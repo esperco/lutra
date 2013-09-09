@@ -1,0 +1,57 @@
+#error {
+  color:red;
+}
+#errorCode {
+  font-size:9pt;
+}
+
+#tabs {
+  border-collapse:collapse;
+}
+#tabs th {
+  border-bottom:1px solid;
+}
+#tabs td {
+  vertical-align:top;
+}
+#queue {
+  border-right:1px solid;
+  padding-right:1em;
+}
+#archive {
+  padding-left:1em;
+}
+
+.buttons {
+  float:right;
+}
+
+.unasked {
+  font-style:italic;
+}
+.choice {
+  margin-left:1em;
+}
+.answer {
+  font-weight:bold;
+  margin-left:1em;
+}
+.unanswered {
+  font-weight:bold;
+  font-style:italic;
+  margin-left:1em;
+}
+
+.comments {
+  margin-left:1em;
+}
+.comments:first-line {
+  font-style:italic;
+}
+.comments div {
+  font-weight:bold;
+}
+
+.quiz {
+  vertical-align:middle;
+}
