@@ -199,24 +199,39 @@ function editViewOfTask(task, reqEdits) {
 }
 
 function updateTaskRequests(task, reqEdits) {
-  var qids = {};
+  var qids_of_task = {}, qids_from_server = {};
   for (var i = task.task_requests.length; --i >=0;) {
-    var qid = task.task_requests[i].rid;
-    if (reqEdits[qid]) {
-      qids[qid] = true;
-    } else {
-      task.task_requests.splice(i, 1);
-      // delete request
+    var q = task.task_requests[i];
+
+    if (q.req_tid && ! reqEdits[q.rid]) {
+        // delete request
+        task.task_requests.splice(i, 1);
+        apiDeleteRequest(q.rid);
+    }
+    else {
+      qids_of_task[q.rid] = true;
+      if (q.req_tid) {
+        qids_from_server[q.rid] = true;
+      }
     }
   }
+
   for (var qid in reqEdits) {
-    var isNew = ! qids[qid];
     var edit = reqEdits[qid];
-    if (edit.updateRequest() || isNew) {
-      // post request
-      if (isNew) {
-        task.task_requests.push(edit.makeRequest());
+
+    var changed = edit.updateRequest();
+
+    if (! qids_from_server[qid]) {
+      var q = edit.makeRequest(task.tid);
+      if (! qids_of_task[qid]) {
+        // add request to task
+        task.task_requests.push(q);
       }
+      // create request
+      apiCreateRequest(task, q);
+    }
+    else if (changed) {
+      // post request
     }
   }
 }
@@ -328,8 +343,8 @@ function EditMessageRequest(qid, qmessage) {
     return changed;
   }
 
-  this.makeRequest = function () {
-    return makeRequest(qid, "Message", {message_q:qmessage});
+  this.makeRequest = function (tid) {
+    return makeRequest(tid, qid, "Message", {message_q:qmessage});
   }
 }
 
@@ -450,8 +465,8 @@ function EditChoicesRequest(qid, qsel) {
     return changed;
   }
 
-  this.makeRequest = function () {
-    return makeRequest(qid, "Selector", {selector_q:qsel});
+  this.makeRequest = function (tid) {
+    return makeRequest(tid, qid, "Selector", {selector_q:qsel});
   }
 
   function editViewOfSelLabel(label) {
@@ -529,16 +544,16 @@ function viewOfNewTaskButton(queueView) {
 function viewOfNewTask(kind, reqEdits) {
   var qid = idForNewRequest();
   var q = 0 == kind
-        ? makeRequest(qid, "Message", {message_q:{msg_text:""}})
-        : makeRequest(qid, "Selector", {selector_q:newSelector(2 == kind)});
+        ? makeRequest(null, qid, "Message", {message_q:{msg_text:""}})
+        : makeRequest(null, qid, "Selector", {selector_q:newSelector(2==kind)});
   var task = {tid:null, task_created:null, task_lastmod:null,
               task_status:{task_open:true, task_summary:null},
               task_requests:[q]};
   return editViewOfTask(task, reqEdits);
 }
 
-function makeRequest(qid, kind, question) {
-  return {rid:qid, req_kind:kind, req_question:question,
+function makeRequest(tid, qid, kind, question) {
+  return {rid:qid, req_tid:tid, req_kind:kind, req_question:question,
           req_status:{req_open:true, req_participants:[]},
           req_responses:[], req_comments:[]};
 }
@@ -573,39 +588,77 @@ function placeView(parent, view) {
 }
 
 // HTTP
-function httpGET(url, cont) {
+function http(method, url, body, error, cont) {
   var http = new XMLHttpRequest();
   http.onreadystatechange = function() {
     if (http.readyState == 4) {
       var statusCode = http.status;
       if (200 <= statusCode && statusCode < 300) {
-        clearError();
+      //clearError();
         cont(http);
       } else {
         reportError("Please try again later.", statusCode);
+        error();
       }
     }
   }
-  http.open("GET", url, true);
-  http.send(null);
+  http.open(method, url, true);
+  http.send(body);
+}
+
+function httpGET(url, cont) {
+  http("GET", url, null, function(){}, cont);
+}
+
+function httpPOST(url, body, cont) {
+  http("POST", url, body, start, cont);
+}
+
+function httpDELETE(url) {
+  http("DELETE", url, null, start, function(http){});
 }
 
 // API
-var test_uid = "PkQYmSe6yhpc8E_pXpmc7Q";
+var test_uid    = "PkUaGeQstJ64Vwz__u01_w";
+var test_teamid = "PlI4tnhhrg3AyCm__a01_w";
 var api_q_prefix = "/api/q/" + test_uid;
 
-function loadTaskQueue(name) {
+function apiLoadTaskQueue(name) {
   httpGET(api_q_prefix + "/" + name, function(http) {
-    var json;
-    eval("json=" + http.responseText);
-
+    var json = JSON.parse(http.responseText);
     placeView(document.getElementById(name), viewOfTaskQueue(json.tasks));
   });
 }
 
+function apiDeleteRequest(qid) {
+  httpDELETE(api_q_prefix + "/request/" + qid);
+}
+
+function apiCreateRequest(task, q) {
+  var qid = q.rid;
+  function cont(http) {
+    var json = JSON.parse(http.responseText);
+    task.tid = json.tid;
+    for (var i in task.task_requests) {
+      var q = task.task_requests[i];
+      if (q.rid == qid) {
+        q.rid     = json.rid;
+        q.req_tid = json.tid;
+        break;
+      }
+    }
+  }
+
+  var url = api_q_prefix + "/request/create/" + test_teamid;
+  if (task.tid) {
+    url += "?tid=" + task.tid;
+  }
+  httpPOST(url, JSON.stringify(q), cont);
+}
+
 function start() {
-  loadTaskQueue("queue");
-  loadTaskQueue("archive");
+  apiLoadTaskQueue("queue");
+  apiLoadTaskQueue("archive");
 }
 
 start();
