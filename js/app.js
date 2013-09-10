@@ -150,6 +150,13 @@ function editViewOfTask(task, reqEdits) {
 
   function remove() {
     view.parentNode.removeChild(view);
+
+    for (var i in task.task_requests) {
+      var q = task.task_requests[i];
+      if (q.req_tid) {
+        apiDeleteRequest(q.rid);
+      }
+    }
   }
   function stopEdit() {
     view.parentNode.replaceChild(viewOfTask(task), view);
@@ -282,8 +289,8 @@ function appendEditViewsOfTaskRequests(taskView, task, taskEdit) {
     makeRequestView(q.rid, edit);
   }
 
-  updateTaskRequestsView();
   taskView.appendChild(view);
+  updateTaskRequestsView();
 
   var requestSelect = selectOfRequestKind();
   var addRequestButton = document.createElement("button");
