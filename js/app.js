@@ -17,7 +17,7 @@ function clearError() {
 function viewOfTaskQueue(tasks) {
   view = document.createElement("div");
   for (var i in tasks) {
-    view.appendChild(viewOfTask(tasks[i]));
+    view.appendChild(viewOfTask(tasks[i].task));
   }
   view.appendChild(viewOfNewTaskButton(view));
   return view;
@@ -631,10 +631,19 @@ function httpDELETE(url) {
 // API
 var api_q_prefix = "/api/q/" + test_ea_uid;
 
-function apiLoadTaskQueue(name) {
-  httpGET(api_q_prefix + "/" + name, function(http) {
+function apiLoadTaskQueue() {
+  httpGET(api_q_prefix + "/queue", function(http) {
     var json = JSON.parse(http.responseText);
-    placeView(document.getElementById(name), viewOfTaskQueue(json.tasks));
+    placeView(document.getElementById("queue"),
+              viewOfTaskQueue(json.queue_elements));
+  });
+}
+
+function apiLoadTaskArchive() {
+  httpGET(api_q_prefix + "/archive", function(http) {
+    var json = JSON.parse(http.responseText);
+    placeView(document.getElementById("archive"),
+              viewOfTaskQueue(json.archive_elements));
   });
 }
 
@@ -676,8 +685,8 @@ function apiPostTask(task, updated_requests) {
 }
 
 function start() {
-  apiLoadTaskQueue("queue");
-  apiLoadTaskQueue("archive");
+  apiLoadTaskQueue();
+  apiLoadTaskArchive();
 }
 
 start();
