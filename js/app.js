@@ -1,3 +1,8 @@
+// test accounts
+var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
+var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
+var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
+
 // error status
 function reportError(msg, statusCode) {
   document.getElementById("errorMsg" ).textContent = msg;
@@ -25,7 +30,8 @@ function viewOfTask(task) {
   var editButton = document.createElement("button");
   editButton.textContent = "Edit";
   editButton.onclick = function() {
-    view.parentNode.replaceChild(editViewOfTask(task, {}), view);
+    view.parentNode.replaceChild(editViewOfTask(task, task.task_requests, {}),
+                                 view);
   }
   var buttons = document.createElement("div");
   buttons.setAttribute("class", "buttons");
@@ -145,7 +151,7 @@ function viewOfAudioComment(audioLink) {
 }
 
 // edit task
-function editViewOfTask(task, reqEdits) {
+function editViewOfTask(task, requests, reqEdits) {
   var view = document.createElement("div");
 
   function remove() {
@@ -153,7 +159,7 @@ function editViewOfTask(task, reqEdits) {
 
     for (var i in task.task_requests) {
       var q = task.task_requests[i];
-      if (q.req_tid) {
+      if (q.rid) {
         apiDeleteRequest(q.rid);
       }
     }
@@ -199,51 +205,49 @@ function editViewOfTask(task, reqEdits) {
   }
 
   var taskEdit = {update:updateTaskView, remove:remove, reqEdits:reqEdits};
-  appendEditViewsOfTaskRequests(view, task, taskEdit);
+  appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
 
   view.appendChild(document.createElement("hr"));
   return view;
 }
 
 function updateTaskRequests(task, reqEdits) {
-  var qids_of_task = {}, qids_from_server = {};
+  var qs = {};
   for (var i = task.task_requests.length; --i >=0;) {
     var q = task.task_requests[i];
-
-    if (q.req_tid && ! reqEdits[q.rid]) {
-        // delete request
+    if (q.rid) {
+      if (reqEdits[q.rid]) {
+        qs[q.rid] = q;
+      } else {
         task.task_requests.splice(i, 1);
         apiDeleteRequest(q.rid);
-    }
-    else {
-      qids_of_task[q.rid] = true;
-      if (q.req_tid) {
-        qids_from_server[q.rid] = true;
       }
     }
   }
 
+  var updated_requests = [];
   for (var qid in reqEdits) {
     var edit = reqEdits[qid];
-
     var changed = edit.updateRequest();
-
-    if (! qids_from_server[qid]) {
-      var q = edit.makeRequest(task.tid);
-      if (! qids_of_task[qid]) {
-        // add request to task
-        task.task_requests.push(q);
-      }
-      // create request
-      apiCreateRequest(task, q);
+    var q = qs[qid];
+    if (! q) {
+      q = edit.makeRequest();
+      task.task_requests.push(q);
+      updated_requests.push(q);
+    } else if (changed) {
+      updated_requests.push(q);
     }
-    else if (changed) {
-      // post request
+  }
+  if (0 < updated_requests.length) {
+    if (task.tid) {
+      apiPostTask(task, updated_requests);
+    } else {
+      apiCreateTask(task, updated_requests);
     }
   }
 }
 
-function appendEditViewsOfTaskRequests(taskView, task, taskEdit) {
+function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   var view = document.createElement("div");
 
   var deleteTaskButton = document.createElement("button");
@@ -281,12 +285,12 @@ function appendEditViewsOfTaskRequests(taskView, task, taskEdit) {
     }
   }
 
-  for (var i in task.task_requests) {
-    var q = task.task_requests[i];
+  for (var i in requests) {
+    var q = requests[i];
     var edit = q.req_kind.toLowerCase() == "message"
              ? new EditMessageRequest(q.rid, q.req_question.message_q)
              : new EditChoicesRequest(q.rid, q.req_question.selector_q);
-    makeRequestView(q.rid, edit);
+    makeRequestView(q.rid ? q.rid : idForNewRequest(), edit);
   }
 
   taskView.appendChild(view);
@@ -297,12 +301,11 @@ function appendEditViewsOfTaskRequests(taskView, task, taskEdit) {
   addRequestButton.textContent = "Add Request";
 
   addRequestButton.onclick = function() {
-    var qid = idForNewRequest();
     var edit = 0 == requestSelect.selectedIndex
-             ? new EditMessageRequest(qid, {msg_text:""})
-             : new EditChoicesRequest(qid, newSelector(
+             ? new EditMessageRequest(null, {msg_text:""})
+             : new EditChoicesRequest(null, newSelector(
                  2 == requestSelect.selectedIndex));
-    makeRequestView(qid, edit);
+    makeRequestView(idForNewRequest(), edit);
     edit.focus();
   }
 
@@ -350,8 +353,8 @@ function EditMessageRequest(qid, qmessage) {
     return changed;
   }
 
-  this.makeRequest = function (tid) {
-    return makeRequest(tid, qid, "Message", {message_q:qmessage});
+  this.makeRequest = function() {
+    return makeRequest(qid, "Message", {message_q:qmessage});
   }
 }
 
@@ -472,8 +475,8 @@ function EditChoicesRequest(qid, qsel) {
     return changed;
   }
 
-  this.makeRequest = function (tid) {
-    return makeRequest(tid, qid, "Selector", {selector_q:qsel});
+  this.makeRequest = function() {
+    return makeRequest(qid, "Selector", {selector_q:qsel});
   }
 
   function editViewOfSelLabel(label) {
@@ -549,18 +552,18 @@ function viewOfNewTaskButton(queueView) {
 }
 
 function viewOfNewTask(kind, reqEdits) {
-  var qid = idForNewRequest();
   var q = 0 == kind
-        ? makeRequest(null, qid, "Message", {message_q:{msg_text:""}})
-        : makeRequest(null, qid, "Selector", {selector_q:newSelector(2==kind)});
-  var task = {tid:null, task_created:null, task_lastmod:null,
+        ? makeRequest(null, "Message", {message_q:{msg_text:""}})
+        : makeRequest(null, "Selector",{selector_q:newSelector(2==kind)});
+  var task = {task_requests:[],
               task_status:{task_open:true, task_summary:null},
-              task_requests:[q]};
-  return editViewOfTask(task, reqEdits);
+              task_participants:{organized_by :[test_ea_uid],
+                                 organized_for:[test_vip_uid]}};
+  return editViewOfTask(task, [q], reqEdits);
 }
 
-function makeRequest(tid, qid, kind, question) {
-  return {rid:qid, req_tid:tid, req_kind:kind, req_question:question,
+function makeRequest(qid, kind, question) {
+  return {rid:qid, req_kind:kind, req_question:question,
           req_status:{req_open:true, req_participants:[]},
           req_responses:[], req_comments:[]};
 }
@@ -626,9 +629,7 @@ function httpDELETE(url) {
 }
 
 // API
-var test_uid    = "PkUaGeQstJ64Vwz__u01_w";
-var test_teamid = "PlI4tnhhrg3AyCm__a01_w";
-var api_q_prefix = "/api/q/" + test_uid;
+var api_q_prefix = "/api/q/" + test_ea_uid;
 
 function apiLoadTaskQueue(name) {
   httpGET(api_q_prefix + "/" + name, function(http) {
@@ -641,26 +642,37 @@ function apiDeleteRequest(qid) {
   httpDELETE(api_q_prefix + "/request/" + qid);
 }
 
-function apiCreateRequest(task, q) {
-  var qid = q.rid;
-  function cont(http) {
+function apiCreateTask(task, updated_requests) {
+  var updated_task = {task_status      : task.task_status,
+                      task_participants: task.task_participants,
+                      task_requests    : updated_requests};
+  httpPOST(api_q_prefix + "/task/create/" + test_teamid,
+           JSON.stringify(updated_task),
+           function(http) {
+    var json = JSON.parse(http.responseText);
+    task.tid               = json.tid;
+    task.task_teamid       = json.task_teamid;
+    task.task_created      = json.task_created;
+    task.task_lastmod      = json.task_lastmod;
+    task.task_status       = json.task_status;
+    task.task_participants = json.task_participants;
+    task.task_requests     = json.task_requests;
+  });
+}
+
+function apiPostTask(task, updated_requests) {
+  var updated_task = {task_status      : task.task_status,
+                      task_participants: task.task_participants,
+                      task_requests    : updated_requests};
+  httpPOST(api_q_prefix + "/task/" + task.tid,
+           JSON.stringify(updated_task),
+           function(http) {
     var json = JSON.parse(http.responseText);
     task.tid = json.tid;
-    for (var i in task.task_requests) {
-      var q = task.task_requests[i];
-      if (q.rid == qid) {
-        q.rid     = json.rid;
-        q.req_tid = json.tid;
-        break;
-      }
+    for (var i in json.rids) {
+      updated_requests[i].rid = json.rids[i];
     }
-  }
-
-  var url = api_q_prefix + "/request/create/" + test_teamid;
-  if (task.tid) {
-    url += "?tid=" + task.tid;
-  }
-  httpPOST(url, JSON.stringify(q), cont);
+  });
 }
 
 function start() {
