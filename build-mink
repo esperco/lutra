@@ -1,0 +1,13 @@
+#! /bin/sh
+set -e
+
+mkdir -p pub/css pub/js pub/html pub/img
+
+# Copy third-party libraries into the pub directory
+cp mink-libs/jquery.min.js pub/js
+cp -a mink-libs/bootstrap/* pub
+
+# Build our own files and copy them into the pub directory
+cp css/*.css pub/css
+cp js/*.js pub/js
+cp html/*.html pub/html
