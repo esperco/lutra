@@ -175,7 +175,7 @@ function editViewOfTask(task, requests, reqEdits) {
   var buttons = document.createElement("div");
   buttons.setAttribute("class", "buttons");
 
-  function updateTaskView(hasRequests) {
+  function updateTaskButtons(hasRequests) {
     if (! task.tid && ! hasRequests) {
       remove();
     }
@@ -204,7 +204,7 @@ function editViewOfTask(task, requests, reqEdits) {
     view.appendChild(viewOfTaskSummary(summary));
   }
 
-  var taskEdit = {update:updateTaskView, remove:remove, reqEdits:reqEdits};
+  var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
   appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
 
   view.appendChild(document.createElement("hr"));
@@ -254,7 +254,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   deleteTaskButton.textContent = "Delete Task";
   deleteTaskButton.onclick = taskEdit.remove;
 
-  function updateTaskRequestsView() {
+  function updateTaskRequestButtons() {
     var hasRequests = view.firstChild;
 
     taskEdit.update(hasRequests);
@@ -281,7 +281,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
     deleteRequestButton.onclick = function() {
       delete taskEdit.reqEdits[qid];
       view.removeChild(requestView);
-      updateTaskRequestsView();
+      updateTaskRequestButtons();
     }
   }
 
@@ -294,7 +294,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   }
 
   taskView.appendChild(view);
-  updateTaskRequestsView();
+  updateTaskRequestButtons();
 
   var requestSelect = selectOfRequestKind();
   var addRequestButton = document.createElement("button");
@@ -306,6 +306,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
              : new EditChoicesRequest(null, newSelector(
                  2 == requestSelect.selectedIndex));
     makeRequestView(idForNewRequest(), edit);
+    updateTaskRequestButtons();
     edit.focus();
   }
 
