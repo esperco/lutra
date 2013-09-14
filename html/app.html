@@ -11,17 +11,24 @@
 
   <body>
     <div id="error">
-      <p id="errorMsg" />
-      <p id="errorCode" />
+      <p id="errorMsg"></p>
+      <p id="errorCode"></p>
     </div>
 
-    <table id="tabs">
-      <tr> <th>Inbox</th> <th>Archive</th> </tr>
-      <tr>
-        <td id="queue"></td>
-        <td id="archive"></td>
-      </tr>
-    </table>
+    <ul class="nav nav-tabs">
+      <li id="queuetab">
+        <a href="#" onclick="showTaskQueue()">
+          Queue
+        </a>
+      </li>
+      <li id="archivetab">
+        <a href="#" onclick="showTaskArchive()">
+          Archive
+        </a>
+      </li>
+    </ul>
+    <div id="queue" class="hide"></div>
+    <div id="archive" class="hide"></div>
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>

@@ -5,23 +5,6 @@
   font-size:9pt;
 }
 
-#tabs {
-  border-collapse:collapse;
-}
-#tabs th {
-  border-bottom:1px solid;
-}
-#tabs td {
-  vertical-align:top;
-}
-#queue {
-  border-right:1px solid;
-  padding-right:1em;
-}
-#archive {
-  padding-left:1em;
-}
-
 .buttons {
   float:right;
 }

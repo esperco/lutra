@@ -685,9 +685,24 @@ function apiPostTask(task, updated_requests) {
   });
 }
 
+function showTaskQueue() {
+  $("#archivetab").removeClass("active");
+  $("#queuetab").addClass("active");
+  $("#archive").addClass("hide");
+  $("#queue").removeClass("hide");
+}
+
+function showTaskArchive() {
+  $("#queuetab").removeClass("active");
+  $("#archivetab").addClass("active");
+  $("#queue").addClass("hide");
+  $("#archive").removeClass("hide");
+}
+
 function start() {
   apiLoadTaskQueue();
   apiLoadTaskArchive();
+  showTaskQueue();
 }
 
 start();
