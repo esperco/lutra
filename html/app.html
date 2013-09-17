@@ -6,29 +6,43 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
     <link href="/assets/css/app.css" rel="stylesheet" media="screen">
   </head>
 
   <body>
-    <div id="error">
-      <p id="errorMsg"></p>
-      <p id="errorCode"></p>
-    </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+<!--
+        <div class="span2">
+        </div>
 
-    <ul class="nav nav-tabs">
-      <li id="queuetab">
-        <a href="#" onclick="showTaskQueue()">
-          Queue
-        </a>
-      </li>
-      <li id="archivetab">
-        <a href="#" onclick="showTaskArchive()">
-          Archive
-        </a>
-      </li>
-    </ul>
-    <div id="queue" class="hide"></div>
-    <div id="archive" class="hide"></div>
+        <div class="span10">
+-->
+        <div class="span12">
+
+          <div id="error">
+            <p id="errorMsg"></p>
+            <p id="errorCode"></p>
+          </div>
+
+          <ul class="nav nav-tabs">
+            <li id="queuetab">
+              <a href="#" onclick="showTaskQueue()">
+                Queue
+              </a>
+            </li>
+            <li id="archivetab">
+              <a href="#" onclick="showTaskArchive()">
+                Archive
+              </a>
+            </li>
+          </ul>
+          <div id="queue" class="hide"></div>
+          <div id="archive" class="hide"></div>
+        </div>
+      </div>
+    </div>
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>

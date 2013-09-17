@@ -1,0 +1,11 @@
+/*
+  This file is for overriding Boostrap's presets.
+  Use with care.
+*/
+
+/* set a max-width for horizontal fluid layout and make it centered */
+.container-fluid {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1000px;
+}
