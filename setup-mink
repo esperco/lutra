@@ -17,3 +17,6 @@ cp jquery-2.0.3.min.js jquery.min.js
 # mink-libs/bootstrap
 rm -rf bootstrap
 unzip bootstrap-2.3.2.zip
+
+# mink-libs/can
+cp can-1.1.7.custom.min.js can.min.js
