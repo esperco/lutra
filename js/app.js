@@ -61,7 +61,7 @@ function viewOfTaskRequests(requests) {
   var view = document.createElement("div");
   for (var i in requests) {
     var q = requests[i];
-    if (q.req_kind.toLowerCase() == "message") {
+    if (q.req_kind.toLowerCase() === "message") {
       view.appendChild(viewOfMessageRequest (q.req_question.message_q));
     } else {
       view.appendChild(viewOfSelectorRequest(q));
@@ -75,7 +75,7 @@ function viewOfTaskRequests(requests) {
 
 function viewOfMessageRequest(q) {
   var view = document.createElement("div");
-  if ("" == q.msg_text) {
+  if ("" === q.msg_text) {
     view.setAttribute("class", "unasked");
     view.textContent = "no message";
   } else {
@@ -89,7 +89,7 @@ function viewOfSelectorRequest(q) {
 
   var question = document.createElement("div");
   question.textContent = q.req_question.selector_q.sel_text;
-  if ("" == question.textContent) {
+  if ("" === question.textContent) {
     question.setAttribute("class", "unasked");
     question.textContent = "no question";
   }
@@ -120,10 +120,10 @@ function viewOfComments(comments) {
   view.textContent = "comments";
   for (var i in comments) {
     var a = comments[i];
-    if ("string" == typeof a.comment_audio) {
+    if ("string" === typeof a.comment_audio) {
       view.appendChild(viewOfAudioComment(a.comment_audio));
     }
-    if ("string" == typeof a.comment_text) {
+    if ("string" === typeof a.comment_text) {
       view.appendChild(viewOfTextComment(a.comment_text));
     }
   }
@@ -260,11 +260,11 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
     taskEdit.update(hasRequests);
 
     if (hasRequests) {
-      if (taskView == deleteTaskButton.parentNode) {
+      if (taskView === deleteTaskButton.parentNode) {
         taskView.removeChild(deleteTaskButton);
       }
     } else {
-      if (taskView != deleteTaskButton.parentNode) {
+      if (taskView !== deleteTaskButton.parentNode) {
         taskView.insertBefore(deleteTaskButton, view);
       }
     }
@@ -287,7 +287,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 
   for (var i in requests) {
     var q = requests[i];
-    var edit = q.req_kind.toLowerCase() == "message"
+    var edit = q.req_kind.toLowerCase() === "message"
              ? new EditMessageRequest(q.rid, q.req_question.message_q)
              : new EditChoicesRequest(q.rid, q.req_question.selector_q);
     makeRequestView(q.rid ? q.rid : idForNewRequest(), edit);
@@ -301,10 +301,10 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   addRequestButton.textContent = "Add Request";
 
   addRequestButton.onclick = function() {
-    var edit = 0 == requestSelect.selectedIndex
+    var edit = 0 === requestSelect.selectedIndex
              ? new EditMessageRequest(null, {msg_text:""})
              : new EditChoicesRequest(null, newSelector(
-                 2 == requestSelect.selectedIndex));
+                 2 === requestSelect.selectedIndex));
     makeRequestView(idForNewRequest(), edit);
     updateTaskRequestButtons();
     edit.focus();
@@ -349,7 +349,7 @@ function EditMessageRequest(qid, qmessage) {
   }
 
   this.updateRequest = function() {
-    var changed = qmessage.msg_text != quizView.value;
+    var changed = qmessage.msg_text !== quizView.value;
     qmessage.msg_text = quizView.value;
     return changed;
   }
@@ -447,16 +447,16 @@ function EditChoicesRequest(qid, qsel) {
   this.updateRequest = function() {
     editStop();
 
-    var changed = qsel.sel_text != quizView.value;
+    var changed = qsel.sel_text !== quizView.value;
     qsel.sel_text = quizView.value;
 
     var old_choices = qsel.sel_choices;
-    changed |= old_choices.length != labelViews.length;
+    changed |= old_choices.length !== labelViews.length;
     qsel.sel_choices = [];
     for (var i in labelViews) {
       var value = labelViews[i].textContent;
       if (! changed) {
-        changed = old_choices[i].sel_label != value;
+        changed = old_choices[i].sel_label !== value;
       }
       qsel.sel_choices.push({sel_label:value});
     }
@@ -467,11 +467,11 @@ function EditChoicesRequest(qid, qsel) {
       if (inputViews[i].checked) {
         var value = labelViews[i].textContent;
         changed |= old_default.length <= qsel.sel_default.length
-                || old_default[qsel.sel_default.length] != value;
+                || old_default[qsel.sel_default.length] !== value;
         qsel.sel_default.push(value);
       }
     }
-    changed |= old_default.length != qsel.sel_default.length;
+    changed |= old_default.length !== qsel.sel_default.length;
 
     return changed;
   }
@@ -490,7 +490,7 @@ function EditChoicesRequest(qid, qsel) {
     }
     view.onkeypress = function(e) {
       var c = e.charCode || e.keyCode;
-      if (13 == c) {
+      if (13 === c) {
         editStop();
         return false;
       }
@@ -507,7 +507,7 @@ function EditChoicesRequest(qid, qsel) {
       editInput = null;
       editLabel = null;
 
-      if ("" == edit.value) {
+      if ("" === edit.value) {
         // Remove the choice.
         var choiceView = edit.parentNode;
         choiceView.parentNode.removeChild(choiceView);
@@ -553,9 +553,9 @@ function viewOfNewTaskButton(queueView) {
 }
 
 function viewOfNewTask(kind, reqEdits) {
-  var q = 0 == kind
+  var q = 0 === kind
         ? makeRequest(null, "Message", {message_q:{msg_text:""}})
-        : makeRequest(null, "Selector",{selector_q:newSelector(2==kind)});
+        : makeRequest(null, "Selector",{selector_q:newSelector(2 === kind)});
   var task = {task_requests:[],
               task_status:{task_open:true, task_summary:null},
               task_participants:{organized_by :[test_ea_uid],
@@ -583,7 +583,7 @@ function idForNewRequest() {
 function chosen(v, vs) {
   v = v.toLowerCase();
   for (var i in vs) {
-    if (v == vs[i].toLowerCase()) {
+    if (v === vs[i].toLowerCase()) {
       return true;
     }
   }
@@ -602,7 +602,7 @@ function placeView(parent, view) {
 function http(method, url, body, error, cont) {
   var http = new XMLHttpRequest();
   http.onreadystatechange = function() {
-    if (http.readyState == 4) {
+    if (http.readyState === 4) {
       var statusCode = http.status;
       if (200 <= statusCode && statusCode < 300) {
       //clearError();
@@ -727,11 +727,11 @@ function unsupportedPath(path) {
 */
 function matchPath(model, path) {
   var args = [];
-  if (path.length != model.length)
+  if (path.length !== model.length)
     return null;
   for (var i in model) {
-    if (model[i] != null) {
-      if (model[i] != path[i])
+    if (model[i] !== null) {
+      if (model[i] !== path[i])
         return null;
     }
     else
