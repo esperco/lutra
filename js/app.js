@@ -699,10 +699,69 @@ function showTaskArchive() {
   $("#archive").removeClass("hide");
 }
 
-function start() {
+/* Different types of pages */
+
+function pageHome() {
   apiLoadTaskQueue();
   apiLoadTaskArchive();
   showTaskQueue();
+}
+
+function pageTask(tid) {
+}
+
+/* URL-based dispatching */
+
+function unsupportedPath(path) {
+  alert("unsupported path: " + path);
+}
+
+/*
+  A model path is given as an array where gaps are indicated by nulls.
+  The subject path must have the same length as the model and must match
+  the model except for the null positions, which are returned
+  as an array of strings extracted from the subject path.
+
+  matchPath(["", "x", null, "y", null], ["", "x", "123", "y", "abc"])
+  -> ["123", "abc"]
+*/
+function matchPath(model, path) {
+  var args = [];
+  if (path.length != model.length)
+    return null;
+  for (var i in model) {
+    if (model[i] != null) {
+      if (model[i] != path[i])
+        return null;
+    }
+    else
+      args.push(path[i]);
+  }
+  return args;
+}
+
+// Change URL and load matching page
+function navigate(path) {
+  var p = path.split('/');
+  var args = [];
+  if (matchPath(["", "app"], p)) {
+    window.history.pushState({}, "Esper", path);
+    pageHome();
+  }
+  else if (args = matchPath(["", "app", "task", null], p)) {
+    var tid = args[0];
+    window.history.pushState({}, "Esper task " + tid, path);
+    pageTask(tid);
+  }
+  else {
+    // Invalid path, redirect to home page
+    window.history.pushState({}, "Esper", "/app");
+    pageHome();
+  }
+}
+
+function start() {
+  navigate(window.location.pathname);
 }
 
 start();
