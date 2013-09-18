@@ -159,19 +159,21 @@ function viewOfTextComment(comment) {
   return view;
 }
 
+// test: http://www.w3schools.com/html/horse.mp3
+// test: http://www.w3schools.com/html/horse.ogg
 function viewOfAudioComment(audioLink) {
-  var play = document.createElement("button");
-  play.setAttribute("class", "btn");
-  play.textContent = "Play";
-  play.onclick = function() {
-    var audio = new Audio();
-    audio.src = audioLink;
-    audio.play();
-  }
+  var source = document.createElement("source");
+  source.setAttribute("src", audioLink);
+  //source.setAttribute("type", "audio/ogg");
+
+  var player = document.createElement("audio");
+  player.setAttribute("controls", "controls");
+  player.textContent = "Your browser doesn't support the audio element.";
+  player.appendChild(source);
 
   var view = document.createElement("div");
   view.setAttribute("class", "comment");
-  view.appendChild(play);
+  view.appendChild(player);
   return view;
 }
 
