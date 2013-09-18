@@ -73,7 +73,7 @@ function viewOfTaskRequests(requests) {
   var view = document.createElement("div");
   for (var i in requests) {
     var q = requests[i];
-    appendRequest = function(node) {
+    function appendRequest(node) {
       node.setAttribute("class", "request");
       view.appendChild(node);
     }
