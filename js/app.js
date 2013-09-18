@@ -3,19 +3,29 @@ var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
 var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
 var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
 
-// error status
-function reportError(msg, statusCode) {
-  document.getElementById("errorMsg" ).textContent = msg;
-  document.getElementById("errorCode").textContent = statusCode;
+function reportStatus(msg, kind) {
+  var e = $("#status");
+  e.text(msg);
+  e.addClass("alert alert-" + kind);
+  e.removeClass("hide");
 }
 
-function clearError() {
-  reportError("", "");
+// error status
+function reportError(msg, statusCode) {
+  reportStatus(msg + " (" + statusCode + ")", "error");
+}
+
+function reportSuccess(msg) {
+  reportStatus(msg, "success");
+}
+
+function clearStatus() {
+  $("#error").addClass("hide");
 }
 
 // task queue view
 function viewOfTaskQueue(tasks) {
-  view = document.createElement("div");
+  var view = document.createElement("div");
   for (var i in tasks) {
     view.appendChild(viewOfTask(tasks[i].task));
   }
@@ -26,15 +36,17 @@ function viewOfTaskQueue(tasks) {
 // display task
 function viewOfTask(task) {
   var view = document.createElement("div");
+  view.setAttribute("class", "task");
 
   var editButton = document.createElement("button");
+  editButton.setAttribute("class", "btn");
   editButton.textContent = "Edit";
   editButton.onclick = function() {
     view.parentNode.replaceChild(editViewOfTask(task, task.task_requests, {}),
                                  view);
   }
   var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons");
+  buttons.setAttribute("class", "buttons rightbox");
   buttons.appendChild(editButton);
   view.appendChild(buttons);
 
@@ -47,12 +59,12 @@ function viewOfTask(task) {
 
   view.appendChild(viewOfTaskRequests(task.task_requests));
 
-  view.appendChild(document.createElement("hr"));
   return view;
 }
 
 function viewOfTaskSummary(summary) {
-  var view = document.createElement("div");
+  var view = document.createElement("h4");
+  view.setAttribute("class", "tasksummary");
   view.textContent = summary;
   return view;
 }
@@ -61,10 +73,14 @@ function viewOfTaskRequests(requests) {
   var view = document.createElement("div");
   for (var i in requests) {
     var q = requests[i];
+    appendRequest = function(node) {
+      node.setAttribute("class", "request");
+      view.appendChild(node);
+    }
     if (q.req_kind.toLowerCase() === "message") {
-      view.appendChild(viewOfMessageRequest (q.req_question.message_q));
+      appendRequest(viewOfMessageRequest (q.req_question.message_q));
     } else {
-      view.appendChild(viewOfSelectorRequest(q));
+      appendRequest(viewOfSelectorRequest(q));
     }
     if (0 < q.req_comments.length) {
       view.appendChild(viewOfComments(q.req_comments));
@@ -76,7 +92,7 @@ function viewOfTaskRequests(requests) {
 function viewOfMessageRequest(q) {
   var view = document.createElement("div");
   if ("" === q.msg_text) {
-    view.setAttribute("class", "unasked");
+    view.setAttribute("class", "requesttitle unasked");
     view.textContent = "no message";
   } else {
     view.textContent = q.msg_text;
@@ -87,12 +103,14 @@ function viewOfMessageRequest(q) {
 function viewOfSelectorRequest(q) {
   var view = document.createElement("div");
 
-  var question = document.createElement("div");
+  var question = document.createElement("h5");
   question.textContent = q.req_question.selector_q.sel_text;
   if ("" === question.textContent) {
     question.setAttribute("class", "unasked");
     question.textContent = "no question";
   }
+  else
+    question.setAttribute("class", "requesttitle");
   view.appendChild(question);
 
   var a = 0 < q.req_responses.length
@@ -115,9 +133,13 @@ function viewOfSelectorRequest(q) {
 }
 
 function viewOfComments(comments) {
-  var view = document.createElement("p");
+  var view = document.createElement("div");
   view.setAttribute("class", "comments");
-  view.textContent = "comments";
+
+  var title = document.createElement("h6");
+  title.textContent = "Comments";
+  view.appendChild(title);
+
   for (var i in comments) {
     var a = comments[i];
     if ("string" === typeof a.comment_audio) {
@@ -132,12 +154,14 @@ function viewOfComments(comments) {
 
 function viewOfTextComment(comment) {
   var view = document.createElement("div");
+  view.setAttribute("class", "comment");
   view.textContent = comment;
   return view;
 }
 
 function viewOfAudioComment(audioLink) {
   var play = document.createElement("button");
+  play.setAttribute("class", "btn");
   play.textContent = "Play";
   play.onclick = function() {
     var audio = new Audio();
@@ -146,6 +170,7 @@ function viewOfAudioComment(audioLink) {
   }
 
   var view = document.createElement("div");
+  view.setAttribute("class", "comment");
   view.appendChild(play);
   return view;
 }
@@ -153,6 +178,7 @@ function viewOfAudioComment(audioLink) {
 // edit task
 function editViewOfTask(task, requests, reqEdits) {
   var view = document.createElement("div");
+  view.setAttribute("class", "task");
 
   function remove() {
     view.parentNode.removeChild(view);
@@ -173,7 +199,7 @@ function editViewOfTask(task, requests, reqEdits) {
   }
 
   var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons");
+  buttons.setAttribute("class", "buttons rightbox");
 
   function updateTaskButtons(hasRequests) {
     if (! task.tid && ! hasRequests) {
@@ -185,11 +211,13 @@ function editViewOfTask(task, requests, reqEdits) {
       }
       if (hasRequests) {
         var saveButton = document.createElement("button");
-        saveButton.textContent = task.tid ? "Save Task" : "Create Task";
+        saveButton.setAttribute("class", "btn");
+        saveButton.textContent = "Save";
         saveButton.onclick = save;
         buttons.appendChild(saveButton);
       }
       var cancelButton = document.createElement("button");
+      cancelButton.setAttribute("class", "btn");
       cancelButton.textContent = "Cancel";
       cancelButton.onclick = task.tid ? stopEdit : remove;
       buttons.appendChild(cancelButton);
@@ -207,7 +235,6 @@ function editViewOfTask(task, requests, reqEdits) {
   var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
   appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
 
-  view.appendChild(document.createElement("hr"));
   return view;
 }
 
@@ -251,6 +278,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   var view = document.createElement("div");
 
   var deleteTaskButton = document.createElement("button");
+  deleteTaskButton.setAttribute("class", "btn");
   deleteTaskButton.textContent = "Delete Task";
   deleteTaskButton.onclick = taskEdit.remove;
 
@@ -272,7 +300,8 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 
   function makeRequestView(qid, edit) {
     var deleteRequestButton = document.createElement("button");
-    deleteRequestButton.textContent = "-";
+    deleteRequestButton.setAttribute("class", "btn");
+    deleteRequestButton.textContent = "Delete request";
 
     taskEdit.reqEdits[qid] = edit;
     var requestView = edit.viewOfRequest(deleteRequestButton);
@@ -298,7 +327,8 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 
   var requestSelect = selectOfRequestKind();
   var addRequestButton = document.createElement("button");
-  addRequestButton.textContent = "Add Request";
+  addRequestButton.setAttribute("class", "btn");
+  addRequestButton.textContent = "Create follow-up request";
 
   addRequestButton.onclick = function() {
     var edit = 0 === requestSelect.selectedIndex
@@ -311,6 +341,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   }
 
   var bbox = document.createElement("p");
+  bbox.setAttribute("class", "buttons rightbox");
   bbox.appendChild(requestSelect);
   bbox.appendChild(addRequestButton);
   taskView.appendChild(bbox);
@@ -335,12 +366,14 @@ function selectOfRequestKind() {
 function EditMessageRequest(qid, qmessage) {
   var quizView = document.createElement("textarea");
   quizView.setAttribute("class", "quiz");
+  quizView.setAttribute("placeholder", "Enter your question or request");
   quizView.textContent = qmessage.msg_text;
 
   this.viewOfRequest = function(deleteRequestButton) {
     var view = document.createElement("div");
-    view.appendChild(deleteRequestButton);
+    view.setAttribute("class", "request buttons");
     view.appendChild(quizView);
+    view.appendChild(deleteRequestButton);
     return view;
   }
 
@@ -406,8 +439,8 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   var addChoiceButton = document.createElement("button");
-  addChoiceButton.setAttribute("class", "choice");
-  addChoiceButton.textContent = "+";
+  addChoiceButton.setAttribute("class", "btn");
+  addChoiceButton.textContent = "New Choice";
   function editNewChoice() {
     var index = addChoice("");
     addChoiceButton.parentNode.insertBefore(viewOfChoice(index),
@@ -418,20 +451,26 @@ function EditChoicesRequest(qid, qsel) {
 
   var quizView = document.createElement("textarea");
   quizView.setAttribute("class", "quiz");
+  quizView.setAttribute("placeholder", "Enter your question or request");
   quizView.textContent = qsel.sel_text;
 
   this.viewOfRequest = function(deleteRequestButton) {
     var view = document.createElement("div");
+    view.setAttribute("class", "request");
 
     var qbox = document.createElement("div");
-    qbox.appendChild(deleteRequestButton);
+    qbox.setAttribute("class", "buttons");
     qbox.appendChild(quizView);
+    qbox.appendChild(deleteRequestButton);
     view.appendChild(qbox);
 
+    var choices = document.createElement("div");
+    choices.setAttribute("class", "choices");
     for (var i in inputViews) {
-      view.appendChild(viewOfChoice(i));
+      choices.appendChild(viewOfChoice(i));
     }
-    view.appendChild(addChoiceButton);
+    choices.appendChild(addChoiceButton);
+    view.appendChild(choices);
 
     return view;
   }
@@ -484,6 +523,7 @@ function EditChoicesRequest(qid, qsel) {
     var view = document.createElement("input");
     view.setAttribute("type", "text");
     view.setAttribute("value", label.textContent);
+    view.setAttribute("placeholder", "Enter a choice");
     view.onblur = function () {
       editStop();
       return true;
@@ -533,10 +573,11 @@ function EditChoicesRequest(qid, qsel) {
 // new task and request
 function viewOfNewTaskButton(queueView) {
   var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons");
+  buttons.setAttribute("class", "buttons rightbox");
 
   var requestSelect = selectOfRequestKind();
   var newTaskButton = document.createElement("button");
+  newTaskButton.setAttribute("class", "btn");
   newTaskButton.textContent = "New Task";
   newTaskButton.onclick = function() {
     var reqEdits = {};
@@ -605,7 +646,7 @@ function http(method, url, body, error, cont) {
     if (http.readyState === 4) {
       var statusCode = http.status;
       if (200 <= statusCode && statusCode < 300) {
-      //clearError();
+        clearStatus();
         cont(http);
       } else {
         reportError("Please try again later.", statusCode);
