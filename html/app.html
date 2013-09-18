@@ -6,25 +6,44 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
     <link href="/assets/css/app.css" rel="stylesheet" media="screen">
   </head>
 
   <body>
-    <div id="error">
-      <p id="errorMsg" />
-      <p id="errorCode" />
-    </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+<!--
+        <div class="span2">
+        </div>
 
-    <table id="tabs">
-      <tr> <th>Inbox</th> <th>Archive</th> </tr>
-      <tr>
-        <td id="queue"></td>
-        <td id="archive"></td>
-      </tr>
-    </table>
+        <div class="span10">
+-->
+        <div class="span12 queuetabarea">
+
+          <div class="hide" id="status"></div>
+
+          <ul class="nav nav-tabs">
+            <li id="queuetab">
+              <a href="#" onclick="showTaskQueue()">
+                Queue
+              </a>
+            </li>
+            <li id="archivetab">
+              <a href="#" onclick="showTaskArchive()">
+                Archive
+              </a>
+            </li>
+          </ul>
+          <div id="queue" class="hide"></div>
+          <div id="archive" class="hide"></div>
+        </div>
+      </div>
+    </div>
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/can.min.js"></script>
     <script src="/assets/js/app.js"></script>
   </body>
 </html>

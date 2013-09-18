@@ -1,57 +1,78 @@
-#error {
-  color:red;
-}
-#errorCode {
-  font-size:9pt;
+.queuetabarea {
+  margin-top: 1em;
+  margin-bottom: 2em;
 }
 
-#tabs {
-  border-collapse:collapse;
-}
-#tabs th {
-  border-bottom:1px solid;
-}
-#tabs td {
-  vertical-align:top;
-}
-#queue {
-  border-right:1px solid;
-  padding-right:1em;
-}
-#archive {
-  padding-left:1em;
+.task {
+  background-color: #f2f2f2;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  padding: 1em;
+  padding-bottom: 3em;
 }
 
-.buttons {
-  float:right;
-}
-
-.unasked {
-  font-style:italic;
-}
-.choice {
-  margin-left:1em;
-}
-.answer {
-  font-weight:bold;
-  margin-left:1em;
-}
-.unanswered {
-  font-weight:bold;
-  font-style:italic;
-  margin-left:1em;
+.request {
+  background-color: #fffefd;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 1em;
 }
 
 .comments {
-  margin-left:1em;
-}
-.comments:first-line {
-  font-style:italic;
-}
-.comments div {
-  font-weight:bold;
+  background-color: #f6f6f6;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-left: 0.3em;
 }
 
-.quiz {
-  vertical-align:middle;
+.comment {
+  background-color: #ffffff;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  padding: 0.2em;
+}
+
+.tasksummary {
+}
+
+.rightbox {
+  float: right;
+}
+
+.requesttitle {
+}
+
+.unasked {
+  font-style: italic;
+}
+
+.choices {
+  margin-top: 0.2em;
+}
+
+.choice {
+  margin-right: 1em;
+}
+
+.answer {
+  font-weight: bold;
+  margin-left: 1em;
+}
+
+.unanswered {
+  font-style: italic;
+  margin-left: 1em;
+}
+
+.buttons > * {
+  vertical-align: top;
+  margin: 0.05em;
+}
+
+/* global override */
+label {
+  display: inline;
+  margin-left: 0.1em;
 }
