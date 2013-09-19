@@ -24,42 +24,61 @@ function clearStatus() {
 }
 
 // task queue view
-function viewOfTaskQueue(tasks) {
+function viewOfTaskQueue(tab, tasks) {
   var view = document.createElement("div");
   for (var i in tasks) {
-    view.appendChild(viewOfTask(tasks[i].task));
+    view.appendChild(viewOfTask(tab, tasks[i].task));
   }
   view.appendChild(viewOfNewTaskButton(view));
   return view;
 }
 
 // display task
-function viewOfTask(task) {
-  var view = document.createElement("div");
-  view.setAttribute("class", "task");
+/*
+  Here we use jQuery for creating elements.
+  jQuery elements wrap around raw DOM elements.
+  The plan is to use jQuery consistently everywhere so that we don't
+  have to write view[0] in order to get the raw element for the view.
+*/
+function viewOfTask(tab, task) {
+  var view = $("<div class='task'></div>");
+  var buttons = $("<div class='buttons rightbox'></div>");
 
-  var editButton = document.createElement("button");
-  editButton.setAttribute("class", "btn");
-  editButton.textContent = "Edit";
-  editButton.onclick = function() {
-    view.parentNode.replaceChild(editViewOfTask(task, task.task_requests, {}),
-                                 view);
+  var archiveButton = $("<button class='btn'></button>");
+  switch (tab) {
+  case "queue":
+    archiveButton.text("Archive")
+      .click(function() {
+        apiQueueRemove(
+          task,
+          function() { view.remove(); });
+      });
+    archiveButton.appendTo(buttons);
+    break;
+  case "archive":
+    /* nothing */
   }
-  var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons rightbox");
-  buttons.appendChild(editButton);
-  view.appendChild(buttons);
+
+  var editButton = $("<button class='btn'>Edit</button>")
+    .click(function() {
+      view.parent()[0].replaceChild(
+        editViewOfTask(tab, task, task.task_requests, {}),
+        view[0]
+      );
+    });
+  editButton.appendTo(buttons);
+  buttons.appendTo(view);
 
   var summary = task.task_status
               ? task.task_status.task_summary
               : null;
   if (summary) {
-    view.appendChild(viewOfTaskSummary(summary));
+    view[0].appendChild(viewOfTaskSummary(summary));
   }
 
-  view.appendChild(viewOfTaskRequests(task.task_requests));
+  view[0].appendChild(viewOfTaskRequests(task.task_requests));
 
-  return view;
+  return view[0];
 }
 
 function viewOfTaskSummary(summary) {
@@ -178,7 +197,7 @@ function viewOfAudioComment(audioLink) {
 }
 
 // edit task
-function editViewOfTask(task, requests, reqEdits) {
+function editViewOfTask(tab, task, requests, reqEdits) {
   var view = document.createElement("div");
   view.setAttribute("class", "task");
 
@@ -193,7 +212,7 @@ function editViewOfTask(task, requests, reqEdits) {
     }
   }
   function stopEdit() {
-    view.parentNode.replaceChild(viewOfTask(task), view);
+    view.parentNode.replaceChild(viewOfTask(tab, task), view);
   }
   function save() {
     updateTaskRequests(task, reqEdits);
@@ -603,7 +622,7 @@ function viewOfNewTask(kind, reqEdits) {
               task_status:{task_open:true, task_summary:null},
               task_participants:{organized_by :[test_ea_uid],
                                  organized_for:[test_vip_uid]}};
-  return editViewOfTask(task, [q], reqEdits);
+  return editViewOfTask(tab, task, [q], reqEdits);
 }
 
 function makeRequest(qid, kind, question) {
@@ -679,7 +698,7 @@ function apiLoadTaskQueue() {
   httpGET(api_q_prefix + "/queue", function(http) {
     var json = JSON.parse(http.responseText);
     placeView(document.getElementById("queue"),
-              viewOfTaskQueue(json.queue_elements));
+              viewOfTaskQueue("queue", json.queue_elements));
   });
 }
 
@@ -687,7 +706,7 @@ function apiLoadTaskArchive() {
   httpGET(api_q_prefix + "/archive", function(http) {
     var json = JSON.parse(http.responseText);
     placeView(document.getElementById("archive"),
-              viewOfTaskQueue(json.archive_elements));
+              viewOfTaskQueue("archive", json.archive_elements));
   });
 }
 
@@ -726,6 +745,13 @@ function apiPostTask(task, updated_requests) {
       updated_requests[i].rid = json.rids[i];
     }
   });
+}
+
+function apiQueueRemove(task, cont) {
+  httpPOST(api_q_prefix + "/queue/" + task.tid + "/remove",
+           "",
+           function(http) { cont(); }
+          );
 }
 
 function showTaskQueue() {
