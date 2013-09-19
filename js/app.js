@@ -31,7 +31,7 @@ function viewOfTaskQueue(tab, tasks) {
   for (var i in tasks) {
     viewOfTask(tab, tasks[i].task).appendTo(view);
   }
-  viewOfNewTaskButton(view).appendTo(view);
+  viewOfNewTaskButton(tab, view).appendTo(view);
   return view;
 }
 
@@ -572,14 +572,14 @@ function EditChoicesRequest(qid, qsel) {
 }
 
 // new task and request
-function viewOfNewTaskButton(queueView) {
+function viewOfNewTaskButton(tab, queueView) {
   var buttons = $("<div class='buttons rightbox'/>");
 
   var requestSelect = selectOfRequestKind();
   var newTaskButton = $("<button class='btn'>New Task</button>")
     .click(function() {
       var reqEdits = {};
-      viewOfNewTask(requestSelect.selectedIndex, reqEdits)
+      viewOfNewTask(tab, requestSelect.selectedIndex, reqEdits)
         .insertBefore(buttons);
       for (var qid in reqEdits) { // actually only one request in the new task
         reqEdits[qid].focus();
@@ -592,7 +592,7 @@ function viewOfNewTaskButton(queueView) {
   return buttons;
 }
 
-function viewOfNewTask(kind, reqEdits) {
+function viewOfNewTask(tab, kind, reqEdits) {
   var q = 0 === kind
         ? makeRequest(null, "Message", {message_q:{msg_text:""}})
         : makeRequest(null, "Selector",{selector_q:newSelector(2 === kind)});
