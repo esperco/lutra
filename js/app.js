@@ -351,10 +351,10 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   var addRequestButton =
     $("<button class='btn'>Create follow-up request</button>")
     .click(function() {
-      var selectedIndex = requestSelect.val();
-      var edit = 0 === selectedIndex ?
-        new EditMessageRequest(null, {msg_text:""})
-      : new EditChoicesRequest(null, newSelector(2 === selectedIndex));
+      var kind = requestSelect.val();
+      var edit = "message" === kind
+      ? new EditMessageRequest(null, {msg_text:""})
+      : new EditChoicesRequest(null, newSelector("multiple" === kind));
       makeRequestView(idForNewRequest(), edit);
       updateTaskRequestButtons();
       edit.focus();
@@ -367,17 +367,17 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 }
 
 function selectOfRequestKind() {
-  var select = $("<select/>");
-  //select.size = 1; // what was this for?
+  var select = $("<select size=1/>");
 
-  var kinds = ["message", "single choice", "multiple choices"];
-  for (var i in kinds) {
+  var kindLabels = ["message", "single choice", "multiple choices"];
+  var kindValues = ["message", "single", "multiple"];
+  for (var i in kindValues) {
     var option = $("<option/>")
-      .attr("value", kinds[i])
-      .text(kinds[i]);
+      .attr("value", kindValues[i])
+      .text(kindLabels[i]);
     option.appendTo(select);
   }
-  select.children(1).attr("selected", "selected");
+  select.val(kindValues[1]);
 
   return select;
 }
@@ -589,7 +589,7 @@ function viewOfNewTaskButton(tab, queueView) {
   var newTaskButton = $("<button class='btn'>New Task</button>")
     .click(function() {
       var reqEdits = {};
-      viewOfNewTask(tab, requestSelect.selectedIndex, reqEdits)
+      viewOfNewTask(tab, requestSelect.val(), reqEdits)
         .insertBefore(buttons);
       for (var qid in reqEdits) { // actually only one request in the new task
         reqEdits[qid].focus();
@@ -603,9 +603,9 @@ function viewOfNewTaskButton(tab, queueView) {
 }
 
 function viewOfNewTask(tab, kind, reqEdits) {
-  var q = 0 === kind
+  var q = "message" === kind
         ? makeRequest(null, "Message", {message_q:{msg_text:""}})
-        : makeRequest(null, "Selector",{selector_q:newSelector(2 === kind)});
+        : makeRequest(null, "Selector",{selector_q:newSelector("multiple" === kind)});
   var task = {task_requests:[],
               task_status:{task_open:true, task_summary:null},
               task_participants:{organized_by :[test_ea_uid],
