@@ -3,20 +3,32 @@ var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
 var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
 var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
 
-function reportStatus(msg, kind) {
-  var e = $("#status");
-  e.text(msg);
-  e.addClass("alert alert-" + kind);
-  e.removeClass("hide");
+function log(x) {
+  console.log(
+    (typeof x === "String") ? x
+      : JSON.stringify(x, undefined, 2)
+  );
+}
+
+function reportStatus(msg, kind, details) {
+  $("#status")
+    .text(msg)
+    .addClass("alert alert-" + kind)
+    .removeClass("hide");
+  log({
+    status: msg,
+    kind: kind,
+    details: details
+  });
 }
 
 // error status
-function reportError(msg, statusCode) {
-  reportStatus(msg + " (" + statusCode + ")", "error");
+function reportError(msg, details) {
+  reportStatus(msg, "error", details);
 }
 
 function reportSuccess(msg) {
-  reportStatus(msg, "success");
+  reportStatus(msg, "success", {});
 }
 
 function clearStatus() {
@@ -25,21 +37,15 @@ function clearStatus() {
 
 // task queue view
 function viewOfTaskQueue(tab, tasks) {
-  var view = document.createElement("div");
+  var view = $("<div/>");
   for (var i in tasks) {
-    view.appendChild(viewOfTask(tab, tasks[i].task));
+    viewOfTask(tab, tasks[i].task).appendTo(view);
   }
-  view.appendChild(viewOfNewTaskButton(view));
+  viewOfNewTaskButton(tab, view).appendTo(view);
   return view;
 }
 
 // display task
-/*
-  Here we use jQuery for creating elements.
-  jQuery elements wrap around raw DOM elements.
-  The plan is to use jQuery consistently everywhere so that we don't
-  have to write view[0] in order to get the raw element for the view.
-*/
 function viewOfTask(tab, task) {
   var view = $("<div class='task'></div>");
   var buttons = $("<div class='buttons rightbox'></div>");
@@ -61,10 +67,8 @@ function viewOfTask(tab, task) {
 
   var editButton = $("<button class='btn'>Edit</button>")
     .click(function() {
-      view.parent()[0].replaceChild(
-        editViewOfTask(tab, task, task.task_requests, {}),
-        view[0]
-      );
+      editViewOfTask(tab, task, task.task_requests, {})
+        .replaceAll(view);
     });
   editButton.appendTo(buttons);
   buttons.appendTo(view);
@@ -73,28 +77,29 @@ function viewOfTask(tab, task) {
               ? task.task_status.task_summary
               : null;
   if (summary) {
-    view[0].appendChild(viewOfTaskSummary(summary));
+    viewOfTaskSummary(summary)
+      .appendTo(view);
   }
 
-  view[0].appendChild(viewOfTaskRequests(task.task_requests));
+  viewOfTaskRequests(task.task_requests)
+    .appendTo(view);
 
-  return view[0];
-}
-
-function viewOfTaskSummary(summary) {
-  var view = document.createElement("h4");
-  view.setAttribute("class", "tasksummary");
-  view.textContent = summary;
   return view;
 }
 
+function viewOfTaskSummary(summary) {
+  return $("<h4 class='tasksummary'/>")
+    .text(summary);
+}
+
 function viewOfTaskRequests(requests) {
-  var view = document.createElement("div");
+  var view = $("<div/>");
   for (var i in requests) {
     var q = requests[i];
     function appendRequest(node) {
-      node.setAttribute("class", "request");
-      view.appendChild(node);
+      node
+        .addClass("request")
+        .appendTo(view);
     }
     if (q.req_kind.toLowerCase() === "message") {
       appendRequest(viewOfMessageRequest (q.req_question.message_q));
@@ -102,107 +107,111 @@ function viewOfTaskRequests(requests) {
       appendRequest(viewOfSelectorRequest(q));
     }
     if (0 < q.req_comments.length) {
-      view.appendChild(viewOfComments(q.req_comments));
+      viewOfComments(q.req_comments).appendTo(view);
     }
   }
   return view;
 }
 
 function viewOfMessageRequest(q) {
-  var view = document.createElement("div");
+  var view = $("<div/>");
   if ("" === q.msg_text) {
-    view.setAttribute("class", "requesttitle unasked");
-    view.textContent = "no message";
+    view
+      .addClass("requesttitle unasked")
+      .text("no message");
   } else {
-    view.textContent = q.msg_text;
+    view.text(q.msg_text);
   }
   return view;
 }
 
 function viewOfSelectorRequest(q) {
-  var view = document.createElement("div");
+  var view = $("<div/>");
 
-  var question = document.createElement("h5");
-  question.textContent = q.req_question.selector_q.sel_text;
-  if ("" === question.textContent) {
-    question.setAttribute("class", "unasked");
-    question.textContent = "no question";
+  var question = $("<h5/>")
+    .text(q.req_question.selector_q.sel_text);
+
+  if ("" === question.text()) {
+    question
+      .addClass("unasked")
+      .text("no question");
   }
   else
-    question.setAttribute("class", "requesttitle");
-  view.appendChild(question);
+    question.addClass("requesttitle");
+  question.appendTo(view);
 
   var a = 0 < q.req_responses.length
         ? q.req_responses[0].response.selector_r : null;
   if (a) {
     for (var i in a.sel_selected) {
-      var choiceView = document.createElement("span");
-      choiceView.setAttribute("class", "answer");
-      choiceView.textContent = a.sel_selected[i];
-      view.appendChild(choiceView);
+      $("<span class='answer'/>")
+        .text(a.sel_selected[i])
+        .appendTo(view);
     }
   } else {
-    var unanswered = document.createElement("span");
-    unanswered.setAttribute("class", "unanswered");
-    unanswered.textContent = "no answer";
-    view.appendChild(unanswered);
+    $("<span class='unanswered'/>")
+      .text("no answer")
+      .appendTo(view);
   }
 
   return view;
 }
 
 function viewOfComments(comments) {
-  var view = document.createElement("div");
-  view.setAttribute("class", "comments");
+  var view = $("<div class='comments'/>");
 
-  var title = document.createElement("h6");
-  title.textContent = "Comments";
-  view.appendChild(title);
+  var title = $("<h6/>")
+    .text("Comments")
+    .appendTo(view);
 
   for (var i in comments) {
     var a = comments[i];
     if ("string" === typeof a.comment_audio) {
-      view.appendChild(viewOfAudioComment(a.comment_audio));
+      viewOfAudioComment(a.comment_audio)
+        .appendTo(view);
     }
     if ("string" === typeof a.comment_text) {
-      view.appendChild(viewOfTextComment(a.comment_text));
+      viewOfTextComment(a.comment_text)
+        .appendTo(view);
     }
   }
   return view;
 }
 
 function viewOfTextComment(comment) {
-  var view = document.createElement("div");
-  view.setAttribute("class", "comment");
-  view.textContent = comment;
-  return view;
+  return $("<div class='comment'/>")
+    .text(comment);
 }
 
-// test: http://www.w3schools.com/html/horse.mp3
-// test: http://www.w3schools.com/html/horse.ogg
+/*
+  TODO: for wider browser support we should offer both an mp3 and an ogg
+  version of each audio recording.
+  Sample sounds for testing:
+  http://www.w3schools.com/html/horse.mp3
+  http://www.w3schools.com/html/horse.ogg
+*/
 function viewOfAudioComment(audioLink) {
-  var source = document.createElement("source");
-  source.setAttribute("src", audioLink);
-  //source.setAttribute("type", "audio/ogg");
+  var view = $("<div class='comment'/>");
 
-  var player = document.createElement("audio");
-  player.setAttribute("controls", "controls");
-  player.textContent = "Your browser doesn't support the audio element.";
-  player.appendChild(source);
+  var player = $("<audio/>")
+    .prop("controls", true)
+    .text("Your browser doesn't support the audio element.")
+    .appendTo(view);
 
-  var view = document.createElement("div");
-  view.setAttribute("class", "comment");
-  view.appendChild(player);
+  var source = $("<source/>")
+    .attr("src", audioLink)
+  //.attr("type", "audio/ogg")
+    .appendTo(player);
+
   return view;
 }
 
 // edit task
 function editViewOfTask(tab, task, requests, reqEdits) {
-  var view = document.createElement("div");
-  view.setAttribute("class", "task");
+  var view = $("<div class='task'/>");
 
   function remove() {
-    view.parentNode.removeChild(view);
+    view.remove();
 
     for (var i in task.task_requests) {
       var q = task.task_requests[i];
@@ -212,45 +221,40 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     }
   }
   function stopEdit() {
-    view.parentNode.replaceChild(viewOfTask(tab, task), view);
+    viewOfTask(tab, task)
+      .replaceAll(view);
   }
   function save() {
     updateTaskRequests(task, reqEdits);
     stopEdit();
   }
 
-  var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons rightbox");
+  var buttons = $("<div class='buttons rightbox'/>")
+    .appendTo(view);
 
   function updateTaskButtons(hasRequests) {
     if (! task.tid && ! hasRequests) {
       remove();
     }
     else {
-      while (buttons.firstChild) {
-        buttons.removeChild(buttons.firstChild);
-      }
+      buttons.children().remove();
       if (hasRequests) {
-        var saveButton = document.createElement("button");
-        saveButton.setAttribute("class", "btn");
-        saveButton.textContent = "Save";
-        saveButton.onclick = save;
-        buttons.appendChild(saveButton);
+        $("<button class='btn'>Save</button>")
+          .click(save)
+          .appendTo(buttons);
       }
-      var cancelButton = document.createElement("button");
-      cancelButton.setAttribute("class", "btn");
-      cancelButton.textContent = "Cancel";
-      cancelButton.onclick = task.tid ? stopEdit : remove;
-      buttons.appendChild(cancelButton);
+      $("<button class='btn'>Cancel</button>")
+        .click(task.tid ? stopEdit : remove)
+        .appendTo(buttons);
     }
   }
 
-  view.appendChild(buttons);
   var summary = task.task_status
               ? task.task_status.task_summary
               : null;
   if (summary) {
-    view.appendChild(viewOfTaskSummary(summary));
+    viewOfTaskSummary(summary)
+      .appendTo(view);
   }
 
   var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
@@ -296,43 +300,40 @@ function updateTaskRequests(task, reqEdits) {
 }
 
 function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
-  var view = document.createElement("div");
+  var view = $("<div/>");
 
-  var deleteTaskButton = document.createElement("button");
-  deleteTaskButton.setAttribute("class", "btn");
-  deleteTaskButton.textContent = "Delete Task";
-  deleteTaskButton.onclick = taskEdit.remove;
+  var deleteTaskButton = $("<button class='btn'>Delete Task</button>")
+    .click(taskEdit.remove);
 
   function updateTaskRequestButtons() {
-    var hasRequests = view.firstChild;
+    var hasRequests = view.children(0);
 
     taskEdit.update(hasRequests);
 
     if (hasRequests) {
-      if (taskView === deleteTaskButton.parentNode) {
-        taskView.removeChild(deleteTaskButton);
+      if (taskView === deleteTaskButton.parent()) {
+        deleteTaskButton.remove();
       }
     } else {
-      if (taskView !== deleteTaskButton.parentNode) {
-        taskView.insertBefore(deleteTaskButton, view);
+      if (taskView !== deleteTaskButton.parent()) {
+        taskView.insertBefore(deleteTaskButton);
       }
     }
   }
 
   function makeRequestView(qid, edit) {
-    var deleteRequestButton = document.createElement("button");
-    deleteRequestButton.setAttribute("class", "btn");
-    deleteRequestButton.textContent = "Delete request";
+    var deleteRequestButton = $("<button class='btn'>Delete request</button>");
 
     taskEdit.reqEdits[qid] = edit;
-    var requestView = edit.viewOfRequest(deleteRequestButton);
-    view.appendChild(requestView);
+    var requestView = edit.viewOfRequest(deleteRequestButton)
+      .appendTo(view);
 
-    deleteRequestButton.onclick = function() {
-      delete taskEdit.reqEdits[qid];
-      view.removeChild(requestView);
-      updateTaskRequestButtons();
-    }
+    deleteRequestButton
+      .click(function() {
+        delete taskEdit.reqEdits[qid];
+        requestView.remove();
+        updateTaskRequestButtons();
+      });
   }
 
   for (var i in requests) {
@@ -343,58 +344,53 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
     makeRequestView(q.rid ? q.rid : idForNewRequest(), edit);
   }
 
-  taskView.appendChild(view);
+  view.appendTo(taskView);
   updateTaskRequestButtons();
 
   var requestSelect = selectOfRequestKind();
-  var addRequestButton = document.createElement("button");
-  addRequestButton.setAttribute("class", "btn");
-  addRequestButton.textContent = "Create follow-up request";
+  var addRequestButton =
+    $("<button class='btn'>Create follow-up request</button>")
+    .click(function() {
+      var selectedIndex = requestSelect.val();
+      var edit = 0 === selectedIndex ?
+        new EditMessageRequest(null, {msg_text:""})
+      : new EditChoicesRequest(null, newSelector(2 === selectedIndex));
+      makeRequestView(idForNewRequest(), edit);
+      updateTaskRequestButtons();
+      edit.focus();
+    });
 
-  addRequestButton.onclick = function() {
-    var edit = 0 === requestSelect.selectedIndex
-             ? new EditMessageRequest(null, {msg_text:""})
-             : new EditChoicesRequest(null, newSelector(
-                 2 === requestSelect.selectedIndex));
-    makeRequestView(idForNewRequest(), edit);
-    updateTaskRequestButtons();
-    edit.focus();
-  }
-
-  var bbox = document.createElement("p");
-  bbox.setAttribute("class", "buttons rightbox");
-  bbox.appendChild(requestSelect);
-  bbox.appendChild(addRequestButton);
-  taskView.appendChild(bbox);
+  var bbox = $("<p class='buttons rightbox'/>");
+  requestSelect.appendTo(bbox);
+  addRequestButton.appendTo(bbox);
+  bbox.appendTo(taskView);
 }
 
 function selectOfRequestKind() {
-  var select = document.createElement("select");
-  select.size = 1;
+  var select = $("<select/>");
+  //select.size = 1; // what was this for?
 
   var kinds = ["message", "single choice", "multiple choices"];
   for (var i in kinds) {
-    var option = document.createElement("option");
-    option.setAttribute("value", kinds[i]);
-    option.textContent = kinds[i];
-    select.add(option);
+    var option = $("<option/>")
+      .attr("value", kinds[i])
+      .text(kinds[i]);
+    option.appendTo(select);
   }
-  select.selectedIndex = 1;
+  select.children(1).attr("selected", "selected");
 
   return select;
 }
 
 function EditMessageRequest(qid, qmessage) {
-  var quizView = document.createElement("textarea");
-  quizView.setAttribute("class", "quiz");
-  quizView.setAttribute("placeholder", "Enter your question or request");
-  quizView.textContent = qmessage.msg_text;
+  var quizView = $("<textarea class='quiz'/>")
+    .attr("placeholder", "Enter your question or request")
+    .text(qmessage.msg_text);
 
   this.viewOfRequest = function(deleteRequestButton) {
-    var view = document.createElement("div");
-    view.setAttribute("class", "request buttons");
-    view.appendChild(quizView);
-    view.appendChild(deleteRequestButton);
+    var view = $("<div class='request buttons'/>");
+    quizView.appendTo(view);
+    deleteRequestButton.appendTo(view);
     return view;
   }
 
@@ -403,8 +399,8 @@ function EditMessageRequest(qid, qmessage) {
   }
 
   this.updateRequest = function() {
-    var changed = qmessage.msg_text !== quizView.value;
-    qmessage.msg_text = quizView.value;
+    var changed = qmessage.msg_text !== quizView.val();
+    qmessage.msg_text = quizView.val();
     return changed;
   }
 
@@ -420,14 +416,13 @@ function EditChoicesRequest(qid, qsel) {
   var labelViews = [];
 
   function viewOfSelLabel(forID, value) {
-    var view = document.createElement("label");
-    view.setAttribute("for", forID);
-    view.textContent = value;
-    view.onclick = function() {
-      editStart(view);
-      return false;
-    }
-    return view;
+    return $("<label/>")
+      .attr("for", forID)
+      .text(value)
+      .click(function() {
+        editStart(view);
+        return false;
+      });
   }
 
   var qname = "sel-" + qid;
@@ -435,11 +430,11 @@ function EditChoicesRequest(qid, qsel) {
     var index = inputViews.length;
     var choiceID = qname + "-" + index;
 
-    var inp = document.createElement("input");
-    inp.setAttribute("id", choiceID);
-    inp.setAttribute("name", qname);
-    inp.setAttribute("type", qsel.sel_multi ? "checkbox" : "radio");
-    inp.checked = chosen(choiceValue, qsel.sel_default);
+    var inp = $("<input/>")
+      .attr("id", choiceID)
+      .attr("name", qname)
+      .attr("type", qsel.sel_multi ? "checkbox" : "radio")
+      .prop("checked", chosen(choiceValue, qsel.sel_default));
 
     inputViews.push(inp);
     labelViews.push(viewOfSelLabel(choiceID, choiceValue));
@@ -452,46 +447,40 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   function viewOfChoice(index) {
-    var view = document.createElement("span");
-    view.setAttribute("class", "choice");
-    view.appendChild(inputViews[index]);
-    view.appendChild(labelViews[index]);
+    var view = $("<span class='choice'/>");
+    inputViews[index].appendTo(view);
+    labelViews[index].appendTo(view);
     return view;
   }
 
-  var addChoiceButton = document.createElement("button");
-  addChoiceButton.setAttribute("class", "btn");
-  addChoiceButton.textContent = "New Choice";
+  var addChoiceButton = $("<button class='btn'>New Choice</button>");
   function editNewChoice() {
     var index = addChoice("");
-    addChoiceButton.parentNode.insertBefore(viewOfChoice(index),
-        addChoiceButton);
+    viewOfChoice(index)
+      .insertBefore(addChoiceButton);
     editStart(labelViews[index]);
   }
-  addChoiceButton.onclick = editNewChoice;
+  addChoiceButton.click(editNewChoice);
 
-  var quizView = document.createElement("textarea");
-  quizView.setAttribute("class", "quiz");
-  quizView.setAttribute("placeholder", "Enter your question or request");
-  quizView.textContent = qsel.sel_text;
+  var quizView = $("<textarea class='quiz'/>")
+    .attr("placeholder", "Enter your question or request")
+    .text(qsel.sel_text);
 
   this.viewOfRequest = function(deleteRequestButton) {
-    var view = document.createElement("div");
-    view.setAttribute("class", "request");
+    var view = $("<div class='request'/>");
 
-    var qbox = document.createElement("div");
-    qbox.setAttribute("class", "buttons");
-    qbox.appendChild(quizView);
-    qbox.appendChild(deleteRequestButton);
-    view.appendChild(qbox);
+    var qbox = $("<div class='buttons'/>");
+    quizView.appendTo(qbox);
+    deleteRequestButton.appendTo(qbox);
+    qbox.appendTo(view);
 
-    var choices = document.createElement("div");
-    choices.setAttribute("class", "choices");
+    var choices = $("<div class='choices'/>");
     for (var i in inputViews) {
-      choices.appendChild(viewOfChoice(i));
+      viewOfChoice(i)
+        .appendTo(choices);
     }
-    choices.appendChild(addChoiceButton);
-    view.appendChild(choices);
+    addChoiceButton.appendTo(choices);
+    choices.appendTo(view);
 
     return view;
   }
@@ -508,13 +497,13 @@ function EditChoicesRequest(qid, qsel) {
     editStop();
 
     var changed = qsel.sel_text !== quizView.value;
-    qsel.sel_text = quizView.value;
+    qsel.sel_text = quizView.val();
 
     var old_choices = qsel.sel_choices;
     changed |= old_choices.length !== labelViews.length;
     qsel.sel_choices = [];
     for (var i in labelViews) {
-      var value = labelViews[i].textContent;
+      var value = labelViews[i].text();
       if (! changed) {
         changed = old_choices[i].sel_label !== value;
       }
@@ -524,8 +513,8 @@ function EditChoicesRequest(qid, qsel) {
     var old_default = qsel.sel_default;
     qsel.sel_default = [];
     for (var i in inputViews) {
-      if (inputViews[i].checked) {
-        var value = labelViews[i].textContent;
+      if (inputViews[i].prop("checked")) {
+        var value = labelViews[i].text();
         changed |= old_default.length <= qsel.sel_default.length
                 || old_default[qsel.sel_default.length] !== value;
         qsel.sel_default.push(value);
@@ -541,22 +530,22 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   function editViewOfSelLabel(label) {
-    var view = document.createElement("input");
-    view.setAttribute("type", "text");
-    view.setAttribute("value", label.textContent);
-    view.setAttribute("placeholder", "Enter a choice");
-    view.onblur = function () {
-      editStop();
-      return true;
-    }
-    view.onkeypress = function(e) {
-      var c = e.charCode || e.keyCode;
-      if (13 === c) {
+    var view = $("<input/>")
+      .attr("type", "text")
+      .attr("value", label.textContent)
+      .attr("placeholder", "Enter a choice")
+      .blur(function () {
         editStop();
-        return false;
-      }
-      return true;
-    }
+        return true;
+      })
+      .keypress(function(e) {
+        var c = e.charCode || e.keyCode;
+        if (13 === c) {
+          editStop();
+          return false;
+        }
+        return true;
+      });
     return view;
   }
 
@@ -568,23 +557,24 @@ function EditChoicesRequest(qid, qsel) {
       editInput = null;
       editLabel = null;
 
-      if ("" === edit.value) {
+      if ("" === edit.val()) {
         // Remove the choice.
-        var choiceView = edit.parentNode;
-        choiceView.parentNode.removeChild(choiceView);
+        var choiceView = edit.parent();
+        choiceView.remove();
         var pos = labelViews.indexOf(label);
         labelViews.splice(pos, 1);
         inputViews.splice(pos, 1);
       } else {
-        label.textContent = edit.value;
-        edit.parentNode.replaceChild(label, edit);
+        label
+          .text(edit.val())
+          .replaceAll(edit);
       }
     }
   }
   editStart = function(label) {
-    var edit = editViewOfSelLabel(label);
-    label.parentNode.replaceChild(edit, label);
-    edit.focus();
+    var edit = editViewOfSelLabel(label)
+      .replaceAll(label)
+      .focus();
 
     editInput = edit;
     editLabel = label;
@@ -592,29 +582,27 @@ function EditChoicesRequest(qid, qsel) {
 }
 
 // new task and request
-function viewOfNewTaskButton(queueView) {
-  var buttons = document.createElement("div");
-  buttons.setAttribute("class", "buttons rightbox");
+function viewOfNewTaskButton(tab, queueView) {
+  var buttons = $("<div class='buttons rightbox'/>");
 
   var requestSelect = selectOfRequestKind();
-  var newTaskButton = document.createElement("button");
-  newTaskButton.setAttribute("class", "btn");
-  newTaskButton.textContent = "New Task";
-  newTaskButton.onclick = function() {
-    var reqEdits = {};
-    queueView.insertBefore(viewOfNewTask(requestSelect.selectedIndex, reqEdits),
-                           buttons);
-    for (var qid in reqEdits) { // actually only one request in the new task
-      reqEdits[qid].focus();
-    }
-  }
+  var newTaskButton = $("<button class='btn'>New Task</button>")
+    .click(function() {
+      var reqEdits = {};
+      viewOfNewTask(tab, requestSelect.selectedIndex, reqEdits)
+        .insertBefore(buttons);
+      for (var qid in reqEdits) { // actually only one request in the new task
+        reqEdits[qid].focus();
+        break;
+      }
+    });
 
-  buttons.appendChild(requestSelect);
-  buttons.appendChild(newTaskButton);
+  requestSelect.appendTo(buttons);
+  newTaskButton.appendTo(buttons);
   return buttons;
 }
 
-function viewOfNewTask(kind, reqEdits) {
+function viewOfNewTask(tab, kind, reqEdits) {
   var q = 0 === kind
         ? makeRequest(null, "Message", {message_q:{msg_text:""}})
         : makeRequest(null, "Selector",{selector_q:newSelector(2 === kind)});
@@ -653,11 +641,8 @@ function chosen(v, vs) {
 }
 
 function placeView(parent, view) {
-  if (parent.firstChild) {
-    parent.replaceChild(view, parent.firstChild);
-  } else {
-    parent.appendChild(view);
-  }
+  parent.children().remove();
+  view.appendTo(parent);
 }
 
 // HTTP
@@ -670,7 +655,14 @@ function http(method, url, body, error, cont) {
         clearStatus();
         cont(http);
       } else {
-        reportError("Please try again later.", statusCode);
+        var details = {
+          code: statusCode.toString(),
+          method: method,
+          url: url,
+          reqBody: body,
+          respBody: http.responseText
+        };
+        reportError("Please try again later.", details);
         error();
       }
     }
@@ -697,7 +689,7 @@ var api_q_prefix = "/api/q/" + test_ea_uid;
 function apiLoadTaskQueue() {
   httpGET(api_q_prefix + "/queue", function(http) {
     var json = JSON.parse(http.responseText);
-    placeView(document.getElementById("queue"),
+    placeView($("#queue"),
               viewOfTaskQueue("queue", json.queue_elements));
   });
 }
@@ -705,7 +697,7 @@ function apiLoadTaskQueue() {
 function apiLoadTaskArchive() {
   httpGET(api_q_prefix + "/archive", function(http) {
     var json = JSON.parse(http.responseText);
-    placeView(document.getElementById("archive"),
+    placeView($("#archive"),
               viewOfTaskQueue("archive", json.archive_elements));
   });
 }
@@ -739,12 +731,13 @@ function apiPostTask(task, updated_requests) {
   httpPOST(api_q_prefix + "/task/" + task.tid,
            JSON.stringify(updated_task),
            function(http) {
-    var json = JSON.parse(http.responseText);
-    task.tid = json.tid;
-    for (var i in json.rids) {
-      updated_requests[i].rid = json.rids[i];
-    }
-  });
+             var json = JSON.parse(http.responseText);
+             task.tid = json.tid;
+             log(["updated_requests", updated_requests]);
+             for (var i in json.rids) {
+               updated_requests[i].rid = json.rids[i];
+             }
+           });
 }
 
 function apiQueueRemove(task, cont) {
