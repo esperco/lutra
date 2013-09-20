@@ -3,13 +3,23 @@ var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
 var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
 var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
 
+function log(x) {
+  console.log(
+    (typeof x === "String") ? x
+      : JSON.stringify(x, undefined, 2)
+  );
+}
+
 function reportStatus(msg, kind, details) {
   $("#status")
     .text(msg)
     .addClass("alert alert-" + kind)
     .removeClass("hide");
-  $("#hidden-status")
-    .text(JSON.stringify(details));
+  log({
+    status: msg,
+    kind: kind,
+    details: details
+  });
 }
 
 // error status
@@ -721,12 +731,13 @@ function apiPostTask(task, updated_requests) {
   httpPOST(api_q_prefix + "/task/" + task.tid,
            JSON.stringify(updated_task),
            function(http) {
-    var json = JSON.parse(http.responseText);
-    task.tid = json.tid;
-    for (var i in json.rids) {
-      updated_requests[i].rid = json.rids[i];
-    }
-  });
+             var json = JSON.parse(http.responseText);
+             task.tid = json.tid;
+             log(["updated_requests", updated_requests]);
+             for (var i in json.rids) {
+               updated_requests[i].rid = json.rids[i];
+             }
+           });
 }
 
 function apiQueueRemove(task, cont) {
