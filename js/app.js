@@ -754,6 +754,11 @@ function showTaskQueue() {
   $("#queue").removeClass("hide");
 }
 
+function apiLogin(email, password, onSuccess) {
+  // TODO call the login api
+  onSuccess();
+}
+
 function showTaskArchive() {
   $("#queuetab").removeClass("active");
   $("#archivetab").addClass("active");
@@ -761,15 +766,41 @@ function showTaskArchive() {
   $("#archive").removeClass("hide");
 }
 
+// Login screen
+function showLogin(redirPath) {
+  $("#login-button")
+    .click(function() {
+      function onSuccess() { navigate(redirPath); }
+      var email = $("#login-email").val();
+      var password = $("#login-password").val();
+      if (email !== "" && password !== "")
+        apiLogin(email, password, onSuccess);
+    });
+  $("#login-page").removeClass("hide");
+}
+
+function clearPage() {
+  $("#login-page").addClass("hide");
+  $("#tabbed-tasks-page").addClass("hide");
+}
+
 /* Different types of pages */
 
 function pageHome() {
+  clearPage();
   apiLoadTaskQueue();
   apiLoadTaskArchive();
   showTaskQueue();
+  $("#tabbed-tasks-page").removeClass("hide");
 }
 
 function pageTask(tid) {
+  clearPage();
+}
+
+function pageLogin(redirState) {
+  clearPage();
+  showLogin(redirState);
 }
 
 /* URL-based dispatching */
@@ -802,28 +833,51 @@ function matchPath(model, path) {
   return args;
 }
 
-// Change URL and load matching page
-function navigate(path) {
+/*
+  Change URL and load matching page.
+  ignoreHistory needs to be true if we don't want to add the page to the
+  browser's navigation history (typically because it is already there).
+*/
+function navigate(path, ignoreHistory) {
   var p = path.split('/');
   var args = [];
+  function historyPushState(title, path) {
+    if (!ignoreHistory)
+      window.history.pushState({}, title, path);
+  }
   if (matchPath(["", "app"], p)) {
-    window.history.pushState({}, "Esper", path);
+    historyPushState("Esper", path);
     pageHome();
+  }
+  else if (args = matchPath(["", "app", "login"], p)) {
+    var redirPath = window.location.pathname;
+    if (redirPath === path)
+      redirPath = "/app";
+    historyPushState("Esper login", path);
+    pageLogin(redirPath);
   }
   else if (args = matchPath(["", "app", "task", null], p)) {
     var tid = args[0];
-    window.history.pushState({}, "Esper task " + tid, path);
+    historyPushState("Esper task " + tid, path);
     pageTask(tid);
   }
   else {
     // Invalid path, redirect to home page
-    window.history.pushState({}, "Esper", "/app");
+    historyPushState("Esper", "/app");
     pageHome();
   }
 }
 
-function start() {
-  navigate(window.location.pathname);
+// Load the proper view when user hits Back or Forward.
+function setupNavigation() {
+  window.onpopstate = function(event) {
+    navigate(window.location.pathname, true);
+  };
 }
 
-start();
+function start() {
+  setupNavigation();
+  navigate(window.location.pathname, true);
+}
+
+$(document).ready(start);

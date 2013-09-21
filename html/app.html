@@ -11,33 +11,55 @@
   </head>
 
   <body>
-    <div class="container-fluid">
-      <div class="row-fluid">
-<!--
-        <div class="span2">
+
+    <div id="login-page" class="hide">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span4"></div>
+          <div class="login-form span4">
+            <h2>Esper Login</h2>
+            <fieldset>
+              <div class="clearfix">
+                <input id="login-email" type="text"
+                       placeholder="Email">
+              </div>
+              <div class="clearfix">
+                <input id="login-password" type="password"
+                       placeholder="Password">
+              </div>
+              <button id="login-button" class="btn primary">
+                Sign in
+              </button>
+            </fieldset>
+          </div>
+          <div class="span4"></div>
         </div>
+      </div>
+    </div>
 
-        <div class="span10">
--->
-        <div class="span12 queuetabarea">
+    <div id="tabbed-tasks-page" class="hide">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12 queue-tab-area">
 
-          <div class="hide" id="status"></div>
-          <div class="hide" id="hidden-status"></div>
+            <div class="hide" id="status"></div>
+            <div class="hide" id="hidden-status"></div>
 
-          <ul class="nav nav-tabs">
-            <li id="queuetab">
-              <a href="#" onclick="showTaskQueue()">
-                Queue
-              </a>
-            </li>
-            <li id="archivetab">
-              <a href="#" onclick="showTaskArchive()">
-                Archive
-              </a>
-            </li>
-          </ul>
-          <div id="queue" class="hide"></div>
-          <div id="archive" class="hide"></div>
+            <ul class="nav nav-tabs">
+              <li id="queuetab">
+                <a href="#" onclick="showTaskQueue()">
+                  Queue
+                </a>
+              </li>
+              <li id="archivetab">
+                <a href="#" onclick="showTaskArchive()">
+                  Archive
+                </a>
+              </li>
+            </ul>
+            <div id="queue" class="hide"></div>
+            <div id="archive" class="hide"></div>
+          </div>
         </div>
       </div>
     </div>
