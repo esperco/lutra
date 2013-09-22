@@ -1,6 +1,18 @@
 #! /bin/sh
 set -e
 
+case "$1" in
+    "prod"|"dev")
+        mode=$1
+        ;;
+    "")
+        mode=dev
+        ;;
+    *)
+        echo "Unknown argument $1" >&2
+        exit 1
+esac
+
 mkdir -p pub/css pub/js pub/html pub/img
 
 # Copy third-party libraries into the pub directory
@@ -8,7 +20,7 @@ cp mink-libs/jquery.min.js pub/js
 cp mink-libs/can.min.js pub/js
 cp -a mink-libs/bootstrap/* pub
 
-# Build our own files and copy them into the pub directory
+# Build our own code and copy the result into the pub directory
+make -C js $mode-install
 cp css/*.css pub/css
-cp js/*.js pub/js
 cp html/*.html pub/html
