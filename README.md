@@ -3,10 +3,20 @@ Mink
 
 Web client for the assistant
 
+Setup
+-----
+
+UglifyJS (JavaScript minifier) needs to be installed.
+
+Ubuntu:
+```
+sudo apt-get install node-uglify
+```
+
 Build instructions
 ------------------
 
-Clone into the same directory as `badger`:
+Clone next to `badger` (`badger` and `mink` must be in the same directory):
 ```
 git clone git@github.com:timeco/mink.git
 ```
