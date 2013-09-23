@@ -11,7 +11,7 @@ prod: prod-build
 dev-build: dev.js
 prod-build: prod.js
 
-SOURCES = main.js
+SOURCES = sample.js login.js users.js main.js
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
@@ -20,7 +20,7 @@ dev.js: Makefile mkloader
 
 # Production: concatenate all files into one for speed
 prod.js: $(SOURCES)
-	cat $< | uglifyjs > $@
+	cat $(SOURCES) | uglifyjs > $@
 
 dev-install:
 	mkdir -p ../pub/js

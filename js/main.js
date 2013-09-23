@@ -1,8 +1,3 @@
-// test accounts
-var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
-var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
-var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
-
 function log(x) {
   console.log(
     (typeof x === "String") ? x
@@ -608,8 +603,8 @@ function viewOfNewTask(tab, kind, reqEdits) {
         : makeRequest(null, "Selector",{selector_q:newSelector("multiple" === kind)});
   var task = {task_requests:[],
               task_status:{task_open:true, task_summary:null},
-              task_participants:{organized_by :[test_ea_uid],
-                                 organized_for:[test_vip_uid]}};
+              task_participants:{organized_by : login.team.team_organizers,
+                                 organized_for: login.team.team_leaders}};
   return editViewOfTask(tab, task, [q], reqEdits);
 }
 
@@ -684,7 +679,7 @@ function httpDELETE(url) {
 }
 
 // API
-var api_q_prefix = "/api/q/" + test_ea_uid;
+var api_q_prefix = "/api/q/" + login.uid;
 
 function apiLoadTaskQueue() {
   httpGET(api_q_prefix + "/queue", function(http) {
@@ -710,7 +705,7 @@ function apiCreateTask(task, updated_requests) {
   var updated_task = {task_status      : task.task_status,
                       task_participants: task.task_participants,
                       task_requests    : updated_requests};
-  httpPOST(api_q_prefix + "/task/create/" + test_teamid,
+  httpPOST(api_q_prefix + "/task/create/" + login.team.teamid,
            JSON.stringify(updated_task),
            function(http) {
     var json = JSON.parse(http.responseText);
