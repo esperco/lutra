@@ -460,25 +460,64 @@ function EditMessageRequest(qid, qmessage) {
 }
 
 function EditChoicesRequest(qid, qsel) {
-  var inputViews = [];
   var labelViews = [];
 
-  function editStop(labelView) {
-    if (inputOfSelLabel(labelView).val() == "")
-      labelView.remove();
+  function removeLabel(labelView) {
+    moveToPrevLabel(labelView);
+    labelView.remove();
+    var index = labelViews.indexOf(labelView);
+    if (index > -1)
+      labelViews.splice(index, 1);
+  }
+
+  function removeLabelIfEmpty(labelView) {
+    if (inputOfSelLabel(labelView).val() == "") {
+      removeLabel(labelView);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  function moveToNextLabel(origLabelView) {
+    var labelView = origLabelView.next();
+    if (labelView.length === 0)
+      labelView = editNewChoice();
+    inputOfSelLabel(labelView).focus();
+  }
+
+  function moveToPrevLabel(origLabelView) {
+    var labelView = origLabelView.prev();
+    if (labelView.length === 0)
+      labelView = editNewChoice();
+    inputOfSelLabel(labelView).focus();
   }
 
   function viewOfSelLabel(value) {
-    var view = $("<label/>")
-      .addClass(qsel.sel_multi ? "checkbox" : "radio")
-      .blur(function() {
-        editStop(view);
-        return false;
-      });
+    var view = $("<label class='choice'/>")
+      .addClass(qsel.sel_multi ? "checkbox" : "radio");
 
     var textView = $("<input type='text' class='sel-text'/>")
       .attr("value", value)
       .attr("placeholder", "Enter a choice")
+      .keypress(function(e) {
+        var c = e.charCode || e.keyCode;
+        // Enter or Tab
+        if (13 === c || 9 === c) {
+          if (! removeLabelIfEmpty(view))
+            moveToNextLabel(view);
+          return false;
+        }
+        // Backspace
+        else if (8 === c) {
+          if (removeLabelIfEmpty(view))
+            return false;
+          else
+            return true;
+        }
+        else
+          return true;
+      })
       .appendTo(view);
 
     return view;
@@ -502,7 +541,7 @@ function EditChoicesRequest(qid, qsel) {
 
     labelViews.push(labelView);
 
-    return labelViews.length;
+    return (labelViews.length - 1);
   }
 
   for (var i in qsel.sel_choices) {
@@ -510,17 +549,16 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   function viewOfChoice(index) {
-    var view = $("<span class='choice'/>");
-    labelViews[index].appendTo(view);
-    return view;
+    return labelViews[index];
   }
 
+  var choicesView = $("<div class='choices'/>");
   var addChoiceButton = $("<button class='btn'>New Choice</button>");
+
   function editNewChoice() {
     var index = addChoice("");
-    viewOfChoice(index)
-      .insertBefore(addChoiceButton);
-    editStart(labelViews[index]);
+    return viewOfChoice(index)
+      .appendTo(choicesView);
   }
   addChoiceButton.click(editNewChoice);
 
@@ -536,13 +574,13 @@ function EditChoicesRequest(qid, qsel) {
     deleteRequestButton.appendTo(qbox);
     qbox.appendTo(view);
 
-    var choices = $("<div class='choices'/>");
     for (var i in labelViews) {
       viewOfChoice(i)
-        .appendTo(choices);
+        .appendTo(choicesView);
     }
-    addChoiceButton.appendTo(choices);
-    choices.appendTo(view);
+
+    choicesView.appendTo(view);
+    addChoiceButton.appendTo(view);
 
     return view;
   }
@@ -589,23 +627,6 @@ function EditChoicesRequest(qid, qsel) {
 
   this.makeRequest = function() {
     return makeRequest(qid, "Selector", {selector_q:qsel});
-  }
-
-  function switchToLabelEdit(label) {
-    var inp = inputOfSelLabel(label)
-      .blur(function () {
-        editStop();
-        return true;
-      })
-      .keypress(function(e) {
-        var c = e.charCode || e.keyCode;
-        if (13 === c) {
-          editStop();
-          return false;
-        }
-        return true;
-      });
-    return inp;
   }
 }
 
