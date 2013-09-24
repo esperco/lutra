@@ -11,9 +11,11 @@ prod: prod-build
 
 dev-build:
 	$(MAKE) -C js dev-build
+	$(MAKE) -C html dev-build
 
 prod-build:
 	$(MAKE) -C js prod-build
+	$(MAKE) -C html prod-build
 
 # Fetch libraries
 setup:

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Esper</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/app.css" rel="stylesheet" media="screen">
+  </head>
+
+  <body>
+
+    <div id="login-page" class="hide">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span4"></div>
+          <div class="login-form span4">
+            <h2>Esper Login</h2>
+            <fieldset>
+              <div class="clearfix">
+                <input id="login-email" type="text"
+                       placeholder="Email">
+              </div>
+              <div class="clearfix">
+                <input id="login-password" type="password"
+                       placeholder="Password">
+              </div>
+              <button id="login-button" class="btn primary">
+                Sign in
+              </button>
+            </fieldset>
+          </div>
+          <div class="span4"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabbed-tasks-page" class="hide">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12 queue-tab-area">
+
+            <div class="hide" id="status"></div>
+            <div class="hide" id="hidden-status"></div>
+
+            <ul class="nav nav-tabs">
+              <li id="queuetab">
+                <a href="#" onclick="showTaskQueue()">
+                  Queue
+                </a>
+              </li>
+              <li id="archivetab">
+                <a href="#" onclick="showTaskArchive()">
+                  All
+                </a>
+              </li>
+            </ul>
+            <div id="queue" class="hide"></div>
+            <div id="archive" class="hide"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/can.min.js"></script>
+    <script src="/assets/js/sha1.js"></script>
+    INCLUDES
+  </body>
+</html>
