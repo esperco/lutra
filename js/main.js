@@ -731,7 +731,7 @@ function apiDeleteRequest(qid) {
 }
 
 function apiDeleteTask(tid) {
-  httpDELETE(api_q_prefix + "/task/" + tid);
+  jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
 }
 
 function apiCreateTask(task, updated_requests) {
