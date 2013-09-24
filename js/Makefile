@@ -8,15 +8,18 @@ prod: prod-build
 	$(MAKE) prod-install
 
 # Build only
-dev-build: dev.js
-prod-build: prod.js
+dev-build: includes-dev.html
+prod-build: prod.js includes-prod.html
 
 SOURCES = sample.js login.js users.js main.js
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
-dev.js: Makefile mkloader
+includes-dev.html: Makefile mkloader
 	./mkloader $(SOURCES) > $@
+
+includes-prod.html: Makefile mkloader
+	./mkloader app.js > $@
 
 # Production: concatenate all files into one for speed
 prod.js: $(SOURCES)
@@ -24,7 +27,6 @@ prod.js: $(SOURCES)
 
 dev-install:
 	mkdir -p ../pub/js
-	cp dev.js ../pub/js/app.js
 	cp $(SOURCES) ../pub/js
 
 prod-install:
@@ -32,4 +34,4 @@ prod-install:
 	cp prod.js ../pub/js/app.js
 
 clean:
-	rm -f *~ dev.js prod.js
+	rm -f *~ prod.js includes-*.html
