@@ -205,6 +205,15 @@ function viewOfAudioComment(audioLink) {
 function editViewOfTask(tab, task, requests, reqEdits) {
   var view = $("<div class='task'/>");
 
+  var summary = task.task_status
+              ? task.task_status.task_summary
+              : null;
+  var summaryView = editViewOfTaskSummary(summary);
+  if (task.task_status && task.task_status.task_summary) {
+    summaryView.text(task.task_status.task_summary);
+  }
+  summaryView.appendTo(view);
+
   function remove() {
     view.remove();
 
@@ -223,7 +232,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
       break;
     }
     if (hasRequests) {
-      updateTaskRequests(task, reqEdits);
+      updateTaskRequests(task, summaryView.val(), reqEdits);
       stopEdit();
     } else {
       remove();
@@ -250,21 +259,13 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     }
   }
 
-  var summary = task.task_status
-              ? task.task_status.task_summary
-              : null;
-  if (summary) {
-    viewOfTaskSummary(summary)
-      .appendTo(view);
-  }
-
   var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
   appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
 
   return view;
 }
 
-function updateTaskRequests(task, reqEdits) {
+function updateTaskRequests(task, summaryEdit, reqEdits) {
   var qs = {};
   for (var i = task.task_requests.length; --i >=0;) {
     var q = task.task_requests[i];
@@ -276,6 +277,15 @@ function updateTaskRequests(task, reqEdits) {
         apiDeleteRequest(q.rid);
       }
     }
+  }
+
+  var summaryChanged = false;
+  if (task.task_status) {
+    summaryChanged = task.task_status.task_summary !== summaryEdit;
+    task.task_status.task_summary = summaryEdit;
+  } else if (summaryEdit && "" !== summaryEdit) {
+    summaryChanged = true;
+    task.task_status = {task_open:true, task_summary:summaryEdit};
   }
 
   var updated_requests = [];
@@ -291,13 +301,21 @@ function updateTaskRequests(task, reqEdits) {
       updated_requests.push(q);
     }
   }
-  if (0 < updated_requests.length) {
+  if (summaryChanged || 0 < updated_requests.length) {
     if (task.tid) {
       apiPostTask(task, updated_requests);
     } else {
       apiCreateTask(task, updated_requests);
     }
   }
+}
+
+function editViewOfTaskSummary(summary) {
+  var view = $("<textarea class='quiz'/>").attr("placeholder", "Subject");
+  if (summary) {
+    view.text(summary);
+  }
+  return view;
 }
 
 function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
@@ -307,7 +325,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
     .click(taskEdit.remove);
 
   function updateTaskRequestButtons() {
-    var hasRequests = view.children(0);
+    var hasRequests = 0 < view.children(0).length;
 
     taskEdit.update(hasRequests);
 
@@ -317,7 +335,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
       }
     } else {
       if (taskView !== deleteTaskButton.parent()) {
-        taskView.insertBefore(deleteTaskButton);
+        deleteTaskButton.appendTo(taskView);
       }
     }
   }
@@ -370,7 +388,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 function selectOfRequestKind() {
   var select = $("<select size=1/>");
 
-  var kindLabels = ["message", "single choice", "multiple choices"];
+  var kindLabels = ["message", "radio buttons", "checkboxes"];
   var kindValues = ["message", "single", "multiple"];
   for (var i in kindValues) {
     var option = $("<option/>")
@@ -713,7 +731,7 @@ function apiDeleteRequest(qid) {
 }
 
 function apiDeleteTask(tid) {
-  httpDELETE(api_q_prefix + "/task/" + tid);
+  jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
 }
 
 function apiCreateTask(task, updated_requests) {
