@@ -1,4 +1,12 @@
-.queuetabarea {
+/*
+  CSS doesn't provide a sane way of centering a block in the window, so we do
+  the following.
+*/
+.login-form {
+  margin-top: 200px;
+}
+
+.queue-tab-area {
   margin-top: 1em;
   margin-bottom: 2em;
 }

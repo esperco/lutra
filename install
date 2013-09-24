@@ -18,6 +18,7 @@ mkdir -p pub/css pub/js pub/html pub/img
 # Copy third-party libraries into the pub directory
 cp mink-libs/jquery.min.js pub/js
 cp mink-libs/can.min.js pub/js
+cp mink-libs/sha1.js pub/js
 cp -a mink-libs/bootstrap/* pub
 
 # Build our own code and copy the result into the pub directory

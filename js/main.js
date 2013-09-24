@@ -1,8 +1,3 @@
-// test accounts
-var test_ea_uid  = "PkUaGeQstJ64Vwz__u01_w";
-var test_vip_uid = "PkUumYKplkzjT5A__u02_w";
-var test_teamid  = "PlI4tnhhrg3AyCm__a01_w";
-
 function log(x) {
   console.log(
     (typeof x === "String") ? x
@@ -614,8 +609,8 @@ function viewOfNewTask(tab, kind, reqEdits) {
         : makeRequest(null, "Selector",{selector_q:newSelector("multiple" === kind)});
   var task = {task_requests:[],
               task_status:{task_open:true, task_summary:null},
-              task_participants:{organized_by :[test_ea_uid],
-                                 organized_for:[test_vip_uid]}};
+              task_participants:{organized_by : login.data.team.team_organizers,
+                                 organized_for: login.data.team.team_leaders}};
   return editViewOfTask(tab, task, [q], reqEdits);
 }
 
@@ -652,64 +647,69 @@ function placeView(parent, view) {
 }
 
 // HTTP
-function http(method, url, body, error, cont) {
-  var http = new XMLHttpRequest();
-  http.onreadystatechange = function() {
-    if (http.readyState === 4) {
-      var statusCode = http.status;
-      if (200 <= statusCode && statusCode < 300) {
-        clearStatus();
-        cont(http);
-      } else {
-        var details = {
-          code: statusCode.toString(),
-          method: method,
-          url: url,
-          reqBody: body,
-          respBody: http.responseText
-        };
-        reportError("Please try again later.", details);
-        error();
-      }
+function jsonHttp(method, url, body, onError, onSuccess) {
+  function error(jqXHR, status, error) {
+    switch (status) {
+    case 401: // Unauthorized - redirect to login screen
+      navigate("/app/login");
+      break;
+    default:
+      var details = {
+        code: status.toString(),
+        method: method,
+        url: url,
+        reqBody: body,
+        respBody: jqXHR.responseText
+      };
+      reportError("Please try again later.", details);
+      onError();
     }
   }
-  http.open(method, url, true);
-  http.send(body);
+
+  $.ajax({
+    url: url,
+    type: method,
+    data: body,
+    dataType: "json",
+    success: onSuccess,
+    beforeSend: login.setHttpHeaders,
+    error: error
+  });
 }
 
-function httpGET(url, cont) {
-  http("GET", url, null, function(){}, cont);
+function jsonHttpGET(url, cont) {
+  jsonHttp("GET", url, null, function(){}, cont);
 }
 
-function httpPOST(url, body, cont) {
-  http("POST", url, body, start, cont);
+function jsonHttpPOST(url, body, cont) {
+  jsonHttp("POST", url, body, start, cont);
 }
 
-function httpDELETE(url) {
-  http("DELETE", url, null, start, function(http){});
+function jsonHttpDELETE(url) {
+  jsonHttp("DELETE", url, null, start, function(http){});
 }
 
 // API
-var api_q_prefix = "/api/q/" + test_ea_uid;
+function api_q_prefix() {
+  return "/api/q/" + login.data.uid;
+}
 
 function apiLoadTaskQueue() {
-  httpGET(api_q_prefix + "/queue", function(http) {
-    var json = JSON.parse(http.responseText);
+  jsonHttpGET(api_q_prefix() + "/queue", function(data) {
     placeView($("#queue"),
-              viewOfTaskQueue("queue", json.queue_elements));
+              viewOfTaskQueue("queue", data.queue_elements));
   });
 }
 
 function apiLoadTaskArchive() {
-  httpGET(api_q_prefix + "/archive", function(http) {
-    var json = JSON.parse(http.responseText);
+  jsonHttpGET(api_q_prefix() + "/archive", function(data) {
     placeView($("#archive"),
-              viewOfTaskQueue("archive", json.archive_elements));
+              viewOfTaskQueue("archive", data.archive_elements));
   });
 }
 
 function apiDeleteRequest(qid) {
-  httpDELETE(api_q_prefix + "/request/" + qid);
+  jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
 }
 
 function apiDeleteTask(tid) {
@@ -720,17 +720,16 @@ function apiCreateTask(task, updated_requests) {
   var updated_task = {task_status      : task.task_status,
                       task_participants: task.task_participants,
                       task_requests    : updated_requests};
-  httpPOST(api_q_prefix + "/task/create/" + test_teamid,
+  jsonHttpPOST(api_q_prefix() + "/task/create/" + login.data.team.teamid,
            JSON.stringify(updated_task),
-           function(http) {
-    var json = JSON.parse(http.responseText);
-    task.tid               = json.tid;
-    task.task_teamid       = json.task_teamid;
-    task.task_created      = json.task_created;
-    task.task_lastmod      = json.task_lastmod;
-    task.task_status       = json.task_status;
-    task.task_participants = json.task_participants;
-    task.task_requests     = json.task_requests;
+           function(data) {
+    task.tid               = data.tid;
+    task.task_teamid       = data.task_teamid;
+    task.task_created      = data.task_created;
+    task.task_lastmod      = data.task_lastmod;
+    task.task_status       = data.task_status;
+    task.task_participants = data.task_participants;
+    task.task_requests     = data.task_requests;
   });
 }
 
@@ -738,12 +737,10 @@ function apiPostTask(task, updated_requests) {
   var updated_task = {task_status      : task.task_status,
                       task_participants: task.task_participants,
                       task_requests    : updated_requests};
-  httpPOST(api_q_prefix + "/task/" + task.tid,
+  jsonHttpPOST(api_q_prefix() + "/task/" + task.tid,
            JSON.stringify(updated_task),
-           function(http) {
-             var json = JSON.parse(http.responseText);
+           function(json) {
              task.tid = json.tid;
-             log(["updated_requests", updated_requests]);
              for (var i in json.rids) {
                updated_requests[i].rid = json.rids[i];
              }
@@ -751,7 +748,7 @@ function apiPostTask(task, updated_requests) {
 }
 
 function apiQueueRemove(task, cont) {
-  httpPOST(api_q_prefix + "/queue/" + task.tid + "/remove",
+  jsonHttpPOST(api_q_prefix() + "/queue/" + task.tid + "/remove",
            "",
            function(http) { cont(); }
           );
@@ -764,6 +761,12 @@ function showTaskQueue() {
   $("#queue").removeClass("hide");
 }
 
+function apiLogin(email, password, onSuccess) {
+  // TODO call the login api
+  login.pretendLogin();
+  onSuccess();
+}
+
 function showTaskArchive() {
   $("#queuetab").removeClass("active");
   $("#archivetab").addClass("active");
@@ -771,15 +774,41 @@ function showTaskArchive() {
   $("#archive").removeClass("hide");
 }
 
+// Login screen
+function showLogin(redirPath) {
+  $("#login-button")
+    .click(function() {
+      function onSuccess() { navigate(redirPath); }
+      var email = $("#login-email").val();
+      var password = $("#login-password").val();
+      if (email !== "" && password !== "")
+        apiLogin(email, password, onSuccess);
+    });
+  $("#login-page").removeClass("hide");
+}
+
+function clearPage() {
+  $("#login-page").addClass("hide");
+  $("#tabbed-tasks-page").addClass("hide");
+}
+
 /* Different types of pages */
 
 function pageHome() {
+  clearPage();
   apiLoadTaskQueue();
   apiLoadTaskArchive();
   showTaskQueue();
+  $("#tabbed-tasks-page").removeClass("hide");
 }
 
 function pageTask(tid) {
+  clearPage();
+}
+
+function pageLogin(redirState) {
+  clearPage();
+  showLogin(redirState);
 }
 
 /* URL-based dispatching */
@@ -812,28 +841,54 @@ function matchPath(model, path) {
   return args;
 }
 
-// Change URL and load matching page
-function navigate(path) {
+/*
+  Change URL and load matching page.
+  ignoreHistory needs to be true if we don't want to add the page to the
+  browser's navigation history (typically because it is already there).
+*/
+function navigate(path, ignoreHistory) {
   var p = path.split('/');
   var args = [];
+  function historyPushState(title, path) {
+    if (!ignoreHistory)
+      window.history.pushState({}, title, path);
+  }
   if (matchPath(["", "app"], p)) {
-    window.history.pushState({}, "Esper", path);
+    historyPushState("Esper", path);
     pageHome();
+  }
+  else if (args = matchPath(["", "app", "login"], p)) {
+    var redirPath = window.location.pathname;
+    if (redirPath === path)
+      redirPath = "/app";
+    historyPushState("Esper login", path);
+    pageLogin(redirPath);
   }
   else if (args = matchPath(["", "app", "task", null], p)) {
     var tid = args[0];
-    window.history.pushState({}, "Esper task " + tid, path);
+    historyPushState("Esper task " + tid, path);
     pageTask(tid);
   }
   else {
     // Invalid path, redirect to home page
-    window.history.pushState({}, "Esper", "/app");
+    historyPushState("Esper", "/app");
     pageHome();
   }
 }
 
-function start() {
-  navigate(window.location.pathname);
+// Load the proper view when user hits Back or Forward.
+function setupNavigation() {
+/*
+  window.onpopstate = function(event) {
+    navigate(window.location.pathname, true);
+  };
+*/
 }
 
-start();
+function start() {
+  login.pretendLogin();
+  setupNavigation();
+  navigate(window.location.pathname, true);
+}
+
+$(document).ready(start);
