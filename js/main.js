@@ -120,6 +120,33 @@ function viewOfMessageRequest(q) {
   return view;
 }
 
+function viewOfChoicesRequest(qsel) {
+  var view = $("<div class='choices-readonly'/>");
+  var choices = qsel.sel_choices;
+
+  for (var i in choices) {
+    var choice = choices[i];
+    var label = choice.sel_label;
+
+    var choiceView = $("<span class='choice'/>");
+
+    var labelView = $("<label/>")
+      .addClass(qsel.sel_multi ? "checkbox" : "radio")
+      .text(label)
+      .click(function () { return false; /* block the event */ })
+      .appendTo(choiceView);
+
+    $("<input readonly/>")
+      .attr("type", qsel.sel_multi ? "checkbox" : "radio")
+      .prop("checked", chosen(label, qsel.sel_default))
+      .appendTo(labelView);
+
+    choiceView.appendTo(view);
+  }
+
+  return view;
+}
+
 function viewOfSelectorRequest(q) {
   var view = $("<div/>");
 
@@ -133,7 +160,11 @@ function viewOfSelectorRequest(q) {
   }
   else
     question.addClass("requesttitle");
+
+  var choices = viewOfChoicesRequest(q.req_question.selector_q);
+
   question.appendTo(view);
+  choices.appendTo(view);
 
   var a = 0 < q.req_responses.length
         ? q.req_responses[0].response.selector_r : null;
@@ -429,36 +460,49 @@ function EditMessageRequest(qid, qmessage) {
 }
 
 function EditChoicesRequest(qid, qsel) {
-  var editStart, editStop;
-
   var inputViews = [];
   var labelViews = [];
 
-  function viewOfSelLabel(forID, value) {
-    return $("<label/>")
-      .attr("for", forID)
-      .text(value)
-      .click(function() {
-        editStart(view);
-        return false;
-      });
+  function editStop(labelView) {
+    if (inputOfSelLabel(labelView).val() == "")
+      labelView.remove();
   }
 
-  var qname = "sel-" + qid;
+  function viewOfSelLabel(value) {
+    var view = $("<label/>")
+      .addClass(qsel.sel_multi ? "checkbox" : "radio")
+      .blur(function() {
+        editStop(view);
+        return false;
+      });
+
+    var textView = $("<input type='text' class='sel-text'/>")
+      .attr("value", value)
+      .attr("placeholder", "Enter a choice")
+      .appendTo(view);
+
+    return view;
+  }
+
+  function boxOfSelLabel(label) {
+    return $(label).find(".sel-box");
+  }
+
+  function inputOfSelLabel(label) {
+    return $(label).find(".sel-text");
+  }
+
   function addChoice(choiceValue) {
-    var index = inputViews.length;
-    var choiceID = qname + "-" + index;
+    var labelView = viewOfSelLabel(choiceValue);
 
-    var inp = $("<input/>")
-      .attr("id", choiceID)
-      .attr("name", qname)
+    var inp = $("<input class='sel-box'/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
-      .prop("checked", chosen(choiceValue, qsel.sel_default));
+      .prop("checked", chosen(choiceValue, qsel.sel_default))
+      .appendTo(labelView);
 
-    inputViews.push(inp);
-    labelViews.push(viewOfSelLabel(choiceID, choiceValue));
+    labelViews.push(labelView);
 
-    return index;
+    return labelViews.length;
   }
 
   for (var i in qsel.sel_choices) {
@@ -467,7 +511,6 @@ function EditChoicesRequest(qid, qsel) {
 
   function viewOfChoice(index) {
     var view = $("<span class='choice'/>");
-    inputViews[index].appendTo(view);
     labelViews[index].appendTo(view);
     return view;
   }
@@ -494,7 +537,7 @@ function EditChoicesRequest(qid, qsel) {
     qbox.appendTo(view);
 
     var choices = $("<div class='choices'/>");
-    for (var i in inputViews) {
+    for (var i in labelViews) {
       viewOfChoice(i)
         .appendTo(choices);
     }
@@ -505,7 +548,7 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   this.focus = function() {
-    if (0 >= inputViews.length) {
+    if (0 >= labelViews.length) {
       editNewChoice();
     } else {
       quizView.focus();
@@ -513,8 +556,6 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   this.updateRequest = function() {
-    editStop();
-
     var changed = qsel.sel_text !== quizView.value;
     qsel.sel_text = quizView.val();
 
@@ -522,7 +563,7 @@ function EditChoicesRequest(qid, qsel) {
     changed |= old_choices.length !== labelViews.length;
     qsel.sel_choices = [];
     for (var i in labelViews) {
-      var value = labelViews[i].text();
+      var value = inputOfSelLabel(labelViews[i]).val();
       if (! changed) {
         changed = old_choices[i].sel_label !== value;
       }
@@ -531,9 +572,11 @@ function EditChoicesRequest(qid, qsel) {
 
     var old_default = qsel.sel_default;
     qsel.sel_default = [];
-    for (var i in inputViews) {
-      if (inputViews[i].prop("checked")) {
-        var value = labelViews[i].text();
+    for (var i in labelViews) {
+      var box = boxOfSelLabel(labelViews[i]);
+      var inp = inputOfSelLabel(labelViews[i]);
+      if (box.prop("checked")) {
+        var value = inp.val();
         changed |= old_default.length <= qsel.sel_default.length
                 || old_default[qsel.sel_default.length] !== value;
         qsel.sel_default.push(value);
@@ -548,11 +591,8 @@ function EditChoicesRequest(qid, qsel) {
     return makeRequest(qid, "Selector", {selector_q:qsel});
   }
 
-  function editViewOfSelLabel(label) {
-    var view = $("<input/>")
-      .attr("type", "text")
-      .attr("value", label.textContent)
-      .attr("placeholder", "Enter a choice")
+  function switchToLabelEdit(label) {
+    var inp = inputOfSelLabel(label)
       .blur(function () {
         editStop();
         return true;
@@ -565,38 +605,7 @@ function EditChoicesRequest(qid, qsel) {
         }
         return true;
       });
-    return view;
-  }
-
-  var editInput, editLabel;
-  editStop = function() {
-    if (editInput) {
-      var edit  = editInput;
-      var label = editLabel;
-      editInput = null;
-      editLabel = null;
-
-      if ("" === edit.val()) {
-        // Remove the choice.
-        var choiceView = edit.parent();
-        choiceView.remove();
-        var pos = labelViews.indexOf(label);
-        labelViews.splice(pos, 1);
-        inputViews.splice(pos, 1);
-      } else {
-        label
-          .text(edit.val())
-          .replaceAll(edit);
-      }
-    }
-  }
-  editStart = function(label) {
-    var edit = editViewOfSelLabel(label)
-      .replaceAll(label)
-      .focus();
-
-    editInput = edit;
-    editLabel = label;
+    return inp;
   }
 }
 
