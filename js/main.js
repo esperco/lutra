@@ -208,11 +208,8 @@ function editViewOfTask(tab, task, requests, reqEdits) {
   function remove() {
     view.remove();
 
-    for (var i in task.task_requests) {
-      var q = task.task_requests[i];
-      if (q.rid) {
-        apiDeleteRequest(q.rid);
-      }
+    if (task.tid) {
+      apiDeleteTask(task.tid);
     }
   }
   function stopEdit() {
@@ -220,8 +217,17 @@ function editViewOfTask(tab, task, requests, reqEdits) {
       .replaceAll(view);
   }
   function save() {
-    updateTaskRequests(task, reqEdits);
-    stopEdit();
+    var hasRequests = false;
+    for (var qid in reqEdits) {
+      hasRequests = true;
+      break;
+    }
+    if (hasRequests) {
+      updateTaskRequests(task, reqEdits);
+      stopEdit();
+    } else {
+      remove();
+    }
   }
 
   var buttons = $("<div class='buttons rightbox'/>")
@@ -704,6 +710,10 @@ function apiLoadTaskArchive() {
 
 function apiDeleteRequest(qid) {
   jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
+}
+
+function apiDeleteTask(tid) {
+  httpDELETE(api_q_prefix + "/task/" + tid);
 }
 
 function apiCreateTask(task, updated_requests) {
