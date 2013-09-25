@@ -51,10 +51,10 @@ function viewOfTask(tab, task) {
   var view = $("<div class='task'></div>");
   var buttons = $("<div class='buttons rightbox'></div>");
 
-  var archiveButton = $("<button class='btn'></button>");
+  var archiveButton = $("<button class='btn btn-primary'>Archive</button>");
   switch (tab) {
   case "queue":
-    archiveButton.text("Archive")
+    archiveButton
       .click(function() {
         api.queueRemove(
           task,
@@ -276,8 +276,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     }
   }
 
-  var buttons = $("<div class='buttons rightbox'/>")
-    .appendTo(view);
+  var buttons = $("<div class='buttons'/>");
 
   function updateTaskButtons(hasRequests) {
     if (! task.tid && ! hasRequests) {
@@ -286,7 +285,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     else {
       buttons.children().remove();
       if (hasRequests) {
-        $("<button class='btn'>Save</button>")
+        $("<button class='btn btn-primary'>Save</button>")
           .click(save)
           .appendTo(buttons);
       }
@@ -297,7 +296,9 @@ function editViewOfTask(tab, task, requests, reqEdits) {
   }
 
   var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
+
   appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
+  buttons.appendTo(view);
 
   return view;
 }
@@ -378,7 +379,8 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   }
 
   function makeRequestView(qid, edit) {
-    var deleteRequestButton = $("<button class='btn'>Delete request</button>");
+    var deleteRequestButton =
+      $("<button class='btn'>Delete request</button>");
 
     taskEdit.reqEdits[qid] = edit;
     var requestView = edit.viewOfRequest(deleteRequestButton)
