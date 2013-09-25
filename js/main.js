@@ -145,12 +145,11 @@ function viewOfChoicesRequest(qsel) {
     var inp = $("<input readonly/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
       .attr("name", radioGroupName)
+      .prop("disabled", true)
       .appendTo(labelView);
 
     if (chosen(label, qsel.sel_default))
       inp.prop("checked", true);
-    else
-      inp.prop("disabled", true);
 
     choiceView.appendTo(view);
   }
