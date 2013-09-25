@@ -380,7 +380,7 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 
   function makeRequestView(qid, edit) {
     var deleteRequestButton =
-      $("<button class='btn'>Delete request</button>");
+      $("<button class='btn btn-danger'>Delete request</button>");
 
     taskEdit.reqEdits[qid] = edit;
     var requestView = edit.viewOfRequest(deleteRequestButton)
