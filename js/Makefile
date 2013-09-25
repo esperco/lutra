@@ -11,7 +11,7 @@ prod: prod-build
 dev-build: includes-dev.html
 prod-build: prod.js includes-prod.html
 
-SOURCES = sample.js login.js users.js api.js main.js
+SOURCES = util.js sample.js login.js users.js api.js main.js
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)

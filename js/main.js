@@ -461,6 +461,7 @@ function EditMessageRequest(qid, qmessage) {
 
 function EditChoicesRequest(qid, qsel) {
   var labelViews = [];
+  var radioGroupName = util.randomString();
 
   function removeLabel(labelView) {
     moveToPrevLabel(labelView);
@@ -535,7 +536,7 @@ function EditChoicesRequest(qid, qsel) {
     var labelView = viewOfSelLabel(choiceValue);
     var inp = $("<input class='sel-box'/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
-      .attr("name", qid) // defines group of radio buttons (single selection)
+      .attr("name", radioGroupName)
       .prop("checked", chosen(choiceValue, qsel.sel_default))
       .appendTo(labelView);
 
