@@ -427,15 +427,19 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 function selectOfRequestKind() {
   var select = $("<select size=1/>");
 
-  var kindLabels = ["message", "radio buttons", "checkboxes"];
-  var kindValues = ["message", "single", "multiple"];
+  var kindLabels = [
+    "Multiple Choices (only one answer)",
+    "Multiple Choices (multiple answers)",
+    "Message (no answer needed)"
+  ];
+  var kindValues = ["single", "multiple", "message"];
   for (var i in kindValues) {
     var option = $("<option/>")
       .attr("value", kindValues[i])
       .text(kindLabels[i]);
     option.appendTo(select);
   }
-  select.val(kindValues[1]);
+  select.val(kindValues[0]);
 
   return select;
 }
