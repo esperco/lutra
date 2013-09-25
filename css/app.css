@@ -61,7 +61,14 @@
 }
 
 .choice {
+  display: inline-block;
+  vertical-align: bottom;
   margin-right: 1em;
+}
+
+.choice-label {
+  display: inline;
+  margin-left: 0.1em;
 }
 
 .answer {
@@ -77,10 +84,4 @@
 .buttons > * {
   vertical-align: top;
   margin: 0.05em;
-}
-
-/* global override */
-label {
-  display: inline;
-  margin-left: 0.1em;
 }

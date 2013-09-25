@@ -50,7 +50,7 @@ function viewOfTask(tab, task) {
   case "queue":
     archiveButton.text("Archive")
       .click(function() {
-        apiQueueRemove(
+        api.queueRemove(
           task,
           function() { view.remove(); });
       });
@@ -120,6 +120,33 @@ function viewOfMessageRequest(q) {
   return view;
 }
 
+function viewOfChoicesRequest(qsel) {
+  var view = $("<div class='choices-readonly'/>");
+  var choices = qsel.sel_choices;
+
+  for (var i in choices) {
+    var choice = choices[i];
+    var label = choice.sel_label;
+
+    var choiceView = $("<span class='choice'/>");
+
+    var labelView = $("<label/>")
+      .addClass(qsel.sel_multi ? "checkbox" : "radio")
+      .text(label)
+      .click(function () { return false; /* block the event */ })
+      .appendTo(choiceView);
+
+    $("<input readonly/>")
+      .attr("type", qsel.sel_multi ? "checkbox" : "radio")
+      .prop("checked", chosen(label, qsel.sel_default))
+      .appendTo(labelView);
+
+    choiceView.appendTo(view);
+  }
+
+  return view;
+}
+
 function viewOfSelectorRequest(q) {
   var view = $("<div/>");
 
@@ -133,7 +160,11 @@ function viewOfSelectorRequest(q) {
   }
   else
     question.addClass("requesttitle");
+
+  var choices = viewOfChoicesRequest(q.req_question.selector_q);
+
   question.appendTo(view);
+  choices.appendTo(view);
 
   var a = 0 < q.req_responses.length
         ? q.req_responses[0].response.selector_r : null;
@@ -218,7 +249,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     view.remove();
 
     if (task.tid) {
-      apiDeleteTask(task.tid);
+      api.deleteTask(task.tid);
     }
   }
   function stopEdit() {
@@ -274,7 +305,7 @@ function updateTaskRequests(task, summaryEdit, reqEdits) {
         qs[q.rid] = q;
       } else {
         task.task_requests.splice(i, 1);
-        apiDeleteRequest(q.rid);
+        api.deleteRequest(q.rid);
       }
     }
   }
@@ -303,9 +334,9 @@ function updateTaskRequests(task, summaryEdit, reqEdits) {
   }
   if (summaryChanged || 0 < updated_requests.length) {
     if (task.tid) {
-      apiPostTask(task, updated_requests);
+      api.postTask(task, updated_requests);
     } else {
-      apiCreateTask(task, updated_requests);
+      api.createTask(task, updated_requests);
     }
   }
 }
@@ -429,36 +460,89 @@ function EditMessageRequest(qid, qmessage) {
 }
 
 function EditChoicesRequest(qid, qsel) {
-  var editStart, editStop;
-
-  var inputViews = [];
   var labelViews = [];
+  var radioGroupName = util.randomString();
 
-  function viewOfSelLabel(forID, value) {
-    return $("<label/>")
-      .attr("for", forID)
-      .text(value)
-      .click(function() {
-        editStart(view);
-        return false;
-      });
+  function removeLabel(labelView) {
+    moveToPrevLabel(labelView);
+    labelView.remove();
+    var index = labelViews.indexOf(labelView);
+    if (index > -1)
+      labelViews.splice(index, 1);
   }
 
-  var qname = "sel-" + qid;
+  function removeLabelIfEmpty(labelView) {
+    if (inputOfSelLabel(labelView).val() == "") {
+      removeLabel(labelView);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  function moveToNextLabel(origLabelView) {
+    var labelView = origLabelView.next();
+    if (labelView.length === 0)
+      labelView = editNewChoice();
+    inputOfSelLabel(labelView).focus();
+  }
+
+  function moveToPrevLabel(origLabelView) {
+    var labelView = origLabelView.prev();
+    if (labelView.length === 0)
+      labelView = editNewChoice();
+    inputOfSelLabel(labelView).focus();
+  }
+
+  function viewOfSelLabel(value) {
+    var view = $("<label class='choice'/>")
+      .addClass(qsel.sel_multi ? "checkbox" : "radio");
+
+    var textView = $("<input type='text' class='sel-text'/>")
+      .attr("value", value)
+      .attr("placeholder", "Enter a choice")
+      .keypress(function(e) {
+        var c = e.charCode || e.keyCode;
+        // Enter or Tab
+        if (13 === c || 9 === c) {
+          if (! removeLabelIfEmpty(view))
+            moveToNextLabel(view);
+          return false;
+        }
+        // Backspace
+        else if (8 === c) {
+          if (removeLabelIfEmpty(view))
+            return false;
+          else
+            return true;
+        }
+        else
+          return true;
+      })
+      .appendTo(view);
+
+    return view;
+  }
+
+  function boxOfSelLabel(label) {
+    return $(label).find(".sel-box");
+  }
+
+  function inputOfSelLabel(label) {
+    return $(label).find(".sel-text");
+  }
+
   function addChoice(choiceValue) {
-    var index = inputViews.length;
-    var choiceID = qname + "-" + index;
-
-    var inp = $("<input/>")
-      .attr("id", choiceID)
-      .attr("name", qname)
+    var labelView = viewOfSelLabel(choiceValue);
+    var inp = $("<input class='sel-box'/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
-      .prop("checked", chosen(choiceValue, qsel.sel_default));
+      .attr("name", radioGroupName)
+      .prop("checked", chosen(choiceValue, qsel.sel_default))
+      .appendTo(labelView);
 
-    inputViews.push(inp);
-    labelViews.push(viewOfSelLabel(choiceID, choiceValue));
+    labelViews.push(labelView);
 
-    return index;
+    return (labelViews.length - 1);
   }
 
   for (var i in qsel.sel_choices) {
@@ -466,18 +550,16 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   function viewOfChoice(index) {
-    var view = $("<span class='choice'/>");
-    inputViews[index].appendTo(view);
-    labelViews[index].appendTo(view);
-    return view;
+    return labelViews[index];
   }
 
+  var choicesView = $("<div class='choices'/>");
   var addChoiceButton = $("<button class='btn'>New Choice</button>");
+
   function editNewChoice() {
     var index = addChoice("");
-    viewOfChoice(index)
-      .insertBefore(addChoiceButton);
-    editStart(labelViews[index]);
+    return viewOfChoice(index)
+      .appendTo(choicesView);
   }
   addChoiceButton.click(editNewChoice);
 
@@ -493,19 +575,19 @@ function EditChoicesRequest(qid, qsel) {
     deleteRequestButton.appendTo(qbox);
     qbox.appendTo(view);
 
-    var choices = $("<div class='choices'/>");
-    for (var i in inputViews) {
+    for (var i in labelViews) {
       viewOfChoice(i)
-        .appendTo(choices);
+        .appendTo(choicesView);
     }
-    addChoiceButton.appendTo(choices);
-    choices.appendTo(view);
+
+    choicesView.appendTo(view);
+    addChoiceButton.appendTo(view);
 
     return view;
   }
 
   this.focus = function() {
-    if (0 >= inputViews.length) {
+    if (0 >= labelViews.length) {
       editNewChoice();
     } else {
       quizView.focus();
@@ -513,8 +595,6 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   this.updateRequest = function() {
-    editStop();
-
     var changed = qsel.sel_text !== quizView.value;
     qsel.sel_text = quizView.val();
 
@@ -522,7 +602,7 @@ function EditChoicesRequest(qid, qsel) {
     changed |= old_choices.length !== labelViews.length;
     qsel.sel_choices = [];
     for (var i in labelViews) {
-      var value = labelViews[i].text();
+      var value = inputOfSelLabel(labelViews[i]).val();
       if (! changed) {
         changed = old_choices[i].sel_label !== value;
       }
@@ -531,9 +611,11 @@ function EditChoicesRequest(qid, qsel) {
 
     var old_default = qsel.sel_default;
     qsel.sel_default = [];
-    for (var i in inputViews) {
-      if (inputViews[i].prop("checked")) {
-        var value = labelViews[i].text();
+    for (var i in labelViews) {
+      var box = boxOfSelLabel(labelViews[i]);
+      var inp = inputOfSelLabel(labelViews[i]);
+      if (box.prop("checked")) {
+        var value = inp.val();
         changed |= old_default.length <= qsel.sel_default.length
                 || old_default[qsel.sel_default.length] !== value;
         qsel.sel_default.push(value);
@@ -546,57 +628,6 @@ function EditChoicesRequest(qid, qsel) {
 
   this.makeRequest = function() {
     return makeRequest(qid, "Selector", {selector_q:qsel});
-  }
-
-  function editViewOfSelLabel(label) {
-    var view = $("<input/>")
-      .attr("type", "text")
-      .attr("value", label.textContent)
-      .attr("placeholder", "Enter a choice")
-      .blur(function () {
-        editStop();
-        return true;
-      })
-      .keypress(function(e) {
-        var c = e.charCode || e.keyCode;
-        if (13 === c) {
-          editStop();
-          return false;
-        }
-        return true;
-      });
-    return view;
-  }
-
-  var editInput, editLabel;
-  editStop = function() {
-    if (editInput) {
-      var edit  = editInput;
-      var label = editLabel;
-      editInput = null;
-      editLabel = null;
-
-      if ("" === edit.val()) {
-        // Remove the choice.
-        var choiceView = edit.parent();
-        choiceView.remove();
-        var pos = labelViews.indexOf(label);
-        labelViews.splice(pos, 1);
-        inputViews.splice(pos, 1);
-      } else {
-        label
-          .text(edit.val())
-          .replaceAll(edit);
-      }
-    }
-  }
-  editStart = function(label) {
-    var edit = editViewOfSelLabel(label)
-      .replaceAll(label)
-      .focus();
-
-    editInput = edit;
-    editLabel = label;
   }
 }
 
@@ -664,125 +695,11 @@ function placeView(parent, view) {
   view.appendTo(parent);
 }
 
-// HTTP
-function jsonHttp(method, url, body, onError, onSuccess) {
-  function error(jqXHR, status, error) {
-    switch (status) {
-    case 401: // Unauthorized - redirect to login screen
-      navigate("/app/login");
-      break;
-    default:
-      var details = {
-        code: status.toString(),
-        method: method,
-        url: url,
-        reqBody: body,
-        respBody: jqXHR.responseText
-      };
-      reportError("Please try again later.", details);
-      onError();
-    }
-  }
-
-  $.ajax({
-    url: url,
-    type: method,
-    data: body,
-    dataType: "json",
-    success: onSuccess,
-    beforeSend: login.setHttpHeaders,
-    error: error
-  });
-}
-
-function jsonHttpGET(url, cont) {
-  jsonHttp("GET", url, null, function(){}, cont);
-}
-
-function jsonHttpPOST(url, body, cont) {
-  jsonHttp("POST", url, body, start, cont);
-}
-
-function jsonHttpDELETE(url) {
-  jsonHttp("DELETE", url, null, start, function(http){});
-}
-
-// API
-function api_q_prefix() {
-  return "/api/q/" + login.data.uid;
-}
-
-function apiLoadTaskQueue() {
-  jsonHttpGET(api_q_prefix() + "/queue", function(data) {
-    placeView($("#queue"),
-              viewOfTaskQueue("queue", data.queue_elements));
-  });
-}
-
-function apiLoadTaskArchive() {
-  jsonHttpGET(api_q_prefix() + "/archive", function(data) {
-    placeView($("#archive"),
-              viewOfTaskQueue("archive", data.archive_elements));
-  });
-}
-
-function apiDeleteRequest(qid) {
-  jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
-}
-
-function apiDeleteTask(tid) {
-  jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
-}
-
-function apiCreateTask(task, updated_requests) {
-  var updated_task = {task_status      : task.task_status,
-                      task_participants: task.task_participants,
-                      task_requests    : updated_requests};
-  jsonHttpPOST(api_q_prefix() + "/task/create/" + login.data.team.teamid,
-           JSON.stringify(updated_task),
-           function(data) {
-    task.tid               = data.tid;
-    task.task_teamid       = data.task_teamid;
-    task.task_created      = data.task_created;
-    task.task_lastmod      = data.task_lastmod;
-    task.task_status       = data.task_status;
-    task.task_participants = data.task_participants;
-    task.task_requests     = data.task_requests;
-  });
-}
-
-function apiPostTask(task, updated_requests) {
-  var updated_task = {task_status      : task.task_status,
-                      task_participants: task.task_participants,
-                      task_requests    : updated_requests};
-  jsonHttpPOST(api_q_prefix() + "/task/" + task.tid,
-           JSON.stringify(updated_task),
-           function(json) {
-             task.tid = json.tid;
-             for (var i in json.rids) {
-               updated_requests[i].rid = json.rids[i];
-             }
-           });
-}
-
-function apiQueueRemove(task, cont) {
-  jsonHttpPOST(api_q_prefix() + "/queue/" + task.tid + "/remove",
-           "",
-           function(http) { cont(); }
-          );
-}
-
 function showTaskQueue() {
   $("#archivetab").removeClass("active");
   $("#queuetab").addClass("active");
   $("#archive").addClass("hide");
   $("#queue").removeClass("hide");
-}
-
-function apiLogin(email, password, onSuccess) {
-  // TODO call the login api
-  login.pretendLogin();
-  onSuccess();
 }
 
 function showTaskArchive() {
@@ -800,7 +717,7 @@ function showLogin(redirPath) {
       var email = $("#login-email").val();
       var password = $("#login-password").val();
       if (email !== "" && password !== "")
-        apiLogin(email, password, onSuccess);
+        api.login(email, password, onSuccess);
     });
   $("#login-page").removeClass("hide");
 }
@@ -814,8 +731,8 @@ function clearPage() {
 
 function pageHome() {
   clearPage();
-  apiLoadTaskQueue();
-  apiLoadTaskArchive();
+  api.loadTaskQueue();
+  api.loadTaskArchive();
   showTaskQueue();
   $("#tabbed-tasks-page").removeClass("hide");
 }
