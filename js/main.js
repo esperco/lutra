@@ -129,6 +129,7 @@ function viewOfMessageRequest(q) {
 function viewOfChoicesRequest(qsel) {
   var view = $("<div class='choices-readonly'/>");
   var choices = qsel.sel_choices;
+  var radioGroupName = util.randomString();
 
   for (var i in choices) {
     var choice = choices[i];
@@ -139,13 +140,17 @@ function viewOfChoicesRequest(qsel) {
     var labelView = $("<label/>")
       .addClass(qsel.sel_multi ? "checkbox" : "radio")
       .text(label)
-      .click(function () { return false; /* block the event */ })
       .appendTo(choiceView);
 
-    $("<input readonly/>")
+    var inp = $("<input readonly/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
-      .prop("checked", chosen(label, qsel.sel_default))
+      .attr("name", radioGroupName)
       .appendTo(labelView);
+
+    if (chosen(label, qsel.sel_default))
+      inp.prop("checked", true);
+    else
+      inp.prop("disabled", true);
 
     choiceView.appendTo(view);
   }
