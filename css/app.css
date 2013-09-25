@@ -60,6 +60,11 @@
   margin-top: 0.2em;
 }
 
+.choices-readonly {
+  margin-top: 0.2em;
+  color: #808080;
+}
+
 .choice {
   display: inline-block;
   vertical-align: bottom;
