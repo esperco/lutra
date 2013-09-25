@@ -33,10 +33,16 @@ function clearStatus() {
 // task queue view
 function viewOfTaskQueue(tab, tasks) {
   var view = $("<div/>");
+  var tasksView = $("<div/>");
+
+  viewOfNewTaskButton(tab, tasksView)
+    .appendTo(view);
+
   for (var i in tasks) {
-    viewOfTask(tab, tasks[i].task).appendTo(view);
+    viewOfTask(tab, tasks[i].task).appendTo(tasksView);
   }
-  viewOfNewTaskButton(tab, view).appendTo(view);
+  tasksView.appendTo(view);
+
   return view;
 }
 
@@ -632,15 +638,15 @@ function EditChoicesRequest(qid, qsel) {
 }
 
 // new task and request
-function viewOfNewTaskButton(tab, queueView) {
-  var buttons = $("<div class='buttons rightbox'/>");
+function viewOfNewTaskButton(tab, tasksView) {
+  var buttons = $("<div class='buttons'/>");
 
   var requestSelect = selectOfRequestKind();
   var newTaskButton = $("<button class='btn'>New Task</button>")
     .click(function() {
       var reqEdits = {};
-      viewOfNewTask(tab, requestSelect.val(), reqEdits)
-        .insertBefore(buttons);
+      tasksView
+        .prepend(viewOfNewTask(tab, requestSelect.val(), reqEdits));
       for (var qid in reqEdits) { // actually only one request in the new task
         reqEdits[qid].focus();
         break;
