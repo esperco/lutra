@@ -19,6 +19,7 @@ var sample = (function() {
   mod.robin = {
     profile_uid : robin_uid,
     username : "robin",
+    familiar_name : "Robin",
     full_name : "Robin Kaufman",
     contact_email : "robin@formation8.com"
   };
@@ -26,6 +27,7 @@ var sample = (function() {
   mod.joe = {
     profile_uid : joe_uid,
     username : "joe",
+    familiar_name : "Joe",
     full_name : "Joe Lonsdale",
     contact_email : "jlonsdale@gmail.com"
   };

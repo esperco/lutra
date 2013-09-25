@@ -147,6 +147,30 @@ function viewOfChoicesRequest(qsel) {
   return view;
 }
 
+function miniAuthorViewOfProfile(profile) {
+  return $("<span class='mini-author'/>")
+    .text(profile.familiar_name + ": ")
+    .attr("title", profile.full_name);
+}
+
+function viewOfSelectorResponse(selResp, byUid) {
+  var view = $("<div class='response'/>");
+
+  var profile = users.get(byUid);
+  if (profile) {
+    authorView = miniAuthorViewOfProfile(profile)
+      .appendTo(view);
+  }
+
+  for (var i in selResp.sel_selected) {
+    $("<span class='answer'/>")
+      .text(selResp.sel_selected[i])
+      .appendTo(view);
+  }
+
+  return view;
+}
+
 function viewOfSelectorRequest(q) {
   var view = $("<div/>");
 
@@ -168,16 +192,21 @@ function viewOfSelectorRequest(q) {
 
   var a = 0 < q.req_responses.length
         ? q.req_responses[0].response.selector_r : null;
-  if (a) {
-    for (var i in a.sel_selected) {
-      $("<span class='answer'/>")
-        .text(a.sel_selected[i])
-        .appendTo(view);
-    }
-  } else {
+  var responses = q.req_responses;
+  if (responses.length === 0) {
     $("<span class='unanswered'/>")
       .text("no answer")
       .appendTo(view);
+  }
+  else {
+    for (var i in responses) {
+      var resp = responses[i];
+      var byUid = resp.response_by;
+      if (resp.response) {
+        viewOfSelectorResponse(resp.response.selector_r, byUid)
+          .appendTo(view);
+      }
+    }
   }
 
   return view;
