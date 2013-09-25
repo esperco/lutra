@@ -533,9 +533,9 @@ function EditChoicesRequest(qid, qsel) {
 
   function addChoice(choiceValue) {
     var labelView = viewOfSelLabel(choiceValue);
-
     var inp = $("<input class='sel-box'/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
+      .attr("name", qid) // defines group of radio buttons (single selection)
       .prop("checked", chosen(choiceValue, qsel.sel_default))
       .appendTo(labelView);
 
