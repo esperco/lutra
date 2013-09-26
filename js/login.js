@@ -5,15 +5,20 @@
 var login = (function() {
   var mod = {};
 
-  mod.pretendLogin = function () {
-    var login = {
-      uid: sample.robin.profile_uid,
-      team: sample.team_lonsdale,
-      teams: [sample.team_lonsdale],
-      api_secret: "d08dec3a355773409da117b739eb4d37"
-    };
+  mod.initLoginInfo = function() {
+    var login = cache.get("login");
 
-    localStorage.login = login; // Persistent storage never sent to the server
+    if (login && login.uid) // sanity check
+      mod.data = login;
+    else
+      cache.remove("login");
+  }
+
+  mod.setLoginInfo = function(login) {
+    // Persistent storage never sent to the server
+    cache.set("login", login);
+    util.log(login);
+    util.log(cache.get("login").uid);
     mod.data = login;
   }
 
@@ -21,8 +26,11 @@ var login = (function() {
     Get API secret from the server.
   */
   mod.login = function (email, password, onSuccess) {
-    pretendLogin(); // TODO get api_secret from server instead
-    onSuccess();
+    function cont(login) {
+      mod.setLoginInfo(login);
+      onSuccess();
+    }
+    api.login(email, password, cont);
   }
 
   /*

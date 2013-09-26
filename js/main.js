@@ -1,16 +1,9 @@
-function log(x) {
-  console.log(
-    (typeof x === "String") ? x
-      : JSON.stringify(x, undefined, 2)
-  );
-}
-
 function reportStatus(msg, kind, details) {
   $("#status")
     .text(msg)
     .addClass("alert alert-" + kind)
     .removeClass("hide");
-  log({
+  util.log({
     status: msg,
     kind: kind,
     details: details
@@ -733,7 +726,7 @@ function showLogin(redirPath) {
       var email = $("#login-email").val();
       var password = $("#login-password").val();
       if (email !== "" && password !== "")
-        api.login(email, password, onSuccess);
+        login.login(email, password, onSuccess);
     });
   $("#login-page").removeClass("hide");
 }
@@ -798,6 +791,7 @@ function matchPath(model, path) {
   browser's navigation history (typically because it is already there).
 */
 function navigate(path, ignoreHistory) {
+  util.log("navigate " + path);
   var p = path.split('/');
   var args = [];
   function historyPushState(title, path) {
@@ -812,7 +806,6 @@ function navigate(path, ignoreHistory) {
     var redirPath = window.location.pathname;
     if (redirPath === path)
       redirPath = "/app";
-    historyPushState("Esper login", path);
     pageLogin(redirPath);
   }
   else if (args = matchPath(["", "app", "task", null], p)) {
@@ -837,9 +830,14 @@ function setupNavigation() {
 }
 
 function start() {
-  login.pretendLogin();
   setupNavigation();
-  navigate(window.location.pathname, true);
+  login.initLoginInfo();
+  if (!login.data)
+    navigate("/app/login");
+  else {
+    util.log("login.data " + login.data);
+    navigate(window.location.pathname, true);
+  }
 }
 
 $(document).ready(start);
