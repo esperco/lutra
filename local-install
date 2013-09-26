@@ -1,0 +1,36 @@
+#! /bin/sh
+set -e
+
+# Copy public files into a directory structure that we will mirror
+# exactly in our S3 bucket used to serve pages for http://esper.co/
+
+# List of files to install
+html="index.html"
+css="esper.css"
+img=""
+js=""
+
+rm -rf pub
+mkdir -p pub
+
+# HTML files go to directly under the server root (https://esper.co/...)
+for x in $html; do
+    cp html/$x pub/$x
+done
+
+# Other files go into /assets/css, /assets/img, /assets/js
+
+mkdir -p pub/assets/css
+for x in $css; do
+    cp css/$x pub/assets/css
+done
+
+mkdir -p pub/assets/img
+for x in $img; do
+    cp img/$x pub/assets/img
+done
+
+mkdir -p pub/assets/js
+for x in $img; do
+    cp js/$x pub/assets/js
+done

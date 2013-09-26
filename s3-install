@@ -1,0 +1,6 @@
+#! /bin/sh
+set -e
+
+# Copy the pub/ directory into our S3 bucket used by http://esper.co/
+(cd pub && s3cmd put * s3://BUCKET )
+
