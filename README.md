@@ -1,7 +1,20 @@
-HoneyBadger ReadMe
+HoneyBadger doesn't care, but in this case, this directory contains
+the files to run the front-end Esper website.
 
-HoneyBadger doesn't care, but in this case, this directory contains the files to run the front-end Esper website.
+Prerequisites
+-------------
 
-It contains simply an HTML page with jpg files. Just read the source.
+Install `s3tools`:
+```
+brew install s3tools  # Mac
+```
 
-HoneyBadger out.
+Obtain your personal access keys from the AWS console. The secret key
+is personal and can be downloaded only once.
+
+Give the S3 access keys to s3cmd:
+```
+s3cmd --configure
+```
+
+Now you are set up for uploading files to S3 using `s3cmd`.
