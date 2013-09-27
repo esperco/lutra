@@ -6,9 +6,10 @@ set -e
 
 # List of files to install
 html="index.html"
-css="esper.css"
-img=""
-js=""
+css="*.css"
+fonts="*.eot *.svg *.ttf *.woff"
+img="*.jpg"
+js="*.js"
 
 rm -rf pub
 mkdir -p pub
@@ -25,12 +26,17 @@ for x in $css; do
     cp css/$x pub/assets/css
 done
 
+mkdir -p pub/assets/fonts
+for x in $fonts; do
+    cp fonts/$x pub/assets/fonts
+done
+
 mkdir -p pub/assets/img
 for x in $img; do
     cp img/$x pub/assets/img
 done
 
 mkdir -p pub/assets/js
-for x in $img; do
+for x in $js; do
     cp js/$x pub/assets/js
 done
