@@ -4,9 +4,9 @@ the files to run the front-end Esper website.
 Prerequisites
 -------------
 
-Install `s3tools`:
+Install `s3tools`. On a Mac, this is:
 ```
-brew install s3tools  # Mac
+brew install s3cmd
 ```
 
 Obtain your personal access keys from the AWS console. The secret key
