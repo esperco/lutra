@@ -318,6 +318,11 @@ function editViewOfTask(tab, task, requests, reqEdits) {
       $("<button class='btn'>Cancel</button>")
         .click(task.tid ? stopEdit : remove)
         .appendTo(buttons);
+      if (!hasRequests) {
+        $("<button class='btn btn-danger'>Delete Task</button>")
+          .click(taskEdit.remove)
+          .appendTo(buttons);
+      }
     }
   }
 
@@ -385,23 +390,9 @@ function editViewOfTaskSummary(summary) {
 function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   var view = $("<div/>");
 
-  var deleteTaskButton = $("<button class='btn'>Delete Task</button>")
-    .click(taskEdit.remove);
-
   function updateTaskRequestButtons() {
     var hasRequests = 0 < view.children(0).length;
-
     taskEdit.update(hasRequests);
-
-    if (hasRequests) {
-      if (taskView === deleteTaskButton.parent()) {
-        deleteTaskButton.remove();
-      }
-    } else {
-      if (taskView !== deleteTaskButton.parent()) {
-        deleteTaskButton.appendTo(taskView);
-      }
-    }
   }
 
   function makeRequestView(qid, edit) {
