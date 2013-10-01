@@ -15,15 +15,21 @@ var login = (function() {
   }
 
   mod.setLoginInfo = function(login) {
+    if (login.teams[0])
+      login.team = login.teams[0];
+
     // Persistent storage never sent to the server
     cache.set("login", login);
-    util.log(login);
-    util.log(cache.get("login").uid);
     mod.data = login;
   }
 
+  mod.clearLoginInfo = function() {
+    cache.remove("login");
+    delete mod.data;
+  }
+
   /*
-    Get API secret from the server.
+    Get API secret from the server, and more.
   */
   mod.login = function (email, password, onSuccess) {
     function cont(login) {
@@ -41,19 +47,22 @@ var login = (function() {
     - the signature expires, preventing replay attacks
     - all clients use the same mechanism
   */
-  mod.setHttpHeaders = function(jqXHR) {
-    var unixTime = Math.round(+new Date()/1000).toString();
-    //var path = jqXHR.url.match(/\/\/[^\/]*(\/.*)/)[1];
-    var path = jqXHR.url;
-    var signature = CryptoJS.SHA1(
-      unixTime
-        + ","
-        + path
-        + ","
-        + mod.data.api_secret
-    );
-    jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
-    jqXHR.setRequestHeader("Esper-Signature", signature);
+  mod.setHttpHeaders = function(path) {
+    return function(jqXHR) {
+      if (mod.data) {
+        var unixTime = Math.round(+new Date()/1000).toString();
+        var signature = CryptoJS.SHA1(
+          unixTime
+            + ","
+            + path
+            + ","
+            + mod.data.api_secret
+        );
+        jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
+        jqXHR.setRequestHeader("Esper-Path", path);
+        jqXHR.setRequestHeader("Esper-Signature", signature);
+      }
+    }
   }
 
   return mod;

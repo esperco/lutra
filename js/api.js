@@ -6,7 +6,7 @@ var api = (function () {
 
   var mod = {};
 
-  // HTTP
+  // HTTP - response body is interpreted as JSON
 
   function jsonHttp(method, url, body, onError, onSuccess) {
     function error(jqXHR, status, error) {
@@ -33,7 +33,7 @@ var api = (function () {
       data: body,
       dataType: "json",
       success: onSuccess,
-      beforeSend: login.setHttpHeaders,
+      beforeSend: login.setHttpHeaders(url),
       error: error
     });
   }
@@ -52,13 +52,13 @@ var api = (function () {
 
   // API
 
-  function api_q_prefix() {
-    return "/api/q/" + login.data.uid;
+  mod.login = function(email, password, onSuccess) {
+    var login_request = { email: email, password: password };
+    jsonHttpPOST("/api/login", JSON.stringify(login_request), onSuccess);
   }
 
-  mod.login = function(email, password, onSuccess) {
-    // TODO call the login api
-    onSuccess(sample.login);
+  function api_q_prefix() {
+    return "/api/q/" + login.data.uid;
   }
 
   mod.loadTaskQueue = function() {
