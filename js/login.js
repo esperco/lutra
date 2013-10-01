@@ -5,24 +5,38 @@
 var login = (function() {
   var mod = {};
 
-  mod.pretendLogin = function () {
-    var login = {
-      uid: sample.robin.profile_uid,
-      team: sample.team_lonsdale,
-      teams: [sample.team_lonsdale],
-      api_secret: "d08dec3a355773409da117b739eb4d37"
-    };
+  mod.initLoginInfo = function() {
+    var login = cache.get("login");
 
-    localStorage.login = login; // Persistent storage never sent to the server
+    if (login && login.uid) // sanity check
+      mod.data = login;
+    else
+      cache.remove("login");
+  }
+
+  mod.setLoginInfo = function(login) {
+    if (login.teams[0])
+      login.team = login.teams[0];
+
+    // Persistent storage never sent to the server
+    cache.set("login", login);
     mod.data = login;
   }
 
+  mod.clearLoginInfo = function() {
+    cache.remove("login");
+    delete mod.data;
+  }
+
   /*
-    Get API secret from the server.
+    Get API secret from the server, and more.
   */
   mod.login = function (email, password, onSuccess) {
-    pretendLogin(); // TODO get api_secret from server instead
-    onSuccess();
+    function cont(login) {
+      mod.setLoginInfo(login);
+      onSuccess();
+    }
+    api.login(email, password, cont);
   }
 
   /*
@@ -33,19 +47,22 @@ var login = (function() {
     - the signature expires, preventing replay attacks
     - all clients use the same mechanism
   */
-  mod.setHttpHeaders = function(jqXHR) {
-    var unixTime = Math.round(+new Date()/1000).toString();
-    //var path = jqXHR.url.match(/\/\/[^\/]*(\/.*)/)[1];
-    var path = jqXHR.url;
-    var signature = CryptoJS.SHA1(
-      unixTime
-        + ","
-        + path
-        + ","
-        + mod.data.api_secret
-    );
-    jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
-    jqXHR.setRequestHeader("Esper-Signature", signature);
+  mod.setHttpHeaders = function(path) {
+    return function(jqXHR) {
+      if (mod.data) {
+        var unixTime = Math.round(+new Date()/1000).toString();
+        var signature = CryptoJS.SHA1(
+          unixTime
+            + ","
+            + path
+            + ","
+            + mod.data.api_secret
+        );
+        jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
+        jqXHR.setRequestHeader("Esper-Path", path);
+        jqXHR.setRequestHeader("Esper-Signature", signature);
+      }
+    }
   }
 
   return mod;
