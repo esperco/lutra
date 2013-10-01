@@ -1,16 +1,9 @@
-function log(x) {
-  console.log(
-    (typeof x === "String") ? x
-      : JSON.stringify(x, undefined, 2)
-  );
-}
-
 function reportStatus(msg, kind, details) {
   $("#status")
     .text(msg)
     .addClass("alert alert-" + kind)
     .removeClass("hide");
-  log({
+  util.log({
     status: msg,
     kind: kind,
     details: details
@@ -33,10 +26,16 @@ function clearStatus() {
 // task queue view
 function viewOfTaskQueue(tab, tasks) {
   var view = $("<div/>");
+  var tasksView = $("<div/>");
+
+  viewOfNewTaskButton(tab, tasksView)
+    .appendTo(view);
+
   for (var i in tasks) {
-    viewOfTask(tab, tasks[i].task).appendTo(view);
+    viewOfTask(tab, tasks[i].task).appendTo(tasksView);
   }
-  viewOfNewTaskButton(tab, view).appendTo(view);
+  tasksView.appendTo(view);
+
   return view;
 }
 
@@ -45,10 +44,10 @@ function viewOfTask(tab, task) {
   var view = $("<div class='task'></div>");
   var buttons = $("<div class='buttons rightbox'></div>");
 
-  var archiveButton = $("<button class='btn'></button>");
+  var archiveButton = $("<button class='btn btn-primary'>Archive</button>");
   switch (tab) {
   case "queue":
-    archiveButton.text("Archive")
+    archiveButton
       .click(function() {
         api.queueRemove(
           task,
@@ -123,6 +122,7 @@ function viewOfMessageRequest(q) {
 function viewOfChoicesRequest(qsel) {
   var view = $("<div class='choices-readonly'/>");
   var choices = qsel.sel_choices;
+  var radioGroupName = util.randomString();
 
   for (var i in choices) {
     var choice = choices[i];
@@ -133,13 +133,16 @@ function viewOfChoicesRequest(qsel) {
     var labelView = $("<label/>")
       .addClass(qsel.sel_multi ? "checkbox" : "radio")
       .text(label)
-      .click(function () { return false; /* block the event */ })
       .appendTo(choiceView);
 
-    $("<input readonly/>")
+    var inp = $("<input readonly/>")
       .attr("type", qsel.sel_multi ? "checkbox" : "radio")
-      .prop("checked", chosen(label, qsel.sel_default))
+      .attr("name", radioGroupName)
+      .prop("disabled", true)
       .appendTo(labelView);
+
+    if (chosen(label, qsel.sel_default))
+      inp.prop("checked", true);
 
     choiceView.appendTo(view);
   }
@@ -299,8 +302,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     }
   }
 
-  var buttons = $("<div class='buttons rightbox'/>")
-    .appendTo(view);
+  var buttons = $("<div class='buttons'/>");
 
   function updateTaskButtons(hasRequests) {
     if (! task.tid && ! hasRequests) {
@@ -309,7 +311,7 @@ function editViewOfTask(tab, task, requests, reqEdits) {
     else {
       buttons.children().remove();
       if (hasRequests) {
-        $("<button class='btn'>Save</button>")
+        $("<button class='btn btn-primary'>Save</button>")
           .click(save)
           .appendTo(buttons);
       }
@@ -320,7 +322,9 @@ function editViewOfTask(tab, task, requests, reqEdits) {
   }
 
   var taskEdit = {update:updateTaskButtons, remove:remove, reqEdits:reqEdits};
+
   appendEditViewsOfTaskRequests(view, task, requests, taskEdit);
+  buttons.appendTo(view);
 
   return view;
 }
@@ -401,7 +405,8 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
   }
 
   function makeRequestView(qid, edit) {
-    var deleteRequestButton = $("<button class='btn'>Delete request</button>");
+    var deleteRequestButton =
+      $("<button class='btn btn-danger'>Delete request</button>");
 
     taskEdit.reqEdits[qid] = edit;
     var requestView = edit.viewOfRequest(deleteRequestButton)
@@ -448,15 +453,19 @@ function appendEditViewsOfTaskRequests(taskView, task, requests, taskEdit) {
 function selectOfRequestKind() {
   var select = $("<select size=1/>");
 
-  var kindLabels = ["message", "radio buttons", "checkboxes"];
-  var kindValues = ["message", "single", "multiple"];
+  var kindLabels = [
+    "Multiple Choices (only one answer)",
+    "Multiple Choices (multiple answers)",
+    "Message (no answer needed)"
+  ];
+  var kindValues = ["single", "multiple", "message"];
   for (var i in kindValues) {
     var option = $("<option/>")
       .attr("value", kindValues[i])
       .text(kindLabels[i]);
     option.appendTo(select);
   }
-  select.val(kindValues[1]);
+  select.val(kindValues[0]);
 
   return select;
 }
@@ -661,15 +670,15 @@ function EditChoicesRequest(qid, qsel) {
 }
 
 // new task and request
-function viewOfNewTaskButton(tab, queueView) {
-  var buttons = $("<div class='buttons rightbox'/>");
+function viewOfNewTaskButton(tab, tasksView) {
+  var buttons = $("<div class='buttons'/>");
 
   var requestSelect = selectOfRequestKind();
   var newTaskButton = $("<button class='btn'>New Task</button>")
     .click(function() {
       var reqEdits = {};
-      viewOfNewTask(tab, requestSelect.val(), reqEdits)
-        .insertBefore(buttons);
+      tasksView
+        .prepend(viewOfNewTask(tab, requestSelect.val(), reqEdits));
       for (var qid in reqEdits) { // actually only one request in the new task
         reqEdits[qid].focus();
         break;
@@ -746,7 +755,7 @@ function showLogin(redirPath) {
       var email = $("#login-email").val();
       var password = $("#login-password").val();
       if (email !== "" && password !== "")
-        api.login(email, password, onSuccess);
+        login.login(email, password, onSuccess);
     });
   $("#login-page").removeClass("hide");
 }
@@ -811,6 +820,7 @@ function matchPath(model, path) {
   browser's navigation history (typically because it is already there).
 */
 function navigate(path, ignoreHistory) {
+  util.log("navigate " + path);
   var p = path.split('/');
   var args = [];
   function historyPushState(title, path) {
@@ -825,7 +835,6 @@ function navigate(path, ignoreHistory) {
     var redirPath = window.location.pathname;
     if (redirPath === path)
       redirPath = "/app";
-    historyPushState("Esper login", path);
     pageLogin(redirPath);
   }
   else if (args = matchPath(["", "app", "task", null], p)) {
@@ -850,9 +859,14 @@ function setupNavigation() {
 }
 
 function start() {
-  login.pretendLogin();
   setupNavigation();
-  navigate(window.location.pathname, true);
+  login.initLoginInfo();
+  if (!login.data)
+    navigate("/app/login");
+  else {
+    util.log("login.data " + login.data);
+    navigate(window.location.pathname, true);
+  }
 }
 
 $(document).ready(start);

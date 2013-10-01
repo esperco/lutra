@@ -56,10 +56,9 @@ var api = (function () {
     return "/api/q/" + login.data.uid;
   }
 
-  mod.apiLogin = function(email, password, onSuccess) {
+  mod.login = function(email, password, onSuccess) {
     // TODO call the login api
-    login.pretendLogin();
-    onSuccess();
+    onSuccess(sample.login);
   }
 
   mod.loadTaskQueue = function() {
