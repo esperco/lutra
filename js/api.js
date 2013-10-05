@@ -9,8 +9,9 @@ var api = (function () {
   // HTTP - response body is interpreted as JSON
 
   function jsonHttp(method, url, body, onError, onSuccess) {
-    function error(jqXHR, status, error) {
-      switch (status) {
+    function error(xhr, textStatus, error) {
+      util.log(xhr.status);
+      switch (xhr.status) {
       case 401: // Unauthorized - redirect to login screen
         navigate("/app/login");
         break;
@@ -20,7 +21,7 @@ var api = (function () {
           method: method,
           url: url,
           reqBody: body,
-          respBody: jqXHR.responseText
+          respBody: xhr.responseText
         };
         reportError("Please try again later.", details);
         onError();
