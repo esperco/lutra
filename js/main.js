@@ -749,6 +749,7 @@ function showLogin(redirPath) {
         login.login(email, password, onSuccess);
     });
   $("#login-page").removeClass("hide");
+  $("#login-email").focus();
 }
 
 function clearPage() {
