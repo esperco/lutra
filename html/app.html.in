@@ -12,6 +12,39 @@
 
   <body>
 
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <a class="brand" href="#">Esper</a>
+        <ul class="nav">
+<!--
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#">Link</a></li>
+          <li><a href="#">Link</a></li>
+-->
+        </ul>
+        <ul class="nav nav-tabs pull-right">
+          <li class="logged-out">
+            <a href="/app/login">
+              Login
+            </a>
+          </li>
+          <li class="hide logged-in dropdown">
+            <a data-toggle="dropdown"
+               class="dropdown-toggle"
+               href="#">
+              <span id="logged-in-email">@</span>
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/app/login">Logout</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <div id="login-page" class="hide">
       <div class="container-fluid">
         <div class="row-fluid">
