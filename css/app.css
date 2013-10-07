@@ -1,3 +1,7 @@
+body {
+  margin-top: 40px; /* room for navigation bar */
+}
+
 /*
   CSS doesn't provide a sane way of centering a block in the window, so we do
   the following.
