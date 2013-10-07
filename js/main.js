@@ -742,7 +742,9 @@ function showTaskArchive() {
 function showLogin(redirPath) {
   $("#login-button")
     .click(function() {
-      function onSuccess() { navigate(redirPath); }
+      function onSuccess() {
+        navigate(redirPath);
+      }
       var email = $("#login-email").val();
       var password = $("#login-password").val();
       if (email !== "" && password !== "")
@@ -812,7 +814,6 @@ function matchPath(model, path) {
   browser's navigation history (typically because it is already there).
 */
 function navigate(path, ignoreHistory) {
-  util.log("navigate " + path);
   var p = path.split('/');
   var args = [];
   function historyPushState(title, path) {
@@ -824,6 +825,7 @@ function navigate(path, ignoreHistory) {
     pageHome();
   }
   else if (args = matchPath(["", "app", "login"], p)) {
+    login.logout(); // hack - we shouldn't do that
     var redirPath = window.location.pathname;
     if (redirPath === path)
       redirPath = "/app";
@@ -856,7 +858,6 @@ function start() {
   if (!login.data)
     navigate("/app/login");
   else {
-    util.log("login.data " + login.data);
     navigate(window.location.pathname, true);
   }
 }

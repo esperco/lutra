@@ -12,6 +12,7 @@ var login = (function() {
       mod.data = login;
     else
       cache.remove("login");
+    mod.updateView();
   }
 
   mod.setLoginInfo = function(login) {
@@ -21,11 +22,13 @@ var login = (function() {
     // Persistent storage never sent to the server
     cache.set("login", login);
     mod.data = login;
+    mod.updateView();
   }
 
   mod.clearLoginInfo = function() {
     cache.remove("login");
     delete mod.data;
+    mod.updateView();
   }
 
   /*
@@ -37,6 +40,10 @@ var login = (function() {
       onSuccess();
     }
     api.login(email, password, cont);
+  }
+
+  mod.logout = function () {
+    mod.clearLoginInfo();
   }
 
   /*
@@ -62,6 +69,17 @@ var login = (function() {
         jqXHR.setRequestHeader("Esper-Path", path);
         jqXHR.setRequestHeader("Esper-Signature", signature);
       }
+    }
+  }
+
+  mod.updateView = function() {
+    if (mod.data && mod.data.email) {
+      $("#logged-in-email").text(mod.data.email);
+      $(".logged-out").addClass("hide");
+      $(".logged-in").removeClass("hide");
+    } else {
+      $(".logged-in").addClass("hide");
+      $(".logged-out").removeClass("hide");
     }
   }
 
