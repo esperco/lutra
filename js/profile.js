@@ -17,7 +17,7 @@ var profile = (function() {
   mod.Observe = can.Observe;
 
   /* cache of observable profiles */
-  var accessCache = cache.create (60, 10, {
+  var accessCache = cache.create (600, 60, {
     get: function(uid) { return api.getProfile(uid); },
     wrap: function(prof) { return new can.Observe({prof:prof}); },
     update: function(obs, prof) { return obs.attr("prof", prof); },
