@@ -46,6 +46,10 @@ body {
   padding: 0.2em;
 }
 
+.author {
+  font-style: italic;
+}
+
 .tasksummary {
 }
 

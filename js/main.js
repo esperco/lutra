@@ -3,7 +3,7 @@ function reportStatus(msg, kind, details) {
     .text(msg)
     .addClass("alert alert-" + kind)
     .removeClass("hide");
-  util.log({
+  log({
     status: msg,
     kind: kind,
     details: details
@@ -49,9 +49,8 @@ function viewOfTask(tab, task) {
   case "queue":
     archiveButton
       .click(function() {
-        api.queueRemove(
-          task,
-          function() { view.remove(); });
+        api.queueRemove(task)
+          .done(function() { view.remove(); });
       });
     archiveButton.appendTo(buttons);
     break;
@@ -150,26 +149,70 @@ function viewOfChoicesRequest(qsel) {
   return view;
 }
 
-function miniAuthorViewOfProfile(profile) {
-  return $("<span class='mini-author'/>")
-    .text(profile.familiar_name + ": ")
-    .attr("title", profile.full_name);
+function miniAuthorViewOfProfile(obs_by, obs_for, confirmed) {
+  var prof_by = obs_by.prof;
+  var prof_for = obs_for.prof;
+  var view = $("<span class='mini-author'/>");
+
+  function nameView(prof) {
+    return $("<span/>")
+      .text(prof.familiar_name)
+      .attr("title", prof.full_name);
+  }
+
+  var by = nameView(prof_by);
+
+  if (prof_by.profile_uid === prof_for.profile_uid) {
+    view
+      .append(nameView(prof_by));
+  }
+  else {
+    view
+      .append(nameView(prof_for))
+      .append(document.createTextNode(" (via "))
+      .append(nameView(prof_by));
+    if (!confirmed)
+      view.append(document.createTextNode(", unconfirmed"));
+    view.append(document.createTextNode(")"));
+  }
+  view.append(document.createTextNode(":"));
+  return view;
 }
 
-function viewOfSelectorResponse(selResp, byUid) {
+function viewOfSelectorResponse(selResp, respondent, confirmed) {
   var view = $("<div class='response'/>");
 
-  var profile = users.get(byUid);
-  if (profile) {
-    authorView = miniAuthorViewOfProfile(profile)
-      .appendTo(view);
-  }
+  var byUid = respondent.resp_by;
+  var forUid = respondent.resp_for;
 
-  for (var i in selResp.sel_selected) {
-    $("<span class='answer'/>")
-      .text(selResp.sel_selected[i])
-      .appendTo(view);
-  }
+  profile.get(byUid).done(function(obs_prof_by) {
+    profile.get(forUid).done(function(obs_prof_for) {
+      if (obs_prof_by && obs_prof_for) {
+
+        var authorView = $("<span/>")
+          .append(miniAuthorViewOfProfile(obs_prof_by, obs_prof_for, confirmed))
+          .appendTo(view);
+
+        function onChange(ev, attr, how, newVal, oldVal) {
+          authorView
+            .children()
+            .replaceWith(miniAuthorViewOfProfile(obs_prof_by,
+                                                 obs_prof_for,
+                                                 confirmed));
+        }
+
+        /* update the view automatically when either profile changes */
+        obs_prof_by.bind("change", onChange);
+        obs_prof_for.bind("change", onChange);
+
+        for (var i in selResp.sel_selected) {
+          $("<span class='answer'/>")
+            .text(selResp.sel_selected[i])
+            .appendTo(view);
+        }
+      }
+    });
+  });
 
   return view;
 }
@@ -204,9 +247,10 @@ function viewOfSelectorRequest(q) {
   else {
     for (var i in responses) {
       var resp = responses[i];
-      var byUid = resp.response_by;
       if (resp.response) {
-        viewOfSelectorResponse(resp.response.selector_r, byUid)
+        viewOfSelectorResponse(resp.response.selector_r,
+                               resp.respondent,
+                               resp.response_confirmed)
           .appendTo(view);
       }
     }
@@ -225,11 +269,11 @@ function viewOfComments(comments) {
   for (var i in comments) {
     var a = comments[i];
     if ("string" === typeof a.comment_audio) {
-      viewOfAudioComment(a.comment_audio)
+      viewOfAudioComment(a)
         .appendTo(view);
     }
     if ("string" === typeof a.comment_text) {
-      viewOfTextComment(a.comment_text)
+      viewOfTextComment(a)
         .appendTo(view);
     }
   }
@@ -237,8 +281,22 @@ function viewOfComments(comments) {
 }
 
 function viewOfTextComment(comment) {
-  return $("<div class='comment'/>")
-    .text(comment);
+  var view = $("<div class='comment'/>")
+    .text(comment.comment_text);
+  profile.get(comment.comment_by)
+    .done(function(obs_prof) {
+      if (obs_prof) {
+        var authorView = $("<span></span>")
+          .append(profile.view.author(obs_prof))
+          .appendTo(view);
+
+        /* update automatically when profile changes */
+        obs_prof.bind("change", function(ev, attr, how, newVal, oldVal) {
+          authorView.children().replaceWith(profile.view.author(obs_prof));
+        });
+      }
+    });
+  return view;
 }
 
 /*
@@ -248,7 +306,7 @@ function viewOfTextComment(comment) {
   http://www.w3schools.com/html/horse.mp3
   http://www.w3schools.com/html/horse.ogg
 */
-function viewOfAudioComment(audioLink) {
+function viewOfAudioComment(comment) {
   var view = $("<div class='comment'/>");
 
   var player = $("<audio/>")
@@ -257,7 +315,7 @@ function viewOfAudioComment(audioLink) {
     .appendTo(view);
 
   var source = $("<source/>")
-    .attr("src", audioLink)
+    .attr("src", comment.comment_audio)
   //.attr("type", "audio/ogg")
     .appendTo(player);
 
@@ -742,13 +800,12 @@ function showTaskArchive() {
 function showLogin(redirPath) {
   $("#login-button")
     .click(function() {
-      function onSuccess() {
-        navigate(redirPath);
-      }
       var email = $("#login-email").val();
       var password = $("#login-password").val();
-      if (email !== "" && password !== "")
-        login.login(email, password, onSuccess);
+      if (email !== "" && password !== "") {
+        login.login(email, password)
+          .done(function() { navigate(redirPath); });
+      }
     });
   $("#login-page").removeClass("hide");
   $("#login-email").focus();

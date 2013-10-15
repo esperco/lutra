@@ -12,6 +12,8 @@
 
   <body>
 
+    <button id="dummy" class="hide"></button>
+
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <a class="brand" href="#">Esper</a>
