@@ -19,4 +19,4 @@ rm -rf bootstrap
 unzip bootstrap-2.3.2.zip
 
 # mink-libs/can
-cp can-1.1.7.custom.min.js can.min.js
+cp can-1.1.8.custom.min.js can.min.js

@@ -3,7 +3,7 @@ function reportStatus(msg, kind, details) {
     .text(msg)
     .addClass("alert alert-" + kind)
     .removeClass("hide");
-  util.log({
+  log({
     status: msg,
     kind: kind,
     details: details
@@ -49,9 +49,8 @@ function viewOfTask(tab, task) {
   case "queue":
     archiveButton
       .click(function() {
-        api.queueRemove(
-          task,
-          function() { view.remove(); });
+        api.queueRemove(task)
+          .done(function() { view.remove(); });
       });
     archiveButton.appendTo(buttons);
     break;
@@ -150,26 +149,29 @@ function viewOfChoicesRequest(qsel) {
   return view;
 }
 
-function miniAuthorViewOfProfile(profile) {
+function miniAuthorViewOfProfile(obs) {
+  var prof = obs.prof;
   return $("<span class='mini-author'/>")
-    .text(profile.familiar_name + ": ")
-    .attr("title", profile.full_name);
+    .text(prof.familiar_name + ": ")
+    .attr("title", prof.full_name);
 }
 
 function viewOfSelectorResponse(selResp, byUid) {
   var view = $("<div class='response'/>");
 
-  var profile = users.get(byUid);
-  if (profile) {
-    authorView = miniAuthorViewOfProfile(profile)
-      .appendTo(view);
-  }
+  profile.get(byUid)
+    .done(function (prof) {
+      if (prof) {
+        authorView = miniAuthorViewOfProfile(prof)
+          .appendTo(view);
+      }
 
-  for (var i in selResp.sel_selected) {
-    $("<span class='answer'/>")
-      .text(selResp.sel_selected[i])
-      .appendTo(view);
-  }
+      for (var i in selResp.sel_selected) {
+        $("<span class='answer'/>")
+          .text(selResp.sel_selected[i])
+          .appendTo(view);
+      }
+    });
 
   return view;
 }
@@ -204,7 +206,7 @@ function viewOfSelectorRequest(q) {
   else {
     for (var i in responses) {
       var resp = responses[i];
-      var byUid = resp.response_by;
+      var byUid = resp.respondent.resp_by;
       if (resp.response) {
         viewOfSelectorResponse(resp.response.selector_r, byUid)
           .appendTo(view);
@@ -225,11 +227,11 @@ function viewOfComments(comments) {
   for (var i in comments) {
     var a = comments[i];
     if ("string" === typeof a.comment_audio) {
-      viewOfAudioComment(a.comment_audio)
+      viewOfAudioComment(a)
         .appendTo(view);
     }
     if ("string" === typeof a.comment_text) {
-      viewOfTextComment(a.comment_text)
+      viewOfTextComment(a)
         .appendTo(view);
     }
   }
@@ -237,8 +239,15 @@ function viewOfComments(comments) {
 }
 
 function viewOfTextComment(comment) {
-  return $("<div class='comment'/>")
-    .text(comment);
+  var view = $("<div class='comment'/>")
+    .text(comment.comment_text);
+  profile.get(comment.comment_by)
+    .done(function(author) {
+      if (author) {
+        view.append(profile.view.author(author));
+      }
+    });
+  return view;
 }
 
 /*
@@ -248,7 +257,7 @@ function viewOfTextComment(comment) {
   http://www.w3schools.com/html/horse.mp3
   http://www.w3schools.com/html/horse.ogg
 */
-function viewOfAudioComment(audioLink) {
+function viewOfAudioComment(comment) {
   var view = $("<div class='comment'/>");
 
   var player = $("<audio/>")
@@ -257,7 +266,7 @@ function viewOfAudioComment(audioLink) {
     .appendTo(view);
 
   var source = $("<source/>")
-    .attr("src", audioLink)
+    .attr("src", comment.comment_audio)
   //.attr("type", "audio/ogg")
     .appendTo(player);
 
@@ -742,13 +751,12 @@ function showTaskArchive() {
 function showLogin(redirPath) {
   $("#login-button")
     .click(function() {
-      function onSuccess() {
-        navigate(redirPath);
-      }
       var email = $("#login-email").val();
       var password = $("#login-password").val();
-      if (email !== "" && password !== "")
-        login.login(email, password, onSuccess);
+      if (email !== "" && password !== "") {
+        login.login(email, password)
+          .done(function() { navigate(redirPath); });
+      }
     });
   $("#login-page").removeClass("hide");
   $("#login-email").focus();

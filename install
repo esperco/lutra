@@ -13,7 +13,7 @@ case "$1" in
         exit 1
 esac
 
-mkdir -p pub/css pub/js pub/html pub/img
+mkdir -p pub/css pub/js pub/ejs pub/html pub/img
 
 # Copy third-party libraries into the pub directory
 cp mink-libs/jquery.min.js pub/js
@@ -25,3 +25,4 @@ cp -a mink-libs/bootstrap/* pub
 make -C js $mode-install
 cp css/*.css pub/css
 cp html/*.html pub/html
+cp ejs/*.ejs pub/ejs

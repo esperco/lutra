@@ -6,12 +6,12 @@ var login = (function() {
   var mod = {};
 
   mod.initLoginInfo = function() {
-    var login = cache.get("login");
+    var login = store.get("login");
 
     if (login && login.uid) // sanity check
       mod.data = login;
     else
-      cache.remove("login");
+      store.remove("login");
     mod.updateView();
   }
 
@@ -20,13 +20,13 @@ var login = (function() {
       login.team = login.teams[0];
 
     // Persistent storage never sent to the server
-    cache.set("login", login);
+    store.set("login", login);
     mod.data = login;
     mod.updateView();
   }
 
   mod.clearLoginInfo = function() {
-    cache.remove("login");
+    store.remove("login");
     delete mod.data;
     mod.updateView();
   }
@@ -34,12 +34,11 @@ var login = (function() {
   /*
     Get API secret from the server, and more.
   */
-  mod.login = function (email, password, onSuccess) {
-    function cont(login) {
-      mod.setLoginInfo(login);
-      onSuccess();
-    }
-    api.login(email, password, cont);
+  mod.login = function (email, password) {
+    return api.login(email, password)
+      .done(function cont(login) {
+        mod.setLoginInfo(login);
+      });
   }
 
   mod.logout = function () {
