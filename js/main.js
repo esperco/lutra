@@ -149,35 +149,70 @@ function viewOfChoicesRequest(qsel) {
   return view;
 }
 
-function miniAuthorViewOfProfile(obs) {
-  var prof = obs.prof;
-  return $("<span class='mini-author'/>")
-    .text(prof.familiar_name + ": ")
-    .attr("title", prof.full_name);
+function miniAuthorViewOfProfile(obs_by, obs_for, confirmed) {
+  var prof_by = obs_by.prof;
+  var prof_for = obs_for.prof;
+  var view = $("<span class='mini-author'/>");
+
+  function nameView(prof) {
+    return $("<span/>")
+      .text(prof.familiar_name)
+      .attr("title", prof.full_name);
+  }
+
+  var by = nameView(prof_by);
+
+  if (prof_by.profile_uid === prof_for.profile_uid) {
+    view
+      .append(nameView(prof_by));
+  }
+  else {
+    view
+      .append(nameView(prof_for))
+      .append(document.createTextNode(" (via "))
+      .append(nameView(prof_by));
+    if (!confirmed)
+      view.append(document.createTextNode(", unconfirmed"));
+    view.append(document.createTextNode(")"));
+  }
+  view.append(document.createTextNode(":"));
+  return view;
 }
 
-function viewOfSelectorResponse(selResp, byUid) {
+function viewOfSelectorResponse(selResp, respondent, confirmed) {
   var view = $("<div class='response'/>");
 
-  profile.get(byUid)
-    .done(function (obs_prof) {
-      if (obs_prof) {
+  var byUid = respondent.resp_by;
+  var forUid = respondent.resp_for;
+
+  profile.get(byUid).done(function(obs_prof_by) {
+    profile.get(forUid).done(function(obs_prof_for) {
+      if (obs_prof_by && obs_prof_for) {
+
         var authorView = $("<span/>")
-          .append(miniAuthorViewOfProfile(obs_prof))
+          .append(miniAuthorViewOfProfile(obs_prof_by, obs_prof_for, confirmed))
           .appendTo(view);
 
-        /* update automatically when profile changes */
-        obs_prof.bind("change", function(ev, attr, how, newVal, oldVal) {
-          authorView.children().replaceWith(miniAuthorViewOfProfile(obs_prof));
-        });
-      }
+        function onChange(ev, attr, how, newVal, oldVal) {
+          authorView
+            .children()
+            .replaceWith(miniAuthorViewOfProfile(obs_prof_by,
+                                                 obs_prof_for,
+                                                 confirmed));
+        }
 
-      for (var i in selResp.sel_selected) {
-        $("<span class='answer'/>")
-          .text(selResp.sel_selected[i])
-          .appendTo(view);
+        /* update the view automatically when either profile changes */
+        obs_prof_by.bind("change", onChange);
+        obs_prof_for.bind("change", onChange);
+
+        for (var i in selResp.sel_selected) {
+          $("<span class='answer'/>")
+            .text(selResp.sel_selected[i])
+            .appendTo(view);
+        }
       }
     });
+  });
 
   return view;
 }
@@ -212,9 +247,10 @@ function viewOfSelectorRequest(q) {
   else {
     for (var i in responses) {
       var resp = responses[i];
-      var byUid = resp.respondent.resp_by;
       if (resp.response) {
-        viewOfSelectorResponse(resp.response.selector_r, byUid)
+        viewOfSelectorResponse(resp.response.selector_r,
+                               resp.respondent,
+                               resp.response_confirmed)
           .appendTo(view);
       }
     }
