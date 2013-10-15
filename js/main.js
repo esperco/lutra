@@ -160,10 +160,16 @@ function viewOfSelectorResponse(selResp, byUid) {
   var view = $("<div class='response'/>");
 
   profile.get(byUid)
-    .done(function (prof) {
-      if (prof) {
-        authorView = miniAuthorViewOfProfile(prof)
+    .done(function (obs_prof) {
+      if (obs_prof) {
+        var authorView = $("<span/>")
+          .append(miniAuthorViewOfProfile(obs_prof))
           .appendTo(view);
+
+        /* update automatically when profile changes */
+        obs_prof.bind("change", function(ev, attr, how, newVal, oldVal) {
+          authorView.children().replaceWith(miniAuthorViewOfProfile(obs_prof));
+        });
       }
 
       for (var i in selResp.sel_selected) {
@@ -242,9 +248,16 @@ function viewOfTextComment(comment) {
   var view = $("<div class='comment'/>")
     .text(comment.comment_text);
   profile.get(comment.comment_by)
-    .done(function(author) {
-      if (author) {
-        view.append(profile.view.author(author));
+    .done(function(obs_prof) {
+      if (obs_prof) {
+        var authorView = $("<span></span>")
+          .append(profile.view.author(obs_prof))
+          .appendTo(view);
+
+        /* update automatically when profile changes */
+        obs_prof.bind("change", function(ev, attr, how, newVal, oldVal) {
+          authorView.children().replaceWith(profile.view.author(obs_prof));
+        });
       }
     });
   return view;

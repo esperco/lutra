@@ -40,6 +40,8 @@ var cache = (function() {
           expires: unixtime.now() + missingTtl,
           v: null
         };
+      else
+        delete cache[k];
     }
 
     function defer(x) {
@@ -76,7 +78,7 @@ var cache = (function() {
     /* get cached value if available, otherwise get the current value */
     function getCached(k) {
       var x = cache[k];
-      if (x && x.expires < unixtime.now()) {
+      if (x && unixtime.now() < x.expires) {
         return defer(x.v);
       }
       else

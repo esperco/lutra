@@ -17,7 +17,7 @@ var profile = (function() {
   mod.Observe = can.Observe;
 
   /* cache of observable profiles */
-  var accessCache = cache.create (10, 1, {
+  var accessCache = cache.create (60, 10, {
     get: function(uid) { return api.getProfile(uid); },
     wrap: function(prof) { return new can.Observe({prof:prof}); },
     update: function(obs, prof) { return obs.attr("prof", prof); },
@@ -37,23 +37,30 @@ var profile = (function() {
   /* display mini profile */
   mod.view.author = function(obs) {
     /* note: can.view, not can.view.render! */
-    return can.view('assets/ejs/userAuthor.ejs', obs);
+    return $(can.view('assets/ejs/userAuthor.ejs', obs));
   }
 
+  /* sample control */
   mod.control.Dummy = can.Control.extend({
-    'button click': function(button, event) {
-      log("yay");
-      /* change profile value, should be reflected in all the views */
-      mod.get(sample.robin_uid)
+    init: function(element) {
+      element.text("click me!");
+      element.removeClass("hide");
+    },
+
+    'click': function(button, event) {
+      /* change my profile value, should be reflected in all the views */
+      mod.get(login.data.uid)
         .done(function(obs) {
+          /* fires a "change" event */
           obs.attr("prof.familiar_name", "new name!");
         });
-      // let other controls know what happened (?)
-      button.trigger('selected');
     }
   });
 
-  mod.control.dummyButton = new mod.control.Dummy("#dummy", {/*options*/});
+  /* display sample control */
+/*
+  mod.control.dummyButton = new mod.control.Dummy("#dummy");
+*/
 
   return mod;
 }());
