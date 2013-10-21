@@ -14,7 +14,7 @@ var api = (function () {
     function onError(xhr, textStatus, err) {
       switch (xhr.status) {
       case 401: // Unauthorized - redirect to login screen
-        navigate("/app/login");
+        route.login();
         break;
       default:
         var details = {

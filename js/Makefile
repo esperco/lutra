@@ -21,6 +21,8 @@ SOURCES = \
   api.js \
   sample.js \
   profile.js \
+  task.js \
+  route.js \
   main.js
 
 # Development: keep each file separate for easier debugging
