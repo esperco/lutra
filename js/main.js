@@ -588,8 +588,8 @@ function EditChoicesRequest(qid, qsel) {
     var textView = $("<input type='text' class='sel-text'/>")
       .attr("value", value)
       .attr("placeholder", "Enter a choice")
-      .keypress(function(e) {
-        var c = e.charCode || e.keyCode;
+      .keydown(function(e) {
+        var c = e.which;
         // Enter or Tab
         if (13 === c || 9 === c) {
           if (! removeLabelIfEmpty(view))
