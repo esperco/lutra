@@ -592,8 +592,11 @@ function EditChoicesRequest(qid, qsel) {
         var c = e.which;
         // Enter or Tab
         if (13 === c || 9 === c) {
-          if (! removeLabelIfEmpty(view))
-            moveToNextLabel(view);
+          if (e.shiftKey)
+            moveToPrevLabel(view);
+          else
+            if (! removeLabelIfEmpty(view))
+              moveToNextLabel(view);
           return false;
         }
         // Backspace
