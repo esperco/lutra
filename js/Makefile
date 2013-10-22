@@ -14,6 +14,7 @@ prod-build: prod.js includes-prod.html
 SOURCES = \
   util.js \
   log.js \
+  status.js \
   unixtime.js \
   cache.js \
   store.js \

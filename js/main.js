@@ -1,8 +1,7 @@
 function main() {
-  route.setup();
   login.initLoginInfo();
-  if (!login.data)
-    route.nav.login();
+  route.setup();
+  api.getProfile("abc");
 }
 
 $(document).ready(main);

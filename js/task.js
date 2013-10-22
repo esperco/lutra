@@ -1,30 +1,5 @@
 /* Lots of stuff unrelated to tasks here, file needs splitting */
 
-function reportStatus(msg, kind, details) {
-  $("#status")
-    .text(msg)
-    .addClass("alert alert-" + kind)
-    .removeClass("hide");
-  log({
-    status: msg,
-    kind: kind,
-    details: details
-  });
-}
-
-// error status
-function reportError(msg, details) {
-  reportStatus(msg, "error", details);
-}
-
-function reportSuccess(msg) {
-  reportStatus(msg, "success", {});
-}
-
-function clearStatus() {
-  $("#error").addClass("hide");
-}
-
 // task queue view
 function viewOfTaskQueue(tab, tasks) {
   var view = $("<div/>");
