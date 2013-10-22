@@ -6,7 +6,6 @@ var route = (function() {
   mod.nav = {};
 
   function withLogin(f) {
-    log(location.hash);
     if (!login.data)
       location.hash = "#!login/redir/" + encodeURIComponent(location.hash);
     else
@@ -31,8 +30,6 @@ var route = (function() {
       mod.nav.login();
     },
     "login/redir/:redir route" : function(data) {
-      log(data);
-      login.logout(); // hack - we shouldn't do that
       pageLogin(data.redir);
     },
 
