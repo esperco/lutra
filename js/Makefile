@@ -22,6 +22,8 @@ SOURCES = \
   api.js \
   sample.js \
   profile.js \
+  comment.js \
+  request.js \
   task.js \
   route.js \
   main.js
