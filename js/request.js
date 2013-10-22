@@ -125,11 +125,11 @@ function selectOfRequestKind() {
   var select = $("<select size=1/>");
 
   var kindLabels = [
-    "Multiple Choices (only one answer)",
     "Multiple Choices (multiple answers)",
+    "Multiple Choices (only one answer)",
     "Message (no answer needed)"
   ];
-  var kindValues = ["single", "multiple", "message"];
+  var kindValues = ["multiple", "single", "message"];
   for (var i in kindValues) {
     var option = $("<option/>")
       .attr("value", kindValues[i])
