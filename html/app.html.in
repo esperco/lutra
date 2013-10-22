@@ -82,18 +82,28 @@
 
             <ul class="nav nav-tabs">
               <li id="queuetab">
-                <a href="#" onclick="showTaskQueue()">
+                <a href="#" onclick="page.showTaskQueue()">
                   Queue
                 </a>
               </li>
               <li id="archivetab">
-                <a href="#" onclick="showTaskArchive()">
+                <a href="#" onclick="page.showTaskArchive()">
                   All
                 </a>
               </li>
             </ul>
             <div id="queue" class="hide"></div>
             <div id="archive" class="hide"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="single-task-page" class="hide">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12 queue-tab-area">
+            <div id="single-task"></div>
           </div>
         </div>
       </div>

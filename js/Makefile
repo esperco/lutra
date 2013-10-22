@@ -25,6 +25,7 @@ SOURCES = \
   comment.js \
   request.js \
   task.js \
+  page.js \
   route.js \
   main.js
 

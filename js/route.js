@@ -18,24 +18,24 @@ var route = (function() {
 
     /* default path /!# */
     "route" : function(data){
-      withLogin(pageHome);
+      withLogin(page.home);
     },
 
     /* login, logout, etc. */
     "login route" : function(data) {
-      pageLogin("");
+      page.login("");
     },
     "logout route" : function(data) {
       login.logout();
       mod.nav.login();
     },
     "login/redir/:redir route" : function(data) {
-      pageLogin(data.redir);
+      page.login(data.redir);
     },
 
     /* various pages */
     "respond/:rid/:uid route" : function(data) {
-      withLogin(function () { log(data); });
+      withLogin(function () { page.respond(rid, asUid); });
     },
     "translate/response/:rid/:uid route" : function(data) {
       withLogin(function () { log(data); });
