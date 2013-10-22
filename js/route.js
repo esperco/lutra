@@ -8,7 +8,7 @@ var route = (function() {
   function withLogin(f) {
     log(location.hash);
     if (!login.data)
-      location.hash = "#!login/redir/" + location.hash;
+      location.hash = "#!login/redir/" + encodeURIComponent(location.hash);
     else
       f ();
   }
@@ -31,6 +31,7 @@ var route = (function() {
       mod.nav.login();
     },
     "login/redir/:redir route" : function(data) {
+      log(data);
       login.logout(); // hack - we shouldn't do that
       pageLogin(data.redir);
     },
@@ -46,9 +47,9 @@ var route = (function() {
 
   /* Navigation functions (set the URL, let the router react to the changes) */
 
-  /* e.g. route.nav.path("a/b/c") goes to URL /#!a/b/c  */
-  mod.nav.path = function(path) {
-    location.hash = "#!" + path;
+  /* e.g. route.nav.path("#!a/b/c") goes to URL /#!a/b/c  */
+  mod.nav.path = function(frag) {
+    location.hash = frag;
   }
 
   mod.nav.home = function() {
