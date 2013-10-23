@@ -14,6 +14,7 @@ prod-build: prod.js includes-prod.html
 SOURCES = \
   util.js \
   log.js \
+  status.js \
   unixtime.js \
   cache.js \
   store.js \
@@ -21,6 +22,11 @@ SOURCES = \
   api.js \
   sample.js \
   profile.js \
+  comment.js \
+  request.js \
+  task.js \
+  page.js \
+  route.js \
   main.js
 
 # Development: keep each file separate for easier debugging

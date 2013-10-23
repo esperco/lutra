@@ -14,17 +14,17 @@ var api = (function () {
     function onError(xhr, textStatus, err) {
       switch (xhr.status) {
       case 401: // Unauthorized - redirect to login screen
-        navigate("/app/login");
+        route.login();
         break;
       default:
         var details = {
-          code: status.toString(),
+          code: xhr.status,
           method: method,
           url: url,
           reqBody: body,
           respBody: xhr.responseText
         };
-        reportError("Please try again later.", details);
+        status.reportError("Please try again later.", details);
       }
     }
 

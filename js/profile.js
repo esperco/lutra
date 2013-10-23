@@ -40,6 +40,37 @@ var profile = (function() {
     return $(can.view('assets/ejs/userAuthor.ejs', obs));
   }
 
+  mod.view.respondent = function(obs_by, obs_for, confirmed) {
+    var prof_by = obs_by.prof;
+    var prof_for = obs_for.prof;
+    var view = $("<span class='mini-author'/>");
+
+    function nameView(prof) {
+      return $("<span/>")
+        .text(prof.familiar_name)
+        .attr("title", prof.full_name);
+    }
+
+    var by = nameView(prof_by);
+
+    if (prof_by.profile_uid === prof_for.profile_uid) {
+      view
+        .append(nameView(prof_by));
+    }
+    else {
+      view
+        .append(nameView(prof_for))
+        .append(document.createTextNode(" (via "))
+        .append(nameView(prof_by));
+      if (!confirmed)
+        view.append(document.createTextNode(", unconfirmed"));
+      view.append(document.createTextNode(")"));
+    }
+    view.append(document.createTextNode(":"));
+    return view;
+  }
+
+
   /* sample control */
   mod.control.Dummy = can.Control.extend({
     init: function(element) {
