@@ -72,23 +72,27 @@ var api = (function () {
     return "/api/q/" + login.data.uid;
   }
 
+  function api_tasks_prefix() {
+    return api_q_prefix() + "/tasks/" + login.data.teams[0].teamid;
+  }
+
   mod.getProfile = function (uid) {
     return jsonHttpGET(api_profile_prefix() + "/" + uid);
   }
 
   mod.loadTaskQueue = function() {
-    return jsonHttpGET(api_q_prefix() + "/queue")
+    return jsonHttpGET(api_tasks_prefix() + "/recent")
       .done(function(data) {
         placeView($("#queue"),
-                  viewOfTaskQueue("queue", data.queue_elements));
+                  viewOfTaskQueue("queue", data.tasks));
       });
   }
 
   mod.loadTaskArchive = function() {
-    return jsonHttpGET(api_q_prefix() + "/archive")
+    return jsonHttpGET(api_tasks_prefix() + "/active")
       .done(function(data) {
         placeView($("#archive"),
-                  viewOfTaskQueue("archive", data.archive_elements));
+                  viewOfTaskQueue("archive", data.tasks));
       });
   }
 
