@@ -9,7 +9,7 @@ function viewOfTaskQueue(tab, tasks) {
     .appendTo(view);
 
   for (var i in tasks) {
-    viewOfTask(tab, tasks[i].task).appendTo(tasksView);
+    viewOfTask(tab, tasks[i]).appendTo(tasksView);
   }
   tasksView.appendTo(view);
 
