@@ -127,6 +127,7 @@ var api = (function () {
   mod.postTask = function(task, updated_requests) {
     var updated_task = {task_status      : task.task_status,
                         task_participants: task.task_participants,
+                        task_kind        : "Questions",
                         task_requests    : updated_requests};
     return jsonHttpPOST(api_q_prefix() + "/task/" + task.tid,
                         JSON.stringify(updated_task))
