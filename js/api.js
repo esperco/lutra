@@ -80,20 +80,14 @@ var api = (function () {
     return jsonHttpGET(api_profile_prefix() + "/" + uid);
   }
 
-  mod.loadTaskQueue = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/recent")
-      .done(function(data) {
-        placeView($("#queue"),
-                  viewOfTaskQueue("queue", data.tasks));
-      });
+  mod.loadActiveTasks = function() {
+    return jsonHttpGET(api_tasks_prefix() + "/active")
+      .done(task.updateActiveTasksView);
   }
 
-  mod.loadTaskArchive = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/active")
-      .done(function(data) {
-        placeView($("#archive"),
-                  viewOfTaskQueue("archive", data.tasks));
-      });
+  mod.loadRecentTasks = function() {
+    return jsonHttpGET(api_tasks_prefix() + "/recent")
+      .done(task.updateRecentTasksView);
   }
 
   mod.deleteRequest = function(qid) {

@@ -72,7 +72,7 @@
       </div>
     </div>
 
-    <div id="tabbed-tasks-page" class="hide">
+    <div id="home-page" class="hide">
       <div class="container-fluid">
         <div class="row-fluid">
           <div class="span12 queue-tab-area">
@@ -81,25 +81,21 @@
             <div class="hide" id="hidden-status"></div>
 
             <ul class="nav nav-tabs">
-              <li id="queuetab">
-                <a href="#" onclick="page.showTaskQueue()">
-                  Queue
+              <li id="active-tasks-tab">
+                <a href="#" id="active-tasks-tab-link">
+                  Tasks
                 </a>
               </li>
-              <li id="archivetab">
-                <a href="#" onclick="page.showTaskArchive()">
-                  All
-                </a>
-              </li>
+              <!-- add more tabs as needed -->
             </ul>
-            <div id="queue" class="hide"></div>
-            <div id="archive" class="hide"></div>
+            <div id="active-tasks-tab-content" class="hide"></div>
+            <!-- add more hidden tab content views as needed -->
           </div>
         </div>
       </div>
     </div>
 
-    <div id="single-task-page" class="hide">
+    <div id="task-page" class="hide">
       <div class="container-fluid">
         <div class="row-fluid">
           <div class="span12 queue-tab-area">
