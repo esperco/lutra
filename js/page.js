@@ -5,6 +5,7 @@ var page = (function() {
     "login",
     "home",
     "task",
+    "scheduling",
     "respond"
   ];
 

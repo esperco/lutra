@@ -16,7 +16,7 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <a class="brand" href="#">Esper</a>
+        <a class="navbar-brand" href="#">Esper</a>
         <ul class="nav">
 <!--
           <li class="active"><a href="#">Home</a></li>
@@ -48,8 +48,8 @@
     </div>
 
     <div id="login-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
+      <div class="container">
+        <div class="row">
           <div class="span4"></div>
           <div class="login-form span4">
             <h2>Esper Login</h2>
@@ -62,7 +62,7 @@
                 <input id="login-password" type="password"
                        placeholder="Password">
               </div>
-              <button id="login-button" class="btn primary">
+              <button id="login-button" class="btn btn-default primary">
                 Sign in
               </button>
             </fieldset>
@@ -73,8 +73,8 @@
     </div>
 
     <div id="home-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
+      <div class="container">
+        <div class="row">
           <div class="span12 queue-tab-area">
 
             <div class="hide" id="status"></div>
@@ -96,10 +96,23 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span12 queue-tab-area">
-            <div id="single-task"></div>
+      <div class="container">
+        <div class="row">
+          <div class="span12">
+            <div id="select-task-category">
+            </div>
+            <div id="sched-task-body" class="hide">
+              <div id="sched-progress-tabs">
+                <span class="sched-progress-tab">Step 1. Coordinate</span>
+                <span class="sched-progress-tab">Step 2. Confirm</span>
+              </div>
+              <div id="sched-select-show-number">
+                ...
+              </div>
+              ...
+            </div>
+            <div id="other-task-body" class="hide">
+            </div>
           </div>
         </div>
       </div>

@@ -25,7 +25,8 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
-    var archiveButton = $("<button class='btn btn-primary'>Archive</button>");
+    var archiveButton =
+      $("<button class='btn btn-default btn-primary'>Archive</button>");
     if (tab === page.home.tab.activeTasks) {
       archiveButton
         .click(function() {
@@ -35,7 +36,7 @@ var task = (function() {
       archiveButton.appendTo(buttons);
     }
 
-    var editButton = $("<button class='btn'>Edit</button>")
+    var editButton = $("<button class='btn btn-default'>Edit</button>")
       .click(function() {
         editViewOfTask(tab, task, task.task_requests, {})
           .replaceAll(view);
@@ -131,15 +132,15 @@ var task = (function() {
       else {
         buttons.children().remove();
         if (hasRequests) {
-          $("<button class='btn btn-primary'>Save</button>")
+          $("<button class='btn btn-default btn-primary'>Save</button>")
             .click(save)
             .appendTo(buttons);
         }
-        $("<button class='btn'>Cancel</button>")
+        $("<button class='btn btn-default'>Cancel</button>")
           .click(task.tid ? stopEdit : remove)
           .appendTo(buttons);
         if (!hasRequests) {
-          $("<button class='btn btn-danger'>Delete Task</button>")
+          $("<button class='btn btn-default btn-danger'>Delete Task</button>")
             .click(taskEdit.remove)
             .appendTo(buttons);
         }
@@ -217,7 +218,7 @@ var task = (function() {
 
     function makeRequestView(qid, edit) {
       var deleteRequestButton =
-        $("<button class='btn btn-danger'>Delete request</button>");
+        $("<button class='btn btn-default btn-danger'>Delete request</button>");
 
       taskEdit.reqEdits[qid] = edit;
       var requestView = edit.viewOfRequest(deleteRequestButton)
@@ -244,7 +245,7 @@ var task = (function() {
 
     var requestSelect = selectOfRequestKind();
     var addRequestButton =
-      $("<button class='btn'>Create follow-up request</button>")
+      $("<button class='btn btn-default'>Create follow-up request</button>")
       .click(function() {
         var kind = requestSelect.val();
         var edit = "message" === kind
@@ -267,7 +268,7 @@ var task = (function() {
     var buttons = $("<div class='buttons'/>");
 
     var requestSelect = selectOfRequestKind();
-    var newTaskButton = $("<button class='btn'>New Task</button>")
+    var newTaskButton = $("<button class='btn btn-default'>New Task</button>")
       .click(function() {
         var reqEdits = {};
         tasksView

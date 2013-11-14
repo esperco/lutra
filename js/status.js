@@ -21,7 +21,7 @@ var status = (function() {
 
   // error status
   mod.reportError = function(msg, details) {
-    mod.report(msg, "error", details);
+    mod.report(msg, "danger", details);
   }
 
   mod.reportSuccess = function(msg) {
