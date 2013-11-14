@@ -1,6 +1,8 @@
 #! /bin/sh
 set -e
 
+ROOT=$(pwd)
+
 # Get archives from our github repository, then unpack them
 
 if [ ! -d mink-libs ]; then

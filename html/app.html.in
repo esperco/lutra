@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/bootstrap-lightbox.min.css" rel="stylesheet" media="screen">
     <link href="/assets/css/app.css" rel="stylesheet" media="screen">
   </head>
 
@@ -100,17 +101,19 @@
         <div class="row">
           <div class="span12">
             <div id="select-task-category">
+              Select category
             </div>
-            <div id="sched-task-body" class="hide">
+            <div id="sched-task-body">
               <div id="sched-progress-tabs">
-                <span class="sched-progress-tab">Step 1. Coordinate</span>
-                <span class="sched-progress-tab">Step 2. Confirm</span>
+                <span class="sched-progress-tab">Step 1. Parameters</span>
+                <span class="sched-progress-tab">Step 2. Coordinate</span>
+                <span class="sched-progress-tab">Step 3. Confirm</span>
               </div>
-              <div id="sched-select-show-number">
-                ...
-              </div>
-              ...
+              <div id="sched-step1-tab" class="hide"></div>
+              <div id="sched-step2-tab" class="hide"></div>
+              <div id="sched-step3-tab"></div>
             </div>
+
             <div id="other-task-body" class="hide">
             </div>
           </div>
@@ -122,6 +125,18 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/can.min.js"></script>
     <script src="/assets/js/sha1.js"></script>
+    <script src="/assets/js/bootstrap-lightbox.min.js"></script>
     INCLUDES
+    <script>
+      $(function(){
+        var includes = [
+          "sched-step3-tab"
+        ];
+        for (var i in includes) {
+          var id = includes[i];
+          $("#" + id).load("/assets/html/" + id + ".html");
+        }
+      });
+    </script>
   </body>
 </html>

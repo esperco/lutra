@@ -1,0 +1,53 @@
+<button class="btn btn-primary btn-lg"
+        data-toggle="modal"
+        data-target="#sched-confirm-modal">
+  Compose
+</button>
+
+<!-- Element IDs:
+       sched-confirm-modal: the whole modal dialog
+       sched-confirm-title: dialog title
+       sched-confirm-body: dialog body
+       sched-confirm-to: readonly recipient
+       sched-confirm-subject: editable subject line
+       sched-confirm-message: editable message body
+       sched-confirm-send: "Send" button
+-->
+<div class="modal fade" id="sched-confirm-modal" tabindex="-1"
+     role="dialog" aria-labelledby="sched-confirm-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close"
+                data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="sched-confirm-title">Edit message</h4>
+      </div>
+      <div class="modal-body" id="sched-confirm-body">
+        <div class="input-group">
+          <span class="input-group-addon">To</span>
+          <input id="sched-confirm-to"
+                 type="text" class="form-control"
+                 value="someone"
+                 readonly>
+        </div>
+        <div class="input-group">
+          <span class="input-group-addon">Subject</span>
+          <input id="sched-confirm-subject"
+                 type="text" class="form-control"
+                 placeholder="Enter email subject">
+        </div>
+        <div id="sched-confirm-message" contenteditable="true">
+          Dear Recipient,
+          ...
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default"
+                data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary"
+                id="sched-confirm-send">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
