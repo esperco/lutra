@@ -1,4 +1,5 @@
 function main() {
+  page.init();
   login.initLoginInfo();
   route.setup();
 }
