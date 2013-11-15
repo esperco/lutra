@@ -17,6 +17,7 @@ SOURCES = \
   status.js \
   unixtime.js \
   cache.js \
+  show.js \
   store.js \
   login.js \
   api.js \

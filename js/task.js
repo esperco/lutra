@@ -48,7 +48,7 @@ var task = (function() {
       ? task.task_status.task_title
       : null;
     if (title) {
-      viewOfTaskTitle(title)
+      viewOfTaskTitle(title, task.tid)
         .appendTo(view);
     }
 
@@ -58,9 +58,12 @@ var task = (function() {
     return view;
   }
 
-  function viewOfTaskTitle(title) {
-    return $("<h4 class='tasktitle'/>")
-      .text(title);
+  function viewOfTaskTitle(title, tid) {
+    var view = $("<h4 class='tasktitle'/>");
+    var link = $("<a href='#!task/" + tid + "'/>")
+      .text(title)
+      .appendTo(view);
+    return view;
   }
 
   function viewOfTaskRequests(requests) {
@@ -314,6 +317,46 @@ var task = (function() {
     placeView($("#" + tabName + "-tab-content"),
               viewOfTaskQueue(tabName, data.tasks));
   };
+
+  var taskTypeSelector = show.create([
+    "select-task-category",
+    "sched-task-body",
+    "q-task-body"
+  ]);
+
+  function loadNewTask() {
+    taskTypeSelector.show("select-task-category");
+  }
+
+  function loadQuestionsTask(task) {
+    var view = mod.viewOfTask("", task);
+    placeView($("#q-task-body"), view);
+    taskTypeSelector.show("q-task-body");
+  }
+
+  function loadMeetingTask(task) {
+    taskTypeSelector.show("sched-task-body");
+  }
+
+  /* Load task page */
+  mod.load = function(optTid) {
+    if (!optTid)
+      loadNewTask();
+    else {
+      api.getTask(optTid)
+        .done(function(task) {
+          switch (task.task_kind) {
+          case "Questions":
+            loadQuestionsTask(task);
+            break;
+          case "Meeting":
+            /* TODO check task progress, display appropriate view */
+            loadMeetingTask(task);
+            break;
+          }
+        })
+    }
+  }
 
   return mod;
 }());

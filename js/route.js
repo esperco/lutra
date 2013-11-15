@@ -36,7 +36,11 @@ var route = (function() {
     /* various pages */
 
     "task route": function(data) {
-      withLogin(function () { page.task.load(data); });
+      withLogin(function () { page.task.load(null); });
+    },
+
+    "task/:tid route": function(data) {
+      withLogin(function () { page.task.load(data.tid); });
     },
 
     "respond/:rid/:uid route" : function(data) {

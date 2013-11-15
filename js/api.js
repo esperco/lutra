@@ -133,6 +133,10 @@ var api = (function () {
       });
   }
 
+  mod.getTask = function(tid) {
+    return jsonHttpGET(api_q_prefix() + "/task/" + tid)
+  }
+
   mod.queueRemove = function(task, cont) {
     return jsonHttpPOST(api_q_prefix() + "/queue/" + task.tid + "/remove",
                         "",

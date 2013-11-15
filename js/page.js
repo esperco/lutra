@@ -102,7 +102,8 @@ var page = (function() {
 
   mod.task.load = function(optTid) {
     hideAll();
-    replace("task");
+    task.load(optTid);
+    show("task");
   };
 
   mod.respond.load = function(rid, asUid) {

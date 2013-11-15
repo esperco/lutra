@@ -18,13 +18,6 @@
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <a class="navbar-brand" href="#">Esper</a>
-        <ul class="nav">
-<!--
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#">Link</a></li>
-          <li><a href="#">Link</a></li>
--->
-        </ul>
         <ul class="nav nav-tabs pull-right">
           <li class="logged-out">
             <a href="#!login">
@@ -114,7 +107,7 @@
               <div id="sched-step3-tab"></div>
             </div>
 
-            <div id="other-task-body" class="hide">
+            <div id="q-task-body" class="hide">
             </div>
           </div>
         </div>
