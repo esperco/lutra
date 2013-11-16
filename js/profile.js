@@ -29,6 +29,16 @@ var profile = (function() {
     return accessCache.getCached(uid);
   }
 
+  /* Get multiple profiles from an array of uids.
+     Positions in the array are preserved.
+     Nulls exist where a failure occurred. */
+  mod.mget = function(uidList) {
+    var deferreds = list.map(uidList, function(uid) {
+      return mod.get(uid);
+    });
+    return deferred.join(deferreds);
+  }
+
   /* set profile value locally (for testing) */
   mod.set = function(uid, prof) {
     return accessCache.setCached(uid, prof);
@@ -37,7 +47,80 @@ var profile = (function() {
   /* display mini profile */
   mod.view.author = function(obs) {
     /* note: can.view, not can.view.render! */
-    return $(can.view('assets/ejs/userAuthor.ejs', obs));
+    return $(can.view("assets/ejs/userAuthor.ejs", obs));
+  }
+
+  function initials(s) {
+    var re = /(^|[^A-Za-z]+)([A-Za-z])/g;
+    var m;
+    var result = "";
+    do {
+      m = re.exec(s);
+      if (m)
+        result += m[2];
+    } while (m);
+    return result;
+  }
+
+  function firstTwoLetters(s) {
+    var re = /(^|[^A-Za-z]+)([A-Za-z][A-Za-z]?)/g;
+    var result = "";
+    do {
+      m = re.exec(s);
+      if (m)
+        result += m[2];
+    } while (m);
+    return result.substring(0,2);
+  }
+
+  function shortenName(s) {
+    var result = initials(s);
+    if (result.length <= 1)
+      result = firstTwoLetters(s);
+    if (result === "")
+      result = s.substring(0,2);
+    return result;
+  }
+
+  function veryShortNameOfProfile(prof) {
+    var result = shortenName(prof.full_name);
+    if (result === "")
+      result = shortenName(prof.familiar_name);
+    return result;
+  }
+
+  function viewOfPhotoMedium(imageUrl) {
+    var view = $("<span class='user-photo-container'/>");
+    var img = $("<img class='user-photo-medium'/>")
+      .attr("src", imageUrl)
+      .appendTo(view);
+    return view;
+  }
+
+  function viewOfInitialsMedium(s) {
+    var view = $("<span class='user-photo-container'/>");
+    var text = $("<span class='user-initials-medium'/>")
+      .text(veryShortNameOfProfile(prof))
+      .appendTo(view);
+    return view;
+  }
+
+  /* display photo if possible, initials otherwise */
+  mod.view.photoMedium = function(obs) {
+    if (obs.prof.photo_url)
+      return viewOfPhotoMedium;
+    else
+      return viewOfInitialsMedium(s);
+  }
+
+  mod.view.photoPlusNameMedium = function(obs) {
+    var view = $("<span>");
+    mod.view.photoMedium(prof)
+      .appendTo(view);
+    $("<span class='name-medium'>")
+      .text(name)
+      .appendTo(view);
+    return view;
   }
 
   mod.view.respondent = function(obs_by, obs_for, confirmed) {

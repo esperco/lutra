@@ -104,7 +104,7 @@
               </div>
               <div id="sched-step1-tab" class="hide"></div>
               <div id="sched-step2-tab" class="hide"></div>
-              <div id="sched-step3-tab"></div>
+              <div id="sched-step3-tab" class="hide"></div>
             </div>
 
             <div id="q-task-body" class="hide">

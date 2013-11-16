@@ -1,3 +1,6 @@
+<div id="sched-step3-table">
+</div>
+
 <button class="btn btn-primary btn-lg"
         data-toggle="modal"
         data-target="#sched-confirm-modal">
@@ -20,15 +23,14 @@
       <div class="modal-header">
         <button type="button" class="close"
                 data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="sched-confirm-title">Edit message</h4>
+        <h4 class="modal-title" id="sched-confirm-title">
+          Confirmation message
+        </h4>
       </div>
       <div class="modal-body" id="sched-confirm-body">
         <div class="input-group">
           <span class="input-group-addon">To</span>
-          <input id="sched-confirm-to"
-                 type="text" class="form-control"
-                 value="someone"
-                 readonly>
+          <span id="sched-confirm-to"></span>
         </div>
         <div class="input-group">
           <span class="input-group-addon">Subject</span>
@@ -40,6 +42,7 @@
           Dear Recipient,
           ...
         </div>
+        <div id="sched-confirm-message-readonly"></div>
 
       </div>
       <div class="modal-footer">

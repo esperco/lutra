@@ -335,6 +335,8 @@ var task = (function() {
   }
 
   function loadMeetingTask(task) {
+    taskTypeSelector.hideAll();
+    sched.loadTask(task);
     taskTypeSelector.show("sched-task-body");
   }
 

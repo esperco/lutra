@@ -12,6 +12,8 @@ dev-build: includes-dev.html
 prod-build: prod.js includes-prod.html
 
 SOURCES = \
+  list.js \
+  deferred.js \
   util.js \
   log.js \
   status.js \
