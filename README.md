@@ -1,5 +1,5 @@
-HoneyBadger doesn't care, but in this case, this directory contains
-the files to run the front-end Esper website.
+In most cases, HoneyBadger doesn't care. In this case, this directory contains
+the files to run the front-end Esper website (incluing our jobs page, privacy policy, contact us, etc.)
 
 Prerequisites
 -------------
