@@ -7,7 +7,7 @@ var deferred = (function() {
   var mod = {};
 
   /* wrap an already-computed value into a Deferred object */
-  mod.defer(x) {
+  mod.defer = function(x) {
     var dfd = new $.Deferred();
     dfd.resolve(x);
     return dfd;

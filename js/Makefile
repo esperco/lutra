@@ -16,6 +16,7 @@ SOURCES = \
   deferred.js \
   util.js \
   log.js \
+  date.js \
   status.js \
   unixtime.js \
   cache.js \
@@ -29,6 +30,7 @@ SOURCES = \
   request.js \
   task.js \
   page.js \
+  test.js \
   route.js \
   main.js
 
@@ -53,4 +55,4 @@ prod-install:
 	cp prod.js ../pub/js/app.js
 
 clean:
-	rm -f *~ prod.js includes-*.html
+	rm -f *~ prod.js includes-*.html run-tests.js

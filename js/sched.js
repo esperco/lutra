@@ -138,41 +138,23 @@ var sched = (function() {
       });
   }
 
-  function determineStep(task) {
+  mod.loadTask = function(task) {
     var progress = task.task_status.task_progress;
     switch (progress) {
     case "Unread_by_organizer":
-      return 1;
+      loadStep1(task);
       break;
     case "Coordinating":
-      return 2;
+      loadStep2(task);
       break;
-    case "Confirmed":
-      return 3;
+    case "Confirmed";
+      loadStep3(task);
       break;
     case "Closed":
-      return 4;
+      loadStep4(task);
       break;
     default:
       log("Unsupported task_progress: " + progress);
-      return -1;
-  }
-
-  mod.loadTask = function(task) {
-    var step = determineStep(task);
-    switch (step) {
-    case 1:
-      loadStep1(task);
-      break;
-    case 2:
-      loadStep2(task);
-      break;
-    case 3;
-      loadStep3(task);
-      break;
-    case 4:
-      loadStep4(task);
-      break;
     }
   }
 

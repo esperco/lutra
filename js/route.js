@@ -35,6 +35,10 @@ var route = (function() {
 
     /* various pages */
 
+    "test route": function(data) {
+      test.run();
+    },
+
     "task route": function(data) {
       withLogin(function () { page.task.load(null); });
     },
