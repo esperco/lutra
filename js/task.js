@@ -1,4 +1,7 @@
-/* Lots of stuff unrelated to tasks here, file needs splitting */
+/*
+  Task-related functions.
+  Meetings have their own module, "sched".
+*/
 
 var task = (function() {
 
@@ -338,31 +341,39 @@ var task = (function() {
   function loadNewTask() {
     taskTypeSelector.hideAll();
 
-    var select = $("#select-category");
-    select
-      .change(function() {
-        var kind = select.val();
-        if (kind !== "") {
-          var title = $("#new-task-title").val();
-          var task_data = initTaskData(kind);
-          var task = {
-            task_status: {
-              task_title: title,
-              task_summary: ""
-            },
-            task_participants: {
-              organized_by: login.data.team.team_organizers,
-              organized_for: login.data.team.team_leaders
-            },
-            task_data: task_data
-          };
-          api.createTask(task)
-            .done(function(task) {
-              /* change URL */
-              window.location.hash = "!task/" + task.tid;
-            });
-        }
-      });
+    function onSelected(kind) {
+      if (kind !== "") {
+        var title = $("#new-task-title").val();
+        var task_data = initTaskData(kind);
+        var task = {
+          task_status: {
+            task_title: title,
+            task_summary: ""
+          },
+          task_participants: {
+            organized_by: login.data.team.team_organizers,
+            organized_for: login.data.team.team_leaders
+          },
+          task_data: task_data
+        };
+        api.createTask(task)
+          .done(function(task) {
+            /* change URL */
+            window.location.hash = "!task/" + task.tid;
+          });
+      }
+    }
+
+    var sel = select.create({
+      options: [
+        { label: "Select category" },
+        { label: "Meeting", value: "Scheduling", action: onSelected },
+        { label: "Other", value: "Questions", action: onSelected },
+      ]
+    });
+    var container = $("#select-category");
+    container.children().remove();
+    sel.view.appendTo(container);
 
     newTaskSelector.show("new-task");
   }

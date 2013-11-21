@@ -8,19 +8,23 @@ var util = (function () {
   // Return a random alphanumeric string
   mod.randomString = function() {
     return Math.random().toString(36).slice(2);
-  }
+  };
+
+  mod.isDefined = function(x) {
+    return typeof x != "undefined";
+  };
 
   mod.isString = function(x) {
     return typeof x === "string";
-  }
+  };
 
   mod.isArray = function(x) {
     return Object.prototype.toString.call(x) === "[object Array]";
-  }
+  };
 
   mod.isObject = function(x) {
     return Object.prototype.toString.call(x) === "[object Object]";
-  }
+  };
 
   function preparePrintableObject(x) {
     var y = {};

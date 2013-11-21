@@ -23,6 +23,7 @@ SOURCES = \
   email.js \
   cache.js \
   show.js \
+  select.js \
   store.js \
   login.js \
   api.js \

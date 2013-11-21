@@ -133,33 +133,37 @@ var sched = (function() {
   var step1Selector = show.create(["sched-step1-connect",
                                    "sched-step1-prefs"]);
 
-  function promptForCalendar() {
+  function promptForCalendar(obsProf, calInfo) {
     var view = $("#sched-step1-connect");
-    var text1 = $("<div class='center-msg'/>")
-      .text("Connect with " + prof.familiar_name + "'s Google Calendar"
-            + "to let Esper help you ﬁnd available times.")
+    view.children().remove();
+
+    var prof = obsProf.prof;
+    $("<div class='center-msg'/>")
+      .text("Connect with " + prof.familiar_name + "'s Google Calendar")
       .appendTo(view);
-    var butt = $("<button>Connect</button>")
-      /* make it a link to Google Auth */
+    $("<div class='center-msg'/>")
+      .text("to let Esper help you ﬁnd available times.")
+      .appendTo(view);
+    $("<a class='btn btn-default'>Connect</a>")
+      .attr("href", calInfo.google_auth_url)
       .appendTo(view);
 
-    var continueAnyway = ...
-      .appendTo(view);
-
+    log("show sched-step1-connect");
     step1Selector.show("sched-step1-connect");
   }
 
-  function connectCalendar(task) {
+  function connectCalendar(profs, task) {
     var leaderUid = login.data.team.team_leaders[0];
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
       result = deferred.defer();
     }
     else {
-      result = api.getCalendar(leaderUid)
-        .then(function(x) {
-          if (!x.has_calendar) {
-            promptForCalendar();
+      var authLandingUrl = document.URL;
+      result = api.getCalendar(leaderUid, authLandingUrl)
+        .then(function(calInfo) {
+          if (!calInfo.has_calendar) {
+            promptForCalendar(profs[leaderUid], calInfo);
           }
         });
     }
@@ -167,73 +171,69 @@ var sched = (function() {
   }
 
   function loadStep1Prefs() {
+    log("show sched-step1-prefs");
     step1Selector.show("sched-step1-prefs");
   }
 
-  function loadStep1(task) {
+  function loadStep1(profs, task) {
     var view = $("#sched-step1-tab");
-    view.children().remove();
 
-    connectCalendar(task)
-      .done(function() {
-        loadStep1Prefs();
-      });
+    connectCalendar(profs, task);
 
     tabHighlighter.show("sched-progress-tab1");
     tabSelector.show("sched-step1-tab");
   }
 
-  function loadStep2(task) {
+  function loadStep2(profs, task) {
     var view = $("#sched-step2-tab");
     view.children().remove();
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
   }
 
-  function loadStep3(task) {
+  function loadStep3(profs, task) {
     var view = $("#sched-step3-tab");
     view.children().remove();
 
     var tid = task.tid;
     var chats = chatsOfTask(task);
-    profilesOfEveryone(task)
-      .done(function(profs) {
-
-        forEachParticipant(task, function(uid) {
-          if (! isGuest(uid)) {
-            var rowView =
-              step3RowViewOfParticipant(tid, chats, profs, uid, false)
-              .appendTo(view);
-          }
-        });
-        forEachParticipant(task, function(uid) {
-          if (isGuest(uid)) {
-            var rowView =
-              step3RowViewOfParticipant(tid, chats, profs, uid, true)
-              .appendTo(view);
-          }
-        });
-        tabHighlighter.show("sched-progress-tab3");
-        tabSelector.show("sched-step3-tab");
-      });
+    forEachParticipant(task, function(uid) {
+      if (! isGuest(uid)) {
+        var rowView =
+          step3RowViewOfParticipant(tid, chats, profs, uid, false)
+          .appendTo(view);
+      }
+    });
+    forEachParticipant(task, function(uid) {
+      if (isGuest(uid)) {
+        var rowView =
+          step3RowViewOfParticipant(tid, chats, profs, uid, true)
+          .appendTo(view);
+      }
+    });
+    tabHighlighter.show("sched-progress-tab3");
+    tabSelector.show("sched-step3-tab");
   }
 
   mod.loadTask = function(task) {
     var state = task.task_data[1];
     var progress = state.scheduling_stage;
-    switch (progress) {
-    case "Find_availability":
-      loadStep1(task);
-      break;
-    case "Coordinate":
-      loadStep2(task, state);
-      break;
-    case "Confirm":
-      loadStep3(task, state);
-      break;
-    default:
-      log("Unsupported task_progress: " + progress);
-    }
+    profilesOfEveryone(task)
+      .done(function(profs) {
+        switch (progress) {
+        case "Find_availability":
+          loadStep1(profs, task);
+          break;
+        case "Coordinate":
+          loadStep2(profs, task, state);
+          break;
+        case "Confirm":
+          loadStep3(profs, task, state);
+          break;
+        default:
+          log("Unsupported task_progress: " + progress);
+        }
+      });
   }
 
   return mod;

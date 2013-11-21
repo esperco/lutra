@@ -41,11 +41,11 @@ var api = (function () {
       .fail(onError);
   }
 
-  function jsonHttpGET(url) {
+  function jsonHttpGet(url) {
     return jsonHttp("GET", url, null);
   }
 
-  function jsonHttpPOST(url, body) {
+  function jsonHttpPost(url, body) {
     return jsonHttp("POST", url, body);
   }
 
@@ -61,7 +61,7 @@ var api = (function () {
 
   mod.login = function(email, password) {
     var login_request = { email: email, password: password };
-    return jsonHttpPOST("/api/login", JSON.stringify(login_request));
+    return jsonHttpPost("/api/login", JSON.stringify(login_request));
   }
 
   function api_profile_prefix() {
@@ -77,16 +77,16 @@ var api = (function () {
   }
 
   mod.getProfile = function (uid) {
-    return jsonHttpGET(api_profile_prefix() + "/" + uid);
+    return jsonHttpGet(api_profile_prefix() + "/" + uid);
   }
 
   mod.loadActiveTasks = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/active")
+    return jsonHttpGet(api_tasks_prefix() + "/active")
       .done(task.updateActiveTasksView);
   }
 
   mod.loadRecentTasks = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/recent")
+    return jsonHttpGet(api_tasks_prefix() + "/recent")
       .done(task.updateRecentTasksView);
   }
 
@@ -99,7 +99,7 @@ var api = (function () {
   }
 
   mod.createTask = function(task) {
-    return jsonHttpPOST(
+    return jsonHttpPost(
       api_q_prefix() + "/task/create/" + login.data.team.teamid,
       JSON.stringify(task)
     );
@@ -110,7 +110,7 @@ var api = (function () {
                         task_participants: task.task_participants,
                         task_kind        : "Questions",
                         task_requests    : updated_requests};
-    return jsonHttpPOST(api_q_prefix() + "/task/" + task.tid,
+    return jsonHttpPost(api_q_prefix() + "/task/" + task.tid,
                         JSON.stringify(updated_task))
       .done(function(json) {
         task.tid = json.tid;
@@ -121,14 +121,28 @@ var api = (function () {
   }
 
   mod.getTask = function(tid) {
-    return jsonHttpGET(api_q_prefix() + "/task/" + tid)
+    return jsonHttpGet(api_q_prefix() + "/task/" + tid)
   }
 
   mod.queueRemove = function(task, cont) {
-    return jsonHttpPOST(api_q_prefix() + "/queue/" + task.tid + "/remove",
-                        "",
-                        function(http) { cont(); }
-                       );
+    return jsonHttpPost(api_q_prefix() + "/queue/" + task.tid + "/remove",
+                        "");
+  }
+
+  /*** Scheduling ***/
+
+  function api_s_prefix() {
+    return "/api/s/" + login.data.uid;
+  }
+
+  mod.getCalendar = function(uid2, optAuthLandingUrl) {
+    var url = api_s_prefix() + "/calendar/"
+      + login.data.team.teamid + "/" + uid2;
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    log(url);
+    return jsonHttpGet(url);
   }
 
   return mod;
