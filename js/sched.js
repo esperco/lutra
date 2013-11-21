@@ -18,21 +18,27 @@ var sched = (function() {
 
   var mod = {};
 
+  function getState(task) {
+    return task.task_data[1];
+  }
+
+  function setState(task, state) {
+    task.task_data = ["Scheduling", state];
+  }
+
   function isGuest(uid) {
     var team = login.data.team;
     return ! list.mem(team.team_leaders, uid);
   }
 
   function forEachParticipant(task, f) {
-    util.iter (task.task_participants.organized_for, function(uid) {
-      f(uid);
-    });
+    list.iter(task.task_participants.organized_for, f);
   }
 
-  function preFillConfirmModal(tid, chats, uid, prof) {
+  function preFillConfirmModal(tid, chats, uid, obsProf) {
     var toView = $("sched-confirm-to");
     toView.children().remove();
-    profile.view.photoPlusNameMedium
+    profile.view.photoPlusNameMedium(obsProf)
       .appendTo(toView);
 
     $("sched-confirm-subject")
@@ -61,12 +67,14 @@ var sched = (function() {
 
   function step3RowViewOfParticipant(tid, chats, profs, uid, guest) {
     var view = $("<span class='sched-step3-row'>");
+    var obsProf = profs[uid];
+    var prof = obsProf.prof;
     var name = guest ? prof.full_name : prof.familiar_name;
-    profile.view.photoPlusNameMedium(prof)
+    profile.view.photoPlusNameMedium(obsProf)
       .appendTo(view);
     $("<button class='btn btn-default'>Confirm</button>")
       .click(function(ev) {
-        preFillConfirmModal(tid, chats, uid, prof);
+        preFillConfirmModal(tid, chats, uid, obsProf);
         $("#sched-confirm-modal").modal({});
       })
       .appendTo(view);
@@ -83,8 +91,8 @@ var sched = (function() {
     var chats = {};
     forEachParticipant(task, function(uid) {
       var chat =
-        util.find(task.task_chats, function(chat) {
-          return util.exists(chat.chat_participants, function(par_status) {
+        list.find(task.task_chats, function(chat) {
+          return list.exists(chat.chat_participants, function(par_status) {
             return (par_status.par_uid === uid);
           });
         });
@@ -104,16 +112,86 @@ var sched = (function() {
     return profile.mget(everyone)
       .then(function(a) {
         var b = {};
-        list.iter(a, function(prof) {
-          if (prof !== null)
-            b[prof.profile_uid] = prof;
+        list.iter(a, function(obsProf) {
+          if (obsProf !== null)
+            b[obsProf.prof.profile_uid] = obsProf;
         });
         return b;
       });
   }
 
+  var tabHighlighter =
+    show.withClass("sched-tab-highlight",
+                   ["sched-progress-tab1",
+                    "sched-progress-tab2",
+                    "sched-progress-tab3"]);
+
+  var tabSelector = show.create(["sched-step1-tab",
+                                 "sched-step2-tab",
+                                 "sched-step3-tab"]);
+
+  var step1Selector = show.create(["sched-step1-connect",
+                                   "sched-step1-prefs"]);
+
+  function promptForCalendar() {
+    var view = $("#sched-step1-connect");
+    var text1 = $("<div class='center-msg'/>")
+      .text("Connect with " + prof.familiar_name + "'s Google Calendar"
+            + "to let Esper help you ﬁnd available times.")
+      .appendTo(view);
+    var butt = $("<button>Connect</button>")
+      /* make it a link to Google Auth */
+      .appendTo(view);
+
+    var continueAnyway = ...
+      .appendTo(view);
+
+    step1Selector.show("sched-step1-connect");
+  }
+
+  function connectCalendar(task) {
+    var leaderUid = login.data.team.team_leaders[0];
+    var result;
+    if (! list.mem(task.task_participants.organized_for, leaderUid)) {
+      result = deferred.defer();
+    }
+    else {
+      result = api.getCalendar(leaderUid)
+        .then(function(x) {
+          if (!x.has_calendar) {
+            promptForCalendar();
+          }
+        });
+    }
+    return result;
+  }
+
+  function loadStep1Prefs() {
+    step1Selector.show("sched-step1-prefs");
+  }
+
+  function loadStep1(task) {
+    var view = $("#sched-step1-tab");
+    view.children().remove();
+
+    connectCalendar(task)
+      .done(function() {
+        loadStep1Prefs();
+      });
+
+    tabHighlighter.show("sched-progress-tab1");
+    tabSelector.show("sched-step1-tab");
+  }
+
+  function loadStep2(task) {
+    var view = $("#sched-step2-tab");
+    view.children().remove();
+    tabHighlighter.show("sched-progress-tab2");
+    tabSelector.show("sched-step2-tab");
+  }
+
   function loadStep3(task) {
-    var view = $("#sched-step3-table");
+    var view = $("#sched-step3-tab");
     view.children().remove();
 
     var tid = task.tid;
@@ -135,23 +213,23 @@ var sched = (function() {
               .appendTo(view);
           }
         });
+        tabHighlighter.show("sched-progress-tab3");
+        tabSelector.show("sched-step3-tab");
       });
   }
 
   mod.loadTask = function(task) {
-    var progress = task.task_status.task_progress;
+    var state = task.task_data[1];
+    var progress = state.scheduling_stage;
     switch (progress) {
-    case "Unread_by_organizer":
+    case "Find_availability":
       loadStep1(task);
       break;
-    case "Coordinating":
-      loadStep2(task);
+    case "Coordinate":
+      loadStep2(task, state);
       break;
-    case "Confirmed";
-      loadStep3(task);
-      break;
-    case "Closed":
-      loadStep4(task);
+    case "Confirm":
+      loadStep3(task, state);
       break;
     default:
       log("Unsupported task_progress: " + progress);

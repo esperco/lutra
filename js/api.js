@@ -98,24 +98,11 @@ var api = (function () {
     return jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
   }
 
-  mod.createTask = function(task, updated_requests) {
-    var updated_task = {task_status      : task.task_status,
-                        task_participants: task.task_participants,
-                        task_kind        : "Questions",
-                        task_requests    : updated_requests};
+  mod.createTask = function(task) {
     return jsonHttpPOST(
       api_q_prefix() + "/task/create/" + login.data.team.teamid,
-      JSON.stringify(updated_task)
-    )
-      .done(function(data) {
-        task.tid               = data.tid;
-        task.task_teamid       = data.task_teamid;
-        task.task_created      = data.task_created;
-        task.task_lastmod      = data.task_lastmod;
-        task.task_status       = data.task_status;
-        task.task_participants = data.task_participants;
-        task.task_requests     = data.task_requests;
-      });
+      JSON.stringify(task)
+    );
   }
 
   mod.postTask = function(task, updated_requests) {

@@ -10,6 +10,10 @@ var util = (function () {
     return Math.random().toString(36).slice(2);
   }
 
+  mod.isString = function(x) {
+    return typeof x === "string";
+  }
+
   mod.isArray = function(x) {
     return Object.prototype.toString.call(x) === "[object Array]";
   }

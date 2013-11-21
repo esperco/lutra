@@ -41,5 +41,16 @@ var show = (function () {
              show : show };
   }
 
+  /* Use a particular class for highlighting one of the selected elements */
+  mod.withClass = function(class_, idList) {
+    function showOne(id) {
+      $("#" + id).addClass(class_);
+    }
+    function hideOne(id) {
+      $("#" + id).removeClass(class_);
+    }
+    return mod.create(idList, showOne, hideOne);
+  }
+
   return mod;
 }());

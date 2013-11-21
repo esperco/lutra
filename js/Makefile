@@ -16,9 +16,11 @@ SOURCES = \
   deferred.js \
   util.js \
   log.js \
+  variant.js \
   date.js \
   status.js \
   unixtime.js \
+  email.js \
   cache.js \
   show.js \
   store.js \
@@ -28,6 +30,7 @@ SOURCES = \
   profile.js \
   comment.js \
   request.js \
+  sched.js \
   task.js \
   page.js \
   test.js \

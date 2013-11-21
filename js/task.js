@@ -318,26 +318,65 @@ var task = (function() {
               viewOfTaskQueue(tabName, data.tasks));
   };
 
+  var newTaskSelector = show.create(["new-task"]);
+
   var taskTypeSelector = show.create([
-    "select-task-category",
-    "sched-task-body",
-    "q-task-body"
+    "sched-task",
+    "q-task"
   ]);
 
+  function initTaskData(kind) {
+    switch(kind) {
+    case "Scheduling":
+      return [kind, {}];
+    case "Questions":
+      return kind;
+    }
+  }
+
+  /* At this stage we don't have a task ID yet */
   function loadNewTask() {
-    taskTypeSelector.show("select-task-category");
+    taskTypeSelector.hideAll();
+
+    var select = $("#select-category");
+    select
+      .change(function() {
+        var kind = select.val();
+        if (kind !== "") {
+          var title = $("#new-task-title").val();
+          var task_data = initTaskData(kind);
+          var task = {
+            task_status: {
+              task_title: title,
+              task_summary: ""
+            },
+            task_participants: {
+              organized_by: login.data.team.team_organizers,
+              organized_for: login.data.team.team_leaders
+            },
+            task_data: task_data
+          };
+          api.createTask(task)
+            .done(function(task) {
+              /* change URL */
+              window.location.hash = "!task/" + task.tid;
+            });
+        }
+      });
+
+    newTaskSelector.show("new-task");
   }
 
   function loadQuestionsTask(task) {
     var view = mod.viewOfTask("", task);
-    placeView($("#q-task-body"), view);
-    taskTypeSelector.show("q-task-body");
+    placeView($("#q-task"), view);
+    taskTypeSelector.show("q-task");
   }
 
   function loadMeetingTask(task) {
     taskTypeSelector.hideAll();
     sched.loadTask(task);
-    taskTypeSelector.show("sched-task-body");
+    taskTypeSelector.show("sched-task");
   }
 
   /* Load task page */
@@ -347,14 +386,17 @@ var task = (function() {
     else {
       api.getTask(optTid)
         .done(function(task) {
-          switch (task.task_kind) {
+          var data = task.task_data;
+          switch (variant.cons(data)) {
           case "Questions":
             loadQuestionsTask(task);
             break;
-          case "Meeting":
+          case "Scheduling":
             /* TODO check task progress, display appropriate view */
             loadMeetingTask(task);
             break;
+          default:
+            log("Invalid task_data", data);
           }
         })
     }

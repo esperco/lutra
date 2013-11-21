@@ -74,11 +74,14 @@ var profile = (function() {
   }
 
   function shortenName(s) {
-    var result = initials(s);
+    /* discard the domain in case it's an email address */
+    var name = email.localpart(s);
+
+    var result = initials(name);
     if (result.length <= 1)
-      result = firstTwoLetters(s);
+      result = firstTwoLetters(name);
     if (result === "")
-      result = s.substring(0,2);
+      result = name.substring(0,2);
     return result;
   }
 
@@ -97,7 +100,7 @@ var profile = (function() {
     return view;
   }
 
-  function viewOfInitialsMedium(s) {
+  function viewOfInitialsMedium(prof) {
     var view = $("<span class='user-photo-container'/>");
     var text = $("<span class='user-initials-medium'/>")
       .text(veryShortNameOfProfile(prof))
@@ -106,16 +109,18 @@ var profile = (function() {
   }
 
   /* display photo if possible, initials otherwise */
-  mod.view.photoMedium = function(obs) {
-    if (obs.prof.photo_url)
-      return viewOfPhotoMedium;
+  mod.view.photoMedium = function(obsProf) {
+    var prof = obsProf.prof;
+    var imgUrl = prof.photo_url;
+    if (imgUrl)
+      return viewOfPhotoMedium(imgUrl);
     else
-      return viewOfInitialsMedium(s);
+      return viewOfInitialsMedium(prof);
   }
 
   mod.view.photoPlusNameMedium = function(obs) {
     var view = $("<span>");
-    mod.view.photoMedium(prof)
+    mod.view.photoMedium(obs)
       .appendTo(view);
     $("<span class='name-medium'>")
       .text(name)

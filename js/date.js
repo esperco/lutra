@@ -1,3 +1,7 @@
+/*
+  Local time handling and formatting.
+*/
+
 var date = (function() {
   var mod = [];
   mod.us = {};
@@ -68,7 +72,7 @@ var date = (function() {
     ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
   /* "Monday", "Tuesday", ... */
-  mod.us.weekDay = function(d) {
+  mod.weekDay = function(d) {
     return weekDays[d.getUTCDay()];
   };
 
@@ -77,19 +81,19 @@ var date = (function() {
      "July", "August", "September", "October", "November", "December"];
 
   /* "January", "February", ... */
-  mod.us.month = function(d) {
+  mod.month = function(d) {
     return months[d.getUTCMonth()];
   };
 
   /* "August 13, 2019" */
-  mod.us.dateOnly = function(d) {
-    return mod.us.month(d)
+  mod.dateOnly = function(d) {
+    return mod.month(d)
       + " " + mod.day(d).toString()
       + ", " + mod.year(d).toString();
   };
 
   /* "1:30 pm" */
-  mod.us.timeOnly = function(d) {
+  mod.timeOnly = function(d) {
     var hour = mod.hours(d);
     var min = mod.minutes(d);
     var ampm;
@@ -108,11 +112,21 @@ var date = (function() {
     return h.toString() + ":" + pad(min.toString()) + " " + ampm;
   };
 
+  jQuery.timeago.settings.allowFuture = true;
+  /* create a DOM element from a date,
+     displaying how long ago it was. */
+  mod.viewTimeAgo = function(d) {
+    var view = $("<time class='timeago'/>")
+      .attr("datetime", mod.toString(d));
+    view.timeago();
+    return view;
+  };
+
   function testDates() {
     var d = date.ofString("2014-09-23T19:38:51.683Z");
-    log(date.us.dateOnly(d));
-    test.assert(date.us.dateOnly(d) === 'September 23, 2014');
-    test.assert(date.us.timeOnly(d) === '7:38 pm');
+    log(date.dateOnly(d));
+    test.assert(date.dateOnly(d) === 'September 23, 2014');
+    test.assert(date.timeOnly(d) === '7:38 pm');
     return true;
   }
 
