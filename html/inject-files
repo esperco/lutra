@@ -11,7 +11,7 @@ subst() {
     name=$1
     template=$2
     insert="$(<$name)"
-    awk -vx="$insert" "{gsub(/@@$name@@/,x);}1" $template
+    gawk -v x="$insert" "{gsub(/@@$name@@/,x);}1" $template
 }
 
 cat > tmp.html

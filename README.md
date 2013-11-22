@@ -13,6 +13,11 @@ Ubuntu:
 sudo apt-get install node-uglify
 ```
 
+Mac:
+```
+brew install gawk
+```
+
 Build instructions
 ------------------
 
