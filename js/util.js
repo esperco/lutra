@@ -10,6 +10,10 @@ var util = (function () {
     return Math.random().toString(36).slice(2);
   };
 
+  mod.isNotNull = function(x) {
+    return typeof x != "undefined" && x !== null;
+  };
+
   mod.isDefined = function(x) {
     return typeof x != "undefined";
   };

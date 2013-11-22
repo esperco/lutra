@@ -62,7 +62,7 @@ var api = (function () {
   mod.login = function(email, password) {
     var login_request = { email: email, password: password };
     return jsonHttpPost("/api/login", JSON.stringify(login_request));
-  }
+  };
 
   function api_profile_prefix() {
     return "/api/profile/" + login.data.uid;
@@ -78,32 +78,32 @@ var api = (function () {
 
   mod.getProfile = function (uid) {
     return jsonHttpGet(api_profile_prefix() + "/" + uid);
-  }
+  };
 
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active")
       .done(task.updateActiveTasksView);
-  }
+  };
 
   mod.loadRecentTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/recent")
       .done(task.updateRecentTasksView);
-  }
+  };
 
   mod.deleteRequest = function(qid) {
     return jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
-  }
+  };
 
   mod.deleteTask = function(tid) {
     return jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
-  }
+  };
 
   mod.createTask = function(task) {
     return jsonHttpPost(
       api_q_prefix() + "/task/create/" + login.data.team.teamid,
       JSON.stringify(task)
     );
-  }
+  };
 
   mod.postTask = function(task, updated_requests) {
     var updated_task = {task_status      : task.task_status,
@@ -118,22 +118,22 @@ var api = (function () {
           updated_requests[i].rid = json.rids[i];
         }
       });
-  }
+  };
 
   mod.getTask = function(tid) {
     return jsonHttpGet(api_q_prefix() + "/task/" + tid)
-  }
+  };
 
   mod.queueRemove = function(task, cont) {
     return jsonHttpPost(api_q_prefix() + "/queue/" + task.tid + "/remove",
                         "");
-  }
+  };
 
   /*** Scheduling ***/
 
   function api_s_prefix() {
     return "/api/s/" + login.data.uid;
-  }
+  };
 
   mod.getCalendar = function(uid2, optAuthLandingUrl) {
     var url = api_s_prefix() + "/calendar/"
@@ -141,9 +141,13 @@ var api = (function () {
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
-    log(url);
     return jsonHttpGet(url);
-  }
+  };
+
+  mod.getTimezones = function() {
+    var url = api_s_prefix() + "/timezones";
+    return jsonHttpGet(url);
+  };
 
   return mod;
 })();

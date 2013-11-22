@@ -13,13 +13,34 @@ var select = (function() {
         { label: "Select one" },
         { label: "Spaghetti with meatballs", value: "spaghetti",
           action: (function(value) { ...}) },
-        { label: "Frozen squirrel", value: "squirrel",
+        { label: "Frozen squirrel", key: "squirrel", value: "frozen_squirrel",
           action: (function(value) { ...}) }
       ]
     }
 
     return: { view, get, set }
    */
+
+  function valueOfOption(o) {
+    if (util.isNotNull(o) && util.isDefined(o.value))
+      return o.value;
+    else
+      return null;
+  }
+
+  function keyOfOption(o) {
+    if (util.isString(o.key))
+      return o.key;
+    else if (util.isString(o.value))
+      return o.value;
+    else
+      return null;
+  }
+
+  function hasKey(o) {
+    return keyOfOption(o) !== null;
+  }
+
   mod.create = function(param) {
     var view = $("<div class='btn-group'>");
     var button = $("<button type='button'/>")
@@ -32,13 +53,22 @@ var select = (function() {
     var state = null;
     var tbl = {};
     var unsetLabel = "";
+
+    function setButtonLabel(o) {
+      if (state === null)
+        buttonLabel.text(unsetLabel + " ");
+      else
+        buttonLabel.text(o.label + " ");
+    }
+
     var ul = $("<ul class='dropdown-menu' role='menu'/>")
       .appendTo(view);
     list.iter(param.options, function(o) {
-      var v = util.isString(o.value) ? o.value : null;
+      var k = keyOfOption(o);
+      var v = valueOfOption(o);
 
-      if (v !== null)
-        tbl[v] = o;
+      if (k !== null)
+        tbl[k] = o;
       else
         unsetLabel = util.isString(o.label) ? o.label : "";
 
@@ -47,6 +77,7 @@ var select = (function() {
         .text(o.label)
         .click(function() {
           state = v;
+          setButtonLabel(o);
           view.removeClass("open"); /* needed b/c we block the event */
           if (util.isDefined(o.action))
             o.action(state);
@@ -59,23 +90,20 @@ var select = (function() {
       return state;
     }
 
-    function set(v, noAction) {
-      state = util.isString(v) ? v : null;
-      if (state === null)
-        buttonLabel.text(unsetLabel + " ");
-      else {
-        var o = tbl[state];
-        buttonLabel.text(o.label + " ");
+    function set(k, noAction) {
+      var o = util.isString(k) ? tbl[k] : null;
+      state = valueOfOption(o);
+      setButtonLabel(o);
+      if (state !== null)
         if (noAction !== true && util.isDefined(o.action))
           o.action(state);
-      }
     }
 
-    var initialValue = util.isDefined(param.initialValue) ?
-      param.initialValue
-      : param.options[0].value;
+    var initialKey = util.isDefined(param.initialKey) ?
+      param.initialKey
+      : keyOfOption(param.options[0]);
 
-    set(initialValue, true);
+    set(initialKey, true);
 
     return {
       view: view,
