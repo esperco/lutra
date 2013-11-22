@@ -8,23 +8,27 @@ var util = (function () {
   // Return a random alphanumeric string
   mod.randomString = function() {
     return Math.random().toString(36).slice(2);
-  }
+  };
+
+  mod.isNotNull = function(x) {
+    return typeof x != "undefined" && x !== null;
+  };
+
+  mod.isDefined = function(x) {
+    return typeof x != "undefined";
+  };
+
+  mod.isString = function(x) {
+    return typeof x === "string";
+  };
 
   mod.isArray = function(x) {
     return Object.prototype.toString.call(x) === "[object Array]";
-  }
+  };
 
   mod.isObject = function(x) {
     return Object.prototype.toString.call(x) === "[object Object]";
-  }
-
-  mod.map = function(a, f) {
-    var b = [];
-    var len = a.length;
-    for (var i = 0; i < len; i++)
-      b[i] = f(a[i]);
-    return b;
-  }
+  };
 
   function preparePrintableObject(x) {
     var y = {};
@@ -36,7 +40,7 @@ var util = (function () {
   function preparePrintable(x) {
     var s = Object.prototype.toString.call(x);
     if (s === "[object Array]")
-      return mod.map(x, preparePrintable);
+      return list.map(x, preparePrintable);
     else if (s === "[object Object]")
       return preparePrintableObject(x);
     else if (s === "[object Function]")
@@ -52,6 +56,15 @@ var util = (function () {
       return x
     else
       return JSON.stringify(preparePrintable(x), undefined, 2);
+  }
+
+  function htmlEscape(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   return mod;

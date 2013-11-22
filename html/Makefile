@@ -1,17 +1,27 @@
 .PHONY: default dev prod dev-build prod-build clean
-default: app.html
+default: dev
 dev: dev-build
 prod: prod-build
+
+HTML_INCLUDES = \
+  new-task.html \
+  sched-step1-tab.html \
+  sched-step2-tab.html \
+  sched-step3-tab.html
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \
             -e '/INCLUDES/d' \
-          app.html.in > app.html
+          app.html.in \
+	| ./inject-files $(HTML_INCLUDES) \
+	> app.html
 
 prod-build:
 	sed -e '/INCLUDES/r ../js/includes-prod.html' \
             -e '/INCLUDES/d' \
-          app.html.in > app.html
+          app.html.in \
+	| ./inject-files $(HTML_INCLUDES) \
+	> app.html
 
 clean:
 	rm -f *~ app.html

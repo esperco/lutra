@@ -16,14 +16,7 @@
 
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <a class="brand" href="#">Esper</a>
-        <ul class="nav">
-<!--
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="#">Link</a></li>
-          <li><a href="#">Link</a></li>
--->
-        </ul>
+        <a class="navbar-brand" href="#">Esper</a>
         <ul class="nav nav-tabs pull-right">
           <li class="logged-out">
             <a href="#!login">
@@ -48,8 +41,8 @@
     </div>
 
     <div id="login-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
+      <div class="container">
+        <div class="row">
           <div class="span4"></div>
           <div class="login-form span4">
             <h2>Esper Login</h2>
@@ -62,7 +55,7 @@
                 <input id="login-password" type="password"
                        placeholder="Password">
               </div>
-              <button id="login-button" class="btn primary">
+              <button id="login-button" class="btn btn-default primary">
                 Sign in
               </button>
             </fieldset>
@@ -73,8 +66,8 @@
     </div>
 
     <div id="home-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
+      <div class="container">
+        <div class="row">
           <div class="span12 queue-tab-area">
 
             <div class="hide" id="status"></div>
@@ -96,10 +89,35 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span12 queue-tab-area">
-            <div id="single-task"></div>
+      <div class="container">
+        <div class="row">
+          <div class="span12">
+            <div id="new-task">
+              @@new-task.html@@
+            </div>
+            <div id="sched-task" class="hide">
+              <div id="sched-progress-tabs">
+                <span id="sched-progress-tab1"
+                      class="sched-tab">Step 1. Parameters
+                </span><span class="sched-tab sched-tab-filler">&nbsp;
+                </span><span id="sched-progress-tab2"
+                      class="sched-tab">Step 2. Coordinate
+                </span><span class="sched-tab sched-tab-filler">&nbsp;
+                </span><span id="sched-progress-tab3"
+                      class="sched-tab">Step 3. Confirm</span>
+              </div>
+              <div id="sched-step1-tab" class="hide">
+                @@sched-step1-tab.html@@
+              </div>
+              <div id="sched-step2-tab" class="hide">
+                @@sched-step2-tab.html@@
+              </div>
+              <div id="sched-step3-tab" class="hide">
+                @@sched-step3-tab.html@@
+              </div>
+            </div>
+
+            <div id="q-task" class="hide"></div>
           </div>
         </div>
       </div>
@@ -109,6 +127,7 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script src="/assets/js/can.min.js"></script>
     <script src="/assets/js/sha1.js"></script>
+    <script src="/assets/js/jquery.timeago.js"></script>
     INCLUDES
   </body>
 </html>

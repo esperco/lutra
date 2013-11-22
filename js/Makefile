@@ -12,11 +12,18 @@ dev-build: includes-dev.html
 prod-build: prod.js includes-prod.html
 
 SOURCES = \
+  list.js \
+  deferred.js \
   util.js \
   log.js \
+  variant.js \
+  date.js \
   status.js \
   unixtime.js \
+  email.js \
   cache.js \
+  show.js \
+  select.js \
   store.js \
   login.js \
   api.js \
@@ -24,8 +31,10 @@ SOURCES = \
   profile.js \
   comment.js \
   request.js \
+  sched.js \
   task.js \
   page.js \
+  test.js \
   route.js \
   main.js
 
@@ -50,4 +59,4 @@ prod-install:
 	cp prod.js ../pub/js/app.js
 
 clean:
-	rm -f *~ prod.js includes-*.html
+	rm -f *~ prod.js includes-*.html run-tests.js

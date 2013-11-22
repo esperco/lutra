@@ -41,11 +41,11 @@ var api = (function () {
       .fail(onError);
   }
 
-  function jsonHttpGET(url) {
+  function jsonHttpGet(url) {
     return jsonHttp("GET", url, null);
   }
 
-  function jsonHttpPOST(url, body) {
+  function jsonHttpPost(url, body) {
     return jsonHttp("POST", url, body);
   }
 
@@ -61,8 +61,8 @@ var api = (function () {
 
   mod.login = function(email, password) {
     var login_request = { email: email, password: password };
-    return jsonHttpPOST("/api/login", JSON.stringify(login_request));
-  }
+    return jsonHttpPost("/api/login", JSON.stringify(login_request));
+  };
 
   function api_profile_prefix() {
     return "/api/profile/" + login.data.uid;
@@ -77,53 +77,40 @@ var api = (function () {
   }
 
   mod.getProfile = function (uid) {
-    return jsonHttpGET(api_profile_prefix() + "/" + uid);
-  }
+    return jsonHttpGet(api_profile_prefix() + "/" + uid);
+  };
 
   mod.loadActiveTasks = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/active")
+    return jsonHttpGet(api_tasks_prefix() + "/active")
       .done(task.updateActiveTasksView);
-  }
+  };
 
   mod.loadRecentTasks = function() {
-    return jsonHttpGET(api_tasks_prefix() + "/recent")
+    return jsonHttpGet(api_tasks_prefix() + "/recent")
       .done(task.updateRecentTasksView);
-  }
+  };
 
   mod.deleteRequest = function(qid) {
     return jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
-  }
+  };
 
   mod.deleteTask = function(tid) {
     return jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
-  }
+  };
 
-  mod.createTask = function(task, updated_requests) {
-    var updated_task = {task_status      : task.task_status,
-                        task_participants: task.task_participants,
-                        task_kind        : "Questions",
-                        task_requests    : updated_requests};
-    return jsonHttpPOST(
+  mod.createTask = function(task) {
+    return jsonHttpPost(
       api_q_prefix() + "/task/create/" + login.data.team.teamid,
-      JSON.stringify(updated_task)
-    )
-      .done(function(data) {
-        task.tid               = data.tid;
-        task.task_teamid       = data.task_teamid;
-        task.task_created      = data.task_created;
-        task.task_lastmod      = data.task_lastmod;
-        task.task_status       = data.task_status;
-        task.task_participants = data.task_participants;
-        task.task_requests     = data.task_requests;
-      });
-  }
+      JSON.stringify(task)
+    );
+  };
 
   mod.postTask = function(task, updated_requests) {
     var updated_task = {task_status      : task.task_status,
                         task_participants: task.task_participants,
                         task_kind        : "Questions",
                         task_requests    : updated_requests};
-    return jsonHttpPOST(api_q_prefix() + "/task/" + task.tid,
+    return jsonHttpPost(api_q_prefix() + "/task/" + task.tid,
                         JSON.stringify(updated_task))
       .done(function(json) {
         task.tid = json.tid;
@@ -131,14 +118,36 @@ var api = (function () {
           updated_requests[i].rid = json.rids[i];
         }
       });
-  }
+  };
+
+  mod.getTask = function(tid) {
+    return jsonHttpGet(api_q_prefix() + "/task/" + tid)
+  };
 
   mod.queueRemove = function(task, cont) {
-    return jsonHttpPOST(api_q_prefix() + "/queue/" + task.tid + "/remove",
-                        "",
-                        function(http) { cont(); }
-                       );
-  }
+    return jsonHttpPost(api_q_prefix() + "/queue/" + task.tid + "/remove",
+                        "");
+  };
+
+  /*** Scheduling ***/
+
+  function api_s_prefix() {
+    return "/api/s/" + login.data.uid;
+  };
+
+  mod.getCalendar = function(uid2, optAuthLandingUrl) {
+    var url = api_s_prefix() + "/calendar/"
+      + login.data.team.teamid + "/" + uid2;
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  };
+
+  mod.getTimezones = function() {
+    var url = api_s_prefix() + "/timezones";
+    return jsonHttpGet(url);
+  };
 
   return mod;
 })();

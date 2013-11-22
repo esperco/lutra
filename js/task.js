@@ -1,4 +1,7 @@
-/* Lots of stuff unrelated to tasks here, file needs splitting */
+/*
+  Task-related functions.
+  Meetings have their own module, "sched".
+*/
 
 var task = (function() {
 
@@ -25,7 +28,8 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
-    var archiveButton = $("<button class='btn btn-primary'>Archive</button>");
+    var archiveButton =
+      $("<button class='btn btn-default btn-primary'>Archive</button>");
     if (tab === page.home.tab.activeTasks) {
       archiveButton
         .click(function() {
@@ -35,7 +39,7 @@ var task = (function() {
       archiveButton.appendTo(buttons);
     }
 
-    var editButton = $("<button class='btn'>Edit</button>")
+    var editButton = $("<button class='btn btn-default'>Edit</button>")
       .click(function() {
         editViewOfTask(tab, task, task.task_requests, {})
           .replaceAll(view);
@@ -47,7 +51,7 @@ var task = (function() {
       ? task.task_status.task_title
       : null;
     if (title) {
-      viewOfTaskTitle(title)
+      viewOfTaskTitle(title, task.tid)
         .appendTo(view);
     }
 
@@ -57,9 +61,12 @@ var task = (function() {
     return view;
   }
 
-  function viewOfTaskTitle(title) {
-    return $("<h4 class='tasktitle'/>")
-      .text(title);
+  function viewOfTaskTitle(title, tid) {
+    var view = $("<h4 class='tasktitle'/>");
+    var link = $("<a href='#!task/" + tid + "'/>")
+      .text(title)
+      .appendTo(view);
+    return view;
   }
 
   function viewOfTaskRequests(requests) {
@@ -131,15 +138,15 @@ var task = (function() {
       else {
         buttons.children().remove();
         if (hasRequests) {
-          $("<button class='btn btn-primary'>Save</button>")
+          $("<button class='btn btn-default btn-primary'>Save</button>")
             .click(save)
             .appendTo(buttons);
         }
-        $("<button class='btn'>Cancel</button>")
+        $("<button class='btn btn-default'>Cancel</button>")
           .click(task.tid ? stopEdit : remove)
           .appendTo(buttons);
         if (!hasRequests) {
-          $("<button class='btn btn-danger'>Delete Task</button>")
+          $("<button class='btn btn-default btn-danger'>Delete Task</button>")
             .click(taskEdit.remove)
             .appendTo(buttons);
         }
@@ -217,7 +224,7 @@ var task = (function() {
 
     function makeRequestView(qid, edit) {
       var deleteRequestButton =
-        $("<button class='btn btn-danger'>Delete request</button>");
+        $("<button class='btn btn-default btn-danger'>Delete request</button>");
 
       taskEdit.reqEdits[qid] = edit;
       var requestView = edit.viewOfRequest(deleteRequestButton)
@@ -244,7 +251,7 @@ var task = (function() {
 
     var requestSelect = selectOfRequestKind();
     var addRequestButton =
-      $("<button class='btn'>Create follow-up request</button>")
+      $("<button class='btn btn-default'>Create follow-up request</button>")
       .click(function() {
         var kind = requestSelect.val();
         var edit = "message" === kind
@@ -267,7 +274,7 @@ var task = (function() {
     var buttons = $("<div class='buttons'/>");
 
     var requestSelect = selectOfRequestKind();
-    var newTaskButton = $("<button class='btn'>New Task</button>")
+    var newTaskButton = $("<button class='btn btn-default'>New Task</button>")
       .click(function() {
         var reqEdits = {};
         tasksView
@@ -313,6 +320,98 @@ var task = (function() {
     placeView($("#" + tabName + "-tab-content"),
               viewOfTaskQueue(tabName, data.tasks));
   };
+
+  var newTaskSelector = show.create(["new-task"]);
+
+  var taskTypeSelector = show.create([
+    "sched-task",
+    "q-task"
+  ]);
+
+  function initTaskData(kind) {
+    switch(kind) {
+    case "Scheduling":
+      return [kind, {}];
+    case "Questions":
+      return kind;
+    }
+  }
+
+  /* At this stage we don't have a task ID yet */
+  function loadNewTask() {
+    taskTypeSelector.hideAll();
+
+    function onSelected(kind) {
+      if (kind !== "") {
+        var title = $("#new-task-title").val();
+        var task_data = initTaskData(kind);
+        var task = {
+          task_status: {
+            task_title: title,
+            task_summary: ""
+          },
+          task_participants: {
+            organized_by: login.data.team.team_organizers,
+            organized_for: login.data.team.team_leaders
+          },
+          task_data: task_data
+        };
+        api.createTask(task)
+          .done(function(task) {
+            /* change URL */
+            window.location.hash = "!task/" + task.tid;
+          });
+      }
+    }
+
+    var sel = select.create({
+      options: [
+        { label: "Select category" },
+        { label: "Meeting", value: "Scheduling", action: onSelected },
+        { label: "Other", value: "Questions", action: onSelected },
+      ]
+    });
+    var container = $("#select-category");
+    container.children().remove();
+    sel.view.appendTo(container);
+
+    newTaskSelector.show("new-task");
+  }
+
+  function loadQuestionsTask(task) {
+    var view = mod.viewOfTask("", task);
+    placeView($("#q-task"), view);
+    taskTypeSelector.show("q-task");
+  }
+
+  function loadMeetingTask(task) {
+    taskTypeSelector.hideAll();
+    sched.loadTask(task);
+    taskTypeSelector.show("sched-task");
+  }
+
+  /* Load task page */
+  mod.load = function(optTid) {
+    if (!optTid)
+      loadNewTask();
+    else {
+      api.getTask(optTid)
+        .done(function(task) {
+          var data = task.task_data;
+          switch (variant.cons(data)) {
+          case "Questions":
+            loadQuestionsTask(task);
+            break;
+          case "Scheduling":
+            /* TODO check task progress, display appropriate view */
+            loadMeetingTask(task);
+            break;
+          default:
+            log("Invalid task_data", data);
+          }
+        })
+    }
+  }
 
   return mod;
 }());

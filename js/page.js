@@ -5,6 +5,7 @@ var page = (function() {
     "login",
     "home",
     "task",
+    "scheduling",
     "respond"
   ];
 
@@ -101,7 +102,8 @@ var page = (function() {
 
   mod.task.load = function(optTid) {
     hideAll();
-    showTask(optTid);
+    task.load(optTid);
+    show("task");
   };
 
   mod.respond.load = function(rid, asUid) {

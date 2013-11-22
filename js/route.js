@@ -34,9 +34,23 @@ var route = (function() {
     },
 
     /* various pages */
+
+    "test route": function(data) {
+      test.run();
+    },
+
+    "task route": function(data) {
+      withLogin(function () { page.task.load(null); });
+    },
+
+    "task/:tid route": function(data) {
+      withLogin(function () { page.task.load(data.tid); });
+    },
+
     "respond/:rid/:uid route" : function(data) {
       withLogin(function () { page.respond.load(rid, asUid); });
     },
+
     "translate/response/:rid/:uid route" : function(data) {
       withLogin(function () { log(data); });
     }

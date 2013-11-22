@@ -266,7 +266,8 @@ function EditChoicesRequest(qid, qsel) {
   }
 
   var choicesView = $("<div class='choices'/>");
-  var addChoiceButton = $("<button class='btn'>New Choice</button>");
+  var addChoiceButton =
+    $("<button class='btn btn-default'>New Choice</button>");
 
   function editNewChoice() {
     var index = addChoice("");
