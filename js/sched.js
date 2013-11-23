@@ -201,8 +201,26 @@ var sched = (function() {
     view.addClass("hide");
     view.children().remove();
 
+    var contMsg =
+      $("<div>Select up to 3 options to present to participants.</div>")
+      .appendTo(view);
+
+    var contButton = $("<a href='#' class='btn btn-default' disabled>")
+      .text("Continue")
+      .appendTo(contMsg);
+
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
+
+    function updateContButton() {
+      if (selected.length > 0) {
+        contButton.attr('disabled', false);
+      }
+      else {
+        contButton.addClass("esper-btn-disabled");
+        contButton.attr('disabled', true);
+      }
+    }
 
     function remove(k) {
       delete selected[k];
@@ -217,12 +235,14 @@ var sched = (function() {
         kv[1].untick();
         remove(i);
       }
+      updateContButton();
     }
 
     function select(k, v) {
       if (selected.length === 3)
         unselect(selected[2], 2);
       selected.push([k, v]);
+      updateContButton();
     }
 
     list.iter(x.suggestions, function(slot, k) {
