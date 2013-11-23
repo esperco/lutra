@@ -9,6 +9,7 @@ var select = (function() {
     parameters:
     {
       initialValue: "squirrel",
+      defaultAction: ...,
       options: [
         { label: "Select one" },
         { label: "Spaghetti with meatballs", value: "spaghetti",
@@ -63,6 +64,18 @@ var select = (function() {
 
     var ul = $("<ul class='dropdown-menu' role='menu'/>")
       .appendTo(view);
+
+    function runAction(o, x) {
+      var action;
+      if (util.isDefined(o.action))
+        action = o.action;
+      else if (util.isDefined(param.defaultAction))
+        action = param.defaultAction;
+      else
+        action = function(x) {};
+      action(x);
+    }
+
     list.iter(param.options, function(o) {
       var k = keyOfOption(o);
       var v = valueOfOption(o);
@@ -79,8 +92,7 @@ var select = (function() {
           state = v;
           setButtonLabel(o);
           view.removeClass("open"); /* needed b/c we block the event */
-          if (util.isDefined(o.action))
-            o.action(state);
+          runAction(o, state);
           return false; /* block event, prevent link from being followed */
         })
         .appendTo(li);

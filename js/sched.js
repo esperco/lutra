@@ -150,7 +150,6 @@ var sched = (function() {
       .attr("href", calInfo.google_auth_url)
       .appendTo(view);
 
-    log("show sched-step1-connect");
     step1Selector.show("sched-step1-connect");
   }
 
@@ -167,26 +166,165 @@ var sched = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadStep1Prefs(tzList);
+            loadStep1Prefs(tzList, task);
         });
     }
     return result;
   }
 
-  function loadStep1Prefs(tzList) {
+  function viewOfSuggestion(x) {
+    var view = $("<div class='sug-details'/>");
+
+    var t1 = date.ofString(x.start);
+    var t2 = date.ofString(x.end);
+
+    var row1 = $("<div/>")
+      .text(date.weekDay(t1))
+      .appendTo(view);
+
+    var row2 = $("<div/>")
+      .text(date.dateOnly(t1))
+      .appendTo(view);
+
+    var row3 = $("<div/>")
+      .append(html.text("from "))
+      .append($("<b>").text(date.timeOnly(t1)))
+      .append(html.text(" to "))
+      .append($("<b>").text(date.timeOnly(t2)))
+      .appendTo(view);
+
+    return view;
+  }
+
+  function refreshSuggestions(x) {
+    var view = $("#sched-step1-suggestions");
+    view.addClass("hide");
+    view.children().remove();
+
+    var contMsg =
+      $("<div>Select up to 3 options to present to participants.</div>")
+      .appendTo(view);
+
+    var contButton = $("<a href='#' class='btn btn-default' disabled>")
+      .text("Continue")
+      .appendTo(contMsg);
+
+    /* maintain a list of at most 3 selected items, first in first out */
+    var selected = [];
+
+    function updateContButton() {
+      if (selected.length > 0) {
+        contButton.attr('disabled', false);
+      }
+      else {
+        contButton.addClass("esper-btn-disabled");
+        contButton.attr('disabled', true);
+      }
+    }
+
+    function remove(k) {
+      delete selected[k];
+      var a = [];
+      for (var i in selected)
+        a.push(selected[i]);
+      selected = a;
+    }
+
+    function unselect(kv, i) {
+      if (util.isArray(kv)) {
+        kv[1].untick();
+        remove(i);
+      }
+      updateContButton();
+    }
+
+    function select(k, v) {
+      if (selected.length === 3)
+        unselect(selected[2], 2);
+      selected.push([k, v]);
+      updateContButton();
+    }
+
+    list.iter(x.suggestions, function(slot, k) {
+      var slotView = $("<div/>");
+      var circle = $("<div class='circ'></div>");
+      var sugDetails = viewOfSuggestion(slot);
+      slotView.click(function() {
+        var index;
+        var kv = list.find(selected, function(kv, i) {
+          index = i;
+          return util.isArray(kv) && kv[0] === k;
+        });
+        if (kv !== null)
+          unselect(kv, index);
+        else {
+          var v = {
+            slot: slot,
+            untick: function() { circle.removeClass("circ-selected")},
+          };
+          circle.addClass("circ-selected");
+          select(k, v);
+        }
+      });
+
+      circle.appendTo(slotView);
+      sugDetails.appendTo(slotView);
+      slotView.appendTo(view);
+    });
+
+    view.removeClass("hide");
+  }
+
+  function loadSuggestions(meetingParam) {
+    api.getSuggestions(meetingParam)
+      .done(refreshSuggestions);
+  }
+
+  function locationOfTimezone(tz) {
+    return {
+      title: "",
+      address: "",
+      instructions: "",
+      timezone: tz
+    };
+  }
+
+  function initMeetingParam(task) {
+    return {
+      participants: task.task_participants.organized_for,
+      location: [locationOfTimezone("US/Pacific")],
+      on_site: true
+    };
+    /* uninitialized but required:
+         how_soon, duration, buffer_time */
+    /* uninitialized and optional:
+         meeting_type, time_of_day_type, time_of_day */
+  }
+
+  function loadSuggestionsIfReady(meetingParam) {
+    /* check for possibly missing fields
+       to make a valid suggest_meeting_request */
+    if (util.isDefined(meetingParam.how_soon)
+        && util.isDefined(meetingParam.duration)
+        && util.isDefined(meetingParam.buffer_time))
+      loadSuggestions(meetingParam);
+  }
+
+  function loadStep1Prefs(tzList, task) {
     var view = $("#sched-step1-prefs");
     view.children().remove();
 
     /* all times and durations given in minutes, converted into seconds */
-    function timeOfDay(lengthMinutes, bufferMinutes,
+    function initTimes(x,
+                       lengthMinutes, bufferMinutes,
                        optEarliest, optLatest) {
-      var x = {};
       x.duration = 60 * lengthMinutes;
       x.buffer_time = 60 * bufferMinutes;
-      if (util.isString(optEarliest))
-        x.earliest = 60 * optEarliest;
-      if (util.isString(optLatest))
-        x.latest = 60 * optLatest;
+      if (util.isDefined(optEarliest) && util.isDefined(optLatest))
+        x.time_of_day = {
+          start: timeonly.ofMinutes(optEarliest),
+          length: 60 * (optLatest - optEarliest)
+        };
       return x;
     }
 
@@ -199,65 +337,92 @@ var sched = (function() {
       return x;
     }
 
-    var breakfast = {
-      meeting_type: "Breakfast",
-      time_of_day: timeOfDay(75, 15, hour(8), hour(10,30))
-    };
+    function equalMeetingParam(a, b) {
+      /* this will return false if the field order differs */
+      return JSON.stringify(a) === JSON.stringify(b);
+    }
 
-    var lunch = {
-      meeting_type: "Lunch",
-      time_of_day: timeOfDay(75, 15, hour(11,30), hour(13,30))
-    };
+    var breakfast =
+      initTimes({ meeting_type: "Breakfast" },
+                75, 15, hour(8), hour(10,30));
 
-    var dinner = {
-      meeting_type: "Dinner",
-      time_of_day: timeOfDay(90, 30, hour(18,00), hour(20,30))
-    };
+    var lunch =
+      initTimes({ meeting_type: "Lunch" },
+                75, 15, hour(11,30), hour(13,30));
 
-    var nightlife = {
-      meeting_type: "Nightlife",
-      time_of_day: timeOfDay(120, 30, hour(19), hour(22))
-    };
+    var dinner =
+      initTimes({ meeting_type: "Dinner" },
+                90, 30, hour(18,00), hour(20,30));
 
-    var coffee = {
-      meeting_type: "Coffee",
-      time_of_day: timeOfDay(30, 15)
-    };
+    var nightlife =
+      initTimes({ meeting_type: "Nightlife" },
+                120, 30, hour(19), hour(22));
 
-    var call = {
-      meeting_type: "Call",
-      time_of_day: timeOfDay(25, 5, hour(7), hour(20))
-    };
+    var coffee =
+      initTimes({ meeting_type: "Coffee" },
+                30, 15);
 
-    var meeting = {
-      time_of_day: timeOfDay(45, 15)
-    };
+    var call =
+      initTimes({ meeting_type: "Call" },
+                25, 5, hour(7), hour(20));
 
-    var morning = {
-      time_of_day_type: "Morning",
-      time_of_day: timeOfDay(45, 15, hour(8), hour(11))
-    };
+    var meeting =
+      initTimes({}, 45, 15);
 
-    var afternoon = {
-      time_of_day_type: "Afternoon",
-      time_of_day: timeOfDay(45, 15, hour(13), hour(18))
-    };
+    var morning =
+      initTimes({ time_of_day_type: "Morning" },
+                45, 15, hour(8), hour(11));
 
-    var late_night = {
-      time_of_day_type: "Late_night",
-      time_of_day: timeOfDay(45, 15, hour(19), hour(22))
-    };
+    var afternoon =
+      initTimes({ time_of_day_type: "Afternoon"},
+                45, 15, hour(13), hour(18));
 
+    var late_night =
+      initTimes({ time_of_day_type: "Late_night" },
+                45, 15, hour(19), hour(22));
+
+    /* inter-dependent dropdowns for setting scheduling constraints */
     var sel1, sel2, sel3, sel4;
+
+    /* value holding the current scheduling constraints;
+       an event is fired each time it changes */
+    var meetingParam = initMeetingParam(task);
+
+    /* read values from selectors 1-4 and update the meetingParam */
+    function mergeSelections() {
+      var old = meetingParam;
+      var x = initMeetingParam(task);
+      util.addFields(x, sel1.get());
+      x.location[0].timezone = sel2.get();
+      util.addFields(x, sel3.get());
+      x.how_soon = sel4.get();
+      meetingParam = x;
+      log(x);
+      if (! equalMeetingParam(old, meetingParam))
+        loadSuggestionsIfReady(meetingParam);
+    }
 
     /* try to match the duration selected as part of the meeting type (sel1)
        with the duration selector (sel3) */
     function action1(x) {
-      var tod = x.time_of_day;
-      if (util.isDefined(tod)) {
-        var k = ((tod.duration + tod.buffer_time) / 60).toString();
+      if (util.isDefined(x)) {
+        var k = ((x.duration + x.buffer_time) / 60).toString();
+        log("sel3 key: " + k);
         sel3.set(k);
+        mergeSelections();
       }
+    }
+
+    function action2(x) {
+      mergeSelections();
+    }
+
+    function action3(x) {
+      mergeSelections();
+    }
+
+    function action4(x) {
+      mergeSelections();
     }
 
     /* type of meeting */
@@ -284,6 +449,7 @@ var sched = (function() {
     var tzOptions =
       list.map(tzList, function(tz) { return { label: tz, value: tz }; });
     var sel2 = select.create({
+      defaultAction: action2,
       options: tzOptions
     });
 
@@ -293,13 +459,14 @@ var sched = (function() {
                buffer_time: 60 * buf };
     }
     var sel3 = select.create({
+      defaultAction: action3,
       options: [
         { label: "60 min", key: "60", value: dur(45,15) },
         { label: "45 min", key: "45", value: dur(30,15) },
         { label: "30 min", key: "30", value: dur(25,5) },
         { label: "15 min", key: "15", value: dur(10,5) },
         { label: "1 hour 15 min",  key: "75", value: dur(60,15) },
-        { label: "1 hour 30 min",  key: "90", value: dur(75,30) },
+        { label: "1 hour 30 min",  key: "90", value: dur(75,15) },
         { label: "2 hours",        key: "120", value: dur(105,15) },
         { label: "2 hours 30 min", key: "150", value: dur(120,30) }
       ]
@@ -307,6 +474,7 @@ var sched = (function() {
 
     /* urgency */
     var sel4 = select.create({
+      defaultAction: action4,
       options: [
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
         { label: "Within 1 week", key: "1week", value: 7 * 86400 },

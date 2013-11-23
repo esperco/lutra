@@ -30,6 +30,11 @@ var util = (function () {
     return Object.prototype.toString.call(x) === "[object Object]";
   };
 
+  mod.addFields = function(x, fields) {
+    for (var k in fields)
+      x[k] = fields[k];
+  };
+
   function preparePrintableObject(x) {
     var y = {};
     for (var k in x)

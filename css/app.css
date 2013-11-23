@@ -159,3 +159,21 @@ body {
   color: black;
   border-bottom: 1px solid #8c42ad; /* Purple */
 }
+
+.circ {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+
+  display: inline-block;
+  color: white;
+  border: 1px solid #a7a9ac; /* Light Gray */;
+}
+
+.circ-selected {
+  background-color: #2bb673; /* Green */
+}
+
+.sug-details {
+  display: inline-block;
+}
