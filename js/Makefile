@@ -12,12 +12,15 @@ dev-build: includes-dev.html
 prod-build: prod.js includes-prod.html
 
 SOURCES = \
+  test.js \
   list.js \
   deferred.js \
   util.js \
   log.js \
+  html.js \
   variant.js \
   date.js \
+  timeonly.js \
   status.js \
   unixtime.js \
   email.js \
@@ -34,7 +37,6 @@ SOURCES = \
   sched.js \
   task.js \
   page.js \
-  test.js \
   route.js \
   main.js
 

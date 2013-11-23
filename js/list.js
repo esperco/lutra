@@ -9,7 +9,7 @@ var list = (function() {
   mod.iter = function(a, f) {
     var len = a.length;
     for (var i = 0; i < len; i++)
-      f(a[i]);
+      f(a[i], i);
   }
 
   /* one-to-one mapping */
@@ -17,7 +17,7 @@ var list = (function() {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++)
-      b[i] = f(a[i]);
+      b[i] = f(a[i], i);
     return b;
   }
 
@@ -26,7 +26,7 @@ var list = (function() {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      var x = f(a[i]);
+      var x = f(a[i], i);
       if (x !== null) {
         b.push(x);
       }
@@ -38,7 +38,7 @@ var list = (function() {
   mod.find = function(a, f) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      if (f(a[i]) === true) {
+      if (f(a[i], i) === true) {
         return a[i];
       }
     }
@@ -49,7 +49,7 @@ var list = (function() {
   mod.exists = function(a, f) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      if (f(a[i])) {
+      if (f(a[i]), i) {
         return true;
       }
     }

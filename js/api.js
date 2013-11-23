@@ -149,5 +149,10 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  mod.getSuggestions = function(x) {
+    var url = api_s_prefix() + "/suggest";
+    return jsonHttpPost(url, JSON.stringify(x));
+  };
+
   return mod;
 })();
