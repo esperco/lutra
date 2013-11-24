@@ -166,7 +166,7 @@ var sched = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadStep1Prefs(tzList, task);
+            loadStep1Prefs(tzList, profs, task);
         });
     }
     return result;
@@ -196,7 +196,7 @@ var sched = (function() {
     return view;
   }
 
-  function refreshSuggestions(x) {
+  function refreshSuggestions(profs, task, x) {
     var view = $("#sched-step1-suggestions");
     view.addClass("hide");
     view.children().remove();
@@ -205,12 +205,16 @@ var sched = (function() {
       $("<div>Select up to 3 options to present to participants.</div>")
       .appendTo(view);
 
-    var contButton = $("<a href='#' class='btn btn-default' disabled>")
-      .text("Continue")
-      .appendTo(contMsg);
-
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
+
+    var contButton = $("<button class='btn btn-default' disabled/>")
+      .text("Continue")
+      .click(function() {
+        var slots = list.map(selected, function(v) { return v[1].slot; });
+        selectCalendarSlots(profs, task, slots);
+      })
+      .appendTo(contMsg);
 
     function updateContButton() {
       if (selected.length > 0) {
@@ -275,9 +279,10 @@ var sched = (function() {
     view.removeClass("hide");
   }
 
-  function loadSuggestions(meetingParam) {
+  function loadSuggestions(profs, task, meetingParam) {
+    task.task_meeting_request = meetingParam;
     api.getSuggestions(meetingParam)
-      .done(refreshSuggestions);
+      .done(function(x) { refreshSuggestions(profs, task, x); });
   }
 
   function locationOfTimezone(tz) {
@@ -301,16 +306,16 @@ var sched = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
-  function loadSuggestionsIfReady(meetingParam) {
+  function loadSuggestionsIfReady(profs, task, meetingParam) {
     /* check for possibly missing fields
        to make a valid suggest_meeting_request */
     if (util.isDefined(meetingParam.how_soon)
         && util.isDefined(meetingParam.duration)
         && util.isDefined(meetingParam.buffer_time))
-      loadSuggestions(meetingParam);
+      loadSuggestions(profs, task, meetingParam);
   }
 
-  function loadStep1Prefs(tzList, task) {
+  function loadStep1Prefs(tzList, profs, task) {
     var view = $("#sched-step1-prefs");
     view.children().remove();
 
@@ -399,7 +404,7 @@ var sched = (function() {
       meetingParam = x;
       log(x);
       if (! equalMeetingParam(old, meetingParam))
-        loadSuggestionsIfReady(meetingParam);
+        loadSuggestionsIfReady(profs, task, meetingParam);
     }
 
     /* try to match the duration selected as part of the meeting type (sel1)
@@ -507,6 +512,32 @@ var sched = (function() {
     sel4.view.appendTo(cell4);
 
     step1Selector.show("sched-step1-prefs");
+  }
+
+  function labelSlots(slots) {
+    return list.map(slots, function(x) {
+      return {
+        label: util.randomString(),
+        slot: x
+      };
+    });
+  }
+
+  /* Record the options for the meeting selected by the user
+     and move on to step 2. */
+  function selectCalendarSlots(profs, task, slots) {
+    var x = task.task_data[1];
+    x.scheduling_stage = "Coordinate";
+    /* TODO: reserve calendar slots for leader of organizing team,
+             unreserve previously-reserved calendar slots */
+    x.calendar_options = labelSlots(slots);
+
+    /* reset further fields */
+    delete x.availabilities;
+    delete x.reserved;
+
+    api.postTask(task)
+      .done(function(task) { loadStep2(profs, task); });
   }
 
   function loadStep1(tzList, profs, task) {
