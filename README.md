@@ -6,11 +6,13 @@ Web client for the assistant
 Setup
 -----
 
-UglifyJS (JavaScript minifier) needs to be installed.
+Requirements:
+* UglifyJS (JavaScript minifier)
+* `gawk`
 
 Ubuntu:
 ```
-sudo apt-get install node-uglify
+sudo apt-get install node-uglify gawk
 ```
 
 Mac:
