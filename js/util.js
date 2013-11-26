@@ -63,7 +63,7 @@ var util = (function () {
       return JSON.stringify(preparePrintable(x), undefined, 2);
   }
 
-  function htmlEscape(str) {
+  mod.htmlEscape = function(str) {
     return String(str)
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')

@@ -47,11 +47,24 @@ var sched = (function() {
     var esc = util.htmlEscape;
     $("sched-confirm-message")
       .html(
-        "<p>Dear " + esc(prof.full_name) + ",</p>" +
+        "<p>Dear " + esc(obsProf.full_name) + ",</p>" +
           "<p>Your appointment with " + esc("") + " is confirmed."
       )
       .text("");
   }
+
+  function editEventDetails(tid, chats, uid) {
+    api.postCalendarInvite(tid, uid)
+       .done(function(chat) {
+        chats[uid] = chat;
+        if (chat.sent_calendar_invite) /* should be true */
+          markCalendarInviteSent(uid);
+      });
+  }
+      /*The above function doesn't do anything right now, but it should be a function accessed on click (or automatically popped).
+      It should accomplish the following:
+      1. Auto-filling event details
+      2. Allowing editing of event details */
 
   function markCalendarInviteSent(uid) { // TODO
   }
@@ -66,25 +79,45 @@ var sched = (function() {
   }
 
   function step3RowViewOfParticipant(tid, chats, profs, uid, guest) {
-    var view = $("<span class='sched-step3-row'>");
+    var view = $("<div class='sched-step3-row'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
-    var name = guest ? prof.full_name : prof.familiar_name;
+    
+    /* var name = guest ? prof.full_name : prof.familiar_name;
     profile.view.photoPlusNameMedium(obsProf)
-      .appendTo(view);
-    $("<button class='btn btn-default'>Confirm</button>")
+      .appendTo(view); */
+
+    /* Commented out the above because button actions will cause global actions
+    to all participants */
+    
+
+    $("<button class='btn btn-default'>Edit event details</button>")
       .click(function(ev) {
-        preFillConfirmModal(tid, chats, uid, obsProf);
+        editEventDetails(tid, chats, uid, obsProf);
         $("#sched-confirm-modal").modal({});
       })
       .appendTo(view);
-    $("<button class='btn btn-default'>Send Calendar Invite</button>")
+    
+    /*Don't which modal above to call*/
+
+    $("<button class='btn btn-default'>Send a confirmation message</button>")
+      .click(function(ev) {
+        preFillConfirmModal(tid, chats, uid, obsProf);
+
+        $("#sched-confirm-modal").modal({});
+      })
+      .appendTo(view);
+
+    $("<button class='btn btn-default'>Send a Calendar Invite</button>")
       .click(function(ev) {
         sendCalendarInvite(tid, chats, uid);
       })
       .appendTo(view);
     return view;
+
   }
+
+
 
   /* convert list of chats into a table keyed by the participant uid */
   function chatsOfTask(task) {
@@ -527,7 +560,7 @@ var sched = (function() {
 
   function loadStep3(profs, task) {
     var view = $("#sched-step3-tab");
-    view.children().remove();
+    /* view.children().remove(); */
 
     var tid = task.tid;
     var chats = chatsOfTask(task);
