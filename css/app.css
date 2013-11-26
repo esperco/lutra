@@ -1,8 +1,8 @@
 /*
   Colors:
 
-  Purple        #8c42ad
-  Light Purple  #8c42ad
+  Purple        #a25cc6
+  Light Purple  #e8d9ee
   Red           #e53030
   Dark Red      #bf2121
   Orange        #f7941e
@@ -20,28 +20,17 @@
 
 */
 
-/*
-  Font advice from http://css-tricks.com/snippets/css/using-font-face/
-*/
-/* @font-face { */
-/*   font-family: proxima-nova; */
-/*   src: url('webfont.eot'); /\* IE9 Compat Modes *\/ */
-/*   src: url('webfont.eot?#iefix') format('embedded-opentype'), /\* IE6-IE8 *\/ */
-/*   url('webfont.woff') format('woff'), /\* Modern Browsers *\/ */
-/*   url('webfont.ttf')  format('truetype'), /\* Safari, Android, iOS *\/ */
-/*   url('webfont.svg#svgFontName') format('svg'); /\* Legacy iOS *\/ */
-/* } */
-
 body {
   background-color: white;
-  color: black;
-  font-family: proxima-nova, arial;
+  color: #282828;
+  font-family: "Proxima Nova", Arial;
+  font-size: 16px;
 }
 
 /*** Old stuff ***/
 
 body {
-  margin-top: 40px; /* room for navigation bar */
+  margin-top: 60px; /* room for navigation bar */
 }
 
 /*
@@ -58,11 +47,13 @@ body {
 }
 
 .task {
-  background-color: #d2d2d2;
+  background-color: white;
+  border-top: 1px;
+  border-top-color: #e6e7e8;
   margin-top: 1em;
-  margin-bottom: 2em;
-  padding: 1em;
-  padding-bottom: 3em;
+  margin-bottom: 1em;
+  padding: 0.75em;
+  padding-bottom: 0.75em;
 }
 
 .request {
@@ -141,6 +132,11 @@ body {
   margin: 0.05em;
 }
 
+#navbar {
+  background-color: white;
+  opacity: 0.9;
+}
+
 /*** Scheduling ***/
 
 .sched-tab {
@@ -176,4 +172,8 @@ body {
 
 .sug-details {
   display: inline-block;
+}
+
+.container{
+  width: 500px ;
 }
