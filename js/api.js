@@ -105,19 +105,15 @@ var api = (function () {
     );
   };
 
-  mod.postTask = function(task, updated_requests) {
-    var updated_task = {task_status      : task.task_status,
-                        task_participants: task.task_participants,
-                        task_kind        : "Questions",
-                        task_requests    : updated_requests};
+  mod.postTask = function(task) {
+    var tid = task.tid;
+    var taskEdit = {
+      task_status      : task.task_status,
+      task_participants: task.task_participants,
+      task_data        : task.task_data
+    };
     return jsonHttpPost(api_q_prefix() + "/task/" + task.tid,
-                        JSON.stringify(updated_task))
-      .done(function(json) {
-        task.tid = json.tid;
-        for (var i in json.rids) {
-          updated_requests[i].rid = json.rids[i];
-        }
-      });
+                        JSON.stringify(taskEdit));
   };
 
   mod.getTask = function(tid) {
