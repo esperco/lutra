@@ -78,18 +78,14 @@ var sched = (function() {
       });
   }
 
-  function step3RowViewOfParticipant(tid, chats, profs, uid, guest) {
+  function step3RowViewOfParticipant(tid, chats, profs, task, uid, guest) {
     var view = $("<div class='sched-step3-row'>");
     var obsProf = profs[uid];
-    var prof = obsProf.prof;
-    
-    /* var name = guest ? prof.full_name : prof.familiar_name;
+    var prof = obsProf.prof;  
+    /*var name = guest ? prof.full_name : prof.familiar_name;
     profile.view.photoPlusNameMedium(obsProf)
-      .appendTo(view); */
+      .appendTo(view);*/
 
-    /* Commented out the above because button actions will cause global actions
-    to all participants */
-    
 
     $("<button class='btn btn-default'>Edit event details</button>")
       .click(function(ev) {
@@ -114,6 +110,20 @@ var sched = (function() {
       })
       .appendTo(view);
     return view;
+
+/*
+    $("#sched-confirm-send")
+      .click(function(ev) {
+          var state = task.task_data[1];
+          state.... = ...;
+          api.postTask(task)
+            .done(function(chat)  {
+              
+            } 
+
+      )
+      } //close the modal
+*/
 
   }
 
@@ -595,13 +605,14 @@ var sched = (function() {
 
     var tid = task.tid;
     var chats = chatsOfTask(task);
-    forEachParticipant(task, function(uid) {
+    /* forEachParticipant(task, function(uid) {
       if (! isGuest(uid)) {
         var rowView =
           step3RowViewOfParticipant(tid, chats, profs, uid, false)
           .appendTo(view);
       }
     });
+    */
     forEachParticipant(task, function(uid) {
       if (isGuest(uid)) {
         var rowView =
