@@ -19,6 +19,11 @@ var chat = (function () {
     return sel;
   }
 
+  function audioPlayer(audioLink) {
+    return $("<audio/>", {src:audioLink, controls:true})
+           .text("Left a voice message.");
+  }
+
   function chatText(chat_item) {
     var kind = chat_item.chat_item_data[0];
     var data = chat_item.chat_item_data[1];
@@ -26,7 +31,7 @@ var chat = (function () {
     case "Message":
       return data;
     case "Audio":
-      return $("<i/>").append("Left a voice message.");
+      return audioPlayer(data);
     case "Selector_q":
       return data.sel_text;
     case "Selector_r":
