@@ -124,6 +124,12 @@
             </div>
 
             <div id="q-task" class="hide"></div>
+
+            <div id="chat" class="hide">
+              <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
+              <div id="chat-panel" class="tab-content"></div>
+            </div>
+
           </div>
         </div>
       </div>

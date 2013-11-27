@@ -34,6 +34,7 @@ SOURCES = \
   profile.js \
   comment.js \
   request.js \
+  chat.js \
   sched.js \
   task.js \
   page.js \
