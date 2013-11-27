@@ -297,7 +297,8 @@ var task = (function() {
     : makeRequest(null, "Selector",{selector_q:newSelector("multiple" === kind)});
     var task = {
       task_requests:[],
-      task_status:{task_open:true, task_title:null},
+      task_status:{task_open:true, task_title:null, task_summary:""},
+      task_data:"Questions",
       task_participants:{
         organized_by : login.data.team.team_organizers,
         organized_for: login.data.team.team_leaders
@@ -409,6 +410,7 @@ var task = (function() {
           default:
             log("Invalid task_data", data);
           }
+          chat.loadTaskChats(task);
         })
     }
   }
