@@ -28,6 +28,7 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
+    /*
     var archiveButton =
       $("<button class='btn btn-default btn-primary'>Archive</button>");
     if (tab === page.home.tab.activeTasks) {
@@ -46,6 +47,7 @@ var task = (function() {
       });
     editButton.appendTo(buttons);
     buttons.appendTo(view);
+    */
 
     var title = task.task_status
       ? task.task_status.task_title
