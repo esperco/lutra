@@ -18,22 +18,26 @@ var sched = (function() {
 
   var mod = {};
 
-  function getState(task) {
+  /***** Scheduling-related utilities *****/
+
+  mod.getState = function(task) {
     return task.task_data[1];
-  }
+  };
 
-  function setState(task, state) {
+  mod.setState = function(task, state) {
     task.task_data = ["Scheduling", state];
-  }
+  };
 
-  function isGuest(uid) {
+  mod.isGuest = function(uid) {
     var team = login.data.team;
     return ! list.mem(team.team_leaders, uid);
-  }
+  };
 
-  function forEachParticipant(task, f) {
+  mod.forEachParticipant = function forEachParticipant(task, f) {
     list.iter(task.task_participants.organized_for, f);
-  }
+  };
+
+  /******************************************/
 
   function preFillConfirmModal(tid, chats, uid, obsProf) {
     var toView = $("sched-confirm-to");
@@ -78,10 +82,10 @@ var sched = (function() {
       });
   }
 
-  function step3RowViewOfParticipant(tid, chats, profs, task, uid, guest) {
+  function step3RowViewOfParticipant(chats, profs, task, uid, guest) {
     var view = $("<div class='sched-step3-row'>");
     var obsProf = profs[uid];
-    var prof = obsProf.prof;  
+    var prof = obsProf.prof;
     /*var name = guest ? prof.full_name : prof.familiar_name;
     profile.view.photoPlusNameMedium(obsProf)
       .appendTo(view);*/
@@ -89,11 +93,11 @@ var sched = (function() {
 
     $("<button class='btn btn-default'>Edit event details</button>")
       .click(function(ev) {
-        editEventDetails(tid, chats, uid, obsProf);
+        editEventDetails(task.tid, chats, uid, obsProf);
         $("#sched-confirm-modal").modal({});
       })
       .appendTo(view);
-    
+
     /*Don't which modal above to call*/
 
     $("<button class='btn btn-default'>Send a confirmation message</button>")
@@ -118,8 +122,8 @@ var sched = (function() {
           state.... = ...;
           api.postTask(task)
             .done(function(chat)  {
-              
-            } 
+
+            }
 
       )
       } //close the modal
@@ -132,7 +136,7 @@ var sched = (function() {
   /* convert list of chats into a table keyed by the participant uid */
   function chatsOfTask(task) {
     var chats = {};
-    forEachParticipant(task, function(uid) {
+    mod.forEachParticipant(task, function(uid) {
       var chat =
         list.find(task.task_chats, function(chat) {
           return list.exists(chat.chat_participants, function(par_status) {
@@ -215,7 +219,7 @@ var sched = (function() {
     return result;
   }
 
-  function viewOfSuggestion(x) {
+  mod.viewOfSuggestion = function(x) {
     var view = $("<div class='sug-details'/>");
 
     var t1 = date.ofString(x.start);
@@ -295,7 +299,7 @@ var sched = (function() {
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div/>");
       var circle = $("<div class='circ'></div>");
-      var sugDetails = viewOfSuggestion(slot);
+      var sugDetails = mod.viewOfSuggestion(slot);
       slotView.click(function() {
         var index;
         var kv = list.find(selected, function(kv, i) {
@@ -580,10 +584,10 @@ var sched = (function() {
     delete x.reserved;
 
     api.postTask(task)
-      .done(function(task) { loadStep2(profs, task); });
+      .done(function(task) { mod.loadStep2(profs, task); });
   }
 
-  function loadStep1(tzList, profs, task) {
+  mod.loadStep1 = function(tzList, profs, task) {
     var view = $("#sched-step1-tab");
 
     connectCalendar(tzList, profs, task);
@@ -592,31 +596,34 @@ var sched = (function() {
     tabSelector.show("sched-step1-tab");
   }
 
-  function loadStep2(profs, task) {
+  mod.loadStep2 = function(profs, task) {
     var view = $("#sched-step2-tab");
     view.children().remove();
+
+    sched2.load(profs, task, view);
+
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
   }
 
-  function loadStep3(profs, task) {
+  mod.loadStep3 = function(profs, task) {
     var view = $("#sched-step3-tab");
     /* view.children().remove(); */
 
     var tid = task.tid;
     var chats = chatsOfTask(task);
-    /* forEachParticipant(task, function(uid) {
+    /* mod.forEachParticipant(task, function(uid) {
       if (! isGuest(uid)) {
         var rowView =
-          step3RowViewOfParticipant(tid, chats, profs, uid, false)
+          step3RowViewOfParticipant(chats, profs, task, uid, false)
           .appendTo(view);
       }
     });
     */
-    forEachParticipant(task, function(uid) {
-      if (isGuest(uid)) {
+    mod.forEachParticipant(task, function(uid) {
+      if (mod.isGuest(uid)) {
         var rowView =
-          step3RowViewOfParticipant(tid, chats, profs, uid, true)
+          step3RowViewOfParticipant(chats, profs, task, uid, true)
           .appendTo(view);
       }
     });
@@ -634,16 +641,16 @@ var sched = (function() {
           .done(function(profs) {
             switch (progress) {
             case "Find_availability":
-              loadStep1(tzList, profs, task);
+              mod.loadStep1(tzList, profs, task);
               break;
             case "Coordinate":
-              loadStep2(profs, task, state);
+              mod.loadStep2(profs, task, state);
               break;
             case "Confirm":
-              loadStep3(profs, task, state);
+              mod.loadStep3(profs, task, state);
               break;
             default:
-              log("Unsupported task_progress: " + progress);
+              log("Unknown scheduling stage: " + progress);
             }
           });
       });
