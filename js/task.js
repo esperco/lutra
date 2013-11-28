@@ -12,8 +12,10 @@ var task = (function() {
     var view = $("<div/>");
     var tasksView = $("<div/>");
 
+/*
     viewOfNewTaskButton(tab, tasksView)
       .appendTo(view);
+*/
 
     for (var i in tasks) {
       mod.viewOfTask(tab, tasks[i]).appendTo(tasksView);
@@ -272,6 +274,8 @@ var task = (function() {
 
 
   // new task and request
+
+/*
   function viewOfNewTaskButton(tab, tasksView) {
     var buttons = $("<div class='buttons'/>");
 
@@ -291,6 +295,7 @@ var task = (function() {
     newTaskButton.appendTo(buttons);
     return buttons;
   }
+*/
 
 
   function viewOfNewTask(tab, kind, reqEdits) {

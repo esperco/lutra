@@ -97,17 +97,10 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div class="container; row; span12">
-        <div id="chat" class="hide">
-           <ul id="chat-profile-tabs" class="nav nav-tabs pull-right"></ul>
-        </div>
-        <div id="chat-panel" class="tab-content pull-right"></div>
-        </div>
-        <div class="container">
-          <div class="row">
-            <div class="span12">
-              <div id="new-task">
-                @@new-task.html@@
+      <div class="row">
+          <div class="col-md-8 container ">
+            <div id="new-task">
+                  @@new-task.html@@
               </div>
               <div id="sched-task" class="hide">
                 <div id="sched-progress-tabs">
@@ -130,13 +123,19 @@
                   @@sched-step3-tab.html@@
                 </div>
               </div>
-              <div id="q-task" class="hide"></div>
-             </div>
+            </div>
+          </div>
+          <div class="col-md-4 pull-right">
+            <div id="chat" class="hide"></div>
+            <ul id="chat-profile-tabs" class="nav nav-tabs pull-right"></ul>
+            <div id="chat-panel" class="tab-content pull-right"></div>
+          </div>
+            <div id="q-task" class="hide"></div>
           </div>
         </div>
       </div>
     </div>
-
+    
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>

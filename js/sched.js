@@ -177,8 +177,23 @@ var sched = (function() {
                                  "sched-step2-tab",
                                  "sched-step3-tab"]);
 
-  var step1Selector = show.create(["sched-step1-connect",
+  var step1Selector = show.create(["sched-step1-location",
+                                   "sched-step1-connect",
                                    "sched-step1-prefs"]);
+
+  /* Upon selecting scheduling, the user will be prompted with a form
+  to enter location before having to "Connect" their Google Calendar. */
+
+/*  function locationForm(obsProf) {
+      var view = $("#sched-step1-location");
+
+;
+  }
+
+  */
+
+
+
 
   /* hitting "Connect" takes the user to Google, then back here with
      a full reload */
