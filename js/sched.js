@@ -43,7 +43,6 @@ var sched = (function() {
   mod.chatsOfTask = function(task) {
     var chats = {};
     mod.forEachParticipant(task, function(uid) {
-      log("CHATS", task.task_chats);
       var chat =
         list.find(task.task_chats, function(chat) {
           return uid === chat.chat_data[1].chat_with;
@@ -369,7 +368,6 @@ var sched = (function() {
       util.addFields(x, sel3.get());
       x.how_soon = sel4.get();
       meetingParam = x;
-      log(x);
       if (! equalMeetingParam(old, meetingParam))
         loadSuggestionsIfReady(profs, task, meetingParam);
     }
@@ -379,7 +377,6 @@ var sched = (function() {
     function action1(x) {
       if (util.isDefined(x)) {
         var k = ((x.duration + x.buffer_time) / 60).toString();
-        log("sel3 key: " + k);
         sel3.set(k);
         mergeSelections();
       }

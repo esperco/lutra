@@ -83,8 +83,6 @@ var sched3 = (function() {
     $("#sched-confirm-send")
       .click(function() {
         var body = $("#sched-confirm-message").val();
-        log(uid, login.me(), login.leader());
-        log(chats);
         var chatid = chats[uid].chatid;
         var chatItem = {
           chatid: chatid,
