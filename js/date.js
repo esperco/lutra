@@ -112,6 +112,12 @@ var date = (function() {
     return h.toString() + ":" + pad(min.toString()) + " " + ampm;
   };
 
+  /* "Wednesday August 13, 2019 from 12:30pm to 1:30 pm" */
+  mod.range = function(d1, d2) {
+    return mod.weekDay(d1) +" "+ mod.dateOnly(d1) +
+      " from "+ mod.timeOnly(d1) +" to "+ mod.timeOnly(d2);
+  };
+
   jQuery.timeago.settings.allowFuture = true;
   /* create a DOM element from a date,
      displaying how long ago it was. */

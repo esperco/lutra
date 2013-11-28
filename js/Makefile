@@ -37,6 +37,7 @@ SOURCES = \
   chat.js \
   sched.js \
   sched2.js \
+  sched3.js \
   task.js \
   page.js \
   route.js \
