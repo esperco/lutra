@@ -1,12 +1,6 @@
 <div id="sched-step3-table">
 </div>
 
-<button class="btn btn-primary btn-lg"
-        data-toggle="modal"
-        data-target="#sched-confirm-modal">
-  Compose
-</button>
-
 <!-- Element IDs:
        sched-confirm-modal: the whole modal dialog
        sched-confirm-title: dialog title
@@ -30,23 +24,16 @@
       <div class="modal-body" id="sched-confirm-body">
         <div class="input-group">
           <span class="input-group-addon">To</span>
-          <span id="sched-confirm-to"></span>
-          <input id="sched-confirm-participants">
+          <input id="sched-confirm-to"
+                 type="text" class="form-control" disabled></span>
         </div>
         <div class="input-group">
           <span class="input-group-addon">Subject</span>
           <input id="sched-confirm-subject"
-                 type="text" contenteditable="true" class="form-control">
+                 type="text" class="form-control" disabled>
         </div>
-        <div id="sched-confirm-message" contenteditable="true">
-          Dear <span class="sched-participant-full-name"></span>, <br><br>
-          You are confirmed for a <span class="sched-meeting-type"></span>  with <span class="sched-team-leaders"></span> on <span class="sched-localtime"></span> at <span class="sched-location"></span>.
-          <br><br>
-          If you have any questions/comments, please do not hesitate to reply to this e-mail.
-          <br><br>
-          Best,
-          <span class="sched-organizer-full-name"></span>
-        </div>
+        <textarea class="form-control" rows="15"
+                  id="sched-confirm-message"></textarea>
         <div id="sched-confirm-message-readonly"></div>
 
       </div>

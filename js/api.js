@@ -120,9 +120,16 @@ var api = (function () {
     return jsonHttpGet(api_q_prefix() + "/task/" + tid)
   };
 
-  mod.queueRemove = function(task, cont) {
+  mod.queueRemove = function(task) {
     return jsonHttpPost(api_q_prefix() + "/queue/" + task.tid + "/remove",
                         "");
+  };
+
+  /*** Chat ***/
+
+  mod.postChatItem = function(chatItem) {
+    var url = api_q_prefix() + "/chat/" + chatItem.chatid + "/item";
+    return jsonHttpPost(url, JSON.stringify(chatItem));
   };
 
   /*** Scheduling ***/
@@ -148,6 +155,11 @@ var api = (function () {
   mod.getSuggestions = function(x) {
     var url = api_s_prefix() + "/suggest";
     return jsonHttpPost(url, JSON.stringify(x));
+  };
+
+  mod.reserveCalendar = function(tid) {
+    var url = api_s_prefix() + "/event/" + tid + "/reserve";
+    return jsonHttpPost(url, "");
   };
 
   return mod;

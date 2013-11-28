@@ -39,109 +39,14 @@ var sched = (function() {
 
   /******************************************/
 
-  function preFillConfirmModal(tid, chats, uid, obsProf) {
-    var toView = $("sched-confirm-to");
-    toView.children().remove();
-    profile.view.photoPlusNameMedium(obsProf)
-      .appendTo(toView);
-
-    $("sched-confirm-subject")
-      .val("Confirmation"); // TODO create more informative default subject
-
-    var esc = util.htmlEscape;
-    $("sched-confirm-message")
-      .html(
-        "<p>Dear " + esc(obsProf.full_name) + ",</p>" +
-          "<p>Your appointment with " + esc("") + " is confirmed."
-      )
-      .text("");
-  }
-
-  function editEventDetails(tid, chats, uid) {
-    api.postCalendarInvite(tid, uid)
-       .done(function(chat) {
-        chats[uid] = chat;
-        if (chat.sent_calendar_invite) /* should be true */
-          markCalendarInviteSent(uid);
-      });
-  }
-      /*The above function doesn't do anything right now, but it should be a function accessed on click (or automatically popped).
-      It should accomplish the following:
-      1. Auto-filling event details
-      2. Allowing editing of event details */
-
-  function markCalendarInviteSent(uid) { // TODO
-  }
-
-  function sendCalendarInvite(tid, chats, uid) {
-    api.postCalendarInvite(tid, uid)
-      .done(function(chat) {
-        chats[uid] = chat;
-        if (chat.sent_calendar_invite) /* should be true */
-          markCalendarInviteSent(uid);
-      });
-  }
-
-  function step3RowViewOfParticipant(chats, profs, task, uid, guest) {
-    var view = $("<div class='sched-step3-row'>");
-    var obsProf = profs[uid];
-    var prof = obsProf.prof;
-    /*var name = guest ? prof.full_name : prof.familiar_name;
-    profile.view.photoPlusNameMedium(obsProf)
-      .appendTo(view);*/
-
-
-    $("<button class='btn btn-default'>Edit event details</button>")
-      .click(function(ev) {
-        editEventDetails(task.tid, chats, uid, obsProf);
-        $("#sched-confirm-modal").modal({});
-      })
-      .appendTo(view);
-
-    /*Don't which modal above to call*/
-
-    $("<button class='btn btn-default'>Send a confirmation message</button>")
-      .click(function(ev) {
-        preFillConfirmModal(tid, chats, uid, obsProf);
-
-        $("#sched-confirm-modal").modal({});
-      })
-      .appendTo(view);
-
-    $("<button class='btn btn-default'>Send a Calendar Invite</button>")
-      .click(function(ev) {
-        sendCalendarInvite(tid, chats, uid);
-      })
-      .appendTo(view);
-    return view;
-
-/*
-    $("#sched-confirm-send")
-      .click(function(ev) {
-          var state = task.task_data[1];
-          state.... = ...;
-          api.postTask(task)
-            .done(function(chat)  {
-
-            }
-
-      )
-      } //close the modal
-*/
-
-  }
-
-
-
   /* convert list of chats into a table keyed by the participant uid */
-  function chatsOfTask(task) {
+  mod.chatsOfTask = function(task) {
     var chats = {};
     mod.forEachParticipant(task, function(uid) {
+      log("CHATS", task.task_chats);
       var chat =
         list.find(task.task_chats, function(chat) {
-          return list.exists(chat.chat_participants, function(par_status) {
-            return (par_status.par_uid === uid);
-          });
+          return uid === chat.chat_data[1].chat_with;
         });
       if (chat !== null)
         chats[uid] = chat;
@@ -622,26 +527,11 @@ var sched = (function() {
   }
 
   mod.loadStep3 = function(profs, task) {
-    var view = $("#sched-step3-tab");
-    /* view.children().remove(); */
+    var view = $("#sched-step3-table");
+    view.children().remove();
 
-    var tid = task.tid;
-    var chats = chatsOfTask(task);
-    /* mod.forEachParticipant(task, function(uid) {
-      if (! isGuest(uid)) {
-        var rowView =
-          step3RowViewOfParticipant(chats, profs, task, uid, false)
-          .appendTo(view);
-      }
-    });
-    */
-    mod.forEachParticipant(task, function(uid) {
-      if (mod.isGuest(uid)) {
-        var rowView =
-          step3RowViewOfParticipant(chats, profs, task, uid, true)
-          .appendTo(view);
-      }
-    });
+    sched3.load(profs, task, view);
+
     tabHighlighter.show("sched-progress-tab3");
     tabSelector.show("sched-step3-tab");
   }

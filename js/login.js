@@ -82,5 +82,22 @@ var login = (function() {
     }
   }
 
+  /* Utilities */
+  mod.me = function() {
+    return mod.data.uid;
+  };
+
+  mod.team = function() {
+    return mod.data.teams[0];
+  };
+
+  mod.organizer = function() {
+    return mod.team().team_organizers[0];
+  };
+
+  mod.leader = function() {
+    return mod.team().team_leaders[0];
+  };
+
   return mod;
 })();
