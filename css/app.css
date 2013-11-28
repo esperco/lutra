@@ -176,6 +176,10 @@ body {
   display: inline-block;
 }
 
-.container{
-  width: 500px ;
+.container {
+  width: 500px;
+}
+
+.sched-highlight {
+  background-color: #e8d9ee; /* Light Purple */
 }

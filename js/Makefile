@@ -36,6 +36,7 @@ SOURCES = \
   request.js \
   chat.js \
   sched.js \
+  sched2.js \
   task.js \
   page.js \
   route.js \
