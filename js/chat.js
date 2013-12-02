@@ -40,6 +40,8 @@ var chat = (function () {
       return $("<i/>").append("Asked for the schedule.");
     case "Scheduling_r":
       return $("<i/>").append("Answered the schedule.");
+    case "Sched_confirm":
+      return data.body;
     default:
       return $("<i/>").append(kind);
     }
