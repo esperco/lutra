@@ -10,6 +10,18 @@
   max-width: 500px;
 }
 
+/*** Text ***/
+
+a {
+    color: #414042;
+    text-decoration: none
+}
+
+a:hover, a:focus {
+    color: #808285;
+    text-decoration: none
+}
+
 body {
   font-family: "Proxima Nova Regular";
 }
@@ -34,12 +46,84 @@ h4,
   font-size: 16px;
 }
 
-a {
-    color: #282828;
-    text-decoration: none
+
+/*** Buttons ***/
+
+.btn-default {
+  color: white;
+  background-color: #a25cc6;
+  border: none;
 }
 
-a:hover, a:focus {
-    color: #414042;
-    text-decoration: none
+.btn-default:hover,
+.btn-default:focus,
+.btn-default:active,
+.btn-default.active {
+  color: white;
+  background-color: #8c42ad;
+  border: none;
+}
+
+.dropdown-toggle.btn-default,
+.open .dropdown-toggle.btn-default {
+  color: #414042;
+  background-color: #e6e7e8;
+  border: none;
+}
+
+.dropdown-toggle.btn-default:hover {
+  color: #414042;
+  background-color: #d1d3d4;
+  border: none;
+}
+
+
+/*** Nav Bar ***/
+
+.nav .caret {
+  border-top-color: #a25cc6;
+  border-bottom-color: #a25cc6;
+}
+
+.nav a:hover .caret {
+  border-top-color: #8c42ad;
+  border-bottom-color: #8c42ad;
+}
+
+.nav > li > a {
+  border-bottom: none;
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+  background: none;
+}
+
+.nav .open > a,
+.nav .open > a:hover,
+.nav .open > a:focus {
+  background: none;
+  border: none;
+}
+
+.nav .open > a .caret,
+.nav .open > a:hover .caret,
+.nav .open > a:focus .caret {
+  border-top-color: #a25cc6;
+  border-bottom-color: #a25cc6;
+}
+
+/*** Dropdown Menu ***/
+
+.nav-tabs .dropdown-menu {
+  margin-top: -1px;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  color: white;
+  text-decoration: none;
+  background-color: #a25cc6;
 }
