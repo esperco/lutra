@@ -108,7 +108,7 @@ var sched = (function() {
   mod.loadStep1 = function(tzList, profs, task) {
     var view = $("#sched-step1-tab");
 
-    sched1.connectCalendar(tzList, profs, task);
+    sched1.load(tzList, profs, task);
 
     tabHighlighter.show("sched-progress-tab1");
     tabSelector.show("sched-step1-tab");

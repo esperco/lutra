@@ -5,8 +5,7 @@
 var sched1 = (function() {
   var mod = {};
 
-  var step1Selector = show.create(["sched-step1-location",
-                                   "sched-step1-connect",
+  var step1Selector = show.create(["sched-step1-connect",
                                    "sched-step1-prefs"]);
 
   function loadSuggestions(profs, task, meetingParam) {
@@ -15,19 +14,30 @@ var sched1 = (function() {
       .done(function(x) { refreshSuggestions(profs, task, x); });
   }
 
-  function locationOfTimezone(tz) {
+  function clearLocation() {
+    var title = $("#sched-step1-loc-title");
+    var addr = $("#sched-step1-loc-addr");
+    var instr = $("#sched-step1-loc-instr");
+
+    title.val("");
+    addr.val("");
+    instr.val("");
+  }
+
+  function getLocation(tz) {
     return {
-      title: "",
-      address: "",
-      instructions: "",
+      title: $("#sched-step1-loc-title").val(),
+      address: $("#sched-step1-loc-addr").val(),
+      instructions: $("#sched-step1-loc-instr").val(),
       timezone: tz
     };
   }
 
   function initMeetingParam(task) {
+    var location = getLocation("US/Pacific");
     return {
       participants: task.task_participants.organized_for,
-      location: [locationOfTimezone("US/Pacific")],
+      location: [location],
       on_site: true
     };
     /* uninitialized but required:
@@ -155,7 +165,7 @@ var sched1 = (function() {
   }
 
   function loadStep1Prefs(tzList, profs, task) {
-    var view = $("#sched-step1-prefs");
+    var view = $("#sched-step1-pref-time");
     view.children().remove();
 
     /* all times and durations given in minutes, converted into seconds */
@@ -237,7 +247,9 @@ var sched1 = (function() {
       var old = meetingParam;
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
-      x.location[0].timezone = sel2.get();
+      var loc = getLocation();
+      loc.timezone = sel2.get();
+      x.location[0] = loc;
       util.addFields(x, sel3.get());
       x.how_soon = sel4.get();
       meetingParam = x;
@@ -371,11 +383,11 @@ var sched1 = (function() {
     step1Selector.show("sched-step1-connect");
   }
 
-  mod.connectCalendar = function(tzList, profs, task) {
+  function connectCalendar(tzList, profs, task) {
     var leaderUid = login.data.team.team_leaders[0];
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer();
+      result = deferred.defer(loadStep1Prefs(tzList, profs, task));
     }
     else {
       var authLandingUrl = document.URL;
@@ -389,6 +401,11 @@ var sched1 = (function() {
     }
     return result;
   }
+
+  mod.load = function(tzList, profs, task) {
+    clearLocation();
+    connectCalendar(tzList, profs, task);
+  };
 
   return mod;
 }());
