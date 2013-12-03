@@ -87,6 +87,11 @@
                   General
                 </a>
               </li>
+              <!-- <li id="active-tasks-tab">
+                <a href="#" id="active-tasks-tab-link">
+                  Completed
+                </a>
+              </li> -->
               <!-- add more tabs as needed -->
             </ul>
             <div id="active-tasks-tab-content" class="hide"></div>

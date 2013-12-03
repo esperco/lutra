@@ -30,9 +30,9 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
-    /*
+    
     var archiveButton =
-      $("<button class='btn btn-default btn-primary'>Archive</button>");
+      $("<button class='btn btn-default btn-primary'>Delete</button>");
     if (tab === page.home.tab.activeTasks) {
       archiveButton
         .click(function() {
@@ -42,14 +42,15 @@ var task = (function() {
       archiveButton.appendTo(buttons);
     }
 
-    var editButton = $("<button class='btn btn-default'>Edit</button>")
-      .click(function() {
-        editViewOfTask(tab, task, task.task_requests, {})
-          .replaceAll(view);
-      });
-    editButton.appendTo(buttons);
+    // var editButton = $("<button class='btn btn-default'>Edit</button>")
+    //   .click(function() {
+    //     editViewOfTask(tab, task, task.task_requests, {})
+    //       .replaceAll(view);
+    //   });
+    // editButton.appendTo(buttons);
+
     buttons.appendTo(view);
-    */
+    
 
     var title = task.task_status
       ? task.task_status.task_title

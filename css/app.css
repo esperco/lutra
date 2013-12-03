@@ -3,16 +3,15 @@
 
   Purple        #a25cc6
   Light Purple  #e8d9ee
+  Dark Purple   #8c42ad
   Red           #e53030
   Dark Red      #bf2121
   Orange        #f7941e
   Green         #2bb673
   Light Gray    #a7a9ac
   Med Gray      #808285
-  BG Gray       #414042
-  Dark Gray     #282828
+  Dark Gray     #414042
 
-#8c42ad
 
   Fonts:
 
@@ -24,7 +23,7 @@
 
 body {
   background-color: white;
-  color: #282828;
+  color: #414042;
   font-family: "Proxima Nova", Arial;
   font-size: 16px;
 }
@@ -49,13 +48,10 @@ body {
 }
 
 .task {
-  background-color: white;
-  border-top: 1px;
-  border-top-color: #e6e7e8;
-  margin-top: 1em;
-  margin-bottom: 1em;
-  padding: 0.75em;
-  padding-bottom: 0.75em;
+  background: none;
+  border-bottom: 1px solid;
+  border-bottom-color: #e6e7e8;
+  padding: 0.7em;
 }
 
 .request {
@@ -137,6 +133,8 @@ body {
 #navbar {
   background-color: white;
   opacity: 0.9;
+  border-bottom: 1px solid;
+  border-bottom-color: #d1d3d4;
 }
 
 /*** Scheduling ***/
