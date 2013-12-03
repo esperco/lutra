@@ -73,12 +73,17 @@ var chat = (function () {
         });
 
         list.iter(task.task_chats, function (chat) {
-          var p = profiles[chat.chat_participants[0].par_uid];
-
-          var pane_id = "chat" + p.profile_uid;
+          var tab_name;
+          if (chat.chatid === task.task_context_chat) {
+            tab_name = "Origin";
+          } else {
+            var p = profiles[chat.chat_participants[0].par_uid];
+            tab_name = p.full_name;
+          }
+          var pane_id = "chat" + chat.chatid;
           tabs.append($("<li/>")
               .append($("<a/>", {href:"#"+pane_id, "data-toggle":"tab"})
-              .append(p.full_name)));
+              .append(tab_name)));
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
                      .append(chatView(chat)));
         });
