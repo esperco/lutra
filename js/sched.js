@@ -115,7 +115,7 @@ var sched = (function() {
   }
 
   mod.loadStep2 = function(profs, task) {
-    var view = $("#sched-step2-tab");
+    var view = $("#sched-step2-table");
     view.children().remove();
 
     sched2.load(profs, task, view);
