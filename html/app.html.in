@@ -102,45 +102,40 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div class="row">
-          <div class="col-md-8 container ">
+      <div class="col-md-8 container ">
+        <div class="row">
             <div id="new-task">
-                  @@new-task.html@@
+              @@new-task.html@@
+            </div>
+            <div id="sched-task" class="hide">
+              <div id="sched-progress-tabs">
+                <span id="sched-progress-tab1"
+                      class="sched-tab">Step 1. Parameters
+                </span><span class="sched-tab sched-tab-filler">&nbsp;
+                </span><span id="sched-progress-tab2"
+                             class="sched-tab">Step 2. Coordinate
+                </span><span class="sched-tab sched-tab-filler">&nbsp;
+                </span><span id="sched-progress-tab3"
+                             class="sched-tab">Step 3. Confirm</span>
               </div>
-              <div id="sched-task" class="hide">
-                <div id="sched-progress-tabs">
-                  <span id="sched-progress-tab1"
-                        class="sched-tab">Step 1. Parameters
-                  </span><span class="sched-tab sched-tab-filler">&nbsp;
-                  </span><span id="sched-progress-tab2"
-                        class="sched-tab">Step 2. Coordinate
-                  </span><span class="sched-tab sched-tab-filler">&nbsp;
-                  </span><span id="sched-progress-tab3"
-                        class="sched-tab">Step 3. Confirm</span>
-                </div>
-                <div id="sched-step1-tab" class="hide">
-                  @@sched-step1-tab.html@@
-                </div>
-                <div id="sched-step2-tab" class="hide">
-                  @@sched-step2-tab.html@@
-                </div>
-                <div id="sched-step3-tab" class="hide">
-                  @@sched-step3-tab.html@@
-                </div>
+              <div id="sched-step1-tab" class="hide">
+                @@sched-step1-tab.html@@
+              </div>
+              <div id="sched-step2-tab" class="hide">
+                @@sched-step2-tab.html@@
+              </div>
+              <div id="sched-step3-tab" class="hide">
+                @@sched-step3-tab.html@@
               </div>
             </div>
-          </div>
-          <div class="col-md-4 pull-right">
-            <div id="chat" class="hide"></div>
-            <ul id="chat-profile-tabs" class="nav nav-tabs pull-right"></ul>
-            <div id="chat-panel" class="tab-content pull-right"></div>
-          </div>
-            <div id="q-task" class="hide"></div>
-          </div>
         </div>
       </div>
+      <div id="q-task" class="hide"></div>
+      <div id="chat" class="col-md-4 pull-right hide">
+        <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
+        <div id="chat-panel" class="tab-content"></div>
+      </div>
     </div>
-    
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
