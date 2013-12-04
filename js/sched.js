@@ -33,8 +33,22 @@ var sched = (function() {
     return ! list.mem(team.team_leaders, uid);
   };
 
-  mod.forEachParticipant = function forEachParticipant(task, f) {
-    list.iter(task.task_participants.organized_for, f);
+  mod.getParticipants = function(task) {
+    return task.task_participants.organized_for;
+  };
+
+  mod.getGuests = function(task) {
+    return list.filter(mod.getParticipants(task), function(uid) {
+      return mod.isGuest(uid);
+    });
+  };
+
+  mod.forEachParticipant = function(task, f) {
+    list.iter(mod.getParticipants(task), f);
+  };
+
+  mod.forEachGuest = function(task, f) {
+    list.iter(mod.getGuests(task), f);
   };
 
   /******************************************/

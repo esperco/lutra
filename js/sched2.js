@@ -110,11 +110,13 @@ var sched2 = (function() {
       availabilityModal.modal("hide");
     }
 
+    function composeEmail() {
+      preFillAvailabilityModal(chats, profs, task, howSoon, options, uid);
+      availabilityModal.modal({});
+    }
+
     $("<button class='btn btn-default'>Ask about availability</button>")
-      .click(function() {
-        preFillAvailabilityModal(chats, profs, task, howSoon, options, uid);
-        availabilityModal.modal({});
-      })
+      .click(composeEmail)
       .appendTo(view);
 
     $("#sched-availability-send")
@@ -135,7 +137,8 @@ var sched2 = (function() {
           .done(closeAvailabilityModal);
       });
 
-    return view;
+    return { view: view,
+             composeEmail: composeEmail };
   }
 
   mod.load = function(profs, task, view) {
@@ -154,12 +157,15 @@ var sched2 = (function() {
     viewOfOptions(profs, task, onSelect)
       .appendTo(view);
 
-    sched.forEachParticipant(task, function(uid) {
-      if (sched.isGuest(uid)) {
-        var rowView =
-          rowViewOfParticipant(chats, profs, task, uid)
-          .appendTo(view);
-      }
+    var guests = sched.getGuests(task);
+    var numGuests = guests.length;
+    list.iter(guests, function(uid) {
+      var x =
+        rowViewOfParticipant(chats, profs, task, uid);
+      x.view
+        .appendTo(view);
+      if (numGuests == 1)
+        x.composeEmail();
     });
 
     next
