@@ -9,7 +9,9 @@ var sched1 = (function() {
                                    "sched-step1-prefs"]);
 
   function loadSuggestions(profs, task, meetingParam) {
-    task.task_meeting_request = meetingParam;
+    var state = sched.getState(task);
+    log(task);
+    state.meeting_request = meetingParam;
     api.getSuggestions(meetingParam)
       .done(function(x) { refreshSuggestions(profs, task, x); });
   }

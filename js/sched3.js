@@ -119,21 +119,7 @@ var sched3 = (function() {
       })
       .appendTo(view);
 
-/*
-    $("#sched-confirm-send")
-      .click(function(ev) {
-          var state = task.task_data[1];
-          state.... = ...;
-          api.postTask(task)
-            .done(function(chat)  {
-
-            }
-
-      )
-      } //close the modal
-*/
     return view;
-
   }
 
 
