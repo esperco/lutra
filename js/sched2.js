@@ -8,7 +8,7 @@ var sched2 = (function() {
 
     "I'm writing on behalf of "+hostName+" who respectfully requests "+
     "a meeting with you. "+
-    toName+"'s schedule has the below open times "+howSoon+". "+
+    hostName+"'s schedule has the below open times "+howSoon+". "+
     "If any of these times are agreeable, please respond to this e-mail "+
     "with your choice.";
   }
