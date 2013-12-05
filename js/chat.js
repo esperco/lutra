@@ -47,16 +47,50 @@ var chat = (function () {
     }
   }
 
+  function viewOChatItem(item, time, unread_status) {
+    var v = $("<div/>");
+    v.append($("<div/>").append(full_name(item.by)));
+    v.append($("<div/>").append(date.viewTimeAgo(date.ofString(time))));
+    v.append($("<div/>").append(item.time_read ? "Read" : unread_status));
+    v.append($("<div/>").append(chatText(item)));
+    v.append($("<hr/>"));
+    return v;
+  }
+
   function chatView(chat) {
     var v = $("<div/>");
+
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
-      v.append($("<div/>").append(full_name(item.by)));
-      v.append(date.viewTimeAgo(date.ofString(item.time_created)));
-      v.append($("<div/>").append(chatText(item)));
-      v.append($("<hr/>"));
+      v.append(viewOChatItem(item, item.time_created, "Posted"));
     }
-    v.append($("<input/>", {placeholder:"Write a reply..."}));
+
+    var edit = $("<input/>", {placeholder:"Write a reply..."});
+    edit.keypress(function (e) {
+      if (13 === e.which) {
+        if (edit.val() !== "") {
+          var me = login.me();
+          var item = {
+            chatid: chat.chatid,
+            by: me,
+            for: me,
+            chat_item_data:["Message", edit.val()]
+          };
+          var tempItemView = viewOChatItem(item, Date.now(), "Posting");
+          edit.before(tempItemView);
+          edit.val("");
+          api.postChatItem(item).done(function(item) {
+            var itemView = viewOChatItem(item, item.time_created, "Posted");
+            tempItemView.replaceWith(itemView);
+          });
+        }
+        return false;
+      } else {
+        return true;
+      }
+    });
+    v.append(edit);
+
     return v;
   }
 
