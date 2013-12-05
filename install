@@ -28,3 +28,4 @@ cp css/*.css pub/css
 cp html/*.html pub/html
 cp ejs/*.ejs pub/ejs
 cp fonts/* pub/fonts
+cp img/* pub/img
