@@ -17,7 +17,10 @@
 
     <div id="navbar" class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <a class="navbar-brand" href="#">TASKS</a>
+        <a href="#">
+          <img class="svg menu" src="/assets/img/menu.svg" width="24px" />
+        </a>
+        <!-- <h2>TASKS</h2> -->
         <ul class="nav nav-tabs pull-right">
           <li class="logged-out">
             <a href="#!login">
@@ -82,16 +85,16 @@
                   Scheduling
                 </a>
               </li>
-              <li id="active-tasks-tab">
+              <!-- <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   General
                 </a>
               </li>
-              <!-- <li id="active-tasks-tab">
+              <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   Completed
-                </a>
-              </li> -->
+                </a> -->
+              </li>
               <!-- add more tabs as needed -->
             </ul>
             <div id="active-tasks-tab-content" class="hide"></div>
@@ -102,35 +105,31 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div class="col-md-8 container ">
-        <div class="row">
-            <div id="new-task">
-              @@new-task.html@@
-            </div>
-            <div id="sched-task" class="hide">
-              <div id="sched-progress-tabs">
-                <span id="sched-progress-tab1"
-                      class="sched-tab">Step 1. Parameters
-                </span><span class="sched-tab sched-tab-filler">&nbsp;
-                </span><span id="sched-progress-tab2"
-                             class="sched-tab">Step 2. Coordinate
-                </span><span class="sched-tab sched-tab-filler">&nbsp;
-                </span><span id="sched-progress-tab3"
-                             class="sched-tab">Step 3. Confirm</span>
-              </div>
-              <div id="sched-step1-tab" class="hide">
-                @@sched-step1-tab.html@@
-              </div>
-              <div id="sched-step2-tab" class="hide">
-                @@sched-step2-tab.html@@
-              </div>
-              <div id="sched-step3-tab" class="hide">
-                @@sched-step3-tab.html@@
-              </div>
-            </div>
+      <div id="new-task">
+        @@new-task.html@@
+      </div>
+      <div id="sched-task" class="hide">
+        <div id="sched-progress-tabs">
+          <!-- <span id="sched-progress-tab1"
+                class="sched-tab">Step 1. Parameters
+          </span><span class="sched-tab sched-tab-filler">&nbsp;
+          </span><span id="sched-progress-tab2"
+                class="sched-tab">Step 2. Coordinate
+          </span><span class="sched-tab sched-tab-filler">&nbsp;
+          </span><span id="sched-progress-tab3"
+                class="sched-tab">Step 3. Confirm</span> -->
+        </div>
+        <div id="sched-step1-tab" class="hide">
+          @@sched-step1-tab.html@@
+        </div>
+        <div id="sched-step2-tab" class="hide">
+          @@sched-step2-tab.html@@
+        </div>
+        <div id="sched-step3-tab" class="hide">
+          @@sched-step3-tab.html@@
         </div>
       </div>
-      <div id="q-task" class="hide"></div>
+      <div id="gen-task" class="hide"></div>
       <div id="chat" class="col-md-4 pull-right hide">
         <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
         <div id="chat-panel" class="tab-content"></div>

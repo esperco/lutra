@@ -332,15 +332,15 @@ var task = (function() {
 
   var taskTypeSelector = show.create([
     "sched-task",
-    "q-task"
+    "gen-task"
   ]);
 
-  function initTaskData(kind) {
-    switch(kind) {
-    case "Scheduling":
-      return [kind, {}];
-    case "Questions":
-      return kind;
+  function initTaskData() {
+    if ($("#category-sched").is(":checked")) {
+      return ["Scheduling", {}];
+    }
+    else if ($("#category-gen").is(":checked")) {
+      return "General";
     }
   }
 
@@ -363,10 +363,10 @@ var task = (function() {
   function loadNewTask() {
     taskTypeSelector.hideAll();
 
-    function onSelected(kind) {
+    function onClicked(kind) {
       if (kind !== "") {
         var title = $("#new-task-title").val();
-        var task_data = initTaskData(kind);
+        var task_data = initTaskData();
         var task = {
           task_status: {
             task_title: title,
@@ -380,30 +380,34 @@ var task = (function() {
         };
         api.createTask(task)
           .done(function(task) {
+            $("#basics").addClass("hide");
+            $("#new-task-footer").addClass("hide");
             /* change URL */
             window.location.hash = "!task/" + task.tid;
           });
       }
     }
 
-    var sel = select.create({
-      options: [
-        { label: "Select category" },
-        { label: "Meeting", value: "Scheduling", action: onSelected },
-        { label: "Other", value: "Questions", action: onSelected },
-      ]
-    });
-    var container = $("#select-category");
-    container.children().remove();
-    sel.view.appendTo(container);
+    $("#start-task").click(onClicked);
 
-    newTaskSelector.show("new-task");
+  //   var sel = select.create({
+  //     options: [
+  //       { label: "Select category" },
+  //       { label: "Scheduling", value: "Scheduling", action: onSelected },
+  //       { label: "General", value: "Questions", action: onSelected },
+  //     ]
+  //   });
+  //   var container = $("#select-category");
+  //   container.children().remove();
+  //   sel.view.appendTo(container);
+
+  //   newTaskSelector.show("new-task");
   }
 
   function loadQuestionsTask(task) {
     var view = mod.viewOfTask("", task);
-    placeView($("#q-task"), view);
-    taskTypeSelector.show("q-task");
+    placeView($("#gen-task"), view);
+    taskTypeSelector.show("gen-task");
   }
 
   function loadMeetingTask(task) {

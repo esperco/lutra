@@ -13,6 +13,7 @@ prod-build: prod.js includes-prod.html
 
 SOURCES = \
   test.js \
+  svg.js \
   list.js \
   deferred.js \
   util.js \
