@@ -129,14 +129,12 @@
           @@sched-step3-tab.html@@
         </div>
       </div>
-      <div class="col-md-4 pull-right">
-        <div id="chat" class="hide"></div>
-        <ul id="chat-profile-tabs" class="nav nav-tabs pull-right"></ul>
-        <div id="chat-panel" class="tab-content pull-right"></div>
-      </div>
       <div id="gen-task" class="hide"></div>
+      <div id="chat" class="col-md-4 pull-right hide">
+        <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
+        <div id="chat-panel" class="tab-content"></div>
+      </div>
     </div>
-   
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>

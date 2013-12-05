@@ -1,203 +1,51 @@
 /*
-  Scheduling meetings
-
-  We're using the following definitions:
-
-  participant = anyone that will join the meeting
-                (does not include organizers, unlike the general definition
-                of a task)
-
-  guest = participant who is not part of the organizing team
-
-  organizer = one of the organizers of the meeting
-              (right now, they are assumed to be part of the organizing team)
-
+  Scheduling step 1
 */
 
-var sched = (function() {
-
+var sched1 = (function() {
   var mod = {};
 
-  /***** Scheduling-related utilities *****/
-
-  mod.getState = function(task) {
-    return task.task_data[1];
-  };
-
-  mod.setState = function(task, state) {
-    task.task_data = ["Scheduling", state];
-  };
-
-  mod.isGuest = function(uid) {
-    var team = login.data.team;
-    return ! list.mem(team.team_leaders, uid);
-  };
-
-  mod.getParticipants = function(task) {
-    return task.task_participants.organized_for;
-  };
-
-  mod.getGuests = function(task) {
-    return list.filter(mod.getParticipants(task), function(uid) {
-      return mod.isGuest(uid);
-    });
-  };
-
-  mod.forEachParticipant = function(task, f) {
-    list.iter(mod.getParticipants(task), f);
-  };
-
-  mod.forEachGuest = function(task, f) {
-    list.iter(mod.getGuests(task), f);
-  };
-
-  /******************************************/
-
-  mod.viewOfSuggestion = function(x) {
-    var view = $("<div class='sug-details'/>");
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    var row1 = $("<div/>")
-      .text(date.weekDay(t1))
-      .appendTo(view);
-
-    var row2 = $("<div/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    var row3 = $("<div/>")
-      .append(html.text("from "))
-      .append($("<b>").text(date.timeOnly(t1)))
-      .append(html.text(" to "))
-      .append($("<b>").text(date.timeOnly(t2)))
-      .appendTo(view);
-
-    return view;
-  }
-
-  /* convert list of chats into a table keyed by the participant uid */
-  mod.chatsOfTask = function(task) {
-    var chats = {};
-    mod.forEachParticipant(task, function(uid) {
-      var chat =
-        list.find(task.task_chats, function(chat) {
-          return uid === chat.chat_data[1].chat_with;
-        });
-      if (chat !== null)
-        chats[uid] = chat;
-    });
-    return chats;
-  }
-
-  /*
-    fetch the profiles of everyone involved in the task
-    (deferred map from uid to profile)
-  */
-  function profilesOfEveryone(task) {
-    var par = task.task_participants;
-    var everyone = par.organized_by.concat(par.organized_for);
-    return profile.mget(everyone)
-      .then(function(a) {
-        var b = {};
-        list.iter(a, function(obsProf) {
-          if (obsProf !== null)
-            b[obsProf.prof.profile_uid] = obsProf;
-        });
-        return b;
-      });
-  }
-
-  var tabHighlighter =
-    show.withClass("sched-tab-highlight",
-                   ["sched-progress-tab1",
-                    "sched-progress-tab2",
-                    "sched-progress-tab3"]);
-
-  var tabSelector = show.create(["sched-step1-tab",
-                                 "sched-step2-tab",
-                                 "sched-step3-tab"]);
-
-  var step1Selector = show.create(["sched-step1-location",
-                                   "sched-step1-connect",
+  var step1Selector = show.create(["sched-step1-connect",
                                    "sched-step1-prefs"]);
 
-  /* Upon selecting scheduling, the user will be prompted with a form
-  to enter location before having to "Connect" their Google Calendar. */
-
-/*  function locationForm(obsProf) {
-      var view = $("#sched-step1-location");
-
-;
+  function loadSuggestions(profs, task, meetingParam) {
+    var state = sched.getState(task);
+    log(task);
+    state.meeting_request = meetingParam;
+    api.getSuggestions(meetingParam)
+      .done(function(x) { refreshSuggestions(profs, task, x); });
   }
 
-  */
+  function clearLocation() {
+    var title = $("#sched-step1-loc-title");
+    var addr = $("#sched-step1-loc-addr");
+    var instr = $("#sched-step1-loc-instr");
 
-
-
-
-  /* hitting "Connect" takes the user to Google, then back here with
-     a full reload */
-  function promptForCalendar(obsProf, calInfo) {
-    var view = $("#sched-step1-connect");
-    view.children().remove();
-
-    var prof = obsProf.prof;
-    $("<div class='center-msg'/>")
-      .text("Connect with " + prof.familiar_name + "'s Google Calendar")
-      .appendTo(view);
-    $("<div class='center-msg'/>")
-      .text("to let Esper help you ﬁnd available times.")
-      .appendTo(view);
-    $("<a class='btn btn-default'>Connect</a>")
-      .attr("href", calInfo.google_auth_url)
-      .appendTo(view);
-
-    step1Selector.show("sched-step1-connect");
+    title.val("");
+    addr.val("");
+    instr.val("");
   }
 
-  function connectCalendar(tzList, profs, task) {
-    var leaderUid = login.data.team.team_leaders[0];
-    var result;
-    if (! list.mem(task.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer();
-    }
-    else {
-      var authLandingUrl = document.URL;
-      result = api.getCalendar(leaderUid, authLandingUrl)
-        .then(function(calInfo) {
-          if (!calInfo.has_calendar)
-            promptForCalendar(profs[leaderUid], calInfo);
-          else
-            loadStep1Prefs(tzList, profs, task);
-        });
-    }
-    return result;
+  function getLocation(tz) {
+    return {
+      title: $("#sched-step1-loc-title").val(),
+      address: $("#sched-step1-loc-addr").val(),
+      instructions: $("#sched-step1-loc-instr").val(),
+      timezone: tz
+    };
   }
 
-  mod.viewOfSuggestion = function(x) {
-    var view = $("<div class='sug-details'/>");
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    var row1 = $("<div/>")
-      .text(date.weekDay(t1))
-      .appendTo(view);
-
-    var row2 = $("<div/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    var row3 = $("<div/>")
-      .append(html.text("from "))
-      .append($("<b>").text(date.timeOnly(t1)))
-      .append(html.text(" to "))
-      .append($("<b>").text(date.timeOnly(t2)))
-      .appendTo(view);
-
-    return view;
+  function initMeetingParam(task) {
+    var location = getLocation("US/Pacific");
+    return {
+      participants: task.task_participants.organized_for,
+      location: [location],
+      on_site: true
+    };
+    /* uninitialized but required:
+         how_soon, duration, buffer_time */
+    /* uninitialized and optional:
+         meeting_type, time_of_day_type, time_of_day */
   }
 
   function refreshSuggestions(profs, task, x) {
@@ -256,7 +104,7 @@ var sched = (function() {
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div/>");
       var circle = $("<div class='circ'></div>");
-      var sugDetails = mod.viewOfSuggestion(slot);
+      var sugDetails = sched.viewOfSuggestion(slot);
       slotView.click(function() {
         var index;
         var kv = list.find(selected, function(kv, i) {
@@ -283,33 +131,6 @@ var sched = (function() {
     view.removeClass("hide");
   }
 
-  function loadSuggestions(profs, task, meetingParam) {
-    task.task_meeting_request = meetingParam;
-    api.getSuggestions(meetingParam)
-      .done(function(x) { refreshSuggestions(profs, task, x); });
-  }
-
-  function locationOfTimezone(tz) {
-    return {
-      title: "",
-      address: "",
-      instructions: "",
-      timezone: tz
-    };
-  }
-
-  function initMeetingParam(task) {
-    return {
-      participants: task.task_participants.organized_for,
-      location: [locationOfTimezone("US/Pacific")],
-      on_site: true
-    };
-    /* uninitialized but required:
-         how_soon, duration, buffer_time */
-    /* uninitialized and optional:
-         meeting_type, time_of_day_type, time_of_day */
-  }
-
   function loadSuggestionsIfReady(profs, task, meetingParam) {
     /* check for possibly missing fields
        to make a valid suggest_meeting_request */
@@ -319,8 +140,34 @@ var sched = (function() {
       loadSuggestions(profs, task, meetingParam);
   }
 
+  function labelSlots(slots) {
+    return list.map(slots, function(x) {
+      return {
+        label: util.randomString(),
+        slot: x
+      };
+    });
+  }
+
+  /* Record the options for the meeting selected by the user
+     and move on to step 2. */
+  function selectCalendarSlots(profs, task, slots) {
+    var x = task.task_data[1];
+    x.scheduling_stage = "Coordinate";
+    /* TODO: reserve calendar slots for leader of organizing team,
+             unreserve previously-reserved calendar slots */
+    x.calendar_options = labelSlots(slots);
+
+    /* reset further fields */
+    delete x.availabilities;
+    delete x.reserved;
+
+    api.postTask(task)
+      .done(function(task) { sched.loadStep2(profs, task); });
+  }
+
   function loadStep1Prefs(tzList, profs, task) {
-    var view = $("#sched-step1-prefs");
+    var view = $("#sched-step1-pref-time");
     view.children().remove();
 
     /* all times and durations given in minutes, converted into seconds */
@@ -402,7 +249,9 @@ var sched = (function() {
       var old = meetingParam;
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
-      x.location[0].timezone = sel2.get();
+      var loc = getLocation();
+      loc.timezone = sel2.get();
+      x.location[0] = loc;
       util.addFields(x, sel3.get());
       x.how_soon = sel4.get();
       meetingParam = x;
@@ -495,6 +344,7 @@ var sched = (function() {
 
     var col1 = $("<div class='col-md-6'/>")
       .appendTo(grid);
+
     var col2 = $("<div class='col-md-6'/>")
       .appendTo(grid);
 
@@ -515,85 +365,49 @@ var sched = (function() {
     step1Selector.show("sched-step1-prefs");
   }
 
-  function labelSlots(slots) {
-    return list.map(slots, function(x) {
-      return {
-        label: util.randomString(),
-        slot: x
-      };
-    });
-  }
-
-  /* Record the options for the meeting selected by the user
-     and move on to step 2. */
-  function selectCalendarSlots(profs, task, slots) {
-    var x = task.task_data[1];
-    x.scheduling_stage = "Coordinate";
-    /* TODO: reserve calendar slots for leader of organizing team,
-             unreserve previously-reserved calendar slots */
-    x.calendar_options = labelSlots(slots);
-
-    /* reset further fields */
-    delete x.availabilities;
-    delete x.reserved;
-
-    api.postTask(task)
-      .done(function(task) { mod.loadStep2(profs, task); });
-  }
-
-  mod.loadStep1 = function(tzList, profs, task) {
-    var view = $("#sched-step1-tab");
-
-    sched1.load(tzList, profs, task);
-
-    tabHighlighter.show("sched-progress-tab1");
-    tabSelector.show("sched-step1-tab");
-  }
-
-  mod.loadStep2 = function(profs, task) {
-    var view = $("#sched-step2-table");
+  /* hitting "Connect" takes the user to Google, then back here with
+     a full reload */
+  function promptForCalendar(obsProf, calInfo) {
+    var view = $("#sched-step1-connect");
     view.children().remove();
 
-    sched2.load(profs, task, view);
+    var prof = obsProf.prof;
+    $("<div class='center-msg'/>")
+      .text("Connect with " + prof.familiar_name + "'s Google Calendar")
+      .appendTo(view);
+    $("<div class='center-msg'/>")
+      .text("to let Esper help you ﬁnd available times.")
+      .appendTo(view);
+    $("<a class='btn btn-default'>Connect</a>")
+      .attr("href", calInfo.google_auth_url)
+      .appendTo(view);
 
-    tabHighlighter.show("sched-progress-tab2");
-    tabSelector.show("sched-step2-tab");
+    step1Selector.show("sched-step1-connect");
   }
 
-  mod.loadStep3 = function(profs, task) {
-    var view = $("#sched-step3-table");
-    view.children().remove();
-
-    sched3.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab3");
-    tabSelector.show("sched-step3-tab");
+  function connectCalendar(tzList, profs, task) {
+    var leaderUid = login.data.team.team_leaders[0];
+    var result;
+    if (! list.mem(task.task_participants.organized_for, leaderUid)) {
+      result = deferred.defer(loadStep1Prefs(tzList, profs, task));
+    }
+    else {
+      var authLandingUrl = document.URL;
+      result = api.getCalendar(leaderUid, authLandingUrl)
+        .then(function(calInfo) {
+          if (!calInfo.has_calendar)
+            promptForCalendar(profs[leaderUid], calInfo);
+          else
+            loadStep1Prefs(tzList, profs, task);
+        });
+    }
+    return result;
   }
 
-  mod.loadTask = function(task) {
-    var state = task.task_data[1];
-    var progress = state.scheduling_stage;
-    api.getTimezones()
-      .done(function(x) {
-        var tzList = x.timezones;
-        profilesOfEveryone(task)
-          .done(function(profs) {
-            switch (progress) {
-            case "Find_availability":
-              mod.loadStep1(tzList, profs, task);
-              break;
-            case "Coordinate":
-              mod.loadStep2(profs, task, state);
-              break;
-            case "Confirm":
-              mod.loadStep3(profs, task, state);
-              break;
-            default:
-              log("Unknown scheduling stage: " + progress);
-            }
-          });
-      });
-  }
+  mod.load = function(tzList, profs, task) {
+    clearLocation();
+    connectCalendar(tzList, profs, task);
+  };
 
   return mod;
 }());

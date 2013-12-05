@@ -30,7 +30,6 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
-    
     var archiveButton =
       $("<button class='btn btn-default btn-primary'>Delete</button>");
     if (tab === page.home.tab.activeTasks) {
@@ -50,7 +49,6 @@ var task = (function() {
     // editButton.appendTo(buttons);
 
     buttons.appendTo(view);
-    
 
     var title = task.task_status
       ? task.task_status.task_title
@@ -346,6 +344,21 @@ var task = (function() {
     }
   }
 
+  /*
+    Automatically save the task with an updated title
+   */
+  function initTaskTitle(task) {
+    var view = $("#new-task-title");
+    var title = task.task_status.task_title;
+    if (util.isString(title))
+      view.val(title);
+
+    util.afterTyping(view, 500, function() {
+      task.task_status.task_title = view.val();
+      api.postTask(task);
+    });
+  }
+
   /* At this stage we don't have a task ID yet */
   function loadNewTask() {
     taskTypeSelector.hideAll();
@@ -411,12 +424,12 @@ var task = (function() {
       api.getTask(optTid)
         .done(function(task) {
           var data = task.task_data;
+          initTaskTitle(task);
           switch (variant.cons(data)) {
           case "Questions":
             loadQuestionsTask(task);
             break;
           case "Scheduling":
-            /* TODO check task progress, display appropriate view */
             loadMeetingTask(task);
             break;
           default:

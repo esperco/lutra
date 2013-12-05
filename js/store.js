@@ -21,7 +21,7 @@ var store = (function() {
         x = JSON.parse(s);
       }
       catch (e) {
-        util.log ("Cannot parse cached data stored under key '"+ k +"': "+ s);
+        log ("Cannot parse cached data stored under key '"+ k +"': "+ s);
       }
     }
     return x;

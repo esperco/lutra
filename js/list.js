@@ -34,6 +34,19 @@ var list = (function() {
     return b;
   }
 
+  /* keep only elements that satisfy the predicate */
+  mod.filter = function(a, f) {
+    var b = [];
+    var len = a.length;
+    for (var i = 0; i < len; i++) {
+      var x = a[i];;
+      if (f(x, i) === true) {
+        b.push(x);
+      }
+    }
+    return b;
+  }
+
   /* return the first element that satisfies the give predicate */
   mod.find = function(a, f) {
     var len = a.length;
