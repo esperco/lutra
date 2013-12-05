@@ -67,8 +67,7 @@ var chat = (function () {
 
     var edit = $("<input/>", {placeholder:"Write a reply..."});
     edit.keypress(function (e) {
-      var c = e.charCode || e.keyCode;
-      if (13 === c) {
+      if (13 === e.which) {
         if (edit.val() !== "") {
           var me = login.me();
           var item = {
