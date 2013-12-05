@@ -21,6 +21,7 @@
 
 */
 
+html;
 body {
   background-color: white;
   color: #414042;
@@ -31,7 +32,7 @@ body {
 /*** Old stuff ***/
 
 body {
-  margin-top: 60px; /* room for navigation bar */
+  margin-top: 100px; /* room for navigation bar */
 }
 
 /*
@@ -130,12 +131,110 @@ body {
   margin: 0.05em;
 }
 
+
+/*** Nav Bar ***/
+
 #navbar {
-  background-color: white;
+  background-color: #f8f8f8;
   opacity: 0.9;
   border-bottom: 1px solid;
   border-bottom-color: #d1d3d4;
 }
+
+.menu {
+  margin-left: 16px;
+  margin-top: 20px;
+}
+
+.menu:hover g path {
+  fill: #8c42ad;
+}
+
+#title {
+  margin-left: 80px;
+}
+
+
+/*** General ***/
+
+.container {
+  max-width: 500px;
+}
+
+#push {
+  height: 120px;
+}
+
+
+/*** New Task ***/
+
+#new-task-title {
+  color: #808285;
+}
+
+#new-task-title:focus {
+  color: #414042;
+}
+
+#categorize {
+  line-height: 3;
+}
+
+
+/*** Footers ***/
+
+#new-task-footer,
+#sched-footer {
+  height: 80px;
+  background-color: #f8f8f8;
+  opacity: 0.9;
+  border-top: 1px solid;
+  border-top-color: #d1d3d4;
+}
+
+#new-task-footer {
+  padding-top: 20px;
+}
+
+#start-task {
+  font-family: "Proxima Nova Light";
+  font-size: 20px;
+  letter-spacing: 3px;
+  width: 240px;
+  height: 40px;
+}
+
+#sched-footer {
+  background-color: none;
+  border-top: none;
+  /*margin-top: 20px;*/
+}
+
+.footer-inner {
+  margin-top: 22px;
+  margin-right: 15px;
+  margin-left: 15px;
+}
+
+#back-button {
+  color: #414042;
+  background-color: #e6e7e8;
+  height: 36px;
+}
+
+#back-button:hover {
+  color: #414042;
+  background-color: #d1d3d4;
+}
+
+#progress {
+  margin-left: -8px;
+}
+
+#next-button {
+  height: 36px;
+}
+
 
 /*** Scheduling ***/
 
@@ -172,10 +271,6 @@ body {
 
 .sug-details {
   display: inline-block;
-}
-
-.container {
-  width: 500px;
 }
 
 .sched-highlight {

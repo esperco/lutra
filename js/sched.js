@@ -457,7 +457,6 @@ var sched = (function() {
 
     var col1 = $("<div class='col-md-6'/>")
       .appendTo(grid);
-
     var col2 = $("<div class='col-md-6'/>")
       .appendTo(grid);
 
