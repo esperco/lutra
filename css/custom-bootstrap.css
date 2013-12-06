@@ -64,6 +64,25 @@ h4,
   border: none;
 }
 
+.btn-default.disabled,
+.btn-default[disabled],
+fieldset[disabled] .btn-default,
+.btn-default.disabled:hover,
+.btn-default[disabled]:hover,
+fieldset[disabled] .btn-default:hover,
+.btn-default.disabled:focus,
+.btn-default[disabled]:focus,
+fieldset[disabled] .btn-default:focus,
+.btn-default.disabled:active,
+.btn-default[disabled]:active,
+fieldset[disabled] .btn-default:active,
+.btn-default.disabled.active,
+.btn-default[disabled].active,
+fieldset[disabled] .btn-default.active {
+  background-color: #e8d9ee;
+  border: none;
+}
+
 .dropdown-toggle.btn-default,
 .open .dropdown-toggle.btn-default {
   color: #414042;
@@ -82,6 +101,19 @@ h4,
 
 .navbar {
   min-height: 60px;
+}
+
+.navbar-text {
+  margin-top: 18px;
+  margin-left: 24px;
+  margin-bottom: 0px;
+  font-size: 18px;
+  cursor: default;
+  -webkit-user-select: none;        
+     -moz-user-select: none;
+      -ms-user-select: none;
+       -o-user-select: none;
+          user-select: none;
 }
 
 .nav .caret {
@@ -163,12 +195,14 @@ h4,
   border-color: #c08add;
   outline: 0;
   -webkit-box-shadow: none;
+          box-shadow: none;
 }
 
 
 /*** Other ***/
 
 hr {
-  /*margin-top: 20px;*/
+  margin-top: 10px;
+  margin-bottom: 15px;
   border-top: 1px solid #e6e7e8;
 }

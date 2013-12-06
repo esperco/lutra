@@ -16,11 +16,11 @@
     <button id="dummy" class="hide"></button>
 
     <div id="navbar" class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
+      <!-- <div class="navbar-inner"> -->
         <a href="#">
           <img class="svg menu" src="/assets/img/menu.svg" width="24px" />
         </a>
-        <!-- <h2>TASKS</h2> -->
+        <p class="navbar-text tasks-title" unselectable="on">TASKS</p>
         <ul class="nav nav-tabs pull-right">
           <li class="logged-out">
             <a href="#!login">
@@ -41,7 +41,7 @@
             </ul>
           </li>
         </ul>
-      </div>
+      <!-- </div> -->
     </div>
 
 
@@ -109,16 +109,16 @@
         @@new-task.html@@
       </div>
       <div id="sched-task" class="hide">
-        <div id="sched-progress-tabs">
-          <!-- <span id="sched-progress-tab1"
+        <!-- <div id="sched-progress-tabs">
+          <span id="sched-progress-tab1"
                 class="sched-tab">Step 1. Parameters
           </span><span class="sched-tab sched-tab-filler">&nbsp;
           </span><span id="sched-progress-tab2"
                 class="sched-tab">Step 2. Coordinate
           </span><span class="sched-tab sched-tab-filler">&nbsp;
           </span><span id="sched-progress-tab3"
-                class="sched-tab">Step 3. Confirm</span> -->
-        </div>
+                class="sched-tab">Step 3. Confirm</span>
+        </div> -->
         <div id="sched-step1-tab" class="hide">
           @@sched-step1-tab.html@@
         </div>

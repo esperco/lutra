@@ -1,22 +1,26 @@
 <div id="basics" class="container">
-	<h3>Name this task.</h3>
-	<div class="form-group">
-		<input type="text" id="new-task-title" class="form-control" placeholder="Untitled Task" autofocus>
+	<div>
+		<h3>Name this task.</h3>
+		<div class="form-group">
+			<input type="text" id="new-task-title" class="form-control" placeholder="Untitled Task" autofocus>
+		</div>
 	</div>
-	<h3 id="categorize">Categorize it.</h3>
-	<hr>
-	<div class="radio">
-	  	<input type="radio" name="categoriesRadios" id="category-sched" value="scheduling" checked>
-	    Scheduling
+	<div id="categorize">
+		<h3>Categorize it.</h3>
+		<hr>
+		<div class="radio">
+		  	<input type="radio" name="categoriesRadios" id="category-sched" value="scheduling" checked>
+		    Scheduling
+		</div>
+		<div class="radio">
+			<input type="radio" name="categoriesRadios" id="category-gen" value="general">
+	    	General
+		</div>
 	</div>
-	<div class="radio">
-		<input type="radio" name="categoriesRadios" id="category-gen" value="general">
-    	General
-	</div>
-	<div id="push"></div>
+	<div class="push"></div>
 </div>
 
-<div id="new-task-footer" class="navbar navbar-fixed-bottom">
+<div class="navbar new-task-footer navbar-fixed-bottom">
 	<div style="text-align:center;">
 		<button id="start-task" class="btn btn-default">START TASK</button>
 	</div>

@@ -142,7 +142,7 @@ var sched2 = (function() {
   }
 
   mod.load = function(profs, task, view) {
-    $("<h1>Select a final time.</h1>")
+    $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
     var chats = sched.chatsOfTask(task);
