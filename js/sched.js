@@ -59,15 +59,15 @@ var sched = (function() {
     var t1 = date.ofString(x.start);
     var t2 = date.ofString(x.end);
 
-    var row1 = $("<div/>")
+    var row1 = $("<div class='day-text' />")
       .text(date.weekDay(t1))
       .appendTo(view);
 
-    var row2 = $("<div/>")
+    var row2 = $("<div class='date-text' />")
       .text(date.dateOnly(t1))
       .appendTo(view);
 
-    var row3 = $("<div/>")
+    var row3 = $("<div class='time-text' />")
       .append(html.text("from "))
       .append($("<b>").text(date.timeOnly(t1)))
       .append(html.text(" to "))

@@ -404,13 +404,13 @@ var task = (function() {
   //   newTaskSelector.show("new-task");
   }
 
-  function loadQuestionsTask(task) {
+  function loadGeneralTask(task) {
     var view = mod.viewOfTask("", task);
     placeView($("#gen-task"), view);
     taskTypeSelector.show("gen-task");
   }
 
-  function loadMeetingTask(task) {
+  function loadSchedulingTask(task) {
     taskTypeSelector.hideAll();
     sched.loadTask(task);
     taskTypeSelector.show("sched-task");
@@ -427,10 +427,10 @@ var task = (function() {
           initTaskTitle(task);
           switch (variant.cons(data)) {
           case "Questions":
-            loadQuestionsTask(task);
+            loadGeneralTask(task);
             break;
           case "Scheduling":
-            loadMeetingTask(task);
+            loadSchedulingTask(task);
             break;
           default:
             log("Invalid task_data", data);

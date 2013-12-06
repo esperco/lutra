@@ -61,7 +61,7 @@ var sched1 = (function() {
     var selected = [];
 
     var contButton = $("<button class='btn btn-default' disabled/>")
-      .text("Continue")
+      .text("Next")
       .click(function() {
         var slots = list.map(selected, function(v) { return v[1].slot; });
         selectCalendarSlots(profs, task, slots);
@@ -102,8 +102,8 @@ var sched1 = (function() {
     }
 
     list.iter(x.suggestions, function(slot, k) {
-      var slotView = $("<div/>");
-      var circle = $("<div class='circ'></div>");
+      var slotView = $("<div class='suggestion' />");
+      var checkbox = svg.load("/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot);
       slotView.click(function() {
         var index;
@@ -116,14 +116,14 @@ var sched1 = (function() {
         else {
           var v = {
             slot: slot,
-            untick: function() { circle.removeClass("circ-selected")},
+            untick: function() { checkbox.removeClass("esper-checkbox-selected")},
           };
-          circle.addClass("circ-selected");
+          checkbox.addClass("esper-checkbox-selected");
           select(k, v);
         }
       });
 
-      circle.appendTo(slotView);
+      checkbox.appendTo(slotView);
       sugDetails.appendTo(slotView);
       slotView.appendTo(view);
     });

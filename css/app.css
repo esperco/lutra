@@ -134,13 +134,13 @@ body {
 /*** Nav Bar ***/
 
 #navbar {
-  background-color: #f8f8f8;
-  opacity: 0.9;
+  background: rgba(248,248,248,0.9);
   border-bottom: 1px solid;
   border-bottom-color: #d1d3d4;
 }
 
 .menu {
+  float: left;
   margin-left: 16px;
   margin-top: 20px;
 }
@@ -149,18 +149,19 @@ body {
   fill: #8c42ad;
 }
 
-#title {
-  margin-left: 80px;
+.tasks-title {
+  letter-spacing: 3px;
+  /*margin-left: 80px;*/
 }
 
 
-/*** General ***/
+/*** Container ***/
 
 .container {
   max-width: 500px;
 }
 
-#push {
+.push {
   height: 120px;
 }
 
@@ -176,22 +177,21 @@ body {
 }
 
 #categorize {
-  line-height: 3;
+  margin-top: 40px;
 }
 
 
 /*** Footers ***/
 
-#new-task-footer,
-#sched-footer {
+.new-task-footer,
+.sched-footer {
   height: 80px;
-  background-color: #f8f8f8;
-  opacity: 0.9;
+  background: rgba(248,248,248,0.9);
   border-top: 1px solid;
   border-top-color: #d1d3d4;
 }
 
-#new-task-footer {
+.new-task-footer {
   padding-top: 20px;
 }
 
@@ -203,27 +203,26 @@ body {
   height: 40px;
 }
 
-#sched-footer {
-  background-color: none;
-  border-top: none;
-  /*margin-top: 20px;*/
-}
-
 .footer-inner {
   margin-top: 22px;
   margin-right: 15px;
   margin-left: 15px;
 }
 
-#back-button {
+.back-button {
   color: #414042;
   background-color: #e6e7e8;
   height: 36px;
 }
 
-#back-button:hover {
+.back-button:hover {
   color: #414042;
   background-color: #d1d3d4;
+}
+
+#progress-bar {
+  width: 500px;
+  padding-top: 3px;
 }
 
 #progress {
@@ -254,22 +253,61 @@ body {
   border-bottom: 1px solid #8c42ad; /* Purple */
 }
 
-.circ {
-  width: 2em;
-  height: 2em;
-  border-radius: 50%;
-
-  display: inline-block;
-  color: white;
-  border: 1px solid #a7a9ac; /* Light Gray */;
+.suggestion {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e6e7e8;
+  cursor: pointer;
 }
 
-.circ-selected {
-  background-color: #2bb673; /* Green */
+.esper-checkbox {
+  float: left;
+  margin-top: 16px;
+}
+
+.suggestion:hover .check-outline {
+  fill: #a7a9ac;
+}
+
+.esper-checkbox-selected .check-background {
+  fill: #e8d9ee;
+}
+
+.esper-checkbox-selected .check-outline {
+  fill: #a25cc6;
+}
+
+.esper-checkbox-selected .check {
+  fill: #414042;
+}
+
+.suggestion:hover .esper-checkbox-selected .check-outline {
+  fill: #8c42ad;
 }
 
 .sug-details {
   display: inline-block;
+  margin-left: 20px;
+}
+
+.day-text {
+  font-family: "Proxima Nova Semibold";
+  font-size: 14px;
+}
+
+.date-text {
+  font-family: "Proxima Nova Light";
+  font-size: 18px;
+}
+
+.time-text {
+  font-size: 14px;
+}
+
+.suggestion:hover .day-text,
+.suggestion:hover .date-text,
+.suggestion:hover .time-text {
+  color: #808285;
 }
 
 .sched-highlight {
