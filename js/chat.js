@@ -47,29 +47,40 @@ var chat = (function () {
     }
   }
 
-  function viewOChatItem(item, time, unread_status) {
+  function viewOChatItem(item, time, status) {
     var v = $("<div/>");
     v.append($("<div/>").append(full_name(item.by)));
     v.append($("<div/>").append(date.viewTimeAgo(date.ofString(time))));
-    v.append($("<div/>").append(item.time_read ? "Read" : unread_status));
+    v.append($("<div/>").append(status));
     v.append($("<div/>").append(chatText(item)));
     v.append($("<hr/>"));
     return v;
   }
 
+  function statusOfChatItem(item) {
+    return item.time_read ? "Read" : "Posted";
+  }
+
   function chatView(chat) {
+    var me = login.me();
     var v = $("<div/>");
 
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
-      v.append(viewOChatItem(item, item.time_created, "Posted"));
+      var status;
+      if (! item.time_read && item.id && me !== item.by) {
+        api.postChatItemRead(item.chatid, item.id);
+        status = "Read";
+      } else {
+        status = statusOfChatItem(item);
+      }
+      v.append(viewOChatItem(item, item.time_created, status));
     }
 
     var edit = $("<input/>", {placeholder:"Write a reply..."});
     edit.keypress(function (e) {
       if (13 === e.which) {
         if (edit.val() !== "") {
-          var me = login.me();
           var item = {
             chatid: chat.chatid,
             by: me,
@@ -80,7 +91,8 @@ var chat = (function () {
           edit.before(tempItemView);
           edit.val("");
           api.postChatItem(item).done(function(item) {
-            var itemView = viewOChatItem(item, item.time_created, "Posted");
+            var itemView = viewOChatItem(item, item.time_created,
+                                         statusOfChatItem(item));
             tempItemView.replaceWith(itemView);
           });
         }

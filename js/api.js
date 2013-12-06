@@ -132,6 +132,11 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(chatItem));
   };
 
+  mod.postChatItemRead = function(chatId, itemId) {
+    var url = api_q_prefix() + "/chat/" + chatId + "/item/" + itemId + "/read";
+    return jsonHttpPost(url, "");
+  }
+
   /*** Scheduling ***/
 
   function api_s_prefix() {
