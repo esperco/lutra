@@ -79,7 +79,7 @@ var util = (function () {
   mod.afterTyping = function(elt, delayMs, func) {
     var lastPressed; // date in milliseconds
     elt
-      .keypress(function() {
+      .keydown(function() {
         var t1 = lastPressed;
         var t2 = Date.now();
         if (lastPressed >= t2)

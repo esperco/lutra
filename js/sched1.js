@@ -8,6 +8,15 @@ var sched1 = (function() {
   var step1Selector = show.create(["sched-step1-connect",
                                    "sched-step1-prefs"]);
 
+  // Set in loadStep1Prefs, used by geocodeAddress
+  var timeZoneDropdown = null;
+
+  // Set in initializeGoogleMap, used by geocodeAddress
+  var googleMap = null;
+
+  // Set in initializeGoogleMap, used by geocodeAddress
+  var addressMarker = null;
+
   function loadSuggestions(profs, task, meetingParam) {
     var state = sched.getState(task);
     log(task);
@@ -306,8 +315,9 @@ var sched1 = (function() {
       list.map(tzList, function(tz) { return { label: tz, value: tz }; });
     var sel2 = select.create({
       defaultAction: action2,
-      options: tzOptions
+      options: tzOptions,
     });
+    timeZoneDropdown = sel2;
 
     /* duration and buffer time specified in minutes, converted to seconds */
     function dur(dur,buf) {
@@ -404,10 +414,40 @@ var sched1 = (function() {
     return result;
   }
 
+  function initializeGoogleMap() {
+    var mapOptions = {
+      center: new google.maps.LatLng(37.4485044, -122.159185),
+      zoom: 12
+    };
+    var mapDiv = document.getElementById("sched-step1-google-map");
+    googleMap = new google.maps.Map(mapDiv, mapOptions);
+    addressMarker = new google.maps.Marker();
+  }
+
+  function geocodeAddress() {
+    var address = $("#sched-step1-loc-addr").val();
+    if (address == "") return;
+    var leaderUid = login.data.team.team_leaders[0];
+    api.getCoordinates(leaderUid, address)
+      .done(function(coords) {
+        var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
+        addressMarker.setPosition(geocoded);
+        addressMarker.setMap(googleMap);
+        googleMap.panTo(geocoded);
+        api.getTimezone(leaderUid, coords.lat, coords.lon)
+          .done(function(tz) {
+            timeZoneDropdown.set(tz, true);
+          })
+      })
+  }
+
   mod.load = function(tzList, profs, task) {
     clearLocation();
+    initializeGoogleMap();
+    util.afterTyping($("#sched-step1-loc-addr"), 1000, geocodeAddress);
     connectCalendar(tzList, profs, task);
   };
+
 
   return mod;
 }());

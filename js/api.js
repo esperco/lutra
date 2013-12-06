@@ -152,6 +152,16 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  mod.getCoordinates = function(uid, loc) {
+    var url = api_s_prefix() + "/geocode/" + encodeURIComponent(loc);
+    return jsonHttpGet(url);
+  };
+
+  mod.getTimezone = function(uid, lat, lon) {
+    var url = api_s_prefix() + "/timezone/" + lat + "/" + lon;
+    return jsonHttpGet(url);
+  };
+
   mod.getSuggestions = function(x) {
     var url = api_s_prefix() + "/suggest";
     return jsonHttpPost(url, JSON.stringify(x));

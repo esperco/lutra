@@ -64,6 +64,7 @@ var select = (function() {
 
     var ul = $("<ul class='dropdown-menu' role='menu'/>")
       .appendTo(view);
+    if (param.id !== undefined) ul.attr("id", param.id);
 
     function runAction(o, x) {
       var action;

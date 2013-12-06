@@ -275,3 +275,11 @@ body {
 .sched-highlight {
   background-color: #e8d9ee; /* Light Purple */
 }
+
+/* TODO Style the Google map */
+#sched-step1-google-map {
+  height: 300px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
