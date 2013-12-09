@@ -146,6 +146,7 @@ var sched2 = (function() {
       .appendTo(view);
 
     var chats = sched.chatsOfTask(task);
+    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
     var next = $("<button disabled class='btn btn-default'>Next</button>");
     var selected;
 

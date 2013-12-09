@@ -27,39 +27,44 @@
 
 	<hr>
 	<div id="sched-step1-suggestions" class="hide"></div>
+<!-- TODO Move the Google Map where it really belongs in the flow -->
+	<div id="sched-step1-google-map"></div>
 	<div class="push"></div>
 </div>
 
-<!-- TODO Move the Google Map where it really belongs in the flow -->
-<div id="sched-step1-google-map"></div>
+
 
 <div class="navbar sched-footer navbar-fixed-bottom">
 	<div class="footer-inner">
-	  	<div style="float:left">
+		<div class="navbar-header">
+			<button id="next-button" class="navbar-toggle collapsed btn btn-default primary">
+				Next
+	    		<object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
+			</button>
 	    	<button class="btn btn-default back-button">
-	    		<img class="svg" src="/assets/img/back.svg" width="7px" />
+	    		<object class="svg" data="/assets/img/back.svg" type="image/svg+xml" width="7px" /></object>
 	      		Back
 	    	</button>
 	  	</div>
-<!-- 	  <div id="progress-bar" style="text-align:center;">
-	    <a href="#">
-	      <img src="/assets/img/progress-1.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-2.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-3.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-4.svg" width="106px" />
-	    </a>
-	  	</div> -->
-		<div style="float:right">
-	  		<button id="next-button" class="btn btn-default primary">
-	    		Next
-	    		<img class="svg" src="/assets/img/next.svg" width="7px" />
-			</button>
-		</div>
+	  	<div class="navbar-collapse collapse sched-progress-step1" style="text-align:center;">
+			<a href="#">
+			    <object class="sched-step1" data="/assets/img/sched-step1.svg" type="image/svg+xml" /></object>
+			</a>
+			<a href="#">
+			    <object class="sched-step2" data="/assets/img/sched-step2.svg" type="image/svg+xml" /></object>
+			</a>
+			<a href="#">
+			    <object class="sched-step3" data="/assets/img/sched-step3.svg" type="image/svg+xml" /></object>
+			</a>
+			<a href="#">
+			    <object class="sched-step4" data="/assets/img/sched-step4.svg" type="image/svg+xml" /></object>
+			</a>
+			<div class="nav navbar-nav navbar-right">
+		  		<button id="next-button" class="btn btn-default primary">
+		    		Next
+		    		<object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
+				</button>
+			</div>
+	  	</div>
 	</div>
 </div>

@@ -28,6 +28,10 @@ body {
   font-size: 16px;
 }
 
+object{
+    pointer-events: none;
+}
+
 /*** Old stuff ***/
 
 body {
@@ -135,49 +139,22 @@ body {
 
 #navbar {
   background: rgba(248,248,248,0.9);
-  border-bottom: 1px solid;
-  border-bottom-color: #d1d3d4;
+  border-bottom: 1px solid #d1d3d4;
 }
 
 .menu {
   float: left;
   margin-left: 16px;
   margin-top: 20px;
+  cursor: pointer;
 }
 
-.menu:hover g path {
+.menu-test:hover g path {
   fill: #8c42ad;
 }
 
 .tasks-title {
   letter-spacing: 3px;
-  /*margin-left: 80px;*/
-}
-
-
-/*** Container ***/
-
-.container {
-  max-width: 500px;
-}
-
-.push {
-  height: 120px;
-}
-
-
-/*** New Task ***/
-
-#new-task-title {
-  color: #808285;
-}
-
-#new-task-title:focus {
-  color: #414042;
-}
-
-#categorize {
-  margin-top: 40px;
 }
 
 
@@ -187,8 +164,7 @@ body {
 .sched-footer {
   height: 80px;
   background: rgba(248,248,248,0.9);
-  border-top: 1px solid;
-  border-top-color: #d1d3d4;
+  border-top: 1px solid #d1d3d4;
 }
 
 .new-task-footer {
@@ -225,12 +201,53 @@ body {
   padding-top: 3px;
 }
 
-#progress {
+.sched-step2,
+.sched-step3,
+.sched-step4 {
+  width: 106px;
   margin-left: -8px;
+}
+
+.sched-progress-step1 .sched-step2 {
+  cursor: default;
+}
+
+.sched-step2:hover .progress-test {
+  fill: white;
+}
+
+.sched-step2 text {
+  font-family: "Proxima Nova Regular";
 }
 
 #next-button {
   height: 36px;
+}
+
+
+/*** Container ***/
+
+.container {
+  max-width: 500px;
+}
+
+.push {
+  height: 120px;
+}
+
+
+/*** New Task ***/
+
+#new-task-title {
+  color: #808285;
+}
+
+#new-task-title:focus {
+  color: #414042;
+}
+
+#categorize {
+  margin-top: 40px;
 }
 
 
@@ -263,25 +280,27 @@ body {
 .esper-checkbox {
   float: left;
   margin-top: 16px;
+  width: 24px;
+  height: 24px;
 }
 
-.suggestion:hover .check-outline {
+.suggestion:hover path.check-outline {
   fill: #a7a9ac;
 }
 
-.esper-checkbox-selected .check-background {
+.esper-checkbox-selected path.check-background {
   fill: #e8d9ee;
 }
 
-.esper-checkbox-selected .check-outline {
+.esper-checkbox-selected path.check-outline {
   fill: #a25cc6;
 }
 
-.esper-checkbox-selected .check {
+.esper-checkbox-selected path.check {
   fill: #414042;
 }
 
-.suggestion:hover .esper-checkbox-selected .check-outline {
+.suggestion:hover .esper-checkbox-selected path.check-outline {
   fill: #8c42ad;
 }
 
