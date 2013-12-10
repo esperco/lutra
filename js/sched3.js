@@ -122,10 +122,49 @@ var sched3 = (function() {
     return view;
   }
 
+  function createReminderSelector(task) {
+    var sel;
+
+    var reserved = sched.getState(task).reserved;
+
+    function saveTask() {
+      var remind = sel.get();
+      if (remind <= 0)
+        delete reserved.remind;
+      else
+        reserved.remind = remind;
+      api.postTask(task);
+    }
+
+    sel = select.create({
+      defaultAction: saveTask,
+      options: [
+        { label: "24 hours before event", key: "24h", value: 86400 },
+        { label: "48 hours before event", key: "48h", value: 2 * 86400 },
+        { label: "No reminder", key: "no", value: -1 }
+      ]
+    });
+
+    var initVal = reserved.remind;
+    var key = "24h";
+    if (! util.isDefined(initVal))
+      key = "no";
+    else if (initVal < 100000)
+      key = "24h";
+    else
+      key = "48h";
+    sel.set(key);
+
+    var view = $("<div>Send automatic reminder to the guests? </div>")
+      .append(sel.view);
+
+    return view;
+  }
 
   mod.load = function(profs, task, view) {
 
     var tid = task.tid;
+    var reminderSelector = createReminderSelector(task).appendTo(view);
     var chats = sched.chatsOfTask(task);
     sched.forEachParticipant(task, function(uid) {
       if (sched.isGuest(uid)) {

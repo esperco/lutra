@@ -58,6 +58,7 @@ var sched2 = (function() {
     state.scheduling_stage = "Confirm";
     state.reserved = {
       slot: calOption.slot,
+      remind: 86400,
       notifs: []
     };
     api.postTask(task)
