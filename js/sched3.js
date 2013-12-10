@@ -150,7 +150,7 @@ var sched3 = (function() {
   mod.load = function(profs, task, view) {
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
-    
+
     var chats = sched.chatsOfTask(task);
     var next = $(".sched-step3-next");
     var selected;
@@ -181,6 +181,7 @@ var sched3 = (function() {
     guestsContainer.appendTo(view);
 
     next
+      .addClass("disabled")
       .click(function() {
         updateTask(profs, task, selected);
       });
