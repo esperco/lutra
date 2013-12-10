@@ -110,10 +110,12 @@ var sched = (function() {
   }
 
   var tabHighlighter =
-    show.withClass("sched-tab-highlight",
-                   ["sched-progress-tab2",
-                    "sched-progress-tab3",
-                    "sched-progress-tab4"]);
+    show.create(
+      ["sched-progress-tab2",
+       "sched-progress-tab3",
+       "sched-progress-tab4"],
+      { onClass: "sched-tab-highlight", offClass: "" }
+    );
 
   var tabSelector = show.create(["sched-step2-tab",
                                  "sched-step3-tab",

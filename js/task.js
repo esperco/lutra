@@ -277,9 +277,8 @@ var task = (function() {
               viewOfTaskQueue(tabName, data.tasks));
   };
 
-  var newTaskSelector = show.create(["new-task"]);
-
   var taskTypeSelector = show.create([
+    "new-task",
     "sched-task",
     "gen-task"
   ]);
@@ -293,51 +292,57 @@ var task = (function() {
     }
   }
 
-  /*
-    Automatically save the task with an updated title
-   */
-  function initTaskTitle(task) {
-    var view = $("#new-task-title");
-    var title = task.task_status.task_title;
-    if (util.isString(title))
-      view.val(title);
-
-    util.afterTyping(view, 500, function() {
-      task.task_status.task_title = view.val();
-      api.postTask(task);
-    });
-  }
-
   /* At this stage we don't have a task ID yet */
   function loadNewTask() {
-    taskTypeSelector.hideAll();
+    var startTaskButton = $("#start-task");
 
-    function onClicked(kind) {
+    function isValidTitle(s) {
+      return s.length > 0;
+    }
+
+    function initTaskTitle() {
+      var input = $("#new-task-title");
+      input.val("");
+      util.afterTyping(input, $("#new-task-title"), function () {
+        if (isValidTitle(input.val()))
+          startTaskButton.removeClass("disabled");
+      });
+    }
+
+    function onClicked() {
+      var kind = "Scheduling";
       if (kind !== "") {
         var title = $("#new-task-title").val();
-        var task_data = initTaskData();
-        var task = {
-          task_status: {
-            task_title: title,
-            task_summary: ""
-          },
-          task_participants: {
-            organized_by: login.data.team.team_organizers,
-            organized_for: login.data.team.team_leaders
-          },
-          task_data: task_data
+        if (title.length > 0) {
+          var task_data = initTaskData();
+          var task = {
+            task_status: {
+              task_title: title,
+              task_summary: ""
+            },
+            task_participants: {
+              organized_by: login.data.team.team_organizers,
+              organized_for: login.data.team.team_leaders
+            },
+            task_data: task_data
+          };
+          api.createTask(task)
+            .done(function(task) {
+              taskTypeSelector.show("sched-task");
+              /* change URL */
+              window.location.hash = "!task/" + task.tid;
+            });
         };
-        api.createTask(task)
-          .done(function(task) {
-            $("#basics").addClass("hide");
-            $("#new-task-footer").addClass("hide");
-            /* change URL */
-            window.location.hash = "!task/" + task.tid;
-          });
       }
     }
 
-    $("#start-task").click(onClicked);
+    /* initialization */
+    taskTypeSelector.hideAll();
+    startTaskButton.addClass("disabled");
+    initTaskTitle();
+
+    startTaskButton.click(onClicked);
+    taskTypeSelector.show("new-task");
   }
 
   function loadGeneralTask(task) {
@@ -354,13 +359,13 @@ var task = (function() {
 
   /* Load task page */
   mod.load = function(optTid) {
+    taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();
     else {
       api.getTask(optTid)
         .done(function(task) {
           var data = task.task_data;
-          initTaskTitle(task);
           switch (variant.cons(data)) {
           case "Questions":
             loadGeneralTask(task);

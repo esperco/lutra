@@ -30,18 +30,11 @@ var sched3 = (function() {
 
     var options = state.calendar_options;
 
-    function showOne(id) {
-      $("#" + id)
-        .addClass("esper-radio-selected");
-    }
-
-    function hideOne(id) {
-      $("#" + id)
-        .removeClass("esper-radio-selected");
-    }
-
     var idList = list.map(options, function(x) { return x.label; });
-    var selector = show.create(idList, showOne, hideOne);
+    var selector = show.create(idList, {
+      onClass: "esper-radio-selected",
+      offClass: ""
+    });
 
     list.iter(options, function(x) {
       viewOfOption(profs, x)
