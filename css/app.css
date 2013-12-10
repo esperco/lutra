@@ -345,30 +345,6 @@ object {
   height: 24px;
 }
 
-.suggestion:hover path.check-outline {
-  fill: #a7a9ac;
-}
-
-.esper-checkbox-selected path.check-background {
-  fill: #e8d9ee;
-}
-
-.esper-checkbox-selected path.check-outline {
-  fill: #a25cc6;
-}
-
-.esper-checkbox-selected path.check {
-  fill: #414042;
-}
-
-.esper-checkbox-selected:hover path.check-outline {
-  fill: #8c42ad;
-}
-
-.options-container {
-  border-top: 1px solid #e6e7e8;
-}
-
 .esper-radio {
   float: left;
   margin-top: 16px;
@@ -376,20 +352,33 @@ object {
   height: 24px;
 }
 
-.esper-radio-selected path.dot-background {
+.suggestion:hover path.check-outline,
+.suggestion:hover path.radio-outline {
+  fill: #a7a9ac;
+}
+
+.esper-checkbox-selected path.check-background,
+.esper-radio-selected path.radio-background {
   fill: #e8d9ee;
 }
 
-.esper-radio-selected path.dot-outline {
+.esper-checkbox-selected path.check-outline,
+.esper-radio-selected path.radio-outline {
   fill: #a25cc6;
 }
 
-.esper-radio-selected path.dot {
+.esper-checkbox-selected path.check,
+.esper-radio-selected circle {
   fill: #414042;
 }
 
-.suggestion:hover .esper-radio-selected path.dot-outline {
+.esper-checkbox-selected:hover path.check-outline,
+.esper-radio-selected:hover path.radio-outline {
   fill: #8c42ad;
+}
+
+.options-container {
+  border-top: 1px solid #e6e7e8;
 }
 
 .sug-details {
@@ -427,7 +416,7 @@ object {
   border-top: 1px solid #e6e7e8;
 }
 
-.sched-step2-row {
+.sched-step3-row {
   padding-top: 10px;
   padding-bottom: 10px;
   height: 70px;
@@ -479,7 +468,7 @@ object {
 }
 
 /* TODO Style the Google map */
-#sched-step1-google-map {
+#sched-step2-google-map {
   height: 300px;
   width: 300px;
   margin-left: auto;

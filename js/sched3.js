@@ -16,8 +16,9 @@ var sched3 = (function() {
   function viewOfOption(profs, calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
-    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
-      radio.appendTo(view);
+    var radio = $("<img class='esper-radio'/>");
+    svg.loadImg(radio, "/assets/img/radio.svg");
+    radio.appendTo(view);
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
     return view;
@@ -41,14 +42,11 @@ var sched3 = (function() {
 
     var idList = list.map(options, function(x) { return x.label; });
     var selector = show.create(idList, showOne, hideOne);
-    log("are you there?");
 
     list.iter(options, function(x) {
-      log("123123123");
       viewOfOption(profs, x)
         .click(function() {
           selector.show(x.label);
-          log("hello world");
           onSelect(x);
         })
         .appendTo(view);
@@ -165,9 +163,8 @@ var sched3 = (function() {
     var selected;
 
     function onSelect(x) {
-      log("selected", next.length);
       selected = x;
-      next.removeAttr("disabled");
+      next.removeClass("disabled");
     }
 
     viewOfOptions(profs, task, onSelect)
@@ -192,7 +189,6 @@ var sched3 = (function() {
 
     next
       .click(function() {
-        log("testing");
         updateTask(profs, task, selected);
       });
   };
