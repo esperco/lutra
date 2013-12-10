@@ -307,6 +307,7 @@ var task = (function() {
         if (isValidTitle(input.val()))
           startTaskButton.removeClass("disabled");
       });
+      input.focus();
     }
 
     function onClicked() {
@@ -328,7 +329,6 @@ var task = (function() {
           };
           api.createTask(task)
             .done(function(task) {
-              taskTypeSelector.show("sched-task");
               /* change URL */
               window.location.hash = "!task/" + task.tid;
             });
@@ -337,7 +337,6 @@ var task = (function() {
     }
 
     /* initialization */
-    taskTypeSelector.hideAll();
     startTaskButton.addClass("disabled");
     initTaskTitle();
 

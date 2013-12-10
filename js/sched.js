@@ -153,6 +153,7 @@ var sched = (function() {
   mod.loadTask = function(task) {
     var state = task.task_data[1];
     var progress = state.scheduling_stage;
+    tabSelector.hideAll();
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;

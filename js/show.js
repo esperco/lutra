@@ -61,11 +61,14 @@ var show = (function () {
 
     function hideAll() {
       for (var i in idList) {
-        hideOne(idList[i]);
+        var id = idList[i];
+        log("hide all - " + id);
+        hideOne(id);
       }
     }
 
     function show(id) {
+      log("show " + id);
       for (var i in idList) {
         var id2 = idList[i];
         if (id !== id2)
