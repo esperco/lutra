@@ -41,11 +41,14 @@ var sched3 = (function() {
 
     var idList = list.map(options, function(x) { return x.label; });
     var selector = show.create(idList, showOne, hideOne);
+    log("are you there?");
 
     list.iter(options, function(x) {
+      log("123123123");
       viewOfOption(profs, x)
         .click(function() {
           selector.show(x.label);
+          log("hello world");
           onSelect(x);
         })
         .appendTo(view);
@@ -158,12 +161,13 @@ var sched3 = (function() {
       .appendTo(view);
     
     var chats = sched.chatsOfTask(task);
-    var next = $("<button disabled class='btn btn-default'>Next</button>");
+    var next = $(".sched-step3-next");
     var selected;
 
     function onSelect(x) {
+      log("selected", next.length);
       selected = x;
-      next.attr("disabled", false);
+      next.removeAttr("disabled");
     }
 
     viewOfOptions(profs, task, onSelect)
@@ -187,8 +191,8 @@ var sched3 = (function() {
     guestsContainer.appendTo(view);
 
     next
-      .appendTo(view)
       .click(function() {
+        log("testing");
         updateTask(profs, task, selected);
       });
   };

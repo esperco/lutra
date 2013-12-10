@@ -149,6 +149,7 @@ var sched2 = (function() {
         && util.isDefined(meetingParam.duration)
         && util.isDefined(meetingParam.buffer_time))
       loadSuggestions(profs, task, meetingParam);
+  }
 
   function labelSlots(slots) {
     return list.map(slots, function(x) {
