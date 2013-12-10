@@ -126,7 +126,7 @@ var sched = (function() {
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
-  }
+  };
 
   mod.loadStep3 = function(profs, task) {
     var view = $("#sched-step3-table");
@@ -136,7 +136,7 @@ var sched = (function() {
 
     tabHighlighter.show("sched-progress-tab3");
     tabSelector.show("sched-step3-tab");
-  }
+  };
 
   mod.loadStep4 = function(profs, task) {
     var view = $("#sched-step4-table");
@@ -146,7 +146,7 @@ var sched = (function() {
 
     tabHighlighter.show("sched-progress-tab4");
     tabSelector.show("sched-step4-tab");
-  }
+  };
 
   mod.loadTask = function(task) {
     var state = task.task_data[1];
@@ -171,7 +171,7 @@ var sched = (function() {
             }
           });
       });
-  }
+  };
 
   return mod;
 }());

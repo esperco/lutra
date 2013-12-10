@@ -68,21 +68,18 @@ var sched2 = (function() {
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
 
-    var contButton = $("<button class='btn btn-default' disabled/>")
-      .text("Next")
+    var contButton = $(".sched-step2-next")
       .click(function() {
         var slots = list.map(selected, function(v) { return v[1].slot; });
         selectCalendarSlots(profs, task, slots);
-      })
-      .appendTo(contMsg);
+      });
 
     function updateContButton() {
       if (selected.length > 0) {
-        contButton.attr('disabled', false);
+        contButton.removeClass("disabled");
       }
       else {
-        contButton.addClass("esper-btn-disabled");
-        contButton.attr('disabled', true);
+        contButton.addClass("disabled");
       }
     }
 
@@ -149,6 +146,7 @@ var sched2 = (function() {
         && util.isDefined(meetingParam.duration)
         && util.isDefined(meetingParam.buffer_time))
       loadSuggestions(profs, task, meetingParam);
+  }
 
   function labelSlots(slots) {
     return list.map(slots, function(x) {

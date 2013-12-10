@@ -16,8 +16,9 @@ var sched3 = (function() {
   function viewOfOption(profs, calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
-    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
-      radio.appendTo(view);
+    var radio = $("<img class='esper-radio'/>");
+    svg.loadImg(radio, "/assets/img/radio.svg");
+    radio.appendTo(view);
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
     return view;
@@ -158,12 +159,12 @@ var sched3 = (function() {
       .appendTo(view);
     
     var chats = sched.chatsOfTask(task);
-    var next = $("<button disabled class='btn btn-default'>Next</button>");
+    var next = $(".sched-step3-next");
     var selected;
 
     function onSelect(x) {
       selected = x;
-      next.attr("disabled", false);
+      next.removeClass("disabled");
     }
 
     viewOfOptions(profs, task, onSelect)
@@ -187,7 +188,6 @@ var sched3 = (function() {
     guestsContainer.appendTo(view);
 
     next
-      .appendTo(view)
       .click(function() {
         updateTask(profs, task, selected);
       });
