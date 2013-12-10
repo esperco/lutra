@@ -19,7 +19,6 @@ var sched1 = (function() {
 
   function loadSuggestions(profs, task, meetingParam) {
     var state = sched.getState(task);
-    log(task);
     state.meeting_request = meetingParam;
     api.getSuggestions(meetingParam)
       .done(function(x) { refreshSuggestions(profs, task, x); });
@@ -112,8 +111,11 @@ var sched1 = (function() {
 
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div class='suggestion' />");
-      var checkbox = $("<object class='esper-checkbox' data='/assets/img/checkbox.svg' type='image/svg+xml'></object>");
-      // var checkbox = svg.load("/assets/img/checkbox.svg");
+      var checkbox = $("<img class='esper-checkbox'/>");
+      svg.loadImg(checkbox, "/assets/img/checkbox.svg")
+        .then(function(newCheckbox) {
+          checkbox = newCheckbox;
+        });
       var sugDetails = sched.viewOfSuggestion(slot);
       slotView.click(function() {
         var index;
@@ -126,9 +128,11 @@ var sched1 = (function() {
         else {
           var v = {
             slot: slot,
-            untick: function() { checkbox.removeClass("esper-checkbox-selected")},
+            untick: function() {
+              slotView.removeClass("esper-checkbox-selected")
+            },
           };
-          checkbox.addClass("esper-checkbox-selected");
+          slotView.addClass("esper-checkbox-selected");
           select(k, v);
         }
       });
