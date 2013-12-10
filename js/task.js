@@ -12,11 +12,6 @@ var task = (function() {
     var view = $("<div/>");
     var tasksView = $("<div/>");
 
-/*
-    viewOfNewTaskButton(tab, tasksView)
-      .appendTo(view);
-*/
-
     for (var i in tasks) {
       mod.viewOfTask(tab, tasks[i]).appendTo(tasksView);
     }
@@ -29,24 +24,6 @@ var task = (function() {
   mod.viewOfTask = function(tab, task) {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
-
-    // var archiveButton =
-    //   $("<button class='btn btn-default btn-primary'>Delete</button>");
-    // if (tab === page.home.tab.activeTasks) {
-    //   archiveButton
-    //     .click(function() {
-    //       api.queueRemove(task)
-    //         .done(function() { view.remove(); });
-    //     });
-    //   archiveButton.appendTo(buttons);
-    // }
-
-    // var editButton = $("<button class='btn btn-default'>Edit</button>")
-    //   .click(function() {
-    //     editViewOfTask(tab, task, task.task_requests, {})
-    //       .replaceAll(view);
-    //   });
-    // editButton.appendTo(buttons);
 
     buttons.appendTo(view);
 
@@ -65,10 +42,8 @@ var task = (function() {
   }
 
   function viewOfTaskTitle(title, tid) {
-    // var view = $("<h4/>");
     var link = $("<a class='tasktitle' href='#!task/" + tid + "'/>")
       .text(title);
-      // .appendTo(view);
     return link;
   }
 
@@ -271,32 +246,6 @@ var task = (function() {
     bbox.appendTo(taskView);
   }
 
-
-  // new task and request
-
-/*
-  function viewOfNewTaskButton(tab, tasksView) {
-    var buttons = $("<div class='buttons'/>");
-
-    var requestSelect = selectOfRequestKind();
-    var newTaskButton = $("<button class='btn btn-default'>New Task</button>")
-      .click(function() {
-        var reqEdits = {};
-        tasksView
-          .prepend(viewOfNewTask(tab, requestSelect.val(), reqEdits));
-        for (var qid in reqEdits) { // actually only one request in the new task
-          reqEdits[qid].focus();
-          break;
-        }
-      });
-
-    requestSelect.appendTo(buttons);
-    newTaskButton.appendTo(buttons);
-    return buttons;
-  }
-*/
-
-
   function viewOfNewTask(tab, kind, reqEdits) {
     var q = "message" === kind
       ? makeRequest(null, "Message", {message_q:{msg_text:""}})
@@ -389,19 +338,6 @@ var task = (function() {
     }
 
     $("#start-task").click(onClicked);
-
-  //   var sel = select.create({
-  //     options: [
-  //       { label: "Select category" },
-  //       { label: "Scheduling", value: "Scheduling", action: onSelected },
-  //       { label: "General", value: "Questions", action: onSelected },
-  //     ]
-  //   });
-  //   var container = $("#select-category");
-  //   container.children().remove();
-  //   sel.view.appendTo(container);
-
-  //   newTaskSelector.show("new-task");
   }
 
   function loadGeneralTask(task) {
