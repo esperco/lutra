@@ -1,5 +1,34 @@
 <div class="container">
-  <div id="sched-step2-table"></div>
+  <h3>Select available times to offer.</h3>
+  <div id="sched-step2-connect" class="hide"></div>
+  <div id="sched-step2-prefs" class="hide">
+
+    <div id="sched-step2-location">
+      Location
+      <form role="form">
+      	<div class="form-group">
+      	  <input type="text" class="form-control" id="sched-step2-loc-title"
+      	         placeholder="Location name, e.g. 'SF Office' or 'Luigi's'">
+      	</div>
+      	<div class="form-group">
+      	  <input type="text" class="form-control" id="sched-step2-loc-addr"
+      	         placeholder="Address, e.g. '1234 Lombard St, San Francisco'">
+      	</div>
+      	<div class="form-group">
+      	  <input type="text" class="form-control" id="sched-step2-loc-instr"
+      	         placeholder="Special instructions, e.g. 'gate code #123456'">
+      	</div>
+      </form>
+    </div>
+
+    <div id="sched-step2-pref-time"></div>
+
+  </div>
+
+  <hr>
+  <div id="sched-step2-suggestions" class="hide"></div>
+  <!-- TODO Move the Google Map where it really belongs in the flow -->
+  <div id="sched-step2-google-map"></div>
   <div class="push"></div>
 </div>
 
@@ -8,66 +37,32 @@
     <div class="navbar-header">
       <button class="navbar-toggle collapsed btn btn-primary next-button">
         Next
-          <object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
+        <img class="svg" src="/assets/img/next.svg" width="7px">
       </button>
-        <button class="btn btn-default back-button">
-          <object class="svg" data="/assets/img/back.svg" type="image/svg+xml" width="7px" /></object>
+        <button class="btn btn-default back-button" disabled>
+          <img class="svg back-arrow-disabled" src="/assets/img/back.svg" width="7px">
             Back
         </button>
       </div>
-      <div class="navbar-collapse collapse sched-progress-step1" style="text-align:center;">
-      <a href="#">
-          <object class="sched-step1" data="/assets/img/sched-step1.svg" type="image/svg+xml" /></object>
-      </a>
-      <a href="#">
-          <object class="sched-step2" data="/assets/img/sched-step2.svg" type="image/svg+xml" /></object>
-      </a>
-      <a href="#">
-          <object class="sched-step3" data="/assets/img/sched-step3.svg" type="image/svg+xml" /></object>
-      </a>
-      <a href="#">
-          <object class="sched-step4" data="/assets/img/sched-step4.svg" type="image/svg+xml" /></object>
-      </a>
-      <div class="nav navbar-nav navbar-right">
-          <button class="btn btn-primary next-button">
-            Next
-            <object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
-        </button>
-      </div>
-      </div>
-  </div>
-</div>
-
-
-<div class="modal fade" id="sched-availability-modal" tabindex="-1"
-     role="dialog" aria-labelledby="sched-availability-title"
-     aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="modal-close-x" src="/assets/img/x.svg">
-    </div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn btn-primary"
-                id="sched-availability-send" style="float:right">Send</button>
-        <h3 class="modal-title" id="sched-availability-title">Offer times to guests.</h3>
-      </div>
-      <div class="modal-body" id="sched-availability-body">
-        <div class="input">
-          <h4 class="modal-first-section-title">To</h4>
-          <input id="sched-availability-to"
-                 type="text" class="form-control" disabled></span>
+      <div class="navbar-collapse collapse sched-progress-step2" style="text-align:center;">
+        <a>
+            <img class="svg sched-step1" src="/assets/img/sched-step1.svg">
+        </a>
+        <a>
+            <img class="svg sched-step2" src="/assets/img/sched-step2.svg">
+        </a>
+        <a>
+            <img class="svg sched-step3" src="/assets/img/sched-step3.svg">
+        </a>
+        <a>
+            <img class="svg sched-step4" src="/assets/img/sched-step4.svg">
+        </a>
+        <div class="nav navbar-nav navbar-right">
+            <button class="btn btn-primary next-button">
+              Next
+              <img class="svg" src="/assets/img/next.svg" width="7px">
+          </button>
         </div>
-        <div class="input">
-          <h4 class="modal-section-title">Subject</h4>
-          <input id="sched-availability-subject"
-                 type="text" class="form-control" disabled>
-        </div>
-        <h4 class="modal-section-title">Message</h4>
-        <textarea class="form-control" rows="8"
-                  id="sched-availability-message"></textarea>
-        <div id="sched-availability-message-readonly"></div>
       </div>
-    </div>
   </div>
 </div>

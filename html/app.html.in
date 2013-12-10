@@ -103,16 +103,6 @@
         @@new-task.html@@
       </div>
       <div id="sched-task" class="hide">
-        <!-- <div id="sched-progress-tabs">
-          <span id="sched-progress-tab1"
-                class="sched-tab">Step 1. Parameters
-          </span><span class="sched-tab sched-tab-filler">&nbsp;
-          </span><span id="sched-progress-tab2"
-                class="sched-tab">Step 2. Coordinate
-          </span><span class="sched-tab sched-tab-filler">&nbsp;
-          </span><span id="sched-progress-tab3"
-                class="sched-tab">Step 3. Confirm</span>
-        </div> -->
         <div id="sched-step1-tab" class="hide">
           @@sched-step1-tab.html@@
         </div>
@@ -121,6 +111,9 @@
         </div>
         <div id="sched-step3-tab" class="hide">
           @@sched-step3-tab.html@@
+        </div>
+        <div id="sched-step4-tab" class="hide">
+          @@sched-step4-tab.html@@
         </div>
       </div>
       <div id="gen-task" class="hide"></div>

@@ -1,170 +1,196 @@
-/* Scheduling step 3 */
+/* Scheduling - step 3 */
 
 var sched3 = (function() {
   var mod = {};
 
-  function formalEmailBody(organizerName, hostName, toName, when, where) {
+  function formalEmailBody(organizerName, hostName, toName, howSoon) {
     return "Dear "+toName+",\n\n"+
 
-    "You are confirmed for a meeting with "+hostName+
-    " "+when+" "+where+".\n\n"+
-
-    "If you have any questions/comments, please do not hesitate to reply "+
-    "to this e-mail.\n\n"+
-
-    "Best,\n\n"+
-
-    organizerName+"\n";
+    "I'm writing on behalf of "+hostName+" who respectfully requests "+
+    "a meeting with you. "+
+    hostName+"'s schedule has the below open times "+howSoon+". "+
+    "If any of these times are agreeable, please respond to this e-mail "+
+    "with your choice.";
   }
 
-  function preFillConfirmModal(chats, profs, task, slot, toUid) {
+  function viewOfOption(profs, calOption) {
+    var view = $("<div class='suggestion'/>")
+      .attr("id", calOption.label);
+    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
+      radio.appendTo(view);
+    sched.viewOfSuggestion(calOption.slot)
+      .appendTo(view);
+    return view;
+  }
+
+  function viewOfOptions(profs, task, onSelect) {
+    var view = $("<div class='options-container'/>");
+    var state = sched.getState(task);
+
+    var options = state.calendar_options;
+
+    function showOne(id) {
+      $("#" + id)
+        .addClass("esper-radio-selected");
+    }
+
+    function hideOne(id) {
+      $("#" + id)
+        .removeClass("esper-radio-selected");
+    }
+
+    var idList = list.map(options, function(x) { return x.label; });
+    var selector = show.create(idList, showOne, hideOne);
+
+    list.iter(options, function(x) {
+      viewOfOption(profs, x)
+        .click(function() {
+          selector.show(x.label);
+          onSelect(x);
+        })
+        .appendTo(view);
+    });
+
+    return view;
+  }
+
+  function updateTask(profs, task, calOption) {
+    var state = sched.getState(task);
+    task.task_progress = "Confirmed";
+    state.scheduling_stage = "Confirm";
+    state.reserved = {
+      slot: calOption.slot,
+      remind: 86400,
+      notifs: []
+    };
+    api.postTask(task)
+      .done(function () { sched.loadStep4(profs, task); });
+  }
+
+  function textOfHowSoon(x) {
+    var days = x / 86400;
+    if (days > 9.5)
+      return "within two weeks";
+    else if (days >= 5.5)
+      return "within one week";
+    else if (days >= 1.5)
+      return "within "+Math.floor(days + 0.5)+" days";
+    else
+      return "within one day";
+  }
+
+  function preFillAvailabilityModal(chats, profs, task,
+                                    howSoon, options, toUid) {
     var toObsProf = profs[toUid];
 
-    $("#sched-confirm-to")
+    $("#sched-availability-to")
       .val(toObsProf.prof.full_name);
 
-    $("#sched-confirm-subject")
+    $("#sched-availability-subject")
       .val("Re: " + task.task_status.task_title);
 
     var organizerName = profs[login.me()].prof.full_name;
     var hostName = profs[login.leader()].prof.full_name;
     var toName = toObsProf.prof.full_name;
-    var t1 = date.ofString(slot.start);
-    var t2 = date.ofString(slot.end);
-    var when = "on " + date.range(t1, t2);
-    var where = "at " + slot.location.title;
-    var body = formalEmailBody(organizerName, hostName, toName, when, where);
-    $("#sched-confirm-message")
+    var howSoon = textOfHowSoon(howSoon);
+    var body = formalEmailBody(organizerName, hostName, toName, howSoon);
+    $("#sched-availability-message")
       .val(body);
   }
 
-  function editEventDetails(tid, chats, uid) {
-    /* This function doesn't do anything right now,
-      but it should be a function accessed on click (or automatically popped).
-      It should accomplish the following:
-      1. Auto-filling event details
-      2. Allowing editing of event details */
-  }
 
-  function updateInviteAction(task, inviteAction) {
-    var state = sched.getState(task);
-    if (util.isDefined(state.reserved.google_event))
-      inviteAction.attr("disabled", true);
-  }
-
-  function step3RowViewOfParticipant(chats, profs, task, uid) {
+  function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row'>");
-    var divDetails = $("<div class='final-sched-div'>");
-    var divConfirmation = $("<div class='final-sched-div'>");
-    var divInvitation = $("<div class='final-sched-div'>");
-    var divReminder = $("<div class='final-sched-div'>");
+    var chatHead = $("<div class='chat-head'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
+    var name = prof.full_name;
+    var firstInitial = $("<p class='first-initial'>" + name.charAt(0).toUpperCase() + "</p>");
 
     var state = sched.getState(task);
-    var slot = state.reserved.slot;
+    var howSoon = state.meeting_request.how_soon;
+    var options = state.calendar_options;
 
-    /* Edit event details */
-
-/*
-    $("<a class='final-sched-actions'>Edit event details</a>")
-      .click(function() {
-        editEventDetails(task.tid, chats, uid, obsProf);
-      })
-      .appendTo(divDetails);
-*/
-    
-    var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkDetails.appendTo(divDetails);
-    $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
-
-    /* Send a confirmation */
-
-    var checkConfirmation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkConfirmation.appendTo(divConfirmation);
-
-    var confirmModal = $("#sched-confirm-modal");
-    function closeConfirmModal() {
-      confirmModal.modal("hide");
+    var availabilityModal = $("#sched-availability-modal");
+    function closeAvailabilityModal() {
+      availabilityModal.modal("hide");
     }
 
-    $("<a class='final-sched-action'>Send a confirmation message</a>")
-      .click(function() {
-        preFillConfirmModal(chats, profs, task, slot, uid);
-        confirmModal.modal({});
-      })
-      .appendTo(divConfirmation);
+    function composeEmail() {
+      preFillAvailabilityModal(chats, profs, task, howSoon, options, uid);
+      availabilityModal.modal({});
+    }
 
-    $("#sched-confirm-send")
+    firstInitial.appendTo(chatHead);
+    chatHead.appendTo(view);
+
+    $("<p class='guest-name'>" + name + "</p>")
+      .appendTo(view);
+
+    $("<a class='send-message'>Send a message</a>")
+      .click(composeEmail)
+      .appendTo(view);
+
+    $("#sched-availability-send")
       .click(function() {
-        var body = $("#sched-confirm-message").val();
+        var body = $("#sched-availability-message").val();
         var chatid = chats[uid].chatid;
         var chatItem = {
           chatid: chatid,
           by: login.me(),
           'for': login.leader(),
           team: login.team().teamid,
-          chat_item_data: ["Sched_confirm", {
+          chat_item_data: ["Scheduling_q", {
             body: body,
-            'final': slot
+            choices: options
           }]
         };
         api.postChatItem(chatItem)
-          .done(closeConfirmModal);
+          .done(closeAvailabilityModal);
       });
 
-    /* Send a Google Calendar invitation */
-
-    var checkInvitation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkInvitation.appendTo(divInvitation);
-
-    var inviteAction =
-      $("<a class='final-sched-action'>Send a Google Calendar invitation</a>");
-
-    /* disable button if invite was already sent */
-    updateInviteAction(task, inviteAction);
-
-    inviteAction
-      .click(function() {
-        /* Warning: currently this writes the event into the host's calendar
-           and sends calendar invites to _all_ other participants */
-        api.reserveCalendar(task.tid)
-          .done(function(eventInfo) {
-            api.getTask(task.tid)
-              .done(function(updatedTask) {
-                task = updatedTask;
-                updateInviteAction(updatedTask, inviteAction);
-              });
-          });
-      })
-      .appendTo(divInvitation);
-
-    /* Send a reminder */
-
-    var checkReminder = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkReminder.appendTo(divReminder);
-    $("<a class='final-sched-action'>Send a reminder</a>").appendTo(divReminder);
-
-    divDetails.appendTo(view);
-    divConfirmation.appendTo(view);
-    divInvitation.appendTo(view);
-    divReminder.appendTo(view);
-
-    return view;
+    return { view: view,
+             composeEmail: composeEmail };
   }
 
-
   mod.load = function(profs, task, view) {
-
-    var tid = task.tid;
+    $("<h3>Select a final time.</h3>")
+      .appendTo(view);
+    
     var chats = sched.chatsOfTask(task);
-    sched.forEachParticipant(task, function(uid) {
-      if (sched.isGuest(uid)) {
-        var rowView =
-          step3RowViewOfParticipant(chats, profs, task, uid)
-          .appendTo(view);
-      }
+    var next = $("<button disabled class='btn btn-default'>Next</button>");
+    var selected;
+
+    function onSelect(x) {
+      selected = x;
+      next.attr("disabled", false);
+    }
+
+    viewOfOptions(profs, task, onSelect)
+      .appendTo(view);
+
+    $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
+      .appendTo(view);
+
+    var guestsContainer = $("<div class='guests-container'>")
+    var guests = sched.getGuests(task);
+    var numGuests = guests.length;
+    list.iter(guests, function(uid) {
+      var x =
+        rowViewOfParticipant(chats, profs, task, uid);
+      x.view
+        .appendTo(guestsContainer);
+      if (numGuests == 1)
+        x.composeEmail();
     });
+
+    guestsContainer.appendTo(view);
+
+    next
+      .appendTo(view)
+      .click(function() {
+        updateTask(profs, task, selected);
+      });
   };
 
   return mod;

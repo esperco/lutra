@@ -40,6 +40,7 @@ SOURCES = \
   sched1.js \
   sched2.js \
   sched3.js \
+  sched4.js \
   task.js \
   page.js \
   route.js \

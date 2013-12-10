@@ -30,16 +30,16 @@ var task = (function() {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
 
-    var archiveButton =
-      $("<button class='btn btn-default btn-primary'>Delete</button>");
-    if (tab === page.home.tab.activeTasks) {
-      archiveButton
-        .click(function() {
-          api.queueRemove(task)
-            .done(function() { view.remove(); });
-        });
-      archiveButton.appendTo(buttons);
-    }
+    // var archiveButton =
+    //   $("<button class='btn btn-default btn-primary'>Delete</button>");
+    // if (tab === page.home.tab.activeTasks) {
+    //   archiveButton
+    //     .click(function() {
+    //       api.queueRemove(task)
+    //         .done(function() { view.remove(); });
+    //     });
+    //   archiveButton.appendTo(buttons);
+    // }
 
     // var editButton = $("<button class='btn btn-default'>Edit</button>")
     //   .click(function() {
@@ -65,11 +65,11 @@ var task = (function() {
   }
 
   function viewOfTaskTitle(title, tid) {
-    var view = $("<h4 class='tasktitle'/>");
-    var link = $("<a href='#!task/" + tid + "'/>")
-      .text(title)
-      .appendTo(view);
-    return view;
+    // var view = $("<h4/>");
+    var link = $("<a class='tasktitle' href='#!task/" + tid + "'/>")
+      .text(title);
+      // .appendTo(view);
+    return link;
   }
 
   function viewOfTaskRequests(requests) {

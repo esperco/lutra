@@ -33,15 +33,7 @@ body {
 
 object {
   pointer-events: none;
-
-/*.chat-container {
-  z-index: -1;
-  float: right;
-  display: block;
-  height: 600px;
-  width: 280px;
-  background-color: #414042;
-}*/
+}
 
 /*** Old stuff ***/
 
@@ -59,10 +51,12 @@ object {
 }
 
 .task {
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-bottom: 20px;
   background: none;
   border-bottom: 1px solid;
   border-bottom-color: #e6e7e8;
-  padding: 0.7em;
 }
 
 .request {
@@ -93,6 +87,11 @@ object {
 }
 
 .tasktitle {
+  color: #414042;
+}
+
+.tasktitle:hover {
+  color: #808285;
 }
 
 .rightbox {
@@ -149,13 +148,6 @@ object {
   border-bottom: 1px solid #d1d3d4;
 }
 
-/* chat container open...
-
-.navbar-fixed-top,
-.navbar-fixed-bottom {
-  right: 280px;
-}*/
-
 .menu {
   float: left;
   margin-left: 16px;
@@ -165,6 +157,10 @@ object {
 
 .menu:hover g {
   fill: #8c42ad;
+}
+
+.menu:active g {
+  fill: #7d3ca0;
 }
 
 .tasks-title {
@@ -213,7 +209,7 @@ object {
   height: 36px;
 }
 
-.back-arrow:disabled {
+.back-arrow-disabled path {
   fill: #bcbec0;
 }
 
@@ -229,16 +225,25 @@ object {
   margin-left: -8px;
 }
 
-.sched-progress-step1 .sched-step2 {
+.sched-progress-step1 .sched-step1,
+.sched-progress-step2 .sched-step2,
+.sched-progress-step3 .sched-step3,
+.sched-progress-step4 .sched-step4 {
   cursor: default;
 }
 
-.sched-step2:hover .progress-test {
-  fill: white;
+.sched-progress-step1 .sched-step1 path,
+.sched-progress-step2 .sched-step2 path,
+.sched-progress-step3 .sched-step3 path,
+.sched-progress-step4 .sched-step4 path {
+  fill: #808285;
 }
 
-.sched-step2 text {
-  font-family: "Proxima Nova Regular";
+.sched-progress-step1 .sched-step1 text,
+.sched-progress-step2 .sched-step2 text,
+.sched-progress-step3 .sched-step3 text,
+.sched-progress-step4 .sched-step4 text {
+  fill: white;
 }
 
 
@@ -273,7 +278,7 @@ object {
 }
 
 .modal-close-x {
-  padding-top: 4px;
+  padding-top: 6px;
   padding-left: 6px;
 }
 
