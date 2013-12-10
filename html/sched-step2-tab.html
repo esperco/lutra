@@ -5,32 +5,36 @@
 
 <div class="navbar sched-footer navbar-fixed-bottom">
   <div class="footer-inner">
-    <div style="float:left">
-      <button class="btn btn-default back-button">
-        <img class="svg" src="/assets/img/back.svg" width="7px" />
-          Back
-      </button>
-    </div>
-    <div class="sched-progress-step2" style="text-align:center;">
-      <a href="#">
-          <img class="sched-step1" src="/assets/img/sched-step1.svg" />
-      </a>
-      <a href="#">
-          <img class="sched-step2" src="/assets/img/sched-step2.svg" />
-      </a>
-      <a href="#">
-          <img class="sched-step3" src="/assets/img/sched-step3.svg" />
-      </a>
-      <a href="#">
-          <img class="sched-step4" src="/assets/img/sched-step4.svg" />
-      </a>
-    </div>
-    <div style="float:right">
-      <button id="next-button" class="btn btn-default primary">
+    <div class="navbar-header">
+      <button class="navbar-toggle collapsed btn btn-primary next-button">
         Next
-        <img class="svg" src="/assets/img/next.svg" width="7px" />
+          <object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
       </button>
-    </div>
+        <button class="btn btn-default back-button">
+          <object class="svg" data="/assets/img/back.svg" type="image/svg+xml" width="7px" /></object>
+            Back
+        </button>
+      </div>
+      <div class="navbar-collapse collapse sched-progress-step1" style="text-align:center;">
+      <a href="#">
+          <object class="sched-step1" data="/assets/img/sched-step1.svg" type="image/svg+xml" /></object>
+      </a>
+      <a href="#">
+          <object class="sched-step2" data="/assets/img/sched-step2.svg" type="image/svg+xml" /></object>
+      </a>
+      <a href="#">
+          <object class="sched-step3" data="/assets/img/sched-step3.svg" type="image/svg+xml" /></object>
+      </a>
+      <a href="#">
+          <object class="sched-step4" data="/assets/img/sched-step4.svg" type="image/svg+xml" /></object>
+      </a>
+      <div class="nav navbar-nav navbar-right">
+          <button class="btn btn-primary next-button">
+            Next
+            <object class="svg" data="/assets/img/next.svg" type="image/svg+xml" width="7px" /></object>
+        </button>
+      </div>
+      </div>
   </div>
 </div>
 
@@ -39,33 +43,30 @@
      role="dialog" aria-labelledby="sched-availability-title"
      aria-hidden="true">
   <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="modal-close-x" src="/assets/img/x.svg">
+    </div>
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close"
-                data-dismiss="modal" aria-hidden="true">Close</button>
-        <h4 class="modal-title" id="sched-availability-title"></h4>
+        <button type="button" class="btn btn-primary"
+                id="sched-availability-send" style="float:right">Send</button>
+        <h3 class="modal-title" id="sched-availability-title">Offer times to guests.</h3>
       </div>
       <div class="modal-body" id="sched-availability-body">
-        <div class="input-group">
-          <span class="input-group-addon">To</span>
+        <div class="input">
+          <h4 class="modal-first-section-title">To</h4>
           <input id="sched-availability-to"
                  type="text" class="form-control" disabled></span>
         </div>
-        <div class="input-group">
-          <span class="input-group-addon">Subject</span>
+        <div class="input">
+          <h4 class="modal-section-title">Subject</h4>
           <input id="sched-availability-subject"
                  type="text" class="form-control" disabled>
         </div>
-        <textarea class="form-control" rows="15"
+        <h4 class="modal-section-title">Message</h4>
+        <textarea class="form-control" rows="8"
                   id="sched-availability-message"></textarea>
         <div id="sched-availability-message-readonly"></div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default"
-                data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary"
-                id="sched-availability-send">Send</button>
       </div>
     </div>
   </div>

@@ -46,39 +46,54 @@ var sched3 = (function() {
       2. Allowing editing of event details */
   }
 
-  function updateInviteButton(task, inviteButton) {
+  function updateInviteAction(task, inviteAction) {
     var state = sched.getState(task);
     if (util.isDefined(state.reserved.google_event))
-      inviteButton.attr("disabled", true);
+      inviteAction.attr("disabled", true);
   }
 
   function step3RowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row'>");
+    var divDetails = $("<div class='final-sched-div'>");
+    var divConfirmation = $("<div class='final-sched-div'>");
+    var divInvitation = $("<div class='final-sched-div'>");
+    var divReminder = $("<div class='final-sched-div'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
 
     var state = sched.getState(task);
     var slot = state.reserved.slot;
 
+    /* Edit event details */
+
 /*
-    $("<button class='btn btn-default'>Edit event details</button>")
+    $("<a class='final-sched-actions'>Edit event details</a>")
       .click(function() {
         editEventDetails(task.tid, chats, uid, obsProf);
       })
-      .appendTo(view);
+      .appendTo(divDetails);
 */
+    
+    var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    checkDetails.appendTo(divDetails);
+    $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
+
+    /* Send a confirmation */
+
+    var checkConfirmation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    checkConfirmation.appendTo(divConfirmation);
 
     var confirmModal = $("#sched-confirm-modal");
     function closeConfirmModal() {
       confirmModal.modal("hide");
     }
 
-    $("<button class='btn btn-default'>Send a confirmation message</button>")
+    $("<a class='final-sched-action'>Send a confirmation message</a>")
       .click(function() {
         preFillConfirmModal(chats, profs, task, slot, uid);
         confirmModal.modal({});
       })
-      .appendTo(view);
+      .appendTo(divConfirmation);
 
     $("#sched-confirm-send")
       .click(function() {
@@ -98,13 +113,18 @@ var sched3 = (function() {
           .done(closeConfirmModal);
       });
 
-    var inviteButton =
-      $("<button class='btn btn-default'>Send a Calendar Invite</button>");
+    /* Send a Google Calendar invitation */
+
+    var checkInvitation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    checkInvitation.appendTo(divInvitation);
+
+    var inviteAction =
+      $("<a class='final-sched-action'>Send a Google Calendar invitation</a>");
 
     /* disable button if invite was already sent */
-    updateInviteButton(task, inviteButton);
+    updateInviteAction(task, inviteAction);
 
-    inviteButton
+    inviteAction
       .click(function() {
         /* Warning: currently this writes the event into the host's calendar
            and sends calendar invites to _all_ other participants */
@@ -113,11 +133,22 @@ var sched3 = (function() {
             api.getTask(task.tid)
               .done(function(updatedTask) {
                 task = updatedTask;
-                updateInviteButton(updatedTask, inviteButton);
+                updateInviteAction(updatedTask, inviteAction);
               });
           });
       })
-      .appendTo(view);
+      .appendTo(divInvitation);
+
+    /* Send a reminder */
+
+    var checkReminder = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    checkReminder.appendTo(divReminder);
+    $("<a class='final-sched-action'>Send a reminder</a>").appendTo(divReminder);
+
+    divDetails.appendTo(view);
+    divConfirmation.appendTo(view);
+    divInvitation.appendTo(view);
+    divReminder.appendTo(view);
 
     return view;
   }

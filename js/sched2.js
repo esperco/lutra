@@ -14,27 +14,29 @@ var sched2 = (function() {
   }
 
   function viewOfOption(profs, calOption) {
-    var view = $("<div/>")
+    var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
+    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
+      radio.appendTo(view);
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
     return view;
   }
 
   function viewOfOptions(profs, task, onSelect) {
-    var view = $("<div/>");
+    var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
 
     var options = state.calendar_options;
 
     function showOne(id) {
       $("#" + id)
-        .addClass("sched-highlight");
+        .addClass("esper-radio-selected");
     }
 
     function hideOne(id) {
       $("#" + id)
-        .removeClass("sched-highlight");
+        .removeClass("esper-radio-selected");
     }
 
     var idList = list.map(options, function(x) { return x.label; });
@@ -98,8 +100,11 @@ var sched2 = (function() {
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step2-row'>");
+    var chatHead = $("<div class='chat-head'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
+    var name = prof.full_name;
+    var firstInitial = $("<p class='first-initial'>" + name.charAt(0).toUpperCase() + "</p>");
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
@@ -115,7 +120,13 @@ var sched2 = (function() {
       availabilityModal.modal({});
     }
 
-    $("<button class='btn btn-default'>Ask about availability</button>")
+    firstInitial.appendTo(chatHead);
+    chatHead.appendTo(view);
+
+    $("<p class='guest-name'>" + name + "</p>")
+      .appendTo(view);
+
+    $("<a class='send-message'>Send a message</a>")
       .click(composeEmail)
       .appendTo(view);
 
@@ -146,7 +157,6 @@ var sched2 = (function() {
       .appendTo(view);
 
     var chats = sched.chatsOfTask(task);
-    var radio = $("<object class='esper-radio' data='/assets/img/radio.svg' type='image/svg+xml'></object>");
     var next = $("<button disabled class='btn btn-default'>Next</button>");
     var selected;
 
@@ -158,16 +168,22 @@ var sched2 = (function() {
     viewOfOptions(profs, task, onSelect)
       .appendTo(view);
 
+    $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
+      .appendTo(view);
+
+    var guestsContainer = $("<div class='guests-container'>")
     var guests = sched.getGuests(task);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
         rowViewOfParticipant(chats, profs, task, uid);
       x.view
-        .appendTo(view);
+        .appendTo(guestsContainer);
       if (numGuests == 1)
         x.composeEmail();
     });
+
+    guestsContainer.appendTo(view);
 
     next
       .appendTo(view)

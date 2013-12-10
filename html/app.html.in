@@ -13,15 +13,12 @@
 
   <body>
 
-    <button id="dummy" class="hide"></button>
-
     <div id="navbar" class="navbar navbar-fixed-top">
-      <!-- <div class="navbar-inner"> -->
         <a href="#">
           <img class="svg menu" src="/assets/img/menu.svg">
         </a>
         <p class="navbar-text tasks-title" unselectable="on">TASKS</p>
-        <ul class="nav nav-tabs pull-right">
+        <ul class="nav nav-tabs pull-right account">
           <li class="logged-out">
             <a href="#!login">
               Login
@@ -41,10 +38,7 @@
             </ul>
           </li>
         </ul>
-      <!-- </div> -->
     </div>
-
-
 
     <div id="login-page" class="hide">
       <div class="container">
@@ -93,8 +87,8 @@
               <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   Completed
-                </a> -->
-              </li>
+                </a>
+              </li> -->
               <!-- add more tabs as needed -->
             </ul>
             <div id="active-tasks-tab-content" class="hide"></div>
@@ -105,7 +99,7 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div id="new-task" class="hidee">
+      <div id="new-task">
         @@new-task.html@@
       </div>
       <div id="sched-task" class="hide">

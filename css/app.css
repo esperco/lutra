@@ -22,21 +22,28 @@
 */
 
 body {
+  margin-top: 100px; /* room for navigation bar */
   background-color: white;
   color: #414042;
   font-family: "Proxima Nova Regular", Arial;
   font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 object {
   pointer-events: none;
-}
+
+/*.chat-container {
+  z-index: -1;
+  float: right;
+  display: block;
+  height: 600px;
+  width: 280px;
+  background-color: #414042;
+}*/
 
 /*** Old stuff ***/
-
-body {
-  margin-top: 100px; /* room for navigation bar */
-}
 
 /*
   CSS doesn't provide a sane way of centering a block in the window, so we do
@@ -142,7 +149,13 @@ body {
   border-bottom: 1px solid #d1d3d4;
 }
 
-/* <img> replaced by <svg> */
+/* chat container open...
+
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  right: 280px;
+}*/
+
 .menu {
   float: left;
   margin-left: 16px;
@@ -156,6 +169,15 @@ body {
 
 .tasks-title {
   letter-spacing: 3px;
+}
+
+.account {
+  margin-top: 9px;
+  margin-right: 9px;
+}
+
+#logged-in-email {
+  color: #414042;
 }
 
 
@@ -186,15 +208,13 @@ body {
   margin-left: 15px;
 }
 
-.back-button {
-  color: #414042;
-  background-color: #e6e7e8;
+.back-button,
+.next-button {
   height: 36px;
 }
 
-.back-button:hover {
-  color: #414042;
-  background-color: #d1d3d4;
+.back-arrow:disabled {
+  fill: #bcbec0;
 }
 
 #progress-bar {
@@ -221,10 +241,6 @@ body {
   font-family: "Proxima Nova Regular";
 }
 
-#next-button {
-  height: 36px;
-}
-
 
 /*** Container ***/
 
@@ -234,6 +250,45 @@ body {
 
 .push {
   height: 120px;
+}
+
+
+/*** Modal ***/
+
+.modal-close-circ {
+  position: absolute;
+  z-index: 10000;
+  margin-left: -12px;
+  height: 24px;
+  width: 24px;
+  border-radius: 12px;
+  background-color: #e6e7e8;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+.modal-close-circ:hover {
+  background-color: #d1d3d4;
+  cursor: pointer;
+}
+
+.modal-close-x {
+  padding-top: 4px;
+  padding-left: 6px;
+}
+
+.modal-content {
+  margin-top: 12px;
+}
+
+.modal-first-section-title {
+  margin-top: 0px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.modal-section-title {
+  padding-top: 15px;
+  font-family: "Proxima Nova Semibold";
 }
 
 
@@ -272,8 +327,8 @@ body {
 }
 
 .suggestion {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #e6e7e8;
   cursor: pointer;
 }
@@ -305,6 +360,33 @@ body {
   fill: #8c42ad;
 }
 
+.options-container {
+  border-top: 1px solid #e6e7e8;
+}
+
+.esper-radio {
+  float: left;
+  margin-top: 16px;
+  width: 24px;
+  height: 24px;
+}
+
+.esper-radio-selected path.dot-background {
+  fill: #e8d9ee;
+}
+
+.esper-radio-selected path.dot-outline {
+  fill: #a25cc6;
+}
+
+.esper-radio-selected path.dot {
+  fill: #414042;
+}
+
+.suggestion:hover .esper-radio-selected path.dot-outline {
+  fill: #8c42ad;
+}
+
 .sug-details {
   display: inline-block;
   margin-left: 20px;
@@ -330,8 +412,65 @@ body {
   color: #808285;
 }
 
-.sched-highlight {
-  background-color: #e8d9ee; /* Light Purple */
+.guest-statuses-title {
+  margin-top: 40px;
+  font-family: "Proxima Nova Light";
+  font-size: 18px;
+}
+
+.guests-container {
+  border-top: 1px solid #e6e7e8;
+}
+
+.sched-step2-row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  height: 70px;
+  border-bottom: 1px solid #e6e7e8;
+}
+
+.guest-name {
+  float: left;
+  margin-top: 14px;
+  margin-left: 18px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.chat-head {
+  float: left;
+  margin-top: 5px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  background-color: #a7a9ac;
+  text-align: center;
+}
+
+.first-initial {
+  padding: 8px;
+  color: white;
+  font-size: 18px;
+}
+
+.send-message {
+  float: right;
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.final-sched-div {
+  margin-bottom: 40px;
+}
+
+.check {
+  float: left;
+  margin-top: 4px;
+}
+
+.final-sched-action {
+  margin-left: 10px;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 /* TODO Style the Google map */
