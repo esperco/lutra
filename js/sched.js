@@ -111,28 +111,18 @@ var sched = (function() {
 
   var tabHighlighter =
     show.withClass("sched-tab-highlight",
-                   ["sched-progress-tab1",
-                    "sched-progress-tab2",
-                    "sched-progress-tab3"]);
+                   ["sched-progress-tab2",
+                    "sched-progress-tab3",
+                    "sched-progress-tab4"]);
 
-  var tabSelector = show.create(["sched-step1-tab",
-                                 "sched-step2-tab",
-                                 "sched-step3-tab"]);
+  var tabSelector = show.create(["sched-step2-tab",
+                                 "sched-step3-tab",
+                                 "sched-step4-tab"]);
 
-  mod.loadStep1 = function(tzList, profs, task) {
-    var view = $("#sched-step1-tab");
+  mod.loadStep2 = function(tzList, profs, task) {
+    var view = $("#sched-step2-tab");
 
-    sched1.load(tzList, profs, task);
-
-    tabHighlighter.show("sched-progress-tab1");
-    tabSelector.show("sched-step1-tab");
-  }
-
-  mod.loadStep2 = function(profs, task) {
-    var view = $("#sched-step2-table");
-    view.children().remove();
-
-    sched2.load(profs, task, view);
+    sched2.load(tzList, profs, task);
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
@@ -148,6 +138,16 @@ var sched = (function() {
     tabSelector.show("sched-step3-tab");
   }
 
+  mod.loadStep4 = function(profs, task) {
+    var view = $("#sched-step4-table");
+    view.children().remove();
+
+    sched4.load(profs, task, view);
+
+    tabHighlighter.show("sched-progress-tab4");
+    tabSelector.show("sched-step4-tab");
+  }
+
   mod.loadTask = function(task) {
     var state = task.task_data[1];
     var progress = state.scheduling_stage;
@@ -158,13 +158,13 @@ var sched = (function() {
           .done(function(profs) {
             switch (progress) {
             case "Find_availability":
-              mod.loadStep1(tzList, profs, task);
+              mod.loadStep2(tzList, profs, task);
               break;
             case "Coordinate":
-              mod.loadStep2(profs, task, state);
+              mod.loadStep3(profs, task, state);
               break;
             case "Confirm":
-              mod.loadStep3(profs, task, state);
+              mod.loadStep4(profs, task, state);
               break;
             default:
               log("Unknown scheduling stage: " + progress);

@@ -7,7 +7,8 @@ HTML_INCLUDES = \
   new-task.html \
   sched-step1-tab.html \
   sched-step2-tab.html \
-  sched-step3-tab.html
+  sched-step3-tab.html \
+  sched-step4-tab.html
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \

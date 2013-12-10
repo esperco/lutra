@@ -1,65 +1,38 @@
 <div class="container">
-	<h3>Select available times to offer.</h3>
-	<div id="sched-step1-connect" class="hide"></div>
-	<div id="sched-step1-prefs" class="hide">
-
-	  <div id="sched-step1-location">
-	    Location
-	    <form role="form">
-	      <div class="form-group">
-	        <input type="text" class="form-control" id="sched-step1-loc-title"
-	               placeholder="Location name, e.g. 'SF Office' or 'Luigi's'">
-	      </div>
-	      <div class="form-group">
-	        <input type="text" class="form-control" id="sched-step1-loc-addr"
-	               placeholder="Address, e.g. '1234 Lombard St, San Francisco'">
-	      </div>
-	      <div class="form-group">
-	        <input type="text" class="form-control" id="sched-step1-loc-instr"
-	               placeholder="Special instructions, e.g. 'gate code #123456'">
-	      </div>
-	    </form>
-	  </div>
-
-	  <div id="sched-step1-pref-time"></div>
-
-	</div>
-
-	<hr>
-	<div id="sched-step1-suggestions" class="hide"></div>
-	<div class="push"></div>
+  <h3>Create the guest list.</h3>
 </div>
 
-<!-- TODO Move the Google Map where it really belongs in the flow -->
-<div id="sched-step1-google-map"></div>
-
 <div class="navbar sched-footer navbar-fixed-bottom">
-	<div class="footer-inner">
-	  	<div style="float:left">
-	    	<button class="btn btn-default back-button">
-	    		<img class="svg" src="/assets/img/back.svg" width="7px" />
-	      		Back
-	    	</button>
-	  	</div>
-<!-- 	  <div id="progress-bar" style="text-align:center;">
-	    <a href="#">
-	      <img src="/assets/img/progress-1.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-2.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-3.svg" width="106px" />
-	    </a>
-	    <a href="#">
-	      <img id="progress" src="/assets/img/progress-4.svg" width="106px" />
-	    </a>
-	  	</div> -->
-		<div style="float:right">
-	  		<button id="next-button" class="btn btn-default primary">
-	    		Next
-	    		<img class="svg" src="/assets/img/next.svg" width="7px" />
-			</button>
-		</div>
-	</div>
+  <div class="footer-inner">
+    <div class="navbar-header">
+      <button class="navbar-toggle collapsed btn btn-primary next-button">
+        Next
+        <img class="svg" src="/assets/img/next.svg" width="7px">
+      </button>
+        <button class="btn btn-default back-button" disabled>
+          <img class="svg back-arrow-disabled" src="/assets/img/back.svg" width="7px">
+            Back
+        </button>
+      </div>
+      <div class="navbar-collapse collapse sched-progress-step1" style="text-align:center;">
+        <a>
+            <img class="svg sched-step1" src="/assets/img/sched-step1.svg">
+        </a>
+        <a>
+            <img class="svg sched-step2" src="/assets/img/sched-step2.svg">
+        </a>
+        <a>
+            <img class="svg sched-step3" src="/assets/img/sched-step3.svg">
+        </a>
+        <a>
+            <img class="svg sched-step4" src="/assets/img/sched-step4.svg">
+        </a>
+        <div class="nav navbar-nav navbar-right">
+            <button class="btn btn-primary next-button">
+              Next
+              <img class="svg" src="/assets/img/next.svg" width="7px">
+          </button>
+        </div>
+      </div>
+  </div>
 </div>

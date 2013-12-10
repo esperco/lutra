@@ -22,17 +22,20 @@
 */
 
 body {
+  margin-top: 100px; /* room for navigation bar */
   background-color: white;
   color: #414042;
   font-family: "Proxima Nova Regular", Arial;
   font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+object {
+  pointer-events: none;
 }
 
 /*** Old stuff ***/
-
-body {
-  margin-top: 100px; /* room for navigation bar */
-}
 
 /*
   CSS doesn't provide a sane way of centering a block in the window, so we do
@@ -48,10 +51,12 @@ body {
 }
 
 .task {
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-bottom: 20px;
   background: none;
   border-bottom: 1px solid;
   border-bottom-color: #e6e7e8;
-  padding: 0.7em;
 }
 
 .request {
@@ -82,6 +87,11 @@ body {
 }
 
 .tasktitle {
+  color: #414042;
+}
+
+.tasktitle:hover {
+  color: #808285;
 }
 
 .rightbox {
@@ -135,49 +145,35 @@ body {
 
 #navbar {
   background: rgba(248,248,248,0.9);
-  border-bottom: 1px solid;
-  border-bottom-color: #d1d3d4;
+  border-bottom: 1px solid #d1d3d4;
 }
 
 .menu {
   float: left;
   margin-left: 16px;
   margin-top: 20px;
+  cursor: pointer;
 }
 
-.menu:hover g path {
+.menu:hover g {
   fill: #8c42ad;
+}
+
+.menu:active g {
+  fill: #7d3ca0;
 }
 
 .tasks-title {
   letter-spacing: 3px;
-  /*margin-left: 80px;*/
 }
 
-
-/*** Container ***/
-
-.container {
-  max-width: 500px;
+.account {
+  margin-top: 9px;
+  margin-right: 9px;
 }
 
-.push {
-  height: 120px;
-}
-
-
-/*** New Task ***/
-
-#new-task-title {
-  color: #808285;
-}
-
-#new-task-title:focus {
+#logged-in-email {
   color: #414042;
-}
-
-#categorize {
-  margin-top: 40px;
 }
 
 
@@ -187,8 +183,7 @@ body {
 .sched-footer {
   height: 80px;
   background: rgba(248,248,248,0.9);
-  border-top: 1px solid;
-  border-top-color: #d1d3d4;
+  border-top: 1px solid #d1d3d4;
 }
 
 .new-task-footer {
@@ -209,15 +204,13 @@ body {
   margin-left: 15px;
 }
 
-.back-button {
-  color: #414042;
-  background-color: #e6e7e8;
+.back-button,
+.next-button {
   height: 36px;
 }
 
-.back-button:hover {
-  color: #414042;
-  background-color: #d1d3d4;
+.back-arrow-disabled path {
+  fill: #bcbec0;
 }
 
 #progress-bar {
@@ -225,12 +218,97 @@ body {
   padding-top: 3px;
 }
 
-#progress {
+.sched-step2,
+.sched-step3,
+.sched-step4 {
+  width: 106px;
   margin-left: -8px;
 }
 
-#next-button {
-  height: 36px;
+.sched-progress-step1 .sched-step1,
+.sched-progress-step2 .sched-step2,
+.sched-progress-step3 .sched-step3,
+.sched-progress-step4 .sched-step4 {
+  cursor: default;
+}
+
+.sched-progress-step1 .sched-step1 path,
+.sched-progress-step2 .sched-step2 path,
+.sched-progress-step3 .sched-step3 path,
+.sched-progress-step4 .sched-step4 path {
+  fill: #808285;
+}
+
+.sched-progress-step1 .sched-step1 text,
+.sched-progress-step2 .sched-step2 text,
+.sched-progress-step3 .sched-step3 text,
+.sched-progress-step4 .sched-step4 text {
+  fill: white;
+}
+
+
+/*** Container ***/
+
+.container {
+  max-width: 500px;
+}
+
+.push {
+  height: 120px;
+}
+
+
+/*** Modal ***/
+
+.modal-close-circ {
+  position: absolute;
+  z-index: 10000;
+  margin-left: -12px;
+  height: 24px;
+  width: 24px;
+  border-radius: 12px;
+  background-color: #e6e7e8;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+.modal-close-circ:hover {
+  background-color: #d1d3d4;
+  cursor: pointer;
+}
+
+.modal-close-x {
+  padding-top: 6px;
+  padding-left: 6px;
+}
+
+.modal-content {
+  margin-top: 12px;
+}
+
+.modal-first-section-title {
+  margin-top: 0px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.modal-section-title {
+  padding-top: 15px;
+  font-family: "Proxima Nova Semibold";
+}
+
+
+/*** New Task ***/
+
+#new-task-title {
+  color: #808285;
+}
+
+#new-task-title:focus {
+  color: #414042;
+}
+
+#categorize {
+  margin-top: 40px;
 }
 
 
@@ -254,8 +332,8 @@ body {
 }
 
 .suggestion {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #e6e7e8;
   cursor: pointer;
 }
@@ -263,25 +341,54 @@ body {
 .esper-checkbox {
   float: left;
   margin-top: 16px;
+  width: 24px;
+  height: 24px;
 }
 
-.suggestion:hover .check-outline {
+.suggestion:hover path.check-outline {
   fill: #a7a9ac;
 }
 
-.esper-checkbox-selected .check-background {
+.esper-checkbox-selected path.check-background {
   fill: #e8d9ee;
 }
 
-.esper-checkbox-selected .check-outline {
+.esper-checkbox-selected path.check-outline {
   fill: #a25cc6;
 }
 
-.esper-checkbox-selected .check {
+.esper-checkbox-selected path.check {
   fill: #414042;
 }
 
-.suggestion:hover .esper-checkbox-selected .check-outline {
+.esper-checkbox-selected:hover path.check-outline {
+  fill: #8c42ad;
+}
+
+.options-container {
+  border-top: 1px solid #e6e7e8;
+}
+
+.esper-radio {
+  float: left;
+  margin-top: 16px;
+  width: 24px;
+  height: 24px;
+}
+
+.esper-radio-selected path.dot-background {
+  fill: #e8d9ee;
+}
+
+.esper-radio-selected path.dot-outline {
+  fill: #a25cc6;
+}
+
+.esper-radio-selected path.dot {
+  fill: #414042;
+}
+
+.suggestion:hover .esper-radio-selected path.dot-outline {
   fill: #8c42ad;
 }
 
@@ -310,8 +417,65 @@ body {
   color: #808285;
 }
 
-.sched-highlight {
-  background-color: #e8d9ee; /* Light Purple */
+.guest-statuses-title {
+  margin-top: 40px;
+  font-family: "Proxima Nova Light";
+  font-size: 18px;
+}
+
+.guests-container {
+  border-top: 1px solid #e6e7e8;
+}
+
+.sched-step2-row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  height: 70px;
+  border-bottom: 1px solid #e6e7e8;
+}
+
+.guest-name {
+  float: left;
+  margin-top: 14px;
+  margin-left: 18px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.chat-head {
+  float: left;
+  margin-top: 5px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  background-color: #a7a9ac;
+  text-align: center;
+}
+
+.first-initial {
+  padding: 8px;
+  color: white;
+  font-size: 18px;
+}
+
+.send-message {
+  float: right;
+  margin-top: 14px;
+  cursor: pointer;
+}
+
+.final-sched-div {
+  margin-bottom: 40px;
+}
+
+.check {
+  float: left;
+  margin-top: 4px;
+}
+
+.final-sched-action {
+  margin-left: 10px;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 /* TODO Style the Google map */
