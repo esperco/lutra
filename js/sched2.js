@@ -212,7 +212,7 @@ var sched2 = (function() {
 
     var lunch =
       initTimes({ meeting_type: "Lunch" },
-                75, 15, hour(11,30), hour(13,30));
+                75, 15, hour(12,00), hour(13,30));
 
     var dinner =
       initTimes({ meeting_type: "Dinner" },
