@@ -110,11 +110,13 @@ var sched = (function() {
   }
 
   var tabHighlighter =
-    show.withClass("sched-tab-highlight",
-                   ["sched-progress-tab1",
-                    "sched-progress-tab2",
-                    "sched-progress-tab3",
-                    "sched-progress-tab4"]);
+    show.create(
+      ["sched-progress-tab1",
+       "sched-progress-tab2",
+       "sched-progress-tab3",
+       "sched-progress-tab4"],
+      { onClass: "sched-tab-highlight", offClass: "" }
+    );
 
   var tabSelector = show.create(["sched-step1-tab",
                                  "sched-step2-tab",
@@ -162,6 +164,7 @@ var sched = (function() {
   mod.loadTask = function(task) {
     var state = task.task_data[1];
     var progress = state.scheduling_stage;
+    tabSelector.hideAll();
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;

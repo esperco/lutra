@@ -30,6 +30,10 @@ var util = (function () {
     return Object.prototype.toString.call(x) === "[object Object]";
   };
 
+  mod.isFunction = function(x) {
+    return typeof x === "function";
+  };
+
   mod.addFields = function(x, fields) {
     for (var k in fields)
       x[k] = fields[k];

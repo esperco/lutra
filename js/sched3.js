@@ -30,18 +30,11 @@ var sched3 = (function() {
 
     var options = state.calendar_options;
 
-    function showOne(id) {
-      $("#" + id)
-        .addClass("esper-radio-selected");
-    }
-
-    function hideOne(id) {
-      $("#" + id)
-        .removeClass("esper-radio-selected");
-    }
-
     var idList = list.map(options, function(x) { return x.label; });
-    var selector = show.create(idList, showOne, hideOne);
+    var selector = show.create(idList, {
+      onClass: "esper-radio-selected",
+      offClass: ""
+    });
 
     list.iter(options, function(x) {
       viewOfOption(profs, x)
@@ -157,7 +150,7 @@ var sched3 = (function() {
   mod.load = function(profs, task, view) {
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
-    
+
     var chats = sched.chatsOfTask(task);
     var next = $(".sched-step3-next");
     var selected;
@@ -188,6 +181,7 @@ var sched3 = (function() {
     guestsContainer.appendTo(view);
 
     next
+      .addClass("disabled")
       .click(function() {
         updateTask(profs, task, selected);
       });

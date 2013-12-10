@@ -56,10 +56,15 @@ var sched2 = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
+  function clearSuggestions() {
+    var view = $("#sched-step2-suggestions");
+    view.children().remove();
+  }
+
   function refreshSuggestions(profs, task, x) {
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
-    view.children().remove();
+    clearSuggestions();
 
     var contMsg =
       $("<div>Select up to 3 options to present to participants.</div>")
@@ -445,8 +450,8 @@ var sched2 = (function() {
     initializeGoogleMap();
     util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
     connectCalendar(tzList, profs, task);
+    clearSuggestions();
   };
-
 
   return mod;
 }());

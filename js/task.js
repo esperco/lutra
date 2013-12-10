@@ -12,11 +12,6 @@ var task = (function() {
     var view = $("<div/>");
     var tasksView = $("<div/>");
 
-/*
-    viewOfNewTaskButton(tab, tasksView)
-      .appendTo(view);
-*/
-
     for (var i in tasks) {
       mod.viewOfTask(tab, tasks[i]).appendTo(tasksView);
     }
@@ -29,24 +24,6 @@ var task = (function() {
   mod.viewOfTask = function(tab, task) {
     var view = $("<div class='task'></div>");
     var buttons = $("<div class='buttons rightbox'></div>");
-
-    // var archiveButton =
-    //   $("<button class='btn btn-default btn-primary'>Delete</button>");
-    // if (tab === page.home.tab.activeTasks) {
-    //   archiveButton
-    //     .click(function() {
-    //       api.queueRemove(task)
-    //         .done(function() { view.remove(); });
-    //     });
-    //   archiveButton.appendTo(buttons);
-    // }
-
-    // var editButton = $("<button class='btn btn-default'>Edit</button>")
-    //   .click(function() {
-    //     editViewOfTask(tab, task, task.task_requests, {})
-    //       .replaceAll(view);
-    //   });
-    // editButton.appendTo(buttons);
 
     buttons.appendTo(view);
 
@@ -65,10 +42,8 @@ var task = (function() {
   }
 
   function viewOfTaskTitle(title, tid) {
-    // var view = $("<h4/>");
     var link = $("<a class='tasktitle' href='#!task/" + tid + "'/>")
       .text(title);
-      // .appendTo(view);
     return link;
   }
 
@@ -271,32 +246,6 @@ var task = (function() {
     bbox.appendTo(taskView);
   }
 
-
-  // new task and request
-
-/*
-  function viewOfNewTaskButton(tab, tasksView) {
-    var buttons = $("<div class='buttons'/>");
-
-    var requestSelect = selectOfRequestKind();
-    var newTaskButton = $("<button class='btn btn-default'>New Task</button>")
-      .click(function() {
-        var reqEdits = {};
-        tasksView
-          .prepend(viewOfNewTask(tab, requestSelect.val(), reqEdits));
-        for (var qid in reqEdits) { // actually only one request in the new task
-          reqEdits[qid].focus();
-          break;
-        }
-      });
-
-    requestSelect.appendTo(buttons);
-    newTaskButton.appendTo(buttons);
-    return buttons;
-  }
-*/
-
-
   function viewOfNewTask(tab, kind, reqEdits) {
     var q = "message" === kind
       ? makeRequest(null, "Message", {message_q:{msg_text:""}})
@@ -328,9 +277,8 @@ var task = (function() {
               viewOfTaskQueue(tabName, data.tasks));
   };
 
-  var newTaskSelector = show.create(["new-task"]);
-
   var taskTypeSelector = show.create([
+    "new-task",
     "sched-task",
     "gen-task"
   ]);
@@ -344,51 +292,56 @@ var task = (function() {
     }
   }
 
-  /*
-    Automatically save the task with an updated title
-   */
-  function initTaskTitle(task) {
-    var view = $("#new-task-title");
-    var title = task.task_status.task_title;
-    if (util.isString(title))
-      view.val(title);
-
-    util.afterTyping(view, 500, function() {
-      task.task_status.task_title = view.val();
-      api.postTask(task);
-    });
-  }
-
   /* At this stage we don't have a task ID yet */
   function loadNewTask() {
-    taskTypeSelector.hideAll();
+    var startTaskButton = $("#start-task");
 
-    function onClicked(kind) {
+    function isValidTitle(s) {
+      return s.length > 0;
+    }
+
+    function initTaskTitle() {
+      var input = $("#new-task-title");
+      input.val("");
+      util.afterTyping(input, $("#new-task-title"), function () {
+        if (isValidTitle(input.val()))
+          startTaskButton.removeClass("disabled");
+      });
+      input.focus();
+    }
+
+    function onClicked() {
+      var kind = "Scheduling";
       if (kind !== "") {
         var title = $("#new-task-title").val();
-        var task_data = initTaskData();
-        var task = {
-          task_status: {
-            task_title: title,
-            task_summary: ""
-          },
-          task_participants: {
-            organized_by: login.data.team.team_organizers,
-            organized_for: login.data.team.team_leaders
-          },
-          task_data: task_data
+        if (title.length > 0) {
+          var task_data = initTaskData();
+          var task = {
+            task_status: {
+              task_title: title,
+              task_summary: ""
+            },
+            task_participants: {
+              organized_by: login.data.team.team_organizers,
+              organized_for: login.data.team.team_leaders
+            },
+            task_data: task_data
+          };
+          api.createTask(task)
+            .done(function(task) {
+              /* change URL */
+              window.location.hash = "!task/" + task.tid;
+            });
         };
-        api.createTask(task)
-          .done(function(task) {
-            $("#basics").addClass("hide");
-            $("#new-task-footer").addClass("hide");
-            /* change URL */
-            window.location.hash = "!task/" + task.tid;
-          });
       }
     }
 
-    $("#start-task").click(onClicked);
+    /* initialization */
+    startTaskButton.addClass("disabled");
+    initTaskTitle();
+
+    startTaskButton.click(onClicked);
+    taskTypeSelector.show("new-task");
   }
 
   function loadGeneralTask(task) {
@@ -405,13 +358,13 @@ var task = (function() {
 
   /* Load task page */
   mod.load = function(optTid) {
+    taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();
     else {
       api.getTask(optTid)
         .done(function(task) {
           var data = task.task_data;
-          initTaskTitle(task);
           switch (variant.cons(data)) {
           case "Questions":
             loadGeneralTask(task);
