@@ -111,13 +111,24 @@ var sched = (function() {
 
   var tabHighlighter =
     show.withClass("sched-tab-highlight",
-                   ["sched-progress-tab2",
+                   ["sched-progress-tab1",
+                    "sched-progress-tab2",
                     "sched-progress-tab3",
                     "sched-progress-tab4"]);
 
-  var tabSelector = show.create(["sched-step2-tab",
+  var tabSelector = show.create(["sched-step1-tab",
+                                 "sched-step2-tab",
                                  "sched-step3-tab",
                                  "sched-step4-tab"]);
+
+  mod.loadStep1 = function(profs, task) {
+    var view = $("#sched-step1-tab");
+
+    sched1.load(profs, task, view);
+
+    tabHighlighter.show("sched-progress-tab1");
+    tabSelector.show("sched-step1-tab");
+  };
 
   mod.loadStep2 = function(tzList, profs, task) {
     var view = $("#sched-step2-tab");
@@ -157,6 +168,9 @@ var sched = (function() {
         profilesOfEveryone(task)
           .done(function(profs) {
             switch (progress) {
+            case "Guest_list":
+              mod.loadStep1(profs, task, state);
+              break;
             case "Find_availability":
               mod.loadStep2(tzList, profs, task);
               break;

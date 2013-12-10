@@ -416,6 +416,7 @@ object {
   border-top: 1px solid #e6e7e8;
 }
 
+.sched-step1-row,
 .sched-step3-row {
   padding-top: 10px;
   padding-bottom: 10px;
