@@ -112,10 +112,7 @@ var sched1 = (function() {
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div class='suggestion' />");
       var checkbox = $("<img class='esper-checkbox'/>");
-      svg.loadImg(checkbox, "/assets/img/checkbox.svg")
-        .then(function(newCheckbox) {
-          checkbox = newCheckbox;
-        });
+      svg.loadImg(checkbox, "/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot);
       slotView.click(function() {
         var index;

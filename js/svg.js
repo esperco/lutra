@@ -20,16 +20,6 @@ var svg = (function() {
           return svgRoot;
         });
     };
-/*
-      return $.get(url, function(data) {
-        var svgRoot = $(data).find('svg')
-          .attr("id", img.attr("id"))
-          .attr("src", url)
-          .attr("class", img.attr("class"));
-        img.replaceWith(svgRoot);
-        return svgRoot;
-      }, 'xml');
-*/
 
     mod.load = function(url) {
       var result = $("<img/>");
