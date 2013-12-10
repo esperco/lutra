@@ -389,19 +389,6 @@ var task = (function() {
     }
 
     $("#start-task").click(onClicked);
-
-  //   var sel = select.create({
-  //     options: [
-  //       { label: "Select category" },
-  //       { label: "Scheduling", value: "Scheduling", action: onSelected },
-  //       { label: "General", value: "Questions", action: onSelected },
-  //     ]
-  //   });
-  //   var container = $("#select-category");
-  //   container.children().remove();
-  //   sel.view.appendTo(container);
-
-  //   newTaskSelector.show("new-task");
   }
 
   function loadGeneralTask(task) {

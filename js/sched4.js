@@ -170,9 +170,10 @@ var sched4 = (function() {
     sel = select.create({
       defaultAction: saveTask,
       options: [
-        { label: "24 hours before event", key: "24h", value: 86400 },
-        { label: "48 hours before event", key: "48h", value: 2 * 86400 },
-        { label: "No reminder", key: "no", value: -1 }
+        { label: "24 hours before event", key: "24h", value: 2 * 43200 },
+        { label: "34 hours before event", key: "24h", value: 3 * 43200 },
+        { label: "48 hours before event", key: "48h", value: 4 * 43200 },
+        { label: "Never", key: "no", value: -1 }
       ]
     });
 
