@@ -7,7 +7,42 @@ var chat = (function () {
     return p ? p.full_name : "someone";
   }
 
-  function selectedText(selected) {
+  function chat_participant_names(chat) {
+    var me = login.me();
+    var names = null;
+    var someone_else = false;
+    for (var i in chat.chat_participants) {
+      var uid = chat.chat_participants[i].par_uid;
+      if (uid !== me) {
+        var p = profiles[uid];
+        if (! p) {
+          someone_else = true;
+        } else if (names) {
+          names += ", " + p.full_name;
+        } else {
+          names = p.full_name;
+        }
+      }
+    }
+    if (names) {
+      return someone_else ? names + ", et al" : names;
+    } else {
+      return "participants";
+    }
+  }
+
+  function viewOfSelectQuestion(sel) {
+    var qs = $("<ol/>");
+    for (var i in sel.sel_choices) {
+      qs.append($("<li/>").append(sel.sel_choices[i].sel_label));
+    }
+    var v = $("<div/>");
+    v.append(sel.sel_text);
+    v.append(qs);
+    return v;
+  }
+
+  function selectedAnswers(selected) {
     var sel = null;
     for (var i in selected) {
       if (sel) {
@@ -24,7 +59,7 @@ var chat = (function () {
            .text("Left a voice message.");
   }
 
-  function chatText(chat_item) {
+  function viewOfChatData(chat_item) {
     var kind = chat_item.chat_item_data[0];
     var data = chat_item.chat_item_data[1];
     switch (kind) {
@@ -33,32 +68,147 @@ var chat = (function () {
     case "Audio":
       return audioPlayer(data);
     case "Selector_q":
-      return data.sel_text;
+      return viewOfSelectQuestion(data);
     case "Selector_r":
-      return selectedText(data.sel_selected);
+      return selectedAnswers(data.sel_selected);
     case "Scheduling_q":
       return $("<i/>").append("Asked for the schedule.");
     case "Scheduling_r":
       return $("<i/>").append("Answered the schedule.");
     case "Sched_confirm":
+    case "Sched_remind":
       return data.body;
     default:
       return $("<i/>").append(kind);
     }
   }
 
-  function viewOChatItem(item, time, status) {
+  function viewOfChatItem(item, time, status) {
     var v = $("<div/>");
     v.append($("<div/>").append(full_name(item.by)));
     v.append($("<div/>").append(date.viewTimeAgo(date.ofString(time))));
     v.append($("<div/>").append(status));
-    v.append($("<div/>").append(chatText(item)));
+    v.append($("<div/>").append(viewOfChatData(item)));
     v.append($("<hr/>"));
     return v;
   }
 
   function statusOfChatItem(item) {
     return item.time_read ? "Read" : "Posted";
+  }
+
+  function editChoiceOption() {
+    var edit = $("<input/>", {placeholder:"Add option."});
+    var v = $("<li/>");
+    v.append(edit);
+
+    edit.keydown(function (e) {
+      switch (e.which) {
+      case 13:
+        if (edit.val() !== "") {
+          var li = editChoiceOption();
+          v.after(li);
+          li.find("input").focus();
+        }
+        return false;
+
+      case 8:
+      case 46:
+        if (edit.val() === "" && 1 < v.parent().children().length) {
+          v.prev().find("input").focus();
+          v.remove();
+          return false;
+        } else {
+          return true;
+        }
+
+      default:
+        return true;
+      }
+    });
+
+    return v;
+  }
+
+  function editChoices() {
+    var v = $("<ul/>");
+    var opt1 = editChoiceOption();
+    opt1.find("input").val("Option 1");
+    v.append(opt1);
+    v.append(editChoiceOption());
+    return v;
+  }
+
+  function selector_q_data(text, choices) {
+    var sel = [];
+    choices.find("input").each(function(i,ed) {
+      if (ed.value !== "") {
+        sel.push({sel_label:ed.value});
+      }
+    });
+    return 0 < sel.length
+         ? ["Selector_q", {sel_text:text,
+                           sel_multi:false,
+                           sel_choices:sel,
+                           sel_default:[]}]
+         : null;
+  }
+
+  function message_data(text) {
+    return "" === text ? null : ["Message", text];
+  }
+
+  function chatEditor(chat) {
+    var v = $("<div/>");
+
+    v.append($("<b>To:</b>"));
+    v.append(" " + chat_participant_names(chat));
+
+    var editText = $("<textarea/>", {placeholder:"Write a reply..."});
+    v.append($("<div/>").append(editText));
+
+    var choicesEditor = editChoices();
+    choicesEditor.hide();
+    v.append(choicesEditor);
+
+    var selChoices = $("<input/>", {type:"checkbox"});
+    selChoices.click(function () {
+      choicesEditor.toggle();
+    });
+    var selChoicesLabel = $("<label/>");
+    selChoicesLabel.append(selChoices);
+    selChoicesLabel.append("Offer multiple choice response.");
+
+    var sendButton = $("<button>Send</button>");
+    sendButton.click(function () {
+      var data = selChoices.prop("checked")
+               ? selector_q_data(editText.val(), choicesEditor)
+               : message_data(editText.val());
+      if (data) {
+        var me = login.me();
+        var item = {
+          chatid: chat.chatid,
+          by: me,
+          for: me,
+          chat_item_data:data
+        };
+        var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+        v.before(tempItemView);
+        editText.val("");
+        api.postChatItem(item).done(function(item) {
+            var itemView = viewOfChatItem(item, item.time_created,
+                                          statusOfChatItem(item));
+            tempItemView.replaceWith(itemView);
+        });
+      }
+    });
+
+    var buttons = $("<div/>");
+    buttons.append(selChoicesLabel);
+    buttons.append(sendButton);
+    v.append(buttons);
+
+    return v;
   }
 
   function chatView(chat) {
@@ -74,35 +224,10 @@ var chat = (function () {
       } else {
         status = statusOfChatItem(item);
       }
-      v.append(viewOChatItem(item, item.time_created, status));
+      v.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    var edit = $("<input/>", {placeholder:"Write a reply..."});
-    edit.keypress(function (e) {
-      if (13 === e.which) {
-        if (edit.val() !== "") {
-          var item = {
-            chatid: chat.chatid,
-            by: me,
-            for: me,
-            chat_item_data:["Message", edit.val()]
-          };
-          var tempItemView = viewOChatItem(item, Date.now(), "Posting");
-          edit.before(tempItemView);
-          edit.val("");
-          api.postChatItem(item).done(function(item) {
-            var itemView = viewOChatItem(item, item.time_created,
-                                         statusOfChatItem(item));
-            tempItemView.replaceWith(itemView);
-          });
-        }
-        return false;
-      } else {
-        return true;
-      }
-    });
-    v.append(edit);
-
+    v.append(chatEditor(chat));
     return v;
   }
 
