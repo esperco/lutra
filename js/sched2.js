@@ -56,19 +56,10 @@ var sched2 = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
-  function clearSuggestions() {
-    var view = $("#sched-step2-suggestions");
-    view.children().remove();
-  }
-
   function refreshSuggestions(profs, task, x) {
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
-    clearSuggestions();
-
-    var contMsg =
-      $("<div>Select up to 3 options to present to participants.</div>")
-      .appendTo(view);
+    view.children().remove();
 
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
@@ -182,6 +173,8 @@ var sched2 = (function() {
   function loadStep2Prefs(tzList, profs, task) {
     var view = $("#sched-step2-pref-time");
     view.children().remove();
+    var viewTimeZone = $("#sched-step2-time-zone");
+    viewTimeZone.children().remove();
 
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,
@@ -263,21 +256,21 @@ var sched2 = (function() {
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
       var loc = getLocation();
-      loc.timezone = sel2.get();
+      loc.timezone = sel4.get();
       x.location[0] = loc;
-      util.addFields(x, sel3.get());
-      x.how_soon = sel4.get();
+      util.addFields(x, sel2.get());
+      x.how_soon = sel3.get();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
         loadSuggestionsIfReady(profs, task, meetingParam);
     }
 
     /* try to match the duration selected as part of the meeting type (sel1)
-       with the duration selector (sel3) */
+       with the duration selector (sel2) */
     function action1(x) {
       if (util.isDefined(x)) {
         var k = ((x.duration + x.buffer_time) / 60).toString();
-        sel3.set(k);
+        sel2.set(k);
         mergeSelections();
       }
     }
@@ -299,8 +292,9 @@ var sched2 = (function() {
       return { label: label, key: key, value: value, action: action };
     }
     var sel1 = select.create({
+      divClass: "fill-div",
+      buttonClass: "fill-div",
       options: [
-        opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
         opt("Lunch", "lunch", lunch, action1),
         opt("Dinner", "dinner", dinner, action1),
@@ -314,27 +308,20 @@ var sched2 = (function() {
       ]
     });
 
-    /* time zone */
-    var tzOptions =
-      list.map(tzList, function(tz) { return { label: tz, value: tz }; });
-    var sel2 = select.create({
-      defaultAction: action2,
-      options: tzOptions,
-    });
-    timeZoneDropdown = sel2;
-
     /* duration and buffer time specified in minutes, converted to seconds */
     function dur(dur,buf) {
       return { duration: 60 * dur,
                buffer_time: 60 * buf };
     }
-    var sel3 = select.create({
-      defaultAction: action3,
+    var sel2 = select.create({
+      divClass: "fill-div",
+      buttonClass: "fill-div",
+      defaultAction: action2,
       options: [
-        { label: "60 min", key: "60", value: dur(45,15) },
-        { label: "45 min", key: "45", value: dur(30,15) },
-        { label: "30 min", key: "30", value: dur(25,5) },
         { label: "15 min", key: "15", value: dur(10,5) },
+        { label: "30 min", key: "30", value: dur(25,5) },
+        { label: "45 min", key: "45", value: dur(30,15) },
+        { label: "1 hour", key: "60", value: dur(45,15) },
         { label: "1 hour 15 min",  key: "75", value: dur(60,15) },
         { label: "1 hour 30 min",  key: "90", value: dur(75,15) },
         { label: "2 hours",        key: "120", value: dur(105,15) },
@@ -343,8 +330,10 @@ var sched2 = (function() {
     });
 
     /* urgency */
-    var sel4 = select.create({
-      defaultAction: action4,
+    var sel3 = select.create({
+      divClass: "fill-div",
+      buttonClass: "fill-div",
+      defaultAction: action3,
       options: [
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
         { label: "Within 1 week", key: "1week", value: 7 * 86400 },
@@ -353,31 +342,42 @@ var sched2 = (function() {
       ]
     });
 
-    var grid = $("<div class='row'/>")
+    /* time zone */
+    var tzOptions =
+      list.map(tzList, function(tz) { return { label: tz, value: tz }; });
+    var sel4 = select.create({
+      divClass: "fill-div",
+      buttonClass: "fill-div",
+      defaultAction: action4,
+      options: tzOptions,
+    });
+    timeZoneDropdown = sel4;
+
+    var grid = $("<div/>")
       .appendTo(view);
 
-    var col1 = $("<div class='col-md-6'/>")
+    var colType = $("<div class='col-sm-4'/>")
+      .appendTo(grid);
+    var colDuration = $("<div class='col-sm-4'/>")
+      .appendTo(grid);
+    var colUrgency = $("<div class='col-sm-4'/>")
       .appendTo(grid);
 
-    var col2 = $("<div class='col-md-6'/>")
-      .appendTo(grid);
+    var optionType = $("<div class='pref-time-title'>Meeting Type</div>")
+      .appendTo(colType);
+    var optionDuration = $("<div class='pref-time-title'>Duration</div>")
+      .appendTo(colDuration);
+    var optionUrgency = $("<div class='pref-time-title'>Urgency</div>")
+      .appendTo(colUrgency);
+    var optionTimeZone = $("<div class='location-title'>Time Zone</div>")
+      .appendTo(viewTimeZone);
 
-    var cell1 = $("<div>Type </div>")
-      .appendTo(col1);
-    var cell2 = $("<div>Time Zone </div>")
-      .appendTo(col2);
-    var cell3 = $("<div>Duration </div>")
-      .appendTo(col1);
-    var cell4 = $("<div>Urgency </div>")
-      .appendTo(col2);
+    sel1.view.appendTo(colType);
+    sel2.view.appendTo(colDuration);
+    sel3.view.appendTo(colUrgency);
+    sel4.view.appendTo(viewTimeZone);
 
-    sel1.view.appendTo(cell1);
-    sel2.view.appendTo(cell2);
-    sel3.view.appendTo(cell3);
-    sel4.view.appendTo(cell4);
-
-    initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
+    sel1.set("meeting");
 
     step2Selector.show("sched-step2-prefs");
   }
@@ -449,10 +449,9 @@ var sched2 = (function() {
   }
 
   mod.load = function(tzList, profs, task) {
-    $(".sched-step2-next").addClass("disabled");
     clearLocation();
-    clearSuggestions();
-
+    initializeGoogleMap();
+    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
     connectCalendar(tzList, profs, task);
   };
 

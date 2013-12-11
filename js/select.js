@@ -8,6 +8,7 @@ var select = (function() {
   /*
     parameters:
     {
+      buttonWidth: "123px"
       initialValue: "squirrel",
       defaultAction: ...,
       options: [
@@ -55,6 +56,18 @@ var select = (function() {
     var tbl = {};
     var unsetLabel = "";
 
+    function addDivClass() {
+      var divClassName = param.divClass;
+      if (divClassName !== null)
+        view.addClass(divClassName);
+    }
+
+    function addButtonClass() {
+      var buttonClassName = param.buttonClass;
+      if (buttonClassName !== null)
+        button.addClass(buttonClassName);
+    }
+
     function setButtonLabel(o) {
       if (state === null)
         buttonLabel.text(unsetLabel + " ");
@@ -91,6 +104,8 @@ var select = (function() {
         .text(o.label)
         .click(function() {
           state = v;
+          addDivClass();
+          addButtonClass();
           setButtonLabel(o);
           view.removeClass("open"); /* needed b/c we block the event */
           runAction(o, state);
@@ -106,6 +121,8 @@ var select = (function() {
     function set(k, noAction) {
       var o = util.isString(k) ? tbl[k] : null;
       state = valueOfOption(o);
+      addDivClass();
+      addButtonClass();
       setButtonLabel(o);
       if (state !== null)
         if (noAction !== true && util.isDefined(o.action))

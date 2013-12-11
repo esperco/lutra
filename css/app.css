@@ -204,6 +204,10 @@ object {
   margin-left: 15px;
 }
 
+.footer-nav {
+  width: 120px;
+}
+
 .back-button,
 .next-button {
   height: 36px;
@@ -249,10 +253,6 @@ object {
 
 /*** Container ***/
 
-.container {
-  max-width: 500px;
-}
-
 .push {
   height: 120px;
 }
@@ -278,8 +278,10 @@ object {
 }
 
 .modal-close-x {
-  padding-top: 6px;
-  padding-left: 6px;
+  margin-top: 6px;
+  margin-left: 6px;
+  height: 12px;
+  width: 12px;
 }
 
 .modal-content {
@@ -294,6 +296,11 @@ object {
 .modal-section-title {
   padding-top: 15px;
   font-family: "Proxima Nova Semibold";
+}
+
+#sched-availability-message,
+#sched-confirm-message {
+  max-width: 538px;
 }
 
 
@@ -312,24 +319,41 @@ object {
 }
 
 
-/*** Scheduling ***/
+/*** Scheduling Step 2 ***/
 
-.sched-tab {
-  display: inline-block;
-  color: #a7a9ac; /* Light Gray */
-  border-bottom: 1px solid #a7a9ac; /* Light Gray */
-  padding-bottom: 1em;
-  padding-top: 1em;
+.top-divider {
+  margin-bottom: 0;
 }
 
-.sched-tab-filler {
-  width: 4em;
+.fill-div {
+  width: 100%;
+  height: 32px;
+  text-align: left;
 }
 
-.sched-tab-highlight {
-  color: black;
-  border-bottom: 1px solid #8c42ad; /* Purple */
+.fill-div .caret {
+  float: right;
+  margin-top: 8px;
+  border-top: 4px solid #414042;
 }
+
+.pref-time-title,
+.location-title {
+  padding-top: 10px;
+  font-family: "Proxima Nova Semibold";
+  font-size: 14px;
+}
+
+#sched-step2-google-map {
+  height: 300px;
+  width: 300px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/*** Scheduling Step 2/3 ***/
 
 .suggestion {
   padding-top: 10px;
@@ -406,6 +430,9 @@ object {
   color: #808285;
 }
 
+
+/*** Scheduling Step 3 ***/
+
 .guest-statuses-title {
   margin-top: 40px;
   font-family: "Proxima Nova Light";
@@ -453,6 +480,9 @@ object {
   cursor: pointer;
 }
 
+
+/*** Scheduling Step 4 ***/
+
 .final-sched-div {
   margin-bottom: 40px;
 }
@@ -462,16 +492,19 @@ object {
   margin-top: 4px;
 }
 
+.checked path {
+  fill: #2bb673;
+}
+
 .final-sched-action {
-  margin-left: 10px;
   font-size: 24px;
   cursor: pointer;
 }
 
-/* TODO Style the Google map */
-#sched-step2-google-map {
-  height: 300px;
-  width: 300px;
-  margin-left: auto;
-  margin-right: auto;
+.final-sched-text {
+  margin-top: 0;
+  margin-right: 10px;
+  margin-bottom: 0;
+  float: left;
+  line-height: 1.42857;
 }
