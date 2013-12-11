@@ -179,13 +179,13 @@ var sched2 = (function() {
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,
                        lengthMinutes, bufferMinutes,
-                       optEarliest, optLatest) {
+                       optMinStart, optMaxEnd) {
       x.duration = 60 * lengthMinutes;
       x.buffer_time = 60 * bufferMinutes;
-      if (util.isDefined(optEarliest) && util.isDefined(optLatest))
+      if (util.isDefined(optMinStart) && util.isDefined(optMaxEnd))
         x.time_of_day = {
-          start: timeonly.ofMinutes(optEarliest),
-          length: 60 * (optLatest - optEarliest)
+          start: timeonly.ofMinutes(optMinStart),
+          length: 60 * (optMaxEnd - optMinStart)
         };
       return x;
     }
@@ -210,15 +210,15 @@ var sched2 = (function() {
 
     var lunch =
       initTimes({ meeting_type: "Lunch" },
-                75, 15, hour(11,30), hour(13,30));
+                75, 15, hour(12,00), hour(14,30));
 
     var dinner =
       initTimes({ meeting_type: "Dinner" },
-                90, 30, hour(18,00), hour(20,30));
+                90, 30, hour(18,00), hour(21,30));
 
     var nightlife =
       initTimes({ meeting_type: "Nightlife" },
-                120, 30, hour(19), hour(22));
+                120, 30, hour(19), hour(01));
 
     var coffee =
       initTimes({ meeting_type: "Coffee" },
@@ -233,15 +233,15 @@ var sched2 = (function() {
 
     var morning =
       initTimes({ time_of_day_type: "Morning" },
-                45, 15, hour(8), hour(11));
+                45, 15, hour(8), hour(12));
 
     var afternoon =
       initTimes({ time_of_day_type: "Afternoon"},
-                45, 15, hour(13), hour(18));
+                45, 15, hour(13), hour(19));
 
     var late_night =
       initTimes({ time_of_day_type: "Late_night" },
-                45, 15, hour(19), hour(22));
+                45, 15, hour(19), hour(23));
 
     /* inter-dependent dropdowns for setting scheduling constraints */
     var sel1, sel2, sel3, sel4;
