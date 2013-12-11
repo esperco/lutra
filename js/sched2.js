@@ -292,7 +292,8 @@ var sched2 = (function() {
       return { label: label, key: key, value: value, action: action };
     }
     var sel1 = select.create({
-      buttonClass: "search-option-dropdown",
+      divClass: "fill-div",
+      buttonClass: "fill-div",
       options: [
         opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
@@ -314,7 +315,8 @@ var sched2 = (function() {
                buffer_time: 60 * buf };
     }
     var sel2 = select.create({
-      buttonClass: "search-option-dropdown",
+      divClass: "fill-div",
+      buttonClass: "fill-div",
       defaultAction: action2,
       options: [
         { label: "15 min", key: "15", value: dur(10,5) },
@@ -330,7 +332,8 @@ var sched2 = (function() {
 
     /* urgency */
     var sel3 = select.create({
-      buttonClass: "search-option-dropdown",
+      divClass: "fill-div",
+      buttonClass: "fill-div",
       defaultAction: action3,
       options: [
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
@@ -344,7 +347,8 @@ var sched2 = (function() {
     var tzOptions =
       list.map(tzList, function(tz) { return { label: tz, value: tz }; });
     var sel4 = select.create({
-      buttonClass: "search-option-dropdown",
+      divClass: "fill-div",
+      buttonClass: "fill-div",
       defaultAction: action4,
       options: tzOptions,
     });

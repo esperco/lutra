@@ -44,9 +44,9 @@ var select = (function() {
   }
 
   mod.create = function(param) {
-    var view = $("<div class='btn-group fill-div'>");
+    var view = $("<div class='btn-group'>");
     var button = $("<button type='button'/>")
-      .addClass("btn btn-default dropdown-toggle fill-div")
+      .addClass("btn btn-default dropdown-toggle")
       .attr("data-toggle", "dropdown")
       .appendTo(view);
     var buttonLabel = $("<span/>").appendTo(button);
@@ -56,10 +56,16 @@ var select = (function() {
     var tbl = {};
     var unsetLabel = "";
 
+    function addDivClass() {
+      var divClassName = param.divClass;
+      if (divClassName !== null)
+        view.addClass(divClassName);
+    }
+
     function addButtonClass() {
-      var className = param.buttonClass;
-      if (className !== null)
-        button.addClass(className);
+      var buttonClassName = param.buttonClass;
+      if (buttonClassName !== null)
+        button.addClass(buttonClassName);
     }
 
     function setButtonLabel(o) {
@@ -98,6 +104,7 @@ var select = (function() {
         .text(o.label)
         .click(function() {
           state = v;
+          addDivClass();
           addButtonClass();
           setButtonLabel(o);
           view.removeClass("open"); /* needed b/c we block the event */
@@ -114,6 +121,7 @@ var select = (function() {
     function set(k, noAction) {
       var o = util.isString(k) ? tbl[k] : null;
       state = valueOfOption(o);
+      addDivClass();
       addButtonClass();
       setButtonLabel(o);
       if (state !== null)
