@@ -53,11 +53,10 @@ var sched4 = (function() {
   }
 
   function step4RowViewOfParticipant(chats, profs, task, uid) {
-    var view = $("<div class='sched-step4-row'>");
+    var view = $("<div/>");
     var divDetails = $("<div class='final-sched-div'>");
     var divConfirmation = $("<div class='final-sched-div'>");
     var divInvitation = $("<div class='final-sched-div'>");
-    var divReminder = $("<div class='final-sched-div'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
 
@@ -74,9 +73,9 @@ var sched4 = (function() {
       .appendTo(divDetails);
 */
     
-    var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkDetails.appendTo(divDetails);
-    $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
+    // var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    // checkDetails.appendTo(divDetails);
+    // $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
 
     /* Send a confirmation */
 
@@ -139,22 +138,15 @@ var sched4 = (function() {
       })
       .appendTo(divInvitation);
 
-    /* Send a reminder */
-
-    var checkReminder = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
-    checkReminder.appendTo(divReminder);
-    $("<a class='final-sched-action'>Send a reminder</a>").appendTo(divReminder);
-
     divDetails.appendTo(view);
     divConfirmation.appendTo(view);
     divInvitation.appendTo(view);
-    divReminder.appendTo(view);
 
     return view;
   }
 
   function createReminderSelector(task) {
-    var sel;
+    var sel;    
 
     var reserved = sched.getState(task).reserved;
 
@@ -168,10 +160,11 @@ var sched4 = (function() {
     }
 
     sel = select.create({
+      buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
         { label: "24 hours before event", key: "24h", value: 2 * 43200 },
-        { label: "34 hours before event", key: "24h", value: 3 * 43200 },
+        { label: "36 hours before event", key: "36h", value: 3 * 43200 },
         { label: "48 hours before event", key: "48h", value: 4 * 43200 },
         { label: "Never", key: "no", value: -1 }
       ]
@@ -187,10 +180,14 @@ var sched4 = (function() {
       key = "48h";
     sel.set(key);
 
-    var view = $("<div>Send automatic reminder to the guests? </div>")
-      .append(sel.view);
+    var divReminder = $("<div class='final-sched-div'>");
+    var checkReminder = $("<object class='check' data='/assets/img/check.svg' \
+                           type='image/svg+xml'></object>")
+      .appendTo(divReminder);
+    $("<h3 class='final-sched-text'>Send a reminder</h3>").appendTo(divReminder);
+    divReminder.append(sel.view);
 
-    return view;
+    return divReminder;
   }
 
   mod.load = function(profs, task, view) {

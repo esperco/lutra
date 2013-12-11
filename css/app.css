@@ -278,8 +278,10 @@ object {
 }
 
 .modal-close-x {
-  padding-top: 6px;
-  padding-left: 6px;
+  margin-top: 6px;
+  margin-left: 6px;
+  height: 12px;
+  width: 12px;
 }
 
 .modal-content {
@@ -314,6 +316,15 @@ object {
 
 /*** Scheduling Step 2 ***/
 
+#sched-step2-pref-time,
+#sched-step2-location {
+  height: 54px;
+}
+
+#sched-step2-location {
+  margin-top: 10px;
+}
+
 .search-option-dropdown {
   width: 158px;
   text-align: left;
@@ -325,19 +336,16 @@ object {
   border-top: 4px solid #414042;
 }
 
-.search-option-title {
-  padding-top: 15px;
-  font-family: "Proxima Nova Regular";
+.pref-time-title,
+.location-title {
+  padding-top: 0;
+  font-family: "Proxima Nova Semibold";
   font-size: 14px;
 }
 
-#sched-step2-loc-addr {
-  width: 158px;
-}
-
 #sched-step2-google-map {
-  height: 158px;
-  width: 158px;
+  height: 300px;
+  width: 300px;
   margin-top: 10px;
   margin-left: auto;
   margin-right: auto;
@@ -487,4 +495,13 @@ object {
   margin-left: 10px;
   font-size: 24px;
   cursor: pointer;
+}
+
+.final-sched-text {
+  margin-top: 0;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 0;
+  float: left;
+  line-height: 1.42857;
 }

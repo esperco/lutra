@@ -61,10 +61,6 @@ var sched2 = (function() {
     view.addClass("hide");
     view.children().remove();
 
-    var contMsg =
-      $("<div>Select up to 3 options to present to participants.</div>")
-      .appendTo(view);
-
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
 
@@ -177,6 +173,8 @@ var sched2 = (function() {
   function loadStep2Prefs(tzList, profs, task) {
     var view = $("#sched-step2-pref-time");
     view.children().remove();
+    var viewTimeZone = $("#sched-step2-time-zone");
+    viewTimeZone.children().remove();
 
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,
@@ -258,21 +256,21 @@ var sched2 = (function() {
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
       var loc = getLocation();
-      loc.timezone = sel2.get();
+      loc.timezone = sel4.get();
       x.location[0] = loc;
-      util.addFields(x, sel3.get());
-      x.how_soon = sel4.get();
+      util.addFields(x, sel2.get());
+      x.how_soon = sel3.get();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
         loadSuggestionsIfReady(profs, task, meetingParam);
     }
 
     /* try to match the duration selected as part of the meeting type (sel1)
-       with the duration selector (sel3) */
+       with the duration selector (sel2) */
     function action1(x) {
       if (util.isDefined(x)) {
         var k = ((x.duration + x.buffer_time) / 60).toString();
-        sel3.set(k);
+        sel2.set(k);
         mergeSelections();
       }
     }
@@ -296,7 +294,7 @@ var sched2 = (function() {
     var sel1 = select.create({
       buttonClass: "search-option-dropdown",
       options: [
-        opt("Select one"),
+        // opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
         opt("Lunch", "lunch", lunch, action1),
         opt("Dinner", "dinner", dinner, action1),
@@ -310,24 +308,14 @@ var sched2 = (function() {
       ]
     });
 
-    /* time zone */
-    var tzOptions =
-      list.map(tzList, function(tz) { return { label: tz, value: tz }; });
-    var sel2 = select.create({
-      buttonClass: "search-option-dropdown",
-      defaultAction: action2,
-      options: tzOptions,
-    });
-    timeZoneDropdown = sel2;
-
     /* duration and buffer time specified in minutes, converted to seconds */
     function dur(dur,buf) {
       return { duration: 60 * dur,
                buffer_time: 60 * buf };
     }
-    var sel3 = select.create({
+    var sel2 = select.create({
       buttonClass: "search-option-dropdown",
-      defaultAction: action3,
+      defaultAction: action2,
       options: [
         { label: "15 min", key: "15", value: dur(10,5) },
         { label: "30 min", key: "30", value: dur(25,5) },
@@ -341,9 +329,9 @@ var sched2 = (function() {
     });
 
     /* urgency */
-    var sel4 = select.create({
+    var sel3 = select.create({
       buttonClass: "search-option-dropdown",
-      defaultAction: action4,
+      defaultAction: action3,
       options: [
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
         { label: "Within 1 week", key: "1week", value: 7 * 86400 },
@@ -352,18 +340,39 @@ var sched2 = (function() {
       ]
     });
 
-    var option1 = $("<div class='search-option-title'>Meeting Type</div>")
+    /* time zone */
+    var tzOptions =
+      list.map(tzList, function(tz) { return { label: tz, value: tz }; });
+    var sel4 = select.create({
+      buttonClass: "search-option-dropdown",
+      defaultAction: action4,
+      options: tzOptions,
+    });
+    timeZoneDropdown = sel4;
+
+    var grid = $("<div/>")
       .appendTo(view);
-    sel1.view.appendTo(view);
-    var option2 = $("<div class='search-option-title'>Time Zone</div>")
-      .appendTo(view);
-    sel2.view.appendTo(view);
-    var option3 = $("<div class='search-option-title'>Duration</div>")
-      .appendTo(view);
-    sel3.view.appendTo(view);
-    var option4 = $("<div class='search-option-title'>Urgency</div>")
-      .appendTo(view);
-    sel4.view.appendTo(view);
+
+    var colType = $("<div class='col-md-4'/>")
+      .appendTo(grid);
+    var colDuration = $("<div class='col-md-4'/>")
+      .appendTo(grid);
+    var colUrgency = $("<div class='col-md-4'/>")
+      .appendTo(grid);
+
+    var optionType = $("<div class='pref-time-title'>Meeting Type</div>")
+      .appendTo(colType);
+    var optionDuration = $("<div class='pref-time-title'>Duration</div>")
+      .appendTo(colDuration);
+    var optionUrgency = $("<div class='pref-time-title'>Urgency</div>")
+      .appendTo(colUrgency);
+    var optionTimeZone = $("<div class='location-title'>Time Zone</div>")
+      .appendTo(viewTimeZone);
+
+    sel1.view.appendTo(colType);
+    sel2.view.appendTo(colDuration);
+    sel3.view.appendTo(colUrgency);
+    sel4.view.appendTo(viewTimeZone);
 
     step2Selector.show("sched-step2-prefs");
   }
