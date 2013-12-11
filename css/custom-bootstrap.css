@@ -4,10 +4,18 @@
 */
 
 /* set a max-width for horizontal fluid layout and make it centered */
+.container,
 .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
   margin-right: auto;
   margin-left: auto;
-  max-width: 500px;
+  max-width: 504px;
+}
+
+.col-md-4 {
+  padding-left: 0;
+  padding-right: 10px;
 }
 
 /*** Text ***/
@@ -66,7 +74,8 @@ h4,
 }
 
 .btn-default:active,
-.btn-default.active {
+.btn-default.active,
+.open .dropdown-toggle.btn-default {
   color: #414042;
   background-color: #bcbec0;
   border: none;

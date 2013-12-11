@@ -204,6 +204,10 @@ object {
   margin-left: 15px;
 }
 
+.footer-nav {
+  width: 120px;
+}
+
 .back-button,
 .next-button {
   height: 36px;
@@ -248,10 +252,6 @@ object {
 
 
 /*** Container ***/
-
-.container {
-  max-width: 500px;
-}
 
 .push {
   height: 120px;
@@ -312,24 +312,39 @@ object {
 }
 
 
-/*** Scheduling ***/
+/*** Scheduling Step 2 ***/
 
-.sched-tab {
-  display: inline-block;
-  color: #a7a9ac; /* Light Gray */
-  border-bottom: 1px solid #a7a9ac; /* Light Gray */
-  padding-bottom: 1em;
-  padding-top: 1em;
+.search-option-dropdown {
+  width: 158px;
+  text-align: left;
 }
 
-.sched-tab-filler {
-  width: 4em;
+.search-option-dropdown .caret {
+  float: right;
+  margin-top: 8px;
+  border-top: 4px solid #414042;
 }
 
-.sched-tab-highlight {
-  color: black;
-  border-bottom: 1px solid #8c42ad; /* Purple */
+.search-option-title {
+  padding-top: 15px;
+  font-family: "Proxima Nova Regular";
+  font-size: 14px;
 }
+
+#sched-step2-loc-addr {
+  width: 158px;
+}
+
+#sched-step2-google-map {
+  height: 158px;
+  width: 158px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/*** Scheduling Step 2/3 ***/
 
 .suggestion {
   padding-top: 10px;
@@ -406,6 +421,9 @@ object {
   color: #808285;
 }
 
+
+/*** Scheduling Step 3 ***/
+
 .guest-statuses-title {
   margin-top: 40px;
   font-family: "Proxima Nova Light";
@@ -453,6 +471,9 @@ object {
   cursor: pointer;
 }
 
+
+/*** Scheduling Step 4 ***/
+
 .final-sched-div {
   margin-bottom: 40px;
 }
@@ -466,12 +487,4 @@ object {
   margin-left: 10px;
   font-size: 24px;
   cursor: pointer;
-}
-
-/* TODO Style the Google map */
-#sched-step2-google-map {
-  height: 300px;
-  width: 300px;
-  margin-left: auto;
-  margin-right: auto;
 }
