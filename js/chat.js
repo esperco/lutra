@@ -54,6 +54,28 @@ var chat = (function () {
     return sel;
   }
 
+  function viewOfCalendarSlot(slot) {
+    var v = $("<li/>");
+    v.append(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    v.append($("<br/>"));
+    v.append("Location: " + slot.location.title);
+    return v;
+  }
+
+  function viewOfCalendarOptions(listRoot, calChoices) {
+    for (var i in calChoices) {
+      listRoot.append(viewOfCalendarSlot(calChoices[i].slot));
+    }
+    return listRoot;
+  }
+
+  function viewOfSchedulingQuestion(q) {
+    var v = $("<div/>");
+    v.append(q.body);
+    v.append(viewOfCalendarOptions($("<ol/>", {type:"A"}), q.choices));
+    return v;
+  }
+
   function audioPlayer(audioLink) {
     return $("<audio/>", {src:audioLink, controls:true})
            .text("Left a voice message.");
@@ -72,9 +94,9 @@ var chat = (function () {
     case "Selector_r":
       return selectedAnswers(data.sel_selected);
     case "Scheduling_q":
-      return $("<i/>").append("Asked for the schedule.");
+      return viewOfSchedulingQuestion(data);
     case "Scheduling_r":
-      return $("<i/>").append("Answered the schedule.");
+      return viewOfCalendarOptions($("<ul/>"), data.selected);
     case "Sched_confirm":
     case "Sched_remind":
       return data.body;
