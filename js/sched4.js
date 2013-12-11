@@ -3,6 +3,25 @@
 var sched4 = (function() {
   var mod = {};
 
+  function sentConfirmation(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Sched_confirm");
+    });
+  }
+
+  function sentReminder(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Sched_remind");
+    });
+  }
+
+  function sentInvitations(task) {
+    var state = sched.getState(task);
+    return isDefined(state.reserved) && isDefined(state.reserved.google_event);
+  }
+
   function formalEmailBody(organizerName, hostName, toName, when, where) {
     return "Dear "+toName+",\n\n"+
 
@@ -52,6 +71,10 @@ var sched4 = (function() {
       inviteAction.attr("disabled", true);
   }
 
+  function markChecked(elt) {
+    elt.addClass("checked");
+  }
+
   function step4RowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step4-row'>");
     var divDetails = $("<div class='final-sched-div'>");
@@ -64,6 +87,15 @@ var sched4 = (function() {
     var state = sched.getState(task);
     var slot = state.reserved.slot;
 
+    if (sentConfirmation(chats, uid))
+      markChecked(divConfirmation);
+
+    if (sentInvitations(task))
+      markChecked(divInvitation);
+
+    if (sentReminder(chats, uid))
+      markChecked(divReminder);
+
     /* Edit event details */
 
 /*
@@ -73,8 +105,8 @@ var sched4 = (function() {
       })
       .appendTo(divDetails);
 */
-    
-    var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+
+    var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'/>");
     checkDetails.appendTo(divDetails);
     $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
 
