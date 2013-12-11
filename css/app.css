@@ -300,7 +300,8 @@ object {
 
 #sched-availability-message,
 #sched-confirm-message {
-  max-width: 538px;
+  min-width: 100%;
+  max-width: 100%;
 }
 
 
