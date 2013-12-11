@@ -294,7 +294,7 @@ var sched2 = (function() {
     var sel1 = select.create({
       buttonClass: "search-option-dropdown",
       options: [
-        // opt("Select one"),
+        opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
         opt("Lunch", "lunch", lunch, action1),
         opt("Dinner", "dinner", dinner, action1),
@@ -353,11 +353,11 @@ var sched2 = (function() {
     var grid = $("<div/>")
       .appendTo(view);
 
-    var colType = $("<div class='col-md-4'/>")
+    var colType = $("<div class='col-sm-4'/>")
       .appendTo(grid);
-    var colDuration = $("<div class='col-md-4'/>")
+    var colDuration = $("<div class='col-sm-4'/>")
       .appendTo(grid);
-    var colUrgency = $("<div class='col-md-4'/>")
+    var colUrgency = $("<div class='col-sm-4'/>")
       .appendTo(grid);
 
     var optionType = $("<div class='pref-time-title'>Meeting Type</div>")

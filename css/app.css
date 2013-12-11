@@ -316,31 +316,36 @@ object {
 
 /*** Scheduling Step 2 ***/
 
+.top-divider {
+  margin-bottom: 0;
+}
+
 #sched-step2-pref-time,
 #sched-step2-location {
-  height: 54px;
+  /*overflow: hidden;*/
 }
 
-#sched-step2-location {
-  margin-top: 10px;
-}
-
-.search-option-dropdown {
-  width: 158px;
-  text-align: left;
-}
-
-.search-option-dropdown .caret {
-  float: right;
-  margin-top: 8px;
-  border-top: 4px solid #414042;
+.fill-div {
+  width: 100%;
 }
 
 .pref-time-title,
 .location-title {
-  padding-top: 0;
+  padding-top: 10px;
   font-family: "Proxima Nova Semibold";
   font-size: 14px;
+}
+
+.search-option-dropdown {
+  text-align: left;
+  height: 32px;
+}
+
+.search-option-dropdown .caret {
+  z-index: 1000;
+  float: right;
+  margin-top: 8px;
+  border-top: 4px solid #414042;
 }
 
 #sched-step2-google-map {

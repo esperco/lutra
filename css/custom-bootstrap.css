@@ -6,21 +6,18 @@
 /* set a max-width for horizontal fluid layout and make it centered */
 .container,
 .container-fluid {
-  padding-left: 0;
-  padding-right: 0;
   margin-right: auto;
   margin-left: auto;
-  max-width: 504px;
+  max-width: 534px;
 }
 
-.col-md-4 {
+.col-sm-3,
+.col-sm-4,
+.col-sm-9 {
+  padding-top: 0;
   padding-left: 5px;
   padding-right: 5px;
-}
-
-.col-md-8 {
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-bottom: 0;
 }
 
 

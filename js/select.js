@@ -44,9 +44,9 @@ var select = (function() {
   }
 
   mod.create = function(param) {
-    var view = $("<div class='btn-group'>");
+    var view = $("<div class='btn-group fill-div'>");
     var button = $("<button type='button'/>")
-      .addClass("btn btn-default dropdown-toggle")
+      .addClass("btn btn-default dropdown-toggle fill-div")
       .attr("data-toggle", "dropdown")
       .appendTo(view);
     var buttonLabel = $("<span/>").appendTo(button);

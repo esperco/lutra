@@ -3,6 +3,25 @@
 var sched4 = (function() {
   var mod = {};
 
+  function sentConfirmation(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Sched_confirm");
+    });
+  }
+
+  function sentReminder(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Sched_remind");
+    });
+  }
+
+  function sentInvitations(task) {
+    var state = sched.getState(task);
+    return util.isDefined(state.reserved) && util.isDefined(state.reserved.google_event);
+  }
+
   function formalEmailBody(organizerName, hostName, toName, when, where) {
     return "Dear "+toName+",\n\n"+
 
@@ -52,6 +71,10 @@ var sched4 = (function() {
       inviteAction.attr("disabled", true);
   }
 
+  function markChecked(elt) {
+    elt.addClass("checked");
+  }
+
   function step4RowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div/>");
     var divDetails = $("<div class='final-sched-div'>");
@@ -65,21 +88,23 @@ var sched4 = (function() {
 
     /* Edit event details */
 
-/*
-    $("<a class='final-sched-actions'>Edit event details</a>")
-      .click(function() {
-        editEventDetails(task.tid, chats, uid, obsProf);
-      })
-      .appendTo(divDetails);
-*/
+    // $("<a class='final-sched-actions'>Edit event details</a>")
+    //   .click(function() {
+    //     editEventDetails(task.tid, chats, uid, obsProf);
+    //   })
+    //   .appendTo(divDetails);
     
-    // var checkDetails = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    // var checkDetails = $("<img class='check'/>");
+    // svg.loadImg(checkDetails, "/assets/img/check.svg");
     // checkDetails.appendTo(divDetails);
     // $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
 
     /* Send a confirmation */
 
-    var checkConfirmation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    var checkConfirmation = $("<img class='check'/>");
+    svg.loadImg(checkConfirmation, "/assets/img/check.svg");
+    if (sentConfirmation(chats, uid))
+      markChecked(checkConfirmation);
     checkConfirmation.appendTo(divConfirmation);
 
     var confirmModal = $("#sched-confirm-modal");
@@ -114,7 +139,10 @@ var sched4 = (function() {
 
     /* Send a Google Calendar invitation */
 
-    var checkInvitation = $("<object class='check' data='/assets/img/check.svg' type='image/svg+xml'></object>");
+    var checkInvitation = $("<img class='check'/>");
+    svg.loadImg(checkInvitation, "/assets/img/check.svg");
+    if (sentInvitations(task))
+      markChecked(divInvitation);
     checkInvitation.appendTo(divInvitation);
 
     var inviteAction =
@@ -138,17 +166,19 @@ var sched4 = (function() {
       })
       .appendTo(divInvitation);
 
-    divDetails.appendTo(view);
+    // divDetails.appendTo(view);
     divConfirmation.appendTo(view);
     divInvitation.appendTo(view);
 
     return view;
   }
 
-  function createReminderSelector(task) {
+  function createReminderSelector(chats, task, uid) {
     var sel;    
-
     var reserved = sched.getState(task).reserved;
+
+    if (sentReminder(chats, uid))
+      markChecked(checkReminder);
 
     function saveTask() {
       var remind = sel.get();
@@ -181,9 +211,9 @@ var sched4 = (function() {
     sel.set(key);
 
     var divReminder = $("<div class='final-sched-div'>");
-    var checkReminder = $("<object class='check' data='/assets/img/check.svg' \
-                           type='image/svg+xml'></object>")
-      .appendTo(divReminder);
+    var checkReminder = $("<img class='check'/>");
+    svg.loadImg(checkReminder, "/assets/img/check.svg");
+    checkReminder.appendTo(divReminder);
     $("<h3 class='final-sched-text'>Send a reminder</h3>").appendTo(divReminder);
     divReminder.append(sel.view);
 
@@ -199,9 +229,9 @@ var sched4 = (function() {
         var rowView =
           step4RowViewOfParticipant(chats, profs, task, uid)
           .appendTo(view);
+        var reminderSelector = createReminderSelector(chats, task, uid).appendTo(view);
       }
     })
-    var reminderSelector = createReminderSelector(task).appendTo(view);
   };
 
   return mod;
