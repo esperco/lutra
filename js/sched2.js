@@ -56,15 +56,10 @@ var sched2 = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
-  function clearSuggestions() {
-    var view = $("#sched-step2-suggestions");
-    view.children().remove();
-  }
-
   function refreshSuggestions(profs, task, x) {
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
-    clearSuggestions();
+    view.children().remove();
 
     var contMsg =
       $("<div>Select up to 3 options to present to participants.</div>")
@@ -186,13 +181,13 @@ var sched2 = (function() {
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,
                        lengthMinutes, bufferMinutes,
-                       optMinStart, optMaxEnd) {
+                       optEarliest, optLatest) {
       x.duration = 60 * lengthMinutes;
       x.buffer_time = 60 * bufferMinutes;
-      if (util.isDefined(optMinStart) && util.isDefined(optMaxEnd))
+      if (util.isDefined(optEarliest) && util.isDefined(optLatest))
         x.time_of_day = {
-          start: timeonly.ofMinutes(optMinStart),
-          length: 60 * (optMaxEnd - optMinStart)
+          start: timeonly.ofMinutes(optEarliest),
+          length: 60 * (optLatest - optEarliest)
         };
       return x;
     }
@@ -217,15 +212,15 @@ var sched2 = (function() {
 
     var lunch =
       initTimes({ meeting_type: "Lunch" },
-                75, 15, hour(12,00), hour(14,30));
+                75, 15, hour(11,30), hour(13,30));
 
     var dinner =
       initTimes({ meeting_type: "Dinner" },
-                90, 30, hour(18,00), hour(21,30));
+                90, 30, hour(18,00), hour(20,30));
 
     var nightlife =
       initTimes({ meeting_type: "Nightlife" },
-                120, 30, hour(19), hour(01));
+                120, 30, hour(19), hour(22));
 
     var coffee =
       initTimes({ meeting_type: "Coffee" },
@@ -240,15 +235,15 @@ var sched2 = (function() {
 
     var morning =
       initTimes({ time_of_day_type: "Morning" },
-                45, 15, hour(8), hour(12));
+                45, 15, hour(8), hour(11));
 
     var afternoon =
       initTimes({ time_of_day_type: "Afternoon"},
-                45, 15, hour(13), hour(19));
+                45, 15, hour(13), hour(18));
 
     var late_night =
       initTimes({ time_of_day_type: "Late_night" },
-                45, 15, hour(19), hour(23));
+                45, 15, hour(19), hour(22));
 
     /* inter-dependent dropdowns for setting scheduling constraints */
     var sel1, sel2, sel3, sel4;
@@ -299,6 +294,7 @@ var sched2 = (function() {
       return { label: label, key: key, value: value, action: action };
     }
     var sel1 = select.create({
+      buttonClass: "search-option-dropdown",
       options: [
         opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
@@ -318,6 +314,7 @@ var sched2 = (function() {
     var tzOptions =
       list.map(tzList, function(tz) { return { label: tz, value: tz }; });
     var sel2 = select.create({
+      buttonClass: "search-option-dropdown",
       defaultAction: action2,
       options: tzOptions,
     });
@@ -329,12 +326,13 @@ var sched2 = (function() {
                buffer_time: 60 * buf };
     }
     var sel3 = select.create({
+      buttonClass: "search-option-dropdown",
       defaultAction: action3,
       options: [
-        { label: "60 min", key: "60", value: dur(45,15) },
-        { label: "45 min", key: "45", value: dur(30,15) },
-        { label: "30 min", key: "30", value: dur(25,5) },
         { label: "15 min", key: "15", value: dur(10,5) },
+        { label: "30 min", key: "30", value: dur(25,5) },
+        { label: "45 min", key: "45", value: dur(30,15) },
+        { label: "1 hour", key: "60", value: dur(45,15) },
         { label: "1 hour 15 min",  key: "75", value: dur(60,15) },
         { label: "1 hour 30 min",  key: "90", value: dur(75,15) },
         { label: "2 hours",        key: "120", value: dur(105,15) },
@@ -344,6 +342,7 @@ var sched2 = (function() {
 
     /* urgency */
     var sel4 = select.create({
+      buttonClass: "search-option-dropdown",
       defaultAction: action4,
       options: [
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
@@ -353,31 +352,18 @@ var sched2 = (function() {
       ]
     });
 
-    var grid = $("<div class='row'/>")
+    var option1 = $("<div class='search-option-title'>Meeting Type</div>")
       .appendTo(view);
-
-    var col1 = $("<div class='col-md-6'/>")
-      .appendTo(grid);
-
-    var col2 = $("<div class='col-md-6'/>")
-      .appendTo(grid);
-
-    var cell1 = $("<div>Type </div>")
-      .appendTo(col1);
-    var cell2 = $("<div>Time Zone </div>")
-      .appendTo(col2);
-    var cell3 = $("<div>Duration </div>")
-      .appendTo(col1);
-    var cell4 = $("<div>Urgency </div>")
-      .appendTo(col2);
-
-    sel1.view.appendTo(cell1);
-    sel2.view.appendTo(cell2);
-    sel3.view.appendTo(cell3);
-    sel4.view.appendTo(cell4);
-
-    initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
+    sel1.view.appendTo(view);
+    var option2 = $("<div class='search-option-title'>Time Zone</div>")
+      .appendTo(view);
+    sel2.view.appendTo(view);
+    var option3 = $("<div class='search-option-title'>Duration</div>")
+      .appendTo(view);
+    sel3.view.appendTo(view);
+    var option4 = $("<div class='search-option-title'>Urgency</div>")
+      .appendTo(view);
+    sel4.view.appendTo(view);
 
     step2Selector.show("sched-step2-prefs");
   }
@@ -449,10 +435,9 @@ var sched2 = (function() {
   }
 
   mod.load = function(tzList, profs, task) {
-    $(".sched-step2-next").addClass("disabled");
     clearLocation();
-    clearSuggestions();
-
+    initializeGoogleMap();
+    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
     connectCalendar(tzList, profs, task);
   };
 
