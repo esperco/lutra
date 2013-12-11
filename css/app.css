@@ -492,15 +492,17 @@ object {
   margin-top: 4px;
 }
 
+.checked path {
+  fill: #2bb673;
+}
+
 .final-sched-action {
-  margin-left: 10px;
   font-size: 24px;
   cursor: pointer;
 }
 
 .final-sched-text {
   margin-top: 0;
-  margin-left: 10px;
   margin-right: 10px;
   margin-bottom: 0;
   float: left;

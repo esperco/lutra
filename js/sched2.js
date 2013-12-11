@@ -295,7 +295,6 @@ var sched2 = (function() {
       divClass: "fill-div",
       buttonClass: "fill-div",
       options: [
-        opt("Select one"),
         opt("Breakfast", "breakfast", breakfast, action1),
         opt("Lunch", "lunch", lunch, action1),
         opt("Dinner", "dinner", dinner, action1),
@@ -377,6 +376,8 @@ var sched2 = (function() {
     sel2.view.appendTo(colDuration);
     sel3.view.appendTo(colUrgency);
     sel4.view.appendTo(viewTimeZone);
+
+    sel1.set("meeting");
 
     step2Selector.show("sched-step2-prefs");
   }
