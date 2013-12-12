@@ -42,6 +42,7 @@ var login = (function() {
   }
 
   mod.logout = function () {
+    $("#navbar").addClass("hide");
     mod.clearLoginInfo();
   }
 
@@ -76,6 +77,7 @@ var login = (function() {
       $("#logged-in-email").text(mod.data.email);
       $(".logged-out").addClass("hide");
       $(".logged-in").removeClass("hide");
+      $("#navbar").removeClass("hide");
     } else {
       $(".logged-in").addClass("hide");
       $(".logged-out").removeClass("hide");

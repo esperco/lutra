@@ -13,16 +13,14 @@
 
   <body>
 
-    <div id="navbar" class="navbar navbar-fixed-top">
+    <div id="navbar" class="navbar navbar-fixed-top hide">
         <a href="#">
           <img class="svg menu" src="/assets/img/menu.svg">
         </a>
         <p class="navbar-text tasks-title" unselectable="on">TASKS</p>
         <ul class="nav nav-tabs pull-right account">
           <li class="logged-out">
-            <a href="#!login">
-              Login
-            </a>
+            <a href="#!login"></a>
           </li>
           <li class="hide logged-in dropdown">
             <a data-toggle="dropdown"
@@ -41,27 +39,22 @@
     </div>
 
     <div id="login-page" class="hide">
-      <div class="container">
-        <div class="row">
-          <div class="span4"></div>
-          <div class="login-form span4">
-            <h2>Esper Login</h2>
-            <fieldset>
-              <div class="clearfix">
-                <input id="login-email" type="text"
-                       placeholder="Email">
-              </div>
-              <div class="clearfix">
-                <input id="login-password" type="password"
-                       placeholder="Password">
-              </div>
-              <button id="login-button" class="btn btn-default primary">
-                Sign in
-              </button>
-            </fieldset>
+      <div class="login-container">
+        <h1 class="esper-title">ESPER</h1>
+
+        <form role="form">
+          <div class="form-group">
+            <label for="login-email" class="login-title">Username</label>
+            <input type="email" class="form-control" id="login-email" autofocus>
           </div>
-          <div class="span4"></div>
-        </div>
+          <div class="form-group">
+            <label for="login-password" class="login-title">Password</label>
+            <input type="password" class="form-control" id="login-password">
+          </div>
+          <button type="submit" id="login-button" class="btn btn-primary login-btn">
+            Log In
+          </button>
+        </form>
       </div>
     </div>
 
