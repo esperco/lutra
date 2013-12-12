@@ -99,7 +99,7 @@ var profile = (function() {
       return name.charAt(0).toUpperCase();
   }
 
-  function firstInitialOfProfile(prof) {
+  mod.firstInitialOfProfile = function(prof) {
     var result = firstInitial(prof.full_name);
     if (result === "")
       result = firstInitial(prof.familiar_name);
