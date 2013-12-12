@@ -41,9 +41,6 @@ object {
   CSS doesn't provide a sane way of centering a block in the window, so we do
   the following.
 */
-.login-form {
-  margin-top: 200px;
-}
 
 .queue-tab-area {
   margin-top: 1em;
@@ -257,7 +254,7 @@ object {
   height: 120px;
 }
 
-
+  
 /*** Modal ***/
 
 .modal-close-circ {
@@ -302,6 +299,40 @@ object {
 #sched-confirm-message {
   min-width: 100%;
   max-width: 100%;
+}
+
+
+/*** Login ***/
+
+.login-container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-top: 160px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 402px;
+}
+
+.esper-title {
+  margin-bottom: 40px;
+  font-family: "Proxima Nova Light";
+  letter-spacing: 12px;
+  text-align: center;
+  color: #808285;
+}
+
+.login-title {
+  padding-top: 10px;
+  font-size: 14px;
+}
+
+.login-btn {
+  width: 100%;
+  height: 40px;
+  margin-top: 20px;
+  font-family: "Proxima Nova Light";
+  font-size: 20px;
+  letter-spacing: 3px;
 }
 
 
