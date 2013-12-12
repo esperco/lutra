@@ -126,22 +126,27 @@ var sched3 = (function() {
       .click(composeEmail)
       .appendTo(view);
 
-    $("#sched-availability-send")
+    var sendButton = $("#sched-availability-send");
+    sendButton
+      .removeClass("disabled")
       .click(function() {
-        var body = $("#sched-availability-message").val();
-        var chatid = chats[uid].chatid;
-        var chatItem = {
-          chatid: chatid,
-          by: login.me(),
-          'for': login.leader(),
-          team: login.team().teamid,
-          chat_item_data: ["Scheduling_q", {
-            body: body,
-            choices: options
-          }]
-        };
-        api.postChatItem(chatItem)
-          .done(closeAvailabilityModal);
+        if (! sendButton.hasClass("disabled")) {
+          sendButton.addClass("disabled");
+          var body = $("#sched-availability-message").val();
+          var chatid = chats[uid].chatid;
+          var chatItem = {
+            chatid: chatid,
+            by: login.me(),
+            'for': login.leader(),
+            team: login.team().teamid,
+            chat_item_data: ["Scheduling_q", {
+              body: body,
+              choices: options
+            }]
+          };
+          api.postChatItem(chatItem)
+            .done(closeAvailabilityModal);
+        }
       });
 
     return { view: view,
