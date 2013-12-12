@@ -115,28 +115,35 @@ var sched4 = (function() {
     }
 
     $("<a class='final-sched-action col-xs-11'>Send a confirmation message</a>")
+      .unbind('click')
       .click(function() {
         preFillConfirmModal(chats, profs, task, slot, uid);
         confirmModal.modal({});
       })
       .appendTo(divConfirmation);
 
-    $("#sched-confirm-send")
+    var sendButton = $("#sched-confirm-send");
+    sendButton
+      .removeClass("disabled")
+      .unbind('click')
       .click(function() {
-        var body = $("#sched-confirm-message").val();
-        var chatid = chats[uid].chatid;
-        var chatItem = {
-          chatid: chatid,
-          by: login.me(),
-          'for': login.leader(),
-          team: login.team().teamid,
-          chat_item_data: ["Sched_confirm", {
-            body: body,
-            'final': slot
-          }]
-        };
-        api.postChatItem(chatItem)
-          .done(closeConfirmModal);
+        if (! sendButton.hasClass("disabled")) {
+          sendButton.addClass("disabled");
+          var body = $("#sched-confirm-message").val();
+          var chatid = chats[uid].chatid;
+          var chatItem = {
+            chatid: chatid,
+            by: login.me(),
+            'for': login.leader(),
+            team: login.team().teamid,
+            chat_item_data: ["Sched_confirm", {
+              body: body,
+              'final': slot
+            }]
+          };
+          api.postChatItem(chatItem)
+            .done(closeConfirmModal);
+        }
       });
 
     /* Send a Google Calendar invitation */
@@ -149,8 +156,8 @@ var sched4 = (function() {
       markChecked(checkInvitation);
     checkInvitation.appendTo(divInvitationCheck);
 
-    var inviteAction =
-      $("<a class='final-sched-action col-xs-11'>Send a Google Calendar invitation</a>");
+    var inviteAction = $("<a class='final-sched-action col-xs-11'/>")
+      .text("Send a Google Calendar invitation");
 
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
@@ -178,7 +185,7 @@ var sched4 = (function() {
   }
 
   function createReminderSelector(chats, task, uid) {
-    var sel;    
+    var sel;
     var reserved = sched.getState(task).reserved;
 
     function saveTask() {

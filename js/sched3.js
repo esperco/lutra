@@ -94,12 +94,13 @@ var sched3 = (function() {
 
 
   function rowViewOfParticipant(chats, profs, task, uid) {
+    log("rowViewOfParticipant chatid " + chats[uid].chatid);
     var view = $("<div class='sched-step3-row'>");
     var chatHead = $("<div class='chat-head'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var firstInitial = $("<p class='first-initial'>")
+    var firstInitial = $("<p class='first-initial'/>")
       .text(profile.firstInitialOfProfile(prof));
 
     var state = sched.getState(task);
@@ -127,13 +128,17 @@ var sched3 = (function() {
       .appendTo(view);
 
     var sendButton = $("#sched-availability-send");
+    log("sendButton chatid " + chats[uid].chatid);
     sendButton
       .removeClass("disabled")
+      .unbind('click')
       .click(function() {
+        log("click chatid " + chats[uid].chatid);
         if (! sendButton.hasClass("disabled")) {
           sendButton.addClass("disabled");
           var body = $("#sched-availability-message").val();
           var chatid = chats[uid].chatid;
+          log(uid + " " + chatid);
           var chatItem = {
             chatid: chatid,
             by: login.me(),
@@ -157,6 +162,7 @@ var sched3 = (function() {
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
+    log("refreshing chats table; task: ", task.task_status.task_title);
     var chats = sched.chatsOfTask(task);
     var next = $(".sched-step3-next");
     var selected;
@@ -182,12 +188,14 @@ var sched3 = (function() {
         .appendTo(guestsContainer);
       if (numGuests == 1)
         x.composeEmail();
+      log("guest chatid " + chats[uid].chatid);
     });
 
     guestsContainer.appendTo(view);
 
     next
       .addClass("disabled")
+      .unbind('click')
       .click(function() {
         updateTask(profs, task, selected);
       });

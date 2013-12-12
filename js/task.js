@@ -249,7 +249,8 @@ var task = (function() {
   function viewOfNewTask(tab, kind, reqEdits) {
     var q = "message" === kind
       ? makeRequest(null, "Message", {message_q:{msg_text:""}})
-    : makeRequest(null, "Selector",{selector_q:newSelector("multiple" === kind)});
+    : makeRequest(null, "Selector",
+                  { selector_q: newSelector("multiple" === kind) });
     var task = {
       task_requests:[],
       task_status:{task_open:true, task_title:null, task_summary:""},
@@ -340,7 +341,9 @@ var task = (function() {
     startTaskButton.addClass("disabled");
     initTaskTitle();
 
-    startTaskButton.click(onClicked);
+    startTaskButton
+      .unbind('click')
+      .click(onClicked);
     taskTypeSelector.show("new-task");
   }
 

@@ -65,6 +65,7 @@ var sched2 = (function() {
     var selected = [];
 
     var contButton = $(".sched-step2-next")
+      .unbind('click')
       .click(function() {
         var slots = list.map(selected, function(v) { return v[1].slot; });
         selectCalendarSlots(profs, task, slots);

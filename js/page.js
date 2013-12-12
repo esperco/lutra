@@ -26,6 +26,7 @@ var page = (function() {
     for (var i in homeTabNames) {
       var tabName = homeTabNames[i];
       $("#" + tabName + "-tab-link")
+        .unbind('click')
         .click(function() { homeShowTab(tabName); });
     }
   }
@@ -51,6 +52,7 @@ var page = (function() {
   /* Login screen */
   function prepareLogin(redirPath) {
     $("#login-button")
+      .unbind('click')
       .click(function() {
         var email = $("#login-email").val();
         var password = $("#login-password").val();
