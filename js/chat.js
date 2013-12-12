@@ -152,12 +152,24 @@ var chat = (function () {
     return v;
   }
 
+  function buttonToAddChoiceOption() {
+    var v = $("<li/>");
+    var button = $("<button>Add Option</button>");
+    button.click(function() {
+      var li = editChoiceOption();
+      v.before(li);
+      li.find("input").focus();
+    });
+    v.append(button);
+    return v;
+  }
+
   function editChoices() {
     var v = $("<ul/>");
     var opt1 = editChoiceOption();
     opt1.find("input").val("Option 1");
     v.append(opt1);
-    v.append(editChoiceOption());
+    v.append(buttonToAddChoiceOption());
     return v;
   }
 
