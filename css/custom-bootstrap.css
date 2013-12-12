@@ -4,10 +4,7 @@
 */
 
 /* set a max-width for horizontal fluid layout and make it centered */
-.container,
-.container-fluid {
-  margin-right: auto;
-  margin-left: auto;
+.container {
   max-width: 534px;
 }
 
