@@ -56,29 +56,6 @@ object {
   border-bottom-color: #e6e7e8;
 }
 
-.request {
-  background-color: #dfdedd;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  padding: 1em;
-}
-
-.comments {
-  background-color: #d6d6d6;
-  margin-top: 0.5em;
-  margin-bottom: 0.2em;
-  margin-left: 2em;
-  margin-right: 2em;
-  padding-left: 0.3em;
-}
-
-.comment {
-  background-color: #dfdfdf;
-  margin-top: 0.3em;
-  margin-bottom: 0.3em;
-  padding: 0.2em;
-}
-
 .author {
   font-style: italic;
 }
