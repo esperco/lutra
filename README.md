@@ -8,16 +8,19 @@ Setup
 
 Requirements:
 * UglifyJS (JavaScript minifier)
-* `gawk`
+* `gawk` (GNU awk)
+* LESS (CSS preprocessor)
 
 Ubuntu:
 ```
-sudo apt-get install node-uglify gawk
+sudo apt-get install node-uglify gawk node-less
 ```
 
 Mac:
 ```
 brew install gawk
+brew install npm
+npm install -g less
 ```
 
 Build instructions

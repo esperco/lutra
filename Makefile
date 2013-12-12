@@ -12,10 +12,12 @@ prod: prod-build
 dev-build:
 	$(MAKE) -C js dev-build
 	$(MAKE) -C html dev-build
+	$(MAKE) -C css dev-build
 
 prod-build:
 	$(MAKE) -C js prod-build
 	$(MAKE) -C html prod-build
+	$(MAKE) -C css prod-build
 
 # Fetch libraries
 setup:
@@ -25,3 +27,5 @@ setup:
 clean:
 	rm -rf pub *~ */*~
 	$(MAKE) -C js clean
+	$(MAKE) -C html clean
+	$(MAKE) -C css clean
