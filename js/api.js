@@ -85,15 +85,6 @@ var api = (function () {
       .done(task.updateActiveTasksView);
   };
 
-  mod.loadRecentTasks = function() {
-    return jsonHttpGet(api_tasks_prefix() + "/recent")
-      .done(task.updateRecentTasksView);
-  };
-
-  mod.deleteRequest = function(qid) {
-    return jsonHttpDELETE(api_q_prefix() + "/request/" + qid);
-  };
-
   mod.deleteTask = function(tid) {
     return jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
   };
