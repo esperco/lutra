@@ -33,8 +33,6 @@ SOURCES = \
   api.js \
   sample.js \
   profile.js \
-  comment.js \
-  request.js \
   chat.js \
   sched.js \
   sched1.js \
