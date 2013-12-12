@@ -9,7 +9,7 @@ var sched1 = (function() {
   	api.postTask(task)
       .done(function(task) { sched.loadStep2(profs, task); });
   }
-  
+
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step1-row'>");
     var chatHead = $("<div class='chat-head'>");
@@ -28,7 +28,7 @@ var sched1 = (function() {
   mod.load = function(profs, task, view) {
     $("<h3>Confirm the guest list.</h3>")
       .appendTo(view);
-    
+
     var chats = sched.chatsOfTask(task);
     var next = $(".sched-step1-next");
 
@@ -47,6 +47,7 @@ var sched1 = (function() {
     guestsContainer.appendTo(view);
 
     next
+      .unbind('click')
       .click(function() {
         finalizeGuests(profs, task, selected);
       });

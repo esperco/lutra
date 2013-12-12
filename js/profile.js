@@ -92,6 +92,20 @@ var profile = (function() {
     return result;
   }
 
+  function firstInitial(s) {
+    if (s === "")
+      return "";
+    else
+      return s.charAt(0).toUpperCase();
+  }
+
+  mod.firstInitialOfProfile = function(prof) {
+    var result = firstInitial(prof.full_name);
+    if (result === "")
+      result = firstInitial(prof.familiar_name);
+    return result;
+  }
+
   function viewOfPhotoMedium(imageUrl) {
     var view = $("<span class='user-photo-container'/>");
     var img = $("<img class='user-photo-medium'/>")
