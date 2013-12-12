@@ -93,10 +93,10 @@ var profile = (function() {
   }
 
   function firstInitial(s) {
-    if (name === "")
+    if (s === "")
       return "";
     else
-      return name.charAt(0).toUpperCase();
+      return s.charAt(0).toUpperCase();
   }
 
   mod.firstInitialOfProfile = function(prof) {
