@@ -18,13 +18,14 @@ var svg = (function() {
   var svgCache = cache.create(300, 30, access);
 
   mod.loadImg = function(img, url) {
-    svgCache.getCached(url)
+    return svgCache.getCached(url)
       .then(function(data) {
         var svgRoot = $(data)
           .attr("id", img.attr("id"))
           .attr("src", url)
           .attr("class", img.attr("class"));
         img.replaceWith(svgRoot);
+        return svgRoot;
       });
   };
 

@@ -72,7 +72,7 @@ var sched4 = (function() {
   }
 
   function markChecked(elt) {
-    elt.addClass("checked");
+    elt.addClass("checked"); // does not work on SVG elements
   }
 
   function step4RowViewOfParticipant(chats, profs, task, uid) {
@@ -93,7 +93,7 @@ var sched4 = (function() {
     //     editEventDetails(task.tid, chats, uid, obsProf);
     //   })
     //   .appendTo(divDetails);
-    
+
     // var checkDetails = $("<img class='check'/>");
     // svg.loadImg(checkDetails, "/assets/img/check.svg");
     // checkDetails.appendTo(divDetails);
@@ -104,10 +104,11 @@ var sched4 = (function() {
     var divConfirmationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divConfirmation);
     var checkConfirmation = $("<img class='check'/>");
-    svg.loadImg(checkConfirmation, "/assets/img/check.svg");
     if (sentConfirmation(chats, uid))
-      markChecked(checkConfirmation);
+      markChecked(divConfirmationCheck);
     checkConfirmation.appendTo(divConfirmationCheck);
+    svg.loadImg(checkConfirmation, "/assets/img/check.svg")
+      .then(function(elt) { checkConfirmation = elt; });
 
     var confirmModal = $("#sched-confirm-modal");
     function closeConfirmModal() {
@@ -142,7 +143,10 @@ var sched4 = (function() {
             }]
           };
           api.postChatItem(chatItem)
-            .done(closeConfirmModal);
+            .done(function() {
+              closeConfirmModal();
+              markChecked(divConfirmationCheck);
+            });
         }
       });
 
@@ -151,10 +155,11 @@ var sched4 = (function() {
     var divInvitationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divInvitation);
     var checkInvitation = $("<img class='check'/>");
-    svg.loadImg(checkInvitation, "/assets/img/check.svg");
     if (sentInvitations(task))
-      markChecked(checkInvitation);
+      markChecked(divInvitationCheck);
     checkInvitation.appendTo(divInvitationCheck);
+    svg.loadImg(checkInvitation, "/assets/img/check.svg")
+      .then(function(elt) { checkInvitation = elt; });
 
     var inviteAction = $("<a class='final-sched-action col-xs-11'/>")
       .text("Send a Google Calendar invitation");
@@ -172,6 +177,7 @@ var sched4 = (function() {
               .done(function(updatedTask) {
                 task = updatedTask;
                 updateInviteAction(updatedTask, inviteAction);
+                markChecked(divInvitationCheck);
               });
           });
       })
@@ -212,8 +218,10 @@ var sched4 = (function() {
     var key = "24h";
     if (! util.isDefined(initVal))
       key = "no";
-    else if (initVal < 100000)
+    else if (initVal < 24 * 3600 + 0.5)
       key = "24h";
+    else if (initVal < 36 * 3600 + 0.5)
+      key = "36h";
     else
       key = "48h";
     sel.set(key);
@@ -223,10 +231,11 @@ var sched4 = (function() {
     var divReminderCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divReminder);
     var checkReminder = $("<img class='check'/>");
-    svg.loadImg(checkReminder, "/assets/img/check.svg");
     if (sentReminder(chats, uid))
-      markChecked(checkReminder);
+      markChecked(divReminderCheck);
     checkReminder.appendTo(divReminderCheck);
+    svg.loadImg(checkReminder, "/assets/img/check.svg")
+      .then(function(elt) { checkReminder = elt; });
 
     var divReminderInstr = $("<div class='instr-div col-xs-11'>")
       .appendTo(divReminder);
@@ -246,7 +255,8 @@ var sched4 = (function() {
         var rowView =
           step4RowViewOfParticipant(chats, profs, task, uid)
           .appendTo(view);
-        var reminderSelector = createReminderSelector(chats, task, uid).appendTo(view);
+        var reminderSelector =
+          createReminderSelector(chats, task, uid).appendTo(view);
       }
     })
   };
