@@ -107,10 +107,19 @@ var chat = (function () {
 
   function viewOfChatItem(item, time, status) {
     var v = $("<div/>");
-    v.append($("<div/>").append(full_name(item.by)));
-    v.append($("<div/>").append(date.viewTimeAgo(date.ofString(time))));
-    v.append($("<div/>").append(status));
-    v.append($("<div/>").append(viewOfChatData(item)));
+    var header = $("<div class='message-header clearfix' />")
+      .appendTo(v);
+
+    var name = $("<div class='col-xs-6 from-name-div' />")
+      .appendTo(header);
+    name.append($("<div class='from-name' />").append(full_name(item.by)));
+
+    var timestamp = $("<div class='col-xs-6 timestamp-div' />")
+      .appendTo(header);
+    timestamp.append($("<div class='timestamp' />").append(date.viewTimeAgo(date.ofString(time))));
+
+    v.append($("<div class='message'/>").append(viewOfChatData(item)));
+    // v.append($("<div class='message-status' />").append(status));
     v.append($("<hr/>"));
     return v;
   }
@@ -193,27 +202,51 @@ var chat = (function () {
   }
 
   function chatEditor(chat) {
-    var v = $("<div/>");
+    var chatFooter = $("<div class='navbar-fixed-bottom col-md-4 chat-footer' />");
 
-    v.append($("<b>To:</b>"));
-    v.append(" " + chat_participant_names(chat));
+    var toField = $("<div id='to-field' />")
+      .appendTo(chatFooter);
+    toField.append($("<b>To:</b>"));
+    toField.append(" " + chat_participant_names(chat));
 
-    var editText = $("<textarea/>", {placeholder:"Write a reply..."});
-    v.append($("<div/>").append(editText));
+    var v = $("<div id='chat-editor' />")
+      .appendTo(chatFooter);
+
+    var editText = $("<textarea/>", {
+      'id': "chat-entry",
+      'class': "form-control",
+      'placeholder': "Write a reply..."
+    });
+    // editText.click(function () {
+    // })
+    editText.appendTo(v);
+
+    var chatActions = $("<div id='chat-actions' class='clearfix' />")
+      .appendTo(v);
+    var selChoicesDiv = $("<div id='offer-choices' class='col-xs-10' />")
+      .appendTo(chatActions);
+    var sendDiv = $("<div id='chat-send' class='col-xs-2' />")
+      .appendTo(chatActions);
 
     var choicesEditor = editChoices();
     choicesEditor.hide();
-    v.append(choicesEditor);
+    chatActions.append(choicesEditor);
 
-    var selChoices = $("<input/>", {type:"checkbox"});
+    var selChoices = $("<img id='offer-choices-checkbox' class='esper-checkbox'/>");
+    svg.loadImg(selChoices, "/assets/img/checkbox.svg");
     selChoices.click(function () {
       choicesEditor.toggle();
+      // untick: function() {
+      //   selChoices.removeClass("esper-checkbox-selected");
+      // }
+      // selChoices.addClass("esper-checkbox-selected");
     });
-    var selChoicesLabel = $("<label/>");
-    selChoicesLabel.append(selChoices);
-    selChoicesLabel.append("Offer multiple choice response.");
 
-    var sendButton = $("<button>Send</button>");
+    selChoicesDiv.append(selChoices);
+    selChoicesDiv.append("<div id='offer-choices-label'>Offer multiple choice response.</div>");
+
+    var sendButton = $("<button id='chat-send-btn' class='btn btn-primary'>Send</button>")
+      .appendTo(sendDiv);
     sendButton.click(function () {
       var data = selChoices.prop("checked")
                ? selector_q_data(editText.val(), choicesEditor)
@@ -237,17 +270,12 @@ var chat = (function () {
       }
     });
 
-    var buttons = $("<div/>");
-    buttons.append(selChoicesLabel);
-    buttons.append(sendButton);
-    v.append(buttons);
-
-    return v;
+    return chatFooter;
   }
 
   function chatView(chat) {
     var me = login.me();
-    var v = $("<div/>");
+    var v = $("<div class='test'/>");
 
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
@@ -280,10 +308,10 @@ var chat = (function () {
         list.iter(task.task_chats, function (chat) {
           var tab_name;
           if (chat.chatid === task.task_context_chat) {
-            tab_name = "Origin";
+            tab_name = "O";
           } else {
             var p = profiles[chat.chat_participants[0].par_uid];
-            tab_name = p.full_name;
+            tab_name = p.full_name.charAt(0).toUpperCase();
           }
           var pane_id = "chat" + chat.chatid;
           tabs.append($("<li/>")

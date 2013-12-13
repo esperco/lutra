@@ -21,8 +21,12 @@
 
 */
 
+body,
+html {
+  height: 100%;
+}
+
 body {
-  margin-top: 100px; /* room for navigation bar */
   background-color: white;
   color: #414042;
   font-family: "Proxima Nova Regular", Arial;
@@ -33,6 +37,20 @@ body {
 
 object {
   pointer-events: none;
+}
+
+*.unselectable {
+  cursor: default;
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
 }
 
 /*** Old stuff ***/
@@ -117,9 +135,18 @@ object {
 
 /*** Nav Bar ***/
 
-#navbar {
+#main-navbar,
+#task-navbar {
+  z-index: 1030;
   background: rgba(248,248,248,0.9);
+  border-top: none;
   border-bottom: 1px solid #d1d3d4;
+  border-radius: 0;
+}
+
+#task-navbar {
+  position: fixed !important;
+  padding: 0;
 }
 
 .menu {
@@ -137,7 +164,7 @@ object {
   fill: #7d3ca0;
 }
 
-.tasks-title {
+.main-title {
   letter-spacing: 3px;
 }
 
@@ -155,9 +182,16 @@ object {
 
 .new-task-footer,
 .sched-footer {
+  position: fixed !important;
   height: 80px;
+  left: 0;
+  bottom: 0;
+  margin-bottom: 0;
+  padding: 0;
   background: rgba(248,248,248,0.9);
   border-top: 1px solid #d1d3d4;
+  border-bottom: none;
+  border-radius: 0;
 }
 
 .new-task-footer {
@@ -191,9 +225,11 @@ object {
   fill: #bcbec0;
 }
 
-#progress-bar {
-  width: 500px;
-  padding-top: 3px;
+.sched-step1,
+.sched-step2,
+.sched-step3,
+.sched-step4 {
+  margin-top: 3px;
 }
 
 .sched-step2,
@@ -227,11 +263,19 @@ object {
 
 /*** Container ***/
 
-.push {
-  height: 120px;
+#task-content {
+  min-height: 100%;
+  position:relative;
+  padding: 0;
+  overflow: scroll;
 }
 
-  
+.split-screen {
+  border-left: none;
+  border-right: 1px solid #d1d3d4;
+}
+
+
 /*** Modal ***/
 
 .modal-close-circ {
@@ -328,6 +372,138 @@ object {
 }
 
 
+/*** Chat ***/
+
+#task-page,
+#chat {
+  height: 100%;
+}
+
+#chat {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#chat-header {
+  position: fixed;
+  height: 100px;
+  width: 100%;
+  background: rgba(248,248,248,0.9);
+}
+
+#chat-profile-details {
+  height: 40px;
+  background-color: #808285;
+  border-top: 1px solid #d1d3d4;
+  border-bottom: 1px solid #d1d3d4;
+}
+
+#chat-profile-tabs {
+  /*position: fixed;*/
+}
+
+#chat-panel {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.test {
+}
+
+.message-header {
+  margin-bottom: 10px;
+}
+
+.from-name-div {
+  padding-left: 0;
+}
+
+.from-name {
+  font-family: "Proxima Nova Semibold";
+  font-size: 12px;
+  color: #808285;
+}
+
+.timestamp-div {
+  padding-right: 0;
+}
+
+.message-status,
+.timestamp {
+  float: right;
+  font-size: 12px;
+  color: #808285;
+}
+
+.message {
+  font-size: 14px;
+}
+
+.chat-footer {
+  margin-left: auto;
+  margin-right: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  background: rgba(248,248,248,0.9);
+}
+
+#to-field {
+  height: 30px;
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  color: white;
+  background-color: #808285;
+  border-top: 1px solid #d1d3d4;
+  border-bottom: 1px solid #d1d3d4;
+}
+
+#chat-editor {
+  margin: 15px;
+}
+
+#chat-entry {
+  min-width: 100%;
+  max-width: 100%;
+}
+
+#chat-actions {
+  margin-top: 15px;
+}
+
+#offer-choices {
+  padding-left: 0;
+}
+
+#offer-choices-checkbox {
+  float: left;
+  margin-top: 5px;
+  height: 18px;
+  width: 18px;
+}
+
+#offer-choices:hover {
+  cursor: pointer;
+}
+
+#offer-choices-label {
+  float: left;
+  margin-top: 5px;
+  margin-left: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#chat-send {
+  padding-right: 0;
+}
+
+#chat-send-btn {
+  float: right;
+}
+
+
 /*** Scheduling Step 2 ***/
 
 .top-divider {
@@ -371,7 +547,7 @@ object {
   cursor: pointer;
 }
 
-.esper-checkbox {
+#suggestion-checkbox {
   float: left;
   margin-top: 16px;
   width: 24px;
@@ -385,6 +561,8 @@ object {
   height: 24px;
 }
 
+#offer-choices-checkbox:hover path.check-outline,
+#offer-choices-label:hover path.check-outline,
 .suggestion:hover path.check-outline,
 .suggestion:hover path.radio-outline {
   fill: #a7a9ac;

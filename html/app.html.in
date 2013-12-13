@@ -13,11 +13,9 @@
 
   <body>
 
-    <div id="navbar" class="navbar navbar-fixed-top hide">
-        <a href="#">
-          <img class="svg menu" src="/assets/img/menu.svg">
-        </a>
-        <p class="navbar-text tasks-title" unselectable="on">TASKS</p>
+    <div id="main-navbar" class="navbar navbar-fixed-top hide">
+      <img href="#" class="svg menu" src="/assets/img/menu.svg">
+      <p class="navbar-text main-title unselectable" data-toggle="tooltip">TASKS</p>
         <ul class="nav nav-tabs pull-right account">
           <li class="logged-out">
             <a href="#!login"></a>
@@ -55,11 +53,13 @@
             LOG IN
           </button>
         </form>
+
+        <div class="footer-push"></div>
       </div>
     </div>
 
     <div id="home-page" class="hide">
-      <div class="container">
+      <div class="navbar-push container">
         <div class="row">
           <div class="span12 queue-tab-area">
 
@@ -92,28 +92,47 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div id="new-task">
-        @@new-task.html@@
+
+      <div id="task-content" class="col-md-8">
+
+        <div id="task-navbar" class="navbar">
+          <a href="#">
+            <img class="svg menu" src="/assets/img/menu.svg">
+          </a>
+          <p id="task-title" class="navbar-text unselectable"></p>
+        </div>
+
+        <div id="new-task">
+          @@new-task.html@@
+        </div>
+
+        <div id="sched-task" class="hide">
+          <div id="sched-step1-tab" class="hide">
+            @@sched-step1-tab.html@@
+          </div>
+          <div id="sched-step2-tab" class="hide">
+            @@sched-step2-tab.html@@
+          </div>
+          <div id="sched-step3-tab" class="hide">
+            @@sched-step3-tab.html@@
+          </div>
+          <div id="sched-step4-tab" class="hide">
+            @@sched-step4-tab.html@@
+          </div>
+        </div>
+
+        <div id="gen-task" class="navbar-push hide"></div>
+
       </div>
-      <div id="sched-task" class="hide">
-        <div id="sched-step1-tab" class="hide">
-          @@sched-step1-tab.html@@
+
+      <div id="chat" class="col-md-4 pull-right">
+        <div id="chat-header">
+          <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
+          <div id="chat-profile-details"></div>
         </div>
-        <div id="sched-step2-tab" class="hide">
-          @@sched-step2-tab.html@@
-        </div>
-        <div id="sched-step3-tab" class="hide">
-          @@sched-step3-tab.html@@
-        </div>
-        <div id="sched-step4-tab" class="hide">
-          @@sched-step4-tab.html@@
-        </div>
-      </div>
-      <div id="gen-task" class="hide"></div>
-      <div id="chat" class="col-md-4 pull-right hide">
-        <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
         <div id="chat-panel" class="tab-content"></div>
       </div>
+
     </div>
 
     <script src="/assets/js/jquery.min.js"></script>
