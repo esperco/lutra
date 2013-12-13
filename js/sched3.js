@@ -3,6 +3,13 @@
 var sched3 = (function() {
   var mod = {};
 
+  function sentEmail(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Scheduling_q");
+    });
+  }
+
   function formalEmailBody(organizerName, hostName, toName, howSoon) {
     return "Dear "+toName+",\n\n"+
 
@@ -181,7 +188,7 @@ var sched3 = (function() {
         rowViewOfParticipant(chats, profs, task, uid);
       x.view
         .appendTo(guestsContainer);
-      if (numGuests == 1)
+      if (numGuests == 1 && ! sentEmail(chats, uid))
         x.composeEmail();
     });
 
