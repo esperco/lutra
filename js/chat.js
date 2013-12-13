@@ -54,11 +54,31 @@ var chat = (function () {
     return sel;
   }
 
+  function locationText(loc) {
+    if (loc.address)
+      return loc.address;
+    else if (loc.title)
+      return loc.title;
+    else if (loc.instructions)
+      return loc.instructions;
+    else
+      return "";
+  }
+
+  function appendLocation(elt, loc) {
+    var locText = locationText(loc);
+    if (locText) {
+      $("<span/>")
+        .text("Location: " + locText)
+        .appendTo(elt);
+    }
+  }
+
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
     v.append(date.range(date.ofString(slot.start), date.ofString(slot.end)));
     v.append($("<br/>"));
-    v.append("Location: " + slot.location.title);
+    appendLocation(v, slot.location);
     return v;
   }
 
