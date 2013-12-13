@@ -27,17 +27,21 @@ var cache = (function() {
 
     var get = access.get;
     var wrap = util.isDefined(access.wrap) ?
-      access.wrap : function(v) { return v; };
+      access.wrap : function(deferredV) {
+        return deferredV;
+      };
     var update = util.isDefined(access.update) ?
-      access.update : function(oldV, newV) { return newV; };
+      access.update : function(oldDeferredW, newDeferredV) {
+        return newDeferredV;
+      };
     var destroy = util.isDefined(access.destroy) ?
-      access.destroy : function(oldV) {};
+      access.destroy : function(oldDeferredW) {};
 
-    /* just write into the table */
-    function cacheSet(k, v) {
+    /* just deferred wrapped value into the table */
+    function cacheSet(k, deferredW) {
       cache[k] = {
         expires: unixtime.now() + ttl,
-        v: v
+        w: deferredW
       };
     }
 
@@ -46,7 +50,7 @@ var cache = (function() {
       if (missingTtl > 0)
         cache[k] = {
           expires: unixtime.now() + missingTtl,
-          v: null
+          w: null
         };
       else
         delete cache[k];
@@ -59,16 +63,17 @@ var cache = (function() {
     }
 
     /* force-update a value in the cache, return wrapped value */
-    function setCached(k, v) {
+    function setCached(k, deferredV) {
       var x = cache[k];
-      var w0 = x ? x.v : null;
-      if (v) {
-        var w = w0 ? update(w0, v) : wrap(v);
-        cacheSet(k, w);
-        return w;
+      var deferredW0 = util.isDefined(x) ? x.w : null;
+      if (util.isDefined(deferredV)) {
+        var deferredW = deferredW0 !== null ?
+          update(deferredW0, deferredV) : wrap(deferredV);
+        cacheSet(k, deferredW);
+        return deferredW;
       }
       else {
-        if (w0)
+        if (deferredW0 !== null)
           destroy(w0);
         cacheSetMissing(k);
         return null;
@@ -77,17 +82,14 @@ var cache = (function() {
 
     /* force-get the current value, update the cache */
     function force(k) {
-      return get(k)
-        .then(function(v) {
-          return setCached(k, v);
-        });
+      return setCached(k, get(k));
     }
 
     /* get cached value if available, otherwise get the current value */
     function getCached(k) {
       var x = cache[k];
       if (x && unixtime.now() < x.expires) {
-        return defer(x.v);
+        return x.w;
       }
       else
         return force(k);
@@ -95,7 +97,7 @@ var cache = (function() {
 
     /* force-remove a value from the cache */
     function removeCached(k) {
-      return setCached(k, null);
+      return setCached(k);
     }
 
     return {

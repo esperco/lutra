@@ -19,9 +19,23 @@ var profile = (function() {
   /* cache of observable profiles */
   var accessCache = cache.create (600, 60, {
     get: function(uid) { return api.getProfile(uid); },
-    wrap: function(prof) { return new can.Observe({prof:prof}); },
-    update: function(obs, prof) { return obs.attr("prof", prof); },
-    destroy: function(obs) { obs.removeAttr("prof"); }
+    wrap: function(deferredProf) {
+      return deferredProf.then(function(prof) {
+        return new can.Observe({prof:prof});
+      });
+    },
+    update: function(deferredObs, deferredProf) {
+      return deferredObs.then(function(obs) {
+        return deferredProf.then(function(prof) {
+          return obs.attr("prof", prof);
+        });
+      });
+    },
+    destroy: function(deferredObs) {
+      deferredObs.then(function(obs) {
+        obs.removeAttr("prof");
+      });
+    }
   });
 
   /* get observable profile */

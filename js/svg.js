@@ -7,11 +7,10 @@ var svg = (function() {
 
   var access = {
     get: function(k) {
-      log("fetch " + k);
       return $.ajax({
         url: k,
         type: "GET",
-        dataType: "xml"
+        dataType: "text"
       });
     }
   };
@@ -21,12 +20,11 @@ var svg = (function() {
   mod.loadImg = function(img, url) {
     svgCache.getCached(url)
       .then(function(data) {
-        var svgRoot = $(data).find('svg')
+        var svgRoot = $(data)
           .attr("id", img.attr("id"))
           .attr("src", url)
           .attr("class", img.attr("class"));
         img.replaceWith(svgRoot);
-        return svgRoot;
       });
   };
 
