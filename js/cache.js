@@ -25,6 +25,14 @@ var cache = (function() {
   mod.create = function (ttl, missingTtl, access) {
     var cache = {};
 
+    var get = access.get;
+    var wrap = util.isDefined(access.wrap) ?
+      access.wrap : function(v) { return v; };
+    var update = util.isDefined(access.update) ?
+      access.update : function(oldV, newV) { return newV; };
+    var destroy = util.isDefined(access.destroy) ?
+      access.destroy : function(oldV) {};
+
     /* just write into the table */
     function cacheSet(k, v) {
       cache[k] = {
@@ -55,13 +63,13 @@ var cache = (function() {
       var x = cache[k];
       var w0 = x ? x.v : null;
       if (v) {
-        var w = w0 ? access.update(w0, v) : access.wrap(v);
+        var w = w0 ? update(w0, v) : wrap(v);
         cacheSet(k, w);
         return w;
       }
       else {
         if (w0)
-          access.destroy(w0);
+          destroy(w0);
         cacheSetMissing(k);
         return null;
       }
@@ -69,7 +77,7 @@ var cache = (function() {
 
     /* force-get the current value, update the cache */
     function force(k) {
-      return access.get(k)
+      return get(k)
         .then(function(v) {
           return setCached(k, v);
         });
