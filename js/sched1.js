@@ -6,7 +6,8 @@ var sched1 = (function() {
   var mod = {};
 
   function finalizeGuests() {
-  	api.postTask(task)
+    task.task_status.task_progress = "Coordinating";
+    api.postTask(task)
       .done(function(task) { sched.loadStep2(profs, task); });
   }
 
