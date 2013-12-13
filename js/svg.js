@@ -25,6 +25,7 @@ var svg = (function() {
           .attr("src", url)
           .attr("class", img.attr("class"));
         img.replaceWith(svgRoot);
+        log("loaded svg data!", data);
         return svgRoot;
       });
   };
