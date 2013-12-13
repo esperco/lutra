@@ -50,8 +50,8 @@ var sched3 = (function() {
 
   function updateTask(profs, task, calOption) {
     var state = sched.getState(task);
-    task.task_progress = "Confirmed";
-    state.scheduling_stage = "Confirm";
+    task.task_status.task_progress = "Confirmed"; // status in the task list
+    state.scheduling_stage = "Confirm";           // step in the scheduling page
     state.reserved = {
       slot: calOption.slot,
       remind: 3*43200,

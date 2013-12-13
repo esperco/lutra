@@ -158,7 +158,8 @@ var sched2 = (function() {
      and move on to step 3. */
   function selectCalendarSlots(profs, task, slots) {
     var x = task.task_data[1];
-    x.scheduling_stage = "Coordinate";
+    task.task_status.task_progress = "Coordinating"; // status in the task list
+    x.scheduling_stage = "Coordinate";               // step in the scheduling page
     /* TODO: reserve calendar slots for leader of organizing team,
              unreserve previously-reserved calendar slots */
     x.calendar_options = labelSlots(slots);
