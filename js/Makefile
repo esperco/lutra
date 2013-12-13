@@ -13,7 +13,6 @@ prod-build: prod.js includes-prod.html
 
 SOURCES = \
   test.js \
-  svg.js \
   list.js \
   deferred.js \
   util.js \
@@ -26,6 +25,7 @@ SOURCES = \
   unixtime.js \
   email.js \
   cache.js \
+  svg.js \
   show.js \
   select.js \
   store.js \

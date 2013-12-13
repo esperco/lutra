@@ -52,7 +52,7 @@ var route = (function() {
     },
 
     "translate/response/:rid/:uid route" : function(data) {
-      withLogin(function () { log(data); });
+      withLogin(function () { });
     }
   });
 
