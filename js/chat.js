@@ -336,18 +336,22 @@ var chat = (function () {
 
         list.iter(task.task_chats, function (chat) {
           var tab_name;
+          var pane_id = "chat" + chat.chatid;
+          var tab = $("<a/>", {href:"#"+pane_id, "id":"tab-name", "data-toggle":"tab"});
           if (chat.chatid === task.task_context_chat) {
-            tab_name = "O";
+            tabs.append($("<li id='chat-tab-div' />")
+              .append(tab));
+            var group = $("<img id='group'/>");
+            group.appendTo(tab);
+            svg.loadImg(group, "/assets/img/group.svg");
           } else {
             var p = profiles[chat.chat_participants[0].par_uid];
             tab_name = p.full_name.charAt(0).toUpperCase();
-          }
-          var pane_id = "chat" + chat.chatid;
-          var tab = $("<a/>", {href:"#"+pane_id, "id":"tab-name", "data-toggle":"tab"});
-          tabs.append($("<li id='chat-tab-div' />")
+            tabs.append($("<li id='chat-tab-div' />")
               .append(tab));
-          tab.append($("<div id='prof-circ' />")
+            tab.append($("<div id='prof-circ' />")
              .append(tab_name));
+          }
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
                      .append(chatView(chat)));
         });
