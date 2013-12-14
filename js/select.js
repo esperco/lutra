@@ -124,9 +124,8 @@ var select = (function() {
       addDivClass();
       addButtonClass();
       setButtonLabel(o);
-      if (state !== null)
-        if (noAction !== true && util.isDefined(o.action))
-          o.action(state);
+      if (state !== null && noAction !== true)
+        runAction(o, state);
     }
 
     var initialKey = util.isDefined(param.initialKey) ?

@@ -54,11 +54,20 @@ var chat = (function () {
     return sel;
   }
 
+  function appendLocation(elt, loc) {
+    var locText = sched.locationText(loc);
+    if (locText) {
+      $("<span/>")
+        .text("Location: " + locText)
+        .appendTo(elt);
+    }
+  }
+
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
     v.append(date.range(date.ofString(slot.start), date.ofString(slot.end)));
     v.append($("<br/>"));
-    v.append("Location: " + slot.location.title);
+    appendLocation(v, slot.location);
     return v;
   }
 

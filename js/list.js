@@ -62,9 +62,8 @@ var list = (function() {
   mod.exists = function(a, f) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      if (f(a[i]), i) {
+      if (f(a[i], i))
         return true;
-      }
     }
     return false;
   }
