@@ -65,25 +65,25 @@
 
             <div class="hide" id="status"></div>
             <div class="hide" id="hidden-status"></div>
-
-            <ul class="nav nav-tabs">
+            <h3>Scheduling Tasks</h3>
+            <hr>
+            <!-- <ul class="nav nav-tabs">
               <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   Scheduling
                 </a>
               </li>
-              <!-- <li id="active-tasks-tab">
+              <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   General
                 </a>
               </li>
               <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
-                  Completed
+                  Archived
                 </a>
-              </li> -->
-              <!-- add more tabs as needed -->
-            </ul>
+              </li>
+            </ul> -->
             <div id="active-tasks-tab-content" class="hide"></div>
             <!-- add more hidden tab content views as needed -->
           </div>
