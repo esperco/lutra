@@ -56,6 +56,10 @@ var sched4 = (function() {
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
     $("#sched-confirm-message")
       .val(body);
+
+    var footer = $("#sched-confirm-message-readonly");
+    footer.children().remove();
+    footer.append(sched.viewOfSuggestion(slot));
   }
 
   function editEventDetails(tid, chats, uid) {
@@ -116,12 +120,14 @@ var sched4 = (function() {
       confirmModal.modal("hide");
     }
 
+    function composeConfirmationEmail() {
+      preFillConfirmModal(chats, profs, task, slot, uid);
+      confirmModal.modal({});
+    }
+
     $("<a class='final-sched-action col-xs-11'>Send a confirmation message</a>")
       .unbind('click')
-      .click(function() {
-        preFillConfirmModal(chats, profs, task, slot, uid);
-        confirmModal.modal({});
-      })
+      .click(composeConfirmationEmail)
       .appendTo(divConfirmation);
 
     var sendButton = $("#sched-confirm-send");
@@ -188,7 +194,10 @@ var sched4 = (function() {
     divConfirmation.appendTo(view);
     divInvitation.appendTo(view);
 
-    return view;
+    return {
+      view: view,
+      composeConfirmationEmail: composeConfirmationEmail
+    };
   }
 
   function createReminderSelector(chats, task, uid) {
@@ -251,15 +260,16 @@ var sched4 = (function() {
 
     var tid = task.tid;
     var chats = sched.chatsOfTask(task);
-    sched.forEachParticipant(task, function(uid) {
-      if (sched.isGuest(uid)) {
-        var rowView =
-          step4RowViewOfParticipant(chats, profs, task, uid)
-          .appendTo(view);
-        var reminderSelector =
-          createReminderSelector(chats, task, uid).appendTo(view);
-      }
-    })
+    var guests = sched.getGuests(task);
+    var numGuests = guests.length;
+    list.iter(guests, function(uid) {
+      var x = step4RowViewOfParticipant(chats, profs, task, uid);
+      view.append(x.view);
+      var reminderSelector =
+        createReminderSelector(chats, task, uid).appendTo(view);
+      if (numGuests == 1 && ! sentConfirmation(chats, uid))
+        x.composeConfirmationEmail();
+    });
   };
 
   return mod;
