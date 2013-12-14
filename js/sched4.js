@@ -19,7 +19,8 @@ var sched4 = (function() {
 
   function sentInvitations(task) {
     var state = sched.getState(task);
-    return util.isDefined(state.reserved) && util.isDefined(state.reserved.google_event);
+    return util.isDefined(state.reserved) &&
+      util.isDefined(state.reserved.google_event);
   }
 
   function formalEmailBody(organizerName, hostName, toName, when, where) {

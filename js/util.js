@@ -98,5 +98,10 @@ var util = (function () {
       });
   };
 
+  /* 0 -> "A", 1 -> "B", ... */
+  mod.letterOfInt = function(n) {
+    return String.fromCharCode(65 + n);
+  }
+
   return mod;
 })();

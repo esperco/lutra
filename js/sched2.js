@@ -18,10 +18,13 @@ var sched2 = (function() {
   var addressMarker = null;
 
   function loadSuggestions(profs, task, meetingParam) {
+    clearSuggestions();
     var state = sched.getState(task);
     state.meeting_request = meetingParam;
     api.getSuggestions(meetingParam)
-      .done(function(x) { refreshSuggestions(profs, task, x); });
+      .done(function(x) {
+        refreshSuggestions(profs, task, x);
+      });
   }
 
   function clearLocation() {
@@ -34,20 +37,18 @@ var sched2 = (function() {
     instr.val("");
   }
 
-  function getLocation(tz) {
+  function getLocation() {
     return {
       title: $("#sched-step2-loc-title").val(),
       address: $("#sched-step2-loc-addr").val(),
       instructions: $("#sched-step2-loc-instr").val(),
-      timezone: tz
+      timezone: timeZoneDropdown.get()
     };
   }
 
   function initMeetingParam(task) {
-    var location = getLocation("US/Pacific");
     return {
       participants: task.task_participants.organized_for,
-      location: [location],
       on_site: true
     };
     /* uninitialized but required:
@@ -56,10 +57,14 @@ var sched2 = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
+  function clearSuggestions() {
+    $("#sched-step2-suggestions").children().remove();
+  }
+
   function refreshSuggestions(profs, task, x) {
+    clearSuggestions();
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
-    view.children().remove();
 
     /* maintain a list of at most 3 selected items, first in first out */
     var selected = [];
@@ -250,16 +255,14 @@ var sched2 = (function() {
 
     /* value holding the current scheduling constraints;
        an event is fired each time it changes */
-    var meetingParam = initMeetingParam(task);
+    var meetingParam;
 
     /* read values from selectors 1-4 and update the meetingParam */
     function mergeSelections() {
       var old = meetingParam;
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
-      var loc = getLocation();
-      loc.timezone = sel4.get();
-      x.location[0] = loc;
+      x.location = [getLocation()];
       util.addFields(x, sel2.get());
       x.how_soon = sel3.get();
       meetingParam = x;
@@ -293,7 +296,7 @@ var sched2 = (function() {
     function opt(label, key, value, action) {
       return { label: label, key: key, value: value, action: action };
     }
-    var sel1 = select.create({
+    sel1 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       options: [
@@ -315,7 +318,7 @@ var sched2 = (function() {
       return { duration: 60 * dur,
                buffer_time: 60 * buf };
     }
-    var sel2 = select.create({
+    sel2 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action2,
@@ -332,7 +335,7 @@ var sched2 = (function() {
     });
 
     /* urgency */
-    var sel3 = select.create({
+    sel3 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action3,
@@ -347,7 +350,7 @@ var sched2 = (function() {
     /* time zone */
     var tzOptions =
       list.map(tzList, function(tz) { return { label: tz, value: tz }; });
-    var sel4 = select.create({
+    sel4 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action4,
@@ -379,6 +382,7 @@ var sched2 = (function() {
     sel3.view.appendTo(colUrgency);
     sel4.view.appendTo(viewTimeZone);
 
+    meetingParam = initMeetingParam(task);
     sel1.set("meeting");
 
     step2Selector.show("sched-step2-prefs");
@@ -436,6 +440,7 @@ var sched2 = (function() {
   function geocodeAddress() {
     var address = $("#sched-step2-loc-addr").val();
     if (address == "") return;
+    clearSuggestions();
     var leaderUid = login.data.team.team_leaders[0];
     api.getCoordinates(leaderUid, address)
       .done(function(coords) {
@@ -445,7 +450,7 @@ var sched2 = (function() {
         googleMap.panTo(geocoded);
         api.getTimezone(leaderUid, coords.lat, coords.lon)
           .done(function(tz) {
-            timeZoneDropdown.set(tz, true);
+            timeZoneDropdown.set(tz);
           })
       })
   }

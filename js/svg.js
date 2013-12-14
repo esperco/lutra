@@ -20,12 +20,13 @@ var svg = (function() {
   mod.loadImg = function(img, url) {
     return svgCache.getCached(url)
       .then(function(data) {
+        if (!data)
+          log("bad result for svgCache.getCached("+ url +"):", data);
         var svgRoot = $(data)
           .attr("id", img.attr("id"))
           .attr("src", url)
           .attr("class", img.attr("class"));
         img.replaceWith(svgRoot);
-        log("loaded svg data!", data);
         return svgRoot;
       });
   };

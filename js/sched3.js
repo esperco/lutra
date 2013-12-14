@@ -3,6 +3,13 @@
 var sched3 = (function() {
   var mod = {};
 
+  function sentEmail(chats, uid) {
+    var chat = chats[uid];
+    return list.exists(chat.chat_items, function(x) {
+      return (x.chat_item_data[0] === "Scheduling_q");
+    });
+  }
+
   function formalEmailBody(organizerName, hostName, toName, howSoon) {
     return "Dear "+toName+",\n\n"+
 
@@ -13,21 +20,20 @@ var sched3 = (function() {
     "with your choice.";
   }
 
-  function viewOfOption(profs, calOption) {
+  function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
     var radio = $("<img class='esper-radio'/>");
-    svg.loadImg(radio, "/assets/img/radio.svg");
     radio.appendTo(view);
+    svg.loadImg(radio, "/assets/img/radio.svg");
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
     return view;
   }
 
-  function viewOfOptions(profs, task, onSelect) {
+  function viewOfOptions(task, onSelect) {
     var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
-
     var options = state.calendar_options;
 
     var idList = list.map(options, function(x) { return x.label; });
@@ -37,7 +43,7 @@ var sched3 = (function() {
     });
 
     list.iter(options, function(x) {
-      viewOfOption(profs, x)
+      viewOfOption(x)
         .click(function() {
           selector.show(x.label);
           onSelect(x);
@@ -45,6 +51,21 @@ var sched3 = (function() {
         .appendTo(view);
     });
 
+    return view;
+  }
+
+  function emailViewOfOption(calOption, i) {
+    return $("<div class='email-option'/>")
+      .append($("<div/>").text("Option " + util.letterOfInt(i)))
+      .append(sched.viewOfSuggestion(calOption.slot));
+  }
+
+  function emailViewOfOptions(options) {
+    var view = $("<div class='email-options'/>");
+    list.iter(options, function(x, i) {
+      emailViewOfOption(x, i)
+        .appendTo(view);
+    });
     return view;
   }
 
@@ -90,6 +111,10 @@ var sched3 = (function() {
     var body = formalEmailBody(organizerName, hostName, toName, howSoon);
     $("#sched-availability-message")
       .val(body);
+
+    var footer = $("#sched-availability-message-readonly");
+    footer.children().remove();
+    footer.append(emailViewOfOptions(options));
   }
 
 
@@ -167,7 +192,7 @@ var sched3 = (function() {
       next.removeClass("disabled");
     }
 
-    viewOfOptions(profs, task, onSelect)
+    viewOfOptions(task, onSelect)
       .appendTo(view);
 
     $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
@@ -181,7 +206,7 @@ var sched3 = (function() {
         rowViewOfParticipant(chats, profs, task, uid);
       x.view
         .appendTo(guestsContainer);
-      if (numGuests == 1)
+      if (numGuests == 1 && ! sentEmail(chats, uid))
         x.composeEmail();
     });
 
