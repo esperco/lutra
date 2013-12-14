@@ -54,19 +54,8 @@ var chat = (function () {
     return sel;
   }
 
-  function locationText(loc) {
-    if (loc.address)
-      return loc.address;
-    else if (loc.title)
-      return loc.title;
-    else if (loc.instructions)
-      return loc.instructions;
-    else
-      return "";
-  }
-
   function appendLocation(elt, loc) {
-    var locText = locationText(loc);
+    var locText = sched.locationText(loc);
     if (locText) {
       $("<span/>")
         .text("Location: " + locText)

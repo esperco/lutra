@@ -53,6 +53,17 @@ var sched = (function() {
 
   /******************************************/
 
+  mod.locationText = function(loc) {
+    if (loc.address)
+      return loc.address;
+    else if (loc.title)
+      return loc.title;
+    else if (loc.instructions)
+      return loc.instructions;
+    else
+      return "";
+  }
+
   mod.viewOfSuggestion = function(x) {
     var view = $("<div class='sug-details'/>");
 
@@ -73,6 +84,14 @@ var sched = (function() {
       .append(html.text(" to "))
       .append($("<b>").text(date.timeOnly(t2)))
       .appendTo(view);
+
+    var locText = mod.locationText(x.location);
+    if (locText) {
+      $("<div class='location-text' />")
+        .append(html.text("Location: "))
+        .append(html.text(locText))
+        .appendTo(view);
+    }
 
     return view;
   }

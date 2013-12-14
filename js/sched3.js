@@ -24,8 +24,8 @@ var sched3 = (function() {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
     var radio = $("<img class='esper-radio'/>");
-    svg.loadImg(radio, "/assets/img/radio.svg");
     radio.appendTo(view);
+    svg.loadImg(radio, "/assets/img/radio.svg");
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
     return view;
