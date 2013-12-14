@@ -58,6 +58,7 @@ var sched2 = (function() {
   }
 
   function clearSuggestions() {
+    $(".sched-step2-next").addClass("disabled");
     $("#sched-step2-suggestions").children().remove();
   }
 
