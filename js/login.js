@@ -36,9 +36,7 @@ var login = (function() {
   */
   mod.login = function (email, password) {
     return api.login(email, password)
-      .done(function cont(login) {
-        mod.setLoginInfo(login);
-      });
+      .done(mod.setLoginInfo);
   }
 
   mod.logout = function () {
