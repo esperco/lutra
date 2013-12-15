@@ -6,8 +6,9 @@ var route = (function() {
   mod.nav = {};
 
   function withLogin(f) {
-    if (!login.data)
+    if (! util.isDefined(login.data)) {
       location.hash = "#!login/redir/" + encodeURIComponent(location.hash);
+    }
     else
       f ();
   }
