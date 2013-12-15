@@ -1,18 +1,23 @@
 var page = (function() {
 
-  var mod = {};
+  var mod = {
+    login: {},
+    requestPassword: {},
+    resetPassword: {},
+    home: {},
+    task: {},
+    scheduling: {},
+    respond: {}
+  };
   var pageNames = [
     "login",
+    "request-password",
+    "reset-password",
     "home",
     "task",
     "scheduling",
     "respond"
   ];
-
-  /* initialize subentry for each page, e.g. page.home */
-  for (var i in pageNames) {
-    mod[pageNames[i]] = {};
-  }
 
   mod.home.tab = {
     activeTasks: "active-tasks"
@@ -66,6 +71,56 @@ var page = (function() {
       });
   }
 
+  function prepareRequestPassword(email0) {
+    var input = $("#passreq-email");
+    if (! email0)
+      email0 = $("#login-email").val();
+
+    input.val(email0);
+
+    function submit() {
+      var email = input.val();
+      if (email !== "") {
+        api.requestPassword(email)
+          .done(function() {
+            status.reportSuccess("Success. Check your email.");
+          })
+          .fail(function () {
+            status.reportError("Oops, something went wrong.");
+          });
+      };
+      return false;
+    }
+
+    $("#passreq-button")
+      .unbind('click')
+      .click(submit);
+  }
+
+  function prepareResetPassword(uid, token) {
+    var input = $("#passreset-password");
+    input.val("");
+
+    function submit() {
+      var password = input.val();
+      if (password !== "") {
+        api.resetPassword(uid, token, password)
+          .done(function(x) {
+            login.setLoginInfo(x);
+            route.nav.path("");
+          })
+          .fail(function () {
+            status.reportError("Oops, something went wrong.");
+          });
+      };
+      return false;
+    }
+
+    $("#passreset-button")
+      .unbind('click')
+      .click(submit);
+  }
+
   function showRespond(rid, asUid) {
     api.getTaskRequestFor(rid, asUid); // TODO call returns task from rid,
                                        // keeps only responses from this
@@ -103,6 +158,20 @@ var page = (function() {
     prepareLogin(redirPath);
     show("login");
     $("#login-email").focus();
+  };
+
+  mod.requestPassword.load = function(email) {
+    hideAll();
+    prepareRequestPassword(email);
+    show("request-password");
+    $("#passreq-email").focus();
+  };
+
+  mod.resetPassword.load = function(uid, token) {
+    hideAll();
+    prepareResetPassword(uid, token);
+    show("reset-password");
+    $("#passreset-password").focus();
   };
 
   mod.task.load = function(optTid) {

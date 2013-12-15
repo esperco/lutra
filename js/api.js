@@ -64,6 +64,18 @@ var api = (function () {
     return jsonHttpPost("/api/login", JSON.stringify(login_request));
   };
 
+  mod.requestPassword = function(email) {
+    var password_request = { email: email };
+    return jsonHttpPost("/api/password-request",
+                        JSON.stringify(password_request));
+  };
+
+  mod.resetPassword = function(uid, token, password) {
+    var password_reset = { password: password };
+    return jsonHttpPost("/api/password/" + uid + "/" + token,
+                        JSON.stringify(password_reset));
+  };
+
   function api_profile_prefix() {
     return "/api/profile/" + login.data.uid;
   }

@@ -54,8 +54,20 @@
           <button id="login-button" class="btn btn-primary login-btn">
             LOG IN
           </button>
+          <div>
+            Forgot password?
+            <a href="#!request-password">Click here to reset.</a>
+          </div>
         </form>
       </div>
+    </div>
+
+    <div id="request-password-page" class="hide">
+      @@request-password.html@@
+    </div>
+
+    <div id="reset-password-page" class="hide">
+      @@reset-password.html@@
     </div>
 
     <div id="home-page" class="hide">
