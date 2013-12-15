@@ -28,6 +28,8 @@ var login = (function() {
   mod.clearLoginInfo = function() {
     store.remove("login");
     delete mod.data;
+    $("#login-email").val("");
+    $("#login-password").val("");
     mod.updateView();
   }
 
