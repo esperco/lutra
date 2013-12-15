@@ -58,8 +58,11 @@ var page = (function() {
         var password = $("#login-password").val();
         if (email !== "" && password !== "") {
           login.login(email, password)
-            .done(function() { route.nav.path(redirPath); });
+            .done(function() {
+              route.nav.path(redirPath);
+            });
         }
+        return false;
       });
   }
 

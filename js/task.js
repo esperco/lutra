@@ -84,6 +84,8 @@ var task = (function() {
       util.afterTyping(input, $("#new-task-title"), function () {
         if (isValidTitle(input.val()))
           startTaskButton.removeClass("disabled");
+        else
+          startTaskButton.addClass("disabled");
       });
       input.focus();
     }
@@ -108,7 +110,7 @@ var task = (function() {
           api.createTask(task)
             .done(function(task) {
               /* change URL */
-              window.location.hash = "!task/" + task.tid;
+              window.location.hash = "#!task/" + task.tid;
             });
         };
       }
