@@ -70,6 +70,9 @@ var page = (function() {
 
   function prepareRequestPassword(email0) {
     var input = $("#passreq-email");
+    if (! email0)
+      email0 = $("#login-email").val();
+
     input.val(email0);
 
     function submit() {
