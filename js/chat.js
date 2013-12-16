@@ -270,10 +270,10 @@ var chat = (function () {
 
     selChoicesDiv.click(function () {
       if (selChoicesDiv.hasClass("checkbox-selected")) {
-        selChoicesDiv.removeClass("checkbox-selected")
+        selChoicesDiv.removeClass("checkbox-selected");
       } else {
-        selChoicesDiv.addClass("checkbox-selected")
-      };
+        selChoicesDiv.addClass("checkbox-selected");
+      }
       choicesEditor.toggle();
     });
 
@@ -318,15 +318,15 @@ var chat = (function () {
 
   function chatView(chat, task) {
     var me = login.me();
+    var v = $("<div/>");
 
-    var displayName = $(".chat-profile-details");
+    var displayName = $("<div class='chat-profile-details'></div>")
+      .appendTo(v);
     if (chat.chatid === task.task_context_chat) {
       displayName.append("Original Email");
     } else {
       displayName.append(chat_participant_names(chat));
     }
-
-    var v = $("<div/>");
 
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
