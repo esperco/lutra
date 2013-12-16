@@ -127,10 +127,10 @@
 
       <div id="chat" class="col-md-4 pull-right">
         <div id="chat-header">
-          <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
-          <div id="chat-profile-details"></div>
+          <ul class="nav nav-tabs chat-profile-tabs"></ul>
+          <div class="chat-profile-details"></div>
         </div>
-        <div id="chat-panel" class="tab-content"></div>
+        <div class="tab-content chat-panel"></div>
       </div>
 
     </div>

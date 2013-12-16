@@ -110,7 +110,7 @@ var sched2 = (function() {
 
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div class='suggestion' />");
-      var checkbox = $("<img id='suggestion-checkbox' class='esper-checkbox'/>");
+      var checkbox = $("<img class='suggestion-checkbox'/>");
       checkbox.appendTo(slotView);
       svg.loadImg(checkbox, "/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot);
@@ -126,10 +126,10 @@ var sched2 = (function() {
           var v = {
             slot: slot,
             untick: function() {
-              slotView.removeClass("esper-checkbox-selected")
+              slotView.removeClass("checkbox-selected")
             },
           };
-          slotView.addClass("esper-checkbox-selected");
+          slotView.addClass("checkbox-selected");
           select(k, v);
         }
       });
