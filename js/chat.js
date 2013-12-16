@@ -138,14 +138,14 @@ var chat = (function () {
   }
 
   function editChoiceOption() {
-    var v = $("<li class='option' />");
+    var v = $("<li class='option'/>");
     var radio = $("<img class='option-radio'/>");
     radio.appendTo(v);
     svg.loadImg(radio, "/assets/img/radio.svg");
 
-    var editDiv = $("<div class='options-input-div' />")
-    var edit = $("<input class='form-control options-input' />", {placeholder:"Add option."});
-    editDiv.append(edit)
+    var editDiv = $("<div class='options-input-div'/>")
+    var edit = $("<input class='form-control options-input'/>", {placeholder:"Add option."});
+    editDiv.append(edit);
     v.append(editDiv);
 
     edit.keydown(function (e) {
@@ -177,12 +177,12 @@ var chat = (function () {
   }
 
   function buttonToAddChoiceOption() {
-    var v = $("<li class='option' />");
-    var radio = $("<img class='option-radio'/>");
+    var v = $("<li class='option'/>");
+    var radio = $("<img class='option-radio add-option-radio'/>");
     radio.appendTo(v);
     svg.loadImg(radio, "/assets/img/radio.svg");
 
-    var button = $("<button class='add-option'>Click to add option</button>");
+    var button = $("<button class='add-option-btn'>Click to add option</button>");
     button.click(function() {
       var li = editChoiceOption();
       v.before(li);
@@ -193,9 +193,9 @@ var chat = (function () {
   }
 
   function editChoices() {
-    var v = $("<ul class='option-list' />");
+    var v = $("<ul class='option-list'/>");
     var opt1 = editChoiceOption();
-    opt1.find("input").val("Option 1");
+    opt1.find("input").focus();
     v.append(opt1);
     v.append(buttonToAddChoiceOption());
     return v;
@@ -221,35 +221,42 @@ var chat = (function () {
   }
 
   function chatEditor(chat, task) {
-    var chatFooter = $("<div class='navbar-fixed-bottom col-md-4 chat-footer' />");
+    var chatFooter = $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
-      var toField = $("<div class='to-field' />")
+      var toField = $("<div class='to-field'/>")
         .appendTo(chatFooter);
       toField.append($("<b>To:</b>"));
       toField.append(" " + chat_participant_names(chat));
     }
 
-    var v = $("<div class='chat-editor' />")
+    var v = $("<div class='chat-editor'/>")
       .appendTo(chatFooter);
 
     var editText = $("<textarea/>", {
       'class': "form-control chat-entry",
       'placeholder': "Write a reply..."
     });
-    // editText.click(function () {
-    // })
+    editText.on("keyup", function (e){
+      $(this).css("height", "auto");
+      $(this).height(this.scrollHeight);
+    });
+    editText.keyup();
     editText.appendTo(v);
 
     var choicesEditor = editChoices();
     choicesEditor.hide();
     v.append(choicesEditor);
 
-    var chatActions = $("<div class='chat-actions clearfix' />")
+    var chatActions = $("<div class='chat-actions clearfix hide'/>")
       .appendTo(v);
-    var selChoicesDiv = $("<div class='col-xs-10 offer-choices' />")
+    editText.focus(function () {
+      chatActions.removeClass("hide");
+    })
+
+    var selChoicesDiv = $("<div class='col-xs-10 offer-choices'/>")
       .appendTo(chatActions);
-    var sendDiv = $("<div class='col-xs-2 chat-send' />")
+    var sendDiv = $("<div class='col-xs-2 chat-send'/>")
       .appendTo(chatActions);
 
     var selChoices = $("<img class='offer-choices-checkbox'/>");
@@ -262,16 +269,27 @@ var chat = (function () {
     selChoicesDiv.append(selChoicesLabel);
 
     selChoicesDiv.click(function () {
-      choicesEditor.toggle()
-      // if (selChoices.hasClass('checkbox-selected') {
-      //   selChoices.removeClass('checkbox-selected')
-      // } else {
-      //   selChoices.addClass('checkbox-selected')
-      // });
+      if (selChoicesDiv.hasClass("checkbox-selected")) {
+        selChoicesDiv.removeClass("checkbox-selected")
+      } else {
+        selChoicesDiv.addClass("checkbox-selected")
+      };
+      choicesEditor.toggle();
     });
 
-    var sendButton = $("<button class='btn btn-primary chat-send-btn'>Send</button>")
+    var sendButton = $("<button class='btn btn-primary chat-send-btn disabled'>Send</button>")
       .appendTo(sendDiv);
+
+    function isValidMessage(s) {
+      return s.length > 0;
+    }
+
+    editText.val("");
+    util.afterTyping(editText, $(".chat-entry"), function () {
+      if (isValidMessage(editText.val()))
+        sendButton.removeClass("disabled");
+    });
+
     sendButton.click(function () {
       var data = selChoices.prop("checked")
                ? selector_q_data(editText.val(), choicesEditor)
@@ -322,14 +340,16 @@ var chat = (function () {
       v.append(viewOfChatItem(item, item.time_created, status));
     }
 
+    v.append($("<div class='chat-push'/>"));
     v.append(chatEditor(chat, task));
+    v.scroll(0, v.height); /* trying to auto scroll to bottom */
 
     return v;
   }
 
   $("#chat-footer").onresize = function adjustPush() {
       var footerHeight = $("chat-footer").height();
-      $("#chat-push").attr('style', 'height:' + footerHeight + 'px');
+      $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
   };
 
   mod.loadTaskChats = function(task) {

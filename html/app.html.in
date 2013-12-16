@@ -93,7 +93,7 @@
 
     <div id="task-page" class="hide">
 
-      <div id="task-content" class="col-md-8">
+      <div id="task-content" class="col-md-8 scrollable">
 
         <div id="task-navbar" class="navbar">
           <a href="#">
@@ -125,7 +125,7 @@
 
       </div>
 
-      <div id="chat" class="col-md-4 pull-right">
+      <div id="chat" class="col-md-4 scrollable pull-right">
         <div id="chat-header">
           <ul class="nav nav-tabs chat-profile-tabs"></ul>
           <div class="chat-profile-details"></div>
