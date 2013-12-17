@@ -62,6 +62,21 @@ var sched4 = (function() {
     footer.append(sched.viewOfSuggestion(slot));
   }
 
+  function preFillReminderModal(task, slot) {
+    $("#sched-reminder-subject")
+      .val("Re: " + task.task_status.task_title);
+
+    api.getReminderMessage()
+      .done(function(x) {
+        $("#sched-reminder-message")
+          .val(x.text);
+      });
+
+    var footer = $("#sched-reminder-message-readonly");
+    footer.children().remove();
+    footer.append(sched.viewOfSuggestion(slot));
+  }
+
   function editEventDetails(tid, chats, uid) {
     /* This function doesn't do anything right now,
       but it should be a function accessed on click (or automatically popped).
@@ -91,7 +106,7 @@ var sched4 = (function() {
     var state = sched.getState(task);
     var slot = state.reserved.slot;
 
-    /* Edit event details */
+    /*** Edit event details ***/
 
     // $("<a class='final-sched-actions'>Edit event details</a>")
     //   .click(function() {
@@ -104,7 +119,7 @@ var sched4 = (function() {
     // checkDetails.appendTo(divDetails);
     // $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
 
-    /* Send a confirmation */
+    /*** Send a confirmation ***/
 
     var divConfirmationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divConfirmation);
@@ -157,7 +172,7 @@ var sched4 = (function() {
         }
       });
 
-    /* Send a Google Calendar invitation */
+    /*** Send a Google Calendar invitation ***/
 
     var divInvitationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divInvitation);
@@ -200,9 +215,22 @@ var sched4 = (function() {
     };
   }
 
-  function createReminderSelector(chats, task, uid) {
+  /*** Reminders (same message sent to everyone) ***/
+
+  function createReminderSelector(chats, profs, task, uid) {
     var sel;
     var reserved = sched.getState(task).reserved;
+    var slot = reserved.slot;
+
+    var reminderModal = $("#sched-reminder-modal");
+    function closeReminderModal() {
+      reminderModal.modal("hide");
+    }
+
+    function composeReminderEmail() {
+      preFillReminderModal(task, slot);
+      reminderModal.modal({});
+    }
 
     function saveTask() {
       var remind = sel.get();
@@ -247,11 +275,24 @@ var sched4 = (function() {
     svg.loadImg(checkReminder, "/assets/img/check.svg")
       .then(function(elt) { checkReminder = elt; });
 
+    var previewLink = $("<button class='btn btn-primary'>Preview</button>")
+      .unbind('click')
+      .click(function() {
+        composeReminderEmail();
+      });
+
+    var okButton = $("#sched-reminder-update");
+    okButton
+      .unbind('click')
+      .click(closeReminderModal);
+
     var divReminderInstr = $("<div class='instr-div col-xs-11'>")
       .appendTo(divReminder);
     $("<h3 class='final-sched-text'>Send a reminder</h3>")
       .appendTo(divReminderInstr);
-    divReminderInstr.append(sel.view);
+    divReminderInstr
+      .append(sel.view)
+      .append(previewLink);
 
     return divReminder;
   }
@@ -266,7 +307,7 @@ var sched4 = (function() {
       var x = step4RowViewOfParticipant(chats, profs, task, uid);
       view.append(x.view);
       var reminderSelector =
-        createReminderSelector(chats, task, uid).appendTo(view);
+        createReminderSelector(chats, profs, task, uid).appendTo(view);
       if (numGuests == 1 && ! sentConfirmation(chats, uid))
         x.composeConfirmationEmail();
     });
