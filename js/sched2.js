@@ -74,6 +74,9 @@ var sched2 = (function() {
       .unbind('click')
       .click(function() {
         var slots = list.map(selected, function(v) { return v[1].slot; });
+        slots.sort(function(a, b) {
+          return date.ofString(a.start) - date.ofString(b.start);
+        });
         selectCalendarSlots(profs, task, slots);
       });
 
@@ -165,7 +168,8 @@ var sched2 = (function() {
   function selectCalendarSlots(profs, task, slots) {
     var x = task.task_data[1];
     task.task_status.task_progress = "Coordinating"; // status in the task list
-    x.scheduling_stage = "Coordinate";               // step in the scheduling page
+    x.scheduling_stage = "Coordinate"; // step in the scheduling page
+
     /* TODO: reserve calendar slots for leader of organizing team,
              unreserve previously-reserved calendar slots */
     x.calendar_options = labelSlots(slots);
