@@ -391,7 +391,7 @@ var chat = (function () {
           if (first_tab) {
             $(".chat-tab-div").addClass("active");
             $(".tab-pane").addClass("active");
-            first_iteration = false;
+            first_tab = false;
           }
         });
 
