@@ -39,6 +39,10 @@ object {
   pointer-events: none;
 }
 
+.scrollable {
+  overflow: auto;
+}
+
 *.unselectable {
   cursor: default;
    -moz-user-select: -moz-none;
@@ -72,6 +76,29 @@ object {
   background: none;
   border-bottom: 1px solid;
   border-bottom-color: #e6e7e8;
+}
+
+.request {
+  background-color: #dfdedd;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 1em;
+}
+
+.comments {
+  background-color: #d6d6d6;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-left: 0.3em;
+}
+
+.comment {
+  background-color: #dfdfdf;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  padding: 0.2em;
 }
 
 .author {
@@ -263,11 +290,14 @@ object {
 
 /*** Container ***/
 
+.container {
+  overflow: auto;
+}
+
 #task-content {
-  min-height: 100%;
+  height: 100%;
   position:relative;
   padding: 0;
-  overflow: scroll;
 }
 
 .split-screen {
@@ -318,8 +348,9 @@ object {
 
 #sched-availability-message,
 #sched-confirm-message {
-  min-width: 100%;
-  max-width: 100%;
+/*  min-width: 100%;
+  max-width: 100%;*/
+  resize: none;
 }
 
 
@@ -386,28 +417,82 @@ object {
 
 #chat-header {
   position: fixed;
+  z-index: 1040;
   height: 100px;
   width: 100%;
   background: rgba(248,248,248,0.9);
 }
 
-#chat-profile-details {
-  height: 40px;
-  background-color: #808285;
-  border-top: 1px solid #d1d3d4;
+.chat-profile-tabs {
+  height: 60px;
   border-bottom: 1px solid #d1d3d4;
 }
 
-#chat-profile-tabs {
-  /*position: fixed;*/
+.chat-tab-div {
+  height: 60px;
+  width: 60px;
 }
 
-#chat-panel {
+.prof-circ {
+  padding-top: 5px;
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  text-align: center;
+  vertical-align: middle;
+  background: #e6e7e8;
+}
+
+.group {
+  margin-top: 4px;
+}
+
+.prof-caret {
+  margin-left: 9px;
+}
+
+.tab-name {
+  color: #414042;
+}
+
+.tab-name:hover {
+  color: #414042;
+}
+
+.tab-name:hover .prof-circ {
+  background: #d1d3d4;
+}
+
+.nav-tabs > li.active > a .prof-caret path,
+.nav-tabs > li.active > a:hover .prof-caret path,
+.nav-tabs > li.active > a:focus .prof-caret path {
+  fill: white;
+}
+
+.nav-tabs > li.active > a .prof-circ,
+.nav-tabs > li.active > a:hover .prof-circ,
+.nav-tabs > li.active > a:focus .prof-circ {
+  background-color: white;
+}
+
+.chat-profile-details-div {
+  height: 40px;
+  background-color: white;
+  border-bottom: 1px solid #d1d3d4;
+}
+
+.chat-profile-details {
+  position: fixed;
+  z-index: 1040;
+  margin-top: -40px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.chat-panel {
+  margin-top: 110px;
   padding-left: 15px;
   padding-right: 15px;
-}
-
-.test {
+  overflow: auto;
 }
 
 .message-header {
@@ -439,6 +524,10 @@ object {
   font-size: 14px;
 }
 
+.chat-push {
+  height: 100px;
+}
+
 .chat-footer {
   margin-left: auto;
   margin-right: 0;
@@ -448,7 +537,7 @@ object {
   background: rgba(248,248,248,0.9);
 }
 
-#to-field {
+.to-field {
   height: 30px;
   padding-top: 5px;
   padding-left: 15px;
@@ -456,38 +545,88 @@ object {
   color: white;
   background-color: #808285;
   border-top: 1px solid #d1d3d4;
-  border-bottom: 1px solid #d1d3d4;
 }
 
-#chat-editor {
-  margin: 15px;
+.chat-editor {
+  border-top: 1px solid #d1d3d4;
+  padding: 15px;
 }
 
-#chat-entry {
+.chat-entry {
+  min-height: 68px;
   min-width: 100%;
   max-width: 100%;
+  resize: none;
+  overflow: hidden;
 }
 
-#chat-actions {
+.chat-actions {
   margin-top: 15px;
 }
 
-#offer-choices {
+.option-list {
+  padding-left: 28px;
+  list-style: none;
+}
+
+.option {
+  margin-top: 10px;
+}
+
+.option-radio {
+  margin-top: 7px;
+  margin-left: -28px;
+  height: 18px;
+  width: 18px;
+  float: left;
+}
+
+.option:hover .option-radio path.radio-outline {
+  fill: #a7a9ac;
+}
+
+.add-option-radio path.radio-outline {
+  fill: #e6e7e8;
+}
+
+.option:hover .add-option-radio path.radio-outline {
+  fill: #d1d3d4;
+}
+
+.add-option-btn {
+  height: 32px;
+  width: 100%;
+  padding-left: 12px;
+  text-align: left;
+  font-size: 14px;
+  color: #e6e7e8;
+  border: 2px solid #e6e7e8;
+  background: white;
+  border-radius: 4px;
+}
+
+.add-option-btn:hover {
+  color: #808285;
+  border: 2px solid #d1d3d4;
+  cursor: pointer;
+}
+
+.offer-choices {
   padding-left: 0;
 }
 
-#offer-choices-checkbox {
+.offer-choices:hover {
+  cursor: pointer;
+}
+
+.offer-choices-checkbox {
   float: left;
   margin-top: 5px;
   height: 18px;
   width: 18px;
 }
 
-#offer-choices:hover {
-  cursor: pointer;
-}
-
-#offer-choices-label {
+.offer-choices-label {
   float: left;
   margin-top: 5px;
   margin-left: 10px;
@@ -495,11 +634,11 @@ object {
   cursor: pointer;
 }
 
-#chat-send {
+.chat-send {
   padding-right: 0;
 }
 
-#chat-send-btn {
+.chat-send-btn {
   float: right;
 }
 
@@ -547,44 +686,43 @@ object {
   cursor: pointer;
 }
 
-#suggestion-checkbox {
+.suggestion-checkbox {
   float: left;
   margin-top: 16px;
   width: 24px;
   height: 24px;
 }
 
-.esper-radio {
+.suggestion-radio {
   float: left;
   margin-top: 16px;
   width: 24px;
   height: 24px;
 }
 
-#offer-choices-checkbox:hover path.check-outline,
-#offer-choices-label:hover path.check-outline,
+.offer-choices:hover path.check-outline,
 .suggestion:hover path.check-outline,
 .suggestion:hover path.radio-outline {
   fill: #a7a9ac;
 }
 
-.esper-checkbox-selected path.check-background,
-.esper-radio-selected path.radio-background {
+.checkbox-selected path.check-background,
+.radio-selected path.radio-background {
   fill: #e8d9ee;
 }
 
-.esper-checkbox-selected path.check-outline,
-.esper-radio-selected path.radio-outline {
+.checkbox-selected path.check-outline,
+.radio-selected path.radio-outline {
   fill: #a25cc6;
 }
 
-.esper-checkbox-selected path.check,
-.esper-radio-selected circle {
+.checkbox-selected path.check,
+.radio-selected circle {
   fill: #414042;
 }
 
-.esper-checkbox-selected:hover path.check-outline,
-.esper-radio-selected:hover path.radio-outline {
+.checkbox-selected:hover path.check-outline,
+.radio-selected:hover path.radio-outline {
   fill: #8c42ad;
 }
 
@@ -611,14 +749,9 @@ object {
   font-size: 14px;
 }
 
-.location-text {
-  font-size: 14px;
-}
-
 .suggestion:hover .day-text,
 .suggestion:hover .date-text,
-.suggestion:hover .time-text,
-.suggestion:hover .location-text {
+.suggestion:hover .time-text {
   color: #808285;
 }
 
