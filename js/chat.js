@@ -248,12 +248,8 @@ var chat = (function () {
     choicesEditor.hide();
     v.append(choicesEditor);
 
-    var chatActions = $("<div class='chat-actions clearfix hide'/>")
+    var chatActions = $("<div class='chat-actions clearfix'/>")
       .appendTo(v);
-    editText.focus(function () {
-      chatActions.removeClass("hide");
-    })
-
     var selChoicesDiv = $("<div class='col-xs-10 offer-choices'/>")
       .appendTo(chatActions);
     var sendDiv = $("<div class='col-xs-2 chat-send'/>")
@@ -342,15 +338,19 @@ var chat = (function () {
 
     v.append($("<div class='chat-push'/>"));
     v.append(chatEditor(chat, task));
-    v.scroll(0, v.height); /* trying to auto scroll to bottom */
+    var footerHeight = $(".chat-footer").height();
+    log("Height: " + footerHeight);
+    $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
+
+    v.scrollTop = v.scrollHeight;
 
     return v;
   }
 
-  $("#chat-footer").onresize = function adjustPush() {
-      var footerHeight = $("chat-footer").height();
-      $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
-  };
+  // $("#chat-footer").onresize = function adjustPush() {
+  //     var footerHeight = $("chat-footer").height();
+  //     $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
+  // };
 
   mod.loadTaskChats = function(task) {
     $(".chat-profile-tabs li").remove();
@@ -364,14 +364,16 @@ var chat = (function () {
           profiles[p.prof.profile_uid] = p.prof;
         });
 
+        var first_tab = true;
         list.iter(task.task_chats, function (chat) {
           var tab_name;
           var pane_id = "chat" + chat.chatid;
           var tab = $("<a/>", {href:"#"+pane_id, "class":"tab-name", "data-toggle":"tab"});
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
+          tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
+                     .append(chatView(chat, task)));
           if (chat.chatid === task.task_context_chat) {
-            $(".chat-tab-div").addClass("active");
             var group = $("<img class='group'/>");
             tab.append($("<div class='prof-circ'/>")
                .append(group));
@@ -386,11 +388,15 @@ var chat = (function () {
           var caret = $("<img class='prof-caret'/>");
           caret.appendTo(tab);
           svg.loadImg(caret, "/assets/img/caret.svg");
-          tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
-                     .append(chatView(chat, task)));
+          if (first_tab) {
+            $(".chat-tab-div").addClass("active");
+            $(".tab-pane").addClass("active");
+            first_iteration = false;
+          }
         });
 
         $("#chat").removeClass("hide");
+
       });
   }
 
