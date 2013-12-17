@@ -180,5 +180,10 @@ var api = (function () {
     return jsonHttpPost(url, "");
   };
 
+  mod.getReminderMessage = function() {
+    var url = api_s_prefix() + "/reminder/message";
+    return jsonHttpGet(url);
+  };
+
   return mod;
 })();
