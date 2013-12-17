@@ -139,14 +139,27 @@ var chat = (function () {
 
   function editChoiceOption() {
     var v = $("<li class='option'/>");
-    var radio = $("<img class='option-radio'/>");
-    radio.appendTo(v);
+    var radio = $("<img class='option-radio'/>")
+      .appendTo(v);
     svg.loadImg(radio, "/assets/img/radio.svg");
 
-    var editDiv = $("<div class='options-input-div'/>")
-    var edit = $("<input class='form-control options-input'/>", {placeholder:"Add option."});
-    editDiv.append(edit);
+    var editDiv = $("<div class='options-input'/>");
+    var edit = $("<input class='form-control'/>")
+      .appendTo(editDiv);
     v.append(editDiv);
+
+    var deleteDiv = $("<div/>");
+    if ($(".option-list").children().length > 2) {
+      var x = $("<img class='option-delete'/>")
+        .appendTo(deleteDiv);
+      svg.loadImg(x, "/assets/img/delete.svg");
+    }
+
+    deleteDiv.click(function() {
+      v.prev().find("input").focus();
+      v.remove();
+    });
+    deleteDiv.appendTo(v);
 
     edit.keydown(function (e) {
       switch (e.which) {
@@ -160,7 +173,7 @@ var chat = (function () {
 
       case 8:
       case 46:
-        if (edit.val() === "" && 1 < v.parent().children().length) {
+        if (edit.val() === "" && 2 < v.parent().children().length) {
           v.prev().find("input").focus();
           v.remove();
           return false;
@@ -188,7 +201,9 @@ var chat = (function () {
       v.before(li);
       li.find("input").focus();
     });
+
     v.append(button);
+
     return v;
   }
 
