@@ -4,9 +4,11 @@
 */
 /* set a max-width for horizontal fluid layout and make it centered */
 .container {
-  padding-top: 100px;
+  margin-top: 60px;
+  padding-top: 40px;
   padding-bottom: 120px;
   max-width: 534px;
+  overflow-y: auto;
 }
 .col-sm-3,
 .col-sm-4,
@@ -234,6 +236,9 @@ fieldset[disabled] .btn-primary.active {
   box-shadow: none;
 }
 /*** Modals ***/
+.modal {
+  z-index: 1050;
+}
 .modal-header {
   border-bottom: 1px solid #e6e7e8;
 }

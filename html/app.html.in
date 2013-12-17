@@ -59,7 +59,7 @@
     </div>
 
     <div id="home-page" class="hide">
-      <div class="navbar-push container">
+      <div class="navbar-push container scrollable">
         <div class="row">
           <div class="span12 queue-tab-area">
 
@@ -121,7 +121,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="navbar-push hide"></div>
+        <div id="gen-task" class="hide"></div>
 
       </div>
 

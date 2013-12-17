@@ -148,24 +148,12 @@ var chat = (function () {
       .appendTo(editDiv);
     v.append(editDiv);
 
-    var deleteDiv = $("<div/>");
-    if ($(".option-list").children().length > 2) {
-      var x = $("<img class='option-delete'/>")
-        .appendTo(deleteDiv);
-      svg.loadImg(x, "/assets/img/delete.svg");
-    }
-
-    deleteDiv.click(function() {
-      v.prev().find("input").focus();
-      v.remove();
-    });
-    deleteDiv.appendTo(v);
-
     edit.keydown(function (e) {
       switch (e.which) {
       case 13:
         if (edit.val() !== "") {
           var li = editChoiceOption();
+          removeChoiceOption(li);
           v.after(li);
           li.find("input").focus();
         }
@@ -189,6 +177,20 @@ var chat = (function () {
     return v;
   }
 
+  function removeChoiceOption(li) {
+    var deleteDiv = $("<div/>");
+    var x = $("<img class='option-delete'/>")
+        .appendTo(deleteDiv);
+    svg.loadImg(x, "/assets/img/delete.svg");
+
+    deleteDiv.click(function() {
+      li.prev().find("input").focus();
+      li.remove();
+    });
+
+    deleteDiv.appendTo(li);
+  }
+
   function buttonToAddChoiceOption() {
     var v = $("<li class='option'/>");
     var radio = $("<img class='option-radio add-option-radio'/>");
@@ -198,6 +200,7 @@ var chat = (function () {
     var button = $("<button class='add-option-btn'>Click to add option</button>");
     button.click(function() {
       var li = editChoiceOption();
+      removeChoiceOption(li);
       v.before(li);
       li.find("input").focus();
     });
@@ -209,9 +212,8 @@ var chat = (function () {
 
   function editChoices() {
     var v = $("<ul class='option-list'/>");
-    var opt1 = editChoiceOption();
-    opt1.find("input").focus();
-    v.append(opt1);
+    var opt1 = editChoiceOption()
+      .appendTo(v);
     v.append(buttonToAddChoiceOption());
     return v;
   }
@@ -235,7 +237,7 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
-  function chatEditor(chat, task) {
+  function chatEditor(messages, chat, task) {
     var chatFooter = $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
@@ -284,6 +286,8 @@ var chat = (function () {
         selChoicesDiv.removeClass("checkbox-selected");
       } else {
         selChoicesDiv.addClass("checkbox-selected");
+        choicesEditor.children().eq(0).find("input").css("background","black");
+        choicesEditor.children().eq(0).find("input").focus();
       }
       choicesEditor.toggle();
     });
@@ -302,7 +306,7 @@ var chat = (function () {
     });
 
     sendButton.click(function () {
-      var data = selChoices.prop("checked")
+      var data = selChoicesDiv.hasClass("checkbox-selected")
                ? selector_q_data(editText.val(), choicesEditor)
                : message_data(editText.val());
       if (data) {
@@ -314,8 +318,20 @@ var chat = (function () {
           chat_item_data:data
         };
         var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-        v.before(tempItemView);
+        messages.append(tempItemView);
         editText.val("");
+
+        if (selChoicesDiv.hasClass("checkbox-selected")) {
+          choicesEditor.toggle();
+          selChoicesDiv.removeClass("checkbox-selected");
+          var numOptions = choicesEditor.children().length-1;
+          if (numOptions > 1) {
+            for (var i=numOptions-1; i>0; i--) {
+              choicesEditor.children().eq(i).remove();
+            }
+          }
+        }
+
         api.postChatItem(item).done(function(item) {
             var itemView = viewOfChatItem(item, item.time_created,
                                           statusOfChatItem(item));
@@ -339,6 +355,10 @@ var chat = (function () {
       displayName.append(chat_participant_names(chat));
     }
 
+    var messagesContainer = $("<div/>")
+    var messages = $("<div class='messages'><div/>")
+      .appendTo(messagesContainer);
+
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
       var status;
@@ -348,16 +368,23 @@ var chat = (function () {
       } else {
         status = statusOfChatItem(item);
       }
-      v.append(viewOfChatItem(item, item.time_created, status));
+      messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    v.append($("<div class='chat-push'/>"));
-    v.append(chatEditor(chat, task));
-    var footerHeight = $(".chat-footer").height();
-    log("Height: " + footerHeight);
-    $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
+    // var push = $("<div/>", {
+    //   'class': "chat-push",
+    //   'height': footer.height()+"px"
+    // });
+    // var footerHeight = $(".chat-footer").height();
+    // log("Height: " + footerHeight);
+    // push.attr("style","height:"+footerHeight+"px");
+    // messagesContainer.append(push);
 
-    v.scrollTop = v.scrollHeight;
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    v.append(messagesContainer);
+    v.append(chatEditor(messages, chat, task));
+
+    // v.scrollTop = v.scrollHeight;
 
     return v;
   }

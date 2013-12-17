@@ -173,6 +173,7 @@ object {
 
 #task-navbar {
   position: fixed !important;
+  margin: 0;
   padding: 0;
 }
 
@@ -289,10 +290,6 @@ object {
 
 
 /*** Container ***/
-
-.container {
-  overflow: auto;
-}
 
 #task-content {
   height: 100%;
@@ -416,8 +413,8 @@ object {
 }
 
 #chat-header {
-  position: fixed;
-  z-index: 1040;
+  position: fixed !important;
+  z-index: 1030;
   height: 100px;
   width: 100%;
   background: rgba(248,248,248,0.9);
@@ -524,10 +521,6 @@ object {
   font-size: 14px;
 }
 
-.chat-push {
-  height: 100px;
-}
-
 .chat-footer {
   margin-left: auto;
   margin-right: 0;
@@ -593,10 +586,6 @@ object {
 }
 
 .option-delete:hover path {
-  fill: #a7a9ac;
-}
-
-.option:hover .option-radio path.radio-outline {
   fill: #a7a9ac;
 }
 
