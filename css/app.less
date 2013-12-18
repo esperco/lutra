@@ -21,8 +21,12 @@
 
 */
 
+body,
+html {
+  height: 100%;
+}
+
 body {
-  margin-top: 100px; /* room for navigation bar */
   background-color: white;
   color: #414042;
   font-family: "Proxima Nova Regular", Arial;
@@ -33,6 +37,24 @@ body {
 
 object {
   pointer-events: none;
+}
+
+.scrollable {
+  overflow: auto;
+}
+
+*.unselectable {
+  cursor: default;
+   -moz-user-select: -moz-none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in IE 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
 }
 
 /*** Old stuff ***/
@@ -54,6 +76,29 @@ object {
   background: none;
   border-bottom: 1px solid;
   border-bottom-color: #e6e7e8;
+}
+
+.request {
+  background-color: #dfdedd;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 1em;
+}
+
+.comments {
+  background-color: #d6d6d6;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+  margin-left: 2em;
+  margin-right: 2em;
+  padding-left: 0.3em;
+}
+
+.comment {
+  background-color: #dfdfdf;
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+  padding: 0.2em;
 }
 
 .author {
@@ -117,9 +162,19 @@ object {
 
 /*** Nav Bar ***/
 
-#navbar {
+#main-navbar,
+#task-navbar {
+  z-index: 1030;
   background: rgba(248,248,248,0.9);
+  border-top: none;
   border-bottom: 1px solid #d1d3d4;
+  border-radius: 0;
+}
+
+#task-navbar {
+  position: fixed !important;
+  margin: 0;
+  padding: 0;
 }
 
 .menu {
@@ -137,7 +192,7 @@ object {
   fill: #7d3ca0;
 }
 
-.tasks-title {
+.main-title {
   letter-spacing: 3px;
 }
 
@@ -155,9 +210,16 @@ object {
 
 .new-task-footer,
 .sched-footer {
+  position: fixed !important;
   height: 80px;
+  left: 0;
+  bottom: 0;
+  margin-bottom: 0;
+  padding: 0;
   background: rgba(248,248,248,0.9);
   border-top: 1px solid #d1d3d4;
+  border-bottom: none;
+  border-radius: 0;
 }
 
 .new-task-footer {
@@ -191,9 +253,11 @@ object {
   fill: #bcbec0;
 }
 
-#progress-bar {
-  width: 500px;
-  padding-top: 3px;
+.sched-step1,
+.sched-step2,
+.sched-step3,
+.sched-step4 {
+  margin-top: 3px;
 }
 
 .sched-step2,
@@ -227,11 +291,18 @@ object {
 
 /*** Container ***/
 
-.push {
-  height: 120px;
+#task-content {
+  height: 100%;
+  position:relative;
+  padding: 0;
 }
 
-  
+.split-screen {
+  border-left: none;
+  border-right: 1px solid #d1d3d4;
+}
+
+
 /*** Modal ***/
 
 .modal-close-circ {
@@ -274,8 +345,9 @@ object {
 
 #sched-availability-message,
 #sched-confirm-message {
-  min-width: 100%;
-  max-width: 100%;
+/*  min-width: 100%;
+  max-width: 100%;*/
+  resize: none;
 }
 
 
@@ -328,6 +400,250 @@ object {
 }
 
 
+/*** Chat ***/
+
+#task-page,
+#chat {
+  height: 100%;
+}
+
+#chat {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#chat-header {
+  position: fixed !important;
+  z-index: 1030;
+  height: 100px;
+  width: 100%;
+  background: rgba(248,248,248,0.9);
+}
+
+.chat-profile-tabs {
+  height: 60px;
+  border-bottom: 1px solid #d1d3d4;
+}
+
+.chat-tab-div {
+  height: 60px;
+  width: 60px;
+}
+
+.prof-circ {
+  padding-top: 5px;
+  height: 30px;
+  width: 30px;
+  border-radius: 15px;
+  text-align: center;
+  vertical-align: middle;
+  background: #e6e7e8;
+}
+
+.group {
+  margin-top: 4px;
+}
+
+.prof-caret {
+  margin-left: 9px;
+}
+
+.tab-name {
+  color: #414042;
+}
+
+.tab-name:hover {
+  color: #414042;
+}
+
+.tab-name:hover .prof-circ {
+  background: #d1d3d4;
+}
+
+.nav-tabs > li.active > a .prof-caret path,
+.nav-tabs > li.active > a:hover .prof-caret path,
+.nav-tabs > li.active > a:focus .prof-caret path {
+  fill: white;
+}
+
+.nav-tabs > li.active > a .prof-circ,
+.nav-tabs > li.active > a:hover .prof-circ,
+.nav-tabs > li.active > a:focus .prof-circ {
+  background-color: white;
+}
+
+.chat-profile-details-div {
+  height: 40px;
+  background-color: white;
+  border-bottom: 1px solid #d1d3d4;
+}
+
+.chat-profile-details {
+  position: fixed;
+  z-index: 1040;
+  margin-top: -40px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.chat-panel {
+  margin-top: 110px;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow: auto;
+}
+
+.message-header {
+  margin-bottom: 10px;
+}
+
+.from-name-div {
+  padding-left: 0;
+}
+
+.from-name {
+  font-family: "Proxima Nova Semibold";
+  font-size: 12px;
+  color: #808285;
+}
+
+.timestamp-div {
+  padding-right: 0;
+}
+
+.message-status,
+.timestamp {
+  float: right;
+  font-size: 12px;
+  color: #808285;
+}
+
+.message {
+  font-size: 14px;
+}
+
+.chat-footer {
+  margin-left: auto;
+  margin-right: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  background: rgba(248,248,248,0.9);
+}
+
+.to-field {
+  height: 30px;
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  color: white;
+  background-color: #808285;
+  border-top: 1px solid #d1d3d4;
+}
+
+.chat-editor {
+  border-top: 1px solid #d1d3d4;
+  padding: 15px;
+}
+
+.chat-entry {
+  min-height: 60px;
+  overflow: hidden;
+}
+
+.chat-actions {
+  margin-top: 15px;
+}
+
+.option-list {
+  padding-left: 28px;
+  padding-right: 20px;
+  list-style: none;
+}
+
+.option {
+  margin-top: 10px;
+}
+
+.option-radio {
+  margin-top: 7px;
+  margin-left: -28px;
+  height: 18px;
+  width: 18px;
+  float: left;
+}
+
+.option-delete {
+  float: right;
+  margin-top: -23px;
+  margin-right: -20px;
+}
+
+.option-delete:hover {
+  cursor: pointer;
+}
+
+.option-delete:hover path {
+  fill: #a7a9ac;
+}
+
+.add-option-radio path.radio-outline {
+  fill: #e6e7e8;
+}
+
+.option:hover .add-option-radio path.radio-outline {
+  fill: #d1d3d4;
+}
+
+.add-option-btn {
+  height: 32px;
+  width: 100%;
+  padding-left: 12px;
+  text-align: left;
+  font-size: 14px;
+  color: #e6e7e8;
+  border: 2px solid #e6e7e8;
+  background: white;
+  border-radius: 4px;
+}
+
+.add-option-btn:hover {
+  color: #808285;
+  border: 2px solid #d1d3d4;
+  cursor: pointer;
+}
+
+.offer-choices {
+  padding-left: 0;
+}
+
+.offer-choices:hover {
+  cursor: pointer;
+}
+
+.offer-choices-checkbox {
+  float: left;
+  margin-top: 5px;
+  height: 18px;
+  width: 18px;
+}
+
+.offer-choices-label {
+  float: left;
+  margin-top: 5px;
+  margin-left: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chat-send {
+  padding-right: 0;
+}
+
+.chat-send-btn {
+  float: right;
+}
+
+
 /*** Scheduling Step 2 ***/
 
 .top-divider {
@@ -371,42 +687,43 @@ object {
   cursor: pointer;
 }
 
-.esper-checkbox {
+.suggestion-checkbox {
   float: left;
   margin-top: 16px;
   width: 24px;
   height: 24px;
 }
 
-.esper-radio {
+.suggestion-radio {
   float: left;
   margin-top: 16px;
   width: 24px;
   height: 24px;
 }
 
+.offer-choices:hover path.check-outline,
 .suggestion:hover path.check-outline,
 .suggestion:hover path.radio-outline {
   fill: #a7a9ac;
 }
 
-.esper-checkbox-selected path.check-background,
-.esper-radio-selected path.radio-background {
+.checkbox-selected path.check-background,
+.radio-selected path.radio-background {
   fill: #e8d9ee;
 }
 
-.esper-checkbox-selected path.check-outline,
-.esper-radio-selected path.radio-outline {
+.checkbox-selected path.check-outline,
+.radio-selected path.radio-outline {
   fill: #a25cc6;
 }
 
-.esper-checkbox-selected path.check,
-.esper-radio-selected circle {
+.checkbox-selected path.check,
+.radio-selected circle {
   fill: #414042;
 }
 
-.esper-checkbox-selected:hover path.check-outline,
-.esper-radio-selected:hover path.radio-outline {
+.checkbox-selected:hover path.check-outline,
+.radio-selected:hover path.radio-outline {
   fill: #8c42ad;
 }
 
@@ -433,14 +750,9 @@ object {
   font-size: 14px;
 }
 
-.location-text {
-  font-size: 14px;
-}
-
 .suggestion:hover .day-text,
 .suggestion:hover .date-text,
-.suggestion:hover .time-text,
-.suggestion:hover .location-text {
+.suggestion:hover .time-text {
   color: #808285;
 }
 

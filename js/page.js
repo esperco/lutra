@@ -147,6 +147,7 @@ var page = (function() {
   /* Load and render different types of pages */
 
   mod.home.load = function() {
+    $("#main-navbar").removeClass("hide");
     hideAll();
     api.loadActiveTasks();
     homeReplaceTab("active-tasks");

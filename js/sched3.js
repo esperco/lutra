@@ -23,7 +23,7 @@ var sched3 = (function() {
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
-    var radio = $("<img class='esper-radio'/>");
+    var radio = $("<img class='suggestion-radio'/>");
     radio.appendTo(view);
     svg.loadImg(radio, "/assets/img/radio.svg");
     sched.viewOfSuggestion(calOption.slot)
@@ -38,7 +38,7 @@ var sched3 = (function() {
 
     var idList = list.map(options, function(x) { return x.label; });
     var selector = show.create(idList, {
-      onClass: "esper-radio-selected",
+      onClass: "radio-selected",
       offClass: ""
     });
 

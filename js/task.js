@@ -126,6 +126,20 @@ var task = (function() {
     taskTypeSelector.show("new-task");
   }
 
+  function loadTaskTitle(task) {
+    var view = $("#task-title");
+    view.children().remove();
+
+    var title = task.task_status
+      ? task.task_status.task_title
+      : null;
+    if (title) {
+      view.text(task.task_status.task_title);
+    }
+
+    return view;
+  }
+
   function loadGeneralTask(task) {
     var view = mod.viewOfTask("", task);
     placeView($("#gen-task"), view);
@@ -134,12 +148,14 @@ var task = (function() {
 
   function loadSchedulingTask(task) {
     taskTypeSelector.hideAll();
+    loadTaskTitle(task);
     sched.loadTask(task);
     taskTypeSelector.show("sched-task");
   }
 
   /* Load task page */
   mod.load = function(optTid) {
+    $("#main-navbar").addClass("hide");
     taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();
