@@ -66,7 +66,7 @@ var task = (function() {
       return ["Scheduling", {}];
     }
     else if ($("#category-gen").is(":checked")) {
-      return "General";
+      return "Questions";
     }
   }
 
@@ -91,29 +91,26 @@ var task = (function() {
     }
 
     function onClicked() {
-      var kind = "Scheduling";
-      if (kind !== "") {
-        var title = $("#new-task-title").val();
-        if (title.length > 0) {
-          var task_data = initTaskData();
-          var task = {
-            task_status: {
-              task_title: title,
-              task_summary: ""
-            },
-            task_participants: {
-              organized_by: login.data.team.team_organizers,
-              organized_for: login.data.team.team_leaders
-            },
-            task_data: task_data
-          };
-          api.createTask(task)
-            .done(function(task) {
-              /* change URL */
-              window.location.hash = "#!task/" + task.tid;
-            });
+      var title = $("#new-task-title").val();
+      if (title.length > 0) {
+        var task_data = initTaskData();
+        var task = {
+          task_status: {
+            task_title: title,
+            task_summary: ""
+          },
+          task_participants: {
+            organized_by: login.data.team.team_organizers,
+            organized_for: login.data.team.team_leaders
+          },
+          task_data: task_data
         };
-      }
+        api.createTask(task)
+          .done(function(task) {
+            /* change URL */
+            window.location.hash = "#!task/" + task.tid;
+          });
+      };
     }
 
     /* initialization */
