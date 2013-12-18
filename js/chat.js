@@ -250,16 +250,24 @@ var chat = (function () {
     var v = $("<div class='chat-editor'/>")
       .appendTo(chatFooter);
 
-    var editText = $("<textarea/>", {
-      'class': "form-control chat-entry",
-      'placeholder': "Write a reply..."
-    });
-    editText.on("keyup", function (e){
-      $(this).css("height", "auto");
-      $(this).height(this.scrollHeight);
-    });
-    editText.keyup();
-    editText.appendTo(v);
+    var editText = $("<textarea class='form-control chat-entry'><textarea/>")
+      .appendTo(v);
+
+    editText.autosize();
+    
+    if (chat.chat_items.length === 0) {
+      editText.attr("placeholder", "Write a message...");
+    } else {
+      editText.attr("placeholder", "Write a reply...");
+    }
+
+    editText.val("");
+
+    // editText.on("keyup", function (e){
+    //   $(this).css("height", "auto");
+    //   $(this).height(this.scrollHeight);
+    // });
+    // editText.keyup();
 
     var choicesEditor = editChoices();
     choicesEditor.hide();
@@ -286,8 +294,8 @@ var chat = (function () {
         selChoicesDiv.removeClass("checkbox-selected");
       } else {
         selChoicesDiv.addClass("checkbox-selected");
-        choicesEditor.children().eq(0).find("input").css("background","black");
-        choicesEditor.children().eq(0).find("input").focus();
+        // choicesEditor.children().eq(0).find("input").css("background","black"); /* Works. */
+        choicesEditor.children().eq(0).find("input").focus(); /* Doesn't work. */
       }
       choicesEditor.toggle();
     });
@@ -295,14 +303,12 @@ var chat = (function () {
     var sendButton = $("<button class='btn btn-primary chat-send-btn disabled'>Send</button>")
       .appendTo(sendDiv);
 
-    function isValidMessage(s) {
-      return s.length > 0;
-    }
-
-    editText.val("");
-    util.afterTyping(editText, $(".chat-entry"), function () {
-      if (isValidMessage(editText.val()))
+    editText.on("keyup", function (e){
+      if ($(this).val() !== "") {
         sendButton.removeClass("disabled");
+      } else {
+        sendButton.addClass("disabled");
+      }
     });
 
     sendButton.click(function () {
@@ -320,6 +326,7 @@ var chat = (function () {
         var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
         messages.append(tempItemView);
         editText.val("");
+        editText.attr("placeholder", "Write a reply...");
 
         if (selChoicesDiv.hasClass("checkbox-selected")) {
           choicesEditor.toggle();
@@ -371,28 +378,20 @@ var chat = (function () {
       messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    // var push = $("<div/>", {
-    //   'class': "chat-push",
-    //   'height': footer.height()+"px"
-    // });
-    // var footerHeight = $(".chat-footer").height();
-    // log("Height: " + footerHeight);
-    // push.attr("style","height:"+footerHeight+"px");
-    // messagesContainer.append(push);
+    var footerHeight = $(".chat-footer").height();
+    var push = $("<div/>", {
+      'class': "chat-push",
+      'height': footerHeight+"px"
+    });
+    messagesContainer.append(push);  /* Doesn't work for first tab. */
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     v.append(messagesContainer);
     v.append(chatEditor(messages, chat, task));
-
-    // v.scrollTop = v.scrollHeight;
+    v.scrollTop = v.scrollHeight;  /* Doesn't work. */
 
     return v;
   }
-
-  // $("#chat-footer").onresize = function adjustPush() {
-  //     var footerHeight = $("chat-footer").height();
-  //     $(".chat-push").attr('style', 'height:' + footerHeight + 'px');
-  // };
 
   mod.loadTaskChats = function(task) {
     $(".chat-profile-tabs li").remove();
