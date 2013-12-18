@@ -8,12 +8,12 @@ var task = (function() {
   var mod = {};
 
   // task queue view
-  function viewOfTaskQueue(tab, tasks) {
+  function viewOfTaskQueue(tasks) {
     var view = $("<div/>");
     var tasksView = $("<div/>");
 
     for (var i in tasks) {
-      mod.viewOfTask(tab, tasks[i]).appendTo(tasksView);
+      viewOfTaskTitle(tasks[i]).appendTo(tasksView);
     }
     tasksView.appendTo(view);
 
@@ -21,27 +21,22 @@ var task = (function() {
   }
 
   // display task
-  mod.viewOfTask = function(tab, task) {
+  function viewOfTask(task) {
+    var view = viewOfTaskTitle(task);
+    return view;
+  }
+
+  function viewOfTaskTitle(task) {
     var view = $("<div class='task'></div>");
-    var buttons = $("<div class='buttons rightbox'></div>");
-
-    buttons.appendTo(view);
-
     var title = task.task_status
       ? task.task_status.task_title
       : null;
     if (title) {
-      viewOfTaskTitle(title, task.tid)
+      $("<a class='tasktitle' href='#!task/" + task.tid + "'/>")
+        .text(title)
         .appendTo(view);
     }
-
     return view;
-  }
-
-  function viewOfTaskTitle(title, tid) {
-    var link = $("<a class='tasktitle' href='#!task/" + tid + "'/>")
-      .text(title);
-    return link;
   }
 
   function placeView(parent, view) {
@@ -52,7 +47,7 @@ var task = (function() {
   mod.updateActiveTasksView = function(data) {
     var tabName = page.home.tab.activeTasks;
     placeView($("#" + tabName + "-tab-content"),
-              viewOfTaskQueue(tabName, data.tasks));
+              viewOfTaskQueue(data.tasks));
   };
 
   var taskTypeSelector = show.create([
@@ -138,7 +133,7 @@ var task = (function() {
   }
 
   function loadGeneralTask(task) {
-    var view = mod.viewOfTask("", task);
+    var view = viewOfTask(task);
     placeView($("#gen-task"), view);
     taskTypeSelector.show("gen-task");
   }
@@ -158,7 +153,7 @@ var task = (function() {
 
       var general_task = JSON.parse(JSON.stringify(task)); // clone
       general_task.task_data = "Questions";
-      placeView($("#gen-task"), mod.viewOfTask("", general_task));
+      placeView($("#gen-task"), viewOfTask(general_task));
 
       var scheduling_task = task;
       if ("Scheduling" !== task_kind) {
