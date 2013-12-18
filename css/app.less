@@ -646,6 +646,10 @@ object {
 
 /*** Scheduling Step 2 ***/
 
+#manual-entry {
+  cursor: pointer;
+}
+
 .top-divider {
   margin-bottom: 0;
 }
@@ -689,7 +693,14 @@ object {
 
 .suggestion-checkbox {
   float: left;
-  margin-top: 16px;
+  margin-top: 30px;
+  width: 24px;
+  height: 24px;
+}
+
+.suggestion-edit {
+  float: right;
+  margin-top: 30px;
   width: 24px;
   height: 24px;
 }
@@ -705,6 +716,14 @@ object {
 .suggestion:hover path.check-outline,
 .suggestion:hover path.radio-outline {
   fill: #a7a9ac;
+}
+
+.suggestion:hover .suggestion-edit g path {
+  fill: #a25cc6;
+}
+
+.suggestion:hover .suggestion-edit:hover g path {
+  fill: #8c42ad;
 }
 
 .checkbox-selected path.check-background,
@@ -746,16 +765,28 @@ object {
   font-size: 18px;
 }
 
-.time-text {
+.time-text, .loc-text {
   font-size: 14px;
+}
+
+.pin {
+  margin-right: 6px;
+}
+
+.tbd {
+  font-family: "Proxima Nova Regular Italic";
 }
 
 .suggestion:hover .day-text,
 .suggestion:hover .date-text,
-.suggestion:hover .time-text {
+.suggestion:hover .time-text,
+.suggestion:hover .loc-text {
   color: #808285;
 }
 
+.suggestion:hover .pin path {
+  fill: #808285;
+}
 
 /*** Scheduling Step 3 ***/
 

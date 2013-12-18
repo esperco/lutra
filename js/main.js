@@ -7,6 +7,8 @@ function main() {
 
 $(document).ready(function() {
 
+  $('[data-toggle="tooltip"]').tooltip({'placement': 'left'});
+
   var $window = $(window);
 
   function checkWidth() {
