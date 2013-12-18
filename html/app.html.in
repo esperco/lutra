@@ -13,11 +13,9 @@
 
   <body>
 
-    <div id="navbar" class="navbar navbar-fixed-top hide">
-        <a href="#">
-          <img class="svg menu" src="/assets/img/menu.svg">
-        </a>
-        <p class="navbar-text tasks-title" unselectable="on">TASKS</p>
+    <div id="main-navbar" class="navbar navbar-fixed-top hide">
+      <img href="#" class="svg menu" src="/assets/img/menu.svg">
+      <p class="navbar-text main-title unselectable" data-toggle="tooltip">TASKS</p>
         <ul class="nav nav-tabs pull-right account">
           <li class="logged-out">
             <a href="#!login"></a>
@@ -59,6 +57,8 @@
             <a href="#!request-password">Click here to reset.</a>
           </div>
         </form>
+
+        <div class="footer-push"></div>
       </div>
     </div>
 
@@ -71,31 +71,31 @@
     </div>
 
     <div id="home-page" class="hide">
-      <div class="container">
+      <div class="navbar-push container scrollable">
         <div class="row">
           <div class="span12 queue-tab-area">
 
             <div class="hide" id="status"></div>
             <div class="hide" id="hidden-status"></div>
-
-            <ul class="nav nav-tabs">
+            <h3>Scheduling Tasks</h3>
+            <hr>
+            <!-- <ul class="nav nav-tabs">
               <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   Scheduling
                 </a>
               </li>
-              <!-- <li id="active-tasks-tab">
+              <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
                   General
                 </a>
               </li>
               <li id="active-tasks-tab">
                 <a href="#" id="active-tasks-tab-link">
-                  Completed
+                  Archived
                 </a>
-              </li> -->
-              <!-- add more tabs as needed -->
-            </ul>
+              </li>
+            </ul> -->
             <div id="active-tasks-tab-content" class="hide"></div>
             <!-- add more hidden tab content views as needed -->
           </div>
@@ -104,28 +104,47 @@
     </div>
 
     <div id="task-page" class="hide">
-      <div id="new-task">
-        @@new-task.html@@
+
+      <div id="task-content" class="col-md-8 scrollable">
+
+        <div id="task-navbar" class="navbar">
+          <a href="#">
+            <img class="svg menu" src="/assets/img/menu.svg">
+          </a>
+          <p id="task-title" class="navbar-text unselectable"></p>
+        </div>
+
+        <div id="new-task">
+          @@new-task.html@@
+        </div>
+
+        <div id="sched-task" class="hide">
+          <div id="sched-step1-tab" class="hide">
+            @@sched-step1-tab.html@@
+          </div>
+          <div id="sched-step2-tab" class="hide">
+            @@sched-step2-tab.html@@
+          </div>
+          <div id="sched-step3-tab" class="hide">
+            @@sched-step3-tab.html@@
+          </div>
+          <div id="sched-step4-tab" class="hide">
+            @@sched-step4-tab.html@@
+          </div>
+        </div>
+
+        <div id="gen-task" class="hide"></div>
+
       </div>
-      <div id="sched-task" class="hide">
-        <div id="sched-step1-tab" class="hide">
-          @@sched-step1-tab.html@@
+
+      <div id="chat" class="col-md-4 scrollable pull-right">
+        <div id="chat-header">
+          <ul class="nav nav-tabs chat-profile-tabs"></ul>
+          <div class="chat-profile-details-div"></div>
         </div>
-        <div id="sched-step2-tab" class="hide">
-          @@sched-step2-tab.html@@
-        </div>
-        <div id="sched-step3-tab" class="hide">
-          @@sched-step3-tab.html@@
-        </div>
-        <div id="sched-step4-tab" class="hide">
-          @@sched-step4-tab.html@@
-        </div>
+        <div class="tab-content chat-panel"></div>
       </div>
-      <div id="gen-task" class="hide"></div>
-      <div id="chat" class="col-md-4 pull-right hide">
-        <ul id="chat-profile-tabs" class="nav nav-tabs"></ul>
-        <div id="chat-panel" class="tab-content"></div>
-      </div>
+
     </div>
 
     <script src="/assets/js/jquery.min.js"></script>
@@ -133,6 +152,7 @@
     <script src="/assets/js/can.min.js"></script>
     <script src="/assets/js/sha1.js"></script>
     <script src="/assets/js/jquery.timeago.js"></script>
+    <script src="/assets/js/jquery.autosize.min.js"></script>
 
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>
