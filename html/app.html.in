@@ -134,7 +134,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="hide"></div>
+        <div id="gen-task" class="container hide"></div>
 
       </div>
 

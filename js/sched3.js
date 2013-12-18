@@ -69,17 +69,19 @@ var sched3 = (function() {
     return view;
   }
 
-  function updateTask(profs, task, calOption) {
-    var state = sched.getState(task);
-    task.task_status.task_progress = "Confirmed"; // status in the task list
+  function updateTask(profs, ta, calOption) {
+    task.dont_change_task_type();
+
+    var state = sched.getState(ta);
+    ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";           // step in the scheduling page
     state.reserved = {
       slot: calOption.slot,
       remind: 3*43200,
       notifs: []
     };
-    api.postTask(task)
-      .done(function () { sched.loadStep4(profs, task); });
+    api.postTask(ta)
+      .done(function (task) { sched.loadStep4(profs, task); });
   }
 
   function textOfHowSoon(x) {

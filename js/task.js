@@ -21,9 +21,30 @@ var task = (function() {
   }
 
   // display task
-  function viewOfTask(task) {
-    var view = viewOfTaskTitle(task);
-    return view;
+  function viewOfGeneralTask(task) {
+    function toggle_title() {
+      switch (task.task_status.task_progress) {
+      case "Unread_by_organizer": return "Start";
+      case "Closed":              return "Reopen";
+      default:                    return "Done";
+      }
+    }
+    var status_button = $("<button/>").append(toggle_title());
+    status_button.click(function() {
+      switch (task.task_status.task_progress) {
+      case "Unread_by_organizer":
+      case "Closed":
+        task.task_status.task_progress = "Coordinating";
+        break;
+      default:
+        task.task_status.task_progress = "Closed";
+        break;
+      }
+      status_button.text(toggle_title());
+      mod.dont_change_task_type();
+      api.postTask(task);
+    });
+    return status_button;
   }
 
   function viewOfTaskTitle(task) {
@@ -133,7 +154,7 @@ var task = (function() {
   }
 
   function loadGeneralTask(task) {
-    var view = viewOfTask(task);
+    var view = viewOfGeneralTask(task);
     placeView($("#gen-task"), view);
     taskTypeSelector.show("gen-task");
   }
@@ -153,7 +174,7 @@ var task = (function() {
 
       var general_task = JSON.parse(JSON.stringify(task)); // clone
       general_task.task_data = "Questions";
-      placeView($("#gen-task"), viewOfTask(general_task));
+      placeView($("#gen-task"), viewOfGeneralTask(general_task));
 
       var scheduling_task = task;
       if ("Scheduling" !== task_kind) {
@@ -197,6 +218,10 @@ var task = (function() {
       }
     }
     chat.loadTaskChats(task);
+  }
+
+  mod.dont_change_task_type = function() {
+    $("#select-task-type").addClass("hide");
   }
 
   /* Load task page */

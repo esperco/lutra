@@ -165,9 +165,11 @@ var sched2 = (function() {
 
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
-  function selectCalendarSlots(profs, task, slots) {
-    var x = task.task_data[1];
-    task.task_status.task_progress = "Coordinating"; // status in the task list
+  function selectCalendarSlots(profs, ta, slots) {
+    task.dont_change_task_type();
+
+    var x = ta.task_data[1];
+    ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page
 
     /* TODO: reserve calendar slots for leader of organizing team,
@@ -178,7 +180,7 @@ var sched2 = (function() {
     delete x.availabilities;
     delete x.reserved;
 
-    api.postTask(task)
+    api.postTask(ta)
       .done(function(task) { sched.loadStep3(profs, task); });
   }
 
