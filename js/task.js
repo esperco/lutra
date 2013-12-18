@@ -154,6 +154,8 @@ var task = (function() {
   /* Load task page */
   mod.load = function(optTid) {
     $("#main-navbar").addClass("hide");
+    $("#chat-sidebar").click(function() {
+    });
     taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();

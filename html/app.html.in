@@ -100,6 +100,9 @@
             <img class="svg menu" src="/assets/img/menu.svg">
           </a>
           <p id="task-title" class="navbar-text unselectable"></p>
+          <a id="chat-sidebar">
+            <img class="svg chat-icon" src="/assets/img/chat.svg">
+          </a>
         </div>
 
         <div id="new-task">

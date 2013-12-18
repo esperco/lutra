@@ -18,6 +18,7 @@ $(document).ready(function() {
       $('.sched-footer').removeClass('col-md-8 split-screen').addClass('navbar-fixed-bottom');
       $('#chat').addClass('hide');
       $('#task-content').removeClass('split-screen');
+      $('#chat-sidebar').removeClass('chat-open').addClass('chat-closed');
     };
 
     if ($window.width() >= 992) {
@@ -26,6 +27,7 @@ $(document).ready(function() {
       $('.sched-footer').removeClass('navbar-fixed-bottom').addClass('col-md-8 split-screen');
       $('#chat').removeClass('hide');
       $('#task-content').addClass('split-screen');
+      $('#chat-sidebar').removeClass('chat-closed').addClass('chat-open');
     }
   }
 
