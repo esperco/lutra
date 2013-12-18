@@ -99,24 +99,10 @@ var profile = (function() {
     return result;
   }
 
-  function veryShortNameOfProfile(prof) {
+  mod.veryShortNameOfProfile = function(prof) {
     var result = shortenName(prof.full_name);
     if (result === "")
       result = shortenName(prof.familiar_name);
-    return result;
-  }
-
-  function firstInitial(s) {
-    if (s === "")
-      return "";
-    else
-      return s.charAt(0).toUpperCase();
-  }
-
-  mod.firstInitialOfProfile = function(prof) {
-    var result = firstInitial(prof.full_name);
-    if (result === "")
-      result = firstInitial(prof.familiar_name);
     return result;
   }
 
@@ -131,7 +117,7 @@ var profile = (function() {
   function viewOfInitialsMedium(prof) {
     var view = $("<span class='user-photo-container'/>");
     var text = $("<span class='user-initials-medium'/>")
-      .text(veryShortNameOfProfile(prof))
+      .text(mod.veryShortNameOfProfile(prof))
       .appendTo(view);
     return view;
   }

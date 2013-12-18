@@ -10,7 +10,7 @@ var list = (function() {
     var len = a.length;
     for (var i = 0; i < len; i++)
       f(a[i], i);
-  }
+  };
 
   /* one-to-one mapping */
   mod.map = function(a, f) {
@@ -19,7 +19,7 @@ var list = (function() {
     for (var i = 0; i < len; i++)
       b[i] = f(a[i], i);
     return b;
-  }
+  };
 
   /* map, remove null elements */
   mod.filter_map = function(a, f) {
@@ -32,7 +32,7 @@ var list = (function() {
       }
     }
     return b;
-  }
+  };
 
   /* keep only elements that satisfy the predicate */
   mod.filter = function(a, f) {
@@ -45,7 +45,7 @@ var list = (function() {
       }
     }
     return b;
-  }
+  };
 
   /* return the first element that satisfies the give predicate */
   mod.find = function(a, f) {
@@ -56,7 +56,7 @@ var list = (function() {
       }
     }
     return null;
-  }
+  };
 
   /* return true if at least one element satisfies the given predicate */
   mod.exists = function(a, f) {
@@ -66,7 +66,7 @@ var list = (function() {
         return true;
     }
     return false;
-  }
+  };
 
   /* return true if at least one element equals the given element */
   mod.mem = function(a, x) {
@@ -77,7 +77,11 @@ var list = (function() {
       }
     }
     return false;
-  }
+  };
+
+  mod.copy = function(a) {
+    return a.slice(0);
+  };
 
   return mod;
 }());

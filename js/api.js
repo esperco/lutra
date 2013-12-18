@@ -88,8 +88,18 @@ var api = (function () {
     return api_q_prefix() + "/tasks/" + login.data.teams[0].teamid;
   }
 
-  mod.getProfile = function (uid) {
+  mod.getProfile = function(uid) {
     return jsonHttpGet(api_profile_prefix() + "/" + uid);
+  };
+
+  mod.postProfile = function(prof) {
+    var url = api_profile_prefix() + "/" + prof.profile_uid;
+    return jsonHttpPost(url, JSON.stringify(prof));
+  };
+
+  mod.getProfileByEmail = function(email) {
+    return jsonHttpGet(api_profile_prefix() + "/email/"
+                       + encodeURIComponent(email));
   };
 
   mod.loadActiveTasks = function() {

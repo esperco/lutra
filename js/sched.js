@@ -37,6 +37,12 @@ var sched = (function() {
     return task.task_participants.organized_for;
   };
 
+  mod.getHosts = function(task) {
+    return list.filter(mod.getParticipants(task), function(uid) {
+      return ! mod.isGuest(uid);
+    });
+  };
+
   mod.getGuests = function(task) {
     return list.filter(mod.getParticipants(task), function(uid) {
       return mod.isGuest(uid);

@@ -124,8 +124,8 @@ var sched3 = (function() {
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var firstInitial = $("<p class='first-initial'/>")
-      .text(profile.firstInitialOfProfile(prof));
+    var initials = $("<p class='initials'/>")
+      .text(profile.veryShortName(prof));
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
@@ -141,7 +141,7 @@ var sched3 = (function() {
       availabilityModal.modal({});
     }
 
-    firstInitial.appendTo(chatHead);
+    initials.appendTo(chatHead);
     chatHead.appendTo(view);
 
     $("<p class='guest-name'>" + name + "</p>")

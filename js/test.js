@@ -43,7 +43,8 @@ var test = (function() {
   function tests() {
     return [
       ["date", date.tests],
-      ["timeonly", timeonly.tests]
+      ["timeonly", timeonly.tests],
+      ["email", email.tests]
     ];
   }
 
