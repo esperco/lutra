@@ -150,6 +150,60 @@ var task = (function() {
     taskTypeSelector.show("sched-task");
   }
 
+  function loadTask(task) {
+    loadTaskTitle(task);
+
+    if ("Unread_by_organizer" === task.task_status.task_progress) {
+      var task_kind = variant.cons(task.task_data);
+
+      var general_task = JSON.parse(JSON.stringify(task)); // clone
+      general_task.task_data = "Questions";
+      placeView($("#gen-task"), mod.viewOfTask("", general_task));
+
+      var scheduling_task = task;
+      if ("Scheduling" !== task_kind) {
+        scheduling_task.task_data = ["Scheduling", {}];
+      }
+      sched.loadTask(scheduling_task);
+
+      var type_select = $("<select/>", {size:1});
+      type_select.append($("<option>Scheduling</option>"));
+      type_select.append($("<option>General</option>"));
+      type_select.prop("selectedIndex", "Scheduling" === task_kind ? 0 : 1);
+
+      function update_type() {
+        switch (type_select.prop("selectedIndex")) {
+        case 0:
+          taskTypeSelector.show("sched-task");
+          break;
+        case 1:
+          taskTypeSelector.show("gen-task");
+          break;
+        }
+      }
+      type_select.change(update_type);
+      update_type();
+
+      var select_place = $("#select-task-type");
+      placeView(select_place, type_select);
+      select_place.removeClass("hide");
+    }
+    else {
+      $("#select-task-type").addClass("hide");
+      switch (variant.cons(task.task_data)) {
+      case "Questions":
+        loadGeneralTask(task);
+        break;
+      case "Scheduling":
+        loadSchedulingTask(task);
+        break;
+      default:
+        log("Invalid task_data", task.task_data);
+      }
+    }
+    chat.loadTaskChats(task);
+  }
+
   /* Load task page */
   mod.load = function(optTid) {
     $("#main-navbar").addClass("hide");
@@ -158,20 +212,7 @@ var task = (function() {
       loadNewTask();
     else {
       api.getTask(optTid)
-        .done(function(task) {
-          var data = task.task_data;
-          switch (variant.cons(data)) {
-          case "Questions":
-            loadGeneralTask(task);
-            break;
-          case "Scheduling":
-            loadSchedulingTask(task);
-            break;
-          default:
-            log("Invalid task_data", data);
-          }
-          chat.loadTaskChats(task);
-        })
+        .done(loadTask);
     }
   }
 
