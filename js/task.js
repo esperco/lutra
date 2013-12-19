@@ -181,7 +181,9 @@ var task = (function() {
 
       var scheduling_task = task;
       if ("Scheduling" !== task_kind) {
-        scheduling_task.task_data = ["Scheduling", {}];
+        scheduling_task.task_data = ["Scheduling", {
+          scheduling_stage: "Guest_list"
+        }];
       }
       sched.loadTask(scheduling_task);
 
