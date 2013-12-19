@@ -7,7 +7,8 @@ var page = (function() {
     home: {},
     task: {},
     scheduling: {},
-    respond: {}
+    respond: {},
+    test: {}
   };
   var pageNames = [
     "login",
@@ -16,7 +17,8 @@ var page = (function() {
     "home",
     "task",
     "scheduling",
-    "respond"
+    "respond",
+    "test"
   ];
 
   mod.home.tab = {
@@ -158,6 +160,13 @@ var page = (function() {
     api.loadActiveTasks();
     homeReplaceTab("scheduling-tasks");
     show("home");
+  }
+
+  mod.test.load = function() {
+    hideAll();
+    $("#test-content").children().remove();
+    show("test");
+    test.load();
   }
 
   mod.login.load = function(redirPath) {

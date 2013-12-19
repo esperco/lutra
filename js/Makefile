@@ -27,6 +27,7 @@ SOURCES = \
   cache.js \
   svg.js \
   show.js \
+  editor.js \
   select.js \
   store.js \
   login.js \

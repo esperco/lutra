@@ -5,6 +5,23 @@
 var test = (function() {
   var mod = {};
 
+  function append(nodes) {
+    $("#test-content").append(nodes);
+  }
+
+  function print() {
+    var a = arguments;
+    var root = $("#test-content");
+    root
+      .append($("<hr/>"));
+    list.iter(a, function(x) {
+      log(x);
+      var s = util.toString(x);
+      root
+        .append($("<pre/>").text(s));
+    });
+  }
+
   mod.assert = function(b) {
     if (!b) {
       log("Failed assertion");
@@ -16,14 +33,14 @@ var test = (function() {
     var name = x[0];
     var f = x[1];
     if (f())
-      log("TEST OK     " + groupName + " - " + name);
+      print("TEST OK     " + groupName + " - " + name);
     else
-      log("TEST FAILED " + groupName + " - " + name);
+      print("TEST FAILED " + groupName + " - " + name);
   }
 
   function runGroup(x) {
     var groupName = x[0];
-    log("--- " + groupName + " ---");
+    print("--- " + groupName + " ---");
     var l = x[1];
     list.iter(l, function(x) { runOne(groupName, x); });
   }
@@ -62,7 +79,9 @@ var test = (function() {
       var result = f(arg);
       var success = JSON.stringify(result) === JSON.stringify(expected);
       if (!success)
-        log("FAILED " + title, "-- expected:", expected, "-- actual:", result);
+        print("FAILED " + title,
+              "-- expected:", expected,
+              "-- actual:", result);
       return success;
     }];
   };
@@ -76,9 +95,14 @@ var test = (function() {
     ];
   }
 
-  mod.run = function() {
+  function run() {
+    append("<h2>Tests</h2>");
     list.iter(tests(), runGroup);
   };
+
+  mod.load = function() {
+    run();
+  }
 
   return mod;
 }());
