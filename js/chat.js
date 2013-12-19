@@ -409,7 +409,11 @@ var chat = (function () {
         list.iter(task.task_chats, function (chat) {
           var tab_name;
           var pane_id = "chat" + chat.chatid;
-          var tab = $("<a/>", {href:"#"+pane_id, "class":"tab-name", "data-toggle":"tab"});
+          var tab = $("<a/>", {
+            href:"#"+pane_id,
+            "class":"tab-name",
+            "data-toggle":"tab"
+          });
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
@@ -422,9 +426,9 @@ var chat = (function () {
           } else {
             var p = profiles[chat.chat_participants[0].par_uid];
             tab_name = p.full_name;
-            var tab_initial = p.full_name.charAt(0).toUpperCase();
+            var tab_initials = profile.veryShortNameOfProfile(p);
             tab.append($("<div class='prof-circ'/>")
-               .append(tab_initial));
+               .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");
           caret.appendTo(tab);

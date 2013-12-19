@@ -5,31 +5,81 @@
 var sched1 = (function() {
   var mod = {};
 
-  function finalizeGuests() {
-    task.task_status.task_progress = "Coordinating";
-    sched.getState(task).scheduling_stage = "Find_availability";
-    api.postTask(task)
-      .done(function(task) { sched.loadStep2(profs, task); });
-  }
+  var nextButton = $(".sched-step1-next");
 
-  function rowViewOfNewParticipant(chats, profs, task, guestTbl) {
+  function rowViewOfNewParticipant(chats, profs, task, hosts, guestTbl) {
     var view = $("<div class='sched-step1-row'/>");
-    var nameInput = $("<input/>");
-    var emailInput = $("<input/>");
+    var initials = $("<div class='prof-circ'/>");
+    var emailInput = $("<input type='email'/>")
+      .addClass("form-control")
+      .attr("placeholder", "guest's email");
+    var nameInput = $("<input type='text'/>")
+      .addClass("form-control")
+      .attr("placeholder", "guest's full name")
+      .attr("disabled", true);
+    var removeButton = $("<button class='btn btn-default'/>")
+      .text("Remove");
+    var optUid;
+
+    function updateNameEditability(editable) {
+      if (util.isString(optUid) && editable)
+        nameInput.removeAttr("disabled");
+      else
+        nameInput.attr("disabled", true);
+    }
+
+    function clearUid() {
+      if (util.isString(optUid))
+        delete guestTbl[optUid];
+      optUid = null;
+      updateNameEditability(false);
+    }
+
+    function updateInitials() {
+      var s = profile.shortenName(nameInput.val());
+      log("update initials " + s);
+      initials
+        .text(profile.shortenName(nameInput.val()));
+    }
 
     function fetchProfile() {
       var emailAddr = emailInput.val();
       if (email.validate(emailAddr)) {
         api.getProfileByEmail(emailAddr)
           .then(function(prof) {
+            clearUid();
             var uid = prof.profile_uid;
+            optUid = uid;
             guestTbl[uid] = true;
             nameInput.attr("id", "name-" + uid);
             emailInput.attr("id", "email-" + uid);
-            var name0 = nameInput.val();
-            if (name0 === "" && ! email.validate(prof.full_name))
+            if (prof.full_name !== emailAddr || ! prof.editable)
               nameInput.val(prof.full_name);
-        });
+            updateNameEditability(prof.editable);
+            updateInitials();
+            updateNextButton(hosts, guestTbl);
+          });
+      } else {
+        clearUid();
+        updateNextButton(hosts, guestTbl);
+      }
+    }
+
+    function saveName() {
+      var name = nameInput.val();
+      updateInitials();
+      if (isValidName(name) && util.isString(optUid)) {
+        var uid = optUid;
+        api.getProfile(uid)
+          .then(function(prof) {
+            name0 = prof.full_name;
+            prof.full_name = name;
+            prof.familiar_name = name;
+            api.postProfile(prof);
+            updateNextButton(hosts, guestTbl);
+          });
+      } else {
+        updateNextButton(hosts, guestTbl);
       }
     }
 
@@ -37,12 +87,23 @@ var sched1 = (function() {
       fetchProfile();
     });
 
-    var name = prof.full_name;
-    var initials = $("<p class='initials'>")
-      .text(profile.veryShortNameOfProfile(prof));
+    util.afterTyping(nameInput, 500, function() {
+      saveName();
+    });
 
-    $("<p class='guest-name'>" + name + "</p>")
-      .appendTo(view);
+    removeButton
+      .click(function() {
+        clearUid();
+        view.remove();
+        updateNextButton(hosts, guestTbl);
+      });
+
+    view
+      .append(initials)
+      .append(emailInput)
+      .append(nameInput)
+      .append(removeButton);
+
     return view;
   }
 
@@ -51,20 +112,48 @@ var sched1 = (function() {
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var initials = $("<p class='initials'>")
+    var initials = $("<div class='prof-circ'>")
       .text(profile.veryShortNameOfProfile(prof));
 
-    $("<p class='guest-name'>" + name + "</p>")
-      .appendTo(view);
+    var nameView = $("<p class='guest-name'>" + name + "</p>");
+
+    view
+      .append(initials)
+      .append(nameView);
+
     return view;
   }
 
-  function tableOfArray(a) {
-    var tbl = {};
-    list.iter(a, function(k) {
-      tbl[k] = true;
+  function collectGuests(hosts, guestTbl) {
+    return list.diff(list.ofTable(guestTbl), hosts);
+  }
+
+  function isValidName(s) {
+    return profile.shortenName(s).length > 0;
+  }
+
+  function isReady(hosts, guestTbl) {
+    var guests = collectGuests(hosts, guestTbl);
+    var missingName = list.exists(guests, function(uid) {
+      return ! isValidName($("#name-" + uid).val());
     });
-    return tbl;
+    return guests.length > 0 && !missingName;
+  }
+
+  function updateNextButton(hosts, guestTbl) {
+    if (isReady(hosts, guestTbl))
+      nextButton.removeClass("disabled");
+    else
+      nextButton.addClass("disabled");
+  }
+
+  function finalizeGuests(task, hosts, guestTbl) {
+    var guests = collectGuests(hosts, guestTbl);
+    task.task_participants.organized_for = list.union(hosts, guests);
+    task.task_status.task_progress = "Coordinating";
+    sched.getState(task).scheduling_stage = "Find_availability";
+    api.postTask(task)
+      .done(sched.loadTask);
   }
 
   mod.load = function(profs, task, view) {
@@ -72,7 +161,6 @@ var sched1 = (function() {
       .appendTo(view);
 
     var chats = sched.chatsOfTask(task);
-    var next = $(".sched-step1-next");
 
     var hostsContainer = $("<div class='hosts-container'>");
     var hosts = sched.getHosts(task);
@@ -83,16 +171,16 @@ var sched1 = (function() {
 
     var guestsContainer = $("<div class='guests-container'>");
     var guests = sched.getGuests(task);
-    var guestTbl = tableOfArray(guests);
+    var guestTbl = list.toTable(guests);
     list.iter(guests, function(uid) {
       rowViewOfParticipant(chats, profs, task, guestTbl, uid)
         .appendTo(guestsContainer);
     });
 
-    var adder = $("<div>")
+    var adder = $("<button class='btn btn-default'/>")
       .text("Add guest")
       .click(function() {
-        rowViewOfNewParticipant(chats, profs, task, guestTbl)
+        rowViewOfNewParticipant(chats, profs, task, hosts, guestTbl)
           .appendTo(guestsContainer);
       });
 
@@ -101,11 +189,14 @@ var sched1 = (function() {
       .append(guestsContainer)
       .append(adder);
 
-    next
+    nextButton
       .unbind('click')
       .click(function() {
-        finalizeGuests(profs, task, selected);
+        nextButton.addClass("disabled");
+        finalizeGuests(task, hosts, guestTbl);
       });
+
+    updateNextButton(hosts, guestTbl);
   };
 
   return mod;

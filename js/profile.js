@@ -87,7 +87,7 @@ var profile = (function() {
     return result.substring(0,2);
   }
 
-  function shortenName(s) {
+  mod.shortenName = function(s) {
     /* discard the domain in case it's an email address */
     var name = email.localpart(s);
 
@@ -100,9 +100,9 @@ var profile = (function() {
   }
 
   mod.veryShortNameOfProfile = function(prof) {
-    var result = shortenName(prof.full_name);
+    var result = mod.shortenName(prof.full_name);
     if (result === "")
-      result = shortenName(prof.familiar_name);
+      result = mod.shortenName(prof.familiar_name);
     return result;
   }
 
