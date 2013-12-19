@@ -112,6 +112,7 @@
             <img class="svg menu" src="/assets/img/menu.svg">
           </a>
           <p id="task-title" class="navbar-text unselectable"></p>
+          <div id="select-task-type" class="hide"></div>
         </div>
 
         <div id="new-task">
@@ -133,7 +134,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="hide"></div>
+        <div id="gen-task" class="container hide"></div>
 
       </div>
 

@@ -5,9 +5,11 @@
 var sched1 = (function() {
   var mod = {};
 
-  function finalizeGuests() {
-    task.task_status.task_progress = "Coordinating";
-    api.postTask(task)
+  function finalizeGuests(profs, ta, selected) {
+    task.dont_change_task_type();
+
+    ta.task_status.task_progress = "Coordinating";
+    api.postTask(ta)
       .done(function(task) { sched.loadStep2(profs, task); });
   }
 
