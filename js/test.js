@@ -6,12 +6,12 @@ var test = (function() {
   var mod = {};
 
   function append(nodes) {
-    $("#test-page").append(nodes);
+    $("#test-content").append(nodes);
   }
 
   function print() {
     var a = arguments;
-    var root = $("#test-page");
+    var root = $("#test-content");
     root
       .append($("<hr/>"));
     list.iter(a, function(x) {
@@ -96,12 +96,7 @@ var test = (function() {
   }
 
   function run() {
-
-    var ed = editor.create(["X", "RECIPIENT"]);
-    ed.doc
-      .attr("style", "width:200px; height:200px");
-    append(ed.view);
-
+    append("<h2>Tests</h2>");
     list.iter(tests(), runGroup);
   };
 

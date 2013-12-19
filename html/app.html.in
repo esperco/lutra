@@ -103,7 +103,12 @@
       </div>
     </div>
 
-    <div id="test-page" class="hide"></div>
+    <div id="test-page" class="hide">
+      <div class="navbar-push container scrollable">
+        <div id="test-content" class="row">
+        </div>
+      </div>
+    </div>
 
     <div id="task-page" class="hide">
 

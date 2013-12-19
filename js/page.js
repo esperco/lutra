@@ -7,7 +7,8 @@ var page = (function() {
     home: {},
     task: {},
     scheduling: {},
-    respond: {}
+    respond: {},
+    test: {}
   };
   var pageNames = [
     "login",
@@ -157,7 +158,7 @@ var page = (function() {
 
   mod.test.load = function() {
     hideAll();
-    $("#test-page").children().remove();
+    $("#test-content").children().remove();
     show("test");
     test.load();
   }
