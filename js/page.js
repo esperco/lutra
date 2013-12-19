@@ -16,7 +16,8 @@ var page = (function() {
     "home",
     "task",
     "scheduling",
-    "respond"
+    "respond",
+    "test"
   ];
 
   mod.home.tab = {
@@ -152,6 +153,13 @@ var page = (function() {
     api.loadActiveTasks();
     homeReplaceTab("active-tasks");
     show("home");
+  }
+
+  mod.test.load = function() {
+    hideAll();
+    $("#test-page").children().remove();
+    show("test");
+    test.load();
   }
 
   mod.login.load = function(redirPath) {

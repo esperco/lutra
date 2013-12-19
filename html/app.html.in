@@ -103,6 +103,8 @@
       </div>
     </div>
 
+    <div id="test-page" class="hide"></div>
+
     <div id="task-page" class="hide">
 
       <div id="task-content" class="col-md-8 scrollable">
