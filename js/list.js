@@ -12,6 +12,14 @@ var list = (function() {
       f(a[i], i);
   };
 
+  mod.concat = function(aa) {
+    var acc = [];
+    mod.iter(aa, function(a) {
+      acc = acc.concat(a);
+    });
+    return acc;
+  };
+
   /* one-to-one mapping */
   mod.map = function(a, f) {
     var b = [];
@@ -84,69 +92,82 @@ var list = (function() {
     return a.slice(0);
   };
 
-  /* convert object into a list of its keys */
+  function getter(optFunc) {
+    return util.isDefined(optFunc) ? optFunc : function(x) { return x; };
+  };
+
+  /* convert object into a list of its values */
   mod.ofTable = function(tbl) {
     var a = [];
     for (var k in tbl)
-      a.push(k);
+      a.push(tbl[k]);
     return a;
   };
 
-  /* convert a list of strings into an object keyed by these strings;
-     values are set to true. */
-  mod.toTable = function(a) {
+  /* convert a list of values into an object keyed by strings;
+     If the values are not strings, a function getKey must be provided
+     which will extract a string key from each value */
+  mod.toTable = function(a, getKey) {
+    var get = getter(getKey);
     var tbl = {};
-    mod.iter(a, function(k) {
-      tbl[k] = true;
+    mod.iter(a, function(v) {
+      var k = get(v);
+      tbl[k] = v;
     });
     return tbl;
   };
 
   /*
-    union of two lists of strings
-    (strings occurring in either list, without duplicates)
+    union of two lists
+    (elements occurring in either list, without duplicates)
   */
-  mod.union = function(a, b) {
-    var tbl = mod.toTable(a);
+  mod.union = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(a, getKey);
     var resTbl = {};
     var c = [];
     for (var k in tbl)
-      c.push(k);
-    mod.iter(b, function(k) {
-      if (! tbl[k] && ! resTbl[k]) {
-        c.push(k);
-        resTbl[k] = true;
+      c.push(tbl[k]);
+    mod.iter(b, function(v) {
+      var k = get(v);
+      if (! util.isDefined(tbl[k]) && ! util.isDefined(resTbl[k])) {
+        c.push(v);
+        resTbl[k] = v;
       }
     });
     return c;
   };
 
   /*
-    remove duplicates from a list of strings
+    remove duplicates from a list
   */
-  mod.unique = function(a) {
-    return mod.union(a, []);
+  mod.unique = function(a, getKey) {
+    return mod.union(a, [], getKey);
   };
 
   /*
-    intersection of two lists of strings
-    (strings occurring in both lists)
+    intersection of two lists
+    (elements occurring in both lists)
   */
-  mod.inter = function(a, b) {
-    var tbl = mod.toTable(b);
-    return mod.filter(a, function(k) {
-      return tbl[k];
+  mod.inter = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(b, getKey);
+    return mod.filter(mod.unique(a, getKey), function(v) {
+      var k = get(v);
+      return util.isDefined(tbl[k]);
     });
   };
 
   /*
-    set difference of two lists of strings
-    (strings occurring in the first list but not in the second list)
+    set difference of two lists
+    (elements occurring in the first list but not in the second list)
   */
-  mod.diff = function(a, b) {
-    var tbl = mod.toTable(b);
-    return mod.filter(mod.unique(a), function(k) {
-      return ! tbl[k];
+  mod.diff = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(b, getKey);
+    return mod.filter(mod.unique(a, getKey), function(v) {
+      var k = get(v);
+      return ! util.isDefined(tbl[k]);
     });
   };
 
@@ -154,6 +175,9 @@ var list = (function() {
   var l2 = ["c", "w", "c", "y"];
 
   mod.tests = [
+    test.expect("concat",
+                function() { return mod.concat([l1, l2]); }, null,
+                ["a", "c", "a", "b", "d", "c", "w", "c", "y"]),
     test.expect("union",
                 function() { return mod.union(l1, l2); }, null,
                 ["a", "c", "b", "d", "w", "y"]),

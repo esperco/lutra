@@ -254,7 +254,7 @@ var chat = (function () {
       .appendTo(v);
 
     editText.autosize();
-    
+
     if (chat.chat_items.length === 0) {
       editText.attr("placeholder", "Write a message...");
     } else {
@@ -406,7 +406,17 @@ var chat = (function () {
         });
 
         var first_tab = true;
-        list.iter(task.task_chats, function (chat) {
+
+        /* move group chat to first position */
+        var singleChats = list.filter(task.task_chats, function(x) {
+          return x.chatid !== task.task_context_chat;
+        });
+        var groupChats = list.filter(task.task_chats, function(x) {
+          return x.chatid === task.task_context_chat;
+        });
+        var chats = list.concat([groupChats, singleChats]);
+
+        list.iter(chats, function (chat) {
           var tab_name;
           var pane_id = "chat" + chat.chatid;
           var tab = $("<a/>", {
