@@ -42,6 +42,7 @@ SOURCES = \
   task.js \
   page.js \
   route.js \
+  display.js \
   main.js
 
 # Development: keep each file separate for easier debugging

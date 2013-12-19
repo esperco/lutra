@@ -97,7 +97,7 @@ var task = (function() {
     function initTaskTitle() {
       var input = $("#new-task-title");
       input.val("");
-      util.afterTyping(input, $("#new-task-title"), function () {
+      util.afterTyping(input, 500, function () {
         if (isValidTitle(input.val()))
           startTaskButton.removeClass("disabled");
         else

@@ -10,7 +10,15 @@ var list = (function() {
     var len = a.length;
     for (var i = 0; i < len; i++)
       f(a[i], i);
-  }
+  };
+
+  mod.concat = function(aa) {
+    var acc = [];
+    mod.iter(aa, function(a) {
+      acc = acc.concat(a);
+    });
+    return acc;
+  };
 
   /* one-to-one mapping */
   mod.map = function(a, f) {
@@ -19,7 +27,7 @@ var list = (function() {
     for (var i = 0; i < len; i++)
       b[i] = f(a[i], i);
     return b;
-  }
+  };
 
   /* map, remove null elements */
   mod.filter_map = function(a, f) {
@@ -32,7 +40,7 @@ var list = (function() {
       }
     }
     return b;
-  }
+  };
 
   /* keep only elements that satisfy the predicate */
   mod.filter = function(a, f) {
@@ -45,7 +53,7 @@ var list = (function() {
       }
     }
     return b;
-  }
+  };
 
   /* return the first element that satisfies the give predicate */
   mod.find = function(a, f) {
@@ -56,7 +64,7 @@ var list = (function() {
       }
     }
     return null;
-  }
+  };
 
   /* return true if at least one element satisfies the given predicate */
   mod.exists = function(a, f) {
@@ -66,7 +74,7 @@ var list = (function() {
         return true;
     }
     return false;
-  }
+  };
 
   /* return true if at least one element equals the given element */
   mod.mem = function(a, x) {
@@ -77,7 +85,112 @@ var list = (function() {
       }
     }
     return false;
-  }
+  };
+
+  /* shallow copy of a list */
+  mod.copy = function(a) {
+    return a.slice(0);
+  };
+
+  function getter(optFunc) {
+    return util.isDefined(optFunc) ? optFunc : function(x) { return x; };
+  };
+
+  /* convert object into a list of its values */
+  mod.ofTable = function(tbl) {
+    var a = [];
+    for (var k in tbl)
+      a.push(tbl[k]);
+    return a;
+  };
+
+  /* convert a list of values into an object keyed by strings;
+     If the values are not strings, a function getKey must be provided
+     which will extract a string key from each value */
+  mod.toTable = function(a, getKey) {
+    var get = getter(getKey);
+    var tbl = {};
+    mod.iter(a, function(v) {
+      var k = get(v);
+      tbl[k] = v;
+    });
+    return tbl;
+  };
+
+  /*
+    union of two lists
+    (elements occurring in either list, without duplicates)
+  */
+  mod.union = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(a, getKey);
+    var resTbl = {};
+    var c = [];
+    for (var k in tbl)
+      c.push(tbl[k]);
+    mod.iter(b, function(v) {
+      var k = get(v);
+      if (! util.isDefined(tbl[k]) && ! util.isDefined(resTbl[k])) {
+        c.push(v);
+        resTbl[k] = v;
+      }
+    });
+    return c;
+  };
+
+  /*
+    remove duplicates from a list
+  */
+  mod.unique = function(a, getKey) {
+    return mod.union(a, [], getKey);
+  };
+
+  /*
+    intersection of two lists
+    (elements occurring in both lists)
+  */
+  mod.inter = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(b, getKey);
+    return mod.filter(mod.unique(a, getKey), function(v) {
+      var k = get(v);
+      return util.isDefined(tbl[k]);
+    });
+  };
+
+  /*
+    set difference of two lists
+    (elements occurring in the first list but not in the second list)
+  */
+  mod.diff = function(a, b, getKey) {
+    var get = getter(getKey);
+    var tbl = mod.toTable(b, getKey);
+    return mod.filter(mod.unique(a, getKey), function(v) {
+      var k = get(v);
+      return ! util.isDefined(tbl[k]);
+    });
+  };
+
+  var l1 = ["a", "c", "a", "b", "d"];
+  var l2 = ["c", "w", "c", "y"];
+
+  mod.tests = [
+    test.expect("concat",
+                function() { return mod.concat([l1, l2]); }, null,
+                ["a", "c", "a", "b", "d", "c", "w", "c", "y"]),
+    test.expect("union",
+                function() { return mod.union(l1, l2); }, null,
+                ["a", "c", "b", "d", "w", "y"]),
+    test.expect("inter",
+                function() { return mod.inter(l1, l2); }, null,
+                ["c"]),
+    test.expect("diff",
+                function() { return mod.diff(l1, l2); }, null,
+                ["a", "b", "d"]),
+    test.expect("unique",
+                function() { return mod.unique(l1); }, null,
+                ["a", "c", "b", "d"])
+  ];
 
   return mod;
 }());
