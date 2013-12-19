@@ -90,11 +90,17 @@ var sched = (function() {
       .appendTo(view);
 
     var locText = mod.locationText(x.location);
+    var locDiv = $("<div class='loc-text' />");
+    var pin = $("<img class='pin'/>");
+      pin.appendTo(locDiv);
+    svg.loadImg(pin, "/assets/img/pin.svg");
     if (locText) {
-      $("<div class='location-text' />")
-        .append(html.text("Location: "))
-        .append(html.text(locText))
-        .appendTo(view);
+      locDiv.append(html.text(locText))
+            .appendTo(view);
+    } else {
+      locDiv.append("Location TBD")
+            .addClass("tbd")
+            .appendTo(view);
     }
 
     return view;

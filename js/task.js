@@ -49,6 +49,9 @@ var task = (function() {
 
   function viewOfTaskTitle(task) {
     var view = $("<div class='task'></div>");
+    var checkbox = $("<img class='task-checkbox'/>")
+      .appendTo(view);
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
     var title = task.task_status
       ? task.task_status.task_title
       : null;
@@ -66,7 +69,7 @@ var task = (function() {
   }
 
   mod.updateActiveTasksView = function(data) {
-    var tabName = page.home.tab.activeTasks;
+    var tabName = page.home.tab.schedulingTasks;
     placeView($("#" + tabName + "-tab-content"),
               viewOfTaskQueue(data.tasks));
   };
@@ -227,6 +230,8 @@ var task = (function() {
   /* Load task page */
   mod.load = function(optTid) {
     $("#main-navbar").addClass("hide");
+    $("#chat-sidebar").click(function() {
+    });
     taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();

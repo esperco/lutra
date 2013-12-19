@@ -114,10 +114,17 @@ var sched2 = (function() {
 
     list.iter(x.suggestions, function(slot, k) {
       var slotView = $("<div class='suggestion' />");
-      var checkbox = $("<img class='suggestion-checkbox'/>");
-      checkbox.appendTo(slotView);
+      var checkbox = $("<img class='suggestion-checkbox'/>")
+        .appendTo(slotView);
       svg.loadImg(checkbox, "/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot);
+      var editTooltip = $("<a data-toggle='tooltip' title='Edit' />")
+        .appendTo(slotView);
+      var edit = $("<img class='suggestion-edit' />")
+        .appendTo(editTooltip);
+      svg.loadImg(edit, "/assets/img/edit.svg");
+      edit.click(function() {
+      });
       slotView.click(function() {
         var index;
         var kv = list.find(selected, function(kv, i) {

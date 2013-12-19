@@ -105,11 +105,11 @@ object {
   font-style: italic;
 }
 
-.tasktitle {
+.task-title {
   color: #414042;
 }
 
-.tasktitle:hover {
+.task-title:hover {
   color: #808285;
 }
 
@@ -162,7 +162,133 @@ object {
 
 /*** Nav Bar ***/
 
-#main-navbar,
+#main-navbar {
+  position: fixed;
+  height: 100%;
+  width: 220px;
+  background-color: #414042;
+  overflow-y: auto;
+}
+
+.nav-header {
+  margin: 0;
+  height: 80px;
+  background-color: #a25cc6;
+}
+
+.nav-section-line {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  height: 1px;
+  background-color: #58595b;
+}
+
+.nav-section-title {
+  position: relative;
+  top: -0.5em;
+  left: 7px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: #a7a9ac;
+  background-color: #414042;
+  font-family: "Proxima Nova Light";
+  letter-spacing: 3px;
+}
+
+.nav-block {
+  margin: 0;
+  height: 60px;
+  color: #d1d3d4;
+}
+
+.nav-text {
+  display: inline-block;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#search-icon {
+  float: left;
+  margin: 10px 2px;
+}
+
+#dashboard-icon {
+  float: left;
+  margin: 10px 1px;
+}
+
+#all-tasks-icon {
+  float: left;
+  margin: 12px 1px;
+}
+
+#scheduling-icon {
+  float: left;
+  margin: 10px 2px;
+}
+
+#general-icon {
+  float: left;
+  margin: 10px 2px;
+}
+
+#archive-icon {
+  float: left;
+  margin-top: 10px;
+}
+
+#people-icon {
+  float: left;
+  margin-top: 10px;
+}
+
+#places-icon {
+  float: left;
+  margin: 10px 5px;
+}
+
+#search-icon path,
+#dashboard-icon path,
+#dashboard-icon circle,
+#all-tasks-icon path,
+#scheduling-icon path,
+#scheduling-icon text,
+#general-icon path,
+#general-icon circle,
+#archive-icon path,
+#people-icon path,
+#places-icon path, {
+  fill: #808285;
+}
+
+.nav-block:hover #search-icon path,
+.nav-block:hover #dashboard-icon path,
+.nav-block:hover #dashboard-icon circle,
+.nav-block:hover #all-tasks-icon path,
+.nav-block:hover #scheduling-icon path,
+.nav-block:hover #scheduling-icon text,
+.nav-block:hover #general-icon path,
+.nav-block:hover #general-icon circle,
+.nav-block:hover #archive-icon path,
+.nav-block:hover #people-icon path,
+.nav-block:hover #places-icon path, {
+  fill: white;
+}
+
+.nav-pills > li.active > a:hover #search-icon path,
+.nav-pills > li.active > a:hover #dashboard-icon path,
+.nav-pills > li.active > a:hover #dashboard-icon circle,
+.nav-pills > li.active > a:hover #all-tasks-icon path,
+.nav-pills > li.active > a:hover #scheduling-icon path,
+.nav-pills > li.active > a:hover #scheduling-icon text,
+.nav-pills > li.active > a:hover #general-icon path,
+.nav-pills > li.active > a:hover #general-icon circle,
+.nav-pills > li.active > a:hover #archive-icon path,
+.nav-pills > li.active > a:hover #people-icon path,
+.nav-pills > li.active > a:hover #places-icon path, {
+  fill: #808285;
+}
+
 #task-navbar {
   z-index: 1030;
   background: rgba(248,248,248,0.9);
@@ -196,13 +322,61 @@ object {
   letter-spacing: 3px;
 }
 
-.account {
+/*.account {
   margin-top: 9px;
   margin-right: 9px;
 }
 
 #logged-in-email {
   color: #414042;
+}*/
+
+#chat-sidebar {
+  float: right;
+  margin-right: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.chat-open .chat-icon path {
+  fill: #e6e7e8;
+}
+
+.chat-open .chat-icon:hover path {
+  fill: #d1d3d4;
+}
+
+.chat-closed .chat-icon path {
+  fill: #a25cc6;
+}
+
+.chat-closed .chat-icon:hover path {
+  fill: #8c42ad;
+}
+
+
+/*** Home ***/
+
+.task-list {
+  border-top: 1px solid #e6e7e8;
+}
+
+.home-container {
+  margin-left: 220px;
+  margin-right: 0;
+  padding-top: 20px;
+}
+
+.page-title {
+  float: left;
+  color: #808285;
+  font-family: "Proxima Nova Light";
+  letter-spacing: 6px;
+}
+
+#new-task-btn {
+  float: right;
+  margin-top: 20px;
 }
 
 
@@ -290,6 +464,11 @@ object {
 
 
 /*** Container ***/
+
+.task-container {
+  padding-top: 80px;
+  padding-bottom: 120px;
+}
 
 #task-content {
   height: 100%;
@@ -646,6 +825,10 @@ object {
 
 /*** Scheduling Step 2 ***/
 
+#manual-entry {
+  cursor: pointer;
+}
+
 .top-divider {
   margin-bottom: 0;
 }
@@ -689,7 +872,14 @@ object {
 
 .suggestion-checkbox {
   float: left;
-  margin-top: 16px;
+  margin-top: 30px;
+  width: 24px;
+  height: 24px;
+}
+
+.suggestion-edit {
+  float: right;
+  margin-top: 30px;
   width: 24px;
   height: 24px;
 }
@@ -705,6 +895,14 @@ object {
 .suggestion:hover path.check-outline,
 .suggestion:hover path.radio-outline {
   fill: #a7a9ac;
+}
+
+.suggestion:hover .suggestion-edit g path {
+  fill: #a25cc6;
+}
+
+.suggestion:hover .suggestion-edit:hover g path {
+  fill: #8c42ad;
 }
 
 .checkbox-selected path.check-background,
@@ -746,16 +944,28 @@ object {
   font-size: 18px;
 }
 
-.time-text {
+.time-text, .loc-text {
   font-size: 14px;
+}
+
+.pin {
+  margin-right: 6px;
+}
+
+.tbd {
+  font-family: "Proxima Nova Regular Italic";
 }
 
 .suggestion:hover .day-text,
 .suggestion:hover .date-text,
-.suggestion:hover .time-text {
+.suggestion:hover .time-text,
+.suggestion:hover .loc-text {
   color: #808285;
 }
 
+.suggestion:hover .pin path {
+  fill: #808285;
+}
 
 /*** Scheduling Step 3 ***/
 

@@ -4,10 +4,9 @@
 */
 /* set a max-width for horizontal fluid layout and make it centered */
 .container {
-  margin-top: 60px;
-  padding-top: 40px;
-  padding-bottom: 120px;
-  max-width: 534px;
+  padding-left: 30px;
+  padding-right: 30px;
+  width: auto;
   overflow-y: auto;
 }
 .col-sm-3,
@@ -170,6 +169,30 @@ fieldset[disabled] .btn-primary.active {
   border-top-color: #a25cc6;
   border-bottom-color: #a25cc6;
 }
+.nav-pills > li > a {
+  border-radius: 0;
+}
+.nav-pills > li + li {
+  margin-left: 0;
+}
+.nav-pills > li > a:hover {
+  color: white;
+  background-color: #808285;
+}
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  color: #414042;
+  background-color: white;
+}
+.nav-pills > li.active > a .caret,
+.nav-pills > li.active > a:hover .caret,
+.nav-pills > li.active > a:focus .caret {
+  border: none;
+}
+.nav-stacked > li + li {
+  margin-top: 0;
+}
 .navbar-toggle {
   margin-top: 0;
   margin-right: 0;
@@ -184,12 +207,10 @@ fieldset[disabled] .btn-primary.active {
   border: none;
   border-radius: 0;
 }
-
 .nav-tabs > li > a:hover {
   background-color: #e6e7e8;
   border: none;
 }
-
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {

@@ -20,11 +20,13 @@ var page = (function() {
   ];
 
   mod.home.tab = {
-    activeTasks: "active-tasks"
+    schedulingTasks: "scheduling-tasks"
   };
 
   var homeTabNames = [
-    mod.home.tab.activeTasks
+    mod.home.tab.schedulingTasks,
+    mod.home.tab.generalTasks,
+    mod.home.tab.archiveTasks
   ];
 
   function homeInitTabs() {
@@ -148,9 +150,13 @@ var page = (function() {
 
   mod.home.load = function() {
     $("#main-navbar").removeClass("hide");
+    var today = new Date();
+    var dd = today.getDate();
+    log($("#scheduling-icon").text());
+    $("#scheduling-icon").text(dd); /* Doesn't work */
     hideAll();
     api.loadActiveTasks();
-    homeReplaceTab("active-tasks");
+    homeReplaceTab("scheduling-tasks");
     show("home");
   }
 
