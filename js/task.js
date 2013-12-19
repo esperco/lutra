@@ -23,9 +23,10 @@ var task = (function() {
   // display task
   mod.viewOfTask = function(tab, task) {
     var view = $("<div class='task'></div>");
-    var buttons = $("<div class='buttons rightbox'></div>");
 
-    buttons.appendTo(view);
+    var checkbox = $("<img class='task-checkbox'/>")
+        .appendTo(view);
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
 
     var title = task.task_status
       ? task.task_status.task_title
@@ -39,7 +40,7 @@ var task = (function() {
   }
 
   function viewOfTaskTitle(title, tid) {
-    var link = $("<a class='tasktitle' href='#!task/" + tid + "'/>")
+    var link = $("<a class='task-title' href='#!task/" + tid + "'/>")
       .text(title);
     return link;
   }
@@ -50,7 +51,7 @@ var task = (function() {
   }
 
   mod.updateActiveTasksView = function(data) {
-    var tabName = page.home.tab.activeTasks;
+    var tabName = page.home.tab.schedulingTasks;
     placeView($("#" + tabName + "-tab-content"),
               viewOfTaskQueue(tabName, data.tasks));
   };
