@@ -37,7 +37,6 @@ var sched1 = (function() {
 
     function updateInitials() {
       var s = profile.shortenName(nameInput.val());
-      log("update initials " + s);
       initials
         .text(profile.shortenName(nameInput.val()));
     }
@@ -50,7 +49,7 @@ var sched1 = (function() {
             clearUid();
             var uid = prof.profile_uid;
             optUid = uid;
-            guestTbl[uid] = true;
+            guestTbl[uid] = uid;
             nameInput.attr("id", "name-" + uid);
             emailInput.attr("id", "email-" + uid);
             if (prof.full_name !== emailAddr || ! prof.editable)
@@ -147,12 +146,13 @@ var sched1 = (function() {
       nextButton.addClass("disabled");
   }
 
-  function finalizeGuests(task, hosts, guestTbl) {
+  function finalizeGuests(ta, hosts, guestTbl) {
     var guests = collectGuests(hosts, guestTbl);
-    task.task_participants.organized_for = list.union(hosts, guests);
-    task.task_status.task_progress = "Coordinating";
-    sched.getState(task).scheduling_stage = "Find_availability";
-    api.postTask(task)
+    ta.task_participants.organized_for = list.union(hosts, guests);
+    ta.task_status.task_progress = "Coordinating";
+    sched.getState(ta).scheduling_stage = "Find_availability";
+    task.dont_change_task_type();
+    api.postTask(ta)
       .done(sched.loadTask);
   }
 
