@@ -120,13 +120,25 @@
             <label for="login-password" class="login-title">Password</label>
             <input type="password" class="form-control" id="login-password">
           </div>
-          <button type="submit" id="login-button" class="btn btn-primary login-btn">
+          <button id="login-button" class="btn btn-primary login-btn">
             LOG IN
           </button>
+          <div>
+            Forgot password?
+            <a href="#!request-password">Click here to reset.</a>
+          </div>
         </form>
 
         <div class="footer-push"></div>
       </div>
+    </div>
+
+    <div id="request-password-page" class="hide">
+      @@request-password.html@@
+    </div>
+
+    <div id="reset-password-page" class="hide">
+      @@reset-password.html@@
     </div>
 
     <div id="home-page" class="hide">
@@ -156,6 +168,7 @@
           <a id="chat-sidebar">
             <img class="svg chat-icon" src="/assets/img/chat.svg">
           </a>
+          <div id="select-task-type" class="hide"></div>
         </div>
 
         <div id="new-task">
@@ -177,7 +190,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="hide"></div>
+        <div id="gen-task" class="container hide"></div>
 
       </div>
 

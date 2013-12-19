@@ -64,6 +64,18 @@ var api = (function () {
     return jsonHttpPost("/api/login", JSON.stringify(login_request));
   };
 
+  mod.requestPassword = function(email) {
+    var password_request = { email: email };
+    return jsonHttpPost("/api/password-request",
+                        JSON.stringify(password_request));
+  };
+
+  mod.resetPassword = function(uid, token, password) {
+    var password_reset = { password: password };
+    return jsonHttpPost("/api/password/" + uid + "/" + token,
+                        JSON.stringify(password_reset));
+  };
+
   function api_profile_prefix() {
     return "/api/profile/" + login.data.uid;
   }
@@ -76,8 +88,18 @@ var api = (function () {
     return api_q_prefix() + "/tasks/" + login.data.teams[0].teamid;
   }
 
-  mod.getProfile = function (uid) {
+  mod.getProfile = function(uid) {
     return jsonHttpGet(api_profile_prefix() + "/" + uid);
+  };
+
+  mod.postProfile = function(prof) {
+    var url = api_profile_prefix() + "/" + prof.profile_uid;
+    return jsonHttpPost(url, JSON.stringify(prof));
+  };
+
+  mod.getProfileByEmail = function(email) {
+    return jsonHttpGet(api_profile_prefix() + "/email/"
+                       + encodeURIComponent(email));
   };
 
   mod.loadActiveTasks = function() {
@@ -166,6 +188,11 @@ var api = (function () {
   mod.reserveCalendar = function(tid) {
     var url = api_s_prefix() + "/event/" + tid + "/reserve";
     return jsonHttpPost(url, "");
+  };
+
+  mod.getReminderMessage = function() {
+    var url = api_s_prefix() + "/reminder/message";
+    return jsonHttpGet(url);
   };
 
   return mod;

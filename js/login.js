@@ -28,6 +28,8 @@ var login = (function() {
   mod.clearLoginInfo = function() {
     store.remove("login");
     delete mod.data;
+    $("#login-email").val("");
+    $("#login-password").val("");
     mod.updateView();
   }
 
@@ -36,9 +38,7 @@ var login = (function() {
   */
   mod.login = function (email, password) {
     return api.login(email, password)
-      .done(function cont(login) {
-        mod.setLoginInfo(login);
-      });
+      .then(mod.setLoginInfo);
   }
 
   mod.logout = function () {

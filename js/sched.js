@@ -37,10 +37,14 @@ var sched = (function() {
     return task.task_participants.organized_for;
   };
 
+  mod.getHosts = function(task) {
+    var team = login.data.team;
+    return list.inter(mod.getParticipants(task), team.team_leaders);
+  };
+
   mod.getGuests = function(task) {
-    return list.filter(mod.getParticipants(task), function(uid) {
-      return mod.isGuest(uid);
-    });
+    var team = login.data.team;
+    return list.diff(mod.getParticipants(task), team.team_leaders);
   };
 
   mod.forEachParticipant = function(task, f) {

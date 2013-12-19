@@ -58,6 +58,7 @@ var sched2 = (function() {
   }
 
   function clearSuggestions() {
+    $(".sched-step2-next").addClass("disabled");
     $("#sched-step2-suggestions").children().remove();
   }
 
@@ -73,6 +74,9 @@ var sched2 = (function() {
       .unbind('click')
       .click(function() {
         var slots = list.map(selected, function(v) { return v[1].slot; });
+        slots.sort(function(a, b) {
+          return date.ofString(a.start) - date.ofString(b.start);
+        });
         selectCalendarSlots(profs, task, slots);
       });
 
@@ -168,10 +172,13 @@ var sched2 = (function() {
 
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
-  function selectCalendarSlots(profs, task, slots) {
-    var x = task.task_data[1];
-    task.task_status.task_progress = "Coordinating"; // status in the task list
-    x.scheduling_stage = "Coordinate";               // step in the scheduling page
+  function selectCalendarSlots(profs, ta, slots) {
+    task.dont_change_task_type();
+
+    var x = ta.task_data[1];
+    ta.task_status.task_progress = "Coordinating"; // status in the task list
+    x.scheduling_stage = "Coordinate"; // step in the scheduling page
+
     /* TODO: reserve calendar slots for leader of organizing team,
              unreserve previously-reserved calendar slots */
     x.calendar_options = labelSlots(slots);
@@ -180,7 +187,7 @@ var sched2 = (function() {
     delete x.availabilities;
     delete x.reserved;
 
-    api.postTask(task)
+    api.postTask(ta)
       .done(function(task) { sched.loadStep3(profs, task); });
   }
 

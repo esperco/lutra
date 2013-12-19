@@ -69,17 +69,19 @@ var sched3 = (function() {
     return view;
   }
 
-  function updateTask(profs, task, calOption) {
-    var state = sched.getState(task);
-    task.task_status.task_progress = "Confirmed"; // status in the task list
+  function updateTask(profs, ta, calOption) {
+    task.dont_change_task_type();
+
+    var state = sched.getState(ta);
+    ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";           // step in the scheduling page
     state.reserved = {
       slot: calOption.slot,
       remind: 3*43200,
       notifs: []
     };
-    api.postTask(task)
-      .done(function () { sched.loadStep4(profs, task); });
+    api.postTask(ta)
+      .done(function (task) { sched.loadStep4(profs, task); });
   }
 
   function textOfHowSoon(x) {
@@ -124,8 +126,8 @@ var sched3 = (function() {
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var firstInitial = $("<p class='first-initial'/>")
-      .text(profile.firstInitialOfProfile(prof));
+    var initials = $("<p class='initials'/>")
+      .text(profile.veryShortName(prof));
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
@@ -141,7 +143,7 @@ var sched3 = (function() {
       availabilityModal.modal({});
     }
 
-    firstInitial.appendTo(chatHead);
+    initials.appendTo(chatHead);
     chatHead.appendTo(view);
 
     $("<p class='guest-name'>" + name + "</p>")

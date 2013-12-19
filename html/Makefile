@@ -7,6 +7,8 @@ HTML_INCLUDES = \
   all-tasks.html \
   arch-task-list.html \
   gen-task-list.html \
+  request-password.html \
+  reset-password.html \
   new-task.html \
   sched-step1-tab.html \
   sched-step2-tab.html \

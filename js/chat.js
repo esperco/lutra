@@ -254,7 +254,7 @@ var chat = (function () {
       .appendTo(v);
 
     editText.autosize();
-    
+
     if (chat.chat_items.length === 0) {
       editText.attr("placeholder", "Write a message...");
     } else {
@@ -406,10 +406,24 @@ var chat = (function () {
         });
 
         var first_tab = true;
-        list.iter(task.task_chats, function (chat) {
+
+        /* move group chat to first position */
+        var singleChats = list.filter(task.task_chats, function(x) {
+          return x.chatid !== task.task_context_chat;
+        });
+        var groupChats = list.filter(task.task_chats, function(x) {
+          return x.chatid === task.task_context_chat;
+        });
+        var chats = list.concat([groupChats, singleChats]);
+
+        list.iter(chats, function (chat) {
           var tab_name;
           var pane_id = "chat" + chat.chatid;
-          var tab = $("<a/>", {href:"#"+pane_id, "class":"tab-name", "data-toggle":"tab"});
+          var tab = $("<a/>", {
+            href:"#"+pane_id,
+            "class":"tab-name",
+            "data-toggle":"tab"
+          });
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
@@ -422,9 +436,9 @@ var chat = (function () {
           } else {
             var p = profiles[chat.chat_participants[0].par_uid];
             tab_name = p.full_name;
-            var tab_initial = p.full_name.charAt(0).toUpperCase();
+            var tab_initials = profile.veryShortNameOfProfile(p);
             tab.append($("<div class='prof-circ'/>")
-               .append(tab_initial));
+               .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");
           caret.appendTo(tab);
