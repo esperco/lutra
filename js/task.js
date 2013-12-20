@@ -243,5 +243,19 @@ var task = (function() {
     }
   }
 
+  mod.init = function() {
+    $("#new-task-btn").click(function () {
+      window.location.hash = "!task";
+    });
+    $("#new-gen-task-btn").click(function () {
+      $("#category-gen").prop("checked", true);
+      window.location.hash = "!task";
+    });
+    $("#new-sched-task-btn").click(function () {
+      $("#category-sched").prop("checked", true);
+      window.location.hash = "!task";
+    });
+  }
+
   return mod;
 }());
