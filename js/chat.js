@@ -292,15 +292,19 @@ var chat = (function () {
     selChoicesDiv.click(function () {
       if (selChoicesDiv.hasClass("checkbox-selected")) {
         selChoicesDiv.removeClass("checkbox-selected");
+        util.cancelFocus();
       } else {
         selChoicesDiv.addClass("checkbox-selected");
-        // choicesEditor.children().eq(0).find("input").css("background","black"); /* Works. */
-        choicesEditor.children().eq(0).find("input").focus(); /* Doesn't work. */
+        var first = choicesEditor.children().eq(0).find("input");
+        util.changeFocus(first);
       }
       choicesEditor.toggle();
+      util.focus();
     });
 
-    var sendButton = $("<button class='btn btn-primary chat-send-btn disabled'>Send</button>")
+    var sendButton = $("<button/>")
+      .addClass('btn btn-primary chat-send-btn disabled')
+      .text("Send")
       .appendTo(sendDiv);
 
     editText.on("keyup", function (e){
@@ -451,7 +455,6 @@ var chat = (function () {
         });
 
         $("#chat").removeClass("hide");
-
       });
   }
 

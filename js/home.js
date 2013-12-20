@@ -52,6 +52,7 @@ var home = (function() {
     tabSelector.hideAll();
     loadSchedulingTasks();
     tabSelector.show("scheduling-tasks");
+    util.focus();
   };
 
   return mod;

@@ -221,6 +221,7 @@ var sched = (function() {
             default:
               log("Unknown scheduling stage: " + progress);
             }
+            util.focus();
           });
       });
   };
