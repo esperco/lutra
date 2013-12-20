@@ -3,6 +3,7 @@ function main() {
   page.init();
   svg.init();
   login.initLoginInfo();
+  task.init();
   route.setup();
 }
 
