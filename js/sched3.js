@@ -127,7 +127,7 @@ var sched3 = (function() {
     var prof = obsProf.prof;
     var name = prof.full_name;
     var initials = $("<p class='initials'/>")
-      .text(profile.veryShortName(prof));
+      .text(profile.veryShortNameOfProfile(prof));
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
