@@ -73,6 +73,7 @@ var profile = (function() {
       if (m)
         result += m[2];
     } while (m);
+    result = result.toUpperCase();
     return result;
   }
 
@@ -92,8 +93,6 @@ var profile = (function() {
     var name = email.localpart(s);
 
     var result = initials(name);
-    if (result.length <= 1)
-      result = firstTwoLetters(name);
     if (result === "")
       result = name.substring(0,2);
     return result;

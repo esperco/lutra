@@ -100,11 +100,12 @@ var task = (function() {
     function initTaskTitle() {
       var input = $("#new-task-title");
       input.val("");
-      util.afterTyping(input, 500, function () {
-        if (isValidTitle(input.val()))
+      input.on("keyup", function (e){
+        if ($(this).val() !== "") {
           startTaskButton.removeClass("disabled");
-        else
+        } else {
           startTaskButton.addClass("disabled");
+        }
       });
       input.focus();
     }

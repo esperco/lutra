@@ -122,11 +122,11 @@ var sched3 = (function() {
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row'>");
-    var chatHead = $("<div class='chat-head'>");
+    var chatHead = $("<div class='list-prof-circ'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var initials = $("<p class='initials'/>")
+    var initials = $("<p class='initials unselectable'/>")
       .text(profile.veryShortName(prof));
 
     var state = sched.getState(task);
@@ -182,6 +182,7 @@ var sched3 = (function() {
   }
 
   mod.load = function(profs, task, view) {
+    var view = $("#sched-step3-table");
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
@@ -200,7 +201,7 @@ var sched3 = (function() {
     $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
       .appendTo(view);
 
-    var guestsContainer = $("<div class='guests-container'>")
+    var guestsContainer = $("<div id='guests-container'>")
     var guests = sched.getGuests(task);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {

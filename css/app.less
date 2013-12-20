@@ -609,7 +609,7 @@ object {
   width: 60px;
 }
 
-.prof-circ {
+.chat-prof-circ {
   padding-top: 5px;
   height: 30px;
   width: 30px;
@@ -635,7 +635,7 @@ object {
   color: #414042;
 }
 
-.tab-name:hover .prof-circ {
+.tab-name:hover .chat-prof-circ {
   background: #d1d3d4;
 }
 
@@ -645,9 +645,9 @@ object {
   fill: white;
 }
 
-.nav-tabs > li.active > a .prof-circ,
-.nav-tabs > li.active > a:hover .prof-circ,
-.nav-tabs > li.active > a:focus .prof-circ {
+.nav-tabs > li.active > a .chat-prof-circ,
+.nav-tabs > li.active > a:hover .chat-prof-circ,
+.nav-tabs > li.active > a:focus .chat-prof-circ {
   background-color: white;
 }
 
@@ -823,6 +823,173 @@ object {
 }
 
 
+/*** Scheduling Step 1 ***/
+
+#guest-list-container {
+  margin-top: 30px;
+  border-top: 1px solid #e6e7e8;
+}
+
+.sched-step1-row,
+.sched-step1-add-row,
+.suggestion,
+.sched-step3-row {
+  padding: 10px;
+  border-bottom: 1px solid #e6e7e8;
+}
+
+.sched-step1-row,
+.sched-step1-add-row {
+  min-height: 70px;
+}
+
+.list-prof-circ,
+.add-guest-circ {
+  float: left;
+  margin-top: 5px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.list-prof-circ {
+  background-color: #808285;
+}
+
+.initials {
+  padding: 8px;
+  color: white;
+  font-size: 18px;
+}
+
+.guest-name {
+  float: left;
+  margin-top: 14px;
+  margin-left: 18px;
+  font-family: "Proxima Nova Semibold";
+}
+
+.add-guest-circ {
+  background-color: #a25cc6;
+}
+
+.add-guest-circ:hover {
+  background-color: #8c42ad;
+  cursor: pointer;
+}
+
+.add-guest-disabled,
+.add-guest-disabled:hover {
+  background-color: #e8d9ee !important;
+  cursor: default;
+}
+
+#plus {
+  margin-top: 10px;
+}
+
+.cancel {
+  background-color: #e53030 !important;
+  -webkit-animation: rotate_cc 0.5s;
+     -moz-animation: rotate_cc 0.5s;
+          animation: rotate_cc 0.5s;
+  -webkit-animation-fill-mode: forwards;
+     -moz-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+  -webkit-animation-iteration-count: 1;
+     -moz-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+}
+@-moz-keyframes rotate_cc {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(-45deg); }
+}
+@-webkit-keyframes rotate_cc {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(-45deg); }
+}
+@keyframes rotate_cc {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(-45deg);}
+}
+
+.cancel:hover {
+  background-color: #bf2121 !important;
+  cursor: pointer;
+}
+
+.return-to-add {
+  background-color: #a25cc6;
+  -webkit-animation: rotate_c 0.5s;
+     -moz-animation: rotate_c 0.5s;
+          animation: rotate_c 0.5s;
+  -webkit-animation-fill-mode: forwards;
+     -moz-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+  -webkit-animation-iteration-count: 1;
+     -moz-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+}
+@-moz-keyframes rotate_c {
+    from { -moz-transform: rotate(-45deg); }
+    to { -moz-transform: rotate(0deg); }
+}
+@-webkit-keyframes rotate_c {
+    from { -webkit-transform: rotate(-45deg); }
+    to { -webkit-transform: rotate(0deg); }
+}
+@keyframes rotate_c {
+    from {transform:rotate(-45deg);}
+    to {transform:rotate(0deg);}
+}
+
+#add-guest-text {
+  float: left;
+  margin-top: 14px;
+  margin-left: 18px;
+  cursor: pointer;
+}
+
+#max-guests-text {
+  float: left;
+  margin-top: 14px;
+  margin-left: 18px;
+  font-family: "Proxima Nova Regular Italic";
+  color: #808285;
+}
+
+#guest-input-div {
+  margin-left: 60px;
+  padding-top: 10px;
+  max-width: 360px;
+}
+
+.guest-input {
+  margin-bottom: 10px;
+}
+
+#add-guest-btn {
+  margin-bottom: 5px;
+}
+
+.remove-guest {
+  float: right;
+  margin-top: 20px;
+}
+
+.remove-guest path {
+  fill: #e6e7e8;
+}
+
+.remove-guest:hover {
+  cursor: pointer;
+}
+
+.remove-guest:hover path {
+  fill: #d1d3d4;
+}
+
 /*** Scheduling Step 2 ***/
 
 #manual-entry {
@@ -864,9 +1031,6 @@ object {
 /*** Scheduling Step 2/3 ***/
 
 .suggestion {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e6e7e8;
   cursor: pointer;
 }
 
@@ -969,45 +1133,17 @@ object {
 
 /*** Scheduling Step 3 ***/
 
-.guest-statuses-title {
-  margin-top: 40px;
-  font-family: "Proxima Nova Light";
-  font-size: 18px;
+.sched-step3-row {
+  height: 70px;
 }
 
-.hosts-container,
-.guests-container {
+#guests-container {
   border-top: 1px solid #e6e7e8;
 }
 
-.sched-step1-row,
-.sched-step3-row {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  height: 70px;
-  border-bottom: 1px solid #e6e7e8;
-}
-
-.guest-name {
-  float: left;
-  margin-top: 14px;
-  margin-left: 18px;
-  font-family: "Proxima Nova Semibold";
-}
-
-.chat-head {
-  float: left;
-  margin-top: 5px;
-  height: 40px;
-  width: 40px;
-  border-radius: 20px;
-  background-color: #a7a9ac;
-  text-align: center;
-}
-
-.initials {
-  padding: 8px;
-  color: white;
+.guest-statuses-title {
+  margin-top: 40px;
+  font-family: "Proxima Nova Light";
   font-size: 18px;
 }
 

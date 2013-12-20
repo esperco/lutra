@@ -430,14 +430,14 @@ var chat = (function () {
                      .append(chatView(chat, task)));
           if (chat.chatid === task.task_context_chat) {
             var group = $("<img class='group'/>");
-            tab.append($("<div class='prof-circ'/>")
+            tab.append($("<div class='chat-prof-circ'/>")
                .append(group));
             svg.loadImg(group, "/assets/img/group.svg");
           } else {
             var p = profiles[chat.chat_participants[0].par_uid];
             tab_name = p.full_name;
             var tab_initials = profile.veryShortNameOfProfile(p);
-            tab.append($("<div class='prof-circ'/>")
+            tab.append($("<div class='chat-prof-circ'/>")
                .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");
