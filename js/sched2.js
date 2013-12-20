@@ -5,8 +5,10 @@
 var sched2 = (function() {
   var mod = {};
 
-  var step2Selector = show.create(["sched-step2-connect",
-                                   "sched-step2-prefs"]);
+  var step2Selector = show.create({
+    "sched-step2-connect": {ids: ["sched-step2-connect"]},
+    "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
+  });
 
   // Set in loadStep2Prefs, used by geocodeAddress
   var timeZoneDropdown = null;
