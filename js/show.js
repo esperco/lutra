@@ -3,76 +3,123 @@
 
   Usage:
 
-  sel = new show.Selector(["foo", "bar", "baz"]);
-  sel.show("foo"); // hides bar and baz, then shows foo.
-  sel.show("baz"); // hides foo and bar, then shows baz.
+  var sel = show.create({
+    foo: { ids: ["foo-page"], classes: ["common-nav"] },
+    bar: { ids: ["bar-page"], classes: ["common-nav"] },
+    baz: { ids: ["baz-page"] }
+  });
+
+  sel.show("foo"); // hide everything then show the elements selected by foo
+  sel.show("baz"); // hide everything then show the elements selected by foo
   sel.hideAll();   // hides everything
+
+  By default hiding an element is achieved by adding the class "hide"
+  (default offClass="hide") and showing an element is achieved by removing
+  the class "hide" (default offClass="").
+
+  Options can be passed as a second parameter to show.create:
+
+  var sel = show.create({
+    foo: { ids: ["foo-page"], classes: ["common-nav"] },
+    bar: { ids: ["bar-page"], classes: ["common-nav"] },
+    baz: { ids: ["baz-page"] }
+  }, {
+    onClass: "highlighted",
+    offClass: "",
+  });
+
+  It is possible to select items of arbitrary types.
+  In this case, custom functions hideOne and showOne must be passed in:
+
+  var sel = show.create({
+    foo: "foo",
+    bar: "bar"
+  }, {
+    showOne: function(k, v) { console.log("show " + v); },
+    hideOne: function(k, v) { console.log("hide " + v); },
+  });
 */
 
 var show = (function () {
   var mod = {};
 
-  function showById(id, onClass, offClass) {
-    $("#" + id)
-      .removeClass(offClass)
-      .addClass(onClass);
+  function defaultShow(k, v, onClass, offClass) {
+    if (util.isDefined(v.ids)) {
+      list.iter(v.ids, function(id) {
+        log("show id " + id);
+        $("#" + id)
+          .removeClass(offClass)
+          .addClass(onClass);
+      });
+    }
+    if (util.isDefined(v.classes)) {
+      list.iter(v.classes, function(class_) {
+        log("show class " + class_);
+        $("." + class_)
+          .removeClass(offClass)
+          .addClass(onClass);
+      });
+    }
   }
 
-  function hideById(id, onClass, offClass) {
-    $("#" + id)
-      .removeClass(onClass)
-      .addClass(offClass);
-  }
-
-  function showByClass(class_, onClass, offClass) {
-    $("." + class_)
-      .removeClass(offClass)
-      .addClass(onClass);
-  }
-
-  function hideByClass(class_, onClass, offClass) {
-    $("." + class_)
-      .removeClass(onClass)
-      .addClass(offClass);
+  function defaultHide(k, v, onClass, offClass) {
+    if (util.isDefined(v.ids)) {
+      list.iter(v.ids, function(id) {
+        log("hide id " + id);
+        $("#" + id)
+          .removeClass(onClass)
+          .addClass(offClass);
+      });
+    }
+    if (util.isDefined(v.classes)) {
+      list.iter(v.classes, function(class_) {
+        log("hide class " + class_);
+        $("." + class_)
+          .removeClass(onClass)
+          .addClass(offClass);
+      });
+    }
   }
 
   /*
     Options may be passed as an object with the following fields:
     - onClass: string (default: "")
     - offClass: string (default: "hide")
-    - selectByClass: bool (default: false)
-    - showOne: string -> unit (default: based on the parameters above)
-    - hideOne: string -> unit (default: based on the parameters above)
+    - showOne/hideOne: string -> 'a -> unit
+       (default: 'a = { ids: string list; classes: string list }
+       uses the parameters above)
    */
-  mod.create = function(idList, opt) {
+  mod.create = function(tbl, opt) {
     var opt = util.isObject(opt) ? opt : {};
     var onClass = util.isString(opt.onClass) ? opt.onClass : "";
     var offClass = util.isString(opt.offClass) ? opt.offClass : "hide";
-    var selectByClass = opt.selectByClass ? true : false;
-    var defaultShowOne = selectByClass ?
-      function(x) { showByClass(x, onClass, offClass); }
-    : function(x) { showById(x, onClass, offClass); };
-    var defaultHideOne = selectByClass ?
-      function(x) { hideByClass(x, onClass, offClass); }
-    : function(x) { hideById(x, onClass, offClass); };
+    var defaultShowOne =
+      function(k, v) { defaultShow(k, v, onClass, offClass); };
+    var defaultHideOne =
+      function(k, v) { defaultHide(k, v, onClass, offClass); };
 
-    var showOne = util.isFunction(opt.showOne) ? opt.showOne : defaultShowOne;
-    var hideOne = util.isFunction(opt.hideOne) ? opt.hideOne : defaultHideOne;
+    var showOne = util.isDefined(opt.showOne) ? opt.showOne : defaultShowOne;
+    var hideOne = util.isDefined(opt.hideOne) ? opt.hideOne : defaultHideOne;
 
     function hideAll() {
-      for (var i in idList) {
-        var id = idList[i];
-        hideOne(id);
+      for (var k in tbl) {
+        var x = tbl[k];
+        hideOne(k, x);
       }
     }
 
-    function show(id) {
-      for (var i in idList) {
-        var id2 = idList[i];
-        if (id !== id2)
-          hideOne(id2);
+    /*
+      Note that the selected page is shown last.
+      This allows an element with multiple classes
+      to be selected and shown on multiple pages.
+    */
+    function show(k) {
+      for (var k2 in tbl) {
+        var v2 = tbl[k2];
+        if (k !== k2)
+          hideOne(k2, v2);
       }
-      showOne(id);
+      showOne(k, tbl[k]);
     }
 
     return { hideAll : hideAll,

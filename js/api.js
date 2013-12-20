@@ -103,8 +103,7 @@ var api = (function () {
   };
 
   mod.loadActiveTasks = function() {
-    return jsonHttpGet(api_tasks_prefix() + "/active")
-      .done(task.updateActiveTasksView);
+    return jsonHttpGet(api_tasks_prefix() + "/active");
   };
 
   mod.deleteTask = function(tid) {
