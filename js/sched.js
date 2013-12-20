@@ -159,7 +159,8 @@ var sched = (function() {
   });
 
   mod.loadStep1 = function(profs, task) {
-    var view = $("#sched-step1-tab");
+    var view = $("#sched-step1-content");
+    view.children().remove();
 
     sched1.load(profs, task, view);
 
