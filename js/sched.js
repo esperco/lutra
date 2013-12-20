@@ -112,7 +112,10 @@ var sched = (function() {
     mod.forEachParticipant(task, function(uid) {
       var chat =
         list.find(task.task_chats, function(chat) {
-          return uid === chat.chat_data[1].chat_with;
+          return chat.chatid !== task.task_context_chat
+              && (chat.chat_with
+                  ? uid === chat.chat_with
+                  : uid === chat.chat_participants[0].par_uid); // a hack for the old data without chat_with field
         });
       if (chat !== null)
         chats[uid] = chat;
@@ -139,18 +142,21 @@ var sched = (function() {
   }
 
   var tabHighlighter =
-    show.create(
-      ["sched-progress-tab1",
-       "sched-progress-tab2",
-       "sched-progress-tab3",
-       "sched-progress-tab4"],
-      { onClass: "sched-tab-highlight", offClass: "" }
+    show.create({
+      "sched-progress-tab1": {ids: ["sched-progress-tab1"]},
+      "sched-progress-tab2": {ids: ["sched-progress-tab2"]},
+      "sched-progress-tab3": {ids: ["sched-progress-tab3"]},
+      "sched-progress-tab4": {ids: ["sched-progress-tab4"]}
+    },
+    { onClass: "sched-tab-highlight", offClass: "" }
     );
 
-  var tabSelector = show.create(["sched-step1-tab",
-                                 "sched-step2-tab",
-                                 "sched-step3-tab",
-                                 "sched-step4-tab"]);
+  var tabSelector = show.create({
+    "sched-step1-tab": {ids: ["sched-step1-tab"]},
+    "sched-step2-tab": {ids: ["sched-step2-tab"]},
+    "sched-step3-tab": {ids: ["sched-step3-tab"]},
+    "sched-step4-tab": {ids: ["sched-step4-tab"]}
+  });
 
   mod.loadStep1 = function(profs, task) {
     var view = $("#sched-step1-tab");

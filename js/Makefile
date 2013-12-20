@@ -27,6 +27,7 @@ SOURCES = \
   cache.js \
   svg.js \
   show.js \
+  editor.js \
   select.js \
   store.js \
   login.js \
@@ -40,6 +41,7 @@ SOURCES = \
   sched3.js \
   sched4.js \
   task.js \
+  home.js \
   page.js \
   route.js \
   display.js \

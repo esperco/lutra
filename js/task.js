@@ -7,19 +7,6 @@ var task = (function() {
 
   var mod = {};
 
-  // task queue view
-  function viewOfTaskQueue(tasks) {
-    var view = $("<div/>");
-    var tasksView = $("<div/>");
-
-    for (var i in tasks) {
-      viewOfTaskTitle(tasks[i]).appendTo(tasksView);
-    }
-    tasksView.appendTo(view);
-
-    return view;
-  }
-
   // display task
   function viewOfGeneralTask(task) {
     function toggle_title() {
@@ -47,38 +34,16 @@ var task = (function() {
     return status_button;
   }
 
-  function viewOfTaskTitle(task) {
-    var view = $("<div class='task'></div>");
-    var checkbox = $("<img class='task-checkbox'/>")
-      .appendTo(view);
-    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-    var title = task.task_status
-      ? task.task_status.task_title
-      : null;
-    if (title) {
-      $("<a class='tasktitle' href='#!task/" + task.tid + "'/>")
-        .text(title)
-        .appendTo(view);
-    }
-    return view;
-  }
-
   function placeView(parent, view) {
     parent.children().remove();
     view.appendTo(parent);
   }
 
-  mod.updateActiveTasksView = function(data) {
-    var tabName = page.home.tab.schedulingTasks;
-    placeView($("#" + tabName + "-tab-content"),
-              viewOfTaskQueue(data.tasks));
-  };
-
-  var taskTypeSelector = show.create([
-    "new-task",
-    "sched-task",
-    "gen-task"
-  ]);
+  var taskTypeSelector = show.create({
+    "new-task": {ids: ["new-task"]},
+    "sched-task": {ids: ["sched-task"]},
+    "gen-task": {ids: ["gen-task"]}
+  });
 
   function initTaskData() {
     if ($("#category-sched").is(":checked")) {
@@ -141,6 +106,7 @@ var task = (function() {
       .unbind('click')
       .click(onClicked);
     taskTypeSelector.show("new-task");
+    initTaskTitle();
   }
 
   function loadTaskTitle(task) {
@@ -182,7 +148,9 @@ var task = (function() {
 
       var scheduling_task = task;
       if ("Scheduling" !== task_kind) {
-        scheduling_task.task_data = ["Scheduling", {}];
+        scheduling_task.task_data = ["Scheduling", {
+          scheduling_stage: "Guest_list"
+        }];
       }
       sched.loadTask(scheduling_task);
 
@@ -230,9 +198,6 @@ var task = (function() {
 
   /* Load task page */
   mod.load = function(optTid) {
-    $("#main-navbar").addClass("hide");
-    $("#chat-sidebar").click(function() {
-    });
     taskTypeSelector.hideAll();
     if (!optTid)
       loadNewTask();
@@ -240,6 +205,20 @@ var task = (function() {
       api.getTask(optTid)
         .done(loadTask);
     }
+  }
+
+  mod.init = function() {
+    $("#new-task-btn").click(function () {
+      window.location.hash = "!task";
+    });
+    $("#new-gen-task-btn").click(function () {
+      $("#category-gen").prop("checked", true);
+      window.location.hash = "!task";
+    });
+    $("#new-sched-task-btn").click(function () {
+      $("#category-sched").prop("checked", true);
+      window.location.hash = "!task";
+    });
   }
 
   return mod;

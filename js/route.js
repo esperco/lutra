@@ -46,7 +46,7 @@ var route = (function() {
     /* various pages */
 
     "test route": function(data) {
-      test.run();
+      page.test.load();
     },
 
     "task route": function(data) {

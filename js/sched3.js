@@ -36,7 +36,11 @@ var sched3 = (function() {
     var state = sched.getState(task);
     var options = state.calendar_options;
 
-    var idList = list.map(options, function(x) { return x.label; });
+    var idList = list.map(options, function(x) {
+      var result = {};
+      result[x.label] = {ids: [x.label]};
+      return result;
+    });
     var selector = show.create(idList, {
       onClass: "radio-selected",
       offClass: ""
@@ -127,7 +131,7 @@ var sched3 = (function() {
     var prof = obsProf.prof;
     var name = prof.full_name;
     var initials = $("<p class='initials unselectable'/>")
-      .text(profile.veryShortName(prof));
+      .text(profile.veryShortNameOfProfile(prof));
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
