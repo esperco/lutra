@@ -178,7 +178,7 @@ var sched1 = (function() {
       .append(chatHead)
       .append(nameView);
 
-    if (/*not host*/) {
+    // if (/*not host*/) {
       var remove = $("<img class='remove-guest'/>")
         .appendTo(view);
       svg.loadImg(remove, "/assets/img/x.svg");
@@ -187,7 +187,7 @@ var sched1 = (function() {
         view.remove();
         updateNextButton(hosts, guestTbl);
       });
-    }
+    // }
 
     return view;
   }

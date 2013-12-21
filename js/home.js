@@ -19,7 +19,7 @@ var home = (function() {
       ? task.task_status.task_title
       : null;
     if (title) {
-      $("<a class='tasktitle' href='#!task/" + task.tid + "'/>")
+      $("<a class='task-title' href='#!task/" + task.tid + "'/>")
         .text(title)
         .appendTo(view);
     }
