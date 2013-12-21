@@ -46,7 +46,6 @@ var show = (function () {
   function defaultShow(k, v, onClass, offClass) {
     if (util.isDefined(v.ids)) {
       list.iter(v.ids, function(id) {
-        log("show id " + id);
         $("#" + id)
           .removeClass(offClass)
           .addClass(onClass);
@@ -54,7 +53,6 @@ var show = (function () {
     }
     if (util.isDefined(v.classes)) {
       list.iter(v.classes, function(class_) {
-        log("show class " + class_);
         $("." + class_)
           .removeClass(offClass)
           .addClass(onClass);
@@ -65,7 +63,6 @@ var show = (function () {
   function defaultHide(k, v, onClass, offClass) {
     if (util.isDefined(v.ids)) {
       list.iter(v.ids, function(id) {
-        log("hide id " + id);
         $("#" + id)
           .removeClass(onClass)
           .addClass(offClass);
@@ -73,7 +70,6 @@ var show = (function () {
     }
     if (util.isDefined(v.classes)) {
       list.iter(v.classes, function(class_) {
-        log("hide class " + class_);
         $("." + class_)
           .removeClass(onClass)
           .addClass(offClass);

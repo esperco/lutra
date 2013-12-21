@@ -57,21 +57,21 @@ var task = (function() {
   /* At this stage we don't have a task ID yet */
   function loadNewTask() {
     var startTaskButton = $("#start-task");
+    var newTaskTitle = $("#new-task-title");
 
     function isValidTitle(s) {
       return s.length > 0;
     }
 
     function initTaskTitle() {
-      var input = $("#new-task-title");
-      input.val("");
-      util.afterTyping(input, 500, function () {
-        if (isValidTitle(input.val()))
+      newTaskTitle.val("");
+      util.afterTyping(newTaskTitle, 500, function () {
+        if (isValidTitle(newTaskTitle.val()))
           startTaskButton.removeClass("disabled");
         else
           startTaskButton.addClass("disabled");
       });
-      input.focus();
+      util.changeFocus(newTaskTitle);
     }
 
     function onClicked() {
@@ -104,8 +104,9 @@ var task = (function() {
     startTaskButton
       .unbind('click')
       .click(onClicked);
+
     taskTypeSelector.show("new-task");
-    initTaskTitle();
+    util.focus();
   }
 
   function loadTaskTitle(task) {
@@ -189,6 +190,7 @@ var task = (function() {
       }
     }
     chat.loadTaskChats(task);
+    util.focus();
   }
 
   mod.dont_change_task_type = function() {
