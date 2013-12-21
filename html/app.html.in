@@ -175,7 +175,6 @@
           <a id="chat-sidebar">
             <img class="svg chat-icon" src="/assets/img/chat.svg">
           </a>
-          <div id="select-task-type" class="hide"></div>
         </div>
 
         <div id="new-task">
