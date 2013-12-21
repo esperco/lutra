@@ -80,5 +80,30 @@ var util = (function () {
     return String.fromCharCode(65 + n);
   }
 
+  /* Element to focus on once the page is ready
+     (currently active input). */
+  var focusOn;
+
+  /* Change the element to focus on. */
+  mod.changeFocus = function(elt) {
+    focusOn = elt;
+    elt.focus(); /* this does nothing if the element is still hidden */
+  };
+
+  /* Unset the element to focus on. */
+  mod.cancelFocus = function() {
+    focusOn = null;
+  };
+
+  /* Focus */
+  mod.focus = function() {
+    if (mod.isNotNull(focusOn)) {
+      log("focus on id=" + focusOn.attr("id")
+          + " visible=" + focusOn.is(":visible")
+          + " hidden=" + focusOn.is(":hidden"));
+      focusOn.focus();
+    }
+  };
+
   return mod;
 })();

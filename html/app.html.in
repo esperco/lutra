@@ -13,7 +13,7 @@
 
   <body>
 
-    <ul id="main-navbar" class="nav nav-pills nav-stacked home-page">
+    <ul id="main-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header"></li>
       <li class="hide logged-in dropdown">
         <a data-toggle="dropdown"
@@ -197,7 +197,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="container hide"></div>
+        <div id="gen-task" class="container task-container hide"></div>
 
       </div>
 

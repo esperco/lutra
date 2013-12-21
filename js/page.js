@@ -43,6 +43,7 @@ var page = (function() {
         }
         return false;
       });
+    util.changeFocus($("#login-email"));
   }
 
   function prepareRequestPassword(email0) {
@@ -69,6 +70,8 @@ var page = (function() {
     $("#passreq-button")
       .unbind('click')
       .click(submit);
+
+    util.changeFocus(input);
   }
 
   function prepareResetPassword(uid, token) {
@@ -93,6 +96,7 @@ var page = (function() {
     $("#passreset-button")
       .unbind('click')
       .click(submit);
+    util.changeFocus(input);
   }
 
   /* Load and render different types of pages */
@@ -101,6 +105,7 @@ var page = (function() {
     pageSelector.hideAll();
     home.load();
     pageSelector.show("home");
+    util.focus();
   };
 
   mod.test.load = function() {
@@ -108,33 +113,35 @@ var page = (function() {
     $("#test-content").children().remove();
     pageSelector.show("test");
     test.load();
+    util.focus();
   };
 
   mod.login.load = function(redirPath) {
     pageSelector.hideAll();
     prepareLogin(redirPath);
     pageSelector.show("login");
-    $("#login-email").focus();
+    util.focus();
   };
 
   mod.requestPassword.load = function(email) {
     pageSelector.hideAll();
     prepareRequestPassword(email);
     pageSelector.show("request-password");
-    $("#passreq-email").focus();
+    util.focus();
   };
 
   mod.resetPassword.load = function(uid, token) {
     pageSelector.hideAll();
     prepareResetPassword(uid, token);
     pageSelector.show("reset-password");
-    $("#passreset-password").focus();
+    util.focus();
   };
 
   mod.task.load = function(optTid) {
     pageSelector.hideAll();
     task.load(optTid);
     pageSelector.show("task");
+    util.focus();
   };
 
   mod.respond.load = function(rid, asUid) {
