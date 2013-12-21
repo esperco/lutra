@@ -30,20 +30,15 @@ var sched2 = (function() {
   }
 
   function clearLocation() {
-    var title = $("#sched-step2-loc-title");
     var addr = $("#sched-step2-loc-addr");
-    var instr = $("#sched-step2-loc-instr");
-
-    title.val("");
     addr.val("");
-    instr.val("");
   }
 
   function getLocation() {
     return {
-      title: $("#sched-step2-loc-title").val(),
+      title: "",
       address: $("#sched-step2-loc-addr").val(),
-      instructions: $("#sched-step2-loc-instr").val(),
+      instructions: "",
       timezone: timeZoneDropdown.get()
     };
   }
