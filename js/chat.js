@@ -446,7 +446,7 @@ var chat = (function () {
           }
           var caret = $("<img class='prof-caret'/>");
           caret.appendTo(tab);
-          svg.loadImg(caret, "/assets/img/caret.svg");
+          svg.loadImg(caret, "/assets/img/prof-caret.svg");
           if (first_tab) {
             $(".chat-tab-div").addClass("active");
             $(".tab-pane").addClass("active");

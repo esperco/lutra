@@ -14,29 +14,28 @@
   <body>
 
     <ul id="main-navbar" class="hide nav nav-pills nav-stacked home-page">
-      <li class="nav-header"></li>
-      <li class="hide logged-in dropdown">
-        <a data-toggle="dropdown"
-           class="dropdown-toggle"
-           href="#">
-          <span id="logged-in-email">@</span>
-          <b class="caret"></b>
+      <li id="nav-header" class="unselectable"></li>
+      <li>
+        <a href="#" class="account-block hide">
+          <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
+          <div class="nav-text">Settings</div>
         </a>
-        <ul class="dropdown-menu">
-          <li>
-            <a href="#!logout">Logout</a>
-          </li>
-        </ul>
       </li>
-      <li class="nav-block hide">
-        <a href="#" class="nav-block">
-          <img href="#" id="search-icon" class="svg" src="/assets/img/search.svg">
+      <li>
+        <a href="#!logout" class="account-block hide">
+          <img id="logout-icon" class="svg" src="/assets/img/logout.svg">
+          <div class="nav-text">Log out</div>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-block hide">
+          <img id="search-icon" class="svg" src="/assets/img/search.svg">
           <div class="nav-text">Search</div>
         </a>
       </li>
       <li>
         <a href="#" class="nav-block hide">
-          <img href="#" id="dashboard-icon" class="svg" src="/assets/img/dashboard.svg">
+          <img id="dashboard-icon" class="svg" src="/assets/img/dashboard.svg">
           <div class="nav-text">Dashboard</div>
         </a>
       </li>
@@ -45,25 +44,25 @@
       </div>
       <li>
         <a href="#" class="nav-block">
-          <img href="#" id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+          <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
           <div class="nav-text">All Tasks</div>
         </a>
       </li>
       <li class="active">
         <a href="#" class="nav-block">
-          <img href="#" id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+          <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
           <div class="nav-text">Scheduling</div>
         </a>
       </li>
       <li>
         <a href="#" class="nav-block">
-          <img href="#" id="general-icon" class="svg" src="/assets/img/general.svg">
+          <img id="general-icon" class="svg" src="/assets/img/general.svg">
           <div class="nav-text">General</div>
         </a>
       </li>
       <li>
         <a href="#" class="nav-block">
-          <img href="#" id="archive-icon" class="svg" src="/assets/img/archive.svg">
+          <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
           <div class="nav-text">Archive</div>
         </a>
       </li>
@@ -72,13 +71,13 @@
       </div>
       <li>
         <a href="#" class="nav-block hide">
-          <img href="#" id="people-icon" class="svg" src="/assets/img/people.svg">
+          <img id="people-icon" class="svg" src="/assets/img/people.svg">
           <div class="nav-text">People</div>
         </a>
       </li>
       <li>
         <a href="#" class="nav-block hide">
-          <img href="#" id="places-icon" class="svg" src="/assets/img/places.svg">
+          <img id="places-icon" class="svg" src="/assets/img/places.svg">
           <div class="nav-text">Places</div>
         </a>
       </li>
@@ -203,7 +202,7 @@
 
       <div id="chat" class="col-md-4 scrollable pull-right">
         <div id="chat-header">
-          <ul class="nav nav-tabs chat-profile-tabs"></ul>
+          <ul class="nav chat-tabs chat-profile-tabs"></ul>
           <div class="chat-profile-details-div"></div>
         </div>
         <div class="tab-content chat-panel"></div>

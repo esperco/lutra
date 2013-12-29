@@ -1,25 +1,27 @@
 /*
-  Colors:
-
-  Purple        #a25cc6
-  Light Purple  #e8d9ee
-  Dark Purple   #8c42ad
-  Red           #e53030
-  Dark Red      #bf2121
-  Orange        #f7941e
-  Green         #2bb673
-  Light Gray    #a7a9ac
-  Med Gray      #808285
-  Dark Gray     #414042
-
-
   Fonts:
-
   Proxima Nova Light
   Proxima Nova Regular
   Proxima Nova Semibold
-
 */
+
+/*** Colors ***/
+@gray_10: #e6e7e8;
+@gray_20: #d1d3d4;
+@gray_40: #a7a9ac;
+@gray_60: #808285;
+@gray_90: #414042;
+@green: #2bb673;
+@orange: #f7941e;
+@purple: #a25cc6;
+@purple_disabled: #e8d9ee;
+@purple_hover: #8c42ad;
+@red: #e53030;
+@red_hover: #bf2121;
+@white: #ffffff;
+
+
+/*** General ***/
 
 body,
 html {
@@ -27,8 +29,8 @@ html {
 }
 
 body {
-  background-color: white;
-  color: #414042;
+  background-color: @white;
+  color: @gray_90;
   font-family: "Proxima Nova Regular", Arial;
   font-size: 16px;
   text-rendering: optimizeLegibility;
@@ -57,106 +59,16 @@ object {
    user-select: none;
 }
 
-/*** Old stuff ***/
 
-/*
-  CSS doesn't provide a sane way of centering a block in the window, so we do
-  the following.
-*/
-
-.queue-tab-area {
-  margin-top: 1em;
-  margin-bottom: 2em;
-}
+/*** Home ***/
 
 .task {
   padding-top: 20px;
   padding-left: 10px;
   padding-bottom: 20px;
-  background: none;
+  height: 70px;
   border-bottom: 1px solid;
-  border-bottom-color: #e6e7e8;
-}
-
-.request {
-  background-color: #dfdedd;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  padding: 1em;
-}
-
-.comments {
-  background-color: #d6d6d6;
-  margin-top: 0.5em;
-  margin-bottom: 0.2em;
-  margin-left: 2em;
-  margin-right: 2em;
-  padding-left: 0.3em;
-}
-
-.comment {
-  background-color: #dfdfdf;
-  margin-top: 0.3em;
-  margin-bottom: 0.3em;
-  padding: 0.2em;
-}
-
-.author {
-  font-style: italic;
-}
-
-.task-title {
-  color: #414042;
-}
-
-.task-title:hover {
-  color: #808285;
-}
-
-.rightbox {
-  float: right;
-}
-
-.requesttitle {
-}
-
-.unasked {
-  font-style: italic;
-}
-
-.choices {
-  margin-top: 0.2em;
-}
-
-.choices-readonly {
-  margin-top: 0.2em;
-  color: #808080;
-}
-
-.choice {
-  display: inline-block;
-  vertical-align: bottom;
-  margin-right: 1em;
-}
-
-.choice-label {
-  display: inline;
-  margin-left: 0.1em;
-}
-
-.answer {
-  font-weight: bold;
-  margin-left: 1em;
-}
-
-.unanswered {
-  font-style: italic;
-  margin-left: 1em;
-}
-
-.buttons > * {
-  vertical-align: top;
-  margin: 0.05em;
+  border-bottom-color: @gray_10;
 }
 
 
@@ -166,14 +78,72 @@ object {
   position: fixed;
   height: 100%;
   width: 220px;
-  background-color: #414042;
+  background-color: @gray_90;
   overflow-y: auto;
 }
 
-.nav-header {
+#nav-header {
   margin: 0;
+  padding: 20px 15px;
   height: 80px;
-  background-color: #a25cc6;
+  background-color: @purple;
+  &:hover {
+    background-color: @purple_hover;
+    cursor: pointer;
+  }
+}
+
+#exec-circ-outline {
+  float: left;
+  padding: 2px;
+  height: 40px;
+  width: 40px;
+  border-radius: 20px;
+  background: @white;
+}
+
+#exec-circ {
+  height: 36px;
+  width: 36px;
+  border-radius: 18px;
+  text-align: center;
+  vertical-align: middle;
+  background: @gray_60;
+}
+
+#exec-name-div {
+  display: inline-block;
+  margin-left: 10px;
+  padding-top: 3px;
+  color: @white;
+}
+
+#assisting {
+  font-size: 12px;
+}
+
+#exec-name {
+  font-family: "Proxima Nova Semibold";
+}
+
+#exec-caret {
+  float: right;
+  margin-top: 8px;
+}
+
+.account-nav-open {
+  .rotate(rotate_cw_180);
+}
+
+.account-nav-closed {
+  .rotate(rotate_ccw_180);
+}
+
+.account-block {
+  margin: 0;
+  height: 60px;
+  color: @gray_20;
+  background-color: #282828;
 }
 
 .nav-section-line {
@@ -189,8 +159,8 @@ object {
   left: 7px;
   padding-left: 8px;
   padding-right: 8px;
-  color: #a7a9ac;
-  background-color: #414042;
+  color: @gray_40;
+  background-color: @gray_90;
   font-family: "Proxima Nova Light";
   letter-spacing: 3px;
 }
@@ -198,7 +168,7 @@ object {
 .nav-block {
   margin: 0;
   height: 60px;
-  color: #d1d3d4;
+  color: @gray_20;
 }
 
 .nav-text {
@@ -207,7 +177,11 @@ object {
   margin-left: 10px;
 }
 
-#search-icon {
+#settings-icon,
+#logout-icon,
+#search-icon,
+#scheduling-icon,
+#general-icon {
   float: left;
   margin: 10px 2px;
 }
@@ -222,21 +196,7 @@ object {
   margin: 12px 1px;
 }
 
-#scheduling-icon {
-  float: left;
-  margin: 10px 2px;
-}
-
-#general-icon {
-  float: left;
-  margin: 10px 2px;
-}
-
-#archive-icon {
-  float: left;
-  margin-top: 10px;
-}
-
+#archive-icon,
 #people-icon {
   float: left;
   margin-top: 10px;
@@ -247,6 +207,8 @@ object {
   margin: 10px 5px;
 }
 
+#settings-icon path,
+#logout-icon g path,
 #search-icon path,
 #dashboard-icon path,
 #dashboard-icon circle,
@@ -258,9 +220,16 @@ object {
 #archive-icon path,
 #people-icon path,
 #places-icon path, {
-  fill: #808285;
+  fill: @gray_60;
 }
 
+.account-block .nav-pills > li > a:hover {
+  color: @gray_90 !important;
+  background-color: @gray_20 !important;
+}
+
+.account-block:hover #settings-icon path,
+.account-block:hover #logout-icon g path,
 .nav-block:hover #search-icon path,
 .nav-block:hover #dashboard-icon path,
 .nav-block:hover #dashboard-icon circle,
@@ -272,9 +241,11 @@ object {
 .nav-block:hover #archive-icon path,
 .nav-block:hover #people-icon path,
 .nav-block:hover #places-icon path, {
-  fill: white;
+  fill: @white;
 }
 
+.nav-pills > li.active > a:hover #settings-icon path,
+.nav-pills > li.active > a:hover #logout-icon g path,
 .nav-pills > li.active > a:hover #search-icon path,
 .nav-pills > li.active > a:hover #dashboard-icon path,
 .nav-pills > li.active > a:hover #dashboard-icon circle,
@@ -286,21 +257,18 @@ object {
 .nav-pills > li.active > a:hover #archive-icon path,
 .nav-pills > li.active > a:hover #people-icon path,
 .nav-pills > li.active > a:hover #places-icon path, {
-  fill: #808285;
+  fill: @gray_60;
 }
 
 #task-navbar {
   z-index: 1030;
-  background: rgba(248,248,248,0.9);
-  border-top: none;
-  border-bottom: 1px solid #d1d3d4;
-  border-radius: 0;
-}
-
-#task-navbar {
   position: fixed !important;
   margin: 0;
   padding: 0;
+  background: rgba(248,248,248,0.9);
+  border-top: none;
+  border-bottom: 1px solid @gray_20;
+  border-radius: 0;
 }
 
 .menu {
@@ -308,28 +276,13 @@ object {
   margin-left: 16px;
   margin-top: 20px;
   cursor: pointer;
-}
-
-.menu:hover g {
-  fill: #8c42ad;
-}
-
-.menu:active g {
-  fill: #7d3ca0;
+  &:hover g { fill: @purple_hover; }
+  &:active g { fill: #7d3ca0; }
 }
 
 .main-title {
   letter-spacing: 3px;
 }
-
-/*.account {
-  margin-top: 9px;
-  margin-right: 9px;
-}
-
-#logged-in-email {
-  color: #414042;
-}*/
 
 #chat-sidebar {
   float: right;
@@ -338,28 +291,88 @@ object {
   cursor: pointer;
 }
 
-.chat-open .chat-icon path {
-  fill: #e6e7e8;
+.chat-open .chat-icon {
+  path { fill: @gray_10; }
+  &:hover path { fill: @gray_20; }
 }
 
-.chat-open .chat-icon:hover path {
-  fill: #d1d3d4;
+.chat-closed .chat-icon {
+  path { fill: @purple; }
+  &:hover path { fill: @purple_hover; }
 }
 
-.chat-closed .chat-icon path {
-  fill: #a25cc6;
+
+/*** Table Structure ***/
+
+.task,
+.sched-step1-row,
+.sched-step1-add-row,
+.suggestion,
+.sched-step3-row {
+  padding: 10px;
+  border-bottom: 1px solid @gray_10;
 }
 
-.chat-closed .chat-icon:hover path {
-  fill: #8c42ad;
+.task,
+.sched-step3-row {
+  height: 70px;
+}
+
+.sched-step1-row,
+.sched-step1-add-row {
+  min-height: 70px;
+}
+
+.task-list,
+#guest-list-container,
+.options-container,
+#guests-container {
+  border-top: 1px solid @gray_10;
+}
+
+.check-all,
+.task-checkbox,
+.suggestion-checkbox,
+.suggestion-radio {
+  float: left;
+  width: 24px;
+  height: 24px;
+}
+
+.task-list {
+  margin-top: 20px;
+}
+
+.check-all {
+  margin-top: 4px;
+  margin-left: 10px;
+}
+
+.task-checkbox {
+  margin-top: 12px
+  &:hover {
+    cursor: pointer;
+    path.check-outline { fill: @gray_40; }
+  }
+}
+
+.suggestion-checkbox {
+  margin-top: 30px;
+}
+
+.suggestion-radio {
+  margin-top: 16px;
+}
+
+.suggestion-edit {
+  float: right;
+  margin-top: 30px;
+  width: 24px;
+  height: 24px;
 }
 
 
 /*** Home ***/
-
-.task-list {
-  border-top: 1px solid #e6e7e8;
-}
 
 .home-container {
   margin-left: 220px;
@@ -369,7 +382,7 @@ object {
 
 .page-title {
   float: left;
-  color: #808285;
+  color: @gray_60;
   font-family: "Proxima Nova Light";
   letter-spacing: 6px;
 }
@@ -377,6 +390,25 @@ object {
 .new-task-btn {
   float: right;
   margin-top: 20px;
+}
+
+.toolbar {
+  margin-top: 20px;
+}
+
+.archive-btn {
+  margin-left: 18px;
+  &:hover { cursor: pointer;
+    path.background { fill: @gray_20; }
+  }
+}
+
+.task-title {
+  display: inline-block;
+  margin-top: 14px;
+  margin-left: 18px;
+  color: @gray_90;
+  &:hover { color: @gray_60; }
 }
 
 
@@ -391,7 +423,7 @@ object {
   margin-bottom: 0;
   padding: 0;
   background: rgba(248,248,248,0.9);
-  border-top: 1px solid #d1d3d4;
+  border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
 }
@@ -427,10 +459,7 @@ object {
   fill: #bcbec0;
 }
 
-.sched-step1,
-.sched-step2,
-.sched-step3,
-.sched-step4 {
+.sched-step1 {
   margin-top: 3px;
 }
 
@@ -438,6 +467,7 @@ object {
 .sched-step3,
 .sched-step4 {
   width: 106px;
+  margin-top: 3px;
   margin-left: -8px;
 }
 
@@ -446,20 +476,8 @@ object {
 .sched-progress-step3 .sched-step3,
 .sched-progress-step4 .sched-step4 {
   cursor: default;
-}
-
-.sched-progress-step1 .sched-step1 path,
-.sched-progress-step2 .sched-step2 path,
-.sched-progress-step3 .sched-step3 path,
-.sched-progress-step4 .sched-step4 path {
-  fill: #808285;
-}
-
-.sched-progress-step1 .sched-step1 text,
-.sched-progress-step2 .sched-step2 text,
-.sched-progress-step3 .sched-step3 text,
-.sched-progress-step4 .sched-step4 text {
-  fill: white;
+  path { fill: @gray_60; }
+  text { fill: @white; }
 }
 
 
@@ -478,7 +496,7 @@ object {
 
 .split-screen {
   border-left: none;
-  border-right: 1px solid #d1d3d4;
+  border-right: 1px solid @gray_20;
 }
 
 
@@ -491,14 +509,13 @@ object {
   height: 24px;
   width: 24px;
   border-radius: 12px;
-  background-color: #e6e7e8;
+  background-color: @gray_10;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
-}
-
-.modal-close-circ:hover {
-  background-color: #d1d3d4;
-  cursor: pointer;
+  &:hover {
+    background-color: @gray_20;
+    cursor: pointer;
+  }
 }
 
 .modal-close-x {
@@ -524,8 +541,6 @@ object {
 
 #sched-availability-message,
 #sched-confirm-message {
-/*  min-width: 100%;
-  max-width: 100%;*/
   resize: none;
 }
 
@@ -546,7 +561,7 @@ object {
   font-family: "Proxima Nova Light";
   letter-spacing: 12px;
   text-align: center;
-  color: #808285;
+  color: @gray_60;
 }
 
 .login-title {
@@ -567,11 +582,8 @@ object {
 /*** New Task ***/
 
 #new-task-title {
-  color: #808285;
-}
-
-#new-task-title:focus {
-  color: #414042;
+  color: @gray_60;
+  &:focus { color: @gray_90; }
 }
 
 #categorize {
@@ -601,7 +613,7 @@ object {
 
 .chat-profile-tabs {
   height: 60px;
-  border-bottom: 1px solid #d1d3d4;
+  border-bottom: 1px solid @gray_20;
 }
 
 .chat-tab-div {
@@ -616,7 +628,7 @@ object {
   border-radius: 15px;
   text-align: center;
   vertical-align: middle;
-  background: #e6e7e8;
+  background: @gray_10;
 }
 
 .group {
@@ -628,33 +640,46 @@ object {
 }
 
 .tab-name {
-  color: #414042;
+  color: @gray_90;
+  &:hover { color: @gray_90;
+    .chat-prof-circ { background: @gray_20; }
+  }
 }
 
-.tab-name:hover {
-  color: #414042;
+.chat-tabs > li {
+  float: left;
 }
 
-.tab-name:hover .chat-prof-circ {
-  background: #d1d3d4;
+.chat-tabs > li > a {
+  height: 60px;
+  padding-top: 15px;
+}
+.chat-tabs > li > a:hover {
+  background-color: @gray_10;
+}
+.chat-tabs > li.active > a,
+.chat-tabs > li.active > a:hover,
+.chat-tabs > li.active > a:focus {
+  cursor: default;
+  background-color: @gray_60;
 }
 
-.nav-tabs > li.active > a .prof-caret path,
-.nav-tabs > li.active > a:hover .prof-caret path,
-.nav-tabs > li.active > a:focus .prof-caret path {
-  fill: white;
+.chat-tabs > li.active > a .prof-caret path,
+.chat-tabs > li.active > a:hover .prof-caret path,
+.chat-tabs > li.active > a:focus .prof-caret path {
+  fill: @white;
 }
 
-.nav-tabs > li.active > a .chat-prof-circ,
-.nav-tabs > li.active > a:hover .chat-prof-circ,
-.nav-tabs > li.active > a:focus .chat-prof-circ {
-  background-color: white;
+.chat-tabs > li.active > a .chat-prof-circ,
+.chat-tabs > li.active > a:hover .chat-prof-circ,
+.chat-tabs > li.active > a:focus .chat-prof-circ {
+  background-color: @white;
 }
 
 .chat-profile-details-div {
   height: 40px;
-  background-color: white;
-  border-bottom: 1px solid #d1d3d4;
+  background-color: @white;
+  border-bottom: 1px solid @gray_20;
 }
 
 .chat-profile-details {
@@ -682,7 +707,7 @@ object {
 .from-name {
   font-family: "Proxima Nova Semibold";
   font-size: 12px;
-  color: #808285;
+  color: @gray_60;
 }
 
 .timestamp-div {
@@ -693,7 +718,7 @@ object {
 .timestamp {
   float: right;
   font-size: 12px;
-  color: #808285;
+  color: @gray_60;
 }
 
 .message {
@@ -714,13 +739,13 @@ object {
   padding-top: 5px;
   padding-left: 15px;
   padding-right: 15px;
-  color: white;
-  background-color: #808285;
-  border-top: 1px solid #d1d3d4;
+  color: @white;
+  background-color: @gray_60;
+  border-top: 1px solid @gray_20;
 }
 
 .chat-editor {
-  border-top: 1px solid #d1d3d4;
+  border-top: 1px solid @gray_20;
   padding: 15px;
 }
 
@@ -741,6 +766,7 @@ object {
 
 .option {
   margin-top: 10px;
+  &:hover .add-option-radio path.radio-outline { fill: @gray_20; }
 }
 
 .option-radio {
@@ -755,22 +781,13 @@ object {
   float: right;
   margin-top: -23px;
   margin-right: -20px;
-}
-
-.option-delete:hover {
-  cursor: pointer;
-}
-
-.option-delete:hover path {
-  fill: #a7a9ac;
+  &:hover { cursor: pointer;
+    path { fill: @gray_40; }
+  }
 }
 
 .add-option-radio path.radio-outline {
-  fill: #e6e7e8;
-}
-
-.option:hover .add-option-radio path.radio-outline {
-  fill: #d1d3d4;
+  fill: @gray_10;
 }
 
 .add-option-btn {
@@ -779,24 +796,22 @@ object {
   padding-left: 12px;
   text-align: left;
   font-size: 14px;
-  color: #e6e7e8;
-  border: 2px solid #e6e7e8;
-  background: white;
+  color: @gray_10;
+  border: 2px solid @gray_10;
+  background: @white;
   border-radius: 4px;
-}
-
-.add-option-btn:hover {
-  color: #808285;
-  border: 2px solid #d1d3d4;
-  cursor: pointer;
+  &:hover {
+    color: @gray_60;
+    border: 2px solid @gray_20;
+    cursor: pointer;
+  }
 }
 
 .offer-choices {
   padding-left: 0;
-}
-
-.offer-choices:hover {
-  cursor: pointer;
+  &:hover { cursor: pointer;
+    path.check-outline { fill: @gray_40; }
+  }
 }
 
 .offer-choices-checkbox {
@@ -827,20 +842,6 @@ object {
 
 #guest-list-container {
   margin-top: 30px;
-  border-top: 1px solid #e6e7e8;
-}
-
-.sched-step1-row,
-.sched-step1-add-row,
-.suggestion,
-.sched-step3-row {
-  padding: 10px;
-  border-bottom: 1px solid #e6e7e8;
-}
-
-.sched-step1-row,
-.sched-step1-add-row {
-  min-height: 70px;
 }
 
 .list-prof-circ,
@@ -854,12 +855,12 @@ object {
 }
 
 .list-prof-circ {
-  background-color: #808285;
+  background-color: @gray_60;
 }
 
 .initials {
   padding: 8px;
-  color: white;
+  color: @white;
   font-size: 18px;
 }
 
@@ -871,17 +872,16 @@ object {
 }
 
 .add-guest-circ {
-  background-color: #a25cc6;
-}
-
-.add-guest-circ:hover {
-  background-color: #8c42ad;
-  cursor: pointer;
+  background-color: @purple;
+  &:hover {
+    background-color: @purple_hover;
+    cursor: pointer;
+  }
 }
 
 .add-guest-disabled,
 .add-guest-disabled:hover {
-  background-color: #e8d9ee !important;
+  background-color: @purple_disabled !important;
   cursor: default;
 }
 
@@ -890,58 +890,17 @@ object {
 }
 
 .cancel {
-  background-color: #e53030 !important;
-  -webkit-animation: rotate_cc 0.5s;
-     -moz-animation: rotate_cc 0.5s;
-          animation: rotate_cc 0.5s;
-  -webkit-animation-fill-mode: forwards;
-     -moz-animation-fill-mode: forwards;
-          animation-fill-mode: forwards;
-  -webkit-animation-iteration-count: 1;
-     -moz-animation-iteration-count: 1;
-          animation-iteration-count: 1;
-}
-@-moz-keyframes rotate_cc {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(-45deg); }
-}
-@-webkit-keyframes rotate_cc {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(-45deg); }
-}
-@keyframes rotate_cc {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(-45deg);}
-}
-
-.cancel:hover {
-  background-color: #bf2121 !important;
-  cursor: pointer;
+  background-color: @red !important;
+  .rotate(rotate_ccw_45);
+  &:hover {
+    background-color: @red_hover !important;
+    cursor: pointer;
+  }
 }
 
 .return-to-add {
-  background-color: #a25cc6;
-  -webkit-animation: rotate_c 0.5s;
-     -moz-animation: rotate_c 0.5s;
-          animation: rotate_c 0.5s;
-  -webkit-animation-fill-mode: forwards;
-     -moz-animation-fill-mode: forwards;
-          animation-fill-mode: forwards;
-  -webkit-animation-iteration-count: 1;
-     -moz-animation-iteration-count: 1;
-          animation-iteration-count: 1;
-}
-@-moz-keyframes rotate_c {
-    from { -moz-transform: rotate(-45deg); }
-    to { -moz-transform: rotate(0deg); }
-}
-@-webkit-keyframes rotate_c {
-    from { -webkit-transform: rotate(-45deg); }
-    to { -webkit-transform: rotate(0deg); }
-}
-@keyframes rotate_c {
-    from {transform:rotate(-45deg);}
-    to {transform:rotate(0deg);}
+  background-color: @purple;
+  .rotate(rotate_cw_45);
 }
 
 #add-guest-text {
@@ -956,7 +915,7 @@ object {
   margin-top: 14px;
   margin-left: 18px;
   font-family: "Proxima Nova Regular Italic";
-  color: #808285;
+  color: @gray_60;
 }
 
 #guest-input-div {
@@ -976,19 +935,12 @@ object {
 .remove-guest {
   float: right;
   margin-top: 20px;
+  path { fill: @gray_10; }
+  &:hover { cursor: pointer;
+    path { fill: @gray_20; }
+  }
 }
 
-.remove-guest path {
-  fill: #e6e7e8;
-}
-
-.remove-guest:hover {
-  cursor: pointer;
-}
-
-.remove-guest:hover path {
-  fill: #d1d3d4;
-}
 
 /*** Scheduling Step 2 ***/
 
@@ -1004,12 +956,11 @@ object {
   width: 100%;
   height: 32px;
   text-align: left;
-}
-
-.fill-div .caret {
-  float: right;
-  margin-top: 8px;
-  border-top: 4px solid #414042;
+  .caret {
+    float: right;
+    margin-top: 8px;
+    border-top: 4px solid @gray_90;
+  }
 }
 
 .pref-time-title,
@@ -1032,70 +983,38 @@ object {
 
 .suggestion {
   cursor: pointer;
+  &:hover {
+    path.check-outline,
+    path.radio-outline { fill: @gray_40; }
+    .suggestion-edit {
+      g path { fill: @purple; }
+      &:hover g path { fill: @purple_hover; }
+    }
+    .day-text,
+    .date-text,
+    .time-text,
+    .loc-text { color: @gray_60; }
+    .pin path { fill: @gray_60; }
+  }
 }
 
-.suggestion-checkbox {
-  float: left;
-  margin-top: 30px;
-  width: 24px;
-  height: 24px;
+.checkbox-selected {
+  path.check-background { fill: @purple_disabled; }
+  path.check-outline { fill: @purple; }
+  path.check { fill: @gray_90; }
+  &:hover path.check-outline { fill: @purple_hover }
 }
 
-.suggestion-edit {
-  float: right;
-  margin-top: 30px;
-  width: 24px;
-  height: 24px;
-}
-
-.suggestion-radio {
-  float: left;
-  margin-top: 16px;
-  width: 24px;
-  height: 24px;
-}
-
-.offer-choices:hover path.check-outline,
-.suggestion:hover path.check-outline,
-.suggestion:hover path.radio-outline {
-  fill: #a7a9ac;
-}
-
-.suggestion:hover .suggestion-edit g path {
-  fill: #a25cc6;
-}
-
-.suggestion:hover .suggestion-edit:hover g path {
-  fill: #8c42ad;
-}
-
-.checkbox-selected path.check-background,
-.radio-selected path.radio-background {
-  fill: #e8d9ee;
-}
-
-.checkbox-selected path.check-outline,
-.radio-selected path.radio-outline {
-  fill: #a25cc6;
-}
-
-.checkbox-selected path.check,
-.radio-selected circle {
-  fill: #414042;
-}
-
-.checkbox-selected:hover path.check-outline,
-.radio-selected:hover path.radio-outline {
-  fill: #8c42ad;
-}
-
-.options-container {
-  border-top: 1px solid #e6e7e8;
+.radio-selected {
+  path.radio-background { fill: @purple_disabled; }
+  path.radio-outline { fill: @purple; }
+  circle { fill: @gray_90; }
+  &:hover path.radio-outline { fill: @purple_hover; }
 }
 
 .sug-details {
   display: inline-block;
-  margin-left: 20px;
+  margin-left: 18px;
 }
 
 .day-text {
@@ -1120,26 +1039,8 @@ object {
   font-family: "Proxima Nova Regular Italic";
 }
 
-.suggestion:hover .day-text,
-.suggestion:hover .date-text,
-.suggestion:hover .time-text,
-.suggestion:hover .loc-text {
-  color: #808285;
-}
-
-.suggestion:hover .pin path {
-  fill: #808285;
-}
 
 /*** Scheduling Step 3 ***/
-
-.sched-step3-row {
-  height: 70px;
-}
-
-#guests-container {
-  border-top: 1px solid #e6e7e8;
-}
 
 .guest-statuses-title {
   margin-top: 40px;
@@ -1166,7 +1067,7 @@ object {
 }
 
 .checked path {
-  fill: #2bb673;
+  fill: @green;
 }
 
 .final-sched-action {
@@ -1180,4 +1081,71 @@ object {
   margin-bottom: 0;
   float: left;
   line-height: 1.42857;
+}
+
+
+/*** Animations ***/
+
+.rotate (@rotation) {
+  -webkit-animation: @rotation 0.25s;
+     -moz-animation: @rotation 0.25s;
+          animation: @rotation 0.25s;
+  -webkit-animation-fill-mode: forwards;
+     -moz-animation-fill-mode: forwards;
+          animation-fill-mode: forwards;
+  -webkit-animation-iteration-count: 1;
+     -moz-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+}
+
+@-moz-keyframes rotate_ccw_180 {
+    from { -moz-transform: rotate(180deg); }
+    to { -moz-transform: rotate(0deg); }
+}
+@-webkit-keyframes rotate_ccw_180 {
+    from { -webkit-transform: rotate(180deg); }
+    to { -webkit-transform: rotate(0deg); }
+}
+@keyframes rotate_ccw_180 {
+    from {transform:rotate(180deg);}
+    to {transform:rotate(0deg);}
+}
+
+@-moz-keyframes rotate_cw_180 {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(180deg); }
+}
+@-webkit-keyframes rotate_cw_180 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(180deg); }
+}
+@keyframes rotate_cw_180 {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(180deg);}
+}
+
+@-moz-keyframes rotate_ccw_45 {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(-45deg); }
+}
+@-webkit-keyframes rotate_ccw_45 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(-45deg); }
+}
+@keyframes rotate_ccw_45 {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(-45deg);}
+}
+
+@-moz-keyframes rotate_cw_45 {
+    from { -moz-transform: rotate(-45deg); }
+    to { -moz-transform: rotate(0deg); }
+}
+@-webkit-keyframes rotate_cw_45 {
+    from { -webkit-transform: rotate(-45deg); }
+    to { -webkit-transform: rotate(0deg); }
+}
+@keyframes rotate_cw_45 {
+    from {transform:rotate(-45deg);}
+    to {transform:rotate(0deg);}
 }

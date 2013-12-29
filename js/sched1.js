@@ -227,6 +227,7 @@ var sched1 = (function() {
 
   mod.load = function(profs, task, view) {
     var view = $("#sched-step1-table");
+    view.children().remove();
     $("<h3>Create the guest list.</h3>")
       .appendTo(view);
 

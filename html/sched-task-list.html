@@ -4,9 +4,14 @@
     <button id="new-sched-task-btn"
             class="new-task-btn btn btn-primary">New task</button>
   </div>
-  <div>
-    <button class="btn btn-default">Archive</button>
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#">IN PROGRESS</a></li>
+    <li><a href="#">SCHEDULED</a></li>
+    <li><a href="#">NEW</a></li>
+  </ul>
+  <div class="toolbar">
+    <img class="svg check-all" src="/assets/img/checkbox.svg">
+    <img class="svg archive-btn" src="/assets/img/archive-task.svg">
   </div>
-  <div id="all-tasks-tab-content" class="task-list"></div>
   <div id="scheduling-tasks-tab-content" class="task-list"></div>
 </div>
