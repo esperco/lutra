@@ -349,7 +349,7 @@ object {
 }
 
 .task-checkbox {
-  margin-top: 12px
+  margin-top: 12px;
   &:hover {
     cursor: pointer;
     path.check-outline { fill: @gray_40; }
@@ -564,9 +564,14 @@ object {
   color: @gray_60;
 }
 
-.login-title {
+.login-title,
+#forgot-password {
   padding-top: 10px;
   font-size: 14px;
+}
+
+#forgot-password {
+  float: right;
 }
 
 .login-btn {
