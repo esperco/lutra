@@ -37,11 +37,10 @@ var sched3 = (function() {
     var options = state.calendar_options;
 
     var idList = list.map(options, function(x) {
-      var result = {};
-      result[x.label] = {ids: [x.label]};
-      return result;
+      return { k: x.label, ids: [x.label] };
     });
-    var selector = show.create(idList, {
+    var idTbl = list.toTable(idList, function(x) { return x.k; });
+    var selector = show.create(idTbl, {
       onClass: "radio-selected",
       offClass: ""
     });
