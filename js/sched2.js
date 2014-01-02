@@ -30,20 +30,15 @@ var sched2 = (function() {
   }
 
   function clearLocation() {
-    var title = $("#sched-step2-loc-title");
     var addr = $("#sched-step2-loc-addr");
-    var instr = $("#sched-step2-loc-instr");
-
-    title.val("");
     addr.val("");
-    instr.val("");
   }
 
   function getLocation() {
     return {
-      title: $("#sched-step2-loc-title").val(),
+      title: "",
       address: $("#sched-step2-loc-addr").val(),
-      instructions: $("#sched-step2-loc-instr").val(),
+      instructions: "",
       timezone: timeZoneDropdown.get()
     };
   }
@@ -175,8 +170,6 @@ var sched2 = (function() {
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
   function selectCalendarSlots(profs, ta, slots) {
-    task.dont_change_task_type();
-
     var x = ta.task_data[1];
     ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page

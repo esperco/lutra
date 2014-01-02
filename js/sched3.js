@@ -74,8 +74,6 @@ var sched3 = (function() {
   }
 
   function updateTask(profs, ta, calOption) {
-    task.dont_change_task_type();
-
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";           // step in the scheduling page

@@ -220,7 +220,6 @@ var sched1 = (function() {
     ta.task_participants.organized_for = list.union(hosts, guests);
     ta.task_status.task_progress = "Coordinating";
     sched.getState(ta).scheduling_stage = "Find_availability";
-    task.dont_change_task_type();
     api.postTask(ta)
       .done(sched.loadTask);
   }
