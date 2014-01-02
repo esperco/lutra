@@ -115,7 +115,11 @@ var show = (function () {
         if (k !== k2)
           hideOne(k2, v2);
       }
-      showOne(k, tbl[k]);
+      var v = tbl[k];
+      if (util.isDefined(v))
+        showOne(k, v);
+      else
+        log("show.js: invalid key " + k);
     }
 
     return { hideAll : hideAll,
