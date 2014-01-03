@@ -159,6 +159,7 @@ var sched1 = (function() {
                                                updateAddGuestAbility));
                 updateAddGuestAbility();
                 saveGuests(task, hosts, guestTbl);
+                updateNextButton(hosts, guestTbl);
               });
           });
       clearAddGuest();
@@ -204,6 +205,7 @@ var sched1 = (function() {
             removeGuest(guestTbl, uid);
             updateAddGuestAbility();
             saveGuests(task, hosts, guestTbl);
+            updateNextButton(hosts, guestTbl);
           });
       });
     }
@@ -221,10 +223,7 @@ var sched1 = (function() {
 
   function isReady(hosts, guestTbl) {
     var guests = collectGuests(hosts, guestTbl);
-    var missingName = list.exists(guests, function(uid) {
-      return ! isValidName($("#name-" + uid).val());
-    });
-    return guests.length > 0 && !missingName;
+    return guests.length > 0;
   }
 
   function updateNextButton(hosts, guestTbl) {
