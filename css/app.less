@@ -508,8 +508,50 @@ object {
   height: 36px;
 }
 
+.back-button {
+  float: left;
+}
+
 .back-arrow-disabled path {
   fill: #bcbec0;
+}
+
+.next-button {
+  float: right;
+}
+
+.sched-progress {
+  padding: 0;
+  text-align: center;
+}
+
+@media (min-width: 992px) {
+  .footer-toggle {
+    display: none;
+  }
+  .footer-collapse {
+    width: auto;
+    border-top: 0;
+    box-shadow: none;
+  }
+  .footer-collapse.collapse {
+    display: block !important;
+    height: auto !important;
+    padding-bottom: 0;
+    overflow: visible !important;
+  }
+  .footer-collapse.in {
+    overflow-y: auto;
+  }
+  .footer-collapse .navbar-nav.navbar-left:first-child {
+    margin-left: -15px;
+  }
+  .footer-collapse .navbar-nav.navbar-right:last-child {
+    margin-right: -15px;
+  }
+  .footer-collapse .navbar-text:last-child {
+    margin-right: 0;
+  }
 }
 
 .sched-step1 {
