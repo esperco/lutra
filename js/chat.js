@@ -431,11 +431,9 @@ var chat = (function () {
             ta.task_participants.organized_for
             .concat(ta.task_participants.organized_by);
 
-          /* Do not display a chat tab for former participants with
-             whom there was no conversation */
+          /* Do not display a chat tab for former participants */
           if (! isGroupChat
-              && ! list.mem(taskParticipants, peerUid)
-              && ! chat.chat_items.length > 0)
+              && ! list.mem(taskParticipants, peerUid))
             return;
 
           var tab_name;
