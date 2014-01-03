@@ -60,21 +60,9 @@ object {
 }
 
 
-/*** Home ***/
-
-.task {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-bottom: 20px;
-  height: 70px;
-  border-bottom: 1px solid;
-  border-bottom-color: @gray_10;
-}
-
-
 /*** Nav Bar ***/
 
-#main-navbar {
+#desktop-navbar {
   position: fixed;
   height: 100%;
   width: 220px;
@@ -82,7 +70,41 @@ object {
   overflow-y: auto;
 }
 
-#nav-header {
+#mobile-navbar-header,
+#task-navbar {
+  margin: 0;
+  padding: 0;
+  background: rgba(248,248,248,0.9);
+  border-bottom: 1px solid @gray_20;
+  border-radius: 0;
+}
+
+#new-task-btn-mobile {
+  float: right;
+  margin-top: 14px;
+  margin-right: 16px;
+}
+
+#menu,
+#return-home {
+  float: left;
+  margin-left: 16px;
+  margin-top: 23px;
+  cursor: pointer;
+  &:hover g { fill: @purple_hover; }
+  &:active g { fill: #7d3ca0; }
+}
+
+#home-title {
+  letter-spacing: 3px;
+}
+
+#mobile-navbar-collapse {
+  background-color: @gray_90;
+  box-shadow: 0 10px 10px @gray_60;
+}
+
+.nav-header {
   margin: 0;
   padding: 20px 15px;
   height: 80px;
@@ -263,25 +285,6 @@ object {
 #task-navbar {
   z-index: 1030;
   position: fixed !important;
-  margin: 0;
-  padding: 0;
-  background: rgba(248,248,248,0.9);
-  border-top: none;
-  border-bottom: 1px solid @gray_20;
-  border-radius: 0;
-}
-
-.menu {
-  float: left;
-  margin-left: 16px;
-  margin-top: 20px;
-  cursor: pointer;
-  &:hover g { fill: @purple_hover; }
-  &:active g { fill: #7d3ca0; }
-}
-
-.main-title {
-  letter-spacing: 3px;
 }
 
 #chat-sidebar {
@@ -375,9 +378,16 @@ object {
 /*** Home ***/
 
 .home-container {
-  margin-left: 220px;
   margin-right: 0;
   padding-top: 20px;
+}
+
+#home-push {
+  height: 80px;
+}
+
+.navbar-open {
+  margin-left: 220px;
 }
 
 .page-title {
@@ -401,6 +411,15 @@ object {
   &:hover { cursor: pointer;
     path.background { fill: @gray_20; }
   }
+}
+
+.task {
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-bottom: 20px;
+  height: 70px;
+  border-bottom: 1px solid;
+  border-bottom-color: @gray_10;
 }
 
 .task-title {
@@ -547,14 +566,16 @@ object {
 
 /*** Login ***/
 
-.login-container {
+#login-container {
   padding-right: 15px;
   padding-left: 15px;
-  margin-top: 160px;
   margin-right: auto;
   margin-left: auto;
   max-width: 402px;
 }
+
+.desktop-login { margin-top: 160px; }
+.mobile-login { margin-top: 80px; }
 
 .esper-title {
   margin-bottom: 40px;

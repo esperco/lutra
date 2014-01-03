@@ -453,8 +453,6 @@ var chat = (function () {
             first_tab = false;
           }
         });
-
-        $("#chat").removeClass("hide");
       });
   }
 

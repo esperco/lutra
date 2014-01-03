@@ -195,7 +195,7 @@ var task = (function() {
   }
 
   mod.init = function() {
-    $("#new-task-btn").click(function () {
+    $("#new-task-btn-mobile").click(function () {
       window.location.hash = "!task";
     });
     $("#new-gen-task-btn").click(function () {

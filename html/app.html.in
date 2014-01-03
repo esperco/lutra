@@ -13,8 +13,8 @@
 
   <body>
 
-    <ul id="main-navbar" class="hide nav nav-pills nav-stacked home-page">
-      <li id="nav-header" class="unselectable"></li>
+    <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
+      <li class="nav-header unselectable"></li>
       <li>
         <a href="#" class="account-block hide">
           <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
@@ -83,31 +83,77 @@
       </li>
     </ul>
 
-    <!-- <div id="main-navbar" class="navbar navbar-fixed-top hide">
-      <img href="#" class="svg menu" src="/assets/img/menu.svg">
-      <p class="navbar-text main-title unselectable" data-toggle="tooltip">TASKS</p>
-        <ul class="nav nav-tabs pull-right account">
-          <li class="logged-out">
-            <a href="#!login"></a>
-          </li>
-          <li class="hide logged-in dropdown">
-            <a data-toggle="dropdown"
-               class="dropdown-toggle"
-               href="#">
-              <span id="logged-in-email">@</span>
-              <b class="caret"></b>
+    <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
+      <div id="mobile-navbar-header" class="navbar navbar-header">
+        <a data-toggle="collapse" data-target="#mobile-navbar-collapse">
+          <img id="menu" class="svg" src="/assets/img/menu.svg">
+        </a>
+        <p id="home-title" class="navbar-text unselectable">SCHEDULING</p>
+        <button id="new-task-btn-mobile" class="btn btn-primary">New Task</button>
+      </div>
+      <div id="mobile-navbar-collapse" class="collapse navbar-collapse scrollable">
+        <ul class="nav navbar-nav nav-pills nav-stacked">
+          <li class="nav-header unselectable"></li>
+          <li>
+            <a href="#" class="account-block hide">
+              <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
+              <div class="nav-text">Settings</div>
             </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="#!logout">Logout</a>
-              </li>
-            </ul>
+          </li>
+          <li>
+            <a href="#!logout" class="account-block hide">
+              <img id="logout-icon" class="svg" src="/assets/img/logout.svg">
+              <div class="nav-text">Log out</div>
+            </a>
+          </li>
+          <div class="nav-section-line unselectable">
+            <span class='nav-section-title'>TASKS</span>
+          </div>
+          <li>
+            <a href="#" class="nav-block">
+              <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+              <div class="nav-text">All Tasks</div>
+            </a>
+          </li>
+          <li class="active">
+            <a href="#" class="nav-block">
+              <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+              <div class="nav-text">Scheduling</div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-block">
+              <img id="general-icon" class="svg" src="/assets/img/general.svg">
+              <div class="nav-text">General</div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-block">
+              <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
+              <div class="nav-text">Archive</div>
+            </a>
+          </li>
+          <div class="nav-section-line unselectable hide">
+            <span class='nav-section-title'>NETWORK</span>
+          </div>
+          <li>
+            <a href="#" class="nav-block hide">
+              <img id="people-icon" class="svg" src="/assets/img/people.svg">
+              <div class="nav-text">People</div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-block hide">
+              <img id="places-icon" class="svg" src="/assets/img/places.svg">
+              <div class="nav-text">Places</div>
+            </a>
           </li>
         </ul>
-    </div> -->
+      </div>
+    </nav>
 
     <div id="login-page" class="hide login-page">
-      <div class="login-container">
+      <div id="login-container">
         <h1 class="esper-title">ESPER</h1>
 
         <form role="form">
@@ -138,6 +184,7 @@
     </div>
 
     <div id="home-page" class="hide home-page">
+      <div id="home-push" class="hide"></div>
       <div id="all-tasks" class="hide">
         @@all-tasks.html@@
       </div>
@@ -165,7 +212,7 @@
 
         <div id="task-navbar" class="navbar">
           <a href="#">
-            <img class="svg menu" src="/assets/img/menu.svg">
+            <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
           </a>
           <p id="task-title" class="navbar-text unselectable"></p>
           <a id="chat-sidebar">
