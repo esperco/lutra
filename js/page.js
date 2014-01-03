@@ -142,7 +142,7 @@ var page = (function() {
     pageSelector.hideAll();
     task.load(optTid);
     pageSelector.show("task");
-    // display.updateChat();
+    display.updateChat();
     util.focus();
   };
 

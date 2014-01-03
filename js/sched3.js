@@ -202,7 +202,7 @@ var sched3 = (function() {
     $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
       .appendTo(view);
 
-    var guestsContainer = $("<div id='guests-container'>")
+    var guestsContainer = $("<div class='guests-container guests-only'>")
     var guests = sched.getGuests(task);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {

@@ -14,7 +14,8 @@ var chat = (function () {
     for (var i in chat.chat_participants) {
       var uid = chat.chat_participants[i].par_uid;
       if (uid !== me) {
-        var p = profiles[uid];
+        log(i);
+        var p = profiles[uid].prof;
         if (! p) {
           someone_else = true;
         } else if (names) {
@@ -284,7 +285,7 @@ var chat = (function () {
     selChoicesDiv.append(selChoices);
     svg.loadImg(selChoices, "/assets/img/checkbox.svg");
     var selChoicesLabel = $("<div/>", {
-      'class': "offer-choices-label unselectable",
+      'class': "offer-choices-label unselectablex",
       'text': "Offer multiple choice response."
     });
     var selChoicesLabelShort = $("<div/>", {
@@ -437,7 +438,6 @@ var chat = (function () {
               && ! chat.chat_items.length > 0)
             return;
 
-          var tab_name;
           var pane_id = "chat" + chat.chatid;
           var tab = $("<a/>", {
             href:"#"+pane_id,

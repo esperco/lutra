@@ -271,8 +271,7 @@ var sched1 = (function() {
 
     var hostsContainer = $("<div class='hosts-container'>");
     var newGuestContainer = $("<div class='new-guest-container'>");
-    var guestsContainer = $("<div id='guests-container'/>")
-      .addClass("guests-container");
+    var guestsContainer = $("<div class='guests-container'/>");
 
     var guests = sched.getGuests(task);
     var guestTbl = list.toTable(guests);
