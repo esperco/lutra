@@ -105,6 +105,7 @@ var page = (function() {
     pageSelector.hideAll();
     home.load();
     pageSelector.show("home");
+    display.updateHome();
     util.focus();
   };
 
