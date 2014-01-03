@@ -93,7 +93,7 @@ var profile = (function() {
     var name = email.localpart(s);
 
     var result = initials(name);
-    if (result === "")
+    if (result.length < 2)
       result = name.substring(0,2);
     return result;
   }

@@ -123,24 +123,6 @@ var sched = (function() {
     return chats;
   }
 
-  /*
-    fetch the profiles of everyone involved in the task
-    (deferred map from uid to profile)
-  */
-  function profilesOfEveryone(task) {
-    var par = task.task_participants;
-    var everyone = par.organized_by.concat(par.organized_for);
-    return profile.mget(everyone)
-      .then(function(a) {
-        var b = {};
-        list.iter(a, function(obsProf) {
-          if (obsProf !== null)
-            b[obsProf.prof.profile_uid] = obsProf;
-        });
-        return b;
-      });
-  }
-
   var tabHighlighter =
     show.create({
       "sched-progress-tab1": {ids: ["sched-progress-tab1"]},
@@ -197,27 +179,27 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  mod.loadTask = function(task) {
-    var state = task.task_data[1];
+  mod.loadTask = function(ta) {
+    var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;
-        profilesOfEveryone(task)
+        task.profilesOfEveryone(ta)
           .done(function(profs) {
             switch (progress) {
             case "Guest_list":
-              mod.loadStep1(profs, task, state);
+              mod.loadStep1(profs, ta, state);
               break;
             case "Find_availability":
-              mod.loadStep2(tzList, profs, task);
+              mod.loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              mod.loadStep3(profs, task, state);
+              mod.loadStep3(profs, ta, state);
               break;
             case "Confirm":
-              mod.loadStep4(profs, task, state);
+              mod.loadStep4(profs, ta, state);
               break;
             default:
               log("Unknown scheduling stage: " + progress);

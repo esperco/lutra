@@ -3,7 +3,7 @@ var chat = (function () {
   var profiles = {};
 
   function full_name(uid) {
-    var p = profiles[uid];
+    var p = profiles[uid].prof;
     return p ? p.full_name : "John Doe";
   }
 
@@ -25,7 +25,7 @@ var chat = (function () {
       }
     }
     if (names) {
-      return someone_else ? names + ", et al" : names;
+      return someone_else ? names + ", and others" : names;
     } else {
       return "participants";
     }
@@ -121,11 +121,16 @@ var chat = (function () {
 
     var name = $("<div class='col-xs-6 from-name-div' />")
       .appendTo(header);
-    name.append($("<div class='from-name' />").append(full_name(item.by)));
+    name.append(
+      $("<div class='from-name' />")
+        .append(full_name(item.by))
+    );
 
     var timestamp = $("<div class='col-xs-6 timestamp-div' />")
       .appendTo(header);
-    timestamp.append($("<div class='timestamp' />").append(date.viewTimeAgo(date.ofString(time))));
+    timestamp
+      .append($("<div class='timestamp' />")
+              .append(date.viewTimeAgo(date.ofString(time))));
 
     v.append($("<div class='message'/>").append(viewOfChatData(item)));
     // v.append($("<div class='message-status' />").append(status));
@@ -238,7 +243,8 @@ var chat = (function () {
   }
 
   function chatEditor(messages, chat, task) {
-    var chatFooter = $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
+    var chatFooter =
+      $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
       var toField = $("<div class='to-field'/>")
@@ -397,30 +403,41 @@ var chat = (function () {
     return v;
   }
 
-  mod.loadTaskChats = function(task) {
+  mod.loadTaskChats = function(ta) {
     $(".chat-profile-tabs li").remove();
     var tabs = $(".chat-profile-tabs");
     $(".chat-panel div").remove();
     var tab_content = $(".chat-panel");
 
-    profile.mget(task.task_participants.organized_for)
+    task.profilesOfEveryone(ta)
       .done(function(profs) {
-        list.iter(profs, function (p) {
-          profiles[p.prof.profile_uid] = p.prof;
-        });
+        profiles = profs;
 
         var first_tab = true;
 
         /* move group chat to first position */
-        var singleChats = list.filter(task.task_chats, function(x) {
-          return x.chatid !== task.task_context_chat;
+        var singleChats = list.filter(ta.task_chats, function(x) {
+          return x.chatid !== ta.task_context_chat;
         });
-        var groupChats = list.filter(task.task_chats, function(x) {
-          return x.chatid === task.task_context_chat;
+        var groupChats = list.filter(ta.task_chats, function(x) {
+          return x.chatid === ta.task_context_chat;
         });
         var chats = list.concat([groupChats, singleChats]);
 
-        list.iter(chats, function (chat) {
+        list.iter(chats, function(chat) {
+          var isGroupChat = chat.chatid === ta.task_context_chat;
+          var peerUid = chat.chat_with;
+          var taskParticipants =
+            ta.task_participants.organized_for
+            .concat(ta.task_participants.organized_by);
+
+          /* Do not display a chat tab for former participants with
+             whom there was no conversation */
+          if (! isGroupChat
+              && ! list.mem(taskParticipants, peerUid)
+              && ! chat.chat_items.length > 0)
+            return;
+
           var tab_name;
           var pane_id = "chat" + chat.chatid;
           var tab = $("<a/>", {
@@ -431,15 +448,16 @@ var chat = (function () {
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
-                     .append(chatView(chat, task)));
-          if (chat.chatid === task.task_context_chat) {
+                     .append(chatView(chat, ta)));
+          if (isGroupChat) {
             var group = $("<img class='group'/>");
             tab.append($("<div class='chat-prof-circ'/>")
                .append(group));
             svg.loadImg(group, "/assets/img/group.svg");
           } else {
-            var p = profiles[chat.chat_participants[0].par_uid];
-            tab_name = p.full_name;
+            if (! util.isDefined(peerUid))
+              peerUid = chat.chat_participants[0].par_uid;
+            var p = profiles[peerUid].prof;
             var tab_initials = profile.veryShortNameOfProfile(p);
             tab.append($("<div class='chat-prof-circ'/>")
                .append(tab_initials));
