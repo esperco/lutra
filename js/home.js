@@ -61,7 +61,6 @@ var home = (function() {
 
   function loadNavHeader() {
     $(".nav-header").each(function() {
-      log("I'm here");
       var view = $(this);
       view.children().remove();
       var circ = $("<div id='exec-circ-outline'></div>")
