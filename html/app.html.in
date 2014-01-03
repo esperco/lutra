@@ -208,15 +208,15 @@
 
     <div id="task-page" class="hide task-page">
 
-      <div id="task-content" class="col-md-8 scrollable">
+      <div id="task-content" class="col-sm-8 scrollable">
 
         <div id="task-navbar" class="navbar">
           <a href="#">
             <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
           </a>
           <p id="task-title" class="navbar-text unselectable"></p>
-          <a id="chat-sidebar">
-            <img class="svg chat-icon" src="/assets/img/chat.svg">
+          <a id="chat-icon-container">
+            <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
           </a>
         </div>
 
@@ -243,7 +243,7 @@
 
       </div>
 
-      <div id="chat" class="col-md-4 scrollable pull-right">
+      <div id="chat" class="col-sm-4 scrollable pull-right">
         <div id="chat-header">
           <ul class="nav chat-tabs chat-profile-tabs"></ul>
           <div class="chat-profile-details-div"></div>

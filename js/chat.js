@@ -27,7 +27,7 @@ var chat = (function () {
     if (names) {
       return someone_else ? names + ", and others" : names;
     } else {
-      return "participants";
+      return "Guest";
     }
   }
 
@@ -244,7 +244,7 @@ var chat = (function () {
 
   function chatEditor(messages, chat, task) {
     var chatFooter =
-      $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
+      $("<div class='navbar-fixed-bottom col-sm-4 chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
       var toField = $("<div class='to-field'/>")
@@ -269,12 +269,6 @@ var chat = (function () {
 
     editText.val("");
 
-    // editText.on("keyup", function (e){
-    //   $(this).css("height", "auto");
-    //   $(this).height(this.scrollHeight);
-    // });
-    // editText.keyup();
-
     var choicesEditor = editChoices();
     choicesEditor.hide();
     v.append(choicesEditor);
@@ -293,7 +287,12 @@ var chat = (function () {
       'class': "offer-choices-label unselectable",
       'text': "Offer multiple choice response."
     });
+    var selChoicesLabelShort = $("<div/>", {
+      'class': "offer-choices-label-short unselectable",
+      'text': "Multiple choice"
+    });
     selChoicesDiv.append(selChoicesLabel);
+    selChoicesDiv.append(selChoicesLabelShort);
 
     selChoicesDiv.click(function () {
       if (selChoicesDiv.hasClass("checkbox-selected")) {

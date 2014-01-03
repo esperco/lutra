@@ -1,20 +1,23 @@
-/*
-  Fonts:
-  Proxima Nova Light
-  Proxima Nova Regular
-  Proxima Nova Semibold
-*/
+/*** Fonts ***/
+@light: "Proxima Nova Light";
+@regular: "Proxima Nova Regular";
+@italic: "Proxima Nova Regular Italic";
+@bold: "Proxima Nova Semibold";
 
 /*** Colors ***/
+@gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
+@gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
 @gray_90: #414042;
 @green: #2bb673;
 @orange: #f7941e;
 @purple: #a25cc6;
+@purple_active: #7d3ca0;
 @purple_disabled: #e8d9ee;
+@purple_focus: #c08add;
 @purple_hover: #8c42ad;
 @red: #e53030;
 @red_hover: #bf2121;
@@ -31,7 +34,7 @@ html {
 body {
   background-color: @white;
   color: @gray_90;
-  font-family: "Proxima Nova Regular", Arial;
+  font-family: @regular, Arial;
   font-size: 16px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -57,6 +60,11 @@ object {
    */
    -ms-user-select: none;
    user-select: none;
+}
+
+.container.mobile {
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 
@@ -145,7 +153,7 @@ object {
 }
 
 #exec-name {
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
 }
 
 #exec-caret {
@@ -181,16 +189,16 @@ object {
   left: 7px;
   padding-left: 8px;
   padding-right: 8px;
-  color: @gray_40;
+  color: @white;
   background-color: @gray_90;
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   letter-spacing: 3px;
 }
 
 .nav-block {
   margin: 0;
   height: 60px;
-  color: @gray_20;
+  color: @gray_60;
 }
 
 .nav-text {
@@ -245,9 +253,8 @@ object {
   fill: @gray_60;
 }
 
-.account-block .nav-pills > li > a:hover {
-  color: @gray_90 !important;
-  background-color: @gray_20 !important;
+.account-block:hover {
+  background-color: #282828 !important;
 }
 
 .account-block:hover {
@@ -269,7 +276,7 @@ object {
   #places-icon path, { fill: @white; }
 }
 
-.nav-pills > li.active > a:hover {
+.nav-pills > li.active > a {
   #settings-icon path,
   #logout-icon g path,
   #search-icon path,
@@ -282,7 +289,7 @@ object {
   #general-icon circle,
   #archive-icon path,
   #people-icon path,
-  #places-icon path, { fill: @gray_60; }
+  #places-icon path, { fill: @white; }
 }
 
 #task-navbar {
@@ -290,20 +297,11 @@ object {
   position: fixed !important;
 }
 
-#chat-sidebar {
+#chat-icon {
   float: right;
   margin-right: 16px;
   margin-top: 20px;
   cursor: pointer;
-}
-
-.chat-open .chat-icon {
-  path { fill: @gray_10; }
-  &:hover path { fill: @gray_20; }
-}
-
-.chat-closed .chat-icon {
-  path { fill: @purple; }
   &:hover path { fill: @purple_hover; }
 }
 
@@ -329,10 +327,19 @@ object {
   min-height: 70px;
 }
 
+.task-list,
 #guest-list-container,
-.options-container,
-#guests-container {
+#sched-step2-suggestions,
+.options-container {
   border-top: 1px solid @gray_10;
+}
+
+.task-list {
+  margin-top: 20px;
+}
+
+#sched-step2-suggestions {
+  margin-top: 15px;
 }
 
 .check-all,
@@ -343,10 +350,6 @@ object {
   width: 24px;
   height: 24px;
 }
-
-// .task-list {
-//   margin-top: 20px;
-// }
 
 .task-checkbox {
   margin-top: 2px;
@@ -381,7 +384,7 @@ object {
 }
 
 #home-push {
-  height: 40px;
+  height: 55px;
 }
 
 .navbar-open {
@@ -389,9 +392,10 @@ object {
 }
 
 .page-title {
+  font-size: 32px;
   float: left;
-  color: @gray_60;
-  font-family: "Proxima Nova Light";
+  margin-right: 20px;
+  font-family: @light;
   letter-spacing: 6px;
 }
 
@@ -412,10 +416,29 @@ object {
 }
 
 .list-tabs > li > a {
+  font-size: 14px;
   padding: 0;
-  padding-bottom: 10px;
-  margin-top: 40px;
   margin-right: 20px;
+}
+
+.desktop-nav-tabs > li > a {
+  margin-top: 33px;
+}
+
+.mobile-nav-tabs > li > a {
+  margin-top: 5px;
+}
+
+.nav-tabs-centered {
+  text-align: center;
+}
+
+.nav-tabs-centered.mobile-nav-tabs > li {
+  float: none;
+  display: inline-block;
+  margin-left: 10px;
+  margin-right: 10px;
+  & > a { margin-right: 0; }
 }
 
 .task {
@@ -462,7 +485,7 @@ object {
 }
 
 #start-task {
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   font-size: 20px;
   letter-spacing: 3px;
   width: 240px;
@@ -560,12 +583,12 @@ object {
 
 .modal-first-section-title {
   margin-top: 0px;
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
 }
 
 .modal-section-title {
   padding-top: 15px;
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
 }
 
 #sched-availability-message,
@@ -589,7 +612,7 @@ object {
 
 .esper-title {
   margin-bottom: 40px;
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   letter-spacing: 12px;
   text-align: center;
   color: @gray_60;
@@ -609,7 +632,7 @@ object {
   width: 100%;
   height: 40px;
   margin-top: 20px;
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   font-size: 20px;
   letter-spacing: 3px;
 }
@@ -692,12 +715,14 @@ object {
 }
 .chat-tabs > li > a:hover {
   background-color: @gray_10;
+  border-bottom: 1px solid @gray_20;
 }
 .chat-tabs > li.active > a,
 .chat-tabs > li.active > a:hover,
 .chat-tabs > li.active > a:focus {
   cursor: default;
   background-color: @gray_60;
+  border: none;
 }
 
 .chat-tabs > li.active > a .prof-caret path,
@@ -722,7 +747,7 @@ object {
   position: fixed;
   z-index: 1040;
   margin-top: -40px;
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
 }
 
 .chat-panel {
@@ -741,7 +766,7 @@ object {
 }
 
 .from-name {
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
   font-size: 12px;
   color: @gray_60;
 }
@@ -829,6 +854,7 @@ object {
 .add-option-btn {
   height: 32px;
   width: 100%;
+  padding-top: 4px;
   padding-left: 12px;
   text-align: left;
   font-size: 14px;
@@ -857,7 +883,8 @@ object {
   width: 18px;
 }
 
-.offer-choices-label {
+.offer-choices-label,
+.offer-choices-label-short {
   float: left;
   margin-top: 5px;
   margin-left: 10px;
@@ -904,7 +931,7 @@ object {
   float: left;
   margin-top: 14px;
   margin-left: 18px;
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
 }
 
 .add-guest-circ {
@@ -950,7 +977,7 @@ object {
   float: left;
   margin-top: 14px;
   margin-left: 18px;
-  font-family: "Proxima Nova Regular Italic";
+  font-family: @italic;
   color: @gray_60;
 }
 
@@ -1002,7 +1029,7 @@ object {
 .pref-time-title,
 .location-title {
   padding-top: 10px;
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
   font-size: 14px;
 }
 
@@ -1059,12 +1086,12 @@ object {
 }
 
 .day-text {
-  font-family: "Proxima Nova Semibold";
+  font-family: @bold;
   font-size: 14px;
 }
 
 .date-text {
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   font-size: 18px;
 }
 
@@ -1077,7 +1104,7 @@ object {
 }
 
 .tbd {
-  font-family: "Proxima Nova Regular Italic";
+  font-family: @italic;
 }
 
 
@@ -1085,7 +1112,7 @@ object {
 
 .guest-statuses-title {
   margin-top: 40px;
-  font-family: "Proxima Nova Light";
+  font-family: @light;
   font-size: 18px;
 }
 

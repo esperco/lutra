@@ -77,24 +77,13 @@ var profile = (function() {
     return result;
   }
 
-  function firstTwoLetters(s) {
-    var re = /(^|[^A-Za-z]+)([A-Za-z][A-Za-z]?)/g;
-    var result = "";
-    do {
-      m = re.exec(s);
-      if (m)
-        result += m[2];
-    } while (m);
-    return result.substring(0,2);
-  }
-
   mod.shortenName = function(s) {
     /* discard the domain in case it's an email address */
     var name = email.localpart(s);
 
     var result = initials(name);
     if (result.length < 2)
-      result = name.substring(0,2);
+      result = name.substring(0,1).toUpperCase();
     return result;
   }
 

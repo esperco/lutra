@@ -68,8 +68,8 @@ var home = (function() {
         .appendTo(view);
       var initials;
       var exec = $("<div id='exec-name-div'></div>")
-//        .append($("<div id='assisting'>ASSISTING</div>"))
-//        .append($("<div id='exec-name'>Joe Lonsdale</div>"))
+        .append($("<div id='assisting'>ASSISTING</div>"))
+        .append($("<div id='exec-name'>Joe Lonsdale</div>"))
         .appendTo(view);
       var caretDiv = $("<div id='exec-caret'></div>")
         .appendTo(view);
