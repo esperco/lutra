@@ -250,36 +250,39 @@ object {
   background-color: @gray_20 !important;
 }
 
-.account-block:hover #settings-icon path,
-.account-block:hover #logout-icon g path,
-.nav-block:hover #search-icon path,
-.nav-block:hover #dashboard-icon path,
-.nav-block:hover #dashboard-icon circle,
-.nav-block:hover #all-tasks-icon path,
-.nav-block:hover #scheduling-icon path,
-.nav-block:hover #scheduling-icon text,
-.nav-block:hover #general-icon path,
-.nav-block:hover #general-icon circle,
-.nav-block:hover #archive-icon path,
-.nav-block:hover #people-icon path,
-.nav-block:hover #places-icon path, {
-  fill: @white;
+.account-block:hover {
+  #settings-icon path,
+  #logout-icon g path { fill: @white; }
 }
 
-.nav-pills > li.active > a:hover #settings-icon path,
-.nav-pills > li.active > a:hover #logout-icon g path,
-.nav-pills > li.active > a:hover #search-icon path,
-.nav-pills > li.active > a:hover #dashboard-icon path,
-.nav-pills > li.active > a:hover #dashboard-icon circle,
-.nav-pills > li.active > a:hover #all-tasks-icon path,
-.nav-pills > li.active > a:hover #scheduling-icon path,
-.nav-pills > li.active > a:hover #scheduling-icon text,
-.nav-pills > li.active > a:hover #general-icon path,
-.nav-pills > li.active > a:hover #general-icon circle,
-.nav-pills > li.active > a:hover #archive-icon path,
-.nav-pills > li.active > a:hover #people-icon path,
-.nav-pills > li.active > a:hover #places-icon path, {
-  fill: @gray_60;
+.nav-block:hover {
+  #search-icon path,
+  #dashboard-icon path,
+  #dashboard-icon circle,
+  #all-tasks-icon path,
+  #scheduling-icon path,
+  #scheduling-icon text,
+  #general-icon path,
+  #general-icon circle,
+  #archive-icon path,
+  #people-icon path,
+  #places-icon path, { fill: @white; }
+}
+
+.nav-pills > li.active > a:hover {
+  #settings-icon path,
+  #logout-icon g path,
+  #search-icon path,
+  #dashboard-icon path,
+  #dashboard-icon circle,
+  #all-tasks-icon path,
+  #scheduling-icon path,
+  #scheduling-icon text,
+  #general-icon path,
+  #general-icon circle,
+  #archive-icon path,
+  #people-icon path,
+  #places-icon path, { fill: @gray_60; }
 }
 
 #task-navbar {
