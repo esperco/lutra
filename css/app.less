@@ -329,7 +329,6 @@ object {
   min-height: 70px;
 }
 
-.task-list,
 #guest-list-container,
 .options-container,
 #guests-container {
@@ -345,17 +344,12 @@ object {
   height: 24px;
 }
 
-.task-list {
-  margin-top: 20px;
-}
-
-.check-all {
-  margin-top: 4px;
-  margin-left: 10px;
-}
+// .task-list {
+//   margin-top: 20px;
+// }
 
 .task-checkbox {
-  margin-top: 12px;
+  margin-top: 2px;
   &:hover {
     cursor: pointer;
     path.check-outline { fill: @gray_40; }
@@ -383,10 +377,11 @@ object {
 .home-container {
   margin-right: 0;
   padding-top: 20px;
+  padding-bottom: 120px;
 }
 
 #home-push {
-  height: 80px;
+  height: 40px;
 }
 
 .navbar-open {
@@ -416,6 +411,13 @@ object {
   }
 }
 
+.list-tabs > li > a {
+  padding: 0;
+  padding-bottom: 10px;
+  margin-top: 40px;
+  margin-right: 20px;
+}
+
 .task {
   padding-top: 20px;
   padding-left: 10px;
@@ -427,15 +429,16 @@ object {
 
 .task-title {
   display: inline-block;
-  margin-top: 14px;
+  margin-top: 4px;
   margin-left: 18px;
   color: @gray_90;
-  &:hover { color: @gray_60; }
+  &:hover { color: @gray_90; }
 }
 
 
 /*** Footers ***/
 
+.list-footer,
 .new-task-footer,
 .sched-footer {
   position: fixed !important;
@@ -448,6 +451,10 @@ object {
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
+}
+
+.list-footer {
+  width: 100%;
 }
 
 .new-task-footer {
@@ -1015,15 +1022,20 @@ object {
   &:hover {
     path.check-outline,
     path.radio-outline { fill: @gray_40; }
-    .suggestion-edit {
-      g path { fill: @purple; }
-      &:hover g path { fill: @purple_hover; }
-    }
-    .day-text,
-    .date-text,
-    .time-text,
-    .loc-text { color: @gray_60; }
-    .pin path { fill: @gray_60; }
+  }
+}
+
+@media(min-width:768px){
+  .suggestion:hover .suggestion-edit {
+    g path { fill: @purple; }
+    &:hover g path { fill: @purple_hover; }
+  }
+}
+
+@media(max-width:767px){
+  .suggestion-edit {
+    g path { fill: @purple; }
+    &:hover g path { fill: @purple_hover; }
   }
 }
 

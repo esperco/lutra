@@ -63,7 +63,7 @@
       <li>
         <a href="#" class="nav-block">
           <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-          <div class="nav-text">Archive</div>
+          <div class="nav-text">Archived</div>
         </a>
       </li>
       <div class="nav-section-line unselectable hide">
@@ -130,7 +130,7 @@
           <li>
             <a href="#" class="nav-block">
               <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-              <div class="nav-text">Archive</div>
+              <div class="nav-text">Archived</div>
             </a>
           </li>
           <div class="nav-section-line unselectable hide">
