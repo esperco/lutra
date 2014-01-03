@@ -60,21 +60,9 @@ object {
 }
 
 
-/*** Home ***/
-
-.task {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-bottom: 20px;
-  height: 70px;
-  border-bottom: 1px solid;
-  border-bottom-color: @gray_10;
-}
-
-
 /*** Nav Bar ***/
 
-#main-navbar {
+#desktop-navbar {
   position: fixed;
   height: 100%;
   width: 220px;
@@ -82,7 +70,41 @@ object {
   overflow-y: auto;
 }
 
-#nav-header {
+#mobile-navbar-header,
+#task-navbar {
+  margin: 0;
+  padding: 0;
+  background: rgba(248,248,248,0.9);
+  border-bottom: 1px solid @gray_20;
+  border-radius: 0;
+}
+
+#new-task-btn-mobile {
+  float: right;
+  margin-top: 14px;
+  margin-right: 16px;
+}
+
+#menu,
+#return-home {
+  float: left;
+  margin-left: 16px;
+  margin-top: 23px;
+  cursor: pointer;
+  &:hover g { fill: @purple_hover; }
+  &:active g { fill: #7d3ca0; }
+}
+
+#home-title {
+  letter-spacing: 3px;
+}
+
+#mobile-navbar-collapse {
+  background-color: @gray_90;
+  box-shadow: 0 10px 10px @gray_60;
+}
+
+.nav-header {
   margin: 0;
   padding: 20px 15px;
   height: 80px;
@@ -228,60 +250,44 @@ object {
   background-color: @gray_20 !important;
 }
 
-.account-block:hover #settings-icon path,
-.account-block:hover #logout-icon g path,
-.nav-block:hover #search-icon path,
-.nav-block:hover #dashboard-icon path,
-.nav-block:hover #dashboard-icon circle,
-.nav-block:hover #all-tasks-icon path,
-.nav-block:hover #scheduling-icon path,
-.nav-block:hover #scheduling-icon text,
-.nav-block:hover #general-icon path,
-.nav-block:hover #general-icon circle,
-.nav-block:hover #archive-icon path,
-.nav-block:hover #people-icon path,
-.nav-block:hover #places-icon path, {
-  fill: @white;
+.account-block:hover {
+  #settings-icon path,
+  #logout-icon g path { fill: @white; }
 }
 
-.nav-pills > li.active > a:hover #settings-icon path,
-.nav-pills > li.active > a:hover #logout-icon g path,
-.nav-pills > li.active > a:hover #search-icon path,
-.nav-pills > li.active > a:hover #dashboard-icon path,
-.nav-pills > li.active > a:hover #dashboard-icon circle,
-.nav-pills > li.active > a:hover #all-tasks-icon path,
-.nav-pills > li.active > a:hover #scheduling-icon path,
-.nav-pills > li.active > a:hover #scheduling-icon text,
-.nav-pills > li.active > a:hover #general-icon path,
-.nav-pills > li.active > a:hover #general-icon circle,
-.nav-pills > li.active > a:hover #archive-icon path,
-.nav-pills > li.active > a:hover #people-icon path,
-.nav-pills > li.active > a:hover #places-icon path, {
-  fill: @gray_60;
+.nav-block:hover {
+  #search-icon path,
+  #dashboard-icon path,
+  #dashboard-icon circle,
+  #all-tasks-icon path,
+  #scheduling-icon path,
+  #scheduling-icon text,
+  #general-icon path,
+  #general-icon circle,
+  #archive-icon path,
+  #people-icon path,
+  #places-icon path, { fill: @white; }
+}
+
+.nav-pills > li.active > a:hover {
+  #settings-icon path,
+  #logout-icon g path,
+  #search-icon path,
+  #dashboard-icon path,
+  #dashboard-icon circle,
+  #all-tasks-icon path,
+  #scheduling-icon path,
+  #scheduling-icon text,
+  #general-icon path,
+  #general-icon circle,
+  #archive-icon path,
+  #people-icon path,
+  #places-icon path, { fill: @gray_60; }
 }
 
 #task-navbar {
   z-index: 1030;
   position: fixed !important;
-  margin: 0;
-  padding: 0;
-  background: rgba(248,248,248,0.9);
-  border-top: none;
-  border-bottom: 1px solid @gray_20;
-  border-radius: 0;
-}
-
-.menu {
-  float: left;
-  margin-left: 16px;
-  margin-top: 20px;
-  cursor: pointer;
-  &:hover g { fill: @purple_hover; }
-  &:active g { fill: #7d3ca0; }
-}
-
-.main-title {
-  letter-spacing: 3px;
 }
 
 #chat-sidebar {
@@ -323,7 +329,6 @@ object {
   min-height: 70px;
 }
 
-.task-list,
 #guest-list-container,
 .options-container,
 #guests-container {
@@ -339,17 +344,12 @@ object {
   height: 24px;
 }
 
-.task-list {
-  margin-top: 20px;
-}
-
-.check-all {
-  margin-top: 4px;
-  margin-left: 10px;
-}
+// .task-list {
+//   margin-top: 20px;
+// }
 
 .task-checkbox {
-  margin-top: 12px;
+  margin-top: 2px;
   &:hover {
     cursor: pointer;
     path.check-outline { fill: @gray_40; }
@@ -375,9 +375,17 @@ object {
 /*** Home ***/
 
 .home-container {
-  margin-left: 220px;
   margin-right: 0;
   padding-top: 20px;
+  padding-bottom: 120px;
+}
+
+#home-push {
+  height: 40px;
+}
+
+.navbar-open {
+  margin-left: 220px;
 }
 
 .page-title {
@@ -403,17 +411,34 @@ object {
   }
 }
 
+.list-tabs > li > a {
+  padding: 0;
+  padding-bottom: 10px;
+  margin-top: 40px;
+  margin-right: 20px;
+}
+
+.task {
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-bottom: 20px;
+  height: 70px;
+  border-bottom: 1px solid;
+  border-bottom-color: @gray_10;
+}
+
 .task-title {
   display: inline-block;
-  margin-top: 14px;
+  margin-top: 4px;
   margin-left: 18px;
   color: @gray_90;
-  &:hover { color: @gray_60; }
+  &:hover { color: @gray_90; }
 }
 
 
 /*** Footers ***/
 
+.list-footer,
 .new-task-footer,
 .sched-footer {
   position: fixed !important;
@@ -426,6 +451,10 @@ object {
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
+}
+
+.list-footer {
+  width: 100%;
 }
 
 .new-task-footer {
@@ -547,14 +576,16 @@ object {
 
 /*** Login ***/
 
-.login-container {
+#login-container {
   padding-right: 15px;
   padding-left: 15px;
-  margin-top: 160px;
   margin-right: auto;
   margin-left: auto;
   max-width: 402px;
 }
+
+.desktop-login { margin-top: 160px; }
+.mobile-login { margin-top: 80px; }
 
 .esper-title {
   margin-bottom: 40px;
@@ -991,15 +1022,20 @@ object {
   &:hover {
     path.check-outline,
     path.radio-outline { fill: @gray_40; }
-    .suggestion-edit {
-      g path { fill: @purple; }
-      &:hover g path { fill: @purple_hover; }
-    }
-    .day-text,
-    .date-text,
-    .time-text,
-    .loc-text { color: @gray_60; }
-    .pin path { fill: @gray_60; }
+  }
+}
+
+@media(min-width:768px){
+  .suggestion:hover .suggestion-edit {
+    g path { fill: @purple; }
+    &:hover g path { fill: @purple_hover; }
+  }
+}
+
+@media(max-width:767px){
+  .suggestion-edit {
+    g path { fill: @purple; }
+    &:hover g path { fill: @purple_hover; }
   }
 }
 
