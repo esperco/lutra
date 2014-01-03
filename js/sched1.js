@@ -7,18 +7,88 @@ var sched1 = (function() {
 
   var nextButton = $(".sched-step1-next");
 
-  function rowViewOfNewParticipant(chats, profs, task, hosts, guestTbl) {
-    var view = $("<div class='sched-step1-row'/>");
-    var initials = $("<div class='prof-circ'/>");
+  /* Form allowing the user to enter a new participant
+     at the bottom of the list */
+  function rowViewOfNewParticipant(profs, task, hosts, guestTbl,
+                                   guestsContainer) {
+    var view = $("<div class='sched-step1-add-row'/>");
+
+    var hosts = sched.getHosts(task);
+    var adder = $("<div class='add-guest-circ'>");
+    var plus = $("<img id='plus'/>");
+    plus.appendTo(adder);
+    svg.loadImg(plus, "/assets/img/plus.svg");
+
+    var addGuestDiv = $("<div/>");
+    var addGuestText = $("<a id='add-guest-text' class='unselectable'/>")
+      .text("Add guest")
+      .appendTo(addGuestDiv);
+    var maxGuests = $("<p id='max-guests-text' class='unselectable'/>")
+      .text("No more guests can be added.")
+      .appendTo(addGuestDiv);
+
     var emailInput = $("<input type='email'/>")
-      .addClass("form-control")
-      .attr("placeholder", "guest's email");
+      .addClass("form-control guest-input")
+      .attr("placeholder", "Email address");
     var nameInput = $("<input type='text'/>")
-      .addClass("form-control")
-      .attr("placeholder", "guest's full name")
+      .addClass("form-control guest-input")
+      .attr("placeholder", "Full name")
       .attr("disabled", true);
-    var removeButton = $("<button class='btn btn-default'/>")
-      .text("Remove");
+    var addButton = $("<button id='add-guest-btn'/>")
+      .addClass("btn btn-primary disabled")
+      .text("Add");
+    updateAddButton(hosts, guestTbl);
+    var guestInputDiv = $("<div id='guest-input-div' class='hide'/>")
+      .append(emailInput)
+      .append(nameInput)
+      .append(addButton);
+
+    function updateAddGuestAbility() {
+      var guests = collectGuests(hosts, guestTbl);
+      if (guests.length === 0) {
+        adder
+          .unbind("click")
+          .click(toggleAddGuest)
+          .removeClass("add-guest-disabled");
+        addGuestDiv.bind("click", toggleAddGuest);
+        addGuestText.removeClass("hide");
+        maxGuests.addClass("hide");
+      } else {
+        adder
+          .unbind("click")
+          .addClass("add-guest-disabled");
+        addGuestDiv.unbind("click");
+        addGuestText.addClass("hide");
+        maxGuests.removeClass("hide");
+      }
+    }
+
+    function toggleAddGuest() {
+      if (guestInputDiv.hasClass("hide")) {
+        addGuestDiv.addClass("hide");
+        guestInputDiv.removeClass("hide");
+        emailInput.focus();
+        adder
+          .removeClass("return-to-add")
+          .addClass("cancel");
+      } else {
+        clearAddGuest();
+      }
+    }
+
+    function clearAddGuest() {
+      clearUid();
+      $(".guest-input").each(function() {
+        $(this).val("");
+      });
+      updateAddButton(hosts, guestTbl);
+      guestInputDiv.addClass("hide");
+      addGuestDiv.removeClass("hide");
+      adder
+        .removeClass("cancel")
+        .addClass("return-to-add");
+    }
+
     var optUid;
 
     function updateNameEditability(editable) {
@@ -35,12 +105,6 @@ var sched1 = (function() {
       updateNameEditability(false);
     }
 
-    function updateInitials() {
-      var s = profile.shortenName(nameInput.val());
-      initials
-        .text(profile.shortenName(nameInput.val()));
-    }
-
     function fetchProfile() {
       var emailAddr = emailInput.val();
       if (email.validate(emailAddr)) {
@@ -49,37 +113,25 @@ var sched1 = (function() {
             clearUid();
             var uid = prof.profile_uid;
             optUid = uid;
-            guestTbl[uid] = uid;
             nameInput.attr("id", "name-" + uid);
             emailInput.attr("id", "email-" + uid);
             if (prof.full_name !== emailAddr || ! prof.editable)
               nameInput.val(prof.full_name);
             updateNameEditability(prof.editable);
-            updateInitials();
-            updateNextButton(hosts, guestTbl);
+            updateAddButton(hosts, guestTbl);
           });
       } else {
         clearUid();
-        updateNextButton(hosts, guestTbl);
+        updateAddButton(hosts, guestTbl);
       }
     }
 
-    function saveName() {
+    function updateAddButton(hosts, guestTbl) {
       var name = nameInput.val();
-      updateInitials();
-      if (isValidName(name) && util.isString(optUid)) {
-        var uid = optUid;
-        api.getProfile(uid)
-          .then(function(prof) {
-            name0 = prof.full_name;
-            prof.full_name = name;
-            prof.familiar_name = name;
-            api.postProfile(prof);
-            updateNextButton(hosts, guestTbl);
-          });
-      } else {
-        updateNextButton(hosts, guestTbl);
-      }
+      if (isValidName(name) && util.isString(optUid))
+        $("#add-guest-btn").removeClass("disabled");
+      else
+        $("#add-guest-btn").addClass("disabled");
     }
 
     util.afterTyping(emailInput, 500, function() {
@@ -87,38 +139,76 @@ var sched1 = (function() {
     });
 
     util.afterTyping(nameInput, 500, function() {
-      saveName();
+      updateAddButton();
     });
 
-    removeButton
-      .click(function() {
-        clearUid();
-        view.remove();
-        updateNextButton(hosts, guestTbl);
-      });
+    addButton.click(function() {
+      var name = nameInput.val();
+      var uid = optUid;
+        api.getProfile(uid)
+          .then(function(prof) {
+            name0 = prof.full_name;
+            prof.full_name = name;
+            prof.familiar_name = name;
+            api.postProfile(prof);
+            updateAddButton(hosts, guestTbl);
+            addGuest(task, guestTbl, uid)
+              .then(function(profs) {
+                guestsContainer
+                  .append(rowViewOfParticipant(profs, task, guestTbl, uid,
+                                               updateAddGuestAbility));
+                updateAddGuestAbility();
+                saveGuests(task, hosts, guestTbl);
+                updateNextButton(hosts, guestTbl);
+              });
+          });
+      clearAddGuest();
+    });
 
-    view
-      .append(initials)
-      .append(emailInput)
-      .append(nameInput)
-      .append(removeButton);
+    view.append(adder)
+        .append(addGuestDiv)
+        .append(guestInputDiv);
 
-    return view;
+    return {
+      view: view,
+      updateAddGuestAbility: updateAddGuestAbility
+    };
   }
 
-  function rowViewOfParticipant(chats, profs, task, guestTbl, uid) {
+  /* Read-only view of a participant */
+  function rowViewOfParticipant(profs, task, guestTbl, uid,
+                                updateAddGuestAbility) {
     var view = $("<div class='sched-step1-row'>");
+    var hosts = sched.getHosts(task);
     var obsProf = profs[uid];
     var prof = obsProf.prof;
     var name = prof.full_name;
-    var initials = $("<div class='prof-circ'>")
-      .text(profile.veryShortNameOfProfile(prof));
+    var chatHead = $("<div class='list-prof-circ'>");
+    var initials = $("<div class='initials unselectable'>")
+      .text(profile.veryShortNameOfProfile(prof))
+      .appendTo(chatHead);
 
     var nameView = $("<p class='guest-name'>" + name + "</p>");
 
     view
-      .append(initials)
+      .append(chatHead)
       .append(nameView);
+
+    if (sched.isGuest(uid)) {
+      var remove = $("<img class='remove-guest'/>")
+        .appendTo(view);
+      svg.loadImg(remove, "/assets/img/x.svg")
+        .then(function(elt) {
+          elt.click(function() {
+            view.remove();
+            updateNextButton(hosts, guestTbl);
+            removeGuest(guestTbl, uid);
+            updateAddGuestAbility();
+            saveGuests(task, hosts, guestTbl);
+            updateNextButton(hosts, guestTbl);
+          });
+      });
+    }
 
     return view;
   }
@@ -133,10 +223,7 @@ var sched1 = (function() {
 
   function isReady(hosts, guestTbl) {
     var guests = collectGuests(hosts, guestTbl);
-    var missingName = list.exists(guests, function(uid) {
-      return ! isValidName($("#name-" + uid).val());
-    });
-    return guests.length > 0 && !missingName;
+    return guests.length > 0;
   }
 
   function updateNextButton(hosts, guestTbl) {
@@ -146,9 +233,30 @@ var sched1 = (function() {
       nextButton.addClass("disabled");
   }
 
-  function finalizeGuests(ta, hosts, guestTbl) {
+  /* add guest and return updated profile table (deferred) */
+  function addGuest(ta, guestTbl, uid) {
+    guestTbl[uid] = uid;
+    ta.task_participants.organized_for.push(uid);
+    return task.profilesOfEveryone(ta);
+  }
+
+  /* remove guest */
+  function removeGuest(guestTbl, uid) {
+    delete guestTbl[uid];
+  }
+
+  function updateGuests(ta, hosts, guestTbl) {
     var guests = collectGuests(hosts, guestTbl);
     ta.task_participants.organized_for = list.union(hosts, guests);
+  }
+
+  function saveGuests(ta, hosts, guestTbl) {
+    updateGuests(ta, hosts, guestTbl);
+    return api.postTask(ta);
+  }
+
+  function finalizeGuests(ta, hosts, guestTbl) {
+    updateGuests(ta, hosts, guestTbl);
     ta.task_status.task_progress = "Coordinating";
     sched.getState(ta).scheduling_stage = "Find_availability";
     api.postTask(ta)
@@ -156,40 +264,49 @@ var sched1 = (function() {
   }
 
   mod.load = function(profs, task, view) {
-    $("<h3>Confirm the guest list.</h3>")
+    var view = $("#sched-step1-table");
+    view.children().remove();
+    $("<h3>Create the guest list.</h3>")
       .appendTo(view);
 
-    var chats = sched.chatsOfTask(task);
-
     var hostsContainer = $("<div class='hosts-container'>");
+    var newGuestContainer = $("<div class='new-guest-container'>");
+    var guestsContainer = $("<div id='guests-container'/>")
+      .addClass("guests-container");
+
+    var guests = sched.getGuests(task);
+    var guestTbl = list.toTable(guests);
+
+    var addResult =
+      rowViewOfNewParticipant(profs, task, hosts, guestTbl, guestsContainer);
+
     var hosts = sched.getHosts(task);
     list.iter(hosts, function(uid) {
-      rowViewOfParticipant(chats, profs, task, guestTbl, uid)
+      rowViewOfParticipant(profs, task, guestTbl, uid,
+                           addResult.updateAddGuestAbility)
         .appendTo(hostsContainer);
     });
 
-    var guestsContainer = $("<div class='guests-container'>");
-    var guests = sched.getGuests(task);
-    var guestTbl = list.toTable(guests);
     list.iter(guests, function(uid) {
-      rowViewOfParticipant(chats, profs, task, guestTbl, uid)
+      rowViewOfParticipant(profs, task, guestTbl, uid,
+                           addResult.updateAddGuestAbility)
         .appendTo(guestsContainer);
     });
+    addResult.updateAddGuestAbility();
 
-    var adder = $("<button class='btn btn-default'/>")
-      .text("Add guest")
-      .click(function() {
-        rowViewOfNewParticipant(chats, profs, task, hosts, guestTbl)
-          .appendTo(guestsContainer);
-      });
+    var newGuestContainer = $("<div class='new-guest-container'>");
+    addResult.view
+      .appendTo(newGuestContainer);
 
-    view
+    var guestListContainer = $("<div id='guest-list-container'>")
       .append(hostsContainer)
       .append(guestsContainer)
-      .append(adder);
+      .append(newGuestContainer);
+
+    view.append(guestListContainer);
 
     nextButton
-      .unbind('click')
+      .unbind("click")
       .click(function() {
         nextButton.addClass("disabled");
         finalizeGuests(task, hosts, guestTbl);

@@ -1,0 +1,7 @@
+<svg width="60" xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 0 60 32" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 60 32">
+<path class="background" fill="#e6e7e8" d="M60,28c0,2.209-1.791,4-4,4H4c-2.209,0-4-1.791-4-4V4c0-2.209,1.791-4,4-4h52c2.209,0,4,1.791,4,4V28z"/>
+<g fill="#808285">
+<path d="M18,11h24V9l-4-3H22l-4,3V11z"/>
+<path d="m19,12v14h22v-14h-22zm11,11l-5-4h3v-4h4v4h3l-5,4z"/>
+</g>
+</svg>

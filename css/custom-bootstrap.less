@@ -1,7 +1,28 @@
 /*
   This file is for overriding Bootstrap's presets.
   Use with care.
+
+  Fonts:
+  Proxima Nova Light
+  Proxima Nova Regular
+  Proxima Nova Semibold
 */
+
+/*** Colors ***/
+@gray_10: #e6e7e8;
+@gray_20: #d1d3d4;
+@gray_40: #a7a9ac;
+@gray_60: #808285;
+@gray_90: #414042;
+@green: #2bb673;
+@orange: #f7941e;
+@purple: #a25cc6;
+@purple_disabled: #e8d9ee;
+@purple_hover: #8c42ad;
+@red: #e53030;
+@red_hover: #bf2121;
+@white: #ffffff;
+
 /* set a max-width for horizontal fluid layout and make it centered */
 .container {
   padding-left: 30px;
@@ -129,6 +150,18 @@ fieldset[disabled] .btn-primary.active {
 /*** Nav Bar ***/
 .navbar {
   min-height: 60px;
+  border: none;
+}
+.navbar-collapse {
+  max-height: 100%;
+  border: none;
+}
+.navbar-nav {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.navbar-toggle .icon-bar {
+  background-color: @purple;
 }
 .navbar-text {
   margin-top: 18px;
@@ -198,37 +231,34 @@ fieldset[disabled] .btn-primary.active {
   margin-right: 0;
   margin-bottom: 0;
 }
-/*** Chat ***/
+.nav-tabs {
+  border: none;
+  border-bottom: 1px solid @gray_10;
+}
 .nav-tabs > li > a {
-  height: 60px;
-  padding-top: 15px;
-  margin-right: 0;
-  background: none;
+  margin: 0;
   border: none;
   border-radius: 0;
 }
 .nav-tabs > li > a:hover {
-  background-color: #e6e7e8;
   border: none;
+  border-bottom: 1px solid @purple;
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  cursor: default;
-  background-color: #808285;
+  color: @gray_90;
   border: none;
+  border-bottom: 1px solid @gray_90;
+  border-radius: 0;
 }
+
 /*** Dropdown Menu ***/
-.nav-tabs,
-.nav-tabs > li > a {
-  border: none;
-}
 .dropdown-menu {
   margin: 0px 0 0;
 }
 .nav-tabs .dropdown-menu {
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px;
+  border-radius: 4px;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {

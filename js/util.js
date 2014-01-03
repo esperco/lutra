@@ -98,9 +98,6 @@ var util = (function () {
   /* Focus */
   mod.focus = function() {
     if (mod.isNotNull(focusOn)) {
-      log("focus on id=" + focusOn.attr("id")
-          + " visible=" + focusOn.is(":visible")
-          + " hidden=" + focusOn.is(":hidden"));
       focusOn.focus();
     }
   };

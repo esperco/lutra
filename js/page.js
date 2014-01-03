@@ -105,6 +105,7 @@ var page = (function() {
     pageSelector.hideAll();
     home.load();
     pageSelector.show("home");
+    display.updateHome();
     util.focus();
   };
 
@@ -146,9 +147,6 @@ var page = (function() {
 
   mod.respond.load = function(rid, asUid) {
     pageSelector.hideAll();
-  };
-
-  mod.init = function () {
   };
 
   return mod;

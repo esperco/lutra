@@ -7,7 +7,44 @@ var task = (function() {
 
   var mod = {};
 
-  // display task
+  /* extract all user IDs contained in the task; this is used to
+     pre-fetch all the profiles. */
+  mod.extractAllUids = function(ta) {
+    var acc = [];
+
+    var taskPar = ta.task_participants;
+    acc = list.union(acc, taskPar.organized_by);
+    acc = list.union(acc, taskPar.organized_for);
+
+    list.iter(ta.task_chats, function(chat) {
+      var uids = list.map(chat.chat_participants, function(x) {
+        return x.par_uid;
+      });
+      acc = list.union(acc, uids);
+    });
+
+    return acc;
+  }
+
+  /*
+    fetch the profiles of everyone involved in the task
+    (deferred map from uid to profile)
+  */
+  mod.profilesOfEveryone = function(ta) {
+    var par = ta.task_participants;
+    var everyone = mod.extractAllUids(ta);
+    return profile.mget(everyone)
+      .then(function(a) {
+        var b = {};
+        list.iter(a, function(obsProf) {
+          if (obsProf !== null)
+            b[obsProf.prof.profile_uid] = obsProf;
+        });
+        return b;
+      });
+  };
+
+  /* display task */
   function viewOfGeneralTask(task) {
     function toggle_title() {
       switch (task.task_status.task_progress) {
@@ -49,7 +86,7 @@ var task = (function() {
       return ["Scheduling", {}];
     }
     else if ($("#category-gen").is(":checked")) {
-      return "Questions";
+      return "General";
     }
   }
 
@@ -73,7 +110,7 @@ var task = (function() {
       if (task) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
-        case "Questions":
+        case "General":
           $("#category-gen").prop("checked", true);
           break;
         case "Scheduling":
@@ -169,7 +206,7 @@ var task = (function() {
     }
     else {
       switch (variant.cons(task.task_data)) {
-      case "Questions":
+      case "General":
         loadGeneralTask(task);
         break;
       case "Scheduling":
@@ -195,7 +232,7 @@ var task = (function() {
   }
 
   mod.init = function() {
-    $("#new-task-btn").click(function () {
+    $("#new-task-btn-mobile").click(function () {
       window.location.hash = "!task";
     });
     $("#new-gen-task-btn").click(function () {
