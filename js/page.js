@@ -148,8 +148,5 @@ var page = (function() {
     pageSelector.hideAll();
   };
 
-  mod.init = function () {
-  };
-
   return mod;
 }());
