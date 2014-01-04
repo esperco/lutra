@@ -62,18 +62,14 @@ var display = (function() {
       $('#task-content').addClass('split-screen');
     }
 
-    // if ($(window).width() < 912) {
-    //   $('.sched-progress').addClass('hide');
-    // } else {
-    //   $('.sched-progress').removeClass('hide');
-    // }
-
     if ($(window).width() < 992) {
+      log("small");
       log($('.offer-choices-label').hasClass('hide'));
       $('.offer-choices-label').addClass('hide');
       $('.offer-choices-label-short').removeClass('hide');
       log($('.offer-choices-label').hasClass('hide'));
     } else {
+      log("big");
       log($('.offer-choices-label').hasClass('hide'));
       $('.offer-choices-label').removeClass('hide');
       $('.offer-choices-label-short').addClass('hide');

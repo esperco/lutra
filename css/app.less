@@ -356,7 +356,7 @@ object {
   margin-top: 2px;
   &:hover {
     cursor: pointer;
-    path.check-outline { fill: @gray_40; }
+    path.checkbox { stroke: @gray_40; }
   }
 }
 
@@ -870,7 +870,6 @@ object {
 
 .option {
   margin-top: 10px;
-  &:hover .add-option-radio path.radio-outline { fill: @gray_20; }
 }
 
 .option-radio {
@@ -878,6 +877,9 @@ object {
   margin-left: -28px;
   height: 18px;
   width: 18px;
+  background-color: @white;
+  border-radius: 9px;
+  border: 2px solid @gray_20;
   float: left;
 }
 
@@ -890,8 +892,8 @@ object {
   }
 }
 
-.add-option-radio path.radio-outline {
-  fill: @gray_10;
+.add-option-radio {
+  border: 2px solid @gray_10;
 }
 
 .add-option-btn {
@@ -915,7 +917,7 @@ object {
 .offer-choices {
   padding-left: 0;
   &:hover { cursor: pointer;
-    path.check-outline { fill: @gray_40; }
+    path.checkbox { stroke: @gray_40; }
   }
 }
 
@@ -1090,7 +1092,7 @@ object {
 .suggestion {
   cursor: pointer;
   &:hover {
-    path.check-outline,
+    path.checkbox {stroke: @gray_40; }
     path.radio-outline { fill: @gray_40; }
   }
 }
@@ -1110,10 +1112,10 @@ object {
 }
 
 .checkbox-selected {
-  path.check-background { fill: @purple_disabled; }
-  path.check-outline { fill: @purple; }
+  path.checkbox { fill: @purple_disabled; }
+  path.checkbox { stroke: @purple; }
   path.check { fill: @gray_90; }
-  &:hover path.check-outline { fill: @purple_hover }
+  &:hover path.checkbox { stroke: @purple_hover }
 }
 
 .radio-selected {

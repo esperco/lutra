@@ -14,7 +14,6 @@ var chat = (function () {
     for (var i in chat.chat_participants) {
       var uid = chat.chat_participants[i].par_uid;
       if (uid !== me) {
-        log(i);
         var p = profiles[uid].prof;
         if (! p) {
           someone_else = true;
@@ -145,9 +144,8 @@ var chat = (function () {
 
   function editChoiceOption() {
     var v = $("<li class='option'/>");
-    var radio = $("<img class='option-radio'/>")
+    var radio = $("<div class='option-radio'/>")
       .appendTo(v);
-    svg.loadImg(radio, "/assets/img/radio.svg");
 
     var editDiv = $("<div class='options-input'/>");
     var edit = $("<input class='form-control'/>")
@@ -199,9 +197,8 @@ var chat = (function () {
 
   function buttonToAddChoiceOption() {
     var v = $("<li class='option'/>");
-    var radio = $("<img class='option-radio add-option-radio'/>");
-    radio.appendTo(v);
-    svg.loadImg(radio, "/assets/img/radio.svg");
+    var emptyRadio = $("<div class='option-radio add-option-radio'/>");
+    emptyRadio.appendTo(v);
 
     var button = $("<button class='add-option-btn'>Click to add option</button>");
     button.click(function() {
@@ -283,7 +280,7 @@ var chat = (function () {
 
     var selChoices = $("<img class='offer-choices-checkbox'/>");
     selChoicesDiv.append(selChoices);
-    svg.loadImg(selChoices, "/assets/img/checkbox.svg");
+    svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
     var selChoicesLabel = $("<div/>", {
       'class': "offer-choices-label unselectablex",
       'text': "Offer multiple choice response."
@@ -367,7 +364,7 @@ var chat = (function () {
     var displayName = $("<div class='chat-profile-details'></div>")
       .appendTo(v);
     if (chat.chatid === task.task_context_chat) {
-      displayName.append("Original Email");
+      displayName.append("Group Conversation");
     } else {
       displayName.append(chat_participant_names(chat));
     }
