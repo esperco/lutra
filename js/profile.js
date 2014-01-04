@@ -53,9 +53,13 @@ var profile = (function() {
     return deferred.join(deferreds);
   }
 
-  /* set profile value locally (for testing) */
-  mod.set = function(uid, prof) {
-    return accessCache.setCached(uid, prof);
+  /* set profile value locally */
+  mod.set = function(prof) {
+    function wrap(prof) {
+      var obsProf = new can.Observe({prof:prof});
+      return (new $.Deferred()).resolve(obsProf);
+    }
+    return accessCache.setCached(prof.profile_uid, wrap(prof));
   }
 
   /* display mini profile */
