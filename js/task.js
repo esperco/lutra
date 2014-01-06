@@ -47,15 +47,15 @@ var task = (function() {
 
   /* display task */
   function viewOfGeneralTask(task) {
-    function toggle_title() {
+    function toggleTitle() {
       switch (task.task_status.task_progress) {
       case "Unread_by_organizer": return "Start";
       case "Closed":              return "Reopen";
       default:                    return "Done";
       }
     }
-    var status_button = $("<button/>").append(toggle_title());
-    status_button.click(function() {
+    var statusButton = $("<button/>").text(toggleTitle());
+    statusButton.click(function() {
       switch (task.task_status.task_progress) {
       case "Unread_by_organizer":
       case "Closed":
@@ -65,10 +65,15 @@ var task = (function() {
         task.task_status.task_progress = "Closed";
         break;
       }
-      status_button.text(toggle_title());
-      api.postTask(task);
+      statusButton.addClass("disabled");
+      api.postTask(task)
+        .done(function() {
+          statusButton
+            .text(toggleTitle())
+            .removeClass("disabled");
+        });
     });
-    return status_button;
+    return statusButton;
   }
 
   function placeView(parent, view) {
@@ -87,7 +92,7 @@ var task = (function() {
       return ["Scheduling", {}];
     }
     else if ($("#category-gen").is(":checked")) {
-      return "General";
+      return "Questions";
     }
   }
 
@@ -111,7 +116,7 @@ var task = (function() {
       if (task) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
-        case "General":
+        case "Questions":
           $("#category-gen").prop("checked", true);
           break;
         case "Scheduling":
@@ -207,7 +212,7 @@ var task = (function() {
     }
     else {
       switch (variant.cons(task.task_data)) {
-      case "General":
+      case "Questions":
         loadGeneralTask(task);
         break;
       case "Scheduling":
