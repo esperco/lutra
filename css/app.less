@@ -109,8 +109,16 @@ object {
   margin-left: 16px;
   margin-top: 23px;
   cursor: pointer;
-  &:hover g { fill: @purple_hover; }
-  &:active g { fill: #7d3ca0; }
+}
+
+#menu {
+  &:hover g path { fill: @purple_hover; }
+  &:active g path { fill: #7d3ca0; }
+}
+
+#return-home {
+  &:hover path { fill: @purple_hover; }
+  &:active path { fill: #7d3ca0; }
 }
 
 #home-title {
@@ -219,6 +227,7 @@ object {
   margin: 0;
   height: 60px;
   color: @gray_60;
+  &:focus { color: @gray_60; }
 }
 
 .nav-text {
@@ -401,13 +410,12 @@ object {
   margin-top: 16px;
 }
 
-.suggestion-edit {
+.suggestion-edit-div {
   float: right;
   margin-top: 30px;
   width: 24px;
   height: 24px;
 }
-
 
 /*** Home ***/
 
@@ -827,6 +835,7 @@ object {
 .chat-tabs > li.active > a .chat-prof-circ,
 .chat-tabs > li.active > a:hover .chat-prof-circ,
 .chat-tabs > li.active > a:focus .chat-prof-circ {
+  color: @gray_90;
   background-color: @white;
 }
 
