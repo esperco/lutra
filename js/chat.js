@@ -241,8 +241,7 @@ var chat = (function () {
   }
 
   function chatEditor(messages, chat, task) {
-    var chatFooter =
-      $("<div class='navbar-fixed-bottom col-sm-4 chat-footer'/>");
+    var chatFooter = $("<div class='chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
       var toField = $("<div class='to-field'/>")
@@ -285,12 +284,7 @@ var chat = (function () {
       'class': "offer-choices-label unselectablex",
       'text': "Offer multiple choice response."
     });
-    var selChoicesLabelShort = $("<div/>", {
-      'class': "offer-choices-label-short unselectable",
-      'text': "Multiple choice"
-    });
     selChoicesDiv.append(selChoicesLabel);
-    selChoicesDiv.append(selChoicesLabelShort);
 
     selChoicesDiv.click(function () {
       if (selChoicesDiv.hasClass("checkbox-selected")) {
@@ -369,9 +363,7 @@ var chat = (function () {
       displayName.append(chat_participant_names(chat));
     }
 
-    var messagesContainer = $("<div/>")
-    var messages = $("<div class='messages'><div/>")
-      .appendTo(messagesContainer);
+    var messages = $("<div class='messages scrollable'><div/>");
 
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
@@ -385,17 +377,10 @@ var chat = (function () {
       messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    var footerHeight = $(".chat-footer").height();
-    var push = $("<div/>", {
-      'class': "chat-push",
-      'height': footerHeight+"px"
-    });
-    messagesContainer.append(push);  /* Doesn't work for first tab. */
+    var editor = chatEditor(messages, chat, task);
 
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    v.append(messagesContainer);
-    v.append(chatEditor(messages, chat, task));
-    v.scrollTop = v.scrollHeight;  /* Doesn't work. */
+    v.append(messages)
+     .append(editor);
 
     return v;
   }
@@ -439,7 +424,7 @@ var chat = (function () {
           var tab = $("<a/>", {
             href:"#"+pane_id,
             "class":"tab-name",
-            "data-toggle":"tab"
+            "data-toggle":"tab",
           });
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
@@ -447,7 +432,8 @@ var chat = (function () {
                      .append(chatView(chat, ta)));
           if (isGroupChat) {
             var group = $("<img class='group'/>");
-            tab.append($("<div class='chat-prof-circ'/>")
+            tab.tooltip({"title":"Group Conversation","placement":"bottom"})
+               .append($("<div class='chat-prof-circ'/>")
                .append(group));
             svg.loadImg(group, "/assets/img/group.svg");
           } else {
@@ -455,7 +441,8 @@ var chat = (function () {
               peerUid = chat.chat_participants[0].par_uid;
             var p = profiles[peerUid].prof;
             var tab_initials = profile.veryShortNameOfProfile(p);
-            tab.append($("<div class='chat-prof-circ'/>")
+            tab.tooltip({"title":p.full_name,"placement":"bottom"})
+               .append($("<div class='chat-prof-circ'/>")
                .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");

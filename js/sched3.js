@@ -23,8 +23,8 @@ var sched3 = (function() {
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
-    var radio = $("<img class='suggestion-radio'/>");
-    radio.appendTo(view);
+    var radio = $("<img class='suggestion-radio'/>")
+      .appendTo(view);
     svg.loadImg(radio, "/assets/img/radio.svg");
     sched.viewOfSuggestion(calOption.slot)
       .appendTo(view);
@@ -150,9 +150,16 @@ var sched3 = (function() {
     $("<p class='guest-name'>" + name + "</p>")
       .appendTo(view);
 
-    $("<a class='send-message'>Send a message</a>")
+    var sendMessage = $("<div class='send-message'></div>")
       .click(composeEmail)
       .appendTo(view);
+    $("<a class='send-message-text'>Send a message</a>")
+      .appendTo(sendMessage);
+    var composeDiv = $("<div class='compose-div'></div>")
+      .appendTo(sendMessage);
+    var compose = $("<img class='compose'/>")
+      .appendTo(composeDiv);
+    svg.loadImg(compose, "/assets/img/compose.svg");
 
     var sendButton = $("#sched-availability-send");
     sendButton

@@ -23,6 +23,9 @@
 @red_hover: #bf2121;
 @white: #ffffff;
 
+/*** Measurements ***/
+@chat_width: 420px;
+
 
 /*** General ***/
 
@@ -50,16 +53,23 @@ object {
 
 *.unselectable {
   cursor: default;
-   -moz-user-select: -moz-none;
+  -webkit-user-select: none;
    -khtml-user-select: none;
-   -webkit-user-select: none;
+     -moz-user-select: -moz-none;
+  /*
+    Introduced in IE 10.
+    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: none;
+      user-select: none;
+}
 
-   /*
-     Introduced in IE 10.
-     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-   */
-   -ms-user-select: none;
-   user-select: none;
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  -ms-text-overflow: ellipsis;
+   -o-text-overflow: ellipsis;
+      text-overflow: ellipsis;
 }
 
 .container.mobile {
@@ -106,6 +116,16 @@ object {
 #home-title {
   letter-spacing: 3px;
 }
+
+#task-title {
+  float: left;
+  width: 65%;
+  margin-top: 18px;
+  margin-left: 16px;
+  margin-bottom: 0px;
+  font-size: 18px;
+}
+
 
 #mobile-navbar-collapse {
   background-color: @gray_90;
@@ -295,7 +315,20 @@ object {
 #task-navbar {
   z-index: 1030;
   position: fixed !important;
+  height: 60px;
+  left: 0;
 }
+
+#task-navbar.chat-closed {
+  right: 0;
+  border-right: none;
+}
+
+#task-navbar.chat-open {
+  right: @chat_width;
+  border-right: 1px solid @gray_20;
+}
+
 
 #chat-icon {
   float: right;
@@ -485,6 +518,18 @@ object {
   padding-top: 20px;
 }
 
+.new-task-footer.chat-closed,
+.sched-footer.chat-closed {
+  right: 0;
+  border-right: none;
+}
+
+.new-task-footer.chat-open,
+.sched-footer.chat-open {
+  right: @chat_width;
+  border-right: 1px solid @gray_20;
+}
+
 #start-task {
   font-family: @light;
   font-size: 20px;
@@ -525,7 +570,7 @@ object {
   text-align: center;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 620px) {
   .footer-toggle {
     display: none;
   }
@@ -590,6 +635,7 @@ object {
 }
 
 .split-screen {
+  margin-right: @chat_width;
   border-left: none;
   border-right: 1px solid @gray_20;
 }
@@ -701,14 +747,18 @@ object {
 }
 
 #chat {
+  position: fixed;
+  width: @chat_width;
+  top: 0;
+  right: 0;
   padding-left: 0;
   padding-right: 0;
 }
 
 #chat-header {
-  position: fixed !important;
+  position: fixed;
   z-index: 1030;
-  height: 100px;
+  height: 60px;
   width: 100%;
   background: rgba(248,248,248,0.9);
 }
@@ -780,24 +830,32 @@ object {
   background-color: @white;
 }
 
-.chat-profile-details-div {
-  height: 40px;
-  background-color: @white;
-  border-bottom: 1px solid @gray_20;
+.chat-panel {
+  position: fixed;
+  width: @chat_width;
+  top: 60px;
+  bottom: 0;
+  padding-left: 15px;
+  padding-right: 15px;
+  overflow-y: auto;
 }
 
 .chat-profile-details {
   position: fixed;
-  z-index: 1040;
-  margin-top: -40px;
+  z-index: 1030;
+  width: 100%;
+  height: 40px;
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-top: 10px;
+  padding-left: 15px;
   font-family: @bold;
+  background-color: @white;
+  border-bottom: 1px solid @gray_20;
 }
 
-.chat-panel {
-  margin-top: 110px;
-  padding-left: 15px;
-  padding-right: 15px;
-  overflow: auto;
+.messages {
+  padding-top: 55px;
 }
 
 .message-header {
@@ -830,8 +888,11 @@ object {
 }
 
 .chat-footer {
-  margin-left: auto;
-  margin-right: 0;
+  position: fixed;
+  z-index: 1030;
+  width: @chat_width;
+  right: 0;
+  bottom: 0;
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;
@@ -1163,8 +1224,22 @@ object {
 
 .send-message {
   float: right;
-  margin-top: 14px;
+  margin-top: 9px;
   cursor: pointer;
+  &:hover {
+    .compose g { fill: @purple_hover; }
+    .send-message-text { color: @purple_hover; }
+  }
+}
+
+.compose-div {
+  float: right;
+}
+
+.send-message-text {
+  display: inline-block;
+  margin-top: 5px;
+  margin-right: 10px;
 }
 
 

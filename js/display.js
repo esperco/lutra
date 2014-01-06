@@ -33,47 +33,39 @@ var display = (function() {
     }
   };
 
-  mod.updateChat = function() {
-    if ($(window).width() < 768) {
+  mod.updateTask = function() {
+    if ($(window).width() < 1040) {
       $('#task-navbar')
-        .removeClass('col-sm-8 split-screen')
-        .addClass('navbar-fixed-top');
+        .addClass('chat-closed')
+        .removeClass('chat-open');
       $('.new-task-footer')
-        .removeClass('col-sm-8 split-screen')
-        .addClass('navbar-fixed-bottom');
+        .addClass('chat-closed')
+        .removeClass('chat-open');
       $('.sched-footer')
-        .removeClass('col-sm-8 split-screen')
-        .addClass('navbar-fixed-bottom');
+        .addClass('chat-closed')
+        .removeClass('chat-open');
       $('#chat').addClass('hide');
       $('#chat-icon-container').removeClass('hide');
       $('#task-content').removeClass('split-screen');
     } else {
       $('#task-navbar')
-        .removeClass('navbar-fixed-top')
-        .addClass('col-sm-8 split-screen');
+        .addClass('chat-open')
+        .removeClass('chat-closed');
       $('.new-task-footer')
-        .removeClass('navbar-fixed-bottom')
-        .addClass('col-sm-8 split-screen');
+        .addClass('chat-open')
+        .removeClass('chat-closed');
       $('.sched-footer')
-        .removeClass('navbar-fixed-bottom')
-        .addClass('col-sm-8 split-screen');
+        .addClass('chat-open')
+        .removeClass('chat-closed');
       $('#chat').removeClass('hide');
       $('#chat-icon-container').addClass('hide');
       $('#task-content').addClass('split-screen');
     }
 
-    if ($(window).width() < 992) {
-      log("small");
-      log($('.offer-choices-label').hasClass('hide'));
-      $('.offer-choices-label').addClass('hide');
-      $('.offer-choices-label-short').removeClass('hide');
-      log($('.offer-choices-label').hasClass('hide'));
+    if ($(window).width() < 620) {
+      $('.send-message-text').addClass('hide');
     } else {
-      log("big");
-      log($('.offer-choices-label').hasClass('hide'));
-      $('.offer-choices-label').removeClass('hide');
-      $('.offer-choices-label-short').addClass('hide');
-      log($('.offer-choices-label').hasClass('hide'));
+      $('.send-message-text').removeClass('hide');
     }
   };
 
@@ -82,9 +74,9 @@ var display = (function() {
       mod.updateHome();
 
     if (!$('#task-page').hasClass('hide'))
-      mod.updateChat();
+      mod.updateTask();
 
-    if ($(window).width() < 768) {
+    if ($(window).width() < 620) {
       $('#login-container')
         .removeClass('desktop-login')
         .addClass('mobile-login');

@@ -168,18 +168,6 @@ fieldset[disabled] .btn-primary.active {
 .navbar-toggle .icon-bar {
   background-color: @purple;
 }
-.navbar-text {
-  margin-top: 18px;
-  margin-left: 16px;
-  margin-bottom: 0px;
-  font-size: 18px;
-  cursor: default;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
 .nav .caret {
   border-top-color: @purple;
   border-bottom-color: @purple;
@@ -276,10 +264,8 @@ fieldset[disabled] .btn-primary.active {
   height: 32px;
   border: 2px solid @gray_20;
   border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 .form-control:hover {
   border: 2px solid @gray_40;
@@ -288,7 +274,7 @@ fieldset[disabled] .btn-primary.active {
   border-color: @purple_focus;
   outline: 0;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 /*** Modals ***/
 .modal {
@@ -298,6 +284,9 @@ fieldset[disabled] .btn-primary.active {
   border-bottom: 1px solid @gray_10;
 }
 /*** Other ***/
+.tooltip {
+  z-index: 1040;
+}
 hr {
   margin-top: 15px;
   margin-bottom: 15px;
