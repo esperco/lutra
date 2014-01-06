@@ -125,17 +125,20 @@ object {
   &:active path { fill: #7d3ca0; }
 }
 
+.nav-title {
+  float: left;
+  margin-top: 18px;
+  margin-left: 16px;
+  margin-bottom: 0px;
+  font-size: 18px;
+}
+
 #home-title {
   letter-spacing: 3px;
 }
 
 #task-title {
-  float: left;
   width: 65%;
-  margin-top: 18px;
-  margin-left: 16px;
-  margin-bottom: 0px;
-  font-size: 18px;
 }
 
 
@@ -185,6 +188,7 @@ object {
 }
 
 #exec-name {
+  width: 125px;
   font-family: @bold;
 }
 
@@ -355,6 +359,7 @@ object {
 /*** Table Structure ***/
 
 .task,
+.workflow-row,
 .sched-step1-row,
 .sched-step1-add-row,
 .suggestion,
@@ -374,6 +379,7 @@ object {
 }
 
 .task-list,
+#workflow-options,
 #guest-list-container,
 #sched-step2-suggestions,
 .guests-container.guests-only,
@@ -385,12 +391,14 @@ object {
   margin-top: 20px;
 }
 
+#workflow-options,
 #sched-step2-suggestions {
   margin-top: 15px;
 }
 
 .check-all,
 .task-checkbox,
+.workflow-radio,
 .suggestion-checkbox,
 .suggestion-radio {
   float: left;
@@ -404,6 +412,10 @@ object {
     cursor: pointer;
     path.checkbox { stroke: @gray_40; }
   }
+}
+
+.workflow-radio {
+  margin-top: 12px;
 }
 
 .suggestion-checkbox {
@@ -748,6 +760,44 @@ object {
 
 #categorize {
   margin-top: 40px;
+}
+
+.workflow-row {
+  cursor: pointer;
+  &:hover {
+    path.radio-outline { fill: @gray_40; }
+  }
+}
+
+#sched-workflow-icon {
+  float: left;
+  margin-top: 2px;
+}
+
+#gen-workflow-icon {
+  float: left;
+  margin-top: 3px;
+  margin-left: 1px;
+}
+
+#sched-workflow-text,
+#gen-workflow-text {
+  display: inline-block;
+  font-family: @bold;
+  font-size: 20px;
+}
+
+#sched-workflow-text {
+  margin-left: 10px;
+}
+
+#gen-workflow-text {
+  margin-left: 11px;
+}
+
+.workflow-details {
+  display: block;
+  margin-left: 42px;
 }
 
 
@@ -1200,8 +1250,9 @@ object {
 }
 
 .sug-details {
-  display: inline-block;
-  margin-left: 18px;
+  display: block;
+  margin-left: 42px;
+  margin-right: 30px;
 }
 
 .day-text {
