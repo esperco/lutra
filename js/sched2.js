@@ -348,9 +348,11 @@ var sched2 = (function() {
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action3,
+      initialKey: "2weeks",
       options: [
-        { label: "Within 2 months", key: "61days", value: 61 * 86400 },
-        { label: "Within 1 month", key: "31days", value: 31 * 86400 },
+        { label: "Within 6 months", key: "6months", value: 183 * 86400 },
+        { label: "Within 2 months", key: "2months", value: 61 * 86400 },
+        { label: "Within 1 month", key: "1month", value: 31 * 86400 },
         { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
         { label: "Within 1 week", key: "1week", value: 7 * 86400 },
         { label: "Within 2 days", key: "2days", value: 2 * 86400 },

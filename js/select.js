@@ -9,7 +9,7 @@ var select = (function() {
     parameters:
     {
       buttonWidth: "123px"
-      initialValue: "squirrel",
+      initialKey: "squirrel",
       defaultAction: ...,
       options: [
         { label: "Select one" },
