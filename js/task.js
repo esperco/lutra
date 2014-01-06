@@ -37,8 +37,9 @@ var task = (function() {
       .then(function(a) {
         var b = {};
         list.iter(a, function(obsProf) {
-          if (obsProf !== null)
+          if (obsProf !== null) {
             b[obsProf.prof.profile_uid] = obsProf;
+          }
         });
         return b;
       });
