@@ -54,7 +54,9 @@ var task = (function() {
       default:                    return "Done";
       }
     }
-    var statusButton = $("<button/>").text(toggleTitle());
+    var statusButton = $("<button/>")
+      .addClass("btn btn-default")
+      .text(toggleTitle());
     statusButton.click(function() {
       switch (task.task_status.task_progress) {
       case "Unread_by_organizer":
