@@ -49,7 +49,7 @@ var select = (function() {
       .addClass("btn btn-default dropdown-toggle")
       .attr("data-toggle", "dropdown")
       .appendTo(view);
-    var buttonLabel = $("<span/>").appendTo(button);
+    var buttonLabel = $("<span class='dropdown-title'/>").appendTo(button);
     $("<span class='caret'/>").appendTo(button);
 
     var state = null;
