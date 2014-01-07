@@ -468,10 +468,59 @@ var sched2 = (function() {
       })
   }
 
+  function saveLocationSelection(loc, refId) {
+    var leaderUid = login.data.team.team_leaders[0];
+    api.postPlaceDetails(leaderUid, loc, refId)
+      .done(function() { });
+  }
+
+  function displayPredictionsDropdown(predictions) {
+    console.log(predictions.toSource());
+    var menu = $("#location-dropdown");
+    menu.children().remove();
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Favorite Locations")
+      .appendTo(menu);
+    list.iter(predictions.from_favorites, function(item) {
+      $('<li role="presentation"/>')
+        .text(item[0])
+        .appendTo(menu)
+        .click(function() {
+          $("#sched-step2-loc-addr").val(item[0]);
+          // TODO
+          //saveLocationSelection(item[0], item[1]);
+        });
+    });
+    $('<li role="presentation" class="divider"/>')
+      .appendTo(menu);
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Suggestions from Google")
+      .appendTo(menu);
+    list.iter(predictions.from_google, function(item) {
+      $('<li/>')
+        .text(item[0])
+        .appendTo(menu)
+        .click(function() {
+          $("#sched-step2-loc-addr").val(item[0]);
+          saveLocationSelection(item[0], item[1]);
+        });
+    });
+    $('.dropdown-toggle').click();
+  }
+
+  function predictAddress() {
+    var address = $("#sched-step2-loc-addr").val();
+    if (address == "") return;
+    var leaderUid = login.data.team.team_leaders[0];
+    api.getPlacePredictions(leaderUid, address)
+      .done(displayPredictionsDropdown);
+  }
+
   mod.load = function(tzList, profs, task) {
     clearLocation();
     initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
+    //util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
+    util.afterTyping($("#sched-step2-loc-addr"), 500, predictAddress);
     connectCalendar(tzList, profs, task);
   };
 

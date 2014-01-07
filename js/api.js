@@ -179,6 +179,18 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  mod.getPlacePredictions = function(uid, loc) {
+    var url = api_s_prefix() + "/place/autocomplete/" +
+              encodeURIComponent(loc);
+    return jsonHttpGet(url);
+  };
+
+  mod.postPlaceDetails = function(uid, loc, refId) {
+    var url = api_s_prefix() + "/place/save/" + encodeURIComponent(loc) +
+              "/" + encodeURIComponent(refId);
+    return jsonHttpPost(url, "");
+  };
+
   mod.getSuggestions = function(x) {
     var url = api_s_prefix() + "/suggest";
     return jsonHttpPost(url, JSON.stringify(x));
