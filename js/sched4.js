@@ -164,8 +164,8 @@ var sched4 = (function() {
               'final': slot
             }]
           };
-          api.postChatItem(chatItem)
-            .done(function() {
+          chat.postChatItem(chatItem)
+            .done(function(item) {
               closeConfirmModal();
               markChecked(divConfirmationCheck);
             });
