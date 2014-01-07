@@ -185,9 +185,15 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.postPlaceDetails = function(uid, loc, refId) {
-    var url = api_s_prefix() + "/place/save/" + encodeURIComponent(loc) +
-              "/" + encodeURIComponent(refId);
+  mod.postSelectGooglePlace = function(uid, loc, refId) {
+    var url = api_s_prefix() + "/place/save/google/" +
+              encodeURIComponent(loc) + "/" + encodeURIComponent(refId);
+    return jsonHttpPost(url, "");
+  };
+
+  mod.postSelectFavoritePlace = function(uid, loc) {
+    var url = api_s_prefix() + "/place/save/favorite/" +
+              encodeURIComponent(loc);
     return jsonHttpPost(url, "");
   };
 

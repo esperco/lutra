@@ -469,13 +469,37 @@ var sched2 = (function() {
   }
 
   function saveLocationSelection(loc, refId) {
-    var leaderUid = login.data.team.team_leaders[0];
     api.postPlaceDetails(leaderUid, loc, refId)
       .done(function() { });
   }
 
+  /* Boy does this function suck. Hooray for imperative programming!
+   * If you can think of a better way to write this, be my guest! */
+  function highlight(address, matches) {
+    var with_bold = "";
+    for (var i = 0; i < address.length; i++) {
+      var c = address[i];
+      var wrote_char = false;
+      for (var j = 0; j < matches.length; j++) {
+        if (i == matches[j][0] + matches[j][1]) {
+          with_bold += "</b>";
+        }
+        if (i == 0 && matches[j][0] == 0) {
+          with_bold += "<b>";
+        } else if (i == matches[j][0] - 1) {
+          with_bold += address.charAt(i) + "<b>";
+          wrote_char = true;
+        }
+      }
+      if (!wrote_char) { with_bold += address.charAt(i); }
+    }
+    console.log(with_bold.toSource());
+    return with_bold;
+  }
+
   function displayPredictionsDropdown(predictions) {
     console.log(predictions.toSource());
+    var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown");
     menu.children().remove();
     $('<li role="presentation" class="dropdown-header"/>')
@@ -483,12 +507,14 @@ var sched2 = (function() {
       .appendTo(menu);
     list.iter(predictions.from_favorites, function(item) {
       $('<li role="presentation"/>')
-        .text(item[0])
+        .text(item.address)
         .appendTo(menu)
         .click(function() {
-          $("#sched-step2-loc-addr").val(item[0]);
-          // TODO
-          //saveLocationSelection(item[0], item[1]);
+          $("#sched-step2-loc-addr").val(item.address);
+          api.postSelectFavoritePlace(leaderUid, item.address)
+            .done(function(loc) {
+              timeZoneDropdown.set(loc.timezone);
+            });
         });
     });
     $('<li role="presentation" class="divider"/>')
@@ -497,12 +523,16 @@ var sched2 = (function() {
       .text("Suggestions from Google")
       .appendTo(menu);
     list.iter(predictions.from_google, function(item) {
+      var bolded = highlight(item.description, item.matched_substrings);
       $('<li/>')
-        .text(item[0])
+        .html(bolded)
         .appendTo(menu)
         .click(function() {
-          $("#sched-step2-loc-addr").val(item[0]);
-          saveLocationSelection(item[0], item[1]);
+          $("#sched-step2-loc-addr").val(item.description);
+          api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
+            .done(function(loc) {
+              timeZoneDropdown.set(loc.timezone);
+            });
         });
     });
     $('.dropdown-toggle').click();
