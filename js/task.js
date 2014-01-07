@@ -107,10 +107,10 @@ var task = (function() {
   });
 
   function initTaskData() {
-    if ($("#category-sched").is(":checked")) {
+    if ($("#workflow-sched").is(":checked")) {
       return ["Scheduling", {}];
     }
-    else if ($("#category-gen").is(":checked")) {
+    else if ($("#workflow-gen").is(":checked")) {
       return "Questions";
     }
   }
@@ -130,22 +130,54 @@ var task = (function() {
         startTaskButton.addClass("disabled");
     }
 
+    function loadWorkflowOptions() {
+      var v = $("#workflow-options");
+      v.children().remove();
+
+      var sched = $("<div id='workflow-sched-temp' class='workflow-row'></div>")
+        .appendTo(v);
+      var radio = $("<img class='workflow-radio'/>")
+        .appendTo(sched);
+      svg.loadImg(radio, "/assets/img/radio.svg");
+      var schedDetails = $("<div class='workflow-details'></div>")
+        .appendTo(sched);
+      var schedIcon = $("<img id='sched-workflow-icon'/>")
+        .appendTo(schedDetails);
+      svg.loadImg(schedIcon, "/assets/img/scheduling.svg");
+      schedDetails.append("<span id='sched-workflow-text'>Scheduling</span>");
+      schedDetails.append("<div>Arrange one-on-one and group meetings.</div>");
+
+      var gen = $("<div id='workflow-gen-temp' class='workflow-row'></div>")
+        .appendTo(v);
+      var radio = $("<img class='workflow-radio'/>")
+        .appendTo(gen);
+      svg.loadImg(radio, "/assets/img/radio.svg");
+      var genDetails = $("<div class='workflow-details'></div>")
+        .appendTo(gen);
+      var genIcon = $("<img id='gen-workflow-icon'/>")
+        .appendTo(genDetails);
+      svg.loadImg(genIcon, "/assets/img/general.svg");
+      genDetails.append("<span id='gen-workflow-text'>General</span>");
+      genDetails.append("<div>Do general stuff.</div>");
+    }
+
     function initUI() {
+      loadWorkflowOptions();
       if (task) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
         case "Questions":
-          $("#category-gen").prop("checked", true);
+          $("#workflow-gen").prop("checked", true);
           break;
         case "Scheduling":
-          $("#category-sched").prop("checked", true);
+          $("#workflow-sched").prop("checked", true);
           break;
         default:
           log("Invalid task_data", task.task_data);
         }
       } else {
         newTaskTitle.val("");
-        $("#category-sched").prop("checked", true);
+        $("#workflow-sched").prop("checked", true);
       }
       updateUI();
       util.afterTyping(newTaskTitle, 500, updateUI);
@@ -264,11 +296,11 @@ var task = (function() {
       window.location.hash = "!task";
     });
     $("#new-gen-task-btn").click(function () {
-      $("#category-gen").prop("checked", true);
+      $("#workflow-gen").prop("checked", true);
       window.location.hash = "!task";
     });
     $("#new-sched-task-btn").click(function () {
-      $("#category-sched").prop("checked", true);
+      $("#workflow-sched").prop("checked", true);
       window.location.hash = "!task";
     });
   }

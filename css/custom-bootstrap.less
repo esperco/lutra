@@ -1,23 +1,28 @@
 /*
   This file is for overriding Bootstrap's presets.
   Use with care.
-
-  Fonts:
-  Proxima Nova Light
-  Proxima Nova Regular
-  Proxima Nova Semibold
 */
 
+/*** Fonts ***/
+@light: "Proxima Nova Light";
+@regular: "Proxima Nova Regular";
+@italic: "Proxima Nova Regular Italic";
+@bold: "Proxima Nova Semibold";
+
 /*** Colors ***/
+@gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
+@gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
 @gray_90: #414042;
 @green: #2bb673;
 @orange: #f7941e;
 @purple: #a25cc6;
+@purple_active: #7d3ca0;
 @purple_disabled: #e8d9ee;
+@purple_focus: #c08add;
 @purple_hover: #8c42ad;
 @red: #e53030;
 @red_hover: #bf2121;
@@ -40,16 +45,16 @@
 }
 /*** Text ***/
 a {
-  color: #a25cc6;
+  color: @purple;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #8c42ad;
+  color: @purple_hover;
   text-decoration: none;
 }
 body {
-  font-family: "Proxima Nova Regular";
+  font-family: @regular;
 }
 h1,
 h2,
@@ -63,7 +68,7 @@ h6,
 .h4,
 .h5,
 .h6 {
-  font-family: "Proxima Nova Regular";
+  font-family: @regular;
 }
 h4,
 .h4 {
@@ -73,22 +78,22 @@ h4,
 .btn-default,
 .dropdown-toggle.btn-default,
 .open .dropdown-toggle.btn-default {
-  color: #414042;
-  background-color: #e6e7e8;
+  color: @gray_90;
+  background-color: @gray_10;
   border: none;
 }
 .btn-default:hover,
 .btn-default:focus,
 .dropdown-toggle.btn-default:hover {
-  color: #414042;
-  background-color: #d1d3d4;
+  color: @gray_90;
+  background-color: @gray_20;
   border: none;
 }
 .btn-default:active,
 .btn-default.active,
 .open .dropdown-toggle.btn-default {
-  color: #414042;
-  background-color: #bcbec0;
+  color: @gray_90;
+  background-color: @gray_30;
   border: none;
   box-shadow: none;
 }
@@ -107,25 +112,25 @@ fieldset[disabled] .btn-default:active,
 .btn-default.disabled.active,
 .btn-default[disabled].active,
 fieldset[disabled] .btn-default.active {
-  color: #bcbec0;
-  background-color: #f1f2f2;
+  color: @gray_30;
+  background-color: @gray_05;
   border: none;
 }
 .btn-primary {
   color: white;
-  background-color: #a25cc6;
+  background-color: @purple;
   border: none;
 }
 .btn-primary:hover,
 .btn-primary:focus {
   color: white;
-  background-color: #8c42ad;
+  background-color: @purple_hover;
   border: none;
 }
 .btn-primary:active,
 .btn-primary.active {
   color: white;
-  background-color: #7d3ca0;
+  background-color: @purple_active;
   border: none;
   box-shadow: none;
 }
@@ -144,7 +149,7 @@ fieldset[disabled] .btn-primary:active,
 .btn-primary.disabled.active,
 .btn-primary[disabled].active,
 fieldset[disabled] .btn-primary.active {
-  background-color: #e8d9ee;
+  background-color: @purple_disabled;
   border: none;
 }
 /*** Nav Bar ***/
@@ -163,25 +168,13 @@ fieldset[disabled] .btn-primary.active {
 .navbar-toggle .icon-bar {
   background-color: @purple;
 }
-.navbar-text {
-  margin-top: 18px;
-  margin-left: 24px;
-  margin-bottom: 0px;
-  font-size: 18px;
-  cursor: default;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
 .nav .caret {
-  border-top-color: #a25cc6;
-  border-bottom-color: #a25cc6;
+  border-top-color: @purple;
+  border-bottom-color: @purple;
 }
 .nav a:hover .caret {
-  border-top-color: #8c42ad;
-  border-bottom-color: #8c42ad;
+  border-top-color: @purple_hover;
+  border-bottom-color: @purple_hover;
 }
 .nav > li > a {
   border-bottom: none;
@@ -199,8 +192,8 @@ fieldset[disabled] .btn-primary.active {
 .nav .open > a .caret,
 .nav .open > a:hover .caret,
 .nav .open > a:focus .caret {
-  border-top-color: #a25cc6;
-  border-bottom-color: #a25cc6;
+  border-top-color: @purple;
+  border-bottom-color: @purple;
 }
 .nav-pills > li > a {
   border-radius: 0;
@@ -209,14 +202,14 @@ fieldset[disabled] .btn-primary.active {
   margin-left: 0;
 }
 .nav-pills > li > a:hover {
-  color: white;
-  background-color: #808285;
+  color: @white;
 }
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
-  color: #414042;
-  background-color: white;
+  color: @white;
+  background-color: @gray_90;
+  cursor: default;
 }
 .nav-pills > li.active > a .caret,
 .nav-pills > li.active > a:hover .caret,
@@ -233,26 +226,25 @@ fieldset[disabled] .btn-primary.active {
 }
 .nav-tabs {
   border: none;
-  border-bottom: 1px solid @gray_10;
+  width: 100%;
 }
 .nav-tabs > li > a {
+  color: @gray_60;
   margin: 0;
   border: none;
   border-radius: 0;
 }
 .nav-tabs > li > a:hover {
+  color: @gray_90;
   border: none;
-  border-bottom: 1px solid @purple;
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: @gray_90;
+  color: @purple;
   border: none;
-  border-bottom: 1px solid @gray_90;
   border-radius: 0;
 }
-
 /*** Dropdown Menu ***/
 .dropdown-menu {
   margin: 0px 0 0;
@@ -264,38 +256,42 @@ fieldset[disabled] .btn-primary.active {
 .dropdown-menu > li > a:focus {
   color: white;
   text-decoration: none;
-  background-color: #a25cc6;
+  background-color: @purple;
 }
 /*** Form Control ***/
 .form-control {
-  color: #808285;
+  color: @gray_60;
   height: 32px;
-  border: 2px solid #d1d3d4;
+  border: 2px solid @gray_20;
   border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  -webkit-box-shadow: none;
+          box-shadow: none;
 }
 .form-control:hover {
-  border: 2px solid #a7a9ac;
+  border: 2px solid @gray_40;
 }
 .form-control:focus {
-  border-color: #c08add;
+  border-color: @purple_focus;
   outline: 0;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 /*** Modals ***/
 .modal {
   z-index: 1050;
 }
 .modal-header {
-  border-bottom: 1px solid #e6e7e8;
+  border-bottom: 1px solid @gray_10;
 }
 /*** Other ***/
+.tooltip {
+  z-index: 1050;
+}
+.tooltip-inner {
+  border-radius: 0;
+}
 hr {
   margin-top: 15px;
   margin-bottom: 15px;
-  border-top: 1px solid #e6e7e8;
+  border-top: 1px solid @gray_10;
 }

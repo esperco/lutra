@@ -115,7 +115,8 @@ var sched2 = (function() {
         .appendTo(slotView);
       svg.loadImg(checkbox, "/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot);
-      var editTooltip = $("<a data-toggle='tooltip' title='Edit' />")
+      var editTooltip = $("<a class='suggestion-edit-div'/>")
+        .tooltip({"title":"Edit","placement":"left"})
         .appendTo(slotView);
       var edit = $("<img class='suggestion-edit' />")
         .appendTo(editTooltip);

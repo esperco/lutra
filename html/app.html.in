@@ -88,7 +88,7 @@
         <a data-toggle="collapse" data-target="#mobile-navbar-collapse">
           <img id="menu" class="svg" src="/assets/img/menu.svg">
         </a>
-        <p id="home-title" class="navbar-text unselectable">SCHEDULING</p>
+        <p id="home-title" class="nav-title unselectable">SCHEDULING</p>
         <button id="new-task-btn-mobile" class="btn btn-primary">New Task</button>
       </div>
       <div id="mobile-navbar-collapse" class="collapse navbar-collapse scrollable">
@@ -208,15 +208,15 @@
 
     <div id="task-page" class="hide task-page">
 
-      <div id="task-content" class="col-md-8 scrollable">
+      <div id="task-content" class="scrollable">
 
-        <div id="task-navbar" class="navbar">
+        <div id="task-navbar">
           <a href="#">
             <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
           </a>
-          <p id="task-title" class="navbar-text unselectable"></p>
-          <a id="chat-sidebar">
-            <img class="svg chat-icon" src="/assets/img/chat.svg">
+          <p id="task-title" class="nav-title unselectable ellipsis"></p>
+          <a id="chat-icon-container">
+            <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
           </a>
         </div>
 
@@ -243,10 +243,10 @@
 
       </div>
 
-      <div id="chat" class="col-md-4 scrollable pull-right">
+      <div id="chat">
         <div id="chat-header">
           <ul class="nav chat-tabs chat-profile-tabs"></ul>
-          <div class="chat-profile-details-div"></div>
+          <!-- <div class="chat-profile-details-div"></div> -->
         </div>
         <div class="tab-content chat-panel"></div>
       </div>
