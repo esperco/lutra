@@ -95,7 +95,7 @@ var chat = (function () {
     var data = chat_item.chat_item_data[1];
     switch (kind) {
     case "Message":
-      return data;
+      return $("<span/>").text(data);
     case "Audio":
       return audioPlayer(data);
     case "Selector_q":
@@ -108,9 +108,9 @@ var chat = (function () {
       return viewOfCalendarOptions($("<ul/>"), data.selected);
     case "Sched_confirm":
     case "Sched_remind":
-      return data.body;
+      return $("<span/>").text(data.body);
     default:
-      return $("<i/>").append(kind);
+      return $("<i/>").text(kind);
     }
   }
 
