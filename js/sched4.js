@@ -32,7 +32,7 @@ var sched4 = (function() {
     "If you have any questions/comments, please do not hesitate to reply "+
     "to this e-mail.\n\n"+
 
-    "Best,\n\n"+
+    "Regards,\n\n"+
 
     organizerName+"\n";
   }
