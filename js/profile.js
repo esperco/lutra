@@ -21,7 +21,7 @@ var profile = (function() {
     get: function(uid) { return api.getProfile(uid); },
     wrap: function(deferredProf) {
       return deferredProf.then(function(prof) {
-        return new can.Observe({prof:prof});
+        return util.isDefined(prof) ? new can.Observe({prof:prof}) : null;
       });
     },
     update: function(deferredObs, deferredProf) {
@@ -53,9 +53,12 @@ var profile = (function() {
     return deferred.join(deferreds);
   }
 
-  /* set profile value locally (for testing) */
-  mod.set = function(uid, prof) {
-    return accessCache.setCached(uid, prof);
+  /* set profile value locally */
+  mod.set = function(prof) {
+    function defer(prof) {
+      return (new $.Deferred()).resolve(prof);
+    }
+    return accessCache.setCached(prof.profile_uid, defer(prof));
   }
 
   /* display mini profile */
