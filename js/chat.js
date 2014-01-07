@@ -2,6 +2,11 @@ var chat = (function () {
   var mod = {};
   var profiles = {};
 
+  mod.postChatItem = function(item) {
+    task.onChatPosting.notify(item);
+    return api.postChatItem(item).done(task.onChatPosted.notify);
+  }
+
   function full_name(uid) {
     var p = profiles[uid].prof;
     return p ? p.full_name : "John Doe";
@@ -333,8 +338,6 @@ var chat = (function () {
           for: me,
           chat_item_data:data
         };
-        var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-        messages.append(tempItemView);
         editText.val("");
         editText.attr("placeholder", "Write a reply...");
 
@@ -349,15 +352,30 @@ var chat = (function () {
           }
         }
 
-        api.postChatItem(item).done(function(item) {
-            var itemView = viewOfChatItem(item, item.time_created,
-                                          statusOfChatItem(item));
-            tempItemView.replaceWith(itemView);
-        });
+        mod.postChatItem(item);
       }
     });
 
     return chatFooter;
+  }
+
+  var tempItemView;
+
+  function chatPosting(item) {
+    var view = $("#chat" + item.chatid + " .messages");
+    if (0 < view.length) {
+      tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+      view.append(tempItemView);
+    }
+  }
+
+  function chatPosted(item) {
+    if (tempItemView) {
+      var itemView = viewOfChatItem(item, item.time_created,
+                                    statusOfChatItem(item));
+      tempItemView.replaceWith(itemView);
+      tempItemView = null;
+    }
   }
 
   function chatView(chat, task) {
@@ -403,10 +421,15 @@ var chat = (function () {
     return v;
   }
 
-  mod.loadTaskChats = function(ta) {
+  mod.clearTaskChats = function() {
     $(".chat-profile-tabs li").remove();
-    var tabs = $(".chat-profile-tabs");
     $(".chat-panel div").remove();
+  }
+
+  mod.loadTaskChats = function(ta) {
+    mod.clearTaskChats();
+
+    var tabs = $(".chat-profile-tabs");
     var tab_content = $(".chat-panel");
 
     task.profilesOfEveryone(ta)
@@ -469,6 +492,9 @@ var chat = (function () {
             first_tab = false;
           }
         });
+
+        task.onChatPosting.observe("chat-tabs", chatPosting);
+        task.onChatPosted .observe("chat-tabs", chatPosted );
       });
   }
 
