@@ -476,65 +476,82 @@ var sched2 = (function() {
   /* Boy does this function suck. Hooray for imperative programming!
    * If you can think of a better way to write this, be my guest! */
   function highlight(address, matches) {
-    var with_bold = "";
+    var withBold = "";
     for (var i = 0; i < address.length; i++) {
       var c = address[i];
-      var wrote_char = false;
+      var wroteChar = false;
       for (var j = 0; j < matches.length; j++) {
         if (i == matches[j][0] + matches[j][1]) {
-          with_bold += "</b>";
+          withBold += "</b>";
         }
         if (i == 0 && matches[j][0] == 0) {
-          with_bold += "<b>";
+          withBold += "<b>";
         } else if (i == matches[j][0] - 1) {
-          with_bold += address.charAt(i) + "<b>";
-          wrote_char = true;
+          withBold += address.charAt(i) + "<b>";
+          wroteChar = true;
         }
       }
-      if (!wrote_char) { with_bold += address.charAt(i); }
+      if (!wroteChar) { withBold += address.charAt(i); }
     }
-    console.log(with_bold.toSource());
-    return with_bold;
+    console.log(withBold.toSource());
+    return withBold;
   }
 
   function displayPredictionsDropdown(predictions) {
-    console.log(predictions.toSource());
+    if (predictions.from_favorites.length == 0
+        && predictions.from_google.length == 0) return;
     var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown");
     menu.children().remove();
-    $('<li role="presentation" class="dropdown-header"/>')
-      .text("Favorite Locations")
-      .appendTo(menu);
-    list.iter(predictions.from_favorites, function(item) {
-      $('<li role="presentation"/>')
-        .text(item.address)
-        .appendTo(menu)
-        .click(function() {
-          $("#sched-step2-loc-addr").val(item.address);
-          api.postSelectFavoritePlace(leaderUid, item.address)
-            .done(function(loc) {
-              timeZoneDropdown.set(loc.timezone);
-            });
-        });
-    });
-    $('<li role="presentation" class="divider"/>')
-      .appendTo(menu);
+
+    if (predictions.from_favorites.length > 0) {
+      $('<li role="presentation" class="dropdown-header"/>')
+        .text("Favorite Locations")
+        .appendTo(menu);
+
+      list.iter(predictions.from_favorites, function(item) {
+        var bolded = highlight(item.loc.address, [item.matched_substring]);
+        var li = $('<li role="presentation"/>')
+          .appendTo(menu);
+        $('<a role="menuitem" tabindex="-1" href="#"/>')
+          .html(bolded)
+          .appendTo(li)
+          .click(function() {
+            $("#sched-step2-loc-addr").val(item.loc.address);
+            api.postSelectFavoritePlace(leaderUid, item.loc.address)
+              .done(function(loc) {
+                timeZoneDropdown.set(loc.timezone);
+              });
+            $("body").trigger("click");
+            return false;
+          });
+      });
+      $('<li role="presentation" class="divider"/>')
+        .appendTo(menu);
+    }
+
     $('<li role="presentation" class="dropdown-header"/>')
       .text("Suggestions from Google")
       .appendTo(menu);
+
     list.iter(predictions.from_google, function(item) {
       var bolded = highlight(item.description, item.matched_substrings);
-      $('<li/>')
+      var li = $('<li role="presentation"/>')
+        .appendTo(menu);
+      $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
-        .appendTo(menu)
+        .appendTo(li)
         .click(function() {
           $("#sched-step2-loc-addr").val(item.description);
           api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
             .done(function(loc) {
               timeZoneDropdown.set(loc.timezone);
             });
+          $("body").trigger("click");
+          return false;
         });
     });
+
     $('.dropdown-toggle').click();
   }
 
