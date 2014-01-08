@@ -39,7 +39,7 @@ var home = (function() {
 
   function viewOfTaskQueue(tasks) {
     var view = $("<div/>");
-    var tasksView = $("<div/>");
+    var tasksView = $("<div/>", {id:"tasks-scheduling"});
 
     list.iter(tasks, function(task) {
       viewOfTaskTitle(task).appendTo(tasksView);
@@ -49,6 +49,17 @@ var home = (function() {
     return view;
   }
 
+  function taskCreated(task) {
+    switch (variant.cons(task.task_data)) {
+    case "Questions":
+    case "Scheduling":
+    default:
+      // All tasks go to scheduling tab for now.
+      $("#tasks-scheduling").append(viewOfTaskTitle(task));
+      break;
+    }
+  }
+
   function loadSchedulingTasks() {
     var view = $("#scheduling-tasks-tab-content");
     view.children().remove();
@@ -56,6 +67,7 @@ var home = (function() {
       .done(function(data) {
         viewOfTaskQueue(data.tasks)
           .appendTo(view);
+        task.onTaskCreated.observe("scheduling-tab", taskCreated);
       });
   }
 
@@ -68,8 +80,8 @@ var home = (function() {
         .appendTo(view);
       var initials;
       var exec = $("<div id='exec-name-div'></div>")
-//        .append($("<div id='assisting'>ASSISTING</div>"))
-//        .append($("<div id='exec-name'>Joe Lonsdale</div>"))
+        .append($("<div id='assisting'>ASSISTING</div>"))
+        .append($("<div id='exec-name' class='ellipsis'>Executive Name</div>"))
         .appendTo(view);
       var caretDiv = $("<div id='exec-caret'></div>")
         .appendTo(view);

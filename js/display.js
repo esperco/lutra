@@ -9,6 +9,7 @@ var display = (function() {
     if ($(window).width() < 768) {
       $('#desktop-navbar').addClass('hide');
       $('#mobile-navbar').removeClass('hide');
+      $('.mobile-nav-tabs').addClass('nav-tabs-centered');
       $('.home-container').removeClass('navbar-open');
       $('#home-push').removeClass('hide');
       $('.page-title').addClass('hide');
@@ -16,51 +17,75 @@ var display = (function() {
     } else {
       $('#desktop-navbar').removeClass('hide');
       $('#mobile-navbar').addClass('hide');
+      $('.mobile-nav-tabs').removeClass('nav-tabs-centered');
       $('.home-container').addClass('navbar-open');
       $('#home-push').addClass('hide');
       $('.page-title').removeClass('hide');
       $('.new-task-btn').removeClass('hide');
     }
+
+    if ($(window).width() < 992) {
+      $('.desktop-nav-tabs').addClass('hide');
+      $('.mobile-nav-tabs').removeClass('hide');
+    } else {
+      $('.desktop-nav-tabs').removeClass('hide');
+      $('.mobile-nav-tabs').addClass('hide');
+    }
+  };
+
+  mod.updateTask = function() {
+    if ($(window).width() < 1040) {
+      $('#task-navbar')
+        .addClass('chat-closed')
+        .removeClass('chat-open');
+      $('.new-task-footer')
+        .addClass('chat-closed')
+        .removeClass('chat-open');
+      $('.sched-footer')
+        .addClass('chat-closed')
+        .removeClass('chat-open');
+      $('#chat').addClass('hide');
+      $('#chat-icon-container').removeClass('hide');
+      $('#task-content').removeClass('split-screen');
+    } else {
+      $('#task-navbar')
+        .addClass('chat-open')
+        .removeClass('chat-closed');
+      $('.new-task-footer')
+        .addClass('chat-open')
+        .removeClass('chat-closed');
+      $('.sched-footer')
+        .addClass('chat-open')
+        .removeClass('chat-closed');
+      $('#chat').removeClass('hide');
+      $('#chat-icon-container').addClass('hide');
+      $('#task-content').addClass('split-screen');
+    }
+
+    if ($(window).width() < 620) {
+      $('.send-message-text').addClass('hide');
+    } else {
+      $('.send-message-text').removeClass('hide');
+    }
   };
 
   mod.checkWidth = function() {
-    if ($(window).width() < 768) {
+    if (!$('#home-page').hasClass('hide'))
+      mod.updateHome();
+
+    if (!$('#task-page').hasClass('hide'))
+      mod.updateTask();
+
+    if ($(window).width() < 620) {
       $('#login-container')
         .removeClass('desktop-login')
         .addClass('mobile-login');
+      $('.container').addClass('mobile');
     } else {
       $('#login-container')
         .removeClass('mobile-login')
         .addClass('desktop-login');
-    }
-
-    if (!$('#home-page').hasClass('hide'))
-      mod.updateHome();
-
-    if ($(window).width() < 992) {
-      $('#task-navbar')
-        .removeClass('col-md-8 split-screen')
-        .addClass('navbar-fixed-top');
-      $('.new-task-footer')
-        .removeClass('col-md-8 split-screen')
-        .addClass('navbar-fixed-bottom');
-      $('.sched-footer')
-        .removeClass('col-md-8 split-screen')
-        .addClass('navbar-fixed-bottom');
-      $('#chat').addClass('hide');
-      $('#task-content').removeClass('split-screen');
-    } else {
-      $('#task-navbar')
-        .removeClass('navbar-fixed-top')
-        .addClass('col-md-8 split-screen');
-      $('.new-task-footer')
-        .removeClass('navbar-fixed-bottom')
-        .addClass('col-md-8 split-screen');
-      $('.sched-footer')
-        .removeClass('navbar-fixed-bottom')
-        .addClass('col-md-8 split-screen');
-      $('#chat').removeClass('hide');
-      $('#task-content').addClass('split-screen');
+      $('.container').removeClass('mobile');
     }
   };
 

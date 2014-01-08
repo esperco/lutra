@@ -2,6 +2,11 @@ var chat = (function () {
   var mod = {};
   var profiles = {};
 
+  mod.postChatItem = function(item) {
+    task.onChatPosting.notify(item);
+    return api.postChatItem(item).done(task.onChatPosted.notify);
+  }
+
   function full_name(uid) {
     var p = profiles[uid].prof;
     return p ? p.full_name : "John Doe";
@@ -14,7 +19,7 @@ var chat = (function () {
     for (var i in chat.chat_participants) {
       var uid = chat.chat_participants[i].par_uid;
       if (uid !== me) {
-        var p = profiles[uid];
+        var p = profiles[uid].prof;
         if (! p) {
           someone_else = true;
         } else if (names) {
@@ -27,7 +32,7 @@ var chat = (function () {
     if (names) {
       return someone_else ? names + ", and others" : names;
     } else {
-      return "participants";
+      return "Guest";
     }
   }
 
@@ -95,7 +100,7 @@ var chat = (function () {
     var data = chat_item.chat_item_data[1];
     switch (kind) {
     case "Message":
-      return data;
+      return $("<span/>").text(data);
     case "Audio":
       return audioPlayer(data);
     case "Selector_q":
@@ -108,9 +113,9 @@ var chat = (function () {
       return viewOfCalendarOptions($("<ul/>"), data.selected);
     case "Sched_confirm":
     case "Sched_remind":
-      return data.body;
+      return $("<span/>").text(data.body);
     default:
-      return $("<i/>").append(kind);
+      return $("<i/>").text(kind);
     }
   }
 
@@ -144,9 +149,8 @@ var chat = (function () {
 
   function editChoiceOption() {
     var v = $("<li class='option'/>");
-    var radio = $("<img class='option-radio'/>")
+    var radio = $("<div class='option-radio'/>")
       .appendTo(v);
-    svg.loadImg(radio, "/assets/img/radio.svg");
 
     var editDiv = $("<div class='options-input'/>");
     var edit = $("<input class='form-control'/>")
@@ -198,9 +202,8 @@ var chat = (function () {
 
   function buttonToAddChoiceOption() {
     var v = $("<li class='option'/>");
-    var radio = $("<img class='option-radio add-option-radio'/>");
-    radio.appendTo(v);
-    svg.loadImg(radio, "/assets/img/radio.svg");
+    var emptyRadio = $("<div class='option-radio add-option-radio'/>");
+    emptyRadio.appendTo(v);
 
     var button = $("<button class='add-option-btn'>Click to add option</button>");
     button.click(function() {
@@ -243,8 +246,7 @@ var chat = (function () {
   }
 
   function chatEditor(messages, chat, task) {
-    var chatFooter =
-      $("<div class='navbar-fixed-bottom col-md-4 chat-footer'/>");
+    var chatFooter = $("<div class='chat-footer'/>");
 
     if (chat.chatid === task.task_context_chat) {
       var toField = $("<div class='to-field'/>")
@@ -269,12 +271,6 @@ var chat = (function () {
 
     editText.val("");
 
-    // editText.on("keyup", function (e){
-    //   $(this).css("height", "auto");
-    //   $(this).height(this.scrollHeight);
-    // });
-    // editText.keyup();
-
     var choicesEditor = editChoices();
     choicesEditor.hide();
     v.append(choicesEditor);
@@ -288,9 +284,9 @@ var chat = (function () {
 
     var selChoices = $("<img class='offer-choices-checkbox'/>");
     selChoicesDiv.append(selChoices);
-    svg.loadImg(selChoices, "/assets/img/checkbox.svg");
+    svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
     var selChoicesLabel = $("<div/>", {
-      'class': "offer-choices-label unselectable",
+      'class': "offer-choices-label unselectablex",
       'text': "Offer multiple choice response."
     });
     selChoicesDiv.append(selChoicesLabel);
@@ -333,8 +329,6 @@ var chat = (function () {
           for: me,
           chat_item_data:data
         };
-        var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-        messages.append(tempItemView);
         editText.val("");
         editText.attr("placeholder", "Write a reply...");
 
@@ -349,15 +343,30 @@ var chat = (function () {
           }
         }
 
-        api.postChatItem(item).done(function(item) {
-            var itemView = viewOfChatItem(item, item.time_created,
-                                          statusOfChatItem(item));
-            tempItemView.replaceWith(itemView);
-        });
+        mod.postChatItem(item);
       }
     });
 
     return chatFooter;
+  }
+
+  var tempItemView;
+
+  function chatPosting(item) {
+    var view = $("#chat" + item.chatid + " .messages");
+    if (0 < view.length) {
+      tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+      view.append(tempItemView);
+    }
+  }
+
+  function chatPosted(item) {
+    if (tempItemView) {
+      var itemView = viewOfChatItem(item, item.time_created,
+                                    statusOfChatItem(item));
+      tempItemView.replaceWith(itemView);
+      tempItemView = null;
+    }
   }
 
   function chatView(chat, task) {
@@ -367,14 +376,12 @@ var chat = (function () {
     var displayName = $("<div class='chat-profile-details'></div>")
       .appendTo(v);
     if (chat.chatid === task.task_context_chat) {
-      displayName.append("Original Email");
+      displayName.append("Group Conversation");
     } else {
       displayName.append(chat_participant_names(chat));
     }
 
-    var messagesContainer = $("<div/>")
-    var messages = $("<div class='messages'><div/>")
-      .appendTo(messagesContainer);
+    var messages = $("<div class='messages scrollable'><div/>");
 
     for (var i in chat.chat_items) {
       var item = chat.chat_items[i];
@@ -388,25 +395,23 @@ var chat = (function () {
       messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    var footerHeight = $(".chat-footer").height();
-    var push = $("<div/>", {
-      'class': "chat-push",
-      'height': footerHeight+"px"
-    });
-    messagesContainer.append(push);  /* Doesn't work for first tab. */
+    var editor = chatEditor(messages, chat, task);
 
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    v.append(messagesContainer);
-    v.append(chatEditor(messages, chat, task));
-    v.scrollTop = v.scrollHeight;  /* Doesn't work. */
+    v.append(messages)
+     .append(editor);
 
     return v;
   }
 
-  mod.loadTaskChats = function(ta) {
+  mod.clearTaskChats = function() {
     $(".chat-profile-tabs li").remove();
-    var tabs = $(".chat-profile-tabs");
     $(".chat-panel div").remove();
+  }
+
+  mod.loadTaskChats = function(ta) {
+    mod.clearTaskChats();
+
+    var tabs = $(".chat-profile-tabs");
     var tab_content = $(".chat-panel");
 
     task.profilesOfEveryone(ta)
@@ -436,12 +441,11 @@ var chat = (function () {
               && ! list.mem(taskParticipants, peerUid))
             return;
 
-          var tab_name;
           var pane_id = "chat" + chat.chatid;
           var tab = $("<a/>", {
             href:"#"+pane_id,
             "class":"tab-name",
-            "data-toggle":"tab"
+            "data-toggle":"tab",
           });
           tabs.append($("<li class='chat-tab-div'/>")
               .append(tab));
@@ -449,7 +453,8 @@ var chat = (function () {
                      .append(chatView(chat, ta)));
           if (isGroupChat) {
             var group = $("<img class='group'/>");
-            tab.append($("<div class='chat-prof-circ'/>")
+            tab.tooltip({"title":"Group Conversation","placement":"bottom"})
+               .append($("<div class='chat-prof-circ'/>")
                .append(group));
             svg.loadImg(group, "/assets/img/group.svg");
           } else {
@@ -457,7 +462,8 @@ var chat = (function () {
               peerUid = chat.chat_participants[0].par_uid;
             var p = profiles[peerUid].prof;
             var tab_initials = profile.veryShortNameOfProfile(p);
-            tab.append($("<div class='chat-prof-circ'/>")
+            tab.tooltip({"title":p.full_name,"placement":"bottom"})
+               .append($("<div class='chat-prof-circ'/>")
                .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");
@@ -469,6 +475,9 @@ var chat = (function () {
             first_tab = false;
           }
         });
+
+        task.onChatPosting.observe("chat-tabs", chatPosting);
+        task.onChatPosted .observe("chat-tabs", chatPosted );
       });
   }
 

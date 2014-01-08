@@ -142,6 +142,7 @@ var page = (function() {
     pageSelector.hideAll();
     task.load(optTid);
     pageSelector.show("task");
+    display.updateTask();
     util.focus();
   };
 

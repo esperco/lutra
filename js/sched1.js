@@ -254,15 +254,17 @@ var sched1 = (function() {
 
   function saveGuests(ta, hosts, guestTbl) {
     updateGuests(ta, hosts, guestTbl);
-    return api.postTask(ta);
+    api.postTask(ta).done(task.onTaskParticipantsChanged.notify);
   }
 
   function finalizeGuests(ta, hosts, guestTbl) {
     updateGuests(ta, hosts, guestTbl);
     ta.task_status.task_progress = "Coordinating";
     sched.getState(ta).scheduling_stage = "Find_availability";
-    api.postTask(ta)
-      .done(sched.loadTask);
+    api.postTask(ta).done(function(ta) {
+      sched.loadTask(ta);
+      task.onTaskParticipantsChanged.notify(ta);
+    });
   }
 
   mod.load = function(profs, task, view) {
@@ -273,8 +275,7 @@ var sched1 = (function() {
 
     var hostsContainer = $("<div class='hosts-container'>");
     var newGuestContainer = $("<div class='new-guest-container'>");
-    var guestsContainer = $("<div id='guests-container'/>")
-      .addClass("guests-container");
+    var guestsContainer = $("<div class='guests-container'/>");
 
     var guests = sched.getGuests(task);
     var guestTbl = list.toTable(guests);
