@@ -11,29 +11,30 @@ var home = (function() {
   });
 
   function viewOfTaskTitle(task) {
-    var view = $("<div class='task'></div>");
-    var checkbox = $("<img class='task-checkbox'/>")
+    var view = $("<div class='task clearfix'></div>");
+    var taskDetails = $("<div class='task-details'></div>")
       .appendTo(view);
-    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-    checkbox.click(function() {
-      log("testing1");
-      if (checkbox.hasClass("checkbox-selected")) {
-        log("testing2");
-        checkbox.removeClass("checkbox-selected");
-      }
-      else {
-        log("testing3");
-        checkbox.addClass("checkbox-selected");
-      }
-    })
     var title = task.task_status
       ? task.task_status.task_title
       : null;
     if (title) {
-      $("<a class='task-title' href='#!task/" + task.tid + "'/>")
+      $("<div class='new-label'>NEW</div>")
+        .appendTo(taskDetails);
+      $("<a href='#!task/" + task.tid + "' class='task-title'></a>")
         .text(title)
-        .appendTo(view);
+        .appendTo(taskDetails);
+      $("<div class='task-status'>Status goes here.</div>")
+        .appendTo(taskDetails);
     }
+
+    var archiveDiv = $("<div class='archive-div'></div>")
+      .appendTo(view);
+    var archive = $("<img class='archive'/>")
+      .appendTo(archiveDiv);
+    svg.loadImg(archive, "/assets/img/x.svg");
+    archiveDiv.tooltip({"title":"Archive","placement":"left"})
+              .click(function() {
+    });
     return view;
   }
 

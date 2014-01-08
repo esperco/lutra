@@ -373,7 +373,6 @@ object {
   &:hover { background-color: @gray_f8; }
 }
 
-.task,
 .sched-step3-row {
   height: 70px;
 }
@@ -412,21 +411,12 @@ object {
 }
 
 .check-all,
-.task-checkbox,
 .workflow-radio,
 .suggestion-checkbox,
 .suggestion-radio {
   float: left;
   width: 24px;
   height: 24px;
-}
-
-.task-checkbox {
-  margin-top: 2px;
-  &:hover {
-    cursor: pointer;
-    path.checkbox { stroke: @gray_40; }
-  }
 }
 
 .workflow-radio {
@@ -477,17 +467,6 @@ object {
   margin-top: 20px;
 }
 
-.toolbar {
-  margin-top: 20px;
-}
-
-.archive-btn {
-  margin-left: 18px;
-  &:hover { cursor: pointer;
-    path.background { fill: @gray_20; }
-  }
-}
-
 .list-tabs > li > a {
   font-size: 14px;
   padding: 0;
@@ -515,26 +494,57 @@ object {
 }
 
 .task {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-bottom: 20px;
-  height: 70px;
+  padding: 20px 10px;
   border-bottom: 1px solid;
   border-bottom-color: @gray_10;
+  &:hover {
+    background-color: @gray_f8;
+    .archive path { fill: @gray_20; }
+  }
 }
 
-.task-title {
+.task-details {
+  float: left;
+}
+
+.task-title { font-family: @bold; }
+
+.new-label {
   display: inline-block;
-  margin-top: 4px;
-  margin-left: 18px;
-  color: @gray_90;
-  &:hover { color: @gray_90; }
+  margin-right: 10px;
+  padding: 2px 5px 1px;
+  font-family: @bold;
+  font-size: 12px;
+  color: @white;
+  background: @purple;
+  border-radius: 4px;
 }
 
+.task-status {
+  display: block;
+  color: @gray_60;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.archive-div {
+  float: right;
+  width: 12px;
+  height: 12px;
+  margin-top: 17px;
+  &:hover {
+    cursor: pointer;
+    .archive path { fill: @red; }
+  }
+}
+
+.archive {
+  display: block;
+  path { fill: @white; }
+}
 
 /*** Footers ***/
 
-.list-footer,
 .new-task-footer,
 .sched-footer {
   position: fixed !important;
@@ -547,10 +557,6 @@ object {
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
-}
-
-.list-footer {
-  width: 100%;
 }
 
 .new-task-footer {
