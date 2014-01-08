@@ -16,30 +16,28 @@ var display = (function() {
 
     if ($(window).width() < 532) {
       $('.place-details')
-        .removeClass('col-xs-4')
+        .removeClass('col-xs-5')
         .addClass('col-xs-9');
-      $('.last-meeting').addClass('hide');
-      $('.mobile-last-meeting').removeClass('hide');
+      $('.stats').addClass('hide');
+      $('.mobile-stats').removeClass('hide');
+      $('.last-visit').addClass('mobile');
+      $('.visits').addClass('mobile');
       $('.place-actions')
         .removeClass('desktop')
         .removeClass('col-xs-4')
         .addClass('col-xs-3');
-      $('.suggest-for')
-        .removeClass('col-xs-8')
-        .addClass('col-xs-9');
     } else {
       $('.place-details')
         .removeClass('col-xs-9')
-        .addClass('col-xs-4');
-      $('.last-meeting').removeClass('hide');
-      $('.mobile-last-meeting').addClass('hide');
+        .addClass('col-xs-5');
+      $('.stats').removeClass('hide');
+      $('.mobile-stats').addClass('hide');
+      $('.last-visit').removeClass('mobile');
+      $('.visits').removeClass('mobile');
       $('.place-actions')
         .removeClass('col-xs-3')
         .addClass('col-xs-4')
         .addClass('desktop');
-      $('.suggest-for')
-        .removeClass('col-xs-9')
-        .addClass('col-xs-8');
     }
 
 

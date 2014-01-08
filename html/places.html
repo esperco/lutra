@@ -4,9 +4,10 @@
     <button id="new-sched-task-btn"
             class="new-task-btn btn btn-primary">New Place</button>
   </div>
+  <span>Sort by: </span>
   <div class="btn-group">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      Sort by
+      Name
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu">
@@ -27,26 +28,60 @@
       <li><a href="#">Incomplete</a></li>
     </ul>
   </div>
+
   <div id="places">
     <!-- re-create in Javascript -->
     <div class="place-row clearfix">
-      <div class="col-xs-4 place-details">
+
+      <div class="col-xs-5 place-details">
         <a class="place-name ellipsis">Asian Box</a>
         <div class="place-loc">
           <div class="place-loc-1 ellipsis">855 El Camino Real #21</div>
           <div class="place-loc-2 ellipsis">Palo Alto, CA 94301</div>
         </div>
-        <div class="mobile-last-meeting">
-          <img id="" class="svg last-meeting-icon" src="/assets/img/scheduling.svg">
-          <div class="last-meeting-text">Last meeting here:</div>
-          <div class="last-meeting-date">Dec. 10, 2013</div>
+        <div class="suggest-for">
+          <span class="suggest-for-text">Suggest for: </span>
+          <span class="suggest-for-types">Lunch, Dinner, Meeting (Anytime)</span>
+        </div>
+        <div class="stats mobile-stats">
+          <div class="col-xs-8 last-visit">
+            <div class="stat-div clearfix">
+              <div id="last-visit-stat" class="stat">2</div>
+              <div class="time-ago-text">
+                <div>DAYS</div>
+                <div>AGO</div>
+              </div>
+            </div>
+            <div class="stat-text">Last visit</div>
+          </div>
+          <div class="col-xs-4 visits">
+            <div class="stat-div clearfix">
+              <div id="visits-stat" class="stat">7</div>
+            </div>
+            <div class="stat-text">Visits</div>
+          </div>
         </div>
       </div>
-      <div class="col-xs-4 last-meeting">
-        <img id="" class="svg last-meeting-icon" src="/assets/img/scheduling.svg">
-        <div class="last-meeting-text">Last meeting here:</div>
-        <div class="last-meeting-date">Dec. 10, 2013</div>
+
+      <div class="col-xs-3 stats">
+        <div class="col-xs-8 last-visit">
+          <div class="stat-div clearfix">
+            <div id="last-visit-stat" class="stat">2</div>
+            <div class="time-ago-text">
+              <div>DAYS</div>
+              <div>AGO</div>
+            </div>
+          </div>
+          <div class="stat-text">Last visit</div>
+        </div>
+        <div class="col-xs-4 visits">
+          <div class="stat-div clearfix">
+            <div id="visits-stat" class="stat">7</div>
+          </div>
+          <div class="stat-text">Visits</div>
+        </div>
       </div>
+
       <div class="col-xs-4 place-actions">
         <a href="#" data-toggle="tooltip" title="Edit" class="col-xs-4 place-action place-edit-div">
           <img id="" class="svg place-edit" src="/assets/img/edit.svg">
@@ -57,9 +92,5 @@
         <a href="#" data-toggle="tooltip" title="View on Yelp" class="col-xs-4 place-action yel-div">
           <img id="" class="svg yelp" src="/assets/img/yelp.svg">
         </a>
-      </div>
-      <div class="col-xs-8 suggest-for">
-        <span class="suggest-for-text">Suggest for: </span>
-        <span class="suggest-for-types">Lunch, Dinner, Meeting (Anytime)</span>
       </div>
     </div>

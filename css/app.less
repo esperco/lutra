@@ -923,23 +923,46 @@ object {
   color: @gray_60;
 }
 
-.last-meeting { margin-top: 25px; }
+.suggest-for {
+  margin-top: 5px;
+}
 
-.mobile-last-meeting { margin-top: 15px; }
+.suggest-for-text,
+.suggest-for-types { font-size: 14px; }
 
-.last-meeting-icon {
+.suggest-for-text { font-family: @bold; }
+
+.stats {
+  margin-top: 12px;
+  padding: 0;
+}
+
+.stat-div { width: 100%; }
+
+.stat {
   float: left;
-  height: 16px;
+  font-size: 32px;
 }
 
-.last-meeting-text,
-.last-meeting-date {
-  display: block;
-  margin-left: 30px;
+.stat-text {
   font-size: 14px;
+  color: @gray_60;
 }
 
-.last-meeting-date { font-family: @bold; }
+.last-visit,
+.visits {
+  padding-left: 0;
+}
+
+.time-ago-text {
+  display: inline-block;
+  margin-left: 8px;
+  padding-top: 8px;
+  font-size: 10px;
+  color: @gray_60;
+}
+
+.place-actions { padding: 0;}
 
 .place-actions.desktop { margin-top: 17px; }
 
@@ -976,17 +999,6 @@ object {
     g path { fill: #c01001; }
   }
 }
-
-.suggest-for {
-  display: inline-block;
-  margin-top: 10px;
-  padding-left: 0;
-}
-
-.suggest-for-text,
-.suggest-for-types { font-size: 14px; }
-
-.suggest-for-text { font-family: @bold; }
 
 
 /*** New Task ***/
