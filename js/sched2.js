@@ -502,7 +502,7 @@ var sched2 = (function() {
     if (predictions.from_favorites.length == 0
         && predictions.from_google.length == 0) return;
     var leaderUid = login.data.team.team_leaders[0];
-    var menu = $("#location-dropdown");
+    var menu = $("#location-dropdown-menu");
     menu.children().remove();
 
     if (predictions.from_favorites.length > 0) {
@@ -522,8 +522,8 @@ var sched2 = (function() {
             api.postSelectFavoritePlace(leaderUid, item.loc.address)
               .done(function(loc) {
                 timeZoneDropdown.set(loc.timezone);
+                $('#location-dropdown-toggle').dropdown("toggle");
               });
-            $("body").trigger("click");
             return false;
           });
       });
@@ -547,13 +547,16 @@ var sched2 = (function() {
           api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
             .done(function(loc) {
               timeZoneDropdown.set(loc.timezone);
+              $('#location-dropdown-toggle').dropdown("toggle");
             });
-          $("body").trigger("click");
           return false;
         });
     });
 
-    $('.dropdown-toggle').click();
+    var toggle = $('#location-dropdown-toggle');
+    if (!toggle.parent().hasClass('open')) {
+      toggle.dropdown("toggle");
+    }
   }
 
   function predictAddress() {
