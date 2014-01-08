@@ -17,7 +17,7 @@ var display = (function() {
     if ($(window).width() < 532) {
       $('.place-details')
         .removeClass('col-xs-5')
-        .addClass('col-xs-9');
+        .addClass('col-xs-10');
       $('.stats').addClass('hide');
       $('.mobile-stats').removeClass('hide');
       $('.last-visit').addClass('mobile');
@@ -25,17 +25,17 @@ var display = (function() {
       $('.place-actions')
         .removeClass('desktop')
         .removeClass('col-xs-4')
-        .addClass('col-xs-3');
+        .addClass('col-xs-2');
     } else {
       $('.place-details')
-        .removeClass('col-xs-9')
+        .removeClass('col-xs-10')
         .addClass('col-xs-5');
       $('.stats').removeClass('hide');
       $('.mobile-stats').addClass('hide');
       $('.last-visit').removeClass('mobile');
       $('.visits').removeClass('mobile');
       $('.place-actions')
-        .removeClass('col-xs-3')
+        .removeClass('col-xs-2')
         .addClass('col-xs-4')
         .addClass('desktop');
     }
