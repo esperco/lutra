@@ -190,16 +190,16 @@ var sched = (function() {
           .done(function(profs) {
             switch (progress) {
             case "Guest_list":
-              mod.loadStep1(profs, ta, state);
+              mod.loadStep1(profs, ta);
               break;
             case "Find_availability":
               mod.loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              mod.loadStep3(profs, ta, state);
+              mod.loadStep3(profs, ta);
               break;
             case "Confirm":
-              mod.loadStep4(profs, ta, state);
+              mod.loadStep4(profs, ta);
               break;
             default:
               log("Unknown scheduling stage: " + progress);

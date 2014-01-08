@@ -7,6 +7,23 @@ var task = (function() {
 
   var mod = {};
 
+  function Observable() {
+    var listeners = {};
+    this.observe = function(key, fn) {
+      listeners[key] = fn;
+    };
+    this.notify = function(v,w,x,y,z) {
+      for (var key in listeners) {
+        listeners[key](v,w,x,y,z);
+      }
+    };
+  }
+
+  mod.onTaskCreated = new Observable();
+  mod.onTaskParticipantsChanged = new Observable();
+  mod.onChatPosting = new Observable();
+  mod.onChatPosted = new Observable();
+
   /* extract all user IDs contained in the task; this is used to
      pre-fetch all the profiles. */
   mod.extractAllUids = function(ta) {
@@ -37,8 +54,9 @@ var task = (function() {
       .then(function(a) {
         var b = {};
         list.iter(a, function(obsProf) {
-          if (obsProf !== null)
+          if (obsProf !== null) {
             b[obsProf.prof.profile_uid] = obsProf;
+          }
         });
         return b;
       });
@@ -46,15 +64,17 @@ var task = (function() {
 
   /* display task */
   function viewOfGeneralTask(task) {
-    function toggle_title() {
+    function toggleTitle() {
       switch (task.task_status.task_progress) {
       case "Unread_by_organizer": return "Start";
       case "Closed":              return "Reopen";
       default:                    return "Done";
       }
     }
-    var status_button = $("<button/>").append(toggle_title());
-    status_button.click(function() {
+    var statusButton = $("<button/>")
+      .addClass("btn btn-default")
+      .text(toggleTitle());
+    statusButton.click(function() {
       switch (task.task_status.task_progress) {
       case "Unread_by_organizer":
       case "Closed":
@@ -64,10 +84,15 @@ var task = (function() {
         task.task_status.task_progress = "Closed";
         break;
       }
-      status_button.text(toggle_title());
-      api.postTask(task);
+      statusButton.addClass("disabled");
+      api.postTask(task)
+        .done(function() {
+          statusButton
+            .text(toggleTitle())
+            .removeClass("disabled");
+        });
     });
-    return status_button;
+    return statusButton;
   }
 
   function placeView(parent, view) {
@@ -86,11 +111,10 @@ var task = (function() {
       return ["Scheduling", {}];
     }
     else if ($("#workflow-gen").is(":checked")) {
-      return "General";
+      return "Questions";
     }
   }
 
-  /* At this stage we don't have a task ID yet */
   function loadNewTask(task) {
     var startTaskButton = $("#start-task");
     var newTaskTitle = $("#new-task-title");
@@ -142,7 +166,7 @@ var task = (function() {
       if (task) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
-        case "General":
+        case "Questions":
           $("#workflow-gen").prop("checked", true);
           break;
         case "Scheduling":
@@ -185,6 +209,7 @@ var task = (function() {
           };
           api.createTask(task)
             .done(function(task) {
+              mod.onTaskCreated.notify(task);
               /* change URL */
               window.location.hash = "#!task/" + task.tid;
             });
@@ -238,7 +263,7 @@ var task = (function() {
     }
     else {
       switch (variant.cons(task.task_data)) {
-      case "General":
+      case "Questions":
         loadGeneralTask(task);
         break;
       case "Scheduling":
@@ -255,12 +280,15 @@ var task = (function() {
   /* Load task page */
   mod.load = function(optTid) {
     taskTypeSelector.hideAll();
-    if (!optTid)
+    if (!optTid) {
       loadNewTask(null);
-    else {
+      chat.clearTaskChats();
+    } else {
       api.getTask(optTid)
         .done(loadTask);
     }
+
+    mod.onTaskParticipantsChanged.observe("chat-tabs", chat.loadTaskChats);
   }
 
   mod.init = function() {

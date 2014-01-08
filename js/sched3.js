@@ -135,7 +135,7 @@ var sched3 = (function() {
     var options = state.calendar_options;
 
     var availabilityModal = $("#sched-availability-modal");
-    function closeAvailabilityModal() {
+    function closeAvailabilityModal(item) {
       availabilityModal.modal("hide");
     }
 
@@ -180,7 +180,7 @@ var sched3 = (function() {
               choices: options
             }]
           };
-          api.postChatItem(chatItem)
+          chat.postChatItem(chatItem)
             .done(closeAvailabilityModal);
         }
       });

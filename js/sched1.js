@@ -145,23 +145,25 @@ var sched1 = (function() {
     addButton.click(function() {
       var name = nameInput.val();
       var uid = optUid;
-        api.getProfile(uid)
-          .then(function(prof) {
-            name0 = prof.full_name;
-            prof.full_name = name;
-            prof.familiar_name = name;
-            api.postProfile(prof);
-            updateAddButton(hosts, guestTbl);
-            addGuest(task, guestTbl, uid)
-              .then(function(profs) {
-                guestsContainer
-                  .append(rowViewOfParticipant(profs, task, guestTbl, uid,
-                                               updateAddGuestAbility));
-                updateAddGuestAbility();
-                saveGuests(task, hosts, guestTbl);
-                updateNextButton(hosts, guestTbl);
-              });
-          });
+      api.getProfile(uid)
+        .then(function(prof) {
+          prof.full_name = name;
+          prof.familiar_name = name;
+          api.postProfile(prof)
+            .then(function() {
+              profile.set(prof); /* update cache */
+              updateAddButton(hosts, guestTbl);
+              addGuest(task, guestTbl, uid)
+                .then(function(profs) {
+                  guestsContainer
+                    .append(rowViewOfParticipant(profs, task, guestTbl, uid,
+                                                 updateAddGuestAbility));
+                  updateAddGuestAbility();
+                  saveGuests(task, hosts, guestTbl);
+                  updateNextButton(hosts, guestTbl);
+                });
+            });
+        });
       clearAddGuest();
     });
 
@@ -252,15 +254,17 @@ var sched1 = (function() {
 
   function saveGuests(ta, hosts, guestTbl) {
     updateGuests(ta, hosts, guestTbl);
-    return api.postTask(ta);
+    api.postTask(ta).done(task.onTaskParticipantsChanged.notify);
   }
 
   function finalizeGuests(ta, hosts, guestTbl) {
     updateGuests(ta, hosts, guestTbl);
     ta.task_status.task_progress = "Coordinating";
     sched.getState(ta).scheduling_stage = "Find_availability";
-    api.postTask(ta)
-      .done(sched.loadTask);
+    api.postTask(ta).done(function(ta) {
+      sched.loadTask(ta);
+      task.onTaskParticipantsChanged.notify(ta);
+    });
   }
 
   mod.load = function(profs, task, view) {
