@@ -158,11 +158,11 @@
 
         <form role="form">
           <div class="form-group">
-            <label for="login-email" class="login-title">Email address</label>
+            <label for="login-email" class="text-field-label">Email address</label>
             <input type="email" class="form-control" id="login-email">
           </div>
           <div class="form-group">
-            <label for="login-password" class="login-title">Password</label>
+            <label for="login-password" class="text-field-label">Password</label>
             <a href="#!request-password" id="forgot-password">Forgot password?</a>
             <input type="password" class="form-control" id="login-password">
           </div>
@@ -189,7 +189,7 @@
         @@all-tasks.html@@
       </div>
       <div id="scheduling-task-list">
-        @@sched-task-list.html@@
+        @@places.html@@
       </div>
       <div id="general-task-list" class="hide">
         @@gen-task-list.html@@

@@ -1,0 +1,65 @@
+<div class="container home-container">
+  <div class="clearfix">
+    <h1 class="page-title unselectable">PLACES</h1>
+    <button id="new-sched-task-btn"
+            class="new-task-btn btn btn-primary">New Place</button>
+  </div>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      Sort by
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Name</a></li>
+      <li><a href="#">Last visited</a></li>
+      <li><a href="#">Most visited</a></li>
+    </ul>
+  </div>
+  <span>Show: </span>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      All
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">All</a></li>
+      <li><a href="#">Complete</a></li>
+      <li><a href="#">Incomplete</a></li>
+    </ul>
+  </div>
+  <div id="places">
+    <!-- re-create in Javascript -->
+    <div class="place-row clearfix">
+      <div class="col-xs-4 place-details">
+        <a class="place-name ellipsis">Asian Box</a>
+        <div class="place-loc">
+          <div class="place-loc-1 ellipsis">855 El Camino Real #21</div>
+          <div class="place-loc-2 ellipsis">Palo Alto, CA 94301</div>
+        </div>
+        <div class="mobile-last-meeting">
+          <img id="" class="svg last-meeting-icon" src="/assets/img/scheduling.svg">
+          <div class="last-meeting-text">Last meeting here:</div>
+          <div class="last-meeting-date">Dec. 10, 2013</div>
+        </div>
+      </div>
+      <div class="col-xs-4 last-meeting">
+        <img id="" class="svg last-meeting-icon" src="/assets/img/scheduling.svg">
+        <div class="last-meeting-text">Last meeting here:</div>
+        <div class="last-meeting-date">Dec. 10, 2013</div>
+      </div>
+      <div class="col-xs-4 place-actions">
+        <a href="#" data-toggle="tooltip" title="Edit" class="col-xs-4 place-action place-edit-div">
+          <img id="" class="svg place-edit" src="/assets/img/edit.svg">
+        </a>
+        <a href="#" data-toggle="tooltip" title="Get directions" class="col-xs-4 place-action directions-div">
+          <img id="" class="svg directions" src="/assets/img/directions.svg">
+        </a>
+        <a href="#" data-toggle="tooltip" title="View on Yelp" class="col-xs-4 place-action yel-div">
+          <img id="" class="svg yelp" src="/assets/img/yelp.svg">
+        </a>
+      </div>
+      <div class="col-xs-8 suggest-for">
+        <span class="suggest-for-text">Suggest for: </span>
+        <span class="suggest-for-types">Lunch, Dinner, Meeting (Anytime)</span>
+      </div>
+    </div>
