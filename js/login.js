@@ -72,14 +72,14 @@ var login = (function() {
   }
 
   mod.updateView = function() {
-    if (mod.data && mod.data.email) {
-      $("#logged-in-email").text(mod.data.email);
-      $(".logged-out").addClass("hide");
-      $(".logged-in").removeClass("hide");
-    } else {
-      $(".logged-in").addClass("hide");
-      $(".logged-out").removeClass("hide");
-    }
+    // if (mod.data && mod.data.email) {
+    //   $("#logged-in-email").text(mod.data.email);
+    //   $(".logged-out").addClass("hide");
+    //   $(".logged-in").removeClass("hide");
+    // } else {
+    //   $(".logged-in").addClass("hide");
+    //   $(".logged-out").removeClass("hide");
+    // }
   }
 
   /* Utilities */
