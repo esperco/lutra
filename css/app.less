@@ -10,6 +10,7 @@
 
 
 /*** Colors ***/
+@gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
@@ -18,6 +19,7 @@
 @gray_60: #808285;
 @gray_90: #414042;
 @green: #2bb673;
+@green_hover: #1e9b5c;
 @orange: #f7941e;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
@@ -161,45 +163,39 @@ object {
     background-color: @purple_hover;
     cursor: pointer;
   }
-}
-
-#exec-circ-outline {
-  float: left;
-  padding: 2px;
-  height: 40px;
-  width: 40px;
-  border-radius: 20px;
-  background: @white;
-}
-
-#exec-circ {
-  height: 36px;
-  width: 36px;
-  border-radius: 18px;
-  text-align: center;
-  vertical-align: middle;
-  background: @gray_60;
-}
-
-#exec-name-div {
-  display: inline-block;
-  margin-left: 10px;
-  padding-top: 3px;
-  color: @white;
-}
-
-#assisting {
-  font-size: 12px;
-}
-
-#exec-name {
-  width: 125px;
-  font-family: @bold;
-}
-
-#exec-caret {
-  float: right;
-  margin-top: 8px;
+  #exec-circ-outline {
+    float: left;
+    padding: 2px;
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    background: @white;
+  }
+  #exec-circ {
+    height: 36px;
+    width: 36px;
+    border-radius: 18px;
+    text-align: center;
+    vertical-align: middle;
+    background: @gray_60;
+  }
+  #exec-name-div {
+    display: inline-block;
+    margin-left: 10px;
+    padding-top: 3px;
+    color: @white;
+  }
+  #assisting {
+    font-size: 12px;
+  }
+  #exec-name {
+    width: 125px;
+    font-family: @bold;
+  }
+  #exec-caret {
+    float: right;
+    margin-top: 8px;
+  }
 }
 
 .account-nav-open {
@@ -364,6 +360,7 @@ object {
 /*** Table Structure ***/
 
 .task,
+.place-row,
 .workflow-row,
 .sched-step1-row,
 .sched-step1-add-row,
@@ -371,9 +368,16 @@ object {
 .sched-step3-row {
   padding: 10px;
   border-bottom: 1px solid @gray_10;
+  &:hover { background-color: @gray_f8; }
 }
 
-.task,
+.account-row,
+.exec-row {
+  padding: 15px 10px;
+  border-bottom: 1px solid @gray_10;
+  &:hover { background-color: @gray_f8; }
+}
+
 .sched-step3-row {
   height: 70px;
 }
@@ -384,6 +388,11 @@ object {
 }
 
 .task-list,
+#user-profile,
+#executives,
+#linked-accounts,
+#scheduling-pref,
+#places,
 #workflow-options,
 #guest-list-container,
 #sched-step2-suggestions,
@@ -392,31 +401,27 @@ object {
   border-top: 1px solid @gray_10;
 }
 
-.task-list {
+.task-list,
+#places {
   margin-top: 20px;
 }
 
+#user-profile,
+#executives,
+#linked-accounts,
+#scheduling-pref,
 #workflow-options,
 #sched-step2-suggestions {
   margin-top: 15px;
 }
 
 .check-all,
-.task-checkbox,
 .workflow-radio,
 .suggestion-checkbox,
 .suggestion-radio {
   float: left;
   width: 24px;
   height: 24px;
-}
-
-.task-checkbox {
-  margin-top: 2px;
-  &:hover {
-    cursor: pointer;
-    path.checkbox { stroke: @gray_40; }
-  }
 }
 
 .workflow-radio {
@@ -467,17 +472,6 @@ object {
   margin-top: 20px;
 }
 
-.toolbar {
-  margin-top: 20px;
-}
-
-.archive-btn {
-  margin-left: 18px;
-  &:hover { cursor: pointer;
-    path.background { fill: @gray_20; }
-  }
-}
-
 .list-tabs > li > a {
   font-size: 14px;
   padding: 0;
@@ -505,26 +499,57 @@ object {
 }
 
 .task {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-bottom: 20px;
-  height: 70px;
+  padding: 20px 10px;
   border-bottom: 1px solid;
   border-bottom-color: @gray_10;
+  &:hover {
+    background-color: @gray_f8;
+    .archive path { fill: @gray_20; }
+  }
 }
 
-.task-title {
+.task-details {
+  float: left;
+}
+
+.task-title { font-family: @bold; }
+
+.new-label {
   display: inline-block;
-  margin-top: 4px;
-  margin-left: 18px;
-  color: @gray_90;
-  &:hover { color: @gray_90; }
+  margin-right: 10px;
+  padding: 2px 5px 1px;
+  font-family: @bold;
+  font-size: 12px;
+  color: @white;
+  background: @purple;
+  border-radius: 4px;
 }
 
+.task-status {
+  display: block;
+  color: @gray_60;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.archive-div {
+  float: right;
+  width: 12px;
+  height: 12px;
+  margin-top: 17px;
+  &:hover {
+    cursor: pointer;
+    .archive path { fill: @red; }
+  }
+}
+
+.archive {
+  display: block;
+  path { fill: @white; }
+}
 
 /*** Footers ***/
 
-.list-footer,
 .new-task-footer,
 .sched-footer {
   position: fixed !important;
@@ -537,10 +562,6 @@ object {
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
-}
-
-.list-footer {
-  width: 100%;
 }
 
 .new-task-footer {
@@ -736,9 +757,9 @@ object {
   color: @gray_60;
 }
 
-.login-title,
+.text-field-label,
 #forgot-password {
-  padding-top: 10px;
+  padding-top: 20px;
   font-size: 14px;
 }
 
@@ -759,6 +780,240 @@ object {
   -webkit-animation: login_error 1s;
      -moz-animation: login_error 1s;
           animation: login_error 1s;
+}
+
+
+/*** Settings ***/
+
+.settings-title {
+  letter-spacing: 3px;
+  color: @gray_60;
+}
+
+#profile-title {
+  margin-top: 20px;
+}
+
+#executives-title,
+#linked-accounts-title,
+#scheduling-pref-title {
+  margin-top: 60px;
+}
+
+#prof-pic {
+  width: 100%;
+  height: 60px;
+  margin-top: 17px;
+}
+
+.settings-prof-circ,
+.add-exec-circ {
+  float: left;
+  height: 54px;
+  width: 54px;
+  border-radius: 27px;
+  text-align: center;
+}
+
+.settings-prof-circ {
+  padding-top: 5px;
+  vertical-align: middle;
+  font-family: @light;
+  font-size: 32px;
+  color: @white;
+  background-color: @gray_60;
+}
+
+#upload-photo {
+  margin-top: 14px;
+  margin-left: 18px;
+}
+
+@media(max-width:992px) {
+  #left-col,
+  #right-col { padding: 10px; }
+}
+
+
+#update-account {
+  float: right;
+  margin-right: 10px;
+}
+
+.not-connected circle {
+  fill: @gray_05;
+}
+
+.linked-account-details,
+.exec-details,
+.add-exec-details {
+  display: block;
+  margin-top: 4px;
+  margin-left: 72px;
+}
+
+.linked-account-details {
+  margin-right: 100px;
+}
+
+.exec-details {
+  margin-right: 30px;
+}
+
+.linked-account-name,
+.exec-name {
+  font-family: @bold;
+  font-size: 18px;
+}
+
+.linked-account-status-text,
+.exec-email {
+  font-size: 14px;
+  color: @gray_60;
+}
+
+.add-exec-text {
+  margin-top: 16px;
+  font-family: @italic;
+  font-size: 16px;
+  color: @gray_60;
+}
+
+#google,
+#linkedin {
+  float: left;
+}
+
+.connect-btn {
+  float: right;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.add-exec-circ {
+  background: @purple;
+  cursor: pointer;
+  &:hover { background: @purple_hover; }
+}
+
+.add-exec-circ.disabled {
+  background: @purple_disabled;
+  cursor: default;
+}
+
+.exec-settings-div {
+  float: right;
+  width: 24px;
+  height: 24px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.exec-settings {
+  width: 24px;
+  height: 24px;
+  path { fill: @gray_20; }
+  &:hover path { fill: @gray_30; }
+}
+
+#plus-exec {
+  width: 26px;
+  height: 26px;
+  margin-top: 14px;
+}
+
+
+/*** Places ***/
+
+.place-row { cursor: pointer; }
+
+.place-details { padding-left: 0; }
+
+.place-name {
+  font-family: @bold;
+  font-size: 18px;
+}
+
+.place-loc,
+.good-for-text {
+  font-size: 14px;
+  color: @gray_60;
+}
+
+.stats {
+  margin-top: 4px;
+  padding: 0;
+  line-height: 1.25;
+}
+
+.stat-div { width: 100%; }
+
+.stat {
+  float: left;
+  font-size: 32px;
+}
+
+.stat-text {
+  font-size: 14px;
+  color: @gray_60;
+}
+
+.last-visit,
+.visits {
+  padding-left: 0;
+}
+
+.time-ago-text {
+  display: inline-block;
+  margin-left: 8px;
+  padding-top: 8px;
+  font-size: 10px;
+  color: @gray_60;
+}
+
+.place-actions { padding: 0;}
+
+.place-actions.desktop { margin-top: 18px; }
+
+.place-action {
+  float: right;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.place-edit-div,
+.directions-div {
+  margin-left: 18px;
+  margin-bottom: 18px;
+}
+
+.place-edit,
+.directions,
+.yelp {
+  display: block;
+}
+
+.place-edit {
+  width: 30px;
+  height: 30px;
+  padding-top: 1px;
+  g { fill: @gray_20; }
+  &:hover g { fill: @purple; }
+}
+
+.directions {
+  path { fill: @gray_20; }
+  &:hover path { fill: @green; }
+}
+
+.yelp {
+  circle,
+  g path { fill: @gray_20; }
+  &:hover {
+    circle,
+    g path { fill: #c01001; }
+  }
 }
 
 
@@ -1128,7 +1383,7 @@ object {
   cursor: default;
 }
 
-#plus {
+#plus-guest {
   margin-top: 10px;
 }
 
@@ -1227,6 +1482,7 @@ object {
 .suggestion {
   cursor: pointer;
   &:hover {
+    background-color: @gray_f8;
     path.checkbox {stroke: @gray_40; }
     path.radio-outline { fill: @gray_40; }
   }

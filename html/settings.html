@@ -1,0 +1,105 @@
+<div class="container home-container">
+  <div class="clearfix">
+    <h1 class="page-title unselectable">SETTINGS</h1>
+  </div>
+  <div class="clearfix">
+    <div id="profile-title" class="settings-title">PROFILE</div>
+      <div id="user-profile" class="clearfix">
+        <!-- re-create in Javascript -->
+        <div id="left-col" class="form-group col-md-6">
+          <div id="prof-pic">
+            <div class="settings-prof-circ">R</div>
+            <button id="upload-photo" class="btn btn-default">Upload Photo</button>
+          </div>
+          <label for="first-name-group" class="text-field-label">First name</label>
+          <div id="first-name-group" class="input-group">
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                Dame <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <!-- should only display options applicable to user's gender (ex. female) -->
+                <li><a href="#">Ms.</a></li>
+                <li><a href="#">Mrs.</a></li>
+                <li><a href="#">Dr.</a></li>
+                <li><a href="#">Dame</a></li>
+              </ul>
+            </div>
+            <input type="text" id="first-name" class="form-control">
+          </div>
+          <label for="last-name" class="text-field-label">Last name</label>
+          <input type="text" id="last-name" class="form-control">
+          <!-- should automatically reflect first name until edited -->
+          <label for="preferred-name" class="text-field-label">Preferred name</label>
+          <input type="text" id="preferred-name" class="form-control">
+        </div>
+        <div id="right-col" class="form-group col-md-6">
+          <label for="email" class="text-field-label">Email address</label>
+          <input type="email" id="other-email" class="form-control">
+          <label for="username" class="text-field-label">Username</label>
+          <input type="email" id="esper-email" class="form-control" disabled>
+          <label for="password" class="text-field-label">Password</label>
+          <input type="password" id="password" class="form-control">
+          <label for="confirm-password" class="text-field-label">Confirm password</label>
+          <input type="password" id="confirm-password" class="form-control">
+        </div>
+      </div>
+      <!-- re-create in Javascript -->
+      <button id="update-account" class="btn btn-primary">Update</button>
+  </div>
+  <div id="executives-title" class="settings-title">EXECUTIVES</div>
+  <div id="executives">
+    <!-- re-create in Javascript -->
+    <div class="exec-row clearfix">
+      <div id="" class="settings-prof-circ">J</div>
+      <a href="#" data-toggle="tooltip" placement="left" title="Settings" class="exec-settings-div">
+        <img id="" class="svg exec-settings" src="/assets/img/settings.svg">
+      </a>
+      <div class="exec-details">
+        <div class="exec-name ellipsis">Joe Lonsdale</div>
+        <div class="exec-email ellipsis">joelonsdale@gmail.com</div>
+      </div>
+    </div>
+    <div class="exec-row clearfix">
+      <div id="" class="add-exec-circ disabled">
+        <img id="plus-exec" class="svg" src="/assets/img/plus.svg">
+      </div>
+      <div class="add-exec-details">
+        <div class="add-exec-text ellipsis">You may only assist one executive at this time.</div>
+      </div>
+    </div>
+    <!-- re-create in Javascript -->
+  </div>
+  <!-- everything below goes in the exec settings modal -->
+  <div id="linked-accounts-title" class="settings-title">LINKED ACCOUNTS</div>
+  <div id="linked-accounts">
+    <!-- re-create in Javascript -->
+    <div class="account-row clearfix">
+      <img id="google" class="svg" src="/assets/img/google.svg">
+      <button id="connect-google" class="connect-btn btn btn-danger">Disconnect</button>
+      <div class="linked-account-details">
+        <div class="linked-account-name">
+          <span>Google</span>
+          <span class="extended-name">Mail, Contacts, Calendar</span>
+        </div>
+        <div class="linked-account-status-text ellipsis">
+          <span id="google-status">Connected</span>
+          <span class="linked-account-email">as joelonsdale@gmail.com</span>
+        </div>
+      </div>
+    </div>
+    <div class="account-row clearfix">
+      <img id="linkedin" class="svg not-connected" src="/assets/img/linkedin.svg">
+      <button id="connect-linkedin" class="connect-btn btn btn-primary">Connect</button>
+      <div class="linked-account-details">
+        <div class="linked-account-name ellipsis">LinkedIn</div>
+        <div class="linked-account-status-text ellipsis">
+          <span id="linkedin-status">Not connected</span>
+          <span class="linked-account-email"></span>
+        </div>
+      </div>
+    </div>
+    <!-- re-create in Javascript -->
+  </div>
+  <div id="scheduling-pref-title" class="settings-title">SCHEDULING PREFERENCES</div>
+  <div id="scheduling-pref">
+</div>

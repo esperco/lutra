@@ -10,11 +10,13 @@ HTML_INCLUDES = \
   request-password.html \
   reset-password.html \
   new-task.html \
+  places.html \
   sched-step1-tab.html \
   sched-step2-tab.html \
   sched-step3-tab.html \
   sched-step4-tab.html \
-  sched-task-list.html
+  sched-task-list.html \
+  settings.html
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \

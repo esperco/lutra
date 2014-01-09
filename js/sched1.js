@@ -15,7 +15,7 @@ var sched1 = (function() {
 
     var hosts = sched.getHosts(task);
     var adder = $("<div class='add-guest-circ'>");
-    var plus = $("<img id='plus'/>");
+    var plus = $("<img id='plus-guest'/>");
     plus.appendTo(adder);
     svg.loadImg(plus, "/assets/img/plus.svg");
 
