@@ -186,13 +186,14 @@ var api = (function () {
   };
 
   mod.postSelectGooglePlace = function(uid, loc, refId) {
-    var url = api_s_prefix() + "/place/save/google/" +
-              encodeURIComponent(loc) + "/" + encodeURIComponent(refId);
+    var url = api_s_prefix() + "/place/select/google/" +
+              encodeURIComponent(loc) + "/" +
+              encodeURIComponent(refId);
     return jsonHttpPost(url, "");
   };
 
   mod.postSelectFavoritePlace = function(uid, loc) {
-    var url = api_s_prefix() + "/place/save/favorite/" +
+    var url = api_s_prefix() + "/place/select/favorite/" +
               encodeURIComponent(loc);
     return jsonHttpPost(url, "");
   };

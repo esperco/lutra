@@ -494,7 +494,6 @@ var sched2 = (function() {
       }
       if (!wroteChar) { withBold += address.charAt(i); }
     }
-    console.log(withBold.toSource());
     return withBold;
   }
 
@@ -570,7 +569,6 @@ var sched2 = (function() {
   mod.load = function(tzList, profs, task) {
     clearLocation();
     initializeGoogleMap();
-    //util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
     util.afterTyping($("#sched-step2-loc-addr"), 500, predictAddress);
     connectCalendar(tzList, profs, task);
   };
