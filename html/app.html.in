@@ -189,7 +189,7 @@
         @@all-tasks.html@@
       </div>
       <div id="scheduling-task-list">
-        @@places.html@@
+        @@sched-task-list.html@@
       </div>
       <div id="general-task-list" class="hide">
         @@gen-task-list.html@@

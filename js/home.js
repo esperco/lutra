@@ -12,7 +12,9 @@ var home = (function() {
 
   function viewOfTaskTitle(task) {
     var view = $("<div class='task clearfix'></div>");
-    var taskDetails = $("<div class='task-details'></div>")
+    var taskDetails = $("<div class='col-sm-6 task-details'></div>")
+      .appendTo(view);
+    var taskGuests = $("<div class='col-sm-6 task-guests'></div>")
       .appendTo(view);
     var title = task.task_status
       ? task.task_status.task_title
@@ -25,6 +27,15 @@ var home = (function() {
         .appendTo(taskDetails);
       $("<div class='task-status'>Status goes here.</div>")
         .appendTo(taskDetails);
+      $("<div class='task-date'></div>")
+        .append($("<span class='created'>Created </span>"))
+        .append($("<span>on </span>"))
+        .append($("<span class='created-date'>Jan 8, 2014</span>"))
+        .append($("<span> by </span>"))
+        .append($("<span class='created-by'>you</span>"))
+        .appendTo(taskDetails);
+      $("<div class='meeting-with'>Meeting with</div>")
+        .appendTo(taskGuests);
     }
 
     var archiveDiv = $("<div class='archive-div'></div>")

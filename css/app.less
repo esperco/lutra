@@ -516,16 +516,19 @@ object {
   font-family: @bold;
   font-size: 12px;
   color: @white;
-  background: @purple;
+  background: @orange;
   border-radius: 4px;
 }
 
-.task-status {
-  display: block;
+.task-status,
+.task-date,
+.meeting-with {
   color: @gray_60;
   font-size: 14px;
   line-height: 24px;
 }
+
+.created { font-family: @bold; }
 
 .archive-div {
   float: right;
@@ -1594,8 +1597,15 @@ object {
 
 /*** Animations ***/
 
+.fadeIn {
+  -webkit-animation-delay: 1s;
+     -moz-animation-delay: 1s;
+          animation-delay: 1s;
+}
+
+
 .rotate (@rotation) {
-  -webkit-animation: @rotation 0.25s;
+  -webkit-animation: @rotation 1s;
      -moz-animation: @rotation 0.25s;
           animation: @rotation 0.25s;
   -webkit-animation-fill-mode: forwards;
