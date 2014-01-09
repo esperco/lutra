@@ -9,11 +9,17 @@
     <hr class="top-divider">
     <div id="sched-step2-pref-time" class="clearfix"></div>
     <div id="sched-step2-location" class="clearfix">
-      <div class="col-sm-3" id="sched-step2-time-zone"></div>
+      <div class="hide col-sm-3" id="sched-step2-time-zone"></div>
       <div class="col-sm-9">
         <div class="location-title">Location</div>
         <input type="text" class="form-control" id="sched-step2-loc-addr"
                placeholder="address, neighborhood, city, state, or zip">
+        <div class="dropdown">
+          <a id="location-dropdown-toggle" data-toggle="dropdown"
+             class="hide dropdown-toggle" href="#"></a>
+          <ul id="location-dropdown-menu" class="dropdown-menu"
+              role="menu"></ul>
+        </div>
       </div>
     </div>
     <div id="sched-step2-google-map" class="hide"></div>
