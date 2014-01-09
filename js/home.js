@@ -10,19 +10,56 @@ var home = (function() {
     "scheduling-tasks": {ids: ["scheduling-tasks-tab-content"]}
   });
 
-  function viewOfTaskTitle(task) {
+  function viewOfTaskRow(task) {
     var view = $("<div class='task clearfix'></div>");
-    var taskDetails = $("<div class='col-sm-6 task-details'></div>")
+    var taskLeft = $("<div class='col-sm-6 task-row-left'></div>")
       .appendTo(view);
-    var taskGuests = $("<div class='col-sm-6 task-guests'></div>")
+    var taskRight = $("<div class='col-sm-6 task-row-right'></div>")
       .appendTo(view);
+
     var title = task.task_status
       ? task.task_status.task_title
       : null;
+
+    var dragDiv = $("<div class='drag-div'></div>")
+      .appendTo(taskLeft);
+    var drag = $("<img class='drag'/>")
+      .appendTo(dragDiv);
+    svg.loadImg(drag, "/assets/img/drag.svg");
+
+    var importantDiv = $("<div class='important-div'></div>")
+      .appendTo(taskLeft);
+    var importantIcon = $("<img class='important'/>")
+      .appendTo(importantDiv);
+    svg.loadImg(importantIcon, "/assets/img/important.svg");
+    importantDiv.tooltip({"title":"Mark as Important"});
+    importantDiv.click(function() {
+      if($(this).hasClass("marked")) {
+        $(this).removeClass("marked");
+      } else {
+        $(this).addClass("marked");
+      }
+    });
+
+    var archiveDivMobile = $("<div class='archive-div archive-mobile'></div>")
+      .appendTo(taskLeft);
+    var archive = $("<img class='archive'/>")
+      .appendTo(archiveDivMobile);
+    svg.loadImg(archive, "/assets/img/x.svg");
+    archiveDivMobile
+      .tooltip({"title":"Archive","placement":"left"})
+      .click(function() {
+      });
+
+    var taskDetails = $("<div class='task-details'></div>")
+      .appendTo(taskLeft);
+
     if (title) {
-      $("<div class='new-label'>NEW</div>")
+      $("<div class='new-label new-label-task'>NEW</div>")
         .appendTo(taskDetails);
-      $("<a href='#!task/" + task.tid + "' class='task-title'></a>")
+      $("<div class='updated updated-task'></div>")
+        .appendTo(taskDetails);
+      $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
       $("<div class='task-status'>Status goes here.</div>")
@@ -34,18 +71,32 @@ var home = (function() {
         .append($("<span> by </span>"))
         .append($("<span class='created-by'>you</span>"))
         .appendTo(taskDetails);
-      $("<div class='meeting-with'>Meeting with</div>")
-        .appendTo(taskGuests);
+      var taskGuest = $("<div class='task-guest'></div>")
+        .appendTo(taskRight);
+      $("<div class='task-guest-circ-line'></div>")
+        .append($("<div class='task-guest-circ unselectable'>JL</div>"))
+        .appendTo(taskGuest);
+      $("<div class='task-guest-name ellipsis'>Joe L.</div>")
+        .appendTo(taskGuest);
+      var taskGuest = $("<div class='task-guest'></div>")
+        .appendTo(taskRight);
+      $("<div class='task-guest-circ-line'></div>")
+        .append($("<div class='task-guest-circ unselectable'>CW</div>"))
+        .appendTo(taskGuest);
+      $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
+        .appendTo(taskGuest);
     }
 
-    var archiveDiv = $("<div class='archive-div'></div>")
-      .appendTo(view);
+    var archiveDivDesktop = $("<div class='archive-div archive-desktop'></div>")
+      .appendTo(taskRight);
     var archive = $("<img class='archive'/>")
-      .appendTo(archiveDiv);
+      .appendTo(archiveDivDesktop);
     svg.loadImg(archive, "/assets/img/x.svg");
-    archiveDiv.tooltip({"title":"Archive","placement":"left"})
-              .click(function() {
-    });
+    archiveDivDesktop
+      .tooltip({"title":"Archive","placement":"left"})
+      .click(function() {
+      });
+
     return view;
   }
 
@@ -54,7 +105,7 @@ var home = (function() {
     var tasksView = $("<div/>", {id:"tasks-scheduling"});
 
     list.iter(tasks, function(task) {
-      viewOfTaskTitle(task).appendTo(tasksView);
+      viewOfTaskRow(task).appendTo(tasksView);
     });
     tasksView.appendTo(view);
 
@@ -67,7 +118,7 @@ var home = (function() {
     case "Scheduling":
     default:
       // All tasks go to scheduling tab for now.
-      $("#tasks-scheduling").append(viewOfTaskTitle(task));
+      $("#tasks-scheduling").append(viewOfTaskRow(task));
       break;
     }
   }
@@ -93,7 +144,7 @@ var home = (function() {
       var initials;
       var exec = $("<div id='exec-name-div'></div>")
         .append($("<div id='assisting'>ASSISTING</div>"))
-        .append($("<div id='exec-name' class='ellipsis'>Executive Name</div>"))
+        .append($("<div id='exec-name' class='ellipsis'>Christopher W.</div>"))
         .appendTo(view);
       var caretDiv = $("<div id='exec-caret'></div>")
         .appendTo(view);

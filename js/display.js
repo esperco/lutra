@@ -6,6 +6,8 @@ var display = (function() {
   var mod = {};
 
   mod.updateHome = function() {
+
+    /*** Settings ***/
     if ($(window).width() < 500) {
       $('.linked-account-email').addClass('hide');
       $('.extended-name').addClass('hide');
@@ -14,6 +16,7 @@ var display = (function() {
       $('.extended-name').removeClass('hide');
     }
 
+    /*** Places ***/
     if ($(window).width() < 532) {
       $('.place-details')
         .removeClass('col-xs-5')
@@ -40,7 +43,7 @@ var display = (function() {
         .addClass('desktop');
     }
 
-
+    /*** Home ***/
     if ($(window).width() < 768) {
       $('#desktop-navbar').addClass('hide');
       $('#mobile-navbar').removeClass('hide');
@@ -65,6 +68,19 @@ var display = (function() {
     } else {
       $('.desktop-nav-tabs').removeClass('hide');
       $('.mobile-nav-tabs').addClass('hide');
+    }
+
+    /*** Lists ***/
+    if ($(window).width() < 768) {
+      $('.task-row-left').addClass('mobile');
+      $('.task-row-right').addClass('mobile');
+      $('.archive-desktop').addClass('hide');
+      $('.archive-mobile').removeClass('hide');
+    } else {
+      $('.task-row-left').removeClass('mobile');
+      $('.task-row-right').removeClass('mobile');
+      $('.archive-desktop').removeClass('hide');
+      $('.archive-mobile').addClass('hide');
     }
   };
 

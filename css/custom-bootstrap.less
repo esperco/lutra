@@ -28,8 +28,8 @@
 @purple_disabled: #e8d9ee;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
-@red: #e53030;
-@red_hover: #bf2121;
+@red: #d9534f;
+@red_hover: #d2322d;
 @white: #ffffff;
 
 /* set a max-width for horizontal fluid layout and make it centered */
@@ -237,24 +237,26 @@ fieldset[disabled] .btn-primary.active {
   margin-bottom: 0;
 }
 .nav-tabs {
-  border: none;
   width: 100%;
+  border: none;
 }
 .nav-tabs > li > a {
-  color: @gray_60;
   margin: 0;
+  color: @purple;
   border: none;
   border-radius: 0;
 }
 .nav-tabs > li > a:hover {
-  color: @gray_90;
+  color: @purple_hover;
   border: none;
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: @purple;
+  padding-bottom: 2px;
+  color: @gray_90;
   border: none;
+  border-bottom: 2px solid @purple;
   border-radius: 0;
 }
 /*** Dropdown Menu ***/
