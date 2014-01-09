@@ -1,8 +1,13 @@
 /*** Fonts ***/
-@light: "Proxima Nova Light";
-@regular: "Proxima Nova Regular";
-@italic: "Proxima Nova Regular Italic";
-@bold: "Proxima Nova Semibold";
+@light: "Open Sans Light";
+@regular: "Open Sans Regular";
+@italic: "Open Sans Italic";
+@bold: "Open Sans Semibold";
+// @light: "Proxima Nova Light";
+// @regular: "Proxima Nova Regular";
+// @italic: "Proxima Nova Regular Italic";
+// @bold: "Proxima Nova Semibold";
+
 
 /*** Colors ***/
 @gray_f8: #f8f8f8;
@@ -769,6 +774,12 @@ object {
   font-family: @light;
   font-size: 20px;
   letter-spacing: 3px;
+}
+
+.login-error {
+  -webkit-animation: login_error 1s;
+     -moz-animation: login_error 1s;
+          animation: login_error 1s;
 }
 
 
@@ -1594,6 +1605,19 @@ object {
 
 /*** Animations ***/
 
+@-moz-keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+@-webkit-keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+@keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+
 .rotate (@rotation) {
   -webkit-animation: @rotation 0.25s;
      -moz-animation: @rotation 0.25s;
@@ -1607,53 +1631,53 @@ object {
 }
 
 @-moz-keyframes rotate_ccw_180 {
-    from { -moz-transform: rotate(180deg); }
-    to { -moz-transform: rotate(0deg); }
+  from { -moz-transform: rotate(180deg); }
+  to { -moz-transform: rotate(0deg); }
 }
 @-webkit-keyframes rotate_ccw_180 {
-    from { -webkit-transform: rotate(180deg); }
-    to { -webkit-transform: rotate(0deg); }
+  from { -webkit-transform: rotate(180deg); }
+  to { -webkit-transform: rotate(0deg); }
 }
 @keyframes rotate_ccw_180 {
-    from {transform:rotate(180deg);}
-    to {transform:rotate(0deg);}
+  from {transform:rotate(180deg);}
+  to {transform:rotate(0deg);}
 }
 
 @-moz-keyframes rotate_cw_180 {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(180deg); }
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(180deg); }
 }
 @-webkit-keyframes rotate_cw_180 {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(180deg); }
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(180deg); }
 }
 @keyframes rotate_cw_180 {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(180deg);}
+  from {transform:rotate(0deg);}
+  to {transform:rotate(180deg);}
 }
 
 @-moz-keyframes rotate_ccw_45 {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(-45deg); }
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(-45deg); }
 }
 @-webkit-keyframes rotate_ccw_45 {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(-45deg); }
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(-45deg); }
 }
 @keyframes rotate_ccw_45 {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(-45deg);}
+  from {transform:rotate(0deg);}
+  to {transform:rotate(-45deg);}
 }
 
 @-moz-keyframes rotate_cw_45 {
-    from { -moz-transform: rotate(-45deg); }
-    to { -moz-transform: rotate(0deg); }
+  from { -moz-transform: rotate(-45deg); }
+  to { -moz-transform: rotate(0deg); }
 }
 @-webkit-keyframes rotate_cw_45 {
-    from { -webkit-transform: rotate(-45deg); }
-    to { -webkit-transform: rotate(0deg); }
+  from { -webkit-transform: rotate(-45deg); }
+  to { -webkit-transform: rotate(0deg); }
 }
 @keyframes rotate_cw_45 {
-    from {transform:rotate(-45deg);}
-    to {transform:rotate(0deg);}
+  from {transform:rotate(-45deg);}
+  to {transform:rotate(0deg);}
 }
