@@ -197,8 +197,11 @@ var sched1 = (function() {
       .append(nameView);
 
     if (sched.isGuest(uid)) {
-      var remove = $("<img class='remove-guest'/>")
+      var removeDiv = $("<div class='remove-guest-div'>")
+        .tooltip({"title":"Remove guest"})
         .appendTo(view);
+      var remove = $("<img class='remove-guest'/>")
+        .appendTo(removeDiv);
       svg.loadImg(remove, "/assets/img/x.svg")
         .then(function(elt) {
           elt.click(function() {

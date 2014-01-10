@@ -84,8 +84,6 @@ object {
       text-overflow: ellipsis;
 }
 
-.svg { display: block; }
-
 .fill-div .dropdown-title {
   float: left;
 }
@@ -598,7 +596,7 @@ object {
   font-size: 14px;
 }
 
-.created { font-family: @bold; }
+.verb { font-family: @bold; }
 
 .task-exec,
 .task-guest {
@@ -1556,14 +1554,18 @@ object {
   margin-bottom: 5px;
 }
 
-.remove-guest {
+.remove-guest-div {
   float: right;
   margin-top: 20px;
-  path { fill: @gray_10; }
-  &:hover { cursor: pointer;
-    path { fill: @gray_20; }
+  &:hover {
+    cursor: pointer;
+    .remove-guest path { fill: @red; }
   }
 }
+
+.remove-guest { display: block; }
+
+.remove-guest path { fill: @gray_20; }
 
 
 /*** Scheduling Step 2 ***/

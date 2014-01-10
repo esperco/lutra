@@ -74,11 +74,13 @@ var display = (function() {
     if ($(window).width() < 360) {
       $('.task-exec').addClass('mobile');
       $('.task-guest').addClass('mobile');
+      // $('.created-by').addClass('hide');
       $('.task-exec-name').addClass('hide');
       $('.task-guest-name').addClass('hide');
     } else {
       $('.task-exec').removeClass('mobile');
       $('.task-guest').removeClass('mobile');
+      // $('.created-by').removeClass('hide');
       $('.task-exec-name').removeClass('hide');
       $('.task-guest-name').removeClass('hide');
     }
@@ -97,6 +99,12 @@ var display = (function() {
   };
 
   mod.updateTask = function() {
+    if ($(window).width() < 620) {
+      $('.send-message-text').addClass('hide');
+    } else {
+      $('.send-message-text').removeClass('hide');
+    }
+
     if ($(window).width() < 1040) {
       $('#task-navbar')
         .addClass('chat-closed')
@@ -123,12 +131,6 @@ var display = (function() {
       $('#chat').removeClass('hide');
       $('#chat-icon-container').addClass('hide');
       $('#task-content').addClass('split-screen');
-    }
-
-    if ($(window).width() < 620) {
-      $('.send-message-text').addClass('hide');
-    } else {
-      $('.send-message-text').removeClass('hide');
     }
   };
 

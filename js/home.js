@@ -65,11 +65,10 @@ var home = (function() {
       $("<div class='task-status'>Status goes here.</div>")
         .appendTo(taskDetails);
       $("<div class='task-date'></div>")
-        .append($("<span class='created'>Created </span>"))
+        .append($("<span class='verb'>Created </span>"))
         .append($("<span>on </span>"))
-        .append($("<span class='created-date'>May 30, 2014</span>"))
-        .append($("<span> by </span>"))
-        .append($("<span class='created-by'>you</span>"))
+        .append($("<span class='update-date'>May 30, 2014 at 12:55 pm</span>"))
+        .append($("<span class='update-author'> by Christopher</span>"))
         .appendTo(taskDetails);
 
       var exec = $("<div class='task-exec'></div>")
