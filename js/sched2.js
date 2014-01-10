@@ -519,8 +519,8 @@ var sched2 = (function() {
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
             api.postSelectFavoritePlace(leaderUid, item.loc.address)
-              .done(function(loc) {
-                timeZoneDropdown.set(loc.timezone);
+              .done(function(place) {
+                timeZoneDropdown.set(place.loc.timezone);
                 $('#location-dropdown-toggle').dropdown("toggle");
               });
             return false;
@@ -544,8 +544,8 @@ var sched2 = (function() {
         .click(function() {
           $("#sched-step2-loc-addr").val(item.description);
           api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
-            .done(function(loc) {
-              timeZoneDropdown.set(loc.timezone);
+            .done(function(place) {
+              timeZoneDropdown.set(place.loc.timezone);
               $('#location-dropdown-toggle').dropdown("toggle");
             });
           return false;
