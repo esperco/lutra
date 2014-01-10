@@ -21,6 +21,7 @@ Mac:
 brew install gawk
 brew install npm
 npm install -g less
+npm install -g uglify-js
 ```
 
 Build instructions

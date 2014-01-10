@@ -57,7 +57,7 @@ includes-prod.html: Makefile mkloader
 
 # Production: concatenate all files into one for speed
 prod.js: $(SOURCES)
-	cat $(SOURCES) | uglifyjs > $@
+	cat $(SOURCES) | uglifyjs -o $@
 
 dev-install:
 	mkdir -p ../pub/js
