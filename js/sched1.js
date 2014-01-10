@@ -163,11 +163,11 @@ var sched1 = (function() {
         .then(function(prof) {
           prof.full_name = name;
           prof.familiar_name = name;
-          if (nameInput.prop("disabled") == true) {
+          if (prof.editable) {
+            api.postProfile(prof).then(addProfile(uid, prof));
+          } else {
             // Bug fix: No need to post profile if name cannot be updated
             addProfile(uid, prof);
-          } else {
-            api.postProfile(prof).then(addProfile(uid, prof));
           }
         });
       clearAddGuest();
