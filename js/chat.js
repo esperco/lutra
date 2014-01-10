@@ -59,8 +59,7 @@ var chat = (function () {
     for (var i in sel.sel_choices) {
       qs.append($("<li/>").append(sel.sel_choices[i].sel_label));
     }
-    var v = $("<div/>");
-    v.append(sel.sel_text);
+    var v = viewOfChatText(sel.sel_text);
     v.append(qs);
     return v;
   }
