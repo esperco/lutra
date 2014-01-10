@@ -71,7 +71,19 @@ var display = (function() {
     }
 
     /*** Lists ***/
-    if ($(window).width() < 768) {
+    if ($(window).width() < 360) {
+      $('.task-exec').addClass('mobile');
+      $('.task-guest').addClass('mobile');
+      $('.task-exec-name').addClass('hide');
+      $('.task-guest-name').addClass('hide');
+    } else {
+      $('.task-exec').removeClass('mobile');
+      $('.task-guest').removeClass('mobile');
+      $('.task-exec-name').removeClass('hide');
+      $('.task-guest-name').removeClass('hide');
+    }
+
+    if ($(window).width() < 992) {
       $('.task-row-left').addClass('mobile');
       $('.task-row-right').addClass('mobile');
       $('.archive-desktop').addClass('hide');

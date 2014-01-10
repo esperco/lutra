@@ -514,7 +514,10 @@ object {
 .task-row-left.mobile { padding-right: 0; }
 
 .task-row-right { padding-right: 0; }
-.task-row-right.mobile { padding-left: 62px; }
+.task-row-right.mobile {
+  padding-top: 13px;
+  padding-left: 62px;
+}
 
 .task-details {
   display: block;
@@ -589,26 +592,36 @@ object {
 }
 
 .task-status,
-.task-date,
-.meeting-with {
+.task-date {
+  margin-top: 3px;
   color: @gray_60;
   font-size: 14px;
-  line-height: 24px;
 }
 
 .created { font-family: @bold; }
 
+.task-exec,
 .task-guest {
-  display: inline-block;
   width: 100px;
-  margin-top: 3px;
   text-align: center;
 }
 
+.task-exec.mobile,
+.task-guest.mobile {
+  width: 40px;
+  .task-exec-circ,
+  .task-guest-circ { margin-left: 0; }
+}
+
+.task-exec { float: left; }
+.task-guest { display: inline-block; }
+
+.task-exec-circ-line,
 .task-guest-circ-line {
   width: 100%;
 }
 
+.task-exec-circ,
 .task-guest-circ {
   width: 40px;
   height: 40px;
@@ -623,11 +636,17 @@ object {
   background-color: @gray_60;
 }
 
+.task-exec-name,
 .task-guest-name {
   display: block;
-  margin-top: 5px;
+  margin-top: 6px;
   font-family: @bold;
   font-size: 12px;
+}
+
+.with-div {
+  float: left;
+  margin: 11px;
 }
 
 .archive-div {

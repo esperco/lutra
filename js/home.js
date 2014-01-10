@@ -12,9 +12,9 @@ var home = (function() {
 
   function viewOfTaskRow(task) {
     var view = $("<div class='task clearfix'></div>");
-    var taskLeft = $("<div class='col-sm-6 task-row-left'></div>")
+    var taskLeft = $("<div class='col-md-6 task-row-left'></div>")
       .appendTo(view);
-    var taskRight = $("<div class='col-sm-6 task-row-right'></div>")
+    var taskRight = $("<div class='col-md-6 task-row-right'></div>")
       .appendTo(view);
 
     var title = task.task_status
@@ -67,17 +67,25 @@ var home = (function() {
       $("<div class='task-date'></div>")
         .append($("<span class='created'>Created </span>"))
         .append($("<span>on </span>"))
-        .append($("<span class='created-date'>Jan 8, 2014</span>"))
+        .append($("<span class='created-date'>May 30, 2014</span>"))
         .append($("<span> by </span>"))
         .append($("<span class='created-by'>you</span>"))
         .appendTo(taskDetails);
-      var taskGuest = $("<div class='task-guest'></div>")
+
+      var exec = $("<div class='task-exec'></div>")
         .appendTo(taskRight);
-      $("<div class='task-guest-circ-line'></div>")
-        .append($("<div class='task-guest-circ unselectable'>JL</div>"))
-        .appendTo(taskGuest);
-      $("<div class='task-guest-name ellipsis'>Joe L.</div>")
-        .appendTo(taskGuest);
+      $("<div class='task-exec-circ-line'></div>")
+        .append($("<div class='task-exec-circ unselectable'>JL</div>"))
+        .appendTo(exec);
+      $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
+        .appendTo(exec);
+
+      var withDiv = $("<div class='with-div'></div>")
+        .appendTo(taskRight);
+      var withIcon = $("<img class='with'/>")
+        .appendTo(withDiv);
+      svg.loadImg(withIcon, "/assets/img/with.svg");
+
       var taskGuest = $("<div class='task-guest'></div>")
         .appendTo(taskRight);
       $("<div class='task-guest-circ-line'></div>")
