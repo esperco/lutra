@@ -95,12 +95,30 @@ var chat = (function () {
            .text("Left a voice message.");
   }
 
+  function viewOfChatText(text) {
+    var view = $("<div/>");
+    var paragraphs = text.split(/\n{2,}/);
+    for (var ip in paragraphs) {
+      var p = $("<p/>");
+      var lines = paragraphs[ip].split(/\n/);
+      if (0 < lines.length) {
+        p.text(lines[0]);
+        for (var il = 1; il < lines.length; ++il) {
+          p.append("<br/>");
+          p.append(document.createTextNode(lines[il]));
+        }
+      }
+      view.append(p);
+    }
+    return view;
+  }
+
   function viewOfChatData(chat_item) {
     var kind = chat_item.chat_item_data[0];
     var data = chat_item.chat_item_data[1];
     switch (kind) {
     case "Message":
-      return $("<span/>").text(data);
+      return viewOfChatText(data);
     case "Audio":
       return audioPlayer(data);
     case "Selector_q":
@@ -113,7 +131,7 @@ var chat = (function () {
       return viewOfCalendarOptions($("<ul/>"), data.selected);
     case "Sched_confirm":
     case "Sched_remind":
-      return $("<span/>").text(data.body);
+      return viewOfChatText(data.body);
     default:
       return $("<i/>").text(kind);
     }
