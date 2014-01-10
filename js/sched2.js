@@ -469,10 +469,107 @@ var sched2 = (function() {
       })
   }
 
+  function saveLocationSelection(loc, refId) {
+    api.postPlaceDetails(leaderUid, loc, refId)
+      .done(function() { });
+  }
+
+  /* Boy does this function suck. Hooray for imperative programming!
+   * If you can think of a better way to write this, be my guest! */
+  function highlight(address, matches) {
+    var withBold = "";
+    for (var i = 0; i < address.length; i++) {
+      var c = address[i];
+      var wroteChar = false;
+      for (var j = 0; j < matches.length; j++) {
+        if (i == matches[j][0] + matches[j][1]) {
+          withBold += "</b>";
+        }
+        if (i == 0 && matches[j][0] == 0) {
+          withBold += "<b>";
+        } else if (i == matches[j][0] - 1) {
+          withBold += address.charAt(i) + "<b>";
+          wroteChar = true;
+        }
+      }
+      if (!wroteChar) { withBold += address.charAt(i); }
+    }
+    return withBold;
+  }
+
+  function displayPredictionsDropdown(predictions) {
+    if (predictions.from_favorites.length == 0
+        && predictions.from_google.length == 0) return;
+    var leaderUid = login.data.team.team_leaders[0];
+    var menu = $("#location-dropdown-menu");
+    menu.children().remove();
+
+    if (predictions.from_favorites.length > 0) {
+      $('<li role="presentation" class="dropdown-header"/>')
+        .text("Favorite Locations")
+        .appendTo(menu);
+
+      list.iter(predictions.from_favorites, function(item) {
+        var bolded = highlight(item.loc.address, [item.matched_substring]);
+        var li = $('<li role="presentation"/>')
+          .appendTo(menu);
+        $('<a role="menuitem" tabindex="-1" href="#"/>')
+          .html(bolded)
+          .appendTo(li)
+          .click(function() {
+            $("#sched-step2-loc-addr").val(item.loc.address);
+            api.postSelectFavoritePlace(leaderUid, item.loc.address)
+              .done(function(loc) {
+                timeZoneDropdown.set(loc.timezone);
+                $('#location-dropdown-toggle').dropdown("toggle");
+              });
+            return false;
+          });
+      });
+      $('<li role="presentation" class="divider"/>')
+        .appendTo(menu);
+    }
+
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Suggestions from Google")
+      .appendTo(menu);
+
+    list.iter(predictions.from_google, function(item) {
+      var bolded = highlight(item.description, item.matched_substrings);
+      var li = $('<li role="presentation"/>')
+        .appendTo(menu);
+      $('<a role="menuitem" tabindex="-1" href="#"/>')
+        .html(bolded)
+        .appendTo(li)
+        .click(function() {
+          $("#sched-step2-loc-addr").val(item.description);
+          api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
+            .done(function(loc) {
+              timeZoneDropdown.set(loc.timezone);
+              $('#location-dropdown-toggle').dropdown("toggle");
+            });
+          return false;
+        });
+    });
+
+    var toggle = $('#location-dropdown-toggle');
+    if (!toggle.parent().hasClass('open')) {
+      toggle.dropdown("toggle");
+    }
+  }
+
+  function predictAddress() {
+    var address = $("#sched-step2-loc-addr").val();
+    if (address == "") return;
+    var leaderUid = login.data.team.team_leaders[0];
+    api.getPlacePredictions(leaderUid, address)
+      .done(displayPredictionsDropdown);
+  }
+
   mod.load = function(tzList, profs, task) {
     clearLocation();
     initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 1000, geocodeAddress);
+    util.afterTyping($("#sched-step2-loc-addr"), 500, predictAddress);
     connectCalendar(tzList, profs, task);
   };
 
