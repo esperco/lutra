@@ -36,6 +36,24 @@ var chat = (function () {
     }
   }
 
+  function viewOfChatText(text) {
+    var view = $("<div/>");
+    var paragraphs = text.split(/\n{2,}/);
+    for (var ip in paragraphs) {
+      var p = $("<p/>");
+      var lines = paragraphs[ip].split(/\n/);
+      if (0 < lines.length) {
+        p.text(lines[0]);
+        for (var il = 1; il < lines.length; ++il) {
+          p.append("<br/>");
+          p.append(document.createTextNode(lines[il]));
+        }
+      }
+      view.append(p);
+    }
+    return view;
+  }
+
   function viewOfSelectQuestion(sel) {
     var qs = $("<ol/>");
     for (var i in sel.sel_choices) {
@@ -84,8 +102,7 @@ var chat = (function () {
   }
 
   function viewOfSchedulingQuestion(q) {
-    var v = $("<div/>");
-    v.append(q.body);
+    var v = viewOfChatText(q.body);
     v.append(viewOfCalendarOptions($("<ol/>", {type:"A"}), q.choices));
     return v;
   }
@@ -93,24 +110,6 @@ var chat = (function () {
   function audioPlayer(audioLink) {
     return $("<audio/>", {src:audioLink, controls:true})
            .text("Left a voice message.");
-  }
-
-  function viewOfChatText(text) {
-    var view = $("<div/>");
-    var paragraphs = text.split(/\n{2,}/);
-    for (var ip in paragraphs) {
-      var p = $("<p/>");
-      var lines = paragraphs[ip].split(/\n/);
-      if (0 < lines.length) {
-        p.text(lines[0]);
-        for (var il = 1; il < lines.length; ++il) {
-          p.append("<br/>");
-          p.append(document.createTextNode(lines[il]));
-        }
-      }
-      view.append(p);
-    }
-    return view;
   }
 
   function viewOfChatData(chat_item) {
