@@ -142,6 +142,20 @@ var sched1 = (function() {
       updateAddButton();
     });
 
+    function addProfile(uid, prof) {
+      profile.set(prof); /* update cache */
+      updateAddButton(hosts, guestTbl);
+      addGuest(task, guestTbl, uid)
+        .then(function(profs) {
+          guestsContainer
+            .append(rowViewOfParticipant(profs, task, guestTbl, uid,
+                                         updateAddGuestAbility));
+          updateAddGuestAbility();
+          saveGuests(task, hosts, guestTbl);
+          updateNextButton(hosts, guestTbl);
+        });
+    }
+
     addButton.click(function() {
       var name = nameInput.val();
       var uid = optUid;
@@ -149,20 +163,12 @@ var sched1 = (function() {
         .then(function(prof) {
           prof.full_name = name;
           prof.familiar_name = name;
-          api.postProfile(prof)
-            .then(function() {
-              profile.set(prof); /* update cache */
-              updateAddButton(hosts, guestTbl);
-              addGuest(task, guestTbl, uid)
-                .then(function(profs) {
-                  guestsContainer
-                    .append(rowViewOfParticipant(profs, task, guestTbl, uid,
-                                                 updateAddGuestAbility));
-                  updateAddGuestAbility();
-                  saveGuests(task, hosts, guestTbl);
-                  updateNextButton(hosts, guestTbl);
-                });
-            });
+          if (nameInput.prop("disabled") == true) {
+            // Bug fix: No need to post profile if name cannot be updated
+            addProfile(uid, prof);
+          } else {
+            api.postProfile(prof).then(addProfile(uid, prof));
+          }
         });
       clearAddGuest();
     });
