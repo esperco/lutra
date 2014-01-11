@@ -36,13 +36,30 @@ var chat = (function () {
     }
   }
 
+  function viewOfChatText(text) {
+    var view = $("<div/>");
+    var paragraphs = text.split(/\n{2,}/);
+    for (var ip in paragraphs) {
+      var p = $("<p/>");
+      var lines = paragraphs[ip].split(/\n/);
+      if (0 < lines.length) {
+        p.text(lines[0]);
+        for (var il = 1; il < lines.length; ++il) {
+          p.append("<br/>");
+          p.append(document.createTextNode(lines[il]));
+        }
+      }
+      view.append(p);
+    }
+    return view;
+  }
+
   function viewOfSelectQuestion(sel) {
     var qs = $("<ol/>");
     for (var i in sel.sel_choices) {
-      qs.append($("<li/>").append(sel.sel_choices[i].sel_label));
+      qs.append($("<li/>").text(sel.sel_choices[i].sel_label));
     }
-    var v = $("<div/>");
-    v.append(sel.sel_text);
+    var v = viewOfChatText(sel.sel_text);
     v.append(qs);
     return v;
   }
@@ -70,7 +87,7 @@ var chat = (function () {
 
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
-    v.append(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
     v.append($("<br/>"));
     appendLocation(v, slot.location);
     return v;
@@ -84,8 +101,7 @@ var chat = (function () {
   }
 
   function viewOfSchedulingQuestion(q) {
-    var v = $("<div/>");
-    v.append(q.body);
+    var v = viewOfChatText(q.body);
     v.append(viewOfCalendarOptions($("<ol/>", {type:"A"}), q.choices));
     return v;
   }
@@ -93,24 +109,6 @@ var chat = (function () {
   function audioPlayer(audioLink) {
     return $("<audio/>", {src:audioLink, controls:true})
            .text("Left a voice message.");
-  }
-
-  function viewOfChatText(text) {
-    var view = $("<div/>");
-    var paragraphs = text.split(/\n{2,}/);
-    for (var ip in paragraphs) {
-      var p = $("<p/>");
-      var lines = paragraphs[ip].split(/\n/);
-      if (0 < lines.length) {
-        p.text(lines[0]);
-        for (var il = 1; il < lines.length; ++il) {
-          p.append("<br/>");
-          p.append(document.createTextNode(lines[il]));
-        }
-      }
-      view.append(p);
-    }
-    return view;
   }
 
   function viewOfChatData(chat_item) {
@@ -124,7 +122,7 @@ var chat = (function () {
     case "Selector_q":
       return viewOfSelectQuestion(data);
     case "Selector_r":
-      return selectedAnswers(data.sel_selected);
+      return $("<span/>").text(selectedAnswers(data.sel_selected));
     case "Scheduling_q":
       return viewOfSchedulingQuestion(data);
     case "Scheduling_r":
