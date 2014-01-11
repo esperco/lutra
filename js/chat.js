@@ -57,7 +57,7 @@ var chat = (function () {
   function viewOfSelectQuestion(sel) {
     var qs = $("<ol/>");
     for (var i in sel.sel_choices) {
-      qs.append($("<li/>").append(sel.sel_choices[i].sel_label));
+      qs.append($("<li/>").text(sel.sel_choices[i].sel_label));
     }
     var v = viewOfChatText(sel.sel_text);
     v.append(qs);
@@ -87,7 +87,7 @@ var chat = (function () {
 
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
-    v.append(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
     v.append($("<br/>"));
     appendLocation(v, slot.location);
     return v;
@@ -122,7 +122,7 @@ var chat = (function () {
     case "Selector_q":
       return viewOfSelectQuestion(data);
     case "Selector_r":
-      return selectedAnswers(data.sel_selected);
+      return $("<span/>").text(selectedAnswers(data.sel_selected));
     case "Scheduling_q":
       return viewOfSchedulingQuestion(data);
     case "Scheduling_r":
