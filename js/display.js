@@ -116,7 +116,7 @@ var display = (function() {
         .addClass('chat-closed')
         .removeClass('chat-open');
       $('#chat').addClass('hide');
-      $('#chat-icon-container').removeClass('hide');
+      // $('#chat-icon-container').removeClass('hide');
       $('#task-content').removeClass('split-screen');
     } else {
       $('#task-navbar')
@@ -129,7 +129,7 @@ var display = (function() {
         .addClass('chat-open')
         .removeClass('chat-closed');
       $('#chat').removeClass('hide');
-      $('#chat-icon-container').addClass('hide');
+      // $('#chat-icon-container').addClass('hide');
       $('#task-content').addClass('split-screen');
     }
   };

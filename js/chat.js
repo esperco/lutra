@@ -428,6 +428,14 @@ var chat = (function () {
 
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
+    $('[rel=popover]').popover({
+      html: true,
+      'data-placement': 'bottom',
+      placement: 'bottom',
+      content: function(){
+        return $($(this).data('contentwrapper')).html();
+      }
+    });
 
     var tabs = $(".chat-profile-tabs");
     var tab_content = $(".chat-panel");

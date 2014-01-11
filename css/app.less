@@ -1,12 +1,12 @@
 /*** Fonts ***/
-@light: "Open Sans Light";
-@regular: "Open Sans Regular";
-@italic: "Open Sans Italic";
-@bold: "Open Sans Semibold";
-// @light: "Proxima Nova Light";
-// @regular: "Proxima Nova Regular";
-// @italic: "Proxima Nova Regular Italic";
-// @bold: "Proxima Nova Semibold";
+// @light: "Open Sans Light";
+// @regular: "Open Sans Regular";
+// @italic: "Open Sans Italic";
+// @bold: "Open Sans Semibold";
+@light: "Proxima Nova Light";
+@regular: "Proxima Nova Regular";
+@italic: "Proxima Nova Regular Italic";
+@bold: "Proxima Nova Semibold";
 
 
 /*** Colors ***/
@@ -17,6 +17,7 @@
 @gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
+@gray_80: #58595b;
 @gray_90: #414042;
 @green: #2bb673;
 @green_hover: #1e9b5c;
@@ -343,7 +344,7 @@ object {
 }
 
 #task-navbar.chat-open {
-  right: @chat_width;
+  right: 0;
   border-right: 1px solid @gray_20;
 }
 
@@ -700,7 +701,7 @@ object {
 
 .new-task-footer.chat-open,
 .sched-footer.chat-open {
-  right: @chat_width;
+  right: 0;
   border-right: 1px solid @gray_20;
 }
 
@@ -809,7 +810,7 @@ object {
 }
 
 .split-screen {
-  margin-right: @chat_width;
+  // margin-right: @chat_width;
   border-left: none;
   border-right: 1px solid @gray_20;
 }
@@ -1199,19 +1200,20 @@ object {
 }
 
 #chat {
-  position: fixed;
-  width: @chat_width;
-  top: 0;
-  right: 0;
+  display: none;
+  // position: fixed;
+  // width: @chat_width;
+  // top: 0;
+  // right: 0;
   padding-left: 0;
   padding-right: 0;
 }
 
 #chat-header {
-  position: fixed;
+  // position: fixed;
   z-index: 1030;
   height: 60px;
-  width: 100%;
+  // width: 100%;
   background: rgba(248,248,248,0.9);
 }
 
@@ -1284,19 +1286,19 @@ object {
 }
 
 .chat-panel {
-  position: fixed;
-  width: @chat_width;
-  top: 60px;
-  bottom: 0;
+  // position: fixed;
+  // width: @chat_width;
+  // top: 60px;
+  // bottom: 0;
   padding-left: 15px;
   padding-right: 15px;
   overflow-y: auto;
 }
 
 .chat-profile-details {
-  position: fixed;
+  // position: fixed;
   z-index: 1030;
-  width: 100%;
+  // width: 100%;
   height: 40px;
   margin-left: -15px;
   margin-right: -15px;
@@ -1341,11 +1343,11 @@ object {
 }
 
 .chat-footer {
-  position: fixed;
+  // position: fixed;
   z-index: 1030;
-  width: @chat_width;
-  right: 0;
-  bottom: 0;
+  // width: @chat_width;
+  // right: 0;
+  // bottom: 0;
   padding-top: 0;
   padding-left: 0;
   padding-right: 0;

@@ -4,14 +4,14 @@
 */
 
 /*** Fonts ***/
-@light: "Open Sans Light";
-@regular: "Open Sans Regular";
-@italic: "Open Sans Italic";
-@bold: "Open Sans Semibold";
-// @light: "Proxima Nova Light";
-// @regular: "Proxima Nova Regular";
-// @italic: "Proxima Nova Regular Italic";
-// @bold: "Proxima Nova Semibold";
+// @light: "Open Sans Light";
+// @regular: "Open Sans Regular";
+// @italic: "Open Sans Italic";
+// @bold: "Open Sans Semibold";
+@light: "Proxima Nova Light";
+@regular: "Proxima Nova Regular";
+@italic: "Proxima Nova Regular Italic";
+@bold: "Proxima Nova Semibold";
 
 /*** Colors ***/
 @gray_05: #f1f2f2;
@@ -20,6 +20,7 @@
 @gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
+@gray_80: #58595b;
 @gray_90: #414042;
 @green: #2bb673;
 @orange: #f7941e;
@@ -31,6 +32,10 @@
 @red: #d9534f;
 @red_hover: #d2322d;
 @white: #ffffff;
+
+/*** Measurements ***/
+@chat_width: 420px;
+
 
 /* set a max-width for horizontal fluid layout and make it centered */
 .container {
@@ -315,3 +320,20 @@ hr {
   margin-bottom: 15px;
   border-top: 1px solid @gray_10;
 }
+
+.popover {
+  position: relative;
+  float: right;
+  max-width: @chat_width;
+}
+
+.popover.bottom .arrow {
+  margin-left: 235px;
+}
+
+.popover-content {
+  top: 90px;
+  right: 30px;
+  padding: 0;
+}
+

@@ -228,7 +228,8 @@
             <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
           </a>
           <p id="task-title" class="nav-title unselectable ellipsis"></p>
-          <a id="chat-icon-container">
+          <a href="javascript: void(0)" id="chat-icon-container"
+             data-contentwrapper="#chat" rel="popover">
             <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
           </a>
         </div>
