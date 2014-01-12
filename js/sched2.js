@@ -109,16 +109,31 @@ var sched2 = (function() {
       updateContButton();
     }
 
-    list.iter(x.suggestions, function(slot, k) {
-      var slotView = $("<div class='suggestion' />");
+    /* sort by increasing date */
+    var suggestions =
+      x.suggestions.sort(function(x1, x2) {
+        var d1 = date.ofString(x1.slot.start).getTime();
+        var d2 = date.ofString(x2.slot.start).getTime();
+        if (d1 < d2)
+          return -1;
+        else if (d1 === d2)
+          return 0;
+        else
+          return 1;
+      });
+
+    list.iter(suggestions, function(res, k) {
+      var score = res.score;
+      var slot = res.slot;
+      var slotView = $("<div class='suggestion'/>");
       var checkbox = $("<img class='suggestion-checkbox'/>")
         .appendTo(slotView);
       svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-      var sugDetails = sched.viewOfSuggestion(slot);
+      var sugDetails = sched.viewOfSuggestion(slot, score);
       var editTooltip = $("<a class='suggestion-edit-div'/>")
         .tooltip({"title":"Edit","placement":"left"})
         .appendTo(slotView);
-      var edit = $("<img class='suggestion-edit' />")
+      var edit = $("<img class='suggestion-edit'/>")
         .appendTo(editTooltip);
       svg.loadImg(edit, "/assets/img/edit.svg");
       edit.click(function() {

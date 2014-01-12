@@ -68,21 +68,27 @@ var sched = (function() {
       return "";
   }
 
-  mod.viewOfSuggestion = function(x) {
+  mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
 
     var t1 = date.ofString(x.start);
     var t2 = date.ofString(x.end);
 
-    var row1 = $("<div class='day-text' />")
-      .text(date.weekDay(t1))
+    var row1 = $("<div class='day-text'/>")
+      .text(date.weekDay(t1) + " ")
       .appendTo(view);
 
-    var row2 = $("<div class='date-text' />")
+    if (score >= 0.75) {
+      $("<span style='color:#ff0'/>")
+        .addClass("glyphicon glyphicon-star")
+        .appendTo(row1);
+    }
+
+    var row2 = $("<div class='date-text'/>")
       .text(date.dateOnly(t1))
       .appendTo(view);
 
-    var row3 = $("<div class='time-text' />")
+    var row3 = $("<div class='time-text'/>")
       .append(html.text("from "))
       .append($("<b>").text(date.timeOnly(t1)))
       .append(html.text(" to "))
@@ -90,7 +96,7 @@ var sched = (function() {
       .appendTo(view);
 
     var locText = mod.locationText(x.location);
-    var locDiv = $("<div class='loc-text' />");
+    var locDiv = $("<div class='loc-text'/>");
     var pin = $("<img class='pin'/>");
       pin.appendTo(locDiv);
     svg.loadImg(pin, "/assets/img/pin.svg");
