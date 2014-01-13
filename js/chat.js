@@ -271,11 +271,11 @@ var chat = (function () {
       toField.append(" " + chat_participant_names(chat));
     }
 
-    var v = $("<div class='chat-editor'/>")
-      .appendTo(chatFooter);
+    // var v = $("<div class='chat-editor'/>")
+    //   .appendTo(chatFooter);
 
     var editText = $("<textarea class='form-control chat-entry'></textarea>")
-      .appendTo(v);
+      .appendTo(chatFooter);
 
     editText.autosize();
 
@@ -289,10 +289,10 @@ var chat = (function () {
 
     var choicesEditor = editChoices();
     choicesEditor.hide();
-    v.append(choicesEditor);
+    chatFooter.append(choicesEditor);
 
     var chatActions = $("<div class='chat-actions clearfix'/>")
-      .appendTo(v);
+      .appendTo(chatFooter);
     var selChoicesDiv = $("<div class='col-xs-10 offer-choices'/>")
       .appendTo(chatActions);
     var sendDiv = $("<div class='col-xs-2 chat-send'/>")
@@ -307,18 +307,35 @@ var chat = (function () {
     });
     selChoicesDiv.append(selChoicesLabel);
 
-    selChoicesDiv.click(function () {
-      if (selChoicesDiv.hasClass("checkbox-selected")) {
-        selChoicesDiv.removeClass("checkbox-selected");
-        util.cancelFocus();
-      } else {
-        selChoicesDiv.addClass("checkbox-selected");
-        var first = choicesEditor.children().eq(0).find("input");
-        util.changeFocus(first);
-      }
-      choicesEditor.toggle();
-      util.focus();
+    $(document).ready(function() {
+      $(document).on("click", selChoicesDiv, function() {
+        if (selChoicesDiv.hasClass("checkbox-selected")) {
+          selChoicesDiv.removeClass("checkbox-selected");
+          util.cancelFocus();
+        } else {
+          selChoicesDiv.addClass("checkbox-selected");
+          var first = choicesEditor.children().eq(0).find("input");
+          util.changeFocus(first);
+        }
+        choicesEditor.toggle();
+        util.focus();
+      });
     });
+
+    
+
+    // selChoicesDiv.click(function () {
+    //   if (selChoicesDiv.hasClass("checkbox-selected")) {
+    //     selChoicesDiv.removeClass("checkbox-selected");
+    //     util.cancelFocus();
+    //   } else {
+    //     selChoicesDiv.addClass("checkbox-selected");
+    //     var first = choicesEditor.children().eq(0).find("input");
+    //     util.changeFocus(first);
+    //   }
+    //   choicesEditor.toggle();
+    //   util.focus();
+    // });
 
     var sendButton = $("<button/>")
       .addClass('btn btn-primary chat-send-btn disabled')
@@ -414,10 +431,8 @@ var chat = (function () {
       messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    var editor = chatEditor(messages, chat, task);
-
     v.append(messages)
-     .append(editor);
+     .append(chatEditor(messages, chat, task));
 
     return v;
   }
