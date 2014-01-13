@@ -134,11 +134,11 @@ var sched1 = (function() {
         $("#add-guest-btn").addClass("disabled");
     }
 
-    util.afterTyping(emailInput, 500, function() {
+    util.afterTyping(emailInput, 250, function() {
       fetchProfile();
     });
 
-    util.afterTyping(nameInput, 500, function() {
+    util.afterTyping(nameInput, 250, function() {
       updateAddButton();
     });
 

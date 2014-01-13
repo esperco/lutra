@@ -569,7 +569,7 @@ var sched2 = (function() {
   mod.load = function(tzList, profs, task) {
     clearLocation();
     initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 500, predictAddress);
+    util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
     connectCalendar(tzList, profs, task);
   };
 

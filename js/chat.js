@@ -274,7 +274,7 @@ var chat = (function () {
     var v = $("<div class='chat-editor'/>")
       .appendTo(chatFooter);
 
-    var editText = $("<textarea class='form-control chat-entry'><textarea/>")
+    var editText = $("<textarea class='form-control chat-entry'></textarea>")
       .appendTo(v);
 
     editText.autosize();
@@ -326,9 +326,12 @@ var chat = (function () {
       .appendTo(sendDiv);
 
     editText.on("keyup", function (e){
+      log("Here1");
       if ($(this).val() !== "") {
+        log("Here2");
         sendButton.removeClass("disabled");
       } else {
+        log("Here3");
         sendButton.addClass("disabled");
       }
     });
@@ -426,9 +429,9 @@ var chat = (function () {
 
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
+
     $('[rel=popover]').popover({
       html: true,
-      'data-placement': 'bottom',
       placement: 'bottom',
       content: function(){
         return $($(this).data('contentwrapper')).html();

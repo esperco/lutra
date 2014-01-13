@@ -234,6 +234,14 @@
           </a>
         </div>
 
+        <div id="chat">
+          <div id="chat-header">
+            <ul class="nav chat-tabs chat-profile-tabs"></ul>
+            <!-- <div class="chat-profile-details-div"></div> -->
+          </div>
+          <div class="tab-content chat-panel"></div>
+        </div>
+
         <div id="new-task">
           @@new-task.html@@
         </div>
@@ -253,16 +261,7 @@
           </div>
         </div>
 
-        <div id="gen-task" class="container task-container hide"></div>
-
-      </div>
-
-      <div id="chat">
-        <div id="chat-header">
-          <ul class="nav chat-tabs chat-profile-tabs"></ul>
-          <!-- <div class="chat-profile-details-div"></div> -->
-        </div>
-        <div class="tab-content chat-panel"></div>
+        <div id="gen-task" class="hide"></div>
       </div>
 
     </div>

@@ -348,13 +348,14 @@ object {
   border-right: 1px solid @gray_20;
 }
 
-
-#chat-icon {
+#chat-icon-container {
   float: right;
+  width: 28px;
+  height: 24px;
   margin-right: 16px;
   margin-top: 20px;
   cursor: pointer;
-  &:hover path { fill: @purple_hover; }
+  &:hover #chat-icon path { fill: @purple_hover; }
 }
 
 
@@ -1212,9 +1213,9 @@ object {
 #chat-header {
   // position: fixed;
   z-index: 1030;
-  height: 60px;
+  // height: 60px;
   // width: 100%;
-  background: rgba(248,248,248,0.9);
+  // background: rgba(248,248,248,0.9);
 }
 
 .chat-profile-tabs {
@@ -1250,6 +1251,10 @@ object {
   &:hover { color: @gray_90;
     .chat-prof-circ { background: @gray_20; }
   }
+}
+
+.chat-tabs {
+  height: 60px;
 }
 
 .chat-tabs > li {
@@ -1290,9 +1295,9 @@ object {
   // width: @chat_width;
   // top: 60px;
   // bottom: 0;
-  padding-left: 15px;
-  padding-right: 15px;
-  overflow-y: auto;
+  // padding-left: 15px;
+  // padding-right: 15px;
+  // overflow-y: auto;
 }
 
 .chat-profile-details {
@@ -1300,8 +1305,6 @@ object {
   z-index: 1030;
   // width: 100%;
   height: 40px;
-  margin-left: -15px;
-  margin-right: -15px;
   padding-top: 10px;
   padding-left: 15px;
   font-family: @bold;
@@ -1310,7 +1313,8 @@ object {
 }
 
 .messages {
-  padding-top: 55px;
+  height: 100% - 160px;
+  padding: 15px;
 }
 
 .message-header {
@@ -1444,11 +1448,10 @@ object {
   width: 18px;
 }
 
-.offer-choices-label,
-.offer-choices-label-short {
+.offer-choices-label {
   float: left;
   margin-top: 5px;
-  margin-left: 10px;
+  margin-left: 5px;
   font-size: 14px;
   cursor: pointer;
 }

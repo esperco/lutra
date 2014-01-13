@@ -74,13 +74,11 @@ var display = (function() {
     if ($(window).width() < 360) {
       $('.task-exec').addClass('mobile');
       $('.task-guest').addClass('mobile');
-      // $('.created-by').addClass('hide');
       $('.task-exec-name').addClass('hide');
       $('.task-guest-name').addClass('hide');
     } else {
       $('.task-exec').removeClass('mobile');
       $('.task-guest').removeClass('mobile');
-      // $('.created-by').removeClass('hide');
       $('.task-exec-name').removeClass('hide');
       $('.task-guest-name').removeClass('hide');
     }
@@ -157,6 +155,16 @@ var display = (function() {
   mod.init = function() {
     mod.checkWidth();
     $(window).resize(mod.checkWidth);
+    $("[data-toggle='tooltip']").tooltip();
+    $("[rel='popover']").tooltip();
+    $('body').on('click', function (e) {
+      $('[rel=popover]').each(function () {
+        if (!$(this).is(e.target) && $(this).has(e.target).length === 0
+            && $('.popover').has(e.target).length === 0) {
+              $(this).popover('hide');
+        }
+      });
+    });
   };
 
   return mod;

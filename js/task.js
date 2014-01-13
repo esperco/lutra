@@ -180,7 +180,7 @@ var task = (function() {
         $("#workflow-sched").prop("checked", true);
       }
       updateUI();
-      util.afterTyping(newTaskTitle, 500, updateUI);
+      util.afterTyping(newTaskTitle, 250, updateUI);
       util.changeFocus(newTaskTitle);
     }
 
