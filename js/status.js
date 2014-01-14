@@ -42,7 +42,7 @@ var status = (function() {
         var msg = util.isString(optMsg) ? optMsg : jqXHR.responseText;
         mod.reportError(msg);
       }
-    }
+    };
   };
 
   /* Any click in the browser's window hides the status area */

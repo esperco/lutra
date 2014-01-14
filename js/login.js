@@ -16,7 +16,6 @@ var login = (function() {
   };
 
   mod.setLoginInfo = function(login) {
-    log("login.setLoginInfo");
     if (login.teams[0])
       login.team = login.teams[0];
 
@@ -38,7 +37,6 @@ var login = (function() {
     Get API secret from the server, and more.
   */
   mod.login = function (email, password) {
-    log("login.login");
     return api.login(email, password)
       .then(mod.setLoginInfo,
             status.onError(400));

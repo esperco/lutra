@@ -58,11 +58,11 @@ var api = (function () {
     return jsonHttp("POST", url, body);
   }
 
-  function jsonHttpPUT(url, body) {
+  function jsonHttpPut(url, body) {
     return jsonHttp("PUT", url, body);
   }
 
-  function jsonHttpDELETE(url) {
+  function jsonHttpDelete(url) {
     return jsonHttp("DELETE", url, null);
   }
 
@@ -116,7 +116,7 @@ var api = (function () {
   };
 
   mod.deleteTask = function(tid) {
-    return jsonHttpDELETE(api_q_prefix() + "/task/" + tid);
+    return jsonHttpDelete(api_q_prefix() + "/task/" + tid);
   };
 
   mod.createTask = function(task) {
