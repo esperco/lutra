@@ -10,21 +10,30 @@ var api = (function () {
 
   function jsonHttp(method, url, body) {
 
-    // Common error handling
-    function onError(xhr, textStatus, err) {
+    function logError(xhr, textStatus, err) {
+      var details = {
+        code: xhr.status,
+        textStatus: textStatus,
+        method: method,
+        url: url,
+        reqBody: body,
+        respBody: xhr.responseText
+      };
       switch (xhr.status) {
-      case 401: // Unauthorized - redirect to login screen
-        route.login();
+      case 400:
+        log("Bad request", details);
         break;
-      default:
-        var details = {
-          code: xhr.status,
-          method: method,
-          url: url,
-          reqBody: body,
-          respBody: xhr.responseText
-        };
-        status.reportError("Please try again later.", details);
+      case 401:
+        log("Unauthorized", details);
+        break;
+      case 404:
+        log("Not found", details);
+        break;
+      case 500: /* Server error */
+        log("Server error", details);
+        break;
+      default: /* Fallback */
+        log("Unknown error " + xhr.status, details);
       }
     }
 
@@ -38,7 +47,7 @@ var api = (function () {
       dataType: "json",
       beforeSend: login.setHttpHeaders(url)
     })
-      .fail(onError);
+      .fail(logError);
   }
 
   function jsonHttpGet(url) {

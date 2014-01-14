@@ -14,6 +14,8 @@
 
   <body>
 
+    <div id="global-status" class="hide"></div>
+
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
       <li>
