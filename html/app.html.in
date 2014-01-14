@@ -231,7 +231,7 @@
           </a>
           <p id="task-title" class="nav-title unselectable ellipsis"></p>
           <a href="javascript: void(0)" id="chat-icon-container"
-             data-contentwrapper="#chat" rel="popover">
+             data-trigger="click" data-contentwrapper="#chat" rel="popover">
             <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
           </a>
         </div>
