@@ -1332,13 +1332,14 @@ object {
 }
 
 .messages {
-  height: 100% - 160px;
+  height: 300px;
   padding: 15px;
 }
 
+.messages.group-chat { height: 270px; }
+
 .blank-chat {
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding-top: 80px;
   text-align: center;
   color: @gray_40;
 }
@@ -1398,6 +1399,7 @@ object {
   padding-left: 15px;
   color: @white;
   background: @orange;
+  border-bottom: 1px solid @gray_20;
 }
 
 .chat-entry {

@@ -269,10 +269,8 @@ var chat = (function () {
         .appendTo(chatFooter);
       toField.append($("<b>To:</b>"));
       toField.append(" " + chat_participant_names(chat));
+      messages.addClass("group-chat");
     }
-
-    // var v = $("<div class='chat-editor'/>")
-    //   .appendTo(chatFooter);
 
     var editText = $("<textarea class='form-control chat-entry'></textarea>")
       .appendTo(chatFooter);
