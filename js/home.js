@@ -16,13 +16,10 @@ var home = (function() {
       .appendTo(view);
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
     checkbox.click(function() {
-      log("testing1");
       if (checkbox.hasClass("checkbox-selected")) {
-        log("testing2");
         checkbox.removeClass("checkbox-selected");
       }
       else {
-        log("testing3");
         checkbox.addClass("checkbox-selected");
       }
     })
@@ -64,7 +61,7 @@ var home = (function() {
     var view = $("#scheduling-tasks-tab-content");
     view.children().remove();
     api.loadActiveTasks()
-      .fail(status.onError(404))
+      .fail(status_.onError(404))
       .then(function(data) {
         viewOfTaskQueue(data.tasks)
           .appendTo(view);
