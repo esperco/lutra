@@ -43,7 +43,7 @@ html {
 }
 
 body {
-  background-color: @white;
+  background: @white;
   color: @gray_90;
   font-family: @regular, Arial;
   font-size: 16px;
@@ -108,7 +108,7 @@ object {
   position: fixed;
   height: 100%;
   width: 220px;
-  background-color: @gray_90;
+  background: @gray_90;
   overflow-y: auto;
 }
 
@@ -163,7 +163,7 @@ object {
 }
 
 #mobile-navbar-collapse {
-  background-color: @gray_90;
+  background: @gray_90;
   box-shadow: 0 10px 10px @gray_60;
 }
 
@@ -171,9 +171,9 @@ object {
   margin: 0;
   padding: 20px 15px;
   height: 80px;
-  background-color: @purple;
+  background: @purple;
   &:hover {
-    background-color: @purple_hover;
+    background: @purple_hover;
     cursor: pointer;
   }
   #exec-circ-outline {
@@ -224,14 +224,14 @@ object {
   margin: 0;
   height: 60px;
   color: @gray_20;
-  background-color: #282828;
+  background: #282828;
 }
 
 .nav-section-line {
   margin-top: 40px;
   margin-bottom: 20px;
   height: 1px;
-  background-color: #58595b;
+  background: #58595b;
 }
 
 .nav-section-title {
@@ -241,7 +241,7 @@ object {
   padding-left: 8px;
   padding-right: 8px;
   color: @white;
-  background-color: @gray_90;
+  background: @gray_90;
   font-family: @light;
   letter-spacing: 3px;
 }
@@ -305,7 +305,7 @@ object {
 
 #important-icon path { stroke: @gray_60; }
 
-.account-block:hover { background-color: #282828 !important; }
+.account-block:hover { background: #282828 !important; }
 
 .account-block:hover {
   #settings-icon path,
@@ -382,14 +382,14 @@ object {
 .sched-step3-row {
   padding: 10px;
   border-bottom: 1px solid @gray_10;
-  &:hover { background-color: @gray_f8; }
+  &:hover { background: @gray_f8; }
 }
 
 .account-row,
 .exec-row {
   padding: 15px 10px;
   border-bottom: 1px solid @gray_10;
-  &:hover { background-color: @gray_f8; }
+  &:hover { background: @gray_f8; }
 }
 
 .sched-step3-row {
@@ -534,7 +534,7 @@ object {
   border-bottom: 1px solid;
   border-bottom-color: @gray_10;
   &:hover {
-    background-color: @gray_f8;
+    background: @gray_f8;
     .archive path { fill: @gray_20; }
   }
 }
@@ -663,7 +663,7 @@ object {
   font-family: @light;
   font-size: 18px;
   color: @white;
-  background-color: @gray_60;
+  background: @gray_60;
 }
 
 .task-exec-name,
@@ -856,11 +856,11 @@ object {
   height: 24px;
   width: 24px;
   border-radius: 12px;
-  background-color: @gray_10;
+  background: @gray_10;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   &:hover {
-    background-color: @gray_20;
+    background: @gray_20;
     cursor: pointer;
   }
 }
@@ -977,7 +977,7 @@ object {
   font-family: @light;
   font-size: 32px;
   color: @white;
-  background-color: @gray_60;
+  background: @gray_60;
 }
 
 #upload-photo {
@@ -1232,30 +1232,20 @@ object {
 
 #chat {
   display: none;
-  // position: fixed;
-  // width: @chat_width;
-  // top: 0;
-  // right: 0;
   padding-left: 0;
   padding-right: 0;
 }
 
 #chat-header {
-  // position: fixed;
   z-index: 1030;
-  // height: 60px;
-  // width: 100%;
-  // background: rgba(248,248,248,0.9);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background: @gray_f8;
 }
 
 .chat-profile-tabs {
-  height: 60px;
+  height: 54px;
   border-bottom: 1px solid @gray_20;
-}
-
-.chat-tab-div {
-  height: 60px;
-  width: 60px;
 }
 
 .chat-prof-circ {
@@ -1273,37 +1263,41 @@ object {
 }
 
 .prof-caret {
+  display: block;
+  margin-top: 6px;
   margin-left: 9px;
 }
 
 .tab-name {
+  padding-top: 12px !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 18px !important;
   color: @gray_90;
   &:hover { color: @gray_90;
     .chat-prof-circ { background: @gray_20; }
   }
 }
 
-.chat-tabs {
-  height: 60px;
-}
-
 .chat-tabs > li {
   float: left;
 }
 
-.chat-tabs > li > a {
-  height: 60px;
-  padding-top: 15px;
-}
 .chat-tabs > li > a:hover {
-  background-color: @gray_10;
-  border-bottom: 1px solid @gray_20;
+  background: none;
 }
+
+.chat-tabs > li > a .prof-caret path,
+.chat-tabs > li > a:hover .prof-caret path {
+  fill: none;
+  stroke: none;
+}
+
 .chat-tabs > li.active > a,
 .chat-tabs > li.active > a:hover,
 .chat-tabs > li.active > a:focus {
   cursor: default;
-  background-color: @gray_60;
+  background: none;
   border: none;
 }
 
@@ -1311,40 +1305,49 @@ object {
 .chat-tabs > li.active > a:hover .prof-caret path,
 .chat-tabs > li.active > a:focus .prof-caret path {
   fill: @white;
+  stroke: @gray_20;
 }
 
 .chat-tabs > li.active > a .chat-prof-circ,
 .chat-tabs > li.active > a:hover .chat-prof-circ,
 .chat-tabs > li.active > a:focus .chat-prof-circ {
-  color: @gray_90;
-  background-color: @white;
+  color: @white;
+  background: @gray_60;
 }
 
-.chat-panel {
-  // position: fixed;
-  // width: @chat_width;
-  // top: 60px;
-  // bottom: 0;
-  // padding-left: 15px;
-  // padding-right: 15px;
-  // overflow-y: auto;
+.chat-tabs > li.active > a .group g,
+.chat-tabs > li.active > a:hover .group g,
+.chat-tabs > li.active > a:focus .group g {
+  fill: @white;
 }
 
 .chat-profile-details {
-  // position: fixed;
   z-index: 1030;
-  // width: 100%;
   height: 40px;
   padding-top: 10px;
   padding-left: 15px;
   font-family: @bold;
-  background-color: @white;
+  background: @white;
   border-bottom: 1px solid @gray_20;
 }
 
 .messages {
   height: 100% - 160px;
   padding: 15px;
+}
+
+.blank-chat {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+  color: @gray_40;
+}
+
+.blank-chat-icon {
+  display: block;
+  margin-left: 130px;
+  margin-bottom: 10px;
+  path { fill: @gray_20; }
 }
 
 .message-header {
@@ -1378,8 +1381,10 @@ object {
 
 .chat-footer {
   padding: 15px;
+  background: @gray_f8;
   border-top: 1px solid @gray_20;
-  background: rgba(248,248,248,0.9);
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .to-field {
@@ -1392,8 +1397,7 @@ object {
   padding-right: 15px;
   padding-left: 15px;
   color: @white;
-  background-color: @gray_60;
-  border-top: 1px solid @gray_20;
+  background: @orange;
 }
 
 .chat-entry {
@@ -1420,7 +1424,7 @@ object {
   margin-left: -28px;
   height: 18px;
   width: 18px;
-  background-color: @white;
+  background: @white;
   border-radius: 9px;
   border: 2px solid @gray_20;
   float: left;
@@ -1505,7 +1509,7 @@ object {
 }
 
 .list-prof-circ {
-  background-color: @gray_60;
+  background: @gray_60;
 }
 
 .initials {
@@ -1522,16 +1526,16 @@ object {
 }
 
 .add-guest-circ {
-  background-color: @purple;
+  background: @purple;
   &:hover {
-    background-color: @purple_hover;
+    background: @purple_hover;
     cursor: pointer;
   }
 }
 
 .add-guest-disabled,
 .add-guest-disabled:hover {
-  background-color: @purple_disabled !important;
+  background: @purple_disabled !important;
   cursor: default;
 }
 
@@ -1540,16 +1544,16 @@ object {
 }
 
 .cancel {
-  background-color: @red !important;
+  background: @red !important;
   .rotate(rotate_ccw_45);
   &:hover {
-    background-color: @red_hover !important;
+    background: @red_hover !important;
     cursor: pointer;
   }
 }
 
 .return-to-add {
-  background-color: @purple;
+  background: @purple;
   .rotate(rotate_cw_45);
 }
 
@@ -1638,7 +1642,7 @@ object {
 .suggestion {
   cursor: pointer;
   &:hover {
-    background-color: @gray_f8;
+    background: @gray_f8;
     path.checkbox {stroke: @gray_40; }
     path.radio-outline { fill: @gray_40; }
   }

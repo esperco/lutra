@@ -307,22 +307,21 @@ var chat = (function () {
     });
     selChoicesDiv.append(selChoicesLabel);
 
-    $(document).ready(function() {
-      $(document).on("click", selChoicesDiv, function() {
-        if (selChoicesDiv.hasClass("checkbox-selected")) {
-          selChoicesDiv.removeClass("checkbox-selected");
-          util.cancelFocus();
-        } else {
-          selChoicesDiv.addClass("checkbox-selected");
-          var first = choicesEditor.children().eq(0).find("input");
-          util.changeFocus(first);
-        }
-        choicesEditor.toggle();
-        util.focus();
-      });
+    selChoicesDiv.click(function() {
+      log("working");
+      if (selChoicesDiv.hasClass("checkbox-selected")) {
+        log("deselecting");
+        selChoicesDiv.removeClass("checkbox-selected");
+        util.cancelFocus();
+      } else {
+        log("selecting");
+        selChoicesDiv.addClass("checkbox-selected");
+        var first = choicesEditor.children().eq(0).find("input");
+        util.changeFocus(first);
+      }
+      choicesEditor.toggle();
+      util.focus();
     });
-
-    
 
     // selChoicesDiv.click(function () {
     //   if (selChoicesDiv.hasClass("checkbox-selected")) {
@@ -417,18 +416,27 @@ var chat = (function () {
       displayName.append(chat_participant_names(chat));
     }
 
-    var messages = $("<div class='messages scrollable'><div/>");
+    var messages = $("<div class='messages scrollable'></div>");
 
-    for (var i in chat.chat_items) {
-      var item = chat.chat_items[i];
-      var status;
-      if (! item.time_read && item.id && me !== item.by) {
-        api.postChatItemRead(item.chatid, item.id);
-        status = "Read";
-      } else {
-        status = statusOfChatItem(item);
+    if (chat.chat_items.length === 0) {
+      var blank = $("<div class='blank-chat'></div>")
+        .appendTo(messages);
+      var blankChatIcon = $("<img class='blank-chat-icon'/>")
+        .appendTo(blank);
+      svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
+      blank.append("Start the conversation below.");
+    } else {
+      for (var i in chat.chat_items) {
+        var item = chat.chat_items[i];
+        var status;
+        if (! item.time_read && item.id && me !== item.by) {
+          api.postChatItemRead(item.chatid, item.id);
+          status = "Read";
+        } else {
+          status = statusOfChatItem(item);
+        }
+        messages.append(viewOfChatItem(item, item.time_created, status));
       }
-      messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
     v.append(messages)

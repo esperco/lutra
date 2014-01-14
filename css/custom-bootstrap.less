@@ -14,6 +14,7 @@
 @bold: "Proxima Nova Semibold";
 
 /*** Colors ***/
+@gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
@@ -284,13 +285,13 @@ fieldset[disabled] .btn-primary.active {
 .form-control {
   color: @gray_60;
   height: 32px;
-  border: 2px solid @gray_20;
+  border: 1px solid @gray_20;
   border-radius: 3px;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
 .form-control:hover {
-  border: 2px solid @gray_40;
+  border: 1px solid @gray_40;
 }
 .form-control:focus {
   border-color: @purple_focus;
@@ -311,32 +312,32 @@ fieldset[disabled] .form-control {
 .modal-header {
   border-bottom: 1px solid @gray_10;
 }
-/*** Other ***/
+/*** Popover + Tooltip ***/
+.popover {
+  min-width: @chat_width !important;
+  top: 48px !important;
+  left: 100% !important;
+  margin-left: -@chat_width;
+  padding: 0;
+}
+.popover.bottom .arrow {
+  margin-left: 121px;
+}
+.popover.bottom .arrow:after {
+  border-bottom-color: @gray_f8;
+}
+.popover-content {
+  padding: 0 !important;
+}
 .tooltip {
   z-index: 1050;
 }
 .tooltip-inner {
   border-radius: 0;
 }
+/*** Other ***/
 hr {
   margin-top: 15px;
   margin-bottom: 15px;
   border-top: 1px solid @gray_10;
 }
-
-.popover {
-  min-width: @chat_width !important;
-  top: 48px !important;
-  left: 100% !important;
-  margin-left: -@chat_width - 2px;
-  padding: 0;
-}
-
-.popover.bottom .arrow {
-  margin-left: 121px;
-}
-
-.popover-content {
-  padding: 0 !important;
-}
-
