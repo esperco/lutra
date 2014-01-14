@@ -21,7 +21,7 @@ SOURCES = \
   variant.js \
   date.js \
   timeonly.js \
-  status.js \
+  status_.js \
   unixtime.js \
   email.js \
   cache.js \

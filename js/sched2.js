@@ -43,7 +43,7 @@ var sched2 = (function() {
       .fail(function() {
         suggestionArea.show("idle");
       })
-      .fail(status.onError(500, "Oops, something went wrong."));
+      .fail(status_.onError(500, "Oops, something went wrong."));
   }
 
   function clearLocation() {

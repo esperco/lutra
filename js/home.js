@@ -61,7 +61,7 @@ var home = (function() {
     var view = $("#scheduling-tasks-tab-content");
     view.children().remove();
     api.loadActiveTasks()
-      .fail(status.onError(404))
+      .fail(status_.onError(404))
       .then(function(data) {
         viewOfTaskQueue(data.tasks)
           .appendTo(view);
