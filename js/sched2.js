@@ -35,9 +35,10 @@ var sched2 = (function() {
   }
 
   function getLocation() {
+    var addr = $("#sched-step2-loc-addr").val();
     return {
-      title: "",
-      address: $("#sched-step2-loc-addr").val(),
+      title: addr,
+      address: addr,
       instructions: "",
       timezone: timeZoneDropdown.get()
     };
