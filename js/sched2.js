@@ -19,14 +19,31 @@ var sched2 = (function() {
   // Set in initializeGoogleMap, used by geocodeAddress
   var addressMarker = null;
 
+  var suggestionArea = show.create({
+    idle: { ids: ["sched-step2-idle"] },
+    busy: { ids: ["sched-step2-busy"] },
+    noResults: { ids: ["sched-step2-no-results"] },
+    suggestions: { ids: ["sched-step2-suggestions"] },
+  });
+
   function loadSuggestions(profs, task, meetingParam) {
     clearSuggestions();
     var state = sched.getState(task);
     state.meeting_request = meetingParam;
+    suggestionArea.show("busy");
     api.getSuggestions(meetingParam)
       .done(function(x) {
-        refreshSuggestions(profs, task, x);
-      });
+        if (x.suggestions.length === 0)
+          suggestionArea.show("noResults");
+        else {
+          refreshSuggestions(profs, task, x);
+          suggestionArea.show("suggestions");
+        }
+      })
+      .fail(function() {
+        suggestionArea.show("idle");
+      })
+      .fail(status.onError(500, "Oops, something went wrong."));
   }
 
   function clearLocation() {
@@ -58,6 +75,7 @@ var sched2 = (function() {
   function clearSuggestions() {
     $(".sched-step2-next").addClass("disabled");
     $("#sched-step2-suggestions").children().remove();
+    suggestionArea.show("idle");
   }
 
   function refreshSuggestions(profs, task, x) {
