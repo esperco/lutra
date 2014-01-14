@@ -64,7 +64,8 @@ var home = (function() {
     var view = $("#scheduling-tasks-tab-content");
     view.children().remove();
     api.loadActiveTasks()
-      .done(function(data) {
+      .fail(status.onError(404))
+      .then(function(data) {
         viewOfTaskQueue(data.tasks)
           .appendTo(view);
         task.onTaskCreated.observe("scheduling-tab", taskCreated);

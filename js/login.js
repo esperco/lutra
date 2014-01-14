@@ -13,9 +13,10 @@ var login = (function() {
     else
       store.remove("login");
     mod.updateView();
-  }
+  };
 
   mod.setLoginInfo = function(login) {
+    log("login.setLoginInfo");
     if (login.teams[0])
       login.team = login.teams[0];
 
@@ -23,7 +24,7 @@ var login = (function() {
     store.set("login", login);
     mod.data = login;
     mod.updateView();
-  }
+  };
 
   mod.clearLoginInfo = function() {
     store.remove("login");
@@ -31,19 +32,21 @@ var login = (function() {
     $("#login-email").val("");
     $("#login-password").val("");
     mod.updateView();
-  }
+  };
 
   /*
     Get API secret from the server, and more.
   */
   mod.login = function (email, password) {
+    log("login.login");
     return api.login(email, password)
-      .then(mod.setLoginInfo);
-  }
+      .then(mod.setLoginInfo,
+            status.onError(400));
+  };
 
   mod.logout = function () {
     mod.clearLoginInfo();
-  }
+  };
 
   /*
     Set HTTP headers for authentication, assuming the user is logged in.
@@ -69,7 +72,7 @@ var login = (function() {
         jqXHR.setRequestHeader("Esper-Signature", signature);
       }
     }
-  }
+  };
 
   mod.updateView = function() {
     if (mod.data && mod.data.email) {
@@ -80,7 +83,7 @@ var login = (function() {
       $(".logged-in").addClass("hide");
       $(".logged-out").removeClass("hide");
     }
-  }
+  };
 
   /* Utilities */
   mod.me = function() {
