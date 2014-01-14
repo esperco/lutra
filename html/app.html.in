@@ -215,6 +215,7 @@
     </div>
 
     <div id="test-page" class="hide test-page">
+
       <div class="navbar-push container scrollable">
         <div id="test-content" class="row">
         </div>
@@ -222,49 +223,46 @@
     </div>
 
     <div id="task-page" class="hide task-page">
+      <div id="task-navbar">
+        <a href="#">
+          <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
+        </a>
+        <p id="task-title" class="nav-title unselectable ellipsis"></p>
+        <a id="chat-icon-container">
+          <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
+        </a>
+      </div>
 
-      <div id="task-content" class="scrollable">
-
-        <div id="task-navbar">
-          <a href="#">
-            <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
-          </a>
-          <p id="task-title" class="nav-title unselectable ellipsis"></p>
-          <a href="javascript: void(0)" id="chat-icon-container"
-             data-trigger="click" data-contentwrapper="#chat" rel="popover">
-            <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
-          </a>
-        </div>
-
-        <div id="chat">
+      <div id="chat" class="animated fadeInRight premiere">
+        <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
+        <div id="chat-container">
           <div id="chat-header">
             <ul class="nav chat-tabs chat-profile-tabs"></ul>
-            <!-- <div class="chat-profile-details-div"></div> -->
           </div>
           <div class="tab-content chat-panel"></div>
         </div>
-
-        <div id="new-task">
-          @@new-task.html@@
-        </div>
-
-        <div id="sched-task" class="hide">
-          <div id="sched-step1-tab" class="hide">
-            @@sched-step1-tab.html@@
-          </div>
-          <div id="sched-step2-tab" class="hide">
-            @@sched-step2-tab.html@@
-          </div>
-          <div id="sched-step3-tab" class="hide">
-            @@sched-step3-tab.html@@
-          </div>
-          <div id="sched-step4-tab" class="hide">
-            @@sched-step4-tab.html@@
-          </div>
-        </div>
-
-        <div id="gen-task" class="hide"></div>
       </div>
+
+      <div id="new-task">
+        @@new-task.html@@
+      </div>
+
+      <div id="sched-task" class="hide">
+        <div id="sched-step1-tab" class="hide">
+          @@sched-step1-tab.html@@
+        </div>
+        <div id="sched-step2-tab" class="hide">
+          @@sched-step2-tab.html@@
+        </div>
+        <div id="sched-step3-tab" class="hide">
+          @@sched-step3-tab.html@@
+        </div>
+        <div id="sched-step4-tab" class="hide">
+          @@sched-step4-tab.html@@
+        </div>
+      </div>
+
+      <div id="gen-task" class="hide"></div>
 
     </div>
 

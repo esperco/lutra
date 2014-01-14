@@ -173,7 +173,7 @@ var chat = (function () {
       .appendTo(editDiv);
     v.append(editDiv);
 
-    edit.keydown(function (e) {
+    edit.keyup(function (e) {
       switch (e.which) {
       case 13:
         if (edit.val() !== "") {
@@ -262,15 +262,7 @@ var chat = (function () {
   }
 
   function chatEditor(messages, chat, task) {
-    var chatFooter = $("<div class='chat-footer'/>");
-
-    if (chat.chatid === task.task_context_chat) {
-      var toField = $("<div class='to-field'/>")
-        .appendTo(chatFooter);
-      toField.append($("<b>To:</b>"));
-      toField.append(" " + chat_participant_names(chat));
-      messages.addClass("group-chat");
-    }
+    var chatFooter = $("<div class='chat-footer scrollable'/>");
 
     var editText = $("<textarea class='form-control chat-entry'></textarea>")
       .appendTo(chatFooter);
@@ -305,14 +297,11 @@ var chat = (function () {
     });
     selChoicesDiv.append(selChoicesLabel);
 
-    selChoicesDiv.click(function() {
-      log("working");
+    selChoicesDiv.click(function () {
       if (selChoicesDiv.hasClass("checkbox-selected")) {
-        log("deselecting");
         selChoicesDiv.removeClass("checkbox-selected");
         util.cancelFocus();
       } else {
-        log("selecting");
         selChoicesDiv.addClass("checkbox-selected");
         var first = choicesEditor.children().eq(0).find("input");
         util.changeFocus(first);
@@ -321,25 +310,12 @@ var chat = (function () {
       util.focus();
     });
 
-    // selChoicesDiv.click(function () {
-    //   if (selChoicesDiv.hasClass("checkbox-selected")) {
-    //     selChoicesDiv.removeClass("checkbox-selected");
-    //     util.cancelFocus();
-    //   } else {
-    //     selChoicesDiv.addClass("checkbox-selected");
-    //     var first = choicesEditor.children().eq(0).find("input");
-    //     util.changeFocus(first);
-    //   }
-    //   choicesEditor.toggle();
-    //   util.focus();
-    // });
-
     var sendButton = $("<button/>")
       .addClass('btn btn-primary chat-send-btn disabled')
       .text("Send")
       .appendTo(sendDiv);
 
-    editText.on("keyup", function (e){
+    editText.on("keydown", function (e){
       log("Here1");
       if ($(this).val() !== "") {
         log("Here2");
@@ -414,7 +390,8 @@ var chat = (function () {
       displayName.append(chat_participant_names(chat));
     }
 
-    var messages = $("<div class='messages scrollable'></div>");
+    var messages = $("<div class='messages scrollable'></div>")
+      .appendTo(v);
 
     if (chat.chat_items.length === 0) {
       var blank = $("<div class='blank-chat'></div>")
@@ -437,8 +414,15 @@ var chat = (function () {
       }
     }
 
-    v.append(messages)
-     .append(chatEditor(messages, chat, task));
+    if (chat.chatid === task.task_context_chat) {
+      var toField = $("<div class='to-field'/>")
+        .appendTo(v);
+      toField.append($("<b>To:</b>"));
+      toField.append(" " + chat_participant_names(chat));
+      messages.addClass("group-chat");
+    }
+
+    v.append(chatEditor(messages, chat, task));
 
     return v;
   }
@@ -451,11 +435,13 @@ var chat = (function () {
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
 
-    $('[rel=popover]').popover({
-      html: true,
-      placement: 'bottom',
-      content: function(){
-        return $($(this).data('contentwrapper')).html();
+    $("#chat-icon-container").click(function() {
+      if ($("#chat").hasClass("fadeOutRight")) {
+        $("#chat").removeClass("fadeOutRight")
+                  .addClass("fadeInRight");
+      } else {
+        $("#chat").addClass("fadeOutRight")
+                  .removeClass("fadeInRight premiere");
       }
     });
 

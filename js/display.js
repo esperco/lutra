@@ -103,33 +103,33 @@ var display = (function() {
       $('.send-message-text').removeClass('hide');
     }
 
-    if ($(window).width() < 1040) {
-      $('#task-navbar')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('.new-task-footer')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('.sched-footer')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('#chat').addClass('hide');
-      // $('#chat-icon-container').removeClass('hide');
-      $('#task-content').removeClass('split-screen');
-    } else {
-      $('#task-navbar')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('.new-task-footer')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('.sched-footer')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('#chat').removeClass('hide');
-      // $('#chat-icon-container').addClass('hide');
-      $('#task-content').addClass('split-screen');
-    }
+    // if ($(window).width() < 1040) {
+    //   $('#task-navbar')
+    //     .addClass('chat-closed')
+    //     .removeClass('chat-open');
+    //   $('.new-task-footer')
+    //     .addClass('chat-closed')
+    //     .removeClass('chat-open');
+    //   $('.sched-footer')
+    //     .addClass('chat-closed')
+    //     .removeClass('chat-open');
+    //   $('#chat').addClass('hide');
+    //   // $('#chat-icon-container').removeClass('hide');
+    //   $('#task-content').removeClass('split-screen');
+    // } else {
+    //   $('#task-navbar')
+    //     .addClass('chat-open')
+    //     .removeClass('chat-closed');
+    //   $('.new-task-footer')
+    //     .addClass('chat-open')
+    //     .removeClass('chat-closed');
+    //   $('.sched-footer')
+    //     .addClass('chat-open')
+    //     .removeClass('chat-closed');
+    //   $('#chat').removeClass('hide');
+    //   // $('#chat-icon-container').addClass('hide');
+    //   $('#task-content').addClass('split-screen');
+    // }
   };
 
   mod.checkWidth = function() {
