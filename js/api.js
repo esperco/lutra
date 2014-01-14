@@ -148,6 +148,11 @@ var api = (function () {
 
   /*** Chat ***/
 
+  mod.getChatItem = function(rid) {
+    var url = api_q_prefix() + "/chat/whatever/item/" + rid;
+    return jsonHttpGet(url);
+  }
+
   mod.postChatItem = function(chatItem) {
     var url = api_q_prefix() + "/chat/" + chatItem.chatid + "/item";
     return jsonHttpPost(url, JSON.stringify(chatItem));

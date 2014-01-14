@@ -52,7 +52,7 @@ var home = (function() {
     case "Scheduling":
     default:
       // All tasks go to scheduling tab for now.
-      $("#tasks-scheduling").append(viewOfTaskTitle(task));
+      $("#tasks-scheduling").prepend(viewOfTaskTitle(task));
       break;
     }
   }
