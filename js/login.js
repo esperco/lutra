@@ -74,37 +74,36 @@ var login = (function() {
   var pusher;
 
   function pusher_start() {
-      pusher = new Pusher('d9694497227b84d1f865');
-      pusher.subscribe(mod.data.uid);
-      pusher.bind('tasks', function(events) {
-        for (var i = 0; i < events.length; ++i) {
-          var ev = events[i];
-          switch (variant.cons(ev)) {
+    pusher = new Pusher('d9694497227b84d1f865');
+    pusher.subscribe(mod.data.uid);
+    pusher.bind('tasks', function(events) {
+      list.iter(events, function(ev) {
+        switch (variant.cons(ev)) {
 
-          case "Task_created":
-            var tid = ev[1].tid;
-            if (tid) {
-              api.getTask(tid).done(task.onTaskCreated.notify);
-            }
-            break;
-
-          case "Chat_posted":
-            var rid = ev[1].rid;
-            if (rid) {
-              api.getChatItem(rid).done(function(chatItem) {
-                task.onChatPosting.notify(chatItem);
-                task.onChatPosted .notify(chatItem);
-              });
-            }
-            break;
-
-          case "Task_modified":
-          default:
-            break;
+        case "Task_created":
+          var tid = ev[1].tid;
+          if (tid) {
+            api.getTask(tid).done(task.onTaskCreated.notify);
           }
+          break;
+
+        case "Chat_posted":
+          var rid = ev[1].rid;
+          if (rid) {
+            api.getChatItem(rid).done(function(chatItem) {
+              task.onChatPosting.notify(chatItem);
+              task.onChatPosted .notify(chatItem);
+            });
+          }
+          break;
+
+        case "Task_modified":
+        default:
+          break;
         }
       });
-    }
+    });
+  }
 
   function pusher_stop() {
     if (pusher) {
