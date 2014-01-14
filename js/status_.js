@@ -1,8 +1,12 @@
 /*
   Error/success messages displayed to the user in the status area.
+
+  This module is called 'status_' rather than 'status' because
+  Chrome uses a global variable of that name (window.status)
+  and we cannot override it.
 */
 
-var status = (function() {
+var status_ = (function() {
   var mod = {};
 
   mod.report = function(msg, kind) {
@@ -42,7 +46,7 @@ var status = (function() {
         var msg = util.isString(optMsg) ? optMsg : jqXHR.responseText;
         mod.reportError(msg);
       }
-    }
+    };
   };
 
   /* Any click in the browser's window hides the status area */

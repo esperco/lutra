@@ -125,7 +125,11 @@ var home = (function() {
     case "Scheduling":
     default:
       // All tasks go to scheduling tab for now.
+<<<<<<< HEAD
       $("#tasks-scheduling").append(viewOfTaskRow(task));
+=======
+      $("#tasks-scheduling").prepend(viewOfTaskTitle(task));
+>>>>>>> f9bf5ccb318700eaf0de5ab62d25f038bc05f5d7
       break;
     }
   }
@@ -134,7 +138,7 @@ var home = (function() {
     var view = $("#scheduling-tasks-tab-content");
     view.children().remove();
     api.loadActiveTasks()
-      .fail(status.onError(404))
+      .fail(status_.onError(404))
       .then(function(data) {
         viewOfTaskQueue(data.tasks)
           .appendTo(view);

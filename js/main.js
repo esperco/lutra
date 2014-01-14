@@ -4,7 +4,7 @@ function main() {
   task.init();
   route.setup();
   display.init();
-  status.init();
+  status_.init();
   $("[data-toggle='tooltip']").tooltip();
 }
 
