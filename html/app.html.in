@@ -265,6 +265,10 @@
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>
 
+    <!-- Pusher client library -->
+    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js">
+    </script>
+
     INCLUDES
   </body>
 </html>
