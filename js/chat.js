@@ -300,7 +300,7 @@ var chat = (function () {
     selChoicesDiv.append(selChoices);
     svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
     var selChoicesLabel = $("<div/>", {
-      'class': "offer-choices-label unselectablex",
+      'class': "offer-choices-label unselectable",
       'text': "Offer multiple choice response."
     });
     selChoicesDiv.append(selChoicesLabel);
