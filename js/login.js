@@ -39,7 +39,7 @@ var login = (function() {
   mod.login = function (email, password) {
     return api.login(email, password)
       .then(mod.setLoginInfo,
-            status.onError(400));
+            status_.onError(400));
   };
 
   mod.logout = function () {

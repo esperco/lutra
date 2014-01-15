@@ -58,10 +58,10 @@ var page = (function() {
       if (email !== "") {
         api.requestPassword(email)
           .done(function() {
-            status.reportSuccess("Success. Check your email.");
+            status_.reportSuccess("Success. Check your email.");
           })
           .fail(function () {
-            status.reportError("Oops, something went wrong.");
+            status_.reportError("Oops, something went wrong.");
           });
       };
       return false;
@@ -87,7 +87,7 @@ var page = (function() {
             route.nav.path("");
           })
           .fail(function () {
-            status.reportError("Oops, something went wrong.");
+            status_.reportError("Oops, something went wrong.");
           });
       };
       return false;

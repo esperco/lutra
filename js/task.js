@@ -12,6 +12,9 @@ var task = (function() {
     this.observe = function(key, fn) {
       listeners[key] = fn;
     };
+    this.stopObserve = function(key) {
+      delete listeners[key];
+    };
     this.notify = function(v,w,x,y,z) {
       for (var key in listeners) {
         listeners[key](v,w,x,y,z);
@@ -177,7 +180,6 @@ var task = (function() {
         }
       } else {
         newTaskTitle.val("");
-        $("#workflow-sched").prop("checked", true);
       }
       updateUI();
       util.afterTyping(newTaskTitle, 500, updateUI);
