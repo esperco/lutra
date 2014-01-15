@@ -5,8 +5,12 @@
 var home = (function() {
   var mod = {};
 
+  function taskTitleViewId(task) {
+    return "tasktitle-" + task.tid;
+  }
+
   function viewOfTaskTitle(task) {
-    var view = $("<div class='task'></div>");
+    var view = $("<div class='task'/>",{id:taskTitleViewId(task)});
     var checkbox = $("<img class='task-checkbox'/>")
       .appendTo(view);
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
@@ -39,6 +43,25 @@ var home = (function() {
     listViewOfTask(task).prepend(viewOfTaskTitle(task));
   }
 
+  function taskModified(task) {
+    var view_id = taskTitleViewId(task);
+
+    // In case the task kind has changed, remove the task title from
+    // all the other tabs.
+    if ("Scheduling" === variant.cons(task.task_data)) {
+      $("#general-tasks-tab-content #" + view_id).remove();
+    } else {
+      $("#scheduling-tasks-tab-content #" + view_id).remove();
+    }
+
+    var view = $("#" + view_id);
+    if (view.length > 0) {
+      view.replaceWith(viewOfTaskTitle(task));
+    } else {
+      taskCreated(task);
+    }
+  }
+
   function loadTasks() {
     $("#general-tasks-tab-content").children().remove();
     $("#scheduling-tasks-tab-content").children().remove();
@@ -48,7 +71,8 @@ var home = (function() {
         list.iter(data.tasks, function(task) {
           listViewOfTask(task).append(viewOfTaskTitle(task));
         });
-        task.onTaskCreated.observe("task-list", taskCreated);
+        task.onTaskCreated .observe("task-list", taskCreated);
+        task.onTaskModified.observe("task-list", taskModified);
       });
   }
 
