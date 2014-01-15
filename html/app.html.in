@@ -54,7 +54,7 @@
         </a>
       </li>
       <li class="active">
-        <a href="#" class="nav-block">
+        <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
           <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
           <div class='new-label new-label-nav'>NEW</div>
           <div class='updated updated-nav'></div>
@@ -62,7 +62,7 @@
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block">
+        <a href="#general-task-list" class="nav-block" data-toggle="pill">
           <img id="general-icon" class="svg" src="/assets/img/general.svg">
           <div class='new-label new-label-nav'>NEW</div>
           <div class='updated updated-nav'></div>
@@ -70,7 +70,7 @@
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block">
+        <a href="#archive-task-list" class="nav-block" data-toggle="pill">
           <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
           <div class="nav-text">Archive</div>
         </a>
@@ -198,18 +198,18 @@
       @@reset-password.html@@
     </div>
 
-    <div id="home-page" class="hide home-page">
+    <div id="home-page" class="hide home-page tab-content">
       <div id="home-push" class="hide"></div>
       <div id="impt-task-list" class="hide">
         @@impt-task-list.html@@
       </div>
-      <div id="scheduling-task-list">
-        @@settings.html@@
+      <div id="scheduling-task-list" class="tab-pane active">
+        @@sched-task-list.html@@
       </div>
-      <div id="general-task-list" class="hide">
+      <div id="general-task-list" class="tab-pane">
         @@gen-task-list.html@@
       </div>
-      <div id="archive-task-list" class="hide">
+      <div id="archive-task-list" class="tab-pane">
         @@arch-task-list.html@@
       </div>
     </div>

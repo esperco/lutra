@@ -505,7 +505,7 @@ var chat = (function () {
           svg.loadImg(caret, "/assets/img/prof-caret.svg");
           if (first_tab) {
             $(".chat-tab-div").addClass("active");
-            $(".tab-pane").addClass("active");
+            $("#" + pane_id).addClass("active");
             first_tab = false;
           }
         });

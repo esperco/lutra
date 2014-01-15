@@ -177,7 +177,6 @@ var task = (function() {
         }
       } else {
         newTaskTitle.val("");
-        $("#workflow-sched").prop("checked", true);
       }
       updateUI();
       util.afterTyping(newTaskTitle, 250, updateUI);

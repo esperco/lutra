@@ -5,11 +5,6 @@
 var home = (function() {
   var mod = {};
 
-  var tabSelector = show.create({
-    "all-tasks":        {ids: ["all-tasks-tab-content"]},
-    "scheduling-tasks": {ids: ["scheduling-tasks-tab-content"]}
-  });
-
   function viewOfTaskRow(task) {
     var view = $("<div class='task clearfix'></div>");
     var taskLeft = $("<div class='col-md-6 task-row-left'></div>")
@@ -107,38 +102,26 @@ var home = (function() {
     return view;
   }
 
-  function viewOfTaskQueue(tasks) {
-    var view = $("<div/>");
-    var tasksView = $("<div/>", {id:"tasks-scheduling"});
-
-    list.iter(tasks, function(task) {
-      viewOfTaskRow(task).appendTo(tasksView);
-    });
-    tasksView.appendTo(view);
-
-    return view;
+  function listViewOfTask(task) {
+    return "Scheduling" === variant.cons(task.task_data)
+         ? $("#scheduling-tasks-tab-content")
+         : $("#general-tasks-tab-content");
   }
 
   function taskCreated(task) {
-    switch (variant.cons(task.task_data)) {
-    case "Questions":
-    case "Scheduling":
-    default:
-      // All tasks go to scheduling tab for now.
-      $("#tasks-scheduling").prepend(viewOfTaskRow(task));
-      break;
-    }
+    listViewOfTask(task).prepend(viewOfTaskRow(task));
   }
 
-  function loadSchedulingTasks() {
-    var view = $("#scheduling-tasks-tab-content");
-    view.children().remove();
+  function loadTasks() {
+    $("#general-tasks-tab-content").children().remove();
+    $("#scheduling-tasks-tab-content").children().remove();
     api.loadActiveTasks()
       .fail(status_.onError(404))
       .then(function(data) {
-        viewOfTaskQueue(data.tasks)
-          .appendTo(view);
-        task.onTaskCreated.observe("scheduling-tab", taskCreated);
+        list.iter(data.tasks, function(task) {
+          listViewOfTask(task).append(viewOfTaskRow(task));
+        });
+        task.onTaskCreated.observe("task-list", taskCreated);
       });
   }
 
@@ -183,9 +166,7 @@ var home = (function() {
 
   mod.load = function() {
     loadNavHeader();
-    tabSelector.hideAll();
-    loadSchedulingTasks();
-    tabSelector.show("scheduling-tasks");
+    loadTasks();
     util.focus();
   };
 
