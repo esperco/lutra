@@ -14,7 +14,9 @@ HTML_INCLUDES = \
   sched-step2-tab.html \
   sched-step3-tab.html \
   sched-step4-tab.html \
-  sched-task-list.html
+  sched-task-list.html \
+  places.html \
+  settings.html
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \

@@ -510,7 +510,7 @@ var sched2 = (function() {
 
   /* Boy does this function suck. Hooray for imperative programming!
    * If you can think of a better way to write this, be my guest! */
-  function highlight(address, matches) {
+  mod.highlight = function (address, matches) {
     var withBold = "";
     for (var i = 0; i < address.length; i++) {
       var c = address[i];
@@ -529,7 +529,7 @@ var sched2 = (function() {
       if (!wroteChar) { withBold += address.charAt(i); }
     }
     return withBold;
-  }
+  };
 
   function displayPredictionsDropdown(predictions) {
     if (predictions.from_favorites.length == 0
@@ -544,7 +544,7 @@ var sched2 = (function() {
         .appendTo(menu);
 
       list.iter(predictions.from_favorites, function(item) {
-        var bolded = highlight(item.loc.address, [item.matched_substring]);
+        var bolded = mod.highlight(item.loc.address, [item.matched_substring]);
         var li = $('<li role="presentation"/>')
           .appendTo(menu);
         $('<a role="menuitem" tabindex="-1" href="#"/>')
@@ -569,7 +569,7 @@ var sched2 = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = highlight(item.description, item.matched_substrings);
+      var bolded = mod.highlight(item.description, item.matched_substrings);
       var li = $('<li role="presentation"/>')
         .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')

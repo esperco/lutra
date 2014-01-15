@@ -78,7 +78,7 @@
         </a>
       </li>
       <li>
-        <a href="#!places" class="nav-block">
+        <a href="#place-list" class="nav-block place-nav" data-toggle="pill">
           <img id="places-icon" class="svg" src="/assets/img/places.svg">
           <div class="nav-text">Places</div>
         </a>
@@ -145,7 +145,7 @@
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block hide">
+            <a href="#place-list" class="nav-block place-nav">
               <img id="places-icon" class="svg" src="/assets/img/places.svg">
               <div class="nav-text">Places</div>
             </a>
@@ -199,6 +199,9 @@
       <div id="archive-task-list" class="tab-pane">
         @@arch-task-list.html@@
       </div>
+      <div id="place-list" class="tab-pane">
+        @@places.html@@
+      </div>
     </div>
 
     <div id="test-page" class="hide test-page">
@@ -210,10 +213,6 @@
 
     <div id="settings-page" class="hide settings-page">
       @@settings.html@@
-    </div>
-
-    <div id="places-page" class="hide places-page">
-      @@places.html@@
     </div>
 
     <div id="task-page" class="hide task-page">

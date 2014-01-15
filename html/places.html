@@ -1,8 +1,8 @@
 <div class="container home-container">
   <div class="clearfix">
     <h1 class="page-title unselectable">PLACES</h1>
-    <button id="new-sched-task-btn"
-            class="new-task-btn btn btn-primary">New Place</button>
+    <button id="new-place-btn"
+            class="new-place-btn btn btn-primary">New Place</button>
   </div>
   <span>Sort by: </span>
   <div class="btn-group">
@@ -85,7 +85,7 @@
      role="dialog" aria-labelledby="edit-place-title"
      aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
+    <div id="edit-place-close" class="modal-close-circ" data-dismiss="modal">
       <img class="svg modal-close-x" src="/assets/img/x.svg">
     </div>
     <div class="modal-content">
@@ -104,8 +104,16 @@
         </div>
         <div class="input"> 
           <h4 class="modal-section-title">Address</h4>
-          <input id="edit-place-address"
-                 type="text" class="form-control" disabled>
+
+        <input id="edit-place-address" type="text" class="form-control"
+               disabled>
+        <div class="dropdown">
+          <a id="places-address-dropdown-toggle" data-toggle="dropdown"
+             class="hide dropdown-toggle" href="#"></a>
+          <ul id="places-address-dropdown-menu" class="dropdown-menu"
+              role="menu"></ul>
+        </div>
+
         </div>
         <div class="input"> 
           <h4 class="modal-section-title">Instructions</h4>

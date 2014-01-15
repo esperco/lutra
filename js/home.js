@@ -94,6 +94,7 @@ var home = (function() {
   mod.load = function() {
     loadNavHeader();
     loadTasks();
+    $(".place-nav").click(places.load);
     util.focus();
   };
 

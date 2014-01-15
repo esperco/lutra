@@ -220,12 +220,14 @@ var api = (function () {
   mod.postUpdatePlace = function(uid, placeid, update) {
     var url = api_s_prefix() + "/place/update/" +
               encodeURIComponent(placeid);
-    var placeUpdate = {
-      title: update.title,
-      address: update.address,
-      instructions: update.instructions
-    };
-    return jsonHttpPost(url, JSON.stringify(placeUpdate));
+    return jsonHttpPost(url, JSON.stringify(update));
+  };
+
+  mod.postCreatePlace = function(uid, loc, refId) {
+    var url = api_s_prefix() + "/place/create/" +
+              encodeURIComponent(loc) + "/" +
+              encodeURIComponent(refId);
+    return jsonHttpPost(url, "");
   };
 
   mod.getSuggestions = function(x) {
