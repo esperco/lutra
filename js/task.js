@@ -105,8 +105,8 @@ var task = (function() {
 
   var taskTypeSelector = show.create({
     "new-task": {ids: ["new-task"]},
-    "sched-task": {ids: ["sched-task"]},
-    "gen-task": {ids: ["gen-task"]}
+    "sched-task": {ids: ["sched-task", "task-title"]},
+    "gen-task": {ids: ["gen-task", "task-title"]}
   });
 
   function initTaskData() {
