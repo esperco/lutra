@@ -18,7 +18,7 @@
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
       <li>
-        <a href="#" class="account-block hide">
+        <a href="#!settings" class="account-block hide">
           <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
           <div class="nav-text">Settings</div>
         </a>
@@ -78,7 +78,7 @@
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block hide">
+        <a href="#!places" class="nav-block">
           <img id="places-icon" class="svg" src="/assets/img/places.svg">
           <div class="nav-text">Places</div>
         </a>
@@ -206,6 +206,14 @@
         <div id="test-content" class="row">
         </div>
       </div>
+    </div>
+
+    <div id="settings-page" class="hide settings-page">
+      @@settings.html@@
+    </div>
+
+    <div id="places-page" class="hide places-page">
+      @@places.html@@
     </div>
 
     <div id="task-page" class="hide task-page">

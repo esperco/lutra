@@ -212,6 +212,22 @@ var api = (function () {
     return jsonHttpPost(url, "");
   };
 
+  mod.getPlaceList = function(uid, loc) {
+    var url = api_s_prefix() + "/place/list/";
+    return jsonHttpGet(url);
+  };
+
+  mod.postUpdatePlace = function(uid, placeid, update) {
+    var url = api_s_prefix() + "/place/update/" +
+              encodeURIComponent(placeid);
+    var placeUpdate = {
+      title: update.title,
+      address: update.address,
+      instructions: update.instructions
+    };
+    return jsonHttpPost(url, JSON.stringify(placeUpdate));
+  };
+
   mod.getSuggestions = function(x) {
     var url = api_s_prefix() + "/suggest";
     return jsonHttpPost(url, JSON.stringify(x));

@@ -8,6 +8,8 @@ var page = (function() {
     task: {},
     scheduling: {},
     respond: {},
+    settings: {},
+    places: {},
     test: {}
   };
 
@@ -25,6 +27,8 @@ var page = (function() {
     "task":             {classes:["task-page"]},
     "scheduling":       {classes:["scheduling-page"]},
     "respond":          {classes:["respond-page"]},
+    "settings":         {classes:["settings-page"]},
+    "places":           {classes:["places-page"]},
     "test":             {classes:["test-page"]}
   });
 
@@ -148,6 +152,31 @@ var page = (function() {
 
   mod.respond.load = function(rid, asUid) {
     pageSelector.hideAll();
+  };
+
+  mod.settings.load = function() {
+    pageSelector.hideAll();
+
+    // TODO Find a better place for this
+    var caretDiv = $("#exec-caret");
+    caretDiv.removeClass("account-nav-open");
+    caretDiv.addClass("account-nav-closed");
+    $(".account-block").each(function() {
+      $(this).addClass("hide");
+    })
+
+    settings.load();
+    pageSelector.show("settings");
+    display.updateHome();
+    util.focus();
+  };
+
+  mod.places.load = function() {
+    pageSelector.hideAll();
+    places.load();
+    pageSelector.show("places");
+    display.updateHome();
+    util.focus();
   };
 
   return mod;

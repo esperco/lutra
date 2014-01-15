@@ -1,0 +1,134 @@
+<div class="container home-container">
+  <div class="clearfix">
+    <h1 class="page-title unselectable">PLACES</h1>
+    <button id="new-sched-task-btn"
+            class="new-task-btn btn btn-primary">New Place</button>
+  </div>
+  <span>Sort by: </span>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      Name
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Name</a></li>
+      <li><a href="#">Last visited</a></li>
+      <li><a href="#">Most visited</a></li>
+    </ul>
+  </div>
+
+  <div id="places">
+    <!-- re-create in Javascript -->
+    <div class="place-row clearfix">
+
+      <div class="col-xs-5 place-details">
+        <a class="place-name ellipsis">Asian Box</a>
+        <div class="place-loc">
+          <div class="place-loc-1 ellipsis">855 El Camino Real #21</div>
+          <div class="place-loc-2 ellipsis">Palo Alto, CA 94301</div>
+        </div>
+        <div class="stats mobile-stats">
+          <div class="col-xs-8 last-visit">
+            <div class="stat-div clearfix">
+              <div id="last-visit-stat" class="stat">2</div>
+              <div class="time-ago-text">
+                <div>DAYS</div>
+                <div>AGO</div>
+              </div>
+            </div>
+            <div class="stat-text">Last visit</div>
+          </div>
+          <div class="col-xs-4 visits">
+            <div class="stat-div clearfix">
+              <div id="visits-stat" class="stat">7</div>
+            </div>
+            <div class="stat-text">Visits</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-3 stats">
+        <div class="col-xs-8 last-visit">
+          <div class="stat-div clearfix">
+            <div id="last-visit-stat" class="stat">2</div>
+            <div class="time-ago-text">
+              <div>DAYS</div>
+              <div>AGO</div>
+            </div>
+          </div>
+          <div class="stat-text">Last visit</div>
+        </div>
+        <div class="col-xs-4 visits">
+          <div class="stat-div clearfix">
+            <div id="visits-stat" class="stat">7</div>
+          </div>
+          <div class="stat-text">Visits</div>
+        </div>
+      </div>
+
+      <div class="col-xs-4 place-actions">
+        <a href="#" data-toggle="tooltip" title="Edit" class="col-xs-4 place-action place-edit-div">
+          <img id="" class="svg place-edit" src="/assets/img/edit.svg">
+        </a>
+        <a href="#" data-toggle="tooltip" title="Get directions" class="col-xs-4 place-action directions-div">
+          <img id="" class="svg directions" src="/assets/img/directions.svg">
+        </a>
+        <a href="#" data-toggle="tooltip" title="View on Yelp" class="col-xs-4 place-action yel-div">
+          <img id="" class="svg yelp" src="/assets/img/yelp.svg">
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-place-modal" tabindex="-1"
+     role="dialog" aria-labelledby="edit-place-title"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="edit-place-save" style="float:right">Save</button>
+        <h3 class="modal-title" id="edit-place-title">
+          Change your location details:
+        </h3>
+      </div>
+      <div class="modal-body" id="edit-place-body">
+        <div class="input"> 
+          <h4 class="modal-first-section-title">Name</h4>
+          <input id="edit-place-location-title"
+                 type="text" class="form-control">
+        </div>
+        <div class="input"> 
+          <h4 class="modal-section-title">Address</h4>
+          <input id="edit-place-address"
+                 type="text" class="form-control" disabled>
+        </div>
+        <div class="input"> 
+          <h4 class="modal-section-title">Instructions</h4>
+          <input id="edit-place-instructions"
+                 type="text" class="form-control">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="google-map-modal" tabindex="-1"
+     role="dialog" aria-labelledby="google-map-modal-title"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="google-map-modal-title"></h3>
+      </div>
+      <div class="modal-body" id="google-map-modal-body"></div>
+    </div>
+  </div>
+</div>

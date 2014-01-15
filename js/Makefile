@@ -41,6 +41,8 @@ SOURCES = \
   sched3.js \
   sched4.js \
   task.js \
+  settings.js \
+  places.js \
   home.js \
   page.js \
   route.js \
