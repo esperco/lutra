@@ -3,9 +3,21 @@
     <h1 class="page-title unselectable">GENERAL</h1>
     <button id="new-gen-task-btn"
     		class="new-task-btn btn btn-primary">New Task</button>
+    <ul class="nav nav-tabs desktop-nav-tabs list-tabs">
+      <li><a href="#">NEW (0)</a></li>
+      <li class="active"><a href="#">IN PROGRESS</a></li>
+      <li><a href="#">DONE</a></li>
+    </ul>
   </div>
-  <div>
-    <button class="btn btn-default">Archive</button>
-  </div>
-  <div id="general-tasks-tab-content" class="task-list hide"></div>
+  <ul class="nav nav-tabs mobile-nav-tabs list-tabs">
+    <li><a href="#">NEW (0)</a></li>
+    <li class="active"><a href="#">IN PROGRESS</a></li>
+    <li><a href="#">DONE</a></li>
+  </ul>
+  <div id="general-tasks-tab-content" class="task-list"></div>
+  <div class="footer-push"></div>
+</div>
+
+<div class="container home-container navbar list-footer">
+  <img class="svg archive-btn" src="/assets/img/archive-task.svg">
 </div>
