@@ -125,11 +125,7 @@ var home = (function() {
     case "Scheduling":
     default:
       // All tasks go to scheduling tab for now.
-<<<<<<< HEAD
-      $("#tasks-scheduling").append(viewOfTaskRow(task));
-=======
-      $("#tasks-scheduling").prepend(viewOfTaskTitle(task));
->>>>>>> f9bf5ccb318700eaf0de5ab62d25f038bc05f5d7
+      $("#tasks-scheduling").prepend(viewOfTaskRow(task));
       break;
     }
   }
