@@ -204,7 +204,7 @@
         @@impt-task-list.html@@
       </div>
       <div id="scheduling-task-list">
-        @@sched-task-list.html@@
+        @@settings.html@@
       </div>
       <div id="general-task-list" class="hide">
         @@gen-task-list.html@@

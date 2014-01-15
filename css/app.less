@@ -377,8 +377,9 @@ object {
   &:hover { background: @gray_f8; }
 }
 
-.account-row,
-.exec-row {
+.exec-row,
+.email-row,
+.account-row {
   padding: 15px 10px;
   border-bottom: 1px solid @gray_10;
   &:hover { background: @gray_f8; }
@@ -396,6 +397,7 @@ object {
 .task-list,
 #user-profile,
 #executives,
+#email-addresses,
 #linked-accounts,
 #scheduling-pref,
 #places,
@@ -414,6 +416,7 @@ object {
 
 #user-profile,
 #executives,
+#email-addresses,
 #linked-accounts,
 #scheduling-pref,
 #workflow-options,
@@ -931,6 +934,7 @@ object {
 }
 
 #executives-title,
+#email-addresses-title,
 #linked-accounts-title,
 #scheduling-pref-title {
   margin-top: 60px;
@@ -970,60 +974,33 @@ object {
   #right-col { padding: 10px; }
 }
 
-
 #update-account {
   float: right;
   margin-right: 10px;
-}
-
-.not-connected circle {
-  fill: @gray_05;
-}
-
-.linked-account-details,
-.exec-details,
-.add-exec-details {
-  display: block;
-  margin-top: 4px;
-  margin-left: 72px;
-}
-
-.linked-account-details {
-  margin-right: 100px;
 }
 
 .exec-details {
   margin-right: 30px;
 }
 
-.linked-account-name,
-.exec-name {
+.exec-details,
+.add-exec-details,
+.linked-account-details {
+  display: block;
+  margin-top: 4px;
+  margin-left: 72px;
+}
+
+.exec-name,
+.linked-account-name {
   font-family: @bold;
   font-size: 18px;
 }
 
-.linked-account-status-text,
-.exec-email {
+.exec-email,
+.linked-account-status-text {
   font-size: 14px;
   color: @gray_60;
-}
-
-.add-exec-text {
-  margin-top: 16px;
-  font-family: @italic;
-  font-size: 16px;
-  color: @gray_60;
-}
-
-#google,
-#linkedin {
-  float: left;
-}
-
-.connect-btn {
-  float: right;
-  display: inline-block;
-  margin-top: 10px;
 }
 
 .add-exec-circ {
@@ -1035,6 +1012,13 @@ object {
 .add-exec-circ.disabled {
   background: @purple_disabled;
   cursor: default;
+}
+
+.add-exec-text {
+  margin-top: 16px;
+  font-family: @italic;
+  font-size: 16px;
+  color: @gray_60;
 }
 
 .exec-settings-div {
@@ -1056,6 +1040,71 @@ object {
   width: 26px;
   height: 26px;
   margin-top: 14px;
+}
+
+.email-row-content {
+  float: left;
+  width: 100%;
+}
+
+.email-address.desktop {
+  margin-right: 180px;
+}
+
+.email-address.mobile.primary {
+  margin-right: 70px;
+}
+
+.primary-label {
+  display: inline-block;
+  padding: 1px 4px;
+  padding-bottom: 0;
+  font-family: @bold;
+  font-size: 12px;
+  color: @white;
+  background: @purple;
+  border-radius: 3px;
+}
+
+.primary-label-mobile {
+  float: right;
+}
+
+.email-actions {
+  display: inline-block;
+  font-size: 14px;
+}
+
+.email-actions-desktop {
+  float: right;
+}
+
+.email-actions-mobile {
+  width: 100%;
+}
+
+.vertical-divider {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.not-connected circle {
+  fill: @gray_05;
+}
+
+.connect-btn {
+  float: right;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.linked-account-details {
+  margin-right: 100px;
+}
+
+#google,
+#linkedin {
+  float: left;
 }
 
 

@@ -9,12 +9,23 @@ var display = (function() {
 
     /*** Settings ***/
     if ($(window).width() < 500) {
+      $('.email-address').removeClass('desktop')
+                         .addClass('mobile');
+      $('.primary-label-mobile').removeClass('hide');
+      $('.email-actions-desktop').addClass('hide');
+      $('.email-actions-mobile').removeClass('hide');
       $('.linked-account-email').addClass('hide');
       $('.extended-name').addClass('hide');
     } else {
+      $('.email-address').addClass('desktop')
+                         .removeClass('mobile');
+      $('.primary-label-mobile').addClass('hide');
+      $('.email-actions-desktop').removeClass('hide');
+      $('.email-actions-mobile').addClass('hide');
       $('.linked-account-email').removeClass('hide');
       $('.extended-name').removeClass('hide');
     }
+
 
     /*** Places ***/
     if ($(window).width() < 532) {
@@ -102,34 +113,6 @@ var display = (function() {
     } else {
       $('.send-message-text').removeClass('hide');
     }
-
-    // if ($(window).width() < 1040) {
-    //   $('#task-navbar')
-    //     .addClass('chat-closed')
-    //     .removeClass('chat-open');
-    //   $('.new-task-footer')
-    //     .addClass('chat-closed')
-    //     .removeClass('chat-open');
-    //   $('.sched-footer')
-    //     .addClass('chat-closed')
-    //     .removeClass('chat-open');
-    //   $('#chat').addClass('hide');
-    //   // $('#chat-icon-container').removeClass('hide');
-    //   $('#task-content').removeClass('split-screen');
-    // } else {
-    //   $('#task-navbar')
-    //     .addClass('chat-open')
-    //     .removeClass('chat-closed');
-    //   $('.new-task-footer')
-    //     .addClass('chat-open')
-    //     .removeClass('chat-closed');
-    //   $('.sched-footer')
-    //     .addClass('chat-open')
-    //     .removeClass('chat-closed');
-    //   $('#chat').removeClass('hide');
-    //   // $('#chat-icon-container').addClass('hide');
-    //   $('#task-content').addClass('split-screen');
-    // }
   };
 
   mod.checkWidth = function() {
@@ -153,18 +136,9 @@ var display = (function() {
   };
 
   mod.init = function() {
+    $("[data-toggle='tooltip']").tooltip();
     mod.checkWidth();
     $(window).resize(mod.checkWidth);
-    $("[data-toggle='tooltip']").tooltip();
-    $("[rel='popover']").tooltip();
-    $('body').on('click', function (e) {
-      $('[rel=popover]').each(function () {
-        if (!$(this).is(e.target) && $(this).has(e.target).length === 0
-            && $('.popover').has(e.target).length === 0) {
-              $(this).popover('hide');
-        }
-      });
-    });
   };
 
   return mod;
