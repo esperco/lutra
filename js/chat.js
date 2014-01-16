@@ -436,12 +436,12 @@ var chat = (function () {
     mod.clearTaskChats();
 
     $("#chat-icon-container").click(function() {
-      if ($("#chat").hasClass("fadeOutRight")) {
-        $("#chat").removeClass("fadeOutRight")
-                  .addClass("fadeInRight");
+      if ($("#chat").hasClass("fadeOutDown")) {
+        $("#chat").removeClass("fadeOutDown")
+                  .addClass("fadeInUp");
       } else {
-        $("#chat").addClass("fadeOutRight")
-                  .removeClass("fadeInRight premiere");
+        $("#chat").addClass("fadeOutDown")
+                  .removeClass("fadeInUp premiere");
       }
     });
 

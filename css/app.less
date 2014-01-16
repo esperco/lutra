@@ -823,12 +823,6 @@ object {
   padding-bottom: 120px;
 }
 
-// .split-screen {
-//   margin-right: @chat_width;
-//   border-left: none;
-//   border-right: 1px solid @gray_20;
-// }
-
 
 /*** Modal ***/
 
@@ -1262,7 +1256,6 @@ object {
   top: 48px;
   left: 100%;
   margin-left: -@chat_width;
-  z-index: 1040;
 }
 
 #chat.premiere {
@@ -1271,10 +1264,12 @@ object {
           animation-delay: 1s;
 }
 
-#chat.exit {
-  -webkit-animation-delay: -0.25s;
-     -moz-animation-delay: -0.25s;
-          animation-delay: -0.25s;
+#chat.fadeOutDown {
+  z-index: -1;
+}
+
+#chat.fadeInUp {
+  z-index: 1040;
 }
 
 #chat-caret {
@@ -1777,10 +1772,53 @@ object {
 
 /*** Scheduling Step 3 ***/
 
-.guest-statuses-title {
+#sched-step3-table {
+  max-width: 742px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.guest-prefs-title {
   margin-top: 40px;
   font-family: @light;
   font-size: 18px;
+}
+
+.guest-prefs-header {
+  margin-bottom: 15px;
+}
+
+.option-letter-block {
+  padding: 0;
+}
+
+.option-letter {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: @gray_40;
+  font-size: 20px;
+  border: 2px solid @gray_40;
+  border-radius: 4px;
+}
+
+.option-letter.recommended {
+  color: @green;
+  border-color: @green;
+}
+
+.option-score {
+  margin-top: 5px;
+  text-align: center;
+  font-family: @bold;
+  font-size: 14px;
+  color: @gray_60;
+}
+
+.option-score.recommended {
+  color: @green;
 }
 
 .send-message {

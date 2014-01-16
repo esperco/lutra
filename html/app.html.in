@@ -233,7 +233,7 @@
         </a>
       </div>
 
-      <div id="chat" class="animated fadeInRight premiere">
+      <div id="chat" class="animated fadeInUp premiere">
         <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
         <div id="chat-container">
           <div id="chat-header">

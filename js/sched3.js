@@ -123,6 +123,11 @@ var sched3 = (function() {
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row'>");
+    var dragDiv = $("<div class='drag-div'></div>")
+      .appendTo(view);
+    var drag = $("<img class='drag'/>")
+      .appendTo(dragDiv);
+    svg.loadImg(drag, "/assets/img/drag.svg");
     var chatHead = $("<div class='list-prof-circ'>");
     var obsProf = profs[uid];
     var prof = obsProf.prof;
@@ -206,8 +211,25 @@ var sched3 = (function() {
     viewOfOptions(task, onSelect)
       .appendTo(view);
 
-    $("<h4 class='guest-statuses-title'>Guest Statuses</h4>")
+    $("<h4 class='guest-prefs-title'>Guest Preferences</h4>")
       .appendTo(view);
+
+    var guestPrefsHeader = $("<div class='guest-prefs-header clearfix'></div>")
+      .append($("<div class='col-xs-6'></div>"))
+      .appendTo(view);
+
+    var ABlock = $("<div class='option-letter-block col-xs-2'></div>")
+      .append($("<div class='option-letter unselectable'>A</div>"))
+      .append($("<div class='option-score unselectable'>63</div>"))
+      .appendTo(guestPrefsHeader);
+    var BBlock = $("<div class='option-letter-block col-xs-2'></div>")
+      .append($("<div class='option-letter recommended unselectable'>B</div>"))
+      .append($("<div class='option-score recommended unselectable'>84</div>"))
+      .appendTo(guestPrefsHeader);
+    var CBlock = $("<div class='option-letter-block col-xs-2'></div>")
+      .append($("<div class='option-letter unselectable'>C</div>"))
+      .append($("<div class='option-score unselectable'>81</div>"))
+      .appendTo(guestPrefsHeader);
 
     var guestsContainer = $("<div class='guests-container guests-only'>")
     var guests = sched.getGuests(task);
