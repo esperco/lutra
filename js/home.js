@@ -30,20 +30,6 @@ var home = (function() {
       .appendTo(dragDiv);
     svg.loadImg(drag, "/assets/img/drag.svg");
 
-    var importantDiv = $("<div class='important-div'></div>")
-      .appendTo(taskLeft);
-    var importantIcon = $("<img class='important'/>")
-      .appendTo(importantDiv);
-    svg.loadImg(importantIcon, "/assets/img/important.svg");
-    importantDiv.tooltip({"title":"Mark as Important"});
-    importantDiv.click(function() {
-      if($(this).hasClass("marked")) {
-        $(this).removeClass("marked");
-      } else {
-        $(this).addClass("marked");
-      }
-    });
-
     var archiveDivMobile = $("<div class='archive-div archive-mobile'></div>")
       .appendTo(taskLeft);
     var archive = $("<img class='archive'/>")

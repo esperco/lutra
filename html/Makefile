@@ -4,9 +4,9 @@ dev: dev-build
 prod: prod-build
 
 HTML_INCLUDES = \
+  all-tasks.html \
   arch-task-list.html \
   gen-task-list.html \
-  impt-task-list.html \
   request-password.html \
   reset-password.html \
   new-task.html \
