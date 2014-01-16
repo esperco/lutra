@@ -35,6 +35,7 @@ SOURCES = \
   sample.js \
   profile.js \
   chat.js \
+  geo.js \
   sched.js \
   sched1.js \
   sched2.js \

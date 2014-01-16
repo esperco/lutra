@@ -17,7 +17,7 @@ var places = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = sched2.highlight(item.description, item.matched_substrings);
+      var bolded = geo.highlight(item.description, item.matched_substrings);
       var li = $('<li role="presentation"/>')
         .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
@@ -106,11 +106,12 @@ var places = (function() {
     editModal.modal({});
   }
 
-  function viewOfPlaceDetails(title, address) {
+  function viewOfPlaceDetails(place, title, address) {
     var placeDetails = $("<div class='col-xs-5 place-details'/>")
     $("<a class='place-name ellipsis'/>")
       .text(title)
-      .appendTo(placeDetails);
+      .appendTo(placeDetails)
+      .click(function() { editAction(place); return false; });
     var placeLoc = $("<div class='place-loc'/>")
       .appendTo(placeDetails);
     $("<div class='place-loc-1 ellipsis'/>")
@@ -170,9 +171,11 @@ var places = (function() {
     svg.loadImg(editImg, "/assets/img/edit.svg");
     edit.click(function() { editAction(place); return false; });
 
+    var directionsURL = "http://maps.google.com/?daddr="
+      + place.loc.coord.lat + "," + place.loc.coord.lon;
     var directions =
       $("<a/>", {
-        href: "#",
+        href: directionsURL,
         "data-toggle": "tooltip",
         title: "Get directions",
         "class": "col-xs-4 place-action directions-div"
@@ -180,7 +183,7 @@ var places = (function() {
     var directionsImg = $("<img class='svg directions'/>")
       .appendTo(directions);
     svg.loadImg(directionsImg, "/assets/img/directions.svg");
-    directions.click(function() { drawDirections(place); return false; });
+    directions.click(function() { this.target = "_blank"; });
 
     var yelp =
       $("<a/>", {
@@ -198,9 +201,9 @@ var places = (function() {
 
   function viewOfPlace(place) {
     var view = $("<div class='place-row clearfix'/>");
-    view.click(function() { editAction(place); return false; });
 
-    var placeDetails = viewOfPlaceDetails(place.loc.title, place.loc.address)
+    var placeDetails = viewOfPlaceDetails(place, place.loc.title,
+                                          place.loc.address)
       .appendTo(view);
 
     var stats = viewOfStats(place.uses);
@@ -271,9 +274,7 @@ var places = (function() {
 
     var editModal = $("#edit-place-modal");
     editModal.on("hidden.bs.modal", function() {
-      console.log("hidden");
       $("#edit-place-save").off("click");
-      //return false;
     });
   };
 

@@ -508,28 +508,6 @@ var sched2 = (function() {
       .done(function() { });
   }
 
-  /* Boy does this function suck. Hooray for imperative programming!
-   * If you can think of a better way to write this, be my guest! */
-  mod.highlight = function (address, matches) {
-    var withBold = "";
-    for (var i = 0; i < address.length; i++) {
-      var c = address[i];
-      var wroteChar = false;
-      for (var j = 0; j < matches.length; j++) {
-        if (i == matches[j][0] + matches[j][1]) {
-          withBold += "</b>";
-        }
-        if (i == 0 && matches[j][0] == 0) {
-          withBold += "<b>";
-        } else if (i == matches[j][0] - 1) {
-          withBold += address.charAt(i) + "<b>";
-          wroteChar = true;
-        }
-      }
-      if (!wroteChar) { withBold += address.charAt(i); }
-    }
-    return withBold;
-  };
 
   function displayPredictionsDropdown(predictions) {
     if (predictions.from_favorites.length == 0
@@ -544,7 +522,20 @@ var sched2 = (function() {
         .appendTo(menu);
 
       list.iter(predictions.from_favorites, function(item) {
-        var bolded = mod.highlight(item.loc.address, [item.matched_substring]);
+        var bolded;
+        var addr = item.loc.address;
+        var title = item.loc.title;
+        if (item.matched_field == "Address") {
+          bolded = geo.highlight(addr, [item.matched_substring]);
+          if (title && title != addr) {
+            bolded = "<i>" + title + "</i> - " + bolded;
+          }
+        } else if (item.matched_field == "Title") {
+          bolded = "<i>" + geo.highlight(title, [item.matched_substring])
+            + "</i> - " + addr;
+        } else {
+          // TODO log error
+        }
         var li = $('<li role="presentation"/>')
           .appendTo(menu);
         $('<a role="menuitem" tabindex="-1" href="#"/>')
@@ -569,7 +560,7 @@ var sched2 = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = mod.highlight(item.description, item.matched_substrings);
+      var bolded = geo.highlight(item.description, item.matched_substrings);
       var li = $('<li role="presentation"/>')
         .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
