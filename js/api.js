@@ -115,6 +115,10 @@ var api = (function () {
     return jsonHttpGet(api_tasks_prefix() + "/active");
   };
 
+  mod.loadRecentTasks = function() {
+    return jsonHttpGet(api_tasks_prefix() + "/recent");
+  };
+
   mod.deleteTask = function(tid) {
     return jsonHttpDelete(api_q_prefix() + "/task/" + tid);
   };
