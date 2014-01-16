@@ -5,8 +5,16 @@
 var home = (function() {
   var mod = {};
 
-  function viewOfTaskRow(task) {
-    var view = $("<div class='task clearfix'></div>");
+  function activeTaskViewId(task) {
+    return "active-" + task.tid;
+  }
+
+  function archivedTaskViewId(task) {
+    return "archive-" + task.tid;
+  }
+
+  function viewofTaskRow(taskViewId, task) {
+    var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId(task)});
     var taskLeft = $("<div class='col-md-6 task-row-left'></div>")
       .appendTo(view);
     var taskRight = $("<div class='col-md-6 task-row-right'></div>")
@@ -108,8 +116,31 @@ var home = (function() {
          : $("#general-tasks-tab-content");
   }
 
-  function taskCreated(task) {
-    listViewOfTask(task).prepend(viewOfTaskRow(task));
+  function taskUpdated(task) {
+    var view_id = activeTaskViewId(task);
+
+    // In case the task kind has changed, remove the task title from
+    // all the other tabs.
+    if ("Scheduling" === variant.cons(task.task_data)) {
+      $("#general-tasks-tab-content #" + view_id).remove();
+    } else {
+      $("#scheduling-tasks-tab-content #" + view_id).remove();
+    }
+
+    var view = $("#" + view_id);
+    if (view.length > 0) {
+      view.replaceWith(viewofTaskRow(activeTaskViewId, task));
+    } else {
+      listViewOfTask(task).prepend(viewofTaskRow(activeTaskViewId, task));
+    }
+
+    view = $("#" + archivedTaskViewId(task));
+    if (view.length > 0) {
+      view.replaceWith(viewofTaskRow(archivedTaskViewId, task));
+    } else {
+      $("#archive-tasks-tab-content")
+              .prepend(viewofTaskRow(archivedTaskViewId, task));
+    }
   }
 
   function loadTasks() {
@@ -119,9 +150,22 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          listViewOfTask(task).append(viewOfTaskRow(task));
+          listViewOfTask(task).append(viewofTaskRow(activeTaskViewId, task));
         });
-        task.onTaskCreated.observe("task-list", taskCreated);
+        task.onTaskCreated .observe("task-list", taskUpdated);
+        task.onTaskModified.observe("task-list", taskUpdated);
+      });
+  }
+
+  function loadArchive() {
+    var view = $("#archive-tasks-tab-content");
+    view.children().remove();
+    api.loadRecentTasks()
+      .fail(status_.onError(404))
+      .then(function(data) {
+        list.iter(data.tasks, function(task) {
+          view.append(viewofTaskRow(archivedTaskViewId, task));
+        });
       });
   }
 
@@ -167,6 +211,7 @@ var home = (function() {
   mod.load = function() {
     loadNavHeader();
     loadTasks();
+    loadArchive();
     util.focus();
   };
 

@@ -1,10 +1,22 @@
 <div class="container home-container">
   <div class="clearfix">
     <h1 class="page-title unselectable">ARCHIVE</h1>
+    <ul class="nav nav-tabs desktop-nav-tabs list-tabs">
+      <li><a href="#">NEW (0)</a></li>
+      <li class="active"><a href="#">IN PROGRESS</a></li>
+      <li><a href="#">DONE</a></li>
+    </ul>
   </div>
-  <div>
-  	<button class="btn btn-default">Restore</button>
-  	<button class="btn btn-default">Delete</button>
-  </div>
-  <div id="archive-tasks-tab-content" class="task-list hide"></div>
+  <ul class="nav nav-tabs mobile-nav-tabs list-tabs">
+    <li><a href="#">NEW (0)</a></li>
+    <li class="active"><a href="#">IN PROGRESS</a></li>
+    <li><a href="#">DONE</a></li>
+  </ul>
+  <div id="archive-tasks-tab-content" class="task-list"></div>
+  <div class="footer-push"></div>
+</div>
+
+<div class="container home-container navbar list-footer">
+  <button class="btn btn-default">Restore</button>
+  <button class="btn btn-default">Delete</button>
 </div>

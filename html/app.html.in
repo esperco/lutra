@@ -239,6 +239,38 @@
           <div id="chat-header">
             <ul class="nav chat-tabs chat-profile-tabs"></ul>
           </div>
+        </div>
+      </div>
+
+      <div id="task-content" class="scrollable">
+
+        <div id="task-navbar">
+          <a href="#">
+            <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
+          </a>
+          <p id="task-title" class="hide nav-title unselectable ellipsis"></p>
+          <a id="chat-icon-container">
+            <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
+          </a>
+        </div>
+
+        <div id="new-task">
+          @@new-task.html@@
+        </div>
+
+        <div id="sched-task" class="hide">
+          <div id="sched-step1-tab" class="hide">
+            @@sched-step1-tab.html@@
+          </div>
+          <div id="sched-step2-tab" class="hide">
+            @@sched-step2-tab.html@@
+          </div>
+          <div id="sched-step3-tab" class="hide">
+            @@sched-step3-tab.html@@
+          </div>
+          <div id="sched-step4-tab" class="hide">
+            @@sched-step4-tab.html@@
+          </div>
           <div class="tab-content chat-panel"></div>
         </div>
       </div>

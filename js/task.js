@@ -12,6 +12,9 @@ var task = (function() {
     this.observe = function(key, fn) {
       listeners[key] = fn;
     };
+    this.stopObserve = function(key) {
+      delete listeners[key];
+    };
     this.notify = function(v,w,x,y,z) {
       for (var key in listeners) {
         listeners[key](v,w,x,y,z);
@@ -20,6 +23,7 @@ var task = (function() {
   }
 
   mod.onTaskCreated = new Observable();
+  mod.onTaskModified = new Observable();
   mod.onTaskParticipantsChanged = new Observable();
   mod.onChatPosting = new Observable();
   mod.onChatPosted = new Observable();
@@ -102,8 +106,8 @@ var task = (function() {
 
   var taskTypeSelector = show.create({
     "new-task": {ids: ["new-task"]},
-    "sched-task": {ids: ["sched-task"]},
-    "gen-task": {ids: ["gen-task"]}
+    "sched-task": {ids: ["sched-task", "task-title"]},
+    "gen-task": {ids: ["gen-task", "task-title"]}
   });
 
   function initTaskData() {
@@ -191,7 +195,10 @@ var task = (function() {
           task.task_status.task_title = title;
           task.task_status.task_progress = "Coordinating";
           api.postTask(task)
-            .done(loadTask);
+            .done(function(task) {
+              mod.onTaskModified.notify(task);
+              loadTask(task);
+            });
         }
         else {
           var task_data = initTaskData();

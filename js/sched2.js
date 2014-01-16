@@ -601,6 +601,7 @@ var sched2 = (function() {
   }
 
   mod.load = function(tzList, profs, task) {
+    suggestionArea.show("idle");
     clearLocation();
     initializeGoogleMap();
     util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);

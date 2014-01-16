@@ -359,22 +359,20 @@ var chat = (function () {
     return chatFooter;
   }
 
-  var tempItemView;
+  var observeChatPosted = 0;
 
   function chatPosting(item) {
     var view = $("#chat" + item.chatid + " .messages");
     if (0 < view.length) {
-      tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+      var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
       view.append(tempItemView);
-    }
-  }
 
-  function chatPosted(item) {
-    if (tempItemView) {
-      var itemView = viewOfChatItem(item, item.time_created,
-                                    statusOfChatItem(item));
-      tempItemView.replaceWith(itemView);
-      tempItemView = null;
+      var key = ++observeChatPosted;
+      task.onChatPosted.observe(key, function(item) {
+        tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
+                                                statusOfChatItem(item)));
+        task.onChatPosted.stopObserve(key);
+      });
     }
   }
 
@@ -511,7 +509,6 @@ var chat = (function () {
         });
 
         task.onChatPosting.observe("chat-tabs", chatPosting);
-        task.onChatPosted .observe("chat-tabs", chatPosted );
       });
   }
 
