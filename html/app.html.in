@@ -121,24 +121,24 @@
           <li>
             <a href="#all-tasks" class="nav-block" data-toggle="pill">
               <img id="important-icon" class="svg" src="/assets/img/all-tasks.svg">
-              <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div>
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">All Tasks</div>
             </a>
           </li>
           <li class="active">
             <a href="#" class="nav-block" data-toggle="pill">
               <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
-              <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div>
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">Scheduling</div>
             </a>
           </li>
           <li>
             <a href="#" class="nav-block" data-toggle="pill">
               <img id="general-icon" class="svg" src="/assets/img/general.svg">
-              <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div>
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">General</div>
             </a>
           </li>
@@ -223,15 +223,6 @@
     </div>
 
     <div id="task-page" class="hide task-page">
-      <div id="task-navbar">
-        <a href="#">
-          <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
-        </a>
-        <p id="task-title" class="nav-title unselectable ellipsis"></p>
-        <a id="chat-icon-container">
-          <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
-        </a>
-      </div>
 
       <div id="chat" class="animated fadeInUp premiere">
         <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
@@ -272,7 +263,6 @@
           <div id="sched-step4-tab" class="hide">
             @@sched-step4-tab.html@@
           </div>
-          <div class="tab-content chat-panel"></div>
         </div>
       </div>
 

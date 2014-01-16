@@ -261,7 +261,7 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
-  function chatEditor(messages, chat, task) {
+  function chatEditor(blank, messages, chat, task) {
     var chatFooter = $("<div class='chat-footer scrollable'/>");
 
     var editText = $("<textarea class='form-control chat-entry'></textarea>")
@@ -349,6 +349,10 @@ var chat = (function () {
           }
         }
 
+        if (chat.chat_items.length === 0) {
+          blank.addClass("hide");
+        }
+
         mod.postChatItem(item);
       }
     });
@@ -388,13 +392,15 @@ var chat = (function () {
     var messages = $("<div class='messages scrollable'></div>")
       .appendTo(v);
 
+    var blank = $("<div class='blank-chat hide'></div>")
+      .appendTo(messages);
+    var blankChatIcon = $("<img class='blank-chat-icon'/>")
+      .appendTo(blank);
+    svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
+    blank.append("<div>Start the conversation below.</div>");
+
     if (chat.chat_items.length === 0) {
-      var blank = $("<div class='blank-chat'></div>")
-        .appendTo(messages);
-      var blankChatIcon = $("<img class='blank-chat-icon'/>")
-        .appendTo(blank);
-      svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
-      blank.append("Start the conversation below.");
+      blank.removeClass("hide");
     } else {
       for (var i in chat.chat_items) {
         var item = chat.chat_items[i];
@@ -417,7 +423,7 @@ var chat = (function () {
       messages.addClass("group-chat");
     }
 
-    v.append(chatEditor(messages, chat, task));
+    v.append(chatEditor(blank, messages, chat, task));
 
     return v;
   }
