@@ -316,12 +316,9 @@ var chat = (function () {
       .appendTo(sendDiv);
 
     editText.on("keydown", function (e){
-      log("Here1");
       if ($(this).val() !== "") {
-        log("Here2");
         sendButton.removeClass("disabled");
       } else {
-        log("Here3");
         sendButton.addClass("disabled");
       }
     });
@@ -438,6 +435,7 @@ var chat = (function () {
         $("#chat").removeClass("fadeOutDown")
                   .addClass("fadeInUp");
       } else {
+        log("here");
         $("#chat").addClass("fadeOutDown")
                   .removeClass("fadeInUp premiere");
       }

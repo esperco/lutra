@@ -24,7 +24,7 @@ var home = (function() {
       ? task.task_status.task_title
       : null;
 
-    var dragDiv = $("<div class='drag-div'></div>")
+    var dragDiv = $("<div class='drag-div hide'></div>")
       .appendTo(taskLeft);
     var drag = $("<img class='drag'/>")
       .appendTo(dragDiv);
@@ -44,9 +44,9 @@ var home = (function() {
       .appendTo(taskLeft);
 
     if (title) {
-      $("<div class='new-label new-label-task'>NEW</div>")
+      $("<div class='new-label new-label-task hide'>NEW</div>")
         .appendTo(taskDetails);
-      $("<div class='updated updated-task'></div>")
+      $("<div class='updated updated-task hide'></div>")
         .appendTo(taskDetails);
       $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
         .text(title)
@@ -129,6 +129,18 @@ var home = (function() {
     }
   }
 
+  function loadArchive() {
+    var view = $("#archive-tasks-tab-content");
+    view.children().remove();
+    api.loadRecentTasks()
+      .fail(status_.onError(404))
+      .then(function(data) {
+        list.iter(data.tasks, function(task) {
+          view.append(viewofTaskRow(archivedTaskViewId, task));
+        });
+      });
+  }
+
   function loadTasks() {
     $("#general-tasks-tab-content").children().remove();
     $("#scheduling-tasks-tab-content").children().remove();
@@ -143,8 +155,8 @@ var home = (function() {
       });
   }
 
-  function loadArchive() {
-    var view = $("#archive-tasks-tab-content");
+  function loadAllTasks() {
+    var view = $("#all-tasks-tab-content");
     view.children().remove();
     api.loadRecentTasks()
       .fail(status_.onError(404))
@@ -196,6 +208,7 @@ var home = (function() {
 
   mod.load = function() {
     loadNavHeader();
+    loadAllTasks();
     loadTasks();
     loadArchive();
     util.focus();
