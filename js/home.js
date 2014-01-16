@@ -177,7 +177,7 @@ var home = (function() {
       var initials;
       var exec = $("<div id='exec-name-div'></div>")
         .append($("<div id='assisting'>ASSISTING</div>"))
-        .append($("<div id='exec-name' class='ellipsis'>Christopher W.</div>"))
+        .append($("<div id='exec-name' class='ellipsis'>Executive Name</div>"))
         .appendTo(view);
       var caretDiv = $("<div id='exec-caret'></div>")
         .appendTo(view);
