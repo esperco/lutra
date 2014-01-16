@@ -5,21 +5,25 @@
 var home = (function() {
   var mod = {};
 
-  function taskTitleViewId(task) {
-    return "tasktitle-" + task.tid;
+  function activeTaskViewId(task) {
+    return "active-" + task.tid;
   }
 
-  function viewOfTaskTitle(task) {
-    var view = $("<div class='task'/>",{id:taskTitleViewId(task)});
+  function archivedTaskViewId(task) {
+    return "archive-" + task.tid;
+  }
+
+  function viewOfTaskTitle(taskViewId, task) {
+    var view = $("<div/>",{'class':'task', 'id':taskViewId(task)});
     var checkbox = $("<img class='task-checkbox'/>")
       .appendTo(view);
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-    checkbox.click(function() {
-      if (checkbox.hasClass("checkbox-selected")) {
-        checkbox.removeClass("checkbox-selected");
+    view.click(function() {
+      if (view.hasClass("checkbox-selected")) {
+        view.removeClass("checkbox-selected");
       }
       else {
-        checkbox.addClass("checkbox-selected");
+        view.addClass("checkbox-selected");
       }
     })
     var title = task.task_status
@@ -39,12 +43,8 @@ var home = (function() {
          : $("#general-tasks-tab-content");
   }
 
-  function taskCreated(task) {
-    listViewOfTask(task).prepend(viewOfTaskTitle(task));
-  }
-
-  function taskModified(task) {
-    var view_id = taskTitleViewId(task);
+  function taskUpdated(task) {
+    var view_id = activeTaskViewId(task);
 
     // In case the task kind has changed, remove the task title from
     // all the other tabs.
@@ -56,9 +56,17 @@ var home = (function() {
 
     var view = $("#" + view_id);
     if (view.length > 0) {
-      view.replaceWith(viewOfTaskTitle(task));
+      view.replaceWith(viewOfTaskTitle(activeTaskViewId, task));
     } else {
-      taskCreated(task);
+      listViewOfTask(task).prepend(viewOfTaskTitle(activeTaskViewId, task));
+    }
+
+    view = $("#" + archivedTaskViewId(task));
+    if (view.length > 0) {
+      view.replaceWith(viewOfTaskTitle(archivedTaskViewId, task));
+    } else {
+      $("#archive-tasks-tab-content")
+              .prepend(viewOfTaskTitle(archivedTaskViewId, task));
     }
   }
 
@@ -69,10 +77,22 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          listViewOfTask(task).append(viewOfTaskTitle(task));
+          listViewOfTask(task).append(viewOfTaskTitle(activeTaskViewId, task));
         });
-        task.onTaskCreated .observe("task-list", taskCreated);
-        task.onTaskModified.observe("task-list", taskModified);
+        task.onTaskCreated .observe("task-list", taskUpdated);
+        task.onTaskModified.observe("task-list", taskUpdated);
+      });
+  }
+
+  function loadArchive() {
+    var view = $("#archive-tasks-tab-content");
+    view.children().remove();
+    api.loadRecentTasks()
+      .fail(status_.onError(404))
+      .then(function(data) {
+        list.iter(data.tasks, function(task) {
+          view.append(viewOfTaskTitle(archivedTaskViewId, task));
+        });
       });
   }
 
@@ -118,6 +138,7 @@ var home = (function() {
   mod.load = function() {
     loadNavHeader();
     loadTasks();
+    loadArchive();
     util.focus();
   };
 
