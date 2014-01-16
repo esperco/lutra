@@ -341,7 +341,7 @@ object {
 }
 
 #task-navbar {
-  z-index: 1030;
+  z-index: 1020;
   position: fixed !important;
   height: 60px;
   left: 0;
@@ -491,7 +491,7 @@ object {
 .new-task-btn {
   float: right;
   margin-top: 20px;
-  margin-right: 16px;
+  // margin-right: 16px;
 }
 
 .list-tabs > li > a {
@@ -530,22 +530,16 @@ object {
   }
 }
 
-.task-row-left { padding-left: 0; }
-.task-row-left.mobile { padding-right: 0; }
-
-.task-row-right { padding-right: 0; }
-.task-row-right.mobile {
-  padding-top: 13px;
-  padding-left: 0;
-  //padding-left: 20px; /* enable when dragging is ready */
+.task-details.manual {
+  margin-left: 20px; /* enable when dragging is ready */
 }
 
-.task-details {
-  display: block;
-  //margin-left: 20px; /* enable when dragging is ready */
+.task-details.mobile {
+  margin-right: 20px;
 }
 
-.drag-div {
+.task-drag-div,
+.guest-drag-div {
   float: left;
   margin-right: 16px;
   &:hover {
@@ -554,20 +548,35 @@ object {
   }
 }
 
-.important-div {
-  float: left;
-  width: 24px;
-  height: 24px;
+.guest-drag-div {
+  margin-top: 13px;
+}
+
+.archive-div {
+  float: right;
+  width: 12px;
+  height: 12px;
+  margin-top: 5px;
+  margin-left: 10px;
   &:hover {
     cursor: pointer;
-    .important path { stroke: @orange; }
+    .archive path { fill: @red; }
   }
 }
 
-.important-div.marked .important path {
-    fill: @orange;
-    stroke: @orange;
+.archive {
+  display: block;
+  path { fill: @white; }
+}
+
+.archive-div.mobile {
+  .archive-div { margin-left: 10px; }
+  .archive path { fill: @gray_20; }
+  &:hover {
+    cursor: pointer;
+    .archive path { fill: @red; }
   }
+}
 
 .updated {
   width: 10px;
@@ -671,30 +680,6 @@ object {
   margin: 11px;
 }
 
-.archive-div {
-  float: right;
-  width: 12px;
-  height: 12px;
-  margin-top: 5px;
-  margin-left: 10px;
-  &:hover {
-    cursor: pointer;
-    .archive path { fill: @red; }
-  }
-}
-
-.archive-desktop .archive {
-  display: block;
-  path { fill: @white; }
-}
-
-.archive-mobile {
-  .archive-div { margin-left: 10px; }
-  .archive {
-    display: block;
-    path { fill: @gray_20; }
-  }
-}
 
 /*** Footers ***/
 
@@ -816,6 +801,9 @@ object {
 /*** Container ***/
 
 .task-container {
+  max-width: 742px;
+  margin-left: auto;
+  margin-right: auto;
   padding-top: 80px;
   padding-bottom: 120px;
 }
@@ -1266,7 +1254,7 @@ object {
 }
 
 #chat.fadeInUp {
-  z-index: 1040;
+  z-index: 1030;
 }
 
 #chat-caret {
@@ -1768,12 +1756,6 @@ object {
 
 
 /*** Scheduling Step 3 ***/
-
-#sched-step3-table {
-  max-width: 742px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
 .guest-prefs-title {
   margin-top: 40px;

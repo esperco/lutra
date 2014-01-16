@@ -15,33 +15,29 @@ var home = (function() {
 
   function viewofTaskRow(taskViewId, task) {
     var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId(task)});
-    var taskLeft = $("<div class='col-md-6 task-row-left'></div>")
-      .appendTo(view);
-    var taskRight = $("<div class='col-md-6 task-row-right'></div>")
-      .appendTo(view);
 
     var title = task.task_status
       ? task.task_status.task_title
       : null;
 
-    var dragDiv = $("<div class='drag-div hide'></div>")
-      .appendTo(taskLeft);
+    var dragDiv = $("<div class='task-drag-div hide'></div>")
+      .appendTo(view);
     var drag = $("<img class='drag'/>")
       .appendTo(dragDiv);
     svg.loadImg(drag, "/assets/img/drag.svg");
 
-    var archiveDivMobile = $("<div class='archive-div archive-mobile'></div>")
-      .appendTo(taskLeft);
+    var archiveDiv = $("<div class='archive-div'></div>")
+      .appendTo(view);
     var archive = $("<img class='archive'/>")
-      .appendTo(archiveDivMobile);
+      .appendTo(archiveDiv);
     svg.loadImg(archive, "/assets/img/x.svg");
-    archiveDivMobile
-      .tooltip({"title":"Archive","placement":"left"})
+    archiveDiv
+      .tooltip({"title":"Archive"})
       .click(function() {
       });
 
     var taskDetails = $("<div class='task-details'></div>")
-      .appendTo(taskLeft);
+      .appendTo(view);
 
     if (title) {
       $("<div class='new-label new-label-task hide'>NEW</div>")
@@ -60,38 +56,28 @@ var home = (function() {
         .append($("<span class='update-author'> by Christopher</span>"))
         .appendTo(taskDetails);
 
-      var exec = $("<div class='task-exec'></div>")
-        .appendTo(taskRight);
-      $("<div class='task-exec-circ-line'></div>")
-        .append($("<div class='task-exec-circ unselectable'>JL</div>"))
-        .appendTo(exec);
-      $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
-        .appendTo(exec);
+      // var exec = $("<div class='task-exec'></div>")
+      //   .appendTo(view);
+      // $("<div class='task-exec-circ-line'></div>")
+      //   .append($("<div class='task-exec-circ unselectable'>JL</div>"))
+      //   .appendTo(exec);
+      // $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
+      //   .appendTo(exec);
 
-      var withDiv = $("<div class='with-div'></div>")
-        .appendTo(taskRight);
-      var withIcon = $("<img class='with'/>")
-        .appendTo(withDiv);
-      svg.loadImg(withIcon, "/assets/img/with.svg");
+      // var withDiv = $("<div class='with-div'></div>")
+      //   .appendTo(view);
+      // var withIcon = $("<img class='with'/>")
+      //   .appendTo(withDiv);
+      // svg.loadImg(withIcon, "/assets/img/with.svg");
 
-      var taskGuest = $("<div class='task-guest'></div>")
-        .appendTo(taskRight);
-      $("<div class='task-guest-circ-line'></div>")
-        .append($("<div class='task-guest-circ unselectable'>CW</div>"))
-        .appendTo(taskGuest);
-      $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
-        .appendTo(taskGuest);
+      // var taskGuest = $("<div class='task-guest'></div>")
+      //   .appendTo(view);
+      // $("<div class='task-guest-circ-line'></div>")
+      //   .append($("<div class='task-guest-circ unselectable'>CW</div>"))
+      //   .appendTo(taskGuest);
+      // $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
+      //   .appendTo(taskGuest);
     }
-
-    var archiveDivDesktop = $("<div class='archive-div archive-desktop'></div>")
-      .appendTo(taskRight);
-    var archive = $("<img class='archive'/>")
-      .appendTo(archiveDivDesktop);
-    svg.loadImg(archive, "/assets/img/x.svg");
-    archiveDivDesktop
-      .tooltip({"title":"Archive","placement":"left"})
-      .click(function() {
-      });
 
     return view;
   }

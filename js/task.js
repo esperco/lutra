@@ -245,7 +245,7 @@ var task = (function() {
       view.text(task.task_status.task_title);
     }
 
-    view.append($("<a id='edit-title'>Edit</a>"));
+    // view.append($("<a id='edit-title'>Edit</a>"));
 
     return view;
   }

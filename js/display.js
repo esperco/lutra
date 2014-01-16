@@ -82,28 +82,13 @@ var display = (function() {
     }
 
     /*** Lists ***/
-    if ($(window).width() < 360) {
-      $('.task-exec').addClass('mobile');
-      $('.task-guest').addClass('mobile');
-      $('.task-exec-name').addClass('hide');
-      $('.task-guest-name').addClass('hide');
-    } else {
-      $('.task-exec').removeClass('mobile');
-      $('.task-guest').removeClass('mobile');
-      $('.task-exec-name').removeClass('hide');
-      $('.task-guest-name').removeClass('hide');
-    }
 
-    if ($(window).width() < 992) {
-      $('.task-row-left').addClass('mobile');
-      $('.task-row-right').addClass('mobile');
-      $('.archive-desktop').addClass('hide');
-      $('.archive-mobile').removeClass('hide');
+    if ($(window).width() < 768) {
+      $('.task-details').addClass('mobile');
+      $('.archive-div').addClass('mobile');
     } else {
-      $('.task-row-left').removeClass('mobile');
-      $('.task-row-right').removeClass('mobile');
-      $('.archive-desktop').removeClass('hide');
-      $('.archive-mobile').addClass('hide');
+      $('.task-details').removeClass('mobile');
+      $('.archive-div').removeClass('mobile');
     }
   };
 

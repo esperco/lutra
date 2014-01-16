@@ -123,7 +123,7 @@ var sched3 = (function() {
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row'>");
-    var dragDiv = $("<div class='drag-div'></div>")
+    var dragDiv = $("<div class='guest-drag-div hide'></div>")
       .appendTo(view);
     var drag = $("<img class='drag'/>")
       .appendTo(dragDiv);
@@ -158,7 +158,7 @@ var sched3 = (function() {
     var sendMessage = $("<div class='send-message'></div>")
       .click(composeEmail)
       .appendTo(view);
-    $("<a class='send-message-text'>Send a message</a>")
+    $("<a class='send-message-text'>Request preferences</a>")
       .appendTo(sendMessage);
     var composeDiv = $("<div class='compose-div'></div>")
       .appendTo(sendMessage);
@@ -214,7 +214,7 @@ var sched3 = (function() {
     $("<h4 class='guest-prefs-title'>Guest Preferences</h4>")
       .appendTo(view);
 
-    var guestPrefsHeader = $("<div class='guest-prefs-header clearfix'></div>")
+    var guestPrefsHeader = $("<div class='guest-prefs-header clearfix hide'></div>")
       .append($("<div class='col-xs-6'></div>"))
       .appendTo(view);
 
