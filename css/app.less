@@ -152,11 +152,19 @@ object {
 
 #home-title { letter-spacing: 3px; }
 
-#task-title { width: 65%; }
+#task-title-div {
+  margin-left: 56px;
+  margin-right: 60px;
+}
 
-#edit-title {
-  margin-left: 16px;
-  font-size: 14px;
+#task-title {
+  width: 100%;
+  margin-top: 14px;
+  margin-bottom: 0px;
+  font-size: 18px;
+  border: 1px solid @white;
+  &:hover { border: 1px solid @gray_20; }
+  &:focus { border: 1px solid @purple; }
 }
 
 #mobile-navbar-collapse {
@@ -366,8 +374,7 @@ object {
 .workflow-row,
 .sched-step1-row,
 .sched-step1-add-row,
-.suggestion,
-.sched-step3-row {
+.suggestion {
   padding: 10px;
   border-bottom: 1px solid @gray_10;
   &:hover { background: @gray_f8; }
@@ -382,7 +389,11 @@ object {
 }
 
 .sched-step3-row {
-  height: 70px;
+  min-height: 75px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid @gray_10;
+  &:hover { background: @gray_f8; }
 }
 
 .sched-step1-row,
@@ -1578,9 +1589,8 @@ object {
 }
 
 .guest-name {
-  float: left;
   margin-top: 14px;
-  margin-left: 18px;
+  margin-left: 58px;
   font-family: @bold;
 }
 
@@ -1725,7 +1735,7 @@ object {
   path.checkbox { fill: @purple_disabled; }
   path.checkbox { stroke: @purple; }
   path.check { fill: @gray_90; }
-  &:hover path.checkbox { stroke: @purple_hover }
+  &:hover path.checkbox { stroke: @purple_hover !important }
 }
 
 .radio-selected {
@@ -1809,24 +1819,69 @@ object {
   color: @green;
 }
 
-.send-message {
-  float: right;
-  margin-top: 9px;
-  cursor: pointer;
-  &:hover {
-    .compose g { fill: @purple_hover; }
-    .send-message-text { color: @purple_hover; }
+.pref-prof-circ { margin-top: 8px; }
+
+.pref-prof-circ.mobile { margin-top: 0; }
+
+.pref-guest-name {
+  margin-top: 4px;
+  margin-left: 58px;
+  font-family: @bold;
+}
+
+.required {
+  margin-left: 58px;
+  padding-left: 0;
+  &:hover { cursor: pointer;
+    path.checkbox { stroke: @gray_40; }
   }
 }
 
-.compose-div {
-  float: right;
+.required.mobile {
+  margin-top: 50px;
+  margin-left: 0;
 }
 
-.send-message-text {
-  display: inline-block;
+.required-checkbox {
+  float: left;
   margin-top: 5px;
-  margin-right: 10px;
+  margin-right: 7px;
+  height: 18px;
+  width: 18px;
+}
+
+.required-label {
+  margin-top: 5px;
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pref-guest-response {
+  margin-top: 3px;
+  text-align: center;
+  font-family: @light;
+  font-size: 36px;
+  cursor: default;
+}
+
+.pref-guest-response.first { color: @green; }
+.pref-guest-response.second { color: @gray_20; }
+.pref-guest-response.third { color: @gray_10; }
+
+.pref-guest-actions { text-align: center; }
+
+.guest-actions-divider {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+.pref-request,
+.pref-answer {
+  font-size: 14px;
+  color: @purple;
+  cursor: pointer;
+  &:hover { color: @purple_hover; }
 }
 
 

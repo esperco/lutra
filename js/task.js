@@ -246,8 +246,6 @@ var task = (function() {
       }
     });
 
-    // view.append($("<a id='edit-title'>Edit</a>"));
-
     return view;
   }
 
