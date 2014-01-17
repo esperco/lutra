@@ -88,6 +88,13 @@ var login = (function() {
           }
           break;
 
+        case "Task_modified":
+          var tid = ev[1].tid;
+          if (tid) {
+            api.getTask(tid).done(task.onTaskModified.notify);
+          }
+          break;
+
         case "Chat_posted":
           var rid = ev[1].rid;
           if (rid) {
@@ -98,7 +105,6 @@ var login = (function() {
           }
           break;
 
-        case "Task_modified":
         default:
           break;
         }

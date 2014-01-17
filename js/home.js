@@ -5,27 +5,80 @@
 var home = (function() {
   var mod = {};
 
-  function viewOfTaskTitle(task) {
-    var view = $("<div class='task'></div>");
-    var checkbox = $("<img class='task-checkbox'/>")
-      .appendTo(view);
-    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-    checkbox.click(function() {
-      if (checkbox.hasClass("checkbox-selected")) {
-        checkbox.removeClass("checkbox-selected");
-      }
-      else {
-        checkbox.addClass("checkbox-selected");
-      }
-    })
+  function activeTaskViewId(task) {
+    return "active-" + task.tid;
+  }
+
+  function archivedTaskViewId(task) {
+    return "archive-" + task.tid;
+  }
+
+  function viewofTaskRow(taskViewId, task) {
+    var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId(task)});
+
     var title = task.task_status
       ? task.task_status.task_title
       : null;
+
+    var dragDiv = $("<div class='task-drag-div hide'></div>")
+      .appendTo(view);
+    var drag = $("<img class='drag'/>")
+      .appendTo(dragDiv);
+    svg.loadImg(drag, "/assets/img/drag.svg");
+
+    var archiveDiv = $("<div class='archive-div'></div>")
+      .appendTo(view);
+    var archive = $("<img class='archive'/>")
+      .appendTo(archiveDiv);
+    svg.loadImg(archive, "/assets/img/x.svg");
+    archiveDiv
+      .tooltip({"title":"Archive"})
+      .click(function() {
+      });
+
+    var taskDetails = $("<div class='task-details'></div>")
+      .appendTo(view);
+
     if (title) {
-      $("<a class='task-title' href='#!task/" + task.tid + "'/>")
+      $("<div class='new-label new-label-task hide'>NEW</div>")
+        .appendTo(taskDetails);
+      $("<div class='updated updated-task hide'></div>")
+        .appendTo(taskDetails);
+      $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
         .text(title)
-        .appendTo(view);
+        .appendTo(taskDetails);
+      $("<div class='task-status'>Status goes here.</div>")
+        .appendTo(taskDetails);
+      $("<div class='task-date'></div>")
+        .append($("<span class='verb'>Created </span>"))
+        .append($("<span>on </span>"))
+        .append($("<span class='update-date'>May 30, 2014 at 12:55 pm</span>"))
+        .append($("<span class='update-author'> by Christopher</span>"))
+        .appendTo(taskDetails);
+
+      // var exec = $("<div class='task-exec'></div>")
+      //   .appendTo(view);
+      // $("<div class='task-exec-circ-line'></div>")
+      //   .append($("<div class='task-exec-circ unselectable'>JL</div>"))
+      //   .appendTo(exec);
+      // $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
+      //   .appendTo(exec);
+
+      // var withDiv = $("<div class='with-div'></div>")
+      //   .appendTo(view);
+      // var withIcon = $("<img class='with'/>")
+      //   .appendTo(withDiv);
+      // svg.loadImg(withIcon, "/assets/img/with.svg");
+
+      // var taskGuest = $("<div class='task-guest'></div>")
+      //   .appendTo(view);
+      // $("<div class='task-guest-circ-line'></div>")
+      //   .append($("<div class='task-guest-circ unselectable'>CW</div>"))
+      //   .appendTo(taskGuest);
+      // $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
+      //   .appendTo(taskGuest);
     }
+
     return view;
   }
 
@@ -35,8 +88,43 @@ var home = (function() {
          : $("#general-tasks-tab-content");
   }
 
-  function taskCreated(task) {
-    listViewOfTask(task).prepend(viewOfTaskTitle(task));
+  function taskUpdated(task) {
+    var view_id = activeTaskViewId(task);
+
+    // In case the task kind has changed, remove the task title from
+    // all the other tabs.
+    if ("Scheduling" === variant.cons(task.task_data)) {
+      $("#general-tasks-tab-content #" + view_id).remove();
+    } else {
+      $("#scheduling-tasks-tab-content #" + view_id).remove();
+    }
+
+    var view = $("#" + view_id);
+    if (view.length > 0) {
+      view.replaceWith(viewofTaskRow(activeTaskViewId, task));
+    } else {
+      listViewOfTask(task).prepend(viewofTaskRow(activeTaskViewId, task));
+    }
+
+    view = $("#" + archivedTaskViewId(task));
+    if (view.length > 0) {
+      view.replaceWith(viewofTaskRow(archivedTaskViewId, task));
+    } else {
+      $("#all-tasks-tasks-tab-content")
+              .prepend(viewofTaskRow(archivedTaskViewId, task));
+    }
+  }
+
+  function loadArchive() {
+    var view = $("#archive-tasks-tab-content");
+    view.children().remove();
+    api.loadRecentTasks()
+      .fail(status_.onError(404))
+      .then(function(data) {
+        list.iter(data.tasks, function(task) {
+          view.append(viewofTaskRow(archivedTaskViewId, task));
+        });
+      });
   }
 
   function loadTasks() {
@@ -46,9 +134,22 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          listViewOfTask(task).append(viewOfTaskTitle(task));
+          listViewOfTask(task).append(viewofTaskRow(activeTaskViewId, task));
         });
-        task.onTaskCreated.observe("task-list", taskCreated);
+        task.onTaskCreated .observe("task-list", taskUpdated);
+        task.onTaskModified.observe("task-list", taskUpdated);
+      });
+  }
+
+  function loadAllTasks() {
+    var view = $("#all-tasks-tab-content");
+    view.children().remove();
+    api.loadRecentTasks()
+      .fail(status_.onError(404))
+      .then(function(data) {
+        list.iter(data.tasks, function(task) {
+          view.append(viewofTaskRow(archivedTaskViewId, task));
+        });
       });
   }
 
@@ -93,7 +194,9 @@ var home = (function() {
 
   mod.load = function() {
     loadNavHeader();
+    loadAllTasks();
     loadTasks();
+    loadArchive();
     $(".place-nav").click(places.load);
     util.focus();
   };

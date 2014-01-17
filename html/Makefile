@@ -10,6 +10,7 @@ HTML_INCLUDES = \
   request-password.html \
   reset-password.html \
   new-task.html \
+  places.html \
   sched-step1-tab.html \
   sched-step2-tab.html \
   sched-step3-tab.html \

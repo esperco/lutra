@@ -15,7 +15,7 @@ var sched1 = (function() {
 
     var hosts = sched.getHosts(task);
     var adder = $("<div class='add-guest-circ'>");
-    var plus = $("<img id='plus'/>");
+    var plus = $("<img id='plus-guest'/>");
     plus.appendTo(adder);
     svg.loadImg(plus, "/assets/img/plus.svg");
 
@@ -134,11 +134,11 @@ var sched1 = (function() {
         $("#add-guest-btn").addClass("disabled");
     }
 
-    util.afterTyping(emailInput, 500, function() {
+    util.afterTyping(emailInput, 250, function() {
       fetchProfile();
     });
 
-    util.afterTyping(nameInput, 500, function() {
+    util.afterTyping(nameInput, 250, function() {
       updateAddButton();
     });
 
@@ -203,8 +203,11 @@ var sched1 = (function() {
       .append(nameView);
 
     if (sched.isGuest(uid)) {
-      var remove = $("<img class='remove-guest'/>")
+      var removeDiv = $("<div class='remove-guest-div'>")
+        .tooltip({"title":"Remove guest"})
         .appendTo(view);
+      var remove = $("<img class='remove-guest'/>")
+        .appendTo(removeDiv);
       svg.loadImg(remove, "/assets/img/x.svg")
         .then(function(elt) {
           elt.click(function() {
@@ -276,7 +279,7 @@ var sched1 = (function() {
   mod.load = function(profs, task, view) {
     var view = $("#sched-step1-table");
     view.children().remove();
-    $("<h3>Create the guest list.</h3>")
+    $("<h3>Add guests to the meeting.</h3>")
       .appendTo(view);
 
     var hostsContainer = $("<div class='hosts-container'>");

@@ -87,8 +87,8 @@ var show = (function () {
    */
   mod.create = function(tbl, opt) {
     var opt = util.isObject(opt) ? opt : {};
-    var onClass = util.isString(opt.onClass) ? opt.onClass : "";
-    var offClass = util.isString(opt.offClass) ? opt.offClass : "hide";
+    var onClass = util.isString(opt.onClass) ? opt.onClass : "animated fadeIn";
+    var offClass = util.isString(opt.offClass) ? opt.offClass : "animated fadeOut hide";
     var defaultShowOne =
       function(k, v) { defaultShow(k, v, onClass, offClass); };
     var defaultHideOne =

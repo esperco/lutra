@@ -23,6 +23,7 @@ var task = (function() {
   }
 
   mod.onTaskCreated = new Observable();
+  mod.onTaskModified = new Observable();
   mod.onTaskParticipantsChanged = new Observable();
   mod.onChatPosting = new Observable();
   mod.onChatPosted = new Observable();
@@ -105,8 +106,8 @@ var task = (function() {
 
   var taskTypeSelector = show.create({
     "new-task": {ids: ["new-task"]},
-    "sched-task": {ids: ["sched-task"]},
-    "gen-task": {ids: ["gen-task"]}
+    "sched-task": {ids: ["sched-task", "task-title"]},
+    "gen-task": {ids: ["gen-task", "task-title"]}
   });
 
   function initTaskData() {
@@ -182,7 +183,7 @@ var task = (function() {
         newTaskTitle.val("");
       }
       updateUI();
-      util.afterTyping(newTaskTitle, 500, updateUI);
+      util.afterTyping(newTaskTitle, 250, updateUI);
       util.changeFocus(newTaskTitle);
     }
 
@@ -194,7 +195,10 @@ var task = (function() {
           task.task_status.task_title = title;
           task.task_status.task_progress = "Coordinating";
           api.postTask(task)
-            .done(loadTask);
+            .done(function(task) {
+              mod.onTaskModified.notify(task);
+              loadTask(task);
+            });
         }
         else {
           var task_data = initTaskData();
@@ -240,6 +244,8 @@ var task = (function() {
     if (title) {
       view.text(task.task_status.task_title);
     }
+
+    // view.append($("<a id='edit-title'>Edit</a>"));
 
     return view;
   }

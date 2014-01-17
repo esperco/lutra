@@ -4,27 +4,32 @@
 @italic: "Proxima Nova Regular Italic";
 @bold: "Proxima Nova Semibold";
 
+
 /*** Colors ***/
+@border: #cccccc;
+@gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
 @gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
+@gray_80: #58595b;
 @gray_90: #414042;
 @green: #2bb673;
+@green_hover: #1e9b5c;
 @orange: #f7941e;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
 @purple_disabled: #e8d9ee;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
-@red: #e53030;
-@red_hover: #bf2121;
+@red: #d9534f;
+@red_hover: #d2322d;
 @white: #ffffff;
 
 /*** Measurements ***/
-@chat_width: 420px;
+@chat_width: 320px;
 
 
 /*** General ***/
@@ -35,7 +40,7 @@ html {
 }
 
 body {
-  background-color: @white;
+  background: @white;
   color: @gray_90;
   font-family: @regular, Arial;
   font-size: 16px;
@@ -81,6 +86,18 @@ object {
   float: left;
 }
 
+.left-inner-addon {
+    position: relative;
+}
+.left-inner-addon input {
+    padding-left: 28px;
+}
+.left-inner-addon i {
+    position: absolute;
+    padding: 9px 10px;
+    pointer-events: none;
+}
+
 
 /*** Nav Bar ***/
 
@@ -88,7 +105,7 @@ object {
   position: fixed;
   height: 100%;
   width: 220px;
-  background-color: @gray_90;
+  background: @gray_90;
   overflow-y: auto;
 }
 
@@ -96,8 +113,8 @@ object {
 #task-navbar {
   margin: 0;
   padding: 0;
-  background: rgba(248,248,248,0.9);
-  border-bottom: 1px solid @gray_20;
+  background: @white;
+  border-bottom: 1px solid @border;
   border-radius: 0;
 }
 
@@ -133,17 +150,17 @@ object {
   font-size: 18px;
 }
 
-#home-title {
-  letter-spacing: 3px;
-}
+#home-title { letter-spacing: 3px; }
 
-#task-title {
-  width: 65%;
-}
+#task-title { width: 65%; }
 
+#edit-title {
+  margin-left: 16px;
+  font-size: 14px;
+}
 
 #mobile-navbar-collapse {
-  background-color: @gray_90;
+  background: @gray_90;
   box-shadow: 0 10px 10px @gray_60;
 }
 
@@ -151,50 +168,45 @@ object {
   margin: 0;
   padding: 20px 15px;
   height: 80px;
-  background-color: @purple;
+  background: @purple;
   &:hover {
-    background-color: @purple_hover;
+    background: @purple_hover;
     cursor: pointer;
   }
-}
-
-#exec-circ-outline {
-  float: left;
-  padding: 2px;
-  height: 40px;
-  width: 40px;
-  border-radius: 20px;
-  background: @white;
-}
-
-#exec-circ {
-  height: 36px;
-  width: 36px;
-  border-radius: 18px;
-  text-align: center;
-  vertical-align: middle;
-  background: @gray_60;
-}
-
-#exec-name-div {
-  display: inline-block;
-  margin-left: 10px;
-  padding-top: 3px;
-  color: @white;
-}
-
-#assisting {
-  font-size: 12px;
-}
-
-#exec-name {
-  width: 125px;
-  font-family: @bold;
-}
-
-#exec-caret {
-  float: right;
-  margin-top: 8px;
+  #exec-circ-outline {
+    float: left;
+    padding: 2px;
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    background: @white;
+  }
+  #exec-circ {
+    height: 36px;
+    width: 36px;
+    border-radius: 18px;
+    text-align: center;
+    vertical-align: middle;
+    background: @gray_60;
+  }
+  #exec-name-div {
+    display: inline-block;
+    margin-left: 10px;
+    padding-top: 4px;
+    color: @white;
+  }
+  #assisting {
+    font-size: 10px;
+  }
+  #exec-name {
+    width: 125px;
+    font-family: @bold;
+    font-size: 14px;
+  }
+  #exec-caret {
+    float: right;
+    margin-top: 8px;
+  }
 }
 
 .account-nav-open {
@@ -209,14 +221,14 @@ object {
   margin: 0;
   height: 60px;
   color: @gray_20;
-  background-color: #282828;
+  background: #282828 !important;
 }
 
 .nav-section-line {
   margin-top: 40px;
   margin-bottom: 20px;
   height: 1px;
-  background-color: #58595b;
+  background: #58595b;
 }
 
 .nav-section-title {
@@ -226,7 +238,7 @@ object {
   padding-left: 8px;
   padding-right: 8px;
   color: @white;
-  background-color: @gray_90;
+  background: @gray_90;
   font-family: @light;
   letter-spacing: 3px;
 }
@@ -241,30 +253,30 @@ object {
 .nav-text {
   display: inline-block;
   margin-top: 10px;
-  margin-left: 10px;
+  margin-left: 14px;
 }
 
 #settings-icon,
 #logout-icon,
 #search-icon,
-#scheduling-icon,
 #general-icon {
   float: left;
   margin: 10px 2px;
 }
 
-#dashboard-icon {
+#dashboard-icon,
+#scheduling-icon {
   float: left;
   margin: 10px 1px;
 }
 
-#all-tasks-icon {
+#important-icon {
   float: left;
-  margin: 12px 1px;
+  margin-top: 8px;
 }
 
 #archive-icon,
-#people-icon {
+#contacts-icon {
   float: left;
   margin-top: 10px;
 }
@@ -279,20 +291,18 @@ object {
 #search-icon path,
 #dashboard-icon path,
 #dashboard-icon circle,
-#all-tasks-icon path,
+#important-icon path,
 #scheduling-icon path,
 #scheduling-icon text,
 #general-icon path,
 #general-icon circle,
 #archive-icon path,
-#people-icon path,
-#places-icon path, {
-  fill: @gray_60;
-}
+#contacts-icon path,
+#places-icon path, { fill: @gray_60; }
 
-.account-block:hover {
-  background-color: #282828 !important;
-}
+#important-icon path { stroke: @gray_60; }
+
+.account-block:hover { background: #282828 !important; }
 
 .account-block:hover {
   #settings-icon path,
@@ -303,14 +313,15 @@ object {
   #search-icon path,
   #dashboard-icon path,
   #dashboard-icon circle,
-  #all-tasks-icon path,
+  #important-icon path,
   #scheduling-icon path,
   #scheduling-icon text,
   #general-icon path,
   #general-icon circle,
   #archive-icon path,
-  #people-icon path,
+  #contacts-icon path,
   #places-icon path, { fill: @white; }
+  #important-icon path { stroke: @white; }
 }
 
 .nav-pills > li.active > a {
@@ -319,46 +330,39 @@ object {
   #search-icon path,
   #dashboard-icon path,
   #dashboard-icon circle,
-  #all-tasks-icon path,
+  #important-icon path,
   #scheduling-icon path,
   #scheduling-icon text,
   #general-icon path,
   #general-icon circle,
   #archive-icon path,
-  #people-icon path,
+  #contacts-icon path,
   #places-icon path, { fill: @white; }
 }
 
 #task-navbar {
-  z-index: 1030;
+  z-index: 1020;
   position: fixed !important;
   height: 60px;
   left: 0;
-}
-
-#task-navbar.chat-closed {
   right: 0;
-  border-right: none;
 }
 
-#task-navbar.chat-open {
-  right: @chat_width;
-  border-right: 1px solid @gray_20;
-}
-
-
-#chat-icon {
+#chat-icon-container {
   float: right;
+  width: 28px;
+  height: 24px;
   margin-right: 16px;
   margin-top: 20px;
   cursor: pointer;
-  &:hover path { fill: @purple_hover; }
+  &:hover #chat-icon path { fill: @purple_hover; }
 }
 
 
 /*** Table Structure ***/
 
 .task,
+.place-row,
 .workflow-row,
 .sched-step1-row,
 .sched-step1-add-row,
@@ -367,9 +371,17 @@ object {
 .place-row {
   padding: 10px;
   border-bottom: 1px solid @gray_10;
+  &:hover { background: @gray_f8; }
 }
 
-.task,
+.exec-row,
+.email-row,
+.account-row {
+  padding: 15px 10px;
+  border-bottom: 1px solid @gray_10;
+  &:hover { background: @gray_f8; }
+}
+
 .sched-step3-row {
   height: 70px;
 }
@@ -380,6 +392,12 @@ object {
 }
 
 .task-list,
+#user-profile,
+#executives,
+#email-addresses,
+#linked-accounts,
+#scheduling-pref,
+#places,
 #workflow-options,
 #guest-list-container,
 #sched-step2-suggestions,
@@ -388,31 +406,28 @@ object {
   border-top: 1px solid @gray_10;
 }
 
-.task-list {
+.task-list,
+#places {
   margin-top: 20px;
 }
 
+#user-profile,
+#executives,
+#email-addresses,
+#linked-accounts,
+#scheduling-pref,
 #workflow-options,
 #sched-step2-suggestions {
   margin-top: 15px;
 }
 
 .check-all,
-.task-checkbox,
 .workflow-radio,
 .suggestion-checkbox,
 .suggestion-radio {
   float: left;
   width: 24px;
   height: 24px;
-}
-
-.task-checkbox {
-  margin-top: 2px;
-  &:hover {
-    cursor: pointer;
-    path.checkbox { stroke: @gray_40; }
-  }
 }
 
 .workflow-radio {
@@ -458,20 +473,26 @@ object {
   letter-spacing: 6px;
 }
 
+.list-search {
+  float: right;
+  width: 240px;
+  margin-top: 20px;
+  &:hover .search-tasks-icon g { fill: @gray_40; }
+  &:active .search-tasks-icon g { fill: @gray_60; }
+}
+
+.search-tasks-icon {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.search-tasks-icon g { fill: @gray_20; }
+
 .new-task-btn {
   float: right;
   margin-top: 20px;
-}
-
-.toolbar {
-  margin-top: 20px;
-}
-
-.archive-btn {
-  margin-left: 18px;
-  &:hover { cursor: pointer;
-    path.background { fill: @gray_20; }
-  }
+  // margin-right: 16px;
 }
 
 .list-tabs > li > a {
@@ -501,26 +522,168 @@ object {
 }
 
 .task {
-  padding-top: 20px;
-  padding-left: 10px;
-  padding-bottom: 20px;
-  height: 70px;
+  padding: 20px 10px;
   border-bottom: 1px solid;
   border-bottom-color: @gray_10;
+  &:hover {
+    background: @gray_f8;
+    .archive path { fill: @gray_20; }
+  }
+}
+
+.task-details.manual {
+  margin-left: 20px; /* enable when dragging is ready */
+}
+
+.task-details.mobile {
+  margin-right: 20px;
+}
+
+.task-drag-div,
+.guest-drag-div {
+  float: left;
+  margin-right: 16px;
+  &:hover {
+    cursor: move;
+    .drag g circle { fill: @gray_40; }
+  }
+}
+
+.guest-drag-div {
+  margin-top: 13px;
+}
+
+.archive-div {
+  float: right;
+  width: 12px;
+  height: 12px;
+  margin-top: 5px;
+  margin-left: 10px;
+  &:hover {
+    cursor: pointer;
+    .archive path { fill: @red; }
+  }
+}
+
+.archive {
+  display: block;
+  path { fill: @white; }
+}
+
+.archive-div.mobile {
+  .archive-div { margin-left: 10px; }
+  .archive path { fill: @gray_20; }
+  &:hover {
+    cursor: pointer;
+    .archive path { fill: @red; }
+  }
+}
+
+.updated {
+  width: 10px;
+  height: 10px;
+  background: @orange;
+  border-radius: 5px;
+}
+
+.updated.updated-task {
+  float: left;
+  margin-top: 5px;
+  margin-right: 10px;
+}
+
+.updated.updated-nav {
+  float: right;
+  margin-top: 15px;
+}
+
+.new-label {
+  padding: 1px 4px;
+  padding-bottom: 0;
+  font-family: @bold;
+  font-size: 12px;
+  color: @white;
+  background: @orange;
+  border-radius: 3px;
+}
+
+.new-label.new-label-task {
+  float: left;
+  margin-top: 2px;
+  margin-right: 10px;
+}
+
+.new-label.new-label-nav {
+  float: right;
+  margin-top: 10px;
 }
 
 .task-title {
-  display: inline-block;
-  margin-top: 4px;
-  margin-left: 18px;
-  color: @gray_90;
-  &:hover { color: @gray_90; }
+  display: block;
+  font-family: @bold;
+}
+
+.task-status,
+.task-date {
+  margin-top: 3px;
+  color: @gray_60;
+  font-size: 14px;
+}
+
+.verb { font-family: @bold; }
+
+.task-exec,
+.task-guest {
+  width: 100px;
+  text-align: center;
+}
+
+.task-exec.mobile,
+.task-guest.mobile {
+  width: 40px;
+  .task-exec-circ,
+  .task-guest-circ { margin-left: 0; }
+}
+
+.task-exec { float: left; }
+.task-guest { display: inline-block; }
+
+.task-exec-circ-line,
+.task-guest-circ-line {
+  width: 100%;
+}
+
+.task-exec-circ,
+.task-guest-circ {
+  width: 40px;
+  height: 40px;
+  margin-left: 30px;
+  padding-top: 8px;
+  border-radius: 20px;
+  text-align: center;
+  vertical-align: middle;
+  font-family: @light;
+  font-size: 18px;
+  color: @white;
+  background: @gray_60;
+}
+
+.task-exec-name,
+.task-guest-name {
+  display: block;
+  margin-top: 6px;
+  font-family: @bold;
+  font-size: 12px;
+}
+
+.with-div {
+  float: left;
+  margin: 11px;
 }
 
 
 /*** Footers ***/
 
-.list-footer,
 .new-task-footer,
 .sched-footer {
   position: fixed !important;
@@ -529,30 +692,20 @@ object {
   bottom: 0;
   margin-bottom: 0;
   padding: 0;
-  background: rgba(248,248,248,0.9);
+  background: @white;
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
-}
-
-.list-footer {
-  width: 100%;
 }
 
 .new-task-footer {
   padding-top: 20px;
 }
 
-.new-task-footer.chat-closed,
-.sched-footer.chat-closed {
+.new-task-footer,
+.sched-footer {
   right: 0;
   border-right: none;
-}
-
-.new-task-footer.chat-open,
-.sched-footer.chat-open {
-  right: @chat_width;
-  border-right: 1px solid @gray_20;
 }
 
 #start-task {
@@ -649,20 +802,11 @@ object {
 /*** Container ***/
 
 .task-container {
+  max-width: 742px;
+  margin-left: auto;
+  margin-right: auto;
   padding-top: 80px;
   padding-bottom: 120px;
-}
-
-#task-content {
-  height: 100%;
-  position:relative;
-  padding: 0;
-}
-
-.split-screen {
-  margin-right: @chat_width;
-  border-left: none;
-  border-right: 1px solid @gray_20;
 }
 
 
@@ -675,11 +819,11 @@ object {
   height: 24px;
   width: 24px;
   border-radius: 12px;
-  background-color: @gray_10;
+  background: @gray_10;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   &:hover {
-    background-color: @gray_20;
+    background: @gray_20;
     cursor: pointer;
   }
 }
@@ -732,9 +876,9 @@ object {
   color: @gray_60;
 }
 
-.login-title,
+.text-field-label,
 #forgot-password {
-  padding-top: 10px;
+  padding-top: 20px;
   font-size: 14px;
 }
 
@@ -1058,36 +1202,60 @@ object {
 
 /*** Chat ***/
 
-#task-page,
-#chat {
-  height: 100%;
-}
+#task-page { height: 100%; }
 
 #chat {
   position: fixed;
   width: @chat_width;
-  top: 0;
-  right: 0;
-  padding-left: 0;
-  padding-right: 0;
+  top: 48px;
+  left: 100%;
+  margin-left: -@chat_width;
+}
+
+#chat.premiere {
+  -webkit-animation-delay: 1s;
+     -moz-animation-delay: 1s;
+          animation-delay: 1s;
+}
+
+#chat.fadeOutDown {
+  z-index: -1;
+}
+
+#chat.fadeInUp {
+  z-index: 1030;
+}
+
+#chat-caret {
+  position: fixed;
+  display: block;
+  margin-left: @chat_width - 38px;
+}
+
+#chat-container {
+  margin-top: 7px;
+  text-align: left;
+  white-space: normal;
+  background-color: @white;
+  border: 1px solid @border;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
 }
 
 #chat-header {
-  position: fixed;
   z-index: 1030;
-  height: 60px;
-  width: 100%;
-  background: rgba(248,248,248,0.9);
+  padding-left: 9px;
+  background: @gray_f8;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom: 1px solid @border;
 }
 
 .chat-profile-tabs {
-  height: 60px;
-  border-bottom: 1px solid @gray_20;
-}
-
-.chat-tab-div {
-  height: 60px;
-  width: 60px;
+  height: 54px;
 }
 
 .chat-prof-circ {
@@ -1105,10 +1273,16 @@ object {
 }
 
 .prof-caret {
+  display: block;
+  margin-top: 7px;
   margin-left: 9px;
 }
 
 .tab-name {
+  padding-top: 12px !important;
+  padding-right: 9px !important;
+  padding-bottom: 0 !important;
+  padding-left: 9px !important;
   color: @gray_90;
   &:hover { color: @gray_90;
     .chat-prof-circ { background: @gray_20; }
@@ -1119,19 +1293,21 @@ object {
   float: left;
 }
 
-.chat-tabs > li > a {
-  height: 60px;
-  padding-top: 15px;
-}
 .chat-tabs > li > a:hover {
-  background-color: @gray_10;
-  border-bottom: 1px solid @gray_20;
+  background: none;
 }
+
+.chat-tabs > li > a .prof-caret path,
+.chat-tabs > li > a:hover .prof-caret path {
+  fill: none;
+  stroke: none;
+}
+
 .chat-tabs > li.active > a,
 .chat-tabs > li.active > a:hover,
 .chat-tabs > li.active > a:focus {
   cursor: default;
-  background-color: @gray_60;
+  background: none;
   border: none;
 }
 
@@ -1139,41 +1315,50 @@ object {
 .chat-tabs > li.active > a:hover .prof-caret path,
 .chat-tabs > li.active > a:focus .prof-caret path {
   fill: @white;
+  stroke: @gray_20;
 }
 
 .chat-tabs > li.active > a .chat-prof-circ,
 .chat-tabs > li.active > a:hover .chat-prof-circ,
 .chat-tabs > li.active > a:focus .chat-prof-circ {
-  color: @gray_90;
-  background-color: @white;
+  color: @white;
+  background: @gray_60;
 }
 
-.chat-panel {
-  position: fixed;
-  width: @chat_width;
-  top: 60px;
-  bottom: 0;
-  padding-left: 15px;
-  padding-right: 15px;
-  overflow-y: auto;
+.chat-tabs > li.active > a .group g,
+.chat-tabs > li.active > a:hover .group g,
+.chat-tabs > li.active > a:focus .group g {
+  fill: @white;
 }
 
 .chat-profile-details {
-  position: fixed;
   z-index: 1030;
-  width: 100%;
   height: 40px;
-  margin-left: -15px;
-  margin-right: -15px;
   padding-top: 10px;
   padding-left: 15px;
   font-family: @bold;
-  background-color: @white;
+  background: @white;
   border-bottom: 1px solid @gray_20;
 }
 
 .messages {
-  padding-top: 55px;
+  height: 300px;
+  padding: 15px;
+}
+
+.messages.group-chat { height: 270px; }
+
+.blank-chat {
+  padding-top: 80px;
+  text-align: center;
+  color: @gray_40;
+}
+
+.blank-chat-icon {
+  display: block;
+  margin-left: 130px;
+  margin-bottom: 10px;
+  path { fill: @gray_20; }
 }
 
 .message-header {
@@ -1199,7 +1384,16 @@ object {
   position: absolute;
   top: 0px;
   width: 100%;
+  color: @white;
+  background: @red;
+  border: none;
+  border-radius: 0;
   z-index:100;
+  &:hover { background: @red_hover; }
+}
+
+.close-status {
+  color: @white;
 }
 
 .message-status,
@@ -1214,30 +1408,23 @@ object {
 }
 
 .chat-footer {
-  position: fixed;
-  z-index: 1030;
-  width: @chat_width;
-  right: 0;
-  bottom: 0;
-  padding-top: 0;
-  padding-left: 0;
-  padding-right: 0;
-  background: rgba(248,248,248,0.9);
+  max-height: 160px;
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
+  background: @gray_f8;
+  border-top: 1px solid @gray_20;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 .to-field {
   height: 30px;
   padding-top: 5px;
-  padding-left: 15px;
   padding-right: 15px;
+  padding-left: 15px;
   color: @white;
-  background-color: @gray_60;
-  border-top: 1px solid @gray_20;
-}
-
-.chat-editor {
-  border-top: 1px solid @gray_20;
-  padding: 15px;
+  background: @orange;
 }
 
 .chat-entry {
@@ -1247,6 +1434,7 @@ object {
 
 .chat-actions {
   margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .option-list {
@@ -1264,7 +1452,7 @@ object {
   margin-left: -28px;
   height: 18px;
   width: 18px;
-  background-color: @white;
+  background: @white;
   border-radius: 9px;
   border: 2px solid @gray_20;
   float: left;
@@ -1286,14 +1474,14 @@ object {
 .add-option-btn {
   height: 32px;
   width: 100%;
-  padding-top: 4px;
+  padding-top: 0px;
   padding-left: 12px;
   text-align: left;
   font-size: 14px;
   color: @gray_10;
   border: 2px solid @gray_10;
   background: @white;
-  border-radius: 4px;
+  border-radius: 3px;
   &:hover {
     color: @gray_60;
     border: 2px solid @gray_20;
@@ -1315,11 +1503,10 @@ object {
   width: 18px;
 }
 
-.offer-choices-label,
-.offer-choices-label-short {
+.offer-choices-label {
   float: left;
   margin-top: 5px;
-  margin-left: 10px;
+  margin-left: 5px;
   font-size: 14px;
   cursor: pointer;
 }
@@ -1350,7 +1537,7 @@ object {
 }
 
 .list-prof-circ {
-  background-color: @gray_60;
+  background: @gray_60;
 }
 
 .initials {
@@ -1367,34 +1554,34 @@ object {
 }
 
 .add-guest-circ {
-  background-color: @purple;
+  background: @purple;
   &:hover {
-    background-color: @purple_hover;
+    background: @purple_hover;
     cursor: pointer;
   }
 }
 
 .add-guest-disabled,
 .add-guest-disabled:hover {
-  background-color: @purple_disabled !important;
+  background: @purple_disabled !important;
   cursor: default;
 }
 
-#plus {
+#plus-guest {
   margin-top: 10px;
 }
 
 .cancel {
-  background-color: @red !important;
+  background: @red !important;
   .rotate(rotate_ccw_45);
   &:hover {
-    background-color: @red_hover !important;
+    background: @red_hover !important;
     cursor: pointer;
   }
 }
 
 .return-to-add {
-  background-color: @purple;
+  background: @purple;
   .rotate(rotate_cw_45);
 }
 
@@ -1427,14 +1614,18 @@ object {
   margin-bottom: 5px;
 }
 
-.remove-guest {
+.remove-guest-div {
   float: right;
   margin-top: 20px;
-  path { fill: @gray_10; }
-  &:hover { cursor: pointer;
-    path { fill: @gray_20; }
+  &:hover {
+    cursor: pointer;
+    .remove-guest path { fill: @red; }
   }
 }
+
+.remove-guest { display: block; }
+
+.remove-guest path { fill: @gray_20; }
 
 
 /*** Scheduling Step 2 ***/
@@ -1479,6 +1670,7 @@ object {
 .suggestion {
   cursor: pointer;
   &:hover {
+    background: @gray_f8;
     path.checkbox {stroke: @gray_40; }
     path.radio-outline { fill: @gray_40; }
   }
@@ -1543,10 +1735,47 @@ object {
 
 /*** Scheduling Step 3 ***/
 
-.guest-statuses-title {
+.guest-prefs-title {
   margin-top: 40px;
   font-family: @light;
   font-size: 18px;
+}
+
+.guest-prefs-header {
+  margin-bottom: 15px;
+}
+
+.option-letter-block {
+  padding: 0;
+}
+
+.option-letter {
+  width: 30px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: @gray_40;
+  font-size: 20px;
+  border: 2px solid @gray_40;
+  border-radius: 4px;
+}
+
+.option-letter.recommended {
+  color: @green;
+  border-color: @green;
+}
+
+.option-score {
+  margin-top: 5px;
+  text-align: center;
+  font-family: @bold;
+  font-size: 14px;
+  color: @gray_60;
+}
+
+.option-score.recommended {
+  color: @green;
 }
 
 .send-message {
@@ -1601,6 +1830,26 @@ object {
 
 /*** Animations ***/
 
+.fadeIn,
+.fadeOut {
+  -webkit-animation-duration: 0.25s;
+     -moz-animation-duration: 0.25s;
+          animation-duration: 0.25s;
+}
+
+@-moz-keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+@-webkit-keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+@keyframes login_error {
+  0% { border-color: @red; }
+  100% { border-color: default }
+}
+
 .rotate (@rotation) {
   -webkit-animation: @rotation 0.25s;
      -moz-animation: @rotation 0.25s;
@@ -1614,53 +1863,53 @@ object {
 }
 
 @-moz-keyframes rotate_ccw_180 {
-    from { -moz-transform: rotate(180deg); }
-    to { -moz-transform: rotate(0deg); }
+  from { -moz-transform: rotate(180deg); }
+  to { -moz-transform: rotate(0deg); }
 }
 @-webkit-keyframes rotate_ccw_180 {
-    from { -webkit-transform: rotate(180deg); }
-    to { -webkit-transform: rotate(0deg); }
+  from { -webkit-transform: rotate(180deg); }
+  to { -webkit-transform: rotate(0deg); }
 }
 @keyframes rotate_ccw_180 {
-    from {transform:rotate(180deg);}
-    to {transform:rotate(0deg);}
+  from {transform:rotate(180deg);}
+  to {transform:rotate(0deg);}
 }
 
 @-moz-keyframes rotate_cw_180 {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(180deg); }
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(180deg); }
 }
 @-webkit-keyframes rotate_cw_180 {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(180deg); }
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(180deg); }
 }
 @keyframes rotate_cw_180 {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(180deg);}
+  from {transform:rotate(0deg);}
+  to {transform:rotate(180deg);}
 }
 
 @-moz-keyframes rotate_ccw_45 {
-    from { -moz-transform: rotate(0deg); }
-    to { -moz-transform: rotate(-45deg); }
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(-45deg); }
 }
 @-webkit-keyframes rotate_ccw_45 {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(-45deg); }
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(-45deg); }
 }
 @keyframes rotate_ccw_45 {
-    from {transform:rotate(0deg);}
-    to {transform:rotate(-45deg);}
+  from {transform:rotate(0deg);}
+  to {transform:rotate(-45deg);}
 }
 
 @-moz-keyframes rotate_cw_45 {
-    from { -moz-transform: rotate(-45deg); }
-    to { -moz-transform: rotate(0deg); }
+  from { -moz-transform: rotate(-45deg); }
+  to { -moz-transform: rotate(0deg); }
 }
 @-webkit-keyframes rotate_cw_45 {
-    from { -webkit-transform: rotate(-45deg); }
-    to { -webkit-transform: rotate(0deg); }
+  from { -webkit-transform: rotate(-45deg); }
+  to { -webkit-transform: rotate(0deg); }
 }
 @keyframes rotate_cw_45 {
-    from {transform:rotate(-45deg);}
-    to {transform:rotate(0deg);}
+  from {transform:rotate(-45deg);}
+  to {transform:rotate(0deg);}
 }

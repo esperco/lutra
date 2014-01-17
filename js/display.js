@@ -6,6 +6,55 @@ var display = (function() {
   var mod = {};
 
   mod.updateHome = function() {
+
+    /*** Settings ***/
+    if ($(window).width() < 500) {
+      $('.email-address').removeClass('desktop')
+                         .addClass('mobile');
+      $('.primary-label-mobile').removeClass('hide');
+      $('.email-actions-desktop').addClass('hide');
+      $('.email-actions-mobile').removeClass('hide');
+      $('.linked-account-email').addClass('hide');
+      $('.extended-name').addClass('hide');
+    } else {
+      $('.email-address').addClass('desktop')
+                         .removeClass('mobile');
+      $('.primary-label-mobile').addClass('hide');
+      $('.email-actions-desktop').removeClass('hide');
+      $('.email-actions-mobile').addClass('hide');
+      $('.linked-account-email').removeClass('hide');
+      $('.extended-name').removeClass('hide');
+    }
+
+
+    /*** Places ***/
+    if ($(window).width() < 532) {
+      $('.place-details')
+        .removeClass('col-xs-5')
+        .addClass('col-xs-10');
+      $('.stats').addClass('hide');
+      $('.mobile-stats').removeClass('hide');
+      $('.last-visit').addClass('mobile');
+      $('.visits').addClass('mobile');
+      $('.place-actions')
+        .removeClass('desktop')
+        .removeClass('col-xs-4')
+        .addClass('col-xs-2');
+    } else {
+      $('.place-details')
+        .removeClass('col-xs-10')
+        .addClass('col-xs-5');
+      $('.stats').removeClass('hide');
+      $('.mobile-stats').addClass('hide');
+      $('.last-visit').removeClass('mobile');
+      $('.visits').removeClass('mobile');
+      $('.place-actions')
+        .removeClass('col-xs-2')
+        .addClass('col-xs-4')
+        .addClass('desktop');
+    }
+
+    /*** Home ***/
     if ($(window).width() < 768) {
       $('#desktop-navbar').addClass('hide');
       $('#mobile-navbar').removeClass('hide');
@@ -31,37 +80,19 @@ var display = (function() {
       $('.desktop-nav-tabs').removeClass('hide');
       $('.mobile-nav-tabs').addClass('hide');
     }
+
+    /*** Lists ***/
+
+    if ($(window).width() < 768) {
+      $('.task-details').addClass('mobile');
+      $('.archive-div').addClass('mobile');
+    } else {
+      $('.task-details').removeClass('mobile');
+      $('.archive-div').removeClass('mobile');
+    }
   };
 
   mod.updateTask = function() {
-    if ($(window).width() < 1040) {
-      $('#task-navbar')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('.new-task-footer')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('.sched-footer')
-        .addClass('chat-closed')
-        .removeClass('chat-open');
-      $('#chat').addClass('hide');
-      $('#chat-icon-container').removeClass('hide');
-      $('#task-content').removeClass('split-screen');
-    } else {
-      $('#task-navbar')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('.new-task-footer')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('.sched-footer')
-        .addClass('chat-open')
-        .removeClass('chat-closed');
-      $('#chat').removeClass('hide');
-      $('#chat-icon-container').addClass('hide');
-      $('#task-content').addClass('split-screen');
-    }
-
     if ($(window).width() < 620) {
       $('.send-message-text').addClass('hide');
     } else {
@@ -90,6 +121,7 @@ var display = (function() {
   };
 
   mod.init = function() {
+    $("[data-toggle='tooltip']").tooltip();
     mod.checkWidth();
     $(window).resize(mod.checkWidth);
   };
