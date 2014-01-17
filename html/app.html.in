@@ -240,10 +240,12 @@
           <a href="#">
             <img id="return-home" class="svg" src="/assets/img/back-arrow.svg">
           </a>
-          <input id="task-title" class="hide nav-title ellipsis">
           <a id="chat-icon-container">
             <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
           </a>
+          <div id="task-title-div" class="clearfix">
+            <input id="task-title" class="hide form-control ellipsis">
+          </div>
         </div>
 
         <div id="new-task">

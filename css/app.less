@@ -152,11 +152,19 @@ object {
 
 #home-title { letter-spacing: 3px; }
 
-#task-title { width: 65%; }
+#task-title-div {
+  margin-left: 56px;
+  margin-right: 60px;
+}
 
-#edit-title {
-  margin-left: 16px;
-  font-size: 14px;
+#task-title {
+  width: 100%;
+  margin-top: 14px;
+  margin-bottom: 0px;
+  font-size: 18px;
+  border: 1px solid @white;
+  &:hover { border: 1px solid @gray_20; }
+  &:focus { border: 1px solid @purple; }
 }
 
 #mobile-navbar-collapse {
