@@ -15,11 +15,12 @@ var status_ = (function() {
     elt
       .text(msg)
       .addClass("alert alert-" + kind)
-      .removeClass("hide")
+      .addClass("fadeInDown")
+      .removeClass("fadeOutUp hide")
       .click(function() {
-        elt.addClass("hide");
+        elt.addClass("fadeOutUp")
+           .removeClass("fadeInDown");
       });
-    elt.append($("<a class='close'>×</a>"));
   };
 
   mod.reportError = function(msg) {
@@ -31,7 +32,7 @@ var status_ = (function() {
   };
 
   mod.clear = function() {
-    $("#error").addClass("hide");
+    $("#error").addClass("fadeOutUp");
   };
 
   /*
@@ -52,7 +53,7 @@ var status_ = (function() {
   /* Any click in the browser's window hides the status area */
   mod.init = function() {
     $("body").click(function() {
-      $("#global-status").addClass("hide");
+      $("#global-status").addClass("fadeOutUp");
       return true;
     });
   };

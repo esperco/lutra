@@ -315,7 +315,7 @@ var chat = (function () {
       .text("Send")
       .appendTo(sendDiv);
 
-    editText.on("keydown", function (e){
+    editText.on("keyup", function (e){
       if ($(this).val() !== "") {
         sendButton.removeClass("disabled");
       } else {
