@@ -149,7 +149,7 @@ var sched2 = (function() {
         .appendTo(slotView);
       svg.loadImg(checkbox, "/assets/img/checkbox.svg");
       var sugDetails = sched.viewOfSuggestion(slot, score);
-      var editTooltip = $("<a class='suggestion-edit-div'/>")
+      var editTooltip = $("<a class='suggestion-edit-div hide'/>")
         .tooltip({"title":"Edit","placement":"left"})
         .appendTo(slotView);
       var edit = $("<img class='suggestion-edit'/>")
@@ -604,7 +604,7 @@ var sched2 = (function() {
     suggestionArea.show("idle");
     clearLocation();
     initializeGoogleMap();
-    util.afterTyping($("#sched-step2-loc-addr"), 500, predictAddress);
+    util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
     connectCalendar(tzList, profs, task);
   };
 

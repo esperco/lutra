@@ -183,7 +183,7 @@ var task = (function() {
         newTaskTitle.val("");
       }
       updateUI();
-      util.afterTyping(newTaskTitle, 500, updateUI);
+      util.afterTyping(newTaskTitle, 250, updateUI);
       util.changeFocus(newTaskTitle);
     }
 
@@ -244,6 +244,8 @@ var task = (function() {
     if (title) {
       view.text(task.task_status.task_title);
     }
+
+    // view.append($("<a id='edit-title'>Edit</a>"));
 
     return view;
   }

@@ -9,16 +9,17 @@
     <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
     <link href="/assets/css/app.css" rel="stylesheet" media="screen">
     <link href="/assets/css/fonts.css" rel="stylesheet" type="text/css" charset="utf-8" />
+    <link href="/assets/css/animate.min.css" rel="stylesheet">
   </head>
 
   <body>
 
-    <div id="global-status" class="hide"></div>
+    <div id="global-status" class="animated"></div>
 
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
       <li>
-        <a href="#" class="account-block hide">
+        <a href="#" class="account-block hide" data-toggle="pill">
           <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
           <div class="nav-text">Settings</div>
         </a>
@@ -30,13 +31,13 @@
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block hide">
+        <a href="#" class="nav-block hide" data-toggle="pill">
           <img id="search-icon" class="svg" src="/assets/img/search.svg">
           <div class="nav-text">Search</div>
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block hide">
+        <a href="#" class="nav-block hide" data-toggle="pill">
           <img id="dashboard-icon" class="svg" src="/assets/img/dashboard.svg">
           <div class="nav-text">Dashboard</div>
         </a>
@@ -45,40 +46,46 @@
         <span class='nav-section-title'>TASKS</span>
       </div>
       <li>
-        <a href="#" class="nav-block">
-          <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+        <a href="#all-tasks" class="nav-block" data-toggle="pill">
+          <img id="important-icon" class="svg" src="/assets/img/all-tasks.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
           <div class="nav-text">All Tasks</div>
         </a>
       </li>
       <li class="active">
         <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
           <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
           <div class="nav-text">Scheduling</div>
         </a>
       </li>
       <li>
         <a href="#general-task-list" class="nav-block" data-toggle="pill">
           <img id="general-icon" class="svg" src="/assets/img/general.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
           <div class="nav-text">General</div>
         </a>
       </li>
       <li>
         <a href="#archive-task-list" class="nav-block" data-toggle="pill">
           <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-          <div class="nav-text">Archived</div>
+          <div class="nav-text">Archive</div>
         </a>
       </li>
-      <div class="nav-section-line unselectable hide">
+      <div class="nav-section-line unselectable">
         <span class='nav-section-title'>NETWORK</span>
       </div>
       <li>
-        <a href="#" class="nav-block hide">
-          <img id="people-icon" class="svg" src="/assets/img/people.svg">
-          <div class="nav-text">People</div>
+        <a href="#" class="nav-block hide" data-toggle="pill">
+          <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+          <div class="nav-text">Contacts</div>
         </a>
       </li>
       <li>
-        <a href="#" class="nav-block hide">
+        <a href="#" class="nav-block" data-toggle="pill">
           <img id="places-icon" class="svg" src="/assets/img/places.svg">
           <div class="nav-text">Places</div>
         </a>
@@ -97,7 +104,7 @@
         <ul class="nav navbar-nav nav-pills nav-stacked">
           <li class="nav-header unselectable"></li>
           <li>
-            <a href="#" class="account-block hide">
+            <a href="#" class="account-block hide" data-toggle="pill">
               <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
               <div class="nav-text">Settings</div>
             </a>
@@ -112,40 +119,46 @@
             <span class='nav-section-title'>TASKS</span>
           </div>
           <li>
-            <a href="#" class="nav-block">
-              <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+            <a href="#all-tasks" class="nav-block" data-toggle="pill">
+              <img id="important-icon" class="svg" src="/assets/img/all-tasks.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">All Tasks</div>
             </a>
           </li>
           <li class="active">
-            <a href="#" class="nav-block">
+            <a href="#" class="nav-block" data-toggle="pill">
               <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">Scheduling</div>
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block">
+            <a href="#" class="nav-block" data-toggle="pill">
               <img id="general-icon" class="svg" src="/assets/img/general.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">General</div>
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block">
+            <a href="#" class="nav-block" data-toggle="pill">
               <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-              <div class="nav-text">Archived</div>
+              <div class="nav-text">Archive</div>
             </a>
           </li>
-          <div class="nav-section-line unselectable hide">
+          <div class="nav-section-line unselectable">
             <span class='nav-section-title'>NETWORK</span>
           </div>
           <li>
-            <a href="#" class="nav-block hide">
-              <img id="people-icon" class="svg" src="/assets/img/people.svg">
-              <div class="nav-text">People</div>
+            <a href="#" class="nav-block hide" data-toggle="pill">
+              <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+              <div class="nav-text">Contacts</div>
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block hide">
+            <a href="#" class="nav-block" data-toggle="pill">
               <img id="places-icon" class="svg" src="/assets/img/places.svg">
               <div class="nav-text">Places</div>
             </a>
@@ -160,15 +173,15 @@
 
         <form role="form">
           <div class="form-group">
-            <label for="login-email" class="login-title">Email address</label>
-            <input type="email" class="form-control" id="login-email">
+            <label for="login-email" class="text-field-label">Email address</label>
+            <input type="email" id="login-email" class="form-control login-error" tabindex=1>
           </div>
           <div class="form-group">
-            <label for="login-password" class="login-title">Password</label>
+            <label for="login-password" class="text-field-label">Password</label>
             <a href="#!request-password" id="forgot-password">Forgot password?</a>
-            <input type="password" class="form-control" id="login-password">
+            <input type="password" id="login-password" class="form-control login-error" tabindex=2>
           </div>
-          <button id="login-button" class="btn btn-primary login-btn">
+          <button id="login-button" class="btn btn-primary login-btn" tabindex=3>
             LOG IN
           </button>
         </form>
@@ -187,7 +200,7 @@
 
     <div id="home-page" class="hide home-page tab-content">
       <div id="home-push" class="hide"></div>
-      <div id="all-tasks" class="hide">
+      <div id="all-tasks" class="tab-pane">
         @@all-tasks.html@@
       </div>
       <div id="scheduling-task-list" class="tab-pane active">
@@ -202,6 +215,7 @@
     </div>
 
     <div id="test-page" class="hide test-page">
+
       <div class="navbar-push container scrollable">
         <div id="test-content" class="row">
         </div>
@@ -209,6 +223,16 @@
     </div>
 
     <div id="task-page" class="hide task-page">
+
+      <div id="chat" class="animated fadeInUp premiere">
+        <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
+        <div id="chat-container">
+          <div id="chat-header">
+            <ul class="nav chat-tabs chat-profile-tabs"></ul>
+          </div>
+          <div class="tab-content chat-panel"></div>
+        </div>
+      </div>
 
       <div id="task-content" class="scrollable">
 
@@ -240,18 +264,24 @@
             @@sched-step4-tab.html@@
           </div>
         </div>
-
-        <div id="gen-task" class="container task-container hide"></div>
-
       </div>
 
-      <div id="chat">
-        <div id="chat-header">
-          <ul class="nav chat-tabs chat-profile-tabs"></ul>
-          <!-- <div class="chat-profile-details-div"></div> -->
+      <div id="sched-task" class="hide">
+        <div id="sched-step1-tab" class="hide">
+          @@sched-step1-tab.html@@
         </div>
-        <div class="tab-content chat-panel"></div>
+        <div id="sched-step2-tab" class="hide">
+          @@sched-step2-tab.html@@
+        </div>
+        <div id="sched-step3-tab" class="hide">
+          @@sched-step3-tab.html@@
+        </div>
+        <div id="sched-step4-tab" class="hide">
+          @@sched-step4-tab.html@@
+        </div>
       </div>
+
+      <div id="gen-task" class="hide"></div>
 
     </div>
 

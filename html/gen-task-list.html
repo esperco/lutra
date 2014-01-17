@@ -1,23 +1,25 @@
 <div class="container home-container">
   <div class="clearfix">
     <h1 class="page-title unselectable">GENERAL</h1>
+    <div class="list-search hide">
+      <div class="left-inner-addon ">
+        <i>
+          <img class="search-tasks-icon" class="svg" src="/assets/img/search.svg">
+        </i>
+        <input type="text" class="form-control" placeholder="Search tasks" />
+      </div>
+    </div>
     <button id="new-gen-task-btn"
     		class="new-task-btn btn btn-primary">New Task</button>
     <ul class="nav nav-tabs desktop-nav-tabs list-tabs">
-      <li><a href="#">NEW (0)</a></li>
       <li class="active"><a href="#">IN PROGRESS</a></li>
-      <li><a href="#">DONE</a></li>
+      <li><a href="#">COMPLETED</a></li>
     </ul>
   </div>
   <ul class="nav nav-tabs mobile-nav-tabs list-tabs">
-    <li><a href="#">NEW (0)</a></li>
     <li class="active"><a href="#">IN PROGRESS</a></li>
-    <li><a href="#">DONE</a></li>
+    <li><a href="#">COMPLETED</a></li>
   </ul>
   <div id="general-tasks-tab-content" class="task-list"></div>
   <div class="footer-push"></div>
-</div>
-
-<div class="container home-container navbar list-footer">
-  <img class="svg archive-btn" src="/assets/img/archive-task.svg">
 </div>

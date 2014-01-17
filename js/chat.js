@@ -173,7 +173,7 @@ var chat = (function () {
       .appendTo(editDiv);
     v.append(editDiv);
 
-    edit.keydown(function (e) {
+    edit.keyup(function (e) {
       switch (e.which) {
       case 13:
         if (edit.val() !== "") {
@@ -261,21 +261,11 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
-  function chatEditor(messages, chat, task) {
-    var chatFooter = $("<div class='chat-footer'/>");
+  function chatEditor(blank, messages, chat, task) {
+    var chatFooter = $("<div class='chat-footer scrollable'/>");
 
-    if (chat.chatid === task.task_context_chat) {
-      var toField = $("<div class='to-field'/>")
-        .appendTo(chatFooter);
-      toField.append($("<b>To:</b>"));
-      toField.append(" " + chat_participant_names(chat));
-    }
-
-    var v = $("<div class='chat-editor'/>")
+    var editText = $("<textarea class='form-control chat-entry'></textarea>")
       .appendTo(chatFooter);
-
-    var editText = $("<textarea class='form-control chat-entry'><textarea/>")
-      .appendTo(v);
 
     editText.autosize();
 
@@ -289,10 +279,10 @@ var chat = (function () {
 
     var choicesEditor = editChoices();
     choicesEditor.hide();
-    v.append(choicesEditor);
+    chatFooter.append(choicesEditor);
 
     var chatActions = $("<div class='chat-actions clearfix'/>")
-      .appendTo(v);
+      .appendTo(chatFooter);
     var selChoicesDiv = $("<div class='col-xs-10 offer-choices'/>")
       .appendTo(chatActions);
     var sendDiv = $("<div class='col-xs-2 chat-send'/>")
@@ -302,7 +292,7 @@ var chat = (function () {
     selChoicesDiv.append(selChoices);
     svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
     var selChoicesLabel = $("<div/>", {
-      'class': "offer-choices-label unselectablex",
+      'class': "offer-choices-label unselectable",
       'text': "Offer multiple choice response."
     });
     selChoicesDiv.append(selChoicesLabel);
@@ -359,6 +349,10 @@ var chat = (function () {
           }
         }
 
+        if (chat.chat_items.length === 0) {
+          blank.addClass("hide");
+        }
+
         mod.postChatItem(item);
       }
     });
@@ -395,24 +389,41 @@ var chat = (function () {
       displayName.append(chat_participant_names(chat));
     }
 
-    var messages = $("<div class='messages scrollable'><div/>");
+    var messages = $("<div class='messages scrollable'></div>")
+      .appendTo(v);
 
-    for (var i in chat.chat_items) {
-      var item = chat.chat_items[i];
-      var status;
-      if (! item.time_read && item.id && me !== item.by) {
-        api.postChatItemRead(item.chatid, item.id);
-        status = "Read";
-      } else {
-        status = statusOfChatItem(item);
+    var blank = $("<div class='blank-chat hide'></div>")
+      .appendTo(messages);
+    var blankChatIcon = $("<img class='blank-chat-icon'/>")
+      .appendTo(blank);
+    svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
+    blank.append("<div>Start the conversation below.</div>");
+
+    if (chat.chat_items.length === 0) {
+      blank.removeClass("hide");
+    } else {
+      for (var i in chat.chat_items) {
+        var item = chat.chat_items[i];
+        var status;
+        if (! item.time_read && item.id && me !== item.by) {
+          api.postChatItemRead(item.chatid, item.id);
+          status = "Read";
+        } else {
+          status = statusOfChatItem(item);
+        }
+        messages.append(viewOfChatItem(item, item.time_created, status));
       }
-      messages.append(viewOfChatItem(item, item.time_created, status));
     }
 
-    var editor = chatEditor(messages, chat, task);
+    if (chat.chatid === task.task_context_chat) {
+      var toField = $("<div class='to-field'/>")
+        .appendTo(v);
+      toField.append($("<b>To:</b>"));
+      toField.append(" " + chat_participant_names(chat));
+      messages.addClass("group-chat");
+    }
 
-    v.append(messages)
-     .append(editor);
+    v.append(chatEditor(blank, messages, chat, task));
 
     return v;
   }
@@ -424,6 +435,17 @@ var chat = (function () {
 
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
+
+    $("#chat-icon-container").click(function() {
+      log("here");
+      if ($("#chat").hasClass("fadeOutDown")) {
+        $("#chat").removeClass("fadeOutDown")
+                  .addClass("fadeInUp");
+      } else {
+        $("#chat").addClass("fadeOutDown")
+                  .removeClass("fadeInUp premiere");
+      }
+    });
 
     var tabs = $(".chat-profile-tabs");
     var tab_content = $(".chat-panel");

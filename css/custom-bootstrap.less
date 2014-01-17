@@ -10,12 +10,14 @@
 @bold: "Proxima Nova Semibold";
 
 /*** Colors ***/
+@gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
 @gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
+@gray_80: #58595b;
 @gray_90: #414042;
 @green: #2bb673;
 @orange: #f7941e;
@@ -24,9 +26,13 @@
 @purple_disabled: #e8d9ee;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
-@red: #e53030;
-@red_hover: #bf2121;
+@red: #d9534f;
+@red_hover: #d2322d;
 @white: #ffffff;
+
+/*** Measurements ***/
+@chat_width: 320px;
+
 
 /* set a max-width for horizontal fluid layout and make it centered */
 .container {
@@ -35,6 +41,10 @@
   width: auto;
   overflow-y: auto;
 }
+.col-xs-4 {
+  padding-left: 5px;
+  padding-right: 5px;
+}
 .col-sm-3,
 .col-sm-4,
 .col-sm-9 {
@@ -42,6 +52,10 @@
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 0;
+}
+.col-md-6 {
+  padding-left: 10px;
+  padding-right: 10px;
 }
 /*** Text ***/
 a {
@@ -75,6 +89,9 @@ h4,
   font-size: 16px;
 }
 /*** Buttons ***/
+.btn {
+  border-radius: 3px;
+}
 .btn-default,
 .dropdown-toggle.btn-default,
 .open .dropdown-toggle.btn-default {
@@ -208,7 +225,7 @@ fieldset[disabled] .btn-primary.active {
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
   color: @white;
-  background-color: @gray_90;
+  background: none;
   cursor: default;
 }
 .nav-pills > li.active > a .caret,
@@ -225,24 +242,26 @@ fieldset[disabled] .btn-primary.active {
   margin-bottom: 0;
 }
 .nav-tabs {
-  border: none;
   width: 100%;
+  border: none;
 }
 .nav-tabs > li > a {
-  color: @gray_60;
   margin: 0;
+  color: @purple;
   border: none;
   border-radius: 0;
 }
 .nav-tabs > li > a:hover {
-  color: @gray_90;
+  color: @purple_hover;
   border: none;
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-  color: @purple;
+  padding-bottom: 2px;
+  color: @gray_90;
   border: none;
+  border-bottom: 2px solid @purple;
   border-radius: 0;
 }
 /*** Dropdown Menu ***/
@@ -250,7 +269,7 @@ fieldset[disabled] .btn-primary.active {
   margin: 0px 0 0;
 }
 .nav-tabs .dropdown-menu {
-  border-radius: 4px;
+  border-radius: 3px;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
@@ -262,19 +281,25 @@ fieldset[disabled] .btn-primary.active {
 .form-control {
   color: @gray_60;
   height: 32px;
-  border: 2px solid @gray_20;
-  border-radius: 4px;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
 .form-control:hover {
-  border: 2px solid @gray_40;
+  border: 1px solid @gray_40;
 }
 .form-control:focus {
   border-color: @purple_focus;
   outline: 0;
   -webkit-box-shadow: none;
           box-shadow: none;
+}
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+  cursor: default;
+  border: 1px solid @gray_20;
 }
 /*** Modals ***/
 .modal {
@@ -283,13 +308,14 @@ fieldset[disabled] .btn-primary.active {
 .modal-header {
   border-bottom: 1px solid @gray_10;
 }
-/*** Other ***/
+/*** Tooltips ***/
 .tooltip {
   z-index: 1050;
 }
 .tooltip-inner {
   border-radius: 0;
 }
+/*** Other ***/
 hr {
   margin-top: 15px;
   margin-bottom: 15px;
