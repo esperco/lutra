@@ -14,7 +14,7 @@
 
   <body>
 
-    <div id="global-status" class="hide"></div>
+    <div id="global-status" class="animated"></div>
 
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
@@ -80,8 +80,8 @@
       </div>
       <li>
         <a href="#" class="nav-block hide" data-toggle="pill">
-          <img id="people-icon" class="svg" src="/assets/img/people.svg">
-          <div class="nav-text">People</div>
+          <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+          <div class="nav-text">Contacts</div>
         </a>
       </li>
       <li>
@@ -153,8 +153,8 @@
           </div>
           <li>
             <a href="#" class="nav-block hide" data-toggle="pill">
-              <img id="people-icon" class="svg" src="/assets/img/people.svg">
-              <div class="nav-text">People</div>
+              <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+              <div class="nav-text">Contacts</div>
             </a>
           </li>
           <li>
@@ -174,14 +174,14 @@
         <form role="form">
           <div class="form-group">
             <label for="login-email" class="text-field-label">Email address</label>
-            <input type="email" class="form-control login-error" id="login-email">
+            <input type="email" id="login-email" class="form-control login-error" tabindex=1>
           </div>
           <div class="form-group">
             <label for="login-password" class="text-field-label">Password</label>
             <a href="#!request-password" id="forgot-password">Forgot password?</a>
-            <input type="password" class="form-control login-error" id="login-password">
+            <input type="password" id="login-password" class="form-control login-error" tabindex=2>
           </div>
-          <button id="login-button" class="btn btn-primary login-btn">
+          <button id="login-button" class="btn btn-primary login-btn" tabindex=3>
             LOG IN
           </button>
         </form>

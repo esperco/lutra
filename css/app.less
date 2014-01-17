@@ -276,7 +276,7 @@ object {
 }
 
 #archive-icon,
-#people-icon {
+#contacts-icon {
   float: left;
   margin-top: 10px;
 }
@@ -297,7 +297,7 @@ object {
 #general-icon path,
 #general-icon circle,
 #archive-icon path,
-#people-icon path,
+#contacts-icon path,
 #places-icon path, { fill: @gray_60; }
 
 #important-icon path { stroke: @gray_60; }
@@ -319,7 +319,7 @@ object {
   #general-icon path,
   #general-icon circle,
   #archive-icon path,
-  #people-icon path,
+  #contacts-icon path,
   #places-icon path, { fill: @white; }
   #important-icon path { stroke: @white; }
 }
@@ -336,7 +336,7 @@ object {
   #general-icon path,
   #general-icon circle,
   #archive-icon path,
-  #people-icon path,
+  #contacts-icon path,
   #places-icon path, { fill: @white; }
 }
 
@@ -1415,7 +1415,16 @@ object {
   position: absolute;
   top: 0px;
   width: 100%;
+  color: @white;
+  background: @red;
+  border: none;
+  border-radius: 0;
   z-index:100;
+  &:hover { background: @red_hover; }
+}
+
+.close-status {
+  color: @white;
 }
 
 .message-status,

@@ -110,7 +110,7 @@ var home = (function() {
     if (view.length > 0) {
       view.replaceWith(viewofTaskRow(archivedTaskViewId, task));
     } else {
-      $("#archive-tasks-tab-content")
+      $("#all-tasks-tasks-tab-content")
               .prepend(viewofTaskRow(archivedTaskViewId, task));
     }
   }
