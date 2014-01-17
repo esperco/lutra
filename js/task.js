@@ -238,12 +238,13 @@ var task = (function() {
     var view = $("#task-title");
     view.children().remove();
 
-    var title = task.task_status
-      ? task.task_status.task_title
-      : null;
-    if (title) {
-      view.text(task.task_status.task_title);
-    }
+    view.val(task.task_status.task_title);
+    view.change(function() {
+      if (task.task_status.task_title !== view.val()) {
+        task.task_status.task_title = view.val();
+        api.postTask(task);
+      }
+    });
 
     // view.append($("<a id='edit-title'>Edit</a>"));
 
