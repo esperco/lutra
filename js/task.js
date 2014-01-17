@@ -239,7 +239,8 @@ var task = (function() {
     view.children().remove();
 
     view.val(task.task_status.task_title);
-    view.change(function() {
+    view.unbind('change')
+        .change(function() {
       if (task.task_status.task_title !== view.val()) {
         task.task_status.task_title = view.val();
         api.postTask(task);
