@@ -51,7 +51,7 @@ var home = (function() {
         .appendTo(taskDetails);
       $("<div class='task-status'/>").text(task.task_status_text)
         .appendTo(taskDetails);
-      $("<div class='task-date'></div>")
+      $("<div class='task-date hide'></div>")
         .append($("<span class='verb'>Created </span>"))
         .append($("<span>on </span>"))
         .append($("<span class='update-date'>May 30, 2014 at 12:55 pm</span>"))
