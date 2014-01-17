@@ -47,7 +47,7 @@
       </div>
       <li>
         <a href="#all-tasks" class="nav-block" data-toggle="pill">
-          <img id="important-icon" class="svg" src="/assets/img/all-tasks.svg">
+          <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
 <!--           <div class='new-label new-label-nav'>NEW</div>
           <div class='updated updated-nav'></div> -->
           <div class="nav-text">All Tasks</div>
@@ -120,7 +120,7 @@
           </div>
           <li>
             <a href="#all-tasks" class="nav-block" data-toggle="pill">
-              <img id="important-icon" class="svg" src="/assets/img/all-tasks.svg">
+              <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
 <!--               <div class='new-label new-label-nav'>NEW</div>
               <div class='updated updated-nav'></div> -->
               <div class="nav-text">All Tasks</div>
