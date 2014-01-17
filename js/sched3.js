@@ -122,18 +122,12 @@ var sched3 = (function() {
 
 
   function rowViewOfParticipant(chats, profs, task, uid) {
-    var view = $("<div class='sched-step3-row'>");
+    var view = $("<div class='sched-step3-row clearfix'>");
     var dragDiv = $("<div class='guest-drag-div hide'></div>")
       .appendTo(view);
     var drag = $("<img class='drag'/>")
       .appendTo(dragDiv);
     svg.loadImg(drag, "/assets/img/drag.svg");
-    var chatHead = $("<div class='list-prof-circ'>");
-    var obsProf = profs[uid];
-    var prof = obsProf.prof;
-    var name = prof.full_name;
-    var initials = $("<p class='initials unselectable'/>")
-      .text(profile.veryShortNameOfProfile(prof));
 
     var state = sched.getState(task);
     var howSoon = state.meeting_request.how_soon;
@@ -149,22 +143,56 @@ var sched3 = (function() {
       availabilityModal.modal({});
     }
 
+    var guest = $("<div class='col-xs-6'></div>")
+      .appendTo(view);
+    var chatHead = $("<div class='list-prof-circ pref-prof-circ'>");
+    var obsProf = profs[uid];
+    var prof = obsProf.prof;
+    var name = prof.full_name;
+    var initials = $("<p class='initials unselectable'/>")
+      .text(profile.veryShortNameOfProfile(prof));
+
     initials.appendTo(chatHead);
-    chatHead.appendTo(view);
+    chatHead.appendTo(guest);
 
-    $("<p class='guest-name'>" + name + "</p>")
+    $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
+      .appendTo(guest);
+
+    var requiredDiv = $("<div class='required clearfix'/>")
+      .appendTo(guest);
+    var required = $("<img class='required-checkbox'/>")
+      .appendTo(requiredDiv);
+    svg.loadImg(required, "/assets/img/checkbox-sm.svg");
+    var requiredLabel = $("<div/>", {
+      'class': "required-label ellipsis unselectable",
+      'text': "Required"
+    });
+    requiredDiv.append(requiredLabel);
+
+    requiredDiv.click(function () {
+      if (requiredDiv.hasClass("checkbox-selected")) {
+        requiredDiv.removeClass("checkbox-selected");
+      } else {
+        requiredDiv.addClass("checkbox-selected");
+      }
+    });
+
+    var responseA = $("<div class='hide col-xs-2 pref-guest-response third'>3</div>")
+      .appendTo(view);
+    var responseB = $("<div class='hide col-xs-2 pref-guest-response first'>1</div>")
+      .appendTo(view);
+    var responseC = $("<div class='hide col-xs-2 pref-guest-response second'>2</div>")
       .appendTo(view);
 
-    var sendMessage = $("<div class='send-message'></div>")
+    var guestActions = $("<div class='col-xs-6 pref-guest-actions'></div>")
+      .appendTo(view);
+    $("<div class='pref-request'>Request preferences</div>")
       .click(composeEmail)
-      .appendTo(view);
-    $("<a class='send-message-text'>Request preferences</a>")
-      .appendTo(sendMessage);
-    var composeDiv = $("<div class='compose-div'></div>")
-      .appendTo(sendMessage);
-    var compose = $("<img class='compose'/>")
-      .appendTo(composeDiv);
-    svg.loadImg(compose, "/assets/img/compose.svg");
+      .appendTo(guestActions);
+    $("<hr class='guest-actions-divider'></hr>")
+      .appendTo(guestActions);
+    $("<div class='pref-answer'>Answer for guest</div>")
+      .appendTo(guestActions);
 
     var sendButton = $("#sched-availability-send");
     sendButton
@@ -214,19 +242,22 @@ var sched3 = (function() {
     $("<h4 class='guest-prefs-title'>Guest Preferences</h4>")
       .appendTo(view);
 
-    var guestPrefsHeader = $("<div class='guest-prefs-header clearfix hide'></div>")
+    $("<div class='score-info'></div>")
+      .appendTo(view);
+
+    var guestPrefsHeader = $("<div class='guest-prefs-header clearfix'></div>")
       .append($("<div class='col-xs-6'></div>"))
       .appendTo(view);
 
-    var ABlock = $("<div class='option-letter-block col-xs-2'></div>")
+    var ABlock = $("<div class='hide option-letter-block col-xs-2'></div>")
       .append($("<div class='option-letter unselectable'>A</div>"))
       .append($("<div class='option-score unselectable'>63</div>"))
       .appendTo(guestPrefsHeader);
-    var BBlock = $("<div class='option-letter-block col-xs-2'></div>")
+    var BBlock = $("<div class='hide option-letter-block col-xs-2'></div>")
       .append($("<div class='option-letter recommended unselectable'>B</div>"))
       .append($("<div class='option-score recommended unselectable'>84</div>"))
       .appendTo(guestPrefsHeader);
-    var CBlock = $("<div class='option-letter-block col-xs-2'></div>")
+    var CBlock = $("<div class='hide option-letter-block col-xs-2'></div>")
       .append($("<div class='option-letter unselectable'>C</div>"))
       .append($("<div class='option-score unselectable'>81</div>"))
       .appendTo(guestPrefsHeader);

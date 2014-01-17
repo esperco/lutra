@@ -238,14 +238,14 @@ var task = (function() {
     var view = $("#task-title");
     view.children().remove();
 
-    var title = task.task_status
-      ? task.task_status.task_title
-      : null;
-    if (title) {
-      view.text(task.task_status.task_title);
-    }
-
-    // view.append($("<a id='edit-title'>Edit</a>"));
+    view.val(task.task_status.task_title);
+    view.unbind('change')
+        .change(function() {
+      if (task.task_status.task_title !== view.val()) {
+        task.task_status.task_title = view.val();
+        api.postTask(task);
+      }
+    });
 
     return view;
   }
@@ -301,6 +301,9 @@ var task = (function() {
 
   mod.init = function() {
     $("#new-task-btn-mobile").click(function () {
+      window.location.hash = "!task";
+    });
+    $("#new-task-btn").click(function () {
       window.location.hash = "!task";
     });
     $("#new-gen-task-btn").click(function () {

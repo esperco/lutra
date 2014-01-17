@@ -93,10 +93,16 @@ var display = (function() {
   };
 
   mod.updateTask = function() {
-    if ($(window).width() < 620) {
-      $('.send-message-text').addClass('hide');
+    if ($(window).width() < 365) {
+      $('.pref-prof-circ').addClass('mobile');
+      $('.pref-guest-name').addClass('hide');
+      $('.required').addClass('mobile');
+      $('.pref-guest-actions').removeClass('desktop');
     } else {
-      $('.send-message-text').removeClass('hide');
+      $('.pref-prof-circ').removeClass('mobile');
+      $('.pref-guest-name').removeClass('hide');
+      $('.required').removeClass('mobile');
+      $('.pref-guest-actions').addClass('desktop');
     }
   };
 
