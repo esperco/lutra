@@ -8,9 +8,11 @@ var home = (function() {
   function activeTaskViewId(task) {
     return "active-" + task.tid;
   }
-
-  function archivedTaskViewId(task) {
+  function archiveTaskViewId(task) {
     return "archive-" + task.tid;
+  }
+  function allTaskViewId(task) {
+    return "all-" + task.tid;
   }
 
   function viewofTaskRow(taskViewId, task) {
@@ -47,7 +49,7 @@ var home = (function() {
       $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
-      $("<div class='task-status'>Status goes here.</div>")
+      $("<div class='task-status'/>").text(task.task_status_text)
         .appendTo(taskDetails);
       $("<div class='task-date'></div>")
         .append($("<span class='verb'>Created </span>"))
@@ -106,25 +108,27 @@ var home = (function() {
       listViewOfTask(task).prepend(viewofTaskRow(activeTaskViewId, task));
     }
 
-    view = $("#" + archivedTaskViewId(task));
+    view = $("#" + allTaskViewId(task));
     if (view.length > 0) {
-      view.replaceWith(viewofTaskRow(archivedTaskViewId, task));
+      view.replaceWith(viewofTaskRow(allTaskViewId, task));
     } else {
-      $("#all-tasks-tasks-tab-content")
-              .prepend(viewofTaskRow(archivedTaskViewId, task));
+      $("#all-tasks-tab-content")
+              .prepend(viewofTaskRow(allTaskViewId, task));
     }
   }
 
   function loadArchive() {
+  if (false) { // not implemented yet
     var view = $("#archive-tasks-tab-content");
     view.children().remove();
     api.loadRecentTasks()
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          view.append(viewofTaskRow(archivedTaskViewId, task));
+          view.append(viewofTaskRow(archiveTaskViewId, task));
         });
       });
+  }
   }
 
   function loadTasks() {
@@ -148,7 +152,7 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          view.append(viewofTaskRow(archivedTaskViewId, task));
+          view.append(viewofTaskRow(allTaskViewId, task));
         });
       });
   }

@@ -303,6 +303,9 @@ var task = (function() {
     $("#new-task-btn-mobile").click(function () {
       window.location.hash = "!task";
     });
+    $("#new-task-btn").click(function () {
+      window.location.hash = "!task";
+    });
     $("#new-gen-task-btn").click(function () {
       $("#workflow-gen").prop("checked", true);
       window.location.hash = "!task";
