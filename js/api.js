@@ -199,12 +199,12 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.postSelectGooglePlace = function(uid, loc, refId) {
+  /*mod.postSelectGooglePlace = function(uid, loc, refId) {
     var url = api_s_prefix() + "/place/select/google/" +
               encodeURIComponent(loc) + "/" +
               encodeURIComponent(refId);
     return jsonHttpPost(url, "");
-  };
+  };*/
 
   mod.postSelectFavoritePlace = function(uid, loc) {
     var url = api_s_prefix() + "/place/select/favorite/" +
@@ -223,11 +223,17 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(update));
   };
 
-  mod.postCreatePlace = function(uid, loc, refId) {
+  mod.postCreatePlace = function(uid, desc, edit) {
     var url = api_s_prefix() + "/place/create/" +
+              encodeURIComponent(desc);
+    return jsonHttpPost(url, JSON.stringify(edit));
+  };
+
+  mod.getPlaceDetails = function(uid, loc, refId) {
+    var url = api_s_prefix() + "/place/details/" +
               encodeURIComponent(loc) + "/" +
               encodeURIComponent(refId);
-    return jsonHttpPost(url, "");
+    return jsonHttpGet(url);
   };
 
   mod.getSuggestions = function(x) {

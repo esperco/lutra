@@ -5,7 +5,8 @@
 var places = (function() {
   var mod = {};
 
-  var selectedRefId = null;
+  var selectedPlaceDesc = null;
+  var selectedPlaceDetails = null;
 
   function addressDropdown(predictions) {
     if (predictions.from_google.length == 0) return;
@@ -24,9 +25,14 @@ var places = (function() {
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          $("#edit-place-address").val(item.description);
-          selectedRefId = item.ref_id;
-          $('#places-address-dropdown-toggle').dropdown("toggle");
+          api.getPlaceDetails(login.me(), item.description, item.ref_id)
+            .done(function(details) {
+              selectedPlaceDesc = item.description;
+              selectedPlaceDetails = details;
+              $("#edit-place-location-title").val(details.name);
+              $("#edit-place-address").val(details.formatted_address);
+              $('#places-address-dropdown-toggle').dropdown("toggle");
+            });
           return false;
         });
     });
@@ -77,11 +83,22 @@ var places = (function() {
     var title = $("#edit-place-location-title").val();
     var address = $("#edit-place-address").val();
     var instructions = $("#edit-place-instructions").val();
+    var google_description = null;
+    var geometry = null;
+    if (selectedPlaceDetails) {
+      google_description = selectedPlaceDesc;
+      geometry = selectedPlaceDetails.geometry;
+    } else {
+      google_description = place.google_description;
+      geometry = place.loc.coord;
+    }
     var update = {
       title: (title == "" ? place.loc.title : title),
       address: (address == "" ? place.loc.address : address),
       instructions:
-        (instructions == "" ? place.loc.instructions : instructions)
+        (instructions == "" ? place.loc.instructions : instructions),
+      google_description: google_description,
+      geometry: geometry
     };
     var uid = login.me();
     api.postUpdatePlace(uid, place.placeid, update)
@@ -215,11 +232,33 @@ var places = (function() {
     return view;
   }
 
+  function placeListComparator(p1, p2) {
+    if (p2.uses - p1.uses > 0) {
+      return 1;
+    } else if (p1.uses - p2.uses > 0) {
+      return -1;
+    } else {
+      if (p1.loc.title > p2.loc.title) {
+        return 1;
+      } else if (p2.loc.title > p1.loc.title) {
+        return -1;
+      } else {
+        if (p1.loc.address > p2.loc.address) {
+          return 1;
+        } else if (p2.loc.address > p1.loc.address) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    }
+  }
+
   function displayPlaces(placeList) {
-    console.log(placeList.toSource());
+    var sortedPlaces = placeList.sort(placeListComparator);
     var placesView = $("#places");
     placesView.children().remove();
-    list.iter(placeList, function(place) {
+    list.iter(sortedPlaces, function(place) {
       viewOfPlace(place).appendTo(placesView);
     });
     display.updateHome();
@@ -235,21 +274,21 @@ var places = (function() {
   }
 
   function saveNewPlace() {
-    if (selectedRefId) {
+    if (selectedPlaceDetails) {
       var editModal = $("#edit-place-modal");
       editModal.modal("hide");
       var title = $("#edit-place-location-title").val();
       var address = $("#edit-place-address").val();
       var instructions = $("#edit-place-instructions").val();
-      var update = {
+      var edit = {
         title: title,
         address: address,
-        instructions: instructions
+        instructions: instructions,
+        google_description: selectedPlaceDesc,
+        geometry: selectedPlaceDetails.geometry
       };
       var uid = login.me();
-      console.log(update.toSource());
-      console.log(selectedRefId);
-      api.postCreatePlace(uid, address, selectedRefId)
+      api.postCreatePlace(uid, selectedPlaceDesc, edit)
         .done(function() {
           api.getPlaceList(uid).done(displayPlaces);
         });
