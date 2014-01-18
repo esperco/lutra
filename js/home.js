@@ -201,6 +201,7 @@ var home = (function() {
     loadAllTasks();
     loadTasks();
     loadArchive();
+    $(".place-nav").click(places.load);
     util.focus();
   };
 

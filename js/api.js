@@ -197,21 +197,38 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.getPlacePredictions = function(uid, loc) {
+  mod.getPlacePredictions = function(uid, partial_loc) {
     var url = api_s_prefix() + "/place/autocomplete/" +
-              encodeURIComponent(loc);
+              encodeURIComponent(partial_loc);
     return jsonHttpGet(url);
   };
 
-  mod.postSelectGooglePlace = function(uid, loc, refId) {
-    var url = api_s_prefix() + "/place/select/google/" +
-              encodeURIComponent(loc) + "/" +
+  mod.getPlaceDetails = function(uid, desc, refId) {
+    var url = api_s_prefix() + "/place/details/" +
+              encodeURIComponent(desc) + "/" +
               encodeURIComponent(refId);
-    return jsonHttpPost(url, "");
+    return jsonHttpGet(url);
   };
 
-  mod.postSelectFavoritePlace = function(uid, loc) {
-    var url = api_s_prefix() + "/place/select/favorite/" +
+  mod.postCreatePlace = function(uid, desc, edit) {
+    var url = api_s_prefix() + "/place/create/" +
+              encodeURIComponent(desc);
+    return jsonHttpPost(url, JSON.stringify(edit));
+  };
+
+  mod.postEditPlace = function(uid, placeid, edit) {
+    var url = api_s_prefix() + "/place/edit/" +
+              encodeURIComponent(placeid);
+    return jsonHttpPost(url, JSON.stringify(edit));
+  };
+
+  mod.getPlaceList = function(uid) {
+    var url = api_s_prefix() + "/place/list/";
+    return jsonHttpGet(url);
+  };
+
+  mod.postSelectPlace = function(uid, loc) {
+    var url = api_s_prefix() + "/place/select/" +
               encodeURIComponent(loc);
     return jsonHttpPost(url, "");
   };

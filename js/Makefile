@@ -35,12 +35,15 @@ SOURCES = \
   sample.js \
   profile.js \
   chat.js \
+  geo.js \
   sched.js \
   sched1.js \
   sched2.js \
   sched3.js \
   sched4.js \
   task.js \
+  settings.js \
+  places.js \
   home.js \
   page.js \
   route.js \
