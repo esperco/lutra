@@ -5,21 +5,11 @@
 var home = (function() {
   var mod = {};
 
-  function activeTaskViewId(tid) {
-    return "active-" + tid;
-  }
-  function archiveTaskViewId(tid) {
-    return "archive-" + tid;
-  }
-  function allTaskViewId(tid) {
-    return "all-" + tid;
-  }
+  function viewOfTaskRow(ta, taskViewId) {
+    var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId});
 
-  function viewofTaskRow(taskViewId, task) {
-    var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId(task.tid)});
-
-    var title = task.task_status
-      ? task.task_status.task_title
+    var title = ta.task_status
+      ? ta.task_status.task_title
       : null;
 
     var dragDiv = $("<div class='task-drag-div hide'></div>")
@@ -28,6 +18,8 @@ var home = (function() {
       .appendTo(dragDiv);
     svg.loadImg(drag, "/assets/img/drag.svg");
 
+    // Add both Archive button and Restore button to the row.
+    // By css magic they will only show up in the appropriate tabs.
     var archiveDiv = $("<div class='archive-div'></div>")
       .appendTo(view);
     var archive = $("<img class='archive'/>")
@@ -36,7 +28,17 @@ var home = (function() {
     archiveDiv
       .tooltip({"title":"Archive"})
       .click(function() {
+        api.archiveTask(ta.tid);
+        task.onTaskArchived.notify(ta.tid);
       });
+
+    var restoreButton = $("<button class='restore-div'/>")
+      .text("Restore")
+      .appendTo(view);
+    restoreButton.click(function() {
+      api.rankTaskFirst(ta.tid);
+      task.onTaskRankedFirst.notify(ta.tid);
+    });
 
     var taskDetails = $("<div class='task-details'></div>")
       .appendTo(view);
@@ -46,10 +48,10 @@ var home = (function() {
         .appendTo(taskDetails);
       $("<div class='updated updated-task hide'></div>")
         .appendTo(taskDetails);
-      $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
+      $("<a href='#!task/" + ta.tid + "' class='task-title ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
-      $("<div class='task-status'/>").text(task.task_status_text)
+      $("<div class='task-status'/>").text(ta.task_status_text)
         .appendTo(taskDetails);
       $("<div class='task-date hide'></div>")
         .append($("<span class='verb'>Created </span>"))
@@ -84,6 +86,26 @@ var home = (function() {
     return view;
   }
 
+  function activeTaskViewId(tid) {
+    return "active-" + tid;
+  }
+  function archiveTaskViewId(tid) {
+    return "archive-" + tid;
+  }
+  function allTaskViewId(tid) {
+    return "all-" + tid;
+  }
+
+  function viewOfActiveTaskRow(task) {
+    return viewOfTaskRow(task, activeTaskViewId(task.tid));
+  }
+  function viewOfArchiveTaskRow(task) {
+    return viewOfTaskRow(task, archiveTaskViewId(task.tid));
+  }
+  function viewOfAllTaskRow(task) {
+    return viewOfTaskRow(task, allTaskViewId(task.tid));
+  }
+
   function listViewOfTask(task) {
     return "Scheduling" === variant.cons(task.task_data)
          ? $("#scheduling-tasks-tab-content")
@@ -103,17 +125,22 @@ var home = (function() {
 
     var view = $("#" + activeViewId);
     if (view.length > 0) {
-      view.replaceWith(viewofTaskRow(activeTaskViewId, task));
+      view.replaceWith(viewOfActiveTaskRow(task));
     } else {
-      listViewOfTask(task).prepend(viewofTaskRow(activeTaskViewId, task));
+      listViewOfTask(task).prepend(viewOfActiveTaskRow(task));
     }
 
     view = $("#" + allTaskViewId(task.tid));
     if (view.length > 0) {
-      view.replaceWith(viewofTaskRow(allTaskViewId, task));
+      view.replaceWith(viewOfAllTaskRow(task));
     } else {
       $("#all-tasks-tab-content")
-              .prepend(viewofTaskRow(allTaskViewId, task));
+              .prepend(viewOfAllTaskRow(task));
+    }
+
+    view = $("#" + archiveTaskViewId(task.tid));
+    if (view.length > 0) {
+      view.replaceWith(viewOfArchiveTaskRow(task));
     }
   }
 
@@ -124,7 +151,7 @@ var home = (function() {
     } else {
       $("#" + archiveTaskViewId(tid)).remove();
       api.getTask(tid).then(function(task) {
-        mover(listViewOfTask(task), viewofTaskRow(activeTaskViewId, task));
+        mover(listViewOfTask(task), viewOfActiveTaskRow(task));
       });
     }
   }
@@ -138,7 +165,7 @@ var home = (function() {
       } else {
         $("#" + archiveTaskViewId(tid)).remove();
         api.getTask(tid).then(function(task) {
-          mover(viewofTaskRow(activeTaskViewId, task), targetView);
+          mover(viewOfActiveTaskRow(task), targetView);
         });
       }
     } else {
@@ -180,7 +207,7 @@ var home = (function() {
     else if ($("#" + archiveTaskViewId(tid)).length <= 0) {
       api.getTask(tid).done(function(task) {
         $("#archive-tasks-tab-content")
-              .prepend(viewofTaskRow(archiveTaskViewId, task));
+              .prepend(viewOfArchiveTaskRow(task));
       });
     }
   }
@@ -196,7 +223,7 @@ var home = (function() {
     var view = $("#archive-tasks-tab-content");
     view.children().remove();
     list.iter(list.diff(allTasks, activeTasks, task_tid), function(task) {
-      view.append(viewofTaskRow(archiveTaskViewId, task));
+      view.append(viewOfArchiveTaskRow(task));
     });
 
     task.onTaskArchived.observe("task-list", taskArchived);
@@ -209,7 +236,7 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          listViewOfTask(task).append(viewofTaskRow(activeTaskViewId, task));
+          listViewOfTask(task).append(viewOfActiveTaskRow(task));
         });
         task.onTaskCreated     .observe("task-list", taskUpdated);
         task.onTaskModified    .observe("task-list", taskUpdated);
@@ -228,7 +255,7 @@ var home = (function() {
       .fail(status_.onError(404))
       .then(function(data) {
         list.iter(data.tasks, function(task) {
-          view.append(viewofTaskRow(allTaskViewId, task));
+          view.append(viewOfAllTaskRow(task));
         });
         return data.tasks;
       });
