@@ -571,8 +571,8 @@ var sched2 = (function() {
           api.getPlaceDetails(leaderUid, desc, item.ref_id)
             .done(function(place) {
               /* TODO Return timezone with details or find some other way
-               * to refresh the list... this is dirty anyway */
-              //timeZoneDropdown.set(place.loc.timezone);
+               * to refresh the list... this is dirty */
+              timeZoneDropdown.set(timeZoneDropdown.get());
               $('#location-dropdown-toggle').dropdown("toggle");
             });
           return false;
