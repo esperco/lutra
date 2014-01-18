@@ -16,6 +16,7 @@ HTML_INCLUDES = \
   sched-step3-tab.html \
   sched-step4-tab.html \
   sched-task-list.html \
+  places.html \
   settings.html
 
 dev-build:

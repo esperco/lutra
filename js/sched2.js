@@ -505,46 +505,37 @@ var sched2 = (function() {
 
   function saveLocationSelection(loc, refId) {
     api.postPlaceDetails(leaderUid, loc, refId)
-      .done(function() { });
-  }
-
-  /* Boy does this function suck. Hooray for imperative programming!
-   * If you can think of a better way to write this, be my guest! */
-  function highlight(address, matches) {
-    var withBold = "";
-    for (var i = 0; i < address.length; i++) {
-      var c = address[i];
-      var wroteChar = false;
-      for (var j = 0; j < matches.length; j++) {
-        if (i == matches[j][0] + matches[j][1]) {
-          withBold += "</b>";
-        }
-        if (i == 0 && matches[j][0] == 0) {
-          withBold += "<b>";
-        } else if (i == matches[j][0] - 1) {
-          withBold += address.charAt(i) + "<b>";
-          wroteChar = true;
-        }
-      }
-      if (!wroteChar) { withBold += address.charAt(i); }
-    }
-    return withBold;
+      .done(function() { /* TODO Is this function needed? */ });
   }
 
   function displayPredictionsDropdown(predictions) {
-    if (predictions.from_favorites.length == 0
+    if (predictions.from_saved_places.length == 0
         && predictions.from_google.length == 0) return;
     var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown-menu");
     menu.children().remove();
 
-    if (predictions.from_favorites.length > 0) {
+    if (predictions.from_saved_places.length > 0) {
       $('<li role="presentation" class="dropdown-header"/>')
         .text("Favorite Locations")
         .appendTo(menu);
 
-      list.iter(predictions.from_favorites, function(item) {
-        var bolded = highlight(item.loc.address, [item.matched_substring]);
+      console.log(predictions.from_saved_places.toSource());
+      list.iter(predictions.from_saved_places, function(item) {
+        var bolded;
+        var addr = item.loc.address;
+        var title = item.loc.title;
+        if (item.matched_field == "Address") {
+          bolded = geo.highlight(addr, [item.matched_substring]);
+          if (title && title != addr) {
+            bolded = "<i>" + title + "</i> - " + bolded;
+          }
+        } else if (item.matched_field == "Title") {
+          bolded = "<i>" + geo.highlight(title, [item.matched_substring])
+            + "</i> - " + addr;
+        } else {
+          // TODO Error, bad API response, should never happen
+        }
         var li = $('<li role="presentation"/>')
           .appendTo(menu);
         $('<a role="menuitem" tabindex="-1" href="#"/>')
@@ -552,7 +543,7 @@ var sched2 = (function() {
           .appendTo(li)
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
-            api.postSelectFavoritePlace(leaderUid, item.loc.address)
+            api.postSelectPlace(leaderUid, item.google_description)
               .done(function(place) {
                 timeZoneDropdown.set(place.loc.timezone);
                 $('#location-dropdown-toggle').dropdown("toggle");
@@ -569,17 +560,19 @@ var sched2 = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = highlight(item.description, item.matched_substrings);
-      var li = $('<li role="presentation"/>')
-        .appendTo(menu);
+      var desc = item.google_description;
+      var bolded = geo.highlight(desc, item.matched_substrings);
+      var li = $('<li role="presentation"/>') .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          $("#sched-step2-loc-addr").val(item.description);
-          api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
+          $("#sched-step2-loc-addr").val(desc);
+          api.getPlaceDetails(leaderUid, desc, item.ref_id)
             .done(function(place) {
-              timeZoneDropdown.set(place.loc.timezone);
+              /* TODO Return timezone with details or find some other way
+               * to refresh the list... this is dirty */
+              timeZoneDropdown.set(timeZoneDropdown.get());
               $('#location-dropdown-toggle').dropdown("toggle");
             });
           return false;

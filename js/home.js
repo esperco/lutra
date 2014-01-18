@@ -277,6 +277,7 @@ var home = (function() {
     loadNavHeader();
     deferred.join([loadAllTasks(), loadActiveTasks()])
             .done(loadArchive);
+    $(".place-nav").click(places.load);
     util.focus();
   };
 
