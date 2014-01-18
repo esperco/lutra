@@ -95,6 +95,27 @@ var login = (function() {
           }
           break;
 
+        case "Task_ranked":
+          var rank = ev[1];
+          switch (variant.cons(rank)) {
+          case "Task_rank_before":
+            task.onTaskRankedBefore.notify(rank[1][0], rank[1][1]);
+            break;
+          case "Task_rank_after":
+            task.onTaskRankedAfter.notify(rank[1][0], rank[1][1]);
+            break;
+          case "Task_rank_first":
+            task.onTaskRankedFirst.notify(rank[1]);
+            break;
+          case "Task_rank_last":
+            task.onTaskRankedLast.notify(rank[1]);
+            break;
+          case "Task_rank_archive":
+            task.onTaskArchived.notify(rank[1]);
+            break;
+          }
+          break;
+
         case "Chat_posted":
           var rid = ev[1].rid;
           if (rid) {
@@ -103,9 +124,6 @@ var login = (function() {
               task.onChatPosted .notify(chatItem);
             });
           }
-          break;
-
-        default:
           break;
         }
       });

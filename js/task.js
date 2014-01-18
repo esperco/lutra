@@ -25,6 +25,11 @@ var task = (function() {
   mod.onTaskCreated = new Observable();
   mod.onTaskModified = new Observable();
   mod.onTaskParticipantsChanged = new Observable();
+  mod.onTaskRankedBefore = new Observable();
+  mod.onTaskRankedAfter = new Observable();
+  mod.onTaskRankedFirst = new Observable();
+  mod.onTaskRankedLast = new Observable();
+  mod.onTaskArchived = new Observable();
   mod.onChatPosting = new Observable();
   mod.onChatPosted = new Observable();
 
