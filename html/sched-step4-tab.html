@@ -54,10 +54,9 @@
         <h3 class="modal-title" id="sched-confirm-title">Send a confirmation message.</h3>
       </div>
       <div class="modal-body" id="sched-confirm-body">
-        <div class="input">
-          <h4 class="modal-first-section-title">To</h4>
-          <input id="sched-confirm-to"
-                 type="text" class="form-control" disabled>
+        <div>
+          <h4 class="modal-first-section-title to-label">To:</h4>
+          <div id="sched-confirm-to-list"></div>
         </div>
         <div class="input">
           <h4 class="modal-section-title">Subject</h4>
@@ -82,10 +81,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="btn btn-primary"
-                id="sched-reminder-update" style="float:right">OK</button>
+                id="sched-reminder-update" style="float:right">Save</button>
         <h3 class="modal-title" id="sched-reminder-title">Reminder message</h3>
       </div>
       <div class="modal-body" id="sched-reminder-body">
+        <div>
+          <h4 class="modal-first-section-title to-label">To:</h4>
+          <div id="sched-reminder-to-list"></div>
+        </div>
         <div class="input">
           <h4 class="modal-section-title">Subject</h4>
           <input id="sched-reminder-subject"
@@ -93,7 +96,7 @@
         </div>
         <h4 class="modal-section-title">Message</h4>
         <textarea class="form-control" rows="10"
-                  id="sched-reminder-message" disabled></textarea>
+                  id="sched-reminder-message"></textarea>
         <div id="sched-reminder-message-readonly"></div>
       </div>
     </div>

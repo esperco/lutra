@@ -387,6 +387,11 @@ object {
   &:hover { background: @gray_f8; }
 }
 
+.sched-step1-row,
+.sched-step1-add-row {
+  min-height: 70px;
+}
+
 .sched-step3-row {
   min-height: 75px;
   padding-top: 10px;
@@ -395,10 +400,12 @@ object {
   &:hover { background: @gray_f8; }
 }
 
-.sched-step1-row,
-.sched-step1-add-row {
-  min-height: 70px;
+.email-option {
+  padding: 10px;
+  border-bottom: 1px solid @gray_10;
 }
+
+
 
 .task-list,
 #user-profile,
@@ -853,15 +860,45 @@ object {
   font-family: @bold;
 }
 
+.to-label {
+  float: left;
+  margin-top: 2px;
+}
+
 .modal-section-title {
   padding-top: 15px;
   font-family: @bold;
 }
 
 #sched-availability-message,
-#sched-confirm-message {
+#sched-confirm-message,
+#sched-reminder-message {
   resize: none;
 }
+
+#sched-availability-to-list,
+#sched-confirm-to-list,
+#sched-reminder-to-list {
+  display: inline-block;
+  margin-left: 16px;
+}
+
+.sched-availability-to,
+.sched-confirm-to,
+.sched-reminder-to {
+  cursor: pointer;
+  &:hover path.checkbox { stroke: @gray_40; }
+}
+
+.recipient-checkbox-div {
+  float: left;
+  margin-top: 1px;
+  margin-right: 7px;
+}
+
+.recipient-checkbox { display: block; }
+
+.recipient-name { display: inline-block; }
 
 
 /*** Login ***/
@@ -1760,13 +1797,20 @@ object {
 .option-letter {
   width: 30px;
   height: 30px;
-  margin-left: auto;
   margin-right: auto;
+  margin-left: auto;
   text-align: center;
   color: @gray_40;
   font-size: 20px;
   border: 2px solid @gray_40;
   border-radius: 4px;
+}
+
+.option-letter-modal {
+  float: left;
+  margin-top: 12px;
+  margin-right: 0;
+  margin-left: 0;
 }
 
 .option-letter.recommended {
@@ -1799,9 +1843,8 @@ object {
 .required {
   margin-left: 58px;
   padding-left: 0;
-  &:hover { cursor: pointer;
-    path.checkbox { stroke: @gray_40; }
-  }
+  cursor: pointer;
+  &:hover path.checkbox { stroke: @gray_40; }
 }
 
 .required.mobile {
