@@ -5,11 +5,11 @@
 var home = (function() {
   var mod = {};
 
-  function viewOfTaskRow(task, taskViewId) {
+  function viewOfTaskRow(ta, taskViewId) {
     var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId});
 
-    var title = task.task_status
-      ? task.task_status.task_title
+    var title = ta.task_status
+      ? ta.task_status.task_title
       : null;
 
     var dragDiv = $("<div class='task-drag-div hide'></div>")
@@ -18,6 +18,8 @@ var home = (function() {
       .appendTo(dragDiv);
     svg.loadImg(drag, "/assets/img/drag.svg");
 
+    // Add both Archive button and Restore button to the row.
+    // By css magic they will only show up in the appropriate tabs.
     var archiveDiv = $("<div class='archive-div'></div>")
       .appendTo(view);
     var archive = $("<img class='archive'/>")
@@ -26,7 +28,17 @@ var home = (function() {
     archiveDiv
       .tooltip({"title":"Archive"})
       .click(function() {
+        api.archiveTask(ta.tid);
+        task.onTaskArchived.notify(ta.tid);
       });
+
+    var restoreButton = $("<button class='restore-div'/>")
+      .text("Restore")
+      .appendTo(view);
+    restoreButton.click(function() {
+      api.rankTaskFirst(ta.tid);
+      task.onTaskRankedFirst.notify(ta.tid);
+    });
 
     var taskDetails = $("<div class='task-details'></div>")
       .appendTo(view);
@@ -36,10 +48,10 @@ var home = (function() {
         .appendTo(taskDetails);
       $("<div class='updated updated-task hide'></div>")
         .appendTo(taskDetails);
-      $("<a href='#!task/" + task.tid + "' class='task-title ellipsis'></a>")
+      $("<a href='#!task/" + ta.tid + "' class='task-title ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
-      $("<div class='task-status'/>").text(task.task_status_text)
+      $("<div class='task-status'/>").text(ta.task_status_text)
         .appendTo(taskDetails);
       $("<div class='task-date hide'></div>")
         .append($("<span class='verb'>Created </span>"))
