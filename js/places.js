@@ -18,16 +18,16 @@ var places = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = geo.highlight(item.description, item.matched_substrings);
-      var li = $('<li role="presentation"/>')
-        .appendTo(menu);
+      var description = item.google_description;
+      var bolded = geo.highlight(description, item.matched_substrings);
+      var li = $('<li role="presentation"/>').appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          api.getPlaceDetails(login.me(), item.description, item.ref_id)
+          api.getPlaceDetails(login.me(), description, item.ref_id)
             .done(function(details) {
-              selectedPlaceDesc = item.description;
+              selectedPlaceDesc = description;
               selectedPlaceDetails = details;
               $("#edit-place-location-title").val(details.name);
               $("#edit-place-address").val(details.formatted_address);
@@ -40,28 +40,6 @@ var places = (function() {
     var toggle = $('#places-address-dropdown-toggle');
     if (!toggle.parent().hasClass('open')) {
       toggle.dropdown("toggle");
-    }
-  }
-
-  function drawDirections(place) {
-    var coords = place.loc.coord;
-    if (coords) {
-      var placeGeo = new google.maps.LatLng(coords.lat, coords.lon);
-      var mapOptions = { center: placeGeo, zoom: 12 };
-      var mapDiv = document.getElementById("google-map-modal-body");
-      $("#google-map-modal-title")
-        .text("Directions to " + place.loc.title);
-      var editModal = $("#google-map-modal");
-      editModal.on("shown.bs.modal", function() {
-        var googleMap = new google.maps.Map(mapDiv, mapOptions);
-        var addressMarker = new google.maps.Marker();
-
-        addressMarker.setPosition(placeGeo);
-        addressMarker.setMap(googleMap);
-        //googleMap.panTo(placeGeo);
-        //google.maps.event.trigger(googleMap, "resize");
-      });
-      editModal.modal({});
     }
   }
 
@@ -92,7 +70,7 @@ var places = (function() {
       google_description = place.google_description;
       geometry = place.loc.coord;
     }
-    var update = {
+    var edit = {
       title: (title == "" ? place.loc.title : title),
       address: (address == "" ? place.loc.address : address),
       instructions:
@@ -101,7 +79,7 @@ var places = (function() {
       geometry: geometry
     };
     var uid = login.me();
-    api.postUpdatePlace(uid, place.placeid, update)
+    api.postEditPlace(uid, place.placeid, edit)
       .done(function() {
         api.getPlaceList(uid).done(displayPlaces);
       });
@@ -219,9 +197,9 @@ var places = (function() {
   function viewOfPlace(place) {
     var view = $("<div class='place-row clearfix'/>");
 
-    var placeDetails = viewOfPlaceDetails(place, place.loc.title,
-                                          place.loc.address)
-      .appendTo(view);
+    var placeDetails =
+      viewOfPlaceDetails(place, place.loc.title, place.loc.address)
+        .appendTo(view);
 
     var stats = viewOfStats(place.uses);
     stats.mobile.appendTo(placeDetails);
@@ -232,6 +210,9 @@ var places = (function() {
     return view;
   }
 
+  /* Sort by uses descending (most uses first)
+   * Among same uses, sort alphabetically by title
+   * Among same title, sort alphabetically by address */
   function placeListComparator(p1, p2) {
     if (p2.uses - p1.uses > 0) {
       return 1;
@@ -268,8 +249,8 @@ var places = (function() {
   function predictAddress() {
     var address = $("#edit-place-address").val();
     if (address == "") return;
-    var leaderUid = login.data.team.team_leaders[0];
-    api.getPlacePredictions(leaderUid, address)
+    //var leaderUid = login.data.team.team_leaders[0]; TODO remove
+    api.getPlacePredictions(login.me(), address)
       .done(addressDropdown);
   }
 

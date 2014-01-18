@@ -197,34 +197,17 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.getPlacePredictions = function(uid, loc) {
+  mod.getPlacePredictions = function(uid, partial_loc) {
     var url = api_s_prefix() + "/place/autocomplete/" +
-              encodeURIComponent(loc);
+              encodeURIComponent(partial_loc);
     return jsonHttpGet(url);
   };
 
-  /*mod.postSelectGooglePlace = function(uid, loc, refId) {
-    var url = api_s_prefix() + "/place/select/google/" +
-              encodeURIComponent(loc) + "/" +
+  mod.getPlaceDetails = function(uid, desc, refId) {
+    var url = api_s_prefix() + "/place/details/" +
+              encodeURIComponent(desc) + "/" +
               encodeURIComponent(refId);
-    return jsonHttpPost(url, "");
-  };*/
-
-  mod.postSelectFavoritePlace = function(uid, loc) {
-    var url = api_s_prefix() + "/place/select/favorite/" +
-              encodeURIComponent(loc);
-    return jsonHttpPost(url, "");
-  };
-
-  mod.getPlaceList = function(uid, loc) {
-    var url = api_s_prefix() + "/place/list/";
     return jsonHttpGet(url);
-  };
-
-  mod.postUpdatePlace = function(uid, placeid, update) {
-    var url = api_s_prefix() + "/place/update/" +
-              encodeURIComponent(placeid);
-    return jsonHttpPost(url, JSON.stringify(update));
   };
 
   mod.postCreatePlace = function(uid, desc, edit) {
@@ -233,11 +216,21 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
-  mod.getPlaceDetails = function(uid, loc, refId) {
-    var url = api_s_prefix() + "/place/details/" +
-              encodeURIComponent(loc) + "/" +
-              encodeURIComponent(refId);
+  mod.postEditPlace = function(uid, placeid, edit) {
+    var url = api_s_prefix() + "/place/edit/" +
+              encodeURIComponent(placeid);
+    return jsonHttpPost(url, JSON.stringify(edit));
+  };
+
+  mod.getPlaceList = function(uid) {
+    var url = api_s_prefix() + "/place/list/";
     return jsonHttpGet(url);
+  };
+
+  mod.postSelectPlace = function(uid, loc) {
+    var url = api_s_prefix() + "/place/select/" +
+              encodeURIComponent(loc);
+    return jsonHttpPost(url, "");
   };
 
   mod.getSuggestions = function(x) {

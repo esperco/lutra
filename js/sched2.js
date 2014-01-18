@@ -505,23 +505,23 @@ var sched2 = (function() {
 
   function saveLocationSelection(loc, refId) {
     api.postPlaceDetails(leaderUid, loc, refId)
-      .done(function() { });
+      .done(function() { /* TODO Is this function needed? */ });
   }
 
-
   function displayPredictionsDropdown(predictions) {
-    if (predictions.from_favorites.length == 0
+    if (predictions.from_saved_places.length == 0
         && predictions.from_google.length == 0) return;
     var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown-menu");
     menu.children().remove();
 
-    if (predictions.from_favorites.length > 0) {
+    if (predictions.from_saved_places.length > 0) {
       $('<li role="presentation" class="dropdown-header"/>')
         .text("Favorite Locations")
         .appendTo(menu);
 
-      list.iter(predictions.from_favorites, function(item) {
+      console.log(predictions.from_saved_places.toSource());
+      list.iter(predictions.from_saved_places, function(item) {
         var bolded;
         var addr = item.loc.address;
         var title = item.loc.title;
@@ -534,7 +534,7 @@ var sched2 = (function() {
           bolded = "<i>" + geo.highlight(title, [item.matched_substring])
             + "</i> - " + addr;
         } else {
-          // TODO log error
+          // TODO Error, bad API response, should never happen
         }
         var li = $('<li role="presentation"/>')
           .appendTo(menu);
@@ -543,7 +543,7 @@ var sched2 = (function() {
           .appendTo(li)
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
-            api.postSelectFavoritePlace(leaderUid, item.loc.address)
+            api.postSelectPlace(leaderUid, item.google_description)
               .done(function(place) {
                 timeZoneDropdown.set(place.loc.timezone);
                 $('#location-dropdown-toggle').dropdown("toggle");
@@ -560,17 +560,19 @@ var sched2 = (function() {
       .appendTo(menu);
 
     list.iter(predictions.from_google, function(item) {
-      var bolded = geo.highlight(item.description, item.matched_substrings);
-      var li = $('<li role="presentation"/>')
-        .appendTo(menu);
+      var desc = item.google_description;
+      var bolded = geo.highlight(desc, item.matched_substrings);
+      var li = $('<li role="presentation"/>') .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          $("#sched-step2-loc-addr").val(item.description);
-          api.postSelectGooglePlace(leaderUid, item.description, item.ref_id)
+          $("#sched-step2-loc-addr").val(desc);
+          api.getPlaceDetails(leaderUid, desc, item.ref_id)
             .done(function(place) {
-              timeZoneDropdown.set(place.loc.timezone);
+              /* TODO Return timezone with details or find some other way
+               * to refresh the list... this is dirty anyway */
+              //timeZoneDropdown.set(place.loc.timezone);
               $('#location-dropdown-toggle').dropdown("toggle");
             });
           return false;
