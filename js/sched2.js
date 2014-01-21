@@ -233,11 +233,15 @@ var sched2 = (function() {
                        optMinStart, optMaxEnd) {
       x.duration = 60 * lengthMinutes;
       x.buffer_time = 60 * bufferMinutes;
-      if (util.isDefined(optMinStart) && util.isDefined(optMaxEnd))
+      if (util.isDefined(optMinStart) && util.isDefined(optMaxEnd)) {
+        var length = 60 * (optMaxEnd - optMinStart);
+        if (length < 0)
+          length = length + 86400;
         x.time_of_day = {
           start: timeonly.ofMinutes(optMinStart),
-          length: 60 * (optMaxEnd - optMinStart)
+          length: length
         };
+      }
       return x;
     }
 
