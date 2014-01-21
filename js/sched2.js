@@ -497,8 +497,8 @@ var sched2 = (function() {
         addressMarker.setMap(googleMap);
         googleMap.panTo(geocoded);
         api.getTimezone(coords.lat, coords.lon)
-          .done(function(tz) {
-            timeZoneDropdown.set(tz);
+          .done(function(x) {
+            timeZoneDropdown.set(x.timezone);
           });
       });
   }
@@ -567,8 +567,8 @@ var sched2 = (function() {
             .done(function(place) {
               var coord = place.geometry;
               api.getTimezone(coord.lat, coord.lon)
-                .done(function(tz) {
-                  timeZoneDropdown.set(tz);
+                .done(function(x) {
+                  timeZoneDropdown.set(x.timezone);
                 });
               $('#location-dropdown-toggle').dropdown("toggle");
             });
