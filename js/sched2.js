@@ -383,7 +383,7 @@ var sched2 = (function() {
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action3,
-      initialKey: "2weeks",
+      initialKey: "1week",
       options: [
         { label: "Within 6 months", key: "6months", value: 183 * 86400 },
         { label: "Within 2 months", key: "2months", value: 61 * 86400 },
