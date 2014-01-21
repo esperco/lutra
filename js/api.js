@@ -195,23 +195,23 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.getCoordinates = function(uid, loc) {
+  mod.getCoordinates = function(loc) {
     var url = api_s_prefix() + "/geocode/" + encodeURIComponent(loc);
     return jsonHttpGet(url);
   };
 
-  mod.getTimezone = function(uid, lat, lon) {
+  mod.getTimezone = function(lat, lon) {
     var url = api_s_prefix() + "/timezone/" + lat + "/" + lon;
     return jsonHttpGet(url);
   };
 
-  mod.getPlacePredictions = function(uid, partial_loc) {
+  mod.getPlacePredictions = function(partial_loc) {
     var url = api_s_prefix() + "/place/autocomplete/" +
               encodeURIComponent(partial_loc);
     return jsonHttpGet(url);
   };
 
-  mod.getPlaceDetails = function(uid, desc, refId) {
+  mod.getPlaceDetails = function(desc, refId) {
     var url = api_s_prefix() + "/place/details/" +
               encodeURIComponent(desc) + "/" +
               encodeURIComponent(refId);
@@ -235,7 +235,7 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.postSelectPlace = function(uid, loc) {
+  mod.postSelectPlace = function(loc) {
     var url = api_s_prefix() + "/place/select/" +
               encodeURIComponent(loc);
     return jsonHttpPost(url, "");
