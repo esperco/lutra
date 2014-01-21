@@ -123,6 +123,14 @@ var api = (function () {
     return jsonHttpDelete(api_q_prefix() + "/task/" + tid);
   };
 
+  mod.archiveTask = function(tid) {
+     return jsonHttpPost(api_q_prefix() + "/task/" + tid + "/remove", "");
+  };
+
+  mod.rankTaskFirst = function(tid) {
+     return jsonHttpPost(api_q_prefix() + "/task/" + tid + "/first", "");
+  };
+
   mod.createTask = function(task) {
     return jsonHttpPost(
       api_q_prefix() + "/task/create/" + login.data.team.teamid,

@@ -215,7 +215,7 @@ var sched4 = (function() {
         }
       });
 
-    /*** Send a Google Calendar invitation ***/
+    /*** Reserve event in Google Calendar (no more Google invitations) ***/
 
     var divInvitationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divInvitation);
@@ -227,7 +227,7 @@ var sched4 = (function() {
       .then(function(elt) { checkInvitation = elt; });
 
     var inviteAction = $("<a class='final-sched-action col-xs-11'/>")
-      .text("Send a Google Calendar invitation");
+      .text("Reserve Google Calendar event");
 
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
@@ -249,8 +249,8 @@ var sched4 = (function() {
       .appendTo(divInvitation);
 
     // divDetails.appendTo(view);
-    divConfirmation.appendTo(view);
     divInvitation.appendTo(view);
+    divConfirmation.appendTo(view);
 
     return {
       view: view,

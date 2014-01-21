@@ -570,6 +570,7 @@ object {
 }
 
 .archive-div {
+  display: none;
   float: right;
   width: 12px;
   height: 12px;
@@ -593,6 +594,20 @@ object {
     cursor: pointer;
     .archive path { fill: @red; }
   }
+}
+
+.restore-div {
+  display: none;
+  float: right;
+}
+
+#general-tasks-tab-content    .archive-div,
+#scheduling-tasks-tab-content .archive-div {
+  display: inline;
+}
+
+#archive-tasks-tab-content .restore-div {
+  display: inline;
 }
 
 .updated {
