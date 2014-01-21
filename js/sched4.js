@@ -37,11 +37,49 @@ var sched4 = (function() {
     organizerName+"\n";
   }
 
+  function loadRecipientRow(x, toObsProf) {
+    var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
+      .appendTo(x);
+
+    var recipientCheckbox = $("<img class='recipient-checkbox'/>")
+      .appendTo(recipientCheckboxDiv);
+    svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var recipientName = $("<div class='recipient-name' />")
+      .append(toObsProf.prof.full_name)
+      .appendTo(x);
+
+    x.click(function() {
+      if (x.hasClass("checkbox-selected")) {
+        x.removeClass("checkbox-selected");
+      } else {
+        x.addClass("checkbox-selected");
+      }
+    })
+  }
+
+ function loadReminderRecipients(toObsProf) {
+    $("#sched-reminder-to-list").children().remove();
+
+    var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
+      .appendTo($("#sched-reminder-to-list"));
+
+    loadRecipientRow(recipientRow, toObsProf);
+  }
+
+  function loadConfirmRecipients(toObsProf) {
+    $("#sched-confirm-to-list").children().remove();
+
+    var recipientRow = $("<div class='sched-confirm-to checkbox-selected'/>")
+      .appendTo($("#sched-confirm-to-list"));
+
+    loadRecipientRow(recipientRow, toObsProf);
+  }
+
   function preFillConfirmModal(chats, profs, task, slot, toUid) {
     var toObsProf = profs[toUid];
 
-    $("#sched-confirm-to")
-      .val(toObsProf.prof.full_name);
+    loadConfirmRecipients(toObsProf);
 
     $("#sched-confirm-subject")
       .val("Re: " + task.task_status.task_title);
@@ -63,7 +101,11 @@ var sched4 = (function() {
     footer.append(sched.viewOfSuggestion(slot));
   }
 
-  function preFillReminderModal(task, slot) {
+  function preFillReminderModal(profs, task, slot, toUid) {
+    var toObsProf = profs[toUid];
+
+    loadReminderRecipients(toObsProf);
+
     $("#sched-reminder-subject")
       .val("Re: " + task.task_status.task_title);
 
@@ -229,7 +271,7 @@ var sched4 = (function() {
     }
 
     function composeReminderEmail() {
-      preFillReminderModal(task, slot);
+      preFillReminderModal(profs, task, slot, uid);
       reminderModal.modal({});
     }
 

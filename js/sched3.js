@@ -59,7 +59,8 @@ var sched3 = (function() {
 
   function emailViewOfOption(calOption, i) {
     return $("<div class='email-option'/>")
-      .append($("<div/>").text("Option " + util.letterOfInt(i)))
+      .append($("<div class='option-letter option-letter-modal unselectable' />")
+      .text(util.letterOfInt(i)))
       .append(sched.viewOfSuggestion(calOption.slot));
   }
 
@@ -75,7 +76,7 @@ var sched3 = (function() {
   function updateTask(profs, ta, calOption) {
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
-    state.scheduling_stage = "Confirm";           // step in the scheduling page
+    state.scheduling_stage = "Confirm";         // step in the scheduling page
     state.reserved = {
       slot: calOption.slot,
       remind: 3*43200,
@@ -97,12 +98,37 @@ var sched3 = (function() {
       return "within one day";
   }
 
+  function loadRecipients(toObsProf) {
+    $("#sched-availability-to-list").children().remove();
+
+    var recipientRow = $("<div class='sched-availability-to'/>")
+      .appendTo($("#sched-availability-to-list"));
+
+    var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
+      .appendTo(recipientRow);
+
+    var recipientCheckbox = $("<img class='recipient-checkbox'/>")
+      .appendTo(recipientCheckboxDiv);
+    svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var recipientName = $("<div class='recipient-name' />")
+      .append(toObsProf.prof.full_name)
+      .appendTo(recipientRow);
+
+    recipientRow.click(function() {
+      if (recipientRow.hasClass("checkbox-selected")) {
+        recipientRow.removeClass("checkbox-selected");
+      } else {
+        recipientRow.addClass("checkbox-selected");
+      }
+    })
+  }
+
   function preFillAvailabilityModal(chats, profs, task,
                                     howSoon, options, toUid) {
     var toObsProf = profs[toUid];
 
-    $("#sched-availability-to")
-      .val(toObsProf.prof.full_name);
+    loadRecipients(toObsProf);
 
     $("#sched-availability-subject")
       .val("Re: " + task.task_status.task_title);
