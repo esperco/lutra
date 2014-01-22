@@ -29,7 +29,7 @@ var sched = (function() {
   };
 
   mod.isGuest = function(uid) {
-    var team = login.data.team;
+    var team = login.getTeam();
     return ! list.mem(team.team_leaders, uid);
   };
 
@@ -38,12 +38,12 @@ var sched = (function() {
   };
 
   mod.getHosts = function(task) {
-    var team = login.data.team;
+    var team = login.getTeam();
     return list.inter(mod.getParticipants(task), team.team_leaders);
   };
 
   mod.getGuests = function(task) {
-    var team = login.data.team;
+    var team = login.getTeam();
     return list.diff(mod.getParticipants(task), team.team_leaders);
   };
 

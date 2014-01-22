@@ -281,7 +281,7 @@ var sched3 = (function() {
             chatid: chatid,
             by: login.me(),
             'for': login.leader(),
-            team: login.team().teamid,
+            team: login.getTeam().teamid,
             chat_item_data: ["Scheduling_q", {
               body: body,
               choices: options

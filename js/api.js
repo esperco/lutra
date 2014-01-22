@@ -94,7 +94,7 @@ var api = (function () {
   }
 
   function api_tasks_prefix() {
-    return api_q_prefix() + "/tasks/" + login.data.teams[0].teamid;
+    return api_q_prefix() + "/tasks/" + login.getTeam().teamid;
   }
 
   mod.getProfile = function(uid) {
@@ -133,7 +133,7 @@ var api = (function () {
 
   mod.createTask = function(task) {
     return jsonHttpPost(
-      api_q_prefix() + "/task/create/" + login.data.team.teamid,
+      api_q_prefix() + "/task/create/" + login.getTeam().teamid,
       JSON.stringify(task)
     );
   };
@@ -183,7 +183,7 @@ var api = (function () {
 
   mod.getCalendar = function(uid2, optAuthLandingUrl) {
     var url = api_s_prefix() + "/calendar/"
-      + login.data.team.teamid + "/" + uid2;
+      + login.getTeam().teamid + "/" + uid2;
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
