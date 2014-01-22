@@ -193,18 +193,21 @@ var sched = (function() {
         loadStep1(profs, task);
       });
     $(".sched-go-step2")
+      .attr('disabled', mod.getGuests(task) <= 0)
       .unbind('click')
       .click(function() {
         api.postTask(task);
         loadStep2(tzList, profs, task);
       });
     $(".sched-go-step3")
+      .attr('disabled', mod.getState(task).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
         api.postTask(task);
         loadStep3(profs, task);
       });
     $(".sched-go-step4")
+      .attr('disabled', ! mod.getState(task).reserved)
       .unbind('click')
       .click(function() {
         api.postTask(task);
@@ -224,27 +227,15 @@ var sched = (function() {
             setup_step_buttons(tzList, profs, ta);
             switch (progress) {
             case "Guest_list":
-              $(".sched-go-step2").attr("disabled", true);
-              $(".sched-go-step3").attr("disabled", true);
-              $(".sched-go-step4").attr("disabled", true);
               loadStep1(profs, ta);
               break;
             case "Find_availability":
-              $(".sched-go-step2").removeAttr("disabled");
-              $(".sched-go-step3").attr("disabled", true);
-              $(".sched-go-step4").attr("disabled", true);
               loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              $(".sched-go-step2").removeAttr("disabled");
-              $(".sched-go-step3").removeAttr("disabled");
-              $(".sched-go-step4").attr("disabled", true);
               loadStep3(profs, ta);
               break;
             case "Confirm":
-              $(".sched-go-step2").removeAttr("disabled");
-              $(".sched-go-step3").removeAttr("disabled");
-              $(".sched-go-step4").removeAttr("disabled");
               loadStep4(profs, ta);
               break;
             default:
