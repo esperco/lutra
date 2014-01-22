@@ -61,6 +61,16 @@ var sched2 = (function() {
     };
   }
 
+  function loadLocation(locations) {
+    if (locations && locations.length > 0) {
+      var loc = locations[0];
+      $("#sched-step2-loc-addr").val(loc.address);
+      if (loc.timezone) {
+        timeZoneDropdown.set(loc.timezone);
+      }
+    }
+  }
+
   function initMeetingParam(task) {
     return {
       participants: task.task_participants.organized_for,
@@ -70,6 +80,21 @@ var sched2 = (function() {
          how_soon, duration, buffer_time */
     /* uninitialized and optional:
          meeting_type, time_of_day_type, time_of_day */
+  }
+
+  function taskMeetingParam(task) {
+    var q = sched.getState(task).meeting_request;
+    if (! q) {
+      q = initMeetingParam(task);
+    }
+    q.participants = task.task_participants.organized_for;
+    if (! q.meeting_type) {
+      q.meeting_type = "Meeting";
+    }
+    if (! q.days_of_week) {
+      q.days_of_week = [0,1,2,3,4,5,6];
+    }
+    return q;
   }
 
   function clearSuggestions() {
@@ -219,6 +244,15 @@ var sched2 = (function() {
 
     api.postTask(ta)
       .done(function(task) { sched.loadTask(task); });
+  }
+
+  function loadDaysOfWeek(meetingParam) {
+    for (var i = 0; i < 7; ++i) {
+      $("#sched-step2-dow" + i).prop("checked", false);
+    }
+    list.iter(meetingParam.days_of_week, function(i) {
+      $("#sched-step2-dow" + i).prop("checked", true);
+    });
   }
 
   function loadStep2Prefs(tzList, task) {
@@ -390,21 +424,31 @@ var sched2 = (function() {
     });
 
     /* urgency */
+    var sel3_options = [
+      { label: "Within 6 months", key: "6months", value: 183 * 86400 },
+      { label: "Within 2 months", key: "2months", value: 61 * 86400 },
+      { label: "Within 1 month", key: "1month", value: 31 * 86400 },
+      { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
+      { label: "Within 1 week", key: "1week", value: 7 * 86400 },
+      { label: "Within 2 days", key: "2days", value: 2 * 86400 },
+      { label: "Today", key: "12hours", value: 12 * 3600 },
+    ];
     sel3 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action3,
       initialKey: "1week",
-      options: [
-        { label: "Within 6 months", key: "6months", value: 183 * 86400 },
-        { label: "Within 2 months", key: "2months", value: 61 * 86400 },
-        { label: "Within 1 month", key: "1month", value: 31 * 86400 },
-        { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
-        { label: "Within 1 week", key: "1week", value: 7 * 86400 },
-        { label: "Within 2 days", key: "2days", value: 2 * 86400 },
-        { label: "Today", key: "12hours", value: 12 * 3600 },
-      ]
+      options: sel3_options
     });
+
+    function loadHowSoon(how_soon) {
+      var opt = list.find(sel3_options, function(opt, i) {
+        return opt.value === how_soon;
+      });
+      if (opt) {
+        sel3.set(opt.key);
+      }
+    }
 
     /* time zone */
     var tzOptions =
@@ -451,7 +495,12 @@ var sched2 = (function() {
     sel4.view.appendTo(viewTimeZone);
 
     meetingParam = initMeetingParam(task);
-    sel1.set("meeting");
+
+    var q = taskMeetingParam(task);
+    loadLocation(q.location);
+    sel1.set(q.meeting_type.toLowerCase());
+    loadDaysOfWeek(q);
+    loadHowSoon(q.how_soon);
 
     step2Selector.show("sched-step2-prefs");
   }
