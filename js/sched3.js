@@ -58,10 +58,13 @@ var sched3 = (function() {
   }
 
   function emailViewOfOption(calOption, i) {
+    var option = sched.viewOfSuggestion(calOption.slot)
+      .addClass("email-option-details");
+
     return $("<div class='email-option'/>")
       .append($("<div class='option-letter option-letter-modal unselectable' />")
       .text(util.letterOfInt(i)))
-      .append(sched.viewOfSuggestion(calOption.slot));
+      .append(option);
   }
 
   function emailViewOfOptions(options) {
@@ -98,10 +101,24 @@ var sched3 = (function() {
       return "within one day";
   }
 
+  function showEndTime() {
+    $("#sched-availability-message-readonly .time-text")
+      .removeClass("hide");
+    $("#sched-availability-message-readonly .time-text-short")
+      .addClass("hide");
+  }
+
+  function hideEndTime() {
+    $("#sched-availability-message-readonly .time-text")
+      .addClass("hide");
+    $("#sched-availability-message-readonly .time-text-short")
+      .removeClass("hide");
+  }
+
   function loadRecipients(toObsProf) {
     $("#sched-availability-to-list").children().remove();
 
-    var recipientRow = $("<div class='sched-availability-to'/>")
+    var recipientRow = $("<div class='sched-availability-to checkbox-selected'/>")
       .appendTo($("#sched-availability-to-list"));
 
     var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
@@ -141,9 +158,40 @@ var sched3 = (function() {
     $("#sched-availability-message")
       .val(body);
 
+    var footerOption = $("#footer-option");
+    footerOption.children().remove();
+
+    var footerCheckboxDiv = $("<div class='footer-checkbox-div'/>")
+      .appendTo(footerOption);
+    var footerCheckbox = $("<img class='footer-checkbox'/>")
+      .appendTo(footerCheckboxDiv);
+    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var timeOption = $("<div class='time-option' />")
+      .append("Show end time of meeting options")
+      .appendTo(footerOption);
+
     var footer = $("#sched-availability-message-readonly");
     footer.children().remove();
     footer.append(emailViewOfOptions(options));
+    if (footer.hasClass("short")) {
+      hideEndTime();
+    } else {
+      showEndTime();
+    }
+
+    footerOption.off("click");
+    footerOption.click(function() {
+      if (footerOption.hasClass("checkbox-selected")) {
+        footerOption.removeClass("checkbox-selected");
+        footer.addClass("short");
+        hideEndTime();
+      } else {
+        footerOption.addClass("checkbox-selected");
+        footer.removeClass("short");
+        showEndTime();
+      }
+    })
   }
 
 
@@ -184,7 +232,7 @@ var sched3 = (function() {
     $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
       .appendTo(guest);
 
-    var requiredDiv = $("<div class='required clearfix'/>")
+    var requiredDiv = $("<div class='required clearfix checkbox-selected'/>")
       .appendTo(guest);
     var required = $("<img class='required-checkbox'/>")
       .appendTo(requiredDiv);

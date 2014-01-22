@@ -405,8 +405,6 @@ object {
   border-bottom: 1px solid @gray_10;
 }
 
-
-
 .task-list,
 #user-profile,
 #executives,
@@ -417,6 +415,7 @@ object {
 #workflow-options,
 #guest-list-container,
 #sched-step2-suggestions,
+#sched-availability-message-readonly,
 .guests-container.guests-only,
 .options-container {
   border-top: 1px solid @gray_10;
@@ -900,20 +899,29 @@ object {
 
 .sched-availability-to,
 .sched-confirm-to,
-.sched-reminder-to {
+.sched-reminder-to,
+#footer-option {
   cursor: pointer;
   &:hover path.checkbox { stroke: @gray_40; }
 }
 
-.recipient-checkbox-div {
+.recipient-checkbox-div,
+.footer-checkbox-div {
   float: left;
   margin-top: 1px;
   margin-right: 7px;
 }
 
-.recipient-checkbox { display: block; }
+.recipient-checkbox,
+.footer-checkbox { display: block; }
 
-.recipient-name { display: inline-block; }
+.recipient-name,
+.footer-option { display: inline-block; }
+
+#footer-option {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
 
 
 /*** Login ***/
@@ -1780,7 +1788,9 @@ object {
   font-size: 18px;
 }
 
-.time-text, .loc-text {
+.time-text,
+.time-text-short,
+.loc-text {
   font-size: 14px;
 }
 
@@ -1817,7 +1827,7 @@ object {
   text-align: center;
   color: @gray_40;
   font-size: 20px;
-  border: 2px solid @gray_40;
+  border: 1px solid @gray_40;
   border-radius: 4px;
 }
 

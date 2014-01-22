@@ -111,6 +111,11 @@ var sched = (function() {
       .append($("<b>").text(toTime))
       .appendTo(view);
 
+    var row4 = $("<div class='time-text-short hide'/>")
+      .append(html.text("at "))
+      .append($("<b>").text(date.timeOnly(t1)))
+      .appendTo(view);
+
     var locText = mod.locationText(x.location);
     var locDiv = $("<div class='loc-text'/>");
     var pin = $("<img class='pin'/>");
