@@ -8,7 +8,7 @@ var places = (function() {
   var selectedPlaceDesc = null;
   var selectedPlaceDetails = null;
 
-  function addressDropdown(predictions) {
+  function addressDropdown(predictions, writeName) {
     if (predictions.from_google.length == 0) return;
     var menu = $("#places-address-dropdown-menu");
     menu.children().remove();
@@ -25,11 +25,13 @@ var places = (function() {
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          api.getPlaceDetails(login.me(), description, item.ref_id)
+          api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
               selectedPlaceDesc = description;
               selectedPlaceDetails = details;
-              $("#edit-place-location-title").val(details.name);
+              if (writeName) {
+                $("#edit-place-location-title").val(details.name);
+              }
               $("#edit-place-address").val(details.formatted_address);
               $('#places-address-dropdown-toggle').dropdown("toggle");
             });
@@ -50,6 +52,8 @@ var places = (function() {
   }
 
   function emptyEditModal() {
+    selectedPlaceDesc = null;
+    selectedPlaceDetails = null;
     $("#edit-place-location-title").val("");
     $("#edit-place-address").val("");
     $("#edit-place-instructions").val("");
@@ -249,11 +253,13 @@ var places = (function() {
   function predictAddress() {
     var address = $("#edit-place-address").val();
     if (address == "") return;
-    api.getPlacePredictions(login.me(), address)
-      .done(addressDropdown);
+    api.getPlacePredictions(address)
+      .done(function(predictions) {
+        addressDropdown(predictions, true);
+      });
   }
 
-  function saveNewPlace() {
+  function saveNewPlace(refreshDisplay) {
     if (selectedPlaceDetails) {
       var editModal = $("#edit-place-modal");
       editModal.modal("hide");
@@ -270,7 +276,9 @@ var places = (function() {
       var uid = login.me();
       api.postCreatePlace(uid, selectedPlaceDesc, edit)
         .done(function() {
-          api.getPlaceList(uid).done(displayPlaces);
+          if (refreshDisplay) {
+            api.getPlaceList(uid).done(displayPlaces);
+          }
         });
     }
   }
@@ -278,7 +286,7 @@ var places = (function() {
   function newPlaceAction() {
     var editModal = $("#edit-place-modal");
     $("#edit-place-save").one("click", function() {
-      saveNewPlace();
+      saveNewPlace(true);
       return false;
     });
     emptyEditModal();
@@ -286,9 +294,17 @@ var places = (function() {
     editModal.modal({});
   }
 
+  mod.addressDropdown = addressDropdown;
+  mod.saveNewPlace = saveNewPlace;
+  mod.emptyEditModal = emptyEditModal;
+
+  mod.getSelectedPlaceDetails = function () {
+    return selectedPlaceDetails;
+  }
+
   mod.load = function() {
     api.getPlaceList(login.me()).done(displayPlaces);
-    util.afterTyping($("#edit-place-address"), 500, predictAddress);
+    util.afterTyping($("#edit-place-address"), 250, predictAddress);
     $("#new-place-btn").click(newPlaceAction);
 
     var editModal = $("#edit-place-modal");
