@@ -301,6 +301,12 @@ var sched2 = (function() {
     /* inter-dependent dropdowns for setting scheduling constraints */
     var sel1, sel2, sel3, sel4;
 
+    function getSelectedDaysOfWeek() {
+      return list.filter([0,1,2,3,4,5,6], function(i) {
+        return $("#sched-step2-dow" + i).prop("checked");
+      });
+    }
+
     /* value holding the current scheduling constraints;
        an event is fired each time it changes */
     var meetingParam;
@@ -313,6 +319,7 @@ var sched2 = (function() {
       x.location = [getLocation()];
       util.addFields(x, sel2.get());
       x.how_soon = sel3.get();
+      x.days_of_week = getSelectedDaysOfWeek();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
         loadSuggestionsIfReady(profs, task, meetingParam);
@@ -409,6 +416,15 @@ var sched2 = (function() {
       options: tzOptions,
     });
     timeZoneDropdown = sel4;
+
+    function initDaysOfWeek() {
+      return list.iter([0,1,2,3,4,5,6], function(i) {
+        $("#sched-step2-dow" + i)
+          .unbind("change")
+          .change(mergeSelections);
+      });
+    }
+    initDaysOfWeek();
 
     var grid = $("<div/>")
       .appendTo(view);
