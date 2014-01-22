@@ -90,6 +90,9 @@
           <div class="nav-text">Places</div>
         </a>
       </li>
+      <div class="nav-section-line unselectable nav-teams">
+        <span class='nav-section-title'>TEAMS</span>
+      </div>
     </ul>
 
     <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
@@ -163,6 +166,9 @@
               <div class="nav-text">Places</div>
             </a>
           </li>
+          <div class="nav-section-line unselectable nav-teams">
+            <span class='nav-section-title'>TEAMS</span>
+          </div>
         </ul>
       </div>
     </nav>

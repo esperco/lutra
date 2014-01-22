@@ -477,7 +477,7 @@ var sched2 = (function() {
   }
 
   function connectCalendar(tzList, profs, task) {
-    var leaderUid = login.data.team.team_leaders[0];
+    var leaderUid = login.leader();
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
       result = deferred.defer(loadStep2Prefs(tzList, profs, task));

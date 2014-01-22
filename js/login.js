@@ -6,24 +6,29 @@ var login = (function() {
   var mod = {};
 
   mod.initLoginInfo = function() {
-    var login = store.get("login");
+    var stored = store.get("login");
 
-    if (login && login.uid) // sanity check
-      mod.data = login;
+    if (stored && stored.uid) // sanity check
+      mod.data = stored;
     else
       store.remove("login");
     mod.updateView();
   };
 
-  mod.setLoginInfo = function(login) {
-    if (login.teams[0])
-      login.team = login.teams[0];
+  mod.setLoginInfo = function(stored) {
+    if (!util.isDefined(stored.team) && util.isDefined(stored.teams[0]))
+      stored.team = stored.teams[0];
 
     // Persistent storage never sent to the server
-    store.set("login", login);
-    mod.data = login;
+    store.set("login", stored);
+    mod.data = stored;
     mod.updateView();
   };
+
+  function saveLoginInfo() {
+    var stored = mod.data;
+    store.set("login", stored);
+  }
 
   mod.clearLoginInfo = function() {
     store.remove("login");
@@ -155,16 +160,25 @@ var login = (function() {
     return mod.data.uid;
   };
 
-  mod.team = function() {
-    return mod.data.teams[0];
+  mod.getTeams = function() {
+    return mod.data.teams;
+  };
+
+  mod.getTeam = function() {
+    return mod.data.team;
+  };
+
+  mod.setTeam = function(team) {
+    mod.data.team = team;
+    saveLoginInfo();
   };
 
   mod.organizer = function() {
-    return mod.team().team_organizers[0];
+    return mod.getTeam().team_organizers[0];
   };
 
   mod.leader = function() {
-    return mod.team().team_leaders[0];
+    return mod.getTeam().team_leaders[0];
   };
 
   return mod;

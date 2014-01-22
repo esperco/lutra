@@ -490,7 +490,7 @@ var chat = (function () {
             var group = $("<img class='group'/>");
             tab.tooltip({"title":"Group Conversation","placement":"bottom"})
                .append($("<div class='chat-prof-circ'/>")
-               .append(group));
+                       .append(group));
             svg.loadImg(group, "/assets/img/group.svg");
           } else {
             if (! util.isDefined(peerUid))
@@ -498,8 +498,8 @@ var chat = (function () {
             var p = profiles[peerUid].prof;
             var tab_initials = profile.veryShortNameOfProfile(p);
             tab.tooltip({"title":p.full_name,"placement":"bottom"})
-               .append($("<div class='chat-prof-circ'/>")
-               .append(tab_initials));
+              .append($("<div class='chat-prof-circ'/>")
+                      .append(tab_initials));
           }
           var caret = $("<img class='prof-caret'/>");
           caret.appendTo(tab);

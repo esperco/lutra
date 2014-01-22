@@ -5,6 +5,19 @@
 var list = (function() {
   var mod = {};
 
+  /* copy */
+  mod.copy = function(a) { return a.slice(0); };
+
+  /* reversal */
+  mod.rev = function(a) { return a.reverse(); };
+
+  /* sort into a new array */
+  mod.sort = function(a, cmp) {
+    var b = mod.copy(a);
+    b.sort(cmp);
+    return b;
+  }
+
   /* iterate over each element (foreach) */
   mod.iter = function(a, f) {
     var len = a.length;
