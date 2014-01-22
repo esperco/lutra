@@ -207,14 +207,15 @@ var task = (function() {
         }
         else {
           var task_data = initTaskData();
+          var team = login.getTeam();
           task = {
             task_status: {
               task_title: title,
               task_summary: ""
             },
             task_participants: {
-              organized_by: login.data.team.team_organizers,
-              organized_for: login.data.team.team_leaders
+              organized_by: team.team_organizers,
+              organized_for: team.team_leaders
             },
             task_data: task_data
           };

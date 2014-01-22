@@ -261,7 +261,66 @@ var home = (function() {
       });
   }
 
+  function clearTeams() {
+    $(".nav-team").remove();
+  }
+
+  function switchTeam(team) {
+    login.setTeam(team);
+    mod.load();
+  }
+
+  function labelOfTeam(team) {
+    var label = team.team_label;
+    if (! util.isString(label) || label === "")
+      label = team.teamname;
+    return label;
+  }
+
+  function sortTeams(a) {
+    return list.sort(a, function(t1, t2) {
+      var l1 = labelOfTeam(t1);
+      var l2 = labelOfTeam(t2);
+      return l1.localeCompare(l2);
+    });
+  }
+
+  function clickableViewOfTeam(team) {
+    var isActive = login.getTeam().teamname === team.teamname;
+    var label = labelOfTeam(team);
+    var li = $("<li class='nav-team'/>");
+    var a = $("<a href='#' class='nav-block' data-toggle='pill'/>")
+      .appendTo(li);
+    var div = $("<div class='nav-text'/>")
+      .text(label)
+      .appendTo(a);
+
+    if (isActive) {
+      li.addClass("active");
+      a.addClass("nav-active-team");
+    } else {
+      li.click(function() {
+        switchTeam(team);
+      });
+    }
+
+    return li;
+  }
+
+  function insertTeams() {
+    clearTeams();
+    var teams = sortTeams(login.getTeams());
+    $(".nav-teams").each(function() {
+      var sep = $(this);
+      list.iter(list.rev(teams), function(team) {
+        clickableViewOfTeam(team)
+          .insertAfter(sep);
+      });
+    });
+  }
+
   function loadNavHeader() {
+    insertTeams();
     $(".nav-header").each(function() {
       var view = $(this);
       view.children().remove();
@@ -281,23 +340,23 @@ var home = (function() {
       $(".account-block").each(function() {
         if (! $(this).hasClass("hide"))
           $(this).addClass("hide");
-      })
+      });
       view.click(function() {
         if (caretDiv.hasClass("account-nav-open")) {
           caretDiv.removeClass("account-nav-open");
           caretDiv.addClass("account-nav-closed");
           $(".account-block").each(function() {
             $(this).addClass("hide");
-          })
+          });
         } else {
           caretDiv.removeClass("account-nav-closed");
           caretDiv.addClass("account-nav-open");
           $(".account-block").each(function() {
             $(this).removeClass("hide");
-          })
+          });
         }
-      })
-    })
+      });
+    });
   }
 
   mod.load = function() {

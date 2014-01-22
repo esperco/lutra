@@ -249,7 +249,6 @@ var places = (function() {
   function predictAddress() {
     var address = $("#edit-place-address").val();
     if (address == "") return;
-    //var leaderUid = login.data.team.team_leaders[0]; TODO remove
     api.getPlacePredictions(login.me(), address)
       .done(addressDropdown);
   }

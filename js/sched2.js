@@ -477,7 +477,7 @@ var sched2 = (function() {
   }
 
   function connectCalendar(tzList, profs, task) {
-    var leaderUid = login.data.team.team_leaders[0];
+    var leaderUid = login.leader();
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
       result = deferred.defer(loadStep2Prefs(tzList, profs, task));
@@ -509,7 +509,6 @@ var sched2 = (function() {
     var address = $("#sched-step2-loc-addr").val();
     if (address == "") return;
     clearSuggestions();
-    var leaderUid = login.data.team.team_leaders[0];
     api.getCoordinates(address)
       .done(function(coords) {
         var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
@@ -526,7 +525,6 @@ var sched2 = (function() {
   function displayPredictionsDropdown(predictions) {
     if (predictions.from_saved_places.length == 0
         && predictions.from_google.length == 0) return;
-    var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown-menu");
     menu.children().remove();
 

@@ -201,7 +201,7 @@ var sched4 = (function() {
             chatid: chatid,
             by: login.me(),
             'for': login.leader(),
-            team: login.team().teamid,
+            team: login.getTeam().teamid,
             chat_item_data: ["Sched_confirm", {
               body: body,
               'final': slot
