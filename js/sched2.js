@@ -509,7 +509,6 @@ var sched2 = (function() {
     var address = $("#sched-step2-loc-addr").val();
     if (address == "") return;
     clearSuggestions();
-    var leaderUid = login.data.team.team_leaders[0];
     api.getCoordinates(address)
       .done(function(coords) {
         var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
@@ -523,19 +522,42 @@ var sched2 = (function() {
       });
   }
 
-  function displayPredictionsDropdown(predictions) {
+  function displayPredictionsDropdown(input, predictions) {
     if (predictions.from_saved_places.length == 0
         && predictions.from_google.length == 0) return;
-    var leaderUid = login.data.team.team_leaders[0];
     var menu = $("#location-dropdown-menu");
     menu.children().remove();
 
+    var li = $('<li role="presentation"/>')
+      .appendTo(menu);
+    var bolded = "Create a place named <b>\"" + input + "\"</b>";
+    $('<a role="menuitem" tabindex="-1" href="#"/>')
+      .html(bolded)
+      .appendTo(li)
+      .click(function() {
+        places.emptyEditModal();
+        $("#edit-place-location-title").val(input);
+        $("#edit-place-address").prop("disabled", false);
+        $("#edit-place-save").one("click", function() {
+          places.saveNewPlace(false);
+          $("#sched-step2-loc-addr").val($("#edit-place-address").val());
+          var details = places.getSelectedPlaceDetails();
+          var coord = details.geometry;
+          api.getTimezone(coord.lat, coord.lon)
+            .done(function(x) {
+              timeZoneDropdown.set(x.timezone);
+            });
+        });
+        $("#edit-place-modal").modal({});
+        $('#location-dropdown-toggle').dropdown("toggle");
+        return false;
+      });
+
     if (predictions.from_saved_places.length > 0) {
       $('<li role="presentation" class="dropdown-header"/>')
-        .text("Favorite Locations")
+        .text("Saved Places")
         .appendTo(menu);
 
-      console.log(predictions.from_saved_places.toSource());
       list.iter(predictions.from_saved_places, function(item) {
         var bolded;
         var addr = item.loc.address;
@@ -603,10 +625,21 @@ var sched2 = (function() {
   }
 
   function predictAddress() {
-    var address = $("#sched-step2-loc-addr").val();
-    if (address == "") return;
-    api.getPlacePredictions(address)
-      .done(displayPredictionsDropdown);
+    var input = $("#sched-step2-loc-addr").val();
+    if (input == "") return;
+    api.getPlacePredictions(input)
+      .done(function(predictions) {
+        displayPredictionsDropdown(input, predictions);
+      });
+  }
+
+  function predictEditAddress() {
+    var input = $("#edit-place-address").val();
+    if (input == "") return;
+    api.getPlacePredictions(input)
+      .done(function(predictions) {
+        places.addressDropdown(predictions, false);
+      });
   }
 
   mod.load = function(tzList, profs, task) {
@@ -615,6 +648,14 @@ var sched2 = (function() {
     initializeGoogleMap();
     util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
     connectCalendar(tzList, profs, task);
+
+    util.afterTyping($("#edit-place-address"), 250, predictEditAddress);
+    // TODO Better way to do this?
+    var editModal = $("#edit-place-modal");
+    editModal.on("hidden.bs.modal", function() {
+      $("#edit-place-save").off("click");
+    });
+
   };
 
   return mod;
