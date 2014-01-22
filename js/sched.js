@@ -88,11 +88,17 @@ var sched = (function() {
       .text(date.dateOnly(t1))
       .appendTo(view);
 
+    var fromTime = date.timeOnly(t1);
+    var toTime = date.timeOnly(t2);
+
+    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
+      fromTime = fromTime.substr(0, fromTime.length-3);
+
     var row3 = $("<div class='time-text'/>")
       .append(html.text("from "))
-      .append($("<b>").text(date.timeOnly(t1)))
+      .append($("<b>").text(fromTime))
       .append(html.text(" to "))
-      .append($("<b>").text(date.timeOnly(t2)))
+      .append($("<b>").text(toTime))
       .appendTo(view);
 
     var locText = mod.locationText(x.location);
