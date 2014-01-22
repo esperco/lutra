@@ -147,8 +147,8 @@ var page = (function() {
 
   mod.task.load = function(optTid) {
     pageSelector.hideAll();
-    task.load(optTid);
     goto_page("task");
+    task.load(optTid);
     display.updateTask();
     util.focus();
   };
