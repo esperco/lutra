@@ -68,6 +68,16 @@ var sched = (function() {
       return "";
   }
 
+  function wordify(time) {
+    if (time === "12:00 am") {
+      return "Midnight";
+    } else if (time === "12:00 pm") {
+      return "Noon";
+    } else {
+      return time;
+    }
+  }
+
   mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
 
@@ -88,11 +98,22 @@ var sched = (function() {
       .text(date.dateOnly(t1))
       .appendTo(view);
 
+    var fromTime = wordify(date.timeOnly(t1));
+    var toTime = wordify(date.timeOnly(t2));
+
+    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
+      fromTime = fromTime.substr(0, fromTime.length-3);
+
     var row3 = $("<div class='time-text'/>")
       .append(html.text("from "))
-      .append($("<b>").text(date.timeOnly(t1)))
+      .append($("<b>").text(fromTime))
       .append(html.text(" to "))
-      .append($("<b>").text(date.timeOnly(t2)))
+      .append($("<b>").text(toTime))
+      .appendTo(view);
+
+    var row4 = $("<div class='time-text-short hide'/>")
+      .append(html.text("at "))
+      .append($("<b>").text(date.timeOnly(t1)))
       .appendTo(view);
 
     var locText = mod.locationText(x.location);
