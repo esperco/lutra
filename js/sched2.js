@@ -26,7 +26,7 @@ var sched2 = (function() {
     suggestions: { ids: ["sched-step2-suggestions"] },
   });
 
-  function loadSuggestions(profs, task, meetingParam) {
+  function loadSuggestions(task, meetingParam) {
     clearSuggestions();
     var state = sched.getState(task);
     state.meeting_request = meetingParam;
@@ -36,7 +36,7 @@ var sched2 = (function() {
         if (x.suggestions.length === 0)
           suggestionArea.show("noResults");
         else {
-          refreshSuggestions(profs, task, x);
+          refreshSuggestions(task, x);
           suggestionArea.show("suggestions");
         }
       })
@@ -78,7 +78,7 @@ var sched2 = (function() {
     suggestionArea.show("idle");
   }
 
-  function refreshSuggestions(profs, task, x) {
+  function refreshSuggestions(task, x) {
     clearSuggestions();
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
@@ -93,7 +93,7 @@ var sched2 = (function() {
         slots.sort(function(a, b) {
           return date.ofString(a.start) - date.ofString(b.start);
         });
-        selectCalendarSlots(profs, task, slots);
+        selectCalendarSlots(task, slots);
       });
 
     function updateContButton() {
@@ -184,13 +184,13 @@ var sched2 = (function() {
     view.removeClass("hide");
   }
 
-  function loadSuggestionsIfReady(profs, task, meetingParam) {
+  function loadSuggestionsIfReady(task, meetingParam) {
     /* check for possibly missing fields
        to make a valid suggest_meeting_request */
     if (util.isDefined(meetingParam.how_soon)
         && util.isDefined(meetingParam.duration)
         && util.isDefined(meetingParam.buffer_time))
-      loadSuggestions(profs, task, meetingParam);
+      loadSuggestions(task, meetingParam);
   }
 
   function labelSlots(slots) {
@@ -204,7 +204,7 @@ var sched2 = (function() {
 
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
-  function selectCalendarSlots(profs, ta, slots) {
+  function selectCalendarSlots(ta, slots) {
     var x = ta.task_data[1];
     ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page
@@ -218,10 +218,10 @@ var sched2 = (function() {
     delete x.reserved;
 
     api.postTask(ta)
-      .done(function(task) { sched.loadStep3(profs, task); });
+      .done(function(task) { sched.loadTask(task); });
   }
 
-  function loadStep2Prefs(tzList, profs, task) {
+  function loadStep2Prefs(tzList, task) {
     var view = $("#sched-step2-pref-time");
     view.children().remove();
     var viewTimeZone = $("#sched-step2-time-zone");
@@ -322,7 +322,7 @@ var sched2 = (function() {
       x.days_of_week = getSelectedDaysOfWeek();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
-        loadSuggestionsIfReady(profs, task, meetingParam);
+        loadSuggestionsIfReady(task, meetingParam);
     }
 
     /* try to match the duration selected as part of the meeting type (sel1)
@@ -480,7 +480,7 @@ var sched2 = (function() {
     var leaderUid = login.leader();
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer(loadStep2Prefs(tzList, profs, task));
+      result = deferred.defer(loadStep2Prefs(tzList, task));
     }
     else {
       var authLandingUrl = document.URL;
@@ -489,7 +489,7 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadStep2Prefs(tzList, profs, task);
+            loadStep2Prefs(tzList, task);
         });
     }
     return result;

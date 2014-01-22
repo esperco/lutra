@@ -73,7 +73,7 @@ var sched3 = (function() {
     return view;
   }
 
-  function updateTask(profs, ta, calOption) {
+  function updateTask(ta, calOption) {
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
@@ -83,7 +83,7 @@ var sched3 = (function() {
       notifs: []
     };
     api.postTask(ta)
-      .done(function (task) { sched.loadStep4(profs, task); });
+      .done(function (task) { sched.loadTask(task); });
   }
 
   function textOfHowSoon(x) {
@@ -306,7 +306,7 @@ var sched3 = (function() {
       .addClass("disabled")
       .unbind('click')
       .click(function() {
-        updateTask(profs, task, selected);
+        updateTask(task, selected);
       });
   };
 

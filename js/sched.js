@@ -146,7 +146,7 @@ var sched = (function() {
     "sched-step4-tab": {ids: ["sched-step4-tab"]}
   });
 
-  mod.loadStep1 = function(profs, task) {
+  function loadStep1(profs, task) {
     var view = $("#sched-step1-content");
     view.children().remove();
 
@@ -156,7 +156,7 @@ var sched = (function() {
     tabSelector.show("sched-step1-tab");
   };
 
-  mod.loadStep2 = function(tzList, profs, task) {
+  function loadStep2(tzList, profs, task) {
     var view = $("#sched-step2-tab");
 
     sched2.load(tzList, profs, task);
@@ -165,7 +165,7 @@ var sched = (function() {
     tabSelector.show("sched-step2-tab");
   };
 
-  mod.loadStep3 = function(profs, task) {
+  function loadStep3(profs, task) {
     var view = $("#sched-step3-table");
     view.children().remove();
 
@@ -175,7 +175,7 @@ var sched = (function() {
     tabSelector.show("sched-step3-tab");
   };
 
-  mod.loadStep4 = function(profs, task) {
+  function loadStep4(profs, task) {
     var view = $("#sched-step4-table");
     view.children().remove();
 
@@ -184,6 +184,33 @@ var sched = (function() {
     tabHighlighter.show("sched-progress-tab4");
     tabSelector.show("sched-step4-tab");
   };
+
+  function setup_step_buttons(tzList, profs, task) {
+    $(".sched-go-step1")
+      .unbind('click')
+      .click(function() {
+        api.postTask(task);
+        loadStep1(profs, task);
+      });
+    $(".sched-go-step2")
+      .unbind('click')
+      .click(function() {
+        api.postTask(task);
+        loadStep2(tzList, profs, task);
+      });
+    $(".sched-go-step3")
+      .unbind('click')
+      .click(function() {
+        api.postTask(task);
+        loadStep3(profs, task);
+      });
+    $(".sched-go-step4")
+      .unbind('click')
+      .click(function() {
+        api.postTask(task);
+        loadStep4(profs, task);
+      });
+  }
 
   mod.loadTask = function(ta) {
     var state = ta.task_data[1];
@@ -194,18 +221,31 @@ var sched = (function() {
         var tzList = x.timezones;
         task.profilesOfEveryone(ta)
           .done(function(profs) {
+            setup_step_buttons(tzList, profs, ta);
             switch (progress) {
             case "Guest_list":
-              mod.loadStep1(profs, ta);
+              $(".sched-go-step2").attr("disabled", true);
+              $(".sched-go-step3").attr("disabled", true);
+              $(".sched-go-step4").attr("disabled", true);
+              loadStep1(profs, ta);
               break;
             case "Find_availability":
-              mod.loadStep2(tzList, profs, ta);
+              $(".sched-go-step2").removeAttr("disabled");
+              $(".sched-go-step3").attr("disabled", true);
+              $(".sched-go-step4").attr("disabled", true);
+              loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              mod.loadStep3(profs, ta);
+              $(".sched-go-step2").removeAttr("disabled");
+              $(".sched-go-step3").removeAttr("disabled");
+              $(".sched-go-step4").attr("disabled", true);
+              loadStep3(profs, ta);
               break;
             case "Confirm":
-              mod.loadStep4(profs, ta);
+              $(".sched-go-step2").removeAttr("disabled");
+              $(".sched-go-step3").removeAttr("disabled");
+              $(".sched-go-step4").removeAttr("disabled");
+              loadStep4(profs, ta);
               break;
             default:
               log("Unknown scheduling stage: " + progress);
