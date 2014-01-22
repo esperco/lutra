@@ -31,6 +31,15 @@ var sched3 = (function() {
     return view;
   }
 
+  function eqSlot(x, y) {
+    return !x && !y
+        || x && y
+           && x.start === y.start
+           && x.end === y.end
+           && x.on_site === y.on_site
+           && x.location.address === y.location.address;
+  }
+
   function viewOfOptions(task, onSelect) {
     var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
@@ -46,12 +55,17 @@ var sched3 = (function() {
     });
 
     list.iter(options, function(x) {
-      viewOfOption(x)
-        .click(function() {
+      var x_view = viewOfOption(x);
+      x_view.click(function() {
           selector.show(x.label);
           onSelect(x);
         })
         .appendTo(view);
+
+      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
+        x_view.addClass("radio-selected");
+        onSelect(x);
+      }
     });
 
     return view;
@@ -268,6 +282,13 @@ var sched3 = (function() {
     var next = $(".sched-step3-next");
     var selected;
 
+    next
+      .addClass("disabled")
+      .unbind('click')
+      .click(function() {
+        updateTask(ta, selected);
+      });
+
     function onSelect(x) {
       selected = x;
       next.removeClass("disabled");
@@ -312,13 +333,6 @@ var sched3 = (function() {
     });
 
     guestsContainer.appendTo(view);
-
-    next
-      .addClass("disabled")
-      .unbind('click')
-      .click(function() {
-        updateTask(ta, selected);
-      });
 
     task.onSchedulingStepChanging.observe("step", function() {
       saveTask(ta, selected);
