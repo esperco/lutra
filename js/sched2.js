@@ -691,12 +691,12 @@ var sched2 = (function() {
       });
   }
 
-  mod.load = function(tzList, profs, task) {
+  mod.load = function(tzList, profs, ta) {
     suggestionArea.show("idle");
     clearLocation();
     initializeGoogleMap();
     util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
-    connectCalendar(tzList, profs, task);
+    connectCalendar(tzList, profs, ta);
 
     util.afterTyping($("#edit-place-address"), 250, predictEditAddress);
     // TODO Better way to do this?
@@ -705,6 +705,9 @@ var sched2 = (function() {
       $("#edit-place-save").off("click");
     });
 
+    task.onSchedulingStepChanging.observe("step", function() {
+      api.postTask(ta);
+    });
   };
 
   return mod;

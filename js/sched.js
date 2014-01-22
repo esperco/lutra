@@ -185,33 +185,33 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, profs, task) {
+  function setup_step_buttons(tzList, profs, ta) {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
-        api.postTask(task);
-        loadStep1(profs, task);
+        task.onSchedulingStepChanging.notify();
+        loadStep1(profs, ta);
       });
     $(".sched-go-step2")
-      .attr('disabled', mod.getGuests(task) <= 0)
+      .attr('disabled', mod.getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
-        api.postTask(task);
-        loadStep2(tzList, profs, task);
+        task.onSchedulingStepChanging.notify();
+        loadStep2(tzList, profs, ta);
       });
     $(".sched-go-step3")
-      .attr('disabled', mod.getState(task).calendar_options.length <= 0)
+      .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
-        api.postTask(task);
-        loadStep3(profs, task);
+        task.onSchedulingStepChanging.notify();
+        loadStep3(profs, ta);
       });
     $(".sched-go-step4")
-      .attr('disabled', ! mod.getState(task).reserved)
+      .attr('disabled', ! mod.getState(ta).reserved)
       .unbind('click')
       .click(function() {
-        api.postTask(task);
-        loadStep4(profs, task);
+        task.onSchedulingStepChanging.notify();
+        loadStep4(profs, ta);
       });
   }
 

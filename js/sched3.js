@@ -73,15 +73,26 @@ var sched3 = (function() {
     return view;
   }
 
+  function updateTaskState(state, calOption) {
+    if (! state.reserved) {
+      state.reserved = {
+        remind: 3*43200,
+        notifs: []
+      };
+    }
+    state.reserved.slot = calOption.slot;
+  }
+
+  function saveTask(ta, calOption) {
+    updateTaskState(sched.getState(ta), calOption);
+    api.postTask(ta);
+  }
+
   function updateTask(ta, calOption) {
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
-    state.reserved = {
-      slot: calOption.slot,
-      remind: 3*43200,
-      notifs: []
-    };
+    updateTaskState(state, calOption);
     api.postTask(ta)
       .done(function (task) { sched.loadTask(task); });
   }
@@ -248,12 +259,12 @@ var sched3 = (function() {
              composeEmail: composeEmail };
   }
 
-  mod.load = function(profs, task, view) {
+  mod.load = function(profs, ta, view) {
     var view = $("#sched-step3-table");
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
-    var chats = sched.chatsOfTask(task);
+    var chats = sched.chatsOfTask(ta);
     var next = $(".sched-step3-next");
     var selected;
 
@@ -262,7 +273,7 @@ var sched3 = (function() {
       next.removeClass("disabled");
     }
 
-    viewOfOptions(task, onSelect)
+    viewOfOptions(ta, onSelect)
       .appendTo(view);
 
     $("<h4 class='guest-prefs-title'>Guest Preferences</h4>")
@@ -289,11 +300,11 @@ var sched3 = (function() {
       .appendTo(guestPrefsHeader);
 
     var guestsContainer = $("<div class='guests-container guests-only'>")
-    var guests = sched.getGuests(task);
+    var guests = sched.getGuests(ta);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
-        rowViewOfParticipant(chats, profs, task, uid);
+        rowViewOfParticipant(chats, profs, ta, uid);
       x.view
         .appendTo(guestsContainer);
       if (numGuests == 1 && ! sentEmail(chats, uid))
@@ -306,8 +317,12 @@ var sched3 = (function() {
       .addClass("disabled")
       .unbind('click')
       .click(function() {
-        updateTask(task, selected);
+        updateTask(ta, selected);
       });
+
+    task.onSchedulingStepChanging.observe("step", function() {
+      saveTask(ta, selected);
+    });
   };
 
   return mod;

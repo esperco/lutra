@@ -28,6 +28,13 @@ var page = (function() {
     "test":             {classes:["test-page"]}
   });
 
+  function goto_page(k) {
+    task.onSchedulingStepChanging.notify();
+    task.onSchedulingStepChanging.stopObserve("step");
+
+    pageSelector.show(k);
+  }
+
   /* Login screen */
   function prepareLogin(redirPath) {
     $("#login-button")
@@ -104,7 +111,7 @@ var page = (function() {
   mod.home.load = function() {
     pageSelector.hideAll();
     home.load();
-    pageSelector.show("home");
+    goto_page("home");
     display.updateHome();
     util.focus();
   };
@@ -112,7 +119,7 @@ var page = (function() {
   mod.test.load = function() {
     pageSelector.hideAll();
     $("#test-content").children().remove();
-    pageSelector.show("test");
+    goto_page("test");
     test.load();
     util.focus();
   };
@@ -120,28 +127,28 @@ var page = (function() {
   mod.login.load = function(redirPath) {
     pageSelector.hideAll();
     prepareLogin(redirPath);
-    pageSelector.show("login");
+    goto_page("login");
     util.focus();
   };
 
   mod.requestPassword.load = function(email) {
     pageSelector.hideAll();
     prepareRequestPassword(email);
-    pageSelector.show("request-password");
+    goto_page("request-password");
     util.focus();
   };
 
   mod.resetPassword.load = function(uid, token) {
     pageSelector.hideAll();
     prepareResetPassword(uid, token);
-    pageSelector.show("reset-password");
+    goto_page("reset-password");
     util.focus();
   };
 
   mod.task.load = function(optTid) {
     pageSelector.hideAll();
     task.load(optTid);
-    pageSelector.show("task");
+    goto_page("task");
     display.updateTask();
     util.focus();
   };

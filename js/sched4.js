@@ -340,20 +340,21 @@ var sched4 = (function() {
     return divReminder;
   }
 
-  mod.load = function(profs, task, view) {
-
-    var tid = task.tid;
-    var chats = sched.chatsOfTask(task);
-    var guests = sched.getGuests(task);
+  mod.load = function(profs, ta, view) {
+    var tid = ta.tid;
+    var chats = sched.chatsOfTask(ta);
+    var guests = sched.getGuests(ta);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
-      var x = step4RowViewOfParticipant(chats, profs, task, uid);
+      var x = step4RowViewOfParticipant(chats, profs, ta, uid);
       view.append(x.view);
       var reminderSelector =
-        createReminderSelector(chats, profs, task, uid).appendTo(view);
+        createReminderSelector(chats, profs, ta, uid).appendTo(view);
       if (numGuests == 1 && ! sentConfirmation(chats, uid))
         x.composeConfirmationEmail();
     });
+    // Task is always saved when remind changes.
+    task.onSchedulingStepChanging.stopObserve("step");
   };
 
   return mod;
