@@ -68,6 +68,16 @@ var sched = (function() {
       return "";
   }
 
+  function wordify(time) {
+    if (time === "12:00 am") {
+      return "Midnight";
+    } else if (time === "12:00 pm") {
+      return "Noon";
+    } else {
+      return time;
+    }
+  }
+
   mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
 
@@ -88,8 +98,8 @@ var sched = (function() {
       .text(date.dateOnly(t1))
       .appendTo(view);
 
-    var fromTime = date.timeOnly(t1);
-    var toTime = date.timeOnly(t2);
+    var fromTime = wordify(date.timeOnly(t1));
+    var toTime = wordify(date.timeOnly(t2));
 
     if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
       fromTime = fromTime.substr(0, fromTime.length-3);
