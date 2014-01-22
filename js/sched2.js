@@ -494,22 +494,17 @@ var sched2 = (function() {
     if (address == "") return;
     clearSuggestions();
     var leaderUid = login.data.team.team_leaders[0];
-    api.getCoordinates(leaderUid, address)
+    api.getCoordinates(address)
       .done(function(coords) {
         var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
         addressMarker.setPosition(geocoded);
         addressMarker.setMap(googleMap);
         googleMap.panTo(geocoded);
-        api.getTimezone(leaderUid, coords.lat, coords.lon)
-          .done(function(tz) {
-            timeZoneDropdown.set(tz);
-          })
-      })
-  }
-
-  function saveLocationSelection(loc, refId) {
-    api.postPlaceDetails(leaderUid, loc, refId)
-      .done(function() { /* TODO Is this function needed? */ });
+        api.getTimezone(coords.lat, coords.lon)
+          .done(function(x) {
+            timeZoneDropdown.set(x.timezone);
+          });
+      });
   }
 
   function displayPredictionsDropdown(predictions) {
@@ -547,7 +542,7 @@ var sched2 = (function() {
           .appendTo(li)
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
-            api.postSelectPlace(leaderUid, item.google_description)
+            api.postSelectPlace(item.google_description)
               .done(function(place) {
                 timeZoneDropdown.set(place.loc.timezone);
                 $('#location-dropdown-toggle').dropdown("toggle");
@@ -572,11 +567,13 @@ var sched2 = (function() {
         .appendTo(li)
         .click(function() {
           $("#sched-step2-loc-addr").val(desc);
-          api.getPlaceDetails(leaderUid, desc, item.ref_id)
+          api.getPlaceDetails(desc, item.ref_id)
             .done(function(place) {
-              /* TODO Return timezone with details or find some other way
-               * to refresh the list... this is dirty */
-              timeZoneDropdown.set(timeZoneDropdown.get());
+              var coord = place.geometry;
+              api.getTimezone(coord.lat, coord.lon)
+                .done(function(x) {
+                  timeZoneDropdown.set(x.timezone);
+                });
               $('#location-dropdown-toggle').dropdown("toggle");
             });
           return false;
@@ -592,8 +589,7 @@ var sched2 = (function() {
   function predictAddress() {
     var address = $("#sched-step2-loc-addr").val();
     if (address == "") return;
-    var leaderUid = login.data.team.team_leaders[0];
-    api.getPlacePredictions(leaderUid, address)
+    api.getPlacePredictions(address)
       .done(displayPredictionsDropdown);
   }
 
