@@ -94,7 +94,9 @@ var sched3 = (function() {
         notifs: []
       };
     }
-    state.reserved.slot = calOption.slot;
+    if (calOption) {
+      state.reserved.slot = calOption.slot;
+    }
   }
 
   function saveTask(ta, calOption) {
