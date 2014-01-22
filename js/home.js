@@ -324,13 +324,20 @@ var home = (function() {
     $(".nav-header").each(function() {
       var view = $(this);
       view.children().remove();
+      var initialsView = $("<div id='exec-circ'/>");
       var circ = $("<div id='exec-circ-outline'></div>")
-        .append("<div id='exec-circ'></div>")
+        .append(initialsView)
         .appendTo(view);
-      var initials;
+      var execNameView = $("<div id='exec-name' class='ellipsis'/>");
+      profile.get(login.leader())
+        .done(function(obsProf) {
+          var p = obsProf.prof;
+          execNameView.text(p.full_name);
+          initialsView.text(profile.veryShortNameOfProfile(p));
+        });
       var exec = $("<div id='exec-name-div'></div>")
         .append($("<div id='assisting'>ASSISTING</div>"))
-        .append($("<div id='exec-name' class='ellipsis'>Executive Name</div>"))
+        .append(execNameView)
         .appendTo(view);
       var caretDiv = $("<div id='exec-caret'></div>")
         .appendTo(view);
