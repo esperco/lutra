@@ -215,7 +215,7 @@ var sched4 = (function() {
         }
       });
 
-    /*** Reserve event in Google Calendar (no more Google invitations) ***/
+    /*** Reserve event in Google Calendar, maybe send invitations ***/
 
     var divInvitationCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divInvitation);
@@ -226,17 +226,47 @@ var sched4 = (function() {
     svg.loadImg(checkInvitation, "/assets/img/check.svg")
       .then(function(elt) { checkInvitation = elt; });
 
-    var inviteAction = $("<a class='final-sched-action col-xs-11'/>")
+    var divInviteAction = $("<div class='col-xs-11'/>");
+    var inviteAction = $("<a class='final-sched-action'/>")
       .text("Reserve Google Calendar event");
 
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
 
+    var divParticipantCheckboxes = $("<div/>");
+    $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
+    var participantCheckboxes = [];
+    profile.mget(task.task_participants.organized_for)
+      .then(function(participants) {
+        list.iter(participants, function(profile) {
+          var prof = profile.prof;
+          var name = "sched-step4-invite-" + prof.uid;
+          $("<label/>", {
+            "for": name,
+            "class": "checkbox-inline"
+          })
+            .text(prof.full_name)
+            .appendTo(divParticipantCheckboxes);
+          var checkbox = $("<input/>", {
+            "type": "checkbox",
+            name: name,
+            checked: "checked"
+          }).appendTo(divParticipantCheckboxes);
+          participantCheckboxes.push(checkbox);
+        });
+      });
+
     inviteAction
       .click(function() {
-        /* Warning: currently this writes the event into the host's calendar
-           and sends calendar invites to _all_ other participants */
-        api.reserveCalendar(task.tid)
+        /* This writes the event into the host's calendar
+           and sends calendar invites to selected participants */
+        var participantsToNotify = [];
+        list.iter(participantCheckboxes, function(checkbox) {
+          if (checkbox.is(":checked")) {
+            participantsToNotify.push(checkbox.prop("id"));
+          }
+        });
+        api.reserveCalendar(task.tid, { notified: participantsToNotify })
           .done(function(eventInfo) {
             api.getTask(task.tid)
               .done(function(updatedTask) {
@@ -246,7 +276,10 @@ var sched4 = (function() {
               });
           });
       })
-      .appendTo(divInvitation);
+      .appendTo(divInviteAction);
+
+    divParticipantCheckboxes.appendTo(divInviteAction);
+    divInviteAction.appendTo(divInvitation);
 
     // divDetails.appendTo(view);
     divInvitation.appendTo(view);

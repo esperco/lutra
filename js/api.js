@@ -246,9 +246,9 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(x));
   };
 
-  mod.reserveCalendar = function(tid) {
+  mod.reserveCalendar = function(tid, notified) {
     var url = api_s_prefix() + "/event/" + tid + "/reserve";
-    return jsonHttpPost(url, "");
+    return jsonHttpPost(url, JSON.stringify(notified));
   };
 
   mod.getReminderMessage = function() {
