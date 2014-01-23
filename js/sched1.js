@@ -276,7 +276,7 @@ var sched1 = (function() {
     });
   }
 
-  mod.load = function(profs, task, view) {
+  mod.load = function(profs, ta, view) {
     var view = $("#sched-step1-table");
     view.children().remove();
     $("<h3>Add guests to the meeting.</h3>")
@@ -286,21 +286,21 @@ var sched1 = (function() {
     var newGuestContainer = $("<div class='new-guest-container'>");
     var guestsContainer = $("<div class='guests-container'/>");
 
-    var guests = sched.getGuests(task);
+    var guests = sched.getGuests(ta);
     var guestTbl = list.toTable(guests);
 
     var addResult =
-      rowViewOfNewParticipant(profs, task, hosts, guestTbl, guestsContainer);
+      rowViewOfNewParticipant(profs, ta, hosts, guestTbl, guestsContainer);
 
-    var hosts = sched.getHosts(task);
+    var hosts = sched.getHosts(ta);
     list.iter(hosts, function(uid) {
-      rowViewOfParticipant(profs, task, guestTbl, uid,
+      rowViewOfParticipant(profs, ta, guestTbl, uid,
                            addResult.updateAddGuestAbility)
         .appendTo(hostsContainer);
     });
 
     list.iter(guests, function(uid) {
-      rowViewOfParticipant(profs, task, guestTbl, uid,
+      rowViewOfParticipant(profs, ta, guestTbl, uid,
                            addResult.updateAddGuestAbility)
         .appendTo(guestsContainer);
     });
@@ -321,10 +321,14 @@ var sched1 = (function() {
       .unbind("click")
       .click(function() {
         nextButton.addClass("disabled");
-        finalizeGuests(task, hosts, guestTbl);
+        finalizeGuests(ta, hosts, guestTbl);
       });
 
     updateNextButton(hosts, guestTbl);
+
+    task.onSchedulingStepChanging.observe("step", function() {
+      saveGuests(ta, hosts, guestTbl);
+    });
   };
 
   return mod;

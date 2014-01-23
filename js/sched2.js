@@ -26,7 +26,7 @@ var sched2 = (function() {
     suggestions: { ids: ["sched-step2-suggestions"] },
   });
 
-  function loadSuggestions(profs, task, meetingParam) {
+  function loadSuggestions(task, meetingParam) {
     clearSuggestions();
     var state = sched.getState(task);
     state.meeting_request = meetingParam;
@@ -36,7 +36,7 @@ var sched2 = (function() {
         if (x.suggestions.length === 0)
           suggestionArea.show("noResults");
         else {
-          refreshSuggestions(profs, task, x);
+          refreshSuggestions(task, x);
           suggestionArea.show("suggestions");
         }
       })
@@ -61,6 +61,16 @@ var sched2 = (function() {
     };
   }
 
+  function loadLocation(locations) {
+    if (locations && locations.length > 0) {
+      var loc = locations[0];
+      $("#sched-step2-loc-addr").val(loc.address);
+      if (loc.timezone) {
+        timeZoneDropdown.set(loc.timezone);
+      }
+    }
+  }
+
   function initMeetingParam(task) {
     return {
       participants: task.task_participants.organized_for,
@@ -72,13 +82,28 @@ var sched2 = (function() {
          meeting_type, time_of_day_type, time_of_day */
   }
 
+  function taskMeetingParam(task) {
+    var q = sched.getState(task).meeting_request;
+    if (! q) {
+      q = initMeetingParam(task);
+    }
+    q.participants = task.task_participants.organized_for;
+    if (! q.meeting_type) {
+      q.meeting_type = "Meeting";
+    }
+    if (! q.days_of_week) {
+      q.days_of_week = [0,1,2,3,4,5,6];
+    }
+    return q;
+  }
+
   function clearSuggestions() {
     $(".sched-step2-next").addClass("disabled");
     $("#sched-step2-suggestions").children().remove();
     suggestionArea.show("idle");
   }
 
-  function refreshSuggestions(profs, task, x) {
+  function refreshSuggestions(task, x) {
     clearSuggestions();
     var view = $("#sched-step2-suggestions");
     view.addClass("hide");
@@ -93,7 +118,7 @@ var sched2 = (function() {
         slots.sort(function(a, b) {
           return date.ofString(a.start) - date.ofString(b.start);
         });
-        selectCalendarSlots(profs, task, slots);
+        selectCalendarSlots(task, slots);
       });
 
     function updateContButton() {
@@ -184,13 +209,13 @@ var sched2 = (function() {
     view.removeClass("hide");
   }
 
-  function loadSuggestionsIfReady(profs, task, meetingParam) {
+  function loadSuggestionsIfReady(task, meetingParam) {
     /* check for possibly missing fields
        to make a valid suggest_meeting_request */
     if (util.isDefined(meetingParam.how_soon)
         && util.isDefined(meetingParam.duration)
         && util.isDefined(meetingParam.buffer_time))
-      loadSuggestions(profs, task, meetingParam);
+      loadSuggestions(task, meetingParam);
   }
 
   function labelSlots(slots) {
@@ -204,7 +229,7 @@ var sched2 = (function() {
 
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
-  function selectCalendarSlots(profs, ta, slots) {
+  function selectCalendarSlots(ta, slots) {
     var x = ta.task_data[1];
     ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page
@@ -218,10 +243,19 @@ var sched2 = (function() {
     delete x.reserved;
 
     api.postTask(ta)
-      .done(function(task) { sched.loadStep3(profs, task); });
+      .done(function(task) { sched.loadTask(task); });
   }
 
-  function loadStep2Prefs(tzList, profs, task) {
+  function loadDaysOfWeek(meetingParam) {
+    for (var i = 0; i < 7; ++i) {
+      $("#sched-step2-dow" + i).prop("checked", false);
+    }
+    list.iter(meetingParam.days_of_week, function(i) {
+      $("#sched-step2-dow" + i).prop("checked", true);
+    });
+  }
+
+  function loadStep2Prefs(tzList, task) {
     var view = $("#sched-step2-pref-time");
     view.children().remove();
     var viewTimeZone = $("#sched-step2-time-zone");
@@ -322,7 +356,7 @@ var sched2 = (function() {
       x.days_of_week = getSelectedDaysOfWeek();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
-        loadSuggestionsIfReady(profs, task, meetingParam);
+        loadSuggestionsIfReady(task, meetingParam);
     }
 
     /* try to match the duration selected as part of the meeting type (sel1)
@@ -390,21 +424,31 @@ var sched2 = (function() {
     });
 
     /* urgency */
+    var sel3_options = [
+      { label: "Within 6 months", key: "6months", value: 183 * 86400 },
+      { label: "Within 2 months", key: "2months", value: 61 * 86400 },
+      { label: "Within 1 month", key: "1month", value: 31 * 86400 },
+      { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
+      { label: "Within 1 week", key: "1week", value: 7 * 86400 },
+      { label: "Within 2 days", key: "2days", value: 2 * 86400 },
+      { label: "Today", key: "12hours", value: 12 * 3600 },
+    ];
     sel3 = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       defaultAction: action3,
       initialKey: "1week",
-      options: [
-        { label: "Within 6 months", key: "6months", value: 183 * 86400 },
-        { label: "Within 2 months", key: "2months", value: 61 * 86400 },
-        { label: "Within 1 month", key: "1month", value: 31 * 86400 },
-        { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
-        { label: "Within 1 week", key: "1week", value: 7 * 86400 },
-        { label: "Within 2 days", key: "2days", value: 2 * 86400 },
-        { label: "Today", key: "12hours", value: 12 * 3600 },
-      ]
+      options: sel3_options
     });
+
+    function loadHowSoon(how_soon) {
+      var opt = list.find(sel3_options, function(opt, i) {
+        return opt.value === how_soon;
+      });
+      if (opt) {
+        sel3.set(opt.key);
+      }
+    }
 
     /* time zone */
     var tzOptions =
@@ -451,7 +495,12 @@ var sched2 = (function() {
     sel4.view.appendTo(viewTimeZone);
 
     meetingParam = initMeetingParam(task);
-    sel1.set("meeting");
+
+    var q = taskMeetingParam(task);
+    loadLocation(q.location);
+    sel1.set(q.meeting_type.toLowerCase());
+    loadDaysOfWeek(q);
+    loadHowSoon(q.how_soon);
 
     step2Selector.show("sched-step2-prefs");
   }
@@ -480,7 +529,7 @@ var sched2 = (function() {
     var leaderUid = login.leader();
     var result;
     if (! list.mem(task.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer(loadStep2Prefs(tzList, profs, task));
+      result = deferred.defer(loadStep2Prefs(tzList, task));
     }
     else {
       var authLandingUrl = document.URL;
@@ -489,7 +538,7 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadStep2Prefs(tzList, profs, task);
+            loadStep2Prefs(tzList, task);
         });
     }
     return result;
@@ -642,12 +691,12 @@ var sched2 = (function() {
       });
   }
 
-  mod.load = function(tzList, profs, task) {
+  mod.load = function(tzList, profs, ta) {
     suggestionArea.show("idle");
     clearLocation();
     initializeGoogleMap();
     util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
-    connectCalendar(tzList, profs, task);
+    connectCalendar(tzList, profs, ta);
 
     util.afterTyping($("#edit-place-address"), 250, predictEditAddress);
     // TODO Better way to do this?
@@ -656,6 +705,9 @@ var sched2 = (function() {
       $("#edit-place-save").off("click");
     });
 
+    task.onSchedulingStepChanging.observe("step", function() {
+      api.postTask(ta);
+    });
   };
 
   return mod;

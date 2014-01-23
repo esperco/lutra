@@ -32,6 +32,7 @@ var task = (function() {
   mod.onTaskArchived = new Observable();
   mod.onChatPosting = new Observable();
   mod.onChatPosted = new Observable();
+  mod.onSchedulingStepChanging = new Observable();
 
   /* extract all user IDs contained in the task; this is used to
      pre-fetch all the profiles. */

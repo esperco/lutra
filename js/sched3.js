@@ -31,6 +31,15 @@ var sched3 = (function() {
     return view;
   }
 
+  function eqSlot(x, y) {
+    return !x && !y
+        || x && y
+           && x.start === y.start
+           && x.end === y.end
+           && x.on_site === y.on_site
+           && x.location.address === y.location.address;
+  }
+
   function viewOfOptions(task, onSelect) {
     var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
@@ -46,12 +55,17 @@ var sched3 = (function() {
     });
 
     list.iter(options, function(x) {
-      viewOfOption(x)
-        .click(function() {
+      var x_view = viewOfOption(x);
+      x_view.click(function() {
           selector.show(x.label);
           onSelect(x);
         })
         .appendTo(view);
+
+      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
+        x_view.addClass("radio-selected");
+        onSelect(x);
+      }
     });
 
     return view;
@@ -76,17 +90,30 @@ var sched3 = (function() {
     return view;
   }
 
-  function updateTask(profs, ta, calOption) {
+  function updateTaskState(state, calOption) {
+    if (! state.reserved) {
+      state.reserved = {
+        remind: 3*43200,
+        notifs: []
+      };
+    }
+    if (calOption) {
+      state.reserved.slot = calOption.slot;
+    }
+  }
+
+  function saveTask(ta, calOption) {
+    updateTaskState(sched.getState(ta), calOption);
+    api.postTask(ta);
+  }
+
+  function updateTask(ta, calOption) {
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
-    state.reserved = {
-      slot: calOption.slot,
-      remind: 3*43200,
-      notifs: []
-    };
+    updateTaskState(state, calOption);
     api.postTask(ta)
-      .done(function (task) { sched.loadStep4(profs, task); });
+      .done(function (task) { sched.loadTask(task); });
   }
 
   function textOfHowSoon(x) {
@@ -296,21 +323,28 @@ var sched3 = (function() {
              composeEmail: composeEmail };
   }
 
-  mod.load = function(profs, task, view) {
+  mod.load = function(profs, ta, view) {
     var view = $("#sched-step3-table");
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
-    var chats = sched.chatsOfTask(task);
+    var chats = sched.chatsOfTask(ta);
     var next = $(".sched-step3-next");
     var selected;
+
+    next
+      .addClass("disabled")
+      .unbind('click')
+      .click(function() {
+        updateTask(ta, selected);
+      });
 
     function onSelect(x) {
       selected = x;
       next.removeClass("disabled");
     }
 
-    viewOfOptions(task, onSelect)
+    viewOfOptions(ta, onSelect)
       .appendTo(view);
 
     $("<h4 class='guest-prefs-title'>Guest Preferences</h4>")
@@ -337,11 +371,11 @@ var sched3 = (function() {
       .appendTo(guestPrefsHeader);
 
     var guestsContainer = $("<div class='guests-container guests-only'>")
-    var guests = sched.getGuests(task);
+    var guests = sched.getGuests(ta);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
-        rowViewOfParticipant(chats, profs, task, uid);
+        rowViewOfParticipant(chats, profs, ta, uid);
       x.view
         .appendTo(guestsContainer);
       if (numGuests == 1 && ! sentEmail(chats, uid))
@@ -350,12 +384,9 @@ var sched3 = (function() {
 
     guestsContainer.appendTo(view);
 
-    next
-      .addClass("disabled")
-      .unbind('click')
-      .click(function() {
-        updateTask(profs, task, selected);
-      });
+    task.onSchedulingStepChanging.observe("step", function() {
+      saveTask(ta, selected);
+    });
   };
 
   return mod;

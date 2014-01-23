@@ -167,7 +167,7 @@ var sched = (function() {
     "sched-step4-tab": {ids: ["sched-step4-tab"]}
   });
 
-  mod.loadStep1 = function(profs, task) {
+  function loadStep1(profs, task) {
     var view = $("#sched-step1-content");
     view.children().remove();
 
@@ -177,7 +177,7 @@ var sched = (function() {
     tabSelector.show("sched-step1-tab");
   };
 
-  mod.loadStep2 = function(tzList, profs, task) {
+  function loadStep2(tzList, profs, task) {
     var view = $("#sched-step2-tab");
 
     sched2.load(tzList, profs, task);
@@ -186,7 +186,7 @@ var sched = (function() {
     tabSelector.show("sched-step2-tab");
   };
 
-  mod.loadStep3 = function(profs, task) {
+  function loadStep3(profs, task) {
     var view = $("#sched-step3-table");
     view.children().remove();
 
@@ -196,7 +196,7 @@ var sched = (function() {
     tabSelector.show("sched-step3-tab");
   };
 
-  mod.loadStep4 = function(profs, task) {
+  function loadStep4(profs, task) {
     var view = $("#sched-step4-table");
     view.children().remove();
 
@@ -205,6 +205,36 @@ var sched = (function() {
     tabHighlighter.show("sched-progress-tab4");
     tabSelector.show("sched-step4-tab");
   };
+
+  function setup_step_buttons(tzList, profs, ta) {
+    $(".sched-go-step1")
+      .unbind('click')
+      .click(function() {
+        task.onSchedulingStepChanging.notify();
+        loadStep1(profs, ta);
+      });
+    $(".sched-go-step2")
+      .attr('disabled', mod.getGuests(ta) <= 0)
+      .unbind('click')
+      .click(function() {
+        task.onSchedulingStepChanging.notify();
+        loadStep2(tzList, profs, ta);
+      });
+    $(".sched-go-step3")
+      .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
+      .unbind('click')
+      .click(function() {
+        task.onSchedulingStepChanging.notify();
+        loadStep3(profs, ta);
+      });
+    $(".sched-go-step4")
+      .attr('disabled', ! mod.getState(ta).reserved)
+      .unbind('click')
+      .click(function() {
+        task.onSchedulingStepChanging.notify();
+        loadStep4(profs, ta);
+      });
+  }
 
   mod.loadTask = function(ta) {
     var state = ta.task_data[1];
@@ -215,18 +245,19 @@ var sched = (function() {
         var tzList = x.timezones;
         task.profilesOfEveryone(ta)
           .done(function(profs) {
+            setup_step_buttons(tzList, profs, ta);
             switch (progress) {
             case "Guest_list":
-              mod.loadStep1(profs, ta);
+              loadStep1(profs, ta);
               break;
             case "Find_availability":
-              mod.loadStep2(tzList, profs, ta);
+              loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              mod.loadStep3(profs, ta);
+              loadStep3(profs, ta);
               break;
             case "Confirm":
-              mod.loadStep4(profs, ta);
+              loadStep4(profs, ta);
               break;
             default:
               log("Unknown scheduling stage: " + progress);
