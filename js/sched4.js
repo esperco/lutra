@@ -89,7 +89,10 @@ var sched4 = (function() {
     var toName = toObsProf.prof.full_name;
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
-    var when = "on " + date.range(t1, t2);
+    var when =
+      $("#sched-availability-message-readonly").hasClass("short") ?
+      "on " + date.justStartTime(t1) :
+      "on " + date.range(t1, t2);
     var title = slot.location.title;
     var where = "at " + (title == "" ? "a place to be determined" : title);
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
@@ -197,6 +200,8 @@ var sched4 = (function() {
           sendButton.addClass("disabled");
           var body = $("#sched-confirm-message").val();
           var chatid = chats[uid].chatid;
+          var hideEnd = $("#sched-availability-message-readonly")
+            .hasClass("short");
           var chatItem = {
             chatid: chatid,
             by: login.me(),
@@ -204,7 +209,8 @@ var sched4 = (function() {
             team: login.getTeam().teamid,
             chat_item_data: ["Sched_confirm", {
               body: body,
-              'final': slot
+              'final': slot,
+              hide_end_time: hideEnd
             }]
           };
           chat.postChatItem(chatItem)

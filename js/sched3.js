@@ -304,6 +304,8 @@ var sched3 = (function() {
           sendButton.addClass("disabled");
           var body = $("#sched-availability-message").val();
           var chatid = chats[uid].chatid;
+          var hideEnd = $("#sched-availability-message-readonly")
+            .hasClass("short");
           var chatItem = {
             chatid: chatid,
             by: login.me(),
@@ -311,9 +313,11 @@ var sched3 = (function() {
             team: login.getTeam().teamid,
             chat_item_data: ["Scheduling_q", {
               body: body,
-              choices: options
+              choices: options,
+              hide_end_times: hideEnd
             }]
           };
+          console.log(chatItem.toSource());
           chat.postChatItem(chatItem)
             .done(closeAvailabilityModal);
         }
