@@ -107,13 +107,26 @@ var sched3 = (function() {
     api.postTask(ta);
   }
 
+  function reserveCalendar(tid) {
+    return api.reserveCalendar(tid, { notified: [] })
+      .then(function(eventInfo) {
+        return api.getTask(tid);
+      });
+  }
+
   function updateTask(ta, calOption) {
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
     updateTaskState(state, calOption);
     api.postTask(ta)
-      .done(function (task) { sched.loadTask(task); });
+      .done(function(ta) {
+        reserveCalendar(ta.tid)
+          .done(function(eventInfo) {
+            api.getTask(ta.tid)
+              .done(sched.loadTask);
+          });
+      });
   }
 
   function textOfHowSoon(x) {
