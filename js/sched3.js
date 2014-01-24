@@ -306,20 +306,23 @@ var sched3 = (function() {
           var chatid = chats[uid].chatid;
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
-          var chatItem = {
-            chatid: chatid,
-            by: login.me(),
-            'for': login.leader(),
-            team: login.getTeam().teamid,
-            chat_item_data: ["Scheduling_q", {
-              body: body,
-              choices: options,
-              hide_end_times: hideEnd
-            }]
-          };
-          console.log(chatItem.toSource());
-          chat.postChatItem(chatItem)
-            .done(closeAvailabilityModal);
+          task.task_data[1].hide_end_times = hideEnd;
+          api.postTask(task).done(function() {
+            var chatItem = {
+              chatid: chatid,
+              by: login.me(),
+              'for': login.leader(),
+              team: login.getTeam().teamid,
+              chat_item_data: ["Scheduling_q", {
+                body: body,
+                choices: options,
+                hide_end_times: hideEnd
+              }]
+            };
+            console.log(chatItem.toSource());
+            chat.postChatItem(chatItem)
+              .done(closeAvailabilityModal);
+          });
         }
       });
 
