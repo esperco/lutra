@@ -235,6 +235,7 @@ var sched4 = (function() {
     updateInviteAction(task, inviteAction);
 
     var divParticipantCheckboxes = $("<div/>");
+    var otherEmailInput;
     $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
     var participantCheckboxes = [];
     profile.mget(task.task_participants.organized_for)
@@ -257,6 +258,12 @@ var sched4 = (function() {
             .appendTo(divParticipantCheckboxes);
           participantCheckboxes.push(checkbox);
         });
+        $("<label for='sched-step4-invite-custom' class='checkbox-inline'/>")
+          .text("Other Email: ")
+          .appendTo(divParticipantCheckboxes);
+        otherEmailInput =
+          $("<input type='text' name='sched-step4-invite-custom'/>")
+            .appendTo(divParticipantCheckboxes);
       });
 
     inviteAction
@@ -269,15 +276,27 @@ var sched4 = (function() {
             participantsToNotify.push(checkbox.data("uid"));
           }
         });
-        api.reserveCalendar(task.tid, { notified: participantsToNotify })
-          .done(function(eventInfo) {
-            api.getTask(task.tid)
-              .done(function(updatedTask) {
-                task = updatedTask;
-                updateInviteAction(updatedTask, inviteAction);
-                markChecked(divInvitationCheck);
-              });
-          });
+        // TODO Email address validation, allow multiple inputs
+        var otherEmail = otherEmailInput.val();
+        // This is probably not the best way to accomplish what I want...
+        var deferredUid =
+          otherEmail ?
+          api.getProfileByEmail(otherEmail) :
+          deferred.defer(null);
+        deferredUid.done(function(prof) {
+          if (prof && prof !== null) {
+            participantsToNotify.push(prof.profile_uid);
+          }
+          api.reserveCalendar(task.tid, { notified: participantsToNotify })
+            .done(function(eventInfo) {
+              api.getTask(task.tid)
+                .done(function(updatedTask) {
+                  task = updatedTask;
+                  updateInviteAction(updatedTask, inviteAction);
+                  markChecked(divInvitationCheck);
+                });
+            });
+        });
       })
       .appendTo(divInviteAction);
 
