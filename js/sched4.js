@@ -200,8 +200,7 @@ var sched4 = (function() {
           sendButton.addClass("disabled");
           var body = $("#sched-confirm-message").val();
           var chatid = chats[uid].chatid;
-          var hideEnd = $("#sched-availability-message-readonly")
-            .hasClass("short");
+          var hideEnd = task.task_data[1].hide_end_times;
           var chatItem = {
             chatid: chatid,
             by: login.me(),

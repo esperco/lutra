@@ -319,7 +319,6 @@ var sched3 = (function() {
                 hide_end_times: hideEnd
               }]
             };
-            console.log(chatItem.toSource());
             chat.postChatItem(chatItem)
               .done(closeAvailabilityModal);
           });
