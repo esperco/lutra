@@ -98,10 +98,6 @@ var sched4 = (function() {
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
     $("#sched-confirm-message")
       .val(body);
-
-    var footer = $("#sched-confirm-message-readonly");
-    footer.children().remove();
-    footer.append(sched.viewOfSuggestion(slot));
   }
 
   function preFillReminderModal(profs, task, slot, toUid) {
