@@ -240,7 +240,8 @@ var sched4 = (function() {
       .then(function(participants) {
         list.iter(participants, function(profile) {
           var prof = profile.prof;
-          var name = "sched-step4-invite-" + prof.uid;
+          var uid = prof.profile_uid;
+          var name = "sched-step4-invite-" + uid;
           $("<label/>", {
             "for": name,
             "class": "checkbox-inline"
@@ -251,7 +252,9 @@ var sched4 = (function() {
             "type": "checkbox",
             name: name,
             checked: "checked"
-          }).appendTo(divParticipantCheckboxes);
+          })
+            .data("uid", uid)
+            .appendTo(divParticipantCheckboxes);
           participantCheckboxes.push(checkbox);
         });
       });
@@ -263,7 +266,7 @@ var sched4 = (function() {
         var participantsToNotify = [];
         list.iter(participantCheckboxes, function(checkbox) {
           if (checkbox.is(":checked")) {
-            participantsToNotify.push(checkbox.prop("id"));
+            participantsToNotify.push(checkbox.data("uid"));
           }
         });
         api.reserveCalendar(task.tid, { notified: participantsToNotify })
