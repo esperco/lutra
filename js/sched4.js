@@ -237,25 +237,28 @@ var sched4 = (function() {
     var divParticipantCheckboxes = $("<div/>");
     $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
     var participantCheckboxes = [];
+    var leader = login.leader();
     profile.mget(task.task_participants.organized_for)
       .then(function(participants) {
         list.iter(participants, function(profile) {
           var prof = profile.prof;
           var uid = prof.profile_uid;
-          var name = "sched-step4-invite-" + uid;
-          $("<label/>", {
-            "for": name,
-            "class": "checkbox-inline"
-          })
-            .text(prof.full_name)
-            .appendTo(divParticipantCheckboxes);
-          var checkbox = $("<input/>", {
-            "type": "checkbox",
-            name: name
-          })
-            .data("uid", uid)
-            .appendTo(divParticipantCheckboxes);
-          participantCheckboxes.push(checkbox);
+          if (uid !== leader) {
+            var name = "sched-step4-invite-" + uid;
+            $("<label/>", {
+              "for": name,
+              "class": "checkbox-inline"
+            })
+              .text(prof.full_name)
+              .appendTo(divParticipantCheckboxes);
+            var checkbox = $("<input/>", {
+              "type": "checkbox",
+              name: name
+            })
+              .data("uid", uid)
+              .appendTo(divParticipantCheckboxes);
+            participantCheckboxes.push(checkbox);
+          }
         });
       });
 
