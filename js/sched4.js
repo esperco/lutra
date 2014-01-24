@@ -250,8 +250,7 @@ var sched4 = (function() {
             .appendTo(divParticipantCheckboxes);
           var checkbox = $("<input/>", {
             "type": "checkbox",
-            name: name,
-            checked: "checked"
+            name: name
           })
             .data("uid", uid)
             .appendTo(divParticipantCheckboxes);
