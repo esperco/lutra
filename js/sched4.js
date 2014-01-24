@@ -89,16 +89,15 @@ var sched4 = (function() {
     var toName = toObsProf.prof.full_name;
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
-    var when = "on " + date.range(t1, t2);
+    var when =
+      $("#sched-availability-message-readonly").hasClass("short") ?
+      "on " + date.justStartTime(t1) :
+      "on " + date.range(t1, t2);
     var title = slot.location.title;
     var where = "at " + (title == "" ? "a place to be determined" : title);
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
     $("#sched-confirm-message")
       .val(body);
-
-    var footer = $("#sched-confirm-message-readonly");
-    footer.children().remove();
-    footer.append(sched.viewOfSuggestion(slot));
   }
 
   function preFillReminderModal(profs, task, slot, toUid) {
@@ -197,6 +196,7 @@ var sched4 = (function() {
           sendButton.addClass("disabled");
           var body = $("#sched-confirm-message").val();
           var chatid = chats[uid].chatid;
+          var hideEnd = task.task_data[1].hide_end_times;
           var chatItem = {
             chatid: chatid,
             by: login.me(),
@@ -204,7 +204,8 @@ var sched4 = (function() {
             team: login.getTeam().teamid,
             chat_item_data: ["Sched_confirm", {
               body: body,
-              'final': slot
+              'final': slot,
+              hide_end_time: hideEnd
             }]
           };
           chat.postChatItem(chatItem)

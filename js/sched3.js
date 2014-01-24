@@ -304,18 +304,24 @@ var sched3 = (function() {
           sendButton.addClass("disabled");
           var body = $("#sched-availability-message").val();
           var chatid = chats[uid].chatid;
-          var chatItem = {
-            chatid: chatid,
-            by: login.me(),
-            'for': login.leader(),
-            team: login.getTeam().teamid,
-            chat_item_data: ["Scheduling_q", {
-              body: body,
-              choices: options
-            }]
-          };
-          chat.postChatItem(chatItem)
-            .done(closeAvailabilityModal);
+          var hideEnd = $("#sched-availability-message-readonly")
+            .hasClass("short");
+          task.task_data[1].hide_end_times = hideEnd;
+          api.postTask(task).done(function() {
+            var chatItem = {
+              chatid: chatid,
+              by: login.me(),
+              'for': login.leader(),
+              team: login.getTeam().teamid,
+              chat_item_data: ["Scheduling_q", {
+                body: body,
+                choices: options,
+                hide_end_times: hideEnd
+              }]
+            };
+            chat.postChatItem(chatItem)
+              .done(closeAvailabilityModal);
+          });
         }
       });
 

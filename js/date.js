@@ -118,6 +118,12 @@ var date = (function() {
       " from "+ mod.timeOnly(d1) +" to "+ mod.timeOnly(d2);
   };
 
+  /* "Wednesday August 13, 2019 at 12:30pm" */
+  mod.justStartTime = function(d1) {
+    return mod.weekDay(d1) +" "+ mod.dateOnly(d1) +
+      " at "+ mod.timeOnly(d1);
+  };
+
   jQuery.timeago.settings.allowFuture = true;
   /* create a DOM element from a date,
      displaying how long ago it was. */
