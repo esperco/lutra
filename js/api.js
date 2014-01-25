@@ -251,9 +251,9 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
-  mod.getReminderMessage = function() {
-    var url = api_s_prefix() + "/reminder/message";
-    return jsonHttpGet(url);
+  mod.getReminderMessage = function(tid, parameters) {
+    var url = api_s_prefix() + "/task/" + tid + "/reminder/message";
+    return jsonHttpPost(url, JSON.stringify(parameters));
   };
 
   return mod;
