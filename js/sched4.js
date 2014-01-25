@@ -100,6 +100,24 @@ var sched4 = (function() {
       .val(body);
   }
 
+  function refreshReminderMessage(cannedMessages) {
+    var conditions = [];
+    function add_cond(cond) {
+      if (cond.length > 0) {
+        conditions.push(cond);
+      }
+    }
+    add_cond($("#sched-reminder-meeting-kind").val());
+    add_cond($("#sched-reminder-guest-addr").val());
+
+    var x = list.find(cannedMessages, function(x) {
+      return list.diff(x.message_conditions, conditions).length <= 0;
+    });
+    if (x) {
+      $("#sched-reminder-message").val(x.message_text);
+    }
+  }
+
   function preFillReminderModal(profs, task, slot, toUid) {
     var toObsProf = profs[toUid];
 
@@ -108,10 +126,15 @@ var sched4 = (function() {
     $("#sched-reminder-subject")
       .val("Re: " + task.task_status.task_title);
 
-    api.getReminderMessage()
+    api.getReminderMessage(task.tid, {guest_name:toObsProf.prof.full_name})
       .done(function(x) {
-        $("#sched-reminder-message")
-          .val(x.text);
+        refreshReminderMessage(x);
+        $("#sched-reminder-meeting-kind")
+          .unbind("change")
+          .change(function(){refreshReminderMessage(x);});
+        $("#sched-reminder-guest-addr")
+          .unbind("change")
+          .change(function(){refreshReminderMessage(x);});
       });
 
     var footer = $("#sched-reminder-message-readonly");
