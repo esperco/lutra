@@ -229,7 +229,7 @@ var sched4 = (function() {
 
     var divInviteAction = $("<div class='col-xs-11'/>");
     var inviteAction = $("<a class='final-sched-action'/>")
-      .text("Reserve Google Calendar event");
+      .text("Send Google Calendar invitations");
 
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
