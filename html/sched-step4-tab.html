@@ -95,9 +95,16 @@
                  type="text" class="form-control" disabled>
         </div>
         <h4 class="modal-section-title">Message</h4>
+        <select id="sched-reminder-meeting-kind">
+          <option value="">Meeting</option>
+          <option value="Phone_meeting">Phone Call</option>
+        </select>
+        <select id="sched-reminder-guest-addr">
+          <option value="Address_directly">Address Directly</option>
+          <option value="Address_to_assistant">Address to Assistant</option>
+        </select>
         <textarea class="form-control" rows="10"
                   id="sched-reminder-message"></textarea>
-        <div id="sched-reminder-message-readonly"></div>
       </div>
     </div>
   </div>

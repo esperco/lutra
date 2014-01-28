@@ -100,7 +100,25 @@ var sched4 = (function() {
       .val(body);
   }
 
-  function preFillReminderModal(profs, task, slot, toUid) {
+  function refreshReminderMessage(cannedMessages) {
+    var conditions = [];
+    function add_cond(cond) {
+      if (cond.length > 0) {
+        conditions.push(cond);
+      }
+    }
+    add_cond($("#sched-reminder-meeting-kind").val());
+    add_cond($("#sched-reminder-guest-addr").val());
+
+    var x = list.find(cannedMessages, function(x) {
+      return list.diff(x.message_conditions, conditions).length <= 0;
+    });
+    if (x) {
+      $("#sched-reminder-message").val(x.message_text);
+    }
+  }
+
+  function preFillReminderModal(profs, task, reserved, toUid) {
     var toObsProf = profs[toUid];
 
     loadReminderRecipients(toObsProf);
@@ -108,15 +126,22 @@ var sched4 = (function() {
     $("#sched-reminder-subject")
       .val("Re: " + task.task_status.task_title);
 
-    api.getReminderMessage()
-      .done(function(x) {
-        $("#sched-reminder-message")
-          .val(x.text);
-      });
+    if (reserved.reminder_message) {
+      $("#sched-reminder-message").val(reserved.reminder_message);
+    }
 
-    var footer = $("#sched-reminder-message-readonly");
-    footer.children().remove();
-    footer.append(sched.viewOfSuggestion(slot));
+    api.getReminderMessage(task.tid, {guest_name:toObsProf.prof.full_name})
+      .done(function(x) {
+        if (! reserved.reminder_message) {
+          refreshReminderMessage(x);
+        }
+        $("#sched-reminder-meeting-kind")
+          .unbind("change")
+          .change(function(){refreshReminderMessage(x);});
+        $("#sched-reminder-guest-addr")
+          .unbind("change")
+          .change(function(){refreshReminderMessage(x);});
+      });
   }
 
   function editEventDetails(tid, chats, uid) {
@@ -229,7 +254,7 @@ var sched4 = (function() {
 
     var divInviteAction = $("<div class='col-xs-11'/>");
     var inviteAction = $("<a class='final-sched-action'/>")
-      .text("Reserve Google Calendar event");
+      .text("Send Google Calendar invitations");
 
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
@@ -238,25 +263,28 @@ var sched4 = (function() {
     var otherEmailInput;
     $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
     var participantCheckboxes = [];
+    var leader = login.leader();
     profile.mget(task.task_participants.organized_for)
       .then(function(participants) {
         list.iter(participants, function(profile) {
           var prof = profile.prof;
           var uid = prof.profile_uid;
-          var name = "sched-step4-invite-" + uid;
-          $("<label/>", {
-            "for": name,
-            "class": "checkbox-inline"
-          })
-            .text(prof.full_name)
-            .appendTo(divParticipantCheckboxes);
-          var checkbox = $("<input/>", {
-            "type": "checkbox",
-            name: name
-          })
-            .data("uid", uid)
-            .appendTo(divParticipantCheckboxes);
-          participantCheckboxes.push(checkbox);
+          if (uid !== leader) {
+            var name = "sched-step4-invite-" + uid;
+            $("<label/>", {
+              "for": name,
+              "class": "checkbox-inline"
+            })
+              .text(prof.full_name)
+              .appendTo(divParticipantCheckboxes);
+            var checkbox = $("<input/>", {
+              "type": "checkbox",
+              name: name
+            })
+              .data("uid", uid)
+              .appendTo(divParticipantCheckboxes);
+            participantCheckboxes.push(checkbox);
+          }
         });
         $("<label for='sched-step4-invite-custom' class='checkbox-inline'/>")
           .text("Other Email: ")
@@ -318,15 +346,16 @@ var sched4 = (function() {
   function createReminderSelector(chats, profs, task, uid) {
     var sel;
     var reserved = sched.getState(task).reserved;
-    var slot = reserved.slot;
 
     var reminderModal = $("#sched-reminder-modal");
     function closeReminderModal() {
+      reserved.reminder_message = $("#sched-reminder-message").val();
+      api.postTask(task);
       reminderModal.modal("hide");
     }
 
     function composeReminderEmail() {
-      preFillReminderModal(profs, task, slot, uid);
+      preFillReminderModal(profs, task, reserved, uid);
       reminderModal.modal({});
     }
 
