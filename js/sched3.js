@@ -15,9 +15,10 @@ var sched3 = (function() {
 
     "I'm writing on behalf of "+hostName+" who respectfully requests "+
     "a meeting with you. "+
-    hostName+"'s schedule has the below open times "+howSoon+". "+
+    hostName+"'s schedule has the following open times "+howSoon+". "+
     "If any of these times are agreeable, please respond to this e-mail "+
-    "with your choice.";
+    "with your choice. If you have an assistant or scheduler, I'd be happy"+
+    "to follow up with him or her.";
   }
 
   function viewOfOption(calOption) {
@@ -91,13 +92,13 @@ var sched3 = (function() {
   }
 
   function updateTaskState(state, calOption) {
-    if (! state.reserved) {
-      state.reserved = {
-        remind: 3*43200,
-        notifs: []
-      };
-    }
     if (calOption) {
+      if (! state.reserved) {
+        state.reserved = {
+          remind: 3*43200,
+          notifs: []
+        };
+      }
       state.reserved.slot = calOption.slot;
     }
   }

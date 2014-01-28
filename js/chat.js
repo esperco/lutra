@@ -436,7 +436,9 @@ var chat = (function () {
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
 
-    $("#chat-icon-container").click(function() {
+    $("#chat-icon-container")
+    .unbind("click")
+    .click(function() {
       if ($("#chat").hasClass("fadeOutDown")) {
         $("#chat").removeClass("fadeOutDown")
                   .addClass("fadeInUp");

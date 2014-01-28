@@ -353,6 +353,8 @@ var sched2 = (function() {
       x.location = [getLocation()];
       util.addFields(x, sel2.get());
       x.how_soon = sel3.get();
+      var no_sooner =  $("#starting").val();
+      x.no_sooner = no_sooner > 0 ? 86400 * no_sooner : 0;
       x.days_of_week = getSelectedDaysOfWeek();
       meetingParam = x;
       if (! equalMeetingParam(old, meetingParam))
@@ -425,12 +427,12 @@ var sched2 = (function() {
 
     /* urgency */
     var sel3_options = [
-      { label: "Within 6 months", key: "6months", value: 183 * 86400 },
-      { label: "Within 2 months", key: "2months", value: 61 * 86400 },
-      { label: "Within 1 month", key: "1month", value: 31 * 86400 },
-      { label: "Within 2 weeks", key: "2weeks", value: 14 * 86400 },
-      { label: "Within 1 week", key: "1week", value: 7 * 86400 },
-      { label: "Within 2 days", key: "2days", value: 2 * 86400 },
+      { label: "6 months", key: "6months", value: 183 * 86400 },
+      { label: "2 months", key: "2months", value: 61 * 86400 },
+      { label: "1 month", key: "1month", value: 31 * 86400 },
+      { label: "2 weeks", key: "2weeks", value: 14 * 86400 },
+      { label: "1 week", key: "1week", value: 7 * 86400 },
+      { label: "2 days", key: "2days", value: 2 * 86400 },
       { label: "Today", key: "12hours", value: 12 * 3600 },
     ];
     sel3 = select.create({
@@ -491,8 +493,14 @@ var sched2 = (function() {
 
     sel1.view.appendTo(colType);
     sel2.view.appendTo(colDuration);
-    sel3.view.appendTo(colUrgency);
     sel4.view.appendTo(viewTimeZone);
+
+    sel3.view.appendTo(colUrgency);
+    $("<span/>").text("starting at ").appendTo(colUrgency);
+    $("<input id='starting' type='number' min='0'/>")
+      .change(mergeSelections)
+      .appendTo(colUrgency);
+    $("<span/>").text(" days from now").appendTo(colUrgency);
 
     meetingParam = initMeetingParam(task);
 
@@ -501,6 +509,7 @@ var sched2 = (function() {
     sel1.set(q.meeting_type.toLowerCase());
     loadDaysOfWeek(q);
     loadHowSoon(q.how_soon);
+    $("#starting").val(q.no_sooner ? q.no_sooner : "0");
 
     step2Selector.show("sched-step2-prefs");
   }
