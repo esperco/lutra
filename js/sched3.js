@@ -91,13 +91,13 @@ var sched3 = (function() {
   }
 
   function updateTaskState(state, calOption) {
-    if (! state.reserved) {
-      state.reserved = {
-        remind: 3*43200,
-        notifs: []
-      };
-    }
     if (calOption) {
+      if (! state.reserved) {
+        state.reserved = {
+          remind: 3*43200,
+          notifs: []
+        };
+      }
       state.reserved.slot = calOption.slot;
     }
   }
