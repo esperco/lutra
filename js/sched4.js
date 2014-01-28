@@ -304,8 +304,8 @@ var sched4 = (function() {
     divInviteAction.appendTo(divInvitation);
 
     // divDetails.appendTo(view);
-    divInvitation.appendTo(view);
     divConfirmation.appendTo(view);
+    divInvitation.appendTo(view);
 
     return {
       view: view,
