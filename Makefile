@@ -1,5 +1,6 @@
-.PHONY: default local-install s3
+.PHONY: default install local-install s3
 default: local-install
+install: s3
 
 # Copy public files into pub/
 local-install:

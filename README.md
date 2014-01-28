@@ -1,5 +1,6 @@
 In most cases, HoneyBadger doesn't care. In this case, this directory contains
-the files to run the front-end Esper website (including our jobs page, privacy policy, contact us, etc.)
+the files to run the front-end Esper website (including our jobs page,
+privacy policy, contact us, etc.)
 
 Prerequisites
 -------------
@@ -18,3 +19,21 @@ s3cmd --configure
 ```
 
 Now you are set up for uploading files to S3 using `s3cmd`.
+
+
+Build and install
+-----------------
+
+It's a two-step process.
+
+```
+$ make
+```
+builds what needs to be built and puts the files into the `pub/`
+directory. This allows you to check locally what the site looks like
+before going live.
+
+```
+$ make install
+```
+will copy files into our S3 bucket used to host the Esper website.
