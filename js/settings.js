@@ -89,6 +89,8 @@ var settings = (function() {
 
   function displayAssistantProfile(eaUID) {
     console.log("settings.displayAssistantProfile");
+    $("#settings-password").val("");
+    $("#settings-confirm-password").val("");
     api.getProfile(eaUID)
       .done(function(eaProf) {
         assistantProfile = eaProf;
@@ -98,6 +100,7 @@ var settings = (function() {
         $("#settings-profile-circ").text(fullName[0]);
         $("#settings-full-name").val(fullName);
         $("#settings-familiar-name").val(eaProf.familiar_name);
+        $("#settings-form-of-address").val(eaProf.form_of_address);
         $("#settings-username").val(login.data.email);
         $("#settings-other-email").val(eaProf.signup_email);
       });
@@ -112,7 +115,6 @@ var settings = (function() {
     $("#settings-form-of-address").on("input", enableButton);
     $("#settings-other-email").on("input", enableButton);
     var password = $("#settings-password");
-    password.on("input", enableButton);
     var confirmPassword = $("#settings-confirm-password");
     util.afterTyping(confirmPassword, 250, function() {
       if (password.val() === confirmPassword.val()) {
@@ -131,24 +133,28 @@ var settings = (function() {
     var password = $("#settings-password").val();
     var confirmPassword = $("#settings-confirm-password").val();
 
+    var maybeChangePassword = deferred.defer(null);
     if (password != "") {
       if (password != confirmPassword) {
         // Shouldn't happen unless util.afterTyping got faked out...
         alert("Password does not match confirmation!");
       } else {
-        // TODO Update the password
+        maybeChangePassword =
+          api.changePassword(assistantProfile.profile_uid, password);
       }
     }
 
-    var profileEdit = {
-      profile_uid: assistantProfile.profile_uid,
-      familiar_name: familiarName,
-      full_name: fullName,
-      form_of_address: formOfAddress,
-      gender: assistantProfile.gender,
-      prefix: prefix
-    };
-    api.postProfile(profileEdit).done(settings.load);
+    maybeChangePassword.done(function() {
+      var profileEdit = {
+        profile_uid: assistantProfile.profile_uid,
+        familiar_name: familiarName,
+        full_name: fullName,
+        form_of_address: formOfAddress,
+        gender: assistantProfile.gender,
+        prefix: prefix
+      };
+      api.postProfile(profileEdit).done(settings.load);
+    });
   }
 
   mod.load = function() {
