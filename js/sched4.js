@@ -17,10 +17,17 @@ var sched4 = (function() {
     });
   }
 
-  function sentInvitations(task) {
+  function reservedCalendarSlot(task) {
     var state = sched.getState(task);
     return util.isDefined(state.reserved) &&
       util.isDefined(state.reserved.google_event);
+  }
+
+  function sentInvitations(task) {
+    var state = sched.getState(task);
+    return util.isDefined(state.reserved) &&
+      util.isDefined(state.reserved.notifs) &&
+      state.reserved.notifs.length > 0;
   }
 
   function formalEmailBody(organizerName, hostName, toName, when, where) {
@@ -319,7 +326,6 @@ var sched4 = (function() {
             .done(function(eventInfo) {
               api.getTask(task.tid)
                 .done(function(updatedTask) {
-                  task = updatedTask;
                   updateInviteAction(updatedTask, inviteAction);
                   markChecked(divInvitationCheck);
                 });
