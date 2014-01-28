@@ -266,13 +266,23 @@ var sched4 = (function() {
     /* disable button if invite was already sent */
     updateInviteAction(task, inviteAction);
 
+    var wasInviteSent = function(uid) {
+      if (sentInvitations(task)) {
+        var notifs = state.reserved.notifs;
+        for (var i = 0; i < notifs.length; i++) {
+          if (state.reserved.notifs[i].participant === uid) return true;
+        }
+      }
+      return false;
+    };
+
     var divParticipantCheckboxes = $("<div/>");
     var otherEmailInput;
     $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
     var participantCheckboxes = [];
     var leader = login.leader();
     profile.mget(task.task_participants.organized_for)
-      .then(function(participants) {
+      .done(function(participants) {
         list.iter(participants, function(profile) {
           var prof = profile.prof;
           var uid = prof.profile_uid;
@@ -286,7 +296,8 @@ var sched4 = (function() {
               .appendTo(divParticipantCheckboxes);
             var checkbox = $("<input/>", {
               "type": "checkbox",
-              name: name
+              name: name,
+              checked: wasInviteSent(uid)
             })
               .data("uid", uid)
               .appendTo(divParticipantCheckboxes);
@@ -300,6 +311,7 @@ var sched4 = (function() {
           $("<input type='text' name='sched-step4-invite-custom'/>")
             .appendTo(divParticipantCheckboxes);
       });
+
 
     inviteAction
       .click(function() {
