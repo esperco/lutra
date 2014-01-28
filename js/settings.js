@@ -1,5 +1,5 @@
 /*
-  Settings
+  Settings Page
 */
 
 var settings = (function() {
@@ -9,8 +9,11 @@ var settings = (function() {
   var femalePrefixes = ["Ms.", "Mrs.", "Miss"];
   var commonPrefixes = ["Dr.", "Prof."];
 
+  var assistantProfile = null;
+  var namePrefixSel = null;
+
   function displayNamePrefixes(gender) {
-    var view = $("#settings-first-name-prefix");
+    var view = $("#settings-name-prefix");
     view.children().remove();
     var prefixes;
     if (!gender) {
@@ -25,8 +28,12 @@ var settings = (function() {
     var options = list.map(prefixes, function(prefix) {
       return { label: prefix, value: prefix };
     });
-    var prefixSel = select.create({ options: options });
+    var prefixSel = select.create({
+      options: options,
+      defaultAction: function() { $("#settings-update-account").prop("disabled", false); }
+    });
     prefixSel.view.appendTo(view);
+    namePrefixSel = prefixSel;
   }
 
   function displayNoMoreExecs() {
@@ -48,6 +55,7 @@ var settings = (function() {
 
   function displayExecutive(execUID) {
     var view = $("#settings-executives");
+    view.children().remove();
     var row = $("<div class='exec-row clearfix'/>");
     api.getProfile(execUID)
       .done(function(execProf) {
@@ -83,10 +91,13 @@ var settings = (function() {
     console.log("settings.displayAssistantProfile");
     api.getProfile(eaUID)
       .done(function(eaProf) {
+        assistantProfile = eaProf;
         console.log(eaProf.toSource());
         displayNamePrefixes(eaProf.gender);
-        $("#settings-first-name").val(eaProf.full_name);
-        $("#settings-preferred-name").val(eaProf.familiar_name);
+        var fullName = eaProf.full_name;
+        $("#settings-profile-circ").text(fullName[0]);
+        $("#settings-full-name").val(fullName);
+        $("#settings-familiar-name").val(eaProf.familiar_name);
         $("#settings-username").val(login.data.email);
         $("#settings-other-email").val(eaProf.signup_email);
       });
@@ -96,12 +107,48 @@ var settings = (function() {
     var updateButton = $("#settings-update-account");
     updateButton.prop("disabled", true);
     var enableButton = function() { updateButton.prop("disabled", false); };
-    $("#settings-first-name").on("input", enableButton);
-    $("#settings-last-name").on("input", enableButton);
-    $("#settings-preferred-name").on("input", enableButton);
+    $("#settings-full-name").on("input", enableButton);
+    $("#settings-familiar-name").on("input", enableButton);
+    $("#settings-form-of-address").on("input", enableButton);
     $("#settings-other-email").on("input", enableButton);
-    $("#settings-password").on("input", enableButton);
-    $("#settings-confirm-password").on("input", enableButton);
+    var password = $("#settings-password");
+    password.on("input", enableButton);
+    var confirmPassword = $("#settings-confirm-password");
+    util.afterTyping(confirmPassword, 250, function() {
+      if (password.val() === confirmPassword.val()) {
+        updateButton.prop("disabled", false);
+      } else {
+        updateButton.prop("disabled", true);
+      }
+    });
+  }
+
+  function updateAssistantProfile() {
+    var fullName = $("#settings-full-name").val();
+    var familiarName = $("#settings-familiar-name").val();
+    var formOfAddress = $("#settings-form-of-address").val();
+    var prefix = namePrefixSel.get();
+    var password = $("#settings-password").val();
+    var confirmPassword = $("#settings-confirm-password").val();
+
+    if (password != "") {
+      if (password != confirmPassword) {
+        // Shouldn't happen unless util.afterTyping got faked out...
+        alert("Password does not match confirmation!");
+      } else {
+        // TODO Update the password
+      }
+    }
+
+    var profileEdit = {
+      profile_uid: assistantProfile.profile_uid,
+      familiar_name: familiarName,
+      full_name: fullName,
+      form_of_address: formOfAddress,
+      gender: assistantProfile.gender,
+      prefix: prefix
+    };
+    api.postProfile(profileEdit).done(settings.load);
   }
 
   mod.load = function() {
@@ -109,6 +156,7 @@ var settings = (function() {
     displayAssistantProfile(login.me());
     displayExecutive(login.leader());
     disableUpdateButtonUntilModified();
+    $("#settings-update-account").one("click", updateAssistantProfile);
   };
 
   return mod;

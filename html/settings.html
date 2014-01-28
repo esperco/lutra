@@ -7,23 +7,23 @@
     <div id="settings-user-profile" class="clearfix">
       <div id="left-col" class="form-group col-md-6">
         <div id="settings-prof-pic">
-          <div class="settings-prof-circ"><!-- TODO --></div>
+          <div class="settings-prof-circ" id="settings-profile-circ"></div>
           <button id="settings-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
         </div>
-        <label for="settings-first-name-group" class="text-field-label">First name</label>
-        <div id="settings-first-name-group" class="input-group">
-          <div class="input-group-btn" id="settings-first-name-prefix"></div>
-          <input type="text" id="settings-first-name" class="form-control">
+        <label for="settings-full-name-group" class="text-field-label">Full name</label>
+        <div id="settings-full-name-group" class="input-group">
+          <div class="input-group-btn" id="settings-name-prefix"></div>
+          <input type="text" id="settings-full-name" class="form-control">
         </div>
-        <label for="settings-last-name" class="text-field-label">Last name</label>
-        <input type="text" id="settings-last-name" class="form-control">
         <!-- TODO should automatically reflect first name until edited -->
-        <label for="settings-preferred-name" class="text-field-label">Preferred name</label>
-        <input type="text" id="settings-preferred-name" class="form-control">
+        <label for="settings-familiar-name" class="text-field-label">Familiar name</label>
+        <input type="text" id="settings-familiar-name" class="form-control">
+        <label for="settings-form-of-address" class="text-field-label">Preferred form of address</label>
+        <input type="text" id="settings-form-of-address" class="form-control">
       </div>
       <div id="right-col" class="form-group col-md-6">
         <label for="settings-other-email" class="text-field-label">Email address</label>
-        <input type="email" id="settings-other-email" class="form-control">
+        <input type="email" id="settings-other-email" class="form-control" disabled>
         <label for="settings-username" class="text-field-label">Username</label>
         <input type="email" id="settings-username" class="form-control" disabled>
         <label for="settings-password" class="text-field-label">Password</label>
@@ -35,31 +35,7 @@
     <button id="settings-update-account" class="btn btn-primary">Update</button>
   </div>
   <div id="settings-executives-title" class="settings-title">EXECUTIVES</div>
-  <div id="settings-executives">
-
-    <!-- TODO re-create in Javascript -->
-    <!--<div class="exec-row clearfix">
-      <div id="" class="settings-prof-circ">J</div>
-      <a href="#" data-toggle="tooltip" placement="left" title="Settings" class="exec-settings-div"
-        onclick="javascript:$('.exec-settings-modal').modal({}); return false">
-        <img id="" class="svg exec-settings" src="/assets/img/settings.svg">
-      </a>
-      <div class="settings-exec-details">
-        <div id="settings-exec-name" class="exec-name ellipsis"></div>
-        <div class="exec-email ellipsis"></div>
-      </div>
-    </div>
-
-    <div class="exec-row clearfix">
-      <div id="" class="add-exec-circ disabled">
-        <img id="plus-exec" class="svg" src="/assets/img/plus.svg">
-      </div>
-      <div class="add-exec-details">
-        <div class="add-exec-text ellipsis">You may only assist one executive at this time.</div>
-      </div>
-    </div>-->
-
-  </div>
+  <div id="settings-executives"></div>
 </div>
 
 <div class="modal fade exec-settings-modal" tabindex="-1"
@@ -75,43 +51,33 @@
                 id="exec-settings-save" style="float:right">Save</button>
         <h3 class="modal-title" id="exec-settings-title">Settings</h3>
       </div>
-      <div class="modal-body" id="sched-availability-body">
+      <div class="modal-body" id="exec-settings-body">
         <div class="exec-profile clearfix">
-          <!-- re-create in Javascript -->
           <div class="form-group col-md-6">
             <div id="prof-pic">
-              <div class="settings-prof-circ">R</div>
-              <button id="upload-photo" class="btn btn-default">Upload Photo</button>
+              <div class="settings-prof-circ" id="settings-modal-circ">
+                <!-- TODO initial of exec -->
+              </div>
+              <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
             </div>
             <label for="first-name-group" class="text-field-label">First name</label>
             <div id="first-name-group" class="input-group">
-              <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  Dame <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                  <!-- should only display options applicable to user's gender (ex. female) -->
-                  <li><a href="#">Ms.</a></li>
-                  <li><a href="#">Mrs.</a></li>
-                  <li><a href="#">Dr.</a></li>
-                  <li><a href="#">Prof.</a></li>
-                  <li><a href="#">Dame</a></li>
-                </ul>
-              </div>
-              <input type="text" id="first-name" class="form-control">
+              <div class="input-group-btn" id="settings-exec-name-prefix"></div>
+              <input type="text" id="settings-exec-first-name" class="form-control">
             </div>
             <label for="last-name" class="text-field-label">Last name</label>
-            <input type="text" id="last-name" class="form-control">
-            <!-- should automatically reflect first name until edited -->
+            <input type="text" id="settings-exec-last-name" class="form-control">
+            <!-- TODO should automatically reflect first name until edited -->
             <label for="preferred-name" class="text-field-label">Preferred name</label>
-            <input type="text" id="preferred-name" class="form-control">
+            <input type="text" id="settings-exec-preferred-name" class="form-control">
           </div>
           <div class="form-group col-md-6">
             <label for="username" class="text-field-label">Username</label>
-            <input type="email" id="esper-email" class="form-control" disabled>
+            <input type="email" id="settings-exec-username" class="form-control" disabled>
             <label for="password" class="text-field-label">Password</label>
-            <input type="password" id="password" class="form-control">
+            <input type="password" id="settings-exec-password" class="form-control">
             <label for="confirm-password" class="text-field-label">Confirm password</label>
-            <input type="password" id="confirm-password" class="form-control">
+            <input type="password" id="settings-exec-confirm-password" class="form-control">
           </div>
         </div>
         <div id="email-addresses-title" class="settings-title">EMAIL ADDRESSES</div>
@@ -184,7 +150,7 @@
           </div>
           <div class="account-row clearfix">
             <img id="linkedin" class="svg not-connected" src="/assets/img/linkedin.svg">
-            <button id="connect-linkedin" class="connect-btn btn btn-primary">Connect</button>
+            <button id="connect-linkedin" class="connect-btn btn btn-primary" disabled>Connect</button>
             <div class="linked-account-details">
               <div class="linked-account-name ellipsis">LinkedIn</div>
               <div class="linked-account-status-text ellipsis">
@@ -199,5 +165,4 @@
       </div>
     </div>
   </div>
->>>>>>> 1b3fb83ef1027b82a1b05e3684b4387c7d1f7b26
 </div>
