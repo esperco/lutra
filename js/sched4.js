@@ -17,10 +17,17 @@ var sched4 = (function() {
     });
   }
 
-  function sentInvitations(task) {
+  function reservedCalendarSlot(task) {
     var state = sched.getState(task);
     return util.isDefined(state.reserved) &&
       util.isDefined(state.reserved.google_event);
+  }
+
+  function sentInvitations(task) {
+    var state = sched.getState(task);
+    return util.isDefined(state.reserved) &&
+      util.isDefined(state.reserved.notifs) &&
+      state.reserved.notifs.length > 0;
   }
 
   function formalEmailBody(organizerName, hostName, toName, when, where) {
@@ -260,6 +267,7 @@ var sched4 = (function() {
     updateInviteAction(task, inviteAction);
 
     var divParticipantCheckboxes = $("<div/>");
+    var otherEmailInput;
     $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
     var participantCheckboxes = [];
     var leader = login.leader();
@@ -285,6 +293,12 @@ var sched4 = (function() {
             participantCheckboxes.push(checkbox);
           }
         });
+        $("<label for='sched-step4-invite-custom' class='checkbox-inline'/>")
+          .text("Other Email: ")
+          .appendTo(divParticipantCheckboxes);
+        otherEmailInput =
+          $("<input type='text' name='sched-step4-invite-custom'/>")
+            .appendTo(divParticipantCheckboxes);
       });
 
     inviteAction
@@ -297,15 +311,26 @@ var sched4 = (function() {
             participantsToNotify.push(checkbox.data("uid"));
           }
         });
-        api.reserveCalendar(task.tid, { notified: participantsToNotify })
-          .done(function(eventInfo) {
-            api.getTask(task.tid)
-              .done(function(updatedTask) {
-                task = updatedTask;
-                updateInviteAction(updatedTask, inviteAction);
-                markChecked(divInvitationCheck);
-              });
-          });
+        // TODO Email address validation, allow multiple inputs
+        var otherEmail = otherEmailInput.val();
+        // This is probably not the best way to accomplish what I want...
+        var deferredUid =
+          otherEmail ?
+          api.getProfileByEmail(otherEmail) :
+          deferred.defer(null);
+        deferredUid.done(function(prof) {
+          if (prof && prof !== null) {
+            participantsToNotify.push(prof.profile_uid);
+          }
+          api.reserveCalendar(task.tid, { notified: participantsToNotify })
+            .done(function(eventInfo) {
+              api.getTask(task.tid)
+                .done(function(updatedTask) {
+                  updateInviteAction(updatedTask, inviteAction);
+                  markChecked(divInvitationCheck);
+                });
+            });
+        });
       })
       .appendTo(divInviteAction);
 
@@ -313,8 +338,8 @@ var sched4 = (function() {
     divInviteAction.appendTo(divInvitation);
 
     // divDetails.appendTo(view);
-    divInvitation.appendTo(view);
     divConfirmation.appendTo(view);
+    divInvitation.appendTo(view);
 
     return {
       view: view,
