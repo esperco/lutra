@@ -142,10 +142,6 @@ var sched4 = (function() {
           .unbind("change")
           .change(function(){refreshReminderMessage(x);});
       });
-
-    var footer = $("#sched-reminder-message-readonly");
-    footer.children().remove();
-    footer.append(sched.viewOfSuggestion(reserved.slot));
   }
 
   function editEventDetails(tid, chats, uid) {
