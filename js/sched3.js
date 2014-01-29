@@ -17,7 +17,7 @@ var sched3 = (function() {
     "a meeting with you. "+
     hostName+"'s schedule has the following open times "+howSoon+". "+
     "If any of these times are agreeable, please respond to this e-mail "+
-    "with your choice. If you have an assistant or scheduler, I'd be happy"+
+    "with your choice. If you have an assistant or scheduler, I'd be happy "+
     "to follow up with him or her.";
   }
 
