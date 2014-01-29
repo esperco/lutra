@@ -102,5 +102,13 @@ var util = (function () {
     }
   };
 
+  mod.arrayUnique = function(arr) {
+    var obj = {};
+    for (var i = 0; i < arr.length; i++) obj[arr[i]] = arr[i];
+    var ret = [];
+    for (var j in obj) ret.push(obj[j]);
+    return ret;
+  };
+
   return mod;
 })();

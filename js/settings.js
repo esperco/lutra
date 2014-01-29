@@ -53,56 +53,74 @@ var settings = (function() {
       .appendTo(view);
   }
 
-  function displayExecutive(execUID) {
-    var view = $("#settings-executives");
-    view.children().remove();
-    var row = $("<div class='exec-row clearfix'/>");
+  function execSettingsModal(execUID) {
     api.getProfile(execUID)
       .done(function(execProf) {
-        var name = execProf.full_name;
-        $("<div class='settings-prof-circ'/>")
-          .text(name[0])
-          .appendTo(row);
-        var gear = $("<a/>", {
-          href: "#",
-          "data-toggle": "tooltip",
-          placement: "left",
-          title: "Settings",
-          "class": "exec-settings-div"
+        var fullName = execProf.full_name;
+        var familiarName = execProf.familiar_name;
+        $("#exec-settings-title").text("Settings for " + familiarName);
+        $("#settings-modal-circ").text(fullName[0]);
+        $("#settings-exec-full-name").val(fullName);
+        $("#settings-exec-familiar-name").val(familiarName);
+        $("#settings-exec-form-of-address").val(execProf.form_of_address);
+        $(".exec-settings-modal").modal({});
+      });
+  }
+
+  function displayExecutives(execUIDs) {
+    var view = $("#settings-executives");
+    view.children().remove();
+    var uniqUIDs = util.arrayUnique(execUIDs);
+    console.log(uniqUIDs.toSource());
+    profile.mget(uniqUIDs)
+      .done(function(execProfs) {
+        list.iter(execProfs, function(execProf) {
+          var prof = execProf.prof;
+          var row = $("<div class='exec-row clearfix'/>");
+          var name = prof.full_name;
+          $("<div class='settings-prof-circ'/>")
+            .text(name[0])
+            .appendTo(row);
+          var gear = $("<a/>", {
+            href: "#",
+            "data-toggle": "tooltip",
+            placement: "left",
+            title: "Settings",
+            "class": "exec-settings-div"
+          });
+          gear.click(function() {
+            execSettingsModal(prof.profile_uid);
+          });
+          $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
+            .appendTo(gear);
+          gear.appendTo(row);
+          var details = $("<div class='exec-details'/>");
+          $("<div class='exec-name ellipsis'/>")
+            .text(name)
+            .appendTo(details);
+          $("<div class='exec-email ellipsis'/>")
+            .text(prof.signup_email)
+            .appendTo(details);
+          details.appendTo(row);
+          row.appendTo(view);
         });
-        gear.click(function() { $(".exec-settings-modal").modal({}); });
-        $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
-          .appendTo(gear);
-        gear.appendTo(row);
-        var details = $("<div class='exec-details'/>");
-        $("<div class='exec-name ellipsis'/>")
-          .text(name)
-          .appendTo(details);
-        $("<div class='exec-email ellipsis'/>")
-          .text(execProf.signup_email)
-          .appendTo(details);
-        details.appendTo(row);
-        row.appendTo(view);
         displayNoMoreExecs();
       });
   }
 
   function displayAssistantProfile(eaUID) {
-    console.log("settings.displayAssistantProfile");
     $("#settings-password").val("");
     $("#settings-confirm-password").val("");
     api.getProfile(eaUID)
       .done(function(eaProf) {
         assistantProfile = eaProf;
-        console.log(eaProf.toSource());
         displayNamePrefixes(eaProf.gender);
         var fullName = eaProf.full_name;
         $("#settings-profile-circ").text(fullName[0]);
         $("#settings-full-name").val(fullName);
         $("#settings-familiar-name").val(eaProf.familiar_name);
         $("#settings-form-of-address").val(eaProf.form_of_address);
-        $("#settings-username").val(login.data.email);
-        $("#settings-other-email").val(eaProf.signup_email);
+        $("#settings-email").val(eaProf.primary_email);
       });
   }
 
@@ -113,7 +131,7 @@ var settings = (function() {
     $("#settings-full-name").on("input", enableButton);
     $("#settings-familiar-name").on("input", enableButton);
     $("#settings-form-of-address").on("input", enableButton);
-    $("#settings-other-email").on("input", enableButton);
+    $("#settings-email").on("input", enableButton);
     var password = $("#settings-password");
     var confirmPassword = $("#settings-confirm-password");
     util.afterTyping(confirmPassword, 250, function() {
@@ -159,8 +177,14 @@ var settings = (function() {
 
   mod.load = function() {
     console.log("settings.load");
+    console.log(login.data.toSource());
     displayAssistantProfile(login.me());
-    displayExecutive(login.leader());
+    var teams = login.getTeams();
+    var leaderUIDs = list.map(teams, function(team) {
+      return team.team_leaders[0];
+    });
+    console.log(leaderUIDs.toSource());
+    displayExecutives(leaderUIDs);
     disableUpdateButtonUntilModified();
     $("#settings-update-account").one("click", updateAssistantProfile);
   };
