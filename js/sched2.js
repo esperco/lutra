@@ -333,7 +333,7 @@ var sched2 = (function() {
                 45, 15, hour(19), hour(23));
 
     /* inter-dependent dropdowns for setting scheduling constraints */
-    var sel1, sel2, sel3, sel4;
+    var sel1, sel3, sel4;
 
     function getSelectedDaysOfWeek() {
       return list.filter([0,1,2,3,4,5,6], function(i) {
@@ -351,7 +351,8 @@ var sched2 = (function() {
       var x = initMeetingParam(task);
       util.addFields(x, sel1.get());
       x.location = [getLocation()];
-      util.addFields(x, sel2.get());
+      x.duration = getDuration();
+      x.buffer_time = 60 * $("#buffer-minute").val();
       x.how_soon = sel3.get();
       var no_sooner =  $("#starting").val();
       x.no_sooner = no_sooner > 0 ? 86400 * no_sooner : 0;
@@ -361,12 +362,28 @@ var sched2 = (function() {
         loadSuggestionsIfReady(task, meetingParam);
     }
 
+    function setDuration(duration) {
+        var minutes = duration / 60;
+        $("#dur-hour").val(Math.floor(minutes / 60));
+        $("#dur-minute").val(minutes % 60);
+    }
+
+    function getDuration() {
+      return 3600 * $("#dur-hour").val() + 60 * $("#dur-minute").val();
+    }
+
+    function durationChange() {
+      setDuration(getDuration());
+      mergeSelections();
+    }
+
     /* try to match the duration selected as part of the meeting type (sel1)
-       with the duration selector (sel2) */
+       with the duration selector (#dur-hour, #dur-minute,
+       and #buffer-minute) */
     function action1(x) {
       if (util.isDefined(x)) {
-        var k = ((x.duration + x.buffer_time) / 60).toString();
-        sel2.set(k);
+        setDuration(x.duration);
+        $("#buffer-minute").val(x.buffer_time / 60);
         mergeSelections();
       }
     }
@@ -401,27 +418,6 @@ var sched2 = (function() {
         opt("Meeting (Morning)", "morning", morning, action1),
         opt("Meeting (Afternoon)", "afternoon", afternoon, action1),
         opt("Meeting (Evening)", "late_night", late_night, action1)
-      ]
-    });
-
-    /* duration and buffer time specified in minutes, converted to seconds */
-    function dur(dur,buf) {
-      return { duration: 60 * dur,
-               buffer_time: 60 * buf };
-    }
-    sel2 = select.create({
-      divClass: "fill-div",
-      buttonClass: "fill-div",
-      defaultAction: action2,
-      options: [
-        { label: "15 min", key: "15", value: dur(10,5) },
-        { label: "30 min", key: "30", value: dur(25,5) },
-        { label: "45 min", key: "45", value: dur(30,15) },
-        { label: "1 hour", key: "60", value: dur(45,15) },
-        { label: "1 hour 15 min",  key: "75", value: dur(60,15) },
-        { label: "1 hour 30 min",  key: "90", value: dur(75,15) },
-        { label: "2 hours",        key: "120", value: dur(105,15) },
-        { label: "2 hours 30 min", key: "150", value: dur(120,30) }
       ]
     });
 
@@ -492,8 +488,22 @@ var sched2 = (function() {
       .appendTo(viewTimeZone);
 
     sel1.view.appendTo(colType);
-    sel2.view.appendTo(colDuration);
     sel4.view.appendTo(viewTimeZone);
+
+    $("<input id='dur-hour' type='number' min='0'/>")
+      .change(durationChange)
+      .appendTo(colDuration);
+    colDuration.append("hrs");
+    $("<input id='dur-minute' type='number' min='0'/>")
+      .change(durationChange)
+      .appendTo(colDuration);
+    colDuration.append("mins ");
+    colDuration.append("<br/>");
+    colDuration.append("+ buffer ");
+    $("<input id='buffer-minute' type='number' min='0'/>")
+      .change(mergeSelections)
+      .appendTo(colDuration);
+    colDuration.append("mins");
 
     sel3.view.appendTo(colUrgency);
     $("<span/>").text("starting at ").appendTo(colUrgency);
@@ -507,6 +517,8 @@ var sched2 = (function() {
     var q = taskMeetingParam(task);
     loadLocation(q.location);
     sel1.set(q.meeting_type.toLowerCase());
+    setDuration(q.duration);
+    $("#buffer-minute").val(q.buffer_time / 60);
     loadDaysOfWeek(q);
     loadHowSoon(q.how_soon);
     $("#starting").val(q.no_sooner ? q.no_sooner : "0");
