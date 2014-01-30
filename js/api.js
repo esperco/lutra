@@ -85,9 +85,9 @@ var api = (function () {
                         JSON.stringify(password_reset));
   };
 
-  mod.changePassword = function(uid, password) {
+  mod.changePassword = function(myUID, theirUID, password) {
     var password_reset = { password: password };
-    return jsonHttpPost("/api/password/change/" + uid,
+    return jsonHttpPost("/api/password/change/" + myUID + "/" + theirUID,
                         JSON.stringify(password_reset));
   };
 

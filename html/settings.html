@@ -21,18 +21,20 @@
         <input type="text" id="settings-form-of-address" class="form-control">
       </div>
       <div id="right-col" class="form-group col-md-6">
-        <label for="settings-email" class="text-field-label">Email address</label>
-        <input type="email" id="settings-email" class="form-control" disabled>
         <label for="settings-username" class="text-field-label">Username</label>
         <input type="email" id="settings-username" class="form-control" disabled>
         <label for="settings-password" class="text-field-label">Password</label>
         <input type="password" id="settings-password" class="form-control">
         <label for="settings-confirm-password" class="text-field-label">Confirm password</label>
         <input type="password" id="settings-confirm-password" class="form-control">
+        <label for="settings-signature" class="text-field-label">Email signature</label>
+        <textarea name="settings-signature" rows="3" id="settings-signature" class="form-control"></textarea>
       </div>
     </div>
     <button id="settings-update-account" class="btn btn-primary">Update</button>
   </div>
+  <div id="settings-emails-title" class="settings-title">EMAIL ADDRESSES</div>
+  <div id="settings-emails"></div>
   <div id="settings-executives-title" class="settings-title">EXECUTIVES</div>
   <div id="settings-executives"></div>
 </div>
@@ -69,6 +71,8 @@
             <input type="text" id="settings-exec-form-of-address" class="form-control">
           </div>
           <div class="form-group col-md-6">
+            <label for="phone-number" class="text-field-label">Phone number</label>
+            <input type="text" id="settings-exec-phone" class="form-control">
             <label for="username" class="text-field-label">Username</label>
             <input type="email" id="settings-exec-username" class="form-control" disabled>
             <label for="password" class="text-field-label">Password</label>
@@ -77,57 +81,8 @@
             <input type="password" id="settings-exec-confirm-password" class="form-control">
           </div>
         </div>
-        <div id="email-addresses-title" class="settings-title">EMAIL ADDRESSES</div>
-        <div id="email-addresses">
-          <div class="email-row clearfix">
-            <div class="email-row-content">
-              <div class="email-actions email-actions-desktop">
-                <div class="primary-label unselectable">PRIMARY</div>
-                <span class="vertical-divider">|</span>
-                <a class="email-action">Remove</a>
-              </div>
-              <div class="primary-label primary-label-mobile unselectable">PRIMARY</div>
-              <div class="email-address primary ellipsis">
-                joelonsdale@gmail.comasdfasdfasdfasdfasdfasdfasdf
-              </div>
-            </div>
-            <div class="email-actions email-actions-mobile">
-              <a class="email-action">Remove</a>
-            </div>
-          </div>
-          <div class="email-row clearfix">
-            <div class="email-row-content">
-              <div class="email-actions email-actions-desktop">
-                <a class="email-action">Verify</a>
-                <span class="vertical-divider">|</span>
-                <a class="email-action">Remove</a>
-              </div>
-              <div class="email-address ellipsis">joelonsdale@aol.com</div>
-              <div class="email-actions email-actions-mobile">
-                <a class="email-action">Verify</a>
-                <span class="vertical-divider">|</span>
-                <a class="email-action">Remove</a>
-              </div>
-            </div>
-          </div>
-          <div class="email-row clearfix">
-            <div class="email-row-content">
-              <div class="email-actions email-actions-desktop">
-                <a class="email-action">Make primary</a>
-                <span class="vertical-divider">|</span>
-                <a class="email-action">Remove</a>
-              </div>
-              <div class="email-address ellipsis">
-                joelonsdale@hotmail.comasdfasdfasdfasdfasdfasdfasdfasdfasdf
-              </div>
-              <div class="email-actions email-actions-mobile">
-                <a class="email-action">Make primary</a>
-                <span class="vertical-divider">|</span>
-                <a class="email-action">Remove</a>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div id="settings-exec-emails-title" class="settings-title">EMAIL ADDRESSES</div>
+        <div id="settings-exec-emails"></div>
         <div id="linked-accounts-title" class="settings-title">LINKED ACCOUNTS</div>
         <div id="linked-accounts">
           <!-- re-create in Javascript -->
