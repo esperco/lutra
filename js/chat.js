@@ -54,6 +54,40 @@ var chat = (function () {
     return view;
   }
 
+  function viewOfComplexMessage(fullText, optShortText) {
+    var view = $("<div/>");
+    var fullDiv = viewOfChatText(fullText);
+    if (util.isString(optShortText)) {
+      var shortDiv = viewOfChatText(optShortText);
+      var full = true;
+      var toggle = $("<a href='#'/>");
+      function onClick() {
+        if (full) {
+          fullDiv.addClass("hide");
+          shortDiv.removeClass("hide");
+          full = false;
+          toggle.text("- show quoted text -");
+        } else {
+          fullDiv.removeClass("hide");
+          shortDiv.addClass("hide");
+          full = true;
+          toggle.text("- hide quoted text -");
+        }
+        return false;
+      }
+      toggle.click(onClick);
+      onClick();
+      view
+        .append(shortDiv)
+        .append(toggle)
+        .append(fullDiv);
+
+    } else {
+      view.append(fullDiv);
+    }
+    return view;
+  }
+
   function viewOfSelectQuestion(sel) {
     var qs = $("<ol/>");
     for (var i in sel.sel_choices) {
@@ -117,6 +151,8 @@ var chat = (function () {
     switch (kind) {
     case "Message":
       return viewOfChatText(data);
+    case "Complex_message":
+      return viewOfComplexMessage(data.body, data.fresh_content);
     case "Audio":
       return audioPlayer(data);
     case "Selector_q":
