@@ -118,7 +118,8 @@ object {
   border-radius: 0;
 }
 
-#new-task-btn-mobile {
+#new-task-btn-mobile,
+#new-place-btn-mobile {
   float: right;
   margin-top: 14px;
   margin-right: 16px;
@@ -192,9 +193,11 @@ object {
   #exec-circ {
     height: 36px;
     width: 36px;
+    padding-top: 8px;
     border-radius: 18px;
     text-align: center;
     vertical-align: middle;
+    color: @white;
     background: @gray_60;
   }
   #exec-name-div {
@@ -508,10 +511,10 @@ object {
 
 .search-tasks-icon g { fill: @gray_20; }
 
-.new-task-btn {
+.new-task-btn,
+#new-place-btn {
   float: right;
   margin-top: 20px;
-  // margin-right: 16px;
 }
 
 .list-tabs > li > a {
@@ -811,33 +814,37 @@ object {
   }
 }
 
-.sched-step1 {
-  margin-top: 3px;
-}
-
-.sched-step2,
-.sched-step3,
-.sched-step4 {
-  width: 106px;
-  margin-top: 3px;
-  margin-left: -8px;
-}
-
-.sched-progress-step1 .sched-step1,
-.sched-progress-step2 .sched-step2,
-.sched-progress-step3 .sched-step3,
-.sched-progress-step4 .sched-step4 {
-  cursor: default;
-  path { fill: @gray_60; }
-  text { fill: @white; }
-}
-
 .sched-go-step1,
 .sched-go-step2,
 .sched-go-step3,
 .sched-go-step4 {
+  width: 116px;
+  height: 30px;
+  margin-top: 3px;
+  padding: 0;
   border: none;
   background-color: transparent;
+  cusor: pointer;
+  &:hover path { fill: @gray_20; }
+  &:disabled {
+    path { fill: @gray_05; }
+    text { fill: @gray_20; }
+  }
+}
+
+.sched-go-step2,
+.sched-go-step3,
+.sched-go-step4 {
+  margin-left: -8px;
+}
+
+.sched-progress-step1 .sched-go-step1,
+.sched-progress-step2 .sched-go-step2,
+.sched-progress-step3 .sched-go-step3,
+.sched-progress-step4 .sched-go-step4 {
+  cursor: default;
+  path { fill: @gray_60; }
+  text { fill: @white; }
 }
 
 
@@ -1130,13 +1137,16 @@ object {
   border-top: 1px solid @gray_10;
 }
 
-.place-row { cursor: pointer; }
-
 .place-details { padding-left: 0; }
 
 .place-name {
   font-family: @bold;
   font-size: 18px;
+  color: @purple;
+  &:hover {
+    color: @purple_hover;
+    cursor: pointer;
+  }
 }
 
 .place-loc,

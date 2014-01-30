@@ -107,7 +107,7 @@ var places = (function() {
 
   function viewOfPlaceDetails(place, title, address) {
     var placeDetails = $("<div class='col-xs-5 place-details'/>")
-    $("<a class='place-name ellipsis'/>")
+    $("<div class='place-name ellipsis'/>")
       .text(title)
       .appendTo(placeDetails)
       .click(function() { editAction(place); return false; });
@@ -147,7 +147,7 @@ var places = (function() {
       .appendTo(statDiv2);
     var visitsText = $("<div class='stat-text'>Visits</div>")
       .appendTo(visitsDiv);
-    
+
     var desktopStats = $("<div class='col-xs-3 stats'/>")
       .append(lastVisitDiv.clone())
       .append(visitsDiv.clone());
