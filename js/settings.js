@@ -10,7 +10,9 @@ var settings = (function() {
   var commonPrefixes = ["Dr.", "Prof."];
 
   var assistantProfile = null;
+  var assistantAccount = null;
   var execProfile = null;
+  var execAccount = null;
   var namePrefixSel = null;
   var execNamePrefixSel = null;
 
@@ -230,10 +232,12 @@ var settings = (function() {
   function displayAssistantProfile(eaUID) {
     $("#settings-password").val("");
     $("#settings-confirm-password").val("");
-    api.getProfile(eaUID)
-      .done(function(eaProf) {
-        assistantProfile = eaProf;
-        console.log("EA: " + eaProf.toSource());
+    api.getProfile(eaUID).done(function(eaProf) {
+      assistantProfile = eaProf;
+      console.log("EA Profile: " + eaProf.toSource());
+      api.getAccount(eaUID).done(function(eaAccount) {
+        assistantAccount = eaAccount;
+        console.log("EA Account: " + eaAccount.toSource());
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         var fullName = eaProf.full_name;
@@ -244,11 +248,12 @@ var settings = (function() {
         $("#settings-signature").val(eaProf.signature);
         var emailView = $("#settings-emails");
         emailView.children().remove();
-        var primary = eaProf.primary_email;
+        var primary = eaAccount.primary_email;
         displayEmail(emailView, primary, true, true);
         displayOtherEmails($("#settings-emails"),
-          eaProf.other_emails, primary);
+          eaAccount.other_emails, primary);
       });
+    });
   }
 
   function disableUpdateButtonUntilModified() {
@@ -298,8 +303,8 @@ var settings = (function() {
         full_name: fullName,
         form_of_address: formOfAddress,
         gender: assistantProfile.gender,
-        prefix: prefix,
-        signature: signature
+        prefix: prefix//,
+        //signature: signature
       };
       api.postProfile(profileEdit).done(function() {
         api.getProfile(assistantProfile.profile_uid).done(function(prof) {

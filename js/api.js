@@ -117,6 +117,18 @@ var api = (function () {
                        + encodeURIComponent(email));
   };
 
+  function api_account_prefix() {
+    return "/api/account/" + login.data.uid;
+
+  mod.getAccount = function(theirUID) {
+    return jsonHttpGet(api_account_prefix() + "/" + theirUID);
+  };
+
+  mod.postAccount = function(theirUID, accountEdit) {
+    var url = api_account_prefix() + "/" + theirUID;
+    return jsonHttpPost(url, JSON.stringify(accountEdit));
+  };
+
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active");
   };
