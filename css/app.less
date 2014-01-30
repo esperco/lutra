@@ -118,7 +118,8 @@ object {
   border-radius: 0;
 }
 
-#new-task-btn-mobile {
+#new-task-btn-mobile,
+#new-place-btn-mobile {
   float: right;
   margin-top: 14px;
   margin-right: 16px;
@@ -192,9 +193,11 @@ object {
   #exec-circ {
     height: 36px;
     width: 36px;
+    padding-top: 8px;
     border-radius: 18px;
     text-align: center;
     vertical-align: middle;
+    color: @white;
     background: @gray_60;
   }
   #exec-name-div {
@@ -508,10 +511,10 @@ object {
 
 .search-tasks-icon g { fill: @gray_20; }
 
-.new-task-btn {
+.new-task-btn,
+#new-place-btn {
   float: right;
   margin-top: 20px;
-  // margin-right: 16px;
 }
 
 .list-tabs > li > a {
@@ -1130,13 +1133,16 @@ object {
   border-top: 1px solid @gray_10;
 }
 
-.place-row { cursor: pointer; }
-
 .place-details { padding-left: 0; }
 
 .place-name {
   font-family: @bold;
   font-size: 18px;
+  color: @purple;
+  &:hover {
+    color: @purple_hover;
+    cursor: pointer;
+  }
 }
 
 .place-loc,
