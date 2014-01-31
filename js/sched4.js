@@ -100,8 +100,10 @@ var sched4 = (function() {
       $("#sched-availability-message-readonly").hasClass("short") ?
       "on " + date.justStartTime(t1) :
       "on " + date.range(t1, t2);
-    var title = slot.location.title;
-    var where = "at " + (title == "" ? "a place to be determined" : title);
+    var place = slot.location.address;
+    if (slot.location.instructions)
+      place += " (" + slot.location.instructions + ")";
+    var where = "at " + (place == "" ? "a place to be determined" : place);
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
     $("#sched-confirm-message")
       .val(body);
