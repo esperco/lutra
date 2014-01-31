@@ -47,8 +47,8 @@ var sched2 = (function() {
   }
 
   function clearLocation() {
-    var addr = $("#sched-step2-loc-addr");
-    addr.val("");
+    $("#sched-step2-loc-addr").val("");
+    $("#sched-step2-loc-notes").val("");
   }
 
   function getLocation() {
@@ -653,6 +653,7 @@ var sched2 = (function() {
           .appendTo(li)
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
+            $("#sched-step2-loc-notes").val(item.loc.instructions);
             api.postSelectPlace(item.google_description)
               .done(function(place) {
                 timeZoneDropdown.set(place.loc.timezone);
