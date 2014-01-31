@@ -58,8 +58,12 @@ var sched = (function() {
   /******************************************/
 
   mod.locationText = function(loc) {
-    if (loc.address)
-      return loc.address;
+    if (loc.address) {
+      if (loc.instructions)
+        return loc.address + " (" + loc.instructions + ")";
+      else
+        return loc.address;
+    }
     else if (loc.title)
       return loc.title;
     else if (loc.instructions)
