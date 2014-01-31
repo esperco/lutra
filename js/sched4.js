@@ -97,7 +97,7 @@ var sched4 = (function() {
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
-      $("#sched-availability-message-readonly").hasClass("short") ?
+      task.task_data[1].hide_end_times ?
       "on " + date.justStartTime(t1) :
       "on " + date.range(t1, t2);
     var place = slot.location.address;
@@ -107,6 +107,38 @@ var sched4 = (function() {
     var body = formalEmailBody(organizerName, hostName, toName, when, where);
     $("#sched-confirm-message")
       .val(body);
+
+    var schedConfirmShowEnd = $("#sched-confirm-show-end");
+    schedConfirmShowEnd.children().remove();
+
+    var showEndCheckboxDiv = $("<div class='footer-checkbox-div'/>")
+      .appendTo(schedConfirmShowEnd);
+    var showEndCheckbox = $("<img class='footer-checkbox'/>")
+      .appendTo(showEndCheckboxDiv);
+    svg.loadImg(showEndCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var timeOption = $("<div class='time-option' />")
+      .append("Show end time of meeting")
+      .appendTo(schedConfirmShowEnd);
+
+    if (task.task_data[1].hide_end_times)
+      schedConfirmShowEnd.removeClass("checkbox-selected");
+    else
+      schedConfirmShowEnd.addClass("checkbox-selected");
+
+    schedConfirmShowEnd.off("click");
+    schedConfirmShowEnd.click(function() {
+      var when = null;
+      if (schedConfirmShowEnd.hasClass("checkbox-selected")) {
+        schedConfirmShowEnd.removeClass("checkbox-selected");
+        var when = "on " + date.justStartTime(t1);
+      } else {
+        schedConfirmShowEnd.addClass("checkbox-selected");
+        var when = "on " + date.range(t1, t2);
+      }
+      var body = formalEmailBody(organizerName, hostName, toName, when, where);
+      $("#sched-confirm-message").val(body);
+    });
   }
 
   function refreshReminderMessage(cannedMessages) {
