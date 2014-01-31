@@ -400,15 +400,15 @@ var sched4 = (function() {
     });
 
     var initVal = reserved.remind;
-    var key = "24h";
-    if (! util.isDefined(initVal))
-      key = "no";
-    else if (initVal < 24 * 3600 + 0.5)
-      key = "24h";
-    else if (initVal < 36 * 3600 + 0.5)
-      key = "36h";
-    else
-      key = "48h";
+    var key = "no";
+    // if (! util.isDefined(initVal))
+    //   key = "no";
+    // else if (initVal < 24 * 3600 + 0.5)
+    //   key = "24h";
+    // else if (initVal < 36 * 3600 + 0.5)
+    //   key = "36h";
+    // else
+    //   key = "48h";
     sel.set(key);
 
     var divReminder = $("<div class='final-sched-div clearfix'>");
