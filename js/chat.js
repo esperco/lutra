@@ -85,24 +85,31 @@ var chat = (function () {
     }
   }
 
-  function viewOfCalendarSlot(slot) {
+  function viewOfCalendarSlot(slot, hideEndTime) {
     var v = $("<li/>");
-    v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    if (hideEndTime)
+      v.text(date.justStartTime(date.ofString(slot.start)));
+    else
+      v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
     v.append($("<br/>"));
     appendLocation(v, slot.location);
     return v;
   }
 
-  function viewOfCalendarOptions(listRoot, calChoices) {
+  function viewOfCalendarOptions(listRoot, calChoices, hideEndTimes) {
     for (var i in calChoices) {
-      listRoot.append(viewOfCalendarSlot(calChoices[i].slot));
+      listRoot.append(viewOfCalendarSlot(calChoices[i].slot, hideEndTimes));
     }
     return listRoot;
   }
 
   function viewOfSchedulingQuestion(q) {
     var v = viewOfChatText(q.body);
-    v.append(viewOfCalendarOptions($("<ol/>", {type:"A"}), q.choices));
+    v.append(viewOfCalendarOptions(
+      $("<ol/>", {type:"A"}),
+      q.choices,
+      q.hide_end_times
+    ));
     return v;
   }
 
