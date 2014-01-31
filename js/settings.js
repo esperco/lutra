@@ -105,9 +105,12 @@ var settings = (function() {
   }
 
   function execSettingsModal(execUID) {
-    api.getProfile(execUID)
-      .done(function(execProf) {
-        execProfile = execProf;
+    api.getProfile(execUID).done(function(execProf) {
+      execProfile = execProf;
+      console.log("Exec profile: " + execProf.toSource());
+      api.getAccount(execUID).done(function(execAcct) {
+        execAccount = execAcct;
+        console.log("Exec account: " + execAccount.toSource());
         var fullName = execProf.full_name;
         var familiarName = execProf.familiar_name;
         $("#exec-settings-title").text("Settings for " + familiarName);
@@ -123,14 +126,15 @@ var settings = (function() {
         $("#settings-exec-phone").val(execProf.phone_number);
         var emailView = $("#settings-exec-emails");
         emailView.children().remove();
-        var primary = execProf.primary_email;
+        var primary = execAccount.primary_email;
         displayEmail(emailView, primary, true, true);
         displayOtherEmails($("#settings-emails"),
-          execProf.other_emails, primary);
+          execAccount.all_emails, primary);
         $("#exec-settings-save").off("click");
         $("#exec-settings-save").one("click", updateExecProfile);
         $(".exec-settings-modal").modal({});
       });
+    });
   }
 
   function displayExecutives(execUIDs) {
@@ -141,34 +145,36 @@ var settings = (function() {
       .done(function(execProfs) {
         list.iter(execProfs, function(execProf) {
           var prof = execProf.prof;
-          console.log("Exec: " + prof.toSource());
-          var row = $("<div class='exec-row clearfix'/>");
-          var name = prof.full_name;
-          $("<div class='settings-prof-circ'/>")
-            .text(name[0])
-            .appendTo(row);
-          var gear = $("<a/>", {
-            href: "#",
-            "data-toggle": "tooltip",
-            placement: "left",
-            title: "Settings",
-            "class": "exec-settings-div"
+          api.getAccount(prof.profile_uid).done(function(execAcct) {
+            console.log("Exec: " + prof.toSource());
+            var row = $("<div class='exec-row clearfix'/>");
+            var name = prof.full_name;
+            $("<div class='settings-prof-circ'/>")
+              .text(name[0])
+              .appendTo(row);
+            var gear = $("<a/>", {
+              href: "#",
+              "data-toggle": "tooltip",
+              placement: "left",
+              title: "Settings",
+              "class": "exec-settings-div"
+            });
+            gear.click(function() {
+              execSettingsModal(prof.profile_uid);
+            });
+            $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
+              .appendTo(gear);
+            gear.appendTo(row);
+            var details = $("<div class='exec-details'/>");
+            $("<div class='exec-name ellipsis'/>")
+              .text(name)
+              .appendTo(details);
+            $("<div class='exec-email ellipsis'/>")
+              .text(execAcct.primary_email)
+              .appendTo(details);
+            details.appendTo(row);
+            row.appendTo(view);
           });
-          gear.click(function() {
-            execSettingsModal(prof.profile_uid);
-          });
-          $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
-            .appendTo(gear);
-          gear.appendTo(row);
-          var details = $("<div class='exec-details'/>");
-          $("<div class='exec-name ellipsis'/>")
-            .text(name)
-            .appendTo(details);
-          $("<div class='exec-email ellipsis'/>")
-            .text(prof.primary_email)
-            .appendTo(details);
-          details.appendTo(row);
-          row.appendTo(view);
         });
         displayNoMoreExecs();
       });
@@ -251,7 +257,7 @@ var settings = (function() {
         var primary = eaAccount.primary_email;
         displayEmail(emailView, primary, true, true);
         displayOtherEmails($("#settings-emails"),
-          eaAccount.other_emails, primary);
+          eaAccount.all_emails, primary);
       });
     });
   }

@@ -119,6 +119,7 @@ var api = (function () {
 
   function api_account_prefix() {
     return "/api/account/" + login.data.uid;
+  }
 
   mod.getAccount = function(theirUID) {
     return jsonHttpGet(api_account_prefix() + "/" + theirUID);
@@ -181,7 +182,7 @@ var api = (function () {
   mod.getChatItem = function(rid) {
     var url = api_q_prefix() + "/chat/whatever/item/" + rid;
     return jsonHttpGet(url);
-  }
+  };
 
   mod.postChatItem = function(chatItem) {
     var url = api_q_prefix() + "/chat/" + chatItem.chatid + "/item";
@@ -191,7 +192,7 @@ var api = (function () {
   mod.postChatItemRead = function(chatId, itemId) {
     var url = api_q_prefix() + "/chat/" + chatId + "/item/" + itemId + "/read";
     return jsonHttpPost(url, "");
-  }
+  };
 
   /*** Scheduling ***/
 
