@@ -63,6 +63,7 @@ var display = (function() {
       $('#home-push').removeClass('hide');
       $('.page-title').addClass('hide');
       $('.new-task-btn').addClass('hide');
+      $('.new-place-btn').addClass('hide');
     } else {
       $('#desktop-navbar').removeClass('hide');
       $('#mobile-navbar').addClass('hide');
@@ -71,6 +72,7 @@ var display = (function() {
       $('#home-push').addClass('hide');
       $('.page-title').removeClass('hide');
       $('.new-task-btn').removeClass('hide');
+      $('.new-place-btn').removeClass('hide');
     }
 
     if ($(window).width() < 992) {

@@ -47,16 +47,17 @@ var sched2 = (function() {
   }
 
   function clearLocation() {
-    var addr = $("#sched-step2-loc-addr");
-    addr.val("");
+    $("#sched-step2-loc-addr").val("");
+    $("#sched-step2-loc-notes").val("");
   }
 
   function getLocation() {
     var addr = $("#sched-step2-loc-addr").val();
+    var notes = $("#sched-step2-loc-notes").val();
     return {
       title: addr,
       address: addr,
-      instructions: "",
+      instructions: notes,
       timezone: timeZoneDropdown.get()
     };
   }
@@ -400,6 +401,8 @@ var sched2 = (function() {
       mergeSelections();
     }
 
+    util.afterTyping($("#sched-step2-loc-notes"), 250, mergeSelections);
+
     /* type of meeting */
     function opt(label, key, value, action) {
       return { label: label, key: key, value: value, action: action };
@@ -517,8 +520,8 @@ var sched2 = (function() {
     var q = taskMeetingParam(task);
     loadLocation(q.location);
     sel1.set(q.meeting_type.toLowerCase());
-    setDuration(q.duration);
-    $("#buffer-minute").val(q.buffer_time / 60);
+    if (q.duration) setDuration(q.duration);
+    if (q.buffer_time) $("#buffer-minute").val(q.buffer_time / 60);
     loadDaysOfWeek(q);
     loadHowSoon(q.how_soon);
     $("#starting").val(q.no_sooner ? q.no_sooner : "0");
@@ -650,6 +653,7 @@ var sched2 = (function() {
           .appendTo(li)
           .click(function() {
             $("#sched-step2-loc-addr").val(item.loc.address);
+            $("#sched-step2-loc-notes").val(item.loc.instructions);
             api.postSelectPlace(item.google_description)
               .done(function(place) {
                 timeZoneDropdown.set(place.loc.timezone);
