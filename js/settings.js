@@ -57,7 +57,7 @@ var settings = (function() {
       .appendTo(view);
   }
 
-  function updateExecProfile() {
+  function updateExecProfile(teamid) {
     var fullName = $("#settings-exec-full-name").val();
     var familiarName = $("#settings-exec-familiar-name").val();
     var formOfAddress = $("#settings-exec-form-of-address").val();
@@ -76,6 +76,7 @@ var settings = (function() {
           api.changePassword(
             assistantProfile.profile_uid,
             execProfile.profile_uid,
+            teamid,
             password
           );
       }
@@ -91,7 +92,7 @@ var settings = (function() {
         prefix: prefix,
         phone_number: phoneNumber
       };
-      api.postProfile(profileEdit).done(function(prof) {
+      api.postProfile(profileEdit, teamid).done(function(prof) {
         api.getProfile(execProfile.profile_uid).done(function(prof) {
           execProfile = prof;
           console.log("Edited: " + prof.toSource());
@@ -104,11 +105,11 @@ var settings = (function() {
     });
   }
 
-  function execSettingsModal(execUID) {
+  function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
       console.log("Exec profile: " + execProf.toSource());
-      api.getAccount(execUID).done(function(execAcct) {
+      api.getAccount(execUID, teamid).done(function(execAcct) {
         execAccount = execAcct;
         console.log("Exec account: " + execAccount.toSource());
         var fullName = execProf.full_name;
@@ -131,21 +132,27 @@ var settings = (function() {
         displayOtherEmails($("#settings-emails"),
           execAccount.all_emails, primary);
         $("#exec-settings-save").off("click");
-        $("#exec-settings-save").one("click", updateExecProfile);
+        $("#exec-settings-save").one("click", function() {
+          updateExecProfile(teamid)
+        });
         $(".exec-settings-modal").modal({});
       });
     });
   }
 
-  function displayExecutives(execUIDs) {
+  function displayExecutives(leaders) {
     var view = $("#settings-executives");
     view.children().remove();
-    var uniqUIDs = util.arrayUnique(execUIDs);
+    var uniqUIDs = util.arrayUnique(Object.keys(leaders));
     profile.mget(uniqUIDs)
       .done(function(execProfs) {
         list.iter(execProfs, function(execProf) {
           var prof = execProf.prof;
-          api.getAccount(prof.profile_uid).done(function(execAcct) {
+          var teamid = leaders[prof.profile_uid];
+          console.log(leaders.toSource());
+          console.log(prof.profile_uid);
+          console.log(teamid);
+          api.getAccount(prof.profile_uid, teamid).done(function(execAcct) {
             console.log("Exec: " + prof.toSource());
             var row = $("<div class='exec-row clearfix'/>");
             var name = prof.full_name;
@@ -160,7 +167,7 @@ var settings = (function() {
               "class": "exec-settings-div"
             });
             gear.click(function() {
-              execSettingsModal(prof.profile_uid);
+              execSettingsModal(prof.profile_uid, teamid);
             });
             $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
               .appendTo(gear);
@@ -241,7 +248,7 @@ var settings = (function() {
     api.getProfile(eaUID).done(function(eaProf) {
       assistantProfile = eaProf;
       console.log("EA Profile: " + eaProf.toSource());
-      api.getAccount(eaUID).done(function(eaAccount) {
+      api.getAccount(eaUID, login.getTeam().teamid).done(function(eaAccount) {
         assistantAccount = eaAccount;
         console.log("EA Account: " + eaAccount.toSource());
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
@@ -298,7 +305,7 @@ var settings = (function() {
       } else {
         var myUID = assistantProfile.profile_uid;
         maybeChangePassword =
-          api.changePassword(myUID, myUID, password);
+          api.changePassword(myUID, myUID, login.getTeam().teamid, password);
       }
     }
 
@@ -312,7 +319,7 @@ var settings = (function() {
         prefix: prefix//,
         //signature: signature
       };
-      api.postProfile(profileEdit).done(function() {
+      api.postProfile(profileEdit, login.getTeam()).done(function() {
         api.getProfile(assistantProfile.profile_uid).done(function(prof) {
           assistantProfile = prof;
           console.log("Edited: " + prof.toSource());
@@ -327,10 +334,11 @@ var settings = (function() {
     console.log("settings.load");
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
-    var leaderUIDs = list.map(teams, function(team) {
-      return team.team_leaders[0];
+    var mapping = {};
+    var leaders = list.iter(teams, function(team) {
+      mapping[team.team_leaders[0]] = team.teamid;
     });
-    displayExecutives(leaderUIDs);
+    displayExecutives(mapping);
     disableUpdateButtonUntilModified();
     $("#settings-update-account").off("click");
     $("#settings-update-account").one("click", updateAssistantProfile);

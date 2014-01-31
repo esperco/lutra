@@ -85,9 +85,10 @@ var api = (function () {
                         JSON.stringify(password_reset));
   };
 
-  mod.changePassword = function(myUID, theirUID, password) {
+  mod.changePassword = function(myUID, theirUID, teamid, password) {
     var password_reset = { password: password };
-    return jsonHttpPost("/api/password/change/" + myUID + "/" + theirUID,
+    return jsonHttpPost("/api/password/change/" + myUID + "/" +
+                        theirUID + "/" + teamid,
                         JSON.stringify(password_reset));
   };
 
@@ -107,8 +108,8 @@ var api = (function () {
     return jsonHttpGet(api_profile_prefix() + "/" + uid);
   };
 
-  mod.postProfile = function(prof) {
-    var url = api_profile_prefix() + "/" + prof.profile_uid;
+  mod.postProfile = function(prof, teamid) {
+    var url = api_profile_prefix() + "/" + prof.profile_uid + "/" + teamid;
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 
@@ -121,12 +122,12 @@ var api = (function () {
     return "/api/account/" + login.data.uid;
   }
 
-  mod.getAccount = function(theirUID) {
-    return jsonHttpGet(api_account_prefix() + "/" + theirUID);
+  mod.getAccount = function(theirUID, teamid) {
+    return jsonHttpGet(api_account_prefix() + "/" + theirUID + "/" + teamid);
   };
 
-  mod.postAccount = function(theirUID, accountEdit) {
-    var url = api_account_prefix() + "/" + theirUID;
+  mod.postAccount = function(theirUID, teamid, accountEdit) {
+    var url = api_account_prefix() + "/" + theirUID + "/" + teamid;
     return jsonHttpPost(url, JSON.stringify(accountEdit));
   };
 
