@@ -119,11 +119,6 @@ var sched2 = (function() {
         slots.sort(function(a, b) {
           return date.ofString(a.start) - date.ofString(b.start);
         });
-        list.map(slots, function(slot) {
-          /* Changing the notes doesn't trigger an update of the slots,
-             so make sure the notes are correct before proceeding */
-          slot.location.instructions = $("#sched-step2-loc-notes").val();
-        });
         selectCalendarSlots(task, slots);
       });
 
