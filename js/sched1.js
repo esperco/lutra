@@ -164,16 +164,11 @@ var sched1 = (function() {
   /* Read-only view of a participant */
   function rowViewOfParticipant(profs, task, guestTbl, uid) {
     var view = $("<div class='sched-step1-row'>");
-    var hosts = sched.getHosts(task);
     var obsProf = profs[uid];
     var prof = obsProf.prof;
-    var name = prof.full_name;
-    var chatHead = $("<div class='list-prof-circ'>");
-    var initials = $("<div class='initials unselectable'>")
-      .text(profile.veryShortNameOfProfile(prof))
-      .appendTo(chatHead);
-
-    var nameView = $("<p class='guest-name'>" + name + "</p>");
+    var hosts = sched.getHosts(task);
+    var chatHead = profile.viewMediumCirc(prof);
+    var nameView = profile.viewMediumFullName(prof);
 
     view
       .append(chatHead)

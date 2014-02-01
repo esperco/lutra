@@ -3,6 +3,11 @@
 var sched4 = (function() {
   var mod = {};
 
+  function getSlot(ta) {
+    var state = sched.getState(ta);
+    return state.reserved.slot;
+  }
+
   function sentConfirmation(chats, uid) {
     var chat = chats[uid];
     return list.exists(chat.chat_items, function(x) {
@@ -83,13 +88,14 @@ var sched4 = (function() {
     loadRecipientRow(recipientRow, toObsProf);
   }
 
-  function preFillConfirmModal(chats, profs, task, slot, toUid) {
+  function preFillConfirmModal(chats, profs, ta, toUid) {
     var toObsProf = profs[toUid];
+    var slot = getSlot(ta);
 
     loadConfirmRecipients(toObsProf);
 
     $("#sched-confirm-subject")
-      .val("Re: " + task.task_status.task_title);
+      .val("Re: " + ta.task_status.task_title);
 
     var organizerName = profs[login.me()].prof.full_name;
     var hostName = profs[login.leader()].prof.full_name;
@@ -197,58 +203,7 @@ var sched4 = (function() {
 
     /*** Send a confirmation ***/
 
-    var divConfirmationCheck = $("<div class='check-div col-xs-1'>")
-      .appendTo(divConfirmation);
-    var checkConfirmation = $("<img class='check'/>");
-    if (sentConfirmation(chats, uid))
-      markChecked(divConfirmationCheck);
-    checkConfirmation.appendTo(divConfirmationCheck);
-    svg.loadImg(checkConfirmation, "/assets/img/check.svg")
-      .then(function(elt) { checkConfirmation = elt; });
-
-    var confirmModal = $("#sched-confirm-modal");
-    function closeConfirmModal() {
-      confirmModal.modal("hide");
-    }
-
-    function composeConfirmationEmail() {
-      preFillConfirmModal(chats, profs, task, slot, uid);
-      confirmModal.modal({});
-    }
-
-    $("<a class='final-sched-action col-xs-11'>Send a confirmation message</a>")
-      .unbind('click')
-      .click(composeConfirmationEmail)
-      .appendTo(divConfirmation);
-
-    var sendButton = $("#sched-confirm-send");
-    sendButton
-      .removeClass("disabled")
-      .unbind('click')
-      .click(function() {
-        if (! sendButton.hasClass("disabled")) {
-          sendButton.addClass("disabled");
-          var body = $("#sched-confirm-message").val();
-          var chatid = chats[uid].chatid;
-          var hideEnd = task.task_data[1].hide_end_times;
-          var chatItem = {
-            chatid: chatid,
-            by: login.me(),
-            'for': login.me(),
-            team: login.getTeam().teamid,
-            chat_item_data: ["Sched_confirm", {
-              body: body,
-              'final': slot,
-              hide_end_time: hideEnd
-            }]
-          };
-          chat.postChatItem(chatItem)
-            .done(function(item) {
-              closeConfirmModal();
-              markChecked(divConfirmationCheck);
-            });
-        }
-      });
+        /* OLD VERSION REMOVED */
 
     /*** Reserve event in Google Calendar, maybe send invitations ***/
 
@@ -356,8 +311,7 @@ var sched4 = (function() {
     divInvitation.appendTo(view);
 
     return {
-      view: view,
-      composeConfirmationEmail: composeConfirmationEmail
+      view: view
     };
   }
 
@@ -444,18 +398,146 @@ var sched4 = (function() {
     return divReminder;
   }
 
+  function createConfirmRow(chats, profs, ta, uid) {
+    var view = $("<div class='sched-step4-row container clickable'/>");
+
+    var divConfirmationCheck = $("<div class='check-div'/>");
+    var checkConfirmation = $("<img class='check'/>");
+    if (sentConfirmation(chats, uid))
+      markChecked(divConfirmationCheck);
+    checkConfirmation.appendTo(divConfirmationCheck);
+    svg.loadImg(checkConfirmation, "/assets/img/check.svg")
+      .then(function(elt) { checkConfirmation = elt; });
+
+    var confirmModal = $("#sched-confirm-modal");
+    function closeConfirmModal() {
+      confirmModal.modal("hide");
+    }
+
+    var prof = profs[uid].prof;
+    var circView = profile.viewMediumCirc(prof);
+    var nameView = profile.viewMediumFullName(prof);
+
+    view
+      .append(divConfirmationCheck)
+      .append(circView)
+      .append(nameView)
+      .click(composeConfirmationEmail);
+
+    function setupSendButton() {
+      var sendButton = $("#sched-confirm-send");
+      sendButton
+        .removeClass("disabled")
+        .unbind('click')
+        .click(function() {
+          if (! sendButton.hasClass("disabled")) {
+            sendButton.addClass("disabled");
+            var body = $("#sched-confirm-message").val();
+            var chatid = chats[uid].chatid;
+            var hideEnd = ta.task_data[1].hide_end_times;
+            var chatItem = {
+              chatid: chatid,
+              by: login.me(),
+              'for': login.me(),
+              team: login.getTeam().teamid,
+              chat_item_data: ["Sched_confirm", {
+                body: body,
+                'final': getSlot(ta),
+                hide_end_time: hideEnd
+              }]
+            };
+            chat.postChatItem(chatItem)
+              .done(function(item) {
+                closeConfirmModal();
+                markChecked(divConfirmationCheck);
+              });
+          }
+        });
+    }
+
+    function composeConfirmationEmail() {
+      preFillConfirmModal(chats, profs, ta, uid);
+      setupSendButton();
+      confirmModal.modal({});
+    }
+
+    return {
+      view: view,
+      composeConfirmationEmail: composeConfirmationEmail
+    };
+  }
+
+  function createConfirmSection(chats, profs, ta, guests) {
+    var view = $("<div class='final-sched-div clearfix'>");
+
+    var title = guests.length > 1 ?
+      "Send confirmation messages." :
+      "Send a confirmation message.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    list.iter(guests, function(uid) {
+      var x = createConfirmRow(chats, profs, ta, uid);
+      x.view
+        .appendTo(view);
+
+      if (guests.length == 1) {
+        var uid = guests[0];
+        if (! sentConfirmation(chats, uid))
+          x.composeConfirmationEmail();
+      }
+    });
+
+    return view;
+  }
+
+  function createInviteSection(guests) {
+    var view = $("<div class='final-sched-div clearfix'/>");
+
+    var title = guests.length > 1 ?
+      "Send Google Calendar invitations." :
+      "Send a Google Calendar invitation.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    list.iter(guests, function(uid) {
+    });
+    return view;
+  }
+
+  function createRemindSection(guests) {
+    var view = $("<div class='final-sched-div clearfix'/>");
+
+    var title = guests.length > 1 ?
+      "Send reminders." :
+      "Send a reminder.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    list.iter(guests, function(uid) {
+    });
+    return view;
+  }
+
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var chats = sched.chatsOfTask(ta);
     var guests = sched.getGuests(ta);
+
+    view
+      .append(createConfirmSection(chats, profs, ta, guests))
+      .append(createInviteSection(guests))
+      .append(createRemindSection(guests));
+
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x = step4RowViewOfParticipant(chats, profs, ta, uid);
       view.append(x.view);
       var reminderSelector =
         createReminderSelector(chats, profs, ta, uid).appendTo(view);
-      if (numGuests == 1 && ! sentConfirmation(chats, uid))
-        x.composeConfirmationEmail();
     });
     // Task is always saved when remind changes.
     task.onSchedulingStepChanging.stopObserve("step");

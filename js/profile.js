@@ -41,7 +41,7 @@ var profile = (function() {
   /* get observable profile */
   mod.get = function(uid) {
     return accessCache.getCached(uid);
-  }
+  };
 
   /* Get multiple profiles from an array of uids.
      Positions in the array are preserved.
@@ -51,7 +51,7 @@ var profile = (function() {
       return mod.get(uid);
     });
     return deferred.join(deferreds);
-  }
+  };
 
   /* set profile value locally */
   mod.set = function(prof) {
@@ -59,13 +59,13 @@ var profile = (function() {
       return (new $.Deferred()).resolve(prof);
     }
     return accessCache.setCached(prof.profile_uid, defer(prof));
-  }
+  };
 
   /* display mini profile */
   mod.view.author = function(obs) {
     /* note: can.view, not can.view.render! */
     return $(can.view("assets/ejs/userAuthor.ejs", obs));
-  }
+  };
 
   function initials(s) {
     var re = /(^|[^A-Za-z]+)([A-Za-z])/g;
@@ -88,103 +88,37 @@ var profile = (function() {
     if (result.length < 2)
       result = name.substring(0,1).toUpperCase();
     return result;
-  }
+  };
 
   mod.veryShortNameOfProfile = function(prof) {
     var result = mod.shortenName(prof.full_name);
     if (result === "")
       result = mod.shortenName(prof.familiar_name);
     return result;
-  }
+  };
 
-  function viewOfPhotoMedium(imageUrl) {
-    var view = $("<span class='user-photo-container'/>");
-    var img = $("<img class='user-photo-medium'/>")
-      .attr("src", imageUrl)
-      .appendTo(view);
-    return view;
-  }
+  /* Make circle containing user's initials */
+  mod.viewMediumCirc = function(prof, withTooltip) {
 
-  function viewOfInitialsMedium(prof) {
-    var view = $("<span class='user-photo-container'/>");
-    var text = $("<span class='user-initials-medium'/>")
+    var view = $("<div class='list-prof-circ pref-prof-circ'>");
+
+    if (withTooltip)
+      view.tooltip({
+        title: prof.full_name,
+        placement: "bottom"
+      });
+
+    $("<p class='initials unselectable'/>")
       .text(mod.veryShortNameOfProfile(prof))
       .appendTo(view);
     return view;
-  }
+  };
 
-  /* display photo if possible, initials otherwise */
-  mod.view.photoMedium = function(obsProf) {
-    var prof = obsProf.prof;
-    var imgUrl = prof.photo_url;
-    if (imgUrl)
-      return viewOfPhotoMedium(imgUrl);
-    else
-      return viewOfInitialsMedium(prof);
-  }
-
-  mod.view.photoPlusNameMedium = function(obs) {
-    var view = $("<span>");
-    mod.view.photoMedium(obs)
-      .appendTo(view);
-    $("<span class='name-medium'>")
-      .text(name)
-      .appendTo(view);
+  mod.viewMediumFullName = function(prof) {
+    var view = $("<p class='guest-name'/>")
+      .text(prof.full_name);
     return view;
-  }
-
-  mod.view.respondent = function(obs_by, obs_for, confirmed) {
-    var prof_by = obs_by.prof;
-    var prof_for = obs_for.prof;
-    var view = $("<span class='mini-author'/>");
-
-    function nameView(prof) {
-      return $("<span/>")
-        .text(prof.familiar_name)
-        .attr("title", prof.full_name);
-    }
-
-    var by = nameView(prof_by);
-
-    if (prof_by.profile_uid === prof_for.profile_uid) {
-      view
-        .append(nameView(prof_by));
-    }
-    else {
-      view
-        .append(nameView(prof_for))
-        .append(document.createTextNode(" (via "))
-        .append(nameView(prof_by));
-      if (!confirmed)
-        view.append(document.createTextNode(", unconfirmed"));
-      view.append(document.createTextNode(")"));
-    }
-    view.append(document.createTextNode(":"));
-    return view;
-  }
-
-
-  /* sample control */
-  mod.control.Dummy = can.Control.extend({
-    init: function(element) {
-      element.text("click me!");
-      element.removeClass("hide");
-    },
-
-    'click': function(button, event) {
-      /* change my profile value, should be reflected in all the views */
-      mod.get(login.data.uid)
-        .done(function(obs) {
-          /* fires a "change" event */
-          obs.attr("prof.familiar_name", "new name!");
-        });
-    }
-  });
-
-  /* display sample control */
-/*
-  mod.control.dummyButton = new mod.control.Dummy("#dummy");
-*/
+  };
 
   return mod;
 }());
