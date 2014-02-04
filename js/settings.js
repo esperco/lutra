@@ -60,7 +60,7 @@ var settings = (function() {
   function updateExecProfile(teamid) {
     var fullName = $("#settings-exec-full-name").val();
     var familiarName = $("#settings-exec-familiar-name").val();
-    var formOfAddress = $("#settings-exec-form-of-address").val();
+    var formalName = $("#settings-exec-formal-name").val();
     var prefix = execNamePrefixSel.get();
     var phoneNumber = $("#settings-exec-phone").val();
     var password = $("#settings-exec-password").val();
@@ -87,7 +87,7 @@ var settings = (function() {
         profile_uid: execProfile.profile_uid,
         familiar_name: familiarName,
         full_name: fullName,
-        form_of_address: formOfAddress,
+        formal_name: formalName,
         gender: execProfile.gender,
         prefix: prefix,
         phone_number: phoneNumber
@@ -123,7 +123,7 @@ var settings = (function() {
         );
         $("#settings-exec-full-name").val(fullName);
         $("#settings-exec-familiar-name").val(familiarName);
-        $("#settings-exec-form-of-address").val(execProf.form_of_address);
+        $("#settings-exec-formal-name").val(execProf.formal_name);
         $("#settings-exec-phone").val(execProf.phone_number);
         var emailView = $("#settings-exec-emails");
         emailView.children().remove();
@@ -257,7 +257,7 @@ var settings = (function() {
         $("#settings-profile-circ").text(fullName[0]);
         $("#settings-full-name").val(fullName);
         $("#settings-familiar-name").val(eaProf.familiar_name);
-        $("#settings-form-of-address").val(eaProf.form_of_address);
+        $("#settings-formal-name").val(eaProf.formal_name);
         $("#settings-signature").val(eaProf.signature);
         var emailView = $("#settings-emails");
         emailView.children().remove();
@@ -275,7 +275,7 @@ var settings = (function() {
     var enableButton = function() { updateButton.prop("disabled", false); };
     $("#settings-full-name").on("input", enableButton);
     $("#settings-familiar-name").on("input", enableButton);
-    $("#settings-form-of-address").on("input", enableButton);
+    $("#settings-formal-name").on("input", enableButton);
     $("#settings-signature").on("input", enableButton);
     var password = $("#settings-password");
     var confirmPassword = $("#settings-confirm-password");
@@ -291,7 +291,7 @@ var settings = (function() {
   function updateAssistantProfile() {
     var fullName = $("#settings-full-name").val();
     var familiarName = $("#settings-familiar-name").val();
-    var formOfAddress = $("#settings-form-of-address").val();
+    var formalName = $("#settings-formal-name").val();
     var prefix = namePrefixSel.get();
     var signature = $("#settings-signature").val();
     var password = $("#settings-password").val();
@@ -314,12 +314,12 @@ var settings = (function() {
         profile_uid: assistantProfile.profile_uid,
         familiar_name: familiarName,
         full_name: fullName,
-        form_of_address: formOfAddress,
+        formal_name: formalName,
         gender: assistantProfile.gender,
         prefix: prefix//,
         //signature: signature
       };
-      api.postProfile(profileEdit, login.getTeam()).done(function() {
+      api.postProfile(profileEdit, login.getTeam().teamid).done(function() {
         api.getProfile(assistantProfile.profile_uid).done(function(prof) {
           assistantProfile = prof;
           console.log("Edited: " + prof.toSource());

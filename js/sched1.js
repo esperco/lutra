@@ -164,7 +164,7 @@ var sched1 = (function() {
           prof.full_name = name;
           prof.familiar_name = name;
           if (prof.editable) {
-            api.postProfile(prof, login.getTeam())
+            api.postProfile(prof, login.getTeam().teamid)
               .then(addProfile(uid, prof));
           } else {
             // Bug fix: No need to post profile if name cannot be updated
