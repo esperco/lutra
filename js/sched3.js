@@ -95,7 +95,7 @@ var sched3 = (function() {
     if (calOption) {
       if (! state.reserved) {
         state.reserved = {
-          remind: 3*43200,
+          /* reminders may be set later by the user */
           notifs: []
         };
       }
