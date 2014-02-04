@@ -168,7 +168,7 @@ var sched4 = (function() {
   function createConfirmRow(chats, profs, ta, uid) {
     var view = $("<div class='sched-step4-row container clickable'/>");
 
-    var divConfirmationCheck = $("<div class='check-div'/>");
+    var divConfirmationCheck = $("<div class='check-div col-xs-1'/>");
     var checkConfirmation = $("<img class='check'/>");
     if (sentConfirmation(chats, uid))
       markChecked(divConfirmationCheck);
@@ -185,11 +185,13 @@ var sched4 = (function() {
     var prof = profs[uid].prof;
     var circView = profile.viewMediumCirc(prof);
     var nameView = profile.viewMediumFullName(prof);
+    var divGuest = $("<div class='col-xs-11'/>")
+      .append(circView)
+      .append(nameView);
 
     view
       .append(divConfirmationCheck)
-      .append(circView)
-      .append(nameView)
+      .append(divGuest)
       .click(composeConfirmationEmail);
 
     function setupSendButton() {
@@ -236,7 +238,7 @@ var sched4 = (function() {
   }
 
   function createConfirmSection(chats, profs, ta, guests) {
-    var view = $("<div class='final-sched-div clearfix'/>");
+    var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
       "Send confirmation messages." :
@@ -277,8 +279,6 @@ var sched4 = (function() {
     svg.loadImg(checkInvitation, "/assets/img/check.svg")
       .then(function(elt) { checkInvitation = elt; });
 
-    var divInviteAction = $("<div class='col-xs-11'/>");
-
     function updateInviteAction(ta) {
       if (sentInvite(ta, uid)) {
         markChecked(divInvitationCheck);
@@ -290,6 +290,9 @@ var sched4 = (function() {
     var prof = profs[uid].prof;
     var circView = profile.viewMediumCirc(prof);
     var nameView = profile.viewMediumFullName(prof);
+    var divGuest = $("<div class='col-xs-11'/>")
+      .append(circView)
+      .append(nameView);
 
     function sendGoogleInvite() {
       api.reserveCalendar(ta.tid, { notified: [uid] })
@@ -303,8 +306,7 @@ var sched4 = (function() {
 
     view
       .append(divInvitationCheck)
-      .append(circView)
-      .append(nameView)
+      .append(divGuest)
       .click(sendGoogleInvite);
 
     return view;
@@ -358,7 +360,7 @@ var sched4 = (function() {
       key = "48h";
     sel.set(key);
 
-    var divReminder = $("<div class='final-sched-div clearfix'>");
+    var divReminder = $("<div class='final-sched-div'>");
 
     var divReminderCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divReminder);
@@ -392,7 +394,7 @@ var sched4 = (function() {
   }
 
   function createInviteSection(chats, profs, ta, guests) {
-    var view = $("<div class='final-sched-div clearfix'/>");
+    var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
       "Send Google Calendar invitations." :
@@ -409,7 +411,7 @@ var sched4 = (function() {
   }
 
   function createRemindSection(chats, profs, task, guests) {
-    var view = $("<div class='final-sched-div clearfix'/>");
+    var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
       "Send reminders." :
