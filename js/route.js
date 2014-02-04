@@ -63,14 +63,6 @@ var route = (function() {
 
     "translate/response/:rid/:uid route" : function(data) {
       withLogin(function () { });
-    },
-
-    "settings route" : function() {
-      withLogin(function () { page.settings.load(); });
-    },
-
-    "places route" : function() {
-      withLogin(function () { page.places.load(); });
     }
   });
 

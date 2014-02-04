@@ -371,6 +371,7 @@ var home = (function() {
     deferred.join([loadAllTasks(), loadActiveTasks()])
             .done(loadArchive);
     $(".place-nav").click(places.load);
+    $(".settings-nav").click(settings.load);
     util.focus();
   };
 
