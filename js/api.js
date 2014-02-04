@@ -110,7 +110,7 @@ var api = (function () {
 
   mod.postProfile = function(prof, teamid) {
     var url = api_profile_prefix() + "/" + prof.profile_uid + "/" + teamid;
-    console.log(teamid.toSource());
+    //console.log(teamid.toSource());
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 

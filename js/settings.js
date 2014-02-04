@@ -95,7 +95,7 @@ var settings = (function() {
       api.postProfile(profileEdit, teamid).done(function(prof) {
         api.getProfile(execProfile.profile_uid).done(function(prof) {
           execProfile = prof;
-          console.log("Edited: " + prof.toSource());
+          //console.log("Edited: " + prof.toSource());
           profile.set(prof);
           $(".exec-settings-modal").modal("hide");
           home.load();
@@ -108,10 +108,10 @@ var settings = (function() {
   function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
-      console.log("Exec profile: " + execProf.toSource());
+      //console.log("Exec profile: " + execProf.toSource());
       api.getAccount(execUID, teamid).done(function(execAcct) {
         execAccount = execAcct;
-        console.log("Exec account: " + execAccount.toSource());
+        //console.log("Exec account: " + execAccount.toSource());
         var fullName = execProf.full_name;
         var familiarName = execProf.familiar_name;
         $("#exec-settings-title").text("Settings for " + familiarName);
@@ -149,11 +149,11 @@ var settings = (function() {
         list.iter(execProfs, function(execProf) {
           var prof = execProf.prof;
           var teamid = leaders[prof.profile_uid];
-          console.log(leaders.toSource());
-          console.log(prof.profile_uid);
-          console.log(teamid);
+          //console.log(leaders.toSource());
+          //console.log(prof.profile_uid);
+          //console.log(teamid);
           api.getAccount(prof.profile_uid, teamid).done(function(execAcct) {
-            console.log("Exec: " + prof.toSource());
+            //console.log("Exec: " + prof.toSource());
             var row = $("<div class='exec-row clearfix'/>");
             var name = prof.full_name;
             $("<div class='settings-prof-circ'/>")
@@ -247,10 +247,10 @@ var settings = (function() {
     $("#settings-confirm-password").val("");
     api.getProfile(eaUID).done(function(eaProf) {
       assistantProfile = eaProf;
-      console.log("EA Profile: " + eaProf.toSource());
+      //console.log("EA Profile: " + eaProf.toSource());
       api.getAccount(eaUID, login.getTeam().teamid).done(function(eaAccount) {
         assistantAccount = eaAccount;
-        console.log("EA Account: " + eaAccount.toSource());
+        //console.log("EA Account: " + eaAccount.toSource());
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         var fullName = eaProf.full_name;
@@ -322,7 +322,7 @@ var settings = (function() {
       api.postProfile(profileEdit, login.getTeam().teamid).done(function() {
         api.getProfile(assistantProfile.profile_uid).done(function(prof) {
           assistantProfile = prof;
-          console.log("Edited: " + prof.toSource());
+          //console.log("Edited: " + prof.toSource());
           profile.set(prof);
           settings.load();
         });
@@ -331,7 +331,7 @@ var settings = (function() {
   }
 
   mod.load = function() {
-    console.log("settings.load");
+    //console.log("settings.load");
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     var mapping = {};
