@@ -4,6 +4,7 @@ var page = (function() {
     login: {},
     requestPassword: {},
     resetPassword: {},
+    verifyEmail: {},
     home: {},
     task: {},
     scheduling: {},
@@ -21,6 +22,7 @@ var page = (function() {
     "login":            {classes:["login-page"]},
     "request-password": {classes:["request-password-page"]},
     "reset-password":   {classes:["reset-password-page"]},
+    "verify-email":     {classes:["verify-email-page"]},
     "home":             {classes:["home-page"]},
     "task":             {classes:["task-page"]},
     "scheduling":       {classes:["scheduling-page"]},
@@ -143,6 +145,16 @@ var page = (function() {
     prepareResetPassword(uid, token);
     goto_page("reset-password");
     util.focus();
+  };
+
+  mod.verifyEmail.load = function(uid, email, token) {
+    pageSelector.hideAll();
+    api.verifyEmail(uid, email, token)
+      .done(function() {
+        alert("verified");
+        //goto_page("home");
+        //util.focus();
+      });
   };
 
   mod.task.load = function(optTid) {

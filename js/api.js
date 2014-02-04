@@ -132,6 +132,14 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(accountEdit));
   };
 
+  mod.verifyEmail = function(uid, email, token) {
+    var url = "/api/q/" + uid + "/email/verify/" +
+      encodeURIComponent(email) + "/" +
+      encodeURIComponent(token);
+    console.log(url);
+    return jsonHttpPost(url, "");
+  };
+
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active");
   };

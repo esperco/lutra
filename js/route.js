@@ -19,6 +19,7 @@ var route = (function() {
 
     /* default path /!# */
     "route" : function(data){
+      alert("default");
       withLogin(page.home.load);
     },
 
@@ -41,6 +42,9 @@ var route = (function() {
     },
     "reset-password/:uid/:token route" : function(data) {
       page.resetPassword.load(data.uid, data.token);
+    },
+    "verify-email/:uid/:email/:token route" : function(data) {
+      page.verifyEmail.load(data.uid, data.email, data.token);
     },
 
     /* various pages */
