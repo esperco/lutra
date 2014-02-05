@@ -95,7 +95,7 @@ var sched3 = (function() {
     if (calOption) {
       if (! state.reserved) {
         state.reserved = {
-          remind: 3*43200,
+          /* reminders may be set later by the user */
           notifs: []
         };
       }
@@ -260,15 +260,10 @@ var sched3 = (function() {
 
     var guest = $("<div class='col-xs-6'></div>")
       .appendTo(view);
-    var chatHead = $("<div class='list-prof-circ pref-prof-circ'>");
-    var obsProf = profs[uid];
-    var prof = obsProf.prof;
-    var name = prof.full_name;
-    var initials = $("<p class='initials unselectable'/>")
-      .text(profile.veryShortNameOfProfile(prof));
 
-    initials.appendTo(chatHead);
-    chatHead.appendTo(guest);
+    var prof = profs[uid].prof;
+    profile.viewMediumCirc(prof)
+      .appendTo(guest);
 
     $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
       .appendTo(guest);

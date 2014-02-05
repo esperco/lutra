@@ -3,6 +3,11 @@
 var sched4 = (function() {
   var mod = {};
 
+  function getSlot(ta) {
+    var state = sched.getState(ta);
+    return state.reserved.slot;
+  }
+
   function sentConfirmation(chats, uid) {
     var chat = chats[uid];
     return list.exists(chat.chat_items, function(x) {
@@ -21,13 +26,6 @@ var sched4 = (function() {
     var state = sched.getState(task);
     return util.isDefined(state.reserved) &&
       util.isDefined(state.reserved.google_event);
-  }
-
-  function sentInvitations(task) {
-    var state = sched.getState(task);
-    return util.isDefined(state.reserved) &&
-      util.isDefined(state.reserved.notifs) &&
-      state.reserved.notifs.length > 0;
   }
 
   function formalEmailBody(organizerName, hostName, toName, when, where) {
@@ -65,13 +63,15 @@ var sched4 = (function() {
     })
   }
 
- function loadReminderRecipients(toObsProf) {
+  function loadReminderRecipients(profs, guests) {
     $("#sched-reminder-to-list").children().remove();
 
-    var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
-      .appendTo($("#sched-reminder-to-list"));
-
-    loadRecipientRow(recipientRow, toObsProf);
+    list.iter(guests, function(uid) {
+      var toObsProf = profs[uid];
+      var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
+        .appendTo($("#sched-reminder-to-list"));
+      loadRecipientRow(recipientRow, toObsProf);
+    });
   }
 
   function loadConfirmRecipients(toObsProf) {
@@ -83,13 +83,14 @@ var sched4 = (function() {
     loadRecipientRow(recipientRow, toObsProf);
   }
 
-  function preFillConfirmModal(chats, profs, task, slot, toUid) {
+  function preFillConfirmModal(chats, profs, ta, toUid) {
     var toObsProf = profs[toUid];
+    var slot = getSlot(ta);
 
     loadConfirmRecipients(toObsProf);
 
     $("#sched-confirm-subject")
-      .val("Re: " + task.task_status.task_title);
+      .val("Re: " + ta.task_status.task_title);
 
     var organizerName = profs[login.me()].prof.full_name;
     var hostName = profs[login.leader()].prof.full_name;
@@ -97,7 +98,7 @@ var sched4 = (function() {
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
-      task.task_data[1].hide_end_times ?
+      ta.task_data[1].hide_end_times ?
       "on " + date.justStartTime(t1) :
       "on " + date.range(t1, t2);
     var place = slot.location.address;
@@ -121,7 +122,7 @@ var sched4 = (function() {
       .append("Show end time of meeting")
       .appendTo(schedConfirmShowEnd);
 
-    if (task.task_data[1].hide_end_times)
+    if (ta.task_data[1].hide_end_times)
       schedConfirmShowEnd.removeClass("checkbox-selected");
     else
       schedConfirmShowEnd.addClass("checkbox-selected");
@@ -159,19 +160,18 @@ var sched4 = (function() {
     }
   }
 
-  function preFillReminderModal(profs, task, reserved, toUid) {
-    var toObsProf = profs[toUid];
+  function preFillReminderModal(profs, ta, reserved, guests) {
 
-    loadReminderRecipients(toObsProf);
+    loadReminderRecipients(profs, guests);
 
     $("#sched-reminder-subject")
-      .val("Re: " + task.task_status.task_title);
+      .val("Re: " + ta.task_status.task_title);
 
     if (reserved.reminder_message) {
       $("#sched-reminder-message").val(reserved.reminder_message);
     }
 
-    api.getReminderMessage(task.tid, {guest_name:toObsProf.prof.full_name})
+    api.getReminderMessage(ta.tid, {})
       .done(function(x) {
         if (! reserved.reminder_message) {
           refreshReminderMessage(x);
@@ -193,47 +193,18 @@ var sched4 = (function() {
       2. Allowing editing of event details */
   }
 
-  function updateInviteAction(task, inviteAction) {
-    var state = sched.getState(task);
-    if (util.isDefined(state.reserved.google_event))
-      inviteAction.attr("disabled", true);
-  }
-
   function markChecked(elt) {
     elt.addClass("checked"); // does not work on SVG elements
   }
 
-  function step4RowViewOfParticipant(chats, profs, task, uid) {
-    var view = $("<div/>");
-    var divDetails = $("<div class='final-sched-div clearfix'>");
-    var divConfirmation = $("<div class='final-sched-div clearfix'>");
-    var divInvitation = $("<div class='final-sched-div clearfix'>");
-    var obsProf = profs[uid];
-    var prof = obsProf.prof;
+  function createConfirmRow(chats, profs, ta, uid) {
+    var view = $("<div class='sched-step4-row container clickable'/>");
 
-    var state = sched.getState(task);
-    var slot = state.reserved.slot;
-
-    /*** Edit event details ***/
-
-    // $("<a class='final-sched-actions'>Edit event details</a>")
-    //   .click(function() {
-    //     editEventDetails(task.tid, chats, uid, obsProf);
-    //   })
-    //   .appendTo(divDetails);
-
-    // var checkDetails = $("<img class='check'/>");
-    // svg.loadImg(checkDetails, "/assets/img/check.svg");
-    // checkDetails.appendTo(divDetails);
-    // $("<a class='final-sched-action'>Edit event details</a>").appendTo(divDetails);
-
-    /*** Send a confirmation ***/
-
-    var divConfirmationCheck = $("<div class='check-div col-xs-1'>")
-      .appendTo(divConfirmation);
+    var divConfirmationCheck = $("<div class='check-div col-xs-1'/>");
     var checkConfirmation = $("<img class='check'/>");
     if (sentConfirmation(chats, uid))
       markChecked(divConfirmationCheck);
+
     checkConfirmation.appendTo(divConfirmationCheck);
     svg.loadImg(checkConfirmation, "/assets/img/check.svg")
       .then(function(elt) { checkConfirmation = elt; });
@@ -243,149 +214,54 @@ var sched4 = (function() {
       confirmModal.modal("hide");
     }
 
-    function composeConfirmationEmail() {
-      preFillConfirmModal(chats, profs, task, slot, uid);
-      confirmModal.modal({});
+    var prof = profs[uid].prof;
+    var circView = profile.viewMediumCirc(prof);
+    var nameView = profile.viewMediumFullName(prof);
+    var divGuest = $("<div class='col-xs-11'/>")
+      .append(circView)
+      .append(nameView);
+
+    view
+      .append(divConfirmationCheck)
+      .append(divGuest)
+      .click(composeConfirmationEmail);
+
+    function setupSendButton() {
+      var sendButton = $("#sched-confirm-send");
+      sendButton
+        .removeClass("disabled")
+        .unbind('click')
+        .click(function() {
+          if (! sendButton.hasClass("disabled")) {
+            sendButton.addClass("disabled");
+            var body = $("#sched-confirm-message").val();
+            var chatid = chats[uid].chatid;
+            var hideEnd = ta.task_data[1].hide_end_times;
+            var chatItem = {
+              chatid: chatid,
+              by: login.me(),
+              'for': login.me(),
+              team: login.getTeam().teamid,
+              chat_item_data: ["Sched_confirm", {
+                body: body,
+                'final': getSlot(ta),
+                hide_end_time: hideEnd
+              }]
+            };
+            chat.postChatItem(chatItem)
+              .done(function(item) {
+                closeConfirmModal();
+                markChecked(divConfirmationCheck);
+              });
+          }
+        });
     }
 
-    $("<a class='final-sched-action col-xs-11'>Send a confirmation message</a>")
-      .unbind('click')
-      .click(composeConfirmationEmail)
-      .appendTo(divConfirmation);
-
-    var sendButton = $("#sched-confirm-send");
-    sendButton
-      .removeClass("disabled")
-      .unbind('click')
-      .click(function() {
-        if (! sendButton.hasClass("disabled")) {
-          sendButton.addClass("disabled");
-          var body = $("#sched-confirm-message").val();
-          var chatid = chats[uid].chatid;
-          var hideEnd = task.task_data[1].hide_end_times;
-          var chatItem = {
-            chatid: chatid,
-            by: login.me(),
-            'for': login.me(),
-            team: login.getTeam().teamid,
-            chat_item_data: ["Sched_confirm", {
-              body: body,
-              'final': slot,
-              hide_end_time: hideEnd
-            }]
-          };
-          chat.postChatItem(chatItem)
-            .done(function(item) {
-              closeConfirmModal();
-              markChecked(divConfirmationCheck);
-            });
-        }
-      });
-
-    /*** Reserve event in Google Calendar, maybe send invitations ***/
-
-    var divInvitationCheck = $("<div class='check-div col-xs-1'>")
-      .appendTo(divInvitation);
-    var checkInvitation = $("<img class='check'/>");
-    if (sentInvitations(task))
-      markChecked(divInvitationCheck);
-    checkInvitation.appendTo(divInvitationCheck);
-    svg.loadImg(checkInvitation, "/assets/img/check.svg")
-      .then(function(elt) { checkInvitation = elt; });
-
-    var divInviteAction = $("<div class='col-xs-11'/>");
-    var inviteAction = $("<a class='final-sched-action'/>")
-      .text("Send Google Calendar invitations");
-
-    /* disable button if invite was already sent */
-    updateInviteAction(task, inviteAction);
-
-    var wasInviteSent = function(uid) {
-      if (sentInvitations(task)) {
-        var notifs = state.reserved.notifs;
-        for (var i = 0; i < notifs.length; i++) {
-          if (state.reserved.notifs[i].participant === uid) return true;
-        }
-      }
-      return false;
-    };
-
-    var divParticipantCheckboxes = $("<div/>");
-    var otherEmailInput;
-    $("<span/>").text("Invite: ").appendTo(divParticipantCheckboxes);
-    var participantCheckboxes = [];
-    var leader = login.leader();
-    profile.mget(task.task_participants.organized_for)
-      .done(function(participants) {
-        list.iter(participants, function(profile) {
-          var prof = profile.prof;
-          var uid = prof.profile_uid;
-          if (uid !== leader) {
-            var name = "sched-step4-invite-" + uid;
-            $("<label/>", {
-              "for": name,
-              "class": "checkbox-inline"
-            })
-              .text(prof.full_name)
-              .appendTo(divParticipantCheckboxes);
-            var checkbox = $("<input/>", {
-              "type": "checkbox",
-              name: name,
-              checked: wasInviteSent(uid)
-            })
-              .data("uid", uid)
-              .appendTo(divParticipantCheckboxes);
-            participantCheckboxes.push(checkbox);
-          }
-        });
-        $("<label for='sched-step4-invite-custom' class='checkbox-inline'/>")
-          .text("Other Email: ")
-          .appendTo(divParticipantCheckboxes);
-        otherEmailInput =
-          $("<input type='text' name='sched-step4-invite-custom'/>")
-            .appendTo(divParticipantCheckboxes);
-      });
-
-
-    inviteAction
-      .click(function() {
-        /* This writes the event into the host's calendar
-           and sends calendar invites to selected participants */
-        var participantsToNotify = [];
-        list.iter(participantCheckboxes, function(checkbox) {
-          if (checkbox.is(":checked")) {
-            participantsToNotify.push(checkbox.data("uid"));
-          }
-        });
-        // TODO Email address validation, allow multiple inputs
-        var otherEmail = otherEmailInput.val();
-        // This is probably not the best way to accomplish what I want...
-        var deferredUid =
-          otherEmail ?
-          api.getProfileByEmail(otherEmail) :
-          deferred.defer(null);
-        deferredUid.done(function(prof) {
-          if (prof && prof !== null) {
-            participantsToNotify.push(prof.profile_uid);
-          }
-          api.reserveCalendar(task.tid, { notified: participantsToNotify })
-            .done(function(eventInfo) {
-              api.getTask(task.tid)
-                .done(function(updatedTask) {
-                  updateInviteAction(updatedTask, inviteAction);
-                  markChecked(divInvitationCheck);
-                });
-            });
-        });
-      })
-      .appendTo(divInviteAction);
-
-    divParticipantCheckboxes.appendTo(divInviteAction);
-    divInviteAction.appendTo(divInvitation);
-
-    // divDetails.appendTo(view);
-    divConfirmation.appendTo(view);
-    divInvitation.appendTo(view);
+    function composeConfirmationEmail() {
+      preFillConfirmModal(chats, profs, ta, uid);
+      setupSendButton();
+      confirmModal.modal({});
+    }
 
     return {
       view: view,
@@ -393,9 +269,82 @@ var sched4 = (function() {
     };
   }
 
-  /*** Reminders (same message sent to everyone) ***/
+  function createConfirmSection(chats, profs, ta, guests) {
+    var view = $("<div class='final-sched-div'/>");
 
-  function createReminderSelector(chats, profs, task, uid) {
+    var title = guests.length > 1 ?
+      "Send confirmation messages." :
+      "Send a confirmation message.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    list.iter(guests, function(uid) {
+      var x = createConfirmRow(chats, profs, ta, uid);
+      x.view
+        .appendTo(view);
+
+      if (guests.length == 1) {
+        var uid = guests[0];
+        if (! sentConfirmation(chats, uid))
+          x.composeConfirmationEmail();
+      }
+    });
+
+    return view;
+  }
+
+  function sentInvite(ta, uid) {
+    var state = sched.getState(ta);
+    return list.exists(state.reserved.notifs, function(notif) {
+      return uid === notif.participant;
+    });
+  }
+
+  function createInviteRow(chats, profs, ta, uid) {
+    var view = $("<div class='sched-step4-row container clickable'>");
+
+    var divInvitationCheck = $("<div class='check-div col-xs-1'>")
+      .appendTo(view);
+    var checkInvitation = $("<img class='check'/>");
+    checkInvitation.appendTo(divInvitationCheck);
+    svg.loadImg(checkInvitation, "/assets/img/check.svg")
+      .then(function(elt) { checkInvitation = elt; });
+
+    function updateInviteAction(ta) {
+      if (sentInvite(ta, uid)) {
+        markChecked(divInvitationCheck);
+      }
+    }
+
+    updateInviteAction(ta);
+
+    var prof = profs[uid].prof;
+    var circView = profile.viewMediumCirc(prof);
+    var nameView = profile.viewMediumFullName(prof);
+    var divGuest = $("<div class='col-xs-11'/>")
+      .append(circView)
+      .append(nameView);
+
+    function sendGoogleInvite() {
+      api.reserveCalendar(ta.tid, { notified: [uid] })
+        .done(function(eventInfo) {
+          api.getTask(ta.tid)
+            .done(function(updatedTask) {
+              updateInviteAction(updatedTask);
+            });
+        });
+    }
+
+    view
+      .append(divInvitationCheck)
+      .append(divGuest)
+      .click(sendGoogleInvite);
+
+    return view;
+  }
+
+  function createReminderSelector(chats, profs, task, guests) {
     var sel;
     var reserved = sched.getState(task).reserved;
 
@@ -407,7 +356,7 @@ var sched4 = (function() {
     }
 
     function composeReminderEmail() {
-      preFillReminderModal(profs, task, reserved, uid);
+      preFillReminderModal(profs, task, reserved, guests);
       reminderModal.modal({});
     }
 
@@ -433,22 +382,24 @@ var sched4 = (function() {
 
     var initVal = reserved.remind;
     var key = "no";
-    // if (! util.isDefined(initVal))
-    //   key = "no";
-    // else if (initVal < 24 * 3600 + 0.5)
-    //   key = "24h";
-    // else if (initVal < 36 * 3600 + 0.5)
-    //   key = "36h";
-    // else
-    //   key = "48h";
+    if (! util.isDefined(initVal))
+      key = "no";
+    else if (initVal < 24 * 3600 + 0.5)
+      key = "24h";
+    else if (initVal < 36 * 3600 + 0.5)
+      key = "36h";
+    else
+      key = "48h";
     sel.set(key);
 
-    var divReminder = $("<div class='final-sched-div clearfix'>");
+    var divReminder = $("<div class='final-sched-div'>");
 
     var divReminderCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divReminder);
     var checkReminder = $("<img class='check'/>");
-    if (sentReminder(chats, uid))
+    if (sentReminder(chats, guests[0] /* unclean; assumes all the guests
+                                       receive the same reminder at the
+                                       same time */))
       markChecked(divReminderCheck);
     checkReminder.appendTo(divReminderCheck);
     svg.loadImg(checkReminder, "/assets/img/check.svg")
@@ -467,8 +418,6 @@ var sched4 = (function() {
 
     var divReminderInstr = $("<div class='instr-div col-xs-11'>")
       .appendTo(divReminder);
-    $("<h3 class='final-sched-text'>Send a reminder</h3>")
-      .appendTo(divReminderInstr);
     divReminderInstr
       .append(sel.view)
       .append(previewLink);
@@ -476,20 +425,50 @@ var sched4 = (function() {
     return divReminder;
   }
 
+  function createInviteSection(chats, profs, ta, guests) {
+    var view = $("<div class='final-sched-div'/>");
+
+    var title = guests.length > 1 ?
+      "Send Google Calendar invitations." :
+      "Send a Google Calendar invitation.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    list.iter(guests, function(uid) {
+      createInviteRow(chats, profs, ta, uid)
+        .appendTo(view);
+    });
+    return view;
+  }
+
+  function createRemindSection(chats, profs, task, guests) {
+    var view = $("<div class='final-sched-div'/>");
+
+    var title = guests.length > 1 ?
+      "Send reminders." :
+      "Send a reminder.";
+    $("<h3 class='final-sched-text'/>")
+      .text(title)
+      .appendTo(view);
+
+    createReminderSelector(chats, profs, task, guests)
+      .appendTo(view);
+
+    return view;
+  }
+
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var chats = sched.chatsOfTask(ta);
     var guests = sched.getGuests(ta);
-    var numGuests = guests.length;
-    list.iter(guests, function(uid) {
-      var x = step4RowViewOfParticipant(chats, profs, ta, uid);
-      view.append(x.view);
-      var reminderSelector =
-        createReminderSelector(chats, profs, ta, uid).appendTo(view);
-      if (numGuests == 1 && ! sentConfirmation(chats, uid))
-        x.composeConfirmationEmail();
-    });
-    // Task is always saved when remind changes.
+
+    view
+      .append(createConfirmSection(chats, profs, ta, guests))
+      .append(createInviteSection(chats, profs, ta, guests))
+      .append(createRemindSection(chats, profs, ta, guests));
+
+    /* Task is always saved when remind changes. */
     task.onSchedulingStepChanging.stopObserve("step");
   };
 

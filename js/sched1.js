@@ -23,9 +23,6 @@ var sched1 = (function() {
     var addGuestText = $("<a id='add-guest-text' class='unselectable'/>")
       .text("Add guest")
       .appendTo(addGuestDiv);
-    var maxGuests = $("<p id='max-guests-text' class='unselectable'/>")
-      .text("No more guests can be added.")
-      .appendTo(addGuestDiv);
 
     var emailInput = $("<input type='email'/>")
       .addClass("form-control guest-input")
@@ -43,26 +40,6 @@ var sched1 = (function() {
       .append(nameInput)
       .append(addButton);
 
-    function updateAddGuestAbility() {
-      var guests = collectGuests(hosts, guestTbl);
-      if (guests.length === 0) {
-        adder
-          .unbind("click")
-          .click(toggleAddGuest)
-          .removeClass("add-guest-disabled");
-        addGuestDiv.bind("click", toggleAddGuest);
-        addGuestText.removeClass("hide");
-        maxGuests.addClass("hide");
-      } else {
-        adder
-          .unbind("click")
-          .addClass("add-guest-disabled");
-        addGuestDiv.unbind("click");
-        addGuestText.addClass("hide");
-        maxGuests.removeClass("hide");
-      }
-    }
-
     function toggleAddGuest() {
       if (guestInputDiv.hasClass("hide")) {
         addGuestDiv.addClass("hide");
@@ -75,6 +52,10 @@ var sched1 = (function() {
         clearAddGuest();
       }
     }
+    addGuestDiv
+      .click(toggleAddGuest);
+    adder
+      .click(toggleAddGuest);
 
     function clearAddGuest() {
       clearUid();
@@ -148,9 +129,7 @@ var sched1 = (function() {
       addGuest(task, guestTbl, uid)
         .then(function(profs) {
           guestsContainer
-            .append(rowViewOfParticipant(profs, task, guestTbl, uid,
-                                         updateAddGuestAbility));
-          updateAddGuestAbility();
+            .append(rowViewOfParticipant(profs, task, guestTbl, uid));
           saveGuests(task, hosts, guestTbl);
           updateNextButton(hosts, guestTbl);
         });
@@ -179,25 +158,18 @@ var sched1 = (function() {
         .append(guestInputDiv);
 
     return {
-      view: view,
-      updateAddGuestAbility: updateAddGuestAbility
+      view: view
     };
   }
 
   /* Read-only view of a participant */
-  function rowViewOfParticipant(profs, task, guestTbl, uid,
-                                updateAddGuestAbility) {
+  function rowViewOfParticipant(profs, task, guestTbl, uid) {
     var view = $("<div class='sched-step1-row'>");
-    var hosts = sched.getHosts(task);
     var obsProf = profs[uid];
     var prof = obsProf.prof;
-    var name = prof.full_name;
-    var chatHead = $("<div class='list-prof-circ'>");
-    var initials = $("<div class='initials unselectable'>")
-      .text(profile.veryShortNameOfProfile(prof))
-      .appendTo(chatHead);
-
-    var nameView = $("<p class='guest-name'>" + name + "</p>");
+    var hosts = sched.getHosts(task);
+    var chatHead = profile.viewMediumCirc(prof);
+    var nameView = profile.viewMediumFullName(prof);
 
     view
       .append(chatHead)
@@ -215,7 +187,6 @@ var sched1 = (function() {
             view.remove();
             updateNextButton(hosts, guestTbl);
             removeGuest(guestTbl, uid);
-            updateAddGuestAbility();
             saveGuests(task, hosts, guestTbl);
             updateNextButton(hosts, guestTbl);
           });
@@ -295,17 +266,14 @@ var sched1 = (function() {
 
     var hosts = sched.getHosts(ta);
     list.iter(hosts, function(uid) {
-      rowViewOfParticipant(profs, ta, guestTbl, uid,
-                           addResult.updateAddGuestAbility)
+      rowViewOfParticipant(profs, ta, guestTbl, uid)
         .appendTo(hostsContainer);
     });
 
     list.iter(guests, function(uid) {
-      rowViewOfParticipant(profs, ta, guestTbl, uid,
-                           addResult.updateAddGuestAbility)
+      rowViewOfParticipant(profs, ta, guestTbl, uid)
         .appendTo(guestsContainer);
     });
-    addResult.updateAddGuestAbility();
 
     var newGuestContainer = $("<div class='new-guest-container'>");
     addResult.view
