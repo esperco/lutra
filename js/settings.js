@@ -93,7 +93,6 @@ var settings = (function() {
       api.postProfile(profileEdit, teamid).done(function(prof) {
         api.getProfile(execProfile.profile_uid).done(function(prof) {
           execProfile = prof;
-          //console.log("Edited: " + prof.toSource());
           profile.set(prof);
           $(".exec-settings-modal").modal("hide");
           home.load();
@@ -107,7 +106,6 @@ var settings = (function() {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
       api.getEmails(execUID, teamid).done(function(execEmails) {
-        console.log(execEmails.toSource());
         var fullName = execProf.full_name;
         var familiarName = execProf.familiar_name;
         $("#exec-settings-title").text("Settings for " + familiarName);
@@ -149,11 +147,10 @@ var settings = (function() {
         list.iter(execProfs, function(execProf) {
           var prof = execProf.prof;
           var teamid = leaders[prof.profile_uid];
-          //console.log(leaders.toSource());
-          //console.log(prof.profile_uid);
-          //console.log(teamid);
           api.getEmails(prof.profile_uid, teamid).done(function(execEmails) {
-            //console.log("Exec: " + prof.toSource());
+            var primaryOnly =
+              execEmails.filter(function(e) { return e.email_primary; });
+            var primaryEmail = primaryOnly[0].email;
             var row = $("<div class='exec-row clearfix'/>");
             var name = prof.full_name;
             $("<div class='settings-prof-circ'/>")
@@ -177,7 +174,7 @@ var settings = (function() {
               .text(name)
               .appendTo(details);
             $("<div class='exec-email ellipsis'/>")
-              .text(execEmails.primary_email) // TODO fix this
+              .text(primaryEmail)
               .appendTo(details);
             details.appendTo(row);
             row.appendTo(view);
@@ -282,7 +279,6 @@ var settings = (function() {
       assistantProfile = eaProf;
       var teamid = login.getTeam().teamid;
       api.getEmails(eaUID, teamid).done(function(eaEmails) {
-        console.log(eaEmails.toSource());
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         var fullName = eaProf.full_name;
@@ -354,7 +350,6 @@ var settings = (function() {
       api.postProfile(profileEdit, login.getTeam().teamid).done(function() {
         api.getProfile(assistantProfile.profile_uid).done(function(prof) {
           assistantProfile = prof;
-          //console.log("Edited: " + prof.toSource());
           profile.set(prof);
           settings.load();
         });
@@ -363,7 +358,6 @@ var settings = (function() {
   }
 
   mod.load = function() {
-    //console.log("settings.load");
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     var mapping = {};
