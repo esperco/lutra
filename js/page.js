@@ -4,7 +4,7 @@ var page = (function() {
     login: {},
     requestPassword: {},
     resetPassword: {},
-    verifyEmail: {},
+    emailVerify: {},
     home: {},
     task: {},
     scheduling: {},
@@ -22,7 +22,7 @@ var page = (function() {
     "login":            {classes:["login-page"]},
     "request-password": {classes:["request-password-page"]},
     "reset-password":   {classes:["reset-password-page"]},
-    "verify-email":     {classes:["verify-email-page"]},
+    "email-verify":     {classes:["email-verify-page"]},
     "home":             {classes:["home-page"]},
     "task":             {classes:["task-page"]},
     "scheduling":       {classes:["scheduling-page"]},
@@ -108,6 +108,17 @@ var page = (function() {
     util.changeFocus(input);
   }
 
+  function prepareEmailVerify(uid, email, token) {
+    $("#verify-email-comment")
+      .text("Press Confirm to verify the email address " + email);
+    $("#verify-email-button")
+      .click(function() {
+        api.emailVerify(uid, email, token)
+          .done(mod.home.load);
+        return false;
+      });
+  }
+
   /* Load and render different types of pages */
 
   mod.home.load = function() {
@@ -147,14 +158,11 @@ var page = (function() {
     util.focus();
   };
 
-  mod.verifyEmail.load = function(uid, email, token) {
+  mod.emailVerify.load = function(uid, email, token) {
     pageSelector.hideAll();
-    api.verifyEmail(uid, email, token)
-      .done(function() {
-        alert("verified");
-        //goto_page("home");
-        //util.focus();
-      });
+    prepareEmailVerify(uid, email, token);
+    goto_page("email-verify");
+    util.focus();
   };
 
   mod.task.load = function(optTid) {

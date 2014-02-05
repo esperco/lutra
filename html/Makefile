@@ -17,7 +17,8 @@ HTML_INCLUDES = \
   sched-task-list.html \
   places.html \
   edit-place.html \
-  settings.html
+  settings.html \
+  email-verify.html
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \
