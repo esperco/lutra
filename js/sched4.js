@@ -98,7 +98,7 @@ var sched4 = (function() {
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
-      task.task_data[1].hide_end_times ?
+      ta.task_data[1].hide_end_times ?
       "on " + date.justStartTime(t1) :
       "on " + date.range(t1, t2);
     var place = slot.location.address;
@@ -122,7 +122,7 @@ var sched4 = (function() {
       .append("Show end time of meeting")
       .appendTo(schedConfirmShowEnd);
 
-    if (task.task_data[1].hide_end_times)
+    if (ta.task_data[1].hide_end_times)
       schedConfirmShowEnd.removeClass("checkbox-selected");
     else
       schedConfirmShowEnd.addClass("checkbox-selected");
@@ -160,18 +160,18 @@ var sched4 = (function() {
     }
   }
 
-  function preFillReminderModal(profs, task, reserved, guests) {
+  function preFillReminderModal(profs, ta, reserved, guests) {
 
     loadReminderRecipients(profs, guests);
 
     $("#sched-reminder-subject")
-      .val("Re: " + task.task_status.task_title);
+      .val("Re: " + ta.task_status.task_title);
 
     if (reserved.reminder_message) {
       $("#sched-reminder-message").val(reserved.reminder_message);
     }
 
-    api.getReminderMessage(task.tid, {})
+    api.getReminderMessage(ta.tid, {})
       .done(function(x) {
         if (! reserved.reminder_message) {
           refreshReminderMessage(x);
