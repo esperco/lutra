@@ -10,9 +10,7 @@ var settings = (function() {
   var commonPrefixes = ["Dr.", "Prof."];
 
   var assistantProfile = null;
-  var assistantAccount = null;
   var execProfile = null;
-  var execAccount = null;
   var namePrefixSel = null;
   var execNamePrefixSel = null;
 
@@ -108,10 +106,8 @@ var settings = (function() {
   function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
-      //console.log("Exec profile: " + execProf.toSource());
-      api.getAccount(execUID, teamid).done(function(execAcct) {
-        execAccount = execAcct;
-        //console.log("Exec account: " + execAccount.toSource());
+      api.getEmails(execUID, teamid).done(function(execEmails) {
+        console.log(execEmails.toSource());
         var fullName = execProf.full_name;
         var familiarName = execProf.familiar_name;
         $("#exec-settings-title").text("Settings for " + familiarName);
@@ -127,10 +123,14 @@ var settings = (function() {
         $("#settings-exec-phone").val(execProf.phone_number);
         var emailView = $("#settings-exec-emails");
         emailView.children().remove();
-        var primary = execAccount.primary_email;
-        displayEmail(emailView, primary, true, true);
-        displayOtherEmails($("#settings-emails"),
-          execAccount.all_emails, primary);
+        list.iter(execEmails, function(email) {
+          displayEmail(emailView, email, execUID, teamid, function() {
+            execSettingsModal(execUID, teamid)
+          });
+        });
+        displayEmailAdd(emailView, execUID, teamid, function() {
+          execSettingsModal(execUID, teamid);
+        });
         $("#exec-settings-save").off("click");
         $("#exec-settings-save").one("click", function() {
           updateExecProfile(teamid)
@@ -152,7 +152,7 @@ var settings = (function() {
           //console.log(leaders.toSource());
           //console.log(prof.profile_uid);
           //console.log(teamid);
-          api.getAccount(prof.profile_uid, teamid).done(function(execAcct) {
+          api.getEmails(prof.profile_uid, teamid).done(function(execEmails) {
             //console.log("Exec: " + prof.toSource());
             var row = $("<div class='exec-row clearfix'/>");
             var name = prof.full_name;
@@ -177,7 +177,7 @@ var settings = (function() {
               .text(name)
               .appendTo(details);
             $("<div class='exec-email ellipsis'/>")
-              .text(execAcct.primary_email)
+              .text(execEmails.primary_email) // TODO fix this
               .appendTo(details);
             details.appendTo(row);
             row.appendTo(view);
@@ -187,7 +187,7 @@ var settings = (function() {
       });
   }
 
-  function displayEmail(view, email, isPrimary, isVerified) {
+  function displayEmail(view, email, uid, teamid, done) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
@@ -195,11 +195,11 @@ var settings = (function() {
     var divEmailActions =
       $("<div class='email-actions email-actions-desktop'/>")
         .appendTo(divEmailRowContent);
-    if (isPrimary) {
+    if (email.email_primary) {
       $("<div class='primary-label unselectable'/>")
         .text("PRIMARY")
         .appendTo(divEmailActions);
-    } else if (isVerified) {
+    } else if (email.email_confirmed) {
       $("<a href='#' class='email-action'/>")
         .text("Make primary")
         .click(function() { /* TODO */ return false; })
@@ -207,39 +207,72 @@ var settings = (function() {
     } else {
       $("<a href='#' class='email-action'/>")
         .text("Verify")
-        .click(function() { /* TODO */ return false; })
+        .click(function() {
+          var json = { email_address: email.email };
+          api.resendEmailToken(login.me(), uid, teamid, json);
+          return false;
+        })
         .appendTo(divEmailActions);
     }
-    $("<span class='vertical-divider'/>")
-      .text("|")
-      .appendTo(divEmailActions);
-    $("<a href='#' class='email-action'/>")
-      .text("Remove")
-      .click(function() { /* TODO */ return false; })
-      .appendTo(divEmailActions);
+    if (!(email.email_primary)) {
+      $("<span class='vertical-divider'/>")
+        .text("|")
+        .appendTo(divEmailActions);
+      $("<a href='#' class='email-action'/>")
+        .text("Remove")
+        .click(function() {
+          var json = { email_address: email.email };
+          api.deleteEmail(login.me(), uid, teamid, json)
+            .done(done);
+          return false;
+        })
+        .appendTo(divEmailActions);
+    }
 
-    $("<div class='primary-label primary-label-mobile unselectable'/>")
-      .text("PRIMARY")
-      .appendTo(divEmailRowContent);
+    if (email.email_primary) {
+      $("<div class='primary-label primary-label-mobile unselectable'/>")
+        .text("PRIMARY")
+        .appendTo(divEmailRowContent);
+    }
     $("<div class='email-address primary ellipsis'/>")
-      .text(email)
+      .text(email.email)
       .appendTo(divEmailRowContent);
-    var divEmailActionsMobile =
-      $("<div class='email-actions email-actions-mobile'/>")
-        .appendTo(divEmailRow);
-    $("<a href='#' class='email-action'/>")
-      .text("Remove")
-      .click(function() { /* TODO */ return false; })
-      .appendTo(divEmailActionsMobile);
+    if (!(email.email_primary)) {
+      var divEmailActionsMobile =
+        $("<div class='email-actions email-actions-mobile'/>")
+          .appendTo(divEmailRow);
+      $("<a href='#' class='email-action'/>")
+        .text("Remove")
+        .click(function() {
+          var json = { email_address: email.email };
+          api.deleteEmail(login.me(), uid, teamid, json)
+            .done(done);
+          return false;
+        })
+        .appendTo(divEmailActionsMobile);
+    }
 
     divEmailRow.appendTo(view);
   }
 
-  function displayOtherEmails(view, profile_emails, primary) {
-    list.iter(profile_emails, function(email) {
-      if (email.email !== primary)
-        displayEmail(view, email.email, false, email.email_confirmed);
-    });
+  function displayEmailAdd(view, uid, teamid, done) {
+    var divEmailAdd = $("<div class='input-group'/>");
+    $("<label for='email-add' class='text-field-label'/>")
+      .text("Add another email:")
+      .appendTo(divEmailAdd);
+    var emailAdd =
+      $("<input type='text' name='email-add' class='form-control'/>")
+        .appendTo(divEmailAdd);
+    $("<button class='btn btn-default'/>")
+      .text("Add")
+      .click(function() {
+        var email = { email_address: emailAdd.val() };
+        api.postEmail(login.me(), uid, teamid, email)
+          .fail(status_.onErrors([403, 409]))
+          .done(done);
+      })
+      .appendTo(divEmailAdd);
+    divEmailAdd.appendTo(view);
   }
 
   function displayAssistantProfile(eaUID) {
@@ -247,10 +280,9 @@ var settings = (function() {
     $("#settings-confirm-password").val("");
     api.getProfile(eaUID).done(function(eaProf) {
       assistantProfile = eaProf;
-      //console.log("EA Profile: " + eaProf.toSource());
-      api.getAccount(eaUID, login.getTeam().teamid).done(function(eaAccount) {
-        assistantAccount = eaAccount;
-        //console.log("EA Account: " + eaAccount.toSource());
+      var teamid = login.getTeam().teamid;
+      api.getEmails(eaUID, teamid).done(function(eaEmails) {
+        console.log(eaEmails.toSource());
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         var fullName = eaProf.full_name;
@@ -261,10 +293,10 @@ var settings = (function() {
         $("#settings-signature").val(eaProf.signature);
         var emailView = $("#settings-emails");
         emailView.children().remove();
-        var primary = eaAccount.primary_email;
-        displayEmail(emailView, primary, true, true);
-        displayOtherEmails($("#settings-emails"),
-          eaAccount.all_emails, primary);
+        list.iter(eaEmails, function(email) {
+          displayEmail(emailView, email, eaUID, teamid, mod.load);
+        });
+        displayEmailAdd(emailView, eaUID, teamid, mod.load);
       });
     });
   }

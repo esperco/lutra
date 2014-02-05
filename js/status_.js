@@ -50,6 +50,15 @@ var status_ = (function() {
     };
   };
 
+  mod.onErrors = function(statusCodes, optMsg) {
+    return function(jqXHR, textStatus, errorThrown) {
+      if (statusCodes.indexOf(jqXHR.status) != -1) {
+        var msg = util.isString(optMsg) ? optMsg : jqXHR.responseText;
+        mod.reportError(msg);
+      }
+    };
+  };
+
   /* Any click in the browser's window hides the status area */
   mod.init = function() {
     $("body").click(function() {

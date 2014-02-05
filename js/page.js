@@ -113,8 +113,10 @@ var page = (function() {
       .text("Press Confirm to verify the email address " + email);
     $("#verify-email-button")
       .click(function() {
-        api.emailVerify(uid, email, token)
-          .done(mod.home.load);
+        var json = { email_address: email };
+        api.emailVerify(uid, json, token)
+          .fail(status_.onErrors([401, 403]))
+          .done(route.nav.home);
         return false;
       });
   }
