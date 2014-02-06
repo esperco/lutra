@@ -1008,6 +1008,7 @@ object {
   margin-top: 20px;
 }
 
+#settings-emails-title,
 #settings-executives-title,
 #settings-exec-emails-title,
 #linked-accounts-title,
@@ -1065,6 +1066,24 @@ object {
 #user-legal-name,
 #exec-legal-name {
   padding-left: 96px;
+}
+
+#pseudonym-option {
+  float: right;
+  &:hover { cursor: pointer;
+    path.checkbox { stroke: @gray_40; }
+  }
+}
+
+#pseudonym-checkbox {
+  float: left;
+  margin-top: 10px;
+}
+
+#pseudonym-checkbox-label {
+  margin-top: 10px;
+  margin-left: 24px;
+  font-size: 14px;
 }
 
 #settings-update-account,

@@ -104,6 +104,19 @@ var settings = (function() {
         $("#settings-exec-familiar-name").val(familiarName);
         $("#settings-exec-formal-name").val(execProf.formal_name);
         $("#settings-exec-phone").val(execProf.phone_number);
+        $("#pseudonym-option").click(function() {
+          if ($(this).hasClass("checkbox-selected")) {
+            $(this).removeClass("checkbox-selected");
+            $("#exec-title").removeClass("hide");
+            $("#exec-legal-name").removeClass("hide");
+            $("#pseudonym-optional-label").removeClass("hide");
+          } else {
+            $(this).addClass("checkbox-selected");
+            $("#exec-title").addClass("hide");
+            $("#exec-legal-name").addClass("hide");
+            $("#pseudonym-optional-label").addClass("hide");
+          }
+        })
         var emailView = $("#settings-exec-emails");
         emailView.children().remove();
         var primary = execAccount.primary_email;
