@@ -243,7 +243,7 @@ object {
   margin-top: 40px;
   margin-bottom: 20px;
   height: 1px;
-  background: #58595b;
+  background: @gray_80;
 }
 
 .nav-section-title {
@@ -394,7 +394,7 @@ object {
 .exec-row,
 .email-row,
 .account-row {
-  height: 85px;
+  min-height: 85px;
   padding: 15px 10px;
   border-bottom: 1px solid @gray_10;
   &:hover { background: @gray_f8; }
@@ -1066,6 +1066,17 @@ object {
 #user-legal-name,
 #exec-legal-name {
   padding-left: 96px;
+}
+
+#pseudonym-container {
+  margin-top: 20px;
+  padding: 10px;
+  background: @gray_f8;
+  border-radius: 6px;
+}
+
+#pseudonym-label {
+  font-size: 14px;
 }
 
 #pseudonym-option {

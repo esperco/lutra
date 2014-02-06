@@ -98,23 +98,26 @@ var settings = (function() {
         $("#settings-exec-familiar-name").val(familiarName);
         $("#settings-exec-formal-name").val(execProf.formal_name);
         $("#settings-exec-phone").val(execProf.phone_number);
-        $("#pseudonym-option").click(function() {
-          if ($(this).hasClass("checkbox-selected")) {
-            $(this).removeClass("checkbox-selected");
-            $("#exec-title").removeClass("hide");
-            $("#exec-legal-name").removeClass("hide");
-            $("#pseudonym-optional-label").removeClass("hide");
-          } else {
-            $(this).addClass("checkbox-selected");
-            $("#exec-title").addClass("hide");
-            $("#exec-legal-name").addClass("hide");
-            $("#pseudonym-optional-label").addClass("hide");
-          }
-        })
+        $("#pseudonym-option")
+          .unbind("click")
+          .click(function() {
+            if ($(this).hasClass("checkbox-selected")) {
+              $(this).removeClass("checkbox-selected");
+              $("#exec-title").removeClass("hide");
+              $("#exec-legal-name").removeClass("hide");
+              $("#pseudonym-optional-label").removeClass("hide");
+            } else {
+              $(this).addClass("checkbox-selected");
+              $("#exec-title").addClass("hide");
+              $("#exec-legal-name").addClass("hide");
+              $("#pseudonym-optional-label").addClass("hide");
+            }
+          })
         var emailView = $("#settings-exec-emails");
         emailView.children().remove();
+        var ea = false;
         list.iter(execEmails, function(email) {
-          displayEmail(emailView, email, execUID, teamid, function() {
+          displayEmail(emailView, ea, email, execUID, teamid, function() {
             execSettingsModal(execUID, teamid)
           });
         });
@@ -176,25 +179,27 @@ var settings = (function() {
       });
   }
 
-  function displayEmail(view, email, uid, teamid, done) {
+  function displayEmail(view, ea, email, uid, teamid, done) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
 
-    $("<button class='btn btn-default edit-signature'/>")
-      .text("Edit signature")
-      .appendTo(divEmailRowContent);
+    if (ea) {
+      $("<button class='btn btn-default edit-signature'/>")
+        .text("Edit signature")
+        .appendTo(divEmailRowContent);
+    }
 
     var emailLine = $("<div class='email-line ellipsis'/>")
       .appendTo(divEmailRowContent);
     $("<span class='email-address primary ellipsis'/>")
-      .text(email)
+      .text(email.email)
       .appendTo(emailLine);
-    if (isPrimary) {
+    if (email.email_primary) {
       $("<span class='email-label primary-label unselectable'/>")
         .text("PRIMARY")
         .appendTo(emailLine);
-    } else if (!isVerified) {
+    } else if (!email.email_confirmed) {
       $("<span class='email-label not-verified-label unselectable'/>")
         .text("NOT VERIFIED")
         .appendTo(emailLine);
@@ -202,18 +207,18 @@ var settings = (function() {
 
     var divEmailActions = $("<div class='email-actions'/>")
         .appendTo(divEmailRowContent);
-    if (!isPrimary && isVerified) {
+    if (!email.email_primary && email.email_confirmed) {
       $("<a href='#' class='email-action'/>")
         .text("Make primary")
         .click(function() { /* TODO */ return false; })
         .appendTo(divEmailActions);
-    } else if (isVerified) {
+    } else if (email.email_confirmed) {
       $("<span class='verified-label unselectable'/>")
         .text("Verified")
         .appendTo(divEmailActions);
-    } else if (!isVerified) {
+    } else if (!email.email_confirmed) {
       $("<a href='#' class='email-action'/>")
-        .text("Verify")
+        .text("Resend verification email")
         .click(function() {
           var json = { email_address: email.email };
           api.resendEmailToken(login.me(), uid, teamid, json);
@@ -235,19 +240,28 @@ var settings = (function() {
         })
         .appendTo(divEmailActions);
     }
-    $("<span class='vertical-divider unselectable'/>")
-      .text("|")
-      .appendTo(divEmailActions);
-    $("<a href='#' class='email-action remove-email'/>")
-        .text("Remove")
-        .click(function() { /* TODO */ return false; })
-        .appendTo(divEmailActions);
 
     divEmailRow.appendTo(view);
   }
 
   function displayEmailAdd(view, uid, teamid, done) {
     var divEmailAdd = $("<div class='input-group'/>");
+
+
+    // var view = $("<div class='sched-step1-add-row'/>");
+
+    // var hosts = sched.getHosts(task);
+    // var adder = $("<div class='add-guest-circ'>");
+    // var plus = $("<img id='plus-guest'/>");
+    // plus.appendTo(adder);
+    // svg.loadImg(plus, "/assets/img/plus.svg");
+
+    // var addGuestDiv = $("<div/>");
+    // var addGuestText = $("<a id='add-guest-text' class='unselectable'/>")
+    //   .text("Add guest")
+    //   .appendTo(addGuestDiv);
+
+
     $("<label for='email-add' class='text-field-label'/>")
       .text("Add another email:")
       .appendTo(divEmailAdd);
@@ -283,8 +297,9 @@ var settings = (function() {
         $("#settings-signature").val(eaProf.signature);
         var emailView = $("#settings-emails");
         emailView.children().remove();
+        var ea = true;
         list.iter(eaEmails, function(email) {
-          displayEmail(emailView, email, eaUID, teamid, mod.load);
+          displayEmail(emailView, ea, email, eaUID, teamid, mod.load);
         });
         displayEmailAdd(emailView, eaUID, teamid, mod.load);
       });
