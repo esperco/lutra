@@ -115,7 +115,7 @@ var settings = (function() {
         var fullName = execProf.full_name;
         var familiarName = execProf.familiar_name;
         $("#exec-settings-title").text("Settings for " + familiarName);
-        $("#settings-modal-circ").text(fullName[0]);
+        $("#settings-modal-circ").text(fullName[0].toUpperCase());
         execNamePrefixSel = displayNamePrefixes(
           $("#settings-exec-name-prefix"),
           execProf.gender,
@@ -157,7 +157,7 @@ var settings = (function() {
             var row = $("<div class='exec-row clearfix'/>");
             var name = prof.full_name;
             $("<div class='settings-prof-circ'/>")
-              .text(name[0])
+              .text(name[0].toUpperCase())
               .appendTo(row);
             var gear = $("<a/>", {
               href: "#",
@@ -187,50 +187,63 @@ var settings = (function() {
       });
   }
 
-  function displayEmail(view, email, isPrimary, isVerified) {
+  function displayEmail(view, email, isPrimary, isVerified, isOnlyEmail) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
 
-    var divEmailActions =
-      $("<div class='email-actions email-actions-desktop'/>")
-        .appendTo(divEmailRowContent);
+    $("<button class='btn btn-default edit-signature'/>")
+      .text("Edit signature")
+      .appendTo(divEmailRowContent);
+
+    var emailLine = $("<div class='email-line ellipsis'/>")
+      .appendTo(divEmailRowContent);
+    $("<span class='email-address primary ellipsis'/>")
+      .text(email)
+      .appendTo(emailLine);
     if (isPrimary) {
-      $("<div class='primary-label unselectable'/>")
+      $("<span class='email-label primary-label unselectable'/>")
         .text("PRIMARY")
-        .appendTo(divEmailActions);
-    } else if (isVerified) {
+        .appendTo(emailLine);
+    } else if (!isVerified) {
+      $("<span class='email-label not-verified-label unselectable'/>")
+        .text("NOT VERIFIED")
+        .appendTo(emailLine);
+    }
+
+    var divEmailActions =
+      $("<div class='email-actions'/>")
+        .appendTo(divEmailRowContent);
+    if (!isPrimary && isVerified) {
       $("<a href='#' class='email-action'/>")
         .text("Make primary")
         .click(function() { /* TODO */ return false; })
         .appendTo(divEmailActions);
-    } else {
+    } else if (isVerified) {
+      $("<span class='verified-label unselectable'/>")
+        .text("Verified")
+        .appendTo(divEmailActions);
+    } else if (!isVerified) {
       $("<a href='#' class='email-action'/>")
         .text("Verify")
         .click(function() { /* TODO */ return false; })
         .appendTo(divEmailActions);
     }
-    $("<span class='vertical-divider'/>")
+    $("<span class='vertical-divider unselectable'/>")
       .text("|")
       .appendTo(divEmailActions);
-    $("<a href='#' class='email-action'/>")
-      .text("Remove")
-      .click(function() { /* TODO */ return false; })
-      .appendTo(divEmailActions);
+    if (isOnlyEmail) {
+      $("<span class='email-action remove-email-disabled unselectable'/>")
+        .text("Remove")
+        .appendTo(divEmailActions);
+    } else {
+      $("<a href='#' class='email-action remove-email'/>")
+        .text("Remove")
+        .click(function() { /* TODO */ return false; })
+        .appendTo(divEmailActions);
+    }
 
-    $("<div class='primary-label primary-label-mobile unselectable'/>")
-      .text("PRIMARY")
-      .appendTo(divEmailRowContent);
-    $("<div class='email-address primary ellipsis'/>")
-      .text(email)
-      .appendTo(divEmailRowContent);
-    var divEmailActionsMobile =
-      $("<div class='email-actions email-actions-mobile'/>")
-        .appendTo(divEmailRow);
-    $("<a href='#' class='email-action'/>")
-      .text("Remove")
-      .click(function() { /* TODO */ return false; })
-      .appendTo(divEmailActionsMobile);
+
 
     divEmailRow.appendTo(view);
   }
@@ -254,7 +267,7 @@ var settings = (function() {
         namePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         var fullName = eaProf.full_name;
-        $("#settings-profile-circ").text(fullName[0]);
+        $("#settings-profile-circ").text(fullName[0].toUpperCase());
         $("#settings-full-name").val(fullName);
         $("#settings-familiar-name").val(eaProf.familiar_name);
         $("#settings-formal-name").val(eaProf.formal_name);
@@ -262,7 +275,11 @@ var settings = (function() {
         var emailView = $("#settings-emails");
         emailView.children().remove();
         var primary = eaAccount.primary_email;
-        displayEmail(emailView, primary, true, true);
+        var oneEmail = true;
+        if (eaAccount.all_emails.length > 1) {
+          oneEmail = false;
+        }
+        displayEmail(emailView, primary, true, true, oneEmail);
         displayOtherEmails($("#settings-emails"),
           eaAccount.all_emails, primary);
       });

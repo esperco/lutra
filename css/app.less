@@ -25,6 +25,7 @@
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
 @red: #d9534f;
+@red_disabled: #eba8a7;
 @red_hover: #d2322d;
 @white: #ffffff;
 
@@ -393,6 +394,7 @@ object {
 .exec-row,
 .email-row,
 .account-row {
+  height: 85px;
   padding: 15px 10px;
   border-bottom: 1px solid @gray_10;
   &:hover { background: @gray_f8; }
@@ -418,8 +420,8 @@ object {
 }
 
 .task-list,
-#user-profile,
-#executives,
+#settings-emails,
+#settings-executives,
 #email-addresses,
 #linked-accounts,
 #scheduling-pref,
@@ -438,8 +440,8 @@ object {
   margin-top: 20px;
 }
 
-#user-profile,
-#executives,
+#settings-emails,
+#settings-executives,
 #email-addresses,
 #linked-accounts,
 #scheduling-pref,
@@ -1047,10 +1049,63 @@ object {
   #right-col { padding: 10px; }
 }
 
-
 #settings-update-account {
   float: right;
   margin-right: 10px;
+}
+
+.email-line {
+  padding-right: 10px;
+}
+
+.edit-signature {
+  float: right;
+  margin-top: 9px;
+}
+
+.email-address {
+  font-family: @bold;
+  font-size: 18px;
+}
+
+.email-label {
+  margin-left: 10px;
+  padding: 1px 4px;
+  padding-bottom: 0;
+  font-family: @bold;
+  font-size: 12px;
+  color: @white;
+  border-radius: 3px;
+}
+
+.primary-label {
+  background: @orange;
+}
+
+.not-verified-label {
+  background: @red;
+}
+
+.email-actions {
+  margin-top: 5px;
+}
+
+.verified-label {
+  color: @gray_40;
+}
+
+.vertical-divider {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.remove-email {
+  color: @red;
+  &:hover { color: @red_hover; }
+}
+
+.remove-email-disabled {
+  color: @red_disabled;
 }
 
 .not-connected circle {

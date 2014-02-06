@@ -11,17 +11,11 @@ var display = (function() {
     if ($(window).width() < 500) {
       $('.email-address').removeClass('desktop')
                          .addClass('mobile');
-      $('.primary-label-mobile').removeClass('hide');
-      $('.email-actions-desktop').addClass('hide');
-      $('.email-actions-mobile').removeClass('hide');
       $('.linked-account-email').addClass('hide');
       $('.extended-name').addClass('hide');
     } else {
       $('.email-address').addClass('desktop')
                          .removeClass('mobile');
-      $('.primary-label-mobile').addClass('hide');
-      $('.email-actions-desktop').removeClass('hide');
-      $('.email-actions-mobile').addClass('hide');
       $('.linked-account-email').removeClass('hide');
       $('.extended-name').removeClass('hide');
     }
