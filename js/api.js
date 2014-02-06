@@ -273,6 +273,12 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
+  mod.deletePlace = function(uid, placeid) {
+    var url = api_s_prefix() + "/place/edit/" +
+              encodeURIComponent(placeid);
+    return jsonHttpDelete(url);
+  };
+
   mod.getPlaceList = function(uid) {
     var url = api_s_prefix() + "/place/list/";
     return jsonHttpGet(url);

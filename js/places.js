@@ -97,11 +97,17 @@ var places = (function() {
     } else {
       $("#edit-place-address").prop("disabled", true);
     }
-    var editSave = $("#edit-place-save");
-    editSave.one("click", function() {
+    $("#edit-place-save").one("click", function() {
       savePlaceChanges(place);
       return false;
     });
+    $("#edit-place-delete")
+      .removeClass("hide")
+      .one("click", function() {;
+        removePlace(login.me(), place.placeid);
+        return false;
+      });
+    $("#edit-place-title").text("Change your location details:");
     editModal.modal({});
   }
 
@@ -283,6 +289,13 @@ var places = (function() {
     }
   }
 
+  function removePlace(uid, placeid) {
+    $("#edit-place-modal").modal("hide");
+    api.deletePlace(uid, placeid).done(function() {
+      api.getPlaceList(uid).done(displayPlaces);
+    });
+  }
+
   function newPlaceAction() {
     var editModal = $("#edit-place-modal");
     $("#edit-place-save").one("click", function() {
@@ -291,6 +304,8 @@ var places = (function() {
     });
     emptyEditModal();
     $("#edit-place-address").prop("disabled", false);
+    $("#edit-place-delete").addClass("hide");
+    $("#edit-place-title").text("Enter your location details:");
     editModal.modal({});
   }
 
@@ -310,6 +325,7 @@ var places = (function() {
     var editModal = $("#edit-place-modal");
     editModal.on("hidden.bs.modal", function() {
       $("#edit-place-save").off("click");
+      $("#edit-place-delete").off("click");
     });
   };
 
