@@ -422,7 +422,7 @@ object {
 .task-list,
 #settings-emails,
 #settings-executives,
-#email-addresses,
+#settings-exec-emails,
 #linked-accounts,
 #scheduling-pref,
 #places,
@@ -442,7 +442,7 @@ object {
 
 #settings-emails,
 #settings-executives,
-#email-addresses,
+#settings-exec-emails,
 #linked-accounts,
 #scheduling-pref,
 #workflow-options,
@@ -1009,6 +1009,7 @@ object {
 }
 
 #settings-executives-title,
+#settings-exec-emails-title,
 #linked-accounts-title,
 #scheduling-pref-title {
   margin-top: 60px;
@@ -1049,9 +1050,28 @@ object {
   #right-col { padding: 10px; }
 }
 
-#settings-update-account {
+#user-title,
+#settings-name-prefix,
+#exec-title,
+#settings-exec-name-prefix {
+  float: left;
+}
+
+#settings-name-prefix,
+#settings-exec-name-prefix {
+  padding-top: 45px;
+}
+
+#user-legal-name,
+#exec-legal-name {
+  padding-left: 96px;
+}
+
+#settings-update-account,
+#settings-update-name,
+#settings-update-password {
   float: right;
-  margin-right: 10px;
+  margin-top: 20px;
 }
 
 .email-line {
@@ -1079,7 +1099,7 @@ object {
 }
 
 .primary-label {
-  background: @orange;
+  background: @green;
 }
 
 .not-verified-label {

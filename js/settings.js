@@ -62,45 +62,24 @@ var settings = (function() {
     var familiarName = $("#settings-exec-familiar-name").val();
     var formalName = $("#settings-exec-formal-name").val();
     var prefix = execNamePrefixSel.get();
-    var phoneNumber = $("#settings-exec-phone").val();
-    var password = $("#settings-exec-password").val();
-    var confirmPassword = $("#settings-exec-confirm-password").val();
 
-    var maybeChangePassword = deferred.defer(null);
-    if (password != "") {
-      if (password != confirmPassword) {
-        // Shouldn't happen unless util.afterTyping got faked out...
-        alert("Password does not match confirmation!");
-      } else {
-        maybeChangePassword =
-          api.changePassword(
-            assistantProfile.profile_uid,
-            execProfile.profile_uid,
-            teamid,
-            password
-          );
-      }
-    }
-
-    maybeChangePassword.done(function() {
-      var profileEdit = {
-        profile_uid: execProfile.profile_uid,
-        familiar_name: familiarName,
-        full_name: fullName,
-        formal_name: formalName,
-        gender: execProfile.gender,
-        prefix: prefix,
-        phone_number: phoneNumber
-      };
-      api.postProfile(profileEdit, teamid).done(function(prof) {
-        api.getProfile(execProfile.profile_uid).done(function(prof) {
-          execProfile = prof;
-          //console.log("Edited: " + prof.toSource());
-          profile.set(prof);
-          $(".exec-settings-modal").modal("hide");
-          home.load();
-          settings.load();
-        });
+    var profileEdit = {
+      profile_uid: execProfile.profile_uid,
+      familiar_name: familiarName,
+      full_name: fullName,
+      formal_name: formalName,
+      gender: execProfile.gender,
+      prefix: prefix,
+      // phone_number: phoneNumber
+    };
+    api.postProfile(profileEdit, teamid).done(function(prof) {
+      api.getProfile(execProfile.profile_uid).done(function(prof) {
+        execProfile = prof;
+        //console.log("Edited: " + prof.toSource());
+        profile.set(prof);
+        $(".exec-settings-modal").modal("hide");
+        home.load();
+        settings.load();
       });
     });
   }

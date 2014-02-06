@@ -7,18 +7,20 @@
     <div id="settings-user-profile" class="clearfix">
       <div id="left-col" class="form-group col-md-6">
         <div id="settings-prof-pic">
-          <div class="settings-prof-circ" id="settings-profile-circ"></div>
+          <div id="settings-profile-circ" class="settings-prof-circ"></div>
           <button id="settings-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
         </div>
-        <label for="settings-full-name-group" class="text-field-label">Full name</label>
-        <div id="settings-full-name-group" class="input-group">
-          <div class="input-group-btn" id="settings-name-prefix"></div>
-          <input type="text" id="settings-full-name" class="form-control">
+        <div id="user-title">
+          <label for="settings-name-prefix" class="text-field-label">Title</label>
+          <div id="settings-name-prefix" class="input-group-btn"></div>
         </div>
-        <label for="settings-familiar-name" class="text-field-label">Familiar name</label>
-        <input type="text" id="settings-familiar-name" class="form-control">
-        <label for="settings-formal-name" class="text-field-label">Formal name</label>
-        <input type="text" id="settings-formal-name" class="form-control">
+        <div id="user-legal-name">
+          <label for="settings-full-name" class="text-field-label">First Name</label>
+          <input type="text" id="settings-full-name" class="form-control">
+          <label for="settings-familiar-name" class="text-field-label">Last Name</label>
+          <input type="text" id="settings-familiar-name" class="form-control">
+        </div>
+        <button id="settings-update-name" class="btn btn-primary">Update</button>
       </div>
       <div id="right-col" class="form-group col-md-6">
         <label for="settings-username" class="text-field-label">Username</label>
@@ -29,9 +31,10 @@
         <input type="password" id="settings-confirm-password" class="form-control">
         <label for="settings-signature" class="text-field-label hide">Email signature</label>
         <textarea name="settings-signature" rows="3" id="settings-signature" class="form-control hide"></textarea>
+        <button id="settings-update-password" class="btn btn-primary hide">Update</button>
+        <button id="settings-update-account" class="btn btn-primary">Update</button>
       </div>
     </div>
-    <button id="settings-update-account" class="btn btn-primary">Update</button>
   </div>
   <div id="settings-emails-title" class="settings-title">EMAIL ADDRESSES</div>
   <div id="settings-emails"></div>
@@ -54,32 +57,24 @@
       </div>
       <div class="modal-body" id="exec-settings-body">
         <div class="exec-profile clearfix">
-          <div class="form-group col-md-6">
-            <div id="prof-pic">
-              <div class="settings-prof-circ" id="settings-modal-circ">
-              </div>
-              <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
-            </div>
-            <label for="settings-exec-full-name-group" class="text-field-label">Full name</label>
-            <div id="settings-exec-full-name-group" class="input-group">
-              <div class="input-group-btn" id="settings-exec-name-prefix"></div>
-              <input type="text" id="settings-exec-full-name" class="form-control">
-            </div>
-            <label for="last-name" class="text-field-label">Familiar name</label>
+          <div id="prof-pic" class="clearfix">
+            <div id="settings-modal-circ" class="settings-prof-circ"></div>
+            <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
+          </div>
+          <div id='exec-title'>
+            <label for="settings-exec-name-prefix" class="text-field-label">Title</label>
+            <div id="settings-exec-name-prefix" class="input-group-btn"></div>
+          </div>
+          <div id='exec-legal-name'>
+            <label for="settings-exec-full-name" class="text-field-label">First Name</label>
+            <input type="text" id="settings-exec-full-name" class="form-control">
+            <label for="settings-exec-familiar-name" class="text-field-label">Last Name</label>
             <input type="text" id="settings-exec-familiar-name" class="form-control">
-            <label for="preferred-name" class="text-field-label">Formal name</label>
-            <input type="text" id="settings-exec-formal-name" class="form-control">
           </div>
-          <div class="form-group col-md-6">
-            <label for="phone-number" class="text-field-label hide">Phone number</label>
-            <input type="text" id="settings-exec-phone" class="form-control hide">
-            <label for="username" class="text-field-label">Username</label>
-            <input type="email" id="settings-exec-username" class="form-control" disabled>
-            <label for="password" class="text-field-label">Password</label>
-            <input type="password" id="settings-exec-password" class="form-control">
-            <label for="confirm-password" class="text-field-label">Confirm password</label>
-            <input type="password" id="settings-exec-confirm-password" class="form-control">
-          </div>
+          <label for="settings-exec-formal-name" class="text-field-label">Pseudonym (optional)</label>
+          <input type="text" id="settings-exec-formal-name" class="form-control">
+          <label for="phone-number" class="text-field-label hide">Phone number</label>
+          <input type="text" id="settings-exec-phone" class="form-control hide">
         </div>
         <div id="settings-exec-emails-title" class="settings-title">EMAIL ADDRESSES</div>
         <div id="settings-exec-emails"></div>
