@@ -123,14 +123,36 @@ var api = (function () {
     return "/api/account/" + login.data.uid;
   }
 
-  mod.getAccount = function(theirUID, teamid) {
-    return jsonHttpGet(api_account_prefix() + "/" + theirUID + "/" + teamid);
+
+  /* Email management */
+
+  mod.getEmails = function(theirUID, teamid) {
+    var url = api_q_prefix()  + "/email/" + theirUID + "/" + teamid;
+    return jsonHttpGet(url);
   };
 
-  mod.postAccount = function(theirUID, teamid, accountEdit) {
-    var url = api_account_prefix() + "/" + theirUID + "/" + teamid;
-    return jsonHttpPost(url, JSON.stringify(accountEdit));
+  mod.postEmail = function(myUID, theirUID, teamid, email) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid;
+    return jsonHttpPost(url, JSON.stringify(email));
   };
+
+  mod.deleteEmail = function(myUID, theirUID, teamid, email) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid +
+      "/remove";
+    return jsonHttpPost(url, JSON.stringify(email));
+  };
+
+  mod.resendEmailToken = function(myUID, theirUID, teamid, email) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid +
+      "/resend-token";
+    return jsonHttpPost(url, JSON.stringify(email));
+  };
+
+  mod.emailVerify = function(uid, email, token) {
+    var url = "/api/q/" + uid + "/email-verify/" + encodeURIComponent(token);
+    return jsonHttpPost(url, JSON.stringify(email));
+  };
+
 
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active");

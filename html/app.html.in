@@ -204,6 +204,10 @@
       @@reset-password.html@@
     </div>
 
+    <div id="email-verify-page" class="hide email-verify-page">
+      @@email-verify.html@@
+    </div>
+
     <div id="home-page" class="hide home-page tab-content">
       <div id="home-push" class="hide"></div>
       <div id="all-tasks" class="tab-pane">

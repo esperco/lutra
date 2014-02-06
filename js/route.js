@@ -42,6 +42,9 @@ var route = (function() {
     "reset-password/:uid/:token route" : function(data) {
       page.resetPassword.load(data.uid, data.token);
     },
+    "email-verify/:uid/:email/:token route" : function(data) {
+      page.emailVerify.load(data.uid, data.email, data.token);
+    },
 
     /* various pages */
 
