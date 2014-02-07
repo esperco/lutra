@@ -62,25 +62,16 @@ var settings = (function() {
     var prefix = execNamePrefixSel.get();
     var firstName = $("#settings-exec-first-name").val();
     var lastName = $("#settings-exec-last-name").val();
-    var pseudonym = $("#settings-exec-pseudonym").val();
-    var name = null;
-    if (pseudonym != "") {
-      if (firstName != "" && lastName != "") {
-        name = ["Both_names", [
-          { first_name: firstName, last_name: lastName },
-          pseudonym
-        ]];
-      } else {
-        name = ["Pseudonym", pseudonym];
-      }
-    } else {
-      name = ["First_last", { first_name: firstName, last_name: lastName }];
-    }
+    var pseudo = $("#settings-exec-pseudonym").val();
+    var firstLast = null;
+    if (firstName != "" && lastName != "")
+      firstLast = [firstName, lastName];
 
     var profileEdit = {
       profile_uid: execProfile.profile_uid,
       prefix: prefix,
-      name: name,
+      first_last: firstLast,
+      pseudonym: (pseudo != "" ? pseudo : null),
       gender: execProfile.gender
     };
     api.postProfile(profileEdit, teamid).done(function(prof) {
@@ -116,31 +107,25 @@ var settings = (function() {
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
-        var modalCirc = $("<div class='settings-modal-circ'/>");
+        var modalCirc = $("#settings-modal-circ");
         var modalTitle = $("#exec-settings-title");
-        switch (execProf.name[0]) {
-          case "First_last":
-            firstName = execProf.name[1].first_name;
-            lastName = execProf.name[1].last_name;
+        if (execProf.first_last) {
+          firstName = execProf.first_last[0];
+          lastName = execProf.first_last[1];
+          if (execProf.pseudonym) {
+            pseudonym = execProf.pseudonym;
+            modalCirc.text(pseudonym[0].toUpperCase());
+            modalTitle.text("Settings for " + pseudonym);
+          } else {
             modalCirc.text(firstName[0].toUpperCase());
             modalTitle.text("Settings for " + firstName);
-            showFirstLastPseudonym();
-            break;
-          case "Pseudonym":
-            pseudonym = execProf.name[1];
-            modalCirc.text(pseudonym[0].toUpperCase());
-            modalTitle.text("Settings for " + pseudonym);
-            showOnlyPseudonym();
-            break;
-          case "Both_names":
-            var firstLast = execProf.name[1][0];
-            firstName = firstLast.first_name;
-            lastName = firstLast.last_name;
-            pseudonym = execProf.name[1][1];
-            modalCirc.text(pseudonym[0].toUpperCase());
-            modalTitle.text("Settings for " + pseudonym);
-            showFirstLastPseudonym();
-            break;
+          }
+          showFirstLastPseudonym();
+        } else {
+          pseudonym = execProf.pseudonym;
+          modalCirc.text(pseudonym[0].toUpperCase());
+          modalTitle.text("Settings for " + pseudonym);
+          showOnlyPseudonym();
         }
 
         execNamePrefixSel = displayNamePrefixes(
@@ -194,24 +179,20 @@ var settings = (function() {
             execEmails.filter(function(e) { return e.email_primary; });
           var primaryEmail = primaryOnly[0].email;
           var row = $("<div class='exec-row clearfix'/>");
-          var name = "";
+          var firstLast = "";
           var pseudonym = "";
           var profCirc = $("<div class='settings-prof-circ'/>");
-          switch (prof.name[0]) {
-            case "First_last":
-              name = prof.name[1].first_name + " " + prof.name[1].last_name;
-              profCirc.text(name[0].toUpperCase());
-              break;
-            case "Pseudonym":
-              pseudonym = prof.name[1];
+          if (prof.first_last) {
+            firstLast = prof.first_last[0] + " " + prof.first_last[1];
+            if (prof.pseudonym) {
+              pseudonym = prof.pseudonym;
               profCirc.text(pseudonym[0].toUpperCase());
-              break;
-            case "Both_names":
-              var firstLast = prof.name[1][0];
-              name = firstLast.first_name + " " + firstLast.last_name;
-              pseudonym = prof.name[1][1];
+            } else {
+              profCirc.text(firstLast[0].toUpperCase());
+            }
+          } else {
+              pseudonym = prof.pseudonym;
               profCirc.text(pseudonym[0].toUpperCase());
-              break;
           }
           profCirc.appendTo(row);
           var gear = $("<a/>", {
@@ -229,7 +210,7 @@ var settings = (function() {
           gear.appendTo(row);
           var details = $("<div class='exec-details'/>");
           $("<div class='exec-name ellipsis'/>")
-            .text(pseudonym ? pseudonym : name)
+            .text(pseudonym ? pseudonym : firstLast)
             .appendTo(details);
           $("<div class='exec-email ellipsis'/>")
             .text(primaryEmail)
@@ -353,21 +334,20 @@ var settings = (function() {
       api.getEmails(eaUID, teamid).done(function(eaEmails) {
         asstNamePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
-        switch (eaProf.name[0]) {
-          case "First_last":
-            var firstName = eaProf.name[1].first_name;
+        if (eaProf.first_last) {
+          var firstName = eaProf.first_last[0];
+          $("#settings-first-name").val(firstName);
+          $("#settings-last-name").val(eaProf.first_last[1]);
+          if (eaProf.pseudonym) {
+            // This shouldn't happen...
+            $("#settings-profile-circ").text(eaProf.pseudonym[0].toUpperCase());
+          } else {
             $("#settings-profile-circ").text(firstName[0].toUpperCase());
-            $("#settings-first-name").val(eaProf.name[1].first_name);
-            $("#settings-last-name").val(eaProf.name[1].last_name);
-            break;
-          case "Pseudonym":
-            /* EAs don't normally have pseudonyms, except for test accounts
-               named after email addresses */
-            $("#settings-profile-circ").text(eaProf.name[1][0].toUpperCase());
-            break;
-          case "Both_names":
-            // TODO Display some kind of error? We don't allow this for EAs
-            break;
+          }
+        } else {
+          /* EAs don't normally have pseudonyms, except for test accounts
+             named after email addresses */
+          $("#settings-profile-circ").text(eaProf.pseudonym[0].toUpperCase());
         }
         var emailView = $("#settings-emails");
         emailView.children().remove();
@@ -409,12 +389,13 @@ var settings = (function() {
     var prefix = asstNamePrefixSel.get();
     var firstName = $("#settings-first-name").val();
     var lastName = $("#settings-last-name").val();
-    var name = ["First_last", { first_name: firstName, last_name: lastName }];
+    var firstLast = [firstName, lastName];
 
     var profileEdit = {
       profile_uid: asstProfile.profile_uid,
       prefix: prefix,
-      name: name,
+      first_last: firstLast,
+      pseudonym: asstProfile.pseudonym,
       gender: asstProfile.gender
     };
     api.postProfile(profileEdit, login.getTeam().teamid).done(function() {

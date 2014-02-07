@@ -119,15 +119,14 @@ var profile = (function() {
   };
 
   mod.fullName = function(prof) {
-    var tag = prof.name[0];
-    var value = prof.name[1];
-    switch (tag) {
-      case "First_last":
-        return value.first_name + " " + value.last_name;
-      case "Pseudonym":
-        return value;
-      case "Both_names":
-        return value[1];
+    if (prof.first_last) {
+      if (prof.pseudonym) {
+        return prof.pseudonym;
+      } else {
+        return prof.first_last[0] + " " + prof.first_last[1];
+      }
+    } else {
+      return prof.pseudonym;
     }
   }
 
