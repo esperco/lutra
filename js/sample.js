@@ -19,14 +19,14 @@ var sample = (function() {
   mod.robin = {
     profile_uid : robin_uid,
     username : "robin",
-    name : ["First_last", "Robin Kaufman"],
+    first_last : ["Robin", "Kaufman"],
     contact_email : "robin@formation8.com"
   };
 
   mod.joe = {
     profile_uid : joe_uid,
     username : "joe",
-    name : ["First_last", "Joe Lonsdale"],
+    first_last : ["Joe", "Lonsdale"],
     contact_email : "jlonsdale@gmail.com"
   };
 

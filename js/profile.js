@@ -120,7 +120,7 @@ var profile = (function() {
 
   mod.fullName = function(prof) {
     if (prof.first_last) {
-      if (prof.pseudonym) {
+      if (prof.pseudonym && !email.validate(prof.pseudonym)) {
         return prof.pseudonym;
       } else {
         return prof.first_last[0] + " " + prof.first_last[1];
