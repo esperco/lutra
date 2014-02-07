@@ -332,7 +332,7 @@ var home = (function() {
       profile.get(login.leader())
         .done(function(obsProf) {
           var p = obsProf.prof;
-          execNameView.text(p.full_name);
+          execNameView.text(profile.fullName(p));
           initialsView.text(profile.veryShortNameOfProfile(p));
         });
       var exec = $("<div id='exec-name-div'></div>")

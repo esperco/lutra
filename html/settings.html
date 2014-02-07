@@ -15,10 +15,10 @@
           <div id="settings-name-prefix" class="input-group-btn"></div>
         </div>
         <div id="user-legal-name">
-          <label for="settings-full-name" class="text-field-label">First Name</label>
-          <input type="text" id="settings-full-name" class="form-control">
-          <label for="settings-familiar-name" class="text-field-label">Last Name</label>
-          <input type="text" id="settings-familiar-name" class="form-control">
+          <label for="settings-first-name" class="text-field-label">First Name</label>
+          <input type="text" id="settings-first-name" class="form-control">
+          <label for="settings-last-name" class="text-field-label">Last Name</label>
+          <input type="text" id="settings-last-name" class="form-control">
         </div>
         <button id="settings-update-name" class="btn btn-primary">Update</button>
       </div>
@@ -31,8 +31,8 @@
         <input type="password" id="settings-confirm-password" class="form-control">
         <label for="settings-signature" class="text-field-label hide">Email signature</label>
         <textarea name="settings-signature" rows="3" id="settings-signature" class="form-control hide"></textarea>
-        <button id="settings-update-password" class="btn btn-primary hide">Update</button>
-        <button id="settings-update-account" class="btn btn-primary">Update</button>
+        <button id="settings-update-password" class="btn btn-primary">Update</button>
+        <!--<button id="settings-update-account" class="btn btn-primary">Update</button>-->
       </div>
     </div>
   </div>
@@ -61,20 +61,20 @@
             <div id="settings-modal-circ" class="settings-prof-circ"></div>
             <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
           </div>
-          <div id='exec-title'>
+          <div id='settings-exec-title'>
             <label for="settings-exec-name-prefix" class="text-field-label">Title</label>
             <div id="settings-exec-name-prefix" class="input-group-btn"></div>
           </div>
-          <div id='exec-legal-name'>
-            <label for="settings-exec-full-name" class="text-field-label">First Name</label>
-            <input type="text" id="settings-exec-full-name" class="form-control">
-            <label for="settings-exec-familiar-name" class="text-field-label">Last Name</label>
-            <input type="text" id="settings-exec-familiar-name" class="form-control">
+          <div id='settings-exec-legal-name'>
+            <label for="settings-exec-first-name" class="text-field-label">First Name</label>
+            <input type="text" id="settings-exec-first-name" class="form-control">
+            <label for="settings-exec-last-name" class="text-field-label">Last Name</label>
+            <input type="text" id="settings-exec-last-name" class="form-control">
           </div>
           <div id="pseudonym-container" class="clearfix">
-            <label for="settings-exec-formal-name" id="pseudonym-label">Pseudonym</label>
+            <label for="settings-exec-pseudonym" id="pseudonym-label">Pseudonym</label>
             <span id="pseudonym-optional-label">(optional)</span>
-            <input type="text" id="settings-exec-formal-name" class="form-control" placeholder="ex. Bono">
+            <input type="text" id="settings-exec-pseudonym" class="form-control" placeholder="ex. Bono">
             <div id="pseudonym-option">
               <img id="pseudonym-checkbox" class="svg" src="/assets/img/checkbox-sm.svg">
               <div id="pseudonym-checkbox-label">Only use pseudonym</div>
@@ -98,7 +98,7 @@
               </div>
               <div class="linked-account-status-text ellipsis">
                 <span id="google-status">Connected</span>
-                <span class="linked-account-email">as joelonsdale@gmail.com</span>
+                <span class="linked-account-email hide">as joelonsdale@gmail.com</span>
               </div>
             </div>
           </div>

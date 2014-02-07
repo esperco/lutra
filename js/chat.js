@@ -9,7 +9,7 @@ var chat = (function () {
 
   function full_name(uid) {
     var p = profiles[uid].prof;
-    return p ? p.full_name : "John Doe";
+    return p ? profile.fullName(p) : "John Doe";
   }
 
   function chat_participant_names(chat) {
@@ -23,9 +23,9 @@ var chat = (function () {
         if (! p) {
           someone_else = true;
         } else if (names) {
-          names += ", " + p.full_name;
+          names += ", " + profile.fullName(p);
         } else {
-          names = p.full_name;
+          names = profile.fullName(p);
         }
       }
     }
@@ -542,7 +542,7 @@ var chat = (function () {
               peerUid = chat.chat_participants[0].par_uid;
             var p = profiles[peerUid].prof;
             var tab_initials = profile.veryShortNameOfProfile(p);
-            tab.tooltip({"title":p.full_name,"placement":"bottom"})
+            tab.tooltip({"title":profile.fullName(p),"placement":"bottom"})
               .append($("<div class='chat-prof-circ'/>")
                       .append(tab_initials));
           }

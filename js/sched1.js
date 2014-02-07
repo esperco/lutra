@@ -96,8 +96,9 @@ var sched1 = (function() {
             optUid = uid;
             nameInput.attr("id", "name-" + uid);
             emailInput.attr("id", "email-" + uid);
-            if (prof.full_name !== emailAddr || ! prof.editable)
-              nameInput.val(prof.full_name);
+            var fullName = profile.fullName(prof);
+            if (fullName !== emailAddr || ! prof.editable)
+              nameInput.val(fullName);
             updateNameEditability(prof.editable);
             updateAddButton(hosts, guestTbl);
           });
@@ -140,8 +141,9 @@ var sched1 = (function() {
       var uid = optUid;
       api.getProfile(uid)
         .then(function(prof) {
-          prof.full_name = name;
-          prof.familiar_name = name;
+          /* TODO How should we fill in the name here? */
+          //prof.full_name = name;
+          //prof.familiar_name = name;
           if (prof.editable) {
             api.postProfile(prof, login.getTeam().teamid)
               .then(addProfile(uid, prof));
