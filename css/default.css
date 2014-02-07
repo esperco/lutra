@@ -132,6 +132,13 @@ body {
 	margin-left: auto;
 }
 
+.legal-label {
+	color: #a7a9ac;
+	font-family: 'Proxima Nova Light';
+	font-size: 14px;
+	letter-spacing: 3px;
+}
+
 .legal-title {
 	margin-bottom: 10px;
 	font-family: 'Proxima Nova Light';
