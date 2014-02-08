@@ -5,13 +5,18 @@
 var home = (function() {
   var mod = {};
 
-  var reStatusTime = /<<time:([^>]+)>>/;
+  var reStatusTime = /<<time:([^>]+)>>/gi;
   function taskStatus(ta) {
-    return ta.task_status_text.replace(reStatusTime, function(_match,timeStr) {
-      var time = date.ofString(timeStr);
-      return date.viewTimeAgo(time).text()
-           + " at " + date.utcToLocalTimeOnly(time);
-    }, "i");
+    return ta.task_status_text.replace(reStatusTime,
+      function(orgMatch, timeStr) {
+        try {
+          var time = date.ofString(timeStr);
+          return date.viewTimeAgo(time).text()
+               + " at " + date.utcToLocalTimeOnly(time);
+        } catch(e) {
+          return orgMatch;
+        }
+      });
   }
 
   function viewOfTaskRow(ta, taskViewId) {
