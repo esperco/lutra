@@ -5,6 +5,15 @@
 var home = (function() {
   var mod = {};
 
+  var reStatusTime = /<<time:([^>]+)>>/;
+  function taskStatus(ta) {
+    return ta.task_status_text.replace(reStatusTime, function(_match,timeStr) {
+      var time = date.ofString(timeStr);
+      return date.viewTimeAgo(time).text()
+           + " at " + date.utcToLocalTimeOnly(time);
+    }, "i");
+  }
+
   function viewOfTaskRow(ta, taskViewId) {
     var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId});
 
@@ -51,7 +60,7 @@ var home = (function() {
       $("<a href='#!task/" + ta.tid + "' class='task-title ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
-      $("<div class='task-status'/>").text(ta.task_status_text)
+      $("<div class='task-status'/>").text(taskStatus(ta))
         .appendTo(taskDetails);
       $("<div class='task-date hide'></div>")
         .append($("<span class='verb'>Created </span>"))
