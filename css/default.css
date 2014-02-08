@@ -12,13 +12,16 @@ body {
   background: #a25cc6;
 }
 
+.bold {
+	font-family: 'Proxima Nova Semibold'
+}
+
 #main-navbar {
   height: 50px;
   background: #414042;
 }
 
 #brand {
-  width: 30px;
   height: 30px;
   margin-top: 10px;
   margin-left: 16px;
@@ -27,16 +30,17 @@ body {
 #login-button {
   margin-top: 10px;
   margin-right: 16px;
+  font-family: 'Proxima Nova Regular';
 }
 
 .container-wrap {
   padding-top: 140px;
-  padding-bottom: 200px;
+  /*padding-bottom: 200px;*/
   background: black;
 }
 
 .container-content {
-  max-width: 600px;
+  max-width: 520px;
   margin-right: auto;
   margin-left: auto;
   padding-right: 15px;
@@ -45,40 +49,61 @@ body {
 }
 
 #hero-mark {
-  width: 60px;
   height: 60px;
+  -webkit-animation-duration: 1.5s;
+  	 -moz-animation-duration: 1.5s;
+  			 -animation-duration: 1.5s;
 }
 
 #hero-word {
   width: 200px;
   margin-top: 30px;
-  margin-bottom: 50px;
+  margin-bottom: 100px;
 }
 
-#reg-form {
-  max-width: 290px;
-  margin-top: 30px;
-  margin-right: auto;
-  margin-left: auto;
+.header-text {
+	font-family: 'Proxima Nova Light';
+	font-size: 28px;
+	text-align: left;
 }
 
-.reg-form-element {
-  margin-bottom: 15px;
+#line1 {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 0.5s;
+  	 -moz-animation-delay: 0.5s;
+  			 -animation-delay: 0.5s;
 }
 
-#occupation-dropdown,
-#occuption-btn {
-  width: 100%;
-  text-align: left;
+#line2 {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 1s;
+  	 -moz-animation-delay: 1s;
+  			 -animation-delay: 1s;
 }
 
-.caret {
-  float: right;
-  margin-top: 8px;
+#description {
+	margin-top: 20px;
+	margin-bottom: 50px;
+	text-align: left;
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 1.5s;
+  	 -moz-animation-delay: 1.5s;
+  			 -animation-delay: 1.5s;
 }
 
-#reg-button {
-  float: left;
+#lead-form {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 2s;
+  	 -moz-animation-delay: 2s;
+  			 -animation-delay: 2s;
 }
 
 #main-footer {
@@ -153,10 +178,10 @@ body {
 	margin-left: 5px;
   padding: 3px 8px;
   padding-bottom: 2px;
-  font-family: 'Proxima Nova Semibold';
+  font-family: 'Proxima Nova Regular';
   font-size: 13px;
-	color: black;
-	background: white;
+	color: white;
+	background: #414042;
 	border-radius: 3px;
 }
 
