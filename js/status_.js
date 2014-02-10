@@ -17,10 +17,14 @@ var status_ = (function() {
       .addClass("alert alert-" + kind)
       .addClass("fadeInDown")
       .removeClass("fadeOutUp hide")
-      .click(function() {
+      setTimeout(function() {
         elt.addClass("fadeOutUp")
            .removeClass("fadeInDown");
-      });
+      },3000);
+      // .click(function() {
+      //   elt.addClass("fadeOutUp")
+      //      .removeClass("fadeInDown");
+      // });
   };
 
   mod.reportError = function(msg) {

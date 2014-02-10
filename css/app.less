@@ -133,18 +133,22 @@ object {
 #return-home {
   float: left;
   margin-left: 16px;
-  margin-top: 23px;
   cursor: pointer;
 }
 
 #menu {
+  margin-top: 23px;
   &:hover g path { fill: @purple_hover; }
   &:active g path { fill: #7d3ca0; }
 }
 
 #return-home {
-  &:hover path { fill: @purple_hover; }
-  &:active path { fill: #7d3ca0; }
+  width: 20px;
+  height: 24px;
+  margin-top: 18px;
+  g path { fill: @purple; }
+  &:hover g path { fill: @purple_hover; }
+  &:active g path { fill: #7d3ca0; }
 }
 
 .nav-title {
@@ -952,23 +956,47 @@ object {
 
 /*** Login ***/
 
-#login-container {
-  padding-right: 15px;
-  padding-left: 15px;
+.login-container {
+  max-width: 432px;
   margin-right: auto;
   margin-left: auto;
-  max-width: 402px;
 }
 
-.desktop-login { margin-top: 160px; }
-.mobile-login { margin-top: 80px; }
+.desktop-login {
+  padding-top: 160px;
+  padding-right: 30px;
+  padding-left: 30px;
+  background: @gray_f8;
+  border-bottom-right-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
 
-.esper-title {
-  margin-bottom: 40px;
-  font-family: @light;
-  letter-spacing: 12px;
+.mobile-login {
+  padding-top: 80px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.logo-container {
   text-align: center;
-  color: @gray_60;
+}
+
+#login-hero-mark {
+  -webkit-animation-duration: 1.5s;
+     -moz-animation-duration: 1.5s;
+         -animation-duration: 1.5s;
+}
+
+.hero-mark {
+  height: 60px;
+  g path { fill: @gray_40; }
+}
+
+.hero-word {
+  width: 200px;
+  margin-top: 30px;
+  margin-bottom: 60px;
+  g path { fill: @gray_40; }
 }
 
 .text-field-label,
@@ -994,6 +1022,41 @@ object {
   -webkit-animation: login_error 1s;
      -moz-animation: login_error 1s;
           animation: login_error 1s;
+}
+
+#login-form,
+#request-password-form,
+#reset-password-form {
+  margin-bottom: 100px;
+}
+
+#request-help,
+#reset-help {
+  text-align: center;
+  margin-bottom: 40px;
+  color: @gray_60;
+}
+
+.login-footer {
+  height: 120px;
+  padding-top: 15px;
+  text-align: center;
+}
+
+.copyright {
+  margin-top: 20px;
+  font-size: 12px;
+  color: @gray_40;
+}
+
+.made {
+  font-size: 12px;
+  color: @gray_40;
+}
+
+.heart {
+  margin-right: 3px;
+  margin-left: 2px;
 }
 
 

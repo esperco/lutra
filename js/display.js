@@ -109,13 +109,13 @@ var display = (function() {
     if (!$('#task-page').hasClass('hide'))
       mod.updateTask();
 
-    if ($(window).width() < 620) {
-      $('#login-container')
+    if ($(window).width() < 432) {
+      $('.login-container')
         .removeClass('desktop-login')
         .addClass('mobile-login');
       $('.container').addClass('mobile');
     } else {
-      $('#login-container')
+      $('.login-container')
         .removeClass('mobile-login')
         .addClass('desktop-login');
       $('.container').removeClass('mobile');
