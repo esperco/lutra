@@ -3,21 +3,23 @@
 var sched4 = (function() {
   var mod = {};
 
+  var chats = null;
+
   function getSlot(ta) {
     var state = sched.getState(ta);
     return state.reserved.slot;
   }
 
-  function sentConfirmation(chats, uid) {
+  function sentConfirmation(uid) {
     var chat = chats[uid];
-    return list.exists(chat.chat_items, function(x) {
+    return chat && list.exists(chat.chat_items, function(x) {
       return (x.chat_item_data[0] === "Sched_confirm");
     });
   }
 
-  function sentReminder(chats, uid) {
+  function sentReminder(uid) {
     var chat = chats[uid];
-    return list.exists(chat.chat_items, function(x) {
+    return chat && list.exists(chat.chat_items, function(x) {
       return (x.chat_item_data[0] === "Sched_remind");
     });
   }
@@ -51,7 +53,7 @@ var sched4 = (function() {
     svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
 
     var recipientName = $("<div class='recipient-name' />")
-      .append(toObsProf.prof.full_name)
+      .append(profile.fullName(toObsProf.prof))
       .appendTo(x);
 
     x.click(function() {
@@ -83,7 +85,7 @@ var sched4 = (function() {
     loadRecipientRow(recipientRow, toObsProf);
   }
 
-  function preFillConfirmModal(chats, profs, ta, toUid) {
+  function preFillConfirmModal(profs, ta, toUid) {
     var toObsProf = profs[toUid];
     var slot = getSlot(ta);
 
@@ -92,9 +94,9 @@ var sched4 = (function() {
     $("#sched-confirm-subject")
       .val("Re: " + ta.task_status.task_title);
 
-    var organizerName = profs[login.me()].prof.full_name;
-    var hostName = profs[login.leader()].prof.full_name;
-    var toName = toObsProf.prof.full_name;
+    var organizerName = profile.fullName(profs[login.me()].prof);
+    var hostName = profile.fullName(profs[login.leader()].prof);
+    var toName = profile.fullName(toObsProf.prof);
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
@@ -185,7 +187,7 @@ var sched4 = (function() {
       });
   }
 
-  function editEventDetails(tid, chats, uid) {
+  function editEventDetails(tid, uid) {
     /* This function doesn't do anything right now,
       but it should be a function accessed on click (or automatically popped).
       It should accomplish the following:
@@ -197,12 +199,12 @@ var sched4 = (function() {
     elt.addClass("checked"); // does not work on SVG elements
   }
 
-  function createConfirmRow(chats, profs, ta, uid) {
+  function createConfirmRow(profs, ta, uid) {
     var view = $("<div class='sched-step4-row container clickable'/>");
 
     var divConfirmationCheck = $("<div class='check-div col-xs-1'/>");
     var checkConfirmation = $("<img class='check'/>");
-    if (sentConfirmation(chats, uid))
+    if (sentConfirmation(uid))
       markChecked(divConfirmationCheck);
 
     checkConfirmation.appendTo(divConfirmationCheck);
@@ -258,7 +260,7 @@ var sched4 = (function() {
     }
 
     function composeConfirmationEmail() {
-      preFillConfirmModal(chats, profs, ta, uid);
+      preFillConfirmModal(profs, ta, uid);
       setupSendButton();
       confirmModal.modal({});
     }
@@ -269,7 +271,7 @@ var sched4 = (function() {
     };
   }
 
-  function createConfirmSection(chats, profs, ta, guests) {
+  function createConfirmSection(profs, ta, guests) {
     var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
@@ -280,13 +282,13 @@ var sched4 = (function() {
       .appendTo(view);
 
     list.iter(guests, function(uid) {
-      var x = createConfirmRow(chats, profs, ta, uid);
+      var x = createConfirmRow(profs, ta, uid);
       x.view
         .appendTo(view);
 
       if (guests.length == 1) {
         var uid = guests[0];
-        if (! sentConfirmation(chats, uid))
+        if (! sentConfirmation(uid))
           x.composeConfirmationEmail();
       }
     });
@@ -301,7 +303,7 @@ var sched4 = (function() {
     });
   }
 
-  function createInviteRow(chats, profs, ta, uid) {
+  function createInviteRow(profs, ta, uid) {
     var view = $("<div class='sched-step4-row container clickable'>");
 
     var divInvitationCheck = $("<div class='check-div col-xs-1'>")
@@ -344,7 +346,7 @@ var sched4 = (function() {
     return view;
   }
 
-  function createReminderSelector(chats, profs, task, guests) {
+  function createReminderSelector(profs, task, guests) {
     var sel;
     var reserved = sched.getState(task).reserved;
 
@@ -397,9 +399,9 @@ var sched4 = (function() {
     var divReminderCheck = $("<div class='check-div col-xs-1'>")
       .appendTo(divReminder);
     var checkReminder = $("<img class='check'/>");
-    if (sentReminder(chats, guests[0] /* unclean; assumes all the guests
-                                       receive the same reminder at the
-                                       same time */))
+    if (sentReminder(guests[0] /* unclean; assumes all the guests
+                                  receive the same reminder at the
+                                  same time */))
       markChecked(divReminderCheck);
     checkReminder.appendTo(divReminderCheck);
     svg.loadImg(checkReminder, "/assets/img/check.svg")
@@ -425,7 +427,7 @@ var sched4 = (function() {
     return divReminder;
   }
 
-  function createInviteSection(chats, profs, ta, guests) {
+  function createInviteSection(profs, ta, guests) {
     var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
@@ -436,13 +438,13 @@ var sched4 = (function() {
       .appendTo(view);
 
     list.iter(guests, function(uid) {
-      createInviteRow(chats, profs, ta, uid)
+      createInviteRow(profs, ta, uid)
         .appendTo(view);
     });
     return view;
   }
 
-  function createRemindSection(chats, profs, task, guests) {
+  function createRemindSection(profs, task, guests) {
     var view = $("<div class='final-sched-div'/>");
 
     var title = guests.length > 1 ?
@@ -452,7 +454,7 @@ var sched4 = (function() {
       .text(title)
       .appendTo(view);
 
-    createReminderSelector(chats, profs, task, guests)
+    createReminderSelector(profs, task, guests)
       .appendTo(view);
 
     return view;
@@ -460,14 +462,17 @@ var sched4 = (function() {
 
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
-    var chats = sched.chatsOfTask(ta);
     var guests = sched.getGuests(ta);
+    chats = sched.chatsOfTask(ta);
 
     view
-      .append(createConfirmSection(chats, profs, ta, guests))
-      .append(createInviteSection(chats, profs, ta, guests))
-      .append(createRemindSection(chats, profs, ta, guests));
+      .append(createConfirmSection(profs, ta, guests))
+      .append(createInviteSection(profs, ta, guests))
+      .append(createRemindSection(profs, ta, guests));
 
+    task.onTaskParticipantsChanged.observe("step4", function(ta) {
+      chats = sched.chatsOfTask(ta);
+    });
     /* Task is always saved when remind changes. */
     task.onSchedulingStepChanging.stopObserve("step");
   };
