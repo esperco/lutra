@@ -133,18 +133,22 @@ object {
 #return-home {
   float: left;
   margin-left: 16px;
-  margin-top: 23px;
   cursor: pointer;
 }
 
 #menu {
+  margin-top: 23px;
   &:hover g path { fill: @purple_hover; }
   &:active g path { fill: #7d3ca0; }
 }
 
 #return-home {
-  &:hover path { fill: @purple_hover; }
-  &:active path { fill: #7d3ca0; }
+  width: 20px;
+  height: 24px;
+  margin-top: 18px;
+  g path { fill: @purple; }
+  &:hover g path { fill: @purple_hover; }
+  &:active g path { fill: #7d3ca0; }
 }
 
 .nav-title {
@@ -186,23 +190,16 @@ object {
     background: @purple_hover;
     cursor: pointer;
   }
-  #exec-circ-outline {
-    float: left;
-    padding: 2px;
-    height: 40px;
-    width: 40px;
-    border-radius: 20px;
-    background: @white;
-  }
   #exec-circ {
-    height: 36px;
-    width: 36px;
-    padding-top: 8px;
-    border-radius: 18px;
+    float: left;
+    width: 40px;
+    height: 40px;
+    padding-top: 10px;
+    border-radius: 20px;
     text-align: center;
     vertical-align: middle;
-    color: @white;
-    background: @gray_60;
+    color: @gray_90;
+    background: @white;
   }
   #exec-name-div {
     display: inline-block;
@@ -233,19 +230,69 @@ object {
 }
 
 .account-block {
-  margin: 0;
   height: 60px;
+  margin: 0;
   color: @gray_20;
   background: #282828 !important;
 }
 
-.nav-section-line {
+.logged-in-as {
+  padding: 15px;
+}
+
+.logged-in-text {
+  color: @gray_60;
+  font-family: @bold;
+  font-size: 12px;
+}
+
+.account-action {
+  width: 100%;
+  height: 28px;
+  margin-top: 6px;
+  padding-top: 2px;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-size: 14px;
+  color: @white;
+  background: none;
+  border: 1px solid @white;
+  border-radius: 3px;
+  &:hover {
+    color: @gray_90;
+    background: @white;
+  }
+}
+
+.account-action-left {
+  padding-right: 5px;
+  padding-left: 10px;
+}
+
+.account-action-right {
+  padding-right: 10px;
+  padding-left: 5px;
+}
+
+.account-divider-div {
+  height: 41px;
+  padding-top: 20px;
+  background: #282828;
+}
+
+.account-divider-line {
+  height: 1px;
+  background: @gray_90;
+}
+
+.nav-divider-line {
+  height: 1px;
   margin-top: 40px;
   margin-bottom: 20px;
-  height: 1px;
   background: @gray_80;
 }
 
+.account-section-title,
 .nav-section-title {
   position: relative;
   top: -0.5em;
@@ -253,9 +300,56 @@ object {
   padding-left: 8px;
   padding-right: 8px;
   color: @white;
-  background: @gray_90;
   font-family: @light;
   letter-spacing: 3px;
+}
+
+.account-section-title {
+  background: #282828;
+}
+
+.nav-section-title {
+  background: @gray_90;
+}
+
+.team-block {
+  height: 50px;
+  padding: 5px 10px;
+  background: #282828 !important;
+}
+
+.nav-team {
+  height: 40px;
+  padding: 8px 10px !important;
+  color: @gray_20;
+  border-radius: 3px !important;
+  &:hover { background: @gray_90 !important; }
+}
+
+.nav-active-team {
+  cursor: default;
+  background: @gray_90 !important;
+}
+
+.list-exec-circ {
+  float: left;
+  width: 24px;
+  height: 24px;
+  padding-top: 4px;
+  color: @gray_90;
+  font-size: 12px;
+  text-align: center;
+  background: @white;
+  border-radius: 12px;
+}
+
+.list-exec-name {
+  margin-top: 2px;
+  margin-left: 32px;
+}
+
+#account-block-push {
+  height: 20px;
 }
 
 .nav-block {
@@ -269,10 +363,6 @@ object {
   display: inline-block;
   margin-top: 10px;
   margin-left: 14px;
-}
-
-.nav-active-team {
-  cursor: default;
 }
 
 #settings-icon,
@@ -952,29 +1042,95 @@ object {
 
 /*** Login ***/
 
-#login-container {
-  padding-right: 15px;
-  padding-left: 15px;
+.login-container {
+  max-width: 432px;
   margin-right: auto;
   margin-left: auto;
-  max-width: 402px;
+  padding-bottom: 40px;
 }
 
-.desktop-login { margin-top: 160px; }
-.mobile-login { margin-top: 80px; }
+.desktop-login-container {
+  padding-top: 120px;
+  background: @gray_f8;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
 
-.esper-title {
-  margin-bottom: 40px;
-  font-family: @light;
-  letter-spacing: 12px;
+.mobile-login-container {
+  padding-top: 80px;
+}
+
+.logo-container {
   text-align: center;
+}
+
+#login-hero-mark {
+  -webkit-animation-duration: 1.5s;
+     -moz-animation-duration: 1.5s;
+         -animation-duration: 1.5s;
+}
+
+.hero-mark {
+  height: 60px;
+  margin-bottom: 40px;
+  g path { fill: @gray_40; }
+}
+
+#login-error-message,
+#request-error-message,
+#request-success-message,
+#reset-error-message {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: 20px;
+  padding: 10px;
+  color: @white;
+  text-align: center;
+}
+
+#login-error-message,
+#request-error-message,
+#reset-error-message {
+  background: @red;
+}
+
+#request-success-message {
+  background: @green;
+}
+
+#request-help,
+#reset-help {
+  text-align: center;
+  margin-right: 15px;
+  margin-bottom: 20px;
+  margin-left: 15px;
   color: @gray_60;
+}
+
+.login-form {
+  margin-bottom: 100px;
+}
+
+.desktop-login-form {
+  padding-right: 30px;
+  padding-left: 30px;
+}
+
+.mobile-login-form {
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .text-field-label,
 #forgot-password {
   padding-top: 20px;
+  padding-bottom: 5px;
   font-size: 14px;
+}
+
+.text-field-label {
+  float: left;
+  font-family: @bold;
 }
 
 #forgot-password {
@@ -991,9 +1147,39 @@ object {
 }
 
 .login-error {
-  -webkit-animation: login_error 1s;
-     -moz-animation: login_error 1s;
-          animation: login_error 1s;
+  -webkit-animation: login_error 1.25s;
+     -moz-animation: login_error 1.25s;
+          animation: login_error 1.25s;
+}
+
+.login-footer {
+  padding-top: 15px;
+  text-align: center;
+}
+
+.hero-word {
+  width: 100px;
+  g path { fill: @gray_40; }
+}
+
+.copyright {
+  margin-top: 10px;
+  font-size: 12px;
+  color: @gray_40;
+}
+
+.made {
+  font-size: 12px;
+  color: @gray_40;
+}
+
+.heart {
+  margin-right: 3px;
+  margin-left: 2px;
+}
+
+.login-footer-push {
+  height: 60px;
 }
 
 
@@ -2095,16 +2281,34 @@ object {
 }
 
 @-moz-keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 @-webkit-keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 @keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 
 .rotate (@rotation) {

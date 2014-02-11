@@ -38,7 +38,31 @@ var page = (function() {
   }
 
   /* Login screen */
+
+  function showLoginError(text) {
+    $("#login-error-message")
+      .text(text)
+      .removeClass("hide")
+      .addClass("fadeIn");
+    $("#login-email")
+      .val("")
+      .focus()
+      .addClass("login-error");
+    $("#login-password")
+      .val("")
+      .addClass("login-error");
+    setTimeout(function() {
+      $("#login-email").removeClass("login-error");
+      $("#login-password").removeClass("login-error");
+    },1250);
+  }
+
   function prepareLogin(redirPath) {
+    $("#login-error-message")
+      .removeClass("fadeIn")
+      .addClass("hide");
+    $("#login-email").val("");
+    $("#login-password").val("");
     $("#login-button")
       .unbind('click')
       .click(function() {
@@ -48,15 +72,51 @@ var page = (function() {
           login.login(email, password)
             .done(function() {
               route.nav.path(redirPath);
-            });
+            })
+            .fail(showLoginError("The email or password you entered is incorrect."));
+        } else {
+          showLoginError("Please enter both an email address and a password.");
         }
         return false;
       });
     util.changeFocus($("#login-email"));
   }
 
+  function showRequestMessage(success, input, text) {
+    if (success) {
+      $("#request-container").addClass("hide");
+      $("#request-error-message").addClass("hide");
+      $("#request-success-message")
+        .text(text)
+        .removeClass("hide")
+        .addClass("fadeIn");
+    } else {
+      $("#request-error-message")
+        .text(text)
+        .removeClass("hide")
+        .addClass("fadeIn");
+      input
+        .val("")
+        .focus()
+        .addClass("login-error");
+      setTimeout(function() {
+        input.removeClass("login-error");
+      },1250);
+    }
+  }
+
   function prepareRequestPassword(email0) {
+    $("#request-container").removeClass("hide");
+    $("#request-error-message")
+      .removeClass("fadeIn")
+      .addClass("hide");
+    $("#request-success-message")
+      .removeClass("fadeIn")
+      .addClass("hide");
+
+    var request = $("#passreq-button");
     var input = $("#passreq-email");
+    input.val("");
     if (! email0)
       email0 = $("#login-email").val();
 
@@ -64,48 +124,93 @@ var page = (function() {
 
     function submit() {
       var email = input.val();
-      if (email !== "") {
-        api.requestPassword(email)
-          .done(function() {
-            status_.reportSuccess("Success. Check your email.");
-          })
-          .fail(function () {
-            status_.reportError("Oops, something went wrong.");
-          });
-      };
+      api.requestPassword(email)
+        .done(function() {
+          showRequestMessage(true, input, "Check your email for a link to reset your password.");
+        })
+        .fail(function () {
+          showRequestMessage(false, input, "We couldn't find an account with that email address.");
+          updateRequestUI();
+        });
       return false;
     }
 
-    $("#passreq-button")
+    function isValidEmail(s) {
+      return s.length > 0;
+    }
+
+    function updateRequestUI() {
+      if (isValidEmail(input.val()))
+        request.removeClass("disabled");
+      else
+        request.addClass("disabled");
+    }
+
+    request
       .unbind('click')
       .click(submit);
 
+    updateRequestUI();
     util.changeFocus(input);
+    util.afterTyping(input, 250, updateRequestUI);
+  }
+
+  function showResetError(text) {
+    $("#reset-error-message")
+      .text(text)
+      .removeClass("hide")
+      .addClass("fadeIn");
+    $("#login-email")
+      .val("")
+      .focus()
+      .addClass("login-error");
+    $("#login-password")
+      .val("")
+      .addClass("login-error");
+    setTimeout(function() {
+      $("#login-email").removeClass("login-error");
+      $("#login-password").removeClass("login-error");
+    },1250);
   }
 
   function prepareResetPassword(uid, token) {
+    var reset = $("#passreset-button");
     var input = $("#passreset-password");
     input.val("");
 
+
     function submit() {
       var password = input.val();
-      if (password !== "") {
-        api.resetPassword(uid, token, password)
-          .done(function(x) {
-            login.setLoginInfo(x);
-            route.nav.path("");
-          })
-          .fail(function () {
-            status_.reportError("Oops, something went wrong.");
-          });
-      };
+      api.resetPassword(uid, token, password)
+        .done(function(x) {
+          login.setLoginInfo(x);
+          route.nav.path("");
+        })
+        .fail(function () {
+          showResetError("Oops, something went wrong.");
+          updateResetUI();
+        });
       return false;
     }
 
-    $("#passreset-button")
+    function isValidPassword(s) {
+      return s.length > 0;
+    }
+
+    function updateResetUI() {
+      if (isValidPassword(input.val()))
+        reset.removeClass("disabled");
+      else
+        reset.addClass("disabled");
+    }
+
+    reset
       .unbind('click')
       .click(submit);
+
+    updateResetUI();
     util.changeFocus(input);
+    util.afterTyping(input, 250, updateResetUI);
   }
 
   function prepareEmailVerify(uid, email, token) {
