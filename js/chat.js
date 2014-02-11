@@ -149,7 +149,10 @@ var chat = (function () {
 
   function audioPlayer(audioLink) {
     return $("<audio/>", {src:audioLink, controls:true})
-           .text("Left a voice message.");
+           .text("Left a voice message.")
+           .bind('ended', function() {
+             this.load();
+           });
   }
 
   function viewOfChatData(chat_item) {
