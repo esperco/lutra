@@ -15,10 +15,12 @@
 
   <body>
 
-    <div id="global-status" class="animated"></div>
+    <!-- <div id="global-status" class="animated"></div> -->
 
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
+      <li class="account-block hide">
+      <div class="nav-teams"></div>
       <li>
         <a href="#settings" class="account-block hide settings-nav" data-toggle="pill">
           <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
@@ -91,9 +93,7 @@
           <div class="nav-text">Places</div>
         </a>
       </li>
-      <div class="nav-section-line unselectable nav-teams">
-        <span class='nav-section-title'>TEAMS</span>
-      </div>
+
     </ul>
 
     <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
@@ -184,15 +184,16 @@
             <img class="svg hero-word" src="assets/img/esper-word.svg">
           </div>
         </div>
-        <form id="login-form" role="form">
+        <div id="login-error-message" class="animated hide"></div>
+        <form class="login-form" role="form">
           <div class="form-group">
-            <label for="login-email" class="text-field-label">Email address</label>
-            <input type="email" id="login-email" class="form-control login-error" tabindex=1>
+            <div class="text-field-label">Email address</div>
+            <input type="email" id="login-email" class="form-control" tabindex=1>
           </div>
           <div class="form-group">
-            <label for="login-password" class="text-field-label">Password</label>
+            <div class="text-field-label">Password</div>
             <a href="#!request-password" id="forgot-password">Forgot password?</a>
-            <input type="password" id="login-password" class="form-control login-error" tabindex=2>
+            <input type="password" id="login-password" class="form-control" tabindex=2>
           </div>
           <button id="login-button" class="btn btn-primary login-btn" tabindex=3>
             LOG IN

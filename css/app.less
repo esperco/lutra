@@ -962,19 +962,15 @@ object {
   margin-left: auto;
 }
 
-.desktop-login {
+.desktop-login-container {
   padding-top: 160px;
-  padding-right: 30px;
-  padding-left: 30px;
   background: @gray_f8;
   border-bottom-right-radius: 12px;
   border-bottom-left-radius: 12px;
 }
 
-.mobile-login {
+.mobile-login-container {
   padding-top: 80px;
-  padding-right: 15px;
-  padding-left: 15px;
 }
 
 .logo-container {
@@ -999,10 +995,59 @@ object {
   g path { fill: @gray_40; }
 }
 
+#login-error-message,
+#request-error-message,
+#request-success-message,
+#reset-error-message {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: 20px;
+  padding: 10px;
+  color: @white;
+  text-align: center;
+}
+
+#login-error-message,
+#request-error-message,
+#reset-error-message {
+  background: @red;
+}
+
+#request-success-message {
+  background: @green;
+}
+
+#request-help,
+#reset-help {
+  text-align: center;
+  margin-bottom: 20px;
+  color: @gray_60;
+}
+
+.login-form {
+  margin-bottom: 100px;
+}
+
+.desktop-login-form {
+  padding-right: 30px;
+  padding-left: 30px;
+}
+
+.mobile-login-form {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
 .text-field-label,
 #forgot-password {
   padding-top: 20px;
+  padding-bottom: 5px;
   font-size: 14px;
+}
+
+.text-field-label {
+  float: left;
+  font-family: @bold;
 }
 
 #forgot-password {
@@ -1019,22 +1064,9 @@ object {
 }
 
 .login-error {
-  -webkit-animation: login_error 1s;
-     -moz-animation: login_error 1s;
-          animation: login_error 1s;
-}
-
-#login-form,
-#request-password-form,
-#reset-password-form {
-  margin-bottom: 100px;
-}
-
-#request-help,
-#reset-help {
-  text-align: center;
-  margin-bottom: 40px;
-  color: @gray_60;
+  -webkit-animation: login_error 1.25s;
+     -moz-animation: login_error 1.25s;
+          animation: login_error 1.25s;
 }
 
 .login-footer {
@@ -2158,16 +2190,34 @@ object {
 }
 
 @-moz-keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 @-webkit-keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 @keyframes login_error {
-  0% { border-color: @red; }
-  100% { border-color: default }
+  0% {
+    background: @red_disabled;
+    border-color: @red;
+  }
+  100% {
+    background: default;
+    border-color: default
+  }
 }
 
 .rotate (@rotation) {

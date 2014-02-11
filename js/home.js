@@ -289,7 +289,7 @@ var home = (function() {
     var isActive = login.getTeam().teamname === team.teamname;
     var label = labelOfTeam(team);
     var li = $("<li class='nav-team'/>");
-    var a = $("<a href='#' class='nav-block' data-toggle='pill'/>")
+    var a = $("<a href='#' class='account-block hide' data-toggle='pill'/>")
       .appendTo(li);
     var div = $("<div class='nav-text'/>")
       .text(label)

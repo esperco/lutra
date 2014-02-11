@@ -109,16 +109,26 @@ var display = (function() {
     if (!$('#task-page').hasClass('hide'))
       mod.updateTask();
 
-    if ($(window).width() < 432) {
-      $('.login-container')
-        .removeClass('desktop-login')
-        .addClass('mobile-login');
+    if ($(window).width() < 620) {
       $('.container').addClass('mobile');
     } else {
-      $('.login-container')
-        .removeClass('mobile-login')
-        .addClass('desktop-login');
       $('.container').removeClass('mobile');
+    }
+
+    if ($(window).width() < 432) {
+      $('.login-container')
+        .removeClass('desktop-login-container')
+        .addClass('mobile-login-container');
+      $('.login-form')
+        .removeClass('desktop-login-form')
+        .addClass('mobile-login-form');
+    } else {
+      $('.login-container')
+        .removeClass('mobile-login-container')
+        .addClass('desktop-login-container');
+      $('.login-form')
+        .removeClass('mobile-login-form')
+        .addClass('desktop-login-form');
     }
   };
 
