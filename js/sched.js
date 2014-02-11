@@ -210,33 +210,41 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, profs, ta) {
+  function setup_step_buttons(tzList, ta) {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
         task.onSchedulingStepChanging.notify();
-        loadStep1(profs, ta);
+        task.profilesOfEveryone(ta).done(function(profs) {
+          loadStep1(profs, ta);
+        });
       });
     $(".sched-go-step2")
       .attr('disabled', mod.getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
         task.onSchedulingStepChanging.notify();
-        loadStep2(tzList, profs, ta);
+        task.profilesOfEveryone(ta).done(function(profs) {
+          loadStep2(tzList, profs, ta);
+        });
       });
     $(".sched-go-step3")
       .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
         task.onSchedulingStepChanging.notify();
-        loadStep3(profs, ta);
+        task.profilesOfEveryone(ta).done(function(profs) {
+          loadStep3(profs, ta);
+        });
       });
     $(".sched-go-step4")
       .attr('disabled', ! mod.getState(ta).reserved)
       .unbind('click')
       .click(function() {
         task.onSchedulingStepChanging.notify();
-        loadStep4(profs, ta);
+        task.profilesOfEveryone(ta).done(function(profs) {
+          loadStep4(profs, ta);
+        });
       });
   }
 
@@ -247,9 +255,9 @@ var sched = (function() {
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;
+        setup_step_buttons(tzList, ta);
         task.profilesOfEveryone(ta)
           .done(function(profs) {
-            setup_step_buttons(tzList, profs, ta);
             switch (progress) {
             case "Guest_list":
               loadStep1(profs, ta);

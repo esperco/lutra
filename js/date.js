@@ -62,12 +62,6 @@ var date = (function() {
       return "0" + s;
   }
 
-  mod.timeOnly = function(d) {
-    return pad(mod.hours(d))
-      + ":" + pad(mod.minutes(d))
-      + ":" + pad(mod.seconds(d));
-  };
-
   var weekDays =
     ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
@@ -93,24 +87,26 @@ var date = (function() {
   };
 
   /* "1:30 pm" */
-  mod.timeOnly = function(d) {
-    var hour = mod.hours(d);
-    var min = mod.minutes(d);
+  function formatTimeOnly(hour, min) {
     var ampm;
     var h;
     if (hour < 12) {
-      h = hour;
+      h = 0 < hour ? hour : 12;
       ampm = "am";
-    } else if (hour < 13) {
-      h = 12;
-      ampm = "pm";
-    }
-    else {
-      h = hour - 12;
+    } else {
+      h = 12 < hour ? hour - 12 : 12;
       ampm = "pm";
     }
     return h.toString() + ":" + pad(min.toString()) + " " + ampm;
+  }
+
+  mod.timeOnly = function(d) {
+    return formatTimeOnly(mod.hours(d), mod.minutes(d));
   };
+
+  mod.utcToLocalTimeOnly = function(d) {
+    return formatTimeOnly(d.getHours(), d.getMinutes());
+  }
 
   /* "Wednesday August 13, 2019 from 12:30pm to 1:30 pm" */
   mod.range = function(d1, d2) {
