@@ -91,9 +91,7 @@ var profile = (function() {
   };
 
   mod.veryShortNameOfProfile = function(prof) {
-    var result = mod.shortenName(prof.full_name);
-    if (result === "")
-      result = mod.shortenName(prof.familiar_name);
+    var result = mod.shortenName(mod.fullName(prof));
     return result;
   };
 
@@ -104,7 +102,7 @@ var profile = (function() {
 
     if (withTooltip)
       view.tooltip({
-        title: prof.full_name,
+        title: mod.fullName(prof),
         placement: "bottom"
       });
 
@@ -116,9 +114,21 @@ var profile = (function() {
 
   mod.viewMediumFullName = function(prof) {
     var view = $("<p class='guest-name'/>")
-      .text(prof.full_name);
+      .text(mod.fullName(prof));
     return view;
   };
+
+  mod.fullName = function(prof) {
+    if (prof.first_last) {
+      if (prof.pseudonym && !email.validate(prof.pseudonym)) {
+        return prof.pseudonym;
+      } else {
+        return prof.first_last[0] + " " + prof.first_last[1];
+      }
+    } else {
+      return prof.pseudonym;
+    }
+  }
 
   return mod;
 }());

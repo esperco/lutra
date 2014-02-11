@@ -341,8 +341,7 @@ var home = (function() {
       var view = $(this);
       view.children().remove();
       api.getProfile(login.me()).done(function(eaProf) {
-        assistantProfile = eaProf;
-        var fullName = eaProf.full_name;
+        var fullName = profile.fullName(eaProf);
         view.append("<div class='logged-in-text'>LOGGED IN AS</div>")
             .append("<div class='logged-in-name ellipsis'>" + fullName + "</div>");
       });
@@ -359,7 +358,7 @@ var home = (function() {
       profile.get(login.leader())
         .done(function(obsProf) {
           var p = obsProf.prof;
-          execNameView.text(p.full_name);
+          execNameView.text(profile.fullName(p));
           initialsView.text(profile.veryShortNameOfProfile(p));
         });
       var exec = $("<div id='exec-name-div'></div>")

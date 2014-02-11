@@ -27,9 +27,13 @@ var sched1 = (function() {
     var emailInput = $("<input type='email'/>")
       .addClass("form-control guest-input")
       .attr("placeholder", "Email address");
-    var nameInput = $("<input type='text'/>")
+    var firstNameInput = $("<input type='text'/>")
       .addClass("form-control guest-input")
-      .attr("placeholder", "Full name")
+      .attr("placeholder", "First name")
+      .attr("disabled", true);
+    var lastNameInput = $("<input type='text'/>")
+      .addClass("form-control guest-input")
+      .attr("placeholder", "Last name")
       .attr("disabled", true);
     var addButton = $("<button id='add-guest-btn'/>")
       .addClass("btn btn-primary disabled")
@@ -37,7 +41,8 @@ var sched1 = (function() {
     updateAddButton(hosts, guestTbl);
     var guestInputDiv = $("<div id='guest-input-div' class='hide'/>")
       .append(emailInput)
-      .append(nameInput)
+      .append(firstNameInput)
+      .append(lastNameInput)
       .append(addButton);
 
     function toggleAddGuest() {
@@ -73,10 +78,13 @@ var sched1 = (function() {
     var optUid;
 
     function updateNameEditability(editable) {
-      if (util.isString(optUid) && editable)
-        nameInput.removeAttr("disabled");
-      else
-        nameInput.attr("disabled", true);
+      if (util.isString(optUid) && editable) {
+        firstNameInput.removeAttr("disabled");
+        lastNameInput.removeAttr("disabled");
+      } else {
+        firstNameInput.attr("disabled", true);
+        lastNameInput.attr("disabled", true);
+      }
     }
 
     function clearUid() {
@@ -94,10 +102,14 @@ var sched1 = (function() {
             clearUid();
             var uid = prof.profile_uid;
             optUid = uid;
-            nameInput.attr("id", "name-" + uid);
+            firstNameInput.attr("id", "first-name-" + uid);
+            lastNameInput.attr("id", "last-name-" + uid);
             emailInput.attr("id", "email-" + uid);
-            if (prof.full_name !== emailAddr || ! prof.editable)
-              nameInput.val(prof.full_name);
+            // TODO Allow pseudonyms for guests?
+            if (prof.first_last || ! prof.editable) {
+              firstNameInput.val(prof.first_last[0]);
+              lastNameInput.val(prof.first_last[1]);
+            }
             updateNameEditability(prof.editable);
             updateAddButton(hosts, guestTbl);
           });
@@ -108,8 +120,10 @@ var sched1 = (function() {
     }
 
     function updateAddButton(hosts, guestTbl) {
-      var name = nameInput.val();
-      if (isValidName(name) && util.isString(optUid))
+      var firstName = firstNameInput.val();
+      var lastName = lastNameInput.val();
+      if (isValidName(firstName) && isValidName(lastName)
+          && util.isString(optUid))
         $("#add-guest-btn").removeClass("disabled");
       else
         $("#add-guest-btn").addClass("disabled");
@@ -119,7 +133,10 @@ var sched1 = (function() {
       fetchProfile();
     });
 
-    util.afterTyping(nameInput, 250, function() {
+    util.afterTyping(firstNameInput, 250, function() {
+      updateAddButton();
+    });
+    util.afterTyping(lastNameInput, 250, function() {
       updateAddButton();
     });
 
@@ -136,12 +153,13 @@ var sched1 = (function() {
     }
 
     addButton.click(function() {
-      var name = nameInput.val();
+      var firstName = firstNameInput.val();
+      var lastName = lastNameInput.val();
       var uid = optUid;
       api.getProfile(uid)
         .then(function(prof) {
-          prof.full_name = name;
-          prof.familiar_name = name;
+          // TODO Allow pseudonym for guests?
+          prof.first_last = [firstName, lastName];
           if (prof.editable) {
             api.postProfile(prof, login.getTeam().teamid)
               .then(addProfile(uid, prof));
