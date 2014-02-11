@@ -31,12 +31,6 @@ var svg = (function() {
       });
   };
 
-  mod.load = function(url) {
-    var result = $("<img/>");
-    mod.loadImg(result, url);
-    return result;
-  };
-
   mod.init = function() {
     $('img.svg').each(function(){
       var elt = $(this);
