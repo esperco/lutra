@@ -71,8 +71,7 @@ var home = (function() {
       var team_organizers = login.organizers();
       if (team_organizers.length > 1) {
         profile.mget(team_organizers).done(function(profs) {
-          var i = 0;
-          list.iter(team_organizers, function(organizer_uid) {
+          list.iter(team_organizers, function(organizer_uid, i) {
             var v = $("<span/>");
             var img = $("<img/>");
             v.append(img);
@@ -95,8 +94,6 @@ var home = (function() {
               }
               api.postTask(ta);
             });
-
-            ++i;
           });
         });
       }
