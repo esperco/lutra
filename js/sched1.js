@@ -267,7 +267,6 @@ var sched1 = (function() {
   }
 
   mod.load = function(profs, ta, view) {
-    console.log(profs.toSource());
     var view = $("#sched-step1-table");
     view.children().remove();
     $("<h3>Add guests to the meeting.</h3>")

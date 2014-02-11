@@ -102,7 +102,6 @@ var settings = (function() {
   function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
-      console.log("Executive: " + execProf.toSource());
       api.getEmails(execUID, teamid).done(function(execEmails) {
         var firstName = "";
         var lastName = "";
@@ -329,7 +328,6 @@ var settings = (function() {
     $("#settings-confirm-password").val("");
     api.getProfile(eaUID).done(function(eaProf) {
       asstProfile = eaProf;
-      console.log("Assistant: " + asstProfile.toSource());
       var teamid = login.getTeam().teamid;
       api.getEmails(eaUID, teamid).done(function(eaEmails) {
         asstNamePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
