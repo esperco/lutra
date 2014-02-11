@@ -276,7 +276,7 @@ var home = (function() {
   }
 
   function clearTeams() {
-    $(".nav-team").remove();
+    $(".team-block").remove();
   }
 
   function switchTeam(team) {
@@ -302,10 +302,13 @@ var home = (function() {
   function clickableViewOfTeam(team) {
     var isActive = login.getTeam().teamname === team.teamname;
     var label = labelOfTeam(team);
-    var li = $("<li class='nav-team'/>");
-    var a = $("<a href='#' class='account-block hide' data-toggle='pill'/>")
+    var li = $("<li class='team-block hide'/>");
+    var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
       .appendTo(li);
-    var div = $("<div class='nav-text'/>")
+    var pic = $("<div class='list-exec-circ'/>")
+      .text(profile.shortenName(label))
+      .appendTo(a);
+    var div = $("<div class='list-exec-name ellipsis'/>")
       .text(label)
       .appendTo(a);
 
@@ -333,14 +336,24 @@ var home = (function() {
     });
   }
 
+  function insertLoggedIn() {
+    $(".logged-in-as").each(function() {
+      var view = $(this);
+      view.children().remove();
+      api.getProfile(login.me()).done(function(eaProf) {
+        assistantProfile = eaProf;
+        var fullName = eaProf.full_name;
+        view.append("<div class='logged-in-text'>LOGGED IN AS</div>")
+            .append("<div class='logged-in-name ellipsis'>" + fullName + "</div>");
+      });
+    })
+  }
+
   function loadNavHeader() {
-    insertTeams();
     $(".nav-header").each(function() {
       var view = $(this);
       view.children().remove();
-      var initialsView = $("<div id='exec-circ'/>");
-      var circ = $("<div id='exec-circ-outline'></div>")
-        .append(initialsView)
+      var initialsView = $("<div id='exec-circ'/>")
         .appendTo(view);
       var execNameView = $("<div id='exec-name' class='ellipsis'/>");
       profile.get(login.leader())
@@ -362,11 +375,25 @@ var home = (function() {
         if (! $(this).hasClass("hide"))
           $(this).addClass("hide");
       });
+      $(".team-block").each(function() {
+        if (! $(this).hasClass("hide"))
+          $(this).addClass("hide");
+      });
+      $(".account-divider-div").each(function() {
+        if (! $(this).hasClass("hide"))
+          $(this).addClass("hide");
+      });
       view.click(function() {
         if (caretDiv.hasClass("account-nav-open")) {
           caretDiv.removeClass("account-nav-open");
           caretDiv.addClass("account-nav-closed");
           $(".account-block").each(function() {
+            $(this).addClass("hide");
+          });
+          $(".team-block").each(function() {
+            $(this).addClass("hide");
+          });
+          $(".account-divider-div").each(function() {
             $(this).addClass("hide");
           });
         } else {
@@ -375,9 +402,18 @@ var home = (function() {
           $(".account-block").each(function() {
             $(this).removeClass("hide");
           });
+          $(".team-block").each(function() {
+            $(this).removeClass("hide");
+          });
+          $(".account-divider-div").each(function() {
+            $(this).removeClass("hide");
+          });
         }
       });
     });
+
+    insertLoggedIn();
+    insertTeams();
   }
 
   mod.load = function() {
