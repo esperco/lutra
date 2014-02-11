@@ -11,26 +11,24 @@
           <button id="settings-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
         </div>
         <div id="user-title">
-          <label for="settings-name-prefix" class="text-field-label">Title</label>
           <div id="settings-name-prefix" class="input-group-btn"></div>
+          <div class="text-field-div text-field-label">Title</div>
         </div>
         <div id="user-legal-name">
-          <label for="settings-first-name" class="text-field-label">First Name</label>
+          <div class="text-field-div text-field-label">First Name</div>
           <input type="text" id="settings-first-name" class="form-control">
-          <label for="settings-last-name" class="text-field-label">Last Name</label>
+          <div class="text-field-div text-field-label">Last Name</div>
           <input type="text" id="settings-last-name" class="form-control">
         </div>
         <button id="settings-update-name" class="btn btn-primary">Update</button>
       </div>
       <div id="right-col" class="form-group col-md-6">
-        <label for="settings-username" class="text-field-label">Username</label>
+        <div class="text-field-div text-field-label">Username</div>
         <input type="email" id="settings-username" class="form-control" disabled>
-        <label for="settings-password" class="text-field-label">Password</label>
+        <div class="text-field-div text-field-label">Password</div>
         <input type="password" id="settings-password" class="form-control">
-        <label for="settings-confirm-password" class="text-field-label">Confirm password</label>
+        <div class="text-field-div text-field-label">Confirm password</div>
         <input type="password" id="settings-confirm-password" class="form-control">
-        <label for="settings-signature" class="text-field-label hide">Email signature</label>
-        <textarea name="settings-signature" rows="3" id="settings-signature" class="form-control hide"></textarea>
         <button id="settings-update-password" class="btn btn-primary">Update</button>
       </div>
     </div>
@@ -42,7 +40,7 @@
 </div>
 
 <div class="modal fade exec-settings-modal" tabindex="-1"
-     role="dialog" aria-labelledby="exec-settings-title"
+     role="dialog" aria-divledby="exec-settings-title"
      aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-close-circ" data-dismiss="modal">
@@ -61,25 +59,25 @@
             <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
           </div>
           <div id='settings-exec-title'>
-            <label for="settings-exec-name-prefix" class="text-field-label">Title</label>
+            <div for="settings-exec-name-prefix" class="text-field-div">Title</div>
             <div id="settings-exec-name-prefix" class="input-group-btn"></div>
           </div>
           <div id='settings-exec-legal-name'>
-            <label for="settings-exec-first-name" class="text-field-label">First Name</label>
+            <div for="settings-exec-first-name" class="text-field-div">First Name</div>
             <input type="text" id="settings-exec-first-name" class="form-control">
-            <label for="settings-exec-last-name" class="text-field-label">Last Name</label>
+            <div for="settings-exec-last-name" class="text-field-div">Last Name</div>
             <input type="text" id="settings-exec-last-name" class="form-control">
           </div>
           <div id="pseudonym-container" class="clearfix">
-            <label for="settings-exec-pseudonym" id="pseudonym-label">Pseudonym</label>
-            <span id="pseudonym-optional-label">(optional)</span>
+            <div for="settings-exec-pseudonym" id="pseudonym-div">Pseudonym</div>
+            <span id="pseudonym-optional-div">(optional)</span>
             <input type="text" id="settings-exec-pseudonym" class="form-control" placeholder="ex. Bono">
             <div id="pseudonym-option">
               <img id="pseudonym-checkbox" class="svg" src="/assets/img/checkbox-sm.svg">
-              <div id="pseudonym-checkbox-label">Only use pseudonym</div>
+              <div id="pseudonym-checkbox-div">Only use pseudonym</div>
             </div>
           </div>
-          <label for="phone-number" class="text-field-label hide">Phone number</label>
+          <div for="phone-number" class="text-field-div hide">Phone number</div>
           <input type="text" id="settings-exec-phone" class="form-control hide">
         </div>
         <div id="settings-exec-emails-title" class="settings-title">EMAIL ADDRESSES</div>

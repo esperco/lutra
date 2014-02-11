@@ -290,22 +290,7 @@ var settings = (function() {
   function displayEmailAdd(view, uid, teamid, done) {
     var divEmailAdd = $("<div class='input-group'/>");
 
-
-    // var view = $("<div class='sched-step1-add-row'/>");
-
-    // var hosts = sched.getHosts(task);
-    // var adder = $("<div class='add-guest-circ'>");
-    // var plus = $("<img id='plus-guest'/>");
-    // plus.appendTo(adder);
-    // svg.loadImg(plus, "/assets/img/plus.svg");
-
-    // var addGuestDiv = $("<div/>");
-    // var addGuestText = $("<a id='add-guest-text' class='unselectable'/>")
-    //   .text("Add guest")
-    //   .appendTo(addGuestDiv);
-
-
-    $("<label for='email-add' class='text-field-label'/>")
+    $("<div class='text-field-label'/>")
       .text("Add another email:")
       .appendTo(divEmailAdd);
     var emailAdd =
