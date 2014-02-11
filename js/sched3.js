@@ -170,7 +170,7 @@ var sched3 = (function() {
     svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
 
     var recipientName = $("<div class='recipient-name' />")
-      .append(toObsProf.prof.full_name)
+      .append(profile.fullName(toObsProf.prof))
       .appendTo(recipientRow);
 
     recipientRow.click(function() {
@@ -191,9 +191,9 @@ var sched3 = (function() {
     $("#sched-availability-subject")
       .val("Re: " + task.task_status.task_title);
 
-    var organizerName = profs[login.me()].prof.full_name;
-    var hostName = profs[login.leader()].prof.full_name;
-    var toName = toObsProf.prof.full_name;
+    var organizerName = profile.fullName(profs[login.me()].prof);
+    var hostName = profile.fullName(profs[login.leader()].prof);
+    var toName = profile.fullName(toObsProf.prof);
     var howSoon = textOfHowSoon(howSoon);
     var body = formalEmailBody(organizerName, hostName, toName, howSoon);
     $("#sched-availability-message")
