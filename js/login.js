@@ -173,8 +173,8 @@ var login = (function() {
     saveLoginInfo();
   };
 
-  mod.organizer = function() {
-    return mod.getTeam().team_organizers[0];
+  mod.organizers = function() {
+    return mod.getTeam().team_organizers;
   };
 
   mod.leader = function() {

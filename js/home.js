@@ -67,12 +67,39 @@ var home = (function() {
         .appendTo(taskDetails);
       $("<div class='task-status'/>").append(taskStatus(ta))
         .appendTo(taskDetails);
-      $("<div class='task-date hide'></div>")
-        .append($("<span class='verb'>Created </span>"))
-        .append($("<span>on </span>"))
-        .append($("<span class='update-date'>May 30, 2014 at 12:55 pm</span>"))
-        .append($("<span class='update-author'> by Christopher</span>"))
-        .appendTo(taskDetails);
+
+      var team_organizers = login.organizers();
+      if (team_organizers.length > 1) {
+        profile.mget(team_organizers).done(function(profs) {
+          var i = 0;
+          list.iter(team_organizers, function(organizer_uid) {
+            var v = $("<span/>");
+            var img = $("<img/>");
+            v.append(img);
+            svg.loadImg(img, "/assets/img/checkbox-sm.svg");
+            v.append(document.createTextNode(profile.fullName(profs[i].prof)));
+            if (list.mem(ta.task_participants.organized_by, organizer_uid)) {
+              v.addClass("checkbox-selected");
+            }
+            v.appendTo(taskDetails);
+
+            v.click(function() {
+              var task_organizers = ta.task_participants.organized_by;
+              if (list.mem(task_organizers, organizer_uid)) {
+                v.removeClass("checkbox-selected");
+                task_organizers.splice(task_organizers.indexOf(organizer_uid),
+                                       1);
+              } else {
+                v.addClass("checkbox-selected");
+                task_organizers.push(organizer_uid);
+              }
+              api.postTask(ta);
+            });
+
+            ++i;
+          });
+        });
+      }
 
       // var exec = $("<div class='task-exec'></div>")
       //   .appendTo(view);

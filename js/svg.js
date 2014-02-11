@@ -34,6 +34,8 @@ var svg = (function() {
   mod.load = function(url) {
     var result = $("<img/>");
     mod.loadImg(result, url);
+      // mod.loadImg calls replaceWith(), which requires `result` to have
+      // a parent node, but that is not the case here. ???
     return result;
   };
 
