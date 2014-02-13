@@ -23,6 +23,7 @@ cp -a mink-libs/bootstrap/* pub
 cp mink-libs/jquery.timeago.js pub/js
 cp mink-libs/autosize-master/jquery.autosize.min.js pub/js
 cp mink-libs/animate.min.css pub/css
+cp mink-libs/font-awesome.css pub/css
 
 # Build our own code and copy the result into the pub directory
 make -C js $mode-install
