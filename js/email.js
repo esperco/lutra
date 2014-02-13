@@ -32,6 +32,7 @@ var email = (function() {
     test.expect(null, mod.validate, "a@a", false),
     test.expect(null, mod.validate, "a", false),
     test.expect(null, mod.validate, "", false),
+    test.expect(null, mod.validate, "a+b@c.com", true)
   ];
 
   return mod;

@@ -23,3 +23,5 @@ mv dist bootstrap
 
 # mink-libs/can
 cp can-1.1.8.custom.min.js can.min.js
+
+cp font-awesome-4.0.3.css font-awesome.css
