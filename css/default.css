@@ -1,16 +1,4 @@
 /* General Blueprint Style */
-@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
-@font-face {
-	font-family: 'fontawesome';
-	src:url('../assets/fonts/fontawesome.eot');
-	src:url('../assets/fonts/fontawesome.eot?#iefix') format('embedded-opentype'),
-		url('../fonts/fontawesome.svg#fontawesome') format('svg'),
-		url('../fonts/fontawesome.woff') format('woff'),
-		url('../fonts/fontawesome.ttf') format('truetype');
-	font-weight: normal;
-	font-style: normal;
-}
-1
 *, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
 body, html { font-size: 100%; padding: 0; margin: 0;}
 
@@ -19,11 +7,198 @@ body, html { font-size: 100%; padding: 0; margin: 0;}
 .clearfix:after { clear: both; }
 
 body {
-    font-family: 'Lato', Calibri, Arial, sans-serif;
-    color: #fff;
+  font-family: 'Proxima Nova Light';
+  color: #fff;
+  background: #a25cc6;
 }
 
-a {
+.bold {
+	font-family: 'Proxima Nova Semibold'
+}
+
+#main-navbar {
+  height: 50px;
+  background: #414042;
+}
+
+#brand {
+  height: 30px;
+  margin-top: 10px;
+  margin-left: 16px;
+}
+
+#login-button {
+  margin-top: 10px;
+  margin-right: 16px;
+  font-family: 'Proxima Nova Regular';
+}
+
+.container-wrap {
+  padding-top: 140px;
+  /*padding-bottom: 200px;*/
+  background: black;
+}
+
+.container-content {
+  max-width: 520px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 15px;
+  padding-left: 15px;
+  text-align: center;
+}
+
+#hero-mark {
+  height: 60px;
+  -webkit-animation-duration: 1.5s;
+  	 -moz-animation-duration: 1.5s;
+  			 -animation-duration: 1.5s;
+}
+
+#hero-word {
+  width: 200px;
+  margin-top: 30px;
+  margin-bottom: 100px;
+}
+
+.header-text {
+	font-family: 'Proxima Nova Light';
+	font-size: 28px;
+	text-align: left;
+}
+
+#line1 {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 0.5s;
+  	 -moz-animation-delay: 0.5s;
+  			 -animation-delay: 0.5s;
+}
+
+#line2 {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 1s;
+  	 -moz-animation-delay: 1s;
+  			 -animation-delay: 1s;
+}
+
+#description {
+	margin-top: 20px;
+	margin-bottom: 50px;
+	text-align: left;
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 1.5s;
+  	 -moz-animation-delay: 1.5s;
+  			 -animation-delay: 1.5s;
+}
+
+#lead-form {
+	-webkit-animation-duration: 2s;
+  	 -moz-animation-duration: 2s;
+  			 -animation-duration: 2s;
+	-webkit-animation-delay: 2s;
+  	 -moz-animation-delay: 2s;
+  			 -animation-delay: 2s;
+}
+
+#main-footer {
+  height: 120px;
+  padding-top: 15px;
+  text-align: center;
+}
+
+.footer-link {
+  font-size: 12px;
+  color: white;
+}
+
+.footer-link:hover {
+  color: white;
+}
+
+.vertical-divider {
+  margin-left: 18px;
+  margin-right: 18px;
+  color: #e8d9ee;
+}
+
+#copyright {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #e8d9ee;
+}
+
+#made {
+  font-size: 12px;
+  color: #e8d9ee;
+}
+
+#heart {
+  margin-right: 3px;
+  margin-left: 2px;
+}
+
+.title-banner {
+  padding-top: 140px;
+  padding-right: 30px;
+  padding-bottom: 50px;
+  padding-left: 30px;
+  background: black;
+}
+
+.title-text {
+	max-width: 672px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.legal-label {
+	color: #a7a9ac;
+	font-family: 'Proxima Nova Light';
+	font-size: 14px;
+	letter-spacing: 3px;
+}
+
+.legal-title {
+	margin-bottom: 10px;
+	font-family: 'Proxima Nova Light';
+	font-size: 30px;
+}
+
+.last-modified {
+	font-family: 'Proxima Nova Regular';
+}
+
+.legal-modified-date {
+	margin-left: 5px;
+  padding: 3px 8px;
+  padding-bottom: 2px;
+  font-family: 'Proxima Nova Regular';
+  font-size: 13px;
+	color: white;
+	background: #414042;
+	border-radius: 3px;
+}
+
+.legal-wrap {
+	padding: 30px;
+	padding-bottom: 140px;
+	background: white;
+}
+
+.legal-content {
+	max-width: 672px;
+	margin-right: auto;
+	margin-left: auto;
+  color: black;
+}
+
+/*a {
 	color: #f0f0f0;
 	text-decoration: none;
 }
@@ -94,7 +269,7 @@ a:hover {
 	background: #47a3da;
 }
 
-.icon-drop:before, 
+.icon-drop:before,
 .icon-arrow-left:before {
 	font-family: 'fontawesome';
 	position: absolute;
@@ -122,5 +297,4 @@ a:hover {
 
 .icon-arrow-left:before {
 	content: "\f060";
-}
-
+}*/
