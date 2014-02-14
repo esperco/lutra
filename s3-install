@@ -1,7 +1,7 @@
 #! /bin/sh
 set -e
 
-s3_bucket=esper.co
+s3_bucket=esper.com
 
 # Copy the pub/ directory into our S3 bucket used by http://esper.co/
 (cd pub && s3cmd put --recursive * s3://$s3_bucket )
