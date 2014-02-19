@@ -165,60 +165,83 @@ var settings = (function() {
     });
   }
 
+  function createExecRow(execEmails, prof) {
+    var primaryOnly =
+      execEmails.filter(function(e) { return e.email_primary; });
+    var primaryEmail = primaryOnly[0].email;
+    var row = $("<div class='exec-row clearfix'/>");
+    var firstLast = "";
+    var pseudonym = "";
+    var profCirc = $("<div class='settings-prof-circ'/>");
+    if (prof.first_last) {
+      firstLast = prof.first_last[0] + " " + prof.first_last[1];
+      if (prof.pseudonym) {
+        pseudonym = prof.pseudonym;
+        profCirc.text(pseudonym[0].toUpperCase());
+      } else {
+        profCirc.text(firstLast[0].toUpperCase());
+      }
+    } else {
+      pseudonym = prof.pseudonym;
+      profCirc.text(pseudonym[0].toUpperCase());
+    }
+    profCirc.appendTo(row);
+    var gear = $("<a/>", {
+      href: "#",
+      "data-toggle": "tooltip",
+      placement: "left",
+      title: "Settings",
+      "class": "exec-settings-div"
+    });
+    gear.click(function() {
+      execSettingsModal(prof.profile_uid, teamid);
+    });
+    $("<img/>")
+      .addClass('svg exec-settings')
+      .attr('src', '/assets/img/settings.svg')
+      .appendTo(gear);
+    gear.appendTo(row);
+    var details = $("<div class='exec-details'/>");
+    $("<div class='exec-name ellipsis'/>")
+      .text(pseudonym ? pseudonym : firstLast)
+      .appendTo(details);
+    $("<div class='exec-email ellipsis'/>")
+      .text(primaryEmail)
+      .appendTo(details);
+    details.appendTo(row);
+    log("returning row:", row);
+    return row;
+  }
+
   function displayExecutives(leaders) {
     var view = $("#settings-executives");
     view.children().remove();
-    var uniqUIDs = util.arrayUnique(Object.keys(leaders));
-    profile.mget(uniqUIDs).done(function(execProfs) {
-      list.iter(execProfs, function(execProf) {
-        var prof = execProf.prof;
-        var teamid = leaders[prof.profile_uid];
-        api.getEmails(prof.profile_uid, teamid).done(function(execEmails) {
-          var primaryOnly =
-            execEmails.filter(function(e) { return e.email_primary; });
-          var primaryEmail = primaryOnly[0].email;
-          var row = $("<div class='exec-row clearfix'/>");
-          var firstLast = "";
-          var pseudonym = "";
-          var profCirc = $("<div class='settings-prof-circ'/>");
-          if (prof.first_last) {
-            firstLast = prof.first_last[0] + " " + prof.first_last[1];
-            if (prof.pseudonym) {
-              pseudonym = prof.pseudonym;
-              profCirc.text(pseudonym[0].toUpperCase());
-            } else {
-              profCirc.text(firstLast[0].toUpperCase());
-            }
-          } else {
-              pseudonym = prof.pseudonym;
-              profCirc.text(pseudonym[0].toUpperCase());
-          }
-          profCirc.appendTo(row);
-          var gear = $("<a/>", {
-            href: "#",
-            "data-toggle": "tooltip",
-            placement: "left",
-            title: "Settings",
-            "class": "exec-settings-div"
-          });
-          gear.click(function() {
-            execSettingsModal(prof.profile_uid, teamid);
-          });
-          $("<img class='svg exec-settings' src='/assets/img/settings.svg'/>")
-            .appendTo(gear);
-          gear.appendTo(row);
-          var details = $("<div class='exec-details'/>");
-          $("<div class='exec-name ellipsis'/>")
-            .text(pseudonym ? pseudonym : firstLast)
-            .appendTo(details);
-          $("<div class='exec-email ellipsis'/>")
-            .text(primaryEmail)
-            .appendTo(details);
-          details.appendTo(row);
-          row.appendTo(view);
+    var uniqUIDs = list.unique(Object.keys(leaders));
+    log(uniqUIDs);
+    var deferredDeferredRows =
+      profile.mget(uniqUIDs).then(function(execProfs) {
+        return list.map(execProfs, function(execProf) {
+          var prof = execProf.prof;
+          var teamid = leaders[prof.profile_uid];
+          var deferredRow = api.getEmails(prof.profile_uid, teamid)
+            .then(function(execEmails) {
+              return createExecRow(execEmails, prof);
+            });
+          log("returning this:", deferredRow);
+          return deferredRow;
         });
       });
-      displayNoMoreExecs();
+    deferredDeferredRows.then(function(deferredRows) {
+      log("deferredRows:", deferredRows);
+      deferred.join(deferredRows)
+        .done(function(rows) {
+          log("rows: ", rows);
+          list.iter(rows, function(row) {
+            log("final row", row);
+            row.appendTo(view);
+          });
+          displayNoMoreExecs();
+        });
     });
   }
 
