@@ -468,6 +468,31 @@ var settings = (function() {
     }
   }
 
+  function setupTabs() {
+    $(".tab-my-account a").off("click");
+    $(".tab-my-account a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-my-account-content").removeClass("hide");
+    });
+    $(".tab-executives a").off("click");
+    $(".tab-executives a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-executives-content").removeClass("hide");
+    });
+    $(".tab-templates a").off("click");
+    $(".tab-templates a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-templates-content").removeClass("hide");
+    });
+  }
+
+
   mod.load = function() {
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
@@ -477,6 +502,7 @@ var settings = (function() {
     });
     displayExecutives(mapping);
     disableUpdateButtonsUntilModified();
+    setupTabs();
     $("#settings-update-name").off("click");
     $("#settings-update-name").one("click", updateAssistantName);
     $("#settings-update-password").off("click");
