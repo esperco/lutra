@@ -222,14 +222,32 @@ var settings = (function() {
     });
   }
 
+  function editSignature(myUID, theirUID, teamid, email) {
+    $("#edit-signature-input").val(email.email_signature);
+    $(".edit-signature-modal").modal({});
+
+    $("#edit-signature-save").off("click");
+    $("#edit-signature-save").one("click", function() {
+      var sig = $("#edit-signature-input").val();
+      api.postEmailSignature(myUID, theirUID, teamid, {
+        email_address: email.email,
+        email_signature: sig
+      }).done(function() {
+        $(".edit-signature-modal").modal("hide");
+        settings.load();
+      });
+    });
+  }
+
   function displayEmail(view, ea, email, uid, teamid, done) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
 
-    if (ea) {
+    if (ea && email.email_confirmed) {
       $("<button class='btn btn-default edit-signature'/>")
         .text("Edit signature")
+        .click(function() { editSignature(uid, uid, teamid, email); })
         .appendTo(divEmailRowContent);
     }
 

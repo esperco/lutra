@@ -153,6 +153,12 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(email));
   };
 
+  mod.postEmailSignature = function(myUID, theirUID, teamid, sig) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid +
+      "/signature";
+    return jsonHttpPost(url, JSON.stringify(sig));
+  };
+
 
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active");

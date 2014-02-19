@@ -77,8 +77,8 @@
               <div id="pseudonym-checkbox-div">Only use pseudonym</div>
             </div>
           </div>
-          <div for="phone-number" class="text-field-div hide">Phone number</div>
-          <input type="text" id="settings-exec-phone" class="form-control hide">
+          <div for="phone-number" class="text-field-div">Phone number</div>
+          <input type="text" id="settings-exec-phone" class="form-control">
         </div>
         <div id="settings-exec-emails-title" class="settings-title">EMAIL ADDRESSES</div>
         <div id="settings-exec-emails"></div>
@@ -113,6 +113,26 @@
         </div>
         <div id="scheduling-pref-title" class="settings-title">SCHEDULING PREFERENCES</div>
         <div id="scheduling-pref"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade edit-signature-modal" tabindex="-1"
+     role="dialog" aria-divledby="edit-signature-title"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="edit-signature-save" style="float:right">Save</button>
+        <h3 class="modal-title" id="edit-signature-title">Edit Signature</h3>
+      </div>
+      <div class="modal-body" id="edit-signature-body">
+        <textarea rows=5 id="edit-signature-input" class="form-control"></textarea>
       </div>
     </div>
   </div>
