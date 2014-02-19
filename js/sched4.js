@@ -119,10 +119,7 @@ var sched4 = (function() {
       )
     })
       .done(function(confirmationMessage) {
-        var body = list.find(confirmationMessage, function(x) {
-          return x.message_condition === "Meeting_confirmation_offer";
-        });
-        $("#sched-confirm-message").val(body.message_text);
+        $("#sched-confirm-message").val(confirmationMessage.message_text);
 
         var schedConfirmShowEnd = $("#sched-confirm-show-end");
         schedConfirmShowEnd.children().remove();
@@ -174,9 +171,6 @@ var sched4 = (function() {
     });
     */
 
-    var x = list.find(cannedMessages, function(x) {
-      return x.message_condition === "Meeting_reminder_offer";
-    });
     if (x) {
       $("#sched-reminder-message").val(x.message_text);
     }

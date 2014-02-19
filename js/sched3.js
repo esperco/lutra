@@ -200,13 +200,10 @@ var sched3 = (function() {
     api.getOptionsMessage(task.tid, {
       exec_name: hostName,
       guest_name: toName,
-      meet_how_soon: howSoon
+      how_soon: howSoon
     })
       .done(function(optionsMessage) {
-        var body = list.find(optionsMessage, function(x) {
-          return x.message_condition === "Meeting_options_offer";
-        });
-        $("#sched-availability-message").val(body.message_text);
+        $("#sched-availability-message").val(optionsMessage.message_text);
         var footerOption = $("#footer-option");
         footerOption.children().remove();
 
