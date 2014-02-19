@@ -443,8 +443,12 @@ var home = (function() {
     loadNavHeader();
     deferred.join([loadAllTasks(), loadActiveTasks()])
             .done(loadArchive);
-    $(".place-nav").click(places.load);
-    $(".settings-nav").click(settings.load);
+    $(".place-nav")
+      .off('click')
+      .click(places.load);
+    $(".settings-nav")
+      .off('click')
+      .click(settings.load);
     util.focus();
   };
 
