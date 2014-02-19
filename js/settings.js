@@ -13,6 +13,7 @@ var settings = (function() {
   var execProfile = null;
   var asstNamePrefixSel = null;
   var execNamePrefixSel = null;
+  var originalExecPhone = null;
 
   function displayNamePrefixes(view, gender, chosenPrefix) {
     view.children().remove();
@@ -67,22 +68,39 @@ var settings = (function() {
     if (firstName != "" && lastName != "")
       firstLast = [firstName, lastName];
 
-    var profileEdit = {
-      profile_uid: execProfile.profile_uid,
-      prefix: prefix,
-      first_last: firstLast,
-      pseudonym: (pseudo != "" ? pseudo : null),
-      gender: execProfile.gender
+    /*
+    var phoneNumber = $("#settings-exec-phone").val();
+    var contact = {
+      contact_kind: "Phone_number",
+      contact_data: phoneNumber
     };
-    api.postProfile(profileEdit, teamid).done(function(prof) {
-      api.getProfile(execProfile.profile_uid).done(function(prof) {
-        execProfile = prof;
-        profile.set(prof);
-        $(".exec-settings-modal").modal("hide");
-        home.load(); // To update top left corner
-        settings.load();
+    var apiCall = deferred.defer(null);
+    if (phoneNumber !== originalExecPhone) {
+      apiCall =
+        api.postContactInfo(execProfile.profile_uid, teamid, contact);
+    } else if (phoneNumber === "" && originalExecPhone !== "") {
+      apiCall =
+        api.deleteContactInfo(execProfile.profile_uid, teamid, contact);
+    }
+    apiCall.done(function() {
+    */
+      var profileEdit = {
+        profile_uid: execProfile.profile_uid,
+        prefix: prefix,
+        first_last: firstLast,
+        pseudonym: (pseudo != "" ? pseudo : null),
+        gender: execProfile.gender
+      };
+      api.postProfile(profileEdit, teamid).done(function(prof) {
+        api.getProfile(execProfile.profile_uid).done(function(prof) {
+          execProfile = prof;
+          profile.set(prof);
+          $(".exec-settings-modal").modal("hide");
+          home.load(); // To update top left corner
+          settings.load();
+        });
       });
-    });
+    //});
   }
 
   function showOnlyPseudonym() {
@@ -103,6 +121,7 @@ var settings = (function() {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
       api.getEmails(execUID, teamid).done(function(execEmails) {
+      api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
@@ -153,6 +172,15 @@ var settings = (function() {
             execSettingsModal(execUID, teamid);
           });
         });
+
+        /* TODO: Only showing one piece of contact info, a phone number.
+                 The backend supports storing others too, like Skype ID. */
+        /*
+        var phoneNumber = execContactInfo.length ? execContactInfo[0][1] : "";
+        $("#settings-exec-phone").val(phoneNumber);
+        originalExecPhone = phoneNumber;
+        */
+
         displayEmailAdd(emailView, execUID, teamid, function() {
           execSettingsModal(execUID, teamid);
         });
@@ -162,10 +190,11 @@ var settings = (function() {
         });
         $(".exec-settings-modal").modal({});
       });
+      });
     });
   }
 
-  function createExecRow(execEmails, prof) {
+  function createExecRow(execEmails, prof, teamid) {
     var primaryOnly =
       execEmails.filter(function(e) { return e.email_primary; });
     var primaryEmail = primaryOnly[0].email;
@@ -209,7 +238,6 @@ var settings = (function() {
       .text(primaryEmail)
       .appendTo(details);
     details.appendTo(row);
-    log("returning row:", row);
     return row;
   }
 
@@ -217,7 +245,6 @@ var settings = (function() {
     var view = $("#settings-executives");
     view.children().remove();
     var uniqUIDs = list.unique(Object.keys(leaders));
-    log(uniqUIDs);
     var deferredDeferredRows =
       profile.mget(uniqUIDs).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
@@ -225,19 +252,15 @@ var settings = (function() {
           var teamid = leaders[prof.profile_uid];
           var deferredRow = api.getEmails(prof.profile_uid, teamid)
             .then(function(execEmails) {
-              return createExecRow(execEmails, prof);
+              return createExecRow(execEmails, prof, teamid);
             });
-          log("returning this:", deferredRow);
           return deferredRow;
         });
       });
     deferredDeferredRows.then(function(deferredRows) {
-      log("deferredRows:", deferredRows);
       deferred.join(deferredRows)
         .done(function(rows) {
-          log("rows: ", rows);
           list.iter(rows, function(row) {
-            log("final row", row);
             row.appendTo(view);
           });
           displayNoMoreExecs();

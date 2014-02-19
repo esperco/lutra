@@ -195,44 +195,55 @@ var sched3 = (function() {
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(toObsProf.prof);
     var howSoon = textOfHowSoon(howSoon);
-    var body = formalEmailBody(organizerName, hostName, toName, howSoon);
-    $("#sched-availability-message")
-      .val(body);
 
-    var footerOption = $("#footer-option");
-    footerOption.children().remove();
-
-    var footerCheckboxDiv = $("<div class='footer-checkbox-div'/>")
-      .appendTo(footerOption);
-    var footerCheckbox = $("<img class='footer-checkbox'/>")
-      .appendTo(footerCheckboxDiv);
-    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
-
-    var timeOption = $("<div class='time-option' />")
-      .append("Show end time of meeting options")
-      .appendTo(footerOption);
-
-    var footer = $("#sched-availability-message-readonly");
-    footer.children().remove();
-    footer.append(emailViewOfOptions(options));
-    if (footer.hasClass("short")) {
-      hideEndTime();
-    } else {
-      showEndTime();
-    }
-
-    footerOption.off("click");
-    footerOption.click(function() {
-      if (footerOption.hasClass("checkbox-selected")) {
-        footerOption.removeClass("checkbox-selected");
-        footer.addClass("short");
-        hideEndTime();
-      } else {
-        footerOption.addClass("checkbox-selected");
-        footer.removeClass("short");
-        showEndTime();
-      }
+    //var body = formalEmailBody(organizerName, hostName, toName, howSoon);
+    api.getOptionsMessage(task.tid, {
+      exec_name: hostName,
+      guest_name: toName,
+      meet_how_soon: howSoon
     })
+      .done(function(optionsMessage) {
+        var body = list.find(optionsMessage, function(x) {
+          return x.message_condition === "Meeting_options_offer";
+        });
+        $("#sched-availability-message").val(body.message_text);
+        var footerOption = $("#footer-option");
+        footerOption.children().remove();
+
+        var footerCheckboxDiv = $("<div class='footer-checkbox-div'/>")
+          .appendTo(footerOption);
+        var footerCheckbox = $("<img class='footer-checkbox'/>")
+          .appendTo(footerCheckboxDiv);
+        svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+
+        var timeOption = $("<div class='time-option' />")
+          .append("Show end time of meeting options")
+          .appendTo(footerOption);
+
+        var footer = $("#sched-availability-message-readonly");
+        footer.children().remove();
+        footer.append(emailViewOfOptions(options));
+        if (footer.hasClass("short")) {
+          hideEndTime();
+        } else {
+          showEndTime();
+        }
+
+        footerOption.off("click");
+        footerOption.click(function() {
+          if (footerOption.hasClass("checkbox-selected")) {
+            footerOption.removeClass("checkbox-selected");
+            footer.addClass("short");
+            hideEndTime();
+          } else {
+            footerOption.addClass("checkbox-selected");
+            footer.removeClass("short");
+            showEndTime();
+          }
+        })
+
+      });
+
   }
 
 
