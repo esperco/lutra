@@ -19,8 +19,8 @@ var home = (function() {
       });
   }
 
-  function viewOfTaskRow(ta, taskViewId) {
-    var view = $("<div/>",{'class':'task clearfix', 'id':taskViewId});
+  function viewOfTaskRow(ta) {
+    var view = $("<div/>",{id:"task-" + ta.tid});
 
     var title = ta.task_status
       ? ta.task_status.task_title
@@ -50,8 +50,9 @@ var home = (function() {
       .text("Restore")
       .appendTo(view);
     restoreButton.click(function() {
+      $("#tasks").prepend(view);
+      setTaskViewClass(view, classOfActiveTask(ta));
       api.rankTaskFirst(ta.tid);
-      task.onTaskRankedFirst.notify(ta.tid);
     });
 
     var taskDetails = $("<div class='task-details'></div>")
@@ -124,103 +125,85 @@ var home = (function() {
     return view;
   }
 
-  function activeTaskViewId(tid) {
-    return "active-" + tid;
+  function classOfActiveTask(task) {
+    if ("Scheduling" === variant.cons(task.task_data)) {
+      return "Confirmed" === task.task_status.task_progress
+          || "Closed"    === task.task_status.task_progress
+           ? "completed-scheduling-task"
+           : "in-progress-scheduling-task";
+    } else {
+      return "Closed" === task.task_status.task_progress
+           ? "completed-general-task"
+           : "in-progress-general-task";
+    }
   }
-  function archiveTaskViewId(tid) {
-    return "archive-" + tid;
-  }
-  function allTaskViewId(tid) {
-    return "all-" + tid;
+
+  function setTaskViewClass(view, viewClass) {
+    view.attr("class", "task clearfix " + viewClass);
   }
 
   function viewOfActiveTaskRow(task) {
-    return viewOfTaskRow(task, activeTaskViewId(task.tid));
-  }
-  function viewOfArchiveTaskRow(task) {
-    return viewOfTaskRow(task, archiveTaskViewId(task.tid));
-  }
-  function viewOfAllTaskRow(task) {
-    return viewOfTaskRow(task, allTaskViewId(task.tid));
+    var view = viewOfTaskRow(task);
+    setTaskViewClass(view, classOfActiveTask(task));
+    return view;
   }
 
-  function listViewOfTask(task) {
-    return "Scheduling" === variant.cons(task.task_data)
-         ? $("#scheduling-tasks-tab-content")
-         : $("#general-tasks-tab-content");
+  function viewOfArchiveTaskRow(task) {
+    var view = viewOfTaskRow(task);
+    setTaskViewClass(view, "archived-task");
+    return view;
   }
 
   function taskUpdated(task) {
-    var activeViewId = activeTaskViewId(task.tid);
-
-    // In case the task kind has changed, remove the task title from
-    // all the other tabs.
-    if ("Scheduling" === variant.cons(task.task_data)) {
-      $("#general-tasks-tab-content #" + activeViewId).remove();
-    } else {
-      $("#scheduling-tasks-tab-content #" + activeViewId).remove();
-    }
-
-    var view = $("#" + activeViewId);
-    if (view.length > 0) {
-      view.replaceWith(viewOfActiveTaskRow(task));
-    } else {
-      listViewOfTask(task).prepend(viewOfActiveTaskRow(task));
-    }
-
-    view = $("#" + allTaskViewId(task.tid));
-    if (view.length > 0) {
-      view.replaceWith(viewOfAllTaskRow(task));
-    } else {
-      $("#all-tasks-tab-content")
-              .prepend(viewOfAllTaskRow(task));
-    }
-
-    view = $("#" + archiveTaskViewId(task.tid));
-    if (view.length > 0) {
+    var view = $("#task-" + task.tid);
+    if (view.length <= 0) {
+      $("#tasks").prepend(viewOfActiveTaskRow(task));
+    } else if (view.hasClass("archived-task")) {
       view.replaceWith(viewOfArchiveTaskRow(task));
+    } else {
+      view.replaceWith(viewOfActiveTaskRow(task));
     }
   }
 
   function taskRanked(tid, mover) {
-    var view = $("#" + activeTaskViewId(tid));
-    if (view.length > 0) {
-      mover(view.parent(), view);
+    var view = $("#task-" + tid);
+    if (view.length > 0 && ! view.hasClass("archived-task")) {
+      mover(view);
     } else {
-      $("#" + archiveTaskViewId(tid)).remove();
+      view.remove();
       api.getTask(tid).then(function(task) {
-        mover(listViewOfTask(task), viewOfActiveTaskRow(task));
+        mover(viewOfActiveTaskRow(task));
       });
     }
   }
 
   function taskRanked2(tid, target_tid, mover) {
-    var targetView = $("#" + activeTaskViewId(target_tid));
+    var targetView = $("#task-" + target_tid);
     if (targetView.length > 0) {
-      var view = $("#" + activeTaskViewId(tid));
+      var view = $("#task-" + tid);
       if (view.length > 0) {
         mover(view, targetView);
       } else {
-        $("#" + archiveTaskViewId(tid)).remove();
         api.getTask(tid).then(function(task) {
           mover(viewOfActiveTaskRow(task), targetView);
         });
       }
     } else {
-      $("#" + archiveTaskViewId(tid)).remove();
-      loadActiveTasks();
+      api.loadActiveTasks()
+        .fail(status_.onError(404))
+        .done(showActiveTasks);
     }
   }
 
   function taskRankedFirst(tid) {
-    taskRanked(tid, function(parent, taskView) {
-      parent.prepend(taskView);
+    taskRanked(tid, function(taskView) {
+      $("#tasks").prepend(taskView);
     });
   }
 
   function taskRankedLast(tid) {
-    taskRanked(tid, function(parent, taskView) {
-      parent.append(taskView);
+    taskRanked(tid, function(taskView) {
+      $("#tasks").append(taskView);
     });
   }
 
@@ -237,66 +220,109 @@ var home = (function() {
   }
 
   function taskArchived(tid) {
-    var view = $("#" + activeTaskViewId(tid));
-    if (view.length == 1) {
-      view.attr("id", archiveTaskViewId(tid));
-      $("#archive-tasks-tab-content").prepend(view);
-    }
-    else if ($("#" + archiveTaskViewId(tid)).length <= 0) {
+    var view = $("#task-" + tid);
+    if (view.length > 0) {
+      setTaskViewClass(view, "archived-task");
+    } else {
       api.getTask(tid).done(function(task) {
-        $("#archive-tasks-tab-content")
-              .prepend(viewOfArchiveTaskRow(task));
+        $("#tasks").prepend(viewOfArchiveTaskRow(task));
       });
     }
   }
 
-  function task_tid(task) {
-    return task.tid;
+  function showActiveTasks(data) {
+    var view = $("#tasks");
+    setTaskViewClass(view.children(), "archived-task");
+    list.iter(data.tasks, function(task) {
+      var taskView = $("#task-" + task.tid);
+      if (taskView.length > 0) {
+        taskView.replaceWith(viewOfActiveTaskRow(task));
+      } else {
+        view.append(viewOfActiveTaskRow(task));
+      }
+    });
   }
 
-  function loadArchive(tasks) {
-    var allTasks    = tasks[0];
-    var activeTasks = tasks[1];
-
-    var view = $("#archive-tasks-tab-content");
-    view.children().remove();
-    list.iter(list.diff(allTasks, activeTasks, task_tid), function(task) {
-      view.append(viewOfArchiveTaskRow(task));
+  function showAllTasks(data) {
+    var view = $("#tasks");
+    list.iter(data[0].tasks, function(task) {
+      view.append(viewOfTaskRow(task));
     });
 
-    task.onTaskArchived.observe("task-list", taskArchived);
+    showActiveTasks(data[1]);
+
+    task.onTaskArchived    .observe("task-list", taskArchived);
+    task.onTaskCreated     .observe("task-list", taskUpdated);
+    task.onTaskModified    .observe("task-list", taskUpdated);
+    task.onTaskRankedFirst .observe("task-list", taskRankedFirst);
+    task.onTaskRankedLast  .observe("task-list", taskRankedLast);
+    task.onTaskRankedBefore.observe("task-list", taskRankedBefore);
+    task.onTaskRankedAfter .observe("task-list", taskRankedAfter);
   }
 
-  function loadActiveTasks() {
-    $("#general-tasks-tab-content").children().remove();
-    $("#scheduling-tasks-tab-content").children().remove();
-    return api.loadActiveTasks()
-      .fail(status_.onError(404))
-      .then(function(data) {
-        list.iter(data.tasks, function(task) {
-          listViewOfTask(task).append(viewOfActiveTaskRow(task));
-        });
-        task.onTaskCreated     .observe("task-list", taskUpdated);
-        task.onTaskModified    .observe("task-list", taskUpdated);
-        task.onTaskRankedFirst .observe("task-list", taskRankedFirst);
-        task.onTaskRankedLast  .observe("task-list", taskRankedLast);
-        task.onTaskRankedBefore.observe("task-list", taskRankedBefore);
-        task.onTaskRankedAfter .observe("task-list", taskRankedAfter);
-        return data.tasks;
-      });
-  }
+  function loadTasks() {
+    $("#tasks").children().remove();
+    deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
+                   api.loadActiveTasks().fail(status_.onError(404))])
+            .done(showAllTasks);
 
-  function loadAllTasks() {
-    var view = $("#all-tasks-tab-content");
-    view.children().remove();
-    return api.loadRecentTasks()
-      .fail(status_.onError(404))
-      .then(function(data) {
-        list.iter(data.tasks, function(task) {
-          view.append(viewOfAllTaskRow(task));
-        });
-        return data.tasks;
-      });
+    $('a[href="#all-tasks"]')
+    .unbind('click')
+    .click(function() {
+      $('#all-tasks-tab-content').append($('#tasks'));
+      $('a[href="#all-tasks"]').tab('show');
+    });
+    $('a[href="#scheduling-task-list"]')
+    .unbind('click')
+    .click(function() {
+      $('#scheduling-tasks-tab-content').append($('#tasks'));
+      $('a[href="#scheduling-task-list"]').tab('show');
+    });
+    $('a[href="#general-task-list"]')
+    .unbind('click')
+    .click(function() {
+      $('#general-tasks-tab-content').append($('#tasks'));
+      $('a[href="#general-task-list"]').tab('show');
+    });
+    $('a[href="#archive-task-list"]')
+    .unbind('click')
+    .click(function() {
+      $('#archive-tasks-tab-content').append($('#tasks'));
+      $('a[href="#archive-task-list"]').tab('show');
+    });
+
+    $('.show-in-progress-scheduling-tasks')
+    .unbind('click')
+    .click(function() {
+      $('.show-in-progress-scheduling-tasks').addClass('active');
+      $('.show-completed-scheduling-tasks').removeClass('active');
+      $('#scheduling-tasks-tab-content')
+        .attr('class', 'in-progress-scheduling-tasks task-list');
+    });
+    $('.show-completed-scheduling-tasks')
+    .unbind('click')
+    .click(function() {
+      $('.show-in-progress-scheduling-tasks').removeClass('active');
+      $('.show-completed-scheduling-tasks').addClass('active');
+      $('#scheduling-tasks-tab-content')
+        .attr('class', 'completed-scheduling-tasks task-list');
+    });
+    $('.show-in-progress-general-tasks')
+    .unbind('click')
+    .click(function() {
+      $('.show-in-progress-general-tasks').addClass('active');
+      $('.show-completed-general-tasks').removeClass('active');
+      $('#general-tasks-tab-content')
+        .attr('class', 'in-progress-general-tasks task-list');
+    });
+    $('.show-completed-general-tasks')
+    .unbind('click')
+    .click(function() {
+      $('.show-in-progress-general-tasks').removeClass('active');
+      $('.show-completed-general-tasks').addClass('active');
+      $('#general-tasks-tab-content')
+        .attr('class', 'completed-general-tasks task-list');
+    });
   }
 
   function clearTeams() {
@@ -441,8 +467,7 @@ var home = (function() {
 
   mod.load = function() {
     loadNavHeader();
-    deferred.join([loadAllTasks(), loadActiveTasks()])
-            .done(loadArchive);
+    loadTasks();
     $(".place-nav")
       .off('click')
       .click(places.load);

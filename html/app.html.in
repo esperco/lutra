@@ -136,7 +136,7 @@
             </a>
           </li>
           <li class="active">
-            <a href="#" class="nav-block" data-toggle="pill">
+            <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
               <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
 <!--               <div class='new-label new-label-nav'>NEW</div>
               <div class='updated updated-nav'></div> -->
@@ -144,7 +144,7 @@
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block" data-toggle="pill">
+            <a href="#general-task-list" class="nav-block" data-toggle="pill">
               <img id="general-icon" class="svg" src="/assets/img/general.svg">
 <!--               <div class='new-label new-label-nav'>NEW</div>
               <div class='updated updated-nav'></div> -->
@@ -152,7 +152,7 @@
             </a>
           </li>
           <li>
-            <a href="#" class="nav-block" data-toggle="pill">
+            <a href="#archive-task-list" class="nav-block" data-toggle="pill">
               <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
               <div class="nav-text">Archive</div>
             </a>
