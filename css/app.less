@@ -641,6 +641,7 @@ object {
 }
 
 .task {
+  display: none;
   padding: 20px 10px;
   border-bottom: 1px solid;
   border-bottom-color: @gray_10;
@@ -704,13 +705,24 @@ object {
   float: right;
 }
 
-#general-tasks-tab-content    .archive-div,
-#scheduling-tasks-tab-content .archive-div {
+.completed-general-task      .archive-div,
+.completed-scheduling-task   .archive-div,
+.in-progress-general-task    .archive-div,
+.in-progress-scheduling-task .archive-div {
   display: inline;
 }
 
-#archive-tasks-tab-content .restore-div {
+.archived-task .restore-div {
   display: inline;
+}
+
+#all-tasks-tab-content        .task,
+#archive-tasks-tab-content    .archived-task,
+.in-progress-scheduling-tasks .in-progress-scheduling-task,
+.completed-scheduling-tasks   .completed-scheduling-task,
+.in-progress-general-tasks    .in-progress-general-task,
+.completed-general-tasks      .completed-general-task {
+  display: block;
 }
 
 .updated {
@@ -1589,6 +1601,11 @@ object {
 .workflow-details {
   display: block;
   margin-left: 42px;
+}
+
+#gen-task {
+  padding-top: 80px;
+  text-align: center;
 }
 
 
