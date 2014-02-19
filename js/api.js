@@ -40,14 +40,18 @@ var api = (function () {
     // We return a Deferred object.
     // Use .done(function(result){...}) to access the result.
     // (see jQuery documentation)
-    return $.ajax({
+    var request = {
       url: url,
       type: method,
       data: body,
       dataType: "json",
       beforeSend: login.setHttpHeaders(url)
-    })
-      .fail(logError);
+    };
+    if (body && body.length > 0) {
+      request.contentType = "application/json; charset=UTF-8";
+    }
+    return $.ajax(request)
+            .fail(logError);
   }
 
   function jsonHttpGet(url) {
