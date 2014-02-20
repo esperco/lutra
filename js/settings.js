@@ -249,15 +249,9 @@ var settings = (function() {
   function displayExecutives(teams) {
     var view = $("#settings-executives");
     view.children().remove();
-<<<<<<< HEAD
     var uniqUIDs = list.unique(Object.keys(leaders));
-=======
-    var leaderUids = list.map(teams, function(team) {
-      return team.team_leaders[0];
-    });
->>>>>>> be21f16e539ef1d1bed23ed6b98af0da8298d226
     var deferredDeferredRows =
-      profile.mget(leaderUids).then(function(execProfs) {
+      profile.mget(uniqUIDs).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
           var prof = execProf.prof;
           var execUid = prof.profile_uid;
