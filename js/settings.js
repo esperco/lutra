@@ -120,7 +120,7 @@ var settings = (function() {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
       api.getEmails(execUID, teamid).done(function(execEmails) {
-      api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
+      //api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
@@ -189,7 +189,7 @@ var settings = (function() {
         });
         $(".exec-settings-modal").modal({});
       });
-      });
+      //});
     });
   }
 

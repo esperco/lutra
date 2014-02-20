@@ -163,22 +163,18 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(sig));
   };
 
-  function api_q_prefix() {
-    return "/api/q/" + login.data.uid;
-  }
-
   mod.getContactInfo = function(theirUID, teamid) {
-    var url = api_q_prefix() + "/contact/" + theirUID + "/" + teamid;
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
     return jsonHttpGet(url);
   };
 
   mod.postContactInfo = function(theirUID, teamid, contact) {
-    var url = api_q_prefix() + "/contact/" + theirUID + "/" + teamid;
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
     return jsonHttpPost(url, JSON.stringify(contact));
   };
 
   mod.deleteContactInfo = function(theirUID, teamid, contact) {
-    var url = api_q_prefix() + "/contact/" + theirUID + "/" + teamid +
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid +
       "/remove";
     return jsonHttpPost(url, JSON.stringify(contact));
   };
@@ -337,12 +333,12 @@ var api = (function () {
   };
 
   mod.getOptionsMessage = function(tid, parameters) {
-    var url = api_s_prefix() + "/task/" + tid + "/options/message";
+    var url = apiSPrefix() + "/task/" + tid + "/options/message";
     return jsonHttpPost(url, JSON.stringify(parameters));
   };
 
   mod.getConfirmationMessage = function(tid, parameters) {
-    var url = api_s_prefix() + "/task/" + tid + "/confirmation/message";
+    var url = apiSPrefix() + "/task/" + tid + "/confirmation/message";
     return jsonHttpPost(url, JSON.stringify(parameters));
   };
 
