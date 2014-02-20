@@ -6,6 +6,20 @@ var display = (function() {
   var mod = {};
 
   mod.updateHome = function() {
+    /*
+      Hiding/styling elements differently for mobile and desktop.
+
+      TODO:
+      This should be done without Javascript by conditional inclusion
+      of CSS files in the <head> section of the HTML document.
+      Here is an example:
+
+      <link rel="stylesheet" type="text/css" href="/assets/css/desktop.css"/>
+      <link rel="stylesheet" type="text/css" href="/assets/css/mobile.css"
+            media="only screen and (max-device-width: 800px)"/>
+
+     */
+
 
     /*** Settings ***/
     if ($(window).width() < 500) {

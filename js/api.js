@@ -237,6 +237,12 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  mod.postCalendarRevoke = function(uid2) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/revoke";
+    return jsonHttpPost(url);
+  };
+
   mod.getTimezones = function() {
     var url = apiSPrefix() + "/timezones";
     return jsonHttpGet(url);

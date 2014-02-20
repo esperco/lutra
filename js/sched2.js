@@ -537,7 +537,7 @@ var sched2 = (function() {
 
     var prof = obsProf.prof;
     $("<div class='center-msg'/>")
-      .text("Connect with " + prof.familiar_name + "'s Google Calendar")
+      .text("Connect with " + profile.fullName(prof) + "'s Google Calendar")
       .appendTo(view);
     $("<div class='center-msg'/>")
       .text("to let Esper help you ﬁnd available times.")
