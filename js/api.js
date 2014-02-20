@@ -163,6 +163,10 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(sig));
   };
 
+  function api_q_prefix() {
+    return "/api/q/" + login.data.uid;
+  }
+
   mod.getContactInfo = function(theirUID, teamid) {
     var url = api_q_prefix() + "/contact/" + theirUID + "/" + teamid;
     return jsonHttpGet(url);
