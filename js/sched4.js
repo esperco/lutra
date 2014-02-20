@@ -177,8 +177,6 @@ var sched4 = (function() {
   }
 
   function preFillReminderModal(profs, ta, reserved, guests) {
-    console.log(guests.toSource());
-
     loadReminderRecipients(profs, guests);
 
     $("#sched-reminder-subject")
@@ -193,7 +191,7 @@ var sched4 = (function() {
     })
       .done(function(x) {
         if (! reserved.reminder_message) {
-          refreshReminderMessage(x);
+          $("#sched-reminder-message").val(x.message_text);
         }
         /*
         $("#sched-reminder-meeting-kind")

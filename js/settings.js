@@ -492,6 +492,58 @@ var settings = (function() {
     });
   }
 
+  function saveTemplate(condition) {
+    var template = {
+      message_condition: condition,
+      message_text: $("#edit-template-message").val()
+    };
+    api.postUserTemplate(login.me(), template)
+      .done(function() {
+        $("#edit-template-modal").modal("hide");
+        settings.load();
+      });
+  }
+
+  function editTemplate(templates, condition) {
+    var editOptions = list.find(templates, function(x) {
+      return x.message_condition === condition;
+    });
+    $("#edit-template-message").val(editOptions.message_text);
+    $("#edit-template-save").off("click");
+    $("#edit-template-save").on("click", function() {
+      saveTemplate(condition);
+    });
+    $("#edit-template-modal").modal({});
+  }
+
+  function displayTemplates() {
+    api.getUserTemplates().done(function(templates) {
+      $("#edit-options-approval").off("click");
+      $("#edit-options-approval").on("click", function() {
+        editTemplate(templates, "Meeting_options_approval");
+      });
+      $("#edit-options-offer").off("click");
+      $("#edit-options-offer").on("click", function() {
+        editTemplate(templates, "Meeting_options_offer");
+      });
+      $("#edit-confirmation-approval").off("click");
+      $("#edit-confirmation-approval").on("click", function() {
+        editTemplate(templates, "Meeting_confirmation_approval");
+      });
+      $("#edit-confirmation-offer").off("click");
+      $("#edit-confirmation-offer").on("click", function() {
+        editTemplate(templates, "Meeting_confirmation_offer");
+      });
+      $("#edit-reminder-approval").off("click");
+      $("#edit-reminder-approval").on("click", function() {
+        editTemplate(templates, "Meeting_reminder_approval");
+      });
+      $("#edit-reminder-offer").off("click");
+      $("#edit-reminder-offer").on("click", function() {
+        editTemplate(templates, "Meeting_reminder_offer");
+      });
+    });
+  }
 
   mod.load = function() {
     displayAssistantProfile(login.me());
@@ -503,6 +555,7 @@ var settings = (function() {
     displayExecutives(mapping);
     disableUpdateButtonsUntilModified();
     setupTabs();
+    displayTemplates();
     $("#settings-update-name").off("click");
     $("#settings-update-name").one("click", updateAssistantName);
     $("#settings-update-password").off("click");

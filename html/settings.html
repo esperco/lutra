@@ -55,7 +55,27 @@
 
   <div id="tab-templates-content" class="settings-content hide">
     <div id="settings-templates-title" class="settings-title">TEMPLATES</div>
-    <div id="settings-templates"></div>
+    <div id="settings-templates">
+      <!-- TODO style me -->
+      <div>
+        <a href="#" id="edit-options-approval">Meeting Options - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-options-offer">Meeting Options - Offer to Guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-confirmation-approval">Meeting Confirmation - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-confirmation-offer">Meeting Confirmation - Offer to Guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-approval">Meeting Reminder - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-offer">Meeting Reminder - Offer to Guest</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -153,6 +173,27 @@
       </div>
       <div class="modal-body" id="edit-signature-body">
         <textarea rows=5 id="edit-signature-input" class="form-control"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-template-modal" tabindex="-1"
+     role="dialog" aria-labelledby="edit-template-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="edit-template-save" style="float:right">Save</button>
+        <h3 class="modal-title" id="edit-template-title">Edit template</h3>
+      </div>
+      <div class="modal-body" id="edit-template-body">
+        <h4 class="modal-section-title">Message</h4>
+        <textarea class="form-control" rows="10"
+                  id="edit-template-message"></textarea>
       </div>
     </div>
   </div>

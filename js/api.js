@@ -337,5 +337,15 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(parameters));
   };
 
+  mod.getUserTemplates = function() {
+    var url = "/api/templates/" + login.data.uid;
+    return jsonHttpGet(url);
+  };
+
+  mod.postUserTemplate = function(uid, template) {
+    var url = "/api/templates/" + login.data.uid + "/save";
+    return jsonHttpPost(url, JSON.stringify(template));
+  };
+
   return mod;
 })();
