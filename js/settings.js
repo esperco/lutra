@@ -184,7 +184,7 @@ var settings = (function() {
           execSettingsModal(execUID, teamid);
         });
         $("#exec-settings-save").off("click");
-        $("#exec-settings-save").one("click", function() {
+        $("#exec-settings-save").click(function() {
           updateExecProfile(teamid);
         });
         $(".exec-settings-modal").modal({});
@@ -240,16 +240,30 @@ var settings = (function() {
     return row;
   }
 
-  function displayExecutives(leaders) {
+  function findTeam(teams, execUid) {
+    return list.find(teams, function(team) {
+      return team.team_leaders[0] === execUid;
+    });
+  }
+
+  function displayExecutives(teams) {
     var view = $("#settings-executives");
     view.children().remove();
+<<<<<<< HEAD
     var uniqUIDs = list.unique(Object.keys(leaders));
+=======
+    var leaderUids = list.map(teams, function(team) {
+      return team.team_leaders[0];
+    });
+>>>>>>> be21f16e539ef1d1bed23ed6b98af0da8298d226
     var deferredDeferredRows =
-      profile.mget(uniqUIDs).then(function(execProfs) {
+      profile.mget(leaderUids).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
           var prof = execProf.prof;
-          var teamid = leaders[prof.profile_uid];
-          var deferredRow = api.getEmails(prof.profile_uid, teamid)
+          var execUid = prof.profile_uid;
+          var team = findTeam(teams, execUid);
+          var teamid = team.teamid;
+          var deferredRow = api.getEmails(execUid, teamid)
             .then(function(execEmails) {
               return createExecRow(execEmails, prof, teamid);
             });
@@ -284,12 +298,12 @@ var settings = (function() {
     });
   }
 
-  function displayEmail(view, ea, email, uid, teamid, done) {
+  function displayEmail(view, isEA, email, uid, teamid, done) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
 
-    if (ea && email.email_confirmed) {
+    if (isEA && email.email_confirmed) {
       $("<button class='btn btn-default edit-signature'/>")
         .text("Edit signature")
         .click(function() { editSignature(uid, uid, teamid, email); })
@@ -347,6 +361,11 @@ var settings = (function() {
         .appendTo(divEmailActions);
     }
 
+    var googleDisconnectButton = $("#connect-google");
+    googleDisconnectButton
+      .off("click")
+      .click(function() { api.postCalendarRevoke(uid); });
+
     divEmailRow.appendTo(view);
   }
 
@@ -397,9 +416,9 @@ var settings = (function() {
         }
         var emailView = $("#settings-emails");
         emailView.children().remove();
-        var ea = true;
+        var isEA = true;
         list.iter(eaEmails, function(email) {
-          displayEmail(emailView, ea, email, eaUID, teamid, mod.load);
+          displayEmail(emailView, isEA, email, eaUID, teamid, mod.load);
         });
         displayEmailAdd(emailView, eaUID, teamid, mod.load);
       });
@@ -547,11 +566,7 @@ var settings = (function() {
   mod.load = function() {
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
-    var mapping = {};
-    var leaders = list.iter(teams, function(team) {
-      mapping[team.team_leaders[0]] = team.teamid;
-    });
-    displayExecutives(mapping);
+    displayExecutives(teams);
     disableUpdateButtonsUntilModified();
     setupTabs();
     displayTemplates();

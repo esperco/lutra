@@ -40,14 +40,18 @@ var api = (function () {
     // We return a Deferred object.
     // Use .done(function(result){...}) to access the result.
     // (see jQuery documentation)
-    return $.ajax({
+    var request = {
       url: url,
       type: method,
       data: body,
       dataType: "json",
       beforeSend: login.setHttpHeaders(url)
-    })
-      .fail(logError);
+    };
+    if (body && body.length > 0) {
+      request.contentType = "application/json; charset=UTF-8";
+    }
+    return $.ajax(request)
+            .fail(logError);
   }
 
   function jsonHttpGet(url) {
@@ -92,30 +96,30 @@ var api = (function () {
                         JSON.stringify(password_reset));
   };
 
-  function api_profile_prefix() {
+  function apiProfilePrefix() {
     return "/api/profile/" + login.data.uid;
   }
 
-  function api_q_prefix() {
+  function apiQPrefix() {
     return "/api/q/" + login.data.uid;
   }
 
   function api_tasks_prefix() {
-    return api_q_prefix() + "/tasks/" + login.getTeam().teamid;
+    return apiQPrefix() + "/tasks/" + login.getTeam().teamid;
   }
 
   mod.getProfile = function(uid) {
-    return jsonHttpGet(api_profile_prefix() + "/" + uid);
+    return jsonHttpGet(apiProfilePrefix() + "/" + uid);
   };
 
   mod.postProfile = function(prof, teamid) {
-    var url = api_profile_prefix() + "/" + prof.profile_uid + "/" + teamid;
+    var url = apiProfilePrefix() + "/" + prof.profile_uid + "/" + teamid;
     //console.log(teamid.toSource());
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 
   mod.getProfileByEmail = function(email) {
-    return jsonHttpGet(api_profile_prefix() + "/email/"
+    return jsonHttpGet(apiProfilePrefix() + "/email/"
                        + encodeURIComponent(email));
   };
 
@@ -127,7 +131,7 @@ var api = (function () {
   /* Email management */
 
   mod.getEmails = function(theirUID, teamid) {
-    var url = api_q_prefix()  + "/email/" + theirUID + "/" + teamid;
+    var url = apiQPrefix()  + "/email/" + theirUID + "/" + teamid;
     return jsonHttpGet(url);
   };
 
@@ -185,20 +189,20 @@ var api = (function () {
   };
 
   mod.deleteTask = function(tid) {
-    return jsonHttpDelete(api_q_prefix() + "/task/" + tid);
+    return jsonHttpDelete(apiQPrefix() + "/task/" + tid);
   };
 
   mod.archiveTask = function(tid) {
-     return jsonHttpPost(api_q_prefix() + "/task/" + tid + "/remove", "");
+     return jsonHttpPost(apiQPrefix() + "/task/" + tid + "/remove", "");
   };
 
   mod.rankTaskFirst = function(tid) {
-     return jsonHttpPost(api_q_prefix() + "/task/" + tid + "/first", "");
+     return jsonHttpPost(apiQPrefix() + "/task/" + tid + "/first", "");
   };
 
   mod.createTask = function(task) {
     return jsonHttpPost(
-      api_q_prefix() + "/task/create/" + login.getTeam().teamid,
+      apiQPrefix() + "/task/create/" + login.getTeam().teamid,
       JSON.stringify(task)
     );
   };
@@ -210,44 +214,44 @@ var api = (function () {
       task_participants: task.task_participants,
       task_data        : task.task_data
     };
-    return jsonHttpPost(api_q_prefix() + "/task/" + task.tid,
+    return jsonHttpPost(apiQPrefix() + "/task/" + task.tid,
                         JSON.stringify(taskEdit));
   };
 
   mod.getTask = function(tid) {
-    return jsonHttpGet(api_q_prefix() + "/task/" + tid)
+    return jsonHttpGet(apiQPrefix() + "/task/" + tid)
   };
 
   mod.queueRemove = function(task) {
-    return jsonHttpPost(api_q_prefix() + "/queue/" + task.tid + "/remove",
+    return jsonHttpPost(apiQPrefix() + "/queue/" + task.tid + "/remove",
                         "");
   };
 
   /*** Chat ***/
 
   mod.getChatItem = function(rid) {
-    var url = api_q_prefix() + "/chat/whatever/item/" + rid;
+    var url = apiQPrefix() + "/chat/whatever/item/" + rid;
     return jsonHttpGet(url);
   };
 
   mod.postChatItem = function(chatItem) {
-    var url = api_q_prefix() + "/chat/" + chatItem.chatid + "/item";
+    var url = apiQPrefix() + "/chat/" + chatItem.chatid + "/item";
     return jsonHttpPost(url, JSON.stringify(chatItem));
   };
 
   mod.postChatItemRead = function(chatId, itemId) {
-    var url = api_q_prefix() + "/chat/" + chatId + "/item/" + itemId + "/read";
+    var url = apiQPrefix() + "/chat/" + chatId + "/item/" + itemId + "/read";
     return jsonHttpPost(url, "");
   };
 
   /*** Scheduling ***/
 
-  function api_s_prefix() {
+  function apiSPrefix() {
     return "/api/s/" + login.data.uid;
   };
 
   mod.getCalendar = function(uid2, optAuthLandingUrl) {
-    var url = api_s_prefix() + "/calendar/"
+    var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2;
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
@@ -255,70 +259,76 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  mod.postCalendarRevoke = function(uid2) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/revoke";
+    return jsonHttpPost(url);
+  };
+
   mod.getTimezones = function() {
-    var url = api_s_prefix() + "/timezones";
+    var url = apiSPrefix() + "/timezones";
     return jsonHttpGet(url);
   };
 
   mod.getCoordinates = function(loc) {
-    var url = api_s_prefix() + "/geocode/" + encodeURIComponent(loc);
+    var url = apiSPrefix() + "/geocode/" + encodeURIComponent(loc);
     return jsonHttpGet(url);
   };
 
   mod.getTimezone = function(lat, lon) {
-    var url = api_s_prefix() + "/timezone/" + lat + "/" + lon;
+    var url = apiSPrefix() + "/timezone/" + lat + "/" + lon;
     return jsonHttpGet(url);
   };
 
   mod.getPlacePredictions = function(partial_loc) {
-    var url = api_s_prefix() + "/place/autocomplete/" +
+    var url = apiSPrefix() + "/place/autocomplete/" +
               encodeURIComponent(partial_loc);
     return jsonHttpGet(url);
   };
 
   mod.getPlaceDetails = function(desc, refId) {
-    var url = api_s_prefix() + "/place/details/" +
+    var url = apiSPrefix() + "/place/details/" +
               encodeURIComponent(desc) + "/" +
               encodeURIComponent(refId);
     return jsonHttpGet(url);
   };
 
   mod.postCreatePlace = function(uid, desc, edit) {
-    var url = api_s_prefix() + "/place/create/" +
+    var url = apiSPrefix() + "/place/create/" +
               encodeURIComponent(desc);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
   mod.postEditPlace = function(uid, placeid, edit) {
-    var url = api_s_prefix() + "/place/edit/" +
+    var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
   mod.deletePlace = function(uid, placeid) {
-    var url = api_s_prefix() + "/place/edit/" +
+    var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpDelete(url);
   };
 
   mod.getPlaceList = function(uid) {
-    var url = api_s_prefix() + "/place/list/";
+    var url = apiSPrefix() + "/place/list/";
     return jsonHttpGet(url);
   };
 
   mod.postSelectPlace = function(loc) {
-    var url = api_s_prefix() + "/place/select/" +
+    var url = apiSPrefix() + "/place/select/" +
               encodeURIComponent(loc);
     return jsonHttpPost(url, "");
   };
 
   mod.getSuggestions = function(x) {
-    var url = api_s_prefix() + "/suggest";
+    var url = apiSPrefix() + "/suggest";
     return jsonHttpPost(url, JSON.stringify(x));
   };
 
   mod.reserveCalendar = function(tid, notified) {
-    var url = api_s_prefix() + "/event/" + tid + "/reserve";
+    var url = apiSPrefix() + "/event/" + tid + "/reserve";
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
@@ -333,7 +343,7 @@ var api = (function () {
   };
 
   mod.getReminderMessage = function(tid, parameters) {
-    var url = api_s_prefix() + "/task/" + tid + "/reminder/message";
+    var url = apiSPrefix() + "/task/" + tid + "/reminder/message";
     return jsonHttpPost(url, JSON.stringify(parameters));
   };
 

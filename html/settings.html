@@ -96,52 +96,80 @@
         <div class="exec-profile clearfix">
           <div id="prof-pic" class="clearfix">
             <div id="settings-modal-circ" class="settings-prof-circ"></div>
-            <button id="exec-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
+            <button id="exec-upload-photo"
+                    class="btn btn-default" disabled>Upload Photo</button>
           </div>
           <div id='settings-exec-title'>
-            <div for="settings-exec-name-prefix" class="text-field-div">Title</div>
-            <div id="settings-exec-name-prefix" class="input-group-btn"></div>
+            <div for="settings-exec-name-prefix"
+                 class="text-field-div">Title</div>
+            <div id="settings-exec-name-prefix"
+                 class="input-group-btn"></div>
           </div>
           <div id='settings-exec-legal-name'>
-            <div for="settings-exec-first-name" class="text-field-div">First Name</div>
-            <input type="text" id="settings-exec-first-name" class="form-control">
-            <div for="settings-exec-last-name" class="text-field-div">Last Name</div>
-            <input type="text" id="settings-exec-last-name" class="form-control">
+            <div for="settings-exec-first-name"
+                 class="text-field-div">First Name</div>
+            <input type="text"
+                   id="settings-exec-first-name"
+                   class="form-control">
+            <div for="settings-exec-last-name"
+                 class="text-field-div">Last Name</div>
+            <input type="text"
+                   id="settings-exec-last-name"
+                   class="form-control">
           </div>
           <div id="pseudonym-container" class="clearfix">
-            <div for="settings-exec-pseudonym" id="pseudonym-div">Pseudonym</div>
+            <div for="settings-exec-pseudonym"
+                 id="pseudonym-div">Pseudonym</div>
             <span id="pseudonym-optional-div">(optional)</span>
-            <input type="text" id="settings-exec-pseudonym" class="form-control" placeholder="ex. Bono">
+            <input type="text"
+                   id="settings-exec-pseudonym"
+                   class="form-control" placeholder="ex. Bono">
             <div id="pseudonym-option">
-              <img id="pseudonym-checkbox" class="svg" src="/assets/img/checkbox-sm.svg">
+              <img id="pseudonym-checkbox"
+                   class="svg"
+                   src="/assets/img/checkbox-sm.svg">
               <div id="pseudonym-checkbox-div">Only use pseudonym</div>
             </div>
           </div>
-          <div for="phone-number" class="text-field-div hide">Phone number</div>
-          <input type="text" id="settings-exec-phone" class="form-control hide">
+          <div for="phone-number"
+               class="text-field-div hide">Phone number</div>
+          <input type="text"
+                 id="settings-exec-phone"
+                 class="form-control hide">
         </div>
-        <div id="settings-exec-emails-title" class="settings-title">EMAIL ADDRESSES</div>
+        <div id="settings-exec-emails-title"
+             class="settings-title">EMAIL ADDRESSES</div>
         <div id="settings-exec-emails"></div>
-        <div id="linked-accounts-title" class="settings-title">LINKED ACCOUNTS</div>
+        <div id="linked-accounts-title"
+             class="settings-title">LINKED ACCOUNTS</div>
         <div id="linked-accounts">
           <!-- re-create in Javascript -->
-          <div class="account-row clearfix">
+          <div class="account-row">
             <img id="google" class="svg" src="/assets/img/google.svg">
-            <button id="connect-google" class="connect-btn btn btn-danger">Disconnect</button>
+            <button id="connect-google"
+                    class="connect-btn btn btn-danger">Disconnect</button>
             <div class="linked-account-details">
               <div class="linked-account-name">
                 <span>Google</span>
                 <span class="extended-name">Mail, Contacts, Calendar</span>
               </div>
               <div class="linked-account-status-text ellipsis">
-                <span id="google-status">Connected</span>
-                <span class="linked-account-email hide">as joelonsdale@gmail.com</span>
+                <span id="google-status">
+                  <!-- Connected -->
+                </span>
+                <span class="linked-account-email hide">
+                  <!-- as joelonsdale@gmail.com -->
+                </span>
               </div>
             </div>
           </div>
-          <div class="account-row clearfix">
-            <img id="linkedin" class="svg not-connected" src="/assets/img/linkedin.svg">
-            <button id="connect-linkedin" class="connect-btn btn btn-primary" disabled>Connect</button>
+          <div class="account-row">
+            <img id="linkedin"
+                 class="svg not-connected"
+                 src="/assets/img/linkedin.svg">
+            <button id="connect-linkedin"
+                    class="connect-btn btn btn-primary"
+                    disabled>Connect</button>
             <div class="linked-account-details">
               <div class="linked-account-name ellipsis">LinkedIn</div>
               <div class="linked-account-status-text ellipsis">
@@ -151,7 +179,8 @@
             </div>
           </div>
         </div>
-        <div id="scheduling-pref-title" class="settings-title">SCHEDULING PREFERENCES</div>
+        <div id="scheduling-pref-title"
+             class="settings-title">SCHEDULING PREFERENCES</div>
         <div id="scheduling-pref"></div>
       </div>
     </div>
