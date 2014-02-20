@@ -508,9 +508,9 @@ var settings = (function() {
     });
   }
 
-  function saveTemplate(condition) {
+  function saveTemplate(kind) {
     var template = {
-      message_condition: condition,
+      message_kind: kind,
       message_text: $("#edit-template-message").val()
     };
     api.postUserTemplate(login.me(), template)
@@ -520,14 +520,14 @@ var settings = (function() {
       });
   }
 
-  function editTemplate(templates, condition) {
+  function editTemplate(templates, kind) {
     var editOptions = list.find(templates, function(x) {
-      return x.message_condition === condition;
+      return x.message_kind === kind;
     });
     $("#edit-template-message").val(editOptions.message_text);
     $("#edit-template-save").off("click");
     $("#edit-template-save").on("click", function() {
-      saveTemplate(condition);
+      saveTemplate(kind);
     });
     $("#edit-template-modal").modal({});
   }
