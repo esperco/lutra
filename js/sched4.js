@@ -30,6 +30,7 @@ var sched4 = (function() {
       util.isDefined(state.reserved.google_event);
   }
 
+  // XXX UNUSED
   function formalEmailBody(organizerName, hostName, toName, when, where) {
     return "Dear "+toName+",\n\n"+
 
@@ -107,7 +108,6 @@ var sched4 = (function() {
     if (slot.location.instructions)
       place += " (" + slot.location.instructions + ")";
     var where = "at " + (place == "" ? "a place to be determined" : place);
-    //var body = formalEmailBody(organizerName, hostName, toName, when, where);
     api.getConfirmationMessage(ta.tid, {
       exec_name: hostName,
       guest_name: toName,
@@ -155,8 +155,8 @@ var sched4 = (function() {
     });
   }
 
+  // XXX UNUSED
   function refreshReminderMessage(cannedMessages) {
-    /*
     var conditions = [];
     function add_cond(cond) {
       if (cond.length > 0) {
@@ -169,11 +169,6 @@ var sched4 = (function() {
     var x = list.find(cannedMessages, function(x) {
       return list.diff(x.message_conditions, conditions).length <= 0;
     });
-    */
-
-    if (x) {
-      $("#sched-reminder-message").val(x.message_text);
-    }
   }
 
   function preFillReminderModal(profs, ta, reserved, guests) {
@@ -193,14 +188,6 @@ var sched4 = (function() {
         if (! reserved.reminder_message) {
           $("#sched-reminder-message").val(x.message_text);
         }
-        /*
-        $("#sched-reminder-meeting-kind")
-          .unbind("change")
-          .change(function(){refreshReminderMessage(x);});
-        $("#sched-reminder-guest-addr")
-          .unbind("change")
-          .change(function(){refreshReminderMessage(x);});
-        */
       });
   }
 

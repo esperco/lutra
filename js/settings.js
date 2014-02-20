@@ -68,7 +68,7 @@ var settings = (function() {
     if (firstName != "" && lastName != "")
       firstLast = [firstName, lastName];
 
-    /*
+    /* TODO Phone number stuff
     var phoneNumber = $("#settings-exec-phone").val();
     var contact = {
       contact_kind: "Phone_number",
@@ -82,25 +82,24 @@ var settings = (function() {
       apiCall =
         api.deleteContactInfo(execProfile.profile_uid, teamid, contact);
     }
-    apiCall.done(function() {
     */
-      var profileEdit = {
-        profile_uid: execProfile.profile_uid,
-        prefix: prefix,
-        first_last: firstLast,
-        pseudonym: (pseudo != "" ? pseudo : null),
-        gender: execProfile.gender
-      };
-      api.postProfile(profileEdit, teamid).done(function(prof) {
-        api.getProfile(execProfile.profile_uid).done(function(prof) {
-          execProfile = prof;
-          profile.set(prof);
-          $(".exec-settings-modal").modal("hide");
-          home.load(); // To update top left corner
-          settings.load();
-        });
+
+    var profileEdit = {
+      profile_uid: execProfile.profile_uid,
+      prefix: prefix,
+      first_last: firstLast,
+      pseudonym: (pseudo != "" ? pseudo : null),
+      gender: execProfile.gender
+    };
+    api.postProfile(profileEdit, teamid).done(function(prof) {
+      api.getProfile(execProfile.profile_uid).done(function(prof) {
+        execProfile = prof;
+        profile.set(prof);
+        $(".exec-settings-modal").modal("hide");
+        home.load(); // To update top left corner
+        settings.load();
       });
-    //});
+    });
   }
 
   function showOnlyPseudonym() {
