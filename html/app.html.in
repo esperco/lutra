@@ -8,9 +8,11 @@
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
     <link href="/assets/css/app.css" rel="stylesheet" media="screen">
-    <link href="/assets/css/fonts.css" rel="stylesheet" type="text/css" charset="utf-8" />
+    <link href="/assets/css/fonts.css" rel="stylesheet" type="text/css" charset="utf-8">
     <link href="/assets/css/animate.min.css" rel="stylesheet">
     <link href="/assets/css/font-awesome.css" rel="stylesheet">
+    <link href="/assets/css/fullcalendar.css" rel="stylesheet">
+    <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
   </head>
 
   <body>
@@ -333,6 +335,9 @@
     <script src="/assets/js/sha1.js"></script>
     <script src="/assets/js/jquery.timeago.js"></script>
     <script src="/assets/js/jquery.autosize.min.js"></script>
+    <script src="/assets/js/jquery-ui.custom.min.js"></script>
+    <script src="/assets/js/moment.min.js"></script>
+    <script src="/assets/js/fullcalendar.min.js"></script>
 
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>

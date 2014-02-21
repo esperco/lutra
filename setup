@@ -25,3 +25,7 @@ mv dist bootstrap
 cp can-1.1.8.custom.min.js can.min.js
 
 cp font-awesome-4.0.3.css font-awesome.css
+
+rm -rf fullcalendar
+unzip fullcalendar-2.0.0-beta2.zip
+mv fullcalendar-2.0.0-beta2 fullcalendar

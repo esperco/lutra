@@ -256,11 +256,29 @@ var sched2 = (function() {
     });
   }
 
+  function createCalendar() {
+    var calendarView = $("<div>");
+    api.postCalendar(login.leader(), {
+      timezone: "America/Los_Angeles",
+      window_start: "2014-02-17T00:00:00-08:00",
+      window_end: "2014-02-24T00:00:00-08:00"
+    }).done(function (x) {
+      calendarView.fullCalendar({
+	defaultDate: "2014-02-20",
+        editable: true,
+	events: x.events
+      });
+    });
+    return calendarView;
+  }
+
   function loadStep2Prefs(tzList, task) {
     var view = $("#sched-step2-pref-time");
     view.children().remove();
     var viewTimeZone = $("#sched-step2-time-zone");
     viewTimeZone.children().remove();
+
+    view.append(createCalendar());
 
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,
