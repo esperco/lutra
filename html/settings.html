@@ -1,52 +1,86 @@
 <div class="container home-container">
   <div class="clearfix">
     <h1 class="page-title unselectable">SETTINGS</h1>
+    <ul class="nav nav-tabs desktop-nav-tabs list-tabs">
+      <li class="active settings-tab tab-my-account"><a href="#">MY ACCOUNT</a></li>
+      <li class="settings-tab tab-executives"><a href="#">EXECUTIVES</a></li>
+      <li class="settings-tab tab-templates"><a href="#">TEMPLATES</a></li>
+    </ul>
   </div>
-  <div class="clearfix">
-    <div id="settings-profile-title" class="settings-title">PROFILE</div>
-    <div id="settings-user-profile" class="clearfix">
-      <div id="left-col" class="form-group col-md-6">
-        <div id="settings-prof-pic">
-          <div id="settings-profile-circ" class="settings-prof-circ"></div>
-          <button id="settings-upload-photo"
-                  class="btn btn-default" disabled>Upload Photo</button>
+  <ul class="nav nav-tabs mobile-nav-tabs list-tabs">
+    <li class="active settings-tab tab-my-account"><a href="#">MY ACCOUNT</a></li>
+    <li class="settings-tab tab-executives"><a href="#">EXECUTIVES</a></li>
+    <li class="settings-tab tab-templates"><a href="#">TEMPLATES</a></li>
+  </ul>
+  <div id="tab-my-account-content" class="settings-content">
+    <div class="clearfix">
+      <div id="settings-profile-title" class="settings-title">PROFILE</div>
+      <div id="settings-user-profile" class="clearfix">
+        <div id="left-col" class="form-group col-md-6">
+          <div id="settings-prof-pic">
+            <div id="settings-profile-circ" class="settings-prof-circ"></div>
+            <button id="settings-upload-photo" class="btn btn-default" disabled>Upload Photo</button>
+          </div>
+          <div id="user-title">
+            <div id="settings-name-prefix" class="input-group-btn"></div>
+            <div class="text-field-div text-field-label">Title</div>
+          </div>
+          <div id="user-legal-name">
+            <div class="text-field-div text-field-label">First Name</div>
+            <input type="text" id="settings-first-name" class="form-control">
+            <div class="text-field-div text-field-label">Last Name</div>
+            <input type="text" id="settings-last-name" class="form-control">
+          </div>
+          <button id="settings-update-name" class="btn btn-primary">Update</button>
         </div>
-        <div id="user-title">
-          <div id="settings-name-prefix" class="input-group-btn"></div>
-          <div class="text-field-div text-field-label">Title</div>
+        <div id="right-col" class="form-group col-md-6">
+          <div class="text-field-div text-field-label">Username</div>
+          <input type="email" id="settings-username" class="form-control" disabled>
+          <div class="text-field-div text-field-label">Password</div>
+          <input type="password" id="settings-password" class="form-control">
+          <div class="text-field-div text-field-label">Confirm password</div>
+          <input type="password" id="settings-confirm-password" class="form-control">
+          <button id="settings-update-password" class="btn btn-primary">Update</button>
         </div>
-        <div id="user-legal-name">
-          <div class="text-field-div text-field-label">First Name</div>
-          <input type="text" id="settings-first-name" class="form-control">
-          <div class="text-field-div text-field-label">Last Name</div>
-          <input type="text" id="settings-last-name" class="form-control">
-        </div>
-        <button id="settings-update-name"
-                class="btn btn-primary">Update</button>
       </div>
-      <div id="right-col" class="form-group col-md-6">
-        <div class="text-field-div text-field-label">Username</div>
-        <input type="email" id="settings-username"
-               class="form-control" disabled>
-        <div class="text-field-div text-field-label">Password</div>
-        <input type="password" id="settings-password" class="form-control">
-        <div class="text-field-div text-field-label">Confirm password</div>
-        <input type="password"
-               id="settings-confirm-password"
-               class="form-control">
-        <button id="settings-update-password"
-                class="btn btn-primary">Update</button>
+    </div>
+    <div id="settings-emails-title" class="settings-title">EMAIL ADDRESSES</div>
+    <div id="settings-emails"></div>
+  </div>
+
+  <div id="tab-executives-content" class="settings-content hide">
+    <div id="settings-executives-title" class="settings-title">EXECUTIVES</div>
+    <div id="settings-executives"></div>
+  </div>
+
+  <div id="tab-templates-content" class="settings-content hide">
+    <div id="settings-templates-title" class="settings-title">TEMPLATES</div>
+    <div id="settings-templates">
+      <!-- TODO style me -->
+      <div>
+        <a href="#" id="edit-options-approval">Meeting Options - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-options-offer">Meeting Options - Offer to Guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-confirmation-approval">Meeting Confirmation - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-confirmation-offer">Meeting Confirmation - Offer to Guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-approval">Meeting Reminder - Approval</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-offer">Meeting Reminder - Offer to Guest</a>
       </div>
     </div>
   </div>
-  <div id="settings-emails-title" class="settings-title">EMAIL ADDRESSES</div>
-  <div id="settings-emails"></div>
-  <div id="settings-executives-title" class="settings-title">EXECUTIVES</div>
-  <div id="settings-executives"></div>
 </div>
 
 <div class="modal fade exec-settings-modal" tabindex="-1"
-     role="dialog" aria-divledby="exec-settings-title"
+     role="dialog" aria-labelledby="exec-settings-title"
      aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-close-circ" data-dismiss="modal">
@@ -148,6 +182,47 @@
         <div id="scheduling-pref-title"
              class="settings-title">SCHEDULING PREFERENCES</div>
         <div id="scheduling-pref"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade edit-signature-modal" tabindex="-1"
+     role="dialog" aria-labelledby="edit-signature-title"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="edit-signature-save" style="float:right">Save</button>
+        <h3 class="modal-title" id="edit-signature-title">Edit Signature</h3>
+      </div>
+      <div class="modal-body" id="edit-signature-body">
+        <textarea rows=5 id="edit-signature-input" class="form-control"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit-template-modal" tabindex="-1"
+     role="dialog" aria-labelledby="edit-template-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="edit-template-save" style="float:right">Save</button>
+        <h3 class="modal-title" id="edit-template-title">Edit template</h3>
+      </div>
+      <div class="modal-body" id="edit-template-body">
+        <h4 class="modal-section-title">Message</h4>
+        <textarea class="form-control" rows="10"
+                  id="edit-template-message"></textarea>
       </div>
     </div>
   </div>

@@ -157,6 +157,28 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(email));
   };
 
+  mod.postEmailSignature = function(myUID, theirUID, teamid, sig) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid +
+      "/signature";
+    return jsonHttpPost(url, JSON.stringify(sig));
+  };
+
+  mod.getContactInfo = function(theirUID, teamid) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
+    return jsonHttpGet(url);
+  };
+
+  mod.postContactInfo = function(theirUID, teamid, contact) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
+    return jsonHttpPost(url, JSON.stringify(contact));
+  };
+
+  mod.deleteContactInfo = function(theirUID, teamid, contact) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid +
+      "/remove";
+    return jsonHttpPost(url, JSON.stringify(contact));
+  };
+
 
   mod.loadActiveTasks = function() {
     return jsonHttpGet(api_tasks_prefix() + "/active");
@@ -310,9 +332,29 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
+  mod.getOptionsMessage = function(tid, parameters) {
+    var url = apiSPrefix() + "/task/" + tid + "/options/message";
+    return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
+  mod.getConfirmationMessage = function(tid, parameters) {
+    var url = apiSPrefix() + "/task/" + tid + "/confirmation/message";
+    return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
   mod.getReminderMessage = function(tid, parameters) {
     var url = apiSPrefix() + "/task/" + tid + "/reminder/message";
     return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
+  mod.getUserTemplates = function() {
+    var url = "/api/templates/" + login.data.uid;
+    return jsonHttpGet(url);
+  };
+
+  mod.postUserTemplate = function(uid, template) {
+    var url = "/api/templates/" + login.data.uid + "/save";
+    return jsonHttpPost(url, JSON.stringify(template));
   };
 
   return mod;

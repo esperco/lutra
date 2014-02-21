@@ -13,6 +13,7 @@ var settings = (function() {
   var execProfile = null;
   var asstNamePrefixSel = null;
   var execNamePrefixSel = null;
+  var originalExecPhone = null;
 
   function displayNamePrefixes(view, gender, chosenPrefix) {
     view.children().remove();
@@ -67,6 +68,22 @@ var settings = (function() {
     if (firstName != "" && lastName != "")
       firstLast = [firstName, lastName];
 
+    /* TODO Phone number stuff
+    var phoneNumber = $("#settings-exec-phone").val();
+    var contact = {
+      contact_kind: "Phone_number",
+      contact_data: phoneNumber
+    };
+    var apiCall = deferred.defer(null);
+    if (phoneNumber !== originalExecPhone) {
+      apiCall =
+        api.postContactInfo(execProfile.profile_uid, teamid, contact);
+    } else if (phoneNumber === "" && originalExecPhone !== "") {
+      apiCall =
+        api.deleteContactInfo(execProfile.profile_uid, teamid, contact);
+    }
+    */
+
     var profileEdit = {
       profile_uid: execProfile.profile_uid,
       prefix: prefix,
@@ -103,6 +120,7 @@ var settings = (function() {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
       api.getEmails(execUID, teamid).done(function(execEmails) {
+      //api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
@@ -153,6 +171,15 @@ var settings = (function() {
             execSettingsModal(execUID, teamid);
           });
         });
+
+        /* TODO: Only showing one piece of contact info, a phone number.
+                 The backend supports storing others too, like Skype ID. */
+        /*
+        var phoneNumber = execContactInfo.length ? execContactInfo[0][1] : "";
+        $("#settings-exec-phone").val(phoneNumber);
+        originalExecPhone = phoneNumber;
+        */
+
         displayEmailAdd(emailView, execUID, teamid, function() {
           execSettingsModal(execUID, teamid);
         });
@@ -162,6 +189,7 @@ var settings = (function() {
         });
         $(".exec-settings-modal").modal({});
       });
+      //});
     });
   }
 
@@ -221,11 +249,13 @@ var settings = (function() {
   function displayExecutives(teams) {
     var view = $("#settings-executives");
     view.children().remove();
-    var leaderUids = list.map(teams, function(team) {
-      return team.team_leaders[0];
-    });
+    var leaderUIDs = list.unique(
+      list.map(teams, function(team) {
+        return team.team_leaders[0];
+      })
+    );
     var deferredDeferredRows =
-      profile.mget(leaderUids).then(function(execProfs) {
+      profile.mget(leaderUIDs).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
           var prof = execProf.prof;
           var execUid = prof.profile_uid;
@@ -249,14 +279,32 @@ var settings = (function() {
     });
   }
 
+  function editSignature(myUID, theirUID, teamid, email) {
+    $("#edit-signature-input").val(email.email_signature);
+    $(".edit-signature-modal").modal({});
+
+    $("#edit-signature-save").off("click");
+    $("#edit-signature-save").one("click", function() {
+      var sig = $("#edit-signature-input").val();
+      api.postEmailSignature(myUID, theirUID, teamid, {
+        email_address: email.email,
+        email_signature: sig
+      }).done(function() {
+        $(".edit-signature-modal").modal("hide");
+        settings.load();
+      });
+    });
+  }
+
   function displayEmail(view, isEA, email, uid, teamid, done) {
     var divEmailRow = $("<div class='email-row clearfix'/>");
     var divEmailRowContent = $("<div class='email-row-content'/>")
       .appendTo(divEmailRow);
 
-    if (isEA) {
+    if (isEA && email.email_confirmed) {
       $("<button class='btn btn-default edit-signature'/>")
         .text("Edit signature")
+        .click(function() { editSignature(uid, uid, teamid, email); })
         .appendTo(divEmailRowContent);
     }
 
@@ -436,11 +484,90 @@ var settings = (function() {
     }
   }
 
+  function setupTabs() {
+    $(".tab-my-account a").off("click");
+    $(".tab-my-account a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-my-account-content").removeClass("hide");
+    });
+    $(".tab-executives a").off("click");
+    $(".tab-executives a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-executives-content").removeClass("hide");
+    });
+    $(".tab-templates a").off("click");
+    $(".tab-templates a").click(function() {
+      $(".settings-tab").removeClass("active");
+      $(this).parent().addClass("active");
+      $(".settings-content").addClass("hide");
+      $("#tab-templates-content").removeClass("hide");
+    });
+  }
+
+  function saveTemplate(kind) {
+    var template = {
+      message_kind: kind,
+      message_text: $("#edit-template-message").val()
+    };
+    api.postUserTemplate(login.me(), template)
+      .done(function() {
+        $("#edit-template-modal").modal("hide");
+        settings.load();
+      });
+  }
+
+  function editTemplate(templates, kind) {
+    var editOptions = list.find(templates, function(x) {
+      return x.message_kind === kind;
+    });
+    $("#edit-template-message").val(editOptions.message_text);
+    $("#edit-template-save").off("click");
+    $("#edit-template-save").on("click", function() {
+      saveTemplate(kind);
+    });
+    $("#edit-template-modal").modal({});
+  }
+
+  function displayTemplates() {
+    api.getUserTemplates().done(function(templates) {
+      $("#edit-options-approval").off("click");
+      $("#edit-options-approval").on("click", function() {
+        editTemplate(templates, "Meeting_options_approval");
+      });
+      $("#edit-options-offer").off("click");
+      $("#edit-options-offer").on("click", function() {
+        editTemplate(templates, "Meeting_options_offer");
+      });
+      $("#edit-confirmation-approval").off("click");
+      $("#edit-confirmation-approval").on("click", function() {
+        editTemplate(templates, "Meeting_confirmation_approval");
+      });
+      $("#edit-confirmation-offer").off("click");
+      $("#edit-confirmation-offer").on("click", function() {
+        editTemplate(templates, "Meeting_confirmation_offer");
+      });
+      $("#edit-reminder-approval").off("click");
+      $("#edit-reminder-approval").on("click", function() {
+        editTemplate(templates, "Meeting_reminder_approval");
+      });
+      $("#edit-reminder-offer").off("click");
+      $("#edit-reminder-offer").on("click", function() {
+        editTemplate(templates, "Meeting_reminder_offer");
+      });
+    });
+  }
+
   mod.load = function() {
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     displayExecutives(teams);
     disableUpdateButtonsUntilModified();
+    setupTabs();
+    displayTemplates();
     $("#settings-update-name").off("click");
     $("#settings-update-name").one("click", updateAssistantName);
     $("#settings-update-password").off("click");

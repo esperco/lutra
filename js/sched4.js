@@ -30,6 +30,7 @@ var sched4 = (function() {
       util.isDefined(state.reserved.google_event);
   }
 
+  // XXX UNUSED
   function formalEmailBody(organizerName, hostName, toName, when, where) {
     return "Dear "+toName+",\n\n"+
 
@@ -101,49 +102,60 @@ var sched4 = (function() {
     var t2 = date.ofString(slot.end);
     var when =
       ta.task_data[1].hide_end_times ?
-      "on " + date.justStartTime(t1) :
-      "on " + date.range(t1, t2);
+      date.justStartTime(t1) :
+      date.range(t1, t2);
     var place = slot.location.address;
     if (slot.location.instructions)
       place += " (" + slot.location.instructions + ")";
     var where = "at " + (place == "" ? "a place to be determined" : place);
-    var body = formalEmailBody(organizerName, hostName, toName, when, where);
-    $("#sched-confirm-message")
-      .val(body);
+    api.getConfirmationMessage(ta.tid, {
+      exec_name: hostName,
+      guest_name: toName,
+      meet_date: date.dateOnly(t1),
+      meet_time: (
+        ta.task_data[1].hide_end_times ?
+        date.timeOnly(t1) :
+        date.timeOnly(t1) + " to " + date.timeOnly(t2)
+      )
+    })
+      .done(function(confirmationMessage) {
+        $("#sched-confirm-message").val(confirmationMessage.message_text);
 
-    var schedConfirmShowEnd = $("#sched-confirm-show-end");
-    schedConfirmShowEnd.children().remove();
+        var schedConfirmShowEnd = $("#sched-confirm-show-end");
+        schedConfirmShowEnd.children().remove();
 
-    var showEndCheckboxDiv = $("<div class='footer-checkbox-div'/>")
-      .appendTo(schedConfirmShowEnd);
-    var showEndCheckbox = $("<img class='footer-checkbox'/>")
-      .appendTo(showEndCheckboxDiv);
-    svg.loadImg(showEndCheckbox, "/assets/img/checkbox-sm.svg");
+        var showEndCheckboxDiv = $("<div class='footer-checkbox-div'/>")
+          .appendTo(schedConfirmShowEnd);
+        var showEndCheckbox = $("<img class='footer-checkbox'/>")
+          .appendTo(showEndCheckboxDiv);
+        svg.loadImg(showEndCheckbox, "/assets/img/checkbox-sm.svg");
 
-    var timeOption = $("<div class='time-option' />")
-      .append("Show end time of meeting")
-      .appendTo(schedConfirmShowEnd);
+        var timeOption = $("<div class='time-option' />")
+          .append("Show end time of meeting")
+          .appendTo(schedConfirmShowEnd);
 
-    if (ta.task_data[1].hide_end_times)
-      schedConfirmShowEnd.removeClass("checkbox-selected");
-    else
-      schedConfirmShowEnd.addClass("checkbox-selected");
+        if (ta.task_data[1].hide_end_times)
+          schedConfirmShowEnd.removeClass("checkbox-selected");
+        else
+          schedConfirmShowEnd.addClass("checkbox-selected");
 
-    schedConfirmShowEnd.off("click");
-    schedConfirmShowEnd.click(function() {
-      var when = null;
-      if (schedConfirmShowEnd.hasClass("checkbox-selected")) {
-        schedConfirmShowEnd.removeClass("checkbox-selected");
-        var when = "on " + date.justStartTime(t1);
-      } else {
-        schedConfirmShowEnd.addClass("checkbox-selected");
-        var when = "on " + date.range(t1, t2);
-      }
-      var body = formalEmailBody(organizerName, hostName, toName, when, where);
-      $("#sched-confirm-message").val(body);
+        schedConfirmShowEnd.off("click");
+        schedConfirmShowEnd.click(function() {
+          var when = null;
+          if (schedConfirmShowEnd.hasClass("checkbox-selected")) {
+            schedConfirmShowEnd.removeClass("checkbox-selected");
+            var when = "on " + date.justStartTime(t1);
+          } else {
+            schedConfirmShowEnd.addClass("checkbox-selected");
+            var when = "on " + date.range(t1, t2);
+          }
+          var body = formalEmailBody(organizerName, hostName, toName, when, where);
+          $("#sched-confirm-message").val(body);
+        });
     });
   }
 
+  // XXX UNUSED
   function refreshReminderMessage(cannedMessages) {
     var conditions = [];
     function add_cond(cond) {
@@ -157,13 +169,9 @@ var sched4 = (function() {
     var x = list.find(cannedMessages, function(x) {
       return list.diff(x.message_conditions, conditions).length <= 0;
     });
-    if (x) {
-      $("#sched-reminder-message").val(x.message_text);
-    }
   }
 
   function preFillReminderModal(profs, ta, reserved, guests) {
-
     loadReminderRecipients(profs, guests);
 
     $("#sched-reminder-subject")
@@ -173,17 +181,13 @@ var sched4 = (function() {
       $("#sched-reminder-message").val(reserved.reminder_message);
     }
 
-    api.getReminderMessage(ta.tid, {})
+    api.getReminderMessage(ta.tid, {
+      guest_name: $(".recipient-name").first().text()
+    })
       .done(function(x) {
         if (! reserved.reminder_message) {
-          refreshReminderMessage(x);
+          $("#sched-reminder-message").val(x.message_text);
         }
-        $("#sched-reminder-meeting-kind")
-          .unbind("change")
-          .change(function(){refreshReminderMessage(x);});
-        $("#sched-reminder-guest-addr")
-          .unbind("change")
-          .change(function(){refreshReminderMessage(x);});
       });
   }
 

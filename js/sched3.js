@@ -10,6 +10,7 @@ var sched3 = (function() {
     });
   }
 
+  // XXX UNUSED
   function formalEmailBody(organizerName, hostName, toName, howSoon) {
     return "Dear "+toName+",\n\n"+
 
@@ -195,9 +196,6 @@ var sched3 = (function() {
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(toObsProf.prof);
     var howSoon = textOfHowSoon(howSoon);
-    var body = formalEmailBody(organizerName, hostName, toName, howSoon);
-    $("#sched-availability-message")
-      .val(body);
 
     var footerOption = $("#footer-option");
     footerOption.children().remove();
@@ -233,6 +231,15 @@ var sched3 = (function() {
         showEndTime();
       }
     })
+
+    //var body = formalEmailBody(organizerName, hostName, toName, howSoon);
+    api.getOptionsMessage(task.tid, {
+      exec_name: hostName,
+      guest_name: toName,
+    })
+      .done(function(optionsMessage) {
+        $("#sched-availability-message").val(optionsMessage.message_text);
+      });
   }
 
 
