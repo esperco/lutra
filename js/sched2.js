@@ -603,7 +603,8 @@ var sched2 = (function() {
 
     var li = $('<li role="presentation"/>')
       .appendTo(menu);
-    var bolded = "Create a place named <b>\"" + input + "\"</b>";
+    var bolded = "Create a place named <b>\""
+      + util.htmlEscape(input) + "\"</b>";
     $('<a role="menuitem" tabindex="-1" href="#"/>')
       .html(bolded)
       .appendTo(li)
@@ -635,14 +636,15 @@ var sched2 = (function() {
         var bolded;
         var addr = item.loc.address;
         var title = item.loc.title;
+        var esc = util.htmlEscape;
         if (item.matched_field == "Address") {
           bolded = geo.highlight(addr, [item.matched_substring]);
           if (title && title != addr) {
-            bolded = "<i>" + title + "</i> - " + bolded;
+            bolded = "<i>" + esc(title) + "</i> - " + bolded;
           }
         } else if (item.matched_field == "Title") {
           bolded = "<i>" + geo.highlight(title, [item.matched_substring])
-            + "</i> - " + addr;
+            + "</i> - " + esc(addr);
         } else {
           // TODO Error, bad API response, should never happen
         }
