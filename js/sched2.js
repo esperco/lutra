@@ -557,7 +557,7 @@ var sched2 = (function() {
     }
     else {
       var authLandingUrl = document.URL;
-      result = api.getCalendar(leaderUid, authLandingUrl)
+      result = api.getCalendarInfo(leaderUid, authLandingUrl)
         .then(function(calInfo) {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);

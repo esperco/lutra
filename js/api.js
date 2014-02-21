@@ -228,9 +228,15 @@ var api = (function () {
     return "/api/s/" + login.data.uid;
   };
 
-  mod.getCalendar = function(uid2, optAuthLandingUrl) {
+  mod.postCalendar = function(uid2, calRequest) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2;
+    return jsonHttpPost(url, JSON.stringify(calRequest));
+  };
+
+  mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/info";
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
