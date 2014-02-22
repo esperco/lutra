@@ -36,6 +36,7 @@ SOURCES = \
   profile.js \
   chat.js \
   geo.js \
+  calpicker.js \
   sched.js \
   sched1.js \
   sched2.js \
