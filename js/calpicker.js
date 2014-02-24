@@ -6,6 +6,16 @@
 var calpicker = (function() {
   var mod = {};
 
+  function fetchEvents(start, end, tz, callback) {
+    api.postCalendar(login.leader(), {
+      timezone: tz,
+      window_start: start,
+      window_end: end
+    }).done(function (x) {
+      callback(x.events);
+    });
+  }
+
   mod.createCalendar = function(param) {
     var calendarView = $("<div>");
 
@@ -41,13 +51,13 @@ var calpicker = (function() {
           right: 'month,agendaWeek,agendaDay'
         },
         defaultView: 'agendaWeek',
-        defaultDate: "2014-02-20",
+        timezone: "America/Los_Angeles",
         selectable: true,
         selectHelper: true,
 	select: select,
         eventClick: eventClick,
         editable: false,
-        events: x.events
+        events: fetchEvents
       });
     });
     return calendarView;
