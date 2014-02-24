@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Esper</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/app.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/fonts.css" rel="stylesheet" type="text/css" charset="utf-8" />
+ <!-- Chrome 33 does not like animate.css; Don't know why.  -->
+ <!-- <link href="/assets/css/animate.min.css" rel="stylesheet"> -->
+    <link href="/assets/css/font-awesome.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="task-content" class="scrollable"></div>
+
+    <div id="chat" class="animated fadeInUp premiere">
+      <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
+      <div id="chat-container">
+        <div id="chat-header">
+          <ul class="nav chat-tabs chat-profile-tabs"></ul>
+        </div>
+        <div class="tab-content chat-panel"></div>
+      </div>
+    </div>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/can.min.js"></script>
+    <script src="/assets/js/sha1.js"></script>
+    <script src="/assets/js/jquery.timeago.js"></script>
+    <script src="/assets/js/jquery.autosize.min.js"></script>
+
+    <!-- API key activated by jeff@esper.co -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>
+
+    <!-- Pusher client library -->
+    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js">
+    </script>
+
+    INCLUDES
+  </body>
+</html>

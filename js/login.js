@@ -77,81 +77,16 @@ var login = (function() {
     }
   };
 
-  var pusher;
-
-  function pusher_start() {
-    pusher = new Pusher('d9694497227b84d1f865');
-    pusher.subscribe(mod.data.uid);
-    pusher.bind('tasks', function(events) {
-      list.iter(events, function(ev) {
-        switch (variant.cons(ev)) {
-
-        case "Task_created":
-          var tid = ev[1].tid;
-          if (tid) {
-            api.getTask(tid).done(task.onTaskCreated.notify);
-          }
-          break;
-
-        case "Task_modified":
-          var tid = ev[1].tid;
-          if (tid) {
-            api.getTask(tid).done(task.onTaskModified.notify);
-          }
-          break;
-
-        case "Task_ranked":
-          var rank = ev[1];
-          switch (variant.cons(rank)) {
-          case "Task_rank_before":
-            task.onTaskRankedBefore.notify(rank[1][0], rank[1][1]);
-            break;
-          case "Task_rank_after":
-            task.onTaskRankedAfter.notify(rank[1][0], rank[1][1]);
-            break;
-          case "Task_rank_first":
-            task.onTaskRankedFirst.notify(rank[1]);
-            break;
-          case "Task_rank_last":
-            task.onTaskRankedLast.notify(rank[1]);
-            break;
-          case "Task_rank_archive":
-            task.onTaskArchived.notify(rank[1]);
-            break;
-          }
-          break;
-
-        case "Chat_posted":
-          var rid = ev[1].rid;
-          if (rid) {
-            api.getChatItem(rid).done(function(chatItem) {
-              task.onChatPosting.notify(chatItem);
-              task.onChatPosted .notify(chatItem);
-            });
-          }
-          break;
-        }
-      });
-    });
-  }
-
-  function pusher_stop() {
-    if (pusher) {
-      pusher.disconnect();
-      pusher = null;
-    }
-  }
-
   mod.updateView = function() {
     if (mod.data && mod.data.email) {
       $("#logged-in-email").text(mod.data.email);
       $(".logged-out").addClass("hide");
       $(".logged-in").removeClass("hide");
-      pusher_start();
+      pusher.start();
     } else {
       $(".logged-in").addClass("hide");
       $(".logged-out").removeClass("hide");
-      pusher_stop();
+      pusher.stop();
     }
   };
 

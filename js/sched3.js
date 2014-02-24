@@ -406,7 +406,7 @@ var sched3 = (function() {
 
     guestsContainer.appendTo(view);
 
-    task.onSchedulingStepChanging.observe("step", function() {
+    observable.onSchedulingStepChanging.observe("step", function() {
       saveTask(ta, selected);
     });
   };

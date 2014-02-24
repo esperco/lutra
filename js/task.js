@@ -7,71 +7,6 @@ var task = (function() {
 
   var mod = {};
 
-  function Observable() {
-    var listeners = {};
-    this.observe = function(key, fn) {
-      listeners[key] = fn;
-    };
-    this.stopObserve = function(key) {
-      delete listeners[key];
-    };
-    this.notify = function(v,w,x,y,z) {
-      for (var key in listeners) {
-        listeners[key](v,w,x,y,z);
-      }
-    };
-  }
-
-  mod.onTaskCreated = new Observable();
-  mod.onTaskModified = new Observable();
-  mod.onTaskParticipantsChanged = new Observable();
-  mod.onTaskRankedBefore = new Observable();
-  mod.onTaskRankedAfter = new Observable();
-  mod.onTaskRankedFirst = new Observable();
-  mod.onTaskRankedLast = new Observable();
-  mod.onTaskArchived = new Observable();
-  mod.onChatPosting = new Observable();
-  mod.onChatPosted = new Observable();
-  mod.onSchedulingStepChanging = new Observable();
-
-  /* extract all user IDs contained in the task; this is used to
-     pre-fetch all the profiles. */
-  mod.extractAllUids = function(ta) {
-    var acc = [];
-
-    var taskPar = ta.task_participants;
-    acc = list.union(acc, taskPar.organized_by);
-    acc = list.union(acc, taskPar.organized_for);
-
-    list.iter(ta.task_chats, function(chat) {
-      var uids = list.map(chat.chat_participants, function(x) {
-        return x.par_uid;
-      });
-      acc = list.union(acc, uids);
-    });
-
-    return acc;
-  }
-
-  /*
-    fetch the profiles of everyone involved in the task
-    (deferred map from uid to profile)
-  */
-  mod.profilesOfEveryone = function(ta) {
-    var par = ta.task_participants;
-    var everyone = mod.extractAllUids(ta);
-    return profile.mget(everyone)
-      .then(function(a) {
-        var b = {};
-        list.iter(a, function(obsProf) {
-          if (obsProf !== null) {
-            b[obsProf.prof.profile_uid] = obsProf;
-          }
-        });
-        return b;
-      });
-  };
-
   /* display task */
   function viewOfGeneralTask(task) {
     function toggleTitle() {
@@ -202,7 +137,7 @@ var task = (function() {
           task.task_status.task_progress = "Coordinating";
           api.postTask(task)
             .done(function(task) {
-              mod.onTaskModified.notify(task);
+              observable.onTaskModified.notify(task);
               loadTask(task);
             });
         }
@@ -222,7 +157,7 @@ var task = (function() {
           };
           api.createTask(task)
             .done(function(task) {
-              mod.onTaskCreated.notify(task);
+              observable.onTaskCreated.notify(task);
               /* change URL */
               window.location.hash = "#!task/" + task.tid;
             });
@@ -302,8 +237,6 @@ var task = (function() {
       api.getTask(optTid)
         .done(loadTask);
     }
-
-    mod.onTaskParticipantsChanged.observe("chat-tabs", chat.loadTaskChats);
   }
 
   mod.init = function() {

@@ -474,11 +474,11 @@ var sched4 = (function() {
       .append(createInviteSection(profs, ta, guests))
       .append(createRemindSection(profs, ta, guests));
 
-    task.onTaskParticipantsChanged.observe("step4", function(ta) {
+    observable.onTaskParticipantsChanged.observe("step4", function(ta) {
       chats = sched.chatsOfTask(ta);
     });
     /* Task is always saved when remind changes. */
-    task.onSchedulingStepChanging.stopObserve("step");
+    observable.onSchedulingStepChanging.stopObserve("step");
   };
 
   return mod;

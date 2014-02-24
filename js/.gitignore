@@ -1,4 +1,6 @@
 dev.js
 prod.js
 includes-dev.html
+includes-dev-guest-app.html
 includes-prod.html
+includes-prod-guest-app.html
