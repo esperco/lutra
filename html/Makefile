@@ -30,13 +30,13 @@ dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev-guest-app.html' \
             -e '/INCLUDES/d' \
           guest-app.html.in \
-	| ./inject-files $(HTML_INCLUDES) \
 	> guest-app.html
 
 prod-build:
 	sed -e '/INCLUDES/r ../js/includes-prod.html' \
             -e '/INCLUDES/d' \
           app.html.in \
+	| ./inject-files $(HTML_INCLUDES) \
 	> app.html
 	sed -e '/INCLUDES/r ../js/includes-prod-guest-app.html' \
             -e '/INCLUDES/d' \
