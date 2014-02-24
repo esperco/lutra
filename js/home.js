@@ -43,7 +43,7 @@ var home = (function() {
       .tooltip({"title":"Archive"})
       .click(function() {
         api.archiveTask(ta.tid);
-        task.onTaskArchived.notify(ta.tid);
+        observable.onTaskArchived.notify(ta.tid);
       });
 
     var restoreButton = $("<button class='restore-div'/>")
@@ -251,13 +251,13 @@ var home = (function() {
 
     showActiveTasks(data[1]);
 
-    task.onTaskArchived    .observe("task-list", taskArchived);
-    task.onTaskCreated     .observe("task-list", taskUpdated);
-    task.onTaskModified    .observe("task-list", taskUpdated);
-    task.onTaskRankedFirst .observe("task-list", taskRankedFirst);
-    task.onTaskRankedLast  .observe("task-list", taskRankedLast);
-    task.onTaskRankedBefore.observe("task-list", taskRankedBefore);
-    task.onTaskRankedAfter .observe("task-list", taskRankedAfter);
+    observable.onTaskArchived    .observe("task-list", taskArchived);
+    observable.onTaskCreated     .observe("task-list", taskUpdated);
+    observable.onTaskModified    .observe("task-list", taskUpdated);
+    observable.onTaskRankedFirst .observe("task-list", taskRankedFirst);
+    observable.onTaskRankedLast  .observe("task-list", taskRankedLast);
+    observable.onTaskRankedBefore.observe("task-list", taskRankedBefore);
+    observable.onTaskRankedAfter .observe("task-list", taskRankedAfter);
   }
 
   function loadTasks() {

@@ -3,8 +3,8 @@ var chat = (function () {
   var profiles = {};
 
   mod.postChatItem = function(item) {
-    task.onChatPosting.notify(item);
-    return api.postChatItem(item).done(task.onChatPosted.notify);
+    observable.onChatPosting.notify(item);
+    return api.postChatItem(item).done(observable.onChatPosted.notify);
   }
 
   function full_name(uid) {
@@ -415,10 +415,10 @@ var chat = (function () {
       view.append(tempItemView);
 
       var key = ++observeChatPosted;
-      task.onChatPosted.observe(key, function(item) {
+      observable.onChatPosted.observe(key, function(item) {
         tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
                                                 statusOfChatItem(item)));
-        task.onChatPosted.stopObserve(key);
+        observable.onChatPosted.stopObserve(key);
       });
     }
   }
@@ -559,7 +559,9 @@ var chat = (function () {
           }
         });
 
-        task.onChatPosting.observe("chat-tabs", chatPosting);
+        observable.onChatPosting.observe("chat-tabs", chatPosting);
+        observable.onTaskParticipantsChanged
+                                .observe("chat-tabs", mod.loadTaskChats);
       });
   }
 

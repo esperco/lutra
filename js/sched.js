@@ -214,7 +214,7 @@ var sched = (function() {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
+        observable.onSchedulingStepChanging.notify();
         task.profilesOfEveryone(ta).done(function(profs) {
           loadStep1(profs, ta);
         });
@@ -223,7 +223,7 @@ var sched = (function() {
       .attr('disabled', mod.getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
+        observable.onSchedulingStepChanging.notify();
         task.profilesOfEveryone(ta).done(function(profs) {
           loadStep2(tzList, profs, ta);
         });
@@ -232,7 +232,7 @@ var sched = (function() {
       .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
+        observable.onSchedulingStepChanging.notify();
         task.profilesOfEveryone(ta).done(function(profs) {
           loadStep3(profs, ta);
         });
@@ -241,7 +241,7 @@ var sched = (function() {
       .attr('disabled', ! mod.getState(ta).reserved)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
+        observable.onSchedulingStepChanging.notify();
         task.profilesOfEveryone(ta).done(function(profs) {
           loadStep4(profs, ta);
         });
