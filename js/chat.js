@@ -497,7 +497,7 @@ var chat = (function () {
     var tabs = $(".chat-profile-tabs");
     var tab_content = $(".chat-panel");
 
-    task.profilesOfEveryone(ta)
+    profile.profilesOfTaskParticipants(ta)
       .done(function(profs) {
         profiles = profs;
 

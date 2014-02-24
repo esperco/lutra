@@ -245,7 +245,7 @@ var sched1 = (function() {
   function addGuest(ta, guestTbl, uid) {
     guestTbl[uid] = uid;
     ta.task_participants.organized_for.push(uid);
-    return task.profilesOfEveryone(ta);
+    return profile.profilesOfTaskParticipants(ta);
   }
 
   /* remove guest */

@@ -215,7 +215,7 @@ var sched = (function() {
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep1(profs, ta);
         });
       });
@@ -224,7 +224,7 @@ var sched = (function() {
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep2(tzList, profs, ta);
         });
       });
@@ -233,7 +233,7 @@ var sched = (function() {
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep3(profs, ta);
         });
       });
@@ -242,7 +242,7 @@ var sched = (function() {
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep4(profs, ta);
         });
       });
@@ -256,7 +256,7 @@ var sched = (function() {
       .done(function(x) {
         var tzList = x.timezones;
         setup_step_buttons(tzList, ta);
-        task.profilesOfEveryone(ta)
+        profile.profilesOfTaskParticipants(ta)
           .done(function(profs) {
             switch (progress) {
             case "Guest_list":

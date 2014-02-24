@@ -35,7 +35,6 @@ COMMON_SOURCES = \
   profile.js \
   chat.js \
   geo.js \
-  task.js \
   display.js
 
 APP_SOURCES = \
@@ -47,6 +46,7 @@ APP_SOURCES = \
   sched2.js \
   sched3.js \
   sched4.js \
+  task.js \
   settings.js \
   places.js \
   home.js \
