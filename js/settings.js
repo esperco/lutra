@@ -532,30 +532,52 @@ var settings = (function() {
     $("#edit-template-modal").modal({});
   }
 
+  function showOptionsTags() {
+    $("#merge-tag-list").text("Tags: @@Exec@@, @@Guest@@, @@Signature@@");
+  }
+
+  function showAllTags() {
+    $("#merge-tag-list").text(
+      "Tags: @@Exec@@, @@Guest@@, @@Location@@, @@LocationName@@, @@Date@@, @@Time@@, @@MeetingType@@, @@Signature@@"
+    );
+  }
+
   function displayTemplates() {
     api.getUserTemplates().done(function(templates) {
       $("#edit-options-approval").off("click");
       $("#edit-options-approval").on("click", function() {
+        showOptionsTags();
+        $("#edit-template-title").text("Options: Approval");
         editTemplate(templates, "Meeting_options_approval");
       });
       $("#edit-options-offer").off("click");
       $("#edit-options-offer").on("click", function() {
+        showOptionsTags();
+        $("#edit-template-title").text("Options: Offer to Guest");
         editTemplate(templates, "Meeting_options_offer");
       });
       $("#edit-confirmation-approval").off("click");
       $("#edit-confirmation-approval").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Meeting Confirmation: Approval");
         editTemplate(templates, "Meeting_confirmation_approval");
       });
       $("#edit-confirmation-offer").off("click");
       $("#edit-confirmation-offer").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Meeting Confirmation: Send to Guest");
         editTemplate(templates, "Meeting_confirmation_offer");
       });
       $("#edit-reminder-approval").off("click");
       $("#edit-reminder-approval").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Meeting Reminder: Approval");
         editTemplate(templates, "Meeting_reminder_approval");
       });
       $("#edit-reminder-offer").off("click");
       $("#edit-reminder-offer").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Meeting Reminder: Send to Guest");
         editTemplate(templates, "Meeting_reminder_offer");
       });
     });

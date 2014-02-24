@@ -57,23 +57,44 @@
     <div id="settings-templates-title" class="settings-title">TEMPLATES</div>
     <div id="settings-templates">
       <!-- TODO style me -->
-      <div>
-        <a href="#" id="edit-options-approval">Meeting Options - Approval</a>
+      <div class="hide">
+        <a href="#" id="edit-options-approval">Ask executive to approve meeting options</a>
       </div>
       <div>
-        <a href="#" id="edit-options-offer">Meeting Options - Offer to Guest</a>
+        <a href="#" id="edit-options-offer">Offer meeting options to guest</a>
       </div>
       <div>
-        <a href="#" id="edit-confirmation-approval">Meeting Confirmation - Approval</a>
+        <a href="#" id="edit-options-offer-ea">Offer meeting options to guest's assistant</a>
+      </div>
+      <div class="hide">
+        <a href="#" id="edit-confirmation-approval">Ask executive to approve meeting confirmation</a>
       </div>
       <div>
-        <a href="#" id="edit-confirmation-offer">Meeting Confirmation - Offer to Guest</a>
+        <a href="#" id="edit-confirmation-offer">Send meeting confirmation to guest</a>
       </div>
       <div>
-        <a href="#" id="edit-reminder-approval">Meeting Reminder - Approval</a>
+        <a href="#" id="edit-confirmation-offer-ea">Send meeting confirmation to guest's assistant</a>
       </div>
       <div>
-        <a href="#" id="edit-reminder-offer">Meeting Reminder - Offer to Guest</a>
+        <a href="#" id="edit-phone-confirmation-offer">Send phone call confirmation to guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-phone-confirmation-offer-ea">Send phone call confirmation to guest's assistant</a>
+      </div>
+      <div class="hide">
+        <a href="#" id="edit-reminder-approval">Ask executive to approve meeting reminder</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-offer">Send meeting reminder to guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-reminder-offer-ea">Send meeting reminder to guest's assistant</a>
+      </div>
+      <div>
+        <a href="#" id="edit-phone-reminder-offer">Send phone call reminder to guest</a>
+      </div>
+      <div>
+        <a href="#" id="edit-phone-reminder-offer-ea">Send phone call reminder to guest's assistant</a>
       </div>
     </div>
   </div>
@@ -217,16 +238,13 @@
       <div class="modal-header">
         <button type="button" class="btn btn-primary"
                 id="edit-template-save" style="float:right">Save</button>
-        <h3 class="modal-title" id="edit-template-title">Edit template</h3>
+        <h3 class="modal-title" id="edit-template-title"></h3>
       </div>
       <div class="modal-body" id="edit-template-body">
         <h4 class="modal-section-title">Message</h4>
         <textarea class="form-control" rows="10"
                   id="edit-template-message"></textarea>
-        <div id="merge-tag-list">
-          Tags: @@Exec@@, @@Guest@@, @@Location@@, @@LocationName@@, @@Date@@,
-          @@Time@@, @@Agenda@@, @@Signature@@
-        </div>
+        <div id="merge-tag-list"></div>
       </div>
     </div>
   </div>

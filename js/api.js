@@ -201,6 +201,7 @@ var api = (function () {
   };
 
   mod.createTask = function(task) {
+    console.log("createTask: " + task.toSource());
     return jsonHttpPost(
       apiQPrefix() + "/task/create/" + login.getTeam().teamid,
       JSON.stringify(task)
@@ -208,6 +209,7 @@ var api = (function () {
   };
 
   mod.postTask = function(task) {
+    console.log("postTask: " + task.toSource());
     var tid = task.tid;
     var taskEdit = {
       task_status      : task.task_status,

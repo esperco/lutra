@@ -10,18 +10,6 @@ var sched3 = (function() {
     });
   }
 
-  // XXX UNUSED
-  function formalEmailBody(organizerName, hostName, toName, howSoon) {
-    return "Dear "+toName+",\n\n"+
-
-    "I'm writing on behalf of "+hostName+" who respectfully requests "+
-    "a meeting with you. "+
-    hostName+"'s schedule has the following open times "+howSoon+". "+
-    "If any of these times are agreeable, please respond to this e-mail "+
-    "with your choice. If you have an assistant or scheduler, I'd be happy "+
-    "to follow up with him or her.";
-  }
-
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
