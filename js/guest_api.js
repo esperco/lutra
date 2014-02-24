@@ -87,19 +87,8 @@ var api = function() {
     return jsonHttpPost(apiPrefix() + "/chat/" + itemId + "/read", "");
   };
 
-  // profile API
-
-  function apiProfilePrefix() {
-    return "/api/profile/" + login.me();
-  }
-
   mod.getProfile = function(uid) {
-    return jsonHttpGet(apiProfilePrefix() + "/" + uid);
-  };
-
-  mod.getProfileByEmail = function(email) {
-    return jsonHttpGet(apiProfilePrefix() + "/email/"
-                       + encodeURIComponent(email));
+    return jsonHttpGet(apiPrefix() + "/profile/" + uid);
   };
 
   return mod;
