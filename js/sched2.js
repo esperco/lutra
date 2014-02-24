@@ -262,7 +262,16 @@ var sched2 = (function() {
     var viewTimeZone = $("#sched-step2-time-zone");
     viewTimeZone.children().remove();
 
-    view.append(calpicker.createCalendar({}));
+    function setTextEventDate(start, end) {
+    }
+
+    var calendar = calpicker.createPicker({
+      timezone: "America/Los_Angeles",
+      setTextEventDate: setTextEventDate
+    });
+
+    var setCalEventDate = calendar.setCalEventDate;
+    view.append(calendar.calendarView);
 
     /* all times and durations given in minutes, converted into seconds */
     function initTimes(x,

@@ -1,6 +1,15 @@
 /*
   Date-time-duration picker using calendar containing read-only events
   retrieved from the user's calendar.
+
+  Input:
+  - timezone
+  - setTextEventDate(start, end): called by the calendar when the date changes
+
+  Output:
+  - calendarView
+  - setCalEventDate(start, end): called from outside to update the calendar view
+
 */
 
 var calpicker = (function() {
@@ -16,20 +25,29 @@ var calpicker = (function() {
     });
   }
 
-  mod.createCalendar = function(param) {
+  function onSelect(calendarView, start, end) {
+    var eventData = {
+      id: util.randomString(),
+      title: "",
+      start: start,
+      end: end,
+      color: "#ff0000",
+      editable: true
+    };
+    var stick = true;
+    calendarView.fullCalendar('renderEvent', eventData, stick);
+    calendarView.fullCalendar('unselect');
+  }
+
+  mod.createPicker = function(param) {
+    var tz = param.timezone;
+    var setCalEventDate = param.selCalEventDate;
+
     var calendarView = $("<div>");
+    var newEvent;
 
     function select(start, end) {
-      var eventData = {
-        id: util.randomString(),
-	title: "Nice!",
-	start: start,
-	end: end,
-        color: "#ff0000"
-      };
-      var stick = false;
-      calendarView.fullCalendar('renderEvent', eventData, stick);
-      calendarView.fullCalendar('unselect');
+      onSelect(calendarView, start, end);
     }
 
     function eventClick(calEvent, jsEvent, view) {
@@ -40,7 +58,7 @@ var calpicker = (function() {
     }
 
     api.postCalendar(login.leader(), {
-      timezone: "America/Los_Angeles",
+      timezone: tz,
       window_start: "2014-02-17T00:00:00-08:00",
       window_end: "2014-02-24T00:00:00-08:00"
     }).done(function (x) {
@@ -51,7 +69,7 @@ var calpicker = (function() {
           right: 'month,agendaWeek,agendaDay'
         },
         defaultView: 'agendaWeek',
-        timezone: "America/Los_Angeles",
+        timezone: tz,
         selectable: true,
         selectHelper: true,
 	select: select,
@@ -60,7 +78,10 @@ var calpicker = (function() {
         events: fetchEvents
       });
     });
-    return calendarView;
+    return {
+      calendarView: calendarView,
+      setCalEventDate: setCalEventDate
+    };
   }
 
   return mod;
