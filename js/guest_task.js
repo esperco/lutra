@@ -76,29 +76,31 @@ var guestTask = function() {
   }
 
   mod.loadTask = function(ta) {
-    var taskView = $("#task-content");
-    taskView.children().remove();
-
-    taskView.append($("<p/>").text(ta.task_status.task_title));
-
-    if ("Scheduling" === variant.cons(ta.task_data)) {
-      var state = ta.task_data[1];
-      if (state.reserved) {
-        taskView.append(viewOfCalendarSlot(state.reserved.slot));
-      }
-    }
-
-    taskView.append($("<p/>").text("Guests"));
-    var participantListView = $("<ul/>");
     profile.profilesOfTaskParticipants(ta).done(function(profs) {
+      var taskView = $("#task-content");
+      taskView.children().remove();
+
+      var myName = profile.fullName(profs[login.me()].prof);
+      taskView.append($("<p/>").text("Hello, " + myName));
+      taskView.append($("<p/>").text(ta.task_status.task_title));
+
+      if ("Scheduling" === variant.cons(ta.task_data)) {
+        var state = ta.task_data[1];
+        if (state.reserved) {
+          taskView.append(viewOfCalendarSlot(state.reserved.slot));
+        }
+      }
+
+      taskView.append($("<p/>").text("Guests"));
+      var participantListView = $("<ul/>");
       list.iter(ta.task_participants.organized_for, function(uid) {
         var name = profile.fullName(profs[uid].prof);
         participantListView.append($("<li/>").text(name));
       });
-    });
-    taskView.append(participantListView);
+      taskView.append(participantListView);
 
-    observable.onTaskModified.observe("guest-task", mod.loadTask);
+      observable.onTaskModified.observe("guest-task", mod.loadTask);
+    });
   }
 
   return mod;
