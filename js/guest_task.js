@@ -77,6 +77,8 @@ var guestTask = function() {
 
   mod.loadTask = function(ta) {
     var taskView = $("#task-content");
+    taskView.children().remove();
+
     taskView.append($("<p/>").text(ta.task_status.task_title));
 
     if ("Scheduling" === variant.cons(ta.task_data)) {
