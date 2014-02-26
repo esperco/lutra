@@ -548,37 +548,55 @@ var settings = (function() {
       $("#edit-options-approval").on("click", function() {
         showOptionsTags();
         $("#edit-template-title").text("Options: Approval");
-        editTemplate(templates, "Meeting_options_approval");
+        editTemplate(templates, "Options_to_exec");
       });
       $("#edit-options-offer").off("click");
       $("#edit-options-offer").on("click", function() {
         showOptionsTags();
         $("#edit-template-title").text("Options: Offer to Guest");
-        editTemplate(templates, "Meeting_options_offer");
+        editTemplate(templates, "Options_to_guest");
+      });
+      $("#edit-options-offer-ea").off("click");
+      $("#edit-options-offer-ea").on("click", function() {
+        showOptionsTags();
+        $("#edit-template-title").text("Options: Offer to Guest's EA");
+        editTemplate(templates, "Options_to_guest_assistant");
       });
       $("#edit-confirmation-approval").off("click");
       $("#edit-confirmation-approval").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Meeting Confirmation: Approval");
-        editTemplate(templates, "Meeting_confirmation_approval");
+        $("#edit-template-title").text("Confirmation: Approval");
+        editTemplate(templates, "Confirmation_to_exec");
       });
       $("#edit-confirmation-offer").off("click");
       $("#edit-confirmation-offer").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Meeting Confirmation: Send to Guest");
-        editTemplate(templates, "Meeting_confirmation_offer");
+        $("#edit-template-title").text("Confirmation: Send to Guest");
+        editTemplate(templates, "Confirmation_to_guest");
+      });
+      $("#edit-confirmation-offer-ea").off("click");
+      $("#edit-confirmation-offer-ea").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Confirmation: Send to Guest's EA");
+        editTemplate(templates, "Confirmation_to_guest_assistant");
       });
       $("#edit-reminder-approval").off("click");
       $("#edit-reminder-approval").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Meeting Reminder: Approval");
-        editTemplate(templates, "Meeting_reminder_approval");
+        $("#edit-template-title").text("Reminder: Approval");
+        editTemplate(templates, "Reminder_to_exec");
       });
       $("#edit-reminder-offer").off("click");
       $("#edit-reminder-offer").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Meeting Reminder: Send to Guest");
-        editTemplate(templates, "Meeting_reminder_offer");
+        $("#edit-template-title").text("Reminder: Send to Guest");
+        editTemplate(templates, "Reminder_to_guest");
+      });
+      $("#edit-reminder-offer-ea").off("click");
+      $("#edit-reminder-offer-ea").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Reminder: Send to Guest's EA");
+        editTemplate(templates, "Reminder_to_guest_assistant");
       });
     });
   }

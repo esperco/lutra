@@ -220,16 +220,32 @@ var sched3 = (function() {
       }
     })
 
-    //var body = formalEmailBody(organizerName, hostName, toName, howSoon);
-    api.getOptionsMessage(task.tid, {
+    $("#sched-options-guest-addr").val("Address_directly");
+    var parameters = {
+      template_kind: "Options_to_guest",
       exec_name: hostName,
-      guest_name: toName,
-    })
+      guest_name: toName
+    };
+    api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
         $("#sched-availability-message").val(optionsMessage.message_text);
+        $("#sched-options-guest-addr")
+          .unbind("change")
+          .change(function(){refreshOptionsMessage(task.tid, parameters);});
       });
   }
 
+  function refreshOptionsMessage(tid, parameters) {
+    if ($("#sched-options-guest-addr").val() === "Address_directly") {
+      parameters.template_kind = "Options_to_guest";
+    } else {
+      parameters.template_kind = "Options_to_guest_assistant";
+    }
+    api.getOptionsMessage(tid, parameters)
+      .done(function(x) {
+        $("#sched-availability-message").val(x.message_text);
+      });
+  }
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row clearfix'>");
