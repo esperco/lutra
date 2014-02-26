@@ -26,6 +26,32 @@ var guestTask = function() {
     }
   }
 
+  function stripTimestamp(d) {
+    // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
+    return d.replace(/[\-:]|\.000/g, "");
+  }
+
+  function googleCalendarURL(text1, text2, slot) {
+    return "http://www.google.com/calendar/event?"
+         + ["action=TEMPLATE",
+            "text=" + encodeURIComponent(text2),
+            "dates=" + stripTimestamp(slot.start)
+               + "/" + stripTimestamp(slot.end),
+            "details=" + encodeURIComponent(text1),
+            "location=" + encodeURIComponent(locationText(slot.location)),
+            "trp=true",             // show as busy
+            "sprop=Esper",          // website name
+            "sprop=name:esper.com"] // website address
+            .join("&");
+  }
+
+  function googleCalendarLink(url) {
+    var buttonImg = "//www.google.com/calendar/images/ext/gc_button6.gif";
+      // It can be gc_button[1..6].gif
+    return $("<a/>", {href:url, target:"_blank"})
+           .append($("<img/>", {src:buttonImg, border:0}));
+  }
+
   function viewOfCalendarSlot(x) {
     var view = $("<div class='sug-details'/>");
 
@@ -88,6 +114,10 @@ var guestTask = function() {
         var state = ta.task_data[1];
         if (state.reserved) {
           taskView.append(viewOfCalendarSlot(state.reserved.slot));
+          taskView.append(googleCalendarLink(
+              googleCalendarURL(ta.task_status.task_title,
+                                ta.task_status_text,
+                                state.reserved.slot)));
         }
       }
 
