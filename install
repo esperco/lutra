@@ -16,22 +16,23 @@ esac
 mkdir -p pub/css pub/js pub/ejs pub/html pub/img pub/fonts
 
 ### Copy third-party libraries into the pub directory
-cp mink-libs/jquery.min.js pub/js
-cp mink-libs/can.min.js pub/js
-cp mink-libs/sha1.js pub/js
-cp -a mink-libs/bootstrap/* pub
-cp mink-libs/jquery.timeago.js pub/js
-cp mink-libs/autosize-master/jquery.autosize.min.js pub/js
+libs=setup/mink-libs
+cp $libs/jquery.min.js pub/js
+cp $libs/can.min.js pub/js
+cp $libs/sha1.js pub/js
+cp -a $libs/bootstrap/* pub
+cp $libs/jquery.timeago.js pub/js
+cp $libs/autosize-master/jquery.autosize.min.js pub/js
 chmod a-x pub/js/jquery.autosize.min.js
-cp mink-libs/animate.min.css pub/css
-cp mink-libs/font-awesome.css pub/css
+cp $libs/animate.min.css pub/css
+cp $libs/font-awesome.css pub/css
 
 # Fullcalendar and dependencies
-cp mink-libs/fullcalendar/fullcalendar/fullcalendar.css pub/css
-cp mink-libs/fullcalendar/fullcalendar/fullcalendar.print.css pub/css
-cp mink-libs/fullcalendar/fullcalendar/fullcalendar.min.js pub/js
-cp mink-libs/fullcalendar/lib/moment.min.js pub/js
-cp mink-libs/fullcalendar/lib/jquery-ui.custom.min.js pub/js
+cp $libs/fullcalendar/fullcalendar/fullcalendar.css pub/css
+cp $libs/fullcalendar/fullcalendar/fullcalendar.print.css pub/css
+cp $libs/fullcalendar/fullcalendar/fullcalendar.min.js pub/js
+cp $libs/fullcalendar/lib/moment.min.js pub/js
+cp $libs/fullcalendar/lib/jquery-ui.custom.min.js pub/js
 
 ### Build our own code and copy the result into the pub directory
 make -C js $mode-install

@@ -21,7 +21,7 @@ prod-build:
 
 # Fetch libraries
 setup:
-	./setup
+	$(MAKE) -C setup
 
 # Remove derived files
 clean:
