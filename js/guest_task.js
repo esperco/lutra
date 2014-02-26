@@ -116,7 +116,7 @@ var guestTask = function() {
           taskView.append(viewOfCalendarSlot(state.reserved.slot));
           taskView.append(googleCalendarLink(
               googleCalendarURL(ta.task_status.task_title,
-                                ta.task_status_text,
+                                ta.task_calendar_title,
                                 state.reserved.slot)));
         }
       }
