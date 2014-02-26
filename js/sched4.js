@@ -471,7 +471,9 @@ var sched4 = (function() {
 
     view
       .append(createConfirmSection(profs, ta, guests))
-      .append(createInviteSection(profs, ta, guests))
+      /* Invites are disabled for now in favor of sending a custom URL
+         that redirects the guest to their own Google calendar. */
+      //.append(createInviteSection(profs, ta, guests))
       .append(createRemindSection(profs, ta, guests));
 
     observable.onTaskParticipantsChanged.observe("step4", function(ta) {
