@@ -11,6 +11,8 @@ prod: prod-build
 dev-build: includes-dev.html
 prod-build: prod.js includes-prod.html
 
+# Quasi-Javascript sources that need to be preprocessed with 'oblivion'.
+# Output Javascript files are put into the js/ subdirectory.
 SOURCES = \
   test.js \
   list.js \
@@ -37,6 +39,7 @@ SOURCES = \
   chat.js \
   geo.js \
   calpicker.js \
+  locpicker.js \
   sched.js \
   sched1.js \
   sched2.js \
@@ -51,6 +54,15 @@ SOURCES = \
   display.js \
   main.js
 
+JS = $(addprefix js/,$(SOURCES))
+
+.PHONY: pp
+pp: $(JS)
+
+js/%.js: %.js
+	@mkdir -p js
+	oblivion $< -o $@
+
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
 includes-dev.html: Makefile mkloader
@@ -60,12 +72,12 @@ includes-prod.html: Makefile mkloader
 	./mkloader app.js > $@
 
 # Production: concatenate all files into one for speed
-prod.js: $(SOURCES)
-	cat $(SOURCES) | uglifyjs -o $@
+prod.js: $(JS)
+	cat $(JS) | uglifyjs -o $@
 
-dev-install:
+dev-install: $(JS)
 	mkdir -p ../pub/js
-	cp $(SOURCES) ../pub/js
+	cp $(JS) ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
@@ -73,3 +85,4 @@ prod-install:
 
 clean:
 	rm -f *~ prod.js includes-*.html run-tests.js
+	rm -rf js/
