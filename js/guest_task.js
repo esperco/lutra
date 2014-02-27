@@ -28,7 +28,7 @@ var guestTask = function() {
 
   function stripTimestamp(d) {
     // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
-    return d.replace(/[\-:]|\.000/g, "");
+    return d.replace(/-|:|\.000/g, "");
   }
 
   function googleCalendarURL(text1, text2, slot) {
@@ -53,29 +53,23 @@ var guestTask = function() {
   }
 
 
-  function googleMapsLink(x) {
-    // var getDirections = $("<div>Get directions</div>");
-
-    // var directionsURL = "http://maps.google.com/?daddr="
-    //   + x.location.coord.lat + "," + x.location.coord.lon;
-
-    // var directions =
-    //   $("<a/>", {
-    //     href: directionsURL,
-    //     "class": ""
-    //   }).appendTo(getDirections);
-
-    // getDirections.click(function() { this.target = "_blank"; });
-
-    // return getDirections;
+  function getDirections(x) {
+    return "http://maps.google.com/?daddr="
+      + x.location.coord.lat + "," + x.location.coord.lon;
   }
 
   function viewOfTimeAndPlace(x) {
-    var meetingTime = $("<div id='meeting-time'/>");
-    var meetingLoc = $("<div id='meeting-location'/>");
-    var view = $("<div/>")
-      .append(meetingTime)
-      .append(meetingLoc);
+    var view = $("<div/>");
+
+    var meetingTime = $("<div id='meeting-time'/>")
+      .appendTo(view);
+    var clock = $("<img id='clock'/>")
+        .appendTo(meetingTime);
+    svg.loadImg(clock, "/assets/img/clock.svg");
+    var time1 = $("<div id='time1'/>")
+      .appendTo(meetingTime);
+    var time2 = $("<div id='time2'/>")
+      .appendTo(meetingTime);
 
     var t1 = date.ofString(x.start);
     var t2 = date.ofString(x.end);
@@ -86,48 +80,123 @@ var guestTask = function() {
     if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
       fromTime = fromTime.substr(0, fromTime.length-3);
 
-    meetingTime
-      .append(date.weekDay(t1).substring(0,3) + ", ")
-      .append(date.dateOnly(t1) + " from ")
-      .append($("<span id='time-text'>" + fromTime + " to " + toTime + "</span>"));
+    time1
+      .append(date.weekDay(t1) + ", ")
+      .append(date.dateOnly(t1))
+    time2
+      .append(fromTime + " to " + toTime);
+
+    var meetingLoc = $("<div id='meeting-location'/>")
+      .appendTo(view);
+    var pin = $("<img id='pin'/>")
+        .appendTo(meetingLoc);
+    svg.loadImg(pin, "/assets/img/pin.svg");
+    var loc = $("<div id='loc'/>")
+      .appendTo(meetingLoc);
 
     var locText = locationText(x.location);
     if (locText) {
-      meetingLoc.append("at ")
-                .append(html.text(locText));
+      loc.append(html.text(locText));
     } else {
-      meetingLoc.append("Location TBD")
-                .addClass("tbd")
+      loc.append("Location TBD")
+         .addClass("tbd")
     }
 
-    return view;
-  }
-
-  function calendarOptions() {
-    var view = $("<div id='calendar-options'/>");
-    var outlook = $("<div class='col-xs-4'/>")
-      .appendTo(view);
-    var google = $("<div class='col-xs-4'/>")
-      .appendTo(view);
-    var apple = $("<div class='col-xs-4'/>")
-      .appendTo(view);
-  }
-
-  function addToCalendar() {
-    var view = $("<div/>", {
-      "id": "add-to-calendar",
-      "class": "tab-pane",
-      "data-container": "body",
-      "data-html": "true",
-      "data-toggle": "popover",
-      "data-placement": "bottom",
-      "data-content": calendarOptions,
-      "text": "Add to my calendar"
+    meetingLoc.click(function() {
+      window.open("http://maps.google.com");
     });
 
-    view.popover();
-
     return view;
+  }
+
+  function addToCalendar(ta, x) {
+    var addCal = $("<img id='add-cal'/>");
+    var button = $("<button/>", {
+      "id": "add-to-calendar",
+      "class": "btn btn-primary",
+      "data-contentwrapper": "#calendar-types",
+      "data-toggle": "popover",
+    })
+      .append(addCal)
+      .append($("<div id='add-cal-text'>Add to my calendar</div>"));
+    svg.loadImg(addCal, "/assets/img/add-to-calendar.svg");
+
+    var googleIcon = $("<img id='google-icon'/>");
+    var google = $("#google")
+      .append(googleIcon)
+      .append("<div class='calendar-type'>Google Calendar</div>");
+    svg.loadImg(googleIcon, "/assets/img/google.svg");
+    $(document).on("click", "#google", function() {
+      $('[data-toggle="popover"]').click();
+      window.open(googleCalendarURL(ta.task_calendar_title,
+                                    window.location,
+                                    x));
+    })
+
+    var outlookIcon = $("<img id='outlook-icon'/>");
+    var outlook = $("#outlook")
+      .append(outlookIcon)
+      .append("<div class='calendar-type'>Outlook Calendar</div>");
+    svg.loadImg(outlookIcon, "/assets/img/outlook.svg");
+
+    var apple = $("#apple")
+      .append($("<img id='apple-icon' src='/assets/img/apple.png'/>"))
+      .append("<div class='calendar-type'>Apple Calendar</div>");
+
+    button.popover({
+      html:true,
+      placement:'bottom',
+      content:function(){
+        return $($(this).data('contentwrapper')).html();
+      }
+    });
+
+    $('body').on('click', function (e) {
+      if ($(e.target).data('toggle') !== 'popover'
+        && $(e.target).parents('[data-toggle="popover"]').length === 0
+        && $(e.target).parents('.popover.in').length === 0
+        && button.next('div.popover:visible').length) {
+        button.click();
+      }
+    });
+
+    return button;
+  }
+
+  function viewOfCalendarOption(choice, answers) {
+    var slotView = $("<div class='suggestion'/>");
+    var checkbox = $("<img class='suggestion-checkbox'/>");
+    slotView.append(checkbox);
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+    slotView.append(viewOfTimeAndPlace(choice.slot));
+    slotView.click(function() {
+      if (slotView.hasClass("checkbox-selected")) {
+        slotView.removeClass("checkbox-selected");
+        delete answers[choice.label];
+      } else {
+        slotView.addClass("checkbox-selected");
+        answers[choice.label] = choice;
+      }
+    });
+    return slotView;
+  }
+
+  function submitButton(answers) {
+    var submitButton = $("<button class='btn btn-primary'>Submit</button>");
+    submitButton.click(function() {
+      var sel = [];
+      for (var label in answers) {
+        sel.push(answers[label]);
+      }
+      var item = {
+        chatid: login.myChatid(),
+        by:     login.me(),
+        "for":  login.me(),
+        chat_item_data: ["Scheduling_r", {selected:sel}]
+      };
+      api.postChatItem(item);
+    });
+    return submitButton;
   }
 
 /*** SAVE FOR MEETING OPTIONS ***/
@@ -190,34 +259,38 @@ var guestTask = function() {
 
       var myName = profile.fullName(profs[login.me()].prof);
       taskWelcome.append($("<p/>").text("Hello, " + myName));
-      taskView.append($("<p id='meeting-title'/>").text(ta.task_calendar_title))
-              .append(addToCalendar);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
         if (state.reserved) {
-          taskView.append(viewOfTimeAndPlace(state.reserved.slot));
-          taskView.append(calendarOptions);
-          taskView.append(googleMapsLink(state.reserved.slot));
-          taskView.append(googleCalendarLink(
-              googleCalendarURL(ta.task_calendar_title,
-                                window.location,
-                                state.reserved.slot)));
+          taskView.append($("<p id='meeting-title'/>").text(ta.task_calendar_title))
+                  .append(addToCalendar(ta, state.reserved.slot))
+                  .append(viewOfTimeAndPlace(state.reserved.slot))
+                  // .append(googleCalendarLink(
+                  //               googleCalendarURL(ta.task_calendar_title,
+                  //               window.location,
+                  //               state.reserved.slot)))
+                  .append($("<div class='task-section-header'/>").text("GUESTS"));
+          var participantListView = $("<ul/>");
+          list.iter(ta.task_participants.organized_for, function(uid) {
+            var name = profile.fullName(profs[uid].prof);
+            participantListView.append($("<li class='guest-name-row'/>").text(name));
+          });
+          taskView.append(participantListView);
+          taskView.append($("<div class='task-section-header'/>").text("NOTES"));
+          taskView.append("This feature is coming soon.");
+          taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
+          $("#messages").removeClass("hide");
+        } else if (state.calendar_options.length > 0) {
+          taskView.append($("<p id='meeting-title'/>").text("Select the options that work for you."))
+          var answers = {};
+          list.iter(state.calendar_options, function(choice) {
+            taskView.append(viewOfCalendarOption(choice, answers));
+          });
+          taskView.append(submitButton(answers));
+          $("#messages").addClass("hide");
         }
       }
-
-      taskView.append($("<div class='task-section-header'/>").text("GUESTS"));
-      var participantListView = $("<ul/>");
-      list.iter(ta.task_participants.organized_for, function(uid) {
-        var name = profile.fullName(profs[uid].prof);
-        participantListView.append($("<li class='guest-name-row'/>").text(name));
-      });
-      taskView.append(participantListView);
-
-      taskView.append($("<div class='task-section-header'/>").text("NOTES"));
-      taskView.append("This feature is coming soon.");
-
-      taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
 
       observable.onTaskModified.observe("guest-task", mod.loadTask);
     });
