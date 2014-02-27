@@ -57,6 +57,7 @@ APP_SOURCES = \
 GUESTAPP_SOURCES = \
   guest_api.js \
   guest_task.js \
+  guest_chat.js \
   guest_login.js \
   guest_main.js \
 
