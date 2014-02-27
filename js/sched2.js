@@ -19,8 +19,6 @@ var sched2 = (function() {
   // Set in initializeGoogleMap, used by geocodeAddress
   var addressMarker = null;
 
-  var locationGeometry = null;
-
   var suggestionArea = show.create({
     idle: { ids: ["sched-step2-idle"] },
     busy: { ids: ["sched-step2-busy"] },
@@ -33,7 +31,6 @@ var sched2 = (function() {
     var state = sched.getState(task);
     state.meeting_request = meetingParam;
     suggestionArea.show("busy");
-    //log(meetingParam);
     api.getSuggestions(meetingParam)
       .done(function(x) {
         if (x.suggestions.length === 0)
@@ -61,8 +58,7 @@ var sched2 = (function() {
       title: addr,
       address: addr,
       instructions: notes,
-      timezone: timeZoneDropdown.get(),
-      geometry: locationGeometry
+      timezone: timeZoneDropdown.get()
     };
   }
 
@@ -152,7 +148,6 @@ var sched2 = (function() {
     }
 
     function select(k, v) {
-      //log(k, v);
       if (selected.length === 3)
         unselect(selected[2], 2);
       selected.push([k, v]);
@@ -175,7 +170,6 @@ var sched2 = (function() {
     list.iter(suggestions, function(res, k) {
       var score = res.score;
       var slot = res.slot;
-      log(slot);
       var slotView = $("<div class='suggestion'/>");
       var checkbox = $("<img class='suggestion-checkbox'/>")
         .appendTo(slotView);
@@ -622,7 +616,6 @@ var sched2 = (function() {
           $("#sched-step2-loc-addr").val($("#edit-place-address").val());
           var details = places.getSelectedPlaceDetails();
           var coord = details.geometry;
-          locationGeometry = coord;
           api.getTimezone(coord.lat, coord.lon)
             .done(function(x) {
               timeZoneDropdown.set(x.timezone);
@@ -663,7 +656,6 @@ var sched2 = (function() {
             $("#sched-step2-loc-notes").val(item.loc.instructions);
             api.postSelectPlace(item.google_description)
               .done(function(place) {
-                locationGeometry = place.loc.coord;
                 timeZoneDropdown.set(place.loc.timezone);
                 $('#location-dropdown-toggle').dropdown("toggle");
               });
@@ -690,7 +682,6 @@ var sched2 = (function() {
           api.getPlaceDetails(desc, item.ref_id)
             .done(function(place) {
               var coord = place.geometry;
-              locationGeometry = coord;
               api.getTimezone(coord.lat, coord.lon)
                 .done(function(x) {
                   timeZoneDropdown.set(x.timezone);
