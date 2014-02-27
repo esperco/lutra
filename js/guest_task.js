@@ -1,21 +1,6 @@
 var guestTask = function() {
   var mod = {};
 
-  function locationText(loc) {
-    if (loc.address) {
-      if (loc.instructions)
-        return loc.address + " (" + loc.instructions + ")";
-      else
-        return loc.address;
-    }
-    else if (loc.title)
-      return loc.title;
-    else if (loc.instructions)
-      return loc.instructions;
-    else
-      return "";
-  }
-
   function wordify(time) {
     if (time === "12:00 am") {
       return "Midnight";
@@ -38,7 +23,7 @@ var guestTask = function() {
             "dates=" + stripTimestamp(slot.start)
                + "/" + stripTimestamp(slot.end),
             "details=" + encodeURIComponent("For meeting details, click here: " + text2),
-            "location=" + encodeURIComponent(locationText(slot.location)),
+            "location=" + encodeURIComponent(chat.locationText(slot.location)),
             "trp=true",             // show as busy
             "sprop=Esper",          // website name
             "sprop=name:esper.com"] // website address
@@ -94,7 +79,7 @@ var guestTask = function() {
     var loc = $("<div id='loc'/>")
       .appendTo(meetingLoc);
 
-    var locText = locationText(x.location);
+    var locText = chat.locationText(x.location);
     if (locText) {
       loc.append(html.text(locText));
     } else {
@@ -194,7 +179,7 @@ var guestTask = function() {
         "for":  login.me(),
         chat_item_data: ["Scheduling_r", {selected:sel}]
       };
-      api.postChatItem(item);
+      chat.postChatItem(item);
     });
     return submitButton;
   }
@@ -233,7 +218,7 @@ var guestTask = function() {
   //     .append($("<b>").text(date.timeOnly(t1)))
   //     .appendTo(view);
 
-  //   var locText = locationText(x.location);
+  //   var locText = chat.locationText(x.location);
   //   var locDiv = $("<div class='loc-text'/>");
   //   var pin = $("<img class='pin'/>");
   //     pin.appendTo(locDiv);
