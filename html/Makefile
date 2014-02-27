@@ -16,7 +16,6 @@ HTML_INCLUDES = \
   sched-step4-tab.html \
   sched-task-list.html \
   places.html \
-  edit-place.html \
   settings.html \
   email-verify.html
 

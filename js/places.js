@@ -2,6 +2,15 @@
   Places Page
 */
 
+/*
+  Please redo this implementation, which is now broken and very hard to update:
+  - get rid of global javascript variables
+  - get rid of global dom node identifiers
+  - use 'if (x)' only if x is a boolean, otherwise use util.isString or other
+  - simplify placeListComparator by using compareNum and
+    compareString functions; define them once and for all if necessary.
+*/
+
 var places = (function() {
   var mod = {};
 
@@ -321,12 +330,6 @@ var places = (function() {
     api.getPlaceList(login.me()).done(displayPlaces);
     util.afterTyping($("#edit-place-address"), 250, predictAddress);
     $("#new-place-btn").click(newPlaceAction);
-
-    var editModal = $("#edit-place-modal");
-    editModal.on("hidden.bs.modal", function() {
-      $("#edit-place-save").off("click");
-      $("#edit-place-delete").off("click");
-    });
   };
 
   return mod;

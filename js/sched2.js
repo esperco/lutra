@@ -13,11 +13,6 @@ var sched2 = (function() {
   // Set in loadStep2Prefs, used by geocodeAddress
   var timeZoneDropdown = null;
 
-  function clearLocation() {
-    $("#sched-step2-loc-addr").val("");
-    $("#sched-step2-loc-notes").val("");
-  }
-
   function getLocation() {
     var addr = $("#sched-step2-loc-addr").val();
     var notes = $("#sched-step2-loc-notes").val();
@@ -67,12 +62,54 @@ var sched2 = (function() {
       .done(function(task) { sched.loadTask(task); });
   }
 
-  function loadStep2Prefs(tzList, task) {
-    var view = $("#sched-step2-pref-time");
-    view.children().remove();
+  /*
+    For now just a dropdown menu of meeting types.
+    May be accompanied with options specific to the type of meeting selected.
+  */
+  function createMeetingTypeSelector(onSet, optInitialKey) {
+    function opt(label, value) {
+      return { label: label, value: value, action: onSet };
+    }
+    var initialKey = util.isString(optInitialKey) ? optInitialKey : "meeting";
+    var meetingTypeSelector = select.create({
+      divClass: "fill-div",
+      buttonClass: "fill-div",
+      initialKey: initialKey,
+      options: [
+        opt("Meeting", "meeting"),
+        opt("Breakfast", "breakfast"),
+        opt("Lunch", "lunch"),
+        opt("Dinner", "dinner"),
+        opt("Coffee", "coffee"),
+        opt("Night life", "nightlife"),
+        opt("Phone call", "call")
+      ]
+    });
+    return meetingTypeSelector;
+  }
 
-    var viewTimeZone = $("#sched-step2-time-zone");
-    viewTimeZone.children().remove();
+  /*
+    Create a view and everything needed to display and edit location
+    and time for a meeting option.
+    The input is an object with mutable fields
+    for place and time, which may or may not be set to initial values.
+  */
+  function createMeetingOptionPicker(data) {
+    var view = $("<div/>");
+
+    /* meeting type */
+
+    function setMeetingType(meetingType) {
+      log(meetingType);
+    }
+
+    var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
+
+    /* location */
+
+    var location = locpicker.create({});
+
+    /* date and time */
 
     function setTextEventDate(start, end) {
     }
@@ -83,26 +120,23 @@ var sched2 = (function() {
     });
 
     var setCalEventDate = calendar.setCalEventDate;
-    view.append(calendar.calendarView);
 
-    /* type of meeting */
-    function opt(label, key) {
-      return { label: label, key: key };
-    }
-    var sel1 = select.create({
-      divClass: "fill-div",
-      buttonClass: "fill-div",
-      options: [
-        opt("Breakfast", "breakfast"),
-        opt("Lunch", "lunch"),
-        opt("Dinner", "dinner"),
-        opt("Night life", "nightlife"),
-        opt("Coffee", "coffee"),
-        opt("Phone call", "call"),
-        opt("Meeting (Any time)", "meeting"),
-      ]
-    });
+    view
+      .append(meetingTypeSelector.view)
+      .append(location.locationView)
+      .append(calendar.calendarView);
 
+    return view;
+  }
+
+  function loadStep2Prefs(tzList, task) {
+    var view = $("#sched-step2-pref-time");
+    view.children().remove();
+
+    var meetingOption = {};
+    view.append(createMeetingOptionPicker(meetingOption));
+
+/*
     var grid = $("<div/>")
       .appendTo(view);
 
@@ -115,38 +149,14 @@ var sched2 = (function() {
 
     var optionType = $("<div class='pref-time-title'>Meeting Type</div>")
       .appendTo(colType);
-    var optionDuration = $("<div class='pref-time-title'>Duration</div>")
-      .appendTo(colDuration);
-    var optionUrgency = $("<div class='pref-time-title'>Urgency</div>")
-      .appendTo(colUrgency);
     var optionTimeZone = $("<div class='location-title'>Time Zone</div>")
       .appendTo(viewTimeZone);
 
     sel1.view.appendTo(colType);
 
-    $("<input id='dur-hour' type='number' min='0'/>")
-      .change(durationChange)
-      .appendTo(colDuration);
-    colDuration.append("hrs");
-    $("<input id='dur-minute' type='number' min='0'/>")
-      .change(durationChange)
-      .appendTo(colDuration);
-    colDuration.append("mins ");
-    colDuration.append("<br/>");
-    colDuration.append("+ buffer ");
-    $("<input id='buffer-minute' type='number' min='0'/>")
-      .change(mergeSelections)
-      .appendTo(colDuration);
-    colDuration.append("mins");
-
     var q = taskMeetingParam(task);
     loadLocation(q.location);
-    sel1.set(q.meeting_type.toLowerCase());
-    if (q.duration) setDuration(q.duration);
-    if (q.buffer_time) $("#buffer-minute").val(q.buffer_time / 60);
-    loadDaysOfWeek(q);
-    loadHowSoon(q.how_soon);
-    $("#starting").val(q.no_sooner ? q.no_sooner : "0");
+*/
 
     step2Selector.show("sched-step2-prefs");
   }
@@ -190,18 +200,8 @@ var sched2 = (function() {
     return result;
   }
 
-
   mod.load = function(tzList, profs, ta) {
-    suggestionArea.show("idle");
-    clearLocation();
-    util.afterTyping($("#sched-step2-loc-addr"), 250, predictAddress);
     connectCalendar(tzList, profs, ta);
-
-    // TODO Better way to do this?
-    var editModal = $("#edit-place-modal");
-    editModal.on("hidden.bs.modal", function() {
-      $("#edit-place-save").off("click");
-    });
 
     task.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

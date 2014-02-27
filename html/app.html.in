@@ -252,10 +252,6 @@
       </div>
     </div>
 
-    <div id="edit-place">
-      @@edit-place.html@@
-    </div>
-
     <div id="test-page" class="hide test-page">
 
       <div class="navbar-push container scrollable">
