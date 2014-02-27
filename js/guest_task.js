@@ -102,7 +102,7 @@ var guestTask = function() {
          .addClass("tbd")
     }
 
-    meetingLoc.click(function() {
+    loc.click(function() {
       window.open("http://maps.google.com");
     });
 
@@ -266,10 +266,6 @@ var guestTask = function() {
           taskView.append($("<p id='meeting-title'/>").text(ta.task_calendar_title))
                   .append(addToCalendar(ta, state.reserved.slot))
                   .append(viewOfTimeAndPlace(state.reserved.slot))
-                  // .append(googleCalendarLink(
-                  //               googleCalendarURL(ta.task_calendar_title,
-                  //               window.location,
-                  //               state.reserved.slot)))
                   .append($("<div class='task-section-header'/>").text("GUESTS"));
           var participantListView = $("<ul/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
@@ -280,7 +276,9 @@ var guestTask = function() {
           taskView.append($("<div class='task-section-header'/>").text("NOTES"));
           taskView.append("This feature is coming soon.");
           taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
-          $("#messages").removeClass("hide");
+          taskView.append("This feature is coming soon.");
+          $("#messages").addClass("hide");
+          // $("#messages").removeClass("hide");
         } else if (state.calendar_options.length > 0) {
           taskView.append($("<p id='meeting-title'/>").text("Select the options that work for you."))
           var answers = {};
