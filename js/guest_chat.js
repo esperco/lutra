@@ -543,7 +543,7 @@ var chat = (function () {
             if (! util.isDefined(peerUid))
               peerUid = chat.chat_participants[0].par_uid;
             var p = profiles[peerUid].prof;
-            tab.append(profile.fullName(p));
+            tab.append(document.createTextNode(profile.fullName(p)));
           }
           if (first_tab) {
             $(".chat-tab-div").addClass("active");
