@@ -28,7 +28,7 @@ var guestTask = function() {
 
   function stripTimestamp(d) {
     // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
-    return d.replace(/[\-:]|\.000/g, "");
+    return d.replace(/-|:|\.000/g, "");
   }
 
   function googleCalendarURL(text1, text2, slot) {
@@ -70,9 +70,6 @@ var guestTask = function() {
     // return getDirections;
   }
 
-  function calendarOptions() {
-  }
-
   function viewOfTimeAndPlace(x) {
     var meetingTime = $("<div id='meeting-time'/>");
     var meetingLoc = $("<div id='meeting-location'/>");
@@ -106,6 +103,41 @@ var guestTask = function() {
     return view;
   }
 
+  function viewOfCalendarOption(choice, answers) {
+    var slotView = $("<div class='suggestion'/>");
+    var checkbox = $("<img class='suggestion-checkbox'/>");
+    slotView.append(checkbox);
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+    slotView.append(viewOfTimeAndPlace(choice.slot));
+    slotView.click(function() {
+      if (slotView.hasClass("checkbox-selected")) {
+        slotView.removeClass("checkbox-selected");
+        delete answers[choice.label];
+      } else {
+        slotView.addClass("checkbox-selected");
+        answers[choice.label] = choice;
+      }
+    });
+    return slotView;
+  }
+
+  function replyButton(answers) {
+    var replyButton = $("<button>Reply</button>");
+    replyButton.click(function() {
+      var sel = [];
+      for (var label in answers) {
+        sel.push(answers[label]);
+      }
+      var item = {
+        chatid: login.myChatid(),
+        by:     login.me(),
+        "for":  login.me(),
+        chat_item_data: ["Scheduling_r", {selected:sel}]
+      };
+      api.postChatItem(item);
+    });
+    return replyButton;
+  }
 
 /*** SAVE FOR MEETING OPTIONS ***/
 
@@ -173,12 +205,17 @@ var guestTask = function() {
         var state = ta.task_data[1];
         if (state.reserved) {
           taskView.append(viewOfTimeAndPlace(state.reserved.slot));
-          taskView.append(calendarOptions);
           taskView.append(googleMapsLink(state.reserved.slot));
           taskView.append(googleCalendarLink(
               googleCalendarURL(ta.task_calendar_title,
                                 window.location,
                                 state.reserved.slot)));
+        } else if (state.calendar_options.length > 0) {
+          var answers = {};
+          list.iter(state.calendar_options, function(choice) {
+            taskView.append(viewOfCalendarOption(choice, answers));
+          });
+          taskView.append(replyButton(answers));
         }
       }
 
