@@ -110,8 +110,23 @@ var chat = (function () {
     return sel;
   }
 
+  mod.locationText = function(loc) {
+    if (loc.address) {
+      if (loc.instructions)
+        return loc.address + " (" + loc.instructions + ")";
+      else
+        return loc.address;
+    }
+    else if (loc.title)
+      return loc.title;
+    else if (loc.instructions)
+      return loc.instructions;
+    else
+      return "";
+  }
+
   function appendLocation(elt, loc) {
-    var locText = sched.locationText(loc);
+    var locText = mod.locationText(loc);
     if (locText) {
       $("<span/>")
         .text("Location: " + locText)
