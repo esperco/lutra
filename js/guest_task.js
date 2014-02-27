@@ -70,9 +70,6 @@ var guestTask = function() {
     // return getDirections;
   }
 
-  function calendarOptions() {
-  }
-
   function viewOfTimeAndPlace(x) {
     var meetingTime = $("<div id='meeting-time'/>");
     var meetingLoc = $("<div id='meeting-location'/>");
@@ -106,6 +103,32 @@ var guestTask = function() {
     return view;
   }
 
+  function calendarOptions() {
+    var view = $("<div id='calendar-options'/>");
+    var outlook = $("<div class='col-xs-4'/>")
+      .appendTo(view);
+    var google = $("<div class='col-xs-4'/>")
+      .appendTo(view);
+    var apple = $("<div class='col-xs-4'/>")
+      .appendTo(view);
+  }
+
+  function addToCalendar() {
+    var view = $("<div/>", {
+      "id": "add-to-calendar",
+      "class": "tab-pane",
+      "data-container": "body",
+      "data-html": "true",
+      "data-toggle": "popover",
+      "data-placement": "bottom",
+      "data-content": calendarOptions,
+      "text": "Add to my calendar"
+    });
+
+    view.popover();
+
+    return view;
+  }
 
 /*** SAVE FOR MEETING OPTIONS ***/
 
@@ -160,14 +183,15 @@ var guestTask = function() {
 
   mod.loadTask = function(ta) {
     profile.profilesOfTaskParticipants(ta).done(function(profs) {
-      var taskView = $("#guest-task-content");
+      var taskView = $("#meeting-content");
       taskView.children().remove();
-      var taskWelcome = $("#guest-task-welcome");
+      var taskWelcome = $("#meeting-welcome");
       taskWelcome.children().remove();
 
       var myName = profile.fullName(profs[login.me()].prof);
       taskWelcome.append($("<p/>").text("Hello, " + myName));
-      taskView.append($("<p id='guest-task-title'/>").text(ta.task_calendar_title));
+      taskView.append($("<p id='meeting-title'/>").text(ta.task_calendar_title))
+              .append(addToCalendar);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
@@ -194,7 +218,6 @@ var guestTask = function() {
       taskView.append("This feature is coming soon.");
 
       taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
-      taskView.append("This feature is coming soon.");
 
       observable.onTaskModified.observe("guest-task", mod.loadTask);
     });
