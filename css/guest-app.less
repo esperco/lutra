@@ -155,11 +155,115 @@ ul {
   font-size: 24px;
 }
 
-#calendar-options {
-  width: 300px;
+
+/*** Options ***/
+
+.suggestion {
+  height: 80px;
+  cursor: pointer;
+  &:hover {
+    background: @gray_80;
+    path.checkbox {stroke: @gray_40; }
+    path.radio-outline { fill: @gray_40; }
+  }
 }
 
-#time-text {
+.suggestion-checkbox {
+  float: left;
+  width: 24px;
+  height: 24px;
+  margin-top: 30px;
+}
+
+.checkbox-selected {
+  path.checkbox { fill: @purple_disabled; }
+  path.checkbox { stroke: @purple; }
+  path.check { fill: @gray_90; }
+  &:hover path.checkbox { stroke: @purple_hover !important }
+}
+
+
+/*** Confirmed ***/
+
+#add-to-calendar {
+  &:focus { outline: none; }
+}
+
+#add-cal {
+  float: left;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+#add-cal-text {
+  margin-top: 2px;
+  margin-left: 26px;
+}
+
+.calendar-type-row {
+  width: 190px;
+  height: 50px;
+  padding: 10px;
+  color: @gray_90;
+}
+
+.calendar-type {
+  margin-top: 5px;
+  margin-left: 40px;
+}
+
+#google:hover {
+  background: @gray_f8;
+  cursor: pointer;
+}
+
+#outlook,
+#apple {
+  opacity: 0.2;
+  cursor: default;
+}
+
+#outlook-icon,
+#google-icon,
+#apple-icon {
+  float: left;
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+#meeting-time,
+#meeting-location {
+  margin-top: 20px;
+}
+
+#meeting-location {
+  cursor: pointer;
+  &:hover {
+    #loc { text-decoration: underline; }
+  }
+}
+
+#clock {
+  float: left;
+  margin-top: 3px;
+}
+
+#pin {
+  float: left;
+  margin-top: 3px;
+  margin-left: 2px;
+  path { fill: @white; }
+}
+
+#time1,
+#time2,
+#loc {
+  margin-left: 20px;
+}
+
+#time2 {
   font-family: @bold;
 }
 
@@ -184,7 +288,6 @@ ul {
   max-width: 742px;
   margin-left: auto;
   margin-right: auto;
-  padding-bottom: 120px;
 }
 
 #messages-container {
@@ -468,7 +571,7 @@ ul {
 /*** Footer ***/
 
 #footer {
-  padding-top: 15px;
+  padding-top: 120px;
   padding-bottom: 30px;
   color: @gray_40;
   font-size: 14px;
