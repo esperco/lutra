@@ -33,7 +33,6 @@ COMMON_SOURCES = \
   observable.js \
   pusher.js \
   profile.js \
-  chat.js \
   geo.js \
   display.js
 
@@ -47,6 +46,7 @@ APP_SOURCES = \
   sched3.js \
   sched4.js \
   task.js \
+  chat.js \
   settings.js \
   places.js \
   home.js \
