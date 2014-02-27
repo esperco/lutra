@@ -258,12 +258,9 @@ var guestTask = function() {
             participantListView.append($("<li class='guest-name-row'/>").text(name));
           });
           taskView.append(participantListView);
-          taskView.append($("<div class='task-section-header'/>").text("NOTES"));
-          taskView.append("This feature is coming soon.");
+          // taskView.append($("<div class='task-section-header'/>").text("NOTES"));
           taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
-          taskView.append("This feature is coming soon.");
-          $("#messages").addClass("hide");
-          // $("#messages").removeClass("hide");
+          $("#messages").removeClass("hide");
         } else if (state.calendar_options.length > 0) {
           taskView.append($("<p id='meeting-title'/>").text("Select the options that work for you."))
           var answers = {};
