@@ -442,15 +442,15 @@ var chat = (function () {
     var me = login.me();
     var v = $("<div/>");
 
-    var displayName = $("<div class='from-details'></div>")
-      .appendTo(v);
-    if (chat.chatid === task.task_context_chat) {
-      displayName.append("Group Conversation");
-    } else {
-      displayName.append(chat_participant_names(chat));
-    }
+    // var displayName = $("<div class='from-details'></div>")
+    //   .appendTo(v);
+    // if (chat.chatid === task.task_context_chat) {
+    //   displayName.append("Group Conversation");
+    // } else {
+    //   displayName.append(chat_participant_names(chat));
+    // }
 
-    var messages = $("<div class='messages scrollable'></div>")
+    var messages = $("<div class='messages'></div>")
       .appendTo(v);
 
     var blank = $("<div class='blank-chat hide'></div>")
@@ -538,23 +538,13 @@ var chat = (function () {
           tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
                      .append(chatView(chat, ta)));
           if (isGroupChat) {
-            var group = $("<img class='group'/>");
-            tab.tooltip({"title":"Group Conversation","placement":"bottom"})
-               .append($("<div class='chat-prof-circ'/>")
-                       .append(group));
-            svg.loadImg(group, "/assets/img/group.svg");
+            tab.append("All");
           } else {
             if (! util.isDefined(peerUid))
               peerUid = chat.chat_participants[0].par_uid;
             var p = profiles[peerUid].prof;
-            var tab_initials = profile.veryShortNameOfProfile(p);
-            tab.tooltip({"title":profile.fullName(p),"placement":"bottom"})
-              .append($("<div class='chat-prof-circ'/>")
-                      .append(tab_initials));
+            tab.append(profile.fullName(p));
           }
-          var caret = $("<img class='prof-caret'/>");
-          caret.appendTo(tab);
-          svg.loadImg(caret, "/assets/img/prof-caret.svg");
           if (first_tab) {
             $(".chat-tab-div").addClass("active");
             $("#" + pane_id).addClass("active");
