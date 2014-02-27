@@ -6,7 +6,8 @@ default: css
 FILES = \
   custom-bootstrap \
   fonts \
-  app
+  app \
+  guest-app
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))

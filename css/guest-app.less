@@ -42,8 +42,8 @@ html {
 }
 
 body {
-  background: @white;
-  color: @gray_90;
+  background: @gray_90;
+  color: @white;
   font-family: @regular, Arial;
   font-size: 16px;
   text-rendering: optimizeLegibility;
@@ -52,6 +52,12 @@ body {
 
 object {
   pointer-events: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
 }
 
 .container.mobile {
@@ -106,76 +112,68 @@ object {
 
 /*** Nav Bar ***/
 
-#desktop-navbar {
-  position: fixed;
-  height: 100%;
-  width: 220px;
-  background: @gray_90;
-  overflow-y: auto;
-}
-
-#mobile-navbar-header,
-#task-navbar {
+#guest-task-navbar {
+  z-index: 1020;
+  position: fixed !important;
+  height: 60px;
+  left: 0;
+  right: 0;
   margin: 0;
   padding: 0;
-  background: @white;
-  border-bottom: 1px solid @border;
+  background: @dark_gray;
   border-radius: 0;
 }
 
-#new-task-btn-mobile,
-#new-place-btn-mobile {
-  float: right;
-  margin-top: 14px;
-  margin-right: 16px;
-}
-
-#menu,
-#return-home {
+#esper-home {
   float: left;
-  margin-left: 16px;
-  cursor: pointer;
-}
-
-#menu {
-  margin-top: 23px;
-  &:hover g path { fill: @purple_hover; }
-  &:active g path { fill: #7d3ca0; }
-}
-
-#return-home {
   width: 20px;
   height: 24px;
   margin-top: 18px;
+  margin-left: 16px;
+  cursor: pointer;
   g path { fill: @purple; }
   &:hover g path { fill: @purple_hover; }
   &:active g path { fill: #7d3ca0; }
 }
 
-.nav-title {
-  float: left;
-  margin-top: 18px;
-  margin-left: 16px;
-  margin-bottom: 0px;
-  font-size: 18px;
+#guest-task-welcome {
+  margin: 20px 16px 0px 56px;
+  font-size: 16px;
+}
+
+#guest-task-content {
+  max-width: 742px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 100px;
+  padding-bottom: 120px;
+}
+
+#guest-task-title {
+  font-size: 24px;
+}
+
+#time-text {
+  font-family: @bold;
+}
+
+.task-section-header {
+  margin-top: 40px;
+  color: @gray_40;
+  font-family: @light;
+  font-size: 20px;
+  letter-spacing: 3px;
+}
+
+.guest-name-row {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-family: @bold;
 }
 
 #home-title { letter-spacing: 3px; }
 
-#task-title-div {
-  margin-left: 56px;
-  margin-right: 60px;
-}
 
-#task-title {
-  width: 100%;
-  margin-top: 14px;
-  margin-bottom: 0px;
-  font-size: 18px;
-  border: 1px solid @white;
-  &:hover { border: 1px solid @gray_20; }
-  &:focus { border: 1px solid @purple; }
-}
 
 #mobile-navbar-collapse {
   background: @gray_90;
@@ -445,14 +443,6 @@ object {
   #archive-icon path,
   #contacts-icon path,
   #places-icon path, { fill: @white; }
-}
-
-#task-navbar {
-  z-index: 1020;
-  position: fixed !important;
-  height: 60px;
-  left: 0;
-  right: 0;
 }
 
 #chat-icon-container {
@@ -960,13 +950,7 @@ object {
 
 /*** Container ***/
 
-.task-container {
-  max-width: 742px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 80px;
-  padding-bottom: 120px;
-}
+
 
 
 /*** Modal ***/
@@ -1617,37 +1601,11 @@ object {
 
 /*** Chat ***/
 
-#task-page { height: 100%; }
-
-#chat {
-  position: fixed;
+#guest-chat {
   width: @chat_width;
-  top: 48px;
-  left: 100%;
-  margin-left: -@chat_width;
 }
 
-#chat.premiere {
-  -webkit-animation-delay: 1s;
-     -moz-animation-delay: 1s;
-          animation-delay: 1s;
-}
-
-#chat.fadeOutDown {
-  z-index: -1;
-}
-
-#chat.fadeInUp {
-  z-index: 1030;
-}
-
-#chat-caret {
-  position: fixed;
-  display: block;
-  margin-left: @chat_width - 38px;
-}
-
-#chat-container {
+#guest-chat-container {
   margin-top: 7px;
   text-align: left;
   white-space: normal;
@@ -1660,7 +1618,7 @@ object {
   background-clip: padding-box;
 }
 
-#chat-header {
+#guest-chat-header {
   z-index: 1030;
   padding-left: 9px;
   background: @gray_f8;
@@ -1669,7 +1627,7 @@ object {
   border-bottom: 1px solid @border;
 }
 
-.chat-profile-tabs {
+.guest-chat-profile-tabs {
   height: 54px;
 }
 
@@ -1961,12 +1919,6 @@ object {
   font-size: 18px;
 }
 
-.guest-name {
-  margin-top: 14px;
-  margin-left: 58px;
-  font-family: @bold;
-}
-
 .add-guest-circ {
   background: @purple;
   &:hover {
@@ -2139,11 +2091,6 @@ object {
   font-size: 18px;
 }
 
-.time-text,
-.time-text-short,
-.loc-text {
-  font-size: 14px;
-}
 
 .pin {
   margin-right: 6px;
