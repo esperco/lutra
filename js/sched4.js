@@ -99,6 +99,7 @@ var sched4 = (function() {
       template_kind: "Confirmation_to_guest",
       exec_name: hostName,
       guest_name: toName,
+      guest_uid: toUid,
       meet_date: date.dateOnly(t1),
       meet_time: (
         ta.task_data[1].hide_end_times ?

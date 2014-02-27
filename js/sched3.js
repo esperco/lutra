@@ -224,7 +224,8 @@ var sched3 = (function() {
     var parameters = {
       template_kind: "Options_to_guest",
       exec_name: hostName,
-      guest_name: toName
+      guest_name: toName,
+      guest_uid: toUid
     };
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
