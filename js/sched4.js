@@ -475,9 +475,8 @@ var sched4 = (function() {
   }
 
   function enableEventEditSave(task, titleEdit, saveButton) {
-    if ($("#edit-calendar-title").val().length > 0
-        && reservedCalendarSlot(task)) {
-      $("#event-edit-save").removeClass("disabled");
+    if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
+      saveButton.removeClass("disabled");
     }
   }
 
