@@ -427,7 +427,7 @@ var chat = (function () {
     var me = login.me();
     var v = $("<div/>");
 
-    var displayName = $("<div class='chat-profile-details'></div>")
+    var displayName = $("<div class='from-details'></div>")
       .appendTo(v);
     if (chat.chatid === task.task_context_chat) {
       displayName.append("Group Conversation");
@@ -443,7 +443,7 @@ var chat = (function () {
     var blankChatIcon = $("<img class='blank-chat-icon'/>")
       .appendTo(blank);
     svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
-    blank.append("<div>Start the conversation below.</div>");
+    blank.append("<div>No messages found.</div>");
 
     if (chat.chat_items.length === 0) {
       blank.removeClass("hide");
@@ -461,29 +461,29 @@ var chat = (function () {
       }
     }
 
-    if (chat.chatid === task.task_context_chat) {
-      var toField = $("<div class='to-field'/>")
-        .appendTo(v);
-      toField.append($("<b>To:</b>"));
-      toField.append(" " + chat_participant_names(chat));
-      messages.addClass("group-chat");
-    }
+    // if (chat.chatid === task.task_context_chat) {
+    //   var toField = $("<div class='to-field'/>")
+    //     .appendTo(v);
+    //   toField.append($("<b>To:</b>"));
+    //   toField.append(" " + chat_participant_names(chat));
+    //   messages.addClass("group-chat");
+    // }
 
-    v.append(chatEditor(blank, messages, chat, task));
+    // v.append(chatEditor(blank, messages, chat, task));
 
     return v;
   }
 
   mod.clearTaskChats = function() {
-    $(".guest-chat-profile-tabs li").remove();
-    $(".guest-chat-panel div").remove();
+    $(".chat-profile-tabs li").remove();
+    $(".chat-panel div").remove();
   }
 
   mod.loadTaskChats = function(ta) {
     mod.clearTaskChats();
 
-    var tabs = $(".guest-chat-profile-tabs");
-    var tab_content = $(".guest-chat-panel");
+    var tabs = $(".chat-profile-tabs");
+    var tab_content = $(".chat-panel");
 
     profile.profilesOfTaskParticipants(ta)
       .done(function(profs) {
