@@ -31,8 +31,8 @@ var page = (function() {
   });
 
   function goto_page(k) {
-    task.onSchedulingStepChanging.notify();
-    task.onSchedulingStepChanging.stopObserve("step");
+    observable.onSchedulingStepChanging.notify();
+    observable.onSchedulingStepChanging.stopObserve("step");
 
     pageSelector.show(k);
   }

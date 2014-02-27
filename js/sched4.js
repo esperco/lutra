@@ -480,14 +480,16 @@ var sched4 = (function() {
 
     view
       .append(createConfirmSection(profs, ta, guests))
-      .append(createInviteSection(profs, ta, guests))
+      /* Invites are disabled for now in favor of sending a custom URL
+         that redirects the guest to their own Google calendar. */
+      //.append(createInviteSection(profs, ta, guests))
       .append(createRemindSection(profs, ta, guests));
 
-    task.onTaskParticipantsChanged.observe("step4", function(ta) {
+    observable.onTaskParticipantsChanged.observe("step4", function(ta) {
       chats = sched.chatsOfTask(ta);
     });
     /* Task is always saved when remind changes. */
-    task.onSchedulingStepChanging.stopObserve("step");
+    observable.onSchedulingStepChanging.stopObserve("step");
   };
 
   return mod;

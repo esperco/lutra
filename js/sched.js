@@ -214,8 +214,8 @@ var sched = (function() {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep1(profs, ta);
         });
       });
@@ -223,8 +223,8 @@ var sched = (function() {
       .attr('disabled', mod.getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep2(tzList, profs, ta);
         });
       });
@@ -232,8 +232,8 @@ var sched = (function() {
       .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep3(profs, ta);
         });
       });
@@ -241,8 +241,8 @@ var sched = (function() {
       .attr('disabled', ! mod.getState(ta).reserved)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep4(profs, ta);
         });
       });
@@ -256,7 +256,7 @@ var sched = (function() {
       .done(function(x) {
         var tzList = x.timezones;
         setup_step_buttons(tzList, ta);
-        task.profilesOfEveryone(ta)
+        profile.profilesOfTaskParticipants(ta)
           .done(function(profs) {
             switch (progress) {
             case "Guest_list":

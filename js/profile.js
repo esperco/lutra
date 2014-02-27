@@ -130,5 +130,43 @@ var profile = (function() {
     }
   }
 
+  /* extract all user IDs contained in the task; this is used to
+     pre-fetch all the profiles. */
+  function extractTaskUids(ta) {
+    var acc = [];
+
+    var taskPar = ta.task_participants;
+    acc = list.union(acc, taskPar.organized_by);
+    acc = list.union(acc, taskPar.organized_for);
+
+    list.iter(ta.task_chats, function(chat) {
+      var uids = list.map(chat.chat_participants, function(x) {
+        return x.par_uid;
+      });
+      acc = list.union(acc, uids);
+    });
+
+    return acc;
+  }
+
+  /*
+    fetch the profiles of everyone involved in the task
+    (deferred map from uid to profile)
+  */
+  mod.profilesOfTaskParticipants = function(ta) {
+    var par = ta.task_participants;
+    var everyone = extractTaskUids(ta);
+    return mod.mget(everyone)
+      .then(function(a) {
+        var b = {};
+        list.iter(a, function(obsProf) {
+          if (obsProf !== null) {
+            b[obsProf.prof.profile_uid] = obsProf;
+          }
+        });
+        return b;
+      });
+  };
+
   return mod;
 }());

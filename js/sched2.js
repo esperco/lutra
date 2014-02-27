@@ -730,7 +730,7 @@ var sched2 = (function() {
       $("#edit-place-save").off("click");
     });
 
-    task.onSchedulingStepChanging.observe("step", function() {
+    observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);
     });
   };

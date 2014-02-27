@@ -331,6 +331,11 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
+  mod.getGuestAppURL = function(tid, guestUid) {
+    var url = apiSPrefix() + "/task/" + tid + "/guestapp/" + guestUid;
+    return jsonHttpGet(url);
+  }
+
   mod.getOptionsMessage = function(tid, parameters) {
     var url = apiSPrefix() + "/task/" + tid + "/options/message";
     return jsonHttpPost(url, JSON.stringify(parameters));

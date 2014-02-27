@@ -189,9 +189,16 @@ var sched1 = (function() {
     var chatHead = profile.viewMediumCirc(prof);
     var nameView = profile.viewMediumFullName(prof);
 
+    var bridgeButton = $("<button>bridge</button>").click(function() {
+      api.getGuestAppURL(task.tid, uid).done(function (url) {
+        window.location.assign(url.url);
+      });
+    });
+
     view
       .append(chatHead)
-      .append(nameView);
+      .append(nameView)
+      .append(bridgeButton);
 
     if (sched.isGuest(uid)) {
       var removeDiv = $("<div class='remove-guest-div'>")
@@ -238,7 +245,7 @@ var sched1 = (function() {
   function addGuest(ta, guestTbl, uid) {
     guestTbl[uid] = uid;
     ta.task_participants.organized_for.push(uid);
-    return task.profilesOfEveryone(ta);
+    return profile.profilesOfTaskParticipants(ta);
   }
 
   /* remove guest */
@@ -253,7 +260,7 @@ var sched1 = (function() {
 
   function saveGuests(ta, hosts, guestTbl) {
     updateGuests(ta, hosts, guestTbl);
-    api.postTask(ta).done(task.onTaskParticipantsChanged.notify);
+    api.postTask(ta).done(observable.onTaskParticipantsChanged.notify);
   }
 
   function finalizeGuests(ta, hosts, guestTbl) {
@@ -262,7 +269,7 @@ var sched1 = (function() {
     sched.getState(ta).scheduling_stage = "Find_availability";
     api.postTask(ta).done(function(ta) {
       sched.loadTask(ta);
-      task.onTaskParticipantsChanged.notify(ta);
+      observable.onTaskParticipantsChanged.notify(ta);
     });
   }
 
@@ -313,7 +320,7 @@ var sched1 = (function() {
 
     updateNextButton(hosts, guestTbl);
 
-    task.onSchedulingStepChanging.observe("step", function() {
+    observable.onSchedulingStepChanging.observe("step", function() {
       saveGuests(ta, hosts, guestTbl);
     });
   };
