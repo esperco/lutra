@@ -114,7 +114,6 @@ var api = (function () {
 
   mod.postProfile = function(prof, teamid) {
     var url = apiProfilePrefix() + "/" + prof.profile_uid + "/" + teamid;
-    //console.log(teamid.toSource());
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 

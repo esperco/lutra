@@ -30,21 +30,6 @@ var sched4 = (function() {
       util.isDefined(state.reserved.google_event);
   }
 
-  // XXX UNUSED
-  function formalEmailBody(organizerName, hostName, toName, when, where) {
-    return "Dear "+toName+",\n\n"+
-
-    "You are confirmed for a meeting with "+hostName+
-    " "+when+" "+where+".\n\n"+
-
-    "If you have any questions/comments, please do not hesitate to reply "+
-    "to this e-mail.\n\n"+
-
-    "Regards,\n\n"+
-
-    organizerName+"\n";
-  }
-
   function loadRecipientRow(x, toObsProf) {
     var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
       .appendTo(x);
@@ -108,19 +93,25 @@ var sched4 = (function() {
     if (slot.location.instructions)
       place += " (" + slot.location.instructions + ")";
     var where = "at " + (place == "" ? "a place to be determined" : place);
-    api.getConfirmationMessage(ta.tid, {
+
+    $("#sched-confirm-guest-addr").val("Address_directly");
+    var parameters = {
+      template_kind: "Confirmation_to_guest",
       exec_name: hostName,
       guest_name: toName,
+      guest_uid: toUid,
       meet_date: date.dateOnly(t1),
       meet_time: (
         ta.task_data[1].hide_end_times ?
         date.timeOnly(t1) :
         date.timeOnly(t1) + " to " + date.timeOnly(t2)
       )
-    })
+    };
+    api.getConfirmationMessage(ta.tid, parameters)
       .done(function(confirmationMessage) {
         $("#sched-confirm-message").val(confirmationMessage.message_text);
 
+        /*
         var schedConfirmShowEnd = $("#sched-confirm-show-end");
         schedConfirmShowEnd.children().remove();
 
@@ -152,23 +143,36 @@ var sched4 = (function() {
           var body = formalEmailBody(organizerName, hostName, toName, when, where);
           $("#sched-confirm-message").val(body);
         });
+        */
+
+        $("#sched-confirm-guest-addr")
+          .unbind("change")
+          .change(function(){refreshConfirmationMessage(ta.tid, parameters);});
     });
   }
 
-  // XXX UNUSED
-  function refreshReminderMessage(cannedMessages) {
-    var conditions = [];
-    function add_cond(cond) {
-      if (cond.length > 0) {
-        conditions.push(cond);
-      }
+  function refreshConfirmationMessage(tid, parameters) {
+    if ($("#sched-confirm-guest-addr").val() === "Address_directly") {
+      parameters.template_kind = "Confirmation_to_guest";
+    } else {
+      parameters.template_kind = "Confirmation_to_guest_assistant";
     }
-    add_cond($("#sched-reminder-meeting-kind").val());
-    add_cond($("#sched-reminder-guest-addr").val());
+    api.getConfirmationMessage(tid, parameters)
+      .done(function(x) {
+        $("#sched-confirm-message").val(x.message_text);
+      });
+  }
 
-    var x = list.find(cannedMessages, function(x) {
-      return list.diff(x.message_conditions, conditions).length <= 0;
-    });
+  function refreshReminderMessage(tid, parameters) {
+    if ($("#sched-reminder-guest-addr").val() === "Address_directly") {
+      parameters.template_kind = "Reminder_to_guest";
+    } else {
+      parameters.template_kind = "Reminder_to_guest_assistant";
+    }
+    api.getReminderMessage(tid, parameters)
+      .done(function(x) {
+        $("#sched-reminder-message").val(x.message_text);
+      });
   }
 
   function preFillReminderModal(profs, ta, reserved, guests) {
@@ -181,13 +185,19 @@ var sched4 = (function() {
       $("#sched-reminder-message").val(reserved.reminder_message);
     }
 
-    api.getReminderMessage(ta.tid, {
+    var parameters = {
+      template_kind: "Reminder_to_guest",
       guest_name: $(".recipient-name").first().text()
-    })
+    };
+    $("#sched-reminder-guest-addr").val("Address_directly");
+    api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
         if (! reserved.reminder_message) {
           $("#sched-reminder-message").val(x.message_text);
         }
+        $("#sched-reminder-guest-addr")
+          .unbind("change")
+          .change(function(){refreshReminderMessage(ta.tid, parameters);});
       });
   }
 

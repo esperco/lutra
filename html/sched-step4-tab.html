@@ -64,6 +64,10 @@
                  type="text" class="form-control" disabled>
         </div>
         <h4 class="modal-section-title">Message</h4>
+        <select id="sched-confirm-guest-addr">
+          <option value="Address_directly">Address Directly</option>
+          <option value="Address_to_assistant">Address to Assistant</option>
+        </select>
         <textarea class="form-control" rows="10"
                   id="sched-confirm-message"></textarea>
         <div id="sched-confirm-show-end" class="checkbox-selected hide"></div>
@@ -100,7 +104,7 @@
           <option value="">Meeting</option>
           <option value="Phone_meeting">Phone Call</option>
         </select>
-        <select id="sched-reminder-guest-addr" class="hide">
+        <select id="sched-reminder-guest-addr">
           <option value="Address_directly">Address Directly</option>
           <option value="Address_to_assistant">Address to Assistant</option>
         </select>
