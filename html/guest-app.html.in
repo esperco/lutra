@@ -7,24 +7,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/assets/css/custom-bootstrap.css" rel="stylesheet" media="screen">
-    <link href="/assets/css/app.css" rel="stylesheet" media="screen">
+    <link href="/assets/css/guest-app.css" rel="stylesheet" media="screen">
     <link href="/assets/css/fonts.css" rel="stylesheet" type="text/css" charset="utf-8" />
     <link href="/assets/css/animate.min.css" rel="stylesheet">
     <link href="/assets/css/font-awesome.css" rel="stylesheet">
   </head>
 
   <body>
-    <div id="task-content" class="scrollable"></div>
-
-    <div id="chat" class="animated fadeInUp premiere">
-      <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
-      <div id="chat-container">
-        <div id="chat-header">
-          <ul class="nav chat-tabs chat-profile-tabs"></ul>
-        </div>
-        <div class="tab-content chat-panel"></div>
-      </div>
+    <div id="guest-task-navbar">
+      <a href="http://www.esper.com" target="blank">
+        <img id="esper-home" class="svg" src="/assets/img/esper-mark.svg">
+      </a>
+      <div id="guest-task-welcome" class="ellipsis"></div>
     </div>
+
+    <div id="guest-task-content" class="scrollable"></div>
+
+<!--     <div id="guest-chat">
+      <div id="guest-chat-container">
+        <div id="guest-chat-header">
+          <ul class="nav chat-tabs guest-chat-profile-tabs"></ul>
+        </div>
+        <div class="tab-content guest-chat-panel"></div>
+      </div>
+    </div> -->
 
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
