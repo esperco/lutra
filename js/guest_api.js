@@ -79,6 +79,10 @@ var api = function() {
     return jsonHttpGet(apiPrefix() + "/task");
   };
 
+  mod.getChatItem = function(itemId) {
+    return jsonHttpGet(apiPrefix() + "/chat/" + itemId);
+  };
+
   mod.postChatItem = function(chatItem) {
     return jsonHttpPost(apiPrefix() + "/chat", JSON.stringify(chatItem));
   };
