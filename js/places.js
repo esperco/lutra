@@ -17,43 +17,6 @@ var places = (function() {
   var selectedPlaceDesc = null;
   var selectedPlaceDetails = null;
 
-  function addressDropdown(predictions, writeName) {
-    if (predictions.from_google.length == 0) return;
-    var menu = $("#places-address-dropdown-menu");
-    menu.children().remove();
-
-    $('<li role="presentation" class="dropdown-header"/>')
-      .text("Suggestions from Google")
-      .appendTo(menu);
-
-    list.iter(predictions.from_google, function(item) {
-      var description = item.google_description;
-      var bolded = geo.highlight(description, item.matched_substrings);
-      var li = $('<li role="presentation"/>').appendTo(menu);
-      $('<a role="menuitem" tabindex="-1" href="#"/>')
-        .html(bolded)
-        .appendTo(li)
-        .click(function() {
-          api.getPlaceDetails(description, item.ref_id)
-            .done(function(details) {
-              selectedPlaceDesc = description;
-              selectedPlaceDetails = details;
-              if (writeName) {
-                $("#edit-place-location-title").val(details.name);
-              }
-              $("#edit-place-address").val(details.formatted_address);
-              $('#places-address-dropdown-toggle').dropdown("toggle");
-            });
-          return false;
-        });
-    });
-
-    var toggle = $('#places-address-dropdown-toggle');
-    if (!toggle.parent().hasClass('open')) {
-      toggle.dropdown("toggle");
-    }
-  }
-
   function prefillEditModal(place) {
     $("#edit-place-location-title").val(place.loc.title);
     $("#edit-place-address").val(place.loc.address);

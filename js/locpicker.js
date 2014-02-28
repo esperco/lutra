@@ -12,6 +12,38 @@
 var locpicker = (function() {
   var mod = {};
 
+  function createLocationForm() {
+'''
+<div #location
+     class="clearfix">
+  <div #timezone
+       class="col-sm-3"></div>
+  <div class="col-sm-6">
+    <div class="location-title">Location</div>
+    <input #address
+           type="text" class="form-control"
+           placeholder="address, neighborhood, city, state, or zip"/>
+    <div class="dropdown">
+      <a #dropdownToggle
+         data-toggle="dropdown"
+         class="hide dropdown-toggle" href="#"></a>
+      <ul #dropdownMenu
+          class="dropdown-menu"
+          role="menu"></ul>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="location-title">Notes</div>
+    <input #notes
+           type="text" class="form-control"
+           placeholder="suite number, etc."/>
+  </div>
+</div>
+'''
+
+    return _view;
+  }
+
   function createGoogleMap(mapDiv) {
     var mapOptions = {
       center: new google.maps.LatLng(37.4485044, -122.159185),
@@ -43,12 +75,43 @@ var locpicker = (function() {
       });
   }
 
-  function displayPredictionsDropdown(input, predictions, formView, modalView) {
+  function getLocation(view) {
+    return {
+      title: view.locationTitle.val(),
+      address: view.address.val(),
+      instructions: view.instructions.val()
+    };
+  }
+
+  function setLocation(view, loc) {
+    view.title.val(loc.title);
+    view.address.val(loc.address);
+    view.instructions.val(loc.instructions);
+  }
+
+  /*
+    Display addresses as autocompleted by Google or by Esper using
+    the user's saved places.
+  */
+  function displayPredictionsDropdown(view, predictions) {
     if (predictions.from_saved_places.length === 0
         && predictions.from_google.length === 0) return;
-    var menu = modalView.dropdownMenu;
+    var menu = view.dropdownMenu;
     menu.children().remove();
 
+    /*
+      Create pop-up for editing and saving a location,
+      taking care of synchronization between the form and the pop-up (modal).
+      The pop-up is shown when the user clicks somewhere in the
+      dropdown menu that opens below the address input box.
+    */
+    function updateForm(loc) {
+      setLocation(view, loc);
+    }
+    var modalView = loceditor.create(getLocation(view), updateForm, updateForm);
+    view.append(modalView.modal);
+
+    /* Fill the menu with suggested addresses */
     var li = $('<li role="presentation"/>')
       .appendTo(menu);
     var bolded = "Create a place named <b>\""
@@ -57,12 +120,12 @@ var locpicker = (function() {
       .html(bolded)
       .appendTo(li)
       .click(function() {
-        places.emptyEditModal();
-        modalView.locationTitle.val(input);
+        /* TODO redo this part */
+        modalView.title.val(input);
         modalView.address.prop("disabled", false);
         modalView.save.one("click", function() {
           places.saveNewPlace(false);
-          formView.address.val(modalView.address.val());
+          view.address.val(modalView.address.val());
           var details = places.getSelectedPlaceDetails();
           var coord = details.geometry;
           api.getTimezone(coord.lat, coord.lon)
@@ -71,7 +134,7 @@ var locpicker = (function() {
             });
         });
         modalView.modal.modal({});
-        modalView.dropdownToggle.dropdown("toggle");
+        formView.dropdownToggle.dropdown("toggle");
         return false;
       });
 
@@ -136,156 +199,46 @@ var locpicker = (function() {
                 .done(function(x) {
                   timeZoneDropdown.set(x.timezone);
                 });
-              modalView.dropdownToggle.dropdown("toggle");
+              formView.dropdownToggle.dropdown("toggle");
             });
           return false;
         });
     });
 
-    var toggle = modalView.dropdownToggle;
+    var toggle = formView.dropdownToggle;
     if (!toggle.parent().hasClass('open')) {
       toggle.dropdown("toggle");
     }
+
+    var editorView = loceditor.create(initLoc, onSave, onDelete);
   }
 
-  function predictAddress(formView, modalView) {
+  function predictAddress(formView) {
     var input = formView.address.val();
     if (input === "") return;
     api.getPlacePredictions(input)
       .done(function(predictions) {
-        displayPredictionsDropdown(input, predictions, formView, modalView);
+        displayPredictionsDropdown(input, predictions, formView);
       });
   }
 
-  function predictEditAddress(formView, modalView) {
-    var input = modalView.address.val();
-    if (input === "") return;
-    api.getPlacePredictions(input)
-      .done(function(predictions) {
-        places.addressDropdown(predictions, false);
-      });
-  }
-
-  function createLocationForm() {
-'''
-<div #location
-     class="clearfix">
-  <div #timezone
-       class="col-sm-3"></div>
-  <div class="col-sm-6">
-    <div class="location-title">Location</div>
-    <input #address
-           type="text" class="form-control"
-           placeholder="address, neighborhood, city, state, or zip">
-    <div class="dropdown">
-      <a #dropdownToggle
-         data-toggle="dropdown"
-         class="hide dropdown-toggle" href="#"></a>
-      <ul #dropdownMenu
-          class="dropdown-menu"
-          role="menu"></ul>
-    </div>
-  </div>
-  <div class="col-sm-3">
-    <div class="location-title">Notes</div>
-    <input #notes
-           type="text" class="form-control"
-           placeholder="suite number, etc.">
-  </div>
-</div>
-'''
-
-    return _view;
-  }
-
-  function createEditPlaceModal() {
-'''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="svg modal-close-x" src="/assets/img/x.svg">
-    </div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <button #save
-                type="button" class="btn btn-primary"
-                style="float:right">Save</button>
-        <h3 #title
-            class="modal-title"></h3>
-      </div>
-      <div #body
-           class="modal-body">
-        <div class="input">
-          <h4 class="modal-first-section-title">Address</h4>
-
-        <input #address
-               type="text" class="form-control"
-               disabled>
-        <div class="dropdown">
-          <a #dropdownToggle
-             data-toggle="dropdown"
-             class="hide dropdown-toggle" href="#"></a>
-          <ul #dropdownMenu
-              class="dropdown-menu"
-              role="menu"></ul>
-        </div>
-
-        <div class="input">
-          <h4 class="modal-section-title">Location Name</h4>
-          <input #locationTitle
-                 type="text" class="form-control">
-        </div>
-
-        </div>
-        <div class="input">
-          <h4 class="modal-section-title">Description</h4>
-          <input #instructions
-                 type="text" class="form-control">
-        </div>
-        <button #delete_
-                type="button" class="btn btn-default hide">
-          Remove Place
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-    var linkedId = util.randomString();
-    title.attr("id", linkedId);
-    modal.attr("aria-labelledby", linkedId);
-
-    modal.on("hidden.bs.modal", function() {
-      save.off("click");
-      delete_.off("click");
-    });
-
-    return _view;
-  }
-
-  function setup(formView, modalView) {
-    util.afterTyping(formView.address, 250, function() {
-      predictAddress(formView, modalView);
-    });
-    util.afterTyping(modalView.address, 250, function() {
-      predictEditAddress(formView, modalView);
+  function setup(form) {
+    util.afterTyping(form.address, 250, function() {
+      log("predictAddress");
+      predictAddress(form);
     });
   }
 
   mod.create = function(param) {
     var view = $("<div/>");
-    var formView = createLocationForm();
-    var modalView = createEditPlaceModal();
+    var form = createLocationForm();
     var mapView = $("<div/>");
     //var map = createGoogleMap(mapView);
 
-    setup(formView, modalView);
+    setup(form);
 
     view
-      .append(formView.form)
-      .append(modalView.modal)
+      .append(formView.location)
       .append(mapView);
 
     return {

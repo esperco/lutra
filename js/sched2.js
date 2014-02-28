@@ -130,7 +130,7 @@ var sched2 = (function() {
   }
 
   function loadStep2Prefs(tzList, task) {
-    var view = $("#sched-step2-pref-time");
+    var view = $("#sched-step2-option-list");
     view.children().remove();
 
     var meetingOption = {};
