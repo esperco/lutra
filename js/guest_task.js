@@ -11,35 +11,6 @@ var guestTask = function() {
     }
   }
 
-  function stripTimestamp(d) {
-    // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
-    // Remove the fraction of second.
-    // Remove the ending 'Z'. According to Util_localtime.create,
-    // "the timezone suffix 'Z' is for compliance only".
-    return d.replace(/-|:|\.000|Z$/g, "");
-  }
-
-  function googleCalendarURL(text1, text2, slot) {
-    return "http://www.google.com/calendar/event?"
-         + ["action=TEMPLATE",
-            "text=" + encodeURIComponent(text1),
-            "dates=" + stripTimestamp(slot.start)
-               + "/" + stripTimestamp(slot.end),
-            "details=" + encodeURIComponent("For meeting details, click here: " + text2),
-            "location=" + encodeURIComponent(chat.locationText(slot.location)),
-            "trp=true",             // show as busy
-            "sprop=Esper",          // website name
-            "sprop=name:esper.com"] // website address
-            .join("&");
-  }
-
-  function googleCalendarLink(url) {
-    var buttonImg = "//www.google.com/calendar/images/ext/gc_button6.gif";
-      // It can be gc_button[1..6].gif
-    return $("<a/>", {href:url, target:"_blank"})
-           .append($("<img/>", {src:buttonImg, border:0}));
-  }
-
   function getDirections(x) {
     return "http://maps.google.com/?daddr="
       + x.location.coord.lat + "," + x.location.coord.lon;
@@ -89,7 +60,7 @@ var guestTask = function() {
   }
 
   function viewOfTimeAndPlace(x) {
-    var view = $("<div/>");
+    var view = $("<div id='time-and-place'/>");
 
     var meetingTime = $("<div id='meeting-time'/>")
       .appendTo(view);
@@ -139,6 +110,42 @@ var guestTask = function() {
     return view;
   }
 
+  function calendarIcon(x) {
+    var view = $("<div id='cal-icon'/>");
+    var month = $("<div id='month'/>")
+      .appendTo(view);
+    var day = $("<div id='day'/>")
+      .appendTo(view);
+
+    var t1 = date.ofString(x.start);
+    month.append(date.month(t1).substr(0,3).toUpperCase());
+    day.append(date.day(t1));
+
+    return view;
+  }
+
+  function stripTimestamp(d) {
+    // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
+    // Remove the fraction of second.
+    // Remove the ending 'Z'. According to Util_localtime.create,
+    // "the timezone suffix 'Z' is for compliance only".
+    return d.replace(/-|:|\.000|Z$/g, "");
+  }
+
+  function googleCalendarURL(text1, text2, slot) {
+    return "http://www.google.com/calendar/event?"
+         + ["action=TEMPLATE",
+            "text=" + encodeURIComponent(text1),
+            "dates=" + stripTimestamp(slot.start)
+               + "/" + stripTimestamp(slot.end),
+            "details=" + encodeURIComponent("For meeting details, click here: " + text2),
+            "location=" + encodeURIComponent(chat.locationText(slot.location)),
+            "trp=true",             // show as busy
+            "sprop=Esper",          // website name
+            "sprop=name:esper.com"] // website address
+            .join("&");
+  }
+
   function addToCalendar(ta, x) {
     var addCal = $("<img id='add-cal'/>");
     var button = $("<button/>", {
@@ -149,7 +156,7 @@ var guestTask = function() {
     })
       .append(addCal)
       .append($("<div id='add-cal-text'>Add to my calendar</div>"));
-    svg.loadImg(addCal, "/assets/img/add-to-calendar.svg");
+    svg.loadImg(addCal, "/assets/img/plus-sm.svg");
 
     var google = $("#google");
     $(document).on("click", "#google", function() {
@@ -265,7 +272,8 @@ var guestTask = function() {
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
         if (state.reserved) {
-          taskView.append($("<p id='meeting-title'/>").text(ta.task_calendar_title))
+          taskView.append(calendarIcon(state.reserved.slot))
+                  .append($("<div id='meeting-title'/>").text(ta.task_calendar_title))
                   .append(addToCalendar(ta, state.reserved.slot))
                   .append(viewOfTimeAndPlace(state.reserved.slot))
                   .append($("<div class='task-section-header'/>").text("GUESTS"));
@@ -280,7 +288,7 @@ var guestTask = function() {
           $("#messages").removeClass("hide");
         } else if (state.calendar_options.length > 0) {
           var select = $("<div id='guest-select'/>")
-            .append($("<p id='meeting-title'/>")
+            .append($("<div id='options-title'/>")
             .text("Select the meeting options that work for you."))
             .appendTo(taskView);
           var answers = {};

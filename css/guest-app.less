@@ -152,12 +152,12 @@ ul {
   }
 }
 
-#meeting-title {
-  font-size: 24px;
-}
-
 
 /*** Options ***/
+
+#options-title {
+  font-size: 24px;
+}
 
 #options {
   margin-top: 30px;
@@ -257,20 +257,61 @@ ul {
 
 /*** Confirmed ***/
 
+#cal-icon {
+  float: left;
+  padding-top: 7px;
+}
+
+#month {
+  width: 50px;
+  height: 18px;
+  color: @gray_90;
+  background: @white;
+  font-size: 14px;
+  font-family: @bold;
+  text-align: center;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+#day {
+  width: 50px;
+  height: 34px;
+  padding-top: 2px;
+  font-size: 20px;
+  font-family: @light;
+  text-align: center;
+  border: 1px solid @white;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+#meeting-title {
+  margin-left: 70px;
+  font-size: 24px;
+}
+
 #add-to-calendar {
+  height: 24px;
+  margin-top: 1px;
+  margin-left: 20px;
+  padding-top: 1px;
+  font-size: 13px;
+  font-family: @light;
+  letter-spacing: 0.5px;
   &:focus { outline: none; }
 }
 
 #add-cal {
   float: left;
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
+  width: 12px;
+  height: 12px;
+  margin-top: 4px;
 }
 
 #add-cal-text {
   margin-top: 2px;
-  margin-left: 26px;
+  margin-left: 18px;
 }
 
 .calendar-type-row {
@@ -305,9 +346,16 @@ ul {
   height: 30px;
 }
 
+#time-and-place {
+  padding-top: 6px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid @gray_40;
+}
+
 #meeting-time,
 #meeting-location {
   margin-top: 20px;
+  margin-left: 70px;
 }
 
 #clock {
@@ -364,7 +412,7 @@ ul {
 
 #messages-header {
   z-index: 1030;
-  border-bottom: 1px solid @border;
+  // border-bottom: 1px solid @border;
 }
 
 .tab-name {
@@ -526,12 +574,12 @@ ul {
 
 .copyright {
   margin-top: 10px;
-  font-size: 12px;
+  font-size: 10px;
   color: @gray_40;
 }
 
 .made {
-  font-size: 12px;
+  font-size: 10px;
   color: @gray_40;
 }
 
