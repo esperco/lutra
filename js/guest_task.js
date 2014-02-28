@@ -13,7 +13,10 @@ var guestTask = function() {
 
   function stripTimestamp(d) {
     // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
-    return d.replace(/-|:|\.000/g, "");
+    // Remove the fraction of second.
+    // Remove the ending 'Z'. According to Util_localtime.create,
+    // "the timezone suffix 'Z' is for compliance only".
+    return d.replace(/-|:|\.000|Z$/g, "");
   }
 
   function googleCalendarURL(text1, text2, slot) {
