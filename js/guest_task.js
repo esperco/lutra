@@ -23,7 +23,30 @@ var guestTask = function() {
     return submitButton;
   }
 
-  function viewOfCalendarOption(choice, answers) {
+  function meetingType(state) {
+    if (state.meeting_request && state.meeting_request.meeting_type) {
+      var typ = variant.cons(state.meeting_request.meeting_type);
+      switch (typ) {
+        case "Call":      return "Phone Call";
+        case "Nightlife": return "Night Life";
+        default:          return typ;
+      }
+    } else {
+      return "Meeting";
+    }
+  }
+
+  function indexLabel(i) {
+    var a = "A".charCodeAt(0);
+    var label = "";
+    do {
+      label = String.fromCharCode(i % 26 + a) + label;
+      i = Math.floor(i / 26);
+    } while (i > 0);
+    return label;
+  }
+
+  function viewOfCalendarOption(answers, choice, label, typ) {
     var slotView = $("<div class='option'/>");
 
     var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
@@ -32,22 +55,22 @@ var guestTask = function() {
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
 
     var optionLetter = $("<div class='option-letter'/>")
-      .append("A")
+      .text(label)
       .appendTo(slotView);
 
     var what = $("<div class='info-row ellipsis'/>")
       .appendTo(slotView);
     var whatLabel = $("<div id='what' class='info-label'/>")
-      .append("WHAT")
+      .text("WHAT")
       .appendTo(what);
     var meetingType = $("<div class='info ellipsis'/>")
-      .append("Phone Call")
+      .text(typ)
       .appendTo(what);
 
     var when = $("<div class='info-row ellipsis'/>")
       .appendTo(slotView);
     var whenLabel = $("<div id='when' class='info-label'/>")
-      .append("WHEN")
+      .text("WHEN")
       .appendTo(when);
     var time = viewOfTimeOnly(choice.slot)
       .addClass("info ellipsis")
@@ -56,7 +79,7 @@ var guestTask = function() {
     var where = $("<div class='info-row ellipsis'/>")
       .appendTo(slotView);
     var whereLabel = $("<div id='where' class='info-label'/>")
-      .append("WHERE")
+      .text("WHERE")
       .appendTo(where);
     var loc = viewOfLocationOnly(choice.slot)
       .addClass("info ellipsis")
@@ -320,8 +343,10 @@ var guestTask = function() {
           var answers = {};
           var options = $("<div id='options'/>")
             .appendTo(select);
-          list.iter(state.calendar_options, function(choice) {
-            options.append(viewOfCalendarOption(choice, answers));
+          var typ = meetingType(state);
+          list.iter(state.calendar_options, function(choice, i) {
+            var label = indexLabel(i);
+            options.append(viewOfCalendarOption(answers, choice, label, typ));
           });
           // select.append($("<div id='comment-header' class='task-section-header'/>")
           //       .text("COMMENT"))
