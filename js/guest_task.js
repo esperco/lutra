@@ -1,14 +1,77 @@
 var guestTask = function() {
   var mod = {};
 
-  function wordify(time) {
-    if (time === "12:00 am") {
-      return "Midnight";
-    } else if (time === "12:00 pm") {
-      return "Noon";
-    } else {
-      return time;
-    }
+  function submitButton(answers) {
+    var submitButton = $("<button/>", {
+      "id":"submit-selections",
+      "class":"btn btn-primary",
+      "text":"Submit"
+    });
+    submitButton.click(function() {
+      var sel = [];
+      for (var label in answers) {
+        sel.push(answers[label]);
+      }
+      var item = {
+        chatid: login.myChatid(),
+        by:     login.me(),
+        "for":  login.me(),
+        chat_item_data: ["Scheduling_r", {selected:sel}]
+      };
+      chat.postChatItem(item);
+    });
+    return submitButton;
+  }
+
+  function viewOfCalendarOption(choice, answers) {
+    var slotView = $("<div class='option'/>");
+
+    var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
+    var checkbox = $("<img class='option-checkbox'/>");
+    slotView.append(checkboxContainer.append(checkbox));
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+
+    var optionLetter = $("<div class='option-letter'/>")
+      .append("A")
+      .appendTo(slotView);
+
+    var what = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whatLabel = $("<div id='what' class='info-label'/>")
+      .append("WHAT")
+      .appendTo(what);
+    var meetingType = $("<div class='info ellipsis'/>")
+      .append("Phone Call")
+      .appendTo(what);
+
+    var when = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whenLabel = $("<div id='when' class='info-label'/>")
+      .append("WHEN")
+      .appendTo(when);
+    var time = viewOfTimeOnly(choice.slot)
+      .addClass("info ellipsis")
+      .appendTo(when);
+
+    var where = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whereLabel = $("<div id='where' class='info-label'/>")
+      .append("WHERE")
+      .appendTo(where);
+    var loc = viewOfLocationOnly(choice.slot)
+      .addClass("info ellipsis")
+      .appendTo(where);
+
+    checkboxContainer.click(function() {
+      if (slotView.hasClass("checkbox-selected")) {
+        slotView.removeClass("checkbox-selected");
+        delete answers[choice.label];
+      } else {
+        slotView.addClass("checkbox-selected");
+        answers[choice.label] = choice;
+      }
+    });
+    return slotView;
   }
 
   function getDirections(x) {
@@ -59,6 +122,16 @@ var guestTask = function() {
     return view;
   }
 
+  function wordify(time) {
+    if (time === "12:00 am") {
+      return "Midnight";
+    } else if (time === "12:00 pm") {
+      return "Noon";
+    } else {
+      return time;
+    }
+  }
+
   function viewOfTimeAndPlace(x) {
     var view = $("<div id='time-and-place'/>");
 
@@ -106,20 +179,6 @@ var guestTask = function() {
     loc.click(function() {
       window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
     });
-
-    return view;
-  }
-
-  function calendarIcon(x) {
-    var view = $("<div id='cal-icon'/>");
-    var month = $("<div id='month'/>")
-      .appendTo(view);
-    var day = $("<div id='day'/>")
-      .appendTo(view);
-
-    var t1 = date.ofString(x.start);
-    month.append(date.month(t1).substr(0,3).toUpperCase());
-    day.append(date.day(t1));
 
     return view;
   }
@@ -186,77 +245,24 @@ var guestTask = function() {
     return button;
   }
 
-  function viewOfCalendarOption(choice, answers) {
-    var slotView = $("<div class='option'/>");
-
-    var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
-    var checkbox = $("<img class='option-checkbox'/>");
-    slotView.append(checkboxContainer.append(checkbox));
-    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-
-    var optionLetter = $("<div class='option-letter'/>")
-      .append("A")
-      .appendTo(slotView);
-
-    var what = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whatLabel = $("<div id='what' class='info-label'/>")
-      .append("WHAT")
-      .appendTo(what);
-    var meetingType = $("<div class='info ellipsis'/>")
-      .append("Phone Call")
-      .appendTo(what);
-
-    var when = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whenLabel = $("<div id='when' class='info-label'/>")
-      .append("WHEN")
-      .appendTo(when);
-    var time = viewOfTimeOnly(choice.slot)
-      .addClass("info ellipsis")
-      .appendTo(when);
-
-    var where = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whereLabel = $("<div id='where' class='info-label'/>")
-      .append("WHERE")
-      .appendTo(where);
-    var loc = viewOfLocationOnly(choice.slot)
-      .addClass("info ellipsis")
-      .appendTo(where);
-
-    checkboxContainer.click(function() {
-      if (slotView.hasClass("checkbox-selected")) {
-        slotView.removeClass("checkbox-selected");
-        delete answers[choice.label];
-      } else {
-        slotView.addClass("checkbox-selected");
-        answers[choice.label] = choice;
-      }
-    });
-    return slotView;
+  function viewOfMeetingHeader(ta, state) {
+    return view = $("<div id='meeting-header'/>")
+      .append($("<div id='meeting-title'/>").text(state.calendar_event_title))
+      .append(addToCalendar(ta, state.reserved.slot));
   }
 
-  function submitButton(answers) {
-    var submitButton = $("<button/>", {
-      "id":"submit-selections",
-      "class":"btn btn-primary",
-      "text":"Submit"
-    });
-    submitButton.click(function() {
-      var sel = [];
-      for (var label in answers) {
-        sel.push(answers[label]);
-      }
-      var item = {
-        chatid: login.myChatid(),
-        by:     login.me(),
-        "for":  login.me(),
-        chat_item_data: ["Scheduling_r", {selected:sel}]
-      };
-      chat.postChatItem(item);
-    });
-    return submitButton;
+  function calendarIcon(x) {
+    var view = $("<div id='cal-icon'/>");
+    var month = $("<div id='month'/>")
+      .appendTo(view);
+    var day = $("<div id='day'/>")
+      .appendTo(view);
+
+    var t1 = date.ofString(x.start);
+    month.append(date.month(t1).substr(0,3).toUpperCase());
+    day.append(date.day(t1));
+
+    return view;
   }
 
   mod.loadTask = function(ta) {
@@ -272,20 +278,40 @@ var guestTask = function() {
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
         if (state.reserved) {
+          var guestsIcon = $("<img id='guests-icon'/>");
+          var notesIcon = $("<img id='notes-icon'/>");
+          var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
-                  .append($("<div id='meeting-title'/>").text(ta.task_calendar_title))
-                  .append(addToCalendar(ta, state.reserved.slot))
+                  .append(viewOfMeetingHeader(ta, state))
                   .append(viewOfTimeAndPlace(state.reserved.slot))
-                  .append($("<div class='task-section-header'/>").text("GUESTS"));
+                  .append($("<div class='task-section-header'/>")
+                    .append(guestsIcon)
+                    .append("<div class='task-section-text'>GUESTS</div>"));
           var participantListView = $("<ul/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
             var name = profile.fullName(profs[uid].prof);
-            participantListView.append($("<li class='guest-name-row'/>").text(name));
+            if (name != myName) {
+              participantListView.append($("<li class='guest-name-row'/>").text(name));
+            } else {
+              participantListView.append($("<li class='guest-name-row'/>").text("Me"));
+            }
           });
-          taskView.append(participantListView);
-          // taskView.append($("<div class='task-section-header'/>").text("NOTES"));
-          taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
+          taskView.append(participantListView)
+          var notes = $("<div id='notes'/>")
+            .text(state.calendar_event_notes);
+          if (notes.text() != "") {
+            taskView.append($("<div class='task-section-header'/>")
+                      .append(notesIcon)
+                      .append("<div class='task-section-text'>NOTES</div>"))
+                    .append(notes);
+          }
+          taskView.append($("<div class='task-section-header'/>")
+            .append(messagesIcon)
+            .append("<div class='task-section-text'>MESSAGES</div>"));
           $("#messages").removeClass("hide");
+          svg.loadImg(guestsIcon, "/assets/img/group.svg");
+          svg.loadImg(notesIcon, "/assets/img/edit.svg");
+          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
         } else if (state.calendar_options.length > 0) {
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")

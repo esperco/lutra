@@ -457,11 +457,13 @@ var chat = (function () {
       .appendTo(messages);
     var blankChatIcon = $("<img class='blank-chat-icon'/>")
       .appendTo(blank);
-    svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
+    svg.loadImg(blankChatIcon, "/assets/img/blank-chat.svg");
     blank.append("<div>No messages found.</div>");
+
 
     if (chat.chat_items.length === 0) {
       blank.removeClass("hide");
+      messages.append($("<hr/>"));
     } else {
       for (var i in chat.chat_items) {
         var item = chat.chat_items[i];

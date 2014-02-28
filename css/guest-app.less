@@ -57,6 +57,10 @@ ul {
   list-style-type: none;
 }
 
+hr {
+  border-top: 1px solid @gray_80;
+}
+
 .container.mobile {
   padding-left: 15px;
   padding-right: 15px;
@@ -286,16 +290,18 @@ ul {
   border-bottom-left-radius: 3px;
 }
 
-#meeting-title {
+#meeting-header {
   margin-left: 70px;
+}
+
+#meeting-title {
   font-size: 24px;
 }
 
 #add-to-calendar {
   height: 24px;
   margin-top: 1px;
-  margin-left: 20px;
-  padding-top: 1px;
+  padding: 0 7px 0 6px;
   font-size: 13px;
   font-family: @light;
   letter-spacing: 0.5px;
@@ -306,12 +312,11 @@ ul {
   float: left;
   width: 12px;
   height: 12px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 #add-cal-text {
-  margin-top: 2px;
-  margin-left: 18px;
+  margin-left: 16px;
 }
 
 .calendar-type-row {
@@ -348,8 +353,6 @@ ul {
 
 #time-and-place {
   padding-top: 6px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid @gray_40;
 }
 
 #meeting-time,
@@ -382,17 +385,48 @@ ul {
 }
 
 .task-section-header {
-  margin-top: 40px;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid @gray_80;
+}
+
+.task-section-text {
+  margin-left: 40px;
   color: @gray_40;
   font-family: @light;
   font-size: 20px;
   letter-spacing: 3px;
 }
 
+#guests-icon {
+  float: left;
+  width: 30px;
+  height: 18px;
+  margin-top: 3px;
+  path { fill: @gray_60; }
+}
+
 .guest-name-row {
   margin-top: 15px;
+  margin-left: 40px;
   margin-bottom: 15px;
   font-family: @bold;
+}
+
+#notes-icon {
+  float: left;
+  path { fill: @gray_60; }
+}
+
+#notes {
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+#messages-icon {
+  float: left;
+  margin-left: 1px;
+  path { fill: @gray_60; }
 }
 
 
@@ -402,17 +436,17 @@ ul {
   max-width: 742px;
   margin-left: auto;
   margin-right: auto;
+  @media (max-width: 767px) {
+    margin-right: 15px;
+    margin-left: 15px;
+  }
 }
 
 #messages-container {
   margin-top: 7px;
+  margin-left: 40px;
   text-align: left;
   white-space: normal;
-}
-
-#messages-header {
-  z-index: 1030;
-  // border-bottom: 1px solid @border;
 }
 
 .tab-name {
@@ -429,9 +463,9 @@ ul {
 .chat-tabs > li {
   float: left;
   margin-top: 5px;
-  margin-right: 5px;
+  margin-right: 10px;
   margin-bottom: 10px;
-  margin-left: 5px;
+  margin-left: 0px;
   text-align: center;
 }
 
@@ -455,13 +489,21 @@ ul {
 }
 
 .messages {
-  padding: 15px;
+  padding-top: 15px;
 }
 
 .blank-chat {
-  padding-top: 80px;
+  width: 240px;
+  height: 100px;
+  margin-top: 30px;
+  margin-right: auto;
+  margin-bottom: 45px;
+  margin-left: auto;
+  padding-top: 22px;
   text-align: center;
-  color: @gray_40;
+  color: @gray_20;
+  // background: @gray_80;
+  border-radius: 6px;
 }
 
 .blank-chat-icon {
@@ -469,7 +511,6 @@ ul {
   margin-right: auto;
   margin-bottom: 10px;
   margin-left: auto;
-  path { fill: @gray_20; }
 }
 
 .message-header {
@@ -563,7 +604,7 @@ ul {
   padding-top: 120px;
   padding-bottom: 30px;
   color: @gray_40;
-  font-size: 14px;
+  font-size: 12px;
   text-align: center;
 }
 
@@ -574,12 +615,10 @@ ul {
 
 .copyright {
   margin-top: 10px;
-  font-size: 10px;
   color: @gray_40;
 }
 
 .made {
-  font-size: 10px;
   color: @gray_40;
 }
 
