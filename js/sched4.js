@@ -480,15 +480,28 @@ var sched4 = (function() {
     }
   }
 
-  function createEventEditSection(task) {
-    log(task);
-    var view = $("<div class='final-sched-div'/>");
+  function updateCalendarEvent(task, titleEdit, notesEdit, saveButton) {
+    var taskState = sched.getState(task);
+    taskState.calendar_event_title = titleEdit.val();
+    taskState.calendar_event_notes = notesEdit.val();
+    api.postTask(task).done(function() {
+      api.updateCalendar(task.tid, {
+        event_id: sched.getState(task).reserved.google_event,
+        event_title: titleEdit.val(),
+        event_notes: notesEdit.val()
+      })
+        .done(function() { saveButton.addClass("disabled"); });
+    });
+  }
 
+  function createEventEditSection(task) {
+    var view = $("<div class='final-sched-div'/>");
     var titleEdit =
       $("<input type='text' id='edit-calendar-title' class='form-control'/>");
     var notesEdit = $("<textarea rows=5 class='form-control'/>");
     var saveButton =
       $("<button id='event-edit-save' class='btn btn-primary'/>");
+    var state = sched.getState(task);
 
     $("<h3 class='final-sched-text'/>")
       .text("Edit calendar event details.")
@@ -498,7 +511,7 @@ var sched4 = (function() {
       .text("Title")
       .appendTo(view);
     titleEdit
-      .val(task.task_calendar_title)
+      .val(state.calendar_event_title)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, saveButton)
       })
@@ -508,7 +521,7 @@ var sched4 = (function() {
       .text("Notes")
       .appendTo(view);
     notesEdit
-      .val(task.task_custom_notes)
+      .val(state.calendar_event_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, saveButton)
       })
@@ -518,12 +531,7 @@ var sched4 = (function() {
       .addClass("disabled")
       .text("Save to Calendar")
       .click(function() {
-        api.updateCalendar(task.tid, {
-          event_id: sched.getState(task).reserved.google_event,
-          event_title: titleEdit.val(),
-          event_notes: notesEdit.val()
-        })
-          .done(function() { saveButton.addClass("disabled"); });
+        updateCalendarEvent(task, titleEdit, notesEdit, saveButton)
       })
       .appendTo(view);
 
