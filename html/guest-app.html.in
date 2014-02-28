@@ -24,9 +24,18 @@
     <div id="meeting-content" class="scrollable"></div>
 
     <div id="calendar-types" class="hide">
-      <div id="google" class="calendar-type-row"></div>
-      <div id="outlook" class="calendar-type-row"></div>
-      <div id="apple" class="calendar-type-row"></div>
+      <div id="google" class="calendar-type-row">
+        <img id="google-icon" class="svg" src="/assets/img/google.svg">
+        <div class='calendar-type'>Google Calendar</div>
+      </div>
+      <div id="outlook" class="calendar-type-row">
+        <img id="outlook-icon" class="svg" src="/assets/img/outlook.svg">
+        <div class='calendar-type'>Outlook Calendar</div>
+      </div>
+      <div id="apple" class="calendar-type-row">
+        <img id="apple-icon" src="/assets/img/apple.png">
+        <div class='calendar-type'>Apple Calendar</div>
+      </div>
     </div>
 
     <div id="messages">

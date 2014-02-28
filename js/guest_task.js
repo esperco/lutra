@@ -37,10 +37,52 @@ var guestTask = function() {
            .append($("<img/>", {src:buttonImg, border:0}));
   }
 
-
   function getDirections(x) {
     return "http://maps.google.com/?daddr="
       + x.location.coord.lat + "," + x.location.coord.lon;
+  }
+
+  function viewOfLocationOnly(x) {
+    var view = $("<span id='address'/>");
+
+    var locText = chat.locationText(x.location);
+    if (locText) {
+      view.append(html.text(locText));
+    } else {
+      view.append("TBD")
+          .addClass("tbd")
+    }
+
+    view.click(function() {
+      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+    });
+
+    return view;
+  }
+
+  function viewOfTimeOnly(x) {
+    var view = $("<div/>");
+    var time1 = $("<div/>")
+      .appendTo(view);
+    var time2 = $("<div class='start-end'/>")
+      .appendTo(view);
+
+    var t1 = date.ofString(x.start);
+    var t2 = date.ofString(x.end);
+
+    var fromTime = wordify(date.timeOnly(t1));
+    var toTime = wordify(date.timeOnly(t2));
+
+    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
+      fromTime = fromTime.substr(0, fromTime.length-3);
+
+    time1
+      .append(date.weekDay(t1) + ", ")
+      .append(date.dateOnly(t1))
+    time2
+      .append(fromTime + " to " + toTime);
+
+    return view;
   }
 
   function viewOfTimeAndPlace(x) {
@@ -53,7 +95,7 @@ var guestTask = function() {
     svg.loadImg(clock, "/assets/img/clock.svg");
     var time1 = $("<div id='time1'/>")
       .appendTo(meetingTime);
-    var time2 = $("<div id='time2'/>")
+    var time2 = $("<div id='time2' class='start-end'/>")
       .appendTo(meetingTime);
 
     var t1 = date.ofString(x.start);
@@ -106,27 +148,13 @@ var guestTask = function() {
       .append($("<div id='add-cal-text'>Add to my calendar</div>"));
     svg.loadImg(addCal, "/assets/img/add-to-calendar.svg");
 
-    var googleIcon = $("<img id='google-icon'/>");
-    var google = $("#google")
-      .append(googleIcon)
-      .append("<div class='calendar-type'>Google Calendar</div>");
-    svg.loadImg(googleIcon, "/assets/img/google.svg");
+    var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
       window.open(googleCalendarURL(ta.task_calendar_title,
                                     window.location,
                                     x));
     })
-
-    var outlookIcon = $("<img id='outlook-icon'/>");
-    var outlook = $("#outlook")
-      .append(outlookIcon)
-      .append("<div class='calendar-type'>Outlook Calendar</div>");
-    svg.loadImg(outlookIcon, "/assets/img/outlook.svg");
-
-    var apple = $("#apple")
-      .append($("<img id='apple-icon' src='/assets/img/apple.png'/>"))
-      .append("<div class='calendar-type'>Apple Calendar</div>");
 
     button.popover({
       html:true,
@@ -149,12 +177,45 @@ var guestTask = function() {
   }
 
   function viewOfCalendarOption(choice, answers) {
-    var slotView = $("<div class='suggestion'/>");
-    var checkbox = $("<img class='suggestion-checkbox'/>");
-    slotView.append(checkbox);
+    var slotView = $("<div class='option'/>");
+
+    var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
+    var checkbox = $("<img class='option-checkbox'/>");
+    slotView.append(checkboxContainer.append(checkbox));
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-    slotView.append(viewOfTimeAndPlace(choice.slot));
-    slotView.click(function() {
+
+    var optionLetter = $("<div class='option-letter'/>")
+      .append("A")
+      .appendTo(slotView);
+
+    var what = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whatLabel = $("<div id='what' class='info-label'/>")
+      .append("WHAT")
+      .appendTo(what);
+    var meetingType = $("<div class='info ellipsis'/>")
+      .append("Phone Call")
+      .appendTo(what);
+
+    var when = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whenLabel = $("<div id='when' class='info-label'/>")
+      .append("WHEN")
+      .appendTo(when);
+    var time = viewOfTimeOnly(choice.slot)
+      .addClass("info ellipsis")
+      .appendTo(when);
+
+    var where = $("<div class='info-row ellipsis'/>")
+      .appendTo(slotView);
+    var whereLabel = $("<div id='where' class='info-label'/>")
+      .append("WHERE")
+      .appendTo(where);
+    var loc = viewOfLocationOnly(choice.slot)
+      .addClass("info ellipsis")
+      .appendTo(where);
+
+    checkboxContainer.click(function() {
       if (slotView.hasClass("checkbox-selected")) {
         slotView.removeClass("checkbox-selected");
         delete answers[choice.label];
@@ -167,7 +228,11 @@ var guestTask = function() {
   }
 
   function submitButton(answers) {
-    var submitButton = $("<button class='btn btn-primary'>Submit</button>");
+    var submitButton = $("<button/>", {
+      "id":"submit-selections",
+      "class":"btn btn-primary",
+      "text":"Submit"
+    });
     submitButton.click(function() {
       var sel = [];
       for (var label in answers) {
@@ -183,57 +248,6 @@ var guestTask = function() {
     });
     return submitButton;
   }
-
-/*** SAVE FOR MEETING OPTIONS ***/
-
-  // function viewOfCalendarSlot(x) {
-  //   var view = $("<div class='sug-details'/>");
-
-  //   var t1 = date.ofString(x.start);
-  //   var t2 = date.ofString(x.end);
-
-  //   var row1 = $("<div class='day-text'/>")
-  //     .text(date.weekDay(t1) + " ")
-  //     .appendTo(view);
-
-  //   var row2 = $("<div class='date-text'/>")
-  //     .text(date.dateOnly(t1))
-  //     .appendTo(view);
-
-  //   var fromTime = wordify(date.timeOnly(t1));
-  //   var toTime = wordify(date.timeOnly(t2));
-
-  //   if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
-  //     fromTime = fromTime.substr(0, fromTime.length-3);
-
-  //   var row3 = $("<div class='time-text'/>")
-  //     .append(html.text("from "))
-  //     .append($("<b>").text(fromTime))
-  //     .append(html.text(" to "))
-  //     .append($("<b>").text(toTime))
-  //     .appendTo(view);
-
-  //   var row4 = $("<div class='time-text-short hide'/>")
-  //     .append(html.text("at "))
-  //     .append($("<b>").text(date.timeOnly(t1)))
-  //     .appendTo(view);
-
-  //   var locText = chat.locationText(x.location);
-  //   var locDiv = $("<div class='loc-text'/>");
-  //   var pin = $("<img class='pin'/>");
-  //     pin.appendTo(locDiv);
-  //   svg.loadImg(pin, "/assets/img/pin.svg");
-  //   if (locText) {
-  //     locDiv.append(html.text(locText))
-  //           .appendTo(view);
-  //   } else {
-  //     locDiv.append("Location TBD")
-  //           .addClass("tbd")
-  //           .appendTo(view);
-  //   }
-
-  //   return view;
-  // }
 
   mod.loadTask = function(ta) {
     profile.profilesOfTaskParticipants(ta).done(function(profs) {
@@ -262,12 +276,24 @@ var guestTask = function() {
           taskView.append($("<div class='task-section-header'/>").text("MESSAGES"));
           $("#messages").removeClass("hide");
         } else if (state.calendar_options.length > 0) {
-          taskView.append($("<p id='meeting-title'/>").text("Select the options that work for you."))
+          var select = $("<div id='guest-select'/>")
+            .append($("<p id='meeting-title'/>")
+            .text("Select the meeting options that work for you."))
+            .appendTo(taskView);
           var answers = {};
+          var options = $("<div id='options'/>")
+            .appendTo(select);
           list.iter(state.calendar_options, function(choice) {
-            taskView.append(viewOfCalendarOption(choice, answers));
+            options.append(viewOfCalendarOption(choice, answers));
           });
-          taskView.append(submitButton(answers));
+          // select.append($("<div id='comment-header' class='task-section-header'/>")
+          //       .text("COMMENT"))
+          //       .append($("<textarea id='comment' class='form-control'/>"))
+          select.append(submitButton(answers));
+
+          var feedback = $("<div id='guest-select' class='hide'/>")
+            .appendTo(taskView);
+
           $("#messages").addClass("hide");
         }
       }
