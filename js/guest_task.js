@@ -1,10 +1,39 @@
 var guestTask = function() {
   var mod = {};
 
+  function viewOfFeedback() {
+    var view = $("<div/>");
+
+    var checkCircle = $("<div id='check-circle' class='animated'/>");
+    var check = $("<img id='submitted-check'/>");
+    checkCircle.append(check);
+    svg.loadImg(check, "/assets/img/check.svg");
+
+    var message = $("<div id='feedback-message'/>")
+      .append(checkCircle)
+      .append("Your selections have been submitted.")
+      .appendTo(view);
+
+    var back = $("<img id='submitted-back'/>");
+    var change = $("<div id='edit-selections'/>")
+      .append(back)
+      .append($("<span id='edit-selections-text'>Edit selections</span>"))
+      .appendTo(view);
+    svg.loadImg(back, "/assets/img/back.svg");
+
+    change.click(function() {
+      $("#check-circle").removeClass("pulse");
+      $("#feedback").addClass("hide");
+      $("#guest-select").removeClass("hide");
+    })
+
+    return view;
+  }
+
   function submitButton(answers) {
     var submitButton = $("<button/>", {
       "id":"submit-selections",
-      "class":"btn btn-primary",
+      "class":"btn btn-primary btn-primary-disabled",
       "text":"Submit"
     });
     submitButton.click(function() {
@@ -19,8 +48,125 @@ var guestTask = function() {
         chat_item_data: ["Scheduling_r", {selected:sel}]
       };
       chat.postChatItem(item);
+      $("#guest-select").addClass("hide");
+      $("#feedback").removeClass("hide");
+      $("#check-circle").addClass("pulse");
     });
     return submitButton;
+  }
+
+  function viewOfNoneWorks(options, answers) {
+    var slotView = $("<tr id='option-none'/>");
+    var select = $("<td class='option-select'/>")
+      .appendTo(slotView);
+    var info = $("<td id='option-none-text'/>")
+      .append("None of the above")
+      .appendTo(slotView);
+
+    var checkboxContainer = $("<div class='checkbox-container'/>");
+    var checkbox = $("<img/>");
+    select.append(checkboxContainer.append(checkbox));
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+
+    var frownBox = $("<div id='frown'/>");
+    var frown = $("<img/>");
+    frownBox.append(frown)
+            .appendTo(select);
+    svg.loadImg(frown, "/assets/img/frown.svg");
+
+    checkboxContainer.click(function() {
+      if (slotView.hasClass("checkbox-selected")) {
+        slotView.removeClass("checkbox-selected");
+        $("#submit-selections").addClass("btn-primary-disabled");
+      } else {
+        slotView.addClass("checkbox-selected");
+        $("#submit-selections").removeClass("btn-primary-disabled");
+        list.iter(options, function(choice, i) {
+          var label = indexLabel(i);
+          delete answers[choice.label];
+        });
+        $(".option").each(function() {
+          $(this).removeClass("checkbox-selected");
+        })
+      }
+    });
+
+    return slotView;
+  }
+
+  function viewOfCalendarOption(answers, choice, label, typ) {
+    var slotView = $("<tr class='option'/>");
+    var select = $("<td class='option-select'/>")
+      .appendTo(slotView);
+    var info = $("<td class='option-info'/>")
+      .appendTo(slotView);
+
+    var checkboxContainer = $("<div class='checkbox-container'/>");
+    var checkbox = $("<img/>");
+    select.append(checkboxContainer.append(checkbox));
+    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+
+    var optionLetter = $("<div class='option-letter'/>")
+      .text(label)
+      .appendTo(select);
+
+    var what = $("<div class='info-row'/>")
+      .appendTo(info);
+    var whatLabel = $("<div class='info-label'/>")
+      .text("WHAT")
+      .appendTo(what);
+    var meetingType = $("<div class='info'/>")
+      .text(typ)
+      .appendTo(what);
+
+    var when = $("<div class='info-row'/>")
+      .appendTo(info);
+    var whenLabel = $("<div class='info-label'/>")
+      .text("WHEN")
+      .appendTo(when);
+    var time = viewOfTimeOnly(choice.slot)
+      .addClass("info")
+      .appendTo(when);
+
+    var where = $("<div class='info-row'/>")
+      .appendTo(info);
+    var whereLabel = $("<div class='info-label'/>")
+      .text("WHERE")
+      .appendTo(where);
+    var loc = viewOfLocationOnly(choice.slot)
+      .addClass("info")
+      .appendTo(where);
+
+    var notes = $("<div class='info-row hide'/>")
+      .appendTo(info);
+    var notesLabel = $("<div class='info-label'/>")
+      .text("NOTES")
+      .appendTo(notes);
+    var notesText = $("<div class='info'/>")
+      // .text("Test")
+      .appendTo(notes);
+    if (notesText.text() != "") {
+      notes.removeClass("hide");
+    }
+
+    checkboxContainer.click(function() {
+      if (slotView.hasClass("checkbox-selected")) {
+        slotView.removeClass("checkbox-selected");
+        delete answers[choice.label];
+        if (jQuery.isEmptyObject(answers)) {
+          $("#submit-selections").addClass("btn-primary-disabled");
+        }
+      } else {
+        slotView.addClass("checkbox-selected");
+        $("#submit-selections").removeClass("btn-primary-disabled");
+        answers[choice.label] = choice;
+        if ($("#option-none").hasClass("checkbox-selected")) {
+          $("#option-none").removeClass("checkbox-selected");
+        }
+      }
+    });
+
+    return slotView;
   }
 
   function meetingType(state) {
@@ -46,64 +192,13 @@ var guestTask = function() {
     return label;
   }
 
-  function viewOfCalendarOption(answers, choice, label, typ) {
-    var slotView = $("<div class='option'/>");
-
-    var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
-    var checkbox = $("<img class='option-checkbox'/>");
-    slotView.append(checkboxContainer.append(checkbox));
-    svg.loadImg(checkbox, "/assets/img/checkbox.svg");
-
-    var optionLetter = $("<div class='option-letter'/>")
-      .text(label)
-      .appendTo(slotView);
-
-    var what = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whatLabel = $("<div id='what' class='info-label'/>")
-      .text("WHAT")
-      .appendTo(what);
-    var meetingType = $("<div class='info ellipsis'/>")
-      .text(typ)
-      .appendTo(what);
-
-    var when = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whenLabel = $("<div id='when' class='info-label'/>")
-      .text("WHEN")
-      .appendTo(when);
-    var time = viewOfTimeOnly(choice.slot)
-      .addClass("info ellipsis")
-      .appendTo(when);
-
-    var where = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
-    var whereLabel = $("<div id='where' class='info-label'/>")
-      .text("WHERE")
-      .appendTo(where);
-    var loc = viewOfLocationOnly(choice.slot)
-      .addClass("info ellipsis")
-      .appendTo(where);
-
-    checkboxContainer.click(function() {
-      if (slotView.hasClass("checkbox-selected")) {
-        slotView.removeClass("checkbox-selected");
-        delete answers[choice.label];
-      } else {
-        slotView.addClass("checkbox-selected");
-        answers[choice.label] = choice;
-      }
-    });
-    return slotView;
-  }
-
   function getDirections(x) {
     return "http://maps.google.com/?daddr="
       + x.location.coord.lat + "," + x.location.coord.lon;
   }
 
   function viewOfLocationOnly(x) {
-    var view = $("<span id='address'/>");
+    var view = $("<div id='address'/>");
 
     var locText = chat.locationText(x.location);
     if (locText) {
@@ -252,9 +347,9 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(ta.task_calendar_title,
+      window.open(googleCalendarURL(x.calendar_event_title,
                                     window.location,
-                                    x));
+                                    x.reserved.slot));
     })
 
     button.popover({
@@ -280,7 +375,7 @@ var guestTask = function() {
   function viewOfMeetingHeader(ta, state) {
     return view = $("<div id='meeting-header'/>")
       .append($("<div id='meeting-title'/>").text(state.calendar_event_title))
-      .append(addToCalendar(ta, state.reserved.slot));
+      .append(addToCalendar(ta, state));
   }
 
   function calendarIcon(x) {
@@ -302,10 +397,10 @@ var guestTask = function() {
       var taskView = $("#meeting-content");
       taskView.children().remove();
       var taskWelcome = $("#meeting-welcome");
-      taskWelcome.children().remove();
+      taskWelcome.text("");
 
       var myName = profile.fullName(profs[login.me()].prof);
-      taskWelcome.append($("<p/>").text("Hello, " + myName));
+      taskWelcome.text("Hello, " + myName);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
@@ -347,22 +442,24 @@ var guestTask = function() {
         } else if (state.calendar_options.length > 0) {
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")
-            .text("Select the meeting options that work for you."))
+              .text("Select the meeting options that work for you."))
             .appendTo(taskView);
           var answers = {};
-          var options = $("<div id='options'/>")
+          var options = $("<table id='options'/>")
             .appendTo(select);
           var typ = meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             var label = indexLabel(i);
             options.append(viewOfCalendarOption(answers, choice, label, typ));
           });
-          // select.append($("<div id='comment-header' class='task-section-header'/>")
-          //       .text("COMMENT"))
-          //       .append($("<textarea id='comment' class='form-control'/>"))
+          options.append(viewOfNoneWorks(state.calendar_options, answers));
+          select.append($("<div id='comment-header'/>")
+                .text("COMMENT"))
+                .append($("<textarea id='comment' class='form-control'/>"))
           select.append(submitButton(answers));
 
-          var feedback = $("<div id='guest-select' class='hide'/>")
+          var feedback = $("<div id='feedback' class='hide'/>")
+            .append(viewOfFeedback)
             .appendTo(taskView);
 
           $("#messages").addClass("hide");
