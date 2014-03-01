@@ -163,16 +163,33 @@ hr {
   font-size: 24px;
 }
 
+#options-help {
+  margin-top: 5px;
+  color: @gray_40;
+}
+
 #options {
+  width: 100%;
   margin-top: 30px;
   border-top: 1px solid @gray_40;
 }
 
 .option {
-  padding-top: 20px;
-  padding-bottom: 14px;
   border-bottom: 1px solid @gray_40;
   cursor: default;
+}
+
+.option-select {
+  width: 80px;
+  padding: 20px 0 16px 0;
+  vertical-align: top;
+  @media (max-width: 767px) {
+    width: 76px;
+  }
+}
+
+.option-info {
+  padding: 20px 0 16px 0;
 }
 
 .checkbox-container {
@@ -186,6 +203,7 @@ hr {
 
 .checkbox-selected {
   path.check { fill: @gray_90; }
+  .option-letter { background: @green; }
 }
 
 .option-letter {
@@ -198,6 +216,9 @@ hr {
   text-align: center;
   background: @gray_80;
   border-radius: 3px;
+  @media (max-width: 767px) {
+    margin-left: 12px;
+  }
 }
 
 .info-row {
@@ -206,33 +227,23 @@ hr {
 
 .info-label {
   float: left;
-  display: inline-block;
-  width: 60px;
+  width: 50px;
   margin-top: 3px;
+  margin-left: 30px;
   color: @gray_40;
   font-size: 13px;
   font-family: @bold;
   text-align: right;
-}
-
-#what,
-#when {
-  margin-left: 20px;
   @media (max-width: 767px) {
-    margin-left: 0px;
-  }
-}
-
-#where {
-  margin-left: 100px;
-  @media (max-width: 767px) {
-    margin-left: 80px;
+    margin-left: 8px;
   }
 }
 
 .info {
-  display: inline-block;
-  margin-left: 10px;
+  margin-left: 100px;
+  @media (max-width: 767px) {
+    margin-left: 70px;
+  }
 }
 
 .start-end {
@@ -246,6 +257,10 @@ hr {
 
 #comment-header {
   margin-top: 20px;
+  color: @gray_40;
+  font-family: @light;
+  font-size: 20px;
+  letter-spacing: 3px;
 }
 
 #comment {
@@ -256,6 +271,7 @@ hr {
 
 #submit-selections {
   margin-top: 20px;
+  &:focus { outline: none; }
 }
 
 
@@ -610,16 +626,12 @@ hr {
 
 .hero-word {
   width: 100px;
+  margin-bottom: 20px;
   g path { fill: @gray_40; }
 }
 
 .copyright {
   margin-top: 10px;
-  color: @gray_40;
-}
-
-.made {
-  color: @gray_40;
 }
 
 .footer-push {

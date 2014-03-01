@@ -47,42 +47,46 @@ var guestTask = function() {
   }
 
   function viewOfCalendarOption(answers, choice, label, typ) {
-    var slotView = $("<div class='option'/>");
+    var slotView = $("<tr class='option'/>");
+    var select = $("<td class='option-select'/>")
+      .appendTo(slotView);
+    var info = $("<td class='option-info'/>")
+      .appendTo(slotView);
 
-    var checkboxContainer = $("<div class='checkbox-container clearfix'/>");
+    var checkboxContainer = $("<div class='checkbox-container'/>");
     var checkbox = $("<img class='option-checkbox'/>");
-    slotView.append(checkboxContainer.append(checkbox));
+    select.append(checkboxContainer.append(checkbox));
     svg.loadImg(checkbox, "/assets/img/checkbox.svg");
 
     var optionLetter = $("<div class='option-letter'/>")
       .text(label)
-      .appendTo(slotView);
+      .appendTo(select);
 
-    var what = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
+    var what = $("<div class='info-row'/>")
+      .appendTo(info);
     var whatLabel = $("<div id='what' class='info-label'/>")
       .text("WHAT")
       .appendTo(what);
-    var meetingType = $("<div class='info ellipsis'/>")
+    var meetingType = $("<div class='info'/>")
       .text(typ)
       .appendTo(what);
 
-    var when = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
+    var when = $("<div class='info-row'/>")
+      .appendTo(info);
     var whenLabel = $("<div id='when' class='info-label'/>")
       .text("WHEN")
       .appendTo(when);
     var time = viewOfTimeOnly(choice.slot)
-      .addClass("info ellipsis")
+      .addClass("info")
       .appendTo(when);
 
-    var where = $("<div class='info-row ellipsis'/>")
-      .appendTo(slotView);
+    var where = $("<div class='info-row'/>")
+      .appendTo(info);
     var whereLabel = $("<div id='where' class='info-label'/>")
       .text("WHERE")
       .appendTo(where);
     var loc = viewOfLocationOnly(choice.slot)
-      .addClass("info ellipsis")
+      .addClass("info")
       .appendTo(where);
 
     checkboxContainer.click(function() {
@@ -103,7 +107,7 @@ var guestTask = function() {
   }
 
   function viewOfLocationOnly(x) {
-    var view = $("<span id='address'/>");
+    var view = $("<div id='address'/>");
 
     var locText = chat.locationText(x.location);
     if (locText) {
@@ -293,10 +297,10 @@ var guestTask = function() {
       var taskView = $("#meeting-content");
       taskView.children().remove();
       var taskWelcome = $("#meeting-welcome");
-      taskWelcome.children().remove();
+      taskWelcome.text("");
 
       var myName = profile.fullName(profs[login.me()].prof);
-      taskWelcome.append($("<p/>").text("Hello, " + myName));
+      taskWelcome.text("Hello, " + myName);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
@@ -338,19 +342,21 @@ var guestTask = function() {
         } else if (state.calendar_options.length > 0) {
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")
-            .text("Select the meeting options that work for you."))
+              .text("Select the meeting options that work for you."))
+            .append($("<div id='options-help'/>")
+              .text("If none of these options works, please let me know in the comment box below."))
             .appendTo(taskView);
           var answers = {};
-          var options = $("<div id='options'/>")
+          var options = $("<table id='options'/>")
             .appendTo(select);
           var typ = meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             var label = indexLabel(i);
             options.append(viewOfCalendarOption(answers, choice, label, typ));
           });
-          // select.append($("<div id='comment-header' class='task-section-header'/>")
-          //       .text("COMMENT"))
-          //       .append($("<textarea id='comment' class='form-control'/>"))
+          select.append($("<div id='comment-header'/>")
+                .text("COMMENT"))
+                .append($("<textarea id='comment' class='form-control'/>"))
           select.append(submitButton(answers));
 
           var feedback = $("<div id='guest-select' class='hide'/>")
