@@ -177,7 +177,6 @@ var loceditor = (function() {
     var view = createModal(initLoc);
 
     util.afterTyping(view.address, 250, function() {
-      log("predictAddress");
       predictAddress(view);
     });
 

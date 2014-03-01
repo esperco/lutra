@@ -95,8 +95,6 @@ var sched2 = (function() {
     for place and time, which may or may not be set to initial values.
   */
   function createMeetingOptionPicker(data) {
-    var view = $("<div/>");
-
     /* meeting type */
 
     function setMeetingType(meetingType) {
@@ -121,10 +119,16 @@ var sched2 = (function() {
 
     var setCalEventDate = calendar.setCalEventDate;
 
-    view
-      .append(meetingTypeSelector.view)
-      .append(location.locationView)
-      .append(calendar.calendarView);
+'''
+<div #view>
+  <div class="row">
+    <div class="col-sm-3">{{meetingTypeSelector.view}}</div>
+    <div class="col-sm-9"/>
+  </div>
+  {{location.locationView}}
+  {{calendar.calendarView}}
+</div>
+'''
 
     return view;
   }

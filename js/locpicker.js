@@ -139,7 +139,6 @@ var locpicker = (function() {
       .appendTo(li)
       .click(function() {
         var loc = getLocation(view);
-        log(loc);
         createLocationEditor(view, loc);
         return false;
       });
