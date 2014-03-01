@@ -474,6 +474,70 @@ var sched4 = (function() {
     return view;
   }
 
+  function enableEventEditSave(task, titleEdit, saveButton) {
+    if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
+      saveButton.removeClass("disabled");
+    }
+  }
+
+  function updateCalendarEvent(task, titleEdit, notesEdit, saveButton) {
+    var taskState = sched.getState(task);
+    taskState.calendar_event_title = titleEdit.val();
+    taskState.calendar_event_notes = notesEdit.val();
+    api.postTask(task).done(function() {
+      api.updateCalendar(task.tid, {
+        event_id: sched.getState(task).reserved.google_event,
+        event_title: titleEdit.val(),
+        event_notes: notesEdit.val()
+      })
+        .done(function() { saveButton.addClass("disabled"); });
+    });
+  }
+
+  function createEventEditSection(task) {
+    var view = $("<div class='final-sched-div'/>");
+    var titleEdit =
+      $("<input type='text' id='edit-calendar-title' class='form-control'/>");
+    var notesEdit = $("<textarea rows=5 class='form-control'/>");
+    var saveButton =
+      $("<button id='event-edit-save' class='btn btn-primary'/>");
+    var state = sched.getState(task);
+
+    $("<h3 class='final-sched-text'/>")
+      .text("Edit calendar event details.")
+      .appendTo(view);
+
+    $("<div class='text-field-label'/>")
+      .text("Title")
+      .appendTo(view);
+    titleEdit
+      .val(state.calendar_event_title)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, saveButton)
+      })
+      .appendTo(view);
+
+    $("<div class='text-field-label'/>")
+      .text("Notes")
+      .appendTo(view);
+    notesEdit
+      .val(state.calendar_event_notes)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, saveButton)
+      })
+      .appendTo(view);
+
+    saveButton
+      .addClass("disabled")
+      .text("Save to Calendar")
+      .click(function() {
+        updateCalendarEvent(task, titleEdit, notesEdit, saveButton)
+      })
+      .appendTo(view);
+
+    return view;
+  }
+
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var guests = sched.getGuests(ta);
@@ -484,7 +548,8 @@ var sched4 = (function() {
       /* Invites are disabled for now in favor of sending a custom URL
          that redirects the guest to their own Google calendar. */
       //.append(createInviteSection(profs, ta, guests))
-      .append(createRemindSection(profs, ta, guests));
+      .append(createRemindSection(profs, ta, guests))
+      .append(createEventEditSection(ta));
 
     observable.onTaskParticipantsChanged.observe("step4", function(ta) {
       chats = sched.chatsOfTask(ta);

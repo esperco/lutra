@@ -331,6 +331,11 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
+  mod.updateCalendar = function(tid, update) {
+    var url = apiSPrefix() + "/event/" + tid + "/update";
+    return jsonHttpPost(url, JSON.stringify(update));
+  };
+
   mod.getGuestAppURL = function(tid, guestUid) {
     var url = apiSPrefix() + "/task/" + tid + "/guestapp/" + guestUid;
     return jsonHttpGet(url);

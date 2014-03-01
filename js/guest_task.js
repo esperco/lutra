@@ -263,20 +263,29 @@ var guestTask = function() {
     return view;
   }
 
-  function stripTimestamp(d) {
-    // Remove the '-' and ':' separators, to turn it into ISO 8601 basic format.
+  function stripTimestamp(d, local) {
+    var s;
+    if (util.isNotNull(d)) {
+      // Normalize timezone to UTC.
+      s = new Date(Date.parse(d)).toISOString();
+    } else {
+      // Backward compatibility, in case the *_utc fields are not available.
+      // Remove the ending 'Z'. According to Util_localtime.create,
+      // "the timezone suffix 'Z' is for compliance only".
+      s = local.replace(/Z$/, "");
+    }
     // Remove the fraction of second.
-    // Remove the ending 'Z'. According to Util_localtime.create,
-    // "the timezone suffix 'Z' is for compliance only".
-    return d.replace(/-|:|\.000|Z$/g, "");
+    // Remove the '-' and ':' separators, to turn it into ISO 8601 basic
+    // format.
+    return s.replace(/-|:|\.\d+/g, "");
   }
 
   function googleCalendarURL(text1, text2, slot) {
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
             "text=" + encodeURIComponent(text1),
-            "dates=" + stripTimestamp(slot.start)
-               + "/" + stripTimestamp(slot.end),
+            "dates=" + stripTimestamp(slot.start_utc, slot.start)
+               + "/" + stripTimestamp(slot.end_utc,   slot.end),
             "details=" + encodeURIComponent("For meeting details, click here: " + text2),
             "location=" + encodeURIComponent(chat.locationText(slot.location)),
             "trp=true",             // show as busy
