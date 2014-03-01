@@ -15,12 +15,12 @@ var loceditor = (function() {
       <img class="svg modal-close-x" src="/assets/img/x.svg"/>
     </div>
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header clearfix">
         <button #save
                 type="button" class="btn btn-primary"
                 style="float:right">Save</button>
         <h3 #modalTitle
-            class="modal-title"></h3>
+            class="modal-title">Enter your location details:</h3>
       </div>
       <div #body
            class="modal-body">
@@ -28,8 +28,7 @@ var loceditor = (function() {
           <h4 class="modal-first-section-title">Address</h4>
 
         <input #address
-               type="text" class="form-control"
-               disabled/>
+               type="text" class="form-control"/>
         <div class="dropdown">
           <a #dropdownToggle
              data-toggle="dropdown"
@@ -47,7 +46,7 @@ var loceditor = (function() {
 
         </div>
         <div class="input">
-          <h4 class="modal-section-title">Description</h4>
+          <h4 class="modal-section-title">Notes</h4>
           <input #instructions
                  type="text" class="form-control"/>
         </div>
@@ -64,25 +63,44 @@ var loceditor = (function() {
     title.attr("id", linkedId);
     modal.attr("aria-labelledby", linkedId);
 
-    title.val(initLoc.title);
-    address.val(initLoc.address);
-    instructions.val(initLoc.instructions);
+    setLocation(_view, initLoc);
+
+    if (util.isNonEmptyString(initLoc.google_description))
+      address.prop("disabled", true);
 
     return _view;
   }
 
   function getLocation(view) {
     return {
-      title: view.locationTitle.val(),
+      /* input boxes */
+      title: view.title.val(),
       address: view.address.val(),
-      instructions: view.instructions.val()
+      instructions: view.instructions.val(),
+
+      /* hidden values */
+      coord: view.coord,
+      timezone: view.timezone,
+      google_description: view.google_description,
+      placeid: view.placeid
     };
+  }
+
+  function setLocation(view, loc) {
+    view.title.val(loc.title);
+    view.address.val(loc.address);
+    view.instructions.val(loc.instructions);
+
+    view.coord = loc.coord;
+    view.timezone = loc.timezone;
+    view.google_description = loc.google_description;
+    view.placeid = loc.placeid;
   }
 
   /* Display addresses as autocompleted by Google */
   function displayAddressDropdown(view, predictions) {
     if (predictions.from_google.length === 0) return;
-    var menu = view.dropDownMenu;
+    var menu = view.dropdownMenu;
     menu.children().remove();
 
     $('<li role="presentation" class="dropdown-header"/>')
@@ -99,17 +117,20 @@ var loceditor = (function() {
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
-              if (view.title.val() === "") {
-                view.title.val(details.name);
-              }
-              view.address.val(details.formatted_address);
-              view.dropdownToggle.dropdown("hide");
+              var title = details.name.length > 0 ? details.name : description;
+              setLocation(view, {
+                title: title,
+                address: details.formatted_address,
+                coord: details.geometry,
+                google_description: description
+              });
+              util.hideDropdown(view.dropdownToggle);
             });
           return false;
         });
     });
 
-    view.dropdownToggle.dropdown("show");
+    util.showDropdown(view.dropdownToggle);
   }
 
   function predictAddress(view) {
@@ -119,6 +140,37 @@ var loceditor = (function() {
       .done(function(predictions) {
         displayAddressDropdown(view, predictions);
       });
+  }
+
+  function savePlace(view) {
+    var loc = getLocation(view);
+    var google_description = loc.google_description;
+    if (util.isDefined(google_description)) {
+      var coord = loc.coord;
+      var edit = {
+        title: loc.title,
+        address: loc.address,
+        instructions: loc.instructions,
+        google_description: google_description,
+        geometry: loc.coord
+      };
+      var placeid = loc.placeid;
+      if (util.isDefined(placeid))
+        return api.postEditPlace(placeid, edit);
+      else
+        return api.postCreatePlace(google_description, edit);
+    }
+    else
+      return deferred.fail();
+  }
+
+  function deletePlace(view) {
+    var loc = getLocation(view);
+    var placeid = loc.placeid;
+    if (util.isDefined(placeid))
+      return api.deletePlace(placeid);
+    else
+      return deferred.defer();
   }
 
   mod.create = function(initLoc, onSave, onDelete) {
@@ -131,17 +183,23 @@ var loceditor = (function() {
 
     view.save
       .click(function() {
-        /* TODO: esper api call */
-        x.modal.("hide");
-        x.onSave(getLocation(view));
+        savePlace(view)
+          .done(function() {
+            view.modal.modal("hide");
+            onSave(getLocation(view));
+          });
       });
 
     view.delete_
       .click(function() {
-        /* TODO: esper api call */
-        x.modal.("hide");
-        x.onDelete(getLocation(view));
+        deletePlace(view)
+          .done(function() {
+            view.modal.modal("hide");
+            onDelete(getLocation(view));
+          });
       });
+
+    view.modal.modal({});
 
     return view;
   };

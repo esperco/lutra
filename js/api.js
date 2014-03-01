@@ -277,25 +277,25 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.postCreatePlace = function(uid, desc, edit) {
+  mod.postCreatePlace = function(desc, edit) {
     var url = apiSPrefix() + "/place/create/" +
               encodeURIComponent(desc);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
-  mod.postEditPlace = function(uid, placeid, edit) {
+  mod.postEditPlace = function(placeid, edit) {
     var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
-  mod.deletePlace = function(uid, placeid) {
+  mod.deletePlace = function(placeid) {
     var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpDelete(url);
   };
 
-  mod.getPlaceList = function(uid) {
+  mod.getPlaceList = function() {
     var url = apiSPrefix() + "/place/list/";
     return jsonHttpGet(url);
   };

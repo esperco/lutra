@@ -16,8 +16,6 @@ var locpicker = (function() {
 '''
 <div #location
      class="clearfix">
-  <div #timezone
-       class="col-sm-3"></div>
   <div class="col-sm-6">
     <div class="location-title">Location</div>
     <input #address
@@ -34,14 +32,67 @@ var locpicker = (function() {
   </div>
   <div class="col-sm-3">
     <div class="location-title">Notes</div>
-    <input #notes
+    <input #instructions
            type="text" class="form-control"
            placeholder="suite number, etc."/>
   </div>
+  <div class="col-sm-3">
+    <div class="location-title">Time Zone</div>
+    <input #timezone
+           type="text" class="form-control" disabled/>
+  </div>
+  <div #editor/>
 </div>
 '''
 
     return _view;
+  }
+
+  function getLocation(view) {
+    return {
+      /* hidden state */
+      title: view.title,
+      coord: view.coord,
+
+      /* input boxes */
+      address: view.address.val(),
+      instructions: view.instructions.val(),
+      timezone: view.timezone.val()
+    };
+  }
+
+  function setLocation(view, loc) {
+    view.title = loc.title;
+    view.coord = loc.coord;
+
+    view.address.val(loc.address);
+    view.instructions.val(loc.instructions);
+    view.timezone.val(loc.timezone);
+  }
+
+  /*
+    Create pop-up for editing and saving a location,
+    taking care of synchronization between the form and the pop-up (modal).
+    The pop-up is shown when the user clicks somewhere in the
+    dropdown menu that opens below the address input box.
+  */
+  function createLocationEditor(view, loc) {
+    function updateForm(loc) {
+      var coord = loc.coord;
+      if (util.isDefined(coord)) {
+        api.getTimezone(coord.lat, coord.lon)
+          .done(function(x) {
+            loc.timezone = x.timezone;
+            setLocation(view, loc);
+          });
+      }
+      else /* this ideally shouldn't happen */
+        setLocation(view, loc);
+    }
+    var modalView = loceditor.create(loc, updateForm, updateForm);
+
+    view.editor.children().remove();
+    view.editor.append(modalView.modal);
   }
 
   function createGoogleMap(mapDiv) {
@@ -58,6 +109,7 @@ var locpicker = (function() {
     };
   }
 
+  /* unused - needs update and testing */
   function geocodeAddress(formView, googleMap) {
     var address = formView.address.val();
     if (address === "") return;
@@ -75,18 +127,107 @@ var locpicker = (function() {
       });
   }
 
-  function getLocation(view) {
-    return {
-      title: view.locationTitle.val(),
-      address: view.address.val(),
-      instructions: view.instructions.val()
-    };
+  function addCreatePlaceToMenu(view) {
+    var menu = view.dropdownMenu;
+    var textInput = view.address.val();
+    var li = $('<li role="presentation"/>')
+      .appendTo(menu);
+    var bolded = "Create a place named <b>\""
+      + util.htmlEscape(textInput) + "\"</b>";
+    $('<a role="menuitem" tabindex="-1" href="#"/>')
+      .html(bolded)
+      .appendTo(li)
+      .click(function() {
+        var loc = getLocation(view);
+        log(loc);
+        createLocationEditor(view, loc);
+        return false;
+      });
   }
 
-  function setLocation(view, loc) {
-    view.title.val(loc.title);
-    view.address.val(loc.address);
-    view.instructions.val(loc.instructions);
+  function addSuggestedSavedPlacesToMenu(view, predictions) {
+    var menu = view.dropdownMenu;
+    if (predictions.from_saved_places.length === 0) return;
+
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Saved Places")
+      .appendTo(menu);
+
+    list.iter(predictions.from_saved_places, function(item) {
+      var bolded;
+      var title = item.loc.title;
+      var coord = item.loc.coord;
+      var address = item.loc.address;
+      var instructions = item.loc.instructions;
+      var esc = util.htmlEscape;
+      if (item.matched_field === "Address") {
+        bolded = geo.highlight(address, [item.matched_substring]);
+        if (title && title != address) {
+          bolded = "<i>" + esc(title) + "</i> - " + bolded;
+        }
+      } else if (item.matched_field === "Title") {
+        bolded = "<i>" + geo.highlight(title, [item.matched_substring])
+          + "</i> - " + esc(address);
+      } else {
+        // TODO Error, bad API response, should never happen
+      }
+      var li = $('<li role="presentation"/>')
+        .appendTo(menu);
+      $('<a role="menuitem" tabindex="-1" href="#"/>')
+        .html(bolded)
+        .appendTo(li)
+        .click(function() {
+          api.postSelectPlace(item.google_description)
+            .done(function(place) {
+              setLocation(view, {
+                title: title,
+                coord: coord,
+                address: address,
+                instructions: instructions,
+                timezone: place.loc.timezone
+              });
+              util.hideDropdown(view.dropdownToggle);
+            });
+          return false;
+        });
+    });
+    $('<li role="presentation" class="divider"/>')
+      .appendTo(menu);
+  }
+
+  function addSuggestedGooglePlacesToMenu(view, predictions) {
+    var menu = view.dropdownMenu;
+
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Suggestions from Google")
+      .appendTo(menu);
+
+    list.iter(predictions.from_google, function(item) {
+      var description = item.google_description;
+      var bolded = geo.highlight(description, item.matched_substrings);
+      var li = $('<li role="presentation"/>').appendTo(menu);
+      $('<a role="menuitem" tabindex="-1" href="#"/>')
+        .html(bolded)
+        .appendTo(li)
+        .click(function() {
+          api.getPlaceDetails(description, item.ref_id)
+            .done(function(place) {
+              var coord = place.geometry;
+              api.getTimezone(coord.lat, coord.lon)
+                .done(function(x) {
+                  var loc = item.loc;
+                  setLocation(view, {
+                    title: description,
+                    coord: coord,
+                    address: description,
+                    timezone: x.timezone
+                  });
+                });
+              util.hideDropdown(view.dropdownToggle);
+            });
+          return false;
+        });
+    });
   }
 
   /*
@@ -99,132 +240,29 @@ var locpicker = (function() {
     var menu = view.dropdownMenu;
     menu.children().remove();
 
-    /*
-      Create pop-up for editing and saving a location,
-      taking care of synchronization between the form and the pop-up (modal).
-      The pop-up is shown when the user clicks somewhere in the
-      dropdown menu that opens below the address input box.
-    */
-    function updateForm(loc) {
-      setLocation(view, loc);
-    }
-    var modalView = loceditor.create(getLocation(view), updateForm, updateForm);
-    view.append(modalView.modal);
+    /* Add "create a place named ..." to the dropdown menu */
+    addCreatePlaceToMenu(view);
 
-    /* Fill the menu with suggested addresses */
-    var li = $('<li role="presentation"/>')
-      .appendTo(menu);
-    var bolded = "Create a place named <b>\""
-      + util.htmlEscape(input) + "\"</b>";
-    $('<a role="menuitem" tabindex="-1" href="#"/>')
-      .html(bolded)
-      .appendTo(li)
-      .click(function() {
-        /* TODO redo this part */
-        modalView.title.val(input);
-        modalView.address.prop("disabled", false);
-        modalView.save.one("click", function() {
-          places.saveNewPlace(false);
-          view.address.val(modalView.address.val());
-          var details = places.getSelectedPlaceDetails();
-          var coord = details.geometry;
-          api.getTimezone(coord.lat, coord.lon)
-            .done(function(x) {
-              timeZoneDropdown.set(x.timezone);
-            });
-        });
-        modalView.modal.modal({});
-        formView.dropdownToggle.dropdown("toggle");
-        return false;
-      });
+    /* Fill the menu with suggested addresses from user's saved places */
+    addSuggestedSavedPlacesToMenu(view, predictions);
 
-    if (predictions.from_saved_places.length > 0) {
-      $('<li role="presentation" class="dropdown-header"/>')
-        .text("Saved Places")
-        .appendTo(menu);
+    /* Fill the menu with suggested addresses from Google */
+    addSuggestedGooglePlacesToMenu(view, predictions);
 
-      list.iter(predictions.from_saved_places, function(item) {
-        var bolded;
-        var addr = item.loc.address;
-        var title = item.loc.title;
-        var esc = util.htmlEscape;
-        if (item.matched_field === "Address") {
-          bolded = geo.highlight(addr, [item.matched_substring]);
-          if (title && title != addr) {
-            bolded = "<i>" + esc(title) + "</i> - " + bolded;
-          }
-        } else if (item.matched_field === "Title") {
-          bolded = "<i>" + geo.highlight(title, [item.matched_substring])
-            + "</i> - " + esc(addr);
-        } else {
-          // TODO Error, bad API response, should never happen
-        }
-        var li = $('<li role="presentation"/>')
-          .appendTo(menu);
-        $('<a role="menuitem" tabindex="-1" href="#"/>')
-          .html(bolded)
-          .appendTo(li)
-          .click(function() {
-            formView.address.val(item.loc.address);
-            formView.notes.val(item.loc.instructions);
-            api.postSelectPlace(item.google_description)
-              .done(function(place) {
-                timeZoneDropdown.set(place.loc.timezone);
-                modalView.dropDownToggle.dropdown("toggle");
-              });
-            return false;
-          });
-      });
-      $('<li role="presentation" class="divider"/>')
-        .appendTo(menu);
-    }
-
-    $('<li role="presentation" class="dropdown-header"/>')
-      .text("Suggestions from Google")
-      .appendTo(menu);
-
-    list.iter(predictions.from_google, function(item) {
-      var desc = item.google_description;
-      var bolded = geo.highlight(desc, item.matched_substrings);
-      var li = $('<li role="presentation"/>') .appendTo(menu);
-      $('<a role="menuitem" tabindex="-1" href="#"/>')
-        .html(bolded)
-        .appendTo(li)
-        .click(function() {
-          formView.address.val(desc);
-          api.getPlaceDetails(desc, item.ref_id)
-            .done(function(place) {
-              var coord = place.geometry;
-              api.getTimezone(coord.lat, coord.lon)
-                .done(function(x) {
-                  timeZoneDropdown.set(x.timezone);
-                });
-              formView.dropdownToggle.dropdown("toggle");
-            });
-          return false;
-        });
-    });
-
-    var toggle = formView.dropdownToggle;
-    if (!toggle.parent().hasClass('open')) {
-      toggle.dropdown("toggle");
-    }
-
-    var editorView = loceditor.create(initLoc, onSave, onDelete);
+    util.showDropdown(view.dropdownToggle);
   }
 
   function predictAddress(formView) {
-    var input = formView.address.val();
-    if (input === "") return;
-    api.getPlacePredictions(input)
+    var textInput = formView.address.val();
+    if (textInput === "") return;
+    api.getPlacePredictions(textInput)
       .done(function(predictions) {
-        displayPredictionsDropdown(input, predictions, formView);
+        displayPredictionsDropdown(formView, predictions);
       });
   }
 
   function setup(form) {
     util.afterTyping(form.address, 250, function() {
-      log("predictAddress");
       predictAddress(form);
     });
   }
@@ -238,7 +276,7 @@ var locpicker = (function() {
     setup(form);
 
     view
-      .append(formView.location)
+      .append(form.location)
       .append(mapView);
 
     return {

@@ -39,6 +39,7 @@ SOURCES = \
   chat.js \
   geo.js \
   calpicker.js \
+  loceditor.js \
   locpicker.js \
   sched.js \
   sched1.js \

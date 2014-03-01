@@ -237,34 +237,10 @@ var places = (function() {
       });
   }
 
-  function saveNewPlace(refreshDisplay) {
-    if (selectedPlaceDetails) {
-      var editModal = $("#edit-place-modal");
-      editModal.modal("hide");
-      var title = $("#edit-place-location-title").val();
-      var address = $("#edit-place-address").val();
-      var instructions = $("#edit-place-instructions").val();
-      var edit = {
-        title: title,
-        address: address,
-        instructions: instructions,
-        google_description: selectedPlaceDesc,
-        geometry: selectedPlaceDetails.geometry
-      };
-      var uid = login.me();
-      api.postCreatePlace(uid, selectedPlaceDesc, edit)
-        .done(function() {
-          if (refreshDisplay) {
-            api.getPlaceList(uid).done(displayPlaces);
-          }
-        });
-    }
-  }
-
-  function removePlace(uid, placeid) {
+  function removePlace(placeid) {
     $("#edit-place-modal").modal("hide");
-    api.deletePlace(uid, placeid).done(function() {
-      api.getPlaceList(uid).done(displayPlaces);
+    api.deletePlace(placeid).done(function() {
+      api.getPlaceList().done(displayPlaces);
     });
   }
 
@@ -281,8 +257,8 @@ var places = (function() {
     editModal.modal({});
   }
 
-  mod.addressDropdown = addressDropdown;
-  mod.saveNewPlace = saveNewPlace;
+  //mod.addressDropdown = addressDropdown;
+  //mod.saveNewPlace = saveNewPlace;
   mod.emptyEditModal = emptyEditModal;
 
   mod.getSelectedPlaceDetails = function () {
