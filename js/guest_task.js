@@ -208,7 +208,7 @@ var guestTask = function() {
 
   function stripTimestamp(d, local) {
     var s;
-    if (d) {
+    if (util.isNotNull(d)) {
       // Normalize timezone to UTC.
       s = new Date(Date.parse(d)).toISOString();
     } else {
@@ -220,7 +220,7 @@ var guestTask = function() {
     // Remove the fraction of second.
     // Remove the '-' and ':' separators, to turn it into ISO 8601 basic
     // format.
-    return s.replace(/-|:|\.000/g, "");
+    return s.replace(/-|:|\.\d+/g, "");
   }
 
   function googleCalendarURL(text1, text2, slot) {
