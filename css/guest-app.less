@@ -61,13 +61,14 @@ hr {
   border-top: 1px solid @gray_80;
 }
 
-.container.mobile {
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
 .scrollable {
   overflow: auto;
+}
+
+.btn-primary-disabled {
+  pointer-events: none;
+  cursor: default;
+  background: @purple_disabled;
 }
 
 *.unselectable {
@@ -263,7 +264,7 @@ hr {
 }
 
 #comment-header {
-  margin-top: 20px;
+  margin-top: 30px;
   color: @gray_40;
   font-family: @light;
   font-size: 20px;
@@ -271,14 +272,68 @@ hr {
 }
 
 #comment {
-  width: 100%;
+  width: 60%;
   margin-top: 10px;
   resize: none;
+  @media (max-width: 767px) {
+    width: 100%;
+  }
 }
 
 #submit-selections {
-  margin-top: 20px;
+  margin-top: 30px;
   &:focus { outline: none; }
+}
+
+#feedback-message {
+  width: 340px;
+  height: 160px;
+  margin-top: 30px;
+  margin-right: auto;
+  margin-bottom: 30px;
+  margin-left: auto;
+  padding-top: 28px;
+  text-align: center;
+  color: @white;
+  background: @gray_80;
+  border-radius: 6px;
+  @media (max-width: 370px) {
+    width: 100%;
+    margin-right: 15px;
+    margin-left: 15px;
+  }
+}
+
+#check-circle {
+  width: 60px;
+  height: 60px;
+  margin-right: auto;
+  margin-bottom: 20px;
+  margin-left: auto;
+  padding-top: 20px;
+  background: @green;
+  border-radius: 30px;
+  -webkit-animation-duration: 0.5s;
+     -moz-animation-duration: 0.5s;
+          animation-duration: 0.5s;
+  -webkit-animation-delay: 0.1s;
+     -moz-animation-delay: 0.1s;
+          animation-delay: 0.1s;
+}
+
+#edit-selections {
+  width: 340px;
+  margin-right: auto;
+  margin-left: auto;
+  cursor: pointer;
+  &:hover #edit-selections-text {
+    text-decoration: underline;
+  }
+}
+
+#submitted-back {
+  margin-right: 10px;
+  path { fill: @white; }
 }
 
 
@@ -333,13 +388,13 @@ hr {
 
 #add-cal {
   float: left;
-  width: 12px;
-  height: 12px;
-  margin-top: 2px;
+  width: 10px;
+  height: 10px;
+  margin-top: 3px;
 }
 
 #add-cal-text {
-  margin-left: 16px;
+  margin-left: 14px;
 }
 
 .calendar-type-row {
@@ -516,17 +571,10 @@ hr {
 }
 
 .blank-chat {
-  width: 240px;
-  height: 100px;
   margin-top: 30px;
-  margin-right: auto;
   margin-bottom: 45px;
-  margin-left: auto;
-  padding-top: 22px;
   text-align: center;
   color: @gray_20;
-  // background: @gray_80;
-  border-radius: 6px;
 }
 
 .blank-chat-icon {

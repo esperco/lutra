@@ -1,10 +1,39 @@
 var guestTask = function() {
   var mod = {};
 
+  function viewOfFeedback() {
+    var view = $("<div/>");
+
+    var checkCircle = $("<div id='check-circle' class='animated'/>");
+    var check = $("<img id='submitted-check'/>");
+    checkCircle.append(check);
+    svg.loadImg(check, "/assets/img/check.svg");
+
+    var message = $("<div id='feedback-message'/>")
+      .append(checkCircle)
+      .append("Your selections have been submitted.")
+      .appendTo(view);
+
+    var back = $("<img id='submitted-back'/>");
+    var change = $("<div id='edit-selections'/>")
+      .append(back)
+      .append($("<span id='edit-selections-text'>Edit selections</span>"))
+      .appendTo(view);
+    svg.loadImg(back, "/assets/img/back.svg");
+
+    change.click(function() {
+      $("#check-circle").removeClass("pulse");
+      $("#feedback").addClass("hide");
+      $("#guest-select").removeClass("hide");
+    })
+
+    return view;
+  }
+
   function submitButton(answers) {
     var submitButton = $("<button/>", {
       "id":"submit-selections",
-      "class":"btn btn-primary",
+      "class":"btn btn-primary btn-primary-disabled",
       "text":"Submit"
     });
     submitButton.click(function() {
@@ -19,6 +48,9 @@ var guestTask = function() {
         chat_item_data: ["Scheduling_r", {selected:sel}]
       };
       chat.postChatItem(item);
+      $("#guest-select").addClass("hide");
+      $("#feedback").removeClass("hide");
+      $("#check-circle").addClass("pulse");
     });
     return submitButton;
   }
@@ -45,8 +77,10 @@ var guestTask = function() {
     checkboxContainer.click(function() {
       if (slotView.hasClass("checkbox-selected")) {
         slotView.removeClass("checkbox-selected");
+        $("#submit-selections").addClass("btn-primary-disabled");
       } else {
         slotView.addClass("checkbox-selected");
+        $("#submit-selections").removeClass("btn-primary-disabled");
         list.iter(options, function(choice, i) {
           var label = indexLabel(i);
           delete answers[choice.label];
@@ -119,8 +153,12 @@ var guestTask = function() {
       if (slotView.hasClass("checkbox-selected")) {
         slotView.removeClass("checkbox-selected");
         delete answers[choice.label];
+        if (jQuery.isEmptyObject(answers)) {
+          $("#submit-selections").addClass("btn-primary-disabled");
+        }
       } else {
         slotView.addClass("checkbox-selected");
+        $("#submit-selections").removeClass("btn-primary-disabled");
         answers[choice.label] = choice;
         if ($("#option-none").hasClass("checkbox-selected")) {
           $("#option-none").removeClass("checkbox-selected");
@@ -309,9 +347,9 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(ta.task_calendar_title,
+      window.open(googleCalendarURL(x.calendar_event_title,
                                     window.location,
-                                    x));
+                                    x.reserved.slot));
     })
 
     button.popover({
@@ -337,7 +375,7 @@ var guestTask = function() {
   function viewOfMeetingHeader(ta, state) {
     return view = $("<div id='meeting-header'/>")
       .append($("<div id='meeting-title'/>").text(state.calendar_event_title))
-      .append(addToCalendar(ta, state.reserved.slot));
+      .append(addToCalendar(ta, state));
   }
 
   function calendarIcon(x) {
@@ -420,7 +458,8 @@ var guestTask = function() {
                 .append($("<textarea id='comment' class='form-control'/>"))
           select.append(submitButton(answers));
 
-          var feedback = $("<div id='guest-select' class='hide'/>")
+          var feedback = $("<div id='feedback' class='hide'/>")
+            .append(viewOfFeedback)
             .appendTo(taskView);
 
           $("#messages").addClass("hide");
