@@ -316,9 +316,9 @@ hr {
   -webkit-animation-duration: 0.5s;
      -moz-animation-duration: 0.5s;
           animation-duration: 0.5s;
-  -webkit-animation-delay: 0.1s;
-     -moz-animation-delay: 0.1s;
-          animation-delay: 0.1s;
+  -webkit-animation-delay: 0.25s;
+     -moz-animation-delay: 0.25s;
+          animation-delay: 0.25s;
 }
 
 #edit-selections {
@@ -484,12 +484,15 @@ hr {
   path { fill: @gray_60; }
 }
 
-#guest-table {
+#guests {
   margin-left: 40px;
 }
 
+.guest-row {
+  margin-top: 20px;
+}
+
 .guest-main {
-  padding-top: 15px;
   font-family: @bold;
 }
 
@@ -509,8 +512,41 @@ hr {
 }
 
 .linkedin-title {
+  cursor: pointer;
+  &:hover .linkedin-text {
+    text-decoration: underline;
+  }
+}
+
+.linkedin-icon {
+  float: left;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+}
+
+.linkedin-text {
+  margin-left: 22px;
   font-size: 14px;
   font-family: @light;
+}
+
+.email-icon {
+  float: left;
+  margin-top: 4px;
+}
+
+.email-address,
+.phone-number {
+  margin-left: 30px;
+}
+
+.phone-icon {
+  float: left;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  margin-left: 2px;
 }
 
 #notes-icon {
