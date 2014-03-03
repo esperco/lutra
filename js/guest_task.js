@@ -249,11 +249,11 @@ var guestTask = function() {
 
     if (name != myName) {
       main.append($("<span class='guest-name'/>").append(name))
-          .append($("<div class='linkedin-title'>Designer at Esper</div>"));
+          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
     } else {
       main.append($("<span class='guest-name'/>").append(name))
           .append($("<span id='me-label'>me</span>"))
-          .append($("<div class='linkedin-title'>Designer at Esper</div>"));
+          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
     }
 
     return view;
