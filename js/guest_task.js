@@ -240,6 +240,25 @@ var guestTask = function() {
     return view;
   }
 
+  function viewOfGuestRow(x, myName) {
+    var view = $("<tr/>");
+
+    var main = $("<td class='guest-main'/>")
+      .appendTo(view);
+    var name = profile.fullName(x);
+
+    if (name != myName) {
+      main.append($("<span class='guest-name'/>").append(name))
+          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
+    } else {
+      main.append($("<span class='guest-name'/>").append(name))
+          .append($("<span id='me-label'>me</span>"))
+          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
+    }
+
+    return view;
+  }
+
   function wordify(time) {
     if (time === "12:00 am") {
       return "Midnight";
@@ -341,7 +360,7 @@ var guestTask = function() {
       "data-toggle": "popover",
     })
       .append(addCal)
-      .append($("<div id='add-cal-text'>Add to my calendar</div>"));
+      .append($("<div id='add-cal-text'>ADD TO CALENDAR</div>"));
     svg.loadImg(addCal, "/assets/img/plus-sm.svg");
 
     var google = $("#google");
@@ -414,14 +433,9 @@ var guestTask = function() {
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
-          var participantListView = $("<ul/>");
+          var participantListView = $("<table id='guest-table'/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
-            var name = profile.fullName(profs[uid].prof);
-            if (name != myName) {
-              participantListView.append($("<li class='guest-name-row'/>").text(name));
-            } else {
-              participantListView.append($("<li class='guest-name-row'/>").text("Me"));
-            }
+            participantListView.append(viewOfGuestRow(profs[uid].prof, myName));
           });
           taskView.append(participantListView)
           var notes = $("<div id='notes'/>")
