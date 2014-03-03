@@ -114,7 +114,7 @@ var guestTask = function() {
   function viewOfGuestRow(x, myName) {
     var view = $("<div class='guest-row clearfix'/>");
 
-    var main = $("<div class='guest-main col-sm-4'/>")
+    var main = $("<div class='guest-main col-sm-5'/>")
       .appendTo(view);
     var name = profile.fullName(x);
     var nameDiv = $("<div class='guest-name ellipsis'/>")
@@ -123,35 +123,35 @@ var guestTask = function() {
     if (name === myName) {
       nameDiv.append($("<span id='me-label'>me</span>"));
     }
-    var linkedinIcon = $("<img class='linkedin-icon'/>");
-    var linkedin = $("<div class='linkedin-title'/>")
-      .append(linkedinIcon)
-      .append($("<div class='linkedin-text ellipsis'/>")
-        .text("Designer at Esper"));
-    svg.loadImg(linkedinIcon, "/assets/img/linkedin-sq.svg");
-    linkedin.click(function() {
-      window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
-    })
-    main.append(linkedin);
+    // var linkedinIcon = $("<img class='linkedin-icon'/>");
+    // var linkedin = $("<div class='linkedin-title'/>")
+    //   .append(linkedinIcon)
+    //   .append($("<div class='linkedin-text ellipsis'/>")
+    //     .text("Designer at Esper"));
+    // svg.loadImg(linkedinIcon, "/assets/img/linkedin-sq.svg");
+    // linkedin.click(function() {
+    //   window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
+    // })
+    // main.append(linkedin);
 
-    var emailIcon = $("<img class='email-icon'/>");
-    var email = $("<div class='guest-email col-sm-4'/>")
-      .append(emailIcon)
-      .append($("<div class='email-address ellipsis'/>")
-        .text("nick@esper.com"));
-    svg.loadImg(emailIcon, "/assets/img/email.svg");
-    email.click(function() {
-      window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
-    })
-    view.append(email);
+    // var emailIcon = $("<img class='email-icon'/>");
+    // var email = $("<div class='guest-email col-sm-4'/>")
+    //   .append(emailIcon)
+    //   .append($("<div class='email-address ellipsis'/>")
+    //     .text("nick@esper.com"));
+    // svg.loadImg(emailIcon, "/assets/img/email.svg");
+    // email.click(function() {
+    //   window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
+    // })
+    // view.append(email);
 
-    var phoneIcon = $("<img class='phone-icon'/>");
-    var phone = $("<div class='guest-phone col-sm-4'/>")
-      .append(phoneIcon)
-      .append($("<div class='phone-number ellipsis'/>")
-        .text("(555) 555-5555"));
-    svg.loadImg(phoneIcon, "/assets/img/phone.svg");
-    view.append(phone);
+    // var phoneIcon = $("<img class='phone-icon'/>");
+    // var phone = $("<div class='guest-phone col-sm-3'/>")
+    //   .append(phoneIcon)
+    //   .append($("<div class='phone-number ellipsis'/>")
+    //     .text("(555) 555-5555"));
+    // svg.loadImg(phoneIcon, "/assets/img/phone.svg");
+    // view.append(phone);
 
     return view;
   }

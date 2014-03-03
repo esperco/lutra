@@ -489,7 +489,15 @@ hr {
 }
 
 .guest-row {
-  margin-top: 20px;
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+.guest-main,
+.guest-email,
+.guest-phone {
+  padding-right: 15px;
+  padding-left: 0;
 }
 
 .guest-main {
@@ -512,9 +520,11 @@ hr {
 }
 
 .linkedin-title {
+  color: @gray_10;
   cursor: pointer;
-  &:hover .linkedin-text {
-    text-decoration: underline;
+  @media (max-width: 767px) {
+    padding-top: 6px;
+    padding-left: 16px;
   }
 }
 
@@ -523,12 +533,31 @@ hr {
   width: 16px;
   height: 16px;
   margin-top: 1px;
+  @media (max-width: 767px) {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+  }
 }
 
 .linkedin-text {
   margin-left: 22px;
   font-size: 14px;
   font-family: @light;
+  @media (max-width: 767px) {
+    margin-left: 30px;
+    font-family: @regular;
+  }
+}
+
+.guest-email,
+.guest-phone {
+  padding-top: 3px;
+  color: @gray_10;
+  @media (max-width: 767px) {
+    padding-top: 10px;
+    padding-left: 16px;
+  }
 }
 
 .email-icon {
@@ -539,6 +568,10 @@ hr {
 .email-address,
 .phone-number {
   margin-left: 30px;
+  @media (max-width: 767px) {
+    margin-left: 30px;
+    font-size: 14px;
+  }
 }
 
 .phone-icon {
