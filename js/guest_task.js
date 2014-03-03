@@ -292,31 +292,38 @@ var guestTask = function() {
         "text":"Submit"
       });
       submitButton.click(function() {
+        var noneWorks = $("#option-none").hasClass("checkbox-selected")
+                        ? $("#option-none-text").text().trim() : "";
+        var message = join(noneWorks, "\n\n", $("#comment").val().trim());
+        function postMessage(reply) {
+          if (message.length > 0) {
+            var item = {
+              chatid: login.myChatid(),
+              by:     login.me(),
+              "for":  login.me(),
+              in_reply_to: reply,
+              chat_item_data: ["Message", message]
+            };
+            chat.postChatItem(item);
+          }
+        }
+
         var sel = [];
         for (var label in answers) {
           sel.push(answers[label]);
         }
-        if (sel.length > 0) {
+        if (sel.length <= 0) {
+          postMessage(null);
+        } else {
           var item = {
             chatid: login.myChatid(),
             by:     login.me(),
             "for":  login.me(),
             chat_item_data: ["Scheduling_r", {selected:sel}]
           };
-          chat.postChatItem(item);
-        }
-
-        var noneWorks = $("#option-none").hasClass("checkbox-selected")
-                        ? $("#option-none-text").text().trim() : "";
-        var message = join(noneWorks, "\n\n", $("#comment").val().trim());
-        if (message.length > 0) {
-          var item = {
-            chatid: login.myChatid(),
-            by:     login.me(),
-            "for":  login.me(),
-            chat_item_data: ["Message", message]
-          };
-          chat.postChatItem(item);
+          chat.postChatItem(item).done(function(item) {
+            postMessage(item.id);
+          });
         }
 
         $("#guest-select").addClass("hide");
