@@ -237,7 +237,7 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(x.calendar_event_title,
+      window.open(googleCalendarURL(x.calendar_event_title.title_text,
                                     window.location,
                                     x.reserved.slot));
     })
@@ -264,7 +264,10 @@ var guestTask = function() {
 
   function viewOfMeetingHeader(ta, state) {
     return view = $("<div id='meeting-header'/>")
-      .append($("<div id='meeting-title'/>").text(state.calendar_event_title))
+      .append(
+        $("<div id='meeting-title'/>")
+          .text(state.calendar_event_title.title_text)
+      )
       .append(addToCalendar(ta, state));
   }
 

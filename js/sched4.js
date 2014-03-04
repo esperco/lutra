@@ -482,7 +482,8 @@ var sched4 = (function() {
 
   function updateCalendarEvent(task, titleEdit, notesEdit, saveButton) {
     var taskState = sched.getState(task);
-    taskState.calendar_event_title = titleEdit.val();
+    taskState.calendar_event_title.title_text = titleEdit.val();
+    taskState.calendar_event_title.is_generated = false;
     taskState.calendar_event_notes = notesEdit.val();
     api.postTask(task).done(function() {
       api.updateCalendar(task.tid, {
@@ -511,7 +512,7 @@ var sched4 = (function() {
       .text("Title")
       .appendTo(view);
     titleEdit
-      .val(state.calendar_event_title)
+      .val(state.calendar_event_title.title_text)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, saveButton)
       })
