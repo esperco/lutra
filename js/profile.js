@@ -80,6 +80,10 @@ var profile = (function() {
     return result;
   }
 
+  mod.email = function(s) {
+    return "Email address goes here.";
+  };
+
   mod.shortenName = function(s) {
     /* discard the domain in case it's an email address */
     var name = email.localpart(s);
@@ -98,7 +102,7 @@ var profile = (function() {
   /* Make circle containing user's initials */
   mod.viewMediumCirc = function(prof, withTooltip) {
 
-    var view = $("<div class='list-prof-circ pref-prof-circ'>");
+    var view = $("<div class='unselectable'/>");
 
     if (withTooltip)
       view.tooltip({
@@ -106,14 +110,14 @@ var profile = (function() {
         placement: "bottom"
       });
 
-    $("<p class='initials unselectable'/>")
+    view
       .text(mod.veryShortNameOfProfile(prof))
-      .appendTo(view);
+
     return view;
   };
 
   mod.viewMediumFullName = function(prof) {
-    var view = $("<p class='guest-name'/>")
+    var view = $("<div/>")
       .text(mod.fullName(prof));
     return view;
   };

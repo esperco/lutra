@@ -103,10 +103,8 @@ var sched1 = (function() {
     plus.appendTo(adder);
     svg.loadImg(plus, "/assets/img/plus.svg");
 
-    var addGuestDiv = $("<div/>");
-    var addGuestText = $("<a id='add-guest-text' class='unselectable'/>")
-      .text("Add guest")
-      .appendTo(addGuestDiv);
+    var addGuest = $("<div id='add-guest-text' class='unselectable'/>")
+      .append($("<a>Add guest</a>"));
 
     var eaCheck = $("<div/>");
     var checkbox = $("<img/>").appendTo(eaCheck);
@@ -153,7 +151,7 @@ var sched1 = (function() {
 
     function toggleAddGuest() {
       if (guestInputDiv.hasClass("hide")) {
-        addGuestDiv.addClass("hide");
+        addGuest.addClass("hide");
         guestInputDiv.removeClass("hide");
         edit.emailInput.focus();
         adder
@@ -163,7 +161,7 @@ var sched1 = (function() {
         clearAddGuest();
       }
     }
-    addGuestDiv
+    addGuest
       .click(toggleAddGuest);
     adder
       .click(toggleAddGuest);
@@ -176,7 +174,7 @@ var sched1 = (function() {
       eaCheck.removeClass("checkbox-selected");
       eaView.addClass("hide");
       guestInputDiv.addClass("hide");
-      addGuestDiv.removeClass("hide");
+      addGuest.removeClass("hide");
       adder
         .removeClass("cancel")
         .addClass("return-to-add");
@@ -222,7 +220,7 @@ var sched1 = (function() {
     });
 
     view.append(adder)
-        .append(addGuestDiv)
+        .append(addGuest)
         .append(guestInputDiv);
 
     return {
@@ -230,49 +228,86 @@ var sched1 = (function() {
     };
   }
 
-  function viewOfProfile(profs, task, uid) {
-    var view = $("<div class='sched-step1-row'>");
+  function viewOfEAProfile(profs, task, uid) {
+    var view = $("<div class='sched-step1-ea-row'>");
     var prof = profs[uid].prof;
-    var chatHead = profile.viewMediumCirc(prof);
-    var nameView = profile.viewMediumFullName(prof);
-    var bridgeButton = $("<button>bridge</button>").click(function() {
+    var branch = $("<div class='relationship-branch'>");
+    var chatHead = profile.viewMediumCirc(prof).addClass("list-prof-circ");
+    var nameView = profile.viewMediumFullName(prof).addClass("ea-name");
+    var bridgeLink = $("<a class='bridge-link'>View Bridge</a>").click(function() {
       api.getGuestAppURL(task.tid, uid).done(function (url) {
-        window.location.assign(url.url);
+        window.open(url.url);
       });
     });
+    var email = $("<div class='ea-email'>")
+      .append(profile.email(prof));
     view
+      .append(branch)
       .append(chatHead)
-      .append(nameView)
-      .append(bridgeButton);
+      .append((nameView)
+        .append(bridgeLink))
+      .append(email);
     return view;
+  }
+
+  function viewOfProfile(v, profs, task, uid, hasEA) {
+    var prof = profs[uid].prof;
+    var chatHead = profile.viewMediumCirc(prof).addClass("list-prof-circ");
+    var nameView = profile.viewMediumFullName(prof).addClass("guest-name");
+    var bridgeLink = $("<a class='bridge-link'>View Bridge</a>").click(function() {
+      api.getGuestAppURL(task.tid, uid).done(function (url) {
+        window.open(url.url);
+      });
+    });
+    var email = $("<div class='guest-email'>")
+      .append(profile.email(prof));
+
+    if (hasEA) {
+      chatHead.addClass("has-ea");
+      nameView.addClass("has-ea");
+      email.addClass("has-ea");
+    }
+
+    v.append(chatHead)
+     .append((nameView)
+       .append(bridgeLink))
+     .append(email);
   }
 
   /* Read-only view of a participant */
   function rowViewOfParticipant(profs, task, guestTbl, guestOptions, uid) {
-    var view = viewOfProfile(profs, task, uid);
+    var ea = sched.assistedBy(uid, guestOptions);
+    var hasEA = util.isNotNull(ea);
+    var view = $("<div class='sched-step1-row'>");
 
     if (sched.isGuest(uid)) {
-      var removeDiv = $("<div class='remove-guest-div'>")
-        .tooltip({"title":"Remove guest"})
+      var edit = $("<button type='button' class='btn btn-default edit-guest-btn'>Edit</button>");
+      var editProfile = $("<li class='edit-profile'><a>Edit profile</a></li>");
+      var remove = $("<li><a class='remove-guest'>Remove guest</a></li>");
+      var editButton = $("<div class='btn-group edit-guest'/>")
+        .append(edit)
+        .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
+          .append($("<span class='caret'/>"))
+          .append($("<span class='sr-only'>Toggle Dropdown</span>")))
+        .append($("<ul class='dropdown-menu pull-right edit-guest-dropdown' role='menu'/>")
+          .append(editProfile)
+          .append(remove))
         .appendTo(view);
-      var remove = $("<img class='remove-guest'/>")
-        .appendTo(removeDiv);
-      svg.loadImg(remove, "/assets/img/x.svg")
-        .then(function(elt) {
-          elt.click(function() {
-            var hosts = sched.getHosts(task);
-            view.remove();
-            updateNextButton(hosts, guestTbl, guestOptions);
-            removeGuest(guestTbl, uid);
-            saveGuests(task, hosts, guestTbl, guestOptions);
-            updateNextButton(hosts, guestTbl, guestOptions);
-          });
+
+      remove.click(function() {
+        var hosts = sched.getHosts(task);
+        view.remove();
+        updateNextButton(hosts, guestTbl, guestOptions);
+        removeGuest(guestTbl, uid);
+        saveGuests(task, hosts, guestTbl, guestOptions);
+        updateNextButton(hosts, guestTbl, guestOptions);
       });
     }
 
-    var ea = sched.assistedBy(uid, guestOptions);
-    if (util.isNotNull(ea)) {
-      view.append(viewOfProfile(profs, task, ea));
+    viewOfProfile(view, profs, task, uid, hasEA);
+
+    if (hasEA) {
+      view.append(viewOfEAProfile(profs, task, ea));
     }
 
     return view;
