@@ -452,8 +452,13 @@ var chat = (function () {
       .appendTo(messages);
     var blankChatIcon = $("<img class='blank-chat-icon'/>")
       .appendTo(blank);
-    svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
-    blank.append("<div>Start the conversation below.</div>");
+    svg.loadImg(blankChatIcon, "/assets/img/blank-chat.svg");
+    if ($("#chat").hasClass("modal-body")) {
+      blank.append($("<div>Start the conversation below.</div>"));
+    } else {
+      blank.append($("<div class='no-messages'>No messages found.</div>"))
+           .append($("<hr/>"));
+    }
 
     if (chat.chat_items.length === 0) {
       blank.removeClass("hide");
@@ -471,7 +476,9 @@ var chat = (function () {
       }
     }
 
-    v.append(chatEditor(blank, messages, chat, task));
+    if ($("#chat").hasClass("modal-body")) {
+      v.append(chatEditor(blank, messages, chat, task));
+    }
 
     return v;
   }

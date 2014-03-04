@@ -202,7 +202,8 @@ var guestTask = function() {
     var loc = $("<div id='loc'/>")
       .appendTo(meetingLoc);
 
-    var locText = chat.locationText(x.location);
+    var locText = "hello";
+    // chat.locationText(x.location);
     if (locText) {
       loc.append(html.text(locText));
     } else {
@@ -500,7 +501,7 @@ var guestTask = function() {
           taskView.append($("<div class='task-section-header'/>")
             .append(messagesIcon)
             .append("<div class='task-section-text'>MESSAGES</div>"));
-          $("#messages").removeClass("hide");
+          $("#chat").removeClass("hide");
           svg.loadImg(guestsIcon, "/assets/img/group.svg");
           svg.loadImg(notesIcon, "/assets/img/edit.svg");
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
@@ -526,7 +527,7 @@ var guestTask = function() {
             .append(viewOfFeedback)
             .appendTo(taskView);
 
-          $("#messages").addClass("hide");
+          $("#chat").addClass("hide");
         }
       }
 
