@@ -308,7 +308,8 @@ var guestTask = function() {
     return view;
   }
 
-  mod.loadTask = function(ta) {
+  mod.loadTask = function(task) {
+    var ta = task.guest_task;
     var answers = {};
 
     function submitButton() {
@@ -505,9 +506,12 @@ var guestTask = function() {
           svg.loadImg(notesIcon, "/assets/img/edit.svg");
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
         } else if (state.calendar_options.length > 0) {
+          var hostName = list.map(task.guest_hosts, function(uid) {
+                  return profile.fullName(profs[uid].prof);
+                }).join(" & ");
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")
-              .text("When can you meet with " + "HOST_NAME" + "?"))
+              .text("When can you meet with " + hostName + "?"))
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
