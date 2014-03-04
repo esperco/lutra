@@ -42,17 +42,31 @@ var sched = (function() {
     return list.inter(mod.getParticipants(task), team.team_leaders);
   };
 
-  mod.getGuests = function(task) {
+  function getGuests(task) {
     var team = login.getTeam();
     return list.diff(mod.getParticipants(task), team.team_leaders);
-  };
+  }
+
+  mod.getGuestOptions = function(task) {
+    return list.toTable(sched.getState(task).participant_options,
+                        function(x){return x.uid;});
+  }
+
+  mod.guestMayAttend = function(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return ! util.isNotNull(options)
+        || false !== options.may_attend;
+  }
+
+  mod.getAttendingGuests = function(task) {
+    var guestOptions = mod.getGuestOptions(task);
+    return list.filter(getGuests(task), function(uid) {
+      return mod.guestMayAttend(uid, guestOptions);
+    });
+  }
 
   mod.forEachParticipant = function(task, f) {
     list.iter(mod.getParticipants(task), f);
-  };
-
-  mod.forEachGuest = function(task, f) {
-    list.iter(mod.getGuests(task), f);
   };
 
   /******************************************/
@@ -220,7 +234,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step2")
-      .attr('disabled', mod.getGuests(ta) <= 0)
+      .attr('disabled', getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
