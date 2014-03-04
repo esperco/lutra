@@ -541,7 +541,7 @@ var sched4 = (function() {
 
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
-    var guests = sched.getGuests(ta);
+    var guests = sched.getAttendingGuests(ta);
     chats = sched.chatsOfTask(ta);
 
     view

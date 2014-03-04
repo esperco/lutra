@@ -34,6 +34,7 @@ COMMON_SOURCES = \
   pusher.js \
   profile.js \
   geo.js \
+  chat.js \
   display.js
 
 APP_SOURCES = \
@@ -46,7 +47,6 @@ APP_SOURCES = \
   sched3.js \
   sched4.js \
   task.js \
-  chat.js \
   settings.js \
   places.js \
   home.js \
@@ -57,7 +57,6 @@ APP_SOURCES = \
 GUESTAPP_SOURCES = \
   guest_api.js \
   guest_task.js \
-  guest_chat.js \
   guest_login.js \
   guest_main.js \
 
