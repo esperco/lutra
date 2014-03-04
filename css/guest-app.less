@@ -601,7 +601,7 @@ hr {
 
 /*** Messages ***/
 
-#messages {
+#chat {
   max-width: 742px;
   margin-left: auto;
   margin-right: auto;
@@ -611,12 +611,30 @@ hr {
   }
 }
 
-#messages-container {
+
+// #messages {
+//   max-width: 742px;
+//   margin-left: auto;
+//   margin-right: auto;
+//   @media (max-width: 767px) {
+//     margin-right: 15px;
+//     margin-left: 15px;
+//   }
+// }
+
+#chat-container {
   margin-top: 7px;
   margin-left: 40px;
   text-align: left;
   white-space: normal;
 }
+
+// #messages-container {
+//   margin-top: 7px;
+//   margin-left: 40px;
+//   text-align: left;
+//   white-space: normal;
+// }
 
 .tab-name {
   padding-top: 2px !important;
@@ -663,7 +681,6 @@ hr {
 
 .blank-chat {
   margin-top: 30px;
-  margin-bottom: 45px;
   text-align: center;
   color: @gray_20;
 }
@@ -673,6 +690,10 @@ hr {
   margin-right: auto;
   margin-bottom: 10px;
   margin-left: auto;
+}
+
+.no-messages {
+  margin-bottom: 45px;
 }
 
 .message-sender {
@@ -693,6 +714,10 @@ hr {
 
 .message-header {
   margin-bottom: 10px;
+}
+
+.header-line-1 {
+  padding-top: 8px;
 }
 
 .header-line-2 {

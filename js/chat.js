@@ -198,7 +198,7 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
-    var line1 = $("<div class='header-line-1'/>")
+    var line1 = $("<div class='header-line-1 clearfix'/>")
       .appendTo(header);
     var fromName = $("<div class='col-xs-6 from-name' />")
       .append(full_name(item.by))
@@ -208,7 +208,7 @@ var chat = (function () {
               .append(date.viewTimeAgo(date.ofString(time))))
       .appendTo(line1);
 
-    var line2 = $("<div class='header-line-2'/>")
+    var line2 = $("<div class='header-line-2 hide'/>")
       .appendTo(header);
     var toName = $("<div class='to-names' />")
       .append("to " + "me")
@@ -452,8 +452,13 @@ var chat = (function () {
       .appendTo(messages);
     var blankChatIcon = $("<img class='blank-chat-icon'/>")
       .appendTo(blank);
-    svg.loadImg(blankChatIcon, "/assets/img/chat.svg");
-    blank.append("<div>Start the conversation below.</div>");
+    svg.loadImg(blankChatIcon, "/assets/img/blank-chat.svg");
+    if ($("#chat").hasClass("modal-body")) {
+      blank.append($("<div>Start the conversation below.</div>"));
+    } else {
+      blank.append($("<div class='no-messages'>No messages found.</div>"))
+           .append($("<hr/>"));
+    }
 
     if (chat.chat_items.length === 0) {
       blank.removeClass("hide");
@@ -471,7 +476,9 @@ var chat = (function () {
       }
     }
 
-    v.append(chatEditor(blank, messages, chat, task));
+    if ($("#chat").hasClass("modal-body")) {
+      v.append(chatEditor(blank, messages, chat, task));
+    }
 
     return v;
   }
