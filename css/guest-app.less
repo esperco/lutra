@@ -675,49 +675,49 @@ hr {
   margin-left: auto;
 }
 
+.message-sender {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin-top: 3px;
+  padding-top: 6px;
+  color: @white;
+  background: @gray_80;
+  text-align: center;
+  border-radius: 3px;
+}
+
+.message {
+  margin-left: 42px;
+}
+
 .message-header {
   margin-bottom: 10px;
 }
 
-.from-name-div {
-  padding-left: 0;
+.header-line-2 {
+  padding-top: 20px;
 }
 
 .from-name {
+  padding-left: 0;
   font-family: @bold;
-  font-size: 12px;
-  color: @gray_60;
+  font-size: 14px;
 }
 
-.timestamp-div {
-  padding-right: 0;
-}
-
-#global-status {
-  cursor: pointer;
-  position: absolute;
-  top: 0px;
-  width: 100%;
-  color: @white;
-  background: @red;
-  border: none;
-  border-radius: 0;
-  z-index:100;
-  &:hover { background: @red_hover; }
-}
-
-.close-status {
-  color: @white;
-}
-
-.message-status,
 .timestamp {
-  float: right;
+  padding-right: 0;
   font-size: 12px;
-  color: @gray_60;
+  text-align: right;
 }
 
-.message {
+.to-names {
+  color: @gray_40;
+  font-size: 14px;
+  font-family: @light;
+}
+
+.message-text {
   font-size: 14px;
 }
 
