@@ -202,8 +202,7 @@ var guestTask = function() {
     var loc = $("<div id='loc'/>")
       .appendTo(meetingLoc);
 
-    var locText = "hello";
-    // chat.locationText(x.location);
+    var locText = chat.locationText(x.location);
     if (locText) {
       loc.append(html.text(locText));
     } else {
