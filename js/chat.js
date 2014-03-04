@@ -198,7 +198,7 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
-    var line1 = $("<div class='header-line-1'/>")
+    var line1 = $("<div class='header-line-1 clearfix'/>")
       .appendTo(header);
     var fromName = $("<div class='col-xs-6 from-name' />")
       .append(full_name(item.by))
@@ -208,7 +208,7 @@ var chat = (function () {
               .append(date.viewTimeAgo(date.ofString(time))))
       .appendTo(line1);
 
-    var line2 = $("<div class='header-line-2'/>")
+    var line2 = $("<div class='header-line-2 hide'/>")
       .appendTo(header);
     var toName = $("<div class='to-names' />")
       .append("to " + "me")
