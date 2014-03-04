@@ -289,7 +289,8 @@ var locpicker = (function() {
       .append(mapView);
 
     return {
-      view: view
+      view: view,
+      getLocation: getLocation
     };
   }
 

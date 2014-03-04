@@ -127,19 +127,26 @@ var sched2 = (function() {
 
     /*** Row controls (save/remove) ***/
 
+    function getCalOption() {
+      var loc = locationForm.getLocation();
+      // TODO to be continued
+    }
+
+    /* TODO: implement getCalOption, and pass calOption to onSave/onRemove */
+
     if (isListRow) {
       var x = listView.createRow(view);
       removeButton
         .click(function () {
           x.remove();
-          onRemove();
+          onRemove(); // wrong argument
         });
 
-      saveButton.click(onSave);
+      saveButton.click(onSave); // wrong argument
     }
     else {
-      removeButton.click(onRemove);
-      saveButton.click(onSave);
+      removeButton.click(onRemove); // wrong argument
+      saveButton.click(onSave); // wrong argument
     }
 
     return(view);

@@ -15,6 +15,98 @@
 var calpicker = (function() {
   var mod = {};
 
+  function createView() {
+'''
+<div #view>
+  <div #calendarView/>
+  <div #textView
+       class="row hide">
+    <div class="col-sm-3">
+      <div class="location-title">Start</div>
+      <div class="bootstrap-timepicker">
+        <input #startInput
+               type="text" class="form-control"/>
+      </div>
+    </div>
+    <div class="col-sm-3 clearfix">
+      <div class="location-title">End</div>
+      <div class="bootstrap-timepicker">
+        <input #endInput
+               type="text" class="form-control"/>
+      </div>
+    </div>
+    <div class="col-sm-6"/>
+  </div>
+</div>
+'''
+    var param = {
+      minuteStep: 5,
+      showSeconds: false
+    };
+    startInput.timepicker(param);
+    endInput.timepicker(param);
+
+    /*
+      Later _view will also contain the following fields:
+      - eventId
+      - eventStart
+      - eventEnd
+     */
+    return _view;
+  }
+
+  function removeEvent(picker) {
+    var id = picker.eventId;
+    if (util.isDefined(id)) {
+      picker.calendarView.fullCalendar('removeEvents', function(calEvent) {
+        return calEvent.id === id;
+      });
+      picker.textView.addClass("hide");
+      delete picker.eventId;
+    }
+    delete picker.eventStart;
+    delete picker.eventEnd;
+  }
+
+  function updateTextView(picker) {
+    var start = picker.eventStart;
+    var end = picker.eventEnd;
+    if (util.isDefined(start)) {
+      picker.startInput.timepicker('setTime', '12:45 AM');
+      picker.endInput.timepicker('setTime', '12:55 AM');
+      picker.textView.removeClass("hide");
+    }
+    else
+      removeEvent(picker);
+  }
+
+  /*
+    Clear previous selection if any,
+    create new calendar event and populate input boxes
+  */
+  function initEvent(picker, start, end) {
+    removeEvent(picker);
+
+    var eventId = util.randomString();
+    picker.eventId = eventId;
+    picker.eventStart = start;
+    picker.eventEnd = end;
+
+    var eventData = {
+      id: eventId,
+      title: "",
+      start: start,
+      end: end,
+      color: "#ff0000",
+      editable: true
+    };
+    var stick = true;
+    picker.calendarView.fullCalendar('renderEvent', eventData, stick);
+    picker.calendarView.fullCalendar('unselect');
+
+    updateTextView(picker);
+  }
+
   function fetchEvents(start, end, tz, callback) {
     api.postCalendar(login.leader(), {
       timezone: tz,
@@ -25,36 +117,17 @@ var calpicker = (function() {
     });
   }
 
-  function onSelect(calendarView, start, end) {
-    var eventData = {
-      id: util.randomString(),
-      title: "",
-      start: start,
-      end: end,
-      color: "#ff0000",
-      editable: true
-    };
-    var stick = true;
-    calendarView.fullCalendar('renderEvent', eventData, stick);
-    calendarView.fullCalendar('unselect');
-  }
-
   mod.createPicker = function(param) {
+    var picker = createView();
+    var calendarView = picker.calendarView;
     var tz = param.timezone;
-    var setCalEventDate = param.selCalEventDate;
-
-    var calendarView = $("<div>");
-    var newEvent;
 
     function select(start, end) {
-      onSelect(calendarView, start, end);
+      initEvent(picker, start, end);
     }
 
     function eventClick(calEvent, jsEvent, view) {
-      var id = calEvent.id;
-      calendarView.fullCalendar('removeEvents', function(calEvent) {
-        return calEvent.id === id;
-      });
+      removeEvent(picker);
     }
 
     api.postCalendar(login.leader(), {
@@ -78,9 +151,9 @@ var calpicker = (function() {
         events: fetchEvents
       });
     });
+
     return {
-      view: calendarView,
-      setCalEventDate: setCalEventDate
+      view: picker.view
     };
   }
 

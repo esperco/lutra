@@ -13,6 +13,7 @@
     <link href="/assets/css/font-awesome.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
+    <link href="/assets/css/bootstrap-timepicker.min.css" rel="stylesheet">
   </head>
 
   <body>
@@ -334,6 +335,8 @@
     <script src="/assets/js/jquery-ui.custom.min.js"></script>
     <script src="/assets/js/moment.min.js"></script>
     <script src="/assets/js/fullcalendar.min.js"></script>
+    <script src="/assets/js/fullcalendar.min.js"></script>
+    <script src="/assets/js/bootstrap-timepicker.min.js"></script>
 
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>

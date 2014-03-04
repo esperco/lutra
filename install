@@ -34,6 +34,9 @@ cp $libs/fullcalendar/fullcalendar/fullcalendar.min.js pub/js
 cp $libs/fullcalendar/lib/moment.min.js pub/js
 cp $libs/fullcalendar/lib/jquery-ui.custom.min.js pub/js
 
+cp $libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js pub/js
+cp $libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css pub/css
+
 ### Build our own code and copy the result into the pub directory
 make -C js $mode-install
 cp css/*.css pub/css

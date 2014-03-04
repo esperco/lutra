@@ -32,6 +32,14 @@ rm -rf fullcalendar
 unzip fullcalendar-2.0.0-beta2.zip
 mv fullcalendar-2.0.0-beta2 fullcalendar
 
+rm -rf bootstrap-timepicker
+tar xzf bootstrap-timepicker-0.2.6.tar.gz
+mv bootstrap-timepicker-0.2.6 bootstrap-timepicker
+# Edit for Bootstrap 3, based on the following pull request:
+# https://github.com/jdewit/bootstrap-timepicker/pull/215/files
+sed -i -e 's/icon-chevron/glyphicon glyphicon-chevron/g' \
+  bootstrap-timepicker/js/bootstrap-timepicker*.js
+
 # oblivion preprocessor, requires ocaml.
 # We install it manually so we don't depend on an opam setup
 cd "$ROOT"
