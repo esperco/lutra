@@ -1952,15 +1952,6 @@ object {
   border: 1px solid @gray_40;
 }
 
-.add-guest-circ {
-  float: left;
-  width: 40px;
-  height: 40px;
-  margin-top: 1px;
-  border-radius: 20px;
-  text-align: center;
-}
-
 .relationship-branch {
   float: left;
   width: 20px;
@@ -2011,24 +2002,13 @@ object {
   margin-right: 2px;
 }
 
-.edit-guest-dropdown {
-  float: right;
-}
-
-.edit-profile {
-  cursor: pointer;
-}
-
-.remove-guest {
-  color: @red !important;
-  cursor: pointer;
-  &:hover {
-    color: @white !important;
-    background: @red !important;
-  }
-}
-
 .add-guest-circ {
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-top: 1px;
+  border-radius: 20px;
+  text-align: center;
   background: @purple;
   &:hover {
     background: @purple_hover;
@@ -2061,18 +2041,23 @@ object {
 }
 
 #add-guest-text {
-  // float: left;
   margin-top: 9px;
   margin-left: 55px;
   cursor: pointer;
 }
 
-#max-guests-text {
+.communicate-ea {
+  cursor: pointer;
+  &:hover path.checkbox { stroke: @gray_40; }
+}
+
+.ea-checkbox {
   float: left;
-  margin-top: 14px;
-  margin-left: 18px;
-  font-family: @italic;
-  color: @gray_60;
+}
+
+.communicate-ea-text {
+  margin-left: 24px;
+  font-size: 14px;
 }
 
 #guest-input-div {

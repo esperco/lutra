@@ -106,10 +106,11 @@ var sched1 = (function() {
     var addGuest = $("<div id='add-guest-text' class='unselectable'/>")
       .append($("<a>Add guest</a>"));
 
-    var eaCheck = $("<div/>");
-    var checkbox = $("<img/>").appendTo(eaCheck);
+    var eaCheck = $("<div class='communicate-ea'/>");
+    var checkbox = $("<img class='ea-checkbox'/>").appendTo(eaCheck);
     svg.loadImg(checkbox, "/assets/img/checkbox-sm.svg");
-    eaCheck.append("Communicate with this guest's assistant");
+    eaCheck.append($("<div class='communicate-ea-text'/>")
+      .text("Communicate with this guest's assistant"));
 
     var edit, eaEdit;
     function updateAddButton() {
