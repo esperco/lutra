@@ -112,20 +112,46 @@ var guestTask = function() {
   }
 
   function viewOfGuestRow(x, myName) {
-    var view = $("<tr/>");
+    var view = $("<div class='guest-row clearfix'/>");
 
-    var main = $("<td class='guest-main'/>")
+    var main = $("<div class='guest-main col-sm-5'/>")
       .appendTo(view);
     var name = profile.fullName(x);
-
-    if (name != myName) {
-      main.append($("<span class='guest-name'/>").append(name))
-          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
-    } else {
-      main.append($("<span class='guest-name'/>").append(name))
-          .append($("<span id='me-label'>me</span>"))
-          // .append($("<div class='linkedin-title'>Designer at Esper</div>"));
+    var nameDiv = $("<div class='guest-name ellipsis'/>")
+      .append(name)
+      .appendTo(main);
+    if (name === myName) {
+      nameDiv.append($("<span id='me-label'>me</span>"));
     }
+    // var linkedinIcon = $("<img class='linkedin-icon'/>");
+    // var linkedin = $("<div class='linkedin-title'/>")
+    //   .append(linkedinIcon)
+    //   .append($("<div class='linkedin-text ellipsis'/>")
+    //     .text("Designer at Esper"));
+    // svg.loadImg(linkedinIcon, "/assets/img/linkedin-sq.svg");
+    // linkedin.click(function() {
+    //   window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
+    // })
+    // main.append(linkedin);
+
+    // var emailIcon = $("<img class='email-icon'/>");
+    // var email = $("<div class='guest-email col-sm-4'/>")
+    //   .append(emailIcon)
+    //   .append($("<div class='email-address ellipsis'/>")
+    //     .text("nick@esper.com"));
+    // svg.loadImg(emailIcon, "/assets/img/email.svg");
+    // email.click(function() {
+    //   window.open("http://www.linkedin.com/vsearch/f?type=all&keywords=" + name);
+    // })
+    // view.append(email);
+
+    // var phoneIcon = $("<img class='phone-icon'/>");
+    // var phone = $("<div class='guest-phone col-sm-3'/>")
+    //   .append(phoneIcon)
+    //   .append($("<div class='phone-number ellipsis'/>")
+    //     .text("(555) 555-5555"));
+    // svg.loadImg(phoneIcon, "/assets/img/phone.svg");
+    // view.append(phone);
 
     return view;
   }
@@ -458,7 +484,7 @@ var guestTask = function() {
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
-          var participantListView = $("<table id='guest-table'/>");
+          var participantListView = $("<div id='guests'/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
             participantListView.append(viewOfGuestRow(profs[uid].prof, myName));
           });
@@ -481,7 +507,7 @@ var guestTask = function() {
         } else if (state.calendar_options.length > 0) {
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")
-              .text("Select the meeting options that work for you."))
+              .text("When can you meet with " + "HOST_NAME" + "?"))
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);

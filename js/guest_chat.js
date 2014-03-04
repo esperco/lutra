@@ -12,6 +12,11 @@ var chat = (function () {
     return p ? profile.fullName(p) : "John Doe";
   }
 
+  function initials(uid) {
+    var p = profiles[uid].prof;
+    return profile.veryShortNameOfProfile(p);
+  }
+
   function chat_participant_names(chat) {
     var me = login.me();
     var names = null;
@@ -197,111 +202,122 @@ var chat = (function () {
   }
 
   function viewOfChatItem(item, time, status) {
-    var v = $("<div/>");
-    var header = $("<div class='message-header clearfix' />")
-      .appendTo(v);
+    var view = $("<div/>");
 
-    var name = $("<div class='col-xs-6 from-name-div' />")
-      .appendTo(header);
-    name.append(
-      $("<div class='from-name' />")
-        .append(full_name(item.by))
-    );
+    var sender = $("<div class='message-sender'/>")
+      .append(initials(item.by))
+      .appendTo(view);
 
-    var timestamp = $("<div class='col-xs-6 timestamp-div' />")
+    var message = $("<div class='message'/>")
+      .appendTo(view);
+    var header = $("<div class='message-header' />")
+      .appendTo(message);
+
+    var line1 = $("<div class='header-line-1'/>")
       .appendTo(header);
-    timestamp
+    var fromName = $("<div class='col-xs-6 from-name' />")
+      .append(full_name(item.by))
+      .appendTo(line1);
+    var timestamp = $("<div class='col-xs-6 timestamp' />")
       .append($("<div class='timestamp' />")
-              .append(date.viewTimeAgo(date.ofString(time))));
+              .append(date.viewTimeAgo(date.ofString(time))))
+      .appendTo(line1);
 
-    v.append($("<div class='message'/>").append(viewOfChatData(item)));
-    // v.append($("<div class='message-status' />").append(status));
-    v.append($("<hr/>"));
-    return v;
+    var line2 = $("<div class='header-line-2'/>")
+      .appendTo(header);
+    var toName = $("<div class='to-names' />")
+      .append("to " + "me")
+      .appendTo(line2);
+
+    message.append($("<div class='message-text'/>").append(viewOfChatData(item)));
+    // message.append($("<div class='message-status' />").append(status));
+    view.append($("<hr/>"));
+
+    return view;
   }
 
   function statusOfChatItem(item) {
     return item.time_read ? "Read" : "Posted";
   }
 
-  function editChoiceOption() {
-    var v = $("<li class='option'/>");
-    var radio = $("<div class='option-radio'/>")
-      .appendTo(v);
+  // function editChoiceOption() {
+  //   var v = $("<li class='option'/>");
+  //   var radio = $("<div class='option-radio'/>")
+  //     .appendTo(v);
 
-    var editDiv = $("<div class='options-input'/>");
-    var edit = $("<input class='form-control'/>")
-      .appendTo(editDiv);
-    v.append(editDiv);
+  //   var editDiv = $("<div class='options-input'/>");
+  //   var edit = $("<input class='form-control'/>")
+  //     .appendTo(editDiv);
+  //   v.append(editDiv);
 
-    edit.keyup(function (e) {
-      switch (e.which) {
-      case 13:
-        if (edit.val() !== "") {
-          var li = editChoiceOption();
-          removeChoiceOption(li);
-          v.after(li);
-          li.find("input").focus();
-        }
-        return false;
+  //   edit.keyup(function (e) {
+  //     switch (e.which) {
+  //     case 13:
+  //       if (edit.val() !== "") {
+  //         var li = editChoiceOption();
+  //         removeChoiceOption(li);
+  //         v.after(li);
+  //         li.find("input").focus();
+  //       }
+  //       return false;
 
-      case 8:
-      case 46:
-        if (edit.val() === "" && 2 < v.parent().children().length) {
-          v.prev().find("input").focus();
-          v.remove();
-          return false;
-        } else {
-          return true;
-        }
+  //     case 8:
+  //     case 46:
+  //       if (edit.val() === "" && 2 < v.parent().children().length) {
+  //         v.prev().find("input").focus();
+  //         v.remove();
+  //         return false;
+  //       } else {
+  //         return true;
+  //       }
 
-      default:
-        return true;
-      }
-    });
+  //     default:
+  //       return true;
+  //     }
+  //   });
 
-    return v;
-  }
+  //   return v;
+  // }
 
-  function removeChoiceOption(li) {
-    var deleteDiv = $("<div/>");
-    var x = $("<img class='option-delete'/>")
-        .appendTo(deleteDiv);
-    svg.loadImg(x, "/assets/img/delete.svg");
+  // function removeChoiceOption(li) {
+  //   var deleteDiv = $("<div/>");
+  //   var x = $("<img class='option-delete'/>")
+  //       .appendTo(deleteDiv);
+  //   svg.loadImg(x, "/assets/img/delete.svg");
 
-    deleteDiv.click(function() {
-      li.prev().find("input").focus();
-      li.remove();
-    });
+  //   deleteDiv.click(function() {
+  //     li.prev().find("input").focus();
+  //     li.remove();
+  //   });
 
-    deleteDiv.appendTo(li);
-  }
+  //   deleteDiv.appendTo(li);
+  // }
 
-  function buttonToAddChoiceOption() {
-    var v = $("<li class='option'/>");
-    var emptyRadio = $("<div class='option-radio add-option-radio'/>");
-    emptyRadio.appendTo(v);
+  // function buttonToAddChoiceOption() {
+  //   var v = $("<li class='option'/>");
+  //   var emptyRadio = $("<div class='option-radio add-option-radio'/>");
+  //   emptyRadio.appendTo(v);
 
-    var button = $("<button class='add-option-btn'>Click to add option</button>");
-    button.click(function() {
-      var li = editChoiceOption();
-      removeChoiceOption(li);
-      v.before(li);
-      li.find("input").focus();
-    });
+  //   var button = $("<button class='add-option-btn'>Click to add option</button>");
+  //   button.click(function() {
+  //     var li = editChoiceOption();
+  //     removeChoiceOption(li);
+  //     v.before(li);
+  //     li.find("input").focus();
+  //   });
 
-    v.append(button);
+  //   v.append(button);
 
-    return v;
-  }
+  //   return v;
+  // }
 
-  function editChoices() {
-    var v = $("<ul class='option-list'/>");
-    var opt1 = editChoiceOption()
-      .appendTo(v);
-    v.append(buttonToAddChoiceOption());
-    return v;
-  }
+  // function editChoices() {
+  //   var v = $("<ul class='option-list'/>");
+  //   var opt1 = editChoiceOption()
+  //     .appendTo(v);
+  //   v.append(buttonToAddChoiceOption());
+  //   return v;
+  // }
 
   function selector_q_data(text, choices) {
     var sel = [];
@@ -349,27 +365,27 @@ var chat = (function () {
     var sendDiv = $("<div class='col-xs-2 chat-send'/>")
       .appendTo(chatActions);
 
-    var selChoices = $("<img class='offer-choices-checkbox'/>");
-    selChoicesDiv.append(selChoices);
-    svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
-    var selChoicesLabel = $("<div/>", {
-      'class': "offer-choices-label unselectable",
-      'text': "Offer multiple choice response."
-    });
-    selChoicesDiv.append(selChoicesLabel);
+    // var selChoices = $("<img class='offer-choices-checkbox'/>");
+    // selChoicesDiv.append(selChoices);
+    // svg.loadImg(selChoices, "/assets/img/checkbox-sm.svg");
+    // var selChoicesLabel = $("<div/>", {
+    //   'class': "offer-choices-label unselectable",
+    //   'text': "Offer multiple choice response."
+    // });
+    // selChoicesDiv.append(selChoicesLabel);
 
-    selChoicesDiv.click(function () {
-      if (selChoicesDiv.hasClass("checkbox-selected")) {
-        selChoicesDiv.removeClass("checkbox-selected");
-        util.cancelFocus();
-      } else {
-        selChoicesDiv.addClass("checkbox-selected");
-        var first = choicesEditor.children().eq(0).find("input");
-        util.changeFocus(first);
-      }
-      choicesEditor.toggle();
-      util.focus();
-    });
+    // selChoicesDiv.click(function () {
+    //   if (selChoicesDiv.hasClass("checkbox-selected")) {
+    //     selChoicesDiv.removeClass("checkbox-selected");
+    //     util.cancelFocus();
+    //   } else {
+    //     selChoicesDiv.addClass("checkbox-selected");
+    //     var first = choicesEditor.children().eq(0).find("input");
+    //     util.changeFocus(first);
+    //   }
+    //   choicesEditor.toggle();
+    //   util.focus();
+    // });
 
     var sendButton = $("<button/>")
       .addClass('btn btn-primary chat-send-btn disabled')
@@ -399,16 +415,16 @@ var chat = (function () {
         editText.val("");
         editText.attr("placeholder", "Write a reply...");
 
-        if (selChoicesDiv.hasClass("checkbox-selected")) {
-          choicesEditor.toggle();
-          selChoicesDiv.removeClass("checkbox-selected");
-          var numOptions = choicesEditor.children().length-1;
-          if (numOptions > 1) {
-            for (var i=numOptions-1; i>0; i--) {
-              choicesEditor.children().eq(i).remove();
-            }
-          }
-        }
+        // if (selChoicesDiv.hasClass("checkbox-selected")) {
+        //   choicesEditor.toggle();
+        //   selChoicesDiv.removeClass("checkbox-selected");
+        //   var numOptions = choicesEditor.children().length-1;
+        //   if (numOptions > 1) {
+        //     for (var i=numOptions-1; i>0; i--) {
+        //       choicesEditor.children().eq(i).remove();
+        //     }
+        //   }
+        // }
 
         if (chat.chat_items.length === 0) {
           blank.addClass("hide");
@@ -427,7 +443,7 @@ var chat = (function () {
     var view = $("#chat" + item.chatid + " .messages");
     if (0 < view.length) {
       var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-      view.append(tempItemView);
+      view.prepend(tempItemView);
 
       var key = ++observeChatPosted;
       observable.onChatPosted.observe(key, function(item) {
@@ -441,14 +457,6 @@ var chat = (function () {
   function chatView(chat, task) {
     var me = login.me();
     var v = $("<div/>");
-
-    // var displayName = $("<div class='from-details'></div>")
-    //   .appendTo(v);
-    // if (chat.chatid === task.task_context_chat) {
-    //   displayName.append("Group Conversation");
-    // } else {
-    //   displayName.append(chat_participant_names(chat));
-    // }
 
     var messages = $("<div class='messages'></div>")
       .appendTo(v);
@@ -474,17 +482,9 @@ var chat = (function () {
         } else {
           status = statusOfChatItem(item);
         }
-        messages.append(viewOfChatItem(item, item.time_created, status));
+        messages.prepend(viewOfChatItem(item, item.time_created, status));
       }
     }
-
-    // if (chat.chatid === task.task_context_chat) {
-    //   var toField = $("<div class='to-field'/>")
-    //     .appendTo(v);
-    //   toField.append($("<b>To:</b>"));
-    //   toField.append(" " + chat_participant_names(chat));
-    //   messages.addClass("group-chat");
-    // }
 
     // v.append(chatEditor(blank, messages, chat, task));
 
