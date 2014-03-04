@@ -308,10 +308,7 @@ var guestTask = function() {
           }
         }
 
-        var sel = [];
-        for (var label in answers) {
-          sel.push(answers[label]);
-        }
+        var sel = list.ofTable(answers);
         if (sel.length <= 0) {
           postMessage(null);
         } else {
