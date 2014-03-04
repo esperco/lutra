@@ -263,7 +263,7 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(x.calendar_event_title,
+      window.open(googleCalendarURL(x.calendar_event_title.title_text,
                                     window.location,
                                     x.reserved.slot));
     })
@@ -290,7 +290,10 @@ var guestTask = function() {
 
   function viewOfMeetingHeader(ta, state) {
     return view = $("<div id='meeting-header'/>")
-      .append($("<div id='meeting-title'/>").text(state.calendar_event_title))
+      .append(
+        $("<div id='meeting-title'/>")
+          .text(state.calendar_event_title.title_text)
+      )
       .append(addToCalendar(ta, state));
   }
 
@@ -308,7 +311,8 @@ var guestTask = function() {
     return view;
   }
 
-  mod.loadTask = function(ta) {
+  mod.loadTask = function(task) {
+    var ta = task.guest_task;
     var answers = {};
 
     function submitButton() {
@@ -505,9 +509,12 @@ var guestTask = function() {
           svg.loadImg(notesIcon, "/assets/img/edit.svg");
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
         } else if (state.calendar_options.length > 0) {
+          var hostName = list.map(task.guest_hosts, function(uid) {
+                  return profile.fullName(profs[uid].prof);
+                }).join(" & ");
           var select = $("<div id='guest-select'/>")
             .append($("<div id='options-title'/>")
-              .text("When can you meet with " + "HOST_NAME" + "?"))
+              .text("When can you meet with " + hostName + "?"))
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);

@@ -131,7 +131,7 @@ var chat = (function () {
   }
 
   function appendLocation(elt, loc) {
-    var locText = sched.locationText(loc);
+    var locText = mod.locationText(loc);
     if (locText) {
       $("<span/>")
         .text("Location: " + locText)

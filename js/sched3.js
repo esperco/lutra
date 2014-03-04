@@ -220,13 +220,20 @@ var sched3 = (function() {
       }
     })
 
-    $("#sched-options-guest-addr").val("Address_directly");
     var parameters = {
-      template_kind: "Options_to_guest",
       exec_name: hostName,
       guest_name: toName,
       guest_uid: toUid
     };
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Options_to_guest_assistant";
+      $("#sched-options-guest-addr").val("Address_to_assistant");
+    } else {
+      parameters.template_kind = "Options_to_guest";
+      $("#sched-options-guest-addr").val("Address_directly");
+    }
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
         $("#sched-availability-message").val(optionsMessage.message_text);
@@ -325,6 +332,12 @@ var sched3 = (function() {
         if (! sendButton.hasClass("disabled")) {
           sendButton.addClass("disabled");
           var body = $("#sched-availability-message").val();
+          if ("Address_to_assistant" === $("#sched-options-guest-addr").val()) {
+            var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
+            if (util.isNotNull(ea)) {
+              uid = ea;
+            }
+          }
           var chatid = chats[uid].chatid;
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
