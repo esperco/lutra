@@ -52,6 +52,11 @@ var sched = (function() {
                         function(x){return x.uid;});
   }
 
+  mod.assistedBy = function(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return util.isNotNull(options) ? options.assisted_by : null;
+  }
+
   mod.guestMayAttend = function(uid, guestOptions) {
     var options = guestOptions[uid];
     return ! util.isNotNull(options)

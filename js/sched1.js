@@ -7,6 +7,15 @@ var sched1 = (function() {
 
   var nextButton = $(".sched-step1-next");
 
+  function getGuestOptions(guestOptions, uid) {
+    var options = guestOptions[uid];
+    if (! util.isNotNull(options)) {
+      options = {uid:uid};
+      guestOptions[uid] = options;
+    }
+    return options;
+  }
+
   function editGuest(updateAddButton) {
     var edit = {};
 
@@ -195,22 +204,11 @@ var sched1 = (function() {
             task.task_participants.organized_for.push(uid);
           });
           profile.profilesOfTaskParticipants(task).then(function(profs) {
-            var options = guestOptions[uids[0]];
-            if (util.isNotNull(options)) {
-              options.may_attend = true;
+            var options = getGuestOptions(guestOptions, uids[0]);
+            if (uids.length < 2) {
+              delete options.assisted_by;
             } else {
-              options = {uid:uids[0]};
-            }
-            if (uids.length >= 2) {
               options.assisted_by = uids[1];
-              guestOptions[uids[0]] = options;
-
-              var eaOptions = guestOptions[uids[1]];
-              if (util.isNotNull(eaOptions)) {
-                delete eaOptions.assisted_by;
-              } else {
-                guestOptions[uids[1]] = {uid:uids[1], may_attend:false};
-              }
             }
             guestsContainer.append(
               rowViewOfParticipant(profs, task, guestTbl, guestOptions,
@@ -232,32 +230,28 @@ var sched1 = (function() {
     };
   }
 
-  function assistedBy(uid, guestOptions) {
-    var options = guestOptions[uid];
-    return util.isNotNull(options) ? options.assisted_by : null;
-  }
-
-  /* Read-only view of a participant */
-  function rowViewOfParticipant(profs, task, guestTbl, guestOptions, uid) {
+  function viewOfProfile(profs, task, uid) {
     var view = $("<div class='sched-step1-row'>");
-    var obsProf = profs[uid];
-    var prof = obsProf.prof;
-    var hosts = sched.getHosts(task);
+    var prof = profs[uid].prof;
     var chatHead = profile.viewMediumCirc(prof);
     var nameView = profile.viewMediumFullName(prof);
-
     var bridgeButton = $("<button>bridge</button>").click(function() {
       api.getGuestAppURL(task.tid, uid).done(function (url) {
         window.location.assign(url.url);
       });
     });
-
     view
       .append(chatHead)
       .append(nameView)
       .append(bridgeButton);
+    return view;
+  }
 
-    if (sched.isGuest(uid) && sched.guestMayAttend(uid, guestOptions)) {
+  /* Read-only view of a participant */
+  function rowViewOfParticipant(profs, task, guestTbl, guestOptions, uid) {
+    var view = viewOfProfile(profs, task, uid);
+
+    if (sched.isGuest(uid)) {
       var removeDiv = $("<div class='remove-guest-div'>")
         .tooltip({"title":"Remove guest"})
         .appendTo(view);
@@ -266,6 +260,7 @@ var sched1 = (function() {
       svg.loadImg(remove, "/assets/img/x.svg")
         .then(function(elt) {
           elt.click(function() {
+            var hosts = sched.getHosts(task);
             view.remove();
             updateNextButton(hosts, guestTbl, guestOptions);
             removeGuest(guestTbl, uid);
@@ -275,9 +270,9 @@ var sched1 = (function() {
       });
     }
 
-    var ea = assistedBy(uid, guestOptions);
+    var ea = sched.assistedBy(uid, guestOptions);
     if (util.isNotNull(ea)) {
-      view.append(rowViewOfParticipant(profs,task,guestTbl,guestOptions, ea));
+      view.append(viewOfProfile(profs, task, ea));
     }
 
     return view;
@@ -285,19 +280,25 @@ var sched1 = (function() {
 
   function collectGuests(hosts, guestTbl, guestOptions) {
     var result = {};
-    for (var uid in guestTbl) {
+    function addResult(uid, mayAttend) {
       result[uid] = uid;
+      getGuestOptions(guestOptions, uid).may_attend = mayAttend;
     }
+
     for (var uid in guestOptions) {
       var options = guestOptions[uid];
       if (util.isNotNull(options.assisted_by)
        && util.isNotNull(guestTbl[uid])) {
-        result[options.assisted_by] = options.assisted_by
+        addResult(options.assisted_by, false);
       }
+    }
+    for (var uid in guestTbl) {
+      addResult(uid, true);
     }
     list.iter(hosts, function(uid) {
       delete result[uid];
     });
+
     return list.ofTable(result);
   }
 
