@@ -236,7 +236,7 @@ var sched1 = (function() {
     var nameView = profile.viewMediumFullName(prof).addClass("ea-name");
     var bridgeLink = $("<a class='bridge-link'>View Bridge</a>").click(function() {
       api.getGuestAppURL(task.tid, uid).done(function (url) {
-        window.location.assign(url.url);
+        window.open(url.url);
       });
     });
     var email = $("<div class='ea-email'>")
@@ -256,7 +256,7 @@ var sched1 = (function() {
     var nameView = profile.viewMediumFullName(prof).addClass("guest-name");
     var bridgeLink = $("<a class='bridge-link'>View Bridge</a>").click(function() {
       api.getGuestAppURL(task.tid, uid).done(function (url) {
-        window.location.assign(url.url);
+        window.open(url.url);
       });
     });
     var email = $("<div class='guest-email'>")
