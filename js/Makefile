@@ -28,6 +28,7 @@ SOURCES = \
   email.js \
   cache.js \
   svg.js \
+  adder.js \
   show.js \
   editor.js \
   select.js \

@@ -79,7 +79,7 @@ var calpicker = (function() {
       });
     });
     return {
-      calendarView: calendarView,
+      view: calendarView,
       setCalEventDate: setCalEventDate
     };
   }

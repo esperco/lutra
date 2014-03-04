@@ -5,43 +5,15 @@
 var sched2 = (function() {
   var mod = {};
 
+  function saveAndReload(ta) {
+    api.postTask(ta)
+      .done(function(task) { sched.loadTask(task); });
+  }
+
   var step2Selector = show.create({
     "sched-step2-connect": {ids: ["sched-step2-connect"]},
     "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
   });
-
-  // Set in loadStep2Prefs, used by geocodeAddress
-  var timeZoneDropdown = null;
-
-  function getLocation() {
-    var addr = $("#sched-step2-loc-addr").val();
-    var notes = $("#sched-step2-loc-notes").val();
-    return {
-      title: addr,
-      address: addr,
-      instructions: notes,
-      timezone: timeZoneDropdown.get()
-    };
-  }
-
-  function loadLocation(locations) {
-    if (locations && locations.length > 0) {
-      var loc = locations[0];
-      $("#sched-step2-loc-addr").val(loc.address);
-      if (loc.timezone) {
-        timeZoneDropdown.set(loc.timezone);
-      }
-    }
-  }
-
-  function labelSlots(slots) {
-    return list.map(slots, function(x) {
-      return {
-        label: util.randomString(),
-        slot: x
-      };
-    });
-  }
 
   /* Record the options for the meeting selected by the user
      and move on to step 3. */
@@ -50,16 +22,10 @@ var sched2 = (function() {
     ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page
 
-    /* TODO: reserve calendar slots for leader of organizing team,
-             unreserve previously-reserved calendar slots */
-    x.calendar_options = labelSlots(slots);
-
-    /* reset further fields */
-    delete x.availabilities;
+    /* Cancel whatever was previously reserved */
     delete x.reserved;
 
-    api.postTask(ta)
-      .done(function(task) { sched.loadTask(task); });
+    saveAndReload(ta);
   }
 
   /*
@@ -91,76 +57,148 @@ var sched2 = (function() {
   /*
     Create a view and everything needed to display and edit location
     and time for a meeting option.
-    The input is an object with mutable fields
-    for place and time, which may or may not be set to initial values.
   */
-  function createMeetingOptionPicker(data) {
-    /* meeting type */
+  function loadMeetingOption(tzList, listView, calOption,
+                             onSave, onRemove, isListRow) {
+    '''
+<div #view>
+  <div #adder/>
+  <div #form/>
+  <div class="clearfix">
+    <div class="col-sm-3">
+      <div class="location-title">Meeting Type</div>
+      <div #meetingTypeContainer/>
+    </div>
+    <div class="col-sm-9"/>
+  </div>
+  <div #locationContainer/>
+  <div #calendarContainer/>
+  <button #removeButton class="btn btn-default">Remove</button>
+  <button #saveButton class="btn btn-primary">Save</button>
+</div>
+'''
+    var x = calOption.slot;
+
+    /*** Meeting type ***/
+
+    if (! util.isNonEmptyString(x.meeting_type))
+      x.meeting_type = "Meeting";
 
     function setMeetingType(meetingType) {
-      log(meetingType);
+      x.meeting_type = meetingType;
     }
 
     var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
+    meetingTypeContainer.append(meetingTypeSelector.view);
 
-    /* location */
-
-    var location = locpicker.create({});
-
-    /* date and time */
+    /*** Meeting date and time, shown only once a timezone is set ***/
 
     function setTextEventDate(start, end) {
+      log(start, end);
     }
 
-    var calendar = calpicker.createPicker({
-      timezone: "America/Los_Angeles",
-      setTextEventDate: setTextEventDate
+    function updateCalendar(timezone) {
+      calendarContainer.children().remove();
+
+      if (util.isNonEmptyString(timezone)) {
+        var calendar = calpicker.createPicker({
+          timezone: timezone,
+          setTextEventDate: setTextEventDate
+        });
+        calendarContainer
+          .append(calendar.view);
+      }
+    }
+
+    //var setCalEventDate = calendar.setCalEventDate;
+
+    /*** Meeting location ***/
+
+    var loc = x.location;
+    if (util.isDefined(loc)) {
+      var timezone = loc.timezone;
+      if (util.isNonEmptyString(timezone))
+        updateCalendar(timezone);
+    }
+    var locationForm = locpicker.create({
+      onTimezoneChange: updateCalendar
     });
+    locationContainer.append(locationForm.view);
 
-    var setCalEventDate = calendar.setCalEventDate;
+    /*** Row controls (save/remove) ***/
 
-'''
-<div #view>
-  <div class="row">
-    <div class="col-sm-3">{{meetingTypeSelector.view}}</div>
-    <div class="col-sm-9"/>
-  </div>
-  {{location.locationView}}
-  {{calendar.calendarView}}
-</div>
-'''
+    if (isListRow) {
+      var x = listView.createRow(view);
+      removeButton
+        .click(function () {
+          x.remove();
+          onRemove();
+        });
 
-    return view;
+      saveButton.click(onSave);
+    }
+    else {
+      removeButton.click(onRemove);
+      saveButton.click(onSave);
+    }
+
+    return(view);
   }
 
-  function loadStep2Prefs(tzList, task) {
+  function createMeetingOption(tzList, listView,
+                               onSave, onRemove, isListRow) {
+    var calOption = {
+      label: util.randomString(),
+      slot: {}
+    };
+    return loadMeetingOption(tzList, listView, calOption, onSave, onRemove);
+  }
+
+  function saveOption(ta, calOption) {
+    var schedState = sched.getState(ta);
+    var label = calOption.label;
+    var options = schedState.calendar_options;
+    if (list.exists(options, function(x) { return x.label === label; })) {
+      schedState.calendar_options =
+        list.replace(options, calOption, function(x) {
+          return x.label === label;
+        });
+    }
+    else
+      options.push(calOption);
+    saveAndReload(ta);
+  }
+
+  function removeOption(ta, calOption) {
+    var schedState = sched.getState(ta);
+    var label = calOption.label;
+    schedState.calendar_options =
+      list.filter(schedState.calendar_options, function(x) {
+        return x.label !== label;
+      });
+    saveAndReload(ta);
+  }
+
+  function loadMeetingOptions(tzList, ta) {
     var view = $("#sched-step2-option-list");
     view.children().remove();
 
-    var meetingOption = {};
-    view.append(createMeetingOptionPicker(meetingOption));
+    function save(calOption) { return saveOption(ta, calOption); }
+    function remove(calOption) { return removeOption(ta, calOption); }
 
-/*
-    var grid = $("<div/>")
-      .appendTo(view);
+    function createAdderForm() {
+      return createMeetingOption(tzList, listView, save, remove, false);
+    }
 
-    var colType = $("<div class='col-sm-4'/>")
-      .appendTo(grid);
-    var colDuration = $("<div class='col-sm-4'/>")
-      .appendTo(grid);
-    var colUrgency = $("<div class='col-sm-4'/>")
-      .appendTo(grid);
-
-    var optionType = $("<div class='pref-time-title'>Meeting Type</div>")
-      .appendTo(colType);
-    var optionTimeZone = $("<div class='location-title'>Time Zone</div>")
-      .appendTo(viewTimeZone);
-
-    sel1.view.appendTo(colType);
-
-    var q = taskMeetingParam(task);
-    loadLocation(q.location);
-*/
+    var schedState = sched.getState(ta);
+    var listView = adder.createList({
+      maxLength: 3,
+      createAdderForm: createAdderForm
+    });
+    view.append(listView.view);
+    list.iter(schedState.calendar_options, function(x) {
+      loadMeetingOption(tzList, listView, x, save, remove, true);
+    });
 
     step2Selector.show("sched-step2-prefs");
   }
@@ -185,11 +223,11 @@ var sched2 = (function() {
     step2Selector.show("sched-step2-connect");
   }
 
-  function connectCalendar(tzList, profs, task) {
+  function connectCalendar(tzList, profs, ta) {
     var leaderUid = login.leader();
     var result;
-    if (! list.mem(task.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer(loadStep2Prefs(tzList, task));
+    if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
+      result = deferred.defer(loadMeetingOptions(tzList, ta));
     }
     else {
       var authLandingUrl = document.URL;
@@ -198,7 +236,7 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadStep2Prefs(tzList, task);
+            loadMeetingOptions(tzList, ta);
         });
     }
     return result;
