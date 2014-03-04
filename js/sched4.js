@@ -94,9 +94,7 @@ var sched4 = (function() {
       place += " (" + slot.location.instructions + ")";
     var where = "at " + (place == "" ? "a place to be determined" : place);
 
-    $("#sched-confirm-guest-addr").val("Address_directly");
     var parameters = {
-      template_kind: "Confirmation_to_guest",
       exec_name: hostName,
       guest_name: toName,
       guest_uid: toUid,
@@ -107,6 +105,15 @@ var sched4 = (function() {
         date.timeOnly(t1) + " to " + date.timeOnly(t2)
       )
     };
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Confirmation_to_guest_assistant";
+      $("#sched-confirm-guest-addr").val("Address_to_assistant");
+    } else {
+      parameters.template_kind = "Confirmation_to_guest";
+      $("#sched-confirm-guest-addr").val("Address_directly");
+    }
     api.getConfirmationMessage(ta.tid, parameters)
       .done(function(confirmationMessage) {
         $("#sched-confirm-message").val(confirmationMessage.message_text);
@@ -186,10 +193,17 @@ var sched4 = (function() {
     }
 
     var parameters = {
-      template_kind: "Reminder_to_guest",
       guest_name: $(".recipient-name").first().text()
     };
-    $("#sched-reminder-guest-addr").val("Address_directly");
+    var ea = sched.assistedBy(guests[0], sched.getGuestOptions(ta));
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Reminder_to_guest_assistant";
+      $("#sched-reminder-guest-addr").val("Address_to_assistant");
+    } else {
+      parameters.template_kind = "Reminder_to_guest";
+      $("#sched-reminder-guest-addr").val("Address_directly");
+    }
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
         if (! reserved.reminder_message) {
@@ -251,6 +265,12 @@ var sched4 = (function() {
           if (! sendButton.hasClass("disabled")) {
             sendButton.addClass("disabled");
             var body = $("#sched-confirm-message").val();
+            if ("Address_to_assistant"===$("#sched-confirm-guest-addr").val()) {
+              var ea = sched.assistedBy(uid, sched.getGuestOptions(ta));
+              if (util.isNotNull(ea)) {
+                uid = ea;
+              }
+            }
             var chatid = chats[uid].chatid;
             var hideEnd = ta.task_data[1].hide_end_times;
             var chatItem = {
