@@ -235,15 +235,15 @@ var sched1 = (function() {
     var prof = profs[uid].prof;
     var chatHead = profile.viewMediumCirc(prof);
     var nameView = profile.viewMediumFullName(prof);
-    var bridgeButton = $("<button>bridge</button>").click(function() {
+    var bridgeLink = $("<a>View Bridge</a>").click(function() {
       api.getGuestAppURL(task.tid, uid).done(function (url) {
-        window.location.assign(url.url);
+        window.open(url.url);
       });
     });
     view
       .append(chatHead)
       .append(nameView)
-      .append(bridgeButton);
+      .append(bridgeLink);
     return view;
   }
 
@@ -252,21 +252,25 @@ var sched1 = (function() {
     var view = viewOfProfile(profs, task, uid);
 
     if (sched.isGuest(uid)) {
-      var removeDiv = $("<div class='remove-guest-div'>")
-        .tooltip({"title":"Remove guest"})
+      var edit = $("<li><a>Edit profile</a></li>");
+      var remove = $("<li><a>Remove guest</a></li>");
+      var editButton = $("<div class='btn-group'/>")
+        .append($("<button type='button' class='btn btn-default'>Edit</button>"))
+        .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
+          .append($("<span class='caret'/>"))
+          .append($("<span class='sr-only'>Toggle Dropdown</span>")))
+        .append($("<ul class='dropdown-menu' role='menu'/>")
+          .append(edit)
+          .append(remove))
         .appendTo(view);
-      var remove = $("<img class='remove-guest'/>")
-        .appendTo(removeDiv);
-      svg.loadImg(remove, "/assets/img/x.svg")
-        .then(function(elt) {
-          elt.click(function() {
-            var hosts = sched.getHosts(task);
-            view.remove();
-            updateNextButton(hosts, guestTbl, guestOptions);
-            removeGuest(guestTbl, uid);
-            saveGuests(task, hosts, guestTbl, guestOptions);
-            updateNextButton(hosts, guestTbl, guestOptions);
-          });
+
+      remove.click(function() {
+        var hosts = sched.getHosts(task);
+        view.remove();
+        updateNextButton(hosts, guestTbl, guestOptions);
+        removeGuest(guestTbl, uid);
+        saveGuests(task, hosts, guestTbl, guestOptions);
+        updateNextButton(hosts, guestTbl, guestOptions);
       });
     }
 
