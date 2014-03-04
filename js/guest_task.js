@@ -30,6 +30,22 @@ var guestTask = function() {
     return view;
   }
 
+  function getGuestOptions(state) {
+    return list.toTable(state.participant_options,
+                        function(x){return x.uid;});
+  }
+
+  function assistedBy(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return util.isNotNull(options) ? options.assisted_by : null;
+  }
+
+  function guestMayAttend(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return ! util.isNotNull(options)
+        || false !== options.may_attend;
+  }
+
   function join(x, sep, y) {
     if (x.length <= 0) {
       return y;
@@ -111,7 +127,7 @@ var guestTask = function() {
     return view;
   }
 
-  function viewOfGuestRow(x, myName) {
+  function viewOfGuestRow(x, guestOptions) {
     var view = $("<div class='guest-row clearfix'/>");
 
     var main = $("<div class='guest-main col-sm-5'/>")
@@ -120,8 +136,11 @@ var guestTask = function() {
     var nameDiv = $("<div class='guest-name ellipsis'/>")
       .append(name)
       .appendTo(main);
-    if (name === myName) {
+    var me = login.me();
+    if (me === x.profile_uid) {
       nameDiv.append($("<span id='me-label'>me</span>"));
+    } else if (me === assistedBy(x.profile_uid, guestOptions)) {
+      nameDiv.append($("<span id='me-label'>my boss</span>"));
     }
     // var linkedinIcon = $("<img class='linkedin-icon'/>");
     // var linkedin = $("<div class='linkedin-title'/>")
@@ -488,9 +507,13 @@ var guestTask = function() {
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
+          var guestOptions = getGuestOptions(state);
           var participantListView = $("<div id='guests'/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
-            participantListView.append(viewOfGuestRow(profs[uid].prof, myName));
+            if (guestMayAttend(uid, guestOptions)) {
+              participantListView.append(
+                  viewOfGuestRow(profs[uid].prof, guestOptions));
+            }
           });
           taskView.append(participantListView)
           var notes = $("<div id='notes'/>")
