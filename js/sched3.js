@@ -275,6 +275,7 @@ var sched3 = (function() {
 
     var prof = profs[uid].prof;
     profile.viewMediumCirc(prof)
+      .addClass("guest-name")
       .appendTo(guest);
 
     $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
