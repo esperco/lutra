@@ -398,7 +398,7 @@ var sched3 = (function() {
       .appendTo(guestPrefsHeader);
 
     var guestsContainer = $("<div class='guests-container guests-only'>")
-    var guests = sched.getGuests(ta);
+    var guests = sched.getAttendingGuests(ta);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
