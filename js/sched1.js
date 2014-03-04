@@ -107,7 +107,8 @@ var sched1 = (function() {
     var edit, eaEdit;
     function updateAddButton() {
       if (edit.isValid()
-       && (! eaCheck.hasClass("checkbox-selected") || eaEdit.isValid()))
+       && (! eaCheck.hasClass("checkbox-selected")
+        || eaEdit.isValid() && edit.optUid !== eaEdit.optUid))
         $("#add-guest-btn").removeClass("disabled");
       else
         $("#add-guest-btn").addClass("disabled");
