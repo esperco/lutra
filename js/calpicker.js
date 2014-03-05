@@ -39,12 +39,6 @@ var calpicker = (function() {
   </div>
 </div>
 '''
-    var param = {
-      minuteStep: 5,
-      showSeconds: false
-    };
-    startInput.timepicker(param);
-    endInput.timepicker(param);
 
     /*
       Later _view will also contain the following fields:
@@ -55,26 +49,94 @@ var calpicker = (function() {
     return _view;
   }
 
-  function removeEvent(picker) {
+  function to24hours(timePickerTime) {
+    var hours12 = timePickerTime.hours % 12;
+    var hours24 = timePickerTime.meridian === "AM" ? hours12 : hours12 + 12;
+    return hours24;
+  }
+
+  function initTimePicker(picker,
+                          fieldName, /* either "eventStart" or "eventEnd" */
+                          timePicker) {
+    timePicker.timepicker({
+      minuteStep: 5,
+      showSeconds: false
+    });
+    timePicker.timepicker().on('changeTime.timepicker', function(e) {
+      /*
+        TODO (known bugs):
+        Ensure that end date/time is after start date/time.
+      */
+      var time = e.time;
+      var date = picker[fieldName];
+      date.hours(to24hours(time));
+      date.minutes(time.minutes);
+      updateCalendarView(picker);
+    });
+  }
+
+  function initTimePickers(picker) {
+    initTimePicker(picker, "eventStart", picker.startInput);
+    initTimePicker(picker, "eventEnd", picker.endInput);
+  }
+
+  /* Remove event from the calendar view but preserve start/end fields */
+  function removeCalendarEvent(picker) {
     var id = picker.eventId;
     if (util.isDefined(id)) {
       picker.calendarView.fullCalendar('removeEvents', function(calEvent) {
         return calEvent.id === id;
       });
-      picker.textView.addClass("hide");
       delete picker.eventId;
     }
+  }
+
+  /* Get rid of any previously selected date and time */
+  function removeEvent(picker) {
+    removeCalendarEvent(picker);
     delete picker.eventStart;
     delete picker.eventEnd;
+    picker.textView.addClass("hide");
+  }
+
+  /*
+    Convert a Fullcalendar date (Moment library) into a string
+    accepted by Bootstrap-timepicker.
+  */
+  function formatTime(calDate) {
+    return date.timeOnly(calDate.toDate());
   }
 
   function updateTextView(picker) {
     var start = picker.eventStart;
     var end = picker.eventEnd;
     if (util.isDefined(start)) {
-      picker.startInput.timepicker('setTime', '12:45 AM');
-      picker.endInput.timepicker('setTime', '12:55 AM');
+      picker.startInput.timepicker('setTime', formatTime(start));
+      picker.endInput.timepicker('setTime', formatTime(end));
       picker.textView.removeClass("hide");
+    }
+    else
+      removeEvent(picker);
+  }
+
+  function updateCalendarView(picker) {
+    var start = picker.eventStart;
+    var end = picker.eventEnd;
+    if (util.isDefined(start)) {
+      removeCalendarEvent(picker);
+      var eventId = util.randomString();
+      picker.eventId = eventId;
+      var eventData = {
+        id: eventId,
+        title: "",
+        start: start,
+        end: end,
+        color: "#A25CC6",
+        editable: true
+      };
+      var stick = true;
+      picker.calendarView.fullCalendar('renderEvent', eventData, stick);
+      picker.calendarView.fullCalendar('unselect');
     }
     else
       removeEvent(picker);
@@ -87,22 +149,8 @@ var calpicker = (function() {
   function initEvent(picker, start, end) {
     removeEvent(picker);
 
-    var eventId = util.randomString();
-    picker.eventId = eventId;
     picker.eventStart = start;
     picker.eventEnd = end;
-
-    var eventData = {
-      id: eventId,
-      title: "",
-      start: start,
-      end: end,
-      color: "#ff0000",
-      editable: true
-    };
-    var stick = true;
-    picker.calendarView.fullCalendar('renderEvent', eventData, stick);
-    picker.calendarView.fullCalendar('unselect');
 
     updateTextView(picker);
   }
@@ -118,9 +166,12 @@ var calpicker = (function() {
   }
 
   mod.createPicker = function(param) {
-    var picker = createView();
-    var calendarView = picker.calendarView;
     var tz = param.timezone;
+
+    var picker = createView();
+    initTimePickers(picker);
+
+    var calendarView = picker.calendarView;
 
     function select(start, end) {
       initEvent(picker, start, end);
@@ -130,30 +181,44 @@ var calpicker = (function() {
       removeEvent(picker);
     }
 
-    api.postCalendar(login.leader(), {
+    function updateEvent(picker, calEvent) {
+      removeEvent(picker);
+      initEvent(picker, calEvent.start, calEvent.end);
+    }
+
+    function eventDrop(calEvent, revertFunc, jsEvent, ui, view) {
+      updateEvent(picker, calEvent);
+    }
+
+    function eventResize(calEvent, jsEvent, ui, view) {
+      updateEvent(picker, calEvent);
+    }
+
+    calendarView.fullCalendar({
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+      },
+      defaultView: 'agendaWeek',
       timezone: tz,
-      window_start: "2014-02-17T00:00:00-08:00",
-      window_end: "2014-02-24T00:00:00-08:00"
-    }).done(function (x) {
-      calendarView.fullCalendar({
-        header: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'month,agendaWeek,agendaDay'
-        },
-        defaultView: 'agendaWeek',
-        timezone: tz,
-        selectable: true,
-        selectHelper: true,
-	select: select,
-        eventClick: eventClick,
-        editable: false,
-        events: fetchEvents
-      });
+      selectable: true,
+      selectHelper: true,
+      select: select,
+      eventClick: eventClick,
+      eventDrop: eventDrop,
+      eventResize: eventResize,
+      editable: false,
+      events: fetchEvents
     });
 
+    function render() {
+      calendarView.fullCalendar("render");
+    }
+
     return {
-      view: picker.view
+      view: picker.view,
+      render: render // to be called after attaching the view to the dom tree
     };
   }
 

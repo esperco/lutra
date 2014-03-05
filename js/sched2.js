@@ -93,20 +93,16 @@ var sched2 = (function() {
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
-    function setTextEventDate(start, end) {
-      log(start, end);
-    }
-
     function updateCalendar(timezone) {
       calendarContainer.children().remove();
 
       if (util.isNonEmptyString(timezone)) {
-        var calendar = calpicker.createPicker({
-          timezone: timezone,
-          setTextEventDate: setTextEventDate
+        var picker = calpicker.createPicker({
+          timezone: timezone
         });
         calendarContainer
-          .append(calendar.view);
+          .append(picker.view);
+        picker.render();
       }
     }
 
