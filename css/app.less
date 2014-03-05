@@ -1917,21 +1917,27 @@ object {
 }
 
 .sched-step1-row,
-.sched-step1-add-row {
+.sched-step1-add-guest {
   min-height: 72px;
   margin-bottom: 15px;
-  padding: 15px;
   border: 1px solid @gray_10;
   border-radius: 6px;
 }
 
+.sched-step1-guest-row,
 .sched-step1-ea-row {
-  min-height: 57px;
-  margin-top: 15px;
-  margin-right: -15px;
-  margin-left: -15px;
-  padding: 15px 15px 0 15px;
-  border-top: 1px solid @gray_10;
+  min-height: 72px;
+  padding: 15px;
+}
+
+.ea-input-div {
+  margin-left: 95px;
+  padding-top: 9px;
+}
+
+.sched-step1-add-guest,
+.sched-step1-add-ea {
+  padding: 15px;
 }
 
 .list-prof-circ {
@@ -2002,6 +2008,28 @@ object {
   margin-right: 2px;
 }
 
+.edit-profile {
+  cursor: pointer;
+}
+
+.remove-guest {
+  color: @red !important;
+  cursor: pointer;
+  &:hover {
+    color: @white !important;
+    background: @red !important;
+  }
+}
+
+.sched-step1-add-row.click-mode {
+  cursor: pointer;
+  &:hover {
+    background: @gray_f8;
+    .add-guest-circ { background: @purple_hover; }
+    #add-guest-text { color: @purple_hover; }
+  }
+}
+
 .add-guest-circ {
   float: left;
   width: 40px;
@@ -2010,16 +2038,6 @@ object {
   border-radius: 20px;
   text-align: center;
   background: @purple;
-  &:hover {
-    background: @purple_hover;
-    cursor: pointer;
-  }
-}
-
-.add-guest-disabled,
-.add-guest-disabled:hover {
-  background: @purple_disabled !important;
-  cursor: default;
 }
 
 #plus-guest {
@@ -2043,7 +2061,26 @@ object {
 #add-guest-text {
   margin-top: 9px;
   margin-left: 55px;
+  color: @purple;
   cursor: pointer;
+}
+
+.edit-guest-title {
+  margin-bottom: 15px;
+  color: @gray_60;
+  font-size: 18px;
+  letter-spacing: 3px;
+}
+
+.communicate-ea-footer {
+  padding: 5px 26px;
+  background: @gray_10;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.communicate-ea-footer.has-ea {
+  border-radius: 0;
 }
 
 .communicate-ea {
@@ -2061,8 +2098,8 @@ object {
 }
 
 #guest-input-div {
-  margin-left: 60px;
-  padding-top: 10px;
+  margin-left: 55px;
+  padding-top: 9px;
   max-width: 360px;
 }
 
@@ -2073,19 +2110,6 @@ object {
 #add-guest-btn {
   margin-bottom: 5px;
 }
-
-.remove-guest-div {
-  float: right;
-  margin-top: -50px;
-  &:hover {
-    cursor: pointer;
-    .remove-guest path { fill: @red; }
-  }
-}
-
-.remove-guest { display: block; }
-
-.remove-guest path { fill: @gray_20; }
 
 
 /*** Scheduling Step 2 ***/
