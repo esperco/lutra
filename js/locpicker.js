@@ -53,7 +53,7 @@ var locpicker = (function() {
   }
 
   function getLocation(form) {
-    return {
+    var loc = {
       /* hidden state */
       title: form.title,
       coord: form.coord,
@@ -63,6 +63,17 @@ var locpicker = (function() {
       instructions: form.instructions.val(),
       timezone: form.timezone.val()
     };
+    return loc;
+  }
+
+  function getCompleteLocation(form) {
+    var loc = getLocation(form);
+    if (util.isNonEmptyString(loc.address)
+        && util.isString(loc.title)
+        && util.isNonEmptyString(loc.timezone))
+      return loc;
+    else
+      return null;
   }
 
   function setLocation(form, loc) {
@@ -290,7 +301,7 @@ var locpicker = (function() {
 
     return {
       view: view,
-      getLocation: getLocation
+      getCompleteLocation: (function () { return getCompleteLocation(form); })
     };
   }
 

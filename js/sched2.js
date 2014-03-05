@@ -59,8 +59,8 @@ var sched2 = (function() {
     and time for a meeting option.
   */
   function loadMeetingOption(tzList, listView, calOption,
-                             onSave, onRemove, isListRow) {
-    '''
+                             saveCalOption, removeCalOption, isListRow) {
+'''
 <div #view>
   <div #adder/>
   <div #form/>
@@ -74,7 +74,7 @@ var sched2 = (function() {
   <div #locationContainer/>
   <div #calendarContainer/>
   <button #removeButton class="btn btn-default">Remove</button>
-  <button #saveButton class="btn btn-primary">Save</button>
+  <button #saveButton class="btn btn-primary disabled">Save</button>
 </div>
 '''
     var x = calOption.slot;
@@ -88,25 +88,31 @@ var sched2 = (function() {
       x.meeting_type = meetingType;
     }
 
+    function getMeetingType() {
+      return x.meeting_type;
+    }
+
     var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
     meetingTypeContainer.append(meetingTypeSelector.view);
 
     /*** Meeting date and time, shown only once a timezone is set ***/
+
+    var getDates = function() { return null; };
 
     function updateCalendar(timezone) {
       calendarContainer.children().remove();
 
       if (util.isNonEmptyString(timezone)) {
         var picker = calpicker.createPicker({
-          timezone: timezone
+          timezone: timezone,
+          onChange: (function() { onChange(); })
         });
+        getDates = picker.getDates;
         calendarContainer
           .append(picker.view);
         picker.render();
       }
     }
-
-    //var setCalEventDate = calendar.setCalEventDate;
 
     /*** Meeting location ***/
 
@@ -124,25 +130,61 @@ var sched2 = (function() {
     /*** Row controls (save/remove) ***/
 
     function getCalOption() {
-      var loc = locationForm.getLocation();
-      // TODO to be continued
+      var meetingType = getMeetingType();
+      var loc = locationForm.getCompleteLocation();
+      var dates = getDates();
+      if (util.isNotNull(meetingType)
+          && util.isNotNull(loc)
+          && util.isNotNull(dates)) {
+        var oldCalOption = calOption;
+        var calSlot = {
+          meeting_type: meetingType,
+          location: loc,
+          on_site: true,
+          start: dates.start,
+          end: dates.end,
+          duration: dates.duration
+        };
+        var newCalOption = {
+          label: oldCalOption.label,
+          slot: calSlot,
+          google_event: oldCalOption.google_event
+        };
+        return newCalOption;
+      }
+      else
+        return null;
     }
 
-    /* TODO: implement getCalOption, and pass calOption to onSave/onRemove */
+    function calOptionIsReady() {
+      return util.isNotNull(getCalOption());
+    }
+
+    function onChange() {
+      if (calOptionIsReady())
+        saveButton.removeClass("disabled");
+      else
+        saveButton.addClass("disabled");
+    }
+
+    function saveMe() {
+      saveButton.addClass("disabled");
+      saveCalOption(getCalOption());
+    }
 
     if (isListRow) {
-      var x = listView.createRow(view);
+      var row = listView.createRow(view);
       removeButton
         .click(function () {
-          x.remove();
-          onRemove(); // wrong argument
+          row.remove();
+          removeCalOption(calOption.label);
         });
 
-      saveButton.click(onSave); // wrong argument
+      saveButton.click(saveMe);
     }
     else {
-      removeButton.click(onRemove); // wrong argument
-      saveButton.click(onSave); // wrong argument
+      removeButton.remove(); /* don't need a Remove button */
+      saveButton.click(saveMe);
     }
 
     return(view);
@@ -172,12 +214,11 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
-  function removeOption(ta, calOption) {
+  function removeOption(ta, calOptionLabel) {
     var schedState = sched.getState(ta);
-    var label = calOption.label;
     schedState.calendar_options =
       list.filter(schedState.calendar_options, function(x) {
-        return x.label !== label;
+        return x.label !== calOptionLabel;
       });
     saveAndReload(ta);
   }

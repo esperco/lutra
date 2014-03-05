@@ -45,6 +45,7 @@ var calpicker = (function() {
       - eventId
       - eventStart
       - eventEnd
+      - onChange
      */
     return _view;
   }
@@ -80,6 +81,21 @@ var calpicker = (function() {
     initTimePicker(picker, "eventEnd", picker.endInput);
   }
 
+  function getDates(picker) {
+    if (util.isDefined(picker.eventStart) && util.isDefined(picker.eventEnd)) {
+      var start = picker.eventStart;
+      var end = picker.eventEnd;
+      var duration = end.unix() - start.unix();
+      return {
+        start: start.toDate(),
+        end: end.toDate(),
+        duration: duration
+      };
+    }
+    else
+      return null;
+  }
+
   /* Remove event from the calendar view but preserve start/end fields */
   function removeCalendarEvent(picker) {
     var id = picker.eventId;
@@ -97,6 +113,7 @@ var calpicker = (function() {
     delete picker.eventStart;
     delete picker.eventEnd;
     picker.textView.addClass("hide");
+    picker.onChange();
   }
 
   /*
@@ -151,6 +168,7 @@ var calpicker = (function() {
 
     picker.eventStart = start;
     picker.eventEnd = end;
+    picker.onChange(getDates(picker));
 
     updateTextView(picker);
   }
@@ -167,9 +185,11 @@ var calpicker = (function() {
 
   mod.createPicker = function(param) {
     var tz = param.timezone;
+    var onChange = param.onChange;
 
     var picker = createView();
     initTimePickers(picker);
+    picker.onChange = onChange;
 
     var calendarView = picker.calendarView;
 
@@ -218,7 +238,8 @@ var calpicker = (function() {
 
     return {
       view: picker.view,
-      render: render // to be called after attaching the view to the dom tree
+      render: render, // to be called after attaching the view to the dom tree
+      getDates: (function() { return getDates(picker); })
     };
   }
 
