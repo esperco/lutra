@@ -5,9 +5,9 @@ var login = function () {
   var chatid;
 
   mod.load = function(task) {
-    list.iter(task.task_chats, function(chat) {
-      if (chat.chat_with) {
-        uid = chat.chat_with;
+    uid = task.guest_uid;
+    list.iter(task.guest_task.task_chats, function(chat) {
+      if (uid === chat.chat_with) {
         chatid = chat.chatid;
       }
     });
