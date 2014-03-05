@@ -236,10 +236,14 @@ var sched1 = (function() {
   }
 
   function viewOfEAInput(v, x, profs, task, uid, eaCheck) {
+    var eaEdit
     function updateAddButton() {
-      // update button
+      if (eaEdit.isValid())
+        $("#add-guest-btn").removeClass("disabled");
+      else
+        $("#add-guest-btn").addClass("disabled");
     }
-    var eaEdit = editGuest(updateAddButton);
+    eaEdit = editGuest(updateAddButton);
     var branch = $("<div class='relationship-branch'>");
     var cancelCirc = $("<div class='add-guest-circ cancel'>");
     var cancel = $("<img id='plus-guest'/>");
@@ -256,6 +260,7 @@ var sched1 = (function() {
     newEA.append(addButton);
 
     addButton.click(function() {
+      var eaFirstLast = eaEdit.firstLast();
       // add assistant
     });
 
