@@ -1932,10 +1932,10 @@ object {
 
 .ea-input-div {
   margin-left: 95px;
-  padding-top: 9px;
+  padding-top: 5px;
 }
 
-.sched-step1-add-guest,
+.add-guest-click,
 .sched-step1-add-ea {
   padding: 15px;
 }
@@ -1999,6 +1999,16 @@ object {
   font-size: 14px;
 }
 
+.sched-step1-guest-row.has-ea {
+  .guest-name { color: @gray_60; }
+  .guest-email { color: @gray_60; }
+  .list-prof-circ {
+    color: @gray_40;
+    background: none;
+    border: 1px solid @gray_40;
+  }
+}
+
 .edit-guest {
   float: right;
   margin-top: 5px;
@@ -2021,13 +2031,19 @@ object {
   }
 }
 
-.sched-step1-add-row.click-mode {
+.sched-step1-add-guest.click-mode:hover {
+  background: @gray_f8;
+  .add-guest-circ { background: @purple_hover; }
+  #add-guest-text { color: @purple_hover; }
+}
+
+.add-guest-click {
   cursor: pointer;
-  &:hover {
-    background: @gray_f8;
-    .add-guest-circ { background: @purple_hover; }
-    #add-guest-text { color: @purple_hover; }
-  }
+}
+
+.add-guest-click.cancel-mode {
+  float: left;
+  padding-right: 0;
 }
 
 .add-guest-circ {
@@ -2059,8 +2075,9 @@ object {
 }
 
 #add-guest-text {
-  margin-top: 9px;
   margin-left: 55px;
+  padding-top: 9px;
+  padding-bottom: 9px;
   color: @purple;
   cursor: pointer;
 }
@@ -2068,24 +2085,25 @@ object {
 .edit-guest-title {
   margin-bottom: 15px;
   color: @gray_60;
-  font-size: 18px;
+  font-size: 24px;
+  font-family: @light;
   letter-spacing: 3px;
 }
 
-.communicate-ea-footer {
+.communicate-ea {
   padding: 5px 26px;
   background: @gray_10;
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
-}
-
-.communicate-ea-footer.has-ea {
-  border-radius: 0;
-}
-
-.communicate-ea {
   cursor: pointer;
-  &:hover path.checkbox { stroke: @gray_40; }
+  &:hover {
+    background: @gray_20;
+    path.checkbox { stroke: @gray_40; }
+  }
+}
+
+.communicate-ea.checkbox-selected {
+  border-radius: 0;
 }
 
 .ea-checkbox {
@@ -2098,8 +2116,9 @@ object {
 }
 
 #guest-input-div {
-  margin-left: 55px;
-  padding-top: 9px;
+  margin-left: 70px;
+  padding-top: 20px;
+  padding-bottom: 15px;
   max-width: 360px;
 }
 
