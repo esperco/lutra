@@ -87,6 +87,9 @@ var adder = (function() {
   mod.createList = function(param) {
     var maxLength = param.maxLength;
     var createAdderForm = param.createAdderForm;
+    var userOnAdderOpen = param.onAdderOpen;
+    var userOnAdderClose = param.onAdderClose;
+
     var currentLength = 0;
     var listView = createListView();
 
@@ -137,17 +140,25 @@ var adder = (function() {
       };
     }
 
+    var adderIsOpen = false;
+
     function onAdderOpen() {
+      adderIsOpen = true;
       listView.formContainer.children().remove();
       listView.formContainer
         .append(createAdderForm())
         .removeClass("hide");
+      if (util.isDefined(userOnAdderOpen))
+        userOnAdderOpen();
     }
 
     function clearAdder() {
+      adderIsOpen = false;
       listView.formContainer.children().remove();
       listView.formContainer
         .addClass("hide");
+      if (util.isDefined(userOnAdderClose))
+        userOnAdderClose();
     }
 
     var toggle = mod.createToggle({
@@ -161,8 +172,8 @@ var adder = (function() {
     return {
       view: listView.view,
       createRow: createRow, // returns the dom element and a remove function
-      openAdder: open,
-      closeAdder: close
+      listLength: (function() { return currentLength; }),
+      adderIsOpen: (function() { return adderIsOpen; })
     };
   };
 

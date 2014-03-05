@@ -6,6 +6,8 @@ var sched2 = (function() {
   var mod = {};
 
   function saveAndReload(ta) {
+    log("saveAndReload", ta);
+    disableNextButton();
     api.postTask(ta)
       .done(function(task) { sched.loadTask(task); });
   }
@@ -15,9 +17,7 @@ var sched2 = (function() {
     "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
   });
 
-  /* Record the options for the meeting selected by the user
-     and move on to step 3. */
-  function selectCalendarSlots(ta, slots) {
+  function moveOnToNextStep(ta) {
     var x = ta.task_data[1];
     ta.task_status.task_progress = "Coordinating"; // status in the task list
     x.scheduling_stage = "Coordinate"; // step in the scheduling page
@@ -28,6 +28,30 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
+  function enableNextButton() {
+    $(".sched-step2-next")
+      .removeClass("disabled");
+  }
+
+  function disableNextButton() {
+    $(".sched-step2-next")
+      .addClass("disabled");
+  }
+
+  function initNextButton(ta) {
+    var nextButton = $(".sched-step2-next")
+      .off("click")
+      .one("click", function() {
+        moveOnToNextStep(ta);
+      });
+    var schedState = sched.getState(ta);
+    var options = schedState.calendar_options;
+    if (util.isDefined(options) && options.length > 0)
+      enableNextButton();
+    else
+      disableNextButton(); /* should be disabled already anyway */
+  }
+
   /*
     For now just a dropdown menu of meeting types.
     May be accompanied with options specific to the type of meeting selected.
@@ -36,19 +60,19 @@ var sched2 = (function() {
     function opt(label, value) {
       return { label: label, value: value, action: onSet };
     }
-    var initialKey = util.isString(optInitialKey) ? optInitialKey : "meeting";
+    var initialKey = util.isString(optInitialKey) ? optInitialKey : "Meeting";
     var meetingTypeSelector = select.create({
       divClass: "fill-div",
       buttonClass: "fill-div",
       initialKey: initialKey,
       options: [
-        opt("Meeting", "meeting"),
-        opt("Breakfast", "breakfast"),
-        opt("Lunch", "lunch"),
-        opt("Dinner", "dinner"),
-        opt("Coffee", "coffee"),
-        opt("Night life", "nightlife"),
-        opt("Phone call", "call")
+        opt("Meeting", "Meeting"),
+        opt("Breakfast", "Breakfast"),
+        opt("Lunch", "Lunch"),
+        opt("Dinner", "Dinner"),
+        opt("Coffee", "Coffee"),
+        opt("Night life", "Nightlife"),
+        opt("Phone call", "Call")
       ]
     });
     return meetingTypeSelector;
@@ -58,13 +82,12 @@ var sched2 = (function() {
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
-  function loadMeetingOption(tzList, listView, calOption,
-                             saveCalOption, removeCalOption, isListRow) {
+  function editableViewOfOption(tzList, calOption, saveCalOption) {
 '''
 <div #view>
   <div #adder/>
   <div #form/>
-  <div class="clearfix">
+  <div class="row clearfix">
     <div class="col-sm-3">
       <div class="location-title">Meeting Type</div>
       <div #meetingTypeContainer/>
@@ -73,7 +96,6 @@ var sched2 = (function() {
   </div>
   <div #locationContainer/>
   <div #calendarContainer/>
-  <button #removeButton class="btn btn-default">Remove</button>
   <button #saveButton class="btn btn-primary disabled">Save</button>
 </div>
 '''
@@ -172,31 +194,49 @@ var sched2 = (function() {
       saveCalOption(getCalOption());
     }
 
-    if (isListRow) {
-      var row = listView.createRow(view);
-      removeButton
-        .click(function () {
-          row.remove();
-          removeCalOption(calOption.label);
-        });
-
-      saveButton.click(saveMe);
-    }
-    else {
-      removeButton.remove(); /* don't need a Remove button */
-      saveButton.click(saveMe);
-    }
-
-    return(view);
+    saveButton.click(saveMe);
+    return view;
   }
 
-  function createMeetingOption(tzList, listView,
-                               onSave, onRemove, isListRow) {
+  function createMeetingOption(tzList, saveCalOption) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return loadMeetingOption(tzList, listView, calOption, onSave, onRemove);
+    return editableViewOfOption(tzList, calOption, saveCalOption);
+  }
+
+  function insertViewOfOption(tzList, listView, calOption,
+                              saveCalOption, removeCalOption) {
+'''
+<div #view>
+  <div #readOnlyContainer/>
+  <div #editableContainer
+       class="hide"/>
+  <button #removeButton class="btn btn-default">Remove</button>
+</div>
+'''
+    var row = listView.createRow(view);
+    removeButton
+      .click(function () {
+        row.remove();
+        removeCalOption(calOption.label);
+      });
+
+    /* Load calendar and forms when user clicks "Edit" */
+    function switchToEdit() {
+      var editView = editableViewOfOption(tzList, calOption, saveCalOption);
+      editableContainer.append(editView);
+
+      readOnlyContainer.addClass("hide");
+      editableContainer.removeClass("hide");
+    }
+
+    var readOnlyView =
+      readOnlyViewOfOption(calOption, switchToEdit);
+    readOnlyContainer.append(readOnlyView);
+
+    return view;
   }
 
   function saveOption(ta, calOption) {
@@ -223,6 +263,21 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
+  function readOnlyViewOfOption(calOption, switchToEdit) {
+'''
+<div #view
+   class="suggestion">
+  {{sched.viewOfSuggestion(calOption.slot)}}
+  <button #editButton
+          class="btn btn-default">
+    Edit
+  </button>
+</div>
+'''
+    editButton.click(switchToEdit);
+    return view;
+  }
+
   function loadMeetingOptions(tzList, ta) {
     var view = $("#sched-step2-option-list");
     view.children().remove();
@@ -231,18 +286,21 @@ var sched2 = (function() {
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm() {
-      return createMeetingOption(tzList, listView, save, remove, false);
+      return createMeetingOption(tzList, save);
     }
 
     var schedState = sched.getState(ta);
     var listView = adder.createList({
       maxLength: 3,
-      createAdderForm: createAdderForm
+      createAdderForm: createAdderForm,
+      onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
     view.append(listView.view);
     list.iter(schedState.calendar_options, function(x) {
-      loadMeetingOption(tzList, listView, x, save, remove, true);
+      insertViewOfOption(tzList, listView, x, save, remove);
     });
+
+    initNextButton(ta);
 
     step2Selector.show("sched-step2-prefs");
   }
