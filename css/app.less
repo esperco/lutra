@@ -23,7 +23,7 @@
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
-@purple_disabled: #e8d9ee;
+@purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
 @red: #d9534f;
@@ -495,7 +495,6 @@ object {
 .workflow-row,
 .suggestion,
 .sched-step3-row,
-.sched-step4-row,
 .place-row {
   padding: 10px;
   border-bottom: 1px solid @gray_10;
@@ -509,10 +508,6 @@ object {
   padding: 15px 10px;
   border-bottom: 1px solid @gray_10;
   &:hover { background: @gray_f8; }
-}
-
-.sched-step4-row {
-  min-height: 70px;
 }
 
 .sched-step3-row {
@@ -978,11 +973,16 @@ object {
 /*** Container ***/
 
 .task-container {
-  max-width: 742px;
+  max-width: 737px;
   margin-left: auto;
   margin-right: auto;
   padding-top: 80px;
   padding-bottom: 120px;
+  @media(max-width:767px){
+    margin: 0;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
 }
 
 
@@ -1788,6 +1788,7 @@ object {
 // }
 
 .chat-editor {
+  padding-bottom: 6px;
   background: @white;
   border: 1px solid @gray_20;
   border-radius: 3px;
@@ -1795,7 +1796,7 @@ object {
 
 .chat-entry {
   width: 100%;
-  min-height: 100px;
+  height: 100px;
   padding: 8px;
   overflow: hidden;
   border: none;
@@ -1818,10 +1819,7 @@ object {
   font-family: @light;
 }
 
-.chat-actions {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
+.chat-actions { margin-top: 6px; }
 
 // .option-list {
 //   padding-left: 28px;
@@ -1897,16 +1895,13 @@ object {
 //   cursor: pointer;
 // }
 
-.chat-send {
-  padding-right: 10px;
-}
+.chat-send { padding-right: 10px; }
 
 .chat-send-btn {
   float: right;
   height: 26px;
   padding: 0 8px 0px 8px;
   font-size: 14px;
-  // font-family: @regular;
 }
 
 
@@ -2363,23 +2358,90 @@ object {
 /*** Scheduling Step 4 ***/
 
 .final-sched-div {
-  margin-bottom: 40px;
+  border: 1px solid @gray_20;
+  border-radius: 6px;
 }
 
-.check {
+#edit-meeting-div { margin-top: 30px; }
+
+.sched-step4-section-header {
+  height: 54px;
+  padding: 13px 15px;
+  font-size: 18px;
+  background: @gray_f8;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.sched-step4-section-title {
+  margin-left: 45px;
+  padding-top: 2px;
+}
+
+.connector {
+  display: block;
+  margin-top: -1px;
+  margin-right: auto;
+  margin-bottom: -1px;
+  margin-left: auto;
+}
+
+#meeting-content {
+  padding: 15px;
+  border-top: 1px solid @gray_20;
+}
+
+#calendar-title { padding-top: 0; }
+
+#edit-event-notes { resize: none; }
+
+#event-edit-update { margin-top: 15px; }
+
+.sched-step4-row {
+  min-height: 72px;
+  padding: 15px;
+  border-top: 1px solid @gray_20;
+}
+
+.confirmation-compose-div,
+.reminder-edit-div {
   float: left;
-  margin-top: 4px;
+  margin-top: 9px;
+  margin-left: 5px;
 }
 
-.checked path {
-  fill: @green;
+.confirmation-compose,
+.reminder-edit {
+  display: block;
+  width: 20px;
+  height: 20px;
+  &:hover path { fill: @purple_hover; }
 }
 
-.final-sched-text {
-  margin-top: 0;
+.confirmation-guest-name,
+.reminder-guest-name {
+  margin-left: 45px;
+  font-family: @bold;
+}
+
+.confirmation-guest-status,
+.reminder-guest-status {
+  margin-left: 45px;
+  color: @gray_60;
+  font-size: 14px;
+}
+
+.sched-step4-section-icon {
+  float: left;
+}
+
+#reminder-scheduler {
+  padding: 8px 15px;
+  border-top: 1px solid @gray_20;
+}
+
+#scheduler-text {
   margin-right: 10px;
-  margin-bottom: 0;
-  line-height: 1.42857;
 }
 
 
