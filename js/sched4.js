@@ -454,9 +454,7 @@ var sched4 = (function() {
   /* EDIT MEETING DETAILS */
 
   function enableEventEditSave(task, titleEdit, updateButton) {
-    log("here");
     if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
-      log("and here");
       updateButton.removeClass("disabled");
     }
   }
