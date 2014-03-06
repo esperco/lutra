@@ -463,6 +463,7 @@ var chat = (function () {
     var me = login.me();
     var v = $("<div/>");
     var textBox = $("<textarea class='chat-entry'></textarea>");
+    var blank = $("<div class='blank-chat hide'></div>");
 
     if (! $("#chat").hasClass("modal-body")) {
       var writeArea;
@@ -487,10 +488,9 @@ var chat = (function () {
     }
 
     var messages = $("<div class='messages scrollable'></div>")
+      .append(blank)
       .appendTo(v);
 
-    var blank = $("<div class='blank-chat hide'></div>")
-      .appendTo(messages);
     var blankChatIcon = $("<img class='blank-chat-icon'/>")
       .appendTo(blank);
     svg.loadImg(blankChatIcon, "/assets/img/blank-chat.svg");
