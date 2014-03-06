@@ -124,9 +124,6 @@ var sched = (function() {
     var fromTime = wordify(date.timeOnly(t1));
     var toTime = wordify(date.timeOnly(t2));
 
-    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
-      fromTime = fromTime.substr(0, fromTime.length-3);
-
     var row3 = $("<div class='time-text'/>")
       .append(html.text("from "))
       .append($("<b>").text(fromTime))
