@@ -334,30 +334,32 @@ var guestTask = function() {
     var chat = list.find(task.guest_task.task_chats, function(chat) {
       return task.guest_uid === chat.chat_with;
     });
+    if (util.isNotNull(chat)) {
+      var msgItem = null;
+      for (var i = chat.chat_items.length; --i >= 0; ) {
+        var item = chat.chat_items[i];
+        switch (variant.cons(item.chat_item_data)) {
 
-    var msgItem = null;
-    for (var i = chat.chat_items.length; --i >= 0; ) {
-      var item = chat.chat_items[i];
-      switch (variant.cons(item.chat_item_data)) {
+        case "Message":
+          var r = /^None of the above(?:\n+|$)(.*)/i
+                  .exec(item.chat_item_data[1]);
+          if (r) {
+            return {comment:r[1], noneWorks:true, answers:{}};
+          }
+          msgItem = item;
+          break;
 
-      case "Message":
-        var r = /^None of the above(?:\n+|$)(.*)/i.exec(item.chat_item_data[1]);
-        if (r) {
-          return {comment:r[1], noneWorks:true, answers:{}};
+        case "Scheduling_r":
+          var comment = util.isNotNull(msgItem)
+                     && item.id === msgItem.in_reply_to
+                     && item.by === msgItem.by
+            ? msgItem.chat_item_data[1]
+            : "";
+          return {comment:comment, noneWorks:false,
+                  answers:list.toTable(item.chat_item_data[1].selected,
+                                       function(sel){return sel.label})};
+        default: break;
         }
-        msgItem = item;
-        break;
-
-      case "Scheduling_r":
-        var comment = util.isNotNull(msgItem)
-                   && item.id === msgItem.in_reply_to
-                   && item.by === msgItem.by
-          ? msgItem.chat_item_data[1]
-          : "";
-        return {comment:comment, noneWorks:false,
-                answers:list.toTable(item.chat_item_data[1].selected,
-                                     function(sel){return sel.label})};
-      default: break;
       }
     }
     return {comment:"", noneWorks:false, answers:{}};
@@ -367,7 +369,7 @@ var guestTask = function() {
     var ta = task.guest_task;
 
     var myLast = recoverCalendarSelection(task);
-    var answers = myLast.answers;
+    var answers = {};
 
     function submitButton() {
       var submitButton = $("<button/>", {
@@ -584,6 +586,9 @@ var guestTask = function() {
             .appendTo(select);
           var typ = meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
+            if (util.isNotNull(myLast.answers[choice.label])) {
+              answers[choice.label] = choice;
+            }
             var label = indexLabel(i);
             options.append(viewOfCalendarOption(choice, label, typ));
           });
