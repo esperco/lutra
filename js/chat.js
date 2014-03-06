@@ -460,6 +460,10 @@ var chat = (function () {
     var me = login.me();
     var v = $("<div/>");
 
+    if (! $("#chat").hasClass("modal-body")) {
+      v.append(chatEditor(blank, messages, chat, task, bridge));
+    }
+
     var messages = $("<div class='messages scrollable'></div>")
       .appendTo(v);
 
@@ -492,7 +496,7 @@ var chat = (function () {
     }
 
     if ($("#chat").hasClass("modal-body")) {
-      v.append(chatEditor(blank, messages, chat, task));
+      v.append(chatEditor(blank, messages, chat, task, bridge));
     }
 
     return v;

@@ -566,9 +566,9 @@ var guestTask = function() {
                     .append(notes);
           }
           taskView.append($("<div class='task-section-header'/>")
-            .append(messagesIcon)
-            .append("<div class='task-section-text'>MESSAGES</div>"));
-          $("#chat").removeClass("hide");
+                  .append(messagesIcon)
+                  .append("<div class='task-section-text'>MESSAGES</div>"));
+          // $("#chat").removeClass("hide");
           svg.loadImg(guestsIcon, "/assets/img/group.svg");
           svg.loadImg(notesIcon, "/assets/img/edit.svg");
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
@@ -599,11 +599,17 @@ var guestTask = function() {
             $("#submit-selections").removeClass("btn-primary-disabled");
           });
 
+          var messagesIcon = $("<img id='messages-icon'/>");
+          select.append($("<div class='task-section-header'/>")
+                .append(messagesIcon)
+                .append("<div class='task-section-text'>MESSAGES</div>"));
+          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
+
           var feedback = $("<div id='feedback' class='hide'/>")
             .append(viewOfFeedback)
             .appendTo(taskView);
 
-          $("#chat").addClass("hide");
+          // $("#chat").addClass("hide");
         }
       }
 
