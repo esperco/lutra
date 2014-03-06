@@ -215,186 +215,56 @@ var sched4 = (function() {
       });
   }
 
-  function editEventDetails(tid, uid) {
-    /* This function doesn't do anything right now,
-      but it should be a function accessed on click (or automatically popped).
-      It should accomplish the following:
-      1. Auto-filling event details
-      2. Allowing editing of event details */
-  }
 
-  function markChecked(elt) {
-    elt.addClass("checked"); // does not work on SVG elements
-  }
+  /* REMINDERS */
 
-  function createConfirmRow(profs, ta, uid) {
-    var view = $("<div class='sched-step4-row container clickable'/>");
-
-    var divConfirmationCheck = $("<div class='check-div col-xs-1'/>");
-    var checkConfirmation = $("<img class='check'/>");
-    if (sentConfirmation(uid))
-      markChecked(divConfirmationCheck);
-
-    checkConfirmation.appendTo(divConfirmationCheck);
-    svg.loadImg(checkConfirmation, "/assets/img/check.svg")
-      .then(function(elt) { checkConfirmation = elt; });
-
-    var confirmModal = $("#sched-confirm-modal");
-    function closeConfirmModal() {
-      confirmModal.modal("hide");
-    }
-
-    var prof = profs[uid].prof;
-    var circView = profile.viewMediumCirc(prof);
-    var nameView = profile.viewMediumFullName(prof);
-    var divGuest = $("<div class='col-xs-11'/>")
-      .append(circView)
-      .append(nameView);
-
-    view
-      .append(divConfirmationCheck)
-      .append(divGuest)
-      .click(composeConfirmationEmail);
-
-    function setupSendButton() {
-      var sendButton = $("#sched-confirm-send");
-      sendButton
-        .removeClass("disabled")
-        .unbind('click')
-        .click(function() {
-          if (! sendButton.hasClass("disabled")) {
-            sendButton.addClass("disabled");
-            var body = $("#sched-confirm-message").val();
-            if ("Address_to_assistant"===$("#sched-confirm-guest-addr").val()) {
-              var ea = sched.assistedBy(uid, sched.getGuestOptions(ta));
-              if (util.isNotNull(ea)) {
-                uid = ea;
-              }
-            }
-            var chatid = chats[uid].chatid;
-            var hideEnd = ta.task_data[1].hide_end_times;
-            var chatItem = {
-              chatid: chatid,
-              by: login.me(),
-              'for': login.me(),
-              team: login.getTeam().teamid,
-              chat_item_data: ["Sched_confirm", {
-                body: body,
-                'final': getSlot(ta),
-                hide_end_time: hideEnd
-              }]
-            };
-            chat.postChatItem(chatItem)
-              .done(function(item) {
-                closeConfirmModal();
-                markChecked(divConfirmationCheck);
-              });
-          }
-        });
-    }
-
-    function composeConfirmationEmail() {
-      preFillConfirmModal(profs, ta, uid);
-      setupSendButton();
-      confirmModal.modal({});
-    }
-
-    return {
-      view: view,
-      composeConfirmationEmail: composeConfirmationEmail
-    };
-  }
-
-  function createConfirmSection(profs, ta, guests) {
-    var view = $("<div class='final-sched-div'/>");
-
-    var title = guests.length > 1 ?
-      "Send confirmation messages." :
-      "Send a confirmation message.";
-    $("<h3 class='final-sched-text'/>")
-      .text(title)
-      .appendTo(view);
-
-    list.iter(guests, function(uid) {
-      var x = createConfirmRow(profs, ta, uid);
-      x.view
-        .appendTo(view);
-
-      if (guests.length == 1) {
-        var uid = guests[0];
-        if (! sentConfirmation(uid))
-          x.composeConfirmationEmail();
-      }
-    });
-
-    return view;
-  }
-
-  function sentInvite(ta, uid) {
-    var state = sched.getState(ta);
-    return list.exists(state.reserved.notifs, function(notif) {
-      return uid === notif.participant;
-    });
-  }
-
-  function createInviteRow(profs, ta, uid) {
-    var view = $("<div class='sched-step4-row container clickable'>");
-
-    var divInvitationCheck = $("<div class='check-div col-xs-1'>")
-      .appendTo(view);
-    var checkInvitation = $("<img class='check'/>");
-    checkInvitation.appendTo(divInvitationCheck);
-    svg.loadImg(checkInvitation, "/assets/img/check.svg")
-      .then(function(elt) { checkInvitation = elt; });
-
-    function updateInviteAction(ta) {
-      if (sentInvite(ta, uid)) {
-        markChecked(divInvitationCheck);
-      }
-    }
-
-    updateInviteAction(ta);
-
-    var prof = profs[uid].prof;
-    var circView = profile.viewMediumCirc(prof);
-    var nameView = profile.viewMediumFullName(prof);
-    var divGuest = $("<div class='col-xs-11'/>")
-      .append(circView)
-      .append(nameView);
-
-    function sendGoogleInvite() {
-      api.reserveCalendar(ta.tid, { notified: [uid] })
-        .done(function(eventInfo) {
-          api.getTask(ta.tid)
-            .done(function(updatedTask) {
-              updateInviteAction(updatedTask);
-            });
-        });
-    }
-
-    view
-      .append(divInvitationCheck)
-      .append(divGuest)
-      .click(sendGoogleInvite);
-
-    return view;
-  }
-
-  function createReminderSelector(profs, task, guests) {
-    var sel;
-    var reserved = sched.getState(task).reserved;
+  function createReminderRow(profs, ta, uid, guests) {
+    var view = $("<div class='sched-step4-row container'/>");
 
     var reminderModal = $("#sched-reminder-modal");
+    var reserved = sched.getState(ta).reserved;
     function closeReminderModal() {
       reserved.reminder_message = $("#sched-reminder-message").val();
-      api.postTask(task);
+      api.postTask(ta);
       reminderModal.modal("hide");
     }
 
-    function composeReminderEmail() {
-      preFillReminderModal(profs, task, reserved, guests);
+    function editReminderEmail() {
+      preFillReminderModal(profs, ta, reserved, guests);
       reminderModal.modal({});
     }
+
+    var okButton = $("#sched-reminder-update");
+    okButton
+      .unbind('click')
+      .click(closeReminderModal);
+
+    var editDiv = $("<div class='reminder-edit-div clickable'/>")
+      .click(editReminderEmail);
+    var edit = $("<img class='reminder-edit'/>")
+      .appendTo(editDiv);
+    svg.loadImg(edit, "/assets/img/compose.svg")
+      .then(function(elt) { edit = elt; });
+
+    var prof = profs[uid].prof;
+    var guestName = profile.viewMediumFullName(prof)
+      .addClass("reminder-guest-name");
+
+    var guestStatusText = sentReminder(uid) ?
+      "Reminder sent" :
+      "Has not been sent a reminder";
+    var guestStatus = $("<div class='reminder-guest-status'/>")
+      .text(guestStatusText);
+
+    return view
+      .append(editDiv)
+      .append(guestName)
+      .append(guestStatus);
+  }
+
+  function createReminderScheduler(profs, task, guests) {
+    var sel;
+    var reserved = sched.getState(task).reserved;
 
     function saveTask() {
       var remind = sel.get();
@@ -428,79 +298,168 @@ var sched4 = (function() {
       key = "48h";
     sel.set(key);
 
-    var divReminder = $("<div class='final-sched-div'>");
-
-    var divReminderCheck = $("<div class='check-div col-xs-1'>")
-      .appendTo(divReminder);
-    var checkReminder = $("<img class='check'/>");
-    if (sentReminder(guests[0] /* unclean; assumes all the guests
-                                  receive the same reminder at the
-                                  same time */))
-      markChecked(divReminderCheck);
-    checkReminder.appendTo(divReminderCheck);
-    svg.loadImg(checkReminder, "/assets/img/check.svg")
-      .then(function(elt) { checkReminder = elt; });
-
-    var previewLink = $("<button class='btn btn-primary'>Preview</button>")
-      .unbind('click')
-      .click(function() {
-        composeReminderEmail();
-      });
-
-    var okButton = $("#sched-reminder-update");
-    okButton
-      .unbind('click')
-      .click(closeReminderModal);
-
-    var divReminderInstr = $("<div class='instr-div col-xs-11'>")
-      .appendTo(divReminder);
-    divReminderInstr
-      .append(sel.view)
-      .append(previewLink);
-
-    return divReminder;
+    return sel.view;
   }
 
-  function createInviteSection(profs, ta, guests) {
+  function createReminderSection(profs, task, guests) {
     var view = $("<div class='final-sched-div'/>");
 
+    var header = $("<div class='sched-step4-section-header'/>")
+      .appendTo(view);
+    var reminderIcon = $("<img class='sched-step4-section-icon'/>")
+      .appendTo(header);
+    svg.loadImg(reminderIcon, "/assets/img/reminder.svg")
+      .then(function(elt) { edit = elt; });
     var title = guests.length > 1 ?
-      "Send Google Calendar invitations." :
-      "Send a Google Calendar invitation.";
-    $("<h3 class='final-sched-text'/>")
+      "Schedule a reminder for guests" :
+      "Schedule a reminder";
+    var headerText = $("<div class='sched-step4-section-title'/>")
       .text(title)
+      .appendTo(header);
+
+    var scheduler = $("<div id='reminder-scheduler'/>")
+    var schedulerText = guests.length > 1 ?
+      "Send reminders" :
+      "Send the reminder";
+    $("<span id='scheduler-text'/>")
+      .text(schedulerText)
+      .appendTo(scheduler);
+    scheduler.append(createReminderScheduler(profs, task, guests))
+             .appendTo(view);
+
+    var content = $("<div/>")
       .appendTo(view);
 
     list.iter(guests, function(uid) {
-      createInviteRow(profs, ta, uid)
-        .appendTo(view);
+      var x = createReminderRow(profs, task, uid, guests)
+        .appendTo(content);
     });
+
     return view;
   }
 
-  function createRemindSection(profs, task, guests) {
+
+  /* CONFIRMATION */
+
+  function createConfirmRow(profs, ta, uid) {
+    var view = $("<div class='sched-step4-row container'/>");
+
+    var composeDiv = $("<div class='confirmation-compose-div clickable'/>")
+      .click(composeConfirmationEmail);
+    var compose = $("<img class='confirmation-compose'/>")
+      .appendTo(composeDiv);
+    svg.loadImg(compose, "/assets/img/compose.svg")
+      .then(function(elt) { compose = elt; });
+
+    var confirmModal = $("#sched-confirm-modal");
+    function closeConfirmModal() {
+      confirmModal.modal("hide");
+    }
+
+    var prof = profs[uid].prof;
+    var guestName = profile.viewMediumFullName(prof)
+      .addClass("confirmation-guest-name");
+
+    var guestStatusText = sentConfirmation(uid) ?
+      "Confirmation sent" :
+      "Has not been sent a confirmation";
+    var guestStatus = $("<div class='confirmation-guest-status'/>")
+      .text(guestStatusText);
+
+    view
+      .append(composeDiv)
+      .append(guestName)
+      .append(guestStatus);
+
+    function setupSendButton() {
+      var sendButton = $("#sched-confirm-send");
+      sendButton
+        .removeClass("disabled")
+        .unbind('click')
+        .click(function() {
+          if (! sendButton.hasClass("disabled")) {
+            sendButton.addClass("disabled");
+            var body = $("#sched-confirm-message").val();
+            if ("Address_to_assistant"===$("#sched-confirm-guest-addr").val()) {
+              var ea = sched.assistedBy(uid, sched.getGuestOptions(ta));
+              if (util.isNotNull(ea)) {
+                uid = ea;
+              }
+            }
+            var chatid = chats[uid].chatid;
+            var hideEnd = ta.task_data[1].hide_end_times;
+            var chatItem = {
+              chatid: chatid,
+              by: login.me(),
+              'for': login.me(),
+              team: login.getTeam().teamid,
+              chat_item_data: ["Sched_confirm", {
+                body: body,
+                'final': getSlot(ta),
+                hide_end_time: hideEnd
+              }]
+            };
+            chat.postChatItem(chatItem)
+              .done(function(item) {
+                closeConfirmModal();
+              });
+          }
+        });
+    }
+
+    function composeConfirmationEmail() {
+      preFillConfirmModal(profs, ta, uid);
+      setupSendButton();
+      confirmModal.modal({});
+    }
+
+    return {
+      view: view,
+      composeConfirmationEmail: composeConfirmationEmail
+    };
+  }
+
+  function createConfirmSection(profs, ta, guests) {
     var view = $("<div class='final-sched-div'/>");
 
+    var header = $("<div class='sched-step4-section-header'/>")
+      .appendTo(view);
+    var confirmationIcon = $("<img class='sched-step4-section-icon'/>")
+      .appendTo(header);
+    svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg")
+      .then(function(elt) { edit = elt; });
     var title = guests.length > 1 ?
-      "Send reminders." :
-      "Send a reminder.";
-    $("<h3 class='final-sched-text'/>")
+      "Send guests a confirmation message" :
+      "Send a confirmation message";
+    var headerText = $("<div class='sched-step4-section-title'/>")
       .text(title)
-      .appendTo(view);
+      .appendTo(header);
 
-    createReminderSelector(profs, task, guests)
+    var content = $("<div/>")
       .appendTo(view);
+    list.iter(guests, function(uid) {
+      var x = createConfirmRow(profs, ta, uid);
+      x.view.appendTo(content);
+      if (guests.length == 1) {
+        var uid = guests[0];
+        if (! sentConfirmation(uid))
+          x.composeConfirmationEmail();
+      }
+    });
 
     return view;
   }
 
-  function enableEventEditSave(task, titleEdit, saveButton) {
+
+  /* EDIT MEETING DETAILS */
+
+  function enableEventEditSave(task, titleEdit, updateButton) {
     if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
-      saveButton.removeClass("disabled");
+      updateButton.removeClass("disabled");
     }
   }
 
-  function updateCalendarEvent(task, titleEdit, notesEdit, saveButton) {
+  function updateCalendarEvent(task, titleEdit, notesEdit, updateButton) {
     var taskState = sched.getState(task);
     taskState.calendar_event_title.title_text = titleEdit.val();
     taskState.calendar_event_title.is_generated = false;
@@ -511,52 +470,69 @@ var sched4 = (function() {
         event_title: titleEdit.val(),
         event_notes: notesEdit.val()
       })
-        .done(function() { saveButton.addClass("disabled"); });
+        .done(function() { updateButton.addClass("disabled"); });
     });
   }
 
   function createEventEditSection(task) {
-    var view = $("<div class='final-sched-div'/>");
+    var view = $("<div id='edit-meeting-div' class='final-sched-div'/>");
+
+    var header = $("<div class='sched-step4-section-header'/>")
+      .appendTo(view);
+    var calendarIcon = $("<img class='sched-step4-section-icon'/>")
+      .appendTo(header);
+    svg.loadImg(calendarIcon, "/assets/img/calendar.svg")
+      .then(function(elt) { edit = elt; });
+    var headerText = $("<div class='sched-step4-section-title'/>")
+      .text("Edit meeting details")
+      .appendTo(header);
+
+    var content = $("<div id='meeting-content'/>")
+      .appendTo(view);
+
     var titleEdit =
       $("<input type='text' id='edit-calendar-title' class='form-control'/>");
-    var notesEdit = $("<textarea rows=5 class='form-control'/>");
-    var saveButton =
-      $("<button id='event-edit-save' class='btn btn-primary'/>");
+    var notesEdit = $("<textarea id='edit-event-notes' rows=5 class='form-control'/>");
+    var updateButton =
+      $("<button id='event-edit-update' class='btn btn-primary'/>");
     var state = sched.getState(task);
 
-    $("<h3 class='final-sched-text'/>")
-      .text("Edit calendar event details.")
-      .appendTo(view);
-
-    $("<div class='text-field-label'/>")
+    $("<div id='calendar-title' class='text-field-label'/>")
       .text("Title")
-      .appendTo(view);
+      .appendTo(content);
     titleEdit
       .val(state.calendar_event_title.title_text)
       .on("input", function() {
-        enableEventEditSave(task, titleEdit, saveButton)
+        enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(view);
+      .appendTo(content);
 
     $("<div class='text-field-label'/>")
       .text("Notes")
-      .appendTo(view);
+      .appendTo(content);
     notesEdit
       .val(state.calendar_event_notes)
       .on("input", function() {
-        enableEventEditSave(task, titleEdit, saveButton)
+        enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(view);
+      .appendTo(content);
 
-    saveButton
+    updateButton
       .addClass("disabled")
-      .text("Save to Calendar")
+      .text("Update calendar")
       .click(function() {
-        updateCalendarEvent(task, titleEdit, notesEdit, saveButton)
+        updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
       })
-      .appendTo(view);
+      .appendTo(content);
 
     return view;
+  }
+
+
+  function createConnector(idName) {
+    var connector = $("<img id='" + idName + "' class='connector'/>");
+    svg.loadImg(connector, "/assets/img/connector.svg");
+    return connector;
   }
 
   mod.load = function(profs, ta, view) {
@@ -565,12 +541,12 @@ var sched4 = (function() {
     chats = sched.chatsOfTask(ta);
 
     view
+      .append($("<h3>Finalize and confirm the meeting.</h3>"))
+      .append(createEventEditSection(ta))
+      .append(createConnector("step4-1to2"))
       .append(createConfirmSection(profs, ta, guests))
-      /* Invites are disabled for now in favor of sending a custom URL
-         that redirects the guest to their own Google calendar. */
-      //.append(createInviteSection(profs, ta, guests))
-      .append(createRemindSection(profs, ta, guests))
-      .append(createEventEditSection(ta));
+      .append(createConnector("step4-2to3"))
+      .append(createReminderSection(profs, ta, guests));
 
     observable.onTaskParticipantsChanged.observe("step4", function(ta) {
       chats = sched.chatsOfTask(ta);
