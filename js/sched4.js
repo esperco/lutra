@@ -216,76 +216,6 @@ var sched4 = (function() {
   }
 
 
-  /* INVITATIONS */
-
-  // function sentInvite(ta, uid) {
-  //   var state = sched.getState(ta);
-  //   return list.exists(state.reserved.notifs, function(notif) {
-  //     return uid === notif.participant;
-  //   });
-  // }
-
-  // function createInviteRow(profs, ta, uid) {
-  //   var view = $("<div class='sched-step4-row container clickable'>");
-
-  //   var divInvitationCheck = $("<div class='check-div col-xs-1'>")
-  //     .appendTo(view);
-  //   var checkInvitation = $("<img class='check'/>");
-  //   checkInvitation.appendTo(divInvitationCheck);
-  //   svg.loadImg(checkInvitation, "/assets/img/check.svg")
-  //     .then(function(elt) { checkInvitation = elt; });
-
-  //   function updateInviteAction(ta) {
-  //     if (sentInvite(ta, uid)) {
-  //       markChecked(divInvitationCheck);
-  //     }
-  //   }
-
-  //   updateInviteAction(ta);
-
-  //   var prof = profs[uid].prof;
-  //   var circView = profile.viewMediumCirc(prof);
-  //   var nameView = profile.viewMediumFullName(prof);
-  //   var divGuest = $("<div class='col-xs-11'/>")
-  //     .append(circView)
-  //     .append(nameView);
-
-  //   function sendGoogleInvite() {
-  //     api.reserveCalendar(ta.tid, { notified: [uid] })
-  //       .done(function(eventInfo) {
-  //         api.getTask(ta.tid)
-  //           .done(function(updatedTask) {
-  //             updateInviteAction(updatedTask);
-  //           });
-  //       });
-  //   }
-
-  //   view
-  //     .append(divInvitationCheck)
-  //     .append(divGuest)
-  //     .click(sendGoogleInvite);
-
-  //   return view;
-  // }
-
-  // function createInviteSection(profs, ta, guests) {
-  //   var view = $("<div class='final-sched-div'/>");
-
-  //   var title = guests.length > 1 ?
-  //     "Send Google Calendar invitations." :
-  //     "Send a Google Calendar invitation.";
-  //   $("<h3 class='final-sched-text'/>")
-  //     .text(title)
-  //     .appendTo(view);
-
-  //   list.iter(guests, function(uid) {
-  //     createInviteRow(profs, ta, uid)
-  //       .appendTo(view);
-  //   });
-  //   return view;
-  // }
-
-
   /* REMINDERS */
 
   function createReminderRow(profs, ta, uid, guests) {
@@ -524,7 +454,9 @@ var sched4 = (function() {
   /* EDIT MEETING DETAILS */
 
   function enableEventEditSave(task, titleEdit, updateButton) {
+    log("here");
     if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
+      log("and here");
       updateButton.removeClass("disabled");
     }
   }
@@ -562,7 +494,7 @@ var sched4 = (function() {
 
     var titleEdit =
       $("<input type='text' id='edit-calendar-title' class='form-control'/>");
-    var notesEdit = $("<textarea rows=5 class='form-control'/>");
+    var notesEdit = $("<textarea id='edit-event-notes' rows=5 class='form-control'/>");
     var updateButton =
       $("<button id='event-edit-update' class='btn btn-primary'/>");
     var state = sched.getState(task);
@@ -590,7 +522,6 @@ var sched4 = (function() {
     updateButton
       .addClass("disabled")
       .text("Update calendar")
-      .unbind('click')
       .click(function() {
         updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
       })
@@ -617,9 +548,6 @@ var sched4 = (function() {
       .append(createConnector("step4-1to2"))
       .append(createConfirmSection(profs, ta, guests))
       .append(createConnector("step4-2to3"))
-      /* Invites are disabled for now in favor of sending a custom URL
-         that redirects the guest to their own Google calendar. */
-      //.append(createInviteSection(profs, ta, guests))
       .append(createReminderSection(profs, ta, guests));
 
     observable.onTaskParticipantsChanged.observe("step4", function(ta) {
