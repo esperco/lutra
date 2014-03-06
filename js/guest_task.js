@@ -104,7 +104,17 @@ var guestTask = function() {
     return view;
   }
 
-  function viewOfTimeOnly(x) {
+  function describeTimeSlot(start, end, hideEndTime) {
+    var fromTime = wordify(date.timeOnly(start));
+    if (hideEndTime) {
+      return fromTime;
+    } else {
+      var toTime = wordify(date.timeOnly(end));
+      return fromTime + " to " + toTime;
+    }
+  }
+
+  function viewOfTimeOnly(x, hideEndTime) {
     var view = $("<div/>");
     var time1 = $("<div/>")
       .appendTo(view);
@@ -114,17 +124,11 @@ var guestTask = function() {
     var t1 = date.ofString(x.start);
     var t2 = date.ofString(x.end);
 
-    var fromTime = wordify(date.timeOnly(t1));
-    var toTime = wordify(date.timeOnly(t2));
-
-    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
-      fromTime = fromTime.substr(0, fromTime.length-3);
-
     time1
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
     time2
-      .append(fromTime + " to " + toTime);
+      .append(describeTimeSlot(t1, t2, hideEndTime));
 
     return view;
   }
@@ -187,7 +191,7 @@ var guestTask = function() {
     }
   }
 
-  function viewOfTimeAndPlace(x) {
+  function viewOfTimeAndPlace(x, hideEndTime) {
     var view = $("<div id='time-and-place'/>");
 
     var meetingTime = $("<div id='meeting-time'/>")
@@ -203,17 +207,11 @@ var guestTask = function() {
     var t1 = date.ofString(x.start);
     var t2 = date.ofString(x.end);
 
-    var fromTime = wordify(date.timeOnly(t1));
-    var toTime = wordify(date.timeOnly(t2));
-
-    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
-      fromTime = fromTime.substr(0, fromTime.length-3);
-
     time1
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
     time2
-      .append(fromTime + " to " + toTime);
+      .append(describeTimeSlot(t1, t2, hideEndTime));
 
     var meetingLoc = $("<div id='meeting-location'/>")
       .appendTo(view);
@@ -255,12 +253,13 @@ var guestTask = function() {
     return s.replace(/-|:|\.\d+/g, "");
   }
 
-  function googleCalendarURL(text1, text2, slot) {
+  function googleCalendarURL(text1, text2, slot, hideEndTime) {
+    var fromTime = stripTimestamp(slot.start_utc, slot.start);
+    var toTime = hideEndTime ? fromTime : stripTimestamp(slot.end_utc,slot.end);
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
             "text=" + encodeURIComponent(text1),
-            "dates=" + stripTimestamp(slot.start_utc, slot.start)
-               + "/" + stripTimestamp(slot.end_utc,   slot.end),
+            "dates=" + fromTime + "/" + toTime,
             "details=" + encodeURIComponent("For meeting details, click here: " + text2),
             "location=" + encodeURIComponent(chat.locationText(slot.location)),
             "trp=true",             // show as busy
@@ -286,7 +285,8 @@ var guestTask = function() {
       $('[data-toggle="popover"]').click();
       window.open(googleCalendarURL(x.calendar_event_title.title_text,
                                     window.location,
-                                    x.reserved.slot));
+                                    x.reserved.slot,
+                                    x.hide_end_times));
     })
 
     button.popover({
@@ -336,30 +336,32 @@ var guestTask = function() {
     var chat = list.find(task.guest_task.task_chats, function(chat) {
       return task.guest_uid === chat.chat_with;
     });
+    if (util.isNotNull(chat)) {
+      var msgItem = null;
+      for (var i = chat.chat_items.length; --i >= 0; ) {
+        var item = chat.chat_items[i];
+        switch (variant.cons(item.chat_item_data)) {
 
-    var msgItem = null;
-    for (var i = chat.chat_items.length; --i >= 0; ) {
-      var item = chat.chat_items[i];
-      switch (variant.cons(item.chat_item_data)) {
+        case "Message":
+          var r = /^None of the above(?:\n+|$)(.*)/i
+                  .exec(item.chat_item_data[1]);
+          if (r) {
+            return {comment:r[1], noneWorks:true, answers:{}};
+          }
+          msgItem = item;
+          break;
 
-      case "Message":
-        var r = /^None of the above(?:\n+|$)(.*)/i.exec(item.chat_item_data[1]);
-        if (r) {
-          return {comment:r[1], noneWorks:true, answers:{}};
+        case "Scheduling_r":
+          var comment = util.isNotNull(msgItem)
+                     && item.id === msgItem.in_reply_to
+                     && item.by === msgItem.by
+            ? msgItem.chat_item_data[1]
+            : "";
+          return {comment:comment, noneWorks:false,
+                  answers:list.toTable(item.chat_item_data[1].selected,
+                                       function(sel){return sel.label})};
+        default: break;
         }
-        msgItem = item;
-        break;
-
-      case "Scheduling_r":
-        var comment = util.isNotNull(msgItem)
-                   && item.id === msgItem.in_reply_to
-                   && item.by === msgItem.by
-          ? msgItem.chat_item_data[1]
-          : "";
-        return {comment:comment, noneWorks:false,
-                answers:list.toTable(item.chat_item_data[1].selected,
-                                     function(sel){return sel.label})};
-      default: break;
       }
     }
     return {comment:"", noneWorks:false, answers:{}};
@@ -369,7 +371,7 @@ var guestTask = function() {
     var ta = task.guest_task;
 
     var myLast = recoverCalendarSelection(task);
-    var answers = myLast.answers;
+    var answers = {};
 
     function submitButton() {
       var submitButton = $("<button/>", {
@@ -455,7 +457,7 @@ var guestTask = function() {
       return slotView;
     }
 
-    function viewOfCalendarOption(choice, label, typ) {
+    function viewOfCalendarOption(choice, label, typ, hideEndTime) {
       var slotView = $("<tr class='option'/>");
       if (answers[choice.label]) {
         slotView.addClass("checkbox-selected");
@@ -488,7 +490,7 @@ var guestTask = function() {
       var whenLabel = $("<div class='info-label'/>")
         .text("WHEN")
         .appendTo(when);
-      var time = viewOfTimeOnly(choice.slot)
+      var time = viewOfTimeOnly(choice.slot, hideEndTime)
         .addClass("info")
         .appendTo(when);
 
@@ -548,7 +550,8 @@ var guestTask = function() {
           var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
                   .append(viewOfMeetingHeader(ta, state))
-                  .append(viewOfTimeAndPlace(state.reserved.slot))
+                  .append(viewOfTimeAndPlace(state.reserved.slot,
+                                             state.hide_end_times))
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
@@ -588,8 +591,12 @@ var guestTask = function() {
             .appendTo(select);
           var typ = meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
+            if (util.isNotNull(myLast.answers[choice.label])) {
+              answers[choice.label] = choice;
+            }
             var label = indexLabel(i);
-            options.append(viewOfCalendarOption(choice, label, typ));
+            options.append(viewOfCalendarOption(choice, label, typ,
+                                                state.hide_end_times));
           });
           options.append(viewOfNoneWorks(state.calendar_options));
           // var editComment = $("<textarea id='comment' class='form-control'/>");
