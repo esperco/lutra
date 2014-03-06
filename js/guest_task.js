@@ -330,9 +330,44 @@ var guestTask = function() {
     return view;
   }
 
+  function recoverCalendarSelection(task) {
+    var chat = list.find(task.guest_task.task_chats, function(chat) {
+      return task.guest_uid === chat.chat_with;
+    });
+
+    var msgItem = null;
+    for (var i = chat.chat_items.length; --i >= 0; ) {
+      var item = chat.chat_items[i];
+      switch (variant.cons(item.chat_item_data)) {
+
+      case "Message":
+        var r = /^None of the above(?:\n+|$)(.*)/i.exec(item.chat_item_data[1]);
+        if (r) {
+          return {comment:r[1], noneWorks:true, answers:{}};
+        }
+        msgItem = item;
+        break;
+
+      case "Scheduling_r":
+        var comment = util.isNotNull(msgItem)
+                   && item.id === msgItem.in_reply_to
+                   && item.by === msgItem.by
+          ? msgItem.chat_item_data[1]
+          : "";
+        return {comment:comment, noneWorks:false,
+                answers:list.toTable(item.chat_item_data[1].selected,
+                                     function(sel){return sel.label})};
+      default: break;
+      }
+    }
+    return {comment:"", noneWorks:false, answers:{}};
+  }
+
   mod.loadTask = function(task) {
     var ta = task.guest_task;
-    var answers = {};
+
+    var myLast = recoverCalendarSelection(task);
+    var answers = myLast.answers;
 
     function submitButton() {
       var submitButton = $("<button/>", {
@@ -381,6 +416,9 @@ var guestTask = function() {
 
     function viewOfNoneWorks(options) {
       var slotView = $("<tr id='option-none'/>");
+      if (myLast.noneWorks) {
+        slotView.addClass("checkbox-selected");
+      }
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
       var info = $("<td id='option-none-text'/>")
@@ -415,6 +453,9 @@ var guestTask = function() {
 
     function viewOfCalendarOption(choice, label, typ) {
       var slotView = $("<tr class='option'/>");
+      if (answers[choice.label]) {
+        slotView.addClass("checkbox-selected");
+      }
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
       var info = $("<td class='option-info'/>")
@@ -547,10 +588,16 @@ var guestTask = function() {
             options.append(viewOfCalendarOption(choice, label, typ));
           });
           options.append(viewOfNoneWorks(state.calendar_options));
+          var editComment = $("<textarea id='comment' class='form-control'/>");
           select.append($("<div id='comment-header'/>")
                 .text("COMMENT"))
-                .append($("<textarea id='comment' class='form-control'/>"))
+                .append(editComment);
           select.append(submitButton());
+
+          editComment.val(myLast.comment.trim());
+          util.afterTyping(editComment, 250, function() {
+            $("#submit-selections").removeClass("btn-primary-disabled");
+          });
 
           var feedback = $("<div id='feedback' class='hide'/>")
             .append(viewOfFeedback)
