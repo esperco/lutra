@@ -338,23 +338,21 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
-  function chatEditor(blank, messages, chat, task) {
+  function chatEditor(blank, messages, chat, task, textBox, writeButton) {
     var chatFooter = $("<div class='chat-footer scrollable'/>");
     var editor = $("<div class='chat-editor'/>")
+      .append(textBox)
       .appendTo(chatFooter);
 
-    var editText = $("<textarea class='chat-entry'></textarea>")
-      .appendTo(editor);
-
-    editText.autosize();
+    textBox.autosize();
 
     if (chat.chat_items.length === 0) {
-      editText.attr("placeholder", "Write a message...");
+      textBox.attr("placeholder", "Write a message...");
     } else {
-      editText.attr("placeholder", "Write a reply...");
+      textBox.attr("placeholder", "Write a reply...");
     }
 
-    editText.val("");
+    textBox.val("");
 
     // var choicesEditor = editChoices();
     // choicesEditor.hide();
@@ -394,7 +392,7 @@ var chat = (function () {
       .text("Send")
       .appendTo(sendDiv);
 
-    editText.on("keyup", function (e){
+    textBox.on("keyup", function (e){
       if ($(this).val() !== "") {
         sendButton.removeClass("disabled");
       } else {
@@ -404,8 +402,8 @@ var chat = (function () {
 
     sendButton.click(function () {
       var data = selChoicesDiv.hasClass("checkbox-selected")
-               ? selector_q_data(editText.val(), choicesEditor)
-               : message_data(editText.val());
+               ? selector_q_data(textBox.val(), choicesEditor)
+               : message_data(textBox.val());
       if (data) {
         var me = login.me();
         var item = {
@@ -414,8 +412,8 @@ var chat = (function () {
           for: me,
           chat_item_data:data
         };
-        editText.val("");
-        editText.attr("placeholder", "Write a reply...");
+        textBox.val("");
+        textBox.attr("placeholder", "Write a reply...");
 
         // if (selChoicesDiv.hasClass("checkbox-selected")) {
         //   choicesEditor.toggle();
@@ -433,6 +431,11 @@ var chat = (function () {
         }
 
         mod.postChatItem(item);
+
+        if (writeButton != null) {
+          chatFooter.addClass("hide");
+          writeButton.removeClass("hide");
+        }
       }
     });
 
@@ -459,9 +462,28 @@ var chat = (function () {
   function chatView(chat, task) {
     var me = login.me();
     var v = $("<div/>");
+    var textBox = $("<textarea class='chat-entry'></textarea>");
 
     if (! $("#chat").hasClass("modal-body")) {
-      v.append(chatEditor(blank, messages, chat, task, bridge));
+      var writeArea;
+
+      var writeButton = $("<textarea class='write-message'></textarea>")
+        .appendTo(v)
+        .click(function() {
+          writeButton.addClass("hide");
+          writeArea.removeClass("hide");
+          textBox.focus();
+        });
+
+      if (chat.chat_items.length === 0) {
+        writeButton.attr("placeholder", "Write a message...");
+      } else {
+        writeButton.attr("placeholder", "Write a reply...");
+      }
+
+      writeArea = chatEditor(blank, messages, chat, task, textBox, writeButton)
+        .addClass("hide")
+        .appendTo(v);
     }
 
     var messages = $("<div class='messages scrollable'></div>")
@@ -496,7 +518,7 @@ var chat = (function () {
     }
 
     if ($("#chat").hasClass("modal-body")) {
-      v.append(chatEditor(blank, messages, chat, task, bridge));
+      v.append(chatEditor(blank, messages, chat, task, textBox, null));
     }
 
     return v;

@@ -2,7 +2,7 @@ var guestTask = function() {
   var mod = {};
 
   function viewOfFeedback() {
-    var view = $("<div/>");
+    var view = $("<div id='feedback'/>");
 
     var checkCircle = $("<div id='check-circle' class='animated'/>");
     var check = $("<img id='submitted-check'/>");
@@ -14,14 +14,16 @@ var guestTask = function() {
       .append("Your selections have been submitted.")
       .appendTo(view);
 
-    var back = $("<img id='submitted-back'/>");
-    var change = $("<div id='edit-selections'/>")
-      .append(back)
-      .append($("<span id='edit-selections-text'>Edit selections</span>"))
+    // var editButton = $("<div id='edit-selections-btn'/>")
+    //   .appendTo(view);
+    var editIcon = $("<img id='edit-selections-icon'/>");
+    edit = $("<div id='edit-selections' class='btn btn-primary'/>")
+      .append(editIcon)
+      .append($("<div id='edit-selections-text'>Edit selections</div>"))
       .appendTo(view);
-    svg.loadImg(back, "/assets/img/back.svg");
+    svg.loadImg(editIcon, "/assets/img/edit.svg");
 
-    change.click(function() {
+    edit.click(function() {
       $("#check-circle").removeClass("pulse");
       $("#feedback").addClass("hide");
       $("#guest-select").removeClass("hide");
@@ -378,7 +380,8 @@ var guestTask = function() {
       submitButton.click(function() {
         var noneWorks = $("#option-none").hasClass("checkbox-selected")
                         ? $("#option-none-text").text().trim() : "";
-        var message = join(noneWorks, "\n\n", $("#comment").val().trim());
+        var message = noneWorks;
+        // var message = join(noneWorks, "\n\n", $("#comment").val().trim());
         function postMessage(reply) {
           if (message.length > 0) {
             var item = {
@@ -407,6 +410,7 @@ var guestTask = function() {
           });
         }
 
+        $("html, body").animate({ scrollTop: 0 }, 350);
         $("#guest-select").addClass("hide");
         $("#feedback").removeClass("hide");
         $("#check-circle").addClass("pulse");
@@ -568,7 +572,6 @@ var guestTask = function() {
           taskView.append($("<div class='task-section-header'/>")
                   .append(messagesIcon)
                   .append("<div class='task-section-text'>MESSAGES</div>"));
-          // $("#chat").removeClass("hide");
           svg.loadImg(guestsIcon, "/assets/img/group.svg");
           svg.loadImg(notesIcon, "/assets/img/edit.svg");
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
@@ -576,9 +579,10 @@ var guestTask = function() {
           var hostName = list.map(task.guest_hosts, function(uid) {
                   return profile.fullName(profs[uid].prof);
                 }).join(" & ");
+          taskView.append($("<div id='options-title'/>")
+                  .text("When can you meet with " + hostName + "?"));
+
           var select = $("<div id='guest-select'/>")
-            .append($("<div id='options-title'/>")
-              .text("When can you meet with " + hostName + "?"))
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
@@ -588,28 +592,26 @@ var guestTask = function() {
             options.append(viewOfCalendarOption(choice, label, typ));
           });
           options.append(viewOfNoneWorks(state.calendar_options));
-          var editComment = $("<textarea id='comment' class='form-control'/>");
-          select.append($("<div id='comment-header'/>")
-                .text("COMMENT"))
-                .append(editComment);
+          // var editComment = $("<textarea id='comment' class='form-control'/>");
+          // select.append($("<div id='comment-header'/>")
+          //       .text("COMMENT"))
+          //       .append(editComment);
           select.append(submitButton());
 
-          editComment.val(myLast.comment.trim());
-          util.afterTyping(editComment, 250, function() {
-            $("#submit-selections").removeClass("btn-primary-disabled");
-          });
-
-          var messagesIcon = $("<img id='messages-icon'/>");
-          select.append($("<div class='task-section-header'/>")
-                .append(messagesIcon)
-                .append("<div class='task-section-text'>MESSAGES</div>"));
-          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
+          // editComment.val(myLast.comment.trim());
+          // util.afterTyping(editComment, 250, function() {
+          //   $("#submit-selections").removeClass("btn-primary-disabled");
+          // });
 
           var feedback = $("<div id='feedback' class='hide'/>")
             .append(viewOfFeedback)
             .appendTo(taskView);
 
-          // $("#chat").addClass("hide");
+          var messagesIcon = $("<img id='messages-icon'/>");
+          taskView.append($("<div id='messages-header'/>")
+                  .append(messagesIcon)
+                  .append("<div class='task-section-text'>MESSAGES</div>"));
+          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
         }
       }
 

@@ -23,7 +23,7 @@
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
-@purple_disabled: #e8d9ee;
+@purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
 @red: #d9534f;
@@ -1788,6 +1788,7 @@ object {
 // }
 
 .chat-editor {
+  padding-bottom: 6px;
   background: @white;
   border: 1px solid @gray_20;
   border-radius: 3px;
@@ -1795,7 +1796,7 @@ object {
 
 .chat-entry {
   width: 100%;
-  min-height: 100px;
+  height: 100px;
   padding: 8px;
   overflow: hidden;
   border: none;
@@ -1818,10 +1819,7 @@ object {
   font-family: @light;
 }
 
-.chat-actions {
-  margin-top: 6px;
-  margin-bottom: 6px;
-}
+.chat-actions { margin-top: 6px; }
 
 // .option-list {
 //   padding-left: 28px;
@@ -1897,16 +1895,13 @@ object {
 //   cursor: pointer;
 // }
 
-.chat-send {
-  padding-right: 10px;
-}
+.chat-send { padding-right: 10px; }
 
 .chat-send-btn {
   float: right;
   height: 26px;
   padding: 0 8px 0px 8px;
   font-size: 14px;
-  // font-family: @regular;
 }
 
 
