@@ -64,13 +64,6 @@
       <div id="made">Made in Palo Alto, CA</div>
     </div>
 
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/bootstrap.min.js"></script>
-    <script src="/assets/js/can.min.js"></script>
-    <script src="/assets/js/sha1.js"></script>
-    <script src="/assets/js/jquery.timeago.js"></script>
-    <script src="/assets/js/jquery.autosize.min.js"></script>
-
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>
 
