@@ -252,7 +252,7 @@ var sched4 = (function() {
 
     var guestStatusText = sentReminder(uid) ?
       "Reminder sent" :
-      "Has not been sent a reminder";
+      "Has not received a reminder";
     var guestStatus = $("<div class='reminder-guest-status'/>")
       .text(guestStatusText);
 
@@ -308,8 +308,7 @@ var sched4 = (function() {
       .appendTo(view);
     var reminderIcon = $("<img class='sched-step4-section-icon'/>")
       .appendTo(header);
-    svg.loadImg(reminderIcon, "/assets/img/reminder.svg")
-      .then(function(elt) { edit = elt; });
+    svg.loadImg(reminderIcon, "/assets/img/reminder.svg");
     var title = guests.length > 1 ?
       "Schedule a reminder for guests" :
       "Schedule a reminder";
@@ -362,7 +361,7 @@ var sched4 = (function() {
 
     var guestStatusText = sentConfirmation(uid) ?
       "Confirmation sent" :
-      "Has not been sent a confirmation";
+      "Has not received a confirmation";
     var guestStatus = $("<div class='confirmation-guest-status'/>")
       .text(guestStatusText);
 
@@ -426,8 +425,7 @@ var sched4 = (function() {
       .appendTo(view);
     var confirmationIcon = $("<img class='sched-step4-section-icon'/>")
       .appendTo(header);
-    svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg")
-      .then(function(elt) { edit = elt; });
+    svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg");
     var title = guests.length > 1 ?
       "Send guests a confirmation message" :
       "Send a confirmation message";
@@ -474,56 +472,101 @@ var sched4 = (function() {
     });
   }
 
-  function createEventEditSection(task) {
+  function createReviewSection(task) {
     var view = $("<div id='edit-meeting-div' class='final-sched-div'/>");
 
     var header = $("<div class='sched-step4-section-header'/>")
       .appendTo(view);
     var calendarIcon = $("<img class='sched-step4-section-icon'/>")
       .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg")
-      .then(function(elt) { edit = elt; });
+    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
     var headerText = $("<div class='sched-step4-section-title'/>")
-      .text("Edit meeting details")
+      .text("Review meeting details")
       .appendTo(header);
 
     var content = $("<div id='meeting-content'/>")
       .appendTo(view);
+    var summary = $("<div id='meeting-summary'/>")
+      .appendTo(content);
+    var editMode = $("<div id='meeting-edit' class='hide'/>")
+      .appendTo(content);
+
+    var edit = $("<button type='button' class='btn btn-default edit-meeting-btn'>Edit</button>");
+    var editDetails = $("<li class='edit-details'><a>Edit details</a></li>");
+    var reschedule = $("<li><a id='reschedule-meeting'>Reschedule meeting</a></li>");
+    var cancel = $("<li><a id='cancel-meeting'>Cancel & archive meeting</a></li>");
+    var editButton = $("<div class='btn-group edit-meeting'/>")
+      .append(edit)
+      .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
+        .append($("<span class='caret'/>"))
+        .append($("<span class='sr-only'>Toggle Dropdown</span>")))
+      .append($("<ul class='dropdown-menu pull-right edit-guest-dropdown' role='menu'/>")
+        .append(editDetails)
+        .append(reschedule)
+        .append(cancel))
+      .appendTo(summary);
+
+    var details = $("<tr/>")
+      .appendTo(summary);
+    var state = sched.getState(task);
+    var choice = state.calendar_options[0]; // This is just a placeholder. Needs to be the selected option.
+    var typ = sched.meetingType(state);
+    var hideEndTime = state.hide_end_times;
+    var info = sched.viewOfOption(choice, typ, hideEndTime)
+      .attr("id","meeting-details")
+      .appendTo(summary);
 
     var titleEdit =
       $("<input type='text' id='edit-calendar-title' class='form-control'/>");
     var notesEdit = $("<textarea id='edit-event-notes' rows=5 class='form-control'/>");
     var updateButton =
       $("<button id='event-edit-update' class='btn btn-primary'/>");
-    var state = sched.getState(task);
+    var cancelEditMode = $("<span id='cancel-edit-mode' class='link'>Cancel</span>");
 
     $("<div id='calendar-title' class='text-field-label'/>")
       .text("Title")
-      .appendTo(content);
+      .appendTo(editMode);
     titleEdit
       .val(state.calendar_event_title.title_text)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(content);
+      .appendTo(editMode);
 
     $("<div class='text-field-label'/>")
       .text("Notes")
-      .appendTo(content);
+      .appendTo(editMode);
     notesEdit
       .val(state.calendar_event_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(content);
+      .appendTo(editMode);
 
+    function toggleEditMode() {
+      if (summary.hasClass("hide")) {
+        summary.removeClass("hide");
+        editMode.addClass("hide");
+      } else {
+        summary.addClass("hide");
+        editMode.removeClass("hide");
+      }
+    }
+
+    edit.click(toggleEditMode);
+    editDetails.click(toggleEditMode);
+
+    var editActions = $("<div id='edit-meeting-actions' class='clearfix'/>").appendTo(editMode);
     updateButton
       .addClass("disabled")
       .text("Update calendar")
       .click(function() {
         updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
       })
-      .appendTo(content);
+      .appendTo(editActions);
+    cancelEditMode
+      .click(toggleEditMode)
+      .appendTo(editActions);
 
     return view;
   }
@@ -542,7 +585,7 @@ var sched4 = (function() {
 
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
-      .append(createEventEditSection(ta))
+      .append(createReviewSection(ta))
       .append(createConnector("step4-1to2"))
       .append(createConfirmSection(profs, ta, guests))
       .append(createConnector("step4-2to3"))

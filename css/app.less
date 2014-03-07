@@ -102,6 +102,15 @@ object {
   cursor: pointer;
 }
 
+.link {
+  color: @purple;
+  cursor: pointer;
+  &:hover {
+    color: @purple_hover;
+    text-decoration: underline;
+  }
+}
+
 #global-status {
   cursor: pointer;
   position: absolute;
@@ -2355,6 +2364,56 @@ object {
 }
 
 
+/*** Meeting Details ***/
+
+.edit-meeting {
+  float: right;
+  margin-top: 5px;
+}
+
+.edit-meeting-btn {
+  margin-right: 2px;
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.option-info {
+  padding: 20px 0 16px 0;
+}
+
+.info-row {
+  margin-bottom: 6px;
+}
+
+.info-label {
+  float: left;
+  width: 50px;
+  margin-top: 3px;
+  margin-left: 30px;
+  color: @gray_40;
+  font-size: 13px;
+  font-family: @bold;
+  text-align: right;
+  @media (max-width: 767px) {
+    margin-left: 8px;
+  }
+}
+
+.info {
+  margin-left: 100px;
+  padding-top: 1px;
+  @media (max-width: 767px) {
+    margin-left: 70px;
+  }
+}
+
+.start-end {
+  font-family: @bold;
+}
+
+
 /*** Scheduling Step 4 ***/
 
 .final-sched-div {
@@ -2391,11 +2450,40 @@ object {
   border-top: 1px solid @gray_20;
 }
 
+#reschedule-meeting {
+  cursor: pointer;
+}
+
+#cancel-meeting {
+  color: @red !important;
+  cursor: pointer;
+  &:hover {
+    color: @white !important;
+    background: @red !important;
+  }
+}
+
+#meeting-details {
+  padding: 0;
+}
+
 #calendar-title { padding-top: 0; }
 
 #edit-event-notes { resize: none; }
 
-#event-edit-update { margin-top: 15px; }
+#edit-meeting-actions { text-align: right; }
+
+#cancel-edit-mode {
+  display: inline-block;
+  margin-top: 21px;
+  font-size: 14px;
+}
+
+#event-edit-update {
+  float: right;
+  margin-top: 15px;
+  margin-left: 10px;
+}
 
 .sched-step4-row {
   min-height: 72px;
