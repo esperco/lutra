@@ -459,22 +459,40 @@ var guestTask = function() {
 
     function viewOfCalendarOption(choice, label, typ, hideEndTime) {
       var slotView = $("<tr class='option'/>");
-      if (answers[choice.label]) {
-        slotView.addClass("checkbox-selected");
-      }
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
-      var info = $("<td class='option-info'/>")
-        .appendTo(slotView);
 
-      var checkboxContainer = $("<div class='checkbox-container'/>");
-      var checkbox = $("<img/>");
-      select.append(checkboxContainer.append(checkbox));
-      svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+      if (! list.mem(task.guest_hosts, task.guest_uid)) {
+        if (answers[choice.label]) {
+          slotView.addClass("checkbox-selected");
+        }
+        var checkboxContainer = $("<div class='checkbox-container'/>");
+        var checkbox = $("<img/>");
+        select.append(checkboxContainer.append(checkbox));
+        svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+
+        checkboxContainer.click(function() {
+          if (slotView.hasClass("checkbox-selected")) {
+            slotView.removeClass("checkbox-selected");
+            delete answers[choice.label];
+            if (jQuery.isEmptyObject(answers)) {
+              $("#submit-selections").addClass("btn-primary-disabled");
+            }
+          } else {
+            slotView.addClass("checkbox-selected");
+            $("#submit-selections").removeClass("btn-primary-disabled");
+            answers[choice.label] = choice;
+            $("#option-none").removeClass("checkbox-selected");
+          }
+        });
+      }
 
       var optionLetter = $("<div class='option-letter'/>")
         .text(label)
         .appendTo(select);
+
+      var info = $("<td class='option-info'/>")
+        .appendTo(slotView);
 
       var what = $("<div class='info-row'/>")
         .appendTo(info);
@@ -514,21 +532,6 @@ var guestTask = function() {
       if (notesText.text() != "") {
         notes.removeClass("hide");
       }
-
-      checkboxContainer.click(function() {
-        if (slotView.hasClass("checkbox-selected")) {
-          slotView.removeClass("checkbox-selected");
-          delete answers[choice.label];
-          if (jQuery.isEmptyObject(answers)) {
-            $("#submit-selections").addClass("btn-primary-disabled");
-          }
-        } else {
-          slotView.addClass("checkbox-selected");
-          $("#submit-selections").removeClass("btn-primary-disabled");
-          answers[choice.label] = choice;
-          $("#option-none").removeClass("checkbox-selected");
-        }
-      });
 
       return slotView;
     }
@@ -598,17 +601,10 @@ var guestTask = function() {
             options.append(viewOfCalendarOption(choice, label, typ,
                                                 state.hide_end_times));
           });
-          options.append(viewOfNoneWorks(state.calendar_options));
-          // var editComment = $("<textarea id='comment' class='form-control'/>");
-          // select.append($("<div id='comment-header'/>")
-          //       .text("COMMENT"))
-          //       .append(editComment);
-          select.append(submitButton());
-
-          // editComment.val(myLast.comment.trim());
-          // util.afterTyping(editComment, 250, function() {
-          //   $("#submit-selections").removeClass("btn-primary-disabled");
-          // });
+          if (! list.mem(task.guest_hosts, task.guest_uid)) {
+            options.append(viewOfNoneWorks(state.calendar_options));
+            select.append(submitButton());
+          }
 
           var feedback = $("<div id='feedback' class='hide'/>")
             .append(viewOfFeedback)
