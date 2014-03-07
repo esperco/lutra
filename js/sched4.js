@@ -646,8 +646,8 @@ var sched4 = (function() {
 
     var edit = $("<button type='button' class='btn btn-default edit-meeting-btn'>Edit</button>");
     var editDetails = $("<li class='edit-details'><a>Edit details</a></li>");
-    var reschedule = $("<li><a id='reschedule-meeting'>Reschedule meeting</a></li>");
-    var cancel = $("<li><a id='cancel-meeting'>Cancel & archive meeting</a></li>");
+    var reschedule = $("<li><a id='reschedule-meeting'>Reschedule</a></li>");
+    var cancel = $("<li><a id='cancel-meeting'>Cancel & archive</a></li>");
     var editButton = $("<div class='btn-group edit-meeting'/>")
       .append(edit)
       .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
