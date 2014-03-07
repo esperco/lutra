@@ -20,12 +20,12 @@ COMMON_LIBS = \
   bootstrap \
   can \
   jquery.timeago \
-  jquery.autosize \
-  jquery-ui
+  jquery.autosize
 
 APP_LIBS = \
   sha1 \
   moment \
+  jquery-ui \
   fullcalendar \
   bootstrap-timepicker
 
