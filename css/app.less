@@ -102,6 +102,15 @@ object {
   cursor: pointer;
 }
 
+.link {
+  color: @purple;
+  cursor: pointer;
+  &:hover {
+    color: @purple_hover;
+    text-decoration: underline;
+  }
+}
+
 #global-status {
   cursor: pointer;
   position: absolute;
@@ -2355,16 +2364,149 @@ object {
 }
 
 
-/*** Scheduling Step 4 ***/
+/*** Meeting Details ***/
 
-.final-sched-div {
+.meeting-detail-row { margin-bottom: 15px; }
+
+.meeting-detail-label {
+  float: left;
+  width: 65px;
+  margin-top: 8px;
+  margin-left: 15px;
+  color: @gray_40;
+  font-size: 13px;
+  font-family: @bold;
+  text-align: right;
+  @media (max-width: 767px) {
+    margin-left: 8px;
+  }
+}
+
+.meeting-detail {
+  margin-left: 100px;
+  padding-top: 1px;
+  @media (max-width: 767px) {
+    margin-left: 70px;
+  }
+}
+
+.edit-meeting {
+  float: right;
+  margin-top: 5px;
+}
+
+.edit-meeting-btn {
+  margin-right: 2px;
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.option-info {
+  padding: 20px 0 16px 0;
+}
+
+.info-row {
+  margin-bottom: 6px;
+}
+
+.info-label {
+  float: left;
+  width: 50px;
+  margin-top: 3px;
+  margin-left: 30px;
+  color: @gray_40;
+  font-size: 13px;
+  font-family: @bold;
+  text-align: right;
+  @media (max-width: 767px) {
+    margin-left: 8px;
+  }
+}
+
+.info {
+  margin-left: 100px;
+  padding-top: 1px;
+  @media (max-width: 767px) {
+    margin-left: 70px;
+  }
+}
+
+.start-end {
+  font-family: @bold;
+}
+
+.notes-editor-public {
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+}
+
+.notes-editor-private {
+  margin-top: 10px;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+}
+
+.notes-entry {
+  width: 100%;
+  padding: 8px;
+  resize: none;
+  border: none;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  &:focus { outline: none !important; }
+}
+
+*::-webkit-input-placeholder {
+  font-family: @light;
+}
+:-moz-placeholder {
+  font-family: @light;
+}
+::-moz-placeholder {
+  font-family: @light;
+}
+:-ms-input-placeholder {
+  font-family: @light;
+}
+
+.viewable-by-label {
+  height: 22px;
+  padding-left: 10px;
+  background: @gray_f8;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.viewable-by-text {
+  display: inline-block;
+  color: @gray_40;
+  font-size: 12px;
+  font-family: @bold;
+}
+
+.viewable-by-eye {
+  float: left;
+  margin-top: 5px;
+  margin-right: 6px;
+}
+
+.add-private-notes {
+  display: inline-block;
+  padding-top: 7px;
+  font-size: 14px;
+}
+
+
+/*** Modules ***/
+
+.sched-module {
   border: 1px solid @gray_20;
   border-radius: 6px;
 }
 
-#edit-meeting-div { margin-top: 30px; }
-
-.sched-step4-section-header {
+.sched-module-header {
   height: 54px;
   padding: 13px 15px;
   font-size: 18px;
@@ -2373,29 +2515,67 @@ object {
   border-top-left-radius: 6px;
 }
 
-.sched-step4-section-title {
+.sched-module-header.collapsed { border-radius: 6px; }
+
+.sched-module-icon { float: left; }
+
+.sched-module-title {
   margin-left: 45px;
   padding-top: 2px;
 }
 
+.show-hide {
+  float: right;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
 .connector {
-  display: block;
+  width: 32px;
+  height: 24px;
   margin-top: -1px;
   margin-right: auto;
   margin-bottom: -1px;
   margin-left: auto;
 }
 
+.connector.collapsed path.down { fill: @gray_f8; }
+
+
+/*** Scheduling Step 4 ***/
+
+#edit-meeting-div { margin-top: 30px; }
+
 #meeting-content {
   padding: 15px;
   border-top: 1px solid @gray_20;
 }
 
-#calendar-title { padding-top: 0; }
+#reschedule-meeting { cursor: pointer; }
 
-#edit-event-notes { resize: none; }
+#cancel-meeting {
+  color: @red !important;
+  cursor: pointer;
+  &:hover {
+    color: @white !important;
+    background: @red !important;
+  }
+}
 
-#event-edit-update { margin-top: 15px; }
+#meeting-details { padding: 0; }
+
+#edit-meeting-actions { text-align: right; }
+
+#cancel-edit-mode {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+#event-edit-update {
+  float: right;
+  margin-left: 10px;
+}
 
 .sched-step4-row {
   min-height: 72px;
@@ -2429,10 +2609,6 @@ object {
   margin-left: 45px;
   color: @gray_60;
   font-size: 14px;
-}
-
-.sched-step4-section-icon {
-  float: left;
 }
 
 #reminder-scheduler {

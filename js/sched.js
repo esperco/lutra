@@ -91,16 +91,6 @@ var sched = (function() {
       return "";
   }
 
-  function wordify(time) {
-    if (time === "12:00 am") {
-      return "Midnight";
-    } else if (time === "12:00 pm") {
-      return "Noon";
-    } else {
-      return time;
-    }
-  }
-
   mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
 
@@ -148,6 +138,126 @@ var sched = (function() {
       locDiv.append("Location TBD")
             .addClass("tbd")
             .appendTo(view);
+    }
+
+    return view;
+  }
+
+  mod.meetingType = function(state) {
+    if (state.meeting_request && state.meeting_request.meeting_type) {
+      var typ = variant.cons(state.meeting_request.meeting_type);
+      switch (typ) {
+        case "Call":      return "Phone Call";
+        case "Nightlife": return "Night Life";
+        default:          return typ;
+      }
+    } else {
+      return "Meeting";
+    }
+  }
+
+  function getDirections(x) {
+    return "http://maps.google.com/?daddr="
+      + x.location.coord.lat + "," + x.location.coord.lon;
+  }
+
+  function viewOfLocationOnly(x) {
+    var view = $("<div id='address'/>");
+
+    var locText = chat.locationText(x.location);
+    if (locText) {
+      view.append(html.text(locText));
+    } else {
+      view.append("TBD")
+          .addClass("tbd")
+    }
+
+    view.click(function() {
+      // window.open(getDirections(x));
+      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+    });
+
+    return view;
+  }
+
+  function wordify(time) {
+    if (time === "12:00 am") {
+      return "Midnight";
+    } else if (time === "12:00 pm") {
+      return "Noon";
+    } else {
+      return time;
+    }
+  }
+
+  function describeTimeSlot(start, end, hideEndTime) {
+    var fromTime = wordify(date.timeOnly(start));
+    if (hideEndTime) {
+      return "at " + fromTime;
+    } else {
+      var toTime = wordify(date.timeOnly(end));
+      return fromTime + " to " + toTime;
+    }
+  }
+
+  function viewOfTimeOnly(x, hideEndTime) {
+    var view = $("<div/>");
+    var time1 = $("<div/>")
+      .appendTo(view);
+    var time2 = $("<div class='start-end'/>")
+      .appendTo(view);
+
+    var t1 = date.ofString(x.start);
+    var t2 = date.ofString(x.end);
+
+    time1
+      .append(date.weekDay(t1) + ", ")
+      .append(date.dateOnly(t1))
+    time2
+      .append(describeTimeSlot(t1, t2, hideEndTime));
+
+    return view;
+  }
+
+  mod.viewOfOption = function(option, typ, hideEndTime) {
+    var view = $("<td class='option-info'/>");
+
+    var what = $("<div class='info-row'/>")
+      .appendTo(view);
+    var whatLabel = $("<div class='info-label'/>")
+      .text("WHAT")
+      .appendTo(what);
+    var meetingType = $("<div class='info'/>")
+      .text(typ)
+      .appendTo(what);
+
+    var when = $("<div class='info-row'/>")
+      .appendTo(view);
+    var whenLabel = $("<div class='info-label'/>")
+      .text("WHEN")
+      .appendTo(when);
+    var time = viewOfTimeOnly(option.slot, hideEndTime)
+      .addClass("info")
+      .appendTo(when);
+
+    var where = $("<div class='info-row'/>")
+      .appendTo(view);
+    var whereLabel = $("<div class='info-label'/>")
+      .text("WHERE")
+      .appendTo(where);
+    var loc = viewOfLocationOnly(option.slot)
+      .addClass("info link")
+      .appendTo(where);
+
+    var notes = $("<div class='info-row hide'/>")
+      .appendTo(view);
+    var notesLabel = $("<div class='info-label'/>")
+      .text("NOTES")
+      .appendTo(notes);
+    var notesText = $("<div class='info'/>")
+      .appendTo(notes);
+    if (notesText.text() != "") {
+      notes.removeClass("hide");
     }
 
     return view;

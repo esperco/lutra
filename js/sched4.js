@@ -252,7 +252,7 @@ var sched4 = (function() {
 
     var guestStatusText = sentReminder(uid) ?
       "Reminder sent" :
-      "Has not been sent a reminder";
+      "Has not received a reminder";
     var guestStatus = $("<div class='reminder-guest-status'/>")
       .text(guestStatusText);
 
@@ -302,18 +302,20 @@ var sched4 = (function() {
   }
 
   function createReminderSection(profs, task, guests) {
-    var view = $("<div class='final-sched-div'/>");
+    var view = $("<div class='sched-module'/>");
 
-    var header = $("<div class='sched-step4-section-header'/>")
+    var header = $("<div class='sched-module-header'/>")
       .appendTo(view);
-    var reminderIcon = $("<img class='sched-step4-section-icon'/>")
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Hide")
       .appendTo(header);
-    svg.loadImg(reminderIcon, "/assets/img/reminder.svg")
-      .then(function(elt) { edit = elt; });
+    var reminderIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(reminderIcon, "/assets/img/reminder.svg");
     var title = guests.length > 1 ?
       "Schedule a reminder for guests" :
       "Schedule a reminder";
-    var headerText = $("<div class='sched-step4-section-title'/>")
+    var headerText = $("<div class='sched-module-title'/>")
       .text(title)
       .appendTo(header);
 
@@ -334,6 +336,20 @@ var sched4 = (function() {
       var x = createReminderRow(profs, task, uid, guests)
         .appendTo(content);
     });
+
+    showHide.click(function() {
+      if (content.hasClass("hide")) {
+        header.removeClass("collapsed");
+        scheduler.removeClass("hide");
+        content.removeClass("hide");
+        showHide.text("Hide");
+      } else {
+        header.addClass("collapsed");
+        scheduler.addClass("hide");
+        content.addClass("hide");
+        showHide.text("Show");
+      }
+    })
 
     return view;
   }
@@ -362,7 +378,7 @@ var sched4 = (function() {
 
     var guestStatusText = sentConfirmation(uid) ?
       "Confirmation sent" :
-      "Has not been sent a confirmation";
+      "Has not received a confirmation";
     var guestStatus = $("<div class='confirmation-guest-status'/>")
       .text(guestStatusText);
 
@@ -420,23 +436,29 @@ var sched4 = (function() {
   }
 
   function createConfirmSection(profs, ta, guests) {
-    var view = $("<div class='final-sched-div'/>");
-
-    var header = $("<div class='sched-step4-section-header'/>")
+    var view = $("<div/>");
+    var module = $("<div class='sched-module'/>")
       .appendTo(view);
-    var confirmationIcon = $("<img class='sched-step4-section-icon'/>")
+    var connector = createConnector()
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Hide")
       .appendTo(header);
-    svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg")
-      .then(function(elt) { edit = elt; });
+    var confirmationIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg");
     var title = guests.length > 1 ?
       "Send guests a confirmation message" :
       "Send a confirmation message";
-    var headerText = $("<div class='sched-step4-section-title'/>")
+    var headerText = $("<div class='sched-module-title'/>")
       .text(title)
       .appendTo(header);
 
     var content = $("<div/>")
-      .appendTo(view);
+      .appendTo(module);
     list.iter(guests, function(uid) {
       var x = createConfirmRow(profs, ta, uid);
       x.view.appendTo(content);
@@ -446,6 +468,20 @@ var sched4 = (function() {
           x.composeConfirmationEmail();
       }
     });
+
+    showHide.click(function() {
+      if (content.hasClass("hide")) {
+        header.removeClass("collapsed");
+        content.removeClass("hide");
+        connector.removeClass("collapsed");
+        showHide.text("Hide");
+      } else {
+        header.addClass("collapsed");
+        content.addClass("hide");
+        connector.addClass("collapsed");
+        showHide.text("Show");
+      }
+    })
 
     return view;
   }
@@ -474,65 +510,222 @@ var sched4 = (function() {
     });
   }
 
-  function createEventEditSection(task) {
-    var view = $("<div id='edit-meeting-div' class='final-sched-div'/>");
-
-    var header = $("<div class='sched-step4-section-header'/>")
-      .appendTo(view);
-    var calendarIcon = $("<img class='sched-step4-section-icon'/>")
-      .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg")
-      .then(function(elt) { edit = elt; });
-    var headerText = $("<div class='sched-step4-section-title'/>")
-      .text("Edit meeting details")
-      .appendTo(header);
-
-    var content = $("<div id='meeting-content'/>")
-      .appendTo(view);
-
-    var titleEdit =
-      $("<input type='text' id='edit-calendar-title' class='form-control'/>");
-    var notesEdit = $("<textarea id='edit-event-notes' rows=5 class='form-control'/>");
-    var updateButton =
-      $("<button id='event-edit-update' class='btn btn-primary'/>");
+  function createEditMode(task, summary) {
+    var view = $("<div id='meeting-edit' class='hide'/>");
     var state = sched.getState(task);
 
-    $("<div id='calendar-title' class='text-field-label'/>")
-      .text("Title")
-      .appendTo(content);
-    titleEdit
+
+    var updateButton = $("<button id='event-edit-update' class='btn btn-primary'/>");
+    var cancelEditMode = $("<span id='cancel-edit-mode' class='link'>Cancel</span>");
+
+    /* TITLE */
+    var title = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var titleEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
+      .text("TITLE")
+      .appendTo(title);
+
+    var titleEditBox = $("<div class='meeting-detail'/>")
+      .appendTo(title);
+    var titleEdit = $("<input type='text' class='form-control'/>")
       .val(state.calendar_event_title.title_text)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(content);
+      .appendTo(titleEditBox);
 
-    $("<div class='text-field-label'/>")
-      .text("Notes")
-      .appendTo(content);
-    notesEdit
+    /* LOCATION */
+    var location = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var locEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
+      .text("LOCATION")
+      .appendTo(location);
+
+    var locEditBox = $("<div class='meeting-detail'/>")
+      .appendTo(location);
+    var locEdit = $("<input type='text' class='form-control' disabled/>")
+      .val("COMING SOON")
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(locEditBox);
+
+    /* NOTES */
+    var notes = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var notesEditTitle = $("<div class='meeting-detail-label'/>")
+      .text("NOTES")
+      .appendTo(notes);
+
+    var notesEditorPublic = $("<div class='notes-editor-public'/>");
+    var notesBoxPublic = $("<textarea class='notes-entry'></textarea>")
       .val(state.calendar_event_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
-      .appendTo(content);
+      .appendTo(notesEditorPublic);
+    var publicEye = $("<img class='viewable-by-eye'/>");
+    svg.loadImg(publicEye, "/assets/img/eye.svg");
+    var publicText = $("<span class='viewable-by-text'/>")
+      .text("ALL GUESTS");
+    var notesLabelPublic = $("<div class='viewable-by-label'/>")
+      .append(publicEye)
+      .append(publicText)
+      .appendTo(notesEditorPublic);
 
+    var notesEditorPrivate = $("<div class='notes-editor-private'/>");
+    var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
+      // .val(state.calendar_event_notes)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(notesEditorPrivate);
+    var privateEye = $("<img class='viewable-by-eye'/>");
+    svg.loadImg(privateEye, "/assets/img/eye.svg");
+    var privateText = $("<span class='viewable-by-text'/>")
+      .text("ANDREW" + " ONLY");
+    var notesLabelPrivate = $("<div class='viewable-by-label'/>")
+      .append(privateEye)
+      .append(privateText)
+      .appendTo(notesEditorPrivate);
+
+    var addPrivateNotes = $("<span class='add-private-notes link'/>")
+      .text("Add private notes for Andrew only")
+      .click(function() {
+        addPrivateNotes.addClass("hide");
+        notesEditorPrivate.removeClass("hide");
+      });
+    if (notesBoxPrivate.val() === "") {
+      notesEditorPrivate.addClass("hide");
+    } else {
+      addPrivateNotes.addClass("hide");
+    }
+
+    var notesEditor = $("<div class='meeting-detail'/>")
+      .append(notesEditorPublic)
+      .append(notesEditorPrivate)
+      .append(addPrivateNotes)
+      .appendTo(notes);
+
+
+
+    function toggleEditMode() {
+      if (summary.hasClass("hide")) {
+        summary.removeClass("hide");
+        view.addClass("hide");
+      } else {
+        summary.addClass("hide");
+        view.removeClass("hide");
+      }
+    }
+
+    var editActions = $("<div id='edit-meeting-actions' class='clearfix'/>").appendTo(view);
     updateButton
       .addClass("disabled")
       .text("Update calendar")
       .click(function() {
-        updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
+        updateCalendarEvent(task, titleEdit, notesBoxPublic, updateButton)
       })
+      .appendTo(editActions);
+    cancelEditMode
+      .click(toggleEditMode)
+      .appendTo(editActions);
+
+    return view;
+  }
+
+  function createReviewSection(task) {
+    var view = $("<div/>");
+    var module = $("<div id='edit-meeting-div' class='sched-module'/>")
+      .appendTo(view);
+    var connector = createConnector().addClass("collapsed")
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header collapsed'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Show")
+      .appendTo(header);
+    var calendarIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Review meeting details")
+      .appendTo(header);
+
+    var content = $("<div id='meeting-content' class='hide'/>")
+      .appendTo(module);
+    var summary = $("<div id='meeting-summary'/>")
       .appendTo(content);
+
+    var edit = $("<button type='button' class='btn btn-default edit-meeting-btn'>Edit</button>");
+    var editDetails = $("<li class='edit-details'><a>Edit details</a></li>");
+    var reschedule = $("<li><a id='reschedule-meeting'>Reschedule</a></li>");
+    var cancel = $("<li><a id='cancel-meeting'>Cancel & archive</a></li>");
+    var editButton = $("<div class='btn-group edit-meeting'/>")
+      .append(edit)
+      .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
+        .append($("<span class='caret'/>"))
+        .append($("<span class='sr-only'>Toggle Dropdown</span>")))
+      .append($("<ul class='dropdown-menu pull-right edit-guest-dropdown' role='menu'/>")
+        .append(editDetails)
+        .append(reschedule)
+        .append(cancel))
+      .appendTo(summary);
+
+    var details = $("<tr/>")
+      .appendTo(summary);
+    var state = sched.getState(task);
+    var choice = state.reserved;
+    var typ = sched.meetingType(state);
+    var hideEndTime = state.hide_end_times;
+    var info = sched.viewOfOption(choice, typ, hideEndTime)
+      .attr("id","meeting-details")
+      .appendTo(summary);
+
+    var editMode = createEditMode(task, summary)
+      .appendTo(content);
+
+    showHide.click(function() {
+      if (content.hasClass("hide")) {
+        header.removeClass("collapsed");
+        content.removeClass("hide");
+        connector.removeClass("collapsed");
+        showHide.text("Hide");
+      } else {
+        header.addClass("collapsed");
+        content.addClass("hide");
+        connector.addClass("collapsed");
+        showHide.text("Show");
+      }
+    })
+
+    function toggleEditMode() {
+      if (summary.hasClass("hide")) {
+        summary.removeClass("hide");
+        editMode.addClass("hide");
+      } else {
+        summary.addClass("hide");
+        editMode.removeClass("hide");
+      }
+    }
+
+    edit.click(toggleEditMode);
+    editDetails.click(toggleEditMode);
 
     return view;
   }
 
 
-  function createConnector(idName) {
-    var connector = $("<img id='" + idName + "' class='connector'/>");
+  function createConnector() {
+    var connectorBox = $("<div class='connector'/>");
+    var connector = $("<img/>")
+      .appendTo(connectorBox);
     svg.loadImg(connector, "/assets/img/connector.svg");
-    return connector;
+    return connectorBox;
   }
 
   mod.load = function(profs, ta, view) {
@@ -542,10 +735,8 @@ var sched4 = (function() {
 
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
-      .append(createEventEditSection(ta))
-      .append(createConnector("step4-1to2"))
+      .append(createReviewSection(ta))
       .append(createConfirmSection(profs, ta, guests))
-      .append(createConnector("step4-2to3"))
       .append(createReminderSection(profs, ta, guests));
 
     observable.onTaskParticipantsChanged.observe("step4", function(ta) {

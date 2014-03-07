@@ -38,6 +38,7 @@ COMMON_SOURCES = \
   profile.js \
   geo.js \
   chat.js \
+  sched.js \
   display.js
 
 APP_SOURCES = \
@@ -48,7 +49,6 @@ APP_SOURCES = \
   calpicker.js \
   loceditor.js \
   locpicker.js \
-  sched.js \
   sched1.js \
   sched2.js \
   sched3.js \

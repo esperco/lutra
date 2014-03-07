@@ -58,19 +58,6 @@ var guestTask = function() {
     }
   }
 
-  function meetingType(state) {
-    if (state.meeting_request && state.meeting_request.meeting_type) {
-      var typ = variant.cons(state.meeting_request.meeting_type);
-      switch (typ) {
-        case "Call":      return "Phone Call";
-        case "Nightlife": return "Night Life";
-        default:          return typ;
-      }
-    } else {
-      return "Meeting";
-    }
-  }
-
   function indexLabel(i) {
     var a = "A".charCodeAt(0);
     var label = "";
@@ -79,58 +66,6 @@ var guestTask = function() {
       i = Math.floor(i / 26);
     } while (i > 0);
     return label;
-  }
-
-  function getDirections(x) {
-    return "http://maps.google.com/?daddr="
-      + x.location.coord.lat + "," + x.location.coord.lon;
-  }
-
-  function viewOfLocationOnly(x) {
-    var view = $("<div id='address'/>");
-
-    var locText = chat.locationText(x.location);
-    if (locText) {
-      view.append(html.text(locText));
-    } else {
-      view.append("TBD")
-          .addClass("tbd")
-    }
-
-    view.click(function() {
-      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
-    });
-
-    return view;
-  }
-
-  function describeTimeSlot(start, end, hideEndTime) {
-    var fromTime = wordify(date.timeOnly(start));
-    if (hideEndTime) {
-      return fromTime;
-    } else {
-      var toTime = wordify(date.timeOnly(end));
-      return fromTime + " to " + toTime;
-    }
-  }
-
-  function viewOfTimeOnly(x, hideEndTime) {
-    var view = $("<div/>");
-    var time1 = $("<div/>")
-      .appendTo(view);
-    var time2 = $("<div class='start-end'/>")
-      .appendTo(view);
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    time1
-      .append(date.weekDay(t1) + ", ")
-      .append(date.dateOnly(t1))
-    time2
-      .append(describeTimeSlot(t1, t2, hideEndTime));
-
-    return view;
   }
 
   function viewOfGuestRow(x, guestOptions) {
@@ -188,6 +123,16 @@ var guestTask = function() {
       return "Noon";
     } else {
       return time;
+    }
+  }
+
+  function describeTimeSlot(start, end, hideEndTime) {
+    var fromTime = wordify(date.timeOnly(start));
+    if (hideEndTime) {
+      return "at " + fromTime;
+    } else {
+      var toTime = wordify(date.timeOnly(end));
+      return fromTime + " to " + toTime;
     }
   }
 
@@ -491,47 +436,8 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      var info = $("<td class='option-info'/>")
+      var info = sched.viewOfOption(choice, typ, hideEndTime)
         .appendTo(slotView);
-
-      var what = $("<div class='info-row'/>")
-        .appendTo(info);
-      var whatLabel = $("<div class='info-label'/>")
-        .text("WHAT")
-        .appendTo(what);
-      var meetingType = $("<div class='info'/>")
-        .text(typ)
-        .appendTo(what);
-
-      var when = $("<div class='info-row'/>")
-        .appendTo(info);
-      var whenLabel = $("<div class='info-label'/>")
-        .text("WHEN")
-        .appendTo(when);
-      var time = viewOfTimeOnly(choice.slot, hideEndTime)
-        .addClass("info")
-        .appendTo(when);
-
-      var where = $("<div class='info-row'/>")
-        .appendTo(info);
-      var whereLabel = $("<div class='info-label'/>")
-        .text("WHERE")
-        .appendTo(where);
-      var loc = viewOfLocationOnly(choice.slot)
-        .addClass("info")
-        .appendTo(where);
-
-      var notes = $("<div class='info-row hide'/>")
-        .appendTo(info);
-      var notesLabel = $("<div class='info-label'/>")
-        .text("NOTES")
-        .appendTo(notes);
-      var notesText = $("<div class='info'/>")
-        // .text("Test")
-        .appendTo(notes);
-      if (notesText.text() != "") {
-        notes.removeClass("hide");
-      }
 
       return slotView;
     }
@@ -592,7 +498,7 @@ var guestTask = function() {
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
-          var typ = meetingType(state);
+          var typ = sched.meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             if (util.isNotNull(myLast.answers[choice.label])) {
               answers[choice.label] = choice;
