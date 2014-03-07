@@ -2430,6 +2430,8 @@ object {
   border-top-left-radius: 6px;
 }
 
+.sched-module-header.collapsed { border-radius: 6px; }
+
 .sched-module-icon { float: left; }
 
 .sched-module-title {
@@ -2439,16 +2441,20 @@ object {
 
 .show-hide {
   float: right;
-  display: inline-block;
+  margin-top: 5px;
+  font-size: 14px;
 }
 
 .connector {
-  display: block;
+  width: 32px;
+  height: 24px;
   margin-top: -1px;
   margin-right: auto;
   margin-bottom: -1px;
   margin-left: auto;
 }
+
+.connector.collapsed path.down { fill: @gray_f8; }
 
 
 /*** Scheduling Step 4 ***/
