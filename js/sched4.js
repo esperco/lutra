@@ -302,17 +302,17 @@ var sched4 = (function() {
   }
 
   function createReminderSection(profs, task, guests) {
-    var view = $("<div class='final-sched-div'/>");
+    var view = $("<div class='sched-module'/>");
 
-    var header = $("<div class='sched-step4-section-header'/>")
+    var header = $("<div class='sched-module-header'/>")
       .appendTo(view);
-    var reminderIcon = $("<img class='sched-step4-section-icon'/>")
+    var reminderIcon = $("<img class='sched-module-icon'/>")
       .appendTo(header);
     svg.loadImg(reminderIcon, "/assets/img/reminder.svg");
     var title = guests.length > 1 ?
       "Schedule a reminder for guests" :
       "Schedule a reminder";
-    var headerText = $("<div class='sched-step4-section-title'/>")
+    var headerText = $("<div class='sched-module-title'/>")
       .text(title)
       .appendTo(header);
 
@@ -419,17 +419,17 @@ var sched4 = (function() {
   }
 
   function createConfirmSection(profs, ta, guests) {
-    var view = $("<div class='final-sched-div'/>");
+    var view = $("<div class='sched-module'/>");
 
-    var header = $("<div class='sched-step4-section-header'/>")
+    var header = $("<div class='sched-module-header'/>")
       .appendTo(view);
-    var confirmationIcon = $("<img class='sched-step4-section-icon'/>")
+    var confirmationIcon = $("<img class='sched-module-icon'/>")
       .appendTo(header);
     svg.loadImg(confirmationIcon, "/assets/img/confirmation.svg");
     var title = guests.length > 1 ?
       "Send guests a confirmation message" :
       "Send a confirmation message";
-    var headerText = $("<div class='sched-step4-section-title'/>")
+    var headerText = $("<div class='sched-module-title'/>")
       .text(title)
       .appendTo(header);
 
@@ -473,18 +473,21 @@ var sched4 = (function() {
   }
 
   function createReviewSection(task) {
-    var view = $("<div id='edit-meeting-div' class='final-sched-div'/>");
+    var view = $("<div id='edit-meeting-div' class='sched-module'/>");
 
-    var header = $("<div class='sched-step4-section-header'/>")
+    var header = $("<div class='sched-module-header'/>")
       .appendTo(view);
-    var calendarIcon = $("<img class='sched-step4-section-icon'/>")
+    var showHide = $("<span id='show-hide' class='link'/>")
+      .text("Show")
+      .appendTo(view);
+    var calendarIcon = $("<img class='sched-module-icon'/>")
       .appendTo(header);
     svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
-    var headerText = $("<div class='sched-step4-section-title'/>")
+    var headerText = $("<div class='sched-module-title'/>")
       .text("Review meeting details")
       .appendTo(header);
 
-    var content = $("<div id='meeting-content'/>")
+    var content = $("<div id='meeting-content' class='hide'/>")
       .appendTo(view);
     var summary = $("<div id='meeting-summary'/>")
       .appendTo(content);
@@ -543,6 +546,22 @@ var sched4 = (function() {
       })
       .appendTo(editMode);
 
+    var connector = createConnector()
+      .addClass("collapsed")
+      .appendTo(view);
+
+    showHide.click(function() {
+      if (content.hasClass("hide")) {
+        content.removeClass("hide");
+        connector.removeClass("collapsed");
+        showHide.text("Hide");
+      } else {
+        content.addClass("hide");
+        connector.addClass("collapsed");
+        showHide.text("Show");
+      }
+    })
+
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
         summary.removeClass("hide");
@@ -572,8 +591,8 @@ var sched4 = (function() {
   }
 
 
-  function createConnector(idName) {
-    var connector = $("<img id='" + idName + "' class='connector'/>");
+  function createConnector() {
+    var connector = $("<img class='connector'/>");
     svg.loadImg(connector, "/assets/img/connector.svg");
     return connector;
   }
@@ -586,7 +605,6 @@ var sched4 = (function() {
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
       .append(createReviewSection(ta))
-      .append(createConnector("step4-1to2"))
       .append(createConfirmSection(profs, ta, guests))
       .append(createConnector("step4-2to3"))
       .append(createReminderSection(profs, ta, guests));
