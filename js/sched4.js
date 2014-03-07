@@ -510,6 +510,116 @@ var sched4 = (function() {
     });
   }
 
+  function createEditMode(task, summary) {
+    var view = $("<div id='meeting-edit' class='hide'/>");
+    var state = sched.getState(task);
+
+
+    var updateButton = $("<button id='event-edit-update' class='btn btn-primary'/>");
+    var cancelEditMode = $("<span id='cancel-edit-mode' class='link'>Cancel</span>");
+
+    /* TITLE */
+    var title = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var titleEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
+      .text("TITLE")
+      .appendTo(title);
+
+    var titleEditBox = $("<div class='meeting-detail'/>")
+      .appendTo(title);
+    var titleEdit = $("<input type='text' class='form-control'/>")
+      .val(state.calendar_event_title.title_text)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(titleEditBox);
+
+    /* NOTES */
+    var notes = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var notesEditTitle = $("<div class='meeting-detail-label'/>")
+      .text("NOTES")
+      .appendTo(notes);
+
+    var notesEditorPublic = $("<div class='notes-editor-public'/>");
+    var notesBoxPublic = $("<textarea class='notes-entry'></textarea>")
+      .val(state.calendar_event_notes)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(notesEditorPublic);
+    var publicEye = $("<img class='viewable-by-eye'/>");
+    svg.loadImg(publicEye, "/assets/img/eye.svg");
+    var publicText = $("<span class='viewable-by-text'/>")
+      .text("ALL GUESTS");
+    var notesLabelPublic = $("<div class='viewable-by-label'/>")
+      .append(publicEye)
+      .append(publicText)
+      .appendTo(notesEditorPublic);
+
+    var notesEditorPrivate = $("<div class='notes-editor-private'/>");
+    var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
+      .val(state.calendar_event_notes)
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(notesEditorPrivate);
+    var privateEye = $("<img class='viewable-by-eye'/>");
+    svg.loadImg(privateEye, "/assets/img/eye.svg");
+    var privateText = $("<span class='viewable-by-text'/>")
+      .text("ANDREW" + " ONLY");
+    var notesLabelPrivate = $("<div class='viewable-by-label'/>")
+      .append(privateEye)
+      .append(privateText)
+      .appendTo(notesEditorPrivate);
+
+    var addPrivateNotes = $("<span class='add-private-notes link'/>")
+      .text("Add private notes for Andrew only")
+      .click(function() {
+        addPrivateNotes.addClass("hide");
+        notesEditorPrivate.removeClass("hide");
+      });
+    if (notesBoxPrivate.val() === "") {
+      notesEditorPrivate.addClass("hide");
+    } else {
+      addPrivateNotes.addClass("hide");
+    }
+
+    var notesEditor = $("<div class='meeting-detail'/>")
+      .append(notesEditorPublic)
+      .append(notesEditorPrivate)
+      .append(addPrivateNotes)
+      .appendTo(notes);
+
+
+
+    function toggleEditMode() {
+      if (summary.hasClass("hide")) {
+        summary.removeClass("hide");
+        view.addClass("hide");
+      } else {
+        summary.addClass("hide");
+        view.removeClass("hide");
+      }
+    }
+
+    var editActions = $("<div id='edit-meeting-actions' class='clearfix'/>").appendTo(view);
+    updateButton
+      .addClass("disabled")
+      .text("Update calendar")
+      .click(function() {
+        updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
+      })
+      .appendTo(editActions);
+    cancelEditMode
+      .click(toggleEditMode)
+      .appendTo(editActions);
+
+    return view;
+  }
+
   function createReviewSection(task) {
     var view = $("<div/>");
     var module = $("<div id='edit-meeting-div' class='sched-module'/>")
@@ -532,8 +642,6 @@ var sched4 = (function() {
     var content = $("<div id='meeting-content' class='hide'/>")
       .appendTo(module);
     var summary = $("<div id='meeting-summary'/>")
-      .appendTo(content);
-    var editMode = $("<div id='meeting-edit' class='hide'/>")
       .appendTo(content);
 
     var edit = $("<button type='button' class='btn btn-default edit-meeting-btn'>Edit</button>");
@@ -561,33 +669,8 @@ var sched4 = (function() {
       .attr("id","meeting-details")
       .appendTo(summary);
 
-    var titleEdit =
-      $("<input type='text' id='edit-calendar-title' class='form-control'/>");
-    var notesEdit = $("<textarea id='edit-event-notes' rows=5 class='form-control'/>");
-    var updateButton =
-      $("<button id='event-edit-update' class='btn btn-primary'/>");
-    var cancelEditMode = $("<span id='cancel-edit-mode' class='link'>Cancel</span>");
-
-    $("<div id='calendar-title' class='text-field-label'/>")
-      .text("Title")
-      .appendTo(editMode);
-    titleEdit
-      .val(state.calendar_event_title.title_text)
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(editMode);
-
-    $("<div class='text-field-label'/>")
-      .text("Notes")
-      .appendTo(editMode);
-    notesEdit
-      .val(state.calendar_event_notes)
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(editMode);
-
+    var editMode = createEditMode(task, summary)
+      .appendTo(content);
 
     showHide.click(function() {
       if (content.hasClass("hide")) {
@@ -615,18 +698,6 @@ var sched4 = (function() {
 
     edit.click(toggleEditMode);
     editDetails.click(toggleEditMode);
-
-    var editActions = $("<div id='edit-meeting-actions' class='clearfix'/>").appendTo(editMode);
-    updateButton
-      .addClass("disabled")
-      .text("Update calendar")
-      .click(function() {
-        updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
-      })
-      .appendTo(editActions);
-    cancelEditMode
-      .click(toggleEditMode)
-      .appendTo(editActions);
 
     return view;
   }

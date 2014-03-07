@@ -2366,6 +2366,30 @@ object {
 
 /*** Meeting Details ***/
 
+.meeting-detail-row { margin-bottom: 15px; }
+
+.meeting-detail-label {
+  float: left;
+  width: 50px;
+  margin-top: 8px;
+  margin-left: 30px;
+  color: @gray_40;
+  font-size: 13px;
+  font-family: @bold;
+  text-align: right;
+  @media (max-width: 767px) {
+    margin-left: 8px;
+  }
+}
+
+.meeting-detail {
+  margin-left: 100px;
+  padding-top: 1px;
+  @media (max-width: 767px) {
+    margin-left: 70px;
+  }
+}
+
 .edit-meeting {
   float: right;
   margin-top: 5px;
@@ -2411,6 +2435,67 @@ object {
 
 .start-end {
   font-family: @bold;
+}
+
+.notes-editor-public {
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+}
+
+.notes-editor-private {
+  margin-top: 10px;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+}
+
+.notes-entry {
+  width: 100%;
+  padding: 8px;
+  resize: none;
+  border: none;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  &:focus { outline: none !important; }
+}
+
+*::-webkit-input-placeholder {
+  font-family: @light;
+}
+:-moz-placeholder {
+  font-family: @light;
+}
+::-moz-placeholder {
+  font-family: @light;
+}
+:-ms-input-placeholder {
+  font-family: @light;
+}
+
+.viewable-by-label {
+  height: 22px;
+  padding-left: 10px;
+  background: @gray_f8;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.viewable-by-text {
+  display: inline-block;
+  color: @gray_40;
+  font-size: 12px;
+  font-family: @bold;
+}
+
+.viewable-by-eye {
+  float: left;
+  margin-top: 5px;
+  margin-right: 6px;
+}
+
+.add-private-notes {
+  display: inline-block;
+  padding-top: 7px;
+  font-size: 14px;
 }
 
 
@@ -2479,21 +2564,16 @@ object {
 
 #meeting-details { padding: 0; }
 
-#calendar-title { padding-top: 0; }
-
-#edit-event-notes { resize: none; }
-
 #edit-meeting-actions { text-align: right; }
 
 #cancel-edit-mode {
   display: inline-block;
-  margin-top: 21px;
+  margin-top: 6px;
   font-size: 14px;
 }
 
 #event-edit-update {
   float: right;
-  margin-top: 15px;
   margin-left: 10px;
 }
 
