@@ -29,7 +29,6 @@ COMMON_SOURCES = \
   email.js \
   cache.js \
   svg.js \
-  adder.js \
   show.js \
   editor.js \
   select.js \
@@ -45,9 +44,7 @@ APP_SOURCES = \
   login.js \
   api.js \
   sample.js \
-  profile.js \
-  chat.js \
-  geo.js \
+  adder.js \
   calpicker.js \
   loceditor.js \
   locpicker.js \
