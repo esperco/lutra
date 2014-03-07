@@ -382,8 +382,7 @@ var guestTask = function() {
         .append("None of the above")
         .appendTo(slotView);
 
-      if (! list.mem(task.guest_hosts, task.guest_uid)) {
-        log("here");
+      if (list.mem(task.guest_hosts, task.guest_uid)) {
         select.addClass("exec-view");
       }
 
@@ -441,6 +440,8 @@ var guestTask = function() {
             $("#option-none").removeClass("checkbox-selected");
           }
         });
+      } else {
+        select.addClass("exec-view");
       }
 
       var optionLetter = $("<div class='option-letter'/>")
@@ -457,13 +458,22 @@ var guestTask = function() {
       var taskView = $("#meeting-content");
       taskView.children().remove();
       var taskWelcome = $("#meeting-welcome");
-      taskWelcome.text("");
-
       var myName = profile.fullName(profs[login.me()].prof);
       taskWelcome.text("Hello, " + myName);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
+
+        if (list.mem(task.guest_hosts, task.guest_uid)) {
+          var taskImpersonator = $("#meeting-impersonator");
+          var viewAs = $("<span id='view-as'>View as</span>");
+          var selector;
+
+          taskWelcome.addClass("exec-view");
+          taskImpersonator.append(viewAs)
+                          .append(selector);
+        }
+
         if (state.reserved) {
           var guestsIcon = $("<img id='guests-icon'/>");
           var notesIcon = $("<img id='notes-icon'/>");
@@ -502,8 +512,20 @@ var guestTask = function() {
           var hostName = list.map(task.guest_hosts, function(uid) {
                   return profile.fullName(profs[uid].prof);
                 }).join(" & ");
-          taskView.append($("<div id='options-title'/>")
-                  .text("When can you meet with " + hostName + "?"));
+
+          var title = $("<div id='options-title'/>")
+            .appendTo(taskView);
+          if (list.mem(task.guest_hosts, task.guest_uid)) {
+            var inProgress = $("<img id='in-progress'/>");
+            svg.loadImg(inProgress, "/assets/img/in-progress.svg");
+            title.append(inProgress)
+                 .append($("<div class='in-progress-text'/>")
+                   .text("This meeting is still being scheduled."))
+                 .append($("<div class='in-progress-text helper-text'/>")
+                   .text("Below are the meeting options in consideration."));
+          } else {
+            title.text("When can you meet with " + hostName + "?");
+          }
 
           var select = $("<div id='guest-select'/>")
             .appendTo(taskView);

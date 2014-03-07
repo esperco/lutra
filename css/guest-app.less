@@ -141,9 +141,18 @@ hr {
   &:active g path { fill: #7d3ca0; }
 }
 
+#meeting-impersonator {
+  float: right;
+  margin: 20px 16px 0px 16px;
+}
+
 #meeting-welcome {
   margin: 20px 16px 0px 56px;
   font-size: 16px;
+}
+
+#meeting-welcome.exec-view {
+  margin-right: 200px;
 }
 
 
@@ -160,6 +169,14 @@ hr {
   }
 }
 
+.helper-text {
+  color: @gray_40;
+  font-size: 18px;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+}
+
 
 /*** Options ***/
 
@@ -169,6 +186,13 @@ hr {
     font-size: 20px;
   }
 }
+
+#in-progress {
+  float: left;
+  margin-top: 3px;
+}
+
+.in-progress-text { margin-left: 40px; }
 
 #options {
   width: 100%;
@@ -191,7 +215,7 @@ hr {
   }
 }
 
-.option-seelct.exec-view { width: 40px; }
+.option-select.exec-view { width: 40px; }
 
 .option-info {
   padding: 20px 0 16px 0;
