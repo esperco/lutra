@@ -578,7 +578,7 @@ var sched4 = (function() {
 
     var notesEditorPrivate = $("<div class='notes-editor-private'/>");
     var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
-      .val(state.calendar_event_notes)
+      // .val(state.calendar_event_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
@@ -627,7 +627,7 @@ var sched4 = (function() {
       .addClass("disabled")
       .text("Update calendar")
       .click(function() {
-        updateCalendarEvent(task, titleEdit, notesEdit, updateButton)
+        updateCalendarEvent(task, titleEdit, notesBoxPublic, updateButton)
       })
       .appendTo(editActions);
     cancelEditMode
