@@ -254,13 +254,19 @@ var guestTask = function() {
     return button;
   }
 
-  function viewOfMeetingHeader(ta, state) {
-    return view = $("<div id='meeting-header'/>")
-      .append(
-        $("<div id='meeting-title'/>")
-          .text(state.calendar_event_title.title_text)
-      )
-      .append(addToCalendar(ta, state));
+  function viewOfMeetingHeader(task, ta, state) {
+    var view = $("<div id='meeting-header'/>");
+    var title = $("<div id='meeting-title'/>")
+      .text(state.calendar_event_title.title_text)
+      .appendTo(view);
+
+    if (! list.mem(task.guest_hosts, task.guest_uid)) {
+      view.append(addToCalendar(ta, state));
+    } else {
+      title.addClass("exec-view");
+    }
+
+    return view;
   }
 
   function calendarIcon(x) {
@@ -376,6 +382,10 @@ var guestTask = function() {
         .append("None of the above")
         .appendTo(slotView);
 
+      if (list.mem(task.guest_hosts, task.guest_uid)) {
+        select.addClass("exec-view");
+      }
+
       var checkboxContainer = $("<div class='checkbox-container'/>");
       var checkbox = $("<img/>");
       select.append(checkboxContainer.append(checkbox));
@@ -430,6 +440,8 @@ var guestTask = function() {
             $("#option-none").removeClass("checkbox-selected");
           }
         });
+      } else {
+        select.addClass("exec-view");
       }
 
       var optionLetter = $("<div class='option-letter'/>")
@@ -446,19 +458,27 @@ var guestTask = function() {
       var taskView = $("#meeting-content");
       taskView.children().remove();
       var taskWelcome = $("#meeting-welcome");
-      taskWelcome.text("");
-
       var myName = profile.fullName(profs[login.me()].prof);
       taskWelcome.text("Hello, " + myName);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
         var state = ta.task_data[1];
+
+        if (list.mem(task.guest_hosts, task.guest_uid)) {
+          var taskImpersonator = $("#meeting-impersonator");
+          var viewAs = $("<span id='view-as'>View as</span>");
+          // Create impersonation selector
+
+          taskWelcome.addClass("exec-view");
+          taskImpersonator.append(viewAs);
+        }
+
         if (state.reserved) {
           var guestsIcon = $("<img id='guests-icon'/>");
           var notesIcon = $("<img id='notes-icon'/>");
           var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
-                  .append(viewOfMeetingHeader(ta, state))
+                  .append(viewOfMeetingHeader(task, ta, state))
                   .append(viewOfTimeAndPlace(state.reserved.slot,
                                              state.hide_end_times))
                   .append($("<div class='task-section-header'/>")
@@ -491,8 +511,20 @@ var guestTask = function() {
           var hostName = list.map(task.guest_hosts, function(uid) {
                   return profile.fullName(profs[uid].prof);
                 }).join(" & ");
-          taskView.append($("<div id='options-title'/>")
-                  .text("When can you meet with " + hostName + "?"));
+
+          var title = $("<div id='options-title'/>")
+            .appendTo(taskView);
+          if (list.mem(task.guest_hosts, task.guest_uid)) {
+            var inProgress = $("<img id='in-progress'/>");
+            svg.loadImg(inProgress, "/assets/img/in-progress.svg");
+            title.append(inProgress)
+                 .append($("<div class='in-progress-text'/>")
+                   .text("This meeting is still being scheduled."))
+                 .append($("<div class='in-progress-text helper-text'/>")
+                   .text("Below are the meeting options in consideration."));
+          } else {
+            title.text("When can you meet with " + hostName + "?");
+          }
 
           var select = $("<div id='guest-select'/>")
             .appendTo(taskView);

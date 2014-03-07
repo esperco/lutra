@@ -141,9 +141,18 @@ hr {
   &:active g path { fill: #7d3ca0; }
 }
 
+#meeting-impersonator {
+  float: right;
+  margin: 20px 16px 0px 16px;
+}
+
 #meeting-welcome {
   margin: 20px 16px 0px 56px;
   font-size: 16px;
+}
+
+#meeting-welcome.exec-view {
+  margin-right: 200px;
 }
 
 
@@ -160,6 +169,14 @@ hr {
   }
 }
 
+.helper-text {
+  color: @gray_40;
+  font-size: 18px;
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+}
+
 
 /*** Options ***/
 
@@ -169,6 +186,13 @@ hr {
     font-size: 20px;
   }
 }
+
+#in-progress {
+  float: left;
+  margin-top: 3px;
+}
+
+.in-progress-text { margin-left: 40px; }
 
 #options {
   width: 100%;
@@ -190,6 +214,8 @@ hr {
     width: 76px;
   }
 }
+
+.option-select.exec-view { width: 40px; }
 
 .option-info {
   padding: 20px 0 16px 0;
@@ -363,13 +389,11 @@ hr {
   border-bottom-left-radius: 3px;
 }
 
-#meeting-header {
-  margin-left: 70px;
-}
+#meeting-header { margin-left: 70px; }
 
-#meeting-title {
-  font-size: 24px;
-}
+#meeting-title { font-size: 24px; }
+
+#meeting-title.exec-view { margin-top: 16px; }
 
 #add-to-calendar {
   height: 24px;
