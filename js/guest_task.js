@@ -467,11 +467,10 @@ var guestTask = function() {
         if (list.mem(task.guest_hosts, task.guest_uid)) {
           var taskImpersonator = $("#meeting-impersonator");
           var viewAs = $("<span id='view-as'>View as</span>");
-          var selector;
+          // Create impersonation selector
 
           taskWelcome.addClass("exec-view");
-          taskImpersonator.append(viewAs)
-                          .append(selector);
+          taskImpersonator.append(viewAs);
         }
 
         if (state.reserved) {
