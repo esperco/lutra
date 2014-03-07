@@ -22,6 +22,10 @@ var util = (function () {
     return typeof x === "string";
   };
 
+  mod.isNonEmptyString = function(x) {
+    return mod.isString(x) && x.length > 0;
+  };
+
   mod.isArray = function(x) {
     return Object.prototype.toString.call(x) === "[object Array]";
   };
@@ -102,12 +106,18 @@ var util = (function () {
     }
   };
 
-  mod.arrayUnique = function(arr) {
-    var obj = {};
-    for (var i = 0; i < arr.length; i++) obj[arr[i]] = arr[i];
-    var ret = [];
-    for (var j in obj) ret.push(obj[j]);
-    return ret;
+  /* dropdownToggle.dropdown("show") is not supported
+     by Bootstrap at this time */
+  mod.showDropdown = function(dropdownToggle) {
+    if (!dropdownToggle.parent().hasClass("open"))
+      dropdownToggle.dropdown("toggle");
+  };
+
+  /* dropdownToggle.dropdown("hide") is not supported
+     by Bootstrap at this time */
+  mod.hideDropdown = function(dropdownToggle) {
+    if (dropdownToggle.parent().hasClass("open"))
+      dropdownToggle.dropdown("toggle");
   };
 
   return mod;

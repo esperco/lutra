@@ -119,18 +119,6 @@ var sched3 = (function() {
       });
   }
 
-  function textOfHowSoon(x) {
-    var days = x / 86400;
-    if (days > 9.5)
-      return "within two weeks";
-    else if (days >= 5.5)
-      return "within one week";
-    else if (days >= 1.5)
-      return "within "+Math.floor(days + 0.5)+" days";
-    else
-      return "within one day";
-  }
-
   function showEndTime() {
     $("#sched-availability-message-readonly .time-text")
       .removeClass("hide");
@@ -171,8 +159,7 @@ var sched3 = (function() {
     })
   }
 
-  function preFillAvailabilityModal(chats, profs, task,
-                                    howSoon, options, toUid) {
+  function preFillAvailabilityModal(chats, profs, task, options, toUid) {
     var toObsProf = profs[toUid];
 
     loadRecipients(toObsProf);
@@ -183,7 +170,6 @@ var sched3 = (function() {
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(toObsProf.prof);
-    var howSoon = textOfHowSoon(howSoon);
 
     var footerOption = $("#footer-option");
     footerOption.children().remove();
@@ -264,7 +250,6 @@ var sched3 = (function() {
     svg.loadImg(drag, "/assets/img/drag.svg");
 
     var state = sched.getState(task);
-    var howSoon = state.meeting_request.how_soon;
     var options = state.calendar_options;
 
     var availabilityModal = $("#sched-availability-modal");
@@ -273,7 +258,7 @@ var sched3 = (function() {
     }
 
     function composeEmail() {
-      preFillAvailabilityModal(chats, profs, task, howSoon, options, uid);
+      preFillAvailabilityModal(chats, profs, task, options, uid);
       availabilityModal.modal({});
     }
 

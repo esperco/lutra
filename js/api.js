@@ -249,9 +249,15 @@ var api = (function () {
     return "/api/s/" + login.data.uid;
   };
 
-  mod.getCalendar = function(uid2, optAuthLandingUrl) {
+  mod.postCalendar = function(uid2, calRequest) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2;
+    return jsonHttpPost(url, JSON.stringify(calRequest));
+  };
+
+  mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/info";
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
@@ -292,25 +298,25 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.postCreatePlace = function(uid, desc, edit) {
+  mod.postCreatePlace = function(desc, edit) {
     var url = apiSPrefix() + "/place/create/" +
               encodeURIComponent(desc);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
-  mod.postEditPlace = function(uid, placeid, edit) {
+  mod.postEditPlace = function(placeid, edit) {
     var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpPost(url, JSON.stringify(edit));
   };
 
-  mod.deletePlace = function(uid, placeid) {
+  mod.deletePlace = function(placeid) {
     var url = apiSPrefix() + "/place/edit/" +
               encodeURIComponent(placeid);
     return jsonHttpDelete(url);
   };
 
-  mod.getPlaceList = function(uid) {
+  mod.getPlaceList = function() {
     var url = apiSPrefix() + "/place/list/";
     return jsonHttpGet(url);
   };

@@ -6,10 +6,19 @@
 var deferred = (function() {
   var mod = {};
 
-  /* wrap an already-computed value into a Deferred object */
+  /* wrap an already-computed value into a Deferred object,
+     indicating a successful computation. */
   mod.defer = function(x) {
     var dfd = new $.Deferred();
     dfd.resolve(x);
+    return dfd;
+  }
+
+  /* wrap an already-computed value into a Deferred object,
+     indicating a failed computation. */
+  mod.fail = function(x) {
+    var dfd = new $.Deferred();
+    dfd.reject(x);
     return dfd;
   }
 

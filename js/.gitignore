@@ -4,4 +4,5 @@ guest-app.js
 includes-dev.html
 includes-dev-guest-app.html
 includes-prod.html
+js
 includes-prod-guest-app.html
