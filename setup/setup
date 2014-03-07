@@ -31,7 +31,7 @@ git checkout master
 git pull --ff-only origin master
 
 # jQuery
-install_js jquery jquery-2.0.3.min.js
+install_js jquery jquery-2.1.0.js
 
 # Bootstrap
 rm -rf bootstrap
@@ -43,7 +43,7 @@ install_js bootstrap bootstrap/js/bootstrap.js
 install_js sha1 sha1.js
 
 # CanJS
-install_js can can-1.1.8.custom.min.js
+install_js can can-2.0.5.custom.js
 
 # Timeago
 install_js jquery.timeago jquery.timeago.js
