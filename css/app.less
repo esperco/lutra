@@ -2414,16 +2414,14 @@ object {
 }
 
 
-/*** Scheduling Step 4 ***/
+/*** Modules ***/
 
-.final-sched-div {
+.sched-module {
   border: 1px solid @gray_20;
   border-radius: 6px;
 }
 
-#edit-meeting-div { margin-top: 30px; }
-
-.sched-step4-section-header {
+.sched-module-header {
   height: 54px;
   padding: 13px 15px;
   font-size: 18px;
@@ -2432,27 +2430,43 @@ object {
   border-top-left-radius: 6px;
 }
 
-.sched-step4-section-title {
+.sched-module-header.collapsed { border-radius: 6px; }
+
+.sched-module-icon { float: left; }
+
+.sched-module-title {
   margin-left: 45px;
   padding-top: 2px;
 }
 
+.show-hide {
+  float: right;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
 .connector {
-  display: block;
+  width: 32px;
+  height: 24px;
   margin-top: -1px;
   margin-right: auto;
   margin-bottom: -1px;
   margin-left: auto;
 }
 
+.connector.collapsed path.down { fill: @gray_f8; }
+
+
+/*** Scheduling Step 4 ***/
+
+#edit-meeting-div { margin-top: 30px; }
+
 #meeting-content {
   padding: 15px;
   border-top: 1px solid @gray_20;
 }
 
-#reschedule-meeting {
-  cursor: pointer;
-}
+#reschedule-meeting { cursor: pointer; }
 
 #cancel-meeting {
   color: @red !important;
@@ -2463,9 +2477,7 @@ object {
   }
 }
 
-#meeting-details {
-  padding: 0;
-}
+#meeting-details { padding: 0; }
 
 #calendar-title { padding-top: 0; }
 
@@ -2517,10 +2529,6 @@ object {
   margin-left: 45px;
   color: @gray_60;
   font-size: 14px;
-}
-
-.sched-step4-section-icon {
-  float: left;
 }
 
 #reminder-scheduler {
