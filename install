@@ -16,25 +16,18 @@ esac
 mkdir -p pub/css pub/js pub/ejs pub/html pub/img pub/fonts
 
 ### Copy third-party libraries into the pub directory
+
+# All Javascript (.js and .min.js)
+cp setup/js/*.js pub/js
+
+# Other
 libs=setup/mink-libs
-cp $libs/jquery.min.js pub/js
-cp $libs/can.min.js pub/js
-cp $libs/sha1.js pub/js
-cp -a $libs/bootstrap/* pub
-cp $libs/jquery.timeago.js pub/js
-cp $libs/autosize-master/jquery.autosize.min.js pub/js
-chmod a-x pub/js/jquery.autosize.min.js
+cp -a $libs/bootstrap/css pub
+cp -a $libs/bootstrap/fonts pub
 cp $libs/animate.min.css pub/css
 cp $libs/font-awesome.css pub/css
-
-# Fullcalendar and dependencies
 cp $libs/fullcalendar/fullcalendar/fullcalendar.css pub/css
 cp $libs/fullcalendar/fullcalendar/fullcalendar.print.css pub/css
-cp $libs/fullcalendar/fullcalendar/fullcalendar.min.js pub/js
-cp $libs/fullcalendar/lib/moment.min.js pub/js
-cp $libs/fullcalendar/lib/jquery-ui.custom.min.js pub/js
-
-cp $libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js pub/js
 cp $libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css pub/css
 
 ### Build our own code and copy the result into the pub directory

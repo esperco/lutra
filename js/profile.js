@@ -14,14 +14,14 @@ var profile = (function() {
   };
 
   /* class for creating observables with backend access */
-  mod.Observe = can.Observe;
+  mod.Observe = can.Map;
 
   /* cache of observable profiles */
   var accessCache = cache.create (600, 60, {
     get: function(uid) { return api.getProfile(uid); },
     wrap: function(deferredProf) {
       return deferredProf.then(function(prof) {
-        return util.isDefined(prof) ? new can.Observe({prof:prof}) : null;
+        return util.isDefined(prof) ? new can.Map({prof:prof}) : null;
       });
     },
     update: function(deferredObs, deferredProf) {

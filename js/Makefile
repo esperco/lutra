@@ -11,6 +11,35 @@ prod: prod-build
 dev-build: includes-dev.html includes-dev-guest-app.html
 prod-build: prod.js guest-app.js includes-prod.html includes-prod-guest-app.html
 
+# Javascript libraries that are made available by the setup process.
+# When available, we use the non-minified version for debugging (DEV),
+# and the minified version for production (PROD).
+
+COMMON_LIBS = \
+  jquery \
+  bootstrap \
+  can \
+  jquery.timeago \
+  jquery.autosize
+
+APP_LIBS = \
+  sha1 \
+  moment \
+  jquery-ui \
+  fullcalendar \
+  bootstrap-timepicker
+
+GUESTAPP_LIBS =
+
+COMMON_DEV_LIBS = $(addsuffix .js, $(COMMON_LIBS))
+APP_DEV_LIBS = $(addsuffix .js, $(APP_LIBS))
+GUESTAPP_DEV_LIBS = $(addsuffix .js, $(GUESTAPP_LIBS))
+
+COMMON_PROD_LIBS = $(addsuffix .min.js, $(COMMON_LIBS))
+APP_PROD_LIBS = $(addsuffix .min.js, $(APP_LIBS))
+GUESTAPP_PROD_LIBS = $(addsuffix .min.js, $(GUESTAPP_LIBS))
+
+
 # Quasi-Javascript sources that need to be preprocessed with 'oblivion'.
 # Output Javascript files are put into the js/ subdirectory.
 
@@ -81,17 +110,20 @@ js/%.js: %.js
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
 includes-dev.html: Makefile mkloader
-	./mkloader $(COMMON_SOURCES) $(APP_SOURCES) > $@
+	./mkloader $(COMMON_DEV_LIBS) $(APP_DEV_LIBS) \
+		   $(COMMON_SOURCES) $(APP_SOURCES) > $@
 
 includes-prod.html: Makefile mkloader
-	./mkloader app.js > $@
+	./mkloader $(COMMON_PROD_LIBS) $(APP_PROD_LIBS) app.js > $@
 
 includes-dev-guest-app.html: Makefile mkloader
-	./mkloader $(COMMON_SOURCES) $(GUESTAPP_SOURCES) \
+	./mkloader $(COMMON_DEV_LIBS) $(GUESTAPP_DEV_LIBS) \
+		   $(COMMON_SOURCES) $(GUESTAPP_SOURCES) \
 		> includes-dev-guest-app.html
 
 includes-prod-guest-app.html: Makefile mkloader
-	./mkloader guest-app.js > includes-prod-guest-app.html
+	./mkloader $(COMMON_PROD_LIBS) $(GUESTAPP_PROD_LIBS) guest-app.js \
+		> includes-prod-guest-app.html
 
 # Production: concatenate all files into one for speed
 prod.js: $(COMMON_JS) $(APP_JS)

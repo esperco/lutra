@@ -4,8 +4,22 @@ set -e
 # Normally we are in the setup/ subdirectory of the project
 ROOT=$(pwd)
 mkdir -p "$ROOT"/bin
+mkdir -p "$ROOT"/js
 
-# Get archives from our github repository, then unpack them
+# Get archives from our github repository, then unpack them.
+# Prepare two versions of each Javascript file:
+# - versionless source, e.g. jquery.js
+# - versionless minified code, e.g. jquery.min.js
+
+# Install a source Javascript file, minify it and install the minified version
+# as well.
+install_js() {
+    name="$1"
+    src="$2"
+    echo "Minifying $name"
+    cp "$src" "$ROOT"/js/"$name".js
+    uglifyjs -o "$ROOT"/js/"$name".min.js "$src"
+}
 
 cd "$ROOT"
 if [ ! -d mink-libs ]; then
@@ -16,30 +30,46 @@ cd mink-libs
 git checkout master
 git pull --ff-only origin master
 
-# mink-libs/jquery
-cp jquery-2.0.3.min.js jquery.min.js
+# jQuery
+install_js jquery jquery-2.1.0.js
 
-# mink-libs/bootstrap
+# Bootstrap
 rm -rf bootstrap
 unzip bootstrap-3.0.2-dist.zip
 mv dist bootstrap
+install_js bootstrap bootstrap/js/bootstrap.js
 
-# mink-libs/can
-cp can-1.1.8.custom.min.js can.min.js
+# SHA1
+install_js sha1 sha1.js
+
+# CanJS
+install_js can can-2.0.5.custom.js
+
+# Timeago
+install_js jquery.timeago jquery.timeago.js
+
+# Autosize
+install_js jquery.autosize autosize-master/jquery.autosize.js
 
 cp font-awesome-4.0.3.css font-awesome.css
 
+# Fullcalendar and dependencies
 rm -rf fullcalendar
 unzip fullcalendar-2.0.0-beta2.zip
 mv fullcalendar-2.0.0-beta2 fullcalendar
+install_js fullcalendar fullcalendar/fullcalendar/fullcalendar.js
+install_js moment fullcalendar/lib/moment.min.js
+install_js jquery-ui fullcalendar/lib/jquery-ui.custom.min.js
 
+# Bootstrap timepicker
 rm -rf bootstrap-timepicker
 tar xzf bootstrap-timepicker-0.2.6.tar.gz
 mv bootstrap-timepicker-0.2.6 bootstrap-timepicker
 # Edit for Bootstrap 3, based on the following pull request:
 # https://github.com/jdewit/bootstrap-timepicker/pull/215/files
 sed -i -e 's/icon-chevron/glyphicon glyphicon-chevron/g' \
-  bootstrap-timepicker/js/bootstrap-timepicker*.js
+  bootstrap-timepicker/js/bootstrap-timepicker.js
+install_js bootstrap-timepicker bootstrap-timepicker/js/bootstrap-timepicker.js
 
 # oblivion preprocessor, requires ocaml.
 # We install it manually so we don't depend on an opam setup
@@ -52,3 +82,7 @@ git checkout master
 git pull --ff-only origin master
 make
 make PREFIX="$ROOT" install
+
+
+# Don't want my Javascript files to be executable for no reason
+chmod a-x "$ROOT"/js/*.js
