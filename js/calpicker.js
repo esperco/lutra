@@ -56,6 +56,12 @@ var calpicker = (function() {
     return hours24;
   }
 
+  function hasDates(picker) {
+    var start = picker.eventStart;
+    var end = picker.eventEnd;
+    return util.isDefined(start) && util.isDefined(end);
+  }
+
   function initTimePicker(picker,
                           fieldName, /* either "eventStart" or "eventEnd" */
                           timePicker) {
@@ -65,35 +71,24 @@ var calpicker = (function() {
     });
     timePicker.timepicker().on('changeTime.timepicker', function(e) {
       /*
-        TODO (known bugs):
+        TODO (known bug):
         Ensure that end date/time is after start date/time.
       */
       var time = e.time;
       var date = picker[fieldName];
-      date.hours(to24hours(time));
-      date.minutes(time.minutes);
-      updateCalendarView(picker);
+      if (util.isDefined(date)) {
+        var hours = to24hours(time);
+        var minutes = time.minutes;
+        date.hours(to24hours(time));
+        date.minutes(time.minutes);
+        updateCalendarView(picker);
+      }
     });
   }
 
   function initTimePickers(picker) {
     initTimePicker(picker, "eventStart", picker.startInput);
     initTimePicker(picker, "eventEnd", picker.endInput);
-  }
-
-  function getDates(picker) {
-    if (util.isDefined(picker.eventStart) && util.isDefined(picker.eventEnd)) {
-      var start = picker.eventStart;
-      var end = picker.eventEnd;
-      var duration = end.unix() - start.unix();
-      return {
-        start: start.toDate(),
-        end: end.toDate(),
-        duration: duration
-      };
-    }
-    else
-      return null;
   }
 
   /* Remove event from the calendar view but preserve start/end fields */
@@ -127,7 +122,7 @@ var calpicker = (function() {
   function updateTextView(picker) {
     var start = picker.eventStart;
     var end = picker.eventEnd;
-    if (util.isDefined(start)) {
+    if (hasDates(picker)) {
       picker.startInput.timepicker('setTime', formatTime(start));
       picker.endInput.timepicker('setTime', formatTime(end));
       picker.textView.removeClass("hide");
@@ -137,10 +132,10 @@ var calpicker = (function() {
   }
 
   function updateCalendarView(picker) {
-    var start = picker.eventStart;
-    var end = picker.eventEnd;
-    if (util.isDefined(start)) {
+    if (hasDates(picker)) {
       removeCalendarEvent(picker);
+      var start = picker.eventStart;
+      var end = picker.eventEnd;
       var eventId = util.randomString();
       picker.eventId = eventId;
       var eventData = {
@@ -155,8 +150,46 @@ var calpicker = (function() {
       picker.calendarView.fullCalendar('renderEvent', eventData, stick);
       picker.calendarView.fullCalendar('unselect');
     }
+  }
+
+  function getDates(picker) {
+    if (util.isDefined(picker.eventStart) && util.isDefined(picker.eventEnd)) {
+      var start = picker.eventStart;
+      var end = picker.eventEnd;
+      var duration = end.unix() - start.unix();
+      return {
+        start: start.toDate(),
+        end: end.toDate(),
+        duration: duration
+      };
+    }
     else
-      removeEvent(picker);
+      return null;
+  }
+
+  /*
+    Ignores the 'Z' suffix and assumes time expressed the calendar's
+    timezone.
+  */
+  function parseDateUsingCalendarTimezone(picker, dateString) {
+    return picker.calendarView.fullCalendar("moment", dateString);
+  }
+
+  function setDates(picker, start, end) {
+    if (util.isDefined(start) && util.isDefined(end)) {
+      picker.eventStart = parseDateUsingCalendarTimezone(picker, start);
+      picker.eventEnd = parseDateUsingCalendarTimezone(picker, end);
+      updateTextView(picker);
+      updateCalendarView(picker);
+    }
+  }
+
+  function clearDates(picker) {
+    delete picker.eventStart;
+    delete picker.eventEnd;
+    removeEvent(picker);
+    updateTextView(picker);
+    updateCalendarView(picker);
   }
 
   /*
@@ -239,7 +272,9 @@ var calpicker = (function() {
     return {
       view: picker.view,
       render: render, // to be called after attaching the view to the dom tree
-      getDates: (function() { return getDates(picker); })
+      getDates: (function() { return getDates(picker); }),
+      setDates: (function(x) { setDates(picker, x.start, x.end); }),
+      clearDates: (function() { return clearDates(picker); })
     };
   }
 

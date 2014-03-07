@@ -88,7 +88,7 @@ var locpicker = (function() {
     form.timezone.val(loc.timezone);
 
     if (oldTimezone !== newTimezone)
-      form.onTimezoneChange(newTimezone);
+      form.onTimezoneChange(oldTimezone, newTimezone);
   }
 
   /*
@@ -301,7 +301,8 @@ var locpicker = (function() {
 
     return {
       view: view,
-      getCompleteLocation: (function () { return getCompleteLocation(form); })
+      getCompleteLocation: (function () { return getCompleteLocation(form); }),
+      setLocation: (function(loc) { return setLocation(form, loc); })
     };
   }
 

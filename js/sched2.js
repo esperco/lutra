@@ -116,10 +116,13 @@ var sched2 = (function() {
 
     var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
     meetingTypeContainer.append(meetingTypeSelector.view);
+    meetingTypeSelector.set(x.meeting_type);
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
     var getDates = function() { return null; };
+    var renderCalendar = function() {};
+    var clearDates = function() {};
 
     function updateCalendar(timezone) {
       calendarContainer.children().remove();
@@ -127,26 +130,39 @@ var sched2 = (function() {
       if (util.isNonEmptyString(timezone)) {
         var picker = calpicker.createPicker({
           timezone: timezone,
-          onChange: (function() { onChange(); })
+          onChange: (function() { updateSaveButton(); })
         });
         getDates = picker.getDates;
         calendarContainer
           .append(picker.view);
+
+        if (util.isDefined(x.start) && util.isDefined(x.end))
+          picker.setDates(x);
+
         picker.render();
+          /* needs to be done once calendar becomes visible */
+
+        renderCalendar = picker.render;
+        clearDates = picker.clearDates;
       }
     }
 
     /*** Meeting location ***/
 
     var loc = x.location;
-    if (util.isDefined(loc)) {
-      var timezone = loc.timezone;
-      if (util.isNonEmptyString(timezone))
-        updateCalendar(timezone);
+    function onTimeZoneChange(oldTimezone, newTimezone) {
+      log("timezone change: " + oldTimezone + " -> " + newTimezone);
+      updateCalendar(newTimezone);
+      if (util.isNonEmptyString(oldTimezone)
+          && util.isNonEmptyString(newTimezone))
+        clearDates();
     }
     var locationForm = locpicker.create({
-      onTimezoneChange: updateCalendar
+      onTimezoneChange: onTimeZoneChange
     });
+    if (util.isDefined(loc)) {
+      locationForm.setLocation(loc);
+    }
     locationContainer.append(locationForm.view);
 
     /*** Row controls (save/remove) ***/
@@ -182,7 +198,7 @@ var sched2 = (function() {
       return util.isNotNull(getCalOption());
     }
 
-    function onChange() {
+    function updateSaveButton() {
       if (calOptionIsReady())
         saveButton.removeClass("disabled");
       else
@@ -195,7 +211,12 @@ var sched2 = (function() {
     }
 
     saveButton.click(saveMe);
-    return view;
+    updateSaveButton();
+
+    return {
+      view: view,
+      renderCalendar: renderCalendar
+    };
   }
 
   function createMeetingOption(tzList, saveCalOption) {
@@ -225,11 +246,14 @@ var sched2 = (function() {
 
     /* Load calendar and forms when user clicks "Edit" */
     function switchToEdit() {
-      var editView = editableViewOfOption(tzList, calOption, saveCalOption);
-      editableContainer.append(editView);
+      var edit =
+        editableViewOfOption(tzList, calOption, saveCalOption);
+      editableContainer.append(edit.view);
 
       readOnlyContainer.addClass("hide");
       editableContainer.removeClass("hide");
+
+      edit.renderCalendar();
     }
 
     var readOnlyView =
@@ -286,7 +310,7 @@ var sched2 = (function() {
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm() {
-      return createMeetingOption(tzList, save);
+      return createMeetingOption(tzList, save).view;
     }
 
     var schedState = sched.getState(ta);

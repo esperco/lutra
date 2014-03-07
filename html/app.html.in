@@ -335,7 +335,6 @@
     <script src="/assets/js/jquery-ui.custom.min.js"></script>
     <script src="/assets/js/moment.min.js"></script>
     <script src="/assets/js/fullcalendar.min.js"></script>
-    <script src="/assets/js/fullcalendar.min.js"></script>
     <script src="/assets/js/bootstrap-timepicker.min.js"></script>
 
     <!-- API key activated by jeff@esper.co -->
