@@ -10,17 +10,6 @@ var sched3 = (function() {
     });
   }
 
-  function formalEmailBody(organizerName, hostName, toName) {
-    return "Dear "+toName+",\n\n"+
-
-    "I'm writing on behalf of "+hostName+" who respectfully requests "+
-    "a meeting with you. "+
-    hostName+"'s schedule has the following open times. "+
-    "If any of these times are agreeable, please respond to this e-mail "+
-    "with your choice. If you have an assistant or scheduler, I'd be happy "+
-    "to follow up with him or her.";
-  }
-
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
@@ -181,9 +170,6 @@ var sched3 = (function() {
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(toObsProf.prof);
-    var body = formalEmailBody(organizerName, hostName, toName);
-    $("#sched-availability-message")
-      .val(body);
 
     var footerOption = $("#footer-option");
     footerOption.children().remove();
@@ -219,8 +205,41 @@ var sched3 = (function() {
         showEndTime();
       }
     })
+
+    var parameters = {
+      exec_name: hostName,
+      guest_name: toName,
+      guest_uid: toUid
+    };
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Options_to_guest_assistant";
+      $("#sched-options-guest-addr").val("Address_to_assistant");
+    } else {
+      parameters.template_kind = "Options_to_guest";
+      $("#sched-options-guest-addr").val("Address_directly");
+    }
+    api.getOptionsMessage(task.tid, parameters)
+      .done(function(optionsMessage) {
+        $("#sched-availability-message").val(optionsMessage.message_text);
+        $("#sched-options-guest-addr")
+          .unbind("change")
+          .change(function(){refreshOptionsMessage(task.tid, parameters);});
+      });
   }
 
+  function refreshOptionsMessage(tid, parameters) {
+    if ($("#sched-options-guest-addr").val() === "Address_directly") {
+      parameters.template_kind = "Options_to_guest";
+    } else {
+      parameters.template_kind = "Options_to_guest_assistant";
+    }
+    api.getOptionsMessage(tid, parameters)
+      .done(function(x) {
+        $("#sched-availability-message").val(x.message_text);
+      });
+  }
 
   function rowViewOfParticipant(chats, profs, task, uid) {
     var view = $("<div class='sched-step3-row clearfix'>");
@@ -248,6 +267,7 @@ var sched3 = (function() {
 
     var prof = profs[uid].prof;
     profile.viewMediumCirc(prof)
+      .addClass("list-prof-circ pref-prof-circ")
       .appendTo(guest);
 
     $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
@@ -297,6 +317,12 @@ var sched3 = (function() {
         if (! sendButton.hasClass("disabled")) {
           sendButton.addClass("disabled");
           var body = $("#sched-availability-message").val();
+          if ("Address_to_assistant" === $("#sched-options-guest-addr").val()) {
+            var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
+            if (util.isNotNull(ea)) {
+              uid = ea;
+            }
+          }
           var chatid = chats[uid].chatid;
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
@@ -371,7 +397,7 @@ var sched3 = (function() {
       .appendTo(guestPrefsHeader);
 
     var guestsContainer = $("<div class='guests-container guests-only'>")
-    var guests = sched.getGuests(ta);
+    var guests = sched.getAttendingGuests(ta);
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
@@ -384,7 +410,7 @@ var sched3 = (function() {
 
     guestsContainer.appendTo(view);
 
-    task.onSchedulingStepChanging.observe("step", function() {
+    observable.onSchedulingStepChanging.observe("step", function() {
       saveTask(ta, selected);
     });
   };

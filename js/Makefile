@@ -8,12 +8,13 @@ prod: prod-build
 	$(MAKE) prod-install
 
 # Build only
-dev-build: includes-dev.html
-prod-build: prod.js includes-prod.html
+dev-build: includes-dev.html includes-dev-guest-app.html
+prod-build: prod.js guest-app.js includes-prod.html includes-prod-guest-app.html
 
 # Quasi-Javascript sources that need to be preprocessed with 'oblivion'.
 # Output Javascript files are put into the js/ subdirectory.
-SOURCES = \
+
+COMMON_SOURCES = \
   test.js \
   list.js \
   deferred.js \
@@ -33,6 +34,14 @@ SOURCES = \
   editor.js \
   select.js \
   store.js \
+  observable.js \
+  pusher.js \
+  profile.js \
+  geo.js \
+  chat.js \
+  display.js
+
+APP_SOURCES = \
   login.js \
   api.js \
   sample.js \
@@ -53,13 +62,20 @@ SOURCES = \
   home.js \
   page.js \
   route.js \
-  display.js \
   main.js
 
-JS = $(addprefix js/,$(SOURCES))
+GUESTAPP_SOURCES = \
+  guest_api.js \
+  guest_task.js \
+  guest_login.js \
+  guest_main.js
+
+COMMON_JS = $(addprefix js/,$(COMMON_SOURCES))
+APP_JS = $(addprefix js/,$(APP_SOURCES))
+GUESTAPP_JS = $(addprefix js/,$(GUESTAPP_SOURCES))
 
 .PHONY: pp
-pp: $(JS)
+pp: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 
 js/%.js: %.js
 	@mkdir -p js
@@ -68,23 +84,36 @@ js/%.js: %.js
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
 includes-dev.html: Makefile mkloader
-	./mkloader $(SOURCES) > $@
+	./mkloader $(COMMON_SOURCES) $(APP_SOURCES) > $@
 
 includes-prod.html: Makefile mkloader
 	./mkloader app.js > $@
 
-# Production: concatenate all files into one for speed
-prod.js: $(JS)
-	cat $(JS) | uglifyjs -o $@
+includes-dev-guest-app.html: Makefile mkloader
+	./mkloader $(COMMON_SOURCES) $(GUESTAPP_SOURCES) \
+		> includes-dev-guest-app.html
 
-dev-install: $(JS)
+includes-prod-guest-app.html: Makefile mkloader
+	./mkloader guest-app.js > includes-prod-guest-app.html
+
+# Production: concatenate all files into one for speed
+prod.js: $(COMMON_JS) $(APP_JS)
+	cat $(COMMON_JS) $(APP_JS) | uglifyjs -o $@
+
+guest-app.js: $(COMMON_JS) $(GUESTAPP_JS)
+	cat $(COMMON_JS) $(GUESTAPP_JS) | uglifyjs -o $@
+
+dev-install: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 	mkdir -p ../pub/js
-	cp $(JS) ../pub/js
+	cp $(COMMON_JS) ../pub/js
+	cp $(APP_JS) ../pub/js
+	cp $(GUESTAPP_JS) ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
 	cp prod.js ../pub/js/app.js
+	cp guest-app.js ../pub/js
 
 clean:
-	rm -f *~ prod.js includes-*.html run-tests.js
+	rm -f *~ prod.js guest-app.js includes-*.html run-tests.js
 	rm -rf js/

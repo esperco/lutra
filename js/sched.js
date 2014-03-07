@@ -42,17 +42,36 @@ var sched = (function() {
     return list.inter(mod.getParticipants(task), team.team_leaders);
   };
 
-  mod.getGuests = function(task) {
+  function getGuests(task) {
     var team = login.getTeam();
     return list.diff(mod.getParticipants(task), team.team_leaders);
-  };
+  }
+
+  mod.getGuestOptions = function(task) {
+    return list.toTable(sched.getState(task).participant_options,
+                        function(x){return x.uid;});
+  }
+
+  mod.assistedBy = function(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return util.isNotNull(options) ? options.assisted_by : null;
+  }
+
+  mod.guestMayAttend = function(uid, guestOptions) {
+    var options = guestOptions[uid];
+    return ! util.isNotNull(options)
+        || false !== options.may_attend;
+  }
+
+  mod.getAttendingGuests = function(task) {
+    var guestOptions = mod.getGuestOptions(task);
+    return list.filter(getGuests(task), function(uid) {
+      return mod.guestMayAttend(uid, guestOptions);
+    });
+  }
 
   mod.forEachParticipant = function(task, f) {
     list.iter(mod.getParticipants(task), f);
-  };
-
-  mod.forEachGuest = function(task, f) {
-    list.iter(mod.getGuests(task), f);
   };
 
   /******************************************/
@@ -104,9 +123,6 @@ var sched = (function() {
 
     var fromTime = wordify(date.timeOnly(t1));
     var toTime = wordify(date.timeOnly(t2));
-
-    if (fromTime.charAt(fromTime.length-2) === toTime.charAt(toTime.length-2))
-      fromTime = fromTime.substr(0, fromTime.length-3);
 
     var row3 = $("<div class='time-text'/>")
       .append(html.text("from "))
@@ -214,17 +230,17 @@ var sched = (function() {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep1(profs, ta);
         });
       });
     $(".sched-go-step2")
-      .attr('disabled', mod.getGuests(ta) <= 0)
+      .attr('disabled', getGuests(ta) <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep2(tzList, profs, ta);
         });
       });
@@ -232,8 +248,8 @@ var sched = (function() {
       .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep3(profs, ta);
         });
       });
@@ -241,8 +257,8 @@ var sched = (function() {
       .attr('disabled', ! mod.getState(ta).reserved)
       .unbind('click')
       .click(function() {
-        task.onSchedulingStepChanging.notify();
-        task.profilesOfEveryone(ta).done(function(profs) {
+        observable.onSchedulingStepChanging.notify();
+        profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadStep4(profs, ta);
         });
       });
@@ -256,7 +272,7 @@ var sched = (function() {
       .done(function(x) {
         var tzList = x.timezones;
         setup_step_buttons(tzList, ta);
-        task.profilesOfEveryone(ta)
+        profile.profilesOfTaskParticipants(ta)
           .done(function(profs) {
             switch (progress) {
             case "Guest_list":

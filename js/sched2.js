@@ -371,7 +371,7 @@ var sched2 = (function() {
   mod.load = function(tzList, profs, ta) {
     connectCalendar(tzList, profs, ta);
 
-    task.onSchedulingStepChanging.observe("step", function() {
+    observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);
     });
   };

@@ -208,12 +208,8 @@
           <div>
             <img class="svg hero-word" src="/assets/img/esper-word.svg">
           </div>
-          <div class="copyright">&copy; 2014 Esper Technologies, Inc. All Rights Reserved.</div>
-          <div class="made">
-            Made with
-            <i class="fa fa-heart-o heart"></i>
-            in Palo Alto, CA
-          </div>
+          <div class="copyright">&copy; 2014 Esper Technologies, Inc. All rights reserved.</div>
+          <div class="made">Made in Palo Alto, CA</div>
         </div>
       </div>
       <div class="login-footer-push"></div>
@@ -263,13 +259,29 @@
 
     <div id="task-page" class="hide task-page">
 
-      <div id="chat" class="animated fadeInUp premiere">
-        <img id="chat-caret" class="svg" src="/assets/img/chat-caret.svg">
-        <div id="chat-container">
-          <div id="chat-header">
-            <ul class="nav chat-tabs chat-profile-tabs"></ul>
+      <div class="modal fade" id="chat-modal" tabindex="-1"
+           role="dialog" aria-labelledby="chat-title"
+           aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <img id="chat-header-icon" class="svg" src="/assets/img/chat.svg">
+              <div style="float:right" data-dismiss="modal">
+                <img class="svg modal-close" src="/assets/img/x.svg">
+              </div>
+              <h3 class="modal-title" id="sched-manual-entry-title">
+                Messages
+              </h3>
+            </div>
+            <div class="modal-body" id="chat">
+              <div id="chat-container">
+                <div id="chat-header">
+                  <ul class="nav chat-tabs chat-profile-tabs"></ul>
+                </div>
+                <div class="tab-content chat-panel"></div>
+              </div>
+            </div>
           </div>
-          <div class="tab-content chat-panel"></div>
         </div>
       </div>
 
@@ -280,7 +292,7 @@
             <img id="return-home" class="svg" src="/assets/img/esper-mark.svg">
           </a>
           <a id="chat-icon-container">
-            <img id="chat-icon" class="svg" src="/assets/img/chat.svg">
+            <img id="chat-icon" class="svg" src="/assets/img/chat-count.svg">
           </a>
           <div id="task-title-div" class="clearfix">
             <input id="task-title" class="hide form-control ellipsis">

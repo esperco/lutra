@@ -114,7 +114,6 @@ var api = (function () {
 
   mod.postProfile = function(prof, teamid) {
     var url = apiProfilePrefix() + "/" + prof.profile_uid + "/" + teamid;
-    //console.log(teamid.toSource());
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 
@@ -155,6 +154,28 @@ var api = (function () {
   mod.emailVerify = function(uid, email, token) {
     var url = "/api/q/" + uid + "/email-verify/" + encodeURIComponent(token);
     return jsonHttpPost(url, JSON.stringify(email));
+  };
+
+  mod.postEmailSignature = function(myUID, theirUID, teamid, sig) {
+    var url = "/api/q/" + myUID + "/email/" + theirUID + "/" + teamid +
+      "/signature";
+    return jsonHttpPost(url, JSON.stringify(sig));
+  };
+
+  mod.getContactInfo = function(theirUID, teamid) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
+    return jsonHttpGet(url);
+  };
+
+  mod.postContactInfo = function(theirUID, teamid, contact) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid;
+    return jsonHttpPost(url, JSON.stringify(contact));
+  };
+
+  mod.deleteContactInfo = function(theirUID, teamid, contact) {
+    var url = apiQPrefix() + "/contact/" + theirUID + "/" + teamid +
+      "/remove";
+    return jsonHttpPost(url, JSON.stringify(contact));
   };
 
 
@@ -316,9 +337,39 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(notified));
   };
 
+  mod.updateCalendar = function(tid, update) {
+    var url = apiSPrefix() + "/event/" + tid + "/update";
+    return jsonHttpPost(url, JSON.stringify(update));
+  };
+
+  mod.getGuestAppURL = function(tid, guestUid) {
+    var url = apiSPrefix() + "/task/" + tid + "/guestapp/" + guestUid;
+    return jsonHttpGet(url);
+  }
+
+  mod.getOptionsMessage = function(tid, parameters) {
+    var url = apiSPrefix() + "/task/" + tid + "/options/message";
+    return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
+  mod.getConfirmationMessage = function(tid, parameters) {
+    var url = apiSPrefix() + "/task/" + tid + "/confirmation/message";
+    return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
   mod.getReminderMessage = function(tid, parameters) {
     var url = apiSPrefix() + "/task/" + tid + "/reminder/message";
     return jsonHttpPost(url, JSON.stringify(parameters));
+  };
+
+  mod.getUserTemplates = function() {
+    var url = "/api/templates/" + login.data.uid;
+    return jsonHttpGet(url);
+  };
+
+  mod.postUserTemplate = function(uid, template) {
+    var url = "/api/templates/" + login.data.uid + "/save";
+    return jsonHttpPost(url, JSON.stringify(template));
   };
 
   return mod;
