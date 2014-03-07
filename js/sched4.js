@@ -535,6 +535,23 @@ var sched4 = (function() {
       })
       .appendTo(titleEditBox);
 
+    /* LOCATION */
+    var location = $("<div class='meeting-detail-row'/>")
+      .appendTo(view);
+
+    var locEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
+      .text("LOCATION")
+      .appendTo(location);
+
+    var locEditBox = $("<div class='meeting-detail'/>")
+      .appendTo(location);
+    var locEdit = $("<input type='text' class='form-control' disabled/>")
+      .val("COMING SOON")
+      .on("input", function() {
+        enableEventEditSave(task, titleEdit, updateButton)
+      })
+      .appendTo(locEditBox);
+
     /* NOTES */
     var notes = $("<div class='meeting-detail-row'/>")
       .appendTo(view);
@@ -662,7 +679,7 @@ var sched4 = (function() {
     var details = $("<tr/>")
       .appendTo(summary);
     var state = sched.getState(task);
-    var choice = state.calendar_options[0]; // This is just a placeholder. Needs to be the selected option.
+    var choice = state.reserved;
     var typ = sched.meetingType(state);
     var hideEndTime = state.hide_end_times;
     var info = sched.viewOfOption(choice, typ, hideEndTime)
