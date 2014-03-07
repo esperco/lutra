@@ -100,6 +100,17 @@ var list = (function() {
     return false;
   };
 
+  /* replace by x all elements that match the predicate f */
+  mod.replace = function(a, x, f) {
+    var b = [];
+    var len = a.length;
+    for (var i = 0; i < len; i++) {
+      var x0 = a[i];
+      b[i] = f(x0, i) ? x : x0;
+    }
+    return b;
+  };
+
   /* shallow copy of a list */
   mod.copy = function(a) {
     return a.slice(0);
@@ -202,7 +213,13 @@ var list = (function() {
                 ["a", "b", "d"]),
     test.expect("unique",
                 function() { return mod.unique(l1); }, null,
-                ["a", "c", "b", "d"])
+                ["a", "c", "b", "d"]),
+    test.expect("replace",
+                function() {
+                  return mod.replace(l1, "X", function(x, i) {
+                    return x === "a" && i > 0;
+                  });
+                }, null, ["a", "c", "X", "b", "d"])
   ];
 
   return mod;

@@ -11,6 +11,9 @@ prod: prod-build
 dev-build: includes-dev.html includes-dev-guest-app.html
 prod-build: prod.js guest-app.js includes-prod.html includes-prod-guest-app.html
 
+# Quasi-Javascript sources that need to be preprocessed with 'oblivion'.
+# Output Javascript files are put into the js/ subdirectory.
+
 COMMON_SOURCES = \
   test.js \
   list.js \
@@ -26,6 +29,7 @@ COMMON_SOURCES = \
   email.js \
   cache.js \
   svg.js \
+  adder.js \
   show.js \
   editor.js \
   select.js \
@@ -42,6 +46,12 @@ APP_SOURCES = \
   login.js \
   api.js \
   sample.js \
+  profile.js \
+  chat.js \
+  geo.js \
+  calpicker.js \
+  loceditor.js \
+  locpicker.js \
   sched1.js \
   sched2.js \
   sched3.js \
@@ -58,7 +68,18 @@ GUESTAPP_SOURCES = \
   guest_api.js \
   guest_task.js \
   guest_login.js \
-  guest_main.js \
+  guest_main.js
+
+COMMON_JS = $(addprefix js/,$(COMMON_SOURCES))
+APP_JS = $(addprefix js/,$(APP_SOURCES))
+GUESTAPP_JS = $(addprefix js/,$(GUESTAPP_SOURCES))
+
+.PHONY: pp
+pp: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
+
+js/%.js: %.js
+	@mkdir -p js
+	oblivion $< -o $@
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
@@ -76,17 +97,17 @@ includes-prod-guest-app.html: Makefile mkloader
 	./mkloader guest-app.js > includes-prod-guest-app.html
 
 # Production: concatenate all files into one for speed
-prod.js: $(COMMON_SOURCES) $(APP_SOURCES)
-	cat $(COMMON_SOURCES) $(APP_SOURCES) | uglifyjs -o $@
+prod.js: $(COMMON_JS) $(APP_JS)
+	cat $(COMMON_JS) $(APP_JS) | uglifyjs -o $@
 
-guest-app.js: $(COMMON_SOURCES) $(GUESTAPP_SOURCES)
-	cat $(COMMON_SOURCES) $(GUESTAPP_SOURCES) | uglifyjs -o $@
+guest-app.js: $(COMMON_JS) $(GUESTAPP_JS)
+	cat $(COMMON_JS) $(GUESTAPP_JS) | uglifyjs -o $@
 
-dev-install:
+dev-install: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 	mkdir -p ../pub/js
-	cp $(COMMON_SOURCES) ../pub/js
-	cp $(APP_SOURCES) ../pub/js
-	cp $(GUESTAPP_SOURCES) ../pub/js
+	cp $(COMMON_JS) ../pub/js
+	cp $(APP_JS) ../pub/js
+	cp $(GUESTAPP_JS) ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
@@ -95,3 +116,4 @@ prod-install:
 
 clean:
 	rm -f *~ prod.js guest-app.js includes-*.html run-tests.js
+	rm -rf js/

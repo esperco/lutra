@@ -2,48 +2,20 @@
   Places Page
 */
 
+/*
+  Please redo this implementation, which is now broken and very hard to update:
+  - get rid of global javascript variables
+  - get rid of global dom node identifiers
+  - use 'if (x)' only if x is a boolean, otherwise use util.isString or other
+  - simplify placeListComparator by using compareNum and
+    compareString functions; define them once and for all if necessary.
+*/
+
 var places = (function() {
   var mod = {};
 
   var selectedPlaceDesc = null;
   var selectedPlaceDetails = null;
-
-  function addressDropdown(predictions, writeName) {
-    if (predictions.from_google.length == 0) return;
-    var menu = $("#places-address-dropdown-menu");
-    menu.children().remove();
-
-    $('<li role="presentation" class="dropdown-header"/>')
-      .text("Suggestions from Google")
-      .appendTo(menu);
-
-    list.iter(predictions.from_google, function(item) {
-      var description = item.google_description;
-      var bolded = geo.highlight(description, item.matched_substrings);
-      var li = $('<li role="presentation"/>').appendTo(menu);
-      $('<a role="menuitem" tabindex="-1" href="#"/>')
-        .html(bolded)
-        .appendTo(li)
-        .click(function() {
-          api.getPlaceDetails(description, item.ref_id)
-            .done(function(details) {
-              selectedPlaceDesc = description;
-              selectedPlaceDetails = details;
-              if (writeName) {
-                $("#edit-place-location-title").val(details.name);
-              }
-              $("#edit-place-address").val(details.formatted_address);
-              $('#places-address-dropdown-toggle').dropdown("toggle");
-            });
-          return false;
-        });
-    });
-
-    var toggle = $('#places-address-dropdown-toggle');
-    if (!toggle.parent().hasClass('open')) {
-      toggle.dropdown("toggle");
-    }
-  }
 
   function prefillEditModal(place) {
     $("#edit-place-location-title").val(place.loc.title);
@@ -265,34 +237,10 @@ var places = (function() {
       });
   }
 
-  function saveNewPlace(refreshDisplay) {
-    if (selectedPlaceDetails) {
-      var editModal = $("#edit-place-modal");
-      editModal.modal("hide");
-      var title = $("#edit-place-location-title").val();
-      var address = $("#edit-place-address").val();
-      var instructions = $("#edit-place-instructions").val();
-      var edit = {
-        title: title,
-        address: address,
-        instructions: instructions,
-        google_description: selectedPlaceDesc,
-        geometry: selectedPlaceDetails.geometry
-      };
-      var uid = login.me();
-      api.postCreatePlace(uid, selectedPlaceDesc, edit)
-        .done(function() {
-          if (refreshDisplay) {
-            api.getPlaceList(uid).done(displayPlaces);
-          }
-        });
-    }
-  }
-
-  function removePlace(uid, placeid) {
+  function removePlace(placeid) {
     $("#edit-place-modal").modal("hide");
-    api.deletePlace(uid, placeid).done(function() {
-      api.getPlaceList(uid).done(displayPlaces);
+    api.deletePlace(placeid).done(function() {
+      api.getPlaceList().done(displayPlaces);
     });
   }
 
@@ -309,8 +257,8 @@ var places = (function() {
     editModal.modal({});
   }
 
-  mod.addressDropdown = addressDropdown;
-  mod.saveNewPlace = saveNewPlace;
+  //mod.addressDropdown = addressDropdown;
+  //mod.saveNewPlace = saveNewPlace;
   mod.emptyEditModal = emptyEditModal;
 
   mod.getSelectedPlaceDetails = function () {
@@ -321,12 +269,6 @@ var places = (function() {
     api.getPlaceList(login.me()).done(displayPlaces);
     util.afterTyping($("#edit-place-address"), 250, predictAddress);
     $("#new-place-btn").click(newPlaceAction);
-
-    var editModal = $("#edit-place-modal");
-    editModal.on("hidden.bs.modal", function() {
-      $("#edit-place-save").off("click");
-      $("#edit-place-delete").off("click");
-    });
   };
 
   return mod;
