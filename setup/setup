@@ -3,6 +3,7 @@ set -e
 
 # Normally we are in the setup/ subdirectory of the project
 ROOT=$(pwd)
+mkdir -p "$ROOT"/bin
 
 # Get archives from our github repository, then unpack them
 
@@ -50,4 +51,4 @@ cd oblivion
 git checkout master
 git pull --ff-only origin master
 make
-make install
+make PREFIX="$ROOT" install

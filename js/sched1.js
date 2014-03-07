@@ -19,6 +19,10 @@ var sched1 = (function() {
   function editGuest(updateAddButton) {
     var edit = {};
 
+    function updateUI() {
+      updateAddButton(edit);
+    }
+
     edit.emailInput = $("<input type='email'/>")
       .addClass("form-control guest-input")
       .attr("placeholder", "Email address");
@@ -76,17 +80,17 @@ var sched1 = (function() {
               edit.lastNameInput.val(prof.first_last[1]);
             }
             updateNameEditability(prof.editable);
-            updateAddButton();
+            updateUI();
           });
       } else {
         edit.clearUid();
-        updateAddButton();
+        updateUI();
       }
     }
 
     util.afterTyping(edit.emailInput, 250, fetchProfile);
-    util.afterTyping(edit.firstNameInput, 250, updateAddButton);
-    util.afterTyping(edit.lastNameInput, 250, updateAddButton);
+    util.afterTyping(edit.firstNameInput, 250, updateUI);
+    util.afterTyping(edit.lastNameInput, 250, updateUI);
 
     return edit;
   }
@@ -109,39 +113,13 @@ var sched1 = (function() {
       .append("Add guest")
       .appendTo(addClick);
 
-    // var eaCheck = $("<div class='communicate-ea'/>");
-    // var checkbox = $("<img class='ea-checkbox'/>").appendTo(eaCheck);
-    // svg.loadImg(checkbox, "/assets/img/checkbox-sm.svg");
-    // eaCheck.append($("<div class='communicate-ea-text'/>")
-    //   .text("Communicate with this guest's assistant"));
-
-    var edit, eaEdit;
-    function updateAddButton() {
+    function updateAddButton(edit) {
       if (edit.isValid())
-       // && (! eaCheck.hasClass("checkbox-selected")
-       //  || eaEdit.isValid() && edit.optUid !== eaEdit.optUid))
         $("#add-guest-btn").removeClass("disabled");
       else
         $("#add-guest-btn").addClass("disabled");
     }
-    edit   = editGuest(updateAddButton);
-    // eaEdit = editGuest(updateAddButton);
-
-    // var eaView = $("<div class='hide sched-step1-add-ea'/>")
-    //              .append($("<div class='edit-guest-title'>NEW ASSISTANT</div>"))
-    //              .append(eaEdit.emailInput)
-    //              .append(eaEdit.firstNameInput)
-    //              .append(eaEdit.lastNameInput);
-    // eaCheck.click(function() {
-    //   if (eaCheck.hasClass("checkbox-selected")) {
-    //     eaCheck.removeClass("checkbox-selected");
-    //     eaView.addClass("hide");
-    //   } else {
-    //     eaCheck.addClass("checkbox-selected");
-    //     eaView.removeClass("hide");
-    //   }
-    //   updateAddButton();
-    // });
+    var edit = editGuest(updateAddButton);
 
     var addButton = $("<button id='add-guest-btn'/>")
       .addClass("btn btn-primary disabled")
@@ -151,8 +129,6 @@ var sched1 = (function() {
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
-      // .append(eaCheck)
-      // .append(eaView)
       .append(addButton);
 
     function toggleAddGuest() {
@@ -167,7 +143,6 @@ var sched1 = (function() {
           .addClass("cancel");
       } else {
         clearAddGuest();
-
       }
     }
     addClick.click(function() {
@@ -176,11 +151,8 @@ var sched1 = (function() {
 
     function clearAddGuest() {
       edit.clearUid();
-      // eaEdit.clearUid();
       $(".guest-input").val("");
-      updateAddButton();
-      // eaCheck.removeClass("checkbox-selected");
-      // eaView.addClass("hide");
+      updateAddButton(edit);
       guestInputDiv.addClass("hide");
       addClick.removeClass("cancel-mode");
       addGuest.removeClass("hide");
@@ -192,36 +164,24 @@ var sched1 = (function() {
 
     addButton.click(function() {
       var firstLast = edit.firstLast();
-      // var eaFirstLast = eaEdit.firstLast();
-      var uids = [edit.optUid];
-      deferred.join(list.map(uids, api.getProfile))
-      .then(function(profs) {
-        profs[0].first_last = firstLast;
-        // if (profs.length >= 2) {
-        //   profs[1].first_last = eaFirstLast;
-        // }
-        deferred.join(list.filter_map(profs, function(prof) {
-          return prof.editable ? api.postProfile(prof, login.getTeam().teamid)
-                               : null;
-        })).then(function() {
-          list.iter(profs, profile.set); /* update cache */
-          guestTbl[uids[0]] = uids[0];
-          list.iter(uids, function(uid) {
-            task.task_participants.organized_for.push(uid);
-          });
-          profile.profilesOfTaskParticipants(task).then(function(profs) {
-            var options = getGuestOptions(guestOptions, uids[0]);
-            if (uids.length < 2) {
-              delete options.assisted_by;
-            } else {
-              options.assisted_by = uids[1];
-            }
-            guestsContainer.append(
-              rowViewOfParticipant(profs, task, guestTbl, guestOptions,
-                                   uids[0]));
-            saveGuests(task, hosts, guestTbl, guestOptions);
-            updateNextButton(hosts, guestTbl, guestOptions);
-          });
+      var uid = edit.optUid;
+      api.getProfile(uid).then(function(prof) {
+        // TODO Allow pseudonym for guests?
+        prof.first_last = firstLast;
+        if (prof.editable) {
+          api.postProfile(prof, login.getTeam().teamid);
+        }
+        profile.set(prof); /* update cache */
+
+        guestTbl[uid] = uid;
+        task.task_participants.organized_for.push(uid);
+
+        profile.profilesOfTaskParticipants(task).then(function(profs) {
+          delete getGuestOptions(guestOptions, uid).assisted_by;
+          rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
+            .appendTo(guestsContainer);
+          saveGuests(task, hosts, guestTbl, guestOptions);
+          updateNextButton(hosts, guestTbl, guestOptions);
         });
       });
       clearAddGuest();
@@ -235,47 +195,9 @@ var sched1 = (function() {
     };
   }
 
-  function viewOfEAInput(v, x, profs, task, uid, eaCheck) {
-    var eaEdit
-    function updateAddButton() {
-      if (eaEdit.isValid())
-        $("#add-guest-btn").removeClass("disabled");
-      else
-        $("#add-guest-btn").addClass("disabled");
-    }
-    eaEdit = editGuest(updateAddButton);
-    var branch = $("<div class='relationship-branch'>");
-    var cancelCirc = $("<div class='add-guest-circ cancel'>");
-    var cancel = $("<img id='plus-guest'/>");
-    cancel.appendTo(cancelCirc);
-    svg.loadImg(cancel, "/assets/img/plus.svg");
-    var newEA = $("<div class='ea-input-div'/>")
-                 .append($("<div class='edit-guest-title'>NEW ASSISTANT</div>"))
-                 .append(eaEdit.emailInput)
-                 .append(eaEdit.firstNameInput)
-                 .append(eaEdit.lastNameInput);
-    var addButton = $("<button id='add-guest-btn'/>")
-      .addClass("btn btn-primary disabled")
-      .text("Add assistant");
-    newEA.append(addButton);
+  function viewOfEAProfile(profs, task, uid, removeEA) {
+    var v = $("<div class='sched-step1-ea-row'>");
 
-    addButton.click(function() {
-      var eaFirstLast = eaEdit.firstLast();
-      // add assistant
-    });
-
-    cancelCirc.click(function() {
-      v.addClass("hide");
-      x.removeClass("has-ea");
-      eaCheck.removeClass("checkbox-selected");
-    })
-
-    v.append(branch)
-     .append(cancelCirc)
-     .append(newEA);
-  }
-
-  function viewOfEAProfile(v, x, profs, task, uid) {
     var prof = profs[uid].prof;
 
     var edit = $("<button type='button' class='btn btn-default edit-guest-btn'>Edit</button>");
@@ -291,9 +213,7 @@ var sched1 = (function() {
         .append(remove))
       .appendTo(v);
     remove.click(function() {
-      // unlink assistant from guest
-      v.addClass("hide");
-      x.removeClass("hide");
+      removeEA();
     });
 
     var branch = $("<div class='relationship-branch'>");
@@ -312,6 +232,8 @@ var sched1 = (function() {
      .append((nameView)
        .append(bridgeLink))
      .append(email);
+
+    return v;
   }
 
   function viewOfProfile(v, profs, task, uid) {
@@ -332,8 +254,73 @@ var sched1 = (function() {
      .append(email);
   }
 
+  function viewOfEAInput(x, profs, task, guestUid, eaCheck,
+                         hosts, guestTbl, guestOptions, makeViewOfEA) {
+    var v = $("<div class='sched-step1-ea-row'/>");
+
+    function updateAddButton(edit) {
+      if (edit.isValid() && edit.optUid !== guestUid)
+        $("#add-guest-ea-btn").removeClass("disabled");
+      else
+        $("#add-guest-ea-btn").addClass("disabled");
+    }
+    var edit = editGuest(updateAddButton);
+
+    var branch = $("<div class='relationship-branch'>");
+    var cancelCirc = $("<div class='add-guest-circ cancel'>");
+    var cancel = $("<img id='plus-guest'/>");
+    cancel.appendTo(cancelCirc);
+    svg.loadImg(cancel, "/assets/img/plus.svg");
+    var newEA = $("<div class='ea-input-div'/>")
+                 .append($("<div class='edit-guest-title'>NEW ASSISTANT</div>"))
+                 .append(edit.emailInput)
+                 .append(edit.firstNameInput)
+                 .append(edit.lastNameInput);
+    var addButton = $("<button id='add-guest-ea-btn'/>")
+      .addClass("btn btn-primary disabled")
+      .text("Add assistant");
+    newEA.append(addButton);
+
+    addButton.click(function() {
+      var firstLast = edit.firstLast();
+      var uid = edit.optUid;
+      api.getProfile(uid).then(function(prof) {
+        // TODO Allow pseudonym for guests?
+        prof.first_last = firstLast;
+        if (prof.editable) {
+          api.postProfile(prof, login.getTeam().teamid);
+        }
+        profile.set(prof); /* update cache */
+
+        task.task_participants.organized_for.push(uid);
+
+        profile.profilesOfTaskParticipants(task).then(function(profs) {
+          getGuestOptions(guestOptions, guestUid).assisted_by = uid;
+          v.replaceWith(makeViewOfEA(profs, uid));
+          saveGuests(task, hosts, guestTbl, guestOptions);
+        });
+      });
+    });
+
+    cancelCirc.click(function() {
+      delete getGuestOptions(guestOptions, guestUid).assisted_by;
+      saveGuests(task, hosts, guestTbl, guestOptions);
+
+      v.remove();
+      x.removeClass("has-ea");
+      eaCheck.removeClass("checkbox-selected");
+    })
+
+    v.append(branch)
+     .append(cancelCirc)
+     .append(newEA);
+
+    return v;
+  }
+
   /* Read-only view of a participant */
-  function rowViewOfParticipant(profs, task, guestTbl, guestOptions, uid) {
+  function rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions,
+                                uid) {
     var ea = sched.assistedBy(uid, guestOptions);
     var hasEA = util.isNotNull(ea);
     var view = $("<div class='sched-step1-row'>");
@@ -371,36 +358,37 @@ var sched1 = (function() {
       eaCheck.append($("<div class='communicate-ea-text'/>")
         .text("Communicate with this guest's assistant"));
 
-      var eaView = $("<div class='sched-step1-ea-row hide'>");
-      var eaInput = $("<div class='hide sched-step1-add-ea'/>");
-
+      var eaView = $("<div/>");
       view.append(eaCheck)
-          .append(eaView)
-          .append(eaInput);
+          .append(eaView);
 
-      viewOfEAInput(eaInput, guestView, profs, task, ea, eaCheck);
+      function removeEA() {
+        delete getGuestOptions(guestOptions, uid).assisted_by;
+        saveGuests(task, hosts, guestTbl, guestOptions);
+
+        eaView.children().remove();
+        eaCheck.removeClass("checkbox-selected");
+        guestView.removeClass("has-ea");
+      }
+      function viewOfEA(profs, ea) {
+        return viewOfEAProfile(profs, task, ea, removeEA);
+      }
 
       eaCheck.click(function() {
         if (eaCheck.hasClass("checkbox-selected")) {
-          eaCheck.removeClass("checkbox-selected");
-          guestView.removeClass("has-ea");
-          eaView.addClass("hide");
-          eaInput.addClass("hide");
+          removeEA();
         } else {
           eaCheck.addClass("checkbox-selected");
           guestView.addClass("has-ea");
-          if (hasEA) {
-            eaView.removeClass("hide");
-          } else {
-            eaInput.removeClass("hide");
-          }
+          eaView.append(viewOfEAInput(guestView, profs, task, uid, eaCheck,
+                                      hosts, guestTbl, guestOptions, viewOfEA));
         }
       });
 
       if (hasEA) {
-        eaCheck.click();
-        viewOfEAProfile(eaView, eaInput, profs, task, ea);
-        eaView.removeClass("hide");
+        eaCheck.addClass("checkbox-selected");
+        guestView.addClass("has-ea");
+        eaView.append(viewOfEA(profs, ea));
       }
     } else {
       viewOfProfile(guestView, profs, task, uid);
@@ -494,12 +482,12 @@ var sched1 = (function() {
 
     var hosts = sched.getHosts(ta);
     list.iter(hosts, function(uid) {
-      rowViewOfParticipant(profs, ta, guestTbl, guestOptions, uid)
+      rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
         .appendTo(hostsContainer);
     });
 
     list.iter(guests, function(uid) {
-      rowViewOfParticipant(profs, ta, guestTbl, guestOptions, uid)
+      rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
         .appendTo(guestsContainer);
     });
 

@@ -76,7 +76,7 @@ pp: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 
 js/%.js: %.js
 	@mkdir -p js
-	oblivion $< -o $@
+	../setup/bin/oblivion $< -o $@
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
