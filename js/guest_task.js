@@ -254,13 +254,19 @@ var guestTask = function() {
     return button;
   }
 
-  function viewOfMeetingHeader(ta, state) {
-    return view = $("<div id='meeting-header'/>")
-      .append(
-        $("<div id='meeting-title'/>")
-          .text(state.calendar_event_title.title_text)
-      )
-      .append(addToCalendar(ta, state));
+  function viewOfMeetingHeader(task, ta, state) {
+    var view = $("<div id='meeting-header'/>");
+    var title = $("<div id='meeting-title'/>")
+      .text(state.calendar_event_title.title_text)
+      .appendTo(view);
+
+    if (! list.mem(task.guest_hosts, task.guest_uid)) {
+      view.append(addToCalendar(ta, state));
+    } else {
+      title.addClass("exec-view");
+    }
+
+    return view;
   }
 
   function calendarIcon(x) {
@@ -376,6 +382,11 @@ var guestTask = function() {
         .append("None of the above")
         .appendTo(slotView);
 
+      if (! list.mem(task.guest_hosts, task.guest_uid)) {
+        log("here");
+        select.addClass("exec-view");
+      }
+
       var checkboxContainer = $("<div class='checkbox-container'/>");
       var checkbox = $("<img/>");
       select.append(checkboxContainer.append(checkbox));
@@ -458,7 +469,7 @@ var guestTask = function() {
           var notesIcon = $("<img id='notes-icon'/>");
           var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
-                  .append(viewOfMeetingHeader(ta, state))
+                  .append(viewOfMeetingHeader(task, ta, state))
                   .append(viewOfTimeAndPlace(state.reserved.slot,
                                              state.hide_end_times))
                   .append($("<div class='task-section-header'/>")
