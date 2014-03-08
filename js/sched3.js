@@ -66,7 +66,7 @@ var sched3 = (function() {
       .addClass("email-option-details");
 
     return $("<div class='email-option'/>")
-      .append($("<div class='option-letter option-letter-modal unselectable' />")
+      .append($("<div class='option-letter-sm option-letter-modal unselectable' />")
       .text(util.letterOfInt(i)))
       .append(option);
   }

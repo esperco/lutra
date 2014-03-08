@@ -16,15 +16,20 @@ var adder = (function() {
 
     var isOpen = false;
 
-    var view = $("<div class='add-guest-circ'/>");
-    var plus = $("<img id='plus-guest'/>");
-    plus.appendTo(view);
-    svg.loadImg(plus, "/assets/img/plus.svg");
+    var view = $("<div class='add-option-sq'/>");
+    var plusIcon = $("<img/>")
+    var plus = $("<div class='plus-option'/>")
+      .append(plusIcon)
+      .appendTo(view);
+    svg.loadImg(plusIcon, "/assets/img/plus.svg");
 
     function open() {
       if (!isOpen) {
         isOpen = true;
         view
+          .removeClass("return-to-add")
+          .addClass("cancel");
+        plus
           .removeClass("return-to-add")
           .addClass("cancel");
       }
@@ -34,6 +39,9 @@ var adder = (function() {
       if (isOpen) {
         isOpen = false;
         view
+          .addClass("return-to-add")
+          .removeClass("cancel");
+        plus
           .addClass("return-to-add")
           .removeClass("cancel");
       }
@@ -61,7 +69,8 @@ var adder = (function() {
 
   function createListView() {
 '''
-<div #view>
+<div #view
+     class="option-row clearfix hide">
   <div #adderList
        class="adder-list"/>
   <div #adder

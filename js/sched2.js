@@ -12,10 +12,10 @@ var sched2 = (function() {
       .done(function(task) { sched.loadTask(task); });
   }
 
-  var step2Selector = show.create({
-    "sched-step2-connect": {ids: ["sched-step2-connect"]},
-    "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
-  });
+  // var step2Selector = show.create({
+  //   "sched-step2-connect": {ids: ["sched-step2-connect"]},
+  //   "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
+  // });
 
   function moveOnToNextStep(ta) {
     var x = ta.task_data[1];
@@ -96,7 +96,7 @@ var sched2 = (function() {
   </div>
   <div #locationContainer/>
   <div #calendarContainer/>
-  <button #saveButton class="btn btn-primary disabled">Save</button>
+  <button #saveButton class="btn btn-primary disabled">Save to calendar</button>
 </div>
 '''
     var x = calOption.slot;
@@ -227,22 +227,20 @@ var sched2 = (function() {
     return editableViewOfOption(tzList, calOption, saveCalOption);
   }
 
-  function insertViewOfOption(tzList, listView, calOption,
+  function insertViewOfOption(ta, tzList, listView, calOption, i,
                               saveCalOption, removeCalOption) {
 '''
 <div #view>
   <div #readOnlyContainer/>
   <div #editableContainer
        class="hide"/>
-  <button #removeButton class="btn btn-default">Remove</button>
 </div>
 '''
     var row = listView.createRow(view);
-    removeButton
-      .click(function () {
-        row.remove();
-        removeCalOption(calOption.label);
-      });
+    function removeOption() {
+      row.remove();
+      removeCalOption(calOption.label);
+    }
 
     /* Load calendar and forms when user clicks "Edit" */
     function switchToEdit() {
@@ -256,9 +254,24 @@ var sched2 = (function() {
       edit.renderCalendar();
     }
 
-    var readOnlyView =
-      readOnlyViewOfOption(calOption, switchToEdit);
-    readOnlyContainer.append(readOnlyView);
+    function indexLabel(i) {
+      var a = "A".charCodeAt(0);
+      var label = "";
+      do {
+        label = String.fromCharCode(i % 26 + a) + label;
+        i = Math.floor(i / 26);
+      } while (i > 0);
+      return label;
+    }
+
+    var label = indexLabel(i);
+    var typ = sched.meetingType(sched.getState(ta));
+    readOnlyContainer.append(readOnlyViewOfOption(calOption, label, typ,
+                                                  switchToEdit, removeOption));
+
+    // var readOnlyView =
+    //   readOnlyViewOfOption(calOption, switchToEdit);
+    // readOnlyContainer.append(readOnlyView);
 
     return view;
   }
@@ -287,25 +300,56 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
-  function readOnlyViewOfOption(calOption, switchToEdit) {
+  function readOnlyViewOfOption(calOption, label, typ,
+                                switchToEdit, remove) {
 '''
 <div #view
-   class="suggestion">
-  {{sched.viewOfSuggestion(calOption.slot)}}
-  <button #editButton
-          class="btn btn-default">
-    Edit
-  </button>
+     class="option-row">
+   <div #editButton
+        class="btn-group edit-option">
+      <button #edit
+              type="button"
+              class="btn btn-default edit-option-btn">
+        Edit
+      </button>
+      <button type="button"
+              class="btn btn-default dropdown-toggle"
+              data-toggle="dropdown">
+        <span class="caret"/>
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu pull-right edit-option-dropdown"
+          role="menu">
+        <li #editOption
+            class="edit-option-details">
+          <a>Edit option</a>
+        </li>
+        <li #removeOption
+            class="remove-option">
+          <a>Remove option</a>
+        </li>
+      </ul>
+  </div>
+  <tr>
+    <td #optionLetterCell
+        class="option-letter-cell"/>
+    {{sched.viewOfOption(calOption, typ, false)}}
+  </tr>
 </div>
 '''
-    editButton.click(switchToEdit);
+
+    var optionLetter = $("<div class='option-letter'/>")
+      .text(label)
+      .appendTo(optionLetterCell);
+
+    edit.click(switchToEdit);
+    editOption.click(switchToEdit);
+    removeOption.click(remove);
+
     return view;
   }
 
-  function loadMeetingOptions(tzList, ta) {
-    var view = $("#sched-step2-option-list");
-    view.children().remove();
-
+  function loadMeetingOptions(v, tzList, ta) {
     function save(calOption) { return saveOption(ta, calOption); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
@@ -319,14 +363,20 @@ var sched2 = (function() {
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
-    view.append(listView.view);
-    list.iter(schedState.calendar_options, function(x) {
-      insertViewOfOption(tzList, listView, x, save, remove);
+    var numOptions = 0;
+    list.iter(schedState.calendar_options, function(x, i) {
+      v.append(insertViewOfOption(ta, tzList, listView, x, i, save, remove));
+      numOptions++;
     });
+    var addRow = listView.view
+      .appendTo(v);
+    if (numOptions < 3) {
+      addRow.removeClass("hide")
+    }
 
     initNextButton(ta);
 
-    step2Selector.show("sched-step2-prefs");
+    return v;
   }
 
   /* hitting "Connect" takes the user to Google, then back here with
@@ -346,30 +396,68 @@ var sched2 = (function() {
       .attr("href", calInfo.google_auth_url)
       .appendTo(view);
 
-    step2Selector.show("sched-step2-connect");
+    view.removeClass("hide");
   }
 
-  function connectCalendar(tzList, profs, ta) {
+  function createOptionsSection(tzList, profs, ta) {
+    var view = $("<div/>");
+    var module = $("<div id='edit-meeting-div' class='sched-module'/>")
+      .appendTo(view);
+    var connector = createConnector()
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Hide")
+      .appendTo(header);
+    var calendarIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Create up to 3 meeting options")
+      .appendTo(header);
+
+    var content = $("<div id='options-content'/>")
+      .appendTo(module);
+
     var leaderUid = login.leader();
-    var result;
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer(loadMeetingOptions(tzList, ta));
+      deferred.defer(loadMeetingOptions(content, tzList, ta));
     }
     else {
       var authLandingUrl = document.URL;
-      result = api.getCalendarInfo(leaderUid, authLandingUrl)
+      api.getCalendarInfo(leaderUid, authLandingUrl)
         .then(function(calInfo) {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadMeetingOptions(tzList, ta);
+            loadMeetingOptions(content, tzList, ta);
         });
     }
-    return result;
+    return view;
   }
 
-  mod.load = function(tzList, profs, ta) {
-    connectCalendar(tzList, profs, ta);
+  function createConnector() {
+    var connectorBox = $("<div class='connector'/>");
+    var connector = $("<img/>")
+      .appendTo(connectorBox);
+    svg.loadImg(connector, "/assets/img/connector.svg");
+    return connectorBox;
+  }
+
+  mod.load = function(tzList, profs, ta, view) {
+    view.children().remove();
+    var guests = sched.getAttendingGuests(ta);
+
+    view
+      .append($("<h3>Find the best meeting option.</h3>"))
+      .append(createOptionsSection(tzList, profs, ta));
+      // .append(createApprovalSection(profs, ta))
+      // .append(createOfferSection(profs, ta, guests));
+      // .append(createSelectionSection(profs, ta, guests));
+
+    // connectCalendar(tzList, profs, ta);
 
     observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

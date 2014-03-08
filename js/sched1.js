@@ -105,9 +105,11 @@ var sched1 = (function() {
     var addClick = $("<div class='add-guest-click clearfix'/>");
     var adder = $("<div class='add-guest-circ'>")
       .appendTo(addClick);
-    var plus = $("<img id='plus-guest'/>");
-    plus.appendTo(adder);
-    svg.loadImg(plus, "/assets/img/plus.svg");
+    var plusIcon = $("<img/>");
+    var plus = $("<div class='plus-guest'/>")
+      .append(plusIcon)
+      .appendTo(adder);
+    svg.loadImg(plusIcon, "/assets/img/plus.svg");
 
     var addGuest = $("<div id='add-guest-text' class='unselectable'/>")
       .append("Add guest")
@@ -141,6 +143,9 @@ var sched1 = (function() {
         adder
           .removeClass("return-to-add")
           .addClass("cancel");
+        plus
+          .removeClass("return-to-add")
+          .addClass("cancel");
       } else {
         clearAddGuest();
       }
@@ -157,6 +162,9 @@ var sched1 = (function() {
       addClick.removeClass("cancel-mode");
       addGuest.removeClass("hide");
       adder
+        .removeClass("cancel")
+        .addClass("return-to-add");
+      plus
         .removeClass("cancel")
         .addClass("return-to-add");
       view.addClass("click-mode");
@@ -268,9 +276,11 @@ var sched1 = (function() {
 
     var branch = $("<div class='relationship-branch'>");
     var cancelCirc = $("<div class='add-guest-circ cancel'>");
-    var cancel = $("<img id='plus-guest'/>");
-    cancel.appendTo(cancelCirc);
-    svg.loadImg(cancel, "/assets/img/plus.svg");
+    var cancelIcon = $("<img/>");
+    var cancel = $("<div class='plus-guest'/>")
+      .append(cancelIcon)
+      .appendTo(cancelCirc);
+    svg.loadImg(cancelIcon, "/assets/img/plus.svg");
     var newEA = $("<div class='ea-input-div'/>")
                  .append($("<div class='edit-guest-title'>NEW ASSISTANT</div>"))
                  .append(edit.emailInput)

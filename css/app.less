@@ -2050,34 +2050,6 @@ object {
   padding-right: 0;
 }
 
-.add-guest-circ {
-  float: left;
-  width: 40px;
-  height: 40px;
-  margin-top: 1px;
-  border-radius: 20px;
-  text-align: center;
-  background: @purple;
-}
-
-#plus-guest {
-  margin-top: 10px;
-}
-
-.cancel {
-  background: @red !important;
-  .rotate(rotate_ccw_45);
-  &:hover {
-    background: @red_hover !important;
-    cursor: pointer;
-  }
-}
-
-.return-to-add {
-  background: @purple;
-  .rotate(rotate_cw_45);
-}
-
 #add-guest-text {
   margin-left: 55px;
   padding-top: 9px;
@@ -2132,6 +2104,56 @@ object {
 
 #add-guest-btn {
   margin-bottom: 5px;
+}
+
+
+/*** Adder ***/
+
+.add-guest-circ,
+.add-option-sq {
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-top: 1px;
+  padding: 10px;
+  text-align: center;
+  background: @purple;
+  cursor: pointer;
+  &:hover { background: @purple_hover; }
+}
+
+.add-guest-circ { border-radius: 20px; }
+.add-option-sq { border-radius: 3px; }
+
+.add-guest-circ.cancel,
+.add-option-sq.cancel {
+  background: @red !important;
+  &:hover {
+    background: @red_hover !important;
+    cursor: pointer;
+  }
+}
+
+.add-guest-circ.return-to-add,
+.add-option-sq.return-to-add {
+  background: @purple;
+  &:hover { background: @purple_hover; }
+}
+
+.plus-guest,
+.plus-option {
+  width: 20px;
+  height: 20px;
+}
+
+.plus-guest.cancel,
+.plus-option.cancel {
+  .rotate(rotate_ccw_45);
+}
+
+.plus-guest.return-to-add,
+.plus-option.return-to-add {
+  .rotate(rotate_cw_45);
 }
 
 
@@ -2263,7 +2285,7 @@ object {
   padding: 0;
 }
 
-.option-letter {
+.option-letter-sm {
   width: 30px;
   height: 30px;
   margin-right: auto;
@@ -2364,9 +2386,26 @@ object {
 }
 
 
-/*** Meeting Details ***/
+/*** Option/Meeting Details ***/
+
+.option-row {
+  padding: 15px;
+  border-top: 1px solid @gray_20;
+}
 
 .meeting-detail-row { margin-bottom: 15px; }
+
+.option-letter {
+  width: 40px;
+  height: 40px;
+  padding-top: 3px;
+  text-align: center;
+  color: @white;
+  font-size: 24px;
+  font-family: @light;
+  background: @gray_60;
+  border-radius: 3px;
+}
 
 .meeting-detail-label {
   float: left;
@@ -2390,11 +2429,13 @@ object {
   }
 }
 
+.edit-option,
 .edit-meeting {
   float: right;
   margin-top: 5px;
 }
 
+.edit-option-btn,
 .edit-meeting-btn {
   margin-right: 2px;
 }
@@ -2403,8 +2444,14 @@ object {
   cursor: pointer;
 }
 
-.option-info {
-  padding: 20px 0 16px 0;
+.remove-option,
+#cancel-meeting {
+  color: @red !important;
+  cursor: pointer;
+  &:hover {
+    color: @white !important;
+    background: @red !important;
+  }
 }
 
 .info-row {
@@ -2542,6 +2589,11 @@ object {
 .connector.collapsed path.down { fill: @gray_f8; }
 
 
+/*** Scheduling Step 2 ***/
+
+.edit-option-details { cursor: pointer; }
+
+
 /*** Scheduling Step 4 ***/
 
 #edit-meeting-div { margin-top: 30px; }
@@ -2552,15 +2604,6 @@ object {
 }
 
 #reschedule-meeting { cursor: pointer; }
-
-#cancel-meeting {
-  color: @red !important;
-  cursor: pointer;
-  &:hover {
-    color: @white !important;
-    background: @red !important;
-  }
-}
 
 #meeting-details { padding: 0; }
 

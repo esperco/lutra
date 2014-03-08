@@ -308,9 +308,9 @@ var sched = (function() {
   };
 
   function loadStep2(tzList, profs, task) {
-    var view = $("#sched-step2-tab");
+    var view = $("#sched-step2-table");
 
-    sched2.load(tzList, profs, task);
+    sched2.load(tzList, profs, task, view);
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
