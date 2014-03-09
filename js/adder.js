@@ -70,12 +70,17 @@ var adder = (function() {
   function createListView() {
 '''
 <div #view
-     class="option-row clearfix hide">
+     id="add-option-row"
+     class="click-mode clearfix hide">
   <div #adderList
        class="adder-list"/>
   <div #adder
        class="adder">
     <div #toggleContainer/>
+    <div #addText
+         id="add-option-text">
+      Add meeting option
+    </div>
     <div #formContainer
          class="hide"/>
 </div>
@@ -153,6 +158,8 @@ var adder = (function() {
 
     function onAdderOpen() {
       adderIsOpen = true;
+      listView.view.removeClass("click-mode");
+      listView.addText.addClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
         .append(createAdderForm())
@@ -163,6 +170,8 @@ var adder = (function() {
 
     function clearAdder() {
       adderIsOpen = false;
+      listView.view.addClass("click-mode");
+      listView.addText.removeClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
         .addClass("hide");

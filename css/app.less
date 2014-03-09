@@ -2053,7 +2053,6 @@ object {
 #add-guest-text {
   margin-left: 55px;
   padding-top: 9px;
-  padding-bottom: 9px;
   color: @purple;
   cursor: pointer;
 }
@@ -2123,10 +2122,14 @@ object {
 }
 
 .add-guest-circ { border-radius: 20px; }
-.add-option-sq { border-radius: 3px; }
+.add-option-sq {
+  margin: 15px 0px 15px 15px;
+  border-radius: 3px;
+}
 
 .add-guest-circ.cancel,
-.add-option-sq.cancel {
+.add-option-sq.cancel,
+.option-letter.cancel {
   background: @red !important;
   &:hover {
     background: @red_hover !important;
@@ -2135,7 +2138,8 @@ object {
 }
 
 .add-guest-circ.return-to-add,
-.add-option-sq.return-to-add {
+.add-option-sq.return-to-add,
+.option-letter.return-to-add {
   background: @purple;
   &:hover { background: @purple_hover; }
 }
@@ -2396,19 +2400,44 @@ object {
 
 .option-row,
 .edit-option-row {
-  padding: 15px;
+  padding: 15px 15px 15px 55px;
   border-top: 1px solid @gray_20;
+}
+
+.edit-option-row.add-row { border: none; }
+
+#add-option-row {
+  border-top: 1px solid @gray_20;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#add-option-row.click-mode:hover {
+  cursor: pointer;
+  background: @gray_f8;
+  .add-option-sq { background: @purple_hover; }
+  #add-option-text { color: @purple_hover; }
+}
+
+#add-option-text {
+  margin-left: 70px;
+  padding-top: 24px;
+  color: @purple;
+  cursor: pointer;
 }
 
 .meeting-detail-row { margin-bottom: 15px; }
 
 .option-letter {
+  float: left;
   width: 40px;
   height: 40px;
-  padding-top: 3px;
+  margin-top: 15px;
+  margin-left: 15px;
+  padding-top: 2px;
   text-align: center;
   color: @white;
-  font-size: 24px;
+  font-size: 27px;
   font-family: @light;
   background: @gray_60;
   border-radius: 3px;
