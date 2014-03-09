@@ -62,8 +62,6 @@ var sched2 = (function() {
     }
     var initialKey = util.isString(optInitialKey) ? optInitialKey : "Meeting";
     var meetingTypeSelector = select.create({
-      divClass: "fill-div",
-      buttonClass: "fill-div",
       initialKey: initialKey,
       options: [
         opt("Meeting", "Meeting"),
@@ -84,19 +82,45 @@ var sched2 = (function() {
   */
   function editableViewOfOption(tzList, calOption, saveCalOption) {
 '''
-<div #view>
-  <div #adder/>
-  <div #form/>
-  <div class="row clearfix">
-    <div class="col-sm-3">
-      <div class="location-title">Meeting Type</div>
-      <div #meetingTypeContainer/>
-    </div>
-    <div class="col-sm-9"/>
-  </div>
-  <div #locationContainer/>
-  <div #calendarContainer/>
-  <button #saveButton class="btn btn-primary disabled">Save to calendar</button>
+<div #view
+     class="edit-option-row">
+  <tr>
+    <td #optionLetterCell
+        class="option-letter-cell">
+      <div #optionLetter
+           class="option-letter"/>
+    </td>
+    <td #form
+        class="option-info clearfix">
+      <div class="info-row">
+        <div class="info-label">WHAT</div>
+        <div #meetingTypeContainer
+             class="info"/>
+      </div>
+      <div class="info-row">
+        <div class="info-label">WHERE</div>
+        <div #locationContainer
+             class="info"/>
+      </div>
+      <div class="info-row">
+        <div class="info-label">WHEN</div>
+        <span #openCalPicker
+             class="info link">
+          Select time in calendar
+        </span>
+      </div>
+      <div class="edit-option-actions clearfix">
+        <button #saveButton
+                class="btn btn-primary save-to-cal disabled">
+          Save to calendar
+        </button>
+        <span #cancel
+              class="cancel-edit-mode link">
+          Cancel
+        </span>
+      </div>
+    </td>
+  </tr>
 </div>
 '''
     var x = calOption.slot;
@@ -117,6 +141,13 @@ var sched2 = (function() {
     var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
+
+    var calendarModal = $("#cal-picker-modal");
+    var calendarContainer = $("#cal-picker");
+    calendarContainer.children().remove();
+    openCalPicker.click(function() {
+      calendarModal.modal({})
+    });
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
@@ -269,10 +300,6 @@ var sched2 = (function() {
     readOnlyContainer.append(readOnlyViewOfOption(calOption, label, typ,
                                                   switchToEdit, removeOption));
 
-    // var readOnlyView =
-    //   readOnlyViewOfOption(calOption, switchToEdit);
-    // readOnlyContainer.append(readOnlyView);
-
     return view;
   }
 
@@ -332,16 +359,15 @@ var sched2 = (function() {
   </div>
   <tr>
     <td #optionLetterCell
-        class="option-letter-cell"/>
+        class="option-letter-cell">
+      <div #optionLetter
+           class="option-letter"/>
+    </td>
     {{sched.viewOfOption(calOption, typ, false)}}
   </tr>
 </div>
 '''
-
-    var optionLetter = $("<div class='option-letter'/>")
-      .text(label)
-      .appendTo(optionLetterCell);
-
+    optionLetter.text(label);
     edit.click(switchToEdit);
     editOption.click(switchToEdit);
     removeOption.click(remove);

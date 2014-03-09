@@ -516,7 +516,7 @@ var sched4 = (function() {
 
 
     var updateButton = $("<button id='event-edit-update' class='btn btn-primary'/>");
-    var cancelEditMode = $("<span id='cancel-edit-mode' class='link'>Cancel</span>");
+    var cancelEditMode = $("<span class='cancel-edit-mode link'>Cancel</span>");
 
     /* TITLE */
     var title = $("<div class='meeting-detail-row'/>")
@@ -609,8 +609,6 @@ var sched4 = (function() {
       .append(notesEditorPrivate)
       .append(addPrivateNotes)
       .appendTo(notes);
-
-
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {

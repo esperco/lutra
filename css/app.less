@@ -1805,7 +1805,7 @@ object {
 
 .chat-entry {
   width: 100%;
-  height: 100px;
+  height: 100px !important;
   padding: 8px;
   overflow: hidden;
   border: none;
@@ -2386,9 +2386,16 @@ object {
 }
 
 
+/*** Calendar Picker ***/
+#cal-picker-dialog {
+  width: 100% !important;
+}
+
+
 /*** Option/Meeting Details ***/
 
-.option-row {
+.option-row,
+.edit-option-row {
   padding: 15px;
   border-top: 1px solid @gray_20;
 }
@@ -2405,6 +2412,10 @@ object {
   font-family: @light;
   background: @gray_60;
   border-radius: 3px;
+}
+
+.option-info {
+  width: 100%;
 }
 
 .meeting-detail-label {
@@ -2426,31 +2437,6 @@ object {
   padding-top: 1px;
   @media (max-width: 767px) {
     margin-left: 70px;
-  }
-}
-
-.edit-option,
-.edit-meeting {
-  float: right;
-  margin-top: 5px;
-}
-
-.edit-option-btn,
-.edit-meeting-btn {
-  margin-right: 2px;
-}
-
-.edit-details {
-  cursor: pointer;
-}
-
-.remove-option,
-#cancel-meeting {
-  color: @red !important;
-  cursor: pointer;
-  &:hover {
-    color: @white !important;
-    background: @red !important;
   }
 }
 
@@ -2545,6 +2531,46 @@ object {
   font-size: 14px;
 }
 
+.edit-option,
+.edit-meeting {
+  float: right;
+  margin-top: 5px;
+}
+
+.edit-option-btn,
+.edit-meeting-btn {
+  margin-right: 2px;
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.remove-option,
+#cancel-meeting {
+  color: @red !important;
+  cursor: pointer;
+  &:hover {
+    color: @white !important;
+    background: @red !important;
+  }
+}
+
+.edit-option-actions,
+#edit-meeting-actions { text-align: right; }
+
+.cancel-edit-mode {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.save-to-cal,
+#event-edit-update {
+  float: right;
+  margin-left: 10px;
+}
+
 
 /*** Modules ***/
 
@@ -2606,19 +2632,6 @@ object {
 #reschedule-meeting { cursor: pointer; }
 
 #meeting-details { padding: 0; }
-
-#edit-meeting-actions { text-align: right; }
-
-#cancel-edit-mode {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 14px;
-}
-
-#event-edit-update {
-  float: right;
-  margin-left: 10px;
-}
 
 .sched-step4-row {
   min-height: 72px;
