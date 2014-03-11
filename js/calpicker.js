@@ -206,13 +206,42 @@ var calpicker = (function() {
     updateTextView(picker);
   }
 
+  function makeTaskUrl(tid) {
+    return "#!task/" + tid;
+  }
+
+  /*
+    Translate calendar events as returned by the API into
+    the format supported by Fullcalendar.
+
+    Input event type: calendar_event defined in api.atd
+    Output event type:
+      http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
+  */
+  function importEvents(esperCalendar) {
+    return list.map(esperCalendar.events, function(x) {
+      var url;
+      if (util.isString(x.esper_tid))
+        url = makeTaskUrl(x.esper_tid);
+      var ev = {
+        title: x.title, /* required */
+        allDay: x.all_day,
+        start: x.start.local, /* required */
+        end: x.end.local, /* required */
+        url: url,
+        orig: x /* custom field */
+      };
+      return ev;
+    })
+  }
+
   function fetchEvents(start, end, tz, callback) {
     api.postCalendar(login.leader(), {
       timezone: tz,
       window_start: start,
       window_end: end
-    }).done(function (x) {
-      callback(x.events);
+    }).done(function (esperCalendar) {
+      callback(importEvents(esperCalendar));
     });
   }
 
