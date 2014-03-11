@@ -27,7 +27,8 @@ APP_LIBS = \
   moment \
   jquery-ui \
   fullcalendar \
-  bootstrap-timepicker
+  bootstrap-timepicker \
+  jstz
 
 GUESTAPP_LIBS =
 

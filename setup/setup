@@ -71,6 +71,9 @@ sed -i -e 's/icon-chevron/glyphicon glyphicon-chevron/g' \
   bootstrap-timepicker/js/bootstrap-timepicker.js
 install_js bootstrap-timepicker bootstrap-timepicker/js/bootstrap-timepicker.js
 
+# jsTimezoneDetect (jstz)
+install_js jstz jstz-2013-04-01-f9e3e30e.js
+
 # oblivion preprocessor, requires ocaml.
 # We install it manually so we don't depend on an opam setup
 cd "$ROOT"
