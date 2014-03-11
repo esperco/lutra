@@ -134,6 +134,16 @@ var profile = (function() {
     }
   }
 
+  mod.firstName = function(prof) {
+    if (prof.first_last) {
+      log("First last", prof.first_last);
+      return prof.first_last[0];
+    } else {
+      log("Pseudonym", prof);
+      return prof.pseudonym;
+    }
+  }
+
   /* extract all user IDs contained in the task; this is used to
      pre-fetch all the profiles. */
   function extractTaskUids(ta) {
