@@ -18,6 +18,13 @@
 
   <body>
 
+    <div id="loading">
+      <div id="loading-box">
+        <img id="loading-icon" src="/assets/img/loading.gif">
+        <div id="loading-text" class="ellipsis">Adding to calendar...</div>
+      </div>
+    </div>
+
     <!-- <div id="global-status" class="animated"></div> -->
 
     <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
