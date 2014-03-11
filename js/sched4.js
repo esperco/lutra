@@ -496,7 +496,8 @@ var sched4 = (function() {
   }
 
   function updateCalendarEvent(param) {
-    var taskState = sched.getState(param.task);
+    var task = param.task;
+    var taskState = sched.getState(task);
     taskState.calendar_event_title.title_text = param.titleEdit.val();
     taskState.calendar_event_title.is_generated = false;
     taskState.public_notes = param.notesBoxPublic.val();
@@ -510,7 +511,7 @@ var sched4 = (function() {
           private_notes: param.notesBoxPrivate.val()
         }
       })
-        .done(function() { updateButton.addClass("disabled"); });
+        .done(function() { param.updateButton.addClass("disabled"); });
     });
   }
 
