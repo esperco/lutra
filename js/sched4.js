@@ -565,6 +565,9 @@ var sched4 = (function() {
       .text("NOTES")
       .appendTo(notes);
 
+    var addPublicNotes = $("<span class='add-public-notes link'/>")
+      .text("Add notes");
+
     var notesEditorPublic = $("<div class='notes-editor-public'/>");
     var notesBoxPublic = $("<textarea class='notes-entry'></textarea>")
       .val(state.public_notes)
@@ -604,13 +607,27 @@ var sched4 = (function() {
         addPrivateNotes.addClass("hide");
         notesEditorPrivate.removeClass("hide");
       });
-    if (notesBoxPrivate.val() === "") {
+
+    addPublicNotes.click(function() {
+      addPublicNotes.addClass("hide");
+      notesEditorPublic.removeClass("hide");
+      addPrivateNotes.removeClass("hide");
+    });
+
+    if ((notesBoxPublic.val() === "") && (notesBoxPrivate.val() === "")) {
+      notesEditorPublic.addClass("hide");
+      notesEditorPrivate.addClass("hide");
+      addPrivateNotes.addClass("hide");
+    } else if (notesBoxPrivate.val() === "") {
+      addPublicNotes.addClass("hide");
       notesEditorPrivate.addClass("hide");
     } else {
+      addPublicNotes.addClass("hide");
       addPrivateNotes.addClass("hide");
     }
 
     var notesEditor = $("<div class='meeting-detail'/>")
+      .append(addPublicNotes)
       .append(notesEditorPublic)
       .append(notesEditorPrivate)
       .append(addPrivateNotes)

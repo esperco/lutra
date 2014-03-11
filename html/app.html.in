@@ -21,7 +21,7 @@
     <div id="loading">
       <div id="loading-box">
         <img id="loading-icon" src="/assets/img/loading.gif">
-        <div id="loading-text" class="ellipsis">Adding to calendar...</div>
+        <div id="loading-text" class="ellipsis">Updating calendar...</div>
       </div>
     </div>
 
