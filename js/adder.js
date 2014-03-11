@@ -11,8 +11,11 @@ var adder = (function() {
     clicked.
    */
   mod.createToggle = function(param) {
+    var cancel = param.cancel;
     var onOpen = param.onOpen;
     var onClose = param.onClose;
+    var cancelAdd = $("<span class='cancel-edit-mode link'/>")
+        .text("Cancel");
 
     var isOpen = false;
 
@@ -54,10 +57,11 @@ var adder = (function() {
       }
       else {
         open();
-        onOpen();
+        onOpen(cancelAdd);
       }
     }
 
+    cancelAdd.click(toggle);
     view.click(toggle);
     return {
       view: view,
@@ -156,13 +160,13 @@ var adder = (function() {
 
     var adderIsOpen = false;
 
-    function onAdderOpen() {
+    function onAdderOpen(cancelAdd) {
       adderIsOpen = true;
       listView.view.removeClass("click-mode");
       listView.addText.addClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
-        .append(createAdderForm())
+        .append(createAdderForm(cancelAdd))
         .removeClass("hide");
       if (util.isDefined(userOnAdderOpen))
         userOnAdderOpen();

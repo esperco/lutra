@@ -16,11 +16,11 @@ var locpicker = (function() {
 '''
 <div #location
      class="clearfix">
-  <div class="col-sm-6">
-    <div class="location-title">Location</div>
+  <div #locationSearch class="left-inner-addon">
+    <i class="glyphicon glyphicon-search"></i>
     <input #address
-           type="text" class="form-control"
-           placeholder="address, neighborhood, city, state, or zip"/>
+           type="search" class="form-control"
+           placeholder="Search by address, neighborhood, city, state, or zip"/>
     <div class="dropdown">
       <a #dropdownToggle
          data-toggle="dropdown"
@@ -30,16 +30,69 @@ var locpicker = (function() {
           role="menu"></ul>
     </div>
   </div>
-  <div class="col-sm-3">
-    <div class="location-title">Notes</div>
-    <input #instructions
-           type="text" class="form-control"
-           placeholder="suite number, etc."/>
+  <div #removeThis
+       class="hide">
+    <div class="col-sm-6">
+      <input #instructions
+             type="text" class="form-control"
+             placeholder="These notes are now Address Line 2"/>
+    </div>
+    <div class="col-sm-6">
+      <input #timezone
+             type="text" class="form-control"
+             placeholder="Timze zone should be hidden" disabled/>
+    </div>
   </div>
-  <div class="col-sm-3">
-    <div class="location-title">Time Zone</div>
-    <input #timezone
-           type="text" class="form-control" disabled/>
+  <div #locationForm>
+    <div #locationDetails class="clearfix">
+      <div class="col-sm-6 address-form">
+        <input #locName
+               type="text"
+               class="form-control loc-input"
+               placeholder="Location Name"/>
+        <input #addressLine1
+               type="text"
+               class="form-control loc-input"
+               placeholder="Address Line 1"/>
+        <input #addressLine2
+               type="text"
+               class="form-control loc-input"
+               placeholder="Address Line 2"/>
+        <div class="clearfix">
+          <div class="col-xs-6 loc-state-input">
+            <input #state
+                   type="text"
+                   class="form-control loc-input"
+                   placeholder="State"/>
+          </div>
+          <div class="col-xs-6 loc-zip-input">
+            <input #zip
+                   type="text"
+                   class="form-control loc-input"
+                   placeholder="Zip/Postal"/>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 address-map">
+        <div class="map-unavailable">
+          <img class="map-unavailable-pin svg"
+             src="/assets/img/pin.svg"/>
+          <div>MAP UNAVAILABLE</div>
+        </div>
+      </div>
+    </div>
+    <div #locationActions class="clearfix">
+      <span #saveLocation
+            class="save-location"/>
+      <span #resetLocation
+            class="reset-location">
+        <img class="reset-location-icon svg"
+             src="/assets/img/reset.svg"/>
+        <span class="reset-location-text danger-link">
+          Reset location
+        </span>
+      </span>
+    </div>
   </div>
   <div #editor/>
 </div>
@@ -48,6 +101,24 @@ var locpicker = (function() {
     var form = _view;
     /* add extra fields to carry along, for convenience */
     form.onTimezoneChange = onTimezoneChange;
+
+    var checkbox = $("<img class='save-location-checkbox'/>")
+      .appendTo(saveLocation);
+    svg.loadImg(checkbox, "/assets/img/checkbox-sm.svg");
+    var saveText = $("<span class='save-location-text'/>")
+      .text("Save this place as a favorite")
+      .appendTo(saveLocation);
+    var saveTextShort = $("<span class='save-location-text-short'/>")
+      .text("Save as favorite")
+      .appendTo(saveLocation);
+
+    saveLocation.click(function() {
+      if (saveLocation.hasClass("checkbox-selected")) {
+        saveLocation.removeClass("checkbox-selected");
+      } else {
+        saveLocation.addClass("checkbox-selected");
+      }
+    })
 
     return form;
   }

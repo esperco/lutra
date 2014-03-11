@@ -18,7 +18,6 @@ var calpicker = (function() {
   function createView() {
 '''
 <div #view>
-  <div #calendarView/>
   <div #textView
        class="row hide">
     <div class="col-sm-3">
@@ -37,6 +36,7 @@ var calpicker = (function() {
     </div>
     <div class="col-sm-6"/>
   </div>
+  <div #calendarView/>
 </div>
 '''
 

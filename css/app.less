@@ -48,18 +48,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-object {
-  pointer-events: none;
-}
+object { pointer-events: none; }
+
+i { color: @gray_60; }
 
 .container.mobile {
   padding-left: 15px;
   padding-right: 15px;
 }
 
-.scrollable {
-  overflow: auto;
-}
+.scrollable { overflow: auto; }
 
 *.unselectable {
   cursor: default;
@@ -90,11 +88,12 @@ object {
     position: relative;
 }
 .left-inner-addon input {
-    padding-left: 28px;
+    padding-left: 30px;
 }
 .left-inner-addon i {
     position: absolute;
-    padding: 9px 10px;
+    left: 0px;
+    padding: 7px 9px;
     pointer-events: none;
 }
 
@@ -107,6 +106,15 @@ object {
   cursor: pointer;
   &:hover {
     color: @purple_hover;
+    text-decoration: underline;
+  }
+}
+
+.danger-link {
+  color: @red;
+  cursor: pointer;
+  &:hover {
+    color: @red_hover;
     text-decoration: underline;
   }
 }
@@ -433,7 +441,7 @@ object {
 #general-icon circle,
 #archive-icon path,
 #contacts-icon path,
-#places-icon path, { fill: @gray_60; }
+#places-icon path { fill: @gray_60; }
 
 .account-block:hover { background: @dark_gray !important; }
 
@@ -453,7 +461,7 @@ object {
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path, { fill: @white; }
+  #places-icon path { fill: @white; }
 }
 
 .nav-pills > li.active > a {
@@ -469,7 +477,7 @@ object {
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path, { fill: @white; }
+  #places-icon path { fill: @white; }
 }
 
 #task-navbar {
@@ -1030,6 +1038,14 @@ object {
     path { fill: @gray_60; }
   }
 }
+
+#tz-picker-icon,
+#cal-picker-icon {
+  float: left;
+  margin-top: 2px;
+}
+
+.modal-title { margin-left: 38px; }
 
 .modal-content {
   margin-top: 12px;
@@ -2137,11 +2153,19 @@ object {
   }
 }
 
+.option-letter.cancel {
+  padding: 0;
+}
+
 .add-guest-circ.return-to-add,
-.add-option-sq.return-to-add,
-.option-letter.return-to-add {
+.add-option-sq.return-to-add {
   background: @purple;
   &:hover { background: @purple_hover; }
+}
+
+.option-letter.return-to-add {
+  background: @gray_60;
+  &:hover { background: @gray_60; }
 }
 
 .plus-guest,
@@ -2404,6 +2428,13 @@ object {
   border-top: 1px solid @gray_20;
 }
 
+.edit-option-row {
+  @media (max-width: 432px) {
+    padding-top: 70px;
+    padding-left: 15px;
+  }
+}
+
 .edit-option-row.add-row { border: none; }
 
 #add-option-row {
@@ -2469,9 +2500,8 @@ object {
   }
 }
 
-.info-row {
-  margin-bottom: 6px;
-}
+.info-row { margin-bottom: 6px; }
+.edit-info-row { margin-bottom: 15px; }
 
 .info-label {
   float: left;
@@ -2485,7 +2515,16 @@ object {
   @media (max-width: 767px) {
     margin-left: 8px;
   }
+  @media (max-width: 432px) {
+    width: 45px;
+    margin-left: 0;
+  }
 }
+
+.what-label-edit,
+.when-label-edit,
+.where-label-edit,
+.notes-label-edit { margin-top: 8px; }
 
 .info {
   margin-left: 100px;
@@ -2493,10 +2532,173 @@ object {
   @media (max-width: 767px) {
     margin-left: 70px;
   }
+  @media (max-width: 432px) {
+    margin-left: 60px;
+  }
+}
+
+.custom-type-input {
+  margin-top: 8px;
 }
 
 .start-end {
   font-family: @bold;
+}
+
+.time-input-row-end {
+  @media (max-width: 631px) { display: none; }
+}
+.time-input-row-end-mobile {
+  margin-top: 5px;
+  .date-picker-field.end {
+    margin-left: 0;
+    margin-right: 5px;
+  }
+  @media (min-width: 632px) { display: none; }
+}
+
+.date-picker-field {
+  float: left;
+  width: 98px;
+}
+.date-picker-field.start { margin-right: 5px; }
+.date-picker-field.end { margin-left: 5px; }
+
+.time-picker-field {
+  float: left;
+  width: 82px;
+}
+
+.time-to-text {
+  float: left;
+  margin: 5px 5px 0px 5px;
+}
+.time-to-text-mobile { margin-bottom: 3px; }
+
+.time-zone-text {
+  display: inline-block;
+  margin-top: 6px;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+#tz-picker-dialog {
+  width: 400px;
+  padding-top: 160px;
+}
+
+.tz-actions { margin-top: 8px; }
+.save-tz { float: right; }
+.cancel-tz {
+  float: right;
+  margin-top: 6px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.open-cal-picker {
+  display: inline-block;
+  margin-top: 7px;
+  cursor: pointer;
+  &:hover .open-cal-picker-text {
+    text-decoration: underline;
+  }
+}
+
+.open-cal-picker-icon {
+  float: left;
+  margin-top: 1px;
+}
+
+.open-cal-picker-text {
+  float: left;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.address-form {
+  padding-left: 0;
+  @media (max-width: 767px) {
+    padding-right: 0;
+  }
+}
+
+.address-map {
+  padding-right: 0;
+  @media (max-width: 767px) {
+    padding-left: 0;
+  }
+}
+
+.loc-input { margin-bottom: 8px; }
+.loc-state-input { padding-left: 0; }
+.loc-zip-input { padding-right: 0; }
+
+.map-unavailable {
+  height: 152px;
+  margin-bottom: 8px;
+  padding-top: 40px;
+  color: @gray_40;
+  text-align: center;
+  background: @gray_10;
+  border-radius: 3px;
+}
+
+.map-unavailable-pin {
+  width: 24px;
+  height: 36px;
+  margin-bottom: 15px;
+  path { fill: @gray_40; }
+}
+
+.save-location {
+  float: left;
+  display: inline-block;
+  cursor: pointer;
+  &:hover path.checkbox {stroke: @gray_40; }
+}
+
+.save-location-checkbox {
+  float: left;
+}
+
+.save-location-text,
+.save-location-text-short {
+  float: left;
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+.save-location-text {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
+.save-location-text-short {
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.reset-location {
+  float: right;
+  display: inline-block;
+  cursor: pointer;
+  &:hover .reset-location-text {
+    text-decoration: underline;
+  }
+}
+
+.reset-location-icon {
+  float: left;
+  margin-top: 3px;
+}
+
+.reset-location-text {
+  float: left;
+  margin-left: 7px;
+  font-size: 14px;
 }
 
 .notes-editor-public {
@@ -2554,9 +2756,10 @@ object {
   margin-right: 6px;
 }
 
+.add-public-notes,
 .add-private-notes {
   display: inline-block;
-  padding-top: 7px;
+  padding-top: 6px;
   font-size: 14px;
 }
 
@@ -2571,7 +2774,9 @@ object {
   margin-right: 2px;
 }
 
-.edit-details {
+.edit-option-details,
+.duplicate-option,
+#edit-details {
   cursor: pointer;
 }
 
@@ -2609,7 +2814,7 @@ object {
 }
 
 .sched-module-header {
-  height: 54px;
+  min-height: 54px;
   padding: 13px 15px;
   font-size: 18px;
   background: @gray_f8;
@@ -2619,10 +2824,13 @@ object {
 
 .sched-module-header.collapsed { border-radius: 6px; }
 
-.sched-module-icon { float: left; }
+.sched-module-icon {
+  float: left;
+  margin-left: 6px;
+}
 
 .sched-module-title {
-  margin-left: 45px;
+  margin-left: 57px;
   padding-top: 2px;
 }
 
@@ -2646,7 +2854,7 @@ object {
 
 /*** Scheduling Step 2 ***/
 
-.edit-option-details { cursor: pointer; }
+#offer-icon { margin-top: 4px; }
 
 
 /*** Scheduling Step 4 ***/

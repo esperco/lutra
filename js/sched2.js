@@ -80,9 +80,9 @@ var sched2 = (function() {
     var showHide = $("<span class='show-hide link'/>")
       .text("Show")
       .appendTo(header);
-    var calendarIcon = $("<img class='sched-module-icon'/>")
+    var selectionIcon = $("<img class='sched-module-icon'/>")
       .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    svg.loadImg(selectionIcon, "/assets/img/star.svg");
     var headerText = $("<div class='sched-module-title'/>")
       .text("Select the preferred meeting option")
       .appendTo(header);
@@ -109,9 +109,9 @@ var sched2 = (function() {
     var showHide = $("<span class='show-hide link'/>")
       .text("Show")
       .appendTo(header);
-    var calendarIcon = $("<img class='sched-module-icon'/>")
+    var offerIcon = $("<img id='offer-icon' class='sched-module-icon'/>")
       .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    svg.loadImg(offerIcon, "/assets/img/email.svg");
     var headerText = $("<div class='sched-module-title'/>")
       .text("Offer to guests")
       .appendTo(header);
@@ -167,6 +167,7 @@ var sched2 = (function() {
     var meetingTypeSelector = select.create({
       initialKey: initialKey,
       options: [
+        opt("Custom...", "Custom"),
         opt("Meeting", "Meeting"),
         opt("Breakfast", "Breakfast"),
         opt("Lunch", "Lunch"),
@@ -183,36 +184,113 @@ var sched2 = (function() {
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
-  function editableViewOfOption(tzList, calOption, saveCalOption, addMode) {
+  function editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode) {
 '''
 <div #view
      class="edit-option-row">
   <div #form
        class="option-info clearfix">
-    <div class="info-row">
-      <div class="info-label">WHAT</div>
-      <div #meetingTypeContainer
-           class="info"/>
+    <div class="edit-info-row">
+      <div class="info-label what-label-edit">WHAT</div>
+      <div class="info">
+        <div #meetingTypeContainer/>
+        <input #customMeetingType
+               type="text"
+               class="form-control custom-type-input"/>
+      </div>
     </div>
-    <div class="info-row">
-      <div class="info-label">WHERE</div>
+    <div class="edit-info-row">
+      <div class="info-label when-label-edit">WHEN</div>
+      <div class="info">
+        <div class="clearfix">
+          <div class="some-datepicker">
+            <input #startDate
+                   type="text"
+                   class="form-control date-picker-field start"/>
+          </div>
+          <div class="bootstrap-timepicker">
+            <input #startTime
+                   type="text"
+                   class="form-control time-picker-field start"/>
+          </div>
+          <div class="time-input-row-end">
+            <span class="time-to-text">to</span>
+            <div class="bootstrap-timepicker">
+              <input #endTime
+                     type="text"
+                     class="form-control time-picker-field end"/>
+            </div>
+            <div class="some-datepicker">
+              <input #endDate
+                     type="text"
+                     class="form-control date-picker-field end"/>
+            </div>
+          </div>
+          <span #timeZoneText class="time-zone-text link">PST</span>
+        </div>
+        <div class="time-input-row-end-mobile clearfix">
+          <div class="time-to-text-mobile">to</div>
+          <div class="some-datepicker">
+            <input #endDateMobile
+                   type="text"
+                   class="form-control date-picker-field end"/>
+          </div>
+          <div class="bootstrap-timepicker">
+            <input #endTimeMobile
+                   type="text"
+                   class="form-control time-picker-field end"/>
+          </div>
+        </div>
+        <span #openCalPicker
+             class="open-cal-picker clearfix">
+          <img class="open-cal-picker-icon svg"
+               src="/assets/img/cal-picker.svg"/>
+          <span class="open-cal-picker-text link">
+            Select time in calendar
+          </span>
+        </span>
+      </div>
+    </div>
+    <div class="edit-info-row">
+      <div class="info-label where-label-edit">WHERE</div>
       <div #locationContainer
            class="info"/>
     </div>
-    <div class="info-row">
-      <div class="info-label">WHEN</div>
-      <span #openCalPicker
-           class="info link">
-        Select time in calendar
-      </span>
+    <div class="edit-info-row">
+      <div class="info-label notes-label-edit">NOTES</div>
+      <div class="info">
+        <span #addPublicNotes
+              class="add-public-notes link">Add notes</span>
+        <div #notes class="hide">
+          <div #notesEditorPublic
+               class="notes-editor-public">
+            <textarea #notesBoxPublic
+                      class="notes-entry"></textarea>
+            <div class="viewable-by-label">
+              <img class="viewable-by-eye svg"
+                   src="/assets/img/eye.svg"/>
+              <span class="viewable-by-text">ALL GUESTS</span>
+            </div>
+          </div>
+          <span #addPrivateNotes
+                class="add-private-notes link"/>
+          <div #notesEditorPrivate
+               class="notes-editor-private">
+            <textarea #notesBoxPrivate
+                      class="notes-entry"></textarea>
+            <div class="viewable-by-label">
+              <img class="viewable-by-eye svg"
+                   src="/assets/img/eye.svg"/>
+              <span class="viewable-by-text">ANDREW ONLY</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="edit-option-actions clearfix">
+    <div #editActions
+         class="edit-option-actions clearfix">
       <button #saveButton
               class="btn btn-primary save-to-cal disabled"/>
-      <span #cancel
-            class="cancel-edit-mode link">
-        Cancel
-      </span>
     </div>
   </div>
 </div>
@@ -235,6 +313,16 @@ var sched2 = (function() {
     var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
+
+    var timeZoneModal = $("#tz-picker-modal");
+    var timeZoneContainer = $("#tz-picker");
+    timeZoneContainer.children().remove();
+    timeZoneText
+      .tooltip({"title":"Click to change the time zone"})
+      .click(function() {
+        createTZPicker();
+        timeZoneModal.modal({})
+      });
 
     var calendarModal = $("#cal-picker-modal");
     var calendarContainer = $("#cal-picker");
@@ -272,6 +360,27 @@ var sched2 = (function() {
       }
     }
 
+    function createTZPicker() {
+      timeZoneContainer.children().remove();
+
+      var locationSearch = $("<div class='left-inner-addon'/>")
+        .append($("<i class='glyphicon glyphicon-search'/>"))
+        .append($("<input type='search' class='form-control' placeholder='Search by city'/>"));
+
+      var saveTZButton = $("<button class='btn btn-primary save-tz'>Save</button>");
+      var cancelTZ = $("<span class='link cancel-tz'>Cancel</span>")
+        .click(function() {
+          timeZoneContainer.modal("hide");
+        });
+      var tzActions = $("<div class='tz-actions clearfix'/>")
+        .append(saveTZButton)
+        .append(cancelTZ);
+
+      timeZoneContainer
+        .append(locationSearch)
+        .append(tzActions);
+    }
+
     /*** Meeting location ***/
 
     var loc = x.location;
@@ -289,6 +398,27 @@ var sched2 = (function() {
       locationForm.setLocation(loc);
     }
     locationContainer.append(locationForm.view);
+
+    /*** Meeting notes ***/
+
+    addPublicNotes
+      .click(function() {
+        addPublicNotes.addClass("hide");
+        notes.removeClass("hide");
+        notesBoxPublic.focus();
+      });
+    addPrivateNotes
+      .text("Add private notes for Andrew only")
+      .click(function() {
+        addPrivateNotes.addClass("hide");
+        notesEditorPrivate.removeClass("hide");
+        notesBoxPrivate.focus();
+      });
+    if (notesBoxPrivate.val() === "") {
+      notesEditorPrivate.addClass("hide");
+    } else {
+      addPrivateNotes.addClass("hide");
+    }
 
     /*** Row controls (save/remove) ***/
 
@@ -343,21 +473,21 @@ var sched2 = (function() {
     saveButton.click(saveMe);
     updateSaveButton();
 
+    editActions.append(cancel);
+
     return {
       view: view,
       renderCalendar: renderCalendar
     };
   }
 
-  function createMeetingOption(tzList, saveCalOption, addMode) {
+  function createMeetingOption(tzList, saveCalOption, cancel, addMode) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return editableViewOfOption(tzList, calOption, saveCalOption, addMode);
+    return editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode);
   }
-
-
 
   function saveOption(ta, calOption) {
     var schedState = sched.getState(ta);
@@ -383,7 +513,7 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
-  function readOnlyViewOfOption(calOption, typ, switchToEdit, remove) {
+  function readOnlyViewOfOption(calOption, typ, toggleEdit, remove) {
 '''
 <div #view
      class="option-row">
@@ -402,21 +532,22 @@ var sched2 = (function() {
       </button>
       <ul class="dropdown-menu pull-right edit-option-dropdown"
           role="menu">
-        <li #editOption
-            class="edit-option-details">
-          <a>Edit option</a>
+        <li #editOption>
+          <a class="edit-option-details">Edit option</a>
         </li>
-        <li #removeOption
-            class="remove-option">
-          <a>Remove option</a>
+        <li #duplicateOption>
+          <a class="duplicate-option">Duplicate option</a>
+        </li>
+        <li #removeOption>
+          <a class="remove-option">Remove option</a>
         </li>
       </ul>
   </div>
   {{sched.viewOfOption(calOption, typ, false)}}
 </div>
 '''
-    edit.click(switchToEdit);
-    editOption.click(switchToEdit);
+    edit.click(toggleEdit);
+    editOption.click(toggleEdit);
     removeOption.click(remove);
 
     return view;
@@ -431,7 +562,7 @@ var sched2 = (function() {
     <span #letter/>
     <img #plus
          class="plus-option svg hide"
-         src="/assets/img/plus.svg">
+         src="/assets/img/plus.svg"/>
   </div>
   <div #readOnlyContainer/>
   <div #editableContainer
@@ -445,22 +576,37 @@ var sched2 = (function() {
     }
 
     /* Load calendar and forms when user clicks "Edit" */
-    function switchToEdit() {
-      var addMode = false;
-      var edit =
-        editableViewOfOption(tzList, calOption, saveCalOption, addMode);
-      editableContainer.append(edit.view);
+    function toggleEdit() {
+      if (readOnlyContainer.hasClass("hide")) {
+        readOnlyContainer.removeClass("hide");
+        editableContainer.addClass("hide");
+        optionLetter.removeClass("cancel")
+                    .off("click");
+        letter.removeClass("hide");
+        plus.removeClass("cancel")
+            .addClass("hide");
+      } else {
+        var cancel = $("<span class='cancel-edit-mode link'/>")
+          .text("Cancel")
+          .click(toggleEdit);
+        var addMode = false;
+        var edit =
+          editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode);
+        editableContainer.children().remove();
+        editableContainer.append(edit.view);
 
-      readOnlyContainer.addClass("hide");
-      editableContainer.removeClass("hide");
+        readOnlyContainer.addClass("hide");
+        editableContainer.removeClass("hide");
 
-      edit.renderCalendar();
+        edit.renderCalendar();
 
-      optionLetter.addClass("cancel")
-                  .click(removeOption);
-      letter.addClass("hide");
-      plus.removeClass("hide")
-          .addClass("cancel");
+        optionLetter.addClass("cancel")
+                    .click(removeOption);
+        letter.addClass("hide");
+        plus.removeClass("hide return-to-add")
+            .addClass("cancel");
+      }
+
     }
 
     function indexLabel(i) {
@@ -476,7 +622,7 @@ var sched2 = (function() {
 
     var typ = sched.meetingType(sched.getState(ta));
     readOnlyContainer.append(readOnlyViewOfOption(calOption, typ,
-                                                  switchToEdit, removeOption));
+                                                  toggleEdit, removeOption));
 
     return view;
   }
@@ -485,9 +631,9 @@ var sched2 = (function() {
     function save(calOption) { return saveOption(ta, calOption); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
-    function createAdderForm() {
+    function createAdderForm(cancelAdd) {
       var addMode = true;
-      return createMeetingOption(tzList, save, addMode).view
+      return createMeetingOption(tzList, save, cancelAdd, addMode).view
                .addClass("add-row");
     }
 
@@ -505,9 +651,14 @@ var sched2 = (function() {
     var addRow = listView.view
       .appendTo(v);
     addRow.hover(function() {
-      connector.addClass("collapsed");
+      if (addRow.hasClass("click-mode")) {
+        connector.addClass("collapsed");
+      } else {
+        connector.removeClass("collapsed");
+      }
     },function() {
-      connector.removeClass("collapsed");
+      if (addRow.hasClass("click-mode"))
+        connector.removeClass("collapsed");
     })
     if (numOptions < 3) {
       addRow.removeClass("hide")
@@ -550,9 +701,9 @@ var sched2 = (function() {
     var showHide = $("<span class='show-hide link'/>")
       .text("Hide")
       .appendTo(header);
-    var calendarIcon = $("<img class='sched-module-icon'/>")
+    var optionsIcon = $("<img class='sched-module-icon'/>")
       .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    svg.loadImg(optionsIcon, "/assets/img/create-options.svg");
     var headerText = $("<div class='sched-module-title'/>")
       .text("Create up to 3 meeting options")
       .appendTo(header);
