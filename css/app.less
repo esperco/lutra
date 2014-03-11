@@ -29,7 +29,6 @@
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
-@white: #ffffff;
 
 
 /*** General ***/
@@ -40,7 +39,7 @@ html {
 }
 
 body {
-  background: @white;
+  background: white;
   color: @gray_90;
   font-family: @regular, Arial;
   font-size: 16px;
@@ -50,6 +49,8 @@ body {
 
 object { pointer-events: none; }
 
+li { cursor: pointer; }
+
 i { color: @gray_60; }
 
 .container.mobile {
@@ -58,6 +59,17 @@ i { color: @gray_60; }
 }
 
 .scrollable { overflow: auto; }
+
+.clickable { cursor: pointer; }
+
+.link {
+  color: @purple;
+  cursor: pointer;
+  &:hover {
+    color: @purple_hover;
+    text-decoration: underline;
+  }
+}
 
 *.unselectable {
   cursor: default;
@@ -97,19 +109,6 @@ i { color: @gray_60; }
     pointer-events: none;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
-.link {
-  color: @purple;
-  cursor: pointer;
-  &:hover {
-    color: @purple_hover;
-    text-decoration: underline;
-  }
-}
-
 .danger-link {
   color: @red;
   cursor: pointer;
@@ -124,7 +123,7 @@ i { color: @gray_60; }
   position: absolute;
   top: 0px;
   width: 100%;
-  color: @white;
+  color: white;
   background: @red;
   border: none;
   border-radius: 0;
@@ -133,7 +132,44 @@ i { color: @gray_60; }
 }
 
 .close-status {
-  color: @white;
+  color: white;
+}
+
+#loading {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  display: none;
+  z-index: 10000;
+}
+
+#loading-box {
+  height: 180px;
+  width: 240px;
+  margin-top: 160px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 25px 15px;
+  background: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  border-radius: 6px;
+}
+
+#loading-icon {
+  width: 70px;
+  height: 85px;
+  margin-right: auto;
+  margin-bottom: 20px;
+  margin-left: auto;
+}
+
+#loading-text {
+  color: white;
+  font-size: 18px;
+  font-family: @bold;
 }
 
 
@@ -151,7 +187,7 @@ i { color: @gray_60; }
 #task-navbar {
   margin: 0;
   padding: 0;
-  background: @white;
+  background: white;
   border-bottom: 1px solid @border;
   border-radius: 0;
 }
@@ -205,7 +241,7 @@ i { color: @gray_60; }
   margin-top: 14px;
   margin-bottom: 0px;
   font-size: 18px;
-  border: 1px solid @white;
+  border: 1px solid white;
   &:hover { border: 1px solid @gray_20; }
   &:focus { border: 1px solid @purple; }
 }
@@ -233,13 +269,13 @@ i { color: @gray_60; }
     text-align: center;
     vertical-align: middle;
     color: @gray_90;
-    background: @white;
+    background: white;
   }
   #exec-name-div {
     display: inline-block;
     margin-left: 10px;
     padding-top: 4px;
-    color: @white;
+    color: white;
   }
   #assisting {
     font-size: 10px;
@@ -288,13 +324,13 @@ i { color: @gray_60; }
   padding-right: 10px;
   padding-left: 10px;
   font-size: 14px;
-  color: @white;
+  color: white;
   background: none;
-  border: 1px solid @white;
+  border: 1px solid white;
   border-radius: 3px;
   &:hover {
     color: @gray_90;
-    background: @white;
+    background: white;
   }
 }
 
@@ -333,7 +369,7 @@ i { color: @gray_60; }
   left: 7px;
   padding-left: 8px;
   padding-right: 8px;
-  color: @white;
+  color: white;
   font-family: @light;
   letter-spacing: 3px;
 }
@@ -373,7 +409,7 @@ i { color: @gray_60; }
   color: @gray_90;
   font-size: 12px;
   text-align: center;
-  background: @white;
+  background: white;
   border-radius: 12px;
 }
 
@@ -447,7 +483,7 @@ i { color: @gray_60; }
 
 .account-block:hover {
   #settings-icon path,
-  #logout-icon g path { fill: @white; }
+  #logout-icon g path { fill: white; }
 }
 
 .nav-block:hover {
@@ -461,7 +497,7 @@ i { color: @gray_60; }
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path { fill: @white; }
+  #places-icon path { fill: white; }
 }
 
 .nav-pills > li.active > a {
@@ -477,7 +513,7 @@ i { color: @gray_60; }
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path { fill: @white; }
+  #places-icon path { fill: white; }
 }
 
 #task-navbar {
@@ -500,7 +536,7 @@ i { color: @gray_60; }
 
 #chat-icon-container.unread-messages #chat-icon {
   path { fill: @orange; }
-  text { fill: @white; }
+  text { fill: white; }
   &:hover path { fill: @orange_hover; }
 }
 
@@ -718,7 +754,7 @@ i { color: @gray_60; }
 
 .archive {
   display: block;
-  path { fill: @white; }
+  path { fill: white; }
 }
 
 .archive-div.mobile {
@@ -778,7 +814,7 @@ i { color: @gray_60; }
   padding-bottom: 0;
   font-family: @bold;
   font-size: 12px;
-  color: @white;
+  color: white;
   background: @orange;
   border-radius: 3px;
 }
@@ -840,7 +876,7 @@ i { color: @gray_60; }
   vertical-align: middle;
   font-family: @light;
   font-size: 18px;
-  color: @white;
+  color: white;
   background: @gray_60;
 }
 
@@ -868,7 +904,7 @@ i { color: @gray_60; }
   bottom: 0;
   margin-bottom: 0;
   padding: 0;
-  background: @white;
+  background: white;
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
@@ -983,7 +1019,7 @@ i { color: @gray_60; }
 .sched-progress-step4 .sched-go-step4 {
   cursor: default;
   path { fill: @gray_60; }
-  text { fill: @white; }
+  text { fill: white; }
 }
 
 
@@ -1150,7 +1186,7 @@ i { color: @gray_60; }
   min-height: 40px;
   margin-bottom: 20px;
   padding: 10px;
-  color: @white;
+  color: white;
   text-align: center;
 }
 
@@ -1289,7 +1325,7 @@ i { color: @gray_60; }
   vertical-align: middle;
   font-family: @light;
   font-size: 32px;
-  color: @white;
+  color: white;
   background-color: @gray_60;
 }
 
@@ -1377,7 +1413,7 @@ i { color: @gray_60; }
   padding-bottom: 0;
   font-family: @bold;
   font-size: 12px;
-  color: @white;
+  color: white;
   border-radius: 3px;
 }
 
@@ -1694,8 +1730,8 @@ i { color: @gray_60; }
   padding-right: 9px !important;
   padding-bottom: 0 !important;
   padding-left: 9px !important;
-  color: @white;
-  border: 1px solid @white !important;
+  color: white;
+  border: 1px solid white !important;
   border-radius: 3px;
   &:hover { color: @gray_90; }
 }
@@ -1707,7 +1743,7 @@ i { color: @gray_60; }
 }
 
 .chat-tabs > li > a:hover {
-  background: @white;
+  background: white;
 }
 
 .chat-tabs > li > a .prof-caret path,
@@ -1721,7 +1757,7 @@ i { color: @gray_60; }
 .chat-tabs > li.active > a:focus {
   cursor: default;
   color: @gray_90;
-  background: @white;
+  background: white;
   border: none;
 }
 
@@ -1751,7 +1787,7 @@ i { color: @gray_60; }
   height: 32px;
   margin-top: 3px;
   padding-top: 6px;
-  color: @white;
+  color: white;
   background: @gray_40;
   text-align: center;
   border-radius: 3px;
@@ -1808,13 +1844,13 @@ i { color: @gray_60; }
 //   padding-top: 5px;
 //   padding-right: 15px;
 //   padding-left: 15px;
-//   color: @white;
+//   color: white;
 //   background: @orange;
 // }
 
 .chat-editor {
   padding-bottom: 6px;
-  background: @white;
+  background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
 }
@@ -1861,7 +1897,7 @@ i { color: @gray_60; }
 //   margin-left: -28px;
 //   height: 18px;
 //   width: 18px;
-//   background: @white;
+//   background: white;
 //   border-radius: 9px;
 //   border: 1px solid @gray_20;
 //   float: left;
@@ -1889,7 +1925,7 @@ i { color: @gray_60; }
 //   font-size: 14px;
 //   color: @gray_10;
 //   border: 1px solid @gray_10;
-//   background: @white;
+//   background: white;
 //   border-radius: 3px;
 //   &:hover {
 //     color: @gray_60;
@@ -1965,7 +2001,7 @@ i { color: @gray_60; }
   width: 40px;
   height: 40px;
   padding: 7px;
-  color: @white;
+  color: white;
   background: @gray_60;
   font-size: 18px;
   text-align: center;
@@ -2046,7 +2082,7 @@ i { color: @gray_60; }
   color: @red !important;
   cursor: pointer;
   &:hover {
-    color: @white !important;
+    color: white !important;
     background: @red !important;
   }
 }
@@ -2467,7 +2503,7 @@ i { color: @gray_60; }
   margin-left: 15px;
   padding-top: 2px;
   text-align: center;
-  color: @white;
+  color: white;
   font-size: 27px;
   font-family: @light;
   background: @gray_60;
@@ -2744,18 +2780,11 @@ i { color: @gray_60; }
   margin-right: 2px;
 }
 
-.edit-option-details,
-.duplicate-option,
-#edit-details {
-  cursor: pointer;
-}
-
 .remove-option,
 #cancel-meeting {
   color: @red !important;
-  cursor: pointer;
   &:hover {
-    color: @white !important;
+    color: white !important;
     background: @red !important;
   }
 }
