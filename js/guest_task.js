@@ -494,13 +494,20 @@ var guestTask = function() {
             }
           });
           taskView.append(participantListView)
-          var notes = $("<div id='notes'/>")
-            .text(state.calendar_event_notes);
-          if (notes.text() != "") {
+          var publicNotes = $("<div id='public-notes'/>")
+            .text(state.public_notes);
+          var privateNotes = $("<div id='private-notes'/>")
+            .text(state.private_notes);
+          if (state.public_notes != "" || state.private_notes != "") {
             taskView.append($("<div class='task-section-header'/>")
-                      .append(notesIcon)
-                      .append("<div class='task-section-text'>NOTES</div>"))
-                    .append(notes);
+              .append(notesIcon)
+              .append("<div class='task-section-text'>NOTES</div>"));
+            if (state.private_notes != "") {
+              taskView.append(privateNotes);
+            }
+            if (state.public_notes != "") {
+              taskView.append(publicNotes);
+            }
           }
           taskView.append($("<div class='task-section-header'/>")
                   .append(messagesIcon)
