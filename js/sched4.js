@@ -515,7 +515,7 @@ var sched4 = (function() {
     });
   }
 
-  function createEditMode(task, summary) {
+  function createEditMode(profs, task, summary) {
     var view = $("<div id='meeting-edit' class='hide'/>");
     var state = sched.getState(task);
 
@@ -581,6 +581,7 @@ var sched4 = (function() {
       .append(publicText)
       .appendTo(notesEditorPublic);
 
+    var hostName = profile.firstName(profs[login.leader()].prof);
     var notesEditorPrivate = $("<div class='notes-editor-private'/>");
     var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
       .val(state.private_notes)
@@ -591,14 +592,14 @@ var sched4 = (function() {
     var privateEye = $("<img class='viewable-by-eye'/>");
     svg.loadImg(privateEye, "/assets/img/eye.svg");
     var privateText = $("<span class='viewable-by-text'/>")
-      .text("ANDREW" + " ONLY");
+      .text(hostName.toUpperCase() + " ONLY");
     var notesLabelPrivate = $("<div class='viewable-by-label'/>")
       .append(privateEye)
       .append(privateText)
       .appendTo(notesEditorPrivate);
 
     var addPrivateNotes = $("<span class='add-private-notes link'/>")
-      .text("Add private notes for Andrew only")
+      .text("Add private notes for " + hostName + " only")
       .click(function() {
         addPrivateNotes.addClass("hide");
         notesEditorPrivate.removeClass("hide");
@@ -646,7 +647,7 @@ var sched4 = (function() {
     return view;
   }
 
-  function createReviewSection(task) {
+  function createReviewSection(profs, task) {
     var view = $("<div/>");
     var module = $("<div id='edit-meeting-div' class='sched-module'/>")
       .appendTo(view);
@@ -695,7 +696,7 @@ var sched4 = (function() {
       .attr("id","meeting-details")
       .appendTo(summary);
 
-    var editMode = createEditMode(task, summary)
+    var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
 
     showHide.click(function() {
@@ -744,7 +745,7 @@ var sched4 = (function() {
 
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
-      .append(createReviewSection(ta))
+      .append(createReviewSection(profs, ta))
       .append(createConfirmSection(profs, ta, guests))
       .append(createReminderSection(profs, ta, guests));
 
