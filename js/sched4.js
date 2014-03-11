@@ -592,7 +592,7 @@ var sched4 = (function() {
     var privateEye = $("<img class='viewable-by-eye'/>");
     svg.loadImg(privateEye, "/assets/img/eye.svg");
     var privateText = $("<span class='viewable-by-text'/>")
-      .text(hostName + " ONLY");
+      .text(hostName.toUpperCase() + " ONLY");
     var notesLabelPrivate = $("<div class='viewable-by-label'/>")
       .append(privateEye)
       .append(privateText)
