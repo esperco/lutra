@@ -2580,6 +2580,7 @@ i { color: @gray_60; }
   margin-top: 6px;
   margin-left: 10px;
   font-size: 14px;
+  cursor: default;
 }
 
 #tz-picker-dialog {
@@ -2635,9 +2636,9 @@ i { color: @gray_60; }
 .loc-zip-input { padding-right: 0; }
 
 .map-unavailable {
-  height: 152px;
+  height: 134px;
   margin-bottom: 8px;
-  padding-top: 40px;
+  padding-top: 32px;
   color: @gray_40;
   text-align: center;
   background: @gray_10;
@@ -2651,38 +2652,7 @@ i { color: @gray_60; }
   path { fill: @gray_40; }
 }
 
-.save-location {
-  float: left;
-  display: inline-block;
-  cursor: pointer;
-  &:hover path.checkbox {stroke: @gray_40; }
-}
-
-.save-location-checkbox {
-  float: left;
-}
-
-.save-location-text,
-.save-location-text-short {
-  float: left;
-  margin-left: 8px;
-  font-size: 14px;
-}
-
-.save-location-text {
-  @media (max-width: 767px) {
-    display: none;
-  }
-}
-
-.save-location-text-short {
-  @media (min-width: 768px) {
-    display: none;
-  }
-}
-
 .reset-location {
-  float: right;
   display: inline-block;
   cursor: pointer;
   &:hover .reset-location-text {

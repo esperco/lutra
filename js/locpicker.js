@@ -33,11 +33,6 @@ var locpicker = (function() {
   <div #removeThis
        class="hide">
     <div class="col-sm-6">
-      <input #instructions
-             type="text" class="form-control"
-             placeholder="These notes are now Address Line 2"/>
-    </div>
-    <div class="col-sm-6">
       <input #timezone
              type="text" class="form-control"
              placeholder="Timze zone should be hidden" disabled/>
@@ -45,53 +40,35 @@ var locpicker = (function() {
   </div>
   <div #locationForm>
     <div #locationDetails class="clearfix">
-      <div class="col-sm-6 address-form">
+      <div class="col-sm-7 address-form">
         <input #locName
                type="text"
                class="form-control loc-input"
-               placeholder="Location Name"/>
-        <input #addressLine1
+               placeholder="Location name"/>
+        <input #locAddress
                type="text"
                class="form-control loc-input"
-               placeholder="Address Line 1"/>
-        <input #addressLine2
+               placeholder="Address" disabled/>
+        <input #instructions
                type="text"
                class="form-control loc-input"
-               placeholder="Address Line 2"/>
-        <div class="clearfix">
-          <div class="col-xs-6 loc-state-input">
-            <input #state
-                   type="text"
-                   class="form-control loc-input"
-                   placeholder="State"/>
-          </div>
-          <div class="col-xs-6 loc-zip-input">
-            <input #zip
-                   type="text"
-                   class="form-control loc-input"
-                   placeholder="Zip/Postal"/>
-          </div>
-        </div>
+               placeholder="Suite #, access code, etc."/>
+        <span #resetLocation
+              class="reset-location">
+          <img class="reset-location-icon svg"
+               src="/assets/img/reset.svg"/>
+          <span class="reset-location-text danger-link">
+            Reset location
+          </span>
+        </span>
       </div>
-      <div class="col-sm-6 address-map">
+      <div class="col-sm-5 address-map">
         <div class="map-unavailable">
           <img class="map-unavailable-pin svg"
              src="/assets/img/pin.svg"/>
           <div>MAP UNAVAILABLE</div>
         </div>
       </div>
-    </div>
-    <div #locationActions class="clearfix">
-      <span #saveLocation
-            class="save-location"/>
-      <span #resetLocation
-            class="reset-location">
-        <img class="reset-location-icon svg"
-             src="/assets/img/reset.svg"/>
-        <span class="reset-location-text danger-link">
-          Reset location
-        </span>
-      </span>
     </div>
   </div>
   <div #editor/>
@@ -102,22 +79,11 @@ var locpicker = (function() {
     /* add extra fields to carry along, for convenience */
     form.onTimezoneChange = onTimezoneChange;
 
-    var checkbox = $("<img class='save-location-checkbox'/>")
-      .appendTo(saveLocation);
-    svg.loadImg(checkbox, "/assets/img/checkbox-sm.svg");
-    var saveText = $("<span class='save-location-text'/>")
-      .text("Save this place as a favorite")
-      .appendTo(saveLocation);
-    var saveTextShort = $("<span class='save-location-text-short'/>")
-      .text("Save as favorite")
-      .appendTo(saveLocation);
-
-    saveLocation.click(function() {
-      if (saveLocation.hasClass("checkbox-selected")) {
-        saveLocation.removeClass("checkbox-selected");
-      } else {
-        saveLocation.addClass("checkbox-selected");
-      }
+    resetLocation.click(function() {
+      locationForm.addClass("hide");
+      // reset location
+      address.val("")
+             .focus();
     })
 
     return form;

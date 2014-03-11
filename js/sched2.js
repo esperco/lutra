@@ -184,7 +184,7 @@ var sched2 = (function() {
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
-  function editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode) {
+  function editableViewOfOption(tzList, profs, calOption, saveCalOption, cancel, addMode) {
 '''
 <div #view
      class="edit-option-row">
@@ -226,7 +226,7 @@ var sched2 = (function() {
                      class="form-control date-picker-field end"/>
             </div>
           </div>
-          <span #timeZoneText class="time-zone-text link">PST</span>
+          <span #timeZoneText class="time-zone-text">PST</span>
         </div>
         <div class="time-input-row-end-mobile clearfix">
           <div class="time-to-text-mobile">to</div>
@@ -281,7 +281,8 @@ var sched2 = (function() {
             <div class="viewable-by-label">
               <img class="viewable-by-eye svg"
                    src="/assets/img/eye.svg"/>
-              <span class="viewable-by-text">ANDREW ONLY</span>
+              <span #viewableByExec
+                    class="viewable-by-text"/>
             </div>
           </div>
         </div>
@@ -318,11 +319,7 @@ var sched2 = (function() {
     var timeZoneContainer = $("#tz-picker");
     timeZoneContainer.children().remove();
     timeZoneText
-      .tooltip({"title":"Click to change the time zone"})
-      .click(function() {
-        createTZPicker();
-        timeZoneModal.modal({})
-      });
+      .tooltip({"title":"The time zone is automatically set based on the meeting location"});
 
     var calendarModal = $("#cal-picker-modal");
     var calendarContainer = $("#cal-picker");
@@ -401,6 +398,9 @@ var sched2 = (function() {
 
     /*** Meeting notes ***/
 
+    var hostName = profile.firstName(profs[login.leader()].prof);
+    viewableByExec.text(hostName.toUpperCase() + " ONLY");
+
     addPublicNotes
       .click(function() {
         addPublicNotes.addClass("hide");
@@ -408,7 +408,7 @@ var sched2 = (function() {
         notesBoxPublic.focus();
       });
     addPrivateNotes
-      .text("Add private notes for Andrew only")
+      .text("Add private notes for " + hostName + " only")
       .click(function() {
         addPrivateNotes.addClass("hide");
         notesEditorPrivate.removeClass("hide");
@@ -481,12 +481,12 @@ var sched2 = (function() {
     };
   }
 
-  function createMeetingOption(tzList, saveCalOption, cancel, addMode) {
+  function createMeetingOption(tzList, profs, saveCalOption, cancel, addMode) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode);
+    return editableViewOfOption(tzList, profs, calOption, saveCalOption, cancel, addMode);
   }
 
   function saveOption(ta, calOption) {
@@ -553,8 +553,8 @@ var sched2 = (function() {
     return view;
   }
 
-  function insertViewOfOption(ta, tzList, listView, calOption, i,
-                              saveCalOption, removeCalOption) {
+  function insertViewOfOption(ta, tzList, profs, listView, calOption,
+                              i, saveCalOption, removeCalOption) {
 '''
 <div #view>
   <div #optionLetter
@@ -591,7 +591,7 @@ var sched2 = (function() {
           .click(toggleEdit);
         var addMode = false;
         var edit =
-          editableViewOfOption(tzList, calOption, saveCalOption, cancel, addMode);
+          editableViewOfOption(tzList, profs, calOption, saveCalOption, cancel, addMode);
         editableContainer.children().remove();
         editableContainer.append(edit.view);
 
@@ -627,13 +627,13 @@ var sched2 = (function() {
     return view;
   }
 
-  function loadMeetingOptions(v, tzList, ta, connector) {
+  function loadMeetingOptions(v, tzList, profs, ta, connector) {
     function save(calOption) { return saveOption(ta, calOption); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
       var addMode = true;
-      return createMeetingOption(tzList, save, cancelAdd, addMode).view
+      return createMeetingOption(tzList, profs, save, cancelAdd, addMode).view
                .addClass("add-row");
     }
 
@@ -645,7 +645,7 @@ var sched2 = (function() {
     });
     var numOptions = 0;
     list.iter(schedState.calendar_options, function(x, i) {
-      v.append(insertViewOfOption(ta, tzList, listView, x, i, save, remove));
+      v.append(insertViewOfOption(ta, tzList, profs, listView, x, i, save, remove));
       numOptions++;
     });
     var addRow = listView.view
@@ -713,7 +713,7 @@ var sched2 = (function() {
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
-      deferred.defer(loadMeetingOptions(content, tzList, ta, connector));
+      deferred.defer(loadMeetingOptions(content, tzList, profs, ta, connector));
     }
     else {
       var authLandingUrl = document.URL;
@@ -722,7 +722,7 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadMeetingOptions(content, tzList, ta, connector);
+            loadMeetingOptions(content, tzList, profs, ta, connector);
         });
     }
 
