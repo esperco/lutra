@@ -495,18 +495,23 @@ var sched4 = (function() {
     }
   }
 
-  function updateCalendarEvent(task, titleEdit, notesEdit, updateButton) {
+  function updateCalendarEvent(param) {
+    var task = param.task;
     var taskState = sched.getState(task);
-    taskState.calendar_event_title.title_text = titleEdit.val();
+    taskState.calendar_event_title.title_text = param.titleEdit.val();
     taskState.calendar_event_title.is_generated = false;
-    taskState.calendar_event_notes = notesEdit.val();
+    taskState.public_notes = param.notesBoxPublic.val();
+    taskState.private_notes = param.notesBoxPrivate.val();
     api.postTask(task).done(function() {
-      api.updateCalendar(task.tid, {
+      api.updateCalendar(param.task.tid, {
         event_id: sched.getState(task).reserved.google_event,
-        event_title: titleEdit.val(),
-        event_notes: notesEdit.val()
+        event_title: param.titleEdit.val(),
+        event_notes: {
+          public_notes: param.notesBoxPublic.val(),
+          private_notes: param.notesBoxPrivate.val()
+        }
       })
-        .done(function() { updateButton.addClass("disabled"); });
+        .done(function() { param.updateButton.addClass("disabled"); });
     });
   }
 
@@ -562,7 +567,7 @@ var sched4 = (function() {
 
     var notesEditorPublic = $("<div class='notes-editor-public'/>");
     var notesBoxPublic = $("<textarea class='notes-entry'></textarea>")
-      .val(state.calendar_event_notes)
+      .val(state.public_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
@@ -578,7 +583,7 @@ var sched4 = (function() {
 
     var notesEditorPrivate = $("<div class='notes-editor-private'/>");
     var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
-      // .val(state.calendar_event_notes)
+      .val(state.private_notes)
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
@@ -627,7 +632,13 @@ var sched4 = (function() {
       .addClass("disabled")
       .text("Update calendar")
       .click(function() {
-        updateCalendarEvent(task, titleEdit, notesBoxPublic, updateButton)
+        updateCalendarEvent({
+          "task": task,
+          "titleEdit": titleEdit,
+          "notesBoxPublic": notesBoxPublic,
+          "notesBoxPrivate": notesBoxPrivate,
+          "updateButton": updateButton
+        })
       })
       .appendTo(editActions);
     cancelEditMode
