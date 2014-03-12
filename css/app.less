@@ -29,7 +29,6 @@
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
-@white: #ffffff;
 
 
 /*** General ***/
@@ -40,7 +39,7 @@ html {
 }
 
 body {
-  background: @white;
+  background: white;
   color: @gray_90;
   font-family: @regular, Arial;
   font-size: 16px;
@@ -48,17 +47,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-object {
-  pointer-events: none;
-}
+object { pointer-events: none; }
+
+li { cursor: pointer; }
+
+i { color: @gray_60; }
 
 .container.mobile {
   padding-left: 15px;
   padding-right: 15px;
 }
 
-.scrollable {
-  overflow: auto;
+.scrollable { overflow: auto; }
+
+.clickable { cursor: pointer; }
+
+.link {
+  color: @purple;
+  cursor: pointer;
+  &:hover {
+    color: @purple_hover;
+    text-decoration: underline;
+  }
 }
 
 *.unselectable {
@@ -90,23 +100,20 @@ object {
     position: relative;
 }
 .left-inner-addon input {
-    padding-left: 28px;
+    padding-left: 30px;
 }
 .left-inner-addon i {
     position: absolute;
-    padding: 9px 10px;
+    left: 0px;
+    padding: 7px 9px;
     pointer-events: none;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
-.link {
-  color: @purple;
+.danger-link {
+  color: @red;
   cursor: pointer;
   &:hover {
-    color: @purple_hover;
+    color: @red_hover;
     text-decoration: underline;
   }
 }
@@ -116,7 +123,7 @@ object {
   position: absolute;
   top: 0px;
   width: 100%;
-  color: @white;
+  color: white;
   background: @red;
   border: none;
   border-radius: 0;
@@ -125,7 +132,44 @@ object {
 }
 
 .close-status {
-  color: @white;
+  color: white;
+}
+
+#loading {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  display: none;
+  z-index: 10000;
+}
+
+#loading-box {
+  height: 180px;
+  width: 240px;
+  margin-top: 160px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 25px 15px;
+  background: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  border-radius: 6px;
+}
+
+#loading-icon {
+  width: 70px;
+  height: 85px;
+  margin-right: auto;
+  margin-bottom: 20px;
+  margin-left: auto;
+}
+
+#loading-text {
+  color: white;
+  font-size: 18px;
+  font-family: @bold;
 }
 
 
@@ -143,7 +187,7 @@ object {
 #task-navbar {
   margin: 0;
   padding: 0;
-  background: @white;
+  background: white;
   border-bottom: 1px solid @border;
   border-radius: 0;
 }
@@ -197,7 +241,7 @@ object {
   margin-top: 14px;
   margin-bottom: 0px;
   font-size: 18px;
-  border: 1px solid @white;
+  border: 1px solid white;
   &:hover { border: 1px solid @gray_20; }
   &:focus { border: 1px solid @purple; }
 }
@@ -225,13 +269,13 @@ object {
     text-align: center;
     vertical-align: middle;
     color: @gray_90;
-    background: @white;
+    background: white;
   }
   #exec-name-div {
     display: inline-block;
     margin-left: 10px;
     padding-top: 4px;
-    color: @white;
+    color: white;
   }
   #assisting {
     font-size: 10px;
@@ -280,13 +324,13 @@ object {
   padding-right: 10px;
   padding-left: 10px;
   font-size: 14px;
-  color: @white;
+  color: white;
   background: none;
-  border: 1px solid @white;
+  border: 1px solid white;
   border-radius: 3px;
   &:hover {
     color: @gray_90;
-    background: @white;
+    background: white;
   }
 }
 
@@ -325,7 +369,7 @@ object {
   left: 7px;
   padding-left: 8px;
   padding-right: 8px;
-  color: @white;
+  color: white;
   font-family: @light;
   letter-spacing: 3px;
 }
@@ -365,7 +409,7 @@ object {
   color: @gray_90;
   font-size: 12px;
   text-align: center;
-  background: @white;
+  background: white;
   border-radius: 12px;
 }
 
@@ -433,13 +477,13 @@ object {
 #general-icon circle,
 #archive-icon path,
 #contacts-icon path,
-#places-icon path, { fill: @gray_60; }
+#places-icon path { fill: @gray_60; }
 
 .account-block:hover { background: @dark_gray !important; }
 
 .account-block:hover {
   #settings-icon path,
-  #logout-icon g path { fill: @white; }
+  #logout-icon g path { fill: white; }
 }
 
 .nav-block:hover {
@@ -453,7 +497,7 @@ object {
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path, { fill: @white; }
+  #places-icon path { fill: white; }
 }
 
 .nav-pills > li.active > a {
@@ -469,7 +513,7 @@ object {
   #general-icon circle,
   #archive-icon path,
   #contacts-icon path,
-  #places-icon path, { fill: @white; }
+  #places-icon path { fill: white; }
 }
 
 #task-navbar {
@@ -492,7 +536,7 @@ object {
 
 #chat-icon-container.unread-messages #chat-icon {
   path { fill: @orange; }
-  text { fill: @white; }
+  text { fill: white; }
   &:hover path { fill: @orange_hover; }
 }
 
@@ -710,7 +754,7 @@ object {
 
 .archive {
   display: block;
-  path { fill: @white; }
+  path { fill: white; }
 }
 
 .archive-div.mobile {
@@ -770,7 +814,7 @@ object {
   padding-bottom: 0;
   font-family: @bold;
   font-size: 12px;
-  color: @white;
+  color: white;
   background: @orange;
   border-radius: 3px;
 }
@@ -832,7 +876,7 @@ object {
   vertical-align: middle;
   font-family: @light;
   font-size: 18px;
-  color: @white;
+  color: white;
   background: @gray_60;
 }
 
@@ -860,7 +904,7 @@ object {
   bottom: 0;
   margin-bottom: 0;
   padding: 0;
-  background: @white;
+  background: white;
   border-top: 1px solid @gray_20;
   border-bottom: none;
   border-radius: 0;
@@ -975,7 +1019,7 @@ object {
 .sched-progress-step4 .sched-go-step4 {
   cursor: default;
   path { fill: @gray_60; }
-  text { fill: @white; }
+  text { fill: white; }
 }
 
 
@@ -1030,6 +1074,14 @@ object {
     path { fill: @gray_60; }
   }
 }
+
+#tz-picker-icon,
+#cal-picker-icon {
+  float: left;
+  margin-top: 2px;
+}
+
+.modal-title { margin-left: 38px; }
 
 .modal-content {
   margin-top: 12px;
@@ -1134,7 +1186,7 @@ object {
   min-height: 40px;
   margin-bottom: 20px;
   padding: 10px;
-  color: @white;
+  color: white;
   text-align: center;
 }
 
@@ -1273,7 +1325,7 @@ object {
   vertical-align: middle;
   font-family: @light;
   font-size: 32px;
-  color: @white;
+  color: white;
   background-color: @gray_60;
 }
 
@@ -1361,7 +1413,7 @@ object {
   padding-bottom: 0;
   font-family: @bold;
   font-size: 12px;
-  color: @white;
+  color: white;
   border-radius: 3px;
 }
 
@@ -1678,8 +1730,8 @@ object {
   padding-right: 9px !important;
   padding-bottom: 0 !important;
   padding-left: 9px !important;
-  color: @white;
-  border: 1px solid @white !important;
+  color: white;
+  border: 1px solid white !important;
   border-radius: 3px;
   &:hover { color: @gray_90; }
 }
@@ -1691,7 +1743,7 @@ object {
 }
 
 .chat-tabs > li > a:hover {
-  background: @white;
+  background: white;
 }
 
 .chat-tabs > li > a .prof-caret path,
@@ -1705,7 +1757,7 @@ object {
 .chat-tabs > li.active > a:focus {
   cursor: default;
   color: @gray_90;
-  background: @white;
+  background: white;
   border: none;
 }
 
@@ -1735,7 +1787,7 @@ object {
   height: 32px;
   margin-top: 3px;
   padding-top: 6px;
-  color: @white;
+  color: white;
   background: @gray_40;
   text-align: center;
   border-radius: 3px;
@@ -1792,20 +1844,20 @@ object {
 //   padding-top: 5px;
 //   padding-right: 15px;
 //   padding-left: 15px;
-//   color: @white;
+//   color: white;
 //   background: @orange;
 // }
 
 .chat-editor {
   padding-bottom: 6px;
-  background: @white;
+  background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
 }
 
 .chat-entry {
   width: 100%;
-  height: 100px;
+  height: 100px !important;
   padding: 8px;
   overflow: hidden;
   border: none;
@@ -1845,7 +1897,7 @@ object {
 //   margin-left: -28px;
 //   height: 18px;
 //   width: 18px;
-//   background: @white;
+//   background: white;
 //   border-radius: 9px;
 //   border: 1px solid @gray_20;
 //   float: left;
@@ -1873,7 +1925,7 @@ object {
 //   font-size: 14px;
 //   color: @gray_10;
 //   border: 1px solid @gray_10;
-//   background: @white;
+//   background: white;
 //   border-radius: 3px;
 //   &:hover {
 //     color: @gray_60;
@@ -1949,7 +2001,7 @@ object {
   width: 40px;
   height: 40px;
   padding: 7px;
-  color: @white;
+  color: white;
   background: @gray_60;
   font-size: 18px;
   text-align: center;
@@ -2030,7 +2082,7 @@ object {
   color: @red !important;
   cursor: pointer;
   &:hover {
-    color: @white !important;
+    color: white !important;
     background: @red !important;
   }
 }
@@ -2050,38 +2102,9 @@ object {
   padding-right: 0;
 }
 
-.add-guest-circ {
-  float: left;
-  width: 40px;
-  height: 40px;
-  margin-top: 1px;
-  border-radius: 20px;
-  text-align: center;
-  background: @purple;
-}
-
-#plus-guest {
-  margin-top: 10px;
-}
-
-.cancel {
-  background: @red !important;
-  .rotate(rotate_ccw_45);
-  &:hover {
-    background: @red_hover !important;
-    cursor: pointer;
-  }
-}
-
-.return-to-add {
-  background: @purple;
-  .rotate(rotate_cw_45);
-}
-
 #add-guest-text {
   margin-left: 55px;
   padding-top: 9px;
-  padding-bottom: 9px;
   color: @purple;
   cursor: pointer;
 }
@@ -2132,6 +2155,69 @@ object {
 
 #add-guest-btn {
   margin-bottom: 5px;
+}
+
+
+/*** Adder ***/
+
+.add-guest-circ,
+.add-option-sq {
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-top: 1px;
+  padding: 10px;
+  text-align: center;
+  background: @purple;
+  cursor: pointer;
+  &:hover { background: @purple_hover; }
+}
+
+.add-guest-circ { border-radius: 20px; }
+.add-option-sq {
+  margin: 15px 0px 15px 15px;
+  border-radius: 3px;
+}
+
+.add-guest-circ.cancel,
+.add-option-sq.cancel,
+.option-letter.cancel {
+  background: @red !important;
+  &:hover {
+    background: @red_hover !important;
+    cursor: pointer;
+  }
+}
+
+.option-letter.cancel {
+  padding: 0;
+}
+
+.add-guest-circ.return-to-add,
+.add-option-sq.return-to-add {
+  background: @purple;
+  &:hover { background: @purple_hover; }
+}
+
+.option-letter.return-to-add {
+  background: @gray_60;
+  &:hover { background: @gray_60; }
+}
+
+.plus-guest,
+.plus-option {
+  width: 20px;
+  height: 20px;
+}
+
+.plus-guest.cancel,
+.plus-option.cancel {
+  .rotate(rotate_ccw_45);
+}
+
+.plus-guest.return-to-add,
+.plus-option.return-to-add {
+  .rotate(rotate_cw_45);
 }
 
 
@@ -2263,7 +2349,7 @@ object {
   padding: 0;
 }
 
-.option-letter {
+.option-letter-sm {
   width: 30px;
   height: 30px;
   margin-right: auto;
@@ -2364,9 +2450,69 @@ object {
 }
 
 
-/*** Meeting Details ***/
+/*** Calendar Picker ***/
+#cal-picker-dialog {
+  width: 100% !important;
+}
+
+
+/*** Option/Meeting Details ***/
+
+.option-row,
+.edit-option-row {
+  padding: 15px 15px 15px 55px;
+  border-top: 1px solid @gray_20;
+}
+
+.edit-option-row {
+  @media (max-width: 432px) {
+    padding-top: 70px;
+    padding-left: 15px;
+  }
+}
+
+.edit-option-row.add-row { border: none; }
+
+#add-option-row {
+  border-top: 1px solid @gray_20;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+#add-option-row.click-mode:hover {
+  cursor: pointer;
+  background: @gray_f8;
+  .add-option-sq { background: @purple_hover; }
+  #add-option-text { color: @purple_hover; }
+}
+
+#add-option-text {
+  margin-left: 70px;
+  padding-top: 24px;
+  color: @purple;
+  cursor: pointer;
+}
 
 .meeting-detail-row { margin-bottom: 15px; }
+
+.option-letter {
+  float: left;
+  width: 40px;
+  height: 40px;
+  margin-top: 15px;
+  margin-left: 15px;
+  padding-top: 2px;
+  text-align: center;
+  color: white;
+  font-size: 27px;
+  font-family: @light;
+  background: @gray_60;
+  border-radius: 3px;
+}
+
+.option-info {
+  width: 100%;
+}
 
 .meeting-detail-label {
   float: left;
@@ -2390,26 +2536,8 @@ object {
   }
 }
 
-.edit-meeting {
-  float: right;
-  margin-top: 5px;
-}
-
-.edit-meeting-btn {
-  margin-right: 2px;
-}
-
-.edit-details {
-  cursor: pointer;
-}
-
-.option-info {
-  padding: 20px 0 16px 0;
-}
-
-.info-row {
-  margin-bottom: 6px;
-}
+.info-row { margin-bottom: 6px; }
+.edit-info-row { margin-bottom: 15px; }
 
 .info-label {
   float: left;
@@ -2423,7 +2551,16 @@ object {
   @media (max-width: 767px) {
     margin-left: 8px;
   }
+  @media (max-width: 432px) {
+    width: 45px;
+    margin-left: 0;
+  }
 }
+
+.what-label-edit,
+.when-label-edit,
+.where-label-edit,
+.notes-label-edit { margin-top: 8px; }
 
 .info {
   margin-left: 100px;
@@ -2431,10 +2568,143 @@ object {
   @media (max-width: 767px) {
     margin-left: 70px;
   }
+  @media (max-width: 432px) {
+    margin-left: 60px;
+  }
+}
+
+.custom-type-input {
+  margin-top: 8px;
 }
 
 .start-end {
   font-family: @bold;
+}
+
+.time-input-row-end {
+  @media (max-width: 631px) { display: none; }
+}
+.time-input-row-end-mobile {
+  margin-top: 5px;
+  .date-picker-field.end {
+    margin-left: 0;
+    margin-right: 5px;
+  }
+  @media (min-width: 632px) { display: none; }
+}
+
+.date-picker-field {
+  float: left;
+  width: 98px;
+}
+.date-picker-field.start { margin-right: 5px; }
+.date-picker-field.end { margin-left: 5px; }
+
+.time-picker-field {
+  float: left;
+  width: 82px;
+}
+
+.time-to-text {
+  float: left;
+  margin: 5px 5px 0px 5px;
+}
+.time-to-text-mobile { margin-bottom: 3px; }
+
+.time-zone-text {
+  display: inline-block;
+  margin-top: 6px;
+  margin-left: 10px;
+  font-size: 14px;
+  cursor: default;
+}
+
+#tz-picker-dialog {
+  width: 400px;
+  padding-top: 160px;
+}
+
+.tz-actions { margin-top: 8px; }
+.save-tz { float: right; }
+.cancel-tz {
+  float: right;
+  margin-top: 6px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.open-cal-picker {
+  display: inline-block;
+  margin-top: 7px;
+  cursor: pointer;
+  &:hover .open-cal-picker-text {
+    text-decoration: underline;
+  }
+}
+
+.open-cal-picker-icon {
+  float: left;
+  margin-top: 1px;
+}
+
+.open-cal-picker-text {
+  float: left;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.address-form {
+  padding-left: 0;
+  @media (max-width: 767px) {
+    padding-right: 0;
+  }
+}
+
+.address-map {
+  padding-right: 0;
+  @media (max-width: 767px) {
+    padding-left: 0;
+  }
+}
+
+.loc-input { margin-bottom: 8px; }
+.loc-state-input { padding-left: 0; }
+.loc-zip-input { padding-right: 0; }
+
+.map-unavailable {
+  height: 134px;
+  margin-bottom: 8px;
+  padding-top: 32px;
+  color: @gray_40;
+  text-align: center;
+  background: @gray_10;
+  border-radius: 3px;
+}
+
+.map-unavailable-pin {
+  width: 24px;
+  height: 36px;
+  margin-bottom: 15px;
+  path { fill: @gray_40; }
+}
+
+.reset-location {
+  display: inline-block;
+  cursor: pointer;
+  &:hover .reset-location-text {
+    text-decoration: underline;
+  }
+}
+
+.reset-location-icon {
+  float: left;
+  margin-top: 3px;
+}
+
+.reset-location-text {
+  float: left;
+  margin-left: 7px;
+  font-size: 14px;
 }
 
 .notes-editor-public {
@@ -2492,10 +2762,46 @@ object {
   margin-right: 6px;
 }
 
+.add-public-notes,
 .add-private-notes {
   display: inline-block;
-  padding-top: 7px;
+  padding-top: 6px;
   font-size: 14px;
+}
+
+.edit-option,
+.edit-meeting {
+  float: right;
+  margin-top: 5px;
+}
+
+.edit-option-btn,
+.edit-meeting-btn {
+  margin-right: 2px;
+}
+
+.remove-option,
+#cancel-meeting {
+  color: @red !important;
+  &:hover {
+    color: white !important;
+    background: @red !important;
+  }
+}
+
+.edit-option-actions,
+#edit-meeting-actions { text-align: right; }
+
+.cancel-edit-mode {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.save-to-cal,
+#event-edit-update {
+  float: right;
+  margin-left: 10px;
 }
 
 
@@ -2507,7 +2813,7 @@ object {
 }
 
 .sched-module-header {
-  height: 54px;
+  min-height: 54px;
   padding: 13px 15px;
   font-size: 18px;
   background: @gray_f8;
@@ -2517,10 +2823,13 @@ object {
 
 .sched-module-header.collapsed { border-radius: 6px; }
 
-.sched-module-icon { float: left; }
+.sched-module-icon {
+  float: left;
+  margin-left: 6px;
+}
 
 .sched-module-title {
-  margin-left: 45px;
+  margin-left: 57px;
   padding-top: 2px;
 }
 
@@ -2542,40 +2851,21 @@ object {
 .connector.collapsed path.down { fill: @gray_f8; }
 
 
+/*** Scheduling Step 2 ***/
+
+#offer-icon { margin-top: 4px; }
+
+
 /*** Scheduling Step 4 ***/
 
 #edit-meeting-div { margin-top: 30px; }
 
-#meeting-content {
+#review-content {
   padding: 15px;
   border-top: 1px solid @gray_20;
 }
 
-#reschedule-meeting { cursor: pointer; }
-
-#cancel-meeting {
-  color: @red !important;
-  cursor: pointer;
-  &:hover {
-    color: @white !important;
-    background: @red !important;
-  }
-}
-
 #meeting-details { padding: 0; }
-
-#edit-meeting-actions { text-align: right; }
-
-#cancel-edit-mode {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 14px;
-}
-
-#event-edit-update {
-  float: right;
-  margin-left: 10px;
-}
 
 .sched-step4-row {
   min-height: 72px;
@@ -2583,33 +2873,63 @@ object {
   border-top: 1px solid @gray_20;
 }
 
-.confirmation-compose-div,
-.reminder-edit-div {
-  float: left;
-  margin-top: 9px;
-  margin-left: 5px;
+.list-prof-circ.sent { background: @green; }
+.list-prof-circ.not-sent { background: @gray_20; }
+
+.compose-confirmation-btn,
+.edit-reminder-btn {
+  float: right;
+  margin-top: 4px;
 }
 
-.confirmation-compose,
-.reminder-edit {
+.compose-confirmation-icon,
+.edit-reminder-icon {
+  float: left;
   display: block;
+  margin-right: 6px;
+}
+
+.compose-confirmation-icon {
   width: 20px;
   height: 20px;
-  &:hover path { fill: @purple_hover; }
+  margin-bottom: 3px;
+}
+
+.edit-reminder-icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+}
+
+.compose-confirmation-icon.not-sent g path { fill: white; }
+.compose-confirmation-icon.sent g path { fill: @gray_60; }
+.edit-reminder-icon.not-sent path { fill: white; }
+.edit-reminder-icon.sent path { fill: @gray_20; }
+
+.compose-confirmation-text,
+.edit-reminder-text {
+  display: inline-block;
+  margin-top: 1px;
 }
 
 .confirmation-guest-name,
 .reminder-guest-name {
-  margin-left: 45px;
+  margin-left: 57px;
   font-family: @bold;
 }
 
+.confirmation-guest-name { margin-right: 160px; }
+.reminder-guest-name { margin-right: 120px; }
+
 .confirmation-guest-status,
 .reminder-guest-status {
-  margin-left: 45px;
+  margin-left: 57px;
   color: @gray_60;
   font-size: 14px;
 }
+
+.confirmation-guest-status { margin-right: 160px; }
+.reminder-guest-status { margin-right: 120px; }
 
 #reminder-scheduler {
   padding: 8px 15px;
