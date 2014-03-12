@@ -2860,12 +2860,10 @@ i { color: @gray_60; }
 
 #edit-meeting-div { margin-top: 30px; }
 
-#meeting-content {
+#review-content {
   padding: 15px;
   border-top: 1px solid @gray_20;
 }
-
-#reschedule-meeting { cursor: pointer; }
 
 #meeting-details { padding: 0; }
 
@@ -2875,33 +2873,63 @@ i { color: @gray_60; }
   border-top: 1px solid @gray_20;
 }
 
-.confirmation-compose-div,
-.reminder-edit-div {
-  float: left;
-  margin-top: 9px;
-  margin-left: 5px;
+.list-prof-circ.sent { background: @green; }
+.list-prof-circ.not-sent { background: @gray_20; }
+
+.compose-confirmation-btn,
+.edit-reminder-btn {
+  float: right;
+  margin-top: 4px;
 }
 
-.confirmation-compose,
-.reminder-edit {
+.compose-confirmation-icon,
+.edit-reminder-icon {
+  float: left;
   display: block;
+  margin-right: 6px;
+}
+
+.compose-confirmation-icon {
   width: 20px;
   height: 20px;
-  &:hover path { fill: @purple_hover; }
+  margin-bottom: 3px;
+}
+
+.edit-reminder-icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+}
+
+.compose-confirmation-icon.not-sent g path { fill: white; }
+.compose-confirmation-icon.sent g path { fill: @gray_60; }
+.edit-reminder-icon.not-sent path { fill: white; }
+.edit-reminder-icon.sent path { fill: @gray_20; }
+
+.compose-confirmation-text,
+.edit-reminder-text {
+  display: inline-block;
+  margin-top: 1px;
 }
 
 .confirmation-guest-name,
 .reminder-guest-name {
-  margin-left: 45px;
+  margin-left: 57px;
   font-family: @bold;
 }
 
+.confirmation-guest-name { margin-right: 160px; }
+.reminder-guest-name { margin-right: 120px; }
+
 .confirmation-guest-status,
 .reminder-guest-status {
-  margin-left: 45px;
+  margin-left: 57px;
   color: @gray_60;
   font-size: 14px;
 }
+
+.confirmation-guest-status { margin-right: 160px; }
+.reminder-guest-status { margin-right: 120px; }
 
 #reminder-scheduler {
   padding: 8px 15px;
