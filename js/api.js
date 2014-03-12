@@ -342,6 +342,11 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(update));
   };
 
+  mod.cancelCalendar = function(tid) {
+    var url = apiSPrefix() + "/event/" + tid + "/cancel";
+    return jsonHttpPost(url, "");
+  };
+
   mod.getGuestAppURL = function(tid, guestUid) {
     var url = apiSPrefix() + "/task/" + tid + "/guestapp/" + guestUid;
     return jsonHttpGet(url);

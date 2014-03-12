@@ -746,6 +746,7 @@ var sched4 = (function() {
   </div>
 </div>
 '''
+    var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
     var typ = sched.meetingType(state);
@@ -773,8 +774,17 @@ var sched4 = (function() {
       }
     }
 
+    function cancelAndArchive() {
+      api.cancelCalendar(tid).done(function() {
+        api.archiveTask(tid);
+        observable.onTaskArchived.notify(tid);
+        page.home.load();
+      });
+    }
+
     edit.click(toggleEditMode);
     editDetails.click(toggleEditMode);
+    cancel.click(cancelAndArchive);
 
     return view;
   }
