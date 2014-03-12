@@ -216,7 +216,7 @@ var sched1 = (function() {
       .append($("<button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown'/>")
         .append($("<span class='caret'/>"))
         .append($("<span class='sr-only'>Toggle Dropdown</span>")))
-      .append($("<ul class='dropdown-menu pull-right edit-guest-dropdown' role='menu'/>")
+      .append($("<ul class='dropdown-menu pull-right' role='menu'/>")
         .append(editProfile)
         .append(remove))
       .appendTo(v);
