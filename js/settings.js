@@ -533,12 +533,12 @@ var settings = (function() {
   }
 
   function showOptionsTags() {
-    $("#merge-tag-list").text("Tags: @@Exec@@, @@Guest@@, @@Assistant@@, @@MeetingDetails@@, @@Signature@@");
+    $("#merge-tag-list").text("Tags: @@Exec@@, @@Guest@@, @@Assistant@@, @@DetailsURL@@, @@Signature@@");
   }
 
   function showAllTags() {
     $("#merge-tag-list").text(
-      "Tags: @@Exec@@, @@Guest@@, @@Assistant@@, @@Location@@, @@LocationName@@, @@Date@@, @@Time@@, @@MeetingType@@, @@MeetingDetails@@, @@Signature@@"
+      "Tags: @@Exec@@, @@Guest@@, @@Assistant@@, @@Location@@, @@LocationName@@, @@Date@@, @@Time@@, @@MeetingType@@, @@DetailsURL@@, @@Signature@@"
     );
   }
 
