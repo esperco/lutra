@@ -774,17 +774,35 @@ var sched4 = (function() {
       }
     }
 
-    function cancelAndArchive() {
+    function rescheduleClick() {
       api.cancelCalendar(tid).done(function() {
-        api.archiveTask(tid);
-        observable.onTaskArchived.notify(tid);
-        page.home.load();
+        task.task_status.task_progress = "Coordinating";
+        state.scheduling_stage = "Find_availability";
+        state.calendar_options = [];
+        delete state.reserved;
+        api.postTask(task).done(function() {
+          observable.onTaskModified.notify(task);
+          sched.loadTask(task);
+        });
+      });
+    }
+
+    function cancelAndArchiveClick() {
+      api.cancelCalendar(tid).done(function() {
+        task.task_status.task_progress = "Closed";
+        delete state.reserved;
+        api.postTask(task).done(function() {
+          api.archiveTask(tid);
+          observable.onTaskArchived.notify(tid);
+          page.home.load();
+        });
       });
     }
 
     edit.click(toggleEditMode);
     editDetails.click(toggleEditMode);
-    cancel.click(cancelAndArchive);
+    reschedule.click(rescheduleClick);
+    cancel.click(cancelAndArchiveClick);
 
     return view;
   }
