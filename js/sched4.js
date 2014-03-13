@@ -51,15 +51,13 @@ var sched4 = (function() {
     })
   }
 
-  function loadReminderRecipients(profs, guests) {
+  function loadReminderRecipients(toObsProf) {
     $("#sched-reminder-to-list").children().remove();
 
-    list.iter(guests, function(uid) {
-      var toObsProf = profs[uid];
-      var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
-        .appendTo($("#sched-reminder-to-list"));
-      loadRecipientRow(recipientRow, toObsProf);
-    });
+    var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
+      .appendTo($("#sched-reminder-to-list"));
+
+    loadRecipientRow(recipientRow, toObsProf);
   }
 
   function loadConfirmRecipients(toObsProf) {
@@ -182,20 +180,22 @@ var sched4 = (function() {
       });
   }
 
-  function preFillReminderModal(profs, ta, reserved, guests) {
-    loadReminderRecipients(profs, guests);
+  function preFillReminderModal(profs, ta, options, toUid) {
+    var toObsProf = profs[toUid];
+    loadReminderRecipients(toObsProf);
 
     $("#sched-reminder-subject")
       .val("Re: " + ta.task_status.task_title);
 
-    if (reserved.reminder_message) {
-      $("#sched-reminder-message").val(reserved.reminder_message);
+    if (options.reminder_message) {
+      $("#sched-reminder-message").val(options.reminder_message);
     }
 
     var parameters = {
-      guest_name: $(".recipient-name").first().text()
+      guest_name: profile.fullName(toObsProf.prof),
+      guest_uid: toUid
     };
-    var ea = sched.assistedBy(guests[0], sched.getGuestOptions(ta));
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Reminder_to_guest_assistant";
@@ -206,7 +206,7 @@ var sched4 = (function() {
     }
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
-        if (! reserved.reminder_message) {
+        if (! options.reminder_message) {
           $("#sched-reminder-message").val(x.message_text);
         }
         $("#sched-reminder-guest-addr")
@@ -217,6 +217,17 @@ var sched4 = (function() {
 
 
   /* REMINDERS */
+
+  function closeReminderModal(ta, options, uid, reminderModal) {
+    var state = sched.getState(ta);
+    options.reminder_message = $("#sched-reminder-message").val();
+    state.participant_options =
+      list.replace(state.participant_options, options, function(x) {
+        return x.uid === options.uid;
+      });
+    api.postTask(ta);
+    reminderModal.modal("hide");
+  }
 
   function createReminderRow(profs, ta, uid, guests) {
 '''
@@ -259,25 +270,24 @@ var sched4 = (function() {
       .text(guestStatusText)
       .appendTo(view);
 
-    edit.click(editReminderEmail);
 
     var reminderModal = $("#sched-reminder-modal");
-    var reserved = sched.getState(ta).reserved;
-    function closeReminderModal() {
-      reserved.reminder_message = $("#sched-reminder-message").val();
-      api.postTask(ta);
-      reminderModal.modal("hide");
-    }
+    var state = sched.getState(ta);
+    var options = sched.getGuestOptions(ta)[uid];
 
-    function editReminderEmail() {
-      preFillReminderModal(profs, ta, reserved, guests);
+    edit.click(function() {
+      preFillReminderModal(profs, ta, options, uid);
+
+      var okButton = $("#sched-reminder-update");
+      okButton
+        .off("click")
+        .click(function() {
+          closeReminderModal(ta, options, uid, reminderModal)
+        });
+
       reminderModal.modal({});
-    }
+    });
 
-    var okButton = $("#sched-reminder-update");
-    okButton
-      .off("click")
-      .click(closeReminderModal);
 
     return view;
   }
