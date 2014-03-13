@@ -309,13 +309,13 @@ var sched4 = (function() {
       buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
-        { label: "1 hour before event", key: "1h", value: 3600 },
-        { label: "3 hours before event", key: "3h", value: 3 * 3600 },
-        { label: "6 hours before event", key: "6h", value: 6 * 3600 },
-        { label: "12 hours before event", key: "12h", value: 12 * 3600 },
-        { label: "24 hours before event", key: "24h", value: 24 * 3600 },
-        { label: "36 hours before event", key: "36h", value: 36 * 3600 },
-        { label: "48 hours before event", key: "48h", value: 48 * 3600 },
+        { label: "1 hour beforehand", key: "1h", value: 3600 },
+        { label: "3 hours beforehand", key: "3h", value: 3 * 3600 },
+        { label: "6 hours beforehand", key: "6h", value: 6 * 3600 },
+        { label: "12 hours beforehand", key: "12h", value: 12 * 3600 },
+        { label: "24 hours beforehand", key: "24h", value: 24 * 3600 },
+        { label: "36 hours beforehand", key: "36h", value: 36 * 3600 },
+        { label: "48 hours beforehand", key: "48h", value: 48 * 3600 },
         { label: "Never", key: "no", value: -1 }
       ]
     });
