@@ -221,13 +221,10 @@ var sched4 = (function() {
   function closeReminderModal(ta, options, uid, reminderModal) {
     var state = sched.getState(ta);
     options.reminder_message = $("#sched-reminder-message").val();
-    log("Options after:", uid, options);
     state.participant_options =
       list.replace(state.participant_options, options, function(x) {
         return x.uid === options.uid;
       });
-    log("Replaced:", uid, state.participant_options);
-    log("Task:", uid, ta);
     api.postTask(ta);
     reminderModal.modal("hide");
   }
@@ -279,7 +276,6 @@ var sched4 = (function() {
     var options = sched.getGuestOptions(ta)[uid];
 
     edit.click(function() {
-      log("Options before:", uid, options);
       preFillReminderModal(profs, ta, options, uid);
 
       var okButton = $("#sched-reminder-update");
