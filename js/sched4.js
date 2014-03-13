@@ -98,6 +98,7 @@ var sched4 = (function() {
       exec_name: hostName,
       guest_name: toName,
       guest_uid: toUid,
+      meet_type: slot.meeting_type,
       meet_date: date.weekDay(t1) + ", " + date.dateOnly(t1),
       meet_time: (
         ta.task_data[1].hide_end_times ?
