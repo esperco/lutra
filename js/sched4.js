@@ -299,9 +299,13 @@ var sched4 = (function() {
       buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
-        { label: "24 hours before event", key: "24h", value: 2 * 43200 },
-        { label: "36 hours before event", key: "36h", value: 3 * 43200 },
-        { label: "48 hours before event", key: "48h", value: 4 * 43200 },
+        { label: "1 hour before event", key: "1h", value: 3600 },
+        { label: "3 hours before event", key: "3h", value: 3 * 3600 },
+        { label: "6 hours before event", key: "6h", value: 6 * 3600 },
+        { label: "12 hours before event", key: "12h", value: 12 * 3600 },
+        { label: "24 hours before event", key: "24h", value: 24 * 3600 },
+        { label: "36 hours before event", key: "36h", value: 36 * 3600 },
+        { label: "48 hours before event", key: "48h", value: 48 * 3600 },
         { label: "Never", key: "no", value: -1 }
       ]
     });
@@ -310,6 +314,14 @@ var sched4 = (function() {
     var key = "no";
     if (! util.isDefined(initVal))
       key = "no";
+    else if (initVal < 3600 + 0.5)
+      key = "1h";
+    else if (initVal < 3 * 3600 + 0.5)
+      key = "3h";
+    else if (initVal < 6 * 3600 + 0.5)
+      key = "6h";
+    else if (initVal < 12 * 3600 + 0.5)
+      key = "12h";
     else if (initVal < 24 * 3600 + 0.5)
       key = "24h";
     else if (initVal < 36 * 3600 + 0.5)
