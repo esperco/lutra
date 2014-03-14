@@ -571,14 +571,26 @@ var settings = (function() {
       $("#edit-confirmation-offer").off("click");
       $("#edit-confirmation-offer").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Confirmation: Send to Guest");
+        $("#edit-template-title").text("Meeting Confirmation: Send to Guest");
         editTemplate(templates, "Confirmation_to_guest");
       });
       $("#edit-confirmation-offer-ea").off("click");
       $("#edit-confirmation-offer-ea").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Confirmation: Send to Guest's EA");
+        $("#edit-template-title").text("Meeting Confirmation: Send to Guest's EA");
         editTemplate(templates, "Confirmation_to_guest_assistant");
+      });
+      $("#edit-phone-confirmation-offer").off("click");
+      $("#edit-phone-confirmation-offer").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Phone Confirmation: Send to Guest");
+        editTemplate(templates, "Phone_confirmation_to_guest");
+      });
+      $("#edit-phone-confirmation-offer-ea").off("click");
+      $("#edit-phone-confirmation-offer-ea").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Phone Confirmation: Send to Guest's EA");
+        editTemplate(templates, "Phone_confirmation_to_guest_assistant");
       });
       $("#edit-reminder-approval").off("click");
       $("#edit-reminder-approval").on("click", function() {
@@ -589,14 +601,26 @@ var settings = (function() {
       $("#edit-reminder-offer").off("click");
       $("#edit-reminder-offer").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Reminder: Send to Guest");
+        $("#edit-template-title").text("Meeting Reminder: Send to Guest");
         editTemplate(templates, "Reminder_to_guest");
       });
       $("#edit-reminder-offer-ea").off("click");
       $("#edit-reminder-offer-ea").on("click", function() {
         showAllTags();
-        $("#edit-template-title").text("Reminder: Send to Guest's EA");
+        $("#edit-template-title").text("Meeting Reminder: Send to Guest's EA");
         editTemplate(templates, "Reminder_to_guest_assistant");
+      });
+      $("#edit-phone-reminder-offer").off("click");
+      $("#edit-phone-reminder-offer").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Phone Reminder: Send to Guest");
+        editTemplate(templates, "Phone_reminder_to_guest");
+      });
+      $("#edit-phone-reminder-offer-ea").off("click");
+      $("#edit-phone-reminder-offer-ea").on("click", function() {
+        showAllTags();
+        $("#edit-template-title").text("Phone Reminder: Send to Guest's EA");
+        editTemplate(templates, "Phone_reminder_to_guest_assistant");
       });
     });
   }
