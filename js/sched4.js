@@ -51,15 +51,13 @@ var sched4 = (function() {
     })
   }
 
-  function loadReminderRecipients(profs, guests) {
+  function loadReminderRecipients(toObsProf) {
     $("#sched-reminder-to-list").children().remove();
 
-    list.iter(guests, function(uid) {
-      var toObsProf = profs[uid];
-      var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
-        .appendTo($("#sched-reminder-to-list"));
-      loadRecipientRow(recipientRow, toObsProf);
-    });
+    var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
+      .appendTo($("#sched-reminder-to-list"));
+
+    loadRecipientRow(recipientRow, toObsProf);
   }
 
   function loadConfirmRecipients(toObsProf) {
@@ -182,20 +180,22 @@ var sched4 = (function() {
       });
   }
 
-  function preFillReminderModal(profs, ta, reserved, guests) {
-    loadReminderRecipients(profs, guests);
+  function preFillReminderModal(profs, ta, options, toUid) {
+    var toObsProf = profs[toUid];
+    loadReminderRecipients(toObsProf);
 
     $("#sched-reminder-subject")
       .val("Re: " + ta.task_status.task_title);
 
-    if (reserved.reminder_message) {
-      $("#sched-reminder-message").val(reserved.reminder_message);
+    if (options.reminder_message) {
+      $("#sched-reminder-message").val(options.reminder_message);
     }
 
     var parameters = {
-      guest_name: $(".recipient-name").first().text()
+      guest_name: profile.fullName(toObsProf.prof),
+      guest_uid: toUid
     };
-    var ea = sched.assistedBy(guests[0], sched.getGuestOptions(ta));
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Reminder_to_guest_assistant";
@@ -206,7 +206,7 @@ var sched4 = (function() {
     }
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
-        if (! reserved.reminder_message) {
+        if (! options.reminder_message) {
           $("#sched-reminder-message").val(x.message_text);
         }
         $("#sched-reminder-guest-addr")
@@ -217,6 +217,17 @@ var sched4 = (function() {
 
 
   /* REMINDERS */
+
+  function closeReminderModal(ta, options, uid, reminderModal) {
+    var state = sched.getState(ta);
+    options.reminder_message = $("#sched-reminder-message").val();
+    state.participant_options =
+      list.replace(state.participant_options, options, function(x) {
+        return x.uid === options.uid;
+      });
+    api.postTask(ta);
+    reminderModal.modal("hide");
+  }
 
   function createReminderRow(profs, ta, uid, guests) {
 '''
@@ -259,25 +270,24 @@ var sched4 = (function() {
       .text(guestStatusText)
       .appendTo(view);
 
-    edit.click(editReminderEmail);
 
     var reminderModal = $("#sched-reminder-modal");
-    var reserved = sched.getState(ta).reserved;
-    function closeReminderModal() {
-      reserved.reminder_message = $("#sched-reminder-message").val();
-      api.postTask(ta);
-      reminderModal.modal("hide");
-    }
+    var state = sched.getState(ta);
+    var options = sched.getGuestOptions(ta)[uid];
 
-    function editReminderEmail() {
-      preFillReminderModal(profs, ta, reserved, guests);
+    edit.click(function() {
+      preFillReminderModal(profs, ta, options, uid);
+
+      var okButton = $("#sched-reminder-update");
+      okButton
+        .off("click")
+        .click(function() {
+          closeReminderModal(ta, options, uid, reminderModal)
+        });
+
       reminderModal.modal({});
-    }
+    });
 
-    var okButton = $("#sched-reminder-update");
-    okButton
-      .off("click")
-      .click(closeReminderModal);
 
     return view;
   }
@@ -299,9 +309,13 @@ var sched4 = (function() {
       buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
-        { label: "24 hours before event", key: "24h", value: 2 * 43200 },
-        { label: "36 hours before event", key: "36h", value: 3 * 43200 },
-        { label: "48 hours before event", key: "48h", value: 4 * 43200 },
+        { label: "1 hour beforehand", key: "1h", value: 3600 },
+        { label: "3 hours beforehand", key: "3h", value: 3 * 3600 },
+        { label: "6 hours beforehand", key: "6h", value: 6 * 3600 },
+        { label: "12 hours beforehand", key: "12h", value: 12 * 3600 },
+        { label: "24 hours beforehand", key: "24h", value: 24 * 3600 },
+        { label: "36 hours beforehand", key: "36h", value: 36 * 3600 },
+        { label: "48 hours beforehand", key: "48h", value: 48 * 3600 },
         { label: "Never", key: "no", value: -1 }
       ]
     });
@@ -310,6 +324,14 @@ var sched4 = (function() {
     var key = "no";
     if (! util.isDefined(initVal))
       key = "no";
+    else if (initVal < 3600 + 0.5)
+      key = "1h";
+    else if (initVal < 3 * 3600 + 0.5)
+      key = "3h";
+    else if (initVal < 6 * 3600 + 0.5)
+      key = "6h";
+    else if (initVal < 12 * 3600 + 0.5)
+      key = "12h";
     else if (initVal < 24 * 3600 + 0.5)
       key = "24h";
     else if (initVal < 36 * 3600 + 0.5)
@@ -761,6 +783,7 @@ var sched4 = (function() {
   </div>
 </div>
 '''
+    var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
     var typ = sched.meetingType(state);
@@ -788,8 +811,35 @@ var sched4 = (function() {
       }
     }
 
+    function rescheduleClick() {
+      api.cancelCalendar(tid).done(function() {
+        task.task_status.task_progress = "Coordinating";
+        state.scheduling_stage = "Find_availability";
+        state.calendar_options = [];
+        delete state.reserved;
+        api.postTask(task).done(function() {
+          observable.onTaskModified.notify(task);
+          sched.loadTask(task);
+        });
+      });
+    }
+
+    function cancelAndArchiveClick() {
+      api.cancelCalendar(tid).done(function() {
+        task.task_status.task_progress = "Closed";
+        delete state.reserved;
+        api.postTask(task).done(function() {
+          api.archiveTask(tid);
+          observable.onTaskArchived.notify(tid);
+          page.home.load();
+        });
+      });
+    }
+
     edit.click(toggleEditMode);
     editDetails.click(toggleEditMode);
+    reschedule.click(rescheduleClick);
+    cancel.click(cancelAndArchiveClick);
 
     return view;
   }
