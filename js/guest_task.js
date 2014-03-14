@@ -228,11 +228,11 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(x.calendar_event_title.title_text,
+      window.open(googleCalendarURL(sched.getCalendarTitle(x),
                                     window.location,
                                     x.reserved.slot,
                                     x.hide_end_times));
-    })
+    });
 
     button.popover({
       html:true,
@@ -257,7 +257,7 @@ var guestTask = function() {
   function viewOfMeetingHeader(task, ta, state) {
     var view = $("<div id='meeting-header'/>");
     var title = $("<div id='meeting-title'/>")
-      .text(state.calendar_event_title.title_text)
+      .text(sched.getCalendarTitle(state))
       .appendTo(view);
 
     if (! list.mem(task.guest_hosts, task.guest_uid)) {
@@ -538,12 +538,12 @@ var guestTask = function() {
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
-          var typ = sched.meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             if (util.isNotNull(myLast.answers[choice.label])) {
               answers[choice.label] = choice;
             }
             var label = indexLabel(i);
+            var typ = sched.formatMeetingType(choice.slot);
             options.append(viewOfCalendarOption(choice, label, typ,
                                                 state.hide_end_times));
           });
