@@ -87,7 +87,7 @@ var api = function() {
     return jsonHttpPost(apiPrefix() + "/chat", JSON.stringify(chatItem));
   };
 
-  mod.postChatItemRead = function(chatId, itemId) {
+  mod.postChatItemRead = function(itemId) {
     return jsonHttpPost(apiPrefix() + "/chat/" + itemId + "/read", "");
   };
 

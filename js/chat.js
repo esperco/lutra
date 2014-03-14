@@ -17,30 +17,6 @@ var chat = (function () {
     return profile.veryShortNameOfProfile(p);
   }
 
-  function chat_participant_names(chat) {
-    var me = login.me();
-    var names = null;
-    var someone_else = false;
-    for (var i in chat.chat_participants) {
-      var uid = chat.chat_participants[i].par_uid;
-      if (uid !== me) {
-        var p = profiles[uid].prof;
-        if (! p) {
-          someone_else = true;
-        } else if (names) {
-          names += ", " + profile.fullName(p);
-        } else {
-          names = profile.fullName(p);
-        }
-      }
-    }
-    if (names) {
-      return someone_else ? names + ", and others" : names;
-    } else {
-      return "Guest";
-    }
-  }
-
   function viewOfChatText(text) {
     var view = $("<div/>");
     var paragraphs = text.split(/\n{2,}/);
@@ -203,6 +179,9 @@ var chat = (function () {
 
   function viewOfChatItem(item, time, status) {
     var view = $("<div/>");
+    if (util.isNotNull(item.id)) {
+      view.attr("id", "chat-" + item.id);
+    }
 
     var sender = $("<div class='message-sender'/>")
       .append(initials(item.by))
@@ -338,7 +317,7 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
-  function chatEditor(blank, messages, chat, task, textBox, writeButton) {
+  function chatEditor(blank, messages, task, textBox, writeButton) {
     var chatFooter = $("<div class='chat-footer scrollable'/>");
     var editor = $("<div class='chat-editor'/>")
       .append(textBox)
@@ -346,7 +325,7 @@ var chat = (function () {
 
     textBox.autosize();
 
-    if (chat.chat_items.length === 0) {
+    if (task.task_chat_items.length === 0) {
       textBox.attr("placeholder", "Write a message...");
     } else {
       textBox.attr("placeholder", "Write a reply...");
@@ -407,9 +386,9 @@ var chat = (function () {
       if (data) {
         var me = login.me();
         var item = {
-          chatid: chat.chatid,
+          tid: task.tid,
           by: me,
-          for: me,
+          to: task.task_participants.organized_by,
           chat_item_data:data
         };
         textBox.val("");
@@ -426,7 +405,7 @@ var chat = (function () {
         //   }
         // }
 
-        if (chat.chat_items.length === 0) {
+        if (task.task_chat_items.length === 0) {
           blank.addClass("hide");
         }
 
@@ -445,21 +424,23 @@ var chat = (function () {
   var observeChatPosted = 0;
 
   function chatPosting(item) {
-    var view = $("#chat" + item.chatid + " .messages");
-    if (0 < view.length) {
-      var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-      view.prepend(tempItemView);
-
-      var key = ++observeChatPosted;
-      observable.onChatPosted.observe(key, function(item) {
-        tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
-                                                statusOfChatItem(item)));
-        observable.onChatPosted.stopObserve(key);
-      });
+    var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+    var itemView = util.isNotNull(item.id) ? $("#chat-" + item.id) : [];
+    if (itemView.length > 0) {
+      itemView.replaceWith(tempItemView);
+    } else {
+      $(".chat-panel .messages").prepend(tempItemView);
     }
+
+    var key = ++observeChatPosted;
+    observable.onChatPosted.observe(key, function(item) {
+      tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
+                                              statusOfChatItem(item)));
+      observable.onChatPosted.stopObserve(key);
+    });
   }
 
-  function chatView(chat, task) {
+  function chatView(task) {
     var me = login.me();
     var v = $("<div/>");
     var textBox = $("<textarea class='chat-entry'></textarea>");
@@ -476,13 +457,13 @@ var chat = (function () {
           textBox.focus();
         });
 
-      if (chat.chat_items.length === 0) {
+      if (task.task_chat_items.length === 0) {
         writeButton.attr("placeholder", "Write a message...");
       } else {
         writeButton.attr("placeholder", "Write a reply...");
       }
 
-      writeArea = chatEditor(blank, messages, chat, task, textBox, writeButton)
+      writeArea = chatEditor(blank, messages, task, textBox, writeButton)
         .addClass("hide")
         .appendTo(v);
     }
@@ -501,24 +482,23 @@ var chat = (function () {
            .append($("<hr/>"));
     }
 
-    if (chat.chat_items.length === 0) {
+    if (task.task_chat_items.length === 0) {
       blank.removeClass("hide");
     } else {
-      for (var i in chat.chat_items) {
-        var item = chat.chat_items[i];
+      list.iter(task.task_chat_items, function(item) {
         var status;
         if (! item.time_read && item.id && me !== item.by) {
-          api.postChatItemRead(item.chatid, item.id);
+          api.postChatItemRead(item.id);
           status = "Read";
         } else {
           status = statusOfChatItem(item);
         }
         messages.prepend(viewOfChatItem(item, item.time_created, status));
-      }
+      });
     }
 
     if ($("#chat").hasClass("modal-body")) {
-      v.append(chatEditor(blank, messages, chat, task, textBox, null));
+      v.append(chatEditor(blank, messages, task, textBox, null));
     }
 
     return v;
@@ -553,64 +533,34 @@ var chat = (function () {
     updateUnreadCount(0);
 
     var tabs = $(".chat-profile-tabs");
-    var tab_content = $(".chat-panel");
 
     profile.profilesOfTaskParticipants(ta)
-      .done(function(profs) {
-        profiles = profs;
+    .done(function(profs) {
+      profiles = profs;
+      $(".chat-panel").append(chatView(ta));
 
-        var first_tab = true;
+      var tab = $("<a>All</a>", {"class":"tab-name", "data-toggle":"tab"});
+      tabs.append($("<li class='chat-tab-div'/>").append(tab));
 
-        /* move group chat to first position */
-        var singleChats = list.filter(ta.task_chats, function(x) {
-          return x.chatid !== ta.task_context_chat;
-        });
-        var groupChats = list.filter(ta.task_chats, function(x) {
-          return x.chatid === ta.task_context_chat;
-        });
-        var chats = list.concat([groupChats, singleChats]);
+      observable.onChatPosting.observe("chat-tabs", chatPosting);
+      observable.onTaskParticipantsChanged
+                              .observe("chat-tabs", mod.loadTaskChats);
+    });
+  }
 
-        list.iter(chats, function(chat) {
-          var isGroupChat = chat.chatid === ta.task_context_chat;
-          var peerUid = chat.chat_with;
-          var taskParticipants =
-            ta.task_participants.organized_for
-            .concat(ta.task_participants.organized_by);
+  mod.loadGuestTaskChats = function(ta) {
+    mod.clearTaskChats();
+    updateUnreadCount(0);
 
-          /* Do not display a chat tab for former participants */
-          if (! isGroupChat
-              && ! list.mem(taskParticipants, peerUid))
-            return;
+    profile.profilesOfTaskParticipants(ta)
+    .done(function(profs) {
+      profiles = profs;
+      $(".chat-panel").append(chatView(ta));
 
-          var pane_id = "chat" + chat.chatid;
-          var tab = $("<a/>", {
-            href:"#"+pane_id,
-            "class":"tab-name",
-            "data-toggle":"tab",
-          });
-          tabs.append($("<li class='chat-tab-div'/>")
-              .append(tab));
-          tab_content.append($("<div/>", {id:pane_id, "class":"tab-pane"})
-                     .append(chatView(chat, ta)));
-          if (isGroupChat) {
-            tab.append("All");
-          } else {
-            if (! util.isDefined(peerUid))
-              peerUid = chat.chat_participants[0].par_uid;
-            var p = profiles[peerUid].prof;
-            tab.append(document.createTextNode(profile.fullName(p)));
-          }
-          if (first_tab) {
-            $(".chat-tab-div").addClass("active");
-            $("#" + pane_id).addClass("active");
-            first_tab = false;
-          }
-        });
-
-        observable.onChatPosting.observe("chat-tabs", chatPosting);
-        observable.onTaskParticipantsChanged
-                                .observe("chat-tabs", mod.loadTaskChats);
-      });
+      observable.onChatPosting.observe("chat-tabs", chatPosting);
+      observable.onTaskParticipantsChanged
+                              .observe("chat-tabs", mod.loadGuestTaskChats);
+    });
   }
 
   return mod;
