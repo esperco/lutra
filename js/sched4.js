@@ -96,7 +96,6 @@ var sched4 = (function() {
       exec_name: hostName,
       guest_name: toName,
       guest_uid: toUid,
-      meet_type: slot.meeting_type,
       meet_date: date.weekDay(t1) + ", " + date.dateOnly(t1),
       meet_time: (
         ta.task_data[1].hide_end_times ?
@@ -771,7 +770,7 @@ var sched4 = (function() {
     var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
-    var typ = sched.meetingType(state);
+    var typ = sched.formatMeetingType(state);
     var hideEndTime = state.hide_end_times;
     info.append(sched.viewOfOption(choice, typ, hideEndTime));
 

@@ -148,9 +148,14 @@ var sched = (function() {
     return view;
   }
 
-  mod.meetingType = function(state) {
-    if (state.meeting_request && state.meeting_request.meeting_type) {
-      var typ = variant.cons(state.meeting_request.meeting_type);
+  /*
+    Get meeting type for a confirmed event and perform some translation
+    for display purposes.
+   */
+  mod.formatMeetingType = function(state) {
+    if (util.isDefined(state.reserved)) {
+      var slot = state.reserved.slot;
+      var typ = slot.meeting_type;
       switch (typ) {
         case "Call":      return "Phone Call";
         case "Nightlife": return "Night Life";
