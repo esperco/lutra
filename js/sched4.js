@@ -70,7 +70,8 @@ var sched4 = (function() {
   }
 
   function preFillConfirmModal(profs, ta, toUid) {
-    var toObsProf = profs[toUid];
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
     var slot = getSlot(ta);
 
     loadConfirmRecipients(toObsProf);
@@ -80,7 +81,7 @@ var sched4 = (function() {
 
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
-    var toName = profile.fullName(toObsProf.prof);
+    var toName = profile.fullName(profs[toUid].prof);
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
@@ -103,7 +104,7 @@ var sched4 = (function() {
         date.timeOnly(t1) + " to " + date.timeOnly(t2)
       )
     };
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       $("#sched-confirm-guest-addr").val("Address_to_assistant");
@@ -207,9 +208,11 @@ var sched4 = (function() {
   }
 
   function preFillReminderModal(profs, ta, options, toUid) {
-    var toObsProf = profs[toUid];
-    loadReminderRecipients(toObsProf);
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
     var slot = getSlot(ta);
+
+    loadReminderRecipients(toObsProf);
 
     $("#sched-reminder-subject")
       .val("Re: " + ta.task_status.task_title);
@@ -219,7 +222,7 @@ var sched4 = (function() {
     }
 
     var parameters = {
-      guest_name: profile.fullName(toObsProf.prof),
+      guest_name: profile.fullName(profs[toUid].prof),
       guest_uid: toUid
     };
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
