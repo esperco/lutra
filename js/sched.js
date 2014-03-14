@@ -152,17 +152,12 @@ var sched = (function() {
     Get meeting type for a confirmed event and perform some translation
     for display purposes.
    */
-  mod.formatMeetingType = function(state) {
-    if (util.isDefined(state.reserved)) {
-      var slot = state.reserved.slot;
-      var typ = slot.meeting_type;
-      switch (typ) {
-        case "Call":      return "Phone Call";
-        case "Nightlife": return "Night Life";
-        default:          return typ;
-      }
-    } else {
-      return "Meeting";
+  mod.formatMeetingType = function(slot) {
+    var typ = slot.meeting_type;
+    switch (typ) {
+    case "Call":      return "Phone Call";
+    case "Nightlife": return "Night Life";
+    default:          return typ;
     }
   }
 

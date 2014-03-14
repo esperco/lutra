@@ -770,7 +770,7 @@ var sched4 = (function() {
     var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
-    var typ = sched.formatMeetingType(state);
+    var typ = sched.formatMeetingType(choice.slot);
     var hideEndTime = state.hide_end_times;
     info.append(sched.viewOfOption(choice, typ, hideEndTime));
 

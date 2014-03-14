@@ -537,12 +537,12 @@ var guestTask = function() {
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
-          var typ = sched.meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             if (util.isNotNull(myLast.answers[choice.label])) {
               answers[choice.label] = choice;
             }
             var label = indexLabel(i);
+            var typ = sched.formatMeetingType(choice.slot);
             options.append(viewOfCalendarOption(choice, label, typ,
                                                 state.hide_end_times));
           });
