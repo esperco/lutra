@@ -177,9 +177,15 @@ var chat = (function () {
     }
   }
 
+  function showAllItem(item, itemView) {
+    itemView.removeClass("hide");
+  }
+  var showItem = showAllItem;
+
   function viewOfChatItem(item, time, status) {
-    var view = $("<div/>");
+    var view = $("<div/>", {"class":"chatitem"});
     if (util.isNotNull(item.id)) {
+      chatItems[item.id] = item;
       view.attr("id", "chat-" + item.id);
     }
 
@@ -212,6 +218,7 @@ var chat = (function () {
     // message.append($("<div class='message-status' />").append(status));
     view.append($("<hr/>"));
 
+    showItem(item, view);
     return view;
   }
 
@@ -317,6 +324,8 @@ var chat = (function () {
     return "" === text ? null : ["Message", text];
   }
 
+  var chatRecipients;
+
   function chatEditor(blank, messages, task, textBox, writeButton) {
     var chatFooter = $("<div class='chat-footer scrollable'/>");
     var editor = $("<div class='chat-editor'/>")
@@ -388,7 +397,7 @@ var chat = (function () {
         var item = {
           tid: task.tid,
           by: me,
-          to: task.task_participants.organized_by,
+          to: chatRecipients,
           chat_item_data:data
         };
         textBox.val("");
@@ -421,23 +430,27 @@ var chat = (function () {
     return chatFooter;
   }
 
+  var chatTid;
+  var chatItems;
   var observeChatPosted = 0;
 
   function chatPosting(item) {
-    var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
-    var itemView = util.isNotNull(item.id) ? $("#chat-" + item.id) : [];
-    if (itemView.length > 0) {
-      itemView.replaceWith(tempItemView);
-    } else {
-      $(".chat-panel .messages").prepend(tempItemView);
-    }
+    if (item.tid === chatTid) {
+      var tempItemView = viewOfChatItem(item, Date.now(), "Posting");
+      var itemView = util.isNotNull(item.id) ? $("#chat-" + item.id) : [];
+      if (itemView.length > 0) {
+        itemView.replaceWith(tempItemView);
+      } else {
+        $(".chat-panel .messages").prepend(tempItemView);
+      }
 
-    var key = ++observeChatPosted;
-    observable.onChatPosted.observe(key, function(item) {
-      tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
-                                              statusOfChatItem(item)));
-      observable.onChatPosted.stopObserve(key);
-    });
+      var key = ++observeChatPosted;
+      observable.onChatPosted.observe(key, function(item) {
+        tempItemView.replaceWith(viewOfChatItem(item, item.time_created,
+                                                statusOfChatItem(item)));
+        observable.onChatPosted.stopObserve(key);
+      });
+    }
   }
 
   function chatView(task) {
@@ -520,17 +533,19 @@ var chat = (function () {
   }
 
   mod.loadTaskChats = function(ta) {
+    chatTid = ta.tid;
+    chatItems = {};
+    chatRecipients = ta.task_participants.organized_for;
+
     mod.clearTaskChats();
+    updateUnreadCount(0);
 
     var chatModal = $("#chat-modal");
-
     $("#chat-icon-container")
       .unbind("click")
       .click(function() {
         chatModal.modal({});
       })
-
-    updateUnreadCount(0);
 
     var tabs = $(".chat-profile-tabs");
 
@@ -539,8 +554,33 @@ var chat = (function () {
       profiles = profs;
       $(".chat-panel").append(chatView(ta));
 
-      var tab = $("<a>All</a>", {"class":"tab-name", "data-toggle":"tab"});
-      tabs.append($("<li class='chat-tab-div'/>").append(tab));
+      var allTab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
+      allTab.text("All");
+      allTab.click(function() {
+        chatRecipients = ta.task_participants.organized_for;
+        showItem = showAllItem;
+        $(".chatitem").removeClass("hide");
+      });
+      tabs.append($("<li class='active chat-tab-div'/>").append(allTab));
+
+      list.iter(ta.task_participants.organized_for, function(uid) {
+        var tab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
+        tab.text(profile.fullName(profiles[uid].prof));
+        tab.click(function() {
+          chatRecipients = [uid];
+          showItem = function(item, itemView) {
+            if (item.by === uid || list.mem(item.to, uid)) {
+              itemView.removeClass("hide");
+            } else {
+              itemView.addClass("hide");
+            }
+          };
+          for (var itemId in chatItems) {
+            showItem(chatItems[itemId], $("#chat-" + itemId));
+          }
+        });
+        tabs.append($("<li class='chat-tab-div'/>").append(tab));
+      });
 
       observable.onChatPosting.observe("chat-tabs", chatPosting);
       observable.onTaskParticipantsChanged
@@ -549,6 +589,10 @@ var chat = (function () {
   }
 
   mod.loadGuestTaskChats = function(ta) {
+    chatTid = ta.tid;
+    chatItems = {};
+    chatRecipients = ta.task_participants.organized_by;
+
     mod.clearTaskChats();
     updateUnreadCount(0);
 
