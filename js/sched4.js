@@ -539,8 +539,7 @@ var sched4 = (function() {
   function updateCalendarEvent(param) {
     var task = param.task;
     var taskState = sched.getState(task);
-    taskState.calendar_event_title.title_text = param.titleEdit.val();
-    taskState.calendar_event_title.is_generated = false;
+    taskState.calendar_event_title.custom = param.titleEdit.val();
     taskState.public_notes = param.notesBoxPublic.val();
     taskState.private_notes = param.notesBoxPrivate.val();
     api.postTask(task).done(function() {
@@ -575,7 +574,7 @@ var sched4 = (function() {
     var titleEditBox = $("<div class='meeting-detail'/>")
       .appendTo(title);
     var titleEdit = $("<input type='text' class='form-control'/>")
-      .val(state.calendar_event_title.title_text)
+      .val(sched.getCalendarTitle(state))
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })

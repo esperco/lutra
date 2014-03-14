@@ -28,6 +28,11 @@ var sched = (function() {
     task.task_data = ["Scheduling", state];
   };
 
+  mod.getCalendarTitle = function(state) {
+    var t = state.calendar_event_title;
+    return util.isString(t.custom) ? t.custom : t['default'];
+  };
+
   mod.isGuest = function(uid) {
     var team = login.getTeam();
     return ! list.mem(team.team_leaders, uid);
@@ -174,7 +179,8 @@ var sched = (function() {
 
     view.click(function() {
       // window.open(getDirections(x));
-      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+      window.open("http://www.google.com/maps/search/"
+                  + encodeURIComponent(locText));
     });
 
     return view;
