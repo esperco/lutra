@@ -3,25 +3,17 @@
 var sched4 = (function() {
   var mod = {};
 
-  var chats = null;
-
   function getSlot(ta) {
     var state = sched.getState(ta);
     return state.reserved.slot;
   }
 
-  function sentConfirmation(uid) {
-    var chat = chats[uid];
-    return chat && list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Sched_confirm");
-    });
+  function sentConfirmation(ta, uid) {
+    return sched.sentEmail(ta, uid, "Sched_confirm");
   }
 
-  function sentReminder(uid) {
-    var chat = chats[uid];
-    return chat && list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Sched_remind");
-    });
+  function sentReminder(ta, uid) {
+    return sched.sentEmail(ta, uid, "Sched_remind");
   }
 
   function reservedCalendarSlot(task) {
@@ -300,7 +292,7 @@ var sched4 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sentReminder(uid)) {
+    if (sentReminder(ta, uid)) {
       chatHead.addClass("sent");
       edit.addClass("btn-default disabled");
       editIcon.addClass("sent");
@@ -314,7 +306,7 @@ var sched4 = (function() {
       .addClass("reminder-guest-name")
       .appendTo(view);
 
-    var guestStatusText = sentReminder(uid) ?
+    var guestStatusText = sentReminder(ta, uid) ?
       "Reminder sent" :
       getReminderStatus(ta);
     var guestStatus = $("<div class='reminder-guest-status'/>")
@@ -440,7 +432,7 @@ var sched4 = (function() {
       var reminderRow = createReminderRow(profs, task, uid, guests);
       content.append(reminderRow.row);
       statuses.push(reminderRow.statusText);
-      if (sentReminder(uid))
+      if (sentReminder(task, uid))
         reminderSent = true;
     });
 
@@ -476,7 +468,7 @@ var sched4 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sentConfirmation(uid)) {
+    if (sentConfirmation(ta, uid)) {
       chatHead.addClass("sent");
       compose.addClass("btn-default");
       composeIcon.addClass("sent");
@@ -490,7 +482,7 @@ var sched4 = (function() {
       .addClass("confirmation-guest-name")
       .appendTo(view);
 
-    var guestStatusText = sentConfirmation(uid) ?
+    var guestStatusText = sentConfirmation(ta, uid) ?
       "Confirmation sent" :
       "Has not received a confirmation";
     var guestStatus = $("<div class='confirmation-guest-status'/>")
@@ -519,13 +511,11 @@ var sched4 = (function() {
                 uid = ea;
               }
             }
-            var chatid = chats[uid].chatid;
             var hideEnd = ta.task_data[1].hide_end_times;
             var chatItem = {
-              chatid: chatid,
+              tid: ta.tid,
               by: login.me(),
-              'for': login.me(),
-              team: login.getTeam().teamid,
+              to: [uid],
               chat_item_data: ["Sched_confirm", {
                 body: body,
                 'final': getSlot(ta),
@@ -592,7 +582,7 @@ var sched4 = (function() {
       x.view.appendTo(content);
       // if (guests.length == 1) {
       //   var uid = guests[0];
-      //   if (! sentConfirmation(uid))
+      //   if (! sentConfirmation(ta, uid))
       //     x.composeConfirmationEmail();
       // }
     });
@@ -934,7 +924,6 @@ var sched4 = (function() {
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var guests = sched.getAttendingGuests(ta);
-    chats = sched.chatsOfTask(ta);
 
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
@@ -945,9 +934,9 @@ var sched4 = (function() {
     var confirmationSent = false;
     var reminderSent = false;
     list.iter(guests, function(uid) {
-      if (sentConfirmation(uid))
+      if (sentConfirmation(ta, uid))
         confirmationSent = true;
-      if (sentReminder(uid))
+      if (sentReminder(ta, uid))
         reminderSent = true;
     });
 
@@ -957,9 +946,6 @@ var sched4 = (function() {
       toggleModule("confirm");
     }
 
-    observable.onTaskParticipantsChanged.observe("step4", function(ta) {
-      chats = sched.chatsOfTask(ta);
-    });
     /* Task is always saved when remind changes. */
     observable.onSchedulingStepChanging.stopObserve("step");
   };

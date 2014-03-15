@@ -153,12 +153,10 @@ var profile = (function() {
     acc = list.union(acc, taskPar.organized_by);
     acc = list.union(acc, taskPar.organized_for);
 
-    list.iter(ta.task_chats, function(chat) {
-      var uids = list.map(chat.chat_participants, function(x) {
-        return x.par_uid;
-      });
-      acc = list.union(acc, uids);
+    var uids = list.map(ta.task_participant_status, function(x) {
+      return x.par_uid;
     });
+    acc = list.union(acc, uids);
 
     return acc;
   }
