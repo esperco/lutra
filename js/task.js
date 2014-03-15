@@ -250,7 +250,7 @@ var task = (function() {
       $("#workflow-gen").prop("checked", true);
       window.location.hash = "!task";
     });
-    $("#new-sched-task-btn").click(function () {
+    $("#new-meeting-btn").click(function () {
       $("#workflow-sched").prop("checked", true);
       window.location.hash = "!task";
     });

@@ -63,33 +63,33 @@ var display = (function() {
     }
 
     /*** Home ***/
-    if ($(window).width() < 768) {
-      $('#desktop-navbar').addClass('hide');
-      $('#mobile-navbar').removeClass('hide');
-      $('.mobile-nav-tabs').addClass('nav-tabs-centered');
-      $('.home-container').removeClass('navbar-open');
-      $('#home-push').removeClass('hide');
-      $('.page-title').addClass('hide');
-      $('.new-task-btn').addClass('hide');
-      $('.new-place-btn').addClass('hide');
-    } else {
-      $('#desktop-navbar').removeClass('hide');
-      $('#mobile-navbar').addClass('hide');
-      $('.mobile-nav-tabs').removeClass('nav-tabs-centered');
-      $('.home-container').addClass('navbar-open');
-      $('#home-push').addClass('hide');
-      $('.page-title').removeClass('hide');
-      $('.new-task-btn').removeClass('hide');
-      $('.new-place-btn').removeClass('hide');
-    }
+    // if ($(window).width() < 768) {
+    //   $('#desktop-navbar').addClass('hide');
+    //   $('#mobile-navbar').removeClass('hide');
+    //   $('.mobile-nav-tabs').addClass('nav-tabs-centered');
+    //   $('.home-container').removeClass('navbar-open');
+    //   $('#home-push').removeClass('hide');
+    //   $('.page-title').addClass('hide');
+    //   $('.new-task-btn').addClass('hide');
+    //   $('.new-place-btn').addClass('hide');
+    // } else {
+    //   $('#desktop-navbar').removeClass('hide');
+    //   $('#mobile-navbar').addClass('hide');
+    //   $('.mobile-nav-tabs').removeClass('nav-tabs-centered');
+    //   $('.home-container').addClass('navbar-open');
+    //   $('#home-push').addClass('hide');
+    //   $('.page-title').removeClass('hide');
+    //   $('.new-task-btn').removeClass('hide');
+    //   $('.new-place-btn').removeClass('hide');
+    // }
 
-    if ($(window).width() < 992) {
-      $('.desktop-nav-tabs').addClass('hide');
-      $('.mobile-nav-tabs').removeClass('hide');
-    } else {
-      $('.desktop-nav-tabs').removeClass('hide');
-      $('.mobile-nav-tabs').addClass('hide');
-    }
+    // if ($(window).width() < 992) {
+    //   $('.desktop-nav-tabs').addClass('hide');
+    //   $('.mobile-nav-tabs').removeClass('hide');
+    // } else {
+    //   $('.desktop-nav-tabs').removeClass('hide');
+    //   $('.mobile-nav-tabs').addClass('hide');
+    // }
 
     /*** Lists ***/
 
@@ -117,8 +117,8 @@ var display = (function() {
   };
 
   mod.checkWidth = function() {
-    if (!$('#home-page').hasClass('hide'))
-      mod.updateHome();
+    // if (!$('#home-page').hasClass('hide'))
+    //   mod.updateHome();
 
     if (!$('#task-page').hasClass('hide'))
       mod.updateTask();

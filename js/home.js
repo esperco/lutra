@@ -19,55 +19,113 @@ var home = (function() {
       });
   }
 
+  function taskSubject(ta) {
+    // get subject of the task's email conversation
+    return "Email subject line";
+  }
+
   function viewOfTaskRow(ta) {
-    var view = $("<div/>",{id:"task-" + ta.tid});
+    var view = $("<div/>",{id:"task-" + ta.tid})
+      .click(function() {
+        $(".task").each(function() {
+          $(this).removeClass("selected");
+        })
+        $(this).addClass("selected");
+        $("#stats").addClass("hide");
+        $("#search-stats").addClass("hide");
+        $("#task-actions").removeClass("hide");
+      })
+
+    // Add both Archive button and Restore button to the row.
+    // By css magic they will only show up in the appropriate tabs.
+
+    // var archiveDiv = $("<div class='archive-div'></div>")
+    //   .appendTo(view);
+    // var archive = $("<img class='archive'/>")
+    //   .appendTo(archiveDiv);
+    // svg.loadImg(archive, "/assets/img/x.svg");
+    // archiveDiv
+    //   .tooltip({"title":"Archive"})
+    //   .click(function() {
+    //     api.archiveTask(ta.tid);
+    //     observable.onTaskArchived.notify(ta.tid);
+    //   });
+
+    // var restoreButton = $("<button class='restore-div'/>")
+    //   .text("Restore")
+    //   .appendTo(view);
+    // restoreButton.click(function() {
+    //   $("#tasks").prepend(view);
+    //   setTaskViewClass(view, classOfActiveTask(ta));
+    //   api.rankTaskFirst(ta.tid);
+    // });
+
+
+
+    var newLabel = $("<div class='new-label hide'>NEW</div>");
+    var unreadLabel = $("<div class='unread-label'></div>");
+    var toDo = $("<img/>");
+    var toDoLabel = $("<div class='to-do-label hide'/>")
+      .append(toDo);
+    svg.loadImg(toDo, "/assets/img/to-do.svg");
+    var sent = $("<img/>");
+    var sentLabel = $("<div class='sent-label hide'/>")
+      .append(sent);
+    svg.loadImg(sent, "/assets/img/reply.svg");
+    var taskLabel = $("<div class='task-label'/>")
+      .append(newLabel)
+      .append(unreadLabel)
+      .append(toDoLabel)
+      .append(sentLabel)
+      .appendTo(view);
+
+
+    var taskDetails = $("<div class='task-details'></div>")
+      .appendTo(view);
 
     var title = ta.task_status
       ? ta.task_status.task_title
       : null;
 
-    var dragDiv = $("<div class='task-drag-div hide'></div>")
-      .appendTo(view);
-    var drag = $("<img class='drag'/>")
-      .appendTo(dragDiv);
-    svg.loadImg(drag, "/assets/img/drag.svg");
-
-    // Add both Archive button and Restore button to the row.
-    // By css magic they will only show up in the appropriate tabs.
-    var archiveDiv = $("<div class='archive-div'></div>")
-      .appendTo(view);
-    var archive = $("<img class='archive'/>")
-      .appendTo(archiveDiv);
-    svg.loadImg(archive, "/assets/img/x.svg");
-    archiveDiv
-      .tooltip({"title":"Archive"})
-      .click(function() {
-        api.archiveTask(ta.tid);
-        observable.onTaskArchived.notify(ta.tid);
-      });
-
-    var restoreButton = $("<button class='restore-div'/>")
-      .text("Restore")
-      .appendTo(view);
-    restoreButton.click(function() {
-      $("#tasks").prepend(view);
-      setTaskViewClass(view, classOfActiveTask(ta));
-      api.rankTaskFirst(ta.tid);
-    });
-
-    var taskDetails = $("<div class='task-details'></div>")
-      .appendTo(view);
-
     if (title) {
-      $("<div class='new-label new-label-task hide'>NEW</div>")
-        .appendTo(taskDetails);
-      $("<div class='updated updated-task hide'></div>")
-        .appendTo(taskDetails);
-      $("<a href='#!task/" + ta.tid + "' class='task-title ellipsis'></a>")
+      var guestsRow = $("<a href='#!task/" + ta.tid + "' class='task-guests link ellipsis'></a>")
         .text(title)
         .appendTo(taskDetails);
-      $("<div class='task-status'/>").append(taskStatus(ta))
+
+      var subjectRow = $("<div class='task-subject'/>")
+        .append(taskSubject(ta))
         .appendTo(taskDetails);
+
+      var statusRow = $("<div class='task-status'/>")
+        .appendTo(taskDetails);
+      var guestsIcon = $("<img/>");
+      var guests = $("<div class='status-icon guests-status-icon'/>")
+        .append(guestsIcon);
+      svg.loadImg(guestsIcon, "/assets/img/group.svg");
+      var emailIcon = $("<img/>");
+      var email = $("<div class='status-icon email-status-icon hide'/>")
+        .append(emailIcon);
+      svg.loadImg(emailIcon, "/assets/img/email.svg");
+      var optionsIcon = $("<img/>");
+      var options = $("<div class='status-icon options-status-icon hide'/>")
+        .append(optionsIcon);
+      svg.loadImg(optionsIcon, "/assets/img/to-do.svg");
+      var calendarIcon = $("<img/>");
+      var calendar = $("<div class='status-icon calendar-status-icon hide'/>")
+        .append(calendarIcon);
+      svg.loadImg(calendarIcon, "/assets/img/reply.svg");
+      var reminderIcon = $("<img/>");
+      var reminder = $("<div class='status-icon reminder-status-icon hide'/>")
+        .append(reminderIcon);
+      svg.loadImg(reminderIcon, "/assets/img/to-do.svg");
+      var statusIcon = $("<div class='task-status-icon'/>")
+        .append(guests)
+        .append(email)
+        .append(options)
+        .append(calendar)
+        .append(reminder)
+        .appendTo(statusRow);
+      statusRow.append(taskStatus(ta));
 
       var team_organizers = login.organizers();
       if (team_organizers.length > 1) {
@@ -98,28 +156,6 @@ var home = (function() {
           });
         });
       }
-
-      // var exec = $("<div class='task-exec'></div>")
-      //   .appendTo(view);
-      // $("<div class='task-exec-circ-line'></div>")
-      //   .append($("<div class='task-exec-circ unselectable'>JL</div>"))
-      //   .appendTo(exec);
-      // $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
-      //   .appendTo(exec);
-
-      // var withDiv = $("<div class='with-div'></div>")
-      //   .appendTo(view);
-      // var withIcon = $("<img class='with'/>")
-      //   .appendTo(withDiv);
-      // svg.loadImg(withIcon, "/assets/img/with.svg");
-
-      // var taskGuest = $("<div class='task-guest'></div>")
-      //   .appendTo(view);
-      // $("<div class='task-guest-circ-line'></div>")
-      //   .append($("<div class='task-guest-circ unselectable'>CW</div>"))
-      //   .appendTo(taskGuest);
-      // $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
-      //   .appendTo(taskGuest);
     }
 
     return view;
@@ -266,37 +302,12 @@ var home = (function() {
                    api.loadActiveTasks().fail(status_.onError(404))])
             .done(showAllTasks);
 
-    $('a[href="#all-tasks"]')
-    .unbind('click')
-    .click(function() {
-      $('#all-tasks-tab-content').append($('#tasks'));
-      $('a[href="#all-tasks"]').tab('show');
-    });
-    $('a[href="#scheduling-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#scheduling-tasks-tab-content').append($('#tasks'));
-      $('a[href="#scheduling-task-list"]').tab('show');
-    });
-    $('a[href="#general-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#general-tasks-tab-content').append($('#tasks'));
-      $('a[href="#general-task-list"]').tab('show');
-    });
-    $('a[href="#archive-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#archive-tasks-tab-content').append($('#tasks'));
-      $('a[href="#archive-task-list"]').tab('show');
-    });
-
     $('.show-in-progress-scheduling-tasks')
     .unbind('click')
     .click(function() {
       $('.show-in-progress-scheduling-tasks').addClass('active');
       $('.show-completed-scheduling-tasks').removeClass('active');
-      $('#scheduling-tasks-tab-content')
+      $('#list-view')
         .attr('class', 'in-progress-scheduling-tasks task-list');
     });
     $('.show-completed-scheduling-tasks')
@@ -304,7 +315,7 @@ var home = (function() {
     .click(function() {
       $('.show-in-progress-scheduling-tasks').removeClass('active');
       $('.show-completed-scheduling-tasks').addClass('active');
-      $('#scheduling-tasks-tab-content')
+      $('#list-view')
         .attr('class', 'completed-scheduling-tasks task-list');
     });
     $('.show-in-progress-general-tasks')
@@ -398,75 +409,408 @@ var home = (function() {
     })
   }
 
-  function loadNavHeader() {
-    $(".nav-header").each(function() {
-      var view = $(this);
-      view.children().remove();
-      var initialsView = $("<div id='exec-circ'/>")
-        .appendTo(view);
-      var execNameView = $("<div id='exec-name' class='ellipsis'/>");
-      profile.get(login.leader())
-        .done(function(obsProf) {
-          var p = obsProf.prof;
-          execNameView.text(profile.fullName(p));
-          initialsView.text(profile.veryShortNameOfProfile(p));
-        });
-      var exec = $("<div id='exec-name-div'></div>")
-        .append($("<div id='assisting'>ASSISTING</div>"))
-        .append(execNameView)
-        .appendTo(view);
-      var caretDiv = $("<div id='exec-caret'></div>")
-        .appendTo(view);
-      var caret = $("<img/>")
-        .appendTo(caretDiv);
-      svg.loadImg(caret, "/assets/img/caret.svg");
-      $(".account-block").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      $(".team-block").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      $(".account-divider-div").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      view.click(function() {
-        if (caretDiv.hasClass("account-nav-open")) {
-          caretDiv.removeClass("account-nav-open");
-          caretDiv.addClass("account-nav-closed");
-          $(".account-block").each(function() {
-            $(this).addClass("hide");
-          });
-          $(".team-block").each(function() {
-            $(this).addClass("hide");
-          });
-          $(".account-divider-div").each(function() {
-            $(this).addClass("hide");
-          });
-        } else {
-          caretDiv.removeClass("account-nav-closed");
-          caretDiv.addClass("account-nav-open");
-          $(".account-block").each(function() {
-            $(this).removeClass("hide");
-          });
-          $(".team-block").each(function() {
-            $(this).removeClass("hide");
-          });
-          $(".account-divider-div").each(function() {
-            $(this).removeClass("hide");
-          });
-        }
-      });
-    });
+  // function loadNavHeader() {
+  //   $(".nav-header").each(function() {
+  //     var view = $(this);
+  //     view.children().remove();
+  //     var initialsView = $("<div id='exec-circ'/>")
+  //       .appendTo(view);
+  //     var execNameView = $("<div id='exec-name' class='ellipsis'/>");
+  //     profile.get(login.leader())
+  //       .done(function(obsProf) {
+  //         var p = obsProf.prof;
+  //         execNameView.text(profile.fullName(p));
+  //         initialsView.text(profile.veryShortNameOfProfile(p));
+  //       });
+  //     var exec = $("<div id='exec-name-div'></div>")
+  //       .append($("<div id='assisting'>ASSISTING</div>"))
+  //       .append(execNameView)
+  //       .appendTo(view);
+  //     var caretDiv = $("<div id='exec-caret'></div>")
+  //       .appendTo(view);
+  //     var caret = $("<img/>")
+  //       .appendTo(caretDiv);
+  //     svg.loadImg(caret, "/assets/img/caret.svg");
+  //     $(".account-block").each(function() {
+  //       if (! $(this).hasClass("hide"))
+  //         $(this).addClass("hide");
+  //     });
+  //     $(".team-block").each(function() {
+  //       if (! $(this).hasClass("hide"))
+  //         $(this).addClass("hide");
+  //     });
+  //     $(".account-divider-div").each(function() {
+  //       if (! $(this).hasClass("hide"))
+  //         $(this).addClass("hide");
+  //     });
+  //     view.click(function() {
+  //       if (caretDiv.hasClass("account-nav-open")) {
+  //         caretDiv.removeClass("account-nav-open");
+  //         caretDiv.addClass("account-nav-closed");
+  //         $(".account-block").each(function() {
+  //           $(this).addClass("hide");
+  //         });
+  //         $(".team-block").each(function() {
+  //           $(this).addClass("hide");
+  //         });
+  //         $(".account-divider-div").each(function() {
+  //           $(this).addClass("hide");
+  //         });
+  //       } else {
+  //         caretDiv.removeClass("account-nav-closed");
+  //         caretDiv.addClass("account-nav-open");
+  //         $(".account-block").each(function() {
+  //           $(this).removeClass("hide");
+  //         });
+  //         $(".team-block").each(function() {
+  //           $(this).removeClass("hide");
+  //         });
+  //         $(".account-divider-div").each(function() {
+  //           $(this).removeClass("hide");
+  //         });
+  //       }
+  //     });
+  //   });
 
-    insertLoggedIn();
-    insertTeams();
+  //   insertLoggedIn();
+  //   insertTeams();
+  // }
+
+  function moveContent(padding) {
+    var view = $("#home-content");
+    view.attr("style","-webkit-transform: translate(0px, " + padding + "px)")
+        .attr("style","-moz-transform: translate(0px, " + padding + "px)")
+        .attr("style","-ms-transform: translate(0px, " + padding + "px)")
+        .attr("style","-o-transform: translate(0px, " + padding + "px)")
+        .attr("style","-transform: translate(0px, " + padding + "px)")
+        .attr("style","padding-top:" + padding + "px");
   }
 
+  function loadFilters() {
+    var toggle = $("#toggle-filters");
+    var label = $("#toggle-filters-label")
+      .text("Show Filters");
+    var caret = $("#filters-caret");
+    var filters = $("#filters")
+      .attr("style","display:none");
+    var sortBy = $("#sort-by-filter");
+    var status = $("#status-filter");
+    var waitingOn = $("#waiting-on-filter");
+    var assignedTo = $("#assigned-to-filter");
+
+    sortBy.children().remove();
+    $("<h5 class='filter-title'>Sort By</h5>")
+      .appendTo(sortBy);
+    var sortByToDo = $("<li class='filter sort-by-filter active'>To Do</li>");
+    var sortByLastUpdated = $("<li class='filter sort-by-filter link'>Last Updated</li>");
+    var sortByMeetingDate = $("<li class='filter sort-by-filter link'>Meeting Date</li>");
+    var sortByOptions = $("<ul class=filter-list/>")
+      .append(sortByToDo)
+      .append(sortByLastUpdated)
+      .append(sortByMeetingDate)
+      .appendTo(sortBy);
+    sortByToDo.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
+        // apply filter
+      }
+    })
+    sortByLastUpdated.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
+        // apply filter
+      }
+    })
+    sortByMeetingDate.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
+        // apply filter
+      }
+    })
+
+
+    status.children().remove();
+    $("<h5 class='filter-title'>Status</h5>")
+      .appendTo(status);
+    var checkCoordinating = $("<img class='filter-checkbox'/>");
+    var statusCoordinating = $("<li class='filter checkbox-option clickable'></li>");
+    var checkUpcoming = $("<img class='filter-checkbox'/>");
+    var statusUpcoming = $("<li class='filter checkbox-option clickable'></li>");
+    var checkPast = $("<img class='filter-checkbox'/>");
+    var statusPast = $("<li class='filter checkbox-option clickable'></li>");
+    var checkCanceled = $("<img class='filter-checkbox'/>");
+    var statusCanceled = $("<li class='filter checkbox-option clickable'></li>");
+    var statusOptions = $("<ul class=filter-list/>")
+      .append(statusCoordinating
+        .append(checkCoordinating)
+        .append($("<span class='filter-checkbox-label'>Coordinating</span>")))
+      .append(statusUpcoming
+        .append(checkUpcoming)
+        .append($("<span class='filter-checkbox-label'>Upcoming</span>")))
+      .append(statusPast
+        .append(checkPast)
+        .append($("<span class='filter-checkbox-label'>Past</span>")))
+      .append(statusCanceled
+        .append(checkCanceled)
+        .append($("<span class='filter-checkbox-label'>Canceled</span>")))
+      .appendTo(status);
+    svg.loadImg(checkCoordinating, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkUpcoming, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkPast, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkCanceled, "/assets/img/checkbox-sm.svg");
+    statusCoordinating.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+    statusUpcoming.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+    statusPast.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+    statusCanceled.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+
+    waitingOn.children().remove();
+    $("<h5 class='filter-title'>Waiting On</h5>")
+      .appendTo(waitingOn);
+    var checkWaitingOnMe = $("<img class='filter-checkbox'/>");
+    var waitingOnMe = $("<li class='filter checkbox-option clickable'></li>");
+    // add other EA's on team here
+    var checkGuests = $("<img class='filter-checkbox'/>");
+    var waitingOnGuests = $("<li class='filter checkbox-option clickable'></li>");
+    var waitingOnOptions = $("<ul class=filter-list/>")
+      .append(waitingOnMe
+        .append(checkWaitingOnMe)
+        .append($("<span class='filter-checkbox-label'>Me</span>")))
+      .append(waitingOnGuests
+        .append(checkGuests)
+        .append($("<span class='filter-checkbox-label'>Guests</span>")))
+      .appendTo(waitingOn);
+    svg.loadImg(checkWaitingOnMe, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkGuests, "/assets/img/checkbox-sm.svg");
+    waitingOnMe.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+    waitingOnGuests.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+
+    // if there's more than 1 EA, remove "hide" class from assignedTo
+    assignedTo.children().remove();
+    $("<h5 class='filter-title'>Waiting On</h5>")
+      .appendTo(assignedTo);
+    var checkAssignedToMe = $("<img class='filter-checkbox'/>");
+    var assignedToMe = $("<li class='filter checkbox-option clickable'></li>");
+    // add other EA's on team here
+    var assignedTo = $("<ul class=filter-list/>")
+      .append(assignedToMe
+        .append(checkAssignedToMe)
+        .append($("<span class='filter-checkbox-label'>Me</span>")))
+      .appendTo(assignedTo);
+    svg.loadImg(checkAssignedToMe, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkGuests, "/assets/img/checkbox-sm.svg");
+    assignedToMe.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
+        // apply filter
+      }
+    })
+
+    toggle.click(function() {
+      if (filters.is(":hidden")) {
+        label.text("Hide Filters");
+        caret.removeClass("closed")
+             .addClass("open");
+        filters.slideDown("fast", function(){
+          var contentPadding = $("#home-header").height();
+          moveContent(contentPadding);
+        });
+      } else {
+        label.text("Show Filters");
+        caret.removeClass("open")
+             .addClass("closed");
+        filters.slideUp("fast", function() {
+          $("#home-content")
+            .attr("style","padding-top:123px");
+        });
+      }
+    })
+  }
+
+  function loadHeader() {
+    var eaName = $("#account-name");
+    var execName = $("#assisting-name");
+    var search = $("#search-meetings-input");
+    var clear = $("#clear-search");
+
+    api.getProfile(login.me()).done(function(eaProf) {
+      var fullName = profile.fullName(eaProf);
+      eaName.text(fullName);
+    });
+
+    profile.get(login.leader()).done(function(obsProf) {
+      var p = obsProf.prof;
+      var assisting = $("<span>assisting </span>");
+      var fullName = $("<span id='exec-name'/>")
+        .text(profile.fullName(p));
+      execName.children().remove();
+      execName.append(assisting)
+              .append(fullName);
+    });
+
+    function updateSearch() {
+      if (search.val() != "") {
+        clear.removeClass("hide");
+        $("#home-title").text("Search");
+      } else {
+        clear.addClass("hide");
+        $("#home-title").text("Meetings");
+      }
+    }
+
+    util.afterTyping(search, 100, updateSearch);
+
+    clear.click(function() {
+      search.val("")
+            .focus();
+      updateSearch();
+    })
+
+    // $(".nav-header").each(function() {
+    //   var view = $(this);
+    //   view.children().remove();
+    //   var initialsView = $("<div id='exec-circ'/>")
+    //     .appendTo(view);
+    //   var execNameView = $("<div id='exec-name' class='ellipsis'/>");
+    //   profile.get(login.leader())
+    //     .done(function(obsProf) {
+    //       var p = obsProf.prof;
+    //       execNameView.text(profile.fullName(p));
+    //       initialsView.text(profile.veryShortNameOfProfile(p));
+    //     });
+    //   var exec = $("<div id='exec-name-div'></div>")
+    //     .append($("<div id='assisting'>ASSISTING</div>"))
+    //     .append(execNameView)
+    //     .appendTo(view);
+    //   var caretDiv = $("<div id='exec-caret'></div>")
+    //     .appendTo(view);
+    //   var caret = $("<img/>")
+    //     .appendTo(caretDiv);
+    //   svg.loadImg(caret, "/assets/img/caret.svg");
+    //   $(".account-block").each(function() {
+    //     if (! $(this).hasClass("hide"))
+    //       $(this).addClass("hide");
+    //   });
+    //   $(".team-block").each(function() {
+    //     if (! $(this).hasClass("hide"))
+    //       $(this).addClass("hide");
+    //   });
+    //   $(".account-divider-div").each(function() {
+    //     if (! $(this).hasClass("hide"))
+    //       $(this).addClass("hide");
+    //   });
+    //   view.click(function() {
+    //     if (caretDiv.hasClass("account-nav-open")) {
+    //       caretDiv.removeClass("account-nav-open");
+    //       caretDiv.addClass("account-nav-closed");
+    //       $(".account-block").each(function() {
+    //         $(this).addClass("hide");
+    //       });
+    //       $(".team-block").each(function() {
+    //         $(this).addClass("hide");
+    //       });
+    //       $(".account-divider-div").each(function() {
+    //         $(this).addClass("hide");
+    //       });
+    //     } else {
+    //       caretDiv.removeClass("account-nav-closed");
+    //       caretDiv.addClass("account-nav-open");
+    //       $(".account-block").each(function() {
+    //         $(this).removeClass("hide");
+    //       });
+    //       $(".team-block").each(function() {
+    //         $(this).removeClass("hide");
+    //       });
+    //       $(".account-divider-div").each(function() {
+    //         $(this).removeClass("hide");
+    //       });
+    //     }
+    //   });
+    // });
+
+    // insertLoggedIn();
+    // insertTeams();
+  }
+
+
   mod.load = function() {
-    loadNavHeader();
+    loadHeader();
+    loadFilters();
+    // loadNavHeader();
     loadTasks();
     $(".place-nav")
       .off('click')
@@ -475,6 +819,18 @@ var home = (function() {
       .off('click')
       .click(settings.load);
     util.focus();
+    $(document).click(function(event) {
+      var target = $(event.target);
+      if ((! target.parents("#tasks").length) &&
+          (! target.parents("#home-tools").length)) {
+        $(".task").each(function() {
+          $(this).removeClass("selected");
+        })
+        $("#stats").removeClass("hide");
+        $("#search-stats").addClass("hide");
+        $("#task-actions").addClass("hide");
+      }
+    })
   };
 
   return mod;

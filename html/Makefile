@@ -5,9 +5,10 @@ prod: prod-build
 guest-app: guest-app-build
 
 HTML_INCLUDES = \
-  all-tasks.html \
-  arch-task-list.html \
-  gen-task-list.html \
+  calendar-view.html \
+  home-header.html \
+  home-sidebar.html \
+  list-view.html \
   request-password.html \
   reset-password.html \
   new-task.html \
@@ -15,8 +16,6 @@ HTML_INCLUDES = \
   sched-step2-tab.html \
   sched-step3-tab.html \
   sched-step4-tab.html \
-  sched-task-list.html \
-  places.html \
   settings.html \
   email-verify.html
 

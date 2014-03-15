@@ -14,22 +14,13 @@
     <link href="/assets/css/fullcalendar.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
     <link href="/assets/css/bootstrap-timepicker.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
   </head>
 
   <body>
 
-    <div id="loading">
-      <div id="loading-box">
-        <img id="loading-icon" src="/assets/img/loading.gif">
-        <div id="loading-text" class="ellipsis">Updating calendar...</div>
-      </div>
-    </div>
-
     <!-- <div id="global-status" class="animated"></div> -->
 
-<!--       <div id="account-block-push" class="account-block hide"></div>
+    <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
       <li class="nav-header unselectable"></li>
       <li class="account-block logged-in-as hide"></li>
       <div class="account-block hide">
@@ -48,12 +39,72 @@
         <div class="account-divider-line"></div>
         <span class='account-section-title'>ASSISTING</span>
       </div>
-      <div class="nav-teams"></div> -->
+      <div class="nav-teams"></div>
+      <div id="account-block-push" class="account-block hide"></div>
+      <li>
+        <a href="#" class="nav-block hide" data-toggle="pill">
+          <img id="search-icon" class="svg" src="/assets/img/search.svg">
+          <div class="nav-text">Search</div>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-block hide" data-toggle="pill">
+          <img id="dashboard-icon" class="svg" src="/assets/img/dashboard.svg">
+          <div class="nav-text">Dashboard</div>
+        </a>
+      </li>
+      <div class="nav-divider-line unselectable">
+        <span class='nav-section-title'>TASKS</span>
+      </div>
+      <li>
+        <a href="#all-tasks" class="nav-block" data-toggle="pill">
+          <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
+          <div class="nav-text">All Tasks</div>
+        </a>
+      </li>
+      <li class="active">
+        <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
+          <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
+          <div class="nav-text">Scheduling</div>
+        </a>
+      </li>
+      <li>
+        <a href="#general-task-list" class="nav-block" data-toggle="pill">
+          <img id="general-icon" class="svg" src="/assets/img/general.svg">
+<!--           <div class='new-label new-label-nav'>NEW</div>
+          <div class='updated updated-nav'></div> -->
+          <div class="nav-text">General</div>
+        </a>
+      </li>
+      <li>
+        <a href="#archive-task-list" class="nav-block" data-toggle="pill">
+          <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
+          <div class="nav-text">Archive</div>
+        </a>
+      </li>
+      <div class="nav-divider-line unselectable">
+        <span class='nav-section-title'>NETWORK</span>
+      </div>
+      <li>
+        <a href="#" class="nav-block hide" data-toggle="pill">
+          <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+          <div class="nav-text">Contacts</div>
+        </a>
+      </li>
+      <li>
+        <a href="#place-list" class="nav-block place-nav" data-toggle="pill">
+          <img id="places-icon" class="svg" src="/assets/img/places.svg">
+          <div class="nav-text">Places</div>
+        </a>
+      </li>
 
+    </ul>
 
-
-
-<!--     <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
+    <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
       <div id="mobile-navbar-header" class="navbar navbar-header">
         <a data-toggle="collapse" data-target="#mobile-navbar-collapse">
           <img id="menu" class="svg" src="/assets/img/menu.svg">
@@ -76,16 +127,52 @@
               <div class="nav-text">Log out</div>
             </a>
           </li>
+          <div class="nav-divider-line unselectable">
+            <span class='nav-section-title'>TASKS</span>
+          </div>
+          <li>
+            <a href="#all-tasks" class="nav-block" data-toggle="pill">
+              <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
+              <div class="nav-text">All Tasks</div>
+            </a>
+          </li>
           <li class="active">
-            <a href="#list-view-nav" class="nav-block" data-toggle="pill">
+            <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
               <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">Scheduling</div>
             </a>
           </li>
           <li>
             <a href="#general-task-list" class="nav-block" data-toggle="pill">
               <img id="general-icon" class="svg" src="/assets/img/general.svg">
+<!--               <div class='new-label new-label-nav'>NEW</div>
+              <div class='updated updated-nav'></div> -->
               <div class="nav-text">General</div>
+            </a>
+          </li>
+          <li>
+            <a href="#archive-task-list" class="nav-block" data-toggle="pill">
+              <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
+              <div class="nav-text">Archive</div>
+            </a>
+          </li>
+          <div class="nav-divider-line unselectable">
+            <span class='nav-section-title'>NETWORK</span>
+          </div>
+          <li>
+            <a href="#" class="nav-block hide" data-toggle="pill">
+              <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
+              <div class="nav-text">Contacts</div>
+            </a>
+          </li>
+          <li>
+            <a href="#place-list" class="nav-block place-nav">
+              <img id="places-icon" class="svg" src="/assets/img/places.svg">
+              <div class="nav-text">Places</div>
             </a>
           </li>
           <div class="nav-divider-line unselectable nav-teams">
@@ -93,7 +180,7 @@
           </div>
         </ul>
       </div>
-    </nav> -->
+    </nav>
 
     <div id="login-page" class="hide login-page">
       <div class="login-container">
@@ -140,24 +227,25 @@
       @@email-verify.html@@
     </div>
 
-    <div id="home-page" class="home-page hide">
-      <div id="home-header">
-        @@home-header.html@@
+    <div id="home-page" class="hide home-page tab-content">
+      <div id="home-push" class="hide"></div>
+      <div id="all-tasks" class="tab-pane">
+        @@all-tasks.html@@
       </div>
-      <div id="home-container">
-        @@home-sidebar.html@@
-        <div class="tab-content" id="home-content">
-          <div class="tab-pane fade in active in-progress-scheduling-tasks task-list"
-               id="list-view">
-            @@list-view.html@@
-          </div>
-          <div class="tab-pane fade" id="calendar-view">
-            @@calendar-view.html@@
-          </div>
-          <div class="tab-pane fade" id="settings">
-            @@settings.html@@
-          </div>
-        </div>
+      <div id="scheduling-task-list" class="tab-pane active">
+        @@sched-task-list.html@@
+      </div>
+      <div id="general-task-list" class="tab-pane">
+        @@gen-task-list.html@@
+      </div>
+      <div id="archive-task-list" class="tab-pane">
+        @@arch-task-list.html@@
+      </div>
+      <div id="place-list" class="tab-pane">
+        @@places.html@@
+      </div>
+      <div id="settings" class="tab-pane">
+        @@settings.html@@
       </div>
     </div>
 
