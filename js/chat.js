@@ -115,9 +115,11 @@ var chat = (function () {
     }
   }
 
-  function viewOfCalendarSlot(slot, hideEndTime) {
+  mod.hideEndTimes = false;
+
+  function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
-    if (hideEndTime)
+    if (mod.hideEndTimes)
       v.text(date.justStartTime(date.ofString(slot.start)));
     else
       v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
@@ -126,9 +128,9 @@ var chat = (function () {
     return v;
   }
 
-  function viewOfCalendarOptions(listRoot, calChoices, hideEndTimes) {
+  function viewOfCalendarOptions(listRoot, calChoices) {
     for (var i in calChoices) {
-      listRoot.append(viewOfCalendarSlot(calChoices[i].slot, hideEndTimes));
+      listRoot.append(viewOfCalendarSlot(calChoices[i].slot));
     }
     return listRoot;
   }
@@ -137,8 +139,7 @@ var chat = (function () {
     var v = viewOfChatText(q.body);
     v.append(viewOfCalendarOptions(
       $("<ol/>", {type:"A"}),
-      q.choices,
-      q.hide_end_times
+      q.choices
     ));
     return v;
   }
@@ -586,6 +587,22 @@ var chat = (function () {
       observable.onTaskParticipantsChanged
                               .observe("chat-tabs", mod.loadTaskChats);
     });
+  }
+
+  mod.setHideEndTimes = function(ta) {
+    if ("Scheduling" === variant.cons(ta.task_data)) {
+      var optsByUid = list.toTable(ta.task_data[1].participant_options,
+                                   function(x){return x.uid;});
+      var options = optsByUid[login.me()];
+      if (util.isNotNull(options)
+       && util.isNotNull(options.hide_end_times)) {
+        mod.hideEndTimes = options.hide_end_times;
+      } else {
+        mod.hideEndTimes = ta.task_data[1].hide_end_times;
+      }
+    } else {
+      mod.hideEndTimes = false;
+    }
   }
 
   mod.loadGuestTaskChats = function(ta) {

@@ -126,9 +126,9 @@ var guestTask = function() {
     }
   }
 
-  function describeTimeSlot(start, end, hideEndTime) {
+  function describeTimeSlot(start, end) {
     var fromTime = wordify(date.timeOnly(start));
-    if (hideEndTime) {
+    if (chat.hideEndTimes) {
       return "at " + fromTime;
     } else {
       var toTime = wordify(date.timeOnly(end));
@@ -136,7 +136,7 @@ var guestTask = function() {
     }
   }
 
-  function viewOfTimeAndPlace(x, hideEndTime) {
+  function viewOfTimeAndPlace(x) {
     var view = $("<div id='time-and-place'/>");
 
     var meetingTime = $("<div id='meeting-time'/>")
@@ -156,7 +156,7 @@ var guestTask = function() {
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
     time2
-      .append(describeTimeSlot(t1, t2, hideEndTime));
+      .append(describeTimeSlot(t1, t2));
 
     var meetingLoc = $("<div id='meeting-location'/>")
       .appendTo(view);
@@ -198,9 +198,10 @@ var guestTask = function() {
     return s.replace(/-|:|\.\d+/g, "");
   }
 
-  function googleCalendarURL(text1, text2, slot, hideEndTime) {
+  function googleCalendarURL(text1, text2, slot) {
     var fromTime = stripTimestamp(slot.start_utc, slot.start);
-    var toTime = hideEndTime ? fromTime : stripTimestamp(slot.end_utc,slot.end);
+    var toTime = chat.hideEndTimes ? fromTime
+               : stripTimestamp(slot.end_utc,slot.end);
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
             "text=" + encodeURIComponent(text1),
@@ -230,8 +231,7 @@ var guestTask = function() {
       $('[data-toggle="popover"]').click();
       window.open(googleCalendarURL(sched.getCalendarTitle(x),
                                     window.location,
-                                    x.reserved.slot,
-                                    x.hide_end_times));
+                                    x.reserved.slot));
     });
 
     button.popover({
@@ -318,6 +318,8 @@ var guestTask = function() {
   mod.loadTask = function(task) {
     var ta = task.guest_task;
 
+    chat.setHideEndTimes(ta);
+
     var myLast = recoverCalendarSelection(ta);
     var answers = {};
 
@@ -393,7 +395,7 @@ var guestTask = function() {
       return slotView;
     }
 
-    function viewOfCalendarOption(choice, label, typ, hideEndTime) {
+    function viewOfCalendarOption(choice, label, typ) {
       var slotView = $("<tr class='option'/>");
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
@@ -429,7 +431,7 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      var info = sched.viewOfOption(choice, typ, hideEndTime)
+      var info = sched.viewOfOption(choice, typ, chat.hideEndTimes)
         .appendTo(slotView);
 
       return slotView;
@@ -460,8 +462,7 @@ var guestTask = function() {
           var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
                   .append(viewOfMeetingHeader(task, ta, state))
-                  .append(viewOfTimeAndPlace(state.reserved.slot,
-                                             state.hide_end_times))
+                  .append(viewOfTimeAndPlace(state.reserved.slot))
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
@@ -524,8 +525,7 @@ var guestTask = function() {
             }
             var label = indexLabel(i);
             var typ = sched.formatMeetingType(choice.slot);
-            options.append(viewOfCalendarOption(choice, label, typ,
-                                                state.hide_end_times));
+            options.append(viewOfCalendarOption(choice, label, typ));
           });
           if (! list.mem(task.guest_hosts, task.guest_uid)) {
             options.append(viewOfNoneWorks(state.calendar_options));
