@@ -30,14 +30,6 @@ var locpicker = (function() {
           role="menu"></ul>
     </div>
   </div>
-  <div #removeThis
-       class="hide">
-    <div class="col-sm-6">
-      <input #timezone
-             type="text" class="form-control"
-             placeholder="Timze zone should be hidden" disabled/>
-    </div>
-  </div>
   <div #locationForm>
     <div #locationDetails class="clearfix">
       <div class="col-sm-7 address-form">
@@ -94,11 +86,11 @@ var locpicker = (function() {
       /* hidden state */
       title: form.title,
       coord: form.coord,
+      timezone: form.timezone,
 
       /* input boxes */
       address: form.address.val(),
       instructions: form.instructions.val(),
-      timezone: form.timezone.val()
     };
     return loc;
   }
@@ -114,15 +106,15 @@ var locpicker = (function() {
   }
 
   function setLocation(form, loc) {
-    var oldTimezone = form.timezone.val();
+    var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
     form.title = loc.title;
     form.coord = loc.coord;
+    form.timezone = loc.timezone;
 
     form.address.val(loc.address);
     form.instructions.val(loc.instructions);
-    form.timezone.val(loc.timezone);
 
     if (oldTimezone !== newTimezone)
       form.onTimezoneChange(oldTimezone, newTimezone);
@@ -338,6 +330,8 @@ var locpicker = (function() {
 
     return {
       view: view,
+
+      /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
       setLocation: (function(loc) { return setLocation(form, loc); })
     };

@@ -6,16 +6,10 @@ var sched2 = (function() {
   var mod = {};
 
   function saveAndReload(ta) {
-    log("saveAndReload", ta);
     disableNextButton();
     api.postTask(ta)
       .done(function(task) { sched.loadTask(task); });
   }
-
-  // var step2Selector = show.create({
-  //   "sched-step2-connect": {ids: ["sched-step2-connect"]},
-  //   "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
-  // });
 
   function moveOnToNextStep(ta) {
     var x = ta.task_data[1];
@@ -181,6 +175,99 @@ var sched2 = (function() {
   }
 
   /*
+    If the meeting type does not require a location, the timezone can
+    be changed by clicking on it, prompting the using for a location.
+    Otherwise the timezone is the determined by the location of the meeting.
+   */
+  function setupTimezoneLink(form, slot) {
+    log("setupTimezoneLink", slot);
+    function displayTimezone(loc) {
+      log("displayTimezone", loc);
+      if (util.isDefined(loc))
+        timezoneText.text(timezone.format(loc.timezone));
+    }
+    function setLocation(loc) {
+      slot.location = loc;
+      displayTimezone(loc);
+    }
+    var timezoneText = form.timezoneText;
+    var timezonePicker = form.timezonePicker;
+    switch (slot.meeting_type) {
+    case "Call":
+      timezoneText
+        .tooltip({
+          title:
+          "Click to change the time zone"
+        })
+        .off("click")
+        .click(function() {
+          var picker = tzpicker.create({
+            onTimeZoneChange: setLocation
+          });
+          timezonePicker.children().remove();
+          timezonePicker.append(picker.view);
+        })
+        .addClass("clickable");
+      break;
+
+    default:
+      timezoneText
+        .removeClass("clickable")
+        .tooltip({
+          title:
+          "The time zone is automatically set based on the meeting location"
+        })
+        .off("click");
+    }
+    displayTimezone(slot.location);
+  }
+
+  function adaptToMeetingType(form, slot) {
+    setupTimezoneLink(form, slot);
+    switch (slot.meeting_type) {
+    case "Call":
+      form.whereSection.addClass("hide");
+      break;
+    default:
+      form.whereSection.removeClass("hide");
+    }
+  }
+
+  function createCalendarModal() {
+'''
+<div #calPickerModal
+     class="modal fade" tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+  <div #calPickerDialog
+       class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img #calPickerIcon
+             class="svg" src="/assets/img/calendar.svg">
+        <div style="float:right" data-dismiss="modal">
+          <img class="svg modal-close" src="/assets/img/x.svg"/>
+        </div>
+        <h3 #calPickerTitle
+            class="modal-title">
+          Select a time.
+        </h3>
+      </div>
+      <div #calPicker
+           class="modal-body"></div>
+    </div>
+  </div>
+</div>
+'''
+    var id = util.randomString();
+    calPickerTitle.attr("id", id);
+    calPickerModal.attr("aria-labelledby", id);
+
+    return _view;
+  }
+
+
+  /*
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
@@ -226,20 +313,8 @@ var sched2 = (function() {
                      class="form-control date-picker-field end"/>
             </div>
           </div>
-          <span #timeZoneText class="time-zone-text">PST</span>
-        </div>
-        <div class="time-input-row-end-mobile clearfix">
-          <div class="time-to-text-mobile">to</div>
-          <div class="some-datepicker">
-            <input #endDateMobile
-                   type="text"
-                   class="form-control date-picker-field end"/>
-          </div>
-          <div class="bootstrap-timepicker">
-            <input #endTimeMobile
-                   type="text"
-                   class="form-control time-picker-field end"/>
-          </div>
+          <span #timezoneText class="timezone-text"></span>
+          <div #timezonePicker/>
         </div>
         <span #openCalPicker
              class="open-cal-picker clearfix">
@@ -251,7 +326,8 @@ var sched2 = (function() {
         </span>
       </div>
     </div>
-    <div class="edit-info-row">
+    <div #whereSection
+         class="edit-info-row">
       <div class="info-label where-label-edit">WHERE</div>
       <div #locationContainer
            class="info"/>
@@ -305,6 +381,7 @@ var sched2 = (function() {
 
     function setMeetingType(meetingType) {
       x.meeting_type = meetingType;
+      adaptToMeetingType(_view, x);
     }
 
     function getMeetingType() {
@@ -315,18 +392,16 @@ var sched2 = (function() {
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
-    var timeZoneModal = $("#tz-picker-modal");
-    var timeZoneContainer = $("#tz-picker");
-    timeZoneContainer.children().remove();
-    timeZoneText
-      .tooltip({"title":"The time zone is automatically set based on the meeting location"});
+    function openCal() {
+      var calModal = createCalendarModal();
+      /* TODO: append the modal somewhere */
+      calModal.calPickerModal.modal({});
+      return false;
+    }
+    openCalPicker.click(openCal);
+    $(".time-picker-field").off("click").click(openCal);
+    $(".date-picker-field").off("click").click(openCal);
 
-    var calendarModal = $("#cal-picker-modal");
-    var calendarContainer = $("#cal-picker");
-    calendarContainer.children().remove();
-    openCalPicker.click(function() {
-      calendarModal.modal({})
-    });
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
@@ -357,43 +432,29 @@ var sched2 = (function() {
       }
     }
 
-    function createTZPicker() {
-      timeZoneContainer.children().remove();
-
-      var locationSearch = $("<div class='left-inner-addon'/>")
-        .append($("<i class='glyphicon glyphicon-search'/>"))
-        .append($("<input type='search' class='form-control' placeholder='Search by city'/>"));
-
-      var saveTZButton = $("<button class='btn btn-primary save-tz'>Save</button>");
-      var cancelTZ = $("<span class='link cancel-tz'>Cancel</span>")
-        .click(function() {
-          timeZoneContainer.modal("hide");
-        });
-      var tzActions = $("<div class='tz-actions clearfix'/>")
-        .append(saveTZButton)
-        .append(cancelTZ);
-
-      timeZoneContainer
-        .append(locationSearch)
-        .append(tzActions);
-    }
-
     /*** Meeting location ***/
 
     var loc = x.location;
-    function onTimeZoneChange(oldTimezone, newTimezone) {
-      log("timezone change: " + oldTimezone + " -> " + newTimezone);
+    function onTimezoneChange(oldTimezone, newTimezone) {
+      log("new timezone: " + newTimezone);
+      setupTimezoneLink(_view, x);
       updateCalendar(newTimezone);
       if (util.isNonEmptyString(oldTimezone)
           && util.isNonEmptyString(newTimezone))
         clearDates();
     }
     var locationForm = locpicker.create({
-      onTimezoneChange: onTimeZoneChange
+      onTimezoneChange: onTimezoneChange
     });
-    if (util.isDefined(loc)) {
+    if (util.isDefined(loc))
       locationForm.setLocation(loc);
-    }
+    else {
+      var tz = timezone.guessUserTimezone();
+      loc = { timezone: tz };
+      x.location = loc;
+      onTimezoneChange(undefined, tz);
+    };
+
     locationContainer.append(locationForm.view);
 
     /*** Meeting notes ***/
@@ -486,7 +547,8 @@ var sched2 = (function() {
       label: util.randomString(),
       slot: {}
     };
-    return editableViewOfOption(tzList, profs, calOption, saveCalOption, cancel, addMode);
+    return editableViewOfOption(tzList, profs, calOption,
+                                saveCalOption, cancel, addMode);
   }
 
   function saveOption(ta, calOption) {
@@ -591,7 +653,8 @@ var sched2 = (function() {
           .click(toggleEdit);
         var addMode = false;
         var edit =
-          editableViewOfOption(tzList, profs, calOption, saveCalOption, cancel, addMode);
+          editableViewOfOption(tzList, profs, calOption,
+                               saveCalOption, cancel, addMode);
         editableContainer.children().remove();
         editableContainer.append(edit.view);
 
@@ -645,7 +708,8 @@ var sched2 = (function() {
     });
     var numOptions = 0;
     list.iter(schedState.calendar_options, function(x, i) {
-      v.append(insertViewOfOption(ta, tzList, profs, listView, x, i, save, remove));
+      v.append(insertViewOfOption(ta, tzList, profs, listView,
+                                  x, i, save, remove));
       numOptions++;
     });
     var addRow = listView.view
@@ -691,7 +755,7 @@ var sched2 = (function() {
 
   function createOptionsSection(tzList, profs, ta) {
     var view = $("<div/>");
-    var module = $("<div id='edit-meeting-div' class='sched-module'/>")
+    var module = $("<div class='sched-module'/>")
       .appendTo(view);
     var connector = createConnector()
       .appendTo(view);
