@@ -213,7 +213,7 @@ var guestTask = function() {
             .join("&");
   }
 
-  function addToCalendar(ta, x) {
+  function addToCalendar(tid,ta, x) {
     var addCal = $("<img id='add-cal'/>");
     var button = $("<button/>", {
       "id": "add-to-calendar",
@@ -232,6 +232,21 @@ var guestTask = function() {
                                     window.location,
                                     x.reserved.slot,
                                     x.hide_end_times));
+    });
+    var outlook = $("#outlook");
+    $(document).on("click", "#google", function() {
+      $('[data-toggle="popover"]').click();
+      var ics = getTaskICS(tid);
+      window.URL = window.webkitURL || window.URL;
+      window.BlobBuilder = window.BlobBuilder || 
+            window.WebKitBlobBuilder || window.MozBlobBuilder;
+      var icsfile = new window.BlobBuilder();
+      icsfile.append(ics.file);
+      var a = document.createElement('a');
+      a.href = window.URL.createObjectURL(icsfile.getBlob(ics.mimetype));
+      a.download = 'calendar-invitation.ics';
+      a.textContent = ics.title;
+      document.body.appendChild(a);
     });
 
     button.popover({
@@ -261,7 +276,7 @@ var guestTask = function() {
       .appendTo(view);
 
     if (! list.mem(task.guest_hosts, task.guest_uid)) {
-      view.append(addToCalendar(ta, state));
+      view.append(addToCalendar(task.tid,ta, state));
     } else {
       title.addClass("exec-view");
     }

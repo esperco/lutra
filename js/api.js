@@ -226,6 +226,10 @@ var api = (function () {
                         "");
   };
 
+  mod.getTaskICS = function(tid) {
+    return jsonHttpGet(apiQPrefix() + "/task/" + tid + "/ics");
+  }
+
   /*** Chat ***/
 
   mod.getChatItem = function(itemId) {
