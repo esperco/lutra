@@ -228,18 +228,18 @@ var api = (function () {
 
   /*** Chat ***/
 
-  mod.getChatItem = function(rid) {
-    var url = apiQPrefix() + "/chat/whatever/item/" + rid;
+  mod.getChatItem = function(itemId) {
+    var url = apiQPrefix() + "/chat/" + itemId;
     return jsonHttpGet(url);
   };
 
   mod.postChatItem = function(chatItem) {
-    var url = apiQPrefix() + "/chat/" + chatItem.chatid + "/item";
+    var url = apiQPrefix() + "/chat";
     return jsonHttpPost(url, JSON.stringify(chatItem));
   };
 
-  mod.postChatItemRead = function(chatId, itemId) {
-    var url = apiQPrefix() + "/chat/" + chatId + "/item/" + itemId + "/read";
+  mod.postChatItemRead = function(itemId) {
+    var url = apiQPrefix() + "/chat/" + itemId + "/read";
     return jsonHttpPost(url, "");
   };
 

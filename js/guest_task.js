@@ -283,14 +283,11 @@ var guestTask = function() {
     return view;
   }
 
-  function recoverCalendarSelection(task) {
-    var chat = list.find(task.guest_task.task_chats, function(chat) {
-      return task.guest_uid === chat.chat_with;
-    });
-    if (util.isNotNull(chat)) {
-      var msgItem = null;
-      for (var i = chat.chat_items.length; --i >= 0; ) {
-        var item = chat.chat_items[i];
+  function recoverCalendarSelection(ta) {
+    var msgItem = null;
+    for (var i = ta.task_chat_items.length; --i >= 0; ) {
+      var item = ta.task_chat_items[i];
+      if (item.by === login.me()) {
         switch (variant.cons(item.chat_item_data)) {
 
         case "Message":
@@ -321,7 +318,7 @@ var guestTask = function() {
   mod.loadTask = function(task) {
     var ta = task.guest_task;
 
-    var myLast = recoverCalendarSelection(task);
+    var myLast = recoverCalendarSelection(ta);
     var answers = {};
 
     function submitButton() {
@@ -331,38 +328,22 @@ var guestTask = function() {
         "text":"Submit"
       });
       submitButton.click(function() {
-        var noneWorks = $("#option-none").hasClass("checkbox-selected")
-                        ? $("#option-none-text").text().trim() : "";
-        var message = noneWorks;
-        // var message = join(noneWorks, "\n\n", $("#comment").val().trim());
-        function postMessage(reply) {
-          if (message.length > 0) {
-            var item = {
-              chatid: login.myChatid(),
-              by:     login.me(),
-              "for":  login.me(),
-              in_reply_to: reply,
-              chat_item_data: ["Message", message]
-            };
-            chat.postChatItem(item);
-          }
-        }
-
+        var data = null;
         var sel = list.ofTable(answers);
-        if (sel.length <= 0) {
-          postMessage(null);
-        } else {
-          var item = {
-            chatid: login.myChatid(),
-            by:     login.me(),
-            "for":  login.me(),
-            chat_item_data: ["Scheduling_r", {selected:sel}]
-          };
-          chat.postChatItem(item).done(function(item) {
-            postMessage(item.id);
-          });
+        if (sel.length > 0) {
+          data = ["Scheduling_r", {selected:sel}];
+        } else if ($("#option-none").hasClass("checkbox-selected")) {
+          data = ["Message", $("#option-none-text").text().trim()];
         }
-
+        if (util.isNotNull(data)) {
+          var item = {
+            tid: ta.tid,
+            to:  ta.task_participants.organized_by,
+            by:  login.me(),
+            chat_item_data: data
+          };
+          chat.postChatItem(item);
+        }
         $("html, body").animate({ scrollTop: 0 }, 350);
         $("#guest-select").addClass("hide");
         $("#feedback").removeClass("hide");
