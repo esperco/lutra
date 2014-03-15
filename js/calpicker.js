@@ -245,7 +245,16 @@ var calpicker = (function() {
     });
   }
 
-  mod.createPicker = function(param) {
+  /*
+    Create date and time picker using user's calendar.
+
+    Parameters:
+    - timezone: IANA timezone in which all local times are expressed
+    - onChange(optDates):
+        fired when the dates are initialized or change;
+        optDates is a record with fields start, end, and duration.
+   */
+  mod.create = function(param) {
     var tz = param.timezone;
     var onChange = param.onChange;
 

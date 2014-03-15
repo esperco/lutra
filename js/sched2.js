@@ -180,13 +180,13 @@ var sched2 = (function() {
     Otherwise the timezone is the determined by the location of the meeting.
    */
   function setupTimezoneLink(form, slot) {
-    log("setupTimezoneLink", slot);
     function displayTimezone(loc) {
       log("displayTimezone", loc);
       if (util.isDefined(loc))
-        timezoneText.text(timezone.format(loc.timezone));
+        timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
     }
-    function setLocation(loc) {
+    function setTimezone(oldTz, newTz) {
+      var loc = { timezone: newTz };
       slot.location = loc;
       displayTimezone(loc);
     }
@@ -195,6 +195,7 @@ var sched2 = (function() {
     switch (slot.meeting_type) {
     case "Call":
       timezoneText
+        .tooltip("destroy")
         .tooltip({
           title:
           "Click to change the time zone"
@@ -202,22 +203,27 @@ var sched2 = (function() {
         .off("click")
         .click(function() {
           var picker = tzpicker.create({
-            onTimeZoneChange: setLocation
+            onTimezoneChange: setTimezone
           });
           timezonePicker.children().remove();
           timezonePicker.append(picker.view);
         })
         .addClass("clickable");
+      form.addPublicNotes
+        .text("Specify phone number and notes");
       break;
 
     default:
       timezoneText
         .removeClass("clickable")
+        .tooltip("destroy")
         .tooltip({
           title:
           "The time zone is automatically set based on the meeting location"
         })
         .off("click");
+      form.addPublicNotes
+        .text("Add notes");
     }
     displayTimezone(slot.location);
   }
@@ -233,35 +239,44 @@ var sched2 = (function() {
     }
   }
 
-  function createCalendarModal() {
+  /* Create modal containing date/time picker based on the
+     user's calendar.
+
+     Input parameters are the same as for calpicker.create.
+  */
+  function createCalendarModal(param) {
 '''
-<div #calPickerModal
+<div #modal
      class="modal fade" tabindex="-1"
      role="dialog"
      aria-hidden="true">
-  <div #calPickerDialog
+  <div #dialog
        class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <img #calPickerIcon
+        <img #icon
              class="svg" src="/assets/img/calendar.svg">
         <div style="float:right" data-dismiss="modal">
           <img class="svg modal-close" src="/assets/img/x.svg"/>
         </div>
-        <h3 #calPickerTitle
+        <h3 #title
             class="modal-title">
           Select a time.
         </h3>
       </div>
-      <div #calPicker
+      <div #body
            class="modal-body"></div>
     </div>
   </div>
 </div>
 '''
     var id = util.randomString();
-    calPickerTitle.attr("id", id);
-    calPickerModal.attr("aria-labelledby", id);
+    title.attr("id", id);
+    modal.attr("aria-labelledby", id);
+
+    var cal = calpicker.create(param);
+    _view.cal = cal;
+    _view.body.append(cal.view);
 
     return _view;
   }
@@ -281,36 +296,36 @@ var sched2 = (function() {
       <div class="info-label what-label-edit">WHAT</div>
       <div class="info">
         <div #meetingTypeContainer/>
-        <input #customMeetingType
-               type="text"
-               class="form-control custom-type-input"/>
       </div>
     </div>
     <div class="edit-info-row">
       <div class="info-label when-label-edit">WHEN</div>
       <div class="info">
         <div class="clearfix">
-          <div class="some-datepicker">
-            <input #startDate
-                   type="text"
-                   class="form-control date-picker-field start"/>
-          </div>
-          <div class="bootstrap-timepicker">
-            <input #startTime
-                   type="text"
-                   class="form-control time-picker-field start"/>
-          </div>
-          <div class="time-input-row-end">
-            <span class="time-to-text">to</span>
-            <div class="bootstrap-timepicker">
-              <input #endTime
-                     type="text"
-                     class="form-control time-picker-field end"/>
-            </div>
+          <div #dateAndTimes
+               class="hide">
             <div class="some-datepicker">
-              <input #endDate
+              <input #startDate
                      type="text"
-                     class="form-control date-picker-field end"/>
+                     class="form-control date-picker-field start"/>
+            </div>
+            <div class="bootstrap-timepicker">
+              <input #startTime
+                     type="text"
+                     class="form-control time-picker-field start"/>
+            </div>
+            <div class="time-input-row-end">
+              <span class="time-to-text">to</span>
+              <div class="bootstrap-timepicker">
+                <input #endTime
+                       type="text"
+                       class="form-control time-picker-field end"/>
+              </div>
+              <div class="some-datepicker">
+                <input #endDate
+                       type="text"
+                       class="form-control date-picker-field end"/>
+              </div>
             </div>
           </div>
           <span #timezoneText class="timezone-text"></span>
@@ -324,6 +339,7 @@ var sched2 = (function() {
             Select time in calendar
           </span>
         </span>
+        <div #calPickerContainer/>
       </div>
     </div>
     <div #whereSection
@@ -392,45 +408,36 @@ var sched2 = (function() {
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
-    function openCal() {
-      var calModal = createCalendarModal();
-      /* TODO: append the modal somewhere */
-      calModal.calPickerModal.modal({});
-      return false;
-    }
-    openCalPicker.click(openCal);
-    $(".time-picker-field").off("click").click(openCal);
-    $(".date-picker-field").off("click").click(openCal);
-
-
     /*** Meeting date and time, shown only once a timezone is set ***/
 
-    var getDates = function() { return null; };
-    var renderCalendar = function() {};
-    var clearDates = function() {};
-
-    function updateCalendar(timezone) {
-      calendarContainer.children().remove();
-
-      if (util.isNonEmptyString(timezone)) {
-        var picker = calpicker.createPicker({
-          timezone: timezone,
-          onChange: (function() { updateSaveButton(); })
-        });
-        getDates = picker.getDates;
-        calendarContainer
-          .append(picker.view);
-
-        if (util.isDefined(x.start) && util.isDefined(x.end))
-          picker.setDates(x);
-
-        picker.render();
-          /* needs to be done once calendar becomes visible */
-
-        renderCalendar = picker.render;
-        clearDates = picker.clearDates;
-      }
+    var dates;
+    function setDates(optDates) {
+      log("sched2 setDates", optDates);
+      /* TODO: render dates if defined */
+      dates = optDates;
     }
+
+    var renderCalendar = function() {};
+    var displayDates = function() {
+      log("TODO: displayDates");
+      dateAndTimes.removeClass("hide");
+    };
+    var hideDates = function() {
+      log("TODO: hideDates");
+      dateAndTimes.addClass("hide");
+    };
+
+    function openCal() {
+      var calModal = createCalendarModal({
+        timezone: x.location.timezone,
+        onChange: setDates
+      });
+      calPickerContainer.children().remove();
+      calPickerContainer.append(calModal.modal);
+      calModal.modal.modal({});
+      calModal.cal.render();
+    }
+    openCalPicker.click(openCal);
 
     /*** Meeting location ***/
 
@@ -438,10 +445,9 @@ var sched2 = (function() {
     function onTimezoneChange(oldTimezone, newTimezone) {
       log("new timezone: " + newTimezone);
       setupTimezoneLink(_view, x);
-      updateCalendar(newTimezone);
       if (util.isNonEmptyString(oldTimezone)
           && util.isNonEmptyString(newTimezone))
-        clearDates();
+        displayDates();
     }
     var locationForm = locpicker.create({
       onTimezoneChange: onTimezoneChange
@@ -486,7 +492,6 @@ var sched2 = (function() {
     function getCalOption() {
       var meetingType = getMeetingType();
       var loc = locationForm.getCompleteLocation();
-      var dates = getDates();
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
           && util.isNotNull(dates)) {

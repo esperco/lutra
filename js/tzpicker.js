@@ -35,29 +35,36 @@ var tzpicker = (function() {
     return _view;
   }
 
+  /*
+    Parameters:
+    - onTimezoneChange(oldTz, newTz):
+        called when the timezone is set (when the modal is closed)
+   */
   mod.create = function(param) {
     var form = createForm();
+    var modal = form.tzPickerModal;
+    var body = form.tzPickerBody;
 
     function close() {
-      view.modal("hide");
+      modal.modal("hide");
     }
 
-    function onTimezoneChange(loc) {
+    function onTimezoneChange(oldTz, newTz) {
       close();
-      param.onTimezoneChange(loc);
+      param.onTimezoneChange(oldTz, newTz);
     }
 
     var picker = locpicker.create({
-      onTimezoneChange: onTimezoneChange
+      onTimezoneChange: onTimezoneChange,
+      showDetails: false
     });
 
-    var view = form.tzPickerBody;
-    view.append(picker.view);
+    body.append(picker.view);
 
-    view.modal({});
+    modal.modal({});
 
     return {
-      view: view,
+      view: modal,
       close: close
     };
   };

@@ -12,7 +12,7 @@
 var locpicker = (function() {
   var mod = {};
 
-  function createLocationForm(onTimezoneChange) {
+  function createLocationForm(onTimezoneChange, showDetails) {
 '''
 <div #location
      class="clearfix">
@@ -71,12 +71,8 @@ var locpicker = (function() {
     /* add extra fields to carry along, for convenience */
     form.onTimezoneChange = onTimezoneChange;
 
-    resetLocation.click(function() {
-      locationForm.addClass("hide");
-      // reset location
-      address.val("")
-             .focus();
-    })
+    if (showDetails === false)
+      locationDetails.addClass("hide");
 
     return form;
   }
@@ -106,6 +102,7 @@ var locpicker = (function() {
   }
 
   function setLocation(form, loc) {
+    log("locpicker setLocation", loc);
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
@@ -118,6 +115,10 @@ var locpicker = (function() {
 
     if (oldTimezone !== newTimezone)
       form.onTimezoneChange(oldTimezone, newTimezone);
+  }
+
+  function clearLocation(form) {
+    setLocation(form, {});
   }
 
   /*
@@ -157,24 +158,6 @@ var locpicker = (function() {
       googleMap: googleMap,
       addressMarker: addressMarker
     };
-  }
-
-  /* unused - needs update and testing */
-  function geocodeAddress(form, googleMap) {
-    var address = form.address.val();
-    if (address === "") return;
-    clearSuggestions();
-    api.getCoordinates(address)
-      .done(function(coords) {
-        var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
-        addressMarker.setPosition(geocoded);
-        addressMarker.setMap(googleMap);
-        googleMap.panTo(geocoded);
-        api.getTimezone(coords.lat, coords.lon)
-          .done(function(x) {
-            timeZoneDropdown.set(x.timezone);
-          });
-      });
   }
 
   function addCreatePlaceToMenu(form) {
@@ -314,13 +297,25 @@ var locpicker = (function() {
     util.afterTyping(form.address, 250, function() {
       predictAddress(form);
     });
+    form.resetLocation
+      .click(function() {
+        clearLocation(form);
+      });
   }
 
+  /*
+    Parameters:
+    - onTimezoneChange(oldTz, newTz):
+        called when the timezone is set or changes
+    - showDetails:
+        whether to show the details (name, address, instructions, map).
+        Default is true.
+   */
   mod.create = function(param) {
     var view = $("<div/>");
-    var form = createLocationForm(param.onTimezoneChange);
+    var form = createLocationForm(param.onTimezoneChange,
+                                  param.showDetails);
     var mapView = $("<div/>");
-    //var map = createGoogleMap(mapView);
 
     setup(form);
 
