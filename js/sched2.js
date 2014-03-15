@@ -255,7 +255,7 @@ var sched2 = (function() {
     <div class="modal-content">
       <div class="modal-header">
         <img #icon
-             class="svg" src="/assets/img/calendar.svg">
+             class="svg" src="/assets/img/calendar.svg"/>
         <div style="float:right" data-dismiss="modal">
           <img class="svg modal-close" src="/assets/img/x.svg"/>
         </div>
@@ -388,6 +388,7 @@ var sched2 = (function() {
   </div>
 </div>
 '''
+
     var x = calOption.slot;
 
     /*** Meeting type ***/
@@ -417,7 +418,6 @@ var sched2 = (function() {
       dates = optDates;
     }
 
-    var renderCalendar = function() {};
     var displayDates = function() {
       log("TODO: displayDates");
       dateAndTimes.removeClass("hide");
@@ -435,7 +435,10 @@ var sched2 = (function() {
       calPickerContainer.children().remove();
       calPickerContainer.append(calModal.modal);
       calModal.modal.modal({});
-      calModal.cal.render();
+      calModal.modal
+        .on("shown.bs.modal", function() {
+          calModal.cal.render(); // can't happen earlier or calendar won't show
+        });
     }
     openCalPicker.click(openCal);
 
@@ -542,8 +545,7 @@ var sched2 = (function() {
     editActions.append(cancel);
 
     return {
-      view: view,
-      renderCalendar: renderCalendar
+      view: view
     };
   }
 
@@ -665,8 +667,6 @@ var sched2 = (function() {
 
         readOnlyContainer.addClass("hide");
         editableContainer.removeClass("hide");
-
-        edit.renderCalendar();
 
         optionLetter.addClass("cancel")
                     .click(removeOption);

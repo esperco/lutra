@@ -22,17 +22,11 @@ var calpicker = (function() {
        class="row hide">
     <div class="col-sm-3">
       <div class="location-title">Start</div>
-      <div class="bootstrap-timepicker">
-        <input #startInput
-               type="text" class="form-control"/>
-      </div>
+      <input #startInput type="text" class="time form-control"/>
     </div>
     <div class="col-sm-3 clearfix">
       <div class="location-title">End</div>
-      <div class="bootstrap-timepicker">
-        <input #endInput
-               type="text" class="form-control"/>
-      </div>
+      <input #endInput type="text" class="time form-control"/>
     </div>
     <div class="col-sm-6"/>
   </div>
@@ -65,22 +59,23 @@ var calpicker = (function() {
   function initTimePicker(picker,
                           fieldName, /* either "eventStart" or "eventEnd" */
                           timePicker) {
+    log("initTimePicker", fieldName);
     timePicker.timepicker({
-      minuteStep: 5,
-      showSeconds: false
+      timeFormat: "g:i a",
+        /* PHP date() format http://php.net/manual/en/function.date.php */
+      step: 5
+        /* granularity in minutes */
     });
-    timePicker.timepicker().on('changeTime.timepicker', function(e) {
+    timePicker.on("changeTime", function() {
       /*
         TODO (known bug):
         Ensure that end date/time is after start date/time.
       */
-      var time = e.time;
-      var date = picker[fieldName];
+      var date = picker[fieldName]; /* Moment */
       if (util.isDefined(date)) {
-        var hours = to24hours(time);
-        var minutes = time.minutes;
-        date.hours(to24hours(time));
-        date.minutes(time.minutes);
+        var time = timePicker.timepicker("getTime"); /* native js Date */
+        date.hours(time.getHours());
+        date.minutes(time.getMinutes());
         updateCalendarView(picker);
       }
     });
