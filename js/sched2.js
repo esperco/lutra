@@ -251,11 +251,11 @@ var sched2 = (function() {
      role="dialog"
      aria-hidden="true">
   <div #dialog
-       class="modal-dialog">
+       class="modal-dialog cal-picker-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <img #icon
-             class="svg" src="/assets/img/calendar.svg"/>
+             class="svg cal-icon" src="/assets/img/calendar.svg"/>
         <div style="float:right" data-dismiss="modal">
           <img class="svg modal-close" src="/assets/img/x.svg"/>
         </div>

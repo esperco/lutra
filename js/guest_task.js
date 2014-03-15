@@ -214,7 +214,7 @@ var guestTask = function() {
   }
 
   function addToCalendar(ta, x) {
-    var addCal = $("<img id='add-cal'/>");
+    var addCal = $("<img class='add-cal'/>");
     var button = $("<button/>", {
       "id": "add-to-calendar",
       "class": "btn btn-primary",
@@ -222,7 +222,7 @@ var guestTask = function() {
       "data-toggle": "popover",
     })
       .append(addCal)
-      .append($("<div id='add-cal-text'>ADD TO CALENDAR</div>"));
+      .append($("<div class='add-cal-text'>ADD TO CALENDAR</div>"));
     svg.loadImg(addCal, "/assets/img/plus-sm.svg");
 
     var google = $("#google");
@@ -270,10 +270,10 @@ var guestTask = function() {
   }
 
   function calendarIcon(x) {
-    var view = $("<div id='cal-icon'/>");
-    var month = $("<div id='month'/>")
+    var view = $("<div class='cal-icon'/>");
+    var month = $("<div class='month'/>")
       .appendTo(view);
-    var day = $("<div id='day'/>")
+    var day = $("<div class='day'/>")
       .appendTo(view);
 
     var t1 = date.ofString(x.start);
