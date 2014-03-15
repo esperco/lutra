@@ -1,9 +1,22 @@
 <div id="home-header-container">
 	<div id="account-bar">
-	  <div id="account-menu" class="clickable">
+	  <div id="account-menu" class="clickable" data-toggle="popover"
+	  		 data-contentwrapper="#account-popover">
 	    <img class="svg link-caret" src="/assets/img/caret.svg">
 	    <span id="account-name" class="link"></span>
 	    <div id="assisting-name"></div>
+	  </div>
+	  <div id="account-popover" class="hide">
+	  	<div id="account-info"></div>
+	  	<div id="exec-switch"></div>
+	  	<ul id="account-popover-list" class="popover-list">
+	  		<li>
+		      <a href="#settings" data-toggle="tab">Settings</a>
+		    </li>
+		    <li>
+		      <a href="#!logout">Sign out</a>
+		    </li>
+	  	</ul>
 	  </div>
 	</div>
 	<div id="home-tools">

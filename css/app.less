@@ -76,6 +76,14 @@ i { color: @gray_60; }
     text-decoration: underline;
   }
 }
+.danger-link {
+  color: @red;
+  cursor: pointer;
+  &:hover {
+    color: @red_hover;
+    text-decoration: underline;
+  }
+}
 
 *.unselectable {
   cursor: default;
@@ -130,14 +138,19 @@ i { color: @gray_60; }
   padding: 7px 9px;
   pointer-events: none;
 }
-
-.danger-link {
-  color: @red;
-  cursor: pointer;
-  &:hover {
-    color: @red_hover;
-    text-decoration: underline;
-  }
+.popover-list {
+  margin: 0;
+  padding: 0;
+}
+.popover-list > li:hover {
+  background: @purple_bg_active;
+}
+.popover-list > li > a {
+  display: block;
+  padding: 5px 10px;
+}
+.popover-list > li + li {
+  margin-left: 0;
 }
 
 #global-status {
@@ -617,6 +630,12 @@ i { color: @gray_60; }
 
 #exec-name { font-family: @bold; }
 
+#account-popover-list {
+  width: 240px;
+}
+
+
+
 #title-bar { margin-bottom: 20px; }
 
 #home-title {
@@ -665,7 +684,10 @@ i { color: @gray_60; }
 .task-action {
   display: inline-block;
   margin: 0px 10px 0px 10px;
+  cursor: pointer;
 }
+
+.task-action-label { margin-left: 8px; }
 
 
 /*** Home Filters ***/

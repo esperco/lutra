@@ -28,27 +28,25 @@ var home = (function() {
     var view = $("#task-actions");
     view.children().remove();
 
-    log("about to load");
-
     var rescheduleAction = $("<div class='task-action'/>");
     var rescheduleIcon = $("<img/>")
       .appendTo(rescheduleAction);
     svg.loadImg(rescheduleIcon, "/assets/img/to-do.svg");
-    rescheduleAction.append(($("<span class='task-action-label'/>"))
+    rescheduleAction.append(($("<a class='task-action-label'/>"))
                       .text("Reschedule..."))
                     .appendTo(view);
     var cancelAction = $("<div class='task-action'/>");
     var cancelIcon = $("<img/>")
       .appendTo(cancelAction);
     svg.loadImg(cancelIcon, "/assets/img/to-do.svg");
-    cancelAction.append(($("<span class='task-action-label'/>"))
+    cancelAction.append(($("<a class='task-action-label'/>"))
                   .text("Cancel..."))
                 .appendTo(view);
     var deleteAction = $("<div class='task-action'/>");
     var deleteIcon = $("<img/>")
       .appendTo(deleteAction);
     svg.loadImg(deleteIcon, "/assets/img/to-do.svg");
-    deleteAction.append(($("<span class='task-action-label'/>"))
+    deleteAction.append(($("<a class='task-action-label'/>"))
                   .text("Delete..."))
                 .appendTo(view);
 
@@ -412,82 +410,7 @@ var home = (function() {
     });
   }
 
-  function insertLoggedIn() {
-    $(".logged-in-as").each(function() {
-      var view = $(this);
-      view.children().remove();
-      api.getProfile(login.me()).done(function(eaProf) {
-        var fullName = profile.fullName(eaProf);
-        view.append("<div class='logged-in-text'>LOGGED IN AS</div>")
-            .append("<div class='logged-in-name ellipsis'>" + fullName + "</div>");
-      });
-    })
-  }
-
   // function loadNavHeader() {
-  //   $(".nav-header").each(function() {
-  //     var view = $(this);
-  //     view.children().remove();
-  //     var initialsView = $("<div id='exec-circ'/>")
-  //       .appendTo(view);
-  //     var execNameView = $("<div id='exec-name' class='ellipsis'/>");
-  //     profile.get(login.leader())
-  //       .done(function(obsProf) {
-  //         var p = obsProf.prof;
-  //         execNameView.text(profile.fullName(p));
-  //         initialsView.text(profile.veryShortNameOfProfile(p));
-  //       });
-  //     var exec = $("<div id='exec-name-div'></div>")
-  //       .append($("<div id='assisting'>ASSISTING</div>"))
-  //       .append(execNameView)
-  //       .appendTo(view);
-  //     var caretDiv = $("<div id='exec-caret'></div>")
-  //       .appendTo(view);
-  //     var caret = $("<img/>")
-  //       .appendTo(caretDiv);
-  //     svg.loadImg(caret, "/assets/img/caret.svg");
-  //     $(".account-block").each(function() {
-  //       if (! $(this).hasClass("hide"))
-  //         $(this).addClass("hide");
-  //     });
-  //     $(".team-block").each(function() {
-  //       if (! $(this).hasClass("hide"))
-  //         $(this).addClass("hide");
-  //     });
-  //     $(".account-divider-div").each(function() {
-  //       if (! $(this).hasClass("hide"))
-  //         $(this).addClass("hide");
-  //     });
-  //     view.click(function() {
-  //       if (caretDiv.hasClass("account-nav-open")) {
-  //         caretDiv.removeClass("account-nav-open");
-  //         caretDiv.addClass("account-nav-closed");
-  //         $(".account-block").each(function() {
-  //           $(this).addClass("hide");
-  //         });
-  //         $(".team-block").each(function() {
-  //           $(this).addClass("hide");
-  //         });
-  //         $(".account-divider-div").each(function() {
-  //           $(this).addClass("hide");
-  //         });
-  //       } else {
-  //         caretDiv.removeClass("account-nav-closed");
-  //         caretDiv.addClass("account-nav-open");
-  //         $(".account-block").each(function() {
-  //           $(this).removeClass("hide");
-  //         });
-  //         $(".team-block").each(function() {
-  //           $(this).removeClass("hide");
-  //         });
-  //         $(".account-divider-div").each(function() {
-  //           $(this).removeClass("hide");
-  //         });
-  //       }
-  //     });
-  //   });
-
-  //   insertLoggedIn();
   //   insertTeams();
   // }
 
@@ -716,26 +639,9 @@ var home = (function() {
     })
   }
 
-  function loadHeader() {
-    var eaName = $("#account-name");
-    var execName = $("#assisting-name");
+  function loadSearch() {
     var search = $("#search-meetings-input");
     var clear = $("#clear-search");
-
-    api.getProfile(login.me()).done(function(eaProf) {
-      var fullName = profile.fullName(eaProf);
-      eaName.text(fullName);
-    });
-
-    profile.get(login.leader()).done(function(obsProf) {
-      var p = obsProf.prof;
-      var assisting = $("<span>assisting </span>");
-      var fullName = $("<span id='exec-name'/>")
-        .text(profile.fullName(p));
-      execName.children().remove();
-      execName.append(assisting)
-              .append(fullName);
-    });
 
     function updateSearch() {
       if (search.val() != "") {
@@ -753,80 +659,56 @@ var home = (function() {
       search.val("");
       updateSearch();
     })
+  }
 
-    // $(".nav-header").each(function() {
-    //   var view = $(this);
-    //   view.children().remove();
-    //   var initialsView = $("<div id='exec-circ'/>")
-    //     .appendTo(view);
-    //   var execNameView = $("<div id='exec-name' class='ellipsis'/>");
-    //   profile.get(login.leader())
-    //     .done(function(obsProf) {
-    //       var p = obsProf.prof;
-    //       execNameView.text(profile.fullName(p));
-    //       initialsView.text(profile.veryShortNameOfProfile(p));
-    //     });
-    //   var exec = $("<div id='exec-name-div'></div>")
-    //     .append($("<div id='assisting'>ASSISTING</div>"))
-    //     .append(execNameView)
-    //     .appendTo(view);
-    //   var caretDiv = $("<div id='exec-caret'></div>")
-    //     .appendTo(view);
-    //   var caret = $("<img/>")
-    //     .appendTo(caretDiv);
-    //   svg.loadImg(caret, "/assets/img/caret.svg");
-    //   $(".account-block").each(function() {
-    //     if (! $(this).hasClass("hide"))
-    //       $(this).addClass("hide");
-    //   });
-    //   $(".team-block").each(function() {
-    //     if (! $(this).hasClass("hide"))
-    //       $(this).addClass("hide");
-    //   });
-    //   $(".account-divider-div").each(function() {
-    //     if (! $(this).hasClass("hide"))
-    //       $(this).addClass("hide");
-    //   });
-    //   view.click(function() {
-    //     if (caretDiv.hasClass("account-nav-open")) {
-    //       caretDiv.removeClass("account-nav-open");
-    //       caretDiv.addClass("account-nav-closed");
-    //       $(".account-block").each(function() {
-    //         $(this).addClass("hide");
-    //       });
-    //       $(".team-block").each(function() {
-    //         $(this).addClass("hide");
-    //       });
-    //       $(".account-divider-div").each(function() {
-    //         $(this).addClass("hide");
-    //       });
-    //     } else {
-    //       caretDiv.removeClass("account-nav-closed");
-    //       caretDiv.addClass("account-nav-open");
-    //       $(".account-block").each(function() {
-    //         $(this).removeClass("hide");
-    //       });
-    //       $(".team-block").each(function() {
-    //         $(this).removeClass("hide");
-    //       });
-    //       $(".account-divider-div").each(function() {
-    //         $(this).removeClass("hide");
-    //       });
-    //     }
-    //   });
-    // });
+  function loadHeader() {
+    var view = $("#account-menu");
+    var eaName = $("#account-name");
+    var execName = $("#assisting-name");
 
-    // insertLoggedIn();
+    api.getProfile(login.me()).done(function(eaProf) {
+      var fullName = profile.fullName(eaProf);
+      eaName.text(fullName);
+    });
+
+    profile.get(login.leader()).done(function(obsProf) {
+      var p = obsProf.prof;
+      var assisting = $("<span>assisting </span>");
+      var fullName = $("<span id='exec-name'/>")
+        .text(profile.fullName(p));
+      execName.children().remove();
+      execName.append(assisting)
+              .append(fullName);
+    });
+
     // insertTeams();
+
+    view.popover({
+      html:true,
+      placement:'bottom',
+      content:function(){
+        return $($(this).data('contentwrapper')).html();
+      }
+    });
+
+    $('body').on('click', function (e) {
+      if ($(e.target).data('toggle') !== 'popover'
+        && $(e.target).parents('[data-toggle="popover"]').length === 0
+        && $(e.target).parents('.popover.in').length === 0
+        && view.next('div.popover:visible').length) {
+        view.click();
+      }
+    });
   }
 
 
   mod.load = function() {
     loadHeader();
+    loadSearch();
     loadFilters();
     loadTasks();
     $(".settings-nav")
-      .off('click')
+      .off("click")
       .click(settings.load);
     util.focus();
     $(document).click(function(event) {
