@@ -199,6 +199,12 @@ var sched4 = (function() {
       });
   }
 
+  function eventTimeHasPassed(task) {
+    var startTime = date.ofString(getSlot(task).start);
+    var now = date.ofString(date.nowUTC());
+    return startTime.getTime() < now.getTime();
+  }
+
   function preFillReminderModal(profs, ta, options, toUid) {
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
@@ -261,12 +267,16 @@ var sched4 = (function() {
     reminderModal.modal("hide");
   }
 
-  function getReminderStatus(ta) {
+  function getReminderStatus(ta, uid) {
     var startTime = date.ofString(getSlot(ta).start);
     var beforeSecs = sched.getState(ta).reserved.remind;
     if (util.isNotNull(beforeSecs)) {
-      startTime.setSeconds(startTime.getSeconds() - beforeSecs);
-      return "Will receive a reminder on " + date.justStartTime(startTime);
+      startTime.setTime(startTime.getTime() - (beforeSecs * 1000));
+      return sentReminder(ta, uid) ?
+        "Reminder sent on " + date.justStartTime(startTime) :
+        "Will receive a reminder on " + date.justStartTime(startTime);
+    } else if (eventTimeHasPassed(ta)) {
+      return "Did not receive a reminder";
     } else {
       return "Not scheduled to receive a reminder";
     }
@@ -306,16 +316,18 @@ var sched4 = (function() {
       .addClass("reminder-guest-name")
       .appendTo(view);
 
-    var guestStatusText = sentReminder(ta, uid) ?
-      "Reminder sent" :
-      getReminderStatus(ta);
     var guestStatus = $("<div class='reminder-guest-status'/>")
-      .text(guestStatusText)
+      .text(getReminderStatus(ta, uid))
       .appendTo(view);
 
     var reminderModal = $("#sched-reminder-modal");
     var state = sched.getState(ta);
     var options = sched.getGuestOptions(ta)[uid];
+
+    // Allow editing reminders only if event time is not already past
+    if (eventTimeHasPassed(ta)) {
+      edit.addClass("disabled");
+    }
 
     edit.click(function() {
       preFillReminderModal(profs, ta, options, uid);
@@ -349,17 +361,33 @@ var sched4 = (function() {
       api.postTask(task);
     }
 
+    /*
+       Is task starting time minus duration (seconds) in the past?
+       If so, disable the option to use that duration for reminders.
+    */
+    function disableIfPast(duration) {
+      var startTime = date.ofString(getSlot(task).start);
+      startTime.setTime(startTime.getTime() - (duration * 1000));
+      var now = date.ofString(date.nowUTC());
+      if (startTime.getTime() < now.getTime())
+        return "disabled";
+      else
+        return null;
+    }
+
+    var hrb4 = " hours beforehand";
+    var hr = 3600; // seconds
     sel = select.create({
       buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
-        { label: "1 hour beforehand", key: "1h", value: 3600 },
-        { label: "3 hours beforehand", key: "3h", value: 3 * 3600 },
-        { label: "6 hours beforehand", key: "6h", value: 6 * 3600 },
-        { label: "12 hours beforehand", key: "12h", value: 12 * 3600 },
-        { label: "24 hours beforehand", key: "24h", value: 24 * 3600 },
-        { label: "36 hours beforehand", key: "36h", value: 36 * 3600 },
-        { label: "48 hours beforehand", key: "48h", value: 48 * 3600 },
+        { label: "1 hour beforehand", key: "hr", value: hr, cls: disableIfPast(hr) },
+        { label: "3"+hrb4, key: "3h", value: 3*hr, cls: disableIfPast(3*hr) },
+        { label: "6"+hrb4, key: "6h", value: 6*hr, cls: disableIfPast(6*hr) },
+        { label: "12"+hrb4, key: "12h", value: 12*hr, cls: disableIfPast(12*hr) },
+        { label: "24"+hrb4, key: "24h", value: 24*hr, cls: disableIfPast(24*hr) },
+        { label: "36"+hrb4, key: "36h", value: 36*hr, cls: disableIfPast(36*hr) },
+        { label: "48"+hrb4, key: "48h", value: 48*hr, cls: disableIfPast(48*hr) },
         { label: "Never", key: "no", value: -1 }
       ]
     });
@@ -436,7 +464,13 @@ var sched4 = (function() {
         reminderSent = true;
     });
 
-    scheduler.append(createReminderScheduler(profs, task, guests, statuses));
+    var schedulerView = createReminderScheduler(profs, task, guests, statuses);
+    scheduler.append(schedulerView);
+
+    // Allow sending reminders only if event time is not already past
+    if (eventTimeHasPassed(task)) {
+      schedulerView.find("button").addClass("disabled");
+    }
 
     showHide.click(function() {
       toggleModule("reminder");
