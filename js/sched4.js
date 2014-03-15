@@ -269,6 +269,17 @@ var sched4 = (function() {
     reminderModal.modal("hide");
   }
 
+  function getReminderStatus(ta) {
+    var startTime = date.ofString(getSlot(ta).start);
+    var beforeSecs = sched.getState(ta).reserved.remind;
+    if (util.isNotNull(beforeSecs)) {
+      startTime.setSeconds(startTime.getSeconds() - beforeSecs);
+      return "Will receive a reminder on " + date.justStartTime(startTime);
+    } else {
+      return "Not scheduled to receive a reminder";
+    }
+  }
+
   function createReminderRow(profs, ta, uid, guests) {
 '''
 <div #view
@@ -305,11 +316,10 @@ var sched4 = (function() {
 
     var guestStatusText = sentReminder(uid) ?
       "Reminder sent" :
-      "Not scheduled to receive a reminder";
+      getReminderStatus(ta);
     var guestStatus = $("<div class='reminder-guest-status'/>")
       .text(guestStatusText)
       .appendTo(view);
-
 
     var reminderModal = $("#sched-reminder-modal");
     var state = sched.getState(ta);
@@ -328,11 +338,10 @@ var sched4 = (function() {
       reminderModal.modal({});
     });
 
-
-    return view;
+    return { row: view, statusText: guestStatus };
   }
 
-  function createReminderScheduler(profs, task, guests) {
+  function createReminderScheduler(profs, task, guests, statuses) {
     var sel;
     var reserved = sched.getState(task).reserved;
 
@@ -342,6 +351,9 @@ var sched4 = (function() {
         delete reserved.remind;
       else
         reserved.remind = remind;
+      list.iter(statuses, function(statusText) {
+        statusText.text(getReminderStatus(task));
+      });
       api.postTask(task);
     }
 
@@ -421,14 +433,18 @@ var sched4 = (function() {
       "Send reminders" :
       "Send the reminder";
     schedulerTitle.text(schedulerText);
-    scheduler.append(createReminderScheduler(profs, task, guests));
 
     var reminderSent = false;
+    var statuses = [];
     list.iter(guests, function(uid) {
-      content.append(createReminderRow(profs, task, uid, guests));
+      var reminderRow = createReminderRow(profs, task, uid, guests);
+      content.append(reminderRow.row);
+      statuses.push(reminderRow.statusText);
       if (sentReminder(uid))
         reminderSent = true;
     });
+
+    scheduler.append(createReminderScheduler(profs, task, guests, statuses));
 
     showHide.click(function() {
       toggleModule("reminder");
