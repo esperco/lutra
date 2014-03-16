@@ -263,6 +263,8 @@ var sched2 = (function() {
             class="modal-title">
           Select a time.
         </h3>
+        <button #doneButton
+                class="btn btn-default">Done</button>
       </div>
       <div #body
            class="modal-body"></div>
@@ -438,6 +440,11 @@ var sched2 = (function() {
       calModal.modal
         .on("shown.bs.modal", function() {
           calModal.cal.render(); // can't happen earlier or calendar won't show
+        });
+      calModal.doneButton
+        .click(function() {
+          log("TODO: save dates");
+          calModal.modal.modal("hide");
         });
     }
     openCalPicker.click(openCal);
