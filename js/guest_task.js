@@ -226,7 +226,7 @@ var guestTask = function() {
         };
     }());
 
-  function addToCalendar(tid,ta, x) {
+  function addToCalendar(ta, x) {
     var addCal = $("<img id='add-cal'/>");
     var button = $("<button/>", {
       "id": "add-to-calendar",
@@ -291,7 +291,7 @@ var guestTask = function() {
       .appendTo(view);
 
     if (! list.mem(task.guest_hosts, task.guest_uid)) {
-      view.append(addToCalendar(task.tid,ta, state));
+      view.append(addToCalendar(ta, state));
     } else {
       title.addClass("exec-view");
     }
