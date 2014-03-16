@@ -247,13 +247,18 @@ var guestTask = function() {
                                     x.hide_end_times));
     });
     var outlook = $("#outlook");
-    $(document).on("click", "#outlook", function() {
+    var apple = $("#apple");
+
+    var getICS = function () {
       $('[data-toggle="popover"]').click();
       api.getTaskICS().done(function (ics) {
           log(ics);
           saveICS(ics.file,'calendar-invitation.ics');
       });
-    });
+      button.click();
+    }
+    $(document).on("click", "#outlook", getICS);
+    $(document).on("click", "#apple", getICS);
 
     button.popover({
       html:true,
