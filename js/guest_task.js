@@ -257,8 +257,12 @@ var guestTask = function() {
       });
       button.click();
     }
-    $(document).on("click", "#outlook", getICS);
-    $(document).on("click", "#apple", getICS);
+    $("#outlook")
+          .off("click")
+          .click(getICS);
+    $("#apple")
+          .off("click")
+          .click(getICS);
 
     button.popover({
       html:true,
