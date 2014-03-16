@@ -39,6 +39,13 @@ var select = (function() {
       return null;
   }
 
+  function classOfOption(o) {
+    if (util.isNotNull(o) && util.isDefined(o.cls))
+      return o.cls;
+    else
+      return null;
+  }
+
   function hasKey(o) {
     return keyOfOption(o) !== null;
   }
@@ -93,22 +100,27 @@ var select = (function() {
     list.iter(param.options, function(o) {
       var k = keyOfOption(o);
       var v = valueOfOption(o);
+      var cls = classOfOption(o);
 
       if (k !== null)
         tbl[k] = o;
       else
         unsetLabel = util.isString(o.label) ? o.label : "";
 
-      var li = $("<li/>").appendTo(ul);
+      var li = $("<li/>")
+        .addClass(cls)
+        .appendTo(ul);
       var a = $("<a href='#'/>")
         .text(o.label)
         .click(function() {
-          state = v;
-          addDivClass();
-          addButtonClass();
-          setButtonLabel(o);
-          view.removeClass("open"); /* needed b/c we block the event */
-          runAction(o, state);
+          if (!($(this).parent().hasClass("disabled"))) {
+            state = v;
+            addDivClass();
+            addButtonClass();
+            setButtonLabel(o);
+            view.removeClass("open"); /* needed b/c we block the event */
+            runAction(o, state);
+          }
           return false; /* block event, prevent link from being followed */
         })
         .appendTo(li);
