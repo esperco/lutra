@@ -212,6 +212,19 @@ var guestTask = function() {
             "sprop=name:esper.com"] // website address
             .join("&");
   }
+    var saveICS = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([data], {type: "text/calendar"});
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        //    window.URL.revokeObjectURL(url);
+        };
+    }());
 
   function addToCalendar(tid,ta, x) {
     var addCal = $("<img id='add-cal'/>");
@@ -234,19 +247,12 @@ var guestTask = function() {
                                     x.hide_end_times));
     });
     var outlook = $("#outlook");
-    $(document).on("click", "#google", function() {
+    $(document).on("click", "#outlook", function() {
       $('[data-toggle="popover"]').click();
-      var ics = getTaskICS(tid);
-      window.URL = window.webkitURL || window.URL;
-      window.BlobBuilder = window.BlobBuilder || 
-            window.WebKitBlobBuilder || window.MozBlobBuilder;
-      var icsfile = new window.BlobBuilder();
-      icsfile.append(ics.file);
-      var a = document.createElement('a');
-      a.href = window.URL.createObjectURL(icsfile.getBlob(ics.mimetype));
-      a.download = 'calendar-invitation.ics';
-      a.textContent = ics.title;
-      document.body.appendChild(a);
+      api.getTaskICS().done(function (ics) {
+          log(ics);
+          saveICS(ics.file,'calendar-invitation.ics');
+      });
     });
 
     button.popover({
