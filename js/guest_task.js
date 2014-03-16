@@ -253,7 +253,7 @@ var guestTask = function() {
       $('[data-toggle="popover"]').click();
       api.getTaskICS().done(function (ics) {
           log(ics);
-          saveICS(ics.file,'calendar-invitation.ics');
+          saveICS(ics.content,'calendar-invitation.ics');
       });
       button.click();
     }
