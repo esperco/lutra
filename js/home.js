@@ -28,6 +28,13 @@ var home = (function() {
     var view = $("#task-actions");
     view.children().remove();
 
+    var viewMeetingPage = $("<div class='task-action'/>");
+    var viewMeetingPageIcon = $("<img/>")
+      .appendTo(viewMeetingPage);
+    svg.loadImg(viewMeetingPageIcon, "/assets/img/to-do.svg");
+    viewMeetingPage.append(($("<a class='task-action-label'/>"))
+                     .text("View meeting page"))
+                   .appendTo(view);
     var rescheduleAction = $("<div class='task-action'/>");
     var rescheduleIcon = $("<img/>")
       .appendTo(rescheduleAction);
@@ -50,6 +57,16 @@ var home = (function() {
                   .text("Delete..."))
                 .appendTo(view);
 
+    viewMeetingPage.click(function() {
+      var hosts = sched.getHosts(ta);
+      var host;
+      list.iter(hosts, function(uid) {
+        host = uid;
+      });
+      api.getGuestAppURL(ta.tid, host).done(function (url) {
+        window.open(url.url);
+      });
+    })
     // rescheduleAction.click(function() {
 
     // })
@@ -349,71 +366,6 @@ var home = (function() {
     });
   }
 
-  function clearTeams() {
-    $(".team-block").remove();
-  }
-
-  function switchTeam(team) {
-    login.setTeam(team);
-    mod.load();
-  }
-
-  function labelOfTeam(team) {
-    var label = team.team_label;
-    if (! util.isString(label) || label === "")
-      label = team.teamname;
-    return label;
-  }
-
-  function sortTeams(a) {
-    return list.sort(a, function(t1, t2) {
-      var l1 = labelOfTeam(t1);
-      var l2 = labelOfTeam(t2);
-      return l1.localeCompare(l2);
-    });
-  }
-
-  function clickableViewOfTeam(team) {
-    var isActive = login.getTeam().teamname === team.teamname;
-    var label = labelOfTeam(team);
-    var li = $("<li class='team-block hide'/>");
-    var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
-      .appendTo(li);
-    var pic = $("<div class='list-exec-circ'/>")
-      .text(profile.shortenName(label))
-      .appendTo(a);
-    var div = $("<div class='list-exec-name ellipsis'/>")
-      .text(label)
-      .appendTo(a);
-
-    if (isActive) {
-      li.addClass("active");
-      a.addClass("nav-active-team");
-    } else {
-      li.click(function() {
-        switchTeam(team);
-      });
-    }
-
-    return li;
-  }
-
-  function insertTeams() {
-    clearTeams();
-    var teams = sortTeams(login.getTeams());
-    $(".nav-teams").each(function() {
-      var sep = $(this);
-      list.iter(list.rev(teams), function(team) {
-        clickableViewOfTeam(team)
-          .insertAfter(sep);
-      });
-    });
-  }
-
-  // function loadNavHeader() {
-  //   insertTeams();
-  // }
-
   function moveContent(padding) {
     var view = $("#home-content");
     view.attr("style","-webkit-transform: translate(0px, " + padding + "px)")
@@ -424,73 +376,74 @@ var home = (function() {
         .attr("style","padding-top:" + padding + "px");
   }
 
-  function loadFilters() {
-    var toggle = $("#toggle-filters");
-    var label = $("#toggle-filters-label")
-      .text("Show Filters");
-    var caret = $("#filters-caret");
-    var filters = $("#filters")
-      .attr("style","display:none");
-    var sortBy = $("#sort-by-filter");
-    var status = $("#status-filter");
-    var waitingOn = $("#waiting-on-filter");
+  function loadAssignedToFilters() {
+    // only do this if there's more than 1 EA on the team
     var assignedTo = $("#assigned-to-filter");
-
-    sortBy.children().remove();
-    $("<h5 class='filter-title'>Sort By</h5>")
-      .appendTo(sortBy);
-    var sortByToDo = $("<li class='filter sort-by-filter active'>To Do</li>");
-    var sortByLastUpdated = $("<li class='filter sort-by-filter link'>Last Updated</li>");
-    var sortByMeetingDate = $("<li class='filter sort-by-filter link'>Meeting Date</li>");
-    var sortByOptions = $("<ul class=filter-list/>")
-      .append(sortByToDo)
-      .append(sortByLastUpdated)
-      .append(sortByMeetingDate)
-      .appendTo(sortBy);
-    sortByToDo.click(function() {
-      if(! $(this).hasClass("active")) {
-        $(".sort-by-filter").each(function() {
-          if ($(this).hasClass("active")) {
-            $(this).removeClass("active")
-                   .addClass("link");
-            // clear filter
-          }
-        })
-        $(this).removeClass("link")
-               .addClass("active");
+    assignedTo.children().remove();
+    $("<h5 class='filter-title'>Waiting On</h5>")
+      .appendTo(assignedTo);
+    var checkAssignedToMe = $("<img class='filter-checkbox'/>");
+    var assignedToMe = $("<li class='filter checkbox-option clickable'></li>");
+    // add other EA's on team here
+    var assignedTo = $("<ul class=filter-list/>")
+      .append(assignedToMe
+        .append(checkAssignedToMe)
+        .append($("<span class='filter-checkbox-label'>Me</span>")))
+      .appendTo(assignedTo);
+    svg.loadImg(checkAssignedToMe, "/assets/img/checkbox-sm.svg");
+    assignedToMe.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
         // apply filter
       }
     })
-    sortByLastUpdated.click(function() {
-      if(! $(this).hasClass("active")) {
-        $(".sort-by-filter").each(function() {
-          if ($(this).hasClass("active")) {
-            $(this).removeClass("active")
-                   .addClass("link");
-            // clear filter
-          }
-        })
-        $(this).removeClass("link")
-               .addClass("active");
+  }
+
+  function loadWaitingOnFilters() {
+    var waitingOn = $("#waiting-on-filter");
+    waitingOn.children().remove();
+    $("<h5 class='filter-title'>Waiting On</h5>")
+      .appendTo(waitingOn);
+    var checkWaitingOnMe = $("<img class='filter-checkbox'/>");
+    var waitingOnMe = $("<li class='filter checkbox-option clickable'></li>");
+    // add other EA's on team here
+    var checkGuests = $("<img class='filter-checkbox'/>");
+    var waitingOnGuests = $("<li class='filter checkbox-option clickable'></li>");
+    var waitingOnOptions = $("<ul class=filter-list/>")
+      .append(waitingOnMe
+        .append(checkWaitingOnMe)
+        .append($("<span class='filter-checkbox-label'>Me</span>")))
+      .append(waitingOnGuests
+        .append(checkGuests)
+        .append($("<span class='filter-checkbox-label'>Guests</span>")))
+      .appendTo(waitingOn);
+    svg.loadImg(checkWaitingOnMe, "/assets/img/checkbox-sm.svg");
+    svg.loadImg(checkGuests, "/assets/img/checkbox-sm.svg");
+    waitingOnMe.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
         // apply filter
       }
     })
-    sortByMeetingDate.click(function() {
-      if(! $(this).hasClass("active")) {
-        $(".sort-by-filter").each(function() {
-          if ($(this).hasClass("active")) {
-            $(this).removeClass("active")
-                   .addClass("link");
-            // clear filter
-          }
-        })
-        $(this).removeClass("link")
-               .addClass("active");
+    waitingOnGuests.click(function() {
+      if($(this).hasClass("checkbox-selected")) {
+        $(this).removeClass("checkbox-selected");
+        // remove filter
+      } else {
+        $(this).addClass("checkbox-selected");
         // apply filter
       }
     })
+  }
 
-
+  function loadStatusFilters() {
+    var status = $("#status-filter");
     status.children().remove();
     $("<h5 class='filter-title'>Status</h5>")
       .appendTo(status);
@@ -556,67 +509,77 @@ var home = (function() {
         // apply filter
       }
     })
+  }
 
-    waitingOn.children().remove();
-    $("<h5 class='filter-title'>Waiting On</h5>")
-      .appendTo(waitingOn);
-    var checkWaitingOnMe = $("<img class='filter-checkbox'/>");
-    var waitingOnMe = $("<li class='filter checkbox-option clickable'></li>");
-    // add other EA's on team here
-    var checkGuests = $("<img class='filter-checkbox'/>");
-    var waitingOnGuests = $("<li class='filter checkbox-option clickable'></li>");
-    var waitingOnOptions = $("<ul class=filter-list/>")
-      .append(waitingOnMe
-        .append(checkWaitingOnMe)
-        .append($("<span class='filter-checkbox-label'>Me</span>")))
-      .append(waitingOnGuests
-        .append(checkGuests)
-        .append($("<span class='filter-checkbox-label'>Guests</span>")))
-      .appendTo(waitingOn);
-    svg.loadImg(checkWaitingOnMe, "/assets/img/checkbox-sm.svg");
-    svg.loadImg(checkGuests, "/assets/img/checkbox-sm.svg");
-    waitingOnMe.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
+  function loadSortByFilters() {
+    var sortBy = $("#sort-by-filter");
+    sortBy.children().remove();
+    $("<h5 class='filter-title'>Sort By</h5>")
+      .appendTo(sortBy);
+    var sortByToDo = $("<li class='filter sort-by-filter active'>To Do</li>");
+    var sortByLastUpdated = $("<li class='filter sort-by-filter link'>Last Updated</li>");
+    var sortByMeetingDate = $("<li class='filter sort-by-filter link'>Meeting Date</li>");
+    var sortByOptions = $("<ul class=filter-list/>")
+      .append(sortByToDo)
+      .append(sortByLastUpdated)
+      .append(sortByMeetingDate)
+      .appendTo(sortBy);
+    sortByToDo.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
         // apply filter
       }
     })
-    waitingOnGuests.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
+    sortByLastUpdated.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
         // apply filter
       }
     })
+    sortByMeetingDate.click(function() {
+      if(! $(this).hasClass("active")) {
+        $(".sort-by-filter").each(function() {
+          if ($(this).hasClass("active")) {
+            $(this).removeClass("active")
+                   .addClass("link");
+            // clear filter
+          }
+        })
+        $(this).removeClass("link")
+               .addClass("active");
+        // apply filter
+      }
+    })
+  }
 
-    // if there's more than 1 EA, remove "hide" class from assignedTo
-    assignedTo.children().remove();
-    $("<h5 class='filter-title'>Waiting On</h5>")
-      .appendTo(assignedTo);
-    var checkAssignedToMe = $("<img class='filter-checkbox'/>");
-    var assignedToMe = $("<li class='filter checkbox-option clickable'></li>");
-    // add other EA's on team here
-    var assignedTo = $("<ul class=filter-list/>")
-      .append(assignedToMe
-        .append(checkAssignedToMe)
-        .append($("<span class='filter-checkbox-label'>Me</span>")))
-      .appendTo(assignedTo);
-    svg.loadImg(checkAssignedToMe, "/assets/img/checkbox-sm.svg");
-    svg.loadImg(checkGuests, "/assets/img/checkbox-sm.svg");
-    assignedToMe.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
-        // apply filter
-      }
-    })
+  function loadFilters() {
+    var toggle = $("#toggle-filters");
+    var label = $("#toggle-filters-label")
+      .text("Show Filters");
+    var caret = $("#filters-caret");
+    var filters = $("#filters")
+      .attr("style","display:none");
+
+    loadSortByFilters();
+    loadStatusFilters();
+    loadWaitingOnFilters();
+    loadAssignedToFilters();
 
     toggle.click(function() {
       if (filters.is(":hidden")) {
@@ -661,14 +624,74 @@ var home = (function() {
     })
   }
 
+  function switchTeam(team) {
+    login.setTeam(team);
+    mod.load();
+  }
+
+  function labelOfTeam(team) {
+    var label = team.team_label;
+    if (! util.isString(label) || label === "")
+      label = team.teamname;
+    return label;
+  }
+
+  function clickableViewOfTeam(team) {
+    var isActive = login.getTeam().teamname === team.teamname;
+    var label = labelOfTeam(team);
+    var li = $("<li class='team-block hide'/>");
+    var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
+      .appendTo(li);
+    var pic = $("<div class='list-exec-circ'/>")
+      .text(profile.shortenName(label))
+      .appendTo(a);
+    var div = $("<div class='list-exec-name ellipsis'/>")
+      .text(label)
+      .appendTo(a);
+
+    if (isActive) {
+      li.addClass("active");
+      a.addClass("nav-active-team");
+    } else {
+      li.click(function() {
+        switchTeam(team);
+      });
+    }
+
+    return li;
+  }
+
+  function sortTeams(a) {
+    return list.sort(a, function(t1, t2) {
+      var l1 = labelOfTeam(t1);
+      var l2 = labelOfTeam(t2);
+      return l1.localeCompare(l2);
+    });
+    log("teams sorted");
+  }
+
+  function insertTeams() {
+    var view = $("#popover-team-list");
+    view.children().remove();
+    var teams = sortTeams(login.getTeams());
+    list.iter(list.rev(teams), function(team) {
+      clickableViewOfTeam(team)
+        .appendTo(view);
+    });
+  }
+
   function loadHeader() {
     var view = $("#account-menu");
+    var info = $("#popover-account-info");
     var eaName = $("#account-name");
     var execName = $("#assisting-name");
 
     api.getProfile(login.me()).done(function(eaProf) {
       var fullName = profile.fullName(eaProf);
+      var email = profile.email(eaProf);
       eaName.text(fullName);
+      info.append($("<div id='popover-account-name'>" + fullName + "</div>"))
+          .append($("<div id='popover-account-email'>" + email + "</div>"));
     });
 
     profile.get(login.leader()).done(function(obsProf) {
