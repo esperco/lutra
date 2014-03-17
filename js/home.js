@@ -152,13 +152,16 @@ var home = (function() {
     // rescheduleAction.click(function() {
 
     // })
-    // cancelAction.click(function() {
-
-    // })
+    cancelAction.click(function() {
+      api.cancelCalendar(ta.tid).done(function (resp) {
+        ta.task_status.task_progress = "Closed";
+        api.postTask(ta).done();
+      });
+    });
     deleteAction.click(function() {
       api.archiveTask(ta.tid);
       observable.onTaskArchived.notify(ta.tid);
-    })
+    });
   }
 
   function viewOfTaskRow(ta) {
