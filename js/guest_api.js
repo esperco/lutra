@@ -95,5 +95,10 @@ var api = function() {
     return jsonHttpGet(apiPrefix() + "/profile/" + uid);
   };
 
+  mod.getTaskICS = function() {
+    return jsonHttpGet(apiPrefix() + "/task/ics");
+  };
+
+
   return mod;
 }();

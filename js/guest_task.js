@@ -213,6 +213,19 @@ var guestTask = function() {
             "sprop=name:esper.com"] // website address
             .join("&");
   }
+    var saveICS = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([data], {type: "text/calendar"});
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        //    window.URL.revokeObjectURL(url);
+        };
+    }());
 
   function addToCalendar(ta, x) {
     var addCal = $("<img id='add-cal'/>");
@@ -233,6 +246,23 @@ var guestTask = function() {
                                     window.location,
                                     x.reserved.slot));
     });
+    var outlook = $("#outlook");
+    var apple = $("#apple");
+
+    var getICS = function () {
+      $('[data-toggle="popover"]').click();
+      api.getTaskICS().done(function (ics) {
+          log(ics);
+          saveICS(ics.content,'calendar-invitation.ics');
+      });
+      button.click();
+    }
+    $("#outlook")
+          .off("click")
+          .click(getICS);
+    $("#apple")
+          .off("click")
+          .click(getICS);
 
     button.popover({
       html:true,
