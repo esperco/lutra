@@ -144,7 +144,7 @@ var home = (function() {
       host = uid;
     });
     api.getGuestAppURL(ta.tid, host).done(function (url) {
-      viewMeetingPage.attr("href", url.url);
+      viewLivePage.attr("href", url.url);
     });
 
     loadAssignToPopover(ta, assignAction);
