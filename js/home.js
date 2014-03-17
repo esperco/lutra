@@ -21,7 +21,68 @@ var home = (function() {
 
   function taskSubject(ta) {
     // get subject of the task's email conversation
-    return "Email subject line";
+    return "Email subject line goes here.";
+  }
+
+  function loadAssignToPopover(ta, x) {
+    var view = $("#popover-ea-list");
+    view.children().remove();
+
+    var team_organizers = login.organizers();
+    // if (team_organizers.length > 1) {
+      profile.mget(team_organizers).done(function(profs) {
+        list.iter(team_organizers, function(organizer_uid, i) {
+          var v = $("<li/>");
+          var checkbox = $("<div class='assign-to-checkbox'/>");
+          var img = $("<img/>")
+            .appendTo(checkbox);
+          svg.loadImg(img, "/assets/img/checkbox-sm.svg");
+          var eaName = $("<div class='assign-to-name'/>")
+            .text(profile.fullName(profs[i].prof));
+          if (list.mem(ta.task_participants.organized_by, organizer_uid)) {
+            v.addClass("checkbox-selected");
+          }
+          v.append(checkbox)
+           .append(eaName)
+           .appendTo(view);
+
+          v.click(function() {
+            var task_organizers = ta.task_participants.organized_by;
+            if (list.mem(task_organizers, organizer_uid)) {
+              v.removeClass("checkbox-selected");
+              task_organizers.splice(task_organizers.indexOf(organizer_uid),
+                                     1);
+            } else {
+              v.addClass("checkbox-selected");
+              task_organizers.push(organizer_uid);
+            }
+            api.postTask(ta);
+          });
+        });
+      });
+    // }
+
+    x.attr({
+      "data-toggle":"popover",
+      "data-contentwrapper":"#assign-to-popover"
+    });
+
+    x.popover({
+      html:true,
+      placement:'bottom',
+      content:function(){
+        return $($(this).data('contentwrapper')).html();
+      }
+    });
+
+    $('body').on('click', function (e) {
+      if ($(e.target).data('toggle') !== 'popover'
+        && $(e.target).parents('[data-toggle="popover"]').length === 0
+        && $(e.target).parents('.popover.in').length === 0
+        && x.next('div.popover:visible').length) {
+        x.click();
+      }
+    });
   }
 
   function loadTaskActions(ta) {
@@ -29,33 +90,55 @@ var home = (function() {
     view.children().remove();
 
     var viewMeetingPage = $("<div class='task-action'/>");
-    var viewMeetingPageIcon = $("<img/>")
+    var viewMeetingPageIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(viewMeetingPage);
+    var viewMeetingPageIcon = $("<img/>")
+      .appendTo(viewMeetingPageIconContainer);
     svg.loadImg(viewMeetingPageIcon, "/assets/img/to-do.svg");
     viewMeetingPage.append(($("<a class='task-action-label'/>"))
                      .text("View meeting page"))
                    .appendTo(view);
+    var assignAction = $("<div class='task-action'/>");
+    var assignIconContainer = $("<div class='task-action-icon'/>")
+      .appendTo(assignAction);
+    var assignIcon = $("<img/>")
+      .appendTo(assignIconContainer);
+    svg.loadImg(assignIcon, "/assets/img/to-do.svg");
+    assignAction.append(($("<a class='task-action-label caret-text'/>"))
+                  .text("Assign to"));
+    var assignCaret = $("<img class='caret-link'/>")
+      .appendTo(assignAction);
+    svg.loadImg(assignCaret, "/assets/img/caret.svg");
+    assignAction.appendTo(view);
     var rescheduleAction = $("<div class='task-action'/>");
-    var rescheduleIcon = $("<img/>")
+    var rescheduleIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(rescheduleAction);
+    var rescheduleIcon = $("<img/>")
+      .appendTo(rescheduleIconContainer);
     svg.loadImg(rescheduleIcon, "/assets/img/to-do.svg");
     rescheduleAction.append(($("<a class='task-action-label'/>"))
                       .text("Reschedule..."))
                     .appendTo(view);
     var cancelAction = $("<div class='task-action'/>");
-    var cancelIcon = $("<img/>")
+    var cancelIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(cancelAction);
-    svg.loadImg(cancelIcon, "/assets/img/to-do.svg");
+    var cancelIcon = $("<img/>")
+      .appendTo(cancelIconContainer);
+    svg.loadImg(cancelIcon, "/assets/img/cancel-meeting.svg");
     cancelAction.append(($("<a class='task-action-label'/>"))
                   .text("Cancel..."))
                 .appendTo(view);
     var deleteAction = $("<div class='task-action'/>");
-    var deleteIcon = $("<img/>")
+    var deleteIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(deleteAction);
-    svg.loadImg(deleteIcon, "/assets/img/to-do.svg");
+    var deleteIcon = $("<img/>")
+      .appendTo(deleteIconContainer);
+    svg.loadImg(deleteIcon, "/assets/img/delete-meeting.svg");
     deleteAction.append(($("<a class='task-action-label'/>"))
                   .text("Delete..."))
                 .appendTo(view);
+
+    loadAssignToPopover(ta, assignAction);
 
     viewMeetingPage.click(function() {
       var hosts = sched.getHosts(ta);
@@ -67,6 +150,9 @@ var home = (function() {
         window.open(url.url);
       });
     })
+    // assignAction.click(function() {
+
+    // })
     // rescheduleAction.click(function() {
 
     // })
@@ -126,28 +212,30 @@ var home = (function() {
         .append(taskSubject(ta))
         .appendTo(taskDetails);
 
-      var statusRow = $("<div class='task-status'/>")
+      var statusRow = $("<div class='task-status-row'/>")
         .appendTo(taskDetails);
-      var guests = $("<div class='status-icon guests-status-icon'/>");
+      var status = $("<div class='task-status-text'/>")
+        .text(taskStatus(ta));
+      var guests = $("<div class='status-icon guests-status-icon '/>");
       var guestsIcon = $("<img/>")
         .appendTo(guests);
-      svg.loadImg(guestsIcon, "/assets/img/group.svg");
+      svg.loadImg(guestsIcon, "/assets/img/status-guests.svg");
       var email = $("<div class='status-icon email-status-icon hide'/>");
       var emailIcon = $("<img/>")
         .appendTo(email);
-      svg.loadImg(emailIcon, "/assets/img/email.svg");
+      svg.loadImg(emailIcon, "/assets/img/status-email.svg");
       var options = $("<div class='status-icon options-status-icon hide'/>");
       var optionsIcon = $("<img/>")
         .appendTo(options);
-      svg.loadImg(optionsIcon, "/assets/img/to-do.svg");
+      svg.loadImg(optionsIcon, "/assets/img/status-options.svg");
       var calendar = $("<div class='status-icon calendar-status-icon hide'/>");
       var calendarIcon = $("<img/>")
         .appendTo(calendar);
-      svg.loadImg(calendarIcon, "/assets/img/reply.svg");
+      svg.loadImg(calendarIcon, "/assets/img/status-calendar.svg");
       var reminder = $("<div class='status-icon reminder-status-icon hide'/>");
       var reminderIcon = $("<img/>")
         .appendTo(reminder);
-      svg.loadImg(reminderIcon, "/assets/img/to-do.svg");
+      svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
       var statusIcon = $("<div class='task-status-icon'/>")
         .append(guests)
         .append(email)
@@ -155,37 +243,8 @@ var home = (function() {
         .append(calendar)
         .append(reminder)
         .appendTo(statusRow);
-      statusRow.append(taskStatus(ta));
+      statusRow.append(status);
 
-      var team_organizers = login.organizers();
-      if (team_organizers.length > 1) {
-        profile.mget(team_organizers).done(function(profs) {
-          list.iter(team_organizers, function(organizer_uid, i) {
-            var v = $("<span/>");
-            var img = $("<img/>");
-            v.append(img);
-            svg.loadImg(img, "/assets/img/checkbox-sm.svg");
-            v.append(document.createTextNode(profile.fullName(profs[i].prof)));
-            if (list.mem(ta.task_participants.organized_by, organizer_uid)) {
-              v.addClass("checkbox-selected");
-            }
-            v.appendTo(taskDetails);
-
-            v.click(function() {
-              var task_organizers = ta.task_participants.organized_by;
-              if (list.mem(task_organizers, organizer_uid)) {
-                v.removeClass("checkbox-selected");
-                task_organizers.splice(task_organizers.indexOf(organizer_uid),
-                                       1);
-              } else {
-                v.addClass("checkbox-selected");
-                task_organizers.push(organizer_uid);
-              }
-              api.postTask(ta);
-            });
-          });
-        });
-      }
     }
 
     return view;
@@ -639,19 +698,20 @@ var home = (function() {
   function clickableViewOfTeam(team) {
     var isActive = login.getTeam().teamname === team.teamname;
     var label = labelOfTeam(team);
-    var li = $("<li class='team-block hide'/>");
-    var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
+    var li = $("<li/>");
+    var a = $("<a href='#' data-toggle='pill'/>")
       .appendTo(li);
-    var pic = $("<div class='list-exec-circ'/>")
-      .text(profile.shortenName(label))
+    var pic = $("<div class='team-list-circ'/>")
+      .text(profile.shortenName(label).substring(0,1))
       .appendTo(a);
-    var div = $("<div class='list-exec-name ellipsis'/>")
+    var div = $("<div class='team-list-name ellipsis'/>")
       .text(label)
       .appendTo(a);
 
     if (isActive) {
       li.addClass("active");
-      a.addClass("nav-active-team");
+      a.addClass("active");
+      pic.addClass("active");
     } else {
       li.click(function() {
         switchTeam(team);
@@ -667,7 +727,6 @@ var home = (function() {
       var l2 = labelOfTeam(t2);
       return l1.localeCompare(l2);
     });
-    log("teams sorted");
   }
 
   function insertTeams() {
@@ -681,17 +740,19 @@ var home = (function() {
   }
 
   function loadHeader() {
-    var view = $("#account-menu");
+    var view = $("#account-circ");
     var info = $("#popover-account-info");
-    var eaName = $("#account-name");
     var execName = $("#assisting-name");
 
     api.getProfile(login.me()).done(function(eaProf) {
       var fullName = profile.fullName(eaProf);
       var email = profile.email(eaProf);
-      eaName.text(fullName);
-      info.append($("<div id='popover-account-name'>" + fullName + "</div>"))
-          .append($("<div id='popover-account-email'>" + email + "</div>"));
+      view.text(profile.shortenName(fullName).substring(0,1).toUpperCase());
+      info.children().remove();
+      info.append($("<div id='popover-account-name' class='ellipsis'/>")
+            .text(fullName))
+          .append($("<div id='popover-account-email' class='ellipsis'/>")
+            .text(email));
     });
 
     profile.get(login.leader()).done(function(obsProf) {
@@ -704,7 +765,7 @@ var home = (function() {
               .append(fullName);
     });
 
-    // insertTeams();
+    insertTeams();
 
     view.popover({
       html:true,
@@ -722,17 +783,18 @@ var home = (function() {
         view.click();
       }
     });
-  }
 
+    $("#settings-nav").click(function() {
+      view.click(); // BUG: not dismissing popover
+      settings.load;
+    })
+}
 
   mod.load = function() {
     loadHeader();
     loadSearch();
     loadFilters();
     loadTasks();
-    $(".settings-nav")
-      .off("click")
-      .click(settings.load);
     util.focus();
     $(document).click(function(event) {
       var target = $(event.target);

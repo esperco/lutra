@@ -61,16 +61,6 @@ install_js fullcalendar fullcalendar/fullcalendar/fullcalendar.js
 install_js moment fullcalendar/lib/moment.min.js
 install_js jquery-ui fullcalendar/lib/jquery-ui.custom.min.js
 
-# Bootstrap timepicker
-rm -rf bootstrap-timepicker
-tar xzf bootstrap-timepicker-0.2.6.tar.gz
-mv bootstrap-timepicker-0.2.6 bootstrap-timepicker
-# Edit for Bootstrap 3, based on the following pull request:
-# https://github.com/jdewit/bootstrap-timepicker/pull/215/files
-sed -i -e 's/icon-chevron/glyphicon glyphicon-chevron/g' \
-  bootstrap-timepicker/js/bootstrap-timepicker.js
-install_js bootstrap-timepicker bootstrap-timepicker/js/bootstrap-timepicker.js
-
 # oblivion preprocessor, requires ocaml.
 # We install it manually so we don't depend on an opam setup
 cd "$ROOT"

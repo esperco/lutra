@@ -85,6 +85,11 @@ i { color: @gray_60; }
     text-decoration: underline;
   }
 }
+.caret-link {
+  float: right;
+  margin-top: 7px;
+}
+.caret-text { margin-right: 6px; }
 
 *.unselectable {
   cursor: default;
@@ -221,13 +226,6 @@ i { color: @gray_60; }
   border-radius: 0;
 }
 
-#new-task-btn-mobile,
-#new-place-btn-mobile {
-  float: right;
-  margin-top: 14px;
-  margin-right: 16px;
-}
-
 #menu,
 #return-home {
   float: left;
@@ -250,14 +248,6 @@ i { color: @gray_60; }
   &:active g path { fill: #7d3ca0; }
 }
 
-.nav-title {
-  float: left;
-  margin-top: 18px;
-  margin-left: 16px;
-  margin-bottom: 0px;
-  font-size: 18px;
-}
-
 #task-title-div {
   margin-left: 56px;
   margin-right: 60px;
@@ -271,182 +261,6 @@ i { color: @gray_60; }
   border: 1px solid white;
   &:hover { border: 1px solid @gray_20; }
   &:focus { border: 1px solid @purple; }
-}
-
-#mobile-navbar-collapse {
-  background: @gray_90;
-  box-shadow: 0 10px 10px @gray_60;
-}
-
-.nav-header {
-  margin: 0;
-  padding: 20px 15px;
-  height: 80px;
-  background: @purple;
-  &:hover {
-    background: @purple_hover;
-    cursor: pointer;
-  }
-  #exec-circ {
-    float: left;
-    width: 40px;
-    height: 40px;
-    padding-top: 10px;
-    border-radius: 20px;
-    text-align: center;
-    vertical-align: middle;
-    color: @gray_90;
-    background: white;
-  }
-  #exec-name-div {
-    display: inline-block;
-    margin-left: 10px;
-    padding-top: 4px;
-    color: white;
-  }
-  #assisting {
-    font-size: 10px;
-  }
-  #exec-name {
-    width: 125px;
-    font-family: @bold;
-    font-size: 14px;
-  }
-  #exec-caret {
-    float: right;
-    margin-top: 8px;
-  }
-}
-
-.account-nav-open {
-  .rotate(rotate_cw_180);
-}
-
-.account-nav-closed {
-  .rotate(rotate_ccw_180);
-}
-
-.account-block {
-  height: 60px;
-  margin: 0;
-  color: @gray_20;
-  background: @dark_gray !important;
-}
-
-.logged-in-as {
-  padding: 15px;
-}
-
-.logged-in-text {
-  color: @gray_60;
-  font-family: @bold;
-  font-size: 12px;
-}
-
-.account-action {
-  width: 100%;
-  height: 28px;
-  margin-top: 6px;
-  padding-top: 2px;
-  padding-right: 10px;
-  padding-left: 10px;
-  font-size: 14px;
-  color: white;
-  background: none;
-  border: 1px solid white;
-  border-radius: 3px;
-  &:hover {
-    color: @gray_90;
-    background: white;
-  }
-}
-
-.account-action-left {
-  padding-right: 5px;
-  padding-left: 10px;
-}
-
-.account-action-right {
-  padding-right: 10px;
-  padding-left: 5px;
-}
-
-.account-divider-div {
-  height: 41px;
-  padding-top: 20px;
-  background: @dark_gray;
-}
-
-.account-divider-line {
-  height: 1px;
-  background: @gray_90;
-}
-
-.nav-divider-line {
-  height: 1px;
-  margin-top: 40px;
-  margin-bottom: 20px;
-  background: @gray_80;
-}
-
-.account-section-title,
-.nav-section-title {
-  position: relative;
-  top: -0.5em;
-  left: 7px;
-  padding-left: 8px;
-  padding-right: 8px;
-  color: white;
-  font-family: @light;
-  letter-spacing: 3px;
-}
-
-.account-section-title {
-  background: @dark_gray;
-}
-
-.nav-section-title {
-  background: @gray_90;
-}
-
-.team-block {
-  height: 50px;
-  padding: 5px 10px;
-  background: @dark_gray !important;
-}
-
-.nav-team {
-  height: 40px;
-  padding: 8px 10px !important;
-  color: @gray_20;
-  border-radius: 3px !important;
-  &:hover { background: @gray_90 !important; }
-}
-
-.nav-active-team {
-  cursor: default;
-  background: @gray_90 !important;
-}
-
-.list-exec-circ {
-  float: left;
-  width: 24px;
-  height: 24px;
-  padding-top: 4px;
-  color: @gray_90;
-  font-size: 12px;
-  text-align: center;
-  background: white;
-  border-radius: 12px;
-}
-
-.list-exec-name {
-  margin-top: 2px;
-  margin-left: 32px;
-}
-
-#account-block-push {
-  height: 20px;
 }
 
 #task-navbar {
@@ -582,25 +396,19 @@ i { color: @gray_60; }
 }
 
 
-/*** Home Header ***/
+/*** Home Content ***/
 
-#home-header {
-  position: fixed;
-  z-index: 2;
-  width: 100%;
-  background-color: white;
-}
+#home-container { height: 100%; }
 
-#home-tools {
-  margin-left: 160px;
-  padding-top: 10px;
-  border-bottom: 1px solid @border;
-}
-
-#account-bar {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  text-align: right;
+#home-content {
+  z-index: 1;
+  padding-left: 160px;
+  padding-top: 163px;
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
 }
 
 
@@ -644,59 +452,66 @@ i { color: @gray_60; }
 }
 
 
-/*** Home Content ***/
+/*** Home Header ***/
 
-#home-container { height: 100%; }
-
-#home-content {
-  z-index: 1;
-  padding-left: 160px;
-  padding-top: 163px;
-  -webkit-transition: all 0.2s ease-out;
-     -moz-transition: all 0.2s ease-out;
-      -ms-transition: all 0.2s ease-out;
-       -o-transition: all 0.2s ease-out;
-          transition: all 0.2s ease-out;
+#home-header {
+  position: fixed;
+  z-index: 2;
+  width: 100%;
+  background-color: white;
 }
 
+#home-tools {
+  margin-left: 160px;
+  padding-top: 10px;
+  border-bottom: 1px solid @border;
+}
 
-/*** Account Popover ***/
+#account-bar {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  text-align: right;
+}
 
 #account-menu {
   display: inline-block;
-  &:hover #account-name {
-    text-decoration: underline;
-  }
+  .popover-content { width: 200px; }
 }
 
-.link-caret {
+#account-caret {
   float: right;
-  margin-top: 7px;
+  margin-top: 12px;
+  path { fill: @gray_40; }
 }
 
-#account-name {
-  margin-right: 6px;
-  font-family: @bold;
+#account-circ {
+  float: right;
+  width: 30px;
+  height: 30px;
+  margin: 0px 4px 0px 8px;
+  padding-top: 5px;
+  color: white;
+  text-align: center;
+  background: @gray_40;
+  border-radius: 15px;
+  cursor: pointer;
+  &:hover { background: @gray_60; }
 }
 
 #assisting-name {
+  margin: 5px 55px 0px 0px;
   color: @gray_60;
+  cursor: default;
 }
 
 #exec-name { font-family: @bold; }
 
+
+/*** Account Popover ***/
+
 #popover-account-info {
   padding: 5px 20px;
 }
-
-#popover-assisting,
-#popover-team-list {
-  padding: 5px 20px;
-  background: @gray_05;
-}
-
-#popover-assisting { margin-top: 10px; }
-#popover-team-list { margin-bottom: 10px; }
 
 #popover-account-name {
   font-family: @bold;
@@ -708,8 +523,58 @@ i { color: @gray_60; }
   color: @gray_60;
 }
 
-#popover-account-actions {
-  width: 200px;
+#popover-team-list {
+  margin: 10px 0px;
+  padding: 5px 0px;
+  border-top: 1px solid @gray_10;
+  border-bottom: 1px solid @gray_10;
+}
+
+#popover-team-list > li {
+  height: 50px;
+  padding: 5px 10px;
+}
+
+#popover-team-list > li:hover {
+  background: none;
+}
+
+#popover-team-list > li > a {
+  height: 40px;
+  padding: 8px 10px;
+  border-radius: 3px;
+}
+
+#popover-team-list > li > a:hover {
+  background: @purple_bg;
+}
+
+#popover-team-list > li > a.active {
+  cursor: default;
+  color: @purple_text;
+  background: @gray_05;
+}
+
+.team-list-name {
+  margin-top: 2px;
+  margin-left: 32px;
+}
+
+.team-list-circ {
+  float: left;
+  width: 24px;
+  height: 24px;
+  padding-top: 4px;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  background: @purple;
+  border-radius: 12px;
+}
+
+.team-list-circ.active {
+  color: white;
+  background: @gray_60;
 }
 
 
@@ -766,8 +631,28 @@ i { color: @gray_60; }
   cursor: pointer;
 }
 
+.task-action-icon {
+  float: left;
+  margin-top: 1px;
+}
+
 .task-action-label { margin-left: 8px; }
 
+.assign-to-name { margin-left: 24px; }
+
+#popover-ea-list > li {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#popover-ea-list > li:hover {
+  background: none;
+  .assign-to-checkbox path.outline { fill: @gray_40; }
+}
+
+.assign-to-checkbox {
+  float: left;
+}
 
 /*** List Filters ***/
 
@@ -780,8 +665,6 @@ i { color: @gray_60; }
     text-decoration: underline;
   }
 }
-
-#toggle-filters-label { margin-right: 6px; }
 
 #filters-caret.open {
   .rotate(rotate_cw_180);
@@ -887,11 +770,12 @@ i { color: @gray_60; }
   font-family: @bold;
 }
 
-.task-status,
-.task-date {
-  margin-top: 3px;
+.task-status-row {
+  margin-top: 10px;
   color: @gray_60;
 }
+
+.task-status-text { margin-left: 28px; }
 
 .status-icon { float: left; }
 
@@ -1603,121 +1487,6 @@ i { color: @gray_60; }
   margin-top: 20px;
 }
 
-
-/*** Places ***/
-
-#places {
-  margin-top: 10px;
-  border-top: 1px solid @gray_10;
-}
-
-.place-details { padding-left: 0; }
-
-.place-name {
-  font-family: @bold;
-  font-size: 18px;
-  color: @purple;
-  &:hover {
-    color: @purple_hover;
-    cursor: pointer;
-  }
-}
-
-.place-loc,
-.good-for-text {
-  font-size: 14px;
-  color: @gray_60;
-}
-
-.stats {
-  margin-top: 4px;
-  padding: 0;
-  line-height: 1.25;
-}
-
-.stat-div { width: 100%; }
-
-.stat {
-  float: left;
-  font-size: 32px;
-}
-
-.stat-text {
-  font-size: 14px;
-  color: @gray_60;
-}
-
-.last-visit,
-.visits {
-  padding-left: 0;
-}
-
-.time-ago-text {
-  display: inline-block;
-  margin-left: 8px;
-  padding-top: 8px;
-  font-size: 10px;
-  color: @gray_60;
-}
-
-.place-actions { padding: 0;}
-
-.place-actions.desktop { margin-top: 18px; }
-
-.place-action {
-  float: right;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
-
-.place-edit-div,
-.directions-div {
-  margin-left: 18px;
-  margin-bottom: 18px;
-}
-
-.place-edit,
-.directions,
-.yelp {
-  display: block;
-}
-
-.place-edit {
-  width: 30px;
-  height: 30px;
-  padding-top: 1px;
-  g { fill: @gray_20; }
-  &:hover g { fill: @purple; }
-}
-
-.directions {
-  path { fill: @gray_20; }
-  &:hover path { fill: @green; }
-}
-
-.yelp {
-  circle,
-  g path { fill: @gray_20; }
-  &:hover {
-    circle,
-    g path { fill: #c01001; }
-  }
-}
-
-#google-map-modal-body {
-  height: 400px;
-  width: 400px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* TODO style me */
-#edit-place-delete {
-  margin-top: 30px;
-}
 
 /*** New Task ***/
 

@@ -13,7 +13,6 @@
     <link href="/assets/css/font-awesome.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
-    <link href="/assets/css/bootstrap-timepicker.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="../img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
   </head>
@@ -28,72 +27,6 @@
     </div>
 
     <!-- <div id="global-status" class="animated"></div> -->
-
-<!--       <div id="account-block-push" class="account-block hide"></div>
-      <li class="nav-header unselectable"></li>
-      <li class="account-block logged-in-as hide"></li>
-      <div class="account-block hide">
-        <div class="col-xs-6 account-action-left">
-          <a href="#settings" class="settings-nav settings-btn" data-toggle="pill">
-            <button class="btn account-action">Settings</button>
-          </a>
-        </div>
-        <div class="col-xs-6 account-action-right">
-          <a href="#!logout" class="logout-btn">
-            <button class="btn account-action">Log out</button>
-          </a>
-        </div>
-      </div>
-      <div class="account-divider-div unselectable hide">
-        <div class="account-divider-line"></div>
-        <span class='account-section-title'>ASSISTING</span>
-      </div>
-      <div class="nav-teams"></div> -->
-
-
-
-
-<!--     <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
-      <div id="mobile-navbar-header" class="navbar navbar-header">
-        <a data-toggle="collapse" data-target="#mobile-navbar-collapse">
-          <img id="menu" class="svg" src="/assets/img/menu.svg">
-        </a>
-        <p id="home-title" class="nav-title unselectable">SCHEDULING</p>
-        <button id="new-task-btn-mobile" class="btn btn-primary">New Task</button>
-      </div>
-      <div id="mobile-navbar-collapse" class="collapse navbar-collapse scrollable">
-        <ul class="nav navbar-nav nav-pills nav-stacked">
-          <li class="nav-header unselectable"></li>
-          <li>
-            <a href="#settings" class="account-block hide settings-nav" data-toggle="pill">
-              <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
-              <div class="nav-text">Settings</div>
-            </a>
-          </li>
-          <li>
-            <a href="#!logout" class="account-block hide">
-              <img id="logout-icon" class="svg" src="/assets/img/logout.svg">
-              <div class="nav-text">Log out</div>
-            </a>
-          </li>
-          <li class="active">
-            <a href="#list-view-nav" class="nav-block" data-toggle="pill">
-              <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
-              <div class="nav-text">Scheduling</div>
-            </a>
-          </li>
-          <li>
-            <a href="#general-task-list" class="nav-block" data-toggle="pill">
-              <img id="general-icon" class="svg" src="/assets/img/general.svg">
-              <div class="nav-text">General</div>
-            </a>
-          </li>
-          <div class="nav-divider-line unselectable nav-teams">
-            <span class='nav-section-title'>TEAMS</span>
-          </div>
-        </ul>
-      </div>
-    </nav> -->
 
     <div id="login-page" class="hide login-page">
       <div class="login-container">
