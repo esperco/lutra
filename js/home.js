@@ -89,7 +89,7 @@ var home = (function() {
     var view = $("#task-actions");
     view.children().remove();
 
-    var viewLivePage = $("<a class='task-action' target='blank'/>");
+    var viewLivePage = $("<a class='task-action disabled' target='blank'/>");
     var viewLivePageIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(viewLivePage);
     var viewLivePageIcon = $("<img/>")
@@ -98,7 +98,7 @@ var home = (function() {
     viewLivePage.append(($("<span class='task-action-label'/>"))
                   .text("View live page"))
                 .appendTo(view);
-    var assignAction = $("<a class='task-action'/>");
+    var assignAction = $("<a class='task-action disabled'/>");
     var assignIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(assignAction);
     var assignIcon = $("<img/>")
@@ -110,7 +110,7 @@ var home = (function() {
       .appendTo(assignAction);
     svg.loadImg(assignCaret, "/assets/img/caret.svg");
     assignAction.appendTo(view);
-    var rescheduleAction = $("<a class='task-action'/>");
+    var rescheduleAction = $("<a class='task-action disabled'/>");
     var rescheduleIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(rescheduleAction);
     var rescheduleIcon = $("<img/>")
@@ -119,7 +119,7 @@ var home = (function() {
     rescheduleAction.append(($("<span class='task-action-label'/>"))
                       .text("Reschedule..."))
                     .appendTo(view);
-    var cancelAction = $("<a class='task-action'/>");
+    var cancelAction = $("<a class='task-action disabled'/>");
     var cancelIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(cancelAction);
     var cancelIcon = $("<img/>")
