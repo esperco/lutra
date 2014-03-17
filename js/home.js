@@ -168,7 +168,7 @@ var home = (function() {
           $(this).removeClass("selected");
         })
         $(this).addClass("selected");
-        $("#stats").addClass("hide");
+        $("#new-message-stats").addClass("hide");
         $("#search-stats").addClass("hide");
         $("#task-actions").removeClass("hide");
         loadTaskActions(ta);
@@ -353,6 +353,8 @@ var home = (function() {
 
   function showActiveTasks(data) {
     var view = $("#tasks");
+    var stats = $("#new-message-stats");
+    var count = 0;
     setTaskViewClass(view.children(), "archived-task");
     list.iter(data.tasks, function(task) {
       var taskView = $("#task-" + task.tid);
@@ -362,6 +364,18 @@ var home = (function() {
         view.append(viewOfActiveTaskRow(task));
       }
     });
+    var email = $("<div class='status-icon email-status-icon'/>");
+    var emailIcon = $("<img/>")
+      .appendTo(email);
+    svg.loadImg(emailIcon, "/assets/img/status-email.svg");
+    var statsText = $("<span id='new-message-count'/>");
+    if (count > 0) {
+      statsText.text(count + " unread messages");
+    } else {
+      statsText.text("No new messages");
+    }
+    stats.append(email)
+         .append(statsText);
   }
 
   function showAllTasks(data) {
@@ -381,7 +395,7 @@ var home = (function() {
     observable.onTaskRankedAfter .observe("task-list", taskRankedAfter);
   }
 
-  function loadTasks() {
+  function loadMeetings() {
     $("#tasks").children().remove();
     deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
                    api.loadActiveTasks().fail(status_.onError(404))])
@@ -790,7 +804,7 @@ var home = (function() {
     loadHeader();
     loadSearch();
     loadFilters();
-    loadTasks();
+    loadMeetings();
     util.focus();
     $(document).click(function(event) {
       var target = $(event.target);
@@ -799,7 +813,7 @@ var home = (function() {
         $(".task").each(function() {
           $(this).removeClass("selected");
         })
-        $("#stats").removeClass("hide");
+        $("#new-message-stats").removeClass("hide");
         $("#search-stats").addClass("hide");
         $("#task-actions").addClass("hide");
       }
