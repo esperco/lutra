@@ -126,16 +126,6 @@ var guestTask = function() {
     }
   }
 
-  function describeTimeSlot(start, end) {
-    var fromTime = wordify(date.timeOnly(start));
-    if (chat.hideEndTimes) {
-      return "at " + fromTime;
-    } else {
-      var toTime = wordify(date.timeOnly(end));
-      return fromTime + " to " + toTime;
-    }
-  }
-
   function viewOfTimeAndPlace(x) {
     var view = $("<div id='time-and-place'/>");
 
@@ -150,13 +140,17 @@ var guestTask = function() {
       .appendTo(meetingTime);
 
     var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
     time1
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
-    time2
-      .append(describeTimeSlot(t1, t2));
+
+    var fromTime = wordify(date.timeOnly(t1));
+    if (util.isNotNull(x.end)) {
+      var toTime = wordify(date.timeOnly(date.ofString(x.end)));
+      time2.append(fromTime + " to " + toTime);
+    } else {
+      time2.append("at " + fromTime);
+    }
 
     var meetingLoc = $("<div id='meeting-location'/>")
       .appendTo(view);
@@ -200,8 +194,9 @@ var guestTask = function() {
 
   function googleCalendarURL(text1, text2, slot) {
     var fromTime = stripTimestamp(slot.start_utc, slot.start);
-    var toTime = chat.hideEndTimes ? fromTime
-               : stripTimestamp(slot.end_utc,slot.end);
+    var toTime = util.isNotNull(slot.end)
+               ? stripTimestamp(slot.end_utc,slot.end)
+               : fromTime;
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
             "text=" + encodeURIComponent(text1),
@@ -348,8 +343,6 @@ var guestTask = function() {
   mod.loadTask = function(task) {
     var ta = task.guest_task;
 
-    chat.setHideEndTimes(ta);
-
     var myLast = recoverCalendarSelection(ta);
     var answers = {};
 
@@ -461,7 +454,7 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      var info = sched.viewOfOption(choice, typ, chat.hideEndTimes)
+      var info = sched.viewOfOption(choice, typ)
         .appendTo(slotView);
 
       return slotView;

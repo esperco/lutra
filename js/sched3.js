@@ -319,7 +319,8 @@ var sched3 = (function() {
           }
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
-          task.task_data[1].hide_end_times = hideEnd;
+          sched.optionsForGuest(sched.getGuestOptions(task), uid)
+            .hide_end_times = hideEnd;
           api.postTask(task).done(function() {
             var chatItem = {
               tid: task.tid,
@@ -327,8 +328,7 @@ var sched3 = (function() {
               to: [uid],
               chat_item_data: ["Scheduling_q", {
                 body: body,
-                choices: options,
-                hide_end_times: hideEnd
+                choices: options
               }]
             };
             chat.postChatItem(chatItem)

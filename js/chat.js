@@ -115,14 +115,13 @@ var chat = (function () {
     }
   }
 
-  mod.hideEndTimes = false;
-
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
-    if (mod.hideEndTimes)
-      v.text(date.justStartTime(date.ofString(slot.start)));
-    else
+    if (util.isNotNull(slot.end)) {
       v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    } else {
+      v.text(date.justStartTime(date.ofString(slot.start)));
+    }
     v.append($("<br/>"));
     appendLocation(v, slot.location);
     return v;
@@ -587,22 +586,6 @@ var chat = (function () {
       observable.onTaskParticipantsChanged
                               .observe("chat-tabs", mod.loadTaskChats);
     });
-  }
-
-  mod.setHideEndTimes = function(ta) {
-    if ("Scheduling" === variant.cons(ta.task_data)) {
-      var optsByUid = list.toTable(ta.task_data[1].participant_options,
-                                   function(x){return x.uid;});
-      var options = optsByUid[login.me()];
-      if (util.isNotNull(options)
-       && util.isNotNull(options.hide_end_times)) {
-        mod.hideEndTimes = options.hide_end_times;
-      } else {
-        mod.hideEndTimes = ta.task_data[1].hide_end_times;
-      }
-    } else {
-      mod.hideEndTimes = false;
-    }
   }
 
   mod.loadGuestTaskChats = function(ta) {
