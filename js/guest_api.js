@@ -87,13 +87,18 @@ var api = function() {
     return jsonHttpPost(apiPrefix() + "/chat", JSON.stringify(chatItem));
   };
 
-  mod.postChatItemRead = function(chatId, itemId) {
+  mod.postChatItemRead = function(itemId) {
     return jsonHttpPost(apiPrefix() + "/chat/" + itemId + "/read", "");
   };
 
   mod.getProfile = function(uid) {
     return jsonHttpGet(apiPrefix() + "/profile/" + uid);
   };
+
+  mod.getTaskICS = function() {
+    return jsonHttpGet(apiPrefix() + "/task/ics");
+  };
+
 
   return mod;
 }();

@@ -26,6 +26,18 @@ var date = (function() {
     return Date.now();
   };
 
+  mod.nowUTC = function() {
+    var x = new Date();
+    return Date.UTC(
+      x.getFullYear(),
+      x.getMonth(),
+      x.getDate(),
+      x.getHours(),
+      x.getMinutes(),
+      x.getSeconds()
+    );
+  };
+
   mod.year = function(d) {
     return d.getUTCFullYear();
   };

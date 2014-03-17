@@ -3,25 +3,17 @@
 var sched4 = (function() {
   var mod = {};
 
-  var chats = null;
-
   function getSlot(ta) {
     var state = sched.getState(ta);
     return state.reserved.slot;
   }
 
-  function sentConfirmation(uid) {
-    var chat = chats[uid];
-    return chat && list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Sched_confirm");
-    });
+  function sentConfirmation(ta, uid) {
+    return sched.sentEmail(ta, uid, "Sched_confirm");
   }
 
-  function sentReminder(uid) {
-    var chat = chats[uid];
-    return chat && list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Sched_remind");
-    });
+  function sentReminder(ta, uid) {
+    return sched.sentEmail(ta, uid, "Sched_remind");
   }
 
   function reservedCalendarSlot(task) {
@@ -207,6 +199,12 @@ var sched4 = (function() {
       });
   }
 
+  function eventTimeHasPassed(task) {
+    var startTime = date.ofString(getSlot(task).start);
+    var now = date.ofString(date.nowUTC());
+    return startTime.getTime() < now.getTime();
+  }
+
   function preFillReminderModal(profs, ta, options, toUid) {
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
@@ -269,6 +267,21 @@ var sched4 = (function() {
     reminderModal.modal("hide");
   }
 
+  function getReminderStatus(ta, uid) {
+    var startTime = date.ofString(getSlot(ta).start);
+    var beforeSecs = sched.getState(ta).reserved.remind;
+    if (util.isNotNull(beforeSecs)) {
+      startTime.setTime(startTime.getTime() - (beforeSecs * 1000));
+      return sentReminder(ta, uid) ?
+        "Reminder sent on " + date.justStartTime(startTime) :
+        "Will receive a reminder on " + date.justStartTime(startTime);
+    } else if (eventTimeHasPassed(ta)) {
+      return "Did not receive a reminder";
+    } else {
+      return "Not scheduled to receive a reminder";
+    }
+  }
+
   function createReminderRow(profs, ta, uid, guests) {
 '''
 <div #view
@@ -289,7 +302,7 @@ var sched4 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sentReminder(uid)) {
+    if (sentReminder(ta, uid)) {
       chatHead.addClass("sent");
       edit.addClass("btn-default disabled");
       editIcon.addClass("sent");
@@ -303,17 +316,18 @@ var sched4 = (function() {
       .addClass("reminder-guest-name")
       .appendTo(view);
 
-    var guestStatusText = sentReminder(uid) ?
-      "Reminder sent" :
-      "Not scheduled to receive a reminder";
     var guestStatus = $("<div class='reminder-guest-status'/>")
-      .text(guestStatusText)
+      .text(getReminderStatus(ta, uid))
       .appendTo(view);
-
 
     var reminderModal = $("#sched-reminder-modal");
     var state = sched.getState(ta);
     var options = sched.getGuestOptions(ta)[uid];
+
+    // Allow editing reminders only if event time is not already past
+    if (eventTimeHasPassed(ta)) {
+      edit.addClass("disabled");
+    }
 
     edit.click(function() {
       preFillReminderModal(profs, ta, options, uid);
@@ -328,11 +342,10 @@ var sched4 = (function() {
       reminderModal.modal({});
     });
 
-
-    return view;
+    return { row: view, statusText: guestStatus };
   }
 
-  function createReminderScheduler(profs, task, guests) {
+  function createReminderScheduler(profs, task, guests, statuses) {
     var sel;
     var reserved = sched.getState(task).reserved;
 
@@ -342,20 +355,39 @@ var sched4 = (function() {
         delete reserved.remind;
       else
         reserved.remind = remind;
+      list.iter(statuses, function(statusText) {
+        statusText.text(getReminderStatus(task));
+      });
       api.postTask(task);
     }
 
+    /*
+       Is task starting time minus duration (seconds) in the past?
+       If so, disable the option to use that duration for reminders.
+    */
+    function disableIfPast(duration) {
+      var startTime = date.ofString(getSlot(task).start);
+      startTime.setTime(startTime.getTime() - (duration * 1000));
+      var now = date.ofString(date.nowUTC());
+      if (startTime.getTime() < now.getTime())
+        return "disabled";
+      else
+        return null;
+    }
+
+    var hrb4 = " hours beforehand";
+    var hr = 3600; // seconds
     sel = select.create({
       buttonClass: "reminder-dropdown",
       defaultAction: saveTask,
       options: [
-        { label: "1 hour beforehand", key: "1h", value: 3600 },
-        { label: "3 hours beforehand", key: "3h", value: 3 * 3600 },
-        { label: "6 hours beforehand", key: "6h", value: 6 * 3600 },
-        { label: "12 hours beforehand", key: "12h", value: 12 * 3600 },
-        { label: "24 hours beforehand", key: "24h", value: 24 * 3600 },
-        { label: "36 hours beforehand", key: "36h", value: 36 * 3600 },
-        { label: "48 hours beforehand", key: "48h", value: 48 * 3600 },
+        { label: "1 hour beforehand", key: "hr", value: hr, cls: disableIfPast(hr) },
+        { label: "3"+hrb4, key: "3h", value: 3*hr, cls: disableIfPast(3*hr) },
+        { label: "6"+hrb4, key: "6h", value: 6*hr, cls: disableIfPast(6*hr) },
+        { label: "12"+hrb4, key: "12h", value: 12*hr, cls: disableIfPast(12*hr) },
+        { label: "24"+hrb4, key: "24h", value: 24*hr, cls: disableIfPast(24*hr) },
+        { label: "36"+hrb4, key: "36h", value: 36*hr, cls: disableIfPast(36*hr) },
+        { label: "48"+hrb4, key: "48h", value: 48*hr, cls: disableIfPast(48*hr) },
         { label: "Never", key: "no", value: -1 }
       ]
     });
@@ -421,14 +453,24 @@ var sched4 = (function() {
       "Send reminders" :
       "Send the reminder";
     schedulerTitle.text(schedulerText);
-    scheduler.append(createReminderScheduler(profs, task, guests));
 
     var reminderSent = false;
+    var statuses = [];
     list.iter(guests, function(uid) {
-      content.append(createReminderRow(profs, task, uid, guests));
-      if (sentReminder(uid))
+      var reminderRow = createReminderRow(profs, task, uid, guests);
+      content.append(reminderRow.row);
+      statuses.push(reminderRow.statusText);
+      if (sentReminder(task, uid))
         reminderSent = true;
     });
+
+    var schedulerView = createReminderScheduler(profs, task, guests, statuses);
+    scheduler.append(schedulerView);
+
+    // Allow sending reminders only if event time is not already past
+    if (eventTimeHasPassed(task)) {
+      schedulerView.find("button").addClass("disabled");
+    }
 
     showHide.click(function() {
       toggleModule("reminder");
@@ -460,7 +502,7 @@ var sched4 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sentConfirmation(uid)) {
+    if (sentConfirmation(ta, uid)) {
       chatHead.addClass("sent");
       compose.addClass("btn-default");
       composeIcon.addClass("sent");
@@ -474,7 +516,7 @@ var sched4 = (function() {
       .addClass("confirmation-guest-name")
       .appendTo(view);
 
-    var guestStatusText = sentConfirmation(uid) ?
+    var guestStatusText = sentConfirmation(ta, uid) ?
       "Confirmation sent" :
       "Has not received a confirmation";
     var guestStatus = $("<div class='confirmation-guest-status'/>")
@@ -503,13 +545,11 @@ var sched4 = (function() {
                 uid = ea;
               }
             }
-            var chatid = chats[uid].chatid;
             var hideEnd = ta.task_data[1].hide_end_times;
             var chatItem = {
-              chatid: chatid,
+              tid: ta.tid,
               by: login.me(),
-              'for': login.me(),
-              team: login.getTeam().teamid,
+              to: [uid],
               chat_item_data: ["Sched_confirm", {
                 body: body,
                 'final': getSlot(ta),
@@ -576,7 +616,7 @@ var sched4 = (function() {
       x.view.appendTo(content);
       // if (guests.length == 1) {
       //   var uid = guests[0];
-      //   if (! sentConfirmation(uid))
+      //   if (! sentConfirmation(ta, uid))
       //     x.composeConfirmationEmail();
       // }
     });
@@ -933,7 +973,6 @@ var sched4 = (function() {
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var guests = sched.getAttendingGuests(ta);
-    chats = sched.chatsOfTask(ta);
 
     view
       .append($("<h3>Finalize and confirm the meeting.</h3>"))
@@ -944,9 +983,9 @@ var sched4 = (function() {
     var confirmationSent = false;
     var reminderSent = false;
     list.iter(guests, function(uid) {
-      if (sentConfirmation(uid))
+      if (sentConfirmation(ta, uid))
         confirmationSent = true;
-      if (sentReminder(uid))
+      if (sentReminder(ta, uid))
         reminderSent = true;
     });
 
@@ -956,9 +995,6 @@ var sched4 = (function() {
       toggleModule("confirm");
     }
 
-    observable.onTaskParticipantsChanged.observe("step4", function(ta) {
-      chats = sched.chatsOfTask(ta);
-    });
     /* Task is always saved when remind changes. */
     observable.onSchedulingStepChanging.stopObserve("step");
   };

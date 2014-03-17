@@ -79,6 +79,13 @@ var sched = (function() {
     list.iter(mod.getParticipants(task), f);
   };
 
+  mod.sentEmail = function(ta, uid, chatKind) {
+    return list.exists(ta.task_chat_items, function(x) {
+      return list.mem(x.to, uid)
+          && variant.cons(x.chat_item_data) === chatKind;
+    });
+  }
+
   /******************************************/
 
   mod.locationText = function(loc) {
@@ -267,23 +274,6 @@ var sched = (function() {
     }
 
     return view;
-  }
-
-  /* convert list of chats into a table keyed by the participant uid */
-  mod.chatsOfTask = function(task) {
-    var chats = {};
-    mod.forEachParticipant(task, function(uid) {
-      var chat =
-        list.find(task.task_chats, function(chat) {
-          return chat.chatid !== task.task_context_chat
-              && (chat.chat_with
-                  ? uid === chat.chat_with
-                  : uid === chat.chat_participants[0].par_uid); // a hack for the old data without chat_with field
-        });
-      if (chat !== null)
-        chats[uid] = chat;
-    });
-    return chats;
   }
 
   var tabHighlighter =
