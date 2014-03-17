@@ -28,6 +28,11 @@ var sched = (function() {
     task.task_data = ["Scheduling", state];
   };
 
+  mod.getCalendarTitle = function(state) {
+    var t = state.calendar_event_title;
+    return util.isString(t.custom) ? t.custom : t['default'];
+  };
+
   mod.isGuest = function(uid) {
     var team = login.getTeam();
     return ! list.mem(team.team_leaders, uid);
@@ -73,6 +78,13 @@ var sched = (function() {
   mod.forEachParticipant = function(task, f) {
     list.iter(mod.getParticipants(task), f);
   };
+
+  mod.sentEmail = function(ta, uid, chatKind) {
+    return list.exists(ta.task_chat_items, function(x) {
+      return list.mem(x.to, uid)
+          && variant.cons(x.chat_item_data) === chatKind;
+    });
+  }
 
   /******************************************/
 
@@ -143,16 +155,16 @@ var sched = (function() {
     return view;
   }
 
-  mod.meetingType = function(state) {
-    if (state.meeting_request && state.meeting_request.meeting_type) {
-      var typ = variant.cons(state.meeting_request.meeting_type);
-      switch (typ) {
-        case "Call":      return "Phone Call";
-        case "Nightlife": return "Night Life";
-        default:          return typ;
-      }
-    } else {
-      return "Meeting";
+  /*
+    Get meeting type for a confirmed event and perform some translation
+    for display purposes.
+   */
+  mod.formatMeetingType = function(slot) {
+    var typ = slot.meeting_type;
+    switch (typ) {
+    case "Call":      return "Phone Call";
+    case "Nightlife": return "Night Life";
+    default:          return typ;
     }
   }
 
@@ -174,7 +186,8 @@ var sched = (function() {
 
     view.click(function() {
       // window.open(getDirections(x));
-      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+      window.open("http://www.google.com/maps/search/"
+                  + encodeURIComponent(locText));
     });
 
     return view;
@@ -261,23 +274,6 @@ var sched = (function() {
     }
 
     return view;
-  }
-
-  /* convert list of chats into a table keyed by the participant uid */
-  mod.chatsOfTask = function(task) {
-    var chats = {};
-    mod.forEachParticipant(task, function(uid) {
-      var chat =
-        list.find(task.task_chats, function(chat) {
-          return chat.chatid !== task.task_context_chat
-              && (chat.chat_with
-                  ? uid === chat.chat_with
-                  : uid === chat.chat_participants[0].par_uid); // a hack for the old data without chat_with field
-        });
-      if (chat !== null)
-        chats[uid] = chat;
-    });
-    return chats;
   }
 
   var tabHighlighter =

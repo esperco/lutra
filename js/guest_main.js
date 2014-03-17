@@ -3,7 +3,7 @@ function main() {
     login.load(task);
     pusher.start();
     guestTask.loadTask(task);
-    chat.loadTaskChats(task.guest_task);
+    chat.loadGuestTaskChats(task.guest_task);
   });
 }
 

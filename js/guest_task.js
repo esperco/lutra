@@ -126,9 +126,9 @@ var guestTask = function() {
     }
   }
 
-  function describeTimeSlot(start, end, hideEndTime) {
+  function describeTimeSlot(start, end) {
     var fromTime = wordify(date.timeOnly(start));
-    if (hideEndTime) {
+    if (chat.hideEndTimes) {
       return "at " + fromTime;
     } else {
       var toTime = wordify(date.timeOnly(end));
@@ -136,7 +136,7 @@ var guestTask = function() {
     }
   }
 
-  function viewOfTimeAndPlace(x, hideEndTime) {
+  function viewOfTimeAndPlace(x) {
     var view = $("<div id='time-and-place'/>");
 
     var meetingTime = $("<div id='meeting-time'/>")
@@ -156,7 +156,7 @@ var guestTask = function() {
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
     time2
-      .append(describeTimeSlot(t1, t2, hideEndTime));
+      .append(describeTimeSlot(t1, t2));
 
     var meetingLoc = $("<div id='meeting-location'/>")
       .appendTo(view);
@@ -198,9 +198,10 @@ var guestTask = function() {
     return s.replace(/-|:|\.\d+/g, "");
   }
 
-  function googleCalendarURL(text1, text2, slot, hideEndTime) {
+  function googleCalendarURL(text1, text2, slot) {
     var fromTime = stripTimestamp(slot.start_utc, slot.start);
-    var toTime = hideEndTime ? fromTime : stripTimestamp(slot.end_utc,slot.end);
+    var toTime = chat.hideEndTimes ? fromTime
+               : stripTimestamp(slot.end_utc,slot.end);
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
             "text=" + encodeURIComponent(text1),
@@ -212,6 +213,19 @@ var guestTask = function() {
             "sprop=name:esper.com"] // website address
             .join("&");
   }
+    var saveICS = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([data], {type: "text/calendar"});
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        //    window.URL.revokeObjectURL(url);
+        };
+    }());
 
   function addToCalendar(ta, x) {
     var addCal = $("<img id='add-cal'/>");
@@ -228,11 +242,27 @@ var guestTask = function() {
     var google = $("#google");
     $(document).on("click", "#google", function() {
       $('[data-toggle="popover"]').click();
-      window.open(googleCalendarURL(x.calendar_event_title.title_text,
+      window.open(googleCalendarURL(sched.getCalendarTitle(x),
                                     window.location,
-                                    x.reserved.slot,
-                                    x.hide_end_times));
-    })
+                                    x.reserved.slot));
+    });
+    var outlook = $("#outlook");
+    var apple = $("#apple");
+
+    var getICS = function () {
+      $('[data-toggle="popover"]').click();
+      api.getTaskICS().done(function (ics) {
+          log(ics);
+          saveICS(ics.content,'calendar-invitation.ics');
+      });
+      button.click();
+    }
+    $("#outlook")
+          .off("click")
+          .click(getICS);
+    $("#apple")
+          .off("click")
+          .click(getICS);
 
     button.popover({
       html:true,
@@ -257,7 +287,7 @@ var guestTask = function() {
   function viewOfMeetingHeader(task, ta, state) {
     var view = $("<div id='meeting-header'/>");
     var title = $("<div id='meeting-title'/>")
-      .text(state.calendar_event_title.title_text)
+      .text(sched.getCalendarTitle(state))
       .appendTo(view);
 
     if (! list.mem(task.guest_hosts, task.guest_uid)) {
@@ -283,14 +313,11 @@ var guestTask = function() {
     return view;
   }
 
-  function recoverCalendarSelection(task) {
-    var chat = list.find(task.guest_task.task_chats, function(chat) {
-      return task.guest_uid === chat.chat_with;
-    });
-    if (util.isNotNull(chat)) {
-      var msgItem = null;
-      for (var i = chat.chat_items.length; --i >= 0; ) {
-        var item = chat.chat_items[i];
+  function recoverCalendarSelection(ta) {
+    var msgItem = null;
+    for (var i = ta.task_chat_items.length; --i >= 0; ) {
+      var item = ta.task_chat_items[i];
+      if (item.by === login.me()) {
         switch (variant.cons(item.chat_item_data)) {
 
         case "Message":
@@ -321,7 +348,9 @@ var guestTask = function() {
   mod.loadTask = function(task) {
     var ta = task.guest_task;
 
-    var myLast = recoverCalendarSelection(task);
+    chat.setHideEndTimes(ta);
+
+    var myLast = recoverCalendarSelection(ta);
     var answers = {};
 
     function submitButton() {
@@ -331,38 +360,22 @@ var guestTask = function() {
         "text":"Submit"
       });
       submitButton.click(function() {
-        var noneWorks = $("#option-none").hasClass("checkbox-selected")
-                        ? $("#option-none-text").text().trim() : "";
-        var message = noneWorks;
-        // var message = join(noneWorks, "\n\n", $("#comment").val().trim());
-        function postMessage(reply) {
-          if (message.length > 0) {
-            var item = {
-              chatid: login.myChatid(),
-              by:     login.me(),
-              "for":  login.me(),
-              in_reply_to: reply,
-              chat_item_data: ["Message", message]
-            };
-            chat.postChatItem(item);
-          }
-        }
-
+        var data = null;
         var sel = list.ofTable(answers);
-        if (sel.length <= 0) {
-          postMessage(null);
-        } else {
-          var item = {
-            chatid: login.myChatid(),
-            by:     login.me(),
-            "for":  login.me(),
-            chat_item_data: ["Scheduling_r", {selected:sel}]
-          };
-          chat.postChatItem(item).done(function(item) {
-            postMessage(item.id);
-          });
+        if (sel.length > 0) {
+          data = ["Scheduling_r", {selected:sel}];
+        } else if ($("#option-none").hasClass("checkbox-selected")) {
+          data = ["Message", $("#option-none-text").text().trim()];
         }
-
+        if (util.isNotNull(data)) {
+          var item = {
+            tid: ta.tid,
+            to:  ta.task_participants.organized_by,
+            by:  login.me(),
+            chat_item_data: data
+          };
+          chat.postChatItem(item);
+        }
         $("html, body").animate({ scrollTop: 0 }, 350);
         $("#guest-select").addClass("hide");
         $("#feedback").removeClass("hide");
@@ -412,7 +425,7 @@ var guestTask = function() {
       return slotView;
     }
 
-    function viewOfCalendarOption(choice, label, typ, hideEndTime) {
+    function viewOfCalendarOption(choice, label, typ) {
       var slotView = $("<tr class='option'/>");
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
@@ -448,7 +461,7 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      var info = sched.viewOfOption(choice, typ, hideEndTime)
+      var info = sched.viewOfOption(choice, typ, chat.hideEndTimes)
         .appendTo(slotView);
 
       return slotView;
@@ -479,8 +492,7 @@ var guestTask = function() {
           var messagesIcon = $("<img id='messages-icon'/>");
           taskView.append(calendarIcon(state.reserved.slot))
                   .append(viewOfMeetingHeader(task, ta, state))
-                  .append(viewOfTimeAndPlace(state.reserved.slot,
-                                             state.hide_end_times))
+                  .append(viewOfTimeAndPlace(state.reserved.slot))
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
@@ -537,14 +549,13 @@ var guestTask = function() {
             .appendTo(taskView);
           var options = $("<table id='options'/>")
             .appendTo(select);
-          var typ = sched.meetingType(state);
           list.iter(state.calendar_options, function(choice, i) {
             if (util.isNotNull(myLast.answers[choice.label])) {
               answers[choice.label] = choice;
             }
             var label = indexLabel(i);
-            options.append(viewOfCalendarOption(choice, label, typ,
-                                                state.hide_end_times));
+            var typ = sched.formatMeetingType(choice.slot);
+            options.append(viewOfCalendarOption(choice, label, typ));
           });
           if (! list.mem(task.guest_hosts, task.guest_uid)) {
             options.append(viewOfNoneWorks(state.calendar_options));

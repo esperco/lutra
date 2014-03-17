@@ -3,13 +3,6 @@
 var sched3 = (function() {
   var mod = {};
 
-  function sentEmail(chats, uid) {
-    var chat = chats[uid];
-    return list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Scheduling_q");
-    });
-  }
-
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
@@ -159,8 +152,9 @@ var sched3 = (function() {
     })
   }
 
-  function preFillAvailabilityModal(chats, profs, task, options, toUid) {
-    var toObsProf = profs[toUid];
+  function preFillAvailabilityModal(profs, task, options, toUid) {
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
 
     loadRecipients(toObsProf);
 
@@ -169,7 +163,7 @@ var sched3 = (function() {
 
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
-    var toName = profile.fullName(toObsProf.prof);
+    var toName = profile.fullName(profs[toUid].prof);
 
     var footerOption = $("#footer-option");
     footerOption.children().remove();
@@ -211,7 +205,7 @@ var sched3 = (function() {
       guest_name: toName,
       guest_uid: toUid
     };
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
@@ -241,7 +235,7 @@ var sched3 = (function() {
       });
   }
 
-  function rowViewOfParticipant(chats, profs, task, uid) {
+  function rowViewOfParticipant(profs, task, uid) {
     var view = $("<div class='sched-step3-row clearfix'>");
     var dragDiv = $("<div class='guest-drag-div hide'></div>")
       .appendTo(view);
@@ -258,7 +252,7 @@ var sched3 = (function() {
     }
 
     function composeEmail() {
-      preFillAvailabilityModal(chats, profs, task, options, uid);
+      preFillAvailabilityModal(profs, task, options, uid);
       availabilityModal.modal({});
     }
 
@@ -323,16 +317,14 @@ var sched3 = (function() {
               uid = ea;
             }
           }
-          var chatid = chats[uid].chatid;
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
           task.task_data[1].hide_end_times = hideEnd;
           api.postTask(task).done(function() {
             var chatItem = {
-              chatid: chatid,
+              tid: task.tid,
               by: login.me(),
-              'for': login.me(),
-              team: login.getTeam().teamid,
+              to: [uid],
               chat_item_data: ["Scheduling_q", {
                 body: body,
                 choices: options,
@@ -354,7 +346,6 @@ var sched3 = (function() {
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
-    var chats = sched.chatsOfTask(ta);
     var next = $(".sched-step3-next");
     var selected;
 
@@ -401,10 +392,10 @@ var sched3 = (function() {
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
-        rowViewOfParticipant(chats, profs, ta, uid);
+        rowViewOfParticipant(profs, ta, uid);
       x.view
         .appendTo(guestsContainer);
-      if (numGuests == 1 && ! sentEmail(chats, uid))
+      if (numGuests == 1 && ! sched.sentEmail(ta, uid, "Scheduling_q"))
         x.composeEmail();
     });
 
