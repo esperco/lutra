@@ -358,6 +358,7 @@ var home = (function() {
     var view = $("#tasks");
     var stats = $("#new-message-stats");
     var count = 0;
+
     setTaskViewClass(view.children(), "archived-task");
     list.iter(data.tasks, function(task) {
       var taskView = $("#task-" + task.tid);
@@ -367,11 +368,13 @@ var home = (function() {
         view.append(viewOfActiveTaskRow(task));
       }
     });
-    var email = $("<div class='status-icon email-status-icon'/>");
+
+    stats.children().remove();
+    var email = $("<div id='new-message-icon' class='status-icon email-status-icon'/>");
     var emailIcon = $("<img/>")
       .appendTo(email);
     svg.loadImg(emailIcon, "/assets/img/status-email.svg");
-    var statsText = $("<span id='new-message-count'/>");
+    var statsText = $("<div id='new-message-count'/>");
     if (count > 0) {
       statsText.text(count + " unread messages");
     } else {
