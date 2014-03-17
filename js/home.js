@@ -89,70 +89,66 @@ var home = (function() {
     var view = $("#task-actions");
     view.children().remove();
 
-    var viewMeetingPage = $("<div class='task-action'/>");
-    var viewMeetingPageIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(viewMeetingPage);
-    var viewMeetingPageIcon = $("<img/>")
-      .appendTo(viewMeetingPageIconContainer);
-    svg.loadImg(viewMeetingPageIcon, "/assets/img/to-do.svg");
-    viewMeetingPage.append(($("<a class='task-action-label'/>"))
-                     .text("View meeting page"))
-                   .appendTo(view);
-    var assignAction = $("<div class='task-action'/>");
+    var viewLivePage = $("<a class='task-action' target='blank'/>");
+    var viewLivePageIconContainer = $("<div class='task-action-icon'/>")
+      .appendTo(viewLivePage);
+    var viewLivePageIcon = $("<img/>")
+      .appendTo(viewLivePageIconContainer);
+    svg.loadImg(viewLivePageIcon, "/assets/img/globe.svg");
+    viewLivePage.append(($("<span class='task-action-label'/>"))
+                  .text("View live page"))
+                .appendTo(view);
+    var assignAction = $("<a class='task-action'/>");
     var assignIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(assignAction);
     var assignIcon = $("<img/>")
       .appendTo(assignIconContainer);
-    svg.loadImg(assignIcon, "/assets/img/to-do.svg");
-    assignAction.append(($("<a class='task-action-label caret-text'/>"))
+    svg.loadImg(assignIcon, "/assets/img/assign-to.svg");
+    assignAction.append(($("<span class='task-action-label caret-text'/>"))
                   .text("Assign to"));
     var assignCaret = $("<img class='caret-link'/>")
       .appendTo(assignAction);
     svg.loadImg(assignCaret, "/assets/img/caret.svg");
     assignAction.appendTo(view);
-    var rescheduleAction = $("<div class='task-action'/>");
+    var rescheduleAction = $("<a class='task-action'/>");
     var rescheduleIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(rescheduleAction);
     var rescheduleIcon = $("<img/>")
       .appendTo(rescheduleIconContainer);
-    svg.loadImg(rescheduleIcon, "/assets/img/to-do.svg");
-    rescheduleAction.append(($("<a class='task-action-label'/>"))
+    svg.loadImg(rescheduleIcon, "/assets/img/reschedule.svg");
+    rescheduleAction.append(($("<span class='task-action-label'/>"))
                       .text("Reschedule..."))
                     .appendTo(view);
-    var cancelAction = $("<div class='task-action'/>");
+    var cancelAction = $("<a class='task-action'/>");
     var cancelIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(cancelAction);
     var cancelIcon = $("<img/>")
       .appendTo(cancelIconContainer);
     svg.loadImg(cancelIcon, "/assets/img/cancel-meeting.svg");
-    cancelAction.append(($("<a class='task-action-label'/>"))
+    cancelAction.append(($("<span class='task-action-label'/>"))
                   .text("Cancel..."))
                 .appendTo(view);
-    var deleteAction = $("<div class='task-action'/>");
+    var deleteAction = $("<a class='task-action'/>");
     var deleteIconContainer = $("<div class='task-action-icon'/>")
       .appendTo(deleteAction);
     var deleteIcon = $("<img/>")
       .appendTo(deleteIconContainer);
     svg.loadImg(deleteIcon, "/assets/img/delete-meeting.svg");
-    deleteAction.append(($("<a class='task-action-label'/>"))
+    deleteAction.append(($("<span class='task-action-label'/>"))
                   .text("Delete..."))
                 .appendTo(view);
 
+    var hosts = sched.getHosts(ta);
+    var host;
+    list.iter(hosts, function(uid) {
+      host = uid;
+    });
+    api.getGuestAppURL(ta.tid, host).done(function (url) {
+      viewMeetingPage.attr("href", url.url);
+    });
+
     loadAssignToPopover(ta, assignAction);
 
-    viewMeetingPage.click(function() {
-      var hosts = sched.getHosts(ta);
-      var host;
-      list.iter(hosts, function(uid) {
-        host = uid;
-      });
-      api.getGuestAppURL(ta.tid, host).done(function (url) {
-        window.open(url.url);
-      });
-    })
-    // assignAction.click(function() {
-
-    // })
     // rescheduleAction.click(function() {
 
     // })
