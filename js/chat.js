@@ -209,10 +209,13 @@ var chat = (function () {
               .append(date.viewTimeAgo(date.ofString(time))))
       .appendTo(line1);
 
-    var line2 = $("<div class='header-line-2 hide'/>")
+    var recipients = list.map(item.to, function(uid) {
+      return profile.fullName(profiles[uid].prof);
+    }).join(", ");
+    var line2 = $("<div class='header-line-2'/>")
       .appendTo(header);
     var toName = $("<div class='to-names' />")
-      .append("to " + "me")
+      .text("to " + recipients)
       .appendTo(line2);
 
     message.append($("<div class='message-text'/>").append(viewOfChatData(item)));
