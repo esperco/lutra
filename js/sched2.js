@@ -1087,17 +1087,11 @@ var sched2 = (function() {
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
-    var numOptions = 0;
     list.iter(schedState.calendar_options, function(x, i) {
       v.append(insertViewOfOption(ta, tzList, profs, listView,
                                   x, i, save, remove));
-      numOptions++;
     });
-    var addRow = listView.view
-      .appendTo(v);
-    if (numOptions < 3) {
-      addRow.removeClass("hide")
-    }
+    v.append(listView.view)
 
     return v;
   }
@@ -1218,6 +1212,11 @@ var sched2 = (function() {
         if ((x != "schedule") && (! schedule.content.hasClass("hide")))
           toggleModule(schedule, "schedule");
       }
+    }
+
+    if (sched.getState(ta).calendar_options.length > 0) {
+      offer.module.removeClass("disabled");
+      schedule.module.removeClass("disabled");
     }
 
     view
