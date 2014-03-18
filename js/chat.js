@@ -198,21 +198,21 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
-    var line1 = $("<div class='header-line-1 clearfix'/>")
-      .appendTo(header);
-    var fromName = $("<div class='col-xs-6 from-name' />")
-      .append(full_name(item.by))
-      .appendTo(line1);
-    var timestamp = $("<div class='col-xs-6 timestamp' />")
+    var timestamp = $("<div class='timestamp' style='float:right'/>")
       .append($("<div class='timestamp' />")
-              .append(date.viewTimeAgo(date.ofString(time))))
-      .appendTo(line1);
-
-    var line2 = $("<div class='header-line-2 hide'/>")
+        .append(date.viewTimeAgo(date.ofString(time))))
       .appendTo(header);
+
+    var fromName = $("<div class='from-name'/>")
+      .append(full_name(item.by))
+      .appendTo(header);
+
+    var recipients = list.map(item.to, function(uid) {
+      return profile.fullName(profiles[uid].prof);
+    }).join(", ");
     var toName = $("<div class='to-names' />")
-      .append("to " + "me")
-      .appendTo(line2);
+      .text("to " + recipients)
+      .appendTo(header);
 
     message.append($("<div class='message-text'/>").append(viewOfChatData(item)));
     // message.append($("<div class='message-status' />").append(status));
