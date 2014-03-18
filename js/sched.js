@@ -93,7 +93,14 @@ var sched = (function() {
       return list.mem(x.to, uid)
           && variant.cons(x.chat_item_data) === chatKind;
     });
-  }
+  };
+
+  mod.receivedEmail = function(ta, uid, chatKind) {
+    return list.exists(ta.task_chat_items, function(x) {
+      return x.by === uid
+          && variant.cons(x.chat_item_data) === chatKind;
+    });
+  };
 
   /******************************************/
 

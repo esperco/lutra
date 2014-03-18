@@ -384,6 +384,19 @@ var sched2 = (function() {
       });
   }
 
+  /*
+     If didWeSend is true, look for the most recent chatKind TO uid
+     otherwise, look for the most recent chatKind BY (from) uid
+  */
+  function howLongAgo(ta, uid, chatKind, didWeSend) {
+    var firstMatch = list.find(ta.task_chat_items, function(x) {
+      var uidMatch = didWeSend ? list.mem(x.to, uid) : x.by === uid;
+      return uidMatch && variant.cons(x.chat_item_data) === chatKind;
+    });
+    var created = date.ofString(firstMatch.time_created);
+    return date.viewTimeAgo(created).text();
+  }
+
   function createOfferRow(profs, task, uid) {
 '''
 <div #view
@@ -430,8 +443,19 @@ var sched2 = (function() {
       .addClass("reminder-guest-name")
       .appendTo(view);
 
+    var plural = options.length === 1 ? "" : "s";
+    var statusText = "Has not received the meeting option" + plural;
+    if (sched.receivedEmail(task, uid, "Scheduling_r")) {
+      statusText =
+        "Submitted meeting preference" + plural + " " +
+        howLongAgo(task, uid, "Scheduling_r", false);
+    } else if (sched.sentEmail(task, uid, "Scheduling_q")) {
+      statusText =
+        "Received the meeting option" + plural + " " +
+        howLongAgo(task, uid, "Scheduling_q", true);
+    }
     var guestStatus = $("<div class='reminder-guest-status'/>")
-      .text("Status goes here.")
+      .text(statusText)
       .appendTo(view);
 
     compose.click(composeEmail);
