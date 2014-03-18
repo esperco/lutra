@@ -168,31 +168,31 @@ var sched2 = (function() {
          class="schedule-content clearfix hide">
       <div #optionA
            id="select-option-a"
-           class="col-sm-4 schedule-option">
+           class="col-sm-4 schedule-option disabled">
         <div #letterA
-             class="select-option-letter">
+             class="select-option-letter disabled">
           A
         </div>
         <button #buttonA
-                class="btn btn-primary select-option-btn">
+                class="btn btn-primary select-option-btn disabled">
           Schedule
         </button>
       </div>
       <div #optionB
            id="select-option-b"
-           class="col-sm-4 schedule-option">
+           class="col-sm-4 schedule-option disabled">
         <div #letterB
-             class="select-option-letter recommended">
+             class="select-option-letter disabled">
           B
         </div>
         <button #buttonB
-                class="btn btn-primary select-option-btn">
+                class="btn btn-primary select-option-btn disabled">
           Schedule
         </button>
       </div>
       <div #optionC
            id="select-option-c"
-           class="col-sm-4 schedule-option">
+           class="col-sm-4 schedule-option disabled">
         <div #letterC
              class="select-option-letter disabled">
           C
@@ -207,6 +207,32 @@ var sched2 = (function() {
   </div>
 </div>
 '''
+    var state = sched.getState(ta);
+    var guests = sched.getAttendingGuests(ta);
+    var avails = state.availabilities;
+    var options = state.calendar_options;
+
+    function enableOptionIfExists(index, letter) {
+      var option = options[index];
+      if (util.isNotNull(option)) {
+        _view["option" + letter].removeClass("disabled");
+        _view["letter" + letter].removeClass("disabled");
+        if (isTheOnlyWorkableOption(guests, avails, option)) {
+          _view["letter" + letter].addClass("recommended");
+        }
+        _view["button" + letter]
+          .removeClass("disabled")
+          .click(function() {
+            $(".select-option-btn").addClass("disabled");
+            updateTask(ta, option);
+          });
+      }
+    }
+
+    enableOptionIfExists(0, "A");
+    enableOptionIfExists(1, "B");
+    enableOptionIfExists(2, "C");
+
     var next = $(".sched-step2-next");
     var selected;
 
@@ -214,16 +240,17 @@ var sched2 = (function() {
       .addClass("disabled")
       .off("click")
       .click(function() {
-        updateTask(ta, selected);
+//        updateTask(ta, selected);
       });
 
     function onSelect(x) {
       selected = x;
+      log(selected);
       next.removeClass("disabled");
     }
 
-    viewOfOptions(ta, onSelect)
-      .appendTo(temporary);
+//    viewOfOptions(ta, onSelect)
+//      .appendTo(temporary);
 
     return _view;
   }
