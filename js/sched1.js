@@ -7,15 +7,6 @@ var sched1 = (function() {
 
   var nextButton = $(".sched-step1-next");
 
-  function getGuestOptions(guestOptions, uid) {
-    var options = guestOptions[uid];
-    if (! util.isNotNull(options)) {
-      options = {uid:uid};
-      guestOptions[uid] = options;
-    }
-    return options;
-  }
-
   function editGuest(updateAddButton) {
     var edit = {};
 
@@ -177,7 +168,7 @@ var sched1 = (function() {
         task.task_participants.organized_for.push(uid);
 
         profile.profilesOfTaskParticipants(task).then(function(profs) {
-          delete getGuestOptions(guestOptions, uid).assisted_by;
+          delete sched.optionsForGuest(guestOptions, uid).assisted_by;
           rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
             .appendTo(guestsContainer);
           saveGuests(task, hosts, guestTbl, guestOptions);
@@ -295,7 +286,7 @@ var sched1 = (function() {
         task.task_participants.organized_for.push(uid);
 
         profile.profilesOfTaskParticipants(task).then(function(profs) {
-          getGuestOptions(guestOptions, guestUid).assisted_by = uid;
+          sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
           v.replaceWith(makeViewOfEA(profs, uid));
           saveGuests(task, hosts, guestTbl, guestOptions);
         });
@@ -303,7 +294,7 @@ var sched1 = (function() {
     });
 
     cancelCirc.click(function() {
-      delete getGuestOptions(guestOptions, guestUid).assisted_by;
+      delete sched.optionsForGuest(guestOptions, guestUid).assisted_by;
       saveGuests(task, hosts, guestTbl, guestOptions);
 
       v.remove();
@@ -363,7 +354,7 @@ var sched1 = (function() {
           .append(eaView);
 
       function removeEA() {
-        delete getGuestOptions(guestOptions, uid).assisted_by;
+        delete sched.optionsForGuest(guestOptions, uid).assisted_by;
         saveGuests(task, hosts, guestTbl, guestOptions);
 
         eaView.children().remove();
@@ -401,7 +392,7 @@ var sched1 = (function() {
     var result = {};
     function addResult(uid, mayAttend) {
       result[uid] = uid;
-      getGuestOptions(guestOptions, uid).may_attend = mayAttend;
+      sched.optionsForGuest(guestOptions, uid).may_attend = mayAttend;
     }
 
     for (var uid in guestOptions) {
