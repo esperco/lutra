@@ -165,7 +165,7 @@ var sched2 = (function() {
       </div>
     </div>
     <div #content
-         class="clearfix hide">
+         class="schedule-content clearfix hide">
       <div #optionA
            id="select-option-a"
            class="col-sm-4 schedule-option">
