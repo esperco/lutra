@@ -388,10 +388,11 @@ var sched = (function() {
               loadStep1(profs, ta);
               break;
             case "Find_availability":
+              // Interpreted as Coordinate until case is removed from type
               loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              loadStep3(profs, ta);
+              loadStep2(tzList, profs, ta);
               break;
             case "Confirm":
               loadStep4(profs, ta);

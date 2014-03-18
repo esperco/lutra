@@ -836,7 +836,7 @@ var sched4 = (function() {
     function rescheduleClick() {
       api.cancelCalendar(tid).done(function() {
         task.task_status.task_progress = "Coordinating";
-        state.scheduling_stage = "Find_availability";
+        state.scheduling_stage = "Coordinate";
         state.calendar_options = [];
         delete state.reserved;
         api.postTask(task).done(function() {
