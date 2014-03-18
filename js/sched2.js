@@ -40,11 +40,10 @@ var sched2 = (function() {
   }
 
   /*
-     Is this the ONLY option that ALL guests are available for?
-     If so, auto-select it for the EA.
-     After sched 2+3 merge, we'll be able to indicate availabilities better.
+     Are all the attending guests available for this option?
+     If so, highlight it for the EA in the schedule module.
   */
-  function isTheOnlyWorkableOption(guests, avails, option) {
+  function worksForAllGuests(guests, avails, option) {
     var worksForAll = null;
 
     // Make sure we're only checking availabilities of attending guests
@@ -62,11 +61,11 @@ var sched2 = (function() {
         avail.labels;
     });
 
-    // Does only the option we're looking for remain?
+    // Does the option we're looking for remain?
+    function matchingOptionLabel(x) { return x === option.label; }
     return (
       util.isNotNull(worksForAll)
-      && worksForAll.length === 1
-      && worksForAll[0] === option.label
+      && list.exists(worksForAll, matchingOptionLabel)
     );
   }
 
@@ -94,10 +93,7 @@ var sched2 = (function() {
         })
         .appendTo(view);
 
-      if (
-        state.reserved && eqSlot(x.slot, state.reserved.slot)
-        || isTheOnlyWorkableOption(guests, avails, x)
-      ) {
+      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
         x_view.addClass("radio-selected");
         onSelect(x);
       }
@@ -217,7 +213,7 @@ var sched2 = (function() {
       if (util.isNotNull(option)) {
         _view["option" + letter].removeClass("disabled");
         _view["letter" + letter].removeClass("disabled");
-        if (isTheOnlyWorkableOption(guests, avails, option)) {
+        if (worksForAllGuests(guests, avails, option)) {
           _view["letter" + letter].addClass("recommended");
         }
         _view["button" + letter]
