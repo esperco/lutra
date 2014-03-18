@@ -46,75 +46,170 @@ var sched2 = (function() {
       disableNextButton(); /* should be disabled already anyway */
   }
 
-  function toggleShow(showHide, header, content, connector) {
-    if (content.hasClass("hide")) {
-      showHide.text("Hide");
-      header.removeClass("collapsed");
-      content.removeClass("hide");
-      if (connector != null) {
-        connector.removeClass("collapsed");
-      }
-    } else {
-      showHide.text("Show");
-      header.addClass("collapsed");
-      content.addClass("hide");
-      if (connector != null) {
-        connector.addClass("collapsed");
-      }
-    }
-  }
+
+  /*** SELECT ***/
 
   function createSelectionSection() {
-    var view = $("<div/>");
-    var module = $("<div class='sched-module'/>")
-      .appendTo(view);
-
-    var header = $("<div class='sched-module-header collapsed'/>")
-      .appendTo(module);
-    var showHide = $("<span class='show-hide link'/>")
-      .text("Show")
-      .appendTo(header);
-    var selectionIcon = $("<img class='sched-module-icon'/>")
-      .appendTo(header);
-    svg.loadImg(selectionIcon, "/assets/img/star.svg");
-    var headerText = $("<div class='sched-module-title'/>")
-      .text("Select the preferred meeting option")
-      .appendTo(header);
-
-    var content = $("<div class='hide'/>")
-      .appendTo(module);
-
+'''
+<div #view>
+  <div #module
+       class="sched-module">
+    <div #header
+         id="select-header"
+         class="sched-module-header collapsed">
+      <span #showHide
+            id="select-show-hide"
+            class="show-hide link">
+        Show
+      </span>
+      <img id="select-icon"
+           class="sched-module-icon"
+           src="/assets/img/star.svg"/>
+      <div #headerTitle
+           class="sched-module-title">
+        Select the preferred meeting option
+    </div>
+    <div #content
+         id="select-content"
+         class="hide"/>
+  </div>
+</div>
+'''
     showHide.click(function() {
-      toggleShow(showHide, header, content);
+      toggleModule("select");
     })
 
     return view;
   }
 
-  function createOfferSection() {
-    var view = $("<div/>");
-    var module = $("<div class='sched-module'/>")
-      .appendTo(view);
-    var connector = createConnector().addClass("collapsed")
+
+/*** OFFER ***/
+
+  function createOfferRow(profs, task, uid) {
+    var view = $("<div class='sched-step2-row clearfix'>");
+
+    var state = sched.getState(task);
+    var options = state.calendar_options;
+
+    var availabilityModal = $("#sched-availability-modal");
+    function closeAvailabilityModal(item) {
+      availabilityModal.modal("hide");
+    }
+
+    function composeEmail() {
+      preFillAvailabilityModal(profs, task, options, uid);
+      availabilityModal.modal({});
+    }
+
+    var guest = $("<div class='col-xs-6'></div>")
       .appendTo(view);
 
-    var header = $("<div class='sched-module-header collapsed'/>")
-      .appendTo(module);
-    var showHide = $("<span class='show-hide link'/>")
-      .text("Show")
-      .appendTo(header);
-    var offerIcon = $("<img id='offer-icon' class='sched-module-icon'/>")
-      .appendTo(header);
-    svg.loadImg(offerIcon, "/assets/img/email.svg");
-    var headerText = $("<div class='sched-module-title'/>")
-      .text("Offer to guests")
-      .appendTo(header);
+    var prof = profs[uid].prof;
+    profile.viewMediumCirc(prof)
+      .addClass("list-prof-circ pref-prof-circ")
+      .appendTo(guest);
 
-    var content = $("<div class='hide'/>")
-      .appendTo(module);
+    $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
+      .appendTo(guest);
+
+    var responseA = $("<div class='hide col-xs-2 pref-guest-response third'>3</div>")
+      .appendTo(view);
+    var responseB = $("<div class='hide col-xs-2 pref-guest-response first'>1</div>")
+      .appendTo(view);
+    var responseC = $("<div class='hide col-xs-2 pref-guest-response second'>2</div>")
+      .appendTo(view);
+
+    var guestActions = $("<div class='col-xs-6 pref-guest-actions'></div>")
+      .appendTo(view);
+    $("<div class='pref-request'>Request preferences</div>")
+      .click(composeEmail)
+      .appendTo(guestActions);
+    $("<hr class='guest-actions-divider'></hr>")
+      .appendTo(guestActions);
+    $("<div class='pref-answer'>Answer for guest</div>")
+      .appendTo(guestActions);
+
+    var sendButton = $("#sched-availability-send");
+    sendButton
+      .removeClass("disabled")
+      .unbind('click')
+      .click(function() {
+        if (! sendButton.hasClass("disabled")) {
+          sendButton.addClass("disabled");
+          var body = $("#sched-availability-message").val();
+          if ("Address_to_assistant" === $("#sched-options-guest-addr").val()) {
+            var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
+            if (util.isNotNull(ea)) {
+              uid = ea;
+            }
+          }
+          var hideEnd = $("#sched-availability-message-readonly")
+            .hasClass("short");
+          sched.optionsForGuest(sched.getGuestOptions(task), uid)
+            .hide_end_times = hideEnd;
+          api.postTask(task).done(function() {
+            var chatItem = {
+              tid: task.tid,
+              by: login.me(),
+              to: [uid],
+              chat_item_data: ["Scheduling_q", {
+                body: body,
+                choices: options
+              }]
+            };
+            chat.postChatItem(chatItem)
+              .done(closeAvailabilityModal);
+          });
+        }
+      });
+
+    return { view: view,
+             composeEmail: composeEmail };
+  }
+
+  function createOfferSection(profs, ta, guests) {
+'''
+<div #view>
+  <div #module
+       class="sched-module">
+    <div #header
+         id="offer-header"
+         class="sched-module-header collapsed">
+      <span #showHide
+            id="offer-show-hide"
+            class="show-hide link">
+        Show
+      </span>
+      <img id="offer-icon"
+           class="sched-module-icon"
+           src="/assets/img/email.svg"/>
+      <div #headerTitle
+           class="sched-module-title"/>
+    </div>
+    <div #content
+         id="offer-content"
+         class="hide"/>
+  </div>
+</div>
+'''
+    var connector = createConnector()
+      .addClass("collapsed")
+      .attr("id","offer-connector")
+      .appendTo(view);
+
+    var headerText = guests.length > 1 ?
+      "Offer to guests" :
+      "Offer to the guest";
+    headerTitle.text(headerText);
+
+    list.iter(guests, function(uid) {
+      var x = createOfferRow(profs, ta, uid);
+      x.view
+        .appendTo(content)
+    });
 
     showHide.click(function() {
-      toggleShow(showHide, header, content, connector);
+      toggleModule("offer");
     })
 
     return view;
@@ -681,7 +776,6 @@ var sched2 = (function() {
         plus.removeClass("hide return-to-add")
             .addClass("cancel");
       }
-
     }
 
     function indexLabel(i) {
@@ -695,7 +789,7 @@ var sched2 = (function() {
     }
     letter.text(indexLabel(i));
 
-    var typ = sched.meetingType(sched.getState(ta));
+    var typ = sched.formatMeetingType(calOption.slot);
     readOnlyContainer.append(readOnlyViewOfOption(calOption, typ,
                                                   toggleEdit, removeOption));
 
@@ -766,26 +860,34 @@ var sched2 = (function() {
   }
 
   function createOptionsSection(tzList, profs, ta) {
-    var view = $("<div/>");
-    var module = $("<div class='sched-module'/>")
-      .appendTo(view);
+'''
+<div #view>
+  <div #module
+       class="sched-module">
+    <div #header
+         id="create-header"
+         class="sched-module-header">
+      <span #showHide
+            id="create-show-hide"
+            class="show-hide link">
+        Hide
+      </span>
+      <img id="create-icon"
+           class="sched-module-icon"
+           src="/assets/img/create-options.svg"/>
+      <div #headerTitle
+           class="sched-module-title">
+        Create up to 3 meeting options
+      </div>
+    </div>
+    <div #content
+         id="create-content"/>
+  </div>
+</div>
+'''
     var connector = createConnector()
+      .attr("id","create-connector")
       .appendTo(view);
-
-    var header = $("<div class='sched-module-header'/>")
-      .appendTo(module);
-    var showHide = $("<span class='show-hide link'/>")
-      .text("Hide")
-      .appendTo(header);
-    var optionsIcon = $("<img class='sched-module-icon'/>")
-      .appendTo(header);
-    svg.loadImg(optionsIcon, "/assets/img/create-options.svg");
-    var headerText = $("<div class='sched-module-title'/>")
-      .text("Create up to 3 meeting options")
-      .appendTo(header);
-
-    var content = $("<div id='options-content'/>")
-      .appendTo(module);
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
@@ -803,7 +905,7 @@ var sched2 = (function() {
     }
 
     showHide.click(function() {
-      toggleShow(showHide, header, content, connector);
+      toggleModule("create");
     })
 
     return view;
@@ -817,6 +919,41 @@ var sched2 = (function() {
     return connectorBox;
   }
 
+  function toggleModule(x) {
+    var content = $("#" + x + "-content");
+    var showHide = $("#" + x + "-show-hide");
+    var header = $("#" + x + "-header");
+    var connector;
+    if (x != "select")
+      connector = $("#" + x + "-connector");
+    if (x == "select")
+      scheduler = $("#" + x + "-scheduler");
+
+    if (content.hasClass("hide")) {
+      showHide.text("Hide");
+      header.removeClass("collapsed");
+      content.removeClass("hide");
+      if (connector != null)
+        connector.removeClass("collapsed");
+      hideOthers(x);
+    } else {
+      showHide.text("Show");
+      header.addClass("collapsed");
+      content.addClass("hide");
+      if (connector != null)
+        connector.addClass("collapsed");
+    }
+
+    function hideOthers(x) {
+      if ((x != "create") && (! $("#create-content").hasClass("hide")))
+        toggleModule("create");
+      if ((x != "offer") && (! $("#offer-content").hasClass("hide")))
+        toggleModule("offer");
+      if ((x != "select") && (! $("#select-content").hasClass("hide")))
+        toggleModule("select");
+    }
+  }
+
   mod.load = function(tzList, profs, ta, view) {
     view.children().remove();
     var guests = sched.getAttendingGuests(ta);
@@ -825,7 +962,7 @@ var sched2 = (function() {
       .append($("<h3>Find the best meeting option.</h3>"))
       .append(createOptionsSection(tzList, profs, ta))
       // .append(createApprovalSection())
-      .append(createOfferSection())
+      .append(createOfferSection(profs, ta, guests))
       .append(createSelectionSection());
 
     observable.onSchedulingStepChanging.observe("step", function() {

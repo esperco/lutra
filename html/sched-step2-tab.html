@@ -7,6 +7,43 @@
   </div> -->
 </div>
 
+<div class="modal fade" id="sched-availability-modal" tabindex="-1"
+     role="dialog" aria-labelledby="sched-availability-title"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn btn-primary"
+                id="sched-availability-send" style="float:right">Send</button>
+        <h3 class="modal-title" id="sched-availability-title">Offer times to guests.</h3>
+      </div>
+      <div class="modal-body" id="sched-availability-body">
+        <div>
+          <h4 class="modal-first-section-title to-label">To:</h4>
+          <div id="sched-availability-to-list"></div>
+        </div>
+        <div class="input">
+          <h4 class="modal-section-title">Subject</h4>
+          <input id="sched-availability-subject"
+                 type="text" class="form-control" disabled>
+        </div>
+        <h4 class="modal-section-title">Message</h4>
+        <select id="sched-options-guest-addr">
+          <option value="Address_directly">Address Directly</option>
+          <option value="Address_to_assistant">Address to Assistant</option>
+        </select>
+        <textarea class="form-control" rows="8"
+                  id="sched-availability-message"></textarea>
+        <div id="footer-option" class="checkbox-selected"></div>
+        <div id="sched-availability-message-readonly"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="navbar sched-footer">
   <div class="footer-inner">
     <div style="width:100%">
