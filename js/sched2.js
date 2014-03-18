@@ -153,13 +153,34 @@ var sched2 = (function() {
     For now just a dropdown menu of meeting types.
     May be accompanied with options specific to the type of meeting selected.
   */
-  function createMeetingTypeSelector(onSet, optInitialKey) {
-    function opt(label, value) {
-      return { label: label, value: value, action: onSet };
+  function createMeetingTypeSelector(onSet, customBox) {
+    function showCustom() {
+      customBox
+        .val("")
+        .removeClass("hide")
+        .focus();
     }
-    var initialKey = util.isString(optInitialKey) ? optInitialKey : "Meeting";
+    function hideCustom() {
+      customBox.addClass("hide");
+    }
+    function onSelect(value) {
+      if (value === "Custom")
+        showCustom();
+      else {
+        hideCustom();
+        onSet(value);
+      }
+    }
+
+    util.afterTyping(customBox, 500, function() {
+      onSet(customBox.val());
+    });
+
+    function opt(label, value) {
+      return { label: label, value: value, action: onSelect };
+    }
     var meetingTypeSelector = select.create({
-      initialKey: initialKey,
+      initialKey: "Meeting",
       options: [
         opt("Custom...", "Custom"),
         opt("Meeting", "Meeting"),
@@ -171,6 +192,9 @@ var sched2 = (function() {
         opt("Phone call", "Call")
       ]
     });
+    /* override default get() to read from the [possibly hidden] input box */
+    meetingTypeSelector.get = function() { return customBox.val(""); };
+
     return meetingTypeSelector;
   }
 
@@ -302,6 +326,9 @@ var sched2 = (function() {
       <div class="info-label what-label-edit">WHAT</div>
       <div class="info">
         <div #meetingTypeContainer/>
+        <input #meetingTypeInput
+               type="text"
+               class="hide form-control custom-type-input"/>
       </div>
     </div>
     <div class="edit-info-row">
@@ -392,7 +419,8 @@ var sched2 = (function() {
       return x.meeting_type;
     }
 
-    var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
+    var meetingTypeSelector =
+      createMeetingTypeSelector(setMeetingType, meetingTypeInput);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
