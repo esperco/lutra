@@ -343,7 +343,7 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, ta) {
+  function setup_step_buttons(tzList, ta, prog) {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
@@ -353,7 +353,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step2")
-      .attr('disabled', getGuests(ta) <= 0)
+      .attr('disabled', prog !== "Find_availability" && prog !== "Coordinate")
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -362,7 +362,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step3")
-      .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
+      .attr('disabled', true) // TODO Remove this button?
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -371,7 +371,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step4")
-      .attr('disabled', ! mod.getState(ta).reserved)
+      .attr('disabled', prog !== "Confirm")
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -388,7 +388,7 @@ var sched = (function() {
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;
-        setup_step_buttons(tzList, ta);
+        setup_step_buttons(tzList, ta, progress);
         profile.profilesOfTaskParticipants(ta)
           .done(function(profs) {
             switch (progress) {
