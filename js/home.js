@@ -150,13 +150,13 @@ var home = (function() {
     loadAssignToPopover(ta, assignAction);
 
     rescheduleAction.click(function() {
-        api.cancelCalendar(ta.tid).done(function (resp) {
-            ta.task_status.task_progress = "Find_availability";
-            api.postTask(ta).done(function() {
-                sched.getState(ta).scheduling_stage = "Coordinate";
-                observable.onTaskModified.notify(ta);
-            });
+      api.cancelCalendar(ta.tid).done(function (resp) {
+        ta.task_status.task_progress = "Find_availability";
+        api.postTask(ta).done(function() {
+          sched.getState(ta).scheduling_stage = "Coordinate";
+          observable.onTaskModified.notify(ta);
         });
+      });
     });
 
     cancelAction.click(function() {
