@@ -279,6 +279,7 @@ var sched2 = (function() {
     var cal = calpicker.create(param);
     _view.cal = cal;
     _view.body.append(cal.view);
+    _view.focus = cal.focus;
 
     return _view;
   }
@@ -437,15 +438,16 @@ var sched2 = (function() {
       calPickerContainer.children().remove();
       calPickerContainer.append(calModal.modal);
       calModal.modal.modal({});
-      calModal.modal
-        .on("shown.bs.modal", function() {
-          calModal.cal.render(); // can't happen earlier or calendar won't show
-        });
       calModal.doneButton
         .click(function() {
           log("TODO: save dates");
           calModal.modal.modal("hide");
         });
+      calModal.modal
+        .on("shown.bs.modal", function() {
+          calModal.cal.render(); // can't happen earlier or calendar won't show
+        });
+      calModal.focus();
     }
     openCalPicker.click(openCal);
 

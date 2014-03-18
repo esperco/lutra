@@ -18,7 +18,7 @@ var locpicker = (function() {
      class="clearfix">
   <div #locationSearch class="left-inner-addon">
     <i class="glyphicon glyphicon-search"></i>
-    <input #address
+    <input #searchBox
            type="search" class="form-control"
            placeholder="Search by address, neighborhood, city, state, or zip"/>
     <div class="dropdown">
@@ -33,11 +33,11 @@ var locpicker = (function() {
   <div #locationForm>
     <div #locationDetails class="clearfix">
       <div class="col-sm-7 address-form">
-        <input #locName
+        <input #title
                type="text"
                class="form-control loc-input"
                placeholder="Location name"/>
-        <input #locAddress
+        <input #address
                type="text"
                class="form-control loc-input"
                placeholder="Address" disabled/>
@@ -80,13 +80,16 @@ var locpicker = (function() {
   function getLocation(form) {
     var loc = {
       /* hidden state */
-      title: form.title,
       coord: form.coord,
       timezone: form.timezone,
 
       /* input boxes */
+      title: form.title.val(),
       address: form.address.val(),
       instructions: form.instructions.val(),
+
+      /* copy contents of search box for loceditor */
+      search: form.searchBox.val(),
     };
     return loc;
   }
@@ -106,10 +109,10 @@ var locpicker = (function() {
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
-    form.title = loc.title;
     form.coord = loc.coord;
     form.timezone = loc.timezone;
 
+    form.title.val(loc.title);
     form.address.val(loc.address);
     form.instructions.val(loc.instructions);
 
@@ -125,7 +128,7 @@ var locpicker = (function() {
     Create pop-up for editing and saving a location,
     taking care of synchronization between the form and the pop-up (modal).
     The pop-up is shown when the user clicks somewhere in the
-    dropdown menu that opens below the address input box.
+    dropdown menu that opens below the search box.
   */
   function createLocationEditor(form, loc) {
     function updateForm(loc) {
@@ -144,6 +147,7 @@ var locpicker = (function() {
 
     form.editor.children().remove();
     form.editor.append(modalView.modal);
+    modalView.focus();
   }
 
   function createGoogleMap(mapDiv) {
@@ -162,7 +166,7 @@ var locpicker = (function() {
 
   function addCreatePlaceToMenu(form) {
     var menu = form.dropdownMenu;
-    var textInput = form.address.val();
+    var textInput = form.searchBox.val();
     var li = $('<li role="presentation"/>')
       .appendTo(menu);
     var bolded = "Create a place named <b>\""
@@ -243,15 +247,17 @@ var locpicker = (function() {
         .appendTo(li)
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
-            .done(function(place) {
-              var coord = place.geometry;
+            .done(function(details) {
+              var title = details.name.length > 0 ? details.name : description;
+              var coord = details.geometry;
               api.getTimezone(coord.lat, coord.lon)
                 .done(function(x) {
                   var loc = item.loc;
                   setLocation(form, {
-                    title: description,
+                    title: title,
+                    address: details.formatted_address,
                     coord: coord,
-                    address: description,
+                    google_description: description,
                     timezone: x.timezone
                   });
                 });
@@ -285,7 +291,7 @@ var locpicker = (function() {
   }
 
   function predictAddress(form) {
-    var textInput = form.address.val();
+    var textInput = form.searchBox.val();
     if (textInput === "") return;
     api.getPlacePredictions(textInput)
       .done(function(predictions) {
@@ -294,7 +300,7 @@ var locpicker = (function() {
   }
 
   function setup(form) {
-    util.afterTyping(form.address, 250, function() {
+    util.afterTyping(form.searchBox, 250, function() {
       predictAddress(form);
     });
     form.resetLocation
@@ -325,6 +331,7 @@ var locpicker = (function() {
 
     return {
       view: view,
+      focus: (function() { form.searchBox.focus(); }),
 
       /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
