@@ -71,7 +71,7 @@ var sched2 = (function() {
   }
 
   function viewOfOptions(task, onSelect) {
-    var view = $("<div class='options-container'/>");
+    var view = $("<div/>");
     var state = sched.getState(task);
     var options = state.calendar_options;
     var guests = sched.getAttendingGuests(task);
@@ -163,7 +163,7 @@ var sched2 = (function() {
            src="/assets/img/star.svg"/>
       <div #headerTitle
            class="sched-module-title">
-        Select the preferred meeting option
+        Schedule the preferred meeting option
       </div>
     </div>
     <div #content
@@ -171,13 +171,40 @@ var sched2 = (function() {
          class="clearfix hide">
       <div #optionA
            id="select-option-a"
-           class="col-sm-4 schedule-option"/>
+           class="col-sm-4 schedule-option">
+        <div #letterA
+             class="select-option-letter">
+          A
+        </div>
+        <button #buttonA
+                class="btn btn-primary select-option-btn">
+          Schedule
+        </button>
+      </div>
       <div #optionB
            id="select-option-b"
-           class="col-sm-4 schedule-option"/>
+           class="col-sm-4 schedule-option">
+        <div #letterB
+             class="select-option-letter recommended">
+          B
+        </div>
+        <button #buttonB
+                class="btn btn-primary select-option-btn">
+          Schedule
+        </button>
+      </div>
       <div #optionC
            id="select-option-c"
-           class="col-sm-4 schedule-option"/>
+           class="col-sm-4 schedule-option">
+        <div #letterC
+             class="select-option-letter disabled">
+          C
+        </div>
+        <button #buttonC
+                class="btn btn-primary select-option-btn disabled">
+          Schedule
+        </button>
+      </div>
       <div #temporary/>
     </div>
   </div>
@@ -200,10 +227,6 @@ var sched2 = (function() {
 
     viewOfOptions(ta, onSelect)
       .appendTo(temporary);
-
-    optionA.text("Testing - A");
-    optionB.text("Testing - B");
-    optionC.text("Testing - C");
 
     showHide.click(function() {
       toggleModule("select");
