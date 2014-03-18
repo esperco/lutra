@@ -151,10 +151,8 @@ var home = (function() {
 
     rescheduleAction.click(function() {
         api.cancelCalendar(ta.tid).done(function (resp) {
-            console.log("Cancelling: " + ta.tid);
             ta.task_status.task_progress = "Find_availability";
             api.postTask(ta).done(function() {
-                console.log("Updating task yo");
                 sched.getState(ta).scheduling_stage = "Coordinate";
                 observable.onTaskModified.notify(ta);
             });
