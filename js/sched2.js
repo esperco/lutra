@@ -19,26 +19,6 @@ var sched2 = (function() {
 
   /*** SELECT ***/
 
-  function viewOfOption(calOption) {
-    var view = $("<div class='suggestion'/>")
-      .attr("id", calOption.label);
-    var radio = $("<img class='suggestion-radio'/>")
-      .appendTo(view);
-    svg.loadImg(radio, "/assets/img/radio.svg");
-    sched.viewOfSuggestion(calOption.slot)
-      .appendTo(view);
-    return view;
-  }
-
-  function eqSlot(x, y) {
-    return !x && !y
-        || x && y
-           && x.start === y.start
-           && x.end === y.end
-           && x.on_site === y.on_site
-           && x.location.address === y.location.address;
-  }
-
   /*
      Are all the attending guests available for this option?
      If so, highlight it for the EA in the schedule module.
@@ -69,37 +49,11 @@ var sched2 = (function() {
     );
   }
 
-  function viewOfOptions(task, onSelect) {
-    var view = $("<div/>");
-    var state = sched.getState(task);
-    var options = state.calendar_options;
-    var guests = sched.getAttendingGuests(task);
-    var avails = state.availabilities;
-
-    var idList = list.map(options, function(x) {
-      return { k: x.label, ids: [x.label] };
-    });
-    var idTbl = list.toTable(idList, function(x) { return x.k; });
-    var selector = show.create(idTbl, {
-      onClass: "radio-selected",
-      offClass: ""
-    });
-
-    list.iter(options, function(x) {
-      var x_view = viewOfOption(x);
-      x_view.click(function() {
-          selector.show(x.label);
-          onSelect(x);
-        })
-        .appendTo(view);
-
-      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
-        x_view.addClass("radio-selected");
-        onSelect(x);
-      }
-    });
-
-    return view;
+  function reserveCalendar(tid) {
+    return api.reserveCalendar(tid, { notified: [] })
+      .then(function(eventInfo) {
+        return api.getTask(tid);
+      });
   }
 
   function updateTaskState(state, calOption) {
@@ -112,18 +66,6 @@ var sched2 = (function() {
       }
       state.reserved.slot = calOption.slot;
     }
-  }
-
-  function saveTask(ta, calOption) {
-    updateTaskState(sched.getState(ta), calOption);
-    api.postTask(ta);
-  }
-
-  function reserveCalendar(tid) {
-    return api.reserveCalendar(tid, { notified: [] })
-      .then(function(eventInfo) {
-        return api.getTask(tid);
-      });
   }
 
   function updateTask(ta, calOption) {
@@ -208,6 +150,19 @@ var sched2 = (function() {
     var avails = state.availabilities;
     var options = state.calendar_options;
 
+    var i = 0;
+    list.iter(options, function(x) {
+      var x_view = sched.viewOfSuggestion(x.slot);
+      if (i === 0) {
+        optionA.append(x_view);
+      } else if (i === 1) {
+        optionB.append(x_view);
+      } else if (i === 2) {
+        optionC.append(x_view);
+      }
+      i++;
+    });
+
     function enableOptionIfExists(index, letter) {
       var option = options[index];
       if (util.isNotNull(option)) {
@@ -236,7 +191,6 @@ var sched2 = (function() {
       .addClass("disabled")
       .off("click")
       .click(function() {
-//        updateTask(ta, selected);
       });
 
     function onSelect(x) {
@@ -244,9 +198,6 @@ var sched2 = (function() {
       log(selected);
       next.removeClass("disabled");
     }
-
-//    viewOfOptions(ta, onSelect)
-//      .appendTo(temporary);
 
     return _view;
   }
@@ -259,7 +210,7 @@ var sched2 = (function() {
       .addClass("email-option-details");
 
     return $("<div class='email-option'/>")
-      .append($("<div class='option-letter-sm option-letter-modal unselectable' />")
+      .append($("<div class='option-letter-sm option-letter-modal unselectable'/>")
       .text(util.letterOfInt(i)))
       .append(option);
   }
