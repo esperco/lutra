@@ -38,9 +38,23 @@ var util = (function () {
     return typeof x === "function";
   };
 
-  mod.addFields = function(x, fields) {
-    for (var k in fields)
-      x[k] = fields[k];
+  /*
+    Merge two objects into one, from left to right.
+    A new object is created, leaving the input untouched.
+  */
+  mod.mergeObjects = function(/* as many object arguments as you want */) {
+    var l = arguments;
+    var result = {};
+    list.iter(l, function(obj) {
+      if (mod.isObject(obj)) {
+        for (var k in obj)
+          result[k] = obj[k];
+      }
+      else {
+        log("util.mergeObjects ignoring non-object:", obj);
+      }
+    });
+    return result;
   };
 
   mod.toString = function(x) {
@@ -119,6 +133,18 @@ var util = (function () {
     if (dropdownToggle.parent().hasClass("open"))
       dropdownToggle.dropdown("toggle");
   };
+
+  mod.tests = [
+    test.expect(
+      "mergeObjects",
+      function() {
+        var m = mod.mergeObjects({x:1, y:2}, {z:3, x:4});
+        return m.x === 4 && m.y === 2 && m.z === 3;
+      },
+      null,
+      true
+    )
+  ];
 
   return mod;
 })();

@@ -177,17 +177,19 @@ var sched2 = (function() {
   /*
     If the meeting type does not require a location, the timezone can
     be changed by clicking on it, prompting the using for a location.
-    Otherwise the timezone is the determined by the location of the meeting.
+    Otherwise the timezone is determined by the location of the meeting.
    */
-  function setupTimezoneLink(form, slot) {
+  function setupTimezoneLink(form, locationForm, slot) {
     function displayTimezone(loc) {
       if (util.isDefined(loc))
         timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
     }
     function setTimezone(oldTz, newTz) {
+      log("setTimezone", newTz);
       var loc = { timezone: newTz };
       slot.location = loc;
       displayTimezone(loc);
+      locationForm.setLocation(loc);
     }
     var timezoneText = form.timezoneText;
     var timezonePicker = form.timezonePicker;
@@ -207,7 +209,7 @@ var sched2 = (function() {
           timezonePicker.children().remove();
           timezonePicker.append(picker.view);
         })
-        .addClass("clickable");
+        .addClass("link");
       form.addPublicNotes
         .text("Specify phone number and notes");
       break;
@@ -227,8 +229,8 @@ var sched2 = (function() {
     displayTimezone(slot.location);
   }
 
-  function adaptToMeetingType(form, slot) {
-    setupTimezoneLink(form, slot);
+  function adaptToMeetingType(form, locationForm, slot) {
+    setupTimezoneLink(form, locationForm, slot);
     switch (slot.meeting_type) {
     case "Call":
       form.whereSection.addClass("hide");
@@ -315,7 +317,8 @@ var sched2 = (function() {
              class="open-cal-picker clearfix">
           <img class="open-cal-picker-icon svg"
                src="/assets/img/cal-picker.svg"/>
-          <span class="open-cal-picker-text link">
+          <span #calendarLinkText
+                class="open-cal-picker-text link">
             Select time in calendar
           </span>
         </span>
@@ -369,6 +372,8 @@ var sched2 = (function() {
 </div>
 '''
 
+    var locationForm; /* defined later because of a circular dependency */
+
     var x = calOption.slot;
 
     /*** Meeting type ***/
@@ -378,7 +383,7 @@ var sched2 = (function() {
 
     function setMeetingType(meetingType) {
       x.meeting_type = meetingType;
-      adaptToMeetingType(_view, x);
+      adaptToMeetingType(_view, locationForm, x);
     }
 
     function getMeetingType() {
@@ -396,9 +401,16 @@ var sched2 = (function() {
       end: date.ofString(x.end)
     };
 
+    function hasDates() {
+      var result = util.isDefined(dates)
+        && util.isNotNull(dates.start)
+        && util.isNotNull(dates.end);
+      return result;
+    }
+
     function displayDates() {
       dateAndTimes.children().remove();
-      if (util.isDefined(dates)) {
+      if (hasDates()) {
         dateAndTimes.append(sched.viewOfDates(dates.start, dates.end));
         dateAndTimes.removeClass("hide");
       }
@@ -441,14 +453,16 @@ var sched2 = (function() {
     var loc = x.location;
 
     function displayTimezone() {
-      setupTimezoneLink(_view, x);
+      setupTimezoneLink(_view, locationForm, x);
     }
 
     function onTimezoneChange(oldTimezone, newTimezone) {
+      log("onTimezoneChange", oldTimezone, newTimezone);
       displayTimezone();
       if (util.isNonEmptyString(oldTimezone)
           && util.isNonEmptyString(newTimezone))
         displayDates();
+      updateSaveButton();
     }
 
     function onLocationSet(newLoc) {
@@ -461,7 +475,8 @@ var sched2 = (function() {
       updateSaveButton();
     }
 
-    var locationForm = locpicker.create({
+    /* locationForm is defined earlier because we have a circular dependency */
+    locationForm = locpicker.create({
       onTimezoneChange: onTimezoneChange,
       onLocationSet: onLocationSet
     });
@@ -504,10 +519,16 @@ var sched2 = (function() {
 
     function getCalOption() {
       var meetingType = getMeetingType();
-      var loc = locationForm.getCompleteLocation();
+      var loc;
+      if (meetingType === "Call")
+        loc = locationForm.getTimezoneLocation();
+      else
+        loc = locationForm.getCompleteLocation();
+
+      log("getCalOption:", meetingType, loc, dates);
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
-          && util.isNotNull(dates)) {
+          && hasDates()) {
         var oldCalOption = calOption;
         var calSlot = {
           meeting_type: meetingType,
@@ -827,8 +848,9 @@ var sched2 = (function() {
       .append($("<h3>Find the best meeting option.</h3>"))
       .append(createOptionsSection(tzList, profs, ta))
       // .append(createApprovalSection())
-      .append(createOfferSection())
-      .append(createSelectionSection());
+      // .append(createOfferSection())
+      // .append(createSelectionSection())
+    ;
 
     observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

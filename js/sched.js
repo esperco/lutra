@@ -108,13 +108,20 @@ var sched = (function() {
     var fromTime = wordify(date.timeOnly(date1));
     var toTime = wordify(date.timeOnly(date2));
 
-    var row = $("<div class='time-text'/>")
+    var view = $("<div/>");
+
+    var row1 = $("<div class='date-text'/>")
+      .text(date.dateOnly(date1))
+      .appendTo(view);
+
+    var row2 = $("<div class='time-text'/>")
       .append(html.text("from "))
       .append($("<b>").text(fromTime))
       .append(html.text(" to "))
-      .append($("<b>").text(toTime));
+      .append($("<b>").text(toTime))
+      .appendTo(view);
 
-    return row;
+    return view;
   };
 
   mod.viewOfSuggestion = function(x, score) {
@@ -133,11 +140,7 @@ var sched = (function() {
         .appendTo(row1);
     }
 
-    var row2 = $("<div class='date-text'/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    viewOfDates(t1, t2)
+    mod.viewOfDates(t1, t2)
       .appendTo(view);
 
     var row4 = $("<div class='time-text-short hide'/>")

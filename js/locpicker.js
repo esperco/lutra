@@ -105,6 +105,26 @@ var locpicker = (function() {
       return null;
   }
 
+  function getTimezoneLocation(form) {
+    var loc = getLocation(form);
+    var completeLoc = getCompleteLocation(form);
+    if (completeLoc === null) {
+      if (util.isNonEmptyString(loc.timezone)) {
+        var result = {
+          title: "",
+          address: "",
+          instructions: "",
+          timezone: loc.timezone
+        };
+        return result;
+      }
+      else
+        return null;
+    }
+    else
+      return null;
+  }
+
   function setLocation(form, loc) {
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
@@ -322,6 +342,7 @@ var locpicker = (function() {
         Default is true.
    */
   mod.create = function(param) {
+    log("locpicker param", param);
     var view = $("<div/>");
     var form = createLocationForm(param);
     var mapView = $("<div/>");
@@ -338,6 +359,7 @@ var locpicker = (function() {
 
       /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
+      getTimezoneLocation: (function () { return getTimezoneLocation(form); }),
       setLocation: (function(loc) { return setLocation(form, loc); })
     };
   }
