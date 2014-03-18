@@ -3,13 +3,6 @@
 var sched3 = (function() {
   var mod = {};
 
-  function sentEmail(chats, uid) {
-    var chat = chats[uid];
-    return list.exists(chat.chat_items, function(x) {
-      return (x.chat_item_data[0] === "Scheduling_q");
-    });
-  }
-
   function viewOfOption(calOption) {
     var view = $("<div class='suggestion'/>")
       .attr("id", calOption.label);
@@ -30,10 +23,43 @@ var sched3 = (function() {
            && x.location.address === y.location.address;
   }
 
+  /*
+     Is this the ONLY option that ALL guests are available for?
+     If so, auto-select it for the EA.
+     After sched 2+3 merge, we'll be able to indicate availabilities better.
+  */
+  function isTheOnlyWorkableOption(guests, avails, option) {
+    var worksForAll = null;
+
+    // Make sure we're only checking availabilities of attending guests
+    var guestAvails = list.filter_map(guests, function(guest) {
+      return list.find(avails, function(avail) {
+        return avail.participant === guest;
+      });
+    });
+
+    // Set-intersect the availability choices of the attending guests
+    list.iter(guestAvails, function(avail) {
+      worksForAll =
+        util.isNotNull(worksForAll) ?
+        list.inter(avail.labels, worksForAll) :
+        avail.labels;
+    });
+
+    // Does only the option we're looking for remain?
+    return (
+      util.isNotNull(worksForAll)
+      && worksForAll.length === 1
+      && worksForAll[0] === option.label
+    );
+  }
+
   function viewOfOptions(task, onSelect) {
     var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
     var options = state.calendar_options;
+    var guests = sched.getAttendingGuests(task);
+    var avails = state.availabilities;
 
     var idList = list.map(options, function(x) {
       return { k: x.label, ids: [x.label] };
@@ -52,7 +78,10 @@ var sched3 = (function() {
         })
         .appendTo(view);
 
-      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
+      if (
+        state.reserved && eqSlot(x.slot, state.reserved.slot)
+        || isTheOnlyWorkableOption(guests, avails, x)
+      ) {
         x_view.addClass("radio-selected");
         onSelect(x);
       }
@@ -159,7 +188,7 @@ var sched3 = (function() {
     })
   }
 
-  function preFillAvailabilityModal(chats, profs, task, options, toUid) {
+  function preFillAvailabilityModal(profs, task, options, toUid) {
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
 
@@ -242,7 +271,7 @@ var sched3 = (function() {
       });
   }
 
-  function rowViewOfParticipant(chats, profs, task, uid) {
+  function rowViewOfParticipant(profs, task, uid) {
     var view = $("<div class='sched-step3-row clearfix'>");
     var dragDiv = $("<div class='guest-drag-div hide'></div>")
       .appendTo(view);
@@ -259,7 +288,7 @@ var sched3 = (function() {
     }
 
     function composeEmail() {
-      preFillAvailabilityModal(chats, profs, task, options, uid);
+      preFillAvailabilityModal(profs, task, options, uid);
       availabilityModal.modal({});
     }
 
@@ -324,20 +353,18 @@ var sched3 = (function() {
               uid = ea;
             }
           }
-          var chatid = chats[uid].chatid;
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
-          task.task_data[1].hide_end_times = hideEnd;
+          sched.optionsForGuest(sched.getGuestOptions(task), uid)
+            .hide_end_times = hideEnd;
           api.postTask(task).done(function() {
             var chatItem = {
-              chatid: chatid,
+              tid: task.tid,
               by: login.me(),
-              'for': login.me(),
-              team: login.getTeam().teamid,
+              to: [uid],
               chat_item_data: ["Scheduling_q", {
                 body: body,
-                choices: options,
-                hide_end_times: hideEnd
+                choices: options
               }]
             };
             chat.postChatItem(chatItem)
@@ -355,7 +382,6 @@ var sched3 = (function() {
     $("<h3>Select a final time.</h3>")
       .appendTo(view);
 
-    var chats = sched.chatsOfTask(ta);
     var next = $(".sched-step3-next");
     var selected;
 
@@ -402,10 +428,10 @@ var sched3 = (function() {
     var numGuests = guests.length;
     list.iter(guests, function(uid) {
       var x =
-        rowViewOfParticipant(chats, profs, ta, uid);
+        rowViewOfParticipant(profs, ta, uid);
       x.view
         .appendTo(guestsContainer);
-      if (numGuests == 1 && ! sentEmail(chats, uid))
+      if (numGuests == 1 && ! sched.sentEmail(ta, uid, "Scheduling_q"))
         x.composeEmail();
     });
 
