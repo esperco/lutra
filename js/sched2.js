@@ -145,16 +145,14 @@ var sched2 = (function() {
       });
   }
 
-  function createSelectionSection(ta) {
+  function createScheduleSection(ta) {
 '''
 <div #view>
   <div #module
        class="sched-module">
     <div #header
-         id="select-header"
          class="sched-module-header collapsed">
       <span #showHide
-            id="select-show-hide"
             class="show-hide link">
         Show
       </span>
@@ -167,7 +165,6 @@ var sched2 = (function() {
       </div>
     </div>
     <div #content
-         id="select-content"
          class="clearfix hide">
       <div #optionA
            id="select-option-a"
@@ -228,11 +225,7 @@ var sched2 = (function() {
     viewOfOptions(ta, onSelect)
       .appendTo(temporary);
 
-    showHide.click(function() {
-      toggleModule("select");
-    })
-
-    return view;
+    return _view;
   }
 
 
@@ -374,10 +367,6 @@ var sched2 = (function() {
      class="module-row clearfix">
   <div #compose
        class="btn compose-offer-btn"/>
-  <a #editResponse
-     target="blank">
-    Edit response
-  </a>
 </div>
 '''
     var prof = profs[uid].prof;
@@ -398,7 +387,7 @@ var sched2 = (function() {
       .appendTo(compose);
     svg.loadImg(composeIcon, "/assets/img/compose.svg");
     compose.append($("<span class='compose-confirmation-text'/>")
-             .text("Write message"));
+             .text("Write offer"));
 
     var chatHead = profile.viewMediumCirc(prof)
       .addClass("list-prof-circ")
@@ -423,10 +412,6 @@ var sched2 = (function() {
       .appendTo(view);
 
     compose.click(composeEmail);
-
-    api.getGuestAppURL(task.tid, uid).done(function (url) {
-      editResponse.attr("href", url.url);
-    });
 
     var sendButton = $("#sched-availability-send");
     sendButton
@@ -472,10 +457,8 @@ var sched2 = (function() {
   <div #module
        class="sched-module">
     <div #header
-         id="offer-header"
          class="sched-module-header collapsed">
       <span #showHide
-            id="offer-show-hide"
             class="show-hide link">
         Show
       </span>
@@ -486,15 +469,13 @@ var sched2 = (function() {
            class="sched-module-title"/>
     </div>
     <div #content
-         id="offer-content"
          class="hide"/>
   </div>
+  <div #connector
+       class="connector"/>
 </div>
 '''
-    var connector = createConnector()
-      .addClass("collapsed")
-      .attr("id","offer-connector")
-      .appendTo(view);
+    connector.append(createConnector());
 
     var headerText = guests.length > 1 ?
       "Offer to guests" :
@@ -507,40 +488,7 @@ var sched2 = (function() {
         .appendTo(content)
     });
 
-    showHide.click(function() {
-      toggleModule("offer");
-    })
-
-    return view;
-  }
-
-  function createApprovalSection() {
-    var view = $("<div/>");
-    var module = $("<div class='sched-module'/>")
-      .appendTo(view);
-    var connector = createConnector().addClass("collapsed")
-      .appendTo(view);
-
-    var header = $("<div class='sched-module-header collapsed'/>")
-      .appendTo(module);
-    var showHide = $("<span class='show-hide link'/>")
-      .text("Show")
-      .appendTo(header);
-    var calendarIcon = $("<img class='sched-module-icon'/>")
-      .appendTo(header);
-    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
-    var headerText = $("<div class='sched-module-title'/>")
-      .text("Request approval (Optional)")
-      .appendTo(header);
-
-    var content = $("<div class='hide'/>")
-      .appendTo(module);
-
-    showHide.click(function() {
-      toggleShow(showHide, header, content, connector);
-    })
-
-    return view;
+    return _view;
   }
 
   /*
@@ -1009,7 +957,7 @@ var sched2 = (function() {
           <a class="duplicate-option">Duplicate option</a>
         </li>
         <li #removeOption>
-          <a class="remove-option">Remove option</a>
+          <a class="danger-list-item">Remove option</a>
         </li>
       </ul>
   </div>
@@ -1160,13 +1108,10 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       id="create-options-module"
        class="sched-module">
     <div #header
-         id="create-header"
          class="sched-module-header">
       <span #showHide
-            id="create-show-hide"
             class="show-hide link">
         Hide
       </span>
@@ -1178,14 +1123,14 @@ var sched2 = (function() {
         Create up to 3 meeting options
       </div>
     </div>
-    <div #content
-         id="create-content"/>
+    <div #content/>
   </div>
+  <div #connector
+       class="connector"/>
 </div>
 '''
-    var connector = createConnector()
-      .attr("id","create-connector")
-      .appendTo(view);
+    module.attr("style","margin-top:30px");
+    connector.append(createConnector());
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
@@ -1202,66 +1147,71 @@ var sched2 = (function() {
         });
     }
 
-    showHide.click(function() {
-      toggleModule("create");
-    })
-
-    return view;
+    return _view;
   }
 
   function createConnector() {
-    var connectorBox = $("<div class='connector'/>");
-    var connector = $("<img/>")
-      .appendTo(connectorBox);
+    var connector = $("<img/>");
     svg.loadImg(connector, "/assets/img/connector.svg");
-    return connectorBox;
-  }
-
-  function toggleModule(x) {
-    var content = $("#" + x + "-content");
-    var showHide = $("#" + x + "-show-hide");
-    var header = $("#" + x + "-header");
-    var connector;
-    if (x != "select")
-      connector = $("#" + x + "-connector");
-    if (x == "select")
-      scheduler = $("#" + x + "-scheduler");
-
-    if (content.hasClass("hide")) {
-      showHide.text("Hide");
-      header.removeClass("collapsed");
-      content.removeClass("hide");
-      if (connector != null)
-        connector.removeClass("collapsed");
-      hideOthers(x);
-    } else {
-      showHide.text("Show");
-      header.addClass("collapsed");
-      content.addClass("hide");
-      if (connector != null)
-        connector.addClass("collapsed");
-    }
-
-    function hideOthers(x) {
-      if ((x != "create") && (! $("#create-content").hasClass("hide")))
-        toggleModule("create");
-      if ((x != "offer") && (! $("#offer-content").hasClass("hide")))
-        toggleModule("offer");
-      if ((x != "select") && (! $("#select-content").hasClass("hide")))
-        toggleModule("select");
-    }
+    return connector;
   }
 
   mod.load = function(tzList, profs, ta, view) {
     view.children().remove();
     var guests = sched.getAttendingGuests(ta);
 
+    var options = createOptionsSection(tzList, profs, ta);
+    var offer = createOfferSection(profs, ta, guests);
+    var schedule = createScheduleSection(ta);
+
+    options.showHide.click(function() {
+      toggleModule(options, "options");
+    })
+    offer.showHide.click(function() {
+      toggleModule(offer, "offer");
+    })
+    schedule.showHide.click(function() {
+      toggleModule(schedule, "schedule");
+    })
+
+    function toggleModule(toggling, x) {
+      var content = toggling.content;
+      var showHide = toggling.showHide;
+      var header = toggling.header;
+      var connector;
+      if (x !== "schedule")
+        connector = toggling.connector;
+
+      if (content.hasClass("hide")) {
+        showHide.text("Hide");
+        header.removeClass("collapsed");
+        content.removeClass("hide");
+        if (connector != null)
+          connector.removeClass("collapsed");
+        hideOthers(x);
+      } else {
+        showHide.text("Show");
+        header.addClass("collapsed");
+        content.addClass("hide");
+        if (connector != null)
+          connector.addClass("collapsed");
+      }
+
+      function hideOthers(x) {
+        if ((x != "options") && (! options.content.hasClass("hide")))
+          toggleModule(options, "options");
+        if ((x != "offer") && (! offer.content.hasClass("hide")))
+          toggleModule(offer, "offer");
+        if ((x != "schedule") && (! schedule.content.hasClass("hide")))
+          toggleModule(schedule, "schedule");
+      }
+    }
+
     view
       .append($("<h3>Find the best meeting option.</h3>"))
-      .append(createOptionsSection(tzList, profs, ta))
-      // .append(createApprovalSection())
-      .append(createOfferSection(profs, ta, guests))
-      .append(createSelectionSection(ta));
+      .append(options.view)
+      .append(offer.view)
+      .append(schedule.view);
 
     observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

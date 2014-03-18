@@ -388,10 +388,8 @@ var sched4 = (function() {
   <div #module
        class="sched-module">
     <div #header
-         id="reminder-header"
          class="sched-module-header collapsed">
       <span #showHide
-            id="reminder-show-hide"
             class="show-hide link">
         Show
       </span>
@@ -401,12 +399,10 @@ var sched4 = (function() {
            class="sched-module-title"/>
     </div>
     <div #scheduler
-         id="reminder-scheduler"
-         class="hide">
+         class="reminder-scheduler hide">
       <span #schedulerTitle/>
     </div>
     <div #content
-         id="reminder-content"
          class="hide"/>
   </div>
 </div>
@@ -419,7 +415,8 @@ var sched4 = (function() {
     var schedulerText = guests.length > 1 ?
       "Send reminders" :
       "Send the reminder";
-    schedulerTitle.text(schedulerText);
+    schedulerTitle.text(schedulerText)
+                  .attr("style","margin-right:10px");
 
     var reminderSent = false;
     var statuses = [];
@@ -439,11 +436,7 @@ var sched4 = (function() {
       schedulerView.find("button").addClass("disabled");
     }
 
-    showHide.click(function() {
-      toggleModule("reminder");
-    })
-
-    return view;
+    return _view;
   }
 
 
@@ -547,10 +540,8 @@ var sched4 = (function() {
   <div #module
        class="sched-module">
     <div #header
-         id="confirm-header"
          class="sched-module-header collapsed">
       <span #showHide
-            id="confirm-show-hide"
             class="show-hide link">
         Show
       </span>
@@ -561,15 +552,13 @@ var sched4 = (function() {
            class="sched-module-title"/>
     </div>
     <div #content
-         id="confirm-content"
          class="hide"/>
   </div>
+  <div #connector
+       class="connector"/>
 </div>
 '''
-    var connector = createConnector()
-      .addClass("collapsed")
-      .attr("id","confirm-connector")
-      .appendTo(view);
+    connector.append(createConnector());
 
     var headerText = guests.length > 1 ?
       "Send guests a confirmation message" :
@@ -586,11 +575,7 @@ var sched4 = (function() {
       // }
     });
 
-    showHide.click(function() {
-      toggleModule("confirm");
-    })
-
-    return view;
+    return _view;
   }
 
 
@@ -774,13 +759,10 @@ var sched4 = (function() {
 '''
 <div #view>
   <div #module
-       id="edit-meeting-module"
        class="sched-module">
     <div #header
-         id="review-header"
          class="sched-module-header collapsed">
       <span #showHide
-            id="review-show-hide"
             class="show-hide link">
         Show
       </span>
@@ -791,8 +773,7 @@ var sched4 = (function() {
       </div>
     </div>
     <div #content
-         id="review-content"
-         class="hide">
+         class="review-content hide">
       <div #summary
            id="meeting-summary">
         <div #editButton
@@ -817,7 +798,7 @@ var sched4 = (function() {
               <a>Reschedule</a>
             </li>
             <li #cancel>
-              <a id="cancel-meeting">Cancel & archive</a>
+              <a class="danger-list-item">Cancel & archive</a>
             </li>
           </ul>
         </div>
@@ -825,6 +806,8 @@ var sched4 = (function() {
       </div>
     </div>
   </div>
+  <div #connector
+       class="connector"/>
 </div>
 '''
     var tid = task.tid;
@@ -833,16 +816,12 @@ var sched4 = (function() {
     var typ = sched.formatMeetingType(choice.slot);
     info.append(sched.viewOfOption(choice, typ));
 
+    module.attr("style","margin-top:30px");
+
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
-    var connector = createConnector()
-      .addClass("collapsed")
-      .attr("id","review-connector")
-      .appendTo(view);
 
-    showHide.click(function() {
-      toggleModule("review");
-    })
+    connector.append(createConnector());
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
@@ -884,65 +863,71 @@ var sched4 = (function() {
     reschedule.click(rescheduleClick);
     cancel.click(cancelAndArchiveClick);
 
-    return view;
+    return _view;
   }
 
   function createConnector() {
-    var connectorBox = $("<div class='connector'/>");
-    var connector = $("<img/>")
-      .appendTo(connectorBox);
+    var connector = $("<img/>");
     svg.loadImg(connector, "/assets/img/connector.svg");
-    return connectorBox;
-  }
-
-  function toggleModule(x) {
-    var content = $("#" + x + "-content");
-    var showHide = $("#" + x + "-show-hide");
-    var header = $("#" + x + "-header");
-    var connector, scheduler;
-    if (x != "reminder")
-      connector = $("#" + x + "-connector");
-    if (x == "reminder")
-      scheduler = $("#" + x + "-scheduler");
-
-    if (content.hasClass("hide")) {
-      showHide.text("Hide");
-      header.removeClass("collapsed");
-      content.removeClass("hide");
-      if (connector != null)
-        connector.removeClass("collapsed");
-      if (scheduler != null)
-        scheduler.removeClass("hide");
-      hideOthers(x);
-    } else {
-      showHide.text("Show");
-      header.addClass("collapsed");
-      content.addClass("hide");
-      if (connector != null)
-        connector.addClass("collapsed");
-      if (scheduler != null)
-        scheduler.addClass("hide");
-    }
-
-    function hideOthers(x) {
-      if ((x != "review") && (! $("#review-content").hasClass("hide")))
-        toggleModule("review");
-      if ((x != "confirm") && (! $("#confirm-content").hasClass("hide")))
-        toggleModule("confirm");
-      if ((x != "reminder") && (! $("#reminder-content").hasClass("hide")))
-        toggleModule("reminder");
-    }
+    return connector;
   }
 
   mod.load = function(profs, ta, view) {
     var tid = ta.tid;
     var guests = sched.getAttendingGuests(ta);
 
-    view
-      .append($("<h3>Finalize and confirm the meeting.</h3>"))
-      .append(createReviewSection(profs, ta))
-      .append(createConfirmSection(profs, ta, guests))
-      .append(createReminderSection(profs, ta, guests));
+    var review = createReviewSection(profs, ta);
+    var confirm = createConfirmSection(profs, ta, guests);
+    var reminder = createReminderSection(profs, ta, guests);
+
+    review.showHide.click(function() {
+      toggleModule(review, "review");
+    })
+    confirm.showHide.click(function() {
+      toggleModule(confirm, "confirm");
+    })
+    reminder.showHide.click(function() {
+      toggleModule(reminder, "reminder");
+    })
+
+    function toggleModule(toggling, x) {
+      var content = toggling.content;
+      var showHide = toggling.showHide;
+      var header = toggling.header;
+      var connector, scheduler;
+      if (x !== "reminder")
+        connector = toggling.connector;
+      if (x === "reminder")
+        scheduler = toggling.scheduler;
+
+      if (content.hasClass("hide")) {
+        showHide.text("Hide");
+        header.removeClass("collapsed");
+        content.removeClass("hide");
+        if (connector != null)
+          connector.removeClass("collapsed");
+        if (scheduler != null)
+          scheduler.removeClass("hide");
+        hideOthers(x);
+      } else {
+        showHide.text("Show");
+        header.addClass("collapsed");
+        content.addClass("hide");
+        if (connector != null)
+          connector.addClass("collapsed");
+        if (scheduler != null)
+          scheduler.addClass("hide");
+      }
+
+      function hideOthers(x) {
+        if ((x != "review") && (! review.content.hasClass("hide")))
+          toggleModule(review, "review");
+        if ((x != "confirm") && (! confirm.content.hasClass("hide")))
+          toggleModule(confirm, "confirm");
+        if ((x != "reminder") && (! reminder.content.hasClass("hide")))
+          toggleModule(reminder, "reminder");
+      }
+    }
 
     var confirmationSent = false;
     var reminderSent = false;
@@ -954,10 +939,16 @@ var sched4 = (function() {
     });
 
     if ((reminderSent) || (confirmationSent && !reminderSent)) {
-      toggleModule("reminder");
+      toggleModule(reminder, "reminder");
     } else {
-      toggleModule("confirm");
+      toggleModule(confirm, "confirm");
     }
+
+    view
+      .append($("<h3>Finalize and confirm the meeting.</h3>"))
+      .append(review.view)
+      .append(confirm.view)
+      .append(reminder.view);
 
     /* Task is always saved when remind changes. */
     observable.onSchedulingStepChanging.stopObserve("step");
