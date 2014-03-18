@@ -558,7 +558,9 @@ var sched4 = (function() {
        class="connector collapsed"/>
 </div>
 '''
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var headerText = guests.length > 1 ?
       "Send guests a confirmation message" :
@@ -819,7 +821,9 @@ var sched4 = (function() {
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
 
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
@@ -862,12 +866,6 @@ var sched4 = (function() {
     cancel.click(cancelAndArchiveClick);
 
     return _view;
-  }
-
-  function createConnector() {
-    var connector = $("<img/>");
-    svg.loadImg(connector, "/assets/img/connector.svg");
-    return connector;
   }
 
   mod.load = function(profs, ta, view) {

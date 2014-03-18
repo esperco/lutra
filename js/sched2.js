@@ -498,7 +498,9 @@ var sched2 = (function() {
        class="connector collapsed"/>
 </div>
 '''
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var headerText = guests.length > 1 ?
       "Offer to guests" :
@@ -1145,7 +1147,9 @@ var sched2 = (function() {
        class="connector"/>
 </div>
 '''
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
@@ -1163,12 +1167,6 @@ var sched2 = (function() {
     }
 
     return _view;
-  }
-
-  function createConnector() {
-    var connector = $("<img/>");
-    svg.loadImg(connector, "/assets/img/connector.svg");
-    return connector;
   }
 
   mod.load = function(tzList, profs, ta, view) {
