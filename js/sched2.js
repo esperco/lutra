@@ -180,6 +180,7 @@ var sched2 = (function() {
     Otherwise the timezone is determined by the location of the meeting.
    */
   function setupTimezoneLink(form, locationForm, slot) {
+    log("setupTimezoneLink", slot);
     function displayTimezone(loc) {
       if (util.isDefined(loc))
         timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
@@ -384,6 +385,7 @@ var sched2 = (function() {
     function setMeetingType(meetingType) {
       x.meeting_type = meetingType;
       adaptToMeetingType(_view, locationForm, x);
+      updateSaveButton();
     }
 
     function getMeetingType() {
@@ -517,7 +519,10 @@ var sched2 = (function() {
 
     /*** Row controls (save/remove) ***/
 
+    /* Get a complete calendar_option or nothing */
     function getCalOption() {
+      if (! util.isNotNull(locationForm)) return null; /* initializing */
+
       var meetingType = getMeetingType();
       var loc;
       if (meetingType === "Call")
