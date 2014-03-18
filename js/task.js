@@ -235,7 +235,15 @@ var task = (function() {
       chat.clearTaskChats();
     } else {
       api.getTask(optTid)
-        .done(loadTask);
+        .done(function(ta) {
+          var team = list.find(login.getTeams(), function(x) {
+            return x.teamid === ta.task_teamid;
+          });
+          if (util.isNotNull(team)) {
+            login.setTeam(team);
+          }
+          loadTask(ta);
+        });
     }
   }
 
