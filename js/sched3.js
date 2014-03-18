@@ -23,10 +23,43 @@ var sched3 = (function() {
            && x.location.address === y.location.address;
   }
 
+  /*
+     Is this the ONLY option that ALL guests are available for?
+     If so, auto-select it for the EA.
+     After sched 2+3 merge, we'll be able to indicate availabilities better.
+  */
+  function isTheOnlyWorkableOption(guests, avails, option) {
+    var worksForAll = null;
+
+    // Make sure we're only checking availabilities of attending guests
+    var guestAvails = list.filter_map(guests, function(guest) {
+      return list.find(avails, function(avail) {
+        return avail.participant === guest;
+      });
+    });
+
+    // Set-intersect the availability choices of the attending guests
+    list.iter(guestAvails, function(avail) {
+      worksForAll =
+        util.isNotNull(worksForAll) ?
+        list.inter(avail.labels, worksForAll) :
+        avail.labels;
+    });
+
+    // Does only the option we're looking for remain?
+    return (
+      util.isNotNull(worksForAll)
+      && worksForAll.length === 1
+      && worksForAll[0] === option.label
+    );
+  }
+
   function viewOfOptions(task, onSelect) {
     var view = $("<div class='options-container'/>");
     var state = sched.getState(task);
     var options = state.calendar_options;
+    var guests = sched.getAttendingGuests(task);
+    var avails = state.availabilities;
 
     var idList = list.map(options, function(x) {
       return { k: x.label, ids: [x.label] };
@@ -45,7 +78,10 @@ var sched3 = (function() {
         })
         .appendTo(view);
 
-      if (state.reserved && eqSlot(x.slot, state.reserved.slot)) {
+      if (
+        state.reserved && eqSlot(x.slot, state.reserved.slot)
+        || isTheOnlyWorkableOption(guests, avails, x)
+      ) {
         x_view.addClass("radio-selected");
         onSelect(x);
       }
@@ -319,7 +355,8 @@ var sched3 = (function() {
           }
           var hideEnd = $("#sched-availability-message-readonly")
             .hasClass("short");
-          task.task_data[1].hide_end_times = hideEnd;
+          sched.optionsForGuest(sched.getGuestOptions(task), uid)
+            .hide_end_times = hideEnd;
           api.postTask(task).done(function() {
             var chatItem = {
               tid: task.tid,
@@ -327,8 +364,7 @@ var sched3 = (function() {
               to: [uid],
               chat_item_data: ["Scheduling_q", {
                 body: body,
-                choices: options,
-                hide_end_times: hideEnd
+                choices: options
               }]
             };
             chat.postChatItem(chatItem)

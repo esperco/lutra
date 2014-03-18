@@ -57,6 +57,15 @@ var sched = (function() {
                         function(x){return x.uid;});
   }
 
+  mod.optionsForGuest = function(guestOptions, guestUid) {
+    var options = guestOptions[guestUid];
+    if (! util.isNotNull(options)) {
+      options = {uid:guestUid};
+      guestOptions[guestUid] = options;
+    }
+    return options;
+  }
+
   mod.assistedBy = function(uid, guestOptions) {
     var options = guestOptions[uid];
     return util.isNotNull(options) ? options.assisted_by : null;
@@ -214,17 +223,7 @@ var sched = (function() {
     }
   }
 
-  function describeTimeSlot(start, end, hideEndTime) {
-    var fromTime = wordify(date.timeOnly(start));
-    if (hideEndTime) {
-      return "at " + fromTime;
-    } else {
-      var toTime = wordify(date.timeOnly(end));
-      return fromTime + " to " + toTime;
-    }
-  }
-
-  function viewOfTimeOnly(x, hideEndTime) {
+  function viewOfTimeOnly(x) {
     var view = $("<div/>");
     var time1 = $("<div/>")
       .appendTo(view);
@@ -232,13 +231,17 @@ var sched = (function() {
       .appendTo(view);
 
     var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
     time1
       .append(date.weekDay(t1) + ", ")
       .append(date.dateOnly(t1))
-    time2
-      .append(describeTimeSlot(t1, t2, hideEndTime));
+
+    var fromTime = wordify(date.timeOnly(t1));
+    if (util.isNotNull(x.end)) {
+      var toTime = wordify(date.timeOnly(date.ofString(x.end)));
+      time2.append(fromTime + " to " + toTime);
+    } else {
+      time2.append("at " + fromTime);
+    }
 
     return view;
   }
@@ -261,7 +264,7 @@ var sched = (function() {
     var whenLabel = $("<div class='info-label'/>")
       .text("WHEN")
       .appendTo(when);
-    var time = viewOfTimeOnly(slot, hideEndTime)
+    var time = viewOfTimeOnly(option.slot, hideEndTime)
       .addClass("info")
       .appendTo(when);
 

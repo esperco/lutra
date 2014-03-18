@@ -115,14 +115,13 @@ var chat = (function () {
     }
   }
 
-  mod.hideEndTimes = false;
-
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
-    if (mod.hideEndTimes)
-      v.text(date.justStartTime(date.ofString(slot.start)));
-    else
+    if (util.isNotNull(slot.end)) {
       v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+    } else {
+      v.text(date.justStartTime(date.ofString(slot.start)));
+    }
     v.append($("<br/>"));
     appendLocation(v, slot.location);
     return v;
@@ -199,21 +198,21 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
-    var line1 = $("<div class='header-line-1 clearfix'/>")
-      .appendTo(header);
-    var fromName = $("<div class='col-xs-6 from-name' />")
-      .append(full_name(item.by))
-      .appendTo(line1);
-    var timestamp = $("<div class='col-xs-6 timestamp' />")
+    var timestamp = $("<div class='timestamp' style='float:right'/>")
       .append($("<div class='timestamp' />")
-              .append(date.viewTimeAgo(date.ofString(time))))
-      .appendTo(line1);
-
-    var line2 = $("<div class='header-line-2 hide'/>")
+        .append(date.viewTimeAgo(date.ofString(time))))
       .appendTo(header);
+
+    var fromName = $("<div class='from-name'/>")
+      .append(full_name(item.by))
+      .appendTo(header);
+
+    var recipients = list.map(item.to, function(uid) {
+      return profile.fullName(profiles[uid].prof);
+    }).join(", ");
     var toName = $("<div class='to-names' />")
-      .append("to " + "me")
-      .appendTo(line2);
+      .text("to " + recipients)
+      .appendTo(header);
 
     message.append($("<div class='message-text'/>").append(viewOfChatData(item)));
     // message.append($("<div class='message-status' />").append(status));
@@ -587,22 +586,6 @@ var chat = (function () {
       observable.onTaskParticipantsChanged
                               .observe("chat-tabs", mod.loadTaskChats);
     });
-  }
-
-  mod.setHideEndTimes = function(ta) {
-    if ("Scheduling" === variant.cons(ta.task_data)) {
-      var optsByUid = list.toTable(ta.task_data[1].participant_options,
-                                   function(x){return x.uid;});
-      var options = optsByUid[login.me()];
-      if (util.isNotNull(options)
-       && util.isNotNull(options.hide_end_times)) {
-        mod.hideEndTimes = options.hide_end_times;
-      } else {
-        mod.hideEndTimes = ta.task_data[1].hide_end_times;
-      }
-    } else {
-      mod.hideEndTimes = false;
-    }
   }
 
   mod.loadGuestTaskChats = function(ta) {
