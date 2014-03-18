@@ -38,7 +38,7 @@ var sched3 = (function() {
       });
     });
 
-    // Set-intersect the availability choices of the attenting guests
+    // Set-intersect the availability choices of the attending guests
     list.iter(guestAvails, function(avail) {
       worksForAll =
         util.isNotNull(worksForAll) ?
