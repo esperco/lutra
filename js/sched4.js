@@ -555,7 +555,7 @@ var sched4 = (function() {
          class="hide"/>
   </div>
   <div #connector
-       class="connector"/>
+       class="connector collapsed"/>
 </div>
 '''
     connector.append(createConnector());
@@ -759,7 +759,7 @@ var sched4 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module first-module">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -815,8 +815,6 @@ var sched4 = (function() {
     var choice = state.reserved;
     var typ = sched.formatMeetingType(choice.slot);
     info.append(sched.viewOfOption(choice, typ));
-
-    module.attr("style","margin-top:30px");
 
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);

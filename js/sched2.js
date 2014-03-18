@@ -149,7 +149,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module disabled">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -482,7 +482,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module disabled">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -499,7 +499,7 @@ var sched2 = (function() {
          class="hide"/>
   </div>
   <div #connector
-       class="connector"/>
+       class="connector collapsed"/>
 </div>
 '''
     connector.append(createConnector());
@@ -1085,6 +1085,7 @@ var sched2 = (function() {
     var schedState = sched.getState(ta);
     var listView = adder.createList({
       maxLength: 3,
+      profs: profs,
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
@@ -1096,16 +1097,6 @@ var sched2 = (function() {
     });
     var addRow = listView.view
       .appendTo(v);
-    addRow.hover(function() {
-      if (addRow.hasClass("click-mode")) {
-        connector.addClass("collapsed");
-      } else {
-        connector.removeClass("collapsed");
-      }
-    },function() {
-      if (addRow.hasClass("click-mode"))
-        connector.removeClass("collapsed");
-    })
     if (numOptions < 3) {
       addRow.removeClass("hide")
     }
@@ -1137,7 +1128,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module first-module">
     <div #header
          class="sched-module-header">
       <span #showHide
@@ -1158,7 +1149,6 @@ var sched2 = (function() {
        class="connector"/>
 </div>
 '''
-    module.attr("style","margin-top:30px");
     connector.append(createConnector());
 
     var leaderUid = login.leader();

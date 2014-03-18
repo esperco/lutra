@@ -71,24 +71,55 @@ var adder = (function() {
     };
   };
 
-  function createListView() {
+  function createListView(profs) {
 '''
-<div #view
-     id="add-option-row"
-     class="click-mode clearfix hide">
-  <div #adderList
-       class="adder-list"/>
-  <div #adder
-       class="adder">
-    <div #toggleContainer/>
-    <div #addText
-         id="add-option-text">
-      Add meeting option
+<div #view>
+  <div #addOption
+       id="add-option-row"
+       class="click-mode clearfix">
+    <div #adderList
+         class="adder-list"/>
+    <div #adder
+         class="adder">
+      <div #toggleContainer/>
+      <div #addText
+           id="add-option-text">
+        Add meeting option
+      </div>
+      <div #formContainer
+           class="hide"/>
     </div>
-    <div #formContainer
-         class="hide"/>
+  </div>
+  <div #help
+       class="options-help-row">
+    <div class="options-help clearfix">
+      <div #icon
+           class="options-help-icon"/>
+      <div #helpText
+           class="options-help-text"/>
+    </div>
+  </div>
 </div>
 '''
+    var img = $("<img/>")
+      .appendTo(icon);
+    svg.loadImg(img, "/assets/img/options-help.svg");
+
+    var hostName = profile.firstName(profs[login.leader()].prof);
+    var possessive = hostName;
+    if (hostName.slice(-1) === "s") {
+      possessive += "'";
+    } else {
+      possessive += "'s"
+    }
+
+    helpText
+      .append($("<span>Each meeting option will be automatically added to "
+        + possessive + " calendar with a </span>"))
+      .append($("<span class='bold'>HOLD</span>"))
+      .append($("<span> label and a link to the most up-to-date information "
+        + "on this meeting.</span>"));
+
     return _view;
   }
 
@@ -104,19 +135,24 @@ var adder = (function() {
    */
   mod.createList = function(param) {
     var maxLength = param.maxLength;
+    var profs = param.profs;
     var createAdderForm = param.createAdderForm;
     var userOnAdderOpen = param.onAdderOpen;
     var userOnAdderClose = param.onAdderClose;
 
     var currentLength = 0;
-    var listView = createListView();
+    var listView = createListView(profs);
 
     function onMaxLength() {
       listView.adder
         .addClass("hide");
+      listView.help
+        .addClass("hide");
     }
     function onLegalLength() {
       listView.adder
+        .removeClass("hide");
+      listView.help
         .removeClass("hide");
     }
 
@@ -162,7 +198,7 @@ var adder = (function() {
 
     function onAdderOpen(cancelAdd) {
       adderIsOpen = true;
-      listView.view.removeClass("click-mode");
+      listView.addOption.removeClass("click-mode");
       listView.addText.addClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
@@ -174,7 +210,7 @@ var adder = (function() {
 
     function clearAdder() {
       adderIsOpen = false;
-      listView.view.addClass("click-mode");
+      listView.addOption.addClass("click-mode");
       listView.addText.removeClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
