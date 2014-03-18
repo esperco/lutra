@@ -11,45 +11,141 @@ var sched2 = (function() {
       .done(function(task) { sched.loadTask(task); });
   }
 
-  function moveOnToNextStep(ta) {
-    var x = ta.task_data[1];
-    ta.task_status.task_progress = "Coordinating"; // status in the task list
-    x.scheduling_stage = "Coordinate"; // step in the scheduling page
-
-    /* Cancel whatever was previously reserved */
-    delete x.reserved;
-
-    saveAndReload(ta);
-  }
-
-  function enableNextButton() {
-    $(".sched-step2-next")
-      .removeClass("disabled");
-  }
-
   function disableNextButton() {
     $(".sched-step2-next")
       .addClass("disabled");
   }
 
-  function initNextButton(ta) {
-    var nextButton = $(".sched-step2-next")
-      .off("click")
-      .one("click", function() {
-        moveOnToNextStep(ta);
-      });
-    var schedState = sched.getState(ta);
-    var options = schedState.calendar_options;
-    if (util.isDefined(options) && options.length > 0)
-      enableNextButton();
-    else
-      disableNextButton(); /* should be disabled already anyway */
-  }
-
 
   /*** SELECT ***/
 
-  function createSelectionSection() {
+  function viewOfOption(calOption) {
+    var view = $("<div class='suggestion'/>")
+      .attr("id", calOption.label);
+    var radio = $("<img class='suggestion-radio'/>")
+      .appendTo(view);
+    svg.loadImg(radio, "/assets/img/radio.svg");
+    sched.viewOfSuggestion(calOption.slot)
+      .appendTo(view);
+    return view;
+  }
+
+  function eqSlot(x, y) {
+    return !x && !y
+        || x && y
+           && x.start === y.start
+           && x.end === y.end
+           && x.on_site === y.on_site
+           && x.location.address === y.location.address;
+  }
+
+  /*
+     Is this the ONLY option that ALL guests are available for?
+     If so, auto-select it for the EA.
+     After sched 2+3 merge, we'll be able to indicate availabilities better.
+  */
+  function isTheOnlyWorkableOption(guests, avails, option) {
+    var worksForAll = null;
+
+    // Make sure we're only checking availabilities of attending guests
+    var guestAvails = list.filter_map(guests, function(guest) {
+      return list.find(avails, function(avail) {
+        return avail.participant === guest;
+      });
+    });
+
+    // Set-intersect the availability choices of the attending guests
+    list.iter(guestAvails, function(avail) {
+      worksForAll =
+        util.isNotNull(worksForAll) ?
+        list.inter(avail.labels, worksForAll) :
+        avail.labels;
+    });
+
+    // Does only the option we're looking for remain?
+    return (
+      util.isNotNull(worksForAll)
+      && worksForAll.length === 1
+      && worksForAll[0] === option.label
+    );
+  }
+
+  function viewOfOptions(task, onSelect) {
+    var view = $("<div class='options-container'/>");
+    var state = sched.getState(task);
+    var options = state.calendar_options;
+    var guests = sched.getAttendingGuests(task);
+    var avails = state.availabilities;
+
+    var idList = list.map(options, function(x) {
+      return { k: x.label, ids: [x.label] };
+    });
+    var idTbl = list.toTable(idList, function(x) { return x.k; });
+    var selector = show.create(idTbl, {
+      onClass: "radio-selected",
+      offClass: ""
+    });
+
+    list.iter(options, function(x) {
+      var x_view = viewOfOption(x);
+      x_view.click(function() {
+          selector.show(x.label);
+          onSelect(x);
+        })
+        .appendTo(view);
+
+      if (
+        state.reserved && eqSlot(x.slot, state.reserved.slot)
+        || isTheOnlyWorkableOption(guests, avails, x)
+      ) {
+        x_view.addClass("radio-selected");
+        onSelect(x);
+      }
+    });
+
+    return view;
+  }
+
+  function updateTaskState(state, calOption) {
+    if (calOption) {
+      if (! state.reserved) {
+        state.reserved = {
+          /* reminders may be set later by the user */
+          notifs: []
+        };
+      }
+      state.reserved.slot = calOption.slot;
+    }
+  }
+
+  function saveTask(ta, calOption) {
+    updateTaskState(sched.getState(ta), calOption);
+    api.postTask(ta);
+  }
+
+  function reserveCalendar(tid) {
+    return api.reserveCalendar(tid, { notified: [] })
+      .then(function(eventInfo) {
+        return api.getTask(tid);
+      });
+  }
+
+  function updateTask(ta, calOption) {
+    var state = sched.getState(ta);
+    ta.task_status.task_progress = "Confirmed"; // status in the task list
+    state.scheduling_stage = "Confirm";         // step in the scheduling page
+    updateTaskState(state, calOption);
+    api.postTask(ta)
+      .done(function(ta) {
+        reserveCalendar(ta.tid)
+          .done(function(eventInfo) {
+            api.getTask(ta.tid)
+              .done(sched.loadTask);
+          });
+      });
+  }
+
+  function createSelectionSection(ta) {
 '''
 <div #view>
   <div #module
@@ -68,13 +164,47 @@ var sched2 = (function() {
       <div #headerTitle
            class="sched-module-title">
         Select the preferred meeting option
+      </div>
     </div>
     <div #content
          id="select-content"
-         class="hide"/>
+         class="clearfix hide">
+      <div #optionA
+           id="select-option-a"
+           class="col-sm-4 schedule-option"/>
+      <div #optionB
+           id="select-option-b"
+           class="col-sm-4 schedule-option"/>
+      <div #optionC
+           id="select-option-c"
+           class="col-sm-4 schedule-option"/>
+      <div #temporary/>
+    </div>
   </div>
 </div>
 '''
+    var next = $(".sched-step2-next");
+    var selected;
+
+    next
+      .addClass("disabled")
+      .off("click")
+      .click(function() {
+        updateTask(ta, selected);
+      });
+
+    function onSelect(x) {
+      selected = x;
+      next.removeClass("disabled");
+    }
+
+    viewOfOptions(ta, onSelect)
+      .appendTo(temporary);
+
+    optionA.text("Testing - A");
+    optionB.text("Testing - B");
+    optionC.text("Testing - C");
+
     showHide.click(function() {
       toggleModule("select");
     })
@@ -85,9 +215,149 @@ var sched2 = (function() {
 
 /*** OFFER ***/
 
-  function createOfferRow(profs, task, uid) {
-    var view = $("<div class='sched-step2-row clearfix'>");
+  function emailViewOfOption(calOption, i) {
+    var option = sched.viewOfSuggestion(calOption.slot)
+      .addClass("email-option-details");
 
+    return $("<div class='email-option'/>")
+      .append($("<div class='option-letter-sm option-letter-modal unselectable' />")
+      .text(util.letterOfInt(i)))
+      .append(option);
+  }
+
+  function emailViewOfOptions(options) {
+    var view = $("<div class='email-options'/>");
+    list.iter(options, function(x, i) {
+      emailViewOfOption(x, i)
+        .appendTo(view);
+    });
+    return view;
+  }
+
+  function showEndTime() {
+    $("#sched-availability-message-readonly .time-text")
+      .removeClass("hide");
+    $("#sched-availability-message-readonly .time-text-short")
+      .addClass("hide");
+  }
+
+  function hideEndTime() {
+    $("#sched-availability-message-readonly .time-text")
+      .addClass("hide");
+    $("#sched-availability-message-readonly .time-text-short")
+      .removeClass("hide");
+  }
+
+  function loadRecipients(toObsProf) {
+    $("#sched-availability-to-list").children().remove();
+
+    var recipientRow = $("<div class='sched-availability-to checkbox-selected'/>")
+      .appendTo($("#sched-availability-to-list"));
+
+    var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
+      .appendTo(recipientRow);
+
+    var recipientCheckbox = $("<img class='recipient-checkbox'/>")
+      .appendTo(recipientCheckboxDiv);
+    svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var recipientName = $("<div class='recipient-name' />")
+      .append(profile.fullName(toObsProf.prof))
+      .appendTo(recipientRow);
+
+    recipientRow.click(function() {
+      if (recipientRow.hasClass("checkbox-selected")) {
+        recipientRow.removeClass("checkbox-selected");
+      } else {
+        recipientRow.addClass("checkbox-selected");
+      }
+    })
+  }
+
+  function preFillAvailabilityModal(profs, task, options, toUid) {
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
+
+    loadRecipients(toObsProf);
+
+    $("#sched-availability-subject")
+      .val("Re: " + task.task_status.task_title);
+
+    var organizerName = profile.fullName(profs[login.me()].prof);
+    var hostName = profile.fullName(profs[login.leader()].prof);
+    var toName = profile.fullName(profs[toUid].prof);
+
+    var footerOption = $("#footer-option");
+    footerOption.children().remove();
+
+    var footerCheckboxDiv = $("<div class='footer-checkbox-div'/>")
+      .appendTo(footerOption);
+    var footerCheckbox = $("<img class='footer-checkbox'/>")
+      .appendTo(footerCheckboxDiv);
+    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+
+    var timeOption = $("<div class='time-option' />")
+      .append("Show end time of meeting options")
+      .appendTo(footerOption);
+
+    var footer = $("#sched-availability-message-readonly");
+    footer.children().remove();
+    footer.append(emailViewOfOptions(options));
+    if (footer.hasClass("short")) {
+      hideEndTime();
+    } else {
+      showEndTime();
+    }
+
+    footerOption.off("click");
+    footerOption.click(function() {
+      if (footerOption.hasClass("checkbox-selected")) {
+        footerOption.removeClass("checkbox-selected");
+        footer.addClass("short");
+        hideEndTime();
+      } else {
+        footerOption.addClass("checkbox-selected");
+        footer.removeClass("short");
+        showEndTime();
+      }
+    })
+
+    var parameters = {
+      exec_name: hostName,
+      guest_name: toName,
+      guest_uid: toUid
+    };
+
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Options_to_guest_assistant";
+      $("#sched-options-guest-addr").val("Address_to_assistant");
+    } else {
+      parameters.template_kind = "Options_to_guest";
+      $("#sched-options-guest-addr").val("Address_directly");
+    }
+    api.getOptionsMessage(task.tid, parameters)
+      .done(function(optionsMessage) {
+        $("#sched-availability-message").val(optionsMessage.message_text);
+        $("#sched-options-guest-addr")
+          .unbind("change")
+          .change(function(){refreshOptionsMessage(task.tid, parameters);});
+      });
+  }
+
+  function createOfferRow(profs, task, uid) {
+'''
+<div #view
+     class="module-row clearfix">
+  <div #compose
+       class="btn compose-offer-btn"/>
+  <a #editResponse
+     target="blank">
+    Edit response
+  </a>
+</div>
+'''
+    var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
 
@@ -101,33 +371,39 @@ var sched2 = (function() {
       availabilityModal.modal({});
     }
 
-    var guest = $("<div class='col-xs-6'></div>")
+    var composeIcon = $("<img class='compose-confirmation-icon'/>")
+      .appendTo(compose);
+    svg.loadImg(composeIcon, "/assets/img/compose.svg");
+    compose.append($("<span class='compose-confirmation-text'/>")
+             .text("Write message"));
+
+    var chatHead = profile.viewMediumCirc(prof)
+      .addClass("list-prof-circ")
       .appendTo(view);
 
-    var prof = profs[uid].prof;
-    profile.viewMediumCirc(prof)
-      .addClass("list-prof-circ pref-prof-circ")
-      .appendTo(guest);
+    if (sched.sentEmail(task, uid, "Scheduling_q")) {
+      chatHead.addClass("sent");
+      compose.addClass("btn-default");
+      composeIcon.addClass("sent");
+    } else {
+      chatHead.addClass("not-sent");
+      compose.addClass("btn-primary");
+      composeIcon.addClass("not-sent");
+    }
 
-    $("<div class='pref-guest-name ellipsis'>" + name + "</div>")
-      .appendTo(guest);
-
-    var responseA = $("<div class='hide col-xs-2 pref-guest-response third'>3</div>")
-      .appendTo(view);
-    var responseB = $("<div class='hide col-xs-2 pref-guest-response first'>1</div>")
-      .appendTo(view);
-    var responseC = $("<div class='hide col-xs-2 pref-guest-response second'>2</div>")
+    var guestName = profile.viewMediumFullName(prof)
+      .addClass("reminder-guest-name")
       .appendTo(view);
 
-    var guestActions = $("<div class='col-xs-6 pref-guest-actions'></div>")
+    var guestStatus = $("<div class='reminder-guest-status'/>")
+      .text("Status goes here.")
       .appendTo(view);
-    $("<div class='pref-request'>Request preferences</div>")
-      .click(composeEmail)
-      .appendTo(guestActions);
-    $("<hr class='guest-actions-divider'></hr>")
-      .appendTo(guestActions);
-    $("<div class='pref-answer'>Answer for guest</div>")
-      .appendTo(guestActions);
+
+    compose.click(composeEmail);
+
+    api.getGuestAppURL(task.tid, uid).done(function (url) {
+      editResponse.attr("href", url.url);
+    });
 
     var sendButton = $("#sched-availability-send");
     sendButton
@@ -834,8 +1110,6 @@ var sched2 = (function() {
       addRow.removeClass("hide")
     }
 
-    initNextButton(ta);
-
     return v;
   }
 
@@ -863,6 +1137,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
+       id="create-options-module"
        class="sched-module">
     <div #header
          id="create-header"
@@ -963,7 +1238,7 @@ var sched2 = (function() {
       .append(createOptionsSection(tzList, profs, ta))
       // .append(createApprovalSection())
       .append(createOfferSection(profs, ta, guests))
-      .append(createSelectionSection());
+      .append(createSelectionSection(ta));
 
     observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

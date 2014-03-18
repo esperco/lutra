@@ -252,9 +252,9 @@ var sched4 = (function() {
   function createReminderRow(profs, ta, uid, guests) {
 '''
 <div #view
-     class="sched-step4-row">
+     class="module-row">
   <div #edit
-       class="btn edit-reminder-btn">
+       class="btn edit-reminder-btn"/>
 </div>
 '''
     var prof = profs[uid].prof;
@@ -452,9 +452,9 @@ var sched4 = (function() {
   function createConfirmRow(profs, ta, uid) {
 '''
 <div #view
-     class="sched-step4-row">
+     class="module-row">
   <div #compose
-       class="btn compose-confirmation-btn">
+       class="btn compose-confirmation-btn"/>
 </div>
 '''
     var prof = profs[uid].prof;
@@ -774,7 +774,7 @@ var sched4 = (function() {
 '''
 <div #view>
   <div #module
-       id="edit-meeting-div"
+       id="edit-meeting-module"
        class="sched-module">
     <div #header
          id="review-header"
