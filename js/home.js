@@ -151,10 +151,11 @@ var home = (function() {
 
     rescheduleAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
-        ta.task_status.task_progress = "Find_availability";
+        ta.task_status.task_progress = "Coordinating";
+        sched.getState(ta).scheduling_stage = "Find_availability";
         api.postTask(ta).done(function() {
-          sched.getState(ta).scheduling_stage = "Coordinate";
           observable.onTaskModified.notify(ta);
+          window.location.href = "/#!task/" + ta.tid;
         });
       });
     });
