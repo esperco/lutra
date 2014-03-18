@@ -149,15 +149,24 @@ var home = (function() {
 
     loadAssignToPopover(ta, assignAction);
 
-    // rescheduleAction.click(function() {
+    rescheduleAction.click(function() {
+      api.cancelCalendar(ta.tid).done(function (resp) {
+        ta.task_status.task_progress = "Coordinating";
+        sched.getState(ta).scheduling_stage = "Find_availability";
+        api.postTask(ta).done(function() {
+          observable.onTaskModified.notify(ta);
+          window.location.href = "/#!task/" + ta.tid;
+        });
+      });
+    });
 
-    // })
     cancelAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
         ta.task_status.task_progress = "Closed";
         api.postTask(ta).done();
       });
     });
+
     deleteAction.click(function() {
       api.archiveTask(ta.tid);
       observable.onTaskArchived.notify(ta.tid);
