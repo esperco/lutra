@@ -145,7 +145,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module disabled">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -502,7 +502,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module disabled">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -519,10 +519,12 @@ var sched2 = (function() {
          class="hide"/>
   </div>
   <div #connector
-       class="connector"/>
+       class="connector collapsed"/>
 </div>
 '''
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var headerText = guests.length > 1 ?
       "Offer to guests" :
@@ -1105,30 +1107,15 @@ var sched2 = (function() {
     var schedState = sched.getState(ta);
     var listView = adder.createList({
       maxLength: 3,
+      profs: profs,
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
-    var numOptions = 0;
     list.iter(schedState.calendar_options, function(x, i) {
       v.append(insertViewOfOption(ta, tzList, profs, listView,
                                   x, i, save, remove));
-      numOptions++;
     });
-    var addRow = listView.view
-      .appendTo(v);
-    addRow.hover(function() {
-      if (addRow.hasClass("click-mode")) {
-        connector.addClass("collapsed");
-      } else {
-        connector.removeClass("collapsed");
-      }
-    },function() {
-      if (addRow.hasClass("click-mode"))
-        connector.removeClass("collapsed");
-    })
-    if (numOptions < 3) {
-      addRow.removeClass("hide")
-    }
+    v.append(listView.view)
 
     return v;
   }
@@ -1157,7 +1144,7 @@ var sched2 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module first-module">
     <div #header
          class="sched-module-header">
       <span #showHide
@@ -1178,8 +1165,9 @@ var sched2 = (function() {
        class="connector"/>
 </div>
 '''
-    module.attr("style","margin-top:30px");
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
@@ -1197,12 +1185,6 @@ var sched2 = (function() {
     }
 
     return _view;
-  }
-
-  function createConnector() {
-    var connector = $("<img/>");
-    svg.loadImg(connector, "/assets/img/connector.svg");
-    return connector;
   }
 
   mod.load = function(tzList, profs, ta, view) {
@@ -1254,6 +1236,11 @@ var sched2 = (function() {
         if ((x != "schedule") && (! schedule.content.hasClass("hide")))
           toggleModule(schedule, "schedule");
       }
+    }
+
+    if (sched.getState(ta).calendar_options.length > 0) {
+      offer.module.removeClass("disabled");
+      schedule.module.removeClass("disabled");
     }
 
     view

@@ -53,10 +53,7 @@ li { cursor: pointer; }
 
 i { color: @gray_60; }
 
-.container.mobile {
-  padding-left: 15px;
-  padding-right: 15px;
-}
+.bold { font-family: @bold; }
 
 .scrollable { overflow: auto; }
 
@@ -2329,123 +2326,6 @@ i { color: @gray_60; }
 }
 
 
-/*** Scheduling Step 3 ***/
-
-.guest-prefs-title {
-  margin-top: 40px;
-  font-family: @light;
-  font-size: 18px;
-}
-
-.guest-prefs-header {
-  margin-bottom: 15px;
-}
-
-.option-letter-block {
-  padding: 0;
-}
-
-.option-letter-sm {
-  width: 30px;
-  height: 30px;
-  margin-right: auto;
-  margin-left: auto;
-  text-align: center;
-  color: @gray_40;
-  font-size: 20px;
-  border: 1px solid @gray_40;
-  border-radius: 4px;
-}
-
-.option-letter-modal {
-  float: left;
-  margin-top: 12px;
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.option-letter.recommended {
-  color: @green;
-  border-color: @green;
-}
-
-.option-score {
-  margin-top: 5px;
-  text-align: center;
-  font-family: @bold;
-  font-size: 14px;
-  color: @gray_60;
-}
-
-.option-score.recommended {
-  color: @green;
-}
-
-.pref-prof-circ { margin-top: 8px; }
-
-.pref-prof-circ.mobile { margin-top: 0; }
-
-.pref-guest-name {
-  margin-top: 4px;
-  margin-left: 58px;
-  font-family: @bold;
-}
-
-.required {
-  margin-left: 58px;
-  padding-left: 0;
-  cursor: pointer;
-  &:hover path.checkbox { stroke: @gray_40; }
-}
-
-.required.mobile {
-  margin-top: 50px;
-  margin-left: 0;
-}
-
-.required-checkbox {
-  float: left;
-  margin-top: 5px;
-  margin-right: 7px;
-  height: 18px;
-  width: 18px;
-}
-
-.required-label {
-  margin-top: 5px;
-  margin-left: 5px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.pref-guest-response {
-  margin-top: 3px;
-  text-align: center;
-  font-family: @light;
-  font-size: 36px;
-  cursor: default;
-}
-
-.pref-guest-response.first { color: @green; }
-.pref-guest-response.second { color: @gray_20; }
-.pref-guest-response.third { color: @gray_10; }
-
-.pref-guest-actions { text-align: center; }
-
-.guest-actions-divider {
-  margin-top: 7px;
-  margin-bottom: 7px;
-}
-
-.pref-request,
-.pref-answer {
-  font-size: 14px;
-  color: @purple;
-  cursor: pointer;
-  &:hover { color: @purple_hover; }
-}
-
-
 /*** Calendar Picker ***/
 .cal-picker-dialog {
   width: 100% !important;
@@ -2806,6 +2686,14 @@ i { color: @gray_60; }
   border-radius: 6px;
 }
 
+.sched-module.disabled {
+  .sched-module-icon,
+  .sched-module-title { opacity: 0.5; }
+  .show-hide { display: none; }
+}
+
+.first-module { margin-top: 30px; }
+
 .sched-module-header {
   min-height: 54px;
   padding: 13px 15px;
@@ -2852,6 +2740,33 @@ i { color: @gray_60; }
 
 
 /*** Scheduling Step 2 ***/
+
+.options-help-row {
+  padding: 15px;
+  border-top: 1px solid @gray_20;
+}
+
+.options-help {
+  max-width: 410px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.options-help-icon {
+  float: left;
+}
+
+.options-help-text {
+  max-width: 260px;
+  margin-top: 20px;
+  margin-left: 150px;
+  color: @gray_60;
+  font-size: 14px;
+  @media (max-width: 470px) {
+    margin-top: 0;
+    margin-left: 140px;
+  }
+}
 
 #offer-icon { margin-top: 4px; }
 

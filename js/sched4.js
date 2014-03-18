@@ -555,10 +555,12 @@ var sched4 = (function() {
          class="hide"/>
   </div>
   <div #connector
-       class="connector"/>
+       class="connector collapsed"/>
 </div>
 '''
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     var headerText = guests.length > 1 ?
       "Send guests a confirmation message" :
@@ -759,7 +761,7 @@ var sched4 = (function() {
 '''
 <div #view>
   <div #module
-       class="sched-module">
+       class="sched-module first-module">
     <div #header
          class="sched-module-header collapsed">
       <span #showHide
@@ -816,12 +818,12 @@ var sched4 = (function() {
     var typ = sched.formatMeetingType(choice.slot);
     info.append(sched.viewOfOption(choice, typ));
 
-    module.attr("style","margin-top:30px");
-
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
 
-    connector.append(createConnector());
+    var connectorIcon = $("<img/>")
+      .appendTo(connector);
+    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
@@ -864,12 +866,6 @@ var sched4 = (function() {
     cancel.click(cancelAndArchiveClick);
 
     return _view;
-  }
-
-  function createConnector() {
-    var connector = $("<img/>");
-    svg.loadImg(connector, "/assets/img/connector.svg");
-    return connector;
   }
 
   mod.load = function(profs, ta, view) {
