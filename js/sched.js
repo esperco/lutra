@@ -146,7 +146,7 @@ var sched = (function() {
       .text(date.dateOnly(t1))
       .appendTo(view);
 
-    viewOfDates(t1, t2)
+    mod.viewOfDates(t1, t2)
       .appendTo(view);
 
     var row4 = $("<div class='time-text-short hide'/>")
