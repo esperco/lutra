@@ -26,7 +26,8 @@ APP_LIBS = \
   sha1 \
   moment \
   jquery-ui \
-  fullcalendar
+  fullcalendar \
+  bootstrap-timepicker
 
 GUESTAPP_LIBS =
 
