@@ -160,7 +160,8 @@ var sched3 = (function() {
   }
 
   function preFillAvailabilityModal(chats, profs, task, options, toUid) {
-    var toObsProf = profs[toUid];
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
 
     loadRecipients(toObsProf);
 
@@ -169,7 +170,7 @@ var sched3 = (function() {
 
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
-    var toName = profile.fullName(toObsProf.prof);
+    var toName = profile.fullName(profs[toUid].prof);
 
     var footerOption = $("#footer-option");
     footerOption.children().remove();
@@ -211,7 +212,7 @@ var sched3 = (function() {
       guest_name: toName,
       guest_uid: toUid
     };
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";

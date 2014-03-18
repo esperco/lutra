@@ -70,7 +70,8 @@ var sched4 = (function() {
   }
 
   function preFillConfirmModal(profs, ta, toUid) {
-    var toObsProf = profs[toUid];
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
     var slot = getSlot(ta);
 
     loadConfirmRecipients(toObsProf);
@@ -80,7 +81,7 @@ var sched4 = (function() {
 
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
-    var toName = profile.fullName(toObsProf.prof);
+    var toName = profile.fullName(profs[toUid].prof);
     var t1 = date.ofString(slot.start);
     var t2 = date.ofString(slot.end);
     var when =
@@ -103,14 +104,22 @@ var sched4 = (function() {
         date.timeOnly(t1) + " to " + date.timeOnly(t2)
       )
     };
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
-      parameters.template_kind = "Confirmation_to_guest_assistant";
       $("#sched-confirm-guest-addr").val("Address_to_assistant");
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest_assistant";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest_assistant";
+      }
     } else {
-      parameters.template_kind = "Confirmation_to_guest";
       $("#sched-confirm-guest-addr").val("Address_directly");
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest";
+      }
     }
     api.getConfirmationMessage(ta.tid, parameters)
       .done(function(confirmationMessage) {
@@ -152,15 +161,25 @@ var sched4 = (function() {
 
         $("#sched-confirm-guest-addr")
           .unbind("change")
-          .change(function(){refreshConfirmationMessage(ta.tid, parameters);});
+          .change(function() {
+            refreshConfirmationMessage(ta.tid, parameters, slot);
+          });
     });
   }
 
-  function refreshConfirmationMessage(tid, parameters) {
+  function refreshConfirmationMessage(tid, parameters, slot) {
     if ($("#sched-confirm-guest-addr").val() === "Address_directly") {
-      parameters.template_kind = "Confirmation_to_guest";
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest";
+      }
     } else {
-      parameters.template_kind = "Confirmation_to_guest_assistant";
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest_assistant";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest_assistant";
+      }
     }
     api.getConfirmationMessage(tid, parameters)
       .done(function(x) {
@@ -168,11 +187,19 @@ var sched4 = (function() {
       });
   }
 
-  function refreshReminderMessage(tid, parameters) {
+  function refreshReminderMessage(tid, parameters, slot) {
     if ($("#sched-reminder-guest-addr").val() === "Address_directly") {
-      parameters.template_kind = "Reminder_to_guest";
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_reminder_to_guest";
+      } else {
+        parameters.template_kind = "Reminder_to_guest";
+      }
     } else {
-      parameters.template_kind = "Reminder_to_guest_assistant";
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_reminder_to_guest_assistant";
+      } else {
+        parameters.template_kind = "Reminder_to_guest_assistant";
+      }
     }
     api.getReminderMessage(tid, parameters)
       .done(function(x) {
@@ -181,7 +208,10 @@ var sched4 = (function() {
   }
 
   function preFillReminderModal(profs, ta, options, toUid) {
-    var toObsProf = profs[toUid];
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
+    var slot = getSlot(ta);
+
     loadReminderRecipients(toObsProf);
 
     $("#sched-reminder-subject")
@@ -192,17 +222,25 @@ var sched4 = (function() {
     }
 
     var parameters = {
-      guest_name: profile.fullName(toObsProf.prof),
+      guest_name: profile.fullName(profs[toUid].prof),
       guest_uid: toUid
     };
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
-      parameters.template_kind = "Reminder_to_guest_assistant";
       $("#sched-reminder-guest-addr").val("Address_to_assistant");
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_reminder_to_guest_assistant";
+      } else {
+        parameters.template_kind = "Reminder_to_guest_assistant";
+      }
     } else {
-      parameters.template_kind = "Reminder_to_guest";
       $("#sched-reminder-guest-addr").val("Address_directly");
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_reminder_to_guest";
+      } else {
+        parameters.template_kind = "Reminder_to_guest";
+      }
     }
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
@@ -211,7 +249,9 @@ var sched4 = (function() {
         }
         $("#sched-reminder-guest-addr")
           .unbind("change")
-          .change(function(){refreshReminderMessage(ta.tid, parameters);});
+          .change(function() {
+            refreshReminderMessage(ta.tid, parameters, slot);
+          });
       });
   }
 
@@ -560,8 +600,7 @@ var sched4 = (function() {
   function updateCalendarEvent(param) {
     var task = param.task;
     var taskState = sched.getState(task);
-    taskState.calendar_event_title.title_text = param.titleEdit.val();
-    taskState.calendar_event_title.is_generated = false;
+    taskState.calendar_event_title.custom = param.titleEdit.val();
     taskState.public_notes = param.notesBoxPublic.val();
     taskState.private_notes = param.notesBoxPrivate.val();
     api.postTask(task).done(function() {
@@ -596,7 +635,7 @@ var sched4 = (function() {
     var titleEditBox = $("<div class='meeting-detail'/>")
       .appendTo(title);
     var titleEdit = $("<input type='text' class='form-control'/>")
-      .val(state.calendar_event_title.title_text)
+      .val(sched.getCalendarTitle(state))
       .on("input", function() {
         enableEventEditSave(task, titleEdit, updateButton)
       })
@@ -786,7 +825,7 @@ var sched4 = (function() {
     var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
-    var typ = sched.meetingType(state);
+    var typ = sched.formatMeetingType(choice.slot);
     var hideEndTime = state.hide_end_times;
     info.append(sched.viewOfOption(choice, typ, hideEndTime));
 

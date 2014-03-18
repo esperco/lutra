@@ -12,7 +12,7 @@
 var locpicker = (function() {
   var mod = {};
 
-  function createLocationForm(onTimezoneChange) {
+  function createLocationForm(onTimezoneChange, showDetails) {
 '''
 <div #location
      class="clearfix">
@@ -28,14 +28,6 @@ var locpicker = (function() {
       <ul #dropdownMenu
           class="dropdown-menu"
           role="menu"></ul>
-    </div>
-  </div>
-  <div #removeThis
-       class="hide">
-    <div class="col-sm-6">
-      <input #timezone
-             type="text" class="form-control"
-             placeholder="Timze zone should be hidden" disabled/>
     </div>
   </div>
   <div #locationForm>
@@ -79,12 +71,8 @@ var locpicker = (function() {
     /* add extra fields to carry along, for convenience */
     form.onTimezoneChange = onTimezoneChange;
 
-    resetLocation.click(function() {
-      locationForm.addClass("hide");
-      // reset location
-      address.val("")
-             .focus();
-    })
+    if (showDetails === false)
+      locationDetails.addClass("hide");
 
     return form;
   }
@@ -94,11 +82,11 @@ var locpicker = (function() {
       /* hidden state */
       title: form.title,
       coord: form.coord,
+      timezone: form.timezone,
 
       /* input boxes */
       address: form.address.val(),
       instructions: form.instructions.val(),
-      timezone: form.timezone.val()
     };
     return loc;
   }
@@ -114,18 +102,23 @@ var locpicker = (function() {
   }
 
   function setLocation(form, loc) {
-    var oldTimezone = form.timezone.val();
+    log("locpicker setLocation", loc);
+    var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
     form.title = loc.title;
     form.coord = loc.coord;
+    form.timezone = loc.timezone;
 
     form.address.val(loc.address);
     form.instructions.val(loc.instructions);
-    form.timezone.val(loc.timezone);
 
     if (oldTimezone !== newTimezone)
       form.onTimezoneChange(oldTimezone, newTimezone);
+  }
+
+  function clearLocation(form) {
+    setLocation(form, {});
   }
 
   /*
@@ -165,24 +158,6 @@ var locpicker = (function() {
       googleMap: googleMap,
       addressMarker: addressMarker
     };
-  }
-
-  /* unused - needs update and testing */
-  function geocodeAddress(form, googleMap) {
-    var address = form.address.val();
-    if (address === "") return;
-    clearSuggestions();
-    api.getCoordinates(address)
-      .done(function(coords) {
-        var geocoded = new google.maps.LatLng(coords.lat, coords.lon);
-        addressMarker.setPosition(geocoded);
-        addressMarker.setMap(googleMap);
-        googleMap.panTo(geocoded);
-        api.getTimezone(coords.lat, coords.lon)
-          .done(function(x) {
-            timeZoneDropdown.set(x.timezone);
-          });
-      });
   }
 
   function addCreatePlaceToMenu(form) {
@@ -322,13 +297,25 @@ var locpicker = (function() {
     util.afterTyping(form.address, 250, function() {
       predictAddress(form);
     });
+    form.resetLocation
+      .click(function() {
+        clearLocation(form);
+      });
   }
 
+  /*
+    Parameters:
+    - onTimezoneChange(oldTz, newTz):
+        called when the timezone is set or changes
+    - showDetails:
+        whether to show the details (name, address, instructions, map).
+        Default is true.
+   */
   mod.create = function(param) {
     var view = $("<div/>");
-    var form = createLocationForm(param.onTimezoneChange);
+    var form = createLocationForm(param.onTimezoneChange,
+                                  param.showDetails);
     var mapView = $("<div/>");
-    //var map = createGoogleMap(mapView);
 
     setup(form);
 
@@ -338,6 +325,8 @@ var locpicker = (function() {
 
     return {
       view: view,
+
+      /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
       setLocation: (function(loc) { return setLocation(form, loc); })
     };

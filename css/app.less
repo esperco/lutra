@@ -1075,8 +1075,8 @@ i { color: @gray_60; }
   }
 }
 
-#tz-picker-icon,
-#cal-picker-icon {
+.tz-picker-icon,
+.cal-picker-icon {
   float: left;
   margin-top: 2px;
 }
@@ -1290,6 +1290,10 @@ i { color: @gray_60; }
 .settings-title {
   letter-spacing: 3px;
   color: @gray_60;
+}
+
+#settings-templates .settings-title {
+  margin-top: 20px;
 }
 
 #settings-profile-title,
@@ -2451,7 +2455,7 @@ i { color: @gray_60; }
 
 
 /*** Calendar Picker ***/
-#cal-picker-dialog {
+.cal-picker-dialog {
   width: 100% !important;
 }
 
@@ -2611,12 +2615,11 @@ i { color: @gray_60; }
 }
 .time-to-text-mobile { margin-bottom: 3px; }
 
-.time-zone-text {
+.timezone-text {
   display: inline-block;
   margin-top: 6px;
   margin-left: 10px;
   font-size: 14px;
-  cursor: default;
 }
 
 #tz-picker-dialog {

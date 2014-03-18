@@ -28,6 +28,11 @@ var sched = (function() {
     task.task_data = ["Scheduling", state];
   };
 
+  mod.getCalendarTitle = function(state) {
+    var t = state.calendar_event_title;
+    return util.isString(t.custom) ? t.custom : t['default'];
+  };
+
   mod.isGuest = function(uid) {
     var team = login.getTeam();
     return ! list.mem(team.team_leaders, uid);
@@ -143,16 +148,16 @@ var sched = (function() {
     return view;
   }
 
-  mod.meetingType = function(state) {
-    if (state.meeting_request && state.meeting_request.meeting_type) {
-      var typ = variant.cons(state.meeting_request.meeting_type);
-      switch (typ) {
-        case "Call":      return "Phone Call";
-        case "Nightlife": return "Night Life";
-        default:          return typ;
-      }
-    } else {
-      return "Meeting";
+  /*
+    Get meeting type for a confirmed event and perform some translation
+    for display purposes.
+   */
+  mod.formatMeetingType = function(slot) {
+    var typ = slot.meeting_type;
+    switch (typ) {
+    case "Call":      return "Phone Call";
+    case "Nightlife": return "Night Life";
+    default:          return typ;
     }
   }
 
@@ -174,7 +179,8 @@ var sched = (function() {
 
     view.click(function() {
       // window.open(getDirections(x));
-      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+      window.open("http://www.google.com/maps/search/"
+                  + encodeURIComponent(locText));
     });
 
     return view;
