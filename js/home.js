@@ -149,15 +149,25 @@ var home = (function() {
 
     loadAssignToPopover(ta, assignAction);
 
-    // rescheduleAction.click(function() {
+    rescheduleAction.click(function() {
+        api.cancelCalendar(ta.tid).done(function (resp) {
+            console.log("Cancelling: " + ta.tid);
+            ta.task_status.task_progress = "Find_availability";
+            api.postTask(ta).done(function() {
+                console.log("Updating task yo");
+                sched.getState(ta).scheduling_stage = "Coordinate";
+                observable.onTaskModified.notify(ta);
+            });
+        });
+    });
 
-    // })
     cancelAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
         ta.task_status.task_progress = "Closed";
         api.postTask(ta).done();
       });
     });
+
     deleteAction.click(function() {
       api.archiveTask(ta.tid);
       observable.onTaskArchived.notify(ta.tid);
