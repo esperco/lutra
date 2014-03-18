@@ -155,6 +155,7 @@ var home = (function() {
         sched.getState(ta).scheduling_stage = "Find_availability";
         api.postTask(ta).done(function() {
           observable.onTaskModified.notify(ta);
+          window.location.href = "/#!task/" + ta.tid;
         });
       });
     });
