@@ -103,6 +103,20 @@ var sched = (function() {
       return "";
   }
 
+  /* Render a range of two javascript Dates as text */
+  mod.viewOfDates = function(date1, date2) {
+    var fromTime = wordify(date.timeOnly(date1));
+    var toTime = wordify(date.timeOnly(date2));
+
+    var row = $("<div class='time-text'/>")
+      .append(html.text("from "))
+      .append($("<b>").text(fromTime))
+      .append(html.text(" to "))
+      .append($("<b>").text(toTime));
+
+    return row;
+  };
+
   mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
 
@@ -123,14 +137,7 @@ var sched = (function() {
       .text(date.dateOnly(t1))
       .appendTo(view);
 
-    var fromTime = wordify(date.timeOnly(t1));
-    var toTime = wordify(date.timeOnly(t2));
-
-    var row3 = $("<div class='time-text'/>")
-      .append(html.text("from "))
-      .append($("<b>").text(fromTime))
-      .append(html.text(" to "))
-      .append($("<b>").text(toTime))
+    viewOfDates(t1, t2)
       .appendTo(view);
 
     var row4 = $("<div class='time-text-short hide'/>")
@@ -232,8 +239,9 @@ var sched = (function() {
     return view;
   }
 
-  mod.viewOfOption = function(option, typ, hideEndTime) {
+  mod.viewOfOption = function(option, hideEndTime) {
     var view = $("<td class='option-info'/>");
+    var slot = option.slot;
 
     var what = $("<div class='info-row'/>")
       .appendTo(view);
@@ -241,7 +249,7 @@ var sched = (function() {
       .text("WHAT")
       .appendTo(what);
     var meetingType = $("<div class='info'/>")
-      .text(typ)
+      .text(mod.formatMeetingType(slot))
       .appendTo(what);
 
     var when = $("<div class='info-row'/>")
@@ -249,7 +257,7 @@ var sched = (function() {
     var whenLabel = $("<div class='info-label'/>")
       .text("WHEN")
       .appendTo(when);
-    var time = viewOfTimeOnly(option.slot, hideEndTime)
+    var time = viewOfTimeOnly(slot, hideEndTime)
       .addClass("info")
       .appendTo(when);
 
@@ -258,7 +266,7 @@ var sched = (function() {
     var whereLabel = $("<div class='info-label'/>")
       .text("WHERE")
       .appendTo(where);
-    var loc = viewOfLocationOnly(option.slot)
+    var loc = viewOfLocationOnly(slot)
       .addClass("info link")
       .appendTo(where);
 

@@ -63,6 +63,11 @@ var tzpicker = (function() {
 
     modal.modal({});
 
+    modal
+      .on("shown.bs.modal", function() {
+        picker.focus();
+      });
+
     return {
       view: modal,
       close: close

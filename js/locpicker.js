@@ -12,7 +12,7 @@
 var locpicker = (function() {
   var mod = {};
 
-  function createLocationForm(onTimezoneChange, showDetails) {
+  function createLocationForm(param) {
 '''
 <div #location
      class="clearfix">
@@ -69,9 +69,10 @@ var locpicker = (function() {
 
     var form = _view;
     /* add extra fields to carry along, for convenience */
-    form.onTimezoneChange = onTimezoneChange;
+    form.onTimezoneChange = param.onTimezoneChange;
+    form.onLocationSet = param.onLocationSet;
 
-    if (showDetails === false)
+    if (param.showDetails === false)
       locationDetails.addClass("hide");
 
     return form;
@@ -105,7 +106,6 @@ var locpicker = (function() {
   }
 
   function setLocation(form, loc) {
-    log("locpicker setLocation", loc);
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
@@ -118,6 +118,8 @@ var locpicker = (function() {
 
     if (oldTimezone !== newTimezone)
       form.onTimezoneChange(oldTimezone, newTimezone);
+
+    form.onLocationSet(loc);
   }
 
   function clearLocation(form) {
@@ -311,6 +313,8 @@ var locpicker = (function() {
 
   /*
     Parameters:
+    - onLocationSet(loc):
+        called when the location is set
     - onTimezoneChange(oldTz, newTz):
         called when the timezone is set or changes
     - showDetails:
@@ -319,8 +323,7 @@ var locpicker = (function() {
    */
   mod.create = function(param) {
     var view = $("<div/>");
-    var form = createLocationForm(param.onTimezoneChange,
-                                  param.showDetails);
+    var form = createLocationForm(param);
     var mapView = $("<div/>");
 
     setup(form);

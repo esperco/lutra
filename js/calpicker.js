@@ -33,6 +33,7 @@ var calpicker = (function() {
   <div #calendarView/>
 </div>
 '''
+    _view.focus = startInput.focus;
 
     /*
       Later _view will also contain the following fields:
@@ -58,7 +59,8 @@ var calpicker = (function() {
 
   function initTimePicker(picker,
                           fieldName, /* either "eventStart" or "eventEnd" */
-                          timePicker) {
+                          timePicker,
+                          userOnChange) {
     log("initTimePicker", fieldName);
     timePicker.timepicker({
       timeFormat: "g:i a",
@@ -77,13 +79,14 @@ var calpicker = (function() {
         date.hours(time.getHours());
         date.minutes(time.getMinutes());
         updateCalendarView(picker);
+        userOnChange(getDates(picker));
       }
     });
   }
 
-  function initTimePickers(picker) {
-    initTimePicker(picker, "eventStart", picker.startInput);
-    initTimePicker(picker, "eventEnd", picker.endInput);
+  function initTimePickers(picker, userOnChange) {
+    initTimePicker(picker, "eventStart", picker.startInput, userOnChange);
+    initTimePicker(picker, "eventEnd", picker.endInput, userOnChange);
   }
 
   /* Remove event from the calendar view but preserve start/end fields */
@@ -254,7 +257,7 @@ var calpicker = (function() {
     var onChange = param.onChange;
 
     var picker = createView();
-    initTimePickers(picker);
+    initTimePickers(picker, onChange);
     picker.onChange = onChange;
 
     var calendarView = picker.calendarView;
