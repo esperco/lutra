@@ -456,8 +456,10 @@ var sched1 = (function() {
 
   function finalizeGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
-    ta.task_status.task_progress = "Coordinating";
-    sched.getState(ta).scheduling_stage = "Coordinate";
+    if (ta.task_status.task_progress !== "Confirmed") {
+      ta.task_status.task_progress = "Coordinating";
+      sched.getState(ta).scheduling_stage = "Coordinate";
+    }
     api.postTask(ta).done(function(ta) {
       sched.loadTask(ta);
       observable.onTaskParticipantsChanged.notify(ta);
