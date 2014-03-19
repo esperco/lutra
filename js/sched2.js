@@ -193,7 +193,7 @@ var sched2 = (function() {
       ]
     });
     /* override default get() to read from the [possibly hidden] input box */
-    meetingTypeSelector.get = function() { return customBox.val(""); };
+    meetingTypeSelector.get = function() { return customBox.val(); };
 
     return meetingTypeSelector;
   }
