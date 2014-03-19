@@ -105,7 +105,6 @@ var sched2 = (function() {
          class="schedule-content clearfix"
          style="display:none">
       <div #optionA
-           id="select-option-a"
            class="col-sm-4 schedule-option disabled">
         <div #letterA
              class="select-option-letter disabled">
@@ -117,8 +116,7 @@ var sched2 = (function() {
         </button>
       </div>
       <div #optionB
-           id="select-option-b"
-           class="col-sm-4 schedule-option disabled">
+           class="col-sm-4 schedule-option center-block disabled">
         <div #letterB
              class="select-option-letter disabled">
           B
@@ -129,7 +127,6 @@ var sched2 = (function() {
         </button>
       </div>
       <div #optionC
-           id="select-option-c"
            class="col-sm-4 schedule-option disabled">
         <div #letterC
              class="select-option-letter disabled">

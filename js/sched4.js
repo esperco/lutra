@@ -789,8 +789,7 @@ var sched4 = (function() {
     <div #content
          class="review-content"
          style="display:none">
-      <div #summary
-           id="meeting-summary">
+      <div #summary>
         <div #editButton
              class="btn-group edit-meeting">
           <button #edit
