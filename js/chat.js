@@ -532,6 +532,38 @@ var chat = (function () {
     $(".chat-panel div").remove();
   }
 
+  function makeChatTabs(ta, uids) {
+    var tabs = $(".chat-profile-tabs");
+
+    var allTab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
+    allTab.text("All");
+    allTab.click(function() {
+      chatRecipients = ta.task_participants.organized_for;
+      showItem = showAllItem;
+      $(".chatitem").removeClass("hide");
+    });
+    tabs.append($("<li class='active chat-tab-div'/>").append(allTab));
+
+    list.iter(uids, function(uid) {
+      var tab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
+      tab.text(profile.fullName(profiles[uid].prof));
+      tab.click(function() {
+        chatRecipients = [uid];
+        showItem = function(item, itemView) {
+          if (item.by === uid || list.mem(item.to, uid)) {
+            itemView.removeClass("hide");
+          } else {
+            itemView.addClass("hide");
+          }
+        };
+        for (var itemId in chatItems) {
+          showItem(chatItems[itemId], $("#chat-" + itemId));
+        }
+      });
+      tabs.append($("<li class='chat-tab-div'/>").append(tab));
+    });
+  }
+
   mod.loadTaskChats = function(ta) {
     chatTid = ta.tid;
     chatItems = {};
@@ -547,40 +579,12 @@ var chat = (function () {
         chatModal.modal({});
       })
 
-    var tabs = $(".chat-profile-tabs");
-
     profile.profilesOfTaskParticipants(ta)
     .done(function(profs) {
       profiles = profs;
+
       $(".chat-panel").append(chatView(ta));
-
-      var allTab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
-      allTab.text("All");
-      allTab.click(function() {
-        chatRecipients = ta.task_participants.organized_for;
-        showItem = showAllItem;
-        $(".chatitem").removeClass("hide");
-      });
-      tabs.append($("<li class='active chat-tab-div'/>").append(allTab));
-
-      list.iter(ta.task_participants.organized_for, function(uid) {
-        var tab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
-        tab.text(profile.fullName(profiles[uid].prof));
-        tab.click(function() {
-          chatRecipients = [uid];
-          showItem = function(item, itemView) {
-            if (item.by === uid || list.mem(item.to, uid)) {
-              itemView.removeClass("hide");
-            } else {
-              itemView.addClass("hide");
-            }
-          };
-          for (var itemId in chatItems) {
-            showItem(chatItems[itemId], $("#chat-" + itemId));
-          }
-        });
-        tabs.append($("<li class='chat-tab-div'/>").append(tab));
-      });
+      makeChatTabs(ta, ta.task_participants.organized_for);
 
       observable.onChatPosting.observe("chat-tabs", chatPosting);
       observable.onTaskParticipantsChanged
@@ -588,7 +592,8 @@ var chat = (function () {
     });
   }
 
-  mod.loadGuestTaskChats = function(ta) {
+  mod.loadGuestTaskChats = function(task) {
+    var ta = task.guest_task;
     chatTid = ta.tid;
     chatItems = {};
     chatRecipients = ta.task_participants.organized_by;
@@ -601,9 +606,11 @@ var chat = (function () {
       profiles = profs;
       $(".chat-panel").append(chatView(ta));
 
+      if (task.guest_chat_with.length > 1) {
+        makeChatTabs(ta, task.guest_chat_with);
+      }
+
       observable.onChatPosting.observe("chat-tabs", chatPosting);
-      observable.onTaskParticipantsChanged
-                              .observe("chat-tabs", mod.loadGuestTaskChats);
     });
   }
 
