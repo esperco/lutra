@@ -177,6 +177,16 @@ var sched2 = (function() {
             $(".select-option-btn").addClass("disabled");
             updateTask(ta, option);
           });
+      } else {
+        if (index === 1) {
+          _view["option" + letter]
+            .append($("<div class='not-offered'/>")
+              .text("A second meeting option was not created."));
+        } else if (index === 2) {
+          _view["option" + letter]
+            .append($("<div class='not-offered'/>")
+              .text("A third meeting option was not created."));
+        }
       }
     }
 
