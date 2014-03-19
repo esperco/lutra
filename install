@@ -28,7 +28,6 @@ cp $libs/animate.min.css pub/css
 cp $libs/font-awesome.css pub/css
 cp $libs/fullcalendar/fullcalendar/fullcalendar.css pub/css
 cp $libs/fullcalendar/fullcalendar/fullcalendar.print.css pub/css
-cp $libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css pub/css
 cp $libs/jquery.timepicker.css pub/css
 
 ### Build our own code and copy the result into the pub directory

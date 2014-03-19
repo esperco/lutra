@@ -1,6 +1,6 @@
 <svg width="32" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="-4 -3 32 24" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new -4 -3 32 24">
 <g stroke="#d1d3d4" stroke-miterlimit="10">
-<path fill="#f8f8f8" d="m-3.999,21c0-8.836 7.163-15.999 15.999-15.999s16.002,7.163 16.002,15.999"/>
+<path class="up" fill="#f8f8f8" d="m-3.999,21c0-8.836 7.163-15.999 15.999-15.999s16.002,7.163 16.002,15.999"/>
 <path class="down" fill="#fff" d="M28.002-3L12,13.002L-3.999-3"/>
 </g>
 </svg>

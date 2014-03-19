@@ -93,7 +93,14 @@ var sched = (function() {
       return list.mem(x.to, uid)
           && variant.cons(x.chat_item_data) === chatKind;
     });
-  }
+  };
+
+  mod.receivedEmail = function(ta, uid, chatKind) {
+    return list.exists(ta.task_chat_items, function(x) {
+      return x.by === uid
+          && variant.cons(x.chat_item_data) === chatKind;
+    });
+  };
 
   /******************************************/
 
@@ -149,6 +156,10 @@ var sched = (function() {
         .addClass("glyphicon glyphicon-star")
         .appendTo(row1);
     }
+
+    var row2 = $("<div class='date-text'/>")
+      .text(date.dateOnly(t1))
+      .appendTo(view);
 
     mod.viewOfDates(t1, t2)
       .appendTo(view);
@@ -264,7 +275,7 @@ var sched = (function() {
     var whenLabel = $("<div class='info-label'/>")
       .text("WHEN")
       .appendTo(when);
-    var time = viewOfTimeOnly(option.slot, hideEndTime)
+    var time = viewOfTimeOnly(slot, hideEndTime)
       .addClass("info")
       .appendTo(when);
 
@@ -347,7 +358,7 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, ta) {
+  function setup_step_buttons(tzList, ta, prog) {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
@@ -357,7 +368,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step2")
-      .attr('disabled', getGuests(ta) <= 0)
+      .attr('disabled', prog !== "Find_availability" && prog !== "Coordinate")
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -366,7 +377,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step3")
-      .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
+      .attr('disabled', true) // TODO Remove this button?
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -375,7 +386,7 @@ var sched = (function() {
         });
       });
     $(".sched-go-step4")
-      .attr('disabled', ! mod.getState(ta).reserved)
+      .attr('disabled', prog !== "Confirm")
       .unbind('click')
       .click(function() {
         observable.onSchedulingStepChanging.notify();
@@ -392,7 +403,7 @@ var sched = (function() {
     api.getTimezones()
       .done(function(x) {
         var tzList = x.timezones;
-        setup_step_buttons(tzList, ta);
+        setup_step_buttons(tzList, ta, progress);
         profile.profilesOfTaskParticipants(ta)
           .done(function(profs) {
             switch (progress) {
@@ -400,10 +411,11 @@ var sched = (function() {
               loadStep1(profs, ta);
               break;
             case "Find_availability":
+              // Interpreted as Coordinate until case is removed from type
               loadStep2(tzList, profs, ta);
               break;
             case "Coordinate":
-              loadStep3(profs, ta);
+              loadStep2(tzList, profs, ta);
               break;
             case "Confirm":
               loadStep4(profs, ta);

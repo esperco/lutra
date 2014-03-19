@@ -1,4 +1,5 @@
 <svg width="28" xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 28 28" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 28 28">
+<path class="bg" fill="none" d="M28,25c0,1.657-1.343,3-3,3H3c-1.657,0-3-1.343-3-3V3c0-1.657,1.343-3,3-3h22c1.657,0,3,1.343,3,3V25z"/>
 <g fill="none" stroke="#d1d3d4" stroke-miterlimit="10">
 <path d="m0,23h28"/>
 <path d="m0,18.5h28"/>
