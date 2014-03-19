@@ -11,20 +11,28 @@ var adder = (function() {
     clicked.
    */
   mod.createToggle = function(param) {
+    var cancel = param.cancel;
     var onOpen = param.onOpen;
     var onClose = param.onClose;
+    var cancelAdd = $("<span class='cancel-edit-mode link'/>")
+        .text("Cancel");
 
     var isOpen = false;
 
-    var view = $("<div class='add-guest-circ'/>");
-    var plus = $("<img id='plus-guest'/>");
-    plus.appendTo(view);
-    svg.loadImg(plus, "/assets/img/plus.svg");
+    var view = $("<div class='add-option-sq'/>");
+    var plusIcon = $("<img/>")
+    var plus = $("<div class='plus-option'/>")
+      .append(plusIcon)
+      .appendTo(view);
+    svg.loadImg(plusIcon, "/assets/img/plus.svg");
 
     function open() {
       if (!isOpen) {
         isOpen = true;
         view
+          .removeClass("return-to-add")
+          .addClass("cancel");
+        plus
           .removeClass("return-to-add")
           .addClass("cancel");
       }
@@ -34,6 +42,9 @@ var adder = (function() {
       if (isOpen) {
         isOpen = false;
         view
+          .addClass("return-to-add")
+          .removeClass("cancel");
+        plus
           .addClass("return-to-add")
           .removeClass("cancel");
       }
@@ -46,10 +57,11 @@ var adder = (function() {
       }
       else {
         open();
-        onOpen();
+        onOpen(cancelAdd);
       }
     }
 
+    cancelAdd.click(toggle);
     view.click(toggle);
     return {
       view: view,
@@ -61,12 +73,18 @@ var adder = (function() {
 
   function createListView() {
 '''
-<div #view>
+<div #view
+     id="add-option-row"
+     class="click-mode clearfix hide">
   <div #adderList
        class="adder-list"/>
   <div #adder
        class="adder">
     <div #toggleContainer/>
+    <div #addText
+         id="add-option-text">
+      Add meeting option
+    </div>
     <div #formContainer
          class="hide"/>
 </div>
@@ -142,11 +160,13 @@ var adder = (function() {
 
     var adderIsOpen = false;
 
-    function onAdderOpen() {
+    function onAdderOpen(cancelAdd) {
       adderIsOpen = true;
+      listView.view.removeClass("click-mode");
+      listView.addText.addClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
-        .append(createAdderForm())
+        .append(createAdderForm(cancelAdd))
         .removeClass("hide");
       if (util.isDefined(userOnAdderOpen))
         userOnAdderOpen();
@@ -154,6 +174,8 @@ var adder = (function() {
 
     function clearAdder() {
       adderIsOpen = false;
+      listView.view.addClass("click-mode");
+      listView.addText.removeClass("hide");
       listView.formContainer.children().remove();
       listView.formContainer
         .addClass("hide");

@@ -14,7 +14,10 @@ var date = (function() {
      Bad:  "2014-09-23T19:38:51.683"
   */
   mod.ofString = function(s) {
-    return new Date(s);
+    if (util.isNonEmptyString(s))
+      return new Date(s);
+    else
+      return null;
   };
 
   /* print RFC 3339 date, millisecond precision */

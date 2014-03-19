@@ -27,7 +27,8 @@ APP_LIBS = \
   moment \
   jquery-ui \
   fullcalendar \
-  bootstrap-timepicker
+  jquery.timepicker \
+  jstz
 
 GUESTAPP_LIBS =
 
@@ -75,9 +76,11 @@ APP_SOURCES = \
   api.js \
   sample.js \
   adder.js \
+  timezone.js \
   calpicker.js \
   loceditor.js \
   locpicker.js \
+  tzpicker.js \
   sched1.js \
   sched2.js \
   sched3.js \

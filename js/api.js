@@ -37,9 +37,11 @@ var api = (function () {
       }
     }
 
-    // We return a Deferred object.
-    // Use .done(function(result){...}) to access the result.
-    // (see jQuery documentation)
+    /*
+      We return a Deferred object.
+      Use .done(function(result){...}) to access the result.
+      (see jQuery documentation)
+    */
     var request = {
       url: url,
       type: method,

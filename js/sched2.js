@@ -6,16 +6,10 @@ var sched2 = (function() {
   var mod = {};
 
   function saveAndReload(ta) {
-    log("saveAndReload", ta);
     disableNextButton();
     api.postTask(ta)
       .done(function(task) { sched.loadTask(task); });
   }
-
-  var step2Selector = show.create({
-    "sched-step2-connect": {ids: ["sched-step2-connect"]},
-    "sched-step2-prefs": {ids: ["sched-step2-prefs"]}
-  });
 
   function moveOnToNextStep(ta) {
     var x = ta.task_data[1];
@@ -52,20 +46,143 @@ var sched2 = (function() {
       disableNextButton(); /* should be disabled already anyway */
   }
 
+  function toggleShow(showHide, header, content, connector) {
+    if (content.hasClass("hide")) {
+      showHide.text("Hide");
+      header.removeClass("collapsed");
+      content.removeClass("hide");
+      if (connector != null) {
+        connector.removeClass("collapsed");
+      }
+    } else {
+      showHide.text("Show");
+      header.addClass("collapsed");
+      content.addClass("hide");
+      if (connector != null) {
+        connector.addClass("collapsed");
+      }
+    }
+  }
+
+  function createSelectionSection() {
+    var view = $("<div/>");
+    var module = $("<div class='sched-module'/>")
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header collapsed'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Show")
+      .appendTo(header);
+    var selectionIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(selectionIcon, "/assets/img/star.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Select the preferred meeting option")
+      .appendTo(header);
+
+    var content = $("<div class='hide'/>")
+      .appendTo(module);
+
+    showHide.click(function() {
+      toggleShow(showHide, header, content);
+    })
+
+    return view;
+  }
+
+  function createOfferSection() {
+    var view = $("<div/>");
+    var module = $("<div class='sched-module'/>")
+      .appendTo(view);
+    var connector = createConnector().addClass("collapsed")
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header collapsed'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Show")
+      .appendTo(header);
+    var offerIcon = $("<img id='offer-icon' class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(offerIcon, "/assets/img/email.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Offer to guests")
+      .appendTo(header);
+
+    var content = $("<div class='hide'/>")
+      .appendTo(module);
+
+    showHide.click(function() {
+      toggleShow(showHide, header, content, connector);
+    })
+
+    return view;
+  }
+
+  function createApprovalSection() {
+    var view = $("<div/>");
+    var module = $("<div class='sched-module'/>")
+      .appendTo(view);
+    var connector = createConnector().addClass("collapsed")
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header collapsed'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Show")
+      .appendTo(header);
+    var calendarIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(calendarIcon, "/assets/img/calendar.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Request approval (Optional)")
+      .appendTo(header);
+
+    var content = $("<div class='hide'/>")
+      .appendTo(module);
+
+    showHide.click(function() {
+      toggleShow(showHide, header, content, connector);
+    })
+
+    return view;
+  }
+
   /*
     For now just a dropdown menu of meeting types.
     May be accompanied with options specific to the type of meeting selected.
   */
-  function createMeetingTypeSelector(onSet, optInitialKey) {
-    function opt(label, value) {
-      return { label: label, value: value, action: onSet };
+  function createMeetingTypeSelector(onSet, customBox) {
+    function showCustom() {
+      customBox
+        .val("")
+        .removeClass("hide")
+        .focus();
     }
-    var initialKey = util.isString(optInitialKey) ? optInitialKey : "Meeting";
+    function hideCustom() {
+      customBox.addClass("hide");
+    }
+    function onSelect(value) {
+      if (value === "Custom")
+        showCustom();
+      else {
+        hideCustom();
+        onSet(value);
+      }
+    }
+
+    util.afterTyping(customBox, 500, function() {
+      onSet(customBox.val());
+    });
+
+    function opt(label, value) {
+      return { label: label, value: value, action: onSelect };
+    }
     var meetingTypeSelector = select.create({
-      divClass: "fill-div",
-      buttonClass: "fill-div",
-      initialKey: initialKey,
+      initialKey: "Meeting",
       options: [
+        opt("Custom...", "Custom"),
         opt("Meeting", "Meeting"),
         opt("Breakfast", "Breakfast"),
         opt("Lunch", "Lunch"),
@@ -75,30 +192,216 @@ var sched2 = (function() {
         opt("Phone call", "Call")
       ]
     });
+    /* override default get() to read from the [possibly hidden] input box */
+    meetingTypeSelector.get = function() { return customBox.val(); };
+
     return meetingTypeSelector;
   }
+
+  /*
+    If the meeting type does not require a location, the timezone can
+    be changed by clicking on it, prompting the using for a location.
+    Otherwise the timezone is determined by the location of the meeting.
+   */
+  function setupTimezoneLink(form, locationForm, slot) {
+    log("setupTimezoneLink", slot);
+    function displayTimezone(loc) {
+      if (util.isDefined(loc))
+        timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
+    }
+    function setTimezone(oldTz, newTz) {
+      log("setTimezone", newTz);
+      var loc = { timezone: newTz };
+      slot.location = loc;
+      displayTimezone(loc);
+      locationForm.setLocation(loc);
+    }
+    var timezoneText = form.timezoneText;
+    var timezonePicker = form.timezonePicker;
+    switch (slot.meeting_type) {
+    case "Call":
+      timezoneText
+        .tooltip("destroy")
+        .tooltip({
+          title:
+          "Click to change the time zone"
+        })
+        .off("click")
+        .click(function() {
+          var picker = tzpicker.create({
+            onTimezoneChange: setTimezone
+          });
+          timezonePicker.children().remove();
+          timezonePicker.append(picker.view);
+        })
+        .addClass("link");
+      form.addPublicNotes
+        .text("Specify phone number and notes");
+      break;
+
+    default:
+      timezoneText
+        .removeClass("clickable")
+        .tooltip("destroy")
+        .tooltip({
+          title:
+          "The time zone is automatically set based on the meeting location"
+        })
+        .off("click");
+      form.addPublicNotes
+        .text("Add notes");
+    }
+    displayTimezone(slot.location);
+  }
+
+  function adaptToMeetingType(form, locationForm, slot) {
+    setupTimezoneLink(form, locationForm, slot);
+    switch (slot.meeting_type) {
+    case "Call":
+      form.whereSection.addClass("hide");
+      break;
+    default:
+      form.whereSection.removeClass("hide");
+    }
+  }
+
+  /* Create modal containing date/time picker based on the
+     user's calendar.
+
+     Input parameters are the same as for calpicker.create.
+  */
+  function createCalendarModal(param) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+  <div #dialog
+       class="modal-dialog cal-picker-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img #icon
+             class="svg cal-icon" src="/assets/img/calendar.svg"/>
+        <div style="float:right" data-dismiss="modal">
+          <img class="svg modal-close" src="/assets/img/x.svg"/>
+        </div>
+        <h3 #title
+            class="modal-title">
+          Select a time.
+        </h3>
+        <button #doneButton
+                class="btn btn-default">Done</button>
+      </div>
+      <div #body
+           class="modal-body"></div>
+    </div>
+  </div>
+</div>
+'''
+    var id = util.randomString();
+    title.attr("id", id);
+    modal.attr("aria-labelledby", id);
+
+    var cal = calpicker.create(param);
+    _view.cal = cal;
+    _view.body.append(cal.view);
+    _view.focus = cal.focus;
+
+    return _view;
+  }
+
 
   /*
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
-  function editableViewOfOption(tzList, calOption, saveCalOption) {
+  function editableViewOfOption(tzList, profs, calOption,
+                                saveCalOption, cancel, addMode) {
 '''
-<div #view>
-  <div #adder/>
-  <div #form/>
-  <div class="row clearfix">
-    <div class="col-sm-3">
-      <div class="location-title">Meeting Type</div>
-      <div #meetingTypeContainer/>
+<div #view
+     class="edit-option-row">
+  <div #form
+       class="option-info clearfix">
+    <div class="edit-info-row">
+      <div class="info-label what-label-edit">WHAT</div>
+      <div class="info">
+        <div #meetingTypeContainer/>
+        <input #meetingTypeInput
+               type="text"
+               class="hide form-control custom-type-input"/>
+      </div>
     </div>
-    <div class="col-sm-9"/>
+    <div class="edit-info-row">
+      <div class="info-label when-label-edit">WHEN</div>
+      <div class="info">
+        <div class="clearfix">
+          <div #dateAndTimes
+               class="hide">
+          </div>
+          <span #timezoneText class="timezone-text"></span>
+          <div #timezonePicker/>
+        </div>
+        <span #openCalPicker
+             class="open-cal-picker clearfix">
+          <img class="open-cal-picker-icon svg"
+               src="/assets/img/cal-picker.svg"/>
+          <span #calendarLinkText
+                class="open-cal-picker-text link">
+            Select time in calendar
+          </span>
+        </span>
+        <div #calPickerContainer/>
+      </div>
+    </div>
+    <div #whereSection
+         class="edit-info-row">
+      <div class="info-label where-label-edit">WHERE</div>
+      <div #locationContainer
+           class="info"/>
+    </div>
+    <div class="edit-info-row">
+      <div class="info-label notes-label-edit">NOTES</div>
+      <div class="info">
+        <span #addPublicNotes
+              class="add-public-notes link">Add notes</span>
+        <div #notes class="hide">
+          <div #notesEditorPublic
+               class="notes-editor-public">
+            <textarea #notesBoxPublic
+                      class="notes-entry"></textarea>
+            <div class="viewable-by-label">
+              <img class="viewable-by-eye svg"
+                   src="/assets/img/eye.svg"/>
+              <span class="viewable-by-text">ALL GUESTS</span>
+            </div>
+          </div>
+          <span #addPrivateNotes
+                class="add-private-notes link"/>
+          <div #notesEditorPrivate
+               class="notes-editor-private">
+            <textarea #notesBoxPrivate
+                      class="notes-entry"></textarea>
+            <div class="viewable-by-label">
+              <img class="viewable-by-eye svg"
+                   src="/assets/img/eye.svg"/>
+              <span #viewableByExec
+                    class="viewable-by-text"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div #editActions
+         class="edit-option-actions clearfix">
+      <button #saveButton
+              class="btn btn-primary save-to-cal disabled"/>
+    </div>
   </div>
-  <div #locationContainer/>
-  <div #calendarContainer/>
-  <button #saveButton class="btn btn-primary disabled">Save</button>
 </div>
 '''
+
+    var locationForm; /* defined later because of a circular dependency */
+
     var x = calOption.slot;
 
     /*** Meeting type ***/
@@ -108,72 +411,157 @@ var sched2 = (function() {
 
     function setMeetingType(meetingType) {
       x.meeting_type = meetingType;
+      adaptToMeetingType(_view, locationForm, x);
+      updateSaveButton();
     }
 
     function getMeetingType() {
       return x.meeting_type;
     }
 
-    var meetingTypeSelector = createMeetingTypeSelector(setMeetingType);
+    var meetingTypeSelector =
+      createMeetingTypeSelector(setMeetingType, meetingTypeInput);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
-    var getDates = function() { return null; };
-    var renderCalendar = function() {};
-    var clearDates = function() {};
+    var dates = {
+      start: date.ofString(x.start),
+      end: date.ofString(x.end)
+    };
 
-    function updateCalendar(timezone) {
-      calendarContainer.children().remove();
+    function hasDates() {
+      var result = util.isDefined(dates)
+        && util.isNotNull(dates.start)
+        && util.isNotNull(dates.end);
+      return result;
+    }
 
-      if (util.isNonEmptyString(timezone)) {
-        var picker = calpicker.createPicker({
-          timezone: timezone,
-          onChange: (function() { updateSaveButton(); })
-        });
-        getDates = picker.getDates;
-        calendarContainer
-          .append(picker.view);
-
-        if (util.isDefined(x.start) && util.isDefined(x.end))
-          picker.setDates(x);
-
-        picker.render();
-          /* needs to be done once calendar becomes visible */
-
-        renderCalendar = picker.render;
-        clearDates = picker.clearDates;
+    function displayDates() {
+      dateAndTimes.children().remove();
+      if (hasDates()) {
+        dateAndTimes.append(sched.viewOfDates(dates.start, dates.end));
+        dateAndTimes.removeClass("hide");
+      }
+      else {
+        dateAndTimes.addClass("hide");
       }
     }
+
+    displayDates();
+
+    function setDates(optDates) {
+      dates = optDates;
+      displayDates(optDates);
+      updateSaveButton();
+    }
+
+    function openCal() {
+      var calModal = createCalendarModal({
+        timezone: x.location.timezone,
+        onChange: setDates
+      });
+      calPickerContainer.children().remove();
+      calPickerContainer.append(calModal.modal);
+      calModal.modal.modal({});
+      calModal.doneButton
+        .click(function() {
+          /* dates are already saved by the onChange handler. */
+          calModal.modal.modal("hide");
+        });
+      calModal.modal
+        .on("shown.bs.modal", function() {
+          calModal.cal.render(); // can't happen earlier or calendar won't show
+        });
+      calModal.cal.setDates(dates);
+    }
+    openCalPicker.click(openCal);
 
     /*** Meeting location ***/
 
     var loc = x.location;
-    function onTimeZoneChange(oldTimezone, newTimezone) {
-      log("timezone change: " + oldTimezone + " -> " + newTimezone);
-      updateCalendar(newTimezone);
+
+    function displayTimezone() {
+      setupTimezoneLink(_view, locationForm, x);
+    }
+
+    function onTimezoneChange(oldTimezone, newTimezone) {
+      log("onTimezoneChange", oldTimezone, newTimezone);
+      displayTimezone();
       if (util.isNonEmptyString(oldTimezone)
           && util.isNonEmptyString(newTimezone))
-        clearDates();
+        displayDates();
+      updateSaveButton();
     }
-    var locationForm = locpicker.create({
-      onTimezoneChange: onTimeZoneChange
+
+    function onLocationSet(newLoc) {
+      log("onLocationSet", newLoc);
+      x.location = newLoc;
+      if (util.isDefined(newLoc)) {
+        displayTimezone();
+        displayDates(dates);
+      }
+      updateSaveButton();
+    }
+
+    /* locationForm is defined earlier because we have a circular dependency */
+    locationForm = locpicker.create({
+      onTimezoneChange: onTimezoneChange,
+      onLocationSet: onLocationSet
     });
-    if (util.isDefined(loc)) {
+    if (util.isDefined(loc))
       locationForm.setLocation(loc);
-    }
+    else {
+      var tz = timezone.guessUserTimezone();
+      loc = { timezone: tz };
+      x.location = loc;
+      onTimezoneChange(undefined, tz);
+    };
+
     locationContainer.append(locationForm.view);
+
+    /*** Meeting notes ***/
+
+    var hostName = profile.firstName(profs[login.leader()].prof);
+    viewableByExec.text(hostName.toUpperCase() + " ONLY");
+
+    addPublicNotes
+      .click(function() {
+        addPublicNotes.addClass("hide");
+        notes.removeClass("hide");
+        notesBoxPublic.focus();
+      });
+    addPrivateNotes
+      .text("Add private notes for " + hostName + " only")
+      .click(function() {
+        addPrivateNotes.addClass("hide");
+        notesEditorPrivate.removeClass("hide");
+        notesBoxPrivate.focus();
+      });
+    if (notesBoxPrivate.val() === "") {
+      notesEditorPrivate.addClass("hide");
+    } else {
+      addPrivateNotes.addClass("hide");
+    }
 
     /*** Row controls (save/remove) ***/
 
+    /* Get a complete calendar_option or nothing */
     function getCalOption() {
+      if (! util.isNotNull(locationForm)) return null; /* initializing */
+
       var meetingType = getMeetingType();
-      var loc = locationForm.getCompleteLocation();
-      var dates = getDates();
+      var loc;
+      if (meetingType === "Call")
+        loc = locationForm.getTimezoneLocation();
+      else
+        loc = locationForm.getCompleteLocation();
+
+      log("getCalOption:", meetingType, loc, dates);
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
-          && util.isNotNull(dates)) {
+          && hasDates()) {
         var oldCalOption = calOption;
         var calSlot = {
           meeting_type: meetingType,
@@ -210,57 +598,28 @@ var sched2 = (function() {
       saveCalOption(getCalOption());
     }
 
+    if (addMode) {
+      saveButton.text("Add to calendar");
+    } else {
+      saveButton.text("Update calendar");
+    }
     saveButton.click(saveMe);
     updateSaveButton();
 
+    editActions.append(cancel);
+
     return {
-      view: view,
-      renderCalendar: renderCalendar
+      view: view
     };
   }
 
-  function createMeetingOption(tzList, saveCalOption) {
+  function createMeetingOption(tzList, profs, saveCalOption, cancel, addMode) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return editableViewOfOption(tzList, calOption, saveCalOption);
-  }
-
-  function insertViewOfOption(tzList, listView, calOption,
-                              saveCalOption, removeCalOption) {
-'''
-<div #view>
-  <div #readOnlyContainer/>
-  <div #editableContainer
-       class="hide"/>
-  <button #removeButton class="btn btn-default">Remove</button>
-</div>
-'''
-    var row = listView.createRow(view);
-    removeButton
-      .click(function () {
-        row.remove();
-        removeCalOption(calOption.label);
-      });
-
-    /* Load calendar and forms when user clicks "Edit" */
-    function switchToEdit() {
-      var edit =
-        editableViewOfOption(tzList, calOption, saveCalOption);
-      editableContainer.append(edit.view);
-
-      readOnlyContainer.addClass("hide");
-      editableContainer.removeClass("hide");
-
-      edit.renderCalendar();
-    }
-
-    var readOnlyView =
-      readOnlyViewOfOption(calOption, switchToEdit);
-    readOnlyContainer.append(readOnlyView);
-
-    return view;
+    return editableViewOfOption(tzList, profs, calOption,
+                                saveCalOption, cancel, addMode);
   }
 
   function saveOption(ta, calOption) {
@@ -287,30 +646,126 @@ var sched2 = (function() {
     saveAndReload(ta);
   }
 
-  function readOnlyViewOfOption(calOption, switchToEdit) {
+  function readOnlyViewOfOption(calOption, toggleEdit, remove) {
 '''
 <div #view
-   class="suggestion">
-  {{sched.viewOfSuggestion(calOption.slot)}}
-  <button #editButton
-          class="btn btn-default">
-    Edit
-  </button>
+     class="option-row">
+   <div #editButton
+        class="btn-group edit-option">
+      <button #edit
+              type="button"
+              class="btn btn-default edit-option-btn">
+        Edit
+      </button>
+      <button type="button"
+              class="btn btn-default dropdown-toggle"
+              data-toggle="dropdown">
+        <span class="caret"/>
+        <span class="sr-only">Toggle Dropdown</span>
+      </button>
+      <ul class="dropdown-menu pull-right edit-option-dropdown"
+          role="menu">
+        <li #editOption>
+          <a class="edit-option-details">Edit option</a>
+        </li>
+        <li #duplicateOption>
+          <a class="duplicate-option">Duplicate option</a>
+        </li>
+        <li #removeOption>
+          <a class="remove-option">Remove option</a>
+        </li>
+      </ul>
+  </div>
+  {{sched.viewOfOption(calOption, false)}}
 </div>
 '''
-    editButton.click(switchToEdit);
+    edit.click(toggleEdit);
+    editOption.click(toggleEdit);
+    removeOption.click(remove);
+
     return view;
   }
 
-  function loadMeetingOptions(tzList, ta) {
-    var view = $("#sched-step2-option-list");
-    view.children().remove();
+  function insertViewOfOption(ta, tzList, profs, listView, calOption,
+                              i, saveCalOption, removeCalOption) {
+'''
+<div #view>
+  <div #optionLetter
+       class="option-letter">
+    <span #letter/>
+    <img #plus
+         class="plus-option svg hide"
+         src="/assets/img/plus.svg"/>
+  </div>
+  <div #readOnlyContainer/>
+  <div #editableContainer
+       class="hide"/>
+</div>
+'''
+    var row = listView.createRow(view);
+    function removeOption() {
+      row.remove();
+      removeCalOption(calOption.label);
+    }
 
+    /* Load calendar and forms when user clicks "Edit" */
+    function toggleEdit() {
+      if (readOnlyContainer.hasClass("hide")) {
+        readOnlyContainer.removeClass("hide");
+        editableContainer.addClass("hide");
+        optionLetter.removeClass("cancel")
+                    .off("click");
+        letter.removeClass("hide");
+        plus.removeClass("cancel")
+            .addClass("hide");
+      } else {
+        var cancel = $("<span class='cancel-edit-mode link'/>")
+          .text("Cancel")
+          .click(toggleEdit);
+        var addMode = false;
+        var edit =
+          editableViewOfOption(tzList, profs, calOption,
+                               saveCalOption, cancel, addMode);
+        editableContainer.children().remove();
+        editableContainer.append(edit.view);
+
+        readOnlyContainer.addClass("hide");
+        editableContainer.removeClass("hide");
+
+        optionLetter.addClass("cancel")
+                    .click(removeOption);
+        letter.addClass("hide");
+        plus.removeClass("hide return-to-add")
+            .addClass("cancel");
+      }
+
+    }
+
+    function indexLabel(i) {
+      var a = "A".charCodeAt(0);
+      var label = "";
+      do {
+        label = String.fromCharCode(i % 26 + a) + label;
+        i = Math.floor(i / 26);
+      } while (i > 0);
+      return label;
+    }
+    letter.text(indexLabel(i));
+
+    readOnlyContainer.append(readOnlyViewOfOption(calOption,
+                                                  toggleEdit, removeOption));
+
+    return view;
+  }
+
+  function loadMeetingOptions(v, tzList, profs, ta, connector) {
     function save(calOption) { return saveOption(ta, calOption); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
-    function createAdderForm() {
-      return createMeetingOption(tzList, save).view;
+    function createAdderForm(cancelAdd) {
+      var addMode = true;
+      return createMeetingOption(tzList, profs, save, cancelAdd, addMode).view
+               .addClass("add-row");
     }
 
     var schedState = sched.getState(ta);
@@ -319,14 +774,31 @@ var sched2 = (function() {
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
-    view.append(listView.view);
-    list.iter(schedState.calendar_options, function(x) {
-      insertViewOfOption(tzList, listView, x, save, remove);
+    var numOptions = 0;
+    list.iter(schedState.calendar_options, function(x, i) {
+      v.append(insertViewOfOption(ta, tzList, profs, listView,
+                                  x, i, save, remove));
+      numOptions++;
     });
+    var addRow = listView.view
+      .appendTo(v);
+    addRow.hover(function() {
+      if (addRow.hasClass("click-mode")) {
+        connector.addClass("collapsed");
+      } else {
+        connector.removeClass("collapsed");
+      }
+    },function() {
+      if (addRow.hasClass("click-mode"))
+        connector.removeClass("collapsed");
+    })
+    if (numOptions < 3) {
+      addRow.removeClass("hide")
+    }
 
     initNextButton(ta);
 
-    step2Selector.show("sched-step2-prefs");
+    return v;
   }
 
   /* hitting "Connect" takes the user to Google, then back here with
@@ -346,30 +818,72 @@ var sched2 = (function() {
       .attr("href", calInfo.google_auth_url)
       .appendTo(view);
 
-    step2Selector.show("sched-step2-connect");
+    view.removeClass("hide");
   }
 
-  function connectCalendar(tzList, profs, ta) {
+  function createOptionsSection(tzList, profs, ta) {
+    var view = $("<div/>");
+    var module = $("<div class='sched-module'/>")
+      .appendTo(view);
+    var connector = createConnector()
+      .appendTo(view);
+
+    var header = $("<div class='sched-module-header'/>")
+      .appendTo(module);
+    var showHide = $("<span class='show-hide link'/>")
+      .text("Hide")
+      .appendTo(header);
+    var optionsIcon = $("<img class='sched-module-icon'/>")
+      .appendTo(header);
+    svg.loadImg(optionsIcon, "/assets/img/create-options.svg");
+    var headerText = $("<div class='sched-module-title'/>")
+      .text("Create up to 3 meeting options")
+      .appendTo(header);
+
+    var content = $("<div id='options-content'/>")
+      .appendTo(module);
+
     var leaderUid = login.leader();
-    var result;
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
-      result = deferred.defer(loadMeetingOptions(tzList, ta));
+      deferred.defer(loadMeetingOptions(content, tzList, profs, ta, connector));
     }
     else {
       var authLandingUrl = document.URL;
-      result = api.getCalendarInfo(leaderUid, authLandingUrl)
+      api.getCalendarInfo(leaderUid, authLandingUrl)
         .then(function(calInfo) {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadMeetingOptions(tzList, ta);
+            loadMeetingOptions(content, tzList, profs, ta, connector);
         });
     }
-    return result;
+
+    showHide.click(function() {
+      toggleShow(showHide, header, content, connector);
+    })
+
+    return view;
   }
 
-  mod.load = function(tzList, profs, ta) {
-    connectCalendar(tzList, profs, ta);
+  function createConnector() {
+    var connectorBox = $("<div class='connector'/>");
+    var connector = $("<img/>")
+      .appendTo(connectorBox);
+    svg.loadImg(connector, "/assets/img/connector.svg");
+    return connectorBox;
+  }
+
+  mod.load = function(tzList, profs, ta, view) {
+    view.children().remove();
+    var guests = sched.getAttendingGuests(ta);
+
+    view
+      .append($("<h3>Find the best meeting option.</h3>"))
+      .append(createOptionsSection(tzList, profs, ta))
+      // .append(createApprovalSection())
+      // .append(createOfferSection())
+      // .append(createSelectionSection())
+    ;
 
     observable.onSchedulingStepChanging.observe("step", function() {
       api.postTask(ta);

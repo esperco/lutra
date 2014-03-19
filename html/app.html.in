@@ -14,10 +14,17 @@
     <link href="/assets/css/font-awesome.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
-    <link href="/assets/css/bootstrap-timepicker.min.css" rel="stylesheet">
+    <link href="/assets/css/jquery.timepicker.css" rel="stylesheet">
   </head>
 
   <body>
+
+    <div id="loading">
+      <div id="loading-box">
+        <img id="loading-icon" src="/assets/img/loading.gif">
+        <div id="loading-text" class="ellipsis">Updating calendar...</div>
+      </div>
+    </div>
 
     <!-- <div id="global-status" class="animated"></div> -->
 

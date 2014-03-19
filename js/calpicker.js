@@ -15,30 +15,28 @@
 var calpicker = (function() {
   var mod = {};
 
-  function createView() {
+  function createView(tz) {
 '''
 <div #view>
-  <div #calendarView/>
   <div #textView
        class="row hide">
     <div class="col-sm-3">
       <div class="location-title">Start</div>
-      <div class="bootstrap-timepicker">
-        <input #startInput
-               type="text" class="form-control"/>
-      </div>
+      <input #startInput type="text" class="time form-control"/>
     </div>
     <div class="col-sm-3 clearfix">
       <div class="location-title">End</div>
-      <div class="bootstrap-timepicker">
-        <input #endInput
-               type="text" class="form-control"/>
-      </div>
+      <input #endInput type="text" class="time form-control"/>
     </div>
     <div class="col-sm-6"/>
   </div>
+  <div #timezoneView/>
+  <div #calendarView/>
 </div>
 '''
+    timezoneView.text("Time Zone: " + timezone.format(tz));
+
+    _view.focus = startInput.focus;
 
     /*
       Later _view will also contain the following fields:
@@ -64,31 +62,34 @@ var calpicker = (function() {
 
   function initTimePicker(picker,
                           fieldName, /* either "eventStart" or "eventEnd" */
-                          timePicker) {
+                          timePicker,
+                          userOnChange) {
+    log("initTimePicker", fieldName);
     timePicker.timepicker({
-      minuteStep: 5,
-      showSeconds: false
+      timeFormat: "g:i a",
+        /* PHP date() format http://php.net/manual/en/function.date.php */
+      step: 5
+        /* granularity in minutes */
     });
-    timePicker.timepicker().on('changeTime.timepicker', function(e) {
+    timePicker.on("changeTime", function() {
       /*
         TODO (known bug):
         Ensure that end date/time is after start date/time.
       */
-      var time = e.time;
-      var date = picker[fieldName];
+      var date = picker[fieldName]; /* Moment */
       if (util.isDefined(date)) {
-        var hours = to24hours(time);
-        var minutes = time.minutes;
-        date.hours(to24hours(time));
-        date.minutes(time.minutes);
+        var time = timePicker.timepicker("getTime"); /* native js Date */
+        date.hours(time.getHours());
+        date.minutes(time.getMinutes());
         updateCalendarView(picker);
+        userOnChange(getDates(picker));
       }
     });
   }
 
-  function initTimePickers(picker) {
-    initTimePicker(picker, "eventStart", picker.startInput);
-    initTimePicker(picker, "eventEnd", picker.endInput);
+  function initTimePickers(picker, userOnChange) {
+    initTimePicker(picker, "eventStart", picker.startInput, userOnChange);
+    initTimePicker(picker, "eventEnd", picker.endInput, userOnChange);
   }
 
   /* Remove event from the calendar view but preserve start/end fields */
@@ -175,10 +176,21 @@ var calpicker = (function() {
     return picker.calendarView.fullCalendar("moment", dateString);
   }
 
+  /*
+    Takes a javascript Date representing a local time and converts
+    it into moment (type used by the calendar) using the calendar's timezone.
+
+    (just slightly contrived)
+   */
+  function momentOfLocalDate(picker, d) {
+    var s = date.toString(d);
+    return parseDateUsingCalendarTimezone(picker, s);
+  }
+
   function setDates(picker, start, end) {
-    if (util.isDefined(start) && util.isDefined(end)) {
-      picker.eventStart = parseDateUsingCalendarTimezone(picker, start);
-      picker.eventEnd = parseDateUsingCalendarTimezone(picker, end);
+    if (util.isNotNull(start) && util.isNotNull(end)) {
+      picker.eventStart = momentOfLocalDate(picker, start);
+      picker.eventEnd = momentOfLocalDate(picker, end);
       updateTextView(picker);
       updateCalendarView(picker);
     }
@@ -245,12 +257,21 @@ var calpicker = (function() {
     });
   }
 
-  mod.createPicker = function(param) {
+  /*
+    Create date and time picker using user's calendar.
+
+    Parameters:
+    - timezone: IANA timezone in which all local times are expressed
+    - onChange(optDates):
+        fired when the dates are initialized or change;
+        optDates is a record with fields start, end, and duration.
+   */
+  mod.create = function(param) {
     var tz = param.timezone;
     var onChange = param.onChange;
 
-    var picker = createView();
-    initTimePickers(picker);
+    var picker = createView(param.timezone);
+    initTimePickers(picker, onChange);
     picker.onChange = onChange;
 
     var calendarView = picker.calendarView;
@@ -301,6 +322,11 @@ var calpicker = (function() {
     return {
       view: picker.view,
       render: render, // to be called after attaching the view to the dom tree
+
+      /*
+        getDates and setDates take/return native js dates as a record of type:
+        { start: Date, end: Date }
+      */
       getDates: (function() { return getDates(picker); }),
       setDates: (function(x) { setDates(picker, x.start, x.end); }),
       clearDates: (function() { return clearDates(picker); })

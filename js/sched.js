@@ -98,19 +98,41 @@ var sched = (function() {
   /******************************************/
 
   mod.locationText = function(loc) {
-    if (loc.address) {
-      if (loc.instructions)
-        return loc.address + " (" + loc.instructions + ")";
-      else
-        return loc.address;
-    }
-    else if (loc.title)
-      return loc.title;
-    else if (loc.instructions)
-      return loc.instructions;
+    var instrSuffix = util.isNonEmptyString(loc.instructions) ?
+      " (" + loc.instructions + ")" : "";
+
+    if (util.isNonEmptyString(loc.address))
+      return loc.address + instrSuffix;
+    else if (util.isNonEmptyString(loc.title))
+      return loc.title + instrSuffix;
+    else if (util.isNonEmptyString(loc.timezone))
+      return "Time Zone: " + timezone.format(loc.timezone) + instrSuffix;
+    else if (util.isNonEmptyString(loc.instructions))
+      return instructions;
     else
       return "";
   }
+
+  /* Render a range of two javascript Dates as text */
+  mod.viewOfDates = function(date1, date2) {
+    var fromTime = wordify(date.timeOnly(date1));
+    var toTime = wordify(date.timeOnly(date2));
+
+    var view = $("<div/>");
+
+    var row1 = $("<div class='date-text'/>")
+      .text(date.dateOnly(date1))
+      .appendTo(view);
+
+    var row2 = $("<div class='time-text'/>")
+      .append(html.text("from "))
+      .append($("<b>").text(fromTime))
+      .append(html.text(" to "))
+      .append($("<b>").text(toTime))
+      .appendTo(view);
+
+    return view;
+  };
 
   mod.viewOfSuggestion = function(x, score) {
     var view = $("<div class='sug-details'/>");
@@ -128,18 +150,7 @@ var sched = (function() {
         .appendTo(row1);
     }
 
-    var row2 = $("<div class='date-text'/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    var fromTime = wordify(date.timeOnly(t1));
-    var toTime = wordify(date.timeOnly(t2));
-
-    var row3 = $("<div class='time-text'/>")
-      .append(html.text("from "))
-      .append($("<b>").text(fromTime))
-      .append(html.text(" to "))
-      .append($("<b>").text(toTime))
+    mod.viewOfDates(t1, t2)
       .appendTo(view);
 
     var row4 = $("<div class='time-text-short hide'/>")
@@ -152,11 +163,11 @@ var sched = (function() {
     var pin = $("<img class='pin'/>");
       pin.appendTo(locDiv);
     svg.loadImg(pin, "/assets/img/pin.svg");
-    if (locText) {
+    if (util.isNonEmptyString(locText)) {
       locDiv.append(html.text(locText))
             .appendTo(view);
     } else {
-      locDiv.append("Location TBD")
+      locDiv.append(" TBD")
             .addClass("tbd")
             .appendTo(view);
     }
@@ -235,8 +246,9 @@ var sched = (function() {
     return view;
   }
 
-  mod.viewOfOption = function(option, typ) {
+  mod.viewOfOption = function(option, hideEndTime) {
     var view = $("<td class='option-info'/>");
+    var slot = option.slot;
 
     var what = $("<div class='info-row'/>")
       .appendTo(view);
@@ -244,7 +256,7 @@ var sched = (function() {
       .text("WHAT")
       .appendTo(what);
     var meetingType = $("<div class='info'/>")
-      .text(typ)
+      .text(mod.formatMeetingType(slot))
       .appendTo(what);
 
     var when = $("<div class='info-row'/>")
@@ -252,7 +264,7 @@ var sched = (function() {
     var whenLabel = $("<div class='info-label'/>")
       .text("WHEN")
       .appendTo(when);
-    var time = viewOfTimeOnly(option.slot)
+    var time = viewOfTimeOnly(option.slot, hideEndTime)
       .addClass("info")
       .appendTo(when);
 
@@ -261,7 +273,7 @@ var sched = (function() {
     var whereLabel = $("<div class='info-label'/>")
       .text("WHERE")
       .appendTo(where);
-    var loc = viewOfLocationOnly(option.slot)
+    var loc = viewOfLocationOnly(slot)
       .addClass("info link")
       .appendTo(where);
 
@@ -307,9 +319,9 @@ var sched = (function() {
   };
 
   function loadStep2(tzList, profs, task) {
-    var view = $("#sched-step2-tab");
+    var view = $("#sched-step2-table");
 
-    sched2.load(tzList, profs, task);
+    sched2.load(tzList, profs, task, view);
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
