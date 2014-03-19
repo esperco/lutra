@@ -82,6 +82,12 @@ var date = (function() {
     return months[d.getUTCMonth()];
   };
 
+  /* "August 13" */
+  mod.dateOnlyWithoutYear = function(d) {
+    return mod.month(d)
+      + " " + mod.day(d).toString();
+  };
+
   /* "August 13, 2019" */
   mod.dateOnly = function(d) {
     return mod.month(d)

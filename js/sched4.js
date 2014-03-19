@@ -816,7 +816,7 @@ var sched4 = (function() {
             </li>
           </ul>
         </div>
-        <tr #info/>
+        {{sched.viewOfOption(sched.getState(task).reserved.slot).view}}
       </div>
     </div>
   </div>
@@ -830,10 +830,6 @@ var sched4 = (function() {
 
     var tid = task.tid;
     var state = sched.getState(task);
-    var choice = state.reserved;
-    var typ = sched.formatMeetingType(choice.slot);
-    info.append(sched.viewOfOption(choice, typ));
-
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
 

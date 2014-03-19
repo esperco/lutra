@@ -152,13 +152,14 @@ var sched2 = (function() {
 
     var i = 0;
     list.iter(options, function(x) {
-      var x_view = sched.viewOfSuggestion(x.slot);
+      var showLoc = false;
+      var x_view = sched.summaryOfOption(x.slot, showLoc);
       if (i === 0) {
-        optionA.append(x_view);
+        optionA.append(x_view.view);
       } else if (i === 1) {
-        optionB.append(x_view);
+        optionB.append(x_view.view);
       } else if (i === 2) {
-        optionC.append(x_view);
+        optionC.append(x_view.view);
       }
       i++;
     });
@@ -1053,7 +1054,7 @@ var sched2 = (function() {
         </li>
       </ul>
   </div>
-  {{sched.viewOfOption(calOption, false)}}
+  {{sched.viewOfOption(calOption.slot).view}}
 </div>
 '''
     edit.click(toggleEdit);
