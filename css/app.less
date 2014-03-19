@@ -56,6 +56,8 @@ li { cursor: pointer; }
 
 i { color: @gray_60; }
 
+.svg { display: block; }
+
 .bold { font-family: @bold; }
 
 .scrollable { overflow: auto; }
@@ -1067,6 +1069,7 @@ i { color: @gray_60; }
 }
 
 .modal-close {
+  float: right;
   margin-top: 11px;
   height: 12px;
   width: 12px;
@@ -1083,25 +1086,45 @@ i { color: @gray_60; }
   margin-top: 2px;
 }
 
+.offer-modal-icon {
+  float: left;
+  margin-top: 6px;
+}
+
 .modal-title { margin-left: 38px; }
 
 .modal-content {
   margin-top: 12px;
 }
 
-.modal-first-section-title {
-  margin-top: 0px;
-  font-family: @bold;
+.email-info-box {
+  margin: -20px -20px 0px -20px;
+  padding: 10px 20px;
+  background: @gray_f8;
+  border-bottom: 1px solid @gray_10;
 }
 
-.to-label {
+.email-info-row {
+  padding: 10px 0px;
+}
+
+.email-info-label {
   float: left;
-  margin-top: 2px;
+  width: 53px;
+  margin-top: 3px;
+  color: @gray_60;
+  font-family: @bold;
+  font-size: 12px;
+  text-align: right;
 }
 
-.modal-section-title {
-  padding-top: 15px;
-  font-family: @bold;
+.email-info {
+  margin-left: 73px;
+}
+
+.modal-compose-box {
+  height: 300px;
+  overflow-y: scroll;
 }
 
 .compose-text {
@@ -1114,39 +1137,23 @@ i { color: @gray_60; }
   resize: none;
 }
 
-#sched-availability-message,
-#sched-confirm-message,
-#sched-reminder-message {
-  resize: none;
+.modal-send-footer {
+  margin: 0px -20px -20px -20px;
+  padding: 20px;
+  border-top: 1px solid @gray_10;
 }
 
-#sched-availability-to-list,
-#sched-confirm-to-list,
-#sched-reminder-to-list {
-  display: inline-block;
-  margin-left: 16px;
-}
-
-.sched-availability-to,
-.sched-confirm-to,
-.sched-reminder-to,
-#footer-option {
+.show-end-time-option {
+  float: right;
+  margin-top: 7px;
+  font-size: 14px;
   cursor: pointer;
   &:hover path.checkbox { stroke: @gray_40; }
 }
 
-.recipient-checkbox-div,
-.footer-checkbox-div {
-  float: left;
-  margin-top: 1px;
-  margin-right: 7px;
-}
+.show-end-time-text { margin-left: 26px; }
 
-.recipient-checkbox,
-.footer-checkbox { display: block; }
-
-.recipient-name,
-.footer-option { display: inline-block; }
+.checkbox-container { float: left; }
 
 #footer-option {
   margin-top: 25px;
@@ -1386,9 +1393,8 @@ i { color: @gray_60; }
 
 #pseudonym-option {
   float: right;
-  &:hover { cursor: pointer;
-    path.checkbox { stroke: @gray_40; }
-  }
+  cursor: pointer;
+  &:hover path.checkbox { stroke: @gray_40; }
 }
 
 #pseudonym-checkbox {

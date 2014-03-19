@@ -14,10 +14,10 @@ var tzpicker = (function() {
   <div class="tz-picker-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <img class="tz-picker-icon svg" src="/assets/img/globe.svg">
-        <div style="float:right" data-dismiss="modal">
-          <img class="svg modal-close" src="/assets/img/x.svg">
-        </div>
+        <img class="tz-picker-icon svg" src="/assets/img/globe.svg"/>
+        <div #closeContainer
+             class="modal-close"
+             data-dismiss="modal"/>
         <h3 #tzPickerTitle
             class="modal-title">
           Change Time Zone
@@ -28,6 +28,10 @@ var tzpicker = (function() {
   </div>
 </div>
 '''
+    var close = $("<img class='svg'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/x.svg");
+
     var id = util.randomString();
     tzPickerTitle.attr("id", id);
     tzPickerModal.attr("aria-labelledby", id);

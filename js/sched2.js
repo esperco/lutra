@@ -255,15 +255,15 @@ var sched2 = (function() {
 
     var plural = options.length === 1 ? "" : "s";
     offerModal.title.text("Offer the meeting option" + plural + ".");
-    offerModal.footerOptionText.text("Show end time of meeting option" + plural);
+    offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
 
     offerModal.recipient.text(toName);
-    offerModal.subject.val("Re: " + task.task_status.task_title);
+    offerModal.subject.text("Re: " + task.task_status.task_title);
 
-    var footer = offerModal.messageReadOnly;
-    footer.children().remove();
-    footer.append(emailViewOfOptions(options));
-    if (footer.hasClass("short")) {
+    var readOnly = offerModal.messageReadOnly;
+    readOnly.children().remove();
+    readOnly.append(emailViewOfOptions(options));
+    if (readOnly.hasClass("short")) {
       hideEndTime();
     } else {
       showEndTime();
@@ -279,9 +279,11 @@ var sched2 = (function() {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
       offerModal.addressTo.val("Address_to_assistant");
+      offerModal.addressTo.removeClass("hide");
     } else {
       parameters.template_kind = "Options_to_guest";
       offerModal.addressTo.val("Address_directly");
+      offerModal.addressTo.addClass("hide");
     }
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
@@ -314,66 +316,80 @@ var sched2 = (function() {
      aria-hidden="true">
   <div #dialog
        class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="svg modal-close-x" src="/assets/img/x.svg">
-    </div>
+
     <div #content
          class="modal-content">
-      <div #header
-           class="modal-header">
-        <button #send
-                type="button" class="btn btn-primary"
-                style="float:right">
-          Send
-        </button>
+      <div class="modal-header">
+        <img class="offer-modal-icon svg" src="/assets/img/email.svg"/>
+        <div #closeContainer
+             class="modal-close"
+             data-dismiss="modal"/>
         <h3 #title
             class="modal-title"/>
       </div>
       <div #body
            class="modal-body">
-        <div>
-          <h4 class="modal-first-section-title to-label">To:</h4>
-          <div #recipient/>
+        <div class="email-info-box">
+          <div class="email-info-row">
+            <div class="email-info-label">TO</div>
+            <div #recipient
+                 class="email-info bold"/>
+            <select #addressTo
+                    class="email-info">
+              <option value="Address_directly">Address directly</option>
+              <option value="Address_to_assistant">Address assistant</option>
+            </select>
+          </div>
+          <div class="email-info-row">
+            <div class="email-info-label">SUBJECT</div>
+            <div #subject
+                 class="email-info"/>
+          </div>
         </div>
-        <div class="input">
-          <h4 class="modal-section-title">Subject</h4>
-          <input #subject
-                 type="text" class="form-control" disabled>
+        <div #composeBox
+             class="modal-compose-box scrollable">
+          <textarea #messageEditable
+                    class="compose-text"
+                    rows="8"/>
+          <div #messageReadOnly/>
         </div>
-        <h4 class="modal-section-title">Message</h4>
-        <select #addressTo>
-          <option value="Address_directly">Address Directly</option>
-          <option value="Address_to_assistant">Address to Assistant</option>
-        </select>
-        <textarea #messageEditable
-                  class="form-control"
-                  rows="8"/>
-        <div #footerOption
-             class="checkbox-selected">
-          <div #footerCheckboxDiv
-               class="footer-checkbox-div"/>
-          <div #footerOptionText
-               class="time-option"/>
+        <div #footer
+             class="modal-send-footer clearfix">
+          <button #send
+                  type="button" class="btn btn-primary"
+                  style="float:left">
+            Send
+          </button>
+          <div #showEndTimeOption
+               class="show-end-time-option checkbox-selected">
+            <div #showEndTimeCheckboxContainer
+                 class="checkbox-container"/>
+            <div #showEndTimeText
+                 class="show-end-time-text"/>
+          </div>
         </div>
-        <div #messageReadOnly/>
       </div>
     </div>
   </div>
 </div>
 '''
-    var footerCheckbox = $("<img class='footer-checkbox'/>")
-      .appendTo(footerCheckboxDiv);
-    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+    var close = $("<img class='svg'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/x.svg");
 
-    footerOption
+    var showEndTimeCheckbox = $("<img class='svg'/>")
+      .appendTo(showEndTimeCheckboxContainer);
+    svg.loadImg(showEndTimeCheckbox, "/assets/img/checkbox-sm.svg");
+
+    showEndTimeOption
       .off("click")
       .click(function() {
-        if (footerOption.hasClass("checkbox-selected")) {
-          footerOption.removeClass("checkbox-selected");
+        if (showEndTimeOption.hasClass("checkbox-selected")) {
+          showEndTimeOption.removeClass("checkbox-selected");
           messageReadOnly.addClass("short");
           hideEndTime();
         } else {
-          footerOption.addClass("checkbox-selected");
+          showEndTimeOption.addClass("checkbox-selected");
           messageReadOnly.removeClass("short");
           showEndTime();
         }
