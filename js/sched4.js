@@ -403,7 +403,7 @@ var sched4 = (function() {
       <span #schedulerTitle/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
 </div>
 '''
@@ -552,7 +552,7 @@ var sched4 = (function() {
            class="sched-module-title"/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
   <div #connector
        class="connector collapsed"/>
@@ -775,7 +775,8 @@ var sched4 = (function() {
       </div>
     </div>
     <div #content
-         class="review-content hide">
+         class="review-content"
+         style="display:none">
       <div #summary
            id="meeting-summary">
         <div #editButton
@@ -887,41 +888,39 @@ var sched4 = (function() {
     })
 
     function toggleModule(toggling, x) {
-      var content = toggling.content;
-      var showHide = toggling.showHide;
-      var header = toggling.header;
-      var connector, scheduler;
-      if (x !== "reminder")
-        connector = toggling.connector;
-      if (x === "reminder")
-        scheduler = toggling.scheduler;
+      if (toggling.header.hasClass("collapsed"))
+        showModule(toggling, x);
+      else
+        hideModule(toggling, x);
 
-      if (content.hasClass("hide")) {
-        showHide.text("Hide");
-        header.removeClass("collapsed");
-        content.removeClass("hide");
-        if (connector != null)
-          connector.removeClass("collapsed");
-        if (scheduler != null)
-          scheduler.removeClass("hide");
+      function showModule(toggling, x) {
+        toggling.showHide.text("Hide");
+        toggling.header.removeClass("collapsed");
+        toggling.content.slideDown("fast");
+        if (x !== "reminder")
+          toggling.connector.removeClass("collapsed");
+        if (x === "reminder")
+          toggling.scheduler.removeClass("hide");
         hideOthers(x);
-      } else {
-        showHide.text("Show");
-        header.addClass("collapsed");
-        content.addClass("hide");
-        if (connector != null)
-          connector.addClass("collapsed");
-        if (scheduler != null)
-          scheduler.addClass("hide");
+      }
+
+      function hideModule(toggling, x) {
+        toggling.showHide.text("Show");
+        toggling.header.addClass("collapsed");
+        toggling.content.slideUp("fast");
+        if (x !== "reminder")
+          toggling.connector.addClass("collapsed");
+        if (x === "reminder")
+          toggling.scheduler.addClass("hide");
       }
 
       function hideOthers(x) {
-        if ((x != "review") && (! review.content.hasClass("hide")))
-          toggleModule(review, "review");
-        if ((x != "confirm") && (! confirm.content.hasClass("hide")))
-          toggleModule(confirm, "confirm");
-        if ((x != "reminder") && (! reminder.content.hasClass("hide")))
-          toggleModule(reminder, "reminder");
+        if ((x != "review") && (! review.header.hasClass("collapsed")))
+          hideModule(review, "review");
+        if ((x != "confirm") && (! confirm.header.hasClass("collapsed")))
+          hideModule(confirm, "confirm");
+        if ((x != "reminder") && (! reminder.header.hasClass("collapsed")))
+          hideModule(reminder, "reminder");
       }
     }
 

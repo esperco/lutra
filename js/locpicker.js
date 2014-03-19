@@ -30,7 +30,8 @@ var locpicker = (function() {
           role="menu"></ul>
     </div>
   </div>
-  <div #locationForm>
+  <div #locationForm
+       class="hide">
     <div #locationDetails class="clearfix">
       <div class="col-sm-7 address-form">
         <input #title
@@ -144,6 +145,8 @@ var locpicker = (function() {
 
   function clearLocation(form) {
     setLocation(form, {});
+    form.searchBox.val("")
+                  .focus();
   }
 
   /*
@@ -284,6 +287,8 @@ var locpicker = (function() {
                   });
                 });
               util.hideDropdown(form.dropdownToggle);
+              form.locationSearch.addClass("hide");
+              form.locationForm.removeClass("hide");
             });
           return false;
         });
@@ -327,6 +332,8 @@ var locpicker = (function() {
     });
     form.resetLocation
       .click(function() {
+        form.locationForm.addClass("hide");
+        form.locationSearch.removeClass("hide");
         clearLocation(form);
       });
   }

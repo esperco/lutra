@@ -94,16 +94,16 @@ var sched2 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="select-icon"
-           class="sched-module-icon"
-           src="/assets/img/star.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon schedule-icon"/>
       <div #headerTitle
            class="sched-module-title">
         Schedule the preferred meeting option
       </div>
     </div>
     <div #content
-         class="schedule-content clearfix hide">
+         class="schedule-content clearfix"
+         style="display:none">
       <div #optionA
            id="select-option-a"
            class="col-sm-4 schedule-option disabled">
@@ -145,6 +145,10 @@ var sched2 = (function() {
   </div>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/star.svg");
+
     var state = sched.getState(ta);
     var guests = sched.getAttendingGuests(ta);
     var avails = state.availabilities;
@@ -470,19 +474,22 @@ var sched2 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="offer-icon"
-           class="sched-module-icon"
-           src="/assets/img/email.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon offer-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
   <div #connector
        class="connector collapsed"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/email.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -1166,9 +1173,8 @@ var sched2 = (function() {
             class="show-hide link">
         Hide
       </span>
-      <img id="create-icon"
-           class="sched-module-icon"
-           src="/assets/img/create-options.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon create-icon selected"/>
       <div #headerTitle
            class="sched-module-title">
         Create up to 3 meeting options
@@ -1180,6 +1186,10 @@ var sched2 = (function() {
        class="connector"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/create-options.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -1221,35 +1231,39 @@ var sched2 = (function() {
     })
 
     function toggleModule(toggling, x) {
-      var content = toggling.content;
-      var showHide = toggling.showHide;
-      var header = toggling.header;
-      var connector;
-      if (x !== "schedule")
-        connector = toggling.connector;
+      if (toggling.header.hasClass("collapsed")) {
+        log("hello");
+        showModule(toggling, x);
+      }
+      else
+        hideModule(toggling, x);
 
-      if (content.hasClass("hide")) {
-        showHide.text("Hide");
-        header.removeClass("collapsed");
-        content.removeClass("hide");
-        if (connector != null)
-          connector.removeClass("collapsed");
+      function showModule(toggling, x) {
+        toggling.showHide.text("Hide");
+        toggling.header.removeClass("collapsed");
+        toggling.headerIconContainer.addClass("selected");
+        toggling.content.slideDown("fast");
+        if (x !== "schedule")
+          toggling.connector.removeClass("collapsed");
         hideOthers(x);
-      } else {
-        showHide.text("Show");
-        header.addClass("collapsed");
-        content.addClass("hide");
-        if (connector != null)
-          connector.addClass("collapsed");
+      }
+
+      function hideModule(toggling, x) {
+        toggling.showHide.text("Show");
+        toggling.header.addClass("collapsed");
+        toggling.headerIconContainer.removeClass("selected");
+        toggling.content.slideUp("fast");
+        if (x !== "schedule")
+          toggling.connector.addClass("collapsed");
       }
 
       function hideOthers(x) {
-        if ((x != "options") && (! options.content.hasClass("hide")))
-          toggleModule(options, "options");
-        if ((x != "offer") && (! offer.content.hasClass("hide")))
-          toggleModule(offer, "offer");
-        if ((x != "schedule") && (! schedule.content.hasClass("hide")))
-          toggleModule(schedule, "schedule");
+        if ((x != "options") && (! options.header.hasClass("collapsed")))
+          hideModule(options, "options");
+        if ((x != "offer") && (! offer.header.hasClass("collapsed")))
+          hideModule(offer, "offer");
+        if ((x != "schedule") && (! schedule.header.hasClass("collapsed")))
+          hideModule(schedule, "schedule");
       }
     }
 

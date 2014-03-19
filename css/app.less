@@ -6,6 +6,8 @@
 
 
 /*** Colors ***/
+@blue: #0080ce;
+@blue_bg: #dfeff7;
 @border: #cccccc;
 @dark_gray: #282828;
 @gray_f8: #f8f8f8;
@@ -20,6 +22,7 @@
 @green: #2bb673;
 @green_hover: #1e9b5c;
 @orange: #f7941e;
+@orange_bg: #f4e3d3;
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
@@ -1968,7 +1971,7 @@ i { color: @gray_60; }
 }
 
 .sched-step1-row,
-.sched-step1-add-guest {
+.add-guest-row {
   min-height: 72px;
   margin-bottom: 15px;
   border: 1px solid @gray_10;
@@ -1987,7 +1990,7 @@ i { color: @gray_60; }
 }
 
 .add-guest-click,
-.sched-step1-add-ea {
+.add-ea-row {
   padding: 15px;
 }
 
@@ -2082,19 +2085,10 @@ i { color: @gray_60; }
   }
 }
 
-.sched-step1-add-guest.click-mode:hover {
+.add-guest-row.click-mode .add-guest-click:hover {
   background: @gray_f8;
   .add-guest-circ { background: @purple_hover; }
   #add-guest-text { color: @purple_hover; }
-}
-
-.add-guest-click {
-  cursor: pointer;
-}
-
-.add-guest-click.cancel-mode {
-  float: left;
-  padding-right: 0;
 }
 
 #add-guest-text {
@@ -2154,6 +2148,17 @@ i { color: @gray_60; }
 
 
 /*** Adder ***/
+
+.add-guest-click,
+.add-option-click {
+  cursor: pointer;
+}
+
+.add-guest-click.cancel-mode,
+.add-option-click.cancel-mode {
+  float: left;
+  padding-right: 0;
+}
 
 .add-guest-circ,
 .add-option-sq {
@@ -2351,14 +2356,13 @@ i { color: @gray_60; }
 
 .edit-option-row.add-row { border: none; }
 
-#add-option-row {
+.add-option-row {
   border-top: 1px solid @gray_20;
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
 }
 
-#add-option-row.click-mode:hover {
-  cursor: pointer;
+.add-option-row.click-mode .add-option-click:hover {
   background: @gray_f8;
   .add-option-sq { background: @purple_hover; }
   #add-option-text { color: @purple_hover; }
@@ -2743,6 +2747,14 @@ i { color: @gray_60; }
 
 /*** Scheduling Step 2 ***/
 
+.create-icon.selected {
+  path {
+    fill: @blue_bg;
+    stroke: @blue;
+  }
+  text { fill: @blue;}
+}
+
 .options-help-row {
   padding: 15px;
   border-top: 1px solid @gray_20;
@@ -2770,11 +2782,19 @@ i { color: @gray_60; }
   }
 }
 
-#offer-icon { margin-top: 4px; }
+.offer-icon { margin-top: 4px; }
+.offer-icon.selected {
+  path.bg { fill: white; }
+}
 
 .compose-offer-btn {
   float: right;
   margin-top: 4px;
+}
+
+.schedule-icon.selected path {
+  fill: @orange_bg;
+  stroke: @orange;
 }
 
 .schedule-content {
