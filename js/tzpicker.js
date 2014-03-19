@@ -55,6 +55,7 @@ var tzpicker = (function() {
     }
 
     var picker = locpicker.create({
+      onLocationSet: function() {},
       onTimezoneChange: onTimezoneChange,
       showDetails: false
     });

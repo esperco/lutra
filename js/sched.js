@@ -105,16 +105,17 @@ var sched = (function() {
   /******************************************/
 
   mod.locationText = function(loc) {
-    if (loc.address) {
-      if (loc.instructions)
-        return loc.address + " (" + loc.instructions + ")";
-      else
-        return loc.address;
-    }
-    else if (loc.title)
-      return loc.title;
-    else if (loc.instructions)
-      return loc.instructions;
+    var instrSuffix = util.isNonEmptyString(loc.instructions) ?
+      " (" + loc.instructions + ")" : "";
+
+    if (util.isNonEmptyString(loc.address))
+      return loc.address + instrSuffix;
+    else if (util.isNonEmptyString(loc.title))
+      return loc.title + instrSuffix;
+    else if (util.isNonEmptyString(loc.timezone))
+      return "Time Zone: " + timezone.format(loc.timezone) + instrSuffix;
+    else if (util.isNonEmptyString(loc.instructions))
+      return instructions;
     else
       return "";
   }
@@ -124,13 +125,20 @@ var sched = (function() {
     var fromTime = wordify(date.timeOnly(date1));
     var toTime = wordify(date.timeOnly(date2));
 
-    var row = $("<div class='time-text'/>")
+    var view = $("<div/>");
+
+    var row1 = $("<div class='date-text'/>")
+      .text(date.dateOnly(date1))
+      .appendTo(view);
+
+    var row2 = $("<div class='time-text'/>")
       .append(html.text("from "))
       .append($("<b>").text(fromTime))
       .append(html.text(" to "))
-      .append($("<b>").text(toTime));
+      .append($("<b>").text(toTime))
+      .appendTo(view);
 
-    return row;
+    return view;
   };
 
   mod.viewOfSuggestion = function(x, score) {
@@ -166,11 +174,11 @@ var sched = (function() {
     var pin = $("<img class='pin'/>");
       pin.appendTo(locDiv);
     svg.loadImg(pin, "/assets/img/pin.svg");
-    if (locText) {
+    if (util.isNonEmptyString(locText)) {
       locDiv.append(html.text(locText))
             .appendTo(view);
     } else {
-      locDiv.append("Location TBD")
+      locDiv.append(" TBD")
             .addClass("tbd")
             .appendTo(view);
     }

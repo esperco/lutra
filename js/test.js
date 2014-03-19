@@ -89,6 +89,7 @@ var test = (function() {
   function tests() {
     return [
       ["list", list.tests],
+      ["util", util.tests],
       ["date", date.tests],
       ["timeonly", timeonly.tests],
       ["email", email.tests]

@@ -15,7 +15,7 @@
 var calpicker = (function() {
   var mod = {};
 
-  function createView() {
+  function createView(tz) {
 '''
 <div #view>
   <div #textView
@@ -30,9 +30,12 @@ var calpicker = (function() {
     </div>
     <div class="col-sm-6"/>
   </div>
+  <div #timezoneView/>
   <div #calendarView/>
 </div>
 '''
+    timezoneView.text("Time Zone: " + timezone.format(tz));
+
     _view.focus = startInput.focus;
 
     /*
@@ -173,10 +176,21 @@ var calpicker = (function() {
     return picker.calendarView.fullCalendar("moment", dateString);
   }
 
+  /*
+    Takes a javascript Date representing a local time and converts
+    it into moment (type used by the calendar) using the calendar's timezone.
+
+    (just slightly contrived)
+   */
+  function momentOfLocalDate(picker, d) {
+    var s = date.toString(d);
+    return parseDateUsingCalendarTimezone(picker, s);
+  }
+
   function setDates(picker, start, end) {
-    if (util.isDefined(start) && util.isDefined(end)) {
-      picker.eventStart = parseDateUsingCalendarTimezone(picker, start);
-      picker.eventEnd = parseDateUsingCalendarTimezone(picker, end);
+    if (util.isNotNull(start) && util.isNotNull(end)) {
+      picker.eventStart = momentOfLocalDate(picker, start);
+      picker.eventEnd = momentOfLocalDate(picker, end);
       updateTextView(picker);
       updateCalendarView(picker);
     }
@@ -256,7 +270,7 @@ var calpicker = (function() {
     var tz = param.timezone;
     var onChange = param.onChange;
 
-    var picker = createView();
+    var picker = createView(param.timezone);
     initTimePickers(picker, onChange);
     picker.onChange = onChange;
 
@@ -308,6 +322,11 @@ var calpicker = (function() {
     return {
       view: picker.view,
       render: render, // to be called after attaching the view to the dom tree
+
+      /*
+        getDates and setDates take/return native js dates as a record of type:
+        { start: Date, end: Date }
+      */
       getDates: (function() { return getDates(picker); }),
       setDates: (function(x) { setDates(picker, x.start, x.end); }),
       clearDates: (function() { return clearDates(picker); })
