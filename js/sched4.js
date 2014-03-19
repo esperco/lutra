@@ -961,6 +961,9 @@ var sched4 = (function() {
 
     /* Task is always saved when remind changes. */
     observable.onSchedulingStepChanging.stopObserve("step");
+
+    spinner.spin();
+    setTimeout(5000, function() { spinner.stop(); });
   };
 
   return mod;
