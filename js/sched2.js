@@ -7,8 +7,11 @@ var sched2 = (function() {
 
   function saveAndReload(ta) {
     disableNextButton();
-    api.postTask(ta)
-      .done(function(task) { sched.loadTask(task); });
+    spinner.spin("Updating calendar...");
+    api.postTask(ta).done(function(task) {
+      spinner.stop();
+      sched.loadTask(task);
+    });
   }
 
   function disableNextButton() {
@@ -69,18 +72,19 @@ var sched2 = (function() {
   }
 
   function updateTask(ta, calOption) {
+    spinner.spin("Scheduling...");
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
     updateTaskState(state, calOption);
-    api.postTask(ta)
-      .done(function(ta) {
-        reserveCalendar(ta.tid)
-          .done(function(eventInfo) {
-            api.getTask(ta.tid)
-              .done(sched.loadTask);
-          });
+    api.postTask(ta).done(function(ta) {
+      reserveCalendar(ta.tid).done(function(eventInfo) {
+        api.getTask(ta.tid).done(function(ta) {
+          spinner.stop();
+          sched.loadTask(ta);
+        });
       });
+    });
   }
 
   function createScheduleSection(ta) {
@@ -450,6 +454,7 @@ var sched2 = (function() {
       .off("click")
       .click(function() {
         if (! sendButton.hasClass("disabled")) {
+          spinner.spin("Sending...");
           sendButton.addClass("disabled");
           var body = offerModal.messageEditable.val();
           if ("Address_to_assistant" === offerModal.addressTo.val()) {
@@ -471,8 +476,10 @@ var sched2 = (function() {
                 choices: options
               }]
             };
-            chat.postChatItem(chatItem)
-              .done(closeAvailabilityModal);
+            chat.postChatItem(chatItem).done(function() {
+              spinner.stop();
+              closeAvailabilityModal();
+            });
           });
         }
       });

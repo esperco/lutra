@@ -506,6 +506,7 @@ var sched4 = (function() {
         .unbind('click')
         .click(function() {
           if (! sendButton.hasClass("disabled")) {
+            spinner.spin("Sending...");
             sendButton.addClass("disabled");
             var body = $("#sched-confirm-message").val();
             if ("Address_to_assistant"===$("#sched-confirm-guest-addr").val()) {
@@ -525,6 +526,7 @@ var sched4 = (function() {
             };
             chat.postChatItem(chatItem)
               .done(function(item) {
+                spinner.stop();
                 closeConfirmModal();
               });
           }
@@ -604,6 +606,8 @@ var sched4 = (function() {
   function updateCalendarEvent(param) {
     var task = param.task;
     var taskState = sched.getState(task);
+    param.updateButton.addClass("disabled");
+    spinner.spin("Updating calendar...");
     taskState.calendar_event_title.custom = param.titleEdit.val();
     taskState.public_notes = param.notesBoxPublic.val();
     taskState.private_notes = param.notesBoxPrivate.val();
@@ -616,11 +620,14 @@ var sched4 = (function() {
           private_notes: param.notesBoxPrivate.val()
         }
       })
-        .done(function() { param.updateButton.addClass("disabled"); });
+        .done(function() {
+          spinner.stop();
+          param.toggleEditMode();
+        });
     });
   }
 
-  function createEditMode(profs, task, summary) {
+  function createEditMode(profs, task, summary, toggle) {
     var view = $("<div id='meeting-edit' class='hide'/>");
     var state = sched.getState(task);
 
@@ -758,7 +765,8 @@ var sched4 = (function() {
           "titleEdit": titleEdit,
           "notesBoxPublic": notesBoxPublic,
           "notesBoxPrivate": notesBoxPrivate,
-          "updateButton": updateButton
+          "updateButton": updateButton,
+          "toggleEditMode": toggle
         })
       })
       .appendTo(editActions);
@@ -834,9 +842,6 @@ var sched4 = (function() {
     var typ = sched.formatMeetingType(choice.slot);
     info.append(sched.viewOfOption(choice, typ));
 
-    var editMode = createEditMode(profs, task, summary)
-      .appendTo(content);
-
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -851,13 +856,18 @@ var sched4 = (function() {
       }
     }
 
+    var editMode = createEditMode(profs, task, summary, toggleEditMode)
+      .appendTo(content);
+
     function rescheduleClick() {
+      spinner.spin("Rescheduling...");
       api.cancelCalendar(tid).done(function() {
         task.task_status.task_progress = "Coordinating";
         state.scheduling_stage = "Coordinate";
         state.calendar_options = [];
         delete state.reserved;
         api.postTask(task).done(function() {
+          spinner.stop();
           observable.onTaskModified.notify(task);
           sched.loadTask(task);
         });
@@ -865,11 +875,13 @@ var sched4 = (function() {
     }
 
     function cancelAndArchiveClick() {
+      spinner.spin("Canceling...");
       api.cancelCalendar(tid).done(function() {
         task.task_status.task_progress = "Closed";
         delete state.reserved;
         api.postTask(task).done(function() {
           api.archiveTask(tid);
+          spinner.stop();
           observable.onTaskArchived.notify(tid);
           page.home.load();
         });
