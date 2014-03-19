@@ -30,6 +30,10 @@ var util = (function () {
     return mod.isString(x) && x.length > 0;
   };
 
+  mod.isNumber = function(x) {
+    return typeof x === "number";
+  };
+
   mod.isArray = function(x) {
     return Object.prototype.toString.call(x) === "[object Array]";
   };

@@ -90,35 +90,44 @@ var sched1 = (function() {
      at the bottom of the list */
   function rowViewOfNewParticipant(profs, task, hosts, guestTbl, guestOptions,
                                    guestsContainer) {
-    var view = $("<div class='sched-step1-add-guest click-mode'/>");
-
+'''
+<div #view
+     class="add-guest-row click-mode">
+  <div #addClick
+       class="add-guest-click clearfix">
+    <div #adder
+         class="add-guest-circ">
+      <div #plus
+           class="plus-guest"/>
+    </div>
+    <div #addGuest
+         class="add-guest-text unselectable">
+      Add guest
+    </div>
+  </div>
+  <div #guestInputDiv
+       class="guest-input-div hide">
+    <div class="edit-guest-title">NEW GUEST</div>
+  </div>
+</div>
+'''
     var hosts = sched.getHosts(task);
-    var addClick = $("<div class='add-guest-click clearfix'/>");
-    var adder = $("<div class='add-guest-circ'>")
-      .appendTo(addClick);
-    var plusIcon = $("<img/>");
-    var plus = $("<div class='plus-guest'/>")
-      .append(plusIcon)
-      .appendTo(adder);
+    var plusIcon = $("<img/>")
+      .appendTo(plus);
     svg.loadImg(plusIcon, "/assets/img/plus.svg");
 
-    var addGuest = $("<div id='add-guest-text' class='unselectable'/>")
-      .append("Add guest")
-      .appendTo(addClick);
+    var addButton = $("<button class='add-guest-btn btn btn-primary disabled'/>")
+      .text("Add guest");
 
     function updateAddButton(edit) {
       if (edit.isValid())
-        $("#add-guest-btn").removeClass("disabled");
+        addButton.removeClass("disabled");
       else
-        $("#add-guest-btn").addClass("disabled");
+        addButton.addClass("disabled");
     }
     var edit = editGuest(updateAddButton);
 
-    var addButton = $("<button id='add-guest-btn'/>")
-      .addClass("btn btn-primary disabled")
-      .text("Add guest");
-    var guestInputDiv = $("<div id='guest-input-div' class='hide'/>")
-      .append($("<div class='edit-guest-title'>NEW GUEST</div>"))
+    guestInputDiv
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
@@ -185,9 +194,6 @@ var sched1 = (function() {
       });
       clearAddGuest();
     });
-
-    view.append(addClick)
-        .append(guestInputDiv);
 
     return {
       view: view
@@ -268,7 +274,7 @@ var sched1 = (function() {
     var branch = $("<div class='relationship-branch'>");
     var cancelCirc = $("<div class='add-guest-circ cancel'>");
     var cancelIcon = $("<img/>");
-    var cancel = $("<div class='plus-guest'/>")
+    var cancel = $("<div class='plus-guest cancel'/>")
       .append(cancelIcon)
       .appendTo(cancelCirc);
     svg.loadImg(cancelIcon, "/assets/img/plus.svg");
@@ -456,8 +462,10 @@ var sched1 = (function() {
 
   function finalizeGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
-    ta.task_status.task_progress = "Coordinating";
-    sched.getState(ta).scheduling_stage = "Find_availability";
+    if (ta.task_status.task_progress !== "Confirmed") {
+      ta.task_status.task_progress = "Coordinating";
+      sched.getState(ta).scheduling_stage = "Coordinate";
+    }
     api.postTask(ta).done(function(ta) {
       sched.loadTask(ta);
       observable.onTaskParticipantsChanged.notify(ta);
