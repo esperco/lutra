@@ -101,14 +101,12 @@ var sched1 = (function() {
            class="plus-guest"/>
     </div>
     <div #addGuest
-         id="add-guest-text"
-         class="unselectable">
+         class="add-guest-text unselectable">
       Add guest
     </div>
   </div>
   <div #guestInputDiv
-       id="guest-input-div"
-       class="hide">
+       class="guest-input-div hide">
     <div class="edit-guest-title">NEW GUEST</div>
   </div>
 </div>
@@ -118,17 +116,17 @@ var sched1 = (function() {
       .appendTo(plus);
     svg.loadImg(plusIcon, "/assets/img/plus.svg");
 
+    var addButton = $("<button class='add-guest-btn btn btn-primary disabled'/>")
+      .text("Add guest");
+
     function updateAddButton(edit) {
       if (edit.isValid())
-        $("#add-guest-btn").removeClass("disabled");
+        addButton.removeClass("disabled");
       else
-        $("#add-guest-btn").addClass("disabled");
+        addButton.addClass("disabled");
     }
     var edit = editGuest(updateAddButton);
 
-    var addButton = $("<button id='add-guest-btn'/>")
-      .addClass("btn btn-primary disabled")
-      .text("Add guest");
     guestInputDiv
       .append(edit.emailInput)
       .append(edit.firstNameInput)

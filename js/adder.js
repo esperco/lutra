@@ -20,8 +20,7 @@ var adder = (function() {
            class="plus-option"/>
     </div>
     <div #addOption
-         id="add-option-text"
-         class="unselectable">
+         class="add-option-text unselectable">
       Add meeting option
     </div>
   </div>
