@@ -346,7 +346,7 @@ var sched4 = (function() {
       /*
       var startTime = date.ofString(getSlot(task).start);
       startTime.setTime(startTime.getTime() - (duration * 1000));
-      var now = date.ofString(date.nowUTC());
+      var now = date.ofString(date.now());
       if (startTime.getTime() < now.getTime())
         return "disabled";
       else
