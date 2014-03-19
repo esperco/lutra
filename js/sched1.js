@@ -90,21 +90,33 @@ var sched1 = (function() {
      at the bottom of the list */
   function rowViewOfNewParticipant(profs, task, hosts, guestTbl, guestOptions,
                                    guestsContainer) {
-    var view = $("<div class='sched-step1-add-guest click-mode'/>");
-
+'''
+<div #view
+     class="add-guest-row click-mode">
+  <div #addClick
+       class="add-guest-click clearfix">
+    <div #adder
+         class="add-guest-circ">
+      <div #plus
+           class="plus-guest"/>
+    </div>
+    <div #addGuest
+         id="add-guest-text"
+         class="unselectable">
+      Add guest
+    </div>
+  </div>
+  <div #guestInputDiv
+       id="guest-input-div"
+       class="hide">
+    <div class="edit-guest-title">NEW GUEST</div>
+  </div>
+</div>
+'''
     var hosts = sched.getHosts(task);
-    var addClick = $("<div class='add-guest-click clearfix'/>");
-    var adder = $("<div class='add-guest-circ'>")
-      .appendTo(addClick);
-    var plusIcon = $("<img/>");
-    var plus = $("<div class='plus-guest'/>")
-      .append(plusIcon)
-      .appendTo(adder);
+    var plusIcon = $("<img/>")
+      .appendTo(plus);
     svg.loadImg(plusIcon, "/assets/img/plus.svg");
-
-    var addGuest = $("<div id='add-guest-text' class='unselectable'/>")
-      .append("Add guest")
-      .appendTo(addClick);
 
     function updateAddButton(edit) {
       if (edit.isValid())
@@ -117,8 +129,7 @@ var sched1 = (function() {
     var addButton = $("<button id='add-guest-btn'/>")
       .addClass("btn btn-primary disabled")
       .text("Add guest");
-    var guestInputDiv = $("<div id='guest-input-div' class='hide'/>")
-      .append($("<div class='edit-guest-title'>NEW GUEST</div>"))
+    guestInputDiv
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
@@ -185,9 +196,6 @@ var sched1 = (function() {
       });
       clearAddGuest();
     });
-
-    view.append(addClick)
-        .append(guestInputDiv);
 
     return {
       view: view

@@ -254,7 +254,7 @@ var sched4 = (function() {
 <div #view
      class="module-row">
   <div #edit
-       class="btn edit-reminder-btn"/>
+       class="btn btn-primary edit-reminder-btn"/>
 </div>
 '''
     var prof = profs[uid].prof;
@@ -271,12 +271,9 @@ var sched4 = (function() {
 
     if (sentReminder(ta, uid)) {
       chatHead.addClass("sent");
-      edit.addClass("btn-default disabled");
-      editIcon.addClass("sent");
+      edit.addClass("hide");
     } else {
       chatHead.addClass("not-sent");
-      edit.addClass("btn-primary");
-      editIcon.addClass("not-sent");
     }
 
     var guestName = profile.viewMediumFullName(prof)
@@ -293,7 +290,7 @@ var sched4 = (function() {
 
     // Allow editing reminders only if event time is not already past
     if (eventTimeHasPassed(ta)) {
-      edit.addClass("disabled");
+      edit.addClass("hide");
     }
 
     edit.click(function() {
@@ -393,8 +390,8 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img class="sched-module-icon"
-           src="/assets/img/reminder.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon reminder-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
@@ -403,10 +400,14 @@ var sched4 = (function() {
       <span #schedulerTitle/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/reminder.svg");
+
     var headerText = guests.length > 1 ?
       "Schedule a reminder for guests" :
       "Schedule a reminder";
@@ -430,11 +431,6 @@ var sched4 = (function() {
 
     var schedulerView = createReminderScheduler(profs, task, guests, statuses);
     scheduler.append(schedulerView);
-
-    // Allow sending reminders only if event time is not already past
-    if (eventTimeHasPassed(task)) {
-      schedulerView.find("button").addClass("disabled");
-    }
 
     return _view;
   }
@@ -545,19 +541,22 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="confirm-icon"
-           class="sched-module-icon"
-           src="/assets/img/confirmation.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon confirm-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
   <div #connector
        class="connector collapsed"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/confirmation.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -768,14 +767,15 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img class="sched-module-icon"
-           src="/assets/img/calendar.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon review-icon"/>
       <div class="sched-module-title">
         Review meeting details
       </div>
     </div>
     <div #content
-         class="review-content hide">
+         class="review-content"
+         style="display:none">
       <div #summary
            id="meeting-summary">
         <div #editButton
@@ -812,6 +812,10 @@ var sched4 = (function() {
        class="connector"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/calendar.svg");
+
     var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
@@ -887,41 +891,52 @@ var sched4 = (function() {
     })
 
     function toggleModule(toggling, x) {
-      var content = toggling.content;
-      var showHide = toggling.showHide;
-      var header = toggling.header;
-      var connector, scheduler;
-      if (x !== "reminder")
-        connector = toggling.connector;
-      if (x === "reminder")
-        scheduler = toggling.scheduler;
+      if (toggling.header.hasClass("collapsed"))
+        showModule(toggling, x);
+      else
+        hideModule(toggling, x);
 
-      if (content.hasClass("hide")) {
-        showHide.text("Hide");
-        header.removeClass("collapsed");
-        content.removeClass("hide");
-        if (connector != null)
-          connector.removeClass("collapsed");
-        if (scheduler != null)
-          scheduler.removeClass("hide");
+      function showModule(toggling, x) {
+        toggling.showHide.text("Hide");
+        toggling.header.removeClass("collapsed");
+        toggling.headerIconContainer.addClass("active");
+        toggling.content.slideDown("fast");
+        if (x === "review") {
+          toggling.connector.removeClass("collapsed");
+        } else if (x === "confirm") {
+          toggling.connector.removeClass("collapsed");
+          review.connector.addClass("bottom-active");
+        } else if (x === "reminder") {
+          if (! eventTimeHasPassed(ta))
+            toggling.scheduler.removeClass("hide");
+          confirm.connector.addClass("bottom-active");
+        }
         hideOthers(x);
-      } else {
-        showHide.text("Show");
-        header.addClass("collapsed");
-        content.addClass("hide");
-        if (connector != null)
-          connector.addClass("collapsed");
-        if (scheduler != null)
-          scheduler.addClass("hide");
+      }
+
+      function hideModule(toggling, x) {
+        toggling.showHide.text("Show");
+        toggling.header.addClass("collapsed");
+        toggling.headerIconContainer.removeClass("active");
+        toggling.content.slideUp("fast");
+        if (x === "review") {
+          toggling.connector.addClass("collapsed");
+        } else if (x === "confirm") {
+          toggling.connector.addClass("collapsed");
+          review.connector.removeClass("bottom-active");
+        } else if (x === "reminder") {
+          toggling.scheduler.addClass("hide");
+          confirm.connector.removeClass("bottom-active");
+        }
       }
 
       function hideOthers(x) {
-        if ((x != "review") && (! review.content.hasClass("hide")))
-          toggleModule(review, "review");
-        if ((x != "confirm") && (! confirm.content.hasClass("hide")))
-          toggleModule(confirm, "confirm");
-        if ((x != "reminder") && (! reminder.content.hasClass("hide")))
-          toggleModule(reminder, "reminder");
+        if ((x != "review") && (! review.header.hasClass("collapsed")))
+          hideModule(review, "review");
+        if ((x != "confirm") && (! confirm.header.hasClass("collapsed")))
+          hideModule(confirm, "confirm");
+        if ((x != "reminder") && (! reminder.header.hasClass("collapsed")))
+          hideModule(reminder, "reminder");
       }
     }
 

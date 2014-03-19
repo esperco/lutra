@@ -94,16 +94,16 @@ var sched2 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="select-icon"
-           class="sched-module-icon"
-           src="/assets/img/star.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon schedule-icon"/>
       <div #headerTitle
            class="sched-module-title">
         Schedule the preferred meeting option
       </div>
     </div>
     <div #content
-         class="schedule-content clearfix hide">
+         class="schedule-content clearfix"
+         style="display:none">
       <div #optionA
            id="select-option-a"
            class="col-sm-4 schedule-option disabled">
@@ -140,11 +140,14 @@ var sched2 = (function() {
           Schedule
         </button>
       </div>
-      <div #temporary/>
     </div>
   </div>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/star.svg");
+
     var state = sched.getState(ta);
     var guests = sched.getAttendingGuests(ta);
     var avails = state.availabilities;
@@ -180,11 +183,11 @@ var sched2 = (function() {
       } else {
         if (index === 1) {
           _view["option" + letter]
-            .append($("<div class='not-offered'/>")
+            .append($("<div class='not-created'/>")
               .text("A second meeting option was not created."));
         } else if (index === 2) {
           _view["option" + letter]
-            .append($("<div class='not-offered'/>")
+            .append($("<div class='not-created'/>")
               .text("A third meeting option was not created."));
         }
       }
@@ -235,72 +238,31 @@ var sched2 = (function() {
   }
 
   function showEndTime() {
-    $("#sched-availability-message-readonly .time-text")
-      .removeClass("hide");
-    $("#sched-availability-message-readonly .time-text-short")
-      .addClass("hide");
+    $(".time-text").removeClass("hide");
+    $(".time-text-short").addClass("hide");
   }
 
   function hideEndTime() {
-    $("#sched-availability-message-readonly .time-text")
-      .addClass("hide");
-    $("#sched-availability-message-readonly .time-text-short")
-      .removeClass("hide");
+    $(".time-text").addClass("hide");
+    $(".time-text-short").removeClass("hide");
   }
 
-  function loadRecipients(toObsProf) {
-    $("#sched-availability-to-list").children().remove();
-
-    var recipientRow = $("<div class='sched-availability-to checkbox-selected'/>")
-      .appendTo($("#sched-availability-to-list"));
-
-    var recipientCheckboxDiv = $("<div class='recipient-checkbox-div'/>")
-      .appendTo(recipientRow);
-
-    var recipientCheckbox = $("<img class='recipient-checkbox'/>")
-      .appendTo(recipientCheckboxDiv);
-    svg.loadImg(recipientCheckbox, "/assets/img/checkbox-sm.svg");
-
-    var recipientName = $("<div class='recipient-name' />")
-      .append(profile.fullName(toObsProf.prof))
-      .appendTo(recipientRow);
-
-    recipientRow.click(function() {
-      if (recipientRow.hasClass("checkbox-selected")) {
-        recipientRow.removeClass("checkbox-selected");
-      } else {
-        recipientRow.addClass("checkbox-selected");
-      }
-    })
-  }
-
-  function preFillAvailabilityModal(profs, task, options, toUid) {
+  function preFillOfferModal(offerModal, profs, task, options, toUid) {
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
-
-    loadRecipients(toObsProf);
-
-    $("#sched-availability-subject")
-      .val("Re: " + task.task_status.task_title);
 
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
 
-    var footerOption = $("#footer-option");
-    footerOption.children().remove();
+    var plural = options.length === 1 ? "" : "s";
+    offerModal.title.text("Offer the meeting option" + plural + ".");
+    offerModal.footerOptionText.text("Show end time of meeting option" + plural);
 
-    var footerCheckboxDiv = $("<div class='footer-checkbox-div'/>")
-      .appendTo(footerOption);
-    var footerCheckbox = $("<img class='footer-checkbox'/>")
-      .appendTo(footerCheckboxDiv);
-    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+    offerModal.recipient.text(toName);
+    offerModal.subject.val("Re: " + task.task_status.task_title);
 
-    var timeOption = $("<div class='time-option' />")
-      .append("Show end time of meeting options")
-      .appendTo(footerOption);
-
-    var footer = $("#sched-availability-message-readonly");
+    var footer = offerModal.messageReadOnly;
     footer.children().remove();
     footer.append(emailViewOfOptions(options));
     if (footer.hasClass("short")) {
@@ -308,19 +270,6 @@ var sched2 = (function() {
     } else {
       showEndTime();
     }
-
-    footerOption.off("click");
-    footerOption.click(function() {
-      if (footerOption.hasClass("checkbox-selected")) {
-        footerOption.removeClass("checkbox-selected");
-        footer.addClass("short");
-        hideEndTime();
-      } else {
-        footerOption.addClass("checkbox-selected");
-        footer.removeClass("short");
-        showEndTime();
-      }
-    })
 
     var parameters = {
       exec_name: hostName,
@@ -331,15 +280,15 @@ var sched2 = (function() {
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
-      $("#sched-options-guest-addr").val("Address_to_assistant");
+      offerModal.addressTo.val("Address_to_assistant");
     } else {
       parameters.template_kind = "Options_to_guest";
-      $("#sched-options-guest-addr").val("Address_directly");
+      offerModal.addressTo.val("Address_directly");
     }
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
-        $("#sched-availability-message").val(optionsMessage.message_text);
-        $("#sched-options-guest-addr")
+        offerModal.messageEditable.val(optionsMessage.message_text);
+        offerModal.addressTo
           .unbind("change")
           .change(function(){refreshOptionsMessage(task.tid, parameters);});
       });
@@ -358,6 +307,83 @@ var sched2 = (function() {
     return date.viewTimeAgo(created).text();
   }
 
+  function createOfferModal() {
+'''
+<div #view
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+  <div #dialog
+       class="modal-dialog">
+    <div class="modal-close-circ" data-dismiss="modal">
+      <img class="svg modal-close-x" src="/assets/img/x.svg">
+    </div>
+    <div #content
+         class="modal-content">
+      <div #header
+           class="modal-header">
+        <button #send
+                type="button" class="btn btn-primary"
+                style="float:right">
+          Send
+        </button>
+        <h3 #title
+            class="modal-title"/>
+      </div>
+      <div #body
+           class="modal-body">
+        <div>
+          <h4 class="modal-first-section-title to-label">To:</h4>
+          <div #recipient/>
+        </div>
+        <div class="input">
+          <h4 class="modal-section-title">Subject</h4>
+          <input #subject
+                 type="text" class="form-control" disabled>
+        </div>
+        <h4 class="modal-section-title">Message</h4>
+        <select #addressTo>
+          <option value="Address_directly">Address Directly</option>
+          <option value="Address_to_assistant">Address to Assistant</option>
+        </select>
+        <textarea #messageEditable
+                  class="form-control"
+                  rows="8"/>
+        <div #footerOption
+             class="checkbox-selected">
+          <div #footerCheckboxDiv
+               class="footer-checkbox-div"/>
+          <div #footerOptionText
+               class="time-option"/>
+        </div>
+        <div #messageReadOnly/>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    var footerCheckbox = $("<img class='footer-checkbox'/>")
+      .appendTo(footerCheckboxDiv);
+    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
+
+    footerOption
+      .off("click")
+      .click(function() {
+        if (footerOption.hasClass("checkbox-selected")) {
+          footerOption.removeClass("checkbox-selected");
+          messageReadOnly.addClass("short");
+          hideEndTime();
+        } else {
+          footerOption.addClass("checkbox-selected");
+          messageReadOnly.removeClass("short");
+          showEndTime();
+        }
+      });
+
+    return _view;
+  }
+
   function createOfferRow(profs, task, uid) {
 '''
 <div #view
@@ -369,15 +395,15 @@ var sched2 = (function() {
     var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
+    var offerModal = createOfferModal();
 
-    var availabilityModal = $("#sched-availability-modal");
     function closeAvailabilityModal(item) {
-      availabilityModal.modal("hide");
+      offerModal.view.modal("hide");
     }
 
     function composeEmail() {
-      preFillAvailabilityModal(profs, task, options, uid);
-      availabilityModal.modal({});
+      preFillOfferModal(offerModal, profs, task, options, uid);
+      offerModal.view.modal({});
     }
 
     var composeIcon = $("<img class='compose-confirmation-icon'/>")
@@ -421,22 +447,21 @@ var sched2 = (function() {
 
     compose.click(composeEmail);
 
-    var sendButton = $("#sched-availability-send");
+    var sendButton = offerModal.send;
     sendButton
       .removeClass("disabled")
-      .unbind('click')
+      .off("click")
       .click(function() {
         if (! sendButton.hasClass("disabled")) {
           sendButton.addClass("disabled");
-          var body = $("#sched-availability-message").val();
-          if ("Address_to_assistant" === $("#sched-options-guest-addr").val()) {
+          var body = offerModal.messageEditable.val();
+          if ("Address_to_assistant" === offerModal.addressTo.val()) {
             var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
             if (util.isNotNull(ea)) {
               uid = ea;
             }
           }
-          var hideEnd = $("#sched-availability-message-readonly")
-            .hasClass("short");
+          var hideEnd = offerModal.messageReadOnly.hasClass("short");
           sched.optionsForGuest(sched.getGuestOptions(task), uid)
             .hide_end_times = hideEnd;
           api.postTask(task).done(function() {
@@ -470,19 +495,22 @@ var sched2 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="offer-icon"
-           class="sched-module-icon"
-           src="/assets/img/email.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon offer-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
     <div #content
-         class="hide"/>
+         style="display:none"/>
   </div>
   <div #connector
        class="connector collapsed"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/email.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -1166,9 +1194,8 @@ var sched2 = (function() {
             class="show-hide link">
         Hide
       </span>
-      <img id="create-icon"
-           class="sched-module-icon"
-           src="/assets/img/create-options.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon create-icon active"/>
       <div #headerTitle
            class="sched-module-title">
         Create up to 3 meeting options
@@ -1180,6 +1207,10 @@ var sched2 = (function() {
        class="connector"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/create-options.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -1221,35 +1252,49 @@ var sched2 = (function() {
     })
 
     function toggleModule(toggling, x) {
-      var content = toggling.content;
-      var showHide = toggling.showHide;
-      var header = toggling.header;
-      var connector;
-      if (x !== "schedule")
-        connector = toggling.connector;
+      if (toggling.header.hasClass("collapsed"))
+        showModule(toggling, x);
+      else
+        hideModule(toggling, x);
 
-      if (content.hasClass("hide")) {
-        showHide.text("Hide");
-        header.removeClass("collapsed");
-        content.removeClass("hide");
-        if (connector != null)
-          connector.removeClass("collapsed");
+      function showModule(toggling, x) {
+        toggling.showHide.text("Hide");
+        toggling.header.removeClass("collapsed");
+        toggling.headerIconContainer.addClass("active");
+        toggling.content.slideDown("fast");
+        if (x === "options") {
+          toggling.connector.removeClass("collapsed");
+        } else if (x === "offer") {
+          toggling.connector.removeClass("collapsed");
+          options.connector.addClass("bottom-active");
+        } else if (x === "schedule") {
+          offer.connector.addClass("bottom-active");
+        }
         hideOthers(x);
-      } else {
-        showHide.text("Show");
-        header.addClass("collapsed");
-        content.addClass("hide");
-        if (connector != null)
-          connector.addClass("collapsed");
+      }
+
+      function hideModule(toggling, x) {
+        toggling.showHide.text("Show");
+        toggling.header.addClass("collapsed");
+        toggling.headerIconContainer.removeClass("active");
+        toggling.content.slideUp("fast");
+        if (x === "options") {
+          toggling.connector.addClass("collapsed");
+        } else if (x === "offer") {
+          toggling.connector.addClass("collapsed");
+          options.connector.removeClass("bottom-active");
+        } else if (x === "schedule") {
+          offer.connector.removeClass("bottom-active");
+        }
       }
 
       function hideOthers(x) {
-        if ((x != "options") && (! options.content.hasClass("hide")))
-          toggleModule(options, "options");
-        if ((x != "offer") && (! offer.content.hasClass("hide")))
-          toggleModule(offer, "offer");
-        if ((x != "schedule") && (! schedule.content.hasClass("hide")))
-          toggleModule(schedule, "schedule");
+        if ((x != "options") && (! options.header.hasClass("collapsed")))
+          hideModule(options, "options");
+        if ((x != "offer") && (! offer.header.hasClass("collapsed")))
+          hideModule(offer, "offer");
+        if ((x != "schedule") && (! schedule.header.hasClass("collapsed")))
+          hideModule(schedule, "schedule");
       }
     }
 

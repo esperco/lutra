@@ -6,6 +6,8 @@
 
 
 /*** Colors ***/
+@blue: #0080ce;
+@blue_bg: #dfeff7;
 @border: #cccccc;
 @dark_gray: #282828;
 @gray_f8: #f8f8f8;
@@ -20,6 +22,7 @@
 @green: #2bb673;
 @green_hover: #1e9b5c;
 @orange: #f7941e;
+@orange_bg: #f4e3d3;
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
@@ -1101,6 +1104,16 @@ i { color: @gray_60; }
   font-family: @bold;
 }
 
+.compose-text {
+  width: 100%;
+  height: auto;
+  padding-top: 1.1em;
+  border: none;
+  overflow: hidden;
+  outline: none;
+  resize: none;
+}
+
 #sched-availability-message,
 #sched-confirm-message,
 #sched-reminder-message {
@@ -1968,7 +1981,7 @@ i { color: @gray_60; }
 }
 
 .sched-step1-row,
-.sched-step1-add-guest {
+.add-guest-row {
   min-height: 72px;
   margin-bottom: 15px;
   border: 1px solid @gray_10;
@@ -1987,7 +2000,7 @@ i { color: @gray_60; }
 }
 
 .add-guest-click,
-.sched-step1-add-ea {
+.add-ea-row {
   padding: 15px;
 }
 
@@ -2082,19 +2095,10 @@ i { color: @gray_60; }
   }
 }
 
-.sched-step1-add-guest.click-mode:hover {
+.add-guest-row.click-mode .add-guest-click:hover {
   background: @gray_f8;
   .add-guest-circ { background: @purple_hover; }
   #add-guest-text { color: @purple_hover; }
-}
-
-.add-guest-click {
-  cursor: pointer;
-}
-
-.add-guest-click.cancel-mode {
-  float: left;
-  padding-right: 0;
 }
 
 #add-guest-text {
@@ -2154,6 +2158,17 @@ i { color: @gray_60; }
 
 
 /*** Adder ***/
+
+.add-guest-click,
+.add-option-click {
+  cursor: pointer;
+}
+
+.add-guest-click.cancel-mode,
+.add-option-click.cancel-mode {
+  float: left;
+  padding-right: 0;
+}
 
 .add-guest-circ,
 .add-option-sq {
@@ -2351,14 +2366,13 @@ i { color: @gray_60; }
 
 .edit-option-row.add-row { border: none; }
 
-#add-option-row {
+.add-option-row {
   border-top: 1px solid @gray_20;
   border-bottom-right-radius: 6px;
   border-bottom-left-radius: 6px;
 }
 
-#add-option-row.click-mode:hover {
-  cursor: pointer;
+.add-option-row.click-mode .add-option-click:hover {
   background: @gray_f8;
   .add-option-sq { background: @purple_hover; }
   #add-option-text { color: @purple_hover; }
@@ -2700,12 +2714,15 @@ i { color: @gray_60; }
   min-height: 54px;
   padding: 13px 15px;
   font-size: 18px;
-  background: @gray_f8;
+  background: @gray_05;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
 }
 
-.sched-module-header.collapsed { border-radius: 6px; }
+.sched-module-header.collapsed {
+  background: @gray_f8;
+  border-radius: 6px;
+}
 
 .sched-module-icon {
   float: left;
@@ -2739,9 +2756,15 @@ i { color: @gray_60; }
 }
 
 .connector.collapsed path.down { fill: @gray_f8; }
+.connector.bottom-active path.up { fill: @gray_05; }
 
 
 /*** Scheduling Step 2 ***/
+
+.create-icon.active g { fill: white; }
+.offer-icon { margin-top: 4px; }
+.offer-icon.active path.bg { fill: white; }
+.schedule-icon.active path { fill: white; }
 
 .options-help-row {
   padding: 15px;
@@ -2769,8 +2792,6 @@ i { color: @gray_60; }
     margin-left: 140px;
   }
 }
-
-#offer-icon { margin-top: 4px; }
 
 .compose-offer-btn {
   float: right;
@@ -2806,13 +2827,18 @@ i { color: @gray_60; }
 .select-option-letter.recommended { color: @green; }
 .select-option-letter.disabled { opacity: 0.5; }
 
-.not-offered {
+.not-created {
   padding: 20px;
   color: @gray_60;
 }
 
 
 /*** Scheduling Step 4 ***/
+
+.review-icon.active path.bg,
+.confirm-icon.active path.bg,
+.reminder-icon.active g.clock,
+.reminder-icon.active g.bells { fill: white; }
 
 .review-content {
   padding: 15px;
@@ -2851,12 +2877,11 @@ i { color: @gray_60; }
   width: 14px;
   height: 14px;
   margin-top: 3px;
+  path { fill: white; }
 }
 
 .compose-confirmation-icon.not-sent g path { fill: white; }
 .compose-confirmation-icon.sent g path { fill: @gray_60; }
-.edit-reminder-icon.not-sent path { fill: white; }
-.edit-reminder-icon.sent path { fill: @gray_20; }
 
 .compose-confirmation-text,
 .edit-reminder-text {
