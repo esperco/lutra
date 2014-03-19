@@ -268,7 +268,7 @@ var sched1 = (function() {
     var branch = $("<div class='relationship-branch'>");
     var cancelCirc = $("<div class='add-guest-circ cancel'>");
     var cancelIcon = $("<img/>");
-    var cancel = $("<div class='plus-guest'/>")
+    var cancel = $("<div class='plus-guest cancel'/>")
       .append(cancelIcon)
       .appendTo(cancelCirc);
     svg.loadImg(cancelIcon, "/assets/img/plus.svg");
