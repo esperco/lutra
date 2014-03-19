@@ -14,7 +14,7 @@ var date = (function() {
      Bad:  "2014-09-23T19:38:51.683"
   */
   mod.ofString = function(s) {
-    if (util.isNonEmptyString(s))
+    if (util.isNumber(s) || util.isNonEmptyString(s))
       return new Date(s);
     else
       return null;
