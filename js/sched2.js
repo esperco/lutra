@@ -184,11 +184,11 @@ var sched2 = (function() {
       } else {
         if (index === 1) {
           _view["option" + letter]
-            .append($("<div class='not-offered'/>")
+            .append($("<div class='not-created'/>")
               .text("A second meeting option was not created."));
         } else if (index === 2) {
           _view["option" + letter]
-            .append($("<div class='not-offered'/>")
+            .append($("<div class='not-created'/>")
               .text("A third meeting option was not created."));
         }
       }
@@ -1174,7 +1174,7 @@ var sched2 = (function() {
         Hide
       </span>
       <div #headerIconContainer
-           class="sched-module-icon create-icon selected"/>
+           class="sched-module-icon create-icon active"/>
       <div #headerTitle
            class="sched-module-title">
         Create up to 3 meeting options
@@ -1241,20 +1241,32 @@ var sched2 = (function() {
       function showModule(toggling, x) {
         toggling.showHide.text("Hide");
         toggling.header.removeClass("collapsed");
-        toggling.headerIconContainer.addClass("selected");
+        toggling.headerIconContainer.addClass("active");
         toggling.content.slideDown("fast");
-        if (x !== "schedule")
+        if (x === "options") {
           toggling.connector.removeClass("collapsed");
+        } else if (x === "offer") {
+          toggling.connector.removeClass("collapsed");
+          options.connector.addClass("bottom-active");
+        } else if (x === "schedule") {
+          offer.connector.addClass("bottom-active");
+        }
         hideOthers(x);
       }
 
       function hideModule(toggling, x) {
         toggling.showHide.text("Show");
         toggling.header.addClass("collapsed");
-        toggling.headerIconContainer.removeClass("selected");
+        toggling.headerIconContainer.removeClass("active");
         toggling.content.slideUp("fast");
-        if (x !== "schedule")
+        if (x === "options") {
           toggling.connector.addClass("collapsed");
+        } else if (x === "offer") {
+          toggling.connector.addClass("collapsed");
+          options.connector.removeClass("bottom-active");
+        } else if (x === "schedule") {
+          offer.connector.removeClass("bottom-active");
+        }
       }
 
       function hideOthers(x) {

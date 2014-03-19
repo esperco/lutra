@@ -254,7 +254,7 @@ var sched4 = (function() {
 <div #view
      class="module-row">
   <div #edit
-       class="btn edit-reminder-btn"/>
+       class="btn btn-primary edit-reminder-btn"/>
 </div>
 '''
     var prof = profs[uid].prof;
@@ -271,12 +271,9 @@ var sched4 = (function() {
 
     if (sentReminder(ta, uid)) {
       chatHead.addClass("sent");
-      edit.addClass("btn-default disabled");
-      editIcon.addClass("sent");
+      edit.addClass("hide");
     } else {
       chatHead.addClass("not-sent");
-      edit.addClass("btn-primary");
-      editIcon.addClass("not-sent");
     }
 
     var guestName = profile.viewMediumFullName(prof)
@@ -293,7 +290,7 @@ var sched4 = (function() {
 
     // Allow editing reminders only if event time is not already past
     if (eventTimeHasPassed(ta)) {
-      edit.addClass("disabled");
+      edit.addClass("hide");
     }
 
     edit.click(function() {
@@ -393,8 +390,8 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img class="sched-module-icon"
-           src="/assets/img/reminder.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon reminder-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
@@ -407,6 +404,10 @@ var sched4 = (function() {
   </div>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/reminder.svg");
+
     var headerText = guests.length > 1 ?
       "Schedule a reminder for guests" :
       "Schedule a reminder";
@@ -430,11 +431,6 @@ var sched4 = (function() {
 
     var schedulerView = createReminderScheduler(profs, task, guests, statuses);
     scheduler.append(schedulerView);
-
-    // Allow sending reminders only if event time is not already past
-    if (eventTimeHasPassed(task)) {
-      schedulerView.find("button").addClass("disabled");
-    }
 
     return _view;
   }
@@ -545,9 +541,8 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img id="confirm-icon"
-           class="sched-module-icon"
-           src="/assets/img/confirmation.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon confirm-icon"/>
       <div #headerTitle
            class="sched-module-title"/>
     </div>
@@ -558,6 +553,10 @@ var sched4 = (function() {
        class="connector collapsed"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/confirmation.svg");
+
     var connectorIcon = $("<img/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
@@ -768,8 +767,8 @@ var sched4 = (function() {
             class="show-hide link">
         Show
       </span>
-      <img class="sched-module-icon"
-           src="/assets/img/calendar.svg"/>
+      <div #headerIconContainer
+           class="sched-module-icon review-icon"/>
       <div class="sched-module-title">
         Review meeting details
       </div>
@@ -813,6 +812,10 @@ var sched4 = (function() {
        class="connector"/>
 </div>
 '''
+    var headerIcon = $("<img/>")
+      .appendTo(headerIconContainer);
+    svg.loadImg(headerIcon, "/assets/img/calendar.svg");
+
     var tid = task.tid;
     var state = sched.getState(task);
     var choice = state.reserved;
@@ -896,22 +899,35 @@ var sched4 = (function() {
       function showModule(toggling, x) {
         toggling.showHide.text("Hide");
         toggling.header.removeClass("collapsed");
+        toggling.headerIconContainer.addClass("active");
         toggling.content.slideDown("fast");
-        if (x !== "reminder")
+        if (x === "review") {
           toggling.connector.removeClass("collapsed");
-        if (x === "reminder")
-          toggling.scheduler.removeClass("hide");
+        } else if (x === "confirm") {
+          toggling.connector.removeClass("collapsed");
+          review.connector.addClass("bottom-active");
+        } else if (x === "reminder") {
+          if (! eventTimeHasPassed(ta))
+            toggling.scheduler.removeClass("hide");
+          confirm.connector.addClass("bottom-active");
+        }
         hideOthers(x);
       }
 
       function hideModule(toggling, x) {
         toggling.showHide.text("Show");
         toggling.header.addClass("collapsed");
+        toggling.headerIconContainer.removeClass("active");
         toggling.content.slideUp("fast");
-        if (x !== "reminder")
+        if (x === "review") {
           toggling.connector.addClass("collapsed");
-        if (x === "reminder")
+        } else if (x === "confirm") {
+          toggling.connector.addClass("collapsed");
+          review.connector.removeClass("bottom-active");
+        } else if (x === "reminder") {
           toggling.scheduler.addClass("hide");
+          confirm.connector.removeClass("bottom-active");
+        }
       }
 
       function hideOthers(x) {

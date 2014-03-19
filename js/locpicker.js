@@ -149,32 +149,6 @@ var locpicker = (function() {
                   .focus();
   }
 
-  /*
-    Create pop-up for editing and saving a location,
-    taking care of synchronization between the form and the pop-up (modal).
-    The pop-up is shown when the user clicks somewhere in the
-    dropdown menu that opens below the search box.
-  */
-  function createLocationEditor(form, loc) {
-    function updateForm(loc) {
-      var coord = loc.coord;
-      if (util.isDefined(coord)) {
-        api.getTimezone(coord.lat, coord.lon)
-          .done(function(x) {
-            loc.timezone = x.timezone;
-            setLocation(form, loc);
-          });
-      }
-      else /* this ideally shouldn't happen */
-        setLocation(form, loc);
-    }
-    var modalView = loceditor.create(loc, updateForm, updateForm);
-
-    form.editor.children().remove();
-    form.editor.append(modalView.modal);
-    modalView.focus();
-  }
-
   function createGoogleMap(mapDiv) {
     var mapOptions = {
       center: new google.maps.LatLng(37.4485044, -122.159185),
@@ -187,23 +161,6 @@ var locpicker = (function() {
       googleMap: googleMap,
       addressMarker: addressMarker
     };
-  }
-
-  function addCreatePlaceToMenu(form) {
-    var menu = form.dropdownMenu;
-    var textInput = form.searchBox.val();
-    var li = $('<li role="presentation"/>')
-      .appendTo(menu);
-    var bolded = "Create a place named <b>\""
-      + util.htmlEscape(textInput) + "\"</b>";
-    $('<a role="menuitem" tabindex="-1" href="#"/>')
-      .html(bolded)
-      .appendTo(li)
-      .click(function() {
-        var loc = getLocation(form);
-        createLocationEditor(form, loc);
-        return false;
-      });
   }
 
   function addSuggestedSavedPlacesToMenu(form, predictions) {
@@ -304,9 +261,6 @@ var locpicker = (function() {
         && predictions.from_google.length === 0) return;
     var menu = form.dropdownMenu;
     menu.children().remove();
-
-    /* Add "create a place named ..." to the dropdown menu */
-    addCreatePlaceToMenu(form);
 
     /* Fill the menu with suggested addresses from user's saved places */
     addSuggestedSavedPlacesToMenu(form, predictions);

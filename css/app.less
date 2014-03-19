@@ -2746,11 +2746,15 @@ i { color: @gray_60; }
 }
 
 .connector.collapsed path.down { fill: @gray_f8; }
+.connector.bottom-active path.up { fill: @gray_05; }
 
 
 /*** Scheduling Step 2 ***/
 
-.create-icon.selected path { fill: white; }
+.create-icon.active g { fill: white; }
+.offer-icon { margin-top: 4px; }
+.offer-icon.active path.bg { fill: white; }
+.schedule-icon.active path { fill: white; }
 
 .options-help-row {
   padding: 15px;
@@ -2779,15 +2783,10 @@ i { color: @gray_60; }
   }
 }
 
-.offer-icon { margin-top: 4px; }
-.offer-icon.selected path.bg { fill: white; }
-
 .compose-offer-btn {
   float: right;
   margin-top: 4px;
 }
-
-.schedule-icon.selected path { fill: white; }
 
 .schedule-content {
   padding: 10px 0px;
@@ -2818,13 +2817,18 @@ i { color: @gray_60; }
 .select-option-letter.recommended { color: @green; }
 .select-option-letter.disabled { opacity: 0.5; }
 
-.not-offered {
+.not-created {
   padding: 20px;
   color: @gray_60;
 }
 
 
 /*** Scheduling Step 4 ***/
+
+.review-icon.active path.bg,
+.confirm-icon.active path.bg,
+.reminder-icon.active g.clock,
+.reminder-icon.active g.bells { fill: white; }
 
 .review-content {
   padding: 15px;
@@ -2863,12 +2867,11 @@ i { color: @gray_60; }
   width: 14px;
   height: 14px;
   margin-top: 3px;
+  path { fill: white; }
 }
 
 .compose-confirmation-icon.not-sent g path { fill: white; }
 .compose-confirmation-icon.sent g path { fill: @gray_60; }
-.edit-reminder-icon.not-sent path { fill: white; }
-.edit-reminder-icon.sent path { fill: @gray_20; }
 
 .compose-confirmation-text,
 .edit-reminder-text {
