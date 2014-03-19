@@ -315,7 +315,7 @@ var sched2 = (function() {
      role="dialog"
      aria-hidden="true">
   <div #dialog
-       class="modal-dialog">
+       class="modal-dialog composition-modal">
 
     <div #content
          class="modal-content">
@@ -355,11 +355,6 @@ var sched2 = (function() {
         </div>
         <div #footer
              class="modal-send-footer clearfix">
-          <button #send
-                  type="button" class="btn btn-primary"
-                  style="float:left">
-            Send
-          </button>
           <div #showEndTimeOption
                class="show-end-time-option checkbox-selected">
             <div #showEndTimeCheckboxContainer
@@ -367,6 +362,16 @@ var sched2 = (function() {
             <div #showEndTimeText
                  class="show-end-time-text"/>
           </div>
+          <button #send
+                  type="button" class="btn btn-primary"
+                  style="float:right">
+            Send
+          </button>
+          <button #saveDraft
+                  type="button" class="btn btn-default disabled"
+                  style="float:right">
+            Save draft
+          </button>
         </div>
       </div>
     </div>
