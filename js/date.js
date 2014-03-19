@@ -14,7 +14,7 @@ var date = (function() {
      Bad:  "2014-09-23T19:38:51.683"
   */
   mod.ofString = function(s) {
-    if (util.isNonEmptyString(s))
+    if (util.isNumber(s) || util.isNonEmptyString(s))
       return new Date(s);
     else
       return null;
@@ -27,18 +27,6 @@ var date = (function() {
 
   mod.now = function() {
     return Date.now();
-  };
-
-  mod.nowUTC = function() {
-    var x = new Date();
-    return Date.UTC(
-      x.getFullYear(),
-      x.getMonth(),
-      x.getDate(),
-      x.getHours(),
-      x.getMinutes(),
-      x.getSeconds()
-    );
   };
 
   mod.year = function(d) {
