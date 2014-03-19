@@ -22,6 +22,10 @@ var util = (function () {
     return typeof x === "string";
   };
 
+  mod.isNumber = function(x) {
+    return typeof x === "number";
+  };
+
   mod.isNonEmptyString = function(x) {
     return mod.isString(x) && x.length > 0;
   };
