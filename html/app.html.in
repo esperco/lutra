@@ -87,7 +87,7 @@
           <div class="nav-text">Archive</div>
         </a>
       </li>
-      <div class="nav-divider-line unselectable">
+      <div class="nav-divider-line unselectable hide">
         <span class='nav-section-title'>NETWORK</span>
       </div>
       <li>
@@ -97,7 +97,7 @@
         </a>
       </li>
       <li>
-        <a href="#place-list" class="nav-block place-nav" data-toggle="pill">
+        <a href="#place-list" class="nav-block place-nav hide" data-toggle="pill">
           <img id="places-icon" class="svg" src="/assets/img/places.svg">
           <div class="nav-text">Places</div>
         </a>
@@ -161,7 +161,7 @@
               <div class="nav-text">Archive</div>
             </a>
           </li>
-          <div class="nav-divider-line unselectable">
+          <div class="nav-divider-line unselectable hide">
             <span class='nav-section-title'>NETWORK</span>
           </div>
           <li>
@@ -171,7 +171,7 @@
             </a>
           </li>
           <li>
-            <a href="#place-list" class="nav-block place-nav">
+            <a href="#place-list" class="nav-block place-nav hide">
               <img id="places-icon" class="svg" src="/assets/img/places.svg">
               <div class="nav-text">Places</div>
             </a>
