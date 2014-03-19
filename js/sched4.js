@@ -166,9 +166,11 @@ var sched4 = (function() {
       });
   }
 
+  // TODO FIXME
   function eventTimeHasPassed(task) {
+    // TODO This is wrong, we need startTime in UTC, like now
     var startTime = date.ofString(getSlot(task).start);
-    var now = date.ofString(date.nowUTC());
+    var now = date.ofString(date.now());
     return startTime.getTime() < now.getTime();
   }
 
@@ -242,9 +244,13 @@ var sched4 = (function() {
       return sentReminder(ta, uid) ?
         "Reminder sent on " + date.justStartTime(startTime) :
         "Will receive a reminder on " + date.justStartTime(startTime);
-    } else if (eventTimeHasPassed(ta)) {
-      return "Did not receive a reminder";
-    } else {
+    }
+    /* TODO Needs timezone fix
+       else if (eventTimeHasPassed(ta)) {
+         return "Did not receive a reminder";
+       }
+    */
+    else {
       return "Not scheduled to receive a reminder";
     }
   }
@@ -292,9 +298,11 @@ var sched4 = (function() {
     var options = sched.getGuestOptions(ta)[uid];
 
     // Allow editing reminders only if event time is not already past
+    /* TODO Needs timezone fix
     if (eventTimeHasPassed(ta)) {
       edit.addClass("disabled");
     }
+    */
 
     edit.click(function() {
       preFillReminderModal(profs, ta, options, uid);
@@ -332,14 +340,19 @@ var sched4 = (function() {
        Is task starting time minus duration (seconds) in the past?
        If so, disable the option to use that duration for reminders.
     */
+    // TODO FIXME
     function disableIfPast(duration) {
+      // This is wrong, startTime needs to be in UTC
+      /*
       var startTime = date.ofString(getSlot(task).start);
       startTime.setTime(startTime.getTime() - (duration * 1000));
-      var now = date.ofString(date.nowUTC());
+      var now = date.ofString(date.now());
       if (startTime.getTime() < now.getTime())
         return "disabled";
       else
         return null;
+      */
+      return null;
     }
 
     var hrb4 = " hours beforehand";
@@ -432,9 +445,11 @@ var sched4 = (function() {
     scheduler.append(schedulerView);
 
     // Allow sending reminders only if event time is not already past
+    /* TODO Needs timezone fix
     if (eventTimeHasPassed(task)) {
       schedulerView.find("button").addClass("disabled");
     }
+    */
 
     return _view;
   }
