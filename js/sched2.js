@@ -226,7 +226,6 @@ var sched2 = (function() {
 
     function onSelect(x) {
       selected = x;
-      log(selected);
       next.removeClass("disabled");
     }
 
@@ -626,17 +625,15 @@ var sched2 = (function() {
 
   /*
     If the meeting type does not require a location, the timezone can
-    be changed by clicking on it, prompting the using for a location.
+    be changed by clicking on it, prompting the user for a location.
     Otherwise the timezone is determined by the location of the meeting.
    */
   function setupTimezoneLink(form, locationForm, slot) {
-    log("setupTimezoneLink", slot);
     function displayTimezone(loc) {
       if (util.isDefined(loc))
         timezoneText.text(timezone.format(loc.timezone));
     }
     function setTimezone(oldTz, newTz) {
-      log("setTimezone", newTz);
       var loc = { timezone: newTz };
       slot.location = loc;
       displayTimezone(loc);
@@ -679,6 +676,8 @@ var sched2 = (function() {
         .text("Add notes");
     }
     displayTimezone(slot.location);
+    if (util.isDefined(locationForm))
+      locationForm.setLocationNoCallback(slot.location);
   }
 
   function adaptToMeetingType(form, locationForm, slot) {
@@ -912,7 +911,6 @@ var sched2 = (function() {
     }
 
     function onTimezoneChange(oldTimezone, newTimezone) {
-      log("onTimezoneChange", oldTimezone, newTimezone);
       displayTimezone();
       if (util.isNonEmptyString(oldTimezone)
           && util.isNonEmptyString(newTimezone))
@@ -921,7 +919,6 @@ var sched2 = (function() {
     }
 
     function onLocationSet(newLoc) {
-      log("onLocationSet", newLoc);
       x.location = newLoc;
       if (util.isDefined(newLoc)) {
         displayTimezone();
@@ -983,7 +980,6 @@ var sched2 = (function() {
       else
         loc = locationForm.getCompleteLocation();
 
-      log("getCalOption:", meetingType, loc, dates);
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
           && hasDates()) {
