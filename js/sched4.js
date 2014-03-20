@@ -856,19 +856,22 @@ var sched4 = (function() {
       }
     }
 
+    function goBackToStep2() {
+      task.task_status.task_progress = "Coordinating";
+      state.scheduling_stage = "Coordinate";
+      state.calendar_options = [];
+      delete state.reserved;
+    }
+
     var editMode = createEditMode(profs, task, summary, toggleEditMode)
       .appendTo(content);
 
     function rescheduleClick() {
       spinner.spin("Removing from calendar...");
       api.cancelCalendar(tid).done(function() {
-        task.task_status.task_progress = "Coordinating";
-        state.scheduling_stage = "Coordinate";
-        state.calendar_options = [];
-        delete state.reserved;
+        goBackToStep2();
         api.postTask(task).done(function() {
           spinner.stop();
-          observable.onTaskModified.notify(task);
           sched.loadTask(task);
         });
       });
@@ -877,13 +880,11 @@ var sched4 = (function() {
     function cancelAndArchiveClick() {
       spinner.spin("Removing from calendar...");
       api.cancelCalendar(tid).done(function() {
-        task.task_status.task_progress = "Closed";
-        delete state.reserved;
+        goBackToStep2();
         api.postTask(task).done(function() {
           api.archiveTask(tid);
           spinner.stop();
-          observable.onTaskArchived.notify(tid);
-          page.home.load();
+          window.location.hash = "#!";
         });
       });
     }
