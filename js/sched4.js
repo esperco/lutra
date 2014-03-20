@@ -166,12 +166,13 @@ var sched4 = (function() {
       });
   }
 
-  // TODO FIXME
   function eventTimeHasPassed(task) {
-    // TODO This is wrong, we need startTime in UTC, like now
-    var startTime = date.ofString(getSlot(task).start);
-    var now = date.ofString(date.now());
-    return startTime.getTime() < now.getTime();
+    var slot = getSlot(task);
+    var startTimeLocal = date.ofString(slot.start);
+    var tz = slot.location.timezone;
+    var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
+    var nowUTC = date.ofString(date.now());
+    return startTimeUTC.getTime() < nowUTC.getTime();
   }
 
   function preFillReminderModal(profs, ta, options, toUid) {
@@ -237,20 +238,20 @@ var sched4 = (function() {
   }
 
   function getReminderStatus(ta, uid) {
-    var startTime = date.ofString(getSlot(ta).start);
+    var slot = getSlot(ta);
+    var startTimeLocal = date.ofString(slot.start);
+    var tz = slot.location.timezone;
+    var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
     var beforeSecs = sched.getState(ta).reserved.remind;
     if (util.isNotNull(beforeSecs)) {
-      startTime.setTime(startTime.getTime() - (beforeSecs * 1000));
+      startTimeLocal.setTime(startTimeLocal.getTime() - (beforeSecs * 1000));
+      startTimeUTC.setTime(startTimeUTC.getTime() - (beforeSecs * 1000));
       return sentReminder(ta, uid) ?
-        "Reminder sent on " + date.justStartTime(startTime) :
-        "Will receive a reminder on " + date.justStartTime(startTime);
-    }
-    /* TODO Needs timezone fix
-       else if (eventTimeHasPassed(ta)) {
-         return "Did not receive a reminder";
-       }
-    */
-    else {
+        "Reminder sent on " + date.justStartTime(startTimeLocal) :
+        "Will receive a reminder on " + date.justStartTime(startTimeLocal);
+    } else if (eventTimeHasPassed(ta)) {
+      return "Did not receive a reminder";
+    } else {
       return "Not scheduled to receive a reminder";
     }
   }
@@ -295,11 +296,9 @@ var sched4 = (function() {
     var options = sched.getGuestOptions(ta)[uid];
 
     // Allow editing reminders only if event time is not already past
-    /* TODO Needs timezone fix
     if (eventTimeHasPassed(ta)) {
       edit.addClass("hide");
     }
-    */
 
     edit.click(function() {
       preFillReminderModal(profs, ta, options, uid);
@@ -337,19 +336,17 @@ var sched4 = (function() {
        Is task starting time minus duration (seconds) in the past?
        If so, disable the option to use that duration for reminders.
     */
-    // TODO FIXME
     function disableIfPast(duration) {
-      // This is wrong, startTime needs to be in UTC
-      /*
-      var startTime = date.ofString(getSlot(task).start);
-      startTime.setTime(startTime.getTime() - (duration * 1000));
-      var now = date.ofString(date.now());
-      if (startTime.getTime() < now.getTime())
+      var slot = getSlot(task);
+      var startTimeLocal = date.ofString(getSlot(task).start);
+      var tz = slot.location.timezone;
+      var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
+      startTimeUTC.setTime(startTimeUTC.getTime() - (duration * 1000));
+      var nowUTC = date.ofString(date.now());
+      if (startTimeUTC.getTime() < nowUTC.getTime())
         return "disabled";
       else
         return null;
-      */
-      return null;
     }
 
     var hrb4 = " hours beforehand";
