@@ -388,11 +388,11 @@ var sched2 = (function() {
   </div>
 </div>
 '''
-    var close = $("<img class='svg'/>")
+    var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
 
-    var showEndTimeCheckbox = $("<img class='svg'/>")
+    var showEndTimeCheckbox = $("<img class='svg-block'/>")
       .appendTo(showEndTimeCheckboxContainer);
     svg.loadImg(showEndTimeCheckbox, "/assets/img/checkbox-sm.svg");
 

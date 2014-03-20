@@ -832,7 +832,7 @@ var sched4 = (function() {
        class="connector collapsed"/>
 </div>
 '''
-    var headerIcon = $("<img class='svg'/>")
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/calendar.svg");
 
@@ -841,7 +841,7 @@ var sched4 = (function() {
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
 
-    var connectorIcon = $("<img class='svg'/>")
+    var connectorIcon = $("<img class='svg-block'/>")
       .appendTo(connector);
     svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
