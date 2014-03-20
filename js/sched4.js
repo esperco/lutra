@@ -22,52 +22,31 @@ var sched4 = (function() {
       util.isDefined(state.reserved.google_event);
   }
 
-  function loadRecipientRow(x, toObsProf) {
-    var recipientName = $("<div class='recipient-name' />")
-      .append(profile.fullName(toObsProf.prof))
-      .appendTo(x);
+  function eventTimeHasPassed(task) {
+    var slot = getSlot(task);
+    var startTimeLocal = date.ofString(slot.start);
+    var tz = slot.location.timezone;
+    var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
+    var nowUTC = date.ofString(date.now());
+    return startTimeUTC.getTime() < nowUTC.getTime();
   }
 
-  function loadReminderRecipients(toObsProf) {
-    $("#sched-reminder-to-list").children().remove();
 
-    var recipientRow = $("<div class='sched-reminder-to checkbox-selected'/>")
-      .appendTo($("#sched-reminder-to-list"));
+  /* REMINDERS */
 
-    loadRecipientRow(recipientRow, toObsProf);
-  }
-
-  function loadConfirmRecipients(toObsProf) {
-    $("#sched-confirm-to-list").children().remove();
-
-    var recipientRow = $("<div class='sched-confirm-to checkbox-selected'/>")
-      .appendTo($("#sched-confirm-to-list"));
-
-    loadRecipientRow(recipientRow, toObsProf);
-  }
-
-  function refreshConfirmationMessage(tid, parameters, slot) {
-    if ($("#sched-confirm-guest-addr").val() === "Address_directly") {
-      if (slot.meeting_type === "Call") {
-        parameters.template_kind = "Phone_confirmation_to_guest";
-      } else {
-        parameters.template_kind = "Confirmation_to_guest";
-      }
-    } else {
-      if (slot.meeting_type === "Call") {
-        parameters.template_kind = "Phone_confirmation_to_guest_assistant";
-      } else {
-        parameters.template_kind = "Confirmation_to_guest_assistant";
-      }
-    }
-    api.getConfirmationMessage(tid, parameters)
-      .done(function(x) {
-        $("#sched-confirm-message").val(x.message_text);
+  function closeReminderModal(reminderModal, ta, options, uid) {
+    var state = sched.getState(ta);
+    options.reminder_message = reminderModal.messageEditable.val();
+    state.participant_options =
+      list.replace(state.participant_options, options, function(x) {
+        return x.uid === options.uid;
       });
+    api.postTask(ta);
+    reminderModal.view.modal("hide");
   }
 
-  function refreshReminderMessage(tid, parameters, slot) {
-    if ($("#sched-reminder-guest-addr").val() === "Address_directly") {
+  function refreshReminderMessage(reminderModal, tid, parameters, slot) {
+    if (reminderModal.addressTo.val() === "Address_directly") {
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_reminder_to_guest";
       } else {
@@ -82,79 +61,145 @@ var sched4 = (function() {
     }
     api.getReminderMessage(tid, parameters)
       .done(function(x) {
-        $("#sched-reminder-message").val(x.message_text);
+        reminderModal.messageEditable
+          .val(x.message_text)
+          .trigger("autosize.resize");
       });
   }
 
-  function eventTimeHasPassed(task) {
-    var slot = getSlot(task);
-    var startTimeLocal = date.ofString(slot.start);
-    var tz = slot.location.timezone;
-    var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
-    var nowUTC = date.ofString(date.now());
-    return startTimeUTC.getTime() < nowUTC.getTime();
+  function createReminderModal() {
+'''
+<div #view
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+  <div #dialog
+       class="modal-dialog composition-modal">
+    <div #content
+         class="modal-content composition-modal">
+      <div class="modal-header">
+        <img class="svg svg-block"
+             style="float:left"
+             src="/assets/img/reminder.svg"/>
+        <div #closeContainer
+             class="modal-close"
+             data-dismiss="modal"/>
+        <div #title
+            class="modal-title">
+          Edit the reminder message.
+        </div>
+      </div>
+      <div class="email-info-box">
+        <div class="email-info-row">
+          <div class="email-info-label">TO</div>
+          <div class="email-info ellipsis bold">
+            <div #recipient
+                 class="recipient-name"/>
+            <select #addressTo>
+              <option value="Address_directly">Address directly</option>
+              <option value="Address_to_assistant">Address assistant</option>
+            </select>
+            <select #meetingKind
+                    class="hide">
+              <option value="">Meeting</option>
+              <option value="Phone_meeting">Phone Call</option>
+            </select>
+          </div>
+        </div>
+        <div class="email-info-row">
+          <div class="email-info-label">SUBJECT</div>
+          <div #subject
+               class="email-info ellipsis"/>
+        </div>
+      </div>
+    </div>
+    <div #composeBox
+         class="modal-compose-box scrollable">
+      <textarea #messageEditable
+                class="compose-text"/>
+      <div #messageReadOnly
+           class="compose-read-only"/>
+    </div>
+    <div #footer
+         class="modal-footer clearfix">
+      <button #save
+              type="button" class="btn btn-primary"
+              style="float:right">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    var close = $("<img class='svg-block'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/x.svg");
+
+    messageEditable.autosize();
+
+    return _view;
   }
 
-  function preFillReminderModal(profs, ta, options, toUid) {
+  function editReminderEmail(profs, ta, options, toUid) {
+    var reminderModal = createReminderModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
-    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
+    var toName = profile.fullName(profs[toUid].prof);
     var slot = getSlot(ta);
 
-    loadReminderRecipients(toObsProf);
-
-    $("#sched-reminder-subject")
-      .val("Re: " + ta.task_status.task_title);
-
-    if (options.reminder_message) {
-      $("#sched-reminder-message").val(options.reminder_message);
-    }
+    reminderModal.recipient.text(toName);
+    reminderModal.subject.text("Re: " + ta.task_status.task_title);
 
     var parameters = {
-      guest_name: profile.fullName(profs[toUid].prof),
+      guest_name: toName,
       guest_uid: toUid
     };
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
+
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
-      $("#sched-reminder-guest-addr").val("Address_to_assistant");
+      reminderModal.addressTo.val("Address_to_assistant");
+      reminderModal.addressTo.removeClass("hide");
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_reminder_to_guest_assistant";
       } else {
         parameters.template_kind = "Reminder_to_guest_assistant";
       }
     } else {
-      $("#sched-reminder-guest-addr").val("Address_directly");
+      reminderModal.addressTo.val("Address_directly");
+      reminderModal.addressTo.addClass("hide");
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_reminder_to_guest";
       } else {
         parameters.template_kind = "Reminder_to_guest";
       }
     }
+
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
         if (! options.reminder_message) {
-          $("#sched-reminder-message").val(x.message_text);
+          reminderModal.messageEditable
+            .val(x.message_text)
+            .trigger("autosize.resize");
+        } else {
+          reminderModal.messageEditable
+            .val(options.reminder_message)
+            .trigger("autosize.resize");
         }
-        $("#sched-reminder-guest-addr")
+        reminderModal.addressTo
           .unbind("change")
           .change(function() {
-            refreshReminderMessage(ta.tid, parameters, slot);
+            refreshReminderMessage(reminderModal, ta.tid, parameters, slot);
           });
       });
-  }
 
-
-  /* REMINDERS */
-
-  function closeReminderModal(ta, options, uid, reminderModal) {
-    var state = sched.getState(ta);
-    options.reminder_message = $("#sched-reminder-message").val();
-    state.participant_options =
-      list.replace(state.participant_options, options, function(x) {
-        return x.uid === options.uid;
+    var saveButton = reminderModal.save;
+    saveButton
+      .off("click")
+      .click(function() {
+        closeReminderModal(reminderModal, ta, options, toUid);
       });
-    api.postTask(ta);
-    reminderModal.modal("hide");
+
+    reminderModal.view.modal({});
   }
 
   function getReminderStatus(ta, uid) {
@@ -221,16 +266,7 @@ var sched4 = (function() {
     }
 
     edit.click(function() {
-      preFillReminderModal(profs, ta, options, uid);
-
-      var okButton = $("#sched-reminder-update");
-      okButton
-        .off("click")
-        .click(function() {
-          closeReminderModal(ta, options, uid, reminderModal)
-        });
-
-      reminderModal.modal({});
+      editReminderEmail(profs, ta, options, uid);
     });
 
     return { row: view, statusText: guestStatus };
@@ -368,6 +404,26 @@ var sched4 = (function() {
 
   /* CONFIRMATION */
 
+  function refreshConfirmationMessage(confirmModal, tid, parameters, slot) {
+    if (confirmModal.addressTo.val() === "Address_directly") {
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest";
+      }
+    } else {
+      if (slot.meeting_type === "Call") {
+        parameters.template_kind = "Phone_confirmation_to_guest_assistant";
+      } else {
+        parameters.template_kind = "Confirmation_to_guest_assistant";
+      }
+    }
+    api.getConfirmationMessage(tid, parameters)
+      .done(function(x) {
+        confirmModal.messageEditable.val(x.message_text);
+      });
+  }
+
   function createConfirmModal() {
 '''
 <div #view
@@ -418,14 +474,7 @@ var sched4 = (function() {
            class="compose-read-only"/>
     </div>
     <div #footer
-         class="modal-send-footer clearfix">
-      // <div #showEndTimeOption
-      //      class="show-end-time-option checkbox-selected">
-      //   <div #showEndTimeCheckboxContainer
-      //        class="checkbox-container"/>
-      //   <div #showEndTimeText
-      //        class="show-end-time-text"/>
-      // </div>
+         class="modal-footer clearfix">
       <button #send
               type="button" class="btn btn-primary"
               style="float:right">
@@ -441,32 +490,12 @@ var sched4 = (function() {
 
     messageEditable.autosize();
 
-    var showEndTimeCheckbox = $("<img class='svg-block'/>")
-      .appendTo(showEndTimeCheckboxContainer);
-    svg.loadImg(showEndTimeCheckbox, "/assets/img/checkbox-sm.svg");
-
-    // showEndTimeOption
-    //   .off("click")
-    //   .click(function() {
-    //     if (showEndTimeOption.hasClass("checkbox-selected")) {
-    //       showEndTimeOption.removeClass("checkbox-selected");
-    //       messageReadOnly.addClass("short");
-    //       hideEndTime();
-    //     } else {
-    //       showEndTimeOption.addClass("checkbox-selected");
-    //       messageReadOnly.removeClass("short");
-    //       showEndTime();
-    //     }
-    //   });
-
     return _view;
   }
 
   function composeConfirmEmail(profs, ta, toUid) {
     var confirmModal = createConfirmModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
-    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
-    var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
     var slot = getSlot(ta);
@@ -502,6 +531,7 @@ var sched4 = (function() {
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       confirmModal.addressTo.val("Address_to_assistant");
+      confirmModal.addressTo.removeClass("hide");
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_confirmation_to_guest_assistant";
       } else {
@@ -509,6 +539,7 @@ var sched4 = (function() {
       }
     } else {
       confirmModal.addressTo.val("Address_directly");
+      confirmModal.addressTo.addClass("hide");
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_confirmation_to_guest";
       } else {
@@ -520,11 +551,11 @@ var sched4 = (function() {
       .done(function(confirmationMessage) {
         confirmModal.messageEditable
           .val(confirmationMessage.message_text)
-          .trigger("autosize.resize");;
+          .trigger("autosize.resize");
         confirmModal.addressTo
           .unbind("change")
           .change(function() {
-            refreshConfirmationMessage(ta.tid, parameters, slot);
+            refreshConfirmationMessage(confirmModal, ta.tid, parameters, slot);
           });
       });
 

@@ -310,7 +310,7 @@ var sched2 = (function() {
            class="compose-read-only"/>
     </div>
     <div #footer
-         class="modal-send-footer clearfix">
+         class="modal-footer clearfix">
       <div #showEndTimeOption
            class="show-end-time-option checkbox-selected">
         <div #showEndTimeCheckboxContainer
