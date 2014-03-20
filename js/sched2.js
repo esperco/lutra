@@ -1318,6 +1318,29 @@ var sched2 = (function() {
       schedule.module.removeClass("disabled");
     }
 
+    function sentAnyOffer() {
+      return list.exists(ta.task_chat_items, function(x) {
+        return variant.cons(x.chat_item_data) === "Scheduling_q";
+      });
+    }
+
+    function receivedAllPreferences() {
+      return list.for_all(sched.getAttendingGuests(ta), function(uid) {
+        return list.exists(ta.task_chat_items, function(x) {
+          return x.by === uid
+              && variant.cons(x.chat_item_data) === "Scheduling_r";
+        });
+      });
+    }
+
+    if (receivedAllPreferences()) {
+      options.content.hide();
+      toggleModule(schedule, "schedule");
+    } else if (sentAnyOffer()) {
+      options.content.hide();
+      toggleModule(offer, "offer");
+    }
+
     view
       .append($("<h3>Find the best meeting option.</h3>"))
       .append(options.view)
