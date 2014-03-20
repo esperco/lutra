@@ -12,6 +12,16 @@
 var locpicker = (function() {
   var mod = {};
 
+  function toggleForm(form) {
+    if (form.locationSearch.hasClass("hide")) {
+      form.locationSearch.removeClass("hide");
+      form.locationForm.addClass("hide");
+    } else {
+      form.locationSearch.addClass("hide");
+      form.locationForm.removeClass("hide");
+    }
+  }
+
   function createLocationForm(param) {
 '''
 <div #location
@@ -247,8 +257,7 @@ var locpicker = (function() {
                   });
                 });
               util.hideDropdown(form.dropdownToggle);
-              form.locationSearch.addClass("hide");
-              form.locationForm.removeClass("hide");
+              toggleForm(form);
             });
           return false;
         });
@@ -284,13 +293,17 @@ var locpicker = (function() {
   }
 
   function setup(form) {
+    form.locationSearch.removeClass("hide");
+    form.locationForm.addClass("hide");
+    if (getCompleteLocation(form) != null) {
+      toggleForm(form);
+    }
     util.afterTyping(form.searchBox, 250, function() {
       predictAddress(form);
     });
     form.resetLocation
       .click(function() {
-        form.locationForm.addClass("hide");
-        form.locationSearch.removeClass("hide");
+        toggleForm(form);
         clearLocation(form);
       });
   }

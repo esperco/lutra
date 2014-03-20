@@ -264,73 +264,6 @@ var sched2 = (function() {
     $(".time-at").removeClass("hide");
   }
 
-  function preFillOfferModal(offerModal, profs, task, options, toUid) {
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
-    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
-
-    var organizerName = profile.fullName(profs[login.me()].prof);
-    var hostName = profile.fullName(profs[login.leader()].prof);
-    var toName = profile.fullName(profs[toUid].prof);
-
-    var plural = options.length === 1 ? "" : "s";
-    offerModal.title.text("Offer the meeting option" + plural + ".");
-    offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
-
-    offerModal.recipient.text(toName);
-    offerModal.subject.text("Re: " + task.task_status.task_title);
-
-    var readOnly = offerModal.messageReadOnly;
-    readOnly.children().remove();
-    list.iter(options, function(calOption, i) {
-      emailViewOfOption(calOption.slot, i)
-        .appendTo(readOnly);
-    });
-    if (readOnly.hasClass("short")) {
-      hideEndTime();
-    } else {
-      showEndTime();
-    }
-
-    var parameters = {
-      exec_name: hostName,
-      guest_name: toName,
-      guest_uid: toUid
-    };
-
-    if (util.isNotNull(ea)) {
-      parameters.guest_EA = profile.fullName(profs[ea].prof);
-      parameters.template_kind = "Options_to_guest_assistant";
-      offerModal.addressTo.val("Address_to_assistant");
-      offerModal.addressTo.removeClass("hide");
-    } else {
-      parameters.template_kind = "Options_to_guest";
-      offerModal.addressTo.val("Address_directly");
-      offerModal.addressTo.addClass("hide");
-    }
-    api.getOptionsMessage(task.tid, parameters)
-      .done(function(optionsMessage) {
-        offerModal.messageEditable
-          .val(optionsMessage.message_text)
-          .trigger("autosize.resize");
-        offerModal.addressTo
-          .unbind("change")
-          .change(function(){refreshOptionsMessage(task.tid, parameters);});
-      });
-  }
-
-  /*
-     If didWeSend is true, look for the most recent chatKind TO uid
-     otherwise, look for the most recent chatKind BY (from) uid
-  */
-  function howLongAgo(ta, uid, chatKind, didWeSend) {
-    var firstMatch = list.find(ta.task_chat_items, function(x) {
-      var uidMatch = didWeSend ? list.mem(x.to, uid) : x.by === uid;
-      return uidMatch && variant.cons(x.chat_item_data) === chatKind;
-    });
-    var created = date.ofString(firstMatch.time_created);
-    return date.viewTimeAgo(created).text();
-  }
-
   function createOfferModal() {
 '''
 <div #view
@@ -343,7 +276,7 @@ var sched2 = (function() {
     <div #content
          class="modal-content composition-modal">
       <div class="modal-header">
-        <img class="offer-modal-icon svg" src="/assets/img/email.svg"/>
+        <img class="offer-modal-icon svg svg-block" src="/assets/img/email.svg"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
@@ -390,11 +323,6 @@ var sched2 = (function() {
               style="float:right">
         Send
       </button>
-      <button #saveDraft
-              type="button" class="btn btn-default hide"
-              style="float:right">
-        Save draft
-      </button>
     </div>
   </div>
 </div>
@@ -426,6 +354,113 @@ var sched2 = (function() {
     return _view;
   }
 
+  function composeEmail(profs, task, options, toUid) {
+    var offerModal = createOfferModal();
+    var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+    var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
+    var organizerName = profile.fullName(profs[login.me()].prof);
+    var hostName = profile.fullName(profs[login.leader()].prof);
+    var toName = profile.fullName(profs[toUid].prof);
+
+    var plural = options.length === 1 ? "" : "s";
+    offerModal.title.text("Offer the meeting option" + plural + ".");
+    offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
+
+    offerModal.recipient.text(toName);
+    offerModal.subject.text("Re: " + task.task_status.task_title);
+
+    var readOnly = offerModal.messageReadOnly;
+    readOnly.children().remove();
+    list.iter(options, function(calOption, i) {
+      emailViewOfOption(calOption.slot, i)
+        .appendTo(readOnly);
+    });
+    if (readOnly.hasClass("short")) {
+      hideEndTime();
+    } else {
+      showEndTime();
+    }
+
+    var parameters = {
+      exec_name: hostName,
+      guest_name: toName,
+      guest_uid: toUid
+    };
+
+    if (util.isNotNull(ea)) {
+      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      parameters.template_kind = "Options_to_guest_assistant";
+      offerModal.addressTo.val("Address_to_assistant");
+      offerModal.addressTo.removeClass("hide");
+    } else {
+      parameters.template_kind = "Options_to_guest";
+      offerModal.addressTo.val("Address_directly");
+      offerModal.addressTo.addClass("hide");
+    }
+
+    api.getOptionsMessage(task.tid, parameters)
+      .done(function(optionsMessage) {
+        offerModal.messageEditable
+          .val(optionsMessage.message_text)
+          .trigger("autosize.resize");
+        offerModal.addressTo
+          .unbind("change")
+          .change(function(){refreshOptionsMessage(task.tid, parameters);});
+      });
+
+
+    var sendButton = offerModal.send;
+    sendButton
+      .removeClass("disabled")
+      .off("click")
+      .click(function() {
+        if (! sendButton.hasClass("disabled")) {
+          spinner.spin("Sending...");
+          sendButton.addClass("disabled");
+          var body = offerModal.messageEditable.val();
+          if ("Address_to_assistant" === offerModal.addressTo.val()) {
+            var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+            if (util.isNotNull(ea)) {
+              toUid = ea;
+            }
+          }
+          var hideEnd = offerModal.messageReadOnly.hasClass("short");
+          sched.optionsForGuest(sched.getGuestOptions(task), toUid)
+            .hide_end_times = hideEnd;
+          api.postTask(task).done(function() {
+            var chatItem = {
+              tid: task.tid,
+              by: login.me(),
+              to: [toUid],
+              chat_item_data: ["Scheduling_q", {
+                body: body,
+                choices: options
+              }]
+            };
+            chat.postChatItem(chatItem).done(function() {
+              spinner.stop();
+              offerModal.view.modal("hide");
+            });
+          });
+        }
+      });
+
+    offerModal.view.modal({});
+  }
+
+  /*
+     If didWeSend is true, look for the most recent chatKind TO uid
+     otherwise, look for the most recent chatKind BY (from) uid
+  */
+  function howLongAgo(ta, uid, chatKind, didWeSend) {
+    var firstMatch = list.find(ta.task_chat_items, function(x) {
+      var uidMatch = didWeSend ? list.mem(x.to, uid) : x.by === uid;
+      return uidMatch && variant.cons(x.chat_item_data) === chatKind;
+    });
+    var created = date.ofString(firstMatch.time_created);
+    return date.viewTimeAgo(created).text();
+  }
+
   function createOfferRow(profs, task, uid) {
 '''
 <div #view
@@ -437,16 +472,6 @@ var sched2 = (function() {
     var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
-    var offerModal = createOfferModal();
-
-    function closeAvailabilityModal(item) {
-      offerModal.view.modal("hide");
-    }
-
-    function composeEmail() {
-      preFillOfferModal(offerModal, profs, task, options, uid);
-      offerModal.view.modal({});
-    }
 
     var composeIcon = $("<img class='compose-confirmation-icon'/>")
       .appendTo(compose);
@@ -487,46 +512,11 @@ var sched2 = (function() {
       .text(statusText)
       .appendTo(view);
 
-    compose.click(composeEmail);
+    compose.click(function() {
+      composeEmail(profs, task, options, uid);
+    });
 
-    var sendButton = offerModal.send;
-    sendButton
-      .removeClass("disabled")
-      .off("click")
-      .click(function() {
-        if (! sendButton.hasClass("disabled")) {
-          spinner.spin("Sending...");
-          sendButton.addClass("disabled");
-          var body = offerModal.messageEditable.val();
-          if ("Address_to_assistant" === offerModal.addressTo.val()) {
-            var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
-            if (util.isNotNull(ea)) {
-              uid = ea;
-            }
-          }
-          var hideEnd = offerModal.messageReadOnly.hasClass("short");
-          sched.optionsForGuest(sched.getGuestOptions(task), uid)
-            .hide_end_times = hideEnd;
-          api.postTask(task).done(function() {
-            var chatItem = {
-              tid: task.tid,
-              by: login.me(),
-              to: [uid],
-              chat_item_data: ["Scheduling_q", {
-                body: body,
-                choices: options
-              }]
-            };
-            chat.postChatItem(chatItem).done(function() {
-              spinner.stop();
-              closeAvailabilityModal();
-            });
-          });
-        }
-      });
-
-    return { view: view,
-             composeEmail: composeEmail };
+    return view;
   }
 
   function createOfferSection(profs, ta, guests) {
@@ -566,9 +556,7 @@ var sched2 = (function() {
     headerTitle.text(headerText);
 
     list.iter(guests, function(uid) {
-      var x = createOfferRow(profs, ta, uid);
-      x.view
-        .appendTo(content)
+      content.append(createOfferRow(profs, ta, uid));
     });
 
     return _view;

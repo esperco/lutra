@@ -168,7 +168,6 @@ var sched = (function() {
     }
   }
 
-
   function formatDates(x) {
     return sched.viewOfDates(date.ofString(x.start),
                              date.ofString(x.end));

@@ -50,6 +50,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+textarea {
+  padding: 0;
+  @media (min-width:768px) { width: 728px; }
+  @media (max-width:767px) { width: 100%; }
+}
+
 object { pointer-events: none; }
 
 li { cursor: pointer; }
@@ -1160,7 +1166,6 @@ i { color: @gray_60; }
 }
 
 .compose-text {
-  width: 100%;
   border: none;
   outline: none;
   resize: none;
@@ -2427,7 +2432,6 @@ i { color: @gray_60; }
   }
   @media (max-width: 432px) {
     width: 45px;
-    margin-left: 0;
   }
 }
 
