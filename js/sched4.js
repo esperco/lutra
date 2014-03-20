@@ -851,14 +851,17 @@ var sched4 = (function() {
       }
     }
 
+    function goBackToStep2() {
+      task.task_status.task_progress = "Coordinating";
+      state.scheduling_stage = "Coordinate";
+      state.calendar_options = [];
+      delete state.reserved;
+    }
+
     function rescheduleClick() {
       api.cancelCalendar(tid).done(function() {
-        task.task_status.task_progress = "Coordinating";
-        state.scheduling_stage = "Coordinate";
-        state.calendar_options = [];
-        delete state.reserved;
+        goBackToStep2();
         api.postTask(task).done(function() {
-          observable.onTaskModified.notify(task);
           sched.loadTask(task);
         });
       });
@@ -866,12 +869,10 @@ var sched4 = (function() {
 
     function cancelAndArchiveClick() {
       api.cancelCalendar(tid).done(function() {
-        task.task_status.task_progress = "Closed";
-        delete state.reserved;
+        goBackToStep2();
         api.postTask(task).done(function() {
           api.archiveTask(tid);
-          observable.onTaskArchived.notify(tid);
-          page.home.load();
+          window.location.hash = "#!";
         });
       });
     }
