@@ -175,13 +175,11 @@ var guestTask = function() {
     return view;
   }
 
-  function stripTimestamp(d, local) {
+  function stripTimestamp(location, d) {
     var s;
-    if (util.isNotNull(d)) {
-      // Normalize timezone to UTC.
-      s = new Date(Date.parse(d)).toISOString();
+    if (util.isNotNull(location) && util.isNotNull(location.timezone)) {
+      s = date.utcOfLocal(location.timezone, d).toISOString();
     } else {
-      // Backward compatibility, in case the *_utc fields are not available.
       // Remove the ending 'Z'. According to Util_localtime.create,
       // "the timezone suffix 'Z' is for compliance only".
       s = local.replace(/Z$/, "");
@@ -193,9 +191,9 @@ var guestTask = function() {
   }
 
   function googleCalendarURL(text1, text2, slot) {
-    var fromTime = stripTimestamp(slot.start_utc, slot.start);
+    var fromTime = stripTimestamp(slot.location, slot.start);
     var toTime = util.isNotNull(slot.end)
-               ? stripTimestamp(slot.end_utc,slot.end)
+               ? stripTimestamp(slot.location, slot.end)
                : fromTime;
     return "http://www.google.com/calendar/event?"
          + ["action=TEMPLATE",
