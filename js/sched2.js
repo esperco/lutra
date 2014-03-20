@@ -633,7 +633,7 @@ var sched2 = (function() {
     log("setupTimezoneLink", slot);
     function displayTimezone(loc) {
       if (util.isDefined(loc))
-        timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
+        timezoneText.text(timezone.format(loc.timezone));
     }
     function setTimezone(oldTz, newTz) {
       log("setTimezone", newTz);
@@ -673,7 +673,8 @@ var sched2 = (function() {
           title:
           "The time zone is automatically set based on the meeting location"
         })
-        .off("click");
+        .off("click")
+        .removeClass("link");
       form.addPublicNotes
         .text("Add notes");
     }
@@ -761,15 +762,17 @@ var sched2 = (function() {
       <div class="info-label when-label-edit">WHEN</div>
       <div class="info">
         <div class="clearfix">
-          <div #dateAndTimes
-               class="hide">
+          <div #dateAndTimes/>
+          <div>
+            <img class="timezone-icon-sm svg-block"
+                 src="/assets/img/globe.svg"/>
+            <span #timezoneText class="timezone-text"></span>
           </div>
-          <span #timezoneText class="timezone-text"></span>
           <div #timezonePicker/>
         </div>
         <span #openCalPicker
              class="open-cal-picker clearfix">
-          <img class="open-cal-picker-icon svg"
+          <img class="open-cal-picker-icon svg-block"
                src="/assets/img/cal-picker.svg"/>
           <span #calendarLinkText
                 class="open-cal-picker-text link">
@@ -868,10 +871,6 @@ var sched2 = (function() {
       dateAndTimes.children().remove();
       if (hasDates()) {
         dateAndTimes.append(sched.viewOfDates(dates.start, dates.end));
-        dateAndTimes.removeClass("hide");
-      }
-      else {
-        dateAndTimes.addClass("hide");
       }
     }
 

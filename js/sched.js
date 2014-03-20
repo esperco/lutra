@@ -168,7 +168,14 @@ var sched = (function() {
     }
   }
 
-  function viewOfDates(x) {
+
+  function formatDates(x) {
+    return sched.viewOfDates(date.ofString(x.start),
+                             date.ofString(x.end));
+  }
+
+  /* Render a range of two javascript Dates as text */
+  mod.viewOfDates = function(date1, date2) {
 '''
 <div #view>
   <div #time1/>
@@ -184,21 +191,20 @@ var sched = (function() {
   </div>
 </div>
 '''
-    var t1 = date.ofString(x.start);
     time1
-      .append(date.weekDay(t1).substring(0,3) + ", ")
-      .append(date.dateOnlyWithoutYear(t1));
+      .append(date.weekDay(date1).substring(0,3) + ", ")
+      .append(date.dateOnlyWithoutYear(date1));
 
-    start.text(wordify(date.timeOnly(t1)));
-    if (util.isNotNull(x.end)) {
-      end.text(wordify(date.timeOnly(date.ofString(x.end))));
+    start.text(wordify(date.timeOnly(date1)));
+    if (util.isNotNull(date2)) {
+      end.text(wordify(date.timeOnly(date2)));
     } else {
       at.removeClass("hide");
       to.addClass("hide");
     }
 
     return view;
-  }
+  };
 
   mod.summaryOfOption = function(slot, showLoc) {
 '''
@@ -223,7 +229,7 @@ var sched = (function() {
 </div>
 '''
     what.text(mod.formatMeetingType(slot).toUpperCase());
-    when.append(viewOfDates(slot));
+    when.append(formatDates(slot));
     if (showLoc) {
       var pin = $("<img class='pin'/>");
         pin.appendTo(pinContainer);
@@ -267,7 +273,7 @@ var sched = (function() {
 </td>
 '''
     what.text(mod.formatMeetingType(slot));
-    when.append(viewOfDates(slot));
+    when.append(formatDates(slot));
     where.append(viewOfLocationOnly(slot));
     // need to get notes for the option
     if (notes.text() != "")

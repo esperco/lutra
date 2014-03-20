@@ -2432,9 +2432,10 @@ i { color: @gray_60; }
 }
 
 .what-label-edit,
-.when-label-edit,
 .where-label-edit,
 .notes-label-edit { margin-top: 8px; }
+
+.when-label-edit { margin-top: 3px; }
 
 .info {
   margin-left: 100px;
@@ -2491,12 +2492,21 @@ i { color: @gray_60; }
 }
 .time-to-text-mobile { margin-bottom: 3px; }
 
+.timezone-icon-sm {
+  float: left;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+}
+
 .timezone-text {
   display: inline-block;
-  margin-top: 6px;
-  margin-left: 10px;
+  margin-left: 8px;
   font-size: 14px;
+  cursor: default;
 }
+
+.timezone-text.link { cursor: pointer; }
 
 #tz-picker-dialog {
   width: 400px;
@@ -2528,7 +2538,7 @@ i { color: @gray_60; }
 
 .open-cal-picker-text {
   float: left;
-  margin-left: 10px;
+  margin-left: 8px;
   font-size: 14px;
 }
 
