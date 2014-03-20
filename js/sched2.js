@@ -5,10 +5,19 @@
 var sched2 = (function() {
   var mod = {};
 
-  function saveAndReload(ta) {
+  function saveAndReload(ta, action) {
     disableNextButton();
-    api.postTask(ta)
-      .done(function(task) { sched.loadTask(task); });
+    if (action === "adding") {
+      spinner.spin("Adding to calendar...");
+    } else if (action === "removing") {
+      spinner.spin("Removing from calendar...");
+    } else {
+      spinner.spin("Updating calendar...");
+    }
+    api.postTask(ta).done(function(task) {
+      spinner.stop();
+      sched.loadTask(task);
+    });
   }
 
   function disableNextButton() {
@@ -69,18 +78,19 @@ var sched2 = (function() {
   }
 
   function updateTask(ta, calOption) {
+    spinner.spin("Updating calendar...");
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
     updateTaskState(state, calOption);
-    api.postTask(ta)
-      .done(function(ta) {
-        reserveCalendar(ta.tid)
-          .done(function(eventInfo) {
-            api.getTask(ta.tid)
-              .done(sched.loadTask);
-          });
+    api.postTask(ta).done(function(ta) {
+      reserveCalendar(ta.tid).done(function(eventInfo) {
+        api.getTask(ta.tid).done(function(ta) {
+          spinner.stop();
+          sched.loadTask(ta);
+        });
       });
+    });
   }
 
   function createScheduleSection(ta) {
@@ -472,6 +482,7 @@ var sched2 = (function() {
       .off("click")
       .click(function() {
         if (! sendButton.hasClass("disabled")) {
+          spinner.spin("Sending...");
           sendButton.addClass("disabled");
           var body = offerModal.messageEditable.val();
           if ("Address_to_assistant" === offerModal.addressTo.val()) {
@@ -493,8 +504,10 @@ var sched2 = (function() {
                 choices: options
               }]
             };
-            chat.postChatItem(chatItem)
-              .done(closeAvailabilityModal);
+            chat.postChatItem(chatItem).done(function() {
+              spinner.stop();
+              closeAvailabilityModal();
+            });
           });
         }
       });
@@ -992,17 +1005,22 @@ var sched2 = (function() {
         saveButton.addClass("disabled");
     }
 
-    function saveMe() {
+    function saveMe(action) {
       saveButton.addClass("disabled");
-      saveCalOption(getCalOption());
+      saveCalOption(getCalOption(), action);
     }
 
+    var action;
     if (addMode) {
       saveButton.text("Add to calendar");
+      action = "adding";
     } else {
       saveButton.text("Update calendar");
+      action = "updating";
     }
-    saveButton.click(saveMe);
+    saveButton.click(function() {
+      saveMe(action);
+    })
     updateSaveButton();
 
     editActions.append(cancel);
@@ -1021,7 +1039,7 @@ var sched2 = (function() {
                                 saveCalOption, cancel, addMode);
   }
 
-  function saveOption(ta, calOption) {
+  function saveOption(ta, calOption, action) {
     var schedState = sched.getState(ta);
     var label = calOption.label;
     var options = schedState.calendar_options;
@@ -1033,7 +1051,7 @@ var sched2 = (function() {
     }
     else
       options.push(calOption);
-    saveAndReload(ta);
+    saveAndReload(ta, action);
   }
 
   function removeOption(ta, calOptionLabel) {
@@ -1042,7 +1060,7 @@ var sched2 = (function() {
       list.filter(schedState.calendar_options, function(x) {
         return x.label !== calOptionLabel;
       });
-    saveAndReload(ta);
+    saveAndReload(ta, "removing");
   }
 
   function readOnlyViewOfOption(calOption, toggleEdit, remove) {
@@ -1157,7 +1175,7 @@ var sched2 = (function() {
   }
 
   function loadMeetingOptions(v, tzList, profs, ta, connector) {
-    function save(calOption) { return saveOption(ta, calOption); }
+    function save(calOption, action) { return saveOption(ta, calOption, action); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
