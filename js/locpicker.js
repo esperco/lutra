@@ -126,7 +126,7 @@ var locpicker = (function() {
       return null;
   }
 
-  function setLocation(form, loc) {
+  function setLocationNoCallback(form, loc) {
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
@@ -139,7 +139,10 @@ var locpicker = (function() {
 
     if (oldTimezone !== newTimezone)
       form.onTimezoneChange(oldTimezone, newTimezone);
+  }
 
+  function setLocation(form, loc) {
+    setLocationNoCallback(form, loc);
     form.onLocationSet(loc);
   }
 
@@ -321,7 +324,11 @@ var locpicker = (function() {
       /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
       getTimezoneLocation: (function () { return getTimezoneLocation(form); }),
-      setLocation: (function(loc) { return setLocation(form, loc); })
+      setLocation: (function(loc) { return setLocation(form, loc); }),
+
+      /* terrible hack to work around circular dependencies */
+      setLocationNoCallback:
+        (function(loc) { return setLocationNoCallback(form, loc); })
     };
   }
 
