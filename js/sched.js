@@ -120,72 +120,6 @@ var sched = (function() {
       return "";
   }
 
-  /* Render a range of two javascript Dates as text */
-  mod.viewOfDates = function(date1, date2) {
-    var fromTime = wordify(date.timeOnly(date1));
-    var toTime = wordify(date.timeOnly(date2));
-
-    var view = $("<div/>");
-
-    var row1 = $("<div class='date-text'/>")
-      .text(date.dateOnly(date1))
-      .appendTo(view);
-
-    var row2 = $("<div class='time-text'/>")
-      .append(html.text("from "))
-      .append($("<b>").text(fromTime))
-      .append(html.text(" to "))
-      .append($("<b>").text(toTime))
-      .appendTo(view);
-
-    return view;
-  };
-
-  mod.viewOfSuggestion = function(x, score) {
-    var view = $("<div class='sug-details'/>");
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    var row1 = $("<div class='day-text'/>")
-      .text(date.weekDay(t1) + " ")
-      .appendTo(view);
-
-    if (score >= 0.75) {
-      $("<span style='color:#ff0'/>")
-        .addClass("glyphicon glyphicon-star")
-        .appendTo(row1);
-    }
-
-    var row2 = $("<div class='date-text'/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    mod.viewOfDates(t1, t2)
-      .appendTo(view);
-
-    var row4 = $("<div class='time-text-short hide'/>")
-      .append(html.text("at "))
-      .append($("<b>").text(date.timeOnly(t1)))
-      .appendTo(view);
-
-    var locText = mod.locationText(x.location);
-    var locDiv = $("<div class='loc-text'/>");
-    var pin = $("<img class='pin'/>");
-      pin.appendTo(locDiv);
-    svg.loadImg(pin, "/assets/img/pin.svg");
-    if (util.isNonEmptyString(locText)) {
-      locDiv.append(html.text(locText))
-            .appendTo(view);
-    } else {
-      locDiv.append(" TBD")
-            .addClass("tbd")
-            .appendTo(view);
-    }
-
-    return view;
-  }
-
   /*
     Get meeting type for a confirmed event and perform some translation
     for display purposes.
@@ -234,72 +168,117 @@ var sched = (function() {
     }
   }
 
-  function viewOfTimeOnly(x) {
-    var view = $("<div/>");
-    var time1 = $("<div/>")
-      .appendTo(view);
-    var time2 = $("<div class='start-end'/>")
-      .appendTo(view);
-
-    var t1 = date.ofString(x.start);
-    time1
-      .append(date.weekDay(t1) + ", ")
-      .append(date.dateOnly(t1))
-
-    var fromTime = wordify(date.timeOnly(t1));
-    if (util.isNotNull(x.end)) {
-      var toTime = wordify(date.timeOnly(date.ofString(x.end)));
-      time2.append(fromTime + " to " + toTime);
-    } else {
-      time2.append("at " + fromTime);
-    }
-
-    return view;
+  function formatDates(x) {
+    return sched.viewOfDates(date.ofString(x.start),
+                             date.ofString(x.end));
   }
 
-  mod.viewOfOption = function(option, hideEndTime) {
-    var view = $("<td class='option-info'/>");
-    var slot = option.slot;
+  /* Render a range of two javascript Dates as text */
+  mod.viewOfDates = function(date1, date2) {
+'''
+<div #view>
+  <div #time1/>
+  <div #time2>
+    <span #at
+          class="time-at hide"> at </span>
+    <span #start
+          class="bold"/>
+    <span #to
+          class="time-to"> to </span>
+    <span #end
+          class="time-end bold"/>
+  </div>
+</div>
+'''
+    time1
+      .append(date.weekDay(date1).substring(0,3) + ", ")
+      .append(date.dateOnlyWithoutYear(date1));
 
-    var what = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whatLabel = $("<div class='info-label'/>")
-      .text("WHAT")
-      .appendTo(what);
-    var meetingType = $("<div class='info'/>")
-      .text(mod.formatMeetingType(slot))
-      .appendTo(what);
-
-    var when = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whenLabel = $("<div class='info-label'/>")
-      .text("WHEN")
-      .appendTo(when);
-    var time = viewOfTimeOnly(slot, hideEndTime)
-      .addClass("info")
-      .appendTo(when);
-
-    var where = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whereLabel = $("<div class='info-label'/>")
-      .text("WHERE")
-      .appendTo(where);
-    var loc = viewOfLocationOnly(slot)
-      .addClass("info link")
-      .appendTo(where);
-
-    var notes = $("<div class='info-row hide'/>")
-      .appendTo(view);
-    var notesLabel = $("<div class='info-label'/>")
-      .text("NOTES")
-      .appendTo(notes);
-    var notesText = $("<div class='info'/>")
-      .appendTo(notes);
-    if (notesText.text() != "") {
-      notes.removeClass("hide");
+    start.text(wordify(date.timeOnly(date1)));
+    if (util.isNotNull(date2)) {
+      end.text(wordify(date.timeOnly(date2)));
+    } else {
+      at.removeClass("hide");
+      to.addClass("hide");
     }
 
     return view;
+  };
+
+  mod.summaryOfOption = function(slot, showLoc) {
+'''
+<div #view>
+  <div class="info-row">
+    <div #what
+         class="summary-type"/>
+  </div>
+  <div class="info-row">
+    <div #when/>
+  </div>
+  <div #whereRow
+       class="info-row">
+    <div #pinContainer/>
+    <div #where
+         class="link"/>
+  </div>
+  <div #notesRow
+       class="info-row hide">
+    <div #notes/>
+  </div>
+</div>
+'''
+    what.text(mod.formatMeetingType(slot).toUpperCase());
+    when.append(formatDates(slot));
+    if (showLoc) {
+      var pin = $("<img class='pin'/>");
+        pin.appendTo(pinContainer);
+      svg.loadImg(pin, "/assets/img/pin.svg");
+    } else {
+      whereRow.addClass("hide");
+    }
+    where.append(viewOfLocationOnly(slot));
+    // need to get notes for the option
+    if (notes.text() != "")
+      notesRow.removeClass("hide");
+
+    return _view;
+  }
+
+  mod.viewOfOption = function(slot) {
+'''
+<td #view
+    class="option-info">
+  <div class="info-row">
+    <div class="info-label">WHAT</div>
+    <div #what
+         class="info"/>
+  </div>
+  <div class="info-row">
+    <div class="info-label">WHEN</div>
+    <div #when
+         class="info"/>
+  </div>
+  <div class="info-row">
+    <div class="info-label">WHERE</div>
+    <div #where
+         class="info link"/>
+  </div>
+  <div #notesRow
+       class="info-row hide">
+    <div class="info-label">NOTES</div>
+    <div #notes
+         class="info"/>
+  </div>
+</td>
+'''
+    what.text(mod.formatMeetingType(slot));
+    when.append(formatDates(slot));
+    where.append(viewOfLocationOnly(slot));
+    // need to get notes for the option
+    if (notes.text() != "")
+      notesRow.removeClass("hide");
+
+    return _view;
   }
 
   var tabHighlighter =

@@ -25,6 +25,16 @@ var sched2 = (function() {
       .addClass("disabled");
   }
 
+  function indexLabel(i) {
+    var a = "A".charCodeAt(0);
+    var label = "";
+    do {
+      label = String.fromCharCode(i % 26 + a) + label;
+      i = Math.floor(i / 26);
+    } while (i > 0);
+    return label;
+  }
+
 
   /*** SELECT ***/
 
@@ -162,13 +172,14 @@ var sched2 = (function() {
 
     var i = 0;
     list.iter(options, function(x) {
-      var x_view = sched.viewOfSuggestion(x.slot);
+      var showLoc = false;
+      var x_view = sched.summaryOfOption(x.slot, showLoc);
       if (i === 0) {
-        optionA.append(x_view);
+        optionA.append(x_view.view);
       } else if (i === 1) {
-        optionB.append(x_view);
+        optionB.append(x_view.view);
       } else if (i === 2) {
-        optionC.append(x_view);
+        optionC.append(x_view.view);
       }
       i++;
     });
@@ -224,54 +235,147 @@ var sched2 = (function() {
 
 /*** OFFER ***/
 
-  function emailViewOfOption(calOption, i) {
-    var option = sched.viewOfSuggestion(calOption.slot)
-      .addClass("email-option-details");
+  function emailViewOfOption(slot, i) {
+'''
+<div #view>
+  <div #optionLetter
+       class="option-letter">
+    <span #letter/>
+  </div>
+  <div class="option-row">
+    {{sched.viewOfOption(slot).view}}
+  </div>
+</div>
+'''
+    letter.text(indexLabel(i));
 
-    return $("<div class='email-option'/>")
-      .append($("<div class='option-letter-sm option-letter-modal unselectable'/>")
-      .text(util.letterOfInt(i)))
-      .append(option);
-  }
-
-  function emailViewOfOptions(options) {
-    var view = $("<div class='email-options'/>");
-    list.iter(options, function(x, i) {
-      emailViewOfOption(x, i)
-        .appendTo(view);
-    });
     return view;
   }
 
   function showEndTime() {
-    $(".time-text").removeClass("hide");
-    $(".time-text-short").addClass("hide");
+    $(".time-to").removeClass("hide");
+    $(".time-end").removeClass("hide");
+    $(".time-at").addClass("hide");
   }
 
   function hideEndTime() {
-    $(".time-text").addClass("hide");
-    $(".time-text-short").removeClass("hide");
+    $(".time-to").addClass("hide");
+    $(".time-end").addClass("hide");
+    $(".time-at").removeClass("hide");
   }
 
-  function preFillOfferModal(offerModal, profs, task, options, toUid) {
+  function createOfferModal() {
+'''
+<div #view
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+  <div #dialog
+       class="modal-dialog composition-modal">
+    <div #content
+         class="modal-content composition-modal">
+      <div class="modal-header">
+        <img class="offer-modal-icon svg svg-block" src="/assets/img/email.svg"/>
+        <div #closeContainer
+             class="modal-close"
+             data-dismiss="modal"/>
+        <div #title
+            class="modal-title"/>
+      </div>
+      <div class="email-info-box">
+        <div class="email-info-row">
+          <div class="email-info-label">TO</div>
+          <div class="email-info ellipsis bold">
+            <div #recipient
+                 class="recipient-name"/>
+            <select #addressTo>
+              <option value="Address_directly">Address directly</option>
+              <option value="Address_to_assistant">Address assistant</option>
+            </select>
+          </div>
+        </div>
+        <div class="email-info-row">
+          <div class="email-info-label">SUBJECT</div>
+          <div #subject
+               class="email-info ellipsis"/>
+        </div>
+      </div>
+    </div>
+    <div #composeBox
+         class="modal-compose-box scrollable">
+      <textarea #messageEditable
+                class="compose-text"/>
+      <div #messageReadOnly
+           class="compose-read-only"/>
+    </div>
+    <div #footer
+         class="modal-footer clearfix">
+      <div #showEndTimeOption
+           class="show-end-time-option checkbox-selected">
+        <div #showEndTimeCheckboxContainer
+             class="checkbox-container"/>
+        <div #showEndTimeText
+             class="show-end-time-text"/>
+      </div>
+      <button #send
+              type="button" class="btn btn-primary"
+              style="float:right">
+        Send
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    var close = $("<img class='svg-block'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/x.svg");
+
+    messageEditable.autosize();
+
+    var showEndTimeCheckbox = $("<img class='svg-block'/>")
+      .appendTo(showEndTimeCheckboxContainer);
+    svg.loadImg(showEndTimeCheckbox, "/assets/img/checkbox-sm.svg");
+
+    showEndTimeOption
+      .off("click")
+      .click(function() {
+        if (showEndTimeOption.hasClass("checkbox-selected")) {
+          showEndTimeOption.removeClass("checkbox-selected");
+          messageReadOnly.addClass("short");
+          hideEndTime();
+        } else {
+          showEndTimeOption.addClass("checkbox-selected");
+          messageReadOnly.removeClass("short");
+          showEndTime();
+        }
+      });
+
+    return _view;
+  }
+
+  function composeEmail(profs, task, options, toUid) {
+    var offerModal = createOfferModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
-
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
 
     var plural = options.length === 1 ? "" : "s";
     offerModal.title.text("Offer the meeting option" + plural + ".");
-    offerModal.footerOptionText.text("Show end time of meeting option" + plural);
+    offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
 
     offerModal.recipient.text(toName);
-    offerModal.subject.val("Re: " + task.task_status.task_title);
+    offerModal.subject.text("Re: " + task.task_status.task_title);
 
-    var footer = offerModal.messageReadOnly;
-    footer.children().remove();
-    footer.append(emailViewOfOptions(options));
-    if (footer.hasClass("short")) {
+    var readOnly = offerModal.messageReadOnly;
+    readOnly.children().remove();
+    list.iter(options, function(calOption, i) {
+      emailViewOfOption(calOption.slot, i)
+        .appendTo(readOnly);
+    });
+    if (readOnly.hasClass("short")) {
       hideEndTime();
     } else {
       showEndTime();
@@ -287,17 +391,61 @@ var sched2 = (function() {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
       offerModal.addressTo.val("Address_to_assistant");
+      offerModal.addressTo.removeClass("hide");
     } else {
       parameters.template_kind = "Options_to_guest";
       offerModal.addressTo.val("Address_directly");
+      offerModal.addressTo.addClass("hide");
     }
+
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
-        offerModal.messageEditable.val(optionsMessage.message_text);
+        offerModal.messageEditable
+          .val(optionsMessage.message_text)
+          .trigger("autosize.resize");
         offerModal.addressTo
           .unbind("change")
           .change(function(){refreshOptionsMessage(task.tid, parameters);});
       });
+
+
+    var sendButton = offerModal.send;
+    sendButton
+      .removeClass("disabled")
+      .off("click")
+      .click(function() {
+        if (! sendButton.hasClass("disabled")) {
+          spinner.spin("Sending...");
+          sendButton.addClass("disabled");
+          var body = offerModal.messageEditable.val();
+          if ("Address_to_assistant" === offerModal.addressTo.val()) {
+            var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+            if (util.isNotNull(ea)) {
+              toUid = ea;
+            }
+          }
+          var hideEnd = offerModal.messageReadOnly.hasClass("short");
+          sched.optionsForGuest(sched.getGuestOptions(task), toUid)
+            .hide_end_times = hideEnd;
+          api.postTask(task).done(function() {
+            var chatItem = {
+              tid: task.tid,
+              by: login.me(),
+              to: [toUid],
+              chat_item_data: ["Scheduling_q", {
+                body: body,
+                choices: options
+              }]
+            };
+            chat.postChatItem(chatItem).done(function() {
+              spinner.stop();
+              offerModal.view.modal("hide");
+            });
+          });
+        }
+      });
+
+    offerModal.view.modal({});
   }
 
   /*
@@ -313,83 +461,6 @@ var sched2 = (function() {
     return date.viewTimeAgo(created).text();
   }
 
-  function createOfferModal() {
-'''
-<div #view
-     class="modal fade"
-     tabindex="-1"
-     role="dialog"
-     aria-hidden="true">
-  <div #dialog
-       class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="svg modal-close-x" src="/assets/img/x.svg">
-    </div>
-    <div #content
-         class="modal-content">
-      <div #header
-           class="modal-header">
-        <button #send
-                type="button" class="btn btn-primary"
-                style="float:right">
-          Send
-        </button>
-        <h3 #title
-            class="modal-title"/>
-      </div>
-      <div #body
-           class="modal-body">
-        <div>
-          <h4 class="modal-first-section-title to-label">To:</h4>
-          <div #recipient/>
-        </div>
-        <div class="input">
-          <h4 class="modal-section-title">Subject</h4>
-          <input #subject
-                 type="text" class="form-control" disabled>
-        </div>
-        <h4 class="modal-section-title">Message</h4>
-        <select #addressTo>
-          <option value="Address_directly">Address Directly</option>
-          <option value="Address_to_assistant">Address to Assistant</option>
-        </select>
-        <textarea #messageEditable
-                  class="form-control"
-                  rows="8"/>
-        <div #footerOption
-             class="checkbox-selected">
-          <div #footerCheckboxDiv
-               class="footer-checkbox-div"/>
-          <div #footerOptionText
-               class="time-option"/>
-        </div>
-        <div #messageReadOnly/>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-    var footerCheckbox = $("<img class='footer-checkbox'/>")
-      .appendTo(footerCheckboxDiv);
-    svg.loadImg(footerCheckbox, "/assets/img/checkbox-sm.svg");
-
-    footerOption
-      .off("click")
-      .click(function() {
-        if (footerOption.hasClass("checkbox-selected")) {
-          footerOption.removeClass("checkbox-selected");
-          messageReadOnly.addClass("short");
-          hideEndTime();
-        } else {
-          footerOption.addClass("checkbox-selected");
-          messageReadOnly.removeClass("short");
-          showEndTime();
-        }
-      });
-
-    return _view;
-  }
-
   function createOfferRow(profs, task, uid) {
 '''
 <div #view
@@ -401,16 +472,6 @@ var sched2 = (function() {
     var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
-    var offerModal = createOfferModal();
-
-    function closeAvailabilityModal(item) {
-      offerModal.view.modal("hide");
-    }
-
-    function composeEmail() {
-      preFillOfferModal(offerModal, profs, task, options, uid);
-      offerModal.view.modal({});
-    }
 
     var composeIcon = $("<img class='compose-confirmation-icon'/>")
       .appendTo(compose);
@@ -451,46 +512,11 @@ var sched2 = (function() {
       .text(statusText)
       .appendTo(view);
 
-    compose.click(composeEmail);
+    compose.click(function() {
+      composeEmail(profs, task, options, uid);
+    });
 
-    var sendButton = offerModal.send;
-    sendButton
-      .removeClass("disabled")
-      .off("click")
-      .click(function() {
-        if (! sendButton.hasClass("disabled")) {
-          spinner.spin("Sending...");
-          sendButton.addClass("disabled");
-          var body = offerModal.messageEditable.val();
-          if ("Address_to_assistant" === offerModal.addressTo.val()) {
-            var ea = sched.assistedBy(uid, sched.getGuestOptions(task));
-            if (util.isNotNull(ea)) {
-              uid = ea;
-            }
-          }
-          var hideEnd = offerModal.messageReadOnly.hasClass("short");
-          sched.optionsForGuest(sched.getGuestOptions(task), uid)
-            .hide_end_times = hideEnd;
-          api.postTask(task).done(function() {
-            var chatItem = {
-              tid: task.tid,
-              by: login.me(),
-              to: [uid],
-              chat_item_data: ["Scheduling_q", {
-                body: body,
-                choices: options
-              }]
-            };
-            chat.postChatItem(chatItem).done(function() {
-              spinner.stop();
-              closeAvailabilityModal();
-            });
-          });
-        }
-      });
-
-    return { view: view,
-             composeEmail: composeEmail };
+    return view;
   }
 
   function createOfferSection(profs, ta, guests) {
@@ -530,9 +556,7 @@ var sched2 = (function() {
     headerTitle.text(headerText);
 
     list.iter(guests, function(uid) {
-      var x = createOfferRow(profs, ta, uid);
-      x.view
-        .appendTo(content)
+      content.append(createOfferRow(profs, ta, uid));
     });
 
     return _view;
@@ -595,7 +619,7 @@ var sched2 = (function() {
   function setupTimezoneLink(form, locationForm, slot) {
     function displayTimezone(loc) {
       if (util.isDefined(loc))
-        timezoneText.text("Time Zone: " + timezone.format(loc.timezone));
+        timezoneText.text(timezone.format(loc.timezone));
     }
     function setTimezone(oldTz, newTz) {
       var loc = { timezone: newTz };
@@ -634,7 +658,8 @@ var sched2 = (function() {
           title:
           "The time zone is automatically set based on the meeting location"
         })
-        .off("click");
+        .off("click")
+        .removeClass("link");
       form.addPublicNotes
         .text("Add notes");
     }
@@ -670,14 +695,14 @@ var sched2 = (function() {
     <div class="modal-content">
       <div class="modal-header">
         <img #icon
-             class="svg cal-icon" src="/assets/img/calendar.svg"/>
+             class="svg cal-picker-icon" src="/assets/img/calendar.svg"/>
         <div style="float:right" data-dismiss="modal">
           <img class="svg modal-close" src="/assets/img/x.svg"/>
         </div>
-        <h3 #title
-            class="modal-title">
+        <div #title
+             class="modal-title">
           Select a time.
-        </h3>
+        </div>
         <button #doneButton
                 class="btn btn-default">Done</button>
       </div>
@@ -724,15 +749,17 @@ var sched2 = (function() {
       <div class="info-label when-label-edit">WHEN</div>
       <div class="info">
         <div class="clearfix">
-          <div #dateAndTimes
-               class="hide">
+          <div #dateAndTimes/>
+          <div>
+            <img class="timezone-icon-sm svg-block"
+                 src="/assets/img/globe.svg"/>
+            <span #timezoneText class="timezone-text"></span>
           </div>
-          <span #timezoneText class="timezone-text"></span>
           <div #timezonePicker/>
         </div>
         <span #openCalPicker
              class="open-cal-picker clearfix">
-          <img class="open-cal-picker-icon svg"
+          <img class="open-cal-picker-icon svg-block"
                src="/assets/img/cal-picker.svg"/>
           <span #calendarLinkText
                 class="open-cal-picker-text link">
@@ -831,10 +858,6 @@ var sched2 = (function() {
       dateAndTimes.children().remove();
       if (hasDates()) {
         dateAndTimes.append(sched.viewOfDates(dates.start, dates.end));
-        dateAndTimes.removeClass("hide");
-      }
-      else {
-        dateAndTimes.addClass("hide");
       }
     }
 
@@ -1067,7 +1090,7 @@ var sched2 = (function() {
         </li>
       </ul>
   </div>
-  {{sched.viewOfOption(calOption, false)}}
+  {{sched.viewOfOption(calOption.slot).view}}
 </div>
 '''
     edit.click(toggleEdit);
@@ -1131,17 +1154,7 @@ var sched2 = (function() {
       }
     }
 
-    function indexLabel(i) {
-      var a = "A".charCodeAt(0);
-      var label = "";
-      do {
-        label = String.fromCharCode(i % 26 + a) + label;
-        i = Math.floor(i / 26);
-      } while (i > 0);
-      return label;
-    }
     letter.text(indexLabel(i));
-
     readOnlyContainer.append(readOnlyViewOfOption(calOption,
                                                   toggleEdit, removeOption));
 
