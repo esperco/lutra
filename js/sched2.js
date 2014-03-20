@@ -25,6 +25,16 @@ var sched2 = (function() {
       .addClass("disabled");
   }
 
+  function indexLabel(i) {
+    var a = "A".charCodeAt(0);
+    var label = "";
+    do {
+      label = String.fromCharCode(i % 26 + a) + label;
+      i = Math.floor(i / 26);
+    } while (i > 0);
+    return label;
+  }
+
 
   /*** SELECT ***/
 
@@ -226,33 +236,33 @@ var sched2 = (function() {
 
 /*** OFFER ***/
 
-  function emailViewOfOption(calOption, i) {
-    var option = sched.viewOfSuggestion(calOption.slot)
-      .addClass("email-option-details");
+  function emailViewOfOption(slot, i) {
+'''
+<div #view>
+  <div #optionLetter
+       class="option-letter">
+    <span #letter/>
+  </div>
+  <div class="option-row">
+    {{sched.viewOfOption(slot).view}}
+  </div>
+</div>
+'''
+    letter.text(indexLabel(i));
 
-    return $("<div class='email-option'/>")
-      .append($("<div class='option-letter-sm option-letter-modal unselectable'/>")
-      .text(util.letterOfInt(i)))
-      .append(option);
-  }
-
-  function emailViewOfOptions(options) {
-    var view = $("<div class='email-options'/>");
-    list.iter(options, function(x, i) {
-      emailViewOfOption(x, i)
-        .appendTo(view);
-    });
     return view;
   }
 
   function showEndTime() {
-    $(".time-text").removeClass("hide");
-    $(".time-text-short").addClass("hide");
+    $(".time-to").removeClass("hide");
+    $(".time-end").removeClass("hide");
+    $(".time-at").addClass("hide");
   }
 
   function hideEndTime() {
-    $(".time-text").addClass("hide");
-    $(".time-text-short").removeClass("hide");
+    $(".time-to").addClass("hide");
+    $(".time-end").addClass("hide");
+    $(".time-at").removeClass("hide");
   }
 
   function preFillOfferModal(offerModal, profs, task, options, toUid) {
@@ -270,11 +280,12 @@ var sched2 = (function() {
     offerModal.recipient.text(toName);
     offerModal.subject.text("Re: " + task.task_status.task_title);
 
-    log(offerModal.content.height());
-
     var readOnly = offerModal.messageReadOnly;
     readOnly.children().remove();
-    readOnly.append(emailViewOfOptions(options));
+    list.iter(options, function(calOption, i) {
+      emailViewOfOption(calOption.slot, i)
+        .appendTo(readOnly);
+    });
     if (readOnly.hasClass("short")) {
       hideEndTime();
     } else {
@@ -299,7 +310,9 @@ var sched2 = (function() {
     }
     api.getOptionsMessage(task.tid, parameters)
       .done(function(optionsMessage) {
-        offerModal.messageEditable.val(optionsMessage.message_text);
+        offerModal.messageEditable
+          .val(optionsMessage.message_text)
+          .trigger("autosize.resize");
         offerModal.addressTo
           .unbind("change")
           .change(function(){refreshOptionsMessage(task.tid, parameters);});
@@ -360,8 +373,7 @@ var sched2 = (function() {
     <div #composeBox
          class="modal-compose-box scrollable">
       <textarea #messageEditable
-                class="compose-text"
-                rows="8"/>
+                class="compose-text"/>
       <div #messageReadOnly
            class="compose-read-only"/>
     </div>
@@ -391,6 +403,8 @@ var sched2 = (function() {
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
+
+    messageEditable.autosize();
 
     var showEndTimeCheckbox = $("<img class='svg-block'/>")
       .appendTo(showEndTimeCheckboxContainer);
@@ -693,14 +707,14 @@ var sched2 = (function() {
     <div class="modal-content">
       <div class="modal-header">
         <img #icon
-             class="svg cal-icon" src="/assets/img/calendar.svg"/>
+             class="svg cal-picker-icon" src="/assets/img/calendar.svg"/>
         <div style="float:right" data-dismiss="modal">
           <img class="svg modal-close" src="/assets/img/x.svg"/>
         </div>
-        <h3 #title
-            class="modal-title">
+        <div #title
+             class="modal-title">
           Select a time.
-        </h3>
+        </div>
         <button #doneButton
                 class="btn btn-default">Done</button>
       </div>
@@ -1157,17 +1171,7 @@ var sched2 = (function() {
       }
     }
 
-    function indexLabel(i) {
-      var a = "A".charCodeAt(0);
-      var label = "";
-      do {
-        label = String.fromCharCode(i % 26 + a) + label;
-        i = Math.floor(i / 26);
-      } while (i > 0);
-      return label;
-    }
     letter.text(indexLabel(i));
-
     readOnlyContainer.append(readOnlyViewOfOption(calOption,
                                                   toggleEdit, removeOption));
 

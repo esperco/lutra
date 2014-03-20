@@ -120,72 +120,6 @@ var sched = (function() {
       return "";
   }
 
-  /* Render a range of two javascript Dates as text */
-  mod.viewOfDates = function(date1, date2) {
-    var fromTime = wordify(date.timeOnly(date1));
-    var toTime = wordify(date.timeOnly(date2));
-
-    var view = $("<div/>");
-
-    var row1 = $("<div class='date-text'/>")
-      .text(date.dateOnly(date1))
-      .appendTo(view);
-
-    var row2 = $("<div class='time-text'/>")
-      .append(html.text("from "))
-      .append($("<b>").text(fromTime))
-      .append(html.text(" to "))
-      .append($("<b>").text(toTime))
-      .appendTo(view);
-
-    return view;
-  };
-
-  mod.viewOfSuggestion = function(x, score) {
-    var view = $("<div class='sug-details'/>");
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    var row1 = $("<div class='day-text'/>")
-      .text(date.weekDay(t1) + " ")
-      .appendTo(view);
-
-    if (score >= 0.75) {
-      $("<span style='color:#ff0'/>")
-        .addClass("glyphicon glyphicon-star")
-        .appendTo(row1);
-    }
-
-    var row2 = $("<div class='date-text'/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    mod.viewOfDates(t1, t2)
-      .appendTo(view);
-
-    var row4 = $("<div class='time-text-short hide'/>")
-      .append(html.text("at "))
-      .append($("<b>").text(date.timeOnly(t1)))
-      .appendTo(view);
-
-    var locText = mod.locationText(x.location);
-    var locDiv = $("<div class='loc-text'/>");
-    var pin = $("<img class='pin'/>");
-      pin.appendTo(locDiv);
-    svg.loadImg(pin, "/assets/img/pin.svg");
-    if (util.isNonEmptyString(locText)) {
-      locDiv.append(html.text(locText))
-            .appendTo(view);
-    } else {
-      locDiv.append(" TBD")
-            .addClass("tbd")
-            .appendTo(view);
-    }
-
-    return view;
-  }
-
   /*
     Get meeting type for a confirmed event and perform some translation
     for display purposes.
@@ -234,18 +168,19 @@ var sched = (function() {
     }
   }
 
-  function viewOfTimeOnly(x) {
+  function viewOfDates(x) {
 '''
 <div #view>
   <div #time1/>
   <div #time2>
     <span #at
-          class="hide"> at </span>
+          class="time-at hide"> at </span>
     <span #start
           class="bold"/>
-    <span #to> to </span>
+    <span #to
+          class="time-to"> to </span>
     <span #end
-          class="bold"/>
+          class="time-end bold"/>
   </div>
 </div>
 '''
@@ -288,7 +223,7 @@ var sched = (function() {
 </div>
 '''
     what.text(mod.formatMeetingType(slot).toUpperCase());
-    when.append(viewOfTimeOnly(slot));
+    when.append(viewOfDates(slot));
     if (showLoc) {
       var pin = $("<img class='pin'/>");
         pin.appendTo(pinContainer);
@@ -332,7 +267,7 @@ var sched = (function() {
 </td>
 '''
     what.text(mod.formatMeetingType(slot));
-    when.append(viewOfTimeOnly(slot));
+    when.append(viewOfDates(slot));
     where.append(viewOfLocationOnly(slot));
     // need to get notes for the option
     if (notes.text() != "")
