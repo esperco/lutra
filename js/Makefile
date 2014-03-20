@@ -55,6 +55,7 @@ COMMON_SOURCES = \
   date.js \
   timeonly.js \
   status_.js \
+  spinner.js \
   unixtime.js \
   email.js \
   cache.js \
