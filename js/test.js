@@ -27,6 +27,7 @@ var test = (function() {
       log("Failed assertion");
       console.trace();
     }
+    return b;
   };
 
   function runOne(groupName, x) {
