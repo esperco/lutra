@@ -829,7 +829,7 @@ var sched4 = (function() {
     </div>
   </div>
   <div #connector
-       class="connector"/>
+       class="connector collapsed"/>
 </div>
 '''
     var headerIcon = $("<img/>")
@@ -860,7 +860,7 @@ var sched4 = (function() {
       .appendTo(content);
 
     function rescheduleClick() {
-      spinner.spin("Rescheduling...");
+      spinner.spin("Removing from calendar...");
       api.cancelCalendar(tid).done(function() {
         task.task_status.task_progress = "Coordinating";
         state.scheduling_stage = "Coordinate";
@@ -875,7 +875,7 @@ var sched4 = (function() {
     }
 
     function cancelAndArchiveClick() {
-      spinner.spin("Canceling...");
+      spinner.spin("Removing from calendar...");
       api.cancelCalendar(tid).done(function() {
         task.task_status.task_progress = "Closed";
         delete state.reserved;

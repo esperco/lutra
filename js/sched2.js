@@ -5,9 +5,15 @@
 var sched2 = (function() {
   var mod = {};
 
-  function saveAndReload(ta) {
+  function saveAndReload(ta, action) {
     disableNextButton();
-    spinner.spin("Updating calendar...");
+    if (action === "adding") {
+      spinner.spin("Adding to calendar...");
+    } else if (action === "removing") {
+      spinner.spin("Removing from calendar...");
+    } else {
+      spinner.spin("Updating calendar...");
+    }
     api.postTask(ta).done(function(task) {
       spinner.stop();
       sched.loadTask(task);
@@ -72,7 +78,7 @@ var sched2 = (function() {
   }
 
   function updateTask(ta, calOption) {
-    spinner.spin("Scheduling...");
+    spinner.spin("Updating calendar...");
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
@@ -977,17 +983,22 @@ var sched2 = (function() {
         saveButton.addClass("disabled");
     }
 
-    function saveMe() {
+    function saveMe(action) {
       saveButton.addClass("disabled");
-      saveCalOption(getCalOption());
+      saveCalOption(getCalOption(), action);
     }
 
+    var action;
     if (addMode) {
       saveButton.text("Add to calendar");
+      action = "adding";
     } else {
       saveButton.text("Update calendar");
+      action = "updating";
     }
-    saveButton.click(saveMe);
+    saveButton.click(function() {
+      saveMe(action);
+    })
     updateSaveButton();
 
     editActions.append(cancel);
@@ -1006,7 +1017,7 @@ var sched2 = (function() {
                                 saveCalOption, cancel, addMode);
   }
 
-  function saveOption(ta, calOption) {
+  function saveOption(ta, calOption, action) {
     var schedState = sched.getState(ta);
     var label = calOption.label;
     var options = schedState.calendar_options;
@@ -1018,7 +1029,7 @@ var sched2 = (function() {
     }
     else
       options.push(calOption);
-    saveAndReload(ta);
+    saveAndReload(ta, action);
   }
 
   function removeOption(ta, calOptionLabel) {
@@ -1027,7 +1038,7 @@ var sched2 = (function() {
       list.filter(schedState.calendar_options, function(x) {
         return x.label !== calOptionLabel;
       });
-    saveAndReload(ta);
+    saveAndReload(ta, "removing");
   }
 
   function readOnlyViewOfOption(calOption, toggleEdit, remove) {
@@ -1142,7 +1153,7 @@ var sched2 = (function() {
   }
 
   function loadMeetingOptions(v, tzList, profs, ta, connector) {
-    function save(calOption) { return saveOption(ta, calOption); }
+    function save(calOption, action) { return saveOption(ta, calOption, action); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
