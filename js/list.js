@@ -89,6 +89,16 @@ var list = (function() {
     return false;
   };
 
+  /* return true if every element satisfies the given predicate */
+  mod.for_all = function(a, f) {
+    var len = a.length;
+    for (var i = 0; i < len; i++) {
+      if (!(f(a[i], i)))
+        return false;
+    }
+    return true;
+  };
+
   /* return true if at least one element equals the given element */
   mod.mem = function(a, x) {
     var len = a.length;
