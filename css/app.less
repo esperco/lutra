@@ -1045,8 +1045,15 @@ i { color: @gray_60; }
 
 /*** Modal ***/
 
-.composition-modal { width: 60%; }
-
+.composition-modal { height: 100%; }
+.modal-dialog.composition-modal { padding: 30px 0px; }
+.modal-content.composition-modal {
+  border: 1px solid @gray_10;
+  background-clip: none;
+}
+@media (min-width:768px) {
+  .modal-dialog.composition-modal { width: 768px; }
+}
 .modal-close-circ {
   position: absolute;
   z-index: 10000;
@@ -1093,21 +1100,21 @@ i { color: @gray_60; }
   margin-top: 6px;
 }
 
-.modal-title { margin-left: 38px; }
-
-.modal-content {
-  margin-top: 12px;
+.modal-title {
+  margin-left: 38px;
+  font-size: 20px;
 }
 
 .email-info-box {
-  margin: -20px -20px 0px -20px;
-  padding: 10px 20px;
+  height: 74px;
+  padding: 5px 20px;
   background: @gray_f8;
   border-bottom: 1px solid @gray_10;
 }
 
 .email-info-row {
-  padding: 10px 0px;
+  height: 32px;
+  padding: 5px 0px;
 }
 
 .email-info-label {
@@ -1124,8 +1131,17 @@ i { color: @gray_60; }
   margin-left: 73px;
 }
 
+.recipient-name {
+  display: inline-block;
+  margin-right: 10px;
+}
+
 .modal-compose-box {
-  height: 300px;
+  position: fixed;
+  top: 165px;
+  bottom: 93px;
+  width: 100%;
+  padding: 0px 20px 20px 20px;
   overflow-y: scroll;
 }
 
@@ -1137,11 +1153,18 @@ i { color: @gray_60; }
   overflow: hidden;
   outline: none;
   resize: none;
+  background: none;
+  color: @gray_90;
+  font-family: @light;
 }
 
+.compose-read-only { opacity: 0.5; }
+
 .modal-send-footer {
-  margin: 0px -20px -20px -20px;
-  padding: 20px;
+  position: fixed;
+  bottom: 30px;
+  width: 100%;
+  padding: 15px 20px;
   border-top: 1px solid @gray_10;
 }
 

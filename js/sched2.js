@@ -270,6 +270,8 @@ var sched2 = (function() {
     offerModal.recipient.text(toName);
     offerModal.subject.text("Re: " + task.task_status.task_title);
 
+    log(offerModal.content.height());
+
     var readOnly = offerModal.messageReadOnly;
     readOnly.children().remove();
     readOnly.append(emailViewOfOptions(options));
@@ -326,64 +328,62 @@ var sched2 = (function() {
      aria-hidden="true">
   <div #dialog
        class="modal-dialog composition-modal">
-
     <div #content
-         class="modal-content">
+         class="modal-content composition-modal">
       <div class="modal-header">
         <img class="offer-modal-icon svg" src="/assets/img/email.svg"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
-        <h3 #title
+        <div #title
             class="modal-title"/>
       </div>
-      <div #body
-           class="modal-body">
-        <div class="email-info-box">
-          <div class="email-info-row">
-            <div class="email-info-label">TO</div>
+      <div class="email-info-box">
+        <div class="email-info-row">
+          <div class="email-info-label">TO</div>
+          <div class="email-info ellipsis bold">
             <div #recipient
-                 class="email-info bold"/>
-            <select #addressTo
-                    class="email-info">
+                 class="recipient-name"/>
+            <select #addressTo>
               <option value="Address_directly">Address directly</option>
               <option value="Address_to_assistant">Address assistant</option>
             </select>
           </div>
-          <div class="email-info-row">
-            <div class="email-info-label">SUBJECT</div>
-            <div #subject
-                 class="email-info"/>
-          </div>
         </div>
-        <div #composeBox
-             class="modal-compose-box scrollable">
-          <textarea #messageEditable
-                    class="compose-text"
-                    rows="8"/>
-          <div #messageReadOnly/>
-        </div>
-        <div #footer
-             class="modal-send-footer clearfix">
-          <div #showEndTimeOption
-               class="show-end-time-option checkbox-selected">
-            <div #showEndTimeCheckboxContainer
-                 class="checkbox-container"/>
-            <div #showEndTimeText
-                 class="show-end-time-text"/>
-          </div>
-          <button #send
-                  type="button" class="btn btn-primary"
-                  style="float:right">
-            Send
-          </button>
-          <button #saveDraft
-                  type="button" class="btn btn-default disabled"
-                  style="float:right">
-            Save draft
-          </button>
+        <div class="email-info-row">
+          <div class="email-info-label">SUBJECT</div>
+          <div #subject
+               class="email-info ellipsis"/>
         </div>
       </div>
+    </div>
+    <div #composeBox
+         class="modal-compose-box scrollable">
+      <textarea #messageEditable
+                class="compose-text"
+                rows="8"/>
+      <div #messageReadOnly
+           class="compose-read-only"/>
+    </div>
+    <div #footer
+         class="modal-send-footer clearfix">
+      <div #showEndTimeOption
+           class="show-end-time-option checkbox-selected">
+        <div #showEndTimeCheckboxContainer
+             class="checkbox-container"/>
+        <div #showEndTimeText
+             class="show-end-time-text"/>
+      </div>
+      <button #send
+              type="button" class="btn btn-primary"
+              style="float:right">
+        Send
+      </button>
+      <button #saveDraft
+              type="button" class="btn btn-default hide"
+              style="float:right">
+        Save draft
+      </button>
     </div>
   </div>
 </div>
