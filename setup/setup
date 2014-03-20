@@ -53,12 +53,18 @@ install_js jquery.autosize autosize-master/jquery.autosize.js
 
 cp font-awesome-4.0.3.css font-awesome.css
 
+# Moment (used by both Fullcalendar and Moment-timezone)
+install_js moment moment-2.5.1.js
+
+# Moment-timezone
+install_js moment-timezone moment-timezone-0.0.3.js
+install_js moment-timezone-data moment-timezone-data-2014-03-19.js
+
 # Fullcalendar and dependencies
 rm -rf fullcalendar
 unzip fullcalendar-2.0.0-beta2.zip
 mv fullcalendar-2.0.0-beta2 fullcalendar
 install_js fullcalendar fullcalendar/fullcalendar/fullcalendar.js
-install_js moment fullcalendar/lib/moment.min.js
 install_js jquery-ui fullcalendar/lib/jquery-ui.custom.min.js
 
 # jQuery Timepicker
