@@ -50,6 +50,7 @@ COMMON_SOURCES = \
   test.js \
   list.js \
   deferred.js \
+  ref.js \
   util.js \
   log.js \
   html.js \
