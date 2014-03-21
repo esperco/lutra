@@ -780,7 +780,7 @@ var sched2 = (function() {
       <div class="info">
         <span #addPublicNotes
               class="add-public-notes link">Add notes</span>
-        <div #notes class="hide">
+        <div #allNotes class="hide">
           <div #notesEditorPublic
                class="notes-editor-public">
             <textarea #notesBoxPublic
@@ -936,10 +936,15 @@ var sched2 = (function() {
     var hostName = profile.firstName(profs[login.leader()].prof);
     viewableByExec.text(hostName.toUpperCase() + " ONLY");
 
+    var notes = util.isDefined(x.notes) ? x.notes
+      : { public_notes: "", private_notes: "" };
+    notesBoxPublic.val(notes.public_notes);
+    notesBoxPrivate.val(notes.private_notes);
+
     addPublicNotes
       .click(function() {
         addPublicNotes.addClass("hide");
-        notes.removeClass("hide");
+        allNotes.removeClass("hide");
         notesBoxPublic.focus();
       });
     addPrivateNotes
@@ -949,11 +954,16 @@ var sched2 = (function() {
         notesEditorPrivate.removeClass("hide");
         notesBoxPrivate.focus();
       });
-    if (notesBoxPrivate.val() === "") {
-      notesEditorPrivate.addClass("hide");
-    } else {
-      addPrivateNotes.addClass("hide");
+
+    if (notesBoxPublic.val() !== "" || notesBoxPrivate.val() !== "") {
+      addPublicNotes.addClass("hide");
+      allNotes.removeClass("hide");
     }
+
+    if (notesBoxPrivate.val() !== "")
+      addPrivateNotes.addClass("hide");
+    else
+      notesEditorPrivate.addClass("hide");
 
     /*** Row controls (save/remove) ***/
 
@@ -972,13 +982,18 @@ var sched2 = (function() {
           && util.isNotNull(loc)
           && hasDates()) {
         var oldCalOption = calOption;
+        var notes = {
+          public_notes: notesBoxPublic.val(),
+          private_notes: notesBoxPrivate.val()
+        };
         var calSlot = {
           meeting_type: meetingType,
           location: loc,
           on_site: true,
           start: dates.start,
           end: dates.end,
-          duration: dates.duration
+          duration: dates.duration,
+          notes: notes
         };
         var newCalOption = {
           label: oldCalOption.label,
