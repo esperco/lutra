@@ -142,7 +142,7 @@ var ref = (function() {
       clear: (function() { set(m, {}); }),
       getAllOrNothing: (function() { return getAllOrNothing(m); }),
       watchTurnValid: (function(handler) { watchTurnValid(m, handler); }),
-      watchTurnInvalid: (function(handler) { watchTurnValid(m, handler); }),
+      watchTurnInvalid: (function(handler) { watchTurnInvalid(m, handler); }),
     }
   }
 
