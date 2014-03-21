@@ -262,9 +262,13 @@ var home = (function() {
 
   function loadTasks() {
     $("#tasks").children().remove();
+    spinner.spin("Loading tasks...");
     deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
                    api.loadActiveTasks().fail(status_.onError(404))])
-            .done(showAllTasks);
+            .done(function(data) {
+              showAllTasks(data);
+              spinner.stop();
+            });
 
     $('a[href="#all-tasks"]')
     .unbind('click')
