@@ -104,6 +104,18 @@ var sched = (function() {
 
   /******************************************/
 
+  function viewOfNotes(slot) {
+'''
+<div #view>
+</div>
+'''
+    var notes = util.isDefined(slot.notes) ? slot.notes
+      : { public_notes: "", private_notes: "" };
+    view.append(notes.public_notes);
+    view.append(notes.private_notes);
+    return view;
+  }
+
   mod.locationText = function(loc) {
     var instrSuffix = util.isNonEmptyString(loc.instructions) ?
       " (" + loc.instructions + ")" : "";
@@ -274,7 +286,7 @@ var sched = (function() {
     what.text(mod.formatMeetingType(slot));
     when.append(formatDates(slot));
     where.append(viewOfLocationOnly(slot));
-    // need to get notes for the option
+    notes.append(viewOfNotes(slot));
     if (notes.text() != "")
       notesRow.removeClass("hide");
 
