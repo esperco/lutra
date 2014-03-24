@@ -299,7 +299,7 @@ var sched = (function() {
   });
 
   function loadStep1(profs, task) {
-    var view = $("#sched-step1-content");
+    var view = $("#sched-step1-table");
     view.children().remove();
 
     sched1.load(profs, task, view);

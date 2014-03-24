@@ -105,11 +105,14 @@ var sched2 = (function() {
 
   function createScheduleSection(ta) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
        class="sched-module disabled">
     <div #header
-         class="sched-module-header collapsed">
+         class="sched-module-header">
       <span #showHide
             class="show-hide link">
         Show
@@ -159,9 +162,15 @@ var sched2 = (function() {
       </div>
     </div>
   </div>
+  <div #connectorArrow
+     class="connector-arrow"/>
 </div>
 '''
-    var headerIcon = $("<img/>")
+    var connectorNubIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorNub);
+    svg.loadImg(connectorNubIcon, "/assets/img/connector-nub.svg");
+
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/star.svg");
 
@@ -215,19 +224,13 @@ var sched2 = (function() {
     enableOptionIfExists(1, "B");
     enableOptionIfExists(2, "C");
 
-    var next = $(".sched-step2-next");
-    var selected;
-
-    next
-      .addClass("disabled")
-      .off("click")
-      .click(function() {
-      });
-
-    function onSelect(x) {
-      selected = x;
-      next.removeClass("disabled");
-    }
+    header.hover(
+      function() {
+        connectorNub.addClass("hovering");
+      }, function() {
+        connectorNub.removeClass("hovering");
+      }
+    );
 
     return _view;
   }
@@ -276,31 +279,32 @@ var sched2 = (function() {
     <div #content
          class="modal-content composition-modal">
       <div class="modal-header">
-        <img class="offer-modal-icon svg svg-block" src="/assets/img/email.svg"/>
+        <div #iconContainer
+             class="modal-icon offer-modal-icon"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
         <div #title
             class="modal-title"/>
       </div>
-      <div class="email-info-box">
-        <div class="email-info-row">
-          <div class="email-info-label">TO</div>
-          <div class="email-info ellipsis bold">
+      <table class="email-info-table">
+        <tr class="email-info-row">
+          <td class="email-info-label">TO</td>
+          <td class="email-info ellipsis bold">
             <div #recipient
                  class="recipient-name"/>
             <select #addressTo>
               <option value="Address_directly">Address directly</option>
               <option value="Address_to_assistant">Address assistant</option>
             </select>
-          </div>
-        </div>
-        <div class="email-info-row">
-          <div class="email-info-label">SUBJECT</div>
-          <div #subject
+          </td>
+        </tr>
+        <tr class="email-info-row">
+          <td class="email-info-label">SUBJECT</td>
+          <td #subject
                class="email-info ellipsis"/>
-        </div>
-      </div>
+        </tr>
+      </table>
     </div>
     <div #composeBox
          class="modal-compose-box scrollable">
@@ -327,6 +331,10 @@ var sched2 = (function() {
   </div>
 </div>
 '''
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/email.svg");
+
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
@@ -521,11 +529,14 @@ var sched2 = (function() {
 
   function createOfferSection(profs, ta, guests) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
-       class="sched-module disabled">
+       class="sched-module">
     <div #header
-         class="sched-module-header collapsed">
+         class="sched-module-header">
       <span #showHide
             class="show-hide link">
         Show
@@ -538,17 +549,21 @@ var sched2 = (function() {
     <div #content
          style="display:none"/>
   </div>
-  <div #connector
-       class="connector collapsed"/>
+  <div #connectorArrow
+       class="connector-arrow"/>
 </div>
 '''
-    var headerIcon = $("<img/>")
+    var connectorNubIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorNub);
+    svg.loadImg(connectorNubIcon, "/assets/img/connector-nub.svg");
+
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/email.svg");
 
-    var connectorIcon = $("<img/>")
-      .appendTo(connector);
-    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
+    var connectorArrowIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorArrow);
+    svg.loadImg(connectorArrowIcon, "/assets/img/connector-arrow.svg");
 
     var headerText = guests.length > 1 ?
       "Offer to guests" :
@@ -558,6 +573,16 @@ var sched2 = (function() {
     list.iter(guests, function(uid) {
       content.append(createOfferRow(profs, ta, uid));
     });
+
+    header.hover(
+      function() {
+        connectorNub.addClass("hovering");
+        connectorArrow.addClass("hovering");
+      }, function() {
+        connectorNub.removeClass("hovering");
+        connectorArrow.removeClass("hovering");
+      }
+    );
 
     return _view;
   }
@@ -1176,7 +1201,7 @@ var sched2 = (function() {
     return view;
   }
 
-  function loadMeetingOptions(v, tzList, profs, ta, connector) {
+  function loadMeetingOptions(v, tzList, profs, ta) {
     function save(calOption, action) { return saveOption(ta, calOption, action); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
@@ -1224,9 +1249,12 @@ var sched2 = (function() {
 
   function createOptionsSection(tzList, profs, ta) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view first-module collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
-       class="sched-module first-module">
+       class="sched-module">
     <div #header
          class="sched-module-header">
       <span #showHide
@@ -1234,29 +1262,30 @@ var sched2 = (function() {
         Hide
       </span>
       <div #headerIconContainer
-           class="sched-module-icon create-icon active"/>
+           class="sched-module-icon create-icon"/>
       <div #headerTitle
            class="sched-module-title">
         Create up to 3 meeting options
       </div>
     </div>
-    <div #content/>
+    <div #content
+         style="display:none"/>
   </div>
-  <div #connector
-       class="connector"/>
+  <div #connectorArrow
+       class="connector-arrow"/>
 </div>
 '''
-    var headerIcon = $("<img/>")
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/create-options.svg");
 
-    var connectorIcon = $("<img/>")
-      .appendTo(connector);
-    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
+    var connectorArrowIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorArrow);
+    svg.loadImg(connectorArrowIcon, "/assets/img/connector-arrow.svg");
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
-      deferred.defer(loadMeetingOptions(content, tzList, profs, ta, connector));
+      deferred.defer(loadMeetingOptions(content, tzList, profs, ta));
     }
     else {
       var authLandingUrl = document.URL;
@@ -1265,9 +1294,17 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadMeetingOptions(content, tzList, profs, ta, connector);
+            loadMeetingOptions(content, tzList, profs, ta);
         });
     }
+
+    header.hover(
+      function() {
+        connectorArrow.addClass("hovering");
+      }, function() {
+        connectorArrow.removeClass("hovering");
+      }
+    );
 
     return _view;
   }
@@ -1280,66 +1317,53 @@ var sched2 = (function() {
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);
 
-    options.showHide.click(function() {
+    options.header.click(function() {
       toggleModule(options, "options");
     })
-    offer.showHide.click(function() {
+    offer.header.click(function() {
       toggleModule(offer, "offer");
     })
-    schedule.showHide.click(function() {
+    schedule.header.click(function() {
       toggleModule(schedule, "schedule");
     })
 
     function toggleModule(toggling, x) {
-      if (toggling.header.hasClass("collapsed"))
+      if (toggling.view.hasClass("collapsed"))
         showModule(toggling, x);
       else
         hideModule(toggling, x);
 
       function showModule(toggling, x) {
         toggling.showHide.text("Hide");
-        toggling.header.removeClass("collapsed");
+        toggling.view.removeClass("collapsed");
         toggling.headerIconContainer.addClass("active");
         toggling.content.slideDown("fast");
-        if (x === "options") {
-          toggling.connector.removeClass("collapsed");
-        } else if (x === "offer") {
-          toggling.connector.removeClass("collapsed");
-          options.connector.addClass("bottom-active");
-        } else if (x === "schedule") {
-          offer.connector.addClass("bottom-active");
-        }
         hideOthers(x);
       }
 
       function hideModule(toggling, x) {
         toggling.showHide.text("Show");
-        toggling.header.addClass("collapsed");
+        toggling.view.addClass("collapsed");
         toggling.headerIconContainer.removeClass("active");
         toggling.content.slideUp("fast");
-        if (x === "options") {
-          toggling.connector.addClass("collapsed");
-        } else if (x === "offer") {
-          toggling.connector.addClass("collapsed");
-          options.connector.removeClass("bottom-active");
-        } else if (x === "schedule") {
-          offer.connector.removeClass("bottom-active");
-        }
       }
 
       function hideOthers(x) {
-        if ((x != "options") && (! options.header.hasClass("collapsed")))
+        if ((x != "options") && (! options.view.hasClass("collapsed")))
           hideModule(options, "options");
-        if ((x != "offer") && (! offer.header.hasClass("collapsed")))
+        if ((x != "offer") && (! offer.view.hasClass("collapsed")))
           hideModule(offer, "offer");
-        if ((x != "schedule") && (! schedule.header.hasClass("collapsed")))
+        if ((x != "schedule") && (! schedule.view.hasClass("collapsed")))
           hideModule(schedule, "schedule");
       }
     }
 
     if (sched.getState(ta).calendar_options.length > 0) {
-      offer.module.removeClass("disabled");
-      schedule.module.removeClass("disabled");
+      offer.view.removeClass("disabled");
+      schedule.view.removeClass("disabled");
+    } else {
+      offer.view.addClass("disabled");
+      schedule.view.addClass("disabled");
     }
 
     function sentAnyOffer() {
@@ -1358,11 +1382,11 @@ var sched2 = (function() {
     }
 
     if (receivedAllPreferences()) {
-      options.content.hide();
       toggleModule(schedule, "schedule");
     } else if (sentAnyOffer()) {
-      options.content.hide();
       toggleModule(offer, "offer");
+    } else {
+      toggleModule(options, "options");
     }
 
     view

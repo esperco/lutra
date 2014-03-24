@@ -11,9 +11,6 @@ var loceditor = (function() {
      class="modal fade" tabindex="-1"
      role="dialog">
   <div class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="svg modal-close-x" src="/assets/img/x.svg"/>
-    </div>
     <div class="modal-content">
       <div class="modal-header clearfix">
         <button #saveButton
