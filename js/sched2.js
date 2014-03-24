@@ -293,10 +293,6 @@ var sched2 = (function() {
           <td class="email-info ellipsis bold">
             <div #recipient
                  class="recipient-name"/>
-            <select #addressTo>
-              <option value="Address_directly">Address directly</option>
-              <option value="Address_to_assistant">Address assistant</option>
-            </select>
           </td>
         </tr>
         <tr class="email-info-row">
@@ -412,18 +408,9 @@ var sched2 = (function() {
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
-      offerModal.addressTo.val("Address_to_assistant");
-      offerModal.addressTo.removeClass("hide");
     } else {
       parameters.template_kind = "Options_to_guest";
-      offerModal.addressTo.val("Address_directly");
-      offerModal.addressTo.addClass("hide");
     }
-
-    // TODO Does this still do anything?
-    offerModal.addressTo
-      .unbind("change")
-      .change(function(){refreshOptionsMessage(task.tid, parameters);});
 
     var localStorageKey = optionsDraftKey(task, toUid);
 
@@ -465,11 +452,9 @@ var sched2 = (function() {
           spinner.spin("Sending...");
           sendButton.addClass("disabled");
           var body = offerModal.messageEditable.val();
-          if ("Address_to_assistant" === offerModal.addressTo.val()) {
-            var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
-            if (util.isNotNull(ea)) {
-              toUid = ea;
-            }
+          var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+          if (util.isNotNull(ea)) {
+            toUid = ea;
           }
           var hideEnd = offerModal.messageReadOnly.hasClass("short");
           sched.optionsForGuest(sched.getGuestOptions(task), toUid)
