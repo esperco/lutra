@@ -416,7 +416,7 @@ var guestTask = function() {
       return slotView;
     }
 
-    function viewOfCalendarOption(choice, label, typ) {
+    function viewOfCalendarOption(choice, label) {
       var slotView = $("<tr class='option'/>");
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
@@ -452,8 +452,7 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      var info = sched.viewOfOption(choice, typ)
-        .appendTo(slotView);
+      slotView.append(sched.viewOfOption(choice.slot).view);
 
       return slotView;
     }
@@ -546,8 +545,7 @@ var guestTask = function() {
               answers[choice.label] = choice;
             }
             var label = indexLabel(i);
-            var typ = sched.formatMeetingType(choice.slot);
-            options.append(viewOfCalendarOption(choice, label, typ));
+            options.append(viewOfCalendarOption(choice, label))
           });
           if (! list.mem(task.guest_hosts, task.guest_uid)) {
             options.append(viewOfNoneWorks(state.calendar_options));
