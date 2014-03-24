@@ -497,10 +497,17 @@ var sched4 = (function() {
            class="compose-read-only"/>
     </div>
     <div #footer
-         class="modal-footer clearfix">
+         class="modal-footer clearfix" style="float:right">
+      <button #discardDraft
+              type="button" class="btn btn-danger">
+        Discard Draft
+      </button>
+      <button #saveDraft
+              type="button" class="btn btn-default">
+        Save as Draft
+      </button>
       <button #send
-              type="button" class="btn btn-primary"
-              style="float:right">
+              type="button" class="btn btn-primary">
         Send
       </button>
     </div>
@@ -518,6 +525,10 @@ var sched4 = (function() {
     messageEditable.autosize();
 
     return _view;
+  }
+
+  function confirmationDraftKey(ta, uid) {
+    return ta.tid + "|" + uid + "|CONFIRM";
   }
 
   function composeConfirmEmail(profs, ta, toUid) {
@@ -574,16 +585,42 @@ var sched4 = (function() {
       }
     }
 
-    api.getConfirmationMessage(ta.tid, parameters)
-      .done(function(confirmationMessage) {
-        confirmModal.messageEditable
-          .val(confirmationMessage.message_text)
-          .trigger("autosize.resize");
-        confirmModal.addressTo
-          .unbind("change")
-          .change(function() {
-            refreshConfirmationMessage(confirmModal, ta.tid, parameters, slot);
-          });
+    // TODO Does this still do anything?
+    confirmModal.addressTo
+      .unbind("change")
+      .change(function() {
+        refreshConfirmationMessage(confirmModal, ta.tid, parameters, slot);
+      });
+
+    var localStorageKey = confirmationDraftKey(ta, toUid);
+
+    var draft = store.get(localStorageKey);
+    if (util.isDefined(draft)) {
+      confirmModal.discardDraft.show();
+      confirmModal.messageEditable
+        .val(draft)
+        .trigger("autosize.resize");
+    } else {
+      confirmModal.discardDraft.hide();
+      api.getConfirmationMessage(ta.tid, parameters)
+        .done(function(confirmationMessage) {
+          confirmModal.messageEditable
+            .val(confirmationMessage.message_text)
+            .trigger("autosize.resize");
+        });
+    }
+
+    confirmModal.saveDraft
+      .click(function() {
+        var draft = confirmModal.messageEditable.val();
+        store.set(localStorageKey, draft);
+        confirmModal.view.modal("hide");
+      });
+
+    confirmModal.discardDraft
+      .click(function() {
+        store.remove(localStorageKey);
+        confirmModal.view.modal("hide");
       });
 
     var sendButton = confirmModal.send;

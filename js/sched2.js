@@ -322,10 +322,20 @@ var sched2 = (function() {
         <div #showEndTimeText
              class="show-end-time-text"/>
       </div>
-      <button #send
-              type="button" class="btn btn-primary"
-              style="float:right">
-        Send
+      <div style="float:right">
+        <button #discardDraft
+                type="button" class="btn btn-danger">
+          Discard Draft
+        </button>
+        <button #saveDraft
+                type="button" class="btn btn-default">
+          Save as Draft
+        </button>
+        <button #send
+                type="button" class="btn btn-primary">
+          Send
+        </button>
+      </div>
       </button>
     </div>
   </div>
@@ -360,6 +370,10 @@ var sched2 = (function() {
       });
 
     return _view;
+  }
+
+  function optionsDraftKey(ta, uid) {
+    return ta.tid + "|" + uid + "|OPTIONS";
   }
 
   function composeEmail(profs, task, options, toUid) {
@@ -406,16 +420,41 @@ var sched2 = (function() {
       offerModal.addressTo.addClass("hide");
     }
 
-    api.getOptionsMessage(task.tid, parameters)
-      .done(function(optionsMessage) {
-        offerModal.messageEditable
-          .val(optionsMessage.message_text)
-          .trigger("autosize.resize");
-        offerModal.addressTo
-          .unbind("change")
-          .change(function(){refreshOptionsMessage(task.tid, parameters);});
+    // TODO Does this still do anything?
+    offerModal.addressTo
+      .unbind("change")
+      .change(function(){refreshOptionsMessage(task.tid, parameters);});
+
+    var localStorageKey = optionsDraftKey(task, toUid);
+
+    var draft = store.get(localStorageKey);
+    if (util.isDefined(draft)) {
+      offerModal.discardDraft.show();
+      offerModal.messageEditable
+        .val(draft)
+        .trigger("autosize.resize");
+    } else {
+      offerModal.discardDraft.hide();
+      api.getOptionsMessage(task.tid, parameters)
+        .done(function(optionsMessage) {
+          offerModal.messageEditable
+            .val(optionsMessage.message_text)
+            .trigger("autosize.resize");
+        });
+    }
+
+    offerModal.saveDraft
+      .click(function() {
+        var draft = offerModal.messageEditable.val();
+        store.set(localStorageKey, draft);
+        offerModal.view.modal("hide");
       });
 
+    offerModal.discardDraft
+      .click(function() {
+        store.remove(localStorageKey);
+        offerModal.view.modal("hide");
+      });
 
     var sendButton = offerModal.send;
     sendButton
