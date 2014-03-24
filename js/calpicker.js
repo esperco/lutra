@@ -306,6 +306,7 @@ var calpicker = (function() {
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
+      defaultDate: param.defaultDate,
       defaultView: 'agendaWeek',
       timezone: tz,
       selectable: true,
