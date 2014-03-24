@@ -97,6 +97,27 @@ var sched = (function() {
 
   /******************************************/
 
+  function viewOfNotes(slot) {
+'''
+<div #view>
+  <div #publicNotes/>
+  <div #privateNotes/>
+</div>
+'''
+    publicNotes.text(slot.notes.public_notes);
+    privateNotes.text(slot.notes.private_notes);
+    if (publicNotes.text() === "" && privateNotes.text() === "") {
+      return "";
+    } else {
+      return view;
+    }
+  }
+
+  function getDirections(x) {
+    return "http://maps.google.com/?daddr="
+      + x.location.coord.lat + "," + x.location.coord.lon;
+  }
+
   mod.locationText = function(loc) {
     var instrSuffix = util.isNonEmptyString(loc.instructions) ?
       " (" + loc.instructions + ")" : "";
@@ -113,42 +134,18 @@ var sched = (function() {
       return "";
   }
 
-  /*
-    Get meeting type for a confirmed event and perform some translation
-    for display purposes.
-   */
-  mod.formatMeetingType = function(slot) {
-    var typ = slot.meeting_type;
-    switch (typ) {
-    case "Call":      return "Phone Call";
-    case "Nightlife": return "Night Life";
-    default:          return typ;
-    }
-  }
-
-  function getDirections(x) {
-    return "http://maps.google.com/?daddr="
-      + x.location.coord.lat + "," + x.location.coord.lon;
-  }
-
-  function viewOfLocationOnly(x) {
-    var view = $("<div id='address'/>");
-
+  function viewOfAddress(x) {
     var locText = chat.locationText(x.location);
     if (locText) {
-      view.append(html.text(locText));
+      return $("<span>" + locText + "</span>")
+        .click(function() {
+          // window.open(getDirections(x));
+          window.open("http://www.google.com/maps/search/"
+                      + encodeURIComponent(locText));
+        })
     } else {
-      view.append("TBD")
-          .addClass("tbd")
+      return $("<div class='tbd'>TBD</div>");
     }
-
-    view.click(function() {
-      // window.open(getDirections(x));
-      window.open("http://www.google.com/maps/search/"
-                  + encodeURIComponent(locText));
-    });
-
-    return view;
   }
 
   function wordify(time) {
@@ -198,6 +195,15 @@ var sched = (function() {
     return view;
   };
 
+  mod.formatMeetingType = function(slot) {
+    var typ = slot.meeting_type;
+    switch (typ) {
+    case "Call":      return "Phone Call";
+    case "Nightlife": return "Night Life";
+    default:          return typ;
+    }
+  }
+
   mod.summaryOfOption = function(slot, showLoc) {
 '''
 <div #view>
@@ -211,12 +217,10 @@ var sched = (function() {
   <div #whereRow
        class="info-row">
     <div #pinContainer/>
-    <div #where
+    <div #whereName
+         class="bold hide"/>
+    <div #whereAddress
          class="link"/>
-  </div>
-  <div #notesRow
-       class="info-row hide">
-    <div #notes/>
   </div>
 </div>
 '''
@@ -226,13 +230,13 @@ var sched = (function() {
       var pin = $("<img class='pin'/>");
         pin.appendTo(pinContainer);
       svg.loadImg(pin, "/assets/img/pin.svg");
+      whereName.text(slot.location.title);
+      if (whereName !== "")
+        whereName.removeClass("hide");
+      whereAddress.append(viewOfAddress(slot));
     } else {
       whereRow.addClass("hide");
     }
-    where.append(viewOfLocationOnly(slot));
-    // need to get notes for the option
-    if (notes.text() != "")
-      notesRow.removeClass("hide");
 
     return _view;
   }
@@ -254,7 +258,12 @@ var sched = (function() {
   <div class="info-row">
     <div class="info-label">WHERE</div>
     <div #where
-         class="info link"/>
+         class="info">
+      <div #whereName
+           class="bold hide"/>
+      <div #whereAddress
+           class="link"/>
+    </div>
   </div>
   <div #notesRow
        class="info-row hide">
@@ -266,9 +275,12 @@ var sched = (function() {
 '''
     what.text(mod.formatMeetingType(slot));
     when.append(formatDates(slot));
-    where.append(viewOfLocationOnly(slot));
-    // need to get notes for the option
-    if (notes.text() != "")
+    whereName.text(slot.location.title);
+    if (whereName.text() !== "")
+      whereName.removeClass("hide");
+    whereAddress.append(viewOfAddress(slot));
+    notes.append(viewOfNotes(slot));
+    if (notes.text() !== "")
       notesRow.removeClass("hide");
 
     return _view;
@@ -278,7 +290,6 @@ var sched = (function() {
     show.create({
       "sched-progress-tab1": {ids: ["sched-progress-tab1"]},
       "sched-progress-tab2": {ids: ["sched-progress-tab2"]},
-      "sched-progress-tab3": {ids: ["sched-progress-tab3"]},
       "sched-progress-tab4": {ids: ["sched-progress-tab4"]}
     },
     { onClass: "sched-tab-highlight", offClass: "" }
@@ -287,7 +298,6 @@ var sched = (function() {
   var tabSelector = show.create({
     "sched-step1-tab": {ids: ["sched-step1-tab"]},
     "sched-step2-tab": {ids: ["sched-step2-tab"]},
-    "sched-step3-tab": {ids: ["sched-step3-tab"]},
     "sched-step4-tab": {ids: ["sched-step4-tab"]}
   });
 
@@ -308,16 +318,6 @@ var sched = (function() {
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
-  };
-
-  function loadStep3(profs, task) {
-    var view = $("#sched-step3-table");
-    view.children().remove();
-
-    sched3.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab3");
-    tabSelector.show("sched-step3-tab");
   };
 
   function loadStep4(profs, task) {
@@ -348,15 +348,7 @@ var sched = (function() {
           loadStep2(tzList, profs, ta);
         });
       });
-    $(".sched-go-step3")
-      .attr('disabled', true) // TODO Remove this button?
-      .unbind('click')
-      .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep3(profs, ta);
-        });
-      });
+
     $(".sched-go-step4")
       .attr('disabled', prog !== "Confirm")
       .unbind('click')

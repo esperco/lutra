@@ -24,7 +24,7 @@
     <div id="loading">
       <div id="loading-box">
         <img id="loading-icon" src="/assets/img/loading.gif">
-        <div id="loading-text" class="ellipsis">Updating calendar...</div>
+        <div id="loading-text" class="ellipsis"></div>
       </div>
     </div>
 
@@ -320,27 +320,9 @@
           <div id="sched-step2-tab" class="hide">
             @@sched-step2-tab.html@@
           </div>
-          <div id="sched-step3-tab" class="hide">
-            @@sched-step3-tab.html@@
-          </div>
           <div id="sched-step4-tab" class="hide">
             @@sched-step4-tab.html@@
           </div>
-        </div>
-      </div>
-
-      <div id="sched-task" class="hide">
-        <div id="sched-step1-tab" class="hide">
-          @@sched-step1-tab.html@@
-        </div>
-        <div id="sched-step2-tab" class="hide">
-          @@sched-step2-tab.html@@
-        </div>
-        <div id="sched-step3-tab" class="hide">
-          @@sched-step3-tab.html@@
-        </div>
-        <div id="sched-step4-tab" class="hide">
-          @@sched-step4-tab.html@@
         </div>
       </div>
 

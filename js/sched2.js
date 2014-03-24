@@ -1014,9 +1014,10 @@ var sched2 = (function() {
       onTimezoneChange: onTimezoneChange,
       onLocationSet: onLocationSet
     });
-    if (util.isDefined(loc))
+    if (util.isDefined(loc)) {
       locationForm.setLocation(loc);
-    else {
+      locationForm.toggleForm();
+    } else {
       var tz = timezone.guessUserTimezone();
       loc = { timezone: tz };
       x.location = loc;
