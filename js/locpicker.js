@@ -244,7 +244,10 @@ var locpicker = (function() {
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
-              var title = details.name.length > 0 ? details.name : description;
+              var title =
+                list.mem(details.types, "establishment") ?
+                details.name :
+                "";
               var coord = details.geometry;
               api.getTimezone(coord.lat, coord.lon)
                 .done(function(x) {
