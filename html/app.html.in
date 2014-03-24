@@ -270,8 +270,8 @@
       <div class="modal fade" id="chat-modal" tabindex="-1"
            role="dialog" aria-labelledby="chat-title"
            aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
+        <div class="modal-dialog chat-modal">
+          <div class="modal-content chat-modal">
             <div class="modal-header">
               <img id="chat-header-icon" class="svg" src="/assets/img/chat.svg">
               <div style="float:right" data-dismiss="modal">

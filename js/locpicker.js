@@ -218,6 +218,7 @@ var locpicker = (function() {
                 timezone: place.loc.timezone
               });
               util.hideDropdown(form.dropdownToggle);
+              toggleForm(form);
             });
           return false;
         });

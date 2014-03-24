@@ -65,12 +65,15 @@ var task = (function() {
     var newTaskTitle = $("#new-task-title");
 
     function isValidTitle(s) {
+      log("checking validity");
       return s.length > 0;
     }
 
     function updateUI() {
-      if (isValidTitle(newTaskTitle.val()))
+      if (isValidTitle(newTaskTitle.val())) {
+        log("valid!");
         startTaskButton.removeClass("disabled");
+      }
       else
         startTaskButton.addClass("disabled");
     }

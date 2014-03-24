@@ -13,7 +13,6 @@ HTML_INCLUDES = \
   new-task.html \
   sched-step1-tab.html \
   sched-step2-tab.html \
-  sched-step3-tab.html \
   sched-step4-tab.html \
   sched-task-list.html \
   places.html \

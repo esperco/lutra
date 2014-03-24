@@ -79,9 +79,8 @@ var sched4 = (function() {
     <div #content
          class="modal-content composition-modal">
       <div class="modal-header">
-        <img class="svg svg-block"
-             style="float:left"
-             src="/assets/img/reminder.svg"/>
+        <div #iconContainer
+             class="modal-icon reminder-modal-icon"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
@@ -90,10 +89,10 @@ var sched4 = (function() {
           Edit the reminder message.
         </div>
       </div>
-      <div class="email-info-box">
-        <div class="email-info-row">
-          <div class="email-info-label">TO</div>
-          <div class="email-info ellipsis bold">
+      <table class="email-info-table">
+        <tr class="email-info-row">
+          <td class="email-info-label">TO</td>
+          <td class="email-info ellipsis bold">
             <div #recipient
                  class="recipient-name"/>
             <select #addressTo>
@@ -105,14 +104,14 @@ var sched4 = (function() {
               <option value="">Meeting</option>
               <option value="Phone_meeting">Phone Call</option>
             </select>
-          </div>
-        </div>
-        <div class="email-info-row">
-          <div class="email-info-label">SUBJECT</div>
-          <div #subject
+          </td>
+        </tr>
+        <tr class="email-info-row">
+          <td class="email-info-label">SUBJECT</td>
+          <td #subject
                class="email-info ellipsis"/>
-        </div>
-      </div>
+        </tr>
+      </table>
     </div>
     <div #composeBox
          class="modal-compose-box scrollable">
@@ -132,6 +131,10 @@ var sched4 = (function() {
   </div>
 </div>
 '''
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/reminder.svg");
+
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
@@ -347,11 +350,14 @@ var sched4 = (function() {
 
   function createReminderSection(profs, task, guests) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
        class="sched-module">
     <div #header
-         class="sched-module-header collapsed">
+         class="sched-module-header">
       <span #showHide
             class="show-hide link">
         Show
@@ -361,16 +367,24 @@ var sched4 = (function() {
       <div #headerTitle
            class="sched-module-title"/>
     </div>
-    <div #scheduler
-         class="reminder-scheduler hide">
-      <span #schedulerTitle/>
-    </div>
     <div #content
-         style="display:none"/>
+         style="display:none">
+      <div #scheduler
+           class="reminder-scheduler">
+        <span #schedulerTitle/>
+      </div>
+      <div #guestList/>
+    </div>
   </div>
+  <div #connectorArrow
+     class="connector-arrow"/>
 </div>
 '''
-    var headerIcon = $("<img/>")
+    var connectorNubIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorNub);
+    svg.loadImg(connectorNubIcon, "/assets/img/connector-nub.svg");
+
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/reminder.svg");
 
@@ -389,7 +403,7 @@ var sched4 = (function() {
     var statuses = [];
     list.iter(guests, function(uid) {
       var reminderRow = createReminderRow(profs, task, uid, guests);
-      content.append(reminderRow.row);
+      guestList.append(reminderRow.row);
       statuses.push(reminderRow.statusText);
       if (sentReminder(task, uid))
         reminderSent = true;
@@ -397,6 +411,16 @@ var sched4 = (function() {
 
     var schedulerView = createReminderScheduler(profs, task, guests, statuses);
     scheduler.append(schedulerView);
+    if (reminderSent)
+      scheduler.addClass("hide");
+
+    header.hover(
+      function() {
+        connectorNub.addClass("hovering");
+      }, function() {
+        connectorNub.removeClass("hovering");
+      }
+    );
 
     return _view;
   }
@@ -436,9 +460,8 @@ var sched4 = (function() {
     <div #content
          class="modal-content composition-modal">
       <div class="modal-header">
-        <img class="svg svg-block"
-             style="float:left"
-             src="/assets/img/confirmation.svg"/>
+        <div #iconContainer
+             class="modal-icon confirmation-modal-icon"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
@@ -447,24 +470,24 @@ var sched4 = (function() {
           Send a confirmation message.
         </div>
       </div>
-      <div class="email-info-box">
-        <div class="email-info-row">
-          <div class="email-info-label">TO</div>
-          <div class="email-info ellipsis bold">
+      <table class="email-info-table">
+        <tr class="email-info-row">
+          <td class="email-info-label">TO</td>
+          <td class="email-info ellipsis bold">
             <div #recipient
                  class="recipient-name"/>
             <select #addressTo>
               <option value="Address_directly">Address directly</option>
               <option value="Address_to_assistant">Address assistant</option>
             </select>
-          </div>
-        </div>
-        <div class="email-info-row">
-          <div class="email-info-label">SUBJECT</div>
-          <div #subject
+          </td>
+        </tr>
+        <tr class="email-info-row">
+          <td class="email-info-label">SUBJECT</td>
+          <td #subject
                class="email-info ellipsis"/>
-        </div>
-      </div>
+        </tr>
+      </table>
     </div>
     <div #composeBox
          class="modal-compose-box scrollable">
@@ -484,6 +507,10 @@ var sched4 = (function() {
   </div>
 </div>
 '''
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/confirmation.svg");
+
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
@@ -644,7 +671,10 @@ var sched4 = (function() {
 
   function createConfirmSection(profs, ta, guests) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
        class="sched-module">
     <div #header
@@ -661,17 +691,21 @@ var sched4 = (function() {
     <div #content
          style="display:none"/>
   </div>
-  <div #connector
-       class="connector collapsed"/>
+  <div #connectorArrow
+       class="connector-arrow"/>
 </div>
 '''
-    var headerIcon = $("<img/>")
+    var connectorNubIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorNub);
+    svg.loadImg(connectorNubIcon, "/assets/img/connector-nub.svg");
+
+    var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/confirmation.svg");
 
-    var connectorIcon = $("<img/>")
-      .appendTo(connector);
-    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
+    var connectorArrowIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorArrow);
+    svg.loadImg(connectorArrowIcon, "/assets/img/connector-arrow.svg");
 
     var headerText = guests.length > 1 ?
       "Send guests a confirmation message" :
@@ -680,12 +714,17 @@ var sched4 = (function() {
 
     list.iter(guests, function(uid) {
       content.append(createConfirmRow(profs, ta, uid));
-      // if (guests.length == 1) {
-      //   var uid = guests[0];
-      //   if (! sentConfirmation(ta, uid))
-      //     x.composeConfirmationEmail();
-      // }
     });
+
+    header.hover(
+      function() {
+        connectorNub.addClass("hovering");
+        connectorArrow.addClass("hovering");
+      }, function() {
+        connectorNub.removeClass("hovering");
+        connectorArrow.removeClass("hovering");
+      }
+    );
 
     return _view;
   }
@@ -875,11 +914,14 @@ var sched4 = (function() {
 
   function createReviewSection(profs, task) {
 '''
-<div #view>
+<div #view
+     class="sched-module-view collapsed">
+  <div #connectorNub
+       class="connector-nub"/>
   <div #module
        class="sched-module first-module">
     <div #header
-         class="sched-module-header collapsed">
+         class="sched-module-header">
       <span #showHide
             class="show-hide link">
         Show
@@ -924,22 +966,22 @@ var sched4 = (function() {
       </div>
     </div>
   </div>
-  <div #connector
-       class="connector collapsed"/>
+  <div #connectorArrow
+       class="connector-arrow"/>
 </div>
 '''
     var headerIcon = $("<img class='svg-block'/>")
       .appendTo(headerIconContainer);
     svg.loadImg(headerIcon, "/assets/img/calendar.svg");
 
+    var connectorArrowIcon = $("<img class='svg-block'/>")
+      .appendTo(connectorArrow);
+    svg.loadImg(connectorArrowIcon, "/assets/img/connector-arrow.svg");
+
     var tid = task.tid;
     var state = sched.getState(task);
     var editMode = createEditMode(profs, task, summary)
       .appendTo(content);
-
-    var connectorIcon = $("<img class='svg-block'/>")
-      .appendTo(connector);
-    svg.loadImg(connectorIcon, "/assets/img/connector.svg");
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
@@ -984,6 +1026,14 @@ var sched4 = (function() {
       });
     }
 
+    header.hover(
+      function() {
+        connectorArrow.addClass("hovering");
+      }, function() {
+        connectorArrow.removeClass("hovering");
+      }
+    );
+
     edit.click(toggleEditMode);
     editDetails.click(toggleEditMode);
     reschedule.click(rescheduleClick);
@@ -1000,62 +1050,43 @@ var sched4 = (function() {
     var confirm = createConfirmSection(profs, ta, guests);
     var reminder = createReminderSection(profs, ta, guests);
 
-    review.showHide.click(function() {
+    review.header.click(function() {
       toggleModule(review, "review");
     })
-    confirm.showHide.click(function() {
+    confirm.header.click(function() {
       toggleModule(confirm, "confirm");
     })
-    reminder.showHide.click(function() {
+    reminder.header.click(function() {
       toggleModule(reminder, "reminder");
     })
 
     function toggleModule(toggling, x) {
-      if (toggling.header.hasClass("collapsed"))
+      if (toggling.view.hasClass("collapsed"))
         showModule(toggling, x);
       else
         hideModule(toggling, x);
 
       function showModule(toggling, x) {
         toggling.showHide.text("Hide");
-        toggling.header.removeClass("collapsed");
+        toggling.view.removeClass("collapsed");
         toggling.headerIconContainer.addClass("active");
         toggling.content.slideDown("fast");
-        if (x === "review") {
-          toggling.connector.removeClass("collapsed");
-        } else if (x === "confirm") {
-          toggling.connector.removeClass("collapsed");
-          review.connector.addClass("bottom-active");
-        } else if (x === "reminder") {
-          if (! eventTimeHasPassed(ta))
-            toggling.scheduler.removeClass("hide");
-          confirm.connector.addClass("bottom-active");
-        }
         hideOthers(x);
       }
 
       function hideModule(toggling, x) {
         toggling.showHide.text("Show");
-        toggling.header.addClass("collapsed");
+        toggling.view.addClass("collapsed");
         toggling.headerIconContainer.removeClass("active");
         toggling.content.slideUp("fast");
-        if (x === "review") {
-          toggling.connector.addClass("collapsed");
-        } else if (x === "confirm") {
-          toggling.connector.addClass("collapsed");
-          review.connector.removeClass("bottom-active");
-        } else if (x === "reminder") {
-          toggling.scheduler.addClass("hide");
-          confirm.connector.removeClass("bottom-active");
-        }
       }
 
       function hideOthers(x) {
-        if ((x != "review") && (! review.header.hasClass("collapsed")))
+        if ((x != "review") && (! review.view.hasClass("collapsed")))
           hideModule(review, "review");
-        if ((x != "confirm") && (! confirm.header.hasClass("collapsed")))
+        if ((x != "confirm") && (! confirm.view.hasClass("collapsed")))
           hideModule(confirm, "confirm");
-        if ((x != "reminder") && (! reminder.header.hasClass("collapsed")))
+        if ((x != "reminder") && (! reminder.view.hasClass("collapsed")))
           hideModule(reminder, "reminder");
       }
     }
