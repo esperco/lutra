@@ -244,7 +244,6 @@ var locpicker = (function() {
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
-              log(details);
               var title =
                 list.mem(details.types, "establishment") ?
                 details.name :
