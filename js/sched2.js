@@ -448,16 +448,59 @@ var sched2 = (function() {
     offerModal.view.modal({});
   }
 
-  /*
-     If didWeSend is true, look for the most recent chatKind TO uid
-     otherwise, look for the most recent chatKind BY (from) uid
-  */
-  function howLongAgo(ta, uid, chatKind, didWeSend) {
-    var firstMatch = list.find(ta.task_chat_items, function(x) {
-      var uidMatch = didWeSend ? list.mem(x.to, uid) : x.by === uid;
-      return uidMatch && variant.cons(x.chat_item_data) === chatKind;
+  function latestOfferTo(uid, ta) {
+    var opts = sched.getState(ta).calendar_options;
+    var offer = null;
+    var latestTime = 0;
+    list.iter(ta.task_chat_items, function(i) {
+      if (i.chat_item_data[0] === "Scheduling_q" && list.mem(i.to, uid)) {
+        var validChoices =
+          list.for_all(i.chat_item_data[1].choices, function(choice) {
+            return list.exists(opts, function(opt) {
+              return opt.label === choice.label;
+            });
+          });
+        var responseTime = date.ofString(i.time_created).getTime();
+        if (validChoices && responseTime > latestTime) {
+          offer = i;
+          latestTime = responseTime;
+        }
+      }
     });
-    var created = date.ofString(firstMatch.time_created);
+    return offer;
+  }
+
+  function latestResponseFrom(uid, ta) {
+    var opts = sched.getState(ta).calendar_options;
+    var response = null;
+    var latestTime = 0;
+    list.iter(ta.task_chat_items, function(i) {
+      if (i.chat_item_data[0] === "Scheduling_r" && i.by === uid) {
+        var validSelections =
+          list.for_all(i.chat_item_data[1].selected, function(sel) {
+            return list.exists(opts, function(opt) {
+              return opt.label === sel.label;
+            });
+          });
+        var responseTime = date.ofString(i.time_created).getTime();
+        if (validSelections && responseTime > latestTime) {
+          response = i;
+          latestTime = responseTime;
+        }
+      }
+    });
+    return response;
+  }
+
+  /*
+     If didWeSend is true, look for the most recent Scheduling_q TO uid
+     otherwise, look for the most recent Scheduling_r BY (from) uid
+  */
+  function howLongAgo(ta, uid, didWeSend) {
+    var latestMatch = didWeSend ?
+      latestOfferTo(uid, ta) :
+      latestResponseFrom(uid, ta);
+    var created = date.ofString(latestMatch.time_created);
     return date.viewTimeAgo(created).text();
   }
 
@@ -472,6 +515,8 @@ var sched2 = (function() {
     var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
+    var sentQ = latestOfferTo(uid, task);
+    var receivedR = latestResponseFrom(uid, task);
 
     var composeIcon = $("<img class='compose-confirmation-icon'/>")
       .appendTo(compose);
@@ -483,7 +528,7 @@ var sched2 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sched.sentEmail(task, uid, "Scheduling_q")) {
+    if (util.isNotNull(sentQ)) {
       chatHead.addClass("sent");
       compose.addClass("btn-default");
       composeIcon.addClass("sent");
@@ -499,14 +544,14 @@ var sched2 = (function() {
 
     var plural = options.length === 1 ? "" : "s";
     var statusText = "Has not received the meeting option" + plural;
-    if (sched.receivedEmail(task, uid, "Scheduling_r")) {
+    if (util.isNotNull(receivedR)) {
       statusText =
         "Submitted meeting preference" + plural + " " +
-        howLongAgo(task, uid, "Scheduling_r", false);
-    } else if (sched.sentEmail(task, uid, "Scheduling_q")) {
+        howLongAgo(task, uid, false);
+    } else if (util.isNotNull(sentQ)) {
       statusText =
         "Received the meeting option" + plural + " " +
-        howLongAgo(task, uid, "Scheduling_q", true);
+        howLongAgo(task, uid, true);
     }
     var guestStatus = $("<div class='reminder-guest-status'/>")
       .text(statusText)
@@ -1342,17 +1387,38 @@ var sched2 = (function() {
       schedule.module.removeClass("disabled");
     }
 
+    /*
+       Is there any offer message in the chat items
+       whose options match the current value of calendar_options?
+    */
     function sentAnyOffer() {
-      return list.exists(ta.task_chat_items, function(x) {
-        return variant.cons(x.chat_item_data) === "Scheduling_q";
+      var opts = sched.getState(ta).calendar_options;
+      return list.exists(ta.task_chat_items, function(i) {
+        if (i.chat_item_data[0] === "Scheduling_q") {
+          return list.for_all(i.chat_item_data[1].choices, function(choice) {
+            return list.exists(opts, function(opt) {
+              return choice.label === opt.label;
+            });
+          });
+        }
       });
     }
 
+    /*
+       For each attending guest, is there a response to our offer in chat,
+       whose selections match the current value of calendar_options?
+    */
     function receivedAllPreferences() {
+      var opts = sched.getState(ta).calendar_options;
       return list.for_all(sched.getAttendingGuests(ta), function(uid) {
-        return list.exists(ta.task_chat_items, function(x) {
-          return x.by === uid
-              && variant.cons(x.chat_item_data) === "Scheduling_r";
+        return list.exists(ta.task_chat_items, function(i) {
+          if (i.by === uid && i.chat_item_data[0] === "Scheduling_r") {
+            return list.for_all(i.chat_item_data[1].selected, function(sel) {
+              return list.exists(opts, function(opt) {
+                return sel.label === opt.label;
+              });
+            });
+          }
         });
       });
     }
