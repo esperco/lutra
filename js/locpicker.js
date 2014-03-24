@@ -192,11 +192,11 @@ var locpicker = (function() {
       if (item.matched_field === "Address") {
         bolded = geo.highlight(address, [item.matched_substring]);
         if (title && title != address) {
-          bolded = "<i>" + esc(title) + "</i> - " + bolded;
+          bolded = esc(title) + ", " + bolded;
         }
       } else if (item.matched_field === "Title") {
-        bolded = "<i>" + geo.highlight(title, [item.matched_substring])
-          + "</i> - " + esc(address);
+        bolded = geo.highlight(title, [item.matched_substring])
+          + ", " + esc(address);
       } else {
         // TODO Error, bad API response, should never happen
       }
@@ -242,12 +242,13 @@ var locpicker = (function() {
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
-              var title = details.name.length > 0 ? details.name : description;
+              var title = details.name.length > 0 ? details.name : "";
               var coord = details.geometry;
               api.getTimezone(coord.lat, coord.lon)
                 .done(function(x) {
                   var loc = item.loc;
                   setLocation(form, {
+                    title: title,
                     address: details.formatted_address,
                     coord: coord,
                     google_description: description,

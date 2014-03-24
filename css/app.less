@@ -967,9 +967,11 @@ i { color: @gray_60; }
 .composition-modal { height: 100%; }
 
 .modal-dialog.chat-modal,
-.modal-dialog.composition-modal {
-  padding: 30px 0px;
-  @media (min-width:768px) { width: 768px; }
+.modal-dialog.composition-modal { padding: 30px 0px; }
+
+@media (min-width:768px) {
+  .modal-dialog.chat-modal,
+  .modal-dialog.composition-modal { width: 768px; }
 }
 
 .modal-content.chat-modal,
