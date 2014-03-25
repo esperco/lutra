@@ -408,7 +408,9 @@ var sched2 = (function() {
     };
 
     if (util.isNotNull(ea)) {
-      parameters.guest_EA = profile.fullName(profs[ea].prof);
+      var eaName = profile.fullName(profs[ea].prof);
+      offerModal.recipient.text(eaName);
+      parameters.guest_EA = eaName;
       parameters.template_kind = "Options_to_guest_assistant";
     } else {
       parameters.template_kind = "Options_to_guest";
