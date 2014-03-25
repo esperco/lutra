@@ -7,17 +7,21 @@ var sched2 = (function() {
 
   function saveAndReload(ta, action) {
     disableNextButton();
-    if (action === "adding") {
-      spinner.spin("Adding to calendar...");
-    } else if (action === "removing") {
-      spinner.spin("Removing from calendar...");
-    } else {
-      spinner.spin("Updating calendar...");
+    var msg;
+    switch (action) {
+    case "adding":
+      msg = "Adding to calendar...";
+      break;
+    case "removing":
+      msg = "Removing from calendar...";
+      break;
+    default:
+      msg = "Updating calendar...";
     }
-    api.postTask(ta).done(function(task) {
-      spinner.stop();
-      sched.loadTask(task);
-    });
+    spinner.spin(
+      msg,
+      api.postTask(ta).done(sched.loadTask)
+    );
   }
 
   function disableNextButton() {
@@ -88,19 +92,17 @@ var sched2 = (function() {
   }
 
   function updateTask(ta, calOption) {
-    spinner.spin("Updating calendar...");
     var state = sched.getState(ta);
     ta.task_status.task_progress = "Confirmed"; // status in the task list
     state.scheduling_stage = "Confirm";         // step in the scheduling page
     updateTaskState(state, calOption);
-    api.postTask(ta).done(function(ta) {
-      reserveCalendar(ta.tid).done(function(eventInfo) {
-        api.getTask(ta.tid).done(function(ta) {
-          spinner.stop();
-          sched.loadTask(ta);
+    var async =
+      api.postTask(ta).then(function(ta) {
+        return reserveCalendar(ta.tid).then(function(eventInfo) {
+          return api.getTask(ta.tid).done(sched.loadTask);
         });
       });
-    });
+    spinner.spin("Updating calendar...", async);
   }
 
   function createScheduleSection(ta) {
@@ -449,7 +451,6 @@ var sched2 = (function() {
       .off("click")
       .click(function() {
         if (! sendButton.hasClass("disabled")) {
-          spinner.spin("Sending...");
           sendButton.addClass("disabled");
           var body = offerModal.messageEditable.val();
           var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
@@ -459,21 +460,22 @@ var sched2 = (function() {
           var hideEnd = offerModal.messageReadOnly.hasClass("short");
           sched.optionsForGuest(sched.getGuestOptions(task), toUid)
             .hide_end_times = hideEnd;
-          api.postTask(task).done(function() {
-            var chatItem = {
-              tid: task.tid,
-              by: login.me(),
-              to: [toUid],
-              chat_item_data: ["Scheduling_q", {
-                body: body,
-                choices: options
-              }]
-            };
-            chat.postChatItem(chatItem).done(function() {
-              spinner.stop();
-              offerModal.view.modal("hide");
+          var async =
+            api.postTask(task).then(function() {
+              var chatItem = {
+                tid: task.tid,
+                by: login.me(),
+                to: [toUid],
+                chat_item_data: ["Scheduling_q", {
+                  body: body,
+                  choices: options
+                }]
+              };
+              return chat.postChatItem(chatItem).done(function() {
+                offerModal.view.modal("hide");
+              });
             });
-          });
+          spinner.spin("Sending...", async);
         }
       });
 
@@ -967,9 +969,13 @@ var sched2 = (function() {
     }
 
     function openCal() {
+      var defaultDate;
+      if (util.isNotNull(dates.start))
+        defaultDate = date.toString(dates.start);
       var calModal = createCalendarModal({
         timezone: x.location.timezone,
-        onChange: setDates
+        onChange: setDates,
+        defaultDate: defaultDate
       });
       calModal.view.modal({});
       calModal.doneButton

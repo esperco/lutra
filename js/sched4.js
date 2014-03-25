@@ -592,7 +592,6 @@ var sched4 = (function() {
       .off("click")
       .click(function() {
         if (! sendButton.hasClass("disabled")) {
-          spinner.spin("Sending...");
           sendButton.addClass("disabled");
           var body = confirmModal.messageEditable.val();
           var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
@@ -608,9 +607,8 @@ var sched4 = (function() {
               'final': getSlot(ta)
             }]
           };
-          chat.postChatItem(chatItem)
+          spinner.spin("Sending...", chat.postChatItem(chatItem))
             .done(function(item) {
-              spinner.stop();
               confirmModal.view.modal("hide");
             });
         }
@@ -740,24 +738,24 @@ var sched4 = (function() {
     var task = param.task;
     var taskState = sched.getState(task);
     param.updateButton.addClass("disabled");
-    spinner.spin("Updating calendar...");
     taskState.calendar_event_title.custom = param.titleEdit.val();
     taskState.public_notes = param.notesBoxPublic.val();
     taskState.private_notes = param.notesBoxPrivate.val();
-    api.postTask(task).done(function() {
-      api.updateCalendar(param.task.tid, {
-        event_id: sched.getState(task).reserved.google_event,
-        event_title: param.titleEdit.val(),
-        event_notes: {
-          public_notes: param.notesBoxPublic.val(),
-          private_notes: param.notesBoxPrivate.val()
-        }
-      })
-        .done(function() {
-          spinner.stop();
-          param.toggleEditMode();
-        });
-    });
+    var async =
+      api.postTask(task).then(function() {
+        return api.updateCalendar(param.task.tid, {
+          event_id: sched.getState(task).reserved.google_event,
+          event_title: param.titleEdit.val(),
+          event_notes: {
+            public_notes: param.notesBoxPublic.val(),
+            private_notes: param.notesBoxPrivate.val()
+          }
+        })
+          .done(function() {
+            param.toggleEditMode();
+          });
+      });
+    spinner.spin("Updating calendar...", async);
   }
 
   function createEditMode(profs, task, summary, toggle) {
@@ -1002,26 +1000,24 @@ var sched4 = (function() {
       .appendTo(content);
 
     function rescheduleClick() {
-      spinner.spin("Removing from calendar...");
-      api.cancelCalendar(tid).done(function() {
+      var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
-        api.postTask(task).done(function() {
-          spinner.stop();
+        return api.postTask(task).done(function() {
           sched.loadTask(task);
         });
       });
+      spinner.spin("Removing from calendar...", async);
     }
 
     function cancelAndArchiveClick() {
-      spinner.spin("Removing from calendar...");
-      api.cancelCalendar(tid).done(function() {
+      var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
-        api.postTask(task).done(function() {
+        return api.postTask(task).done(function() {
           api.archiveTask(tid);
-          spinner.stop();
           window.location.hash = "#!";
         });
       });
+      spinner.spin("Removing from calendar...", async);
     }
 
     header.hover(
