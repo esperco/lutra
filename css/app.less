@@ -1027,6 +1027,8 @@ i { color: @gray_60; }
 .chat-modal,
 .composition-modal { height: 100%; }
 
+.modal-dialog.cal-picker-modal { width: 100%; }
+
 .modal-dialog.chat-modal,
 .modal-dialog.composition-modal { padding: 30px 0px; }
 
@@ -1036,6 +1038,7 @@ i { color: @gray_60; }
 }
 
 .modal-content.chat-modal,
+.modal-content.cal-picker-modal,
 .modal-content.composition-modal {
   border: 1px solid @gray_10;
   background-clip: none;
@@ -1063,10 +1066,13 @@ i { color: @gray_60; }
   }
 }
 
-.tz-picker-icon,
-.cal-picker-icon {
-  float: left;
+.tz-picker-icon { margin-top: 1px; }
+
+.cal-picker-modal-icon {
   margin-top: 1px;
+  path.cal-header,
+  path.outline { fill: white; }
+  g.grid { stroke: white; }
 }
 
 .offer-modal-icon {
@@ -1086,6 +1092,8 @@ i { color: @gray_60; }
   margin-left: 40px;
   font-size: 20px;
 }
+
+.cal-picker-container { padding: 15px; }
 
 .email-info-row {
   height: 40px;
@@ -2294,12 +2302,6 @@ i { color: @gray_60; }
 
 .tbd {
   font-family: @italic;
-}
-
-
-/*** Calendar Picker ***/
-.cal-picker-dialog {
-  width: 100% !important;
 }
 
 
