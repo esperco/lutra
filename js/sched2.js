@@ -897,10 +897,13 @@ var sched2 = (function() {
     }
 
     function openCal() {
+      var defaultDate;
+      if (util.isNotNull(dates.start))
+        defaultDate = date.toString(dates.start);
       var calModal = createCalendarModal({
         timezone: x.location.timezone,
         onChange: setDates,
-        defaultDate: date.toString(dates.start)
+        defaultDate: defaultDate
       });
       calPickerContainer.children().remove();
       calPickerContainer.append(calModal.modal);
