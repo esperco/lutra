@@ -104,8 +104,11 @@ var sched = (function() {
   <div #privateNotes/>
 </div>
 '''
-    publicNotes.text(slot.notes.public_notes);
-    privateNotes.text(slot.notes.private_notes);
+    var notes = util.isDefined(slot.notes) ?
+      slot.notes
+      : { public_notes: "", private_notes: "" };
+    publicNotes.text(notes.public_notes);
+    privateNotes.text(notes.private_notes);
     if (publicNotes.text() === "" && privateNotes.text() === "") {
       return "";
     } else {
