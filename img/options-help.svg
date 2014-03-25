@@ -22,7 +22,7 @@
 <path d="m16.094,20.227 0,79.18"/>
 </g>
 <path fill="#a2a4ff" stroke="#4446db" d="M119,60c0,8.774-1.915,17.1-5.352,24.584H16.094V35.417h97.593   C117.167,42.94,119,51.165,119,60z"/>
-<circle fill="none" cx="60" cy="60" stroke="#808285" r="59" stroke-width="2"/>
+<circle fill="none" cx="60" cy="60" stroke="#a7a9ac" r="59" stroke-width="2"/>
 </g>
 <text transform="translate(22.4873 50.9189)"><tspan x="0" y="0" font-family="'Arial Black'" font-size="9.8333">6</tspan><tspan x="5.469" y="0" font-family="'Arial'" font-size="11.8"> - HOLD: Dinner</tspan>
 </text>

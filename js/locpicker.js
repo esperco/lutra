@@ -66,6 +66,8 @@ var locpicker = (function() {
         </span>
       </div>
       <div class="col-sm-5 address-map">
+        <div #map
+             class="map-available hide"/>
         <div class="map-unavailable">
           <img class="map-unavailable-pin svg"
              src="/assets/img/pin.svg"/>
@@ -77,14 +79,10 @@ var locpicker = (function() {
   <div #editor/>
 </div>
 '''
-
     var form = _view;
     /* add extra fields to carry along, for convenience */
     form.onTimezoneChange = param.onTimezoneChange;
     form.onLocationSet = param.onLocationSet;
-
-    if (param.showDetails === false)
-      locationDetails.addClass("hide");
 
     return form;
   }
@@ -164,7 +162,7 @@ var locpicker = (function() {
 
   function createGoogleMap(mapDiv) {
     var mapOptions = {
-      center: new google.maps.LatLng(37.4485044, -122.159185),
+      center: new google.maps.LatLng(37.449435, -122.158977),
       zoom: 12
     };
     var googleMap = new google.maps.Map(mapDiv, mapOptions);
@@ -194,11 +192,11 @@ var locpicker = (function() {
       if (item.matched_field === "Address") {
         bolded = geo.highlight(address, [item.matched_substring]);
         if (title && title != address) {
-          bolded = "<i>" + esc(title) + "</i> - " + bolded;
+          bolded = esc(title) + ", " + bolded;
         }
       } else if (item.matched_field === "Title") {
-        bolded = "<i>" + geo.highlight(title, [item.matched_substring])
-          + "</i> - " + esc(address);
+        bolded = geo.highlight(title, [item.matched_substring])
+          + ", " + esc(address);
       } else {
         // TODO Error, bad API response, should never happen
       }
@@ -244,7 +242,10 @@ var locpicker = (function() {
         .click(function() {
           api.getPlaceDetails(description, item.ref_id)
             .done(function(details) {
-              var title = details.name.length > 0 ? details.name : description;
+              var title =
+                list.mem(details.types, "establishment") ?
+                details.name :
+                "";
               var coord = details.geometry;
               api.getTimezone(coord.lat, coord.lon)
                 .done(function(x) {
@@ -259,6 +260,7 @@ var locpicker = (function() {
                 });
               util.hideDropdown(form.dropdownToggle);
               toggleForm(form);
+              form.title.focus();
             });
           return false;
         });
@@ -296,9 +298,6 @@ var locpicker = (function() {
   function setup(form) {
     form.locationSearch.removeClass("hide");
     form.locationForm.addClass("hide");
-    if (getCompleteLocation(form) != null) {
-      toggleForm(form);
-    }
     util.afterTyping(form.searchBox, 250, function() {
       predictAddress(form);
     });
@@ -315,30 +314,21 @@ var locpicker = (function() {
         called when the location is set
     - onTimezoneChange(oldTz, newTz):
         called when the timezone is set or changes
-    - showDetails:
-        whether to show the details (name, address, instructions, map).
-        Default is true.
    */
   mod.create = function(param) {
     log("locpicker param", param);
-    var view = $("<div/>");
     var form = createLocationForm(param);
-    var mapView = $("<div/>");
-
     setup(form);
 
-    view
-      .append(form.location)
-      .append(mapView);
-
     return {
-      view: view,
+      view: form.location,
       focus: (function() { form.searchBox.focus(); }),
 
       /* get/set location fields of the form */
       getCompleteLocation: (function () { return getCompleteLocation(form); }),
       getTimezoneLocation: (function () { return getTimezoneLocation(form); }),
       setLocation: (function(loc) { return setLocation(form, loc); }),
+      toggleForm: (function() { return toggleForm(form); }),
 
       /* terrible hack to work around circular dependencies */
       setLocationNoCallback:

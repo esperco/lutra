@@ -295,10 +295,6 @@ var sched2 = (function() {
           <td class="email-info ellipsis bold">
             <div #recipient
                  class="recipient-name"/>
-            <select #addressTo>
-              <option value="Address_directly">Address directly</option>
-              <option value="Address_to_assistant">Address assistant</option>
-            </select>
           </td>
         </tr>
         <tr class="email-info-row">
@@ -324,10 +320,20 @@ var sched2 = (function() {
         <div #showEndTimeText
              class="show-end-time-text"/>
       </div>
-      <button #send
-              type="button" class="btn btn-primary"
-              style="float:right">
-        Send
+      <div style="float:right">
+        <button #discardDraft
+                type="button" class="btn btn-danger">
+          Discard Draft
+        </button>
+        <button #saveDraft
+                type="button" class="btn btn-default">
+          Save as Draft
+        </button>
+        <button #send
+                type="button" class="btn btn-primary">
+          Send
+        </button>
+      </div>
       </button>
     </div>
   </div>
@@ -362,6 +368,10 @@ var sched2 = (function() {
       });
 
     return _view;
+  }
+
+  function optionsDraftKey(ta, uid) {
+    return ta.tid + "|" + uid + "|OPTIONS";
   }
 
   function composeEmail(profs, task, options, toUid) {
@@ -400,24 +410,40 @@ var sched2 = (function() {
     if (util.isNotNull(ea)) {
       parameters.guest_EA = profile.fullName(profs[ea].prof);
       parameters.template_kind = "Options_to_guest_assistant";
-      offerModal.addressTo.val("Address_to_assistant");
-      offerModal.addressTo.removeClass("hide");
     } else {
       parameters.template_kind = "Options_to_guest";
-      offerModal.addressTo.val("Address_directly");
-      offerModal.addressTo.addClass("hide");
     }
 
-    api.getOptionsMessage(task.tid, parameters)
-      .done(function(optionsMessage) {
-        offerModal.messageEditable
-          .val(optionsMessage.message_text)
-          .trigger("autosize.resize");
-        offerModal.addressTo
-          .unbind("change")
-          .change(function(){refreshOptionsMessage(task.tid, parameters);});
+    var localStorageKey = optionsDraftKey(task, toUid);
+
+    var draft = store.get(localStorageKey);
+    if (util.isDefined(draft)) {
+      offerModal.discardDraft.show();
+      offerModal.messageEditable
+        .val(draft)
+        .trigger("autosize.resize");
+    } else {
+      offerModal.discardDraft.hide();
+      api.getOptionsMessage(task.tid, parameters)
+        .done(function(optionsMessage) {
+          offerModal.messageEditable
+            .val(optionsMessage.message_text)
+            .trigger("autosize.resize");
+        });
+    }
+
+    offerModal.saveDraft
+      .click(function() {
+        var draft = offerModal.messageEditable.val();
+        store.set(localStorageKey, draft);
+        offerModal.view.modal("hide");
       });
 
+    offerModal.discardDraft
+      .click(function() {
+        store.remove(localStorageKey);
+        offerModal.view.modal("hide");
+      });
 
     var sendButton = offerModal.send;
     sendButton
@@ -427,11 +453,9 @@ var sched2 = (function() {
         if (! sendButton.hasClass("disabled")) {
           sendButton.addClass("disabled");
           var body = offerModal.messageEditable.val();
-          if ("Address_to_assistant" === offerModal.addressTo.val()) {
-            var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
-            if (util.isNotNull(ea)) {
-              toUid = ea;
-            }
+          var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
+          if (util.isNotNull(ea)) {
+            toUid = ea;
           }
           var hideEnd = offerModal.messageReadOnly.hasClass("short");
           sched.optionsForGuest(sched.getGuestOptions(task), toUid)
@@ -458,16 +482,59 @@ var sched2 = (function() {
     offerModal.view.modal({});
   }
 
-  /*
-     If didWeSend is true, look for the most recent chatKind TO uid
-     otherwise, look for the most recent chatKind BY (from) uid
-  */
-  function howLongAgo(ta, uid, chatKind, didWeSend) {
-    var firstMatch = list.find(ta.task_chat_items, function(x) {
-      var uidMatch = didWeSend ? list.mem(x.to, uid) : x.by === uid;
-      return uidMatch && variant.cons(x.chat_item_data) === chatKind;
+  function latestOfferTo(uid, ta) {
+    var opts = sched.getState(ta).calendar_options;
+    var offer = null;
+    var latestTime = 0;
+    list.iter(ta.task_chat_items, function(i) {
+      if (i.chat_item_data[0] === "Scheduling_q" && list.mem(i.to, uid)) {
+        var validChoices =
+          list.for_all(i.chat_item_data[1].choices, function(choice) {
+            return list.exists(opts, function(opt) {
+              return opt.label === choice.label;
+            });
+          });
+        var responseTime = date.ofString(i.time_created).getTime();
+        if (validChoices && responseTime > latestTime) {
+          offer = i;
+          latestTime = responseTime;
+        }
+      }
     });
-    var created = date.ofString(firstMatch.time_created);
+    return offer;
+  }
+
+  function latestResponseFrom(uid, ta) {
+    var opts = sched.getState(ta).calendar_options;
+    var response = null;
+    var latestTime = 0;
+    list.iter(ta.task_chat_items, function(i) {
+      if (i.chat_item_data[0] === "Scheduling_r" && i.by === uid) {
+        var validSelections =
+          list.for_all(i.chat_item_data[1].selected, function(sel) {
+            return list.exists(opts, function(opt) {
+              return opt.label === sel.label;
+            });
+          });
+        var responseTime = date.ofString(i.time_created).getTime();
+        if (validSelections && responseTime > latestTime) {
+          response = i;
+          latestTime = responseTime;
+        }
+      }
+    });
+    return response;
+  }
+
+  /*
+     If didWeSend is true, look for the most recent Scheduling_q TO uid
+     otherwise, look for the most recent Scheduling_r BY (from) uid
+  */
+  function howLongAgo(ta, uid, didWeSend) {
+    var latestMatch = didWeSend ?
+      latestOfferTo(uid, ta) :
+      latestResponseFrom(uid, ta);
+    var created = date.ofString(latestMatch.time_created);
     return date.viewTimeAgo(created).text();
   }
 
@@ -482,6 +549,8 @@ var sched2 = (function() {
     var prof = profs[uid].prof;
     var state = sched.getState(task);
     var options = state.calendar_options;
+    var sentQ = latestOfferTo(uid, task);
+    var receivedR = latestResponseFrom(uid, task);
 
     var composeIcon = $("<img class='compose-confirmation-icon'/>")
       .appendTo(compose);
@@ -493,7 +562,7 @@ var sched2 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sched.sentEmail(task, uid, "Scheduling_q")) {
+    if (util.isNotNull(sentQ)) {
       chatHead.addClass("sent");
       compose.addClass("btn-default");
       composeIcon.addClass("sent");
@@ -509,14 +578,14 @@ var sched2 = (function() {
 
     var plural = options.length === 1 ? "" : "s";
     var statusText = "Has not received the meeting option" + plural;
-    if (sched.receivedEmail(task, uid, "Scheduling_r")) {
+    if (util.isNotNull(receivedR)) {
       statusText =
         "Submitted meeting preference" + plural + " " +
-        howLongAgo(task, uid, "Scheduling_r", false);
-    } else if (sched.sentEmail(task, uid, "Scheduling_q")) {
+        howLongAgo(task, uid, false);
+    } else if (util.isNotNull(sentQ)) {
       statusText =
         "Received the meeting option" + plural + " " +
-        howLongAgo(task, uid, "Scheduling_q", true);
+        howLongAgo(task, uid, true);
     }
     var guestStatus = $("<div class='reminder-guest-status'/>")
       .text(statusText)
@@ -951,9 +1020,10 @@ var sched2 = (function() {
       onTimezoneChange: onTimezoneChange,
       onLocationSet: onLocationSet
     });
-    if (util.isDefined(loc))
+    if (util.isDefined(loc)) {
       locationForm.setLocation(loc);
-    else {
+      locationForm.toggleForm();
+    } else {
       var tz = timezone.guessUserTimezone();
       loc = { timezone: tz };
       x.location = loc;
@@ -1372,17 +1442,38 @@ var sched2 = (function() {
       schedule.view.addClass("disabled");
     }
 
+    /*
+       Is there any offer message in the chat items
+       whose options match the current value of calendar_options?
+    */
     function sentAnyOffer() {
-      return list.exists(ta.task_chat_items, function(x) {
-        return variant.cons(x.chat_item_data) === "Scheduling_q";
+      var opts = sched.getState(ta).calendar_options;
+      return list.exists(ta.task_chat_items, function(i) {
+        if (i.chat_item_data[0] === "Scheduling_q") {
+          return list.for_all(i.chat_item_data[1].choices, function(choice) {
+            return list.exists(opts, function(opt) {
+              return choice.label === opt.label;
+            });
+          });
+        }
       });
     }
 
+    /*
+       For each attending guest, is there a response to our offer in chat,
+       whose selections match the current value of calendar_options?
+    */
     function receivedAllPreferences() {
+      var opts = sched.getState(ta).calendar_options;
       return list.for_all(sched.getAttendingGuests(ta), function(uid) {
-        return list.exists(ta.task_chat_items, function(x) {
-          return x.by === uid
-              && variant.cons(x.chat_item_data) === "Scheduling_r";
+        return list.exists(ta.task_chat_items, function(i) {
+          if (i.by === uid && i.chat_item_data[0] === "Scheduling_r") {
+            return list.for_all(i.chat_item_data[1].selected, function(sel) {
+              return list.exists(opts, function(opt) {
+                return sel.label === opt.label;
+              });
+            });
+          }
         });
       });
     }
