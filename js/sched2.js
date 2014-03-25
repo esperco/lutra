@@ -827,7 +827,7 @@ var sched2 = (function() {
     Create a view and everything needed to display and edit location
     and time for a meeting option.
   */
-  function editableViewOfOption(tzList, profs, calOption,
+  function editableViewOfOption(profs, calOption,
                                 saveCalOption, cancel, addMode) {
 '''
 <div #view
@@ -1145,12 +1145,12 @@ var sched2 = (function() {
     };
   }
 
-  function createMeetingOption(tzList, profs, saveCalOption, cancel, addMode) {
+  function createMeetingOption(profs, saveCalOption, cancel, addMode) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return editableViewOfOption(tzList, profs, calOption,
+    return editableViewOfOption(profs, calOption,
                                 saveCalOption, cancel, addMode);
   }
 
@@ -1218,7 +1218,7 @@ var sched2 = (function() {
     return view;
   }
 
-  function insertViewOfOption(ta, tzList, profs, listView, calOption,
+  function insertViewOfOption(ta, profs, listView, calOption,
                               i, saveCalOption, removeCalOption) {
 '''
 <div #view>
@@ -1256,7 +1256,7 @@ var sched2 = (function() {
           .click(toggleEdit);
         var addMode = false;
         var edit =
-          editableViewOfOption(tzList, profs, calOption,
+          editableViewOfOption(profs, calOption,
                                saveCalOption, cancel, addMode);
         editableContainer.children().remove();
         editableContainer.append(edit.view);
@@ -1279,13 +1279,13 @@ var sched2 = (function() {
     return view;
   }
 
-  function loadMeetingOptions(v, tzList, profs, ta) {
+  function loadMeetingOptions(v, profs, ta) {
     function save(calOption, action) { return saveOption(ta, calOption, action); }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
       var addMode = true;
-      return createMeetingOption(tzList, profs, save, cancelAdd, addMode).view
+      return createMeetingOption(profs, save, cancelAdd, addMode).view
                .addClass("add-row");
     }
 
@@ -1297,7 +1297,7 @@ var sched2 = (function() {
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
     list.iter(schedState.calendar_options, function(x, i) {
-      v.append(insertViewOfOption(ta, tzList, profs, listView,
+      v.append(insertViewOfOption(ta, profs, listView,
                                   x, i, save, remove));
     });
     v.append(listView.view)
@@ -1325,7 +1325,7 @@ var sched2 = (function() {
     view.removeClass("hide");
   }
 
-  function createOptionsSection(tzList, profs, ta) {
+  function createOptionsSection(profs, ta) {
 '''
 <div #view
      class="sched-module-view first-module collapsed">
@@ -1363,7 +1363,7 @@ var sched2 = (function() {
 
     var leaderUid = login.leader();
     if (! list.mem(ta.task_participants.organized_for, leaderUid)) {
-      deferred.defer(loadMeetingOptions(content, tzList, profs, ta));
+      deferred.defer(loadMeetingOptions(content, profs, ta));
     }
     else {
       var authLandingUrl = document.URL;
@@ -1372,7 +1372,7 @@ var sched2 = (function() {
           if (!calInfo.has_calendar)
             promptForCalendar(profs[leaderUid], calInfo);
           else
-            loadMeetingOptions(content, tzList, profs, ta);
+            loadMeetingOptions(content, profs, ta);
         });
     }
 
@@ -1387,11 +1387,11 @@ var sched2 = (function() {
     return _view;
   }
 
-  mod.load = function(tzList, profs, ta, view) {
+  mod.load = function(profs, ta, view) {
     view.children().remove();
     var guests = sched.getAttendingGuests(ta);
 
-    var options = createOptionsSection(tzList, profs, ta);
+    var options = createOptionsSection(profs, ta);
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);
 

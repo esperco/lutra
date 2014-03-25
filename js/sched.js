@@ -314,10 +314,10 @@ var sched = (function() {
     tabSelector.show("sched-step1-tab");
   };
 
-  function loadStep2(tzList, profs, task) {
+  function loadStep2(profs, task) {
     var view = $("#sched-step2-table");
 
-    sched2.load(tzList, profs, task, view);
+    sched2.load(profs, task, view);
 
     tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
@@ -333,7 +333,7 @@ var sched = (function() {
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, ta, prog) {
+  function setup_step_buttons(ta, prog) {
     $(".sched-go-step1")
       .unbind('click')
       .click(function() {
@@ -348,7 +348,7 @@ var sched = (function() {
       .click(function() {
         observable.onSchedulingStepChanging.notify();
         profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep2(tzList, profs, ta);
+          loadStep2(profs, ta);
         });
       });
 
@@ -367,31 +367,27 @@ var sched = (function() {
     var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
-    api.getTimezones()
-      .done(function(x) {
-        var tzList = x.timezones;
-        setup_step_buttons(tzList, ta, progress);
-        profile.profilesOfTaskParticipants(ta)
-          .done(function(profs) {
-            switch (progress) {
-            case "Guest_list":
-              loadStep1(profs, ta);
-              break;
-            case "Find_availability":
-              // Interpreted as Coordinate until case is removed from type
-              loadStep2(tzList, profs, ta);
-              break;
-            case "Coordinate":
-              loadStep2(tzList, profs, ta);
-              break;
-            case "Confirm":
-              loadStep4(profs, ta);
-              break;
-            default:
-              log("Unknown scheduling stage: " + progress);
-            }
-            util.focus();
-          });
+    setup_step_buttons(ta, progress);
+    profile.profilesOfTaskParticipants(ta)
+      .done(function(profs) {
+        switch (progress) {
+        case "Guest_list":
+          loadStep1(profs, ta);
+          break;
+        case "Find_availability":
+          // Interpreted as Coordinate until case is removed from type
+          loadStep2(profs, ta);
+          break;
+        case "Coordinate":
+          loadStep2(profs, ta);
+          break;
+        case "Confirm":
+          loadStep4(profs, ta);
+          break;
+        default:
+          log("Unknown scheduling stage: " + progress);
+        }
+        util.focus();
       });
   };
 
