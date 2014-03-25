@@ -12,6 +12,9 @@
 var locpicker = (function() {
   var mod = {};
 
+  // Set by setPositionFromNavigator, stored until refresh
+  var position = null;
+
   function toggleForm(form) {
     if (form.locationSearch.hasClass("hide")) {
       form.locationSearch.removeClass("hide");
@@ -287,9 +290,21 @@ var locpicker = (function() {
   }
 
   function predictAddress(form) {
+    // Default: No location bias
+    var lat = 0;
+    var lon = 0;
+    var radius = 20000000;
+
+    if (util.isNotNull(position) && util.isNotNull(position.coords)) {
+      // If position detected: Bias to within 100 km
+      lat = position.coords.latitude;
+      lon = position.coords.longitude;
+      radius = 100000;
+    }
+
     var textInput = form.searchBox.val();
     if (textInput === "") return;
-    api.getPlacePredictions(textInput)
+    api.getPlacePredictions(textInput, lat, lon, radius)
       .done(function(predictions) {
         displayPredictionsDropdown(form, predictions);
       });
@@ -309,6 +324,20 @@ var locpicker = (function() {
   }
 
   /*
+     getCurrentPosition is an async call, but we don't want to wait for it,
+     since it can take some time. Until it finishes, location biasing is
+     disabled. After position is set, we remember it until the JS is reloaded.
+  */
+  function setPositionFromNavigator() {
+    var geo = window.navigator.geolocation;
+    if (util.isNotNull(geo) && position === null) {
+      geo.getCurrentPosition(function(pos) {
+        position = pos;
+      });
+    }
+  }
+
+  /*
     Parameters:
     - onLocationSet(loc):
         called when the location is set
@@ -319,6 +348,7 @@ var locpicker = (function() {
     log("locpicker param", param);
     var form = createLocationForm(param);
     setup(form);
+    setPositionFromNavigator();
 
     return {
       view: form.location,

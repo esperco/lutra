@@ -287,9 +287,12 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
-  mod.getPlacePredictions = function(partial_loc) {
+  mod.getPlacePredictions = function(partial_loc, lat, lon, radius) {
     var url = apiSPrefix() + "/place/autocomplete/" +
-              encodeURIComponent(partial_loc);
+              encodeURIComponent(partial_loc) + "/" +
+              encodeURIComponent(lat) + "/" +
+              encodeURIComponent(lon) + "/" +
+              encodeURIComponent(radius);
     return jsonHttpGet(url);
   };
 
