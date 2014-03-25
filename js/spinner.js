@@ -5,7 +5,7 @@
 var spinner = (function() {
   var mod = {};
 
-  mod.spin = function(msg) {
+  mod.start = function(msg) {
     if (util.isNotNull(msg)) {
       $("#loading-text").text(msg);
     } else {
@@ -16,6 +16,16 @@ var spinner = (function() {
 
   mod.stop = function() {
     $("#loading").hide();
+  };
+
+  /* Spin the spinner while the asynchronous call isn't over. */
+  mod.spin = function(msg, deferredValue) {
+    if (deferredValue.state() === "pending") {
+      mod.start(msg);
+      deferredValue
+        .always(mod.stop);
+    }
+    return deferredValue;
   };
 
   return mod;

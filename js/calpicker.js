@@ -248,16 +248,16 @@ var calpicker = (function() {
   }
 
   function fetchEvents(start, end, tz, callback) {
-    spinner.spin("Loading calendar...");
-    api.postCalendar(login.leader(), {
+    var async = api.postCalendar(login.leader(), {
       timezone: tz,
       window_start: start,
       window_end: end
-    }).done(function (esperCalendar) {
-      var events = importEvents(esperCalendar);
-      spinner.stop();
-      callback(events);
-    });
+    })
+      .done(function (esperCalendar) {
+        var events = importEvents(esperCalendar);
+        callback(events);
+      });
+    spinner.spin("Loading calendar...", async);
   }
 
   /*
@@ -306,6 +306,7 @@ var calpicker = (function() {
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
+      defaultDate: param.defaultDate,
       defaultView: 'agendaWeek',
       timezone: tz,
       selectable: true,
