@@ -1380,9 +1380,7 @@ var sched2 = (function() {
   }
 
   mod.load = function(tzList, profs, ta, view) {
-    view.children().remove();
     var guests = sched.getAttendingGuests(ta);
-
     var options = createOptionsSection(tzList, profs, ta);
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);

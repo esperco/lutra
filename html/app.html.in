@@ -269,7 +269,7 @@
 
     <div id="task-page" class="hide task-page">
 
-      <div class="modal fade" id="chat-modal" tabindex="-1"
+<!--       <div class="modal fade" id="chat-modal" tabindex="-1"
            role="dialog" aria-labelledby="chat-title"
            aria-hidden="true">
         <div class="modal-dialog chat-modal">
@@ -293,35 +293,57 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div id="task-content" class="scrollable">
 
-        <div id="task-navbar">
+        <div class="task-header">
           <a href="#">
-            <img id="return-home" class="svg" src="/assets/img/esper-mark.svg">
-          </a>
-          <a id="chat-icon-container">
-            <img id="chat-icon" class="svg" src="/assets/img/chat-count.svg">
+            <img class="svg return-home" src="/assets/img/esper-mark.svg">
           </a>
           <div id="task-title-div" class="clearfix">
             <input id="task-title" class="hide form-control ellipsis">
           </div>
         </div>
 
-        <div id="new-task">
+        <div class="task-navbar">
+          <a class="task-tab coordination-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
+            </div>
+            <div class="coordination-tab-name">COORDINATION</div>
+          </a>
+          <a class="task-tab messages-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
+            </div>
+            <div class="messages-tab-name">MESSAGES</div>
+          </a>
+          <a class="task-tab setup-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
+            </div>
+            <div class="setup-tab-name">SETUP</div>
+          </a>
+        </div>
+
+        <div id="new-task" class="scrollable">
           @@new-task.html@@
         </div>
 
-        <div id="sched-task" class="hide">
-          <div id="sched-step1-tab" class="hide">
-            @@sched-step1-tab.html@@
+        <div id="sched-task" class="scrollable hide">
+          <div id="sched-step2-tab" class="task-container hide">
+            <div id="sched-step2-connect" class="hide"></div>
+            <div id="sched-step2-table"></div>
           </div>
-          <div id="sched-step2-tab" class="hide">
-            @@sched-step2-tab.html@@
+          <div id="sched-step4-tab" class="task-container hide">
+            <div id="sched-step4-table"></div>
           </div>
-          <div id="sched-step4-tab" class="hide">
-            @@sched-step4-tab.html@@
+          <div id="messages-tab" class="task-container hide">
+            @@messages-tab.html@@
+          </div>
+          <div id="setup-tab" class="task-container hide">
+            @@setup-tab.html@@
           </div>
         </div>
       </div>

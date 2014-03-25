@@ -523,7 +523,7 @@ var chat = (function () {
     if (newMessages > 0) {
       var newCount = document.getElementById("unread-count");
       newCount.firstChild.nodeValue = newMessages;
-      $("#chat-icon-container").addClass("unread-messages");
+      $("#messages-tab").addClass("unread-messages");
     }
   }
 
@@ -571,13 +571,6 @@ var chat = (function () {
 
     mod.clearTaskChats();
     updateUnreadCount(0);
-
-    var chatModal = $("#chat-modal");
-    $("#chat-icon-container")
-      .unbind("click")
-      .click(function() {
-        chatModal.modal({});
-      })
 
     profile.profilesOfTaskParticipants(ta)
     .done(function(profs) {

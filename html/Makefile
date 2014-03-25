@@ -11,9 +11,8 @@ HTML_INCLUDES = \
   request-password.html \
   reset-password.html \
   new-task.html \
-  sched-step1-tab.html \
-  sched-step2-tab.html \
-  sched-step4-tab.html \
+  messages-tab.html \
+  setup-tab.html \
   sched-task-list.html \
   places.html \
   settings.html \

@@ -5,7 +5,7 @@
 var sched1 = (function() {
   var mod = {};
 
-  var nextButton = $(".sched-step1-next");
+  var saveButton = $(".save-setup");
 
   function editGuest(updateAddButton) {
     var edit = {};
@@ -189,7 +189,7 @@ var sched1 = (function() {
           rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
             .appendTo(guestsContainer);
           saveGuests(task, hosts, guestTbl, guestOptions);
-          updateNextButton(hosts, guestTbl, guestOptions);
+          updateSaveButton(hosts, guestTbl, guestOptions);
         });
       });
       clearAddGuest();
@@ -351,10 +351,10 @@ var sched1 = (function() {
       remove.click(function() {
         var hosts = sched.getHosts(task);
         view.remove();
-        updateNextButton(hosts, guestTbl, guestOptions);
+        updateSaveButton(hosts, guestTbl, guestOptions);
         removeGuest(guestTbl, uid);
         saveGuests(task, hosts, guestTbl, guestOptions);
-        updateNextButton(hosts, guestTbl, guestOptions);
+        updateSaveButton(hosts, guestTbl, guestOptions);
       });
 
       viewOfProfile(guestView, profs, task, uid);
@@ -437,11 +437,11 @@ var sched1 = (function() {
     return guests.length > 0;
   }
 
-  function updateNextButton(hosts, guestTbl, guestOptions) {
+  function updateSaveButton(hosts, guestTbl, guestOptions) {
     if (isReady(hosts, guestTbl, guestOptions))
-      nextButton.removeClass("disabled");
+      saveButton.removeClass("disabled");
     else
-      nextButton.addClass("disabled");
+      saveButton.addClass("disabled");
   }
 
   /* remove guest */
@@ -473,9 +473,11 @@ var sched1 = (function() {
   }
 
   mod.load = function(profs, ta, view) {
-    var view = $("#sched-step1-table");
-    view.children().remove();
-    $("<h3>Add guests to the meeting.</h3>")
+    $("<h4>Email Subject</h4>")
+      .appendTo(view);
+    $("<h4>Live Meeting Page</h4>")
+      .appendTo(view);
+    $("<h4>Guests</h4>")
       .appendTo(view);
 
     var hostsContainer = $("<div class='hosts-container'>");
@@ -511,14 +513,14 @@ var sched1 = (function() {
 
     view.append(guestListContainer);
 
-    nextButton
-      .unbind("click")
+    saveButton
+      .off("click")
       .click(function() {
-        nextButton.addClass("disabled");
+        saveButton.addClass("disabled");
         finalizeGuests(ta, hosts, guestTbl, guestOptions);
       });
 
-    updateNextButton(hosts, guestTbl, guestOptions);
+    updateSaveButton(hosts, guestTbl, guestOptions);
 
     observable.onSchedulingStepChanging.observe("step", function() {
       saveGuests(ta, hosts, guestTbl, guestOptions);
