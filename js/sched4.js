@@ -611,7 +611,7 @@ var sched4 = (function() {
           chat.postChatItem(chatItem)
             .done(function(item) {
               spinner.stop();
-              confirmModal.modal("hide");
+              confirmModal.view.modal("hide");
             });
         }
       });
