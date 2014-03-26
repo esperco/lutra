@@ -145,7 +145,7 @@ var locpicker = (function() {
       return null;
   }
 
-  function setLocationNoCallback(form, loc) {
+  function setLocationNoCallback(form, loc, place) {
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
@@ -162,6 +162,11 @@ var locpicker = (function() {
 
     form.coord = loc.coord;
     form.timezone = loc.timezone;
+    form.googleDescription = loc.google_description;
+
+    if (util.isNotNull(place)) {
+      form.savedPlaceID = place.placeid;
+    }
 
     form.title.val(loc.title);
     form.address.val(loc.address);
@@ -171,8 +176,8 @@ var locpicker = (function() {
       form.onTimezoneChange(oldTimezone, newTimezone);
   }
 
-  function setLocation(form, loc) {
-    setLocationNoCallback(form, loc);
+  function setLocation(form, loc, place) {
+    setLocationNoCallback(form, loc, place);
     form.onLocationSet(loc);
   }
 
@@ -216,13 +221,15 @@ var locpicker = (function() {
         .click(function() {
           api.postSelectPlace(item.google_description)
             .done(function(place) {
-              setLocation(form, {
+              var loc = {
                 title: title,
                 coord: coord,
                 address: address,
                 instructions: instructions,
-                timezone: place.loc.timezone
-              });
+                timezone: place.loc.timezone,
+                google_description: item.google_description
+              };
+              setLocation(form, loc, place);
               util.hideDropdown(form.dropdownToggle);
               toggleForm(form);
             });
@@ -367,7 +374,10 @@ var locpicker = (function() {
 
       /* terrible hack to work around circular dependencies */
       setLocationNoCallback:
-        (function(loc) { return setLocationNoCallback(form, loc); })
+        (function(loc) { return setLocationNoCallback(form, loc); }),
+
+      getGoogleDescription: (function () { return form.googleDescription; }),
+      getSavedPlaceID: (function () { return form.savedPlaceID; })
     };
   }
 
