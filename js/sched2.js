@@ -1122,7 +1122,9 @@ var sched2 = (function() {
 
     function saveMe(action) {
       saveButton.addClass("disabled");
-      saveCalOption(getCalOption(), action);
+      var desc = locationForm.getGoogleDescription();
+      var savedID = locationForm.getSavedPlaceID();
+      saveCalOption(getCalOption(), action, desc, savedID);
     }
 
     var action;
@@ -1154,7 +1156,23 @@ var sched2 = (function() {
                                 saveCalOption, cancel, addMode);
   }
 
-  function saveOption(ta, calOption, action) {
+  function saveNamedPlace(calOption, googleDescription, savedPlaceID) {
+    var loc = calOption.slot.location;
+    var edit = {
+      title: loc.title,
+      address: loc.address,
+      instructions: loc.instructions,
+      google_description: googleDescription,
+      geometry: loc.coord
+    };
+    if (util.isNotNull(savedPlaceID)) {
+      return api.postEditPlace(savedPlaceID, edit);
+    } else {
+      return api.postCreatePlace(googleDescription, edit);
+    }
+  }
+
+  function saveOption(ta, calOption, action, googleDescription, savedPlaceID) {
     var schedState = sched.getState(ta);
     var label = calOption.label;
     var options = schedState.calendar_options;
@@ -1166,7 +1184,18 @@ var sched2 = (function() {
     }
     else
       options.push(calOption);
-    saveAndReload(ta, action);
+    if (
+      util.isNotNull(calOption.slot)
+      && util.isNotNull(googleDescription)
+      && calOption.slot.location.title !== ""
+    ) {
+      saveNamedPlace(calOption, googleDescription, savedPlaceID)
+        .done(function() {
+          saveAndReload(ta, action);
+        });
+    } else {
+      saveAndReload(ta, action);
+    }
   }
 
   function removeOption(ta, calOptionLabel) {
@@ -1280,7 +1309,9 @@ var sched2 = (function() {
   }
 
   function loadMeetingOptions(v, profs, ta) {
-    function save(calOption, action) { return saveOption(ta, calOption, action); }
+    function save(calOption, action, desc, savedID) {
+      return saveOption(ta, calOption, action, desc, savedID);
+    }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
