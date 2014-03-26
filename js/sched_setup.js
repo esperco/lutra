@@ -5,8 +5,8 @@
 var setup = (function() {
   var mod = {};
 
-  var saveButton = $("<button class='btn btn-primary save-guests'/>")
-    .text("Save");
+  var doneButton = $("<button class='btn btn-primary done-setup'/>")
+    .text("Done");
 
   function editGuest(updateAddButton) {
     var edit = {};
@@ -190,7 +190,6 @@ var setup = (function() {
           rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
             .appendTo(guestsContainer);
           saveGuests(task, hosts, guestTbl, guestOptions);
-          updateSaveButton(hosts, guestTbl, guestOptions);
         });
       });
       clearAddGuest();
@@ -352,10 +351,9 @@ var setup = (function() {
       remove.click(function() {
         var hosts = sched.getHosts(task);
         view.remove();
-        updateSaveButton(hosts, guestTbl, guestOptions);
-        removeGuest(guestTbl, uid);
+        disableButtons();
+        removeGuest(task, guestTbl, uid);
         saveGuests(task, hosts, guestTbl, guestOptions);
-        updateSaveButton(hosts, guestTbl, guestOptions);
       });
 
       viewOfProfile(guestView, profs, task, uid);
@@ -433,20 +431,33 @@ var setup = (function() {
     return profile.shortenName(s).length > 0;
   }
 
-  function isReady(hosts, guestTbl, guestOptions) {
-    var guests = collectGuests(hosts, guestTbl, guestOptions);
-    return guests.length > 0;
+  function updateStage(ta) {
+    if (sched.getAttendingGuests(ta).length === 0) {
+      ta.task_status.task_progress = "Unread_by_organizer";
+      sched.getState(ta).scheduling_stage = "Guest_list";
+    } else if (ta.task_status.task_progress !== "Confirmed") {
+      ta.task_status.task_progress = "Coordinating";
+      sched.getState(ta).scheduling_stage = "Coordinate";
+    }
   }
 
-  function updateSaveButton(hosts, guestTbl, guestOptions) {
-    if (isReady(hosts, guestTbl, guestOptions))
-      saveButton.removeClass("disabled");
-    else
-      saveButton.addClass("disabled");
+  function updateButtons(ta) {
+    if (sched.getAttendingGuests(ta).length === 0) {
+      $(".coordination-tab-select").addClass("disabled");
+      doneButton.addClass("disabled");
+    } else {
+      $(".coordination-tab-select").removeClass("disabled");
+      doneButton.removeClass("disabled");
+    }
+  }
+
+  function disableButtons() {
+    $(".coordination-tab-select").addClass("disabled");
+    doneButton.addClass("disabled");
   }
 
   /* remove guest */
-  function removeGuest(guestTbl, uid) {
+  function removeGuest(ta, guestTbl, uid) {
     delete guestTbl[uid];
   }
 
@@ -458,17 +469,9 @@ var setup = (function() {
 
   function saveGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
-    api.postTask(ta).done(observable.onTaskParticipantsChanged.notify);
-  }
-
-  function finalizeGuests(ta, hosts, guestTbl, guestOptions) {
-    updateGuests(ta, hosts, guestTbl, guestOptions);
-    if (ta.task_status.task_progress !== "Confirmed") {
-      ta.task_status.task_progress = "Coordinating";
-      sched.getState(ta).scheduling_stage = "Coordinate";
-    }
     api.postTask(ta).done(function(ta) {
-      sched.loadTask(ta);
+      updateButtons(ta);
+      updateStage(ta);
       observable.onTaskParticipantsChanged.notify(ta);
     });
   }
@@ -506,17 +509,8 @@ var setup = (function() {
         .appendTo(guestList);
     });
 
+    updateButtons(ta);
     content.append(addResult.view);
-
-    saveButton
-      .appendTo(content)
-      .off("click")
-      .click(function() {
-        saveButton.addClass("disabled");
-        finalizeGuests(ta, hosts, guestTbl, guestOptions);
-      });
-
-    updateSaveButton(hosts, guestTbl, guestOptions);
 
     observable.onSchedulingStepChanging.observe("step", function() {
       saveGuests(ta, hosts, guestTbl, guestOptions);
@@ -605,7 +599,14 @@ var setup = (function() {
       host = uid;
     });
 
+    doneButton
+      .off("click")
+      .click(function() {
+        sched.loadTask(ta);
+      });
+
     view
+      .append(doneButton)
       .append($("<h3>Manage settings for this meeting.</h3>"))
       .append($("<hr/>"))
       .append(viewOfEmailSubject(ta).view)

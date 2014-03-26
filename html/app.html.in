@@ -270,33 +270,37 @@
     <div id="task-page" class="task-page scrollable hide">
 
       <div class="task-header">
-        <a href="#">
-          <img class="svg return-home" src="/assets/img/esper-mark.svg">
-        </a>
-        <div id="task-title-div" class="clearfix">
-          <input id="task-title" class="hide form-control ellipsis">
+        <div class="task-header-container">
+          <a href="#">
+            <img class="svg return-home" src="/assets/img/esper-mark.svg">
+          </a>
+          <div id="task-title-div" class="clearfix">
+            <input id="task-title" class="hide form-control ellipsis">
+          </div>
         </div>
       </div>
 
       <div class="task-navbar">
-        <a class="task-tab coordination-tab-select">
-          <div class="task-tab-icon">
-            <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
-          </div>
-          <div class="coordination-tab-name">COORDINATION</div>
-        </a>
-        <a class="task-tab messages-tab-select">
-          <div class="task-tab-icon">
-            <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
-          </div>
-          <div class="messages-tab-name">MESSAGES</div>
-        </a>
-        <a class="task-tab setup-tab-select">
-          <div class="task-tab-icon">
-            <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
-          </div>
-          <div class="setup-tab-name">SETUP</div>
-        </a>
+        <div class="task-navbar-container clearfix">
+          <a class="task-tab coordination-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
+            </div>
+            <div class="coordination-tab-name">COORDINATION</div>
+          </a>
+          <a class="task-tab messages-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
+            </div>
+            <div class="messages-tab-name">MESSAGES</div>
+          </a>
+          <a class="task-tab setup-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
+            </div>
+            <div class="setup-tab-name">SETUP</div>
+          </a>
+        </div>
       </div>
 
       <div id="new-task" class="scrollable">

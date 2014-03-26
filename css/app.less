@@ -527,17 +527,17 @@ i { color: @gray_60; }
 
 .return-home {
   float: left;
-  width: 28px;
-  height: 34px;
-  margin-top: 18px;
-  margin-left: 16px;
+  width: 23px;
+  height: 28px;
+  margin-top: 21px;
+  margin-left: 15px;
   cursor: pointer;
   g path { fill: @gray_40; }
   &:hover g path { fill: white; }
 }
 
 #task-title-div {
-  margin-left: 56px;
+  margin-left: 48px;
   margin-right: 60px;
 }
 
@@ -577,6 +577,14 @@ i { color: @gray_60; }
 .task-tab.active {
   color: white;
   pointer-events: none;
+}
+
+.coordination-tab-select.disabled {
+  color: @gray_60;
+  pointer-events: none;
+  path.cal-header,
+  path.outline { fill: @gray_60; }
+  g.grid { stroke: @gray_60; }
 }
 
 .task-tab-icon { float: left; }
@@ -1001,13 +1009,31 @@ i { color: @gray_60; }
 
 /*** Container ***/
 
+.task-header-container,
+.task-navbar-container {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width:767px) {
+  .task-navbar-container { width: 403px; }
+}
+@media (max-width:410px) {
+  .task-tab-icon { display: none; }
+  .coordination-tab-name,
+  .messages-tab-name,
+  .setup-tab-name { margin-left: 0; }
+  .task-navbar-container { width: 310px; }
+}
+
 .task-container {
-  max-width: 990px;
+  max-width: 924px;
   margin-left: auto;
   margin-right: auto;
   padding-top: 20px;
   padding-bottom: 150px;
-  @media(max-width:1020px){
+  @media(max-width:954px){
     margin-right: 15px;
     margin-left: 15px;
   }
@@ -1949,7 +1975,11 @@ i { color: @gray_60; }
 .setup-section { padding: 5px 0px 15px 0px; }
 
 .setup-section-icon { float: left; }
-.subject-icon { margin-top: 8px; }
+.subject-icon {
+  margin-top: 8px;
+  path.inside-line { fill: @gray_30; }
+  path.outside-line { stroke: @gray_30; }
+}
 .live-icon {
   margin-top: 5px;
   margin-left: 1px;
@@ -1969,8 +1999,12 @@ i { color: @gray_60; }
   color: @gray_60;
 }
 
-.update-subject,
-.save-guests { margin-top: 10px; }
+.done-setup {
+  float: right;
+  margin-top: -4px;
+}
+
+.update-subject { margin-top: 10px; }
 
 .sched-step1-row,
 .add-guest-row {
