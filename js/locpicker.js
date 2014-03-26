@@ -25,6 +25,14 @@ var locpicker = (function() {
     }
   }
 
+  function createGoogleMap(mapDiv, pos) {
+    var mapOptions = { center: pos, zoom: 12 };
+    var googleMap = new google.maps.Map(mapDiv, mapOptions);
+    var addressMarker = new google.maps.Marker();
+
+    return { googleMap: googleMap, addressMarker: addressMarker };
+  }
+
   function createLocationForm(param) {
 '''
 <div #location
@@ -70,8 +78,8 @@ var locpicker = (function() {
       </div>
       <div class="col-sm-5 address-map">
         <div #map
-             class="map-available hide"/>
-        <div class="map-unavailable">
+             class="map-available"/>
+        <div class="map-unavailable hide">
           <img class="map-unavailable-pin svg"
              src="/assets/img/pin.svg"/>
           <div>MAP UNAVAILABLE</div>
@@ -141,6 +149,17 @@ var locpicker = (function() {
     var oldTimezone = form.timezone;
     var newTimezone = loc.timezone;
 
+    if (util.isNotNull(loc.coord)) {
+      form.map.children().remove();
+      var pos = new google.maps.LatLng(loc.coord.lat, loc.coord.lon);
+      var mapView = createGoogleMap(form.map.get(0), pos);
+      var map = mapView.googleMap;
+      var marker = mapView.addressMarker;
+      marker.setPosition(pos);
+      marker.setMap(map);
+      map.panTo(pos);
+    }
+
     form.coord = loc.coord;
     form.timezone = loc.timezone;
 
@@ -161,20 +180,6 @@ var locpicker = (function() {
     setLocation(form, {});
     form.searchBox.val("")
                   .focus();
-  }
-
-  function createGoogleMap(mapDiv) {
-    var mapOptions = {
-      center: new google.maps.LatLng(37.449435, -122.158977),
-      zoom: 12
-    };
-    var googleMap = new google.maps.Map(mapDiv, mapOptions);
-    var addressMarker = new google.maps.Marker();
-
-    return {
-      googleMap: googleMap,
-      addressMarker: addressMarker
-    };
   }
 
   function addSuggestedSavedPlacesToMenu(form, predictions) {
