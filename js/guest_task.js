@@ -169,7 +169,9 @@ var guestTask = function() {
     }
 
     loc.click(function() {
-      window.open("http://www.google.com/maps/search/" + encodeURIComponent(locText));
+      window.open(
+        "http://maps.google.com/?daddr=" + encodeURIComponent(locText)
+      );
     });
 
     return view;

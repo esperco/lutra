@@ -296,11 +296,11 @@ var sched = (function() {
     "setup-tab": {ids: ["setup-tab"]}
   });
 
-  function loadStep2(tzList, profs, task) {
+  function loadStep2(profs, task) {
     var view = $("#sched-step2-table");
     view.children().remove();
 
-    sched2.load(tzList, profs, task, view);
+    sched2.load(profs, task, view);
     tabSelector.show("sched-step2-tab");
   };
 
@@ -340,7 +340,7 @@ var sched = (function() {
     }
   }
 
-  function setup_step_buttons(tzList, ta, prog) {
+  function setup_step_buttons(ta, prog) {
     $(".coordination-tab-select")
       .off("click")
       .click(function() {
@@ -372,35 +372,31 @@ var sched = (function() {
     var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
-    api.getTimezones()
-      .done(function(x) {
-        var tzList = x.timezones;
-        setup_step_buttons(tzList, ta, progress);
-        profile.profilesOfTaskParticipants(ta)
-          .done(function(profs) {
-            switch (progress) {
-            case "Guest_list":
-              markActive("setup");
-              loadSetup(profs, ta);
-              break;
-            case "Find_availability":
-              // Interpreted as Coordinate until case is removed from type
-              markActive("coordination");
-              loadStep2(tzList, profs, ta);
-              break;
-            case "Coordinate":
-              markActive("coordination");
-              loadStep2(tzList, profs, ta);
-              break;
-            case "Confirm":
-              markActive("coordination");
-              loadStep4(profs, ta);
-              break;
-            default:
-              log("Unknown scheduling stage: " + progress);
-            }
-            util.focus();
-          });
+    setup_step_buttons(ta, progress);
+    profile.profilesOfTaskParticipants(ta)
+      .done(function(profs) {
+        switch (progress) {
+        case "Guest_list":
+          markActive("setup");
+          loadSetup(profs, ta);
+          break;
+        case "Find_availability":
+          // Interpreted as Coordinate until case is removed from type
+          markActive("coordination");
+          loadStep2(profs, ta);
+          break;
+        case "Coordinate":
+          markActive("coordination");
+          loadStep2(profs, ta);
+          break;
+        case "Confirm":
+          markActive("coordination");
+          loadStep4(profs, ta);
+          break;
+        default:
+          log("Unknown scheduling stage: " + progress);
+        }
+        util.focus();
       });
   };
 
