@@ -5,7 +5,8 @@
 var setup = (function() {
   var mod = {};
 
-  var saveButton = $(".save-setup");
+  var saveButton = $("<button class='btn btn-primary save-guests'/>")
+    .text("Save");
 
   function editGuest(updateAddButton) {
     var edit = {};
@@ -472,47 +473,43 @@ var setup = (function() {
     });
   }
 
-  mod.load = function(profs, ta, view) {
-    view
-      .append($("<h3>Manage settings for this meeting.</h3>"))
-      .append($("<h4>Email Subject</h4>"))
-      .append($("<h4>Live Meeting Page</h4>"))
-      .append($("<h4>Guests</h4>"))
-
-    var hostsContainer = $("<div class='hosts-container'>");
-    var newGuestContainer = $("<div class='new-guest-container'>");
-    var guestsContainer = $("<div class='guests-container'/>");
+  function viewOfGuests(profs, ta, hosts) {
+'''
+<div #view
+     class="setup-section">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Guests</h4>
+    <div #help
+         class="help-text"/>
+    <div #content
+         class="setup-guests">
+      <div #guestList/>
+    </div>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block guests-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/group.svg");
 
     var guests = sched.getAttendingGuests(ta);
     var guestTbl = list.toTable(guests);
     var guestOptions = sched.getGuestOptions(ta);
     var addResult =
       rowViewOfNewParticipant(profs, ta, hosts, guestTbl, guestOptions,
-                              guestsContainer);
-
-    var hosts = sched.getHosts(ta);
-    list.iter(hosts, function(uid) {
-      rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
-        .appendTo(hostsContainer);
-    });
+                              guestList);
 
     list.iter(guests, function(uid) {
       rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
-        .appendTo(guestsContainer);
+        .appendTo(guestList);
     });
 
-    var newGuestContainer = $("<div class='new-guest-container'>");
-    addResult.view
-      .appendTo(newGuestContainer);
-
-    var guestListContainer = $("<div id='guest-list-container'>")
-      .append(hostsContainer)
-      .append(guestsContainer)
-      .append(newGuestContainer);
-
-    view.append(guestListContainer);
+    content.append(addResult.view);
 
     saveButton
+      .appendTo(content)
       .off("click")
       .click(function() {
         saveButton.addClass("disabled");
@@ -524,6 +521,96 @@ var setup = (function() {
     observable.onSchedulingStepChanging.observe("step", function() {
       saveGuests(ta, hosts, guestTbl, guestOptions);
     });
+
+    return _view;
+  }
+
+  function viewOfLiveMeetingPage(profs, ta, host) {
+'''
+<div #view
+     class="setup-section">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Live meeting page</h4>
+    <div #help
+         class="help-text"/>
+    <input #link
+           class="form-control setup-input"/>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block live-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/link.svg");
+
+    var hostName = profile.firstName(profs[host].prof);
+
+    if (hostName.slice(-1) === "s") {
+      hostName += "'";
+    } else {
+      hostName += "'s";
+    }
+
+    help
+      .append("<div>This link appears in the event description on " + hostName
+              + " calendar.</div>")
+      .append("<div>A separate link will be created for each guest.</div>");
+
+    api.getGuestAppURL(ta.tid, host).done(function (url) {
+      log(url.url);
+      link.val(url.url);
+    });
+
+    link.click(function() {
+      this.select();
+    });
+
+    return _view;
+  }
+
+  function viewOfEmailSubject(ta) {
+'''
+<div #view
+     class="setup-section">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Email subject</h4>
+    <div #help
+         class="help-text"/>
+    <input #subject
+           class="form-control setup-input"
+           disabled/>
+    <button #update
+            class="btn btn-primary update-subject disabled">
+      Update
+    </button>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block subject-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/email.svg");
+
+    help.text("The subject cannot be changed once a message has been sent.");
+    subject.val(ta.task_status.task_title);
+
+    return _view;
+  }
+
+  mod.load = function(profs, ta, view) {
+    var hosts = sched.getHosts(ta);
+    var host;
+    list.iter(hosts, function(uid) {
+      host = uid;
+    });
+
+    view
+      .append($("<h3>Manage settings for this meeting.</h3>"))
+      .append(viewOfEmailSubject(ta).view)
+      .append(viewOfLiveMeetingPage(profs, ta, host).view)
+      .append(viewOfGuests(profs, ta, hosts).view);
   };
 
   return mod;

@@ -315,7 +315,7 @@
           @@messages-tab.html@@
         </div>
         <div id="setup-tab" class="task-container hide">
-          @@setup-tab.html@@
+          <div id="setup-table"></div>
         </div>
       </div>
 

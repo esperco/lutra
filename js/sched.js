@@ -319,7 +319,7 @@ var sched = (function() {
   };
 
   function loadSetup(profs, task) {
-    var view = $("#guests-table");
+    var view = $("#setup-table");
     view.children().remove();
 
     setup.load(profs, task, view);

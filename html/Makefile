@@ -12,7 +12,6 @@ HTML_INCLUDES = \
   reset-password.html \
   new-task.html \
   messages-tab.html \
-  setup-tab.html \
   sched-task-list.html \
   places.html \
   settings.html \
