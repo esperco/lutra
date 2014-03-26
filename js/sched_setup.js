@@ -2,7 +2,7 @@
   Scheduling step 1
 */
 
-var sched1 = (function() {
+var setup = (function() {
   var mod = {};
 
   var saveButton = $(".save-setup");
@@ -473,12 +473,11 @@ var sched1 = (function() {
   }
 
   mod.load = function(profs, ta, view) {
-    $("<h4>Email Subject</h4>")
-      .appendTo(view);
-    $("<h4>Live Meeting Page</h4>")
-      .appendTo(view);
-    $("<h4>Guests</h4>")
-      .appendTo(view);
+    view
+      .append($("<h3>Manage settings for this meeting.</h3>"))
+      .append($("<h4>Email Subject</h4>"))
+      .append($("<h4>Live Meeting Page</h4>"))
+      .append($("<h4>Guests</h4>"))
 
     var hostsContainer = $("<div class='hosts-container'>");
     var newGuestContainer = $("<div class='new-guest-container'>");

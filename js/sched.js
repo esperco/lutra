@@ -315,13 +315,14 @@ var sched = (function() {
   function loadMessages(task) {
     chat.loadTaskChats(task);
     tabSelector.show("messages-tab");
+    $(".chat-entry").focus();
   };
 
   function loadSetup(profs, task) {
     var view = $("#guests-table");
     view.children().remove();
 
-    sched1.load(profs, task, view);
+    setup.load(profs, task, view);
     tabSelector.show("setup-tab");
   };
 

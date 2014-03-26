@@ -882,11 +882,11 @@ var sched4 = (function() {
   function createReviewSection(profs, task) {
 '''
 <div #view
-     class="sched-module-view collapsed">
+     class="sched-module-view first-module collapsed">
   <div #connectorNub
        class="connector-nub"/>
   <div #module
-       class="sched-module first-module">
+       class="sched-module">
     <div #header
          class="sched-module-header">
       <span #showHide
