@@ -346,7 +346,7 @@ var sched = (function() {
       .click(function() {
         if (ta.task_status.task_progress !== "Confirmed") {
           ta.task_status.task_progress = "Coordinating";
-          sched.getState(ta).scheduling_stage = "Coordinate";
+          prog = "Coordinate";
         }
         sched.loadTask(ta);
         markActive("coordination");

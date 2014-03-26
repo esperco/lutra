@@ -1,5 +1,5 @@
 /*
-  Scheduling step 1
+  Scheduling Setup
 */
 
 var setup = (function() {
@@ -433,7 +433,6 @@ var setup = (function() {
 
   function updateStage(ta) {
     if (sched.getAttendingGuests(ta).length === 0) {
-      ta.task_status.task_progress = "Unread_by_organizer";
       sched.getState(ta).scheduling_stage = "Guest_list";
     } else if (ta.task_status.task_progress !== "Confirmed") {
       ta.task_status.task_progress = "Coordinating";
