@@ -492,7 +492,7 @@ var setup = (function() {
 '''
     var icon = $("<img class='svg-block guests-icon'/>")
       .appendTo(iconContainer);
-    svg.loadImg(icon, "/assets/img/group.svg");
+    svg.loadImg(icon, "/assets/img/guests.svg");
 
     var guests = sched.getAttendingGuests(ta);
     var guestTbl = list.toTable(guests);
@@ -558,7 +558,6 @@ var setup = (function() {
       .append("<div>A separate link will be created for each guest.</div>");
 
     api.getGuestAppURL(ta.tid, host).done(function (url) {
-      log(url.url);
       link.val(url.url);
     });
 
@@ -608,8 +607,11 @@ var setup = (function() {
 
     view
       .append($("<h3>Manage settings for this meeting.</h3>"))
+      .append($("<hr/>"))
       .append(viewOfEmailSubject(ta).view)
+      .append($("<hr/>"))
       .append(viewOfLiveMeetingPage(profs, ta, host).view)
+      .append($("<hr/>"))
       .append(viewOfGuests(profs, ta, hosts).view);
   };
 
