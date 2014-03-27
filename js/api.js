@@ -110,6 +110,10 @@ var api = (function () {
     return apiQPrefix() + "/tasks/" + login.getTeam().teamid;
   }
 
+  function apiTaskProfilePrefix() {
+    return apiQPrefix() + "/profile";
+  }
+
   mod.getProfile = function(uid) {
     return jsonHttpGet(apiProfilePrefix() + "/" + uid);
   };
@@ -119,9 +123,19 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(prof));
   };
 
+  mod.getTaskProfile = function(uid, tid) {
+    return jsonHttpGet(apiTaskProfilePrefix() + "/" + uid + "/task/" + tid);
+  };
+
+  mod.postTaskProfile = function(prof, tid) {
+    var url = apiTaskProfilePrefix() + "/" + prof.profile_uid + "/task/" + tid;
+    return jsonHttpPost(url, JSON.stringify(prof));
+  }
+
   mod.getProfileByEmail = function(email) {
-    return jsonHttpGet(apiProfilePrefix() + "/email/"
-                       + encodeURIComponent(email));
+    return jsonHttpGet(apiTaskProfilePrefix()
+                       + "/email/" + encodeURIComponent(email)
+                       + "/team/" + login.getTeam().teamid);
   };
 
   function api_account_prefix() {

@@ -91,7 +91,7 @@ var api = function() {
     return jsonHttpPost(apiPrefix() + "/chat/" + itemId + "/read", "");
   };
 
-  mod.getProfile = function(uid) {
+  mod.getTaskProfile = function(uid, _tid) {
     return jsonHttpGet(apiPrefix() + "/profile/" + uid);
   };
 

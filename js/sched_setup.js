@@ -174,13 +174,13 @@ var setup = (function() {
     addButton.click(function() {
       var firstLast = edit.firstLast();
       var uid = edit.optUid;
-      api.getProfile(uid).then(function(prof) {
+      api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
         if (prof.editable) {
-          api.postProfile(prof, login.getTeam().teamid);
+          api.postTaskProfile(prof, task.tid);
         }
-        profile.set(prof); /* update cache */
+        profile.setWithTask(prof, task.tid); /* update cache */
 
         guestTbl[uid] = uid;
         task.task_participants.organized_for.push(uid);
@@ -291,13 +291,13 @@ var setup = (function() {
     addButton.click(function() {
       var firstLast = edit.firstLast();
       var uid = edit.optUid;
-      api.getProfile(uid).then(function(prof) {
+      api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
         if (prof.editable) {
-          api.postProfile(prof, login.getTeam().teamid);
+          api.postTaskProfile(prof, task.tid);
         }
-        profile.set(prof); /* update cache */
+        profile.setWithTask(prof, task.tid); /* update cache */
 
         task.task_participants.organized_for.push(uid);
 
