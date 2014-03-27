@@ -84,13 +84,13 @@ var adder = (function() {
     var listView = createListView(profs);
 
     function onMaxLength() {
-      listView.addOption
+      listView.addClick
         .addClass("hide");
       listView.help
         .addClass("hide");
     }
     function onLegalLength() {
-      listView.addOption
+      listView.addClick
         .removeClass("hide");
       listView.help
         .removeClass("hide");

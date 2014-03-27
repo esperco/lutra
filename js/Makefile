@@ -81,6 +81,7 @@ APP_SOURCES = \
   sample.js \
   adder.js \
   timezone.js \
+  calcache.js \
   calpicker.js \
   loceditor.js \
   locpicker.js \
