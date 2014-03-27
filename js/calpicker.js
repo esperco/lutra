@@ -230,8 +230,8 @@ var calpicker = (function() {
     Output event type:
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
-  function importEvents(esperCalendar) {
-    return list.map(esperCalendar.events, function(x) {
+  function importEvents(esperEvents) {
+    return list.map(esperEvents, function(x) {
       var url;
       if (util.isString(x.esper_tid))
         url = makeTaskUrl(x.esper_tid);
@@ -244,18 +244,17 @@ var calpicker = (function() {
         orig: x /* custom field */
       };
       return ev;
-    })
+    });
   }
 
-  function fetchEvents(start, end, tz, callback) {
-    var async = api.postCalendar(login.leader(), {
-      timezone: tz,
-      window_start: start,
-      window_end: end
-    })
-      .done(function (esperCalendar) {
-        var events = importEvents(esperCalendar);
-        callback(events);
+  function fetchEvents(momentStart, momentEnd, tz, callback) {
+    var start = momentStart.toDate();
+    var end = momentEnd.toDate();
+    var cache = calcache.getCache();
+    var async = cache.fetch(start, end, tz)
+      .done(function (esperEvents) {
+        var fullcalEvents = importEvents(esperEvents);
+        callback(fullcalEvents);
       });
     spinner.spin("Loading calendar...", async);
   }

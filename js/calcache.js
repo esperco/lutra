@@ -23,6 +23,22 @@ var calcache = (function() {
     return new Date(1000 * unixtime);
   }
 
+  /* Round down to 24 hours before beginning of month */
+  function roundBeginningOfMonth(d) {
+    var withinMonth = new Date(d.getTime() + 86400000);
+    var year = withinMonth.getUTCFullYear();
+    var month = withinMonth.getUTCMonth();
+    return new Date(year, month, 0); /* warning: uses local timezone */
+  }
+
+  /* Round down to 24 hours after the end of the month */
+  function roundEndOfMonth(d) {
+    var withinNextMonth = new Date(d.getTime() + 86400000);
+    var year = withinNextMonth.getUTCFullYear();
+    var month = withinNextMonth.getUTCMonth();
+    return new Date(year, month, 2); /* warning: uses local timezone */
+  }
+
   function getDateOnly(d) {
     var s = ""
       + d.getUTCFullYear() + "-"
@@ -34,15 +50,38 @@ var calcache = (function() {
   /*
     Extend week boundaries to accomodate all time zones.
     This produces the key used in the cache.
+
+    TODO: make it work for month pages.
+          Note that Fullcalendar extends the month
+          to the ends of the week, i.e. the narrowest Sun-Sat range that
+          includes the whole month, resulting in 4, 5, or 6 whole weeks.
   */
   function getRoundRange(localStart, localEnd) {
     var start = roundBeginningOfWeek(localStart);
     var end = roundEndOfWeek(localEnd);
-    var key = getDateOnly(localStart) + "-" + getDateOnly(localEnd);
+    var key = getDateOnly(start) + "-" + getDateOnly(end);
     return {
       start: start,
       end: end,
       key: key
+    };
+  }
+
+  function previousPage(start, end) {
+    var t1 = start.getTime();
+    var t2 = end.getTime();
+    return {
+      start: new Date(t1 - (t2-t1)),
+      end: new Date(t1)
+    };
+  }
+
+  function nextPage(start, end) {
+    var t1 = start.getTime();
+    var t2 = end.getTime();
+    return {
+      start: new Date(t2),
+      end: new Date(t2 + (t2-t1))
     };
   }
 
@@ -62,9 +101,10 @@ var calcache = (function() {
       return null;
   }
 
+  /* Fetch from server, update the cache when the response arrives. */
   function refresh(cache, start, end, tz) {
     var range = getRoundRange(start, end);
-    api.postCalendar(login.leader(), {
+    return api.postCalendar(login.leader(), {
       timezone: tz,
       window_start: range.start,
       window_end: range.end
@@ -84,15 +124,19 @@ var calcache = (function() {
     function is called when the refresh call succeeds.
   */
   function fetch(cache, start, end, tz, whenRefreshed) {
-    var k = makeKey(start, end, tz);
+    var range = getRoundRange(start, end);
+    var k = range.key;
     var v = cache[k];
     function fetchAhead() {
-      refresh(cache, oneWeekEarlier(start), start, tz);
-      refresh(cache, end, oneWeekLater(end), tz);
+      var prev = previousPage(start, end);
+      var next = nextPage(start, end);
+      refresh(cache, prev.start, prev.end, tz);
+      refresh(cache, next.start, next.end, tz);
     }
     if (util.isDefined(v)) {
-      refresh(cache, start, end, tz)
-        .then(whenRefreshed);
+      var deferredEvents = refresh(cache, start, end, tz);
+      if (util.isDefined(whenRefreshed))
+        deferredEvents.then(whenRefreshed);
       fetchAhead();
       return deferred.defer(v);
     }
@@ -103,7 +147,7 @@ var calcache = (function() {
     }
   }
 
-  mod.create = function() {
+  function create() {
     var cache = {};
     return {
       get: function(start, end, tz) {
@@ -119,7 +163,21 @@ var calcache = (function() {
         clear(cache);
       }
     };
-  }
+  };
+
+  /* One cache per team calendar */
+  var caches = {};
+
+  /* Create a cache for the team as needed */
+  mod.getCache = function() {
+    var teamid = login.getTeam();
+    var cache = caches[teamid];
+    if (!util.isDefined(cache)) {
+      cache = create();
+      caches[teamid] = cache;
+    }
+    return cache;
+  };
 
   return mod;
 })();

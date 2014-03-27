@@ -58,6 +58,12 @@ var date = (function() {
     return d.getUTCSeconds();
   };
 
+  mod.addDays = function(d, n) {
+    var unixtime = d.getTime(); /* ms */
+    unixtime = unixtime - n * 86400 * 1000;
+    return new Date(unixtime);
+  };
+
   function pad(s) {
     if (s.length >= 2)
       return s;
