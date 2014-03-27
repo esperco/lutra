@@ -18,6 +18,8 @@ var calpicker = (function() {
   function createView(tz) {
 '''
 <div #view>
+  <div class="location-title">Date</div>
+  <div #datePicker/>
   <div #textView
        class="row hide">
     <div class="col-sm-3">
@@ -34,6 +36,11 @@ var calpicker = (function() {
   <div #calendarView/>
 </div>
 '''
+    datePicker.datepicker({
+      onSelect: function(selectedDate) {
+        alert(selectedDate);
+      }
+    });
     timezoneView.text("Time Zone: " + timezone.format(tz));
 
     _view.focus = startInput.focus;

@@ -30,6 +30,7 @@ APP_LIBS = \
   jquery-ui \
   fullcalendar \
   jquery.timepicker \
+  jquery-ui-core-datepicker \
   jstz
 
 GUESTAPP_LIBS =
