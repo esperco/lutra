@@ -311,12 +311,13 @@ var setup = (function() {
 
     cancelCirc.click(function() {
       delete sched.optionsForGuest(guestOptions, guestUid).assisted_by;
-      saveGuests(task, hosts, guestTbl, guestOptions);
-
-      v.remove();
-      x.removeClass("has-ea");
-      eaCheck.removeClass("checkbox-selected");
-    })
+      saveGuests(task, hosts, guestTbl, guestOptions)
+        .done(function() {
+          v.remove();
+          x.removeClass("has-ea");
+          eaCheck.removeClass("checkbox-selected")
+        });
+    });
 
     v.append(branch)
      .append(cancelCirc)
@@ -442,7 +443,6 @@ var setup = (function() {
 
   function updateButtons(ta) {
     if (sched.getAttendingGuests(ta).length === 0) {
-      log("making disabled");
       $(".coordination-tab-select").addClass("disabled");
       doneButton.addClass("disabled");
     } else {
@@ -469,9 +469,9 @@ var setup = (function() {
 
   function saveGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
-    api.postTask(ta).done(function(ta) {
+    updateStage(ta);
+    return api.postTask(ta).done(function(ta) {
       updateButtons(ta);
-      updateStage(ta);
       observable.onTaskParticipantsChanged.notify(ta);
     });
   }
