@@ -784,39 +784,43 @@ var sched2 = (function() {
   */
   function createCalendarModal(param) {
 '''
-<div #modal
-     class="modal fade" tabindex="-1"
+<div #view
+     class="modal fade"
+     tabindex="-1"
      role="dialog"
      aria-hidden="true">
   <div #dialog
-       class="modal-dialog cal-picker-dialog">
-    <div class="modal-content">
+       class="modal-dialog cal-picker-modal">
+    <div #content
+         class="modal-content cal-picker-modal">
       <div class="modal-header">
-        <img #icon
-             class="svg cal-picker-icon" src="/assets/img/calendar.svg"/>
-        <div style="float:right" data-dismiss="modal">
-          <img class="svg modal-close" src="/assets/img/x.svg"/>
-        </div>
-        <div #title
-             class="modal-title">
-          Select a time.
-        </div>
+        <div #iconContainer
+             class="modal-icon cal-picker-modal-icon"/>
         <button #doneButton
-                class="btn btn-default">Done</button>
+                class="btn btn-primary"
+                style="float:right">
+          Done
+        </button>
+        <div #title
+            class="modal-title">
+          Click on the calendar to select a time.
+        </div>
       </div>
-      <div #body
-           class="modal-body"></div>
     </div>
   </div>
 </div>
 '''
-    var id = util.randomString();
-    title.attr("id", id);
-    modal.attr("aria-labelledby", id);
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/calendar.svg");
+
+    // var id = util.randomString();
+    // title.attr("id", id);
+    // view.attr("aria-labelledby", id);
 
     var cal = calpicker.create(param);
     _view.cal = cal;
-    _view.body.append(cal.view);
+    _view.content.append(cal.view);
     _view.focus = cal.focus;
 
     return _view;
@@ -864,7 +868,6 @@ var sched2 = (function() {
             Select time in calendar
           </span>
         </span>
-        <div #calPickerContainer/>
       </div>
     </div>
     <div #whereSection
@@ -976,15 +979,13 @@ var sched2 = (function() {
         onChange: setDates,
         defaultDate: defaultDate
       });
-      calPickerContainer.children().remove();
-      calPickerContainer.append(calModal.modal);
-      calModal.modal.modal({});
+      calModal.view.modal({});
       calModal.doneButton
         .click(function() {
           /* dates are already saved by the onChange handler. */
-          calModal.modal.modal("hide");
+          calModal.view.modal("hide");
         });
-      calModal.modal
+      calModal.view
         .on("shown.bs.modal", function() {
           calModal.cal.render(); // can't happen earlier or calendar won't show
         });
@@ -1419,9 +1420,7 @@ var sched2 = (function() {
   }
 
   mod.load = function(profs, ta, view) {
-    view.children().remove();
     var guests = sched.getAttendingGuests(ta);
-
     var options = createOptionsSection(profs, ta);
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);

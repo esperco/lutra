@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div id="chat">
+    <div id="chat" class="guest-app">
       <div id="chat-container">
         <div id="chat-header">
           <ul class="nav chat-tabs chat-profile-tabs"></ul>

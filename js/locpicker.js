@@ -40,7 +40,7 @@ var locpicker = (function() {
   <div #locationSearch class="left-inner-addon">
     <i class="glyphicon glyphicon-search"></i>
     <input #searchBox
-           type="search" class="form-control"
+           type="search" class="form-control loc-search"
            placeholder="Search by address, neighborhood, city, state, or zip"/>
     <div class="dropdown">
       <a #dropdownToggle
