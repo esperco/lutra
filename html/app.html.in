@@ -282,6 +282,12 @@
 
       <div class="task-navbar">
         <div class="task-navbar-container clearfix">
+          <a class="task-tab setup-tab-select">
+            <div class="task-tab-icon">
+              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
+            </div>
+            <div class="setup-tab-name">SETUP</div>
+          </a>
           <a class="task-tab coordination-tab-select">
             <div class="task-tab-icon">
               <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
@@ -293,12 +299,6 @@
               <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
             </div>
             <div class="messages-tab-name">MESSAGES</div>
-          </a>
-          <a class="task-tab setup-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
-            </div>
-            <div class="setup-tab-name">SETUP</div>
           </a>
         </div>
       </div>
@@ -331,8 +331,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>
 
     <!-- Pusher client library -->
-    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js">
-    </script>
+    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js"></script>
 
     INCLUDES
   </body>

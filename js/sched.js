@@ -326,17 +326,20 @@ var sched = (function() {
     tabSelector.show("setup-tab");
   };
 
-  function markActive(tab) {
+  function highlight(tab) {
     $("." + tab + "-tab-select").addClass("active");
-    if (tab === "coordination") {
+    if (tab === "setup") {
+      $(".setup-tab-select").removeClass("disabled");
+      $(".coordination-tab-select").removeClass("active");
       $(".messages-tab-select").removeClass("active");
+    } else if (tab === "coordination") {
       $(".setup-tab-select").removeClass("active");
+      $(".coordination-tab-select").removeClass("disabled");
+      $(".messages-tab-select").removeClass("active");
     } else if (tab === "messages") {
-      $(".coordination-tab-select").removeClass("active");
       $(".setup-tab-select").removeClass("active");
-    } else if (tab === "setup") {
       $(".coordination-tab-select").removeClass("active");
-      $(".messages-tab-select").removeClass("active");
+      $(".messages-tab-select").removeClass("disabled");
     }
   }
 
@@ -349,22 +352,21 @@ var sched = (function() {
           prog = "Coordinate";
         }
         sched.loadTask(ta);
-        markActive("coordination");
+        highlight("coordination");
       });
     $(".messages-tab-select")
       .off("click")
       .click(function() {
         loadMessages(ta);
-        markActive("messages");
+        highlight("messages");
       });
     $(".setup-tab-select")
       .off("click")
       .click(function() {
-        observable.onSchedulingStepChanging.notify();
         profile.profilesOfTaskParticipants(ta).done(function(profs) {
           loadSetup(profs, ta);
         });
-        markActive("setup");
+        highlight("setup");
       });
   }
 
@@ -377,20 +379,20 @@ var sched = (function() {
       .done(function(profs) {
         switch (progress) {
         case "Guest_list":
-          markActive("setup");
+          highlight("setup");
           loadSetup(profs, ta);
           break;
         case "Find_availability":
           // Interpreted as Coordinate until case is removed from type
-          markActive("coordination");
+          highlight("coordination");
           loadStep2(profs, ta);
           break;
         case "Coordinate":
-          markActive("coordination");
+          highlight("coordination");
           loadStep2(profs, ta);
           break;
         case "Confirm":
-          markActive("coordination");
+          highlight("coordination");
           loadStep4(profs, ta);
           break;
         default:

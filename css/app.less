@@ -1973,6 +1973,12 @@ i { color: @gray_60; }
 /*** Scheduling - Setup ***/
 
 .setup-section { padding: 5px 0px 15px 0px; }
+.email-subject-section { padding-right: 10px; }
+.live-meeting-page-section { padding-left: 10px; }
+@media (max-width: 767px) {
+  .email-subject-section { padding-right: 0; }
+  .live-meeting-page-section { padding-left: 0; }
+}
 
 .setup-section-icon { float: left; }
 .subject-icon {
@@ -1989,7 +1995,7 @@ i { color: @gray_60; }
 .setup-section-content { margin-left: 40px; }
 
 .setup-input {
-  max-width: 540px;
+  max-width: 500px;
   margin-top: 10px;
 }
 .setup-guests { margin-top: 15px; }
@@ -2004,7 +2010,8 @@ i { color: @gray_60; }
   margin-top: -4px;
 }
 
-.update-subject { margin-top: 10px; }
+.update-subject,
+.copy-link { margin-top: 10px; }
 
 .sched-step1-row,
 .add-guest-row {

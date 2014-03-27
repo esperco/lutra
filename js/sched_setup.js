@@ -442,6 +442,7 @@ var setup = (function() {
 
   function updateButtons(ta) {
     if (sched.getAttendingGuests(ta).length === 0) {
+      log("making disabled");
       $(".coordination-tab-select").addClass("disabled");
       doneButton.addClass("disabled");
     } else {
@@ -511,17 +512,13 @@ var setup = (function() {
     updateButtons(ta);
     content.append(addResult.view);
 
-    observable.onSchedulingStepChanging.observe("step", function() {
-      saveGuests(ta, hosts, guestTbl, guestOptions);
-    });
-
     return _view;
   }
 
   function viewOfLiveMeetingPage(profs, ta, host) {
 '''
 <div #view
-     class="setup-section">
+     class="setup-section live-meeting-page-section col-sm-6">
   <div #iconContainer
        class="setup-section-icon"/>
   <div class="setup-section-content">
@@ -530,6 +527,10 @@ var setup = (function() {
          class="help-text"/>
     <input #link
            class="form-control setup-input"/>
+    <button #copy
+            class="btn btn-primary copy-link disabled">
+      Copy link
+    </button>
   </div>
 </div>
 '''
@@ -545,10 +546,8 @@ var setup = (function() {
       hostName += "'s";
     }
 
-    help
-      .append("<div>This link appears in the event description on " + hostName
-              + " calendar.</div>")
-      .append("<div>A separate link will be created for each guest.</div>");
+    help.text("This link appears in the event description on " + hostName
+              + " calendar. A separate link will be created for each guest.");
 
     api.getGuestAppURL(ta.tid, host).done(function (url) {
       link.val(url.url);
@@ -564,7 +563,7 @@ var setup = (function() {
   function viewOfEmailSubject(ta) {
 '''
 <div #view
-     class="setup-section">
+     class="setup-section email-subject-section col-sm-6">
   <div #iconContainer
        class="setup-section-icon"/>
   <div class="setup-section-content">
@@ -585,7 +584,8 @@ var setup = (function() {
       .appendTo(iconContainer);
     svg.loadImg(icon, "/assets/img/email.svg");
 
-    help.text("The subject cannot be changed once a message has been sent.");
+    help.text("This subject is used for every email sent to a guest regarding "
+              + "the meeting. It cannot be changed once a message has been sent.");
     subject.val(ta.task_status.task_title);
 
     return _view;
@@ -608,9 +608,9 @@ var setup = (function() {
       .append(doneButton)
       .append($("<h3>Manage settings for this meeting.</h3>"))
       .append($("<hr/>"))
-      .append(viewOfEmailSubject(ta).view)
-      .append($("<hr/>"))
-      .append(viewOfLiveMeetingPage(profs, ta, host).view)
+      .append($("<div class='clearfix'/>")
+        .append(viewOfEmailSubject(ta).view)
+        .append(viewOfLiveMeetingPage(profs, ta, host).view))
       .append($("<hr/>"))
       .append(viewOfGuests(profs, ta, hosts).view);
   };
