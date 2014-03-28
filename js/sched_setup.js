@@ -194,11 +194,11 @@ var setup = (function() {
         prof.first_last = firstLast;
         if (prof.emails.length === 0) {
           // TODO Support more than one email address for guests?
-          prof.emails = [{label: "Email", email: email}];
+          prof.emails = [{email: email}];
         }
         if (phone.length > 0) {
           // TODO Support more than one phone number on frontend?
-          prof.phones = [{label: "Phone", number: phone}];
+          prof.phones = [{number: phone}];
         }
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
