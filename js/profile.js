@@ -105,8 +105,12 @@ var profile = (function() {
     return result;
   }
 
-  mod.email = function(s) {
-    return "Email address goes here.";
+  mod.email = function(prof) {
+    if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
+      return prof.emails[0].email;
+    } else {
+      return "Missing email";
+    }
   };
 
   mod.shortenName = function(s) {

@@ -26,6 +26,10 @@ var setup = (function() {
       .addClass("form-control guest-input")
       .attr("placeholder", "Last name")
       .attr("disabled", true);
+    edit.phoneInput = $("<input type='tel'/>")
+      .addClass("form-control guest-input")
+      .attr("placeholder", "Phone number")
+      .attr("disabled", true);
 
     edit.firstLast = function() {
       return [edit.firstNameInput.val(),
@@ -44,9 +48,11 @@ var setup = (function() {
       if (util.isString(edit.optUid) && editable) {
         edit.firstNameInput.removeAttr("disabled");
         edit.lastNameInput.removeAttr("disabled");
+        edit.phoneInput.removeAttr("disabled");
       } else {
         edit.firstNameInput.attr("disabled", true);
         edit.lastNameInput.attr("disabled", true);
+        edit.phoneInput.attr("disabled", true);
       }
     }
 
@@ -63,13 +69,19 @@ var setup = (function() {
             edit.clearUid();
             var uid = prof.profile_uid;
             edit.optUid = uid;
+            // XXX Are these attributes still needed?
             edit.firstNameInput.attr("id", "first-name-" + uid);
             edit.lastNameInput.attr("id", "last-name-" + uid);
             edit.emailInput.attr("id", "email-" + uid);
+            edit.phoneInput.attr("id", "phone-" + uid);
             // TODO Allow pseudonyms for guests?
-            if (prof.first_last || ! prof.editable) {
+            if (prof.first_last || ! prof.editable) { // XXX Why second case?
               edit.firstNameInput.val(prof.first_last[0]);
               edit.lastNameInput.val(prof.first_last[1]);
+            }
+            if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
+              // TODO Support more than one phone number on frontend?
+              edit.phoneInput.val(prof.phones[0].number);
             }
             updateNameEditability(prof.editable);
             updateUI();
@@ -132,6 +144,7 @@ var setup = (function() {
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
+      .append(edit.phoneInput)
       .append(addButton);
 
     function toggleAddGuest() {
@@ -173,10 +186,20 @@ var setup = (function() {
 
     addButton.click(function() {
       var firstLast = edit.firstLast();
+      var email = edit.emailInput.val();
+      var phone = edit.phoneInput.val();
       var uid = edit.optUid;
       api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
+        if (prof.emails.length === 0) {
+          // TODO Support more than one email address for guests?
+          prof.emails = [{label: "Email", email: email}];
+        }
+        if (phone.length > 0) {
+          // TODO Support more than one phone number on frontend?
+          prof.phones = [{label: "Phone", number: phone}];
+        }
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
