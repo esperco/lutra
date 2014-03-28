@@ -381,12 +381,13 @@ var sched2 = (function() {
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
+    var toEmail = profile.email(profs[toUid].prof);
 
     var plural = options.length === 1 ? "" : "s";
     offerModal.title.text("Offer the meeting option" + plural + ".");
     offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
 
-    offerModal.recipient.text(toName);
+    offerModal.recipient.text(toName + " <" + toEmail + ">");
     offerModal.subject.text("Re: " + task.task_status.task_title);
 
     var readOnly = offerModal.messageReadOnly;
