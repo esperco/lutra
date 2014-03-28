@@ -56,6 +56,7 @@ COMMON_SOURCES = \
   log.js \
   html.js \
   variant.js \
+  dateYmd.js \
   date.js \
   timeonly.js \
   status_.js \

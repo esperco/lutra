@@ -15,7 +15,75 @@
 var calpicker = (function() {
   var mod = {};
 
-  function createView(tz) {
+  /* Duration in seconds between two Dates */
+  function getDuration(start, end) {
+    return (end.getTime() - start.getTime()) / 1000;
+  }
+
+  /* Check if the start and end dates are complete and valid */
+  function datesAreValid(dates) {
+    if (util.isDefined(dates.start) && util.isDefined(dates.end)) {
+      var start = dates.start;
+      var end = dates.end;
+      var duration = getDuration(start, end);
+      return duration > 0;
+    }
+    else
+      return false;
+  }
+
+  /* Export dates for outside use */
+  function getDates(r) {
+    if (datesAreValid(dates)) {
+      var start = r.start;
+      var end = r.end;
+      return {
+        start: start,
+        end: end,
+        duration: getDuration(start, end)
+      };
+    }
+    else
+      return null;
+  }
+
+  /* Import dates */
+  function setDates(r, start, end) {
+    r.set({
+      start: start,
+      end: end
+    });
+  }
+
+  /*
+    Create a ref (r) holding start and end date expressed in calendar time
+    (local time relative to the calendar's timezone).
+  */
+  function createRef(localStart, localEnd) {
+
+    var initDates = {
+      start: localStart,
+      end: localEnd
+    };
+
+    var r = ref.create(datesAreValid, initDates);
+    return r;
+  }
+
+/*
+    dateOnlyRef.watch(function(ymd, isValid) {
+      if (isValid) {
+        datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
+      }
+    });
+    dateOnlyRef.watch(function(ymd, isValid) {
+      if (isValid) {
+        setCalendarDate(ymd);
+      }
+    });
+*/
+
+  function createView(datesRef, tz) {
 '''
 <div #view>
   <div class="location-title">Date</div>
@@ -36,14 +104,10 @@ var calpicker = (function() {
   <div #calendarView/>
 </div>
 '''
-    datePicker.datepicker({
-      onSelect: function(selectedDate) {
-        alert(selectedDate);
-      }
-    });
     timezoneView.text("Time Zone: " + timezone.format(tz));
 
     _view.focus = startInput.focus;
+    _view.datesRef = datesRef;
 
     /*
       Later _view will also contain the following fields:
@@ -67,11 +131,10 @@ var calpicker = (function() {
     return util.isDefined(start) && util.isDefined(end);
   }
 
-  function initTimePicker(picker,
-                          fieldName, /* either "eventStart" or "eventEnd" */
-                          timePicker,
-                          userOnChange) {
-    log("initTimePicker", fieldName);
+  function setupTimePicker(picker,
+                           fieldName, /* either "start" or "end" */
+                           timePicker) {
+    var r = picker.datesRef;
     timePicker.timepicker({
       timeFormat: "g:i a",
         /* PHP date() format http://php.net/manual/en/function.date.php */
@@ -79,24 +142,38 @@ var calpicker = (function() {
         /* granularity in minutes */
     });
     timePicker.on("changeTime", function() {
-      /*
-        TODO (known bug):
-        Ensure that end date/time is after start date/time.
-      */
-      var date = picker[fieldName]; /* Moment */
-      if (util.isDefined(date)) {
+      var oldDates = r.get();
+      var oldDate = oldDates[fieldName];
+      if (util.isDefined(oldDate)) {
         var time = timePicker.timepicker("getTime"); /* native js Date */
-        date.hours(time.getHours());
-        date.minutes(time.getMinutes());
-        updateCalendarView(picker);
-        userOnChange(getDates(picker));
+        var hours = time.getHours();
+        var minutes = time.getMinutes();
+        var ymd = ymdDate.utc.ofDate(oldDate);
+        var date = ymdDate.utc.toDate(hours, minutes, 0);
+        var dates = util.copyObject(oldDates);
+        dates[fieldName] = date;
+        r.set(dates);
+      }
+    });
+    r.watch(function(dates) {
+      var date = dates[fieldName];
+      if (util.isDefined(date)) {
+        timePicker.timepicker('setTime', formatTime(start));
       }
     });
   }
 
-  function initTimePickers(picker, userOnChange) {
-    initTimePicker(picker, "eventStart", picker.startInput, userOnChange);
-    initTimePicker(picker, "eventEnd", picker.endInput, userOnChange);
+  function setupTimePickers(picker) {
+    setupTimePicker(picker, "start", picker.startInput);
+    setupTimePicker(picker, "end", picker.endInput);
+
+    /* Make time pickers visible once dates have been set */
+    picker.datesRef.watch(function(dates, isValid) {
+      if (isValid)
+        picker.textView.removeClass("hide");
+      else if (! util.isDefined(dates.start) && !util.isDefined(dates.end))
+        picker.textView.addClass("hide");
+    });
   }
 
   /* Remove event from the calendar view but preserve start/end fields */
@@ -113,10 +190,7 @@ var calpicker = (function() {
   /* Get rid of any previously selected date and time */
   function removeEvent(picker) {
     removeCalendarEvent(picker);
-    delete picker.eventStart;
-    delete picker.eventEnd;
-    picker.textView.addClass("hide");
-    picker.onChange();
+    picker.datesRef.set({});
   }
 
   /*
@@ -160,21 +234,6 @@ var calpicker = (function() {
     }
   }
 
-  function getDates(picker) {
-    if (util.isDefined(picker.eventStart) && util.isDefined(picker.eventEnd)) {
-      var start = picker.eventStart;
-      var end = picker.eventEnd;
-      var duration = end.unix() - start.unix();
-      return {
-        start: start.toDate(),
-        end: end.toDate(),
-        duration: duration
-      };
-    }
-    else
-      return null;
-  }
-
   /*
     Ignores the 'Z' suffix and assumes time expressed the calendar's
     timezone.
@@ -203,14 +262,6 @@ var calpicker = (function() {
     }
   }
 
-  function clearDates(picker) {
-    delete picker.eventStart;
-    delete picker.eventEnd;
-    removeEvent(picker);
-    updateTextView(picker);
-    updateCalendarView(picker);
-  }
-
   /*
     Clear previous selection if any,
     create new calendar event and populate input boxes
@@ -218,8 +269,6 @@ var calpicker = (function() {
   function initEvent(picker, start, end) {
     removeEvent(picker);
 
-    picker.eventStart = start;
-    picker.eventEnd = end;
     picker.onChange(getDates(picker));
 
     updateTextView(picker);
@@ -267,23 +316,47 @@ var calpicker = (function() {
     spinner.spin("Loading calendar...", async);
   }
 
-  /*
-    Create date and time picker using user's calendar.
+  function setDate(ymd, d) {
+    return ymdDate.utc.toDate(ymd,
+                              d.getUTCHours(),
+                              d.getUTCMinutes(),
+                              d.getUTCSeconds());
+  }
 
-    Parameters:
-    - timezone: IANA timezone in which all local times are expressed
-    - onChange(optDates):
-        fired when the dates are initialized or change;
-        optDates is a record with fields start, end, and duration.
-   */
-  mod.create = function(param) {
-    var tz = param.timezone;
-    var onChange = param.onChange;
+  function setupDatePicker(picker) {
+    var r = picker.datesRef;
+    r.watch(function(dates, isValid) {
+      if (isValid) {
+        var ymd = dateYmd.utc(dates.start);
+        picker.datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
+      }
+    });
+    datePicker.datepicker({
+      onSelect: function(selectedDate) {
+        var ymd = dateYmd.ofString(selectedDate);
+        var oldDates = r.getAllOrNothing();
+        var dates;
+        if (oldDates !== null) {
+          dates = {
+            start: setDate(ymd, oldDates.start),
+            end: setDate(ymd, oldDates.end)
+          };
+        }
+        else {
+          /* default to 9:00-10:00 */
+          var start = ymdDate.utc.toDate(ymd, 9, 0, 0);
+          var end = ymdDate.utc.toDate(ymd, 10, 0, 0);
+          dates = {
+            start: start,
+            end: end
+          };
+        }
+        r.set(dates);
+      }
+    });
+  }
 
-    var picker = createView(param.timezone);
-    initTimePickers(picker, onChange);
-    picker.onChange = onChange;
-
+  function setupCalendar(picker) {
     var calendarView = picker.calendarView;
 
     function select(start, end) {
@@ -325,6 +398,32 @@ var calpicker = (function() {
       editable: false,
       events: fetchEvents
     });
+  }
+
+  /*
+    Create date and time picker using user's calendar.
+
+    Parameters:
+    - timezone: IANA timezone in which all local times are expressed
+    - onChange(optDates):
+        fired when the dates are initialized or change;
+        optDates is a record with fields start, end, and duration.
+   */
+  mod.create = function(param) {
+    var tz = param.timezone;
+    var onChange = param.onChange;
+
+    var r = createRef();
+    var picker = createView(r, tz);
+
+    setupTimePickers(picker);
+    setupDatePicker(picker);
+    setupCalendar(picker);
+
+    picker.datesRef.watch(function(dates, isValid) {
+      if (isValid)
+        onChange(dates);
+    });
 
     function render() {
       calendarView.fullCalendar("render");
@@ -337,10 +436,11 @@ var calpicker = (function() {
       /*
         getDates and setDates take/return native js dates as a record of type:
         { start: Date, end: Date }
+        getDates also returns a 'duration' field (seconds).
       */
       getDates: (function() { return getDates(picker); }),
-      setDates: (function(x) { setDates(picker, x.start, x.end); }),
-      clearDates: (function() { return clearDates(picker); })
+      setDates: (function(x) { picker.datesRef.set(x); }),
+      clearDates: (function() { picker.datesRef.set({}); })
     };
   }
 
