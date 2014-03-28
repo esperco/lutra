@@ -61,33 +61,34 @@ var setup = (function() {
       updateNameEditability(false);
     }
 
+    edit.setProfile = function(prof) {
+      edit.optUid = prof.profile_uid;
+      // TODO Allow pseudonyms for guests?
+      if (util.isNotNull(prof.first_last)) {
+        edit.firstNameInput.val(prof.first_last[0]);
+        edit. lastNameInput.val(prof.first_last[1]);
+      }
+      if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
+        // TODO Support more than one phone number on frontend?
+        edit.phoneInput.val(prof.phones[0].number);
+      }
+      updateNameEditability(prof.editable);
+      updateUI();
+    };
+
+    edit.willFetchProfile = false;
+
     function fetchProfile() {
-      var emailAddr = edit.emailInput.val();
-      if (email.validate(emailAddr)) {
-        api.getProfileByEmail(emailAddr)
-          .then(function(prof) {
-            edit.clearUid();
-            var uid = prof.profile_uid;
-            edit.optUid = uid;
-            // XXX Are these attributes still needed?
-            edit.firstNameInput.attr("id", "first-name-" + uid);
-            edit.lastNameInput.attr("id", "last-name-" + uid);
-            edit.emailInput.attr("id", "email-" + uid);
-            edit.phoneInput.attr("id", "phone-" + uid);
-            // TODO Allow pseudonyms for guests?
-            if (prof.first_last || ! prof.editable) { // XXX Why second case?
-              edit.firstNameInput.val(prof.first_last[0]);
-              edit.lastNameInput.val(prof.first_last[1]);
-            }
-            if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
-              // TODO Support more than one phone number on frontend?
-              edit.phoneInput.val(prof.phones[0].number);
-            }
-            updateNameEditability(prof.editable);
-            updateUI();
-          });
+      if (edit.willFetchProfile) {
+        var emailAddr = edit.emailInput.val();
+        if (email.validate(emailAddr)) {
+          api.getProfileByEmail(emailAddr)
+            .then(edit.setProfile);
+        } else {
+          edit.clearUid();
+          updateUI();
+        }
       } else {
-        edit.clearUid();
         updateUI();
       }
     }
@@ -139,6 +140,7 @@ var setup = (function() {
         addButton.addClass("disabled");
     }
     var edit = editGuest(updateAddButton);
+    edit.willFetchProfile = true;
 
     guestInputDiv
       .append(edit.emailInput)
@@ -192,10 +194,8 @@ var setup = (function() {
       api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
-        if (prof.emails.length === 0) {
-          // TODO Support more than one email address for guests?
-          prof.emails = [{email: email}];
-        }
+        // TODO Support more than one email address for guests?
+        prof.emails = [{email: email}];
         if (phone.length > 0) {
           // TODO Support more than one phone number on frontend?
           prof.phones = [{number: phone}];
@@ -206,13 +206,12 @@ var setup = (function() {
         profile.setWithTask(prof, task.tid); /* update cache */
 
         guestTbl[uid] = uid;
-        task.task_participants.organized_for.push(uid);
+        delete sched.optionsForGuest(guestOptions, uid).assisted_by;
+        saveGuests(task, hosts, guestTbl, guestOptions);
 
         profile.profilesOfTaskParticipants(task).then(function(profs) {
-          delete sched.optionsForGuest(guestOptions, uid).assisted_by;
           rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
             .appendTo(guestsContainer);
-          saveGuests(task, hosts, guestTbl, guestOptions);
         });
       });
       clearAddGuest();
@@ -223,7 +222,7 @@ var setup = (function() {
     };
   }
 
-  function viewOfEAProfile(profs, task, uid, removeEA) {
+  function viewOfEAProfile(profs, task, uid, editEA, removeEA) {
     var v = $("<div class='sched-step1-ea-row'>");
 
     var prof = profs[uid].prof;
@@ -240,9 +239,9 @@ var setup = (function() {
         .append(editProfile)
         .append(remove))
       .appendTo(v);
-    remove.click(function() {
-      removeEA();
-    });
+    edit.click(editEA);
+    editProfile.click(editEA);
+    remove.click(removeEA);
 
     var branch = $("<div class='relationship-branch'>");
     var chatHead = profile.viewMediumCirc(prof).addClass("list-prof-circ");
@@ -286,13 +285,26 @@ var setup = (function() {
                          hosts, guestTbl, guestOptions, makeViewOfEA) {
     var v = $("<div class='sched-step1-ea-row'/>");
 
+    var ea = sched.assistedBy(guestUid, guestOptions);
+    var addButton = $("<button/>")
+      .addClass("btn btn-primary disabled")
+      .text(util.isNotNull(ea) ? "Save assistant" : "Add assistant");
     function updateAddButton(edit) {
       if (edit.isValid() && edit.optUid !== guestUid)
-        $("#add-guest-ea-btn").removeClass("disabled");
+        addButton.removeClass("disabled");
       else
-        $("#add-guest-ea-btn").addClass("disabled");
+        addButton.addClass("disabled");
     }
     var edit = editGuest(updateAddButton);
+    if (util.isNotNull(ea)) {
+      var prof = profs[ea].prof;
+      edit.setProfile(prof);
+      if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
+        edit.emailInput.val(prof.emails[0].email);
+      }
+    } else {
+      edit.willFetchProfile = true;
+    }
 
     var branch = $("<div class='relationship-branch'>");
     var cancelCirc = $("<div class='add-guest-circ cancel'>");
@@ -301,45 +313,52 @@ var setup = (function() {
       .append(cancelIcon)
       .appendTo(cancelCirc);
     svg.loadImg(cancelIcon, "/assets/img/plus.svg");
+    var title = $("<div/>")
+              .addClass("edit-guest-title")
+              .text(util.isNotNull(ea) ? "EDIT ASSISTANT" : "NEW ASSISTANT");
     var newEA = $("<div class='ea-input-div'/>")
-                 .append($("<div class='edit-guest-title'>NEW ASSISTANT</div>"))
+                 .append(title)
                  .append(edit.emailInput)
                  .append(edit.firstNameInput)
                  .append(edit.lastNameInput);
-    var addButton = $("<button id='add-guest-ea-btn'/>")
-      .addClass("btn btn-primary disabled")
-      .text("Add assistant");
     newEA.append(addButton);
 
     addButton.click(function() {
       var firstLast = edit.firstLast();
+      var email = edit.emailInput.val();
+      var phone = edit.phoneInput.val();
       var uid = edit.optUid;
       api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
+        // TODO Support more than one email address for guests?
+        prof.emails = [{email: email}];
+        if (phone.length > 0) {
+          // TODO Support more than one phone number on frontend?
+          prof.phones = [{number: phone}];
+        }
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
         profile.setWithTask(prof, task.tid); /* update cache */
 
-        task.task_participants.organized_for.push(uid);
+        sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
+        saveGuests(task, hosts, guestTbl, guestOptions);
 
         profile.profilesOfTaskParticipants(task).then(function(profs) {
-          sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
           v.replaceWith(makeViewOfEA(profs, uid));
-          saveGuests(task, hosts, guestTbl, guestOptions);
         });
       });
     });
 
     cancelCirc.click(function() {
-      delete sched.optionsForGuest(guestOptions, guestUid).assisted_by;
-      saveGuests(task, hosts, guestTbl, guestOptions)
-        .done(function() {
-          v.remove();
-          x.removeClass("has-ea");
-          eaCheck.removeClass("checkbox-selected")
-        });
+      if (util.isNotNull(ea)) {
+        v.replaceWith(makeViewOfEA(profs, ea));
+      } else {
+        v.remove();
+        x.removeClass("has-ea");
+        eaCheck.removeClass("checkbox-selected");
+      }
     });
 
     v.append(branch)
@@ -400,9 +419,18 @@ var setup = (function() {
         eaCheck.removeClass("checkbox-selected");
         guestView.removeClass("has-ea");
       }
+      var editViewOfEA;
       function viewOfEA(profs, ea) {
-        return viewOfEAProfile(profs, task, ea, removeEA);
+        function editEA() {
+          eaView.children().remove();
+          eaView.append(editViewOfEA(profs));
+        }
+        return viewOfEAProfile(profs, task, ea, editEA, removeEA);
       }
+      editViewOfEA = function(profs) {
+        return viewOfEAInput(guestView, profs, task, uid, eaCheck,
+                             hosts, guestTbl, guestOptions, viewOfEA);
+      };
 
       eaCheck.click(function() {
         if (eaCheck.hasClass("checkbox-selected")) {
@@ -410,8 +438,7 @@ var setup = (function() {
         } else {
           eaCheck.addClass("checkbox-selected");
           guestView.addClass("has-ea");
-          eaView.append(viewOfEAInput(guestView, profs, task, uid, eaCheck,
-                                      hosts, guestTbl, guestOptions, viewOfEA));
+          eaView.append(editViewOfEA(profs));
         }
       });
 
