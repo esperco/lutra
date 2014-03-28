@@ -664,12 +664,13 @@ var sched2 = (function() {
     For now just a dropdown menu of meeting types.
     May be accompanied with options specific to the type of meeting selected.
   */
-  function createMeetingTypeSelector(onSet, customBox) {
+  function createMeetingTypeSelector(onSet, customBox, saveButton) {
     function showCustom() {
       customBox
         .val("")
         .removeClass("hide")
         .focus();
+      saveButton.addClass("disabled");
     }
     function hideCustom() {
       customBox.addClass("hide");
@@ -937,7 +938,7 @@ var sched2 = (function() {
     }
 
     var meetingTypeSelector =
-      createMeetingTypeSelector(setMeetingType, meetingTypeInput);
+      createMeetingTypeSelector(setMeetingType, meetingTypeInput, saveButton);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
@@ -1081,6 +1082,13 @@ var sched2 = (function() {
         loc = locationForm.getTimezoneLocation();
       else
         loc = locationForm.getCompleteLocation();
+
+      if (
+        !(meetingTypeInput.hasClass("hide"))
+        && meetingTypeInput.val() === ""
+      ) {
+        return null;
+      }
 
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
