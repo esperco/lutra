@@ -11,7 +11,7 @@
 var dateYmd = (function() {
   var mod = {};
 
-  function isLeapYear = function(x) {
+  function isLeapYear(x) {
     return x % 4 === 0 && (! x % 100 === 0 || x % 400 === 0);
   }
 
@@ -38,10 +38,10 @@ var dateYmd = (function() {
     }
   }
 
-  mod.isValid(x) {
-    var y = ymd.year;
-    var m = ymd.month;
-    var d = ymd.day;
+  mod.isValid = function(x) {
+    var y = x.year;
+    var m = x.month;
+    var d = x.day;
     if (y < 2000 || y > 2100)
       return false;
     else if (m < 1 || m > 12)
@@ -127,32 +127,32 @@ var dateYmd = (function() {
   };
 
   mod.tests = [
-    test.expect("not a leap year", mod.isLeapYear, 2001, false);
-    test.expect("leap year", mod.isLeapYear, 2004, true);
-    test.expect("not a leap year", mod.isLeapYear, 2100, false);
-    test.expect("leap year", mod.isLeapYear, 2000, true);
+    test.expect("not a leap year", mod.isLeapYear, 2001, false),
+    test.expect("leap year", mod.isLeapYear, 2004, true),
+    test.expect("not a leap year", mod.isLeapYear, 2100, false),
+    test.expect("leap year", mod.isLeapYear, 2000, true),
     test.expect("valid date", mod.isValid,
-                {year: 2014, month: 1, day: 31}, true);
+                {year: 2014, month: 1, day: 31}, true),
     test.expect("valid date", mod.isValid,
-                {year: 2014, month: 6, day: 31}, false);
+                {year: 2014, month: 6, day: 31}, false),
     test.expect("valid date", mod.isValid,
-                {year: 2014, month: 7, day: 31}, true);
+                {year: 2014, month: 7, day: 31}, true),
     test.expect("valid date", mod.isValid,
-                {year: 2014, month: 8, day: 31}, true);
+                {year: 2014, month: 8, day: 31}, true),
     test.expect("valid date", mod.isValid,
-                {year: 2014, month: 9, day: 30}, false);
+                {year: 2014, month: 9, day: 30}, false),
     test.expect("valid date", mod.isValid,
-                {year: 2016, month: 2, day: 29}, true);
+                {year: 2016, month: 2, day: 29}, true),
     test.expect("invalid date", mod.isValid,
-                {year: 2016, month: 2, day: 30}, false);
+                {year: 2016, month: 2, day: 30}, false),
     test.expect("invalid date (year too small)", mod.isValid,
-                {year: 1970, month: 1, day: 1}, false);
+                {year: 1970, month: 1, day: 1}, false),
     test.expect("invalid date (year too large)", mod.isValid,
-                {year: 20014, month: 3, day: 27}, false);
+                {year: 20014, month: 3, day: 27}, false),
     test.expect("date to string", mod.toString,
-                {year: 2014, month: 1, day: 01}, "2014-01-01");
+                {year: 2014, month: 1, day: 01}, "2014-01-01"),
     test.expect("date to string", mod.toString,
-                {year: 2015, month: 12, day: 31}, "2014-12-31");
+                {year: 2015, month: 12, day: 31}, "2014-12-31")
   ];
 
   return mod;

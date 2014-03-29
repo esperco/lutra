@@ -15,7 +15,8 @@ var ref = (function() {
   var lockTimeout = 1000; /* milliseconds */
 
   function createId() {
-    return idCounter++;
+    idCounter++;
+    return "" + idCounter;
   }
 
   /*
@@ -25,8 +26,8 @@ var ref = (function() {
   */
   function lock(id) {
     var d = locks[id];
-    var now = date.now();
-    if (d != null && now.UTC() <= d.UTC() + lockTimeout)
+    var now = new Date();
+    if (d != null && now.getTime() <= d.getTime() + lockTimeout)
       return false;
     else {
       locks[id] = now;
@@ -41,9 +42,12 @@ var ref = (function() {
   /*
     Register a general-purpose handler, executed each time the data
     field is set.
+    Return a watcher ID.
   */
-  function watch(m, handler) {
-    m.changeHandlers.push(handler);
+  function watch(m, handler, optWatcherId) {
+    var id = optWatcherId === undefined ? createId() : optWatcherId;
+    m.changeHandlers.push({ handler: handler, id: id });
+    return id;
   }
 
   /*
@@ -78,14 +82,30 @@ var ref = (function() {
     m.changeHandlers = [];
   }
 
+  function objectOfIdArray(a) {
+    var obj = {};
+    for (var i = 0; i < a.length; i++) {
+      var k = a[i];
+      obj[k] = true;
+    }
+    return obj;
+  }
+
   /*
     Set a value.
     The lock prevents a value from being set twice during the same
     (synchronous) call.
+
+    optBlockedWatchers is an optional list of watcher IDs that should
+    be disabled.
   */
-  function set(m, newData) {
+  function set(m, newData, optBlockedWatchers) {
     var id = m.id;
+    var blockedWatchers =
+      optBlockedWatchers === undefined ? {}
+    : objectOfIdArray(optBlockedWatchers);
     if (lock(id)) {
+      log("ref["+ id +"]: set value", newData);
       var oldValidity = m.validity;
       var oldData = m.data;
       var newValidity = m.isValid(newData);
@@ -94,9 +114,13 @@ var ref = (function() {
 
       var n = m.changeHandlers.length;
       for (var i = 0; i < n; i++) {
-        var handler = m.changeHandlers[i];
-        handler(newData, newValidity,
-                oldData, oldValidity);
+        var watcher = m.changeHandlers[i];
+        var watcherId = watcher.id;
+        if (blockedWatchers[watcherId] === undefined) {
+          log("ref["+ id +"]: activate watcher " + watcherId);
+          watcher.handler(newData, newValidity,
+                          oldData, oldValidity);
+        }
       }
       unlock(id);
     }
@@ -131,10 +155,12 @@ var ref = (function() {
     };
     return {
       /* Core functions */
-      set: (function(newData) { set(m, newData); }),
+      set: (function(newData, blockedWatchers) {
+        set(m, newData, blockedWatchers);
+      }),
       get: (function() { return m.data; }),
       isValid: (function() { return m.validity; }),
-      watch: (function(handler) { watch(m, handler); }),
+      watch: (function(handler, optId) { watch(m, handler, optId); }),
       unwatch: (function() { unwatch(m); }),
 
       /* Convenience functions */

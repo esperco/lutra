@@ -10,6 +10,19 @@
   - calendarView
   - setCalEventDate(start, end): called from outside to update the calendar view
 
+
+  Implementation notes:
+
+  Several input widgets are tied to a pair of dates. This pair of dates
+  is an observable value of type ref (see ref.js). Each input widget
+  does the following:
+  - reacts to user actions (clicks and such) by calling r.set()
+  - reacts to changes in r by initially registering a handler using r.watch()
+
+  We have 3 kinds of inputs:
+  - time only (start and end picked independently)
+  - date only (start)
+  - date-time (start + end) picked from full calendar
 */
 
 var calpicker = (function() {
@@ -47,16 +60,8 @@ var calpicker = (function() {
       return null;
   }
 
-  /* Import dates */
-  function setDates(r, start, end) {
-    r.set({
-      start: start,
-      end: end
-    });
-  }
-
   /*
-    Create a ref (r) holding start and end date expressed in calendar time
+    Create a ref (r) holding start and end date-time expressed in calendar time
     (local time relative to the calendar's timezone).
   */
   function createRef(localStart, localEnd) {
@@ -69,19 +74,6 @@ var calpicker = (function() {
     var r = ref.create(datesAreValid, initDates);
     return r;
   }
-
-/*
-    dateOnlyRef.watch(function(ymd, isValid) {
-      if (isValid) {
-        datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
-      }
-    });
-    dateOnlyRef.watch(function(ymd, isValid) {
-      if (isValid) {
-        setCalendarDate(ymd);
-      }
-    });
-*/
 
   function createView(datesRef, tz) {
 '''
@@ -119,16 +111,14 @@ var calpicker = (function() {
     return _view;
   }
 
+  /***** Time pickers (start/end time of day) *****/
+
+  var timeWatcherId = "timeWatcher";
+
   function to24hours(timePickerTime) {
     var hours12 = timePickerTime.hours % 12;
     var hours24 = timePickerTime.meridian === "AM" ? hours12 : hours12 + 12;
     return hours24;
-  }
-
-  function hasDates(picker) {
-    var start = picker.eventStart;
-    var end = picker.eventEnd;
-    return util.isDefined(start) && util.isDefined(end);
   }
 
   function setupTimePicker(picker,
@@ -146,21 +136,22 @@ var calpicker = (function() {
       var oldDate = oldDates[fieldName];
       if (util.isDefined(oldDate)) {
         var time = timePicker.timepicker("getTime"); /* native js Date */
+        log("time from timepicker", time);
         var hours = time.getHours();
         var minutes = time.getMinutes();
-        var ymd = ymdDate.utc.ofDate(oldDate);
-        var date = ymdDate.utc.toDate(hours, minutes, 0);
+        var ymd = dateYmd.utc.ofDate(oldDate);
+        var date = dateYmd.utc.toDate(hours, minutes, 0);
         var dates = util.copyObject(oldDates);
         dates[fieldName] = date;
-        r.set(dates);
+        r.set(dates, [timeWatcherId]);
       }
     });
     r.watch(function(dates) {
       var date = dates[fieldName];
       if (util.isDefined(date)) {
-        timePicker.timepicker('setTime', formatTime(start));
+        timePicker.timepicker('setTime', date);
       }
-    });
+    }, timeWatcherId);
   }
 
   function setupTimePickers(picker) {
@@ -173,8 +164,56 @@ var calpicker = (function() {
         picker.textView.removeClass("hide");
       else if (! util.isDefined(dates.start) && !util.isDefined(dates.end))
         picker.textView.addClass("hide");
+    }, timeWatcherId);
+  }
+
+  /***** Date picker (start date, independent from time of day) *****/
+
+  var dateWatcherId = "dateWatcher";
+
+  function setDate(ymd, d) {
+    return dateYmd.utc.toDate(ymd,
+                              d.getUTCHours(),
+                              d.getUTCMinutes(),
+                              d.getUTCSeconds());
+  }
+
+  function setupDatePicker(picker) {
+    var r = picker.datesRef;
+    r.watch(function(dates, isValid) {
+      if (isValid) {
+        var ymd = dateYmd.utc.ofDate(dates.start);
+        picker.datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
+      }
+    }, dateWatcherId);
+    picker.datePicker.datepicker({
+      onSelect: function(selectedDate) {
+        var ymd = dateYmd.ofString(selectedDate);
+        var oldDates = r.getAllOrNothing();
+        var dates;
+        if (oldDates !== null) {
+          dates = {
+            start: setDate(ymd, oldDates.start),
+            end: setDate(ymd, oldDates.end)
+          };
+        }
+        else {
+          /* default to 9:00-10:00 */
+          var start = dateYmd.utc.toDate(ymd, 9, 0, 0);
+          var end = dateYmd.utc.toDate(ymd, 10, 0, 0);
+          dates = {
+            start: start,
+            end: end
+          };
+        }
+        r.set(dates, [dateWatcherId]);
+      }
     });
   }
+
+  /***** Calendar picker (start/end date-time) *****/
+
+  var calendarWatcherId = "calendarWatcher";
 
   /* Remove event from the calendar view but preserve start/end fields */
   function removeCalendarEvent(picker) {
@@ -187,55 +226,31 @@ var calpicker = (function() {
     }
   }
 
-  /* Get rid of any previously selected date and time */
+  /* Get rid of any previously selected date and time,
+     propagate to other date/time pickers */
   function removeEvent(picker) {
     removeCalendarEvent(picker);
-    picker.datesRef.set({});
+    picker.datesRef.set({}, [calendarWatcherId]);
+  }
+
+  function createPickedCalendarEvent(picker, startMoment, endMoment) {
+    var eventId = util.randomString();
+    picker.eventId = eventId;
+    var eventData = {
+      id: eventId,
+      title: "",
+      start: startMoment,
+      end: endMoment,
+      color: "#A25CC6",
+      editable: true
+    };
+    var stick = true;
+    picker.calendarView.fullCalendar('renderEvent', eventData, stick);
+    picker.calendarView.fullCalendar('unselect');
   }
 
   /*
-    Convert a Fullcalendar date (Moment library) into a string
-    accepted by Bootstrap-timepicker.
-  */
-  function formatTime(calDate) {
-    return date.timeOnly(calDate.toDate());
-  }
-
-  function updateTextView(picker) {
-    var start = picker.eventStart;
-    var end = picker.eventEnd;
-    if (hasDates(picker)) {
-      picker.startInput.timepicker('setTime', formatTime(start));
-      picker.endInput.timepicker('setTime', formatTime(end));
-      picker.textView.removeClass("hide");
-    }
-    else
-      removeEvent(picker);
-  }
-
-  function updateCalendarView(picker) {
-    if (hasDates(picker)) {
-      removeCalendarEvent(picker);
-      var start = picker.eventStart;
-      var end = picker.eventEnd;
-      var eventId = util.randomString();
-      picker.eventId = eventId;
-      var eventData = {
-        id: eventId,
-        title: "",
-        start: start,
-        end: end,
-        color: "#A25CC6",
-        editable: true
-      };
-      var stick = true;
-      picker.calendarView.fullCalendar('renderEvent', eventData, stick);
-      picker.calendarView.fullCalendar('unselect');
-    }
-  }
-
-  /*
-    Ignores the 'Z' suffix and assumes time expressed the calendar's
+    Ignores the 'Z' suffix and assumes time expressed in the calendar's
     timezone.
   */
   function parseDateUsingCalendarTimezone(picker, dateString) {
@@ -248,18 +263,30 @@ var calpicker = (function() {
 
     (just slightly contrived)
    */
-  function momentOfLocalDate(picker, d) {
+  function momentOfDate(picker, d) {
     var s = date.toString(d);
     return parseDateUsingCalendarTimezone(picker, s);
   }
 
-  function setDates(picker, start, end) {
-    if (util.isNotNull(start) && util.isNotNull(end)) {
-      picker.eventStart = momentOfLocalDate(picker, start);
-      picker.eventEnd = momentOfLocalDate(picker, end);
-      updateTextView(picker);
-      updateCalendarView(picker);
-    }
+  /*
+    Convert a Fullcalendar date (Moment library) into a javascript Date
+  */
+  function dateOfMoment(m) {
+    return m.toDate();
+  }
+
+  function datesOfMoments(startMoment, endMoment) {
+    return {
+      start: dateOfMoment(startMoment),
+      end: dateOfMoment(endMoment)
+    };
+  }
+
+  function createPickedEvent(picker, dates) {
+    log("createPickedEvent", dates);
+    var startMoment = momentOfDate(picker, dates.start);
+    var endMoment = momentOfDate(picker, dates.end);
+    createPickedCalendarEvent(picker, startMoment, endMoment);
   }
 
   /*
@@ -267,10 +294,7 @@ var calpicker = (function() {
     create new calendar event and populate input boxes
   */
   function initEvent(picker, start, end) {
-    removeEvent(picker);
-
-    picker.onChange(getDates(picker));
-
+    removeCalendarEvent(picker);
     updateTextView(picker);
   }
 
@@ -316,51 +340,14 @@ var calpicker = (function() {
     spinner.spin("Loading calendar...", async);
   }
 
-  function setDate(ymd, d) {
-    return ymdDate.utc.toDate(ymd,
-                              d.getUTCHours(),
-                              d.getUTCMinutes(),
-                              d.getUTCSeconds());
-  }
-
-  function setupDatePicker(picker) {
+  function setupCalendar(picker, tz, defaultDate) {
     var r = picker.datesRef;
-    r.watch(function(dates, isValid) {
-      if (isValid) {
-        var ymd = dateYmd.utc(dates.start);
-        picker.datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
-      }
-    });
-    datePicker.datepicker({
-      onSelect: function(selectedDate) {
-        var ymd = dateYmd.ofString(selectedDate);
-        var oldDates = r.getAllOrNothing();
-        var dates;
-        if (oldDates !== null) {
-          dates = {
-            start: setDate(ymd, oldDates.start),
-            end: setDate(ymd, oldDates.end)
-          };
-        }
-        else {
-          /* default to 9:00-10:00 */
-          var start = ymdDate.utc.toDate(ymd, 9, 0, 0);
-          var end = ymdDate.utc.toDate(ymd, 10, 0, 0);
-          dates = {
-            start: start,
-            end: end
-          };
-        }
-        r.set(dates);
-      }
-    });
-  }
-
-  function setupCalendar(picker) {
     var calendarView = picker.calendarView;
 
-    function select(start, end) {
-      initEvent(picker, start, end);
+    function select(startMoment, endMoment) {
+      createPickedCalendarEvent(picker, startMoment, endMoment);
+      picker.datesRef.set(datesOfMoments(startMoment, endMoment),
+                          [calendarWatcherId]);
     }
 
     function eventClick(calEvent, jsEvent, view) {
@@ -368,8 +355,8 @@ var calpicker = (function() {
     }
 
     function updateEvent(picker, calEvent) {
-      removeEvent(picker);
-      initEvent(picker, calEvent.start, calEvent.end);
+      removeCalendarEvent(picker);
+      createPickedCalendarEvent(picker, calEvent.start, calEvent.end);
     }
 
     function eventDrop(calEvent, revertFunc, jsEvent, ui, view) {
@@ -380,13 +367,20 @@ var calpicker = (function() {
       updateEvent(picker, calEvent);
     }
 
+    r.watch(function(dates, isValid) {
+      if (isValid)
+        createPickedEvent(picker, dates);
+      else
+        removeEvent(picker);
+    }, calendarWatcherId);
+
     calendarView.fullCalendar({
       header: {
         left: 'prev,next today',
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
-      defaultDate: param.defaultDate,
+      defaultDate: defaultDate,
       defaultView: 'agendaWeek',
       timezone: tz,
       selectable: true,
@@ -408,17 +402,21 @@ var calpicker = (function() {
     - onChange(optDates):
         fired when the dates are initialized or change;
         optDates is a record with fields start, end, and duration.
+    - defaultDate:
+        date that determines which calendar page to display initially
+        (default: today)
    */
   mod.create = function(param) {
     var tz = param.timezone;
     var onChange = param.onChange;
+    var defaultDate = param.defaultDate;
 
     var r = createRef();
     var picker = createView(r, tz);
 
     setupTimePickers(picker);
     setupDatePicker(picker);
-    setupCalendar(picker);
+    setupCalendar(picker, tz, defaultDate);
 
     picker.datesRef.watch(function(dates, isValid) {
       if (isValid)
@@ -426,7 +424,7 @@ var calpicker = (function() {
     });
 
     function render() {
-      calendarView.fullCalendar("render");
+      picker.calendarView.fullCalendar("render");
     }
 
     return {
@@ -442,7 +440,7 @@ var calpicker = (function() {
       setDates: (function(x) { picker.datesRef.set(x); }),
       clearDates: (function() { picker.datesRef.set({}); })
     };
-  }
+  };
 
   return mod;
 })();
