@@ -27,7 +27,6 @@
 
 var calpicker = (function() {
   var mod = {};
-
   /* Duration in seconds between two Dates */
   function getDuration(start, end) {
     return (end.getTime() - start.getTime()) / 1000;
@@ -35,7 +34,7 @@ var calpicker = (function() {
 
   /* Check if the start and end dates are complete and valid */
   function datesAreValid(dates) {
-    if (util.isDefined(dates.start) && util.isDefined(dates.end)) {
+    if (util.isNotNull(dates.start) && util.isNotNull(dates.end)) {
       var start = dates.start;
       var end = dates.end;
       var duration = getDuration(start, end);
@@ -100,6 +99,7 @@ var calpicker = (function() {
 
     _view.focus = startInput.focus;
     _view.datesRef = datesRef;
+    _view.timezone = tz;
 
     /*
       Later _view will also contain the following fields:
@@ -146,10 +146,14 @@ var calpicker = (function() {
         r.set(dates, [timeWatcherId]);
       }
     });
-    r.watch(function(dates) {
-      var date = dates[fieldName];
-      if (util.isDefined(date)) {
-        timePicker.timepicker('setTime', date);
+    r.watch(function(dates, isValid) {
+      if (isValid) {
+        var local = dates[fieldName];
+        var d = date.copy(local);
+        d.setHours(local.getUTCHours());
+        if (util.isDefined(date)) {
+          timePicker.timepicker('setTime', d);
+        }
       }
     }, timeWatcherId);
   }
@@ -356,7 +360,7 @@ var calpicker = (function() {
 
     function updateEvent(picker, calEvent) {
       removeCalendarEvent(picker);
-      createPickedCalendarEvent(picker, calEvent.start, calEvent.end);
+      select(calEvent.start, calEvent.end);
     }
 
     function eventDrop(calEvent, revertFunc, jsEvent, ui, view) {
