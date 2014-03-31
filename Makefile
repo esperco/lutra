@@ -3,11 +3,11 @@ default: dev
 
 # Copy public files into the pub/ directory without minifying
 dev: dev-build
-	./install dev
+	./install dev 2>&1 | tee -a install.log
 # Clean installation for production purposes
 prod: prod-build
 	rm -rf pub
-	./install prod
+	./install prod 2>&1 | tee -a install.log
 
 dev-build:
 	$(MAKE) -C js dev-build
