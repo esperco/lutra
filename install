@@ -2,7 +2,7 @@
 set -e
 
 echo "INSTALL mink ($*)"
-TZ=America/Los_Angeles date '+%FT%T.%N%:z'
+TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
 
 case "$1" in
     "prod"|"dev")
