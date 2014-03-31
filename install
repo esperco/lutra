@@ -1,6 +1,9 @@
 #! /bin/sh
 set -e
 
+echo "INSTALL mink ($*)"
+date
+
 case "$1" in
     "prod"|"dev")
         mode=$1
@@ -39,3 +42,14 @@ cp html/*.html pub/html
 cp ejs/*.ejs pub/ejs
 cp fonts/* pub/fonts
 cp img/* pub/img
+
+### Log info about this installation
+if commit=$(git log -1 2>/dev/null); then
+    echo "\
+Latest commit of the current branch of the local git repository:
+$commit"
+else
+    echo "Missing git info"
+fi
+
+echo "Installation complete."
