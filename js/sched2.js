@@ -973,7 +973,6 @@ var sched2 = (function() {
         defaultDate = date.toString(dates.start);
       var calModal = createCalendarModal({
         timezone: x.location.timezone,
-        onChange: setDates,
         defaultDate: defaultDate
       });
       calPickerContainer.children().remove();
@@ -981,8 +980,8 @@ var sched2 = (function() {
       calModal.modal.modal({});
       calModal.doneButton
         .click(function() {
-          /* dates are already saved by the onChange handler. */
           calModal.modal.modal("hide");
+          setDates(calModal.cal.getDates());
         });
       calModal.modal
         .on("shown.bs.modal", function() {

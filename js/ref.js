@@ -130,7 +130,7 @@ var ref = (function() {
     Get the data only if it is valid, otherwise return null.
     Avoids returning data with only some of the required fields.
    */
-  function getAllOrNothing(m) {
+  function getValidOrNothing(m) {
     return m.validity ? m.data : null;
   }
 
@@ -166,7 +166,7 @@ var ref = (function() {
       /* Convenience functions */
       reset: (function() { set(m, initialData); }),
       clear: (function() { set(m, {}); }),
-      getAllOrNothing: (function() { return getAllOrNothing(m); }),
+      getValidOrNothing: (function() { return getValidOrNothing(m); }),
       watchTurnValid: (function(handler) { watchTurnValid(m, handler); }),
       watchTurnInvalid: (function(handler) { watchTurnInvalid(m, handler); }),
     }

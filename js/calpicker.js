@@ -45,10 +45,12 @@ var calpicker = (function() {
   }
 
   /* Export dates for outside use */
-  function getDates(r) {
-    if (datesAreValid(dates)) {
-      var start = r.start;
-      var end = r.end;
+  function getDates(picker) {
+    var r = picker.datesRef;
+    var dates = r.getValidOrNothing();
+    if (util.isNotNull(dates)) {
+      var start = dates.start;
+      var end = dates.end;
       return {
         start: start,
         end: end,
@@ -106,7 +108,6 @@ var calpicker = (function() {
       - eventId
       - eventStart
       - eventEnd
-      - onChange
      */
     return _view;
   }
@@ -419,16 +420,12 @@ var calpicker = (function() {
 
     Parameters:
     - timezone: IANA timezone in which all local times are expressed
-    - onChange(optDates):
-        fired when the dates are initialized or change;
-        optDates is a record with fields start, end, and duration.
     - defaultDate:
         date that determines which calendar page to display initially
         (default: today)
    */
   mod.create = function(param) {
     var tz = param.timezone;
-    var onChange = param.onChange;
     var defaultDate = param.defaultDate;
 
     var r = createRef();
@@ -437,11 +434,6 @@ var calpicker = (function() {
     setupTimePickers(picker);
     setupDatePicker(picker);
     setupCalendar(picker, tz, defaultDate);
-
-    picker.datesRef.watch(function(dates, isValid) {
-      if (isValid)
-        onChange(dates);
-    });
 
     function render() {
       picker.calendarView.fullCalendar("render");
