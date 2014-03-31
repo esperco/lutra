@@ -115,12 +115,6 @@ var calpicker = (function() {
 
   var timeWatcherId = "timeWatcher";
 
-  function to24hours(timePickerTime) {
-    var hours12 = timePickerTime.hours % 12;
-    var hours24 = timePickerTime.meridian === "AM" ? hours12 : hours12 + 12;
-    return hours24;
-  }
-
   function setupTimePicker(picker,
                            fieldName, /* either "start" or "end" */
                            timePicker) {
@@ -134,15 +128,14 @@ var calpicker = (function() {
     timePicker.on("changeTime", function() {
       var oldDates = r.get();
       var oldDate = oldDates[fieldName];
-      if (util.isDefined(oldDate)) {
-        var time = timePicker.timepicker("getTime"); /* native js Date */
-        log("time from timepicker", time);
-        var hours = time.getHours();
-        var minutes = time.getMinutes();
-        var ymd = dateYmd.utc.ofDate(oldDate);
-        var date = dateYmd.utc.toDate(hours, minutes, 0);
+      if (util.isNotNull(oldDate)) {
         var dates = util.copyObject(oldDates);
-        dates[fieldName] = date;
+        var d = timePicker.timepicker("getTime"); /* native js Date */
+        log("timepicker's date: ", d);
+        var local = date.copy(oldDates[fieldName]);
+        local.setUTCHours(d.getHours());
+        local.setUTCMinutes(d.getMinutes());
+        dates[fieldName] = local;
         r.set(dates, [timeWatcherId]);
       }
     });
@@ -151,6 +144,7 @@ var calpicker = (function() {
         var local = dates[fieldName];
         var d = date.copy(local);
         d.setHours(local.getUTCHours());
+        d.setMinutes(local.getUTCMinutes());
         if (util.isDefined(date)) {
           timePicker.timepicker('setTime', d);
         }
@@ -348,32 +342,41 @@ var calpicker = (function() {
     var r = picker.datesRef;
     var calendarView = picker.calendarView;
 
-    function select(startMoment, endMoment) {
+    function setEventMoments(startMoment, endMoment) {
+      removeCalendarEvent(picker);
       createPickedCalendarEvent(picker, startMoment, endMoment);
       picker.datesRef.set(datesOfMoments(startMoment, endMoment),
                           [calendarWatcherId]);
+    }
+
+    function setEvent(dates) {
+      setEventMoments(momentOfDate(picker, dates.start),
+                      momentOfDate(picker, dates.end));
+    }
+
+    function select(startMoment, endMoment) {
+      setEventMoments(startMoment, endMoment);
     }
 
     function eventClick(calEvent, jsEvent, view) {
       removeEvent(picker);
     }
 
-    function updateEvent(picker, calEvent) {
-      removeCalendarEvent(picker);
-      select(calEvent.start, calEvent.end);
+    function updateEvent(calEvent) {
+      setEventMoments(calEvent.start, calEvent.end);
     }
 
     function eventDrop(calEvent, revertFunc, jsEvent, ui, view) {
-      updateEvent(picker, calEvent);
+      updateEvent(calEvent);
     }
 
     function eventResize(calEvent, jsEvent, ui, view) {
-      updateEvent(picker, calEvent);
+      updateEvent(calEvent);
     }
 
     r.watch(function(dates, isValid) {
       if (isValid)
-        createPickedEvent(picker, dates);
+        setEvent(dates);
       else
         removeEvent(picker);
     }, calendarWatcherId);
