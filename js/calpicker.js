@@ -184,7 +184,7 @@ var calpicker = (function() {
       numberOfMonths: 4,
       onSelect: function(selectedDate) {
         var ymd = dateYmd.ofString(selectedDate);
-        var oldDates = r.getAllOrNothing();
+        var oldDates = r.getValidOrNothing();
         var dates;
         if (oldDates !== null) {
           dates = {
