@@ -20,6 +20,7 @@ var spinner = (function() {
 
   /* Spin the spinner while the asynchronous call isn't over. */
   mod.spin = function(msg, deferredValue) {
+    /* Don't start the spinner if the result is already available */
     if (deferredValue.state() === "pending") {
       mod.start(msg);
       deferredValue

@@ -381,12 +381,13 @@ var sched2 = (function() {
     var organizerName = profile.fullName(profs[login.me()].prof);
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
+    var toEmail = profile.email(profs[toUid].prof);
 
     var plural = options.length === 1 ? "" : "s";
     offerModal.title.text("Offer the meeting option" + plural + ".");
     offerModal.showEndTimeText.text("Show end time of meeting option" + plural);
 
-    offerModal.recipient.text(toName);
+    offerModal.recipient.text(toName + " <" + toEmail + ">");
     offerModal.subject.text("Re: " + task.task_status.task_title);
 
     var readOnly = offerModal.messageReadOnly;
@@ -664,12 +665,13 @@ var sched2 = (function() {
     For now just a dropdown menu of meeting types.
     May be accompanied with options specific to the type of meeting selected.
   */
-  function createMeetingTypeSelector(onSet, customBox) {
+  function createMeetingTypeSelector(onSet, customBox, saveButton) {
     function showCustom() {
       customBox
         .val("")
         .removeClass("hide")
         .focus();
+      saveButton.addClass("disabled");
     }
     function hideCustom() {
       customBox.addClass("hide");
@@ -784,39 +786,43 @@ var sched2 = (function() {
   */
   function createCalendarModal(param) {
 '''
-<div #modal
-     class="modal fade" tabindex="-1"
+<div #view
+     class="modal fade"
+     tabindex="-1"
      role="dialog"
      aria-hidden="true">
   <div #dialog
-       class="modal-dialog cal-picker-dialog">
-    <div class="modal-content">
+       class="modal-dialog cal-picker-modal">
+    <div #content
+         class="modal-content cal-picker-modal">
       <div class="modal-header">
-        <img #icon
-             class="svg cal-picker-icon" src="/assets/img/calendar.svg"/>
-        <div style="float:right" data-dismiss="modal">
-          <img class="svg modal-close" src="/assets/img/x.svg"/>
-        </div>
-        <div #title
-             class="modal-title">
-          Select a time.
-        </div>
+        <div #iconContainer
+             class="modal-icon cal-picker-modal-icon"/>
         <button #doneButton
-                class="btn btn-default">Done</button>
+                class="btn btn-primary"
+                style="float:right">
+          Done
+        </button>
+        <div #title
+            class="modal-title">
+          Click on the calendar to select a time.
+        </div>
       </div>
-      <div #body
-           class="modal-body"></div>
     </div>
   </div>
 </div>
 '''
-    var id = util.randomString();
-    title.attr("id", id);
-    modal.attr("aria-labelledby", id);
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/calendar.svg");
+
+    // var id = util.randomString();
+    // title.attr("id", id);
+    // view.attr("aria-labelledby", id);
 
     var cal = calpicker.create(param);
     _view.cal = cal;
-    _view.body.append(cal.view);
+    _view.content.append(cal.view);
     _view.focus = cal.focus;
 
     return _view;
@@ -864,7 +870,6 @@ var sched2 = (function() {
             Select time in calendar
           </span>
         </span>
-        <div #calPickerContainer/>
       </div>
     </div>
     <div #whereSection
@@ -934,7 +939,7 @@ var sched2 = (function() {
     }
 
     var meetingTypeSelector =
-      createMeetingTypeSelector(setMeetingType, meetingTypeInput);
+      createMeetingTypeSelector(setMeetingType, meetingTypeInput, saveButton);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
@@ -975,15 +980,13 @@ var sched2 = (function() {
         timezone: x.location.timezone,
         defaultDate: defaultDate
       });
-      calPickerContainer.children().remove();
-      calPickerContainer.append(calModal.modal);
-      calModal.modal.modal({});
+      calModal.view.modal({});
       calModal.doneButton
         .click(function() {
-          calModal.modal.modal("hide");
+          calModal.view.modal("hide");
           setDates(calModal.cal.getDates());
         });
-      calModal.modal
+      calModal.view
         .on("shown.bs.modal", function() {
           calModal.cal.render(); // can't happen earlier or calendar won't show
         });
@@ -1080,6 +1083,13 @@ var sched2 = (function() {
       else
         loc = locationForm.getCompleteLocation();
 
+      if (
+        !(meetingTypeInput.hasClass("hide"))
+        && meetingTypeInput.val() === ""
+      ) {
+        return null;
+      }
+
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
           && hasDates()) {
@@ -1121,7 +1131,9 @@ var sched2 = (function() {
 
     function saveMe(action) {
       saveButton.addClass("disabled");
-      saveCalOption(getCalOption(), action);
+      var desc = locationForm.getGoogleDescription();
+      var savedID = locationForm.getSavedPlaceID();
+      saveCalOption(getCalOption(), action, desc, savedID);
     }
 
     var action;
@@ -1153,7 +1165,23 @@ var sched2 = (function() {
                                 saveCalOption, cancel, addMode);
   }
 
-  function saveOption(ta, calOption, action) {
+  function saveNamedPlace(calOption, googleDescription, savedPlaceID) {
+    var loc = calOption.slot.location;
+    var edit = {
+      title: loc.title,
+      address: loc.address,
+      instructions: loc.instructions,
+      google_description: googleDescription,
+      geometry: loc.coord
+    };
+    if (util.isNotNull(savedPlaceID)) {
+      return api.postEditPlace(savedPlaceID, edit);
+    } else {
+      return api.postCreatePlace(googleDescription, edit);
+    }
+  }
+
+  function saveOption(ta, calOption, action, googleDescription, savedPlaceID) {
     var schedState = sched.getState(ta);
     var label = calOption.label;
     var options = schedState.calendar_options;
@@ -1165,7 +1193,18 @@ var sched2 = (function() {
     }
     else
       options.push(calOption);
-    saveAndReload(ta, action);
+    if (
+      util.isNotNull(calOption.slot)
+      && util.isNotNull(googleDescription)
+      && calOption.slot.location.title !== ""
+    ) {
+      saveNamedPlace(calOption, googleDescription, savedPlaceID)
+        .done(function() {
+          saveAndReload(ta, action);
+        });
+    } else {
+      saveAndReload(ta, action);
+    }
   }
 
   function removeOption(ta, calOptionLabel) {
@@ -1279,7 +1318,9 @@ var sched2 = (function() {
   }
 
   function loadMeetingOptions(v, profs, ta) {
-    function save(calOption, action) { return saveOption(ta, calOption, action); }
+    function save(calOption, action, desc, savedID) {
+      return saveOption(ta, calOption, action, desc, savedID);
+    }
     function remove(calOption) { return removeOption(ta, calOption); }
 
     function createAdderForm(cancelAdd) {
@@ -1387,9 +1428,7 @@ var sched2 = (function() {
   }
 
   mod.load = function(profs, ta, view) {
-    view.children().remove();
     var guests = sched.getAttendingGuests(ta);
-
     var options = createOptionsSection(profs, ta);
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);

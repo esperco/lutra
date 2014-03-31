@@ -289,37 +289,18 @@ var sched = (function() {
     return _view;
   }
 
-  var tabHighlighter =
-    show.create({
-      "sched-progress-tab1": {ids: ["sched-progress-tab1"]},
-      "sched-progress-tab2": {ids: ["sched-progress-tab2"]},
-      "sched-progress-tab4": {ids: ["sched-progress-tab4"]}
-    },
-    { onClass: "sched-tab-highlight", offClass: "" }
-    );
-
   var tabSelector = show.create({
-    "sched-step1-tab": {ids: ["sched-step1-tab"]},
     "sched-step2-tab": {ids: ["sched-step2-tab"]},
-    "sched-step4-tab": {ids: ["sched-step4-tab"]}
+    "sched-step4-tab": {ids: ["sched-step4-tab"]},
+    "messages-tab": {ids: ["messages-tab"]},
+    "setup-tab": {ids: ["setup-tab"]}
   });
-
-  function loadStep1(profs, task) {
-    var view = $("#sched-step1-table");
-    view.children().remove();
-
-    sched1.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab1");
-    tabSelector.show("sched-step1-tab");
-  };
 
   function loadStep2(profs, task) {
     var view = $("#sched-step2-table");
+    view.children().remove();
 
     sched2.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab2");
     tabSelector.show("sched-step2-tab");
   };
 
@@ -328,38 +309,64 @@ var sched = (function() {
     view.children().remove();
 
     sched4.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab4");
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(ta, prog) {
-    $(".sched-go-step1")
-      .unbind('click')
-      .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep1(profs, ta);
-        });
-      });
-    $(".sched-go-step2")
-      .attr('disabled', prog !== "Find_availability" && prog !== "Coordinate")
-      .unbind('click')
-      .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep2(profs, ta);
-        });
-      });
+  function loadMessages(task) {
+    chat.loadTaskChats(task);
+    tabSelector.show("messages-tab");
+    $(".chat-entry").focus();
+  };
 
-    $(".sched-go-step4")
-      .attr('disabled', prog !== "Confirm")
-      .unbind('click')
+  function loadSetup(profs, task) {
+    var view = $("#setup-table");
+    view.children().remove();
+
+    setup.load(profs, task, view);
+    tabSelector.show("setup-tab");
+  };
+
+  function highlight(tab) {
+    $("." + tab + "-tab-select").addClass("active");
+    if (tab === "setup") {
+      $(".setup-tab-select").removeClass("disabled");
+      $(".coordination-tab-select").removeClass("active");
+      $(".messages-tab-select").removeClass("active");
+    } else if (tab === "coordination") {
+      $(".setup-tab-select").removeClass("active");
+      $(".coordination-tab-select").removeClass("disabled");
+      $(".messages-tab-select").removeClass("active");
+    } else if (tab === "messages") {
+      $(".setup-tab-select").removeClass("active");
+      $(".coordination-tab-select").removeClass("active");
+      $(".messages-tab-select").removeClass("disabled");
+    }
+  }
+
+  function setup_step_buttons(ta, prog) {
+    $(".coordination-tab-select")
+      .off("click")
       .click(function() {
-        observable.onSchedulingStepChanging.notify();
+        if (ta.task_status.task_progress !== "Confirmed") {
+          ta.task_status.task_progress = "Coordinating";
+          prog = "Coordinate";
+        }
+        sched.loadTask(ta);
+        highlight("coordination");
+      });
+    $(".messages-tab-select")
+      .off("click")
+      .click(function() {
+        loadMessages(ta);
+        highlight("messages");
+      });
+    $(".setup-tab-select")
+      .off("click")
+      .click(function() {
         profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep4(profs, ta);
+          loadSetup(profs, ta);
         });
+        highlight("setup");
       });
   }
 
@@ -372,16 +379,20 @@ var sched = (function() {
       .done(function(profs) {
         switch (progress) {
         case "Guest_list":
-          loadStep1(profs, ta);
+          highlight("setup");
+          loadSetup(profs, ta);
           break;
         case "Find_availability":
           // Interpreted as Coordinate until case is removed from type
+          highlight("coordination");
           loadStep2(profs, ta);
           break;
         case "Coordinate":
+          highlight("coordination");
           loadStep2(profs, ta);
           break;
         case "Confirm":
+          highlight("coordination");
           loadStep4(profs, ta);
           break;
         default:

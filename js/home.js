@@ -71,7 +71,7 @@ var home = (function() {
 
       var team_organizers = login.organizers();
       if (team_organizers.length > 1) {
-        profile.mget(team_organizers).done(function(profs) {
+        profile.mget(team_organizers, ta.tid).done(function(profs) {
           list.iter(team_organizers, function(organizer_uid, i) {
             var v = $("<span/>");
             var img = $("<img/>");
@@ -393,7 +393,7 @@ var home = (function() {
     $(".logged-in-as").each(function() {
       var view = $(this);
       view.children().remove();
-      api.getProfile(login.me()).done(function(eaProf) {
+      profile.get(login.me()).done(function(eaProf) {
         var fullName = profile.fullName(eaProf);
         view.append("<div class='logged-in-text'>LOGGED IN AS</div>")
             .append("<div class='logged-in-name ellipsis'>" + fullName + "</div>");

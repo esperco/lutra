@@ -83,6 +83,14 @@ var guestTask = function() {
     } else if (me === assistedBy(x.profile_uid, guestOptions)) {
       nameDiv.append($("<span id='me-label'>my boss</span>"));
     }
+
+    if (util.isNotNull(x.phones) && x.phones.length > 0) {
+      var phone = x.phones[0].number;
+      $("<div class='guest-phone'/>")
+        .text(phone)
+        .appendTo(main);
+    }
+
     // var linkedinIcon = $("<img class='linkedin-icon'/>");
     // var linkedin = $("<div class='linkedin-title'/>")
     //   .append(linkedinIcon)

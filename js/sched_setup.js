@@ -1,11 +1,12 @@
 /*
-  Scheduling step 1
+  Scheduling Setup
 */
 
-var sched1 = (function() {
+var setup = (function() {
   var mod = {};
 
-  var nextButton = $(".sched-step1-next");
+  var doneButton = $("<button class='btn btn-primary done-setup'/>")
+    .text("Done");
 
   function editGuest(updateAddButton) {
     var edit = {};
@@ -25,6 +26,10 @@ var sched1 = (function() {
       .addClass("form-control guest-input")
       .attr("placeholder", "Last name")
       .attr("disabled", true);
+    edit.phoneInput = $("<input type='tel'/>")
+      .addClass("form-control guest-input")
+      .attr("placeholder", "Phone number")
+      .attr("disabled", true);
 
     edit.firstLast = function() {
       return [edit.firstNameInput.val(),
@@ -43,9 +48,11 @@ var sched1 = (function() {
       if (util.isString(edit.optUid) && editable) {
         edit.firstNameInput.removeAttr("disabled");
         edit.lastNameInput.removeAttr("disabled");
+        edit.phoneInput.removeAttr("disabled");
       } else {
         edit.firstNameInput.attr("disabled", true);
         edit.lastNameInput.attr("disabled", true);
+        edit.phoneInput.attr("disabled", true);
       }
     }
 
@@ -62,13 +69,19 @@ var sched1 = (function() {
             edit.clearUid();
             var uid = prof.profile_uid;
             edit.optUid = uid;
+            // XXX Are these attributes still needed?
             edit.firstNameInput.attr("id", "first-name-" + uid);
             edit.lastNameInput.attr("id", "last-name-" + uid);
             edit.emailInput.attr("id", "email-" + uid);
+            edit.phoneInput.attr("id", "phone-" + uid);
             // TODO Allow pseudonyms for guests?
-            if (prof.first_last || ! prof.editable) {
+            if (prof.first_last || ! prof.editable) { // XXX Why second case?
               edit.firstNameInput.val(prof.first_last[0]);
               edit.lastNameInput.val(prof.first_last[1]);
+            }
+            if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
+              // TODO Support more than one phone number on frontend?
+              edit.phoneInput.val(prof.phones[0].number);
             }
             updateNameEditability(prof.editable);
             updateUI();
@@ -131,6 +144,7 @@ var sched1 = (function() {
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
+      .append(edit.phoneInput)
       .append(addButton);
 
     function toggleAddGuest() {
@@ -172,14 +186,24 @@ var sched1 = (function() {
 
     addButton.click(function() {
       var firstLast = edit.firstLast();
+      var email = edit.emailInput.val();
+      var phone = edit.phoneInput.val();
       var uid = edit.optUid;
-      api.getProfile(uid).then(function(prof) {
+      api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
-        if (prof.editable) {
-          api.postProfile(prof, login.getTeam().teamid);
+        if (prof.emails.length === 0) {
+          // TODO Support more than one email address for guests?
+          prof.emails = [{email: email}];
         }
-        profile.set(prof); /* update cache */
+        if (phone.length > 0) {
+          // TODO Support more than one phone number on frontend?
+          prof.phones = [{number: phone}];
+        }
+        if (prof.editable) {
+          api.postTaskProfile(prof, task.tid);
+        }
+        profile.setWithTask(prof, task.tid); /* update cache */
 
         guestTbl[uid] = uid;
         task.task_participants.organized_for.push(uid);
@@ -189,7 +213,6 @@ var sched1 = (function() {
           rowViewOfParticipant(profs, task, hosts, guestTbl, guestOptions, uid)
             .appendTo(guestsContainer);
           saveGuests(task, hosts, guestTbl, guestOptions);
-          updateNextButton(hosts, guestTbl, guestOptions);
         });
       });
       clearAddGuest();
@@ -291,13 +314,13 @@ var sched1 = (function() {
     addButton.click(function() {
       var firstLast = edit.firstLast();
       var uid = edit.optUid;
-      api.getProfile(uid).then(function(prof) {
+      api.getTaskProfile(uid, task.tid).then(function(prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last = firstLast;
         if (prof.editable) {
-          api.postProfile(prof, login.getTeam().teamid);
+          api.postTaskProfile(prof, task.tid);
         }
-        profile.set(prof); /* update cache */
+        profile.setWithTask(prof, task.tid); /* update cache */
 
         task.task_participants.organized_for.push(uid);
 
@@ -311,12 +334,13 @@ var sched1 = (function() {
 
     cancelCirc.click(function() {
       delete sched.optionsForGuest(guestOptions, guestUid).assisted_by;
-      saveGuests(task, hosts, guestTbl, guestOptions);
-
-      v.remove();
-      x.removeClass("has-ea");
-      eaCheck.removeClass("checkbox-selected");
-    })
+      saveGuests(task, hosts, guestTbl, guestOptions)
+        .done(function() {
+          v.remove();
+          x.removeClass("has-ea");
+          eaCheck.removeClass("checkbox-selected")
+        });
+    });
 
     v.append(branch)
      .append(cancelCirc)
@@ -351,10 +375,9 @@ var sched1 = (function() {
       remove.click(function() {
         var hosts = sched.getHosts(task);
         view.remove();
-        updateNextButton(hosts, guestTbl, guestOptions);
-        removeGuest(guestTbl, uid);
+        disableButtons();
+        removeGuest(task, guestTbl, uid);
         saveGuests(task, hosts, guestTbl, guestOptions);
-        updateNextButton(hosts, guestTbl, guestOptions);
       });
 
       viewOfProfile(guestView, profs, task, uid);
@@ -432,20 +455,32 @@ var sched1 = (function() {
     return profile.shortenName(s).length > 0;
   }
 
-  function isReady(hosts, guestTbl, guestOptions) {
-    var guests = collectGuests(hosts, guestTbl, guestOptions);
-    return guests.length > 0;
+  function updateStage(ta) {
+    if (sched.getAttendingGuests(ta).length === 0) {
+      sched.getState(ta).scheduling_stage = "Guest_list";
+    } else if (ta.task_status.task_progress !== "Confirmed") {
+      ta.task_status.task_progress = "Coordinating";
+      sched.getState(ta).scheduling_stage = "Coordinate";
+    }
   }
 
-  function updateNextButton(hosts, guestTbl, guestOptions) {
-    if (isReady(hosts, guestTbl, guestOptions))
-      nextButton.removeClass("disabled");
-    else
-      nextButton.addClass("disabled");
+  function updateButtons(ta) {
+    if (sched.getAttendingGuests(ta).length === 0) {
+      $(".coordination-tab-select").addClass("disabled");
+      doneButton.addClass("disabled");
+    } else {
+      $(".coordination-tab-select").removeClass("disabled");
+      doneButton.removeClass("disabled");
+    }
+  }
+
+  function disableButtons() {
+    $(".coordination-tab-select").addClass("disabled");
+    doneButton.addClass("disabled");
   }
 
   /* remove guest */
-  function removeGuest(guestTbl, uid) {
+  function removeGuest(ta, guestTbl, uid) {
     delete guestTbl[uid];
   }
 
@@ -457,72 +492,150 @@ var sched1 = (function() {
 
   function saveGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
-    api.postTask(ta).done(observable.onTaskParticipantsChanged.notify);
-  }
-
-  function finalizeGuests(ta, hosts, guestTbl, guestOptions) {
-    updateGuests(ta, hosts, guestTbl, guestOptions);
-    if (ta.task_status.task_progress !== "Confirmed") {
-      ta.task_status.task_progress = "Coordinating";
-      sched.getState(ta).scheduling_stage = "Coordinate";
-    }
-    api.postTask(ta).done(function(ta) {
-      sched.loadTask(ta);
+    updateStage(ta);
+    return api.postTask(ta).done(function(ta) {
+      updateButtons(ta);
       observable.onTaskParticipantsChanged.notify(ta);
     });
   }
 
-  mod.load = function(profs, ta, view) {
-    var view = $("#sched-step1-table");
-    view.children().remove();
-    $("<h3>Add guests to the meeting.</h3>")
-      .appendTo(view);
-
-    var hostsContainer = $("<div class='hosts-container'>");
-    var newGuestContainer = $("<div class='new-guest-container'>");
-    var guestsContainer = $("<div class='guests-container'/>");
+  function viewOfGuests(profs, ta, hosts) {
+'''
+<div #view
+     class="setup-section">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Guests</h4>
+    <div #help
+         class="help-text"/>
+    <div #content
+         class="setup-guests">
+      <div #guestList/>
+    </div>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block guests-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/guests.svg");
 
     var guests = sched.getAttendingGuests(ta);
     var guestTbl = list.toTable(guests);
     var guestOptions = sched.getGuestOptions(ta);
     var addResult =
       rowViewOfNewParticipant(profs, ta, hosts, guestTbl, guestOptions,
-                              guestsContainer);
-
-    var hosts = sched.getHosts(ta);
-    list.iter(hosts, function(uid) {
-      rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
-        .appendTo(hostsContainer);
-    });
+                              guestList);
 
     list.iter(guests, function(uid) {
       rowViewOfParticipant(profs, ta, hosts, guestTbl, guestOptions, uid)
-        .appendTo(guestsContainer);
+        .appendTo(guestList);
     });
 
-    var newGuestContainer = $("<div class='new-guest-container'>");
-    addResult.view
-      .appendTo(newGuestContainer);
+    updateButtons(ta);
+    content.append(addResult.view);
 
-    var guestListContainer = $("<div id='guest-list-container'>")
-      .append(hostsContainer)
-      .append(guestsContainer)
-      .append(newGuestContainer);
+    return _view;
+  }
 
-    view.append(guestListContainer);
+  function viewOfLiveMeetingPage(profs, ta, host) {
+'''
+<div #view
+     class="setup-section live-meeting-page-section col-sm-6">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Live meeting page</h4>
+    <div #help
+         class="help-text"/>
+    <input #link
+           class="form-control setup-input"/>
+    <button #copy
+            class="btn btn-primary copy-link disabled">
+      Copy link
+    </button>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block live-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/link.svg");
 
-    nextButton
-      .unbind("click")
+    var hostName = profile.firstName(profs[host].prof);
+
+    if (hostName.slice(-1) === "s") {
+      hostName += "'";
+    } else {
+      hostName += "'s";
+    }
+
+    help.text("This link appears in the event description on " + hostName
+              + " calendar. A separate link will be created for each guest.");
+
+    api.getGuestAppURL(ta.tid, host).done(function (url) {
+      link.val(url.url);
+    });
+
+    link.click(function() {
+      this.select();
+    });
+
+    return _view;
+  }
+
+  function viewOfEmailSubject(ta) {
+'''
+<div #view
+     class="setup-section email-subject-section col-sm-6">
+  <div #iconContainer
+       class="setup-section-icon"/>
+  <div class="setup-section-content">
+    <h4 class="bold">Email subject</h4>
+    <div #help
+         class="help-text"/>
+    <input #subject
+           class="form-control setup-input"
+           disabled/>
+    <button #update
+            class="btn btn-primary update-subject disabled">
+      Update
+    </button>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block subject-icon'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/email.svg");
+
+    help.text("This subject is used for every email sent to a guest regarding "
+              + "the meeting. It cannot be changed once a message has been sent.");
+    subject.val(ta.task_status.task_title);
+
+    return _view;
+  }
+
+  mod.load = function(profs, ta, view) {
+    var hosts = sched.getHosts(ta);
+    var host;
+    list.iter(hosts, function(uid) {
+      host = uid;
+    });
+
+    doneButton
+      .off("click")
       .click(function() {
-        nextButton.addClass("disabled");
-        finalizeGuests(ta, hosts, guestTbl, guestOptions);
+        sched.loadTask(ta);
       });
 
-    updateNextButton(hosts, guestTbl, guestOptions);
-
-    observable.onSchedulingStepChanging.observe("step", function() {
-      saveGuests(ta, hosts, guestTbl, guestOptions);
-    });
+    view
+      .append(doneButton)
+      .append($("<h3>Manage settings for this meeting.</h3>"))
+      .append($("<hr/>"))
+      .append($("<div class='clearfix'/>")
+        .append(viewOfEmailSubject(ta).view)
+        .append(viewOfLiveMeetingPage(profs, ta, host).view))
+      .append($("<hr/>"))
+      .append(viewOfGuests(profs, ta, hosts).view);
   };
 
   return mod;

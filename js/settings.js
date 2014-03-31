@@ -255,7 +255,7 @@ var settings = (function() {
       })
     );
     var deferredDeferredRows =
-      profile.mget(leaderUIDs).then(function(execProfs) {
+      profile.mget(leaderUIDs, null).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
           var prof = execProf.prof;
           var execUid = prof.profile_uid;

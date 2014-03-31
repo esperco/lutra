@@ -83,13 +83,14 @@ APP_SOURCES = \
   sample.js \
   adder.js \
   timezone.js \
+  calcache.js \
   calpicker.js \
   loceditor.js \
   locpicker.js \
   tzpicker.js \
-  sched1.js \
   sched2.js \
   sched4.js \
+  sched_setup.js \
   task.js \
   settings.js \
   places.js \

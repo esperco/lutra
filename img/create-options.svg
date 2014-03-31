@@ -4,5 +4,5 @@
 <path d="m20.5,24v-15c0-.828-.672-1.5-1.5-1.5h-15v-2c0-.828 .672-1.5 1.5-1.5h2 15c.828,0 1.5,.672 1.5,1.5v15 2c0,.828-.672,1.5-1.5,1.5h-2z"/>
 <path d="m20.5,9c0-.828-.672-1.5-1.5-1.5h-15-2c-.828,0-1.5,.672-1.5,1.5v17c0,.828 .672,1.5 1.5,1.5h17c.828,0 1.5-.672 1.5-1.5v-2-15z"/>
 </g>
-<text font-family="'ProximaNova-Regular'" fill="#808285" transform="translate(5.3682 22.8359)" font-size="16">A</text>
+<text font-family="'Proxima Nova Regular'" fill="#808285" transform="translate(5.3682 22.8359)" font-size="16">A</text>
 </svg>

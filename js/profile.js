@@ -13,12 +13,25 @@ var profile = (function() {
     control: {}
   };
 
+  function makeKey(uid, tid) {
+    return uid + " " + tid;
+  }
+
+  function splitKey(key) {
+    return key.split(" ");
+  }
+
   /* class for creating observables with backend access */
   mod.Observe = can.Map;
 
   /* cache of observable profiles */
   var accessCache = cache.create (600, 60, {
-    get: function(uid) { return api.getProfile(uid); },
+    get: function(key) {
+      var k = splitKey(key);
+      return k.length > 1
+           ? api.getTaskProfile(k[0], k[1])
+           : api.getProfile(key);
+    },
     wrap: function(deferredProf) {
       return deferredProf.then(function(prof) {
         return util.isDefined(prof) ? new can.Map({prof:prof}) : null;
@@ -43,13 +56,18 @@ var profile = (function() {
     return accessCache.getCached(uid);
   };
 
+  mod.getWithTask = function(uid, tid) {
+    return accessCache.getCached(makeKey(uid, tid));
+  };
+
   /* Get multiple profiles from an array of uids.
      Positions in the array are preserved.
      Nulls exist where a failure occurred. */
-  mod.mget = function(uidList) {
-    var deferreds = list.map(uidList, function(uid) {
-      return mod.get(uid);
-    });
+  mod.mget = function(uidList, tid) {
+    var getter = util.isNotNull(tid)
+               ? function(uid) { return mod.getWithTask(uid, tid); }
+               : mod.get;
+    var deferreds = list.map(uidList, getter);
     return deferred.join(deferreds);
   };
 
@@ -59,6 +77,13 @@ var profile = (function() {
       return (new $.Deferred()).resolve(prof);
     }
     return accessCache.setCached(prof.profile_uid, defer(prof));
+  };
+
+  mod.setWithTask = function(prof, tid) {
+    function defer(prof) {
+      return (new $.Deferred()).resolve(prof);
+    }
+    return accessCache.setCached(makeKey(prof.profile_uid, tid), defer(prof));
   };
 
   /* display mini profile */
@@ -80,8 +105,12 @@ var profile = (function() {
     return result;
   }
 
-  mod.email = function(s) {
-    return "Email address goes here.";
+  mod.email = function(prof) {
+    if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
+      return prof.emails[0].email;
+    } else {
+      return "Missing email";
+    }
   };
 
   mod.shortenName = function(s) {
@@ -166,7 +195,7 @@ var profile = (function() {
   mod.profilesOfTaskParticipants = function(ta) {
     var par = ta.task_participants;
     var everyone = extractTaskUids(ta);
-    return mod.mget(everyone)
+    return mod.mget(everyone, ta.tid)
       .then(function(a) {
         var b = {};
         list.iter(a, function(obsProf) {

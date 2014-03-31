@@ -122,9 +122,10 @@ var sched4 = (function() {
     var reminderModal = createReminderModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     var toName = profile.fullName(profs[toUid].prof);
+    var toEmail = profile.email(profs[toUid].prof);
     var slot = getSlot(ta);
 
-    reminderModal.recipient.text(toName);
+    reminderModal.recipient.text(toName + " <" + toEmail + ">");
     reminderModal.subject.text("Re: " + ta.task_status.task_title);
 
     var parameters = {
@@ -479,9 +480,10 @@ var sched4 = (function() {
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
     var hostName = profile.fullName(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
+    var toEmail = profile.email(profs[toUid].prof);
     var slot = getSlot(ta);
 
-    confirmModal.recipient.text(toName);
+    confirmModal.recipient.text(toName + " <" + toEmail + ">");
     confirmModal.subject.text("Re: " + ta.task_status.task_title);
 
     var t1 = date.ofString(slot.start);
@@ -882,11 +884,11 @@ var sched4 = (function() {
   function createReviewSection(profs, task) {
 '''
 <div #view
-     class="sched-module-view collapsed">
+     class="sched-module-view first-module collapsed">
   <div #connectorNub
        class="connector-nub"/>
   <div #module
-       class="sched-module first-module">
+       class="sched-module">
     <div #header
          class="sched-module-header">
       <span #showHide
