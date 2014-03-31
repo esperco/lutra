@@ -176,15 +176,11 @@ var calpicker = (function() {
                               d.getUTCSeconds());
   }
 
-  function setupDatePicker(picker) {
+  function createDatePicker(picker) {
     var r = picker.datesRef;
-    r.watch(function(dates, isValid) {
-      if (isValid) {
-        var ymd = dateYmd.utc.ofDate(dates.start);
-        picker.datePicker.datepicker("setDate", dateYmd.local.toDate(ymd));
-      }
-    }, dateWatcherId);
     picker.datePicker.datepicker({
+      gotoCurrent: true,
+      numberOfMonths: 4,
       onSelect: function(selectedDate) {
         var ymd = dateYmd.ofString(selectedDate);
         var oldDates = r.getAllOrNothing();
@@ -207,6 +203,23 @@ var calpicker = (function() {
         r.set(dates, [dateWatcherId]);
       }
     });
+  }
+
+  function datePickerDateOfDates(dates) {
+    var ymd = dateYmd.utc.ofDate(dates.start);
+    var pickerDate = dateYmd.local.toDate(ymd);
+    return pickerDate;
+  }
+
+  function setupDatePicker(picker) {
+    var r = picker.datesRef;
+    r.watch(function(dates, isValid) {
+      if (isValid) {
+        var pickerDate = datePickerDateOfDates(dates);
+        picker.datePicker.datepicker("setDate", pickerDate);
+      }
+    }, dateWatcherId);
+    createDatePicker(picker);
   }
 
   /***** Calendar picker (start/end date-time) *****/
@@ -245,6 +258,7 @@ var calpicker = (function() {
     var stick = true;
     picker.calendarView.fullCalendar('renderEvent', eventData, stick);
     picker.calendarView.fullCalendar('unselect');
+    picker.calendarView.fullCalendar('gotoDate', startMoment);
   }
 
   /*
