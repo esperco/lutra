@@ -978,14 +978,13 @@ var sched2 = (function() {
         defaultDate = date.toString(dates.start);
       var calModal = createCalendarModal({
         timezone: x.location.timezone,
-        onChange: setDates,
         defaultDate: defaultDate
       });
       calModal.view.modal({});
       calModal.doneButton
         .click(function() {
-          /* dates are already saved by the onChange handler. */
           calModal.view.modal("hide");
+          setDates(calModal.cal.getDates());
         });
       calModal.view
         .on("shown.bs.modal", function() {

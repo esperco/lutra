@@ -91,6 +91,7 @@ var test = (function() {
     return [
       ["list", list.tests],
       ["util", util.tests],
+      ["dateYmd", dateYmd.tests],
       ["date", date.tests],
       ["timeonly", timeonly.tests],
       ["email", email.tests]

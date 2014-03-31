@@ -30,6 +30,7 @@ APP_LIBS = \
   jquery-ui \
   fullcalendar \
   jquery.timepicker \
+  jquery-ui-core-datepicker \
   jstz
 
 GUESTAPP_LIBS =
@@ -55,6 +56,7 @@ COMMON_SOURCES = \
   log.js \
   html.js \
   variant.js \
+  dateYmd.js \
   date.js \
   timeonly.js \
   status_.js \

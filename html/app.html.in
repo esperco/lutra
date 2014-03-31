@@ -17,6 +17,7 @@
     <link href="/assets/css/fullcalendar.css" rel="stylesheet">
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
     <link href="/assets/css/jquery.timepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery-ui-flick.css" rel="stylesheet">
   </head>
 
   <body>

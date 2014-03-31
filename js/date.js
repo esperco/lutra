@@ -6,6 +6,10 @@ var date = (function() {
   var mod = [];
   mod.us = {};
 
+  mod.copy = function(d) {
+    return new Date(d.getTime());
+  };
+
   /* parse RFC 3339 date.
      For browser-compatibility reasons, a timezone specification
      must be provided (otherwise some interpret it as local time, some as UTC).

@@ -65,6 +65,10 @@ var util = (function () {
     return result;
   };
 
+  mod.copyObject = function(x) {
+    return mod.mergeObjects(x);
+  };
+
   mod.toString = function(x) {
     return test.toString(x);
   }
