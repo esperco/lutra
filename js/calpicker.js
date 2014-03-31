@@ -295,7 +295,6 @@ var calpicker = (function() {
   }
 
   function createPickedEvent(picker, dates) {
-    log("createPickedEvent", dates);
     var startMoment = momentOfDate(picker, dates.start);
     var endMoment = momentOfDate(picker, dates.end);
     createPickedCalendarEvent(picker, startMoment, endMoment);

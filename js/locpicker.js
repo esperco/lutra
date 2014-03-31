@@ -350,7 +350,6 @@ var locpicker = (function() {
         called when the timezone is set or changes
    */
   mod.create = function(param) {
-    log("locpicker param", param);
     var form = createLocationForm(param);
     setup(form);
     setPositionFromNavigator();
