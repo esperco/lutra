@@ -9,7 +9,7 @@ var chat = (function () {
 
   function full_name(uid) {
     var p = profiles[uid].prof;
-    return p ? profile.fullName(p) : "John Doe";
+    return p ? profile.fullNameOrEmail(p) : "John Doe";
   }
 
   function firstInitial(uid) {
@@ -212,7 +212,7 @@ var chat = (function () {
       .appendTo(header);
 
     var recipients = list.map(item.to, function(uid) {
-      return profile.fullName(profiles[uid].prof);
+      return profile.fullNameOrEmail(profiles[uid].prof);
     }).join(", ");
     var toName = $("<div class='to-names' />")
       .text("to " + recipients)
@@ -420,7 +420,7 @@ var chat = (function () {
 
     list.iter(uids, function(uid) {
       var tab = $("<a/>", {"class":"tab-name", "data-toggle":"tab"});
-      tab.text(profile.fullName(profiles[uid].prof));
+      tab.text(profile.fullNameOrEmail(profiles[uid].prof));
       tab.click(function() {
         chatRecipients = [uid];
         showItem = function(item, itemView) {

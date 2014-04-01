@@ -219,7 +219,8 @@ var sched4 = (function() {
       chatHead.addClass("not-sent");
     }
 
-    var guestName = profile.viewMediumFullName(prof)
+    var guestName = $("<div/>")
+      .text(profile.fullNameOrEmail(prof))
       .addClass("reminder-guest-name")
       .appendTo(view);
 
@@ -478,7 +479,7 @@ var sched4 = (function() {
   function composeConfirmEmail(profs, ta, toUid) {
     var confirmModal = createConfirmModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
-    var hostName = profile.fullName(profs[login.leader()].prof);
+    var hostName = profile.fullNameOrEmail(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
     var toEmail = profile.email(profs[toUid].prof);
     var slot = getSlot(ta);
@@ -620,7 +621,8 @@ var sched4 = (function() {
       composeIcon.addClass("not-sent");
     }
 
-    var guestName = profile.viewMediumFullName(prof)
+    var guestName = $("<div/>")
+      .text(profile.fullNameOrEmail(prof))
       .addClass("confirmation-guest-name")
       .appendTo(view);
 
