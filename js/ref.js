@@ -78,7 +78,23 @@ var ref = (function() {
     watch(m, handler);
   }
 
-  function unwatch(m) {
+  function filter(a, f) {
+    var b = [];
+    for (var i = 0; i < a.length; i++) {
+      var x = a[i];
+      if (f(x) === true)
+        b.push(x);
+    }
+    return b;
+  }
+
+  function unwatch(m, watcherId) {
+    m.changeHandlers = filter(m.changeHandlers, function(watcher) {
+      return watcher.id !== watcherId;
+    });
+  }
+
+  function unwatchAll(m) {
     m.changeHandlers = [];
   }
 
@@ -161,7 +177,8 @@ var ref = (function() {
       get: (function() { return m.data; }),
       isValid: (function() { return m.validity; }),
       watch: (function(handler, optId) { watch(m, handler, optId); }),
-      unwatch: (function() { unwatch(m); }),
+      unwatch: (function(watcherId) { unwatch(m, watcherId); }),
+      unwatchAll: (function() { unwatchAll(m); }),
 
       /* Convenience functions */
       reset: (function() { set(m, initialData); }),

@@ -945,40 +945,41 @@ var sched2 = (function() {
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
-    var dates = {
-      start: date.ofString(x.start),
-      end: date.ofString(x.end)
-    };
+    var inlineDatesPicker = calpicker.create({
+      withDatePicker: true,
+      withCalendarPicker: false
+    });
 
-    function hasDates() {
-      var result = util.isDefined(dates)
-        && util.isNotNull(dates.start)
-        && util.isNotNull(dates.end);
-      return result;
+    function getDates() {
+      return inlineDatesPicker.getDates();
     }
-
-    function displayDates() {
-      dateAndTimes.children().remove();
-      if (hasDates()) {
-        dateAndTimes.append(sched.viewOfDates(dates.start, dates.end));
-      }
-    }
-
-    displayDates();
 
     function setDates(optDates) {
-      dates = optDates;
-      displayDates(optDates);
-      updateSaveButton();
+      inlineDatesPicker.setDates(optDates);
     }
 
+    dateAndTimes.append(inlineDatesPicker.view);
+
+    inlineDatesPicker.watchDates(function(newDates) {
+      updateSaveButton();
+    }, "saveButton");
+
+    inlineDatesPicker.setDates({
+      start: date.ofString(x.start),
+      end: date.ofString(x.end)
+    });
+
     function openCal() {
+      var dates = getDates();
       var defaultDate;
-      if (util.isNotNull(dates.start))
+      if (util.isNotNull(dates))
         defaultDate = date.toString(dates.start);
+      log("createCalendarModal with tz from:", x.location);
       var calModal = createCalendarModal({
         timezone: x.location.timezone,
-        defaultDate: defaultDate
+        defaultDate: defaultDate,
+        withDatePicker: false,
+        withCalendarPicker: true
       });
       calModal.view.modal({});
       calModal.doneButton
@@ -990,7 +991,7 @@ var sched2 = (function() {
         .on("shown.bs.modal", function() {
           calModal.cal.render(); // can't happen earlier or calendar won't show
         });
-      calModal.cal.setDates(dates);
+      calModal.cal.setDates(getDates());
     }
     openCalPicker.click(openCal);
 
@@ -1004,9 +1005,6 @@ var sched2 = (function() {
 
     function onTimezoneChange(oldTimezone, newTimezone) {
       displayTimezone();
-      if (util.isNonEmptyString(oldTimezone)
-          && util.isNonEmptyString(newTimezone))
-        displayDates();
       updateSaveButton();
     }
 
@@ -1014,7 +1012,6 @@ var sched2 = (function() {
       x.location = newLoc;
       if (util.isDefined(newLoc)) {
         displayTimezone();
-        displayDates(dates);
       }
       updateSaveButton();
     }
@@ -1090,9 +1087,10 @@ var sched2 = (function() {
         return null;
       }
 
+      var dates = getDates();
       if (util.isNotNull(meetingType)
           && util.isNotNull(loc)
-          && hasDates()) {
+          && util.isNotNull(dates)) {
         var oldCalOption = calOption;
         var notes = {
           public_notes: notesBoxPublic.val(),
