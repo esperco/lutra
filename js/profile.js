@@ -152,8 +152,8 @@ var profile = (function() {
   };
 
   mod.fullName = function(prof) {
-    if (prof.first_last) {
-      if (prof.pseudonym && !email.validate(prof.pseudonym)) {
+    if (util.isNotNull(prof.first_last)) {
+      if (util.isNotNull(prof.pseudonym) && !email.validate(prof.pseudonym)) {
         return prof.pseudonym;
       } else {
         return prof.first_last[0] + " " + prof.first_last[1];
@@ -164,7 +164,7 @@ var profile = (function() {
   }
 
   mod.firstName = function(prof) {
-    if (prof.first_last) {
+    if (util.isNotNull(prof.first_last)) {
       return prof.first_last[0];
     } else {
       return prof.pseudonym;

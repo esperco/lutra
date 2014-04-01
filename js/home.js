@@ -84,16 +84,18 @@ var home = (function() {
             v.appendTo(taskDetails);
 
             v.click(function() {
-              var task_organizers = ta.task_participants.organized_by;
-              if (list.mem(task_organizers, organizer_uid)) {
-                v.removeClass("checkbox-selected");
-                task_organizers.splice(task_organizers.indexOf(organizer_uid),
-                                       1);
-              } else {
-                v.addClass("checkbox-selected");
-                task_organizers.push(organizer_uid);
-              }
-              api.postTask(ta);
+              api.getTask(ta.tid).done(function(fullTask) {
+                var task_organizers = fullTask.task_participants.organized_by;
+                if (list.mem(task_organizers, organizer_uid)) {
+                  v.removeClass("checkbox-selected");
+                  task_organizers.splice(task_organizers.indexOf(organizer_uid),
+                                         1);
+                } else {
+                  v.addClass("checkbox-selected");
+                  task_organizers.push(organizer_uid);
+                }
+                api.postTask(fullTask);
+              });
             });
           });
         });
