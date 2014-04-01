@@ -78,18 +78,8 @@ var ref = (function() {
     watch(m, handler);
   }
 
-  function filter(a, f) {
-    var b = [];
-    for (var i = 0; i < a.length; i++) {
-      var x = a[i];
-      if (f(x) === true)
-        b.push(x);
-    }
-    return b;
-  }
-
   function unwatch(m, watcherId) {
-    m.changeHandlers = filter(m.changeHandlers, function(watcher) {
+    m.changeHandlers = util.filter(m.changeHandlers, function(watcher) {
       return watcher.id !== watcherId;
     });
   }
