@@ -163,14 +163,14 @@ var calpicker = (function() {
       if (util.isNotNull(start)) {
         dates.start = setDate(ymd, start);
         if (util.isNotNull(end))
-          dates.end = end;
+          dates.end = setDate(ymd, end);
         else
           dates.end = date.addMinutes(dates.start, defaultMeetingLength);
       }
       else if (util.isNotNull(end)) {
         dates.end = setDate(ymd, end);
         if (util.isNotNull(start))
-          dates.start = start;
+          dates.start = setDate(ymd, start);
         else
           dates.start = date.addMinutes(dates.end, -defaultMeetingLength);
       }
