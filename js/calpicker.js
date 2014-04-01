@@ -124,27 +124,64 @@ var calpicker = (function() {
 
   var defaultMeetingLength = 60; /* minutes */
 
+  function setDate(ymd, d) {
+    return dateYmd.utc.toDate(ymd,
+                              d.getUTCHours(),
+                              d.getUTCMinutes(),
+                              d.getUTCSeconds());
+  }
+
+  function defaultDates(ymd) {
+    /* default to 9:00-10:00 */
+    var start = dateYmd.utc.toDate(ymd, 9, 0, 0);
+    var end = date.addMinutes(start, defaultMeetingLength);
+    return {
+      start: start,
+      end: end
+    };
+  }
+
   /* Set default */
   function completeDates(optYmd, optDates) {
-    var ymd = util.isDefined(optYmd) ? optYmd : dateYmd.local.today();
+    log("completeDates", optYmd, optDates);
+    var ymd = optYmd;
+    if (! util.isDefined(optYmd)) {
+      ymd = dateYmd.local.today();
+      if (util.isNotNull(optDates)) {
+        var start = optDates.start;
+        var end = optDates.end;
+        var d = util.isNotNull(start) ? start
+          : (util.isNotNull(end) ? end : new Date());
+        ymd = dateYmd.utc.ofDate(d);
+      }
+    }
     var dates = {};
     if (util.isNotNull(optDates)) {
-      if (util.isNotNull(optDates.start)) {
-        dates.start = setDate(ymd, optDates.start);
-        if (! util.isNotNull(optDates.end))
+      var start = optDates.start;
+      var end = optDates.end;
+      log("start-end", start, end);
+      if (util.isNotNull(start)) {
+        dates.start = setDate(ymd, start);
+        if (util.isNotNull(end))
+          dates.end = end;
+        else
           dates.end = date.addMinutes(dates.start, defaultMeetingLength);
       }
-      if (util.isNotNull(optDates.end)) {
-        dates.end = setDate(ymd, optDates.end);
-        if (! util.isNotNull(optDates.start))
+      else if (util.isNotNull(end)) {
+        dates.end = setDate(ymd, end);
+        if (util.isNotNull(start))
+          dates.start = start;
+        else
           dates.start = date.addMinutes(dates.end, -defaultMeetingLength);
+      }
+      else {
+        dates = defaultDates(ymd);
       }
     }
     else {
-      /* default to 9:00-10:00 */
-      dates.start = dateYmd.utc.toDate(ymd, 9, 0, 0);
-      dates.end = date.addMinutes(dates.start, defaultMeetingLength);
+      dates = defaultDates(ymd);
     };
+    log("completeDates returns:", dates);
     return dates;
   }
 
@@ -190,7 +227,7 @@ var calpicker = (function() {
           var d = date.copy(local);
           d.setHours(local.getUTCHours());
           d.setMinutes(local.getUTCMinutes());
-          if (util.isDefined(date)) {
+          if (util.isDefined(d)) {
             timePicker.timepicker('setTime', d);
           }
         }
@@ -206,13 +243,6 @@ var calpicker = (function() {
   /***** Date picker (start date, independent from time of day) *****/
 
   var dateWatcherId = "dateWatcher";
-
-  function setDate(ymd, d) {
-    return dateYmd.utc.toDate(ymd,
-                              d.getUTCHours(),
-                              d.getUTCMinutes(),
-                              d.getUTCSeconds());
-  }
 
   function createDatePicker(picker) {
     var r = picker.datesRef;
