@@ -1221,7 +1221,7 @@ var sched2 = (function() {
 '''
 <div #view
      class="option-row">
-   <div #editButton
+  <div #editButton
         class="btn-group edit-option">
       <button #edit
               type="button"
