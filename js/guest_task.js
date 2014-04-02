@@ -73,7 +73,7 @@ var guestTask = function() {
 
     var main = $("<div class='guest-main col-sm-5'/>")
       .appendTo(view);
-    var name = profile.fullName(x);
+    var name = profile.fullNameOrEmail(x);
     var nameDiv = $("<div class='guest-name ellipsis'/>")
       .append(name)
       .appendTo(main);
@@ -82,6 +82,15 @@ var guestTask = function() {
       nameDiv.append($("<span id='me-label'>me</span>"));
     } else if (me === assistedBy(x.profile_uid, guestOptions)) {
       nameDiv.append($("<span id='me-label'>my boss</span>"));
+    }
+
+    if (util.isNotNull(x.emails) && x.emails.length > 0) {
+      var email = x.emails[0].email;
+      if (email !== name) {
+        $("<div class='guest-email'/>")
+          .text(email)
+          .appendTo(main);
+      }
     }
 
     if (util.isNotNull(x.phones) && x.phones.length > 0) {
@@ -471,7 +480,7 @@ var guestTask = function() {
       var taskView = $("#meeting-content");
       taskView.children().remove();
       var taskWelcome = $("#meeting-welcome");
-      var myName = profile.fullName(profs[login.me()].prof);
+      var myName = profile.fullNameOrEmail(profs[login.me()].prof);
       taskWelcome.text("Hello, " + myName);
 
       if ("Scheduling" === variant.cons(ta.task_data)) {
@@ -529,7 +538,7 @@ var guestTask = function() {
           svg.loadImg(messagesIcon, "/assets/img/chat.svg");
         } else if (state.calendar_options.length > 0) {
           var hostName = list.map(task.guest_hosts, function(uid) {
-                  return profile.fullName(profs[uid].prof);
+                  return profile.fullNameOrEmail(profs[uid].prof);
                 }).join(" & ");
 
           var title = $("<div id='options-title'/>")

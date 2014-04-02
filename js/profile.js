@@ -151,25 +151,39 @@ var profile = (function() {
     return view;
   };
 
-  mod.fullName = function(prof) {
+  mod.maybeFullName = function(prof) {
     if (util.isNotNull(prof.first_last)) {
       if (util.isNotNull(prof.pseudonym) && !email.validate(prof.pseudonym)) {
         return prof.pseudonym;
       } else {
         return prof.first_last[0] + " " + prof.first_last[1];
       }
-    } else {
+    } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
+    } else {
+      return null;
     }
-  }
+  };
+
+  mod.fullName = function(prof) {
+    var name = mod.maybeFullName(prof);
+    return util.isNotNull(name) ? name : "Missing Name";
+  };
+
+  mod.fullNameOrEmail = function(prof) {
+    var name = mod.maybeFullName(prof);
+    return util.isNotNull(name) ? name : mod.email(prof);
+  };
 
   mod.firstName = function(prof) {
     if (util.isNotNull(prof.first_last)) {
       return prof.first_last[0];
-    } else {
+    } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
+    } else {
+      return "Missing Name";
     }
-  }
+  };
 
   /* extract all user IDs contained in the task; this is used to
      pre-fetch all the profiles. */

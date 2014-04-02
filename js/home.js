@@ -77,7 +77,9 @@ var home = (function() {
             var img = $("<img/>");
             v.append(img);
             svg.loadImg(img, "/assets/img/checkbox-sm.svg");
-            v.append(document.createTextNode(profile.fullName(profs[i].prof)));
+            v.append(
+              document.createTextNode(profile.fullNameOrEmail(profs[i].prof))
+            );
             if (list.mem(ta.task_participants.organized_by, organizer_uid)) {
               v.addClass("checkbox-selected");
             }
@@ -413,7 +415,7 @@ var home = (function() {
       profile.get(login.leader())
         .done(function(obsProf) {
           var p = obsProf.prof;
-          execNameView.text(profile.fullName(p));
+          execNameView.text(profile.fullNameOrEmail(p));
           initialsView.text(profile.veryShortNameOfProfile(p));
         });
       var exec = $("<div id='exec-name-div'></div>")

@@ -378,8 +378,8 @@ var sched2 = (function() {
     var offerModal = createOfferModal();
     var ea = sched.assistedBy(toUid, sched.getGuestOptions(task));
     var toObsProf = util.isNotNull(ea) ? profs[ea] : profs[toUid];
-    var organizerName = profile.fullName(profs[login.me()].prof);
-    var hostName = profile.fullName(profs[login.leader()].prof);
+    var organizerName = profile.fullNameOrEmail(profs[login.me()].prof);
+    var hostName = profile.fullNameOrEmail(profs[login.leader()].prof);
     var toName = profile.fullName(profs[toUid].prof);
     var toEmail = profile.email(profs[toUid].prof);
 
@@ -575,7 +575,8 @@ var sched2 = (function() {
       composeIcon.addClass("not-sent");
     }
 
-    var guestName = profile.viewMediumFullName(prof)
+    var guestName = $("<div/>")
+      .text(profile.fullNameOrEmail(prof))
       .addClass("reminder-guest-name")
       .appendTo(view);
 
@@ -1351,7 +1352,7 @@ var sched2 = (function() {
 
     var prof = obsProf.prof;
     $("<div class='center-msg'/>")
-      .text("Connect with " + profile.fullName(prof) + "'s Google Calendar")
+      .text("Connect with " + profile.fullNameOrEmail(prof) + "'s Google Calendar")
       .appendTo(view);
     $("<div class='center-msg'/>")
       .text("to let Esper help you ﬁnd available times.")
