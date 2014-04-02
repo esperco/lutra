@@ -18,6 +18,13 @@ var util = (function () {
     return typeof x != "undefined";
   };
 
+  mod.option = function(optValue, defaultValue) {
+    if (mod.isDefined(optValue))
+      return optValue;
+    else
+      return defaultValue;
+  };
+
   mod.isString = function(x) {
     return typeof x === "string";
   };

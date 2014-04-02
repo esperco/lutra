@@ -62,9 +62,21 @@ var date = (function() {
     return d.getUTCSeconds();
   };
 
+  mod.addMinutes = function(d, n) {
+    var unixtime = d.getTime(); /* ms */
+    unixtime = unixtime + n * 60 * 1000;
+    return new Date(unixtime);
+  };
+
+  mod.addHours = function(d, n) {
+    var unixtime = d.getTime(); /* ms */
+    unixtime = unixtime + n * 3600 * 1000;
+    return new Date(unixtime);
+  };
+
   mod.addDays = function(d, n) {
     var unixtime = d.getTime(); /* ms */
-    unixtime = unixtime - n * 86400 * 1000;
+    unixtime = unixtime + n * 86400 * 1000;
     return new Date(unixtime);
   };
 

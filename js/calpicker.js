@@ -79,26 +79,33 @@ var calpicker = (function() {
   function createView(datesRef, tz) {
 '''
 <div #view>
-  <div class="location-title">Date</div>
-  <div #datePicker/>
-  <div #textView
-       class="hide">
-    <div class="col-sm-3">
-      <div class="location-title">Start</div>
-      <input #startInput type="text" class="time form-control"/>
+  <div #datePickerContainer class="hide">
+    <div class="row">
+      <div class="col-sm-3">
+        <div class="location-title">Date</div>
+        <input #datePicker
+               type="text" class="form-control"/>
+      </div>
+      <div class="col-sm-3">
+        <div class="location-title">Start</div>
+        <input #startInput type="text" class="time form-control"/>
+      </div>
+      <div class="col-sm-3">
+        <div class="location-title">End</div>
+        <input #endInput type="text" class="time form-control"/>
+      </div>
     </div>
-    <div class="col-sm-3 clearfix">
-      <div class="location-title">End</div>
-      <input #endInput type="text" class="time form-control"/>
-    </div>
-    <div #timezoneView
-         class="col-sm-6"/>
   </div>
-  <div #calendarView
-       class="cal-picker-container"/>
+
+  <div #calendarPickerContainer class="hide">
+    <div #timezoneView/>
+    <div #calendarView
+         class="cal-picker-container"/>
+  </div>
 </div>
 '''
-    timezoneView.text("Time Zone: " + timezone.format(tz));
+    if (util.isDefined(tz))
+      timezoneView.text("Time Zone: " + timezone.format(tz));
 
     _view.focus = startInput.focus;
     _view.datesRef = datesRef;
@@ -113,6 +120,71 @@ var calpicker = (function() {
     return _view;
   }
 
+  /*** Shared utilities ***/
+
+  var defaultMeetingLength = 60; /* minutes */
+
+  function setDate(ymd, d) {
+    return dateYmd.utc.toDate(ymd,
+                              d.getUTCHours(),
+                              d.getUTCMinutes(),
+                              d.getUTCSeconds());
+  }
+
+  function defaultDates(ymd) {
+    /* default to 9:00-10:00 */
+    var start = dateYmd.utc.toDate(ymd, 9, 0, 0);
+    var end = date.addMinutes(start, defaultMeetingLength);
+    return {
+      start: start,
+      end: end
+    };
+  }
+
+  /* Set default */
+  function completeDates(optYmd, optDates) {
+    log("completeDates", optYmd, optDates);
+    var ymd = optYmd;
+    if (! util.isDefined(optYmd)) {
+      ymd = dateYmd.local.today();
+      if (util.isNotNull(optDates)) {
+        var start = optDates.start;
+        var end = optDates.end;
+        var d = util.isNotNull(start) ? start
+          : (util.isNotNull(end) ? end : new Date());
+        ymd = dateYmd.utc.ofDate(d);
+      }
+    }
+    var dates = {};
+    if (util.isNotNull(optDates)) {
+      var start = optDates.start;
+      var end = optDates.end;
+      log("start-end", start, end);
+      if (util.isNotNull(start)) {
+        dates.start = setDate(ymd, start);
+        if (util.isNotNull(end))
+          dates.end = setDate(ymd, end);
+        else
+          dates.end = date.addMinutes(dates.start, defaultMeetingLength);
+      }
+      else if (util.isNotNull(end)) {
+        dates.end = setDate(ymd, end);
+        if (util.isNotNull(start))
+          dates.start = setDate(ymd, start);
+        else
+          dates.start = date.addMinutes(dates.end, -defaultMeetingLength);
+      }
+      else {
+        dates = defaultDates(ymd);
+      }
+    }
+    else {
+      dates = defaultDates(ymd);
+    };
+    log("completeDates returns:", dates);
+    return dates;
+  }
+
   /***** Time pickers (start/end time of day) *****/
 
   var timeWatcherId = "timeWatcher";
@@ -120,6 +192,7 @@ var calpicker = (function() {
   function setupTimePicker(picker,
                            fieldName, /* either "start" or "end" */
                            timePicker) {
+    var watcherId = timeWatcherId + "-" + fieldName;
     var r = picker.datesRef;
     timePicker.timepicker({
       timeFormat: "g:i a",
@@ -129,79 +202,57 @@ var calpicker = (function() {
     });
     timePicker.on("changeTime", function() {
       var oldDates = r.get();
-      var oldDate = oldDates[fieldName];
-      if (util.isNotNull(oldDate)) {
-        var dates = util.copyObject(oldDates);
-        var d = timePicker.timepicker("getTime"); /* native js Date */
-        log("timepicker's date: ", d);
-        var local = date.copy(oldDates[fieldName]);
+      var dates = {};
+      var local = new Date();
+      if (util.isNotNull(oldDates)) {
+        dates = util.copyObject(oldDates);
+        var oldDate = oldDates[fieldName];
+        if (util.isNotNull(oldDate)) {
+          local = date.copy(oldDates[fieldName]);
+        }
+      }
+      var d = timePicker.timepicker("getTime"); /* native js Date */
+      if (util.isNotNull(d)) {
         local.setUTCHours(d.getHours());
         local.setUTCMinutes(d.getMinutes());
         dates[fieldName] = local;
-        r.set(dates, [timeWatcherId]);
       }
+      dates = completeDates(undefined, dates);
+      r.set(dates, [watcherId]);
     });
     r.watch(function(dates, isValid) {
-      if (isValid) {
+      if (util.isNotNull(dates)) {
         var local = dates[fieldName];
-        var d = date.copy(local);
-        d.setHours(local.getUTCHours());
-        d.setMinutes(local.getUTCMinutes());
-        if (util.isDefined(date)) {
-          timePicker.timepicker('setTime', d);
+        if (util.isNotNull(local)) {
+          var d = date.copy(local);
+          d.setHours(local.getUTCHours());
+          d.setMinutes(local.getUTCMinutes());
+          if (util.isDefined(d)) {
+            timePicker.timepicker('setTime', d);
+          }
         }
       }
-    }, timeWatcherId);
+    }, watcherId);
   }
 
   function setupTimePickers(picker) {
     setupTimePicker(picker, "start", picker.startInput);
     setupTimePicker(picker, "end", picker.endInput);
-
-    /* Make time pickers visible once dates have been set */
-    picker.datesRef.watch(function(dates, isValid) {
-      if (isValid)
-        picker.textView.removeClass("hide");
-      else if (! util.isDefined(dates.start) && !util.isDefined(dates.end))
-        picker.textView.addClass("hide");
-    }, timeWatcherId);
   }
 
   /***** Date picker (start date, independent from time of day) *****/
 
   var dateWatcherId = "dateWatcher";
 
-  function setDate(ymd, d) {
-    return dateYmd.utc.toDate(ymd,
-                              d.getUTCHours(),
-                              d.getUTCMinutes(),
-                              d.getUTCSeconds());
-  }
-
   function createDatePicker(picker) {
     var r = picker.datesRef;
     picker.datePicker.datepicker({
       gotoCurrent: true,
-      numberOfMonths: 4,
+      numberOfMonths: 1,
       onSelect: function(selectedDate) {
         var ymd = dateYmd.ofString(selectedDate);
-        var oldDates = r.getValidOrNothing();
-        var dates;
-        if (oldDates !== null) {
-          dates = {
-            start: setDate(ymd, oldDates.start),
-            end: setDate(ymd, oldDates.end)
-          };
-        }
-        else {
-          /* default to 9:00-10:00 */
-          var start = dateYmd.utc.toDate(ymd, 9, 0, 0);
-          var end = dateYmd.utc.toDate(ymd, 10, 0, 0);
-          dates = {
-            start: start,
-            end: end
-          };
-        }
+        var oldDates = r.get();
+        var dates = completeDates(ymd, oldDates);
         r.set(dates, [dateWatcherId]);
       }
     });
@@ -222,6 +273,7 @@ var calpicker = (function() {
       }
     }, dateWatcherId);
     createDatePicker(picker);
+    picker.datePickerContainer.removeClass("hide");
   }
 
   /***** Calendar picker (start/end date-time) *****/
@@ -413,30 +465,40 @@ var calpicker = (function() {
       editable: false,
       events: fetchEvents
     });
+    picker.calendarPickerContainer.removeClass("hide");
   }
 
   /*
     Create date and time picker using user's calendar.
 
     Parameters:
-    - timezone: IANA timezone in which all local times are expressed
+    - timezone: IANA timezone in which all local times are expressed;
+      optional if the full calendar is not displayed.
     - defaultDate:
         date that determines which calendar page to display initially
         (default: today)
+    - withDatePicker, withCalendarPicker: whether
+      the corresponding input widgets should be created.
    */
   mod.create = function(param) {
     var tz = param.timezone;
     var defaultDate = param.defaultDate;
+    var withDatePicker = util.option(param.withDatePicker, false);
+    var withCalendarPicker = util.option(param.withCalendarPicker, false);
 
     var r = createRef();
     var picker = createView(r, tz);
 
-    setupTimePickers(picker);
-    setupDatePicker(picker);
-    setupCalendar(picker, tz, defaultDate);
+    if (withDatePicker) {
+      setupDatePicker(picker);
+      setupTimePickers(picker);
+    }
+    if (withCalendarPicker)
+      setupCalendar(picker, tz, defaultDate);
 
     function render() {
-      picker.calendarView.fullCalendar("render");
+      if (withCalendarPicker)
+        picker.calendarView.fullCalendar("render");
     }
 
     return {
@@ -450,7 +512,10 @@ var calpicker = (function() {
       */
       getDates: (function() { return getDates(picker); }),
       setDates: (function(x) { picker.datesRef.set(x); }),
-      clearDates: (function() { picker.datesRef.set({}); })
+      clearDates: (function() { picker.datesRef.set({}); }),
+      watchDates: (function(handler, watcherId) {
+        picker.datesRef.watch(handler, watcherId);
+      })
     };
   };
 

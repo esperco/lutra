@@ -91,39 +91,52 @@ var dateYmd = (function() {
   };
 
   /* Assume the ymd date is in UTC */
-  mod.utc = {
-    toDate: function(x, optHours, optMinutes, optSeconds) {
-      var d = new Date(mod.toString(x));
-      if (optHours > 0)
-        d.setUTCHours(optHours);
-      if (optMinutes > 0)
-        d.setUTCMinutes(optMinutes);
-      if (optSeconds > 0)
-        d.setUTCSeconds(optSeconds);
-      return d;
-    },
-    ofDate: function(d) {
-      return {
-        year: d.getUTCFullYear(),
-        month: d.getUTCMonth() + 1,
-        day: d.getUTCDate()
-      };
-    }
+  mod.utc = {};
+
+  mod.utc.toDate = function(x, optHours, optMinutes, optSeconds) {
+    var d = new Date(mod.toString(x));
+    if (optHours > 0)
+      d.setUTCHours(optHours);
+    if (optMinutes > 0)
+      d.setUTCMinutes(optMinutes);
+    if (optSeconds > 0)
+      d.setUTCSeconds(optSeconds);
+    return d;
+  };
+
+  mod.utc.ofDate = function(d) {
+    return {
+      year: d.getUTCFullYear(),
+      month: d.getUTCMonth() + 1,
+      day: d.getUTCDate()
+    };
+  };
+
+  mod.utc.today = function() {
+    return mod.utc.ofDate(new Date());
   };
 
   /* Assume the ymd date is expressed in the local timezone */
-  mod.local = {
-    toDate: function(x, optHours, optMinutes, optSeconds) {
-      return new Date(x.year, x.month - 1, x.day,
-                      optHours, optMinutes, optSeconds);
-    },
-    ofDate: function(d) {
-      return {
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
-        day: d.getDate()
-      }
+  mod.local = {};
+
+  mod.local.toDate = function(x, optHours, optMinutes, optSeconds) {
+    var hours = util.option(optHours, 0);
+    var minutes = util.option(optMinutes, 0);
+    var seconds = util.option(optSeconds, 0);
+    return new Date(x.year, x.month - 1, x.day,
+                    hours, minutes, seconds);
+  };
+
+  mod.local.ofDate = function(d) {
+    return {
+      year: d.getFullYear(),
+      month: d.getMonth() + 1,
+      day: d.getDate()
     }
+  };
+
+  mod.local.today = function() {
+    return mod.local.ofDate(new Date());
   };
 
   mod.tests = [
