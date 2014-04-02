@@ -18,17 +18,47 @@ var timezone = (function() {
     "America/New_York": "US Eastern Time"
   };
 
+  function pad(n) {
+    var s = "" + n;
+    var len = s.length;
+    if (len === 0)
+      s = "00";
+    else if (len === 1)
+      s = "0" + s;
+    return s;
+  }
+
+  mod.getOffsetString = function(tz, localdate) {
+    var d = date.utcOfLocal(tz, localdate);
+    var offsetMinutes =
+      Math.floor((localdate.getTime() - d.getTime()) / 1000 / 60);
+    var sign = offsetMinutes < 0 ? "-" : "+";
+
+    offsetMinutes = Math.abs(offsetMinutes);
+    var m = offsetMinutes % 60;
+    var h = Math.floor(offsetMinutes / 60);
+    return "GMT" + sign + pad(h) + ":" + pad(m);
+  };
+
   /*
     Take a IANA timezone and convert it into a string that is more
     user-friendly:
     "America/Los_Angeles" -> "US Pacific Time (America/Los_Angeles)"
   */
-  mod.format = function(tz) {
+  mod.format = function(tz, optLocaldate) {
     var name = mapping[tz];
-    if (util.isDefined(name))
-      name = name + " (" + tz + ")";
-    else
-      name = tz;
+    var offs = "";
+
+    if (util.isDefined(name)) {
+      if (util.isDefined(optLocaldate))
+        offs = ", " + mod.getOffsetString(tz, optLocaldate);
+      name = name + " (" + tz + offs + ")";
+    }
+    else {
+      if (util.isDefined(optLocaldate))
+        offs = " (" + mod.getOffsetString(tz, optLocaldate) + ")";
+      name = tz + offs;
+    }
     return name;
   };
 

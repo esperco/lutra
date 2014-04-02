@@ -95,6 +95,13 @@ var sched = (function() {
     });
   };
 
+  mod.getTimezone = function(slot) {
+    var tz = slot.timezone;
+    if (! util.isNonEmptyString(tz) && util.isDefined(slot.location))
+      tz = slot.location.timezone;
+    return tz;
+  };
+
   /******************************************/
 
   function viewOfNotes(slot) {
@@ -162,12 +169,13 @@ var sched = (function() {
   }
 
   function formatDates(x) {
-    return sched.viewOfDates(date.ofString(x.start),
-                             date.ofString(x.end));
+    return mod.viewOfDates(date.ofString(x.start),
+                           date.ofString(x.end),
+                           mod.getTimezone(x));
   }
 
   /* Render a range of two javascript Dates as text */
-  mod.viewOfDates = function(date1, date2) {
+  mod.viewOfDates = function(date1, date2, tz) {
 '''
 <div #view>
   <div #time1/>
@@ -180,6 +188,12 @@ var sched = (function() {
           class="time-to"> to </span>
     <span #end
           class="time-end bold"/>
+    <div>
+      <img class="timezone-icon-sm svg-block"
+           src="/assets/img/globe.svg"/>
+      <span #timezoneElt
+            class="timezone-text"/>
+    </div>
   </div>
 </div>
 '''
@@ -194,6 +208,7 @@ var sched = (function() {
       at.removeClass("hide");
       to.addClass("hide");
     }
+    timezoneElt.text(timezone.format(tz, date1));
 
     return view;
   };

@@ -718,53 +718,49 @@ var sched2 = (function() {
     Otherwise the timezone is determined by the location of the meeting.
    */
   function setupTimezoneLink(form, locationForm, slot) {
-    function displayTimezone(loc) {
-      if (util.isDefined(loc))
-        timezoneText.text(timezone.format(loc.timezone));
+    function displayTimezone(slot) {
+      var tz = sched.getTimezone(slot);
+      if (util.isDefined(tz))
+        timezoneText.text(timezone.format(tz));
     }
     function setTimezone(oldTz, newTz) {
-      var loc = { timezone: newTz };
-      slot.location = loc;
-      displayTimezone(loc);
-      locationForm.setLocation(loc);
+      slot.timezone = newTz;
+      var oldLoc = slot.location;
+      if (! util.isDefined(oldLoc)) {
+        var loc = { timezone: newTz };
+        slot.location = loc;
+        locationForm.setLocation(loc);
+      }
+      displayTimezone(slot);
     }
     var timezoneText = form.timezoneText;
     var timezonePicker = form.timezonePicker;
     switch (slot.meeting_type) {
     case "Call":
-      timezoneText
-        .tooltip("destroy")
-        .tooltip({
-          title:
-          "Click to change the time zone"
-        })
-        .off("click")
-        .click(function() {
-          var picker = tzpicker.create({
-            onTimezoneChange: setTimezone
-          });
-          timezonePicker.children().remove();
-          timezonePicker.append(picker.view);
-        })
-        .addClass("link");
       form.addPublicNotes
         .text("Specify phone number and notes");
       break;
 
     default:
-      timezoneText
-        .removeClass("clickable")
-        .tooltip("destroy")
-        .tooltip({
-          title:
-          "The time zone is automatically set based on the meeting location"
-        })
-        .off("click")
-        .removeClass("link");
       form.addPublicNotes
         .text("Add notes");
     }
-    displayTimezone(slot.location);
+    timezoneText
+      .tooltip("destroy")
+      .tooltip({
+        title:
+        "Click to change the time zone"
+      })
+      .off("click")
+      .click(function() {
+        var picker = tzpicker.create({
+          onTimezoneChange: setTimezone
+        });
+        timezonePicker.children().remove();
+        timezonePicker.append(picker.view);
+      })
+      .addClass("link");
+    displayTimezone(slot);
     if (util.isDefined(locationForm))
       locationForm.setLocationNoCallback(slot.location);
   }
@@ -977,7 +973,7 @@ var sched2 = (function() {
         defaultDate = date.toString(dates.start);
       log("createCalendarModal with tz from:", x.location);
       var calModal = createCalendarModal({
-        timezone: x.location.timezone,
+        timezone: sched.getTimezone(x),
         defaultDate: defaultDate,
         withDatePicker: false,
         withCalendarPicker: true
@@ -1101,6 +1097,7 @@ var sched2 = (function() {
           meeting_type: meetingType,
           location: loc,
           on_site: true,
+          timezone: x.timezone, /* optional */
           start: dates.start,
           end: dates.end,
           duration: dates.duration,
