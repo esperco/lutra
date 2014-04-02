@@ -48,6 +48,7 @@ GUESTAPP_PROD_LIBS = $(addsuffix .min.js, $(GUESTAPP_LIBS))
 # Output Javascript files are put into the js/ subdirectory.
 
 COMMON_SOURCES = \
+  type.js \
   test.js \
   list.js \
   deferred.js \
