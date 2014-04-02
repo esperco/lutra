@@ -5,17 +5,19 @@
 var util = (function () {
   var mod = {};
 
+  var undef;
+
   // Return a random alphanumeric string
   mod.randomString = function() {
     return Math.random().toString(36).slice(2);
   };
 
   mod.isNotNull = function(x) {
-    return typeof x != "undefined" && x !== null;
+    return x !== undef && x !== null;
   };
 
   mod.isDefined = function(x) {
-    return typeof x != "undefined";
+    return x !== undef;
   };
 
   mod.option = function(optValue, defaultValue) {
@@ -27,10 +29,6 @@ var util = (function () {
 
   mod.isString = function(x) {
     return typeof x === "string";
-  };
-
-  mod.isNumber = function(x) {
-    return typeof x === "number";
   };
 
   mod.isNonEmptyString = function(x) {
