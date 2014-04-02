@@ -54,6 +54,7 @@ COMMON_SOURCES = \
   ref.js \
   util.js \
   log.js \
+  mixpanel.js \
   html.js \
   variant.js \
   dateYmd.js \
@@ -105,6 +106,10 @@ GUESTAPP_SOURCES = \
   guest_login.js \
   guest_main.js
 
+# These don't get minified
+PROD_FLAGS = prod_flags.js
+DEV_FLAGS = dev_flags.js
+
 COMMON_JS = $(addprefix js/,$(COMMON_SOURCES))
 APP_JS = $(addprefix js/,$(APP_SOURCES))
 GUESTAPP_JS = $(addprefix js/,$(GUESTAPP_SOURCES))
@@ -143,12 +148,14 @@ guest-app.js: $(COMMON_JS) $(GUESTAPP_JS)
 
 dev-install: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 	mkdir -p ../pub/js
+	cp $(DEV_FLAGS) ../pub/js/flags.js
 	cp $(COMMON_JS) ../pub/js
 	cp $(APP_JS) ../pub/js
 	cp $(GUESTAPP_JS) ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
+	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp prod.js ../pub/js/app.js
 	cp guest-app.js ../pub/js
 

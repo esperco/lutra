@@ -154,8 +154,10 @@ var setup = (function() {
       .append(edit.lastNameInput)
       .append(edit.phoneInput);
 
+    var updating = util.isNotNull(ea);
+
     addButton
-      .text(util.isNotNull(ea) ? "Update" : "Add assistant")
+      .text(updating ? "Update" : "Add assistant")
       .click(function() {
         var firstLast = edit.firstLast();
         var email = edit.emailInput.val();
@@ -177,6 +179,10 @@ var setup = (function() {
 
           sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
           saveGuests(task, hosts, guestTbl, guestOptions);
+
+          if (isProduction) {
+            mixpanel.track(updating ? "Update assistant" : "Add assistant");
+          }
 
           profile.profilesOfTaskParticipants(task).then(function(profs) {
             view.replaceWith(makeViewOfEA(profs, uid));
@@ -308,8 +314,10 @@ var setup = (function() {
       .append(edit.lastNameInput)
       .append(edit.phoneInput);
 
+    var updating = util.isNotNull(uid);
+
     addButton
-      .text(util.isNotNull(uid) ? "Update" : "Add guest")
+      .text(updating ? "Update" : "Add guest")
       .click(function() {
         var firstLast = edit.firstLast();
         var email = edit.emailInput.val();
@@ -332,6 +340,10 @@ var setup = (function() {
           guestTbl[uid] = uid;
           delete sched.optionsForGuest(guestOptions, uid).assisted_by;
           saveGuests(task, sched.getHosts(task), guestTbl, guestOptions);
+
+          if (isProduction) {
+            mixpanel.track(updating ? "Update guest" : "Add guest");
+          }
 
           profile.profilesOfTaskParticipants(task).then(function(profs) {
             updateGuestDetails(profs, uid);
@@ -781,6 +793,7 @@ var setup = (function() {
     doneButton
       .off("click")
       .click(function() {
+        if (isProduction) mixpanel.track("Done with setup");
         sched.loadTask(ta);
       });
 

@@ -140,6 +140,7 @@ var task = (function() {
           task.task_status.task_progress = "Coordinating";
           api.postTask(task)
             .done(function(task) {
+              if (isProduction) mixpanel.track("Start task");
               observable.onTaskModified.notify(task);
               loadTask(task);
             });
@@ -160,6 +161,7 @@ var task = (function() {
           };
           api.createTask(task)
             .done(function(task) {
+              if (isProduction) mixpanel.track("Start task");
               observable.onTaskCreated.notify(task);
               /* change URL */
               window.location.hash = "#!task/" + task.tid;
@@ -262,6 +264,7 @@ var task = (function() {
       window.location.hash = "!task";
     });
     $("#new-sched-task-btn").click(function () {
+      if (isProduction) mixpanel.track("New task from Web");
       $("#workflow-sched").prop("checked", true);
       window.location.hash = "!task";
     });

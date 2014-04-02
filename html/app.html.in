@@ -18,6 +18,9 @@
     <link href="/assets/css/fullcalendar.print.css" rel="stylesheet" media="print">
     <link href="/assets/css/jquery.timepicker.css" rel="stylesheet">
     <link href="/assets/css/jquery-ui-flick.css" rel="stylesheet">
+
+    <!-- Mixpanel JS loader file, copied from js/mixpanel.js -->
+    <script type="text/javascript" href="/assets/js/mixpanel.js"></script>
   </head>
 
   <body>
@@ -334,6 +337,7 @@
     <!-- Pusher client library -->
     <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js"></script>
 
+    <script src="/assets/js/flags.js"></script>
     INCLUDES
   </body>
 </html>
