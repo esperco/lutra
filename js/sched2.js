@@ -849,12 +849,6 @@ var sched2 = (function() {
                class="hide form-control custom-type-input"/>
       </div>
     </div>
-    <div #whereSection
-         class="edit-info-row">
-      <div class="info-label where-label-edit">WHERE</div>
-      <div #locationContainer
-           class="info"/>
-    </div>
     <div class="edit-info-row">
       <div class="info-label when-label-edit">WHEN</div>
       <div class="info">
@@ -877,6 +871,12 @@ var sched2 = (function() {
           </span>
         </span>
       </div>
+    </div>
+    <div #whereSection
+         class="edit-info-row">
+      <div class="info-label where-label-edit">WHERE</div>
+      <div #locationContainer
+           class="info"/>
     </div>
     <div class="edit-info-row">
       <div class="info-label notes-label-edit">NOTES</div>
