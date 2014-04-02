@@ -2021,6 +2021,8 @@ i { color: @gray_60; }
   border-radius: 6px;
 }
 
+.add-guest-row { padding: 15px; }
+
 .sched-step1-guest-row,
 .sched-step1-ea-row {
   min-height: 72px;
@@ -2028,12 +2030,14 @@ i { color: @gray_60; }
 }
 
 .ea-input-div {
+  max-width: 360px;
   margin-left: 95px;
   padding-top: 5px;
 }
 
-.add-guest-click,
-.add-ea-row {
+.add-guest-click {
+  height: 72px;
+  margin: -15px;
   padding: 15px;
 }
 
@@ -2175,10 +2179,9 @@ i { color: @gray_60; }
 }
 
 .guest-input-div {
-  margin-left: 70px;
-  padding-top: 20px;
-  padding-bottom: 15px;
   max-width: 360px;
+  margin-left: 70px;
+  padding-top: 5px;
 }
 
 .guest-input {
@@ -2186,7 +2189,8 @@ i { color: @gray_60; }
 }
 
 .add-guest-btn {
-  margin-bottom: 5px;
+  float: right;
+  margin: 0px 0px 5px 8px;
 }
 
 
@@ -2208,7 +2212,6 @@ i { color: @gray_60; }
   float: left;
   width: 40px;
   height: 40px;
-  margin-top: 1px;
   padding: 10px;
   text-align: center;
   background: @purple;
@@ -2655,15 +2658,12 @@ i { color: @gray_60; }
 
 .cancel-edit-mode {
   display: inline-block;
-  margin-top: 6px;
+  margin: 6px 10px 0px 0px;
   font-size: 14px;
 }
 
 .save-to-cal,
-#event-edit-update {
-  float: right;
-  margin-left: 10px;
-}
+#event-edit-update { float: right; }
 
 
 /*** Modules ***/
