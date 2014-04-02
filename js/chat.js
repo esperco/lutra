@@ -304,7 +304,7 @@ var chat = (function () {
           writeButton.removeClass("hide");
         }
 
-        if (isProduction) mixpanel.track("Send chat message");
+        mixpanel.trackProd("Send chat message");
 
         sendButton.addClass("disabled")
                   .blur();

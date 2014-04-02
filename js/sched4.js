@@ -167,7 +167,7 @@ var sched4 = (function() {
     saveButton
       .off("click")
       .click(function() {
-        if (isProduction) mixpanel.track("Save reminder");
+        mixpanel.trackProd("Save reminder");
         closeReminderModal(reminderModal, ta, options, toUid);
       });
 
@@ -239,7 +239,7 @@ var sched4 = (function() {
     }
 
     edit.click(function() {
-      if (isProduction) mixpanel.track("Edit reminder");
+      mixpanel.trackProd("Edit reminder");
       editReminderEmail(profs, ta, options, uid);
     });
 
@@ -551,7 +551,7 @@ var sched4 = (function() {
 
     confirmModal.saveDraft
       .click(function() {
-        if (isProduction) mixpanel.track("Save confirmation draft");
+        mixpanel.trackProd("Save confirmation draft");
         var draft = confirmModal.messageEditable.val();
         store.set(localStorageKey, draft);
         confirmModal.view.modal("hide");
@@ -559,7 +559,7 @@ var sched4 = (function() {
 
     confirmModal.discardDraft
       .click(function() {
-        if (isProduction) mixpanel.track("Discard confirmation draft");
+        mixpanel.trackProd("Discard confirmation draft");
         store.remove(localStorageKey);
         confirmModal.view.modal("hide");
       });
@@ -587,7 +587,7 @@ var sched4 = (function() {
           };
           spinner.spin("Sending...", chat.postChatItem(chatItem))
             .done(function(item) {
-              if (isProduction) mixpanel.track("Send confirmation");
+              mixpanel.trackProd("Send confirmation");
               confirmModal.view.modal("hide");
             });
         }
@@ -639,7 +639,7 @@ var sched4 = (function() {
       .appendTo(view);
 
     compose.click(function() {
-      if (isProduction) mixpanel.track("Write confirmation");
+      mixpanel.trackProd("Write confirmation");
       composeConfirmEmail(profs, ta, uid);
     })
 
@@ -962,11 +962,11 @@ var sched4 = (function() {
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
-        if (isProduction) mixpanel.track("Show meeting details editor");
+        mixpanel.trackProd("Show meeting details editor");
         summary.removeClass("hide");
         editMode.addClass("hide");
       } else {
-        if (isProduction) mixpanel.track("Hide meeting details editor");
+        mixpanel.trackProd("Hide meeting details editor");
         summary.addClass("hide");
         editMode.removeClass("hide");
       }
@@ -986,7 +986,7 @@ var sched4 = (function() {
       var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
         return api.postTask(task).done(function() {
-          if (isProduction) mixpanel.track("Reschedule");
+          mixpanel.trackProd("Reschedule");
           sched.loadTask(task);
         });
       });
@@ -997,7 +997,7 @@ var sched4 = (function() {
       var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
         return api.postTask(task).done(function() {
-          if (isProduction) mixpanel.track("Cancel and archive");
+          mixpanel.trackProd("Cancel and archive");
           api.archiveTask(tid);
           window.location.hash = "#!";
         });
@@ -1031,9 +1031,9 @@ var sched4 = (function() {
 
     function toggleByClick(toggling, x) {
       if (toggling.view.hasClass("collapsed")) {
-        if (isProduction) mixpanel.track("Show " + x);
+        mixpanel.trackProd("Show " + x);
       } else {
-        if (isProduction) mixpanel.track("Hide " + x);
+        mixpanel.trackProd("Hide " + x);
       }
       toggleModule(toggling, x);
     }

@@ -53,7 +53,7 @@ var login = (function() {
   };
 
   mod.logout = function () {
-    if (isProduction) mixpanel.track("Logout");
+    mixpanel.trackProd("Logout");
     mod.clearLoginInfo();
   };
 

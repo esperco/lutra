@@ -206,7 +206,7 @@ var sched2 = (function() {
         _view["button" + letter]
           .removeClass("disabled")
           .click(function() {
-            if (isProduction) mixpanel.track("Schedule preferred option");
+            mixpanel.trackProd("Schedule preferred option");
             $(".select-option-btn").addClass("disabled");
             updateTask(ta, option);
           });
@@ -438,7 +438,7 @@ var sched2 = (function() {
 
     offerModal.saveDraft
       .click(function() {
-        if (isProduction) mixpanel.track("Save offer draft");
+        mixpanel.trackProd("Save offer draft");
         var draft = offerModal.messageEditable.val();
         store.set(localStorageKey, draft);
         offerModal.view.modal("hide");
@@ -446,7 +446,7 @@ var sched2 = (function() {
 
     offerModal.discardDraft
       .click(function() {
-        if (isProduction) mixpanel.track("Discard offer draft");
+        mixpanel.trackProd("Discard offer draft");
         store.remove(localStorageKey);
         offerModal.view.modal("hide");
       });
@@ -478,7 +478,7 @@ var sched2 = (function() {
                 }]
               };
               return chat.postChatItem(chatItem).done(function() {
-                if (isProduction) mixpanel.track("Send offer");
+                mixpanel.trackProd("Send offer");
                 offerModal.view.modal("hide");
               });
             });
@@ -600,7 +600,7 @@ var sched2 = (function() {
       .appendTo(view);
 
     compose.click(function() {
-      if (isProduction) mixpanel.track("Write offer");
+      mixpanel.trackProd("Write offer");
       composeEmail(profs, task, options, uid);
     });
 
@@ -976,7 +976,7 @@ var sched2 = (function() {
     });
 
     function openCal() {
-      if (isProduction) mixpanel.track("Set time in calendar");
+      mixpanel.trackProd("Set time in calendar");
       var dates = getDates();
       var defaultDate;
       if (util.isNotNull(dates))
@@ -1052,7 +1052,7 @@ var sched2 = (function() {
 
     addPublicNotes
       .click(function() {
-        if (isProduction) mixpanel.track("Add event notes");
+        mixpanel.trackProd("Add event notes");
         addPublicNotes.addClass("hide");
         allNotes.removeClass("hide");
         notesBoxPublic.focus();
@@ -1206,11 +1206,11 @@ var sched2 = (function() {
     ) {
       saveNamedPlace(calOption, googleDescription, savedPlaceID)
         .done(function() {
-          if (isProduction) mixpanel.track("Save option");
+          mixpanel.trackProd("Save option");
           saveAndReload(ta, action);
         });
     } else {
-      if (isProduction) mixpanel.track("Save option");
+      mixpanel.trackProd("Save option");
       saveAndReload(ta, action);
     }
   }
@@ -1221,7 +1221,7 @@ var sched2 = (function() {
       list.filter(schedState.calendar_options, function(x) {
         return x.label !== calOptionLabel;
       });
-    if (isProduction) mixpanel.track("Remove option");
+    mixpanel.trackProd("Remove option");
     saveAndReload(ta, "removing");
   }
 
@@ -1444,9 +1444,9 @@ var sched2 = (function() {
 
     function toggleByClick(toggling, x) {
       if (toggling.view.hasClass("collapsed")) {
-        if (isProduction) mixpanel.track("Show " + x);
+        mixpanel.trackProd("Show " + x);
       } else {
-        if (isProduction) mixpanel.track("Hide " + x);
+        mixpanel.trackProd("Hide " + x);
       }
       toggleModule(toggling, x);
     }
@@ -1463,10 +1463,10 @@ var sched2 = (function() {
 
     function toggleModule(toggling, x) {
       if (toggling.view.hasClass("collapsed")) {
-        if (isProduction) mixpanel.track("Show " + x);
+        mixpanel.trackProd("Show " + x);
         showModule(toggling, x);
       } else {
-        if (isProduction) mixpanel.track("Hide " + x);
+        mixpanel.trackProd("Hide " + x);
         hideModule(toggling, x);
       }
 
