@@ -190,9 +190,8 @@ var sched = (function() {
           class="time-end bold"/>
     <div>
       <img class="timezone-icon-sm svg-block"
-           src="/assets/img/globe.svg"/>
-      <span #timezoneElt
-            class="timezone-text"/>
+           src="/assets/img/globe.svg"
+      /><span #timezoneElt class="timezone-text"/>
     </div>
   </div>
 </div>
