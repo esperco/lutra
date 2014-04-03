@@ -16,6 +16,11 @@ var login = (function() {
   };
 
   mod.setLoginInfo = function(stored) {
+    if (flags.isProduction) {
+      mixpanel.register({uid: stored.uid}); // Sent with every track()
+      mixpanel.track("Login");
+    }
+
     if (!util.isDefined(stored.team) && util.isDefined(stored.teams[0]))
       stored.team = stored.teams[0];
 
@@ -48,6 +53,7 @@ var login = (function() {
   };
 
   mod.logout = function () {
+    mp.track("Logout");
     mod.clearLoginInfo();
   };
 

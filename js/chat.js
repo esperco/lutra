@@ -304,6 +304,8 @@ var chat = (function () {
           writeButton.removeClass("hide");
         }
 
+        mp.track("Send chat message");
+
         sendButton.addClass("disabled")
                   .blur();
       }
