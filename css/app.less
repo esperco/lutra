@@ -1052,12 +1052,15 @@ i { color: @gray_60; }
 
 .composition-modal { height: 100%; }
 
-.modal-dialog.cal-picker-modal { width: 100%; }
-
 .modal-dialog.composition-modal { padding: 30px 0px; }
 
 @media (min-width:768px) {
   .modal-dialog.composition-modal { width: 768px; }
+}
+
+.modal-dialog.cal-picker-modal {
+  width: 100%;
+  padding: 60px 0px 0px 0px;
 }
 
 .modal-dialog.tz-picker-modal {
@@ -1070,12 +1073,23 @@ i { color: @gray_60; }
   background-clip: none;
 }
 
+.modal-content.cal-picker-modal { border-radius: 0; }
+
 .modal-header {
   margin: -1px;
   color: white;
   background: @gray_90;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
+}
+
+.calendar-modal-header {
+  z-index: 1060;
+  position: fixed;
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+  border: none;
 }
 
 .modal-icon { float: left; }
@@ -1119,7 +1133,34 @@ i { color: @gray_60; }
   font-size: 20px;
 }
 
-.cal-picker-container { padding: 15px; }
+.cal-sidebar {
+  z-index: 1060;
+  position: fixed;
+  top: 75px;
+  left: 15px;
+  width: 200px;
+}
+
+.date-jumper {
+  height: 200px;
+  padding-top: 90px;
+  text-align: center;
+  font-family: @bold;
+  color: @gray_60;
+  background: @gray_05;
+}
+
+.time-zone-label-section {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.time-zone-label { color: @gray_60; }
+
+.cal-picker-container {
+  margin-left: 215px;
+  padding: 15px;
+}
 
 .email-info-row {
   height: 40px;
@@ -2414,10 +2455,9 @@ i { color: @gray_60; }
 }
 
 .what-label-edit,
+.when-label-edit,
 .where-label-edit,
 .notes-label-edit { margin-top: 8px; }
-
-.when-label-edit { margin-top: 3px; }
 
 .info {
   margin-left: 100px;
@@ -2458,14 +2498,14 @@ i { color: @gray_60; }
 
 .date-picker-field {
   float: left;
-  width: 98px;
+  width: 110px;
 }
 .date-picker-field.start { margin-right: 5px; }
 .date-picker-field.end { margin-left: 5px; }
 
 .time-picker-field {
   float: left;
-  width: 82px;
+  width: 90px;
 }
 
 .time-to-text {
@@ -2481,14 +2521,17 @@ i { color: @gray_60; }
   margin-top: 2px;
 }
 
-.timezone-text {
+.timezone-link {
   display: inline-block;
+  margin-top: 6px;
   margin-left: 8px;
   font-size: 14px;
-  cursor: default;
 }
 
-.timezone-text.link { cursor: pointer; }
+.timezone-text {
+  font-size: 13px;
+  color: @gray_60;
+}
 
 .tz-actions { margin-top: 8px; }
 .save-tz { float: right; }
@@ -2519,9 +2562,10 @@ i { color: @gray_60; }
   font-size: 14px;
 }
 
-.loc-search { max-width: 472px; }
+.loc-search { max-width: 433px; }
 
 .address-form {
+  padding-right: 6px;
   padding-left: 0;
   @media (max-width: 767px) {
     padding-right: 0;
@@ -2530,6 +2574,7 @@ i { color: @gray_60; }
 
 .address-map {
   padding-right: 0;
+  padding-left: 6px;
   @media (max-width: 767px) {
     padding-left: 0;
   }

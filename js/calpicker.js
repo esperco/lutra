@@ -76,36 +76,51 @@ var calpicker = (function() {
     return r;
   }
 
+
+
   function createView(datesRef, tz) {
 '''
 <div #view>
   <div #datePickerContainer class="hide">
-    <div class="row">
-      <div class="col-sm-3">
-        <div class="location-title">Date</div>
-        <input #datePicker
-               type="text" class="form-control"/>
-      </div>
-      <div class="col-sm-3">
-        <div class="location-title">Start</div>
-        <input #startInput type="text" class="time form-control"/>
-      </div>
-      <div class="col-sm-3">
-        <div class="location-title">End</div>
-        <input #endInput type="text" class="time form-control"/>
-      </div>
-    </div>
+    <input #datePickerStart
+           type="text"
+           class="form-control date-picker-field start"/>
+    <input #startInput
+           type="text"
+           class="form-control time time-picker-field"/>
+    <div class="time-to-text">to</div>
+    <input #endInput
+           type="text"
+           class="form-control time time-picker-field"/>
+    <input #datePickerEnd
+           type="text"
+           class="form-control date-picker-field end"
+           disabled/>
   </div>
 
   <div #calendarPickerContainer class="hide">
-    <div #timezoneView/>
-    <div #calendarView
-         class="cal-picker-container"/>
+    <div #calendarSidebar
+         class="cal-sidebar">
+      <div #dateJumper
+           class="date-jumper">
+        DATE JUMPER
+      </div>
+      <div class="time-zone-label-section">
+        <div class="time-zone-label">TIME ZONE:</div>
+        <div #timezoneView/>
+      </div>
+    </div>
+    <div class="modal-dialog cal-picker-modal">
+      <div class="modal-content cal-picker-modal">
+        <div #calendarView
+             class="cal-picker-container"/>
+      </div>
+    </div>
   </div>
 </div>
 '''
     if (util.isDefined(tz))
-      timezoneView.text("Time Zone: " + timezone.format(tz));
+      timezoneView.text(timezone.format(tz));
 
     _view.focus = startInput.focus;
     _view.datesRef = datesRef;
@@ -243,7 +258,7 @@ var calpicker = (function() {
 
   function createDatePicker(picker) {
     var r = picker.datesRef;
-    picker.datePicker.datepicker({
+    picker.datePickerStart.datepicker({
       gotoCurrent: true,
       numberOfMonths: 1,
       onSelect: function(selectedDate) {
@@ -266,7 +281,7 @@ var calpicker = (function() {
     r.watch(function(dates, isValid) {
       if (isValid) {
         var pickerDate = datePickerDateOfDates(dates);
-        picker.datePicker.datepicker("setDate", pickerDate);
+        picker.datePickerStart.datepicker("setDate", pickerDate);
       }
     }, dateWatcherId);
     createDatePicker(picker);

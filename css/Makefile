@@ -7,7 +7,9 @@ FILES = \
   custom-bootstrap \
   fonts \
   app \
-  guest-app
+  guest-app \
+  jquery-ui-flick \
+  jquery.timepicker
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))

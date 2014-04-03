@@ -755,8 +755,7 @@ var sched2 = (function() {
         var picker = tzpicker.create({
           onTimezoneChange: setTimezone
         });
-      })
-      .addClass("link");
+      });
     displayTimezone(slot);
     if (util.isDefined(locationForm))
       locationForm.setLocationNoCallback(slot.location);
@@ -782,25 +781,20 @@ var sched2 = (function() {
      tabindex="-1"
      role="dialog"
      aria-hidden="true">
-  <div #dialog
-       class="modal-dialog cal-picker-modal">
-    <div #content
-         class="modal-content cal-picker-modal">
-      <div class="modal-header">
-        <div #iconContainer
-             class="modal-icon cal-picker-modal-icon"/>
-        <button #doneButton
-                class="btn btn-primary"
-                style="float:right">
-          Done
-        </button>
-        <div #title
-            class="modal-title">
-          Click on the calendar to select a time.
-        </div>
-      </div>
+  <div class="modal-header calendar-modal-header">
+    <div #iconContainer
+         class="modal-icon cal-picker-modal-icon"/>
+    <button #doneButton
+            class="btn btn-primary"
+            style="float:right">
+      Done
+    </button>
+    <div #title
+        class="modal-title">
+      Click on the calendar to select a time.
     </div>
   </div>
+  <div #content/>
 </div>
 '''
     var icon = $("<img class='svg-block'/>")
@@ -845,11 +839,7 @@ var sched2 = (function() {
       <div class="info">
         <div class="clearfix">
           <div #dateAndTimes/>
-          <div>
-            <img class="timezone-icon-sm svg-block"
-                 src="/assets/img/globe.svg"/>
-            <span #timezoneText class="timezone-text"></span>
-          </div>
+          <span #timezoneText class="timezone-link link"></span>
         </div>
         <span #openCalPicker
              class="open-cal-picker clearfix">
@@ -857,7 +847,7 @@ var sched2 = (function() {
                src="/assets/img/cal-picker.svg"/>
           <span #calendarLinkText
                 class="open-cal-picker-text link">
-            Select time in calendar
+            Adjust time in calendar
           </span>
         </span>
       </div>
