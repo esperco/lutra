@@ -764,13 +764,10 @@ var sched2 = (function() {
 
   function adaptToMeetingType(form, locationForm, slot) {
     setupTimezoneLink(form, locationForm, slot);
-    switch (slot.meeting_type) {
-    case "Call":
-      form.whereSection.addClass("hide");
-      break;
-    default:
+    if (sched.showLocation(slot.meeting_type))
       form.whereSection.removeClass("hide");
-    }
+    else
+      form.whereSection.addClass("hide");
   }
 
   /* Create modal containing date/time picker based on the
@@ -967,7 +964,6 @@ var sched2 = (function() {
       var defaultDate;
       if (util.isNotNull(dates))
         defaultDate = date.toString(dates.start);
-      log("createCalendarModal with tz from:", x.location);
       var calModal = createCalendarModal({
         timezone: sched.getTimezone(x),
         defaultDate: defaultDate,
