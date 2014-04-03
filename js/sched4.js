@@ -167,6 +167,7 @@ var sched4 = (function() {
     saveButton
       .off("click")
       .click(function() {
+        mp.track("Save reminder");
         closeReminderModal(reminderModal, ta, options, toUid);
       });
 
@@ -238,6 +239,7 @@ var sched4 = (function() {
     }
 
     edit.click(function() {
+      mp.track("Edit reminder");
       editReminderEmail(profs, ta, options, uid);
     });
 
@@ -549,6 +551,7 @@ var sched4 = (function() {
 
     confirmModal.saveDraft
       .click(function() {
+        mp.track("Save confirmation draft");
         var draft = confirmModal.messageEditable.val();
         store.set(localStorageKey, draft);
         confirmModal.view.modal("hide");
@@ -556,6 +559,7 @@ var sched4 = (function() {
 
     confirmModal.discardDraft
       .click(function() {
+        mp.track("Discard confirmation draft");
         store.remove(localStorageKey);
         confirmModal.view.modal("hide");
       });
@@ -583,6 +587,7 @@ var sched4 = (function() {
           };
           spinner.spin("Sending...", chat.postChatItem(chatItem))
             .done(function(item) {
+              mp.track("Send confirmation");
               confirmModal.view.modal("hide");
             });
         }
@@ -634,6 +639,7 @@ var sched4 = (function() {
       .appendTo(view);
 
     compose.click(function() {
+      mp.track("Write confirmation");
       composeConfirmEmail(profs, ta, uid);
     })
 
@@ -956,9 +962,11 @@ var sched4 = (function() {
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
+        mp.track("Show meeting details editor");
         summary.removeClass("hide");
         editMode.addClass("hide");
       } else {
+        mp.track("Hide meeting details editor");
         summary.addClass("hide");
         editMode.removeClass("hide");
       }
@@ -978,6 +986,7 @@ var sched4 = (function() {
       var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
         return api.postTask(task).done(function() {
+          mp.track("Reschedule");
           sched.loadTask(task);
         });
       });
@@ -988,6 +997,7 @@ var sched4 = (function() {
       var async = api.cancelCalendar(tid).then(function() {
         goBackToStep2();
         return api.postTask(task).done(function() {
+          mp.track("Cancel and archive");
           api.archiveTask(tid);
           window.location.hash = "#!";
         });
@@ -1018,6 +1028,15 @@ var sched4 = (function() {
     var review = createReviewSection(profs, ta);
     var confirm = createConfirmSection(profs, ta, guests);
     var reminder = createReminderSection(profs, ta, guests);
+
+    function toggleByClick(toggling, x) {
+      if (toggling.view.hasClass("collapsed")) {
+        mp.track("Show " + x);
+      } else {
+        mp.track("Hide " + x);
+      }
+      toggleModule(toggling, x);
+    }
 
     review.header.click(function() {
       toggleModule(review, "review");

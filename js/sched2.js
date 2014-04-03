@@ -206,6 +206,7 @@ var sched2 = (function() {
         _view["button" + letter]
           .removeClass("disabled")
           .click(function() {
+            mp.track("Schedule preferred option");
             $(".select-option-btn").addClass("disabled");
             updateTask(ta, option);
           });
@@ -437,6 +438,7 @@ var sched2 = (function() {
 
     offerModal.saveDraft
       .click(function() {
+        mp.track("Save offer draft");
         var draft = offerModal.messageEditable.val();
         store.set(localStorageKey, draft);
         offerModal.view.modal("hide");
@@ -444,6 +446,7 @@ var sched2 = (function() {
 
     offerModal.discardDraft
       .click(function() {
+        mp.track("Discard offer draft");
         store.remove(localStorageKey);
         offerModal.view.modal("hide");
       });
@@ -475,6 +478,7 @@ var sched2 = (function() {
                 }]
               };
               return chat.postChatItem(chatItem).done(function() {
+                mp.track("Send offer");
                 offerModal.view.modal("hide");
               });
             });
@@ -596,6 +600,7 @@ var sched2 = (function() {
       .appendTo(view);
 
     compose.click(function() {
+      mp.track("Write offer");
       composeEmail(profs, task, options, uid);
     });
 
@@ -960,6 +965,7 @@ var sched2 = (function() {
     });
 
     function openCal() {
+      mp.track("Set time in calendar");
       var dates = getDates();
       var defaultDate;
       if (util.isNotNull(dates))
@@ -1035,6 +1041,7 @@ var sched2 = (function() {
 
     addPublicNotes
       .click(function() {
+        mp.track("Add event notes");
         addPublicNotes.addClass("hide");
         allNotes.removeClass("hide");
         notesBoxPublic.focus();
@@ -1189,9 +1196,11 @@ var sched2 = (function() {
     ) {
       saveNamedPlace(calOption, googleDescription, savedPlaceID)
         .done(function() {
+          mp.track("Save option");
           saveAndReload(ta, action);
         });
     } else {
+      mp.track("Save option");
       saveAndReload(ta, action);
     }
   }
@@ -1202,6 +1211,7 @@ var sched2 = (function() {
       list.filter(schedState.calendar_options, function(x) {
         return x.label !== calOptionLabel;
       });
+    mp.track("Remove option");
     saveAndReload(ta, "removing");
   }
 
@@ -1422,21 +1432,33 @@ var sched2 = (function() {
     var offer = createOfferSection(profs, ta, guests);
     var schedule = createScheduleSection(ta);
 
+    function toggleByClick(toggling, x) {
+      if (toggling.view.hasClass("collapsed")) {
+        mp.track("Show " + x);
+      } else {
+        mp.track("Hide " + x);
+      }
+      toggleModule(toggling, x);
+    }
+
     options.header.click(function() {
-      toggleModule(options, "options");
+      toggleByClick(options, "options");
     })
     offer.header.click(function() {
-      toggleModule(offer, "offer");
+      toggleByClick(offer, "offer");
     })
     schedule.header.click(function() {
-      toggleModule(schedule, "schedule");
+      toggleByClick(schedule, "schedule");
     })
 
     function toggleModule(toggling, x) {
-      if (toggling.view.hasClass("collapsed"))
+      if (toggling.view.hasClass("collapsed")) {
+        mp.track("Show " + x);
         showModule(toggling, x);
-      else
+      } else {
+        mp.track("Hide " + x);
         hideModule(toggling, x);
+      }
 
       function showModule(toggling, x) {
         toggling.showHide.text("Hide");
