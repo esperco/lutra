@@ -7,34 +7,46 @@ var tzpicker = (function() {
 
   function createForm() {
 '''
-<div #tzPickerModal
-     class="modal fade" tabindex="-1"
-     role="dialog" aria-labelledby="tz-picker-title"
+<div #view
+     class="modal fade"
+     tabindex="-1"
+     role="dialog"
      aria-hidden="true">
-  <div class="tz-picker-dialog modal-dialog">
-    <div class="modal-content">
+  <div #dialog
+       class="modal-dialog tz-picker-modal">
+    <div #content
+         class="modal-content tz-picker-modal">
       <div class="modal-header">
-        <img class="tz-picker-icon svg" src="/assets/img/globe.svg"/>
+        <div #iconContainer
+             class="modal-icon tz-picker-modal-icon"/>
         <div #closeContainer
              class="modal-close"
              data-dismiss="modal"/>
-        <h3 #tzPickerTitle
+        <div #tzPickerTitle
             class="modal-title">
           Change Time Zone
-        </h3>
+        </div>
       </div>
-      <div #tzPickerBody class="modal-body"></div>
+      <div #tzPickerBody class="modal-body"/>
     </div>
   </div>
 </div>
 '''
-    var close = $("<img class='svg'/>")
+    var icon = $("<img class='svg-block'/>")
+      .appendTo(iconContainer);
+    svg.loadImg(icon, "/assets/img/globe.svg");
+
+    var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
     svg.loadImg(close, "/assets/img/x.svg");
 
     var id = util.randomString();
     tzPickerTitle.attr("id", id);
-    tzPickerModal.attr("aria-labelledby", id);
+    view.attr("aria-labelledby", id);
+
+    closeContainer.click(function() {
+      view.modal("hide");
+    })
 
     return _view;
   }
@@ -46,7 +58,7 @@ var tzpicker = (function() {
    */
   mod.create = function(param) {
     var form = createForm();
-    var modal = form.tzPickerModal;
+    var modal = form.view;
     var body = form.tzPickerBody;
 
     function close() {

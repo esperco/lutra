@@ -187,7 +187,7 @@ var locpicker = (function() {
                   .focus();
   }
 
-  function addSuggestedSavedPlacesToMenu(form, predictions) {
+  function addSuggestedSavedPlacesToMenu(form, predictions, showDetails) {
     var menu = form.dropdownMenu;
     if (predictions.from_saved_places.length === 0) return;
 
@@ -231,7 +231,9 @@ var locpicker = (function() {
               };
               setLocation(form, loc, place);
               util.hideDropdown(form.dropdownToggle);
-              toggleForm(form);
+              if (showDetails) {
+                toggleForm(form);
+              }
             });
           return false;
         });
@@ -240,7 +242,7 @@ var locpicker = (function() {
       .appendTo(menu);
   }
 
-  function addSuggestedGooglePlacesToMenu(form, predictions) {
+  function addSuggestedGooglePlacesToMenu(form, predictions, showDetails) {
     var menu = form.dropdownMenu;
 
     $('<li role="presentation" class="dropdown-header"/>')
@@ -274,8 +276,10 @@ var locpicker = (function() {
                   });
                 });
               util.hideDropdown(form.dropdownToggle);
-              toggleForm(form);
-              form.title.focus();
+              if (showDetails) {
+                toggleForm(form);
+                form.title.focus();
+              }
             });
           return false;
         });
@@ -286,22 +290,22 @@ var locpicker = (function() {
     Display addresses as autocompleted by Google or by Esper using
     the user's saved places.
   */
-  function displayPredictionsDropdown(form, predictions) {
+  function displayPredictionsDropdown(form, predictions, showDetails) {
     if (predictions.from_saved_places.length === 0
         && predictions.from_google.length === 0) return;
     var menu = form.dropdownMenu;
     menu.children().remove();
 
     /* Fill the menu with suggested addresses from user's saved places */
-    addSuggestedSavedPlacesToMenu(form, predictions);
+    addSuggestedSavedPlacesToMenu(form, predictions, showDetails);
 
     /* Fill the menu with suggested addresses from Google */
-    addSuggestedGooglePlacesToMenu(form, predictions);
+    addSuggestedGooglePlacesToMenu(form, predictions, showDetails);
 
     util.showDropdown(form.dropdownToggle);
   }
 
-  function predictAddress(form) {
+  function predictAddress(form, showDetails) {
     // Default: No location bias
     var lat = 0;
     var lon = 0;
@@ -318,15 +322,15 @@ var locpicker = (function() {
     if (textInput === "") return;
     api.getPlacePredictions(textInput, lat, lon, radius)
       .done(function(predictions) {
-        displayPredictionsDropdown(form, predictions);
+        displayPredictionsDropdown(form, predictions, showDetails);
       });
   }
 
-  function setup(form) {
+  function setup(form, showDetails) {
     form.locationSearch.removeClass("hide");
     form.locationForm.addClass("hide");
     util.afterTyping(form.searchBox, 250, function() {
-      predictAddress(form);
+      predictAddress(form, showDetails);
     });
     form.resetLocation
       .click(function() {
@@ -358,7 +362,9 @@ var locpicker = (function() {
    */
   mod.create = function(param) {
     var form = createLocationForm(param);
-    setup(form);
+    var showDetails = param.showDetails;
+    log(showDetails);
+    setup(form, showDetails);
     setPositionFromNavigator();
 
     return {
