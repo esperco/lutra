@@ -8,8 +8,7 @@ FILES = \
   fonts \
   app \
   guest-app \
-  jquery-ui-flick \
-  jquery.timepicker
+  datepicker \
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))
