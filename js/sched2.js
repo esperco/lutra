@@ -734,7 +734,6 @@ var sched2 = (function() {
       displayTimezone(slot);
     }
     var timezoneText = form.timezoneText;
-    var timezonePicker = form.timezonePicker;
     switch (slot.meeting_type) {
     case "Call":
       form.addPublicNotes
@@ -756,8 +755,6 @@ var sched2 = (function() {
         var picker = tzpicker.create({
           onTimezoneChange: setTimezone
         });
-        timezonePicker.children().remove();
-        timezonePicker.append(picker.view);
       })
       .addClass("link");
     displayTimezone(slot);
@@ -813,9 +810,9 @@ var sched2 = (function() {
       .appendTo(iconContainer);
     svg.loadImg(icon, "/assets/img/calendar.svg");
 
-    // var id = util.randomString();
-    // title.attr("id", id);
-    // view.attr("aria-labelledby", id);
+    var id = util.randomString();
+    title.attr("id", id);
+    view.attr("aria-labelledby", id);
 
     var cal = calpicker.create(param);
     _view.cal = cal;
@@ -856,7 +853,6 @@ var sched2 = (function() {
                  src="/assets/img/globe.svg"/>
             <span #timezoneText class="timezone-text"></span>
           </div>
-          <div #timezonePicker/>
         </div>
         <span #openCalPicker
              class="open-cal-picker clearfix">
@@ -1016,7 +1012,8 @@ var sched2 = (function() {
     /* locationForm is defined earlier because we have a circular dependency */
     locationForm = locpicker.create({
       onTimezoneChange: onTimezoneChange,
-      onLocationSet: onLocationSet
+      onLocationSet: onLocationSet,
+      showDetails: true
     });
     if (util.isDefined(loc)) {
       locationForm.setLocation(loc);

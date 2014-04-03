@@ -1060,8 +1060,12 @@ i { color: @gray_60; }
   .modal-dialog.composition-modal { width: 768px; }
 }
 
-.modal-content.cal-picker-modal,
-.modal-content.composition-modal {
+.modal-dialog.tz-picker-modal {
+  max-width: 400px;
+  padding-top: 160px;
+}
+
+.modal-content {
   border: 1px solid @gray_10;
   background-clip: none;
 }
@@ -1088,7 +1092,7 @@ i { color: @gray_60; }
   }
 }
 
-.tz-picker-icon { margin-top: 1px; }
+.tz-picker-modal-icon g { fill: white; }
 
 .cal-picker-modal-icon {
   margin-top: 1px;
@@ -1332,11 +1336,6 @@ i { color: @gray_60; }
 .made {
   font-size: 12px;
   color: @gray_40;
-}
-
-.heart {
-  margin-right: 3px;
-  margin-left: 2px;
 }
 
 .login-footer-push {
@@ -2490,11 +2489,6 @@ i { color: @gray_60; }
 }
 
 .timezone-text.link { cursor: pointer; }
-
-#tz-picker-dialog {
-  width: 400px;
-  padding-top: 160px;
-}
 
 .tz-actions { margin-top: 8px; }
 .save-tz { float: right; }
