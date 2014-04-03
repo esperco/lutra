@@ -968,7 +968,6 @@ var sched2 = (function() {
       var defaultDate;
       if (util.isNotNull(dates))
         defaultDate = date.toString(dates.start);
-      log("createCalendarModal with tz from:", x.location);
       var calModal = createCalendarModal({
         timezone: sched.getTimezone(x),
         defaultDate: defaultDate,
