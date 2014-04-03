@@ -60,6 +60,7 @@ COMMON_SOURCES = \
   dateYmd.js \
   date.js \
   timeonly.js \
+  timezone.js \
   status_.js \
   spinner.js \
   unixtime.js \
@@ -83,7 +84,6 @@ APP_SOURCES = \
   api.js \
   sample.js \
   adder.js \
-  timezone.js \
   calcache.js \
   calpicker.js \
   loceditor.js \
