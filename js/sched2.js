@@ -206,7 +206,7 @@ var sched2 = (function() {
         _view["button" + letter]
           .removeClass("disabled")
           .click(function() {
-            mixpanel.trackProd("Schedule preferred option");
+            mp.track("Schedule preferred option");
             $(".select-option-btn").addClass("disabled");
             updateTask(ta, option);
           });
@@ -438,7 +438,7 @@ var sched2 = (function() {
 
     offerModal.saveDraft
       .click(function() {
-        mixpanel.trackProd("Save offer draft");
+        mp.track("Save offer draft");
         var draft = offerModal.messageEditable.val();
         store.set(localStorageKey, draft);
         offerModal.view.modal("hide");
@@ -446,7 +446,7 @@ var sched2 = (function() {
 
     offerModal.discardDraft
       .click(function() {
-        mixpanel.trackProd("Discard offer draft");
+        mp.track("Discard offer draft");
         store.remove(localStorageKey);
         offerModal.view.modal("hide");
       });
@@ -478,7 +478,7 @@ var sched2 = (function() {
                 }]
               };
               return chat.postChatItem(chatItem).done(function() {
-                mixpanel.trackProd("Send offer");
+                mp.track("Send offer");
                 offerModal.view.modal("hide");
               });
             });
@@ -600,7 +600,7 @@ var sched2 = (function() {
       .appendTo(view);
 
     compose.click(function() {
-      mixpanel.trackProd("Write offer");
+      mp.track("Write offer");
       composeEmail(profs, task, options, uid);
     });
 
@@ -976,7 +976,7 @@ var sched2 = (function() {
     });
 
     function openCal() {
-      mixpanel.trackProd("Set time in calendar");
+      mp.track("Set time in calendar");
       var dates = getDates();
       var defaultDate;
       if (util.isNotNull(dates))
@@ -1052,7 +1052,7 @@ var sched2 = (function() {
 
     addPublicNotes
       .click(function() {
-        mixpanel.trackProd("Add event notes");
+        mp.track("Add event notes");
         addPublicNotes.addClass("hide");
         allNotes.removeClass("hide");
         notesBoxPublic.focus();
@@ -1206,11 +1206,11 @@ var sched2 = (function() {
     ) {
       saveNamedPlace(calOption, googleDescription, savedPlaceID)
         .done(function() {
-          mixpanel.trackProd("Save option");
+          mp.track("Save option");
           saveAndReload(ta, action);
         });
     } else {
-      mixpanel.trackProd("Save option");
+      mp.track("Save option");
       saveAndReload(ta, action);
     }
   }
@@ -1221,7 +1221,7 @@ var sched2 = (function() {
       list.filter(schedState.calendar_options, function(x) {
         return x.label !== calOptionLabel;
       });
-    mixpanel.trackProd("Remove option");
+    mp.track("Remove option");
     saveAndReload(ta, "removing");
   }
 
@@ -1444,9 +1444,9 @@ var sched2 = (function() {
 
     function toggleByClick(toggling, x) {
       if (toggling.view.hasClass("collapsed")) {
-        mixpanel.trackProd("Show " + x);
+        mp.track("Show " + x);
       } else {
-        mixpanel.trackProd("Hide " + x);
+        mp.track("Hide " + x);
       }
       toggleModule(toggling, x);
     }
@@ -1463,10 +1463,10 @@ var sched2 = (function() {
 
     function toggleModule(toggling, x) {
       if (toggling.view.hasClass("collapsed")) {
-        mixpanel.trackProd("Show " + x);
+        mp.track("Show " + x);
         showModule(toggling, x);
       } else {
-        mixpanel.trackProd("Hide " + x);
+        mp.track("Hide " + x);
         hideModule(toggling, x);
       }
 

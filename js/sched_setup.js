@@ -180,7 +180,7 @@ var setup = (function() {
           sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
           saveGuests(task, hosts, guestTbl, guestOptions);
 
-          mixpanel.trackProd(updating ? "Update assistant" : "Add assistant");
+          mp.track(updating ? "Update assistant" : "Add assistant");
 
           profile.profilesOfTaskParticipants(task).then(function(profs) {
             view.replaceWith(makeViewOfEA(profs, uid));
@@ -339,7 +339,7 @@ var setup = (function() {
           delete sched.optionsForGuest(guestOptions, uid).assisted_by;
           saveGuests(task, sched.getHosts(task), guestTbl, guestOptions);
 
-          mixpanel.trackProd(updating ? "Update guest" : "Add guest");
+          mp.track(updating ? "Update guest" : "Add guest");
 
           profile.profilesOfTaskParticipants(task).then(function(profs) {
             updateGuestDetails(profs, uid);
@@ -789,7 +789,7 @@ var setup = (function() {
     doneButton
       .off("click")
       .click(function() {
-        mixpanel.trackProd("Done with setup");
+        mp.track("Done with setup");
         sched.loadTask(ta);
       });
 

@@ -16,7 +16,7 @@ var login = (function() {
   };
 
   mod.setLoginInfo = function(stored) {
-    if (isProduction) {
+    if (flags.isProduction) {
       mixpanel.register({uid: stored.uid}); // Sent with every track()
       mixpanel.track("Login");
     }
@@ -53,7 +53,7 @@ var login = (function() {
   };
 
   mod.logout = function () {
-    mixpanel.trackProd("Logout");
+    mp.track("Logout");
     mod.clearLoginInfo();
   };
 
