@@ -701,14 +701,14 @@ var sched2 = (function() {
     var meetingTypeSelector = select.create({
       initialKey: "Meeting",
       options: [
-        opt("Custom...", "Custom"),
-        opt("Meeting", "Meeting"),
         opt("Breakfast", "Breakfast"),
-        opt("Lunch", "Lunch"),
-        opt("Dinner", "Dinner"),
+        opt("Call", "Call"),
         opt("Coffee", "Coffee"),
-        opt("Night life", "Nightlife"),
-        opt("Phone call", "Call")
+        opt("Dinner", "Dinner"),
+        opt("Drinks", "Drinks"),
+        opt("Lunch", "Lunch"),
+        opt("Meeting", "Meeting"),
+        opt("Custom...", "Custom")
       ]
     });
     /* override default get() to read from the [possibly hidden] input box */
