@@ -220,7 +220,16 @@ var sched = (function() {
     case "Nightlife": return "Night Life";
     default:          return typ;
     }
-  }
+  };
+
+  mod.showLocation = function(meetingType) {
+    switch (meetingType) {
+    case "Call":
+      return false;
+    default:
+      return true;
+    }
+  };
 
   mod.summaryOfOption = function(slot, showLoc) {
 '''
@@ -244,7 +253,7 @@ var sched = (function() {
 '''
     what.text(mod.formatMeetingType(slot).toUpperCase());
     when.append(formatDates(slot));
-    if (showLoc) {
+    if (showLoc && mod.showLocation(slot.meeting_type)) {
       var pin = $("<img class='pin'/>");
         pin.appendTo(pinContainer);
       svg.loadImg(pin, "/assets/img/pin.svg");
@@ -273,7 +282,8 @@ var sched = (function() {
     <div #when
          class="info"/>
   </div>
-  <div class="info-row">
+  <div #whereRow
+       class="info-row">
     <div class="info-label">WHERE</div>
     <div #where
          class="info">
@@ -293,10 +303,15 @@ var sched = (function() {
 '''
     what.text(mod.formatMeetingType(slot));
     when.append(formatDates(slot));
-    whereName.text(slot.location.title);
-    if (whereName.text() !== "")
-      whereName.removeClass("hide");
-    whereAddress.append(viewOfAddress(slot));
+    if (mod.showLocation(slot.meeting_type)) {
+      whereName.text(slot.location.title);
+      if (whereName.text() !== "")
+        whereName.removeClass("hide");
+      whereAddress.append(viewOfAddress(slot));
+    }
+    else
+      whereRow.addClass("hide");
+
     notes.append(viewOfNotes(slot));
     if (notes.text() !== "")
       notesRow.removeClass("hide");

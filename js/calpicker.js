@@ -143,7 +143,6 @@ var calpicker = (function() {
 
   /* Set default */
   function completeDates(optYmd, optDates) {
-    log("completeDates", optYmd, optDates);
     var ymd = optYmd;
     if (! util.isDefined(optYmd)) {
       ymd = dateYmd.local.today();
@@ -159,7 +158,6 @@ var calpicker = (function() {
     if (util.isNotNull(optDates)) {
       var start = optDates.start;
       var end = optDates.end;
-      log("start-end", start, end);
       if (util.isNotNull(start)) {
         dates.start = setDate(ymd, start);
         if (util.isNotNull(end))
@@ -181,7 +179,6 @@ var calpicker = (function() {
     else {
       dates = defaultDates(ymd);
     };
-    log("completeDates returns:", dates);
     return dates;
   }
 
