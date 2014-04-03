@@ -253,6 +253,7 @@ var guestTask = function() {
 
     var google = $("#google");
     $(document).on("click", "#google", function() {
+      mp.track("Guest add to Google calendar");
       $('[data-toggle="popover"]').click();
       window.open(googleCalendarURL(sched.getCalendarTitle(x),
                                     window.location,
@@ -271,10 +272,16 @@ var guestTask = function() {
     }
     $("#outlook")
           .off("click")
-          .click(getICS);
+          .click(function() {
+            mp.track("Guest download Outlook ICS");
+            getICS();
+          });
     $("#apple")
           .off("click")
-          .click(getICS);
+          .click(function() {
+            mp.track("Guest download Apple ICS");
+            getICS();
+          });
 
     button.popover({
       html:true,
@@ -385,6 +392,7 @@ var guestTask = function() {
             chat_item_data: data
           };
           chat.postChatItem(item);
+          mp.track("Guest submit selections");
         }
         $("html, body").animate({ scrollTop: 0 }, 350);
         $("#guest-select").addClass("hide");
