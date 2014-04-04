@@ -5,18 +5,17 @@
 var home = (function() {
   var mod = {};
 
-  var reStatusTime = /<esper:time>([^<>]+)<\/esper:time>/gi;
   function taskStatus(ta) {
-    return ta.task_status_text.replace(reStatusTime,
-      function(orgMatch, timeStr) {
-        try {
-          var time = date.ofString(timeStr);
-          return date.viewTimeAgo(time).text()
-               + " at " + date.utcToLocalTimeOnly(time);
-        } catch(e) {
-          return orgMatch;
-        }
-      });
+    var time = date.ofString(ta.task_status_text.status_timestamp);
+    var statusEvent = $("<span/>")
+      .text(ta.task_status_text.status_event + " ");
+    var statusTimeAgo = date.viewTimeAgo(time);
+    var statusTime = $("<span/>")
+      .text(" at " + date.utcToLocalTimeOnly(time));
+    return $("<div/>")
+      .append(statusEvent)
+      .append(statusTimeAgo)
+      .append(statusTime);
   }
 
   function viewOfTaskRow(ta) {
