@@ -542,7 +542,7 @@ var sched2 = (function() {
       latestOfferTo(uid, ta) :
       latestResponseFrom(uid, ta);
     var created = date.ofString(latestMatch.time_created);
-    return date.viewTimeAgo(created).text();
+    return date.viewTimeAgo(created);
   }
 
   function createOfferRow(profs, task, uid) {
@@ -586,17 +586,17 @@ var sched2 = (function() {
 
     var plural = options.length === 1 ? "" : "s";
     var statusText = "Has not received the meeting option" + plural;
+    var statusTime;
     if (util.isNotNull(receivedR)) {
-      statusText =
-        "Submitted meeting preference" + plural + " " +
-        howLongAgo(task, uid, false);
+      statusText = "Submitted meeting preference" + plural + " ";
+      statusTime = howLongAgo(task, uid, false);
     } else if (util.isNotNull(sentQ)) {
-      statusText =
-        "Received the meeting option" + plural + " " +
-        howLongAgo(task, uid, true);
+      statusText = "Received the meeting option" + plural + " ";
+      statusTime = howLongAgo(task, uid, true);
     }
     var guestStatus = $("<div class='reminder-guest-status'/>")
-      .text(statusText)
+      .append($("<span/>").text(statusText))
+      .append(statusTime)
       .appendTo(view);
 
     compose.click(function() {
