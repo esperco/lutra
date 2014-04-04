@@ -188,11 +188,8 @@ var sched = (function() {
           class="time-to"> to </span>
     <span #end
           class="time-end bold"/>
-    <div>
-      <img class="timezone-icon-sm svg-block"
-           src="/assets/img/globe.svg"
-      /><span #timezoneElt class="timezone-text"/>
-    </div>
+    <div #timezoneElt
+          class="timezone-text"/>
   </div>
 </div>
 '''
@@ -210,15 +207,6 @@ var sched = (function() {
     timezoneElt.text(timezone.format(tz, date1));
 
     return view;
-  };
-
-  mod.formatMeetingType = function(slot) {
-    var typ = slot.meeting_type;
-    switch (typ) {
-    case "Call":      return "Phone Call";
-    case "Nightlife": return "Night Life";
-    default:          return typ;
-    }
   };
 
   mod.showLocation = function(meetingType) {
@@ -250,7 +238,7 @@ var sched = (function() {
   </div>
 </div>
 '''
-    what.text(mod.formatMeetingType(slot).toUpperCase());
+    what.text(slot.meeting_type.toUpperCase());
     when.append(formatDates(slot));
     if (showLoc && mod.showLocation(slot.meeting_type)) {
       var pin = $("<img class='pin'/>");
@@ -300,7 +288,7 @@ var sched = (function() {
   </div>
 </td>
 '''
-    what.text(mod.formatMeetingType(slot));
+    what.text(slot.meeting_type);
     when.append(formatDates(slot));
     if (mod.showLocation(slot.meeting_type)) {
       whereName.text(slot.location.title);
