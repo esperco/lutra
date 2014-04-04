@@ -1018,8 +1018,8 @@ var sched2 = (function() {
       showDetails: true
     });
     if (util.isDefined(loc)) {
-      locationForm.setLocation(loc);
       locationForm.toggleForm();
+      locationForm.setLocation(loc);
     } else {
       var tz = timezone.guessUserTimezone();
       loc = { timezone: tz };
