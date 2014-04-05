@@ -143,12 +143,21 @@ var chat = (function () {
     return v;
   }
 
-  function audioPlayer(audioLink) {
-    return $("<audio/>", {src:audioLink, controls:true})
-           .text("Left a voice message.")
-           .bind('ended', function() {
-             this.load();
-           });
+  function audioPlayer(x) {
+    var player = $("<audio controls/>")
+      .text("Left a voice message.")
+      .bind('ended', function() {
+        this.load();
+      });
+    var src = x.sources;
+    var ogg = src.ogg_vorbis;
+    var mp3 = src.mp3;
+    var src_ogg = $("<source/>", { src: ogg.src, type: ogg.type });
+    var src_mp3 = $("<source/>", { src: mp3.src, type: mp3.type });
+    player
+      .append(src_ogg)
+      .append(src_mp3);
+    return player;
   }
 
   function viewOfChatData(chat_item) {
@@ -159,7 +168,7 @@ var chat = (function () {
       return viewOfChatText(data);
     case "Complex_message":
       return viewOfComplexMessage(data.body, data.fresh_content);
-    case "Audio":
+    case "Audio_msg":
       return audioPlayer(data);
     case "Selector_q":
       return viewOfSelectQuestion(data);
