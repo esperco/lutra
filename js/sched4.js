@@ -31,7 +31,6 @@ var sched4 = (function() {
     return startTimeUTC.getTime() < nowUTC.getTime();
   }
 
-
   /* REMINDERS */
 
   function closeReminderModal(reminderModal, ta, options, uid) {
@@ -203,6 +202,8 @@ var sched4 = (function() {
 '''
     var prof = profs[uid].prof;
 
+    var eaUID = sched.assistedBy(uid, sched.getGuestOptions(ta));
+
     var editIcon = $("<img class='edit-reminder-icon'/>")
       .appendTo(edit);
     svg.loadImg(editIcon, "/assets/img/edit.svg");
@@ -213,7 +214,10 @@ var sched4 = (function() {
       .addClass("list-prof-circ")
       .appendTo(view);
 
-    if (sentReminder(ta, uid)) {
+    var sent = util.isNotNull(eaUID) ?
+      sentReminder(ta, eaUID) :
+      sentReminder(ta, uid);
+    if (sent) {
       chatHead.addClass("sent");
       edit.addClass("hide");
     } else {
@@ -221,12 +225,15 @@ var sched4 = (function() {
     }
 
     var guestName = $("<div/>")
-      .text(profile.fullNameOrEmail(prof))
       .addClass("reminder-guest-name")
+      .text(profile.fullNameOrEmail(prof))
       .appendTo(view);
 
+    var reminderStatus = util.isNotNull(eaUID) ?
+      getReminderStatus(ta, eaUID) :
+      getReminderStatus(ta, uid);
     var guestStatus = $("<div class='reminder-guest-status'/>")
-      .text(getReminderStatus(ta, uid))
+      .text(reminderStatus)
       .appendTo(view);
 
     var reminderModal = $("#sched-reminder-modal");
@@ -256,8 +263,13 @@ var sched4 = (function() {
         delete reserved.remind;
       else
         reserved.remind = remind;
-      list.iter(statuses, function(statusText) {
-        statusText.text(getReminderStatus(task));
+      list.iter(statuses, function(stat) {
+        var uid = stat.uid;
+        var statusText = stat.text;
+        var eaUID = sched.assistedBy(uid, sched.getGuestOptions(task));
+        util.isNotNull(eaUID) ?
+          statusText.text(getReminderStatus(task, eaUID)) :
+          statusText.text(getReminderStatus(task, uid));
       });
       api.postTask(task);
     }
@@ -375,7 +387,7 @@ var sched4 = (function() {
     list.iter(guests, function(uid) {
       var reminderRow = createReminderRow(profs, task, uid, guests);
       guestList.append(reminderRow.row);
-      statuses.push(reminderRow.statusText);
+      statuses.push({uid: uid, text: reminderRow.statusText});
       if (sentReminder(task, uid))
         reminderSent = true;
     });
