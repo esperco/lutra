@@ -89,13 +89,12 @@ var calpicker = (function() {
            type="text"
            class="form-control time time-picker-field"/>
     <div class="time-to-text">to</div>
+    <input #datePickerEnd
+           type="text"
+           class="form-control date-picker-field end"/>
     <input #endInput
            type="text"
            class="form-control time time-picker-field"/>
-    <input #datePickerEnd
-           type="text"
-           class="form-control date-picker-field end"
-           disabled/>
   </div>
 
   <div #calendarPickerContainer class="hide">
