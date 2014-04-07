@@ -818,6 +818,26 @@ var sched2 = (function() {
     return _view;
   }
 
+  function next9AM(tz) {
+    var nowUTC = date.ofString(date.now());
+    type.set("date", nowUTC);
+    var nowLocal = date.localOfUtc(tz, nowUTC);
+    type.set("localdate", nowLocal);
+
+    var today9AM = new Date(nowLocal.getTime());
+    type.set("localdate", today9AM);
+    // This is in local time but represented as UTC so we have to setUTCHours
+    today9AM.setUTCHours(9, 0, 0, 0);
+
+    if (nowLocal.getTime() < today9AM.getTime()) {
+      return today9AM;
+    } else {
+      var oneDay = 86400000; // milliseconds
+      var tomorrow9AM = date.ofString(today9AM.getTime() + oneDay);
+      type.set("localdate", tomorrow9AM);
+      return tomorrow9AM;
+    }
+  }
 
   /*
     Create a view and everything needed to display and edit location
@@ -949,10 +969,21 @@ var sched2 = (function() {
       updateSaveButton();
     }, "saveButton");
 
-    inlineDatesPicker.setDates({
-      start: date.ofString(x.start),
-      end: date.ofString(x.end)
-    });
+    if (util.isNotNull(x.start) && util.isNotNull(x.end)) {
+      inlineDatesPicker.setDates({
+        start: date.ofString(x.start),
+        end: date.ofString(x.end)
+      });
+    } else {
+      var oneHour = 3600000; // milliseconds
+      var nine = next9AM(timezone.guessUserTimezone());
+      type.check("localdate", nine);
+      var ten = date.ofString(nine.getTime() + oneHour);
+      inlineDatesPicker.setDates({
+        start: nine,
+        end: ten
+      });
+    }
 
     function openCal() {
       mp.track("Set time in calendar");
