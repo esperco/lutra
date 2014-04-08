@@ -271,7 +271,6 @@ var sched4 = (function() {
         delete reserved.remind;
       else
         reserved.remind = remind;
-      // TODO Get statuses selectively
       list.iter(statuses, function(stat) {
         var uid = stat.uid;
         var statusText = stat.text;
