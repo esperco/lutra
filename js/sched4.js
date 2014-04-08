@@ -33,7 +33,7 @@ var sched4 = (function() {
 
   /* REMINDERS */
 
-  function closeReminderModal(reminderModal, ta, options, uid) {
+  function closeReminderModal(reminderModal, ta, options) {
     var state = sched.getState(ta);
     options.reminder_message = reminderModal.messageEditable.val();
     state.participant_options =
@@ -117,24 +117,27 @@ var sched4 = (function() {
     return _view;
   }
 
-  function editReminderEmail(profs, ta, options, toUid) {
+  function editReminderEmail(profs, ta, options, guestUid) {
     var reminderModal = createReminderModal();
-    var ea = sched.assistedBy(toUid, sched.getGuestOptions(ta));
-    var toName = profile.fullName(profs[toUid].prof);
-    var toEmail = profile.email(profs[toUid].prof);
+    var guestName = profile.fullName(profs[guestUid].prof);
+    var guestEmail = profile.email(profs[guestUid].prof);
     var slot = getSlot(ta);
 
-    reminderModal.recipient.text(toName + " <" + toEmail + ">");
+    reminderModal.recipient.text(guestName + " <" + guestEmail + ">");
     reminderModal.subject.text("Re: " + ta.task_status.task_title);
 
     var parameters = {
-      guest_name: toName,
-      guest_uid: toUid
+      guest_name: guestName,
+      guest_uid: guestUid
     };
 
-    if (util.isNotNull(ea)) {
-      var eaName = profile.fullName(profs[ea].prof);
-      reminderModal.recipient.text(eaName);
+    var eaUid = sched.assistedBy(guestUid, sched.getGuestOptions(ta));
+    var receiverOptions = options;
+    if (util.isNotNull(eaUid)) {
+      var eaName = profile.fullName(profs[eaUid].prof);
+      var eaEmail = profile.email(profs[eaUid].prof);
+      receiverOptions = sched.getGuestOptions(ta)[eaUid];
+      reminderModal.recipient.text(eaName + " <" + eaEmail + ">");
       parameters.guest_EA = eaName;
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_reminder_to_guest_assistant";
@@ -151,13 +154,13 @@ var sched4 = (function() {
 
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
-        if (! options.reminder_message) {
+        if (! receiverOptions.reminder_message) {
           reminderModal.messageEditable
             .val(x.message_text)
             .trigger("autosize.resize");
         } else {
           reminderModal.messageEditable
-            .val(options.reminder_message)
+            .val(receiverOptions.reminder_message)
             .trigger("autosize.resize");
         }
       });
@@ -167,7 +170,7 @@ var sched4 = (function() {
       .off("click")
       .click(function() {
         mp.track("Save reminder");
-        closeReminderModal(reminderModal, ta, options, toUid);
+        closeReminderModal(reminderModal, ta, receiverOptions);
       });
 
     reminderModal.view.modal({});
@@ -263,6 +266,7 @@ var sched4 = (function() {
         delete reserved.remind;
       else
         reserved.remind = remind;
+      // TODO Get statuses selectively
       list.iter(statuses, function(stat) {
         var uid = stat.uid;
         var statusText = stat.text;
