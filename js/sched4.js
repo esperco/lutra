@@ -178,6 +178,7 @@ var sched4 = (function() {
 
   function getReminderStatus(ta, uid) {
     var slot = getSlot(ta);
+    var options = sched.getGuestOptions(ta)[uid];
     var startTimeLocal = date.ofString(slot.start);
     var tz = slot.location.timezone;
     var startTimeUTC = date.utcOfLocal(tz, startTimeLocal);
@@ -185,9 +186,13 @@ var sched4 = (function() {
     if (util.isNotNull(beforeSecs)) {
       startTimeLocal.setTime(startTimeLocal.getTime() - (beforeSecs * 1000));
       startTimeUTC.setTime(startTimeUTC.getTime() - (beforeSecs * 1000));
+      var reminderIntent =
+        util.isNotNull(options.reminder_message) ?
+        "Will receive a reminder on " + date.justStartTime(startTimeLocal) :
+        "Not scheduled to receive a reminder";
       return sentReminder(ta, uid) ?
         "Reminder sent on " + date.justStartTime(startTimeLocal) :
-        "Will receive a reminder on " + date.justStartTime(startTimeLocal);
+        reminderIntent;
     } else if (eventTimeHasPassed(ta)) {
       return "Did not receive a reminder";
     } else {
@@ -386,19 +391,18 @@ var sched4 = (function() {
     schedulerTitle.text(schedulerText)
                   .attr("style","margin-right:10px");
 
-    var reminderSent = false;
+    var allRemindersSent = true;
     var statuses = [];
     list.iter(guests, function(uid) {
       var reminderRow = createReminderRow(profs, task, uid, guests);
       guestList.append(reminderRow.row);
       statuses.push({uid: uid, text: reminderRow.statusText});
-      if (sentReminder(task, uid))
-        reminderSent = true;
+      allRemindersSent = allRemindersSent && sentReminder(task, uid);
     });
 
     var schedulerView = createReminderScheduler(profs, task, guests, statuses);
     scheduler.append(schedulerView);
-    if (reminderSent)
+    if (allRemindersSent)
       scheduler.addClass("hide");
 
     header.hover(
