@@ -1093,10 +1093,12 @@ var sched2 = (function() {
 
       var meetingType = getMeetingType();
       var loc;
-      if (meetingType === "Call")
+      if (meetingType === "Call") {
         loc = locationForm.getTimezoneLocation();
-      else
+      } else {
         loc = locationForm.getCompleteLocation();
+        if (loc === null) loc = locationForm.getTimezoneLocation();
+      }
 
       if (
         !(meetingTypeInput.hasClass("hide"))
