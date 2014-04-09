@@ -1142,10 +1142,13 @@ var sched2 = (function() {
     }
 
     function updateSaveButton() {
-      if (calOptionIsReady())
+      if (calOptionIsReady()) {
         saveButton.removeClass("disabled");
-      else
+        dateAndTimes.removeClass("has-error");
+      } else {
         saveButton.addClass("disabled");
+        dateAndTimes.addClass("has-error");
+      }
     }
 
     function saveMe(action) {
