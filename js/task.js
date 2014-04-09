@@ -111,7 +111,7 @@ var task = (function() {
 
     function initUI() {
       loadWorkflowOptions();
-      if (util.isDefined(task)) {
+      if (util.isNotNull(task)) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
         case "Questions":
