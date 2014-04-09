@@ -339,7 +339,7 @@ var sched = (function() {
     var view = $("#setup-table");
     view.children().remove();
 
-    setup.load(profs, task, view);
+    schedSetup.load(profs, task, view);
     tabSelector.show("setup-tab");
   };
 

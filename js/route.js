@@ -52,10 +52,6 @@ var route = (function() {
       page.test.load();
     },
 
-    "task route": function(data) {
-      withLogin(function () { page.task.load(null); });
-    },
-
     "task/:tid route": function(data) {
       withLogin(function () { page.task.load(data.tid); });
     },
