@@ -156,7 +156,7 @@ var calpicker = (function() {
   }
 
   /* Set default */
-  function completeDates(optYmd, optDates) {
+  function completeDates(optYmd, optDates, fieldName) {
     var ymd = optYmd;
     if (! util.isDefined(optYmd)) {
       ymd = dateYmd.local.today();
@@ -173,16 +173,16 @@ var calpicker = (function() {
       var start = optDates.start;
       var end = optDates.end;
       if (util.isNotNull(start)) {
-        dates.start = setDate(ymd, start);
+        dates.start = fieldName === "start" ? setDate(ymd, start) : start;
         if (util.isNotNull(end))
-          dates.end = setDate(ymd, end);
+          dates.end = fieldName === "end" ? setDate(ymd, end) : end;
         else
           dates.end = date.addMinutes(dates.start, defaultMeetingLength);
       }
       else if (util.isNotNull(end)) {
-        dates.end = setDate(ymd, end);
+        dates.end = fieldName === "end" ? setDate(ymd, end) : end;
         if (util.isNotNull(start))
-          dates.start = setDate(ymd, start);
+          dates.start = fieldName === "start" ? setDate(ymd, start) : start;
         else
           dates.start = date.addMinutes(dates.end, -defaultMeetingLength);
       }
@@ -228,7 +228,7 @@ var calpicker = (function() {
         local.setUTCMinutes(d.getMinutes());
         dates[fieldName] = local;
       }
-      dates = completeDates(undefined, dates);
+      dates = completeDates(undefined, dates, undefined);
       r.set(dates, [watcherId]);
     });
     r.watch(function(dates, isValid) {
@@ -255,35 +255,48 @@ var calpicker = (function() {
 
   var dateWatcherId = "dateWatcher";
 
-  function createDatePicker(picker) {
+  function createDatePicker(picker, datePicker, fieldName) {
     var r = picker.datesRef;
-    picker.datePickerStart.datepicker({
+    datePicker.datepicker({
       gotoCurrent: true,
       numberOfMonths: 1,
       onSelect: function(selectedDate) {
         var ymd = dateYmd.ofString(selectedDate);
         var oldDates = r.get();
-        var dates = completeDates(ymd, oldDates);
-        r.set(dates, [dateWatcherId]);
+        var dates = completeDates(ymd, oldDates, fieldName);
+        r.set(dates, [dateWatcherId + "-" + fieldName]);
       }
     });
   }
 
-  function datePickerDateOfDates(dates) {
+  function startDateOfDates(dates) {
     var ymd = dateYmd.utc.ofDate(dates.start);
-    var pickerDate = dateYmd.local.toDate(ymd);
-    return pickerDate;
+    var startDate = dateYmd.local.toDate(ymd);
+    return startDate;
   }
 
-  function setupDatePicker(picker) {
+  function endDateOfDates(dates) {
+    var ymd = dateYmd.utc.ofDate(dates.end);
+    var endDate = dateYmd.local.toDate(ymd);
+    return endDate;
+  }
+
+  function setupDatePickers(picker) {
     var r = picker.datesRef;
     r.watch(function(dates, isValid) {
       if (isValid) {
-        var pickerDate = datePickerDateOfDates(dates);
-        picker.datePickerStart.datepicker("setDate", pickerDate);
+        var startDate = startDateOfDates(dates);
+        picker.datePickerStart.datepicker("setDate", startDate);
       }
-    }, dateWatcherId);
-    createDatePicker(picker);
+    }, dateWatcherId + "-start");
+    r.watch(function(dates, isValid) {
+      if (isValid) {
+        var endDate = endDateOfDates(dates);
+        picker.datePickerEnd.datepicker("setDate", endDate);
+      }
+    }, dateWatcherId + "-end");
+    createDatePicker(picker, picker.datePickerStart, "start");
+    createDatePicker(picker, picker.datePickerEnd, "end");
     picker.datePickerContainer.removeClass("hide");
   }
 
@@ -501,7 +514,7 @@ var calpicker = (function() {
     var picker = createView(r, tz);
 
     if (withDatePicker) {
-      setupDatePicker(picker);
+      setupDatePickers(picker);
       setupTimePickers(picker);
     }
     if (withCalendarPicker)
