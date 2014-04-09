@@ -10,7 +10,6 @@ HTML_INCLUDES = \
   gen-task-list.html \
   request-password.html \
   reset-password.html \
-  new-task.html \
   messages-tab.html \
   sched-task-list.html \
   places.html \
