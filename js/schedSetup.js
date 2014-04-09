@@ -2,7 +2,7 @@
   Scheduling Setup
 */
 
-var setup = (function() {
+var schedSetup = (function() {
   var mod = {};
 
   var doneButton = $("<button class='btn btn-primary done-setup'/>")
