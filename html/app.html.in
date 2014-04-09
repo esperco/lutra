@@ -278,7 +278,7 @@
             <img class="svg return-home" src="/assets/img/esper-mark.svg">
           </a>
           <div id="task-title-div" class="clearfix">
-            <input id="task-title" class="hide form-control ellipsis">
+            <div id="task-title" class="hide ellipsis"></div>
           </div>
         </div>
       </div>

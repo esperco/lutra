@@ -757,10 +757,15 @@ var schedSetup = (function() {
   <div class="setup-section-content">
     <h4 class="bold">Email subject</h4>
     <div #help
-         class="help-text"/>
+         class="help-text">
+      This subject is used for every email sent to a guest regarding
+      the meeting.
+      We do not recommend editing the subject after exchanging messages
+      with the guests because it may break the conversation
+      into multiple threads.
+    </div>
     <input #subject
-           class="form-control setup-input"
-           disabled/>
+           class="form-control setup-input"/>
     <button #update
             class="btn btn-primary update-subject disabled">
       Update
@@ -772,9 +777,28 @@ var schedSetup = (function() {
       .appendTo(iconContainer);
     svg.loadImg(icon, "/assets/img/email.svg");
 
-    help.text("This subject is used for every email sent to a guest regarding "
-              + "the meeting. It cannot be changed once a message has been sent.");
-    subject.val(ta.task_status.task_title);
+    var origSubject = ta.task_status.task_title;
+    subject.val(origSubject);
+
+    util.afterTyping(subject, 100, function() {
+      var s = subject.val();
+      if (s !== origSubject) {
+        update.removeClass("disabled");
+      }
+      else {
+        update.addClass("disabled");
+      }
+    });
+
+    update.one("click", function() {
+      update.addClass("disabled");
+      ta.task_status.task_title = subject.val();
+      var async = api.postTask(ta);
+      spinner.spin("Updating...", async);
+      async.then(function(ta) {
+        task.loadTask(ta);
+      });
+    });
 
     return _view;
   }

@@ -111,7 +111,7 @@ var task = (function() {
 
     function initUI() {
       loadWorkflowOptions();
-      if (task) {
+      if (util.isDefined(task)) {
         newTaskTitle.val(task.task_status.task_title);
         switch (variant.cons(task.task_data)) {
         case "Questions":
@@ -142,7 +142,7 @@ var task = (function() {
             .done(function(task) {
               mp.track("Start task");
               observable.onTaskModified.notify(task);
-              loadTask(task);
+              mod.loadTask(task);
             });
         }
         else {
@@ -184,15 +184,7 @@ var task = (function() {
   function loadTaskTitle(task) {
     var view = $("#task-title");
     view.children().remove();
-
-    view.val(task.task_status.task_title);
-    view.unbind('change')
-        .change(function() {
-      if (task.task_status.task_title !== view.val()) {
-        task.task_status.task_title = view.val();
-        api.postTask(task);
-      }
-    });
+    view.text(task.task_status.task_title);
 
     return view;
   }
@@ -210,32 +202,28 @@ var task = (function() {
     taskTypeSelector.show("sched-task");
   }
 
-  function loadTask(task) {
+  /* Load task data */
+  mod.loadTask = function(task) {
     loadTaskTitle(task);
 
-    if ("Unread_by_organizer" === task.task_status.task_progress) {
-      loadNewTask(task);
-    }
-    else {
-      switch (variant.cons(task.task_data)) {
-      case "Questions":
-        loadGeneralTask(task);
-        break;
-      case "Scheduling":
-        loadSchedulingTask(task);
-        break;
-      default:
-        log("Invalid task_data", task.task_data);
-      }
+    switch (variant.cons(task.task_data)) {
+    case "Questions":
+      loadGeneralTask(task);
+      break;
+    case "Scheduling":
+      loadSchedulingTask(task);
+      break;
+    default:
+      log("Invalid task_data", task.task_data);
     }
     chat.loadTaskChats(task);
     util.focus();
   }
 
-  /* Load task page */
+  /* Load task page from its task ID, if available */
   mod.load = function(optTid) {
     taskTypeSelector.hideAll();
-    if (!optTid) {
+    if (! util.isNotNull(optTid)) {
       loadNewTask(null);
       chat.clearTaskChats();
     } else {
@@ -247,7 +235,7 @@ var task = (function() {
           if (util.isNotNull(team)) {
             login.setTeam(team);
           }
-          loadTask(ta);
+          mod.loadTask(ta);
         });
     }
   }
