@@ -728,184 +728,30 @@ var sched4 = (function() {
 
   /* EDIT MEETING DETAILS */
 
-  function enableEventEditSave(task, titleEdit, updateButton) {
-    if (titleEdit.val().length > 0 && reservedCalendarSlot(task)) {
-      updateButton.removeClass("disabled");
-    }
+  function saveAndReload(ta) {
+    spinner.spin(
+      "Updating calendar...",
+      api.postTask(ta).done(sched.loadTask)
+    );
   }
 
-  function updateCalendarEvent(param) {
-    var task = param.task;
-    var taskState = sched.getState(task);
-    param.updateButton.addClass("disabled");
-    taskState.calendar_event_title.custom = param.titleEdit.val();
-    taskState.public_notes = param.notesBoxPublic.val();
-    taskState.private_notes = param.notesBoxPrivate.val();
-    var async =
-      api.postTask(task).then(function() {
-        return api.updateCalendar(param.task.tid, {
-          event_id: sched.getState(task).reserved.google_event,
-          event_title: param.titleEdit.val(),
-          event_notes: {
-            public_notes: param.notesBoxPublic.val(),
-            private_notes: param.notesBoxPrivate.val()
-          }
-        })
-          .done(function() {
-            param.toggleEditMode();
-          });
-      });
-    spinner.spin("Updating calendar...", async);
-  }
-
-  function createEditMode(profs, task, summary, toggle) {
-    var view = $("<div id='meeting-edit' class='hide'/>");
-    var state = sched.getState(task);
-
-
-    var updateButton = $("<button id='event-edit-update' class='btn btn-primary'/>");
-    var cancelEditMode = $("<span class='cancel-edit-mode link'>Cancel</span>");
-
-    /* TITLE */
-    var title = $("<div class='meeting-detail-row'/>")
-      .appendTo(view);
-
-    var titleEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
-      .text("TITLE")
-      .appendTo(title);
-
-    var titleEditBox = $("<div class='meeting-detail'/>")
-      .appendTo(title);
-    var titleEdit = $("<input type='text' class='form-control'/>")
-      .val(sched.getCalendarTitle(state))
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(titleEditBox);
-
-    /* LOCATION */
-    var location = $("<div class='meeting-detail-row'/>")
-      .appendTo(view);
-
-    var locEditTitle = $("<div id='calendar-title' class='meeting-detail-label'/>")
-      .text("LOCATION")
-      .appendTo(location);
-
-    var locEditBox = $("<div class='meeting-detail'/>")
-      .appendTo(location);
-    var locEdit = $("<input type='text' class='form-control' disabled/>")
-      .val("COMING SOON")
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(locEditBox);
-
-    /* NOTES */
-    var notes = $("<div class='meeting-detail-row'/>")
-      .appendTo(view);
-
-    var notesEditTitle = $("<div class='meeting-detail-label'/>")
-      .text("NOTES")
-      .appendTo(notes);
-
-    var addPublicNotes = $("<span class='add-public-notes link'/>")
-      .text("Add notes");
-
-    var notesEditorPublic = $("<div class='notes-editor-public'/>");
-    var notesBoxPublic = $("<textarea class='notes-entry'></textarea>")
-      .val(state.public_notes)
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(notesEditorPublic);
-    var publicEye = $("<img class='viewable-by-eye'/>");
-    svg.loadImg(publicEye, "/assets/img/eye.svg");
-    var publicText = $("<span class='viewable-by-text'/>")
-      .text("ALL GUESTS");
-    var notesLabelPublic = $("<div class='viewable-by-label'/>")
-      .append(publicEye)
-      .append(publicText)
-      .appendTo(notesEditorPublic);
-
-    var hostName = profile.firstName(profs[login.leader()].prof);
-    var notesEditorPrivate = $("<div class='notes-editor-private'/>");
-    var notesBoxPrivate = $("<textarea class='notes-entry'></textarea>")
-      .val(state.private_notes)
-      .on("input", function() {
-        enableEventEditSave(task, titleEdit, updateButton)
-      })
-      .appendTo(notesEditorPrivate);
-    var privateEye = $("<img class='viewable-by-eye'/>");
-    svg.loadImg(privateEye, "/assets/img/eye.svg");
-    var privateText = $("<span class='viewable-by-text'/>")
-      .text(hostName.toUpperCase() + " ONLY");
-    var notesLabelPrivate = $("<div class='viewable-by-label'/>")
-      .append(privateEye)
-      .append(privateText)
-      .appendTo(notesEditorPrivate);
-
-    var addPrivateNotes = $("<span class='add-private-notes link'/>")
-      .text("Add private notes for " + hostName + " only")
-      .click(function() {
-        addPrivateNotes.addClass("hide");
-        notesEditorPrivate.removeClass("hide");
-      });
-
-    addPublicNotes.click(function() {
-      addPublicNotes.addClass("hide");
-      notesEditorPublic.removeClass("hide");
-      addPrivateNotes.removeClass("hide");
-    });
-
-    if ((notesBoxPublic.val() === "") && (notesBoxPrivate.val() === "")) {
-      notesEditorPublic.addClass("hide");
-      notesEditorPrivate.addClass("hide");
-      addPrivateNotes.addClass("hide");
-    } else if (notesBoxPrivate.val() === "") {
-      addPublicNotes.addClass("hide");
-      notesEditorPrivate.addClass("hide");
+  function saveReserved(ta, calOption, googleDescription, savedPlaceID) {
+    var schedState = sched.getState(ta);
+    schedState.reserved = calOption;
+    if (
+      util.isNotNull(calOption.slot)
+      && util.isNotNull(googleDescription)
+      && calOption.slot.location.title !== ""
+    ) {
+      places.saveNamedPlace(calOption, googleDescription, savedPlaceID)
+        .done(function() {
+          mp.track("Update reserved");
+          saveAndReload(ta);
+        });
     } else {
-      addPublicNotes.addClass("hide");
-      addPrivateNotes.addClass("hide");
+      mp.track("Update reserved");
+      saveAndReload(ta);
     }
-
-    var notesEditor = $("<div class='meeting-detail'/>")
-      .append(addPublicNotes)
-      .append(notesEditorPublic)
-      .append(notesEditorPrivate)
-      .append(addPrivateNotes)
-      .appendTo(notes);
-
-    function toggleEditMode() {
-      if (summary.hasClass("hide")) {
-        summary.removeClass("hide");
-        view.addClass("hide");
-      } else {
-        summary.addClass("hide");
-        view.removeClass("hide");
-      }
-    }
-
-    var editActions = $("<div id='edit-meeting-actions' class='clearfix'/>").appendTo(view);
-    updateButton
-      .addClass("disabled")
-      .text("Update calendar")
-      .click(function() {
-        updateCalendarEvent({
-          "task": task,
-          "titleEdit": titleEdit,
-          "notesBoxPublic": notesBoxPublic,
-          "notesBoxPrivate": notesBoxPrivate,
-          "updateButton": updateButton,
-          "toggleEditMode": toggle
-        })
-      })
-      .appendTo(editActions);
-    cancelEditMode
-      .click(toggleEditMode)
-      .appendTo(editActions);
-
-    return view;
   }
 
   function createReviewSection(profs, task) {
@@ -976,8 +822,20 @@ var sched4 = (function() {
 
     var tid = task.tid;
     var state = sched.getState(task);
-    var editMode = createEditMode(profs, task, summary)
-      .appendTo(content);
+
+    function save(calOption, action, desc, savedID) {
+      return saveReserved(task, calOption, desc, savedID);
+    }
+
+    var cancelEditMode =
+      $("<span class='cancel-edit-mode link'>Cancel</span>")
+        .click(toggleEditMode);
+    var addMode = false;
+    var editMode = editevent.create(profs, state.reserved,
+                                     save, cancelEditMode, addMode);
+    editMode = editMode.view;
+    editMode.appendTo(content);
+    editMode.addClass("hide");
 
     function toggleEditMode() {
       if (summary.hasClass("hide")) {
@@ -997,9 +855,6 @@ var sched4 = (function() {
       state.calendar_options = [];
       delete state.reserved;
     }
-
-    var editMode = createEditMode(profs, task, summary, toggleEditMode)
-      .appendTo(content);
 
     function rescheduleClick() {
       var async = api.cancelCalendar(tid).then(function() {

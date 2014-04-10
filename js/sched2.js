@@ -672,23 +672,7 @@ var sched2 = (function() {
       label: util.randomString(),
       slot: {}
     };
-    return editoption.create(profs, calOption, saveCalOption, cancel, addMode);
-  }
-
-  function saveNamedPlace(calOption, googleDescription, savedPlaceID) {
-    var loc = calOption.slot.location;
-    var edit = {
-      title: loc.title,
-      address: loc.address,
-      instructions: loc.instructions,
-      google_description: googleDescription,
-      geometry: loc.coord
-    };
-    if (util.isNotNull(savedPlaceID)) {
-      return api.postEditPlace(savedPlaceID, edit);
-    } else {
-      return api.postCreatePlace(googleDescription, edit);
-    }
+    return editevent.create(profs, calOption, saveCalOption, cancel, addMode);
   }
 
   function saveOption(ta, calOption, action, googleDescription, savedPlaceID) {
@@ -708,7 +692,7 @@ var sched2 = (function() {
       && util.isNotNull(googleDescription)
       && calOption.slot.location.title !== ""
     ) {
-      saveNamedPlace(calOption, googleDescription, savedPlaceID)
+      places.saveNamedPlace(calOption, googleDescription, savedPlaceID)
         .done(function() {
           mp.track("Save option");
           saveAndReload(ta, action);
@@ -807,7 +791,7 @@ var sched2 = (function() {
           .click(toggleEdit);
         var addMode = false;
         var edit =
-          editoption.create(profs, calOption, saveCalOption, cancel, addMode);
+          editevent.create(profs, calOption, saveCalOption, cancel, addMode);
         editableContainer.children().remove();
         editableContainer.append(edit.view);
 
