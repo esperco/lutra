@@ -123,7 +123,8 @@
           <img id="menu" class="svg" src="/assets/img/menu.svg">
         </a>
         <p id="home-title" class="nav-title unselectable">SCHEDULING</p>
-        <button id="new-task-btn-mobile" class="btn btn-primary">New Task</button>
+        <button id="new-task-btn-mobile"
+                class="new-task-btn btn btn-primary">New Task</button>
       </div>
       <div id="mobile-navbar-collapse" class="collapse navbar-collapse scrollable">
         <ul class="nav navbar-nav nav-pills nav-stacked">
@@ -278,7 +279,7 @@
             <img class="svg return-home" src="/assets/img/esper-mark.svg">
           </a>
           <div id="task-title-div" class="clearfix">
-            <input id="task-title" class="hide form-control ellipsis">
+            <div id="task-title" class="hide ellipsis"></div>
           </div>
         </div>
       </div>
@@ -304,10 +305,6 @@
             <div class="messages-tab-name">MESSAGES</div>
           </a>
         </div>
-      </div>
-
-      <div id="new-task" class="scrollable">
-        @@new-task.html@@
       </div>
 
       <div id="sched-task" class="scrollable hide">

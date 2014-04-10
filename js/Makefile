@@ -93,7 +93,7 @@ APP_SOURCES = \
   editevent.js \
   sched2.js \
   sched4.js \
-  sched_setup.js \
+  schedSetup.js \
   task.js \
   settings.js \
   places.js \
@@ -102,9 +102,11 @@ APP_SOURCES = \
   route.js \
   main.js
 
+# guest_ prefix indicates an alternate implementation.
+# For instance, guest_foo.js would provide an object named just 'foo'.
 GUESTAPP_SOURCES = \
   guest_api.js \
-  guest_task.js \
+  guestTask.js \
   guest_login.js \
   guest_main.js
 
