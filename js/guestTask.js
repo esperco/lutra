@@ -523,19 +523,20 @@ var guestTask = function() {
             }
           });
           taskView.append(participantListView)
+          var notes = state.reserved.slot.notes;
           var publicNotes = $("<div id='public-notes'/>")
-            .text(state.public_notes);
+            .text(notes.public_notes);
           var privateNotes = $("<div id='private-notes'/>")
-            .text(state.private_notes);
-          if (state.public_notes != "" || state.private_notes != "") {
+            .text(notes.private_notes);
+          if (notes.public_notes != "" || notes.private_notes != "") {
             taskView.append($("<div class='task-section-header'/>")
               .append(notesIcon)
               .append("<div class='task-section-text'>NOTES</div>"));
-            if (state.private_notes != "") {
-              taskView.append(privateNotes);
-            }
-            if (state.public_notes != "") {
+            if (notes.public_notes != "") {
               taskView.append(publicNotes);
+            }
+            if (notes.private_notes != "") {
+              taskView.append(privateNotes);
             }
           }
           taskView.append($("<div class='task-section-header'/>")

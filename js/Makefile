@@ -90,6 +90,7 @@ APP_SOURCES = \
   loceditor.js \
   locpicker.js \
   tzpicker.js \
+  editevent.js \
   sched2.js \
   sched4.js \
   schedSetup.js \
