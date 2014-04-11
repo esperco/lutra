@@ -174,7 +174,8 @@ var editevent = (function() {
     return meetingTypeSelector;
   }
 
-  function createCallerDropdown(ta, profs) {
+  function createCallerDropdown(ta, profs, slot) {
+    var currentCaller = slot.caller;
     var attendees = sched.getAttendingGuests(ta);
     attendees.unshift(login.leader());
     var options = list.map(attendees, function(uid) {
@@ -184,6 +185,7 @@ var editevent = (function() {
       return { label: name + " at " + phone, value: uid };
     });
     return select.create({
+      initialKey: slot.caller,
       options: options
     });
   }
@@ -299,7 +301,7 @@ var editevent = (function() {
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
 
-    var callerDropdown = createCallerDropdown(ta, profs);
+    var callerDropdown = createCallerDropdown(ta, profs, x);
     callerDropdownContainer.append(callerDropdown.view);
 
     /*** Meeting date and time, shown only once a timezone is set ***/

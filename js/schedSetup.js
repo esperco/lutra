@@ -416,8 +416,10 @@ var schedSetup = (function() {
         .append(chatHead)
         .append((nameView)
         .append(bridgeLink))
-        .append(email)
-        .append(phone);
+        .append(email);
+
+      if (util.isNotNull(prof.phones) && prof.phones.length > 0)
+        guestDetails.append(phone)
     }
 
     function cancelEdit() {
