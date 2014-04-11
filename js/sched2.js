@@ -241,7 +241,7 @@ var sched2 = (function() {
 
 /*** OFFER ***/
 
-  function emailViewOfOption(slot, i) {
+  function emailViewOfOption(slot, profs, i) {
 '''
 <div #view>
   <div #optionLetter
@@ -249,7 +249,7 @@ var sched2 = (function() {
     <span #letter/>
   </div>
   <div class="option-row">
-    {{sched.viewOfOption(slot).view}}
+    {{sched.viewOfOption(slot, profs).view}}
   </div>
 </div>
 '''
@@ -394,7 +394,7 @@ var sched2 = (function() {
     var readOnly = offerModal.messageReadOnly;
     readOnly.children().remove();
     list.iter(options, function(calOption, i) {
-      emailViewOfOption(calOption.slot, i)
+      emailViewOfOption(calOption.slot, profs, i)
         .appendTo(readOnly);
     });
     if (readOnly.hasClass("short")) {
@@ -667,12 +667,12 @@ var sched2 = (function() {
     return _view;
   }
 
-  function createMeetingOption(profs, saveCalOption, cancel, addMode) {
+  function createMeetingOption(ta, profs, saveCalOption, cancel, addMode) {
     var calOption = {
       label: util.randomString(),
       slot: {}
     };
-    return editevent.create(profs, calOption, saveCalOption, cancel, addMode);
+    return editevent.create(ta, profs, calOption, saveCalOption, cancel, addMode);
   }
 
   function saveOption(ta, calOption, action, googleDescription, savedPlaceID) {
@@ -713,7 +713,7 @@ var sched2 = (function() {
     saveAndReload(ta, "removing");
   }
 
-  function readOnlyViewOfOption(calOption, toggleEdit, remove) {
+  function readOnlyViewOfOption(calOption, profs, toggleEdit, remove) {
 '''
 <div #view
      class="option-row">
@@ -743,7 +743,7 @@ var sched2 = (function() {
         </li>
       </ul>
   </div>
-  {{sched.viewOfOption(calOption.slot).view}}
+  {{sched.viewOfOption(calOption.slot, profs).view}}
 </div>
 '''
     edit.click(toggleEdit);
@@ -791,7 +791,7 @@ var sched2 = (function() {
           .click(toggleEdit);
         var addMode = false;
         var edit =
-          editevent.create(profs, calOption, saveCalOption, cancel, addMode);
+          editevent.create(ta, profs, calOption, saveCalOption, cancel, addMode);
         editableContainer.children().remove();
         editableContainer.append(edit.view);
 
@@ -807,7 +807,7 @@ var sched2 = (function() {
     }
 
     letter.text(indexLabel(i));
-    readOnlyContainer.append(readOnlyViewOfOption(calOption,
+    readOnlyContainer.append(readOnlyViewOfOption(calOption, profs,
                                                   toggleEdit, removeOption));
 
     return view;
@@ -821,7 +821,7 @@ var sched2 = (function() {
 
     function createAdderForm(cancelAdd) {
       var addMode = true;
-      return createMeetingOption(profs, save, cancelAdd, addMode).view
+      return createMeetingOption(ta, profs, save, cancelAdd, addMode).view
                .addClass("add-row");
     }
 

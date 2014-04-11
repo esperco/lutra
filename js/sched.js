@@ -255,13 +255,19 @@ var sched = (function() {
     return _view;
   }
 
-  mod.viewOfOption = function(slot) {
+  mod.viewOfOption = function(slot, profs) {
 '''
 <td #view
     class="option-info">
   <div class="info-row">
     <div class="info-label">WHAT</div>
     <div #what
+         class="info"/>
+  </div>
+  <div #callerRow
+       class="info-row hide">
+    <div class="info-label">CALLER</div>
+    <div #caller
          class="info"/>
   </div>
   <div class="info-row">
@@ -302,6 +308,14 @@ var sched = (function() {
     notes.append(viewOfNotes(slot));
     if (notes.text() !== "")
       notesRow.removeClass("hide");
+
+    if (slot.meeting_type === "Call") {
+      var prof = profs[slot.caller].prof;
+      var name = profile.fullNameOrEmail(prof);
+      var phone = profile.phone(prof);
+      caller.text(name + " at " + phone);
+      callerRow.removeClass("hide");
+    }
 
     return _view;
   }

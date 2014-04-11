@@ -113,6 +113,14 @@ var profile = (function() {
     }
   };
 
+  mod.phone = function(prof) {
+    if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
+      return prof.phones[0].number;
+    } else {
+      return "Missing phone";
+    }
+  };
+
   mod.shortenName = function(s) {
     /* discard the domain in case it's an email address */
     var name = email.localpart(s);
