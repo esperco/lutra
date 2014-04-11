@@ -93,16 +93,8 @@ var editevent = (function() {
       displayTimezone(slot);
     }
     var timezoneText = form.timezoneText;
-    switch (slot.meeting_type) {
-    case "Call":
-      form.addPublicNotes
-        .text("Specify phone number and notes");
-      break;
-
-    default:
-      form.addPublicNotes
-        .text("Add notes");
-    }
+    form.addPublicNotes
+      .text("Add notes");
     timezoneText
       .tooltip("destroy")
       .tooltip({
@@ -126,6 +118,10 @@ var editevent = (function() {
       form.whereSection.removeClass("hide");
     else
       form.whereSection.addClass("hide");
+    if (slot.meeting_type === "Call")
+      form.callerSection.removeClass("hide");
+    else
+      form.callerSection.addClass("hide");
   }
 
   /*
@@ -178,7 +174,21 @@ var editevent = (function() {
     return meetingTypeSelector;
   }
 
-  mod.create = function(profs, calOption, saveCalOption, cancel, addMode) {
+  function createCallerDropdown(ta, profs) {
+    var attendees = sched.getAttendingGuests(ta);
+    attendees.unshift(login.leader());
+    var options = list.map(attendees, function(uid) {
+      var prof = profs[uid].prof;
+      var name = profile.fullNameOrEmail(prof);
+      var phone = profile.phone(prof);
+      return { label: name + " at " + phone, value: uid };
+    });
+    return select.create({
+      options: options
+    });
+  }
+
+  mod.create = function(ta, profs, calOption, saveCalOption, cancel, addMode) {
 '''
 <div #view
      class="edit-option-row">
@@ -192,6 +202,11 @@ var editevent = (function() {
                type="text"
                class="hide form-control custom-type-input"/>
       </div>
+    </div>
+    <div #callerSection
+         class="edit-info-row hide">
+      <div class="info-label caller-label-edit">CALLER</div>
+      <div #callerDropdownContainer class="info"></div>
     </div>
     <div class="edit-info-row">
       <div class="info-label when-label-edit">WHEN</div>
@@ -251,6 +266,8 @@ var editevent = (function() {
     </div>
     <div #editActions
          class="edit-option-actions clearfix">
+      <span #missingPhones
+            class="hide">Missing a phone number</span>
       <button #saveButton
               class="btn btn-primary save-to-cal disabled"/>
     </div>
@@ -281,6 +298,9 @@ var editevent = (function() {
       createMeetingTypeSelector(setMeetingType, meetingTypeInput, saveButton);
     meetingTypeContainer.append(meetingTypeSelector.view);
     meetingTypeSelector.set(x.meeting_type);
+
+    var callerDropdown = createCallerDropdown(ta, profs);
+    callerDropdownContainer.append(callerDropdown.view);
 
     /*** Meeting date and time, shown only once a timezone is set ***/
 
@@ -427,8 +447,10 @@ var editevent = (function() {
 
       var meetingType = getMeetingType();
       var loc;
+      var caller;
       if (meetingType === "Call") {
         loc = locationForm.getTimezoneLocation();
+        caller = callerDropdown.get();
       } else {
         loc = locationForm.getCompleteLocation();
         if (loc === null) loc = locationForm.getTimezoneLocation();
@@ -458,7 +480,8 @@ var editevent = (function() {
           start: dates.start,
           end: dates.end,
           duration: dates.duration,
-          notes: notes
+          notes: notes,
+          caller: caller
         };
         var newCalOption = {
           label: oldCalOption.label,
@@ -471,17 +494,43 @@ var editevent = (function() {
         return null;
     }
 
+    function hasPhone(uid) {
+      var prof = profs[uid].prof;
+      return util.isNotNull(prof.phones) && prof.phones.length > 0;
+    }
+
     function calOptionIsReady() {
       return util.isNotNull(getCalOption());
     }
 
+    function havePhonesForCall() {
+      var meetingType = getMeetingType();
+      var attendees = sched.getAttendingGuests(ta);
+      //attendees.unshift(login.leader());
+      return meetingType === "Call" ?
+        list.for_all(attendees, hasPhone) :
+        true;
+    }
+
     function updateSaveButton() {
-      if (calOptionIsReady()) {
-        saveButton.removeClass("disabled");
+      var optionReady = calOptionIsReady();
+      var havePhones = havePhonesForCall();
+      if (optionReady && havePhones) {
         dateAndTimes.removeClass("has-error");
-      } else {
+        missingPhones.addClass("hide");
+        saveButton.removeClass("disabled");
+      } else if (optionReady && !havePhones) {
+        dateAndTimes.removeClass("has-error");
+        missingPhones.removeClass("hide");
         saveButton.addClass("disabled");
+      } else if (!optionReady && havePhones) {
         dateAndTimes.addClass("has-error");
+        missingPhones.removeClass("hide");
+        saveButton.addClass("disabled");
+      } else {
+        dateAndTimes.addClass("has-error");
+        missingPhones.addClass("hide");
+        saveButton.addClass("disabled");
       }
     }
 

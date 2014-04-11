@@ -804,7 +804,7 @@ var sched4 = (function() {
             </li>
           </ul>
         </div>
-        {{sched.viewOfOption(sched.getState(task).reserved.slot).view}}
+        {{sched.viewOfOption(sched.getState(task).reserved.slot, profs).view}}
       </div>
     </div>
   </div>
@@ -831,7 +831,7 @@ var sched4 = (function() {
       $("<span class='cancel-edit-mode link'>Cancel</span>")
         .click(toggleEditMode);
     var addMode = false;
-    var editMode = editevent.create(profs, state.reserved,
+    var editMode = editevent.create(task, profs, state.reserved,
                                      save, cancelEditMode, addMode);
     editMode = editMode.view;
     editMode.appendTo(content);

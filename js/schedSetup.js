@@ -409,12 +409,15 @@ var schedSetup = (function() {
       });
       var email = $("<div class='guest-email'>")
         .append(profile.email(prof));
+      var phone = $("<div class='guest-phone'>")
+        .append(profile.phone(prof));
 
       guestDetails
         .append(chatHead)
         .append((nameView)
         .append(bridgeLink))
-        .append(email);
+        .append(email)
+        .append(phone);
     }
 
     function cancelEdit() {

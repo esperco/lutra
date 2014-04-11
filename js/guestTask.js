@@ -143,7 +143,31 @@ var guestTask = function() {
     }
   }
 
-  function viewOfTimeAndPlace(x) {
+  function phoneText(ta, profs, opts, slot) {
+    var me = login.me();
+    var caller = slot.caller;
+    if (caller === me) {
+      var org_for = ta.task_participants.organized_for;
+      var callees = list.filter_map(org_for, function(uid) {
+        var prof = profs[uid].prof;
+        if (uid !== me && sched.guestMayAttend(prof, opts)) {
+          var name = profile.fullNameOrEmail(prof);
+          var phone = profile.phone(prof);
+          return name + " at " + phone;
+        } else {
+          return null;
+        }
+      });
+      return "Call " + callees.join(" + ");
+    } else {
+      var prof = profs[caller].prof;
+      var name = profile.fullNameOrEmail(prof);
+      var phone = profile.phone(prof);
+      return name + " will call you from " + phone;
+    }
+  }
+
+  function viewOfTimeAndPlace(ta, profs, opts, x) {
     var view = $("<div id='time-and-place'/>");
 
     var meetingTime = $("<div id='meeting-time'/>")
@@ -180,6 +204,8 @@ var guestTask = function() {
     var locText = chat.locationText(x.location);
     if (locText) {
       loc.append(html.text(locText));
+    } else if (x.meeting_type === "Call") {
+      loc.append(phoneText(ta, profs, opts, x));
     } else {
       loc.append("Location TBD")
          .addClass("tbd")
@@ -443,7 +469,7 @@ var guestTask = function() {
       return slotView;
     }
 
-    function viewOfCalendarOption(choice, label) {
+    function viewOfCalendarOption(choice, profs, label) {
       var slotView = $("<tr class='option'/>");
       var select = $("<td class='option-select'/>")
         .appendTo(slotView);
@@ -479,7 +505,7 @@ var guestTask = function() {
         .text(label)
         .appendTo(select);
 
-      slotView.append(sched.viewOfOption(choice.slot).view);
+      slotView.append(sched.viewOfOption(choice.slot, profs).view);
 
       return slotView;
     }
@@ -508,13 +534,15 @@ var guestTask = function() {
           var guestsIcon = $("<img id='guests-icon'/>");
           var notesIcon = $("<img id='notes-icon'/>");
           var messagesIcon = $("<img id='messages-icon'/>");
+          var guestOptions = getGuestOptions(state);
+          var timeAndPlace =
+            viewOfTimeAndPlace(ta, profs, guestOptions, state.reserved.slot);
           taskView.append(calendarIcon(state.reserved.slot))
                   .append(viewOfMeetingHeader(task, ta, state))
-                  .append(viewOfTimeAndPlace(state.reserved.slot))
+                  .append(timeAndPlace)
                   .append($("<div class='task-section-header'/>")
                     .append(guestsIcon)
                     .append("<div class='task-section-text'>GUESTS</div>"));
-          var guestOptions = getGuestOptions(state);
           var participantListView = $("<div id='guests'/>");
           list.iter(ta.task_participants.organized_for, function(uid) {
             if (guestMayAttend(uid, guestOptions)) {
@@ -573,7 +601,7 @@ var guestTask = function() {
               answers[choice.label] = choice;
             }
             var label = indexLabel(i);
-            options.append(viewOfCalendarOption(choice, label))
+            options.append(viewOfCalendarOption(choice, profs, label))
           });
           if (! list.mem(task.guest_hosts, task.guest_uid)) {
             options.append(viewOfNoneWorks(state.calendar_options));
