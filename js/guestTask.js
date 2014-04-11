@@ -195,27 +195,32 @@ var guestTask = function() {
 
     var meetingLoc = $("<div id='meeting-location'/>")
       .appendTo(view);
-    var pin = $("<img id='pin'/>")
-        .appendTo(meetingLoc);
-    svg.loadImg(pin, "/assets/img/pin.svg");
-    var loc = $("<div id='loc'/>")
-      .appendTo(meetingLoc);
-
     var locText = chat.locationText(x.location);
-    if (locText) {
-      loc.append(html.text(locText));
-    } else if (x.meeting_type === "Call") {
-      loc.append(phoneText(ta, profs, opts, x));
-    } else {
-      loc.append("Location TBD")
-         .addClass("tbd")
-    }
 
-    loc.click(function() {
-      window.open(
-        "http://maps.google.com/?daddr=" + encodeURIComponent(locText)
-      );
-    });
+    if (locText) {
+      var pin = $("<img/>")
+          .appendTo(meetingLoc);
+      svg.loadImg(pin, "/assets/img/pin.svg");
+      var loc = $("<div id='loc'/>")
+        .appendTo(meetingLoc);
+      loc.append(html.text(locText));
+      loc.click(function() {
+        window.open(
+          "http://maps.google.com/?daddr=" + encodeURIComponent(locText)
+        );
+      });
+    } else if (x.meeting_type === "Call") {
+      var phone = $("<img class='phone-icon'/>")
+        .appendTo(meetingLoc);
+      svg.loadImg(phone, "/assets/img/phone.svg");
+      var where = $("<div id='loc'/>")
+        .appendTo(meetingLoc);
+      where.append(phoneText(ta, profs, opts, x));
+    } else {
+      $("<div/>")
+        .append("Location TBD")
+        .addClass("tbd")
+    }
 
     return view;
   }
