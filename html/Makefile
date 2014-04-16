@@ -14,7 +14,6 @@ HTML_INCLUDES = \
   messages-tab.html \
   sched-task-list.html \
   places.html \
->>>>>>> 863bf9307b6bcfa4bd8f300acc16303531e5e2bf
   settings.html \
   email-verify.html
 
