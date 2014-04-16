@@ -799,6 +799,80 @@ hr {
 
 .chat-actions { margin-top: 6px; }
 
+.option-list {
+  padding-left: 28px;
+  padding-right: 20px;
+  list-style: none;
+}
+
+.option {
+  margin-top: 10px;
+}
+
+.option-radio {
+  margin-top: 7px;
+  margin-left: -28px;
+  height: 18px;
+  width: 18px;
+  background: white;
+  border-radius: 9px;
+  border: 1px solid @gray_20;
+  float: left;
+}
+
+.option-delete {
+  float: right;
+  margin-top: -23px;
+  margin-right: -20px;
+  &:hover { cursor: pointer;
+    path { fill: @gray_40; }
+  }
+}
+
+.add-option-radio {
+  border: 1px solid @gray_10;
+}
+
+.add-option-btn {
+  height: 32px;
+  width: 100%;
+  padding-top: 3px;
+  padding-left: 12px;
+  text-align: left;
+  font-size: 14px;
+  color: @gray_40;
+  border: 1px solid @gray_10;
+  background: white;
+  border-radius: 3px;
+  &:hover {
+    color: @gray_60;
+    border: 1px solid @gray_20;
+    cursor: pointer;
+  }
+}
+
+.offer-choices {
+  &:hover { cursor: pointer;
+    path.checkbox { stroke: @gray_40; }
+  }
+}
+
+.offer-choices-checkbox {
+  float: left;
+  margin-top: 5px;
+  height: 18px;
+  width: 18px;
+}
+
+.offer-choices-label {
+  float: left;
+  margin-top: 5px;
+  margin-left: 5px;
+  font-size: 14px;
+  color: @gray_60;
+  cursor: pointer;
+}
+
 .chat-send { padding-right: 10px; }
 
 .chat-send-btn {
