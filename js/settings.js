@@ -65,8 +65,12 @@ var settings = (function() {
     var lastName = $("#settings-exec-last-name").val();
     var pseudo = $("#settings-exec-pseudonym").val();
     var firstLast = null;
-    if (firstName != "" && lastName != "")
-      firstLast = [firstName, lastName];
+    if (firstName != "" && lastName != "") {
+      firstLast = {
+        first: firstName,
+        last: lastName
+      };
+    }
 
     var phoneNumber = $("#settings-exec-phone").val();
     var phones = phoneNumber !== "" ? [{number: phoneNumber}] : null;
@@ -74,7 +78,7 @@ var settings = (function() {
     var profileEdit = {
       profile_uid: execProfile.profile_uid,
       prefix: prefix,
-      first_last: firstLast,
+      first_last_name: firstLast,
       pseudonym: (pseudo != "" ? pseudo : null),
       gender: execProfile.gender,
       phones: phones
@@ -114,9 +118,9 @@ var settings = (function() {
         var pseudonym = "";
         var modalCirc = $("#settings-modal-circ");
         var modalTitle = $("#exec-settings-title");
-        if (execProf.first_last) {
-          firstName = execProf.first_last[0];
-          lastName = execProf.first_last[1];
+        if (execProf.first_last_name) {
+          firstName = execProf.first_last_name.first;
+          lastName = execProf.first_last_name.last;
           if (execProf.pseudonym) {
             pseudonym = execProf.pseudonym;
             modalCirc.text(pseudonym[0].toUpperCase());
@@ -189,8 +193,8 @@ var settings = (function() {
     var firstLast = "";
     var pseudonym = "";
     var profCirc = $("<div class='settings-prof-circ'/>");
-    if (prof.first_last) {
-      firstLast = prof.first_last[0] + " " + prof.first_last[1];
+    if (prof.first_last_name) {
+      firstLast = prof.first_last_name.first + " " + prof.first_last_name.last;
       if (prof.pseudonym) {
         pseudonym = prof.pseudonym;
         profCirc.text(pseudonym[0].toUpperCase());
@@ -385,10 +389,10 @@ var settings = (function() {
       api.getEmails(eaUID, teamid).done(function(eaEmails) {
         asstNamePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
-        if (eaProf.first_last) {
-          var firstName = eaProf.first_last[0];
+        if (eaProf.first_last_name) {
+          var firstName = eaProf.first_last_name.first;
           $("#settings-first-name").val(firstName);
-          $("#settings-last-name").val(eaProf.first_last[1]);
+          $("#settings-last-name").val(eaProf.first_last_name.last);
           if (eaProf.pseudonym) {
             // This shouldn't happen...
             $("#settings-profile-circ").text(eaProf.pseudonym[0].toUpperCase());
@@ -440,12 +444,15 @@ var settings = (function() {
     var prefix = asstNamePrefixSel.get();
     var firstName = $("#settings-first-name").val();
     var lastName = $("#settings-last-name").val();
-    var firstLast = [firstName, lastName];
+    var firstLast = {
+      first: firstName,
+      last: lastName
+    };
 
     var profileEdit = {
       profile_uid: asstProfile.profile_uid,
       prefix: prefix,
-      first_last: firstLast,
+      first_last_name: firstLast,
       pseudonym: asstProfile.pseudonym,
       gender: asstProfile.gender
     };

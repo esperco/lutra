@@ -160,11 +160,11 @@ var profile = (function() {
   };
 
   mod.maybeFullName = function(prof) {
-    if (util.isNotNull(prof.first_last)) {
+    if (util.isNotNull(prof.first_last_name)) {
       if (util.isNotNull(prof.pseudonym) && !email.validate(prof.pseudonym)) {
         return prof.pseudonym;
       } else {
-        return prof.first_last[0] + " " + prof.first_last[1];
+        return prof.first_last_name.first + " " + prof.first_last_name.last;
       }
     } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
@@ -184,8 +184,8 @@ var profile = (function() {
   };
 
   mod.firstName = function(prof) {
-    if (util.isNotNull(prof.first_last)) {
-      return prof.first_last[0];
+    if (util.isNotNull(prof.first_last_name)) {
+      return prof.first_last_name.first;
     } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
     } else {
