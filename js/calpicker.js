@@ -284,16 +284,24 @@ var calpicker = (function() {
   function setupDatePickers(picker) {
     var r = picker.datesRef;
     r.watch(function(dates, isValid) {
-      if (isValid) {
+      //if (isValid) {
         var startDate = startDateOfDates(dates);
+        var endDate = endDateOfDates(dates);
         picker.datePickerStart.datepicker("setDate", startDate);
-      }
+        picker.datePickerEnd.datepicker("setDate", endDate);
+      //}
     }, dateWatcherId + "-start");
     r.watch(function(dates, isValid) {
-      if (isValid) {
-        var endDate = endDateOfDates(dates);
-        picker.datePickerEnd.datepicker("setDate", endDate);
-      }
+      //if (isValid) {
+        //var endDate = endDateOfDates(dates);
+        var startDate = startDateOfDates(dates);
+        picker.datePickerEnd.datepicker("setDate", startDate);
+        dates.end.setUTCHours(dates.start.getUTCHours());
+        dates.end.setUTCMinutes(dates.start.getUTCMinutes());
+        dates.end.setUTCSeconds(dates.start.getUTCSeconds());
+        dates.end.setUTCMilliseconds(dates.start.getUTCMilliseconds());
+        r.set(dates, [dateWatcherId + "-end"]);
+      //}
     }, dateWatcherId + "-end");
     createDatePicker(picker, picker.datePickerStart, "start");
     createDatePicker(picker, picker.datePickerEnd, "end");
