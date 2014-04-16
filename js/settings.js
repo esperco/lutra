@@ -539,7 +539,8 @@ var settings = (function() {
   }
 
   function displayTemplates() {
-    api.getUserTemplates().done(function(templates) {
+    api.getUserTemplates().done(function(x) {
+      var templates = x.canned_messages;
       $("#edit-options-approval").off("click");
       $("#edit-options-approval").on("click", function() {
         showOptionsTags();
