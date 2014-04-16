@@ -47,6 +47,8 @@ var calpicker = (function() {
   /* Export dates for outside use */
   function getDates(picker) {
     var r = picker.datesRef;
+    log("r.get() returns:", r.get());
+    log("r.getValidOrNothing() returns:", r.getValidOrNothing());
     var dates = r.getValidOrNothing();
     if (util.isNotNull(dates)) {
       var start = dates.start;
@@ -283,26 +285,27 @@ var calpicker = (function() {
 
   function setupDatePickers(picker) {
     var r = picker.datesRef;
+
+    // Fires when the END date is selected
     r.watch(function(dates, isValid) {
-      //if (isValid) {
-        var startDate = startDateOfDates(dates);
-        var endDate = endDateOfDates(dates);
-        picker.datePickerStart.datepicker("setDate", startDate);
-        picker.datePickerEnd.datepicker("setDate", endDate);
-      //}
+      var startDate = startDateOfDates(dates);
+      var endDate = endDateOfDates(dates);
+      picker.datePickerStart.datepicker("setDate", startDate);
+      picker.datePickerEnd.datepicker("setDate", endDate);
     }, dateWatcherId + "-start");
+
+    // Fires when the START date is selected
     r.watch(function(dates, isValid) {
-      //if (isValid) {
-        //var endDate = endDateOfDates(dates);
-        var startDate = startDateOfDates(dates);
-        picker.datePickerEnd.datepicker("setDate", startDate);
-        dates.end.setUTCHours(dates.start.getUTCHours());
-        dates.end.setUTCMinutes(dates.start.getUTCMinutes());
-        dates.end.setUTCSeconds(dates.start.getUTCSeconds());
-        dates.end.setUTCMilliseconds(dates.start.getUTCMilliseconds());
-        r.set(dates, [dateWatcherId + "-end"]);
-      //}
+      var startDate = startDateOfDates(dates);
+      picker.datePickerEnd.datepicker("setDate", startDate);
+      var oldEnd = dates.end;
+      dates.end = date.copy(dates.start);
+      dates.end.setUTCHours(oldEnd.getUTCHours());
+      dates.end.setUTCMinutes(oldEnd.getUTCMinutes());
+      r.updateValidity();
+      //r.set(dates, [dateWatcherId + "-start", dateWatcherId + "-end"]);
     }, dateWatcherId + "-end");
+
     createDatePicker(picker, picker.datePickerStart, "start");
     createDatePicker(picker, picker.datePickerEnd, "end");
     picker.datePickerContainer.removeClass("hide");

@@ -527,7 +527,7 @@ var editevent = (function() {
         saveButton.addClass("disabled");
       } else if (!optionReady && havePhones) {
         dateAndTimes.addClass("has-error");
-        missingPhones.removeClass("hide");
+        missingPhones.addClass("hide");
         saveButton.addClass("disabled");
       } else {
         dateAndTimes.addClass("has-error");
