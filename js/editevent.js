@@ -185,7 +185,7 @@ var editevent = (function() {
       return { label: name + " at " + phone, value: uid };
     });
     return select.create({
-      initialKey: slot.caller,
+      initialKey: currentCaller,
       options: options
     });
   }

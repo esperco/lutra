@@ -146,6 +146,7 @@ var guestTask = function() {
   function phoneText(ta, profs, opts, slot) {
     var me = login.me();
     var caller = slot.caller;
+
     if (caller === me) {
       var org_for = ta.task_participants.organized_for;
       var callees = list.filter_map(org_for, function(uid) {
@@ -159,11 +160,14 @@ var guestTask = function() {
         }
       });
       return "Call " + callees.join(" + ");
-    } else {
+    } else if (util.isNotNull(caller)) {
       var prof = profs[caller].prof;
       var name = profile.fullNameOrEmail(prof);
       var phone = profile.phone(prof);
       return name + " will call you from " + phone;
+    } else {
+      // We don't know who the caller is
+      return "See phone numbers below";
     }
   }
 
