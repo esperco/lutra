@@ -93,87 +93,33 @@ var sched = (function() {
       return list.mem(x.to, uid)
           && variant.cons(x.chat_item_data) === chatKind;
     });
-  }
+  };
+
+  mod.getTimezone = function(slot) {
+    var tz = slot.timezone;
+    if (! util.isNonEmptyString(tz) && util.isDefined(slot.location))
+      tz = slot.location.timezone;
+    return tz;
+  };
 
   /******************************************/
 
-  mod.locationText = function(loc) {
-    if (loc.address) {
-      if (loc.instructions)
-        return loc.address + " (" + loc.instructions + ")";
-      else
-        return loc.address;
-    }
-    else if (loc.title)
-      return loc.title;
-    else if (loc.instructions)
-      return loc.instructions;
-    else
+  function viewOfNotes(slot) {
+'''
+<div #view>
+  <div #publicNotes/>
+  <div #privateNotes/>
+</div>
+'''
+    var notes = util.isDefined(slot.notes) ?
+      slot.notes
+      : { public_notes: "", private_notes: "" };
+    publicNotes.text(notes.public_notes);
+    privateNotes.text(notes.private_notes);
+    if (publicNotes.text() === "" && privateNotes.text() === "") {
       return "";
-  }
-
-  mod.viewOfSuggestion = function(x, score) {
-    var view = $("<div class='sug-details'/>");
-
-    var t1 = date.ofString(x.start);
-    var t2 = date.ofString(x.end);
-
-    var row1 = $("<div class='day-text'/>")
-      .text(date.weekDay(t1) + " ")
-      .appendTo(view);
-
-    if (score >= 0.75) {
-      $("<span style='color:#ff0'/>")
-        .addClass("glyphicon glyphicon-star")
-        .appendTo(row1);
-    }
-
-    var row2 = $("<div class='date-text'/>")
-      .text(date.dateOnly(t1))
-      .appendTo(view);
-
-    var fromTime = wordify(date.timeOnly(t1));
-    var toTime = wordify(date.timeOnly(t2));
-
-    var row3 = $("<div class='time-text'/>")
-      .append(html.text("from "))
-      .append($("<b>").text(fromTime))
-      .append(html.text(" to "))
-      .append($("<b>").text(toTime))
-      .appendTo(view);
-
-    var row4 = $("<div class='time-text-short hide'/>")
-      .append(html.text("at "))
-      .append($("<b>").text(date.timeOnly(t1)))
-      .appendTo(view);
-
-    var locText = mod.locationText(x.location);
-    var locDiv = $("<div class='loc-text'/>");
-    var pin = $("<img class='pin'/>");
-      pin.appendTo(locDiv);
-    svg.loadImg(pin, "/assets/img/pin.svg");
-    if (locText) {
-      locDiv.append(html.text(locText))
-            .appendTo(view);
     } else {
-      locDiv.append("Location TBD")
-            .addClass("tbd")
-            .appendTo(view);
-    }
-
-    return view;
-  }
-
-  /*
-    Get meeting type for a confirmed event and perform some translation
-    for display purposes.
-   */
-  mod.formatMeetingType = function(slot) {
-    var typ = slot.meeting_type;
-    switch (typ) {
-    case "Call":      return "Phone Call";
-    case "Nightlife": return "Night Life";
-    default:          return typ;
+      return view;
     }
   }
 
@@ -182,24 +128,34 @@ var sched = (function() {
       + x.location.coord.lat + "," + x.location.coord.lon;
   }
 
-  function viewOfLocationOnly(x) {
-    var view = $("<div id='address'/>");
+  mod.locationText = function(loc) {
+    var instrSuffix = util.isNonEmptyString(loc.instructions) ?
+      " (" + loc.instructions + ")" : "";
 
+    if (util.isNonEmptyString(loc.address))
+      return loc.address + instrSuffix;
+    else if (util.isNonEmptyString(loc.title))
+      return loc.title + instrSuffix;
+    else if (util.isNonEmptyString(loc.timezone))
+      return "Time Zone: " + timezone.format(loc.timezone) + instrSuffix;
+    else if (util.isNonEmptyString(loc.instructions))
+      return instructions;
+    else
+      return "";
+  }
+
+  function viewOfAddress(x) {
     var locText = chat.locationText(x.location);
     if (locText) {
-      view.append(html.text(locText));
+      return $("<span>" + locText + "</span>")
+        .click(function() {
+          // window.open(getDirections(x));
+          window.open("http://www.google.com/maps/search/"
+                      + encodeURIComponent(locText));
+        })
     } else {
-      view.append("TBD")
-          .addClass("tbd")
+      return $("<div class='tbd'>TBD</div>");
     }
-
-    view.click(function() {
-      // window.open(getDirections(x));
-      window.open("http://www.google.com/maps/search/"
-                  + encodeURIComponent(locText));
-    });
-
-    return view;
   }
 
   function wordify(time) {
@@ -212,117 +168,171 @@ var sched = (function() {
     }
   }
 
-  function viewOfTimeOnly(x) {
-    var view = $("<div/>");
-    var time1 = $("<div/>")
-      .appendTo(view);
-    var time2 = $("<div class='start-end'/>")
-      .appendTo(view);
+  function formatDates(x) {
+    return mod.viewOfDates(date.ofString(x.start),
+                           date.ofString(x.end),
+                           mod.getTimezone(x));
+  }
 
-    var t1 = date.ofString(x.start);
+  /* Render a range of two javascript Dates as text */
+  mod.viewOfDates = function(date1, date2, tz) {
+'''
+<div #view>
+  <div #time1/>
+  <div #time2>
+    <span #at
+          class="time-at hide"> at </span>
+    <span #start
+          class="bold"/>
+    <span #to
+          class="time-to"> to </span>
+    <span #end
+          class="time-end bold"/>
+    <div #timezoneElt
+          class="timezone-text"/>
+  </div>
+</div>
+'''
     time1
-      .append(date.weekDay(t1) + ", ")
-      .append(date.dateOnly(t1))
+      .append(date.weekDay(date1).substring(0,3) + ", ")
+      .append(date.dateOnlyWithoutYear(date1));
 
-    var fromTime = wordify(date.timeOnly(t1));
-    if (util.isNotNull(x.end)) {
-      var toTime = wordify(date.timeOnly(date.ofString(x.end)));
-      time2.append(fromTime + " to " + toTime);
+    start.text(wordify(date.timeOnly(date1)));
+    if (util.isNotNull(date2)) {
+      end.text(wordify(date.timeOnly(date2)));
     } else {
-      time2.append("at " + fromTime);
+      at.removeClass("hide");
+      to.addClass("hide");
     }
+    timezoneElt.text(timezone.format(tz, date1));
 
     return view;
-  }
+  };
 
-  mod.viewOfOption = function(option, typ) {
-    var view = $("<td class='option-info'/>");
+  mod.showLocation = function(meetingType) {
+    switch (meetingType) {
+    case "Call":
+      return false;
+    default:
+      return true;
+    }
+  };
 
-    var what = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whatLabel = $("<div class='info-label'/>")
-      .text("WHAT")
-      .appendTo(what);
-    var meetingType = $("<div class='info'/>")
-      .text(typ)
-      .appendTo(what);
-
-    var when = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whenLabel = $("<div class='info-label'/>")
-      .text("WHEN")
-      .appendTo(when);
-    var time = viewOfTimeOnly(option.slot)
-      .addClass("info")
-      .appendTo(when);
-
-    var where = $("<div class='info-row'/>")
-      .appendTo(view);
-    var whereLabel = $("<div class='info-label'/>")
-      .text("WHERE")
-      .appendTo(where);
-    var loc = viewOfLocationOnly(option.slot)
-      .addClass("info link")
-      .appendTo(where);
-
-    var notes = $("<div class='info-row hide'/>")
-      .appendTo(view);
-    var notesLabel = $("<div class='info-label'/>")
-      .text("NOTES")
-      .appendTo(notes);
-    var notesText = $("<div class='info'/>")
-      .appendTo(notes);
-    if (notesText.text() != "") {
-      notes.removeClass("hide");
+  mod.summaryOfOption = function(slot, showLoc) {
+'''
+<div #view>
+  <div class="info-row">
+    <div #what
+         class="summary-type"/>
+  </div>
+  <div class="info-row">
+    <div #when/>
+  </div>
+  <div #whereRow
+       class="info-row">
+    <div #pinContainer/>
+    <div #whereName
+         class="bold hide"/>
+    <div #whereAddress
+         class="link"/>
+  </div>
+</div>
+'''
+    what.text(slot.meeting_type.toUpperCase());
+    when.append(formatDates(slot));
+    if (showLoc && mod.showLocation(slot.meeting_type)) {
+      var pin = $("<img class='pin'/>");
+        pin.appendTo(pinContainer);
+      svg.loadImg(pin, "/assets/img/pin.svg");
+      whereName.text(slot.location.title);
+      if (whereName !== "")
+        whereName.removeClass("hide");
+      whereAddress.append(viewOfAddress(slot));
+    } else {
+      whereRow.addClass("hide");
     }
 
-    return view;
+    return _view;
   }
 
-  var tabHighlighter =
-    show.create({
-      "sched-progress-tab1": {ids: ["sched-progress-tab1"]},
-      "sched-progress-tab2": {ids: ["sched-progress-tab2"]},
-      "sched-progress-tab3": {ids: ["sched-progress-tab3"]},
-      "sched-progress-tab4": {ids: ["sched-progress-tab4"]}
-    },
-    { onClass: "sched-tab-highlight", offClass: "" }
-    );
+  mod.viewOfOption = function(slot, profs) {
+'''
+<td #view
+    class="option-info">
+  <div class="info-row">
+    <div class="info-label">WHAT</div>
+    <div #what
+         class="info"/>
+  </div>
+  <div #callerRow
+       class="info-row hide">
+    <div class="info-label">CALLER</div>
+    <div #caller
+         class="info"/>
+  </div>
+  <div class="info-row">
+    <div class="info-label">WHEN</div>
+    <div #when
+         class="info"/>
+  </div>
+  <div #whereRow
+       class="info-row">
+    <div class="info-label">WHERE</div>
+    <div #where
+         class="info">
+      <div #whereName
+           class="bold hide"/>
+      <div #whereAddress
+           class="link"/>
+    </div>
+  </div>
+  <div #notesRow
+       class="info-row hide">
+    <div class="info-label">NOTES</div>
+    <div #notes
+         class="info"/>
+  </div>
+</td>
+'''
+    what.text(slot.meeting_type);
+    when.append(formatDates(slot));
+    if (mod.showLocation(slot.meeting_type)) {
+      whereName.text(slot.location.title);
+      if (whereName.text() !== "")
+        whereName.removeClass("hide");
+      whereAddress.append(viewOfAddress(slot));
+    }
+    else
+      whereRow.addClass("hide");
+
+    notes.append(viewOfNotes(slot));
+    if (notes.text() !== "")
+      notesRow.removeClass("hide");
+
+    if (slot.meeting_type === "Call") {
+      var prof = profs[slot.caller].prof;
+      var name = profile.fullNameOrEmail(prof);
+      var phone = profile.phone(prof);
+      caller.text(name + " at " + phone);
+      callerRow.removeClass("hide");
+    }
+
+    return _view;
+  }
 
   var tabSelector = show.create({
-    "sched-step1-tab": {ids: ["sched-step1-tab"]},
     "sched-step2-tab": {ids: ["sched-step2-tab"]},
-    "sched-step3-tab": {ids: ["sched-step3-tab"]},
-    "sched-step4-tab": {ids: ["sched-step4-tab"]}
+    "sched-step4-tab": {ids: ["sched-step4-tab"]},
+    "messages-tab": {ids: ["messages-tab"]},
+    "setup-tab": {ids: ["setup-tab"]}
   });
 
-  function loadStep1(profs, task) {
-    var view = $("#sched-step1-content");
+  function loadStep2(profs, task) {
+    var view = $("#sched-step2-table");
     view.children().remove();
 
-    sched1.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab1");
-    tabSelector.show("sched-step1-tab");
-  };
-
-  function loadStep2(tzList, profs, task) {
-    var view = $("#sched-step2-tab");
-
-    sched2.load(tzList, profs, task);
-
-    tabHighlighter.show("sched-progress-tab2");
+    sched2.load(profs, task, view);
     tabSelector.show("sched-step2-tab");
-  };
-
-  function loadStep3(profs, task) {
-    var view = $("#sched-step3-table");
-    view.children().remove();
-
-    sched3.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab3");
-    tabSelector.show("sched-step3-tab");
   };
 
   function loadStep4(profs, task) {
@@ -330,46 +340,64 @@ var sched = (function() {
     view.children().remove();
 
     sched4.load(profs, task, view);
-
-    tabHighlighter.show("sched-progress-tab4");
     tabSelector.show("sched-step4-tab");
   };
 
-  function setup_step_buttons(tzList, ta) {
-    $(".sched-go-step1")
-      .unbind('click')
+  function loadMessages(task) {
+    chat.loadTaskChats(task);
+    tabSelector.show("messages-tab");
+    $(".chat-entry").focus();
+  };
+
+  function loadSetup(profs, task) {
+    var view = $("#setup-table");
+    view.children().remove();
+
+    schedSetup.load(profs, task, view);
+    tabSelector.show("setup-tab");
+  };
+
+  function highlight(tab) {
+    $("." + tab + "-tab-select").addClass("active");
+    if (tab === "setup") {
+      $(".setup-tab-select").removeClass("disabled");
+      $(".coordination-tab-select").removeClass("active");
+      $(".messages-tab-select").removeClass("active");
+    } else if (tab === "coordination") {
+      $(".setup-tab-select").removeClass("active");
+      $(".coordination-tab-select").removeClass("disabled");
+      $(".messages-tab-select").removeClass("active");
+    } else if (tab === "messages") {
+      $(".setup-tab-select").removeClass("active");
+      $(".coordination-tab-select").removeClass("active");
+      $(".messages-tab-select").removeClass("disabled");
+    }
+  }
+
+  function setup_step_buttons(ta, prog) {
+    $(".coordination-tab-select")
+      .off("click")
       .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep1(profs, ta);
-        });
+        if (ta.task_status.task_progress !== "Confirmed") {
+          ta.task_status.task_progress = "Coordinating";
+          prog = "Coordinate";
+        }
+        sched.loadTask(ta);
+        highlight("coordination");
       });
-    $(".sched-go-step2")
-      .attr('disabled', getGuests(ta) <= 0)
-      .unbind('click')
+    $(".messages-tab-select")
+      .off("click")
       .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep2(tzList, profs, ta);
-        });
+        loadMessages(ta);
+        highlight("messages");
       });
-    $(".sched-go-step3")
-      .attr('disabled', mod.getState(ta).calendar_options.length <= 0)
-      .unbind('click')
+    $(".setup-tab-select")
+      .off("click")
       .click(function() {
-        observable.onSchedulingStepChanging.notify();
         profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep3(profs, ta);
+          loadSetup(profs, ta);
         });
-      });
-    $(".sched-go-step4")
-      .attr('disabled', ! mod.getState(ta).reserved)
-      .unbind('click')
-      .click(function() {
-        observable.onSchedulingStepChanging.notify();
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadStep4(profs, ta);
-        });
+        highlight("setup");
       });
   }
 
@@ -377,30 +405,31 @@ var sched = (function() {
     var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
-    api.getTimezones()
-      .done(function(x) {
-        var tzList = x.timezones;
-        setup_step_buttons(tzList, ta);
-        profile.profilesOfTaskParticipants(ta)
-          .done(function(profs) {
-            switch (progress) {
-            case "Guest_list":
-              loadStep1(profs, ta);
-              break;
-            case "Find_availability":
-              loadStep2(tzList, profs, ta);
-              break;
-            case "Coordinate":
-              loadStep3(profs, ta);
-              break;
-            case "Confirm":
-              loadStep4(profs, ta);
-              break;
-            default:
-              log("Unknown scheduling stage: " + progress);
-            }
-            util.focus();
-          });
+    setup_step_buttons(ta, progress);
+    profile.profilesOfTaskParticipants(ta)
+      .done(function(profs) {
+        switch (progress) {
+        case "Guest_list":
+          highlight("setup");
+          loadSetup(profs, ta);
+          break;
+        case "Find_availability":
+          // Interpreted as Coordinate until case is removed from type
+          highlight("coordination");
+          loadStep2(profs, ta);
+          break;
+        case "Coordinate":
+          highlight("coordination");
+          loadStep2(profs, ta);
+          break;
+        case "Confirm":
+          highlight("coordination");
+          loadStep4(profs, ta);
+          break;
+        default:
+          log("Unknown scheduling stage: " + progress);
+        }
+        util.focus();
       });
   };
 

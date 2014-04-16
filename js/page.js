@@ -272,10 +272,10 @@ var page = (function() {
     util.focus();
   };
 
-  mod.task.load = function(optTid) {
+  mod.task.load = function(tid) {
     pageSelector.hideAll();
     goto_page("task");
-    task.load(optTid);
+    task.load(tid);
     display.updateTask();
     util.focus();
   };

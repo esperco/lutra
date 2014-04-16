@@ -1,6 +1,9 @@
 #! /bin/sh
 set -e
 
+echo "INSTALL mink ($*)"
+TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
+
 case "$1" in
     "prod"|"dev")
         mode=$1
@@ -28,7 +31,6 @@ cp $libs/animate.min.css pub/css
 cp $libs/font-awesome.css pub/css
 cp $libs/fullcalendar/fullcalendar/fullcalendar.css pub/css
 cp $libs/fullcalendar/fullcalendar/fullcalendar.print.css pub/css
-cp $libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css pub/css
 
 ### Build our own code and copy the result into the pub directory
 make -C js $mode-install
@@ -37,3 +39,14 @@ cp html/*.html pub/html
 cp ejs/*.ejs pub/ejs
 cp fonts/* pub/fonts
 cp img/* pub/img
+
+### Log info about this installation
+if commit=$(git log -1 2>/dev/null); then
+    echo "\
+Latest commit of the current branch of the local git repository:
+$commit"
+else
+    echo "Missing git info"
+fi
+
+echo "Installation complete."

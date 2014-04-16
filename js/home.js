@@ -5,18 +5,17 @@
 var home = (function() {
   var mod = {};
 
-  var reStatusTime = /<esper:time>([^<>]+)<\/esper:time>/gi;
   function taskStatus(ta) {
-    return ta.task_status_text.replace(reStatusTime,
-      function(orgMatch, timeStr) {
-        try {
-          var time = date.ofString(timeStr);
-          return date.viewTimeAgo(time).text()
-               + " at " + date.utcToLocalTimeOnly(time);
-        } catch(e) {
-          return orgMatch;
-        }
-      });
+    var time = date.ofString(ta.task_status_text.status_timestamp);
+    var statusEvent = $("<span/>")
+      .text(ta.task_status_text.status_event + " ");
+    var statusTimeAgo = date.viewTimeAgo(time);
+    var statusTime = $("<span/>")
+      .text(" at " + date.utcToLocalTimeOnly(time));
+    return $("<div/>")
+      .append(statusEvent)
+      .append(statusTimeAgo)
+      .append(statusTime);
   }
 
   function taskSubject(ta) {
@@ -259,7 +258,7 @@ var home = (function() {
   }
 
   function classOfActiveTask(task) {
-    if ("Scheduling" === variant.cons(task.task_data)) {
+    if ("Scheduling" === task.task_kind) {
       return "Confirmed" === task.task_status.task_progress
           || "Closed"    === task.task_status.task_progress
            ? "completed-scheduling-task"
@@ -412,9 +411,12 @@ var home = (function() {
 
   function loadMeetings() {
     $("#tasks").children().remove();
-    deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
-                   api.loadActiveTasks().fail(status_.onError(404))])
-            .done(showAllTasks);
+    spinner.spin(
+      "Loading tasks...",
+      deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
+                     api.loadActiveTasks().fail(status_.onError(404))])
+        .done(showAllTasks)
+    );
 
     $('.show-in-progress-scheduling-tasks')
     .unbind('click')

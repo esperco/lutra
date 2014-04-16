@@ -13,12 +13,25 @@ var profile = (function() {
     control: {}
   };
 
+  function makeKey(uid, tid) {
+    return uid + " " + tid;
+  }
+
+  function splitKey(key) {
+    return key.split(" ");
+  }
+
   /* class for creating observables with backend access */
   mod.Observe = can.Map;
 
   /* cache of observable profiles */
   var accessCache = cache.create (600, 60, {
-    get: function(uid) { return api.getProfile(uid); },
+    get: function(key) {
+      var k = splitKey(key);
+      return k.length > 1
+           ? api.getTaskProfile(k[0], k[1])
+           : api.getProfile(key);
+    },
     wrap: function(deferredProf) {
       return deferredProf.then(function(prof) {
         return util.isDefined(prof) ? new can.Map({prof:prof}) : null;
@@ -43,13 +56,18 @@ var profile = (function() {
     return accessCache.getCached(uid);
   };
 
+  mod.getWithTask = function(uid, tid) {
+    return accessCache.getCached(makeKey(uid, tid));
+  };
+
   /* Get multiple profiles from an array of uids.
      Positions in the array are preserved.
      Nulls exist where a failure occurred. */
-  mod.mget = function(uidList) {
-    var deferreds = list.map(uidList, function(uid) {
-      return mod.get(uid);
-    });
+  mod.mget = function(uidList, tid) {
+    var getter = util.isNotNull(tid)
+               ? function(uid) { return mod.getWithTask(uid, tid); }
+               : mod.get;
+    var deferreds = list.map(uidList, getter);
     return deferred.join(deferreds);
   };
 
@@ -59,6 +77,13 @@ var profile = (function() {
       return (new $.Deferred()).resolve(prof);
     }
     return accessCache.setCached(prof.profile_uid, defer(prof));
+  };
+
+  mod.setWithTask = function(prof, tid) {
+    function defer(prof) {
+      return (new $.Deferred()).resolve(prof);
+    }
+    return accessCache.setCached(makeKey(prof.profile_uid, tid), defer(prof));
   };
 
   /* display mini profile */
@@ -80,8 +105,20 @@ var profile = (function() {
     return result;
   }
 
-  mod.email = function(s) {
-    return "Email address goes here.";
+  mod.email = function(prof) {
+    if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
+      return prof.emails[0].email;
+    } else {
+      return "Missing email";
+    }
+  };
+
+  mod.phone = function(prof) {
+    if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
+      return prof.phones[0].number;
+    } else {
+      return "Missing phone";
+    }
   };
 
   mod.shortenName = function(s) {
@@ -122,27 +159,39 @@ var profile = (function() {
     return view;
   };
 
-  mod.fullName = function(prof) {
-    if (prof.first_last) {
-      if (prof.pseudonym && !email.validate(prof.pseudonym)) {
+  mod.maybeFullName = function(prof) {
+    if (util.isNotNull(prof.first_last)) {
+      if (util.isNotNull(prof.pseudonym) && !email.validate(prof.pseudonym)) {
         return prof.pseudonym;
       } else {
         return prof.first_last[0] + " " + prof.first_last[1];
       }
-    } else {
+    } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
+    } else {
+      return null;
     }
-  }
+  };
+
+  mod.fullName = function(prof) {
+    var name = mod.maybeFullName(prof);
+    return util.isNotNull(name) ? name : "Missing Name";
+  };
+
+  mod.fullNameOrEmail = function(prof) {
+    var name = mod.maybeFullName(prof);
+    return util.isNotNull(name) ? name : mod.email(prof);
+  };
 
   mod.firstName = function(prof) {
-    if (prof.first_last) {
-      log("First last", prof.first_last);
+    if (util.isNotNull(prof.first_last)) {
       return prof.first_last[0];
-    } else {
-      log("Pseudonym", prof);
+    } else if (util.isNotNull(prof.pseudonym)) {
       return prof.pseudonym;
+    } else {
+      return "Missing Name";
     }
-  }
+  };
 
   /* extract all user IDs contained in the task; this is used to
      pre-fetch all the profiles. */
@@ -168,7 +217,7 @@ var profile = (function() {
   mod.profilesOfTaskParticipants = function(ta) {
     var par = ta.task_participants;
     var everyone = extractTaskUids(ta);
-    return mod.mget(everyone)
+    return mod.mget(everyone, ta.tid)
       .then(function(a) {
         var b = {};
         list.iter(a, function(obsProf) {

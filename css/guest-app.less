@@ -357,15 +357,27 @@ hr {
   margin-left: 20px;
 }
 
+.timezone-icon-sm {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-bottom: 0.20em;
+}
+
+.timezone-text {
+  font-size: 13px;
+  color: @gray_20;
+}
+
 
 /*** Confirmed ***/
 
-#cal-icon {
+.cal-icon {
   float: left;
   padding-top: 7px;
 }
 
-#month {
+.month {
   width: 50px;
   height: 18px;
   color: @gray_90;
@@ -377,7 +389,7 @@ hr {
   border-top-left-radius: 3px;
 }
 
-#day {
+.day {
   width: 50px;
   height: 34px;
   padding-top: 2px;
@@ -405,14 +417,14 @@ hr {
   &:focus { outline: none; }
 }
 
-#add-cal {
+.add-cal {
   float: left;
   width: 10px;
   height: 10px;
   margin-top: 3px;
 }
 
-#add-cal-text {
+.add-cal-text {
   margin-left: 14px;
 }
 
@@ -591,10 +603,10 @@ hr {
 
 .phone-icon {
   float: left;
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-  margin-left: 2px;
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  path { fill: white; }
 }
 
 #notes-icon {
@@ -627,30 +639,12 @@ hr {
   }
 }
 
-
-// #messages {
-//   max-width: 742px;
-//   margin-left: auto;
-//   margin-right: auto;
-//   @media (max-width: 767px) {
-//     margin-right: 15px;
-//     margin-left: 15px;
-//   }
-// }
-
 #chat-container {
   margin-top: 7px;
   margin-left: 40px;
   text-align: left;
   white-space: normal;
 }
-
-// #messages-container {
-//   margin-top: 7px;
-//   margin-left: 40px;
-//   text-align: left;
-//   white-space: normal;
-// }
 
 .tab-name {
   padding-top: 2px !important;
@@ -754,13 +748,10 @@ hr {
   font-size: 14px;
 }
 
-.chat-footer {
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
-
 .chat-editor {
   height: 138px;
+  margin-top: 15px;
+  margin-bottom: 10px;
   padding-bottom: 6px;
   background: @white;
   border-radius: 3px;

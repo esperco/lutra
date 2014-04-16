@@ -271,5 +271,21 @@ var places = (function() {
     $("#new-place-btn").click(newPlaceAction);
   };
 
+  mod.saveNamedPlace = function(calOption, googleDescription, savedPlaceID) {
+    var loc = calOption.slot.location;
+    var edit = {
+      title: loc.title,
+      address: loc.address,
+      instructions: loc.instructions,
+      google_description: googleDescription,
+      geometry: loc.coord
+    };
+    if (util.isNotNull(savedPlaceID)) {
+      return api.postEditPlace(savedPlaceID, edit);
+    } else {
+      return api.postCreatePlace(googleDescription, edit);
+    }
+  }
+
   return mod;
 }());

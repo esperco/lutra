@@ -11,11 +11,10 @@ HTML_INCLUDES = \
   list-view.html \
   request-password.html \
   reset-password.html \
-  new-task.html \
-  sched-step1-tab.html \
-  sched-step2-tab.html \
-  sched-step3-tab.html \
-  sched-step4-tab.html \
+  messages-tab.html \
+  sched-task-list.html \
+  places.html \
+>>>>>>> 863bf9307b6bcfa4bd8f300acc16303531e5e2bf
   settings.html \
   email-verify.html
 

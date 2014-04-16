@@ -27,6 +27,7 @@ var test = (function() {
       log("Failed assertion");
       console.trace();
     }
+    return b;
   };
 
   function runOne(groupName, x) {
@@ -89,6 +90,8 @@ var test = (function() {
   function tests() {
     return [
       ["list", list.tests],
+      ["util", util.tests],
+      ["dateYmd", dateYmd.tests],
       ["date", date.tests],
       ["timeonly", timeonly.tests],
       ["email", email.tests]

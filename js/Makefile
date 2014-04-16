@@ -20,14 +20,18 @@ COMMON_LIBS = \
   bootstrap \
   can \
   jquery.timeago \
-  jquery.autosize
+  jquery.autosize \
+  moment \
+  moment-timezone \
+  moment-timezone-data
 
 APP_LIBS = \
   sha1 \
-  moment \
   jquery-ui \
   fullcalendar \
-  bootstrap-timepicker
+  jquery.timepicker \
+  jquery-ui-core-datepicker \
+  jstz
 
 GUESTAPP_LIBS =
 
@@ -44,16 +48,22 @@ GUESTAPP_PROD_LIBS = $(addsuffix .min.js, $(GUESTAPP_LIBS))
 # Output Javascript files are put into the js/ subdirectory.
 
 COMMON_SOURCES = \
+  type.js \
   test.js \
   list.js \
   deferred.js \
+  ref.js \
   util.js \
   log.js \
+  mixpanel.js \
   html.js \
   variant.js \
+  dateYmd.js \
   date.js \
   timeonly.js \
+  timezone.js \
   status_.js \
+  spinner.js \
   unixtime.js \
   email.js \
   cache.js \
@@ -75,13 +85,15 @@ APP_SOURCES = \
   api.js \
   sample.js \
   adder.js \
+  calcache.js \
   calpicker.js \
   loceditor.js \
   locpicker.js \
-  sched1.js \
+  tzpicker.js \
+  editevent.js \
   sched2.js \
-  sched3.js \
   sched4.js \
+  schedSetup.js \
   task.js \
   settings.js \
   places.js \
@@ -90,11 +102,17 @@ APP_SOURCES = \
   route.js \
   main.js
 
+# guest_ prefix indicates an alternate implementation.
+# For instance, guest_foo.js would provide an object named just 'foo'.
 GUESTAPP_SOURCES = \
   guest_api.js \
-  guest_task.js \
+  guestTask.js \
   guest_login.js \
   guest_main.js
+
+# These don't get minified
+PROD_FLAGS = prod_flags.js
+DEV_FLAGS = dev_flags.js
 
 COMMON_JS = $(addprefix js/,$(COMMON_SOURCES))
 APP_JS = $(addprefix js/,$(APP_SOURCES))
@@ -134,12 +152,14 @@ guest-app.js: $(COMMON_JS) $(GUESTAPP_JS)
 
 dev-install: $(COMMON_JS) $(APP_JS) $(GUESTAPP_JS)
 	mkdir -p ../pub/js
+	cp $(DEV_FLAGS) ../pub/js/flags.js
 	cp $(COMMON_JS) ../pub/js
 	cp $(APP_JS) ../pub/js
 	cp $(GUESTAPP_JS) ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
+	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp prod.js ../pub/js/app.js
 	cp guest-app.js ../pub/js
 

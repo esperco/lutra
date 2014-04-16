@@ -68,28 +68,16 @@ var settings = (function() {
     if (firstName != "" && lastName != "")
       firstLast = [firstName, lastName];
 
-    /* TODO Phone number stuff
     var phoneNumber = $("#settings-exec-phone").val();
-    var contact = {
-      contact_kind: "Phone_number",
-      contact_data: phoneNumber
-    };
-    var apiCall = deferred.defer(null);
-    if (phoneNumber !== originalExecPhone) {
-      apiCall =
-        api.postContactInfo(execProfile.profile_uid, teamid, contact);
-    } else if (phoneNumber === "" && originalExecPhone !== "") {
-      apiCall =
-        api.deleteContactInfo(execProfile.profile_uid, teamid, contact);
-    }
-    */
+    var phones = phoneNumber !== "" ? [{number: phoneNumber}] : null;
 
     var profileEdit = {
       profile_uid: execProfile.profile_uid,
       prefix: prefix,
       first_last: firstLast,
       pseudonym: (pseudo != "" ? pseudo : null),
-      gender: execProfile.gender
+      gender: execProfile.gender,
+      phones: phones
     };
     api.postProfile(profileEdit, teamid).done(function(prof) {
       api.getProfile(execProfile.profile_uid).done(function(prof) {
@@ -255,7 +243,7 @@ var settings = (function() {
       })
     );
     var deferredDeferredRows =
-      profile.mget(leaderUIDs).then(function(execProfs) {
+      profile.mget(leaderUIDs, null).then(function(execProfs) {
         return list.map(execProfs, function(execProf) {
           var prof = execProf.prof;
           var execUid = prof.profile_uid;

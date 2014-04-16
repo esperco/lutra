@@ -11,12 +11,9 @@ var loceditor = (function() {
      class="modal fade" tabindex="-1"
      role="dialog">
   <div class="modal-dialog">
-    <div class="modal-close-circ" data-dismiss="modal">
-      <img class="svg modal-close-x" src="/assets/img/x.svg"/>
-    </div>
     <div class="modal-content">
       <div class="modal-header clearfix">
-        <button #save
+        <button #saveButton
                 type="button" class="btn btn-primary"
                 style="float:right">Save</button>
         <h3 #modalTitle
@@ -24,34 +21,35 @@ var loceditor = (function() {
       </div>
       <div #body
            class="modal-body">
-        <div class="input">
-          <h4 class="modal-first-section-title">Address</h4>
-
-        <input #address
-               type="text" class="form-control"/>
-        <div class="dropdown">
-          <a #dropdownToggle
-             data-toggle="dropdown"
-             class="hide dropdown-toggle" href="#"></a>
-          <ul #dropdownMenu
-              class="dropdown-menu"
-              role="menu"></ul>
-        </div>
 
         <div class="input">
-          <h4 class="modal-section-title">Location Name</h4>
+          <h4 class="modal-first-section-title">Location Name</h4>
           <input #title
                  type="text" class="form-control"/>
         </div>
 
+        <div class="input">
+          <h4 class="modal-section-title">Address</h4>
+
+          <input #address
+                 type="text" class="form-control"/>
+          <div class="dropdown">
+            <a #dropdownToggle
+               data-toggle="dropdown"
+               class="hide dropdown-toggle" href="#"></a>
+            <ul #dropdownMenu
+                class="dropdown-menu"
+                role="menu"></ul>
+          </div>
         </div>
+
         <div class="input">
           <h4 class="modal-section-title">Notes</h4>
           <input #instructions
                  type="text" class="form-control"/>
         </div>
-        <button #delete_
-                type="button" class="btn btn-default hide">
+        <button #deleteButton
+                type="button" class="btn btn-default hide disabled">
           Remove Place
         </button>
       </div>
@@ -67,6 +65,8 @@ var loceditor = (function() {
 
     if (util.isNonEmptyString(initLoc.google_description))
       address.prop("disabled", true);
+
+    _view.focus = function() { address.focus(); };
 
     return _view;
   }
@@ -87,14 +87,26 @@ var loceditor = (function() {
   }
 
   function setLocation(view, loc) {
-    view.title.val(loc.title);
-    view.address.val(loc.address);
+    var title = loc.title;
+    var address = loc.address;
+
+    /* use copy of original search box if nothing else is available */
+    if (! util.isNonEmptyString(title))
+      title = loc.search;
+    if (! util.isNonEmptyString(address))
+      address = loc.search;
+
+    view.title.val(title);
+    view.address.val(address);
     view.instructions.val(loc.instructions);
 
     view.coord = loc.coord;
     view.timezone = loc.timezone;
     view.google_description = loc.google_description;
     view.placeid = loc.placeid;
+
+    updateSaveButton(view);
+    updateDeleteButton(view);
   }
 
   /* Display addresses as autocompleted by Google */
@@ -173,6 +185,29 @@ var loceditor = (function() {
       return deferred.defer();
   }
 
+  function updateSaveButton(view) {
+    var loc = getLocation(view);
+    if (util.isDefined(loc.google_description))
+      view.saveButton.removeClass("disabled");
+    else
+      view.saveButton.addClass("disabled");
+  }
+
+  function updateDeleteButton(view) {
+    /* button is initially hidden; we show it only once deletion
+       becomes possible which may not happen,
+       depending on whether the original input was a saved place
+       and whether we close the dialog upon saving.
+    */
+    var loc = getLocation(view);
+    if (util.isDefined(loc.placeid)) {
+      view.deleteButton.removeClass("hide");
+      view.deleteButton.removeClass("disabled");
+    }
+    else
+      view.deleteButton.addClass("disabled");
+  }
+
   mod.create = function(initLoc, onSave, onDelete) {
     var view = createModal(initLoc);
 
@@ -180,16 +215,17 @@ var loceditor = (function() {
       predictAddress(view);
     });
 
-    view.save
+    view.saveButton
       .click(function() {
         savePlace(view)
           .done(function() {
-            view.modal.modal("hide");
+             view.modal.modal("hide");
             onSave(getLocation(view));
           });
       });
+    updateSaveButton(view);
 
-    view.delete_
+    view.deleteButton
       .click(function() {
         deletePlace(view)
           .done(function() {
@@ -197,8 +233,14 @@ var loceditor = (function() {
             onDelete(getLocation(view));
           });
       });
+    updateDeleteButton(view);
 
     view.modal.modal({});
+
+    view.modal
+      .on("shown.bs.modal", function() {
+        view.focus();
+      });
 
     return view;
   };

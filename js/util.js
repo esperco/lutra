@@ -5,17 +5,26 @@
 var util = (function () {
   var mod = {};
 
+  var undef;
+
   // Return a random alphanumeric string
   mod.randomString = function() {
     return Math.random().toString(36).slice(2);
   };
 
   mod.isNotNull = function(x) {
-    return typeof x != "undefined" && x !== null;
+    return x !== undef && x !== null;
   };
 
   mod.isDefined = function(x) {
-    return typeof x != "undefined";
+    return x !== undef;
+  };
+
+  mod.option = function(optValue, defaultValue) {
+    if (mod.isDefined(optValue))
+      return optValue;
+    else
+      return defaultValue;
   };
 
   mod.isString = function(x) {
@@ -24,6 +33,10 @@ var util = (function () {
 
   mod.isNonEmptyString = function(x) {
     return mod.isString(x) && x.length > 0;
+  };
+
+  mod.isNumber = function(x) {
+    return typeof x === "number";
   };
 
   mod.isArray = function(x) {
@@ -38,9 +51,27 @@ var util = (function () {
     return typeof x === "function";
   };
 
-  mod.addFields = function(x, fields) {
-    for (var k in fields)
-      x[k] = fields[k];
+  /*
+    Merge two objects into one, from left to right.
+    A new object is created, leaving the input untouched.
+  */
+  mod.mergeObjects = function(/* as many object arguments as you want */) {
+    var l = arguments;
+    var result = {};
+    list.iter(l, function(obj) {
+      if (mod.isObject(obj)) {
+        for (var k in obj)
+          result[k] = obj[k];
+      }
+      else {
+        log("util.mergeObjects ignoring non-object:", obj);
+      }
+    });
+    return result;
+  };
+
+  mod.copyObject = function(x) {
+    return mod.mergeObjects(x);
   };
 
   mod.toString = function(x) {
@@ -119,6 +150,18 @@ var util = (function () {
     if (dropdownToggle.parent().hasClass("open"))
       dropdownToggle.dropdown("toggle");
   };
+
+  mod.tests = [
+    test.expect(
+      "mergeObjects",
+      function() {
+        var m = mod.mergeObjects({x:1, y:2}, {z:3, x:4});
+        return m.x === 4 && m.y === 2 && m.z === 3;
+      },
+      null,
+      true
+    )
+  ];
 
   return mod;
 })();

@@ -6,71 +6,60 @@
 var adder = (function() {
   var mod = {};
 
-  /*
-    Simply create the +/x toggle, calling either onOpen or onClose when
-    clicked.
-   */
-  mod.createToggle = function(param) {
-    var onOpen = param.onOpen;
-    var onClose = param.onClose;
-
-    var isOpen = false;
-
-    var view = $("<div class='add-guest-circ'/>");
-    var plus = $("<img id='plus-guest'/>");
-    plus.appendTo(view);
-    svg.loadImg(plus, "/assets/img/plus.svg");
-
-    function open() {
-      if (!isOpen) {
-        isOpen = true;
-        view
-          .removeClass("return-to-add")
-          .addClass("cancel");
-      }
-    }
-
-    function close() {
-      if (isOpen) {
-        isOpen = false;
-        view
-          .addClass("return-to-add")
-          .removeClass("cancel");
-      }
-    }
-
-    function toggle() {
-      if (isOpen) {
-        close();
-        onClose();
-      }
-      else {
-        open();
-        onOpen();
-      }
-    }
-
-    view.click(toggle);
-    return {
-      view: view,
-      open: open,
-      close: close,
-      toggle: toggle
-    };
-  };
-
-  function createListView() {
+  function createListView(profs) {
 '''
-<div #view>
+<div #view
+     class="add-option-row click-mode">
   <div #adderList
-       class="adder-list"/>
-  <div #adder
-       class="adder">
-    <div #toggleContainer/>
-    <div #formContainer
-         class="hide"/>
+         class="adder-list"/>
+  <div #addClick
+       class="add-option-click clearfix">
+    <div #adder
+         class="add-option-sq">
+      <div #plus
+           class="plus-option"/>
+    </div>
+    <div #addOption
+         class="add-option-text unselectable">
+      Add meeting option
+    </div>
+  </div>
+  <div #formContainer
+       class="hide"/>
+  <div #help
+       class="options-help-row">
+    <div class="options-help clearfix">
+      <div #icon
+           class="options-help-icon"/>
+      <div #helpText
+           class="options-help-text"/>
+    </div>
+  </div>
 </div>
 '''
+    var plusIcon = $("<img/>")
+      .appendTo(plus);
+    svg.loadImg(plusIcon, "/assets/img/plus.svg");
+
+    var img = $("<img/>")
+      .appendTo(icon);
+    svg.loadImg(img, "/assets/img/options-help.svg");
+
+    var hostName = profile.firstName(profs[login.leader()].prof);
+    var possessive = hostName;
+    if (hostName.slice(-1) === "s") {
+      possessive += "'";
+    } else {
+      possessive += "'s"
+    }
+
+    helpText
+      .append($("<span>Each meeting option will be automatically added to "
+        + possessive + " calendar with a </span>"))
+      .append($("<span class='bold'>HOLD</span>"))
+      .append($("<span> label and a link to the most up-to-date information "
+        + "on this meeting.</span>"));
+
     return _view;
   }
 
@@ -86,19 +75,24 @@ var adder = (function() {
    */
   mod.createList = function(param) {
     var maxLength = param.maxLength;
+    var profs = param.profs;
     var createAdderForm = param.createAdderForm;
     var userOnAdderOpen = param.onAdderOpen;
     var userOnAdderClose = param.onAdderClose;
 
     var currentLength = 0;
-    var listView = createListView();
+    var listView = createListView(profs);
 
     function onMaxLength() {
-      listView.adder
+      listView.addClick
+        .addClass("hide");
+      listView.help
         .addClass("hide");
     }
     function onLegalLength() {
-      listView.adder
+      listView.addClick
+        .removeClass("hide");
+      listView.help
         .removeClass("hide");
     }
 
@@ -140,20 +134,38 @@ var adder = (function() {
       };
     }
 
-    var adderIsOpen = false;
-
-    function onAdderOpen() {
-      adderIsOpen = true;
-      listView.formContainer.children().remove();
-      listView.formContainer
-        .append(createAdderForm())
-        .removeClass("hide");
-      if (util.isDefined(userOnAdderOpen))
-        userOnAdderOpen();
+    function toggleAddOption(cancelAdd) {
+      if (listView.formContainer.hasClass("hide")) {
+        listView.view.removeClass("click-mode");
+        listView.addClick.addClass("cancel-mode");
+        listView.addOption.addClass("hide");
+        listView.formContainer.children().remove();
+        listView.formContainer
+          .append(createAdderForm(cancelAdd))
+          .removeClass("hide");
+        listView.adder
+          .removeClass("return-to-add")
+          .addClass("cancel");
+        listView.plus
+          .removeClass("return-to-add")
+          .addClass("cancel");
+        if (util.isDefined(userOnAdderOpen))
+          userOnAdderOpen();
+      } else {
+        clearAddOption();
+      }
     }
 
-    function clearAdder() {
-      adderIsOpen = false;
+    function clearAddOption() {
+      listView.view.addClass("click-mode");
+      listView.addClick.removeClass("cancel-mode");
+      listView.addOption.removeClass("hide");
+      listView.adder
+        .removeClass("cancel")
+        .addClass("return-to-add");
+      listView.plus
+        .removeClass("cancel")
+        .addClass("return-to-add");
       listView.formContainer.children().remove();
       listView.formContainer
         .addClass("hide");
@@ -161,13 +173,15 @@ var adder = (function() {
         userOnAdderClose();
     }
 
-    var toggle = mod.createToggle({
-      onOpen: onAdderOpen,
-      onClose: clearAdder
-    });
+    function createCancelLink() {
+      return $("<span class='cancel-edit-mode link'/>")
+        .text("Cancel")
+        .click(clearAddOption);
+    }
 
-    listView.toggleContainer
-      .append(toggle.view);
+    listView.addClick.click(function() {
+      toggleAddOption(createCancelLink);
+    })
 
     return {
       view: listView.view,
