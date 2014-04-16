@@ -32,8 +32,10 @@ var schedSetup = (function() {
       .attr("disabled", true);
 
     edit.firstLast = function() {
-      return [edit.firstNameInput.val(),
-              edit.lastNameInput.val()];
+      return {
+        first: edit.firstNameInput.val(),
+        last: edit.lastNameInput.val()
+      };
     }
 
     edit.optUid = null;
