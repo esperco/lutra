@@ -12,8 +12,6 @@ HTML_INCLUDES = \
   request-password.html \
   reset-password.html \
   messages-tab.html \
-  sched-task-list.html \
-  places.html \
   settings.html \
   email-verify.html
 

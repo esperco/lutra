@@ -131,14 +131,10 @@ var task = (function() {
   };
 
   mod.init = function() {
-    $(".new-task-btn")
+    $("#new-meeting-btn")
       .unbind("click")
       .click(function () {
         createAndLoadTask();
-    });
-    $("#new-meeting-btn").click(function () {
-      $("#workflow-sched").prop("checked", true);
-      window.location.hash = "!task";
     });
   };
 
