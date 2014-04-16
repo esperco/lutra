@@ -47,8 +47,6 @@ var calpicker = (function() {
   /* Export dates for outside use */
   function getDates(picker) {
     var r = picker.datesRef;
-    log("r.get() returns:", r.get());
-    log("r.getValidOrNothing() returns:", r.getValidOrNothing());
     var dates = r.getValidOrNothing();
     if (util.isNotNull(dates)) {
       var start = dates.start;
@@ -303,7 +301,6 @@ var calpicker = (function() {
       dates.end.setUTCHours(oldEnd.getUTCHours());
       dates.end.setUTCMinutes(oldEnd.getUTCMinutes());
       r.updateValidity();
-      //r.set(dates, [dateWatcherId + "-start", dateWatcherId + "-end"]);
     }, dateWatcherId + "-end");
 
     createDatePicker(picker, picker.datePickerStart, "start");
