@@ -8,7 +8,7 @@ var home = (function() {
   function taskStatus(ta) {
     var time = date.ofString(ta.task_status_text.status_timestamp);
     var statusEvent = $("<span/>")
-      .text(ta.task_status_text.status_event + " ");
+      .text(ta.task_status_text.status_last + " ");
     var statusTimeAgo = date.viewTimeAgo(time);
     var statusTime = $("<span/>")
       .text(" at " + date.utcToLocalTimeOnly(time));
