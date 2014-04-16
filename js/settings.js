@@ -65,8 +65,12 @@ var settings = (function() {
     var lastName = $("#settings-exec-last-name").val();
     var pseudo = $("#settings-exec-pseudonym").val();
     var firstLast = null;
-    if (firstName != "" && lastName != "")
-      firstLast = [firstName, lastName];
+    if (firstName != "" && lastName != "") {
+      firstLast = {
+        first: firstName,
+        last: lastName
+      };
+    }
 
     var phoneNumber = $("#settings-exec-phone").val();
     var phones = phoneNumber !== "" ? [{number: phoneNumber}] : null;
@@ -74,7 +78,7 @@ var settings = (function() {
     var profileEdit = {
       profile_uid: execProfile.profile_uid,
       prefix: prefix,
-      first_last: firstLast,
+      first_last_name: firstLast,
       pseudonym: (pseudo != "" ? pseudo : null),
       gender: execProfile.gender,
       phones: phones
@@ -107,16 +111,16 @@ var settings = (function() {
   function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
-      api.getEmails(execUID, teamid).done(function(execEmails) {
-      //api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
+      api.getEmails(execUID, teamid).done(function(x) {
+        var execEmails = x.account_emails;
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
         var modalCirc = $("#settings-modal-circ");
         var modalTitle = $("#exec-settings-title");
-        if (execProf.first_last) {
-          firstName = execProf.first_last[0];
-          lastName = execProf.first_last[1];
+        if (execProf.first_last_name) {
+          firstName = execProf.first_last_name.first;
+          lastName = execProf.first_last_name.last;
           if (execProf.pseudonym) {
             pseudonym = execProf.pseudonym;
             modalCirc.text(pseudonym[0].toUpperCase());
@@ -177,7 +181,6 @@ var settings = (function() {
         });
         $(".exec-settings-modal").modal({});
       });
-      //});
     });
   }
 
@@ -189,8 +192,8 @@ var settings = (function() {
     var firstLast = "";
     var pseudonym = "";
     var profCirc = $("<div class='settings-prof-circ'/>");
-    if (prof.first_last) {
-      firstLast = prof.first_last[0] + " " + prof.first_last[1];
+    if (prof.first_last_name) {
+      firstLast = prof.first_last_name.first + " " + prof.first_last_name.last;
       if (prof.pseudonym) {
         pseudonym = prof.pseudonym;
         profCirc.text(pseudonym[0].toUpperCase());
@@ -250,7 +253,8 @@ var settings = (function() {
           var team = findTeam(teams, execUid);
           var teamid = team.teamid;
           var deferredRow = api.getEmails(execUid, teamid)
-            .then(function(execEmails) {
+            .then(function(x) {
+              var execEmails = x.account_emails;
               return createExecRow(execEmails, prof, teamid);
             });
           return deferredRow;
@@ -382,13 +386,14 @@ var settings = (function() {
     api.getProfile(eaUID).done(function(eaProf) {
       asstProfile = eaProf;
       var teamid = login.getTeam().teamid;
-      api.getEmails(eaUID, teamid).done(function(eaEmails) {
+      api.getEmails(eaUID, teamid).done(function(x) {
+        var eaEmails = x.account_emails;
         asstNamePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
-        if (eaProf.first_last) {
-          var firstName = eaProf.first_last[0];
+        if (eaProf.first_last_name) {
+          var firstName = eaProf.first_last_name.first;
           $("#settings-first-name").val(firstName);
-          $("#settings-last-name").val(eaProf.first_last[1]);
+          $("#settings-last-name").val(eaProf.first_last_name.last);
           if (eaProf.pseudonym) {
             // This shouldn't happen...
             $("#settings-profile-circ").text(eaProf.pseudonym[0].toUpperCase());
@@ -440,12 +445,15 @@ var settings = (function() {
     var prefix = asstNamePrefixSel.get();
     var firstName = $("#settings-first-name").val();
     var lastName = $("#settings-last-name").val();
-    var firstLast = [firstName, lastName];
+    var firstLast = {
+      first: firstName,
+      last: lastName
+    };
 
     var profileEdit = {
       profile_uid: asstProfile.profile_uid,
       prefix: prefix,
-      first_last: firstLast,
+      first_last_name: firstLast,
       pseudonym: asstProfile.pseudonym,
       gender: asstProfile.gender
     };
@@ -531,7 +539,8 @@ var settings = (function() {
   }
 
   function displayTemplates() {
-    api.getUserTemplates().done(function(templates) {
+    api.getUserTemplates().done(function(x) {
+      var templates = x.canned_messages;
       $("#edit-options-approval").off("click");
       $("#edit-options-approval").on("click", function() {
         showOptionsTags();

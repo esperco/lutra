@@ -217,7 +217,8 @@ var places = (function() {
     }
   }
 
-  function displayPlaces(placeList) {
+  function displayPlaces(x) {
+    var placeList = x.saved_places;
     var sortedPlaces = placeList.sort(placeListComparator);
     var placesView = $("#places");
     placesView.children().remove();

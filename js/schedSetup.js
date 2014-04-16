@@ -32,8 +32,10 @@ var schedSetup = (function() {
       .attr("disabled", true);
 
     edit.firstLast = function() {
-      return [edit.firstNameInput.val(),
-              edit.lastNameInput.val()];
+      return {
+        first: edit.firstNameInput.val(),
+        last: edit.lastNameInput.val()
+      };
     }
 
     edit.optUid = null;
@@ -64,9 +66,9 @@ var schedSetup = (function() {
     edit.setProfile = function(prof) {
       edit.optUid = prof.profile_uid;
       // TODO Allow pseudonyms for guests?
-      if (util.isNotNull(prof.first_last)) {
-        edit.firstNameInput.val(prof.first_last[0]);
-        edit. lastNameInput.val(prof.first_last[1]);
+      if (util.isNotNull(prof.first_last_name)) {
+        edit.firstNameInput.val(prof.first_last_name.first);
+        edit. lastNameInput.val(prof.first_last_name.last);
       }
       if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
         // TODO Support more than one phone number on frontend?
@@ -165,7 +167,7 @@ var schedSetup = (function() {
         var uid = edit.optUid;
         api.getTaskProfile(uid, task.tid).then(function(prof) {
           // TODO Allow pseudonym for guests?
-          prof.first_last = firstLast;
+          prof.first_last_name = firstLast;
           // TODO Support more than one email address for guests?
           prof.emails = [{email: email}];
           if (phone.length > 0) {
@@ -323,7 +325,7 @@ var schedSetup = (function() {
         var uid = edit.optUid;
         api.getTaskProfile(uid, task.tid).then(function(prof) {
           // TODO Allow pseudonym for guests?
-          prof.first_last = firstLast;
+          prof.first_last_name = firstLast;
           // TODO Support more than one email address for guests?
           prof.emails = [{email: email}];
           if (phone.length > 0) {
