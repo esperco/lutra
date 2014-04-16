@@ -111,8 +111,8 @@ var settings = (function() {
   function execSettingsModal(execUID, teamid) {
     api.getProfile(execUID).done(function(execProf) {
       execProfile = execProf;
-      api.getEmails(execUID, teamid).done(function(execEmails) {
-      //api.getContactInfo(execUID, teamid).done(function(execContactInfo) {
+      api.getEmails(execUID, teamid).done(function(x) {
+        var execEmails = x.account_emails;
         var firstName = "";
         var lastName = "";
         var pseudonym = "";
@@ -181,7 +181,6 @@ var settings = (function() {
         });
         $(".exec-settings-modal").modal({});
       });
-      //});
     });
   }
 
@@ -254,7 +253,8 @@ var settings = (function() {
           var team = findTeam(teams, execUid);
           var teamid = team.teamid;
           var deferredRow = api.getEmails(execUid, teamid)
-            .then(function(execEmails) {
+            .then(function(x) {
+              var execEmails = x.account_emails;
               return createExecRow(execEmails, prof, teamid);
             });
           return deferredRow;
@@ -386,7 +386,8 @@ var settings = (function() {
     api.getProfile(eaUID).done(function(eaProf) {
       asstProfile = eaProf;
       var teamid = login.getTeam().teamid;
-      api.getEmails(eaUID, teamid).done(function(eaEmails) {
+      api.getEmails(eaUID, teamid).done(function(x) {
+        var eaEmails = x.account_emails;
         asstNamePrefixSel = displayNamePrefixes($("#settings-name-prefix"),
           eaProf.gender, eaProf.prefix);
         if (eaProf.first_last_name) {
