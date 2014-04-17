@@ -9,7 +9,7 @@
 /*** Colors ***/
 @blue: #0080ce;
 @blue_bg: #dfeff7;
-@border: #cccccc;
+@border: #ebebeb;
 @dark_gray: #282828;
 @gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
@@ -97,7 +97,7 @@ i { color: @gray_60; }
   }
 }
 .caret-link {
-  float: right;
+  float: left;
   margin-top: 7px;
 }
 .caret-text { margin-right: 6px; }
@@ -478,31 +478,17 @@ i { color: @gray_60; }
   height: 24px;
 }
 
-/*** Home ***/
-
-.home-page {
-  height: 100%;
-  padding-bottom: 120px;
-}
-
-#home-container,
-#home-header-container {
-  max-width: 990px;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
 
 /*** Home Content ***/
 
-#home-container { height: 100%; }
-
 #home-content {
-  z-index: 1;
-  padding-left: 160px;
-  padding-top: 163px;
+  position: fixed;
+  z-index: 2;
+  min-width: 600px;
+  top: 60px;
+  right: 300px;
+  bottom: 0;
+  left: 0;
   -webkit-transition: all 0.2s ease-out;
      -moz-transition: all 0.2s ease-out;
       -ms-transition: all 0.2s ease-out;
@@ -515,22 +501,14 @@ i { color: @gray_60; }
 
 #home-sidebar {
   position: fixed;
-  z-index: 3;
-  width: 120px;
-  top: 68px;
+  z-index: 2;
+  width: 300px;
+  height: 100%;
+  top: 60px;
+  right: 0;
+  padding: 15px;
   font-size: 14px;
-  text-align: center;
-}
-
-#home-icon-div {
-  display: inline-block;
-  margin-bottom: 36px;
-}
-
-#home-icon {
-  width: 28px;
-  height: 34px;
-  g path { fill: @purple; }
+  background: @gray_f8;
 }
 
 #new-meeting-btn {
@@ -555,26 +533,67 @@ i { color: @gray_60; }
 
 #home-header {
   position: fixed;
-  z-index: 2;
+  z-index: 3;
   width: 100%;
-  background-color: white;
-}
-
-#home-tools {
-  margin-left: 160px;
-  padding-top: 10px;
+  height: 60px;
+  padding: 15px;
+  background: -webkit-linear-gradient(white, #fefdff);
+  background:    -moz-linear-gradient(white, #fefdff);
+  background:      -o-linear-gradient(white, #fefdff);
+  background:         linear-gradient(white, #fefdff);
   border-bottom: 1px solid @border;
+  -webkit-box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
 }
 
-#account-bar {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  text-align: right;
+#home-icon-div {
+  float: left;
+}
+
+#home-icon {
+  width: 24px;
+  height: 30px;
+  g path { fill: @gray_40; }
+  &:hover g path { fill: @purple; }
+}
+
+#vertical-divider {
+  float: left;
+  height: 100%;
+  margin: 0px 25px 0px 18px;
+  border-left: 1px solid @border;
+}
+
+#meeting-path {
+  display: none;
+  float: left;
+  padding: 2px;
+  font-size: 20px;
+}
+
+#path-to {
+  margin: 0px 10px 0px 8px;
+  path { fill: @gray_40; }
+}
+
+#page-title {
+  float: left;
+  padding-top: 2px;
+  font-size: 20px;
+  cursor: default;
 }
 
 #account-menu {
   display: inline-block;
+  float: right;
+  cursor: pointer;
   .popover-content { width: 200px; }
+  &:hover {
+    #account-caret path { fill: @purple; }
+    #account-circ { background: @purple; }
+    #account-name { color: @purple; }
+  }
 }
 
 #account-caret {
@@ -593,12 +612,16 @@ i { color: @gray_60; }
   text-align: center;
   background: @gray_40;
   border-radius: 15px;
-  cursor: pointer;
-  &:hover { background: @gray_60; }
+}
+
+#account-name {
+  float: right;
+  margin-top: 5px;
+  color: @gray_60;
+  font-family: @bold;
 }
 
 #assisting-name {
-  margin: 5px 55px 0px 0px;
   color: @gray_60;
   cursor: default;
 }
@@ -677,16 +700,9 @@ i { color: @gray_60; }
 }
 
 
-/*** Title/Search ***/
+/*** Tab Bar ***/
 
-#title-bar { margin-bottom: 20px; }
-
-#home-title {
-  float: left;
-  margin-top: 3px;
-  padding: 0px 10px 0px 10px;
-  font-size: 20px;
-}
+#tabbar { margin: 30px 0px 15px 0px; }
 
 #search-meetings {
   float: right;
@@ -707,7 +723,7 @@ i { color: @gray_60; }
   height: 10px;
 }
 
-.toolbar {
+.actionbar {
   height: 20px;
   margin: 30px 0px 10px 0px;
   padding: 0px 10px;
@@ -721,7 +737,9 @@ i { color: @gray_60; }
 #new-message-count { margin-left: 40px; }
 
 #search-stats {
-  
+  display: none;
+  float: left;
+  font-size: 18px;
 }
 
 #task-actions {
@@ -764,15 +782,11 @@ i { color: @gray_60; }
 
 /*** List Filters ***/
 
-#toggle-filters {
-  float: left;
-  display: inline-block;
-  margin-top: 9px;
-  padding: 0px 10px 0px 10px;
-  &:hover #toggle-filters-label {
-    text-decoration: underline;
-  }
+#filters-toggle:hover #filters-toggle-label {
+  text-decoration: underline;
 }
+
+#filters-toggle-label { float: left; }
 
 #filters-caret.open {
   .rotate(rotate_cw_180);
@@ -819,71 +833,78 @@ i { color: @gray_60; }
 }
 
 
-/*** List View ***/
+/*** Meetings ***/
+
+#meetings-tools {
+  position: fixed;
+  z-index: 2;
+  top: 60px;
+  right: 360px;
+  left: 60px;
+  padding-bottom: 15px;
+  background-color: white;
+  border-bottom: 1px solid @border;
+}
+
+#meetings-toggle {
+  float: left;
+  display: block;
+  margin-top: 6px;
+}
+
+#tasks {
+  position: fixed;
+  z-index: 1;
+  top: 60px;
+  right: 300px;
+  bottom: 0;
+  left: 0;
+  padding: 113px 60px 100px 60px;
+}
 
 .task {
   display: none;
-  padding: 20px 10px;
-  border-bottom: 1px solid;
-  border-bottom-color: @gray_10;
+  width: 240px;
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid @gray_10;
+  border-radius: 3px;
   cursor: default;
-  &:hover { background: @purple_bg_hover; }
+  &:hover {
+    background: @purple_bg_hover;
+    -webkit-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+       -moz-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+           -box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+  }
 }
 
 .task.selected { background: @purple_bg_active; }
 
-.in-progress-scheduling-tasks .in-progress-scheduling-task,
-.completed-scheduling-tasks   .completed-scheduling-task {
+.pending-scheduling-tasks .pending-scheduling-task,
+.finalized-scheduling-tasks .finalized-scheduling-task {
   display: block;
 }
 
-.task-label {
-  float: left;
-  width: 30px;
-  text-align: center;
-}
-
-.new-label {
-  width: 30px;
-  height: 15px;
-  margin-top: 2px;
-  padding: 1px 4px 0px 4px;
+.meeting-guest-name {
+  margin: 4px 0px 4px 0px;
   font-family: @bold;
-  font-size: 10px;
-  color: white;
-  background: @orange;
-  border-radius: 3px;
+  font-size: 16px;
 }
 
-.unread-label {
-  width: 12px;
-  height: 12px;
-  margin-top: 3px;
-  margin-right: auto;
-  margin-left: auto;
-  background: @orange;
-  border-radius: 6px;
+.meeting-footer {
+  margin: 10px -10px -10px -10px;
+  padding: 10px;
+  background: @gray_f8;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
-.to-do-label { margin-top: 2px; }
-
-.sent-label { margin-top: 1px; }
-
-.task-details {
-  margin-left: 30px;
-  padding: 0px 10px 0px 10px;
-}
-
-.task-guests {
-  font-family: @bold;
-}
-
-.task-status-row {
-  margin-top: 10px;
+.meeting-status-row {
+  margin-bottom: 4px;
   color: @gray_60;
 }
 
-.task-status-text { margin-left: 28px; }
+.meeting-status-text { margin-left: 28px; }
 
 .status-icon { float: left; }
 
@@ -907,32 +928,19 @@ i { color: @gray_60; }
 
 }
 
-
-/*** Calendar View ***/
-
-#coming-soon-icon {
-  display: block;
-  width: 100px;
-  height: 100px;
-  margin-top: 120px;
-  margin-right: auto;
-  margin-bottom: 40px;
-  margin-left: auto;
-}
-
-#coming-soon-text {
-  color: @gray_20;
-  font-size: 36px;
-  text-align: center;
+.meeting-updated-row {
+  font-size: 12px;
+  color: @gray_60;
 }
 
 
-/*** SETTINGS ***/
+/*** Meetings ***/
 
 .list-tabs > li > a {
-  font-size: 14px;
+  font-size: 16px;
+  margin-right: 30px;
   padding: 0;
-  margin-right: 20px;
+  padding-right: 15px;
 }
 
 .desktop-nav-tabs > li > a {
@@ -1360,9 +1368,15 @@ i { color: @gray_60; }
 
 /*** Settings ***/
 
-.settings-title {
-  letter-spacing: 3px;
-  color: @gray_60;
+#settings-toggle {
+  position: fixed;
+  z-index: 2;
+  top: 60px;
+  right: 360px;
+  left: 60px;
+  padding: 36px 0px 15px 0px;
+  background-color: white;
+  border-bottom: 1px solid @border;
 }
 
 #settings-templates .settings-title {

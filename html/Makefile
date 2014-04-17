@@ -5,10 +5,9 @@ prod: prod-build
 guest-app: guest-app-build
 
 HTML_INCLUDES = \
-  calendar-view.html \
-  home-header.html \
+  header.html \
   home-sidebar.html \
-  list-view.html \
+  meetings-view.html \
   request-password.html \
   reset-password.html \
   messages-tab.html \

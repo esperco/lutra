@@ -620,6 +620,8 @@ var settings = (function() {
     disableUpdateButtonsUntilModified();
     setupTabs();
     displayTemplates();
+    log("Loading Settings");
+    $("#page-title").text("Settings");
     $("#settings-update-name").off("click");
     $("#settings-update-name").one("click", updateAssistantName);
     $("#settings-update-password").off("click");

@@ -79,22 +79,15 @@
     </div>
 
     <div id="home-page" class="home-page hide">
-      <div id="home-header">
-        @@home-header.html@@
-      </div>
-      <div id="home-container">
-        @@home-sidebar.html@@
-        <div class="tab-content" id="home-content">
-          <div class="tab-pane fade in active in-progress-scheduling-tasks task-list"
-               id="list-view">
-            @@list-view.html@@
-          </div>
-          <div class="tab-pane fade" id="calendar-view">
-            @@calendar-view.html@@
-          </div>
-          <div class="tab-pane fade" id="settings">
-            @@settings.html@@
-          </div>
+      @@header.html@@
+      @@home-sidebar.html@@
+      <div class="tab-content" id="home-content">
+        <div class="tab-pane fade in active"
+             id="meetings-view">
+          @@meetings-view.html@@
+        </div>
+        <div class="tab-pane fade" id="settings">
+          @@settings.html@@
         </div>
       </div>
     </div>
@@ -108,7 +101,7 @@
     </div>
 
     <div id="task-page" class="task-page scrollable hide">
-
+      @@header.html@@
       <div class="task-header">
         <div class="task-header-container">
           <a href="#">

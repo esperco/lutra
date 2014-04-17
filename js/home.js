@@ -18,9 +18,10 @@ var home = (function() {
       .append(statusTime);
   }
 
-  function taskSubject(ta) {
-    // get subject of the task's email conversation
-    return "Email subject line goes here.";
+  function meetingType(ta) {
+    // get meeting type
+    var type = "[Meeting type]"
+    return type + " with";
   }
 
   function loadAssignToPopover(ta, x) {
@@ -180,48 +181,33 @@ var home = (function() {
         })
         $(this).addClass("selected");
         $("#new-message-stats").addClass("hide");
-        $("#search-stats").addClass("hide");
         $("#task-actions").removeClass("hide");
         loadTaskActions(ta);
       })
 
-    var newLabel = $("<div class='new-label hide'>NEW</div>");
-    var unreadLabel = $("<div class='unread-label'></div>");
-    var toDoLabel = $("<div class='to-do-label hide'/>");
-    var toDoIcon = $("<img/>")
-      .appendTo(toDoLabel);
-    svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
-    var sentLabel = $("<div class='sent-label hide'/>");
-    var sentIcon = $("<img/>")
-      .appendTo(sentLabel);
-    svg.loadImg(sentIcon, "/assets/img/reply.svg");
-    var taskLabel = $("<div class='task-label'/>")
-      .append(newLabel)
-      .append(unreadLabel)
-      .append(toDoLabel)
-      .append(sentLabel)
-      .appendTo(view);
+    if (ta.task_status) {
+      var typeRow = $("<div class='meeting-type'/>")
+        .append(meetingType(ta))
+        .appendTo(view);
 
+      var guestsSection = $("<a href='#!task/" + ta.tid + "' class='meeting-guests link ellipsis'></a>")
+        .appendTo(view);
+      var guest1 = $("<div class='meeting-guest-name'/>")
+        .text("Christopher Christopherson")
+        .appendTo(guestsSection);
+      var guest2 = $("<div class='meeting-guest-name'/>")
+        .text("Christopher Christopherson")
+        .appendTo(guestsSection);
+      var guest3 = $("<div/>")
+        .text("+2 more")
+        .appendTo(guestsSection);
 
-    var taskDetails = $("<div class='task-details'></div>")
-      .appendTo(view);
+      var meetingFooter = $("<div class='meeting-footer'/>")
+        .appendTo(view);
 
-    var title = ta.task_status
-      ? ta.task_status.task_title
-      : null;
-
-    if (title) {
-      var guestsRow = $("<a href='#!task/" + ta.tid + "' class='task-guests link ellipsis'></a>")
-        .text(title)
-        .appendTo(taskDetails);
-
-      var subjectRow = $("<div class='task-subject'/>")
-        .append(taskSubject(ta))
-        .appendTo(taskDetails);
-
-      var statusRow = $("<div class='task-status-row'/>")
-        .appendTo(taskDetails);
-      var status = $("<div class='task-status-text'/>")
+      var statusRow = $("<div class='meeting-status-row'/>")
+        .appendTo(meetingFooter);
+      var status = $("<div class='meeting-status-text'/>")
         .text(taskStatus(ta));
       var guests = $("<div class='status-icon guests-status-icon '/>");
       var guestsIcon = $("<img/>")
@@ -243,7 +229,7 @@ var home = (function() {
       var reminderIcon = $("<img/>")
         .appendTo(reminder);
       svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
-      var statusIcon = $("<div class='task-status-icon'/>")
+      var statusIcon = $("<div class='meeting-status-icon'/>")
         .append(guests)
         .append(email)
         .append(options)
@@ -252,6 +238,9 @@ var home = (function() {
         .appendTo(statusRow);
       statusRow.append(status);
 
+      var updatedRow = $("<div class='meeting-updated-row'/>")
+        .text("Updated 3 days ago")
+        .appendTo(meetingFooter);
     }
 
     return view;
@@ -261,12 +250,12 @@ var home = (function() {
     if ("Scheduling" === task.task_kind) {
       return "Confirmed" === task.task_status.task_progress
           || "Closed"    === task.task_status.task_progress
-           ? "completed-scheduling-task"
-           : "in-progress-scheduling-task";
+           ? "finalized-scheduling-task"
+           : "pending-scheduling-task";
     } else {
       return "Closed" === task.task_status.task_progress
-           ? "completed-general-task"
-           : "in-progress-general-task";
+           ? "finalized-general-task"
+           : "pending-general-task";
     }
   }
 
@@ -418,42 +407,26 @@ var home = (function() {
         .done(showAllTasks)
     );
 
-    $('.show-in-progress-scheduling-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-scheduling-tasks').addClass('active');
-      $('.show-completed-scheduling-tasks').removeClass('active');
-      $('#list-view')
-        .attr('class', 'in-progress-scheduling-tasks task-list');
-    });
-    $('.show-completed-scheduling-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-scheduling-tasks').removeClass('active');
-      $('.show-completed-scheduling-tasks').addClass('active');
-      $('#list-view')
-        .attr('class', 'completed-scheduling-tasks task-list');
-    });
-    $('.show-in-progress-general-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-general-tasks').addClass('active');
-      $('.show-completed-general-tasks').removeClass('active');
-      $('#general-tasks-tab-content')
-        .attr('class', 'in-progress-general-tasks task-list');
-    });
-    $('.show-completed-general-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-general-tasks').removeClass('active');
-      $('.show-completed-general-tasks').addClass('active');
-      $('#general-tasks-tab-content')
-        .attr('class', 'completed-general-tasks task-list');
-    });
+    $('.show-pending-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').addClass('active');
+        $('.show-finalized-meetings').removeClass('active');
+        $('#tasks')
+          .attr('class', 'pending-scheduling-tasks task-list scrollable');
+      });
+    $('.show-finalized-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').removeClass('active');
+        $('.show-finalized-meetings').addClass('active');
+        $('#tasks')
+          .attr('class', 'finalized-scheduling-tasks task-list scrollable');
+      });
   }
 
   function moveContent(padding) {
-    var view = $("#home-content");
+    var view = $("#tasks");
     view.attr("style","-webkit-transform: translate(0px, " + padding + "px)")
         .attr("style","-moz-transform: translate(0px, " + padding + "px)")
         .attr("style","-ms-transform: translate(0px, " + padding + "px)")
@@ -528,102 +501,17 @@ var home = (function() {
     })
   }
 
-  function loadStatusFilters() {
-    var status = $("#status-filter");
-    status.children().remove();
-    $("<h5 class='filter-title'>Status</h5>")
-      .appendTo(status);
-    var checkCoordinating = $("<img class='filter-checkbox'/>");
-    var statusCoordinating = $("<li class='filter checkbox-option clickable'></li>");
-    var checkUpcoming = $("<img class='filter-checkbox'/>");
-    var statusUpcoming = $("<li class='filter checkbox-option clickable'></li>");
-    var checkPast = $("<img class='filter-checkbox'/>");
-    var statusPast = $("<li class='filter checkbox-option clickable'></li>");
-    var checkCanceled = $("<img class='filter-checkbox'/>");
-    var statusCanceled = $("<li class='filter checkbox-option clickable'></li>");
-    var statusOptions = $("<ul class=filter-list/>")
-      .append(statusCoordinating
-        .append(checkCoordinating)
-        .append($("<span class='filter-checkbox-label'>Coordinating</span>")))
-      .append(statusUpcoming
-        .append(checkUpcoming)
-        .append($("<span class='filter-checkbox-label'>Upcoming</span>")))
-      .append(statusPast
-        .append(checkPast)
-        .append($("<span class='filter-checkbox-label'>Past</span>")))
-      .append(statusCanceled
-        .append(checkCanceled)
-        .append($("<span class='filter-checkbox-label'>Canceled</span>")))
-      .appendTo(status);
-    svg.loadImg(checkCoordinating, "/assets/img/checkbox-sm.svg");
-    svg.loadImg(checkUpcoming, "/assets/img/checkbox-sm.svg");
-    svg.loadImg(checkPast, "/assets/img/checkbox-sm.svg");
-    svg.loadImg(checkCanceled, "/assets/img/checkbox-sm.svg");
-    statusCoordinating.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
-        // apply filter
-      }
-    })
-    statusUpcoming.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
-        // apply filter
-      }
-    })
-    statusPast.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
-        // apply filter
-      }
-    })
-    statusCanceled.click(function() {
-      if($(this).hasClass("checkbox-selected")) {
-        $(this).removeClass("checkbox-selected");
-        // remove filter
-      } else {
-        $(this).addClass("checkbox-selected");
-        // apply filter
-      }
-    })
-  }
-
   function loadSortByFilters() {
     var sortBy = $("#sort-by-filter");
     sortBy.children().remove();
     $("<h5 class='filter-title'>Sort By</h5>")
       .appendTo(sortBy);
-    var sortByToDo = $("<li class='filter sort-by-filter active'>To Do</li>");
-    var sortByLastUpdated = $("<li class='filter sort-by-filter link'>Last Updated</li>");
-    var sortByMeetingDate = $("<li class='filter sort-by-filter link'>Meeting Date</li>");
+    var sortByLastUpdated = $("<li class='filter sort-by-filter active'>Last Updated</li>");
+    var sortByUrgency = $("<li class='filter sort-by-filter link'>Meeting Date</li>");
     var sortByOptions = $("<ul class=filter-list/>")
-      .append(sortByToDo)
       .append(sortByLastUpdated)
-      .append(sortByMeetingDate)
+      .append(sortByUrgency)
       .appendTo(sortBy);
-    sortByToDo.click(function() {
-      if(! $(this).hasClass("active")) {
-        $(".sort-by-filter").each(function() {
-          if ($(this).hasClass("active")) {
-            $(this).removeClass("active")
-                   .addClass("link");
-            // clear filter
-          }
-        })
-        $(this).removeClass("link")
-               .addClass("active");
-        // apply filter
-      }
-    })
     sortByLastUpdated.click(function() {
       if(! $(this).hasClass("active")) {
         $(".sort-by-filter").each(function() {
@@ -638,7 +526,7 @@ var home = (function() {
         // apply filter
       }
     })
-    sortByMeetingDate.click(function() {
+    sortByUrgency.click(function() {
       if(! $(this).hasClass("active")) {
         $(".sort-by-filter").each(function() {
           if ($(this).hasClass("active")) {
@@ -655,34 +543,36 @@ var home = (function() {
   }
 
   function loadFilters() {
-    var toggle = $("#toggle-filters");
-    var label = $("#toggle-filters-label")
+    var toggle = $("#filters-toggle");
+    var label = $("#filters-toggle-label")
       .text("Show Filters");
     var caret = $("#filters-caret");
     var filters = $("#filters")
       .attr("style","display:none");
 
     loadSortByFilters();
-    loadStatusFilters();
     loadWaitingOnFilters();
     loadAssignedToFilters();
 
     toggle.click(function() {
       if (filters.is(":hidden")) {
+        toggle.removeClass("closed");
         label.text("Hide Filters");
         caret.removeClass("closed")
              .addClass("open");
         filters.slideDown("fast", function(){
-          var contentPadding = $("#home-header").height();
+          var contentPadding = $("#meetings-tools").height();
+          log(contentPadding);
           moveContent(contentPadding);
         });
       } else {
+        toggle.addClass("closed");
         label.text("Show Filters");
         caret.removeClass("open")
              .addClass("closed");
         filters.slideUp("fast", function() {
-          $("#home-content")
-            .attr("style","padding-top:163px");
+          $("#tasks")
+            .attr("style","padding-top:113px");
         });
       }
     })
@@ -695,10 +585,12 @@ var home = (function() {
     function updateSearch() {
       if (search.val() != "") {
         clear.removeClass("hide");
-        $("#home-title").text("Search");
+        $("#meetings-toggle").attr("style","display:none");
+        $("#search-stats").attr("style","display:block")
       } else {
         clear.addClass("hide");
-        $("#home-title").text("Meetings");
+        $("#meetings-toggle").attr("style","display:block");
+        $("#search-stats").attr("style","display:none")
       }
     }
 
@@ -708,6 +600,19 @@ var home = (function() {
       search.val("");
       updateSearch();
     })
+  }
+
+  function loadSidebar() {
+    var execName = $("#assisting-name");
+    profile.get(login.leader()).done(function(obsProf) {
+      var p = obsProf.prof;
+      var assisting = $("<div>assisting </div>");
+      var fullName = $("<div id='exec-name'/>")
+        .text(profile.fullName(p));
+      execName.children().remove();
+      execName.append(assisting)
+              .append(fullName);
+    });
   }
 
   function switchTeam(team) {
@@ -768,28 +673,19 @@ var home = (function() {
 
   function loadHeader() {
     var view = $("#account-circ");
+    var name = $("#account-name");
     var info = $("#popover-account-info");
-    var execName = $("#assisting-name");
 
     api.getProfile(login.me()).done(function(eaProf) {
       var fullName = profile.fullName(eaProf);
       var email = profile.email(eaProf);
       view.text(profile.shortenName(fullName).substring(0,1).toUpperCase());
+      name.text(fullName);
       info.children().remove();
       info.append($("<div id='popover-account-name' class='ellipsis'/>")
             .text(fullName))
           .append($("<div id='popover-account-email' class='ellipsis'/>")
             .text(email));
-    });
-
-    profile.get(login.leader()).done(function(obsProf) {
-      var p = obsProf.prof;
-      var assisting = $("<span>assisting </span>");
-      var fullName = $("<span id='exec-name'/>")
-        .text(profile.fullName(p));
-      execName.children().remove();
-      execName.append(assisting)
-              .append(fullName);
     });
 
     insertTeams();
@@ -802,6 +698,11 @@ var home = (function() {
       }
     });
 
+    view.on('shown.bs.popover', function () {
+      $('.popover').css('left',parseInt($('.popover').css('left')) - 70 + 'px');
+      $('.arrow').css('left','80%');
+    })
+
     $('body').on('click', function (e) {
       if ($(e.target).data('toggle') !== 'popover'
         && $(e.target).parents('[data-toggle="popover"]').length === 0
@@ -810,19 +711,23 @@ var home = (function() {
         view.click();
       }
     });
+  }
 
-    $("#settings-nav").click(function() {
-      view.click(); // BUG: not dismissing popover
-      settings.load;
-    })
-}
+  mod.runMyFunction = function() {
+    log("Load Settings");
+    settings.load();
+    $("#account-circ").click();
+    return true;
+  }
 
   mod.load = function() {
     loadHeader();
+    loadSidebar();
     loadSearch();
     loadFilters();
     loadMeetings();
     util.focus();
+    $("#page-title").text("Meetings");
     $(document).click(function(event) {
       var target = $(event.target);
       if ((! target.parents("#tasks").length) &&
@@ -831,7 +736,6 @@ var home = (function() {
           $(this).removeClass("selected");
         })
         $("#new-message-stats").removeClass("hide");
-        $("#search-stats").addClass("hide");
         $("#task-actions").addClass("hide");
       }
     })
