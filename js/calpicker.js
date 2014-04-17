@@ -199,6 +199,7 @@ var calpicker = (function() {
   /***** Time pickers (start/end time of day) *****/
 
   var timeWatcherId = "timeWatcher";
+  var dateWatcherId = "dateWatcher";
 
   function setupTimePicker(picker,
                            fieldName, /* either "start" or "end" */
@@ -227,9 +228,25 @@ var calpicker = (function() {
         local.setUTCHours(d.getHours());
         local.setUTCMinutes(d.getMinutes());
         dates[fieldName] = local;
+        if (
+          fieldName === "start"
+          && util.isNotNull(oldDates)
+          && util.isNotNull(oldDates["start"])
+          && util.isNotNull(oldDates["end"])
+        ) {
+          /* When start time is increased or decreased by some amount,
+             apply the same amount to the end time */
+          var oldSecs = oldDates["start"].getTime();
+          var newSecs = local.getTime();
+          var diffSecs = newSecs - oldSecs;
+          var newEnd = oldDates["end"];
+          newEnd.setTime(newEnd.getTime() + diffSecs);
+          dates["end"] = newEnd;
+          r.updateValidity();
+        }
       }
       dates = completeDates(undefined, dates, undefined);
-      r.set(dates, [watcherId]);
+      r.set(dates, [watcherId, dateWatcherId + "-end"]);
     });
     r.watch(function(dates, isValid) {
       if (util.isNotNull(dates)) {
@@ -252,8 +269,6 @@ var calpicker = (function() {
   }
 
   /***** Date picker (start date, independent from time of day) *****/
-
-  var dateWatcherId = "dateWatcher";
 
   function createDatePicker(picker, datePicker, fieldName) {
     var r = picker.datesRef;
@@ -281,26 +296,72 @@ var calpicker = (function() {
     return endDate;
   }
 
+  var dayMS = 86400000; // milliseconds per day
+
+  // Fires when the END date is selected
+  function startDateWatcher(picker, dates) {
+    var r = picker.datesRef;
+    var startDate = startDateOfDates(dates);
+    var endDate = endDateOfDates(dates);
+    picker.datePickerStart.datepicker("setDate", startDate);
+    picker.datePickerEnd.datepicker("setDate", endDate);
+    var startMS = dates.start.getTime();
+    var endMS = dates.end.getTime();
+    if (endMS <= startMS) {
+      /* End date was moved before start date,
+         so move start date back to new end date */
+      dates.start.setUTCFullYear(dates.end.getUTCFullYear());
+      dates.start.setUTCMonth(dates.end.getUTCMonth());
+      dates.start.setUTCDate(dates.end.getUTCDate());
+      startMS = dates.start.getTime();
+      endMS = dates.end.getTime();
+      var newStartDateUTC = dateYmd.utc.ofDate(dates.start);
+      var newStartDate = dateYmd.local.toDate(newStartDateUTC);
+      picker.datePickerStart.datepicker("setDate", newStartDate);
+      if (endMS <= startMS) {
+        /* If end time is STILL before start time (on same day),
+           advance the end date by a day */
+        dates.end.setTime(endMS + dayMS);
+        var newEndDateUTC = dateYmd.utc.ofDate(dates.end);
+        var newEndDate = dateYmd.local.toDate(newEndDateUTC);
+        picker.datePickerEnd.datepicker("setDate", newEndDate);
+      }
+    }
+    r.updateValidity();
+  }
+
+  // Fires when the START date is selected
+  function endDateWatcher(picker, dates) {
+    var r = picker.datesRef;
+    var startDate = startDateOfDates(dates);
+    picker.datePickerEnd.datepicker("setDate", startDate);
+    // Copy selected start date into end date
+    var oldEnd = dates.end;
+    dates.end = date.copy(dates.start);
+    dates.end.setUTCHours(oldEnd.getUTCHours());
+    dates.end.setUTCMinutes(oldEnd.getUTCMinutes());
+    var newEndMS = dates.end.getTime();
+    var startMS = dates.start.getTime();
+    if (newEndMS <= startMS) {
+      /* If copying start into end has made the range invalid,
+         advance the end date by a day */
+      dates.end.setTime(newEndMS + dayMS);
+      var newEndDateUTC = dateYmd.utc.ofDate(dates.end);
+      var newEndDate = dateYmd.local.toDate(newEndDateUTC);
+      picker.datePickerEnd.datepicker("setDate", newEndDate);
+    }
+    r.updateValidity();
+  }
+
   function setupDatePickers(picker) {
     var r = picker.datesRef;
 
-    // Fires when the END date is selected
     r.watch(function(dates, isValid) {
-      var startDate = startDateOfDates(dates);
-      var endDate = endDateOfDates(dates);
-      picker.datePickerStart.datepicker("setDate", startDate);
-      picker.datePickerEnd.datepicker("setDate", endDate);
+      startDateWatcher(picker, dates);
     }, dateWatcherId + "-start");
 
-    // Fires when the START date is selected
     r.watch(function(dates, isValid) {
-      var startDate = startDateOfDates(dates);
-      picker.datePickerEnd.datepicker("setDate", startDate);
-      var oldEnd = dates.end;
-      dates.end = date.copy(dates.start);
-      dates.end.setUTCHours(oldEnd.getUTCHours());
-      dates.end.setUTCMinutes(oldEnd.getUTCMinutes());
-      r.updateValidity();
+      endDateWatcher(picker, dates);
     }, dateWatcherId + "-end");
 
     createDatePicker(picker, picker.datePickerStart, "start");
