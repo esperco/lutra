@@ -283,18 +283,26 @@ var calpicker = (function() {
 
   function setupDatePickers(picker) {
     var r = picker.datesRef;
+
+    // Fires when the END date is selected
     r.watch(function(dates, isValid) {
-      if (isValid) {
-        var startDate = startDateOfDates(dates);
-        picker.datePickerStart.datepicker("setDate", startDate);
-      }
+      var startDate = startDateOfDates(dates);
+      var endDate = endDateOfDates(dates);
+      picker.datePickerStart.datepicker("setDate", startDate);
+      picker.datePickerEnd.datepicker("setDate", endDate);
     }, dateWatcherId + "-start");
+
+    // Fires when the START date is selected
     r.watch(function(dates, isValid) {
-      if (isValid) {
-        var endDate = endDateOfDates(dates);
-        picker.datePickerEnd.datepicker("setDate", endDate);
-      }
+      var startDate = startDateOfDates(dates);
+      picker.datePickerEnd.datepicker("setDate", startDate);
+      var oldEnd = dates.end;
+      dates.end = date.copy(dates.start);
+      dates.end.setUTCHours(oldEnd.getUTCHours());
+      dates.end.setUTCMinutes(oldEnd.getUTCMinutes());
+      r.updateValidity();
     }, dateWatcherId + "-end");
+
     createDatePicker(picker, picker.datePickerStart, "start");
     createDatePicker(picker, picker.datePickerEnd, "end");
     picker.datePickerContainer.removeClass("hide");

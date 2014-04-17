@@ -508,7 +508,7 @@ var editevent = (function() {
     function havePhonesForCall() {
       var meetingType = getMeetingType();
       var attendees = sched.getAttendingGuests(ta);
-      //attendees.unshift(login.leader());
+      attendees.unshift(login.leader());
       return meetingType === "Call" ?
         list.for_all(attendees, hasPhone) :
         true;
@@ -527,11 +527,11 @@ var editevent = (function() {
         saveButton.addClass("disabled");
       } else if (!optionReady && havePhones) {
         dateAndTimes.addClass("has-error");
-        missingPhones.removeClass("hide");
+        missingPhones.addClass("hide");
         saveButton.addClass("disabled");
       } else {
         dateAndTimes.addClass("has-error");
-        missingPhones.addClass("hide");
+        missingPhones.removeClass("hide");
         saveButton.addClass("disabled");
       }
     }
