@@ -713,7 +713,7 @@ var sched2 = (function() {
     saveAndReload(ta, "removing");
   }
 
-  function readOnlyViewOfOption(calOption, profs, toggleEdit, remove) {
+  function readOnlyViewOfOption(calOption, profs, toggleEdit, duplicate, remove) {
 '''
 <div #view
      class="option-row">
@@ -748,13 +748,14 @@ var sched2 = (function() {
 '''
     edit.click(toggleEdit);
     editOption.click(toggleEdit);
+    duplicateOption.click(duplicate);
     removeOption.click(remove);
 
     return view;
   }
 
   function insertViewOfOption(ta, profs, listView, calOption,
-                              i, saveCalOption, removeCalOption) {
+                              i, saveCalOption, removeCalOption, editable) {
 '''
 <div #view>
   <div #optionLetter
@@ -805,10 +806,41 @@ var sched2 = (function() {
             .addClass("cancel");
       }
     }
+    /* Add new duplicated option when user clicks "Duplicate" */
+    function duplicateOption() {
+        log("Duplicate option selected");
+        var newcalOption = {
+            label: util.randomString(),
+            slot: calOption.slot
+        };
+        var editable = true;
+        option = insertViewOfOption(ta, profs, listView, newcalOption,
+                             listView.length, saveCalOption, removeCalOption,editable);
+    }
+      
 
     letter.text(indexLabel(i));
-    readOnlyContainer.append(readOnlyViewOfOption(calOption, profs,
-                                                  toggleEdit, removeOption));
+    if(editable){ // it is editable if it comes from a duplicate
+        var addMode = true;
+        var cancel = $("<span class='cancel-edit-mode link'/>")
+          .text("Cancel")
+          .click(row.remove);
+        var edit =
+          editevent.create(ta, profs, calOption, saveCalOption, cancel, addMode);
+        view.addClass("add-row");
+        readOnlyContainer.addClass("hide");
+        editableContainer.removeClass("hide");
+        optionLetter.addClass("cancel")
+                    .click(row.remove);
+        letter.addClass("hide");
+        plus.removeClass("hide return-to-add")
+            .addClass("cancel");
+        editableContainer.append(edit.view);
+    } else {
+        readOnlyContainer.append(
+            readOnlyViewOfOption(calOption, profs,
+                                 toggleEdit, duplicateOption,removeOption));
+    }
 
     return view;
   }
@@ -832,9 +864,10 @@ var sched2 = (function() {
       createAdderForm: createAdderForm,
       onAdderOpen: disableNextButton /* reenabled when the page is reloaded */
     });
+    var editable = false; /* By default the options are read-only */
     list.iter(schedState.calendar_options, function(x, i) {
       v.append(insertViewOfOption(ta, profs, listView,
-                                  x, i, save, remove));
+                                  x, i, save, remove, editable));
     });
     v.append(listView.view)
 
