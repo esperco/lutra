@@ -132,6 +132,10 @@ var ref = (function() {
     }
   }
 
+  function updateValidity(m) {
+    m.validity = m.isValid(m.data);
+  }
+
   /*
     Get the data only if it is valid, otherwise return null.
     Avoids returning data with only some of the required fields.
@@ -176,6 +180,7 @@ var ref = (function() {
       getValidOrNothing: (function() { return getValidOrNothing(m); }),
       watchTurnValid: (function(handler) { watchTurnValid(m, handler); }),
       watchTurnInvalid: (function(handler) { watchTurnInvalid(m, handler); }),
+      updateValidity: (function() { return updateValidity(m); })
     }
   }
 

@@ -310,7 +310,11 @@ var sched = (function() {
       notesRow.removeClass("hide");
 
     if (slot.meeting_type === "Call") {
-      var prof = profs[slot.caller].prof;
+      var slotCaller =
+        util.isNotNull(slot.caller) ?
+        slot.caller :
+        login.leader();
+      var prof = profs[slotCaller].prof;
       var name = profile.fullNameOrEmail(prof);
       var phone = profile.phone(prof);
       caller.text(name + " at " + phone);
