@@ -101,9 +101,7 @@ var calpicker = (function() {
     <div #calendarSidebar
          class="cal-sidebar">
       <div #dateJumper
-           class="date-jumper">
-        DATE JUMPER
-      </div>
+           class="date-jumper"/>
       <div class="time-zone-label-section">
         <div class="time-zone-label">TIME ZONE:</div>
         <div #timezoneView/>
@@ -500,6 +498,7 @@ var calpicker = (function() {
   function setupCalendar(picker, tz, defaultDate) {
     var r = picker.datesRef;
     var calendarView = picker.calendarView;
+    var calendarJump = picker.dateJumper;
 
     function setEventMoments(startMoment, endMoment) {
       removeCalendarEvent(picker);
@@ -558,6 +557,15 @@ var calpicker = (function() {
       editable: false,
       events: fetchEvents
     });
+
+    function dateJump(date,view){
+        log("Jump");
+        calendarView.fullCalendar('gotoDate',date);
+    }
+
+    calendarJump.datepicker({inline : true,
+                             onSelect : dateJump});
+
     picker.calendarPickerContainer.removeClass("hide");
   }
 
