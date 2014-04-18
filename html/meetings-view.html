@@ -1,5 +1,5 @@
-<div id="meetings-tools">
-	<div id="tabbar" class="clearfix">
+<div id="meetings-toolbar">
+	<div class="meetings-container clearfix">
 		<div id="search-stats">0 meetings found</div>
 		<ul id="meetings-toggle" class="nav nav-tabs list-tabs">
 		  <li class="show-pending-meetings active"><a>Pending</a></li>
@@ -15,8 +15,9 @@
 	    <input type="search" id="search-meetings-input" class="form-control"
 	           placeholder="Search meetings"/>
 	  </div>
- </div>
- <div id="filters-toggle" class="clearfix clickable closed">
+	</div>
+</div>
+<!--  <div id="filters-toggle" class="clearfix clickable closed">
     <span id="filters-toggle-label" class="link caret-text"></span>
     <div id="filters-caret" class="caret-link">
     	<img class="svg svg-block" src="/assets/img/caret.svg">
@@ -26,11 +27,13 @@
 		<div id="sort-by-filter" class="filter-col col-sm-3"></div>
 		<div id="waiting-on-filter" class="filter-col col-sm-3"></div>
 		<div id="assigned-to-filter" class="filter-col col-sm-3 hide"></div>
-	</div>
+	</div> -->
 <!-- 	<div id="task-actions" class="actionbar clearfix hide"></div>
 	<div id="assign-to-popover" class="hide">
   	<ul id="popover-ea-list" class="popover-list"></ul>
   </div> -->
+<div id="meetings-grid" class="scrollable">
+	<div class="meetings-container">
+		<div id="tasks" class="pending-scheduling-tasks task-list"></div>
+	</div>
 </div>
-
-<div id="tasks" class="pending-scheduling-tasks task-list scrollable"></div>

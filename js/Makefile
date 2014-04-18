@@ -97,6 +97,7 @@ APP_SOURCES = \
   task.js \
   settings.js \
   places.js \
+  header.js \
   home.js \
   page.js \
   route.js \

@@ -1,29 +1,11 @@
-<div id="home-header">
-	<a href="#meetings-view" id="home-icon-div" data-toggle="tab">
-    <img id="home-icon" class="svg" src="assets/img/esper-mark.svg">
-  </a>
-  <div id="vertical-divider"></div>
-  <div id="meeting-path">
-  	<a href="#meetings-view" data-toggle="tab">Meetings</a>
-  	<img id="path-to" class="svg" src="assets/img/next.svg">
-  </div>
-  <div id="page-title"></div>
-  <div id="account-menu">
-    <img id="account-caret" class="svg" src="/assets/img/caret.svg">
-    <div id="account-circ" data-toggle="popover"
-    		 data-contentwrapper="#account-popover"></div>
-    <div id="account-name"></div>
-  </div>
-  <div id="account-popover" class="hide">
-    <div id="popover-account-info"></div>
-    <ul id="popover-team-list" class="popover-list"></ul>
-    <ul id="popover-account-actions" class="popover-list">
-      <li>
-        <a href="#settings" onclick="return home.runMyFunction();" data-toggle="tab">Settings</a>
-      </li>
-      <li>
-        <a href="#!logout">Sign out</a>
-      </li>
-    </ul>
-  </div>
+<div class="header-accent"></div>
+<a href="#" class="home-icon-container" data-toggle="tab">
+  <img class="svg svg-block home-icon" src="assets/img/esper-mark.svg">
+</a>
+<div id="page-title"></div>
+<div class="hide account-menu">
+  <img id="account-menu-caret" class="svg svg-block" src="/assets/img/arrow-south.svg">
+  <div id="assisting-name"></div>
+  <div id="assisting-circ"></div>
 </div>
+<div class="account-popover" style="display:none"></div>

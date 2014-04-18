@@ -242,83 +242,19 @@ i { color: @gray_60; }
 
 /*** Nav Bar ***/
 
-#mobile-navbar-header,
-#task-navbar {
-  margin: 0;
-  padding: 0;
-  background: white;
-  border-bottom: 1px solid @border;
-  border-radius: 0;
+.task-navbar {
+  position: fixed;
+  top: 60px;
+  background: @gray_60;
 }
 
-#menu,
-#return-home {
+#menu {
   float: left;
   margin-top: 23px;
   margin-left: 16px;
   cursor: pointer;
   &:hover g path { fill: @purple_hover; }
   &:active g path { fill: #7d3ca0; }
-}
-
-#task-title-div {
-  margin-left: 56px;
-  margin-right: 60px;
-}
-
-#task-title {
-  width: 100%;
-  margin-top: 14px;
-  margin-bottom: 0px;
-  font-size: 18px;
-  border: 1px solid white;
-  &:hover { border: 1px solid @gray_20; }
-  &:focus { border: 1px solid @purple; }
-}
-
-#task-navbar {
-  z-index: 1020;
-  position: fixed !important;
-  width: 100%;
-  height: 70px;
-  left: 0;
-  background: @gray_90;
-}
-
-.return-home {
-  float: left;
-  width: 23px;
-  height: 28px;
-  margin-top: 21px;
-  margin-left: 15px;
-  cursor: pointer;
-  g path { fill: @gray_40; }
-  &:hover g path { fill: white; }
-}
-
-#task-title-div {
-  margin-left: 48px;
-  margin-right: 60px;
-}
-
-#task-title {
-  width: 100%;
-  margin-top: 19px;
-  margin-bottom: 0px;
-  font-family: @light;
-  font-size: 18px;
-  color: white;
-  background: none;
-  border: none;
-}
-
-.task-navbar {
-  position: fixed !important;
-  width: 100%;
-  height: 50px;
-  top: 70px;
-  left: 0;
-  background: @gray_80;
 }
 
 .task-tab {
@@ -501,14 +437,15 @@ i { color: @gray_60; }
 
 #home-sidebar {
   position: fixed;
-  z-index: 2;
-  width: 300px;
+  z-index: 3;
+  width: 256px;
   height: 100%;
-  top: 60px;
-  right: 0;
+  top: 63px;
+  left: 0;
   padding: 15px;
   font-size: 14px;
-  background: @gray_f8;
+  background: white;
+  border-right: 1px solid @border;
 }
 
 #new-meeting-btn {
@@ -529,14 +466,13 @@ i { color: @gray_60; }
 }
 
 
-/*** Home Header ***/
+/*** App Header ***/
 
-#home-header {
+.app-header {
   position: fixed;
-  z-index: 3;
+  z-index: 4;
   width: 100%;
-  height: 60px;
-  padding: 15px;
+  height: 63px;
   background: -webkit-linear-gradient(white, #fefdff);
   background:    -moz-linear-gradient(white, #fefdff);
   background:      -o-linear-gradient(white, #fefdff);
@@ -547,66 +483,93 @@ i { color: @gray_60; }
          -box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
 }
 
-#home-icon-div {
-  float: left;
+.header-accent {
+  width: 100%;
+  height: 3px;
+  background: @purple;
 }
 
-#home-icon {
+.home-icon-container {
+  float: left;
+  height: 60px;
+  margin-right: 25px;
+  padding: 15px 18px 0px 15px;
+  border-right: 1px solid @border;
+  border-bottom: 1px solid @border;
+  cursor: pointer;
+  &:hover {
+    .home-icon g path { fill: @purple; }
+    background: -webkit-linear-gradient(@gray_f8, white);
+    background:    -moz-linear-gradient(@gray_f8, white);
+    background:      -o-linear-gradient(@gray_f8, white);
+    background:         linear-gradient(@gray_f8, white);
+  }
+}
+
+.home-icon {
   width: 24px;
   height: 30px;
   g path { fill: @gray_40; }
-  &:hover g path { fill: @purple; }
 }
 
-#vertical-divider {
-  float: left;
+.vertical-divider-right {
+  float: right;
   height: 100%;
-  margin: 0px 25px 0px 18px;
+  margin: 0px 18px 0px 25px;
   border-left: 1px solid @border;
 }
 
 #meeting-path {
-  display: none;
   float: left;
-  padding: 2px;
+  padding: 17px;
   font-size: 20px;
 }
 
 #path-to {
-  margin: 0px 10px 0px 8px;
+  margin: 15px 10px 15px 8px;
   path { fill: @gray_40; }
 }
 
-#page-title {
+#page-title,
+#task-title {
   float: left;
-  padding-top: 2px;
+  padding-top: 17px;
   font-size: 20px;
   cursor: default;
 }
 
-#account-menu {
-  display: inline-block;
+.account-menu {
   float: right;
+  height: 60px;
+  margin-left: 25px;
+  padding: 15px 15px 0px 15px;
+  border-bottom: 1px solid @border;
+  border-left: 1px solid @border;
   cursor: pointer;
   .popover-content { width: 200px; }
   &:hover {
-    #account-caret path { fill: @purple; }
-    #account-circ { background: @purple; }
-    #account-name { color: @purple; }
+    #account-menu-caret path { fill: @gray_60; }
+    #assisting-circ { background: @gray_60; }
+    #assisting-name { color: @gray_80; }
+    background: -webkit-linear-gradient(@gray_f8, white);
+    background:    -moz-linear-gradient(@gray_f8, white);
+    background:      -o-linear-gradient(@gray_f8, white);
+    background:         linear-gradient(@gray_f8, white);
   }
 }
 
-#account-caret {
+#account-menu-caret {
   float: right;
   margin-top: 12px;
+  margin-left: 8px;
   path { fill: @gray_40; }
 }
 
-#account-circ {
+#assisting-circ {
   float: right;
   width: 30px;
   height: 30px;
-  margin: 0px 4px 0px 8px;
+  margin-right: 8px;
   padding-top: 5px;
   color: white;
   text-align: center;
@@ -614,64 +577,71 @@ i { color: @gray_60; }
   border-radius: 15px;
 }
 
-#account-name {
+#assisting-name {
   float: right;
   margin-top: 5px;
   color: @gray_60;
   font-family: @bold;
 }
 
-#assisting-name {
-  color: @gray_60;
-  cursor: default;
-}
-
-#exec-name { font-family: @bold; }
-
 
 /*** Account Popover ***/
 
-#popover-account-info {
+.account-popover {
+  position: fixed;
+  width: 200px;
+  top: 64px;
+  right: 15px;
+  padding: 6px 0px;
+  background: white;
+  border: 1px solid @border;
+  border-radius: 6px;
+  -webkit-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+}
+
+.popover-account-info {
   padding: 5px 20px;
 }
 
-#popover-account-name {
+.popover-account-name {
   font-family: @bold;
   font-size: 16px;
 }
 
-#popover-account-email {
+.popover-account-email {
   font-size: 12px;
   color: @gray_60;
 }
 
-#popover-team-list {
+.popover-team-list {
   margin: 10px 0px;
   padding: 5px 0px;
   border-top: 1px solid @gray_10;
   border-bottom: 1px solid @gray_10;
 }
 
-#popover-team-list > li {
+.popover-team-list > li {
   height: 50px;
   padding: 5px 10px;
 }
 
-#popover-team-list > li:hover {
+.popover-team-list > li:hover {
   background: none;
 }
 
-#popover-team-list > li > a {
+.popover-team-list > li > a {
   height: 40px;
   padding: 8px 10px;
   border-radius: 3px;
 }
 
-#popover-team-list > li > a:hover {
+.popover-team-list > li > a:hover {
   background: @purple_bg;
 }
 
-#popover-team-list > li > a.active {
+.popover-team-list > li > a.active {
   cursor: default;
   color: @purple_text;
   background: @gray_05;
@@ -701,8 +671,6 @@ i { color: @gray_60; }
 
 
 /*** Tab Bar ***/
-
-#tabbar { margin: 30px 0px 15px 0px; }
 
 #search-meetings {
   float: right;
@@ -835,14 +803,23 @@ i { color: @gray_60; }
 
 /*** Meetings ***/
 
-#meetings-tools {
+.meetings-container {
+  width: 100%;
+  min-width: 768px;
+  max-width: 1260px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0px 60px;
+}
+
+#meetings-toolbar {
   position: fixed;
   z-index: 2;
-  top: 60px;
-  right: 360px;
-  left: 60px;
-  padding-bottom: 15px;
-  background-color: white;
+  top: 63px;
+  right: 0;
+  left: 256px;
+  padding: 30px 0px;
+  background: white;
   border-bottom: 1px solid @border;
 }
 
@@ -852,14 +829,15 @@ i { color: @gray_60; }
   margin-top: 6px;
 }
 
-#tasks {
+#meetings-grid {
   position: fixed;
   z-index: 1;
-  top: 60px;
-  right: 300px;
+  top: 156px;
+  right: 0;
   bottom: 0;
-  left: 0;
-  padding: 113px 60px 100px 60px;
+  left: 256px;
+  padding: 20px 0px 100px 0px;
+  background: @gray_f8;
 }
 
 .task {
@@ -867,9 +845,10 @@ i { color: @gray_60; }
   width: 240px;
   margin: 10px;
   padding: 10px;
+  background: white;
   border: 1px solid @gray_10;
   border-radius: 3px;
-  cursor: default;
+  cursor: pointer;
   &:hover {
     background: @purple_bg_hover;
     -webkit-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
@@ -892,11 +871,9 @@ i { color: @gray_60; }
 }
 
 .meeting-footer {
-  margin: 10px -10px -10px -10px;
-  padding: 10px;
-  background: @gray_f8;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid @border;
 }
 
 .meeting-status-row {
@@ -1521,11 +1498,6 @@ i { color: @gray_60; }
 
 .verified-label {
   color: @gray_40;
-}
-
-.vertical-divider {
-  margin-right: 10px;
-  margin-left: 10px;
 }
 
 .remove-email {

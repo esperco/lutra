@@ -24,6 +24,10 @@
 
   <body>
 
+    <div id="app-header" class="app-header">
+      @@header.html@@
+    </div>
+
     <div id="loading">
       <div id="loading-box">
         <img id="loading-icon" src="/assets/img/loading.gif">
@@ -32,6 +36,13 @@
     </div>
 
     <!-- <div id="global-status" class="animated"></div> -->
+
+    <div id="test-page" class="hide test-page">
+      <div class="navbar-push container scrollable">
+        <div id="test-content" class="row">
+        </div>
+      </div>
+    </div>
 
     <div id="login-page" class="hide login-page">
       <div class="login-container">
@@ -78,41 +89,18 @@
       @@email-verify.html@@
     </div>
 
-    <div id="home-page" class="home-page hide">
-      @@header.html@@
+    <div id="home-page" class="hide home-page">
       @@home-sidebar.html@@
-      <div class="tab-content" id="home-content">
-        <div class="tab-pane fade in active"
-             id="meetings-view">
-          @@meetings-view.html@@
-        </div>
-        <div class="tab-pane fade" id="settings">
-          @@settings.html@@
-        </div>
+      <div id="meetings-view">
+        @@meetings-view.html@@
       </div>
     </div>
 
-    <div id="test-page" class="hide test-page">
-
-      <div class="navbar-push container scrollable">
-        <div id="test-content" class="row">
-        </div>
-      </div>
+    <div id="settings-page" class="hide settings-page">
+        @@settings.html@@
     </div>
 
-    <div id="task-page" class="task-page scrollable hide">
-      @@header.html@@
-      <div class="task-header">
-        <div class="task-header-container">
-          <a href="#">
-            <img class="svg return-home" src="/assets/img/esper-mark.svg">
-          </a>
-          <div id="task-title-div" class="clearfix">
-            <div id="task-title" class="hide ellipsis"></div>
-          </div>
-        </div>
-      </div>
-
+    <div id="task-page" class="hide task-page scrollable">
       <div class="task-navbar">
         <div class="task-navbar-container clearfix">
           <a class="task-tab setup-tab-select">
@@ -136,24 +124,21 @@
         </div>
       </div>
 
-      <div id="sched-task" class="scrollable hide">
-        <div id="sched-step2-tab" class="task-container hide">
+      <div id="sched-task" class="hide scrollable">
+        <div id="sched-step2-tab" class="hide task-container">
           <div id="sched-step2-connect" class="hide"></div>
           <div id="sched-step2-table"></div>
         </div>
-        <div id="sched-step4-tab" class="task-container hide">
+        <div id="sched-step4-tab" class="hide task-container">
           <div id="sched-step4-table"></div>
         </div>
-        <div id="messages-tab" class="task-container hide">
+        <div id="messages-tab" class="hide task-container">
           @@messages-tab.html@@
         </div>
-        <div id="setup-tab" class="task-container hide">
+        <div id="setup-tab" class="hide task-container">
           <div id="setup-table"></div>
         </div>
       </div>
-
-      <div id="gen-task" class="hide"></div>
-
     </div>
 
     <!-- API key activated by jeff@esper.co -->

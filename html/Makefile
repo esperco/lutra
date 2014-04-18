@@ -5,14 +5,16 @@ prod: prod-build
 guest-app: guest-app-build
 
 HTML_INCLUDES = \
+  email-verify.html \
   header.html \
   home-sidebar.html \
   meetings-view.html \
+  messages-tab.html \
   request-password.html \
   reset-password.html \
-  messages-tab.html \
   settings.html \
-  email-verify.html
+  task-header.html
+
 
 dev-build:
 	sed -e '/INCLUDES/r ../js/includes-dev.html' \

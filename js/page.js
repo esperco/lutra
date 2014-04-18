@@ -6,6 +6,7 @@ var page = (function() {
     resetPassword: {},
     emailVerify: {},
     home: {},
+    settings: {},
     task: {},
     scheduling: {},
     respond: {},
@@ -24,6 +25,7 @@ var page = (function() {
     "reset-password":   {classes:["reset-password-page"]},
     "email-verify":     {classes:["email-verify-page"]},
     "home":             {classes:["home-page"]},
+    "settings":         {classes:["settings-page"]},
     "task":             {classes:["task-page"]},
     "scheduling":       {classes:["scheduling-page"]},
     "respond":          {classes:["respond-page"]},
@@ -232,7 +234,14 @@ var page = (function() {
     pageSelector.hideAll();
     home.load();
     goto_page("home");
-    display.updateHome();
+    util.focus();
+  };
+
+  mod.settings.load = function() {
+    pageSelector.hideAll();
+    settings.load();
+    goto_page("settings");
+    display.updateSettings();
     util.focus();
   };
 

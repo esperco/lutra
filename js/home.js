@@ -413,7 +413,7 @@ var home = (function() {
         $('.show-pending-meetings').addClass('active');
         $('.show-finalized-meetings').removeClass('active');
         $('#tasks')
-          .attr('class', 'pending-scheduling-tasks task-list scrollable');
+          .attr('class', 'pending-scheduling-tasks task-list');
       });
     $('.show-finalized-meetings')
       .unbind('click')
@@ -421,7 +421,7 @@ var home = (function() {
         $('.show-pending-meetings').removeClass('active');
         $('.show-finalized-meetings').addClass('active');
         $('#tasks')
-          .attr('class', 'finalized-scheduling-tasks task-list scrollable');
+          .attr('class', 'finalized-scheduling-tasks task-list');
       });
   }
 
@@ -603,19 +603,11 @@ var home = (function() {
   }
 
   function loadSidebar() {
-    var execName = $("#assisting-name");
-    profile.get(login.leader()).done(function(obsProf) {
-      var p = obsProf.prof;
-      var assisting = $("<div>assisting </div>");
-      var fullName = $("<div id='exec-name'/>")
-        .text(profile.fullName(p));
-      execName.children().remove();
-      execName.append(assisting)
-              .append(fullName);
-    });
+
   }
 
   function switchTeam(team) {
+    log("Switching");
     login.setTeam(team);
     mod.load();
   }
@@ -645,7 +637,9 @@ var home = (function() {
       a.addClass("active");
       pic.addClass("active");
     } else {
+      log("Not active");
       li.click(function() {
+        log("switch");
         switchTeam(team);
       });
     }
@@ -661,8 +655,7 @@ var home = (function() {
     });
   }
 
-  function insertTeams() {
-    var view = $("#popover-team-list");
+  function insertTeams(view) {
     view.children().remove();
     var teams = sortTeams(login.getTeams());
     list.iter(list.rev(teams), function(team) {
@@ -671,63 +664,86 @@ var home = (function() {
     });
   }
 
-  function loadHeader() {
-    var view = $("#account-circ");
-    var name = $("#account-name");
-    var info = $("#popover-account-info");
-
-    api.getProfile(login.me()).done(function(eaProf) {
-      var fullName = profile.fullName(eaProf);
-      var email = profile.email(eaProf);
-      view.text(profile.shortenName(fullName).substring(0,1).toUpperCase());
+  function loadHeader(popover) {
+'''
+<div #view class="home-header">
+  <div class="header-accent"></div>
+  <a href="#" class="home-icon-container" data-toggle="tab">
+    <img class="svg svg-block home-icon" src="assets/img/esper-mark.svg">
+  </a>
+  <div id="page-title"></div>
+  <div #menu class="account-menu">
+    <img id="account-menu-caret" class="svg" src="/assets/img/arrow-south.svg">
+    <div id="assisting-name"></div>
+    <div id="assisting-circ"></div>
+  </div>
+</div>
+'''
+    profile.get(login.leader()).done(function(obsProf) {
+      var circ = $("#assisting-circ");
+      var name = $("#assisting-name");
+      var p = obsProf.prof;
+      var fullName = profile.fullName(p);
+      circ.text(profile.shortenName(fullName).substring(0,1).toUpperCase());
+      name.children().remove();
       name.text(fullName);
-      info.children().remove();
-      info.append($("<div id='popover-account-name' class='ellipsis'/>")
-            .text(fullName))
-          .append($("<div id='popover-account-email' class='ellipsis'/>")
-            .text(email));
     });
 
-    insertTeams();
-
-    view.popover({
-      html:true,
-      placement:'bottom',
-      content:function(){
-        return $($(this).data('contentwrapper')).html();
+    menu.click(function() {
+      if (popover.hasClass("open")) {
+        popover.removeClass("open")
+               .attr("style","display:none");
+      } else {
+        popover.addClass("open")
+               .attr("style","display:block");
       }
-    });
-
-    view.on('shown.bs.popover', function () {
-      $('.popover').css('left',parseInt($('.popover').css('left')) - 70 + 'px');
-      $('.arrow').css('left','80%');
     })
 
     $('body').on('click', function (e) {
-      if ($(e.target).data('toggle') !== 'popover'
-        && $(e.target).parents('[data-toggle="popover"]').length === 0
-        && $(e.target).parents('.popover.in').length === 0
-        && view.next('div.popover:visible').length) {
-        view.click();
+      if ($(e.target) == popover) {
+        menu.click();
       }
     });
   }
 
-  mod.runMyFunction = function() {
-    log("Load Settings");
-    settings.load();
-    $("#account-circ").click();
-    return true;
+  function loadAccountPopover() {
+'''
+<div #view style="display:none">
+  <div #accountInfo/>
+  <ul #teamList class="popover-list"></ul>
+  <ul #accountActions" class="popover-list">
+    <li>
+      <a href="#!settings" data-toggle="tab">Settings</a>
+    </li>
+    <li>
+      <a href="#!logout">Sign out</a>
+    </li>
+  </ul>
+</div>
+'''
+    api.getProfile(login.me()).done(function(eaProf) {
+      var name = profile.fullName(eaProf);
+      var email = profile.email(eaProf);
+      accountInfo.children().remove();
+      accountInfo.append($("<div id='popover-account-name' class='ellipsis'/>")
+                   .text(name))
+                 .append($("<div id='popover-account-email' class='ellipsis'/>")
+                   .text(email));
+    });
+
+    insertTeams(teamList);
+
+    loadHeader(view);
   }
 
   mod.load = function() {
-    loadHeader();
+    document.title = "Meetings - Esper";
+    $("#page-title").text("Meetings");
+    header.load();
     loadSidebar();
     loadSearch();
-    loadFilters();
     loadMeetings();
     util.focus();
-    $("#page-title").text("Meetings");
     $(document).click(function(event) {
       var target = $(event.target);
       if ((! target.parents("#tasks").length) &&

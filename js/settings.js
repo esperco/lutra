@@ -623,6 +623,7 @@ var settings = (function() {
   }
 
   mod.load = function() {
+    document.title = "Settings - Esper";
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     displayExecutives(teams);
