@@ -448,6 +448,20 @@ i { color: @gray_60; }
   border-right: 1px solid @border;
 }
 
+.home-sidebar-footer {
+  position: fixed;
+  width: 226px;
+  height: 50px;
+  bottom: 0px;
+  padding: 15px;
+  border-top: 1px solid @border;
+}
+
+.sidebar-footer-link {
+  float: left;
+  margin-right: 15px;
+}
+
 #new-meeting-btn {
   width: 100%;
   margin-bottom: 20px;
@@ -478,9 +492,9 @@ i { color: @gray_60; }
   background:      -o-linear-gradient(white, #fefdff);
   background:         linear-gradient(white, #fefdff);
   border-bottom: 1px solid @border;
-  -webkit-box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
-     -moz-box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
-         -box-shadow: 0px 1px 1px 0px rgba(230,231,232,0.7);
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
 }
 
 .header-accent {
@@ -519,19 +533,19 @@ i { color: @gray_60; }
   border-left: 1px solid @border;
 }
 
-#meeting-path {
+.meeting-path {
   float: left;
-  padding: 17px;
+  padding-top: 17px;
   font-size: 20px;
 }
 
-#path-to {
-  margin: 15px 10px 15px 8px;
+.path-to {
+  float: left;
+  margin: 24px 20px 0px 18px;
   path { fill: @gray_40; }
 }
 
-#page-title,
-#task-title {
+.page-title {
   float: left;
   padding-top: 17px;
   font-size: 20px;
@@ -558,14 +572,14 @@ i { color: @gray_60; }
   }
 }
 
-#account-menu-caret {
+.account-menu-arrow {
   float: right;
   margin-top: 12px;
   margin-left: 8px;
   path { fill: @gray_40; }
 }
 
-#assisting-circ {
+.assisting-circ {
   float: right;
   width: 30px;
   height: 30px;
@@ -577,7 +591,7 @@ i { color: @gray_60; }
   border-radius: 15px;
 }
 
-#assisting-name {
+.assisting-name {
   float: right;
   margin-top: 5px;
   color: @gray_60;
@@ -590,15 +604,14 @@ i { color: @gray_60; }
 .account-popover {
   position: fixed;
   width: 200px;
-  top: 64px;
+  top: 70px;
   right: 15px;
-  padding: 6px 0px;
   background: white;
-  border: 1px solid @border;
-  border-radius: 6px;
-  -webkit-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
-     -moz-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
-         -box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
 }
 
 .popover-account-info {
@@ -841,19 +854,21 @@ i { color: @gray_60; }
 }
 
 .task {
+  float: left;
   display: none;
   width: 240px;
   margin: 10px;
   padding: 10px;
+  color: @gray_60;
   background: white;
   border: 1px solid @gray_10;
   border-radius: 3px;
   cursor: pointer;
   &:hover {
     background: @purple_bg_hover;
-    -webkit-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
-       -moz-box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
-           -box-shadow: 0px 0px 1px 1px rgba(230,231,232,0.7);
+    -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+       -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+           -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
   }
 }
 

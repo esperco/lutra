@@ -60,6 +60,10 @@ var page = (function() {
   }
 
   function prepareLogin(redirPath) {
+    document.title = "Esper - Sign in";
+    $(".meeting-path").addClass("hide");
+    $(".path-to").addClass("hide");
+    $(".page-title").text("");
     $("#login-error-message")
       .removeClass("fadeIn")
       .addClass("hide");
@@ -285,7 +289,6 @@ var page = (function() {
     pageSelector.hideAll();
     goto_page("task");
     task.load(tid);
-    display.updateTask();
     util.focus();
   };
 

@@ -9,37 +9,43 @@ var header = (function() {
   var popover = $(".account-popover");
 
   function loadMenu() {
+'''
+<div #view>
+  <div #arrowContainer class="account-menu-arrow"/>
+  <div #name class="assisting-name"/>
+  <div #circ class="assisting-circ"/>
+</div>
+'''
+    var arrow = $("<img class='svg-block'/>")
+      .appendTo(arrowContainer);
+    svg.loadImg(arrow, "/assets/img/arrow-south.svg");
+
     profile.get(login.leader()).done(function(obsProf) {
-      var circ = $("#assisting-circ");
-      var name = $("#assisting-name");
       var p = obsProf.prof;
       var fullName = profile.fullName(p);
       circ.text(profile.shortenName(fullName).substring(0,1).toUpperCase());
-      name.children().remove();
       name.text(fullName);
     });
 
-    menu.click(function() {
-      if (popover.hasClass("open")) {
-        popover.removeClass("open")
-               .attr("style","display:none");
-      } else {
-        popover.addClass("open")
-               .attr("style","display:block");
-      }
-    })
+    menu
+      .off("click")
+      .click(function() {
+        if (popover.hasClass("open")) {
+          popover.removeClass("open")
+                 .attr("style","display:none");
+        } else {
+          popover.addClass("open")
+                 .attr("style","display:block");
+        }
+      })
 
-    $('body').on('click', function (e) {
-      if ($(e.target) == popover) {
-        menu.click();
-      }
-    });
+    menu.children().remove();
+    menu.append(view);
   }
 
   function switchTeam(team) {
-    log("Switching");
     login.setTeam(team);
-    mod.load();
+    home.load();
   }
 
   function labelOfTeam(team) {
@@ -67,9 +73,7 @@ var header = (function() {
       a.addClass("active");
       pic.addClass("active");
     } else {
-      log("Not active");
       li.click(function() {
-        log("switch");
         switchTeam(team);
       });
     }
@@ -96,13 +100,13 @@ var header = (function() {
 
   function loadAccountPopover() {
 '''
-<div #view>
-  <div #accountInfo>
+<div #view class="popover-content">
+  <div #accountInfo class="popover-account-info">
     <div #accountName class="popover-account-name ellipsis"/>
     <div #accountEmail class="popover-account-email ellipsis"/>
   </div>
-  <ul #teamList class="popover-team-list"></ul>
-  <ul #accountActions" class="popover-team-list">
+  <ul #teamList class="popover-team-list popover-list"></ul>
+  <ul #accountActions" class="popover-account-actions popover-list">
     <li>
       <a href="#!settings" data-toggle="tab">Settings</a>
     </li>
@@ -123,8 +127,18 @@ var header = (function() {
     popover.append(view);
   }
 
+  mod.clear = function() {
+    popover.children().remove();
+    popover.removeClass("open")
+           .attr("style","display:none");
+    menu.children().remove();
+    menu.addClass("hide");
+  }
+
   mod.load = function() {
     loadAccountPopover();
+    popover.removeClass("open")
+       .attr("style","display:none");
     loadMenu();
     menu.removeClass("hide");
   };

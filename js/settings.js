@@ -622,8 +622,15 @@ var settings = (function() {
     });
   }
 
-  mod.load = function() {
+  function loadPageTitle() {
     document.title = "Settings - Esper";
+    $(".meeting-path").addClass("hide");
+    $(".path-to").addClass("hide");
+    $(".page-title").text("Settings");
+  }
+
+  mod.load = function() {
+    loadPageTitle();
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     displayExecutives(teams);

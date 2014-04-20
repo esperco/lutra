@@ -55,6 +55,7 @@ var login = (function() {
   mod.logout = function () {
     mp.track("Logout");
     mod.clearLoginInfo();
+    header.clear();
   };
 
   /*

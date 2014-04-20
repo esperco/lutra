@@ -90,7 +90,9 @@
     </div>
 
     <div id="home-page" class="hide home-page">
-      @@home-sidebar.html@@
+      <div id="home-sidebar">
+        @@home-sidebar.html@@
+      </div>
       <div id="meetings-view">
         @@meetings-view.html@@
       </div>
