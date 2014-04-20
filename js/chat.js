@@ -117,10 +117,14 @@ var chat = (function () {
 
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
+    var meetType = slot.meeting_type + ", ";
     if (util.isNotNull(slot.end)) {
-      v.text(date.range(date.ofString(slot.start), date.ofString(slot.end)));
+      var range = date.range(
+        date.ofString(slot.start), date.ofString(slot.end)
+      );
+      v.text(meetType + range);
     } else {
-      v.text(date.justStartTime(date.ofString(slot.start)));
+      v.text(meetType + date.justStartTime(date.ofString(slot.start)));
     }
     v.append($("<br/>"));
     appendLocation(v, slot.location);
