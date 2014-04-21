@@ -508,8 +508,29 @@ i { color: @gray_60; }
   margin-right: 15px;
 }
 
-#new-meeting-btn {
+.new-meeting-btn {
+  width: 280px;
+  height: 245px;
+  margin: 10px;
+  text-align: center;
+  vertical-align: center;
+  background: none;
+  border: 4px dotted @border;
+  border-radius: 6px;
+  &:focus { outline: none; }
+  &:hover { background: rgba(255,255,255,0.7); }
+}
+
+.new-meeting-plus {
+  width: 40px;
+  height: 40px;
   margin-bottom: 20px;
+  path { fill: @purple; }
+}
+
+.new-meeting-text {
+  color: @purple;
+  font-size: 20px;
 }
 
 
@@ -868,7 +889,7 @@ i { color: @gray_60; }
   z-index: 50;
   width: 150px;
   margin: 18px 0px 0px 98px;
-  padding: 3px 0px;
+  padding: 6px 0px;
   background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;

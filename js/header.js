@@ -18,7 +18,7 @@ var header = (function() {
 '''
     var arrow = $("<img class='svg-block'/>")
       .appendTo(arrowContainer);
-    svg.loadImg(arrow, "/assets/img/arrow-south.svg");
+    svg.loadImg(arrow, "/assets/img/arrow-south-sm.svg");
 
     profile.get(login.leader()).done(function(obsProf) {
       var p = obsProf.prof;

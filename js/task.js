@@ -200,7 +200,7 @@ var task = (function() {
   };
 
   mod.init = function() {
-    $("#new-meeting-btn")
+    $(".new-meeting-btn")
       .unbind("click")
       .click(function () {
         createAndLoadTask();
