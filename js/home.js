@@ -27,9 +27,11 @@ var home = (function() {
   function loadMeetingActions(ta, popover) {
 '''
 <ul #view class="popover-list">
-  <li #viewLivePage class="meeting-action" target="blank">
-    <div #viewLivePageIconContainer class="meeting-action-icon"/>
-    <span class="meeting-action-label">View live page</span>
+  <li class="meeting-action">
+    <a #viewLivePage target="blank">
+      <div #viewLivePageIconContainer class="meeting-action-icon"/>
+      <span class="meeting-action-label">View live page</span>
+    </a>
   </li>
   <li #rescheduleAction class="meeting-action">
     <div #rescheduleIconContainer class="meeting-action-icon"/>
@@ -97,7 +99,7 @@ var home = (function() {
   function viewOfTaskCard(ta) {
 '''
 <div #view>
-  <div #newMessages class="meeting-new-messages"/>
+  <div #newMessages class="meeting-new-messages ellipsis"/>
   <div #actionsPopover class="meeting-actions-popover"
                        style="display:none"/>
   <div #subjectRow class="meeting-subject ellipsis">
@@ -399,18 +401,21 @@ var home = (function() {
   }
 
   function loadNotifications(view) {
-    var notification1 = $("<div class='ellipsis notification unread'/>")
+    var notification1 = $("<div class='notification unread'/>")
       .append($("<span class='bold'/>")
         .text("Johnny Appleseed"))
       .append($("<span/>")
         .text(" sent you a message."))
       .appendTo(view);
-    var notification2 = $("<div class='ellipsis notification'/>")
+    // notification1.dotdotdot();
+
+    var notification2 = $("<div class='notification'/>")
       .append($("<span class='bold'/>")
         .text("Executive"))
       .append($("<span/>")
         .text(" sent you a new scheduling request."))
       .appendTo(view);
+    // notification2.dotdotdot();
   }
 
   function loadSidebar() {
@@ -443,6 +448,12 @@ var home = (function() {
 
     profile.get(login.leader()).done(function(obsProf) {
       var execName = profile.firstName(obsProf.prof);
+      var possessive = execName;
+      if (execName.slice(-1) === "s") {
+        possessive += "'";
+      } else {
+        possessive += "'s"
+      }
       exec.text("Here's what's happening with " + execName + "'s meetings:");
     });
 
