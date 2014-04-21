@@ -24,58 +24,39 @@ var home = (function() {
     return type + " with";
   }
 
-  function loadTaskActions(ta) {
-    var view = $("#task-actions");
-    view.children().remove();
-
-    var viewLivePage = $("<a class='task-action' target='blank'/>");
-    var viewLivePageIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(viewLivePage);
-    var viewLivePageIcon = $("<img/>")
+  function loadMeetingActions(ta, popover) {
+'''
+<ul #view class="popover-list">
+  <li #viewLivePage class="meeting-action" target="blank">
+    <div #viewLivePageIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">View live page</span>
+  </li>
+  <li #rescheduleAction class="meeting-action">
+    <div #rescheduleIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Reschedule...</span>
+  </li>
+  <li #cancelAction class="meeting-action">
+    <div #cancelIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Cancel...</span>
+  </li>
+  <li #deleteAction class="meeting-action">
+    <div #deleteIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Delete...</span>
+  </li>
+</ul>
+'''
+    var viewLivePageIcon = $("<img class='svg-block'/>")
       .appendTo(viewLivePageIconContainer);
     svg.loadImg(viewLivePageIcon, "/assets/img/globe.svg");
-    viewLivePage.append(($("<span class='task-action-label'/>"))
-                  .text("View live page"))
-                .appendTo(view);
-    var assignAction = $("<a class='task-action disabled'/>");
-    var assignIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(assignAction);
-    var assignIcon = $("<img/>")
-      .appendTo(assignIconContainer);
-    svg.loadImg(assignIcon, "/assets/img/assign-to.svg");
-    assignAction.append(($("<span class='task-action-label caret-text'/>"))
-                  .text("Assign to"));
-    var assignCaret = $("<img class='caret-link'/>")
-      .appendTo(assignAction);
-    svg.loadImg(assignCaret, "/assets/img/caret.svg");
-    assignAction.appendTo(view);
-    var rescheduleAction = $("<a class='task-action'/>");
-    var rescheduleIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(rescheduleAction);
-    var rescheduleIcon = $("<img/>")
+    var rescheduleIcon = $("<img class='svg-block'/>")
       .appendTo(rescheduleIconContainer);
     svg.loadImg(rescheduleIcon, "/assets/img/reschedule.svg");
-    rescheduleAction.append(($("<span class='task-action-label'/>"))
-                      .text("Reschedule..."))
-                    .appendTo(view);
-    var cancelAction = $("<a class='task-action'/>");
-    var cancelIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(cancelAction);
-    var cancelIcon = $("<img/>")
+    var cancelIcon = $("<img class='svg-block'/>")
       .appendTo(cancelIconContainer);
     svg.loadImg(cancelIcon, "/assets/img/cancel-meeting.svg");
-    cancelAction.append(($("<span class='task-action-label'/>"))
-                  .text("Cancel..."))
-                .appendTo(view);
-    var deleteAction = $("<a class='task-action'/>");
-    var deleteIconContainer = $("<div class='task-action-icon'/>")
-      .appendTo(deleteAction);
-    var deleteIcon = $("<img/>")
+    var deleteIcon = $("<img class='svg-block'/>")
       .appendTo(deleteIconContainer);
     svg.loadImg(deleteIcon, "/assets/img/delete-meeting.svg");
-    deleteAction.append(($("<span class='task-action-label'/>"))
-                  .text("Delete..."))
-                .appendTo(view);
 
     var hosts = sched.getHosts(ta);
     var host;
@@ -85,8 +66,6 @@ var home = (function() {
     api.getGuestAppURL(ta.tid, host).done(function (url) {
       viewLivePage.attr("href", url.url);
     });
-
-    loadAssignToPopover(ta, assignAction);
 
     rescheduleAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
@@ -110,41 +89,59 @@ var home = (function() {
       api.archiveTask(ta.tid);
       observable.onTaskArchived.notify(ta.tid);
     });
+
+    popover.children().remove();
+    popover.append(view);
   }
 
   function viewOfTaskCard(ta) {
-    var view = $("<a/>",{
-      href: "#!task/" + ta.tid,
-      id:"task-" + ta.tid
-    })
-      .click(function() {
-        loadTaskActions(ta);
-      })
+'''
+<div #view>
+  <div #newMessages class="meeting-new-messages"/>
+  <div #actionsPopover class="meeting-actions-popover"
+                       style="display:none"/>
+  <div #subjectRow class="meeting-subject ellipsis">
+    <div #arrowContainer class="meeting-actions-arrow"/>
+    <div #subjectIconContainer class="meeting-subject-icon"/>
+    <div #subject class="meeting-subject-text link ellipsis">
+      <a #subjectText/>
+    </div>
+  </div>
+  <div class="inner-shadow-down"/>
+  <div #meetingTitle class="meeting-title scrollable">
+    <div #meetingRow class="meeting-type"/>
+  </div>
+  <div class="inner-shadow-up"/>
+  <div #meetingFooter class="meeting-footer">
+    <div #statusRow class="meeting-status-row">
+      <div #statusIcon class="meeting-status-icon">
+        <div #toDo class="status-icon to-do-icon"/>
+        <div #reminder class="status-icon reminder-status-icon hide"/>
+      </div>
+      <div #status class="meeting-status-text"/>
+    </div>
+    <div #updated class="meeting-updated-row"/>
+  </div>
+</div>
+'''
+    view.attr("id","task-" + ta.tid);
 
     if (ta.task_status) {
-      var newMessages = $("<div class='meeting-new-messages'/>")
-        .text("2")
-        .appendTo(view);
+      newMessages.text("2");
 
-      var subjectRow = $("<div class='meeting-subject ellipsis'/>")
-        .appendTo(view);
-      var subjectIconContainer = $("<div class='meeting-subject-icon'/>")
-        .appendTo(subjectRow)
+      loadMeetingActions(ta, actionsPopover);
+
       var subjectIcon = $("<img class='svg-block'/>")
         .appendTo(subjectIconContainer);
       svg.loadImg(subjectIcon, "/assets/img/status-email.svg");
-      var subject = $("<div class='meeting-subject-text'/>")
+      var arrow = $("<img class='svg-block'/>")
+        .appendTo(arrowContainer);
+      svg.loadImg(arrow, "/assets/img/arrow-south-sm.svg");
+      subjectText
         .text(ta.task_status.task_title)
-        .appendTo(subjectRow);
+        .attr("href","#!task/" + ta.tid);
 
-      var innerShadowDown = $("<div class='inner-shadow-down'/>")
-        .appendTo(view);
-
-      var meetingTitle = $("<div class='meeting-title scrollable'/>")
-        .appendTo(view);
-      var typeRow = $("<div class='meeting-type'/>")
-        .append(meetingType(ta))
-        .appendTo(meetingTitle);
+      meetingRow.text(meetingType(ta));
       var guest1 = $("<div class='meeting-guest clearfix'/>")
         .appendTo(meetingTitle);
       var guest1Circ = $("<div class='meeting-guest-circ'/>")
@@ -170,46 +167,38 @@ var home = (function() {
         .text("Christopher Christopherson")
         .appendTo(guest3);
 
-      var innerShadowUp = $("<div class='inner-shadow-up'/>")
-        .appendTo(view);
-
-      var meetingFooter = $("<div class='meeting-footer'/>")
-        .appendTo(view);
-      var statusRow = $("<div class='meeting-status-row'/>")
-        .appendTo(meetingFooter);
-      var status = $("<div class='meeting-status-text'/>")
-        .text(taskStatus(ta));
-      var guests = $("<div class='status-icon guests-status-icon '/>");
-      var guestsIcon = $("<img/>")
-        .appendTo(guests);
-      svg.loadImg(guestsIcon, "/assets/img/status-guests.svg");
-      var email = $("<div class='status-icon email-status-icon hide'/>");
-      var emailIcon = $("<img/>")
-        .appendTo(email);
-      svg.loadImg(emailIcon, "/assets/img/status-email.svg");
-      var options = $("<div class='status-icon options-status-icon hide'/>");
-      var optionsIcon = $("<img/>")
-        .appendTo(options);
-      svg.loadImg(optionsIcon, "/assets/img/status-options.svg");
-      var calendar = $("<div class='status-icon calendar-status-icon hide'/>");
-      var calendarIcon = $("<img/>")
-        .appendTo(calendar);
-      svg.loadImg(calendarIcon, "/assets/img/status-calendar.svg");
-      var reminder = $("<div class='status-icon reminder-status-icon hide'/>");
-      var reminderIcon = $("<img/>")
+      var toDoIcon = $("<img class='svg-block'/>")
+        .appendTo(toDo);
+      svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
+      var reminderIcon = $("<img class='svg-block'/>")
         .appendTo(reminder);
       svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
-      var statusIcon = $("<div class='meeting-status-icon'/>")
-        .append(guests)
-        .append(email)
-        .append(options)
-        .append(calendar)
-        .append(reminder)
-        .appendTo(statusRow);
-      statusRow.append(status);
-      var updatedRow = $("<div class='meeting-updated-row'/>")
-        .text("Updated 3 days ago")
-        .appendTo(meetingFooter);
+      status.text(taskStatus(ta));
+      updated.text("Updated 3 days ago");
+
+      view.hover(
+        function() {
+          if (! view.hasClass("actions-open"))
+            arrowContainer.css("display","block");
+        }, function() {
+          if (! view.hasClass("actions-open"))
+            arrowContainer.css("display","none");
+        }
+      );
+
+      arrowContainer
+        .off("click")
+        .click(function() {
+          if (actionsPopover.hasClass("open")) {
+            view.removeClass("actions-open");
+            actionsPopover.removeClass("open")
+                          .attr("style","display:none");
+          } else {
+            view.addClass("actions-open");
+            actionsPopover.addClass("open")
+                          .attr("style","display:block");
+          }
+        })
     }
 
     return view;
@@ -365,7 +354,7 @@ var home = (function() {
         $('.show-pending-meetings').addClass('active');
         $('.show-finalized-meetings').removeClass('active');
         $('#tasks')
-          .attr('class', 'pending-scheduling-tasks task-list');
+          .attr('class', 'clearfix pending-scheduling-tasks task-list');
       });
     $('.show-finalized-meetings')
       .unbind('click')
@@ -373,7 +362,7 @@ var home = (function() {
         $('.show-pending-meetings').removeClass('active');
         $('.show-finalized-meetings').addClass('active');
         $('#tasks')
-          .attr('class', 'finalized-scheduling-tasks task-list');
+          .attr('class', 'clearfix finalized-scheduling-tasks task-list');
       });
   }
 
@@ -401,8 +390,74 @@ var home = (function() {
     })
   }
 
-  function loadSidebar() {
+  function loadNotification() {
+'''
+<div #view class="notification">
 
+</div>
+'''
+  }
+
+  function loadNotifications(view) {
+    var notification1 = $("<div class='ellipsis notification unread'/>")
+      .append($("<span class='bold'/>")
+        .text("Johnny Appleseed"))
+      .append($("<span/>")
+        .text(" sent you a message."))
+      .appendTo(view);
+    var notification2 = $("<div class='ellipsis notification'/>")
+      .append($("<span class='bold'/>")
+        .text("Executive"))
+      .append($("<span/>")
+        .text(" sent you a new scheduling request."))
+      .appendTo(view);
+  }
+
+  function loadSidebar() {
+'''
+<div #view>
+  <div #hello class="hello ellipsis"/>
+  <div #exec/>
+  <div #notifications class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div #notificationsIcon class="notifications-icon"/>
+      <div #notificationsCount class="notifications-count"/>
+      <div class="sidebar-section-title">Notifications</div>
+      <a class="see-all link">See all</a>
+    </div>
+    <div #notificationsList class="notifications-list"/>
+  </div>
+  <div #toDo class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div #toDoIcon class="to-do-icon"/>
+      <div #toDoCount class="to-do-count"/>
+      <div class="sidebar-section-title">To Do</div>
+      <a class="see-all link">See all</a>
+    </div>
+  </div>
+</div>
+'''
+    api.getProfile(login.me()).done(function(eaProf) {
+      hello.text("Hello, " + profile.firstName(eaProf) + "!");
+    });
+
+    profile.get(login.leader()).done(function(obsProf) {
+      var execName = profile.firstName(obsProf.prof);
+      exec.text("Here's what's happening with " + execName + "'s meetings:");
+    });
+
+    var bell = $("<img class='svg-block'/>")
+      .appendTo(notificationsIcon);
+    svg.loadImg(bell, "/assets/img/notifications.svg");
+
+    loadNotifications(notificationsList);
+
+    var clipboard = $("<img class='svg-block'/>")
+      .appendTo(toDoIcon);
+    svg.loadImg(clipboard, "/assets/img/to-do.svg");
+
+    $(".sidebar-content").children().remove();
+    $(".sidebar-content").append(view);
   }
 
   function loadPageTitle() {
@@ -422,17 +477,6 @@ var home = (function() {
     loadSearch();
     loadMeetings();
     util.focus();
-    $(document).click(function(event) {
-      var target = $(event.target);
-      if ((! target.parents("#tasks").length) &&
-          (! target.parents("#home-tools").length)) {
-        $(".task").each(function() {
-          $(this).removeClass("selected");
-        })
-        $("#new-message-stats").removeClass("hide");
-        $("#task-actions").addClass("hide");
-      }
-    })
   };
 
   return mod;

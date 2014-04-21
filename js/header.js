@@ -59,7 +59,7 @@ var header = (function() {
     var isActive = login.getTeam().teamname === team.teamname;
     var label = labelOfTeam(team);
     var li = $("<li/>");
-    var a = $("<a href='#' data-toggle='pill'/>")
+    var a = $("<a href='#'/>")
       .appendTo(li);
     var pic = $("<div class='team-list-circ'/>")
       .text(profile.shortenName(label).substring(0,1))
@@ -106,7 +106,7 @@ var header = (function() {
     <div #accountEmail class="popover-account-email ellipsis"/>
   </div>
   <ul #teamList class="popover-team-list popover-list"></ul>
-  <ul #accountActions" class="popover-account-actions popover-list">
+  <ul #accountActions" class="popover-list">
     <li>
       <a href="#!settings" data-toggle="tab">Settings</a>
     </li>

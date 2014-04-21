@@ -162,6 +162,7 @@ i { color: @gray_60; }
 }
 .popover-list > li:hover {
   background: @purple_bg;
+  cursor: pointer;
 }
 .popover-list > li > a {
   display: block;
@@ -442,10 +443,55 @@ i { color: @gray_60; }
   height: 100%;
   top: 63px;
   left: 0;
-  padding: 15px;
+  padding: 20px;
   font-size: 14px;
   background: white;
   border-right: 1px solid @border;
+}
+
+.hello {
+  margin: 2px 0px 8px 0px;
+  font-size: 20px;
+}
+
+.sidebar-section {
+  margin-top: 40px;
+}
+
+.sidebar-section-header {
+  padding: 10px 0px 10px 0px;
+  border-bottom: 1px solid @border;
+}
+
+.sidebar-section-title {
+  display: inline-block;
+  margin-left: 8px;
+  color: @gray_60;
+  font-family: @bold;
+}
+
+.see-all {
+  float: right;
+}
+
+.notifications-icon,
+.to-do-icon {
+  float: left;
+}
+
+.notification {
+  height: 60px;
+  padding: 10px;
+  border-bottom: 1px solid @border;
+  cursor: pointer;
+  &:hover {
+    background: @purple_bg;
+  }
+}
+
+.notification.unread {
+  background: @purple_bg_hover;
+  &:hover { background: @purple_bg; }
 }
 
 .home-sidebar-footer {
@@ -453,7 +499,7 @@ i { color: @gray_60; }
   width: 226px;
   height: 50px;
   bottom: 0px;
-  padding: 15px;
+  padding: 15px 5px;
   border-top: 1px solid @border;
 }
 
@@ -463,20 +509,7 @@ i { color: @gray_60; }
 }
 
 #new-meeting-btn {
-  width: 100%;
   margin-bottom: 20px;
-}
-
-#desktop-nav { text-align: left; }
-
-.nav-block { padding: 10px 0px 10px 0px; }
-
-.nav-icon { float: left; }
-
-.nav-text {
-  display: inline-block;
-  margin-left: 8px;
-  font-family: @bold;
 }
 
 
@@ -704,113 +737,10 @@ i { color: @gray_60; }
   height: 10px;
 }
 
-.actionbar {
-  height: 20px;
-  margin: 30px 0px 10px 0px;
-  padding: 0px 10px;
-}
-
-#new-message-icon {
-  float: left;
-  margin-left: 6px;
-}
-
-#new-message-count { margin-left: 40px; }
-
 #search-stats {
   display: none;
   float: left;
   font-size: 18px;
-}
-
-#task-actions {
-  
-}
-
-.task-action {
-  display: inline-block;
-  margin-right: 20px;
-  cursor: pointer;
-}
-
-.task-action.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.task-action-icon {
-  float: left;
-  margin-top: 1px;
-}
-
-.task-action-label { margin-left: 8px; }
-
-.assign-to-name { margin-left: 24px; }
-
-#popover-ea-list > li {
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-#popover-ea-list > li:hover {
-  background: none;
-  .assign-to-checkbox path.outline { fill: @gray_40; }
-}
-
-.assign-to-checkbox {
-  float: left;
-}
-
-/*** List Filters ***/
-
-#filters-toggle:hover #filters-toggle-label {
-  text-decoration: underline;
-}
-
-#filters-toggle-label { float: left; }
-
-#filters-caret.open {
-  .rotate(rotate_cw_180);
-}
-
-#filters-caret.closed {
-  .rotate(rotate_ccw_180);
-}
-
-.filter-title {
-  margin-bottom: 10px;
-  color: @gray_60;
-  font-family: @bold;
-}
-
-.filter {
-  margin-bottom: 5px;
-}
-
-.filter-col {
-  float: left;
-  padding: 6px 10px 8px 10px;
-}
-
-.filter-list { padding: 0; }
-
-.filter.active {
-  color: @gray_90;
-  font-family: @bold;
-  cursor: default;
-}
-
-.checkbox-option:hover {
-  .filter-checkbox path.outline { fill: @gray_40; }
-}
-
-.filter-checkbox {
-  float: left;
-}
-
-.filter-checkbox-label {
-  display: inline-block;
-  margin-left: 8px;
 }
 
 
@@ -863,7 +793,7 @@ i { color: @gray_60; }
   background: white;
   border: 1px solid @gray_10;
   border-radius: 3px;
-  cursor: pointer;
+  cursor: default;
   &:hover {
     background: @purple_bg_hover;
     -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
@@ -872,29 +802,30 @@ i { color: @gray_60; }
   }
 }
 
+.task.actions-open {
+  .meeting-subject-icon,
+  .meeting-subject-text,
+  .meeting-title,
+  .meeting-status-row,
+  .meeting-updated-row { opacity: 0.2; }
+  .meeting-subject-text {
+    pointer-events: none;
+    cursor: default;
+  }
+  .meeting-actions-arrow {
+    background: white;
+    border: 1px solid @gray_20;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom: none;
+    &:hover { background: white; }
+  }
+  &:hover { background: white; }
+}
+
 .pending-scheduling-tasks .pending-scheduling-task,
 .finalized-scheduling-tasks .finalized-scheduling-task {
   display: block;
-}
-
-.inner-shadow-down {
-  position: relative;
-  z-index: 20;
-  height: 10px;
-  background: -webkit-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
-  background:    -moz-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
-  background:      -o-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
-  background:         linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
-}
-
-.inner-shadow-up {
-  position: relative;
-  z-index: 20;
-  height: 10px;
-  background: -webkit-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
-  background:    -moz-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
-  background:      -o-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
-  background:         linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
 }
 
 .meeting-new-messages {
@@ -915,6 +846,55 @@ i { color: @gray_60; }
          -box-shadow: 0px 0px 2px 2px rgba(230,231,232,0.7);
 }
 
+.meeting-actions-arrow {
+  display: none;
+  float: right;
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,0);
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover {
+    path { fill: @gray_60; }
+    background: -webkit-linear-gradient(white, @gray_f8);
+    background:    -moz-linear-gradient(white, @gray_f8);
+    background:      -o-linear-gradient(white, @gray_f8);
+    background:         linear-gradient(white, @gray_f8);
+    border: 1px solid @border;
+  }
+}
+
+.meeting-actions-popover {
+  position: absolute;
+  z-index: 50;
+  width: 150px;
+  margin: 18px 0px 0px 98px;
+  padding: 3px 0px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  border-top-right-radius: 0;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.meeting-action {
+  padding: 7px 10px;
+  color: @purple_text;
+}
+
+.meeting-action.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.meeting-action-icon {
+  float: left;
+  margin-top: 1px;
+}
+
+.meeting-action-label { margin-left: 8px; }
+
 .meeting-subject {
   position: relative;
   z-index: 30;
@@ -927,7 +907,7 @@ i { color: @gray_60; }
 }
 
 .meeting-subject-text {
-  margin-left: 26px;
+  margin: 0px 16px 0px 26px;
 }
 
 .meeting-title {
@@ -977,19 +957,7 @@ i { color: @gray_60; }
 
 .status-icon { float: left; }
 
-.guests-status-icon {
-
-}
-
-.email-status-icon {
-
-}
-
-.options-status-icon {
-
-}
-
-.calendar-status-icon {
+.to-do-status-icon {
 
 }
 
@@ -1000,6 +968,26 @@ i { color: @gray_60; }
 .meeting-updated-row {
   font-size: 12px;
   color: @gray_60;
+}
+
+.inner-shadow-down {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:    -moz-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:      -o-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:         linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+}
+
+.inner-shadow-up {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:    -moz-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:      -o-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:         linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
 }
 
 
