@@ -392,30 +392,46 @@ var home = (function() {
     })
   }
 
-  function loadNotification() {
+  function viewOfToDo() {
 '''
-<div #view class="notification">
-
+<div #view class="to-do">
+  <div #toDoText class="to-do-text"/>
+  <div #timestamp class="sidebar-timestamp"/>
 </div>
 '''
+    toDoText
+      .append($("<span class='bold'/>")
+        .text("Offer meeting options"))
+      .append($("<span/>")
+        .text(" - Coffee with Johnny Appleseed"));
+
+    // Implement jQuery dotdotdot()
+    // toDoText.dotdotdot();
+
+    timestamp.text("Yesterday at 12:45pm");
+
+    return view;
   }
 
-  function loadNotifications(view) {
-    var notification1 = $("<div class='notification unread'/>")
+  function viewOfNotification() {
+'''
+<div #view class="notification">
+  <div #notificationText class="notification-text"/>
+  <div #timestamp class="sidebar-timestamp"/>
+</div>
+'''
+    notificationText
       .append($("<span class='bold'/>")
         .text("Johnny Appleseed"))
       .append($("<span/>")
-        .text(" sent you a message."))
-      .appendTo(view);
-    // notification1.dotdotdot();
+        .text(" sent you a message."));
 
-    var notification2 = $("<div class='notification'/>")
-      .append($("<span class='bold'/>")
-        .text("Executive"))
-      .append($("<span/>")
-        .text(" sent you a new scheduling request."))
-      .appendTo(view);
-    // notification2.dotdotdot();
+    // Implement jQuery dotdotdot()
+    // notificationText.dotdotdot();
+
+    timestamp.text("Apr 30 at 12:45pm");
+
+    return view;
   }
 
   function loadSidebar() {
@@ -439,6 +455,7 @@ var home = (function() {
       <div class="sidebar-section-title">To Do</div>
       <a class="see-all link">See all</a>
     </div>
+    <div #toDoList class="to-do-list"/>
   </div>
 </div>
 '''
@@ -461,7 +478,11 @@ var home = (function() {
       .appendTo(notificationsIcon);
     svg.loadImg(bell, "/assets/img/notifications.svg");
 
-    loadNotifications(notificationsList);
+    //iterate through notifications
+    notificationsList.append(viewOfNotification);
+
+    //iterate through to do's
+    toDoList.append(viewOfToDo);
 
     var clipboard = $("<img class='svg-block'/>")
       .appendTo(toDoIcon);

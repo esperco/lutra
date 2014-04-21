@@ -479,8 +479,8 @@ i { color: @gray_60; }
   float: left;
 }
 
-.notification {
-  height: 60px;
+.notification,
+.to-do {
   padding: 10px;
   border-bottom: 1px solid @border;
   cursor: pointer;
@@ -489,9 +489,21 @@ i { color: @gray_60; }
   }
 }
 
-.notification.unread {
+.notification.unread,
+.to-do.incomplete {
   background: @purple_bg_hover;
   &:hover { background: @purple_bg; }
+}
+
+.notification-text,
+.to-do-text {
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.sidebar-timestamp {
+  color: @gray_40;
+  font-size: 12px;
 }
 
 .home-sidebar-footer {
@@ -561,30 +573,15 @@ i { color: @gray_60; }
   float: left;
   height: 60px;
   margin-right: 25px;
-  padding: 15px 18px 0px 15px;
-  border-right: 1px solid @border;
-  border-bottom: 1px solid @border;
+  padding-top: 15px;
   cursor: pointer;
-  &:hover {
-    .home-icon g path { fill: @purple; }
-    background: -webkit-linear-gradient(@gray_f8, white);
-    background:    -moz-linear-gradient(@gray_f8, white);
-    background:      -o-linear-gradient(@gray_f8, white);
-    background:         linear-gradient(@gray_f8, white);
-  }
+  &:hover .home-icon g path { fill: @purple; }
 }
 
 .home-icon {
   width: 24px;
   height: 30px;
   g path { fill: @gray_40; }
-}
-
-.vertical-divider-right {
-  float: right;
-  height: 100%;
-  margin: 0px 18px 0px 25px;
-  border-left: 1px solid @border;
 }
 
 .meeting-path {
@@ -606,32 +603,84 @@ i { color: @gray_60; }
   cursor: default;
 }
 
-.account-menu {
+.header-account {
   float: right;
-  height: 60px;
-  margin-left: 25px;
-  padding: 15px 15px 0px 15px;
-  border-bottom: 1px solid @border;
-  border-left: 1px solid @border;
+  margin-top: 20px;
+  margin-left: 10px;
+}
+
+.header-notifications,
+.header-to-do {
+  float: right;
+  margin-top: 20px;
+  margin-left: 24px;
+}
+
+.header-assisting {
+  float: right;
+  margin-top: 14px;
+  margin-left: 24px;
+  cursor: default;
+}
+
+.header-account-arrow {
+  padding: 6px;
+  border: 1px solid @border;
+  border-radius: 3px;
   cursor: pointer;
-  .popover-content { width: 200px; }
+  path { fill: @gray_40; }
+  background: -webkit-linear-gradient(white, @gray_f8);
+  background:    -moz-linear-gradient(white, @gray_f8);
+  background:      -o-linear-gradient(white, @gray_f8);
+  background:         linear-gradient(white, @gray_f8);
   &:hover {
-    #account-menu-caret path { fill: @gray_60; }
-    #assisting-circ { background: @gray_60; }
-    #assisting-name { color: @gray_80; }
-    background: -webkit-linear-gradient(@gray_f8, white);
-    background:    -moz-linear-gradient(@gray_f8, white);
-    background:      -o-linear-gradient(@gray_f8, white);
-    background:         linear-gradient(@gray_f8, white);
+    path { fill: @gray_60; }
+    background: -webkit-linear-gradient(white, @gray_10);
+    background:    -moz-linear-gradient(white, @gray_10);
+    background:      -o-linear-gradient(white, @gray_10);
+    background:         linear-gradient(white, @gray_10);
   }
 }
 
-.account-menu-arrow {
-  float: right;
-  margin-top: 12px;
-  margin-left: 8px;
-  path { fill: @gray_40; }
+.header-notifications-icon {
+  path { fill: @gray_20; }
+  cursor: pointer;
+  &:hover path { fill: @gray_40; }
 }
+
+.header-notifications-icon.unread {
+  path { fill: @purple; }
+  &:hover path { fill: @purple_hover; }
+}
+
+.header-to-do-icon {
+  g path { fill: @gray_20; }
+  cursor: pointer;
+  &:hover g path { fill: @gray_40; }
+}
+
+.header-to-do-icon.incomplete {
+  g path { fill: @purple; }
+  &:hover g path { fill: @purple_hover; }
+}
+
+.header-notifications-count,
+.header-to-do-count {
+  position: absolute;
+  z-index: 5;
+  margin: -30px 0px 0px 12px;
+  padding: 0px 4px;
+  color: white;
+  font-family: @bold;
+  font-size: 12px;
+  text-align: center;
+  background: @red;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
+}
+
 
 .assisting-circ {
   float: right;
@@ -655,11 +704,11 @@ i { color: @gray_60; }
 
 /*** Account Popover ***/
 
-.account-popover {
-  position: fixed;
+.header-account-popover {
+  position: absolute;
   width: 200px;
-  top: 70px;
-  right: 15px;
+  top: 42px;
+  margin-left: -176px;
   background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
@@ -774,7 +823,14 @@ i { color: @gray_60; }
   margin-right: auto;
   margin-left: auto;
   padding: 0px 60px;
-  @media (max-width:1576px) { max-width: 1020px; }
+}
+
+@media (max-width:1320px) {
+  .meetings-container { max-width: 1020px; }
+}
+
+@media (max-width:1020px) {
+  .meetings-container { max-width: 768px; }
 }
 
 #meetings-toolbar {
@@ -782,7 +838,7 @@ i { color: @gray_60; }
   z-index: 2;
   top: 63px;
   right: 0;
-  left: 256px;
+  left: 0;
   padding: 30px 0px;
   background: white;
   border-bottom: 1px solid @border;
@@ -800,7 +856,7 @@ i { color: @gray_60; }
   top: 156px;
   right: 0;
   bottom: 0;
-  left: 256px;
+  left: 0;
   padding: 20px 0px 100px 0px;
   background: @gray_f8;
 }
