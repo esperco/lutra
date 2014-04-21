@@ -122,22 +122,59 @@ var home = (function() {
       })
 
     if (ta.task_status) {
-      var typeRow = $("<div class='meeting-type'/>")
-        .append(meetingType(ta))
+      var newMessages = $("<div class='meeting-new-messages'/>")
+        .text("2")
         .appendTo(view);
 
-      var guestsSection = $("<div class='meeting-guests ellipsis'/>")
+      var subjectRow = $("<div class='meeting-subject ellipsis'/>")
         .appendTo(view);
-      var guest1 = $("<div class='meeting-guest-name'/>")
+      var subjectIconContainer = $("<div class='meeting-subject-icon'/>")
+        .appendTo(subjectRow)
+      var subjectIcon = $("<img class='svg-block'/>")
+        .appendTo(subjectIconContainer);
+      svg.loadImg(subjectIcon, "/assets/img/status-email.svg");
+      var subject = $("<div class='meeting-subject-text'/>")
+        .text(ta.task_status.task_title)
+        .appendTo(subjectRow);
+
+      var innerShadowDown = $("<div class='inner-shadow-down'/>")
+        .appendTo(view);
+
+      var meetingTitle = $("<div class='meeting-title scrollable'/>")
+        .appendTo(view);
+      var typeRow = $("<div class='meeting-type'/>")
+        .append(meetingType(ta))
+        .appendTo(meetingTitle);
+      var guest1 = $("<div class='meeting-guest clearfix'/>")
+        .appendTo(meetingTitle);
+      var guest1Circ = $("<div class='meeting-guest-circ'/>")
+        .text("C")
+        .appendTo(guest1);
+      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
         .text("Christopher Christopherson")
-        .appendTo(guestsSection);
-      var guest2 = $("<div class='meeting-guest-name'/>")
+        .appendTo(guest1);
+     var guest2 = $("<div class='meeting-guest clearfix'/>")
+        .appendTo(meetingTitle);
+      var guest1Circ = $("<div class='meeting-guest-circ'/>")
+        .text("C")
+        .appendTo(guest2);
+      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
         .text("Christopher Christopherson")
-        .appendTo(guestsSection);
+        .appendTo(guest2);
+     var guest3 = $("<div class='meeting-guest clearfix'/>")
+        .appendTo(meetingTitle);
+      var guest1Circ = $("<div class='meeting-guest-circ'/>")
+        .text("C")
+        .appendTo(guest3);
+      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
+        .text("Christopher Christopherson")
+        .appendTo(guest3);
+
+      var innerShadowUp = $("<div class='inner-shadow-up'/>")
+        .appendTo(view);
 
       var meetingFooter = $("<div class='meeting-footer'/>")
         .appendTo(view);
-
       var statusRow = $("<div class='meeting-status-row'/>")
         .appendTo(meetingFooter);
       var status = $("<div class='meeting-status-text'/>")
@@ -170,7 +207,6 @@ var home = (function() {
         .append(reminder)
         .appendTo(statusRow);
       statusRow.append(status);
-
       var updatedRow = $("<div class='meeting-updated-row'/>")
         .text("Updated 3 days ago")
         .appendTo(meetingFooter);

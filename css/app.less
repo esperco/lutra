@@ -856,9 +856,9 @@ i { color: @gray_60; }
 .task {
   float: left;
   display: none;
-  width: 240px;
+  width: 280px;
   margin: 10px;
-  padding: 10px;
+  padding: 15px;
   color: @gray_60;
   background: white;
   border: 1px solid @gray_10;
@@ -872,21 +872,98 @@ i { color: @gray_60; }
   }
 }
 
-.task.selected { background: @purple_bg_active; }
-
 .pending-scheduling-tasks .pending-scheduling-task,
 .finalized-scheduling-tasks .finalized-scheduling-task {
   display: block;
 }
 
+.inner-shadow-down {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:    -moz-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:      -o-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:         linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+}
+
+.inner-shadow-up {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:    -moz-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:      -o-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:         linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+}
+
+.meeting-new-messages {
+  position: relative;
+  z-index: 40;
+  float: right;
+  width: 24px;
+  height: 24px;
+  margin: -27px -27px 0px 0px;
+  padding-top: 2px;
+  color: white;
+  font-family: @bold;
+  text-align: center;
+  background: @red;
+  border-radius: 12px;
+  -webkit-box-shadow: 0px 0px 6px 2px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 6px 2px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 2px 2px rgba(230,231,232,0.7);
+}
+
+.meeting-subject {
+  position: relative;
+  z-index: 30;
+  padding-bottom: 10px;
+  border-bottom: 1px solid @border;
+}
+
+.meeting-subject-icon {
+  float: left;
+}
+
+.meeting-subject-text {
+  margin-left: 26px;
+}
+
+.meeting-title {
+  position: relative;
+  z-index: 10;
+  height: 130px;
+  margin: -10px 0px -10px 0px;
+  padding-top: 10px;
+}
+
+.meeting-guest {
+  margin: 10px 0px 10px 0px;
+}
+
+.meeting-guest-circ {
+  float: left;
+  width: 28px;
+  height: 28px;
+  padding-top: 4px;
+  color: white;
+  font-family: @light;
+  font-size: 16px;
+  text-align: center;
+  background: @gray_40;
+  border-radius: 14px;
+}
+
 .meeting-guest-name {
-  margin: 4px 0px 4px 0px;
+  margin: 3px 0px 0px 36px;
   font-family: @bold;
   font-size: 16px;
 }
 
 .meeting-footer {
-  margin-top: 10px;
+  position: relative;
+  z-index: 30;
   padding-top: 10px;
   border-top: 1px solid @border;
 }
