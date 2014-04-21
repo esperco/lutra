@@ -230,6 +230,7 @@ var header = (function() {
     accountPopover
       .removeClass("open")
       .attr("style","display:none");
+    loggedIn.children().remove();
     loggedIn
       .append(view)
       .removeClass("hide");
