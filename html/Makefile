@@ -8,7 +8,8 @@ HTML_INCLUDES = \
   email-verify.html \
   header.html \
   home-sidebar.html \
-  meetings-view.html \
+  meeting-workflow.html \
+  meetings.html \
   messages-tab.html \
   request-password.html \
   reset-password.html \

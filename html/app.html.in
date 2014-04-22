@@ -90,57 +90,17 @@
     </div>
 
     <div id="home-page" class="hide home-page">
-<!--       <div id="home-sidebar">
-        @@home-sidebar.html@@
-      </div> -->
-      <div id="meetings-view">
-        @@meetings-view.html@@
+      <div id="meetings-page">
+        @@meetings.html@@
       </div>
     </div>
 
     <div id="settings-page" class="hide settings-page">
-        @@settings.html@@
+      @@settings.html@@
     </div>
 
     <div id="task-page" class="hide task-page scrollable">
-      <div class="task-navbar">
-        <div class="task-navbar-container clearfix">
-          <a class="task-tab setup-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
-            </div>
-            <div class="setup-tab-name">SETUP</div>
-          </a>
-          <a class="task-tab coordination-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
-            </div>
-            <div class="coordination-tab-name">COORDINATION</div>
-          </a>
-          <a class="task-tab messages-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
-            </div>
-            <div class="messages-tab-name">MESSAGES</div>
-          </a>
-        </div>
-      </div>
-
-      <div id="sched-task" class="hide scrollable">
-        <div id="sched-step2-tab" class="hide task-container">
-          <div id="sched-step2-connect" class="hide"></div>
-          <div id="sched-step2-table"></div>
-        </div>
-        <div id="sched-step4-tab" class="hide task-container">
-          <div id="sched-step4-table"></div>
-        </div>
-        <div id="messages-tab" class="hide task-container">
-          @@messages-tab.html@@
-        </div>
-        <div id="setup-tab" class="hide task-container">
-          <div id="setup-table"></div>
-        </div>
-      </div>
+      @@meeting-workflow.html@@
     </div>
 
     <!-- API key activated by jeff@esper.co -->

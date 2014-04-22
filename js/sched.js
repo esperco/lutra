@@ -362,24 +362,24 @@ var sched = (function() {
   };
 
   function highlight(tab) {
-    $("." + tab + "-tab-select").addClass("active");
+    $(".show-" + tab + "-tab").addClass("active");
     if (tab === "setup") {
-      $(".setup-tab-select").removeClass("disabled");
-      $(".coordination-tab-select").removeClass("active");
-      $(".messages-tab-select").removeClass("active");
+      $(".show-setup-tab").removeClass("disabled");
+      $(".show-coordination-tab").removeClass("active");
+      $(".show-messages-tab").removeClass("active");
     } else if (tab === "coordination") {
-      $(".setup-tab-select").removeClass("active");
-      $(".coordination-tab-select").removeClass("disabled");
-      $(".messages-tab-select").removeClass("active");
+      $(".show-setup-tab").removeClass("active");
+      $(".show-coordination-tab").removeClass("disabled");
+      $(".show-messages-tab").removeClass("active");
     } else if (tab === "messages") {
-      $(".setup-tab-select").removeClass("active");
-      $(".coordination-tab-select").removeClass("active");
-      $(".messages-tab-select").removeClass("disabled");
+      $(".show-setup-tab").removeClass("active");
+      $(".show-coordination-tab").removeClass("active");
+      $(".show-messages-tab").removeClass("disabled");
     }
   }
 
   function setup_step_buttons(ta, prog) {
-    $(".coordination-tab-select")
+    $(".show-coordination-tab")
       .off("click")
       .click(function() {
         if (ta.task_status.task_progress !== "Confirmed") {
@@ -389,13 +389,13 @@ var sched = (function() {
         sched.loadTask(ta);
         highlight("coordination");
       });
-    $(".messages-tab-select")
+    $(".show-messages-tab")
       .off("click")
       .click(function() {
         loadMessages(ta);
         highlight("messages");
       });
-    $(".setup-tab-select")
+    $(".show-setup-tab")
       .off("click")
       .click(function() {
         profile.profilesOfTaskParticipants(ta).done(function(profs) {

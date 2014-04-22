@@ -369,18 +369,18 @@ var home = (function() {
   }
 
   function loadSearch() {
-    var search = $("#search-meetings-input");
-    var clear = $("#clear-search");
+    var search = $(".search-meetings-input");
+    var clear = $(".clear-search");
 
     function updateSearch() {
       if (search.val() != "") {
         clear.removeClass("hide");
-        $("#meetings-toggle").attr("style","display:none");
-        $("#search-stats").attr("style","display:block")
+        $(".meetings-toggle").attr("style","display:none");
+        $(".search-stats").attr("style","display:block")
       } else {
         clear.addClass("hide");
-        $("#meetings-toggle").attr("style","display:block");
-        $("#search-stats").attr("style","display:none")
+        $(".meetings-toggle").attr("style","display:block");
+        $(".search-stats").attr("style","display:none")
       }
     }
 

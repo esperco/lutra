@@ -636,16 +636,16 @@ var schedSetup = (function() {
 
   function updateButtons(ta) {
     if (sched.getAttendingGuests(ta).length === 0) {
-      $(".coordination-tab-select").addClass("disabled");
+      $(".show-coordination-tab").addClass("disabled");
       doneButton.addClass("disabled");
     } else {
-      $(".coordination-tab-select").removeClass("disabled");
+      $(".show-coordination-tab").removeClass("disabled");
       doneButton.removeClass("disabled");
     }
   }
 
   function disableButtons() {
-    $(".coordination-tab-select").addClass("disabled");
+    $(".show-coordination-tab").addClass("disabled");
     doneButton.addClass("disabled");
   }
 

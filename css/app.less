@@ -241,100 +241,6 @@ i { color: @gray_60; }
 }
 
 
-/*** Nav Bar ***/
-
-.task-navbar {
-  position: fixed;
-  top: 60px;
-  background: @gray_60;
-}
-
-#menu {
-  float: left;
-  margin-top: 23px;
-  margin-left: 16px;
-  cursor: pointer;
-  &:hover g path { fill: @purple_hover; }
-  &:active g path { fill: #7d3ca0; }
-}
-
-.task-tab {
-  float: left;
-  height: 24px;
-  margin: 15px 15px 0px 15px;
-  color: @gray_40;
-  font-family: @bold;
-  font-size: 14px;
-  cursor: pointer;
-  &:hover { color: white; }
-}
-
-.task-tab.active {
-  color: white;
-  pointer-events: none;
-}
-
-.coordination-tab-select.disabled {
-  color: @gray_60;
-  pointer-events: none;
-  path.cal-header,
-  path.outline { fill: @gray_60; }
-  g.grid { stroke: @gray_60; }
-}
-
-.task-tab-icon { float: left; }
-
-.coordination-tab-icon,
-.setup-tab-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.messages-tab-icon {
-  width: 21px;
-  height: 18px;
-}
-
-.coordination-tab-name,
-.setup-tab-name { margin-left: 30px; }
-
-.messages-tab-name { margin-left: 33px; }
-
-.coordination-tab-select {
-  path.cal-header,
-  path.outline { fill: @gray_40; }
-  g.grid { stroke: @gray_40; }
-  &:hover {
-    path.cal-header,
-    path.outline { fill: white; }
-    g.grid { stroke: white; }
-  }
-}
-
-.coordination-tab-select.active {
-  path.cal-header,
-  path.outline { fill: white; }
-  g.grid { stroke: white; }
-}
-
-.messages-tab-select,
-.setup-tab-select {
-  path { fill: @gray_40; }
-  &:hover path { fill: white; }
-}
-
-.messages-tab-select.active,
-.setup-tab-select.active {
-  path { fill: white; }
-}
-
-.messages-tab-select.unread-messages #chat-icon {
-  path { fill: @orange; }
-  text { fill: white; }
-  &:hover path { fill: @orange_hover; }
-}
-
-
 /*** Table Structure ***/
 
 .task,
@@ -571,6 +477,16 @@ i { color: @gray_60; }
   }
 }
 
+.header-account-arrow.open {
+  position: absolute;
+  z-index: 2;
+  background: white;
+  border: 1px solid @gray_20;
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .header-assisting {
   float: right;
   margin-top: 14px;
@@ -650,11 +566,12 @@ i { color: @gray_60; }
 .header-account-popover {
   position: absolute;
   width: 200px;
-  top: 42px;
+  top: 41px;
   margin-left: -176px;
   background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
+  border-top-right-radius: 0;
   -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
      -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
          -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
@@ -674,10 +591,16 @@ i { color: @gray_60; }
   color: @gray_60;
 }
 
-.popover-team-list {
-  margin: 10px 0px;
-  padding: 5px 0px;
+.popover-assist-text {
+  margin-top: 10px;
+  padding: 10px 20px 0px 20px;
+  color: @gray_60;
   border-top: 1px solid @gray_10;
+}
+
+.popover-team-list {
+  margin-bottom: 10px;
+  padding: 5px 0px;
   border-bottom: 1px solid @gray_10;
 }
 
@@ -731,12 +654,21 @@ i { color: @gray_60; }
 
 /*** Notifications + To Do Popovers ***/
 
+.popover-caret {
+  position: absolute;
+  z-index: 2;
+  top: 50px;
+}
+
+.notifications-caret { margin-left: 1px; }
+
 .header-notifications-popover,
 .header-to-do-popover {
   position: absolute;
+  z-index: 1;
   width: 300px;
-  top: 56px;
-  margin-left: -276px;
+  top: 59px;
+  margin-left: -270px;
   background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
@@ -805,12 +737,12 @@ li.to-do {
 
 /*** Tab Bar ***/
 
-#search-meetings {
+.search-meetings {
   float: right;
   width: 240px;
 }
 
-#clear-search {
+.clear-search {
   position: absolute;
   right: 0;
   padding: 11px 10px;
@@ -819,12 +751,12 @@ li.to-do {
   &:hover path { fill: @gray_60; }
 }
 
-#clear-search-icon {
+.clear-search-icon {
   width: 10px;
   height: 10px;
 }
 
-#search-stats {
+.search-stats {
   display: none;
   float: left;
   font-size: 18px;
@@ -833,7 +765,7 @@ li.to-do {
 
 /*** Meetings ***/
 
-.meetings-container {
+.app-container {
   width: 100%;
   min-width: 768px;
   max-width: 1320px;
@@ -843,14 +775,14 @@ li.to-do {
 }
 
 @media (max-width:1320px) {
-  .meetings-container { max-width: 1020px; }
+  .app-container { max-width: 1020px; }
 }
 
 @media (max-width:1020px) {
-  .meetings-container { max-width: 768px; }
+  .app-container { max-width: 768px; }
 }
 
-#meetings-toolbar {
+.meetings-toolbar {
   position: fixed;
   z-index: 2;
   top: 63px;
@@ -861,13 +793,13 @@ li.to-do {
   border-bottom: 1px solid @border;
 }
 
-#meetings-toggle {
+.meetings-toggle {
   float: left;
   display: block;
   margin-top: 6px;
 }
 
-#meetings-grid {
+.meetings-grid {
   position: fixed;
   z-index: 1;
   top: 156px;
@@ -1181,7 +1113,7 @@ li.to-do {
 #sched-task {
   position: fixed;
   width: 100%;
-  top: 120px;
+  top: 105px;
   bottom: 0;
 }
 
@@ -1775,61 +1707,6 @@ li.to-do {
 }
 
 
-/*** New Task ***/
-
-#new-task-title {
-  color: @gray_60;
-  &:focus { color: @gray_90; }
-}
-
-#categorize {
-  margin-top: 40px;
-}
-
-.workflow-row {
-  cursor: pointer;
-  &:hover {
-    path.radio-outline { fill: @gray_40; }
-  }
-}
-
-#sched-workflow-icon {
-  float: left;
-  margin-top: 2px;
-}
-
-#gen-workflow-icon {
-  float: left;
-  margin-top: 3px;
-  margin-left: 1px;
-}
-
-#sched-workflow-text,
-#gen-workflow-text {
-  display: inline-block;
-  font-family: @bold;
-  font-size: 20px;
-}
-
-#sched-workflow-text {
-  margin-left: 10px;
-}
-
-#gen-workflow-text {
-  margin-left: 11px;
-}
-
-.workflow-details {
-  display: block;
-  margin-left: 42px;
-}
-
-#gen-task {
-  padding-top: 80px;
-  text-align: center;
-}
-
-
 /*** Chat ***/
 
 #chat-container {
@@ -2105,6 +1982,27 @@ li.to-do {
   height: 26px;
   padding: 0 8px 0px 8px;
   font-size: 14px;
+}
+
+
+/*** Meeting Workflow ***/
+
+.meeting-workflow-toolbar {
+  position: fixed;
+  z-index: 2;
+  top: 63px;
+  right: 0;
+  left: 0;
+  padding-top: 10px;
+  background: white;
+  border-bottom: 1px solid @border;
+}
+
+.workflow-toggle {
+  float: left;
+  display: block;
+  margin-top: 6px;
+  border: none;
 }
 
 

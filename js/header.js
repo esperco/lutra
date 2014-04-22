@@ -15,6 +15,19 @@ var header = (function() {
     })
   }
 
+  function togglePopover(popover) {
+    if (popover.hasClass("open")) {
+      popover
+        .removeClass("open")
+        .attr("style","display:none");
+    } else {
+      hideAllPopovers();
+      popover
+        .addClass("open")
+        .attr("style","display:block");
+    }
+  }
+
   function viewOfAssisting() {
 '''
 <div #view>
@@ -55,16 +68,25 @@ var header = (function() {
 
   function viewOfToDoPopover() {
 '''
-<div #view class="popover-content">
-  <div class="header-popover-header">
-    <div class="header-popover-title">To Do</div>
-  </div>
-  <ul #toDoList class="to-do-list"/>
-  <div class="see-all">
-    <a class="link">See all</a>
+<div #view>
+  <div #caretContainer class="popover-caret to-do-caret"/>
+  <div class="header-to-do-popover">
+    <div class="popover-content">
+      <div class="header-popover-header">
+        <div class="header-popover-title">To Do</div>
+      </div>
+      <ul #toDoList class="to-do-list"/>
+      <div class="see-all">
+        <a class="link">See all</a>
+      </div>
+    </div>
   </div>
 </div>
 '''
+    var caret = $("<img class='svg-block'/>")
+      .appendTo(caretContainer);
+    svg.loadImg(caret, "/assets/img/popover-caret.svg");
+
     //iterate through to do's
     toDoList.append(viewOfToDo);
 
@@ -94,17 +116,26 @@ var header = (function() {
 
   function viewOfNotificationsPopover() {
 '''
-<div #view class="popover-content">
-  <div class="header-popover-header">
-    <div class="header-popover-title">Notifications</div>
-    <a class="mark-read link">Mark read</a>
-  </div>
-  <ul #notificationsList class="notifications-list scrollable"/>
-  <div class="see-all">
-    <a class="link">See all</a>
+<div #view>
+  <div #caretContainer class="popover-caret notifications-caret"/>
+  <div class="header-notifications-popover">
+    <div class="popover-content">
+      <div class="header-popover-header">
+        <div class="header-popover-title">Notifications</div>
+        <a class="mark-read link">Mark read</a>
+      </div>
+      <ul #notificationsList class="notifications-list scrollable"/>
+      <div class="see-all">
+        <a class="link">See all</a>
+      </div>
+    </div>
   </div>
 </div>
 '''
+    var caret = $("<img class='svg-block'/>")
+      .appendTo(caretContainer);
+    svg.loadImg(caret, "/assets/img/popover-caret.svg");
+
     //iterate through notifications
     notificationsList.append(viewOfNotification);
 
@@ -173,7 +204,7 @@ var header = (function() {
     <div #accountName class="popover-account-name ellipsis"/>
     <div #accountEmail class="popover-account-email ellipsis"/>
   </div>
-  <div>Use Esper to assist:</div>
+  <div class="popover-assist-text">Use Esper to assist:</div>
   <ul #teamList class="popover-team-list popover-list">
   </ul>
   <ul class="popover-list">
@@ -217,13 +248,13 @@ var header = (function() {
   <div #notifications class="header-notifications">
     <div #notificationsIcon class="header-popover-click header-notifications-icon unread"/>
     <div #notificationsCount class="header-notifications-count">5</div>
-    <div #notificationsPopover class="header-popover header-notifications-popover"
+    <div #notificationsPopover class="header-popover"
          style="display:none"/>
   </div>
   <div #toDo class="header-to-do">
     <div #toDoIcon class="header-popover-click header-to-do-icon incomplete"/>
     <div #toDoCount class="header-to-do-count">2</div>
-    <div #toDoPopover class="header-popover header-to-do-popover"
+    <div #toDoPopover class="header-popover"
          style="display:none"/>
   </div>
 </div>
@@ -249,45 +280,24 @@ var header = (function() {
       .off("click")
       .click(function() {
         if (accountPopover.hasClass("open")) {
-          accountPopover
-            .removeClass("open")
-            .attr("style","display:none");
+          accountArrow.removeClass("open");
         } else {
-          hideAllPopovers();
-          accountPopover
-            .addClass("open")
-            .attr("style","display:block");
+          accountArrow.addClass("open");
         }
+        togglePopover(accountPopover);
+
       });
 
     notificationsIcon
       .off("click")
       .click(function() {
-        if (notificationsPopover.hasClass("open")) {
-          notificationsPopover
-            .removeClass("open")
-            .attr("style","display:none");
-        } else {
-          hideAllPopovers();
-          notificationsPopover
-            .addClass("open")
-            .attr("style","display:block");
-        }
+        togglePopover(notificationsPopover);
       });
 
     toDoIcon
       .off("click")
       .click(function() {
-        if (toDoPopover.hasClass("open")) {
-          toDoPopover
-            .removeClass("open")
-            .attr("style","display:none");
-        } else {
-          hideAllPopovers();
-          toDoPopover
-            .addClass("open")
-            .attr("style","display:block");
-        }
+        togglePopover(toDoPopover);
       });
 
     $("body").on("click", function (e) {
@@ -299,6 +309,7 @@ var header = (function() {
             && $(target).parents(".header-popover").length === 0
             && $(target).parents(".header-popover-click").length === 0) {
               hideAllPopovers();
+              accountArrow.removeClass("open");
         }
       });
     });
