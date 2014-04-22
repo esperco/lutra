@@ -5,6 +5,36 @@
 var home = (function() {
   var mod = {};
 
+  function hideAllPopovers() {
+    $(".task").each(function() {
+      $(this).removeClass("actions-open");
+    })
+    $(".meeting-actions-arrow").each(function() {
+      $(this).css("display","none");
+    })
+    $(".meeting-actions-popover").each(function() {
+      $(this)
+        .removeClass("open")
+        .attr("style","display:none");
+    })
+  }
+
+  function togglePopover(view, arrow, popover) {
+    if (popover.hasClass("open")) {
+      view.removeClass("actions-open");
+      popover
+        .removeClass("open")
+        .attr("style","display:none");
+    } else {
+      hideAllPopovers();
+      view.addClass("actions-open");
+      arrow.css("display","block");
+      popover
+        .addClass("open")
+        .attr("style","display:block");
+    }
+  }
+
   function taskStatus(ta) {
     var time = date.ofString(ta.task_status_text.status_timestamp);
     var statusEvent = $("<span/>")
@@ -105,8 +135,8 @@ var home = (function() {
   <div #subjectRow class="meeting-subject ellipsis">
     <div #arrowContainer class="meeting-actions-arrow"/>
     <div #subjectIconContainer class="meeting-subject-icon"/>
-    <div #subject class="meeting-subject-text link ellipsis">
-      <a #subjectText/>
+    <div #subject class="meeting-subject-text ellipsis">
+      <a #subjectText class="link"/>
     </div>
   </div>
   <div class="inner-shadow-down"/>
@@ -127,6 +157,8 @@ var home = (function() {
 </div>
 '''
     view.attr("id","task-" + ta.tid);
+    actionsPopover.attr("id","popover-" + ta.tid);
+    arrowContainer.attr("id","popover-trigger-" + ta.tid);
 
     if (ta.task_status) {
       newMessages.text("2");
@@ -191,16 +223,24 @@ var home = (function() {
       arrowContainer
         .off("click")
         .click(function() {
-          if (actionsPopover.hasClass("open")) {
-            view.removeClass("actions-open");
-            actionsPopover.removeClass("open")
-                          .attr("style","display:none");
-          } else {
-            view.addClass("actions-open");
-            actionsPopover.addClass("open")
-                          .attr("style","display:block");
-          }
+          togglePopover(view, arrowContainer, actionsPopover);
         })
+
+      $("body").on("click", function (e) {
+        var target = e.target;
+        var parents = $(target).parents();
+        if (actionsPopover.hasClass("open")
+            && !actionsPopover.is(target)
+            && $(target).parents("#popover-" + ta.tid).length === 0
+            && !arrowContainer.is(target)
+            && $(target).parents("#popover-trigger-" + ta.tid).length === 0) {
+              hideAllPopovers();
+              var card = $(target).parents(".task");
+              if (card.length === 1) {
+                card.find(".meeting-actions-arrow").css("display","block");
+              }
+        }
+      });
     }
 
     return view;

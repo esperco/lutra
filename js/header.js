@@ -13,6 +13,7 @@ var header = (function() {
         .removeClass("open")
         .attr("style","display:none");
     })
+    $(".header-account-arrow").removeClass("open");
   }
 
   function togglePopover(popover) {
@@ -20,11 +21,17 @@ var header = (function() {
       popover
         .removeClass("open")
         .attr("style","display:none");
+      if (popover.hasClass("header-account-popover")) {
+        $(".header-account-arrow").removeClass("open");
+      }
     } else {
       hideAllPopovers();
       popover
         .addClass("open")
         .attr("style","display:block");
+      if (popover.hasClass("header-account-popover")) {
+        $(".header-account-arrow").addClass("open");
+      }
     }
   }
 
@@ -279,13 +286,7 @@ var header = (function() {
     accountArrow
       .off("click")
       .click(function() {
-        if (accountPopover.hasClass("open")) {
-          accountArrow.removeClass("open");
-        } else {
-          accountArrow.addClass("open");
-        }
         togglePopover(accountPopover);
-
       });
 
     notificationsIcon
@@ -309,7 +310,6 @@ var header = (function() {
             && $(target).parents(".header-popover").length === 0
             && $(target).parents(".header-popover-click").length === 0) {
               hideAllPopovers();
-              accountArrow.removeClass("open");
         }
       });
     });
