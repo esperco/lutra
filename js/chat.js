@@ -215,9 +215,13 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
+    var d = date.ofString(time);
+    var timeAgoSpan = $("<span/>")
+      .append(date.viewTimeAgo(d))
+      .append(" on " + date.justStartTime(d));
     var timestamp = $("<div class='timestamp' style='float:right'/>")
       .append($("<div class='timestamp' />")
-        .append(date.viewTimeAgo(date.ofString(time))))
+        .append(timeAgoSpan))
       .appendTo(header);
 
     var fromName = $("<div class='from-name'/>")
