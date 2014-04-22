@@ -413,6 +413,7 @@ var sched2 = (function() {
       var eaName = profile.fullName(profs[ea].prof);
       offerModal.recipient.text(eaName);
       parameters.guest_EA = eaName;
+      parameters.guest_uid = ea;
       parameters.template_kind = "Options_to_guest_assistant";
     } else {
       parameters.template_kind = "Options_to_guest";

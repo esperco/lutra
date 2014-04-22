@@ -138,6 +138,7 @@ var sched4 = (function() {
       var eaEmail = profile.email(profs[eaUid].prof);
       receiverOptions = sched.getGuestOptions(ta)[eaUid];
       reminderModal.recipient.text(eaName + " <" + eaEmail + ">");
+      parameters.guest_uid = eaUid;
       parameters.guest_EA = eaName;
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_reminder_to_guest_assistant";
@@ -536,6 +537,7 @@ var sched4 = (function() {
     if (util.isNotNull(ea)) {
       var eaName = profile.fullName(profs[ea].prof);
       confirmModal.recipient.text(eaName);
+      parameters.guest_uid = ea;
       parameters.guest_EA = eaName;
       if (slot.meeting_type === "Call") {
         parameters.template_kind = "Phone_confirmation_to_guest_assistant";
