@@ -33,7 +33,7 @@ var guestpicker = (function() {
     <i class="glyphicon glyphicon-search"></i>
     <input #searchBox
            type="search" class="form-control guest-search"
-           placeholder="Search by first name, last name or email address"/>
+           placeholder="Type first name, last name or email address"/>
     <div class="dropdown">
       <a #dropdownToggle
          data-toggle="dropdown"
@@ -50,11 +50,11 @@ var guestpicker = (function() {
                type="text"
                class="form-control guest-input"
                placeholder="email"/>
-        <input #FirstName
+        <input #firstname
                type="text"
                class="form-control guest-input"
-               placeholder="First Name" disabled/>
-        <input #LastName
+               placeholder="First Name"/>
+        <input #lastname
                type="text"
                class="form-control guest-input"
                placeholder="Last Name"/>
@@ -71,8 +71,24 @@ var guestpicker = (function() {
 </div>
 '''
     var form = _view;
+    log(param.task);
+    log(param.teamid);
+    form.task = param.task;
+    form.teamid = param.teamid;
+    form.onGuestSet = param.onGuestSet;
+
+    form.isValid = function() {
+      return isValidName(form.firstname.val())
+          && isValidName(form.lastname.val())
+          && util.isString(form.uid);
+    }
 
     return form;
+  }
+
+  
+  function isValidName(s) {
+    return profile.shortenName(s).length > 0;
   }
 
   function getGuest(form) {
@@ -99,10 +115,9 @@ var guestpicker = (function() {
   }
 
   function setGuestNoCallback(form, guest, uid) {
-
-    form.email = guest.email;
-    form.firstname = guest.firstname;
-    form.lastname = guest.lastname;
+    form.email.val(guest.email);
+    form.firstname.val(guest.firstname);
+    form.lastname.val(guest.lastname);
 
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
@@ -110,8 +125,8 @@ var guestpicker = (function() {
   }
 
   function setGuest(form, guest, uid) {
-    setLocationNoCallback(form, guest, uid);
-    form.onLocationSet(guest);
+    setGuestNoCallback(form, guest, uid);
+    form.onGuestSet(guest);
   }
 
   function clearGuest(form) {
@@ -120,39 +135,92 @@ var guestpicker = (function() {
                   .focus();
   }
 
-  function addSuggestedSavedPlacesToMenu(form, predictions, showDetails) {
+  function textToGuest(text) {
+    if (email.validate(text)){
+      var guest = { email : text,
+                    firstname : '',
+                    lastname : '' };
+      return guest;
+    } else {
+        var pos = text.search(" ");
+        if (pos != -1) {
+            var first = text.substring(0,pos);
+            var last = text.substring(pos+1,text.length);
+            var guest = { email : '',
+                          firstname : first,
+                          lastname : last };
+            return guest;
+        } else {
+            var guest = { email : '',
+                          firstname : text,
+                          lastname : '' };
+            return guest;
+        }
+    }   
+  }
+
+  function addSuggestedGuestsToMenu(form, predictions, showDetails) {
     var menu = form.dropdownMenu;
-    if (predictions.from_saved_places.length === 0) return;
+    var text = form.searchBox.val();
+    $('<li role="presentation" class="dropdown-header"/>')
+      .text("Create New Contact")
+      .appendTo(menu);
+    var liplus = $('<li role="presentation"/>')
+        .appendTo(menu);
+    $('<a role="menuitem" tabindex="-1" href="#"/>')
+        .html(text)
+        .appendTo(liplus)
+        .click(function() {
+            var guest = textToGuest(text);
+            setGuest(form, guest, '');
+            util.hideDropdown(form.dropdownToggle);
+            if (showDetails) {
+                toggleForm(form);
+            }
+            return false;
+        });
+    $('<li role="presentation" class="divider"/>')
+          .appendTo(menu);
+    if (predictions.count === 0){
+        return;
+    }
 
     $('<li role="presentation" class="dropdown-header"/>')
-      .text("Saved Places")
+      .text("Saved Contacts")
       .appendTo(menu);
 
-    list.iter(predictions.from_saved_places, function(item) {
+    list.iter(predictions.results, function(item) {
       var bolded;
-      var title = item.loc.title;
-      var coord = item.loc.coord;
-      var address = item.loc.address;
-      var instructions = item.loc.instructions;
+      var firstname = item.profile.first_last_name.first;
+      var lastname = item.profile.first_last_name.last;
+      var name = firstname + ' ' + lastname;
+      var email = item.profile.emails[0].email;
+      var pseudo = item.profile.pseudonym;
+      var phone = item.profile.phones[0];
       var esc = util.htmlEscape;
-      if (item.matched_field === "Address") {
-        bolded = geo.highlight(address, [item.matched_substring]);
-        if (title && title != address) {
-          bolded = esc(title) + ", " + bolded;
-        }
-      } else if (item.matched_field === "Title") {
-        bolded = geo.highlight(title, [item.matched_substring])
-          + ", " + esc(address);
+      if (item.matched_field === "Name") {
+        bolded = geo.highlight(name, [item.matched_substring]);
+        bolded = bolded + ', ' + email;
+      } else if (item.matched_field === "Email") {
+        bolded = geo.highlight(email, [item.matched_substring]);
+          bolded = firstname + ' ' + lastname + ', ' + bolded;
       } else {
         // TODO Error, bad API response, should never happen
       }
+
       var li = $('<li role="presentation"/>')
         .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
-        .appendTo(li)
-        .click(function() {
-          api.postSelectPlace(item.google_description)
+        .appendTo(li);
+
+//        .click(function() {
+//            api.postTaskProfile(item.profile,task.tid);
+//            profile.setWithTask(item.prof, form.task.tid); /* update cache */
+//        });
+
+/*        .click(function() {
+         api.postSelectPlace(item.google_description)
             .done(function(place) {
               var loc = {
                 title: title,
@@ -170,6 +238,7 @@ var guestpicker = (function() {
             });
           return false;
         });
+*/
     });
     $('<li role="presentation" class="divider"/>')
       .appendTo(menu);
@@ -180,31 +249,33 @@ var guestpicker = (function() {
     the user's saved places.
   */
   function displayPredictionsDropdown(form, predictions, showDetails) {
-    if (predictions.from_saved_places.length === 0) return;
+    //if (predictions.count === 0) return;
     var menu = form.dropdownMenu;
     menu.children().remove();
 
     /* Fill the menu with suggested addresses from user's saved places */
-    addSuggestedSavedPlacesToMenu(form, predictions, showDetails);
+    addSuggestedGuestsToMenu(form, predictions, showDetails);
 
     util.showDropdown(form.dropdownToggle);
   }
 
-  function predictGuest(form, showDetails) {
-
+  function predictGuest(task,form, showDetails) {
+      
     var textInput = form.searchBox.val();
-    log(textInput);
-    /*api.getProfileSearch(teamid,textInput)
-      .done(function(predictions) {
-        displayPredictionsDropdown(form, predictions, showDetails);
-      });*/
+    if(textInput)
+      {api.getProfileSearch(form.teamid,textInput)
+       .done(function(predictions) {
+           log(predictions);
+           displayPredictionsDropdown(form, predictions, showDetails);
+       });
+      }
   }
 
-  function setup(form, showDetails) {
+  function setup(param,form, showDetails) {
     form.guestSearch.removeClass("hide");
     form.guestForm.addClass("hide");
     util.afterTyping(form.searchBox, 250, function() {
-      predictGuest(form, showDetails);
+      predictGuest(param.task,form, showDetails);
     });
     form.resetGuest
       .click(function() {
@@ -217,16 +288,14 @@ var guestpicker = (function() {
   /*
     Parameters:
     - teamid
-    - onLocationSet(loc):
-        called when the location is set
-    - onTimezoneChange(oldTz, newTz):
-        called when the timezone is set or changes
+    - showDetails
+    - onGuestSet(guest):
+        called when the Guest is set
    */
   mod.create = function(param) {
     var form = createGuestForm(param);
     var showDetails = param.showDetails;
-    log(showDetails);
-    setup(form, showDetails);
+    setup(param,form, showDetails);
 
     return {
       view: form.guest,
@@ -241,7 +310,7 @@ var guestpicker = (function() {
       setGuestNoCallback:
         (function(guest) { return setGuestNoCallback(form, guest); }),
 
-      getSavedPlaceID: (function () { return form.savedPlaceID; })
+      getSavedGuestID: (function () { return form.SavedGuestID; })
     };
   }
 

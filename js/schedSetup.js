@@ -8,7 +8,7 @@ var schedSetup = (function() {
   var doneButton = $("<button class='btn btn-primary done-setup'/>")
     .text("Done");
 
-  function editGuest(updateAddButton) {
+  function editGuest(updateAddButton,task) {
     var edit = {};
 
     function updateUI() {
@@ -30,6 +30,14 @@ var schedSetup = (function() {
       .addClass("form-control guest-input")
       .attr("placeholder", "Phone number")
       .attr("disabled", true);
+
+    edit.searchbox = guestpicker.create({
+        uid : '',
+        task : task,
+        teamid : task.task_teamid,
+        onGuestSet : (function (guest) { }),
+        showDetails : true
+    }).view;
 
     edit.firstLast = function() {
       return {
@@ -135,7 +143,7 @@ var schedSetup = (function() {
       else
         addButton.addClass("disabled");
     }
-    var edit = editGuest(updateAddButton);
+    var edit = editGuest(updateAddButton,task);
     if (util.isNotNull(ea)) {
       var prof = profs[ea].prof;
       edit.setProfile(prof);
@@ -295,7 +303,7 @@ var schedSetup = (function() {
 
     title.text(util.isNotNull(uid) ? "EDIT GUEST" : "NEW GUEST");
 
-    var edit = editGuest(updateAddButton);
+    var edit = editGuest(updateAddButton,task);
     if (util.isNotNull(uid)) {
       var prof = profs[uid].prof;
       edit.setProfile(prof);
@@ -309,6 +317,7 @@ var schedSetup = (function() {
     edit.emailInput.focus();
 
     inputs
+      .append(edit.searchbox)
       .append(edit.emailInput)
       .append(edit.firstNameInput)
       .append(edit.lastNameInput)
