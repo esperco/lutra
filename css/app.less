@@ -449,63 +449,6 @@ i { color: @gray_60; }
   border-right: 1px solid @border;
 }
 
-.hello {
-  margin: 2px 0px 8px 0px;
-  font-size: 20px;
-}
-
-.sidebar-section {
-  margin-top: 40px;
-}
-
-.sidebar-section-header {
-  padding: 10px 0px 10px 0px;
-  border-bottom: 1px solid @border;
-}
-
-.sidebar-section-title {
-  display: inline-block;
-  margin-left: 8px;
-  color: @gray_60;
-  font-family: @bold;
-}
-
-.see-all {
-  float: right;
-}
-
-.notifications-icon,
-.to-do-icon {
-  float: left;
-}
-
-.notification,
-.to-do {
-  padding: 10px;
-  border-bottom: 1px solid @border;
-  cursor: pointer;
-  &:hover {
-    background: @purple_bg;
-  }
-}
-
-.notification.unread,
-.to-do.incomplete {
-  background: @purple_bg_hover;
-  &:hover { background: @purple_bg; }
-}
-
-.notification-text,
-.to-do-text {
-  height: 40px;
-  margin-bottom: 4px;
-}
-
-.sidebar-timestamp {
-  color: @gray_40;
-  font-size: 12px;
-}
-
 .home-sidebar-footer {
   position: fixed;
   width: 226px;
@@ -609,20 +552,6 @@ i { color: @gray_60; }
   margin-left: 10px;
 }
 
-.header-notifications,
-.header-to-do {
-  float: right;
-  margin-top: 20px;
-  margin-left: 24px;
-}
-
-.header-assisting {
-  float: right;
-  margin-top: 14px;
-  margin-left: 24px;
-  cursor: default;
-}
-
 .header-account-arrow {
   padding: 6px;
   border: 1px solid @border;
@@ -640,6 +569,39 @@ i { color: @gray_60; }
     background:      -o-linear-gradient(white, @gray_10);
     background:         linear-gradient(white, @gray_10);
   }
+}
+
+.header-assisting {
+  float: right;
+  margin-top: 14px;
+  margin-left: 24px;
+  cursor: default;
+}
+
+.assisting-circ {
+  float: right;
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  padding-top: 5px;
+  color: white;
+  text-align: center;
+  background: @gray_40;
+  border-radius: 15px;
+}
+
+.assisting-name {
+  float: right;
+  margin-top: 5px;
+  color: @gray_60;
+  font-family: @bold;
+}
+
+.header-notifications,
+.header-to-do {
+  float: right;
+  margin-top: 20px;
+  margin-left: 24px;
 }
 
 .header-notifications-icon {
@@ -674,32 +636,13 @@ i { color: @gray_60; }
   font-family: @bold;
   font-size: 12px;
   text-align: center;
-  background: @red;
-  border-radius: 3px;
-  -webkit-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
-     -moz-box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
-         -box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.7);
+  border: 2px solid white;
+  border-radius: 6px;
+  cursor: default;
 }
 
-
-.assisting-circ {
-  float: right;
-  width: 30px;
-  height: 30px;
-  margin-right: 8px;
-  padding-top: 5px;
-  color: white;
-  text-align: center;
-  background: @gray_40;
-  border-radius: 15px;
-}
-
-.assisting-name {
-  float: right;
-  margin-top: 5px;
-  color: @gray_60;
-  font-family: @bold;
-}
+.header-notifications-count { background: @red; }
+.header-to-do-count { background: @orange; }
 
 
 /*** Account Popover ***/
@@ -783,6 +726,80 @@ i { color: @gray_60; }
 .team-list-circ.active {
   color: white;
   background: @gray_60;
+}
+
+
+/*** Notifications + To Do Popovers ***/
+
+.header-notifications-popover,
+.header-to-do-popover {
+  position: absolute;
+  width: 300px;
+  top: 56px;
+  margin-left: -276px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.header-popover-header {
+  padding: 0px 20px 10px 20px;
+  border-bottom: 1px solid @border;
+}
+
+.header-popover-title {
+  display: inline-block;
+  color: @gray_60;
+  font-family: @bold;
+}
+
+.mark-read {
+  float: right;
+}
+
+ul.notifications-list,
+ul.to-do-list {
+  height: 200px;
+  margin: 0;
+  padding: 0;
+}
+
+li.notification,
+li.to-do {
+  padding: 10px 20px;
+  border-bottom: 1px solid @border;
+  cursor: pointer;
+  &:hover { background: @purple_bg; }
+}
+
+.notification.unread,
+.to-do.incomplete {
+  background: @purple_bg_hover;
+  &:hover { background: @purple_bg; }
+}
+
+.notification-text,
+.to-do-text {
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.header-popover-timestamp {
+  color: @gray_40;
+  font-size: 12px;
+}
+
+.see-all {
+  margin-bottom: -10px;
+  padding: 10px 20px;
+  text-align: center;
+  background: @purple_bg_hover;
+  border-top: 1px solid @border;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
 

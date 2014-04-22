@@ -392,106 +392,6 @@ var home = (function() {
     })
   }
 
-  function viewOfToDo() {
-'''
-<div #view class="to-do">
-  <div #toDoText class="to-do-text"/>
-  <div #timestamp class="sidebar-timestamp"/>
-</div>
-'''
-    toDoText
-      .append($("<span class='bold'/>")
-        .text("Offer meeting options"))
-      .append($("<span/>")
-        .text(" - Coffee with Johnny Appleseed"));
-
-    // Implement jQuery dotdotdot()
-    // toDoText.dotdotdot();
-
-    timestamp.text("Yesterday at 12:45pm");
-
-    return view;
-  }
-
-  function viewOfNotification() {
-'''
-<div #view class="notification">
-  <div #notificationText class="notification-text"/>
-  <div #timestamp class="sidebar-timestamp"/>
-</div>
-'''
-    notificationText
-      .append($("<span class='bold'/>")
-        .text("Johnny Appleseed"))
-      .append($("<span/>")
-        .text(" sent you a message."));
-
-    // Implement jQuery dotdotdot()
-    // notificationText.dotdotdot();
-
-    timestamp.text("Apr 30 at 12:45pm");
-
-    return view;
-  }
-
-  function loadSidebar() {
-'''
-<div #view>
-  <div #hello class="hello ellipsis"/>
-  <div #exec/>
-  <div #notifications class="sidebar-section">
-    <div class="sidebar-section-header">
-      <div #notificationsIcon class="notifications-icon"/>
-      <div #notificationsCount class="notifications-count"/>
-      <div class="sidebar-section-title">Notifications</div>
-      <a class="see-all link">See all</a>
-    </div>
-    <div #notificationsList class="notifications-list"/>
-  </div>
-  <div #toDo class="sidebar-section">
-    <div class="sidebar-section-header">
-      <div #toDoIcon class="to-do-icon"/>
-      <div #toDoCount class="to-do-count"/>
-      <div class="sidebar-section-title">To Do</div>
-      <a class="see-all link">See all</a>
-    </div>
-    <div #toDoList class="to-do-list"/>
-  </div>
-</div>
-'''
-    api.getProfile(login.me()).done(function(eaProf) {
-      hello.text("Hello, " + profile.firstName(eaProf) + "!");
-    });
-
-    profile.get(login.leader()).done(function(obsProf) {
-      var execName = profile.firstName(obsProf.prof);
-      var possessive = execName;
-      if (execName.slice(-1) === "s") {
-        possessive += "'";
-      } else {
-        possessive += "'s"
-      }
-      exec.text("Here's what's happening with " + execName + "'s meetings:");
-    });
-
-    var bell = $("<img class='svg-block'/>")
-      .appendTo(notificationsIcon);
-    svg.loadImg(bell, "/assets/img/notifications.svg");
-
-    //iterate through notifications
-    notificationsList.append(viewOfNotification);
-
-    //iterate through to do's
-    toDoList.append(viewOfToDo);
-
-    var clipboard = $("<img class='svg-block'/>")
-      .appendTo(toDoIcon);
-    svg.loadImg(clipboard, "/assets/img/to-do.svg");
-
-    $(".sidebar-content").children().remove();
-    $(".sidebar-content").append(view);
-  }
-
   function loadPageTitle() {
     profile.get(login.leader()).done(function(obsProf) {
       var execName = profile.fullName(obsProf.prof);
@@ -505,7 +405,6 @@ var home = (function() {
   mod.load = function() {
     header.load();
     loadPageTitle();
-    loadSidebar();
     loadSearch();
     loadMeetings();
     util.focus();

@@ -7,6 +7,14 @@ var header = (function() {
 
   var loggedIn = $(".header-logged-in");
 
+  function hideAllPopovers() {
+    $(".header-popover").each(function() {
+      $(this)
+        .removeClass("open")
+        .attr("style","display:none");
+    })
+  }
+
   function viewOfAssisting() {
 '''
 <div #view>
@@ -24,30 +32,62 @@ var header = (function() {
     return view;
   }
 
+  function viewOfToDo() {
+'''
+<li #view class="to-do">
+  <div #toDoText class="to-do-text"/>
+  <div #timestamp class="header-popover-timestamp"/>
+</li>
+'''
+    toDoText
+      .append($("<span class='bold'/>")
+        .text("Offer meeting options"))
+      .append($("<span/>")
+        .text(" - Coffee with Johnny Appleseed"));
+
+    // Implement jQuery dotdotdot()
+    // toDoText.dotdotdot();
+
+    timestamp.text("Yesterday at 12:45pm");
+
+    return view;
+  }
+
   function viewOfToDoPopover() {
 '''
 <div #view class="popover-content">
-  <div #accountInfo class="popover-account-info">
-    <div #accountName class="popover-account-name ellipsis"/>
-    <div #accountEmail class="popover-account-email ellipsis"/>
+  <div class="header-popover-header">
+    <div class="header-popover-title">To Do</div>
   </div>
-  <ul #teamList class="popover-team-list popover-list"></ul>
-  <ul #accountActions" class="popover-list">
-    <li>
-      <a href="#!settings" data-toggle="tab">Settings</a>
-    </li>
-    <li>
-      <a href="#!logout">Sign out</a>
-    </li>
-  </ul>
+  <ul #toDoList class="to-do-list"/>
+  <div class="see-all">
+    <a class="link">See all</a>
+  </div>
 </div>
 '''
-    api.getProfile(login.me()).done(function(eaProf) {
-      accountName.text(profile.fullName(eaProf));
-      accountEmail.text(profile.email(eaProf));
-    });
+    //iterate through to do's
+    toDoList.append(viewOfToDo);
 
-    insertTeams(teamList);
+    return view;
+  }
+
+  function viewOfNotification() {
+'''
+<li #view class="notification">
+  <div #notificationText class="notification-text"/>
+  <div #timestamp class="header-popover-timestamp"/>
+</li>
+'''
+    notificationText
+      .append($("<span class='bold'/>")
+        .text("Johnny Appleseed"))
+      .append($("<span/>")
+        .text(" sent you a message."));
+
+    // Implement jQuery dotdotdot()
+    // notificationText.dotdotdot();
+
+    timestamp.text("Apr 30 at 12:45pm");
 
     return view;
   }
@@ -55,27 +95,18 @@ var header = (function() {
   function viewOfNotificationsPopover() {
 '''
 <div #view class="popover-content">
-  <div #accountInfo class="popover-account-info">
-    <div #accountName class="popover-account-name ellipsis"/>
-    <div #accountEmail class="popover-account-email ellipsis"/>
+  <div class="header-popover-header">
+    <div class="header-popover-title">Notifications</div>
+    <a class="mark-read link">Mark read</a>
   </div>
-  <ul #teamList class="popover-team-list popover-list"></ul>
-  <ul #accountActions" class="popover-list">
-    <li>
-      <a href="#!settings" data-toggle="tab">Settings</a>
-    </li>
-    <li>
-      <a href="#!logout">Sign out</a>
-    </li>
-  </ul>
+  <ul #notificationsList class="notifications-list scrollable"/>
+  <div class="see-all">
+    <a class="link">See all</a>
+  </div>
 </div>
 '''
-    api.getProfile(login.me()).done(function(eaProf) {
-      accountName.text(profile.fullName(eaProf));
-      accountEmail.text(profile.email(eaProf));
-    });
-
-    insertTeams(teamList);
+    //iterate through notifications
+    notificationsList.append(viewOfNotification);
 
     return view;
   }
@@ -166,9 +197,10 @@ var header = (function() {
   }
 
   mod.clear = function() {
-    accountPopover.children().remove();
-    accountPopover.removeClass("open")
-                  .attr("style","display:none");
+    $(".header-popover").each(function() {
+      $(this).children().remove();
+    })
+    hideAllPopovers();
     loggedIn.children().remove();
     loggedIn.addClass("hide");
   }
@@ -177,21 +209,21 @@ var header = (function() {
 '''
 <div #view>
   <div class="header-account">
-    <div #accountArrow class="header-account-arrow"/>
-    <div #accountPopover class="header-account-popover"
+    <div #accountArrow class="header-popover-click header-account-arrow"/>
+    <div #accountPopover class="header-popover header-account-popover"
          style="display:none"/>
   </div>
   <div #assisting class="header-assisting"/>
   <div #notifications class="header-notifications">
-    <div #notificationsIcon class="header-notifications-icon unread"/>
+    <div #notificationsIcon class="header-popover-click header-notifications-icon unread"/>
     <div #notificationsCount class="header-notifications-count">5</div>
-    <div #notificationsPopover class="header-notifications-popover"
+    <div #notificationsPopover class="header-popover header-notifications-popover"
          style="display:none"/>
   </div>
   <div #toDo class="header-to-do">
-    <div #toDoIcon class="header-to-do-icon incomplete"/>
+    <div #toDoIcon class="header-popover-click header-to-do-icon incomplete"/>
     <div #toDoCount class="header-to-do-count">2</div>
-    <div #toDoPopover class="header-to-do-popover"
+    <div #toDoPopover class="header-popover header-to-do-popover"
          style="display:none"/>
   </div>
 </div>
@@ -221,15 +253,57 @@ var header = (function() {
             .removeClass("open")
             .attr("style","display:none");
         } else {
+          hideAllPopovers();
           accountPopover
             .addClass("open")
             .attr("style","display:block");
         }
-      })
+      });
 
-    accountPopover
-      .removeClass("open")
-      .attr("style","display:none");
+    notificationsIcon
+      .off("click")
+      .click(function() {
+        if (notificationsPopover.hasClass("open")) {
+          notificationsPopover
+            .removeClass("open")
+            .attr("style","display:none");
+        } else {
+          hideAllPopovers();
+          notificationsPopover
+            .addClass("open")
+            .attr("style","display:block");
+        }
+      });
+
+    toDoIcon
+      .off("click")
+      .click(function() {
+        if (toDoPopover.hasClass("open")) {
+          toDoPopover
+            .removeClass("open")
+            .attr("style","display:none");
+        } else {
+          hideAllPopovers();
+          toDoPopover
+            .addClass("open")
+            .attr("style","display:block");
+        }
+      });
+
+    $("body").on("click", function (e) {
+      var target = e.target;
+      $(".header-popover").each(function () {
+        if ($(this).hasClass("open")
+            && !$(this).is(target)
+            && !$(target).hasClass("header-popover-click")
+            && $(target).parents(".header-popover").length === 0
+            && $(target).parents(".header-popover-click").length === 0) {
+              hideAllPopovers();
+        }
+      });
+    });
+
+    hideAllPopovers();
     loggedIn.children().remove();
     loggedIn
       .append(view)
