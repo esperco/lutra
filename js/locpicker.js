@@ -182,7 +182,8 @@ var locpicker = (function() {
   }
 
   function clearLocation(form) {
-    setLocation(form, {});
+    var loc = getLocation(form);
+    setLocation(form, {timezone: loc.timezone});
     form.searchBox.val("")
                   .focus();
   }
