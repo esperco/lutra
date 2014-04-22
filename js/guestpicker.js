@@ -16,6 +16,7 @@ var guestpicker = (function() {
   var position = null;
 
   function toggleForm(form) {
+    log("call to toggleForm");
     if (form.guestSearch.hasClass("hide")) {
       form.guestSearch.removeClass("hide");
       form.guestForm.addClass("hide");
@@ -25,6 +26,15 @@ var guestpicker = (function() {
     }
   }
 
+  function isValidForm(form) {
+      log("call to isValidForm");
+      var guest = getGuest(form);
+      return (guest != null && email.validate(guest.email)
+              &&  util.isString(guest.firstname)
+              && util.isString(guest.lastname));
+  }
+
+  
   function createGuestForm(param) {
 '''
 <div #guest
@@ -71,17 +81,31 @@ var guestpicker = (function() {
 </div>
 '''
     var form = _view;
-    log(param.task);
     log(param.teamid);
     form.task = param.task;
+    form.optuid = param.uid;
     form.teamid = param.teamid;
     form.onGuestSet = param.onGuestSet;
+    
 
-    form.isValid = function() {
-      return isValidName(form.firstname.val())
-          && isValidName(form.lastname.val())
-          && util.isString(form.uid);
+    form.updateUI = function() {
+      log("call to updateUI");
+      param.updateAddButton(form);
     }
+      
+    form.isValid = function() {
+        log("call to isValid");
+        return isValidName(form.firstname.val())
+            && isValidName(form.lastname.val())
+            && util.isString(form.optuid);
+    }
+      form.isValidForm = function () { 
+          log("call to isValidForm");
+          return isValidForm(form); }
+
+    util.afterTyping(form.firstname, 250, form.updateUI);
+    util.afterTyping(form.lastname, 250, form.updateUI);
+    util.afterTyping(form.email, 250, form.updateUI);
 
     return form;
   }
@@ -98,14 +122,14 @@ var guestpicker = (function() {
       firstname: form.firstname.val(),
       lastname: form.lastname.val(),
 
-      /* copy contents of search box for loceditor */
+      /* copy contents of search box for Guesteditor */
       search: form.searchBox.val(),
     };
     return guest;
   }
 
   function getCompleteGuest(form) {
-    var loc = getGuest(form);
+    var guest = getGuest(form);
     if (util.isNonEmptyString(guest.email)
         && util.isString(guest.firstname)
         && util.isString(guest.lastname))
@@ -125,6 +149,7 @@ var guestpicker = (function() {
   }
 
   function setGuest(form, guest, uid) {
+    log("call to setGuest");
     setGuestNoCallback(form, guest, uid);
     form.onGuestSet(guest);
   }
@@ -197,6 +222,7 @@ var guestpicker = (function() {
       var email = item.profile.emails[0].email;
       var pseudo = item.profile.pseudonym;
       var phone = item.profile.phones[0];
+      var uid = item.profile.profile_uid;
       var esc = util.htmlEscape;
       if (item.matched_field === "Name") {
         bolded = geo.highlight(name, [item.matched_substring]);
@@ -212,7 +238,18 @@ var guestpicker = (function() {
         .appendTo(menu);
       $('<a role="menuitem" tabindex="-1" href="#"/>')
         .html(bolded)
-        .appendTo(li);
+        .appendTo(li)
+        .click(function() {
+          var guest = {
+              email : item.profile.emails[0].email,
+              firstname : item.profile.first_last_name.first,
+              lastname : item.profile.first_last_name.last
+          };
+          setGuest(form,guest,item.profile.profile_uid);
+          toggleForm(form);
+          form.updateUI();
+          return false;
+        });
 
 //        .click(function() {
 //            api.postTaskProfile(item.profile,task.tid);
@@ -260,12 +297,11 @@ var guestpicker = (function() {
   }
 
   function predictGuest(task,form, showDetails) {
-      
+    log("call to predictGuest");      
     var textInput = form.searchBox.val();
     if(textInput)
       {api.getProfileSearch(form.teamid,textInput)
        .done(function(predictions) {
-           log(predictions);
            displayPredictionsDropdown(form, predictions, showDetails);
        });
       }
@@ -280,7 +316,7 @@ var guestpicker = (function() {
     form.resetGuest
       .click(function() {
         toggleForm(form);
-        clearLocation(form);
+        clearGuest(form);
       });
   }
 
@@ -293,6 +329,7 @@ var guestpicker = (function() {
         called when the Guest is set
    */
   mod.create = function(param) {
+    log("call to guestpicker.create");
     var form = createGuestForm(param);
     var showDetails = param.showDetails;
     setup(param,form, showDetails);
@@ -303,8 +340,9 @@ var guestpicker = (function() {
 
       /* get/set location fields of the form */
       getCompleteGuest: (function () { return getCompleteGuest(form); }),
-      setGuest: (function(guest) { return setGuest(form, guest); }),
+      setGuest: (function(guest,uid) { return setGuest(form, guest,uid); }),
       toggleForm: (function() { return toggleForm(form); }),
+      isValidForm: (function() { return isValidForm(form); }),
 
       /* terrible hack to work around circular dependencies */
       setGuestNoCallback:
