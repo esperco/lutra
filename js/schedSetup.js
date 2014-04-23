@@ -8,96 +8,41 @@ var schedSetup = (function() {
   var doneButton = $("<button class='btn btn-primary done-setup'/>")
     .text("Done");
 
-  function editGuest(updateAddButton) {
+  function editGuest(updateAddButton, task) {
     var edit = {};
 
     function updateUI() {
       updateAddButton(edit);
     }
 
-    edit.emailInput = $("<input type='email'/>")
-      .addClass("form-control guest-input")
-      .attr("placeholder", "Email address");
-    edit.firstNameInput = $("<input type='text'/>")
-      .addClass("form-control guest-input")
-      .attr("placeholder", "First name")
-      .attr("disabled", true);
-    edit.lastNameInput = $("<input type='text'/>")
-      .addClass("form-control guest-input")
-      .attr("placeholder", "Last name")
-      .attr("disabled", true);
-    edit.phoneInput = $("<input type='tel'/>")
-      .addClass("form-control guest-input")
-      .attr("placeholder", "Phone number")
-      .attr("disabled", true);
+    var gpicker = guestpicker.create({
+      uid : null,
+      task : task,
+      teamid : task.task_teamid,
+      onGuestSet : (function (guest) { }),
+      updateAddButton : updateAddButton,
+      showDetails : true
+    });
 
-    edit.firstLast = function() {
-      return {
-        first: edit.firstNameInput.val(),
-        last: edit.lastNameInput.val()
-      };
-    }
+    edit.guestpicker = gpicker;
+
+    edit.searchbox = gpicker.view;
 
     edit.optUid = null;
 
-    edit.isValid = function() {
-      return isValidName(edit.firstNameInput.val())
-          && isValidName(edit.lastNameInput.val())
-          && util.isString(edit.optUid);
-    }
-
-    function updateNameEditability(editable) {
-      if (util.isString(edit.optUid) && editable) {
-        edit.firstNameInput.removeAttr("disabled");
-        edit.lastNameInput.removeAttr("disabled");
-        edit.phoneInput.removeAttr("disabled");
-      } else {
-        edit.firstNameInput.attr("disabled", true);
-        edit.lastNameInput.attr("disabled", true);
-        edit.phoneInput.attr("disabled", true);
-      }
+    edit.isValidForm = function() {
+      return edit.guestpicker.isValidForm();
     }
 
     edit.clearUid = function() {
       edit.optUid = null;
-      updateNameEditability(false);
     }
 
     edit.setProfile = function(prof) {
       edit.optUid = prof.profile_uid;
-      // TODO Allow pseudonyms for guests?
-      if (util.isNotNull(prof.first_last_name)) {
-        edit.firstNameInput.val(prof.first_last_name.first);
-        edit. lastNameInput.val(prof.first_last_name.last);
-      }
-      if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
-        // TODO Support more than one phone number on frontend?
-        edit.phoneInput.val(prof.phones[0].number);
-      }
-      updateNameEditability(prof.editable);
+      edit.guestpicker.setGuestFromProfile(prof);
       updateUI();
     };
-
-    edit.willFetchProfile = false;
-
-    function fetchProfile() {
-      if (edit.willFetchProfile) {
-        var emailAddr = edit.emailInput.val();
-        if (email.validate(emailAddr)) {
-          api.getProfileByEmail(emailAddr)
-            .then(edit.setProfile);
-        } else {
-          edit.clearUid();
-          updateUI();
-        }
-      } else {
-        updateUI();
-      }
-    }
-
-    util.afterTyping(edit.emailInput, 250, fetchProfile);
-    util.afterTyping(edit.firstNameInput, 250, updateUI);
-    util.afterTyping(edit.lastNameInput, 250, updateUI);
 
     return edit;
   }
@@ -130,64 +75,69 @@ var schedSetup = (function() {
 
     var ea = sched.assistedBy(guestUid, guestOptions);
     function updateAddButton(edit) {
-      if (edit.isValid() && edit.optUid !== guestUid)
+      if (edit.isValidForm() && edit.optUid !== guestUid)
         addButton.removeClass("disabled");
       else
         addButton.addClass("disabled");
     }
-    var edit = editGuest(updateAddButton);
+    var edit = editGuest(updateAddButton, task);
     if (util.isNotNull(ea)) {
       var prof = profs[ea].prof;
       edit.setProfile(prof);
-      if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
-        edit.emailInput.val(prof.emails[0].email);
-      }
+      edit.guestpicker.toggleForm();
     } else {
       edit.willFetchProfile = true;
     }
-    edit.emailInput.focus();
 
     svg.loadImg(removeIcon, "/assets/img/plus.svg");
 
     title.text(util.isNotNull(ea) ? "EDIT ASSISTANT" : "NEW ASSISTANT");
     inputs
-      .append(edit.emailInput)
-      .append(edit.firstNameInput)
-      .append(edit.lastNameInput)
-      .append(edit.phoneInput);
+      .append(edit.searchbox);
 
     var updating = util.isNotNull(ea);
 
+    var updateProfile = function(guest) {
+      var result = function (prof) {
+        // TODO Allow pseudonym for guests?
+        prof.first_last_name = { first : guest.firstname,
+                                 last : guest.lastname};
+        // TODO Support more than one email address for guests?
+        var email = { email : guest.email };
+        prof.emails[0] = email;
+        var phone = { number : guest.phone };
+        prof.phones[0] = phone;
+        if (prof.editable) {
+          api.postTaskProfile(prof, task.tid);
+        }
+        profile.setWithTask(prof, task.tid); /* update cache */
+        var uid = prof.profile_uid;
+        sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
+        saveGuests(task, hosts, guestTbl, guestOptions);
+
+        mp.track(updating ? "Update assistant" : "Add assistant");
+
+        profile.profilesOfTaskParticipants(task).then(function(profs) {
+          view.replaceWith(makeViewOfEA(profs, uid));
+        });
+      };
+      return result;
+    }
     addButton
       .text(updating ? "Update" : "Add assistant")
       .click(function() {
-        var firstLast = edit.firstLast();
-        var email = edit.emailInput.val();
-        var phone = edit.phoneInput.val();
+        var guest = edit.guestpicker.getCompleteGuest();
         var uid = edit.optUid;
-        api.getTaskProfile(uid, task.tid).then(function(prof) {
-          // TODO Allow pseudonym for guests?
-          prof.first_last_name = firstLast;
-          // TODO Support more than one email address for guests?
-          prof.emails = [{email: email}];
-          if (phone.length > 0) {
-            // TODO Support more than one phone number on frontend?
-            prof.phones = [{number: phone}];
-          }
-          if (prof.editable) {
-            api.postTaskProfile(prof, task.tid);
-          }
-          profile.setWithTask(prof, task.tid); /* update cache */
-
-          sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
-          saveGuests(task, hosts, guestTbl, guestOptions);
-
-          mp.track(updating ? "Update assistant" : "Add assistant");
-
-          profile.profilesOfTaskParticipants(task).then(function(profs) {
-            view.replaceWith(makeViewOfEA(profs, uid));
-          });
-        });
+        if (!util.isNotNull(uid)) { // uid null
+            var emailAddr = guest.email;
+            api.getProfileByEmail(emailAddr)
+              .then(function (prof) {
+                api.getTaskProfile(prof.profile_uid, task.tid)
+                  .then(updateProfile(guest));
+              });
+        } else {
+          api.getTaskProfile(uid, task.tid).then(updateProfile(guest))
+        };
       });
 
     removeCirc.click(function() {
@@ -286,8 +236,8 @@ var schedSetup = (function() {
       style="float: right">Cancel</span>
 </div>
 '''
-    function updateAddButton(edit) {
-      if (edit.isValid())
+    function updateAddButton(form) {
+      if (form.isValidForm())
         addButton.removeClass("disabled");
       else
         addButton.addClass("disabled");
@@ -295,58 +245,64 @@ var schedSetup = (function() {
 
     title.text(util.isNotNull(uid) ? "EDIT GUEST" : "NEW GUEST");
 
-    var edit = editGuest(updateAddButton);
+    var edit = editGuest(updateAddButton, task);
+
+    inputs
+      .append(edit.searchbox);
+
     if (util.isNotNull(uid)) {
       var prof = profs[uid].prof;
       edit.setProfile(prof);
-      if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
-        edit.emailInput.val(prof.emails[0].email);
-      }
+      edit.guestpicker.toggleForm();
     } else {
-      edit.willFetchProfile = true;
+      edit.searchbox.focus();
     }
 
-    edit.emailInput.focus();
-
-    inputs
-      .append(edit.emailInput)
-      .append(edit.firstNameInput)
-      .append(edit.lastNameInput)
-      .append(edit.phoneInput);
-
     var updating = util.isNotNull(uid);
+
+    var updateProfile = function(guest) {
+      var result = function (prof) {
+        // TODO Allow pseudonym for guests?
+        prof.first_last_name = { first : guest.firstname,
+                                 last : guest.lastname};
+        // TODO Support more than one email address for guests?
+        var email = { email : guest.email };
+        prof.emails[0] = email;
+        var phone = { number : guest.phone };
+        prof.phones[0] = phone;
+        if (prof.editable) {
+          api.postTaskProfile(prof, task.tid);
+        }
+        profile.setWithTask(prof, task.tid); /* update cache */
+        var uid = prof.profile_uid;
+        guestTbl[uid] = uid;
+        delete sched.optionsForGuest(guestOptions, uid).assisted_by;
+        saveGuests(task, sched.getHosts(task), guestTbl, guestOptions);
+
+        mp.track(updating ? "Update guest" : "Add guest");
+
+        profile.profilesOfTaskParticipants(task).then(function(profs) {
+          updateGuestDetails(profs, uid);
+        });
+      };
+      return result;
+    }
 
     addButton
       .text(updating ? "Update" : "Add guest")
       .click(function() {
-        var firstLast = edit.firstLast();
-        var email = edit.emailInput.val();
-        var phone = edit.phoneInput.val();
+        var guest = edit.guestpicker.getCompleteGuest();
         var uid = edit.optUid;
-        api.getTaskProfile(uid, task.tid).then(function(prof) {
-          // TODO Allow pseudonym for guests?
-          prof.first_last_name = firstLast;
-          // TODO Support more than one email address for guests?
-          prof.emails = [{email: email}];
-          if (phone.length > 0) {
-            // TODO Support more than one phone number on frontend?
-            prof.phones = [{number: phone}];
-          }
-          if (prof.editable) {
-            api.postTaskProfile(prof, task.tid);
-          }
-          profile.setWithTask(prof, task.tid); /* update cache */
-
-          guestTbl[uid] = uid;
-          delete sched.optionsForGuest(guestOptions, uid).assisted_by;
-          saveGuests(task, sched.getHosts(task), guestTbl, guestOptions);
-
-          mp.track(updating ? "Update guest" : "Add guest");
-
-          profile.profilesOfTaskParticipants(task).then(function(profs) {
-            updateGuestDetails(profs, uid);
-          });
-        });
+        if (!util.isNotNull(uid)) { // uid null
+          var emailAddr = guest.email;
+          api.getProfileByEmail(emailAddr)
+              .then(function (prof) {
+                api.getTaskProfile(prof.profile_uid, task.tid)
+                  .then(updateProfile(guest));
+              });
+        } else {
+          api.getTaskProfile(uid, task.tid).then(updateProfile(guest));
+        }
       });
 
     return _view;
@@ -417,7 +373,7 @@ var schedSetup = (function() {
       guestDetails
         .append(chatHead)
         .append((nameView)
-        .append(bridgeLink))
+          .append(bridgeLink))
         .append(email);
 
       if (util.isNotNull(prof.phones) && prof.phones.length > 0)
@@ -619,10 +575,6 @@ var schedSetup = (function() {
     });
 
     return list.ofTable(result);
-  }
-
-  function isValidName(s) {
-    return profile.shortenName(s).length > 0;
   }
 
   function updateStage(ta) {

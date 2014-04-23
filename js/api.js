@@ -138,6 +138,13 @@ var api = (function () {
                        + "/team/" + login.getTeam().teamid);
   };
 
+  mod.getProfileSearch = function(teamid, partial_profile) {
+    var url = apiProfilePrefix() + "/search/" +
+              teamid  + "/" +
+              encodeURIComponent(partial_profile);
+    return jsonHttpGet(url);
+  };
+
   function api_account_prefix() {
     return "/api/account/" + login.data.uid;
   }

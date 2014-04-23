@@ -7,6 +7,7 @@ var geo = (function() {
 
   mod.highlight = function (address, matches) {
     var withBold = "";
+    var wroteBold = false;
     var esc = util.htmlEscape;
     for (var i = 0; i < address.length; i++) {
       var c = address[i];
@@ -15,18 +16,24 @@ var geo = (function() {
         var match = matches[j];
         var offset = match.offset;
         var length = match.length;
-        if (i == offset + length) {
+        if (i == offset + length && wroteBold) {
           withBold += "</b>";
+          wroteBold = false;
         }
-        if (i == 0 && offset == 0) {
+        if (i == 0 && offset == 0 && !wroteBold) {
           withBold += "<b>";
-        } else if (i == offset - 1) {
+          wroteBold = true;
+        } else if (i == offset - 1 && !wroteBold) {
           withBold += esc(address.charAt(i)) + "<b>";
           wroteChar = true;
+          wroteBold = true;
         }
       }
       if (!wroteChar) { withBold += esc(address.charAt(i)); }
     }
+    if (wroteBold){
+        withBold += "</b>";
+    } 
     return withBold;
   };
 
