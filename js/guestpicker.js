@@ -73,7 +73,7 @@ var guestpicker = (function() {
           <img class="reset-guest-icon svg"
                src="/assets/img/reset.svg"/>
           <span class="reset-guest-text danger-link">
-            Reset guest
+            Reset
           </span>
         </span>
       </div>

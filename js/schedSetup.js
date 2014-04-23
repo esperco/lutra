@@ -174,46 +174,47 @@ var schedSetup = (function() {
     if (util.isNotNull(ea)) {
       var prof = profs[ea].prof;
       edit.setProfile(prof);
-      if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
-        edit.emailInput.val(prof.emails[0].email);
-      }
+      edit.guestpicker.toggleForm();
+      //if (util.isNotNull(prof.emails) && prof.emails.length > 0) {
+      //  edit.emailInput.val(prof.emails[0].email);
+      //}
     } else {
       edit.willFetchProfile = true;
     }
-    edit.emailInput.focus();
+    //edit.emailInput.focus();
 
     svg.loadImg(removeIcon, "/assets/img/plus.svg");
 
     title.text(util.isNotNull(ea) ? "EDIT ASSISTANT" : "NEW ASSISTANT");
     inputs
-      .append(edit.emailInput)
-      .append(edit.firstNameInput)
-      .append(edit.lastNameInput)
-      .append(edit.phoneInput);
+      .append(edit.searchbox);
+//      .append(edit.emailInput)
+//      .append(edit.firstNameInput)
+//      .append(edit.lastNameInput)
+//      .append(edit.phoneInput);
 
     var updating = util.isNotNull(ea);
 
-    addButton
-      .text(updating ? "Update" : "Add assistant")
-      .click(function() {
-        var firstLast = edit.firstLast();
-        var email = edit.emailInput.val();
-        var phone = edit.phoneInput.val();
-        var uid = edit.optUid;
-        api.getTaskProfile(uid, task.tid).then(function(prof) {
+    var updateProfile = function(guest) {
+        var result = function (prof) {
           // TODO Allow pseudonym for guests?
-          prof.first_last_name = firstLast;
+          prof.first_last_name = { first : guest.firstname,
+                                   last : guest.lastname};
+          // prof.first_last_name = firstLast;
           // TODO Support more than one email address for guests?
-          prof.emails = [{email: email}];
+          // prof.emails = [{email: email}];
+          var email = { email : guest.email };
+          prof.emails[0] = email;
+          /*
           if (phone.length > 0) {
             // TODO Support more than one phone number on frontend?
             prof.phones = [{number: phone}];
-          }
+          } */
           if (prof.editable) {
             api.postTaskProfile(prof, task.tid);
           }
           profile.setWithTask(prof, task.tid); /* update cache */
-
+          var uid = prof.profile_uid;
           sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
           saveGuests(task, hosts, guestTbl, guestOptions);
 
@@ -222,7 +223,27 @@ var schedSetup = (function() {
           profile.profilesOfTaskParticipants(task).then(function(profs) {
             view.replaceWith(makeViewOfEA(profs, uid));
           });
-        });
+        };
+        return result;
+    }
+    addButton
+      .text(updating ? "Update" : "Add assistant")
+      .click(function() {
+        log("click on Add/Update Add assistant button");
+        var guest = edit.guestpicker.getCompleteGuest();
+        var firstLast = edit.firstLast();
+        var email = edit.emailInput.val();
+        var phone = edit.phoneInput.val();
+        var uid = edit.optUid;
+        if (!util.isNotNull(uid)){ // uid null
+            var emailAddr = guest.email;
+            api.getProfileByEmail(emailAddr)
+                .then(function (prof) {
+                    api.getTaskProfile(prof.profile_uid, task.tid)
+                        .then(updateProfile(guest));})
+        } else {
+            api.getTaskProfile(uid, task.tid).then(updateProfile(guest))
+        };
       });
 
     removeCirc.click(function() {
