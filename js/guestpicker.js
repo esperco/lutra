@@ -30,8 +30,9 @@ var guestpicker = (function() {
       log("call to isValidForm");
       var guest = getGuest(form);
       return (guest != null && email.validate(guest.email)
-              &&  util.isString(guest.firstname)
-              && util.isString(guest.lastname));
+              && util.isString(guest.firstname)
+              && util.isString(guest.lastname)
+              && util.isString(guest.phone));
   }
 
   
@@ -68,6 +69,10 @@ var guestpicker = (function() {
                type="text"
                class="form-control guest-input"
                placeholder="Last Name"/>
+        <input #phone
+               type="text"
+               class="form-control guest-input"
+               placeholder="Phone number"/>
         <span #resetGuest
               class="reset-guest">
           <img class="reset-guest-icon svg"
@@ -97,6 +102,7 @@ var guestpicker = (function() {
         log("call to isValid");
         return isValidName(form.firstname.val())
             && isValidName(form.lastname.val())
+            && isValidName(form.phone.val())
             && util.isString(form.optuid);
     }
       form.isValidForm = function () { 
@@ -106,6 +112,7 @@ var guestpicker = (function() {
     util.afterTyping(form.firstname, 250, form.updateUI);
     util.afterTyping(form.lastname, 250, form.updateUI);
     util.afterTyping(form.email, 250, form.updateUI);
+    util.afterTyping(form.phone, 250, form.updateUI);
 
     return form;
   }
@@ -121,6 +128,7 @@ var guestpicker = (function() {
       email: form.email.val(),
       firstname: form.firstname.val(),
       lastname: form.lastname.val(),
+      phone: form.phone.val(),
 
       /* copy contents of search box for Guesteditor */
       search: form.searchBox.val(),
@@ -132,7 +140,8 @@ var guestpicker = (function() {
     var guest = getGuest(form);
     if (util.isNonEmptyString(guest.email)
         && util.isString(guest.firstname)
-        && util.isString(guest.lastname))
+        && util.isString(guest.lastname)
+        && util.isString(guest.phone))
       return guest;
     else
       return null;
@@ -142,6 +151,7 @@ var guestpicker = (function() {
     form.email.val(guest.email);
     form.firstname.val(guest.firstname);
     form.lastname.val(guest.lastname);
+    form.phone.val(guest.phone);
 
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
@@ -164,7 +174,8 @@ var guestpicker = (function() {
     if (email.validate(text)){
       var guest = { email : text,
                     firstname : '',
-                    lastname : '' };
+                    lastname : '' ,
+                    phone : '' };
       return guest;
     } else {
         var pos = text.search(" ");
@@ -173,12 +184,14 @@ var guestpicker = (function() {
             var last = text.substring(pos+1,text.length);
             var guest = { email : '',
                           firstname : first,
-                          lastname : last };
+                          lastname : last ,
+                          phone : ''  };
             return guest;
         } else {
             var guest = { email : '',
                           firstname : text,
-                          lastname : '' };
+                          lastname : '' ,
+                          phone : ''  };
             return guest;
         }
     }   
@@ -221,7 +234,10 @@ var guestpicker = (function() {
       var name = firstname + ' ' + lastname;
       var email = item.profile.emails[0].email;
       var pseudo = item.profile.pseudonym;
-      var phone = item.profile.phones[0];
+      var phone = '' ;
+      if (item.profile.phones.length > 0){
+         phone = item.profile.phones[0].number;
+      }    
       var uid = item.profile.profile_uid;
       var esc = util.htmlEscape;
       if (item.matched_field === "Name") {
@@ -243,7 +259,8 @@ var guestpicker = (function() {
           var guest = {
               email : item.profile.emails[0].email,
               firstname : item.profile.first_last_name.first,
-              lastname : item.profile.first_last_name.last
+              lastname : item.profile.first_last_name.last,
+              phone : phone
           };
           setGuest(form,guest,item.profile.profile_uid);
           toggleForm(form);
