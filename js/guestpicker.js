@@ -26,14 +26,17 @@ var guestpicker = (function() {
   }
 
   function isValidForm(form) {
-      var guest = getGuest(form);
-      return (guest != null && email.validate(guest.email)
-              && util.isString(guest.firstname)
-              && util.isString(guest.lastname)
-              && util.isString(guest.phone));
+    var guest = getGuest(form);
+    return (
+      guest != null
+      && email.validate(guest.email)
+      && util.isString(guest.firstname)
+      && util.isString(guest.lastname)
+      && util.isString(guest.phone)
+    );
   }
 
-  
+
   function createGuestForm(param) {
 '''
 <div #guest
@@ -88,14 +91,15 @@ var guestpicker = (function() {
     form.optuid = param.uid;
     form.teamid = param.teamid;
     form.onGuestSet = param.onGuestSet;
-    
+
 
     form.updateUI = function() {
       param.updateAddButton(form);
     }
-      
-    form.isValidForm = function () { 
-        return isValidForm(form); }
+
+    form.isValidForm = function () {
+      return isValidForm(form);
+    }
 
     util.afterTyping(form.firstname, 250, form.updateUI);
     util.afterTyping(form.lastname, 250, form.updateUI);
@@ -121,10 +125,12 @@ var guestpicker = (function() {
 
   function getCompleteGuest(form) {
     var guest = getGuest(form);
-    if (util.isNonEmptyString(guest.email)
-        && util.isString(guest.firstname)
-        && util.isString(guest.lastname)
-        && util.isString(guest.phone))
+    if (
+      util.isNonEmptyString(guest.email)
+      && util.isString(guest.firstname)
+      && util.isString(guest.lastname)
+      && util.isString(guest.phone)
+    )
       return guest;
     else
       return null;
@@ -140,6 +146,7 @@ var guestpicker = (function() {
       form.uid = uid.uid;
     }
   }
+
   function setGuestFromProfileNoCallback(form, prof) {
     form.email.val(prof.emails[0].email);
     form.firstname.val(prof.first_last_name.first);
@@ -155,6 +162,7 @@ var guestpicker = (function() {
     setGuestNoCallback(form, guest, uid);
     form.onGuestSet(guest);
   }
+
   function setGuestFromProfile(form, profile) {
     setGuestFromProfileNoCallback(form, profile);
     form.onGuestSet(getGuest(form));
@@ -167,30 +175,30 @@ var guestpicker = (function() {
   }
 
   function textToGuest(text) {
-    if (email.validate(text)){
+    if (email.validate(text)) {
       var guest = { email : text,
                     firstname : '',
                     lastname : '' ,
                     phone : '' };
       return guest;
     } else {
-        var pos = text.search(" ");
-        if (pos != -1) {
-            var first = text.substring(0,pos);
-            var last = text.substring(pos+1,text.length);
-            var guest = { email : '',
-                          firstname : first,
-                          lastname : last ,
-                          phone : ''  };
-            return guest;
-        } else {
-            var guest = { email : '',
-                          firstname : text,
-                          lastname : '' ,
-                          phone : ''  };
-            return guest;
-        }
-    }   
+      var pos = text.search(" ");
+      if (pos != -1) {
+        var first = text.substring(0, pos);
+        var last = text.substring(pos+1, text.length);
+        var guest = { email : '',
+                      firstname : first,
+                      lastname : last ,
+                      phone : ''  };
+        return guest;
+      } else {
+        var guest = { email : '',
+                      firstname : text,
+                      lastname : '' ,
+                      phone : ''  };
+        return guest;
+      }
+    }
   }
 
   function addSuggestedGuestsToMenu(form, predictions, showDetails) {
@@ -200,23 +208,23 @@ var guestpicker = (function() {
       .text("Create New Contact")
       .appendTo(menu);
     var liplus = $('<li role="presentation"/>')
-        .appendTo(menu);
+      .appendTo(menu);
     $('<a role="menuitem" tabindex="-1" href="#"/>')
-        .html(text)
-        .appendTo(liplus)
-        .click(function() {
-            var guest = textToGuest(text);
-            setGuest(form, guest, '');
-            util.hideDropdown(form.dropdownToggle);
-            if (showDetails) {
-                toggleForm(form);
-            }
-            return false;
-        });
+      .html(text)
+      .appendTo(liplus)
+      .click(function() {
+          var guest = textToGuest(text);
+          setGuest(form, guest, '');
+          util.hideDropdown(form.dropdownToggle);
+          if (showDetails) {
+            toggleForm(form);
+          }
+          return false;
+      });
     $('<li role="presentation" class="divider"/>')
-          .appendTo(menu);
+      .appendTo(menu);
     if (predictions.count === 0){
-        return;
+      return;
     }
 
     $('<li role="presentation" class="dropdown-header"/>')
@@ -233,7 +241,7 @@ var guestpicker = (function() {
       var phone = '' ;
       if (item.profile.phones.length > 0){
          phone = item.profile.phones[0].number;
-      }    
+      }
       var uid = item.profile.profile_uid;
       var esc = util.htmlEscape;
       if (item.matched_field === "Name") {
@@ -241,7 +249,7 @@ var guestpicker = (function() {
         bolded = bolded + ', ' + email;
       } else if (item.matched_field === "Email") {
         bolded = geo.highlight(email, [item.matched_substring]);
-          bolded = firstname + ' ' + lastname + ', ' + bolded;
+        bolded = firstname + ' ' + lastname + ', ' + bolded;
       } else {
         // TODO Error, bad API response, should never happen
       }
@@ -252,7 +260,7 @@ var guestpicker = (function() {
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          setGuestFromProfile(form,item.profile);
+          setGuestFromProfile(form, item.profile);
           toggleForm(form);
           form.updateUI();
           return false;
@@ -277,21 +285,21 @@ var guestpicker = (function() {
     util.showDropdown(form.dropdownToggle);
   }
 
-  function predictGuest(task,form, showDetails) {
+  function predictGuest(task, form, showDetails) {
     var textInput = form.searchBox.val();
-    if(textInput)
-      {api.getProfileSearch(form.teamid,textInput)
+    if (textInput) {
+      api.getProfileSearch(form.teamid, textInput)
        .done(function(predictions) {
-           displayPredictionsDropdown(form, predictions, showDetails);
+         displayPredictionsDropdown(form, predictions, showDetails);
        });
-      }
+    }
   }
 
-  function setup(param,form, showDetails) {
+  function setup(param, form, showDetails) {
     form.guestSearch.removeClass("hide");
     form.guestForm.addClass("hide");
     util.afterTyping(form.searchBox, 250, function() {
-      predictGuest(param.task,form, showDetails);
+      predictGuest(param.task, form, showDetails);
     });
     form.resetGuest
       .click(function() {
@@ -311,7 +319,7 @@ var guestpicker = (function() {
   mod.create = function(param) {
     var form = createGuestForm(param);
     var showDetails = param.showDetails;
-    setup(param,form, showDetails);
+    setup(param, form, showDetails);
 
     return {
       view: form.guest,
@@ -319,8 +327,8 @@ var guestpicker = (function() {
 
       /* get/set location fields of the form */
       getCompleteGuest: (function () { return getCompleteGuest(form); }),
-      setGuest: (function(guest,uid) { return setGuest(form, guest,uid); }),
-      setGuestFromProfile: (function(prof) { 
+      setGuest: (function(guest, uid) { return setGuest(form, guest, uid); }),
+      setGuestFromProfile: (function(prof) {
           return setGuestFromProfile(form, prof); }),
       toggleForm: (function() { return toggleForm(form); }),
       isValidForm: (function() { return isValidForm(form); }),

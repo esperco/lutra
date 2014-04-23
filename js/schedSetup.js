@@ -8,7 +8,7 @@ var schedSetup = (function() {
   var doneButton = $("<button class='btn btn-primary done-setup'/>")
     .text("Done");
 
-  function editGuest(updateAddButton,task) {
+  function editGuest(updateAddButton, task) {
     var edit = {};
 
     function updateUI() {
@@ -16,12 +16,12 @@ var schedSetup = (function() {
     }
 
     var gpicker = guestpicker.create({
-        uid : null,
-        task : task,
-        teamid : task.task_teamid,
-        onGuestSet : (function (guest) { }),
-        updateAddButton : updateAddButton,
-        showDetails : true
+      uid : null,
+      task : task,
+      teamid : task.task_teamid,
+      onGuestSet : (function (guest) { }),
+      updateAddButton : updateAddButton,
+      showDetails : true
     });
 
     edit.guestpicker = gpicker;
@@ -80,7 +80,7 @@ var schedSetup = (function() {
       else
         addButton.addClass("disabled");
     }
-    var edit = editGuest(updateAddButton,task);
+    var edit = editGuest(updateAddButton, task);
     if (util.isNotNull(ea)) {
       var prof = profs[ea].prof;
       edit.setProfile(prof);
@@ -98,44 +98,45 @@ var schedSetup = (function() {
     var updating = util.isNotNull(ea);
 
     var updateProfile = function(guest) {
-        var result = function (prof) {
-          // TODO Allow pseudonym for guests?
-          prof.first_last_name = { first : guest.firstname,
-                                   last : guest.lastname};
-          // TODO Support more than one email address for guests?
-          var email = { email : guest.email };
-          prof.emails[0] = email;
-          var phone = { number : guest.phone };
-          prof.phones[0] = phone;
-          if (prof.editable) {
-            api.postTaskProfile(prof, task.tid);
-          }
-          profile.setWithTask(prof, task.tid); /* update cache */
-          var uid = prof.profile_uid;
-          sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
-          saveGuests(task, hosts, guestTbl, guestOptions);
+      var result = function (prof) {
+        // TODO Allow pseudonym for guests?
+        prof.first_last_name = { first : guest.firstname,
+                                 last : guest.lastname};
+        // TODO Support more than one email address for guests?
+        var email = { email : guest.email };
+        prof.emails[0] = email;
+        var phone = { number : guest.phone };
+        prof.phones[0] = phone;
+        if (prof.editable) {
+          api.postTaskProfile(prof, task.tid);
+        }
+        profile.setWithTask(prof, task.tid); /* update cache */
+        var uid = prof.profile_uid;
+        sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
+        saveGuests(task, hosts, guestTbl, guestOptions);
 
-          mp.track(updating ? "Update assistant" : "Add assistant");
+        mp.track(updating ? "Update assistant" : "Add assistant");
 
-          profile.profilesOfTaskParticipants(task).then(function(profs) {
-            view.replaceWith(makeViewOfEA(profs, uid));
-          });
-        };
-        return result;
+        profile.profilesOfTaskParticipants(task).then(function(profs) {
+          view.replaceWith(makeViewOfEA(profs, uid));
+        });
+      };
+      return result;
     }
     addButton
       .text(updating ? "Update" : "Add assistant")
       .click(function() {
         var guest = edit.guestpicker.getCompleteGuest();
         var uid = edit.optUid;
-        if (!util.isNotNull(uid)){ // uid null
+        if (!util.isNotNull(uid)) { // uid null
             var emailAddr = guest.email;
             api.getProfileByEmail(emailAddr)
-                .then(function (prof) {
-                    api.getTaskProfile(prof.profile_uid, task.tid)
-                        .then(updateProfile(guest));})
+              .then(function (prof) {
+                api.getTaskProfile(prof.profile_uid, task.tid)
+                  .then(updateProfile(guest));
+              });
         } else {
-            api.getTaskProfile(uid, task.tid).then(updateProfile(guest))
+          api.getTaskProfile(uid, task.tid).then(updateProfile(guest))
         };
       });
 
@@ -244,7 +245,7 @@ var schedSetup = (function() {
 
     title.text(util.isNotNull(uid) ? "EDIT GUEST" : "NEW GUEST");
 
-    var edit = editGuest(updateAddButton,task);
+    var edit = editGuest(updateAddButton, task);
 
     inputs
       .append(edit.searchbox);
@@ -254,14 +255,13 @@ var schedSetup = (function() {
       edit.setProfile(prof);
       edit.guestpicker.toggleForm();
     } else {
-        edit.searchbox.focus();
+      edit.searchbox.focus();
     }
-
 
     var updating = util.isNotNull(uid);
 
     var updateProfile = function(guest) {
-        var result = function (prof) {
+      var result = function (prof) {
         // TODO Allow pseudonym for guests?
         prof.first_last_name = { first : guest.firstname,
                                  last : guest.lastname};
@@ -271,21 +271,21 @@ var schedSetup = (function() {
         var phone = { number : guest.phone };
         prof.phones[0] = phone;
         if (prof.editable) {
-            api.postTaskProfile(prof, task.tid);
+          api.postTaskProfile(prof, task.tid);
         }
         profile.setWithTask(prof, task.tid); /* update cache */
         var uid = prof.profile_uid;
         guestTbl[uid] = uid;
         delete sched.optionsForGuest(guestOptions, uid).assisted_by;
         saveGuests(task, sched.getHosts(task), guestTbl, guestOptions);
-        
+
         mp.track(updating ? "Update guest" : "Add guest");
-        
+
         profile.profilesOfTaskParticipants(task).then(function(profs) {
-            updateGuestDetails(profs, uid);
+          updateGuestDetails(profs, uid);
         });
-        };
-        return result;
+      };
+      return result;
     }
 
     addButton
@@ -293,17 +293,16 @@ var schedSetup = (function() {
       .click(function() {
         var guest = edit.guestpicker.getCompleteGuest();
         var uid = edit.optUid;
-        if (!util.isNotNull(uid)){ // uid null
-            var emailAddr = guest.email;
-            api.getProfileByEmail(emailAddr)
-                .then(function (prof) {
-                    /*edit.setProfile)
-                .then(*/
-                    api.getTaskProfile(prof.profile_uid, task.tid)
-                        .then(updateProfile(guest));})
+        if (!util.isNotNull(uid)) { // uid null
+          var emailAddr = guest.email;
+          api.getProfileByEmail(emailAddr)
+              .then(function (prof) {
+                api.getTaskProfile(prof.profile_uid, task.tid)
+                  .then(updateProfile(guest));
+              });
         } else {
-            api.getTaskProfile(uid, task.tid).then(updateProfile(guest));
-        }     
+          api.getTaskProfile(uid, task.tid).then(updateProfile(guest));
+        }
       });
 
     return _view;
@@ -374,7 +373,7 @@ var schedSetup = (function() {
       guestDetails
         .append(chatHead)
         .append((nameView)
-        .append(bridgeLink))
+          .append(bridgeLink))
         .append(email);
 
       if (util.isNotNull(prof.phones) && prof.phones.length > 0)
