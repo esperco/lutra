@@ -258,31 +258,6 @@ var guestpicker = (function() {
           return false;
         });
 
-//        .click(function() {
-//            api.postTaskProfile(item.profile,task.tid);
-//            profile.setWithTask(item.prof, form.task.tid); /* update cache */
-//        });
-
-/*        .click(function() {
-         api.postSelectPlace(item.google_description)
-            .done(function(place) {
-              var loc = {
-                title: title,
-                coord: coord,
-                address: address,
-                instructions: instructions,
-                timezone: place.loc.timezone,
-                google_description: item.google_description
-              };
-              setLocation(form, loc, place);
-              util.hideDropdown(form.dropdownToggle);
-              if (showDetails) {
-                toggleForm(form);
-              }
-            });
-          return false;
-        });
-*/
     });
     $('<li role="presentation" class="divider"/>')
       .appendTo(menu);
@@ -293,7 +268,6 @@ var guestpicker = (function() {
     the user's saved places.
   */
   function displayPredictionsDropdown(form, predictions, showDetails) {
-    //if (predictions.count === 0) return;
     var menu = form.dropdownMenu;
     menu.children().remove();
 
