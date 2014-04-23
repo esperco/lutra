@@ -821,6 +821,7 @@ var schedSetup = (function() {
       .off("click")
       .click(function() {
         mp.track("Done with setup");
+        updateStage(ta);
         sched.loadTask(ta);
       });
 
