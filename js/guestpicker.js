@@ -16,7 +16,6 @@ var guestpicker = (function() {
   var position = null;
 
   function toggleForm(form) {
-    log("call to toggleForm");
     if (form.guestSearch.hasClass("hide")) {
       form.guestSearch.removeClass("hide");
       form.guestForm.addClass("hide");
@@ -27,7 +26,6 @@ var guestpicker = (function() {
   }
 
   function isValidForm(form) {
-      log("call to isValidForm");
       var guest = getGuest(form);
       return (guest != null && email.validate(guest.email)
               && util.isString(guest.firstname)
@@ -86,7 +84,6 @@ var guestpicker = (function() {
 </div>
 '''
     var form = _view;
-    log(param.teamid);
     form.task = param.task;
     form.optuid = param.uid;
     form.teamid = param.teamid;
@@ -94,20 +91,11 @@ var guestpicker = (function() {
     
 
     form.updateUI = function() {
-      log("call to updateUI");
       param.updateAddButton(form);
     }
       
-    form.isValid = function() {
-        log("call to isValid");
-        return isValidName(form.firstname.val())
-            && isValidName(form.lastname.val())
-            && isValidName(form.phone.val())
-            && util.isString(form.optuid);
-    }
-      form.isValidForm = function () { 
-          log("call to isValidForm");
-          return isValidForm(form); }
+    form.isValidForm = function () { 
+        return isValidForm(form); }
 
     util.afterTyping(form.firstname, 250, form.updateUI);
     util.afterTyping(form.lastname, 250, form.updateUI);
@@ -115,11 +103,6 @@ var guestpicker = (function() {
     util.afterTyping(form.phone, 250, form.updateUI);
 
     return form;
-  }
-
-  
-  function isValidName(s) {
-    return profile.shortenName(s).length > 0;
   }
 
   function getGuest(form) {
@@ -157,11 +140,24 @@ var guestpicker = (function() {
       form.uid = uid.uid;
     }
   }
+  function setGuestFromProfileNoCallback(form, prof) {
+    form.email.val(prof.emails[0].email);
+    form.firstname.val(prof.first_last_name.first);
+    form.lastname.val(prof.first_last_name.last);
+    form.phone.val(prof.phones[0].number);
+
+    if (util.isNotNull(prof.profile_uid)) {
+      form.uid = prof.profile_uid;
+    }
+  }
 
   function setGuest(form, guest, uid) {
-    log("call to setGuest");
     setGuestNoCallback(form, guest, uid);
     form.onGuestSet(guest);
+  }
+  function setGuestFromProfile(form, profile) {
+    setGuestFromProfileNoCallback(form, profile);
+    form.onGuestSet(getGuest(form));
   }
 
   function clearGuest(form) {
@@ -256,13 +252,7 @@ var guestpicker = (function() {
         .html(bolded)
         .appendTo(li)
         .click(function() {
-          var guest = {
-              email : item.profile.emails[0].email,
-              firstname : item.profile.first_last_name.first,
-              lastname : item.profile.first_last_name.last,
-              phone : phone
-          };
-          setGuest(form,guest,item.profile.profile_uid);
+          setGuestFromProfile(form,item.profile);
           toggleForm(form);
           form.updateUI();
           return false;
@@ -314,7 +304,6 @@ var guestpicker = (function() {
   }
 
   function predictGuest(task,form, showDetails) {
-    log("call to predictGuest");      
     var textInput = form.searchBox.val();
     if(textInput)
       {api.getProfileSearch(form.teamid,textInput)
@@ -346,7 +335,6 @@ var guestpicker = (function() {
         called when the Guest is set
    */
   mod.create = function(param) {
-    log("call to guestpicker.create");
     var form = createGuestForm(param);
     var showDetails = param.showDetails;
     setup(param,form, showDetails);
@@ -358,6 +346,8 @@ var guestpicker = (function() {
       /* get/set location fields of the form */
       getCompleteGuest: (function () { return getCompleteGuest(form); }),
       setGuest: (function(guest,uid) { return setGuest(form, guest,uid); }),
+      setGuestFromProfile: (function(prof) { 
+          return setGuestFromProfile(form, prof); }),
       toggleForm: (function() { return toggleForm(form); }),
       isValidForm: (function() { return isValidForm(form); }),
 
