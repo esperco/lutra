@@ -151,7 +151,9 @@ var guestpicker = (function() {
     form.email.val(prof.emails[0].email);
     form.firstname.val(prof.first_last_name.first);
     form.lastname.val(prof.first_last_name.last);
-    form.phone.val(prof.phones[0].number);
+    if(prof.phones.length > 0){
+      form.phone.val(prof.phones[0].number);
+    }
 
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
