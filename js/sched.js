@@ -317,7 +317,7 @@ var sched = (function() {
       var prof = profs[slotCaller].prof;
       var name = profile.fullNameOrEmail(prof);
       var phone = profile.phone(prof);
-      caller.text(name + " at " + phone);
+      caller.text(name + " : " + phone);
       callerRow.removeClass("hide");
     }
 

@@ -182,7 +182,7 @@ var editevent = (function() {
       var prof = profs[uid].prof;
       var name = profile.fullNameOrEmail(prof);
       var phone = profile.phone(prof);
-      return { label: name + " at " + phone, value: uid };
+      return { label: name + " : " + phone, value: uid };
     });
     return select.create({
       initialKey: currentCaller,
