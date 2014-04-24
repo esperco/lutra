@@ -133,7 +133,6 @@ var chat = (function () {
     } else {
       v.text(meetType + date.justStartTime(date.ofString(slot.start)));
     }
-    v.text(slot.meeting_type + ", " + d);
     v.append($("<br/>"));
     var locText = mod.locationText(slot.location);
     if (!(util.isNotNull(locText)) || locText === "")
