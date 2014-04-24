@@ -272,8 +272,7 @@ var guestpicker = (function() {
   }
 
   /*
-    Display addresses as autocompleted by Google or by Esper using
-    the user's saved places.
+    Display contacts as autocompleted by Esper using the team's saved contacts.
   */
   function displayPredictionsDropdown(form, predictions, showDetails) {
     var menu = form.dropdownMenu;
@@ -311,10 +310,14 @@ var guestpicker = (function() {
 
   /*
     Parameters:
+    - task
+    - uid
     - teamid
     - showDetails
     - onGuestSet(guest):
         called when the Guest is set
+    - updateAddButton(form):
+        called when the input is valid
    */
   mod.create = function(param) {
     var form = createGuestForm(param);
@@ -335,9 +338,7 @@ var guestpicker = (function() {
 
       /* terrible hack to work around circular dependencies */
       setGuestNoCallback:
-        (function(guest) { return setGuestNoCallback(form, guest); }),
-
-      getSavedGuestID: (function () { return form.SavedGuestID; })
+        (function(guest) { return setGuestNoCallback(form, guest); })
     };
   }
 
