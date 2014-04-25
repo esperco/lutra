@@ -27,13 +27,7 @@ var guestpicker = (function() {
 
   function isValidForm(form) {
     var guest = getGuest(form);
-    return (
-      guest != null
-      && email.validate(guest.email)
-      && util.isString(guest.firstname)
-      && util.isString(guest.lastname)
-      && util.isString(guest.phone)
-    );
+    return (isGuestValid(guest));
   }
 
 
@@ -124,6 +118,18 @@ var guestpicker = (function() {
     return form;
   }
 
+  function isGuestValid(guest) {
+    return (
+      guest != null
+      && email.validate(guest.email)
+      && util.isString(guest.firstname)
+      && guest.firsname.length > 0
+      && util.isString(guest.lastname)
+      && guest.lastname.length > 0
+    );
+  }
+
+
   function getGuest(form) {
     var guest = {
       /* input boxes */
@@ -141,12 +147,7 @@ var guestpicker = (function() {
 
   function getCompleteGuest(form) {
     var guest = getGuest(form);
-    if (
-      util.isNonEmptyString(guest.email)
-      && util.isString(guest.firstname)
-      && util.isString(guest.lastname)
-      && util.isString(guest.phone)
-    )
+    if (isGuestValid(guest))
       return guest;
     else
       return null;
