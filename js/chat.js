@@ -115,6 +115,13 @@ var chat = (function () {
     }
   }
 
+  function appendTimezone(elt, loc, start) {
+    var tz = timezone.format(loc.timezone, start);
+    $("<span/>")
+      .text("Time zone: " + tz)
+      .appendTo(elt);
+  }
+
   function viewOfCalendarSlot(slot) {
     var v = $("<li/>");
     var meetType = slot.meeting_type + ", ";
@@ -127,7 +134,11 @@ var chat = (function () {
       v.text(meetType + date.justStartTime(date.ofString(slot.start)));
     }
     v.append($("<br/>"));
-    appendLocation(v, slot.location);
+    var locText = mod.locationText(slot.location);
+    if (!(util.isNotNull(locText)) || locText === "")
+      appendTimezone(v, slot.location, date.ofString(slot.start));
+    else
+      appendLocation(v, slot.location);
     return v;
   }
 

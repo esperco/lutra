@@ -154,7 +154,7 @@ var guestTask = function() {
         if (uid !== me && sched.guestMayAttend(prof, opts)) {
           var name = profile.fullNameOrEmail(prof);
           var phone = profile.phone(prof);
-          return name + " at " + phone;
+          return name + " : " + phone;
         } else {
           return null;
         }
