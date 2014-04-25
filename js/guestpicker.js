@@ -52,10 +52,6 @@ var guestpicker = (function() {
   <div #guestForm class="hide">
     <div #guestDetails class="clearfix">
       <div class="col-sm-7 address-form">
-        <input #email
-               type="text"
-               class="form-control guest-input"
-               placeholder="email"/>
         <div #prefix />
         <input #firstname
                type="text"
@@ -65,6 +61,20 @@ var guestpicker = (function() {
                type="text"
                class="form-control guest-input"
                placeholder="Last Name"/>
+        <input #pseudonym
+               type="text"
+               class="form-control guest-input"
+               placeholder="Alternative Name"/>
+        <span #altName
+              class="altName">
+          <span class="use-alternative-name-text danger-link">
+            Use an alternative name
+          </span>
+        </span>
+        <input #email
+               type="text"
+               class="form-control guest-input"
+               placeholder="email"/>
         <input #phone
                type="text"
                class="form-control guest-input"
@@ -112,6 +122,7 @@ var guestpicker = (function() {
 
     util.afterTyping(form.firstname, 250, form.updateUI);
     util.afterTyping(form.lastname, 250, form.updateUI);
+    util.afterTyping(form.pseudonym, 250, form.updateUI);
     util.afterTyping(form.email, 250, form.updateUI);
     util.afterTyping(form.phone, 250, form.updateUI);
 
@@ -136,6 +147,7 @@ var guestpicker = (function() {
       email: form.email.val(),
       firstname: form.firstname.val(),
       lastname: form.lastname.val(),
+      pseudonym: form.pseudonym.val(),
       phone: form.phone.val(),
       prefix: form.prefixSel.get(),
 
@@ -159,6 +171,7 @@ var guestpicker = (function() {
     form.lastname.val(guest.lastname);
     form.phone.val(guest.phone);
     form.prefixSel.set(guest.prefix);
+    form.pseudonym.val(guest.pseudonym);
 
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
@@ -175,6 +188,9 @@ var guestpicker = (function() {
       form.phone.val(prof.phones[0].number);
     }
     form.prefixSel.set(prof.prefix);
+    if (util.isNotNull(prof.pseudonym)) {
+      form.pseudonym.val(prof.pseudonym);
+    }
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
     }
@@ -201,6 +217,7 @@ var guestpicker = (function() {
       var guest = { email : text,
                     firstname : '',
                     lastname : '' ,
+                    pseudonym : null ,
                     phone : '' };
       return guest;
     } else {
@@ -211,6 +228,7 @@ var guestpicker = (function() {
         var guest = { email : '',
                       firstname : first,
                       lastname : last ,
+                      pseudonym : null ,
                       phone : '',
                       prefix : null };
         return guest;
@@ -218,6 +236,7 @@ var guestpicker = (function() {
         var guest = { email : '',
                       firstname : text,
                       lastname : '' ,
+                      pseudonym : null ,
                       phone : '',
                       prefix : null };
         return guest;
