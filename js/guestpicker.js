@@ -166,14 +166,14 @@ var guestpicker = (function() {
 
   function setGuestFromProfileNoCallback(form, prof) {
     form.email.val(prof.emails[0].email);
-    form.firstname.val(prof.first_last_name.first);
-    form.lastname.val(prof.first_last_name.last);
-    if(prof.phones.length > 0){
+    if (util.isNotNull(prof.first_last_name)) {
+      form.firstname.val(prof.first_last_name.first);
+      form.lastname.val(prof.first_last_name.last);
+    }
+    if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
       form.phone.val(prof.phones[0].number);
     }
-    //if(prof.prefix){
-      form.prefixSel.set(prof.prefix);
-    //}
+    form.prefixSel.set(prof.prefix);
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
     }
