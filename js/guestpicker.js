@@ -123,7 +123,7 @@ var guestpicker = (function() {
       guest != null
       && email.validate(guest.email)
       && util.isString(guest.firstname)
-      && guest.firsname.length > 0
+      && guest.firstname.length > 0
       && util.isString(guest.lastname)
       && guest.lastname.length > 0
     );
