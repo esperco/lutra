@@ -107,6 +107,8 @@ var schedSetup = (function() {
         prof.emails[0] = email;
         var phone = { number : guest.phone };
         prof.phones[0] = phone;
+        var pref = guest.prefix;
+        prof.prefix = pref;
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
@@ -270,6 +272,8 @@ var schedSetup = (function() {
         prof.emails[0] = email;
         var phone = { number : guest.phone };
         prof.phones[0] = phone;
+        var pref = guest.prefix;
+        prof.prefix = pref;
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }

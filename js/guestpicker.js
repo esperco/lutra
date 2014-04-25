@@ -56,12 +56,13 @@ var guestpicker = (function() {
     </div>
   </div>
   <div #guestForm class="hide">
-    <div #locationDetails class="clearfix">
+    <div #guestDetails class="clearfix">
       <div class="col-sm-7 address-form">
         <input #email
                type="text"
                class="form-control guest-input"
                placeholder="email"/>
+        <div #prefix />
         <input #firstname
                type="text"
                class="form-control guest-input"
@@ -87,6 +88,20 @@ var guestpicker = (function() {
 </div>
 '''
     var form = _view;
+
+    form.prefixSel = select.create({
+      options: [{label:"No prefix", value:null},
+                {label:"Mr.", value:"Mr."},
+                {label:"Ms.", value:"Ms."},
+                {label:"Mrs.", value:"Mrs."},
+                {label:"Miss", value:"Miss"},
+                {label:"Dr.", value:"Dr."},
+                {label:"Prof.", value:"Prof."}],
+      initialKey: "No prefix",
+      defaultAction: function () {}
+      });
+    form.prefix.prepend(form.prefixSel.view);
+
     form.task = param.task;
     form.optuid = param.uid;
     form.teamid = param.teamid;
@@ -116,6 +131,7 @@ var guestpicker = (function() {
       firstname: form.firstname.val(),
       lastname: form.lastname.val(),
       phone: form.phone.val(),
+      prefix: form.prefixSel.get(),
 
       /* copy contents of search box for Guesteditor */
       search: form.searchBox.val(),
@@ -141,6 +157,7 @@ var guestpicker = (function() {
     form.firstname.val(guest.firstname);
     form.lastname.val(guest.lastname);
     form.phone.val(guest.phone);
+    form.prefixSel.set(guest.prefix);
 
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
@@ -154,7 +171,9 @@ var guestpicker = (function() {
     if(prof.phones.length > 0){
       form.phone.val(prof.phones[0].number);
     }
-
+    //if(prof.prefix){
+      form.prefixSel.set(prof.prefix);
+    //}
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
     }
@@ -191,13 +210,15 @@ var guestpicker = (function() {
         var guest = { email : '',
                       firstname : first,
                       lastname : last ,
-                      phone : ''  };
+                      phone : '',
+                      prefix : null };
         return guest;
       } else {
         var guest = { email : '',
                       firstname : text,
                       lastname : '' ,
-                      phone : ''  };
+                      phone : '',
+                      prefix : null };
         return guest;
       }
     }
@@ -240,6 +261,7 @@ var guestpicker = (function() {
       var name = firstname + ' ' + lastname;
       var email = item.profile.emails[0].email;
       var pseudo = item.profile.pseudonym;
+      var prefix = item.profile.prefix;
       var phone = '' ;
       if (item.profile.phones.length > 0){
          phone = item.profile.phones[0].number;
