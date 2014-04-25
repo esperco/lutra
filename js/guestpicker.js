@@ -25,6 +25,26 @@ var guestpicker = (function() {
     }
   }
 
+
+  function setToAltName(form) {
+    form.altname.removeClass("hide");
+    form.altNameInstruction.text("Use first and last names");
+  }
+
+  function setToFullName(form) {
+    form.altname.addClass("hide");
+    form.pseudonym.val(''); // reinitialises to null
+    form.altNameInstruction.text("Use an alternative name");
+  }
+
+  function toggleAltName(form) {
+    if (form.altname.hasClass("hide")) {
+      setToAltName(form);
+    } else {
+      setToFullName(form);
+    }
+  }
+
   function isValidForm(form) {
     var guest = getGuest(form);
     return (isGuestValid(guest));
@@ -52,24 +72,29 @@ var guestpicker = (function() {
   <div #guestForm class="hide">
     <div #guestDetails class="clearfix">
       <div class="col-sm-7 address-form">
-        <div #prefix />
-        <input #firstname
+        <div #fullname>
+          <div #prefix />
+            <input #firstname
                type="text"
                class="form-control guest-input"
                placeholder="First Name"/>
-        <input #lastname
+            <input #lastname
                type="text"
                class="form-control guest-input"
                placeholder="Last Name"/>
-        <input #pseudonym
+        </div>
+        <div #altname>
+            <input #pseudonym
                type="text"
                class="form-control guest-input"
                placeholder="Alternative Name"/>
-        <span #altName
-              class="altName">
-          <span class="use-alternative-name-text danger-link">
-            Use an alternative name
-          </span>
+        </div>
+        <span #altNameLink class="alt-name-link">
+            <img class="reset-guest-icon svg"
+               src="/assets/img/reset.svg"/>
+              <span #altNameInstruction class="use-alternative-name-text danger-link">
+                Use an alternative name
+              </span>
         </span>
         <input #email
                type="text"
@@ -105,6 +130,8 @@ var guestpicker = (function() {
       defaultAction: function () {}
       });
     form.prefix.prepend(form.prefixSel.view);
+
+    form.altname.addClass("hide");
 
     form.task = param.task;
     form.optuid = param.uid;
@@ -171,8 +198,12 @@ var guestpicker = (function() {
     form.lastname.val(guest.lastname);
     form.phone.val(guest.phone);
     form.prefixSel.set(guest.prefix);
-    form.pseudonym.val(guest.pseudonym);
-
+    if (util.isNotNull(guest.pseudonym)) {
+      form.pseudonym.val(guest.pseudonym);
+      setToAltName(form);
+    } else {
+      setToFullName(form);
+    }
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
     }
@@ -190,6 +221,9 @@ var guestpicker = (function() {
     form.prefixSel.set(prof.prefix);
     if (util.isNotNull(prof.pseudonym)) {
       form.pseudonym.val(prof.pseudonym);
+      setToAltName(form);
+    } else {
+      setToFullName(form);
     }
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
@@ -306,6 +340,11 @@ var guestpicker = (function() {
         .click(function() {
           setGuestFromProfile(form, item.profile);
           toggleForm(form);
+          if (util.isNotNull(item.profile.pseudonym)) {
+            setToAltName(form);
+          } else {
+            setToFullName(form);
+          }
           form.updateUI();
           return false;
         });
@@ -348,6 +387,10 @@ var guestpicker = (function() {
       .click(function() {
         toggleForm(form);
         clearGuest(form);
+      });
+    form.altNameLink
+      .click(function() {
+        toggleAltName(form);
       });
   }
 
