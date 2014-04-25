@@ -12,7 +12,7 @@ prod: prod-build
 dev-build:
 	$(MAKE) -C js dev-build
 	$(MAKE) -C html dev-build
-#	$(MAKE) -C css dev-build
+	$(MAKE) -C css dev-build
 
 prod-build:
 	$(MAKE) -C js prod-build
