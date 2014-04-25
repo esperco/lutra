@@ -104,7 +104,7 @@ var calpicker = (function() {
            class="date-jumper"/>
       <div class="time-zone-label-section">
         <div class="time-zone-label">TIME ZONE:</div>
-        <div #timezoneView/>
+        <div #timezoneView class="time-zone-text"/>
       </div>
     </div>
     <div class="modal-dialog cal-picker-modal">
