@@ -158,7 +158,7 @@ var guestpicker = (function() {
 
   function isGuestValid(guest) {
     return (
-      guest != null
+      util.isNotNull(guest)
       && email.validate(guest.email)
       && util.isString(guest.firstname)
       && guest.firstname.length > 0

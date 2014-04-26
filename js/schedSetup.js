@@ -110,7 +110,7 @@ var schedSetup = (function() {
         var pref = guest.prefix;
         prof.prefix = pref;
         var pseudo = guest.pseudonym;
-        if (pseudo != null && pseudo.length > 0){
+        if (util.isNotNull(pseudo) && pseudo.length > 0){
           prof.pseudonym = pseudo;
         } else {
           prof.pseudonym = null;
@@ -281,7 +281,7 @@ var schedSetup = (function() {
         var pref = guest.prefix;
         prof.prefix = pref;
         var pseudo = guest.pseudonym;
-        if (pseudo != null && pseudo.length > 0){
+        if (util.isNotNull(pseudo) && pseudo.length > 0){
           prof.pseudonym = pseudo;
         } else {
           prof.pseudonym = null;
