@@ -226,10 +226,11 @@ var chat = (function () {
     var header = $("<div class='message-header' />")
       .appendTo(message);
 
-    var d = date.ofString(time);
+    var timeUTC = date.ofString(time);
+    var timeLocal = date.localOfUtc(timezone.guessUserTimezone(), timeUTC);
     var timeAgoSpan = $("<span/>")
-      .append(date.viewTimeAgo(d))
-      .append(" on " + date.justStartTime(d));
+      .append(date.viewTimeAgo(timeUTC))
+      .append(" on " + date.justStartTime(timeLocal));
     var timestamp = $("<div class='timestamp' style='float:right'/>")
       .append($("<div class='timestamp' />")
         .append(timeAgoSpan))
