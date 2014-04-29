@@ -155,7 +155,10 @@ var sched4 = (function() {
 
     api.getReminderMessage(ta.tid, parameters)
       .done(function(x) {
-        if (! receiverOptions.reminder_message) {
+        if (
+          !(util.isNotNull(receiverOptions))
+          || !(receiverOptions.reminder_message)
+        ) {
           reminderModal.messageEditable
             .val(x.message_text)
             .trigger("autosize.resize");
