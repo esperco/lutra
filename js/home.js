@@ -154,7 +154,7 @@ var home = (function() {
   }
 
   function classOfActiveTask(task) {
-    if ("Scheduling" === task.task_kind) {
+    if ("Scheduling" === variant.cons(task.task_data)) {
       return "Confirmed" === task.task_status.task_progress
           || "Closed"    === task.task_status.task_progress
            ? "completed-scheduling-task"
