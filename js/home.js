@@ -35,10 +35,36 @@ var home = (function() {
     }
   }
 
+  /* The EA Web app status formatting shows what they need to do,
+     while the exec mobile status formatting shows what the EA is doing */
+  function eaStatus(ta) {
+    var step = ta.task_status_text.status_step;
+    var plural_s = ta.task_participants.organized_for.length > 2 ? "s" : "";
+    if (step === "Offer_meeting_options")
+      return "Offer meeting options";
+    else if (step === "Wait_on_guest")
+      return "Waiting on guest" + plural_s;
+    else if (step === "Follow_up_with_guest")
+      return "Follow up with guest" + plural_s;
+    else if (step === "Finalize_meeting_details")
+      return "Finalize meeting details";
+    else if (step === "Confirm_with_guest")
+      return "Confirm with guest" + plural_s;
+    else if (step === "No_reminder_scheduled")
+      return "No reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_scheduled")
+      return "Reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_sent")
+      return "Reminder" + plural_s + " sent";
+    else
+      // Should never happen
+      return "UNRECOGNIZED TASK STATUS STEP";
+  }
+
   function taskStatus(ta) {
     var time = date.ofString(ta.task_status_text.status_timestamp);
     var statusEvent = $("<span/>")
-      .text(ta.task_status_text.status_last + " ");
+      .text(eaStatus(ta) + ", updated ");
     var statusTimeAgo = date.viewTimeAgo(time);
     var statusTime = $("<span/>")
       .text(" at " + date.utcToLocalTimeOnly(time));
@@ -247,7 +273,7 @@ var home = (function() {
   }
 
   function classOfActiveTask(task) {
-    if ("Scheduling" === task.task_kind) {
+    if ("Scheduling" === variant.cons(task.task_data)) {
       return "Confirmed" === task.task_status.task_progress
           || "Closed"    === task.task_status.task_progress
            ? "finalized-scheduling-task"

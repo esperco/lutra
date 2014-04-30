@@ -107,6 +107,14 @@ var schedSetup = (function() {
         prof.emails[0] = email;
         var phone = { number : guest.phone };
         prof.phones[0] = phone;
+        var pref = guest.prefix;
+        prof.prefix = pref;
+        var pseudo = guest.pseudonym;
+        if (util.isNotNull(pseudo) && pseudo.length > 0){
+          prof.pseudonym = pseudo;
+        } else {
+          prof.pseudonym = null;
+        }
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
@@ -270,6 +278,14 @@ var schedSetup = (function() {
         prof.emails[0] = email;
         var phone = { number : guest.phone };
         prof.phones[0] = phone;
+        var pref = guest.prefix;
+        prof.prefix = pref;
+        var pseudo = guest.pseudonym;
+        if (util.isNotNull(pseudo) && pseudo.length > 0){
+          prof.pseudonym = pseudo;
+        } else {
+          prof.pseudonym = null;
+        }
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }

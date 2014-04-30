@@ -25,15 +25,29 @@ var guestpicker = (function() {
     }
   }
 
+
+  function setToAltName(form) {
+    form.altname.removeClass("hide");
+    form.altNameInstruction.text("Use first and last names");
+  }
+
+  function setToFullName(form) {
+    form.altname.addClass("hide");
+    form.pseudonym.val(''); // reinitialises to null
+    form.altNameInstruction.text("Use an alternative name");
+  }
+
+  function toggleAltName(form) {
+    if (form.altname.hasClass("hide")) {
+      setToAltName(form);
+    } else {
+      setToFullName(form);
+    }
+  }
+
   function isValidForm(form) {
     var guest = getGuest(form);
-    return (
-      guest != null
-      && email.validate(guest.email)
-      && util.isString(guest.firstname)
-      && util.isString(guest.lastname)
-      && util.isString(guest.phone)
-    );
+    return (isGuestValid(guest));
   }
 
 
@@ -56,20 +70,36 @@ var guestpicker = (function() {
     </div>
   </div>
   <div #guestForm class="hide">
-    <div #locationDetails class="clearfix">
+    <div #guestDetails class="clearfix">
       <div class="col-sm-7 address-form">
+        <div #fullname>
+          <div #prefix />
+            <input #firstname
+               type="text"
+               class="form-control guest-input"
+               placeholder="First Name"/>
+            <input #lastname
+               type="text"
+               class="form-control guest-input"
+               placeholder="Last Name"/>
+        </div>
+        <div #altname>
+            <input #pseudonym
+               type="text"
+               class="form-control guest-input"
+               placeholder="Alternative Name"/>
+        </div>
+        <span #altNameLink class="alt-name-link">
+            <img class="reset-guest-icon svg"
+               src="/assets/img/reset.svg"/>
+              <span #altNameInstruction class="use-alternative-name-text danger-link">
+                Use an alternative name
+              </span>
+        </span>
         <input #email
                type="text"
                class="form-control guest-input"
                placeholder="email"/>
-        <input #firstname
-               type="text"
-               class="form-control guest-input"
-               placeholder="First Name"/>
-        <input #lastname
-               type="text"
-               class="form-control guest-input"
-               placeholder="Last Name"/>
         <input #phone
                type="text"
                class="form-control guest-input"
@@ -87,6 +117,22 @@ var guestpicker = (function() {
 </div>
 '''
     var form = _view;
+
+    form.prefixSel = select.create({
+      options: [{label:"No prefix", value:null},
+                {label:"Mr.", value:"Mr."},
+                {label:"Ms.", value:"Ms."},
+                {label:"Mrs.", value:"Mrs."},
+                {label:"Miss", value:"Miss"},
+                {label:"Dr.", value:"Dr."},
+                {label:"Prof.", value:"Prof."}],
+      initialKey: "No prefix",
+      defaultAction: function () {}
+      });
+    form.prefix.prepend(form.prefixSel.view);
+
+    form.altname.addClass("hide");
+
     form.task = param.task;
     form.optuid = param.uid;
     form.teamid = param.teamid;
@@ -103,11 +149,24 @@ var guestpicker = (function() {
 
     util.afterTyping(form.firstname, 250, form.updateUI);
     util.afterTyping(form.lastname, 250, form.updateUI);
+    util.afterTyping(form.pseudonym, 250, form.updateUI);
     util.afterTyping(form.email, 250, form.updateUI);
     util.afterTyping(form.phone, 250, form.updateUI);
 
     return form;
   }
+
+  function isGuestValid(guest) {
+    return (
+      util.isNotNull(guest)
+      && email.validate(guest.email)
+      && util.isString(guest.firstname)
+      && guest.firstname.length > 0
+      && util.isString(guest.lastname)
+      && guest.lastname.length > 0
+    );
+  }
+
 
   function getGuest(form) {
     var guest = {
@@ -115,7 +174,9 @@ var guestpicker = (function() {
       email: form.email.val(),
       firstname: form.firstname.val(),
       lastname: form.lastname.val(),
+      pseudonym: form.pseudonym.val(),
       phone: form.phone.val(),
+      prefix: form.prefixSel.get(),
 
       /* copy contents of search box for Guesteditor */
       search: form.searchBox.val(),
@@ -125,12 +186,7 @@ var guestpicker = (function() {
 
   function getCompleteGuest(form) {
     var guest = getGuest(form);
-    if (
-      util.isNonEmptyString(guest.email)
-      && util.isString(guest.firstname)
-      && util.isString(guest.lastname)
-      && util.isString(guest.phone)
-    )
+    if (isGuestValid(guest))
       return guest;
     else
       return null;
@@ -141,7 +197,13 @@ var guestpicker = (function() {
     form.firstname.val(guest.firstname);
     form.lastname.val(guest.lastname);
     form.phone.val(guest.phone);
-
+    form.prefixSel.set(guest.prefix);
+    if (util.isNotNull(guest.pseudonym)) {
+      form.pseudonym.val(guest.pseudonym);
+      setToAltName(form);
+    } else {
+      setToFullName(form);
+    }
     if (util.isNotNull(uid)) {
       form.uid = uid.uid;
     }
@@ -156,7 +218,13 @@ var guestpicker = (function() {
     if (util.isNotNull(prof.phones) && prof.phones.length > 0) {
       form.phone.val(prof.phones[0].number);
     }
-
+    form.prefixSel.set(prof.prefix);
+    if (util.isNotNull(prof.pseudonym)) {
+      form.pseudonym.val(prof.pseudonym);
+      setToAltName(form);
+    } else {
+      setToFullName(form);
+    }
     if (util.isNotNull(prof.profile_uid)) {
       form.uid = prof.profile_uid;
     }
@@ -183,6 +251,7 @@ var guestpicker = (function() {
       var guest = { email : text,
                     firstname : '',
                     lastname : '' ,
+                    pseudonym : null ,
                     phone : '' };
       return guest;
     } else {
@@ -193,13 +262,17 @@ var guestpicker = (function() {
         var guest = { email : '',
                       firstname : first,
                       lastname : last ,
-                      phone : ''  };
+                      pseudonym : null ,
+                      phone : '',
+                      prefix : null };
         return guest;
       } else {
         var guest = { email : '',
                       firstname : text,
                       lastname : '' ,
-                      phone : ''  };
+                      pseudonym : null ,
+                      phone : '',
+                      prefix : null };
         return guest;
       }
     }
@@ -242,6 +315,7 @@ var guestpicker = (function() {
       var name = firstname + ' ' + lastname;
       var email = item.profile.emails[0].email;
       var pseudo = item.profile.pseudonym;
+      var prefix = item.profile.prefix;
       var phone = '' ;
       if (item.profile.phones.length > 0){
          phone = item.profile.phones[0].number;
@@ -266,6 +340,11 @@ var guestpicker = (function() {
         .click(function() {
           setGuestFromProfile(form, item.profile);
           toggleForm(form);
+          if (util.isNotNull(item.profile.pseudonym)) {
+            setToAltName(form);
+          } else {
+            setToFullName(form);
+          }
           form.updateUI();
           return false;
         });
@@ -276,8 +355,7 @@ var guestpicker = (function() {
   }
 
   /*
-    Display addresses as autocompleted by Google or by Esper using
-    the user's saved places.
+    Display contacts as autocompleted by Esper using the team's saved contacts.
   */
   function displayPredictionsDropdown(form, predictions, showDetails) {
     var menu = form.dropdownMenu;
@@ -310,15 +388,23 @@ var guestpicker = (function() {
         toggleForm(form);
         clearGuest(form);
       });
+    form.altNameLink
+      .click(function() {
+        toggleAltName(form);
+      });
   }
 
 
   /*
     Parameters:
+    - task
+    - uid
     - teamid
     - showDetails
     - onGuestSet(guest):
         called when the Guest is set
+    - updateAddButton(form):
+        called when the input is valid
    */
   mod.create = function(param) {
     var form = createGuestForm(param);
@@ -339,9 +425,7 @@ var guestpicker = (function() {
 
       /* terrible hack to work around circular dependencies */
       setGuestNoCallback:
-        (function(guest) { return setGuestNoCallback(form, guest); }),
-
-      getSavedGuestID: (function () { return form.SavedGuestID; })
+        (function(guest) { return setGuestNoCallback(form, guest); })
     };
   }
 

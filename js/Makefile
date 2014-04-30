@@ -23,15 +23,15 @@ COMMON_LIBS = \
   jquery.autosize \
   moment \
   moment-timezone \
-  moment-timezone-data
+  moment-timezone-data \
+  jstz
 
 APP_LIBS = \
   sha1 \
   jquery-ui \
   fullcalendar \
   jquery.timepicker \
-  jquery-ui-core-datepicker \
-  jstz
+  jquery-ui-core-datepicker
 
 GUESTAPP_LIBS =
 
