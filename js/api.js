@@ -278,6 +278,12 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(calRequest));
   };
 
+  mod.postCalendarAlternate = function(uid2, name, calRequest) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/alternate/" + name;
+    return jsonHttpPost(url, JSON.stringify(calRequest));
+  };
+
   mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2 + "/info";
