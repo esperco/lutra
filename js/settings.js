@@ -87,9 +87,18 @@ var settings = (function() {
       api.getProfile(execProfile.profile_uid).done(function(prof) {
         execProfile = prof;
         profile.set(prof);
-        $(".exec-settings-modal").modal("hide");
-        home.load(); // To update top left corner
-        settings.load();
+        function finished() {
+          $(".exec-settings-modal").modal("hide");
+          home.load(); // To update top left corner
+          settings.load();
+        }
+        // Alternate calendar name
+        var calName = $("#settings-exec-calendar-name").val();
+        if (calName.length > 0) {
+          var uid = execProfile.profile_uid;
+          api.postCalendarAlternate(uid, calName)
+            .done(finished)
+        } else finished();
       });
     });
   }
