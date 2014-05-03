@@ -387,7 +387,6 @@ var home = (function() {
     var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
       .appendTo(li);
     var pic = $("<div class='list-exec-circ'/>")
-      .text(profile.shortenName(label))
       .appendTo(a);
     var div = $("<div class='list-exec-name ellipsis'/>")
       .text(label)
@@ -401,6 +400,13 @@ var home = (function() {
         switchTeam(team);
       });
     }
+
+    var leaderUid = team.team_leaders[0];
+    profile.get(leaderUid)
+      .done(function(p) {
+        var initials = profile.veryShortNameOfProfile(p.prof);
+        pic.text(initials);
+      });
 
     return li;
   }
