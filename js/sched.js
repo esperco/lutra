@@ -102,6 +102,29 @@ var sched = (function() {
     return tz;
   };
 
+  mod.getMeetingType = function(ta) {
+    var state = mod.getState(ta);
+    var reserved = state.reserved;
+    if (util.isNotNull(reserved)) // Finalized meeting
+      return reserved.slot.meeting_type;
+    else { // Not yet finalized
+      var options = state.calendar_options;
+      if (util.isNotNull(options) && options.length > 0) {
+        // If all options have the same meeting_type, use it
+        var sharedType = options[0].slot.meeting_type;
+        for (var i = 1; i < options.length; i++) {
+          if (options[i].slot.meeting_type !== sharedType) {
+            sharedType = "Meeting";
+            break;
+          }
+        }
+        return sharedType;
+      } else // No options selected yet
+        return "Meeting";
+    }
+  }
+
+
   /******************************************/
 
   function viewOfNotes(slot) {

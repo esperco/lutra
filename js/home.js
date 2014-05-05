@@ -74,12 +74,6 @@ var home = (function() {
       .append(statusTime);
   }
 
-  function meetingType(ta) {
-    // get meeting type
-    var type = "[Meeting type]"
-    return type + " with";
-  }
-
   function loadMeetingActions(ta, popover) {
 '''
 <ul #view class="popover-list">
@@ -201,7 +195,7 @@ var home = (function() {
         .text(ta.task_status.task_title)
         .attr("href","#!task/" + ta.tid);
 
-      meetingRow.text(meetingType(ta));
+      meetingRow.text(sched.getMeetingType(ta) + " with");
       var guest1 = $("<div class='meeting-guest clearfix'/>")
         .appendTo(meetingTitle);
       var guest1Circ = $("<div class='meeting-guest-circ'/>")
