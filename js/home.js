@@ -180,76 +180,75 @@ var home = (function() {
     actionsPopover.attr("id","popover-" + ta.tid);
     arrowContainer.attr("id","popover-trigger-" + ta.tid);
 
-    if (ta.task_status && ta.task_data !== "Questions") { // TODO XXX Why is this here?
-      newMessages.text("2");
+    if (ta.task_data === "Questions") return view;
+    newMessages.text("2");
 
-      loadMeetingActions(ta, actionsPopover);
+    loadMeetingActions(ta, actionsPopover);
 
-      var subjectIcon = $("<img class='svg-block'/>")
-        .appendTo(subjectIconContainer);
-      svg.loadImg(subjectIcon, "/assets/img/status-email.svg");
-      var arrow = $("<img class='svg-block'/>")
-        .appendTo(arrowContainer);
-      svg.loadImg(arrow, "/assets/img/arrow-south-sm.svg");
-      subjectText
-        .text(ta.task_status.task_title)
-        .attr("href","#!task/" + ta.tid);
+    var subjectIcon = $("<img class='svg-block'/>")
+      .appendTo(subjectIconContainer);
+    svg.loadImg(subjectIcon, "/assets/img/status-email.svg");
+    var arrow = $("<img class='svg-block'/>")
+      .appendTo(arrowContainer);
+    svg.loadImg(arrow, "/assets/img/arrow-south-sm.svg");
+    subjectText
+      .text(ta.task_status.task_title)
+      .attr("href","#!task/" + ta.tid);
 
-      meetingRow.text(sched.getMeetingType(ta) + " with");
-      var guests = sched.getAttendingGuests(ta);
-      list.iter(guests, function(guest) {
-        var nameOrEmail = profile.fullNameOrEmail(profs[guest].prof);
-        var guestDiv = $("<div class='meeting-guest clearfix'/>")
-          .appendTo(meetingTitle);
-        var guestCirc = $("<div class='meeting-guest-circ'/>")
-          .text(nameOrEmail[0])
-          .appendTo(guestDiv);
-        var guestName = $("<div class='meeting-guest-name ellipsis'/>")
-          .text(nameOrEmail)
-          .appendTo(guestDiv);
-      });
+    meetingRow.text(sched.getMeetingType(ta) + " with");
+    var guests = sched.getAttendingGuests(ta);
+    list.iter(guests, function(guest) {
+      var nameOrEmail = profile.fullNameOrEmail(profs[guest].prof);
+      var guestDiv = $("<div class='meeting-guest clearfix'/>")
+        .appendTo(meetingTitle);
+      var guestCirc = $("<div class='meeting-guest-circ'/>")
+        .text(nameOrEmail[0])
+        .appendTo(guestDiv);
+      var guestName = $("<div class='meeting-guest-name ellipsis'/>")
+        .text(nameOrEmail)
+        .appendTo(guestDiv);
+    });
 
-      var toDoIcon = $("<img class='svg-block'/>")
-        .appendTo(toDo);
-      svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
-      var reminderIcon = $("<img class='svg-block'/>")
-        .appendTo(reminder);
-      svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
-      status.text(taskStatus(ta));
-      updated.text("Updated 3 days ago");
+    var toDoIcon = $("<img class='svg-block'/>")
+      .appendTo(toDo);
+    svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
+    var reminderIcon = $("<img class='svg-block'/>")
+      .appendTo(reminder);
+    svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
+    status.text(taskStatus(ta));
+    updated.text("Updated 3 days ago");
 
-      view.hover(
-        function() {
-          if (! view.hasClass("actions-open"))
-            arrowContainer.css("display","block");
-        }, function() {
-          if (! view.hasClass("actions-open"))
-            arrowContainer.css("display","none");
-        }
-      );
+    view.hover(
+      function() {
+        if (! view.hasClass("actions-open"))
+          arrowContainer.css("display","block");
+      }, function() {
+        if (! view.hasClass("actions-open"))
+          arrowContainer.css("display","none");
+      }
+    );
 
-      arrowContainer
-        .off("click")
-        .click(function() {
-          togglePopover(view, arrowContainer, actionsPopover);
-        })
+    arrowContainer
+      .off("click")
+      .click(function() {
+        togglePopover(view, arrowContainer, actionsPopover);
+      })
 
-      $("body").on("click", function (e) {
-        var target = e.target;
-        var parents = $(target).parents();
-        if (actionsPopover.hasClass("open")
-            && !actionsPopover.is(target)
-            && $(target).parents("#popover-" + ta.tid).length === 0
-            && !arrowContainer.is(target)
-            && $(target).parents("#popover-trigger-" + ta.tid).length === 0) {
-              hideAllPopovers();
-              var card = $(target).parents(".task");
-              if (card.length === 1) {
-                card.find(".meeting-actions-arrow").css("display","block");
-              }
-        }
-      });
-    }
+    $("body").on("click", function (e) {
+      var target = e.target;
+      var parents = $(target).parents();
+      if (actionsPopover.hasClass("open")
+          && !actionsPopover.is(target)
+          && $(target).parents("#popover-" + ta.tid).length === 0
+          && !arrowContainer.is(target)
+          && $(target).parents("#popover-trigger-" + ta.tid).length === 0) {
+            hideAllPopovers();
+            var card = $(target).parents(".task");
+            if (card.length === 1) {
+              card.find(".meeting-actions-arrow").css("display","block");
+            }
+      }
+    });
 
     return view;
   }
