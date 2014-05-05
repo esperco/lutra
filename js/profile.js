@@ -202,10 +202,12 @@ var profile = (function() {
     acc = list.union(acc, taskPar.organized_by);
     acc = list.union(acc, taskPar.organized_for);
 
-    var uids = list.map(ta.task_participant_status, function(x) {
-      return x.par_uid;
-    });
-    acc = list.union(acc, uids);
+    if (util.isNotNull(ta.task_participant_status)) {
+      var uids = list.map(ta.task_participant_status, function(x) {
+        return x.par_uid;
+      });
+      acc = list.union(acc, uids);
+    }
 
     return acc;
   }

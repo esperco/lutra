@@ -146,7 +146,7 @@ var home = (function() {
     popover.append(view);
   }
 
-  function viewOfTaskCard(ta) {
+  function viewOfTaskCard(profs, ta) {
 '''
 <div #view>
   <div #newMessages class="meeting-new-messages ellipsis"/>
@@ -180,7 +180,7 @@ var home = (function() {
     actionsPopover.attr("id","popover-" + ta.tid);
     arrowContainer.attr("id","popover-trigger-" + ta.tid);
 
-    if (ta.task_status) {
+    if (ta.task_status && ta.task_data !== "Questions") { // TODO XXX Why is this here?
       newMessages.text("2");
 
       loadMeetingActions(ta, actionsPopover);
@@ -196,30 +196,18 @@ var home = (function() {
         .attr("href","#!task/" + ta.tid);
 
       meetingRow.text(sched.getMeetingType(ta) + " with");
-      var guest1 = $("<div class='meeting-guest clearfix'/>")
-        .appendTo(meetingTitle);
-      var guest1Circ = $("<div class='meeting-guest-circ'/>")
-        .text("C")
-        .appendTo(guest1);
-      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
-        .text("Christopher Christopherson")
-        .appendTo(guest1);
-     var guest2 = $("<div class='meeting-guest clearfix'/>")
-        .appendTo(meetingTitle);
-      var guest1Circ = $("<div class='meeting-guest-circ'/>")
-        .text("C")
-        .appendTo(guest2);
-      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
-        .text("Christopher Christopherson")
-        .appendTo(guest2);
-     var guest3 = $("<div class='meeting-guest clearfix'/>")
-        .appendTo(meetingTitle);
-      var guest1Circ = $("<div class='meeting-guest-circ'/>")
-        .text("C")
-        .appendTo(guest3);
-      var guest1Name = $("<div class='meeting-guest-name ellipsis'/>")
-        .text("Christopher Christopherson")
-        .appendTo(guest3);
+      var guests = sched.getAttendingGuests(ta);
+      list.iter(guests, function(guest) {
+        var nameOrEmail = profile.fullNameOrEmail(profs[guest].prof);
+        var guestDiv = $("<div class='meeting-guest clearfix'/>")
+          .appendTo(meetingTitle);
+        var guestCirc = $("<div class='meeting-guest-circ'/>")
+          .text(nameOrEmail[0])
+          .appendTo(guestDiv);
+        var guestName = $("<div class='meeting-guest-name ellipsis'/>")
+          .text(nameOrEmail)
+          .appendTo(guestDiv);
+      });
 
       var toDoIcon = $("<img class='svg-block'/>")
         .appendTo(toDo);
@@ -283,27 +271,29 @@ var home = (function() {
     view.attr("class", "task clearfix " + viewClass);
   }
 
-  function viewOfActiveTaskCard(task) {
-    var view = viewOfTaskCard(task);
+  function viewOfActiveTaskCard(profs, task) {
+    var view = viewOfTaskCard(profs, task);
     setTaskViewClass(view, classOfActiveTask(task));
     return view;
   }
 
-  function viewOfArchiveTaskCard(task) {
-    var view = viewOfTaskCard(task);
+  function viewOfArchiveTaskCard(profs, task) {
+    var view = viewOfTaskCard(profs, task);
     setTaskViewClass(view, "archived-task");
     return view;
   }
 
   function taskUpdated(task) {
     var view = $("#task-" + task.tid);
-    if (view.length <= 0) {
-      $("#tasks").prepend(viewOfActiveTaskCard(task));
-    } else if (view.hasClass("archived-task")) {
-      view.replaceWith(viewOfArchiveTaskCard(task));
-    } else {
-      view.replaceWith(viewOfActiveTaskCard(task));
-    }
+    profile.profilesOfTaskParticipants(task).done(function(profs) {
+      if (view.length <= 0) {
+        $("#tasks").prepend(viewOfActiveTaskCard(profs, task));
+      } else if (view.hasClass("archived-task")) {
+        view.replaceWith(viewOfArchiveTaskCard(profs, task));
+      } else {
+        view.replaceWith(viewOfActiveTaskCard(profs, task));
+      }
+    });
   }
 
   function taskRanked(tid, mover) {
@@ -313,7 +303,9 @@ var home = (function() {
     } else {
       view.remove();
       api.getTask(tid).then(function(task) {
-        mover(viewOfActiveTaskCard(task));
+        profile.profilesOfTaskParticipants(task).done(function(profs) {
+          mover(viewOfActiveTaskCard(profs, task));
+        });
       });
     }
   }
@@ -326,7 +318,9 @@ var home = (function() {
         mover(view, targetView);
       } else {
         api.getTask(tid).then(function(task) {
-          mover(viewOfActiveTaskCard(task), targetView);
+          profile.profilesOfTaskParticipants(task).done(function(profs) {
+            mover(viewOfActiveTaskCard(profs, task), targetView);
+          });
         });
       }
     } else {
@@ -366,7 +360,9 @@ var home = (function() {
       setTaskViewClass(view, "archived-task");
     } else {
       api.getTask(tid).done(function(task) {
-        $("#tasks").prepend(viewOfArchiveTaskCard(task));
+        profile.profilesOfTaskParticipants(task).done(function(profs) {
+          $("#tasks").prepend(viewOfArchiveTaskCard(task));
+        });
       });
     }
   }
@@ -374,22 +370,24 @@ var home = (function() {
   function showActiveTasks(data) {
     var view = $("#tasks");
     setTaskViewClass(view.children(), "archived-task");
-    list.iter(data.tasks, function(task) {
-      var taskView = $("#task-" + task.tid);
-      if (taskView.length > 0) {
-        taskView.replaceWith(viewOfActiveTaskCard(task));
-      } else {
-        view.append(viewOfActiveTaskCard(task));
-      }
+    var deferredCards = list.map(data.tasks, function(task) {
+      return profile.profilesOfTaskParticipants(task).then(function(profs) {
+        return { tid: task.tid, view: viewOfActiveTaskCard(profs, task) };
+      });
+    });
+    deferred.join(deferredCards).done(function(cards) {
+      list.iter(cards, function(card) {
+        var taskView = $("#task-" + card.tid);
+        if (taskView.length > 0) {
+          taskView.replaceWith(card.view);
+        } else {
+          view.append(card.view);
+        }
+      });
     });
   }
 
   function showAllTasks(data) {
-    var view = $("#tasks");
-    list.iter(data[0].tasks, function(task) {
-      view.append(viewOfTaskCard(task));
-    });
-
     showActiveTasks(data[1]);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);

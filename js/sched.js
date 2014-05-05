@@ -53,7 +53,7 @@ var sched = (function() {
   }
 
   mod.getGuestOptions = function(task) {
-    return list.toTable(sched.getState(task).participant_options,
+    return list.toTable(mod.getState(task).participant_options,
                         function(x){return x.uid;});
   }
 
