@@ -63,15 +63,14 @@ var home = (function() {
 
   function taskStatus(ta) {
     var time = date.ofString(ta.task_status_text.status_timestamp);
-    var statusEvent = $("<span/>")
-      .text(eaStatus(ta) + ", updated ");
+    var statusEvent = eaStatus(ta);
     var statusTimeAgo = date.viewTimeAgo(time);
-    var statusTime = $("<span/>")
-      .text(" at " + date.utcToLocalTimeOnly(time));
-    return $("<div/>")
-      .append(statusEvent)
-      .append(statusTimeAgo)
-      .append(statusTime);
+    var statusTime = date.utcToLocalTimeOnly(time);
+    return {
+      event: statusEvent,
+      timeAgo: statusTimeAgo,
+      time: statusTime
+    };
   }
 
   function loadMeetingActions(ta, popover) {
@@ -146,6 +145,31 @@ var home = (function() {
     popover.append(view);
   }
 
+  function needsToDoIcon(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "Offer_meeting_options":
+      case "Follow_up_with_guest":
+      case "Finalize_meeting_details":
+      case "Confirm_with_guest":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  function needsReminderIcon(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "No_reminder_scheduled":
+      case "Reminder_scheduled":
+      case "Reminder_sent":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   function viewOfTaskCard(profs, ta) {
 '''
 <div #view>
@@ -166,11 +190,8 @@ var home = (function() {
   <div class="inner-shadow-up"/>
   <div #meetingFooter class="meeting-footer">
     <div #statusRow class="meeting-status-row">
-      <div #statusIcon class="meeting-status-icon">
-        <div #toDo class="status-icon to-do-icon"/>
-        <div #reminder class="status-icon reminder-status-icon hide"/>
-      </div>
-      <div #status class="meeting-status-text"/>
+      <div #statusIcon class="meeting-status-icon status-icon"/>
+      <div #statusText class="meeting-status-text"/>
     </div>
     <div #updated class="meeting-updated-row"/>
   </div>
@@ -181,7 +202,12 @@ var home = (function() {
     arrowContainer.attr("id","popover-trigger-" + ta.tid);
 
     if (ta.task_data === "Questions") return view;
-    newMessages.text("2");
+
+    var unread = ta.task_status_text.status_unread_messages;
+    if (unread > 0)
+      newMessages.text(unread);
+    else
+      newMessages.hide();
 
     loadMeetingActions(ta, actionsPopover);
 
@@ -209,14 +235,26 @@ var home = (function() {
         .appendTo(guestDiv);
     });
 
-    var toDoIcon = $("<img class='svg-block'/>")
-      .appendTo(toDo);
-    svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
-    var reminderIcon = $("<img class='svg-block'/>")
-      .appendTo(reminder);
-    svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
-    status.text(taskStatus(ta));
-    updated.text("Updated 3 days ago");
+    if (needsToDoIcon(ta)) {
+      log("needs todo");
+      var toDoIcon = $("<img class='svg-block'/>")
+        .appendTo(statusIcon);
+      svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
+    } else if (needsReminderIcon(ta)) {
+      var reminderIcon = $("<img class='svg-block'/>")
+        .appendTo(statusIcon);
+      svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
+    } else {
+      statusIcon.hide();
+    }
+
+    var statusDetails = taskStatus(ta);
+    statusText.text(statusDetails.event);
+    if (ta.task_status_text.status_step === "Wait_on_guest")
+      statusText.addClass("waiting-on-guest");
+    updated
+      .append($("<span/>").text("Updated "))
+      .append(statusDetails.timeAgo);
 
     view.hover(
       function() {
