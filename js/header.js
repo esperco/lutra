@@ -161,9 +161,9 @@ var header = (function() {
     return label;
   }
 
-  function clickableViewOfTeam(team) {
+  function clickableViewOfTeam(team, prof) {
     var isActive = login.getTeam().teamname === team.teamname;
-    var label = labelOfTeam(team);
+    var label = profile.fullNameOrEmail(prof);
     var li = $("<li/>");
     var a = $("<a href='#'/>")
       .appendTo(li);
@@ -199,8 +199,10 @@ var header = (function() {
     view.children().remove();
     var teams = sortTeams(login.getTeams());
     list.iter(list.rev(teams), function(team) {
-      clickableViewOfTeam(team)
-        .appendTo(view);
+      profile.get(team.team_leaders[0]).done(function(obsProf) {
+        clickableViewOfTeam(team, obsProf.prof)
+          .appendTo(view);
+      });
     });
   }
 
