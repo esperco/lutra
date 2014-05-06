@@ -195,7 +195,7 @@ var sched4 = (function() {
       startTimeLocal.setTime(startTimeLocal.getTime() - (beforeSecs * 1000));
       startTimeUTC.setTime(startTimeUTC.getTime() - (beforeSecs * 1000));
       var reminderIntent =
-        util.isNotNull(options.reminder_message) ?
+        util.isNotNull(options) && util.isNotNull(options.reminder_message) ?
         "Will receive a reminder on " + date.justStartTime(startTimeLocal) :
         "Not scheduled to receive a reminder";
       return sentReminder(ta, uid) ?
