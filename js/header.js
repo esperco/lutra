@@ -107,13 +107,26 @@ var header = (function() {
     });
     deferred.join(deferredToDos).done(function(toDos) {
       log("todos: " + toDos.length);
-      if (toDos.length > 0) mod.toDoCount.text(toDos.length);
-      else mod.toDoCount.hide();
+      if (toDos.length > 0) {
+        mod.toDoCount.text(toDos.length);
+        mod.toDoCount.show();
+      } else
+        mod.toDoCount.hide();
       list.iter(toDos, function(toDo) {
         toDoList.append(toDo);
       });
     });
   };
+
+  function addToDoCount(incr) {
+    var cur = parseInt(mod.toDoCount.text());
+    cur = cur + incr;
+    mod.toDoCount.text(cur);
+    if (cur > 0)
+      mod.toDoCount.show();
+    else
+      mod.toDoCount.hide();
+  }
 
   // When a task changes, update the ToDo list accordingly
   mod.updateToDo = function(ta) {
@@ -125,13 +138,13 @@ var header = (function() {
         if (toDo.length > 0) toDo.replaceWith(newView);
         else {
           toDoList.append(newView);
-          mod.toDoCount.text(parseInt(mod.toDoCount.text()) + 1);
+          addToDoCount(1);
         }
       });
     } else {
       if (toDo.length > 0) {
         toDo.remove();
-        mod.toDoCount.text(parseInt(mod.toDoCount.text()) - 1);
+        addToDoCount(-1);
       }
     }
   }

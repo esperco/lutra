@@ -185,9 +185,17 @@ var task = (function() {
     util.focus();
   }
 
+  var refresh = true;
+
   /* Load task page from its task ID, if available */
   mod.load = function(tid) {
     header.load();
+    if (refresh) {
+      api.loadActiveTasks().done(function(data) {
+        header.populateToDoList(data.tasks);
+        refresh = false;
+      });
+    }
     taskTypeSelector.hideAll();
     api.getTask(tid)
       .done(function(ta) {
