@@ -634,10 +634,12 @@ var schedSetup = (function() {
   function saveGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
     updateStage(ta);
-    return api.postTask(ta).done(function(ta) {
+    var async = api.postTask(ta).done(function(ta) {
       updateButtons(ta);
       observable.onTaskParticipantsChanged.notify(ta);
+      task.loadTaskTitle(ta);
     });
+    spinner.spin("Saving...", async);
   }
 
   function viewOfGuests(profs, ta, hosts) {

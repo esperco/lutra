@@ -84,7 +84,7 @@ var task = (function() {
 
   function loadSchedulingTask(task) {
     taskTypeSelector.hideAll();
-    loadTaskTitle(task);
+    mod.loadTaskTitle(task);
     sched.loadTask(task);
     taskTypeSelector.show("sched-task");
   }
@@ -152,7 +152,7 @@ var task = (function() {
     }
   }
 
-  function loadTaskTitle(task) {
+  mod.loadTaskTitle = function(task) {
     var title = task.task_status.task_title;
     var execName;
     profile.get(login.leader()).done(function(obsProf) {
@@ -161,12 +161,14 @@ var task = (function() {
     document.title = title + " - " + execName;
     $(".meeting-path").removeClass("hide");
     $(".path-to").removeClass("hide");
-    $(".page-title").text(title);
+    profile.profilesOfTaskParticipants(task).done(function(profs) {
+      $(".page-title").text(sched.getMeetingTitle(profs, task));
+    });
   }
 
   /* Load task data */
   mod.loadTask = function(task) {
-    loadTaskTitle(task);
+    mod.loadTaskTitle(task);
     loadSidebar(task);
 
     switch (variant.cons(task.task_data)) {

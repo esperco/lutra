@@ -124,6 +124,16 @@ var sched = (function() {
     }
   }
 
+  mod.getMeetingTitle = function(profs, ta) {
+    var guests = sched.getAttendingGuests(ta);
+    if (guests.length === 0) return "New Meeting Request";
+    var names = [];
+    list.iter(guests, function(guest) {
+      names.push(profile.fullNameOrEmail(profs[guest].prof));
+    });
+    return mod.getMeetingType(ta) + " with " + names.join(" + ");
+  }
+
 
   /******************************************/
 
@@ -429,6 +439,7 @@ var sched = (function() {
   }
 
   mod.loadTask = function(ta) {
+    task.loadTaskTitle(ta);
     var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
