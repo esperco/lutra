@@ -257,6 +257,7 @@ var home = (function() {
   }
 
   function taskUpdated(task) {
+    header.updateToDo(task);
     var view = $("#task-" + task.tid);
     profile.profilesOfTaskParticipants(task).done(function(profs) {
       if (view.length <= 0) {

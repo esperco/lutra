@@ -83,11 +83,17 @@ var header = (function() {
       .append(statusDetails.timeAgo)
       .append(" at " + statusDetails.time);
 
+    // So we can find it to update later, when the task changes
+    view.attr("id", "toDo-" + ta.tid);
+
     return view;
   }
 
+  // Called afer header.load(), once we have the tasks in home.showAllTasks()
+  // TODO: Refactor this shit so we create the header with the tasks
   mod.populateToDoList = function(tasks) {
-    var toDoList = mod.toDoPopover.find(".to-do-list");
+    var toDoList = mod.toDoPopoverView.find(".to-do-list");
+    toDoList.children().remove();
     var deferredToDos = list.filter_map(tasks, function(ta) {
       if (sched.isToDoStep(ta)) {
         return profile.profilesOfTaskParticipants(ta).then(function(profs) {
@@ -104,6 +110,27 @@ var header = (function() {
       });
     });
   };
+
+  // When a task changes, update the ToDo list accordingly
+  mod.updateToDo = function(ta) {
+    var toDoList = mod.toDoPopoverView.find(".to-do-list");
+    var toDo = toDoList.find("#toDo-" + ta.tid);
+    if (sched.isToDoStep(ta)) {
+      profile.profilesOfTaskParticipants(ta).done(function(profs) {
+        var newView = viewOfToDo(profs, ta);
+        if (toDo.length > 0) toDo.replaceWith(newView);
+        else {
+          toDoList.append(newView);
+          mod.toDoCount.text(parseInt(mod.toDoCount.text()) + 1);
+        }
+      });
+    } else {
+      if (toDo.length > 0) {
+        toDo.remove();
+        mod.toDoCount.text(parseInt(mod.toDoCount.text()) - 1);
+      }
+    }
+  }
 
   function viewOfToDoPopover() {
 '''
@@ -275,7 +302,7 @@ var header = (function() {
   }
 
   // Saved in load() below, to populate later via populateToDoList()
-  mod.toDoPopover = null;
+  mod.toDoPopoverView = null;
   mod.toDoCount = null;
 
   mod.load = function() {
@@ -316,11 +343,15 @@ var header = (function() {
     accountPopover.append(viewOfAccountPopover());
     assisting.append(viewOfAssisting());
     notificationsPopover.append(viewOfNotificationsPopover());
-    toDoPopover.append(viewOfToDoPopover());
 
     // Save to populate later
-    mod.toDoCount = toDoCount;
-    mod.toDoPopover = toDoPopover;
+    if (mod.toDoPopoverView === null)
+      mod.toDoPopoverView = viewOfToDoPopover();
+    toDoPopover.append(mod.toDoPopoverView);
+    if (mod.toDoCount === null)
+      mod.toDoCount = toDoCount;
+    else
+      toDoCount.replaceWith(mod.toDoCount);
 
     accountArrow
       .off("click")
