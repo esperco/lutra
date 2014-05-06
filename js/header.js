@@ -86,6 +86,10 @@ var header = (function() {
     // So we can find it to update later, when the task changes
     view.attr("id", "toDo-" + ta.tid);
 
+    view.click(function() {
+      window.location.hash = "#!task/" + ta.tid;
+    });
+
     return view;
   }
 
