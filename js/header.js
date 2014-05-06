@@ -106,7 +106,6 @@ var header = (function() {
       } else return null;
     });
     deferred.join(deferredToDos).done(function(toDos) {
-      log("todos: " + toDos.length);
       if (toDos.length > 0) {
         mod.toDoCount.text(toDos.length);
         mod.toDoCount.show();

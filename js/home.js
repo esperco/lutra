@@ -82,8 +82,11 @@ var home = (function() {
 
     rescheduleAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
+        var state = sched.getState(ta);
         ta.task_status.task_progress = "Coordinating";
-        sched.getState(ta).scheduling_stage = "Find_availability";
+        state.scheduling_stage = "Find_availability";
+        state.calendar_options = [];
+        delete state.reserved;
         api.postTask(ta).done(function() {
           observable.onTaskModified.notify(ta);
           window.location.href = "/#!task/" + ta.tid;
@@ -93,8 +96,13 @@ var home = (function() {
 
     cancelAction.click(function() {
       api.cancelCalendar(ta.tid).done(function (resp) {
+        var state = sched.getState(ta);
         ta.task_status.task_progress = "Closed";
-        api.postTask(ta).done();
+        state.calendar_options = [];
+        delete state.reserved;
+        api.postTask(ta).done(function() {
+          observable.onTaskModified.notify(ta);
+        });
       });
     });
 
@@ -102,6 +110,14 @@ var home = (function() {
       api.archiveTask(ta.tid);
       observable.onTaskArchived.notify(ta.tid);
     });
+
+    if (!(util.isNotNull(sched.getState(ta).reserved)))
+      rescheduleAction.hide();
+    if (ta.task_status.task_progress === "Closed") {
+      cancelAction.hide();
+      rescheduleAction.show();
+    } else
+      deleteAction.hide();
 
     popover.children().remove();
     popover.append(view);
@@ -229,10 +245,12 @@ var home = (function() {
 
   function classOfActiveTask(task) {
     if ("Scheduling" === variant.cons(task.task_data)) {
-      return "Confirmed" === task.task_status.task_progress
-          || "Closed"    === task.task_status.task_progress
-           ? "finalized-scheduling-task"
-           : "pending-scheduling-task";
+      if ("Confirmed" === task.task_status.task_progress)
+        return "finalized-scheduling-task";
+      else if ("Closed" === task.task_status.task_progress)
+        return "canceled-scheduling-task";
+      else
+        return "pending-scheduling-task";
     } else {
       return "Closed" === task.task_status.task_progress
            ? "finalized-general-task"
@@ -341,10 +359,10 @@ var home = (function() {
     }
   }
 
-  function showActiveTasks(data) {
+  function showActiveTasks(active) {
     var view = $("#tasks");
-    setTaskViewClass(view.children(), "archived-task");
-    var deferredCards = list.map(data.tasks, function(task) {
+    setTaskViewClass(view.children(), "archived-task"); // XXX Why??
+    var deferredCards = list.map(active, function(task) {
       return profile.profilesOfTaskParticipants(task).then(function(profs) {
         return { tid: task.tid, view: viewOfActiveTaskCard(profs, task) };
       });
@@ -362,7 +380,7 @@ var home = (function() {
   }
 
   function showAllTasks(data) {
-    showActiveTasks(data[1]);
+    showActiveTasks(data[1].tasks);
     header.populateToDoList(data[1].tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
@@ -388,6 +406,7 @@ var home = (function() {
       .click(function() {
         $('.show-pending-meetings').addClass('active');
         $('.show-finalized-meetings').removeClass('active');
+        $('.show-canceled-meetings').removeClass('active');
         $('#tasks')
           .attr('class', 'clearfix pending-scheduling-tasks task-list');
       });
@@ -396,8 +415,18 @@ var home = (function() {
       .click(function() {
         $('.show-pending-meetings').removeClass('active');
         $('.show-finalized-meetings').addClass('active');
+        $('.show-canceled-meetings').removeClass('active');
         $('#tasks')
           .attr('class', 'clearfix finalized-scheduling-tasks task-list');
+      });
+    $('.show-canceled-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').removeClass('active');
+        $('.show-finalized-meetings').removeClass('active');
+        $('.show-canceled-meetings').addClass('active');
+        $('#tasks')
+          .attr('class', 'clearfix canceled-scheduling-tasks task-list');
       });
   }
 
