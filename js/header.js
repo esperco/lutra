@@ -99,7 +99,7 @@ var header = (function() {
     var toDoList = mod.toDoPopoverView.find(".to-do-list");
     toDoList.children().remove();
     var deferredToDos = list.filter_map(tasks, function(ta) {
-      if (sched.isToDoStep(ta)) {
+      if (sched.isToDoStep(ta) && ta.task_status.task_progress !== "Closed") {
         return profile.profilesOfTaskParticipants(ta).then(function(profs) {
           return viewOfToDo(profs, ta);
         });
