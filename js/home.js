@@ -35,44 +35,6 @@ var home = (function() {
     }
   }
 
-  /* The EA Web app status formatting shows what they need to do,
-     while the exec mobile status formatting shows what the EA is doing */
-  function eaStatus(ta) {
-    var step = ta.task_status_text.status_step;
-    var plural_s = ta.task_participants.organized_for.length > 2 ? "s" : "";
-    if (step === "Offer_meeting_options")
-      return "Offer meeting options";
-    else if (step === "Wait_on_guest")
-      return "Waiting on guest" + plural_s;
-    else if (step === "Follow_up_with_guest")
-      return "Follow up with guest" + plural_s;
-    else if (step === "Finalize_meeting_details")
-      return "Finalize meeting details";
-    else if (step === "Confirm_with_guest")
-      return "Confirm with guest" + plural_s;
-    else if (step === "No_reminder_scheduled")
-      return "No reminder" + plural_s + " scheduled";
-    else if (step === "Reminder_scheduled")
-      return "Reminder" + plural_s + " scheduled";
-    else if (step === "Reminder_sent")
-      return "Reminder" + plural_s + " sent";
-    else
-      // Should never happen
-      return "UNRECOGNIZED TASK STATUS STEP";
-  }
-
-  function taskStatus(ta) {
-    var time = date.ofString(ta.task_status_text.status_timestamp);
-    var statusEvent = eaStatus(ta);
-    var statusTimeAgo = date.viewTimeAgo(time);
-    var statusTime = date.utcToLocalTimeOnly(time);
-    return {
-      event: statusEvent,
-      timeAgo: statusTimeAgo,
-      time: statusTime
-    };
-  }
-
   function loadMeetingActions(ta, popover) {
 '''
 <ul #view class="popover-list">
@@ -145,31 +107,6 @@ var home = (function() {
     popover.append(view);
   }
 
-  function needsToDoIcon(ta) {
-    var step = ta.task_status_text.status_step;
-    switch (step) {
-      case "Offer_meeting_options":
-      case "Follow_up_with_guest":
-      case "Finalize_meeting_details":
-      case "Confirm_with_guest":
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  function needsReminderIcon(ta) {
-    var step = ta.task_status_text.status_step;
-    switch (step) {
-      case "No_reminder_scheduled":
-      case "Reminder_scheduled":
-      case "Reminder_sent":
-        return true;
-      default:
-        return false;
-    }
-  }
-
   function viewOfTaskCard(profs, ta) {
 '''
 <div #view>
@@ -235,12 +172,11 @@ var home = (function() {
         .appendTo(guestDiv);
     });
 
-    if (needsToDoIcon(ta)) {
-      log("needs todo");
+    if (sched.isToDoStep(ta)) {
       var toDoIcon = $("<img class='svg-block'/>")
         .appendTo(statusIcon);
       svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
-    } else if (needsReminderIcon(ta)) {
+    } else if (sched.isReminderStep(ta)) {
       var reminderIcon = $("<img class='svg-block'/>")
         .appendTo(statusIcon);
       svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
@@ -248,7 +184,7 @@ var home = (function() {
       statusIcon.hide();
     }
 
-    var statusDetails = taskStatus(ta);
+    var statusDetails = sched.taskStatus(ta);
     statusText.text(statusDetails.event);
     if (ta.task_status_text.status_step === "Wait_on_guest")
       statusText.addClass("waiting-on-guest");
@@ -426,6 +362,7 @@ var home = (function() {
 
   function showAllTasks(data) {
     showActiveTasks(data[1]);
+    header.populateToDoList(data[1].tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
     observable.onTaskCreated     .observe("task-list", taskUpdated);

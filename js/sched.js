@@ -134,6 +134,18 @@ var sched = (function() {
     return mod.getMeetingType(ta) + " with " + names.join(" + ");
   }
 
+  mod.taskStatus = function(ta) {
+    var time = date.ofString(ta.task_status_text.status_timestamp);
+    var statusEvent = mod.eaStatus(ta);
+    var statusTimeAgo = date.viewTimeAgo(time);
+    var statusTime = date.utcToLocalTimeOnly(time);
+    return {
+      event: statusEvent,
+      timeAgo: statusTimeAgo,
+      time: statusTime
+    };
+  }
+
 
   /******************************************/
 
@@ -470,6 +482,57 @@ var sched = (function() {
         util.focus();
       });
   };
+
+  mod.isToDoStep = function(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "Offer_meeting_options":
+      case "Follow_up_with_guest":
+      case "Finalize_meeting_details":
+      case "Confirm_with_guest":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  mod.isReminderStep = function(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "No_reminder_scheduled":
+      case "Reminder_scheduled":
+      case "Reminder_sent":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /* The EA Web app status formatting shows what they need to do,
+     while the exec mobile status formatting shows what the EA is doing */
+  mod.eaStatus = function(ta) {
+    var step = ta.task_status_text.status_step;
+    var plural_s = ta.task_participants.organized_for.length > 2 ? "s" : "";
+    if (step === "Offer_meeting_options")
+      return "Offer meeting options";
+    else if (step === "Wait_on_guest")
+      return "Waiting on guest" + plural_s;
+    else if (step === "Follow_up_with_guest")
+      return "Follow up with guest" + plural_s;
+    else if (step === "Finalize_meeting_details")
+      return "Finalize meeting details";
+    else if (step === "Confirm_with_guest")
+      return "Confirm with guest" + plural_s;
+    else if (step === "No_reminder_scheduled")
+      return "No reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_scheduled")
+      return "Reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_sent")
+      return "Reminder" + plural_s + " sent";
+    else
+      // Should never happen
+      return "UNRECOGNIZED TASK STATUS STEP";
+  }
 
   return mod;
 }());

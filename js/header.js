@@ -52,7 +52,16 @@ var header = (function() {
     return view;
   }
 
-  function viewOfToDo() {
+  function guestNames(profs, ta) {
+    var guests = sched.getAttendingGuests(ta);
+    var names = [];
+    list.iter(guests, function(guest) {
+      names.push(profile.fullNameOrEmail(profs[guest].prof));
+    });
+    return names.join(" + ");
+  }
+
+  function viewOfToDo(profs, ta) {
 '''
 <li #view class="to-do">
   <div #toDoText class="to-do-text"/>
@@ -61,17 +70,40 @@ var header = (function() {
 '''
     toDoText
       .append($("<span class='bold'/>")
-        .text("Offer meeting options"))
+        .text(sched.eaStatus(ta)))
       .append($("<span/>")
-        .text(" - Coffee with Johnny Appleseed"));
+        .text(" - " + sched.getMeetingType(ta) + " with " + guestNames(profs, ta)));
 
     // Implement jQuery dotdotdot()
     // toDoText.dotdotdot();
 
-    timestamp.text("Yesterday at 12:45pm");
+    var statusDetails = sched.taskStatus(ta);
+    timestamp
+      .append($("<span/>").text("Updated "))
+      .append(statusDetails.timeAgo)
+      .append(" at " + statusDetails.time);
 
     return view;
   }
+
+  mod.populateToDoList = function(tasks) {
+    var toDoList = mod.toDoPopover.find(".to-do-list");
+    var deferredToDos = list.filter_map(tasks, function(ta) {
+      if (sched.isToDoStep(ta)) {
+        return profile.profilesOfTaskParticipants(ta).then(function(profs) {
+          return viewOfToDo(profs, ta);
+        });
+      } else return null;
+    });
+    deferred.join(deferredToDos).done(function(toDos) {
+      log("todos: " + toDos.length);
+      if (toDos.length > 0) mod.toDoCount.text(toDos.length);
+      else mod.toDoCount.hide();
+      list.iter(toDos, function(toDo) {
+        toDoList.append(toDo);
+      });
+    });
+  };
 
   function viewOfToDoPopover() {
 '''
@@ -93,9 +125,6 @@ var header = (function() {
     var caret = $("<img class='svg-block'/>")
       .appendTo(caretContainer);
     svg.loadImg(caret, "/assets/img/popover-caret.svg");
-
-    //iterate through to do's
-    toDoList.append(viewOfToDo);
 
     return view;
   }
@@ -245,6 +274,10 @@ var header = (function() {
     loggedIn.addClass("hide");
   }
 
+  // Saved in load() below, to populate later via populateToDoList()
+  mod.toDoPopover = null;
+  mod.toDoCount = null;
+
   mod.load = function() {
 '''
 <div #view>
@@ -262,7 +295,7 @@ var header = (function() {
   </div>
   <div #toDo class="header-to-do">
     <div #toDoIcon class="header-popover-click header-to-do-icon incomplete"/>
-    <div #toDoCount class="header-to-do-count">2</div>
+    <div #toDoCount class="header-to-do-count"/>
     <div #toDoPopover class="header-popover"
          style="display:none"/>
   </div>
@@ -284,6 +317,10 @@ var header = (function() {
     assisting.append(viewOfAssisting());
     notificationsPopover.append(viewOfNotificationsPopover());
     toDoPopover.append(viewOfToDoPopover());
+
+    // Save to populate later
+    mod.toDoCount = toDoCount;
+    mod.toDoPopover = toDoPopover;
 
     accountArrow
       .off("click")
