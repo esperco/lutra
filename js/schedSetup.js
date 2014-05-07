@@ -803,7 +803,7 @@ var schedSetup = (function() {
       .append($("<hr/>"))
       .append(viewOfGuests(profs, ta, hosts).view);
 
-    var coordTab = $(".show-coordination-tab");
+    var coordTab = $(".coordination-tab-select");
     if (
       !(coordTab.hasClass("disabled"))
       && sched.getState(ta).scheduling_stage === "Guest_list"
