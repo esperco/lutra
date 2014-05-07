@@ -810,7 +810,11 @@ var schedSetup = (function() {
     ) {
       coordTab
         .off("click")
-        .click(function() { updateStage(ta); sched.loadTask(ta); });
+        .click(function() {
+          updateStage(ta);
+          api.postTask(ta);
+          sched.loadTask(ta);
+        });
     }
   };
 
