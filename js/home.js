@@ -407,6 +407,7 @@ var home = (function() {
         $('.show-pending-meetings').addClass('active');
         $('.show-finalized-meetings').removeClass('active');
         $('.show-canceled-meetings').removeClass('active');
+        $(".new-meeting-btn").show();
         $('#tasks')
           .attr('class', 'clearfix pending-scheduling-tasks task-list');
       });
@@ -416,6 +417,7 @@ var home = (function() {
         $('.show-pending-meetings').removeClass('active');
         $('.show-finalized-meetings').addClass('active');
         $('.show-canceled-meetings').removeClass('active');
+        $(".new-meeting-btn").hide();
         $('#tasks')
           .attr('class', 'clearfix finalized-scheduling-tasks task-list');
       });
@@ -425,6 +427,7 @@ var home = (function() {
         $('.show-pending-meetings').removeClass('active');
         $('.show-finalized-meetings').removeClass('active');
         $('.show-canceled-meetings').addClass('active');
+        $(".new-meeting-btn").hide();
         $('#tasks')
           .attr('class', 'clearfix canceled-scheduling-tasks task-list');
       });
