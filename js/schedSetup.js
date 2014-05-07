@@ -802,6 +802,20 @@ var schedSetup = (function() {
         .append(viewOfLiveMeetingPage(profs, ta, host).view))
       .append($("<hr/>"))
       .append(viewOfGuests(profs, ta, hosts).view);
+
+    var coordTab = $(".coordination-tab-select");
+    if (
+      !(coordTab.hasClass("disabled"))
+      && sched.getState(ta).scheduling_stage === "Guest_list"
+    ) {
+      coordTab
+        .off("click")
+        .click(function() {
+          updateStage(ta);
+          api.postTask(ta);
+          sched.loadTask(ta);
+        });
+    }
   };
 
   return mod;
