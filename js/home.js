@@ -457,6 +457,49 @@ var home = (function() {
     })
   }
 
+  function clickableViewOfTeam(team) {
+    var isActive = login.getTeam().teamname === team.teamname;
+    var label = labelOfTeam(team);
+    var li = $("<li class='team-block hide'/>");
+    var a = $("<a href='#' class='nav-team' data-toggle='pill'/>")
+      .appendTo(li);
+    var pic = $("<div class='list-exec-circ'/>")
+      .appendTo(a);
+    var div = $("<div class='list-exec-name ellipsis'/>")
+      .text(label)
+      .appendTo(a);
+
+    if (isActive) {
+      li.addClass("active");
+      a.addClass("nav-active-team");
+    } else {
+      li.click(function() {
+        switchTeam(team);
+      });
+    }
+
+    var leaderUid = team.team_leaders[0];
+    profile.get(leaderUid)
+      .done(function(p) {
+        var initials = profile.veryShortNameOfProfile(p.prof);
+        pic.text(initials);
+      });
+
+    return li;
+  }
+
+  function insertTeams() {
+    clearTeams();
+    var teams = sortTeams(login.getTeams());
+    $(".nav-teams").each(function() {
+      var sep = $(this);
+      list.iter(list.rev(teams), function(team) {
+        clickableViewOfTeam(team)
+          .insertAfter(sep);
+      });
+    });
+  }
+
   function loadPageTitle() {
     profile.get(login.leader()).done(function(obsProf) {
       var execName = profile.fullName(obsProf.prof);

@@ -33,13 +33,17 @@ var sched4 = (function() {
 
   /* REMINDERS */
 
-  function closeReminderModal(reminderModal, ta, options) {
+  function closeReminderModal(reminderModal, ta, options, uid) {
     var state = sched.getState(ta);
+    if (!(util.isNotNull(options))) options = {uid: uid};
     options.reminder_message = reminderModal.messageEditable.val();
-    state.participant_options =
-      list.replace(state.participant_options, options, function(x) {
-        return x.uid === options.uid;
-      });
+    if (state.participant_options.length === 0)
+      state.participant_options = [options];
+    else
+      state.participant_options =
+        list.replace(state.participant_options, options, function(x) {
+          return x.uid === options.uid;
+        });
     api.postTask(ta);
     reminderModal.view.modal("hide");
   }
@@ -174,7 +178,7 @@ var sched4 = (function() {
       .off("click")
       .click(function() {
         mp.track("Save reminder");
-        closeReminderModal(reminderModal, ta, receiverOptions);
+        closeReminderModal(reminderModal, ta, receiverOptions, parameters.guest_uid);
       });
 
     reminderModal.view.modal({});
@@ -191,7 +195,7 @@ var sched4 = (function() {
       startTimeLocal.setTime(startTimeLocal.getTime() - (beforeSecs * 1000));
       startTimeUTC.setTime(startTimeUTC.getTime() - (beforeSecs * 1000));
       var reminderIntent =
-        util.isNotNull(options.reminder_message) ?
+        util.isNotNull(options) && util.isNotNull(options.reminder_message) ?
         "Will receive a reminder on " + date.justStartTime(startTimeLocal) :
         "Not scheduled to receive a reminder";
       return sentReminder(ta, uid) ?
