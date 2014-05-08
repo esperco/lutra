@@ -587,6 +587,10 @@ var chat = (function () {
       observable.onChatPosting.observe("chat-tabs", chatPosting);
       observable.onTaskParticipantsChanged
                               .observe("chat-tabs", mod.loadTaskChats);
+
+      api.getTask(chatTid).done(function(ta) {
+        header.updateNotifications(ta);
+      });
     });
   }
 

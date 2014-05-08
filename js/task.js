@@ -195,6 +195,7 @@ var task = (function() {
     if (pageRefresh) {
       api.loadActiveTasks().done(function(data) {
         header.populateToDoList(data.tasks);
+        header.populateNotifications(data.tasks);
         pageRefresh = false;
       });
     }

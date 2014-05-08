@@ -7,6 +7,12 @@ var header = (function() {
 
   var loggedIn = $(".header-logged-in");
 
+  // Saved in load(), to populate later when tasks are available
+  var toDoPopoverView = null;
+  var toDoCountView = null;
+  var notificationsPopoverView = null;
+  var notificationsCountView = null;
+
   function hideAllPopovers() {
     $(".header-popover").each(function() {
       $(this)
@@ -94,9 +100,9 @@ var header = (function() {
   }
 
   // Called afer header.load(), once we have the tasks in home.showAllTasks()
-  // TODO: Refactor this shit so we create the header with the tasks
+  // TODO: Refactor this shit so we create the header with the tasks?
   mod.populateToDoList = function(tasks) {
-    var toDoList = mod.toDoPopoverView.find(".to-do-list");
+    var toDoList = toDoPopoverView.find(".to-do-list");
     toDoList.children().remove();
     var deferredToDos = list.filter_map(tasks, function(ta) {
       if (sched.isToDoStep(ta) && ta.task_status.task_progress !== "Closed") {
@@ -107,10 +113,10 @@ var header = (function() {
     });
     deferred.join(deferredToDos).done(function(toDos) {
       if (toDos.length > 0) {
-        mod.toDoCount.text(toDos.length);
-        mod.toDoCount.show();
+        toDoCountView.text(toDos.length);
+        toDoCountView.show();
       } else
-        mod.toDoCount.hide();
+        toDoCountView.hide();
       list.iter(toDos, function(toDo) {
         toDoList.append(toDo);
       });
@@ -118,18 +124,18 @@ var header = (function() {
   };
 
   function addToDoCount(incr) {
-    var cur = parseInt(mod.toDoCount.text());
+    var cur = parseInt(toDoCountView.text());
     cur = cur + incr;
-    mod.toDoCount.text(cur);
+    toDoCountView.text(cur);
     if (cur > 0)
-      mod.toDoCount.show();
+      toDoCountView.show();
     else
-      mod.toDoCount.hide();
+      toDoCountView.hide();
   }
 
   // When a task changes, update the ToDo list accordingly
   mod.updateToDo = function(ta) {
-    var toDoList = mod.toDoPopoverView.find(".to-do-list");
+    var toDoList = toDoPopoverView.find(".to-do-list");
     var toDo = toDoList.find("#toDo-" + ta.tid);
     if (sched.isToDoStep(ta)) {
       profile.profilesOfTaskParticipants(ta).done(function(profs) {
@@ -172,23 +178,38 @@ var header = (function() {
     return view;
   }
 
-  function viewOfNotification() {
+  function viewOfNotification(ta) {
 '''
 <li #view class="notification">
   <div #notificationText class="notification-text"/>
   <div #timestamp class="header-popover-timestamp"/>
 </li>
 '''
+    var unread = ta.task_status_text.status_unread_messages;
+    var pluralS = unread > 1 ? "s" : "";
     notificationText
       .append($("<span class='bold'/>")
-        .text("Johnny Appleseed"))
+        .text(ta.task_status.task_title))
       .append($("<span/>")
-        .text(" sent you a message."));
+        .text(" has " + unread + " unread message" + pluralS + "."));
 
     // Implement jQuery dotdotdot()
     // notificationText.dotdotdot();
 
-    timestamp.text("Apr 30 at 12:45pm");
+    var statusDetails = sched.taskStatus(ta);
+    timestamp
+      .append("Updated ")
+      .append(statusDetails.timeAgo)
+      .append(" at ")
+      .append(statusDetails.time);
+
+    // So we can find it to update later, when the task changes
+    view.attr("id", "notif-" + ta.tid);
+    view.data("unread", unread);
+
+    view.click(function() {
+      window.location.hash = "#!task/" + ta.tid;
+    });
 
     return view;
   }
@@ -215,10 +236,58 @@ var header = (function() {
       .appendTo(caretContainer);
     svg.loadImg(caret, "/assets/img/popover-caret.svg");
 
-    //iterate through notifications
-    notificationsList.append(viewOfNotification);
-
     return view;
+  }
+
+  mod.populateNotifications = function(tasks) {
+    var notifList = notificationsPopoverView.find(".notifications-list");
+    notifList.children().remove();
+    var unreadCount = 0;
+    list.iter(tasks, function(ta) {
+      var unread = ta.task_status_text.status_unread_messages;
+      if (unread > 0) {
+        unreadCount += unread;
+        notifList.append(viewOfNotification(ta));
+      }
+    });
+    if (unreadCount > 0) {
+      notificationsCountView.text(unreadCount);
+      notificationsCountView.show();
+    } else
+      notificationsCountView.hide();
+  }
+
+  function addNotifsCount(incr) {
+    var cur = parseInt(notificationsCountView.text());
+    cur = cur + incr;
+    notificationsCountView.text(cur);
+    if (cur > 0)
+      notificationsCountView.show();
+    else
+      notificationsCountView.hide();
+  }
+
+  mod.updateNotifications = function(ta) {
+    var notifList = notificationsPopoverView.find(".notifications-list");
+    var notif = notifList.find("#notif-" + ta.tid);
+    var unread = ta.task_status_text.status_unread_messages;
+    if (unread > 0) {
+      var newView = viewOfNotification(ta);
+      if (notif.length > 0) {
+        var oldUnread = notif.data("unread");
+        addNotifsCount(unread - oldUnread);
+        notif.replaceWith(newView);
+      } else {
+        notifList.append(newView);
+        addNotifsCount(unread);
+      }
+    } else {
+      if (notif.length > 0) {
+        var oldUnread = notif.data("unread");
+        addNotifsCount(-1 * oldUnread);
+        notif.remove();
+      }
+    }
   }
 
   function switchTeam(team) {
@@ -317,10 +386,6 @@ var header = (function() {
     loggedIn.addClass("hide");
   }
 
-  // Saved in load() below, to populate later via populateToDoList()
-  mod.toDoPopoverView = null;
-  mod.toDoCount = null;
-
   mod.load = function() {
 '''
 <div #view>
@@ -332,7 +397,7 @@ var header = (function() {
   <div #assisting class="header-assisting"/>
   <div #notifications class="header-notifications">
     <div #notificationsIcon class="header-popover-click header-notifications-icon unread"/>
-    <div #notificationsCount class="header-notifications-count">5</div>
+    <div #notificationsCount class="header-notifications-count"/>
     <div #notificationsPopover class="header-popover"
          style="display:none"/>
   </div>
@@ -358,16 +423,24 @@ var header = (function() {
 
     accountPopover.append(viewOfAccountPopover());
     assisting.append(viewOfAssisting());
-    notificationsPopover.append(viewOfNotificationsPopover());
 
-    // Save to populate later
-    if (mod.toDoPopoverView === null)
-      mod.toDoPopoverView = viewOfToDoPopover();
-    toDoPopover.append(mod.toDoPopoverView);
-    if (mod.toDoCount === null)
-      mod.toDoCount = toDoCount;
+    // Save to populate ToDos later
+    if (toDoPopoverView === null)
+      toDoPopoverView = viewOfToDoPopover();
+    toDoPopover.append(toDoPopoverView);
+    if (toDoCountView === null)
+      toDoCountView = toDoCount;
     else
-      toDoCount.replaceWith(mod.toDoCount);
+      toDoCount.replaceWith(toDoCountView);
+
+    // Save to populate notifications later
+    if (notificationsPopoverView === null)
+      notificationsPopoverView = viewOfNotificationsPopover();
+    notificationsPopover.append(notificationsPopoverView);
+    if (notificationsCountView === null)
+      notificationsCountView = notificationsCount;
+    else
+      notificationsCount.replaceWith(notificationsCountView);
 
     accountArrow
       .off("click")

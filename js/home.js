@@ -276,6 +276,7 @@ var home = (function() {
 
   function taskUpdated(task) {
     header.updateToDo(task);
+    header.updateNotifications(task);
     var view = $("#task-" + task.tid);
     profile.profilesOfTaskParticipants(task).done(function(profs) {
       if (view.length <= 0) {
@@ -382,6 +383,7 @@ var home = (function() {
   function showAllTasks(data) {
     showActiveTasks(data[1].tasks);
     header.populateToDoList(data[1].tasks);
+    header.populateNotifications(data[1].tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
     observable.onTaskCreated     .observe("task-list", taskUpdated);
