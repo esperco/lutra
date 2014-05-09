@@ -577,20 +577,17 @@ var chat = (function () {
     mod.clearTaskChats();
     updateUnreadCount(0);
 
-    profile.profilesOfTaskParticipants(ta)
-    .done(function(profs) {
-      profiles = profs;
+    profiles = profile.profilesOfTaskParticipants(ta);
 
-      $(".chat-panel").append(chatView(ta));
-      makeChatTabs(ta, ta.task_participants.organized_for);
+    $(".chat-panel").append(chatView(ta));
+    makeChatTabs(ta, ta.task_participants.organized_for);
 
-      observable.onChatPosting.observe("chat-tabs", chatPosting);
-      observable.onTaskParticipantsChanged
-                              .observe("chat-tabs", mod.loadTaskChats);
+    observable.onChatPosting.observe("chat-tabs", chatPosting);
+    observable.onTaskParticipantsChanged
+                            .observe("chat-tabs", mod.loadTaskChats);
 
-      api.getTask(chatTid).done(function(ta) {
-        header.updateNotifications(ta);
-      });
+    api.getTask(chatTid).done(function(ta) {
+      header.updateNotifications(ta);
     });
   }
 
@@ -603,17 +600,14 @@ var chat = (function () {
     mod.clearTaskChats();
     updateUnreadCount(0);
 
-    profile.profilesOfTaskParticipants(ta)
-    .done(function(profs) {
-      profiles = profs;
-      $(".chat-panel").append(chatView(ta));
+    profiles = profile.profilesOfTaskParticipants(ta);
 
-      if (task.guest_chat_with.length > 1) {
-        makeChatTabs(ta, task.guest_chat_with);
-      }
+    $(".chat-panel").append(chatView(ta));
+    if (task.guest_chat_with.length > 1) {
+      makeChatTabs(ta, task.guest_chat_with);
+    }
 
-      observable.onChatPosting.observe("chat-tabs", chatPosting);
-    });
+    observable.onChatPosting.observe("chat-tabs", chatPosting);
   }
 
   return mod;

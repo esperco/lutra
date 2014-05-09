@@ -79,11 +79,14 @@ var profile = (function() {
     return accessCache.setCached(prof.profile_uid, defer(prof));
   };
 
-  mod.setWithTask = function(prof, tid) {
+  mod.setWithTask = function(prof, ta) {
+    ta.task_profiles.push(prof); // profilesOfTaskParticipants will dedup.
+
     function defer(prof) {
       return (new $.Deferred()).resolve(prof);
     }
-    return accessCache.setCached(makeKey(prof.profile_uid, tid), defer(prof));
+    return accessCache.setCached(makeKey(prof.profile_uid, ta.tid),
+                                 defer(prof));
   };
 
   /* display mini profile */
@@ -216,7 +219,7 @@ var profile = (function() {
     fetch the profiles of everyone involved in the task
     (deferred map from uid to profile)
   */
-  mod.profilesOfTaskParticipants = function(ta) {
+  mod.fetchProfilesOfTaskParticipants = function(ta) {
     var par = ta.task_participants;
     var everyone = extractTaskUids(ta);
     return mod.mget(everyone, ta.tid)
@@ -229,6 +232,14 @@ var profile = (function() {
         });
         return b;
       });
+  };
+
+  mod.profilesOfTaskParticipants = function(ta) {
+    var profiles = {};
+    list.iter(ta.task_profiles, function(prof) {
+      profiles[prof.profile_uid] = {prof:prof};
+    });
+    return profiles;
   };
 
   return mod;
