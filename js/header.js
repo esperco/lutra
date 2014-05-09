@@ -162,10 +162,10 @@ var header = (function() {
         } else return null;
       });
       deferred.join(deferredToDos).done(function(toDos) {
-        if (toDos.length > 0) {
-          toDoCountView.text(toDos.length);
+        toDoCountView.text(toDos.length);
+        if (toDos.length > 0)
           toDoCountView.show();
-        } else
+        else
           toDoCountView.hide();
         list.iter(toDos, function(toDo) {
           toDoList.append(toDo);
@@ -245,10 +245,10 @@ var header = (function() {
           notifList.append(viewOfNotification(ta));
         }
       });
-      if (unreadCount > 0) {
-        notificationsCountView.text(unreadCount);
+      notificationsCountView.text(unreadCount);
+      if (unreadCount > 0)
         notificationsCountView.show();
-      } else
+      else
         notificationsCountView.hide();
     }
 
