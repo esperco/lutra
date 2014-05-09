@@ -161,7 +161,7 @@ var task = (function() {
     document.title = title + " - " + execName;
     $(".meeting-path").removeClass("hide");
     $(".path-to").removeClass("hide");
-    profile.profilesOfTaskParticipants(task).done(function(profs) {
+    profile.fetchProfilesOfTaskParticipants(task).done(function(profs) {
       $(".page-title").text(sched.getMeetingTitle(profs, task));
     });
   }

@@ -278,15 +278,14 @@ var home = (function() {
     header.updateToDo(task);
     header.updateNotifications(task);
     var view = $("#task-" + task.tid);
-    profile.profilesOfTaskParticipants(task).done(function(profs) {
-      if (view.length <= 0) {
-        $("#tasks").prepend(viewOfActiveTaskCard(profs, task));
-      } else if (view.hasClass("archived-task")) {
-        view.replaceWith(viewOfArchiveTaskCard(profs, task));
-      } else {
-        view.replaceWith(viewOfActiveTaskCard(profs, task));
-      }
-    });
+    var profs = profile.profilesOfTaskParticipants(task);
+    if (view.length <= 0) {
+      $("#tasks").prepend(viewOfActiveTaskCard(profs, task));
+    } else if (view.hasClass("archived-task")) {
+      view.replaceWith(viewOfArchiveTaskCard(profs, task));
+    } else {
+      view.replaceWith(viewOfActiveTaskCard(profs, task));
+    }
   }
 
   function taskRanked(tid, mover) {
@@ -296,9 +295,8 @@ var home = (function() {
     } else {
       view.remove();
       api.getTask(tid).then(function(task) {
-        profile.profilesOfTaskParticipants(task).done(function(profs) {
-          mover(viewOfActiveTaskCard(profs, task));
-        });
+        var profs = profilesOfTaskParticipants(task);
+        mover(viewOfActiveTaskCard(profs, task));
       });
     }
   }
@@ -311,9 +309,8 @@ var home = (function() {
         mover(view, targetView);
       } else {
         api.getTask(tid).then(function(task) {
-          profile.profilesOfTaskParticipants(task).done(function(profs) {
-            mover(viewOfActiveTaskCard(profs, task), targetView);
-          });
+          var profs = profile.profilesOfTaskParticipants(task);
+          mover(viewOfActiveTaskCard(profs, task), targetView);
         });
       }
     } else {
@@ -353,9 +350,8 @@ var home = (function() {
       setTaskViewClass(view, "archived-task");
     } else {
       api.getTask(tid).done(function(task) {
-        profile.profilesOfTaskParticipants(task).done(function(profs) {
-          $("#tasks").prepend(viewOfArchiveTaskCard(task));
-        });
+        var profs = profilesOfTaskParticipants(task);
+        $("#tasks").prepend(viewOfArchiveTaskCard(task));
       });
     }
   }
@@ -364,9 +360,10 @@ var home = (function() {
     var view = $("#tasks");
     setTaskViewClass(view.children(), "archived-task"); // XXX Why??
     var deferredCards = list.map(active, function(task) {
-      return profile.profilesOfTaskParticipants(task).then(function(profs) {
-        return { tid: task.tid, view: viewOfActiveTaskCard(profs, task) };
-      });
+      return profile.fetchProfilesOfTaskParticipants(task)
+        .then(function(profs) {
+          return { tid: task.tid, view: viewOfActiveTaskCard(profs, task) };
+        });
     });
     deferred.join(deferredCards).done(function(cards) {
       list.iter(cards, function(card) {

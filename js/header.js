@@ -115,7 +115,7 @@ var header = (function() {
     var toDoList = toDoPopoverView.find(".to-do-list");
     var toDo = toDoList.find("#toDo-" + ta.tid);
     if (sched.isToDoStep(ta)) {
-      profile.profilesOfTaskParticipants(ta).done(function(profs) {
+      profile.fetchProfilesOfTaskParticipants(ta).done(function(profs) {
         var newView = viewOfToDo(profs, ta);
         if (util.elementFound(toDo))
           toDo.replaceWith(newView);
@@ -156,9 +156,10 @@ var header = (function() {
     if (util.isNotNull(tasks)) {
       var deferredToDos = list.filter_map(tasks, function(ta) {
         if (sched.isToDoStep(ta) && ta.task_status.task_progress !== "Closed") {
-          return profile.profilesOfTaskParticipants(ta).then(function(profs) {
-            return viewOfToDo(profs, ta);
-          });
+          return profile.fetchProfilesOfTaskParticipants(ta)
+            .then(function(profs) {
+              return viewOfToDo(profs, ta);
+            });
         } else return null;
       });
       deferred.join(deferredToDos).done(function(toDos) {
