@@ -496,6 +496,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-my-account-content").removeClass("hide");
+      return false;
     });
     $(".tab-executives a").off("click");
     $(".tab-executives a").click(function() {
@@ -503,6 +504,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-executives-content").removeClass("hide");
+      return false;
     });
     $(".tab-templates a").off("click");
     $(".tab-templates a").click(function() {
@@ -510,6 +512,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-templates-content").removeClass("hide");
+      return false;
     });
   }
 

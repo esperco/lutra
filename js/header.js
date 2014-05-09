@@ -359,7 +359,7 @@ var header = (function() {
   </ul>
   <ul class="popover-list">
     <li>
-      <a href="#!settings" data-toggle="tab">Settings</a>
+      <a #settings data-toggle="tab">Settings</a>
     </li>
     <li>
       <a href="#!logout">Sign out</a>
@@ -370,6 +370,11 @@ var header = (function() {
     api.getProfile(login.me()).done(function(eaProf) {
       accountName.text(profile.fullName(eaProf));
       accountEmail.text(profile.email(eaProf));
+    });
+
+    settings.click(function() {
+      location.hash = "#!settings";
+      hideAllPopovers();
     });
 
     insertTeams(teamList);
