@@ -223,6 +223,7 @@ var settings = (function() {
     });
     gear.click(function() {
       execSettingsModal(prof.profile_uid, teamid);
+      return false;
     });
     $("<img/>")
       .addClass('svg exec-settings')
