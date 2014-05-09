@@ -79,11 +79,14 @@ var profile = (function() {
     return accessCache.setCached(prof.profile_uid, defer(prof));
   };
 
-  mod.setWithTask = function(prof, tid) {
+  mod.setWithTask = function(prof, ta) {
+    ta.task_profiles.push(prof); // profilesOfTaskParticipants will dedup.
+
     function defer(prof) {
       return (new $.Deferred()).resolve(prof);
     }
-    return accessCache.setCached(makeKey(prof.profile_uid, tid), defer(prof));
+    return accessCache.setCached(makeKey(prof.profile_uid, ta.tid),
+                                 defer(prof));
   };
 
   /* display mini profile */
@@ -193,40 +196,16 @@ var profile = (function() {
     }
   };
 
-  /* extract all user IDs contained in the task; this is used to
-     pre-fetch all the profiles. */
-  function extractTaskUids(ta) {
-    var acc = [];
-
-    var taskPar = ta.task_participants;
-    acc = list.union(acc, taskPar.organized_by);
-    acc = list.union(acc, taskPar.organized_for);
-
-    var uids = list.map(ta.task_participant_status, function(x) {
-      return x.par_uid;
-    });
-    acc = list.union(acc, uids);
-
-    return acc;
-  }
-
   /*
     fetch the profiles of everyone involved in the task
     (deferred map from uid to profile)
   */
   mod.profilesOfTaskParticipants = function(ta) {
-    var par = ta.task_participants;
-    var everyone = extractTaskUids(ta);
-    return mod.mget(everyone, ta.tid)
-      .then(function(a) {
-        var b = {};
-        list.iter(a, function(obsProf) {
-          if (obsProf !== null) {
-            b[obsProf.prof.profile_uid] = obsProf;
-          }
-        });
-        return b;
-      });
+    var profiles = {};
+    list.iter(ta.task_profiles, function(prof) {
+      profiles[prof.profile_uid] = {prof:prof};
+    });
+    return profiles;
   };
 
   return mod;

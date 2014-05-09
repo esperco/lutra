@@ -118,16 +118,15 @@ var schedSetup = (function() {
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
-        profile.setWithTask(prof, task.tid); /* update cache */
+        profile.setWithTask(prof, task); /* update cache */
         var uid = prof.profile_uid;
         sched.optionsForGuest(guestOptions, guestUid).assisted_by = uid;
         saveGuests(task, hosts, guestTbl, guestOptions);
 
         mp.track(updating ? "Update assistant" : "Add assistant");
 
-        profile.profilesOfTaskParticipants(task).then(function(profs) {
-          view.replaceWith(makeViewOfEA(profs, uid));
-        });
+        var profs = profile.profilesOfTaskParticipants(task);
+        view.replaceWith(makeViewOfEA(profs, uid));
       };
       return result;
     }
@@ -289,7 +288,7 @@ var schedSetup = (function() {
         if (prof.editable) {
           api.postTaskProfile(prof, task.tid);
         }
-        profile.setWithTask(prof, task.tid); /* update cache */
+        profile.setWithTask(prof, task); /* update cache */
         var uid = prof.profile_uid;
         guestTbl[uid] = uid;
         delete sched.optionsForGuest(guestOptions, uid).assisted_by;
@@ -297,9 +296,8 @@ var schedSetup = (function() {
 
         mp.track(updating ? "Update guest" : "Add guest");
 
-        profile.profilesOfTaskParticipants(task).then(function(profs) {
-          updateGuestDetails(profs, uid);
-        });
+        var profs = profile.profilesOfTaskParticipants(task);
+        updateGuestDetails(profs, uid);
       };
       return result;
     }

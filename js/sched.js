@@ -398,9 +398,8 @@ var sched = (function() {
     $(".setup-tab-select")
       .off("click")
       .click(function() {
-        profile.profilesOfTaskParticipants(ta).done(function(profs) {
-          loadSetup(profs, ta);
-        });
+        var profs = profile.profilesOfTaskParticipants(ta);
+        loadSetup(profs, ta);
         highlight("setup");
       });
   }
@@ -410,31 +409,29 @@ var sched = (function() {
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
     setup_step_buttons(ta, progress);
-    profile.profilesOfTaskParticipants(ta)
-      .done(function(profs) {
-        switch (progress) {
-        case "Guest_list":
-          highlight("setup");
-          loadSetup(profs, ta);
-          break;
-        case "Find_availability":
-          // Interpreted as Coordinate until case is removed from type
-          highlight("coordination");
-          loadStep2(profs, ta);
-          break;
-        case "Coordinate":
-          highlight("coordination");
-          loadStep2(profs, ta);
-          break;
-        case "Confirm":
-          highlight("coordination");
-          loadStep4(profs, ta);
-          break;
-        default:
-          log("Unknown scheduling stage: " + progress);
-        }
-        util.focus();
-      });
+    var profs = profile.profilesOfTaskParticipants(ta);
+    switch (progress) {
+    case "Guest_list":
+      highlight("setup");
+      loadSetup(profs, ta);
+      break;
+    case "Find_availability":
+      // Interpreted as Coordinate until case is removed from type
+      highlight("coordination");
+      loadStep2(profs, ta);
+      break;
+    case "Coordinate":
+      highlight("coordination");
+      loadStep2(profs, ta);
+      break;
+    case "Confirm":
+      highlight("coordination");
+      loadStep4(profs, ta);
+      break;
+    default:
+      log("Unknown scheduling stage: " + progress);
+    }
+    util.focus();
   };
 
   return mod;
