@@ -382,8 +382,7 @@ var home = (function() {
 
   function showAllTasks(data) {
     showActiveTasks(data[1].tasks);
-    header.populateToDoList(data[1].tasks);
-    header.populateNotifications(data[1].tasks);
+    header.load(data[1].tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
     observable.onTaskCreated     .observe("task-list", taskUpdated);
@@ -513,7 +512,6 @@ var home = (function() {
   }
 
   mod.load = function() {
-    header.load();
     loadPageTitle();
     loadSearch();
     loadMeetings();

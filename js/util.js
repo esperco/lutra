@@ -151,6 +151,11 @@ var util = (function () {
       dropdownToggle.dropdown("toggle");
   };
 
+  /* Do we have any element(s) in this jQuery selector result? */
+  mod.elementFound = function(jqResult) {
+    return jqResult.length > 0;
+  };
+
   mod.tests = [
     test.expect(
       "mergeObjects",

@@ -189,15 +189,15 @@ var task = (function() {
 
   /* Load task page from its task ID, if available */
   mod.load = function(tid) {
-    header.load();
 
     // Terrible
     if (pageRefresh) {
       api.loadActiveTasks().done(function(data) {
-        header.populateToDoList(data.tasks);
-        header.populateNotifications(data.tasks);
+        header.load(data.tasks);
         pageRefresh = false;
       });
+    } else {
+      header.load();
     }
 
     taskTypeSelector.hideAll();

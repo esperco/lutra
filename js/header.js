@@ -7,7 +7,8 @@ var header = (function() {
 
   var loggedIn = $(".header-logged-in");
 
-  // Saved in load(), to populate later when tasks are available
+  /* Saved in load(),
+   * so we can update the existing list/count when a task changes */
   var toDoPopoverView = null;
   var toDoCountView = null;
   var notificationsPopoverView = null;
@@ -99,9 +100,8 @@ var header = (function() {
     return view;
   }
 
-  // Called afer header.load(), once we have the tasks in home.showAllTasks()
-  // TODO: Refactor this shit so we create the header with the tasks?
-  mod.populateToDoList = function(tasks) {
+  // Fill up a newly created ToDo list
+  function populateToDoList(tasks) {
     var toDoList = toDoPopoverView.find(".to-do-list");
     toDoList.children().remove();
     var deferredToDos = list.filter_map(tasks, function(ta) {
@@ -133,21 +133,22 @@ var header = (function() {
       toDoCountView.hide();
   }
 
-  // When a task changes, update the ToDo list accordingly
+  // When a task changes, update the existing ToDo list accordingly
   mod.updateToDo = function(ta) {
     var toDoList = toDoPopoverView.find(".to-do-list");
     var toDo = toDoList.find("#toDo-" + ta.tid);
     if (sched.isToDoStep(ta)) {
       profile.profilesOfTaskParticipants(ta).done(function(profs) {
         var newView = viewOfToDo(profs, ta);
-        if (toDo.length > 0) toDo.replaceWith(newView);
+        if (util.elementFound(toDo))
+          toDo.replaceWith(newView);
         else {
           toDoList.append(newView);
           addToDoCount(1);
         }
       });
     } else {
-      if (toDo.length > 0) {
+      if (util.elementFound(toDo)) {
         toDo.remove();
         addToDoCount(-1);
       }
@@ -205,6 +206,7 @@ var header = (function() {
 
     // So we can find it to update later, when the task changes
     view.attr("id", "notif-" + ta.tid);
+    // Needed to calculate the change to the total count (old vs. new)
     view.data("unread", unread);
 
     view.click(function() {
@@ -239,7 +241,7 @@ var header = (function() {
     return view;
   }
 
-  mod.populateNotifications = function(tasks) {
+  function populateNotifications(tasks) {
     var notifList = notificationsPopoverView.find(".notifications-list");
     notifList.children().remove();
     var unreadCount = 0;
@@ -273,7 +275,7 @@ var header = (function() {
     var unread = ta.task_status_text.status_unread_messages;
     if (unread > 0) {
       var newView = viewOfNotification(ta);
-      if (notif.length > 0) {
+      if (util.elementFound(notif)) {
         var oldUnread = notif.data("unread");
         addNotifsCount(unread - oldUnread);
         notif.replaceWith(newView);
@@ -282,7 +284,7 @@ var header = (function() {
         addNotifsCount(unread);
       }
     } else {
-      if (notif.length > 0) {
+      if (util.elementFound(notif)) {
         var oldUnread = notif.data("unread");
         addNotifsCount(-1 * oldUnread);
         notif.remove();
@@ -391,7 +393,7 @@ var header = (function() {
     loggedIn.addClass("hide");
   }
 
-  mod.load = function() {
+  mod.load = function(optTasks) {
 '''
 <div #view>
   <div class="header-account">
@@ -429,23 +431,34 @@ var header = (function() {
     accountPopover.append(viewOfAccountPopover());
     assisting.append(viewOfAssisting());
 
-    // Save to populate ToDos later
-    if (toDoPopoverView === null)
+    /* Create new ToDo list only if it doesn't already exist;
+     * otherwise, use the current one, saved in toDoPopoverView
+     * and its count from toDoCountView */
+    if (toDoPopoverView === null) {
       toDoPopoverView = viewOfToDoPopover();
+    }
     toDoPopover.append(toDoPopoverView);
     if (toDoCountView === null)
       toDoCountView = toDoCount;
     else
       toDoCount.replaceWith(toDoCountView);
 
-    // Save to populate notifications later
-    if (notificationsPopoverView === null)
+    /* Create new notifications list only if it doesn't already exist;
+     * otherwise, use the current one, saved in notificationsPopoverView
+     * and its count from notificationsCountView */
+    if (notificationsPopoverView === null) {
       notificationsPopoverView = viewOfNotificationsPopover();
+    }
     notificationsPopover.append(notificationsPopoverView);
     if (notificationsCountView === null)
       notificationsCountView = notificationsCount;
     else
       notificationsCount.replaceWith(notificationsCountView);
+
+    if (util.isNotNull(optTasks)) {
+      populateToDoList(optTasks);
+      populateNotifications(optTasks);
+    }
 
     accountArrow
       .off("click")
