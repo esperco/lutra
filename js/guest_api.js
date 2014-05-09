@@ -91,10 +91,6 @@ var api = function() {
     return jsonHttpPost(apiPrefix() + "/chat/" + itemId + "/read", "");
   };
 
-  mod.getTaskProfile = function(uid, _tid) {
-    return jsonHttpGet(apiPrefix() + "/profile/" + uid);
-  };
-
   mod.getTaskICS = function() {
     return jsonHttpGet(apiPrefix() + "/task/ics");
   };

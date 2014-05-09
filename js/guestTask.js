@@ -519,118 +519,117 @@ var guestTask = function() {
       return slotView;
     }
 
-    profile.profilesOfTaskParticipants(ta).done(function(profs) {
-      var taskView = $("#meeting-content");
-      taskView.children().remove();
-      var taskWelcome = $("#meeting-welcome");
-      var myName = profile.fullNameOrEmail(profs[login.me()].prof);
-      taskWelcome.text("Hello, " + myName);
+    var profs = profile.profilesOfTaskParticipants(ta);
+    var taskView = $("#meeting-content");
+    taskView.children().remove();
+    var taskWelcome = $("#meeting-welcome");
+    var myName = profile.fullNameOrEmail(profs[login.me()].prof);
+    taskWelcome.text("Hello, " + myName);
 
-      if ("Scheduling" === variant.cons(ta.task_data)) {
-        var state = ta.task_data[1];
+    if ("Scheduling" === variant.cons(ta.task_data)) {
+      var state = ta.task_data[1];
 
-        if (list.mem(task.guest_hosts, task.guest_uid)) {
-          var taskImpersonator = $("#meeting-impersonator");
-          taskImpersonator.children().remove();
-          var viewAs = $("<span id='view-as'>View as</span>");
-          // Create impersonation selector
+      if (list.mem(task.guest_hosts, task.guest_uid)) {
+        var taskImpersonator = $("#meeting-impersonator");
+        taskImpersonator.children().remove();
+        var viewAs = $("<span id='view-as'>View as</span>");
+        // Create impersonation selector
 
-          taskWelcome.addClass("exec-view");
-          taskImpersonator.append(viewAs);
-        }
-
-        if (state.reserved) {
-          var guestsIcon = $("<img id='guests-icon'/>");
-          var notesIcon = $("<img id='notes-icon'/>");
-          var messagesIcon = $("<img id='messages-icon'/>");
-          var guestOptions = getGuestOptions(state);
-          var timeAndPlace =
-            viewOfTimeAndPlace(ta, profs, guestOptions, state.reserved.slot);
-          taskView.append(calendarIcon(state.reserved.slot))
-                  .append(viewOfMeetingHeader(task, ta, state))
-                  .append(timeAndPlace)
-                  .append($("<div class='task-section-header'/>")
-                    .append(guestsIcon)
-                    .append("<div class='task-section-text'>GUESTS</div>"));
-          var participantListView = $("<div id='guests'/>");
-          list.iter(ta.task_participants.organized_for, function(uid) {
-            if (guestMayAttend(uid, guestOptions)) {
-              participantListView.append(
-                  viewOfGuestRow(profs[uid].prof, guestOptions));
-            }
-          });
-          taskView.append(participantListView)
-          var notes = state.reserved.slot.notes;
-          var publicNotes = $("<div id='public-notes'/>")
-            .text(notes.public_notes);
-          var privateNotes = $("<div id='private-notes'/>")
-            .text(notes.private_notes);
-          if (notes.public_notes != "" || notes.private_notes != "") {
-            taskView.append($("<div class='task-section-header'/>")
-              .append(notesIcon)
-              .append("<div class='task-section-text'>NOTES</div>"));
-            if (notes.public_notes != "") {
-              taskView.append(publicNotes);
-            }
-            if (notes.private_notes != "") {
-              taskView.append(privateNotes);
-            }
-          }
-          taskView.append($("<div class='task-section-header'/>")
-                  .append(messagesIcon)
-                  .append("<div class='task-section-text'>MESSAGES</div>"));
-          svg.loadImg(guestsIcon, "/assets/img/group.svg");
-          svg.loadImg(notesIcon, "/assets/img/edit.svg");
-          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
-        } else if (state.calendar_options.length > 0) {
-          var hostName = list.map(task.guest_hosts, function(uid) {
-                  return profile.fullNameOrEmail(profs[uid].prof);
-                }).join(" & ");
-
-          var title = $("<div id='options-title'/>")
-            .appendTo(taskView);
-          if (list.mem(task.guest_hosts, task.guest_uid)) {
-            var inProgress = $("<img id='in-progress'/>");
-            svg.loadImg(inProgress, "/assets/img/in-progress.svg");
-            title.append(inProgress)
-                 .append($("<div class='in-progress-text'/>")
-                   .text("This meeting is still being scheduled."))
-                 .append($("<div class='in-progress-text helper-text'/>")
-                   .text("Below are the meeting options in consideration."));
-          } else {
-            title.text("When can you meet with " + hostName + "?");
-          }
-
-          var select = $("<div id='guest-select'/>")
-            .appendTo(taskView);
-          var options = $("<table id='options'/>")
-            .appendTo(select);
-          list.iter(state.calendar_options, function(choice, i) {
-            if (util.isNotNull(myLast.answers[choice.label])) {
-              answers[choice.label] = choice;
-            }
-            var label = indexLabel(i);
-            options.append(viewOfCalendarOption(choice, profs, label))
-          });
-          if (! list.mem(task.guest_hosts, task.guest_uid)) {
-            options.append(viewOfNoneWorks(state.calendar_options));
-            select.append(submitButton());
-          }
-
-          var feedback = $("<div id='feedback' class='hide'/>")
-            .append(viewOfFeedback)
-            .appendTo(taskView);
-
-          var messagesIcon = $("<img id='messages-icon'/>");
-          taskView.append($("<div id='messages-header'/>")
-                  .append(messagesIcon)
-                  .append("<div class='task-section-text'>MESSAGES</div>"));
-          svg.loadImg(messagesIcon, "/assets/img/chat.svg");
-        }
+        taskWelcome.addClass("exec-view");
+        taskImpersonator.append(viewAs);
       }
 
-      observable.onTaskModified.observe("guest-task", mod.loadTask);
-    });
+      if (state.reserved) {
+        var guestsIcon = $("<img id='guests-icon'/>");
+        var notesIcon = $("<img id='notes-icon'/>");
+        var messagesIcon = $("<img id='messages-icon'/>");
+        var guestOptions = getGuestOptions(state);
+        var timeAndPlace =
+          viewOfTimeAndPlace(ta, profs, guestOptions, state.reserved.slot);
+        taskView.append(calendarIcon(state.reserved.slot))
+                .append(viewOfMeetingHeader(task, ta, state))
+                .append(timeAndPlace)
+                .append($("<div class='task-section-header'/>")
+                  .append(guestsIcon)
+                  .append("<div class='task-section-text'>GUESTS</div>"));
+        var participantListView = $("<div id='guests'/>");
+        list.iter(ta.task_participants.organized_for, function(uid) {
+          if (guestMayAttend(uid, guestOptions)) {
+            participantListView.append(
+                viewOfGuestRow(profs[uid].prof, guestOptions));
+          }
+        });
+        taskView.append(participantListView)
+        var notes = state.reserved.slot.notes;
+        var publicNotes = $("<div id='public-notes'/>")
+          .text(notes.public_notes);
+        var privateNotes = $("<div id='private-notes'/>")
+          .text(notes.private_notes);
+        if (notes.public_notes != "" || notes.private_notes != "") {
+          taskView.append($("<div class='task-section-header'/>")
+            .append(notesIcon)
+            .append("<div class='task-section-text'>NOTES</div>"));
+          if (notes.public_notes != "") {
+            taskView.append(publicNotes);
+          }
+          if (notes.private_notes != "") {
+            taskView.append(privateNotes);
+          }
+        }
+        taskView.append($("<div class='task-section-header'/>")
+                .append(messagesIcon)
+                .append("<div class='task-section-text'>MESSAGES</div>"));
+        svg.loadImg(guestsIcon, "/assets/img/group.svg");
+        svg.loadImg(notesIcon, "/assets/img/edit.svg");
+        svg.loadImg(messagesIcon, "/assets/img/chat.svg");
+      } else if (state.calendar_options.length > 0) {
+        var hostName = list.map(task.guest_hosts, function(uid) {
+          return profile.fullNameOrEmail(profs[uid].prof);
+        }).join(" & ");
+
+        var title = $("<div id='options-title'/>")
+          .appendTo(taskView);
+        if (list.mem(task.guest_hosts, task.guest_uid)) {
+          var inProgress = $("<img id='in-progress'/>");
+          svg.loadImg(inProgress, "/assets/img/in-progress.svg");
+          title.append(inProgress)
+               .append($("<div class='in-progress-text'/>")
+                 .text("This meeting is still being scheduled."))
+               .append($("<div class='in-progress-text helper-text'/>")
+                 .text("Below are the meeting options in consideration."));
+        } else {
+          title.text("When can you meet with " + hostName + "?");
+        }
+
+        var select = $("<div id='guest-select'/>")
+          .appendTo(taskView);
+        var options = $("<table id='options'/>")
+          .appendTo(select);
+        list.iter(state.calendar_options, function(choice, i) {
+          if (util.isNotNull(myLast.answers[choice.label])) {
+            answers[choice.label] = choice;
+          }
+          var label = indexLabel(i);
+          options.append(viewOfCalendarOption(choice, profs, label))
+        });
+        if (! list.mem(task.guest_hosts, task.guest_uid)) {
+          options.append(viewOfNoneWorks(state.calendar_options));
+          select.append(submitButton());
+        }
+
+        var feedback = $("<div id='feedback' class='hide'/>")
+          .append(viewOfFeedback)
+          .appendTo(taskView);
+
+        var messagesIcon = $("<img id='messages-icon'/>");
+        taskView.append($("<div id='messages-header'/>")
+                .append(messagesIcon)
+                .append("<div class='task-section-text'>MESSAGES</div>"));
+        svg.loadImg(messagesIcon, "/assets/img/chat.svg");
+      }
+    }
+
+    observable.onTaskModified.observe("guest-task", mod.loadTask);
   }
 
   return mod;
