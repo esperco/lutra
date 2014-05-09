@@ -60,6 +60,11 @@ var route = (function() {
       withLogin(function () { page.respond.load(rid, asUid); });
     },
 
+    "settings route" : function(data) {
+      log("here");
+      withLogin(function () { page.settings.load(); });
+    },
+
     "translate/response/:rid/:uid route" : function(data) {
       withLogin(function () { });
     }
@@ -94,6 +99,10 @@ var route = (function() {
 
   mod.nav.respond = function(rid, uid) {
     location.hash = "#!respond/" + rid + "/" + uid;
+  };
+
+  mod.nav.settings = function() {
+    location.hash = "#!settings";
   };
 
   mod.nav.translateResponse = function(rid, uid) {

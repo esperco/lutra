@@ -24,6 +24,10 @@
 
   <body>
 
+    <div id="app-header" class="app-header">
+      @@header.html@@
+    </div>
+
     <div id="loading">
       <div id="loading-box">
         <img id="loading-icon" src="/assets/img/loading.gif">
@@ -33,168 +37,12 @@
 
     <!-- <div id="global-status" class="animated"></div> -->
 
-    <ul id="desktop-navbar" class="hide nav nav-pills nav-stacked home-page">
-      <li class="nav-header unselectable"></li>
-      <li class="account-block logged-in-as hide"></li>
-      <div class="account-block hide">
-        <div class="col-xs-6 account-action-left">
-          <a href="#settings" class="settings-nav settings-btn" data-toggle="pill">
-            <button class="btn account-action">Settings</button>
-          </a>
-        </div>
-        <div class="col-xs-6 account-action-right">
-          <a href="#!logout" class="logout-btn">
-            <button class="btn account-action">Log out</button>
-          </a>
+    <div id="test-page" class="hide test-page">
+      <div class="navbar-push container scrollable">
+        <div id="test-content" class="row">
         </div>
       </div>
-      <div class="account-divider-div unselectable hide">
-        <div class="account-divider-line"></div>
-        <span class='account-section-title'>ASSISTING</span>
-      </div>
-      <div class="nav-teams"></div>
-      <div id="account-block-push" class="account-block hide"></div>
-      <li>
-        <a href="#" class="nav-block hide" data-toggle="pill">
-          <img id="search-icon" class="svg" src="/assets/img/search.svg">
-          <div class="nav-text">Search</div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="nav-block hide" data-toggle="pill">
-          <img id="dashboard-icon" class="svg" src="/assets/img/dashboard.svg">
-          <div class="nav-text">Dashboard</div>
-        </a>
-      </li>
-      <div class="nav-divider-line unselectable">
-        <span class='nav-section-title'>TASKS</span>
-      </div>
-      <li>
-        <a href="#all-tasks" class="nav-block" data-toggle="pill">
-          <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
-<!--           <div class='new-label new-label-nav'>NEW</div>
-          <div class='updated updated-nav'></div> -->
-          <div class="nav-text">All Tasks</div>
-        </a>
-      </li>
-      <li class="active">
-        <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
-          <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
-<!--           <div class='new-label new-label-nav'>NEW</div>
-          <div class='updated updated-nav'></div> -->
-          <div class="nav-text">Scheduling</div>
-        </a>
-      </li>
-      <li>
-        <a href="#general-task-list" class="nav-block" data-toggle="pill">
-          <img id="general-icon" class="svg" src="/assets/img/general.svg">
-<!--           <div class='new-label new-label-nav'>NEW</div>
-          <div class='updated updated-nav'></div> -->
-          <div class="nav-text">General</div>
-        </a>
-      </li>
-      <li>
-        <a href="#archive-task-list" class="nav-block" data-toggle="pill">
-          <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-          <div class="nav-text">Archive</div>
-        </a>
-      </li>
-      <div class="nav-divider-line unselectable hide">
-        <span class='nav-section-title'>NETWORK</span>
-      </div>
-      <li>
-        <a href="#" class="nav-block hide" data-toggle="pill">
-          <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
-          <div class="nav-text">Contacts</div>
-        </a>
-      </li>
-      <li>
-        <a href="#place-list" class="nav-block place-nav hide" data-toggle="pill">
-          <img id="places-icon" class="svg" src="/assets/img/places.svg">
-          <div class="nav-text">Places</div>
-        </a>
-      </li>
-
-    </ul>
-
-    <nav id="mobile-navbar" class="hide navbar-fixed-top home-page">
-      <div id="mobile-navbar-header" class="navbar navbar-header">
-        <a data-toggle="collapse" data-target="#mobile-navbar-collapse">
-          <img id="menu" class="svg" src="/assets/img/menu.svg">
-        </a>
-        <p id="home-title" class="nav-title unselectable">SCHEDULING</p>
-        <button id="new-task-btn-mobile"
-                class="new-task-btn btn btn-primary">New Task</button>
-      </div>
-      <div id="mobile-navbar-collapse" class="collapse navbar-collapse scrollable">
-        <ul class="nav navbar-nav nav-pills nav-stacked">
-          <li class="nav-header unselectable"></li>
-          <li>
-            <a href="#settings" class="account-block hide settings-nav" data-toggle="pill">
-              <img id="settings-icon" class="svg" src="/assets/img/settings.svg">
-              <div class="nav-text">Settings</div>
-            </a>
-          </li>
-          <li>
-            <a href="#!logout" class="account-block hide">
-              <img id="logout-icon" class="svg" src="/assets/img/logout.svg">
-              <div class="nav-text">Log out</div>
-            </a>
-          </li>
-          <div class="nav-divider-line unselectable">
-            <span class='nav-section-title'>TASKS</span>
-          </div>
-          <li>
-            <a href="#all-tasks" class="nav-block" data-toggle="pill">
-              <img id="all-tasks-icon" class="svg" src="/assets/img/all-tasks.svg">
-<!--               <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div> -->
-              <div class="nav-text">All Tasks</div>
-            </a>
-          </li>
-          <li class="active">
-            <a href="#scheduling-task-list" class="nav-block" data-toggle="pill">
-              <img id="scheduling-icon" class="svg" src="/assets/img/scheduling.svg">
-<!--               <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div> -->
-              <div class="nav-text">Scheduling</div>
-            </a>
-          </li>
-          <li>
-            <a href="#general-task-list" class="nav-block" data-toggle="pill">
-              <img id="general-icon" class="svg" src="/assets/img/general.svg">
-<!--               <div class='new-label new-label-nav'>NEW</div>
-              <div class='updated updated-nav'></div> -->
-              <div class="nav-text">General</div>
-            </a>
-          </li>
-          <li>
-            <a href="#archive-task-list" class="nav-block" data-toggle="pill">
-              <img id="archive-icon" class="svg" src="/assets/img/archive.svg">
-              <div class="nav-text">Archive</div>
-            </a>
-          </li>
-          <div class="nav-divider-line unselectable hide">
-            <span class='nav-section-title'>NETWORK</span>
-          </div>
-          <li>
-            <a href="#" class="nav-block hide" data-toggle="pill">
-              <img id="contacts-icon" class="svg" src="/assets/img/contacts.svg">
-              <div class="nav-text">Contacts</div>
-            </a>
-          </li>
-          <li>
-            <a href="#place-list" class="nav-block place-nav hide">
-              <img id="places-icon" class="svg" src="/assets/img/places.svg">
-              <div class="nav-text">Places</div>
-            </a>
-          </li>
-          <div class="nav-divider-line unselectable nav-teams">
-            <span class='nav-section-title'>TEAMS</span>
-          </div>
-        </ul>
-      </div>
-    </nav>
+    </div>
 
     <div id="login-page" class="hide login-page">
       <div class="login-container">
@@ -241,90 +89,18 @@
       @@email-verify.html@@
     </div>
 
-    <div id="home-page" class="hide home-page tab-content">
-      <div id="home-push" class="hide"></div>
-      <div id="all-tasks" class="tab-pane">
-        @@all-tasks.html@@
-      </div>
-      <div id="scheduling-task-list" class="tab-pane active">
-        @@sched-task-list.html@@
-      </div>
-      <div id="general-task-list" class="tab-pane">
-        @@gen-task-list.html@@
-      </div>
-      <div id="archive-task-list" class="tab-pane">
-        @@arch-task-list.html@@
-      </div>
-      <div id="place-list" class="tab-pane">
-        @@places.html@@
-      </div>
-      <div id="settings" class="tab-pane">
-        @@settings.html@@
+    <div id="home-page" class="hide home-page">
+      <div id="meetings-page">
+        @@meetings.html@@
       </div>
     </div>
 
-    <div id="test-page" class="hide test-page">
-
-      <div class="navbar-push container scrollable">
-        <div id="test-content" class="row">
-        </div>
-      </div>
+    <div id="settings-page" class="hide settings-page">
+      @@settings.html@@
     </div>
 
-    <div id="task-page" class="task-page scrollable hide">
-
-      <div class="task-header">
-        <div class="task-header-container">
-          <a href="#">
-            <img class="svg return-home" src="/assets/img/esper-mark.svg">
-          </a>
-          <div id="task-title-div" class="clearfix">
-            <div id="task-title" class="hide ellipsis"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="task-navbar">
-        <div class="task-navbar-container clearfix">
-          <a class="task-tab setup-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg setup-tab-icon" src="/assets/img/wrench.svg">
-            </div>
-            <div class="setup-tab-name">SETUP</div>
-          </a>
-          <a class="task-tab coordination-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg coordination-tab-icon" src="/assets/img/calendar.svg">
-            </div>
-            <div class="coordination-tab-name">COORDINATION</div>
-          </a>
-          <a class="task-tab messages-tab-select">
-            <div class="task-tab-icon">
-              <img class="svg messages-tab-icon" src="/assets/img/chat-count.svg">
-            </div>
-            <div class="messages-tab-name">MESSAGES</div>
-          </a>
-        </div>
-      </div>
-
-      <div id="sched-task" class="scrollable hide">
-        <div id="sched-step2-tab" class="task-container hide">
-          <div id="sched-step2-connect" class="hide"></div>
-          <div id="sched-step2-table"></div>
-        </div>
-        <div id="sched-step4-tab" class="task-container hide">
-          <div id="sched-step4-table"></div>
-        </div>
-        <div id="messages-tab" class="task-container hide">
-          @@messages-tab.html@@
-        </div>
-        <div id="setup-tab" class="task-container hide">
-          <div id="setup-table"></div>
-        </div>
-      </div>
-
-      <div id="gen-task" class="hide"></div>
-
+    <div id="task-page" class="hide task-page scrollable">
+      @@meeting-workflow.html@@
     </div>
 
     <!-- API key activated by jeff@esper.co -->

@@ -223,6 +223,7 @@ var settings = (function() {
     });
     gear.click(function() {
       execSettingsModal(prof.profile_uid, teamid);
+      return false;
     });
     $("<img/>")
       .addClass('svg exec-settings')
@@ -496,6 +497,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-my-account-content").removeClass("hide");
+      return false;
     });
     $(".tab-executives a").off("click");
     $(".tab-executives a").click(function() {
@@ -503,6 +505,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-executives-content").removeClass("hide");
+      return false;
     });
     $(".tab-templates a").off("click");
     $(".tab-templates a").click(function() {
@@ -510,6 +513,7 @@ var settings = (function() {
       $(this).parent().addClass("active");
       $(".settings-content").addClass("hide");
       $("#tab-templates-content").removeClass("hide");
+      return false;
     });
   }
 
@@ -631,13 +635,23 @@ var settings = (function() {
     });
   }
 
+  function loadPageTitle() {
+    document.title = "Settings - Esper";
+    $(".meeting-path").addClass("hide");
+    $(".path-to").addClass("hide");
+    $(".page-title").text("Settings");
+  }
+
   mod.load = function() {
+    loadPageTitle();
     displayAssistantProfile(login.me());
     var teams = login.getTeams();
     displayExecutives(teams);
     disableUpdateButtonsUntilModified();
     setupTabs();
     displayTemplates();
+    log("Loading Settings");
+    $("#page-title").text("Settings");
     $("#settings-update-name").off("click");
     $("#settings-update-name").one("click", updateAssistantName);
     $("#settings-update-password").off("click");

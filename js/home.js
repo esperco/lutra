@@ -5,164 +5,256 @@
 var home = (function() {
   var mod = {};
 
-  /* The EA Web app status formatting shows what they need to do,
-     while the exec mobile status formatting shows what the EA is doing */
-  function eaStatus(ta) {
-    var step = ta.task_status_text.status_step;
-    var plural_s = ta.task_participants.organized_for.length > 2 ? "s" : "";
-    if (step === "Offer_meeting_options")
-      return "Offer meeting options";
-    else if (step === "Wait_on_guest")
-      return "Waiting on guest" + plural_s;
-    else if (step === "Follow_up_with_guest")
-      return "Follow up with guest" + plural_s;
-    else if (step === "Finalize_meeting_details")
-      return "Finalize meeting details";
-    else if (step === "Confirm_with_guest")
-      return "Confirm with guest" + plural_s;
-    else if (step === "No_reminder_scheduled")
-      return "No reminder" + plural_s + " scheduled";
-    else if (step === "Reminder_scheduled")
-      return "Reminder" + plural_s + " scheduled";
-    else if (step === "Reminder_sent")
-      return "Reminder" + plural_s + " sent";
-    else
-      // Should never happen
-      return "UNRECOGNIZED TASK STATUS STEP";
+  function hideAllPopovers() {
+    $(".task").each(function() {
+      $(this).removeClass("actions-open");
+    })
+    $(".meeting-actions-arrow").each(function() {
+      $(this).css("display","none");
+    })
+    $(".meeting-actions-popover").each(function() {
+      $(this)
+        .removeClass("open")
+        .attr("style","display:none");
+    })
   }
 
-  function taskStatus(ta) {
-    var time = date.ofString(ta.task_status_text.status_timestamp);
-    var statusEvent = $("<span/>")
-      .text(eaStatus(ta) + ", updated ");
-    var statusTimeAgo = date.viewTimeAgo(time);
-    var statusTime = $("<span/>")
-      .text(" at " + date.utcToLocalTimeOnly(time));
-    return $("<div/>")
-      .append(statusEvent)
-      .append(statusTimeAgo)
-      .append(statusTime);
+  function togglePopover(view, arrow, popover) {
+    if (popover.hasClass("open")) {
+      view.removeClass("actions-open");
+      popover
+        .removeClass("open")
+        .attr("style","display:none");
+    } else {
+      hideAllPopovers();
+      view.addClass("actions-open");
+      arrow.css("display","block");
+      popover
+        .addClass("open")
+        .attr("style","display:block");
+    }
   }
 
-  function viewOfTaskRow(ta) {
-    var view = $("<div/>",{id:"task-" + ta.tid});
+  function loadMeetingActions(ta, popover) {
+'''
+<ul #view class="popover-list">
+  <li class="meeting-action">
+    <a #viewLivePage target="blank">
+      <div #viewLivePageIconContainer class="meeting-action-icon"/>
+      <span class="meeting-action-label">View live page</span>
+    </a>
+  </li>
+  <li #rescheduleAction class="meeting-action">
+    <div #rescheduleIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Reschedule...</span>
+  </li>
+  <li #cancelAction class="meeting-action">
+    <div #cancelIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Cancel...</span>
+  </li>
+  <li #deleteAction class="meeting-action">
+    <div #deleteIconContainer class="meeting-action-icon"/>
+    <span class="meeting-action-label">Delete...</span>
+  </li>
+</ul>
+'''
+    var viewLivePageIcon = $("<img class='svg-block'/>")
+      .appendTo(viewLivePageIconContainer);
+    svg.loadImg(viewLivePageIcon, "/assets/img/globe.svg");
+    var rescheduleIcon = $("<img class='svg-block'/>")
+      .appendTo(rescheduleIconContainer);
+    svg.loadImg(rescheduleIcon, "/assets/img/reschedule.svg");
+    var cancelIcon = $("<img class='svg-block'/>")
+      .appendTo(cancelIconContainer);
+    svg.loadImg(cancelIcon, "/assets/img/cancel-meeting.svg");
+    var deleteIcon = $("<img class='svg-block'/>")
+      .appendTo(deleteIconContainer);
+    svg.loadImg(deleteIcon, "/assets/img/delete-meeting.svg");
 
-    var title = ta.task_status
-      ? ta.task_status.task_title
-      : null;
-
-    var dragDiv = $("<div class='task-drag-div hide'></div>")
-      .appendTo(view);
-    var drag = $("<img class='drag'/>")
-      .appendTo(dragDiv);
-    svg.loadImg(drag, "/assets/img/drag.svg");
-
-    // Add both Archive button and Restore button to the row.
-    // By css magic they will only show up in the appropriate tabs.
-    var archiveDiv = $("<div class='archive-div'></div>")
-      .appendTo(view);
-    var archive = $("<img class='archive'/>")
-      .appendTo(archiveDiv);
-    svg.loadImg(archive, "/assets/img/x.svg");
-    archiveDiv
-      .tooltip({"title":"Archive"})
-      .click(function() {
-        api.archiveTask(ta.tid);
-        observable.onTaskArchived.notify(ta.tid);
-      });
-
-    var restoreButton = $("<button class='restore-div'/>")
-      .text("Restore")
-      .appendTo(view);
-    restoreButton.click(function() {
-      $("#tasks").prepend(view);
-      setTaskViewClass(view, classOfActiveTask(ta));
-      api.rankTaskFirst(ta.tid);
+    var hosts = sched.getHosts(ta);
+    var host;
+    list.iter(hosts, function(uid) {
+      host = uid;
+    });
+    api.getGuestAppURL(ta.tid, host).done(function (url) {
+      viewLivePage.attr("href", url.url);
     });
 
-    var taskDetails = $("<div class='task-details'></div>")
-      .appendTo(view);
-
-    if (title) {
-      $("<div class='new-label new-label-task hide'>NEW</div>")
-        .appendTo(taskDetails);
-      $("<div class='updated updated-task hide'></div>")
-        .appendTo(taskDetails);
-      $("<a href='#!task/" + ta.tid + "' class='task-title ellipsis'></a>")
-        .text(title)
-        .appendTo(taskDetails);
-      $("<div class='task-status'/>").append(taskStatus(ta))
-        .appendTo(taskDetails);
-
-      var team_organizers = login.organizers();
-      if (team_organizers.length > 1) {
-        profile.mget(team_organizers, ta.tid).done(function(profs) {
-          list.iter(team_organizers, function(organizer_uid, i) {
-            var v = $("<span/>");
-            var img = $("<img/>");
-            v.append(img);
-            svg.loadImg(img, "/assets/img/checkbox-sm.svg");
-            v.append(
-              document.createTextNode(profile.fullNameOrEmail(profs[i].prof))
-            );
-            if (list.mem(ta.task_participants.organized_by, organizer_uid)) {
-              v.addClass("checkbox-selected");
-            }
-            v.appendTo(taskDetails);
-
-            v.click(function() {
-              var task_organizers = ta.task_participants.organized_by;
-              if (list.mem(task_organizers, organizer_uid)) {
-                v.removeClass("checkbox-selected");
-                task_organizers.splice(task_organizers.indexOf(organizer_uid),
-                                       1);
-              } else {
-                v.addClass("checkbox-selected");
-                task_organizers.push(organizer_uid);
-              }
-              var ed = {tid:ta.tid, task_participants:ta.task_participants};
-              api.postTask(ed);
-            });
-          });
+    rescheduleAction.click(function() {
+      api.cancelCalendar(ta.tid).done(function (resp) {
+        var state = sched.getState(ta);
+        ta.task_status.task_progress = "Coordinating";
+        state.scheduling_stage = "Find_availability";
+        state.calendar_options = [];
+        delete state.reserved;
+        api.postTask(ta).done(function() {
+          observable.onTaskModified.notify(ta);
+          window.location.href = "/#!task/" + ta.tid;
         });
-      }
+      });
+    });
 
-      // var exec = $("<div class='task-exec'></div>")
-      //   .appendTo(view);
-      // $("<div class='task-exec-circ-line'></div>")
-      //   .append($("<div class='task-exec-circ unselectable'>JL</div>"))
-      //   .appendTo(exec);
-      // $("<div class='task-exec-name ellipsis'>Christopher W.</div>")
-      //   .appendTo(exec);
+    cancelAction.click(function() {
+      api.cancelCalendar(ta.tid).done(function (resp) {
+        var state = sched.getState(ta);
+        ta.task_status.task_progress = "Closed";
+        state.calendar_options = [];
+        delete state.reserved;
+        api.postTask(ta).done(function() {
+          observable.onTaskModified.notify(ta);
+        });
+      });
+    });
 
-      // var withDiv = $("<div class='with-div'></div>")
-      //   .appendTo(view);
-      // var withIcon = $("<img class='with'/>")
-      //   .appendTo(withDiv);
-      // svg.loadImg(withIcon, "/assets/img/with.svg");
+    deleteAction.click(function() {
+      api.archiveTask(ta.tid);
+      observable.onTaskArchived.notify(ta.tid);
+    });
 
-      // var taskGuest = $("<div class='task-guest'></div>")
-      //   .appendTo(view);
-      // $("<div class='task-guest-circ-line'></div>")
-      //   .append($("<div class='task-guest-circ unselectable'>CW</div>"))
-      //   .appendTo(taskGuest);
-      // $("<div class='task-guest-name ellipsis'>Christopher W.</div>")
-      //   .appendTo(taskGuest);
+    if (!(util.isNotNull(sched.getState(ta).reserved)))
+      rescheduleAction.hide();
+    if (ta.task_status.task_progress === "Closed") {
+      cancelAction.hide();
+      rescheduleAction.show();
+    } else
+      deleteAction.hide();
+
+    popover.children().remove();
+    popover.append(view);
+  }
+
+  function viewOfTaskCard(profs, ta) {
+'''
+<div #view>
+  <div #newMessages class="meeting-new-messages ellipsis"/>
+  <div #actionsPopover class="meeting-actions-popover"
+                       style="display:none"/>
+  <div #subjectRow class="meeting-subject ellipsis">
+    <div #arrowContainer class="meeting-actions-arrow"/>
+    <div #subjectIconContainer class="meeting-subject-icon"/>
+    <div #subject class="meeting-subject-text ellipsis">
+      <a #subjectText class="link"/>
+    </div>
+  </div>
+  <div class="inner-shadow-down"/>
+  <div #meetingTitle class="meeting-title scrollable">
+    <div #meetingRow class="meeting-type"/>
+  </div>
+  <div class="inner-shadow-up"/>
+  <div #meetingFooter class="meeting-footer">
+    <div #statusRow class="meeting-status-row">
+      <div #statusIcon class="meeting-status-icon status-icon"/>
+      <div #statusText class="meeting-status-text"/>
+    </div>
+    <div #updated class="meeting-updated-row"/>
+  </div>
+</div>
+'''
+    view.attr("id","task-" + ta.tid);
+    actionsPopover.attr("id","popover-" + ta.tid);
+    arrowContainer.attr("id","popover-trigger-" + ta.tid);
+
+    if (ta.task_data === "Questions") return view;
+
+    var unread = ta.task_status_text.status_unread_messages;
+    if (unread > 0)
+      newMessages.text(unread);
+    else
+      newMessages.hide();
+
+    loadMeetingActions(ta, actionsPopover);
+
+    var subjectIcon = $("<img class='svg-block'/>")
+      .appendTo(subjectIconContainer);
+    svg.loadImg(subjectIcon, "/assets/img/status-email.svg");
+    var arrow = $("<img class='svg-block'/>")
+      .appendTo(arrowContainer);
+    svg.loadImg(arrow, "/assets/img/arrow-south-sm.svg");
+    subjectText
+      .text(ta.task_status.task_title)
+      .attr("href","#!task/" + ta.tid);
+
+    meetingRow.text(sched.getMeetingType(ta) + " with");
+    var guests = sched.getAttendingGuests(ta);
+    list.iter(guests, function(guest) {
+      var nameOrEmail = profile.fullNameOrEmail(profs[guest].prof);
+      var guestDiv = $("<div class='meeting-guest clearfix'/>")
+        .appendTo(meetingTitle);
+      var guestCirc = $("<div class='meeting-guest-circ'/>")
+        .text(nameOrEmail[0])
+        .appendTo(guestDiv);
+      var guestName = $("<div class='meeting-guest-name ellipsis'/>")
+        .text(nameOrEmail)
+        .appendTo(guestDiv);
+    });
+
+    if (sched.isToDoStep(ta)) {
+      var toDoIcon = $("<img class='svg-block'/>")
+        .appendTo(statusIcon);
+      svg.loadImg(toDoIcon, "/assets/img/to-do.svg");
+    } else if (sched.isReminderStep(ta)) {
+      var reminderIcon = $("<img class='svg-block'/>")
+        .appendTo(statusIcon);
+      svg.loadImg(reminderIcon, "/assets/img/status-reminder.svg");
+    } else {
+      statusIcon.hide();
     }
+
+    var statusDetails = sched.taskStatus(ta);
+    statusText.text(statusDetails.event);
+    if (ta.task_status_text.status_step === "Wait_on_guest")
+      statusText.addClass("waiting-on-guest");
+    updated
+      .append($("<span/>").text("Updated "))
+      .append(statusDetails.timeAgo);
+
+    view.hover(
+      function() {
+        if (! view.hasClass("actions-open"))
+          arrowContainer.css("display","block");
+      }, function() {
+        if (! view.hasClass("actions-open"))
+          arrowContainer.css("display","none");
+      }
+    );
+
+    arrowContainer
+      .off("click")
+      .click(function() {
+        togglePopover(view, arrowContainer, actionsPopover);
+      })
+
+    $("body").on("click", function (e) {
+      var target = e.target;
+      var parents = $(target).parents();
+      if (actionsPopover.hasClass("open")
+          && !actionsPopover.is(target)
+          && $(target).parents("#popover-" + ta.tid).length === 0
+          && !arrowContainer.is(target)
+          && $(target).parents("#popover-trigger-" + ta.tid).length === 0) {
+            hideAllPopovers();
+            var card = $(target).parents(".task");
+            if (card.length === 1) {
+              card.find(".meeting-actions-arrow").css("display","block");
+            }
+      }
+    });
 
     return view;
   }
 
   function classOfActiveTask(task) {
     if ("Scheduling" === variant.cons(task.task_data)) {
-      return "Confirmed" === task.task_status.task_progress
-          || "Closed"    === task.task_status.task_progress
-           ? "completed-scheduling-task"
-           : "in-progress-scheduling-task";
+      if ("Confirmed" === task.task_status.task_progress)
+        return "finalized-scheduling-task";
+      else if ("Closed" === task.task_status.task_progress)
+        return "canceled-scheduling-task";
+      else
+        return "pending-scheduling-task";
     } else {
       return "Closed" === task.task_status.task_progress
-           ? "completed-general-task"
-           : "in-progress-general-task";
+           ? "finalized-general-task"
+           : "pending-general-task";
     }
   }
 
@@ -170,26 +262,29 @@ var home = (function() {
     view.attr("class", "task clearfix " + viewClass);
   }
 
-  function viewOfActiveTaskRow(task) {
-    var view = viewOfTaskRow(task);
+  function viewOfActiveTaskCard(profs, task) {
+    var view = viewOfTaskCard(profs, task);
     setTaskViewClass(view, classOfActiveTask(task));
     return view;
   }
 
-  function viewOfArchiveTaskRow(task) {
-    var view = viewOfTaskRow(task);
+  function viewOfArchiveTaskCard(profs, task) {
+    var view = viewOfTaskCard(profs, task);
     setTaskViewClass(view, "archived-task");
     return view;
   }
 
   function taskUpdated(task) {
+    header.updateToDo(task);
+    header.updateNotifications(task);
     var view = $("#task-" + task.tid);
+    var profs = profile.profilesOfTaskParticipants(task);
     if (view.length <= 0) {
-      $("#tasks").prepend(viewOfActiveTaskRow(task));
+      $("#tasks").prepend(viewOfActiveTaskCard(profs, task));
     } else if (view.hasClass("archived-task")) {
-      view.replaceWith(viewOfArchiveTaskRow(task));
+      view.replaceWith(viewOfArchiveTaskCard(profs, task));
     } else {
-      view.replaceWith(viewOfActiveTaskRow(task));
+      view.replaceWith(viewOfActiveTaskCard(profs, task));
     }
   }
 
@@ -200,7 +295,8 @@ var home = (function() {
     } else {
       view.remove();
       api.getTask(tid).then(function(task) {
-        mover(viewOfActiveTaskRow(task));
+        var profs = profilesOfTaskParticipants(task);
+        mover(viewOfActiveTaskCard(profs, task));
       });
     }
   }
@@ -213,7 +309,8 @@ var home = (function() {
         mover(view, targetView);
       } else {
         api.getTask(tid).then(function(task) {
-          mover(viewOfActiveTaskRow(task), targetView);
+          var profs = profile.profilesOfTaskParticipants(task);
+          mover(viewOfActiveTaskCard(profs, task), targetView);
         });
       }
     } else {
@@ -253,31 +350,36 @@ var home = (function() {
       setTaskViewClass(view, "archived-task");
     } else {
       api.getTask(tid).done(function(task) {
-        $("#tasks").prepend(viewOfArchiveTaskRow(task));
+        var profs = profilesOfTaskParticipants(task);
+        $("#tasks").prepend(viewOfArchiveTaskCard(task));
       });
     }
   }
 
-  function showActiveTasks(data) {
+  function showActiveTasks(active) {
     var view = $("#tasks");
-    setTaskViewClass(view.children(), "archived-task");
-    list.iter(data.tasks, function(task) {
-      var taskView = $("#task-" + task.tid);
-      if (taskView.length > 0) {
-        taskView.replaceWith(viewOfActiveTaskRow(task));
-      } else {
-        view.append(viewOfActiveTaskRow(task));
-      }
+    setTaskViewClass(view.children(), "archived-task"); // XXX Why??
+    var deferredCards = list.map(active, function(task) {
+      return profile.fetchProfilesOfTaskParticipants(task)
+        .then(function(profs) {
+          return { tid: task.tid, view: viewOfActiveTaskCard(profs, task) };
+        });
+    });
+    deferred.join(deferredCards).done(function(cards) {
+      list.iter(cards, function(card) {
+        var taskView = $("#task-" + card.tid);
+        if (taskView.length > 0) {
+          taskView.replaceWith(card.view);
+        } else {
+          view.append(card.view);
+        }
+      });
     });
   }
 
   function showAllTasks(data) {
-    var view = $("#tasks");
-    list.iter(data[0].tasks, function(task) {
-      view.append(viewOfTaskRow(task));
-    });
-
-    showActiveTasks(data[1]);
+    showActiveTasks(data.tasks);
+    header.load(data.tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
     observable.onTaskCreated     .observe("task-list", taskUpdated);
@@ -288,96 +390,69 @@ var home = (function() {
     observable.onTaskRankedAfter .observe("task-list", taskRankedAfter);
   }
 
-  function loadTasks() {
+  function loadMeetings() {
     $("#tasks").children().remove();
     spinner.spin(
       "Loading tasks...",
-      deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
-                     api.loadActiveTasks().fail(status_.onError(404))])
+      api.loadActiveTasks()
+        .fail(status_.onError(404))
         .done(showAllTasks)
     );
 
-    $('a[href="#all-tasks"]')
-    .unbind('click')
-    .click(function() {
-      $('#all-tasks-tab-content').append($('#tasks'));
-      $('a[href="#all-tasks"]').tab('show');
-    });
-    $('a[href="#scheduling-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#scheduling-tasks-tab-content').append($('#tasks'));
-      $('a[href="#scheduling-task-list"]').tab('show');
-    });
-    $('a[href="#general-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#general-tasks-tab-content').append($('#tasks'));
-      $('a[href="#general-task-list"]').tab('show');
-    });
-    $('a[href="#archive-task-list"]')
-    .unbind('click')
-    .click(function() {
-      $('#archive-tasks-tab-content').append($('#tasks'));
-      $('a[href="#archive-task-list"]').tab('show');
-    });
-
-    $('.show-in-progress-scheduling-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-scheduling-tasks').addClass('active');
-      $('.show-completed-scheduling-tasks').removeClass('active');
-      $('#scheduling-tasks-tab-content')
-        .attr('class', 'in-progress-scheduling-tasks task-list');
-    });
-    $('.show-completed-scheduling-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-scheduling-tasks').removeClass('active');
-      $('.show-completed-scheduling-tasks').addClass('active');
-      $('#scheduling-tasks-tab-content')
-        .attr('class', 'completed-scheduling-tasks task-list');
-    });
-    $('.show-in-progress-general-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-general-tasks').addClass('active');
-      $('.show-completed-general-tasks').removeClass('active');
-      $('#general-tasks-tab-content')
-        .attr('class', 'in-progress-general-tasks task-list');
-    });
-    $('.show-completed-general-tasks')
-    .unbind('click')
-    .click(function() {
-      $('.show-in-progress-general-tasks').removeClass('active');
-      $('.show-completed-general-tasks').addClass('active');
-      $('#general-tasks-tab-content')
-        .attr('class', 'completed-general-tasks task-list');
-    });
+    $('.show-pending-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').addClass('active');
+        $('.show-finalized-meetings').removeClass('active');
+        $('.show-canceled-meetings').removeClass('active');
+        $(".new-meeting-btn").show();
+        $('#tasks')
+          .attr('class', 'clearfix pending-scheduling-tasks task-list');
+      });
+    $('.show-finalized-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').removeClass('active');
+        $('.show-finalized-meetings').addClass('active');
+        $('.show-canceled-meetings').removeClass('active');
+        $(".new-meeting-btn").hide();
+        $('#tasks')
+          .attr('class', 'clearfix finalized-scheduling-tasks task-list');
+      });
+    $('.show-canceled-meetings')
+      .unbind('click')
+      .click(function() {
+        $('.show-pending-meetings').removeClass('active');
+        $('.show-finalized-meetings').removeClass('active');
+        $('.show-canceled-meetings').addClass('active');
+        $(".new-meeting-btn").hide();
+        $('#tasks')
+          .attr('class', 'clearfix canceled-scheduling-tasks task-list');
+      });
   }
 
-  function clearTeams() {
-    $(".team-block").remove();
-  }
+  function loadSearch() {
+    var search = $(".search-meetings-input");
+    var clear = $(".clear-search");
 
-  function switchTeam(team) {
-    login.setTeam(team);
-    mod.load();
-  }
+    function updateSearch() {
+      if (search.val() != "") {
+        clear.removeClass("hide");
+        $(".meetings-toggle").attr("style","display:none");
+        $(".search-stats").attr("style","display:block")
+      } else {
+        clear.addClass("hide");
+        $(".meetings-toggle").attr("style","display:block");
+        $(".search-stats").attr("style","display:none")
+      }
+    }
 
-  function labelOfTeam(team) {
-    var label = team.team_label;
-    if (! util.isString(label) || label === "")
-      label = team.teamname;
-    return label;
-  }
+    util.afterTyping(search, 100, updateSearch);
 
-  function sortTeams(a) {
-    return list.sort(a, function(t1, t2) {
-      var l1 = labelOfTeam(t1);
-      var l2 = labelOfTeam(t2);
-      return l1.localeCompare(l2);
-    });
+    clear.click(function() {
+      search.val("");
+      updateSearch();
+    })
   }
 
   function clickableViewOfTeam(team) {
@@ -423,94 +498,20 @@ var home = (function() {
     });
   }
 
-  function insertLoggedIn() {
-    $(".logged-in-as").each(function() {
-      var view = $(this);
-      view.children().remove();
-      profile.get(login.me()).done(function(eaProf) {
-        var fullName = profile.fullName(eaProf);
-        view.append("<div class='logged-in-text'>LOGGED IN AS</div>")
-            .append("<div class='logged-in-name ellipsis'>" + fullName + "</div>");
-      });
-    })
-  }
-
-  function loadNavHeader() {
-    $(".nav-header").each(function() {
-      var view = $(this);
-      view.children().remove();
-      var initialsView = $("<div id='exec-circ'/>")
-        .appendTo(view);
-      var execNameView = $("<div id='exec-name' class='ellipsis'/>");
-      profile.get(login.leader())
-        .done(function(obsProf) {
-          var p = obsProf.prof;
-          execNameView.text(profile.fullNameOrEmail(p));
-          initialsView.text(profile.veryShortNameOfProfile(p));
-        });
-      var exec = $("<div id='exec-name-div'></div>")
-        .append($("<div id='assisting'>ASSISTING</div>"))
-        .append(execNameView)
-        .appendTo(view);
-      var caretDiv = $("<div id='exec-caret'></div>")
-        .appendTo(view);
-      var caret = $("<img/>")
-        .appendTo(caretDiv);
-      svg.loadImg(caret, "/assets/img/caret.svg");
-      $(".account-block").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      $(".team-block").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      $(".account-divider-div").each(function() {
-        if (! $(this).hasClass("hide"))
-          $(this).addClass("hide");
-      });
-      view.click(function() {
-        if (caretDiv.hasClass("account-nav-open")) {
-          caretDiv.removeClass("account-nav-open");
-          caretDiv.addClass("account-nav-closed");
-          $(".account-block").each(function() {
-            $(this).addClass("hide");
-          });
-          $(".team-block").each(function() {
-            $(this).addClass("hide");
-          });
-          $(".account-divider-div").each(function() {
-            $(this).addClass("hide");
-          });
-        } else {
-          caretDiv.removeClass("account-nav-closed");
-          caretDiv.addClass("account-nav-open");
-          $(".account-block").each(function() {
-            $(this).removeClass("hide");
-          });
-          $(".team-block").each(function() {
-            $(this).removeClass("hide");
-          });
-          $(".account-divider-div").each(function() {
-            $(this).removeClass("hide");
-          });
-        }
-      });
+  function loadPageTitle() {
+    profile.get(login.leader()).done(function(obsProf) {
+      var execName = profile.fullName(obsProf.prof);
+      document.title = "Meetings - " + execName;
     });
-
-    insertLoggedIn();
-    insertTeams();
+    $(".meeting-path").addClass("hide");
+    $(".path-to").addClass("hide");
+    $(".page-title").text("Meetings");
   }
 
   mod.load = function() {
-    loadNavHeader();
-    loadTasks();
-    $(".place-nav")
-      .off('click')
-      .click(places.load);
-    $(".settings-nav")
-      .off('click')
-      .click(settings.load);
+    loadPageTitle();
+    loadSearch();
+    loadMeetings();
     util.focus();
   };
 

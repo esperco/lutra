@@ -53,7 +53,7 @@ var sched = (function() {
   }
 
   mod.getGuestOptions = function(task) {
-    return list.toTable(sched.getState(task).participant_options,
+    return list.toTable(mod.getState(task).participant_options,
                         function(x){return x.uid;});
   }
 
@@ -101,6 +101,51 @@ var sched = (function() {
       tz = slot.location.timezone;
     return tz;
   };
+
+  mod.getMeetingType = function(ta) {
+    var state = mod.getState(ta);
+    var reserved = state.reserved;
+    if (util.isNotNull(reserved)) // Finalized meeting
+      return reserved.slot.meeting_type;
+    else { // Not yet finalized
+      var options = state.calendar_options;
+      if (util.isNotNull(options) && options.length > 0) {
+        // If all options have the same meeting_type, use it
+        var sharedType = options[0].slot.meeting_type;
+        for (var i = 1; i < options.length; i++) {
+          if (options[i].slot.meeting_type !== sharedType) {
+            sharedType = "Meeting";
+            break;
+          }
+        }
+        return sharedType;
+      } else // No options selected yet
+        return "Meeting";
+    }
+  }
+
+  mod.getMeetingTitle = function(profs, ta) {
+    var guests = sched.getAttendingGuests(ta);
+    if (guests.length === 0) return "New Meeting Request";
+    var names = [];
+    list.iter(guests, function(guest) {
+      names.push(profile.fullNameOrEmail(profs[guest].prof));
+    });
+    return mod.getMeetingType(ta) + " with " + names.join(" + ");
+  }
+
+  mod.taskStatus = function(ta) {
+    var time = date.ofString(ta.task_status_text.status_timestamp);
+    var statusEvent = mod.eaStatus(ta);
+    var statusTimeAgo = date.viewTimeAgo(time);
+    var statusTime = date.utcToLocalTimeOnly(time);
+    return {
+      event: statusEvent,
+      timeAgo: statusTimeAgo,
+      time: statusTime
+    };
+  }
+
 
   /******************************************/
 
@@ -362,24 +407,24 @@ var sched = (function() {
   };
 
   function highlight(tab) {
-    $("." + tab + "-tab-select").addClass("active");
+    $(".show-" + tab + "-tab").addClass("active");
     if (tab === "setup") {
-      $(".setup-tab-select").removeClass("disabled");
-      $(".coordination-tab-select").removeClass("active");
-      $(".messages-tab-select").removeClass("active");
+      $(".show-setup-tab").removeClass("disabled");
+      $(".show-coordination-tab").removeClass("active");
+      $(".show-messages-tab").removeClass("active");
     } else if (tab === "coordination") {
-      $(".setup-tab-select").removeClass("active");
-      $(".coordination-tab-select").removeClass("disabled");
-      $(".messages-tab-select").removeClass("active");
+      $(".show-setup-tab").removeClass("active");
+      $(".show-coordination-tab").removeClass("disabled");
+      $(".show-messages-tab").removeClass("active");
     } else if (tab === "messages") {
-      $(".setup-tab-select").removeClass("active");
-      $(".coordination-tab-select").removeClass("active");
-      $(".messages-tab-select").removeClass("disabled");
+      $(".show-setup-tab").removeClass("active");
+      $(".show-coordination-tab").removeClass("active");
+      $(".show-messages-tab").removeClass("disabled");
     }
   }
 
   function setup_step_buttons(ta, prog) {
-    $(".coordination-tab-select")
+    $(".show-coordination-tab")
       .off("click")
       .click(function() {
         if (ta.task_status.task_progress !== "Confirmed") {
@@ -389,13 +434,13 @@ var sched = (function() {
         sched.loadTask(ta);
         highlight("coordination");
       });
-    $(".messages-tab-select")
+    $(".show-messages-tab")
       .off("click")
       .click(function() {
         loadMessages(ta);
         highlight("messages");
       });
-    $(".setup-tab-select")
+    $(".show-setup-tab")
       .off("click")
       .click(function() {
         var profs = profile.profilesOfTaskParticipants(ta);
@@ -405,6 +450,7 @@ var sched = (function() {
   }
 
   mod.loadTask = function(ta) {
+    task.loadTaskTitle(ta);
     var state = ta.task_data[1];
     var progress = state.scheduling_stage;
     tabSelector.hideAll();
@@ -433,6 +479,57 @@ var sched = (function() {
     }
     util.focus();
   };
+
+  mod.isToDoStep = function(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "Offer_meeting_options":
+      case "Follow_up_with_guest":
+      case "Finalize_meeting_details":
+      case "Confirm_with_guest":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  mod.isReminderStep = function(ta) {
+    var step = ta.task_status_text.status_step;
+    switch (step) {
+      case "No_reminder_scheduled":
+      case "Reminder_scheduled":
+      case "Reminder_sent":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /* The EA Web app status formatting shows what they need to do,
+     while the exec mobile status formatting shows what the EA is doing */
+  mod.eaStatus = function(ta) {
+    var step = ta.task_status_text.status_step;
+    var plural_s = ta.task_participants.organized_for.length > 2 ? "s" : "";
+    if (step === "Offer_meeting_options")
+      return "Offer meeting options";
+    else if (step === "Wait_on_guest")
+      return "Waiting on guest" + plural_s;
+    else if (step === "Follow_up_with_guest")
+      return "Follow up with guest" + plural_s;
+    else if (step === "Finalize_meeting_details")
+      return "Finalize meeting details";
+    else if (step === "Confirm_with_guest")
+      return "Confirm with guest" + plural_s;
+    else if (step === "No_reminder_scheduled")
+      return "No reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_scheduled")
+      return "Reminder" + plural_s + " scheduled";
+    else if (step === "Reminder_sent")
+      return "Reminder" + plural_s + " sent";
+    else
+      // Should never happen
+      return "UNRECOGNIZED TASK STATUS STEP";
+  }
 
   return mod;
 }());

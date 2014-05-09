@@ -10,6 +10,8 @@
 @bold: "Proxima Nova Semibold";
 
 /*** Colors ***/
+@border: #e5e5e5;
+@dark_gray: #282828;
 @gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
@@ -20,18 +22,20 @@
 @gray_80: #58595b;
 @gray_90: #414042;
 @green: #2bb673;
+@green_hover: #1e9b5c;
 @orange: #f7941e;
+@orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
+@purple_bg_hover: #fefdff;
+@purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
+@purple_text: #463c4c;
 @red: #d9534f;
+@red_disabled: #eba8a7;
 @red_hover: #d2322d;
-@white: #ffffff;
-
-/*** Measurements ***/
-@chat_width: 320px;
 
 
 /* set a max-width for horizontal fluid layout and make it centered */
@@ -117,26 +121,27 @@ h6,
 }
 /*** Buttons ***/
 .btn {
+  font-family: @light;
   border-radius: 3px;
 }
 .btn-default,
 .dropdown-toggle.btn-default,
 .open .dropdown-toggle.btn-default {
-  color: @gray_90;
+  color: @purple_text;
   background-color: @gray_10;
   border: none;
 }
 .btn-default:hover,
 .btn-default:focus,
 .dropdown-toggle.btn-default:hover {
-  color: @gray_90;
+  color: @purple_text;
   background-color: @gray_20;
   border: none;
 }
 .btn-default:active,
 .btn-default.active,
 .open .dropdown-toggle.btn-default {
-  color: @gray_90;
+  color: @purple_text;
   background-color: @gray_30;
   border: none;
   box-shadow: none;
@@ -221,6 +226,7 @@ fieldset[disabled] .btn-primary.active {
   border-bottom-color: @purple_hover;
 }
 .nav > li > a {
+  padding: 0;
   border-bottom: none;
 }
 .nav > li > a:hover,
@@ -246,12 +252,12 @@ fieldset[disabled] .btn-primary.active {
   margin-left: 0;
 }
 .nav-pills > li > a:hover {
-  color: @white;
+  text-decoration: underline;
 }
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
 .nav-pills > li.active > a:focus {
-  color: @white;
+  color: @purple_text;
   background: none;
   cursor: default;
 }
@@ -268,25 +274,22 @@ fieldset[disabled] .btn-primary.active {
   margin-right: 0;
   margin-bottom: 0;
 }
-.nav-tabs {
-  width: 100%;
-  border: none;
-}
 .nav-tabs > li > a {
   margin: 0;
-  color: @purple;
+  color: @gray_40;
   border: none;
   border-radius: 0;
+  cursor: pointer;
 }
 .nav-tabs > li > a:hover {
-  color: @purple_hover;
+  color: @purple_text;
   border: none;
 }
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
   padding-bottom: 2px;
-  color: @gray_90;
+  color: @purple_text;
   border: none;
   border-bottom: 2px solid @purple;
   border-radius: 0;
@@ -340,15 +343,10 @@ fieldset[disabled] .form-control {
 }
 .modal-backdrop { background: white; }
 /*** Tooltips ***/
-.tooltip {
-  z-index: 1050;
-}
-.tooltip-inner {
-  border-radius: 0;
-}
-.popover-content {
-  padding: 1px;
-}
+.tooltip { z-index: 1050; }
+.tooltip-inner { border-radius: 0; }
+.popover { padding: 0; }
+.popover-content { padding: 10px 0px; }
 /*** Other ***/
 hr {
   margin-top: 15px;

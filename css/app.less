@@ -9,7 +9,7 @@
 /*** Colors ***/
 @blue: #0080ce;
 @blue_bg: #dfeff7;
-@border: #cccccc;
+@border: #ebebeb;
 @dark_gray: #282828;
 @gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
@@ -27,12 +27,17 @@
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
+@purple_bg: #e8d9ee;
+@purple_bg_hover: #fefdff;
+@purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
 @purple_hover: #8c42ad;
+@purple_text: #463c4c;
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
+
 
 
 /*** General ***/
@@ -44,9 +49,9 @@ html {
 
 body {
   background: white;
-  color: @gray_90;
+  color: @purple_text;
   font-family: @regular, Arial;
-  font-size: 16px;
+  font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -61,7 +66,7 @@ textarea {
 
 object { pointer-events: none; }
 
-li { cursor: pointer; }
+li { list-style: none; }
 
 i { color: @gray_60; }
 
@@ -83,6 +88,19 @@ i { color: @gray_60; }
     text-decoration: underline;
   }
 }
+.danger-link {
+  color: @red;
+  cursor: pointer;
+  &:hover {
+    color: @red_hover;
+    text-decoration: underline;
+  }
+}
+.caret-link {
+  float: left;
+  margin-top: 7px;
+}
+.caret-text { margin-right: 6px; }
 
 *.unselectable {
   cursor: default;
@@ -109,26 +127,49 @@ i { color: @gray_60; }
   float: left;
 }
 
-.left-inner-addon {
-    position: relative;
+.left-inner-addon,
+.right-inner-addon,
+.left-right-inner-addon {
+  position: relative;
 }
 .left-inner-addon input {
-    padding-left: 30px;
+  padding-left: 30px;
 }
-.left-inner-addon i {
-    position: absolute;
-    left: 0px;
-    padding: 7px 9px;
-    pointer-events: none;
+.right-inner-addon input {
+  padding-right: 30px;
+}
+.left-right-inner-addon input {
+  padding-right: 30px;
+  padding-left: 30px;
+}
+.left-inner-addon i,
+.left-right-inner-addon i {
+  position: absolute;
+  left: 0px;
+  padding: 7px 9px;
+  pointer-events: none;
+}
+.right-inner-addon i {
+  position: absolute;
+  right: 0px;
+  padding: 7px 9px;
+  pointer-events: none;
 }
 
-.danger-link {
-  color: @red;
+.popover-list {
+  margin: 0;
+  padding: 0;
+}
+.popover-list > li:hover {
+  background: @purple_bg;
   cursor: pointer;
-  &:hover {
-    color: @red_hover;
-    text-decoration: underline;
-  }
+}
+.popover-list > li > a {
+  display: block;
+  padding: 5px 20px;
+}
+.popover-list > li + li {
+  margin-left: 0;
 }
 
 #global-status {
@@ -200,444 +241,6 @@ i { color: @gray_60; }
 }
 
 
-/*** Nav Bar ***/
-
-#desktop-navbar {
-  position: fixed;
-  height: 100%;
-  width: 220px;
-  background: @gray_90;
-  overflow-y: auto;
-}
-
-#mobile-navbar-header {
-  margin: 0;
-  padding: 0;
-  background: white;
-  border-bottom: 1px solid @border;
-  border-radius: 0;
-}
-
-#new-task-btn-mobile,
-#new-place-btn-mobile {
-  float: right;
-  margin-top: 14px;
-  margin-right: 16px;
-}
-
-#menu {
-  float: left;
-  margin-top: 23px;
-  margin-left: 16px;
-  cursor: pointer;
-  &:hover g path { fill: @purple_hover; }
-  &:active g path { fill: #7d3ca0; }
-}
-
-.nav-title {
-  float: left;
-  margin-top: 18px;
-  margin-left: 16px;
-  margin-bottom: 0px;
-  font-size: 18px;
-}
-
-#home-title { letter-spacing: 3px; }
-
-#mobile-navbar-collapse {
-  background: @gray_90;
-  box-shadow: 0 10px 10px @gray_60;
-}
-
-.nav-header {
-  margin: 0;
-  padding: 20px 15px;
-  height: 80px;
-  background: @purple;
-  &:hover {
-    background: @purple_hover;
-    cursor: pointer;
-  }
-  #exec-circ {
-    float: left;
-    width: 40px;
-    height: 40px;
-    padding-top: 10px;
-    border-radius: 20px;
-    text-align: center;
-    vertical-align: middle;
-    color: @gray_90;
-    background: white;
-  }
-  #exec-name-div {
-    display: inline-block;
-    margin-left: 10px;
-    padding-top: 4px;
-    color: white;
-  }
-  #assisting {
-    font-size: 10px;
-  }
-  #exec-name {
-    width: 125px;
-    font-family: @bold;
-    font-size: 14px;
-  }
-  #exec-caret {
-    float: right;
-    margin-top: 8px;
-  }
-}
-
-.account-nav-open {
-  .rotate(rotate_cw_180);
-}
-
-.account-nav-closed {
-  .rotate(rotate_ccw_180);
-}
-
-.account-block {
-  height: 60px;
-  margin: 0;
-  color: @gray_20;
-  background: @dark_gray !important;
-}
-
-.logged-in-as {
-  padding: 15px;
-}
-
-.logged-in-text {
-  color: @gray_60;
-  font-family: @bold;
-  font-size: 12px;
-}
-
-.account-action {
-  width: 100%;
-  height: 28px;
-  margin-top: 6px;
-  padding-top: 2px;
-  padding-right: 10px;
-  padding-left: 10px;
-  font-size: 14px;
-  color: white;
-  background: none;
-  border: 1px solid white;
-  border-radius: 3px;
-  &:hover {
-    color: @gray_90;
-    background: white;
-  }
-}
-
-.account-action-left {
-  padding-right: 5px;
-  padding-left: 10px;
-}
-
-.account-action-right {
-  padding-right: 10px;
-  padding-left: 5px;
-}
-
-.account-divider-div {
-  height: 41px;
-  padding-top: 20px;
-  background: @dark_gray;
-}
-
-.account-divider-line {
-  height: 1px;
-  background: @gray_90;
-}
-
-.nav-divider-line {
-  height: 1px;
-  margin-top: 40px;
-  margin-bottom: 20px;
-  background: @gray_80;
-}
-
-.account-section-title,
-.nav-section-title {
-  position: relative;
-  top: -0.5em;
-  left: 7px;
-  padding-left: 8px;
-  padding-right: 8px;
-  color: white;
-  font-family: @light;
-  letter-spacing: 3px;
-}
-
-.account-section-title {
-  background: @dark_gray;
-}
-
-.nav-section-title {
-  background: @gray_90;
-}
-
-.team-block {
-  height: 50px;
-  padding: 5px 10px;
-  background: @dark_gray !important;
-}
-
-.nav-team {
-  height: 40px;
-  padding: 8px 10px !important;
-  color: @gray_20;
-  border-radius: 3px !important;
-  &:hover { background: @gray_90 !important; }
-}
-
-.nav-active-team {
-  cursor: default;
-  background: @gray_90 !important;
-}
-
-.list-exec-circ {
-  float: left;
-  width: 24px;
-  height: 24px;
-  padding-top: 4px;
-  color: @gray_90;
-  font-size: 12px;
-  text-align: center;
-  background: white;
-  border-radius: 12px;
-}
-
-.list-exec-name {
-  margin-top: 2px;
-  margin-left: 32px;
-}
-
-#account-block-push {
-  height: 20px;
-}
-
-.nav-block {
-  margin: 0;
-  height: 60px;
-  color: @gray_60;
-  &:focus { color: @gray_60; }
-}
-
-.nav-text {
-  display: inline-block;
-  margin-top: 10px;
-  margin-left: 14px;
-}
-
-#settings-icon,
-#logout-icon,
-#search-icon,
-#general-icon {
-  float: left;
-  margin: 10px 2px;
-}
-
-#dashboard-icon,
-#scheduling-icon {
-  float: left;
-  margin: 10px 1px;
-}
-
-#all-tasks-icon {
-  float: left;
-  margin: 12px 1px;
-}
-
-#archive-icon,
-#contacts-icon {
-  float: left;
-  margin-top: 10px;
-}
-
-#places-icon {
-  float: left;
-  margin: 10px 5px;
-}
-
-#settings-icon path,
-#logout-icon g path,
-#search-icon path,
-#dashboard-icon path,
-#dashboard-icon circle,
-#all-tasks-icon path,
-#scheduling-icon path,
-#scheduling-icon text,
-#general-icon path,
-#general-icon circle,
-#archive-icon path,
-#contacts-icon path,
-#places-icon path { fill: @gray_60; }
-
-.account-block:hover { background: @dark_gray !important; }
-
-.account-block:hover {
-  #settings-icon path,
-  #logout-icon g path { fill: white; }
-}
-
-.nav-block:hover {
-  #search-icon path,
-  #dashboard-icon path,
-  #dashboard-icon circle,
-  #all-tasks-icon path,
-  #scheduling-icon path,
-  #scheduling-icon text,
-  #general-icon path,
-  #general-icon circle,
-  #archive-icon path,
-  #contacts-icon path,
-  #places-icon path { fill: white; }
-}
-
-.nav-pills > li.active > a {
-  #settings-icon path,
-  #logout-icon g path,
-  #search-icon path,
-  #dashboard-icon path,
-  #dashboard-icon circle,
-  #all-tasks-icon path,
-  #scheduling-icon path,
-  #scheduling-icon text,
-  #general-icon path,
-  #general-icon circle,
-  #archive-icon path,
-  #contacts-icon path,
-  #places-icon path { fill: white; }
-}
-
-
-/*** TASK FRAME ***/
-
-.task-header {
-  position: fixed !important;
-  width: 100%;
-  height: 70px;
-  left: 0;
-  background: @gray_90;
-}
-
-.return-home {
-  float: left;
-  width: 23px;
-  height: 28px;
-  margin-top: 21px;
-  margin-left: 15px;
-  cursor: pointer;
-  g path { fill: @gray_40; }
-  &:hover g path { fill: white; }
-}
-
-#task-title-div {
-  margin-left: 48px;
-  margin-right: 60px;
-}
-
-#task-title {
-  width: 100%;
-  margin-top: 19px;
-  margin-bottom: 0px;
-  font-family: @light;
-  font-size: 18px;
-  color: white;
-  background: none;
-  border: none;
-}
-
-.task-navbar {
-  position: fixed !important;
-  width: 100%;
-  height: 50px;
-  top: 70px;
-  left: 0;
-  background: @gray_80;
-}
-
-.task-tab {
-  float: left;
-  height: 24px;
-  margin: 15px 15px 0px 15px;
-  color: @gray_40;
-  font-family: @bold;
-  font-size: 14px;
-  cursor: pointer;
-  &:hover { color: white; }
-}
-
-.task-tab.active {
-  color: white;
-  pointer-events: none;
-}
-
-.coordination-tab-select.disabled {
-  color: @gray_60;
-  pointer-events: none;
-  path.cal-header,
-  path.outline { fill: @gray_60; }
-  g.grid { stroke: @gray_60; }
-}
-
-.task-tab-icon { float: left; }
-
-.coordination-tab-icon,
-.setup-tab-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.messages-tab-icon {
-  width: 21px;
-  height: 18px;
-}
-
-.coordination-tab-name,
-.setup-tab-name { margin-left: 30px; }
-
-.messages-tab-name { margin-left: 33px; }
-
-.coordination-tab-select {
-  path.cal-header,
-  path.outline { fill: @gray_40; }
-  g.grid { stroke: @gray_40; }
-  &:hover {
-    path.cal-header,
-    path.outline { fill: white; }
-    g.grid { stroke: white; }
-  }
-}
-
-.coordination-tab-select.active {
-  path.cal-header,
-  path.outline { fill: white; }
-  g.grid { stroke: white; }
-}
-
-.messages-tab-select,
-.setup-tab-select {
-  path { fill: @gray_40; }
-  &:hover path { fill: white; }
-}
-
-.messages-tab-select.active,
-.setup-tab-select.active {
-  path { fill: white; }
-}
-
-.messages-tab-select.unread-messages #chat-icon {
-  path { fill: @orange; }
-  text { fill: white; }
-  &:hover path { fill: @orange_hover; }
-}
-
-
 /*** Table Structure ***/
 
 .task,
@@ -664,7 +267,6 @@ i { color: @gray_60; }
   border-bottom: 1px solid @gray_10;
 }
 
-.task-list,
 #settings-emails,
 #settings-executives,
 #settings-exec-emails,
@@ -678,7 +280,6 @@ i { color: @gray_60; }
   border-top: 1px solid @gray_10;
 }
 
-.task-list,
 #places {
   margin-top: 20px;
 }
@@ -720,56 +321,717 @@ i { color: @gray_60; }
   height: 24px;
 }
 
-/*** Home ***/
 
-.home-container {
-  margin-right: 0;
-  padding-top: 20px;
-  padding-bottom: 120px;
+/*** Home Content ***/
+
+#home-content {
+  position: fixed;
+  z-index: 2;
+  min-width: 600px;
+  top: 60px;
+  right: 300px;
+  bottom: 0;
+  left: 0;
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
 }
 
-#home-push {
-  height: 55px;
+
+/*** Home Sidebar ***/
+
+#home-sidebar {
+  position: fixed;
+  z-index: 3;
+  width: 256px;
+  height: 100%;
+  top: 63px;
+  left: 0;
+  padding: 20px;
+  font-size: 14px;
+  background: white;
+  border-right: 1px solid @border;
 }
 
-.navbar-open {
-  margin-left: 220px;
+.home-sidebar-footer {
+  position: fixed;
+  width: 226px;
+  height: 50px;
+  bottom: 0px;
+  padding: 15px 5px;
+  border-top: 1px solid @border;
+}
+
+.sidebar-footer-link {
+  float: left;
+  margin-right: 15px;
+}
+
+.new-meeting-btn {
+  width: 280px;
+  height: 245px;
+  margin: 10px;
+  text-align: center;
+  vertical-align: center;
+  background: none;
+  border: 4px dotted @border;
+  border-radius: 6px;
+  float: left;
+  &:focus { outline: none; }
+  &:hover { background: rgba(255,255,255,0.7); }
+}
+
+.new-meeting-plus {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 20px;
+  path { fill: @purple; }
+}
+
+.new-meeting-text {
+  color: @purple;
+  font-size: 20px;
+}
+
+
+/*** App Header ***/
+
+.app-header {
+  position: fixed;
+  z-index: 4;
+  width: 100%;
+  height: 63px;
+  background: -webkit-linear-gradient(white, #fefdff);
+  background:    -moz-linear-gradient(white, #fefdff);
+  background:      -o-linear-gradient(white, #fefdff);
+  background:         linear-gradient(white, #fefdff);
+  border-bottom: 1px solid @border;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.header-accent {
+  width: 100%;
+  height: 3px;
+  background: @purple;
+}
+
+.home-icon-container {
+  float: left;
+  height: 60px;
+  margin-right: 25px;
+  padding-top: 15px;
+  cursor: pointer;
+  &:hover .home-icon g path { fill: @purple; }
+}
+
+.home-icon {
+  width: 24px;
+  height: 30px;
+  g path { fill: @gray_40; }
+}
+
+.meeting-path {
+  float: left;
+  padding-top: 17px;
+  font-size: 20px;
+}
+
+.path-to {
+  float: left;
+  margin: 24px 20px 0px 18px;
+  path { fill: @gray_40; }
 }
 
 .page-title {
-  font-size: 32px;
   float: left;
-  margin-right: 20px;
-  font-family: @light;
-  letter-spacing: 6px;
+  padding-top: 17px;
+  font-size: 20px;
+  cursor: default;
 }
 
-.list-search {
+.header-account {
+  float: right;
+  margin-top: 20px;
+  margin-left: 10px;
+}
+
+.header-account-arrow {
+  padding: 6px;
+  border: 1px solid @border;
+  border-radius: 3px;
+  cursor: pointer;
+  path { fill: @gray_40; }
+  background: -webkit-linear-gradient(white, @gray_f8);
+  background:    -moz-linear-gradient(white, @gray_f8);
+  background:      -o-linear-gradient(white, @gray_f8);
+  background:         linear-gradient(white, @gray_f8);
+  &:hover {
+    path { fill: @gray_60; }
+    background: -webkit-linear-gradient(white, @gray_10);
+    background:    -moz-linear-gradient(white, @gray_10);
+    background:      -o-linear-gradient(white, @gray_10);
+    background:         linear-gradient(white, @gray_10);
+  }
+}
+
+.header-account-arrow.open {
+  position: absolute;
+  z-index: 2;
+  background: white;
+  border: 1px solid @gray_20;
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.header-assisting {
+  float: right;
+  margin-top: 14px;
+  margin-left: 24px;
+  cursor: default;
+}
+
+.assisting-circ {
+  float: right;
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  padding-top: 5px;
+  color: white;
+  text-align: center;
+  background: @gray_40;
+  border-radius: 15px;
+}
+
+.assisting-name {
+  float: right;
+  margin-top: 5px;
+  color: @gray_60;
+  font-family: @bold;
+}
+
+.header-notifications,
+.header-to-do {
+  float: right;
+  margin-top: 20px;
+  margin-left: 24px;
+}
+
+.header-notifications-icon {
+  path { fill: @gray_20; }
+  cursor: pointer;
+  &:hover path { fill: @gray_40; }
+}
+
+.header-notifications-icon.unread {
+  path { fill: @purple; }
+  &:hover path { fill: @purple_hover; }
+}
+
+.header-to-do-icon {
+  g path { fill: @gray_20; }
+  cursor: pointer;
+  &:hover g path { fill: @gray_40; }
+}
+
+.header-to-do-icon.incomplete {
+  g path { fill: @purple; }
+  &:hover g path { fill: @purple_hover; }
+}
+
+.header-notifications-count,
+.header-to-do-count {
+  position: absolute;
+  z-index: 5;
+  margin: -30px 0px 0px 12px;
+  padding: 0px 4px;
+  color: white;
+  font-family: @bold;
+  font-size: 12px;
+  text-align: center;
+  border: 2px solid white;
+  border-radius: 6px;
+  cursor: default;
+}
+
+.header-notifications-count { background: @red; }
+.header-to-do-count { background: @orange; }
+
+
+/*** Account Popover ***/
+
+.header-account-popover {
+  position: absolute;
+  width: 200px;
+  top: 41px;
+  margin-left: -176px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  border-top-right-radius: 0;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.popover-account-info {
+  padding: 5px 20px;
+}
+
+.popover-account-name {
+  font-family: @bold;
+  font-size: 16px;
+}
+
+.popover-account-email {
+  font-size: 12px;
+  color: @gray_60;
+}
+
+.popover-assist-text {
+  margin-top: 10px;
+  padding: 15px 20px 0px 20px;
+  color: @gray_60;
+  border-top: 1px solid @gray_10;
+}
+
+.popover-team-list {
+  margin-bottom: 10px;
+  padding: 5px 0px;
+  border-bottom: 1px solid @gray_10;
+}
+
+.popover-team-list > li {
+  height: 50px;
+  padding: 5px 10px;
+}
+
+.popover-team-list > li:hover {
+  background: none;
+}
+
+.popover-team-list > li > a {
+  height: 40px;
+  padding: 8px 10px;
+  border-radius: 3px;
+}
+
+.popover-team-list > li > a:hover {
+  background: @purple_bg;
+}
+
+.popover-team-list > li > a.active {
+  cursor: default;
+  color: @purple_text;
+  background: @gray_05;
+}
+
+.team-list-name {
+  margin-top: 2px;
+  margin-left: 32px;
+}
+
+.team-list-circ {
+  float: left;
+  width: 24px;
+  height: 24px;
+  padding-top: 4px;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  background: @purple;
+  border-radius: 12px;
+}
+
+.team-list-circ.active {
+  color: white;
+  background: @gray_60;
+}
+
+
+/*** Notifications + To Do Popovers ***/
+
+.popover-caret {
+  position: absolute;
+  z-index: 2;
+  top: 50px;
+}
+
+.notifications-caret { margin-left: 1px; }
+
+.header-notifications-popover,
+.header-to-do-popover {
+  position: absolute;
+  z-index: 1;
+  width: 300px;
+  top: 59px;
+  margin-left: -270px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.header-popover-header {
+  padding: 0px 20px 10px 20px;
+  border-bottom: 1px solid @border;
+}
+
+.header-popover-title {
+  display: inline-block;
+  color: @gray_60;
+  font-family: @bold;
+}
+
+.mark-read {
+  float: right;
+}
+
+ul.notifications-list,
+ul.to-do-list {
+  height: 200px;
+  margin: 0;
+  padding: 0;
+}
+
+li.notification,
+li.to-do {
+  padding: 10px 20px;
+  border-bottom: 1px solid @border;
+  cursor: pointer;
+  &:hover { background: @purple_bg; }
+}
+
+.notification.unread,
+.to-do.incomplete {
+  background: @purple_bg_hover;
+  &:hover { background: @purple_bg; }
+}
+
+.notification-text,
+.to-do-text {
+  height: 40px;
+  margin-bottom: 4px;
+}
+
+.header-popover-timestamp {
+  color: @gray_40;
+  font-size: 12px;
+}
+
+.see-all {
+  margin-bottom: -10px;
+  padding: 10px 20px;
+  text-align: center;
+  background: @purple_bg_hover;
+  border-top: 1px solid @border;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+
+/*** Tab Bar ***/
+
+.search-meetings {
   float: right;
   width: 240px;
-  margin-top: 20px;
-  &:hover .search-tasks-icon g { fill: @gray_40; }
-  &:active .search-tasks-icon g { fill: @gray_60; }
 }
 
-.search-tasks-icon {
+.clear-search {
+  position: absolute;
+  right: 0;
+  padding: 11px 10px;
+  cursor: pointer;
+  path { fill: @gray_30; }
+  &:hover path { fill: @gray_60; }
+}
+
+.clear-search-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.search-stats {
+  display: none;
+  float: left;
+  font-size: 18px;
+}
+
+
+/*** Meetings ***/
+
+.app-container {
+  width: 100%;
+  min-width: 768px;
+  max-width: 1320px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0px 60px;
+}
+
+@media (max-width:1320px) {
+  .app-container { max-width: 1020px; }
+}
+
+@media (max-width:1020px) {
+  .app-container { max-width: 768px; }
+}
+
+.meetings-toolbar {
+  position: fixed;
+  z-index: 2;
+  top: 63px;
+  right: 0;
+  left: 0;
+  padding: 30px 0px;
+  background: white;
+  border-bottom: 1px solid @border;
+}
+
+.meetings-toggle {
+  float: left;
   display: block;
-  width: 14px;
-  height: 14px;
+  margin-top: 6px;
 }
 
-.search-tasks-icon g { fill: @gray_20; }
+.meetings-grid {
+  position: fixed;
+  z-index: 1;
+  top: 156px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 20px 0px 100px 0px;
+  background: @gray_f8;
+}
 
-.new-task-btn,
-#new-place-btn {
+.task {
+  float: left;
+  display: none;
+  width: 280px;
+  margin: 10px;
+  padding: 15px;
+  color: @gray_60;
+  background: white;
+  border: 1px solid @gray_10;
+  border-radius: 3px;
+  cursor: default;
+  &:hover {
+    background: @purple_bg_hover;
+    -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+       -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+           -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+  }
+}
+
+.task.actions-open {
+  .meeting-subject-icon,
+  .meeting-subject-text,
+  .meeting-title,
+  .meeting-status-row,
+  .meeting-updated-row { opacity: 0.2; }
+  .meeting-title { overflow: hidden; }
+  .meeting-subject-text {
+    pointer-events: none;
+    cursor: default;
+  }
+  .meeting-actions-arrow {
+    background: white;
+    border: 1px solid @gray_20;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom: none;
+    &:hover { background: white; }
+  }
+  &:hover { background: white; }
+}
+
+.pending-scheduling-tasks .pending-scheduling-task,
+.finalized-scheduling-tasks .finalized-scheduling-task,
+.canceled-scheduling-tasks .canceled-scheduling-task {
+  display: block;
+}
+
+.meeting-new-messages {
+  position: relative;
+  z-index: 50;
   float: right;
-  margin-top: 20px;
+  max-width: 50px;
+  height: 24px;
+  margin: -27px -30px 0px 0px;
+  padding: 2px 10px;
+  color: white;
+  font-family: @bold;
+  text-align: center;
+  background: @red;
+  border-radius: 12px;
+  -webkit-box-shadow: 0px 0px 6px 2px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 6px 2px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 2px 2px rgba(230,231,232,0.7);
 }
+
+.meeting-actions-arrow {
+  position: absolute;
+  z-index: 40;
+  display: none;
+  right: 0;
+  padding: 6px;
+  border: 1px solid rgba(255,255,255,0);
+  border-radius: 3px;
+  cursor: pointer;
+  &:hover {
+    path { fill: @gray_60; }
+    background: -webkit-linear-gradient(white, @gray_f8);
+    background:    -moz-linear-gradient(white, @gray_f8);
+    background:      -o-linear-gradient(white, @gray_f8);
+    background:         linear-gradient(white, @gray_f8);
+    border: 1px solid @border;
+  }
+}
+
+.meeting-actions-popover {
+  position: absolute;
+  z-index: 30;
+  width: 150px;
+  margin: 18px 0px 0px 98px;
+  padding: 6px 0px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  border-top-right-radius: 0;
+  -webkit-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+     -moz-box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+         -box-shadow: 0px 0px 1px 0px rgba(230,231,232,0.7);
+}
+
+.meeting-action {
+  padding: 7px 10px;
+  color: @purple_text;
+  a {
+    padding: 0 !important;
+    color: @purple_text;
+  }
+}
+
+.meeting-action.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.meeting-action-icon {
+  float: left;
+  margin-top: 1px;
+}
+
+.meeting-action-label { margin-left: 8px; }
+
+.meeting-subject {
+  position: relative;
+  padding-bottom: 10px;
+  border-bottom: 1px solid @border;
+}
+
+.meeting-subject-icon {
+  float: left;
+}
+
+.meeting-subject-text {
+  margin: 0px 26px;
+}
+
+.meeting-title {
+  position: relative;
+  z-index: 10;
+  height: 130px;
+  margin: -10px 0px -10px 0px;
+  padding-top: 10px;
+}
+
+.meeting-guest {
+  margin: 10px 0px 10px 0px;
+}
+
+.meeting-guest-circ {
+  float: left;
+  width: 28px;
+  height: 28px;
+  padding-top: 4px;
+  color: white;
+  font-family: @light;
+  font-size: 16px;
+  text-align: center;
+  background: @gray_40;
+  border-radius: 14px;
+}
+
+.meeting-guest-name {
+  margin: 3px 0px 0px 36px;
+  font-family: @bold;
+  font-size: 16px;
+}
+
+.meeting-footer {
+  position: relative;
+  padding-top: 10px;
+  border-top: 1px solid @border;
+}
+
+.meeting-status-row {
+  margin-bottom: 4px;
+  color: @gray_60;
+}
+
+.meeting-status-text { margin-left: 28px; }
+
+.status-icon { float: left; }
+
+.to-do-status-icon {
+
+}
+
+.reminder-status-icon {
+
+}
+
+.meeting-updated-row {
+  font-size: 12px;
+  color: @gray_60;
+}
+
+.inner-shadow-down {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:    -moz-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:      -o-linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+  background:         linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0));
+}
+
+.inner-shadow-up {
+  position: relative;
+  z-index: 20;
+  height: 10px;
+  background: -webkit-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:    -moz-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:      -o-linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+  background:         linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0.5));
+}
+
+
+/*** Meetings ***/
 
 .list-tabs > li > a {
-  font-size: 14px;
+  font-size: 16px;
+  margin-right: 30px;
   padding: 0;
-  margin-right: 20px;
+  padding-right: 15px;
 }
 
 .desktop-nav-tabs > li > a {
@@ -790,193 +1052,6 @@ i { color: @gray_60; }
   margin-left: 10px;
   margin-right: 10px;
   & > a { margin-right: 0; }
-}
-
-.task {
-  display: none;
-  padding: 20px 10px;
-  border-bottom: 1px solid;
-  border-bottom-color: @gray_10;
-  &:hover {
-    background: @gray_f8;
-    .archive path { fill: @gray_20; }
-  }
-}
-
-.task-details.manual {
-  margin-left: 20px; /* enable when dragging is ready */
-}
-
-.task-details.mobile {
-  margin-right: 20px;
-}
-
-.task-drag-div,
-.guest-drag-div {
-  float: left;
-  margin-right: 16px;
-  &:hover {
-    cursor: move;
-    .drag g circle { fill: @gray_40; }
-  }
-}
-
-.guest-drag-div {
-  margin-top: 13px;
-}
-
-.archive-div {
-  display: none;
-  float: right;
-  width: 12px;
-  height: 12px;
-  margin-top: 5px;
-  margin-left: 10px;
-  &:hover {
-    cursor: pointer;
-    .archive path { fill: @red; }
-  }
-}
-
-.archive {
-  display: block;
-  path { fill: white; }
-}
-
-.archive-div.mobile {
-  .archive-div { margin-left: 10px; }
-  .archive path { fill: @gray_20; }
-  &:hover {
-    cursor: pointer;
-    .archive path { fill: @red; }
-  }
-}
-
-.restore-div {
-  display: none;
-  float: right;
-}
-
-.completed-general-task      .archive-div,
-.completed-scheduling-task   .archive-div,
-.in-progress-general-task    .archive-div,
-.in-progress-scheduling-task .archive-div {
-  display: inline;
-}
-
-.archived-task .restore-div {
-  display: inline;
-}
-
-#all-tasks-tab-content        .task,
-#archive-tasks-tab-content    .archived-task,
-.in-progress-scheduling-tasks .in-progress-scheduling-task,
-.completed-scheduling-tasks   .completed-scheduling-task,
-.in-progress-general-tasks    .in-progress-general-task,
-.completed-general-tasks      .completed-general-task {
-  display: block;
-}
-
-.updated {
-  width: 10px;
-  height: 10px;
-  background: @orange;
-  border-radius: 5px;
-}
-
-.updated.updated-task {
-  float: left;
-  margin-top: 5px;
-  margin-right: 10px;
-}
-
-.updated.updated-nav {
-  float: right;
-  margin-top: 15px;
-}
-
-.new-label {
-  padding: 1px 4px;
-  padding-bottom: 0;
-  font-family: @bold;
-  font-size: 12px;
-  color: white;
-  background: @orange;
-  border-radius: 3px;
-}
-
-.new-label.new-label-task {
-  float: left;
-  margin-top: 2px;
-  margin-right: 10px;
-}
-
-.new-label.new-label-nav {
-  float: right;
-  margin-top: 10px;
-}
-
-.task-title {
-  display: block;
-  font-family: @bold;
-}
-
-.task-status,
-.task-date {
-  margin-top: 3px;
-  color: @gray_60;
-  font-size: 14px;
-}
-
-.verb { font-family: @bold; }
-
-.task-exec,
-.task-guest {
-  width: 100px;
-  text-align: center;
-}
-
-.task-exec.mobile,
-.task-guest.mobile {
-  width: 40px;
-  .task-exec-circ,
-  .task-guest-circ { margin-left: 0; }
-}
-
-.task-exec { float: left; }
-.task-guest { display: inline-block; }
-
-.task-exec-circ-line,
-.task-guest-circ-line {
-  width: 100%;
-}
-
-.task-exec-circ,
-.task-guest-circ {
-  width: 40px;
-  height: 40px;
-  margin-left: 30px;
-  padding-top: 8px;
-  border-radius: 20px;
-  text-align: center;
-  vertical-align: middle;
-  font-family: @light;
-  font-size: 18px;
-  color: white;
-  background: @gray_60;
-}
-
-.task-exec-name,
-.task-guest-name {
-  display: block;
-  margin-top: 6px;
-  font-family: @bold;
-  font-size: 12px;
-}
-
-.with-div {
-  float: left;
-  margin: 11px;
 }
 
 
@@ -1041,7 +1116,7 @@ i { color: @gray_60; }
 #sched-task {
   position: fixed;
   width: 100%;
-  top: 120px;
+  top: 105px;
   bottom: 0;
 }
 
@@ -1377,9 +1452,15 @@ i { color: @gray_60; }
 
 /*** Settings ***/
 
-.settings-title {
-  letter-spacing: 3px;
-  color: @gray_60;
+#settings-toggle {
+  position: fixed;
+  z-index: 2;
+  top: 60px;
+  right: 360px;
+  left: 60px;
+  padding: 36px 0px 15px 0px;
+  background-color: white;
+  border-bottom: 1px solid @border;
 }
 
 #settings-templates .settings-title {
@@ -1526,11 +1607,6 @@ i { color: @gray_60; }
   color: @gray_40;
 }
 
-.vertical-divider {
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
 .remove-email {
   color: @red;
   &:hover { color: @red_hover; }
@@ -1624,176 +1700,6 @@ i { color: @gray_60; }
 
 #merge-tag-list {
   margin-top: 20px;
-}
-
-
-/*** Places ***/
-
-#places {
-  margin-top: 10px;
-  border-top: 1px solid @gray_10;
-}
-
-.place-details { padding-left: 0; }
-
-.place-name {
-  font-family: @bold;
-  font-size: 18px;
-  color: @purple;
-  &:hover {
-    color: @purple_hover;
-    cursor: pointer;
-  }
-}
-
-.place-loc,
-.good-for-text {
-  font-size: 14px;
-  color: @gray_60;
-}
-
-.stats {
-  margin-top: 4px;
-  padding: 0;
-  line-height: 1.25;
-}
-
-.stat-div { width: 100%; }
-
-.stat {
-  float: left;
-  font-size: 32px;
-}
-
-.stat-text {
-  font-size: 14px;
-  color: @gray_60;
-}
-
-.last-visit,
-.visits {
-  padding-left: 0;
-}
-
-.time-ago-text {
-  display: inline-block;
-  margin-left: 8px;
-  padding-top: 8px;
-  font-size: 10px;
-  color: @gray_60;
-}
-
-.place-actions { padding: 0;}
-
-.place-actions.desktop { margin-top: 18px; }
-
-.place-action {
-  float: right;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-}
-
-.place-edit-div,
-.directions-div {
-  margin-left: 18px;
-  margin-bottom: 18px;
-}
-
-.place-edit,
-.directions,
-.yelp {
-  display: block;
-}
-
-.place-edit {
-  width: 30px;
-  height: 30px;
-  padding-top: 1px;
-  g { fill: @gray_20; }
-  &:hover g { fill: @purple; }
-}
-
-.directions {
-  path { fill: @gray_20; }
-  &:hover path { fill: @green; }
-}
-
-.yelp {
-  circle,
-  g path { fill: @gray_20; }
-  &:hover {
-    circle,
-    g path { fill: #c01001; }
-  }
-}
-
-#google-map-modal-body {
-  height: 400px;
-  width: 400px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* TODO style me */
-#edit-place-delete {
-  margin-top: 30px;
-}
-
-/*** New Task ***/
-
-#new-task-title {
-  color: @gray_60;
-  &:focus { color: @gray_90; }
-}
-
-#categorize {
-  margin-top: 40px;
-}
-
-.workflow-row {
-  cursor: pointer;
-  &:hover {
-    path.radio-outline { fill: @gray_40; }
-  }
-}
-
-#sched-workflow-icon {
-  float: left;
-  margin-top: 2px;
-}
-
-#gen-workflow-icon {
-  float: left;
-  margin-top: 3px;
-  margin-left: 1px;
-}
-
-#sched-workflow-text,
-#gen-workflow-text {
-  display: inline-block;
-  font-family: @bold;
-  font-size: 20px;
-}
-
-#sched-workflow-text {
-  margin-left: 10px;
-}
-
-#gen-workflow-text {
-  margin-left: 11px;
-}
-
-.workflow-details {
-  display: block;
-  margin-left: 42px;
-}
-
-#gen-task {
-  padding-top: 80px;
-  text-align: center;
 }
 
 
@@ -2075,6 +1981,27 @@ i { color: @gray_60; }
 }
 
 
+/*** Meeting Workflow ***/
+
+.meeting-workflow-toolbar {
+  position: fixed;
+  z-index: 2;
+  top: 63px;
+  right: 0;
+  left: 0;
+  padding-top: 10px;
+  background: white;
+  border-bottom: 1px solid @border;
+}
+
+.workflow-toggle {
+  float: left;
+  display: block;
+  margin-top: 6px;
+  border: none;
+}
+
+
 /*** Scheduling - Setup ***/
 
 .setup-section { padding: 5px 0px 15px 0px; }
@@ -2267,7 +2194,7 @@ i { color: @gray_60; }
   cursor: pointer;
   &:hover {
     background: @gray_20;
-    path.checkbox { stroke: @gray_40; }
+    path.outline { fill: @gray_40; }
   }
 }
 
@@ -2423,7 +2350,8 @@ i { color: @gray_60; }
   float: left;
 }
 
-.tbd {
+.tbd,
+.waiting-on-guest {
   font-family: @regular_italic;
 }
 

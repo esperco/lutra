@@ -34,7 +34,7 @@ var tzpicker = (function() {
 '''
     var icon = $("<img class='svg-block'/>")
       .appendTo(iconContainer);
-    svg.loadImg(icon, "/assets/img/globe.svg");
+    svg.loadImg(icon, "/assets/img/globe-modal.svg");
 
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);

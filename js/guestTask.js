@@ -455,7 +455,7 @@ var guestTask = function() {
       var checkboxContainer = $("<div class='checkbox-container'/>");
       var checkbox = $("<img/>");
       select.append(checkboxContainer.append(checkbox));
-      svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+      svg.loadImg(checkbox, "/assets/img/checkbox-lg.svg");
 
       var frownBox = $("<div id='frown'/>");
       var frown = $("<img/>");
@@ -490,7 +490,7 @@ var guestTask = function() {
         var checkboxContainer = $("<div class='checkbox-container'/>");
         var checkbox = $("<img/>");
         select.append(checkboxContainer.append(checkbox));
-        svg.loadImg(checkbox, "/assets/img/checkbox.svg");
+        svg.loadImg(checkbox, "/assets/img/checkbox-lg.svg");
 
         checkboxContainer.click(function() {
           if (slotView.hasClass("checkbox-selected")) {

@@ -602,16 +602,16 @@ var schedSetup = (function() {
 
   function updateButtons(ta) {
     if (sched.getAttendingGuests(ta).length === 0) {
-      $(".coordination-tab-select").addClass("disabled");
+      $(".show-coordination-tab").addClass("disabled");
       doneButton.addClass("disabled");
     } else {
-      $(".coordination-tab-select").removeClass("disabled");
+      $(".show-coordination-tab").removeClass("disabled");
       doneButton.removeClass("disabled");
     }
   }
 
   function disableButtons() {
-    $(".coordination-tab-select").addClass("disabled");
+    $(".show-coordination-tab").addClass("disabled");
     doneButton.addClass("disabled");
   }
 
@@ -632,10 +632,12 @@ var schedSetup = (function() {
   function saveGuests(ta, hosts, guestTbl, guestOptions) {
     updateGuests(ta, hosts, guestTbl, guestOptions);
     updateStage(ta);
-    return api.postTask(ta).done(function(ta) {
+    var async = api.postTask(ta).done(function(ta) {
       updateButtons(ta);
       observable.onTaskParticipantsChanged.notify(ta);
+      task.loadTaskTitle(ta);
     });
+    spinner.spin("Saving...", async);
   }
 
   function viewOfGuests(profs, ta, hosts) {

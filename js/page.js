@@ -6,6 +6,7 @@ var page = (function() {
     resetPassword: {},
     emailVerify: {},
     home: {},
+    settings: {},
     task: {},
     scheduling: {},
     respond: {},
@@ -24,6 +25,7 @@ var page = (function() {
     "reset-password":   {classes:["reset-password-page"]},
     "email-verify":     {classes:["email-verify-page"]},
     "home":             {classes:["home-page"]},
+    "settings":         {classes:["settings-page"]},
     "task":             {classes:["task-page"]},
     "scheduling":       {classes:["scheduling-page"]},
     "respond":          {classes:["respond-page"]},
@@ -58,6 +60,10 @@ var page = (function() {
   }
 
   function prepareLogin(redirPath) {
+    document.title = "Esper - Sign in";
+    $(".meeting-path").addClass("hide");
+    $(".path-to").addClass("hide");
+    $(".page-title").text("");
     $("#login-error-message")
       .removeClass("fadeIn")
       .addClass("hide");
@@ -232,7 +238,14 @@ var page = (function() {
     pageSelector.hideAll();
     home.load();
     goto_page("home");
-    display.updateHome();
+    util.focus();
+  };
+
+  mod.settings.load = function() {
+    pageSelector.hideAll();
+    settings.load();
+    goto_page("settings");
+    display.updateSettings();
     util.focus();
   };
 
@@ -276,7 +289,6 @@ var page = (function() {
     pageSelector.hideAll();
     goto_page("task");
     task.load(tid);
-    display.updateTask();
     util.focus();
   };
 
