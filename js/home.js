@@ -381,8 +381,8 @@ var home = (function() {
   }
 
   function showAllTasks(data) {
-    showActiveTasks(data[1].tasks);
-    header.load(data[1].tasks);
+    showActiveTasks(data.tasks);
+    header.load(data.tasks);
 
     observable.onTaskArchived    .observe("task-list", taskArchived);
     observable.onTaskCreated     .observe("task-list", taskUpdated);
@@ -397,8 +397,8 @@ var home = (function() {
     $("#tasks").children().remove();
     spinner.spin(
       "Loading tasks...",
-      deferred.join([api.loadRecentTasks().fail(status_.onError(404)),
-                     api.loadActiveTasks().fail(status_.onError(404))])
+      api.loadActiveTasks()
+        .fail(status_.onError(404))
         .done(showAllTasks)
     );
 

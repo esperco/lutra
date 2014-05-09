@@ -100,29 +100,6 @@ var header = (function() {
     return view;
   }
 
-  // Fill up a newly created ToDo list
-  function populateToDoList(tasks) {
-    var toDoList = toDoPopoverView.find(".to-do-list");
-    toDoList.children().remove();
-    var deferredToDos = list.filter_map(tasks, function(ta) {
-      if (sched.isToDoStep(ta) && ta.task_status.task_progress !== "Closed") {
-        return profile.profilesOfTaskParticipants(ta).then(function(profs) {
-          return viewOfToDo(profs, ta);
-        });
-      } else return null;
-    });
-    deferred.join(deferredToDos).done(function(toDos) {
-      if (toDos.length > 0) {
-        toDoCountView.text(toDos.length);
-        toDoCountView.show();
-      } else
-        toDoCountView.hide();
-      list.iter(toDos, function(toDo) {
-        toDoList.append(toDo);
-      });
-    });
-  };
-
   function addToDoCount(incr) {
     var cur = parseInt(toDoCountView.text());
     cur = cur + incr;
@@ -155,7 +132,7 @@ var header = (function() {
     }
   }
 
-  function viewOfToDoPopover() {
+  function viewOfToDoPopover(tasks) {
 '''
 <div #view>
   <div #caretContainer class="popover-caret to-do-caret"/>
@@ -175,6 +152,26 @@ var header = (function() {
     var caret = $("<img class='svg-block'/>")
       .appendTo(caretContainer);
     svg.loadImg(caret, "/assets/img/popover-caret.svg");
+
+    if (util.isNotNull(tasks)) {
+      var deferredToDos = list.filter_map(tasks, function(ta) {
+        if (sched.isToDoStep(ta) && ta.task_status.task_progress !== "Closed") {
+          return profile.profilesOfTaskParticipants(ta).then(function(profs) {
+            return viewOfToDo(profs, ta);
+          });
+        } else return null;
+      });
+      deferred.join(deferredToDos).done(function(toDos) {
+        if (toDos.length > 0) {
+          toDoCountView.text(toDos.length);
+          toDoCountView.show();
+        } else
+          toDoCountView.hide();
+        list.iter(toDos, function(toDo) {
+          toDoList.append(toDo);
+        });
+      });
+    }
 
     return view;
   }
@@ -216,7 +213,7 @@ var header = (function() {
     return view;
   }
 
-  function viewOfNotificationsPopover() {
+  function viewOfNotificationsPopover(tasks) {
 '''
 <div #view>
   <div #caretContainer class="popover-caret notifications-caret"/>
@@ -226,7 +223,7 @@ var header = (function() {
         <div class="header-popover-title">Notifications</div>
         <a class="mark-read link">Mark read</a>
       </div>
-      <ul #notificationsList class="notifications-list scrollable"/>
+      <ul #notifList class="notifications-list scrollable"/>
       <div class="see-all">
         <a class="link">See all</a>
       </div>
@@ -238,25 +235,24 @@ var header = (function() {
       .appendTo(caretContainer);
     svg.loadImg(caret, "/assets/img/popover-caret.svg");
 
-    return view;
-  }
+    if (util.isNotNull(tasks)) {
+      notifList.children().remove();
+      var unreadCount = 0;
+      list.iter(tasks, function(ta) {
+        var unread = ta.task_status_text.status_unread_messages;
+        if (unread > 0) {
+          unreadCount += unread;
+          notifList.append(viewOfNotification(ta));
+        }
+      });
+      if (unreadCount > 0) {
+        notificationsCountView.text(unreadCount);
+        notificationsCountView.show();
+      } else
+        notificationsCountView.hide();
+    }
 
-  function populateNotifications(tasks) {
-    var notifList = notificationsPopoverView.find(".notifications-list");
-    notifList.children().remove();
-    var unreadCount = 0;
-    list.iter(tasks, function(ta) {
-      var unread = ta.task_status_text.status_unread_messages;
-      if (unread > 0) {
-        unreadCount += unread;
-        notifList.append(viewOfNotification(ta));
-      }
-    });
-    if (unreadCount > 0) {
-      notificationsCountView.text(unreadCount);
-      notificationsCountView.show();
-    } else
-      notificationsCountView.hide();
+    return view;
   }
 
   function addNotifsCount(incr) {
@@ -269,6 +265,7 @@ var header = (function() {
       notificationsCountView.hide();
   }
 
+  // When a task changes, update the existing notifications list accordingly
   mod.updateNotifications = function(ta) {
     var notifList = notificationsPopoverView.find(".notifications-list");
     var notif = notifList.find("#notif-" + ta.tid);
@@ -393,6 +390,8 @@ var header = (function() {
     loggedIn.addClass("hide");
   }
 
+  /* You need to pass in the list of active tasks
+   * if you want the ToDos and notifications to be refreshed */
   mod.load = function(optTasks) {
 '''
 <div #view>
@@ -431,34 +430,29 @@ var header = (function() {
     accountPopover.append(viewOfAccountPopover());
     assisting.append(viewOfAssisting());
 
-    /* Create new ToDo list only if it doesn't already exist;
+    /* Create new ToDo list from optTasks only if it doesn't already exist;
      * otherwise, use the current one, saved in toDoPopoverView
      * and its count from toDoCountView */
-    if (toDoPopoverView === null) {
-      toDoPopoverView = viewOfToDoPopover();
-    }
-    toDoPopover.append(toDoPopoverView);
     if (toDoCountView === null)
       toDoCountView = toDoCount;
     else
       toDoCount.replaceWith(toDoCountView);
+    if (toDoPopoverView === null) {
+      toDoPopoverView = viewOfToDoPopover(optTasks);
+    }
+    toDoPopover.append(toDoPopoverView);
 
-    /* Create new notifications list only if it doesn't already exist;
+    /* Create new notif list from optTasks only if it doesn't already exist;
      * otherwise, use the current one, saved in notificationsPopoverView
      * and its count from notificationsCountView */
-    if (notificationsPopoverView === null) {
-      notificationsPopoverView = viewOfNotificationsPopover();
-    }
-    notificationsPopover.append(notificationsPopoverView);
     if (notificationsCountView === null)
       notificationsCountView = notificationsCount;
     else
       notificationsCount.replaceWith(notificationsCountView);
-
-    if (util.isNotNull(optTasks)) {
-      populateToDoList(optTasks);
-      populateNotifications(optTasks);
+    if (notificationsPopoverView === null) {
+      notificationsPopoverView = viewOfNotificationsPopover(optTasks);
     }
+    notificationsPopover.append(notificationsPopoverView);
 
     accountArrow
       .off("click")
