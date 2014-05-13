@@ -173,7 +173,13 @@ var home = (function() {
     subjectText
       .text(ta.task_status.task_title)
       .attr("href","#!task/" + ta.tid);
-
+    if (ta.task_priority_percentile >= 0.9){
+      subjectRow.css({"border-left":"5px solid red", "padding-left":"5px"});
+    } else if (ta.task_priority_percentile >= 0.6){
+      subjectRow.css({"border-left":"5px solid orange", "padding-left":"5px"});
+    } else {
+      subjectRow.css({"border-left":"5px solid white", "padding-left":"5px"});
+    }
     meetingRow.text(sched.getMeetingType(ta) + " with");
     var guests = sched.getAttendingGuests(ta);
     list.iter(guests, function(guest) {
@@ -356,6 +362,28 @@ var home = (function() {
     }
   }
 
+  function cmpScore(task1,task2) {
+    //  log(task1.task_priority_percentile, task2.task_priority_percentile);
+    if (task1.task_priority_percentile < task2.task_priority_percentile)
+      return 1;
+    if (task1.task_priority_percentile > task2.task_priority_percentile)
+      return -1;
+    return 0;
+  }
+
+  function cmpUpdate(task1,task2) {
+    if (task1.task_lastmod < task2.task_lastmod)
+      return 1;
+    if (task1.task_lastmod > task2.task_lastmod)
+      return -1;
+    return 0;
+  }
+
+  function sortTasksBy(active,cmp) {
+    log('sorting tasks');
+    active.sort(cmp);
+  }
+
   function showActiveTasks(active) {
     var view = $("#tasks");
     setTaskViewClass(view.children(), "archived-task"); // XXX Why??
@@ -375,6 +403,22 @@ var home = (function() {
         }
       });
     });
+    $(".sort-task-update-btn")
+          .unbind("click")
+          .click(function () {
+              log('sort by update time');
+              sortTasksBy(active, cmpUpdate);
+              $("#tasks").children().remove();
+              showActiveTasks(active);
+          });
+      $(".sort-task-btn")
+          .unbind("click")
+          .click(function () {
+              log('sort by score');
+              sortTasksBy(active, cmpScore);
+              $("#tasks").children().remove();
+              showActiveTasks(active);
+          });
   }
 
   function showAllTasks(data) {
@@ -406,6 +450,8 @@ var home = (function() {
         $('.show-finalized-meetings').removeClass('active');
         $('.show-canceled-meetings').removeClass('active');
         $(".new-meeting-btn").show();
+        $(".sort-task-btn").show();
+        $(".sort-task-update-btn").show();
         $('#tasks')
           .attr('class', 'clearfix pending-scheduling-tasks task-list');
       });
@@ -416,6 +462,8 @@ var home = (function() {
         $('.show-finalized-meetings').addClass('active');
         $('.show-canceled-meetings').removeClass('active');
         $(".new-meeting-btn").hide();
+        $(".sort-task-btn").hide();
+        $(".sort-task-update-btn").hide();
         $('#tasks')
           .attr('class', 'clearfix finalized-scheduling-tasks task-list');
       });
@@ -426,6 +474,8 @@ var home = (function() {
         $('.show-finalized-meetings').removeClass('active');
         $('.show-canceled-meetings').addClass('active');
         $(".new-meeting-btn").hide();
+        $(".sort-task-btn").hide();
+        $(".sort-task-update-btn").hide();
         $('#tasks')
           .attr('class', 'clearfix canceled-scheduling-tasks task-list');
       });
