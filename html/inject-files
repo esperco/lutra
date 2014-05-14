@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+usage () {
+    echo "\
+Usage: $0 FILE1 FILE2 ... < INPUT
+Inject the contents of files FILE1, FILE2, etc. into INPUT
+where the strings @@FILE1@@, @@FILE2@@, etc. occur."
+}
+
+subst() {
+    name=$1
+    template=$2
+    insert="$(<$name)"
+    gawk -v x="$insert" "{gsub(/@@$name@@/,x);}1" $template
+}
+
+cat > tmp.html
+for x in $*; do
+    subst $x tmp.html > tmp-out.html
+    mv tmp-out.html tmp.html
+done
+cat tmp.html
+rm tmp.html
