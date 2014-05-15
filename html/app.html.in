@@ -24,10 +24,6 @@
 
   <body>
 
-    <div id="app-header" class="app-header">
-      @@header.html@@
-    </div>
-
     <div id="loading">
       <div id="loading-box">
         <img id="loading-icon" src="/assets/img/loading.gif">
@@ -90,9 +86,7 @@
     </div>
 
     <div id="home-page" class="hide home-page">
-      <div id="meetings-page">
-        @@meetings.html@@
-      </div>
+      @@onboarding.html@@
     </div>
 
     <div id="settings-page" class="hide settings-page">
