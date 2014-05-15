@@ -407,12 +407,12 @@ var api = (function () {
 
   /*** New Esper Beta (wolverine) ***/
 
-  function apiBPrefix() {
-    return "/api/b/" + login.data.uid;
+  function apiPrefix() {
+    return "/api/" + login.data.uid;
   };
 
   mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
-    var url = apiBPrefix() + "/google/auth/info";
+    var url = apiPrefix() + "/google/auth/info";
     if (util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
@@ -420,7 +420,7 @@ var api = (function () {
   };
 
   mod.postGoogleAuthRevoke = function() {
-    var url = apiBPrefix() + "/google/auth/revoke";
+    var url = apiPrefix() + "/google/auth/revoke";
     return jsonHttpPost(url, "");
   };
 
