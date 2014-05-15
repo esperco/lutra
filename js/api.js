@@ -404,5 +404,25 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(template));
   };
 
+
+  /*** New Esper Beta (wolverine) ***/
+
+  function apiBPrefix() {
+    return "/api/b/" + login.data.uid;
+  };
+
+  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
+    var url = apiBPrefix() + "/google/auth/info";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  };
+
+  mod.postGoogleAuthRevoke = function() {
+    var url = apiBPrefix() + "/google/auth/revoke";
+    return jsonHttpPost(url, "");
+  };
+
   return mod;
 })();

@@ -14,6 +14,7 @@ HTML_INCLUDES = \
   request-password.html \
   reset-password.html \
   settings.html \
+  onboarding.html \
   task-header.html
 
 

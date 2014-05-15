@@ -1,7 +1,7 @@
 #! /bin/sh
 set -e
 
-echo "INSTALL mink ($*)"
+echo "INSTALL otter ($*)"
 TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
 
 case "$1" in
