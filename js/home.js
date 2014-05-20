@@ -564,22 +564,82 @@ var home = (function() {
   <a href="#!logout">Log out of Esper</a>
 </div>
 <div #revoke>
-  <a href="#">Revoke Esper's access to my Google account</a>
+  <a href="#">Revoke Esper access to my Google account</a>
+</div>
+<div #calendarList> Calendars found:</div>
+<div #sendAgenda>
+  <div #agendaDrafter><a href="#">Send Agenda to the Exec</a></div>
+  <span> Date: <input #agendaDatePicker type="text"/> </span>
+<input type="hidden" name="selectedCalendar" value="" />
 </div>
 '''
     var view = $("#onboarding-interface");
     view.children().remove();
+
+    function agendaDate(date,view){
+        log("Selected");
+        //calendarView.fullCalendar('gotoDate',date);
+    }
+
+    sendAgenda.addClass("hide");
+    agendaDatePicker.datepicker({inline: true,
+                                 currentText: "Today",
+                                 gotoCurrent: true});
+    agendaDatePicker.css("width","100px");
+    var calList = $("#calendarList");
 
     revoke.click(function() {
       api.postGoogleAuthRevoke().done(revoke.remove());
       return false;
     });
 
+    function diplayCalendarChoice(data) {
+      var calendarlist = data.items.map(function(x){ return x.summary });
+      list.iter(calendarlist, function(x) {
+'''
+<input #calendarRadio type="radio" name="calendar">
+<label #calendarLabel></label>
+'''
+            calendarRadio.attr("id", "calendar-" + x);
+            calendarLabel.attr("value", x);
+            calendarLabel.attr("for", "calendar-" + x);
+            calendarRadio.attr("value", x);
+            calendarLabel.append(x);
+            calendarList.append(calendarRadio);
+            calendarList.append(calendarLabel);
+            log(x + " appended");
+        });
+        calendarList.select(0);
+        view.append(sendAgenda);
+        view.append(calendarList);
+
+        calendarList.change(function(event) {
+            log("change");
+            log($("#calendarLabel").val());
+            log($(this).val()); //.attr("value"));
+            $("selectedCalendar").val($(this).val());
+        });
+
+        sendAgenda.removeClass("hide");
+        calendarList.button();
+    }
+
+    agendaDrafter.click(function() {
+      var date = agendaDatePicker.datepicker("getDate");
+      if (date && $("selectedCalendar").val() != ""){
+        log("calendar is " + $("selectedCalendar").val());
+        log("date is " + date);
+      };
+    });
+
     api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
+        //api.getEmailSyncStart();
         view.append(logout);
         if (info.has_token) view.append(revoke);
         else window.location = info.google_auth_url;
+        api.getCalendarList(login.leader(), null)
+              .done(diplayCalendarChoice);
       });
   };
 

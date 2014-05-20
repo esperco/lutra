@@ -284,6 +284,14 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(calRequest));
   };
 
+  mod.getCalendarList = function(uid2, optAuthLandingUrl) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/list";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  }
   mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2 + "/info";
@@ -423,6 +431,11 @@ var api = (function () {
     var url = apiPrefix() + "/google/auth/revoke";
     return jsonHttpPost(url, "");
   };
+
+  mod.getEmailSyncStart = function() {
+    var url = apiPrefix() + "/email/sync/start/";
+    return jsonHttpGet(url);
+  }
 
   return mod;
 })();
