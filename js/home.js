@@ -578,23 +578,23 @@ var home = (function() {
   }
 
   function eventToAgenda(event){
-      var summary = event.summary;
+      var summary = "• " + event.summary + "";
 
       var time = "";
       if(util.isNotNull(event.start.dateTime)){
           var d1 = date.ofString(event.start.dateTime);
           var d2 = date.ofString(event.end.dateTime);
-          time = "\n - When: " + date.hourRange(d1,d2);
+          time = "\n → " + date.hourRange(d1,d2);
       }
       var location = "";
       if(util.isNotNull(event.location)){
-          location = "\n - Where: " + event.location
+          location = "\n → " + event.location
       }
       var description = "";
       if(util.isNotNull(event.description)){
-          description = "\n - What: " + event.description
+          description = "\n → " + event.description
       }
-      return ("* " + summary + time + location + description + '\n');
+      return (summary + time + location + description + "\n\n");
   }
 
 
@@ -611,12 +611,12 @@ var home = (function() {
     dayEvents = list.sort(dayEvents, cmpEvents);
     shortEvents = list.sort(shortEvents, cmpEvents);
     var agenda = "";
-    if(dayEvents.length > 0) { agenda = "Day events\n"; }
+    if(dayEvents.length > 0) { agenda = "Day events\n\n"; }
     list.iter(dayEvents,function(event){
       agenda = agenda + eventToAgenda(event);
     });
     if(shortEvents.length > 0) {
-        agenda = agenda + "Schedule \n";
+        agenda = agenda + "Detailed Schedule\n\n";
         list.iter(shortEvents,function(event){
             agenda = agenda + eventToAgenda(event);
         });
@@ -686,22 +686,32 @@ var home = (function() {
     }
 
     agendaDrafter.click(function() {
-      var date = agendaDatePicker.datepicker("getDate");
-      if (date && mod.calendar != ""){
+      var chosendate = agendaDatePicker.datepicker("getDate");
+      if (chosendate && mod.calendar != ""){
         log("calendar is " + mod.calendar);
-        log("date is " + date + " or " + date.getTime());
-        api.getCalendarAgenda(login.leader(), mod.calendar.id, date.toISOString()).
+        log("date is " + chosendate + " or " + chosendate.getTime());
+        api.getCalendarAgenda(login.leader(),
+                              mod.calendar.id,
+                              chosendate.toISOString()).
               done(function (eventlist) {
-                  log(eventlist);
+                  //log(eventlist);
                   var agenda = buildAgenda(date,eventlist.items);
-                  var url = "https://mail.google.com/mail?view=cm&tf=0";
+                  var url = "https://mail.google.com/mail?view=cm&cs=wh&tf=0";
                   api.getEmails(login.leader(), login.getTeam().teamid)
                       .done(function (x) {
                         log(x.account_emails[0].email);
+                        if (encodeURIComponent(agenda).length > 1850) {
+                            while(encodeURIComponent(agenda).length > 1850) {
+                                log("Long agenda detected! Shortening ...");
+                                agenda = agenda.substring(0,agenda.length-10);
+                            };
+                            agenda = agenda + " [...]";
+                        }
                         open(url + "&to="
                              + encodeURIComponent(x.account_emails[0].email)
-                             + "&su=" 
-                             + encodeURIComponent("Agenda of the day")
+                             + "&su="
+                             + encodeURIComponent("Agenda for "
+                                                  + date.dateOnly(chosendate))
                              + "&body="
                              + encodeURIComponent(agenda));
                       });
