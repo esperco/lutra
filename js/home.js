@@ -561,18 +561,18 @@ var home = (function() {
   function cmpEvents(event1,event2) {
     if ((util.isNotNull(event1.start.dateTime) &&
          util.isNotNull(event2.start.dateTime) &&
-         event1.start.dateTime < event2.start.dateTime) ||
+         event1.start.dateTime > event2.start.dateTime) ||
         (util.isNotNull(event1.start.date) &&
          util.isNotNull(event2.start.date) &&
-         event1.start.date < event2.start.date)
+         event1.start.date > event2.start.date)
        )
       return 1;
     if ((util.isNotNull(event1.start.dateTime) &&
          util.isNotNull(event2.start.dateTime) &&
-         event1.start.dateTime > event2.start.dateTime) ||
+         event1.start.dateTime < event2.start.dateTime) ||
         (util.isNotNull(event1.start.date) &&
          util.isNotNull(event2.start.date) &&
-         event1.start.date > event2.start.date))
+         event1.start.date < event2.start.date))
       return -1;
     return 0;
   }
@@ -581,14 +581,14 @@ var home = (function() {
       var summary = event.summary;
 
       var time = "";
-      if(util.isNotNull(event.start.datetime)){
-          time = "\n - When: "
-          time = time + event.start.datetime.toLocaleTimeString();
-          time = time + ' to ' + event.end.datetime.toLocaleTimeString();
+      if(util.isNotNull(event.start.dateTime)){
+          var d1 = date.ofString(event.start.dateTime);
+          var d2 = date.ofString(event.end.dateTime);
+          time = "\n - When: " + date.hourRange(d1,d2);
       }
       var location = "";
       if(util.isNotNull(event.location)){
-          location = "\n - Where: " + event.description
+          location = "\n - Where: " + event.location
       }
       var description = "";
       if(util.isNotNull(event.description)){
@@ -602,12 +602,10 @@ var home = (function() {
     var dayEvents = [];
     var shortEvents = [];
     list.iter(events,function(event){
-      if(util.isNotNull(event.start.dateTime) && event.start.dateTime <= day){
-        dayEvents.push(event);
-      } else if(util.isNotNull(event.start.date) && event.start.date <= day){
-        dayEvents.push(event);
-      } else {
+      if(util.isNotNull(event.start.dateTime)){
         shortEvents.push(event);
+      } else {
+        dayEvents.push(event);
       }
     });
     dayEvents = list.sort(dayEvents, cmpEvents);
@@ -618,7 +616,7 @@ var home = (function() {
       agenda = agenda + eventToAgenda(event);
     });
     if(shortEvents.length > 0) {
-        agenda = agenda + "Events\n";
+        agenda = agenda + "Schedule \n";
         list.iter(shortEvents,function(event){
             agenda = agenda + eventToAgenda(event);
         });
@@ -694,13 +692,18 @@ var home = (function() {
         log("date is " + date + " or " + date.getTime());
         api.getCalendarAgenda(login.leader(), mod.calendar.id, date.toISOString()).
               done(function (eventlist) {
+                  log(eventlist);
                   var agenda = buildAgenda(date,eventlist.items);
                   var url = "https://mail.google.com/mail?view=cm&tf=0";
-                  api.getEmails(login.leader(), login.getTeam)
-                      .then(function (email) {
-                          log(email);
-                         open(url + "&to=" + email + "&su=Agenda&body="
-                              + encodeURIComponent(agenda));
+                  api.getEmails(login.leader(), login.getTeam().teamid)
+                      .done(function (x) {
+                        log(x.account_emails[0].email);
+                        open(url + "&to="
+                             + encodeURIComponent(x.account_emails[0].email)
+                             + "&su=" 
+                             + encodeURIComponent("Agenda of the day")
+                             + "&body="
+                             + encodeURIComponent(agenda));
                       });
               });
       };
