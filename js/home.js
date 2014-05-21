@@ -564,12 +564,11 @@ var home = (function() {
   <a href="#!logout">Log out of Esper</a>
 </div>
 <div #revoke>
-  <a href="#">Revoke Esper access to my Google account</a>
+  <a href="#">Revoke Esper's access to my Google account</a>
 </div>
 '''
     var view = $("#onboarding-interface");
     view.children().remove();
-    mod.calendar = {};
 
     revoke.click(function() {
       api.postGoogleAuthRevoke().done(revoke.remove());
@@ -578,7 +577,6 @@ var home = (function() {
 
     api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
-        //api.getEmailSyncStart();
         view.append(logout);
         if (info.has_token) view.append(revoke);
         else window.location = info.google_auth_url;

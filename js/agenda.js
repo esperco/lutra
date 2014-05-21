@@ -5,6 +5,7 @@
 var agenda = (function() {
   var mod = [];
 
+  // Global variable to record which calendar is chosen
   mod.calendar = {};
 
   // Compares two events by starting time
@@ -89,6 +90,7 @@ var agenda = (function() {
     return calendarList;
   }
 
+  // Creates a date picker and a link to send the agenda
   function createForm () {
 '''
 <div #sendAgenda>
@@ -134,6 +136,7 @@ var agenda = (function() {
     return sendAgenda;
   }
 
+  // Create a radio button for the list of calendars
   function diplayCalendarChoice(data) {
 '''
 <div #calendarList class="chat-actions clearfix">
@@ -162,6 +165,8 @@ var agenda = (function() {
     return calendarList;
   }
 
+  // appends to view a list of calendars, a date picker
+  // and a link to send agenda
   mod.create = function (view) {
 '''
 <div #sendAgenda class="agenda-send" />

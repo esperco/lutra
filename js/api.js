@@ -438,10 +438,5 @@ var api = (function () {
     return jsonHttpPost(url, "");
   };
 
-  mod.getEmailSyncStart = function() {
-    var url = apiPrefix() + "/email/sync/start/";
-    return jsonHttpGet(url);
-  }
-
   return mod;
 })();
