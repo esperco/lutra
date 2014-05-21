@@ -83,7 +83,7 @@ COMMON_SOURCES = \
 APP_SOURCES = \
   login.js \
   api.js \
-  sample.js \
+  signin.js \
   adder.js \
   calcache.js \
   calpicker.js \

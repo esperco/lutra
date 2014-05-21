@@ -74,9 +74,8 @@ var api = (function () {
 
   // API
 
-  mod.login = function(email, password) {
-    var login_request = { email: email, password: password };
-    return jsonHttpPost("/api/login", JSON.stringify(login_request));
+  mod.getLoginInfo = function() {
+    return jsonHttpGet("/api/login/" + login.me() + "/info");
   };
 
   mod.requestPassword = function(email) {

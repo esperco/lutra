@@ -564,7 +564,7 @@ var home = (function() {
   <a href="#!logout">Log out of Esper</a>
 </div>
 <div #revoke>
-  <a href="#">Revoke Esper's access to my Google account</a>
+  <a href="#">Revoke Esper&quot;s access to my Google account</a>
 </div>
 '''
     var view = $("#onboarding-interface");
