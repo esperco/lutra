@@ -103,21 +103,16 @@ var agenda = (function() {
     agendaDrafter.click(function() {
       var chosendate = agendaDatePicker.datepicker("getDate");
       if (chosendate && mod.calendar != ""){
-        log("calendar is " + mod.calendar);
-        log("date is " + chosendate + " or " + chosendate.getTime());
         api.getCalendarAgenda(login.leader(),
                               mod.calendar.id,
                               chosendate.toISOString())
           .done(function (eventlist) {
-            //log(eventlist);
             var agenda = buildAgenda(date,eventlist.items);
             var url = "https://mail.google.com/mail?view=cm&cs=wh&tf=0";
             api.getEmails(login.leader(), login.getTeam().teamid)
               .done(function (x) {
-                log(x.account_emails[0].email);
                 if (encodeURIComponent(agenda).length > 1850) {
                   while(encodeURIComponent(agenda).length > 1850) {
-                    log("Long agenda detected! Shortening ...");
                     agenda = agenda.substring(0,agenda.length-10);
                   };
                   agenda = agenda + " [...]";
@@ -156,9 +151,7 @@ var agenda = (function() {
       calendarLabel.append(x.summary);
       calendarList.append(calendarRadio);
       calendarList.append(calendarLabel);
-      log(x.summary + " appended");
       calendarRadio.change(function(event) {
-        log("radio change to" + x.summary);
         mod.calendar = x;
       });
     });
@@ -175,7 +168,6 @@ var agenda = (function() {
       .done(function (data) {
         var calListView = diplayCalendarChoice(data);
         sendAgenda.append(calListView);
-        //calListView.button();
         var agendaForm = createForm();
         sendAgenda.append(agendaForm);
         view.append(sendAgenda);
