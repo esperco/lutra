@@ -292,6 +292,12 @@ var api = (function () {
     }
     return jsonHttpGet(url);
   }
+  mod.getCalendarAgenda = function(uid2, calendar_id, time) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/agenda/"
+          + calendar_id + "/" + time;
+    return jsonHttpGet(url);
+  }
   mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2 + "/info";

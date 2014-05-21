@@ -558,6 +558,76 @@ var home = (function() {
     $(".page-title").text("Meetings");
   }
 
+  function cmpEvents(event1,event2) {
+    if ((util.isNotNull(event1.start.dateTime) &&
+         util.isNotNull(event2.start.dateTime) &&
+         event1.start.dateTime < event2.start.dateTime) ||
+        (util.isNotNull(event1.start.date) &&
+         util.isNotNull(event2.start.date) &&
+         event1.start.date < event2.start.date)
+       )
+      return 1;
+    if ((util.isNotNull(event1.start.dateTime) &&
+         util.isNotNull(event2.start.dateTime) &&
+         event1.start.dateTime > event2.start.dateTime) ||
+        (util.isNotNull(event1.start.date) &&
+         util.isNotNull(event2.start.date) &&
+         event1.start.date > event2.start.date))
+      return -1;
+    return 0;
+  }
+
+  function eventToAgenda(event){
+      var summary = event.summary;
+
+      var time = "";
+      if(util.isNotNull(event.start.datetime)){
+          time = "\n - When: "
+          time = time + event.start.datetime.toLocaleTimeString();
+          time = time + ' to ' + event.end.datetime.toLocaleTimeString();
+      }
+      var location = "";
+      if(util.isNotNull(event.location)){
+          location = "\n - Where: " + event.description
+      }
+      var description = "";
+      if(util.isNotNull(event.description)){
+          description = "\n - What: " + event.description
+      }
+      return ("* " + summary + time + location + description + '\n');
+  }
+
+
+  function buildAgenda(day, events) {
+    var dayEvents = [];
+    var shortEvents = [];
+    list.iter(events,function(event){
+      if(util.isNotNull(event.start.dateTime) && event.start.dateTime <= day){
+        dayEvents.push(event);
+      } else if(util.isNotNull(event.start.date) && event.start.date <= day){
+        dayEvents.push(event);
+      } else {
+        shortEvents.push(event);
+      }
+    });
+    dayEvents = list.sort(dayEvents, cmpEvents);
+    shortEvents = list.sort(shortEvents, cmpEvents);
+    var agenda = "";
+    if(dayEvents.length > 0) { agenda = "Day events\n"; }
+    list.iter(dayEvents,function(event){
+      agenda = agenda + eventToAgenda(event);
+    });
+    if(shortEvents.length > 0) {
+        agenda = agenda + "Events\n";
+        list.iter(shortEvents,function(event){
+            agenda = agenda + eventToAgenda(event);
+        });
+    } else {
+        agenda = agenda + "\nNo scheduled events for today";
+    }
+    return agenda;
+  }
+
   mod.load = function() {
 '''
 <div #logout>
@@ -566,20 +636,15 @@ var home = (function() {
 <div #revoke>
   <a href="#">Revoke Esper access to my Google account</a>
 </div>
-<div #calendarList> Calendars found:</div>
+<div #calendarList class="chat-actions clearfix"> Calendars found:</div>
 <div #sendAgenda>
-  <div #agendaDrafter><a href="#">Send Agenda to the Exec</a></div>
   <span> Date: <input #agendaDatePicker type="text"/> </span>
-<input type="hidden" name="selectedCalendar" value="" />
+  <div #agendaDrafter><a href="#">Send Agenda to the Exec</a></div>
 </div>
 '''
     var view = $("#onboarding-interface");
     view.children().remove();
-
-    function agendaDate(date,view){
-        log("Selected");
-        //calendarView.fullCalendar('gotoDate',date);
-    }
+    mod.calendar = {};
 
     sendAgenda.addClass("hide");
     agendaDatePicker.datepicker({inline: true,
@@ -594,41 +659,50 @@ var home = (function() {
     });
 
     function diplayCalendarChoice(data) {
-      var calendarlist = data.items.map(function(x){ return x.summary });
+      var calendarlist = data.items;
       list.iter(calendarlist, function(x) {
 '''
 <input #calendarRadio type="radio" name="calendar">
 <label #calendarLabel></label>
 '''
-            calendarRadio.attr("id", "calendar-" + x);
-            calendarLabel.attr("value", x);
-            calendarLabel.attr("for", "calendar-" + x);
-            calendarRadio.attr("value", x);
-            calendarLabel.append(x);
+            calendarRadio.attr("id", "calendar-" + x.id);
+            calendarLabel.attr("value", x.summary);
+            calendarLabel.attr("for", "calendar-" + x.id);
+            calendarRadio.attr("value", x.summary);
+            calendarLabel.append(x.summary);
             calendarList.append(calendarRadio);
             calendarList.append(calendarLabel);
-            log(x + " appended");
+            log(x.summary + " appended");
+          calendarRadio.change(function(event) {
+            log("radio change to" + x.summary);
+            mod.calendar = x;
+          });
         });
-        calendarList.select(0);
-        view.append(sendAgenda);
         view.append(calendarList);
+        view.append(sendAgenda);
+        //view.append(selectedCalendar);
 
-        calendarList.change(function(event) {
-            log("change");
-            log($("#calendarLabel").val());
-            log($(this).val()); //.attr("value"));
-            $("selectedCalendar").val($(this).val());
-        });
-
+        //var radioChoice = calendarChoice(calendarlist);
         sendAgenda.removeClass("hide");
         calendarList.button();
     }
 
     agendaDrafter.click(function() {
       var date = agendaDatePicker.datepicker("getDate");
-      if (date && $("selectedCalendar").val() != ""){
-        log("calendar is " + $("selectedCalendar").val());
-        log("date is " + date);
+      if (date && mod.calendar != ""){
+        log("calendar is " + mod.calendar);
+        log("date is " + date + " or " + date.getTime());
+        api.getCalendarAgenda(login.leader(), mod.calendar.id, date.toISOString()).
+              done(function (eventlist) {
+                  var agenda = buildAgenda(date,eventlist.items);
+                  var url = "https://mail.google.com/mail?view=cm&tf=0";
+                  api.getEmails(login.leader(), login.getTeam)
+                      .then(function (email) {
+                          log(email);
+                         open(url + "&to=" + email + "&su=Agenda&body="
+                              + encodeURIComponent(agenda));
+                      });
+              });
       };
     });
 
