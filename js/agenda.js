@@ -42,9 +42,10 @@ var agenda = (function() {
       location = "\n → " + event.location
     }
     var description = "";
-    if(util.isNotNull(event.description)){
-      description = "\n → " + event.description
-    }
+    // Remove description for now as it makes the agenda too long
+    //if(util.isNotNull(event.description)){
+    //  description = "\n → " + event.description
+    //}
     return (summary + time + location + description + "\n\n");
   }
 
