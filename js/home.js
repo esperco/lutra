@@ -578,8 +578,12 @@ var home = (function() {
     api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
         view.append(logout);
-        if (info.has_token) view.append(revoke);
-        else window.location = info.google_auth_url;
+        if (info.has_token) {
+          view.append(revoke);
+          agenda.create(view);
+        } else {
+          window.location = info.google_auth_url;
+        }
       });
   };
 

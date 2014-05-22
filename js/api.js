@@ -284,6 +284,20 @@ var api = (function () {
     return jsonHttpPost(url, JSON.stringify(calRequest));
   };
 
+  mod.getCalendarList = function(uid2, optAuthLandingUrl) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/list";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  }
+  mod.getCalendarAgenda = function(uid2, calendar_id, time) {
+    var url = apiSPrefix() + "/calendar/"
+      + login.getTeam().teamid + "/" + uid2 + "/agenda/"
+          + calendar_id + "/" + time;
+    return jsonHttpGet(url);
+  }
   mod.getCalendarInfo = function(uid2, optAuthLandingUrl) {
     var url = apiSPrefix() + "/calendar/"
       + login.getTeam().teamid + "/" + uid2 + "/info";
