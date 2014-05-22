@@ -103,7 +103,7 @@ var agenda = (function() {
 
     agendaDrafter.click(function() {
       var chosendate = agendaDatePicker.datepicker("getDate");
-      if (chosendate && mod.calendar != ""){
+      if (chosendate && mod.calendar != {}){
         api.getCalendarAgenda(login.leader(),
                               mod.calendar.id,
                               chosendate.toISOString())
