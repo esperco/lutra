@@ -35,15 +35,44 @@
 var signin = (function() {
   var mod = [];
 
+  function requestGoogleAuth(url) {
+    window.location = url;
+  }
+
   function displayLoginLinks() {
+'''
+<button #button
+        class="google-sign-in"/>
+'''
     var view = $("#onboarding-interface");
     view.children().remove();
     view.removeClass("hide");
+    view.append(_view);
+  }
 
-    // TODO html for Google+ signin button + link to waiting list
+  function displayLogoutLinks() {
 '''
+<div #logout>
+  <a href="#!logout">Log out of Esper</a>
+</div>
+<div #revoke>
+  <a href="#">Revoke Esper&quot;s access to my Google account</a>
+</div>
+'''
+    var view = $("#onboarding-interface");
+    view.children().remove();
 
-'''
+    revoke.click(function() {
+      api.postGoogleAuthRevoke().done(revoke.remove());
+      return false;
+    });
+
+    api.getGoogleAuthInfo(document.URL)
+      .done(function(info) {
+        view.append(logout);
+        if (info.has_token) view.append(revoke);
+        else window.location = info.google_auth_url;
+      });
   }
 
   function checkInviteCode(optInviteCode) {
@@ -81,21 +110,35 @@ var signin = (function() {
   }
 
   function checkGooglePermissions() {
+    return api.getGoogleAuthInfo(document.URL)
+      .then(function(info) {
+        if (info.has_token)
+          return true;
+        else {
+          requestGoogleAuth(info.google_auth_url);
+          return false;
+        }
+      });
   }
 
   function completeTeam() {
+    // TODO: return successfully only once the team is complete
+    return deferred.fail();
   }
 
   mod.signin = function(whenDone, optInviteCode) {
     loginOrSignup(optInviteCode)
-      .then(function() {
-        return checkGooglePermissions();
-      })
-      .then(function() {
-        return completeTeam();
-      })
-      .then(function() {
-        whenDone();
+      .done(function() {
+        checkGooglePermissions()
+          .done(function(ok) {
+            if (ok) {
+              displayLogoutLinks();
+              completeTeam()
+                .done(function() {
+                  whenDone();
+                })
+            }
+          });
       });
   };
 

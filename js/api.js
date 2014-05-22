@@ -407,7 +407,11 @@ var api = (function () {
   /*** New Esper Beta (wolverine) ***/
 
   function apiPrefix() {
-    return "/api/" + login.data.uid;
+    var uid = login.data.uid;
+    if (! util.isString(uid)) {
+      uid = "UNDEFINED";
+    }
+    return "/api/" + uid;
   };
 
   mod.getGoogleAuthInfo = function(optAuthLandingUrl) {

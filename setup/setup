@@ -92,6 +92,10 @@ git pull --ff-only origin master
 make
 make PREFIX="$ROOT" install
 
+# Google sign-in button
+cd "$ROOT"/google-buttons
+unzip gplus-assets.zip
+
 
 # Don't want my Javascript files to be executable for no reason
 chmod a-x "$ROOT"/js/*.js
