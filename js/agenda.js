@@ -6,7 +6,7 @@ var agenda = (function() {
   var mod = [];
 
   // Global variable to record which calendar is chosen
-  mod.calendar = {};
+  mod.calendar = null;
 
   // Compares two events by starting time
   function cmpEvents(event1,event2) {
@@ -30,23 +30,23 @@ var agenda = (function() {
 
   // Converts an event to an agenda item
   function eventToAgenda(event){
-    var summary = "• " + event.summary;
-    var time = "";
+    var summary = " - " + event.summary;
+    var time = "All-day";
     if (util.isNotNull(event.start.dateTime)) {
       var d1 = date.ofString(event.start.dateTime);
       var d2 = date.ofString(event.end.dateTime);
-      time = "\n → " + date.hourRange(d1,d2);
+      time = date.utcToLocalTimeOnly(d1);
     }
     var location = "";
     if(util.isNotNull(event.location)){
-      location = "\n → " + event.location
+      location = "\n- " + event.location
     }
     var description = "";
     // Remove description for now as it makes the agenda too long
     //if(util.isNotNull(event.description)){
     //  description = "\n → " + event.description
     //}
-    return (summary + time + location + description + "\n\n");
+    return (time + summary + location + description + "\n\n");
   }
 
   // builds an agenda (as a string) from a list of events
@@ -65,17 +65,17 @@ var agenda = (function() {
     dayEvents = list.sort(dayEvents, cmpEvents);
     shortEvents = list.sort(shortEvents, cmpEvents);
     var agenda = "";
-    if(dayEvents.length > 0) { agenda = "Day events\n\n"; }
+    //if(dayEvents.length > 0) { agenda = "Day events\n\n"; }
     list.iter(dayEvents,function(event){
       agenda = agenda + eventToAgenda(event);
     });
     if(shortEvents.length > 0) {
-      agenda = agenda + "Detailed Schedule\n\n";
+      //agenda = agenda + "Detailed Schedule\n\n";
       list.iter(shortEvents,function(event){
         agenda = agenda + eventToAgenda(event);
       });
     } else {
-      agenda = agenda + "No scheduled events";
+      //agenda = agenda + "No scheduled events";
     }
     return agenda;
   }
@@ -103,7 +103,7 @@ var agenda = (function() {
 
     agendaDrafter.click(function() {
       var chosendate = agendaDatePicker.datepicker("getDate");
-      if (chosendate && mod.calendar != {}){
+      if (chosendate && util.isNotNull(mod.calendar)){
         api.getCalendarAgenda(login.leader(),
                               mod.calendar.id,
                               chosendate.toISOString())
