@@ -5,12 +5,8 @@ var route = (function() {
   var mod = {};
   mod.nav = {};
 
-  function withLogin(f) {
-    if (! util.isDefined(login.data)) {
-      location.hash = "#!login/redir/" + encodeURIComponent(location.hash);
-    }
-    else
-      f ();
+  function withLogin(whenDone, optInviteCode) {
+    signin.signin(whenDone, optInviteCode);
   }
 
   var Router = can.Control({
@@ -22,17 +18,12 @@ var route = (function() {
       withLogin(page.home.load);
     },
 
+    /* invitation */
+    "invite/:code route" : function(data) {
+      withLogin(page.home.load, data.code);
+    },
+
     /* login, logout, etc. */
-    "login route" : function(data) {
-      page.login.load("");
-    },
-    "logout route" : function(data) {
-      login.logout();
-      mod.nav.login();
-    },
-    "login/redir/:redir route" : function(data) {
-      page.login.load(data.redir);
-    },
     "request-password route" : function() {
       page.requestPassword.load("");
     },

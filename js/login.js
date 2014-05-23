@@ -4,6 +4,7 @@
 
 var login = (function() {
   var mod = {};
+  mod.data = {};
 
   mod.initLoginInfo = function() {
     var stored = store.get("login");

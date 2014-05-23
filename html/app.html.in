@@ -40,6 +40,8 @@
       </div>
     </div>
 
+    <div id="onboarding-interface" class="hide"></div>
+
     <div id="login-page" class="hide login-page">
       <div class="login-container">
         <div class="logo-container">
@@ -83,10 +85,6 @@
 
     <div id="email-verify-page" class="hide email-verify-page">
       @@email-verify.html@@
-    </div>
-
-    <div id="home-page" class="hide home-page">
-      @@onboarding.html@@
     </div>
 
     <div id="settings-page" class="hide settings-page">

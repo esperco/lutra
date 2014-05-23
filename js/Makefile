@@ -8,7 +8,7 @@ prod: prod-build
 	$(MAKE) prod-install
 
 # Build only
-dev-build: includes-dev.html includes-dev-guest-app.html
+dev-build: pp includes-dev.html includes-dev-guest-app.html
 prod-build: prod.js guest-app.js includes-prod.html includes-prod-guest-app.html
 
 # Javascript libraries that are made available by the setup process.

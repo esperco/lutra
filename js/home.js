@@ -559,28 +559,7 @@ var home = (function() {
   }
 
   mod.load = function() {
-'''
-<div #logout>
-  <a href="#!logout">Log out of Esper</a>
-</div>
-<div #revoke>
-  <a href="#">Revoke Esper&quot;s access to my Google account</a>
-</div>
-'''
-    var view = $("#onboarding-interface");
-    view.children().remove();
-
-    revoke.click(function() {
-      api.postGoogleAuthRevoke().done(revoke.remove());
-      return false;
-    });
-
-    api.getGoogleAuthInfo(document.URL)
-      .done(function(info) {
-        view.append(logout);
-        if (info.has_token) view.append(revoke);
-        else window.location = info.google_auth_url;
-      });
+    log("Nothing to do.");
   };
 
   return mod;

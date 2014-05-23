@@ -74,6 +74,9 @@ var api = (function () {
 
   // API
 
+
+  /* Esper login and password management */
+
   mod.getLoginInfo = function() {
     return jsonHttpGet("/api/login/" + login.me() + "/info");
   };
@@ -96,6 +99,34 @@ var api = (function () {
                         theirUID + "/" + teamid,
                         JSON.stringify(password_reset));
   };
+
+
+  /***** Google authentication and permissions *****/
+
+  mod.getGoogleAuthUrl = function(optAuthLandingUrl) {
+    var url = "/api/google-auth-url";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  };
+
+  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
+    var url = "/api/google/" + login.me() + "/auth/info";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  };
+
+  mod.postGoogleAuthRevoke = function() {
+    var url = "/api/google/" + login.me() + "/auth/revoke";
+    return jsonHttpPost(url, "");
+  };
+
+
+
+  /*******/
 
   function apiProfilePrefix() {
     return "/api/profile/" + login.data.uid;
@@ -401,30 +432,6 @@ var api = (function () {
   mod.postUserTemplate = function(uid, template) {
     var url = "/api/templates/" + login.data.uid + "/save";
     return jsonHttpPost(url, JSON.stringify(template));
-  };
-
-
-  /*** New Esper Beta (wolverine) ***/
-
-  function apiPrefix() {
-    var uid = login.data.uid;
-    if (! util.isString(uid)) {
-      uid = "UNDEFINED";
-    }
-    return "/api/" + uid;
-  };
-
-  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
-    var url = apiPrefix() + "/google/auth/info";
-    if (util.isString(optAuthLandingUrl)) {
-      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
-    }
-    return jsonHttpGet(url);
-  };
-
-  mod.postGoogleAuthRevoke = function() {
-    var url = apiPrefix() + "/google/auth/revoke";
-    return jsonHttpPost(url, "");
   };
 
   return mod;

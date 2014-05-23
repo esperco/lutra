@@ -36,7 +36,8 @@ var signin = (function() {
   var mod = [];
 
   function requestGoogleAuth(url) {
-    window.location = url;
+    log("ready to go to " + url);
+    //window.location = url;
   }
 
   function displayLoginLinks() {
@@ -47,51 +48,79 @@ var signin = (function() {
     var view = $("#onboarding-interface");
     view.children().remove();
     view.removeClass("hide");
-    view.append(_view);
+
+    button.click(function() {
+      button.off("click");
+      api.getGoogleAuthUrl(document.URL)
+        .done(function(x) {
+          requestGoogleAuth(x.url);
+        });
+    });
+
+    view.append(button);
   }
 
   function displayLogoutLinks() {
 '''
-<div #logout>
-  <a href="#!logout">Log out of Esper</a>
-</div>
-<div #revoke>
-  <a href="#">Revoke Esper&quot;s access to my Google account</a>
+<div class="hide">
+  <div #logout class="hide">
+    <a href="#!logout">Log out of Esper</a>
+  </div>
+  <div #revoke class="hide">
+    <a href="#">Revoke Esper&quot;s access to my Google account</a>
+  </div>
 </div>
 '''
     var view = $("#onboarding-interface");
     view.children().remove();
+    view.append(_view);
 
     revoke.click(function() {
-      api.postGoogleAuthRevoke().done(revoke.remove());
+      api.postGoogleAuthRevoke()
+        .done(function() {
+          revoke.remove();
+        });
       return false;
     });
 
     api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
-        view.append(logout);
-        if (info.has_token) view.append(revoke);
-        else window.location = info.google_auth_url;
+        logout.removeClass("hide");
+        if (info.has_token)
+          revoke.removeClass("hide");
+        else {
+          requestGoogleAuth(info.google_auth_url);
+        }
       });
+
+    view.removeClass("hide");
   }
 
   function checkInviteCode(optInviteCode) {
+    log("checkInviteCode");
     if (util.isString(optInviteCode)) {
-      api.loginInvite(optInviteCode)
+      return api.loginInvite(optInviteCode)
         .then(
           /* success */
           function(x) {
             login.setLoginInfo(x);
+            return deferred.defer(true);
           },
           /* failure */
           function() {
             displayLoginLinks();
+            return deferred.defer(false);
           }
         );
     }
+    else {
+      displayLoginLinks();
+      return deferred.defer(false);
+    }
   }
 
-  function loginOrSignup() {
+  function loginOrSignup(optInviteCode) {
+    log("loginOrSignup");
     var uid = login.me();
     if (util.isDefined(uid)) {
       return api.getLoginInfo()
@@ -99,6 +128,7 @@ var signin = (function() {
           /* success */
           function(x) {
             login.setLoginInfo(x);
+            return deferred.defer(true);
           },
           /* failure */
           function() {
@@ -110,6 +140,7 @@ var signin = (function() {
   }
 
   function checkGooglePermissions() {
+    log("checkGooglePermissions");
     return api.getGoogleAuthInfo(document.URL)
       .then(function(info) {
         if (info.has_token)
@@ -122,23 +153,27 @@ var signin = (function() {
   }
 
   function completeTeam() {
+    log("completeTeam");
     // TODO: return successfully only once the team is complete
     return deferred.fail();
   }
 
   mod.signin = function(whenDone, optInviteCode) {
     loginOrSignup(optInviteCode)
-      .done(function() {
-        checkGooglePermissions()
-          .done(function(ok) {
-            if (ok) {
-              displayLogoutLinks();
-              completeTeam()
-                .done(function() {
-                  whenDone();
-                })
-            }
-          });
+      .done(function(ok) {
+        if (ok) {
+          checkGooglePermissions()
+            .done(function(ok) {
+              if (ok) {
+                displayLogoutLinks();
+                completeTeam()
+                  .done(function() {
+                    log("sign-in done");
+                    whenDone();
+                  })
+              }
+            });
+        }
       });
   };
 
