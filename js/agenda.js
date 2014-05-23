@@ -65,18 +65,12 @@ var agenda = (function() {
     dayEvents = list.sort(dayEvents, cmpEvents);
     shortEvents = list.sort(shortEvents, cmpEvents);
     var agenda = "";
-    //if(dayEvents.length > 0) { agenda = "Day events\n\n"; }
     list.iter(dayEvents,function(event){
       agenda = agenda + eventToAgenda(event);
     });
-    if(shortEvents.length > 0) {
-      //agenda = agenda + "Detailed Schedule\n\n";
-      list.iter(shortEvents,function(event){
-        agenda = agenda + eventToAgenda(event);
-      });
-    } else {
-      //agenda = agenda + "No scheduled events";
-    }
+    list.iter(shortEvents,function(event){
+      agenda = agenda + eventToAgenda(event);
+    });
     return agenda;
   }
 
