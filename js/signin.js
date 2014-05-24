@@ -36,8 +36,9 @@ var signin = (function() {
   var mod = [];
 
   function requestGoogleAuth(url) {
-    log("ready to go to " + url);
-    //window.location = url;
+    var debugDelay = 3000; // ms
+    log("ready to go to " + url + " in " + debugDelay + " ms");
+    setTimeout(function() { window.location = url; }, debugDelay);
   }
 
   function displayLoginLinks() {
@@ -50,7 +51,6 @@ var signin = (function() {
     view.removeClass("hide");
 
     button.click(function() {
-      button.off("click");
       api.getGoogleAuthUrl(document.URL)
         .done(function(x) {
           requestGoogleAuth(x.url);
