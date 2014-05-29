@@ -72,13 +72,28 @@ var api = (function () {
     return jsonHttp("DELETE", url, null);
   }
 
-  // API
+  /*
+    ["foo=123", "bar=abc"] -> "?foo=123&bar=abc"
+    [] -> ""
+  */
+  function makeQuery(argArray) {
+    var s = argArray.join("&");
+    if (argArray.length > 0)
+      s = "?" + s;
+    return s;
+  }
+
+  /********************************* API ***************************/
 
 
   /* Esper login and password management */
 
   mod.getLoginInfo = function() {
     return jsonHttpGet("/api/login/" + login.me() + "/info");
+  };
+
+  mod.loginOnce = function(uid, loginNonce) {
+    return jsonHttpPost("/api/login/" + uid + "/once/" + loginNonce);
   };
 
   mod.requestPassword = function(email) {
@@ -100,14 +115,20 @@ var api = (function () {
                         JSON.stringify(password_reset));
   };
 
+  mod.random = function() {
+    return jsonHttpPost("/api/random");
+  };
 
   /***** Google authentication and permissions *****/
 
-  mod.getGoogleAuthUrl = function(optAuthLandingUrl) {
+  mod.getGoogleAuthUrl = function(optAuthLandingUrl, optLoginNonce) {
     var url = "/api/google-auth-url";
-    if (util.isString(optAuthLandingUrl)) {
-      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
-    }
+    var q = [];
+    if (util.isString(optAuthLandingUrl))
+      q.push("auth_landing=" + encodeURIComponent(optAuthLandingUrl));
+    if (util.isString(optLoginNonce))
+      q.push("login_nonce=" + encodeURIComponent(optLoginNonce));
+    url = url + makeQuery(q);
     return jsonHttpGet(url);
   };
 

@@ -36,28 +36,60 @@ var signin = (function() {
   var mod = [];
 
   function requestGoogleAuth(url) {
-    var debugDelay = 3000; // ms
-    log("ready to go to " + url + " in " + debugDelay + " ms");
-    setTimeout(function() { window.location = url; }, debugDelay);
+    log("Going off to " + url);
+    window.location = url;
   }
 
-  function displayLoginLinks() {
-'''
-<button #button
-        class="google-sign-in"/>
-'''
-    var view = $("#onboarding-interface");
-    view.children().remove();
-    view.removeClass("hide");
+  function setLoginNonce() {
+    /* We use Esper as our random number generator because it's
+       a single implementation and it's under our control, as opposed
+       to whatever broken browser the user might use.
+    */
+    return api.random()
+      .then(function(x) {
+        var loginNonce = x.random;
+        if (loginNonce.length >= 64) {
+          store.set("login_nonce", loginNonce);
+          return loginNonce;
+        }
+      });
+  }
 
-    button.click(function() {
-      api.getGoogleAuthUrl(document.URL)
-        .done(function(x) {
-          requestGoogleAuth(x.url);
+  function getLoginNonce() {
+    return store.get("login_nonce");
+  }
+
+  function clearLoginNonce() {
+    store.remove("login_nonce");
+  }
+
+  function displayLoginLinks(msg) {
+'''
+<div #view>
+  <div #msgDiv/>
+  <button #button
+          class="google-sign-in"/>
+</div>
+'''
+    var rootView = $("#onboarding-interface");
+    rootView.children().remove();
+
+    setLoginNonce()
+      .done(function(loginNonce) {
+        rootView.removeClass("hide");
+
+        if (util.isString(msg))
+          msgDiv.text(msg);
+
+        button.click(function() {
+          api.getGoogleAuthUrl(document.URL, loginNonce)
+            .done(function(x) {
+              requestGoogleAuth(x.url);
+            });
         });
-    });
 
-    view.append(button);
+        rootView.append(view);
+      });
   }
 
   function displayLogoutLinks() {
@@ -108,13 +140,16 @@ var signin = (function() {
           },
           /* failure */
           function() {
-            displayLoginLinks();
+            displayLoginLinks("Invalid invite.");
             return deferred.defer(false);
           }
         );
     }
     else {
-      displayLoginLinks();
+      displayLoginLinks(
+        "Please log in using the GMail account that you use with Esper. "
+      + "If you're not an Esper member yet, you may join the waiting list."
+      );
       return deferred.defer(false);
     }
   }
@@ -174,6 +209,27 @@ var signin = (function() {
               }
             });
         }
+      });
+  };
+
+  function goToRelativeUrl(url) {
+    var relativeUrl = parseUrl.toRelative(parseUrl.parse(url));
+    window.location = relativeUrl;
+  }
+
+  mod.loginOnce = function(uid, landingUrl) {
+    var loginNonce = getLoginNonce();
+    log("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
+    api.loginOnce(uid, loginNonce)
+      .done(function(loginInfo) {
+        login.setLoginInfo(loginInfo);
+        clearLoginNonce();
+        /* Make sure we don't redirect to a phishing URL: discard host. */
+        goToRelativeUrl(landingUrl);
+      })
+      .fail(function() {
+        clearLoginNonce();
+        goToRelativeUrl(landingUrl); /* and try again */
       });
   };
 

@@ -23,6 +23,11 @@ var route = (function() {
       withLogin(page.home.load, data.code);
     },
 
+    /* Sign-in via Google */
+    "login-once/:uid/:hex_landing_url route" : function(data) {
+      signin.loginOnce(data.uid, util.hexDecode(data.hex_landing_url));
+    },
+
     /* login, logout, etc. */
     "request-password route" : function() {
       page.requestPassword.load("");

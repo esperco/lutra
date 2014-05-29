@@ -81,6 +81,7 @@ COMMON_SOURCES = \
   display.js
 
 APP_SOURCES = \
+  parseUrl.js \
   login.js \
   api.js \
   signin.js \

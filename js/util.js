@@ -156,6 +156,14 @@ var util = (function () {
     return jqResult.length > 0;
   };
 
+  /* Decode a string encode in hexadecimal */
+  mod.hexDecode = function(hex) {
+    var s = "";
+    for (var i = 0; i < hex.length; i += 2)
+      s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return s;
+  };
+
   mod.tests = [
     test.expect(
       "mergeObjects",
