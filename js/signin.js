@@ -11,11 +11,10 @@
   1. user has api_secret (login cookie)?
      - yes: check api_secret validity, go to 2
      - no:
-         user provides invite code?
-           - yes: log in with invite code, go to 2
-           - no:
-             * display "Google sign-in" button for members (goes to 2)
-             * display a link to "let us put you on the waiting list" page
+         * user provides invite code?
+           - yes: check invite code, display what it's for, add invite code
+                  to login "state" passed to Google.
+         * display "Google sign-in" button (goes to 2)
 
   2. server has a valid Google token for all the scopes?
      - yes: go to 3

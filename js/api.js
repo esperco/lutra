@@ -119,6 +119,21 @@ var api = (function () {
     return jsonHttpPost("/api/random");
   };
 
+  /***** Opaque URLs with unique token *****/
+
+  /*
+    Post an opaque token provided in a URL of the form:
+
+      https://app.esper.com/#!t/XXXXXX
+
+    The response describes what has be done and what can be done next.
+    This is used for invites and other URLs that are given out to users.
+   */
+  mod.postToken = function(token) {
+    return jsonHttpPost("/api/token/" + encodeURIComponent(token));
+  };
+
+
   /***** Google authentication and permissions *****/
 
   mod.getGoogleAuthUrl = function(optAuthLandingUrl, optLoginNonce) {

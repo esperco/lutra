@@ -18,9 +18,9 @@ var route = (function() {
       withLogin(page.home.load);
     },
 
-    /* invitation */
-    "invite/:code route" : function(data) {
-      withLogin(page.home.load, data.code);
+    /* Generic invitation */
+    "t/:token route" : function(data) {
+      withLogin(page.token.load, data.token);
     },
 
     /* Sign-in via Google */
