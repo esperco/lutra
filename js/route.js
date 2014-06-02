@@ -5,12 +5,8 @@ var route = (function() {
   var mod = {};
   mod.nav = {};
 
-  function withLogin(f) {
-    if (! util.isDefined(login.data)) {
-      location.hash = "#!login/redir/" + encodeURIComponent(location.hash);
-    }
-    else
-      f ();
+  function withLogin(whenDone, optInviteCode) {
+    signin.signin(whenDone, optInviteCode);
   }
 
   var Router = can.Control({
@@ -22,17 +18,17 @@ var route = (function() {
       withLogin(page.home.load);
     },
 
+    /* Generic invitation */
+    "t/:token route" : function(data) {
+      withLogin(page.home.load, data.token);
+    },
+
+    /* Sign-in via Google */
+    "login-once/:uid/:hex_landing_url route" : function(data) {
+      signin.loginOnce(data.uid, util.hexDecode(data.hex_landing_url));
+    },
+
     /* login, logout, etc. */
-    "login route" : function(data) {
-      page.login.load("");
-    },
-    "logout route" : function(data) {
-      login.logout();
-      mod.nav.login();
-    },
-    "login/redir/:redir route" : function(data) {
-      page.login.load(data.redir);
-    },
     "request-password route" : function() {
       page.requestPassword.load("");
     },
@@ -79,14 +75,6 @@ var route = (function() {
 
   mod.nav.home = function() {
     location.hash = "#!";
-  };
-
-  mod.nav.login = function() {
-    location.hash = "#!login";
-  };
-
-  mod.nav.logout = function() {
-    location.hash = "#!logout";
   };
 
   mod.nav.requestPassword = function(email) {

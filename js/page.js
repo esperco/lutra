@@ -20,16 +20,17 @@ var page = (function() {
     all the classes, such as class="request-password-page reset-password-page".
   */
   var pageSelector = show.create({
+    "email-verify":     {classes:["email-verify-page"]},
+    "home":             {classes:["home-page"]},
     "login":            {classes:["login-page"]},
     "request-password": {classes:["request-password-page"]},
     "reset-password":   {classes:["reset-password-page"]},
-    "email-verify":     {classes:["email-verify-page"]},
-    "home":             {classes:["home-page"]},
+    "respond":          {classes:["respond-page"]},
+    "scheduling":       {classes:["scheduling-page"]},
     "settings":         {classes:["settings-page"]},
     "task":             {classes:["task-page"]},
-    "scheduling":       {classes:["scheduling-page"]},
-    "respond":          {classes:["respond-page"]},
-    "test":             {classes:["test-page"]}
+    "test":             {classes:["test-page"]},
+    "token":            {classes:["token-page"]}
   });
 
   function goto_page(k) {

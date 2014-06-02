@@ -72,11 +72,28 @@ var api = (function () {
     return jsonHttp("DELETE", url, null);
   }
 
-  // API
+  /*
+    ["foo=123", "bar=abc"] -> "?foo=123&bar=abc"
+    [] -> ""
+  */
+  function makeQuery(argArray) {
+    var s = argArray.join("&");
+    if (argArray.length > 0)
+      s = "?" + s;
+    return s;
+  }
 
-  mod.login = function(email, password) {
-    var login_request = { email: email, password: password };
-    return jsonHttpPost("/api/login", JSON.stringify(login_request));
+  /********************************* API ***************************/
+
+
+  /* Esper login and password management */
+
+  mod.getLoginInfo = function() {
+    return jsonHttpGet("/api/login/" + login.me() + "/info");
+  };
+
+  mod.loginOnce = function(uid, loginNonce) {
+    return jsonHttpPost("/api/login/" + uid + "/once/" + loginNonce);
   };
 
   mod.requestPassword = function(email) {
@@ -97,6 +114,59 @@ var api = (function () {
                         theirUID + "/" + teamid,
                         JSON.stringify(password_reset));
   };
+
+  mod.random = function() {
+    return jsonHttpPost("/api/random");
+  };
+
+  /***** Opaque URLs with unique token *****/
+
+  /*
+    Post an opaque token provided in a URL of the form:
+
+      https://app.esper.com/#!t/XXXXXX
+
+    The response describes what has be done and what can be done next.
+    This is used for invites and other URLs that are given out to users.
+   */
+  mod.postToken = function(token) {
+    return jsonHttpPost("/api/token/" + encodeURIComponent(token));
+  };
+
+
+  /***** Google authentication and permissions *****/
+
+  mod.getGoogleAuthUrl = function(optAuthLandingUrl,
+                                  optLoginNonce,
+                                  optInvite) {
+    var url = "/api/google-auth-url";
+    var q = [];
+    if (util.isString(optAuthLandingUrl))
+      q.push("auth_landing=" + encodeURIComponent(optAuthLandingUrl));
+    if (util.isString(optLoginNonce))
+      q.push("login_nonce=" + encodeURIComponent(optLoginNonce));
+    if (util.isString(optInvite))
+      q.push("invite=" + encodeURIComponent(optInvite));
+    url = url + makeQuery(q);
+    return jsonHttpGet(url);
+  };
+
+  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
+    var url = "/api/google/" + login.me() + "/auth/info";
+    if (util.isString(optAuthLandingUrl)) {
+      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
+    }
+    return jsonHttpGet(url);
+  };
+
+  mod.postGoogleAuthRevoke = function() {
+    var url = "/api/google/" + login.me() + "/auth/revoke";
+    return jsonHttpPost(url, "");
+  };
+
+
+
+  /*******/
 
   function apiProfilePrefix() {
     return "/api/profile/" + login.data.uid;
@@ -416,26 +486,6 @@ var api = (function () {
   mod.postUserTemplate = function(uid, template) {
     var url = "/api/templates/" + login.data.uid + "/save";
     return jsonHttpPost(url, JSON.stringify(template));
-  };
-
-
-  /*** New Esper Beta (wolverine) ***/
-
-  function apiPrefix() {
-    return "/api/" + login.data.uid;
-  };
-
-  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
-    var url = apiPrefix() + "/google/auth/info";
-    if (util.isString(optAuthLandingUrl)) {
-      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
-    }
-    return jsonHttpGet(url);
-  };
-
-  mod.postGoogleAuthRevoke = function() {
-    var url = apiPrefix() + "/google/auth/revoke";
-    return jsonHttpPost(url, "");
   };
 
   return mod;

@@ -4,6 +4,7 @@
 
 var login = (function() {
   var mod = {};
+  mod.data = {};
 
   mod.initLoginInfo = function() {
     var stored = store.get("login");
@@ -99,7 +100,10 @@ var login = (function() {
 
   /* Utilities */
   mod.me = function() {
-    return mod.data.uid;
+    if (util.isDefined(mod.data))
+      return mod.data.uid;
+    else
+      return;
   };
 
   mod.getTeams = function() {
