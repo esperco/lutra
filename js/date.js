@@ -145,6 +145,11 @@ var date = (function() {
       " from "+ mod.timeOnly(d1) +" to "+ mod.timeOnly(d2);
   };
 
+  /* "12:30pm to 1:30 pm" */
+  mod.hourRange = function(d1, d2) {
+    return mod.utcToLocalTimeOnly(d1) +" to "+ mod.utcToLocalTimeOnly(d2);
+  };
+
   /* "Wednesday August 13, 2019 at 12:30pm" */
   mod.justStartTime = function(d1) {
     return mod.weekDay(d1) +" "+ mod.dateOnly(d1) +

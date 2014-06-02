@@ -100,6 +100,7 @@ APP_SOURCES = \
   settings.js \
   places.js \
   header.js \
+  agenda.js \
   home.js \
   page.js \
   route.js \

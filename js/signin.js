@@ -98,19 +98,20 @@ var signin = (function() {
   }
 
   function displayLogoutLinks() {
+    log("displayLogoutLinks");
 '''
-<div class="hide">
+<div #root>
   <div #logout class="hide">
     <a href="#!logout">Log out of Esper</a>
   </div>
   <div #revoke class="hide">
-    <a href="#">Revoke Esper&quot;s access to my Google account</a>
+    <a href="#">Revoke Esper&apos;s access to my Google account</a>
   </div>
 </div>
 '''
     var view = $("#onboarding-interface");
     view.children().remove();
-    view.append(_view);
+    view.append(root);
 
     revoke.click(function() {
       api.postGoogleAuthRevoke()
@@ -213,6 +214,7 @@ var signin = (function() {
                   completeTeam()
                     .done(function() {
                       log("sign-in done");
+                      displayLogoutLinks();
                       whenDone();
                     });
                 }

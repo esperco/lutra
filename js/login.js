@@ -121,7 +121,7 @@ var login = (function() {
   };
 
   mod.leader = function() {
-    return mod.getTeam().team_leaders[0];
+    return mod.getTeam().team_executive;
   };
 
   return mod;

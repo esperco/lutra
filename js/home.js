@@ -559,7 +559,8 @@ var home = (function() {
   }
 
   mod.load = function() {
-    log("Nothing to do.");
+    var view = $("#home-page");
+    agenda.create(view);
   };
 
   return mod;
