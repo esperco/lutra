@@ -20,7 +20,7 @@ var route = (function() {
 
     /* Generic invitation */
     "t/:token route" : function(data) {
-      withLogin(page.token.load, data.token);
+      withLogin(page.home.load, data.token);
     },
 
     /* Sign-in via Google */

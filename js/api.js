@@ -136,13 +136,17 @@ var api = (function () {
 
   /***** Google authentication and permissions *****/
 
-  mod.getGoogleAuthUrl = function(optAuthLandingUrl, optLoginNonce) {
+  mod.getGoogleAuthUrl = function(optAuthLandingUrl,
+                                  optLoginNonce,
+                                  optInvite) {
     var url = "/api/google-auth-url";
     var q = [];
     if (util.isString(optAuthLandingUrl))
       q.push("auth_landing=" + encodeURIComponent(optAuthLandingUrl));
     if (util.isString(optLoginNonce))
       q.push("login_nonce=" + encodeURIComponent(optLoginNonce));
+    if (util.isString(optInvite))
+      q.push("invite=" + encodeURIComponent(optInvite));
     url = url + makeQuery(q);
     return jsonHttpGet(url);
   };

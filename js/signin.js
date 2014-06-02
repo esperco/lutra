@@ -8,12 +8,16 @@
 
   The flow is as follows:
 
+  0. user provides invite code?
+     - yes:
+        * check invite code, display what it's for, add invite code
+          to login "state" passed to Google.
+        * display "Google sign-in" button (goes to 2)
+     - no: go to 1
+
   1. user has api_secret (login cookie)?
      - yes: check api_secret validity, go to 2
      - no:
-         * user provides invite code?
-           - yes: check invite code, display what it's for, add invite code
-                  to login "state" passed to Google.
          * display "Google sign-in" button (goes to 2)
 
   2. server has a valid Google token for all the scopes?
@@ -62,7 +66,7 @@ var signin = (function() {
     store.remove("login_nonce");
   }
 
-  function displayLoginLinks(msg) {
+  function displayLoginLinks(msg, landingUrl, optInvite) {
 '''
 <div #view>
   <div #msgDiv/>
@@ -73,15 +77,15 @@ var signin = (function() {
     var rootView = $("#onboarding-interface");
     rootView.children().remove();
 
+    if (util.isString(msg))
+      msgDiv.text(msg);
+
     setLoginNonce()
       .done(function(loginNonce) {
         rootView.removeClass("hide");
 
-        if (util.isString(msg))
-          msgDiv.text(msg);
-
         button.click(function() {
-          api.getGoogleAuthUrl(document.URL, loginNonce)
+          api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite)
             .done(function(x) {
               requestGoogleAuth(x.url);
             });
@@ -89,6 +93,8 @@ var signin = (function() {
 
         rootView.append(view);
       });
+
+    return _view;
   }
 
   function displayLogoutLinks() {
@@ -127,35 +133,30 @@ var signin = (function() {
     view.removeClass("hide");
   }
 
-  function checkInviteCode(optInviteCode) {
-    log("checkInviteCode");
-    if (util.isString(optInviteCode)) {
-      return api.loginInvite(optInviteCode)
-        .then(
-          /* success */
-          function(x) {
-            login.setLoginInfo(x);
-            return deferred.defer(true);
-          },
-          /* failure */
-          function() {
-            displayLoginLinks("Invalid invite.");
-            return deferred.defer(false);
-          }
-        );
-    }
-    else {
-      displayLoginLinks(
-        "Please log in using the GMail account that you use with Esper. "
-      + "If you're not an Esper member yet, you may join the waiting list."
-      );
-      return deferred.defer(false);
-    }
+  function showTokenDetails(loginView, tokenDescription) {
+    loginView.msgDiv.text(JSON.stringify(tokenDescription));
   }
 
-  function loginOrSignup(optInviteCode) {
+  function useInvite(inviteCode) {
+    log("useInvite");
+    return api.postToken(inviteCode)
+      .then(
+        /* success */
+        function(tokenDescription) {
+          var loginView = displayLoginLinks("", "#!", inviteCode);
+          showTokenDetails(loginView, tokenDescription);
+        },
+        /* failure */
+        function() {
+          displayLoginLinks("Invalid invite.", "#!");
+        }
+      );
+  }
+
+  function loginOrSignup() {
     log("loginOrSignup");
     var uid = login.me();
+    var landingUrl = document.URL;
     if (util.isDefined(uid)) {
       return api.getLoginInfo()
         .then(
@@ -166,16 +167,21 @@ var signin = (function() {
           },
           /* failure */
           function() {
-            return checkInviteCode(optInviteCode);
+            /* useful for testing; may not be ideal in production */
+            login.clearLoginInfo();
+            displayLoginLinks("Something's wrong. Please try to log in.",
+                              landingUrl);
+            return deferred.defer(false);
           });
     } else {
-      return checkInviteCode(optInviteCode);
+      displayLoginLinks("Please log in.", landingUrl);
+      return deferred.defer(false);
     }
   }
 
-  function checkGooglePermissions() {
+  function checkGooglePermissions(landingUrl) {
     log("checkGooglePermissions");
-    return api.getGoogleAuthInfo(document.URL)
+    return api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
         if (info.has_token)
           return true;
@@ -189,26 +195,31 @@ var signin = (function() {
   function completeTeam() {
     log("completeTeam");
     // TODO: return successfully only once the team is complete
-    return deferred.fail();
+    return deferred.defer();
   }
 
   mod.signin = function(whenDone, optInviteCode) {
-    loginOrSignup(optInviteCode)
-      .done(function(ok) {
-        if (ok) {
-          checkGooglePermissions()
-            .done(function(ok) {
-              if (ok) {
-                displayLogoutLinks();
-                completeTeam()
-                  .done(function() {
-                    log("sign-in done");
-                    whenDone();
-                  })
-              }
-            });
-        }
-      });
+    if (util.isString(optInviteCode)) {
+      useInvite(optInviteCode);
+    } else {
+      loginOrSignup()
+        .done(function(ok) {
+          if (ok) {
+            var landingUrl = document.URL;
+            checkGooglePermissions(landingUrl)
+              .done(function(ok) {
+                if (ok) {
+                  displayLogoutLinks();
+                  completeTeam()
+                    .done(function() {
+                      log("sign-in done");
+                      whenDone();
+                    });
+                }
+              });
+          }
+        });
+    }
   };
 
   function goToRelativeUrl(url) {
