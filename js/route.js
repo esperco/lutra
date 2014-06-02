@@ -77,14 +77,6 @@ var route = (function() {
     location.hash = "#!";
   };
 
-  mod.nav.login = function() {
-    location.hash = "#!login";
-  };
-
-  mod.nav.logout = function() {
-    location.hash = "#!logout";
-  };
-
   mod.nav.requestPassword = function(email) {
     location.hash = "#!request-password/" + email;
   };

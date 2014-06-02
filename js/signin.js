@@ -98,11 +98,10 @@ var signin = (function() {
   }
 
   function displayLogoutLinks() {
-    log("displayLogoutLinks");
 '''
 <div #root>
   <div #logout class="hide">
-    <a href="#!logout">Log out of Esper</a>
+    <a #logoutLink href="#!">Log out of Esper</a>
   </div>
   <div #revoke class="hide">
     <a href="#">Revoke Esper&apos;s access to my Google account</a>
@@ -112,6 +111,12 @@ var signin = (function() {
     var view = $("#onboarding-interface");
     view.children().remove();
     view.append(root);
+
+    logoutLink.click(function() {
+      login.clearLoginInfo();
+      mod.signin(function(){});
+      return false;
+    });
 
     revoke.click(function() {
       api.postGoogleAuthRevoke()
