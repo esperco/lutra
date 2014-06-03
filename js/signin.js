@@ -100,6 +100,7 @@ var signin = (function() {
   function displayLogoutLinks() {
 '''
 <div #root>
+  <div #me/>
   <div #logout class="hide">
     <a #logoutLink href="#!">Log out of Esper</a>
   </div>
@@ -111,6 +112,8 @@ var signin = (function() {
     var view = $("#onboarding-interface");
     view.children().remove();
     view.append(root);
+
+    me.text(login.myEmail());
 
     logoutLink.click(function() {
       login.clearLoginInfo();
@@ -200,7 +203,6 @@ var signin = (function() {
 
   function completeTeam() {
     log("completeTeam");
-    // TODO: return successfully only once the team is complete
     return deferred.defer();
   }
 

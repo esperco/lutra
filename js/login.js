@@ -106,12 +106,23 @@ var login = (function() {
       return;
   };
 
+  mod.myEmail = function() {
+    if (util.isDefined(mod.data))
+      return mod.data.email;
+    else
+      return;
+  };
+
   mod.getTeams = function() {
-    return mod.data.teams;
+    if (util.isDefined(mod.data))
+      return mod.data.teams;
+    else
+      return [];
   };
 
   mod.getTeam = function() {
-    return mod.data.team;
+    if (util.isDefined(mod.data))
+      return mod.data.team;
   };
 
   mod.setTeam = function(team) {
