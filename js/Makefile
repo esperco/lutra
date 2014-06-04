@@ -56,6 +56,7 @@ COMMON_SOURCES = \
   util.js \
   log.js \
   mixpanel.js \
+  gmailCompose.js \
   html.js \
   variant.js \
   dateYmd.js \

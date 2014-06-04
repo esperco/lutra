@@ -77,6 +77,8 @@ var signin = (function() {
     var rootView = $("#onboarding-interface");
     rootView.children().remove();
 
+    $("#login-status").addClass("hide");
+
     if (util.isString(msg))
       msgDiv.text(msg);
 
@@ -109,7 +111,7 @@ var signin = (function() {
   </div>
 </div>
 '''
-    var view = $("#onboarding-interface");
+    var view = $("#login-status");
     view.children().remove();
     view.append(root);
 
@@ -201,8 +203,74 @@ var signin = (function() {
       });
   }
 
+  function composeInviteForRole(role) {
+    var invite = {
+      from_uid: login.me(),
+      teamid: login.getTeam().teamid,
+      role: role
+    };
+    api.inviteJoinTeam(invite)
+      .done(function(x) {
+        var url = x.url;
+        var body =
+          "Please click the link and sign in with your Google account:\n\n"
+          + "  " + url;
+
+        gmailCompose.compose({
+          subject: "Join my team on Esper",
+          body: body
+        });
+      });
+  }
+
+  function displayInviteDialog() {
+'''
+<div #root>
+  <div>Invite team members:</div>
+  <div #roleSelector/>
+  <button #closeButton class="btn btn-default">Close</button>
+</div>
+'''
+    var rootView = $("#onboarding-interface");
+    rootView.children().remove();
+
+    var role;
+
+    var sel = select.create({
+      defaultAction: function(v) {
+        role = v;
+        if (util.isString(role))
+          composeInviteForRole(role);
+      },
+      options: [
+        { label: "Pick a role" },
+        { label: "Executive", value: "Executive" },
+        { label: "Assistant", value: "Assistant" }
+      ]
+    });
+
+    closeButton.click(function() {
+      rootView.addClass("hide");
+      $("#main-content").removeClass("hide");
+    })
+
+    sel.view.appendTo(roleSelector);
+    rootView.append(root);
+    rootView.removeClass("hide");
+  }
+
   function completeTeam() {
     log("completeTeam");
+    var team = login.getTeam();
+    if (util.isDefined(team)) {
+      log("team", team);
+      var assistants = team.team_assistants;
+      if (true /*assistants.length === 0*/) {
+        displayInviteDialog();
+      } else {
+        $("#main-content").removeClass("hide");
+      }
+    }
     return deferred.defer();
   }
 

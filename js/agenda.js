@@ -112,13 +112,11 @@ var agenda = (function() {
                   };
                   agenda = agenda + " [...]";
                 }
-                open(url + "&to="
-                     + encodeURIComponent(x.account_emails[0].email)
-                     + "&su="
-                     + encodeURIComponent("Agenda for "
-                                          + date.dateOnly(chosendate))
-                     + "&body="
-                     + encodeURIComponent(agenda));
+                gmailCompose.compose({
+                  to: x.account_emails[0].email,
+                  subject: "Agenda for " + date.dateOnly(chosendate),
+                  body: agenda
+                });
               });
           });
       };

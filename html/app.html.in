@@ -31,8 +31,6 @@
       </div>
     </div>
 
-    <!-- <div id="global-status" class="animated"></div> -->
-
     <div id="test-page" class="hide test-page">
       <div class="navbar-push container scrollable">
         <div id="test-content" class="row">
@@ -40,62 +38,81 @@
       </div>
     </div>
 
+    <!-- Section showing who's logged in, on any page -->
+    <div id="login-status" class="hide"></div>
+
+    <!-- Section used to display login dialogs,
+         shown before any content that requires login
+         regardless of the URL. -->
     <div id="onboarding-interface" class="hide"></div>
 
-    <div id="home-page" class="hide home-page"></div>
 
-    <div id="login-page" class="hide login-page">
-      <div class="login-container">
-        <div class="logo-container">
-          <div id="login-hero-mark" class="animated fadeInUp">
-            <img class="svg hero-mark" src="/assets/img/esper-mark.svg">
+    <!-- Mutually exclusive "pages", each corresponding to a URL kind -->
+    <div id="main-content" class="hide">
+
+      <div id="home-page" class="hide home-page"></div>
+
+      <div id="login-page" class="hide login-page">
+        <div class="login-container">
+          <div class="logo-container">
+            <div id="login-hero-mark" class="animated fadeInUp">
+              <img class="svg hero-mark" src="/assets/img/esper-mark.svg">
+            </div>
+          </div>
+          <div id="login-error-message" class="animated hide"></div>
+          <form class="login-form" role="form">
+            <div class="form-group">
+              <div class="text-field-label">Email address</div>
+              <input type="email" id="login-email"
+                     class="form-control" tabindex=1>
+            </div>
+            <div class="form-group">
+              <div class="text-field-label">Password</div>
+              <a href="#!request-password"
+                 id="forgot-password">Forgot password?</a>
+              <input type="password" id="login-password"
+                     class="form-control" tabindex=2>
+            </div>
+            <button id="login-button"
+                    class="btn btn-primary login-btn" tabindex=3>
+              LOG IN
+            </button>
+          </form>
+          <div class="login-footer">
+            <div>
+              <img class="svg hero-word" src="/assets/img/esper-word.svg">
+            </div>
+            <div class="copyright">
+              &copy; 2014 Esper Technologies, Inc.
+              All rights reserved.
+            </div>
+            <div class="made">Made in Palo Alto, CA</div>
           </div>
         </div>
-        <div id="login-error-message" class="animated hide"></div>
-        <form class="login-form" role="form">
-          <div class="form-group">
-            <div class="text-field-label">Email address</div>
-            <input type="email" id="login-email" class="form-control" tabindex=1>
-          </div>
-          <div class="form-group">
-            <div class="text-field-label">Password</div>
-            <a href="#!request-password" id="forgot-password">Forgot password?</a>
-            <input type="password" id="login-password" class="form-control" tabindex=2>
-          </div>
-          <button id="login-button" class="btn btn-primary login-btn" tabindex=3>
-            LOG IN
-          </button>
-        </form>
-        <div class="login-footer">
-          <div>
-            <img class="svg hero-word" src="/assets/img/esper-word.svg">
-          </div>
-          <div class="copyright">&copy; 2014 Esper Technologies, Inc. All rights reserved.</div>
-          <div class="made">Made in Palo Alto, CA</div>
-        </div>
+        <div class="login-footer-push"></div>
       </div>
-      <div class="login-footer-push"></div>
-    </div>
 
-    <div id="request-password-page" class="hide request-password-page">
-      @@request-password.html@@
-    </div>
+      <div id="request-password-page" class="hide request-password-page">
+        @@request-password.html@@
+      </div>
 
-    <div id="reset-password-page" class="hide reset-password-page">
-      @@reset-password.html@@
-    </div>
+      <div id="reset-password-page" class="hide reset-password-page">
+        @@reset-password.html@@
+      </div>
 
-    <div id="email-verify-page" class="hide email-verify-page">
-      @@email-verify.html@@
-    </div>
+      <div id="email-verify-page" class="hide email-verify-page">
+        @@email-verify.html@@
+      </div>
 
-    <div id="settings-page" class="hide settings-page">
-      @@settings.html@@
-    </div>
+      <div id="settings-page" class="hide settings-page">
+        @@settings.html@@
+      </div>
 
-    <div id="task-page" class="hide task-page scrollable">
-      @@meeting-workflow.html@@
-    </div>
+      <div id="task-page" class="hide task-page scrollable">
+        @@meeting-workflow.html@@
+      </div>
+
+    </div><!-- end main-content -->
 
     <!-- API key activated by jeff@esper.co -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA1NI4SRYse6mchKKKUTYIvorssNcWju-g&sensor=false"></script>

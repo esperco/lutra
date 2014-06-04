@@ -131,7 +131,7 @@ var login = (function() {
   };
 
   mod.organizers = function() {
-    return mod.getTeam().team_organizers;
+    return mod.getTeam().team_assistants;
   };
 
   mod.leader = function() {
