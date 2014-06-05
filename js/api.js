@@ -119,6 +119,13 @@ var api = (function () {
     return jsonHttpPost("/api/random");
   };
 
+  /*** Esper invites ***/
+
+  mod.inviteJoinTeam = function(invite) {
+    return jsonHttpPost("/api/invite/" + login.me() + "/join-team",
+                        JSON.stringify(invite));
+  };
+
   /***** Opaque URLs with unique token *****/
 
   /*
