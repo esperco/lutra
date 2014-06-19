@@ -1,0 +1,84 @@
+#! /bin/sh
+set -e
+
+# Normally we are in the setup/ subdirectory of the project
+ROOT=$(pwd)
+mkdir -p "$ROOT"/bin
+mkdir -p "$ROOT"/js
+mkdir -p "$ROOT"/ts
+
+# Get archives from our github repository, then unpack them.
+# Prepare two versions of each Javascript file:
+# - versionless source, e.g. jquery.js
+# - versionless minified code, e.g. jquery.min.js
+
+# Install a source Javascript file, minify it and install the minified version
+# as well.
+install_js() {
+    name="$1"
+    src="$2"
+    echo "Minifying $name"
+    cp "$src" "$ROOT"/js/"$name".js
+    uglifyjs -o "$ROOT"/js/"$name".min.js "$src"
+}
+
+install_ts() {
+    name="$1"
+    src="$2"
+    echo "Importing $name"
+    cp "$src" "$ROOT"/ts/"$name".d.ts
+}
+
+# TypeScript type definitions for some of the JavaScript libraries we're using
+cd "$ROOT"
+if [ ! -d DefinitelyTyped ]; then
+    git clone git@github.com:timeco/DefinitelyTyped.git
+fi
+
+cd "$ROOT"/DefinitelyTyped
+git checkout master
+git pull --ff-only origin master
+
+install_ts jquery jquery/jquery.d.ts
+
+
+cd "$ROOT"
+if [ ! -d mink-libs ]; then
+    git clone git@github.com:timeco/mink-libs.git
+fi
+
+cd "$ROOT"/mink-libs
+git checkout master
+git pull --ff-only origin master
+
+
+# jQuery
+install_js jquery jquery-2.1.0.js
+
+# Bootstrap
+rm -rf bootstrap
+unzip bootstrap-3.0.2-dist.zip
+mv dist bootstrap
+install_js bootstrap bootstrap/js/bootstrap.js
+
+# jsTimezoneDetect (jstz)
+install_js jstz jstz-2013-04-01-f9e3e30e.js
+
+# Google sign-in button
+(cd google-buttons && unzip -o gplus-assets.zip)
+
+
+# oblivion preprocessor, requires ocaml.
+# We install it manually so we don't depend on an opam setup
+cd "$ROOT"
+if [ ! -d oblivion ]; then
+    git clone git@github.com:timeco/oblivion.git
+fi
+cd oblivion
+git checkout master
+git pull --ff-only origin master
+make
+make PREFIX="$ROOT" install
+
+# Don't want my Javascript files to be executable for no reason
+chmod a-x "$ROOT"/js/*.js
