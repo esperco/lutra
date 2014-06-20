@@ -15,7 +15,7 @@ var labelSettings = (function() {
       <div class="modal-header clearfix">
         <button #updateButton
                 type="button" class="btn btn-primary"
-                style="float:right">Update</button>
+                style="float:right" disabled>Update</button>
         <h3 #modalTitle
             class="modal-title">Team Settings</h3>
       </div>
@@ -62,9 +62,9 @@ var labelSettings = (function() {
             $("<div><input type='text' class='labelNew'/></div>")
               .prependTo(newLabelDiv);
           });
+        updateButton.prop("disabled", false);
       });
     });
-
 
     updateButton.click(function() {
       var syncedLabels = [];
