@@ -172,6 +172,22 @@ var api = (function () {
   };
 
 
+  /***** Team label syncing *****/
+
+  mod.getSyncedLabels = function(teamid) {
+    var url = "/api/labels/synced/" + teamid;
+    return jsonHttpGet(url);
+  };
+
+  mod.putSyncedLabels = function(teamid, labels) {
+    var url = "/api/labels/synced/" + teamid;
+    return jsonHttpPut(url, JSON.stringify(labels));
+  };
+
+  mod.getSharedLabels = function(teamid) {
+    var url = "/api/labels/shared/" + teamid;
+    return jsonHttpGet(url);
+  };
 
   /*******/
 

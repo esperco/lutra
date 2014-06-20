@@ -99,51 +99,6 @@ var signin = (function() {
     return _view;
   }
 
-  function displayLogoutLinks() {
-'''
-<div #root>
-  <div #me/>
-  <div #logout class="hide">
-    <a #logoutLink href="#!">Log out of Esper</a>
-  </div>
-  <div #revoke class="hide">
-    <a href="#">Revoke Esper&apos;s access to my Google account</a>
-  </div>
-</div>
-'''
-    var view = $("#login-status");
-    view.children().remove();
-    view.append(root);
-
-    me.text(login.myEmail());
-
-    logoutLink.click(function() {
-      login.clearLoginInfo();
-      mod.signin(function(){});
-      return false;
-    });
-
-    revoke.click(function() {
-      api.postGoogleAuthRevoke()
-        .done(function() {
-          revoke.remove();
-        });
-      return false;
-    });
-
-    api.getGoogleAuthInfo(document.URL)
-      .done(function(info) {
-        logout.removeClass("hide");
-        if (info.has_token)
-          revoke.removeClass("hide");
-        else {
-          requestGoogleAuth(info.google_auth_url);
-        }
-      });
-
-    view.removeClass("hide");
-  }
-
   function showTokenDetails(loginView, tokenDescription) {
     loginView.msgDiv.text(JSON.stringify(tokenDescription));
   }
@@ -285,13 +240,13 @@ var signin = (function() {
             checkGooglePermissions(landingUrl)
               .done(function(ok) {
                 if (ok) {
-                  displayLogoutLinks();
                   completeTeam()
                     .done(function() {
                       log("sign-in done");
-                      displayLogoutLinks();
                       whenDone();
+                      labelSettings.load();
                     });
+                  labelSettings.load();
                 }
               });
           }

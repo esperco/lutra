@@ -85,6 +85,7 @@ APP_SOURCES = \
   parseUrl.js \
   login.js \
   api.js \
+  labelSettings.js \
   signin.js \
   adder.js \
   calcache.js \
