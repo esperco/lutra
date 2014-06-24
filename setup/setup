@@ -19,7 +19,6 @@ install_js() {
     src="$2"
     echo "Minifying $name"
     cp "$src" "$ROOT"/js/"$name".js
-    uglifyjs -o "$ROOT"/js/"$name".min.js "$src"
 }
 
 install_ts() {
@@ -40,6 +39,7 @@ git checkout master
 git pull --ff-only origin master
 
 install_ts jquery jquery/jquery.d.ts
+install_ts chrome chrome/chrome.d.ts
 
 
 cd "$ROOT"

@@ -15,7 +15,8 @@ JS_LIBS = \
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time)
 TS_LIBS = \
-  jquery.d
+  jquery.d \
+  chrome.d
 
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
