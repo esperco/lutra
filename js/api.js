@@ -189,6 +189,14 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+
+  /***** Google profile information *****/
+
+  mod.getGoogleProfile = function(myUID, theirUID, teamid) {
+    var url = "/api/google-profile/" + myUID + "/" + theirUID + "/" + teamid;
+    return jsonHttpGet(url);
+  };
+
   /*******/
 
   function apiProfilePrefix() {
