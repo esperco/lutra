@@ -8,6 +8,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
       ],

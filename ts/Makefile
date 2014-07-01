@@ -23,7 +23,10 @@ TS_LIBS = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  main
+  Util \
+  Log \
+  Auth \
+  Main
 
 # Complete oblivion/TypeScript source file names
 APP_TS_SRC = \

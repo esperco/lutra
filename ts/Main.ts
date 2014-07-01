@@ -7,8 +7,10 @@
 
 module Main {
   export function init() : void {
-    console.log("Hello.");
+    Log.d("Main.init()");
+    Auth.init();
   }
 }
 
+/* Called once per page */
 Main.init();
