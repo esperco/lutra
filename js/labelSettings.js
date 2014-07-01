@@ -87,12 +87,23 @@ var labelSettings = (function() {
     var view = $("<div/>");
     var settingsURL = $("<a href='#'>Label Sync Settings</a>")
       .click(function() { showLabelSettingsModal(team) });
-    view
-      .append("Executive: " + team.team_executive)
-      .append("<br/>")
-      .append("Assistants: " + team.team_assistants.join(", "))
-      .append("<br/>")
-      .append(settingsURL);
+    api.getGoogleProfile(login.me(), team.team_executive, team.teamid)
+      .done(function(execProf) {
+        var deferredAsstProfs = list.map(team.team_assistants, function(a) {
+          return api.getGoogleProfile(login.me(), a, team.teamid);
+        });
+        deferred.join(deferredAsstProfs).done(function(asstProfs) {
+          var asstNames = list.map(asstProfs, function(p) {
+            return util.isNotNull(p) ? p.display_name : "UNKNOWN";
+          });
+          view
+            .append("Executive: " + execProf.display_name)
+            .append("<br/>")
+            .append("Assistants: " + asstNames.join(", "))
+            .append("<br/>")
+            .append(settingsURL);
+        });
+      });
     return view;
   }
 
@@ -109,7 +120,7 @@ var labelSettings = (function() {
     <a #logoutLink href="#!">Log out of Esper</a>
   </div>
   <div #revoke class="hide">
-    <a href="#">Revoke Esper&apos;s access to my Google account</a>
+    <a href="#" #revokeURL>Revoke Esper&apos;s access to my Google account</a>
   </div>
 </div>
 '''
@@ -131,7 +142,7 @@ var labelSettings = (function() {
       return false;
     });
 
-    revoke.click(function() {
+    revokeURL.click(function() {
       api.postGoogleAuthRevoke()
         .done(function() {
           revoke.remove();
