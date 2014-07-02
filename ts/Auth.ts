@@ -29,6 +29,13 @@ module Auth {
      They should be used as long as the API doesn't reject it. */
   export var credentials : Credentials;
 
+  function printCredentialsStatus() {
+    if (credentials !== undefined)
+      Log.d("We are logged in.");
+    else
+      Log.d("We are not logged in.");
+  }
+
   /* Fetch UID and API secret from permanent storage, if they're available */
   function fetchCredentials(callback) {
     var s = document.location.href;
@@ -42,6 +49,7 @@ module Auth {
   function storeCredentials(x, callback) : void {
     credentials = x;
     chrome.storage.sync.set({credentials: credentials}, function() {
+      printCredentialsStatus();
       callback();
     });
   }
@@ -51,13 +59,23 @@ module Auth {
     var port = chrome.runtime.connect();
 
     window.addEventListener("message", function(event) {
+      Log.d("extension received a message",
+            event.origin,
+            event.data);
+      var data = event.data;
       if ((event.origin === "http://localhost"
            || event.origin === "https://app.esper.com")
           && event.source === window
-          && event.data !== undefined
-          && event.data.type === "FROM_PAGE") {
-        Log.d("Content script received: " + JSON.stringify(event.data));
-        // TODO store this.
+          && data !== undefined
+          && data.sender === "Esper") {
+        switch (data.type) {
+        case "Credentials":
+          storeCredentials(data.value, function() {});
+          break;
+        case "Logout":
+          storeCredentials({}, function() {});
+          break;
+        }
       }
     }, false);
   }
@@ -85,6 +103,7 @@ module Auth {
     if (! alreadyInitialized) {
       Log.d("Auth.init()");
       alreadyInitialized = true;
+      fetchCredentials(printCredentialsStatus);
       listenToWindowMessages();
       listenToSyncStorageChanges();
     }
