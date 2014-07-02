@@ -40,6 +40,7 @@ git pull --ff-only origin master
 
 install_ts jquery jquery/jquery.d.ts
 install_ts chrome chrome/chrome.d.ts
+install_ts cryptojs cryptojs/cryptojs.d.ts
 
 
 cd "$ROOT"
