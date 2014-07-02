@@ -87,19 +87,19 @@ var labelSettings = (function() {
     var view = $("<div/>");
     var settingsURL = $("<a href='#'>Label Sync Settings</a>")
       .click(function() { showLabelSettingsModal(team) });
-    api.getGoogleProfile(login.me(), team.team_executive, team.teamid)
-      .done(function(execProf) {
-        var deferredAsstProfs = list.map(team.team_assistants, function(a) {
-          return api.getGoogleProfile(login.me(), a, team.teamid);
+    api.getGoogleEmail(login.me(), team.team_executive, team.teamid)
+      .done(function(execEmail) {
+        var deferredAsstEmails = list.map(team.team_assistants, function(a) {
+          return api.getGoogleEmail(login.me(), a, team.teamid);
         });
-        deferred.join(deferredAsstProfs).done(function(asstProfs) {
-          var asstNames = list.map(asstProfs, function(p) {
-            return util.isNotNull(p) ? p.display_name : "UNKNOWN";
+        deferred.join(deferredAsstEmails).done(function(asstAcctEmails) {
+          var asstEmails = list.map(asstAcctEmails, function(e) {
+            return e.email;
           });
           view
-            .append("Executive: " + execProf.display_name)
+            .append("Executive: " + execEmail.email)
             .append("<br/>")
-            .append("Assistants: " + asstNames.join(", "))
+            .append("Assistants: " + asstEmails.join(", "))
             .append("<br/>")
             .append(settingsURL);
         });
