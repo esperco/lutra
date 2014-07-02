@@ -6,7 +6,7 @@ var login = (function() {
   var mod = {};
   mod.data = {};
 
-  mod.initLoginInfo = function() {
+  function initLoginInfo() {
     var stored = store.get("login");
 
     if (stored && stored.uid) // sanity check
@@ -14,6 +14,24 @@ var login = (function() {
     else
       store.remove("login");
     mod.updateView();
+  };
+
+  /* Pass UID and API secret to the Esper extension */
+  function postLoginInfo() {
+    var x = mod.data;
+    if (util.isDefined(x)
+        && util.isDefined(x.api_secret)
+        && util.isDefined(x.uid)) {
+      var esperMessage = {
+        sender: "Esper",
+        type: "Credentials",
+        value: {
+          apiSecret: x.api_secret,
+          uid: x.uid
+        }
+      };
+      window.postMessage(esperMessage, "*");
+    }
   };
 
   mod.setLoginInfo = function(stored) {
@@ -28,6 +46,7 @@ var login = (function() {
     // Persistent storage never sent to the server
     store.set("login", stored);
     mod.data = stored;
+    postLoginInfo();
     mod.updateView();
   };
 
@@ -37,6 +56,13 @@ var login = (function() {
   }
 
   mod.clearLoginInfo = function() {
+    var esperMessage = {
+      sender: "Esper",
+      type: "Logout",
+      value: {}
+    };
+    window.postMessage(esperMessage, "*");
+
     store.remove("login");
     delete mod.data;
     $("#login-email").val("");
@@ -136,6 +162,11 @@ var login = (function() {
 
   mod.leader = function() {
     return mod.getTeam().team_executive;
+  };
+
+  mod.init = function() {
+    initLoginInfo();
+    postLoginInfo();
   };
 
   return mod;
