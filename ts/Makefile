@@ -8,15 +8,19 @@ app: build
 # Build only
 build: js/app.js
 
-# External JavaScript libraries (needed at runtime only)
+# External JavaScript libraries (needed at runtime only).
+# sha1 is part of cryptojs.
+# The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
-  jquery
+  jquery \
+  sha1
 
 # External TypeScript libraries and type definitions for
-# the external JavaScript libraries (needed at compile time)
+# the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
   jquery.d \
-  chrome.d
+  chrome.d \
+  cryptojs.d
 
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
@@ -25,6 +29,9 @@ TS_LIBS = \
 APP_SOURCES = \
   Util \
   Log \
+  Login \
+  ApiT \
+  Api \
   Auth \
   Main
 
