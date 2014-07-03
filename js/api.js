@@ -192,8 +192,13 @@ var api = (function () {
 
   /***** Google profile information *****/
 
+  mod.getGoogleEmail = function(myUID, theirUID, teamid) {
+    var url = "/api/google/email/" + myUID + "/" + theirUID + "/" + teamid;
+    return jsonHttpGet(url);
+  };
+
   mod.getGoogleProfile = function(myUID, theirUID, teamid) {
-    var url = "/api/google-profile/" + myUID + "/" + theirUID + "/" + teamid;
+    var url = "/api/google/profile/" + myUID + "/" + theirUID + "/" + teamid;
     return jsonHttpGet(url);
   };
 
