@@ -13,7 +13,8 @@ build: js/app.js
 # The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
   jquery \
-  sha1
+  sha1 \
+  gmail
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
@@ -22,6 +23,13 @@ TS_LIBS = \
   chrome.d \
   cryptojs.d
 
+# Our own JavaScript code required in edge cases
+APP_JS = \
+  gmailInit
+
+# Our own TypeScript definitions for external libraries
+APP_DEFS = \
+  gmail.d
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
@@ -46,11 +54,13 @@ APP_TS = \
 # Input to TypeScript compiler
 ALL_TS = \
   $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS))) \
+  $(addsuffix .ts,$(APP_DEFS)) \
   $(APP_TS)
 
 # All JavaScript code to be packed into one file
 ALL_JS = \
   $(addsuffix .js,$(addprefix ../setup/js/,$(JS_LIBS))) \
+  $(addsuffix .js,$(APP_JS)) \
   $(addsuffix .js,$(addprefix js/,$(APP_SOURCES)))
 
 .PHONY: pp
