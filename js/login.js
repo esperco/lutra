@@ -6,7 +6,7 @@ var login = (function() {
   var mod = {};
   mod.data = {};
 
-  function initLoginInfo() {
+  mod.initLoginInfo = function() {
     var stored = store.get("login");
 
     if (stored && stored.uid) // sanity check
