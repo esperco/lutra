@@ -7,7 +7,9 @@ prod: prod-build
 	./install prod 2>&1 | tee -a install.log
 
 prod-build:
-	$(MAKE) -C ts build
+	$(MAKE) -C common
+	$(MAKE) -C content-script build
+	$(MAKE) -C injected-script build
 	$(MAKE) -C css prod-build
 
 # Fetch libraries
@@ -17,5 +19,7 @@ setup:
 # Remove derived files
 clean:
 	rm -rf pub *~ */*~
-	$(MAKE) -C ts clean
+	$(MAKE) -C common clean
+	$(MAKE) -C content-script clean
+	$(MAKE) -C injected-script clean
 	$(MAKE) -C css clean

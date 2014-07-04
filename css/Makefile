@@ -4,7 +4,7 @@
 default: css
 
 FILES = \
-  app
+  content-script
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))
