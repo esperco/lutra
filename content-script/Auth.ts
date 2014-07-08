@@ -56,8 +56,6 @@ module Auth {
 
   /* Wait for the app.esper.com page to post UID and API secret */
   function listenToWindowMessages() {
-    var port = chrome.runtime.connect();
-
     window.addEventListener("message", function(event) {
       Log.d("extension received a message",
             event.origin,

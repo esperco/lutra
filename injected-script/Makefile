@@ -33,7 +33,8 @@ APP_DEFS = \
 # path to file without .ts suffix
 SHARED_SOURCES = \
   ../common/ts/Util \
-  ../common/ts/Log
+  ../common/ts/Log \
+  ../common/ts/Msg
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
@@ -60,12 +61,10 @@ ALL_TS = \
   $(SHARED_TS) \
   $(APP_TS)
 
-# All JavaScript code to be packed into one file
-ALL_JS = \
+# All JavaScript code not derived from our TypeScript files
+EXTRA_JS = \
   $(addsuffix .js,$(addprefix ../setup/js/,$(JS_LIBS))) \
-  $(addsuffix .js,$(APP_JS)) \
-  $(addsuffix .js,$(addprefix js/,$(notdir $(SHARED_SOURCES)))) \
-  $(addsuffix .js,$(addprefix js/,$(APP_SOURCES)))
+  $(addsuffix .js,$(APP_JS))
 
 .PHONY: pp
 pp: $(APP_TS)
@@ -76,7 +75,8 @@ ts/%.ts: %.ts
 
 js/injected-script.js: $(ALL_TS)
 	@mkdir -p js
-	tsc --out $@ $(ALL_TS)
+	tsc --out js/injected-script-ts.js $(ALL_TS)
+	cat $(EXTRA_JS) js/injected-script-ts.js > $@
 
 install:
 	mkdir -p ../pub/js

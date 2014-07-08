@@ -6,9 +6,17 @@
 */
 
 module Main {
+  function injectScript() {
+    var scriptUrl = chrome.extension.getURL("js/injected-script.js");
+    $("<script/>")
+      .attr("src", scriptUrl)
+      .appendTo($("head"));
+  }
+
   export function init() : void {
     Log.d("Main.init()");
     Auth.init();
+    injectScript();
   }
 }
 
