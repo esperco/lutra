@@ -10,7 +10,7 @@ prod-build:
 	$(MAKE) -C common
 	$(MAKE) -C content-script build
 	$(MAKE) -C injected-script build
-	$(MAKE) -C css prod-build
+	$(MAKE) -C css
 
 # Fetch libraries
 setup:

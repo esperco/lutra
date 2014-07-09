@@ -20,8 +20,18 @@
     }
   ],
 
+  "externally_connectable": {
+    "matches": [
+      "http://localhost/*",
+      "https://app.esper.com/*",
+      "https://www.google.com/calendar/*",
+      "https://mail.google.com/mail/*"
+    ]
+  },
+
   "web_accessible_resources": [
-    "js/injected-script.js"
+    "js/injected-script.js",
+    "css/injected-script.css"
   ],
 
   "permissions": [

@@ -12,15 +12,13 @@ build: js/content-script.js
 # sha1 is part of cryptojs.
 # The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
-  jquery \
-  sha1
+  jquery
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
   jquery.d \
-  chrome.d \
-  cryptojs.d
+  chrome.d
 
 # Our own JavaScript code required in edge cases
 APP_JS =
@@ -32,17 +30,12 @@ APP_DEFS =
 # path to file without .ts suffix
 SHARED_SOURCES = \
   ../common/ts/Util \
-  ../common/ts/Log \
-  ../common/ts/Msg
+  ../common/ts/Log
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  Login \
-  ApiT \
-  Api \
-  Auth \
   Main
 
 # Paths to preprocessed TypeScript files from other directories
