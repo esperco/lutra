@@ -27,7 +27,8 @@ var login = (function() {
         type: "Credentials",
         value: {
           apiSecret: x.api_secret,
-          uid: x.uid
+          uid: x.uid,
+          googleAccountId: x.email
         }
       };
       window.postMessage(esperMessage, "*");
