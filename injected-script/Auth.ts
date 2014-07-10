@@ -54,7 +54,6 @@ module Auth {
       alreadyInitialized = true;
       loadCredentials();
       printCredentialsStatus();
-      Api.echo({x:"Hello!"});
     }
   }
 }

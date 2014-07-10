@@ -101,11 +101,12 @@ module Api {
   /* Esper login and password management */
 
   export function echo(serializable) {
-    return jsonHttpPost("/echo", serializable);
+    return jsonHttpPost(Conf.Api.url + "/echo",
+                        JSON.stringify(serializable));
   }
 
   export function getLoginInfo() {
-    return jsonHttpGet("/api/login/" + Login.myUid() + "/info");
+    return jsonHttpGet(Conf.Api.url + "/api/login/" + Login.myUid() + "/info");
   }
 
 }
