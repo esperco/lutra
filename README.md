@@ -29,7 +29,7 @@ Build instructions
 
 Clone next to `badger` (`badger` and `otter` must be in the same directory):
 ```
-git clone git@github.com:timeco/otter.git
+git clone git@github.com:esperco/otter.git
 ```
 
 ```
