@@ -31,7 +31,7 @@ install_ts() {
 # TypeScript type definitions for some of the JavaScript libraries we're using
 cd "$ROOT"
 if [ ! -d DefinitelyTyped ]; then
-    git clone git@github.com:timeco/DefinitelyTyped.git
+    git clone git@github.com:esperco/DefinitelyTyped.git
 fi
 
 cd "$ROOT"/DefinitelyTyped
@@ -45,7 +45,7 @@ install_ts cryptojs cryptojs/cryptojs.d.ts
 
 cd "$ROOT"
 if [ ! -d mink-libs ]; then
-    git clone git@github.com:timeco/mink-libs.git
+    git clone git@github.com:esperco/mink-libs.git
 fi
 
 cd "$ROOT"/mink-libs
@@ -73,7 +73,7 @@ install_js jstz jstz-2013-04-01-f9e3e30e.js
 # We install it manually so we don't depend on an opam setup
 cd "$ROOT"
 if [ ! -d oblivion ]; then
-    git clone git@github.com:timeco/oblivion.git
+    git clone git@github.com:esperco/oblivion.git
 fi
 cd oblivion
 git checkout master
