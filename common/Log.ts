@@ -25,7 +25,8 @@ Esper . xxxxxxxx
 
   /* debug */
   export function d(...a: any[]) {
-    logArray("D", a);
+    if (! Conf.prod)
+      logArray("D", a);
   }
 
   /* info */

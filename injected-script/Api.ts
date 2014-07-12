@@ -1,14 +1,14 @@
 module Api {
   function setHttpHeaders(path) {
     return function(jqXHR) {
-      if (Auth.credentials !== undefined) {
+      if (Init.credentials !== undefined) {
         var unixTime = Math.round(+new Date()/1000).toString();
         var signature = CryptoJS.SHA1(
           unixTime
             + ","
             + path
             + ","
-            + Auth.credentials.apiSecret
+            + Init.credentials.apiSecret
         );
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);

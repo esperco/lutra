@@ -7,7 +7,7 @@
 module Main {
   export function init() : void {
     Log.d("Initializing injected script");
-    Auth.init();
+    Init.init();
   }
 }
 

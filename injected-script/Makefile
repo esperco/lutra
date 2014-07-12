@@ -36,17 +36,17 @@ APP_DEFS = \
 SHARED_SOURCES = \
   ../common/ts/Conf \
   ../common/ts/Util \
-  ../common/ts/Log
+  ../common/ts/Log \
+  ../common/EsperStorage
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  EsperStorage \
   Login \
   ApiT \
   Api \
-  Auth \
+  Init \
   Main
 
 # Paths to preprocessed TypeScript files from other directories

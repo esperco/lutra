@@ -4,7 +4,8 @@ default: pp
 SOURCES = \
   Conf \
   Util \
-  Log
+  Log \
+  EsperStorage
 
 # Paths to .ts source files
 TS_SRC = \

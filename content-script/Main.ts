@@ -20,7 +20,9 @@ module Main {
 
   export function init() : void {
     Log.d("Initializing content script");
-    injectScript();
+    if ((/^https:\/\/mail.google.com\//).test(document.URL))
+      injectScript();
+    Auth.init();
   }
 }
 

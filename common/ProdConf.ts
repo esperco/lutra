@@ -1,5 +1,6 @@
 module Conf {
-  export module Prod {
+  export var prod = true;
+  export module Api {
     export var url = "https://app.esper.com";
   }
 }

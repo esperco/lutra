@@ -29,13 +29,16 @@ APP_DEFS =
 # Preprocessed TypeScript code coming from another directory,
 # path to file without .ts suffix
 SHARED_SOURCES = \
+  ../common/ts/Conf \
   ../common/ts/Util \
-  ../common/ts/Log
+  ../common/ts/Log \
+  ../common/ts/EsperStorage
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
+  Auth \
   Main
 
 # Paths to preprocessed TypeScript files from other directories
