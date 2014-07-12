@@ -16,9 +16,12 @@ var login = (function() {
     mod.updateView();
   };
 
+  var esperExtensionId = "ookpbfepjdkpccenpiehbpeaiglfofgh";
+
   /* Pass UID and API secret to the Esper extension */
   function postLoginInfo() {
     var x = mod.data;
+    log("postLoginInfo:", x);
     if (util.isDefined(x)
         && util.isDefined(x.api_secret)
         && util.isDefined(x.uid)) {
@@ -31,9 +34,19 @@ var login = (function() {
           googleAccountId: x.email
         }
       };
-      window.postMessage(esperMessage, "*");
+      log("esperMessage:", esperMessage);
+      if (util.isDefined(chrome)
+          && util.isDefined(chrome.runtime)
+          && util.isDefined(chrome.runtime.sendMessage)) {
+
+        log("sending message using chrome.runtime.sendMessage");
+        chrome.runtime.sendMessage(
+          esperExtensionId,
+          esperMessage,
+          function() {});
+      }
     }
-  };
+  }
 
   mod.setLoginInfo = function(stored) {
     if (flags.isProduction) {
