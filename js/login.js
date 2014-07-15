@@ -16,8 +16,6 @@ var login = (function() {
     mod.updateView();
   };
 
-  var esperExtensionId = "ookpbfepjdkpccenpiehbpeaiglfofgh";
-
   /* Pass UID and API secret to the Esper extension */
   function postLoginInfo() {
     var x = mod.data;
@@ -39,11 +37,8 @@ var login = (function() {
           && util.isDefined(chrome.runtime)
           && util.isDefined(chrome.runtime.sendMessage)) {
 
-        log("sending message using chrome.runtime.sendMessage");
-        chrome.runtime.sendMessage(
-          esperExtensionId,
-          esperMessage,
-          function() {});
+        log("sending message using window.postMessage");
+        window.postMessage(esperMessage, "*");
       }
     }
   }
