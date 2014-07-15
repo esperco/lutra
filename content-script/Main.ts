@@ -19,6 +19,7 @@ module Main {
   }
 
   export function init() : void {
+    Log.tag = "Esper [CS]";
     Log.d("Initializing content script");
     if ((/^https:\/\/mail.google.com\//).test(document.URL))
       injectScript();

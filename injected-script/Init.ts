@@ -28,7 +28,12 @@ module Init {
   function obtainCredentials(callback: (x: EsperStorage.Credentials) => void) {
     var googleAccountId = gmail.get.user_email();
     Log.d("Google account ID: " + googleAccountId);
-    //credentials = ...
+    var esperMessage : EsperMessage.EsperMessage = {
+      sender: "Esper",
+      type: "CredentialsRequest",
+      value: googleAccountId
+    };
+    window.postMessage(esperMessage, "*");
   }
 
   function injectLoginControls() {

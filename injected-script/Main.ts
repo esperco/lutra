@@ -6,6 +6,7 @@
 
 module Main {
   export function init() : void {
+    Log.tag = "Esper [IS]";
     Log.d("Initializing injected script");
     Init.init();
   }

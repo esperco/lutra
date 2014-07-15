@@ -16,7 +16,7 @@ module EsperStorage {
     credentials: Credentials
   }
 
-  interface EsperStorage {
+  export interface EsperStorage {
     accounts: { [googleAccountId: string]: Account; };
   }
 
@@ -25,6 +25,7 @@ module EsperStorage {
 
   function save(x: EsperStorage, callback: () => void) {
     chrome.storage.sync.set({esper: x}, function() {
+      Log.d("saved esper storage", x);
       callback();
     });
   }
@@ -32,6 +33,7 @@ module EsperStorage {
   function load(callback: (x: EsperStorage) => void) {
     chrome.storage.sync.get("esper", function(obj : any) {
       var x : EsperStorage = obj.esper;
+      Log.d("got esper storage:", x);
       if (x === undefined)
         x = { accounts: {} };
       else if (x.accounts === undefined)
@@ -60,7 +62,7 @@ module EsperStorage {
       var account = getAccount(esper, k);
       if (account === undefined) {
         account = { credentials: x };
-        esper[k] = account;
+        esper.accounts[k] = account;
       }
       else
         account.credentials = x;
@@ -85,6 +87,18 @@ module EsperStorage {
       if (esper.accounts[googleAccountId] !== undefined)
         delete esper.accounts[googleAccountId];
       save(esper, whenDone);
+    });
+  }
+
+  export function listenForChange(callback: (oldValue: EsperStorage,
+                                             newValue: EsperStorage) => void) {
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+      if (namespace === "sync") {
+        var change = changes["esper"];
+        if (change !== undefined) {
+          callback(change.oldValue, change.newValue);
+        }
+      }
     });
   }
 }

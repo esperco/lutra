@@ -5,7 +5,8 @@ SOURCES = \
   Conf \
   Util \
   Log \
-  EsperStorage
+  EsperStorage \
+  EsperMessage
 
 # Paths to .ts source files
 TS_SRC = \
