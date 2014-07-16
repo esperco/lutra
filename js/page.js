@@ -10,6 +10,7 @@ var page = (function() {
     task: {},
     scheduling: {},
     respond: {},
+    close: {},
     test: {}
   };
 
