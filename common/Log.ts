@@ -1,4 +1,10 @@
 module Log {
+  /*
+    Change this tag to distinguish between different scripts
+    logging to the same console.
+  */
+  export var tag = "Esper";
+
   function prefixLines(prefix, text) {
     return text.replace(/\n/mg, "\n" + prefix);
   }
@@ -16,16 +22,17 @@ Esper . xxxxxxxx
       if (console != undefined && console.log != undefined) {
         var s = Util.toString(args[i]);
         if (i === 0)
-          s = "Esper " + prefix + " " + s;
+          s = tag + " " + prefix + " " + s;
         else
-          s = "Esper . " + s;
-        console.log(prefixLines("Esper . ", s));
+          s = tag + " . " + s;
+        console.log(prefixLines(tag + " . ", s));
       }
   }
 
   /* debug */
   export function d(...a: any[]) {
-    logArray("D", a);
+    if (! Conf.prod)
+      logArray("D", a);
   }
 
   /* info */

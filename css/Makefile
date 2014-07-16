@@ -1,16 +1,14 @@
 # Compile LESS files into CSS
 
-.PHONY: default prod-build dev-build css clean
+.PHONY: default css clean
 default: css
 
 FILES = \
-  app
+  content-script \
+  injected-script
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))
-
-prod-build: css
-dev-build: css
 
 css: $(CSS)
 

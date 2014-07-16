@@ -13,11 +13,25 @@
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
       ],
-      "css": ["css/app.css"],
-      "js": ["js/app.js"],
+      "css": ["css/content-script.css"],
+      "js": ["js/content-script.js"],
 
       "run_at": "document_end"
     }
+  ],
+
+  "externally_connectable": {
+    "matches": [
+      "http://localhost/*",
+      "https://app.esper.com/*",
+      "https://www.google.com/calendar/*",
+      "https://mail.google.com/mail/*"
+    ]
+  },
+
+  "web_accessible_resources": [
+    "js/injected-script.js",
+    "css/injected-script.css"
   ],
 
   "permissions": [

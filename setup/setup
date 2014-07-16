@@ -42,6 +42,17 @@ install_ts jquery jquery/jquery.d.ts
 install_ts chrome chrome/chrome.d.ts
 install_ts cryptojs cryptojs/cryptojs.d.ts
 
+cd "$ROOT"
+if [ ! -d gmail.js ]; then
+    git clone git@github.com:timeco/gmail.js.git
+fi
+
+cd "$ROOT"/gmail.js
+git checkout master
+git pull --ff-only origin master
+
+install_js gmail src/gmail.js
+
 
 cd "$ROOT"
 if [ ! -d mink-libs ]; then
@@ -51,7 +62,6 @@ fi
 cd "$ROOT"/mink-libs
 git checkout master
 git pull --ff-only origin master
-
 
 # jQuery
 install_js jquery jquery-2.1.0.js

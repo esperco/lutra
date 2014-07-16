@@ -21,7 +21,8 @@ mkdir -p pub/css pub/js pub/img pub/html
 ### Copy third-party libraries into the pub directory
 
 ### Build our own code and copy the result into the pub directory
-make -C ts install
+make -C content-script install
+make -C injected-script install
 cp css/*.css pub/css
 cp img/* pub/img
 cp html/popup.html pub/html

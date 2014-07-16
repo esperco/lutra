@@ -1,22 +1,4 @@
-module Api {
-  function setHttpHeaders(path) {
-    return function(jqXHR) {
-      if (Auth.credentials !== undefined) {
-        var unixTime = Math.round(+new Date()/1000).toString();
-        var signature = CryptoJS.SHA1(
-          unixTime
-            + ","
-            + path
-            + ","
-            + Auth.credentials.apiSecret
-        );
-        jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
-        jqXHR.setRequestHeader("Esper-Path", path);
-        jqXHR.setRequestHeader("Esper-Signature", signature);
-      }
-    }
-  }
-
+module JsonHttp {
   function jsonHttp(method, path, body) {
 
     function logError(xhr, textStatus, err) {
@@ -60,26 +42,25 @@ module Api {
       type: method,
       data: body,
       dataType: "json",
-      contentType: contentType,
-      beforeSend: setHttpHeaders(path)
+      contentType: contentType
     };
     return $.ajax(request)
       .fail(logError);
   }
 
-  function jsonHttpGet(path) {
+  export function get(path) {
     return jsonHttp("GET", path, null);
   }
 
-  function jsonHttpPost(path, body) {
+  export function post(path, body) {
     return jsonHttp("POST", path, body);
   }
 
-  function jsonHttpPut(path, body) {
+  export function put(path, body) {
     return jsonHttp("PUT", path, body);
   }
 
-  function jsonHttpDelete(path) {
+  export function delete_(path) {
     return jsonHttp("DELETE", path, null);
   }
 
@@ -87,21 +68,10 @@ module Api {
     ["foo=123", "bar=abc"] -> "?foo=123&bar=abc"
     [] -> ""
   */
-  function makeQuery(argArray) {
+  export function makeQuery(argArray) {
     var s = argArray.join("&");
     if (argArray.length > 0)
       s = "?" + s;
     return s;
   }
-
-
-  /********************************* API ***************************/
-
-
-  /* Esper login and password management */
-
-  export function getLoginInfo() {
-    return jsonHttpGet("/api/login/" + Login.myUid() + "/info");
-  }
-
 }
