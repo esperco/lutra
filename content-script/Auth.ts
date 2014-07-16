@@ -75,6 +75,14 @@ module Auth {
         case "CredentialsResponse":
           break;
 
+        /* Listen for logouts from the app.esper.com page */
+        case "Logout":
+          EsperStorage.deleteCredentials(
+            request.value.googleAccountId,
+            function() { Log.d("Removed credentials from storage"); }
+          );
+          break;
+
         default:
           Log.d("Unknown request type: " + request.type);
         }
