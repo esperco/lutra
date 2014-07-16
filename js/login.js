@@ -68,8 +68,9 @@ var login = (function() {
     var esperMessage = {
       sender: "Esper",
       type: "Logout",
-      value: {}
+      value: { googleAccountId: mod.data.email }
     };
+    log("esperMessage:", esperMessage);
     window.postMessage(esperMessage, "*");
 
     store.remove("login");
