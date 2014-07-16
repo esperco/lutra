@@ -25,7 +25,7 @@ module Init {
     but this solution comes with a bunch of assumptions and possible
     complications).
   */
-  function obtainCredentials(callback: (x: EsperStorage.Credentials) => void) {
+  function obtainCredentials() {
     var googleAccountId = gmail.get.user_email();
     Log.d("Google account ID: " + googleAccountId);
     var esperMessage : EsperMessage.EsperMessage = {
@@ -52,14 +52,53 @@ module Init {
       injectLoggedInControls();
   }
 
+  /*
+    Check if the credentials we received from the content script
+    match the current gmail user.
+  */
+  function filterCredentials(cred: EsperStorage.Credentials) {
+    var googleAccountId = gmail.get.user_email();
+    if (cred !== undefined && cred.googleAccountId === googleAccountId) {
+      credentials = cred;
+      injectEsperControls();
+    }
+  }
+
+  function listenForMessages() {
+    Log.d("listenForMessages()");
+    window.addEventListener("message", function(event) {
+      var request = event.data;
+      if (request.sender === "Esper") {
+        Log.d("Received message:", event.data);
+        switch (request.type) {
+
+        /* Credentials sent by content script;
+           may not be for the desired account. */
+        case "CredentialsResponse":
+          filterCredentials(request.value);
+          break;
+
+        /* Sent by injected script itself, ignored. */
+        case "CredentialsRequest":
+          break;
+
+        default:
+          Log.d("Unknown request type: " + request.type);
+        }
+      }
+    });
+
+  }
+
   var alreadyInitialized = false;
 
   export function init() {
     if (! alreadyInitialized) {
       Log.d("Init.init()");
       alreadyInitialized = true;
+      listenForMessages();
       if (credentials === undefined) {
-        obtainCredentials(injectEsperControls)
+        obtainCredentials();
       }
     }
   }

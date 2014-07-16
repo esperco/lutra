@@ -7,30 +7,51 @@ module Auth {
     as a Google Chrome user.
   */
 
-  function sendResponse(x: EsperStorage.EsperStorage) {
+  function sendCredentialsResponse(x: EsperStorage.Credentials) {
     if (/^https:\/\/mail.google.com\//.test(document.URL)) {
       Log.d("Sending message from content script to gmail page", x);
       var esperMessage : EsperMessage.EsperMessage = {
         sender: "Esper",
-        type: "EsperStorage",
+        type: "CredentialsResponse",
         value: x
       };
       window.postMessage(esperMessage, "*");
     }
   }
 
+  /*
+    Send credentials for all Esper accounts because we're not keeping track
+    of which account was requested.
+  */
+  function sendStorage(x: EsperStorage.EsperStorage) {
+    if (x !== undefined && x.accounts !== undefined) {
+      var accounts = x.accounts;
+      for (var k in accounts) {
+        sendCredentialsResponse(accounts[k].credentials);
+      }
+    }
+  }
+
+  function openLoginTab(googleAccountId) {
+    var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
+    Log.d("Going off to " + url);
+    var win = window.open(url, '_blank');
+    win.focus();
+  }
+
   function obtainCredentials(googleAccountId) {
-    EsperStorage.loadCredentials(googleAccountId, function(x) {
+    EsperStorage.loadCredentials(googleAccountId,
+                                 function(x: EsperStorage.Credentials) {
       if (x !== undefined)
-        sendResponse(x);
+        sendCredentialsResponse(x);
       else
-        Log.d("TODO: initiate Google Oauth sign-in");
+        openLoginTab(googleAccountId);
     });
   }
 
 
   function listenForMessages() {
-    Log.d("listenForCredentials()");
+    Log.d("listenForMessages()");
     window.addEventListener("message", function(event) {
       var request = event.data;
       if (request.sender === "Esper") {
@@ -50,6 +71,10 @@ module Auth {
           obtainCredentials(request.value);
           break;
 
+        /* Sent by content script itself, ignored. */
+        case "CredentialsResponse":
+          break;
+
         default:
           Log.d("Unknown request type: " + request.type);
         }
@@ -64,7 +89,7 @@ module Auth {
     Log.d("listenForCredentialsChange()");
     EsperStorage.listenForChange(function(oldStorage, newStorage) {
       if (newStorage !== undefined) {
-        sendResponse(newStorage);
+        sendStorage(newStorage);
       }
     });
   }
