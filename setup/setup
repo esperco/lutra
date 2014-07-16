@@ -53,7 +53,6 @@ git pull --ff-only origin master
 
 install_js gmail src/gmail.js
 
-
 cd "$ROOT"
 if [ ! -d mink-libs ]; then
     git clone git@github.com:esperco/mink-libs.git
@@ -62,6 +61,8 @@ fi
 cd "$ROOT"/mink-libs
 git checkout master
 git pull --ff-only origin master
+
+install_js sha1 sha1.js
 
 # jQuery
 install_js jquery jquery-2.1.0.js
