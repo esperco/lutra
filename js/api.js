@@ -26,6 +26,9 @@ var api = (function () {
       case 401:
         log("Unauthorized", details);
         break;
+      case 403:
+        log("Forbidden", details);
+        break;
       case 404:
         log("Not found", details);
         break;
@@ -145,7 +148,8 @@ var api = (function () {
 
   mod.getGoogleAuthUrl = function(optAuthLandingUrl,
                                   optLoginNonce,
-                                  optInvite) {
+                                  optInvite,
+                                  optEmail) {
     var url = "/api/google-auth-url";
     var q = [];
     if (util.isString(optAuthLandingUrl))
@@ -154,6 +158,8 @@ var api = (function () {
       q.push("login_nonce=" + encodeURIComponent(optLoginNonce));
     if (util.isString(optInvite))
       q.push("invite=" + encodeURIComponent(optInvite));
+    if (util.isString(optEmail))
+      q.push("login_hint=" + encodeURIComponent(optEmail));
     url = url + makeQuery(q);
     return jsonHttpGet(url);
   };

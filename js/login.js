@@ -19,6 +19,7 @@ var login = (function() {
   /* Pass UID and API secret to the Esper extension */
   function postLoginInfo() {
     var x = mod.data;
+    log("postLoginInfo:", x);
     if (util.isDefined(x)
         && util.isDefined(x.api_secret)
         && util.isDefined(x.uid)) {
@@ -27,12 +28,20 @@ var login = (function() {
         type: "Credentials",
         value: {
           apiSecret: x.api_secret,
-          uid: x.uid
+          uid: x.uid,
+          googleAccountId: x.email
         }
       };
-      window.postMessage(esperMessage, "*");
+      log("esperMessage:", esperMessage);
+      if (util.isDefined(chrome)
+          && util.isDefined(chrome.runtime)
+          && util.isDefined(chrome.runtime.sendMessage)) {
+
+        log("sending message using window.postMessage");
+        window.postMessage(esperMessage, "*");
+      }
     }
-  };
+  }
 
   mod.setLoginInfo = function(stored) {
     if (flags.isProduction) {

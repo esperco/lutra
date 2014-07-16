@@ -5,8 +5,8 @@ var route = (function() {
   var mod = {};
   mod.nav = {};
 
-  function withLogin(whenDone, optInviteCode) {
-    signin.signin(whenDone, optInviteCode);
+  function withLogin(whenDone, optInviteCode, optEmail) {
+    signin.signin(whenDone, optInviteCode, optEmail);
   }
 
   var Router = can.Control({
@@ -26,6 +26,10 @@ var route = (function() {
     /* Sign-in via Google */
     "login-once/:uid/:hex_landing_url route" : function(data) {
       signin.loginOnce(data.uid, util.hexDecode(data.hex_landing_url));
+    },
+
+    "login/:email route" : function(data) {
+      withLogin(function() { window.close(); }, undefined, data.email);
     },
 
     /* login, logout, etc. */

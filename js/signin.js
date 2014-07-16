@@ -66,7 +66,18 @@ var signin = (function() {
     store.remove("login_nonce");
   }
 
-  function displayLoginLinks(msg, landingUrl, optInvite) {
+  /* Go straight to Google Oauth page without displaying the sign-in button */
+  function forceLogin(landingUrl, optInvite, optEmail) {
+    setLoginNonce()
+      .done(function(loginNonce) {
+        api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
+          .done(function(x) {
+            requestGoogleAuth(x.url);
+          });
+      });
+  }
+
+  function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
 <div #view>
   <div #msgDiv/>
@@ -87,7 +98,7 @@ var signin = (function() {
         rootView.removeClass("hide");
 
         button.click(function() {
-          api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite)
+          api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
             .done(function(x) {
               requestGoogleAuth(x.url);
             });
@@ -109,21 +120,23 @@ var signin = (function() {
       .then(
         /* success */
         function(tokenDescription) {
-          var loginView = displayLoginLinks("", "#!", inviteCode);
+          var loginView = displayLoginLinks("", "#!", inviteCode, undefined);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */
         function() {
-          displayLoginLinks("Invalid invite.", "#!");
+          displayLoginLinks("Invalid invite.", "#!", undefined);
         }
       );
   }
 
-  function loginOrSignup() {
+  function loginOrSignup(optEmail) {
     log("loginOrSignup");
     var uid = login.me();
     var landingUrl = document.URL;
-    if (util.isDefined(uid)) {
+    if (util.isDefined(optEmail)) {
+      forceLogin(landingUrl, undefined, optEmail);
+    } else if (util.isDefined(uid)) {
       return api.getLoginInfo()
         .then(
           /* success */
@@ -136,11 +149,13 @@ var signin = (function() {
             /* useful for testing; may not be ideal in production */
             login.clearLoginInfo();
             displayLoginLinks("Something's wrong. Please try to log in.",
-                              landingUrl);
+                              landingUrl,
+                              undefined,
+                              optEmail);
             return deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Please log in.", landingUrl);
+      displayLoginLinks("Please log in.", landingUrl, undefined, optEmail);
       return deferred.defer(false);
     }
   }
@@ -229,11 +244,11 @@ var signin = (function() {
     return deferred.defer();
   }
 
-  mod.signin = function(whenDone, optInviteCode) {
+  mod.signin = function(whenDone, optInviteCode, optEmail) {
     if (util.isString(optInviteCode)) {
       useInvite(optInviteCode);
     } else {
-      loginOrSignup()
+      loginOrSignup(optEmail)
         .done(function(ok) {
           if (ok) {
             var landingUrl = document.URL;
@@ -256,6 +271,7 @@ var signin = (function() {
 
   function goToRelativeUrl(url) {
     var relativeUrl = parseUrl.toRelative(parseUrl.parse(url));
+    log("Going to " + relativeUrl);
     window.location = relativeUrl;
   }
 
