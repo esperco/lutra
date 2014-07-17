@@ -272,7 +272,10 @@ var signin = (function() {
   function goToRelativeUrl(url) {
     var relativeUrl = parseUrl.toRelative(parseUrl.parse(url));
     log("Going to " + relativeUrl);
-    window.location = relativeUrl;
+    $(document).ready(function() {
+      window.location.assign(relativeUrl);
+      window.location.reload();
+    });
   }
 
   mod.loginOnce = function(uid, landingUrl) {

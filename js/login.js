@@ -33,13 +33,9 @@ var login = (function() {
         }
       };
       log("esperMessage:", esperMessage);
-      if (util.isDefined(chrome)
-          && util.isDefined(chrome.runtime)
-          && util.isDefined(chrome.runtime.sendMessage)) {
 
-        log("sending message using window.postMessage");
-        window.postMessage(esperMessage, "*");
-      }
+      log("sending message using window.postMessage");
+      window.postMessage(esperMessage, "*");
     }
   }
 
