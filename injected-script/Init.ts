@@ -40,16 +40,12 @@ module Init {
     Log.d("injectLoginControls()");
   }
 
-  function injectLoggedInControls() {
-    Log.d("injectLoggedInControls()");
-  }
-
   function injectEsperControls() {
     printCredentialsStatus();
     if (credentials === undefined)
       injectLoginControls();
     else
-      injectLoggedInControls();
+      MsgView.init();
   }
 
   /*
@@ -97,9 +93,7 @@ module Init {
       Log.d("Init.init()");
       alreadyInitialized = true;
       listenForMessages();
-      if (credentials === undefined) {
-        obtainCredentials();
-      }
+      obtainCredentials();
     }
   }
 }

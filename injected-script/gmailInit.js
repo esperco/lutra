@@ -11,8 +11,8 @@ gmail.off = {};
                           gmail.observe.unread.off()
 */
 function specialize(name) {
-  gmail.on[name] = function(callback) { gmail.observe.on(callback); };
-  gmail.off[name] = function() { gmail.observe.off(); };
+  gmail.on[name] = function(callback) { gmail.observe.on(name, callback); };
+  gmail.off[name] = function() { gmail.observe.off(name); };
 }
 
 specialize("unread");

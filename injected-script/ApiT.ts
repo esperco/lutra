@@ -56,4 +56,50 @@ module ApiT {
     profile: Profile;
     teams: Team[];
   }
+
+  export interface CalendarTime {
+    local: string; // RFC 3339 timestamp; local time = time read in UTC
+    utc: string; // RFC 3339 timestamp
+  }
+
+  export interface Latlon {
+    lat: number;
+    lon: number;
+  }
+
+  export interface Location {
+    title: string;
+    address: string;
+    instructions: string;
+    coord: Latlon; // optional
+    timezone: string; // required if coordinates are missing
+  }
+
+  export interface CalendarEvent {
+    google_event_id : string;
+    start: CalendarTime;
+    end: CalendarTime;
+
+    /* optional fields */
+    meeting_type: string;
+    title: string;
+    description: string;
+    location: Location;
+    all_day: boolean;
+    transparent: boolean;
+    esper_tid: string;
+  }
+
+  export interface ShowCalendarEvents {
+    events: CalendarEvent[];
+  }
+
+  export interface googleEvent {
+    google_event_id: string;
+    sync_description: boolean;
+  }
+
+  export interface LinkCalendarEvents {
+    google_events: googleEvent[];
+  }
 }

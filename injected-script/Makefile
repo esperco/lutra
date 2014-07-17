@@ -48,6 +48,7 @@ APP_SOURCES = \
   JsonHttp \
   ApiT \
   Api \
+  MsgView \
   Init \
   Main
 
