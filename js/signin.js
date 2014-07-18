@@ -134,6 +134,7 @@ var signin = (function() {
     log("loginOrSignup");
     var uid = login.me();
     var landingUrl = document.URL;
+    landingUrl.hash = "#!";
     if (util.isDefined(optEmail)) {
       forceLogin(landingUrl, undefined, optEmail);
     } else if (util.isDefined(uid)) {
