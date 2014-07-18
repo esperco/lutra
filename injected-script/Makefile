@@ -81,7 +81,7 @@ pp: $(APP_TS)
 
 ts/%.ts: %.ts
 	@mkdir -p ts
-	../setup/bin/oblivion $< -o $@
+	../setup/bin/oblivion -ts $< -o $@
 
 js/injected-script.js: $(ALL_TS)
 	@mkdir -p js

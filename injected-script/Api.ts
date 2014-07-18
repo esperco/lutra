@@ -11,21 +11,20 @@ module Api {
     return JsonHttp.get(Conf.Api.url + "/api/login/" + Login.myUid() + "/info");
   }
 
-  export function getLinkedEvents(uid, teamid, googleAccountId, threadId) {
+  export function getLinkedEvents(teamid, threadId) {
     var url =
-      Conf.Api.url + "/api/thread/events/" + uid
+      Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
-      + "/" + encodeURIComponent(googleAccountId)
+      + "/" + encodeURIComponent(Login.myGoogleAccountId())
       + "/" + threadId;
     return JsonHttp.get(url);
   }
 
-  export function putLinkedEvents(uid, teamid, googleAccountId, threadId,
-                                  calEvents) {
+  export function putLinkedEvents(teamid, threadId, calEvents) {
     var url =
-      Conf.Api.url + "/api/thread/events/" + uid
+      Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
-      + "/" + encodeURIComponent(googleAccountId)
+      + "/" + encodeURIComponent(Login.myGoogleAccountId())
       + "/" + threadId;
     return JsonHttp.put(url, calEvents);
   }
