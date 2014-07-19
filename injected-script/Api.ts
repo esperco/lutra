@@ -15,7 +15,6 @@ module Api {
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
-      + "/" + encodeURIComponent(Login.myGoogleAccountId())
       + "/" + threadId;
     return JsonHttp.get(url);
   }
@@ -24,14 +23,13 @@ module Api {
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
-      + "/" + encodeURIComponent(Login.myGoogleAccountId())
       + "/" + threadId;
     return JsonHttp.put(url, calEvents);
   }
 
-  export function eventSearch(uid, teamid, query) {
+  export function eventSearch(teamid, query) {
     var url =
-      Conf.Api.url + "/api/calendar/search/" + uid
+      Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(query);
     return JsonHttp.get(url);

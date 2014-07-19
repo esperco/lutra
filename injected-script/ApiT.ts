@@ -76,7 +76,8 @@ module ApiT {
   }
 
   export interface CalendarEvent {
-    google_event_id : string;
+    google_event_id: string;
+    google_cal_id: string;
     start: CalendarTime;
     end: CalendarTime;
 

@@ -63,6 +63,7 @@ module JsonHttp {
       contentType: contentType,
       beforeSend: setHttpHeaders(path)
     };
+    Log.d("API request:", request);
     return $.ajax(request)
       .fail(logError);
   }
