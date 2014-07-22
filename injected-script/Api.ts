@@ -24,7 +24,34 @@ module Api {
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId;
-    return JsonHttp.put(url, calEvents);
+    return JsonHttp.put(url, JSON.stringify(calEvents));
+  }
+
+  export function linkEvent(teamid, threadId, calEvent) {
+    var url =
+      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + calEvent.google_event_id;
+    return JsonHttp.put(url, JSON.stringify(calEvent));
+  }
+
+  export function unlinkEvent(teamid, threadId, eventId) {
+    var url =
+      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.delete_(url);
+  }
+
+  export function deleteLinkedEvent(teamid, threadId, eventId) {
+    var url =
+      Conf.Api.url + "/api/thread/event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.delete_(url);
   }
 
   export function eventSearch(teamid, query) {

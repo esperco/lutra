@@ -24,7 +24,7 @@ module MsgView {
     return root;
   }
 
-  function renderEvent(e: ApiT.CalendarEvent) {
+  function renderEvent(e: ApiT.CalendarEvent, teamid, threadId) {
 '''
 <div #view class="esper-ev">
   <div class="esper-ev-date">
@@ -38,27 +38,41 @@ module MsgView {
       &rarr;
       <span #end class="esper-ev-end"></span>
     </div>
+    <button #unlinkButton>Unlink</button>
+    <button #deleteButton>Delete</button>
   </div>
 </div>
 '''
     month.text("Jun"); // TODO
-    day.text("31"); // TODO
+    day.text("33"); // TODO
     start.text("9:00am"); // TODO
-    end.text("9:30am"); // TODO
+    end.text("9:99am"); // TODO
 
     if (e.title !== undefined)
       title.text(e.title);
-    else if (e.description !== undefined)
-      title.text(e.description);
+
+    unlinkButton.click(function() {
+      Api.unlinkEvent(teamid, threadId, e.google_event_id)
+        .done(function() {
+          view.remove();
+        });
+    });
+
+    deleteButton.click(function() {
+      Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
+        .done(function() {
+          view.remove();
+        });
+    });
 
     return view;
   }
 
-  function displayEventList(events, view) {
+  function displayEventList(events, teamid, threadId, view) {
     view.count.text(events.length.toString());
     view.events.children().remove();
     events.forEach(function(e) {
-      view.events.append(renderEvent(e));
+      view.events.append(renderEvent(e, teamid, threadId));
     });
   }
 
@@ -81,10 +95,60 @@ module MsgView {
       });
   }
 
-  function setupSearch(view) {
-    afterTyping(view.searchbox, 250, function() {
-      Api.eventSearch(teamid, view.searchbox.text())
+  function linkEvent(e, teamid, threadId, view) {
+    Api.linkEvent(teamid, threadId, {
+      google_event_id: e.google_event_id,
+      sync_description: true
+    })
+      .done(function() {
+        refreshEventList(teamid, threadId, view);
+      });
+  }
+
+  function renderSearchResult(e: ApiT.CalendarEvent, teamid, teamView) {
+'''
+<div #view class="esper-ev-result">
+  <span #title class="esper-ev-result-title"></span>
+  <span #date class="esper-ev-result-date"></span>
+</div>
+'''
+    var threadId = currentThreadId;
+    if (e.title !== undefined)
+      title.text(e.title);
+    if (e.start !== undefined) {
+      date.text(e.start.utc);
+    }
+    view.click(function() {
+      linkEvent(e, teamid, threadId, teamView);
     });
+    return view;
+  }
+
+  function displayLinkableEvents(eventList, teamid, view) {
+    var list = $("<div>");
+    eventList.forEach(function(e) {
+      renderSearchResult(e, teamid, view)
+        .appendTo(list);
+    });
+    view.results.children().remove();
+    view.results.append(list);
+  }
+
+  function setupSearch(teamid, view) {
+    afterTyping(view.searchbox, 250, function() {
+      Api.eventSearch(teamid, view.searchbox.val())
+        .done(function(results) {
+          displayLinkableEvents(results.events, teamid, view);
+        });
+    });
+  }
+
+  /* reuse the view created for the team, update list of linked events */
+  function refreshEventList(teamid, threadId, view) {
+    Api.getLinkedEvents(teamid, threadId)
+      .done(function(linkedEvents) {
+        displayEventList(linkedEvents.events, teamid, threadId, view);
+      });
   }
 
   function displayLinkedEvents(rootElement,
@@ -103,7 +167,8 @@ module MsgView {
   </div>
 </div>
 '''
-    displayEventList(linkedEvents.events, _view);
+    displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
+    setupSearch(team.teamid, _view);
     rootElement.append(view);
   }
 
