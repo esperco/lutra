@@ -1,14 +1,14 @@
 module JsonHttp {
   function setHttpHeaders(path) {
     return function(jqXHR) {
-      if (Init.credentials !== undefined) {
+      if (Login.credentials !== undefined) {
         var unixTime = Math.round(+new Date()/1000).toString();
         var signature = CryptoJS.SHA1(
           unixTime
             + ","
             + path
             + ","
-            + Init.credentials.apiSecret
+            + Login.credentials.apiSecret
         );
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);
@@ -52,7 +52,7 @@ module JsonHttp {
       (see jQuery documentation)
     */
     var contentType;
-    if (body !== undefined && body.length > 0) {
+    if (body !== undefined && body !== null && body.length > 0) {
       contentType = "application/json; charset=UTF-8";
     }
     var request = {
@@ -63,6 +63,7 @@ module JsonHttp {
       contentType: contentType,
       beforeSend: setHttpHeaders(path)
     };
+    Log.d("API request:", request);
     return $.ajax(request)
       .fail(logError);
   }

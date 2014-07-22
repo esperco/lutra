@@ -1,11 +1,10 @@
 module Init {
-  /* Cached UID and API secret and user ID.
-     They should be used as long as the API doesn't reject it. */
-  export var credentials : EsperStorage.Credentials;
+  export var loginInfo : ApiT.LoginResponse;
+    /* List of teams, etc; refreshed when credentials change */
 
   function printCredentialsStatus() {
-    if (credentials !== undefined)
-      Log.d("We are logged in as " + credentials.googleAccountId + ".");
+    if (Login.credentials !== undefined)
+      Log.d("We are logged in as " + Login.myGoogleAccountId() + ".");
     else
       Log.d("We are not logged in.");
   }
@@ -40,16 +39,12 @@ module Init {
     Log.d("injectLoginControls()");
   }
 
-  function injectLoggedInControls() {
-    Log.d("injectLoggedInControls()");
-  }
-
   function injectEsperControls() {
     printCredentialsStatus();
-    if (credentials === undefined)
+    if (Login.credentials === undefined)
       injectLoginControls();
     else
-      injectLoggedInControls();
+      MsgView.init();
   }
 
   /*
@@ -59,8 +54,12 @@ module Init {
   function filterCredentials(cred: EsperStorage.Credentials) {
     var googleAccountId = gmail.get.user_email();
     if (cred !== undefined && cred.googleAccountId === googleAccountId) {
-      credentials = cred;
-      injectEsperControls();
+      Login.credentials = cred;
+      Api.getLoginInfo()
+        .done(function(loginInfo) {
+          Login.info = loginInfo;
+          injectEsperControls();
+        });
     }
   }
 
@@ -97,9 +96,7 @@ module Init {
       Log.d("Init.init()");
       alreadyInitialized = true;
       listenForMessages();
-      if (credentials === undefined) {
-        obtainCredentials();
-      }
+      obtainCredentials();
     }
   }
 }
