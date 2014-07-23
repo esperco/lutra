@@ -80,9 +80,34 @@ var signin = (function() {
   function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
 <div #view>
-  <div #msgDiv/>
-  <button #button
-          class="google-sign-in"/>
+  <div class="sign-in">
+    <div class="logo-container">
+      <div #loginLogo id="sign-in-hero-mark" class="animated fadeInUp"/>
+    </div>
+    <div #msgDiv class="sign-in-msg"/>
+    <button #button class="sign-in-btn">
+      <div #google class="google-g"/>
+      <div class="btn-divider"/>
+      <div class="sign-in-text">Sign in with Google</div>
+    </button>
+  </div>
+  <div class="sign-in-footer">
+    <div class="copyright">
+      &copy; 2014 Esper Technologies, Inc.
+      All rights reserved.
+    </div>
+    <a href="mailto:team@esper.com" class="footer-link">Help</a>
+    <div class="footer-divider"/>
+    <a href="http://esper.com/privacypolicy.html"
+       target="blank"
+       class="footer-link">Privacy</a>
+    <div class="footer-divider"/>
+    <a href="http://esper.com/termsofuse.html"
+       target="blank"
+       class="footer-link">
+         Terms
+    </a>
+  </div>
 </div>
 '''
     var rootView = $("#onboarding-interface");
@@ -90,8 +115,16 @@ var signin = (function() {
 
     $("#login-status").addClass("hide");
 
+    var logo = $("<img class='svg-block hero-mark'/>")
+      .appendTo(loginLogo);
+    svg.loadImg(logo, "/assets/img/esper-mark.svg");
+
     if (util.isString(msg))
       msgDiv.text(msg);
+
+    var googleG = $("<img class='svg-block'/>")
+      .appendTo(google);
+    svg.loadImg(googleG, "/assets/img/google-g.svg");
 
     setLoginNonce()
       .done(function(loginNonce) {
@@ -149,14 +182,14 @@ var signin = (function() {
           function() {
             /* useful for testing; may not be ideal in production */
             login.clearLoginInfo();
-            displayLoginLinks("Something's wrong. Please try to log in.",
+            displayLoginLinks("Something's wrong. Please try to sign in.",
                               landingUrl,
                               undefined,
                               optEmail);
             return deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Please log in.", landingUrl, undefined, optEmail);
+      displayLoginLinks("Sign in to continue.", landingUrl, undefined, optEmail);
       return deferred.defer(false);
     }
   }

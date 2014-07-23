@@ -5,7 +5,6 @@ default: css
 
 FILES = \
   custom-bootstrap \
-  fonts \
   app \
   guest-app \
   datepicker \

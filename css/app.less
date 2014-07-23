@@ -1,11 +1,3 @@
-/*** Fonts ***/
-@light: "Proxima Nova Light";
-@light_italic: "Proxima Nova Light Italic";
-@regular: "Proxima Nova Regular";
-@regular_italic: "Proxima Nova Regular Italic";
-@bold: "Proxima Nova Semibold";
-
-
 /*** Colors ***/
 @blue: #0080ce;
 @blue_bg: #dfeff7;
@@ -32,6 +24,7 @@
 @purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
+@purple_gradient: #a464c6;
 @purple_hover: #8c42ad;
 @purple_text: #463c4c;
 @red: #d9534f;
@@ -50,7 +43,8 @@ html {
 body {
   background: white;
   color: @purple_text;
-  font-family: @regular, Arial;
+  font-family: "Open Sans";
+  font-weight: normal;
   font-size: 14px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -72,7 +66,7 @@ i { color: @gray_60; }
 
 .svg-block { display: block; }
 
-.bold { font-family: @bold; }
+.bold { font-weight: bold; }
 
 .scrollable { overflow: auto; }
 
@@ -223,7 +217,7 @@ i { color: @gray_60; }
 #loading-text {
   color: white;
   font-size: 18px;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .checkbox-selected {
@@ -511,7 +505,7 @@ i { color: @gray_60; }
   float: right;
   margin-top: 5px;
   color: @gray_60;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .header-notifications,
@@ -550,7 +544,7 @@ i { color: @gray_60; }
   margin: -30px 0px 0px 12px;
   padding: 0px 4px;
   color: white;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 12px;
   text-align: center;
   border: 2px solid white;
@@ -583,7 +577,7 @@ i { color: @gray_60; }
 }
 
 .popover-account-name {
-  font-family: @bold;
+  font-weight: bold;
   font-size: 16px;
 }
 
@@ -686,7 +680,7 @@ i { color: @gray_60; }
 .header-popover-title {
   display: inline-block;
   color: @gray_60;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .mark-read {
@@ -867,7 +861,7 @@ li.to-do {
   margin: -27px -30px 0px 0px;
   padding: 2px 10px;
   color: white;
-  font-family: @bold;
+  font-weight: bold;
   text-align: center;
   background: @red;
   border-radius: 12px;
@@ -963,7 +957,7 @@ li.to-do {
   height: 28px;
   padding-top: 4px;
   color: white;
-  font-family: @light;
+  font-weight: 300;
   font-size: 16px;
   text-align: center;
   background: @gray_40;
@@ -972,7 +966,7 @@ li.to-do {
 
 .meeting-guest-name {
   margin: 3px 0px 0px 36px;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 16px;
 }
 
@@ -1072,7 +1066,7 @@ li.to-do {
 }
 
 .footer-btn {
-  font-family: @light;
+  font-weight: 300;
   font-size: 20px;
   letter-spacing: 3px;
   width: 240px;
@@ -1241,7 +1235,7 @@ li.to-do {
 .email-info-label {
   padding: 3px 10px 0px 20px;
   color: @gray_60;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 12px;
   text-align: right;
   background: @gray_05;
@@ -1276,7 +1270,7 @@ li.to-do {
   resize: none;
   background: none;
   color: @gray_90;
-  font-family: @light;
+  font-weight: 300;
   // line-height: 1.25;
 }
 
@@ -1332,21 +1326,7 @@ li.to-do {
   padding-top: 80px;
 }
 
-.logo-container {
-  text-align: center;
-}
 
-#login-hero-mark {
-  -webkit-animation-duration: 1.5s;
-     -moz-animation-duration: 1.5s;
-         -animation-duration: 1.5s;
-}
-
-.hero-mark {
-  height: 60px;
-  margin-bottom: 40px;
-  g path { fill: @gray_40; }
-}
 
 #login-error-message,
 #request-error-message,
@@ -1402,7 +1382,7 @@ li.to-do {
 
 .text-field-label {
   float: left;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 #forgot-password {
@@ -1413,7 +1393,7 @@ li.to-do {
   width: 100%;
   height: 40px;
   margin-top: 20px;
-  font-family: @light;
+  font-weight: 300;
   font-size: 20px;
   letter-spacing: 3px;
 }
@@ -1434,11 +1414,7 @@ li.to-do {
   g path { fill: @gray_40; }
 }
 
-.copyright {
-  margin-top: 10px;
-  font-size: 12px;
-  color: @gray_40;
-}
+
 
 .made {
   font-size: 12px;
@@ -1498,7 +1474,7 @@ li.to-do {
 .settings-prof-circ {
   padding-top: 5px;
   vertical-align: middle;
-  font-family: @light;
+  font-weight: 300;
   font-size: 32px;
   color: white;
   background-color: @gray_60;
@@ -1577,7 +1553,7 @@ li.to-do {
 }
 
 .email-address {
-  font-family: @bold;
+  font-weight: bold;
   font-size: 18px;
 }
 
@@ -1585,7 +1561,7 @@ li.to-do {
   margin-left: 10px;
   padding: 1px 4px;
   padding-bottom: 0;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 12px;
   color: white;
   border-radius: 3px;
@@ -1638,7 +1614,7 @@ li.to-do {
 
 .linked-account-name,
 .exec-name {
-  font-family: @bold;
+  font-weight: bold;
   font-size: 18px;
 }
 
@@ -1650,7 +1626,7 @@ li.to-do {
 
 .add-exec-text {
   margin-top: 16px;
-  font-family: @regular_italic;
+  font-weight: normal_italic;
   font-size: 16px;
   color: @gray_60;
 }
@@ -1825,7 +1801,7 @@ li.to-do {
 
 .from-name {
   padding-left: 0;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 14px;
 }
 
@@ -1838,7 +1814,7 @@ li.to-do {
 .to-names {
   color: @gray_40;
   font-size: 14px;
-  font-family: @light;
+  font-weight: 300;
 }
 
 .message-text {
@@ -1883,16 +1859,16 @@ li.to-do {
 }
 
 *::-webkit-input-placeholder {
-  font-family: @light;
+  font-weight: 300;
 }
 :-moz-placeholder {
-  font-family: @light;
+  font-weight: 300;
 }
 ::-moz-placeholder {
-  font-family: @light;
+  font-weight: 300;
 }
 :-ms-input-placeholder {
-  font-family: @light;
+  font-weight: 300;
 }
 
 .chat-actions { margin-top: 6px; }
@@ -2103,20 +2079,20 @@ li.to-do {
 
 .guest-name {
   margin-left: 55px;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .guest-name.has-ea { color: @gray_60; }
 
 .ea-name {
   margin-left: 95px;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .bridge-link {
   margin-left: 10px;
   font-size: 14px;
-  font-family: @regular;
+  font-weight: normal;
   cursor: pointer;
 }
 
@@ -2182,7 +2158,7 @@ li.to-do {
   margin-bottom: 15px;
   color: @gray_60;
   font-size: 24px;
-  font-family: @light;
+  font-weight: 300;
   letter-spacing: 3px;
 }
 
@@ -2324,7 +2300,7 @@ li.to-do {
 .pref-time-title,
 .location-title {
   padding-top: 10px;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 14px;
 }
 
@@ -2352,7 +2328,7 @@ li.to-do {
 
 .tbd,
 .waiting-on-guest {
-  font-family: @regular_italic;
+  font-weight: normal_italic;
 }
 
 
@@ -2404,7 +2380,7 @@ li.to-do {
   text-align: center;
   color: white;
   font-size: 27px;
-  font-family: @light;
+  font-weight: 300;
   background: @gray_60;
   border-radius: 3px;
 }
@@ -2418,7 +2394,7 @@ li.to-do {
   margin-left: 15px;
   color: @gray_40;
   font-size: 13px;
-  font-family: @bold;
+  font-weight: bold;
   text-align: right;
   @media (max-width: 767px) {
     margin-left: 8px;
@@ -2443,7 +2419,7 @@ li.to-do {
   margin-left: 30px;
   color: @gray_40;
   font-size: 13px;
-  font-family: @bold;
+  font-weight: bold;
   text-align: right;
   @media (max-width: 767px) {
     margin-left: 8px;
@@ -2472,7 +2448,7 @@ li.to-do {
 
 .summary-type {
   color: @gray_60;
-  font-family: @bold;
+  font-weight: bold;
   font-size: 12px;
 }
 
@@ -2481,7 +2457,7 @@ li.to-do {
 }
 
 .start-end {
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .time-input-row-end {
@@ -2657,7 +2633,7 @@ li.to-do {
   display: inline-block;
   color: @gray_40;
   font-size: 12px;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .viewable-by-eye {
@@ -2856,7 +2832,7 @@ li.to-do {
 
 .select-option-letter {
   font-size: 36px;
-  font-family: @light;
+  font-weight: 300;
   cursor: default;
 }
 .select-option-letter.recommended { color: @green; }
@@ -2929,7 +2905,7 @@ li.to-do {
 .confirmation-guest-name,
 .reminder-guest-name {
   margin-left: 57px;
-  font-family: @bold;
+  font-weight: bold;
 }
 
 .confirmation-guest-name { margin-right: 160px; }
@@ -3055,21 +3031,119 @@ li.to-do {
   to {transform:rotate(0deg);}
 }
 
-/* Google sign-in button */
+/* Sign In */
+
+.sign-in {
+  width: 400px;
+  margin-top: 100px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 30px 20px;
+  text-align: center;
+  border: 1px solid @gray_20;
+  border-radius: 6px;
+}
+
+.logo-container {
+  text-align: center;
+}
+
+#sign-in-hero-mark {
+  -webkit-animation-duration: 1.5s;
+     -moz-animation-duration: 1.5s;
+         -animation-duration: 1.5s;
+}
+
+.hero-mark {
+  width: 40px;
+  height: 50px;
+  margin-right: auto;
+  margin-left: auto;
+  g path { fill: @gray_20; }
+}
+
+.sign-in-msg {
+  color: @gray_60;
+  font-size: 16px;
+  margin-top: 30px;
+  margin-bottom: 24px;
+}
+
+.sign-in-btn {
+  background: linear-gradient(@purple, @purple_hover);
+  border: 1px solid @purple_active;
+  border-radius: 3px;
+  color: white;
+  font-size: 16px;
+  font-weight: 300;
+  outline: none;
+  padding: 10px 20px 10px 15px;
+  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
+  &:active { background: linear-gradient(@purple_active, @purple_hover); }
+}
+
+.google-g {
+  float: left;
+  width: 14px;
+}
+
+.btn-divider {
+  float: left;
+  width: 14px;
+  height: 21px;
+  margin-left: 2px;
+  border-right: 1px solid rgba(255,255,255,0.3);
+}
+
+.sign-in-text {
+  margin-left: 50px;
+}
+
 .google-sign-in {
   border: 0px;
   width: 492px;
   height: 108px;
   background:
     transparent
-    url('/assets/img/Red-signin-Long-base-44dp.png')
+    url('/assets/img/Red-signin-Long-hover-44dp.png')
     center top no-repeat;
 }
 
 .google-sign-in:hover {
-  background-image: url('/assets/img/Red-signin-Long-hover-44dp.png');
+  background-image: url('/assets/img/Red-signin-Long-base-44dp.png');
 }
 
 .google-sign-in:active {
   background-image: url('/assets/img/Red-signin-Long-press-44dp.png');
+}
+
+.sign-in-footer {
+  width: 400px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 25px;
+  text-align: center;
+  font-size: 12px;
+  color: @gray_60;
+}
+
+.copyright {
+  margin-bottom: 7px;
+  color: @gray_40;
+}
+
+.footer-link {
+  color: @gray_60;
+  &:hover {
+    color: @gray_80;
+    text-decoration: underline;
+  }
+}
+
+.footer-divider {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  border-right: 1px solid @gray_10;
 }

@@ -39,7 +39,6 @@ make -C js $mode-install
 cp css/*.css pub/css
 cp html/*.html pub/html
 cp ejs/*.ejs pub/ejs
-cp fonts/* pub/fonts
 cp img/* pub/img
 
 ### Log info about this installation
