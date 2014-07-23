@@ -36,6 +36,7 @@ APP_DEFS = \
 SHARED_SOURCES = \
   ../common/ts/Conf \
   ../common/ts/Util \
+  ../common/ts/XDate \
   ../common/ts/Log \
   ../common/EsperStorage \
   ../common/EsperMessage
