@@ -101,4 +101,9 @@ module EsperStorage {
       }
     });
   }
+
+  /* Clear all sync storage for the Esper extension */
+  export function clearAll(callback: () => void) {
+    chrome.storage.sync.clear(callback);
+  }
 }

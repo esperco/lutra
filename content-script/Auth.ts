@@ -83,6 +83,12 @@ module Auth {
           );
           break;
 
+        case "ClearSyncStorage":
+          EsperStorage.clearAll(function() {
+            Log.d("Cleared all sync storage created by the Esper extension");
+          });
+          break;
+
         default:
           Log.d("Unknown request type: " + request.type);
         }
