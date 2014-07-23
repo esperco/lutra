@@ -71,13 +71,13 @@ module XDate {
     return months[d.getUTCMonth()];
   }
 
-  /* "August 13" */
+  /* "Aug 13" */
   export function dateOnlyWithoutYear(d : Date) : string {
     return month(d)
       + " " + day(d).toString();
   }
 
-  /* "August 13, 2019" */
+  /* "Aug 13, 2019" */
   export function dateOnly(d : Date) : string {
     return month(d)
       + " " + day(d).toString()
@@ -106,7 +106,7 @@ module XDate {
     return formatTimeOnly(d.getHours(), d.getMinutes());
   }
 
-  /* "Wednesday August 13, 2019 from 12:30pm to 1:30 pm" */
+  /* "Wed Aug 13, 2019 from 12:30pm to 1:30 pm" */
   export function range(d1 : Date, d2 : Date) : string {
   return /*weekDay(d1) +" "+*/ dateOnly(d1) +
       " from "+ timeOnly(d1) +" to "+ timeOnly(d2);
@@ -117,7 +117,7 @@ module XDate {
     return utcToLocalTimeOnly(d1) +" to "+ utcToLocalTimeOnly(d2);
   }
 
-  /* "Wednesday August 13, 2019 at 12:30pm" */
+  /* "Wed Aug 13, 2019 at 12:30pm" */
   export function justStartTime(d1 : Date) : string {
     return weekDay(d1) +" "+ dateOnly(d1) +
       " at "+ timeOnly(d1);
