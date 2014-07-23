@@ -34,19 +34,22 @@ module MsgView {
   <div>
     <div #title class="esper-ev-title"></div>
     <div class="esper-ev-times">
-      <span #start class="esper-ev-start"></span>
+      <span #startTime class="esper-ev-start"></span>
       &rarr;
-      <span #end class="esper-ev-end"></span>
+      <span #endTime class="esper-ev-end"></span>
     </div>
     <button #unlinkButton>Unlink</button>
     <button #deleteButton>Delete</button>
   </div>
 </div>
 '''
-    month.text("Jun"); // TODO
-    day.text("33"); // TODO
-    start.text("9:00am"); // TODO
-    end.text("9:99am"); // TODO
+    var start = XDate.ofString(e.start.local);
+    var end = XDate.ofString(e.end.local);
+
+    month.text(XDate.month(start));
+    day.text(XDate.day(start).toString());
+    startTime.text(XDate.timeOnly(start));
+    endTime.text(XDate.timeOnly(end));
 
     if (e.title !== undefined)
       title.text(e.title);

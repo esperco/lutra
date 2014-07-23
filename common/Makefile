@@ -4,6 +4,7 @@ default: pp
 SOURCES = \
   Conf \
   Util \
+  XDate \
   Log \
   EsperStorage \
   EsperMessage
