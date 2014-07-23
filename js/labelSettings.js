@@ -110,20 +110,32 @@ var labelSettings = (function() {
   mod.load = function() {
 '''
 <div #root>
-  <h1>Settings</h1>
-  <h2>Profile</h2>
-  <div #me/>
-  <h2>Teams</h2>
-  <div #teams/>
-  <h2>Account</h2>
-  <div #logout class="hide">
-    <a #logoutLink href="#!">Log out of Esper</a>
+  <div class="settings-block">
+    <h1>Settings</h1>
   </div>
-  <div #revoke class="hide">
-    <a href="#" #revokeLink>Revoke Esper&apos;s access to my Google account</a>
+  <div class="settings-block-gray">
+    <div class="settings-block">
+      <h2>Profile</h2>
+      <div #me/>
+    </div>
   </div>
-  <div>
-    <a href="#" #clearSync>Log out all Esper accounts</a>
+  <div class="settings-block">
+    <h2>Teams</h2>
+    <div #teams/>
+  </div>
+  <div class="settings-block-gray">
+    <div class="settings-block">
+      <h2>Account</h2>
+      <div #logout class="hide">
+        <a #logoutLink href="#!">Log out of Esper</a>
+      </div>
+      <div #revoke class="hide">
+        <a href="#" #revokeLink>Revoke Esper&apos;s access to my Google account</a>
+      </div>
+      <div>
+        <a href="#" #clearSync>Log out all Esper accounts</a>
+      </div>
+    </div>
   </div>
 </div>
 '''
