@@ -120,7 +120,10 @@ var labelSettings = (function() {
     <a #logoutLink href="#!">Log out of Esper</a>
   </div>
   <div #revoke class="hide">
-    <a href="#" #revokeURL>Revoke Esper&apos;s access to my Google account</a>
+    <a href="#" #revokeLink>Revoke Esper&apos;s access to my Google account</a>
+  </div>
+  <div>
+    <a href="#" #clearSync>Log out all Esper accounts</a>
   </div>
 </div>
 '''
@@ -142,12 +145,17 @@ var labelSettings = (function() {
       return false;
     });
 
-    revokeURL.click(function() {
+    revokeLink.click(function() {
       api.postGoogleAuthRevoke()
         .done(function() {
           revoke.remove();
         });
       return false;
+    });
+
+    clearSync.click(function() {
+      login.clearAllLoginInfo();
+      signin.signin(function(){});
     });
 
     api.getGoogleAuthInfo(document.URL)

@@ -76,6 +76,16 @@ var login = (function() {
     mod.updateView();
   };
 
+  mod.clearAllLoginInfo = function() {
+    mod.clearLoginInfo();
+    var esperMessage = {
+      sender: "Esper",
+      type: "ClearSyncStorage",
+      value: {}
+    };
+    window.postMessage(esperMessage, "*");
+  };
+
   /*
     Get API secret from the server, and more.
   */
