@@ -1,13 +1,110 @@
 /* LESS stylesheet for the Esper Chrome extension */
 
-@grey_text: #808285;
+/*** Colors ***/
+@blue: #0080ce;
+@blue_bg: #dfeff7;
+@border: #ebebeb;
+@dark_gray: #282828;
+@gray_f8: #f8f8f8;
+@gray_05: #f1f2f2;
+@gray_10: #e6e7e8;
+@gray_20: #d1d3d4;
+@gray_30: #bcbec0;
+@gray_40: #a7a9ac;
+@gray_60: #808285;
+@gray_80: #58595b;
+@gray_90: #414042;
+@green: #2bb673;
+@green_hover: #1e9b5c;
+@orange: #f7941e;
+@orange_bg: #f4e3d3;
+@orange_hover: #e87400;
+@purple: #a25cc6;
+@purple_active: #7d3ca0;
+@purple_bg: #e8d9ee;
+@purple_bg_hover: #fefdff;
+@purple_bg_active: #faf7fc;
+@purple_disabled: #ceb3e5;
+@purple_focus: #c08add;
+@purple_gradient: #a464c6;
+@purple_hover: #8c42ad;
+@purple_text: #463c4c;
+@red: #d9534f;
+@red_disabled: #eba8a7;
+@red_hover: #d2322d;
+
+a { text-decoration: none; }
 
 .esper-hide {
   display: none;
 }
 
+.esper-sidebar {
+	top: 10px !important;
+}
+
 .esper-title {
+	padding: 7px 4px;
+	border-bottom: 1px solid @gray_20;
 }
 
 .esper-searchbox {
+}
+
+.esper-ev {
+	padding: 20px 4px;
+	border-bottom: 1px solid @gray_20;
+}
+
+.esper-ev-date {
+	float: left;
+	width: 36px;
+	height: 34px;
+	border-radius: 4px;
+	border: 2px solid @gray_20;
+	padding-top: 3px;
+	text-align: center;
+}
+
+.esper-ev-month {
+	font-size: 11px;
+}
+
+.esper-ev-day {
+	color: @red;
+	font-size: 18px;
+}
+
+.esper-ev-title {
+	margin-left: 48px;
+	padding: 3px 0px 1px 0px;
+}
+
+.esper-ev-times {
+	color: @gray_60;
+	font-size: 13px;
+	margin-left: 48px;
+	padding: 1px 0px 2px 0px;
+}
+
+.esper-footer {
+	padding: 10px 4px;
+}
+
+.esper-footer-links {
+	float: right;
+	font-size: 12px;
+	a { color: @gray_60; }
+	a:hover {
+    color: @gray_80;
+    text-decoration: underline;
+	}
+}
+
+.esper-footer-divider {
+  display: inline-block;
+  width: 7px;
+  height: 10px;
+  margin-right: 7px;
+  border-right: 1px solid @gray_10;
 }
