@@ -282,16 +282,20 @@ var signin = (function() {
   mod.loginOnce = function(uid, landingUrl) {
     var loginNonce = getLoginNonce();
     log("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
+    /*
+      TODO: figure out why redirecting to landingUrl causes an infinite loop;
+            disabled for now.
+     */
     api.loginOnce(uid, loginNonce)
       .done(function(loginInfo) {
         login.setLoginInfo(loginInfo);
         clearLoginNonce();
         /* Make sure we don't redirect to a phishing URL: discard host. */
-        goToRelativeUrl(landingUrl);
+        goToRelativeUrl("/#!");
       })
       .fail(function() {
         clearLoginNonce();
-        goToRelativeUrl(landingUrl); /* and try again */
+        goToRelativeUrl("/#!");
       });
   };
 
