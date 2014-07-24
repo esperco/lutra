@@ -34,12 +34,13 @@ module MsgView {
   <div>
     <div #title class="esper-ev-title"></div>
     <div class="esper-ev-times">
-      <div class="esper-ev-cog aos T-I-J3 J-J5-Ji">
-        <ul class="esper-ev-menu">
-          <li #unlinkEvent class="esper-ev-menu-item">Unlink</li>
-          <li #deleteEvent class="esper-ev-menu-item delete-event">Delete from calendar</li>
-        </ul>
-      </div>
+      <img #cog class="esper-ev-cog"/>
+      <ul #menu class="esper-ev-menu">
+        <li #editEvent class="esper-ev-menu-item">Edit</li>
+        <li #duplicateEvent class="esper-ev-menu-item">Duplicate</li>
+        <li #unlinkEvent class="esper-ev-menu-item">Unlink</li>
+        <li #deleteEvent class="esper-ev-menu-item delete-event">Delete from calendar</li>
+      </ul>
       <span #startTime class="esper-ev-start"></span>
       &rarr;
       <span #endTime class="esper-ev-end"></span>
@@ -57,6 +58,15 @@ module MsgView {
 
     if (e.title !== undefined)
       title.text(e.title);
+
+    cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
+    cog.click(function() {
+      menu.toggle();
+      if (cog.hasClass("open"))
+        cog.removeClass("open");
+      else
+        cog.addClass("open");
+    })
 
     unlinkEvent.click(function() {
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
@@ -163,7 +173,16 @@ module MsgView {
                                linkedEvents: ApiT.ShowCalendarEvents) {
 '''
 <div #view>
-  <div class="esper-title">Linked Events (<span #count></span>)</div>
+  <div class="esper-header">
+    <button #add class="esper-add-btn">
+      <img #addIcon class="esper-add-icon"/>
+    </button>
+    <div class="esper-title">Linked Events (<span #count></span>)</div>
+    <ul #menu class="esper-add-menu">
+      <li #newEvent class="esper-ev-menu-item disabled">Create new linked event</li>
+      <li #existingEvent class="esper-ev-menu-item">Link to existing event</li>
+    </ul>
+  </div>
   <input #searchbox
          type="text" class="esper-searchbox"
          placeholder="Search calendar, e.g. meeting, tennis, joe, ...">
@@ -171,19 +190,32 @@ module MsgView {
   <div #results/>
   <div #events/>
   <div #footer class="esper-footer">
-    <img #logo class="esper-footer-logo"/>
+    <a href="http://esper.com">
+      <img #logo class="esper-footer-logo"/>
+    </a>
     <div class="esper-footer-links">
       <a href="mailto:team@esper.com">Help</a>
       <div class="esper-footer-divider"/>
-      <a href="www.esper.com/privacypolicy.html">Privacy</a>
+      <a href="http://esper.com/privacypolicy.html">Privacy</a>
       <div class="esper-footer-divider"/>
-      <a href="app.esper.com">Settings</a>
+      <a href="https://app.esper.com">Settings</a>
     </div>
+    <div class="copyright">&copy; 2014 Esper</div>
   </div>
 </div>
 '''
+    addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
+
+    add.click(function() {
+      menu.toggle();
+      if (add.hasClass("open"))
+        add.removeClass("open");
+      else
+        add.addClass("open");
+    })
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
     setupSearch(team.teamid, _view);
+    logo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
     rootElement.append(view);
   }
 
