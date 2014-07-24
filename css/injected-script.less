@@ -225,8 +225,16 @@ ul, li { list-style-type: none; }
 				 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+.modal-close-icon {
+	float: right;
+	margin: 18px 15px;
+	opacity: 0.7;
+	cursor: pointer;
+	&:hover { opacity: 1.0; }
+}
+
 .search-modal-title {
-	padding: 10px 15px;
+	padding: 15px;
 }
 
 .esper-searchbox {
@@ -249,9 +257,33 @@ ul, li { list-style-type: none; }
 	overflow:auto;
 }
 
+.esper-ev-result {
+	padding: 14px 14px 16px 14px;
+	border-bottom: 1px solid #d8d8d8;
+	cursor: default;
+	.esper-ev-date { cursor: default; }
+	.esper-ev-title, .esper-ev-times { margin-right: 38px; }
+	.esper-ev-date:hover { border-color: @gray_30; }
+}
+
+.link-event {
+	float: right;
+	color: @purple;
+	cursor: pointer;
+	margin-top: 10px;
+	&:hover {
+		color: @purple_hover;
+		text-decoration: underline;
+	}
+}
+
 .search-footer {
 	height: 30px;
 	padding: 10px 15px;
+}
+
+.search-footer-logo {
+	margin-top: 5px;
 }
 
 .done-btn {

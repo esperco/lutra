@@ -124,7 +124,7 @@ module MsgView {
 
   function renderSearchResult(e: ApiT.CalendarEvent, teamid, teamView) {
 '''
-<div #view class="esper-ev">
+<div #view class="esper-ev-result">
   <div class="esper-ev-date">
     <div #month class="esper-ev-month"></div>
     <div #day class="esper-ev-day"></div>
@@ -148,13 +148,13 @@ module MsgView {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    link.text()
+    link.text("Link");
 
     var threadId = currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
 
-    view.click(function() {
+    link.click(function() {
       linkEvent(e, teamid, threadId, teamView);
     });
 
@@ -221,6 +221,7 @@ module MsgView {
     </div>
     <div class="copyright">&copy; 2014 Esper</div>
     <div class="search-modal">
+      <img #close class="modal-close-icon"/>
       <div #searchTitle class="search-modal-title"/>
       <input #searchbox
            type="text" class="esper-searchbox"
@@ -228,7 +229,7 @@ module MsgView {
       </input>
       <div #results class="search-results"/>
       <div class="search-footer">
-        <img #modalLogo class="esper-footer-logo"/>
+        <img #modalLogo class="search-footer-logo"/>
         <button #done class="done-btn">Done</button>
       </div>
     </div>
@@ -255,6 +256,7 @@ module MsgView {
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
     
+    close.attr("src", Init.esperRootUrl + "img/close.png");
     searchTitle.text("Link to existing event");
     setupSearch(team.teamid, _view);
     
