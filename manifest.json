@@ -31,7 +31,8 @@
 
   "web_accessible_resources": [
     "js/injected-script.js",
-    "css/injected-script.css"
+    "css/injected-script.css",
+    "img/*"
   ],
 
   "permissions": [
