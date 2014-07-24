@@ -97,12 +97,22 @@ ul, li { list-style-type: none; }
 	padding-top: 6px;
 }
 
-.esper-searchbox {
-}
-
 .esper-ev {
 	padding: 14px 4px 16px 4px;
 	border-bottom: 1px solid #d8d8d8;
+}
+
+.no-events-arrow {
+	float: right;
+	margin-top: -26px;
+	margin-right: 54px;
+}
+
+.no-events-text {
+	color: @gray_40;
+	font-size: 14px;
+	margin: 6px 0px;
+	text-align: center;
 }
 
 .esper-ev-date {
@@ -205,4 +215,57 @@ ul, li { list-style-type: none; }
 	font-size: 11px;
 	margin-top: 7px;
 	text-align: right;
+}
+
+.search-modal {
+	width: 220px;
+	background: #fbfafc;
+	border: 1px solid #d8d8d8;
+	webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+				 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-modal-title {
+	padding: 10px 15px;
+}
+
+.esper-searchbox {
+	width: 190px;
+	background: white;
+	border: none;
+	border-top: 1px solid #d8d8d8;
+	border-bottom: 1px solid #d8d8d8;
+	margin-bottom: 10px;
+	padding: 15px;
+	outline: none;
+}
+
+.search-results {
+	height: 240px;
+	background: white;
+	border: 1px solid #d8d8d8;
+	border-radius: 2px;
+	margin: 0px 15px;
+	overflow:auto;
+}
+
+.search-footer {
+	height: 30px;
+	padding: 10px 15px;
+}
+
+.done-btn {
+	float: right;
+	background: linear-gradient(@purple, @purple_hover);
+  border: 1px solid @purple_active;
+  border-radius: 3px;
+  color: white;
+  font-size: 13px;
+  font-weight: 300;
+  height: 30px;
+  outline: none;
+  padding: 0px 20px;
+  cursor: pointer;
+  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
+  &:active { background: linear-gradient(@purple_active, @purple_hover); }
 }

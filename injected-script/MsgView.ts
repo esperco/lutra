@@ -124,20 +124,40 @@ module MsgView {
 
   function renderSearchResult(e: ApiT.CalendarEvent, teamid, teamView) {
 '''
-<div #view class="esper-ev-result">
-  <span #title class="esper-ev-result-title"></span>
-  <span #date class="esper-ev-result-date"></span>
+<div #view class="esper-ev">
+  <div class="esper-ev-date">
+    <div #month class="esper-ev-month"></div>
+    <div #day class="esper-ev-day"></div>
+  </div>
+  <a #link class="link-event"/>
+  <div>
+    <div #title class="esper-ev-title"></div>
+    <div class="esper-ev-times">
+      <span #startTime class="esper-ev-start"></span>
+      &rarr;
+      <span #endTime class="esper-ev-end"></span>
+    </div>
+  </div>
 </div>
 '''
+    var start = XDate.ofString(e.start.local);
+    var end = XDate.ofString(e.end.local);
+
+    month.text(XDate.month(start).toUpperCase());
+    day.text(XDate.day(start).toString());
+    startTime.text(XDate.timeOnly(start));
+    endTime.text(XDate.timeOnly(end));
+
+    link.text()
+
     var threadId = currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
-    if (e.start !== undefined) {
-      date.text(e.start.utc);
-    }
+
     view.click(function() {
       linkEvent(e, teamid, threadId, teamView);
     });
+
     return view;
   }
 
@@ -183,15 +203,14 @@ module MsgView {
       <li #existingEvent class="esper-ev-menu-item">Link to existing event</li>
     </ul>
   </div>
-  <input #searchbox
-         type="text" class="esper-searchbox"
-         placeholder="Search calendar, e.g. meeting, tennis, joe, ...">
-  </input>
-  <div #results/>
+  <div #noEvents class="esper-ev">
+    <img #arrow class="no-events-arrow"/>
+    <div #noEventsText class="no-events-text"/>
+  </div>
   <div #events/>
   <div #footer class="esper-footer">
     <a href="http://esper.com">
-      <img #logo class="esper-footer-logo"/>
+      <img #sidebarLogo class="esper-footer-logo"/>
     </a>
     <div class="esper-footer-links">
       <a href="mailto:team@esper.com">Help</a>
@@ -201,21 +220,47 @@ module MsgView {
       <a href="https://app.esper.com">Settings</a>
     </div>
     <div class="copyright">&copy; 2014 Esper</div>
-  </div>
+    <div class="search-modal">
+      <div #searchTitle class="search-modal-title"/>
+      <input #searchbox
+           type="text" class="esper-searchbox"
+           placeholder="Search calendar">
+      </input>
+      <div #results class="search-results"/>
+      <div class="search-footer">
+        <img #modalLogo class="esper-footer-logo"/>
+        <button #done class="done-btn">Done</button>
+      </div>
+    </div>
 </div>
 '''
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
-
     add.click(function() {
+      arrow.toggle();
       menu.toggle();
       if (add.hasClass("open"))
         add.removeClass("open");
       else
         add.addClass("open");
     })
+
+    arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
+    noEventsText.text("Click here to link this email conversation to events on "
+      + "[Executive's]" + " calendar.");
+    console.log("Number of linked events: " + linkedEvents.events.length);
+    if (linkedEvents.events.length == 0)
+      noEvents.attr("style", "display: block");
+    else
+      noEvents.attr("style", "display: none");
+
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
+    
+    searchTitle.text("Link to existing event");
     setupSearch(team.teamid, _view);
-    logo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    
+    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    
     rootElement.append(view);
   }
 
