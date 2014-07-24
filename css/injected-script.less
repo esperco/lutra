@@ -35,6 +35,8 @@
 
 a { text-decoration: none; }
 
+ul, li { list-style-type: none; }
+
 .esper-hide {
   display: none;
 }
@@ -85,6 +87,38 @@ a { text-decoration: none; }
 	font-size: 13px;
 	margin-left: 48px;
 	padding: 1px 0px 2px 0px;
+}
+
+.esper-ev-cog {
+	z-index: 1;
+	float: right;
+	&:hover .esper-ev-menu { display: block; }
+}
+
+.esper-ev-menu {
+	z-index: 2;
+	display: none;
+	position: relative;
+	width: 170px;
+	margin-top: 20px;
+	margin-left: -150px;
+	padding: 7px 0px;
+	background: white;
+	border: 1px solid @gray_20;
+	webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+				 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.esper-ev-menu-item {
+	position: relative;
+	padding: 7px 16px;
+	color: black;
+	cursor: pointer;
+	&:hover { background: @gray_10;	}
+}
+
+.delete-event {
+	color: @red;
 }
 
 .esper-footer {

@@ -18,7 +18,7 @@ module MsgView {
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
+    var anchor = findAnchor().attr("class", "esper-sidebar");
     var root = $("<div id='esper'/>");
     anchor.prepend(root);
     return root;
@@ -34,19 +34,23 @@ module MsgView {
   <div>
     <div #title class="esper-ev-title"></div>
     <div class="esper-ev-times">
+      <div class="esper-ev-cog aos T-I-J3 J-J5-Ji">
+        <ul class="esper-ev-menu">
+          <li #unlinkEvent class="esper-ev-menu-item">Unlink</li>
+          <li #deleteEvent class="esper-ev-menu-item delete-event">Delete from calendar</li>
+        </ul>
+      </div>
       <span #startTime class="esper-ev-start"></span>
       &rarr;
       <span #endTime class="esper-ev-end"></span>
     </div>
-    <button #unlinkButton>Unlink</button>
-    <button #deleteButton>Delete</button>
   </div>
 </div>
 '''
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
-    month.text(XDate.month(start));
+    month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
@@ -54,14 +58,14 @@ module MsgView {
     if (e.title !== undefined)
       title.text(e.title);
 
-    unlinkButton.click(function() {
+    unlinkEvent.click(function() {
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.remove();
         });
     });
 
-    deleteButton.click(function() {
+    deleteEvent.click(function() {
       Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.remove();
@@ -164,9 +168,17 @@ module MsgView {
          type="text" class="esper-searchbox"
          placeholder="Search calendar, e.g. meeting, tennis, joe, ...">
   </input>
-  <div #results>
-  </div>
-  <div #events>
+  <div #results/>
+  <div #events/>
+  <div #footer class="esper-footer">
+    <img #logo class="esper-footer-logo"/>
+    <div class="esper-footer-links">
+      <a href="mailto:team@esper.com">Help</a>
+      <div class="esper-footer-divider"/>
+      <a href="www.esper.com/privacypolicy.html">Privacy</a>
+      <div class="esper-footer-divider"/>
+      <a href="app.esper.com">Settings</a>
+    </div>
   </div>
 </div>
 '''
