@@ -7,14 +7,16 @@
 
 module Main {
   function injectScript() {
+    var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/injected-script.css");
     var scriptUrl = chrome.extension.getURL("js/injected-script.js");
     var docHead = $("head");
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
       .appendTo(docHead);
-    $("<script/>")
+    $("<script id='esper-script'/>")
       .attr("src", scriptUrl)
+      .attr("data-root-url", rootUrl)
       .appendTo(docHead);
   }
 

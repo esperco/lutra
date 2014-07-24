@@ -1,4 +1,10 @@
 module Init {
+  export var esperRootUrl : string;
+    /* URL prefix to access files provided by the extension.
+       Sample usage:
+         img.attr("src", esperRootUrl + "img/icon.png");
+     */
+
   export var loginInfo : ApiT.LoginResponse;
     /* List of teams, etc; refreshed when credentials change */
 
@@ -94,6 +100,7 @@ module Init {
   export function init() {
     if (! alreadyInitialized) {
       Log.d("Init.init()");
+      esperRootUrl = $("#esper-script").attr("data-root-url");
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
