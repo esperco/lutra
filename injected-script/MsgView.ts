@@ -196,6 +196,8 @@ module MsgView {
   }
 
   function setupSearch(events, teamid, view) {
+    view.searchbox.val("");
+    view.results.children().remove();
     afterTyping(view.searchbox, 250, function() {
       Api.eventSearch(teamid, view.searchbox.val())
         .done(function(results) {
@@ -249,19 +251,21 @@ module MsgView {
       <a href="https://app.esper.com">Settings</a>
     </div>
     <div class="copyright">&copy; 2014 Esper</div>
-    <div #searchModal class="search-modal">
-      <img #close class="modal-close-icon"/>
-      <div #searchTitle class="search-modal-title"/>
-      <input #searchbox
-        type="text" class="esper-searchbox"
-        placeholder="Search calendar">
-        <img #clear class="clear-search"/>
-      </input>
-      <div #results class="search-results"/>
-      <div class="search-footer">
-        <img #modalLogo class="search-footer-logo"/>
-        <button #done class="done-btn">Done</button>
-      </div>
+    <div #search class="esper-modal">
+      <div #modalBackground class="modal-bg">
+      <div #searchModal class="search-modal">
+        <img #close class="modal-close-icon"/>
+        <div #searchTitle class="search-modal-title"/>
+        <input #searchbox
+          type="text" class="esper-searchbox"
+          placeholder="Search calendar">
+          <img #clear class="clear-search"/>
+        </input>
+        <div #results class="search-results"/>
+        <div class="search-footer">
+          <img #modalLogo class="search-footer-logo"/>
+          <button #done class="done-btn">Done</button>
+        </div>
     </div>
 </div>
 '''
@@ -288,6 +292,9 @@ module MsgView {
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
     existingEvent.click(function() {
+      setupSearch(linkedEvents.events, team.teamid, _view);
+
+      search.attr("style", "display: block");
       searchModal.dialog({ 
         modal: true,
         dialogClass: "no-close"
@@ -295,18 +302,23 @@ module MsgView {
       searchModal.dialog("option","modal",true);
 
       close.attr("src", Init.esperRootUrl + "img/close.png");
-      close.click(function() { searchModal.dialog( "close" ) });
-      done.click(function() { searchModal.dialog( "close" ) });
+      close.click(closeModal);
+      done.click(closeModal);
+      modalBackground.click(closeModal);
       searchTitle.text("Link to existing event");
       searchbox.attr("style", "background: url(" + Init.esperRootUrl + "img/search.png) no-repeat scroll 16px 16px");
       clear.attr("src", Init.esperRootUrl + "img/clear.png");
-      setupSearch(linkedEvents.events, team.teamid, _view);
 
-      sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
       modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
-
     });
+
+    function closeModal() {
+      search.attr("style", "display:none");
+      searchModal.dialog("close");
+    }
     
+    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+
     rootElement.append(view);
   }
 
