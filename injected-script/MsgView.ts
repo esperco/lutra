@@ -1,6 +1,17 @@
 module MsgView {
   var currentThreadId : string;
 
+  // $(document).on('click', function(e) {
+  //   $(".esper-menu").each(function() {
+  //     if ($(this).css("display") == "block")
+  //       $(this).attr("style", "display: none");
+  //   })
+  //   $(".esper-menu-btn").each(function() {
+  //     if ($(this).hasClass("open"))
+  //       $(this).removeClass("open");
+  //   })
+  // });
+
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
     var anchor = $("div[role=complementary].nH.adC");
@@ -34,10 +45,10 @@ module MsgView {
   <div>
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
-      <img #cog class="esper-ev-cog"/>
-      <ul #menu class="esper-ev-menu">
-        <li #editEvent class="esper-ev-menu-item">Edit</li>
-        <li #duplicateEvent class="esper-ev-menu-item">Duplicate</li>
+      <img #cog class="esper-menu-btn esper-ev-cog"/>
+      <ul #menu class="esper-menu esper-ev-menu">
+        <li #editEvent class="esper-ev-menu-item disabled">Edit</li>
+        <li #duplicateEvent class="esper-ev-menu-item disabled">Duplicate</li>
         <li #unlinkEvent class="esper-ev-menu-item">Unlink</li>
         <li #deleteEvent class="esper-ev-menu-item delete-event">Delete from calendar</li>
       </ul>
@@ -197,6 +208,7 @@ module MsgView {
 
   function setupSearch(events, teamid, view) {
     view.searchbox.val("");
+    view.searchbox.focus();
     view.results.children().remove();
     afterTyping(view.searchbox, 250, function() {
       Api.eventSearch(teamid, view.searchbox.val())
@@ -225,11 +237,11 @@ module MsgView {
 '''
 <div #view>
   <div class="esper-header">
-    <button #add class="esper-add-btn">
+    <button #add class="esper-menu-btn esper-add-btn">
       <img #addIcon class="esper-add-icon"/>
     </button>
     <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #menu class="esper-add-menu">
+    <ul #menu class="esper-menu esper-add-menu">
       <li #newEvent class="esper-ev-menu-item disabled">Create new linked event</li>
       <li #existingEvent class="esper-ev-menu-item">Link to existing event</li>
     </ul>

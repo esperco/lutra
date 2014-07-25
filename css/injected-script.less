@@ -40,6 +40,12 @@ a { text-decoration: none; }
 
 ul, li { list-style-type: none; }
 
+li.disabled {
+	color: @gray_30;
+	cursor: default;
+	&:hover { background: none; }
+}
+
 .esper-hide {
   display: none;
 }
@@ -68,7 +74,7 @@ ul, li { list-style-type: none; }
   height: 27px;
   outline: none;
   padding: 5px 10px;
-  .esper-add-icon { opacity: 0.7; }
+  .esper-add-icon { opacity: 0.75; }
   &:hover {
   	background: linear-gradient(#f8f8f8, #f1f1f1);
   	border-color: #c6c6c6;
@@ -245,7 +251,7 @@ ul, li { list-style-type: none; }
 	top: 0;
 	left: 0;
 	background: black;
-	opacity: 0.8;
+	opacity: 0.5;
 	z-index: 6;
 }
 
@@ -297,7 +303,7 @@ ul, li { list-style-type: none; }
 	border: none;
 	border-top: 1px solid #d8d8d8;
 	border-bottom: 1px solid #d8d8d8;
-	margin-bottom: 10px;
+	margin-bottom: 12px;
 	padding: 15px 15px 15px 40px;
 	outline: none;
 	&::-webkit-input-placeholder {
