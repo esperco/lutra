@@ -139,7 +139,7 @@ ul, li { list-style-type: none; }
 }
 
 .esper-ev-day {
-	color: @red;
+	color: @purple;
 	font-size: 18px;
 }
 
@@ -252,13 +252,24 @@ ul, li { list-style-type: none; }
 
 .esper-searchbox {
 	width: 190px;
-	background: white;
+	background-color: white !important;
 	border: none;
 	border-top: 1px solid #d8d8d8;
 	border-bottom: 1px solid #d8d8d8;
 	margin-bottom: 10px;
-	padding: 15px;
+	padding: 15px 15px 15px 40px;
 	outline: none;
+	&::-webkit-input-placeholder {
+		color: @gray_30;
+	}
+}
+
+.clear-search {
+	float: right;
+	margin-top: 4px;
+	opacity: 0.5;
+	cursor: pointer;
+	&:hover { opacity: 1.0; }
 }
 
 .search-results {
@@ -292,7 +303,7 @@ ul, li { list-style-type: none; }
 
 .linked {
 	float: right;
-	color: @gray_40;
+	color: @gray_20;
 	cursor: default;
 	margin-top: 10px;
 }

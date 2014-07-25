@@ -138,7 +138,7 @@ module MsgView {
     <div class="double-bounce1"></div>
     <div class="double-bounce2"></div>
   </div>
-  <div #linked class="linked">
+  <div #linked class="linked animated fadeInRight">
     <img #check/>
     <span>Linked</span>
   </div>
@@ -253,8 +253,9 @@ module MsgView {
       <img #close class="modal-close-icon"/>
       <div #searchTitle class="search-modal-title"/>
       <input #searchbox
-           type="text" class="esper-searchbox"
-           placeholder="Search calendar">
+        type="text" class="esper-searchbox"
+        placeholder="Search calendar">
+        <img #clear class="clear-search"/>
       </input>
       <div #results class="search-results"/>
       <div class="search-footer">
@@ -288,6 +289,8 @@ module MsgView {
     // existingEvent.click(searchModal.dialog("option","modal",true));
     close.attr("src", Init.esperRootUrl + "img/close.png");
     searchTitle.text("Link to existing event");
+    searchbox.attr("style", "background: url(" + Init.esperRootUrl + "img/search.png) no-repeat scroll 16px 16px");
+    clear.attr("src", Init.esperRootUrl + "img/clear.png");
     setupSearch(linkedEvents.events, team.teamid, _view);
     
     sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
