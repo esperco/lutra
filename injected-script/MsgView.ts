@@ -114,17 +114,19 @@ module MsgView {
       });
   }
 
-  function linkEvent(e, teamid, threadId, view) {
+  function linkEvent(e, teamid, threadId, sidebar, view) {
     Api.linkEvent(teamid, threadId, {
       google_event_id: e.google_event_id,
       sync_description: true
     })
       .done(function() {
-        refreshEventList(teamid, threadId, view);
+        view.spinner.attr("style", "display: none");
+        view.linked.attr("style", "display: block");
+        refreshEventList(teamid, threadId, sidebar);
       });
   }
 
-  function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents, teamid, teamView) {
+  function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents, teamid, sidebar) {
 '''
 <div #view class="esper-ev-result">
   <div class="esper-ev-date">
@@ -165,18 +167,14 @@ module MsgView {
     link.click(function() {
       spinner.attr("style", "display: block");
       link.attr("style", "display: none");
-      linkEvent(e, teamid, threadId, teamView);
+      linkEvent(e, teamid, threadId, sidebar, _view);
     });
 
-    // console.log("Number of linked events: " + linkedEvents.length);
-    // console.log("First linked event: " + linkedEvents[0].title);
-    // console.log("This event: " + e.title);
-    // if (e == linkedEvents[0])
-    //   console.log("true");
-    // console.log(e.title + ": " + linkedEvents.indexOf(e));
-
     check.attr("src", Init.esperRootUrl + "img/check.png");
-    if (linkedEvents.indexOf(e) > -1) {
+    var alreadyLinked = linkedEvents.filter(function(ev) {
+      return ev.google_event_id == e.google_event_id;
+    })
+    if (alreadyLinked.length > 0) {
       link.attr("style", "display: none");
       linked.attr("style", "display: block");
     } else {
