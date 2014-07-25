@@ -110,6 +110,9 @@ module Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
+
+      // temporary; remove once login stuff is restored
+      CalEventView.init();
     }
   }
 }
