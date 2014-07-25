@@ -284,7 +284,9 @@ module MsgView {
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
+
     /* Search Modal */
+    // http://api.jqueryui.com/dialog/#method-close
     existingEvent.click(function() {
       searchModal.dialog({ 
         modal: true,
@@ -293,6 +295,8 @@ module MsgView {
       searchModal.dialog("option","modal",true);
 
       close.attr("src", Init.esperRootUrl + "img/close.png");
+      close.click(function() { searchModal.dialog( "close" ) });
+      done.click(function() { searchModal.dialog( "close" ) });
       searchTitle.text("Link to existing event");
       setupSearch(linkedEvents.events, team.teamid, _view);
 
