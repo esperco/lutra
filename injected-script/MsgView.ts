@@ -261,11 +261,13 @@ module MsgView {
       noEvents.attr("style", "display: none");
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
-    
-    // searchModal.dialog({ modal: true });
-    // existingEvent.click(searchModal.dialog("option","modal",true));
+
+
+    /* Search Modal */
+    searchModal.dialog({ modal: true });
+    //existingEvent.click(searchModal.dialog("option","modal",true));
     close.attr("src", Init.esperRootUrl + "img/close.png");
-    searchTitle.text("Link to existing event");
+    searchTitle.text("LINK LINK LINK"); //Link to existing event
     setupSearch(team.teamid, _view);
     
     sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");

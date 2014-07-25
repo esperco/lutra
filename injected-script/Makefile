@@ -13,15 +13,17 @@ build: js/injected-script.js
 # The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
   jquery \
+  jqueryui \
   gmail \
   sha1
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
-  jquery.d \
-  chrome.d \
-  cryptojs.d
+  jquery/jquery.d \
+  jqueryui/jqueryui.d \
+  chrome/chrome.d \
+  cryptojs/cryptojs.d
 
 # Our own JavaScript code required in edge cases
 APP_JS = \
