@@ -286,16 +286,19 @@ module MsgView {
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
-
     /* Search Modal */
-    searchModal.dialog({ modal: true });
-    //existingEvent.click(searchModal.dialog("option","modal",true));
-    close.attr("src", Init.esperRootUrl + "img/close.png");
-    searchTitle.text("Link to existing event");
-    setupSearch(linkedEvents.events, team.teamid, _view);
-    
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
-    modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    existingEvent.click(function() {
+      searchModal.dialog({ modal: true });
+      searchModal.dialog("option","modal",true);
+
+      close.attr("src", Init.esperRootUrl + "img/close.png");
+      searchTitle.text("BLAHA"); //Link to existing event
+      setupSearch(linkedEvents.events, team.teamid, _view);
+
+      sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+      modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+
+    });
     
     rootElement.append(view);
   }
