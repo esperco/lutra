@@ -1,3 +1,6 @@
+/*
+  Gmail thread view
+*/
 module MsgView {
   var currentThreadId : string;
 

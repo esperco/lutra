@@ -7,7 +7,11 @@ SOURCES = \
   XDate \
   Log \
   EsperStorage \
-  EsperMessage
+  EsperMessage \
+  Login \
+  JsonHttp \
+  ApiT \
+  Api
 
 # Paths to .ts source files
 TS_SRC = \

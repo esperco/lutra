@@ -1,19 +1,18 @@
-.PHONY: default injected-script build install clean
-default: injected-script
+.PHONY: default gcal-is build install clean
+default: gcal-is
 
 # Build and install javascript files
-injected-script: build
+gcal-is: build
 	$(MAKE) install
 
 # Build only
-build: js/injected-script.js
+build: js/gcal-is.js
 
 # External JavaScript libraries (needed at runtime only).
 # sha1 is part of cryptojs.
 # The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
   jquery \
-  gmail \
   sha1
 
 # External TypeScript libraries and type definitions for
@@ -24,12 +23,10 @@ TS_LIBS = \
   cryptojs.d
 
 # Our own JavaScript code required in edge cases
-APP_JS = \
-  gmailInit
+APP_JS =
 
 # Our own TypeScript definitions for external libraries
-APP_DEFS = \
-  gmail.d
+APP_DEFS =
 
 # Preprocessed TypeScript code coming from another directory,
 # path to file without .ts suffix
@@ -39,17 +36,18 @@ SHARED_SOURCES = \
   ../common/ts/XDate \
   ../common/ts/Log \
   ../common/EsperStorage \
-  ../common/EsperMessage
+  ../common/EsperMessage \
+  ../common/Login \
+  ../common/JsonHttp \
+  ../common/ApiT \
+  ../common/Api
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  Login \
-  JsonHttp \
-  ApiT \
-  Api \
-  MsgView \
+  CalEvent \
+  CalEventView \
   Init \
   Main
 
@@ -84,14 +82,14 @@ ts/%.ts: %.ts
 	@mkdir -p ts
 	../setup/bin/oblivion -ts $< -o $@
 
-js/injected-script.js: $(ALL_TS)
+js/gcal-is.js: $(ALL_TS)
 	@mkdir -p js
-	tsc --out js/injected-script-ts.js $(ALL_TS)
-	cat $(EXTRA_JS) js/injected-script-ts.js > $@
+	tsc --out js/gcal-is-ts.js $(ALL_TS)
+	cat $(EXTRA_JS) js/gcal-is-ts.js > $@
 
 install:
 	mkdir -p ../pub/js
-	cp js/injected-script.js ../pub/js/injected-script.js
+	cp js/gcal-is.js ../pub/js/gcal-is.js
 
 clean:
 	rm -f *~

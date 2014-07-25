@@ -22,7 +22,8 @@ mkdir -p pub/css pub/js pub/img pub/html
 
 ### Build our own code and copy the result into the pub directory
 make -C content-script install
-make -C injected-script install
+make -C gmail-is install
+make -C gcal-is install
 cp css/*.css pub/css
 cp img/* pub/img
 cp html/popup.html pub/html

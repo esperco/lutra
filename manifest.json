@@ -30,7 +30,8 @@
   },
 
   "web_accessible_resources": [
-    "js/injected-script.js",
+    "js/gmail-is.js",
+    "js/gcal-is.js",
     "css/injected-script.css",
     "img/*"
   ],
