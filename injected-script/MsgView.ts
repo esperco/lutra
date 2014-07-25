@@ -130,6 +130,10 @@ module MsgView {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="link-event"/>
+  <div #spinner class="spinner">
+    <div class="double-bounce1"></div>
+    <div class="double-bounce2"></div>
+  </div>
   <div>
     <div #title class="esper-ev-title"></div>
     <div class="esper-ev-times">
@@ -155,6 +159,8 @@ module MsgView {
       title.text(e.title);
 
     link.click(function() {
+      spinner.attr("style", "display: block");
+      link.attr("style", "display: none");
       linkEvent(e, teamid, threadId, teamView);
     });
 
@@ -220,7 +226,7 @@ module MsgView {
       <a href="https://app.esper.com">Settings</a>
     </div>
     <div class="copyright">&copy; 2014 Esper</div>
-    <div class="search-modal">
+    <div #searchModal class="search-modal">
       <img #close class="modal-close-icon"/>
       <div #searchTitle class="search-modal-title"/>
       <input #searchbox
@@ -256,6 +262,8 @@ module MsgView {
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
     
+    // searchModal.dialog({ modal: true });
+    // existingEvent.click(searchModal.dialog("option","modal",true));
     close.attr("src", Init.esperRootUrl + "img/close.png");
     searchTitle.text("Link to existing event");
     setupSearch(team.teamid, _view);
