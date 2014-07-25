@@ -284,17 +284,28 @@ module MsgView {
       noEvents.attr("style", "display: none");
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
-    
-    // searchModal.dialog({ modal: true });
-    // existingEvent.click(searchModal.dialog("option","modal",true));
-    close.attr("src", Init.esperRootUrl + "img/close.png");
-    searchTitle.text("Link to existing event");
-    searchbox.attr("style", "background: url(" + Init.esperRootUrl + "img/search.png) no-repeat scroll 16px 16px");
-    clear.attr("src", Init.esperRootUrl + "img/clear.png");
-    setupSearch(linkedEvents.events, team.teamid, _view);
-    
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
-    modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+
+    /* Search Modal */
+    // http://api.jqueryui.com/dialog/#method-close
+    existingEvent.click(function() {
+      searchModal.dialog({ 
+        modal: true,
+        dialogClass: "no-close"
+        });
+      searchModal.dialog("option","modal",true);
+
+      close.attr("src", Init.esperRootUrl + "img/close.png");
+      close.click(function() { searchModal.dialog( "close" ) });
+      done.click(function() { searchModal.dialog( "close" ) });
+      searchTitle.text("Link to existing event");
+      searchbox.attr("style", "background: url(" + Init.esperRootUrl + "img/search.png) no-repeat scroll 16px 16px");
+      clear.attr("src", Init.esperRootUrl + "img/clear.png");
+      setupSearch(linkedEvents.events, team.teamid, _view);
+
+      sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+      modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+
+    });
     
     rootElement.append(view);
   }
