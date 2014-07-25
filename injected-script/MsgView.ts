@@ -24,7 +24,7 @@ module MsgView {
     return root;
   }
 
-  function renderEvent(e: ApiT.CalendarEvent, teamid, threadId) {
+  function renderEvent(e: ApiT.CalendarEvent, teamid, threadId, sidebar) {
 '''
 <div #view class="esper-ev">
   <div class="esper-ev-date">
@@ -32,7 +32,7 @@ module MsgView {
     <div #day class="esper-ev-day"></div>
   </div>
   <div>
-    <div #title class="esper-ev-title"></div>
+    <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
       <img #cog class="esper-ev-cog"/>
       <ul #menu class="esper-ev-menu">
@@ -72,6 +72,7 @@ module MsgView {
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.remove();
+          refreshEventList(teamid, threadId, sidebar);
         });
     });
 
@@ -79,6 +80,7 @@ module MsgView {
       Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.remove();
+          refreshEventList(teamid, threadId, sidebar);
         });
     });
 
@@ -89,7 +91,7 @@ module MsgView {
     view.count.text(events.length.toString());
     view.events.children().remove();
     events.forEach(function(e) {
-      view.events.append(renderEvent(e, teamid, threadId));
+      view.events.append(renderEvent(e, teamid, threadId, view));
     });
   }
 
@@ -122,20 +124,24 @@ module MsgView {
       });
   }
 
-  function renderSearchResult(e: ApiT.CalendarEvent, teamid, teamView) {
+  function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents, teamid, teamView) {
 '''
 <div #view class="esper-ev-result">
   <div class="esper-ev-date">
     <div #month class="esper-ev-month"></div>
     <div #day class="esper-ev-day"></div>
   </div>
-  <a #link class="link-event"/>
+  <a #link class="link-event">Link</a>
   <div #spinner class="spinner">
     <div class="double-bounce1"></div>
     <div class="double-bounce2"></div>
   </div>
+  <div #linked class="linked">
+    <img #check/>
+    <span>Linked</span>
+  </div>
   <div>
-    <div #title class="esper-ev-title"></div>
+    <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
       <span #startTime class="esper-ev-start"></span>
       &rarr;
@@ -152,8 +158,6 @@ module MsgView {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    link.text("Link");
-
     var threadId = currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
@@ -164,24 +168,40 @@ module MsgView {
       linkEvent(e, teamid, threadId, teamView);
     });
 
+    // console.log("Number of linked events: " + linkedEvents.length);
+    // console.log("First linked event: " + linkedEvents[0].title);
+    // console.log("This event: " + e.title);
+    // if (e == linkedEvents[0])
+    //   console.log("true");
+    // console.log(e.title + ": " + linkedEvents.indexOf(e));
+
+    check.attr("src", Init.esperRootUrl + "img/check.png");
+    if (linkedEvents.indexOf(e) > -1) {
+      link.attr("style", "display: none");
+      linked.attr("style", "display: block");
+    } else {
+      link.attr("style", "display: block");
+      linked.attr("style", "display: none");
+    }
+
     return view;
   }
 
-  function displayLinkableEvents(eventList, teamid, view) {
+  function displayLinkableEvents(linkedEvents, eventList, teamid, view) {
     var list = $("<div>");
     eventList.forEach(function(e) {
-      renderSearchResult(e, teamid, view)
+      renderSearchResult(e, linkedEvents, teamid, view)
         .appendTo(list);
     });
     view.results.children().remove();
     view.results.append(list);
   }
 
-  function setupSearch(teamid, view) {
+  function setupSearch(events, teamid, view) {
     afterTyping(view.searchbox, 250, function() {
       Api.eventSearch(teamid, view.searchbox.val())
         .done(function(results) {
-          displayLinkableEvents(results.events, teamid, view);
+          displayLinkableEvents(events, results.events, teamid, view);
         });
     });
   }
@@ -191,6 +211,11 @@ module MsgView {
     Api.getLinkedEvents(teamid, threadId)
       .done(function(linkedEvents) {
         displayEventList(linkedEvents.events, teamid, threadId, view);
+        view.count.text(linkedEvents.events.length.toString());
+        if (linkedEvents.events.length == 0)
+          view.noEvents.attr("style", "display: block");
+        else
+          view.noEvents.attr("style", "display: none");  
       });
   }
 
@@ -254,7 +279,6 @@ module MsgView {
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
     noEventsText.text("Click here to link this email conversation to events on "
       + "[Executive's]" + " calendar.");
-    console.log("Number of linked events: " + linkedEvents.events.length);
     if (linkedEvents.events.length == 0)
       noEvents.attr("style", "display: block");
     else
@@ -267,8 +291,8 @@ module MsgView {
     searchModal.dialog({ modal: true });
     //existingEvent.click(searchModal.dialog("option","modal",true));
     close.attr("src", Init.esperRootUrl + "img/close.png");
-    searchTitle.text("LINK LINK LINK"); //Link to existing event
-    setupSearch(team.teamid, _view);
+    searchTitle.text("Link to existing event");
+    setupSearch(linkedEvents.events, team.teamid, _view);
     
     sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
     modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
