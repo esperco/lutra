@@ -206,11 +206,20 @@ module MsgView {
     view.results.append(list);
   }
 
-  function setupSearch(events, teamid, view) {
+  function resetSearch(view) {
     view.searchbox.val("");
     view.searchbox.focus();
+    view.clear.attr("style", "visibility: hidden");
     view.results.children().remove();
+  }
+
+  function setupSearch(events, teamid, view) {
+    resetSearch(view);
     afterTyping(view.searchbox, 250, function() {
+      if (view.searchbox.val.length > 0)
+        view.clear.attr("style", "visibility: visible");
+      else
+        view.clear.attr("style", "visibility: hidden");
       Api.eventSearch(teamid, view.searchbox.val())
         .done(function(results) {
           displayLinkableEvents(events, results.events, teamid, view);
@@ -268,11 +277,12 @@ module MsgView {
       <div #searchModal class="search-modal">
         <img #close class="modal-close-icon"/>
         <div #searchTitle class="search-modal-title"/>
+        <div class="clear-search-container">
+          <img #clear class="clear-search"/>
+        </div>
         <input #searchbox
           type="text" class="esper-searchbox"
-          placeholder="Search calendar">
-          <img #clear class="clear-search"/>
-        </input>
+          placeholder="Search calendar"/>
         <div #results class="search-results"/>
         <div class="search-footer">
           <img #modalLogo class="search-footer-logo"/>
@@ -300,6 +310,8 @@ module MsgView {
       noEvents.attr("style", "display: none");
 
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
+
+    clear.click(function() { resetSearch(_view) });
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close

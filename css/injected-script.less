@@ -265,7 +265,7 @@ li.disabled {
 	width: @modal_width !important;
 	background: #fbfafc;
 	border: 1px solid #d8d8d8;
-	border-radius: 2px;
+	border-radius: 4px;
 	webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 				 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -298,22 +298,30 @@ li.disabled {
 }
 
 .esper-searchbox {
-	width: @modal_width - 55px;
+	width: @modal_width - 78px;
 	background-color: white !important;
 	border: none;
 	border-top: 1px solid #d8d8d8;
 	border-bottom: 1px solid #d8d8d8;
 	margin-bottom: 12px;
-	padding: 15px 15px 15px 40px;
+	padding: 15px 10px 15px 40px;
 	outline: none;
 	&::-webkit-input-placeholder {
 		color: @gray_30;
 	}
 }
 
-.clear-search {
+.clear-search-container {
 	float: right;
-	margin-top: 4px;
+	background: white;
+	border-top: 1px solid #d8d8d8;
+	border-bottom: 1px solid #d8d8d8;
+	height: 32px;
+	padding: 16px 16px 0px 0px;
+}
+
+.clear-search {
+	visibility: hidden;
 	opacity: 0.5;
 	cursor: pointer;
 	&:hover { opacity: 1.0; }
