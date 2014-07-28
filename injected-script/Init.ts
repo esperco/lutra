@@ -2,7 +2,7 @@ module Init {
   export var esperRootUrl : string;
     /* URL prefix to access files provided by the extension.
        Sample usage:
-         img.attr("src", esperRootUrl + "img/icon.png");
+         img.attr("src", Init.esperRootUrl + "img/icon.png");
      */
 
   export var loginInfo : ApiT.LoginResponse;
