@@ -312,8 +312,8 @@ module MsgView {
     })
 
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
-    noEventsText.text("Click here to link this email conversation to events on "
-      + "[Executive's]" + " calendar.");
+    noEventsText.text("Click here to link this email conversation " +
+      "to events on your executive's calendar.");
     if (linkedEvents.events.length == 0)
       noEvents.attr("style", "display: block");
     else
