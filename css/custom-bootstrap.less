@@ -1,16 +1,7 @@
-/*
-  This file is for overriding Bootstrap's presets.
-  Use with care.
-*/
-
-/*** Fonts ***/
-@light: "Proxima Nova Light";
-@regular: "Proxima Nova Regular";
-@italic: "Proxima Nova Regular Italic";
-@bold: "Proxima Nova Semibold";
-
 /*** Colors ***/
-@border: #e5e5e5;
+@blue: #0080ce;
+@blue_bg: #dfeff7;
+@border: #ebebeb;
 @dark_gray: #282828;
 @gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
@@ -24,13 +15,16 @@
 @green: #2bb673;
 @green_hover: #1e9b5c;
 @orange: #f7941e;
+@orange_bg: #f4e3d3;
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
+@purple_bg: #e8d9ee;
 @purple_bg_hover: #fefdff;
 @purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
+@purple_gradient: #a464c6;
 @purple_hover: #8c42ad;
 @purple_text: #463c4c;
 @red: #d9534f;
@@ -103,7 +97,7 @@ a:focus {
   text-decoration: none;
 }
 body {
-  font-family: @regular;
+  font-weight: normal;
 }
 h1,
 h2,
@@ -117,11 +111,12 @@ h6,
 .h4,
 .h5,
 .h6 {
-  font-family: @regular;
+  font-family: "Open Sans";
+  font-weight: normal;
 }
 /*** Buttons ***/
 .btn {
-  font-family: @light;
+  font-weight: 300;
   border-radius: 3px;
 }
 .btn-default,

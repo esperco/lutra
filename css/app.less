@@ -35,11 +35,6 @@
 
 /*** General ***/
 
-body,
-html {
-  height: 100%;
-}
-
 body {
   background: white;
   color: @purple_text;
@@ -3100,24 +3095,6 @@ li.to-do {
   margin-left: 50px;
 }
 
-.google-sign-in {
-  border: 0px;
-  width: 492px;
-  height: 108px;
-  background:
-    transparent
-    url('/assets/img/Red-signin-Long-hover-44dp.png')
-    center top no-repeat;
-}
-
-.google-sign-in:hover {
-  background-image: url('/assets/img/Red-signin-Long-base-44dp.png');
-}
-
-.google-sign-in:active {
-  background-image: url('/assets/img/Red-signin-Long-press-44dp.png');
-}
-
 .sign-in-footer {
   width: 400px;
   margin-right: auto;
@@ -3143,8 +3120,23 @@ li.to-do {
 
 .footer-divider {
   display: inline-block;
-  width: 10px;
+  width: 7px;
   height: 10px;
-  margin-right: 10px;
+  margin-right: 7px;
   border-right: 1px solid @gray_10;
+}
+
+
+/** Settings **/
+
+.settings-block {
+  width: 900px;
+  padding-top: 4px;
+  margin-right: auto;
+  padding-bottom: 20px;
+  margin-left: auto;
+}
+
+.settings-block-gray {
+  background: @gray_f8;
 }
