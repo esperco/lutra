@@ -11,6 +11,14 @@ module Api {
     return JsonHttp.get(Conf.Api.url + "/api/login/" + Login.myUid() + "/info");
   }
 
+  export function getGoogleProfile(uid, teamid) {
+    var url =
+      Conf.Api.url + "/api/google/profile/" + Login.myUid()
+      + "/" + uid
+      + "/" + teamid;
+    return JsonHttp.get(url);
+  }
+
   export function getLinkedEvents(teamid, threadId) {
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()

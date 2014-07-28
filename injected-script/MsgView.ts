@@ -307,7 +307,10 @@ module MsgView {
       <div class="esper-footer-divider"/>
       <a href="https://app.esper.com">Settings</a>
     </div>
-    <div class="copyright">&copy; 2014 Esper</div>
+    <div>
+      <div #teamName class="esper-team-name"/>
+      <div class="copyright">&copy; 2014 Esper</div>
+    </div>
     <div #search class="esper-modal">
       <div #modalBackground class="modal-bg">
       <div #searchModal class="search-modal">
@@ -358,6 +361,16 @@ module MsgView {
     clear.click(function() { resetSearch(_view) });
     searchInstructions.text("Start typing above to find events on your " +
       "executive's calendar.");
+
+    var assisting = team.team_name;
+    if (assisting === null || assisting === undefined || assisting === "") {
+      Api.getGoogleProfile(team.team_executive, team.teamid)
+        .done(function(exec) {
+          teamName.text("Assisting: " + exec.display_name);
+        });
+    } else {
+      teamName.text("Assisting: " + assisting);
+    }
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
