@@ -326,7 +326,15 @@ module MsgView {
 
     clear.click(function() { resetSearch(_view) });
 
-    teamName.text("Assisting: " + team.team_name);
+    var assisting = team.team_name;
+    if (assisting === null || assisting === undefined || assisting === "") {
+      Api.getGoogleProfile(team.team_executive, team.teamid)
+        .done(function(exec) {
+          teamName.text("Assisting: " + exec.display_name);
+        });
+    } else {
+      teamName.text("Assisting: " + assisting);
+    }
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
