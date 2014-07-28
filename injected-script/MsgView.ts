@@ -1,16 +1,28 @@
 module MsgView {
   var currentThreadId : string;
 
-  // $(document).on('click', function(e) {
-  //   $(".esper-menu").each(function() {
-  //     if ($(this).css("display") == "block")
-  //       $(this).attr("style", "display: none");
-  //   })
-  //   $(".esper-menu-btn").each(function() {
-  //     if ($(this).hasClass("open"))
-  //       $(this).removeClass("open");
-  //   })
-  // });
+  $(document).on('click', function(e) {
+    var $target = $(e.target);
+    var dismiss = true;
+
+    if ($target.hasClass("esper-dropdown-btn") ||
+        $target.parent().hasClass("esper-dropdown-btn")) {
+        dismiss = false;
+    }
+
+    if (dismiss) {
+      if ($(".esper-add-btn").hasClass("open")) {
+        $(".no-events-arrow").toggle();
+      }
+      $(".esper-dropdown").each(function() {
+        if ($(this).css("display") == "block")
+          $(this).attr("style", "display: none");
+      })
+      $(".esper-dropdown-btn").each(function() {
+        $(this).removeClass("open");
+      })
+    }
+  });
 
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
@@ -45,12 +57,12 @@ module MsgView {
   <div>
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
-      <img #cog class="esper-menu-btn esper-ev-cog"/>
-      <ul #menu class="esper-menu esper-ev-menu">
-        <li #editEvent class="esper-ev-menu-item disabled">Edit</li>
-        <li #duplicateEvent class="esper-ev-menu-item disabled">Duplicate</li>
-        <li #unlinkEvent class="esper-ev-menu-item">Unlink</li>
-        <li #deleteEvent class="esper-ev-menu-item delete-event">Delete from calendar</li>
+      <img #cog class="esper-dropdown-btn esper-ev-cog"/>
+      <ul #dropdown class="esper-dropdown esper-ev-dropdown">
+        <li #editEvent class="esper-ev-dropdown-item disabled">Edit</li>
+        <li #duplicateEvent class="esper-ev-dropdown-item disabled">Duplicate</li>
+        <li #unlinkEvent class="esper-ev-dropdown-item">Unlink</li>
+        <li #deleteEvent class="esper-ev-dropdown-item delete-event">Delete from calendar</li>
       </ul>
       <span #startTime class="esper-ev-start"></span>
       &rarr;
@@ -72,7 +84,7 @@ module MsgView {
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
-      menu.toggle();
+      dropdown.toggle();
       if (cog.hasClass("open"))
         cog.removeClass("open");
       else
@@ -82,7 +94,6 @@ module MsgView {
     unlinkEvent.click(function() {
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
-          view.remove();
           refreshEventList(teamid, threadId, sidebar);
         });
     });
@@ -90,7 +101,6 @@ module MsgView {
     deleteEvent.click(function() {
       Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
-          view.remove();
           refreshEventList(teamid, threadId, sidebar);
         });
     });
@@ -246,13 +256,13 @@ module MsgView {
 '''
 <div #view>
   <div class="esper-header">
-    <button #add class="esper-menu-btn esper-add-btn">
+    <button #add class="esper-dropdown-btn esper-add-btn">
       <img #addIcon class="esper-add-icon"/>
     </button>
     <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #menu class="esper-menu esper-add-menu">
-      <li #newEvent class="esper-ev-menu-item disabled">Create new linked event</li>
-      <li #existingEvent class="esper-ev-menu-item">Link to existing event</li>
+    <ul #dropdown class="esper-dropdown esper-add-dropdown">
+      <li #newEvent class="esper-ev-dropdown-item disabled">Create new linked event</li>
+      <li #existingEvent class="esper-ev-dropdown-item">Link to existing event</li>
     </ul>
   </div>
   <div #noEvents class="esper-ev">
@@ -294,7 +304,7 @@ module MsgView {
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
     add.click(function() {
       arrow.toggle();
-      menu.toggle();
+      dropdown.toggle();
       if (add.hasClass("open"))
         add.removeClass("open");
       else
