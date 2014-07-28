@@ -348,9 +348,20 @@ module MsgView {
         add.addClass("open");
     })
 
+    var assisting = team.team_name;
+    if (assisting === null || assisting === undefined || assisting === "") {
+      Api.getGoogleProfile(team.team_executive, team.teamid)
+        .done(function(exec) {
+          assisting = exec.display_name;
+        });
+    }
+    var possessive = (assisting.slice(-1) == "s")
+        ? (assisting + "'")
+        : (assisting + "'s");
+
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
     noEventsText.text("Click here to link this email conversation " +
-      "to events on your executive's calendar.");
+      "to events on " + possessive + " calendar.");
     if (linkedEvents.events.length == 0)
       noEvents.attr("style", "display: block");
     else
@@ -362,15 +373,7 @@ module MsgView {
     searchInstructions.text("Start typing above to find events on your " +
       "executive's calendar.");
 
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
-      Api.getGoogleProfile(team.team_executive, team.teamid)
-        .done(function(exec) {
-          teamName.text("Assisting: " + exec.display_name);
-        });
-    } else {
-      teamName.text("Assisting: " + assisting);
-    }
+    teamName.text("Assisting " + assisting);
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
