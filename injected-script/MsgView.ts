@@ -281,7 +281,10 @@ module MsgView {
       <div class="esper-footer-divider"/>
       <a href="https://app.esper.com">Settings</a>
     </div>
-    <div class="copyright">&copy; 2014 Esper</div>
+    <div>
+      <div #teamName class="esper-team-name"/>
+      <div class="copyright">&copy; 2014 Esper</div>
+    </div>
     <div #search class="esper-modal">
       <div #modalBackground class="modal-bg">
       <div #searchModal class="search-modal">
@@ -322,6 +325,8 @@ module MsgView {
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
     clear.click(function() { resetSearch(_view) });
+
+    teamName.text("Assisting: " + team.team_name);
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
