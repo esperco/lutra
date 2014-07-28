@@ -155,7 +155,7 @@ module MsgView {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="link-event">Link</a>
-  <div #spinner class="spinner">
+  <div #spinner class="link-spinner">
     <div class="double-bounce1"></div>
     <div class="double-bounce2"></div>
   </div>
@@ -212,24 +212,50 @@ module MsgView {
       renderSearchResult(e, linkedEvents, teamid, view)
         .appendTo(list);
     });
-    view.results.children().remove();
-    view.results.append(list);
+    view.searchInstructions.attr("style", "display: none");
+    view.spinner.attr("style", "display: none");
+    view.resultsList.attr("style", "display: block");
+    view.resultsList.children().remove();
+    view.resultsList.append(list);
+    if (eventList.length == 0) {
+      view.searchStats.text("No events found");
+      view.searchStats.addClass("no-events");
+    } else if (eventList.length == 1) {
+      view.searchStats.text(eventList.length + " event found");
+      view.searchStats.removeClass("no-events");
+    } else {
+      view.searchStats.text(eventList.length + " events found");
+      view.searchStats.removeClass("no-events");
+    }
+    view.searchStats.attr("style", "display: block");
   }
 
   function resetSearch(view) {
     view.searchbox.val("");
     view.searchbox.focus();
     view.clear.attr("style", "visibility: hidden");
-    view.results.children().remove();
+    view.searchInstructions.attr("style", "display: block");
+    view.spinner.attr("style", "display: none");
+    view.resultsList.children().remove();
+    view.searchStats.attr("style", "display: none");
   }
 
   function setupSearch(events, teamid, view) {
     resetSearch(view);
     afterTyping(view.searchbox, 250, function() {
-      if (view.searchbox.val.length > 0)
-        view.clear.attr("style", "visibility: visible");
-      else
-        view.clear.attr("style", "visibility: hidden");
+      if (view.searchbox.val().length == 0) {
+        resetSearch(view);
+      } else {
+          view.searchbox.keypress(function(e) {
+          if (e.which != 0) {
+            view.clear.attr("style", "visibility: visible");
+            view.searchInstructions.attr("style", "display: none");
+            view.spinner.attr("style", "display: block");
+            view.resultsList.attr("style", "display: none");
+            view.searchStats.attr("style", "display: none");
+          }
+        })
+      }
       Api.eventSearch(teamid, view.searchbox.val())
         .done(function(results) {
           displayLinkableEvents(events, results.events, teamid, view);
@@ -293,7 +319,15 @@ module MsgView {
         <input #searchbox
           type="text" class="esper-searchbox"
           placeholder="Search calendar"/>
-        <div #results class="search-results"/>
+        <div #results class="search-results">
+          <div #searchInstructions class="search-instructions"/>
+          <div #spinner class="search-spinner">
+            <div class="double-bounce1"></div>
+            <div class="double-bounce2"></div>
+          </div>
+          <div #resultsList/>
+          <div #searchStats class="search-stats"/>
+        </div>
         <div class="search-footer">
           <img #modalLogo class="search-footer-logo"/>
           <button #done class="done-btn">Done</button>
@@ -322,6 +356,8 @@ module MsgView {
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
     clear.click(function() { resetSearch(_view) });
+    searchInstructions.text("Start typing above to find events on your " +
+      "executive's calendar.");
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close

@@ -336,6 +336,12 @@ li.disabled {
 	overflow:auto;
 }
 
+.search-instructions {
+	margin: 101px;
+	color: @gray_30;
+	text-align: center;
+}
+
 .esper-ev-result {
 	padding: 14px 14px 16px 14px;
 	border-bottom: 1px solid #d8d8d8;
@@ -358,10 +364,18 @@ li.disabled {
 
 .linked {
 	float: right;
-	color: @gray_20;
+	color: @gray_30;
 	cursor: default;
 	margin-top: 10px;
 }
+
+.search-stats {
+	margin: 20px 20px 40px 20px;
+	color: @gray_30;
+	text-align: center;
+}
+
+.search-stats.no-events { margin-top: 110px; }
 
 .search-footer {
 	height: 30px;
@@ -392,7 +406,15 @@ li.disabled {
 
 /** Spinner **/
 
-.spinner {
+.search-spinner {
+	display: none;
+	margin: 110px auto;
+	width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.link-spinner {
 	display: none;
 	float: right;
   width: 20px;
