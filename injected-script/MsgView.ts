@@ -443,6 +443,11 @@ module MsgView {
       Log.d("Opened email " + id, url, body);
       maybeUpdateView(10);
     });
+    window.onhashchange = function() {
+      // TODO Actually check hash?
+      Log.d("Left email message view");
+      currentThreadId = null;
+    };
   }
 
   var alreadyInitialized = false;
