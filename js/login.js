@@ -13,7 +13,6 @@ var login = (function() {
       mod.data = stored;
     else
       store.remove("login");
-    mod.updateView();
   };
 
   /* Pass UID and API secret to the Esper extension */
@@ -52,7 +51,6 @@ var login = (function() {
     store.set("login", stored);
     mod.data = stored;
     postLoginInfo();
-    mod.updateView();
   };
 
   function saveLoginInfo() {
@@ -71,9 +69,6 @@ var login = (function() {
 
     store.remove("login");
     delete mod.data;
-    $("#login-email").val("");
-    $("#login-password").val("");
-    mod.updateView();
   };
 
   mod.clearAllLoginInfo = function() {
@@ -124,19 +119,6 @@ var login = (function() {
         jqXHR.setRequestHeader("Esper-Path", path);
         jqXHR.setRequestHeader("Esper-Signature", signature);
       }
-    }
-  };
-
-  mod.updateView = function() {
-    if (mod.data && mod.data.email) {
-      $("#logged-in-email").text(mod.data.email);
-      $(".logged-out").addClass("hide");
-      $(".logged-in").removeClass("hide");
-      pusher.start();
-    } else {
-      $(".logged-in").addClass("hide");
-      $(".logged-out").removeClass("hide");
-      pusher.stop();
     }
   };
 
