@@ -195,6 +195,13 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  /***** Team calendar *****/
+
+  mod.setTeamCalendar = function(teamid, calId) {
+    var url = "/api/calendar/select/" + login.me() + "/" + teamid;
+    var data = { calendar_id: calId };
+    return jsonHttpPut(url, JSON.stringify(data));
+  }
 
   /***** Google profile information *****/
 

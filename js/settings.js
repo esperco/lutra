@@ -83,9 +83,47 @@ var settings = (function() {
     modal.modal({});
   }
 
+  function setTeamCalendar(team, calId) {
+    return api.setTeamCalendar(team.teamid, calId)
+      .done(function() {
+        log("Successfully set team calendar to " + calId);
+      });
+  }
+
+  function makeCalendarSelector(team, root) {
+    api.getCalendarList(login.leader(), null)
+      .done(function(x) {
+        var calId = team.team_calendar_id;
+        var options = [ { label: "Select calendar" } ];
+        list.iter(x.items, function(calInfo) {
+          options.push({ label: calInfo.summary, value: calInfo.id });
+        });
+        var sel = select.create({
+          initialKey: calId,
+          defaultAction: function(v) {
+            calId = v;
+            log("Selected calendar is: " + calId);
+            if (util.isString(calId))
+              setTeamCalendar(team, calId);
+          },
+          options: options
+        });
+        root.append(sel.view);
+      });
+  }
+
   function viewOfTeam(team) {
-    var view = $("<div/>");
-    var settingsURL = $("<a href='#'>Label Sync Settings</a>")
+'''
+<div #view>
+  <div #executive></div>
+  <div #assistants></div>
+  <a #labelSettingsLink href="#">Label Sync Settings</a>
+  <div>
+    Team calendar: <span #calendarSelector></span>
+  </div>
+</div>
+'''
+    labelSettingsLink
       .click(function() { showLabelSettingsModal(team) });
     api.getGoogleEmail(login.me(), team.team_executive, team.teamid)
       .done(function(execEmail) {
@@ -96,14 +134,13 @@ var settings = (function() {
           var asstEmails = list.map(asstAcctEmails, function(e) {
             return e.email;
           });
-          view
-            .append("Executive: " + execEmail.email)
-            .append("<br/>")
-            .append("Assistants: " + asstEmails.join(", "))
-            .append("<br/>")
-            .append(settingsURL);
+          executive.text("Executive: " + execEmail.email);
+          assistants.text("Assistants: " + asstEmails.join(", "));
         });
       });
+
+    makeCalendarSelector(team, calendarSelector);
+
     return view;
   }
 
