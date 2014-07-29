@@ -61,9 +61,9 @@ module MsgView {
         <li #unlinkEvent class="esper-ev-dropdown-item">Unlink</li>
         <li #deleteEvent class="esper-ev-dropdown-item delete-event">Delete from calendar</li>
       </ul>
-      <span #startTime class="esper-ev-start"></span>
+      <span #startTime class="esper-ev-start"/>
       &rarr;
-      <span #endTime class="esper-ev-end"></span>
+      <span #endTime class="esper-ev-end"/>
     </div>
   </div>
 </div>
