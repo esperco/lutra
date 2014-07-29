@@ -48,8 +48,8 @@ module MsgView {
 '''
 <div #view class="esper-ev">
   <div class="esper-ev-date">
-    <div #month class="esper-ev-month"></div>
-    <div #day class="esper-ev-day"></div>
+    <div #month class="esper-ev-month"/>
+    <div #day class="esper-ev-day"/>
   </div>
   <div>
     <div #title class="esper-ev-title"/>
