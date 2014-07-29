@@ -125,7 +125,7 @@ var agenda = (function() {
   }
 
   // Create a radio button for the list of calendars
-  function diplayCalendarChoice(data) {
+  function displayCalendarChoice(data) {
 '''
 <div #calendarList class="chat-actions clearfix">
   <div>Calendars found:</div>
@@ -159,7 +159,7 @@ var agenda = (function() {
 '''
     api.getCalendarList(login.leader(), null)
       .done(function (data) {
-        var calListView = diplayCalendarChoice(data);
+        var calListView = displayCalendarChoice(data);
         sendAgenda.append(calListView);
         var agendaForm = createForm();
         sendAgenda.append(agendaForm);

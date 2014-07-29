@@ -17,7 +17,9 @@ var gmailCompose = (function() {
   };
 
   mod.compose = function(param) {
-    window.open(makeUrl(param));
+    var url = makeUrl(param);
+    var win = window.open(url, "_blank"); /* a nasty pop up */
+    win.focus();
   };
 
   return mod;

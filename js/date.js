@@ -156,16 +156,6 @@ var date = (function() {
       " at "+ mod.timeOnly(d1);
   };
 
-  jQuery.timeago.settings.allowFuture = true;
-  /* create a DOM element from a date,
-     displaying how long ago it was. */
-  mod.viewTimeAgo = function(d) {
-    var view = $("<time class='timeago'/>")
-      .attr("datetime", mod.toString(d));
-    view.timeago();
-    return view;
-  };
-
   /*
     Add 8 hours if the timezone offset is -08:00.
     (spend as little time as possible in momentjs whose interface

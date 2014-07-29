@@ -15,12 +15,12 @@ var route = (function() {
 
     /* default path /!# */
     "route" : function(data){
-      withLogin(page.home.load);
+      withLogin(page.settings.load);
     },
 
     /* Generic invitation */
     "t/:token route" : function(data) {
-      withLogin(page.home.load, data.token);
+      withLogin(page.settings.load, data.token);
     },
 
     /* Sign-in via Google */
@@ -32,42 +32,12 @@ var route = (function() {
       withLogin(function() { window.close(); }, undefined, data.email);
     },
 
-    /* login, logout, etc. */
-    "request-password route" : function() {
-      page.requestPassword.load("");
-    },
-    "request-password/:email route" : function(data) {
-      page.requestPassword.load(data.email);
-    },
-    "reset-password/:uid/:token route" : function(data) {
-      page.resetPassword.load(data.uid, data.token);
-    },
-    "email-verify/:uid/:email/:token route" : function(data) {
-      page.emailVerify.load(data.uid, data.email, data.token);
-    },
-
     /* various pages */
 
     "test route": function(data) {
       page.test.load();
     },
 
-    "task/:tid route": function(data) {
-      withLogin(function () { page.task.load(data.tid); });
-    },
-
-    "respond/:rid/:uid route" : function(data) {
-      withLogin(function () { page.respond.load(rid, asUid); });
-    },
-
-    "settings route" : function(data) {
-      log("here");
-      withLogin(function () { page.settings.load(); });
-    },
-
-    "translate/response/:rid/:uid route" : function(data) {
-      withLogin(function () { });
-    }
   });
 
   /* Navigation functions (set the URL, let the router react to the changes) */
@@ -79,26 +49,6 @@ var route = (function() {
 
   mod.nav.home = function() {
     location.hash = "#!";
-  };
-
-  mod.nav.requestPassword = function(email) {
-    location.hash = "#!request-password/" + email;
-  };
-
-  mod.nav.resetPassword = function(uid, token) {
-    location.hash = "#!reset-password/" + uid + "/" + token;
-  };
-
-  mod.nav.respond = function(rid, uid) {
-    location.hash = "#!respond/" + rid + "/" + uid;
-  };
-
-  mod.nav.settings = function() {
-    location.hash = "#!settings";
-  };
-
-  mod.nav.translateResponse = function(rid, uid) {
-    location.hash = "#!translate/response/" + rid + "/" + uid;
   };
 
   /* Initialization */
