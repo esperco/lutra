@@ -313,9 +313,11 @@ module MsgView {
     </div>
     <div #search class="esper-modal">
       <div #modalBackground class="modal-bg">
-      <div #searchModal class="search-modal">
-        <img #close class="modal-close-icon"/>
-        <div #searchTitle class="search-modal-title"/>
+      <div #searchModal class="modal search-modal">
+        <div class="modal-header">
+          <img #close class="modal-close-icon"/>
+          <div #searchTitle class="search-modal-title"/>
+        </div>
         <div class="clear-search-container">
           <img #clear class="clear-search"/>
         </div>
@@ -370,8 +372,8 @@ module MsgView {
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
     clear.click(function() { resetSearch(_view) });
-    searchInstructions.text("Start typing above to find events on your " +
-      "executive's calendar.");
+    searchInstructions.text("Start typing above to find events on " +
+      possessive + " calendar.");
 
     teamName.text("Assisting " + assisting);
 
