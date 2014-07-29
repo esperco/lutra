@@ -92,6 +92,7 @@ module MsgView {
     })
 
     unlinkEvent.click(function() {
+      view.attr("style", "opacity: 0.3");
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           refreshEventList(teamid, threadId, sidebar);
@@ -99,7 +100,8 @@ module MsgView {
     });
 
     deleteEvent.click(function() {
-      Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
+      view.attr("style", "opacity: 0.3");
+      Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           refreshEventList(teamid, threadId, sidebar);
         });
@@ -212,6 +214,7 @@ module MsgView {
       renderSearchResult(e, linkedEvents, teamid, view)
         .appendTo(list);
     });
+    view.clear.attr("style", "visibility: visible");
     view.searchInstructions.attr("style", "display: none");
     view.spinner.attr("style", "display: none");
     view.resultsList.attr("style", "display: block");
@@ -248,7 +251,6 @@ module MsgView {
       } else {
           view.searchbox.keypress(function(e) {
           if (e.which != 0) {
-            view.clear.attr("style", "visibility: visible");
             view.searchInstructions.attr("style", "display: none");
             view.spinner.attr("style", "display: block");
             view.resultsList.attr("style", "display: none");
@@ -311,33 +313,35 @@ module MsgView {
       <div #teamName class="esper-team-name"/>
       <div class="copyright">&copy; 2014 Esper</div>
     </div>
-    <div #search class="esper-modal">
-      <div #modalBackground class="modal-bg">
-      <div #searchModal class="modal search-modal">
-        <div class="modal-header">
-          <img #close class="modal-close-icon"/>
-          <div #searchTitle class="search-modal-title"/>
+  </div>
+  <div #search class="esper-modal">
+    <div #modalBackground class="modal-bg">
+    <div #searchModal class="modal search-modal">
+      <div class="modal-header">
+        <img #close class="modal-close-icon"/>
+        <div #searchTitle class="search-modal-title"/>
+      </div>
+      <div class="clear-search-container">
+        <img #clear class="clear-search"/>
+      </div>
+      <input #searchbox
+        type="text" class="esper-searchbox"
+        placeholder="Search calendar"/>
+      <div #results class="search-results">
+        <div #searchInstructions class="search-instructions"/>
+        <div #spinner class="search-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
         </div>
-        <div class="clear-search-container">
-          <img #clear class="clear-search"/>
-        </div>
-        <input #searchbox
-          type="text" class="esper-searchbox"
-          placeholder="Search calendar"/>
-        <div #results class="search-results">
-          <div #searchInstructions class="search-instructions"/>
-          <div #spinner class="search-spinner">
-            <div class="double-bounce1"></div>
-            <div class="double-bounce2"></div>
-          </div>
-          <div #resultsList/>
-          <div #searchStats class="search-stats"/>
-        </div>
-        <div class="search-footer">
-          <img #modalLogo class="search-footer-logo"/>
-          <button #done class="done-btn">Done</button>
-        </div>
+        <div #resultsList/>
+        <div #searchStats class="search-stats"/>
+      </div>
+      <div class="search-footer">
+        <img #modalLogo class="search-footer-logo"/>
+        <button #done class="done-btn">Done</button>
+      </div>
     </div>
+  </div>
 </div>
 '''
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
