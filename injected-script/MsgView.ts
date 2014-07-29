@@ -2,17 +2,14 @@ module MsgView {
   var currentThreadId : string;
 
   function dismissDropdowns() {
-    console.log("dimiss");
     if ($(".esper-add-btn").hasClass("open")) {
       $(".no-events-arrow").toggle();
     }
     $(".esper-dropdown").each(function() {
-      if ($(this).css("display") == "block")
+      if ($(this).css("display") === "block")
         $(this).attr("style", "display: none");
     })
-    $(".esper-dropdown-btn").each(function() {
-      $(this).removeClass("open");
-    })
+    $(".esper-dropdown-btn").removeClass("open");
   }
 
   $(document).on('click', function(e) {
@@ -196,7 +193,7 @@ module MsgView {
 
     check.attr("src", Init.esperRootUrl + "img/check.png");
     var alreadyLinked = linkedEvents.filter(function(ev) {
-      return ev.google_event_id == e.google_event_id;
+      return ev.google_event_id === e.google_event_id;
     })
     if (alreadyLinked.length > 0) {
       link.attr("style", "display: none");
@@ -221,10 +218,10 @@ module MsgView {
     view.resultsList.attr("style", "display: block");
     view.resultsList.children().remove();
     view.resultsList.append(list);
-    if (eventList.length == 0) {
+    if (eventList.length === 0) {
       view.searchStats.text("No events found");
       view.searchStats.addClass("no-events");
-    } else if (eventList.length == 1) {
+    } else if (eventList.length === 1) {
       view.searchStats.text(eventList.length + " event found");
       view.searchStats.removeClass("no-events");
     } else {
@@ -247,7 +244,7 @@ module MsgView {
   function setupSearch(events, teamid, view) {
     resetSearch(view);
     afterTyping(view.searchbox, 250, function() {
-      if (view.searchbox.val().length == 0) {
+      if (view.searchbox.val().length === 0) {
         resetSearch(view);
       } else {
           view.searchbox.keypress(function(e) {
@@ -272,7 +269,7 @@ module MsgView {
       .done(function(linkedEvents) {
         displayEventList(linkedEvents.events, teamid, threadId, view);
         view.count.text(linkedEvents.events.length.toString());
-        if (linkedEvents.events.length == 0)
+        if (linkedEvents.events.length === 0)
           view.noEvents.attr("style", "display: block");
         else
           view.noEvents.attr("style", "display: none");  
@@ -363,14 +360,14 @@ module MsgView {
           assisting = exec.display_name;
         });
     }
-    var possessive = (assisting.slice(-1) == "s")
+    var possessive = (assisting.slice(-1) === "s")
         ? (assisting + "'")
         : (assisting + "'s");
 
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
     noEventsText.text("Click here to link this email conversation " +
       "to events on " + possessive + " calendar.");
-    if (linkedEvents.events.length == 0)
+    if (linkedEvents.events.length === 0)
       noEvents.attr("style", "display: block");
     else
       noEvents.attr("style", "display: none");
