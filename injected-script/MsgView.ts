@@ -1,26 +1,23 @@
 module MsgView {
   var currentThreadId : string;
 
+  function dismissDropdowns() {
+    if ($(".esper-add-btn").hasClass("open")) {
+      $(".no-events-arrow").toggle();
+    }
+    $(".esper-dropdown").each(function() {
+      if ($(this).css("display") === "block")
+        $(this).attr("style", "display: none");
+    })
+    $(".esper-dropdown-btn").removeClass("open");
+  }
+
   $(document).on('click', function(e) {
     var $target = $(e.target);
-    var dismiss = true;
 
-    if ($target.hasClass("esper-dropdown-btn") ||
-        $target.parent().hasClass("esper-dropdown-btn")) {
-        dismiss = false;
-    }
-
-    if (dismiss) {
-      if ($(".esper-add-btn").hasClass("open")) {
-        $(".no-events-arrow").toggle();
-      }
-      $(".esper-dropdown").each(function() {
-        if ($(this).css("display") == "block")
-          $(this).attr("style", "display: none");
-      })
-      $(".esper-dropdown-btn").each(function() {
-        $(this).removeClass("open");
-      })
+    if (!$target.hasClass("esper-dropdown-btn") &&
+        !$target.parent().hasClass("esper-dropdown-btn")) {
+        dismissDropdowns();
     }
   });
 
@@ -51,8 +48,8 @@ module MsgView {
 '''
 <div #view class="esper-ev">
   <div class="esper-ev-date">
-    <div #month class="esper-ev-month"></div>
-    <div #day class="esper-ev-day"></div>
+    <div #month class="esper-ev-month"/>
+    <div #day class="esper-ev-day"/>
   </div>
   <div>
     <div #title class="esper-ev-title"/>
@@ -64,9 +61,9 @@ module MsgView {
         <li #unlinkEvent class="esper-ev-dropdown-item">Unlink</li>
         <li #deleteEvent class="esper-ev-dropdown-item delete-event">Delete from calendar</li>
       </ul>
-      <span #startTime class="esper-ev-start"></span>
+      <span #startTime class="esper-ev-start"/>
       &rarr;
-      <span #endTime class="esper-ev-end"></span>
+      <span #endTime class="esper-ev-end"/>
     </div>
   </div>
 </div>
@@ -84,6 +81,7 @@ module MsgView {
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
+      dismissDropdowns();
       dropdown.toggle();
       if (cog.hasClass("open"))
         cog.removeClass("open");
@@ -92,6 +90,7 @@ module MsgView {
     })
 
     unlinkEvent.click(function() {
+      view.attr("style", "opacity: 0.3");
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           refreshEventList(teamid, threadId, sidebar);
@@ -99,7 +98,8 @@ module MsgView {
     });
 
     deleteEvent.click(function() {
-      Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
+      view.attr("style", "opacity: 0.3");
+      Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           refreshEventList(teamid, threadId, sidebar);
         });
@@ -155,7 +155,7 @@ module MsgView {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="link-event">Link</a>
-  <div #spinner class="spinner">
+  <div #spinner class="link-spinner">
     <div class="double-bounce1"></div>
     <div class="double-bounce2"></div>
   </div>
@@ -193,7 +193,7 @@ module MsgView {
 
     check.attr("src", Init.esperRootUrl + "img/check.png");
     var alreadyLinked = linkedEvents.filter(function(ev) {
-      return ev.google_event_id == e.google_event_id;
+      return ev.google_event_id === e.google_event_id;
     })
     if (alreadyLinked.length > 0) {
       link.attr("style", "display: none");
@@ -212,24 +212,50 @@ module MsgView {
       renderSearchResult(e, linkedEvents, teamid, view)
         .appendTo(list);
     });
-    view.results.children().remove();
-    view.results.append(list);
+    view.clear.attr("style", "visibility: visible");
+    view.searchInstructions.attr("style", "display: none");
+    view.spinner.attr("style", "display: none");
+    view.resultsList.attr("style", "display: block");
+    view.resultsList.children().remove();
+    view.resultsList.append(list);
+    if (eventList.length === 0) {
+      view.searchStats.text("No events found");
+      view.searchStats.addClass("no-events");
+    } else if (eventList.length === 1) {
+      view.searchStats.text(eventList.length + " event found");
+      view.searchStats.removeClass("no-events");
+    } else {
+      view.searchStats.text(eventList.length + " events found");
+      view.searchStats.removeClass("no-events");
+    }
+    view.searchStats.attr("style", "display: block");
   }
 
   function resetSearch(view) {
     view.searchbox.val("");
     view.searchbox.focus();
     view.clear.attr("style", "visibility: hidden");
-    view.results.children().remove();
+    view.searchInstructions.attr("style", "display: block");
+    view.spinner.attr("style", "display: none");
+    view.resultsList.children().remove();
+    view.searchStats.attr("style", "display: none");
   }
 
   function setupSearch(events, teamid, view) {
     resetSearch(view);
     afterTyping(view.searchbox, 250, function() {
-      if (view.searchbox.val.length > 0)
-        view.clear.attr("style", "visibility: visible");
-      else
-        view.clear.attr("style", "visibility: hidden");
+      if (view.searchbox.val().length === 0) {
+        resetSearch(view);
+      } else {
+          view.searchbox.keypress(function(e) {
+          if (e.which != 0) {
+            view.searchInstructions.attr("style", "display: none");
+            view.spinner.attr("style", "display: block");
+            view.resultsList.attr("style", "display: none");
+            view.searchStats.attr("style", "display: none");
+          }
+        })
+      }
       Api.eventSearch(teamid, view.searchbox.val())
         .done(function(results) {
           displayLinkableEvents(events, results.events, teamid, view);
@@ -243,7 +269,7 @@ module MsgView {
       .done(function(linkedEvents) {
         displayEventList(linkedEvents.events, teamid, threadId, view);
         view.count.text(linkedEvents.events.length.toString());
-        if (linkedEvents.events.length == 0)
+        if (linkedEvents.events.length === 0)
           view.noEvents.attr("style", "display: block");
         else
           view.noEvents.attr("style", "display: none");  
@@ -285,27 +311,40 @@ module MsgView {
       <div #teamName class="esper-team-name"/>
       <div class="copyright">&copy; 2014 Esper</div>
     </div>
-    <div #search class="esper-modal">
-      <div #modalBackground class="modal-bg">
-      <div #searchModal class="search-modal">
+  </div>
+  <div #search class="esper-modal">
+    <div #modalBackground class="modal-bg">
+    <div #searchModal class="modal search-modal">
+      <div class="modal-header">
         <img #close class="modal-close-icon"/>
         <div #searchTitle class="search-modal-title"/>
-        <div class="clear-search-container">
-          <img #clear class="clear-search"/>
+      </div>
+      <div class="clear-search-container">
+        <img #clear class="clear-search"/>
+      </div>
+      <input #searchbox
+        type="text" class="esper-searchbox"
+        placeholder="Search calendar"/>
+      <div #results class="search-results">
+        <div #searchInstructions class="search-instructions"/>
+        <div #spinner class="search-spinner">
+          <div class="double-bounce1"></div>
+          <div class="double-bounce2"></div>
         </div>
-        <input #searchbox
-          type="text" class="esper-searchbox"
-          placeholder="Search calendar"/>
-        <div #results class="search-results"/>
-        <div class="search-footer">
-          <img #modalLogo class="search-footer-logo"/>
-          <button #done class="done-btn">Done</button>
-        </div>
+        <div #resultsList/>
+        <div #searchStats class="search-stats"/>
+      </div>
+      <div class="search-footer">
+        <img #modalLogo class="search-footer-logo"/>
+        <button #done class="done-btn">Done</button>
+      </div>
     </div>
+  </div>
 </div>
 '''
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
     add.click(function() {
+      dismissDropdowns();
       arrow.toggle();
       dropdown.toggle();
       if (add.hasClass("open"))
@@ -314,10 +353,21 @@ module MsgView {
         add.addClass("open");
     })
 
+    var assisting = team.team_name;
+    if (assisting === null || assisting === undefined || assisting === "") {
+      Api.getGoogleProfile(team.team_executive, team.teamid)
+        .done(function(exec) {
+          assisting = exec.display_name;
+        });
+    }
+    var possessive = (assisting.slice(-1) === "s")
+        ? (assisting + "'")
+        : (assisting + "'s");
+
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
-    noEventsText.text("Click here to link this email conversation to events on "
-      + "[Executive's]" + " calendar.");
-    if (linkedEvents.events.length == 0)
+    noEventsText.text("Click here to link this email conversation " +
+      "to events on " + possessive + " calendar.");
+    if (linkedEvents.events.length === 0)
       noEvents.attr("style", "display: block");
     else
       noEvents.attr("style", "display: none");
@@ -325,16 +375,10 @@ module MsgView {
     displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
 
     clear.click(function() { resetSearch(_view) });
+    searchInstructions.text("Start typing above to find events on " +
+      possessive + " calendar.");
 
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
-      Api.getGoogleProfile(team.team_executive, team.teamid)
-        .done(function(exec) {
-          teamName.text("Assisting: " + exec.display_name);
-        });
-    } else {
-      teamName.text("Assisting: " + assisting);
-    }
+    teamName.text("Assisting " + assisting);
 
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close

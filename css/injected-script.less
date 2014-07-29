@@ -229,12 +229,7 @@ li.disabled {
   border-right: 1px solid @gray_10;
 }
 
-.esper-team-name {
-  display: inline-block;
-  font-size: 12px;
-  float: left;
-}
-
+.esper-team-name,
 .copyright {
   color: @gray_30;
   font-size: 11px;
@@ -261,19 +256,22 @@ li.disabled {
   z-index: 6;
 }
 
-.search-modal {
+.modal {
   display: none;
   position: relative;
   outline: none;
-  margin-left: -92px;
   margin-right: auto;
   z-index: 10;
-  width: @modal_width !important;
   background: #fbfafc;
   border: 1px solid #d8d8d8;
   border-radius: 4px;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-modal {
+  margin-left: -92px;
+  width: @modal_width !important;
 }
 
 .ui-dialog {
@@ -291,16 +289,25 @@ li.disabled {
   display: none;
 }
 
+.modal-header {
+  background: @purple_text;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  color: white;
+  margin: -1px -1px 0px -1px;
+}
+
 .modal-close-icon {
   float: right;
-  margin: 18px 15px;
+  margin: 15px;
   opacity: 0.7;
   cursor: pointer;
   &:hover { opacity: 1.0; }
 }
 
 .search-modal-title {
-  padding: 15px;
+  font-size: 18px;
+  padding: 10px 15px;
 }
 
 .esper-searchbox {
@@ -342,6 +349,12 @@ li.disabled {
   overflow:auto;
 }
 
+.search-instructions {
+  margin: 101px 80px;
+  color: @gray_30;
+  text-align: center;
+}
+
 .esper-ev-result {
   padding: 14px 14px 16px 14px;
   border-bottom: 1px solid #d8d8d8;
@@ -364,10 +377,18 @@ li.disabled {
 
 .linked {
   float: right;
-  color: @gray_20;
+  color: @gray_30;
   cursor: default;
   margin-top: 10px;
 }
+
+.search-stats {
+  margin: 20px 20px 40px 20px;
+  color: @gray_30;
+  text-align: center;
+}
+
+.search-stats.no-events { margin-top: 110px; }
 
 .search-footer {
   height: 30px;
@@ -398,7 +419,15 @@ li.disabled {
 
 /** Spinner **/
 
-.spinner {
+.search-spinner {
+  display: none;
+  margin: 110px auto;
+  width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.link-spinner {
   display: none;
   float: right;
   width: 20px;
