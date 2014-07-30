@@ -1,4 +1,4 @@
-.PHONY: default setup dev prod dev-build prod-build install clean
+.PHONY: default setup dev prod dev-build prod-build install zip clean
 default: dev
 
 dev:
@@ -8,10 +8,14 @@ dev:
 prod:
 	$(MAKE) prod-build
 	$(MAKE) install
+	$(MAKE) zip
 
 install:
 	rm -rf pub
 	./install prod 2>&1 | tee -a install.log
+
+zip:
+	zip -r pub pub
 
 dev-build:
 	$(MAKE) -C common dev-conf
