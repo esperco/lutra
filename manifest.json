@@ -5,6 +5,12 @@
 
   "description": "Link between Gmail and Google Calendar",
 
+  "icons": {
+    "16": "img/icon16.png",
+    "64": "img/icon64.png",
+    "128": "img/icon128.png"
+  },
+
   "content_scripts": [
     {
       "matches": [
