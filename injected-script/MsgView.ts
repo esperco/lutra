@@ -93,14 +93,16 @@ module MsgView {
       view.attr("style", "opacity: 0.3");
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
+          view.slideUp();
           refreshEventList(teamid, threadId, sidebar);
         });
     });
 
     deleteEvent.click(function() {
       view.attr("style", "opacity: 0.3");
-      Api.unlinkEvent(teamid, threadId, e.google_event_id)
+      Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
+          view.slideUp();
           refreshEventList(teamid, threadId, sidebar);
         });
     });
