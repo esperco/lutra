@@ -95,7 +95,7 @@ var settings = (function() {
       .done(function(x) {
         var cal = team.team_calendar;
         var calId =
-          cal !== null && cal !== undefined ? cal.calendar_id : null;
+          cal !== null && cal !== undefined ? cal.google_calendar_id : null;
         var options = [ { label: "Select calendar" } ];
         list.iter(x.items, function(calInfo) {
           options.push({ label: calInfo.summary, value: calInfo.id });
