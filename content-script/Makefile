@@ -17,8 +17,8 @@ JS_LIBS = \
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
-  jquery.d \
-  chrome.d
+  jquery/jquery.d \
+  chrome/chrome.d
 
 # Our own JavaScript code required in edge cases
 APP_JS =

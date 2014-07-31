@@ -5,9 +5,16 @@
 
   "description": "Link between Gmail and Google Calendar",
 
+  "icons": {
+    "16": "img/icon16.png",
+    "64": "img/icon64.png",
+    "128": "img/icon128.png"
+  },
+
   "content_scripts": [
     {
       "matches": [
+        "http://127.0.0.1/*",
         "http://localhost/*",
         "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
@@ -22,6 +29,7 @@
 
   "externally_connectable": {
     "matches": [
+      "http://127.0.0.1/*",
       "http://localhost/*",
       "https://app.esper.com/*",
       "https://www.google.com/calendar/*",
