@@ -3,6 +3,7 @@ default: pp
 
 SOURCES = \
   Conf \
+  List \
   Util \
   XDate \
   Log \

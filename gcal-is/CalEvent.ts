@@ -14,7 +14,6 @@ module CalEvent {
   }
 
   function decodeBase64(encoded: string): string {
-    //s.replace("/","_").replace("+","-");
     return atob(encoded);
   }
 

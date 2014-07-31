@@ -30,6 +30,7 @@ APP_DEFS =
 # path to file without .ts suffix
 SHARED_SOURCES = \
   ../common/ts/Conf \
+  ../common/ts/List \
   ../common/ts/Util \
   ../common/ts/Log \
   ../common/ts/EsperStorage \

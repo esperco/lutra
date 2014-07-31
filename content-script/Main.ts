@@ -30,7 +30,7 @@ module Main {
 
       injectScript("gmail-is.js");
 
-    else if ((/^https:\/\/www\.google\.com\/calendar\/render/)
+    else if ((/^https:\/\/www\.google\.com\/calendar\//)
              .test(document.URL))
 
       injectScript("gcal-is.js");

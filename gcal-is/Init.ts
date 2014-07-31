@@ -101,6 +101,27 @@ module Init {
 
   }
 
+  function inspectUrlFragment() {
+    var frag = location.hash;
+    Log.d("Fragment: ", frag);
+    if (/^#esper-/.test(frag)) {
+      var data = frag.slice(7);
+      if (/^ev-title-/.test(data)) {
+        var evTitle = data.slice(9);
+        Log.d("Event title: ", evTitle);
+        var candidates = $("span.evt-lk");
+        var matches =
+          candidates.filter(function(index) {
+            return $(candidates[index]).text() === evTitle;
+          });
+        Log.d("Number of matching events: ", matches.length);
+        if (matches.length === 1)
+          matches.click();
+      }
+      delete location.hash;
+    }
+  }
+
   var alreadyInitialized = false;
 
   export function init() {
@@ -110,6 +131,8 @@ module Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
+
+      inspectUrlFragment();
 
       // temporary; remove once login stuff is restored
       CalEventView.init();
