@@ -54,10 +54,22 @@ module Esper.MsgView {
     <div class="esper-ev-times">
       <img #cog class="esper-dropdown-btn esper-ev-cog"/>
       <ul #dropdown class="esper-dropdown esper-ev-dropdown">
-        <li #editEvent class="esper-ev-dropdown-item disabled">Edit</li>
-        <li #duplicateEvent class="esper-ev-dropdown-item disabled">Duplicate</li>
-        <li #unlinkEvent class="esper-ev-dropdown-item">Unlink</li>
-        <li #deleteEvent class="esper-ev-dropdown-item delete-event">Delete from calendar</li>
+        <li #editEvent
+            class="esper-ev-dropdown-item disabled">
+          Edit
+        </li>
+        <li #duplicateEvent
+            class="esper-ev-dropdown-item disabled">
+          Duplicate
+        </li>
+        <li #unlinkEvent
+            class="esper-ev-dropdown-item">
+          Unlink
+        </li>
+        <li #deleteEvent
+            class="esper-ev-dropdown-item delete-event">
+          Delete from calendar
+        </li>
       </ul>
       <span #startTime class="esper-ev-start"/>
       &rarr;
@@ -148,7 +160,8 @@ module Esper.MsgView {
       });
   }
 
-  function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents, teamid, sidebar) {
+  function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
+                              teamid, sidebar) {
 '''
 <div #view class="esper-ev-result">
   <div class="esper-ev-date">
@@ -273,7 +286,7 @@ module Esper.MsgView {
         if (linkedEvents.events.length === 0)
           view.noEvents.attr("style", "display: block");
         else
-          view.noEvents.attr("style", "display: none");  
+          view.noEvents.attr("style", "display: none");
       });
   }
 
@@ -288,8 +301,13 @@ module Esper.MsgView {
     </button>
     <div class="esper-title">Linked Events (<span #count></span>)</div>
     <ul #dropdown class="esper-dropdown esper-add-dropdown">
-      <li #newEvent class="esper-ev-dropdown-item disabled">Create new linked event</li>
-      <li #existingEvent class="esper-ev-dropdown-item">Link to existing event</li>
+      <li #newEvent
+          class="esper-ev-dropdown-item disabled">
+        Create new linked event
+      </li>
+      <li #existingEvent class="esper-ev-dropdown-item">
+        Link to existing event
+      </li>
     </ul>
   </div>
   <div #noEvents class="esper-ev">
@@ -388,7 +406,7 @@ module Esper.MsgView {
       setupSearch(linkedEvents.events, team.teamid, _view);
 
       search.attr("style", "display: block");
-      searchModal.dialog({ 
+      searchModal.dialog({
         modal: true,
         dialogClass: "no-close"
         });
@@ -399,7 +417,11 @@ module Esper.MsgView {
       done.click(closeModal);
       modalBackground.click(closeModal);
       searchTitle.text("Link to existing event");
-      searchbox.attr("style", "background: url(" + Init.esperRootUrl + "img/search.png) no-repeat scroll 16px 16px");
+      var searchBgUrl = Init.esperRootUrl + "img/search.png";
+      searchbox.attr(
+        "style",
+        "background: url(" + searchBgUrl + ") no-repeat scroll 16px 16px"
+      );
       clear.attr("src", Init.esperRootUrl + "img/clear.png");
 
       modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
@@ -409,7 +431,7 @@ module Esper.MsgView {
       search.attr("style", "display:none");
       searchModal.dialog("close");
     }
-    
+
     sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
 
     rootElement.append(view);
