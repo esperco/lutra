@@ -3,11 +3,16 @@ default: pp
 
 SOURCES = \
   Conf \
+  List \
   Util \
   XDate \
   Log \
   EsperStorage \
-  EsperMessage
+  EsperMessage \
+  Login \
+  JsonHttp \
+  ApiT \
+  Api
 
 # Paths to .ts source files
 TS_SRC = \

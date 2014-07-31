@@ -28,7 +28,8 @@ prod-build:
 build:
 	$(MAKE) -C common
 	$(MAKE) -C content-script build
-	$(MAKE) -C injected-script build
+	$(MAKE) -C gmail-is build
+	$(MAKE) -C gcal-is build
 	$(MAKE) -C css
 
 # Fetch libraries
@@ -40,5 +41,6 @@ clean:
 	rm -rf pub *~ */*~
 	$(MAKE) -C common clean
 	$(MAKE) -C content-script clean
-	$(MAKE) -C injected-script clean
+	$(MAKE) -C gmail-is clean
+	$(MAKE) -C gcal-is clean
 	$(MAKE) -C css clean

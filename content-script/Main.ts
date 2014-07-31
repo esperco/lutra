@@ -6,10 +6,11 @@
 */
 
 module Main {
-  function injectScript() {
+  function injectScript(scriptName) {
+    Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/injected-script.css");
-    var scriptUrl = chrome.extension.getURL("js/injected-script.js");
+    var scriptUrl = chrome.extension.getURL("js/" + scriptName);
     var docHead = $("head");
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
@@ -23,8 +24,17 @@ module Main {
   export function init() : void {
     Log.tag = "Esper [CS]";
     Log.d("Initializing content script");
-    if ((/^https:\/\/mail.google.com\//).test(document.URL))
-      injectScript();
+
+    if ((/^https:\/\/mail\.google\.com\//)
+        .test(document.URL))
+
+      injectScript("gmail-is.js");
+
+    else if ((/^https:\/\/www\.google\.com\/calendar\//)
+             .test(document.URL))
+
+      injectScript("gcal-is.js");
+
     Auth.init();
   }
 }
