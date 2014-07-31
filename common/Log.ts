@@ -1,4 +1,4 @@
-module Log {
+module Esper.Log {
   /*
     Change this tag to distinguish between different scripts
     logging to the same console.

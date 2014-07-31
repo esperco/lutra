@@ -4,7 +4,7 @@
   as required by gmail.js.
 */
 
-module Main {
+module Esper.Main {
   export function init() : void {
     Log.tag = "Esper [IS]";
     Log.d("Initializing injected script");
@@ -13,4 +13,4 @@ module Main {
 }
 
 /* Called once per page */
-Main.init();
+Esper.Main.init();

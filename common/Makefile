@@ -2,6 +2,7 @@
 default: pp
 
 SOURCES = \
+  Esper \
   Conf \
   List \
   Util \

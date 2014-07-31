@@ -1,4 +1,4 @@
-module JsonHttp {
+module Esper.JsonHttp {
   function setHttpHeaders(path) {
     return function(jqXHR) {
       if (Login.credentials !== undefined) {

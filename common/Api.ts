@@ -1,4 +1,4 @@
-module Api {
+module Esper.Api {
 
   /* Esper login and password management */
 

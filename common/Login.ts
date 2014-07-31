@@ -1,4 +1,4 @@
-module Login {
+module Esper.Login {
   /* Cached UID and API secret and user ID.
      They should be used as long as the API doesn't reject it. */
   export var credentials : EsperStorage.Credentials;

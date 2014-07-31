@@ -1,7 +1,7 @@
 /*
   Google Calendar event view
 */
-module CalEventView {
+module Esper.CalEventView {
   var currentEventId : CalEvent.FullEventId;
 
   function checkForNewEventId(callback: (x: CalEvent.FullEventId) => void) {

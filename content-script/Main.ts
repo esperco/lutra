@@ -5,7 +5,7 @@
     https://developer.chrome.com/extensions/content_scripts
 */
 
-module Main {
+module Esper.Main {
   function injectScript(scriptName) {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
@@ -40,4 +40,4 @@ module Main {
 }
 
 /* Called once per page */
-Main.init();
+Esper.Main.init();

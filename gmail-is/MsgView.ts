@@ -1,7 +1,7 @@
 /*
   Gmail thread view
 */
-module MsgView {
+module Esper.MsgView {
   var currentThreadId : string;
 
   function dismissDropdowns() {

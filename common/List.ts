@@ -2,7 +2,7 @@
   List operations, similar to those used in OCaml, on Javascript arrays.
 */
 
-module List {
+module Esper.List {
 
   /* copy */
   export function copy(a) { return a.slice(0); };

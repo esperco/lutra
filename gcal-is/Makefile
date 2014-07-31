@@ -18,9 +18,10 @@ JS_LIBS = \
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
-  jquery.d \
-  chrome.d \
-  cryptojs.d
+  jquery/jquery.d \
+  jqueryui/jqueryui.d \
+  chrome/chrome.d \
+  cryptojs/cryptojs.d
 
 # Our own JavaScript code required in edge cases
 APP_JS =
@@ -31,6 +32,7 @@ APP_DEFS =
 # Preprocessed TypeScript code coming from another directory,
 # path to file without .ts suffix
 SHARED_SOURCES = \
+  ../common/ts/Esper \
   ../common/ts/Conf \
   ../common/ts/List \
   ../common/ts/Util \
