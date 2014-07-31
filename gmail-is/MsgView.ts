@@ -41,8 +41,8 @@ module MsgView {
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor().attr("class", "esper-sidebar");
-    var root = $("<div id='esper'/>");
+    var anchor = findAnchor();
+    var root = $("<div id='esper' class='esper-sidebar'/>");
     anchor.prepend(root);
     return root;
   }
