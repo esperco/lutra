@@ -5,19 +5,14 @@ module MsgView {
   var currentThreadId : string;
 
   function dismissDropdowns() {
-    if ($(".esper-add-btn").hasClass("open")) {
+    if ($(".esper-add-btn").hasClass("open"))
       $(".no-events-arrow").toggle();
-    }
-    $(".esper-dropdown").each(function() {
-      if ($(this).css("display") === "block")
-        $(this).attr("style", "display: none");
-    })
+    $(".esper-dropdown").attr("style", "display: none");
     $(".esper-dropdown-btn").removeClass("open");
   }
 
   $(document).on('click', function(e) {
     var $target = $(e.target);
-
     if (!$target.hasClass("esper-dropdown-btn") &&
         !$target.parent().hasClass("esper-dropdown-btn")) {
         dismissDropdowns();
@@ -84,12 +79,13 @@ module MsgView {
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
-      dismissDropdowns();
-      dropdown.toggle();
-      if (cog.hasClass("open"))
-        cog.removeClass("open");
-      else
+      if (cog.hasClass("open")) {
+        dismissDropdowns();
+      } else {
+        dismissDropdowns();
+        dropdown.toggle();
         cog.addClass("open");
+      }
     })
 
     unlinkEvent.click(function() {
@@ -349,13 +345,14 @@ module MsgView {
 '''
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
     add.click(function() {
-      dismissDropdowns();
-      arrow.toggle();
-      dropdown.toggle();
-      if (add.hasClass("open"))
-        add.removeClass("open");
-      else
+      if (add.hasClass("open")) {
+        dismissDropdowns();
+      } else {
+        dismissDropdowns();
+        arrow.toggle();
+        dropdown.toggle();
         add.addClass("open");
+      }
     })
 
     var assisting = team.team_name;
