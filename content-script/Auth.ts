@@ -1,4 +1,4 @@
-module Auth {
+module Esper.Auth {
   /*
     The user's API secret is stored using chrome.storage.sync.
 

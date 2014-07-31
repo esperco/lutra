@@ -1,4 +1,4 @@
-module Init {
+module Esper.Init {
   export var esperRootUrl : string;
     /* URL prefix to access files provided by the extension.
        Sample usage:

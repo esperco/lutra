@@ -1,7 +1,7 @@
 /*
   Synchronized storage used by Esper, controlled by the content script.
 */
-module EsperStorage {
+module Esper.EsperStorage {
   /*
     This is the minimum we need to make API calls as a logged-in Esper user.
     Other account information (profile, teams) can be retrieved using these.

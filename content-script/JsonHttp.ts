@@ -1,4 +1,4 @@
-module JsonHttp {
+module Esper.JsonHttp {
   function jsonHttp(method, path, body) {
 
     function logError(xhr, textStatus, err) {

@@ -1,4 +1,4 @@
-module Util {
+module Esper.Util {
   function unsafePreparePrintable(x : any, parents, maxDepth: number) {
     if (parents.length >= maxDepth)
       return "[MAX DEPTH]";

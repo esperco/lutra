@@ -36,6 +36,7 @@ APP_DEFS = \
 # Preprocessed TypeScript code coming from another directory,
 # path to file without .ts suffix
 SHARED_SOURCES = \
+  ../common/ts/Esper \
   ../common/ts/Conf \
   ../common/ts/List \
   ../common/ts/Util \

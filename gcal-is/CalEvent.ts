@@ -1,4 +1,4 @@
-module CalEvent {
+module Esper.CalEvent {
   export interface FullEventId {
     calendarId: string;
     eventId: string;
