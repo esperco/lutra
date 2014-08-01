@@ -1,0 +1,23 @@
+function esperSaveGlobals(names) {
+  var state = {};
+  for (var k in names) {
+    var name = names[k];
+    var v = window[name];
+    if (v !== undefined)
+      state[name] = v;
+  }
+
+  function restoreGlobals() {
+    for (var name in state) {
+      window[name] = state[name];
+    }
+  }
+  return restoreGlobals;
+}
+
+/*
+  Save global variables that are about to be overridden by the Esper extension.
+*/
+var esperRestoreGlobals = esperSaveGlobals([
+  "$", "jQuery", "CryptoJS", "Esper"
+]);

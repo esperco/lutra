@@ -91,7 +91,10 @@ ts/%.ts: %.ts
 js/gmail-is.js: $(ALL_TS)
 	@mkdir -p js
 	tsc --out js/gmail-is-ts.js $(ALL_TS)
-	cat $(EXTRA_JS) js/gmail-is-ts.js > $@
+	cat ../common/SaveGlobals.js \
+            $(EXTRA_JS) \
+            js/gmail-is-ts.js \
+            ../common/RestoreGlobals.js > $@
 
 install:
 	mkdir -p ../pub/js
