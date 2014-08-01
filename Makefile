@@ -1,4 +1,4 @@
-.PHONY: default setup dev prod dev-build prod-build install zip clean
+.PHONY: default setup dev prod dev-build prod-build install zip dropbox clean
 default: dev
 
 dev:
@@ -15,7 +15,17 @@ install:
 	./install prod 2>&1 | tee -a install.log
 
 zip:
-	zip -r pub pub
+	rm -rf esper esper.zip
+	cp -a pub esper
+	zip -r esper esper
+
+# Make a production build and put it into our Dropbox folder
+dropbox:
+	$(MAKE) clean
+	$(MAKE) prod
+	$(MAKE) zip
+	mkdir -p ~/Dropbox/Esper/software/chrome
+	cp -a esper esper.zip ~/Dropbox/Esper/software/chrome
 
 dev-build:
 	$(MAKE) -C common dev-conf
