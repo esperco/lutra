@@ -14,11 +14,18 @@ mkdir -p "$ROOT"/ts
 
 # Install a source Javascript file, minify it and install the minified version
 # as well.
+# The 'cat' argument must be a program that reads the input js from stdin
+# and writes the js output on stdout. This gives a chance to perform
+# some wrapping (e.g. jquery-freeze).
 install_js() {
     name="$1"
     src="$2"
+    cat="$3"
+    if [ -z "$cat" ]; then
+        cat=cat
+    fi
     echo "Installing $name"
-    cp "$src" "$ROOT"/js/"$name".js
+    "$cat" < "$src" > "$ROOT"/js/"$name".js
 }
 
 install_ts() {
@@ -68,13 +75,13 @@ install_js sha1 sha1.js
 install_js jquery jquery-2.1.0.js
 # full jQuery UI
 unzip -o jquery-ui-1.11.0.custom.zip
-install_js jqueryui jquery-ui-1.11.0.custom/jquery-ui.js
+install_js jqueryui jquery-ui-1.11.0.custom/jquery-ui.js "$ROOT"/jquery-freeze
 
 # Bootstrap
 rm -rf bootstrap dist
 unzip bootstrap-3.0.2-dist.zip
 mv dist bootstrap
-install_js bootstrap bootstrap/js/bootstrap.js
+install_js bootstrap bootstrap/js/bootstrap.js "$ROOT"/jquery-freeze
 
 # jsTimezoneDetect (jstz)
 install_js jstz jstz-2013-04-01-f9e3e30e.js

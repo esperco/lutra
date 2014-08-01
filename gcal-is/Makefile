@@ -88,7 +88,10 @@ ts/%.ts: %.ts
 js/gcal-is.js: $(ALL_TS)
 	@mkdir -p js
 	tsc --out js/gcal-is-ts.js $(ALL_TS)
-	cat $(EXTRA_JS) js/gcal-is-ts.js > $@
+	cat ../common/SaveGlobals.js \
+            $(EXTRA_JS) \
+            js/gcal-is-ts.js \
+            ../common/RestoreGlobals.js > $@
 
 install:
 	mkdir -p ../pub/js
