@@ -463,7 +463,7 @@ module Esper.MsgView {
   }
 
   function listen() {
-    gmail.on.open_email(function(id, url, body) {
+    gmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
       maybeUpdateView(10);
     });

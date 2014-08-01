@@ -59,19 +59,22 @@ declare module gmail.on {
   export function open_email(
     callback: (id: string,
                url: string,
-               body: string) => void
+               body: string,
+               xhr: XMLHttpRequest) => void
   ): void;
 
   export function star(
     callback: (id: string,
                url: string,
-               body: string) => void
+               body: string,
+               xhr: XMLHttpRequest) => void
   ): void;
 
   export function unstar(
     callback: (id: string,
                url: string,
-               body: string) => void
+               body: string,
+               xhr: XMLHttpRequest) => void
   ): void;
 
   /* complete as needed */
