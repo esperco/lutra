@@ -27,14 +27,6 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function putLinkedEvents(teamid, threadId, calEvents) {
-    var url =
-      Conf.Api.url + "/api/thread/events/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId;
-    return JsonHttp.put(url, JSON.stringify(calEvents));
-  }
-
   export function linkEvent(teamid, threadId, calEvent) {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
