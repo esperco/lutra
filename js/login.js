@@ -24,11 +24,14 @@ var login = (function() {
         && util.isDefined(x.uid)) {
       var esperMessage = {
         sender: "Esper",
-        type: "Credentials",
+        type: "Account",
         value: {
-          apiSecret: x.api_secret,
-          uid: x.uid,
-          googleAccountId: x.email
+          googleAccountId: x.email,
+          credentials: {
+            apiSecret: x.api_secret,
+            uid: x.uid
+          },
+          declined: false
         }
       };
       log("esperMessage:", esperMessage);
