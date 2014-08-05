@@ -64,7 +64,7 @@ module Esper.Util {
     return y;
   }
 
-  export function toString(x, maxDepth: number = 4) {
+  export function toString(x, maxDepth: number = 10) {
     if (x === undefined)
       return "undefined";
     else if (typeof x === "string")

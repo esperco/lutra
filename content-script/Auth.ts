@@ -7,7 +7,7 @@ module Esper.Auth {
     as a Google Chrome user.
   */
 
-  function sendCredentialsResponse(x: EsperStorage.Credentials) {
+  function sendCredentialsResponse(x: EsperStorage.Account) {
     if (/^https:\/\/mail.google.com\//.test(document.URL)) {
       Log.d("Sending message from content script to gmail page", x);
       var esperMessage : EsperMessage.EsperMessage = {
@@ -27,7 +27,7 @@ module Esper.Auth {
     if (x !== undefined && x.accounts !== undefined) {
       var accounts = x.accounts;
       for (var k in accounts) {
-        sendCredentialsResponse(accounts[k].credentials);
+        sendCredentialsResponse(accounts[k]);
       }
     }
   }
@@ -39,13 +39,41 @@ module Esper.Auth {
     win.focus();
   }
 
-  function obtainCredentials(googleAccountId) {
-    EsperStorage.loadCredentials(googleAccountId,
-                                 function(x: EsperStorage.Credentials) {
-      if (x !== undefined)
-        sendCredentialsResponse(x);
-      else
+  function openWelcomePopup(googleAccountId) {
+'''
+<div #view
+  class="esper-welcome-popup">
+  <button #signInButton>
+    Sign in
+  </button>
+  <button #noThanksButton>
+    No, thanks
+  </button>
+</div>
+'''
+    signInButton
+      .click(function() {
+        view.remove();
         openLoginTab(googleAccountId);
+      });
+
+    noThanksButton
+      .click(function() {
+        view.remove();
+        /* TODO remember this choice */
+      });
+
+    view.append("body");
+  }
+
+  function obtainCredentials(googleAccountId) {
+    EsperStorage.loadCredentials(
+      googleAccountId,
+      function(x: EsperStorage.Account) {
+        if (x.credentials !== undefined || x.declined === true)
+          sendCredentialsResponse(x);
+        else
+          openWelcomePopup(googleAccountId);
     });
   }
 
@@ -59,7 +87,7 @@ module Esper.Auth {
         switch (request.type) {
 
         /* Listen for Esper credentials posted by an app.esper.com page. */
-        case "Credentials":
+        case "Account":
           EsperStorage.saveCredentials(
             request.value,
             function() { Log.d("Received and stored credentials"); }

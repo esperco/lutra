@@ -8,13 +8,6 @@ module Esper.Init {
   export var loginInfo : ApiT.LoginResponse;
     /* List of teams, etc; refreshed when credentials change */
 
-  function printCredentialsStatus() {
-    if (Login.credentials !== undefined)
-      Log.d("We are logged in as " + Login.myGoogleAccountId() + ".");
-    else
-      Log.d("We are not logged in.");
-  }
-
   /*
     Retrieve UID and API secret from the content script,
     if they're available. The content script first checks if they are available
@@ -46,8 +39,8 @@ module Esper.Init {
   }
 
   function injectEsperControls() {
-    printCredentialsStatus();
-    if (Login.credentials === undefined)
+    Login.printStatus();
+    if (! Login.loggedIn())
       injectLoginControls();
     else
       MsgView.init();
@@ -57,15 +50,17 @@ module Esper.Init {
     Check if the credentials we received from the content script
     match the current gmail user.
   */
-  function filterCredentials(cred: EsperStorage.Credentials) {
+  function filterCredentials(account: EsperStorage.Account) {
     var googleAccountId = gmail.get.user_email();
-    if (cred !== undefined && cred.googleAccountId === googleAccountId) {
-      Login.credentials = cred;
-      Api.getLoginInfo()
-        .done(function(loginInfo) {
-          Login.info = loginInfo;
-          injectEsperControls();
-        });
+    if (account !== undefined && account.googleAccountId === googleAccountId) {
+      Login.account = account;
+      if (Login.loggedIn()) {
+        Api.getLoginInfo()
+          .done(function(loginInfo) {
+            Login.info = loginInfo;
+            injectEsperControls();
+          });
+      }
     }
   }
 
