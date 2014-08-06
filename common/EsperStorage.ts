@@ -76,14 +76,18 @@ module Esper.EsperStorage {
     return account;
   }
 
-  export function saveCredentials(x: Account,
-                                  whenDone: () => void) {
+  export function saveAccount(x: Account,
+                              whenDone: () => void) {
     update(function(esper) {
       var k = x.googleAccountId;
       var account = getAccount(esper, k);
       account.googleAccountId = k;
-      account.credentials = x.credentials;
-      account.declined = false;
+      if (x.credentials !== undefined)
+        account.credentials = x.credentials;
+      if (x.declined === true)
+        account.declined = true;
+      else
+        account.declined = false;
       return esper;
     }, whenDone);
   }

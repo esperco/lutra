@@ -39,7 +39,7 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomePopup(googleAccountId) {
+  function openWelcomePopup(account: EsperStorage.Account) {
 '''
 <div #view>
   <div class="esper-welcome-bg"/>
@@ -69,13 +69,13 @@ module Esper.Auth {
     signInButton
       .click(function() {
         closeModal();
-        openLoginTab(googleAccountId);
+        openLoginTab(account.googleAccountId);
       });
 
     noThanksButton
       .click(function() {
-        closeModal();
-        /* TODO remember this choice */
+        account.declined = true;
+        EsperStorage.saveAccount(account, closeModal);
       });
 
     close.attr("src", chrome.extension.getURL("img/close.png"));
@@ -93,7 +93,7 @@ module Esper.Auth {
           sendCredentialsResponse(x);
         }
         else {
-          openWelcomePopup(googleAccountId);
+          openWelcomePopup(x);
         }
     });
   }
@@ -109,7 +109,7 @@ module Esper.Auth {
 
         /* Listen for Esper credentials posted by an app.esper.com page. */
         case "Account":
-          EsperStorage.saveCredentials(
+          EsperStorage.saveAccount(
             request.value,
             function() { Log.d("Received and stored credentials"); }
           );
