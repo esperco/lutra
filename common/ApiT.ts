@@ -91,7 +91,21 @@ module Esper.ApiT {
     esper_tid: string;
   }
 
-  export interface ShowCalendarEvents {
+  export interface SyncedThread {
+    esper_uid: string;
+    gmail_thrid: string;
+  }
+
+  export interface EventWithSyncInfo {
+    event: CalendarEvent;
+    synced_threads: SyncedThread[];
+  }
+
+  export interface LinkedCalendarEvents {
+    linked_events: EventWithSyncInfo[];
+  }
+
+  export interface CalendarEventList {
     events: CalendarEvent[];
   }
 
