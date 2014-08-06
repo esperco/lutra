@@ -45,6 +45,24 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
+  export function syncEvent(teamid, threadId, eventId) {
+    var url =
+      Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.put(url, "");
+  }
+
+  export function unsyncEvent(teamid, threadId, eventId) {
+    var url =
+      Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.delete_(url);
+  }
+
   export function deleteLinkedEvent(teamid, threadId, eventId) {
     var url =
       Conf.Api.url + "/api/thread/event/" + Login.myUid()

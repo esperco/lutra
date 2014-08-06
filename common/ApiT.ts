@@ -111,7 +111,6 @@ module Esper.ApiT {
 
   export interface googleEvent {
     google_event_id: string;
-    sync_description: boolean;
   }
 
   export interface LinkCalendarEvents {

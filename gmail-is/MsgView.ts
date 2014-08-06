@@ -115,13 +115,9 @@ module Esper.MsgView {
     })
 
     syncDescription.click(function () {
-      Api.linkEvent(teamid, threadId, {
-        google_event_id: e.google_event_id,
-        sync_description: true
-      })
-        .done(function() {
-          refreshEventList(teamid, threadId, sidebar);
-        });
+      Api.syncEvent(teamid, threadId, e.google_event_id).done(function() {
+        refreshEventList(teamid, threadId, sidebar);
+      });
     });
 
     unlinkEvent.click(function() {
@@ -174,13 +170,15 @@ module Esper.MsgView {
 
   function linkEvent(e, teamid, threadId, sidebar, view) {
     Api.linkEvent(teamid, threadId, {
-      google_event_id: e.google_event_id,
-      sync_description: true
+      google_event_id: e.google_event_id
     })
       .done(function() {
         view.spinner.attr("style", "display: none");
         view.linked.attr("style", "display: block");
         refreshEventList(teamid, threadId, sidebar);
+
+        Api.syncEvent(teamid, threadId, e.google_event_id);
+        // TODO Report something, handle failure, etc.
       });
   }
 
