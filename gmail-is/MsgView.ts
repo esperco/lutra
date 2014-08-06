@@ -82,7 +82,6 @@ module Esper.MsgView {
   </div>
 </div>
 '''
-    Log.d(ev);
     function isMyThread(x) {
       return x.esper_uid === Login.myUid() && x.gmail_thrid === threadId;
     }
