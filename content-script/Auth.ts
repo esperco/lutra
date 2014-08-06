@@ -41,39 +41,60 @@ module Esper.Auth {
 
   function openWelcomePopup(googleAccountId) {
 '''
-<div #view
-  class="esper-welcome-popup">
-  <button #signInButton>
-    Sign in
-  </button>
-  <button #noThanksButton>
-    No, thanks
-  </button>
+<div #view>
+  <div class="esper-welcome-bg"/>
+  <div #modal class="esper-welcome-modal">
+    <div class="esper-welcome-header">
+      <img #close class="esper-welcome-close-icon"/>
+      <div #title class="esper-welcome-title"/>
+    </div>
+    <div>
+      <button #signInButton>
+        Sign in
+      </button>
+      <button #noThanksButton>
+        No, thanks
+      </button>
+    </div>
+  </div>
 </div>
 '''
+
+    function closeModal() {
+      view.remove();
+    }
+
+    title.text("Welcome to Esper!");
+
     signInButton
       .click(function() {
-        view.remove();
+        closeModal();
         openLoginTab(googleAccountId);
       });
 
     noThanksButton
       .click(function() {
-        view.remove();
+        closeModal();
         /* TODO remember this choice */
       });
 
-    view.append("body");
+    close.attr("src", chrome.extension.getURL("img/close.png"));
+    close.click(closeModal);
+    view.click(closeModal);
+
+    $("body").append(view);
   }
 
   function obtainCredentials(googleAccountId) {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: EsperStorage.Account) {
-        if (x.credentials !== undefined || x.declined === true)
+        if (x.credentials !== undefined || x.declined === true) {
           sendCredentialsResponse(x);
-        else
+        }
+        else {
           openWelcomePopup(googleAccountId);
+        }
     });
   }
 

@@ -409,7 +409,7 @@ module Esper.MsgView {
       searchModal.dialog({
         modal: true,
         dialogClass: "no-close"
-        });
+      });
       searchModal.dialog("option","modal",true);
 
       close.attr("src", Init.esperRootUrl + "img/close.png");

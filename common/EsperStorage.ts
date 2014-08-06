@@ -32,7 +32,7 @@ module Esper.EsperStorage {
 
   function save(x: EsperStorage, callback: () => void) {
     chrome.storage.sync.set({esper: x}, function() {
-      Log.d("saved esper storage", x);
+      Log.d("Saved esper storage", x);
       callback();
     });
   }
@@ -67,7 +67,6 @@ module Esper.EsperStorage {
   function getAccount(esper: EsperStorage, googleAccountId: string) {
     console.assert(esper.accounts !== undefined);
     var account = esper.accounts[googleAccountId];
-    Log.d("getAccount:", esper, googleAccountId, account);
     if (account === undefined) {
       account = newAccount(googleAccountId);
       esper.accounts[googleAccountId] = account;

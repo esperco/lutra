@@ -9,7 +9,7 @@ module Esper.Main {
   function injectScript(scriptName) {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
-    var cssUrl = chrome.extension.getURL("css/injected-script.css");
+    var cssUrl = chrome.extension.getURL("css/esper.css");
     var scriptUrl = chrome.extension.getURL("js/" + scriptName);
     var docHead = $("head");
     $("<link rel='stylesheet' type='text/css'/>")
