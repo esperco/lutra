@@ -82,10 +82,13 @@ module Esper.MsgView {
   </div>
 </div>
 '''
-    function isMyThread(x) {
-      return x.esper_uid === Login.myUid() && x.gmail_thrid === threadId;
+    function isThreadOf(uid) {
+      return function(x) {
+        return x.esper_uid === uid && x.gmail_thrid === threadId;
+      }
     }
-    if (List.exists(ev.synced_threads, isMyThread)) {
+
+    if (List.exists(ev.synced_threads, isThreadOf(Login.myUid()))) {
       syncDescription.addClass("disabled");
     } else {
       syncDescription.removeClass("disabled");
@@ -102,6 +105,25 @@ module Esper.MsgView {
 
     if (e.title !== undefined)
       title.text(e.title);
+
+    var profiles = sidebar["profiles"];
+    List.iter(profiles, function(prof) {
+      var syncInfo = $("<li class='esper-ev-dropdown-item esper-sync-info'>")
+        .text(prof[1].display_name);
+      if (prof[0] !== Login.myUid()) syncInfo.addClass("disabled");
+      var synced = List.exists(ev.synced_threads, isThreadOf(prof[0]));
+      if (synced) syncInfo.append(" - Synced");
+      else syncInfo.append(" - Not Synced");
+      syncInfo.click(function() {
+        var apiCall;
+        if (synced) apiCall = Api.unsyncEvent;
+        else apiCall = Api.syncEvent;
+        apiCall(teamid, threadId, e.google_event_id).done(function() {
+          refreshEventList(teamid, threadId, sidebar);
+        });
+      });
+      syncInfo.appendTo(dropdown);
+    });
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
@@ -136,6 +158,16 @@ module Esper.MsgView {
           view.slideUp();
           refreshEventList(teamid, threadId, sidebar);
         });
+    });
+
+    $(".esper-sync-info").click(function(syncInfo) {
+      Log.d("clicked");
+      var apiCall;
+      if (syncInfo.data("synced") === true) apiCall = Api.syncEvent;
+      else apiCall = Api.unsyncEvent;
+      apiCall(teamid, threadId, e.google_event_id).done(function() {
+        refreshEventList(teamid, threadId, sidebar);
+      });
     });
 
     return view;
@@ -314,6 +346,7 @@ module Esper.MsgView {
 
   function displayLinkedEvents(rootElement,
                                team: ApiT.Team,
+                               profiles : any[],
                                linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
@@ -397,10 +430,10 @@ module Esper.MsgView {
 
     var assisting = team.team_name;
     if (assisting === null || assisting === undefined || assisting === "") {
-      Api.getGoogleProfile(team.team_executive, team.teamid)
-        .done(function(exec) {
-          assisting = exec.display_name;
-        });
+      var exec = List.find(profiles, function(prof) {
+        return prof[0] === team.team_executive;
+      });
+      assisting = exec[1].display_name;
     }
     var possessive = (assisting.slice(-1) === "s")
         ? (assisting + "'")
@@ -413,6 +446,8 @@ module Esper.MsgView {
       noEvents.attr("style", "display: block");
     else
       noEvents.attr("style", "display: none");
+
+    _view["profiles"] = profiles;
 
     displayEventList(
       linkedEvents.linked_events,
@@ -475,10 +510,18 @@ module Esper.MsgView {
         Log.d("Using new thread ID " + currentThreadId);
         var rootElement = insertEsperRoot();
         Login.myTeams().forEach(function(team) {
-          Api.getLinkedEvents(team.teamid, currentThreadId)
-            .done(function(linkedEvents) {
-              displayLinkedEvents(rootElement, team, linkedEvents);
-            });
+          var teamMembers = team.team_assistants;
+          teamMembers.push(team.team_executive);
+          var profileApiCalls = List.map(teamMembers, function(uid) {
+            var apiCall = Api.getGoogleProfile(uid, team.teamid);
+            return Deferred.join([Deferred.defer(uid), apiCall]);
+          });
+          Deferred.join(profileApiCalls).done(function(profiles) {
+            Api.getLinkedEvents(team.teamid, currentThreadId)
+              .done(function(linkedEvents) {
+                displayLinkedEvents(rootElement, team, profiles, linkedEvents);
+              });
+          });
         });
       }
     }
