@@ -42,7 +42,7 @@ module Esper.MsgView {
     return root;
   }
 
-  function renderEvent(e: ApiT.CalendarEvent, teamid, threadId, sidebar) {
+  function renderEvent(ev: ApiT.EventWithSyncInfo, teamid, threadId, sidebar) {
 '''
 <div #view class="esper-ev">
   <div class="esper-ev-date">
@@ -62,6 +62,10 @@ module Esper.MsgView {
             class="esper-ev-dropdown-item disabled">
           Duplicate
         </li>
+        <li #syncDescription
+            class="esper-ev-dropdown-item">
+          Sync thread to description
+        </li>
         <li #unlinkEvent
             class="esper-ev-dropdown-item">
           Unlink
@@ -78,6 +82,16 @@ module Esper.MsgView {
   </div>
 </div>
 '''
+    function isMyThread(x) {
+      return x.esper_uid === Login.myUid() && x.gmail_thrid === threadId;
+    }
+    if (List.exists(ev.synced_threads, isMyThread)) {
+      syncDescription.addClass("disabled");
+    } else {
+      syncDescription.removeClass("disabled");
+    }
+
+    var e = ev.event;
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
@@ -99,6 +113,12 @@ module Esper.MsgView {
         cog.addClass("open");
       }
     })
+
+    syncDescription.click(function () {
+      Api.syncEvent(teamid, threadId, e.google_event_id).done(function() {
+        refreshEventList(teamid, threadId, sidebar);
+      });
+    });
 
     unlinkEvent.click(function() {
       view.attr("style", "opacity: 0.3");
@@ -150,13 +170,15 @@ module Esper.MsgView {
 
   function linkEvent(e, teamid, threadId, sidebar, view) {
     Api.linkEvent(teamid, threadId, {
-      google_event_id: e.google_event_id,
-      sync_description: true
+      google_event_id: e.google_event_id
     })
       .done(function() {
         view.spinner.attr("style", "display: none");
         view.linked.attr("style", "display: block");
         refreshEventList(teamid, threadId, sidebar);
+
+        Api.syncEvent(teamid, threadId, e.google_event_id);
+        // TODO Report something, handle failure, etc.
       });
   }
 
@@ -281,9 +303,9 @@ module Esper.MsgView {
   function refreshEventList(teamid, threadId, view) {
     Api.getLinkedEvents(teamid, threadId)
       .done(function(linkedEvents) {
-        displayEventList(linkedEvents.events, teamid, threadId, view);
-        view.count.text(linkedEvents.events.length.toString());
-        if (linkedEvents.events.length === 0)
+        displayEventList(linkedEvents.linked_events, teamid, threadId, view);
+        view.count.text(linkedEvents.linked_events.length.toString());
+        if (linkedEvents.linked_events.length === 0)
           view.noEvents.attr("style", "display: block");
         else
           view.noEvents.attr("style", "display: none");
@@ -292,7 +314,7 @@ module Esper.MsgView {
 
   function displayLinkedEvents(rootElement,
                                team: ApiT.Team,
-                               linkedEvents: ApiT.ShowCalendarEvents) {
+                               linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
   <div class="esper-header">
@@ -387,12 +409,17 @@ module Esper.MsgView {
     arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
     noEventsText.text("Click here to link this email conversation " +
       "to events on " + possessive + " calendar.");
-    if (linkedEvents.events.length === 0)
+    if (linkedEvents.linked_events.length === 0)
       noEvents.attr("style", "display: block");
     else
       noEvents.attr("style", "display: none");
 
-    displayEventList(linkedEvents.events, team.teamid, currentThreadId, _view);
+    displayEventList(
+      linkedEvents.linked_events,
+      team.teamid,
+      currentThreadId,
+      _view
+    );
 
     clear.click(function() { resetSearch(_view) });
     searchInstructions.text("Start typing above to find events on " +
@@ -403,7 +430,7 @@ module Esper.MsgView {
     /* Search Modal */
     // http://api.jqueryui.com/dialog/#method-close
     existingEvent.click(function() {
-      setupSearch(linkedEvents.events, team.teamid, _view);
+      setupSearch(linkedEvents.linked_events, team.teamid, _view);
 
       search.attr("style", "display: block");
       searchModal.dialog({

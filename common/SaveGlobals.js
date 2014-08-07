@@ -3,8 +3,10 @@ function esperSaveGlobals(names) {
   for (var k in names) {
     var name = names[k];
     var v = window[name];
-    if (v !== undefined)
+    if (v !== undefined) {
       state[name] = v;
+      window[name] = undefined;
+    }
   }
 
   function restoreGlobals() {
