@@ -42,11 +42,13 @@ module Esper.Auth {
   function openWelcomePopup(account: EsperStorage.Account) {
 '''
 <div #view>
-  <div class="esper-welcome-bg"/>
-  <div #modal class="esper-welcome-modal">
-    <div class="esper-welcome-header">
-      <img #close class="esper-welcome-close-icon"/>
-      <div #title class="esper-welcome-title"/>
+  <div #background class="esper-modal-bg"/>
+  <div #modal class="esper-modal esper-welcome-modal">
+    <div class="esper-modal-header">
+      <div #close class="esper-modal-close-container">
+        <img #closeIcon class="esper-modal-close-icon"/>
+      </div>
+      <div #title class="esper-modal-title"/>
     </div>
     <div>
       <button #signInButton>
@@ -78,9 +80,9 @@ module Esper.Auth {
         EsperStorage.saveAccount(account, closeModal);
       });
 
-    close.attr("src", chrome.extension.getURL("img/close.png"));
+    background.click(closeModal);
+    closeIcon.attr("src", chrome.extension.getURL("img/close.png"));
     close.click(closeModal);
-    view.click(closeModal);
 
     $("body").append(view);
   }

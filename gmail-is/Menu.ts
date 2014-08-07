@@ -113,6 +113,7 @@ function popWindow(url, width, height) {
   </div>
 </div>
 '''
+
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
       logo.attr("src", Init.esperRootUrl + "img/menu-logo-white.png")

@@ -33,9 +33,6 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
-/*** Modal ***/
-@modal_width: 480px;
-
 a { text-decoration: none; }
 
 ul.esper-ul, li.esper-li { list-style-type: none; }
@@ -233,40 +230,6 @@ ul.esper-ev-dropdown {
 
 /** Search Modal **/
 
-.esper-modal {
-  display: none;
-  z-index: 6;
-}
-
-.modal-bg {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: black;
-  opacity: 0.5;
-  z-index: 6;
-}
-
-.modal {
-  display: none;
-  position: relative;
-  outline: none;
-  margin-right: auto;
-  z-index: 10;
-  background: #fbfafc;
-  border: 1px solid #d8d8d8;
-  border-radius: 4px;
-  webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.search-modal {
-  margin-left: -92px;
-  width: @modal_width !important;
-}
-
 .ui-dialog {
   display: none;
   outline: none;
@@ -282,14 +245,6 @@ ul.esper-ev-dropdown {
   display: none;
 }
 
-.modal-header {
-  background: @purple_text;
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px;
-  color: white;
-  margin: -1px -1px 0px -1px;
-}
-
 .modal-close-icon {
   float: right;
   margin: 15px;
@@ -298,13 +253,8 @@ ul.esper-ev-dropdown {
   &:hover { opacity: 1.0; }
 }
 
-.search-modal-title {
-  font-size: 18px;
-  padding: 10px 15px;
-}
-
 .esper-searchbox {
-  width: @modal_width - 78px;
+  width: @search_width - 78px;
   background-color: white !important;
   border: none;
   border-top: 1px solid #d8d8d8;
@@ -463,11 +413,12 @@ ul.esper-ev-dropdown {
 }
 
 
-/** Welcome modal (doesn't use jQueryUI) **/
+/** Modals **/
 
 @welcome_width: 480px;
+@search_width: 480px;
 
-.esper-welcome-bg {
+.esper-modal-bg {
   z-index: 6;
   position: fixed;
   width: 100%;
@@ -479,43 +430,57 @@ ul.esper-ev-dropdown {
 }
 
 .esper-welcome-modal {
+  margin-left: -@welcome_width/2;
+  width: @welcome_width;
+}
+
+.esper-search-modal {
+  margin-left: -@search_width/2;
+  width: @search_width;
+}
+
+.esper-modal {
   /* geometry */
   z-index: 10;
   position: fixed;
   top: 20%;
   left: 50%;
-  margin-left: -@welcome_width/2;
-  width: @welcome_width;
 
   /* appearance */
   outline: none;
   background: #fbfafc;
   opacity: 1;
   border: 1px solid #d8d8d8;
-  border-radius: 4px;
-  webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.esper-welcome-header {
-  background: @purple_text;
-  border-top-right-radius: 4px;
-  border-top-left-radius: 4px;
+.esper-modal-header {
+  background: @gray_90;
   color: white;
   margin: -1px -1px 0px -1px;
 }
 
-.esper-welcome-close-icon {
+.esper-modal-close-container {
   float: right;
-  margin: 15px;
-  opacity: 0.7;
+  height: 10px;
+  width: 10px;
+  margin: 6px 5px;
+  padding: 7px;
   cursor: pointer;
-  &:hover { opacity: 1.0; }
+  .esper-modal-close-icon {
+    float: left;
+    opacity: 0.6;
+  }
+  &:hover {
+    background: #737373;
+    .esper-modal-close-icon { opacity: 1.0; }
+  }
 }
 
-.esper-welcome-title {
-  font-size: 18px;
-  padding: 10px 15px;
+.esper-modal-title {
+  font-size: 14px;
+  padding: 10px 12px;
 }
 
 
