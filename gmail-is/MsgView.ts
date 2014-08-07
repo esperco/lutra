@@ -7,7 +7,7 @@ module Esper.MsgView {
   function dismissDropdowns() {
     if ($(".esper-add-btn").hasClass("open"))
       $(".no-events-arrow").toggle();
-    $(".esper-dropdown").attr("style", "display: none");
+    $(".esper-ul").attr("style", "display: none");
     $(".esper-dropdown-btn").removeClass("open");
   }
 
@@ -53,25 +53,25 @@ module Esper.MsgView {
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
       <img #cog class="esper-dropdown-btn esper-ev-cog"/>
-      <ul #dropdown class="esper-dropdown esper-ev-dropdown">
+      <ul #dropdown class="esper-ul esper-ev-dropdown">
         <li #editEvent
-            class="esper-ev-dropdown-item disabled">
+            class="esper-li disabled">
           Edit
         </li>
         <li #duplicateEvent
-            class="esper-ev-dropdown-item disabled">
+            class="esper-li disabled">
           Duplicate
         </li>
         <li #syncDescription
-            class="esper-ev-dropdown-item">
+            class="esper-li">
           Sync thread to description
         </li>
         <li #unlinkEvent
-            class="esper-ev-dropdown-item">
+            class="esper-li">
           Unlink
         </li>
         <li #deleteEvent
-            class="esper-ev-dropdown-item delete-event">
+            class="esper-li danger">
           Delete from calendar
         </li>
       </ul>
@@ -322,12 +322,12 @@ module Esper.MsgView {
       <img #addIcon class="esper-add-icon"/>
     </button>
     <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #dropdown class="esper-dropdown esper-add-dropdown">
+    <ul #dropdown class="esper-ul esper-add-dropdown">
       <li #newEvent
-          class="esper-ev-dropdown-item disabled">
+          class="esper-li disabled">
         Create new linked event
       </li>
-      <li #existingEvent class="esper-ev-dropdown-item">
+      <li #existingEvent class="esper-li">
         Link to existing event
       </li>
     </ul>
@@ -451,7 +451,7 @@ module Esper.MsgView {
       );
       clear.attr("src", Init.esperRootUrl + "img/clear.png");
 
-      modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+      modalLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
     });
 
     function closeModal() {
@@ -459,7 +459,7 @@ module Esper.MsgView {
       searchModal.dialog("close");
     }
 
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    sidebarLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
     rootElement.append(view);
   }
