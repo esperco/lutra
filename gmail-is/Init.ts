@@ -23,27 +23,32 @@ module Esper.Init {
     but this solution comes with a bunch of assumptions and possible
     complications).
   */
-  function obtainCredentials() {
+  export function obtainCredentials(forceLogin: boolean = false) {
     var googleAccountId = gmail.get.user_email();
     Log.d("Google account ID: " + googleAccountId);
+    var type = forceLogin === true ? "LoginRequest" : "CredentialsRequest";
     var esperMessage : EsperMessage.EsperMessage = {
       sender: "Esper",
-      type: "CredentialsRequest",
+      type: type,
       value: googleAccountId
     };
     window.postMessage(esperMessage, "*");
   }
 
-  function injectLoginControls() {
-    Log.d("injectLoginControls()");
-  }
+  export function login() {
+    obtainCredentials(true);
+  };
 
   function injectEsperControls() {
     Login.printStatus();
-    if (! Login.loggedIn())
-      injectLoginControls();
-    else
-      MsgView.init();
+    Menu.create();
+    if (Login.loggedIn()) {
+      Api.getLoginInfo()
+        .done(function(loginInfo) {
+          Login.info = loginInfo;
+          MsgView.init();
+        });
+    }
   }
 
   /*
@@ -54,13 +59,7 @@ module Esper.Init {
     var googleAccountId = gmail.get.user_email();
     if (account !== undefined && account.googleAccountId === googleAccountId) {
       Login.account = account;
-      if (Login.loggedIn()) {
-        Api.getLoginInfo()
-          .done(function(loginInfo) {
-            Login.info = loginInfo;
-            injectEsperControls();
-          });
-      }
+      injectEsperControls();
     }
   }
 

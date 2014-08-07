@@ -74,4 +74,17 @@ module Esper.Util {
       return JSON.stringify(prep, undefined, 2);
     }
   }
+
+  /* Call the given function f() until it returns true,
+     every delayMs milliseconds, at most maxAttempts times. */
+  export function repeatUntil(maxAttempts: number,
+                              delayMs: number,
+                              f: () => boolean) {
+    if (maxAttempts >= 1) {
+      if (f() !== true)
+        setTimeout(function() {
+          repeatUntil(maxAttempts - 1, delayMs, f);
+        }, delayMs);
+    }
+  }
 }

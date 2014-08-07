@@ -10,8 +10,8 @@ module Esper.Login {
   }
 
   export function printStatus() {
-    if (Login.loggedIn())
-      Log.d("We are logged in as " + Login.myGoogleAccountId() + ".");
+    if (loggedIn())
+      Log.d("We are logged in as " + myGoogleAccountId() + ".");
     else
       Log.d("We are not logged in");
   }
@@ -42,5 +42,18 @@ module Esper.Login {
       return info.teams;
     else
       return;
+  }
+
+  /* Send a Logout request. */
+  export function logout() {
+    if (loggedIn()) {
+      var esperMessage = {
+        sender: "Esper",
+        type: "Logout",
+        value: { googleAccountId: myGoogleAccountId() }
+      };
+      Log.d("Logout request:", esperMessage);
+      window.postMessage(esperMessage, "*");
+    }
   }
 }

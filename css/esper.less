@@ -496,7 +496,7 @@ li.disabled {
   margin-left: -@welcome_width/2;
   width: @welcome_width;
 
-  /* decorations */
+  /* appearance */
   outline: none;
   background: #fbfafc;
   opacity: 1;
@@ -525,4 +525,67 @@ li.disabled {
 .esper-welcome-title {
   font-size: 18px;
   padding: 10px 15px;
+}
+
+
+/* Esper Menu (dropdown) */
+
+.esper-menu {
+  display: inline;
+  position: relative;
+}
+
+.esper-menu-bg {
+  z-index: 10;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+}
+
+ul.esper-menu-dropdown {
+  /* geometry */
+  z-index: 11;
+  position: absolute;
+  top: 48px;
+  left: 0px;
+  width: 150px;
+
+  /* initial visibility */
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+
+  /* appearance */
+  background: white;
+  margin: 0px;
+  padding: 0px;
+  border: 1px;
+}
+
+ul.esper-menu-dropdown-visible {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+
+  /* appearance */
+  text-align: left;
+}
+
+ul.esper-menu-dropdown li {
+  display: block;
+
+  /* appearance */
+  margin: 0px;
+  padding: 0px;
+  color: @gray_40;
+}
+
+ul.esper-menu-dropdown li:hover {
+  /* appearance */
+  background: @gray_20;
+}
+
+.esper-menu-clickable {
 }

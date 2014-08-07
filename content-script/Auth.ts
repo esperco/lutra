@@ -85,11 +85,12 @@ module Esper.Auth {
     $("body").append(view);
   }
 
-  function obtainCredentials(googleAccountId) {
+  function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: EsperStorage.Account) {
-        if (x.credentials !== undefined || x.declined === true) {
+        if (x.credentials !== undefined
+            || (x.declined === true && ! forceLogin)) {
           sendCredentialsResponse(x);
         }
         else {
@@ -117,7 +118,12 @@ module Esper.Auth {
 
         /* Listen for request from the injected script at mail.google.com */
         case "CredentialsRequest":
-          obtainCredentials(request.value);
+          obtainCredentials(request.value, false);
+          break;
+
+        /* Same as CredentialsRequest, but try to log in no matter what. */
+        case "LoginRequest":
+          obtainCredentials(request.value, true);
           break;
 
         /* Sent by content script itself, ignored. */

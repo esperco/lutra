@@ -23,7 +23,7 @@ module Esper.MsgView {
   function findAnchor() {
     var anchor = $("div[role=complementary].nH.adC");
     if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for Esper controls");
+      Log.e("Cannot find anchor point for the Esper thread controls.");
       return $();
     }
     else
