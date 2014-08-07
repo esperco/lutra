@@ -7,7 +7,7 @@ module Esper.Auth {
     as a Google Chrome user.
   */
 
-  function sendCredentialsResponse(x: EsperStorage.Credentials) {
+  function sendCredentialsResponse(x: EsperStorage.Account) {
     if (/^https:\/\/mail.google.com\//.test(document.URL)) {
       Log.d("Sending message from content script to gmail page", x);
       var esperMessage : EsperMessage.EsperMessage = {
@@ -27,7 +27,7 @@ module Esper.Auth {
     if (x !== undefined && x.accounts !== undefined) {
       var accounts = x.accounts;
       for (var k in accounts) {
-        sendCredentialsResponse(accounts[k].credentials);
+        sendCredentialsResponse(accounts[k]);
       }
     }
   }
@@ -39,13 +39,63 @@ module Esper.Auth {
     win.focus();
   }
 
-  function obtainCredentials(googleAccountId) {
-    EsperStorage.loadCredentials(googleAccountId,
-                                 function(x: EsperStorage.Credentials) {
-      if (x !== undefined)
-        sendCredentialsResponse(x);
-      else
-        openLoginTab(googleAccountId);
+  function openWelcomePopup(account: EsperStorage.Account) {
+'''
+<div #view>
+  <div class="esper-welcome-bg"/>
+  <div #modal class="esper-welcome-modal">
+    <div class="esper-welcome-header">
+      <img #close class="esper-welcome-close-icon"/>
+      <div #title class="esper-welcome-title"/>
+    </div>
+    <div>
+      <button #signInButton>
+        Sign in
+      </button>
+      <button #noThanksButton>
+        No, thanks
+      </button>
+    </div>
+  </div>
+</div>
+'''
+
+    function closeModal() {
+      view.remove();
+    }
+
+    title.text("Welcome to Esper!");
+
+    signInButton
+      .click(function() {
+        closeModal();
+        openLoginTab(account.googleAccountId);
+      });
+
+    noThanksButton
+      .click(function() {
+        account.declined = true;
+        EsperStorage.saveAccount(account, closeModal);
+      });
+
+    close.attr("src", chrome.extension.getURL("img/close.png"));
+    close.click(closeModal);
+    view.click(closeModal);
+
+    $("body").append(view);
+  }
+
+  function obtainCredentials(googleAccountId, forceLogin) {
+    EsperStorage.loadCredentials(
+      googleAccountId,
+      function(x: EsperStorage.Account) {
+        if (x.credentials !== undefined
+            || (x.declined === true && ! forceLogin)) {
+          sendCredentialsResponse(x);
+        }
+        else {
+          openWelcomePopup(x);
+        }
     });
   }
 
@@ -59,8 +109,8 @@ module Esper.Auth {
         switch (request.type) {
 
         /* Listen for Esper credentials posted by an app.esper.com page. */
-        case "Credentials":
-          EsperStorage.saveCredentials(
+        case "Account":
+          EsperStorage.saveAccount(
             request.value,
             function() { Log.d("Received and stored credentials"); }
           );
@@ -68,7 +118,12 @@ module Esper.Auth {
 
         /* Listen for request from the injected script at mail.google.com */
         case "CredentialsRequest":
-          obtainCredentials(request.value);
+          obtainCredentials(request.value, false);
+          break;
+
+        /* Same as CredentialsRequest, but try to log in no matter what. */
+        case "LoginRequest":
+          obtainCredentials(request.value, true);
           break;
 
         /* Sent by content script itself, ignored. */

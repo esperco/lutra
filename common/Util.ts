@@ -64,7 +64,7 @@ module Esper.Util {
     return y;
   }
 
-  export function toString(x, maxDepth: number = 4) {
+  export function toString(x, maxDepth: number = 10) {
     if (x === undefined)
       return "undefined";
     else if (typeof x === "string")
@@ -72,6 +72,19 @@ module Esper.Util {
     else {
       var prep = preparePrintable(x, [], maxDepth);
       return JSON.stringify(prep, undefined, 2);
+    }
+  }
+
+  /* Call the given function f() until it returns true,
+     every delayMs milliseconds, at most maxAttempts times. */
+  export function repeatUntil(maxAttempts: number,
+                              delayMs: number,
+                              f: () => boolean) {
+    if (maxAttempts >= 1) {
+      if (f() !== true)
+        setTimeout(function() {
+          repeatUntil(maxAttempts - 1, delayMs, f);
+        }, delayMs);
     }
   }
 }

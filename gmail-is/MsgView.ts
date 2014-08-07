@@ -23,7 +23,7 @@ module Esper.MsgView {
   function findAnchor() {
     var anchor = $("div[role=complementary].nH.adC");
     if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for Esper controls");
+      Log.e("Cannot find anchor point for the Esper thread controls.");
       return $();
     }
     else
@@ -436,7 +436,7 @@ module Esper.MsgView {
       searchModal.dialog({
         modal: true,
         dialogClass: "no-close"
-        });
+      });
       searchModal.dialog("option","modal",true);
 
       close.attr("src", Init.esperRootUrl + "img/close.png");

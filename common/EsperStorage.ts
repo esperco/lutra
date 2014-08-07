@@ -7,13 +7,20 @@ module Esper.EsperStorage {
     Other account information (profile, teams) can be retrieved using these.
   */
   export interface Credentials {
-    googleAccountId: string; // Google email address tied to the Esper account
     apiSecret: string;       // used for signing, but not sent to the server
     uid: string;             // used by the server to find the API secret
   }
 
   export interface Account {
-    credentials: Credentials
+    googleAccountId: string;
+      /* Google account (email address) tied to the Esper account */
+    credentials?: Credentials;
+      /* Esper UID and API secret */
+    declined: boolean;
+      /* user said "no thanks" when asked to log in;
+         this field should be set to false
+         if credentials exist.
+      */
   }
 
   export interface EsperStorage {
@@ -25,7 +32,7 @@ module Esper.EsperStorage {
 
   function save(x: EsperStorage, callback: () => void) {
     chrome.storage.sync.set({esper: x}, function() {
-      Log.d("saved esper storage", x);
+      Log.d("Saved esper storage", x);
       callback();
     });
   }
@@ -33,7 +40,7 @@ module Esper.EsperStorage {
   function load(callback: (x: EsperStorage) => void) {
     chrome.storage.sync.get("esper", function(obj : any) {
       var x : EsperStorage = obj.esper;
-      Log.d("got esper storage:", x);
+      Log.d("Got esper storage:", x);
       if (x === undefined)
         x = { accounts: {} };
       else if (x.accounts === undefined)
@@ -50,37 +57,50 @@ module Esper.EsperStorage {
     });
   }
 
-  function getAccount(esper: EsperStorage, googleAccountId: string) {
-    console.assert(esper.accounts !== undefined);
-    return esper.accounts[googleAccountId];
+  function newAccount(googleAccountId: string): Account {
+    return {
+      googleAccountId: googleAccountId,
+      declined: false
+    };
   }
 
-  export function saveCredentials(x: Credentials,
-                                  whenDone: () => void) {
+  function getAccount(esper: EsperStorage, googleAccountId: string) {
+    console.assert(esper.accounts !== undefined);
+    var account = esper.accounts[googleAccountId];
+    if (account === undefined) {
+      account = newAccount(googleAccountId);
+      esper.accounts[googleAccountId] = account;
+    }
+    account.googleAccountId = googleAccountId; // compatibility fix 2014-08-04
+    Log.d("getAccount returns:", account);
+    return account;
+  }
+
+  export function saveAccount(x: Account,
+                              whenDone: () => void) {
     update(function(esper) {
       var k = x.googleAccountId;
       var account = getAccount(esper, k);
-      if (account === undefined) {
-        account = { credentials: x };
-        esper.accounts[k] = account;
-      }
+      account.googleAccountId = k;
+      if (x.credentials !== undefined)
+        account.credentials = x.credentials;
+      if (x.declined === true)
+        account.declined = true;
       else
-        account.credentials = x;
+        account.declined = false;
       return esper;
     }, whenDone);
   }
 
   export function loadCredentials(googleAccountId: string,
-                                  whenDone: (Credentials) => void) {
+                                  whenDone: (Account) => void) {
     load(function(esper) {
       var account = getAccount(esper, googleAccountId);
-      var credentials: Credentials;
-      if (account !== undefined)
-        credentials = account.credentials;
-      whenDone(credentials);
+      whenDone(account);
     });
   }
 
+  /* currently: delete the whole Account entry */
   export function deleteCredentials(googleAccountId: string,
                                     whenDone: () => void) {
     load(function(esper) {

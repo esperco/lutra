@@ -20,7 +20,6 @@
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
       ],
-      "css": ["css/content-script.css"],
       "js": ["js/content-script.js"],
 
       "run_at": "document_end"
@@ -40,7 +39,7 @@
   "web_accessible_resources": [
     "js/gmail-is.js",
     "js/gcal-is.js",
-    "css/injected-script.css",
+    "css/esper.css",
     "img/*"
   ],
 

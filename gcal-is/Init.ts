@@ -8,13 +8,6 @@ module Esper.Init {
   export var loginInfo : ApiT.LoginResponse;
     /* List of teams, etc; refreshed when credentials change */
 
-  function printCredentialsStatus() {
-    if (Login.credentials !== undefined)
-      Log.d("We are logged in as " + Login.myGoogleAccountId() + ".");
-    else
-      Log.d("We are not logged in.");
-  }
-
   /*
     Retrieve UID and API secret from the content script,
     if they're available. The content script first checks if they are available
@@ -49,8 +42,8 @@ module Esper.Init {
   }
 
   function injectEsperControls() {
-    printCredentialsStatus();
-    if (Login.credentials === undefined)
+    Login.printStatus();
+    if (! Login.loggedIn())
       injectLoginControls();
     else
       CalEventView.init();

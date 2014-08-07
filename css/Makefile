@@ -3,9 +3,12 @@
 .PHONY: default css clean
 default: css
 
+# Content scripts and injected scripts share the same CSS rules
+# because they use the same DOM.
+# Currently the same CSS rules are injected regardless of the URL:
+# app.esper.com, Gmail, and Google Calendar share the same CSS rules.
 FILES = \
-  content-script \
-  injected-script
+  esper
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))

@@ -1,14 +1,14 @@
 module Esper.JsonHttp {
   function setHttpHeaders(path) {
     return function(jqXHR) {
-      if (Login.credentials !== undefined) {
+      if (Login.loggedIn()) {
         var unixTime = Math.round(+new Date()/1000).toString();
         var signature = CryptoJS.SHA1(
           unixTime
             + ","
             + path
             + ","
-            + Login.credentials.apiSecret
+            + Login.account.credentials.apiSecret
         );
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);
