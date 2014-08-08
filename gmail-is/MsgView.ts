@@ -211,8 +211,11 @@ module Esper.MsgView {
         view.linked.attr("style", "display: block");
         refreshEventList(teamid, threadId, sidebar);
 
-        Api.syncEvent(teamid, threadId, e.google_event_id);
-        // TODO Report something, handle failure, etc.
+        Api.syncEvent(teamid, threadId, e.google_event_id)
+          .done(function() {
+            // TODO Report something, handle failure, etc.
+            refreshEventList(teamid, threadId, sidebar);
+          });
       });
   }
 
