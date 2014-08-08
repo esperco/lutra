@@ -6,6 +6,7 @@ SOURCES = \
   Conf \
   List \
   Util \
+  Watchable \
   XDate \
   Log \
   EsperStorage \
