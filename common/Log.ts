@@ -49,4 +49,13 @@ Esper . xxxxxxxx
   export function e(...a: any[]) {
     logArray("E", a);
   }
+
+  /* Log the beginning and the end of something */
+  export function start(...a: any[]): { (): void } {
+    var id = Util.randomString();
+    logArray("BEGIN " + id, a);
+    return function() {
+      logArray("END " + id, a);
+    }
+  }
 }

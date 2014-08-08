@@ -1,5 +1,5 @@
 /*
-  Synchronized storage used by Esper, controlled by the content script.
+  Persistent storage used by Esper, controlled by the content script.
 */
 module Esper.EsperStorage {
   /*
@@ -31,29 +31,33 @@ module Esper.EsperStorage {
   /* The functions below will only work from the Esper content script */
 
   function save(x: EsperStorage, callback: () => void) {
-    chrome.storage.sync.set({esper: x}, function() {
-      Log.d("Saved esper storage", x);
+    var stop = Log.start("EsperStorage.save()");
+    chrome.storage.local.set({esper: x}, function() {
       callback();
+      stop();
     });
   }
 
   function load(callback: (x: EsperStorage) => void) {
-    chrome.storage.sync.get("esper", function(obj : any) {
+    var stop = Log.start("EsperStorage.load()");
+    chrome.storage.local.get("esper", function(obj : any) {
       var x : EsperStorage = obj.esper;
-      Log.d("Got esper storage:", x);
       if (x === undefined)
         x = { accounts: {} };
       else if (x.accounts === undefined)
         x.accounts = {};
+      Log.d("Loaded Esper storage:", x);
       callback(x);
+      stop();
     });
   }
 
   function update(transform: (x: EsperStorage) => EsperStorage,
                   whenSaved: (y: EsperStorage) => void) {
+    var stop = Log.start("EsperStorage.update()");
     load(function(x) {
       var y = transform(x);
-      save(y, function() { whenSaved(y); });
+      save(y, function() { whenSaved(y); stop(); });
     });
   }
 
@@ -113,7 +117,7 @@ module Esper.EsperStorage {
   export function listenForChange(callback: (oldValue: EsperStorage,
                                              newValue: EsperStorage) => void) {
     chrome.storage.onChanged.addListener(function(changes, namespace) {
-      if (namespace === "sync") {
+      if (namespace === "local") {
         var change = changes["esper"];
         if (change !== undefined) {
           callback(change.oldValue, change.newValue);
@@ -122,8 +126,12 @@ module Esper.EsperStorage {
     });
   }
 
-  /* Clear all sync storage for the Esper extension */
+  /* Clear all storage for the Esper extension */
   export function clearAll(callback: () => void) {
-    chrome.storage.sync.clear(callback);
+    var stop = Log.start("clearAll()");
+    chrome.storage.local.clear(function() {
+      callback();
+      stop();
+    });
   }
 }

@@ -63,19 +63,14 @@ module Esper.Menu {
     var loggedIn = Login.loggedIn();
 
     var loginLink = loggedIn?
-      makeDisabledLink("Sign into Esper")
-      : makeActionLink("Sign into Esper", Init.login);
-
-    var logoutLink = loggedIn?
       makeActionLink("Sign out of Esper", Login.logout)
-      : makeDisabledLink("Sign out of Esper");
+      : makeActionLink("Sign into Esper", Init.login);
 
     var settingsLink = makeHyperLink("Settings", Conf.Api.url);
 
     ul.children().remove();
     ul
       .append(loginLink)
-      .append(logoutLink)
       .append(settingsLink);
   }
 

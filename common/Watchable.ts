@@ -60,23 +60,27 @@ module Esper.Watchable {
 
   /*
     Input:
-    - isValid(data) : bool - decides whether the data is valid
-    - initialData - initial data of any type; defaults to the empty object {}.
+    - validate(data) : bool - decides whether the data is valid.
+    - initialData - initial data of any type, possibly undefined.
    */
-  export class Watchable<T> {
+  export class C<T> {
     private id: string;
-    isValid: { (T): boolean };
+    private validate: { (T): boolean };
     private data: T;
     private validity: boolean;
     private changeWatchers: Watcher<T> [];
 
-    constructor(isValid: { (T): boolean },
+    constructor(validate: { (T): boolean },
                 initialData: T) {
       this.id = createId();
-      this.isValid = isValid;
+      this.validate = validate;
       this.data = initialData;
-      this.validity = isValid(initialData);
+      this.validity = validate(initialData);
       this.changeWatchers = [];
+    }
+
+    isValid() {
+      return this.validate(this.data);
     }
 
     /*
@@ -130,6 +134,10 @@ module Esper.Watchable {
       this.changeWatchers = [];
     }
 
+    get() {
+      return this.data;
+    }
+
     /*
       Set a value.
       The lock prevents a value from being set twice during the same
@@ -138,16 +146,14 @@ module Esper.Watchable {
       optBlockedWatchers is an optional list of watcher IDs that should
       be disabled.
     */
-    set(newData, optBlockedWatchers) {
+    set(newData, optBlockedWatchers: string[] = []) {
       var id = this.id;
-      var blockedWatchers =
-        optBlockedWatchers === undefined ? {}
-      : objectOfIdArray(optBlockedWatchers);
+      var blockedWatchers = objectOfIdArray(optBlockedWatchers);
       if (lock(id)) {
         Log.d("ref["+ id +"]: set value", newData);
         var oldValidity = this.validity;
         var oldData = this.data;
-        var newValidity = this.isValid(newData);
+        var newValidity = this.validate(newData);
         this.data = newData;
         this.validity = newValidity;
 
@@ -166,7 +172,7 @@ module Esper.Watchable {
     }
 
     updateValidity() {
-      this.validity = this.isValid(this.data);
+      this.validity = this.validate(this.data);
     }
 
     /*
@@ -174,7 +180,7 @@ module Esper.Watchable {
       Avoids returning data with only some of the required fields.
     */
     getValidOrNothing() {
-      return this.validity ? this.data : null;
+      return this.validity ? this.data : undefined;
     }
 
   }

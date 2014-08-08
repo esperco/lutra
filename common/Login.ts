@@ -1,12 +1,27 @@
 module Esper.Login {
   /* Cached UID and API secret and user ID.
      They should be used as long as the API doesn't reject it. */
-  export var account : EsperStorage.Account;
+
+  function validateAccount(account): boolean {
+    return account !== undefined && account.credentials !== undefined;
+  }
+
+  export var watchableAccount = new Esper.Watchable.C<EsperStorage.Account>(
+    validateAccount, undefined
+  );
 
   export var info : ApiT.LoginResponse;
 
-  export function loggedIn(): boolean {
-    return account !== undefined && account.credentials !== undefined;
+  export function loggedIn() {
+    return watchableAccount.isValid();
+  }
+
+  export function getAccount() {
+    return watchableAccount.get();
+  }
+
+  export function setAccount(account: EsperStorage.Account) {
+    watchableAccount.set(account);
   }
 
   export function printStatus() {
@@ -18,14 +33,14 @@ module Esper.Login {
 
   export function myUid() {
     if (loggedIn())
-      return account.credentials.uid;
+      return getAccount().credentials.uid;
     else
       return;
   }
 
   export function myGoogleAccountId() {
     if (loggedIn())
-      return account.googleAccountId;
+      return getAccount().googleAccountId;
     else
       return;
   }
@@ -47,10 +62,12 @@ module Esper.Login {
   /* Send a Logout request. */
   export function logout() {
     if (loggedIn()) {
+      var googleAccountId = myGoogleAccountId();
+      setAccount(undefined);
       var esperMessage = {
         sender: "Esper",
         type: "Logout",
-        value: { googleAccountId: myGoogleAccountId() }
+        value: { googleAccountId: googleAccountId }
       };
       Log.d("Logout request:", esperMessage);
       window.postMessage(esperMessage, "*");
