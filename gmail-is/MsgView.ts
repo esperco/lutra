@@ -162,16 +162,6 @@ module Esper.MsgView {
         });
     });
 
-    $(".esper-sync-info").click(function(syncInfo) {
-      Log.d("clicked");
-      var apiCall;
-      if (syncInfo.data("synced") === true) apiCall = Api.syncEvent;
-      else apiCall = Api.unsyncEvent;
-      apiCall(teamid, threadId, e.google_event_id).done(function() {
-        refreshEventList(teamid, threadId, sidebar);
-      });
-    });
-
     return view;
   }
 
