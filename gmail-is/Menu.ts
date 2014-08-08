@@ -4,21 +4,15 @@
 */
 
 module Esper.Menu {
-
+  
   function dismissDropdowns() {
+    if ($(".esper-add-btn").hasClass("open"))
+      $(".no-events-arrow").toggle();
     $(".esper-ul").attr("style", "display: none");
     $(".esper-menu-bg").attr("style", "display: none");
     $(".esper-caret").attr("style", "display: none");
     $(".esper-dropdown-btn").removeClass("open");
   }
-
-  $(document).on('click', function(e) {
-    var $target = $(e.target);
-    if (!$target.hasClass("esper-dropdown-btn") &&
-        !$target.parent().hasClass("esper-dropdown-btn")) {
-        dismissDropdowns();
-    }
-  });
 
   /*
     Find a good insertion point.

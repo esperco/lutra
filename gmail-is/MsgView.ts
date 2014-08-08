@@ -8,13 +8,18 @@ module Esper.MsgView {
     if ($(".esper-add-btn").hasClass("open"))
       $(".no-events-arrow").toggle();
     $(".esper-ul").attr("style", "display: none");
+    $(".esper-menu-bg").attr("style", "display: none");
+    $(".esper-caret").attr("style", "display: none");
     $(".esper-dropdown-btn").removeClass("open");
   }
 
   $(document).on('click', function(e) {
     var $target = $(e.target);
     if (!$target.hasClass("esper-dropdown-btn") &&
-        !$target.parent().hasClass("esper-dropdown-btn")) {
+        !$target.parent().hasClass("esper-dropdown-btn") &&
+        !$target.hasClass("sync-list") &&
+        !$target.parent().hasClass("sync-list") &&
+        !$target.hasClass("disabled")) {
         dismissDropdowns();
     }
   });
@@ -54,26 +59,31 @@ module Esper.MsgView {
     <div class="esper-ev-times">
       <img #cog class="esper-dropdown-btn esper-ev-cog"/>
       <ul #dropdown class="esper-ul esper-ev-dropdown">
-        <li #editEvent
-            class="esper-li disabled">
-          Edit
-        </li>
-        <li #duplicateEvent
-            class="esper-li disabled">
-          Duplicate
-        </li>
-        <li #syncDescription
-            class="esper-li">
-          Sync thread to description
-        </li>
-        <li #unlinkEvent
-            class="esper-li">
-          Unlink
-        </li>
-        <li #deleteEvent
-            class="esper-li danger">
-          Delete from calendar
-        </li>
+        <div class="esper-ev-actions">
+          <li #editEvent
+              class="esper-li disabled">
+            Edit
+          </li>
+          <li #duplicateEvent
+              class="esper-li disabled">
+            Duplicate
+          </li>
+          <li #unlinkEvent
+              class="esper-li">
+            Unlink
+          </li>
+          <li #deleteEvent
+              class="esper-li danger">
+            Delete from calendar
+          </li>
+        </div>
+        <div class="esper-ul-divider"/>
+        <div #syncList class="esper-ev-sync">
+          <li #sectionHeader class="esper-li sync-list ul-section-header">
+            <span class="ul-section-header-text">Description Sync</span>
+            <img #info title class="info"/>
+          </li>
+        </div>
       </ul>
       <span #startTime class="esper-ev-start"/>
       &rarr;
@@ -88,12 +98,6 @@ module Esper.MsgView {
       }
     }
 
-    if (List.exists(ev.synced_threads, isThreadOf(Login.myUid()))) {
-      syncDescription.addClass("disabled");
-    } else {
-      syncDescription.removeClass("disabled");
-    }
-
     var e = ev.event;
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
@@ -106,25 +110,47 @@ module Esper.MsgView {
     if (e.title !== undefined)
       title.text(e.title);
 
+    info
+      .attr("src", Init.esperRootUrl + "img/info.png")
+      .tooltip();
+    var position = { my: 'center bottom', at: 'center top-10' };
+    var infoContent = "Team members included in this email conversation " +
+      "can sync their messages to this event's description.";
+    info
+      .tooltip("option", "content", infoContent)
+      .tooltip("option", "position", position)
+      .tooltip("option", "tooltipClass", "top sync-info");
+
     var profiles = sidebar["profiles"];
     List.iter(profiles, function(prof) {
-      var syncInfo = $("<li class='esper-ev-dropdown-item'>")
-        .text(prof[1].display_name);
-      if (prof[0] !== Login.myUid()) syncInfo.addClass("disabled");
+      var syncInfo = $("<li class='esper-li sync-list sync-row'>");
+      var name = (prof[0] === Login.myUid())
+        ? (prof[1].display_name + " (Me)")
+        : (prof[1].display_name);
+      
       var synced = List.exists(ev.synced_threads, function(x) {
         return x.esper_uid === prof[0];
       });
-      if (synced) syncInfo.append(" - Synced");
-      else syncInfo.append(" - Not Synced");
-      syncInfo.click(function() {
-        var apiCall;
-        if (synced) apiCall = Api.unsyncEvent;
-        else apiCall = Api.syncEvent;
-        apiCall(teamid, threadId, e.google_event_id).done(function() {
-          refreshEventList(teamid, threadId, sidebar);
-        });
-      });
-      syncInfo.appendTo(dropdown);
+      var syncCheckbox = $("<input type='checkbox' class='sync-checkbox'>")
+        .appendTo(syncInfo);
+      if (synced) syncCheckbox.attr("checked", true);
+      if (prof[0] !== Login.myUid()) {
+        syncInfo.addClass("disabled");
+        syncCheckbox.attr("disabled", true);
+      } else {
+        syncCheckbox.change(function() {
+          var apiCall;
+          if(this.checked) apiCall = Api.syncEvent;
+          else apiCall = Api.unsyncEvent;
+          apiCall(teamid, threadId, e.google_event_id).done(function() {
+            refreshEventList(teamid, threadId, sidebar);
+          });
+        });  
+      }
+      
+      syncInfo
+        .append(name)
+        .appendTo(syncList);
     });
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
@@ -137,12 +163,6 @@ module Esper.MsgView {
         cog.addClass("open");
       }
     })
-
-    syncDescription.click(function () {
-      Api.syncEvent(teamid, threadId, e.google_event_id).done(function() {
-        refreshEventList(teamid, threadId, sidebar);
-      });
-    });
 
     unlinkEvent.click(function() {
       view.attr("style", "opacity: 0.3");

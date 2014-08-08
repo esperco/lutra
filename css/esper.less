@@ -48,6 +48,10 @@ ul.esper-ul {
   border: 1px solid @gray_20;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  .esper-ul-divider {
+    height: 1px;
+    background: @gray_20;
+  }
 }
 
 li.esper-li, a.esper-a {
@@ -219,8 +223,6 @@ ul.esper-add-dropdown {
   border: 1px solid @gray_30;
   padding-top: 3px;
   text-align: center;
-  cursor: pointer;
-  &:hover { border-color: @gray_40; }
 }
 
 .esper-ev-month {
@@ -259,6 +261,37 @@ ul.esper-ev-dropdown {
   z-index: 2;
   margin-top: 18px;
   right: 0;
+  .esper-ev-actions { padding-bottom: 7px; }
+  .esper-ev-sync { padding-top: 7px; }
+}
+
+li.ul-section-header {
+  height: 13px;
+  font-weight: bold;
+  color: @gray_40;
+  cursor: default;
+  padding-bottom: 10px;
+  &:hover { background: none; }
+  .ul-section-header-text {
+    float: left;
+    padding-top: 1px;
+    padding-right: 8px;
+  }
+  .info {
+    float: left;
+    opacity: 0.5;
+    &:hover { opacity: 1.0; }
+  }
+}
+
+li.sync-row {
+  padding: 7px 16px 7px 32px;
+  cursor: default;
+  &:hover { background: none; }
+  .sync-checkbox {
+    float: right;
+    margin-left: 20px;
+  }
 }
 
 
@@ -493,6 +526,49 @@ ul.esper-ev-dropdown {
 .search-footer-logo { margin-top: 5px; }
 
 .done-btn { float: right; }
+
+
+/** Tooltip **/
+
+@sync_info: 220px;
+
+.ui-tooltip {
+  z-index: 9999;
+  background: #2a2a2a;
+  color: white;
+  border: none;
+  padding: 0;
+  opacity: 1;
+  &.sync-info {
+    max-width: @sync_info;
+    right: -72px;
+  }
+}
+
+.ui-tooltip-content {
+  position: relative;
+  font-size: 12px;
+  line-height: 1.3;
+  padding: 9px 11px;
+}
+
+.ui-tooltip-content::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 0;
+}
+
+.top .ui-tooltip-content::after {
+  bottom: -8px;
+  border-style: solid;
+  border-color: #2a2a2a transparent;
+  border-width: 8px 8px 0;
+}
+
+.sync-info .ui-tooltip-content::after {
+  left: @sync_info - 46px;
+}
 
 
 /** Spinner **/
