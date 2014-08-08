@@ -111,7 +111,9 @@ module Esper.MsgView {
       var syncInfo = $("<li class='esper-ev-dropdown-item esper-sync-info'>")
         .text(prof[1].display_name);
       if (prof[0] !== Login.myUid()) syncInfo.addClass("disabled");
-      var synced = List.exists(ev.synced_threads, isThreadOf(prof[0]));
+      var synced = List.exists(ev.synced_threads, function(x) {
+        return x.esper_uid === prof[0];
+      });
       if (synced) syncInfo.append(" - Synced");
       else syncInfo.append(" - Not Synced");
       syncInfo.click(function() {
