@@ -33,6 +33,9 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
+
+/*** General ***/
+
 a { text-decoration: none; }
 
 ul.esper-ul, li.esper-li { list-style-type: none; }
@@ -69,7 +72,77 @@ li.esper-li, a.esper-a {
 }
 
 
-/** Header **/
+/** Buttons **/
+
+.primary-btn {
+  background: linear-gradient(@purple, @purple_hover);
+  border: 1px solid @purple_active;
+  border-radius: 3px;
+  color: white;
+  font-size: 13px;
+  font-weight: 300;
+  height: 30px;
+  line-height: 0.8;
+  outline: none;
+  padding: 0px 20px;
+  cursor: pointer;
+  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
+  &:active { background: linear-gradient(@purple_active, @purple_hover); }
+}
+
+
+/* Esper Menu (Dropdown) */
+
+.esper-menu {
+  display: inline;
+  position: relative;
+  height: 30px;
+  width: 30px;
+  margin-right: 15px;
+}
+
+.esper-menu-logo {
+  float: left;
+  &.white {
+    margin: 2px 3px 1px 4px;
+  }
+  &.black {
+    margin: 5px 7px;
+    opacity: 0.47;
+    &:hover { opacity: 0.85; }
+  }
+}
+
+.esper-menu-bg {
+  z-index: 10;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+}
+
+.esper-caret {
+  display: none;
+  position: absolute;
+  left: 14px;
+}
+
+.esper-menu-dropdown {
+  z-index: 11;
+  position: absolute;
+  top: 33px;
+  left: -12px;
+  ul {
+    width: 150px;
+    margin-top: 11px;
+    webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+           box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+}
+
+
+/** Sidebar Header **/
 
 .esper-header {
   height: 27px;
@@ -117,7 +190,7 @@ ul.esper-add-dropdown {
 }
 
 
-/** Events **/
+/** Sidebar Events **/
 
 .esper-ev {
   padding: 14px 4px 16px 4px;
@@ -189,7 +262,7 @@ ul.esper-ev-dropdown {
 }
 
 
-/** Footer **/
+/** Sidebar Footer **/
 
 .esper-footer {
   padding: 10px 4px;
@@ -228,29 +301,108 @@ ul.esper-ev-dropdown {
 }
 
 
+/** Modals **/
+
+.esper-modal {
+  /* geometry */
+  z-index: 10;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+
+  /* appearance */
+  outline: none;
+  background: #fbfafc;
+  opacity: 1;
+  border: 1px solid #d8d8d8;
+  webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.esper-modal-bg {
+  z-index: 6;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: black;
+  opacity: 0.5;
+}
+
+.esper-modal-header {
+  background: @gray_90;
+  color: white;
+  margin: -1px -1px 0px -1px;
+}
+
+.esper-modal-close-container {
+  float: right;
+  height: 10px;
+  width: 10px;
+  margin: 6px 5px;
+  padding: 7px;
+  cursor: pointer;
+  .esper-modal-close-icon {
+    float: left;
+    opacity: 0.6;
+  }
+  &:hover {
+    background: #737373;
+    .esper-modal-close-icon { opacity: 1.0; }
+  }
+}
+
+.esper-modal-title {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+
+/** Welcome Modal **/
+
+@welcome_width: 480px;
+
+.esper-welcome-modal {
+  margin-left: -@welcome_width/2;
+  width: @welcome_width;
+}
+
+.about-esper {
+  width: 100%;
+  height: 300px;
+  background: @gray_10;
+}
+
+.welcome-footer {
+  padding: 10px;
+}
+
+.disable-link {
+  float: left;
+  padding-top: 8px;
+  font-size: 12px;
+  color: @gray_40;
+  cursor: pointer;
+  &:hover {
+    color: @gray_60;
+    text-decoration: underline;
+  }
+}
+
+.enable-btn {
+  float: right;
+  margin-bottom: 10px;
+}
+
+
 /** Search Modal **/
 
-.ui-dialog {
-  display: none;
-  outline: none;
-  width: 1px;
-  height: 1px;
-}
+@search_width: 480px;
 
-.ui-dialog-title {
-  display: none;
-}
-
-.no-close .ui-dialog-titlebar-close {
-  display: none;
-}
-
-.modal-close-icon {
-  float: right;
-  margin: 15px;
-  opacity: 0.7;
-  cursor: pointer;
-  &:hover { opacity: 1.0; }
+.esper-search-modal {
+  margin-left: -@search_width/2;
+  width: @search_width;
 }
 
 .esper-searchbox {
@@ -338,26 +490,9 @@ ul.esper-ev-dropdown {
   padding: 10px 15px;
 }
 
-.search-footer-logo {
-  margin-top: 5px;
-}
+.search-footer-logo { margin-top: 5px; }
 
-.done-btn {
-  float: right;
-  background: linear-gradient(@purple, @purple_hover);
-  border: 1px solid @purple_active;
-  border-radius: 3px;
-  color: white;
-  font-size: 11px;
-  font-weight: 300;
-  height: 30px;
-  line-height: 0.8;
-  outline: none;
-  padding: 0px 20px;
-  cursor: pointer;
-  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
-  &:active { background: linear-gradient(@purple_active, @purple_hover); }
-}
+.done-btn { float: right; }
 
 
 /** Spinner **/
@@ -409,127 +544,5 @@ ul.esper-ev-dropdown {
   } 50% {
     transform: scale(1.0);
     -webkit-transform: scale(1.0);
-  }
-}
-
-
-/** Modals **/
-
-@welcome_width: 480px;
-@search_width: 480px;
-
-.esper-modal-bg {
-  z-index: 6;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: black;
-  opacity: 0.5;
-}
-
-.esper-welcome-modal {
-  margin-left: -@welcome_width/2;
-  width: @welcome_width;
-}
-
-.esper-search-modal {
-  margin-left: -@search_width/2;
-  width: @search_width;
-}
-
-.esper-modal {
-  /* geometry */
-  z-index: 10;
-  position: fixed;
-  top: 20%;
-  left: 50%;
-
-  /* appearance */
-  outline: none;
-  background: #fbfafc;
-  opacity: 1;
-  border: 1px solid #d8d8d8;
-  webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.esper-modal-header {
-  background: @gray_90;
-  color: white;
-  margin: -1px -1px 0px -1px;
-}
-
-.esper-modal-close-container {
-  float: right;
-  height: 10px;
-  width: 10px;
-  margin: 6px 5px;
-  padding: 7px;
-  cursor: pointer;
-  .esper-modal-close-icon {
-    float: left;
-    opacity: 0.6;
-  }
-  &:hover {
-    background: #737373;
-    .esper-modal-close-icon { opacity: 1.0; }
-  }
-}
-
-.esper-modal-title {
-  font-size: 14px;
-  padding: 10px 12px;
-}
-
-
-/* Esper Menu (Dropdown) */
-
-.esper-menu {
-  display: inline;
-  position: relative;
-  height: 30px;
-  width: 30px;
-  margin-right: 15px;
-}
-
-.esper-menu-logo {
-  float: left;
-  &.white {
-    margin: 2px 3px 1px 4px;
-  }
-  &.black {
-    margin: 5px 7px;
-    opacity: 0.47;
-    &:hover { opacity: 0.85; }
-  }
-}
-
-.esper-menu-bg {
-  z-index: 10;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-}
-
-.esper-caret {
-  display: none;
-  position: absolute;
-  left: 14px;
-}
-
-.esper-menu-dropdown {
-  z-index: 11;
-  position: absolute;
-  top: 33px;
-  left: -12px;
-  ul {
-    width: 150px;
-    margin-top: 11px;
-    webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-           box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   }
 }

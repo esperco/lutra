@@ -340,7 +340,7 @@ module Esper.MsgView {
     </div>
     <div class="search-footer">
       <img #modalLogo class="search-footer-logo"/>
-      <button #done class="done-btn">Done</button>
+      <button #done class="primary-btn done-btn">Done</button>
     </div>
   </div>
 </div>

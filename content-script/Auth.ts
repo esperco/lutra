@@ -39,7 +39,7 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomePopup(account: EsperStorage.Account) {
+  function openWelcomeModal(account: EsperStorage.Account) {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -50,12 +50,13 @@ module Esper.Auth {
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div>
-      <button #signInButton>
-        Sign in
-      </button>
-      <button #noThanksButton>
-        No, thanks
+    <div #about class="about-esper"/>
+    <div #footer class="welcome-footer">
+      <a #disableLink class="disable-link">
+        Disable Esper for this account
+      </a>
+      <button #enableButton class="primary-btn enable-btn">
+        Enable
       </button>
     </div>
   </div>
@@ -66,15 +67,15 @@ module Esper.Auth {
       view.remove();
     }
 
-    title.text("Welcome to Esper!");
+    title.text("Welcome to Esper");
 
-    signInButton
+    enableButton
       .click(function() {
         closeModal();
         openLoginTab(account.googleAccountId);
       });
 
-    noThanksButton
+    disableLink
       .click(function() {
         account.declined = true;
         EsperStorage.saveAccount(account, closeModal);
@@ -96,7 +97,7 @@ module Esper.Auth {
           sendCredentialsResponse(x);
         }
         else {
-          openWelcomePopup(x);
+          openWelcomeModal(x);
         }
     });
   }
