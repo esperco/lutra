@@ -7,6 +7,7 @@ SOURCES = \
   List \
   Util \
   Watchable \
+  Deferred \
   XDate \
   Log \
   EsperStorage \

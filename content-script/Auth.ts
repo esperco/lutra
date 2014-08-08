@@ -40,21 +40,24 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomePopup(account: EsperStorage.Account) {
+  function openWelcomeModal(account: EsperStorage.Account) {
 '''
 <div #view>
-  <div class="esper-welcome-bg"/>
-  <div #modal class="esper-welcome-modal">
-    <div class="esper-welcome-header">
-      <img #close class="esper-welcome-close-icon"/>
-      <div #title class="esper-welcome-title"/>
+  <div #background class="esper-modal-bg"/>
+  <div #modal class="esper-modal esper-welcome-modal">
+    <div class="esper-modal-header">
+      <div #close class="esper-modal-close-container">
+        <img #closeIcon class="esper-modal-close-icon"/>
+      </div>
+      <div #title class="esper-modal-title"/>
     </div>
-    <div>
-      <button #signInButton>
-        Sign in
-      </button>
-      <button #noThanksButton>
-        No, thanks
+    <div #about class="about-esper"/>
+    <div #footer class="welcome-footer">
+      <a #disableLink class="disable-link">
+        Disable Esper for this account
+      </a>
+      <button #enableButton class="primary-btn enable-btn">
+        Enable
       </button>
     </div>
   </div>
@@ -65,23 +68,23 @@ module Esper.Auth {
       view.remove();
     }
 
-    title.text("Welcome to Esper!");
+    title.text("Welcome to Esper");
 
-    signInButton
+    enableButton
       .click(function() {
         closeModal();
         openLoginTab(account.googleAccountId);
       });
 
-    noThanksButton
+    disableLink
       .click(function() {
         account.declined = true;
         EsperStorage.saveAccount(account, closeModal);
       });
 
-    close.attr("src", chrome.extension.getURL("img/close.png"));
+    background.click(closeModal);
+    closeIcon.attr("src", chrome.extension.getURL("img/close.png"));
     close.click(closeModal);
-    view.click(closeModal);
 
     $("body").append(view);
   }
@@ -95,7 +98,7 @@ module Esper.Auth {
           sendCredentialsResponse(x);
         }
         else {
-          openWelcomePopup(x);
+          openWelcomeModal(x);
         }
     });
   }

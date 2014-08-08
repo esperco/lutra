@@ -7,14 +7,19 @@ module Esper.MsgView {
   function dismissDropdowns() {
     if ($(".esper-add-btn").hasClass("open"))
       $(".no-events-arrow").toggle();
-    $(".esper-dropdown").attr("style", "display: none");
+    $(".esper-ul").attr("style", "display: none");
+    $(".esper-menu-bg").attr("style", "display: none");
+    $(".esper-caret").attr("style", "display: none");
     $(".esper-dropdown-btn").removeClass("open");
   }
 
   $(document).on('click', function(e) {
     var $target = $(e.target);
     if (!$target.hasClass("esper-dropdown-btn") &&
-        !$target.parent().hasClass("esper-dropdown-btn")) {
+        !$target.parent().hasClass("esper-dropdown-btn") &&
+        !$target.hasClass("sync-list") &&
+        !$target.parent().hasClass("sync-list") &&
+        !$target.hasClass("disabled")) {
         dismissDropdowns();
     }
   });
@@ -53,27 +58,32 @@ module Esper.MsgView {
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
       <img #cog class="esper-dropdown-btn esper-ev-cog"/>
-      <ul #dropdown class="esper-dropdown esper-ev-dropdown">
-        <li #editEvent
-            class="esper-ev-dropdown-item disabled">
-          Edit
-        </li>
-        <li #duplicateEvent
-            class="esper-ev-dropdown-item disabled">
-          Duplicate
-        </li>
-        <li #syncDescription
-            class="esper-ev-dropdown-item">
-          Sync thread to description
-        </li>
-        <li #unlinkEvent
-            class="esper-ev-dropdown-item">
-          Unlink
-        </li>
-        <li #deleteEvent
-            class="esper-ev-dropdown-item delete-event">
-          Delete from calendar
-        </li>
+      <ul #dropdown class="esper-ul esper-ev-dropdown">
+        <div class="esper-ev-actions">
+          <li #editEvent
+              class="esper-li disabled">
+            Edit
+          </li>
+          <li #duplicateEvent
+              class="esper-li disabled">
+            Duplicate
+          </li>
+          <li #unlinkEvent
+              class="esper-li">
+            Unlink
+          </li>
+          <li #deleteEvent
+              class="esper-li danger">
+            Delete from calendar
+          </li>
+        </div>
+        <div class="esper-ul-divider"/>
+        <div #syncList class="esper-ev-sync">
+          <li #sectionHeader class="esper-li sync-list ul-section-header">
+            <span class="ul-section-header-text">Description Sync</span>
+            <img #info title class="info"/>
+          </li>
+        </div>
       </ul>
       <span #startTime class="esper-ev-start"/>
       &rarr;
@@ -82,13 +92,10 @@ module Esper.MsgView {
   </div>
 </div>
 '''
-    function isMyThread(x) {
-      return x.esper_uid === Login.myUid() && x.gmail_thrid === threadId;
-    }
-    if (List.exists(ev.synced_threads, isMyThread)) {
-      syncDescription.addClass("disabled");
-    } else {
-      syncDescription.removeClass("disabled");
+    function isThreadOf(uid) {
+      return function(x) {
+        return x.esper_uid === uid && x.gmail_thrid === threadId;
+      }
     }
 
     var e = ev.event;
@@ -103,6 +110,49 @@ module Esper.MsgView {
     if (e.title !== undefined)
       title.text(e.title);
 
+    info
+      .attr("src", Init.esperRootUrl + "img/info.png")
+      .tooltip();
+    var position = { my: 'center bottom', at: 'center top-10' };
+    var infoContent = "Team members included in this email conversation " +
+      "can sync their messages to this event's description.";
+    info
+      .tooltip("option", "content", infoContent)
+      .tooltip("option", "position", position)
+      .tooltip("option", "tooltipClass", "top sync-info");
+
+    var profiles = sidebar["profiles"];
+    List.iter(profiles, function(prof) {
+      var syncInfo = $("<li class='esper-li sync-list sync-row'>");
+      var name = (prof[0] === Login.myUid())
+        ? (prof[1].display_name + " (Me)")
+        : (prof[1].display_name);
+      
+      var synced = List.exists(ev.synced_threads, function(x) {
+        return x.esper_uid === prof[0];
+      });
+      var syncCheckbox = $("<input type='checkbox' class='sync-checkbox'>")
+        .appendTo(syncInfo);
+      if (synced) syncCheckbox.attr("checked", true);
+      if (prof[0] !== Login.myUid()) {
+        syncInfo.addClass("disabled");
+        syncCheckbox.attr("disabled", true);
+      } else {
+        syncCheckbox.change(function() {
+          var apiCall;
+          if(this.checked) apiCall = Api.syncEvent;
+          else apiCall = Api.unsyncEvent;
+          apiCall(teamid, threadId, e.google_event_id).done(function() {
+            refreshEventList(teamid, threadId, sidebar);
+          });
+        });  
+      }
+      
+      syncInfo
+        .append(name)
+        .appendTo(syncList);
+    });
+
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
       if (cog.hasClass("open")) {
@@ -113,12 +163,6 @@ module Esper.MsgView {
         cog.addClass("open");
       }
     })
-
-    syncDescription.click(function () {
-      Api.syncEvent(teamid, threadId, e.google_event_id).done(function() {
-        refreshEventList(teamid, threadId, sidebar);
-      });
-    });
 
     unlinkEvent.click(function() {
       view.attr("style", "opacity: 0.3");
@@ -177,8 +221,11 @@ module Esper.MsgView {
         view.linked.attr("style", "display: block");
         refreshEventList(teamid, threadId, sidebar);
 
-        Api.syncEvent(teamid, threadId, e.google_event_id);
-        // TODO Report something, handle failure, etc.
+        Api.syncEvent(teamid, threadId, e.google_event_id)
+          .done(function() {
+            // TODO Report something, handle failure, etc.
+            refreshEventList(teamid, threadId, sidebar);
+          });
       });
   }
 
@@ -312,8 +359,72 @@ module Esper.MsgView {
       });
   }
 
+  function openSearchModal(linkedEvents, team, possessive) {
+'''
+<div #view>
+  <div #background class="esper-modal-bg"/>
+  <div #modal class="esper-modal esper-search-modal">
+    <div class="esper-modal-header">
+      <div #close class="esper-modal-close-container">
+        <img #closeIcon class="esper-modal-close-icon"/>
+      </div>
+      <div #title class="esper-modal-title"/>
+    </div>
+    <div class="clear-search-container">
+      <img #clear class="clear-search"/>
+    </div>
+    <input #searchbox
+      type="text" class="esper-searchbox"
+      placeholder="Search calendar"/>
+    <div #results class="search-results">
+      <div #searchInstructions class="search-instructions"/>
+      <div #spinner class="search-spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+      <div #resultsList/>
+      <div #searchStats class="search-stats"/>
+    </div>
+    <div class="search-footer">
+      <img #modalLogo class="search-footer-logo"/>
+      <button #done class="primary-btn done-btn">Done</button>
+    </div>
+  </div>
+</div>
+'''
+
+    function closeModal() {
+      view.remove();
+    }
+
+    title.text("Link to existing event");
+
+    setupSearch(linkedEvents.linked_events, team.teamid, _view);
+    
+    var searchBgUrl = Init.esperRootUrl + "img/search.png";
+    searchbox.attr(
+      "style",
+      "background: url(" + searchBgUrl + ") no-repeat scroll 16px 16px"
+    );
+
+    clear.attr("src", Init.esperRootUrl + "img/clear.png");
+    clear.click(function() { resetSearch(_view) });
+    searchInstructions.text("Start typing above to find upcoming events on " +
+      possessive + " calendar.");
+
+    modalLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+
+    background.click(closeModal);
+    closeIcon.attr("src", Init.esperRootUrl + "img/close.png");
+    close.click(closeModal);
+    done.click(closeModal);
+
+    $("body").append(view);
+  }
+
   function displayLinkedEvents(rootElement,
                                team: ApiT.Team,
+                               profiles : any[],
                                linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
@@ -322,12 +433,12 @@ module Esper.MsgView {
       <img #addIcon class="esper-add-icon"/>
     </button>
     <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #dropdown class="esper-dropdown esper-add-dropdown">
+    <ul #dropdown class="esper-ul esper-add-dropdown">
       <li #newEvent
-          class="esper-ev-dropdown-item disabled">
+          class="esper-li disabled">
         Create new linked event
       </li>
-      <li #existingEvent class="esper-ev-dropdown-item">
+      <li #existingEvent class="esper-li">
         Link to existing event
       </li>
     </ul>
@@ -353,34 +464,7 @@ module Esper.MsgView {
       <div class="copyright">&copy; 2014 Esper</div>
     </div>
   </div>
-  <div #search class="esper-modal">
-    <div #modalBackground class="modal-bg">
-    <div #searchModal class="modal search-modal">
-      <div class="modal-header">
-        <img #close class="modal-close-icon"/>
-        <div #searchTitle class="search-modal-title"/>
-      </div>
-      <div class="clear-search-container">
-        <img #clear class="clear-search"/>
-      </div>
-      <input #searchbox
-        type="text" class="esper-searchbox"
-        placeholder="Search calendar"/>
-      <div #results class="search-results">
-        <div #searchInstructions class="search-instructions"/>
-        <div #spinner class="search-spinner">
-          <div class="double-bounce1"></div>
-          <div class="double-bounce2"></div>
-        </div>
-        <div #resultsList/>
-        <div #searchStats class="search-stats"/>
-      </div>
-      <div class="search-footer">
-        <img #modalLogo class="search-footer-logo"/>
-        <button #done class="done-btn">Done</button>
-      </div>
-    </div>
-  </div>
+
 </div>
 '''
     addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
@@ -397,10 +481,10 @@ module Esper.MsgView {
 
     var assisting = team.team_name;
     if (assisting === null || assisting === undefined || assisting === "") {
-      Api.getGoogleProfile(team.team_executive, team.teamid)
-        .done(function(exec) {
-          assisting = exec.display_name;
-        });
+      var exec = List.find(profiles, function(prof) {
+        return prof[0] === team.team_executive;
+      });
+      assisting = exec[1].display_name;
     }
     var possessive = (assisting.slice(-1) === "s")
         ? (assisting + "'")
@@ -414,6 +498,8 @@ module Esper.MsgView {
     else
       noEvents.attr("style", "display: none");
 
+    _view["profiles"] = profiles;
+
     displayEventList(
       linkedEvents.linked_events,
       team.teamid,
@@ -421,45 +507,13 @@ module Esper.MsgView {
       _view
     );
 
-    clear.click(function() { resetSearch(_view) });
-    searchInstructions.text("Start typing above to find events on " +
-      possessive + " calendar.");
-
     teamName.text("Assisting " + assisting);
 
-    /* Search Modal */
-    // http://api.jqueryui.com/dialog/#method-close
     existingEvent.click(function() {
-      setupSearch(linkedEvents.linked_events, team.teamid, _view);
-
-      search.attr("style", "display: block");
-      searchModal.dialog({
-        modal: true,
-        dialogClass: "no-close"
-      });
-      searchModal.dialog("option","modal",true);
-
-      close.attr("src", Init.esperRootUrl + "img/close.png");
-      close.click(closeModal);
-      done.click(closeModal);
-      modalBackground.click(closeModal);
-      searchTitle.text("Link to existing event");
-      var searchBgUrl = Init.esperRootUrl + "img/search.png";
-      searchbox.attr(
-        "style",
-        "background: url(" + searchBgUrl + ") no-repeat scroll 16px 16px"
-      );
-      clear.attr("src", Init.esperRootUrl + "img/clear.png");
-
-      modalLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+      openSearchModal(linkedEvents, team, possessive);
     });
 
-    function closeModal() {
-      search.attr("style", "display:none");
-      searchModal.dialog("close");
-    }
-
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/logo-footer.png");
+    sidebarLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
     rootElement.append(view);
   }
@@ -475,10 +529,18 @@ module Esper.MsgView {
         Log.d("Using new thread ID " + currentThreadId);
         var rootElement = insertEsperRoot();
         Login.myTeams().forEach(function(team) {
-          Api.getLinkedEvents(team.teamid, currentThreadId)
-            .done(function(linkedEvents) {
-              displayLinkedEvents(rootElement, team, linkedEvents);
-            });
+          var teamMembers = team.team_assistants;
+          teamMembers.push(team.team_executive);
+          var profileApiCalls = List.map(teamMembers, function(uid) {
+            var apiCall = Api.getGoogleProfile(uid, team.teamid);
+            return Deferred.join([Deferred.defer(uid), apiCall]);
+          });
+          Deferred.join(profileApiCalls).done(function(profiles) {
+            Api.getLinkedEvents(team.teamid, currentThreadId)
+              .done(function(linkedEvents) {
+                displayLinkedEvents(rootElement, team, profiles, linkedEvents);
+              });
+          });
         });
       }
     }
