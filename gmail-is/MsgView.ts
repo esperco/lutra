@@ -108,7 +108,7 @@ module Esper.MsgView {
 
     var profiles = sidebar["profiles"];
     List.iter(profiles, function(prof) {
-      var syncInfo = $("<li class='esper-ev-dropdown-item esper-sync-info'>")
+      var syncInfo = $("<li class='esper-ev-dropdown-item'>")
         .text(prof[1].display_name);
       if (prof[0] !== Login.myUid()) syncInfo.addClass("disabled");
       var synced = List.exists(ev.synced_threads, function(x) {
