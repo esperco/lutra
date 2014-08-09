@@ -87,4 +87,23 @@ module Esper.Util {
         }, delayMs);
     }
   }
+
+  export function afterTyping(elt: JQuery, delayMs: number, func) {
+    var lastPressed = Date.now(); // date in milliseconds
+    elt
+      .unbind("keydown")
+      .keydown(function() {
+        var t1 = lastPressed;
+        var t2 = Date.now();
+        if (lastPressed >= t2)
+          lastPressed = lastPressed + 1;
+        else
+          lastPressed = t2;
+        var lastPressed0 = lastPressed;
+        window.setTimeout(function() {
+          if (lastPressed0 === lastPressed)
+            func();
+        }, delayMs);
+      });
+  }
 }

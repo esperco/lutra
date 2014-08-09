@@ -117,9 +117,11 @@ module Esper.ApiT {
     google_events: googleEvent[];
   }
 
+/*
   export interface GoogleProfile {
     display_name: string;
     gender: string;
     image_url: string;
   }
+*/
 }
