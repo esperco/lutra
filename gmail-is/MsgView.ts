@@ -175,7 +175,7 @@ module Esper.MsgView {
           teamPhrase += "and " + syncedUsers[i] + " are ";
       }
     }
-    teamSync.text(teamPhrase += " syncing messages to this event.");
+    teamSync.text(teamPhrase += " syncing messages with this event.");
 
     var notePhrase = "";
     if (!currentSynced && syncedUsers.length > 0) {
