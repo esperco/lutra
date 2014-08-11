@@ -4,7 +4,7 @@
 */
 
 module Esper.Menu {
-  
+
   function dismissDropdowns() {
     if ($(".esper-add-btn").hasClass("open"))
       $(".no-events-arrow").toggle();
@@ -46,7 +46,7 @@ function popWindow(url, width, height) {
   leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
   //Allow for title and status bars.
   topPosition = (window.screen.height / 2) - ((height / 2) + 50);
-  //Open the window.
+
   window.open(url, "Window2", "status=no,height="
     + height + ",width=" + width + ",resizable=yes,left="
     + leftPosition + ",top=" + topPosition + ",screenX="

@@ -6,6 +6,7 @@ SOURCES = \
   Conf \
   List \
   Util \
+  Watchable \
   Deferred \
   XDate \
   Log \

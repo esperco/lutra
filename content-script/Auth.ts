@@ -1,6 +1,6 @@
 module Esper.Auth {
   /*
-    The user's API secret is stored using chrome.storage.sync.
+    The user's API secret is stored using chrome.storage.local.
 
     The user logs in once with Esper, then the API secret is
     propagated across all Chrome browsers where the user is logged-in
@@ -25,6 +25,7 @@ module Esper.Auth {
   */
   function sendStorage(x: EsperStorage.EsperStorage) {
     if (x !== undefined && x.accounts !== undefined) {
+      Log.d("sendStorage()");
       var accounts = x.accounts;
       for (var k in accounts) {
         sendCredentialsResponse(accounts[k]);
@@ -143,7 +144,7 @@ module Esper.Auth {
 
         case "ClearSyncStorage":
           EsperStorage.clearAll(function() {
-            Log.d("Cleared all sync storage created by the Esper extension");
+            Log.d("Cleared all sync storage created by the Esper extension.");
           });
           break;
 
@@ -160,8 +161,23 @@ module Esper.Auth {
   function listenForCredentialsChange() {
     Log.d("listenForCredentialsChange()");
     EsperStorage.listenForChange(function(oldStorage, newStorage) {
-      if (newStorage !== undefined) {
+      Log.d("Detected change in local storage.");
+      if (newStorage !== undefined && newStorage.accounts !== undefined) {
+        /* Send credentials for all known accounts */
         sendStorage(newStorage);
+
+        /* Send empty account for all newly logged-out accounts */
+        if (oldStorage !== undefined && oldStorage.accounts !== undefined) {
+          for (var k in oldStorage.accounts) {
+            var account = newStorage.accounts[k];
+            if (account === undefined) {
+              sendCredentialsResponse({
+                googleAccountId: k,
+                declined: false
+              });
+            }
+          }
+        }
       }
     });
   }
