@@ -32,28 +32,18 @@ module Esper.ApiT {
     Executive
   }
 
-  export enum Gender {
-    Female,
-    Male
-  }
-
   export interface Profile {
     profile_uid: string;
-    role: Role; // optional
-    editable: boolean; // optional
-    prefix: string; // optional
-    first_last_name: FirstLastName; // optional
-    pseudonym: string; // optional
-    gender: Gender; // optional
-    emails: EmailEntry[];
-    phones: Phone[];
+    email: string;
+    display_name?: string;
+    gender?: string; // "Female" or "Male"
+    image_url?: string;
   }
 
   export interface LoginResponse {
     uid: string;
     api_secret: string;
     email: string;
-    profile: Profile;
     teams: Team[];
   }
 
@@ -117,11 +107,4 @@ module Esper.ApiT {
     google_events: googleEvent[];
   }
 
-/*
-  export interface GoogleProfile {
-    display_name: string;
-    gender: string;
-    image_url: string;
-  }
-*/
 }

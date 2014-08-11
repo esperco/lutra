@@ -127,17 +127,17 @@ module Esper.MsgView {
 
     List.iter(profiles, function(prof: ApiT.Profile) {
       var syncInfo = $("<li class='esper-li sync-list sync-row'>");
-      var name = (prof[0] === Login.myUid()) // WTF?
-        ? (prof[1].display_name + " (Me)")
-        : (prof[1].display_name);
+      var name = (prof.profile_uid === Login.myUid())
+        ? (prof.display_name + " (Me)")
+        : (prof.display_name);
 
       var synced = List.exists(ev.synced_threads, function(x) {
-        return x.esper_uid === prof[0];
+        return x.esper_uid === prof.profile_uid;
       });
       var syncCheckbox = $("<input type='checkbox' class='sync-checkbox'>")
         .appendTo(syncInfo);
       if (synced) syncCheckbox.attr("checked", true);
-      if (prof[0] !== Login.myUid()) {
+      if (prof.profile_uid !== Login.myUid()) {
         syncInfo.addClass("disabled");
         syncCheckbox.attr("disabled", true);
       } else {
@@ -199,25 +199,8 @@ module Esper.MsgView {
     });
   }
 
-  export function linkEvent(e, teamid, threadId, sidebar, profiles) {
-    Api.linkEvent(teamid, threadId, {
-      google_event_id: e.google_event_id
-    })
-      .done(function() {
-        sidebar.spinner.attr("style", "display: none");
-        sidebar.linked.attr("style", "display: block");
-        refreshEventList(teamid, threadId, sidebar, profiles);
-
-        Api.syncEvent(teamid, threadId, e.google_event_id)
-          .done(function() {
-            // TODO Report something, handle failure, etc.
-            refreshEventList(teamid, threadId, sidebar, profiles);
-          });
-      });
-  }
-
   /* reuse the view created for the team, update list of linked events */
-  function refreshEventList(teamid, threadId, sidebar, profiles) {
+  export function refreshEventList(teamid, threadId, sidebar, profiles) {
     Api.getLinkedEvents(teamid, threadId)
       .done(function(linkedEvents) {
         displayEventList(linkedEvents.linked_events, teamid,
@@ -308,9 +291,9 @@ module Esper.MsgView {
     var assisting = team.team_name;
     if (assisting === null || assisting === undefined || assisting === "") {
       var exec = List.find(profiles, function(prof) {
-        return prof[0] === team.team_executive;
+        return prof.profile_uid === team.team_executive;
       });
-      assisting = exec[1].display_name;
+      assisting = exec.display_name;
     }
     var possessive = (assisting.slice(-1) === "s")
         ? (assisting + "'")
@@ -349,7 +332,7 @@ module Esper.MsgView {
     teamMembers.push(team.team_executive);
     var l =
       List.map(teamMembers, function(uid) {
-        return Api.getGoogleProfile(uid, team.teamid);
+        return Api.getProfile(uid, team.teamid);
       });
     return Deferred.join(l);
   }

@@ -1,4 +1,38 @@
 module Esper.EvSearch {
+
+  interface ResultView {
+    view: JQuery;
+    month: JQuery;
+    day: JQuery;
+    link: JQuery;
+    spinner: JQuery;
+    linked: JQuery;
+    check: JQuery;
+    title: JQuery;
+    startTime: JQuery;
+    endTime: JQuery;
+  }
+
+  function linkEvent(e, teamid, threadId,
+                     sidebar: MsgView.Sidebar,
+                     profiles,
+                     resultView: ResultView) {
+    Api.linkEvent(teamid, threadId, {
+      google_event_id: e.google_event_id
+    })
+      .done(function() {
+        resultView.spinner.attr("style", "display: none");
+        resultView.linked.attr("style", "display: block");
+        MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+
+        Api.syncEvent(teamid, threadId, e.google_event_id)
+          .done(function() {
+            // TODO Report something, handle failure, etc.
+            MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+          });
+      });
+  }
+
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
                               teamid, sidebar,
                               profiles: ApiT.Profile[]) {
@@ -27,6 +61,7 @@ module Esper.EvSearch {
   </div>
 </div>
 '''
+    var resultView = <ResultView> _view;
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
@@ -42,7 +77,7 @@ module Esper.EvSearch {
     link.click(function() {
       spinner.attr("style", "display: block");
       link.attr("style", "display: none");
-      MsgView.linkEvent(e, teamid, threadId, sidebar, profiles);
+      linkEvent(e, teamid, threadId, sidebar, profiles, resultView);
     });
 
     check.attr("src", Init.esperRootUrl + "img/check.png");
