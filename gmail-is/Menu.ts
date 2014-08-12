@@ -40,19 +40,19 @@ module Esper.Menu {
       return false;
   }
 
-function popWindow(url, width, height) {
-  var leftPosition, topPosition;
-  //Allow for borders.
-  leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
-  //Allow for title and status bars.
-  topPosition = (window.screen.height / 2) - ((height / 2) + 50);
+  function popWindow(url, width, height) {
+    /* Allow for borders. */
+    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
+    /* Allow for title and status bars. */
+    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
 
-  window.open(url, "Window2", "status=no,height="
-    + height + ",width=" + width + ",resizable=yes,left="
-    + leftPosition + ",top=" + topPosition + ",screenX="
-    + leftPosition + ",screenY=" + topPosition
-    + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
-}
+    window.open(
+      url, "Window2", "status=no,height="
+        + height + ",width=" + width + ",resizable=yes,left="
+        + leftPosition + ",top=" + topPosition + ",screenX="
+        + leftPosition + ",screenY=" + topPosition
+        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
+  }
 
   function makeActionLink(text, action, danger) {
     var link = $("<li class='esper-li'/>")
@@ -98,7 +98,7 @@ function popWindow(url, width, height) {
    */
   export function create() {
 '''
-<div #view class="esper-menu">
+<div #view id="esper-menu" class="esper-menu">
   <img #logo class="esper-dropdown-btn esper-menu-logo"/>
   <div #background class="esper-menu-bg"/>
   <div class="esper-menu-dropdown">
