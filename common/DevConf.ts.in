@@ -1,5 +1,6 @@
 module Esper.Conf {
   export var prod = false;
+  export var version = "@@VERSION@@";
   export module Api {
     export var url = "http://localhost";
   }
