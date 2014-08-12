@@ -8,7 +8,7 @@ module Esper.JsonHttp {
             + ","
             + path
             + ","
-            + Login.account.credentials.apiSecret
+            + Login.getAccount().credentials.apiSecret
         );
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);

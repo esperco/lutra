@@ -1,5 +1,26 @@
 module Esper.EvSearch {
 
+  function linkEvent(e, teamid, threadId,
+                     sidebar: MsgView.Sidebar,
+                     profiles,
+                     resultView: ResultView) {
+    Api.linkEventForMe(teamid, threadId, e.google_event_id)
+      .done(function() {
+        resultView.spinner.attr("style", "display: none");
+        resultView.linked.attr("style", "display: block");
+        MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+
+        Api.linkEventForTeam(teamid, threadId, e.google_event_id)
+          .done(function() {
+            Api.syncEvent(teamid, threadId, e.google_event_id)
+              .done(function() {
+                // TODO Report something, handle failure, etc.
+                MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+              });
+          });
+      });
+  }
+
   interface ResultView {
     view: JQuery;
     month: JQuery;
@@ -13,29 +34,10 @@ module Esper.EvSearch {
     endTime: JQuery;
   }
 
-  function linkEvent(e, teamid, threadId,
-                     sidebar: MsgView.Sidebar,
-                     profiles,
-                     resultView: ResultView) {
-    Api.linkEvent(teamid, threadId, {
-      google_event_id: e.google_event_id
-    })
-      .done(function() {
-        resultView.spinner.attr("style", "display: none");
-        resultView.linked.attr("style", "display: block");
-        MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
-
-        Api.syncEvent(teamid, threadId, e.google_event_id)
-          .done(function() {
-            // TODO Report something, handle failure, etc.
-            MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
-          });
-      });
-  }
-
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
                               teamid, sidebar,
                               profiles: ApiT.Profile[]) {
+    Log.d("renderSearchResult()");
 '''
 <div #view class="esper-ev-result">
   <div class="esper-ev-date">
@@ -43,7 +45,7 @@ module Esper.EvSearch {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="link-event">Link</a>
-  <div #spinner class="link-spinner">
+  <div #spinner class="spinner link-spinner">
     <div class="double-bounce1"></div>
     <div class="double-bounce2"></div>
   </div>
@@ -101,6 +103,7 @@ module Esper.EvSearch {
                                  searchView: SearchView,
                                  sidebar: MsgView.Sidebar,
                                  profiles: ApiT.Profile[]) {
+    Log.d("displayLinkableEvents()");
     var list = $("<div>");
     eventList.forEach(function(e) {
       renderSearchResult(e, linkedEvents, teamid, sidebar, profiles)
@@ -139,6 +142,7 @@ module Esper.EvSearch {
                        searchView: SearchView,
                        sidebar: MsgView.Sidebar,
                        profiles: ApiT.Profile[]) {
+    Log.d("setupSearch()");
     resetSearch(searchView);
     Util.afterTyping(searchView.searchbox, 250, function() {
       if (searchView.searchbox.val().length === 0) {
@@ -199,7 +203,7 @@ module Esper.EvSearch {
       placeholder="Search calendar"/>
     <div #results class="search-results">
       <div #searchInstructions class="search-instructions"/>
-      <div #spinner class="search-spinner">
+      <div #spinner class="spinner search-spinner">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
       </div>

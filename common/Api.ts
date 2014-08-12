@@ -30,14 +30,24 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function linkEvent(teamid, threadId, calEvent):
+  export function linkEventForMe(teamid, threadId, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId
-      + "/" + calEvent.google_event_id;
-    return JsonHttp.put(url, JSON.stringify(calEvent));
+      + "/" + eventId;
+    return JsonHttp.put(url, "");
+  }
+
+  export function linkEventForTeam(teamid, threadId, eventId):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.post(url, "");
   }
 
   export function unlinkEvent(teamid, threadId, eventId):

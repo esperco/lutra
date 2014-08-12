@@ -82,11 +82,18 @@ module Esper.MsgView {
           </li>
         </div>
         <div class="esper-ul-divider"/>
-        <div #syncList class="esper-ev-sync">
-          <li #sectionHeader class="esper-li sync-list ul-section-header">
-            <span class="ul-section-header-text">Description Sync</span>
+        <div #syncOption class="esper-ev-sync">
+          <li class="esper-li sync-list sync-option">
+            <span class="sync-option-text">Description Sync</span>
             <img #info title class="info"/>
+            <input #syncCheckbox type="checkbox" class="sync-checkbox"/>
+            <div #spinner class="spinner sync-spinner">
+              <div class="double-bounce1"></div>
+              <div class="double-bounce2"></div>
+            </div>
           </li>
+          <li #teamSync class="esper-li sync-list sync-users"/>
+          <li #syncNote class="esper-li sync-list sync-note"/>
         </div>
       </ul>
       <span #startTime class="esper-ev-start"/>
@@ -118,45 +125,71 @@ module Esper.MsgView {
       .attr("src", Init.esperRootUrl + "img/info.png")
       .tooltip();
     var position = { my: 'center bottom', at: 'center top-10' };
-    var infoContent = "Team members included in this email conversation " +
-      "can sync their messages to this event's description.";
+    var infoContent = "Automatically synchronizes the event's " +
+      "description with the contents of this email conversation.";
     info
       .tooltip("option", "content", infoContent)
       .tooltip("option", "position", position)
       .tooltip("option", "tooltipClass", "top sync-info");
 
-    List.iter(profiles, function(prof: ApiT.Profile) {
-      var syncInfo = $("<li class='esper-li sync-list sync-row'>");
-      var name = (prof.profile_uid === Login.myUid())
-        ? (prof.display_name + " (Me)")
-        : (prof.display_name);
+    syncCheckbox.change(function() {
+      var apiCall;
+      if(this.checked) apiCall = Api.syncEvent;
+      else apiCall = Api.unsyncEvent;
+      syncCheckbox.attr("style", "display: none");
+      spinner.attr("style", "display: block");
+      apiCall(teamid, threadId, e.google_event_id).done(function() {
+        spinner.attr("style", "display: none");
+        syncCheckbox.attr("style", "display: block");
+        refreshEventList(teamid, threadId, sidebar, profiles);
+      });
+    });
 
+    var currentSynced = false;
+    var syncedUsers = [];
+
+    List.iter(profiles, function(prof) {
       var synced = List.exists(ev.synced_threads, function(x) {
         return x.esper_uid === prof.profile_uid;
       });
-      var syncCheckbox = $("<input type='checkbox' class='sync-checkbox'>")
-        .appendTo(syncInfo);
-      if (synced) syncCheckbox.attr("checked", true);
-      if (prof.profile_uid !== Login.myUid()) {
-        syncInfo.addClass("disabled");
-        syncCheckbox.attr("disabled", true);
-      } else {
-        syncCheckbox.change(function() {
-          var apiCall;
-          if (this.checked)
-            apiCall = Api.syncEvent;
-          else
-            apiCall = Api.unsyncEvent;
-          apiCall(teamid, threadId, e.google_event_id).done(function() {
-            refreshEventList(teamid, threadId, sidebar, profiles);
-          });
-        });
+      if (synced && prof.profile_uid === Login.myUid()) {
+        syncCheckbox.attr("checked", true);
+        currentSynced = true;
+        syncedUsers.unshift("You");
+      } else if (synced) {
+        syncedUsers.push(prof[1].display_name);
       }
-
-      syncInfo
-        .append(name)
-        .appendTo(syncList);
     });
+
+    var teamPhrase = "";
+    if ((syncedUsers.length === 0) ||
+        (syncedUsers.length === 1 && syncedUsers[0] === "You")) {
+      teamPhrase = "No other team members are ";
+      syncNote.attr("style", "display: none");
+    } else if (syncedUsers.length === 1) {
+      teamPhrase = syncedUsers[0] + " is ";
+    } else if (syncedUsers.length === 2) {
+      teamPhrase = syncedUsers[0] + " and " + syncedUsers[1] + " are ";
+    } else {
+      for (var i = 0; i < syncedUsers.length; i++) {
+        if (i < syncedUsers.length - 1)
+          teamPhrase += syncedUsers[i] + ", ";
+        else
+          teamPhrase += "and " + syncedUsers[i] + " are ";
+      }
+    }
+    teamSync.text(teamPhrase += " syncing messages with this event.");
+
+    var notePhrase = "";
+    if (!currentSynced && syncedUsers.length > 0) {
+      notePhrase = "Turn on Description Sync to also include messages from " +
+        "your version of this email conversation. Duplicate messages will be " +
+        "automatically excluded.";
+    } else if (syncedUsers.length > 1) {
+      notePhrase = "Duplicate messages are automatically excluded.";
+    }
+    syncNote.text(notePhrase);
+
 
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
