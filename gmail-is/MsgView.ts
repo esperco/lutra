@@ -54,7 +54,7 @@ module Esper.MsgView {
                        profiles: ApiT.Profile[]) {
 '''
 <div #view class="esper-ev">
-  <div class="esper-ev-date">
+  <div #date class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
   </div>
@@ -120,6 +120,14 @@ module Esper.MsgView {
 
     if (e.title !== undefined)
       title.text(e.title);
+
+    if (e.google_cal_url !== undefined) {
+      date
+        .addClass("esper-clickable")
+        .click(function() {
+          open(e.google_cal_url, "_blank");
+        });
+    }
 
     info
       .attr("src", Init.esperRootUrl + "img/info.png")
