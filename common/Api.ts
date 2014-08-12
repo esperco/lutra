@@ -7,19 +7,22 @@ module Esper.Api {
                          JSON.stringify(serializable));
   }
 
-  export function getLoginInfo() {
+  export function getLoginInfo():
+  JQueryDeferred<ApiT.LoginResponse> {
     return JsonHttp.get(Conf.Api.url + "/api/login/" + Login.myUid() + "/info");
   }
 
-  export function getGoogleProfile(uid, teamid) {
+  export function getProfile(uid, teamid):
+  JQueryDeferred<ApiT.Profile> {
     var url =
-      Conf.Api.url + "/api/google/profile/" + Login.myUid()
+      Conf.Api.url + "/api/profile/" + Login.myUid()
       + "/" + uid
       + "/" + teamid;
     return JsonHttp.get(url);
   }
 
-  export function getLinkedEvents(teamid, threadId) {
+  export function getLinkedEvents(teamid, threadId):
+  JQueryDeferred<ApiT.LinkedCalendarEvents> {
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
@@ -27,7 +30,8 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function linkEventForMe(teamid, threadId, eventId) {
+  export function linkEventForMe(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
       + "/" + teamid
@@ -36,7 +40,8 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
-  export function linkEventForTeam(teamid, threadId, eventId) {
+  export function linkEventForTeam(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
       + "/" + teamid
@@ -45,7 +50,8 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-  export function unlinkEvent(teamid, threadId, eventId) {
+  export function unlinkEvent(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
       + "/" + teamid
@@ -54,7 +60,8 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function syncEvent(teamid, threadId, eventId) {
+  export function syncEvent(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
@@ -63,7 +70,8 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
-  export function unsyncEvent(teamid, threadId, eventId) {
+  export function unsyncEvent(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
@@ -72,7 +80,8 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function deleteLinkedEvent(teamid, threadId, eventId) {
+  export function deleteLinkedEvent(teamid, threadId, eventId):
+  JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/event/" + Login.myUid()
       + "/" + teamid
@@ -81,7 +90,8 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function eventSearch(teamid, query) {
+  export function eventSearch(teamid, query):
+  JQueryDeferred<ApiT.CalendarEventList> {
     var url =
       Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
