@@ -1,11 +1,14 @@
 .PHONY: default setup dev prod dev-build prod-build install zip dropbox clean
 default: dev
 
-dev:
+manifest.json: manifest.json.in VERSION
+	sed -e "s/@@VERSION@@/`cat VERSION`/g" manifest.json.in > $@
+
+dev: manifest.json
 	$(MAKE) dev-build
 	$(MAKE) install
 
-prod:
+prod: manifest.json
 	$(MAKE) prod-build
 	$(MAKE) install
 	$(MAKE) zip
@@ -48,7 +51,7 @@ setup:
 
 # Remove derived files
 clean:
-	rm -rf pub *~ */*~
+	rm -rf pub *~ */*~ manifest.json
 	$(MAKE) -C common clean
 	$(MAKE) -C content-script clean
 	$(MAKE) -C gmail-is clean
