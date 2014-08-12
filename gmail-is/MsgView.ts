@@ -41,8 +41,8 @@ module Esper.MsgView {
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
-    var root = $("<div id='esper' class='esper-sidebar'/>");
+    var anchor = $("body");
+    var root = $("<div id='esper'/>");
     anchor.prepend(root);
     return root;
   }
@@ -263,12 +263,30 @@ module Esper.MsgView {
     teamName: JQuery;
   }
 
+  function displayDock(rootElement,
+                       sidebar,
+                       team: ApiT.Team,
+                       profiles : ApiT.Profile[]) {
+'''
+<div #view class="esper-dock">
+</div>
+'''
+    view.click(function() {
+      if (sidebar.css("display") === "none")
+        sidebar.show("slide", { direction: "down" }, 250);
+      else
+        sidebar.hide("slide", { direction: "down" }, 250);
+    });
+
+    rootElement.append(view);
+  }
+
   function displayLinkedEvents(rootElement,
                                team: ApiT.Team,
                                profiles : ApiT.Profile[],
                                linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
-<div #view>
+<div #view class="esper-sidebar">
   <div class="esper-header">
     <button #add class="esper-dropdown-btn esper-add-btn">
       <img #addIcon class="esper-add-icon"/>
@@ -358,6 +376,8 @@ module Esper.MsgView {
     sidebarLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
     rootElement.append(view);
+
+    return sidebar.view;
   }
 
   function getTeamProfiles(team: ApiT.Team): JQueryDeferred<ApiT.Profile[]> {
@@ -369,7 +389,6 @@ module Esper.MsgView {
       });
     return Deferred.join(l);
   }
-
 
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView(maxRetries) {
@@ -385,7 +404,8 @@ module Esper.MsgView {
           getTeamProfiles(team).done(function(profiles) {
             Api.getLinkedEvents(team.teamid, currentThreadId)
               .done(function(linkedEvents) {
-                displayLinkedEvents(rootElement, team, profiles, linkedEvents);
+                var sidebar = displayLinkedEvents(rootElement, team, profiles, linkedEvents);
+                displayDock(rootElement, sidebar, team, profiles);
               });
           });
         });
