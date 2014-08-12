@@ -157,7 +157,7 @@ module Esper.MsgView {
         currentSynced = true;
         syncedUsers.unshift("You");
       } else if (synced) {
-        syncedUsers.push(prof[1].display_name);
+        syncedUsers.push(prof.display_name);
       }
     });
 
