@@ -31,12 +31,16 @@ DevConf.ts: DevConf.ts.in ../VERSION
 ProdConf.ts: ProdConf.ts.in ../VERSION
 	sed -e "s:@@VERSION@@:`cat ../VERSION`:g" ProdConf.ts.in > $@
 
+conf-pp: DevConf.ts ProdConf.ts
+
 # Use localhost for API calls
-dev-conf: DevConf.ts
+dev-conf:
+	$(MAKE) conf-pp
 	if ! `cmp -s DevConf.ts Conf.ts`; then cp DevConf.ts Conf.ts; fi
 
 # Use app.esper.com for API calls
-prod-conf: ProdConf.ts
+prod-conf:
+	$(MAKE) conf-pp
 	if ! `cmp -s ProdConf.ts Conf.ts`; then cp ProdConf.ts Conf.ts; fi
 
 # Allow a local 'make' after a 'make clean' for dev purposes
