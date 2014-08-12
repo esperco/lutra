@@ -72,13 +72,13 @@ module Esper.ApiT {
     end: CalendarTime;
 
     /* optional fields */
-    meeting_type: string;
-    title: string;
-    description: string;
-    location: Location;
-    all_day: boolean;
-    transparent: boolean;
-    esper_tid: string;
+    google_cal_url?: string;
+    meeting_type?: string;
+    title?: string;
+    description?: string;
+    location?: Location;
+    all_day?: boolean;
+    transparent?: boolean;
   }
 
   export interface SyncedThread {
