@@ -98,7 +98,7 @@ module Esper.Menu {
    */
   export function create() {
 '''
-<div #view class="esper-menu">
+<div #view id="esper-menu" class="esper-menu">
   <img #logo class="esper-dropdown-btn esper-menu-logo"/>
   <div #background class="esper-menu-bg"/>
   <div class="esper-menu-dropdown">
