@@ -1,11 +1,16 @@
 module Esper.Api {
 
-  /* Esper login and password management */
-
   export function echo(serializable) {
     return JsonHttp.post(Conf.Api.url + "/echo",
                          JSON.stringify(serializable));
   }
+
+  export function checkVersion():
+  JQueryDeferred<ApiT.ChromeSupport> {
+    return JsonHttp.get(Conf.Api.url + "/api/support/chrome/" + Conf.version);
+  }
+
+  /* Esper login and password management */
 
   export function getLoginInfo():
   JQueryDeferred<ApiT.LoginResponse> {
