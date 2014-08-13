@@ -122,11 +122,15 @@ module Esper.MsgView {
       title.text(e.title);
 
     if (e.google_cal_url !== undefined) {
+      function openGcal() {
+        open(e.google_cal_url, "_blank");
+      }
       date
         .addClass("esper-clickable")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
+        .click(openGcal);
+      editEvent
+        .removeClass("disabled")
+        .click(openGcal);
     }
 
     info
