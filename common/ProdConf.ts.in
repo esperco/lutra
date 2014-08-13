@@ -1,5 +1,6 @@
 module Esper.Conf {
   export var prod = true;
+  export var version = "@@VERSION@@";
   export module Api {
     export var url = "https://app.esper.com";
   }

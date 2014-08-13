@@ -35,6 +35,23 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
+/*** Generic classes. ***/
+
+/*
+  They can be added or removed using .removeClass and .addClass
+  on jQuery selections.
+*/
+
+/* Use appropriate cursor to indicate that an element is clickable */
+.esper-clickable {
+  cursor: pointer;
+}
+
+/* Hide and collapse any element */
+.esper-hide {
+  display: none;
+}
+
 
 /*** General ***/
 
@@ -109,14 +126,23 @@ li.esper-li, a.esper-a {
 
 .esper-menu-logo {
   float: left;
-  &.white {
+  &.esper-menu-white {
     margin: 2px 3px 1px 4px;
   }
-  &.black {
+  &.esper-menu-black {
     margin: 5px 7px;
     opacity: 0.47;
     &:hover { opacity: 0.85; }
   }
+}
+
+.esper-menu-red {
+  background-color: red;
+  padding: 5px;
+}
+
+.esper-menu-important {
+  font-weight: bold;
 }
 
 .esper-menu-bg {

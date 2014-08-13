@@ -5,6 +5,13 @@ module Esper.ApiT {
     We might want to generate them with atdgen in the future.
   */
 
+  export interface ChromeSupport {
+    requested_version: string;
+    must_upgrade: boolean;
+    minimum_version: string;
+    download_page: string;
+  }
+
   export interface Team {
     teamid: string;
     team_name: string;
@@ -72,13 +79,13 @@ module Esper.ApiT {
     end: CalendarTime;
 
     /* optional fields */
-    meeting_type: string;
-    title: string;
-    description: string;
-    location: Location;
-    all_day: boolean;
-    transparent: boolean;
-    esper_tid: string;
+    google_cal_url?: string;
+    meeting_type?: string;
+    title?: string;
+    description?: string;
+    location?: Location;
+    all_day?: boolean;
+    transparent?: boolean;
   }
 
   export interface SyncedThread {

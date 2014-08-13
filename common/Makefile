@@ -25,12 +25,22 @@ TS_SRC = \
 TS = \
   $(addprefix ts/,$(TS_SRC))
 
+DevConf.ts: DevConf.ts.in ../VERSION
+	sed -e "s:@@VERSION@@:`cat ../VERSION`:g" DevConf.ts.in > $@
+
+ProdConf.ts: ProdConf.ts.in ../VERSION
+	sed -e "s:@@VERSION@@:`cat ../VERSION`:g" ProdConf.ts.in > $@
+
+conf-pp: DevConf.ts ProdConf.ts
+
 # Use localhost for API calls
 dev-conf:
+	$(MAKE) conf-pp
 	if ! `cmp -s DevConf.ts Conf.ts`; then cp DevConf.ts Conf.ts; fi
 
 # Use app.esper.com for API calls
 prod-conf:
+	$(MAKE) conf-pp
 	if ! `cmp -s ProdConf.ts Conf.ts`; then cp ProdConf.ts Conf.ts; fi
 
 # Allow a local 'make' after a 'make clean' for dev purposes
@@ -47,4 +57,4 @@ clean:
 	rm -f *~
 	rm -rf ts/
 	rm -rf js/
-	rm -f Conf.ts
+	rm -f DevConf.ts ProdConf.ts Conf.ts
