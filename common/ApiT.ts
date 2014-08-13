@@ -5,6 +5,13 @@ module Esper.ApiT {
     We might want to generate them with atdgen in the future.
   */
 
+  export interface ChromeSupport {
+    requested_version: string;
+    must_upgrade: boolean;
+    minimum_version: string;
+    download_page: string;
+  }
+
   export interface Team {
     teamid: string;
     team_name: string;

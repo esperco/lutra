@@ -64,12 +64,20 @@ module Esper.Menu {
     return link;
   }
 
-  function makeHyperLink(text, url) {
+  function makeImportantLink(text, url) {
+    return $("<li class='esper-li esper-menu-important'/>")
+      .text(text)
+      .click(function() {
+        open(url, "_blank");
+      });
+  }
+
+  function makePopupLink(text, url) {
     return $("<li class='esper-li'/>")
       .text(text)
       .click(function() {
         popWindow(url, 545, 433)
-       });
+      });
   }
 
   function updateLinks(ul) {
@@ -79,9 +87,9 @@ module Esper.Menu {
       makeActionLink("Disable Esper", Login.logout, true)
       : makeActionLink("Enable Esper", Init.login, false);
 
-    var settingsLink = makeHyperLink("Settings", Conf.Api.url);
+    var settingsLink = makePopupLink("Settings", Conf.Api.url);
 
-    var helpLink = $("<a class='esper-a'>Help</li>")
+    var helpLink = $("<a class='esper-a'>Help</a>")
       .attr("href", "mailto:team@esper.com");
 
     ul.children().remove();
@@ -111,13 +119,13 @@ module Esper.Menu {
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
       logo.attr("src", Init.esperRootUrl + "img/menu-logo-white.png")
-          .addClass("white");
+          .addClass("esper-menu-white");
     } else {
       logo.attr("src", Init.esperRootUrl + "img/menu-logo-black.png")
-          .addClass("black");
+          .addClass("esper-menu-black");
     }
 
-    caret.attr("src", Init.esperRootUrl + "img/caret.png")
+    caret.attr("src", Init.esperRootUrl + "img/caret.png");
 
     updateLinks(dropdown);
 
@@ -131,7 +139,18 @@ module Esper.Menu {
         dropdown.toggle();
         logo.addClass("open");
       }
-    })
+    });
+
+    Api.checkVersion().done(function(status) {
+      if (status.must_upgrade === true) {
+        var li =
+          makeImportantLink("Please upgrade now",
+                            status.download_page);
+        dropdown.prepend(li);
+        logo.addClass("esper-menu-red esper-clickable");
+        logo.removeClass("esper-menu-black esper-menu-white");
+      }
+    });
 
     Util.repeatUntil(100, 1000, function() {
       Log.d("Inserting Esper menu...");
