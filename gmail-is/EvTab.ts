@@ -1,23 +1,5 @@
 module Esper.EvTab {
 
-  function dismissDropdowns() {
-    $(".esper-ul").attr("style", "display: none");
-    $(".esper-menu-bg").attr("style", "display: none");
-    $(".esper-caret").attr("style", "display: none");
-    $(".esper-dropdown-btn").removeClass("open");
-  }
-
-  $(document).on('click', function(e) {
-    var $target = $(e.target);
-    if (!$target.hasClass("esper-dropdown-btn") &&
-        !$target.parent().hasClass("esper-dropdown-btn") &&
-        !$target.hasClass("sync-list") &&
-        !$target.parent().hasClass("sync-list") &&
-        !$target.hasClass("disabled")) {
-        dismissDropdowns();
-    }
-  });
-
   function renderEvent(ev: ApiT.EventWithSyncInfo,
                        teamid: string,
                        threadId: string,
@@ -32,7 +14,7 @@ module Esper.EvTab {
   <div>
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
-      <img #cog class="esper-dropdown-btn esper-ev-cog"/>
+      <img #cog class="esper-click-safe esper-dropdown-btn esper-ev-cog"/>
       <ul #dropdown class="esper-ul esper-ev-dropdown">
         <div class="esper-ev-actions">
           <li #editEvent
@@ -52,19 +34,23 @@ module Esper.EvTab {
             Delete from calendar
           </li>
         </div>
-        <div class="esper-ul-divider"/>
-        <div #syncOption class="esper-ev-sync">
-          <li class="esper-li sync-list sync-option">
-            <span class="sync-option-text">Description Sync</span>
-            <img #info title class="info"/>
-            <input #syncCheckbox type="checkbox" class="sync-checkbox"/>
-            <div #spinner class="spinner sync-spinner">
+        <div class="esper-click-safe esper-ul-divider"/>
+        <div #syncOption class="esper-click-safe esper-ev-sync">
+          <li class="esper-click-safe esper-li sync-list sync-option">
+            <span class="esper-click-safe  sync-option-text">
+              Description Sync
+            </span>
+            <img #info title class="esper-click-safe info"/>
+            <input #syncCheckbox
+                   type="checkbox"
+                   class="esper-click-safe sync-checkbox"/>
+            <div #spinner class="esper-click-safe spinner sync-spinner">
               <div class="double-bounce1"></div>
               <div class="double-bounce2"></div>
             </div>
           </li>
-          <li #teamSync class="esper-li sync-list sync-users"/>
-          <li #syncNote class="esper-li sync-list sync-note"/>
+          <li #teamSync class="esper-click-safe esper-li sync-list sync-users"/>
+          <li #syncNote class="esper-click-safe esper-li sync-list sync-note"/>
         </div>
       </ul>
       <span #startTime class="esper-ev-start"/>
@@ -177,9 +163,9 @@ module Esper.EvTab {
     cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
     cog.click(function() {
       if (cog.hasClass("open")) {
-        dismissDropdowns();
+        MsgView.dismissDropdowns();
       } else {
-        dismissDropdowns();
+        MsgView.dismissDropdowns();
         dropdown.toggle();
         cog.addClass("open");
       }

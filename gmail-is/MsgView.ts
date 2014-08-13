@@ -4,6 +4,18 @@
 module Esper.MsgView {
   export var currentThreadId : string;
 
+  export function dismissDropdowns() {
+    $(".esper-ul").css("display", "none");
+    $(".esper-menu-bg").css("display", "none");
+    $(".esper-caret").css("display", "none");
+    $(".esper-dropdown-btn").removeClass("open");
+  }
+
+  $(document).on('click', function(e) {
+    if (!$(e.target).hasClass("esper-click-safe"))
+      dismissDropdowns();
+  });
+
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
     var anchor = $(".nH.g.id");

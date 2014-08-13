@@ -4,16 +4,6 @@
 */
 
 module Esper.Menu {
-
-  function dismissDropdowns() {
-    if ($(".esper-add-btn").hasClass("open"))
-      $(".no-events-arrow").toggle();
-    $(".esper-ul").attr("style", "display: none");
-    $(".esper-menu-bg").attr("style", "display: none");
-    $(".esper-caret").attr("style", "display: none");
-    $(".esper-dropdown-btn").removeClass("open");
-  }
-
   /*
     Find a good insertion point.
     We return the element containing the name of the logged-in user,
@@ -107,7 +97,7 @@ module Esper.Menu {
   export function create() {
 '''
 <div #view id="esper-menu" class="esper-menu">
-  <img #logo class="esper-dropdown-btn esper-menu-logo"/>
+  <img #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo"/>
   <div #background class="esper-menu-bg"/>
   <div class="esper-menu-dropdown">
     <ul #dropdown class="esper-ul"/>
@@ -131,9 +121,9 @@ module Esper.Menu {
 
     logo.click(function() {
       if (logo.hasClass("open")) {
-        dismissDropdowns();
+        MsgView.dismissDropdowns();
       } else {
-        dismissDropdowns();
+        MsgView.dismissDropdowns();
         background.toggle();
         caret.toggle();
         dropdown.toggle();
