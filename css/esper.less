@@ -30,6 +30,7 @@
 @purple_focus: #c08add;
 @purple_gradient: #a464c6;
 @purple_hover: #8c42ad;
+@purple_hover_light: #be89d7;
 @purple_text: #463c4c;
 @red: #d9534f;
 @red_disabled: #eba8a7;
@@ -64,7 +65,7 @@ ul.esper-ul, li.esper-li { list-style-type: none; }
 ul.esper-ul {
   display: none;
   position: absolute;
-  padding: 7px 0px;
+  padding: 7px 0;
   background: white;
   border: 1px solid @google_border_gray;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -81,7 +82,7 @@ li.esper-li, a.esper-a {
   padding: 7px 16px;
   color: black;
   cursor: pointer;
-  line-height: 1.0;
+  line-height: 1;
   text-align: left;
   &:hover { background: @gray_10; }
   &.danger { color: @red; }
@@ -107,7 +108,7 @@ li.esper-li, a.esper-a {
   height: 30px;
   line-height: 0.8;
   outline: none;
-  padding: 0px 20px;
+  padding: 0 20px;
   cursor: pointer;
   &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
   &:active { background: linear-gradient(@purple_active, @purple_hover); }
@@ -151,8 +152,8 @@ li.esper-li, a.esper-a {
   position: fixed;
   width: 100%;
   height: 100%;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
 }
 
 .esper-caret {
@@ -206,13 +207,42 @@ li.esper-li, a.esper-a {
   height: 36px;
   width: @sidebar_width + 14px;
   margin-top: 7px;
+  padding: 0 4px;
   color: white;
   background: @purple;
-  cursor: pointer;
-  &:hover { background: @purple_hover; }
+  cursor: default;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
-.esper-team-name { padding: 9px; }
+.esper-team-name {
+  float: left;
+  padding: 10px 0 0 10px;
+  font-size: 13px;
+}
+
+.esper-dock-action {
+  float: right;
+  width: 24px;
+  height: 24px;
+  margin: 6px 0;
+  padding: 7px;
+  cursor: pointer;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; 
+  .esper-dock-action-icon { opacity: 0.6; }
+  &:hover {
+    background: @purple_hover_light;
+    .esper-dock-action-icon { opacity: 1; }
+  }
+}
+
+.esper-size-icon {
+  width: 10px;
+  height: 2px;
+  background: white;
+  &.minimize { margin-top: 8px; }
+}
 
 
 /** Sidebar **/
@@ -298,7 +328,7 @@ li.esper-li, a.esper-a {
   cursor: pointer;
   .esper-link-action-icon { float: left; }
   .esper-link-action-text {
-    margin: 3px 0px 0px 32px;
+    margin: 3px 0 0 32px;
     font-size: 13px;
   }
   &:hover .esper-link-action-text { text-decoration: underline; }
@@ -321,7 +351,7 @@ li.esper-li, a.esper-a {
 }
 
 .esper-linked-events {
-  padding: 0px 10px 20px 10px;
+  padding: 0 10px 20px 10px;
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -353,14 +383,14 @@ li.esper-li, a.esper-a {
 .esper-ev-title {
   font-size: 14px;
   margin-left: 48px;
-  padding: 3px 0px 1px 0px;
+  padding: 3px 0 1px 0;
 }
 
 .esper-ev-times {
   color: @gray_60;
   font-size: 13px;
   margin-left: 48px;
-  padding: 1px 0px 2px 0px;
+  padding: 1px 0 2px 0;
 }
 
 .esper-ev-cog {
@@ -368,10 +398,10 @@ li.esper-li, a.esper-a {
   float: right;
   opacity: 0.5;
   cursor: pointer;
-  &:hover { opacity: 1.0; }
+  &:hover { opacity: 1; }
 }
 
-.esper-ev-cog.open { opacity: 1.0; }
+.esper-ev-cog.open { opacity: 1; }
 
 ul.esper-ev-dropdown {
   z-index: 2;
@@ -387,7 +417,7 @@ li.sync-list {
   &:hover { background: none; }
   &.sync-option {
     height: 13px;
-    padding-bottom: 0px;
+    padding-bottom: 0;
   }
   .sync-option-text {
     float: left;
@@ -398,7 +428,7 @@ li.sync-list {
   .info {
     float: left;
     opacity: 0.5;
-    &:hover { opacity: 1.0; }
+    &:hover { opacity: 1; }
   }
   .sync-checkbox {
     float: right;
@@ -419,7 +449,7 @@ li.sync-list {
 
 .esper-footer-logo {
   opacity: 0.7;
-  &:hover { opacity: 1.0; }
+  &:hover { opacity: 1; }
 }
 
 .esper-footer-links {
@@ -481,7 +511,7 @@ li.sync-list {
 .esper-modal-header {
   background: @gray_90;
   color: white;
-  margin: -1px -1px 0px -1px;
+  margin: -1px -1px 0 -1px;
 }
 
 .esper-modal-close-container {
@@ -497,7 +527,7 @@ li.sync-list {
   }
   &:hover {
     background: #737373;
-    .esper-modal-close-icon { opacity: 1.0; }
+    .esper-modal-close-icon { opacity: 1; }
   }
 }
 
@@ -573,14 +603,14 @@ li.sync-list {
   border-top: 1px solid #d8d8d8;
   border-bottom: 1px solid #d8d8d8;
   height: 32px;
-  padding: 16px 16px 0px 0px;
+  padding: 16px 16px 0 0;
 }
 
 .clear-search {
   visibility: hidden;
   opacity: 0.5;
   cursor: pointer;
-  &:hover { opacity: 1.0; }
+  &:hover { opacity: 1; }
 }
 
 .search-results {
@@ -588,7 +618,7 @@ li.sync-list {
   background: white;
   border: 1px solid @google_border_gray;
   border-radius: 2px;
-  margin: 0px 15px;
+  margin: 0 15px;
   overflow:auto;
 }
 
