@@ -57,6 +57,7 @@ SHARED_SOURCES = \
 APP_SOURCES = \
   Menu \
   EvSearch \
+  EvTab \
   MsgView \
   Init \
   Main

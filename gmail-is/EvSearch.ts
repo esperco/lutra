@@ -1,21 +1,21 @@
 module Esper.EvSearch {
 
   function linkEvent(e, teamid, threadId,
-                     eventsTab: MsgView.EventsTab,
+                     eventsTab: EvTab.EventsTab,
                      profiles,
                      resultView: ResultView) {
     Api.linkEventForMe(teamid, threadId, e.google_event_id)
       .done(function() {
         resultView.spinner.attr("style", "display: none");
         resultView.linked.attr("style", "display: block");
-        MsgView.refreshEventList(teamid, threadId, eventsTab, profiles);
+        EvTab.refreshEventList(teamid, threadId, eventsTab, profiles);
 
         Api.linkEventForTeam(teamid, threadId, e.google_event_id)
           .done(function() {
             Api.syncEvent(teamid, threadId, e.google_event_id)
               .done(function() {
                 // TODO Report something, handle failure, etc.
-                MsgView.refreshEventList(teamid, threadId, eventsTab, profiles);
+                EvTab.refreshEventList(teamid, threadId, eventsTab, profiles);
               });
           });
       });
@@ -101,7 +101,7 @@ module Esper.EvSearch {
                                  eventList,
                                  teamid,
                                  searchView: SearchView,
-                                 eventsTab: MsgView.EventsTab,
+                                 eventsTab: EvTab.EventsTab,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
@@ -140,7 +140,7 @@ module Esper.EvSearch {
 
   function setupSearch(events, teamid,
                        searchView: SearchView,
-                       eventsTab: MsgView.EventsTab,
+                       eventsTab: EvTab.EventsTab,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
@@ -183,7 +183,7 @@ module Esper.EvSearch {
   }
 
   export function openSearchModal(linkedEvents, team,
-                                  eventsTab: MsgView.EventsTab,
+                                  eventsTab: EvTab.EventsTab,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>
