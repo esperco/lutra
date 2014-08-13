@@ -5,8 +5,6 @@ module Esper.MsgView {
   export var currentThreadId : string;
 
   function dismissDropdowns() {
-    if ($(".esper-add-btn").hasClass("open"))
-      $(".no-events-arrow").toggle();
     $(".esper-ul").attr("style", "display: none");
     $(".esper-menu-bg").attr("style", "display: none");
     $(".esper-caret").attr("style", "display: none");
@@ -26,7 +24,7 @@ module Esper.MsgView {
 
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
-    var anchor = $("div[role=complementary].nH.adC");
+    var anchor = $(".nH.g.id");
     if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper thread controls.");
       return $();
@@ -41,16 +39,66 @@ module Esper.MsgView {
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = $("body");
+    var anchor = findAnchor();
     var root = $("<div id='esper'/>");
     anchor.prepend(root);
     return root;
   }
 
+  function displayDock(rootElement,
+                       sidebar,
+                       team: ApiT.Team,
+                       profiles : ApiT.Profile[]) {
+'''
+<div #view class="esper-dock-container">
+  <div #wrapLeft class="esper-dock-wrap-left"/>
+  <div #wrapRight class="esper-dock-wrap-right"/>
+  <div class="esper-dock">
+    <div #teamName class="esper-team-name"/>
+  </div>
+  <div #overflow class="esper-overflow" style="display:none">
+    <a href="http://esper.com">
+      <img #sidebarLogo class="esper-footer-logo"/>
+    </a>
+    <div class="esper-footer-links">
+      <a href="mailto:team@esper.com">Help</a>
+      <div class="esper-footer-divider"/>
+      <a href="http://esper.com/privacypolicy.html">Privacy</a>
+      <div class="esper-footer-divider"/>
+      <a href="https://app.esper.com">Settings</a>
+  </div>
+</div>
+'''
+  
+    var name = team.team_name;
+    if (name === null || name === undefined || name === "") {
+      var exec = List.find(profiles, function(prof) {
+        return prof.profile_uid === team.team_executive;
+      });
+      name = exec.display_name;
+    }
+
+    teamName.text(name);
+
+    view.click(function() {
+      if (sidebar.css("display") === "none") {
+        wrapLeft.fadeIn(250);
+        wrapRight.fadeIn(250);
+        sidebar.show("slide", { direction: "down" }, 250);
+      } else {
+        wrapLeft.fadeOut(250);
+        wrapRight.fadeOut(250);
+        sidebar.hide("slide", { direction: "down" }, 250);
+      }
+    });
+
+    rootElement.append(view);
+  }
+
   function renderEvent(ev: ApiT.EventWithSyncInfo,
                        teamid: string,
                        threadId: string,
-                       sidebar: Sidebar,
+                       eventsTab: EventsTab,
                        profiles: ApiT.Profile[]) {
 '''
 <div #view class="esper-ev">
@@ -141,7 +189,7 @@ module Esper.MsgView {
       apiCall(teamid, threadId, e.google_event_id).done(function() {
         spinner.attr("style", "display: none");
         syncCheckbox.attr("style", "display: block");
-        refreshEventList(teamid, threadId, sidebar, profiles);
+        refreshEventList(teamid, threadId, eventsTab, profiles);
       });
     });
 
@@ -207,7 +255,7 @@ module Esper.MsgView {
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.slideUp();
-          refreshEventList(teamid, threadId, sidebar, profiles);
+          refreshEventList(teamid, threadId, eventsTab, profiles);
         });
     });
 
@@ -216,168 +264,133 @@ module Esper.MsgView {
       Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.slideUp();
-          refreshEventList(teamid, threadId, sidebar, profiles);
+          refreshEventList(teamid, threadId, eventsTab, profiles);
         });
     });
 
     return view;
   }
 
-  function displayEventList(events, teamid, threadId, sidebar, profiles) {
-    sidebar.count.text(events.length.toString());
-    sidebar.events.children().remove();
+  function displayEventList(events, teamid, threadId, eventsTab, profiles) {
+    eventsTab.events.children().remove();
     events.forEach(function(e) {
-      sidebar.events.append(renderEvent(e, teamid, threadId,
-                                        sidebar, profiles));
+      eventsTab.events.append(renderEvent(e, teamid, threadId,
+                                          eventsTab, profiles));
     });
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function refreshEventList(teamid, threadId, sidebar, profiles) {
+  export function refreshEventList(teamid, threadId, eventsTab, profiles) {
     Api.getLinkedEvents(teamid, threadId)
       .done(function(linkedEvents) {
         displayEventList(linkedEvents.linked_events, teamid,
-                         threadId, sidebar, profiles);
-        sidebar.count.text(linkedEvents.linked_events.length.toString());
+                         threadId, eventsTab, profiles);
+        // eventsTab.count.text(linkedEvents.linked_events.length.toString());
         if (linkedEvents.linked_events.length === 0)
-          sidebar.noEvents.attr("style", "display: block");
+          eventsTab.noEvents.attr("style", "display: block");
         else
-          sidebar.noEvents.attr("style", "display: none");
+          eventsTab.noEvents.attr("style", "display: none");
       });
   }
 
-  export interface Sidebar {
+  export interface EventsTab {
     view: JQuery;
-    add: JQuery;
-    addIcon: JQuery;
-    count: JQuery;
-    dropdown: JQuery;
+    linkActions: JQuery;
     newEvent: JQuery;
-    existingEvent: JQuery;
-    noEvents: JQuery;
-    arrow: JQuery;
-    noEventsText: JQuery;
+    newEventIcon: JQuery;
+    linkEvent: JQuery;
+    linkEventIcon: JQuery;
     events: JQuery;
+    noEvents: JQuery;
     footer: JQuery;
     sidebarLogo: JQuery;
     teamName: JQuery;
   }
 
-  function displayDock(rootElement,
-                       sidebar,
-                       team: ApiT.Team,
-                       profiles : ApiT.Profile[]) {
-'''
-<div #view class="esper-dock">
-</div>
-'''
-    view.click(function() {
-      if (sidebar.css("display") === "none")
-        sidebar.show("slide", { direction: "down" }, 250);
-      else
-        sidebar.hide("slide", { direction: "down" }, 250);
-    });
-
-    rootElement.append(view);
-  }
-
-  function displayLinkedEvents(rootElement,
+  function displayLinkedEvents(tab1,
                                team: ApiT.Team,
                                profiles : ApiT.Profile[],
                                linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
-<div #view class="esper-sidebar">
-  <div class="esper-header">
-    <button #add class="esper-dropdown-btn esper-add-btn">
-      <img #addIcon class="esper-add-icon"/>
-    </button>
-    <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #dropdown class="esper-ul esper-add-dropdown">
-      <li #newEvent
-          class="esper-li disabled">
-        Create new linked event
-      </li>
-      <li #existingEvent class="esper-li">
-        Link to existing event
-      </li>
-    </ul>
-  </div>
-  <div #noEvents class="esper-ev">
-    <img #arrow class="no-events-arrow"/>
-    <div #noEventsText class="no-events-text"/>
-  </div>
-  <div #events/>
-  <div #footer class="esper-footer">
-    <a href="http://esper.com">
-      <img #sidebarLogo class="esper-footer-logo"/>
-    </a>
-    <div class="esper-footer-links">
-      <a href="mailto:team@esper.com">Help</a>
-      <div class="esper-footer-divider"/>
-      <a href="http://esper.com/privacypolicy.html">Privacy</a>
-      <div class="esper-footer-divider"/>
-      <a href="https://app.esper.com">Settings</a>
+<div #view>
+  <div #linkActions class="esper-link-actions">
+    <div #newEvent class="esper-link-action">
+      <img #newEventIcon class="esper-link-action-icon"/>
+      <div class="esper-link-action-text">Create new linked event</div>
     </div>
-    <div>
-      <div #teamName class="esper-team-name"/>
-      <div class="copyright">&copy; 2014 Esper</div>
+    <div #linkEvent class="esper-link-action">
+      <img #linkEventIcon class="esper-link-action-icon"/>
+      <div class="esper-link-action-text">Link to existing event</div>
     </div>
   </div>
-
+  <div #noEvents class="esper-no-events">No linked events</div>
+  <div #events class="esper-linked-events"/>
 </div>
 '''
-    var sidebar = <Sidebar> _view;
-    addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
-    add.click(function() {
-      if (add.hasClass("open")) {
-        dismissDropdowns();
-      } else {
-        dismissDropdowns();
-        arrow.toggle();
-        dropdown.toggle();
-        add.addClass("open");
-      }
-    })
 
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      assisting = exec.display_name;
-    }
-    var possessive = (assisting.slice(-1) === "s")
-        ? (assisting + "'")
-        : (assisting + "'s");
+    var eventsTab = <EventsTab> _view;
 
-    arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
-    noEventsText.text("Click here to link this email conversation " +
-      "to events on " + possessive + " calendar.");
+    newEventIcon.attr("src", Init.esperRootUrl + "img/new-event.png");
+    linkEventIcon.attr("src", Init.esperRootUrl + "img/link-event.png");
+
     if (linkedEvents.linked_events.length === 0)
       noEvents.attr("style", "display: block");
-    else
-      noEvents.attr("style", "display: none");
 
     displayEventList(
       linkedEvents.linked_events,
       team.teamid,
       currentThreadId,
-      sidebar,
+      eventsTab,
       profiles
     );
 
-    teamName.text("Assisting " + assisting);
-
-    existingEvent.click(function() {
-      EvSearch.openSearchModal(linkedEvents, team, possessive,
-                               sidebar, profiles);
+    linkEvent.click(function() {
+      EvSearch.openSearchModal(linkedEvents, team, eventsTab, profiles);
     });
 
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+    tab1.append(view);
+  }
+
+  function displaySidebar(rootElement,
+                          team: ApiT.Team,
+                          profiles : ApiT.Profile[],
+                          linkedEvents: ApiT.LinkedCalendarEvents) {
+'''
+<div #view class="esper-sidebar">
+  <ul class="esper-tab-links">
+    <li class="active"><a #tab1 href="#tab1">Events</a></li>
+    <li><a #tab2 href="#tab2">Polls</a></li>
+    <li><a #tab3 href="#tab3">People</a></li>
+  </ul>
+  <div class="esper-tab-content">
+    <div #content1 id="tab1" class="tab active"/>
+    <div #content2 id="tab2" class="tab"/>
+    <div #content3 id="tab3" class="tab"/>
+  </div>
+</div>
+'''
+
+    tab1.click(function() {
+      switchTab(tab1);
+    })
+    tab2.click(function() {
+      switchTab(tab2);
+    })
+    tab3.click(function() {
+      switchTab(tab3);
+    })
+
+    function switchTab(tab) {
+      var currentAttrValue = tab.attr("href");
+      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
+      tab.parent('li').addClass('active').siblings().removeClass('active');
+    };
+
+    displayLinkedEvents(content1, team, profiles, linkedEvents);
 
     rootElement.append(view);
 
-    return sidebar.view;
+    return view;
   }
 
   function getTeamProfiles(team: ApiT.Team): JQueryDeferred<ApiT.Profile[]> {
@@ -404,8 +417,10 @@ module Esper.MsgView {
           getTeamProfiles(team).done(function(profiles) {
             Api.getLinkedEvents(team.teamid, currentThreadId)
               .done(function(linkedEvents) {
-                var sidebar = displayLinkedEvents(rootElement, team, profiles, linkedEvents);
+                var sidebar = displaySidebar(rootElement, team,
+                                             profiles, linkedEvents);
                 displayDock(rootElement, sidebar, team, profiles);
+                sidebar.show("slide", { direction: "down" }, 250);
               });
           });
         });

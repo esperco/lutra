@@ -1,21 +1,21 @@
 module Esper.EvSearch {
 
   function linkEvent(e, teamid, threadId,
-                     sidebar: MsgView.Sidebar,
+                     eventsTab: MsgView.EventsTab,
                      profiles,
                      resultView: ResultView) {
     Api.linkEventForMe(teamid, threadId, e.google_event_id)
       .done(function() {
         resultView.spinner.attr("style", "display: none");
         resultView.linked.attr("style", "display: block");
-        MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+        MsgView.refreshEventList(teamid, threadId, eventsTab, profiles);
 
         Api.linkEventForTeam(teamid, threadId, e.google_event_id)
           .done(function() {
             Api.syncEvent(teamid, threadId, e.google_event_id)
               .done(function() {
                 // TODO Report something, handle failure, etc.
-                MsgView.refreshEventList(teamid, threadId, sidebar, profiles);
+                MsgView.refreshEventList(teamid, threadId, eventsTab, profiles);
               });
           });
       });
@@ -35,7 +35,7 @@ module Esper.EvSearch {
   }
 
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
-                              teamid, sidebar,
+                              teamid, eventsTab,
                               profiles: ApiT.Profile[]) {
     Log.d("renderSearchResult()");
 '''
@@ -79,7 +79,7 @@ module Esper.EvSearch {
     link.click(function() {
       spinner.attr("style", "display: block");
       link.attr("style", "display: none");
-      linkEvent(e, teamid, threadId, sidebar, profiles, resultView);
+      linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
     });
 
     check.attr("src", Init.esperRootUrl + "img/check.png");
@@ -101,12 +101,12 @@ module Esper.EvSearch {
                                  eventList,
                                  teamid,
                                  searchView: SearchView,
-                                 sidebar: MsgView.Sidebar,
+                                 eventsTab: MsgView.EventsTab,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
     eventList.forEach(function(e) {
-      renderSearchResult(e, linkedEvents, teamid, sidebar, profiles)
+      renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
         .appendTo(list);
     });
     searchView.clear.attr("style", "visibility: visible");
@@ -140,7 +140,7 @@ module Esper.EvSearch {
 
   function setupSearch(events, teamid,
                        searchView: SearchView,
-                       sidebar: MsgView.Sidebar,
+                       eventsTab: MsgView.EventsTab,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
@@ -160,7 +160,7 @@ module Esper.EvSearch {
       Api.eventSearch(teamid, searchView.searchbox.val())
         .done(function(results) {
           displayLinkableEvents(events, results.events, teamid,
-                                searchView, sidebar, profiles);
+                                searchView, eventsTab, profiles);
         });
     });
   }
@@ -182,8 +182,8 @@ module Esper.EvSearch {
     done: JQuery;
   }
 
-  export function openSearchModal(linkedEvents, team, possessive,
-                                  sidebar: MsgView.Sidebar,
+  export function openSearchModal(linkedEvents, team,
+                                  eventsTab: MsgView.EventsTab,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>
@@ -226,7 +226,7 @@ module Esper.EvSearch {
     title.text("Link to existing event");
 
     setupSearch(linkedEvents.linked_events, team.teamid,
-                searchView, sidebar, profiles);
+                searchView, eventsTab, profiles);
 
     var searchBgUrl = Init.esperRootUrl + "img/search.png";
     searchbox.attr(
@@ -236,6 +236,18 @@ module Esper.EvSearch {
 
     clear.attr("src", Init.esperRootUrl + "img/clear.png");
     clear.click(function() { resetSearch(_view) });
+
+    var assisting = team.team_name;
+    if (assisting === null || assisting === undefined || assisting === "") {
+      var exec = List.find(profiles, function(prof) {
+        return prof.profile_uid === team.team_executive;
+      });
+      assisting = exec.display_name;
+    }
+    var possessive = (assisting.slice(-1) === "s")
+        ? (assisting + "'")
+        : (assisting + "'s");
+
     searchInstructions.text("Start typing above to find upcoming events on " +
       possessive + " calendar.");
 

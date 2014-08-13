@@ -5,6 +5,8 @@
 @blue_bg: #dfeff7;
 @border: #ebebeb;
 @dark_gray: #282828;
+@google_bg_gray: #f5f5f5;
+@google_border_gray: #d8d8d8;
 @gray_f8: #f8f8f8;
 @gray_05: #f1f2f2;
 @gray_10: #e6e7e8;
@@ -36,6 +38,8 @@
 
 /*** General ***/
 
+@sidebar_width: 248px;
+
 a { text-decoration: none; }
 
 ul.esper-ul, li.esper-li { list-style-type: none; }
@@ -45,7 +49,7 @@ ul.esper-ul {
   position: absolute;
   padding: 7px 0px;
   background: white;
-  border: 1px solid @gray_20;
+  border: 1px solid @google_border_gray;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   .esper-ul-divider {
@@ -71,39 +75,14 @@ li.esper-li, a.esper-a {
   }
 }
 
-.nH.adC {
-  top: 0px !important;
-}
-
-.esper-dock {
-  z-index: 5;
-  height: 36px;
-  width: 250px;
-  position: absolute;
-  right: 14px;
-  bottom: 0;
-  background: @purple;
-  cursor: pointer;
-  &:hover { background: @purple_hover; }
-}
-
-.esper-sidebar {
-  display: none;
-  z-index: 4;
-  width: 250px;
-  position: absolute;
-  top: 108px;
-  right: 14px;
-  bottom: 0;
-  background: white;
-}
+.dw .nH .nH .no { margin-right: 256px; }
 
 
 /** Buttons **/
 
 .primary-btn {
   background: linear-gradient(@purple, @purple_hover);
-  border: 1px solid @purple_active;
+  border: 1px solid @google_border_gray;
   border-radius: 3px;
   color: white;
   font-size: 13px;
@@ -170,73 +149,160 @@ li.esper-li, a.esper-a {
 }
 
 
-/** Sidebar Header **/
+/*** Esper Dock ***/
 
-.esper-header {
-  height: 27px;
-  padding: 7px 0px 7px 4px;
-  border-bottom: 1px solid #d8d8d8;
+.esper-dock-container {
+  z-index: 5;
+  position: absolute;
+  right: 14px;
+  bottom: 0;
 }
 
-.esper-add-btn {
+.esper-dock-wrap-left {
+  float: left;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 7px 7px;
+  border-color: transparent transparent @purple_active transparent;
+}
+
+.esper-dock-wrap-right {
   float: right;
-  z-index: 1;
-  background: linear-gradient(#f5f5f5, #f1f1f1);
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 2px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 0 0 7px;
+  border-color: transparent transparent transparent @purple_active;
+}
+
+.esper-dock {
+  height: 36px;
+  width: @sidebar_width + 14px;
+  margin-top: 7px;
   color: white;
+  background: @purple;
   cursor: pointer;
-  height: 27px;
-  outline: none;
-  padding: 5px 10px;
-  .esper-add-icon { opacity: 0.75; }
-  &:hover {
-    background: linear-gradient(#f8f8f8, #f1f1f1);
-    border-color: #c6c6c6;
-    .esper-add-icon { opacity: 0.9; }
+  &:hover { background: @purple_hover; }
+}
+
+.esper-team-name { padding: 9px; }
+
+
+/** Sidebar **/
+
+.esper-sidebar {
+  display: none;
+  z-index: 4;
+  width: @sidebar_width;
+  position: absolute;
+  top: 10px;
+  right: 21px;
+  bottom: 0;
+  background: white;
+}
+
+.esper-tab-links {
+  margin: 0;
+  padding-left: 18px;
+  border-bottom: 1px solid @gray_20;
+  li {
+    float:left;
+    list-style:none;
+  }
+  a {
+    width: 72px;
+    height: 32px;
+    display: inline-block;
+    margin: 0 0 -1px -1px;
+    padding: 5px 7px;
+    border: 1px solid @google_border_gray;
+    background: white;
+    color: @gray_40;
+    text-align: center;
+    transition: all linear 0.15s;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box; 
+    &:hover { background: @gray_10; }
+  }
+  li.active a, li.active a:hover {
+    background: @google_bg_gray;
+    border-bottom: none;
+    color: black;
+    cursor: default;
+  }
+  a:hover {
+    color: black;
+  }
+  &:after {
+    display:block;
+    clear:both;
+    content:'';
   }
 }
 
-.esper-add-btn.open {
-  background: linear-gradient(#eee, #e0e0e0);
-  border-color: #ccc;
-  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-          box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-  .esper-add-icon { opacity: 0.9; }
-}
-
-ul.esper-add-dropdown {
-  z-index: 2;
-  font-size: 13px;
-  margin-top: 3px;
-  right: 0;
-}
-
-.esper-title {
-  font-size: 16px;
-  padding-top: 6px;
+.esper-tab-content {
+  position: absolute;
+  width: @sidebar_width;
+  top: 32px;
+  bottom: 36px;
+  background: white;
+  border-left: 1px solid @gray_20;
+  border-right: 1px solid @gray_20;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; 
+  .tab { display:none; }
+  .tab.active { display:block; }
 }
 
 
 /** Sidebar Events **/
 
-.esper-ev {
-  padding: 14px 4px 16px 4px;
+.esper-link-actions {
+  padding: 5px 15px;
+  background: @google_bg_gray;
   border-bottom: 1px solid #d8d8d8;
 }
 
-.no-events-arrow {
-  float: right;
-  margin-top: -26px;
-  margin-right: 54px;
+.esper-link-action {
+  height: 22px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  color: @purple;
+  cursor: pointer;
+  .esper-link-action-icon { float: left; }
+  .esper-link-action-text {
+    margin: 3px 0px 0px 32px;
+    font-size: 13px;
+  }
+  &:hover .esper-link-action-text { text-decoration: underline; }
 }
 
-.no-events-text {
-  color: @gray_40;
-  font-size: 14px;
-  line-height: 1.4;
-  margin: 6px 0px;
+.esper-no-events,
+.esper-linked-events {
+  position: absolute;
+  width: 100%;
+  top: 83px;
+  bottom: 0;
+}
+
+.esper-no-events {
+  display: none;
+  color: @gray_20;
+  font-size: 18px;
+  padding-top: 100px;
   text-align: center;
+}
+
+.esper-linked-events {
+  padding: 0px 10px 20px 10px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.esper-ev {
+  padding: 14px 4px 16px 4px;
+  border-bottom: 1px solid #d8d8d8;
 }
 
 .esper-ev-date {
@@ -349,7 +415,6 @@ li.sync-list {
   border-right: 1px solid @gray_10;
 }
 
-.esper-team-name,
 .copyright {
   color: @gray_30;
   font-size: 11px;
@@ -371,7 +436,7 @@ li.sync-list {
   outline: none;
   background: #fbfafc;
   opacity: 1;
-  border: 1px solid #d8d8d8;
+  border: 1px solid @google_border_gray;
   webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.2);
          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
@@ -495,7 +560,7 @@ li.sync-list {
 .search-results {
   height: 240px;
   background: white;
-  border: 1px solid #d8d8d8;
+  border: 1px solid @google_border_gray;
   border-radius: 2px;
   margin: 0px 15px;
   overflow:auto;
