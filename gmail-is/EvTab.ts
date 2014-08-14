@@ -92,8 +92,8 @@ module Esper.EvTab {
     }
 
     date.tooltip({
-      show: { delay: 500, duration: "fast"},
-      hide: { duration: "fast"},
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
       "content": "Open in Google Calendar",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "top esper-tooltip"
@@ -104,8 +104,8 @@ module Esper.EvTab {
     info
       .attr("src", Init.esperRootUrl + "img/info.png")
       .tooltip({
-        show: { duration: "fast"},
-        hide: { duration: "fast"},
+        show: { effect: "none" },
+        hide: { effect: "none" },
         "content": infoContent,
         "position": { my: 'center bottom', at: 'center top-5' },
         "tooltipClass": "top sync-info"

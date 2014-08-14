@@ -201,7 +201,12 @@ li.esper-li, a.esper-a {
   bottom: 0;
 }
 
-.esper-dock-wrap { height: 7px; }
+.esper-dock-wrap {
+  position: absolute;
+  bottom: 36px;
+  width: @sidebar_width + 14px;
+  height: 7px;
+}
 
 .esper-dock-wrap-left {
   float: left;
@@ -239,7 +244,6 @@ li.esper-li, a.esper-a {
 }
 
 .esper-dock-action {
-  
   width: 24px;
   height: 24px;
   margin: 6px 0;
@@ -278,7 +282,10 @@ li.esper-li, a.esper-a {
   &.minimize { margin-top: 8px; }
 }
 
-.esper-options-menu { margin: 0 20px 0 0; }
+.esper-options-menu {
+  position: relative;
+  margin: 0 20px 0 0;
+}
 
 .esper-team-list-checkmark {
   float: right;
@@ -352,22 +359,22 @@ li.esper-li.selected:hover .esper-team-list-email { color: @gray_60; }
     padding: 5px 7px;
     border: 1px solid @google_border_gray;
     background: white;
-    color: @gray_40;
     text-align: center;
     transition: all linear 0.15s;
     -webkit-box-sizing: border-box;
-            box-sizing: border-box; 
-    &:hover { background: @gray_10; }
+            box-sizing: border-box;
+    .esper-tab-icon { opacity: 0.4; }
+    &:hover {
+      background: @gray_10;
+      .esper-tab-icon { opacity: 0.6; }
+    }
   }
   li.active a, li.active a:hover {
     background: @gray_f8;
     border-bottom: none;
-    color: black;
     cursor: default;
-  }
-  a:hover {
-    color: black;
-  }
+    .esper-tab-icon { opacity: 1; }
+  }  
   &:after {
     display:block;
     clear:both;
@@ -491,7 +498,7 @@ ul.esper-ev-dropdown {
   z-index: 2;
   position: absolute;
   right: 0;
-  margin: 22px 10px 22px 22px;
+  margin: 14px 10px 22px 22px;
 }
 
 .sync-option {

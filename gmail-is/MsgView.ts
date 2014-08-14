@@ -59,6 +59,10 @@ module Esper.MsgView {
                        profiles : ApiT.Profile[]) {
 '''
 <div #view class="esper-dock-container">
+  <div #wrap class="esper-dock-wrap">
+    <div #wrapLeft class="esper-dock-wrap-left"/>
+    <div #wrapRight class="esper-dock-wrap-right"/>
+  </div>
   <ul #dropdown class="esper-ul esper-options-menu">
     <div class="esper-dropdown-section">
       <li class="esper-click-safe esper-li disabled esper-team-list-title">
@@ -95,10 +99,6 @@ module Esper.MsgView {
       </div>
     </div>
   </ul>
-  <div #wrap class="esper-dock-wrap">
-    <div #wrapLeft class="esper-dock-wrap-left"/>
-    <div #wrapRight class="esper-dock-wrap-right"/>
-  </div>
   <div class="esper-dock">
     <div #options title
          class="esper-click-safe esper-dock-action
@@ -131,16 +131,16 @@ module Esper.MsgView {
     footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
     options.tooltip({
-      show: { delay: 500, duration: "fast"},
-      hide: { duration: "fast"},
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
       "content": "Options",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "top esper-tooltip"
     });
 
     size.tooltip({
-      show: { delay: 500, duration: "fast"},
-      hide: { duration: "fast"},
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
       "content": "Minimize",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "top esper-tooltip"
@@ -149,10 +149,13 @@ module Esper.MsgView {
     function toggleOptions() {
       if (options.hasClass("open")) {
         dismissDropdowns();
+        options.tooltip("enable");
       } else {
         dismissDropdowns();
         dropdown.toggle();
-        options.addClass("open");
+        options
+          .addClass("open")
+          .tooltip("disable");
       }
     }
 
@@ -203,9 +206,11 @@ module Esper.MsgView {
 '''
 <div #view class="esper-sidebar">
   <ul class="esper-tab-links">
-    <li class="active"><a #tab1 href="#tab1">Events</a></li>
-    <li><a #tab2 href="#tab2">Polls</a></li>
-    <li><a #tab3 href="#tab3">People</a></li>
+    <li class="active"><a #tab1 href="#tab1">
+      <img #calendar class="esper-tab-icon"/>
+    </a></li>
+    <li><a #tab2 href="#tab2"><img #polls class="esper-tab-icon"/></a></li>
+    <li><a #tab3 href="#tab3"><img #person class="esper-tab-icon"/></a></li>
   </ul>
   <div class="esper-tab-content">
     <div #content1 id="tab1" class="tab active"/>
@@ -224,6 +229,10 @@ module Esper.MsgView {
     tab3.click(function() {
       switchTab(tab3);
     })
+
+    calendar.attr("src", Init.esperRootUrl + "img/calendar.png");
+    polls.attr("src", Init.esperRootUrl + "img/polls.png");
+    person.attr("src", Init.esperRootUrl + "img/person.png");
 
     function switchTab(tab) {
       var currentAttrValue = tab.attr("href");
@@ -261,15 +270,20 @@ module Esper.MsgView {
         currentThreadId = threadId;
         Log.d("Using new thread ID " + threadId);
         var rootElement = insertEsperRoot();
-        Login.myTeams().forEach(function(team) {
-          getTeamProfiles(team).done(function(profiles) {
-            Api.getLinkedEvents(team.teamid, currentThreadId)
-              .done(function(linkedEvents) {
-                var sidebar = displaySidebar(rootElement, team,
-                                             profiles, linkedEvents);
-                displayDock(rootElement, sidebar, team, profiles);
-                sidebar.show("slide", { direction: "down" }, 250);
-              });
+        if (rootElement === undefined) {
+          return false;
+        }
+        else {
+          Login.myTeams().forEach(function(team) {
+            getTeamProfiles(team).done(function(profiles) {
+              Api.getLinkedEvents(team.teamid, threadId)
+                .done(function(linkedEvents) {
+                  var sidebar = displaySidebar(rootElement, team,
+                                               profiles, linkedEvents);
+                  displayDock(rootElement, sidebar, team, profiles);
+                  sidebar.show("slide", { direction: "down" }, 250);
+                });
+            });
           });
           return true;
         }
