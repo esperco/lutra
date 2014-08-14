@@ -42,9 +42,13 @@ module Esper.MsgView {
   function insertEsperRoot() {
     removeEsperRoot();
     var anchor = findAnchor();
-    var root = $("<div id='esper' class='esper-sidebar'/>");
-    anchor.prepend(root);
-    return root;
+    if (anchor.length === 1) {
+      var root = $("<div id='esper' class='esper-sidebar'/>");
+      anchor.prepend(root);
+      return root;
+    }
+    else
+      return;
   }
 
   function renderEvent(ev: ApiT.EventWithSyncInfo,
@@ -146,8 +150,10 @@ module Esper.MsgView {
 
     syncCheckbox.change(function() {
       var apiCall;
-      if(this.checked) apiCall = Api.syncEvent;
-      else apiCall = Api.unsyncEvent;
+      if (this.checked)
+        apiCall = Api.syncEvent;
+      else
+        apiCall = Api.unsyncEvent;
       syncCheckbox.attr("style", "display: none");
       spinner.attr("style", "display: block");
       apiCall(teamid, threadId, e.google_event_id).done(function() {
@@ -384,41 +390,48 @@ module Esper.MsgView {
 
 
   /* We do something if we detect a new msg ID. */
-  function maybeUpdateView(maxRetries) {
-    Log.d("maybeUpdateView("+maxRetries+")");
-    var emailData = gmail.get.email_data();
-    if (emailData !== undefined && emailData.first_email !== undefined) {
-      var threadId = emailData.first_email;
-      if (currentThreadId !== threadId) {
+  function maybeUpdateView() {
+    function retry() {
+      Log.d("Trying to display Esper sidebar...");
+      var emailData = gmail.get.email_data();
+
+      if (emailData !== undefined && emailData.first_email !== undefined) {
+        var threadId = emailData.first_email;
         currentThreadId = threadId;
-        Log.d("Using new thread ID " + currentThreadId);
+        Log.d("Using new thread ID " + threadId);
         var rootElement = insertEsperRoot();
-        Login.myTeams().forEach(function(team) {
-          getTeamProfiles(team).done(function(profiles) {
-            Api.getLinkedEvents(team.teamid, currentThreadId)
-              .done(function(linkedEvents) {
-                displayLinkedEvents(rootElement, team, profiles, linkedEvents);
-              });
+        if (rootElement === undefined) {
+          return false;
+        }
+        else {
+          Login.myTeams().forEach(function(team) {
+            getTeamProfiles(team).done(function(profiles) {
+              Api.getLinkedEvents(team.teamid, threadId)
+                .done(function(linkedEvents) {
+                  displayLinkedEvents(rootElement, team,
+                                      profiles, linkedEvents);
+                });
+            });
           });
-        });
+          return true;
+        }
       }
+      else
+        return false;
     }
-    else {
-      /* retry every second, up to 10 times. */
-      if (maxRetries > 0)
-        setTimeout(maybeUpdateView, 1000, maxRetries - 1);
-    }
+
+    Util.repeatUntil(30, 300, retry);
   }
 
   function listen() {
     gmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
-      maybeUpdateView(10);
+      maybeUpdateView();
     });
     window.onhashchange = function() {
-      // TODO Actually check hash?
-      Log.d("Left email message view");
+      Log.d("URL changed");
       currentThreadId = null;
+      maybeUpdateView();
     };
   }
 
@@ -429,7 +442,7 @@ module Esper.MsgView {
       alreadyInitialized = true;
       Log.d("MsgView.init()");
       listen();
-      maybeUpdateView(10);
+      maybeUpdateView();
     }
   }
 }
