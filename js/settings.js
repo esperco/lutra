@@ -195,12 +195,17 @@ var settings = (function() {
     return view;
   }
 
-
   mod.load = function() {
 '''
 <div #view>
   <div class="settings-block">
     <h1>Settings</h1>
+  </div>
+  <div class="settings-block">
+    Make sure you&apos;ve installed the
+    <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
+       target="_blank">Esper extension</a>
+    for Google Chrome browsers.
   </div>
   <div class="settings-block-gray">
     <div class="settings-block">
