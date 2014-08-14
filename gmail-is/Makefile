@@ -58,6 +58,8 @@ APP_SOURCES = \
   Menu \
   EvSearch \
   EvTab \
+  Tab2Content \
+  Tab3Content \
   MsgView \
   Init \
   Main

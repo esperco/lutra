@@ -30,20 +30,6 @@ module Esper.Menu {
       return false;
   }
 
-  function popWindow(url, width, height) {
-    /* Allow for borders. */
-    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
-    /* Allow for title and status bars. */
-    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
-
-    window.open(
-      url, "Window2", "status=no,height="
-        + height + ",width=" + width + ",resizable=yes,left="
-        + leftPosition + ",top=" + topPosition + ",screenX="
-        + leftPosition + ",screenY=" + topPosition
-        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
-  }
-
   function makeActionLink(text, action, danger) {
     var link = $("<li class='esper-li'/>")
       .text(text)
@@ -66,16 +52,16 @@ module Esper.Menu {
     return $("<li class='esper-li'/>")
       .text(text)
       .click(function() {
-        popWindow(url, 545, 433)
+        MsgView.popWindow(url, 545, 433);
       });
   }
 
   function updateLinks(ul) {
     var loggedIn = Login.loggedIn();
 
-    var enableLink = loggedIn?
-      makeActionLink("Disable Esper", Login.logout, true)
-      : makeActionLink("Enable Esper", Init.login, false);
+    var signInLink = loggedIn?
+      makeActionLink("Sign out", Login.logout, true)
+      : makeActionLink("Sign in", Init.login, false);
 
     var settingsLink = makePopupLink("Settings", Conf.Api.url);
 
@@ -84,7 +70,7 @@ module Esper.Menu {
 
     ul.children().remove();
     ul
-      .append(enableLink)
+      .append(signInLink)
       .append(settingsLink)
       .append(helpLink);
   }
@@ -99,8 +85,8 @@ module Esper.Menu {
 <div #view id="esper-menu" class="esper-menu">
   <img #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo"/>
   <div #background class="esper-menu-bg"/>
-  <div class="esper-menu-dropdown">
-    <ul #dropdown class="esper-ul"/>
+  <div class="esper-menu-dropdown esper-dropdown-section">
+    <ul #dropdown class="esper-ul esper-menu-dropdown"/>
     <img #caret class="esper-caret"/>
   </div>
 </div>

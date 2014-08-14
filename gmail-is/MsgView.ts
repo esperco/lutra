@@ -4,6 +4,20 @@
 module Esper.MsgView {
   export var currentThreadId : string;
 
+  export function popWindow(url, width, height) {
+    /* Allow for borders. */
+    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
+    /* Allow for title and status bars. */
+    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
+
+    window.open(
+      url, "Window2", "status=no,height="
+        + height + ",width=" + width + ",resizable=yes,left="
+        + leftPosition + ",top=" + topPosition + ",screenX="
+        + leftPosition + ",screenY=" + topPosition
+        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
+  }
+
   export function dismissDropdowns() {
     $(".esper-ul").css("display", "none");
     $(".esper-menu-bg").css("display", "none");
@@ -45,28 +59,57 @@ module Esper.MsgView {
                        profiles : ApiT.Profile[]) {
 '''
 <div #view class="esper-dock-container">
-  <div #wrapLeft class="esper-dock-wrap-left"/>
-  <div #wrapRight class="esper-dock-wrap-right"/>
-  <div class="esper-dock">
-    <div #teamName class="esper-team-name"/>
-    <div #overflow class="esper-dock-action">
-      <div #overflowIcon class="esper-dock-action-icon"/>
+  <ul #dropdown class="esper-ul esper-options-menu">
+    <div class="esper-dropdown-section">
+      <li class="esper-click-safe esper-li disabled esper-team-list-title">
+        TEAMS
+      </li>
+      <li class="esper-click-safe esper-li selected">
+        <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+        <div #teamListName class="esper-click-safe esper-team-list-name"/>
+        <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
+      </li>
+      <li #example class="esper-li example">
+        <img #teamListCheckEx class="esper-team-list-checkmark"/>
+        <div class="esper-team-list-name">Another Exec</div>
+        <div class="esper-team-list-email">anotherexec@company.com</div>
+      </li>
     </div>
-    <div #size class="esper-dock-action">
-      <div #sizeIcon
-           class="esper-dock-action-icon esper-size-icon minimize"/>
+    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-dropdown-section">
+      <li #settings class="esper-li">Settings</li>
+      <a #help class="esper-a" href="mailto:team@esper.com">Help</a>
+      <li #signOut class="esper-li danger">Sign out</li>
     </div>
+    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
+      <a href="http://esper.com">
+        <img #footerLogo class="esper-click-safe esper-footer-logo"/>
+      </a>
+      <div class="esper-click-safe esper-dropdown-footer-links">
+        <a href="http://esper.com/privacypolicy.html">Privacy</a>
+        <div class="esper-click-safe esper-dropdown-footer-divider"/>
+        <a href="http://esper.com/termsofuse.html">Terms</a>
+        <div class="esper-click-safe esper-dropdown-footer-divider"/>
+        <span class="esper-click-safe esper-copyright">&copy; 2014 Esper</span>
+      </div>
+    </div>
+  </ul>
+  <div #wrap class="esper-dock-wrap">
+    <div #wrapLeft class="esper-dock-wrap-left"/>
+    <div #wrapRight class="esper-dock-wrap-right"/>
   </div>
-  <div class="esper-overflow" style="display:none">
-    <a href="http://esper.com">
-      <img #sidebarLogo class="esper-footer-logo"/>
-    </a>
-    <div class="esper-footer-links">
-      <a href="mailto:team@esper.com">Help</a>
-      <div class="esper-footer-divider"/>
-      <a href="http://esper.com/privacypolicy.html">Privacy</a>
-      <div class="esper-footer-divider"/>
-      <a href="https://app.esper.com">Settings</a>
+  <div class="esper-dock">
+    <div #options title
+         class="esper-click-safe esper-dock-action
+                esper-dropdown-btn esper-options">
+      <div #optionsIcon
+           class="esper-click-safe esper-dock-action-icon esper-options-icon"/>
+    </div>
+    <div #teamName class="esper-team-name"/>
+    <div #size title class="esper-dock-action esper-size">
+      <div #sizeIcon class="esper-dock-action-icon esper-size-icon minimize"/>
+    </div>
   </div>
 </div>
 '''
@@ -79,19 +122,75 @@ module Esper.MsgView {
       name = exec.display_name;
     }
     teamName.text(name);
+    teamListName.text(name);
+    teamListEmail.text("exec@company.com");
+    teamListCheck.attr("src", Init.esperRootUrl + "img/check.png");
+    teamListCheckEx.attr("src", Init.esperRootUrl + "img/check.png");
+    teamListCheckEx.css("display", "none");
 
-    size.click(function() {
+    footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+
+    options.tooltip({
+      show: { delay: 500, duration: "fast"},
+      hide: { duration: "fast"},
+      "content": "Options",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "top esper-tooltip"
+    });
+
+    size.tooltip({
+      show: { delay: 500, duration: "fast"},
+      hide: { duration: "fast"},
+      "content": "Minimize",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "top esper-tooltip"
+    });
+
+    function toggleOptions() {
+      if (options.hasClass("open")) {
+        dismissDropdowns();
+      } else {
+        dismissDropdowns();
+        dropdown.toggle();
+        options.addClass("open");
+      }
+    }
+
+    function toggleSidebar() {
       if (sidebar.css("display") === "none") {
-        wrapLeft.fadeIn(250);
-        wrapRight.fadeIn(250);
+        wrap.fadeIn(250);
         sizeIcon.addClass("minimize");
+        size.tooltip("option", "content", "Minimize");
         sidebar.show("slide", { direction: "down" }, 250);
       } else {
-        wrapLeft.fadeOut(250);
-        wrapRight.fadeOut(250);
+        wrap.fadeOut(250);
         sizeIcon.removeClass("minimize");
+        size.tooltip("option", "content", "Maximize");
         sidebar.hide("slide", { direction: "down" }, 250);
       }
+    }
+
+    options.click(toggleOptions);
+    size.click(toggleSidebar);
+
+    example.click(function() {
+      wrap.fadeOut(250);
+      sizeIcon.removeClass("minimize");
+      sidebar.hide("slide", { direction: "down" }, 250);
+      wrap.fadeIn(250);
+      sizeIcon.addClass("minimize");
+      sidebar.show("slide", { direction: "down" }, 250);
+    })
+
+    settings.click(function() {
+      popWindow(Conf.Api.url, 545, 433);
+    })
+    signOut.click(function() {
+      if (sidebar.css("display") !== "none")
+        sidebar.hide("slide", { direction: "down" }, 250);
+      view.fadeOut(250).delay(250);
+      Login.logout();
+      Menu.create();
     });
 
     rootElement.append(view);
@@ -133,6 +232,8 @@ module Esper.MsgView {
     };
 
     EvTab.displayLinkedEvents(content1, team, profiles, linkedEvents);
+    Tab2Content.displayTab2ComingSoon(content2);
+    Tab3Content.displayTab3ComingSoon(content3);
 
     rootElement.append(view);
 

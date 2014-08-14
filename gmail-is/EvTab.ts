@@ -7,16 +7,17 @@ module Esper.EvTab {
                        profiles: ApiT.Profile[]) {
 '''
 <div #view class="esper-ev">
-  <div #date class="esper-ev-date">
+  <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
   </div>
   <div>
     <div #title class="esper-ev-title"/>
     <div class="esper-ev-times">
-      <img #cog class="esper-click-safe esper-dropdown-btn esper-ev-cog"/>
+      <div #disclose class="esper-click-safe esper-dropdown-btn
+                       esper-clickable esper-ev-disclose"/>
       <ul #dropdown class="esper-ul esper-ev-dropdown">
-        <div class="esper-ev-actions">
+        <div class="esper-dropdown-section">
           <li #editEvent
               class="esper-li disabled">
             Edit
@@ -35,9 +36,9 @@ module Esper.EvTab {
           </li>
         </div>
         <div class="esper-click-safe esper-ul-divider"/>
-        <div #syncOption class="esper-click-safe esper-ev-sync">
-          <li class="esper-click-safe esper-li sync-list sync-option">
-            <span class="esper-click-safe  sync-option-text">
+        <div #syncOption class="esper-click-safe esper-dropdown-section">
+          <li class="esper-click-safe esper-li disabled sync-option">
+            <span class="esper-click-safe sync-option-text">
               Description Sync
             </span>
             <img #info title class="esper-click-safe info"/>
@@ -49,8 +50,8 @@ module Esper.EvTab {
               <div class="double-bounce2"></div>
             </div>
           </li>
-          <li #teamSync class="esper-click-safe esper-li sync-list sync-users"/>
-          <li #syncNote class="esper-click-safe esper-li sync-list sync-note"/>
+          <li #teamSync class="esper-click-safe esper-li disabled sync-users"/>
+          <li #syncNote class="esper-click-safe esper-li disabled sync-note"/>
         </div>
       </ul>
       <span #startTime class="esper-ev-start"/>
@@ -90,16 +91,25 @@ module Esper.EvTab {
         .click(openGcal);
     }
 
-    info
-      .attr("src", Init.esperRootUrl + "img/info.png")
-      .tooltip();
-    var position = { my: 'center bottom', at: 'center top-10' };
+    date.tooltip({
+      show: { delay: 500, duration: "fast"},
+      hide: { duration: "fast"},
+      "content": "Open in Google Calendar",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "top esper-tooltip"
+    });
+
     var infoContent = "Automatically synchronizes the event's " +
       "description with the contents of this email conversation.";
     info
-      .tooltip("option", "content", infoContent)
-      .tooltip("option", "position", position)
-      .tooltip("option", "tooltipClass", "top sync-info");
+      .attr("src", Init.esperRootUrl + "img/info.png")
+      .tooltip({
+        show: { duration: "fast"},
+        hide: { duration: "fast"},
+        "content": infoContent,
+        "position": { my: 'center bottom', at: 'center top-5' },
+        "tooltipClass": "top sync-info"
+      });
 
     syncCheckbox.change(function() {
       var apiCall;
@@ -159,15 +169,13 @@ module Esper.EvTab {
     }
     syncNote.text(notePhrase);
 
-
-    cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
-    cog.click(function() {
-      if (cog.hasClass("open")) {
+    disclose.click(function() {
+      if (disclose.hasClass("open")) {
         MsgView.dismissDropdowns();
       } else {
         MsgView.dismissDropdowns();
         dropdown.toggle();
-        cog.addClass("open");
+        disclose.addClass("open");
       }
     })
 
@@ -234,7 +242,7 @@ module Esper.EvTab {
                                       linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
-  <div #linkActions class="esper-link-actions">
+  <div #linkActions class="esper-tab-header">
     <div #newEvent class="esper-link-action">
       <img #newEventIcon class="esper-link-action-icon"/>
       <div class="esper-link-action-text">Create new linked event</div>

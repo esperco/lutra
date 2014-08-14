@@ -41,13 +41,14 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    Menu.create();
     if (Login.loggedIn()) {
       Api.getLoginInfo()
         .done(function(loginInfo) {
           Login.info = loginInfo;
           MsgView.init();
         });
+    } else {
+      Menu.create();
     }
   }
 
