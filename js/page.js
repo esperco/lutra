@@ -19,9 +19,6 @@ var page = (function() {
   });
 
   function showPage(k) {
-    observable.onSchedulingStepChanging.notify();
-    observable.onSchedulingStepChanging.stopObserve("step");
-
     pageSelector.show(k);
   }
 

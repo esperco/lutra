@@ -1,4 +1,0 @@
-/*
-  Hexadecimal encoding and decoding
-*/
-
