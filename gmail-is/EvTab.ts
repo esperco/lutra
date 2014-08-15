@@ -244,11 +244,15 @@ module Esper.EvTab {
 <div #view>
   <div #linkActions class="esper-tab-header">
     <div #newEvent class="esper-link-action">
-      <img #newEventIcon class="esper-link-action-icon"/>
+      <div class="esper-link-action-icon-container">
+        <img #newEventIcon class="esper-link-action-icon"/>
+      </div>
       <div class="esper-link-action-text">Create new linked event</div>
     </div>
     <div #linkEvent class="esper-link-action">
-      <img #linkEventIcon class="esper-link-action-icon"/>
+      <div class="esper-link-action-icon-container">
+        <img #linkEventIcon class="esper-link-action-icon"/>
+      </div>
       <div class="esper-link-action-text">Link to existing event</div>
     </div>
   </div>
@@ -259,8 +263,8 @@ module Esper.EvTab {
 
     var eventsTab = <EventsTab> _view;
 
-    newEventIcon.attr("src", Init.esperRootUrl + "img/new-event.png");
-    linkEventIcon.attr("src", Init.esperRootUrl + "img/link-event.png");
+    newEventIcon.attr("src", Init.esperRootUrl + "img/add.png");
+    linkEventIcon.attr("src", Init.esperRootUrl + "img/link.png");
 
     if (linkedEvents.linked_events.length === 0)
       noEvents.attr("style", "display: block");

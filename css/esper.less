@@ -411,7 +411,16 @@ li.esper-li.selected:hover .esper-team-list-email { color: @gray_60; }
   padding-bottom: 7px;
   color: @purple;
   cursor: pointer;
-  .esper-link-action-icon { float: left; }
+  .esper-link-action-icon-container {
+    float: left;
+    width: 22px;
+    height: 22px;
+    padding: 4px;
+    border: 1px solid @purple;
+    border-radius: 11px;
+    box-sizing: border-box;
+  }
+  .esper-link-action-icon { display: block; }
   .esper-link-action-text {
     margin: 3px 0 0 32px;
     font-size: 13px;
