@@ -170,7 +170,7 @@ var settings = (function() {
   function renderInviteDialog() {
 '''
 <div #view>
-  <div>Invite team members (pop-up):</div>
+  <div>Invite team members:</div>
   <div #roleSelector/>
 </div>
 '''
@@ -199,7 +199,7 @@ var settings = (function() {
 '''
 <div #view>
   <div class="settings-block">
-    <h1>Settings</h1>
+    <h1>Esper Settings</h1>
   </div>
   <div class="settings-block">
     Make sure you&apos;ve installed the
@@ -207,32 +207,31 @@ var settings = (function() {
        target="_blank">Esper extension</a>
     for Google Chrome browsers.
   </div>
-  <div class="settings-block-gray">
-    <div class="settings-block">
-      <h2>Profile</h2>
-      <div #me/>
-    </div>
+  <div class="settings-block settings-block-gray">
+    <h2>Profile</h2>
+    <div #me/>
   </div>
   <div class="settings-block">
     <h2>Teams</h2>
     <div #teams/>
   </div>
-  <div class="settings-block-gray">
-    <div class="settings-block">
-      <h2>Account</h2>
-      <div #logout class="hide">
-        <a #logoutLink href="#!">Log out of Esper</a>
-      </div>
-      <div #revoke class="hide">
-        <a href="#" #revokeLink>Revoke Esper&apos;s access
-                                to my Google account</a>
-      </div>
-      <div>
-        <a href="#" #clearSync>Log out all Esper accounts</a>
-      </div>
+  <div class="settings-block settings-block-gray">
+    <h2>Account</h2>
+    <div #logout class="hide">
+      <a #logoutLink href="#!">Log out of Esper</a>
+    </div>
+    <div #revoke class="hide">
+      <a href="#" #revokeLink>Revoke Esper&apos;s access
+                              to my Google account</a>
+    </div>
+    <div>
+      <a href="#" #clearSync>Log out all Esper accounts</a>
     </div>
   </div>
-  <div #inviteSection/>
+  <div class="settings-block">
+    <h2>Invites</h2>
+    <div #inviteSection class="settings-block"/>
+  </div>
 </div>
 '''
     var root = $("#settings-page");
