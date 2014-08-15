@@ -85,10 +85,10 @@ module Esper.Menu {
 <div #view id="esper-menu" class="esper-menu">
   <img #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo"/>
   <div #background class="esper-menu-bg"/>
-  <div class="esper-menu-dropdown esper-dropdown-section">
-    <ul #dropdown class="esper-ul esper-menu-dropdown"/>
-    <img #caret class="esper-caret"/>
-  </div>
+  <img #caret class="esper-caret"/>
+  <ul #dropdown class="esper-ul esper-menu-dropdown">
+    <div #dropdownContent class="esper-dropdown-section"/>
+  </ul>
 </div>
 '''
 
@@ -103,7 +103,7 @@ module Esper.Menu {
 
     caret.attr("src", Init.esperRootUrl + "img/caret.png");
 
-    updateLinks(dropdown);
+    updateLinks(dropdownContent);
 
     logo.click(function() {
       if (logo.hasClass("open")) {
@@ -122,7 +122,7 @@ module Esper.Menu {
         var li =
           makeImportantLink("Please upgrade now",
                             status.download_page);
-        dropdown.prepend(li);
+        dropdownContent.prepend(li);
         logo.addClass("esper-menu-red esper-clickable");
         logo.removeClass("esper-menu-black esper-menu-white");
       }
@@ -136,6 +136,6 @@ module Esper.Menu {
       return success;
     });
 
-    return dropdown; /* .append <li> items to it */
+    return dropdownContent; /* .append <li> items to it */
   }
 }
