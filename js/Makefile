@@ -35,31 +35,20 @@ APP_PROD_LIBS = $(addsuffix .min.js, $(APP_LIBS))
 # Output Javascript files are put into the js/ subdirectory.
 
 COMMON_SOURCES = \
-  type.js \
   test.js \
   list.js \
   deferred.js \
-  ref.js \
   util.js \
   log.js \
   mixpanel.js \
   gmailCompose.js \
-  html.js \
-  variant.js \
-  dateYmd.js \
-  date.js \
-  timeonly.js \
   status_.js \
-  spinner.js \
   unixtime.js \
-  email.js \
   cache.js \
   svg.js \
   show.js \
   select.js \
-  store.js \
-  observable.js \
-  pusher.js
+  store.js
 
 APP_SOURCES = \
   parseUrl.js \
@@ -67,7 +56,6 @@ APP_SOURCES = \
   api.js \
   settings.js \
   signin.js \
-  agenda.js \
   page.js \
   route.js \
   main.js
