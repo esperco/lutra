@@ -40,14 +40,6 @@ module Esper.Menu {
     return link;
   }
 
-  function makeImportantLink(text, url) {
-    return $("<li class='esper-li esper-menu-important'/>")
-      .text(text)
-      .click(function() {
-        open(url, "_blank");
-      });
-  }
-
   function makePopupLink(text, url) {
     return $("<li class='esper-li'/>")
       .text(text)
@@ -114,17 +106,6 @@ module Esper.Menu {
         caret.toggle();
         dropdown.toggle();
         logo.addClass("open");
-      }
-    });
-
-    Api.checkVersion().done(function(status) {
-      if (status.must_upgrade === true) {
-        var li =
-          makeImportantLink("Please upgrade now",
-                            status.download_page);
-        dropdownContent.prepend(li);
-        logo.addClass("esper-menu-red esper-clickable");
-        logo.removeClass("esper-menu-black esper-menu-white");
       }
     });
 

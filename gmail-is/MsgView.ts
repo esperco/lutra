@@ -99,7 +99,7 @@ module Esper.MsgView {
       </div>
     </div>
   </ul>
-  <div class="esper-dock">
+  <div #dock class="esper-dock">
     <div #options title
          class="esper-click-safe esper-dock-action
                 esper-dropdown-btn esper-options">
@@ -196,6 +196,19 @@ module Esper.MsgView {
       Menu.create();
     });
 
+    Api.checkVersion().done(function(status) {
+      if (status.must_upgrade === false) {
+        toggleSidebar();
+        dock.children().remove();
+        dock
+          .addClass("esper-update")
+          .text("A new version of Esper is available.")
+          .click(function() {
+            open(status.download_page, "_blank");
+          });
+      }
+    });
+
     rootElement.append(view);
   }
 
@@ -249,6 +262,22 @@ module Esper.MsgView {
     return view;
   }
 
+  function displayUpdateDock(rootElement, url) {
+'''
+<div #view class="esper-dock-container">
+  <div #dock class="esper-dock esper-update">
+    Click here to update Esper.
+  </div>
+</div>
+'''
+  
+    dock.click(function() {
+      open(url, "_blank");
+    });
+
+    rootElement.append(view);
+  }
+
   function getTeamProfiles(team: ApiT.Team): JQueryDeferred<ApiT.Profile[]> {
     var teamMembers = List.copy(team.team_assistants);
     teamMembers.push(team.team_executive);
@@ -278,10 +307,16 @@ module Esper.MsgView {
             getTeamProfiles(team).done(function(profiles) {
               Api.getLinkedEvents(team.teamid, threadId)
                 .done(function(linkedEvents) {
-                  var sidebar = displaySidebar(rootElement, team,
-                                               profiles, linkedEvents);
-                  displayDock(rootElement, sidebar, team, profiles);
-                  sidebar.show("slide", { direction: "down" }, 250);
+                  Api.checkVersion().done(function(status) {
+                    if (status.must_upgrade === false) {
+                      displayUpdateDock(rootElement, status.download_page);
+                    } else {
+                      var sidebar = displaySidebar(rootElement, team,
+                                                   profiles, linkedEvents);
+                      displayDock(rootElement, sidebar, team, profiles);
+                      sidebar.show("slide", { direction: "down" }, 250);
+                    }
+                  });
                 });
             });
           });

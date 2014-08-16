@@ -153,11 +153,6 @@ li.esper-li, a.esper-a {
   }
 }
 
-.esper-menu-red {
-  background-color: red;
-  padding: 5px;
-}
-
 .esper-menu-important {
   font-weight: bold;
 }
@@ -234,6 +229,17 @@ li.esper-li, a.esper-a {
   cursor: default;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
+  &.esper-update {
+    padding: 11px;
+    background: @orange;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    &:hover {
+      background: @orange_hover;
+      text-decoration: underline;
+    }
+  }
 }
 
 .esper-team-name {
