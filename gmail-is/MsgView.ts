@@ -196,19 +196,6 @@ module Esper.MsgView {
       Menu.create();
     });
 
-    Api.checkVersion().done(function(status) {
-      if (status.must_upgrade === false) {
-        toggleSidebar();
-        dock.children().remove();
-        dock
-          .addClass("esper-update")
-          .text("A new version of Esper is available.")
-          .click(function() {
-            open(status.download_page, "_blank");
-          });
-      }
-    });
-
     rootElement.append(view);
   }
 
