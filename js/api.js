@@ -209,8 +209,10 @@ var api = (function () {
     return apiQPrefix() + "/profile";
   }
 
-  mod.getProfile = function(uid) {
-    return jsonHttpGet(apiProfilePrefix() + "/" + uid);
+  mod.getProfile = function(uid, teamid) {
+    return jsonHttpGet(apiProfilePrefix()
+                       + "/" + uid
+                       + "/" + teamid);
   };
 
 
