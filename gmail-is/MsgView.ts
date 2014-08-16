@@ -308,7 +308,7 @@ module Esper.MsgView {
               Api.getLinkedEvents(team.teamid, threadId)
                 .done(function(linkedEvents) {
                   Api.checkVersion().done(function(status) {
-                    if (status.must_upgrade === false) {
+                    if (status.must_upgrade === true) {
                       displayUpdateDock(rootElement, status.download_page);
                     } else {
                       var sidebar = displaySidebar(rootElement, team,
