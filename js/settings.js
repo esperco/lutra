@@ -270,6 +270,24 @@ var settings = (function() {
     return view;
   }
 
+  function renderAdminSection() {
+'''
+<div #view>
+  <button #button
+          class="btn btn-default">Generate new team invite</button>
+  <code #url></code>
+</div>
+'''
+    button.click(function() {
+      api.inviteCreateTeam()
+        .done(function(x) {
+          url.text(x.url);
+        });
+    });
+
+    return view;
+  }
+
   mod.load = function() {
 '''
 <div #view>
@@ -305,7 +323,11 @@ var settings = (function() {
   </div>
   <div class="settings-block">
     <h2>Invites</h2>
-    <div #inviteSection class="settings-block"/>
+    <div #inviteSection/>
+  </div>
+  <div #adminSection class="hide settings-block settings-block-gray">
+    <h2>Admin</h2>
+    <div #adminBody />
   </div>
 </div>
 '''
@@ -351,6 +373,11 @@ var settings = (function() {
       });
 
     inviteSection.append(renderInviteDialog());
+
+    if (login.isAdmin()) {
+      adminBody.append(renderAdminSection());
+      adminSection.removeClass("hide");
+    }
   }
 
   return mod;

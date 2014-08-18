@@ -105,6 +105,13 @@ var api = (function () {
 
   /*** Esper team management ***/
 
+  mod.inviteCreateTeam = function() {
+    var fromUid = login.me();
+    var invite = { from_uid: fromUid };
+    return jsonHttpPost("/api/invite/" + fromUid + "/create-team",
+                        JSON.stringify(invite));
+  };
+
   mod.inviteJoinTeam = function(invite) {
     return jsonHttpPost("/api/invite/" + login.me() + "/join-team",
                         JSON.stringify(invite));
