@@ -133,6 +133,13 @@ var login = (function() {
       return;
   };
 
+  mod.isAdmin = function() {
+    if (util.isDefined(mod.data))
+      return mod.data.is_admin === true;
+    else
+      return false;
+  };
+
   mod.myEmail = function() {
     if (util.isDefined(mod.data))
       return mod.data.email;
