@@ -114,6 +114,84 @@ var settings = (function() {
       });
   }
 
+  function viewOfProfiles(team, profiles) {
+'''
+<div #table>
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-3">Role</div>
+    <div class="col-md-3">Email</div>
+    <div class="col-md-2">Google access</div>
+    <div class="col-md-2"></div>
+  </div>
+</div>
+'''
+    list.iter(profiles, function(profile) {
+'''
+<div #row class="row">
+  <div #name   class="col-md-2"></div>
+  <div #role   class="col-md-3"></div>
+  <div #email  class="col-md-3"></div>
+  <div #google class="col-md-2"></div>
+  <div #buttons class="col-md-2"></div>
+</div>
+'''
+      var execUid = team.team_executive;
+      var memberUid = profile.profile_uid;
+      name.text(profile.display_name);
+      role.text(execUid === memberUid ? "Executive" : " Assistant");
+      email.text(profile.email);
+      if (profile.google_access) {
+        google.text("OK");
+        google.attr("style", "color:green");
+      }
+      else {
+        google.text("Sign-in needed");
+        google.attr("style", "color:red");
+      }
+
+      function refresh() {
+        /*
+          Reload the whole document.
+          It could be improved but the team structure known by the login module
+          would need to be refreshed.
+        */
+        location.reload(true);
+      }
+
+      if (memberUid !== login.me()
+          && list.mem(team.team_assistants, memberUid)) {
+        var label = execUid !== memberUid ?
+            "Remove"
+          : "Remove from Assistants";
+        $("<a href='#'></a>")
+          .text(label)
+          .appendTo(buttons)
+          .click(function() {
+            api.removeAssistant(team.teamid, memberUid)
+              .done(function() { refresh(); });
+          });
+      }
+
+      if (memberUid !== execUid) {
+        '''
+<span #span>
+  [<a #link href="#">replace Executive</a>]
+</span>
+'''
+        span.appendTo(role);
+        link
+          .click(function() {
+            api.setExecutive(team.teamid, memberUid)
+              .done(function() { refresh(); });
+          });
+      }
+
+      table.append(row);
+    });
+    return table;
+  }
+
   function viewOfTeam(team) {
 '''
 <div #view>
@@ -123,22 +201,19 @@ var settings = (function() {
   <div>
     Team calendar: <span #calendarSelector></span>
   </div>
+  <div #teamTableDiv/>
 </div>
 '''
     labelSettingsLink
-      .click(function() { showLabelSettingsModal(team) });
-    api.getGoogleEmail(login.me(), team.team_executive, team.teamid)
-      .done(function(execEmail) {
-        var deferredAsstEmails = list.map(team.team_assistants, function(a) {
-          return api.getGoogleEmail(login.me(), a, team.teamid);
-        });
-        deferred.join(deferredAsstEmails).done(function(asstAcctEmails) {
-          var asstEmails = list.map(asstAcctEmails, function(e) {
-            return e.email;
-          });
-          executive.text("Executive: " + execEmail.email);
-          assistants.text("Assistants: " + asstEmails.join(", "));
-        });
+      .click(function() { showLabelSettingsModal(team); });
+    var members = list.union([team.team_executive], team.team_assistants);
+
+    deferred.join(list.map(members, function(uid) {
+      return api.getProfile(uid, team.teamid);
+    }))
+      .done(function(profiles) {
+        viewOfProfiles(team, profiles)
+          .appendTo(teamTableDiv);
       });
 
     makeCalendarSelector(team, calendarSelector);
