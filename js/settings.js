@@ -114,12 +114,12 @@ var settings = (function() {
       });
   }
 
-  function viewOfProfiles(execUid, profiles) {
+  function viewOfProfiles(team, profiles) {
 '''
 <div #table>
   <div class="row">
-    <div class="col-md-3"></div>
-    <div class="col-md-2">Role</div>
+    <div class="col-md-2"></div>
+    <div class="col-md-3">Role</div>
     <div class="col-md-3">Email</div>
     <div class="col-md-2">Google access</div>
     <div class="col-md-2"></div>
@@ -129,15 +129,17 @@ var settings = (function() {
     list.iter(profiles, function(profile) {
 '''
 <div #row class="row">
-  <div #name   class="col-md-3"></div>
-  <div #role   class="col-md-2"></div>
+  <div #name   class="col-md-2"></div>
+  <div #role   class="col-md-3"></div>
   <div #email  class="col-md-3"></div>
   <div #google class="col-md-2"></div>
-  <div class="col-md-2"><button #removeButton>Remove</button></div>
+  <div #buttons class="col-md-2"></div>
 </div>
 '''
+      var execUid = team.team_executive;
+      var memberUid = profile.profile_uid;
       name.text(profile.display_name);
-      role.text(execUid === profile.profile_uid ? "Executive" : " Assistant");
+      role.text(execUid === memberUid ? "Executive" : " Assistant");
       email.text(profile.email);
       if (profile.google_access) {
         google.text("OK");
@@ -147,9 +149,43 @@ var settings = (function() {
         google.text("Sign-in needed");
         google.attr("style", "color:red");
       }
-      removeButton.click(function() {
-        log("TODO: remove user from team");
-      });
+
+      function refresh() {
+        /*
+          Reload the whole document.
+          It could be improved but the team structure known by the login module
+          would need to be refreshed.
+        */
+        location.reload(true);
+      }
+
+      if (memberUid !== login.me()
+          && list.mem(team.team_assistants, memberUid)) {
+        var label = execUid !== memberUid ?
+            "Remove"
+          : "Remove from Assistants";
+        $("<a href='#'></a>")
+          .text(label)
+          .appendTo(buttons)
+          .click(function() {
+            api.removeAssistant(team.teamid, memberUid)
+              .done(function() { refresh(); });
+          });
+      }
+
+      if (memberUid !== execUid) {
+        '''
+<span #span>
+  [<a #link href="#">replace Executive</a>]
+</span>
+'''
+        span.appendTo(role);
+        link
+          .click(function() {
+            api.setExecutive(team.teamid, memberUid)
+              .done(function() { refresh(); });
+          });
+      }
 
       table.append(row);
     });
@@ -176,7 +212,7 @@ var settings = (function() {
       return api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) {
-        viewOfProfiles(team.team_executive, profiles)
+        viewOfProfiles(team, profiles)
           .appendTo(teamTableDiv);
       });
 

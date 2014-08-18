@@ -103,11 +103,21 @@ var api = (function () {
     return jsonHttpPost("/api/random");
   };
 
-  /*** Esper invites ***/
+  /*** Esper team management ***/
 
   mod.inviteJoinTeam = function(invite) {
     return jsonHttpPost("/api/invite/" + login.me() + "/join-team",
                         JSON.stringify(invite));
+  };
+
+  mod.setExecutive = function(teamid, memberUid) {
+    return jsonHttpPut("/api/team/" + login.me() + "/" + teamid
+                       + "/executive/" + memberUid);
+  };
+
+  mod.removeAssistant = function(teamid, memberUid) {
+    return jsonHttpDelete("/api/team/" + login.me() + "/" + teamid
+                          + "/member/" + memberUid);
   };
 
   /***** Opaque URLs with unique token *****/
