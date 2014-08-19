@@ -19,6 +19,10 @@ module Esper.JsonHttp {
 
   function jsonHttp(method, path, body) {
 
+    function logResponse(respBody) {
+      Log.d("HTTP response body:", respBody);
+    }
+
     function logError(xhr, textStatus, err) {
       var details = {
         code: xhr.status,
@@ -65,7 +69,8 @@ module Esper.JsonHttp {
     };
     Log.d("API request:", request);
     return $.ajax(request)
-      .fail(logError);
+      .fail(logError)
+      .done(logResponse);
   }
 
   export function get(path) {
