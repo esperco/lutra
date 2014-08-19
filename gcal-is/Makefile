@@ -39,6 +39,7 @@ SHARED_SOURCES = \
   ../common/ts/Watchable \
   ../common/ts/XDate \
   ../common/ts/Log \
+  ../common/ts/LRU \
   ../common/EsperStorage \
   ../common/EsperMessage \
   ../common/Login \

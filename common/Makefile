@@ -10,6 +10,7 @@ SOURCES = \
   Deferred \
   XDate \
   Log \
+  LRU \
   EsperStorage \
   EsperMessage \
   Login \

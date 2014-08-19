@@ -44,6 +44,7 @@ SHARED_SOURCES = \
   ../common/ts/Deferred \
   ../common/ts/XDate \
   ../common/ts/Log \
+  ../common/ts/LRU \
   ../common/EsperStorage \
   ../common/EsperMessage \
   ../common/Login \
