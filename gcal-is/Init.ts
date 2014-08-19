@@ -24,9 +24,7 @@ module Esper.Init {
     complications).
   */
   function obtainCredentials() {
-    // TODO: adapt this for Google Calendar.
-/*
-    var googleAccountId = gmail.get.user_email();
+    var googleAccountId = Gcal.getUserEmail();
     Log.d("Google account ID: " + googleAccountId);
     var esperMessage : EsperMessage.EsperMessage = {
       sender: "Esper",
@@ -34,7 +32,6 @@ module Esper.Init {
       value: googleAccountId
     };
     window.postMessage(esperMessage, "*");
-*/
   }
 
   function injectLoginControls() {
@@ -53,19 +50,13 @@ module Esper.Init {
     Check if the credentials we received from the content script
     match the current gmail user.
   */
-  function filterCredentials(cred: EsperStorage.Credentials) {
-    // TODO: adapt for Google Calendar
-/*
-    var googleAccountId = gmail.get.user_email();
-    if (cred !== undefined && cred.googleAccountId === googleAccountId) {
-      Login.credentials = cred;
-      Api.getLoginInfo()
-        .done(function(loginInfo) {
-          Login.info = loginInfo;
-          injectEsperControls();
-        });
+  function filterCredentials(account: EsperStorage.Account) {
+    Log.d("filterCredentials():", account);
+    var googleAccountId = Gcal.getUserEmail();
+    if (account !== undefined && account.googleAccountId === googleAccountId) {
+      Login.setAccount(account);
+      injectEsperControls();
     }
-*/
   }
 
   function listenForMessages() {
@@ -84,6 +75,7 @@ module Esper.Init {
 
         /* Sent by injected script itself, ignored. */
         case "CredentialsRequest":
+        case "Logout":
           break;
 
         default:
@@ -103,9 +95,6 @@ module Esper.Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
-
-      // temporary; remove once login stuff is restored
-      CalEventView.init();
     }
   }
 }
