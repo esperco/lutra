@@ -57,11 +57,37 @@ module Esper.Gcal {
       return atob(encoded);
     }
 
+    /*
+      Google Calendar uses abbreviations for common "domains" in
+      email-like calendar IDs.
+      We convert these abbreviations to their full form usable
+      with the Google APIs.
+     */
+    function fixCalendarId(s) {
+      var ar = s.split("@");
+      if (ar.length !== 2)
+        return s;
+      else {
+        var domain = ar[1];
+        switch (ar[1]) {
+        case "m":
+          /* "mjambon@gmail.com" */
+          domain = "gmail.com";
+          break;
+        case "v":
+          /* "en.usa#holiday@group.v.calendar.google.com" */
+          domain = "group.v.calendar.google.com";
+          break;
+        }
+        return ar[0] + "@" + domain;
+      }
+    }
+
     function decodeFullEventId(encodedId: string): FullEventId {
       var decoded = decodeBase64(encodedId);
       var eventId = decoded.slice(0, 26);
       var ar = decoded.split(" ");
-      var calendarId = ar[1];
+      var calendarId = fixCalendarId(ar[1]);
       return {
         calendarId: calendarId,
         eventId: eventId
