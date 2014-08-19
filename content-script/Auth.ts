@@ -8,7 +8,8 @@ module Esper.Auth {
   */
 
   function sendCredentialsResponse(x: EsperStorage.Account) {
-    if (/^https:\/\/mail.google.com\//.test(document.URL)) {
+    if (/^https:\/\/mail.google.com\//.test(document.URL)
+        || /^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
       Log.d("Sending message from content script to gmail page", x);
       var esperMessage : EsperMessage.EsperMessage = {
         sender: "Esper",

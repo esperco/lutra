@@ -50,7 +50,7 @@ SHARED_SOURCES = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  CalEvent \
+  Gcal \
   CalEventView \
   Init \
   Main
