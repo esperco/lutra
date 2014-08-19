@@ -4,6 +4,9 @@
 module Esper.MsgView {
   export var currentThreadId : string;
 
+  // Profiles of everyone on all the viewer's teams
+  var profiles : ApiT.Profile[];
+
   export function popWindow(url, width, height) {
     /* Allow for borders. */
     var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
@@ -53,10 +56,36 @@ module Esper.MsgView {
     return root;
   }
 
-  function displayDock(rootElement,
-                       sidebar,
-                       team: ApiT.Team,
-                       profiles : ApiT.Profile[]) {
+  function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
+'''
+<li #selector class="esper-click-safe esper-li">
+  <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+  <div #teamListName class="esper-click-safe esper-team-list-name"/>
+  <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
+</li>
+'''
+    var exec = List.find(profiles, function(prof) {
+      return prof.profile_uid === team.team_executive;
+    });
+    var name = team.team_name;
+    if (name === null || name === undefined || name === "") {
+      name = exec.display_name;
+    }
+    teamListName.text(name);
+    teamListEmail.text(exec.email);
+
+    if (team.teamid === myTeamId) {
+      selector.addClass("selected");
+      teamListCheck.attr("src", Init.esperRootUrl + "img/check.png");
+    } else {
+      teamListCheck.css("display", "none");
+      selector.click(function() { onTeamSwitch(team); });
+    }
+
+    teamsSection.append(selector);
+  }
+
+  function displayDock(rootElement, sidebar, team: ApiT.Team) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -64,19 +93,9 @@ module Esper.MsgView {
     <div #wrapRight class="esper-dock-wrap-right"/>
   </div>
   <ul #dropdown class="esper-ul esper-options-menu">
-    <div class="esper-dropdown-section">
+    <div #teamsSection class="esper-dropdown-section">
       <li class="esper-click-safe esper-li disabled esper-team-list-title">
         TEAMS
-      </li>
-      <li class="esper-click-safe esper-li selected">
-        <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
-        <div #teamListName class="esper-click-safe esper-team-list-name"/>
-        <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
-      </li>
-      <li #example class="esper-li example">
-        <img #teamListCheckEx class="esper-team-list-checkmark"/>
-        <div class="esper-team-list-name">Another Exec</div>
-        <div class="esper-team-list-email">anotherexec@company.com</div>
       </li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
@@ -113,20 +132,33 @@ module Esper.MsgView {
   </div>
 </div>
 '''
-  
+    function onTeamSwitch(toTeam) {
+      dismissDropdowns();
+      wrap.fadeOut(250);
+      sizeIcon.removeClass("minimize");
+      sidebar.hide("slide", { direction: "down" }, 250);
+      wrap.fadeIn(250);
+      sizeIcon.addClass("minimize");
+      sidebar.show("slide", { direction: "down" }, 250);
+      function afterAnimation() {
+        displayTeamSidebar(rootElement, toTeam, currentThreadId);
+      }
+      setTimeout(afterAnimation, 250);
+    }
+
+    Login.myTeams().forEach(function(otherTeam) {
+      displayTeamSelector(teamsSection, team.teamid, otherTeam, onTeamSwitch);
+    });
+
+
     var name = team.team_name;
     if (name === null || name === undefined || name === "") {
       var exec = List.find(profiles, function(prof) {
         return prof.profile_uid === team.team_executive;
       });
-      name = exec.display_name;
+      name = exec.display_name ? exec.display_name : "NO NAME";
     }
     teamName.text(name);
-    teamListName.text(name);
-    teamListEmail.text("exec@company.com");
-    teamListCheck.attr("src", Init.esperRootUrl + "img/check.png");
-    teamListCheckEx.attr("src", Init.esperRootUrl + "img/check.png");
-    teamListCheckEx.css("display", "none");
 
     footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
@@ -176,15 +208,6 @@ module Esper.MsgView {
     options.click(toggleOptions);
     size.click(toggleSidebar);
 
-    example.click(function() {
-      wrap.fadeOut(250);
-      sizeIcon.removeClass("minimize");
-      sidebar.hide("slide", { direction: "down" }, 250);
-      wrap.fadeIn(250);
-      sizeIcon.addClass("minimize");
-      sidebar.show("slide", { direction: "down" }, 250);
-    })
-
     settings.click(function() {
       popWindow(Conf.Api.url, 545, 433);
     })
@@ -201,7 +224,6 @@ module Esper.MsgView {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
-                          profiles : ApiT.Profile[],
                           linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view class="esper-sidebar">
@@ -275,6 +297,32 @@ module Esper.MsgView {
     return Deferred.join(l);
   }
 
+  function getAllProfiles(teams : ApiT.Team[])
+    : JQueryDeferred<ApiT.Profile[][]>
+  {
+    var profileLists =
+      List.map(teams, function(team) {
+        return getTeamProfiles(team);
+      });
+    return Deferred.join(profileLists);
+  }
+
+  function displayTeamSidebar(rootElement, team, threadId) {
+    rootElement.children().remove();
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        Api.checkVersion().done(function(status_) {
+          if (status_.must_upgrade === true) {
+            displayUpdateDock(rootElement, status_.download_page);
+          } else {
+            var sidebar = displaySidebar(rootElement, team, linkedEvents);
+            displayDock(rootElement, sidebar, team);
+            sidebar.show("slide", { direction: "down" }, 250);
+          }
+        });
+      });
+  }
+
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
     function retry() {
@@ -290,23 +338,9 @@ module Esper.MsgView {
           return false;
         }
         else {
-          Login.myTeams().forEach(function(team) {
-            getTeamProfiles(team).done(function(profiles) {
-              Api.getLinkedEvents(team.teamid, threadId)
-                .done(function(linkedEvents) {
-                  Api.checkVersion().done(function(status) {
-                    if (status.must_upgrade === true) {
-                      displayUpdateDock(rootElement, status.download_page);
-                    } else {
-                      var sidebar = displaySidebar(rootElement, team,
-                                                   profiles, linkedEvents);
-                      displayDock(rootElement, sidebar, team, profiles);
-                      sidebar.show("slide", { direction: "down" }, 250);
-                    }
-                  });
-                });
-            });
-          });
+          var firstTeam = Login.myTeams()[0];
+          if (firstTeam !== undefined && firstTeam !== null)
+            displayTeamSidebar(rootElement, firstTeam, threadId);
           return true;
         }
       }
@@ -335,8 +369,12 @@ module Esper.MsgView {
     if (! alreadyInitialized) {
       alreadyInitialized = true;
       Log.d("MsgView.init()");
-      listen();
-      maybeUpdateView();
+      getAllProfiles(Login.myTeams()).done(function(profLists) {
+        profiles = List.concat(profLists);
+        Log.d(profiles);
+        listen();
+        maybeUpdateView();
+      });
     }
   }
 }
