@@ -69,7 +69,7 @@ module Esper.Init {
     Check if the credentials we received from the content script
     match the current gmail user.
   */
-  function filterCredentials(account: EsperStorage.Account) {
+  function filterCredentials(account: Types.Account) {
     var googleAccountId = gmail.get.user_email();
     if (account !== undefined && account.googleAccountId === googleAccountId) {
       Login.setAccount(account);

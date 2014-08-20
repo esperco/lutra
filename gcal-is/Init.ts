@@ -50,7 +50,7 @@ module Esper.Init {
     Check if the credentials we received from the content script
     match the current gmail user.
   */
-  function filterCredentials(account: EsperStorage.Account) {
+  function filterCredentials(account: Types.Account) {
     Log.d("filterCredentials():", account);
     var googleAccountId = Gcal.getUserEmail();
     if (account !== undefined && account.googleAccountId === googleAccountId) {
@@ -76,6 +76,7 @@ module Esper.Init {
         /* Sent by injected script itself, ignored. */
         case "CredentialsRequest":
         case "Logout":
+        case "ActiveEvents":
           break;
 
         default:

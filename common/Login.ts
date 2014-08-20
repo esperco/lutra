@@ -6,7 +6,7 @@ module Esper.Login {
     return account !== undefined && account.credentials !== undefined;
   }
 
-  export var watchableAccount = new Esper.Watchable.C<EsperStorage.Account>(
+  export var watchableAccount = new Esper.Watchable.C<Types.Account>(
     validateAccount, undefined
   );
 
@@ -20,7 +20,7 @@ module Esper.Login {
     return watchableAccount.get();
   }
 
-  export function setAccount(account: EsperStorage.Account) {
+  export function setAccount(account: Types.Account) {
     watchableAccount.set(account);
   }
 

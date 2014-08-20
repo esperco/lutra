@@ -3,6 +3,7 @@ default: pp
 
 SOURCES = \
   Esper \
+  Types \
   Conf \
   List \
   Util \
@@ -10,6 +11,7 @@ SOURCES = \
   Deferred \
   XDate \
   Log \
+  LRU \
   EsperStorage \
   EsperMessage \
   Login \
