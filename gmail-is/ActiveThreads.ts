@@ -25,8 +25,8 @@ module Esper.ActiveThreads {
     };
   }
 
-  export function handleNewActiveThread(threadId: string) {
-    add({ threadId: threadId });
+  export function handleNewActiveThread(threadId: string, subject: string) {
+    add({ threadId: threadId, subject: subject });
     var esperMessage : EsperMessage.EsperMessage = {
       sender: "Esper",
       type: "ActiveThreads",
