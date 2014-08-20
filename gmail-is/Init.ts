@@ -95,6 +95,7 @@ module Esper.Init {
         /* Sent by injected script itself, ignored. */
         case "CredentialsRequest":
         case "Logout":
+        case "ActiveThreads":
           break;
 
         default:

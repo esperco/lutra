@@ -47,18 +47,19 @@ SHARED_SOURCES = \
   ../common/ts/XDate \
   ../common/ts/Log \
   ../common/ts/LRU \
-  ../common/EsperStorage \
-  ../common/EsperMessage \
-  ../common/Login \
-  ../common/JsonHttp \
-  ../common/ApiT \
-  ../common/Api
+  ../common/ts/EsperStorage \
+  ../common/ts/EsperMessage \
+  ../common/ts/Login \
+  ../common/ts/JsonHttp \
+  ../common/ts/ApiT \
+  ../common/ts/Api
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
   Menu \
+  ActiveThreads \
   EvSearch \
   EvTab \
   Tab2Content \

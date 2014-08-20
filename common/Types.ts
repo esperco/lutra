@@ -14,6 +14,9 @@ module Esper.Types {
 
   export interface GmailThread {
     threadId: string;
+    subject: string;
+      /* easy to extract from gmail, saves an API call,
+         helps for debugging */
   }
 
   export interface FullEventId {
@@ -21,7 +24,9 @@ module Esper.Types {
     eventId: string;
   }
 
+  /* One short list of the recently consulted email threads */
   export interface ActiveThreads {
+    googleAccountId: string;
     threads: GmailThread[];
   }
 
