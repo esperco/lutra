@@ -4,29 +4,38 @@
 module Esper.MsgView {
   export var currentThreadId : string;
 
-  function dismissDropdowns() {
-    if ($(".esper-add-btn").hasClass("open"))
-      $(".no-events-arrow").toggle();
-    $(".esper-ul").attr("style", "display: none");
-    $(".esper-menu-bg").attr("style", "display: none");
-    $(".esper-caret").attr("style", "display: none");
+  // Profiles of everyone on all the viewer's teams
+  var profiles : ApiT.Profile[];
+
+  export function popWindow(url, width, height) {
+    /* Allow for borders. */
+    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
+    /* Allow for title and status bars. */
+    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
+
+    window.open(
+      url, "Window2", "status=no,height="
+        + height + ",width=" + width + ",resizable=yes,left="
+        + leftPosition + ",top=" + topPosition + ",screenX="
+        + leftPosition + ",screenY=" + topPosition
+        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
+  }
+
+  export function dismissDropdowns() {
+    $(".esper-ul").css("display", "none");
+    $(".esper-menu-bg").css("display", "none");
+    $(".esper-caret").css("display", "none");
     $(".esper-dropdown-btn").removeClass("open");
   }
 
   $(document).on('click', function(e) {
-    var $target = $(e.target);
-    if (!$target.hasClass("esper-dropdown-btn") &&
-        !$target.parent().hasClass("esper-dropdown-btn") &&
-        !$target.hasClass("sync-list") &&
-        !$target.parent().hasClass("sync-list") &&
-        !$target.hasClass("disabled")) {
-        dismissDropdowns();
-    }
+    if (!$(e.target).hasClass("esper-click-safe"))
+      dismissDropdowns();
   });
 
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
-    var anchor = $("div[role=complementary].nH.adC");
+    var anchor = $(".nH.g.id");
     if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper thread controls.");
       return $();
@@ -42,338 +51,238 @@ module Esper.MsgView {
   function insertEsperRoot() {
     removeEsperRoot();
     var anchor = findAnchor();
-    if (anchor.length === 1) {
-      var root = $("<div id='esper' class='esper-sidebar'/>");
-      anchor.prepend(root);
-      return root;
-    }
-    else
-      return;
+    var root = $("<div id='esper'/>");
+    anchor.prepend(root);
+    return root;
   }
 
-  function renderEvent(ev: ApiT.EventWithSyncInfo,
-                       teamid: string,
-                       threadId: string,
-                       sidebar: Sidebar,
-                       profiles: ApiT.Profile[]) {
+  function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
 '''
-<div #view class="esper-ev">
-  <div #date class="esper-ev-date">
-    <div #month class="esper-ev-month"/>
-    <div #day class="esper-ev-day"/>
+<li #selector class="esper-click-safe esper-li">
+  <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+  <div #teamListName class="esper-click-safe esper-team-list-name"/>
+  <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
+</li>
+'''
+    var exec = List.find(profiles, function(prof) {
+      return prof.profile_uid === team.team_executive;
+    });
+    var name = team.team_name;
+    if (name === null || name === undefined || name === "") {
+      name = exec.display_name;
+    }
+    teamListName.text(name);
+    teamListEmail.text(exec.email);
+
+    if (team.teamid === myTeamId) {
+      selector.addClass("selected");
+      teamListCheck.attr("src", Init.esperRootUrl + "img/check.png");
+    } else {
+      teamListCheck.css("display", "none");
+      selector.click(function() { onTeamSwitch(team); });
+    }
+
+    teamsSection.append(selector);
+  }
+
+  function displayDock(rootElement, sidebar, team: ApiT.Team) {
+'''
+<div #view class="esper-dock-container">
+  <div #wrap class="esper-dock-wrap">
+    <div #wrapLeft class="esper-dock-wrap-left"/>
+    <div #wrapRight class="esper-dock-wrap-right"/>
   </div>
-  <div>
-    <div #title class="esper-ev-title"/>
-    <div class="esper-ev-times">
-      <img #cog class="esper-dropdown-btn esper-ev-cog"/>
-      <ul #dropdown class="esper-ul esper-ev-dropdown">
-        <div class="esper-ev-actions">
-          <li #editEvent
-              class="esper-li disabled">
-            Edit
-          </li>
-          <li #duplicateEvent
-              class="esper-li disabled">
-            Duplicate
-          </li>
-          <li #unlinkEvent
-              class="esper-li">
-            Unlink
-          </li>
-          <li #deleteEvent
-              class="esper-li danger">
-            Delete from calendar
-          </li>
-        </div>
-        <div class="esper-ul-divider"/>
-        <div #syncOption class="esper-ev-sync">
-          <li class="esper-li sync-list sync-option">
-            <span class="sync-option-text">Description Sync</span>
-            <img #info title class="info"/>
-            <input #syncCheckbox type="checkbox" class="sync-checkbox"/>
-            <div #spinner class="spinner sync-spinner">
-              <div class="double-bounce1"></div>
-              <div class="double-bounce2"></div>
-            </div>
-          </li>
-          <li #teamSync class="esper-li sync-list sync-users"/>
-          <li #syncNote class="esper-li sync-list sync-note"/>
-        </div>
-      </ul>
-      <span #startTime class="esper-ev-start"/>
-      &rarr;
-      <span #endTime class="esper-ev-end"/>
+  <ul #dropdown class="esper-ul esper-options-menu">
+    <div #teamsSection class="esper-dropdown-section">
+      <li class="esper-click-safe esper-li disabled esper-team-list-title">
+        TEAMS
+      </li>
+    </div>
+    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-dropdown-section">
+      <li #settings class="esper-li">Settings</li>
+      <a #help class="esper-a" href="mailto:team@esper.com">Help</a>
+      <li #signOut class="esper-li danger">Sign out</li>
+    </div>
+    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
+      <a href="http://esper.com">
+        <img #footerLogo class="esper-click-safe esper-footer-logo"/>
+      </a>
+      <div class="esper-click-safe esper-dropdown-footer-links">
+        <a href="http://esper.com/privacypolicy.html">Privacy</a>
+        <div class="esper-click-safe esper-dropdown-footer-divider"/>
+        <a href="http://esper.com/termsofuse.html">Terms</a>
+        <div class="esper-click-safe esper-dropdown-footer-divider"/>
+        <span class="esper-click-safe esper-copyright">&copy; 2014 Esper</span>
+      </div>
+    </div>
+  </ul>
+  <div #dock class="esper-dock">
+    <div #options title
+         class="esper-click-safe esper-dock-action
+                esper-dropdown-btn esper-options">
+      <div #optionsIcon
+           class="esper-click-safe esper-dock-action-icon esper-options-icon"/>
+    </div>
+    <div #teamName class="esper-team-name"/>
+    <div #size title class="esper-dock-action esper-size">
+      <div #sizeIcon class="esper-dock-action-icon esper-size-icon minimize"/>
     </div>
   </div>
 </div>
 '''
-    function isThreadOf(uid) {
-      return function(x) {
-        return x.esper_uid === uid && x.gmail_thrid === threadId;
+    function onTeamSwitch(toTeam) {
+      dismissDropdowns();
+      wrap.fadeOut(250);
+      sizeIcon.removeClass("minimize");
+      sidebar.hide("slide", { direction: "down" }, 250);
+      wrap.fadeIn(250);
+      sizeIcon.addClass("minimize");
+      sidebar.show("slide", { direction: "down" }, 250);
+      function afterAnimation() {
+        displayTeamSidebar(rootElement, toTeam, currentThreadId);
       }
+      setTimeout(afterAnimation, 250);
     }
 
-    var e = ev.event;
-    var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end.local);
-
-    month.text(XDate.month(start).toUpperCase());
-    day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
-
-    if (e.title !== undefined)
-      title.text(e.title);
-
-    if (e.google_cal_url !== undefined) {
-      function openGcal() {
-        open(e.google_cal_url, "_blank");
-      }
-      date
-        .addClass("esper-clickable")
-        .click(openGcal);
-      editEvent
-        .removeClass("disabled")
-        .click(openGcal);
-    }
-
-    info
-      .attr("src", Init.esperRootUrl + "img/info.png")
-      .tooltip();
-    var position = { my: 'center bottom', at: 'center top-10' };
-    var infoContent = "Automatically synchronizes the event's " +
-      "description with the contents of this email conversation.";
-    info
-      .tooltip("option", "content", infoContent)
-      .tooltip("option", "position", position)
-      .tooltip("option", "tooltipClass", "top sync-info");
-
-    syncCheckbox.change(function() {
-      var apiCall;
-      if (this.checked)
-        apiCall = Api.syncEvent;
-      else
-        apiCall = Api.unsyncEvent;
-      syncCheckbox.attr("style", "display: none");
-      spinner.attr("style", "display: block");
-      apiCall(teamid, threadId, e.google_event_id).done(function() {
-        spinner.attr("style", "display: none");
-        syncCheckbox.attr("style", "display: block");
-        refreshEventList(teamid, threadId, sidebar, profiles);
-      });
+    Login.myTeams().forEach(function(otherTeam) {
+      displayTeamSelector(teamsSection, team.teamid, otherTeam, onTeamSwitch);
     });
 
-    var currentSynced = false;
-    var syncedUsers = [];
 
-    List.iter(profiles, function(prof) {
-      var synced = List.exists(ev.synced_threads, function(x) {
-        return x.esper_uid === prof.profile_uid;
+    var name = team.team_name;
+    if (name === null || name === undefined || name === "") {
+      var exec = List.find(profiles, function(prof) {
+        return prof.profile_uid === team.team_executive;
       });
-      if (synced && prof.profile_uid === Login.myUid()) {
-        syncCheckbox.attr("checked", true);
-        currentSynced = true;
-        syncedUsers.unshift("You");
-      } else if (synced) {
-        syncedUsers.push(prof.display_name);
-      }
+      name = exec.display_name ? exec.display_name : "NO NAME";
+    }
+    teamName.text(name);
+
+    footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+
+    options.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      "content": "Options",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "top esper-tooltip"
     });
 
-    var teamPhrase = "";
-    if ((syncedUsers.length === 0) ||
-        (syncedUsers.length === 1 && syncedUsers[0] === "You")) {
-      teamPhrase = "No other team members are ";
-      syncNote.attr("style", "display: none");
-    } else if (syncedUsers.length === 1) {
-      teamPhrase = syncedUsers[0] + " is ";
-    } else if (syncedUsers.length === 2) {
-      teamPhrase = syncedUsers[0] + " and " + syncedUsers[1] + " are ";
-    } else {
-      for (var i = 0; i < syncedUsers.length; i++) {
-        if (i < syncedUsers.length - 1)
-          teamPhrase += syncedUsers[i] + ", ";
-        else
-          teamPhrase += "and " + syncedUsers[i] + " are ";
-      }
-    }
-    teamSync.text(teamPhrase += " syncing messages with this event.");
+    size.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      "content": "Minimize",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "top esper-tooltip"
+    });
 
-    var notePhrase = "";
-    if (!currentSynced && syncedUsers.length > 0) {
-      notePhrase = "Turn on Description Sync to also include messages from " +
-        "your version of this email conversation. Duplicate messages will be " +
-        "automatically excluded.";
-    } else if (syncedUsers.length > 1) {
-      notePhrase = "Duplicate messages are automatically excluded.";
-    }
-    syncNote.text(notePhrase);
-
-
-    cog.attr("src", Init.esperRootUrl + "img/event-cog.png")
-    cog.click(function() {
-      if (cog.hasClass("open")) {
+    function toggleOptions() {
+      if (options.hasClass("open")) {
         dismissDropdowns();
+        options.tooltip("enable");
       } else {
         dismissDropdowns();
         dropdown.toggle();
-        cog.addClass("open");
+        options
+          .addClass("open")
+          .tooltip("disable");
       }
+    }
+
+    function toggleSidebar() {
+      if (sidebar.css("display") === "none") {
+        wrap.fadeIn(250);
+        sizeIcon.addClass("minimize");
+        size.tooltip("option", "content", "Minimize");
+        sidebar.show("slide", { direction: "down" }, 250);
+      } else {
+        wrap.fadeOut(250);
+        sizeIcon.removeClass("minimize");
+        size.tooltip("option", "content", "Maximize");
+        sidebar.hide("slide", { direction: "down" }, 250);
+      }
+    }
+
+    options.click(toggleOptions);
+    size.click(toggleSidebar);
+
+    settings.click(function() {
+      popWindow(Conf.Api.url, 545, 433);
+    })
+    signOut.click(function() {
+      if (sidebar.css("display") !== "none")
+        sidebar.hide("slide", { direction: "down" }, 250);
+      view.fadeOut(250).delay(250);
+      Login.logout();
+      Menu.create();
+    });
+
+    rootElement.append(view);
+  }
+
+  function displaySidebar(rootElement,
+                          team: ApiT.Team,
+                          linkedEvents: ApiT.LinkedCalendarEvents) {
+'''
+<div #view class="esper-sidebar">
+  <ul class="esper-tab-links">
+    <li class="active"><a #tab1 href="#tab1">
+      <img #calendar class="esper-tab-icon"/>
+    </a></li>
+    <li><a #tab2 href="#tab2"><img #polls class="esper-tab-icon"/></a></li>
+    <li><a #tab3 href="#tab3"><img #person class="esper-tab-icon"/></a></li>
+  </ul>
+  <div class="esper-tab-content">
+    <div #content1 id="tab1" class="tab active"/>
+    <div #content2 id="tab2" class="tab"/>
+    <div #content3 id="tab3" class="tab"/>
+  </div>
+</div>
+'''
+
+    tab1.click(function() {
+      switchTab(tab1);
+    })
+    tab2.click(function() {
+      switchTab(tab2);
+    })
+    tab3.click(function() {
+      switchTab(tab3);
     })
 
-    unlinkEvent.click(function() {
-      view.attr("style", "opacity: 0.3");
-      Api.unlinkEvent(teamid, threadId, e.google_event_id)
-        .done(function() {
-          view.slideUp();
-          refreshEventList(teamid, threadId, sidebar, profiles);
-        });
-    });
+    calendar.attr("src", Init.esperRootUrl + "img/calendar.png");
+    polls.attr("src", Init.esperRootUrl + "img/polls.png");
+    person.attr("src", Init.esperRootUrl + "img/person.png");
 
-    deleteEvent.click(function() {
-      view.attr("style", "opacity: 0.3");
-      Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
-        .done(function() {
-          view.slideUp();
-          refreshEventList(teamid, threadId, sidebar, profiles);
-        });
-    });
+    function switchTab(tab) {
+      var currentAttrValue = tab.attr("href");
+      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
+      tab.parent('li').addClass('active').siblings().removeClass('active');
+    };
+
+    EvTab.displayLinkedEvents(content1, team, profiles, linkedEvents);
+    Tab2Content.displayTab2ComingSoon(content2);
+    Tab3Content.displayTab3ComingSoon(content3);
+
+    rootElement.append(view);
 
     return view;
   }
 
-  function displayEventList(events, teamid, threadId, sidebar, profiles) {
-    sidebar.count.text(events.length.toString());
-    sidebar.events.children().remove();
-    events.forEach(function(e) {
-      sidebar.events.append(renderEvent(e, teamid, threadId,
-                                        sidebar, profiles));
-    });
-  }
-
-  /* reuse the view created for the team, update list of linked events */
-  export function refreshEventList(teamid, threadId, sidebar, profiles) {
-    Api.getLinkedEvents(teamid, threadId)
-      .done(function(linkedEvents) {
-        displayEventList(linkedEvents.linked_events, teamid,
-                         threadId, sidebar, profiles);
-        sidebar.count.text(linkedEvents.linked_events.length.toString());
-        if (linkedEvents.linked_events.length === 0)
-          sidebar.noEvents.attr("style", "display: block");
-        else
-          sidebar.noEvents.attr("style", "display: none");
-      });
-  }
-
-  export interface Sidebar {
-    view: JQuery;
-    add: JQuery;
-    addIcon: JQuery;
-    count: JQuery;
-    dropdown: JQuery;
-    newEvent: JQuery;
-    existingEvent: JQuery;
-    noEvents: JQuery;
-    arrow: JQuery;
-    noEventsText: JQuery;
-    events: JQuery;
-    footer: JQuery;
-    sidebarLogo: JQuery;
-    teamName: JQuery;
-  }
-
-  function displayLinkedEvents(rootElement,
-                               team: ApiT.Team,
-                               profiles : ApiT.Profile[],
-                               linkedEvents: ApiT.LinkedCalendarEvents) {
+  function displayUpdateDock(rootElement, url) {
 '''
-<div #view>
-  <div class="esper-header">
-    <button #add class="esper-dropdown-btn esper-add-btn">
-      <img #addIcon class="esper-add-icon"/>
-    </button>
-    <div class="esper-title">Linked Events (<span #count></span>)</div>
-    <ul #dropdown class="esper-ul esper-add-dropdown">
-      <li #newEvent
-          class="esper-li disabled">
-        Create new linked event
-      </li>
-      <li #existingEvent class="esper-li">
-        Link to existing event
-      </li>
-    </ul>
+<div #view class="esper-dock-container">
+  <div #dock class="esper-dock esper-update">
+    Click here to update Esper.
   </div>
-  <div #noEvents class="esper-ev">
-    <img #arrow class="no-events-arrow"/>
-    <div #noEventsText class="no-events-text"/>
-  </div>
-  <div #events/>
-  <div #footer class="esper-footer">
-    <a href="http://esper.com">
-      <img #sidebarLogo class="esper-footer-logo"/>
-    </a>
-    <div class="esper-footer-links">
-      <a href="mailto:team@esper.com">Help</a>
-      <div class="esper-footer-divider"/>
-      <a href="http://esper.com/privacypolicy.html">Privacy</a>
-      <div class="esper-footer-divider"/>
-      <a href="https://app.esper.com">Settings</a>
-    </div>
-    <div>
-      <div #teamName class="esper-team-name"/>
-      <div class="copyright">&copy; 2014 Esper</div>
-    </div>
-  </div>
-
 </div>
 '''
-    var sidebar = <Sidebar> _view;
-    addIcon.attr("src", Init.esperRootUrl + "img/add-event.png");
-    add.click(function() {
-      if (add.hasClass("open")) {
-        dismissDropdowns();
-      } else {
-        dismissDropdowns();
-        arrow.toggle();
-        dropdown.toggle();
-        add.addClass("open");
-      }
-    })
-
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      assisting = exec.display_name;
-    }
-    var possessive = (assisting.slice(-1) === "s")
-        ? (assisting + "'")
-        : (assisting + "'s");
-
-    arrow.attr("src", Init.esperRootUrl + "img/arrow.png");
-    noEventsText.text("Click here to link this email conversation " +
-      "to events on " + possessive + " calendar.");
-    if (linkedEvents.linked_events.length === 0)
-      noEvents.attr("style", "display: block");
-    else
-      noEvents.attr("style", "display: none");
-
-    displayEventList(
-      linkedEvents.linked_events,
-      team.teamid,
-      currentThreadId,
-      sidebar,
-      profiles
-    );
-
-    teamName.text("Assisting " + assisting);
-
-    existingEvent.click(function() {
-      EvSearch.openSearchModal(linkedEvents, team, possessive,
-                               sidebar, profiles);
+  
+    dock.click(function() {
+      open(url, "_blank");
     });
-
-    sidebarLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
     rootElement.append(view);
   }
@@ -388,6 +297,31 @@ module Esper.MsgView {
     return Deferred.join(l);
   }
 
+  function getAllProfiles(teams : ApiT.Team[])
+    : JQueryDeferred<ApiT.Profile[][]>
+  {
+    var profileLists =
+      List.map(teams, function(team) {
+        return getTeamProfiles(team);
+      });
+    return Deferred.join(profileLists);
+  }
+
+  function displayTeamSidebar(rootElement, team, threadId) {
+    rootElement.children().remove();
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        Api.checkVersion().done(function(status_) {
+          if (status_.must_upgrade === true) {
+            displayUpdateDock(rootElement, status_.download_page);
+          } else {
+            var sidebar = displaySidebar(rootElement, team, linkedEvents);
+            displayDock(rootElement, sidebar, team);
+            sidebar.show("slide", { direction: "down" }, 250);
+          }
+        });
+      });
+  }
 
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
@@ -404,15 +338,9 @@ module Esper.MsgView {
           return false;
         }
         else {
-          Login.myTeams().forEach(function(team) {
-            getTeamProfiles(team).done(function(profiles) {
-              Api.getLinkedEvents(team.teamid, threadId)
-                .done(function(linkedEvents) {
-                  displayLinkedEvents(rootElement, team,
-                                      profiles, linkedEvents);
-                });
-            });
-          });
+          var firstTeam = Login.myTeams()[0];
+          if (firstTeam !== undefined && firstTeam !== null)
+            displayTeamSidebar(rootElement, firstTeam, threadId);
           return true;
         }
       }
@@ -441,8 +369,12 @@ module Esper.MsgView {
     if (! alreadyInitialized) {
       alreadyInitialized = true;
       Log.d("MsgView.init()");
-      listen();
-      maybeUpdateView();
+      getAllProfiles(Login.myTeams()).done(function(profLists) {
+        profiles = List.concat(profLists);
+        Log.d(profiles);
+        listen();
+        maybeUpdateView();
+      });
     }
   }
 }

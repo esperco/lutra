@@ -15,7 +15,8 @@ JS_LIBS = \
   jquery \
   jqueryui \
   gmail \
-  sha1
+  sha1 \
+  retina
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
@@ -59,6 +60,9 @@ SHARED_SOURCES = \
 APP_SOURCES = \
   Menu \
   EvSearch \
+  EvTab \
+  Tab2Content \
+  Tab3Content \
   MsgView \
   Init \
   Main
