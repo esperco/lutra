@@ -21,7 +21,9 @@ module Esper.Types {
     eventId: string;
   }
 
+  /* One short list of the recently consulted email threads */
   export interface ActiveThreads {
+    googleAccountId: string;
     threads: GmailThread[];
   }
 

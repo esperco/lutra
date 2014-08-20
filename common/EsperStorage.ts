@@ -80,6 +80,15 @@ module Esper.EsperStorage {
     }, whenDone);
   }
 
+  export function saveActiveThreads(x: Types.ActiveThreads,
+                                   whenDone: () => void) {
+    update(function(esper) {
+      var k = x.googleAccountId;
+      getAccount(esper, k).activeThreads = x;
+      return esper;
+    }, whenDone);
+  }
+
   export function loadCredentials(googleAccountId: string,
                                   whenDone: (account: Types.Account) => void) {
     load(function(esper) {

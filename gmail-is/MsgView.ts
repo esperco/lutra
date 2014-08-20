@@ -333,6 +333,7 @@ module Esper.MsgView {
         var threadId = emailData.first_email;
         currentThreadId = threadId;
         Log.d("Using new thread ID " + threadId);
+        ActiveThreads.handleNewActiveThread(threadId);
         var rootElement = insertEsperRoot();
         if (rootElement === undefined) {
           return false;
