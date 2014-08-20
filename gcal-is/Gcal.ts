@@ -49,7 +49,10 @@ module Esper.Gcal {
     }
 
     function decodeBase64(encoded: string): string {
-      return atob(encoded);
+      if (encoded !== undefined && encoded !== null)
+        return atob(encoded);
+      else
+        return;
     }
 
     /*
@@ -80,7 +83,7 @@ module Esper.Gcal {
 
     function decodeFullEventId(encodedId: string): Types.FullEventId {
       var decoded = decodeBase64(encodedId);
-      if (decoded !== undefined && decoded !== null) {
+      if (decoded !== undefined) {
         var eventId = decoded.slice(0, 26);
         var ar = decoded.split(" ");
         if (ar.length === 2) {
