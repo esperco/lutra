@@ -1,6 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Esper",
+  "short_name": "Esper",
   "version": "@@VERSION@@",
 
   "description": "Link between Gmail and Google Calendar",
