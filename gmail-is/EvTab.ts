@@ -243,7 +243,7 @@ module Esper.EvTab {
 '''
 <div #view>
   <div #linkActions class="esper-tab-header">
-    <div #newEvent class="esper-link-action">
+    <div #newEvent class="esper-link-action disabled">
       <div class="esper-link-action-icon-container">
         <img #newEventIcon class="esper-link-action-icon"/>
       </div>
