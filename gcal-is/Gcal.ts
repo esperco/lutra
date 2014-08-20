@@ -39,12 +39,7 @@ module Esper.Gcal {
 
   export module Event {
 
-    export interface FullEventId {
-      calendarId: string;
-      eventId: string;
-    }
-
-    export function equal(a: FullEventId, b: FullEventId): boolean {
+    export function equal(a: Types.FullEventId, b: Types.FullEventId): boolean {
       if (a === b)
         return true;
       else if (a === undefined || b === undefined)
@@ -83,7 +78,7 @@ module Esper.Gcal {
       }
     }
 
-    function decodeFullEventId(encodedId: string): FullEventId {
+    function decodeFullEventId(encodedId: string): Types.FullEventId {
       var decoded = decodeBase64(encodedId);
       var eventId = decoded.slice(0, 26);
       var ar = decoded.split(" ");
@@ -94,7 +89,7 @@ module Esper.Gcal {
       };
     }
 
-    export function extractFullEventId(): FullEventId {
+    export function extractFullEventId(): Types.FullEventId {
       var encodedId = $("div.ep[data-eid]").attr("data-eid");
       if (encodedId !== undefined)
         return decodeFullEventId(encodedId);

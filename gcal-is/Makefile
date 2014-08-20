@@ -33,6 +33,7 @@ APP_DEFS =
 # path to file without .ts suffix
 SHARED_SOURCES = \
   ../common/ts/Esper \
+  ../common/ts/Types \
   ../common/ts/Conf \
   ../common/ts/List \
   ../common/ts/Util \
@@ -52,6 +53,7 @@ SHARED_SOURCES = \
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
   Gcal \
+  ActiveEvents \
   CalEventView \
   Init \
   Main

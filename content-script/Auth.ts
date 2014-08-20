@@ -7,7 +7,7 @@ module Esper.Auth {
     as a Google Chrome user.
   */
 
-  function sendCredentialsResponse(x: EsperStorage.Account) {
+  function sendCredentialsResponse(x: Types.Account) {
     if (/^https:\/\/mail.google.com\//.test(document.URL)
         || /^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
       Log.d("Sending message from content script to gmail page", x);
@@ -24,7 +24,7 @@ module Esper.Auth {
     Send credentials for all Esper accounts because we're not keeping track
     of which account was requested.
   */
-  function sendStorage(x: EsperStorage.EsperStorage) {
+  function sendStorage(x: Types.Storage) {
     if (x !== undefined && x.accounts !== undefined) {
       Log.d("sendStorage()");
       var accounts = x.accounts;
@@ -41,7 +41,7 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomeModal(account: EsperStorage.Account) {
+  function openWelcomeModal(account: Types.Account) {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -93,7 +93,7 @@ module Esper.Auth {
   function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
       googleAccountId,
-      function(x: EsperStorage.Account) {
+      function(x: Types.Account) {
         if (x.credentials !== undefined
             || (x.declined === true && ! forceLogin)) {
           sendCredentialsResponse(x);
@@ -117,7 +117,15 @@ module Esper.Auth {
         case "Account":
           EsperStorage.saveAccount(
             request.value,
-            function() { Log.d("Received and stored credentials"); }
+            function() { Log.d("Received and stored account data"); }
+          );
+          break;
+
+        /* Receive an updated list of recently accessed calendar events */
+        case "ActiveEvents":
+          EsperStorage.saveActiveEvents(
+            request.value,
+            function() { Log.d("Received and stored active events"); }
           );
           break;
 

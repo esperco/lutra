@@ -2,9 +2,9 @@
   Google Calendar event view
 */
 module Esper.CalEventView {
-  var currentEventId : Gcal.Event.FullEventId;
+  var currentEventId : Types.FullEventId;
 
-  function checkForNewEventId(callback: (x: Gcal.Event.FullEventId) => void) {
+  function checkForNewEventId(callback: (x: Types.FullEventId) => void) {
     var oldEventId = currentEventId;
     currentEventId = Gcal.Event.extractFullEventId();
     if (currentEventId !== undefined
@@ -14,7 +14,7 @@ module Esper.CalEventView {
     listenForNewEventId(callback);
   }
 
-  function listenForNewEventId(callback: (x: Gcal.Event.FullEventId) => void) {
+  function listenForNewEventId(callback: (x: Types.FullEventId) => void) {
     setTimeout(function() {
       checkForNewEventId(callback);
     }, 1000);
@@ -27,6 +27,7 @@ module Esper.CalEventView {
       alreadyInitialized = true;
       listenForNewEventId(function(fullEventId) {
         Log.d("New current event ID:", fullEventId);
+        ActiveEvents.handleNewActiveEvent(fullEventId);
       });
     }
   }

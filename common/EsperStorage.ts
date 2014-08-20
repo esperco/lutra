@@ -2,35 +2,10 @@
   Persistent storage used by Esper, controlled by the content script.
 */
 module Esper.EsperStorage {
-  /*
-    This is the minimum we need to make API calls as a logged-in Esper user.
-    Other account information (profile, teams) can be retrieved using these.
-  */
-  export interface Credentials {
-    apiSecret: string;       // used for signing, but not sent to the server
-    uid: string;             // used by the server to find the API secret
-  }
-
-  export interface Account {
-    googleAccountId: string;
-      /* Google account (email address) tied to the Esper account */
-    credentials?: Credentials;
-      /* Esper UID and API secret */
-    declined: boolean;
-      /* user said "no thanks" when asked to log in;
-         this field should be set to false
-         if credentials exist.
-      */
-  }
-
-  export interface EsperStorage {
-    accounts: { [googleAccountId: string]: Account; };
-  }
-
 
   /* The functions below will only work from the Esper content script */
 
-  function save(x: EsperStorage, callback: () => void) {
+  function save(x: Types.Storage, callback: () => void) {
     var stop = Log.start("EsperStorage.save()");
     chrome.storage.local.set({esper: x}, function() {
       callback();
@@ -38,10 +13,10 @@ module Esper.EsperStorage {
     });
   }
 
-  function load(callback: (x: EsperStorage) => void) {
-    var stop = Log.start("EsperStorage.load()");
+  function load(callback: (x: Types.Storage) => void) {
+    var stop = Log.start("Types.Storage.load()");
     chrome.storage.local.get("esper", function(obj : any) {
-      var x : EsperStorage = obj.esper;
+      var x : Types.Storage = obj.esper;
       if (x === undefined)
         x = { accounts: {} };
       else if (x.accounts === undefined)
@@ -52,8 +27,8 @@ module Esper.EsperStorage {
     });
   }
 
-  function update(transform: (x: EsperStorage) => EsperStorage,
-                  whenSaved: (y: EsperStorage) => void) {
+  function update(transform: (x: Types.Storage) => Types.Storage,
+                  whenSaved: (y: Types.Storage) => void) {
     var stop = Log.start("EsperStorage.update()");
     load(function(x) {
       var y = transform(x);
@@ -61,14 +36,14 @@ module Esper.EsperStorage {
     });
   }
 
-  function newAccount(googleAccountId: string): Account {
+  function newAccount(googleAccountId: string): Types.Account {
     return {
       googleAccountId: googleAccountId,
       declined: false
     };
   }
 
-  function getAccount(esper: EsperStorage, googleAccountId: string) {
+  function getAccount(esper: Types.Storage, googleAccountId: string) {
     console.assert(esper.accounts !== undefined);
     var account = esper.accounts[googleAccountId];
     if (account === undefined) {
@@ -80,7 +55,7 @@ module Esper.EsperStorage {
     return account;
   }
 
-  export function saveAccount(x: Account,
+  export function saveAccount(x: Types.Account,
                               whenDone: () => void) {
     update(function(esper) {
       var k = x.googleAccountId;
@@ -96,8 +71,17 @@ module Esper.EsperStorage {
     }, whenDone);
   }
 
+  export function saveActiveEvents(x: Types.ActiveEvents,
+                                   whenDone: () => void) {
+    update(function(esper) {
+      var k = x.googleAccountId;
+      getAccount(esper, k).activeEvents = x;
+      return esper;
+    }, whenDone);
+  }
+
   export function loadCredentials(googleAccountId: string,
-                                  whenDone: (Account) => void) {
+                                  whenDone: (account: Types.Account) => void) {
     load(function(esper) {
       var account = getAccount(esper, googleAccountId);
       whenDone(account);
@@ -114,8 +98,8 @@ module Esper.EsperStorage {
     });
   }
 
-  export function listenForChange(callback: (oldValue: EsperStorage,
-                                             newValue: EsperStorage) => void) {
+  export function listenForChange(callback: (oldValue: Types.Storage,
+                                             newValue: Types.Storage) => void) {
     chrome.storage.onChanged.addListener(function(changes, namespace) {
       if (namespace === "local") {
         var change = changes["esper"];
