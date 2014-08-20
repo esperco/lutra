@@ -49,7 +49,10 @@ module Esper.Gcal {
     }
 
     function decodeBase64(encoded: string): string {
-      return atob(encoded);
+      if (encoded !== undefined && encoded !== null)
+        return atob(encoded);
+      else
+        return;
     }
 
     /*
@@ -80,13 +83,17 @@ module Esper.Gcal {
 
     function decodeFullEventId(encodedId: string): Types.FullEventId {
       var decoded = decodeBase64(encodedId);
-      var eventId = decoded.slice(0, 26);
-      var ar = decoded.split(" ");
-      var calendarId = fixCalendarId(ar[1]);
-      return {
-        calendarId: calendarId,
-        eventId: eventId
-      };
+      if (decoded !== undefined) {
+        var eventId = decoded.slice(0, 26);
+        var ar = decoded.split(" ");
+        if (ar.length === 2) {
+          var calendarId = fixCalendarId(ar[1]);
+          return {
+            calendarId: calendarId,
+            eventId: eventId
+          };
+        }
+      }
     }
 
     export function extractFullEventId(): Types.FullEventId {
