@@ -279,7 +279,7 @@ module Esper.MsgView {
   </div>
 </div>
 '''
-  
+
     dock.click(function() {
       open(url, "_blank");
     });
