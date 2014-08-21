@@ -7,10 +7,30 @@ module Esper.Auth {
     as a Google Chrome user.
   */
 
+  enum PageType {
+    Gmail,
+    Gcal,
+    Other
+  }
+
+  var pageType: PageType;
+
+  function getPageType() {
+    if (pageType === undefined) {
+      if (/^https:\/\/mail.google.com\//.test(document.URL))
+        pageType = PageType.Gmail;
+      else if (/^https:\/\/www.google.com\/calendar\//.test(document.URL))
+        pageType = PageType.Gcal;
+      else
+        pageType = PageType.Other;
+    }
+    return pageType;
+  }
+
   function sendCredentialsResponse(x: Types.Account) {
-    if (/^https:\/\/mail.google.com\//.test(document.URL)
-        || /^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
-      Log.d("Sending message from content script to gmail page", x);
+    var pageType = getPageType();
+    if (pageType === PageType.Gmail || pageType === PageType.Gcal) {
+      Log.d("Sending message from content script to page", x);
       var esperMessage : EsperMessage.EsperMessage = {
         sender: "Esper",
         type: "CredentialsResponse",
@@ -110,7 +130,12 @@ module Esper.Auth {
     window.addEventListener("message", function(event) {
       var request = event.data;
       if (request.sender === "Esper") {
-        Log.d("Received message:", event.data);
+
+        var ignored = ["CredentialsResponse"];
+        var isIgnored = List.mem(request.type, ignored);
+        if (! isIgnored)
+          Log.d("Received message:", event.data);
+
         switch (request.type) {
 
         /* Listen for Esper credentials posted by an app.esper.com page. */
@@ -147,10 +172,6 @@ module Esper.Auth {
           obtainCredentials(request.value, true);
           break;
 
-        /* Sent by content script itself, ignored. */
-        case "CredentialsResponse":
-          break;
-
         /* Listen for logouts from the app.esper.com page */
         case "Logout":
           EsperStorage.deleteCredentials(
@@ -166,7 +187,8 @@ module Esper.Auth {
           break;
 
         default:
-          Log.d("Unknown request type: " + request.type);
+          if (! isIgnored)
+            Log.d("Unknown request type: " + request.type);
         }
       }
     });
