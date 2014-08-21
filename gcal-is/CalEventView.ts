@@ -11,13 +11,12 @@ module Esper.CalEventView {
         && ! Gcal.Event.equal(currentEventId, oldEventId)) {
       callback(currentEventId);
     }
-    listenForNewEventId(callback);
   }
 
   function listenForNewEventId(callback: (x: Types.FullEventId) => void) {
-    setTimeout(function() {
+    Util.every(300, function() {
       checkForNewEventId(callback);
-    }, 1000);
+    });
   }
 
   /* Find a good insertion point, on the right-hand side

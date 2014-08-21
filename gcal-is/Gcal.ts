@@ -81,12 +81,22 @@ module Esper.Gcal {
       }
     }
 
+    /* Examples covering what we're parsing after base64 decoding:
+
+       "4jqqn6rb48sh9c2sbet0che86k lois.mj.esper@m"
+       "4jqqn6rb48sh9c2sbet0che86k_20140825T000000Z lois.mj.esper@m"
+       "4jqqn6rb48sh9c2sbet0che86k someone@example.com"
+     */
     function decodeFullEventId(encodedId: string): Types.FullEventId {
       var decoded = decodeBase64(encodedId);
       if (decoded !== undefined) {
-        var eventId = decoded.slice(0, 26);
         var ar = decoded.split(" ");
         if (ar.length === 2) {
+          /* An event ID looks like this:
+             one-time:  qvb2c11pcjkpdm2t0simrfvo24
+             recurring: qvb2c11pcjkpdm2t0simrfvo24_20140822T190000Z
+          */
+          var eventId = ar[0];
           var calendarId = fixCalendarId(ar[1]);
           return {
             calendarId: calendarId,
