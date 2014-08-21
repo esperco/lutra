@@ -146,7 +146,7 @@ var signin = (function() {
   }
 
   function showTokenDetails(loginView, tokenDescription) {
-    loginView.msgDiv.text(JSON.stringify(tokenDescription));
+    Log.d(JSON.stringify(tokenDescription));
   }
 
   function useInvite(inviteCode) {
@@ -155,7 +155,8 @@ var signin = (function() {
       .then(
         /* success */
         function(tokenDescription) {
-          var loginView = displayLoginLinks("", "#!", inviteCode, undefined);
+          var loginView =
+            displayLoginLinks("Valid invite.", "#!", inviteCode, undefined);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */
