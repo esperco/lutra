@@ -75,7 +75,7 @@ module Esper.Util {
     }
   }
 
-  /* Call the given function f() until it returns true,
+  /* Call the given function f() until it returns true or throws an exception,
      every delayMs milliseconds, at most maxAttempts times. */
   export function repeatUntil(maxAttempts: number,
                               delayMs: number,
@@ -86,6 +86,27 @@ module Esper.Util {
           repeatUntil(maxAttempts - 1, delayMs, f);
         }, delayMs);
     }
+  }
+
+  /* Run the given function f() every delayMs milliseconds.
+     Exceptions are logged and otherwise ignored. */
+  export function every(delayMs: number,
+                        f: () => void) {
+    setTimeout(function() {
+      try {
+        f();
+        try {
+          every(delayMs, f)
+        }
+        catch(e) {
+          Log.e("Exception thrown by Util.every():", e);
+        }
+      }
+      catch(e) {
+        Log.e("Exception thrown by callback passed to Util.every():", e);
+        every(delayMs, f);
+      }
+    }, delayMs);
   }
 
   export function afterTyping(elt: JQuery, delayMs: number, func) {

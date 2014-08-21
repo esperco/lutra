@@ -83,7 +83,16 @@ module Esper.Init {
     window.addEventListener("message", function(event) {
       var request = event.data;
       if (request.sender === "Esper") {
-        Log.d("Received message:", event.data);
+
+        var ignored = [
+          "CredentialsRequest",
+          "Logout",
+          "ActiveThreads"
+        ];
+        var isIgnored = List.mem(request.type, ignored);
+        if (! isIgnored)
+          Log.d("Received message:", event.data);
+
         switch (request.type) {
 
         /* Credentials sent by content script;
@@ -92,14 +101,9 @@ module Esper.Init {
           filterCredentials(request.value);
           break;
 
-        /* Sent by injected script itself, ignored. */
-        case "CredentialsRequest":
-        case "Logout":
-        case "ActiveThreads":
-          break;
-
         default:
-          Log.e("Unknown request type: " + request.type);
+          if (! isIgnored)
+            Log.e("Unknown request type: " + request.type);
         }
       }
     });
