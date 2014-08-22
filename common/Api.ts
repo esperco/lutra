@@ -103,4 +103,13 @@ module Esper.Api {
       + "/" + encodeURIComponent(query);
     return JsonHttp.get(url);
   }
+
+  export function getEvent(teamid, eventid):
+  JQueryDeferred<ApiT.CalendarEvent> {
+    var url =
+      Conf.Api.url + "/api/event/get/" + Login.myUid()
+      + "/" + teamid
+      + "/" + encodeURIComponent(eventid);
+    return JsonHttp.get(url);
+  }
 }
