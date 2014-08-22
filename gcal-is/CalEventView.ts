@@ -43,10 +43,32 @@ module Esper.CalEventView {
     return root;
   }
 
+  function renderEventControls(team: ApiT.Team,
+                               fullEventId: Types.FullEventId) {
+'''
+<div #view>
+  <div>
+    <div>Linked threads</div>
+    <div #linked/>
+  </div>
+  <div>
+    <div>Recently visited threads</div>
+    <div #linkable/>
+  </div>
+</div>
+'''
+
+    return view;
+  }
+
   function updateView(fullEventId) {
     var rootElement = insertEsperRoot();
     /* For each team that uses this calendar */
-    rootElement.text("Hello from Esper!");
+    Login.myTeams().forEach(function(team) {
+      if (team.team_calendar.google_calendar_id === fullEventId.calendarId) {
+        rootElement.append(renderEventControls(team, fullEventId));
+      }
+    });
   }
 
   var alreadyInitialized = false;
