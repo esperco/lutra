@@ -12,11 +12,17 @@ module Esper.ApiT {
     download_page: string;
   }
 
+  export interface TeamCalendar {
+    access_uid: string;
+    google_calendar_id: string;
+  }
+
   export interface Team {
     teamid: string;
     team_name: string;
     team_executive: string;
     team_assistants: string[];
+    team_calendar: TeamCalendar;
   }
 
   export interface Phone {
