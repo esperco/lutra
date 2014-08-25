@@ -281,18 +281,17 @@ module Esper.EvTab {
       var newTab = window.open("");
       newTab.document.write("Creating new linked event, please wait...");
       var threadId = MsgView.currentThreadId;
-      Api.createNewLinkedEvent(team.teamid, threadId)
-        .done(function(e) {
-          var eventId = e.google_event_id;
-          if (eventId !== null && eventId !== undefined) {
-            newTab.document.write(" done! Syncing thread to description...");
-            Api.syncEvent(team.teamid, threadId, eventId).done(function() {
-              var url = e.google_cal_url;
-              if (url !== null && url !== undefined)
-                newTab.location.assign(url);
-            });
-          }
-        });
+      Api.createNewLinkedEvent(team.teamid, threadId).done(function(e) {
+        var eventId = e.google_event_id;
+        if (eventId !== null && eventId !== undefined) {
+          newTab.document.write(" done! Syncing thread to description...");
+          Api.syncEvent(team.teamid, threadId, eventId).done(function() {
+            var url = e.google_cal_url;
+            if (url !== null && url !== undefined)
+              newTab.location.assign(url);
+          });
+        }
+      });
     });
 
     linkEvent.click(function() {
