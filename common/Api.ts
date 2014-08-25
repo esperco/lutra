@@ -104,10 +104,10 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEvent(teamid, eventid):
+  export function getEventDetails(teamid, eventid):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
-      Conf.Api.url + "/api/event/get/" + Login.myUid()
+      Conf.Api.url + "/api/event/details/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(eventid);
     return JsonHttp.get(url);
