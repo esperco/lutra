@@ -243,7 +243,7 @@ module Esper.EvTab {
 '''
 <div #view>
   <div #linkActions class="esper-tab-header">
-    <div #newEvent class="esper-link-action disabled">
+    <div #newEvent class="esper-link-action">
       <div class="esper-link-action-icon-container">
         <img #newEventIcon class="esper-link-action-icon"/>
       </div>
@@ -276,6 +276,17 @@ module Esper.EvTab {
       eventsTab,
       profiles
     );
+
+    newEvent.click(function() {
+      var newTab = window.open("");
+      newTab.document.write("Creating new linked event, please wait...");
+      Api.createNewLinkedEvent(team.teamid, MsgView.currentThreadId)
+        .done(function(e) {
+          var url = e.google_cal_url;
+          if (url !== null && url !== undefined)
+            newTab.location.assign(url);
+        });
+    });
 
     linkEvent.click(function() {
       EvSearch.openSearchModal(linkedEvents, team, eventsTab, profiles);
