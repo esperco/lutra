@@ -35,7 +35,8 @@ module Esper.MsgView {
 
   /* Find a good insertion point, on the right-hand side of the page. */
   function findAnchor() {
-    var anchor = $(".nH.g.id");
+    var anchor = $(".nH.g.id"); // email only
+    // var anchor = $(".Tm.aeJ"); // global
     if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper thread controls.");
       return $();
