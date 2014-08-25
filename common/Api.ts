@@ -112,4 +112,13 @@ module Esper.Api {
       + "/" + encodeURIComponent(eventid);
     return JsonHttp.get(url);
   }
+
+  export function createNewLinkedEvent(teamid, threadId):
+  JQueryDeferred<ApiT.CalendarEvent> {
+    var url =
+      Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId;
+    return JsonHttp.post(url, "");
+  }
 }
