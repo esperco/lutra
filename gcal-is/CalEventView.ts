@@ -92,18 +92,28 @@ module Esper.CalEventView {
             var threadView = renderLinkedThread(thread);
             linked.append(threadView);
           });
-          var account = Login.getAccount();
-          var activeThreads = account.activeThreads;
-          if (activeThreads !== undefined) {
-            List.iter(activeThreads.threads, function(thread) {
-              if (! List.exists(thrids, function(thrid) {
-                return thread.threadId === thrid;
-              })) {
-                var threadView = renderActiveThread(thread);
-                linkable.append(threadView);
-              }
-            });
+
+          function refreshLinkable() {
+            linkable.children().remove();
+            var account = Login.getAccount();
+            var activeThreads = account.activeThreads;
+            if (activeThreads !== undefined) {
+              List.iter(activeThreads.threads, function(thread) {
+                if (! List.exists(thrids, function(thrid) {
+                  return thread.threadId === thrid;
+                })) {
+                  var threadView = renderActiveThread(thread);
+                  linkable.append(threadView);
+                }
+              });
+            }
           }
+
+          refreshLinkable();
+          Login.watchableAccount.watch(function(newAccount, newValidity,
+                                                oldAccount, oldValidity) {
+            refreshLinkable();
+          });
         });
       });
 
