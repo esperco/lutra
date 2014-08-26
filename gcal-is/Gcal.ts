@@ -6,7 +6,12 @@
 module Esper.Gcal {
 
   function extractUserEmail() {
-    var selection = $(".gb_ia");
+    var selection;
+    try {
+      selection = window["gbar"]._CONFIG[0][10][5];
+    } catch(e) {
+      return;
+    }
     if (selection.length === 1) {
       var text = selection.text();
       if (/^[^ ]+@[^ ]+$/.test(text))
