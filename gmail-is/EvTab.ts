@@ -200,12 +200,39 @@ module Esper.EvTab {
     return view;
   }
 
+  function displayActiveEvents(linkedEvents, teamid, eventsTab, profiles) {
+    var list = $("<div>");
+    var active = Login.getAccount().activeEvents;
+    var events;
+    if (active === null || active === undefined) return;
+    events = active.calendars;
+    var team =
+      List.find(Login.myTeams(), function(team) {
+        return team.teamid === teamid;
+      });
+    if (team === null || team === undefined) return;
+    var getEventCalls =
+      List.map(events[team.team_calendar.google_calendar_id], function(e) {
+        return Api.getEventDetails(teamid, e.eventId);
+      });
+    Deferred.join(getEventCalls).done(function(activeEvents) {
+      activeEvents.forEach(function(e : ApiT.CalendarEvent) {
+        EvSearch.renderSearchResult(
+          e, linkedEvents, teamid, eventsTab, profiles
+        ).appendTo(list);
+      });
+    });
+    eventsTab.active.children().remove();
+    eventsTab.active.append(list);
+  }
+
   function displayEventList(events, teamid, threadId, eventsTab, profiles) {
     eventsTab.events.children().remove();
     events.forEach(function(e) {
       eventsTab.events.append(renderEvent(e, teamid, threadId,
                                           eventsTab, profiles));
     });
+    displayActiveEvents(events, teamid, eventsTab, profiles);
   }
 
   /* reuse the view created for the team, update list of linked events */
@@ -230,6 +257,7 @@ module Esper.EvTab {
     linkEvent: JQuery;
     linkEventIcon: JQuery;
     events: JQuery;
+    active: JQuery;
     noEvents: JQuery;
     footer: JQuery;
     sidebarLogo: JQuery;
@@ -258,6 +286,7 @@ module Esper.EvTab {
   </div>
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #events class="esper-linked-events"/>
+  <div #active class="esper-active-events"/>
 </div>
 '''
 
@@ -276,6 +305,18 @@ module Esper.EvTab {
       eventsTab,
       profiles
     );
+
+    Login.watchableAccount.watch(function(newAccount, newValidity) {
+      if (newValidity === true && !!MsgView.currentThreadId) {
+        Log.d("Refreshing active events");
+        displayActiveEvents(
+          linkedEvents.linked_events,
+          team.teamid,
+          eventsTab,
+          profiles
+        );
+      }
+    });
 
     newEvent.click(function() {
       var newTab = window.open("");
