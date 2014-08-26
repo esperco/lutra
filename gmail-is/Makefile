@@ -48,7 +48,7 @@ SHARED_SOURCES = \
   ../common/ts/Log \
   ../common/ts/LRU \
   ../common/ts/EsperStorage \
-  ../common/ts/EsperMessage \
+  ../common/ts/Message \
   ../common/ts/Login \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \

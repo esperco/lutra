@@ -20,6 +20,12 @@ module Esper.Util {
       case "[object global]": // e.g. the window object
         return preparePrintableObject(x, parents, maxDepth);
 
+      case "[object Error]":
+        return unsafePreparePrintable({
+          name: x.name,
+          message: x.message
+        }, parents, maxDepth);
+
       case "[object Function]":
         return type;
 
@@ -88,24 +94,12 @@ module Esper.Util {
     }
   }
 
-  /* Run the given function f() every delayMs milliseconds.
-     Exceptions are logged and otherwise ignored. */
+  /* Run the given function f() every delayMs milliseconds. */
   export function every(delayMs: number,
                         f: () => void) {
     setTimeout(function() {
-      try {
-        f();
-        try {
-          every(delayMs, f)
-        }
-        catch(e) {
-          Log.e("Exception thrown by Util.every():", e);
-        }
-      }
-      catch(e) {
-        Log.e("Exception thrown by callback passed to Util.every():", e);
-        every(delayMs, f);
-      }
+      every(delayMs, f);
+      f();
     }, delayMs);
   }
 
@@ -201,6 +195,7 @@ module Esper.Util {
             break;
 
           case "[object Function]":
+          case "[object Error]":
             break;
 
           /* Standard JSON atoms */

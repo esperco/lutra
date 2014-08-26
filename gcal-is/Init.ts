@@ -26,7 +26,7 @@ module Esper.Init {
   function obtainCredentials() {
     var googleAccountId = Gcal.getUserEmail();
     Log.d("Google account ID: " + googleAccountId);
-    var esperMessage : EsperMessage.EsperMessage = {
+    var esperMessage : Message.Message = {
       sender: "Esper",
       type: "CredentialsRequest",
       value: googleAccountId
@@ -40,10 +40,13 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    if (! Login.loggedIn())
-      injectLoginControls();
-    else
-      CalEventView.init();
+    if (Login.loggedIn()) {
+      Api.getLoginInfo()
+        .done(function(loginInfo) {
+          Login.info = loginInfo;
+          CalEventView.init();
+        });
+    }
   }
 
   /*
@@ -62,7 +65,7 @@ module Esper.Init {
   function listenForMessages() {
     Log.d("listenForMessages()");
     window.addEventListener("message", function(event) {
-      var request = event.data;
+      var request: Message.Message = event.data;
       if (request.sender === "Esper") {
 
         var ignored = [
@@ -70,7 +73,7 @@ module Esper.Init {
           "Logout",
           "ActiveEvents"
         ];
-        var isIgnored = List.mem(request.type, ignored);
+        var isIgnored = List.mem(ignored, request.type);
         if (! isIgnored)
           Log.d("Received message:", event.data);
 

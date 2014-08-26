@@ -43,6 +43,29 @@ module Esper.CalEventView {
     return root;
   }
 
+  function renderLinkedThread(thread: ApiT.EmailThread): JQuery {
+'''
+<div #view>
+  <b #subject></b>
+  <span #snippet></span>
+</div>
+'''
+    subject.text(thread.subject);
+    snippet.html(thread.snippet);
+    return view;
+  }
+
+  function renderActiveThread(thread: Types.GmailThread): JQuery {
+'''
+<div #view>
+  <b #subject></b>
+  <span #snippet></span>
+</div>
+'''
+    subject.text(thread.subject);
+    return view;
+  }
+
   function renderEventControls(team: ApiT.Team,
                                fullEventId: Types.FullEventId) {
 '''
@@ -57,6 +80,32 @@ module Esper.CalEventView {
   </div>
 </div>
 '''
+    Api.getLinkedThreads(team.teamid, fullEventId.eventId)
+      .done(function(linkedThrids) {
+        var thrids = linkedThrids.linked_threads;
+        Deferred.join(
+          List.map(thrids, function(thrid) {
+            return Api.getThreadDetails(thrid);
+          })
+        ).done(function(threads) {
+          List.iter(threads, function(thread) {
+            var threadView = renderLinkedThread(thread);
+            linked.append(threadView);
+          });
+          var account = Login.getAccount();
+          var activeThreads = account.activeThreads;
+          if (activeThreads !== undefined) {
+            List.iter(activeThreads.threads, function(thread) {
+              if (! List.exists(thrids, function(thrid) {
+                return thread.threadId === thrid;
+              })) {
+                var threadView = renderActiveThread(thread);
+                linkable.append(threadView);
+              }
+            });
+          }
+        });
+      });
 
     return view;
   }

@@ -13,7 +13,7 @@ SOURCES = \
   Log \
   LRU \
   EsperStorage \
-  EsperMessage \
+  Message \
   Login \
   JsonHttp \
   ApiT \

@@ -99,6 +99,12 @@ module Esper.ApiT {
     gmail_thrid: string;
   }
 
+  export interface EmailThread {
+    gmail_thrid: string;
+    subject: string;
+    snippet: string;
+  }
+
   export interface EventWithSyncInfo {
     event: CalendarEvent;
     synced_threads: SyncedThread[];
@@ -106,6 +112,10 @@ module Esper.ApiT {
 
   export interface LinkedCalendarEvents {
     linked_events: EventWithSyncInfo[];
+  }
+
+  export interface LinkedEmailThreads {
+    linked_threads: string[]; /* hexadecimal gthrids */
   }
 
   export interface CalendarEventList {
