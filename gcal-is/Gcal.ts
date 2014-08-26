@@ -5,22 +5,48 @@
 
 module Esper.Gcal {
 
-  function extractUserEmail() {
-    var selection;
-    try {
-      selection = window["gbar"]._CONFIG[0][10][5];
-    } catch(e) {
-      return;
-    }
+  function validateEmail(s) {
+    return (/^[^ ]+@[^ ]+$/.test(s));
+  }
+
+  function tryJQuerySelection(selection: JQuery) {
     if (selection.length === 1) {
       var text = selection.text();
-      if (/^[^ ]+@[^ ]+$/.test(text))
+      if (validateEmail(text))
         return text;
       else
         return;
     }
     else
       return;
+  }
+
+  function method0() {
+    return tryJQuerySelection($(".gb_ia"));
+  }
+
+  function method1() {
+    return tryJQuerySelection($(".gb_ja"));
+  }
+
+  /* Seems to work only after some delay */
+  function method2() {
+    return window["gbar"]._CONFIG[0][10][5];
+  }
+
+  function trySeveralMethods(l) {
+    for (var i = 0; i < l.length; i++) {
+      try {
+        Log.d("Extracting logged-in email address using method " + i);
+        var x = l[i]();
+        if (x !== undefined && x !== null)
+          return x;
+      } catch(e) {}
+    }
+  }
+
+  function extractUserEmail() {
+    return trySeveralMethods([method0, method1, method2]);
   }
 
   var userEmail;
