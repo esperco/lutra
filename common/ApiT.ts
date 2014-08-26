@@ -17,6 +17,7 @@ module Esper.ApiT {
     team_name: string;
     team_executive: string;
     team_assistants: string[];
+    team_calendar: string;
   }
 
   export interface Phone {
