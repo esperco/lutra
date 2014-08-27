@@ -231,8 +231,8 @@ var settings = (function() {
 '''
 <div #view class="member-row">
   <div class="clearfix">
+    <div #emailContainer class="img-container-left"/>
     <div #invite class="invite-action clickable">
-      <div #emailContainer class="img-container-left click-safe"/>
       <a class="link click-safe" style="float:left">Invite new team member</a>
       <span class="caret-south click-safe"/>
     </div>
@@ -244,7 +244,7 @@ var settings = (function() {
   </ul>
 </div>
 '''
-    var email = $("<img class='svg-block invite-icon click-safe'/>")
+    var email = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
     svg.loadImg(email, "/assets/img/email.svg");
 
@@ -263,8 +263,13 @@ var settings = (function() {
     <div #name/>
     <div #email class="gray"/>
   </div>
-  <div #statusContainer class="col-md-1 assistant-row-status"></div>
-  <div #actions class="col-md-5 assistant-row-actions"></div>
+  <div class="col-md-1 assistant-row-status">
+    <div #statusContainer
+         data-toggle="tooltip"
+         data-placement="right"
+         title="Reauthorization required."/>
+  </div>
+  <div #actions class="col-md-5 assistant-row-actions"/>
 </li>
 '''
       function refresh() {
@@ -286,6 +291,7 @@ var settings = (function() {
         var warning = $("<img class='svg-block'/>")
           .appendTo(statusContainer);
         svg.loadImg(warning, "/assets/img/warning.svg");
+        statusContainer.tooltip();
       }
 
       if (memberUid !== login.me()
@@ -302,6 +308,11 @@ var settings = (function() {
         });
 
         actions.append($("<span class='text-divider'>|</span>"));
+      } else {
+        name
+          .text("")
+          .append($("<span>" + profile.display_name + "</span>"))
+          .append($("<span class='bold'> (Me)</span>"));
       }
 
       if (memberUid !== execUid) {
@@ -326,9 +337,13 @@ var settings = (function() {
 <div #view>
   <div class="exec-profile clearfix">
     <div #profilePic class="profile-pic"/>
-    <div style="height: 31px">
+    <div style="height: 27px">
       <span #execName class="profile-name exec-profile-name"/>
-      <span #execStatusContainer class="exec-status"/>
+      <span #execStatusContainer
+       class="exec-status"
+       data-toggle="tooltip"
+       data-placement="right"
+       title="Reauthorization required."/>
     </div>
     <div #execEmail class="profile-email"/>
   </div>
@@ -340,15 +355,17 @@ var settings = (function() {
 </div>
 '''
     spinner.show();
-
+    
     api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
+        profilePic.css("background-image", "url('" + exec.image_url + "')");
         execName.text(exec.display_name);
-        execEmail.text(exec.email)
+        execEmail.text(exec.email);
         if (!exec.google_access) {
           var warning = $("<img class='svg-block'/>")
             .appendTo(execStatusContainer);
           svg.loadImg(warning, "/assets/img/warning.svg");
+          execStatusContainer.tooltip();
         }
       });    
 
@@ -378,8 +395,8 @@ var settings = (function() {
           <span>Members</span>
         </a></li>
         <li><a #tab2 href="#" id="tab2">
-          <img #labelSync class="svg-block esper-tab-icon"/>
-          <span>LabelSync</span>
+          <img #labels class="svg-block esper-tab-icon"/>
+          <span>Labels</span>
         </a></li>
         <li><a #tab3 href="#" id="tab3">
           <img #calendar class="svg-block esper-tab-icon"/>
@@ -402,7 +419,7 @@ var settings = (function() {
 
     // svg.loadImg(calendar, "/assets/img/logo.svg");
     // svg.loadImg(members, "/assets/img/logo.svg");
-    // svg.loadImg(labelSync, "/assets/img/logo.svg");
+    // svg.loadImg(labels, "/assets/img/logo.svg");
 
     function switchTab(tab) {
       var currentAttrValue = "#" + tab.attr("id");
@@ -417,26 +434,59 @@ var settings = (function() {
     modal.modal({});
   }
 
+  function checkTeamStatus(profiles, statusContainer) {
+    var error = false;
+    list.iter(profiles, function(profile) {
+      if (!profile.google_access) {
+        error = true;
+      }
+    });
+    if (error) {
+      var warning = $("<img class='svg-block'/>")
+        .appendTo(statusContainer);
+      svg.loadImg(warning, "/assets/img/warning.svg");
+      statusContainer.tooltip();
+    }
+  }
 
   function viewOfTeam(team) {
 '''
-<div #view class="team-row">
+<div #view class="team-row clearfix">
   <div #cogContainer class="img-container-right"/>
-  <div #name class="team-name"/>
-  <div #email class="team-email gray"/>
+  <div #statusContainer
+       class="img-container-right team-status"
+       data-toggle="tooltip"
+       data-placement="left"
+       title="Some team members may need to be reauthorized."/>
+  <div #profilePic class="profile-pic"/>
+  <div #name class="profile-name"/>
+  <div #email class="profile-email gray"/>
 </div>
 '''
-    var cog = $("<img class='svg-block team-cog'/>")  
+    var cog = $("<img class='svg-block team-cog clickable'/>")  
       .appendTo(cogContainer);
     svg.loadImg(cog, "/assets/img/cog.svg");
 
-    cogContainer.click(function() { showTeamSettings(team); });
+    var members = list.union([team.team_executive], team.team_assistants);
+    deferred.join(list.map(members, function(uid) {
+      return api.getProfile(uid, team.teamid);
+    }))
+      .done(function(profiles) { checkTeamStatus(profiles, statusContainer); });
 
     api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
-        name.text(profile.display_name);
+        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (team.team_executive === login.me()) {
+          name
+            .append($("<span>" + profile.display_name + "</span>"))
+            .append($("<span class='bold'> (Me)</span>"));
+        } else {
+          name.text(profile.display_name);
+        }
         email.text(profile.email);
       });;
+
+    cogContainer.click(function() { showTeamSettings(team); });
 
     return view;
   }
@@ -476,7 +526,8 @@ var settings = (function() {
     <span #signOut class="header-signout clickable">Sign out</span>
   </div>
   <div class="divider"/>
-  <div class="install clearfix">
+  <div #install class="install clearfix">
+    <div #closeContainer class="img-container-right close clickable"/>
     <div #chromeLogoContainer
          class="img-container-right chrome-logo-container animated fadeIn"/>
     <div class="install-h1 animated fadeInLeft">
@@ -489,11 +540,11 @@ var settings = (function() {
     </div>
   </div>
   <div class="profile settings-section col-sm-6">
-    <h4 class="settings-section-title">Profile</h4>
-    <div class="clearfix">
+    <h4 class="settings-section-title">My Profile</h4>
+    <div class="clearfix" style="margin-top:16px">
       <div #profilePic class="profile-pic"/>
       <div #myName class="profile-name"/>
-      <div #myEmail class="profile-email"/>
+      <div #myEmail class="profile-email gray"/>
     </div>
     <div class="toggle-advanced">
       <a #toggleAdvanced href="#">Show advanced</a>
@@ -502,7 +553,7 @@ var settings = (function() {
       <div #uid/>
       <a #revoke
          href="#"
-         class="danger-link">Revoke Esper&apos;s access to my Google account</a>
+         class="danger-link">Deauthorize this account</a>
     </div>
     <div #adminSection class="hide settings-block">
       <h2>Admin</h2>
@@ -523,17 +574,21 @@ var settings = (function() {
       .appendTo(logoContainer);
     svg.loadImg(logo, "/assets/img/logo.svg");
 
+    var close = $("<img class='svg-block'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/close.svg");
+
     var chrome = $("<img class='svg-block chrome-logo'/>")
       .appendTo(chromeLogoContainer);
     svg.loadImg(chrome, "/assets/img/chrome.svg");
 
-    api.getProfileCopy(login.me())
-      .done(function(profile) {
-        console.log("This is me: " + login.me());
+    api.getMyProfile()
+      .done(function(profile){
+        profilePic.css("background-image", "url('" + profile.image_url + "')");
         myName.text(profile.display_name);
-      })
-
-    myEmail.text(login.myEmail());
+        myEmail.text(login.myEmail());
+      });
+    
     uid
       .append("<span>UID: </span>")
       .append("<span class='gray'>" + login.me() + "</span>");
@@ -547,6 +602,8 @@ var settings = (function() {
       signin.signin(function(){});
       return false;
     });
+
+    closeContainer.click(function() { install.slideUp(); });
 
     toggleAdvanced.click(function() {
       if (advanced.css("display") === "none") {

@@ -180,6 +180,7 @@ i { color: @gray_60; }
 .overlay-list > li > a {
   display: block;
   padding: 5px 15px;
+  color: @purple_text;
 }
 .overlay-list > li + li {
   margin-left: 0;
@@ -299,18 +300,15 @@ i { color: @gray_60; }
   padding: 16px 0;
   border-bottom: 1px solid @gray_20;
 }
-
 .header-logo {
   width: 24px;
   height: 30px;
 }
-
 .header-title {
   display: inline-block;
   margin: 2px 0 0 24px;
   font-size: 20px;
 }
-
 .header-signout {
   float: right;
   padding: 8px 0;
@@ -320,8 +318,8 @@ i { color: @gray_60; }
 
 .install {
   width: 580px;
-  margin: 16px auto;
-  padding: 12px 24px 0 24px;
+  margin: 16px auto 0 auto;
+  padding: 12px 12px 0 24px;
   background: @purple_bg;
   border: 1px solid @gray_10;
   border-radius: 3px;
@@ -329,12 +327,17 @@ i { color: @gray_60; }
     -webkit-animation-duration: 1s;
             animation-duration: 1s;
   }
+  .close {
+    opacity: 0.5;
+    &:hover { opacity: 1; }
+  }
   .chrome-logo {
     width: 92px;
     height: 56px;
-    margin-top: 6px;
+    margin: 6px 12px 0 0;
   }
   .install-h1, .install-h2 {
+    display: inline-block;
     margin-top: 2px;
     -webkit-animation-duration: 1s;
             animation-duration: 1s;
@@ -355,54 +358,56 @@ i { color: @gray_60; }
 .settings-section {
   margin-bottom: 60px;
   .settings-section-title {
-    margin-bottom: 20px;
+    margin: 26px 0 0 0;
     padding-bottom: 10px;
     color: @gray_60;
     border-bottom: 1px solid @gray_10;
   }
 }
 
-.profile { padding-right: 30px; }
+@media (min-width:768px) {
+  .profile { padding-right: 30px; }
+  .team { padding-left: 30px; }
+}
+
 .profile-pic {
   float: left;
-  width: 64px;
-  height: 64px;
+  width: 50px;
+  height: 50px;
   background: @gray_10;
   border-radius: 100%;
 }
-.profile-name, .profile-email { margin-left: 80px; }
+.profile-name, .profile-email { margin-left: 64px; }
 .profile-name {
-  margin-top: 9px;
+  margin-top: 5px;
   font-size: 16px;
 }
-.profile-email {
-  margin-top: 3px;
-  color: @gray_60;
-}
-.toggle-advanced { margin: 12px 0 6px 0; }
+.toggle-advanced { margin: 12px 0 6px 64px; }
 .profile-advanced {
   display: none;
-  max-width: 320px;
+  max-width: 240px;
+  margin-left: 64px;
   padding: 8px;
   background: @gray_f8;
   border: 1px solid @gray_10;
   border-radius: 3px;
 }
 
-.teams {
-  padding-left: 30px;
-  .team-row {
-    padding: 12px;
-    border-bottom: 1px solid @gray_10;
-    .team-name { font-size: 16px; }
-    .team-cog {
-      float: right;
-      margin-top: 10px;
-      opacity: 0.8;
-      cursor: pointer;
-      &:hover { opacity: 1; }
-    }  
-  } 
+.team-row {
+  padding: 16px 0;
+  border-bottom: 1px solid @gray_10;
+  .team-name { font-size: 16px; }
+  .team-cog {
+    margin-top: 14px;
+    opacity: 0.8;
+    &:hover { opacity: 1; }
+  }
+  .tooltip.team-status-tooltip { top: 80px; }
+  .team-status {
+    width: 20px;
+    height: 16px;
+    margin: 17px 14px 0 0;
+  }
 }
 
 .esper-tab-links {
@@ -466,7 +471,7 @@ i { color: @gray_60; }
 
 .exec-profile-name {
   float: left;
-  margin-left: 16px;
+  margin-left: 14px;
   margin-right: 8px;
 }
 .exec-status {
@@ -485,7 +490,7 @@ i { color: @gray_60; }
   border-top-left-radius: 3px;
 }
 .assistants-list {
-  height: 200px;
+  height: 210px;
   margin-bottom: 20px;
   padding: 0;
   border: 1px solid @gray_10;
@@ -497,7 +502,7 @@ i { color: @gray_60; }
   padding: 10px 6px;
   border-bottom: 1px solid @gray_10;
 }
-.assistant-row-status { padding-top: 10px; }
+.assistant-row-status { padding: 10px 12px; }
 .assistant-row-actions {
   padding-top: 9px;
   text-align: right;
@@ -509,6 +514,7 @@ i { color: @gray_60; }
 .invite-icon { margin: 2px 6px 0 0; }
 .invite-options {
   display: none;
+  margin-left: 26px;
   padding: 6px 0;
   background: white;
   border: 1px solid @gray_30;
@@ -528,7 +534,6 @@ i { color: @gray_60; }
   border-bottom: 1px solid @gray_10;
 }
 .sync-col { text-align: center; }
-
 
 
 /** Spinner **/
