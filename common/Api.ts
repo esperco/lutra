@@ -121,6 +121,7 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+
   export function getEventThreads(teamid, eventId):
   JQueryDeferred<ApiT.LinkedEmailThreads> {
     var url =
@@ -128,5 +129,23 @@ module Esper.Api {
       + "/" + teamid
       + "/" + eventId;
     return JsonHttp.get(url);
+  }
+
+  export function getEventDetails(teamid, eventid):
+  JQueryDeferred<ApiT.CalendarEvent> {
+    var url =
+      Conf.Api.url + "/api/event/details/" + Login.myUid()
+      + "/" + teamid
+      + "/" + encodeURIComponent(eventid);
+    return JsonHttp.get(url);
+  }
+
+  export function createNewLinkedEvent(teamid, threadId):
+  JQueryDeferred<ApiT.CalendarEvent> {
+    var url =
+      Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId;
+    return JsonHttp.post(url, "");
   }
 }

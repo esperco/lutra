@@ -25,13 +25,17 @@ module Esper.Init {
   */
   function obtainCredentials() {
     var googleAccountId = Gcal.getUserEmail();
-    Log.d("Google account ID: " + googleAccountId);
-    var esperMessage : Message.Message = {
-      sender: "Esper",
-      type: "CredentialsRequest",
-      value: googleAccountId
-    };
-    window.postMessage(esperMessage, "*");
+    if (googleAccountId === undefined)
+      Log.e("Cannot extract Google account ID (email address)");
+    else {
+      Log.d("Google account ID: " + googleAccountId);
+      var esperMessage : Message.Message = {
+        sender: "Esper",
+        type: "CredentialsRequest",
+        value: googleAccountId
+      };
+      window.postMessage(esperMessage, "*");
+    }
   }
 
   function injectLoginControls() {
