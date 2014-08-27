@@ -232,6 +232,11 @@ var api = (function () {
                        + "/" + teamid);
   };
 
+  mod.getProfileCopy = function(uid) {
+    return jsonHttpGet(apiProfilePrefix()
+                       + "/" + uid);
+  };
+
 
   /*** Scheduling ***/
 

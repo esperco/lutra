@@ -332,6 +332,24 @@ fieldset[disabled] .form-control {
   border: 1px solid @gray_20;
 }
 /*** Modals ***/
+.modal.fade .modal-dialog {
+  -webkit-transform: none;
+      -ms-transform: none;
+       -o-transform: none;
+          transform: none;
+  -webkit-transition: opacity .3s linear, ease-in-out;
+     -moz-transition: opacity .3s linear, ease-in-out;
+      -ms-transition: opacity .3s linear, ease-in-out;
+       -o-transition: opacity .3s linear, ease-in-out;
+          transition: opacity .3s linear, ease-in-out;
+}
+.modal-backdrop-in { opacity: 0.8; }
+.modal-content {
+  border: 1px solid @gray_30;
+  border-radius: 0;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+          box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+}
 .modal-header {
   height: 60px;
   border-bottom: 1px solid @gray_10;

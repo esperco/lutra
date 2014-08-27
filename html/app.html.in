@@ -22,13 +22,6 @@
 
   <body>
 
-    <div id="loading">
-      <div id="loading-box">
-        <img id="loading-icon" src="/assets/img/loading.gif">
-        <div id="loading-text" class="ellipsis"></div>
-      </div>
-    </div>
-
     <div id="test-page" class="hide test-page">
       <div class="navbar-push container scrollable">
         <div id="test-content" class="row">
