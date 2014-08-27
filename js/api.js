@@ -232,6 +232,10 @@ var api = (function () {
                        + "/" + teamid);
   };
 
+  mod.getMyProfile = function() {
+    return jsonHttpGet(apiProfilePrefix() + "/me");
+  };
+
 
   /*** Scheduling ***/
 
