@@ -96,11 +96,14 @@ module Esper.Util {
 
   /* Run the given function f() every delayMs milliseconds. */
   export function every(delayMs: number,
-                        f: () => void) {
+                        f: () => void,
+                        firstTime = true) {
     setTimeout(function() {
-      every(delayMs, f);
+      every(delayMs, f, false);
       f();
     }, delayMs);
+    if (firstTime)
+      f();
   }
 
   export function afterTyping(elt: JQuery, delayMs: number, func) {
