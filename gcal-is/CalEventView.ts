@@ -58,7 +58,8 @@ module Esper.CalEventView {
 '''
 <div #view
      class="esper-thread-row">
-  <img #unlinkButton class="esper-clickable"
+  <img #unlinkButton alt="Linked"
+                     class="esper-clickable"
                      title="Click to unlink this conversation from the event"/>
   <a #threadView
      target="_blank"
@@ -88,11 +89,13 @@ module Esper.CalEventView {
   function renderActiveThread(
     teamid,
     thread: Types.GmailThread,
-    fullEventId: Types.FullEventId): JQuery {
+    fullEventId: Types.FullEventId
+  ): JQuery {
 '''
 <div #view
      class="esper-thread-row">
-  <img #linkButton class="esper-clickable"
+  <img #linkButton alt="Unlinked"
+                   class="esper-clickable"
                    title="Click to link this conversation to the event"/>
   <a #threadView
      target="_blank"
@@ -105,11 +108,26 @@ module Esper.CalEventView {
     linkButton.attr("src", Init.esperRootUrl + "img/unlinked.png");
     subject.text(thread.subject);
 
+    var threadId = thread.threadId;
+    var eventId = fullEventId.eventId;
     linkButton.click(function() {
-      Api.linkEventForMe(teamid, thread.threadId, fullEventId.eventId)
+      Api.linkEventForMe(teamid, threadId, eventId)
         .done(function() {
           updateView(fullEventId);
-          Api.linkEventForTeam(teamid, thread.threadId, fullEventId.eventId);
+          Api.linkEventForTeam(teamid, threadId, eventId)
+            .done(function() {
+              Api.syncEvent(teamid, threadId, eventId)
+                .done(function() {
+                  /* TODO: Update description field?
+                     We would have to merge
+                     the current description (above the marker)
+                     with what comes from the server
+                     (conversation, below the marker).
+                  */
+                  Log.d("Link and sync complete.");
+                  updateView(fullEventId);
+                });
+            });
         });
     });
 
