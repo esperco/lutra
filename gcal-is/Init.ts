@@ -38,10 +38,6 @@ module Esper.Init {
     }
   }
 
-  function injectLoginControls() {
-    Log.d("injectLoginControls()");
-  }
-
   function injectEsperControls() {
     Login.printStatus();
     if (Login.loggedIn()) {
