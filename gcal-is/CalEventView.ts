@@ -19,10 +19,10 @@ module Esper.CalEventView {
     });
   }
 
-  /* Find a good insertion point, on the right-hand side
-     of the "Add guests" column. */
+  /* Find a good insertion point */
   function findAnchor() {
-    var anchor = $("div.ep-dp");
+    /* Table row with header "Calendar" and dropdown for choosing calendar */
+    var anchor = $("#\\:15\\.calendar-row");
     if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper event controls.");
       return $();
@@ -38,49 +38,107 @@ module Esper.CalEventView {
   function insertEsperRoot() {
     removeEsperRoot();
     var anchor = findAnchor();
-    var root = $("<div id='esper-event-root'/>");
-    anchor.append(root);
+    var root = $("<tr id='esper-event-root'/>");
+    root.insertAfter(anchor);
     return root;
   }
 
-  function renderLinkedThread(thread: ApiT.EmailThread): JQuery {
+  function makeGmailThreadUrl(threadId: string) {
+    var url =
+      "https://mail.google.com/mail/u/" + Gcal.getUserEmail()
+      + "/#inbox/" + threadId;
+    return url;
+  }
+
+  function renderLinkedThread(
+    teamid,
+    thread: ApiT.EmailThread,
+    fullEventId: Types.FullEventId
+  ): JQuery {
 '''
-<div #view>
-  <b #subject></b>
-  <span #snippet></span>
+<div #view
+     class="esper-thread-row">
+  <img #unlinkButton class="esper-clickable"
+                     title="Click to unlink this conversation from the event"/>
+  <a #threadView
+     target="_blank"
+     class="esper-message">
+    <span #subject class="esper-subject"></span>
+    <span #snippet class="esper-snippet"></span>
+  </a>
 </div>
 '''
+    unlinkButton.attr("src", Init.esperRootUrl + "img/linked.png");
     subject.text(thread.subject);
     snippet.html(thread.snippet);
+
+    unlinkButton.click(function() {
+      Api.unlinkEvent(teamid, thread.gmail_thrid, fullEventId.eventId)
+        .done(function() {
+          view.remove();
+        });
+    });
+
+    var gmailUrl = makeGmailThreadUrl(thread.gmail_thrid);
+    threadView.attr("href", gmailUrl);
+
     return view;
   }
 
-  function renderActiveThread(thread: Types.GmailThread): JQuery {
+  function renderActiveThread(
+    teamid,
+    thread: Types.GmailThread,
+    fullEventId: Types.FullEventId): JQuery {
 '''
-<div #view>
-  <b #subject></b>
-  <span #snippet></span>
+<div #view
+     class="esper-thread-row">
+  <img #linkButton class="esper-clickable"
+                   title="Click to link this conversation to the event"/>
+  <a #threadView
+     target="_blank"
+     class="esper-message">
+    <span #subject class="esper-subject"></span>
+    <span #snippet class="esper-snippet"></span>
+  </a>
 </div>
 '''
+    linkButton.attr("src", Init.esperRootUrl + "img/unlinked.png");
     subject.text(thread.subject);
+
+    linkButton.click(function() {
+      Api.linkEventForMe(teamid, thread.threadId, fullEventId.eventId)
+        .done(function() {
+          updateView(fullEventId);
+          Api.linkEventForTeam(teamid, thread.threadId, fullEventId.eventId);
+        });
+    });
+
+    threadView.attr("href", makeGmailThreadUrl(thread.threadId));
+
     return view;
+  }
+
+  function renderTh(): JQuery {
+'''
+<th #th class="ep-dp-dt-th">
+  <label>Email</label>
+</th>
+'''
+    return th;
   }
 
   function renderEventControls(team: ApiT.Team,
                                fullEventId: Types.FullEventId) {
+    var th = renderTh();
+
 '''
-<div #view>
-  <div>
-    <div>Linked threads</div>
-    <div #linked/>
-  </div>
-  <div>
-    <div>Recently visited threads</div>
-    <div #linkable/>
-  </div>
-</div>
+<td #td class="ep-dp-dt-td">
+  <div #linked/>
+  <div #linkable/>
+</td>
 '''
-    Api.getLinkedThreads(team.teamid, fullEventId.eventId)
+    var teamid = team.teamid;
+    Api.getLinkedThreads(teamid, fullEventId.eventId)
       .done(function(linkedThrids) {
         var thrids = linkedThrids.linked_threads;
         Deferred.join(
@@ -89,7 +147,7 @@ module Esper.CalEventView {
           })
         ).done(function(threads) {
           List.iter(threads, function(thread) {
-            var threadView = renderLinkedThread(thread);
+            var threadView = renderLinkedThread(teamid, thread, fullEventId);
             linked.append(threadView);
           });
 
@@ -102,7 +160,8 @@ module Esper.CalEventView {
                 if (! List.exists(thrids, function(thrid) {
                   return thread.threadId === thrid;
                 })) {
-                  var threadView = renderActiveThread(thread);
+                  var threadView =
+                    renderActiveThread(teamid, thread, fullEventId);
                   linkable.append(threadView);
                 }
               });
@@ -117,7 +176,7 @@ module Esper.CalEventView {
         });
       });
 
-    return view;
+    return { th: th, td: td };
   }
 
   function updateView(fullEventId) {
@@ -125,7 +184,10 @@ module Esper.CalEventView {
     /* For each team that uses this calendar */
     Login.myTeams().forEach(function(team) {
       if (team.team_calendar.google_calendar_id === fullEventId.calendarId) {
-        rootElement.append(renderEventControls(team, fullEventId));
+        var rowElements = renderEventControls(team, fullEventId);
+        rootElement
+          .append(rowElements.th)
+          .append(rowElements.td);
       }
     });
   }
