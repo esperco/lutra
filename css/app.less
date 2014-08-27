@@ -91,6 +91,15 @@ i { color: @gray_60; }
   margin-top: 7px;
 }
 .caret-text { margin-right: 6px; }
+.caret-south {
+  float: left;
+  width: 0;
+  height: 0;
+  margin: 8px 0 0 4px;
+  border-style: solid;
+  border-width: 4px 4px 0 4px;
+  border-color: @purple transparent transparent transparent;
+}
 
 *.unselectable {
   cursor: default;
@@ -151,19 +160,28 @@ i { color: @gray_60; }
   pointer-events: none;
 }
 
-.popover-list {
+.overlay-list {
+  display: inline-block;
   margin: 0;
   padding: 0;
 }
-.popover-list > li:hover {
-  background: @purple_bg;
+.overlay-list > li.unselectable {
+  padding: 5px 15px;
+  &:hover {
+    background: none;
+    cursor: default;
+  }
+}
+.overlay-list > li:hover {
+  background: @purple;
   cursor: pointer;
+  a { color: white; }
 }
-.popover-list > li > a {
+.overlay-list > li > a {
   display: block;
-  padding: 5px 20px;
+  padding: 5px 15px;
 }
-.popover-list > li + li {
+.overlay-list > li + li {
   margin-left: 0;
 }
 
@@ -390,7 +408,7 @@ i { color: @gray_60; }
 .esper-tab-links {
   margin: 0;
   padding: 26px 68px 0 68px;
-  border-bottom: 1px solid @gray_10;
+  border-bottom: 1px solid @gray_30;
   li {
     float: left;
     list-style: none;
@@ -403,7 +421,7 @@ i { color: @gray_60; }
     padding: 6px 7px;
     border-top: 1px solid @purple_disabled;
     border-right: 1px solid @purple_disabled;
-    border-bottom: 1px solid @gray_10;
+    border-bottom: 1px solid @gray_30;
     border-left: 1px solid @purple_disabled;
     background: white;
     color: @purple;
@@ -484,6 +502,10 @@ i { color: @gray_60; }
   padding-top: 9px;
   text-align: right;
 }
+.invite-action {
+  display: inline-block;
+  &:hover a { text-decoration: underline; }
+}
 .invite-icon { margin: 2px 6px 0 0; }
 .invite-options {
   display: none;
@@ -520,7 +542,12 @@ i { color: @gray_60; }
           animation: scaleout 1.0s infinite ease-in-out;
 }
 
-.modal-spinner {
+.members-spinner {
+  margin: 90px auto;
+  width: 20px;
+  height: 20px;
+}
+.labels-spinner {
   margin: 110px auto;
   width: 20px;
   height: 20px;

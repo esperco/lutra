@@ -5,6 +5,22 @@
 var settings = (function() {
   var mod = {};
 
+  function toggleOverlay(overlay) {
+    if (overlay.css("display") === "none")
+      overlay.css("display", "inline-block");
+    else
+      overlay.css("display", "none");
+  }
+
+  function dismissOverlays() {
+    $(".overlay-list").css("display", "none");
+  }
+
+  $(document).on('click', function(e) {
+    if (!$(e.target).hasClass("click-safe"))
+      dismissOverlays();
+  });
+
   function showLabelSettingsModal(team) {
 '''
 <div #modal
@@ -128,7 +144,7 @@ var settings = (function() {
   function viewOfLabelsTab(team) {
 '''
 <div #view>
-  <div #spinner class="spinner modal-spinner"/>
+  <div #spinner class="spinner labels-spinner"/>
   <div class="table-header clearfix">
     <div class="col-sm-10">Shared Label</div>
     <div class="col-sm-2 sync-col">Sync</div>
@@ -190,6 +206,7 @@ var settings = (function() {
   }
 
   function composeInviteForRole(team, role) {
+    dismissOverlays();
     var invite = {
       from_uid: login.me(),
       teamid: team.teamid,
@@ -213,40 +230,32 @@ var settings = (function() {
   function renderInviteDialog(team) {
 '''
 <div #view class="member-row">
-  <div #emailContainer class="img-container-left"/>
-  <a #invite class="link">Invite new team member</a>
-  <ul #inviteOptions class="invite-options">
-    <li>Select a role for this new team member:</li>
-    <li><a #assistant href="#">Assistant</a></li>
-    <li><a #executive href="#">Executive</a></li>
+  <div class="clearfix">
+    <div #invite class="invite-action clickable">
+      <div #emailContainer class="img-container-left click-safe"/>
+      <a class="link click-safe" style="float:left">Invite new team member</a>
+      <span class="caret-south click-safe"/>
+    </div>
+  </div>
+  <ul #inviteOptions class="invite-options overlay-list click-safe">
+    <li class="gray unselectable click-safe">Select a role:</li>
+    <li><a #assistant href="#" class="click-safe">Assistant</a></li>
+    <li><a #executive href="#" class="click-safe">Executive</a></li>
   </ul>
 </div>
 '''
-    var email = $("<img class='svg-block invite-icon'/>")
+    var email = $("<img class='svg-block invite-icon click-safe'/>")
       .appendTo(emailContainer);
     svg.loadImg(email, "/assets/img/email.svg");
-    invite.click(function() { inviteOptions.toggle(); });
+
+    invite.click(function() { toggleOverlay(inviteOptions); });
     assistant.click(function() { composeInviteForRole(team, "Assistant"); });
     executive.click(function() { composeInviteForRole(team, "Executive"); });
 
     return view;
   }
 
-  function viewOfProfiles(team, profiles) {
-'''
-<div #view>
-  <div class="exec-profile clearfix">
-    <div #profilePic class="profile-pic"/>
-    <div style="height: 31px">
-      <span #execName class="profile-name exec-profile-name"/>
-      <span #execStatusContainer class="exec-status"/>
-    </div>
-    <div #execEmail class="profile-email"/>
-  </div>
-  <div class="assistants-title">Assistants</div>
-  <ul #assistants class="assistants-list"/>
-</div>
-'''
+  function displayAssistants(assistantsList, team, profiles) {
     list.iter(profiles, function(profile) {
 '''
 <li #row class="assistant-row clearfix">
@@ -269,73 +278,86 @@ var settings = (function() {
 
       var execUid = team.team_executive;
       var memberUid = profile.profile_uid;
-      if (execUid === memberUid) {
-        execName.text(profile.display_name);
-        execEmail.text(profile.email)
-        if (!profile.google_access) {
-          var warning = $("<img class='svg-block'/>")
-            .appendTo(execStatusContainer);
-          svg.loadImg(warning, "/assets/img/warning.svg");
-        }
-      } else {
-        name.text(profile.display_name);
-        email.text(profile.email);
-        if (!profile.google_access) {
-          var warning = $("<img class='svg-block'/>")
-            .appendTo(statusContainer);
-          svg.loadImg(warning, "/assets/img/warning.svg");
-        }
-        if (memberUid !== login.me()
-            && list.mem(team.team_assistants, memberUid)) {
+
+      name.text(profile.display_name);
+      email.text(profile.email);
+
+      if (!profile.google_access) {
+        var warning = $("<img class='svg-block'/>")
+          .appendTo(statusContainer);
+        svg.loadImg(warning, "/assets/img/warning.svg");
+      }
+
+      if (memberUid !== login.me()
+          && list.mem(team.team_assistants, memberUid)) {
 '''
 <span #removeSpan>
   <a #removeLink href="#" class="danger-link">Remove</a>
 </span>
 '''
-          removeLink.appendTo(actions)
-          removeLink.click(function() {
-            api.removeAssistant(team.teamid, memberUid)
-              .done(function() { refresh(); });
-          });
+        removeLink.appendTo(actions)
+        removeLink.click(function() {
+          api.removeAssistant(team.teamid, memberUid)
+            .done(function() { refresh(); });
+        });
 
-          actions.append($("<span class='text-divider'>|</span>"));
-        }
+        actions.append($("<span class='text-divider'>|</span>"));
+      }
 
-        if (memberUid !== execUid) {
+      if (memberUid !== execUid) {
 '''
 <span #makeExecSpan>
   <a #makeExecLink href="#" class="link">Make Executive</a>
 </span>
 '''
-          makeExecSpan.appendTo(actions);
-          makeExecLink.click(function() {
-            api.setExecutive(team.teamid, memberUid)
-              .done(function() { refresh(); });
-          });
-        }
-
-        assistants.append(row);
+        makeExecSpan.appendTo(actions);
+        makeExecLink.click(function() {
+          api.setExecutive(team.teamid, memberUid)
+            .done(function() { refresh(); });
+        });
       }
-    });
 
-    return view;
+      assistantsList.append(row);
+    });
   }
 
   function viewOfMembersTab(team) {
 '''
 <div #view>
-  <div #membersList/>
+  <div class="exec-profile clearfix">
+    <div #profilePic class="profile-pic"/>
+    <div style="height: 31px">
+      <span #execName class="profile-name exec-profile-name"/>
+      <span #execStatusContainer class="exec-status"/>
+    </div>
+    <div #execEmail class="profile-email"/>
+  </div>
+  <div class="assistants-title">Assistants</div>
+  <ul #assistantsList class="assistants-list">
+    <div #spinner class="spinner members-spinner"/>
+  </ul>
   <div #invitationRow/>
 </div>
 '''
-    var members = list.union([team.team_executive], team.team_assistants);
+    spinner.show();
 
-    deferred.join(list.map(members, function(uid) {
+    api.getProfile(team.team_executive, team.teamid)
+      .done(function(exec) {
+        execName.text(exec.display_name);
+        execEmail.text(exec.email)
+        if (!exec.google_access) {
+          var warning = $("<img class='svg-block'/>")
+            .appendTo(execStatusContainer);
+          svg.loadImg(warning, "/assets/img/warning.svg");
+        }
+      });    
+
+    deferred.join(list.map(team.team_assistants, function(uid) {
       return api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) {
-        viewOfProfiles(team, profiles)
-          .appendTo(membersList);
+        spinner.hide();
+        displayAssistants(assistantsList, team, profiles);
       });
 
     invitationRow.append(renderInviteDialog(team));
@@ -505,7 +527,11 @@ var settings = (function() {
       .appendTo(chromeLogoContainer);
     svg.loadImg(chrome, "/assets/img/chrome.svg");
 
-    myName.text("Johnny Appleseed");
+    api.getProfileCopy(login.me())
+      .done(function(profile) {
+        console.log("This is me: " + login.me());
+        myName.text(profile.display_name);
+      })
 
     myEmail.text(login.myEmail());
     uid
