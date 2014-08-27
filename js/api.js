@@ -232,9 +232,8 @@ var api = (function () {
                        + "/" + teamid);
   };
 
-  mod.getProfileCopy = function(uid) {
-    return jsonHttpGet(apiProfilePrefix()
-                       + "/" + uid);
+  mod.getMyProfile = function() {
+    return jsonHttpGet(apiProfilePrefix() + "/me");
   };
 
 
