@@ -38,11 +38,12 @@ SHARED_SOURCES = \
   ../common/ts/List \
   ../common/ts/Util \
   ../common/ts/Watchable \
+  ../common/ts/Deferred \
   ../common/ts/XDate \
   ../common/ts/Log \
   ../common/ts/LRU \
   ../common/ts/EsperStorage \
-  ../common/ts/EsperMessage \
+  ../common/ts/Message \
   ../common/ts/Login \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \

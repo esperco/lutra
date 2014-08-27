@@ -38,7 +38,7 @@ SHARED_SOURCES = \
   ../common/ts/Util \
   ../common/ts/Log \
   ../common/ts/EsperStorage \
-  ../common/ts/EsperMessage
+  ../common/ts/Message
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.

@@ -142,9 +142,8 @@ module Esper.EvSearch {
                                eventsTab, profiles) {
     var list = $("<div>");
     var active = Login.getAccount().activeEvents;
-    var events;
     if (active === null || active === undefined) return;
-    events = active.calendars;
+    var events = active.calendars;
     var team =
       List.find(Login.myTeams(), function(team) {
         return team.teamid === teamid;

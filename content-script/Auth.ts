@@ -31,7 +31,7 @@ module Esper.Auth {
     var pageType = getPageType();
     if (pageType === PageType.Gmail || pageType === PageType.Gcal) {
       Log.d("Sending message from content script to page", x);
-      var esperMessage : EsperMessage.EsperMessage = {
+      var esperMessage : Message.Message = {
         sender: "Esper",
         type: "CredentialsResponse",
         value: x
@@ -128,11 +128,11 @@ module Esper.Auth {
   function listenForMessages() {
     Log.d("listenForMessages()");
     window.addEventListener("message", function(event) {
-      var request = event.data;
+      var request: Message.Message = event.data;
       if (request.sender === "Esper") {
 
         var ignored = ["CredentialsResponse"];
-        var isIgnored = List.mem(request.type, ignored);
+        var isIgnored = List.mem(ignored, request.type);
         if (! isIgnored)
           Log.d("Received message:", event.data);
 

@@ -36,7 +36,7 @@ module Esper.ActiveEvents {
 
   export function handleNewActiveEvent(x: Types.FullEventId) {
     add(x);
-    var esperMessage : EsperMessage.EsperMessage = {
+    var esperMessage : Message.Message = {
       sender: "Esper",
       type: "ActiveEvents",
       value: exportActiveEvents()
