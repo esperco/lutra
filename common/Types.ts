@@ -24,16 +24,22 @@ module Esper.Types {
     eventId: string;
   }
 
+  export interface Visited<T> {
+    lastVisited: number; /* unixtime in seconds */
+    id: string; /* used in comparisons for deduplication */
+    item: T;
+  }
+
   /* One short list of the recently consulted email threads */
   export interface ActiveThreads {
     googleAccountId: string;
-    threads: GmailThread[];
+    threads: Visited<GmailThread>[];
   }
 
   /* One short list of the recently consulted events per calendar */
   export interface ActiveEvents {
     googleAccountId: string;
-    calendars: { [calendarId: string]: FullEventId[] };
+    calendars: { [calendarId: string]: Visited<FullEventId>[] };
   }
 
   export interface Account {

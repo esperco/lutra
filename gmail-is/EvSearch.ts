@@ -151,7 +151,7 @@ module Esper.EvSearch {
     if (team === null || team === undefined) return;
     var getEventCalls =
       List.map(events[team.team_calendar.google_calendar_id], function(e) {
-        return Api.getEventDetails(teamid, e.eventId);
+        return Api.getEventDetails(teamid, e.item.eventId);
       });
     searchView.spinner.attr("style", "display: block");
     Deferred.join(getEventCalls).done(function(activeEvents) {
