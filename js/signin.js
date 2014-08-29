@@ -85,7 +85,7 @@ var signin = (function() {
       <div #loginLogo id="sign-in-hero-mark" class="animated fadeInUp"/>
     </div>
     <div #msgDiv class="sign-in-msg"/>
-    <button #button class="sign-in-btn">
+    <button #button class="button-primary sign-in-btn">
       <div #google class="google-g"/>
       <div class="btn-divider"/>
       <div class="sign-in-text">Sign in with Google</div>
@@ -212,6 +212,7 @@ var signin = (function() {
   }
 
   mod.signin = function(whenDone, optInviteCode, optEmail) {
+    document.title = "Sign in - Esper";
     if (util.isString(optInviteCode)) {
       useInvite(optInviteCode);
     } else {

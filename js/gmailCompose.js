@@ -17,8 +17,7 @@ var gmailCompose = (function() {
   };
 
   mod.compose = function(param) {
-    var url = makeUrl(param);
-    location.href = url;
+    return makeUrl(param);
   };
 
   return mod;

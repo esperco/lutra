@@ -51,6 +51,29 @@ var util = (function () {
     return test.toString(x);
   }
 
+  /*
+    Do something once the user has stopped typing for a certain number
+    of milliseconds.
+   */
+  mod.afterTyping = function(elt, delayMs, func) {
+    var lastPressed; // date in milliseconds
+    elt
+      .unbind('keydown')
+      .keydown(function() {
+        var t1 = lastPressed;
+        var t2 = Date.now();
+        if (lastPressed >= t2)
+          lastPressed = lastPressed + 1;
+        else
+          lastPressed = t2;
+        var lastPressed0 = lastPressed;
+        window.setTimeout(function() {
+          if (lastPressed0 === lastPressed)
+            func();
+        }, delayMs);
+      });
+  };
+
   /* Element to focus on once the page is ready
      (currently active input). */
   var focusOn;

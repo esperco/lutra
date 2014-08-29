@@ -5,83 +5,24 @@
 var settings = (function() {
   var mod = {};
 
-  function showLabelSettingsModal(team) {
-'''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header clearfix">
-        <button #updateButton
-                type="button" class="btn btn-primary"
-                style="float:right" disabled>Update</button>
-        <h3 #modalTitle
-            class="modal-title">Team Settings</h3>
-      </div>
-      <div #body
-           class="modal-body">
-        <table>
-          <thead>
-            <tr>
-              <td>Shared Labels</td>
-              <td>Sync</td>
-            </tr>
-          </thead>
-          <tbody #labels/>
-        </table>
-        <p #loading>Loading...</p>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-    api.getSharedLabels(team.teamid).done(function(sharedLabels) {
-      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
-        loading.hide();
-
-        var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
-        allLabels.sort();
-        list.iter(allLabels, function(label) {
-          var checkbox = $("<input type='checkbox' class='labelSync'/>")
-            .data("label", label);
-          if (list.mem(syncedLabels.labels, label))
-            checkbox.prop("checked", true);
-          $("<tr><td>" + label + "</td><td>")
-            .append(checkbox)
-            .append("</td></tr>")
-            .appendTo(labels);
-        });
-
-        var newLabelDiv = $("<div/>")
-          .appendTo(body);
-        var newLabelLink = $("<a href='#'>+ New shared label</a>")
-          .appendTo(newLabelDiv);
-        newLabelLink
-          .click(function() {
-            $("<div><input type='text' class='labelNew'/></div>")
-              .prependTo(newLabelDiv);
-          });
-        updateButton.prop("disabled", false);
-      });
-    });
-
-    updateButton.click(function() {
-      var syncedLabels = [];
-      $(".labelSync").each(function(i, x) {
-        if ($(x).is(":checked"))
-          syncedLabels.push($(x).data("label"));
-      });
-      $(".labelNew").each(function(i, x) {
-        syncedLabels.push($(x).val());
-      });
-      api.putSyncedLabels(team.teamid, { labels: syncedLabels })
-        .done(function() {
-          modal.modal("hide");
-        });
-    });
-    modal.modal({});
+  function toggleOverlay(overlay) {
+    if (overlay.css("display") === "none")
+      overlay.css("display", "inline-block");
+    else
+      overlay.css("display", "none");
   }
+
+  function dismissOverlays() {
+    $(".overlay-list").css("display", "none");
+    $(".overlay-popover").css("display", "none");
+    $(".overlay-popover input").val("");
+    $(".overlay-popover .new-label-error").hide();
+  }
+
+  $(document).on('click', function(e) {
+    if (!$(e.target).hasClass("click-safe"))
+      dismissOverlays();
+  });
 
   function setTeamCalendar(team, calId) {
     return api.setTeamCalendar(team.teamid, calId)
@@ -96,7 +37,7 @@ var settings = (function() {
         var cal = team.team_calendar;
         var calId =
           cal !== null && cal !== undefined ? cal.google_calendar_id : null;
-        var options = [ { label: "Select calendar" } ];
+        var options = [];
         list.iter(x.items, function(calInfo) {
           options.push({ label: calInfo.summary, value: calInfo.id });
         });
@@ -114,42 +55,284 @@ var settings = (function() {
       });
   }
 
-  function viewOfProfiles(team, profiles) {
+  function viewOfCalendarTab(team) {
 '''
-<div #table>
-  <div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-3">Role</div>
-    <div class="col-md-3">Email</div>
-    <div class="col-md-2">Google access</div>
-    <div class="col-md-2"></div>
+<div #view>
+  <div class="esper-h1">Team Calendar</div>
+  <div #description class="calendar-setting-description"/>
+  <span #calendarSelector></span>
+</div>
+'''
+    description
+      .text("Select the calendar to be used by the team. " +
+            "Newly created events will be saved to this calendar.");
+
+    makeCalendarSelector(team, calendarSelector);
+
+    return view;
+  }
+
+  function viewOfLabelRow(team, label, syncedLabelsList) {
+'''
+<li #row class="table-row labels-table clearfix">
+  <div #labelText class="col-xs-5"/>
+  <div #status class="col-xs-4">
+    <div #dot class="sync-status-dot"/>
+    <span #statusText class="gray"/>
+  </div>
+  <div class="col-xs-3 sync-action">
+    <a #action href="#" class="link"/>
+  </div>
+</li>
+'''
+    labelText.text(label);
+
+    function disable() {
+      status.css("opacity", "0.5");
+      action
+        .css("opacity", "0.5")
+        .css("pointer-events", "none");
+    }
+
+    function enable() {
+      status.css("opacity", "1");
+      action
+        .css("opacity", "1")
+        .css("pointer-events", "auto");
+    }
+
+    function showSyncing() {
+      enable();
+      dot.css("background", "#2bb673");
+      statusText.text("Syncing");
+      action.text("Stop syncing");
+    }
+
+    function showNotSyncing() {
+      enable();
+      dot.css("background", "#d9534f");
+      statusText.text("Not syncing");
+      action.text("Sync");
+    }
+
+    function toggleSync() {
+      disable();
+      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        if (list.mem(syncedLabels.labels, label)) {
+          var index = syncedLabels.labels.indexOf(label);
+          if (index != undefined) {
+            syncedLabels.labels.splice(index, 1);
+          }
+          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+            .done(function() { showNotSyncing(); });
+        } else {
+          syncedLabels.labels.push(label);
+          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+            .done(function() { showSyncing(); });
+        }
+      });
+    }
+
+    if (list.mem(syncedLabelsList, label))
+      showSyncing();
+    else
+      showNotSyncing();
+
+    action.click(toggleSync);
+
+    return row;
+  }
+
+  function viewOfLabelSyncTab(team) {
+'''
+<div #view>
+  <div class="exec-profile clearfix">
+    <div #labelSyncContainer />
+    <div #description class="label-sync-description"/>
+  </div>
+  <div class="table-header">Shared Labels</div>
+  <ul #labels class="assistants-list">
+    <div #tableSpinner class="spinner table-spinner"/>
+    <div #tableEmpty
+         class="table-empty">There are no shared labels across this team.</div>
+  </ul>
+  <div class="clearfix">
+    <div #labelIconContainer class="img-container-left"/>
+    <a #create disabled
+       class="link popover-trigger click-safe"
+       style="float:left">Create new shared label</a>
+  </div>
+  <div #newLabelPopover class="new-label-popover overlay-popover click-safe">
+    <div class="overlay-popover-header click-safe">New shared label</div>
+    <div class="overlay-popover-body click-safe">
+      <input #newLabel class="new-label-input click-safe"
+             autofocus placeholder="Untitled label"/>
+      <div class="clearfix click-safe">
+        <div #error class="new-label-error click-safe">
+          This label already exists.</div>
+        <button #cancel class="button-secondary label-btn">Cancel</button>
+        <button #save class="button-primary label-btn click-safe"
+                disabled>Save</button>
+        <div #inlineSpinner class="spinner inline-spinner"/>
+    </div>
   </div>
 </div>
 '''
-    list.iter(profiles, function(profile) {
+    var labelSync = $("<img class='svg-block label-sync-icon'/>")
+      .appendTo(labelSyncContainer);
+    svg.loadImg(labelSync, "/assets/img/LabelSync.svg");
+
+    var labelIcon = $("<img class='svg-block label-icon'/>")
+      .appendTo(labelIconContainer);
+    svg.loadImg(labelIcon, "/assets/img/new-label.svg");
+
+    description
+      .text("LabelSync lets you share email labels across your team. Below " +
+        "are labels that currently appear in every team member's account.");
+
+    tableSpinner.show();
+
+    // local array for keyup function
+    var sharedLabelsList;
+
+    api.getSharedLabels(team.teamid).done(function(sharedLabels) {
+      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        sharedLabelsList = sharedLabels.labels;
+        var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
+        tableSpinner.hide();
+        if (allLabels.length > 0) {
+          labels.children().remove();
+          allLabels.sort();
+          list.iter(allLabels, function(label) {
+            labels.append(viewOfLabelRow(team, label, syncedLabels.labels));
+          });
+        } else {
+          tableEmpty.show();
+        }
+        create.click(function() {
+          toggleOverlay(newLabelPopover);
+          newLabel.focus();
+        });
+      });
+    });
+
+    newLabel.keyup(function() {
+      console.log(newLabel.val());
+      if (newLabel.val() != "") {
+        if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
+          save.attr("disabled", "true");
+          error.css("display", "inline-block");
+        } else {
+          save.removeAttr("disabled");
+          error.hide();
+        }
+      }
+      else
+        save.attr("disabled", "true");
+    });
+
+    save.click(function() {
+      inlineSpinner.show();
+      newLabel.addClass("disabled");
+      save.attr("disabled", "true");
+      var label = newLabel.val();
+      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        sharedLabelsList.push(label);
+        syncedLabels.labels.push(label);
+        api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+          .done(function() {
+            inlineSpinner.hide();
+            toggleOverlay(newLabelPopover);
+            newLabel
+              .val("")
+              .removeClass("disabled");
+            var newRow = viewOfLabelRow(team, label, syncedLabels.labels);
+            labels.prepend(newRow);
+            newRow.addClass("purple-flash");
+          });
+      });
+    });
+
+    cancel.click(function() {
+      toggleOverlay(newLabelPopover);
+      newLabel.val("");
+      error.hide();
+    })
+
+    return view;
+  }
+
+  function composeInviteForRole(team, role) {
+    dismissOverlays();
+    var invite = {
+      from_uid: login.me(),
+      teamid: team.teamid,
+      role: role
+    };
+    log("Invite:", invite);
+
+    var subject, body;
+    api.inviteJoinTeam(invite)
+      .done(function(x) {
+        var url = x.url;
+        var body =
+          "Please click the link and sign in with your Google account:\n\n"
+          + "  " + url;
+      });
+
+    return gmailCompose.compose({
+      subject: "Join my team on Esper",
+      body: body
+    });
+  }
+
+  function renderInviteDialog(team) {
 '''
-<div #row class="row">
-  <div #name   class="col-md-2"></div>
-  <div #role   class="col-md-3"></div>
-  <div #email  class="col-md-3"></div>
-  <div #google class="col-md-2"></div>
-  <div #buttons class="col-md-2"></div>
+<div #view class="member-row">
+  <div class="clearfix">
+    <div #emailContainer class="img-container-left"/>
+    <div #invite class="invite-action clickable">
+      <a class="link click-safe" style="float:left">Invite new team member</a>
+      <span class="caret-south click-safe"/>
+    </div>
+  </div>
+  <ul #inviteOptions class="invite-options overlay-list click-safe">
+    <li class="unselectable click-safe">Select a role:</li>
+    <li><a #assistant href="#" target="_blank"
+           class="click-safe">Assistant</a></li>
+    <li><a #executive href="#" target="_blank"
+           class="click-safe">Executive</a></li>
+  </ul>
 </div>
 '''
-      var execUid = team.team_executive;
-      var memberUid = profile.profile_uid;
-      name.text(profile.display_name);
-      role.text(execUid === memberUid ? "Executive" : " Assistant");
-      email.text(profile.email);
-      if (profile.google_access) {
-        google.text("OK");
-        google.attr("style", "color:green");
-      }
-      else {
-        google.text("Sign-in needed");
-        google.attr("style", "color:red");
-      }
+    var email = $("<img class='svg-block invite-icon'/>")
+      .appendTo(emailContainer);
+    svg.loadImg(email, "/assets/img/email.svg");
 
+    invite.click(function() { toggleOverlay(inviteOptions); });
+    assistant.attr("href", composeInviteForRole(team, "Assistant"));
+    executive.attr("href", composeInviteForRole(team, "Executive"));
+
+    return view;
+  }
+
+  function displayAssistants(assistantsList, team, profiles) {
+    list.iter(profiles, function(profile) {
+'''
+<li #row class="table-row assistants-table clearfix">
+  <div class="col-xs-6">
+    <div #name/>
+    <div #email class="gray"/>
+  </div>
+  <div class="col-xs-1 assistant-row-status">
+    <div #statusContainer
+         data-toggle="tooltip"
+         data-placement="right"
+         title="Reauthorization required."/>
+  </div>
+  <div #actions class="col-xs-5 assistant-row-actions"/>
+</li>
+'''
       function refresh() {
         /*
           Reload the whole document.
@@ -159,129 +342,258 @@ var settings = (function() {
         location.reload(true);
       }
 
+      var execUid = team.team_executive;
+      var memberUid = profile.profile_uid;
+
+      name.text(profile.display_name);
+      email.text(profile.email);
+
+      if (!profile.google_access) {
+        var warning = $("<img class='svg-block'/>")
+          .appendTo(statusContainer);
+        svg.loadImg(warning, "/assets/img/warning.svg");
+        statusContainer.tooltip();
+      }
+
       if (memberUid !== login.me()
           && list.mem(team.team_assistants, memberUid)) {
-        var label = execUid !== memberUid ?
-            "Remove"
-          : "Remove from Assistants";
-        $("<a href='#'></a>")
-          .text(label)
-          .appendTo(buttons)
-          .click(function() {
-            api.removeAssistant(team.teamid, memberUid)
-              .done(function() { refresh(); });
-          });
+'''
+<span #removeSpan>
+  <a #removeLink href="#" class="danger-link">Remove</a>
+</span>
+'''
+        removeLink.appendTo(actions)
+        removeLink.click(function() {
+          api.removeAssistant(team.teamid, memberUid)
+            .done(function() { refresh(); });
+        });
+
+        actions.append($("<span class='text-divider'>|</span>"));
+      } else {
+        name
+          .text("")
+          .append($("<span>" + profile.display_name + "</span>"))
+          .append($("<span class='semibold'> (Me)</span>"));
       }
 
       if (memberUid !== execUid) {
-        '''
-<span #span>
-  [<a #link href="#">replace Executive</a>]
+'''
+<span #makeExecSpan>
+  <a #makeExecLink href="#" class="link">Make Executive</a>
 </span>
 '''
-        span.appendTo(role);
-        link
-          .click(function() {
-            api.setExecutive(team.teamid, memberUid)
-              .done(function() { refresh(); });
-          });
+        makeExecSpan.appendTo(actions);
+        makeExecLink.click(function() {
+          api.setExecutive(team.teamid, memberUid)
+            .done(function() { refresh(); });
+        });
       }
 
-      table.append(row);
+      assistantsList.append(row);
     });
-    return table;
   }
 
-  function viewOfTeam(team) {
+  function viewOfMembersTab(team) {
 '''
 <div #view>
-  <div #executive></div>
-  <div #assistants></div>
-  <a #labelSettingsLink href="#">Label Sync Settings</a>
-  <div>
-    Team calendar: <span #calendarSelector></span>
+  <div class="exec-profile clearfix">
+    <div #profilePic class="profile-pic"/>
+    <div style="height: 27px">
+      <span #execName class="profile-name exec-profile-name"/>
+      <span class="exec-label">EXECUTIVE</span>
+      <span #execStatusContainer
+       class="exec-status"
+       data-toggle="tooltip"
+       data-placement="right"
+       title="Reauthorization required."/>
+    </div>
+    <div #execEmail class="profile-email gray"/>
   </div>
-  <div #teamTableDiv/>
+  <div class="table-header">Assistants</div>
+  <ul #assistantsList class="assistants-list">
+    <div #spinner class="spinner table-spinner"/>
+    <div #tableEmpty
+         class="table-empty">There are no assistants on this team.</div>
+  </ul>
+  <div #invitationRow/>
 </div>
 '''
-    labelSettingsLink
-      .click(function() { showLabelSettingsModal(team); });
-    var members = list.union([team.team_executive], team.team_assistants);
+    spinner.show();
 
-    deferred.join(list.map(members, function(uid) {
+    api.getProfile(team.team_executive, team.teamid)
+      .done(function(exec) {
+        profilePic.css("background-image", "url('" + exec.image_url + "')");
+        if (team.team_executive === login.me()) {
+          execName
+            .append($("<span>" + exec.display_name + "</span>"))
+            .append($("<span class='semibold'> (Me)</span>"));
+        } else {
+          execName.text(exec.display_name);
+        }
+        execEmail.text(exec.email);
+        if (!exec.google_access) {
+          var warning = $("<img class='svg-block'/>")
+            .appendTo(execStatusContainer);
+          svg.loadImg(warning, "/assets/img/warning.svg");
+          execStatusContainer.tooltip();
+        }
+      });
+
+    deferred.join(list.map(team.team_assistants, function(uid) {
       return api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) {
-        viewOfProfiles(team, profiles)
-          .appendTo(teamTableDiv);
+        spinner.hide();
+        if (profiles.length > 0)
+          displayAssistants(assistantsList, team, profiles);
+        else
+          tableEmpty.show();
       });
 
-    makeCalendarSelector(team, calendarSelector);
+    invitationRow.append(renderInviteDialog(team));
 
     return view;
   }
 
-  function composeInviteForRole(role) {
-    var invite = {
-      from_uid: login.me(),
-      teamid: login.getTeam().teamid,
-      role: role
-    };
-    log("Invite:", invite);
-    api.inviteJoinTeam(invite)
-      .done(function(x) {
-        var url = x.url;
-        var body =
-          "Please click the link and sign in with your Google account:\n\n"
-          + "  " + url;
-
-        gmailCompose.compose({
-          subject: "Join my team on Esper",
-          body: body
-        });
-      });
-  }
-
-  function renderInviteDialog() {
+  function showTeamSettings(team) {
 '''
-<div #view>
-  <div>Invite team members:</div>
-  <div #roleSelector/>
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog team-settings">
+    <div class="modal-content">
+      <div style="text-align:center">
+        <ul class="esper-tab-links">
+          <li class="active"><a #tab1 href="#" id="tab1" class="first">
+            <img #members class="svg-block esper-tab-icon"/>
+            <span>Members</span>
+          </a></li>
+          <li><a #tab2 href="#" id="tab2">
+            <img #labelSync class="svg-block esper-tab-icon"/>
+            <span>LabelSync</span>
+          </a></li>
+          <li><a #tab3 href="#" id="tab3" class="last">
+            <img #calendar class="svg-block esper-tab-icon"/>
+            <span>Calendar</span>
+          </a></li>
+        </ul>
+      </div>
+      <div class="esper-tab-content">
+        <div #content1 id="tab1" class="tab active"/>
+        <div #content2 id="tab2" class="tab"/>
+        <div #content3 id="tab3" class="tab"/>
+      </div>
+      <div class="modal-footer">
+        <button #done class="button-primary">Done</button>
+      </div>
+    </div>
+  </div>
 </div>
 '''
-    var role;
 
-    var sel = select.create({
-      defaultAction: function(v) {
-        role = v;
-        log("Selected role is: " + role);
-        if (util.isString(role))
-          composeInviteForRole(role);
-      },
-      options: [
-        { label: "Pick a role" },
-        { label: "Executive", value: "Executive" },
-        { label: "Assistant", value: "Assistant" }
-      ]
+    tab1.click(function() { switchTab(tab1); });
+    tab2.click(function() { switchTab(tab2); });
+    tab3.click(function() { switchTab(tab3); });
+
+    function switchTab(tab) {
+      var currentAttrValue = "#" + tab.attr("id");
+      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
+      tab.parent('li').addClass('active').siblings().removeClass('active');
+    };
+
+    content1.append(viewOfMembersTab(team));
+    content2.append(viewOfLabelSyncTab(team));
+    content3.append(viewOfCalendarTab(team));
+
+    done.click(function() { modal.modal("hide") });
+
+    modal.modal({});
+  }
+
+  function checkTeamStatus(profiles, statusContainer) {
+    var error = false;
+    list.iter(profiles, function(profile) {
+      if (!profile.google_access) {
+        error = true;
+      }
     });
+    if (error) {
+      var warning = $("<img class='svg-block'/>")
+        .appendTo(statusContainer);
+      svg.loadImg(warning, "/assets/img/warning.svg");
+      statusContainer.tooltip();
+    }
+  }
 
-    sel.view.appendTo(roleSelector);
+  function viewOfTeam(team) {
+'''
+<div #view class="team-row clearfix">
+  <div #cogContainer class="img-container-right"/>
+  <div #statusContainer
+       class="img-container-right team-status"
+       data-toggle="tooltip"
+       data-placement="left"
+       title="Some team members may need to be reauthorized."/>
+  <div #profilePic class="profile-pic"/>
+  <div #name class="profile-name"/>
+  <div #email class="profile-email gray"/>
+</div>
+'''
+    var cog = $("<img class='svg-block team-cog clickable'/>")
+      .appendTo(cogContainer);
+    svg.loadImg(cog, "/assets/img/cog.svg");
+
+    var members = list.union([team.team_executive], team.team_assistants);
+    deferred.join(list.map(members, function(uid) {
+      return api.getProfile(uid, team.teamid);
+    }))
+      .done(function(profiles) { checkTeamStatus(profiles, statusContainer); });
+
+    api.getProfile(team.team_executive, team.teamid)
+      .done(function(profile) {
+        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (team.team_executive === login.me()) {
+          name
+            .append($("<span>" + profile.display_name + "</span>"))
+            .append($("<span class='semibold'> (Me)</span>"));
+        } else {
+          name.text(profile.display_name);
+        }
+        email.text(profile.email);
+      });;
+
+    cogContainer.click(function() { showTeamSettings(team); });
 
     return view;
   }
 
   function renderAdminSection() {
 '''
-<div #view>
-  <button #button
-          class="btn btn-default">Generate new team invite</button>
-  <code #url></code>
+<div #view style="margin-top:16px">
+  <div class="esper-h2">New Team Invitation URL</div>
+  <div class="generate-row clearfix">
+    <button #button
+            class="button-primary col-xs-3 generate">Generate</button>
+    <input #url class="generate-input col-xs-9 disabled"
+           onclick="this.select();"/>
+  </div>
+  <div>
+    <a href="#" #clearSync class="danger-link">Log out of all Esper accounts</a>
+  </div>
 </div>
 '''
+    clearSync.click(function() {
+      login.clearAllLoginInfo();
+      signin.signin(function(){});
+    });
+
     button.click(function() {
       api.inviteCreateTeam()
         .done(function(x) {
-          url.text(x.url);
+          url
+            .val(x.url)
+            .removeClass("disabled")
+            .select();
         });
     });
 
@@ -290,89 +602,161 @@ var settings = (function() {
 
   mod.load = function() {
 '''
-<div #view>
-  <div class="settings-block">
-    <h1>Esper Settings</h1>
+<div #view class="settings-container">
+  <div class="header clearfix">
+    <a #logoContainer href="http://esper.com" target="_blank"
+       class="img-container-left"/>
+    <div class="header-title">Settings</div>
+    <span #signOut class="header-signout clickable">Sign out</span>
   </div>
-  <div class="settings-block">
-    Make sure you&apos;ve installed the
-    <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
-       target="_blank">Esper extension</a>
-    for Google Chrome browsers.
-  </div>
-  <div class="settings-block settings-block-gray">
-    <h2>Profile</h2>
-    <div #me/>
-  </div>
-  <div class="settings-block">
-    <h2>Teams</h2>
-    <div #teams/>
-  </div>
-  <div class="settings-block settings-block-gray">
-    <h2>Account</h2>
-    <div #logout class="hide">
-      <a #logoutLink href="#!">Log out of Esper</a>
+  <div class="divider"/>
+  <div #install class="install clearfix">
+    <div #closeContainer class="img-container-right close clickable"/>
+    <div #chromeLogoContainer
+         class="img-container-right chrome-logo-container animated fadeIn"/>
+    <div class="esper-h1 install-h1 gray animated fadeInLeft">
+      Bring your inbox and calendar closer together.
     </div>
-    <div #revoke class="hide">
-      <a href="#" #revokeLink>Revoke Esper&apos;s access
-                              to my Google account</a>
-    </div>
-    <div>
-      <a href="#" #clearSync>Log out all Esper accounts</a>
+    <div class="esper-h2 install-h2 animated fadeInLeft">
+      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
+         target="_blank">Install the Esper Chrome extension</a>
+      <span #arrowContainer class="img-container-inline"/>
     </div>
   </div>
-  <div class="settings-block">
-    <h2>Invites</h2>
-    <div #inviteSection/>
+  <div #main class="clearfix">
+    <div class="leftCol settings-section col-sm-6">
+      <div class="esper-h1 settings-section-title">My Profile</div>
+      <div class="clearfix" style="margin-top:16px">
+        <div #profilePic class="profile-pic"/>
+        <div #myName class="profile-name"/>
+        <div #myEmail class="profile-email gray"/>
+      </div>
+      <div class="toggle-advanced">
+        <a #toggleAdvanced href="#" class="link">Show advanced</a>
+      </div>
+      <div #advanced class="profile-advanced">
+        <div #uid/>
+        <a #revoke
+           href="#"
+           class="danger-link">Deauthorize this account</a>
+      </div>
+      <div #adminSection class="admin hide">
+        <div class="esper-h1 settings-section-title">Admin Tools</div>
+        <div #adminBody/>
+      </div>
+    </div>
+    <div class="rightCol settings-section col-sm-6">
+      <div class="esper-h1 settings-section-title">Executive Teams</div>
+      <div #teams class="team-list"/>
+    </div>
   </div>
-  <div #adminSection class="hide settings-block settings-block-gray">
-    <h2>Admin</h2>
-    <div #adminBody />
+  <div class="footer clearfix">
+    <ul class="col-xs-2">
+      <li class="footer-header">Esper</li>
+      <li><a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
+             target="_blank" class="gray-link">Install</a></li>
+      <li><a href="http://esper.com/aboutus.html" target="_blank"
+             class="gray-link">About us</a></li>
+      <li><a href="http://blog.esper.com" target="_blank"
+             class="gray-link">Blog</a></li>
+      <li><a href="http://esper.com/jobs.html" target="_blank"
+             class="gray-link">Jobs</a></li>
+    </ul>
+    <ul class="col-xs-2">
+      <li class="footer-header">Support</li>
+      <li><a href="http://esper.com" target="_blank"
+             class="gray-link">Getting started</a></li>
+      <li><a href="http://esper.com/privacypolicy.html" target="_blank"
+             class="gray-link">Privacy</a></li>
+      <li><a href="http://esper.com/termsofuse.html" target="_blank"
+             class="gray-link">Terms</a></li>
+      <li><a #contact href="#" class="gray-link">Contact us</a></li>
+    </ul>
+    <div class="col-xs-8">
+      <a #wordMarkContainer href="http://esper.com" target="_blank"
+         class="img-container-right"/>
+    </div>
   </div>
 </div>
 '''
     var root = $("#settings-page");
     root.children().remove();
     root.append(view);
+    document.title = "Settings - Esper";
 
-    me
-      .append("Logged into Esper as " + login.myEmail())
-      .append(" (UID " + login.me() + ")");
+    var logo = $("<img class='svg-block header-logo'/>")
+      .appendTo(logoContainer);
+    svg.loadImg(logo, "/assets/img/logo.svg");
+
+    var close = $("<img class='svg-block'/>")
+      .appendTo(closeContainer);
+    svg.loadImg(close, "/assets/img/close.svg");
+
+    var chrome = $("<img class='svg-block chrome-logo'/>")
+      .appendTo(chromeLogoContainer);
+    svg.loadImg(chrome, "/assets/img/chrome.svg");
+
+    var arrowEast = $("<img class='svg-block arrow-east'/>")
+      .appendTo(arrowContainer);
+    svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
+
+    var wordMark = $("<img class='svg-block word-mark'/>")
+      .appendTo(wordMarkContainer);
+    svg.loadImg(wordMark, "/assets/img/word-mark.svg");
+
+    api.getMyProfile()
+      .done(function(profile){
+        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        myName.text(profile.display_name);
+        myEmail.text(login.myEmail());
+      });
+
+    uid
+      .append("<span>UID: </span>")
+      .append("<span class='gray'>" + login.me() + "</span>");
 
     list.iter(login.getTeams(), function(team) {
       teams.append(viewOfTeam(team));
     });
 
-    logoutLink.click(function() {
+    signOut.click(function() {
       login.clearLoginInfo();
       signin.signin(function(){});
       return false;
     });
 
-    revokeLink.click(function() {
+    closeContainer.click(function() { install.slideUp(); });
+
+    toggleAdvanced.click(function() {
+      if (advanced.css("display") === "none") {
+        advanced.slideDown("fast");
+        toggleAdvanced.text("Hide advanced");
+      } else {
+        advanced.slideUp("fast");
+        toggleAdvanced.text("Show advanced");
+      }
+    })
+
+    revoke.click(function() {
       api.postGoogleAuthRevoke()
         .done(function() {
-          revoke.remove();
+          signOut.click();
         });
       return false;
     });
 
-    clearSync.click(function() {
-      login.clearAllLoginInfo();
-      signin.signin(function(){});
+    contact.click(function() {
+      gmailCompose.compose({ to: "team@esper.com" });
     });
 
     api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
-        logout.removeClass("hide");
         if (info.has_token)
           revoke.removeClass("hide");
         else {
           window.url = info.google_auth_url;
         }
       });
-
-    inviteSection.append(renderInviteDialog());
 
     if (login.isAdmin()) {
       adminBody.append(renderAdminSection());
