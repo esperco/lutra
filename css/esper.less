@@ -23,7 +23,7 @@
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
-@purple_bg: #e8d9ee;
+@purple_bg: #F4EFF5;
 @purple_bg_hover: #fefdff;
 @purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
@@ -461,6 +461,14 @@ li.esper-li.selected:hover .esper-team-list-email { color: @gray_60; }
 .esper-ev {
   padding: 14px 4px 16px 4px;
   border-bottom: 1px solid #d8d8d8;
+}
+
+.esper-ev.disabled {
+  pointer-events: none;
+  .esper-ev-date,
+  .esper-ev-title,
+  .esper-ev-times,
+  .esper-ev-disclose { opacity: 0.3; }
 }
 
 .esper-ev-date {
