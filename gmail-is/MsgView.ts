@@ -210,7 +210,7 @@ module Esper.MsgView {
     size.click(toggleSidebar);
 
     settings.click(function() {
-      popWindow(Conf.Api.url, 545, 433);
+      popWindow(Conf.Api.url, 1000, 610);
     })
     signOut.click(function() {
       if (sidebar.css("display") !== "none")
