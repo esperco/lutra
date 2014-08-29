@@ -19,25 +19,13 @@ module Esper.CalEventView {
     });
   }
 
-  /* Find a good insertion point */
-  function findAnchor() {
-    /* Table row with header "Calendar" and dropdown for choosing calendar */
-    var anchor = $("#\\:15\\.calendar-row");
-    if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper event controls.");
-      return $();
-    }
-    else
-      return anchor;
-  }
-
   function removeEsperRoot() {
     $("#esper-event-root").remove();
   }
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
+    var anchor = Gcal.Event.findAnchor();
     var root = $("<tr id='esper-event-root'/>");
     root.insertAfter(anchor);
     return root;
@@ -131,7 +119,7 @@ module Esper.CalEventView {
   }
 
   function mergeDescription(event: ApiT.CalendarEvent) {
-    var userDescriptionElt = $("textarea#\\:2i");
+    var userDescriptionElt = Gcal.Event.findDescriptionBox();
     var userDescription = userDescriptionElt.val();
     var serverDescription = event.description;
     if (userDescriptionElt.length === 1 && serverDescription !== undefined) {
