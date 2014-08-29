@@ -58,9 +58,15 @@ var settings = (function() {
   function viewOfCalendarTab(team) {
 '''
 <div #view>
-  Team calendar: <span #calendarSelector></span>
+  <div class="esper-h1">Team Calendar</div>
+  <div #description class="calendar-setting-description"/>
+  <span #calendarSelector></span>
 </div>
 '''
+    description
+      .text("Select the calendar to be used by the team. " +
+            "Newly created events will be saved to this calendar.");
+
     makeCalendarSelector(team, calendarSelector);
 
     return view;
@@ -147,6 +153,8 @@ var settings = (function() {
   <div class="table-header">Shared Labels</div>
   <ul #labels class="assistants-list">
     <div #tableSpinner class="spinner table-spinner"/>
+    <div #tableEmpty
+         class="table-empty">There are no shared labels across this team.</div>
   </ul>
   <div class="clearfix">
     <div #labelIconContainer class="img-container-left"/>
@@ -182,7 +190,6 @@ var settings = (function() {
       .text("LabelSync lets you share email labels across your team. Below " +
         "are labels that currently appear in every team member's account.");
 
-    labels.children().remove();
     tableSpinner.show();
 
     // local array for keyup function
@@ -191,12 +198,17 @@ var settings = (function() {
     api.getSharedLabels(team.teamid).done(function(sharedLabels) {
       api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
         sharedLabelsList = sharedLabels.labels;
-        tableSpinner.hide();
         var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
-        allLabels.sort();
-        list.iter(allLabels, function(label) {
-          labels.append(viewOfLabelRow(team, label, syncedLabels.labels));
-        });
+        tableSpinner.hide();
+        if (allLabels.length > 0) {
+          labels.children().remove();
+          allLabels.sort();
+          list.iter(allLabels, function(label) {
+            labels.append(viewOfLabelRow(team, label, syncedLabels.labels));
+          });
+        } else {
+          tableEmpty.show();
+        }
         create.click(function() {
           toggleOverlay(newLabelPopover);
           newLabel.focus();
@@ -205,6 +217,7 @@ var settings = (function() {
     });
 
     newLabel.keyup(function() {
+      console.log(newLabel.val());
       if (newLabel.val() != "") {
         if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
           save.attr("disabled", "true");
@@ -395,12 +408,14 @@ var settings = (function() {
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="assistants-list">
     <div #spinner class="spinner table-spinner"/>
+    <div #tableEmpty
+         class="table-empty">There are no assistants on this team.</div>
   </ul>
   <div #invitationRow/>
 </div>
 '''
     spinner.show();
-    
+
     api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
         profilePic.css("background-image", "url('" + exec.image_url + "')");
@@ -418,14 +433,17 @@ var settings = (function() {
           svg.loadImg(warning, "/assets/img/warning.svg");
           execStatusContainer.tooltip();
         }
-      });    
+      });
 
     deferred.join(list.map(team.team_assistants, function(uid) {
       return api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) {
         spinner.hide();
-        displayAssistants(assistantsList, team, profiles);
+        if (profiles.length > 0)
+          displayAssistants(assistantsList, team, profiles);
+        else
+          tableEmpty.show();
       });
 
     invitationRow.append(renderInviteDialog(team));
@@ -517,7 +535,7 @@ var settings = (function() {
   <div #email class="profile-email gray"/>
 </div>
 '''
-    var cog = $("<img class='svg-block team-cog clickable'/>")  
+    var cog = $("<img class='svg-block team-cog clickable'/>")
       .appendTo(cogContainer);
     svg.loadImg(cog, "/assets/img/cog.svg");
 
@@ -557,7 +575,7 @@ var settings = (function() {
   </div>
   <div>
     <a href="#" #clearSync class="danger-link">Log out of all Esper accounts</a>
-  </div> 
+  </div>
 </div>
 '''
     clearSync.click(function() {
@@ -688,7 +706,7 @@ var settings = (function() {
         myName.text(profile.display_name);
         myEmail.text(login.myEmail());
       });
-    
+
     uid
       .append("<span>UID: </span>")
       .append("<span class='gray'>" + login.me() + "</span>");

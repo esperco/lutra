@@ -333,22 +333,15 @@ input.disabled {
 }
 
 .sign-in-btn {
-  background: linear-gradient(@purple, @purple_hover);
-  border: 1px solid @purple_active;
-  border-radius: 3px;
-  color: white;
   font-size: 16px;
   font-weight: 300;
-  height: 44px;
-  outline: none;
   padding: 10px 20px 10px 15px;
-  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
-  &:active { background: linear-gradient(@purple_active, @purple_hover); }
 }
 
 .google-g {
   float: left;
   width: 14px;
+  margin-top: 2px;
 }
 
 .btn-divider {
@@ -633,6 +626,13 @@ input.disabled {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
 }
+.table-empty {
+  display: none;
+  margin-top: 90px;
+  font-size: 18px;
+  color: @gray_40;
+  text-align: center;
+}
 .table-row {
   border-bottom: 1px solid @gray_10;
   &.assistants-table { padding: 12px 6px; }
@@ -709,7 +709,11 @@ input.disabled {
 .purple-flash {
   -webkit-animation: purple_flash 2s;
           animation: purple_flash 2s;
-}  
+}
+
+.calendar-setting-description {
+  margin: 4px 0 10px 0;
+}
 
 /** Spinner **/
 
