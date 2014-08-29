@@ -142,5 +142,27 @@ module Esper.Gcal {
       if (encodedId !== undefined)
         return decodeFullEventId(encodedId);
     }
+
+    /* Find a good insertion point: after "Calendar" dropdown row. */
+    export function findAnchor(): JQuery {
+      var anchor = $("[id*=calendar-row]");
+      if (anchor.length !== 1) {
+        Log.e("Cannot find anchor point for the Esper event controls.");
+        return $();
+      }
+      else
+        return anchor;
+    }
+
+    /* Find the textarea used by the event description. */
+    export function findDescriptionBox(): JQuery {
+      var sel = $("textarea[id*=\\:]");
+      if (sel.length !== 1) {
+        Log.e("Cannot find description textarea.");
+        return $();
+      }
+      else
+        return sel;
+    }
   }
 }

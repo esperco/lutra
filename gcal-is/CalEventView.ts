@@ -19,25 +19,13 @@ module Esper.CalEventView {
     });
   }
 
-  /* Find a good insertion point */
-  function findAnchor() {
-    /* Table row with header "Calendar" and dropdown for choosing calendar */
-    var anchor = $("#\\:15\\.calendar-row");
-    if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper event controls.");
-      return $();
-    }
-    else
-      return anchor;
-  }
-
   function removeEsperRoot() {
     $("#esper-event-root").remove();
   }
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
+    var anchor = Gcal.Event.findAnchor();
     var root = $("<tr id='esper-event-root'/>");
     root.insertAfter(anchor);
     return root;
@@ -58,7 +46,8 @@ module Esper.CalEventView {
 '''
 <div #view
      class="esper-thread-row">
-  <img #unlinkButton class="esper-clickable"
+  <img #unlinkButton alt="Linked"
+                     class="esper-clickable"
                      title="Click to unlink this conversation from the event"/>
   <a #threadView
      target="_blank"
@@ -72,10 +61,17 @@ module Esper.CalEventView {
     subject.text(thread.subject);
     snippet.html(thread.snippet);
 
+    var threadId = thread.gmail_thrid;
+    var eventId = fullEventId.eventId;
     unlinkButton.click(function() {
-      Api.unlinkEvent(teamid, thread.gmail_thrid, fullEventId.eventId)
+      Api.unlinkEvent(teamid, threadId, eventId)
         .done(function() {
           view.remove();
+          Api.getEventDetails(teamid, eventId)
+            .done(function(event) {
+              mergeDescription(event);
+              Log.d("Updated description textarea.");
+            });
         });
     });
 
@@ -85,14 +81,64 @@ module Esper.CalEventView {
     return view;
   }
 
+  /*
+    Keep the user-edited part of the description field (text area), and
+    overwrite the bottom part below the marker with the new content
+    from the server.
+  */
+  export function mergeDescriptionText(userDescription: string,
+                                       serverDescription: string) {
+    var delimiter = "=== Conversation ===";
+
+    var split1 = userDescription.split(delimiter);
+    var split2 = serverDescription.split(delimiter);
+    var description = "";
+    if (split1.length >= 1) {
+      description += split1[0];
+      if (description.length > 0
+          && description[description.length-1] !== '\n')
+        description += "\n";
+    }
+    if (split2.length >= 2) {
+      description += delimiter;
+      split2.shift();
+      description += split2.join(delimiter);
+    }
+    return description;
+  }
+
+  export function testMergeDescriptionText() {
+    console.assert(mergeDescriptionText("", "") === "");
+    console.assert(mergeDescriptionText("bla", "") === "bla\n");
+    console.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
+                                        "=== Conversation ===")
+                   === "bla\n=== Conversation ===");
+    console.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
+                                        "=== Conversation ===\nYo!")
+                   === "bla\n=== Conversation ===\nYo!");
+  }
+
+  function mergeDescription(event: ApiT.CalendarEvent) {
+    var userDescriptionElt = Gcal.Event.findDescriptionBox();
+    var userDescription = userDescriptionElt.val();
+    var serverDescription = event.description;
+    if (userDescriptionElt.length === 1 && serverDescription !== undefined) {
+      var description =
+        mergeDescriptionText(userDescription, serverDescription);
+      userDescriptionElt.val(description);
+    }
+  }
+
   function renderActiveThread(
     teamid,
     thread: Types.GmailThread,
-    fullEventId: Types.FullEventId): JQuery {
+    fullEventId: Types.FullEventId
+  ): JQuery {
 '''
 <div #view
      class="esper-thread-row">
-  <img #linkButton class="esper-clickable"
+  <img #linkButton alt="Unlinked"
+                   class="esper-clickable"
                    title="Click to link this conversation to the event"/>
   <a #threadView
      target="_blank"
@@ -105,11 +151,24 @@ module Esper.CalEventView {
     linkButton.attr("src", Init.esperRootUrl + "img/unlinked.png");
     subject.text(thread.subject);
 
+    var threadId = thread.threadId;
+    var eventId = fullEventId.eventId;
     linkButton.click(function() {
-      Api.linkEventForMe(teamid, thread.threadId, fullEventId.eventId)
+      Api.linkEventForMe(teamid, threadId, eventId)
         .done(function() {
           updateView(fullEventId);
-          Api.linkEventForTeam(teamid, thread.threadId, fullEventId.eventId);
+          Api.linkEventForTeam(teamid, threadId, eventId)
+            .done(function() {
+              Api.syncEvent(teamid, threadId, eventId)
+                .done(function() {
+                  updateView(fullEventId);
+                  Api.getEventDetails(teamid, eventId)
+                    .done(function(event) {
+                      mergeDescription(event);
+                      Log.d("Link and sync complete.");
+                    });
+                });
+            });
         });
     });
 
