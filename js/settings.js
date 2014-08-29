@@ -13,7 +13,6 @@ var settings = (function() {
   }
 
   function dismissOverlays() {
-    console.log("dismissing");
     $(".overlay-list").css("display", "none");
     $(".overlay-popover").css("display", "none");
     $(".overlay-popover input").val("");
@@ -163,8 +162,8 @@ var settings = (function() {
       <div class="clearfix click-safe">
         <div #error class="new-label-error click-safe">
           This label already exists.</div>
-        <button #cancel class="btn btn-secondary label-btn">Cancel</button>
-        <button #save class="btn btn-primary label-btn click-safe"
+        <button #cancel class="button-secondary label-btn">Cancel</button>
+        <button #save class="button-primary label-btn click-safe"
                 disabled>Save</button>
         <div #inlineSpinner class="spinner inline-spinner"/>
     </div>
@@ -357,7 +356,7 @@ var settings = (function() {
         name
           .text("")
           .append($("<span>" + profile.display_name + "</span>"))
-          .append($("<span class='bold'> (Me)</span>"));
+          .append($("<span class='semibold'> (Me)</span>"));
       }
 
       if (memberUid !== execUid) {
@@ -405,7 +404,13 @@ var settings = (function() {
     api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
         profilePic.css("background-image", "url('" + exec.image_url + "')");
-        execName.text(exec.display_name);
+        if (team.team_executive === login.me()) {
+          execName
+            .append($("<span>" + exec.display_name + "</span>"))
+            .append($("<span class='semibold'> (Me)</span>"));
+        } else {
+          execName.text(exec.display_name);
+        }
         execEmail.text(exec.email);
         if (!exec.google_access) {
           var warning = $("<img class='svg-block'/>")
@@ -457,7 +462,7 @@ var settings = (function() {
         <div #content3 id="tab3" class="tab"/>
       </div>
       <div class="modal-footer">
-        <button #done class="btn btn-primary">Done</button>
+        <button #done class="button-primary">Done</button>
       </div>
     </div>
   </div>
@@ -528,7 +533,7 @@ var settings = (function() {
         if (team.team_executive === login.me()) {
           name
             .append($("<span>" + profile.display_name + "</span>"))
-            .append($("<span class='bold'> (Me)</span>"));
+            .append($("<span class='semibold'> (Me)</span>"));
         } else {
           name.text(profile.display_name);
         }
@@ -546,7 +551,7 @@ var settings = (function() {
   <div class="esper-h2">New Team Invitation URL</div>
   <div class="generate-row clearfix">
     <button #button
-            class="btn btn-primary col-xs-3 generate">Generate</button>
+            class="button-primary col-xs-3 generate">Generate</button>
     <input #url class="generate-input col-xs-9 disabled"
            onclick="this.select();"/>
   </div>
@@ -577,7 +582,8 @@ var settings = (function() {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
-    <div #logoContainer class="img-container-left"/>
+    <a #logoContainer href="http://esper.com" target="_blank"
+       class="img-container-left"/>
     <div class="header-title">Settings</div>
     <span #signOut class="header-signout clickable">Sign out</span>
   </div>
@@ -627,19 +633,26 @@ var settings = (function() {
       <li class="footer-header">Esper</li>
       <li><a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
              target="_blank" class="gray-link">Install</a></li>
-      <li><a href="http://esper.com/aboutus.html" class="gray-link">About us</a></li>
-      <li><a href="http://blog.esper.com" class="gray-link">Blog</a></li>
-      <li><a href="http://esper.com/jobs.html" class="gray-link">Jobs</a></li>
+      <li><a href="http://esper.com/aboutus.html" target="_blank"
+             class="gray-link">About us</a></li>
+      <li><a href="http://blog.esper.com" target="_blank"
+             class="gray-link">Blog</a></li>
+      <li><a href="http://esper.com/jobs.html" target="_blank"
+             class="gray-link">Jobs</a></li>
     </ul>
     <ul class="col-xs-2">
       <li class="footer-header">Support</li>
-      <li><a href="http://esper.com" class="gray-link">Getting started</a></li>
-      <li><a href="http://esper.com/privacypolicy.html" class="gray-link">Privacy</a></li>
-      <li><a href="http://esper.com/termsofuse.html" class="gray-link">Terms</a></li>
+      <li><a href="http://esper.com" target="_blank"
+             class="gray-link">Getting started</a></li>
+      <li><a href="http://esper.com/privacypolicy.html" target="_blank"
+             class="gray-link">Privacy</a></li>
+      <li><a href="http://esper.com/termsofuse.html" target="_blank"
+             class="gray-link">Terms</a></li>
       <li><a #contact href="#" class="gray-link">Contact us</a></li>
     </ul>
     <div class="col-xs-8">
-      <div #wordMarkContainer class="img-container-right"/>
+      <a #wordMarkContainer href="http://esper.com" target="_blank"
+         class="img-container-right"/>
     </div>
   </div>
 </div>
@@ -647,6 +660,7 @@ var settings = (function() {
     var root = $("#settings-page");
     root.children().remove();
     root.append(view);
+    document.title = "Settings - Esper";
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);

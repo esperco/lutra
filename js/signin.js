@@ -212,6 +212,7 @@ var signin = (function() {
   }
 
   mod.signin = function(whenDone, optInviteCode, optEmail) {
+    document.title = "Sign in - Esper";
     if (util.isString(optInviteCode)) {
       useInvite(optInviteCode);
     } else {
