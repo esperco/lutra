@@ -43,7 +43,8 @@ module Esper.EsperStorage {
     };
   }
 
-  function getAccount(esper: Types.Storage, googleAccountId: string) {
+  function getAccount(esper: Types.Storage, googleAccountId: string):
+  Types.Account {
     console.assert(esper.accounts !== undefined);
     var account = esper.accounts[googleAccountId];
     if (account === undefined) {
@@ -51,6 +52,16 @@ module Esper.EsperStorage {
       esper.accounts[googleAccountId] = account;
     }
     account.googleAccountId = googleAccountId; // compatibility fix 2014-08-04
+    if (account.activeEvents === undefined)
+      account.activeEvents = {
+        googleAccountId: googleAccountId,
+        calendars: {}
+      };
+    if (account.activeThreads === undefined)
+      account.activeThreads = {
+        googleAccountId: googleAccountId,
+        threads: []
+      };
     Log.d("getAccount returns:", account);
     return account;
   }
@@ -75,7 +86,15 @@ module Esper.EsperStorage {
                                    whenDone: () => void) {
     update(function(esper) {
       var k = x.googleAccountId;
-      getAccount(esper, k).activeEvents = x;
+      var account = getAccount(esper, k);
+      var old = account.activeEvents.calendars;
+      var updates = x.calendars;
+      for (var cal in updates) {
+        if (old[cal] === undefined)
+          old[cal] = updates[cal];
+        else
+          old[cal] = Visited.merge(updates[cal], old[cal], Visited.maxEvents);
+      }
       return esper;
     }, whenDone);
   }
@@ -84,7 +103,11 @@ module Esper.EsperStorage {
                                    whenDone: () => void) {
     update(function(esper) {
       var k = x.googleAccountId;
-      getAccount(esper, k).activeThreads = x;
+      var account = getAccount(esper, k);
+      account.activeThreads.threads =
+        Visited.merge(x.threads,
+                      account.activeThreads.threads,
+                      Visited.maxThreads);
       return esper;
     }, whenDone);
   }

@@ -37,6 +37,8 @@ SHARED_SOURCES = \
   ../common/ts/List \
   ../common/ts/Util \
   ../common/ts/Log \
+  ../common/ts/LRU \
+  ../common/ts/Visited \
   ../common/ts/EsperStorage \
   ../common/ts/Message
 

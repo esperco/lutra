@@ -12,6 +12,7 @@ SOURCES = \
   XDate \
   Log \
   LRU \
+  Visited \
   EsperStorage \
   Message \
   Login \
