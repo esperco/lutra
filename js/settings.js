@@ -13,91 +13,17 @@ var settings = (function() {
   }
 
   function dismissOverlays() {
+    console.log("dismissing");
     $(".overlay-list").css("display", "none");
+    $(".overlay-popover").css("display", "none");
+    $(".overlay-popover input").val("");
+    $(".overlay-popover .new-label-error").hide();
   }
 
   $(document).on('click', function(e) {
     if (!$(e.target).hasClass("click-safe"))
       dismissOverlays();
   });
-
-  function showLabelSettingsModal(team) {
-'''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header clearfix">
-        <button #updateButton
-                type="button" class="btn btn-primary"
-                style="float:right" disabled>Update</button>
-        <h3 #modalTitle
-            class="modal-title">Team Settings</h3>
-      </div>
-      <div #body
-           class="modal-body">
-        <table>
-          <thead>
-            <tr>
-              <td>Shared Labels</td>
-              <td>Sync</td>
-            </tr>
-          </thead>
-          <tbody #labels/>
-        </table>
-        <p #loading>Loading...</p>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-    api.getSharedLabels(team.teamid).done(function(sharedLabels) {
-      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
-        loading.hide();
-
-        var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
-        allLabels.sort();
-        list.iter(allLabels, function(label) {
-          var checkbox = $("<input type='checkbox' class='labelSync'/>")
-            .data("label", label);
-          if (list.mem(syncedLabels.labels, label))
-            checkbox.prop("checked", true);
-          $("<tr><td>" + label + "</td><td>")
-            .append(checkbox)
-            .append("</td></tr>")
-            .appendTo(labels);
-        });
-
-        var newLabelDiv = $("<div/>")
-          .appendTo(body);
-        var newLabelLink = $("<a href='#'>+ New shared label</a>")
-          .appendTo(newLabelDiv);
-        newLabelLink
-          .click(function() {
-            $("<div><input type='text' class='labelNew'/></div>")
-              .prependTo(newLabelDiv);
-          });
-        updateButton.prop("disabled", false);
-      });
-    });
-
-    updateButton.click(function() {
-      var syncedLabels = [];
-      $(".labelSync").each(function(i, x) {
-        if ($(x).is(":checked"))
-          syncedLabels.push($(x).data("label"));
-      });
-      $(".labelNew").each(function(i, x) {
-        syncedLabels.push($(x).val());
-      });
-      api.putSyncedLabels(team.teamid, { labels: syncedLabels })
-        .done(function() {
-          modal.modal("hide");
-        });
-    });
-    modal.modal({});
-  }
 
   function setTeamCalendar(team, calId) {
     return api.setTeamCalendar(team.teamid, calId)
@@ -112,7 +38,7 @@ var settings = (function() {
         var cal = team.team_calendar;
         var calId =
           cal !== null && cal !== undefined ? cal.google_calendar_id : null;
-        var options = [ { label: "Select calendar" } ];
+        var options = [];
         list.iter(x.items, function(calInfo) {
           options.push({ label: calInfo.summary, value: calInfo.id });
         });
@@ -141,66 +67,185 @@ var settings = (function() {
     return view;
   }
 
-  function viewOfLabelsTab(team) {
+  function viewOfLabelRow(team, label, syncedLabelsList) {
+'''
+<li #row class="table-row labels-table clearfix">
+  <div #labelText class="col-xs-5"/>
+  <div #status class="col-xs-4">
+    <div #dot class="sync-status-dot"/>
+    <span #statusText class="gray"/>
+  </div>
+  <div class="col-xs-3 sync-action">
+    <a #action href="#" class="link"/>
+  </div>
+</li>
+'''
+    labelText.text(label);
+
+    function disable() {
+      status.css("opacity", "0.5");
+      action
+        .css("opacity", "0.5")
+        .css("pointer-events", "none");
+    }
+
+    function enable() {
+      status.css("opacity", "1");
+      action
+        .css("opacity", "1")
+        .css("pointer-events", "auto");
+    }
+
+    function showSyncing() {
+      enable();
+      dot.css("background", "#2bb673");
+      statusText.text("Syncing");
+      action.text("Stop syncing");
+    }
+
+    function showNotSyncing() {
+      enable();
+      dot.css("background", "#d9534f");
+      statusText.text("Not syncing");
+      action.text("Sync");
+    }
+
+    function toggleSync() {
+      disable();
+      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        if (list.mem(syncedLabels.labels, label)) {
+          var index = syncedLabels.labels.indexOf(label);
+          if (index != undefined) {
+            syncedLabels.labels.splice(index, 1);
+          }
+          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+            .done(function() { showNotSyncing(); });
+        } else {
+          syncedLabels.labels.push(label);
+          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+            .done(function() { showSyncing(); });
+        }
+      });
+    }
+
+    if (list.mem(syncedLabelsList, label))
+      showSyncing();
+    else
+      showNotSyncing();
+
+    action.click(toggleSync);
+
+    return row;
+  }
+
+  function viewOfLabelSyncTab(team) {
 '''
 <div #view>
-  <div #spinner class="spinner labels-spinner"/>
-  <div class="table-header clearfix">
-    <div class="col-sm-10">Shared Label</div>
-    <div class="col-sm-2 sync-col">Sync</div>
+  <div class="exec-profile clearfix">
+    <div #labelSyncContainer />
+    <div #description class="label-sync-description"/>
   </div>
-  <div #labels/>
-  <button #updateButton
-          type="button" class="btn btn-primary"
-          style="float:left" disabled>Update</button>
+  <div class="table-header">Shared Labels</div>
+  <ul #labels class="assistants-list">
+    <div #tableSpinner class="spinner table-spinner"/>
+  </ul>
+  <div class="clearfix">
+    <div #labelIconContainer class="img-container-left"/>
+    <a #create disabled
+       class="link popover-trigger click-safe"
+       style="float:left">Create new shared label</a>
+  </div>
+  <div #newLabelPopover class="new-label-popover overlay-popover click-safe">
+    <div class="overlay-popover-header click-safe">New shared label</div>
+    <div class="overlay-popover-body click-safe">
+      <input #newLabel class="new-label-input click-safe"
+             autofocus placeholder="Untitled label"/>
+      <div class="clearfix click-safe">
+        <div #error class="new-label-error click-safe">
+          This label already exists.</div>
+        <button #cancel class="btn btn-secondary label-btn">Cancel</button>
+        <button #save class="btn btn-primary label-btn click-safe"
+                disabled>Save</button>
+        <div #inlineSpinner class="spinner inline-spinner"/>
+    </div>
+  </div>
 </div>
 '''
-    spinner.show();
+    var labelSync = $("<img class='svg-block label-sync-icon'/>")
+      .appendTo(labelSyncContainer);
+    svg.loadImg(labelSync, "/assets/img/LabelSync.svg");
+
+    var labelIcon = $("<img class='svg-block label-icon'/>")
+      .appendTo(labelIconContainer);
+    svg.loadImg(labelIcon, "/assets/img/new-label.svg");
+
+    description
+      .text("LabelSync lets you share email labels across your team. Below " +
+        "are labels that currently appear in every team member's account.");
+
+    labels.children().remove();
+    tableSpinner.show();
+
+    // local array for keyup function
+    var sharedLabelsList;
+
     api.getSharedLabels(team.teamid).done(function(sharedLabels) {
       api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
-        spinner.hide();
-
+        sharedLabelsList = sharedLabels.labels;
+        tableSpinner.hide();
         var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
         allLabels.sort();
         list.iter(allLabels, function(label) {
-          var checkbox = $("<input type='checkbox' class='labelSync'/>")
-            .data("label", label);
-          if (list.mem(syncedLabels.labels, label))
-            checkbox.prop("checked", true);
-          $("<div class='label-row clearfix'/>")
-            .append($("<div class='col-sm-10'>" + label + "</div>"))
-            .append($("<div class='col-sm-2 sync-col'/>")
-              .append(checkbox))
-            .appendTo(labels);
+          labels.append(viewOfLabelRow(team, label, syncedLabels.labels));
         });
+        create.click(function() {
+          toggleOverlay(newLabelPopover);
+          newLabel.focus();
+        });
+      });
+    });
 
-        var newLabelDiv = $("<div/>")
-          .appendTo(view);
-        var newLabelLink = $("<a href='#'>+ New shared label</a>")
-          .appendTo(newLabelDiv);
-        newLabelLink
-          .click(function() {
-            $("<div><input type='text' class='labelNew'/></div>")
-              .prependTo(newLabelDiv);
+    newLabel.keyup(function() {
+      if (newLabel.val() != "") {
+        if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
+          save.attr("disabled", "true");
+          error.css("display", "inline-block");
+        } else {
+          save.removeAttr("disabled");
+          error.hide();
+        }
+      }
+      else
+        save.attr("disabled", "true");
+    });
+
+    save.click(function() {
+      inlineSpinner.show();
+      newLabel.addClass("disabled");
+      save.attr("disabled", "true");
+      var label = newLabel.val();
+      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        sharedLabelsList.push(label);
+        syncedLabels.labels.push(label);
+        api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+          .done(function() {
+            inlineSpinner.hide();
+            toggleOverlay(newLabelPopover);
+            newLabel
+              .val("")
+              .removeClass("disabled");
+            var newRow = viewOfLabelRow(team, label, syncedLabels.labels);
+            labels.prepend(newRow);
+            newRow.addClass("purple-flash");
           });
-        updateButton.prop("disabled", false);
       });
     });
 
-    updateButton.click(function() {
-      var syncedLabels = [];
-      $(".labelSync").each(function(i, x) {
-        if ($(x).is(":checked"))
-          syncedLabels.push($(x).data("label"));
-      });
-      $(".labelNew").each(function(i, x) {
-        syncedLabels.push($(x).val());
-      });
-      api.putSyncedLabels(team.teamid, { labels: syncedLabels })
-        .done(function() {
-          modal.modal("hide");
-        });
-    });
+    cancel.click(function() {
+      toggleOverlay(newLabelPopover);
+      newLabel.val("");
+      error.hide();
+    })
 
     return view;
   }
@@ -238,7 +283,7 @@ var settings = (function() {
     </div>
   </div>
   <ul #inviteOptions class="invite-options overlay-list click-safe">
-    <li class="gray unselectable click-safe">Select a role:</li>
+    <li class="unselectable click-safe">Select a role:</li>
     <li><a #assistant href="#" class="click-safe">Assistant</a></li>
     <li><a #executive href="#" class="click-safe">Executive</a></li>
   </ul>
@@ -258,18 +303,18 @@ var settings = (function() {
   function displayAssistants(assistantsList, team, profiles) {
     list.iter(profiles, function(profile) {
 '''
-<li #row class="assistant-row clearfix">
-  <div class="col-md-6">
+<li #row class="table-row assistants-table clearfix">
+  <div class="col-xs-6">
     <div #name/>
     <div #email class="gray"/>
   </div>
-  <div class="col-md-1 assistant-row-status">
+  <div class="col-xs-1 assistant-row-status">
     <div #statusContainer
          data-toggle="tooltip"
          data-placement="right"
          title="Reauthorization required."/>
   </div>
-  <div #actions class="col-md-5 assistant-row-actions"/>
+  <div #actions class="col-xs-5 assistant-row-actions"/>
 </li>
 '''
       function refresh() {
@@ -339,17 +384,18 @@ var settings = (function() {
     <div #profilePic class="profile-pic"/>
     <div style="height: 27px">
       <span #execName class="profile-name exec-profile-name"/>
+      <span class="exec-label">EXECUTIVE</span>
       <span #execStatusContainer
        class="exec-status"
        data-toggle="tooltip"
        data-placement="right"
        title="Reauthorization required."/>
     </div>
-    <div #execEmail class="profile-email"/>
+    <div #execEmail class="profile-email gray"/>
   </div>
-  <div class="assistants-title">Assistants</div>
+  <div class="table-header">Assistants</div>
   <ul #assistantsList class="assistants-list">
-    <div #spinner class="spinner members-spinner"/>
+    <div #spinner class="spinner table-spinner"/>
   </ul>
   <div #invitationRow/>
 </div>
@@ -387,26 +433,31 @@ var settings = (function() {
 <div #modal
      class="modal fade" tabindex="-1"
      role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog team-settings">
     <div class="modal-content">
-      <ul class="esper-tab-links">
-        <li class="active"><a #tab1 href="#" id="tab1">
-          <img #members class="svg-block esper-tab-icon"/>
-          <span>Members</span>
-        </a></li>
-        <li><a #tab2 href="#" id="tab2">
-          <img #labels class="svg-block esper-tab-icon"/>
-          <span>Labels</span>
-        </a></li>
-        <li><a #tab3 href="#" id="tab3">
-          <img #calendar class="svg-block esper-tab-icon"/>
-          <span>Calendar</span>
-        </a></li>
-      </ul>
+      <div style="text-align:center">
+        <ul class="esper-tab-links">
+          <li class="active"><a #tab1 href="#" id="tab1" class="first">
+            <img #members class="svg-block esper-tab-icon"/>
+            <span>Members</span>
+          </a></li>
+          <li><a #tab2 href="#" id="tab2">
+            <img #labelSync class="svg-block esper-tab-icon"/>
+            <span>LabelSync</span>
+          </a></li>
+          <li><a #tab3 href="#" id="tab3" class="last">
+            <img #calendar class="svg-block esper-tab-icon"/>
+            <span>Calendar</span>
+          </a></li>
+        </ul>
+      </div>
       <div class="esper-tab-content">
         <div #content1 id="tab1" class="tab active"/>
         <div #content2 id="tab2" class="tab"/>
         <div #content3 id="tab3" class="tab"/>
+      </div>
+      <div class="modal-footer">
+        <button #done class="btn btn-primary">Done</button>
       </div>
     </div>
   </div>
@@ -417,10 +468,6 @@ var settings = (function() {
     tab2.click(function() { switchTab(tab2); });
     tab3.click(function() { switchTab(tab3); });
 
-    // svg.loadImg(calendar, "/assets/img/logo.svg");
-    // svg.loadImg(members, "/assets/img/logo.svg");
-    // svg.loadImg(labels, "/assets/img/logo.svg");
-
     function switchTab(tab) {
       var currentAttrValue = "#" + tab.attr("id");
       $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
@@ -428,8 +475,10 @@ var settings = (function() {
     };
 
     content1.append(viewOfMembersTab(team));
-    content2.append(viewOfLabelsTab(team));
+    content2.append(viewOfLabelSyncTab(team));
     content3.append(viewOfCalendarTab(team));
+
+    done.click(function() { modal.modal("hide") });
 
     modal.modal({});
   }
@@ -493,13 +542,17 @@ var settings = (function() {
 
   function renderAdminSection() {
 '''
-<div #view>
+<div #view style="margin-top:16px">
+  <div class="esper-h2">New Team Invitation URL</div>
+  <div class="generate-row clearfix">
+    <button #button
+            class="btn btn-primary col-xs-3 generate">Generate</button>
+    <input #url class="generate-input col-xs-9 disabled"
+           onclick="this.select();"/>
+  </div>
   <div>
-    <a href="#" #clearSync>Log out all Esper accounts</a>
+    <a href="#" #clearSync class="danger-link">Log out of all Esper accounts</a>
   </div> 
-  <button #button
-          class="btn btn-default">Generate new team invite</button>
-  <code #url></code>
 </div>
 '''
     clearSync.click(function() {
@@ -510,7 +563,10 @@ var settings = (function() {
     button.click(function() {
       api.inviteCreateTeam()
         .done(function(x) {
-          url.text(x.url);
+          url
+            .val(x.url)
+            .removeClass("disabled")
+            .select();
         });
     });
 
@@ -530,39 +586,61 @@ var settings = (function() {
     <div #closeContainer class="img-container-right close clickable"/>
     <div #chromeLogoContainer
          class="img-container-right chrome-logo-container animated fadeIn"/>
-    <div class="install-h1 animated fadeInLeft">
+    <div class="esper-h1 install-h1 gray animated fadeInLeft">
       Bring your inbox and calendar closer together.
     </div>
-    <div class="install-h2 animated fadeInLeft">
+    <div class="esper-h2 install-h2 animated fadeInLeft">
       <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
          target="_blank">Install the Esper Chrome extension</a>
-      <span>></span>
+      <span #arrowContainer class="img-container-inline"/>
     </div>
   </div>
-  <div class="profile settings-section col-sm-6">
-    <h4 class="settings-section-title">My Profile</h4>
-    <div class="clearfix" style="margin-top:16px">
-      <div #profilePic class="profile-pic"/>
-      <div #myName class="profile-name"/>
-      <div #myEmail class="profile-email gray"/>
+  <div #main class="clearfix">
+    <div class="leftCol settings-section col-sm-6">
+      <div class="esper-h1 settings-section-title">My Profile</div>
+      <div class="clearfix" style="margin-top:16px">
+        <div #profilePic class="profile-pic"/>
+        <div #myName class="profile-name"/>
+        <div #myEmail class="profile-email gray"/>
+      </div>
+      <div class="toggle-advanced">
+        <a #toggleAdvanced href="#" class="link">Show advanced</a>
+      </div>
+      <div #advanced class="profile-advanced">
+        <div #uid/>
+        <a #revoke
+           href="#"
+           class="danger-link">Deauthorize this account</a>
+      </div>
+      <div #adminSection class="admin hide">
+        <div class="esper-h1 settings-section-title">Admin Tools</div>
+        <div #adminBody/>
+      </div>
     </div>
-    <div class="toggle-advanced">
-      <a #toggleAdvanced href="#">Show advanced</a>
-    </div>
-    <div #advanced class="profile-advanced">
-      <div #uid/>
-      <a #revoke
-         href="#"
-         class="danger-link">Deauthorize this account</a>
-    </div>
-    <div #adminSection class="hide settings-block">
-      <h2>Admin</h2>
-      <div #adminBody />
+    <div class="rightCol settings-section col-sm-6">
+      <div class="esper-h1 settings-section-title">Executive Teams</div>
+      <div #teams class="team-list"/>
     </div>
   </div>
-  <div class="teams settings-section col-sm-6">
-    <h4 class="settings-section-title">Executive Teams</h4>
-    <div #teams class="team-list"/>
+  <div class="footer clearfix">
+    <ul class="col-xs-2">
+      <li class="footer-header">Esper</li>
+      <li><a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
+             target="_blank" class="gray-link">Install</a></li>
+      <li><a href="http://esper.com/aboutus.html" class="gray-link">About us</a></li>
+      <li><a href="http://blog.esper.com" class="gray-link">Blog</a></li>
+      <li><a href="http://esper.com/jobs.html" class="gray-link">Jobs</a></li>
+    </ul>
+    <ul class="col-xs-2">
+      <li class="footer-header">Support</li>
+      <li><a href="http://esper.com" class="gray-link">Getting started</a></li>
+      <li><a href="http://esper.com/privacypolicy.html" class="gray-link">Privacy</a></li>
+      <li><a href="http://esper.com/termsofuse.html" class="gray-link">Terms</a></li>
+      <li><a #contact href="#" class="gray-link">Contact us</a></li>
+    </ul>
+    <div class="col-xs-8">
+      <div #wordMarkContainer class="img-container-right"/>
+    </div>
   </div>
 </div>
 '''
@@ -581,6 +659,14 @@ var settings = (function() {
     var chrome = $("<img class='svg-block chrome-logo'/>")
       .appendTo(chromeLogoContainer);
     svg.loadImg(chrome, "/assets/img/chrome.svg");
+
+    var arrowEast = $("<img class='svg-block arrow-east'/>")
+      .appendTo(arrowContainer);
+    svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
+
+    var wordMark = $("<img class='svg-block word-mark'/>")
+      .appendTo(wordMarkContainer);
+    svg.loadImg(wordMark, "/assets/img/word-mark.svg");
 
     api.getMyProfile()
       .done(function(profile){
@@ -621,6 +707,10 @@ var settings = (function() {
           signOut.click();
         });
       return false;
+    });
+
+    contact.click(function() {
+      gmailCompose.compose({ to: "team@esper.com" });
     });
 
     api.getGoogleAuthInfo(document.URL)

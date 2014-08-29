@@ -332,6 +332,14 @@ fieldset[disabled] .form-control {
   border: 1px solid @gray_20;
 }
 /*** Modals ***/
+.modal-backdrop { background: white; }
+.modal-backdrop-in { opacity: 0.8; }
+.modal-content {
+  border: 1px solid @gray_30;
+  border-radius: 3px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+          box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+}
 .modal.fade .modal-dialog {
   -webkit-transform: none;
       -ms-transform: none;
@@ -343,22 +351,18 @@ fieldset[disabled] .form-control {
        -o-transition: opacity .3s linear, ease-in-out;
           transition: opacity .3s linear, ease-in-out;
 }
-.modal-backdrop-in { opacity: 0.8; }
-.modal-content {
-  border: 1px solid @gray_30;
-  border-radius: 0;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
-          box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
-}
+.modal-footer { padding: 16px 20px; }
 .modal-header {
   height: 60px;
   border-bottom: 1px solid @gray_10;
 }
-.modal-backdrop { background: white; }
 /*** Tooltips ***/
 .tooltip { z-index: 1050; }
 .tooltip-inner { border-radius: 0; }
-.popover { padding: 0; }
+.popover {
+  padding: 0;
+  border-radius: 3px;
+}
 .popover-content { padding: 10px 0px; }
 /*** Other ***/
 hr {
