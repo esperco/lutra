@@ -270,18 +270,20 @@ var settings = (function() {
       role: role
     };
     log("Invite:", invite);
+
+    var subject, body;
     api.inviteJoinTeam(invite)
       .done(function(x) {
         var url = x.url;
         var body =
           "Please click the link and sign in with your Google account:\n\n"
           + "  " + url;
-
-        gmailCompose.compose({
-          subject: "Join my team on Esper",
-          body: body
-        });
       });
+
+    return gmailCompose.compose({
+      subject: "Join my team on Esper",
+      body: body
+    });
   }
 
   function renderInviteDialog(team) {
@@ -296,8 +298,10 @@ var settings = (function() {
   </div>
   <ul #inviteOptions class="invite-options overlay-list click-safe">
     <li class="unselectable click-safe">Select a role:</li>
-    <li><a #assistant href="#" class="click-safe">Assistant</a></li>
-    <li><a #executive href="#" class="click-safe">Executive</a></li>
+    <li><a #assistant href="#" target="_blank"
+           class="click-safe">Assistant</a></li>
+    <li><a #executive href="#" target="_blank"
+           class="click-safe">Executive</a></li>
   </ul>
 </div>
 '''
@@ -306,8 +310,8 @@ var settings = (function() {
     svg.loadImg(email, "/assets/img/email.svg");
 
     invite.click(function() { toggleOverlay(inviteOptions); });
-    assistant.click(function() { composeInviteForRole(team, "Assistant"); });
-    executive.click(function() { composeInviteForRole(team, "Executive"); });
+    assistant.attr("href", composeInviteForRole(team, "Assistant"));
+    executive.attr("href", composeInviteForRole(team, "Executive"));
 
     return view;
   }
