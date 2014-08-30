@@ -246,6 +246,7 @@ var settings = (function() {
             newLabel
               .val("")
               .removeClass("disabled");
+            tableEmpty.hide();
             var newRow = viewOfLabelRow(team, label, syncedLabels.labels);
             labels.prepend(newRow);
             newRow.addClass("purple-flash");
