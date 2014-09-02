@@ -150,8 +150,14 @@ module Esper.EvSearch {
       });
     if (team === null || team === undefined) return;
     var getEventCalls =
-      List.map(events[team.team_calendar.google_calendar_id], function(e) {
-        return Api.getEventDetails(teamid, e.item.eventId);
+      List.filterMap(
+        events[team.team_calendar.google_calendar_id],
+        function(e) {
+          var item = e.item; // compatibility check
+          if (item !== undefined)
+            return Api.getEventDetails(teamid, item.eventId);
+          else
+            return undefined;
       });
     searchView.spinner.attr("style", "display: block");
     Deferred.join(getEventCalls).done(function(activeEvents) {
