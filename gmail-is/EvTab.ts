@@ -180,7 +180,7 @@ module Esper.EvTab {
     })
 
     unlinkEvent.click(function() {
-      view.attr("style", "opacity: 0.3");
+      view.addClass("disabled");
       Api.unlinkEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.slideUp();
@@ -189,7 +189,7 @@ module Esper.EvTab {
     });
 
     deleteEvent.click(function() {
-      view.attr("style", "opacity: 0.3");
+      view.addClass("disabled");
       Api.deleteLinkedEvent(teamid, threadId, e.google_event_id)
         .done(function() {
           view.slideUp();

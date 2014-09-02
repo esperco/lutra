@@ -23,7 +23,7 @@
 @orange_hover: #e87400;
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
-@purple_bg: #e8d9ee;
+@purple_bg: #F4EFF5;
 @purple_bg_hover: #fefdff;
 @purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
@@ -463,6 +463,14 @@ li.esper-li.selected:hover .esper-team-list-email { color: @gray_60; }
   border-bottom: 1px solid #d8d8d8;
 }
 
+.esper-ev.disabled {
+  pointer-events: none;
+  .esper-ev-date,
+  .esper-ev-title,
+  .esper-ev-times,
+  .esper-ev-disclose { opacity: 0.3; }
+}
+
 .esper-ev-date {
   float: left;
   width: 36px;
@@ -864,4 +872,37 @@ ul.esper-ev-dropdown {
     transform: scale(1.0);
     -webkit-transform: scale(1.0);
   }
+}
+
+
+/** Calendar **/
+
+.esper-thread-row {
+  /* Taken from Gmail */
+  background-color: rgba(243,243,243,.85);
+  border-bottom: 1px #e5e5e5 solid;
+  height: 2.83ex;
+  outline: none;
+  padding: 3px 0 1px;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+
+  width: 537px; /* match width of the description box */
+}
+
+.esper-message {
+  /* extend clickable area to the end of the line */
+  display: inline-block;
+  width: 100%;
+}
+
+.esper-subject {
+  /* gmail color */
+  color: #222;
+}
+
+.esper-snippet {
+  /* gmail color */
+  color: #777;
 }

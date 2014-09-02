@@ -1,20 +1,17 @@
 module Esper.ActiveThreads {
 
-  /* Equality function used to deduplicate cache elements */
-  function eq(a: Types.GmailThread, b: Types.GmailThread) {
-    return a.threadId === b.threadId;
-  }
-
-  var cacheCapacity = 5;
-  var activeEvents: LRU.C<Types.GmailThread>;
+  var activeEvents: LRU.C<Types.Visited<Types.GmailThread>>;
 
   function getCache() {
-    if (activeEvents === undefined)
-      activeEvents = new LRU.C(cacheCapacity, eq);
+    if (activeEvents === undefined) {
+      activeEvents =
+        new LRU.C<Types.Visited<Types.GmailThread>>(Visited.maxThreads,
+                                                    Visited.eq);
+    }
     return activeEvents;
   }
 
-  function add(x: Types.GmailThread) {
+  function add(x: Types.Visited<Types.GmailThread>) {
     getCache().add(x);
   }
 
@@ -26,8 +23,12 @@ module Esper.ActiveThreads {
   }
 
   export function handleNewActiveThread(threadId: string, subject: string) {
-    add({ threadId: threadId, subject: subject });
-    var esperMessage : EsperMessage.EsperMessage = {
+    add({
+      lastVisited: Date.now() / 1000,
+      id: threadId,
+      item: { threadId: threadId, subject: subject }
+    });
+    var esperMessage : Message.Message = {
       sender: "Esper",
       type: "ActiveThreads",
       value: exportActiveThreads()

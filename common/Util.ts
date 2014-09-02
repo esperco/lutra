@@ -20,6 +20,12 @@ module Esper.Util {
       case "[object global]": // e.g. the window object
         return preparePrintableObject(x, parents, maxDepth);
 
+      case "[object Error]":
+        return unsafePreparePrintable({
+          name: x.name,
+          message: x.message
+        }, parents, maxDepth);
+
       case "[object Function]":
         return type;
 
@@ -88,25 +94,16 @@ module Esper.Util {
     }
   }
 
-  /* Run the given function f() every delayMs milliseconds.
-     Exceptions are logged and otherwise ignored. */
+  /* Run the given function f() every delayMs milliseconds. */
   export function every(delayMs: number,
-                        f: () => void) {
+                        f: () => void,
+                        firstTime = true) {
     setTimeout(function() {
-      try {
-        f();
-        try {
-          every(delayMs, f)
-        }
-        catch(e) {
-          Log.e("Exception thrown by Util.every():", e);
-        }
-      }
-      catch(e) {
-        Log.e("Exception thrown by callback passed to Util.every():", e);
-        every(delayMs, f);
-      }
+      every(delayMs, f, false);
+      f();
     }, delayMs);
+    if (firstTime)
+      f();
   }
 
   export function afterTyping(elt: JQuery, delayMs: number, func) {
@@ -131,4 +128,115 @@ module Esper.Util {
   export function randomString() {
     return Math.random().toString(36).slice(2);
   }
+
+  /* Inspect DOM tree */
+  export function findTextInDom(text: string) {
+    var sel = $(":contains(" + JSON.stringify(text) + ")");
+    List.iter(sel, function(elt, i) {
+      Esper.Log.d("========= [" + i + "] =========", $(elt).text());
+    });
+  }
+
+  export interface PathToNode {
+    path: string;
+    node: any;
+  }
+
+  /* Inspect arbitrary JavaScript object such as 'window'. */
+  export function find(
+    x: any,
+    predicate: { (any): boolean },
+    maxDepth = 10
+  ): PathToNode[] {
+
+    var acc: PathToNode[] = [];
+
+    var longestPath = "";
+    var longestPathLength = 0;
+
+    function aux(x,
+                 path: string,
+                 parents: any[]) {
+
+      var depth = parents.length + 1;
+      if (depth > longestPathLength) {
+        longestPath = path;
+        longestPathLength = depth;
+      }
+
+      if (depth > maxDepth)
+        return;
+
+      else if (parents.length > 0 && x instanceof Window)
+        return;
+
+      else if (List.mem(parents, x))
+        return;
+
+      else {
+
+        if (predicate(x))
+          acc.push({ path: path, node: x });
+        else {
+
+          var type = Object.prototype.toString.call(x);
+          switch(type) {
+
+          case "[object Array]":
+            var newParents = List.append(parents, [x]);
+            List.iter(x, function(child, i) {
+              aux(child, path + "[" + i + "]", newParents);
+            });
+            break;
+
+          case "[object Object]":
+          case "[object global]": // e.g. the window object
+            var newParents = List.append(parents, [x]);
+            for (var k in x) {
+              aux(x[k], path + "." + k, newParents);
+            };
+            break;
+
+          case "[object Function]":
+          case "[object Error]":
+            break;
+
+          /* Standard JSON atoms */
+          case "[object Null]":
+          case "[object Boolean]":
+          case "[object Number]":
+          case "[object String]":
+            break;
+
+          /* Other known types supported by JSON.stringify */
+          case "[object Date]":
+            break;
+
+          /* Known unsupported types */
+          case "[object Undefined]":
+            break;
+
+          /* Unknown types */
+          default:
+          }
+        }
+      }
+    }
+
+    aux(x, "", []);
+
+    Log.d("Longest path: " + longestPath);
+
+    return acc;
+  }
+
+  /* Same as find() but prints the results nicely */
+  export function search(
+    x: any,
+    predicate: { (any): boolean },
+    maxDepth = 10
+  ) {
+    Log.d(toString(find(x, predicate, maxDepth), maxDepth));
+  }
+
 }

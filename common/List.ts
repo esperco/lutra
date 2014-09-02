@@ -5,27 +5,27 @@
 module Esper.List {
 
   /* copy */
-  export function copy(a) { return a.slice(0); };
+  export function copy<T>(a: T[]): T[] { return a.slice(0); };
 
   /* reversal */
-  export function rev(a) { return a.reverse(); };
+  export function rev<T>(a: T[]): T[] { return a.reverse(); };
 
   /* sort into a new array */
-  export function sort(a, cmp) {
+  export function sort<T>(a: T[], cmp: (x: T, y: T) => number): T[] {
     var b = copy(a);
     b.sort(cmp);
     return b;
   }
 
   /* iterate over each element (foreach) */
-  export function iter(a, f) {
+  export function iter<T>(a: T[], f: (x: T, i?: number) => void) {
     var len = a.length;
     for (var i = 0; i < len; i++)
       f(a[i], i);
   };
 
   /* concatenation of a list of lists e.g. concat([a, b, c]) */
-  export function concat(aa) {
+  export function concat<T>(aa: T[][]): T[] {
     var acc = [];
     iter(aa, function(a) {
       acc = acc.concat(a);
@@ -34,12 +34,12 @@ module Esper.List {
   };
 
   /* concatenation of lists passed as arguments e.g append(a, b, c) */
-  export function append(...a: any[]) {
-    return concat(arguments);
+  export function append<T>(...a: T[][]): T[] {
+    return concat(a);
   };
 
   /* one-to-one mapping */
-  export function map(a, f) {
+  export function map<T, U>(a: T[], f: (x: T, i?: number) => U): U[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++)
@@ -47,13 +47,13 @@ module Esper.List {
     return b;
   };
 
-  /* map, remove null elements */
-  export function filterMap(a, f) {
+  /* map, remove null or undefined elements */
+  export function filterMap<T, U>(a: T[], f: (x: T, i?: number) => U): U[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {
       var x = f(a[i], i);
-      if (x !== null) {
+      if (x !== null && x !== undefined) {
         b.push(x);
       }
     }
@@ -61,7 +61,7 @@ module Esper.List {
   };
 
   /* keep only elements that satisfy the predicate */
-  export function filter(a, f) {
+  export function filter<T>(a: T[], f: (x: T, i?: number) => boolean): T[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {
@@ -74,7 +74,7 @@ module Esper.List {
   };
 
   /* return the first element that satisfies the give predicate */
-  export function find(a, f) {
+  export function find<T>(a: T[], f: (x: T, i?: number) => boolean): T {
     var len = a.length;
     for (var i = 0; i < len; i++) {
       if (f(a[i], i) === true) {
@@ -85,7 +85,7 @@ module Esper.List {
   };
 
   /* return true if at least one element satisfies the given predicate */
-  export function exists(a, f) {
+  export function exists<T>(a: T[], f: (x: T, i?: number) => boolean): boolean {
     var len = a.length;
     for (var i = 0; i < len; i++) {
       if (f(a[i], i) === true)
@@ -95,7 +95,7 @@ module Esper.List {
   };
 
   /* return true iff every element satisfies the given predicate */
-  export function forAll(a, f) {
+  export function forAll<T>(a: T[], f: (x: T, i?: number) => boolean) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
       if (f(a[i], i) !== true)
@@ -105,7 +105,7 @@ module Esper.List {
   };
 
   /* return true if at least one element equals the given element */
-  export function mem(a, x) {
+  export function mem<T>(a: T[], x: T): boolean {
     var len = a.length;
     for (var i = 0; i < len; i++) {
       if (a[i] === x) {
@@ -116,7 +116,8 @@ module Esper.List {
   };
 
   /* replace by x all elements that match the predicate f */
-  export function replace(a, x, f) {
+  export function replace<T>(a: T[], x: T, f: (x0: T, i?: number) => boolean):
+  T[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {
@@ -131,7 +132,7 @@ module Esper.List {
   };
 
   /* convert object into a list of its values */
-  export function ofTable(tbl) {
+  export function ofTable<T>(tbl: { [k: string]: T }): T[] {
     var a = [];
     for (var k in tbl)
       a.push(tbl[k]);
@@ -141,9 +142,10 @@ module Esper.List {
   /* convert a list of values into an object keyed by strings;
      If the values are not strings, a function getKey must be provided
      which will extract a string key from each value */
-  export function toTable(a, getKey) {
+  export function toTable<T>(a: T[], getKey: (x: T) => string):
+  { [k: string]: T } {
     var get = getter(getKey);
-    var tbl = {};
+    var tbl: { [k: string]: T } = {};
     iter(a, function(v) {
       var k = get(v);
       tbl[k] = v;
@@ -155,7 +157,7 @@ module Esper.List {
     union of two lists
     (elements occurring in either list, without duplicates)
   */
-  export function union(a, b, getKey) {
+  export function union<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(a, getKey);
     var resTbl = {};
@@ -175,7 +177,7 @@ module Esper.List {
   /*
     remove duplicates from a list
   */
-  export function unique(a, getKey) {
+  export function unique<T>(a: T[], getKey: (x: T) => string): T[] {
     return union(a, [], getKey);
   }
 
@@ -183,7 +185,7 @@ module Esper.List {
     intersection of two lists
     (elements occurring in both lists)
   */
-  export function inter(a, b, getKey) {
+  export function inter<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(b, getKey);
     return filter(unique(a, getKey), function(v) {
@@ -196,7 +198,7 @@ module Esper.List {
     set difference of two lists
     (elements occurring in the first list but not in the second list)
   */
-  export function diff(a, b, getKey) {
+  export function diff<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(b, getKey);
     return filter(unique(a, getKey), function(v) {

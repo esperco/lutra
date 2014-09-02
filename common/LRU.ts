@@ -3,7 +3,23 @@
 */
 
 module Esper.LRU {
+
+  function sanityCheck(this_) {
+    /*
+      Note to programmers: make sure the object was created with 'new'
+      and that the methods are not detached and passed
+      to higher-order functions.
+
+      Bad:  List.iter(a, cache.add);
+      Good: List.iter(a, function(x) { cache.add(x); });
+
+    */
+    console.assert(this_ !== window);
+  }
+
   export class C<T> {
+    that = this;
+
     /*
       Array of at most maxlen elements without repeats,
       least recently added last.
@@ -15,11 +31,13 @@ module Esper.LRU {
 
     constructor(maxlen: number,
                 eq: (a: T, b: T) => boolean) {
+      sanityCheck(this);
       this.maxlen = maxlen;
       this.eq = eq;
     }
 
     remove(x: T) {
+      sanityCheck(this);
       var i = 0;
       while (i < this.all.length) {
         if (this.eq(x, this.all[i]))
@@ -30,6 +48,7 @@ module Esper.LRU {
     }
 
     add(x: T) {
+      sanityCheck(this);
       this.remove(x);
       this.all.unshift(x);
       if (this.all.length > this.maxlen) {
@@ -38,6 +57,7 @@ module Esper.LRU {
     }
 
     clear() {
+      sanityCheck(this);
       this.all.splice(0, this.all.length);
     }
   }

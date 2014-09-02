@@ -27,7 +27,7 @@ module Esper.Init {
     var googleAccountId = gmail.get.user_email();
     Log.d("Google account ID: " + googleAccountId);
     var type = forceLogin === true ? "LoginRequest" : "CredentialsRequest";
-    var esperMessage : EsperMessage.EsperMessage = {
+    var esperMessage : Message.Message = {
       sender: "Esper",
       type: type,
       value: googleAccountId
@@ -81,7 +81,7 @@ module Esper.Init {
   function listenForMessages() {
     Log.d("listenForMessages()");
     window.addEventListener("message", function(event) {
-      var request = event.data;
+      var request: Message.Message = event.data;
       if (request.sender === "Esper") {
 
         var ignored = [
@@ -89,7 +89,7 @@ module Esper.Init {
           "Logout",
           "ActiveThreads"
         ];
-        var isIgnored = List.mem(request.type, ignored);
+        var isIgnored = List.mem(ignored, request.type);
         if (! isIgnored)
           Log.d("Received message:", event.data);
 

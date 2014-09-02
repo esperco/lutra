@@ -12,12 +12,17 @@ module Esper.ApiT {
     download_page: string;
   }
 
+  export interface TeamCalendar {
+    access_uid: string;
+    google_calendar_id: string;
+  }
+
   export interface Team {
     teamid: string;
     team_name: string;
     team_executive: string;
     team_assistants: string[];
-    team_calendar: string;
+    team_calendar: TeamCalendar;
   }
 
   export interface Phone {
@@ -94,6 +99,12 @@ module Esper.ApiT {
     gmail_thrid: string;
   }
 
+  export interface EmailThread {
+    gmail_thrid: string;
+    subject: string;
+    snippet: string;
+  }
+
   export interface EventWithSyncInfo {
     event: CalendarEvent;
     synced_threads: SyncedThread[];
@@ -101,6 +112,10 @@ module Esper.ApiT {
 
   export interface LinkedCalendarEvents {
     linked_events: EventWithSyncInfo[];
+  }
+
+  export interface LinkedEmailThreads {
+    linked_threads: string[]; /* hexadecimal gthrids */
   }
 
   export interface CalendarEventList {

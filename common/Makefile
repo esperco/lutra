@@ -12,8 +12,9 @@ SOURCES = \
   XDate \
   Log \
   LRU \
+  Visited \
   EsperStorage \
-  EsperMessage \
+  Message \
   Login \
   JsonHttp \
   ApiT \

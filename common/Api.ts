@@ -26,6 +26,23 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getThreadDetails(threadId):
+  JQueryDeferred<ApiT.EmailThread> {
+    var url =
+      Conf.Api.url + "/api/thread/details/" + Login.myUid()
+      + "/" + threadId;
+    return JsonHttp.get(url);
+  }
+
+  export function getLinkedThreads(teamid, eventId):
+  JQueryDeferred<ApiT.LinkedEmailThreads> {
+    var url =
+      Conf.Api.url + "/api/event/threads/" + Login.myUid()
+      + "/" + teamid
+      + "/" + eventId;
+    return JsonHttp.get(url);
+  }
+
   export function getLinkedEvents(teamid, threadId):
   JQueryDeferred<ApiT.LinkedCalendarEvents> {
     var url =
@@ -101,6 +118,16 @@ module Esper.Api {
       Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(query);
+    return JsonHttp.get(url);
+  }
+
+
+  export function getEventThreads(teamid, eventId):
+  JQueryDeferred<ApiT.LinkedEmailThreads> {
+    var url =
+      Conf.Api.url + "/api/event/threads/" + Login.myUid()
+      + "/" + teamid
+      + "/" + eventId;
     return JsonHttp.get(url);
   }
 

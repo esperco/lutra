@@ -138,6 +138,42 @@ module Esper.EvSearch {
     view.searchStats.attr("style", "display: none");
   }
 
+  function displayActiveEvents(linkedEvents, teamid, searchView,
+                               eventsTab, profiles) {
+    var list = $("<div>");
+    var active = Login.getAccount().activeEvents;
+    if (active === null || active === undefined) return;
+    var events = active.calendars;
+    var team =
+      List.find(Login.myTeams(), function(team) {
+        return team.teamid === teamid;
+      });
+    if (team === null || team === undefined) return;
+    var getEventCalls =
+      List.filterMap(
+        events[team.team_calendar.google_calendar_id],
+        function(e) {
+          var item = e.item; // compatibility check
+          if (item !== undefined)
+            return Api.getEventDetails(teamid, item.eventId);
+          else
+            return undefined;
+      });
+    searchView.spinner.attr("style", "display: block");
+    Deferred.join(getEventCalls).done(function(activeEvents) {
+      activeEvents.forEach(function(e : ApiT.CalendarEvent) {
+        renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
+          .appendTo(list);
+      });
+      searchView.clear.attr("style", "visibility: visible");
+      searchView.searchInstructions.attr("style", "display: none");
+      searchView.spinner.attr("style", "display: none");
+      searchView.resultsList.attr("style", "display: block");
+      searchView.resultsList.children().remove();
+      searchView.resultsList.append(list);
+    });
+  }
+
   function setupSearch(events, teamid,
                        searchView: SearchView,
                        eventsTab: EvTab.EventsTab,
