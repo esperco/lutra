@@ -276,12 +276,15 @@ module Esper.EvSearch {
     clear.attr("src", Init.esperRootUrl + "img/clear.png");
     clear.click(function() { resetSearch(_view) });
 
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
+    var teamCal = team.team_calendar;
+    var assisting;
+    if (teamCal !== null && teamCal !== undefined) {
+      assisting = teamCal.google_calendar_id;
+    } else {
       var exec = List.find(profiles, function(prof) {
         return prof.profile_uid === team.team_executive;
       });
-      assisting = exec.display_name;
+      assisting = exec.email;
     }
     var possessive = (assisting.slice(-1) === "s")
         ? (assisting + "'")

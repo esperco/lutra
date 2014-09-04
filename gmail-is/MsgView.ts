@@ -61,19 +61,22 @@ module Esper.MsgView {
 '''
 <li #selector class="esper-click-safe esper-li">
   <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+  <div #teamListCalendar class="esper-click-safe esper-team-list-calendar"/>
   <div #teamListName class="esper-click-safe esper-team-list-name"/>
-  <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
 </li>
 '''
+    var teamCal = team.team_calendar;
+    var name;
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    var name = team.team_name;
-    if (name === null || name === undefined || name === "") {
-      name = exec.display_name;
+    if (teamCal !== null && teamCal !== undefined) {
+      name = teamCal.google_calendar_id;
+    } else {
+      name = exec.email;
     }
-    teamListName.text(name);
-    teamListEmail.text(exec.email);
+    teamListCalendar.text(name);
+    teamListName.text(exec.display_name);
 
     if (team.teamid === myTeamId) {
       selector.addClass("selected");
@@ -152,12 +155,15 @@ module Esper.MsgView {
     });
 
 
-    var name = team.team_name;
-    if (name === null || name === undefined || name === "") {
+    var teamCal = team.team_calendar;
+    var name;
+    if (teamCal !== null && teamCal !== undefined) {
+      name = teamCal.google_calendar_id;
+    } else {
       var exec = List.find(profiles, function(prof) {
         return prof.profile_uid === team.team_executive;
       });
-      name = exec.display_name ? exec.display_name : "NO NAME";
+      name = exec.email;
     }
     teamName.text(name);
 
