@@ -125,9 +125,11 @@ module Esper.EvSearch {
         return team.teamid === teamid;
       });
     if (team === null || team === undefined) return;
+    var eventsForTeam = events[team.team_calendar.google_calendar_id];
+    if (eventsForTeam === undefined) return;
     var getEventCalls =
       List.filterMap(
-        events[team.team_calendar.google_calendar_id],
+        eventsForTeam,
         function(e) {
           var item = e.item; // compatibility check
           if (item !== undefined)
@@ -246,19 +248,9 @@ module Esper.EvSearch {
     clear.attr("data", Init.esperRootUrl + "img/clear.svg");
     clear.click(function() { resetSearch(_view) });
 
-    var assisting = team.team_name;
-    if (assisting === null || assisting === undefined || assisting === "") {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      assisting = exec.display_name;
-    }
-    var possessive = (assisting.slice(-1) === "s")
-        ? (assisting + "'")
-        : (assisting + "'s");
-
+    var cal = team.team_calendar.google_calendar_id;
     searchInstructions.text("Start typing above to find upcoming events on " +
-      possessive + " calendar.");
+      "calendar " + cal + ".");
 
     modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 

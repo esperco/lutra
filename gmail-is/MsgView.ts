@@ -62,19 +62,16 @@ module Esper.MsgView {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+  <div #teamListCalendar class="esper-click-safe esper-team-list-calendar"/>
   <div #teamListName class="esper-click-safe esper-team-list-name"/>
-  <div #teamListEmail class="esper-click-safe esper-team-list-email"/>
 </li>
 '''
+    var name = team.team_calendar.google_calendar_id;
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    var name = team.team_name;
-    if (name === null || name === undefined || name === "") {
-      name = exec.display_name;
-    }
-    teamListName.text(name);
-    teamListEmail.text(exec.email);
+    teamListCalendar.text(name);
+    teamListName.text(exec.display_name);
 
     if (team.teamid === myTeamId) {
       selector.addClass("selected");
@@ -153,13 +150,7 @@ module Esper.MsgView {
     });
 
 
-    var name = team.team_name;
-    if (name === null || name === undefined || name === "") {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      name = exec.display_name ? exec.display_name : "NO NAME";
-    }
+    var name = team.team_calendar.google_calendar_id;
     teamName.text(name);
 
     footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
