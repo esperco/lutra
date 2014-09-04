@@ -1,4 +1,4 @@
-module Esper.EvSearch {
+module Esper.CalSearch {
 
   interface ResultView {
     view: JQuery;
@@ -55,7 +55,7 @@ module Esper.EvSearch {
     link.click(function() {
       spinner.show();
       link.hide();
-      EvTab.linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
+      CalTab.linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
     });
 
     check.attr("data", Init.esperRootUrl + "img/check.svg");
@@ -77,7 +77,7 @@ module Esper.EvSearch {
                                  eventList,
                                  teamid,
                                  searchView: SearchView,
-                                 eventsTab: EvTab.EventsTab,
+                                 eventsTab: CalTab.EventsTab,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
@@ -154,7 +154,7 @@ module Esper.EvSearch {
 
   function setupSearch(events, teamid,
                        searchView: SearchView,
-                       eventsTab: EvTab.EventsTab,
+                       eventsTab: CalTab.EventsTab,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
@@ -197,7 +197,7 @@ module Esper.EvSearch {
   }
 
   export function openSearchModal(linkedEvents, team,
-                                  eventsTab: EvTab.EventsTab,
+                                  eventsTab: CalTab.EventsTab,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>

@@ -7,20 +7,6 @@ module Esper.MsgView {
   // Profiles of everyone on all the viewer's teams
   var profiles : ApiT.Profile[];
 
-  export function popWindow(url, width, height) {
-    /* Allow for borders. */
-    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
-    /* Allow for title and status bars. */
-    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
-
-    window.open(
-      url, "Window2", "status=no,height="
-        + height + ",width=" + width + ",resizable=yes,left="
-        + leftPosition + ",top=" + topPosition + ",screenX="
-        + leftPosition + ",screenY=" + topPosition
-        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
-  }
-
   export function dismissDropdowns() {
     $(".esper-ul").hide();
     $(".esper-menu-bg").hide();
@@ -189,7 +175,7 @@ module Esper.MsgView {
     size.click(toggleSidebar);
 
     settings.click(function() {
-      popWindow(Conf.Api.url, 1000, 610);
+      window.open(Conf.Api.url);
     })
     signOut.click(function() {
       if (sidebar.css("display") !== "none")
@@ -248,7 +234,7 @@ module Esper.MsgView {
       tab.parent('li').addClass('active').siblings().removeClass('active');
     };
 
-    EvTab.displayCalendarTab(content1, team, profiles, linkedEvents);
+    CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
     Tab3Content.displayTab3ComingSoon(content3);
 

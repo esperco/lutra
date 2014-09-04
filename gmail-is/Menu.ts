@@ -40,14 +40,6 @@ module Esper.Menu {
     return link;
   }
 
-  function makePopupLink(text, url) {
-    return $("<li class='esper-li'/>")
-      .text(text)
-      .click(function() {
-        MsgView.popWindow(url, 1000, 610);
-      });
-  }
-
   function updateLinks(ul) {
     var loggedIn = Login.loggedIn();
 
@@ -55,7 +47,11 @@ module Esper.Menu {
       makeActionLink("Sign out", Login.logout, true)
       : makeActionLink("Sign in", Init.login, false);
 
-    var settingsLink = makePopupLink("Settings", Conf.Api.url);
+    function openSettings() {
+      window.open(Conf.Api.url);
+    }
+
+    var settingsLink = makeActionLink("Settings", openSettings, false);
 
     var helpLink = $("<a class='esper-a'>Help</a>")
       .attr("href", "mailto:team@esper.com");
