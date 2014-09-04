@@ -86,7 +86,6 @@ module Esper.ApiT {
 
     /* optional fields */
     google_cal_url?: string;
-    meeting_type?: string;
     title?: string;
     description?: string;
     location?: Location;
