@@ -65,16 +65,10 @@ module Esper.MsgView {
   <div #teamListName class="esper-click-safe esper-team-list-name"/>
 </li>
 '''
-    var teamCal = team.team_calendar;
-    var name;
+    var name = team.team_calendar.google_calendar_id;
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    if (teamCal !== null && teamCal !== undefined) {
-      name = teamCal.google_calendar_id;
-    } else {
-      name = exec.email;
-    }
     teamListCalendar.text(name);
     teamListName.text(exec.display_name);
 
@@ -155,16 +149,7 @@ module Esper.MsgView {
     });
 
 
-    var teamCal = team.team_calendar;
-    var name;
-    if (teamCal !== null && teamCal !== undefined) {
-      name = teamCal.google_calendar_id;
-    } else {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      name = exec.email;
-    }
+    var name = team.team_calendar.google_calendar_id;
     teamName.text(name);
 
     footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");

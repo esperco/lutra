@@ -276,22 +276,9 @@ module Esper.EvSearch {
     clear.attr("src", Init.esperRootUrl + "img/clear.png");
     clear.click(function() { resetSearch(_view) });
 
-    var teamCal = team.team_calendar;
-    var assisting;
-    if (teamCal !== null && teamCal !== undefined) {
-      assisting = teamCal.google_calendar_id;
-    } else {
-      var exec = List.find(profiles, function(prof) {
-        return prof.profile_uid === team.team_executive;
-      });
-      assisting = exec.email;
-    }
-    var possessive = (assisting.slice(-1) === "s")
-        ? (assisting + "'")
-        : (assisting + "'s");
-
+    var cal = team.team_calendar.google_calendar_id;
     searchInstructions.text("Start typing above to find upcoming events on " +
-      possessive + " calendar.");
+      "calendar " + cal + ".");
 
     modalLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
 
