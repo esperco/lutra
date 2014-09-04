@@ -149,9 +149,11 @@ module Esper.EvSearch {
         return team.teamid === teamid;
       });
     if (team === null || team === undefined) return;
+    var eventsForTeam = events[team.team_calendar.google_calendar_id];
+    if (eventsForTeam === undefined) return;
     var getEventCalls =
       List.filterMap(
-        events[team.team_calendar.google_calendar_id],
+        eventsForTeam,
         function(e) {
           var item = e.item; // compatibility check
           if (item !== undefined)
