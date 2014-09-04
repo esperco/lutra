@@ -36,7 +36,7 @@ module Esper.EvTab {
   <div #link class="esper-link-event esper-clickable">Link to this event</div>
   <div #spinner class="spinner link-spinner"/>
   <div #linked class="esper-linked">
-    <object #check/>
+    <object #check class="esper-svg"/>
     <span>Linked</span>
   </div>
 </div>
@@ -303,22 +303,18 @@ module Esper.EvTab {
     container.children().remove();
 
     var active = Login.getAccount().activeEvents;
-    console.log("active: " + active);
-
     if (active === null || active === undefined) return;
-    else console.log("not null");
     var events = active.calendars;
-    console.log("length: " + events.length);
-
     var team =
       List.find(Login.myTeams(), function(team) {
         return team.teamid === teamid;
       });
     if (team === null || team === undefined) return;
-
+    var eventsForTeam = events[team.team_calendar.google_calendar_id];
+    if (eventsForTeam === undefined) return;
     var getEventCalls =
       List.filterMap(
-        events[team.team_calendar.google_calendar_id],
+        eventsForTeam,
         function(e) {
           var item = e.item; // compatibility check
           if (item !== undefined)
@@ -348,26 +344,21 @@ module Esper.EvTab {
 '''
 <div #view>
   <div #linkActions class="esper-section-actions clearfix">
-    <div #newEvent class="esper-link-action">
-      <div class="esper-link-action-icon-container">
-        <object #newEventIcon type="image/svg+xml"
-                class="esper-link-action-icon"/>
-      </div>
-      <div class="esper-link-action-text">New event</div>
+    <div #createEvent class="esper-link-action">
+      <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+      <div class="esper-link-action-text">Create event</div>
     </div>
+    <div class="esper-vertical-divider"/>
     <div #linkEvent class="esper-link-action">
-      <div class="esper-link-action-icon-container">
-        <object #linkEventIcon type="image/svg+xml"
-                class="esper-link-action-icon"/>
-      </div>
-      <div class="esper-link-action-text">Link to event</div>
+      <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+      <div class="esper-link-action-text">Link event</div>
     </div>
   </div>
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
 </div>
 '''
-    newEventIcon.attr("data", Init.esperRootUrl + "img/add.svg");
+    createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
     container.children().remove();
@@ -386,7 +377,7 @@ module Esper.EvTab {
       });
     }
 
-    newEvent.click(function() {
+    createEvent.click(function() {
       var newTab = window.open("");
       newTab.document.write("Creating new linked event, please wait...");
       var threadId = MsgView.currentThreadId;

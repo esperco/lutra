@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>add</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="100%" x2="50%" y2="0%" id="linearGradient-1">
+            <stop stop-color="#9C59BF" offset="0%"></stop>
+            <stop stop-color="#A75FCC" offset="100%"></stop>
+        </linearGradient>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="0.3" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.21 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="add" sketch:type="MSArtboardGroup">
+            <rect id="Rectangle-4" stroke="#9353B4" stroke-width="0.5" fill="url(#linearGradient-1)" sketch:type="MSShapeGroup" x="0" y="0" width="16" height="16" rx="3"></rect>
+            <path d="M7.30000019,8.70000019 L3,8.70000019 L3,7.30000019 L7.30000019,7.30000019 L7.30000019,2.79999995 L8.70000019,2.79999995 L8.70000019,7.30000019 L13,7.30000019 L13,8.70000019 L8.70000019,8.70000019 L8.70000019,12.8 L7.30000019,12.8 L7.30000019,8.70000019 Z" id="Rectangle-7" fill="#FFFFFF" filter="url(#filter-2)" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

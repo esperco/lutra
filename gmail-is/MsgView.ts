@@ -29,7 +29,6 @@ module Esper.MsgView {
   }
 
   $(document).on('click', function(e) {
-    console.log($(e.target));
     if (!$(e.target).hasClass("esper-click-safe"))
       dismissDropdowns();
   });
@@ -223,13 +222,13 @@ module Esper.MsgView {
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
       <li class="active"><a #tab1 href="#tab1" class="first">
-        <object #calendar class="esper-tab-icon"/>
+        <object #calendar class="esper-svg esper-tab-icon"/>
       </a></li>
       <li><a #tab2 href="#tab2">
-        <object #polls class="esper-tab-icon"/>
+        <object #polls class="esper-svg esper-tab-icon"/>
       </a></li>
       <li><a #tab3 href="#tab3" class="last">
-        <object #person class="esper-tab-icon"/>
+        <object #person class="esper-svg esper-tab-icon"/>
       </a></li>
     </ul>
   </div>

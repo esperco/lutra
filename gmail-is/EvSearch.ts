@@ -26,7 +26,7 @@ module Esper.EvSearch {
   <a #link class="link-event">Link</a>
   <div #spinner class="spinner link-spinner"/>
   <div #linked class="linked">
-    <object #check/>
+    <object #check class="esper-svg"/>
     <span>Linked</span>
   </div>
   <div>
@@ -205,12 +205,14 @@ module Esper.EvSearch {
   <div #modal class="esper-modal esper-search-modal">
     <div class="esper-modal-header">
       <div #close class="esper-modal-close-container">
-        <object #closeIcon class="esper-modal-close-icon"/>
+        <object #closeIcon class="esper-svg esper-modal-close-icon"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
     <div class="clear-search-container">
-      <object #clear class="clear-search"/>
+      <div #clear class="clear-search">
+        <object #clearImg class="esper-svg-block"/>
+      </div>
     </div>
     <input #searchbox
       type="text" class="esper-searchbox"
@@ -222,30 +224,27 @@ module Esper.EvSearch {
       <div #searchStats class="search-stats"/>
     </div>
     <div class="search-footer">
-      <object #modalLogo class="search-footer-logo"/>
       <button #done class="primary-btn done-btn">Done</button>
+      <object #modalLogo class="esper-svg search-footer-logo"/>
     </div>
   </div>
 </div>
 '''
     var searchView = <SearchView> _view;
 
-    function closeModal() {
-      view.remove();
-    }
+    function closeModal() { view.remove(); }
 
     title.text("Link to existing event");
 
     setupSearch(linkedEvents.linked_events, team.teamid,
                 searchView, eventsTab, profiles);
 
-    var searchBgUrl = Init.esperRootUrl + "img/search.svg";
-    searchbox.attr(
-      "style",
-      "background: url(" + searchBgUrl + ") no-repeat scroll 16px 16px"
+    searchbox.css(
+      "background",
+      "url(" + Init.esperRootUrl + "img/search.svg) no-repeat scroll 16px 16px"
     );
 
-    clear.attr("data", Init.esperRootUrl + "img/clear.svg");
+    clearImg.attr("data", Init.esperRootUrl + "img/clear.svg");
     clear.click(function() { resetSearch(_view) });
 
     var cal = team.team_calendar.google_calendar_id;

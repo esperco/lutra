@@ -26,7 +26,7 @@
 @purple: #a25cc6;
 @purple_active: #7d3ca0;
 @purple_bg: #FEFBFF;
-@purple_bg_hover: #fefdff;
+@purple_bg_hover: #F5EBF8;
 @purple_bg_active: #faf7fc;
 @purple_disabled: #ceb3e5;
 @purple_focus: #c08add;
@@ -88,7 +88,6 @@ li.esper-li, a.esper-a {
   padding: 7px 16px;
   color: black;
   cursor: pointer;
-  font-size: 13px;
   line-height: 1;
   text-align: left;
   &:hover {
@@ -144,6 +143,20 @@ li.esper-li, a.esper-a {
   &:hover { text-decoration: underline; }
 }
 
+.esper-vertical-divider {
+  float: left;
+  width: 1px;
+  height: 16px;
+  margin: 4px 5px;
+  background: @gray_20;
+}
+
+.esper-svg { pointer-events: none; }
+.esper-svg-block {
+  display: block;
+  pointer-events: none;
+}
+
 .clearfix:before,
 .clearfix:after {
   content: " ";
@@ -164,7 +177,6 @@ li.esper-li, a.esper-a {
   border: 1px solid @google_border_gray;
   border-radius: 3px;
   color: white;
-  font-size: 13px;
   font-weight: 300;
   height: 30px;
   line-height: 0.8;
@@ -278,7 +290,6 @@ li.esper-li, a.esper-a {
     padding: 11px;
     background: @orange;
     cursor: pointer;
-    font-size: 13px;
     text-align: center;
     &:hover {
       background: @orange_hover;
@@ -290,7 +301,6 @@ li.esper-li, a.esper-a {
 .esper-team-name {
   float: left;
   padding: 10px 0 0 4px;
-  font-size: 13px;
 }
 
 .esper-dock-action {
@@ -420,12 +430,12 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
     text-align: center;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    .esper-tab-icon { opacity: 0.4; }
-    &:hover .esper-tab-icon { opacity: 0.6; }
+    .esper-tab-icon { opacity: 0.2; }
+    &:hover .esper-tab-icon { opacity: 0.5; }
   }
   li.active a, li.active a:hover {
     color: @purple_text;
-    background: @purple_bg;
+    background: @google_border_gray;
     cursor: default;
     .esper-tab-icon { opacity: 1; }
   }
@@ -464,7 +474,7 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
 }
 
 .esper-section-actions {
-  padding: 5px 10px;
+  padding: 7px 5px;
   background: @purple_bg;
   border-bottom: 1px solid @google_border_gray;
 }
@@ -479,11 +489,9 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
 
 .esper-link-action {
   float: left;
-  width: 50%;
-  height: 22px;
-  padding-top: 7px;
-  padding-bottom: 7px;
+  padding: 4px;
   color: @purple;
+  border-radius: 3px;
   cursor: pointer;
   .esper-link-action-icon-container {
     float: left;
@@ -494,16 +502,16 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
     border-radius: 100%;
     box-sizing: border-box;
   }
-  .esper-link-action-icon { display: block; }
+  .esper-link-action-icon { float: left; }
   .esper-link-action-text {
-    margin: 3px 0 0 26px;
-    font-size: 13px;
+    margin: 1px 0 0 21px;
+    font-weight: bold;
   }
   &.disabled {
     opacity: 0.5;
     pointer-events: none;
   }
-  &:hover .esper-link-action-text { text-decoration: underline; }
+  &:hover { background: @purple_bg_hover; }
 }
 
 .esper-no-events {
@@ -588,7 +596,6 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
 
 .esper-ev-times {
   color: @gray_60;
-  font-size: 13px;
   margin-left: 48px;
   padding: 1px 0 2px 0;
 }
@@ -654,6 +661,7 @@ ul.esper-ev-dropdown {
 
 .esper-coming-soon-text {
   margin-top: 40px;
+  font-size: 16px;
   color: @gray_30;
 }
 
