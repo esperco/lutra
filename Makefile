@@ -8,6 +8,11 @@ dev: manifest.json
 	$(MAKE) dev-build
 	$(MAKE) install
 
+tikhon: manifest.json
+	$(MAKE) tikhon-build
+	$(MAKE) install
+
+
 prod: manifest.json
 	$(MAKE) prod-build
 	$(MAKE) install
@@ -29,6 +34,10 @@ dropbox:
 	$(MAKE) zip
 	mkdir -p ~/Dropbox/Esper/software/chrome
 	cp -a esper esper.zip ~/Dropbox/Esper/software/chrome
+
+tikhon-build:
+	$(MAKE) -C common tikhon-conf
+	$(MAKE) build
 
 dev-build:
 	$(MAKE) -C common dev-conf
