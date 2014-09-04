@@ -2,7 +2,7 @@ module Esper.Init {
   export var esperRootUrl : string;
     /* URL prefix to access files provided by the extension.
        Sample usage:
-         img.attr("src", Init.esperRootUrl + "img/icon.png");
+         object.attr("data", Init.esperRootUrl + "img/icon.svg");
      */
 
   export var loginInfo : ApiT.LoginResponse;
@@ -41,14 +41,13 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
+    Menu.create();
     if (Login.loggedIn()) {
       Api.getLoginInfo()
         .done(function(loginInfo) {
           Login.info = loginInfo;
           MsgView.init();
         });
-    } else {
-      Menu.create();
     }
   }
 

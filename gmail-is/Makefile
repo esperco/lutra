@@ -66,6 +66,7 @@ APP_SOURCES = \
   Tab2Content \
   Tab3Content \
   MsgView \
+  Gmail \
   Init \
   Main
 

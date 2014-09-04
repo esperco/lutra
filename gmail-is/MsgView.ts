@@ -33,25 +33,13 @@ module Esper.MsgView {
       dismissDropdowns();
   });
 
-  /* Find a good insertion point, on the right-hand side of the page. */
-  function findAnchor() {
-    var anchor = $(".nH.g.id"); // email only
-    // var anchor = $(".Tm.aeJ"); // global
-    if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper thread controls.");
-      return $();
-    }
-    else
-      return anchor;
-  }
-
   function removeEsperRoot() {
     $("#esper").remove();
   }
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
+    var anchor = Gmail.findSidebarAnchor();
     var root = $("<div id='esper'/>");
     anchor.prepend(root);
     return root;

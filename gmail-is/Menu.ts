@@ -44,7 +44,7 @@ module Esper.Menu {
     return $("<li class='esper-li'/>")
       .text(text)
       .click(function() {
-        MsgView.popWindow(url, 545, 433);
+        MsgView.popWindow(url, 1000, 610);
       });
   }
 
@@ -76,10 +76,10 @@ module Esper.Menu {
 '''
 <div #view id="esper-menu" class="esper-menu">
   <div #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo">
-    <object #logoSVG/>
+    <object #logoImg class="esper-svg-block"/>
   </div>
   <div #background class="esper-menu-bg"/>
-  <img #caret class="esper-caret"/>
+  <object #caret class="esper-click-safe esper-caret"/>
   <ul #dropdown class="esper-ul esper-menu-dropdown">
     <div #dropdownContent class="esper-dropdown-section"/>
   </ul>
@@ -89,13 +89,13 @@ module Esper.Menu {
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
       logo.addClass("esper-menu-white");
-      logoSVG.attr("data", Init.esperRootUrl + "img/menu-logo-white.svg");
+      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-white.svg");
     } else {
       logo.addClass("esper-menu-black");
-      logoSVG.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
+      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
     }
 
-    caret.attr("src", Init.esperRootUrl + "img/caret.png");
+    caret.attr("data", Init.esperRootUrl + "img/caret.svg");
 
     updateLinks(dropdownContent);
 
