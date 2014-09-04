@@ -75,7 +75,9 @@ module Esper.Menu {
   export function create() {
 '''
 <div #view id="esper-menu" class="esper-menu">
-  <img #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo"/>
+  <div #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo">
+    <object #logoSVG/>
+  </div>
   <div #background class="esper-menu-bg"/>
   <img #caret class="esper-caret"/>
   <ul #dropdown class="esper-ul esper-menu-dropdown">
@@ -86,11 +88,11 @@ module Esper.Menu {
 
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
-      logo.attr("src", Init.esperRootUrl + "img/menu-logo-white.png")
-          .addClass("esper-menu-white");
+      logo.addClass("esper-menu-white");
+      logoSVG.attr("data", Init.esperRootUrl + "img/menu-logo-white.svg");
     } else {
-      logo.attr("src", Init.esperRootUrl + "img/menu-logo-black.png")
-          .addClass("esper-menu-black");
+      logo.addClass("esper-menu-black");
+      logoSVG.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
     }
 
     caret.attr("src", Init.esperRootUrl + "img/caret.png");
