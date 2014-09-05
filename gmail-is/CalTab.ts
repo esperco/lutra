@@ -204,7 +204,7 @@ module Esper.CalTab {
       view.addClass("disabled");
       Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          view.slideUp();
+          refreshLinkedList(team, threadId, eventsTab, profiles);
           refreshRecentsList(team, threadId, eventsTab, profiles);
         });
     });
@@ -213,7 +213,7 @@ module Esper.CalTab {
       view.addClass("disabled");
       Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          view.slideUp();
+          refreshLinkedList(team, threadId, eventsTab, profiles);
           refreshRecentsList(team, threadId, eventsTab, profiles);
         });
     });
@@ -376,9 +376,9 @@ module Esper.CalTab {
             i++;
           });
           eventsTab.linkedList.append(eventsList);
-          eventsTab.linkedSpinner.hide();
-          eventsTab.refreshLinked.removeClass("disabled");
         }
+        eventsTab.linkedSpinner.hide();
+        eventsTab.refreshLinked.removeClass("disabled");
       });
   }
 
