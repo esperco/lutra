@@ -1,4 +1,4 @@
-module Esper.EvTab {
+module Esper.CalTab {
 
   function toggleList(container) {
     if (container.css("display") === "none") {
@@ -294,33 +294,39 @@ module Esper.EvTab {
   function displayRecentEvents(linkedEvents, teamid, threadId,
                                container, profiles) {
 '''
-<div #view>
-  <div #spinner class="spinner list-spinner"/>
-  <div #noRecents class="esper-no-events">No recent events</div>
-  <div #eventsList class="esper-events-list"/>
-</div>
+<div #noRecents class="esper-no-events">No recently viewed events</div>
+<div #eventsList class="esper-events-list"/>
 '''
-    container.children().remove();
-
     var active = Login.getAccount().activeEvents;
-    if (active === null || active === undefined) return;
+    if (active === null || active === undefined) {
+      container.children().remove();
+      return noRecents;
+    }
     var events = active.calendars;
     var team =
       List.find(Login.myTeams(), function(team) {
         return team.teamid === teamid;
       });
-    if (team === null || team === undefined) return;
+    if (team === null || team === undefined) {
+      container.children().remove();
+      return noRecents;
+    }
     var eventsForTeam = events[team.team_calendar.google_calendar_id];
-    if (eventsForTeam === undefined) return;
+    if (eventsForTeam === undefined) {
+      container.children().remove();
+      return noRecents;
+    }
     var getEventCalls =
       List.filterMap(
         eventsForTeam,
         function(e) {
           var item = e.item; // compatibility check
-          if (item !== undefined)
+          if (item !== undefined) {
             return Api.getEventDetails(teamid, item.eventId);
-          else
-            return undefined;
+          } else {
+            container.children().remove();
+            return noRecents;
+          }
       });
 
     Deferred.join(getEventCalls).done(function(activeEvents) {
@@ -336,35 +342,19 @@ module Esper.EvTab {
       });
     });
 
-    return view;
+    container.children().remove();
+    return eventsList;
   }
 
-  function displayLinkedEvents(eventsTab, linkedEvents, team, threadId,
+  function displayLinkedEvents(linkedEvents, team, threadId,
                                container, profiles) {
 '''
-<div #view>
-  <div #linkActions class="esper-section-actions clearfix">
-    <div #createEvent class="esper-link-action">
-      <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-      <div class="esper-link-action-text">Create event</div>
-    </div>
-    <div class="esper-vertical-divider"/>
-    <div #linkEvent class="esper-link-action">
-      <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
-      <div class="esper-link-action-text">Link event</div>
-    </div>
-  </div>
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
-</div>
 '''
-    createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
-    linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
-
-    container.children().remove();
-
     if (linkedEvents.length === 0) {
-      noEvents.show();
+      container.children().remove();
+      return noEvents;
     } else {
       var i = 0;
       var recent, last = false;
@@ -377,46 +367,29 @@ module Esper.EvTab {
       });
     }
 
-    createEvent.click(function() {
-      var newTab = window.open("");
-      newTab.document.write("Creating new linked event, please wait...");
-      var threadId = MsgView.currentThreadId;
-      Api.createNewLinkedEvent(team.teamid, threadId).done(function(e) {
-        var eventId = e.google_event_id;
-        if (eventId !== null && eventId !== undefined) {
-          newTab.document.write(" done! Syncing thread to description...");
-          Api.syncEvent(team.teamid, threadId, eventId).done(function() {
-            var url = e.google_cal_url;
-            if (url !== null && url !== undefined)
-              newTab.location.assign(url);
-          });
-        }
-      });
-    });
-
-    linkEvent.click(function() {
-      EvSearch.openSearchModal(linkedEvents, team, eventsTab, profiles);
-    });
-
-    return view;
+    container.children().remove();
+    return eventsList;
   }
 
   /* reuse the view created for the team, update list of linked events */
   export function refreshEventList(team, threadId, eventsTab, profiles) {
+'''
+<div #spinner class="esper-events-list-loading">
+  <div class="spinner list-spinner"/>
+</div>
+'''
+    var container = eventsTab.linkedEventsContainer;
+    container.children().remove();
+    container.append(spinner);
     Api.getLinkedEvents(team.teamid, threadId)
       .done(function(linkedEvents) {
-        eventsTab.linkedEventsContainer.append(displayLinkedEvents(
-          eventsTab,
-          linkedEvents.linked_events,
-          team,
-          threadId,
-          eventsTab.linkedEventsContainer,
-          profiles
-        ));
-        if (linkedEvents.linked_events.length === 0)
-          eventsTab.noEvents.show();
-        else
-          eventsTab.noEvents.hide();
+          container.append(displayLinkedEvents(
+            linkedEvents.linked_events,
+            team,
+            threadId,
+            eventsTab.linkedEventsContainer,
+            profiles
+          ));
       });
   }
 
@@ -424,14 +397,13 @@ module Esper.EvTab {
     view: JQuery;
     linkedEventsHeader: JQuery;
     showLinkedEvents: JQuery;
+    linkActions: JQuery;
+    createEvent: JQuery;
+    linkEvent: JQuery;
     linkedEventsContainer: JQuery;
     recentEventsHeader: JQuery;
     showRecentEvents: JQuery;
     recentEventsContainer: JQuery;
-    recents: JQuery;
-    footer: JQuery;
-    sidebarLogo: JQuery;
-    teamName: JQuery;
   }
 
   export function displayCalendarTab(tab1,
@@ -440,27 +412,53 @@ module Esper.EvTab {
                                      linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
+  <div #refresh class="esper-refresh esper-clickable">
+    <object #refreshIcon class="esper-svg" style="float:left"/>
+    <div class="esper-link esper-refresh-link">Refresh</div>
+  </div>
   <div class="esper-section">
     <div #linkedEventsHeader class="esper-section-header open">
       <span #showLinkedEvents class="esper-link" style="float:right">Hide</span>
       <span class="bold">Linked Events</span>
     </div>
-    <div #linkedEventsContainer class="esper-section-container"/>
+    <div #linkActions class="esper-section-actions clearfix">
+      <div #createEvent class="esper-link-action">
+        <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+        <div class="esper-link-action-text">Create event</div>
+      </div>
+      <div class="esper-vertical-divider"/>
+      <div #linkEvent class="esper-link-action">
+        <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+        <div class="esper-link-action-text">Link event</div>
+      </div>
+    </div>
+    <div #linkedEventsContainer class="esper-section-container">
+      <div class="esper-events-list-loading">
+        <div class="spinner list-spinner"/>
+      </div>
+    </div>
   </div>
   <div class="esper-section">
     <div #recentEventsHeader class="esper-section-header open">
       <span #showRecentEvents class="esper-link" style="float:right">Hide</span>
       <span class="bold">Recently Viewed Events</span>
     </div>
-    <div #recentEventsContainer class="esper-section-container"/>
+    <div #recentEventsContainer class="esper-section-container">
+      <div class="esper-events-list-loading">
+        <div class="spinner list-spinner"/>
+      </div>
+    </div>
   </div>
 </div>
 '''
-
     var eventsTab = <EventsTab> _view;
+    var threadId = MsgView.currentThreadId;
+
+    refreshIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
+    linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
     linkedEventsContainer.append(displayLinkedEvents(
-      eventsTab,
       linkedEvents.linked_events,
       team,
       MsgView.currentThreadId,
@@ -475,6 +473,10 @@ module Esper.EvTab {
       recentEventsContainer,
       profiles
     ));
+
+    refresh.click(function() {
+      refreshEventList(team, threadId, eventsTab, profiles);
+    })
 
     showLinkedEvents.click(function() {
       toggleList(linkedEventsContainer);
@@ -491,6 +493,27 @@ module Esper.EvTab {
       else
         $(this).text("Hide");
     })
+
+    createEvent.click(function() {
+      var newTab = window.open("");
+      newTab.document.write("Creating new linked event, please wait...");
+      Api.createNewLinkedEvent(team.teamid, threadId).done(function(e) {
+        var eventId = e.google_event_id;
+        if (eventId !== null && eventId !== undefined) {
+          newTab.document.write(" done! Syncing thread to description...");
+          Api.syncEvent(team.teamid, threadId, eventId).done(function() {
+            var url = e.google_cal_url;
+            if (url !== null && url !== undefined)
+              newTab.location.assign(url);
+          });
+        }
+      });
+    });
+
+    linkEvent.click(function() {
+      CalSearch.openSearchModal(linkedEvents.linked_events,
+                                team, eventsTab, profiles);
+    });
 
     Login.watchableAccount.watch(function(newAccount, newValidity) {
       if (newValidity === true && !!MsgView.currentThreadId) {
