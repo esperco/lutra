@@ -489,16 +489,12 @@ li.esper-li.selected:hover .esper-team-list-name { color: @gray_60; }
 /** Sidebar Events **/
 
 .esper-refresh {
-  display: inline-block;
-  padding: 0 0 10px 2px;
-  &:hover {
-    .esper-refresh-link { text-decoration: underline; }
-  }
-}
-
-.esper-refresh-link {
   float: left;
-  margin: 1px 4px;
+  padding-left: 8px;
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .esper-link-action {
