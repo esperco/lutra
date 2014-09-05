@@ -61,11 +61,12 @@ SHARED_SOURCES = \
 APP_SOURCES = \
   Menu \
   ActiveThreads \
-  EvSearch \
-  EvTab \
+  CalSearch \
+  CalTab \
   Tab2Content \
   Tab3Content \
   MsgView \
+  Gmail \
   Init \
   Main
 

@@ -5,14 +5,14 @@ module Esper.Tab2Content {
 <div #view>
   <div #linkActions class="esper-tab-header"/>
   <div #comingSoon class="esper-coming-soon">
-    <img #truck/>
+    <object #truck class="esper-svg"/>
     <div #comingSoonText class="esper-coming-soon-text"/>
   </div>
   <div #events class="esper-linked-events"/>
 </div>
 '''
 
-    truck.attr("src", Init.esperRootUrl + "img/truck.png");
+    truck.attr("data", Init.esperRootUrl + "img/truck.svg");
     comingSoonText.text("New features are coming. " +
       "Check back soon!");
 
