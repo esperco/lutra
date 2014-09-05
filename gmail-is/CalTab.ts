@@ -462,11 +462,19 @@ module Esper.CalTab {
     refreshLinked.click(function() {
       refreshLinked.addClass("disabled");
       refreshLinkedList(team, threadId, eventsTab, profiles);
+      if (linkedEventsContainer.css("display") === "none") {
+        toggleList(linkedEventsContainer);
+        showLinkedEvents.text("Hide");
+      }
     })
 
     refreshRecents.click(function() {
       refreshRecents.addClass("disabled");
       refreshRecentsList(team, threadId, eventsTab, profiles);
+      if (recentEventsContainer.css("display") === "none") {
+        toggleList(recentEventsContainer);
+        showRecentEvents.text("Hide");
+      }
     })
 
     showLinkedEvents.click(function() {
