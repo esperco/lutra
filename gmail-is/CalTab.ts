@@ -302,6 +302,7 @@ module Esper.CalTab {
     function renderNone() {
       eventsTab.recentsList.append(noEvents);
       eventsTab.recentsSpinner.hide();
+      eventsTab.refreshRecents.removeClass("disabled");
     }
 
     if (team === null || team === undefined) {
