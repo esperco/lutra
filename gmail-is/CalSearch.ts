@@ -1,25 +1,4 @@
-module Esper.EvSearch {
-
-  function linkEvent(e, teamid, threadId,
-                     eventsTab: EvTab.EventsTab,
-                     profiles,
-                     resultView: ResultView) {
-    Api.linkEventForMe(teamid, threadId, e.google_event_id)
-      .done(function() {
-        resultView.spinner.attr("style", "display: none");
-        resultView.linked.attr("style", "display: block");
-        EvTab.refreshEventList(teamid, threadId, eventsTab, profiles);
-
-        Api.linkEventForTeam(teamid, threadId, e.google_event_id)
-          .done(function() {
-            Api.syncEvent(teamid, threadId, e.google_event_id)
-              .done(function() {
-                // TODO Report something, handle failure, etc.
-                EvTab.refreshEventList(teamid, threadId, eventsTab, profiles);
-              });
-          });
-      });
-  }
+module Esper.CalSearch {
 
   interface ResultView {
     view: JQuery;
@@ -45,12 +24,9 @@ module Esper.EvSearch {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="link-event">Link</a>
-  <div #spinner class="spinner link-spinner">
-    <div class="double-bounce1"></div>
-    <div class="double-bounce2"></div>
-  </div>
-  <div #linked class="linked animated fadeInRight">
-    <img #check/>
+  <div #spinner class="spinner link-spinner"/>
+  <div #linked class="linked">
+    <object #check class="esper-svg"/>
     <span>Linked</span>
   </div>
   <div>
@@ -77,21 +53,21 @@ module Esper.EvSearch {
       title.text(e.title);
 
     link.click(function() {
-      spinner.attr("style", "display: block");
-      link.attr("style", "display: none");
-      linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
+      spinner.show();
+      link.hide();
+      CalTab.linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
     });
 
-    check.attr("src", Init.esperRootUrl + "img/check.png");
+    check.attr("data", Init.esperRootUrl + "img/check.svg");
     var alreadyLinked = linkedEvents.filter(function(ev) {
       return ev.google_event_id === e.google_event_id;
     })
     if (alreadyLinked.length > 0) {
-      link.attr("style", "display: none");
-      linked.attr("style", "display: block");
+      link.hide();
+      linked.show();
     } else {
-      link.attr("style", "display: block");
-      linked.attr("style", "display: none");
+      link.show();
+      linked.hide();
     }
 
     return view;
@@ -101,7 +77,7 @@ module Esper.EvSearch {
                                  eventList,
                                  teamid,
                                  searchView: SearchView,
-                                 eventsTab: EvTab.EventsTab,
+                                 eventsTab: CalTab.EventsTab,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
@@ -109,10 +85,10 @@ module Esper.EvSearch {
       renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
         .appendTo(list);
     });
-    searchView.clear.attr("style", "visibility: visible");
-    searchView.searchInstructions.attr("style", "display: none");
-    searchView.spinner.attr("style", "display: none");
-    searchView.resultsList.attr("style", "display: block");
+    searchView.clear.css("visibility", "visible");
+    searchView.searchInstructions.hide();
+    searchView.spinner.hide();
+    searchView.resultsList.show();
     searchView.resultsList.children().remove();
     searchView.resultsList.append(list);
     if (eventList.length === 0) {
@@ -125,17 +101,17 @@ module Esper.EvSearch {
       searchView.searchStats.text(eventList.length + " events found");
       searchView.searchStats.removeClass("no-events");
     }
-    searchView.searchStats.attr("style", "display: block");
+    searchView.searchStats.show();
   }
 
   function resetSearch(view: SearchView) {
     view.searchbox.val("");
     view.searchbox.focus();
-    view.clear.attr("style", "visibility: hidden");
-    view.searchInstructions.attr("style", "display: block");
-    view.spinner.attr("style", "display: none");
+    view.clear.css("visibility", "hidden");
+    view.searchInstructions.show();
+    view.spinner.hide();
     view.resultsList.children().remove();
-    view.searchStats.attr("style", "display: none");
+    view.searchStats.hide();
   }
 
   function displayActiveEvents(linkedEvents, teamid, searchView,
@@ -167,10 +143,10 @@ module Esper.EvSearch {
         renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
           .appendTo(list);
       });
-      searchView.clear.attr("style", "visibility: visible");
-      searchView.searchInstructions.attr("style", "display: none");
-      searchView.spinner.attr("style", "display: none");
-      searchView.resultsList.attr("style", "display: block");
+      searchView.clear.css("visibility", "visible");
+      searchView.searchInstructions.hide();
+      searchView.spinner.hide();
+      searchView.resultsList.show();
       searchView.resultsList.children().remove();
       searchView.resultsList.append(list);
     });
@@ -178,21 +154,20 @@ module Esper.EvSearch {
 
   function setupSearch(events, teamid,
                        searchView: SearchView,
-                       eventsTab: EvTab.EventsTab,
+                       eventsTab: CalTab.EventsTab,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
-    displayActiveEvents(events, teamid, searchView, eventsTab, profiles);
     Util.afterTyping(searchView.searchbox, 250, function() {
       if (searchView.searchbox.val().length === 0) {
         resetSearch(searchView);
       } else {
           searchView.searchbox.keypress(function(e) {
           if (e.which != 0) {
-            searchView.searchInstructions.attr("style", "display: none");
-            searchView.spinner.attr("style", "display: block");
-            searchView.resultsList.attr("style", "display: none");
-            searchView.searchStats.attr("style", "display: none");
+            searchView.searchInstructions.hide();
+            searchView.spinner.show();
+            searchView.resultsList.hide();
+            searchView.searchStats.hide();
           }
         })
       }
@@ -222,7 +197,7 @@ module Esper.EvSearch {
   }
 
   export function openSearchModal(linkedEvents, team,
-                                  eventsTab: EvTab.EventsTab,
+                                  eventsTab: CalTab.EventsTab,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>
@@ -230,60 +205,56 @@ module Esper.EvSearch {
   <div #modal class="esper-modal esper-search-modal">
     <div class="esper-modal-header">
       <div #close class="esper-modal-close-container">
-        <img #closeIcon class="esper-modal-close-icon"/>
+        <object #closeIcon class="esper-svg esper-modal-close-icon"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
     <div class="clear-search-container">
-      <img #clear class="clear-search"/>
+      <div #clear class="clear-search">
+        <object #clearImg class="esper-svg-block"/>
+      </div>
     </div>
     <input #searchbox
       type="text" class="esper-searchbox"
       placeholder="Search calendar"/>
     <div #results class="search-results">
       <div #searchInstructions class="search-instructions"/>
-      <div #spinner class="spinner search-spinner">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
-      </div>
+      <div #spinner class="spinner search-spinner"/>
       <div #resultsList/>
       <div #searchStats class="search-stats"/>
     </div>
     <div class="search-footer">
-      <img #modalLogo class="search-footer-logo"/>
       <button #done class="primary-btn done-btn">Done</button>
+      <object #modalLogo class="esper-svg search-footer-logo"/>
     </div>
   </div>
 </div>
 '''
     var searchView = <SearchView> _view;
 
-    function closeModal() {
-      view.remove();
-    }
+    function closeModal() { view.remove(); }
 
     title.text("Link to existing event");
 
     setupSearch(linkedEvents.linked_events, team.teamid,
                 searchView, eventsTab, profiles);
 
-    var searchBgUrl = Init.esperRootUrl + "img/search.png";
-    searchbox.attr(
-      "style",
-      "background: url(" + searchBgUrl + ") no-repeat scroll 16px 16px"
+    searchbox.css(
+      "background",
+      "url(" + Init.esperRootUrl + "img/search.svg) no-repeat scroll 16px 16px"
     );
 
-    clear.attr("src", Init.esperRootUrl + "img/clear.png");
+    clearImg.attr("data", Init.esperRootUrl + "img/clear.svg");
     clear.click(function() { resetSearch(_view) });
 
     var cal = team.team_calendar.google_calendar_id;
     searchInstructions.text("Start typing above to find upcoming events on " +
       "calendar " + cal + ".");
 
-    modalLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+    modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
     background.click(closeModal);
-    closeIcon.attr("src", Init.esperRootUrl + "img/close.png");
+    closeIcon.attr("data", Init.esperRootUrl + "img/close.svg");
     close.click(closeModal);
     done.click(closeModal);
 

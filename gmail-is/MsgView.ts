@@ -7,24 +7,10 @@ module Esper.MsgView {
   // Profiles of everyone on all the viewer's teams
   var profiles : ApiT.Profile[];
 
-  export function popWindow(url, width, height) {
-    /* Allow for borders. */
-    var leftPosition = (window.screen.width / 2) - ((width / 2) + 10);
-    /* Allow for title and status bars. */
-    var topPosition = (window.screen.height / 2) - ((height / 2) + 50);
-
-    window.open(
-      url, "Window2", "status=no,height="
-        + height + ",width=" + width + ",resizable=yes,left="
-        + leftPosition + ",top=" + topPosition + ",screenX="
-        + leftPosition + ",screenY=" + topPosition
-        + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
-  }
-
   export function dismissDropdowns() {
-    $(".esper-ul").css("display", "none");
-    $(".esper-menu-bg").css("display", "none");
-    $(".esper-caret").css("display", "none");
+    $(".esper-ul").hide();
+    $(".esper-menu-bg").hide();
+    $(".esper-caret").hide();
     $(".esper-dropdown-btn").removeClass("open");
   }
 
@@ -33,25 +19,13 @@ module Esper.MsgView {
       dismissDropdowns();
   });
 
-  /* Find a good insertion point, on the right-hand side of the page. */
-  function findAnchor() {
-    var anchor = $(".nH.g.id"); // email only
-    // var anchor = $(".Tm.aeJ"); // global
-    if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper thread controls.");
-      return $();
-    }
-    else
-      return anchor;
-  }
-
   function removeEsperRoot() {
     $("#esper").remove();
   }
 
   function insertEsperRoot() {
     removeEsperRoot();
-    var anchor = findAnchor();
+    var anchor = Gmail.findSidebarAnchor();
     var root = $("<div id='esper'/>");
     anchor.prepend(root);
     return root;
@@ -60,7 +34,7 @@ module Esper.MsgView {
   function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
 '''
 <li #selector class="esper-click-safe esper-li">
-  <img #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
+  <object #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
   <div #teamListCalendar class="esper-click-safe esper-team-list-calendar"/>
   <div #teamListName class="esper-click-safe esper-team-list-name"/>
 </li>
@@ -74,9 +48,9 @@ module Esper.MsgView {
 
     if (team.teamid === myTeamId) {
       selector.addClass("selected");
-      teamListCheck.attr("src", Init.esperRootUrl + "img/check.png");
+      teamListCheck.attr("data", Init.esperRootUrl + "img/check.svg");
     } else {
-      teamListCheck.css("display", "none");
+      teamListCheck.hide();
       selector.click(function() { onTeamSwitch(team); });
     }
 
@@ -105,7 +79,7 @@ module Esper.MsgView {
     <div class="esper-click-safe esper-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
       <a href="http://esper.com">
-        <img #footerLogo class="esper-click-safe esper-footer-logo"/>
+        <object #footerLogo class="esper-click-safe esper-footer-logo"/>
       </a>
       <div class="esper-click-safe esper-dropdown-footer-links">
         <a href="http://esper.com/privacypolicy.html">Privacy</a>
@@ -152,7 +126,7 @@ module Esper.MsgView {
     var name = team.team_calendar.google_calendar_id;
     teamName.text(name);
 
-    footerLogo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+    footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
     options.tooltip({
       show: { delay: 500, effect: "none" },
@@ -201,7 +175,7 @@ module Esper.MsgView {
     size.click(toggleSidebar);
 
     settings.click(function() {
-      popWindow(Conf.Api.url, 1000, 610);
+      window.open(Conf.Api.url);
     })
     signOut.click(function() {
       if (sidebar.css("display") !== "none")
@@ -219,13 +193,19 @@ module Esper.MsgView {
                           linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view class="esper-sidebar">
-  <ul class="esper-tab-links">
-    <li class="active"><a #tab1 href="#tab1">
-      <img #calendar class="esper-tab-icon"/>
-    </a></li>
-    <li><a #tab2 href="#tab2"><img #polls class="esper-tab-icon"/></a></li>
-    <li><a #tab3 href="#tab3"><img #person class="esper-tab-icon"/></a></li>
-  </ul>
+  <div class="esper-tabs-container">
+    <ul class="esper-tab-links">
+      <li class="active"><a #tab1 href="#tab1" class="first">
+        <object #calendar class="esper-svg esper-tab-icon"/>
+      </a></li>
+      <li><a #tab2 href="#tab2">
+        <object #polls class="esper-svg esper-tab-icon"/>
+      </a></li>
+      <li><a #tab3 href="#tab3" class="last">
+        <object #person class="esper-svg esper-tab-icon"/>
+      </a></li>
+    </ul>
+  </div>
   <div class="esper-tab-content">
     <div #content1 id="tab1" class="tab active"/>
     <div #content2 id="tab2" class="tab"/>
@@ -244,9 +224,9 @@ module Esper.MsgView {
       switchTab(tab3);
     })
 
-    calendar.attr("src", Init.esperRootUrl + "img/calendar.png");
-    polls.attr("src", Init.esperRootUrl + "img/polls.png");
-    person.attr("src", Init.esperRootUrl + "img/person.png");
+    calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
+    polls.attr("data", Init.esperRootUrl + "img/polls.svg");
+    person.attr("data", Init.esperRootUrl + "img/person.svg");
 
     function switchTab(tab) {
       var currentAttrValue = tab.attr("href");
@@ -254,7 +234,7 @@ module Esper.MsgView {
       tab.parent('li').addClass('active').siblings().removeClass('active');
     };
 
-    EvTab.displayLinkedEvents(content1, team, profiles, linkedEvents);
+    CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
     Tab3Content.displayTab3ComingSoon(content3);
 
