@@ -18,8 +18,10 @@ module Esper.CalTab {
               .done(function() {
                 // TODO Report something, handle failure, etc.
                 view.link.hide();
+                view.spinner.hide();
                 view.linked.show();
                 refreshLinkedList(team, threadId, eventsTab, profiles);
+                refreshRecentsList(team, threadId, eventsTab, profiles);
               });
           });
       });
@@ -32,6 +34,7 @@ module Esper.CalTab {
 '''
 <div #view>
   <div #link class="esper-link-event esper-clickable">Link to this event</div>
+  <div #spinner/>
   <div #linked class="esper-linked">
     <object #check class="esper-svg"/>
     <span>Linked</span>
@@ -204,7 +207,7 @@ module Esper.CalTab {
       view.addClass("disabled");
       Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          view.slideUp();
+          refreshLinkedList(team, threadId, eventsTab, profiles);
           refreshRecentsList(team, threadId, eventsTab, profiles);
         });
     });
@@ -213,7 +216,7 @@ module Esper.CalTab {
       view.addClass("disabled");
       Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          view.slideUp();
+          refreshLinkedList(team, threadId, eventsTab, profiles);
           refreshRecentsList(team, threadId, eventsTab, profiles);
         });
     });
@@ -296,12 +299,14 @@ module Esper.CalTab {
   <div #noEvents class="esper-no-events">No recently viewed events</div>
   <div #eventsList class="esper-events-list"/>
 '''
+    eventsTab.refreshRecents.addClass("disabled");
     eventsTab.recentsList.children().remove();
     eventsTab.recentsSpinner.show();
 
     function renderNone() {
       eventsTab.recentsList.append(noEvents);
       eventsTab.recentsSpinner.hide();
+      eventsTab.refreshRecents.removeClass("disabled");
     }
 
     if (team === null || team === undefined) {
@@ -358,6 +363,7 @@ module Esper.CalTab {
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
 '''
+    eventsTab.refreshLinked.addClass("disabled");
     eventsTab.linkedList.children().remove();
     eventsTab.linkedSpinner.show();
     Api.getLinkedEvents(team.teamid, threadId)
@@ -376,9 +382,9 @@ module Esper.CalTab {
             i++;
           });
           eventsTab.linkedList.append(eventsList);
-          eventsTab.linkedSpinner.hide();
-          eventsTab.refreshLinked.removeClass("disabled");
         }
+        eventsTab.linkedSpinner.hide();
+        eventsTab.refreshLinked.removeClass("disabled");
       });
   }
 
@@ -414,14 +420,16 @@ module Esper.CalTab {
       </div>
     </div>
     <div #linkActions class="esper-section-actions clearfix">
-      <div #createEvent class="esper-link-action">
-        <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-        <div class="esper-link-action-text">Create event</div>
-      </div>
-      <div class="esper-vertical-divider"/>
-      <div #linkEvent class="esper-link-action">
-        <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
-        <div class="esper-link-action-text">Link event</div>
+      <div style="display:inline-block">
+        <div #createEvent class="esper-link-action">
+          <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+          <div class="esper-link-action-text">Create event</div>
+        </div>
+        <div class="esper-vertical-divider"/>
+        <div #linkEvent class="esper-link-action">
+          <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+          <div class="esper-link-action-text">Link event</div>
+        </div>
       </div>
     </div>
     <div #linkedEventsContainer class="esper-section-container">
@@ -460,7 +468,6 @@ module Esper.CalTab {
     refreshRecentsList(team, threadId, eventsTab, profiles);
 
     refreshLinked.click(function() {
-      refreshLinked.addClass("disabled");
       refreshLinkedList(team, threadId, eventsTab, profiles);
       if (linkedEventsContainer.css("display") === "none") {
         toggleList(linkedEventsContainer);
@@ -469,7 +476,6 @@ module Esper.CalTab {
     })
 
     refreshRecents.click(function() {
-      refreshRecents.addClass("disabled");
       refreshRecentsList(team, threadId, eventsTab, profiles);
       if (recentEventsContainer.css("display") === "none") {
         toggleList(recentEventsContainer);
@@ -501,6 +507,7 @@ module Esper.CalTab {
         if (eventId !== null && eventId !== undefined) {
           newTab.document.write(" done! Syncing thread to description...");
           Api.syncEvent(team.teamid, threadId, eventId).done(function() {
+            refreshLinkedList(team, threadId, eventsTab, profiles);
             var url = e.google_cal_url;
             if (url !== null && url !== undefined)
               newTab.location.assign(url);
@@ -510,14 +517,12 @@ module Esper.CalTab {
     });
 
     linkEvent.click(function() {
-      CalSearch.openSearchModal(linkedEvents.linked_events,
-                                team, eventsTab, profiles);
+      CalSearch.openSearchModal(team, threadId, eventsTab, profiles);
     });
 
     Login.watchableAccount.watch(function(newAccount, newValidity) {
       if (newValidity === true && !!MsgView.currentThreadId) {
         Log.d("Refreshing recently viewed events");
-        refreshRecents.addClass("disabled");
         refreshRecentsList(team, threadId, eventsTab, profiles);
       }
     });
