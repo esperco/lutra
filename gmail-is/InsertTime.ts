@@ -9,7 +9,6 @@ module Esper.InsertTime {
     anchor.each(function (i, div) {
       // If we haven't added a menu to this one yet.
       if ($(div).children().length === 1) {
-        console.log("Adding controls...");
         var controls = esperToolbar();
         $(div).prepend(controls.bar);
         $(div).height(70);
@@ -56,8 +55,6 @@ module Esper.InsertTime {
    */
   export function init() {
     gmail.on.reply_forward(function () {
-      console.log("");
-      console.log("On reply_forward fired! ");
       attachControls(Gmail.compositionToolbar());
     });
   }
