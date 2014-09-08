@@ -20,12 +20,27 @@ Esper . xxxxxxxx
   function logArray(prefix, args) {
     for (var i = 0; i < args.length; i++)
       if (console != undefined && console.log != undefined) {
-        var s = Util.toString(args[i]);
+        var x = args[i];
+        var s = "";
         if (i === 0)
-          s = tag + " " + prefix + " " + s;
+          s = tag + " " + prefix + " ";
         else
-          s = tag + " . " + s;
-        console.log(prefixLines(tag + " . ", s));
+          s = tag + " . ";
+        switch (typeof x) {
+        case "string":
+        case "number":
+        case "boolean":
+        case "undefined":
+          console.log("%s", s, x);
+          break;
+        default:
+          if (x === null)
+            console.log("%s", s, null);
+          else
+            /* Print as expandable tree
+               see https://developer.chrome.com/devtools/docs/console */
+            console.log("%s%O", s, x);
+        }
       }
   }
 
