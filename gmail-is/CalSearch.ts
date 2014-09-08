@@ -14,23 +14,23 @@ module Esper.CalSearch {
   }
 
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
-                              teamid, eventsTab,
+                              team, eventsTab,
                               profiles: ApiT.Profile[]) {
     Log.d("renderSearchResult()");
 '''
 <div #view class="esper-ev-result">
-  <div class="esper-ev-date">
+  <div #date title class="esper-ev-date esper-clickable">
     <div #month class="esper-ev-month"></div>
     <div #day class="esper-ev-day"></div>
   </div>
-  <a #link class="link-event">Link</a>
+  <a #link class="esper-link-event">Link</a>
   <div #spinner class="spinner link-spinner"/>
-  <div #linked class="linked">
+  <div #linked class="esper-linked">
     <object #check class="esper-svg"/>
     <span>Linked</span>
   </div>
   <div>
-    <div #title class="esper-ev-title"/>
+    <div class="esper-ev-title"><span #title/></div>
     <div class="esper-ev-times">
       <span #startTime class="esper-ev-start"></span>
       &rarr;
@@ -51,16 +51,38 @@ module Esper.CalSearch {
     var threadId = MsgView.currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
+    else
+      title.text("Untitled event");
+
+    if (e.google_cal_url !== undefined) {
+      date
+        .addClass("esper-clickable")
+        .click(function() {
+          open(e.google_cal_url, "_blank");
+        })
+        .tooltip({
+          show: { delay: 500, effect: "none" },
+          hide: { effect: "none" },
+          "content": "Open in Google Calendar",
+          "position": { my: 'center bottom', at: 'center top-1' },
+          "tooltipClass": "top esper-tooltip"
+        });
+      title
+        .addClass("esper-link-black")
+        .click(function() {
+          open(e.google_cal_url, "_blank");
+        });
+    }
 
     link.click(function() {
       spinner.show();
       link.hide();
-      CalTab.linkEvent(e, teamid, threadId, eventsTab, profiles, resultView);
+      CalTab.linkEvent(e, team, threadId, eventsTab, profiles, resultView);
     });
 
     check.attr("data", Init.esperRootUrl + "img/check.svg");
     var alreadyLinked = linkedEvents.filter(function(ev) {
-      return ev.google_event_id === e.google_event_id;
+      return ev.event.google_event_id === e.google_event_id;
     })
     if (alreadyLinked.length > 0) {
       link.hide();
@@ -75,14 +97,14 @@ module Esper.CalSearch {
 
   function displayLinkableEvents(linkedEvents,
                                  eventList,
-                                 teamid,
+                                 team,
                                  searchView: SearchView,
                                  eventsTab: CalTab.EventsTab,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
     eventList.forEach(function(e) {
-      renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
+      renderSearchResult(e, linkedEvents, team, eventsTab, profiles)
         .appendTo(list);
     });
     searchView.clear.css("visibility", "visible");
@@ -92,7 +114,7 @@ module Esper.CalSearch {
     searchView.resultsList.children().remove();
     searchView.resultsList.append(list);
     if (eventList.length === 0) {
-      searchView.searchStats.text("No events found");
+      searchView.searchStats.text("No upcoming events found");
       searchView.searchStats.addClass("no-events");
     } else if (eventList.length === 1) {
       searchView.searchStats.text(eventList.length + " event found");
@@ -114,45 +136,7 @@ module Esper.CalSearch {
     view.searchStats.hide();
   }
 
-  function displayActiveEvents(linkedEvents, teamid, searchView,
-                               eventsTab, profiles) {
-    var list = $("<div>");
-    var active = Login.getAccount().activeEvents;
-    if (active === null || active === undefined) return;
-    var events = active.calendars;
-    var team =
-      List.find(Login.myTeams(), function(team) {
-        return team.teamid === teamid;
-      });
-    if (team === null || team === undefined) return;
-    var eventsForTeam = events[team.team_calendar.google_calendar_id];
-    if (eventsForTeam === undefined) return;
-    var getEventCalls =
-      List.filterMap(
-        eventsForTeam,
-        function(e) {
-          var item = e.item; // compatibility check
-          if (item !== undefined)
-            return Api.getEventDetails(teamid, item.eventId);
-          else
-            return undefined;
-      });
-    searchView.spinner.attr("style", "display: block");
-    Deferred.join(getEventCalls).done(function(activeEvents) {
-      activeEvents.forEach(function(e : ApiT.CalendarEvent) {
-        renderSearchResult(e, linkedEvents, teamid, eventsTab, profiles)
-          .appendTo(list);
-      });
-      searchView.clear.css("visibility", "visible");
-      searchView.searchInstructions.hide();
-      searchView.spinner.hide();
-      searchView.resultsList.show();
-      searchView.resultsList.children().remove();
-      searchView.resultsList.append(list);
-    });
-  }
-
-  function setupSearch(events, teamid,
+  function setupSearch(events, team,
                        searchView: SearchView,
                        eventsTab: CalTab.EventsTab,
                        profiles: ApiT.Profile[]) {
@@ -171,9 +155,9 @@ module Esper.CalSearch {
           }
         })
       }
-      Api.eventSearch(teamid, searchView.searchbox.val())
+      Api.eventSearch(team.teamid, searchView.searchbox.val())
         .done(function(results) {
-          displayLinkableEvents(events, results.events, teamid,
+          displayLinkableEvents(events, results.events, team,
                                 searchView, eventsTab, profiles);
         });
     });
@@ -196,7 +180,7 @@ module Esper.CalSearch {
     done: JQuery;
   }
 
-  export function openSearchModal(linkedEvents, team,
+  export function openSearchModal(team, threadId,
                                   eventsTab: CalTab.EventsTab,
                                   profiles: ApiT.Profile[]) {
 '''
@@ -236,8 +220,11 @@ module Esper.CalSearch {
 
     title.text("Link to existing event");
 
-    setupSearch(linkedEvents.linked_events, team.teamid,
-                searchView, eventsTab, profiles);
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        setupSearch(linkedEvents.linked_events, team,
+                    searchView, eventsTab, profiles);
+    });
 
     searchbox.css(
       "background",
