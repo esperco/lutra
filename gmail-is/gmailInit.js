@@ -45,3 +45,4 @@ specialize("poll");
 specialize("new_email");
 specialize("refresh");
 specialize("open_email");
+specialize("reply_forward");

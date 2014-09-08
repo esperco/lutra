@@ -47,6 +47,7 @@ module Esper.Init {
         .done(function(loginInfo) {
           Login.info = loginInfo;
           MsgView.init();
+          InsertTime.init();
         });
     }
   }

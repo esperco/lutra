@@ -12,7 +12,7 @@ module Esper.Menu {
   function findAnchor() {
     var anchor = $("div.gb_sc.gb_f.gb_Ic.gb_Ac");
     if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper menu.");
+      // Log.e("Cannot find anchor point for the Esper menu.");
       return $();
     }
     else
