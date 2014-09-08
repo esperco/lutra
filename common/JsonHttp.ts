@@ -2,7 +2,7 @@ module Esper.JsonHttp {
   function setHttpHeaders(path) {
     return function(jqXHR) {
       if (Login.loggedIn()) {
-        var unixTime = Math.round(+new Date()/1000).toString();
+        var unixTime = Math.round(Date.now()/1000).toString();
         var signature = CryptoJS.SHA1(
           unixTime
             + ","
@@ -19,8 +19,10 @@ module Esper.JsonHttp {
 
   function jsonHttp(method, path, body) {
 
-    function logResponse(respBody) {
-      Log.d("HTTP response body:", respBody);
+    var id = Util.randomString();
+
+    function logResponse(method: string, path: string, respBody) {
+      Log.d("API response " + id + " " + method + " " + path, respBody);
     }
 
     function logError(xhr, textStatus, err) {
@@ -67,10 +69,12 @@ module Esper.JsonHttp {
       contentType: contentType,
       beforeSend: setHttpHeaders(path)
     };
-    Log.d("API request:", request);
+    Log.d("API request " + id + " " + method + " " + path, request);
     return $.ajax(request)
       .fail(logError)
-      .done(logResponse);
+      .done(function(respBody) {
+        logResponse(method, path, respBody);
+      });
   }
 
   export function get(path) {
