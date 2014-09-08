@@ -23,4 +23,11 @@ module Esper.Gmail {
   export function compositionToolbar() {
     return $("div.aDg div.aDh");
   }
+
+  /** Returns the closest editable field to the given div. This is
+   *  useful for going from the menu to the actual reply field.
+   */
+  export function replyTextField(toolbar) {
+    return toolbar.closest("table.iN").find(".editable");
+  }
 }

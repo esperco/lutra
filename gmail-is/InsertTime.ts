@@ -22,8 +22,16 @@ module Esper.InsertTime {
         });
 
         controls.insertButton.click(function (e) {
+          var textField = Gmail.replyTextField($(div));
+          console.log("Text Field");
+          console.log(textField.length);
+          console.log(textField);
+
           for (var i = 0; i < events.length; i++) {
-            console.log(events[i].start, events[i].end);
+            var start = new Date(events[i].event.start.local);
+            var end   = new Date(events[i].event.end.local);
+
+            textField.html(textField.html() + "<br /><br />start: " + start + "<br />end: " + end);
           }
         });
       }
