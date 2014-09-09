@@ -56,3 +56,17 @@ $ npm install -g less
 $ lessc -v
 lessc 1.7.2 (Less Compiler) [JavaScript]
 ```
+
+How to a make production release
+================================
+
+Once the `master` branch is usable and candidate for a release, you
+need to perform the following:
+
+1. edit the `VERSION` file, change the version ID e.g. `1.2.34`
+2. commit the version file: `git commit VERSION`
+3. tag this latest commit for future reference: `git tag v1.2.34`
+4. push this commit and the tag to Github: `git push origin master --tags`
+5. build and package up the extension for upload to the
+   [Chrome Dashboard](https://chrome.google.com/webstore/developer/dashboard)
+   using `make release`

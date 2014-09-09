@@ -1,17 +1,24 @@
-.PHONY: default setup dev prod dev-build prod-build install zip dropbox clean
+.PHONY: default setup dev prod dev-build prod-build install zip release clean
 default: dev
 
 manifest.json: manifest.json.in VERSION
 	sed -e "s/@@VERSION@@/`cat VERSION`/g" manifest.json.in > $@
 
+# Build and install development version that make API calls to localhost
 dev: manifest.json
 	$(MAKE) dev-build
 	$(MAKE) install
 
+# Make a production build
+release:
+	$(MAKE) clean
+	$(MAKE) prod
+	$(MAKE) zip
+
+
 prod: manifest.json
 	$(MAKE) prod-build
 	$(MAKE) install
-	$(MAKE) zip
 
 install:
 	rm -rf pub
@@ -21,14 +28,6 @@ zip:
 	rm -rf esper esper.zip
 	cp -a pub esper
 	zip -r esper esper
-
-# Make a production build and put it into our Dropbox folder
-dropbox:
-	$(MAKE) clean
-	$(MAKE) prod
-	$(MAKE) zip
-	mkdir -p ~/Dropbox/Esper/software/chrome
-	cp -a esper esper.zip ~/Dropbox/Esper/software/chrome
 
 dev-build:
 	$(MAKE) -C common dev-conf
