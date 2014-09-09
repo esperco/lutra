@@ -59,14 +59,14 @@ SHARED_SOURCES = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  Menu \
+  Gmail \
   ActiveThreads \
   CalSearch \
   CalTab \
   Tab2Content \
   Tab3Content \
-  MsgView \
-  Gmail \
+  Menu \
+  Sidebar \
   Init \
   Main
 

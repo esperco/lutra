@@ -17,7 +17,7 @@ module Esper.Log {
   */
   function printTimeSeparator(prefix) {
     var ts = Date.now() / 1000;
-    if (timeOfLastLogging > 0 && ts - timeOfLastLogging > 60)
+    if (timeOfLastLogging > 0 && ts - timeOfLastLogging > 20)
       console.log("%s %s %c----- Getting back to work -----",
                   prefix, new Date(ts*1000).toString(), "color: blue");
     timeOfLastLogging = ts;

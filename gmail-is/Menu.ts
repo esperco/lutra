@@ -92,7 +92,7 @@ module Esper.Menu {
       }
     });
 
-    Util.repeatUntil(1000, 1000, function() {
+    Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");
       var success = replace(view);
       if (success)
