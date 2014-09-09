@@ -1,20 +1,20 @@
 module Esper.InsertTime {
 
-  // TODO: .on('reply_forward') gets called when a thread is replied to
-
   /** Attaches the composition controls and sets up the event
    *  handlers.
    */
   function attachControls(anchor) {
     anchor.each(function (i, div) {
+      div = $(div); // each gives us raw elements, not $ selections
+
       // If we haven't added a menu to this one yet.
-      if ($(div).children().length === 1) {
+      if (div.children().length === 1) {
         var controls = esperToolbar();
-        $(div).prepend(controls.bar);
-        $(div).height(70);
+        div.prepend(controls.bar);
+        div.height(70);
 
         controls.insertButton.click(function (e) {
-          var textField = Gmail.replyTextField($(div));
+          var textField = Gmail.replyTextField(div);
           var threadId  = MsgView.currentThreadId;
           var team      = Login.myTeams()[0];
 
@@ -40,13 +40,13 @@ module Esper.InsertTime {
    */
   function esperToolbar() {
 '''
-<div #bar class="esper-toolbar">
+<div #bar class="esper-composition-toolbar">
   <img #logo alt=""/>
   <span #eventsLabel> No linked events. </span>
   <button #insertButton>Insert</button>
 </div>
 '''
-    logo.attr("src", Init.esperRootUrl + "img/footer-logo.png");
+    logo.attr("src", Init.esperRootUrl + "img/icon16.png");
 
     return _view;
   }
