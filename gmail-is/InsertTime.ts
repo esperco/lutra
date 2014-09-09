@@ -13,6 +13,14 @@ module Esper.InsertTime {
         div.prepend(controls.bar);
         div.height(70);
 
+        // We need a timeout to make sure we get the height *after*
+        // the controls have been added.
+        setTimeout(function () {
+          var containing = Gmail.containingTable(div);
+          console.log("Containing", containing);
+          containing.height(containing.height() + 30);
+        }, 10);
+
         updateEventsLabel(controls);
         CalTab.onEventsChanged(function () {
           updateEventsLabel(controls)

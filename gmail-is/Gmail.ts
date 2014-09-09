@@ -30,4 +30,9 @@ module Esper.Gmail {
   export function replyTextField(toolbar) {
     return toolbar.closest("table.iN").find(".editable");
   }
+
+  /** Given a div, returns the top-level table for that message in the thread. */
+  export function containingTable(div) {
+    return div.closest("div.M9");
+  }
 }
