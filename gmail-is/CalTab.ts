@@ -520,12 +520,15 @@ module Esper.CalTab {
       CalSearch.openSearchModal(team, threadId, eventsTab, profiles);
     });
 
+    /* Reuse the same watcherId in order to overwrite the previous
+       watcher for that same thread. */
+    var watcherId = "CalTab-" + threadId;
     Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && !!MsgView.currentThreadId) {
+      if (newValidity === true && threadId === MsgView.currentThreadId) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, eventsTab, profiles);
       }
-    });
+    }, watcherId);
 
     tab1.append(view);
   }
