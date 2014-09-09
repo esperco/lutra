@@ -13,26 +13,21 @@ module Esper.InsertTime {
         $(div).prepend(controls.bar);
         $(div).height(70);
 
-        var threadId = MsgView.currentThreadId;
-        var events   = [];
-        var team     = Login.myTeams()[0];
-
-        Api.getLinkedEvents(team.teamid, threadId).done(function (linkedEvents) {
-          events = linkedEvents.linked_events;
-        });
-
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField($(div));
-          console.log("Text Field");
-          console.log(textField.length);
-          console.log(textField);
+          var threadId  = MsgView.currentThreadId;
+          var team      = Login.myTeams()[0];
 
-          for (var i = 0; i < events.length; i++) {
-            var start = new Date(events[i].event.start.local);
-            var end   = new Date(events[i].event.end.local);
+          Api.getLinkedEvents(team.teamid, threadId).done(function (linkedEvents) {
+            var events = linkedEvents.linked_events;
 
-            textField.html(textField.html() + "<br /><br />start: " + start + "<br />end: " + end);
-          }
+            for (var i = 0; i < events.length; i++) {
+              var start = new Date(events[i].event.start.local);
+              var end   = new Date(events[i].event.end.local);
+
+              textField.html(textField.html() + "<br />start: " + start + "<br />end: " + end + "<br />");
+            }
+          });
         });
       }
     });
