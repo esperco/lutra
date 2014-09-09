@@ -41,6 +41,7 @@ SHARED_SOURCES = \
   ../common/ts/Types \
   ../common/ts/Conf \
   ../common/ts/List \
+  ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
   ../common/ts/Deferred \
