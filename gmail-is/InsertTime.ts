@@ -18,16 +18,14 @@ module Esper.InsertTime {
           var threadId  = MsgView.currentThreadId;
           var team      = Login.myTeams()[0];
 
-          Api.getLinkedEvents(team.teamid, threadId).done(function (linkedEvents) {
-            var events = linkedEvents.linked_events;
+          var events = CalTab.currentEvents;
 
-            for (var i = 0; i < events.length; i++) {
-              var start = new Date(events[i].event.start.local);
-              var end   = new Date(events[i].event.end.local);
+          for (var i = 0; i < events.length; i++) {
+            var start = new Date(events[i].event.start.local);
+            var end   = new Date(events[i].event.end.local);
 
-              textField.html(textField.html() + "<br />start: " + start + "<br />end: " + end + "<br />");
-            }
-          });
+            textField.html(textField.html() + "<br />start: " + start + "<br />end: " + end + "<br />");
+          }
         });
       }
     });
