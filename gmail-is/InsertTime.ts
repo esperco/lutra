@@ -13,17 +13,10 @@ module Esper.InsertTime {
         div.prepend(controls.bar);
         div.height(70);
 
-        switch (CalTab.currentEvents.length) {
-        case 0:
-          controls.eventsLabel.text("No linked events.");
-          break;
-        case 1:
-          controls.eventsLabel.text("1 linked event.");
-          break;
-        default:
-          controls.eventsLabel.text(CalTab.currentEvents.length + " linked events.");
-          break;
-        }
+        updateEventsLabel(controls);
+        CalTab.onEventsChanged(function () {
+          updateEventsLabel(controls)
+        });
 
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField(div);
@@ -41,6 +34,20 @@ module Esper.InsertTime {
         });
       }
     });
+  }
+
+  function updateEventsLabel (controls) {
+    switch (CalTab.currentEvents.length) {
+    case 0:
+      controls.eventsLabel.text("No linked events.");
+      break;
+    case 1:
+      controls.eventsLabel.text("1 linked event.");
+      break;
+    default:
+      controls.eventsLabel.text(CalTab.currentEvents.length + " linked events.");
+      break;
+    }
   }
 
   /** Returns a _view that contains Esper-specific controls for the

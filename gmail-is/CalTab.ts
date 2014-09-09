@@ -3,6 +3,20 @@ module Esper.CalTab {
   /** The events currently displayed as "linked" in the sidebar. */
   export var currentEvents : ApiT.EventWithSyncInfo[]
 
+  var currentEventsListeners = []
+
+  export function onEventsChanged(callback) {
+    currentEventsListeners.push(callback);
+  }
+
+  function updateEvents(newEvents) {
+    currentEvents = newEvents;
+
+    for (var i = 0; i < currentEventsListeners.length; i++) {
+      currentEventsListeners[i]();
+    }
+  }
+
   function toggleList(container) {
     if (container.css("display") === "none") {
       container.slideDown("fast");
@@ -371,7 +385,8 @@ module Esper.CalTab {
     eventsTab.linkedSpinner.show();
     Api.getLinkedEvents(team.teamid, threadId)
       .done(function(linkedEvents) {
-        currentEvents = linkedEvents.linked_events;
+        updateEvents(linkedEvents.linked_events);
+        
         if (currentEvents.length === 0) {
           eventsTab.linkedList.append(noEvents);
         } else {
