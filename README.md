@@ -57,7 +57,7 @@ $ lessc -v
 lessc 1.7.2 (Less Compiler) [JavaScript]
 ```
 
-How to a make production release
+How to make a production release
 ================================
 
 Once the `master` branch is usable and candidate for a release, you
