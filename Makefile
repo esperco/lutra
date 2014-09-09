@@ -9,7 +9,7 @@ dev: manifest.json
 	$(MAKE) dev-build
 	$(MAKE) install
 
-# Make a production build
+# Make a production build; see full instructions in README.md.
 release:
 	$(MAKE) clean
 	$(MAKE) prod
