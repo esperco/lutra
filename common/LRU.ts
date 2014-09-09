@@ -18,7 +18,6 @@ module Esper.LRU {
   }
 
   export class C<T> {
-    that = this;
 
     /*
       Array of at most maxlen elements without repeats,

@@ -90,10 +90,10 @@ module Esper.EsperStorage {
       var old = account.activeEvents.calendars;
       var updates = x.calendars;
       for (var cal in updates) {
+        var oldCal = old[cal];
         if (old[cal] === undefined)
-          old[cal] = updates[cal];
-        else
-          old[cal] = Visited.merge(updates[cal], old[cal], Visited.maxEvents);
+          oldCal = [];
+        old[cal] = Visited.merge(updates[cal], oldCal, Visited.maxEvents);
       }
       return esper;
     }, whenDone);

@@ -4,14 +4,31 @@
 
 module Esper.Gmail {
 
-  export function findSidebarAnchor() {
-    var anchor = $(".nH.g.id");
+  /*
+    Find a good insertion point.
+    We return the element containing the name of the logged-in user,
+    e.g. "+Peter". The Esper menu is inserted to the left of that element.
+  */
+  export function findMenuAnchor() {
+    var anchor = $('[style*=min-width\\:\\ 195px]');
     if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper thread controls.");
+      Log.e("Cannot find anchor point for the Esper menu.");
       return $();
     }
     else
       return anchor;
+  }
+
+  export function findSidebarAnchor() {
+    var anchor = $(".nH.g.id");
+    if (anchor.length !== 1) {
+      Log.w("Cannot find anchor point for the Esper sidebar.");
+      return $();
+    }
+    else {
+      Log.i("Found anchor point for the Esper sidebar.");
+      return anchor;
+    }
   }
 
 }
