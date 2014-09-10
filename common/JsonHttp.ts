@@ -21,8 +21,12 @@ module Esper.JsonHttp {
 
     var id = Util.randomString();
 
-    function logResponse(method: string, path: string, respBody) {
-      Log.d("API response " + id + " " + method + " " + path, respBody);
+    function logResponse(method: string, path: string, respBody, latency) {
+      Log.d("API response " + id
+            + " " + method
+            + " " + path
+            + " [" + latency + "s]",
+            respBody);
     }
 
     function logError(xhr, textStatus, err) {
@@ -70,10 +74,13 @@ module Esper.JsonHttp {
       beforeSend: setHttpHeaders(path)
     };
     Log.d("API request " + id + " " + method + " " + path, request);
+
+    var startTime = Date.now();
     return $.ajax(request)
       .fail(logError)
       .done(function(respBody) {
-        logResponse(method, path, respBody);
+        var latency = (Date.now() - startTime) / 1000;
+        logResponse(method, path, respBody, latency);
       });
   }
 
