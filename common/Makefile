@@ -6,6 +6,7 @@ SOURCES = \
   Types \
   Conf \
   List \
+  Lazy \
   Util \
   Watchable \
   Deferred \

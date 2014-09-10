@@ -4,26 +4,11 @@
 */
 
 module Esper.Menu {
-  /*
-    Find a good insertion point.
-    We return the element containing the name of the logged-in user,
-    e.g. "+Peter". The Esper menu is inserted right after that element.
-  */
-  function findAnchor() {
-    var anchor = $("div.gb_sc.gb_f.gb_Ic.gb_Ac");
-    if (anchor.length !== 1) {
-      // Log.e("Cannot find anchor point for the Esper menu.");
-      return $();
-    }
-    else
-      return anchor;
-  }
-
   function replace(menu: JQuery) {
-    var leftSibling = findAnchor();
-    if (leftSibling.length === 1) {
+    var rightSibling = Gmail.findMenuAnchor();
+    if (rightSibling.length === 1) {
       $("#esper-menu").remove();
-      menu.insertAfter(leftSibling);
+      menu.insertBefore(rightSibling);
       return true;
     }
     else
@@ -107,7 +92,7 @@ module Esper.Menu {
       }
     });
 
-    Util.repeatUntil(100, 1000, function() {
+    Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");
       var success = replace(view);
       if (success)

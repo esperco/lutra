@@ -41,6 +41,7 @@ SHARED_SOURCES = \
   ../common/ts/Types \
   ../common/ts/Conf \
   ../common/ts/List \
+  ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
   ../common/ts/Deferred \
@@ -59,15 +60,15 @@ SHARED_SOURCES = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
-  Menu \
+  Gmail \
   ActiveThreads \
   CalSearch \
   CalTab \
   InsertTime \
   Tab2Content \
   Tab3Content \
-  MsgView \
-  Gmail \
+  Menu \
+  Sidebar \
   Init \
   Main
 

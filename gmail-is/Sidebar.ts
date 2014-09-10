@@ -26,9 +26,11 @@ module Esper.MsgView {
   function insertEsperRoot() {
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
-    var root = $("<div id='esper'/>");
-    anchor.prepend(root);
-    return root;
+    if (anchor.length === 1) {
+      var root = $("<div id='esper'/>");
+      anchor.prepend(root);
+      return root;
+    }
   }
 
   function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
@@ -280,6 +282,7 @@ module Esper.MsgView {
   }
 
   function displayTeamSidebar(rootElement, team, threadId) {
+    Log.d("displayTeamSidebar()");
     rootElement.children().remove();
     Api.getLinkedEvents(team.teamid, threadId)
       .done(function(linkedEvents) {
@@ -302,16 +305,18 @@ module Esper.MsgView {
       var emailData = gmail.get.email_data();
 
       if (emailData !== undefined && emailData.first_email !== undefined) {
-        var threadId = emailData.first_email;
-        currentThreadId = threadId;
-        var subject = emailData.subject;
-        Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
-        ActiveThreads.handleNewActiveThread(threadId, subject);
+
         var rootElement = insertEsperRoot();
         if (rootElement === undefined) {
           return false;
         }
         else {
+          var threadId = emailData.first_email;
+          currentThreadId = threadId;
+          var subject = emailData.subject;
+          Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
+          ActiveThreads.handleNewActiveThread(threadId, subject);
+
           var firstTeam = Login.myTeams()[0];
           if (firstTeam !== undefined && firstTeam !== null)
             displayTeamSidebar(rootElement, firstTeam, threadId);
@@ -322,7 +327,7 @@ module Esper.MsgView {
         return false;
     }
 
-    Util.repeatUntil(30, 300, retry);
+    Util.repeatUntil(20, 500, retry);
   }
 
   function listen() {
