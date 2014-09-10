@@ -122,4 +122,9 @@ module Esper.XDate {
     return weekDay(d1) +" "+ dateOnly(d1) +
       " at "+ timeOnly(d1);
   }
+
+  export function timeWithoutYear(d1 : Date) : string {
+    return weekDay(d1) + " " + dateOnlyWithoutYear(d1) +
+      " at " + timeOnly(d1);
+  }
 }
