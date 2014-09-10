@@ -29,10 +29,11 @@ module Esper.InsertTime {
           var events = CalTab.currentEvents;
 
           for (var i = 0; i < events.length; i++) {
-            var start = XDate.timeWithoutYear(new Date(events[i].event.start.local));
-            var end   = XDate.timeWithoutYear(new Date(events[i].event.end.local));
+            var start = new Date(events[i].event.start.local);
+            var end   = new Date(events[i].event.end.local);
+            var range = XDate.rangeWithoutYear(start, end);
 
-            textField.html(textField.html() + "<br />" + start + "<br />" + end + "<br />");
+            textField.html(textField.html() + "<br />" + XDate.weekDay(start) + ", " + range + "<br />");
           }
         });
       }
