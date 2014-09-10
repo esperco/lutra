@@ -77,6 +77,10 @@ declare module gmail.on {
                xhr: XMLHttpRequest) => void
   ): void;
 
+  // TODO: Support the arguments ($selection, string) to the callback.
+  export function reply_forward(
+    callback: () => void): void;
+
   /* complete as needed */
 }
 

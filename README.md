@@ -57,6 +57,13 @@ $ lessc -v
 lessc 1.7.2 (Less Compiler) [JavaScript]
 ```
 
+HTTPS
+=====
+
+If the extension isn't showing up properly on your local setup, that could be an https issue, since it requests resources from your test server over http. (When in prod mode, it gets them from app.esper.com over https.)
+
+To enable loading these resources, you can click the little grey shield icon on the righthand side of Chrome's URL bar.
+
 How to make a production release
 ================================
 
@@ -70,3 +77,4 @@ need to perform the following:
 5. build and package up the extension for upload to the
    [Chrome Dashboard](https://chrome.google.com/webstore/developer/dashboard)
    using `make release`
+
