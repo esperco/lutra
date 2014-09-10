@@ -43,9 +43,16 @@ module Esper.Init {
     Login.printStatus();
     Menu.create();
     if (Login.loggedIn()) {
-      Api.getLoginInfo()
+      if (Login.getLoginInfo === undefined) {
+        Login.getLoginInfo = Api.getLoginInfo();
+        Login.getLoginInfo
+          .done(function(loginInfo) {
+            Login.info = loginInfo;
+          });
+      }
+
+      Login.getLoginInfo
         .done(function(loginInfo) {
-          Login.info = loginInfo;
           Sidebar.init();
         });
     }
