@@ -350,8 +350,6 @@ module Esper.CalTab {
     Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
       var eventsForTeam : TimedEventId[] =
         mergeActiveWithCreated(activeEvents, created.created_events);
-      Log.d("EVENTS FOR TEAM:");
-      Log.d(eventsForTeam);
 
       var getEventCalls =
         List.filterMap(
