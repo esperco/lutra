@@ -62,6 +62,7 @@ module Esper.Login {
 
   /* Send a Logout request. */
   export function logout() {
+    getLoginInfo = undefined;
     if (loggedIn()) {
       var googleAccountId = myGoogleAccountId();
       setAccount(undefined);
