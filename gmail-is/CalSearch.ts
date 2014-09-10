@@ -48,7 +48,7 @@ module Esper.CalSearch {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    var threadId = MsgView.currentThreadId;
+    var threadId = Sidebar.currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
     else

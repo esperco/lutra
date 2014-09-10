@@ -46,7 +46,7 @@ module Esper.Init {
       Api.getLoginInfo()
         .done(function(loginInfo) {
           Login.info = loginInfo;
-          MsgView.init();
+          Sidebar.init();
         });
     }
   }

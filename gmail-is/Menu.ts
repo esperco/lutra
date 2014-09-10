@@ -82,9 +82,9 @@ module Esper.Menu {
 
     logo.click(function() {
       if (logo.hasClass("open")) {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
       } else {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
         background.toggle();
         caret.toggle();
         dropdown.toggle();

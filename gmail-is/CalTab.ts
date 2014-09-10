@@ -194,9 +194,9 @@ module Esper.CalTab {
 
     disclose.click(function() {
       if (disclose.hasClass("open")) {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
       } else {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
         dropdown.toggle();
         disclose.addClass("open");
       }
@@ -479,7 +479,7 @@ module Esper.CalTab {
 </div>
 '''
     var eventsTab = <EventsTab> _view;
-    var threadId = MsgView.currentThreadId;
+    var threadId = Sidebar.currentThreadId;
 
     refreshLinkedIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -548,7 +548,7 @@ module Esper.CalTab {
     */
     var watcherId = "CalTab-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && threadId === MsgView.currentThreadId) {
+      if (newValidity === true && threadId === Sidebar.currentThreadId) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, eventsTab, profiles);
       }
