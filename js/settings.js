@@ -263,7 +263,7 @@ var settings = (function() {
     return view;
   }
 
-  function composeInviteForRole(team, role) {
+  function generateInviteURL(team, role) {
     dismissOverlays();
     var invite = {
       from_uid: login.me(),
@@ -271,15 +271,13 @@ var settings = (function() {
       role: role
     };
     log("Invite:", invite);
+    return api.inviteJoinTeam(invite);
+  }
 
-    var subject, body;
-    api.inviteJoinTeam(invite)
-      .done(function(x) {
-        var url = x.url;
-        var body =
-          "Please click the link and sign in with your Google account:\n\n"
-          + "  " + url;
-      });
+  function composeInviteWithURL(url) {
+    var body =
+      "Please click the link and sign in with your Google account:\n\n"
+      + "  " + url;
 
     return gmailCompose.compose({
       subject: "Join my team on Esper",
@@ -311,8 +309,15 @@ var settings = (function() {
     svg.loadImg(email, "/assets/img/email.svg");
 
     invite.click(function() { toggleOverlay(inviteOptions); });
-    assistant.attr("href", composeInviteForRole(team, "Assistant"));
-    executive.attr("href", composeInviteForRole(team, "Executive"));
+
+    generateInviteURL(team, "Assistant")
+      .done(function(x) {
+        assistant.attr("href", composeInviteWithURL(x.url));
+      });
+    generateInviteURL(team, "Executive")
+      .done(function(x) {
+        executive.attr("href", composeInviteWithURL(x.url));
+      });
 
     return view;
   }
