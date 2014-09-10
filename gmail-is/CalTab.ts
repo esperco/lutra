@@ -308,7 +308,7 @@ module Esper.CalTab {
       var time = XDate.ofString(e.creation_time).getTime() / 1000;
       return { eventId: e.google_event_id, time: time };
     });
-    function cmp(e1 : TimedEventId, e2 : TimedEventId) {
+    function cmp(e1: TimedEventId, e2: TimedEventId) {
       if (e2.time < e1.time) return -1;
       else if (e2.time > e1.time) return 1;
       else return 0;
@@ -348,7 +348,7 @@ module Esper.CalTab {
     }
 
     Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
-      var eventsForTeam : TimedEventId[] =
+      var eventsForTeam: TimedEventId[] =
         mergeActiveWithCreated(activeEvents, created.created_events);
 
       var getEventCalls =
@@ -435,7 +435,7 @@ module Esper.CalTab {
 
   export function displayCalendarTab(tab1,
                                      team: ApiT.Team,
-                                     profiles : ApiT.Profile[],
+                                     profiles: ApiT.Profile[],
                                      linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
