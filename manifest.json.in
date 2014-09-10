@@ -17,6 +17,7 @@
       "matches": [
         "http://127.0.0.1/*",
         "http://localhost/*",
+        "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
         "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
@@ -31,6 +32,7 @@
     "matches": [
       "http://127.0.0.1/*",
       "http://localhost/*",
+      "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
       "https://app.esper.com/*",
       "https://www.google.com/calendar/*",
       "https://mail.google.com/mail/*"

@@ -112,6 +112,13 @@ module Esper.XDate {
       " from "+ timeOnly(d1) +" to "+ timeOnly(d2);
   }
 
+
+  /* "Wed Aug 13 from 12:30pm to 1:30 pm" */
+  export function rangeWithoutYear(d1 : Date, d2 : Date) : string {
+  return /*weekDay(d1) +" "+*/ dateOnlyWithoutYear(d1) +
+      " from "+ timeOnly(d1) +" to "+ timeOnly(d2);
+  }
+
   /* "12:30pm to 1:30 pm" */
   export function hourRange(d1 : Date, d2 : Date) : string {
     return utcToLocalTimeOnly(d1) +" to "+ utcToLocalTimeOnly(d2);
@@ -121,5 +128,10 @@ module Esper.XDate {
   export function justStartTime(d1 : Date) : string {
     return weekDay(d1) +" "+ dateOnly(d1) +
       " at "+ timeOnly(d1);
+  }
+
+  export function timeWithoutYear(d1 : Date) : string {
+    return weekDay(d1) + " " + dateOnlyWithoutYear(d1) +
+      " at " + timeOnly(d1);
   }
 }
