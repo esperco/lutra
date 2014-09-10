@@ -521,8 +521,10 @@ module Esper.CalTab {
     });
 
     /* Reuse the same watcherId in order to overwrite the previous
-       watcher for that same thread. */
-    var watcherId = "CalTab-" + threadId;
+       watcher for that same thread or any other thread,
+       since at most one thread is displayed at once.
+    */
+    var watcherId = "CalTab-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
       if (newValidity === true && threadId === MsgView.currentThreadId) {
         Log.d("Refreshing recently viewed events");
