@@ -20,8 +20,7 @@ module Esper.CalTab {
                 view.link.hide();
                 view.spinner.hide();
                 view.linked.show();
-                refreshLinkedList(team, threadId, eventsTab, profiles);
-                refreshRecentsList(team, threadId, eventsTab, profiles);
+                refreshEventLists(team, threadId, eventsTab, profiles);
               });
           });
       });
@@ -294,7 +293,8 @@ module Esper.CalTab {
     return view;
   }
 
-  export function refreshRecentsList(team, threadId, eventsTab, profiles) {
+  export function displayRecentsList(team, threadId, eventsTab, profiles,
+                                     linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
   <div #noEvents class="esper-no-events">No recently viewed events</div>
   <div #eventsList class="esper-events-list"/>
@@ -337,28 +337,26 @@ module Esper.CalTab {
           }
       });
 
-    Api.getLinkedEvents(team.teamid, threadId)
-      .done(function(linkedEvents) {
-        Deferred.join(getEventCalls).done(function(activeEvents) {
-          var i = 0;
-          var last = false;
-          var recent = true;
-          activeEvents.forEach(function(e: ApiT.CalendarEvent) {
-            if (i === activeEvents.length - 1)
-              last = true;
-            eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                          threadId, eventsTab, profiles));
-            i++;
-          });
-        });
-        eventsTab.recentsList.append(eventsList);
-        eventsTab.recentsSpinner.hide();
-        eventsTab.refreshRecents.removeClass("disabled");
+    Deferred.join(getEventCalls).done(function(activeEvents) {
+      var i = 0;
+      var last = false;
+      var recent = true;
+      activeEvents.forEach(function(e: ApiT.CalendarEvent) {
+        if (i === activeEvents.length - 1)
+          last = true;
+        eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
+                                      threadId, eventsTab, profiles));
+        i++;
       });
+    });
+    eventsTab.recentsList.append(eventsList);
+    eventsTab.recentsSpinner.hide();
+    eventsTab.refreshRecents.removeClass("disabled");
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function refreshLinkedList(team, threadId, eventsTab, profiles) {
+  export function displayLinkedList(team, threadId, eventsTab, profiles,
+                                    linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
@@ -366,25 +364,49 @@ module Esper.CalTab {
     eventsTab.refreshLinked.addClass("disabled");
     eventsTab.linkedList.children().remove();
     eventsTab.linkedSpinner.show();
+
+    var events = linkedEvents.linked_events;
+    if (events.length === 0) {
+      eventsTab.linkedList.append(noEvents);
+    } else {
+      var i = 0;
+      var recent, last = false;
+      events.forEach(function(e: ApiT.EventWithSyncInfo) {
+        if (i === events.length - 1)
+          last = true;
+        eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
+                                      threadId, eventsTab, profiles));
+        i++;
+      });
+      eventsTab.linkedList.append(eventsList);
+    }
+    eventsTab.linkedSpinner.hide();
+    eventsTab.refreshLinked.removeClass("disabled");
+  }
+
+  /* Refresh only linked events, fetching linked events from the server. */
+  export function refreshLinkedList(team, threadId, eventsTab, profiles) {
     Api.getLinkedEvents(team.teamid, threadId)
       .done(function(linkedEvents) {
-        var events = linkedEvents.linked_events;
-        if (events.length === 0) {
-          eventsTab.linkedList.append(noEvents);
-        } else {
-          var i = 0;
-          var recent, last = false;
-          events.forEach(function(e: ApiT.EventWithSyncInfo) {
-            if (i === events.length - 1)
-              last = true;
-            eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                          threadId, eventsTab, profiles));
-            i++;
-          });
-          eventsTab.linkedList.append(eventsList);
-        }
-        eventsTab.linkedSpinner.hide();
-        eventsTab.refreshLinked.removeClass("disabled");
+        displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+      });
+  }
+
+  /* Refresh only recent events, fetching linked events from the server. */
+  export function refreshRecentsList(team, threadId, eventsTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
+      });
+  }
+
+  /* Refresh linked events and recent events, fetching linked events from
+     the server. */
+  export function refreshEventLists(team, threadId, eventsTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+        displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
       });
   }
 
@@ -464,8 +486,8 @@ module Esper.CalTab {
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
-    refreshLinkedList(team, threadId, eventsTab, profiles);
-    refreshRecentsList(team, threadId, eventsTab, profiles);
+    displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+    displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
 
     refreshLinked.click(function() {
       refreshLinkedList(team, threadId, eventsTab, profiles);
