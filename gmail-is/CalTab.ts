@@ -309,8 +309,8 @@ module Esper.CalTab {
       return { eventId: e.google_event_id, time: time };
     });
     function cmp(e1 : any, e2 : any) {
-      if (e1.time < e2.time) return -1;
-      else if (e1.time > e2.time) return 1;
+      if (e2.time < e1.time) return -1;
+      else if (e2.time > e1.time) return 1;
       else return 0;
     }
     return activeTimed.concat(createdTimed).sort(cmp);
@@ -355,7 +355,7 @@ module Esper.CalTab {
 
       var getEventCalls =
         List.filterMap(
-          List.rev(eventsForTeam).slice(0, 5),
+          eventsForTeam.slice(0, 5),
           function(e) {
             var eventId = e.eventId;
             if (eventId !== undefined) {
