@@ -40,7 +40,7 @@ module Esper.InsertTime {
     });
   }
 
-  function updateEventsLabel (controls) {
+  function updateEventsLabel(controls) {
     switch (CalTab.currentEvents.length) {
     case 0:
       controls.eventsLabel.text("No linked events.");
