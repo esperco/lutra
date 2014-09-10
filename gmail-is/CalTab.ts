@@ -308,7 +308,7 @@ module Esper.CalTab {
       var time = XDate.ofString(e.creation_time).getTime() / 1000;
       return { eventId: e.google_event_id, time: time };
     });
-    function cmp(e1 : any, e2 : any) {
+    function cmp(e1 : TimedEventId, e2 : TimedEventId) {
       if (e2.time < e1.time) return -1;
       else if (e2.time > e1.time) return 1;
       else return 0;
