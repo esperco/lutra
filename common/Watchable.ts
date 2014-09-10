@@ -87,10 +87,19 @@ module Esper.Watchable {
       Register a general-purpose handler, executed each time the data
       field is set.
       Return a watcher ID.
+
+      If there's already a watcher associated with the given watcher ID,
+      the old watcher is replaced by the new one.
     */
     watch(handler,
           optWatcherId? : string) {
-      var id = optWatcherId === undefined ? createId() : optWatcherId;
+      var id;
+      if (optWatcherId === undefined)
+        id = createId();
+      else {
+        id = optWatcherId;
+        this.unwatch(id);
+      }
       this.changeWatchers.push({ id: id, handler: handler });
       return id;
     }
