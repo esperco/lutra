@@ -1,7 +1,7 @@
 module Esper.CalTab {
 
   /** The events currently displayed as "linked" in the sidebar. */
-  export var currentEvents : ApiT.EventWithSyncInfo[]
+  export var currentEvents : ApiT.EventWithSyncInfo[] = []
 
   var currentEventsListeners = []
 
@@ -37,7 +37,7 @@ module Esper.CalTab {
         refreshRecentsList(team, threadId, eventsTab, profiles);
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-            Api.syncEvent(team.teamid, threadId, e.google_event_id)
+            Api.syncEvent(team.teamid, threadId, e.google_event_id);
           });
       });
   }
@@ -210,9 +210,9 @@ module Esper.CalTab {
 
     disclose.click(function() {
       if (disclose.hasClass("open")) {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
       } else {
-        MsgView.dismissDropdowns();
+        Sidebar.dismissDropdowns();
         dropdown.toggle();
         disclose.addClass("open");
       }
@@ -323,7 +323,8 @@ module Esper.CalTab {
     return Visited.merge(active, createdTimed, 5);
   }
 
-  export function refreshRecentsList(team, threadId, eventsTab, profiles) {
+  export function displayRecentsList(team, threadId, eventsTab, profiles,
+                                     linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
   <div #noEvents class="esper-no-events">No recently viewed events</div>
   <div #eventsList class="esper-events-list"/>
@@ -371,29 +372,27 @@ module Esper.CalTab {
             }
         });
 
-      Api.getLinkedEvents(team.teamid, threadId)
-        .done(function(linkedEvents) {
-          Deferred.join(getEventCalls).done(function(activeEvents) {
-            var i = 0;
-            var last = false;
-            var recent = true;
-            activeEvents.forEach(function(e: ApiT.CalendarEvent) {
-              if (i === activeEvents.length - 1)
-                last = true;
-              eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                            threadId, eventsTab, profiles));
-              i++;
-            });
-          });
-          eventsTab.recentsList.append(eventsList);
-          eventsTab.recentsSpinner.hide();
-          eventsTab.refreshRecents.removeClass("disabled");
+      Deferred.join(getEventCalls).done(function(activeEvents) {
+        var i = 0;
+        var last = false;
+        var recent = true;
+        activeEvents.forEach(function(e: ApiT.CalendarEvent) {
+          if (i === activeEvents.length - 1)
+            last = true;
+          eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
+                                        threadId, eventsTab, profiles));
+          i++;
         });
+      });
+      eventsTab.recentsList.append(eventsList);
+      eventsTab.recentsSpinner.hide();
+      eventsTab.refreshRecents.removeClass("disabled");
     });
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function refreshLinkedList(team, threadId, eventsTab, profiles) {
+  export function displayLinkedList(team, threadId, eventsTab, profiles,
+                                    linkedEvents) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
@@ -404,7 +403,7 @@ module Esper.CalTab {
     Api.getLinkedEvents(team.teamid, threadId)
       .done(function(linkedEvents) {
         updateEvents(linkedEvents.linked_events);
-        
+
         if (currentEvents.length === 0) {
           eventsTab.linkedList.append(noEvents);
         } else {
@@ -421,6 +420,32 @@ module Esper.CalTab {
         }
         eventsTab.linkedSpinner.hide();
         eventsTab.refreshLinked.removeClass("disabled");
+      });
+  }
+
+  /* Refresh only linked events, fetching linked events from the server. */
+  export function refreshLinkedList(team, threadId, eventsTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+      });
+  }
+
+  /* Refresh only recent events, fetching linked events from the server. */
+  export function refreshRecentsList(team, threadId, eventsTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
+      });
+  }
+
+  /* Refresh linked events and recent events, fetching linked events from
+     the server. */
+  export function refreshEventLists(team, threadId, eventsTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId)
+      .done(function(linkedEvents) {
+        displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+        displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
       });
   }
 
@@ -493,15 +518,15 @@ module Esper.CalTab {
 </div>
 '''
     var eventsTab = <EventsTab> _view;
-    var threadId = MsgView.currentThreadId;
+    var threadId = Sidebar.currentThreadId;
 
     refreshLinkedIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
-    refreshLinkedList(team, threadId, eventsTab, profiles);
-    refreshRecentsList(team, threadId, eventsTab, profiles);
+    displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
+    displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
 
     refreshLinked.click(function() {
       refreshLinkedList(team, threadId, eventsTab, profiles);
@@ -562,7 +587,7 @@ module Esper.CalTab {
     */
     var watcherId = "CalTab-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && threadId === MsgView.currentThreadId) {
+      if (newValidity === true && threadId === Sidebar.currentThreadId) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, eventsTab, profiles);
       }

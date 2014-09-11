@@ -15,7 +15,7 @@ module Esper.InsertTime {
 
         var containing = Gmail.containingTable(div);
         containing.css("padding-bottom", 30);
-        
+
         updateEventsLabel(controls);
         CalTab.onEventsChanged(function () {
           updateEventsLabel(controls)
@@ -23,7 +23,7 @@ module Esper.InsertTime {
 
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField(div);
-          var threadId  = MsgView.currentThreadId;
+          var threadId  = Sidebar.currentThreadId;
           var team      = Login.myTeams()[0];
 
           var events = CalTab.currentEvents;
@@ -40,7 +40,7 @@ module Esper.InsertTime {
     });
   }
 
-  function updateEventsLabel (controls) {
+  function updateEventsLabel(controls) {
     switch (CalTab.currentEvents.length) {
     case 0:
       controls.eventsLabel.text("No linked events.");

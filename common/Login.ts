@@ -10,7 +10,8 @@ module Esper.Login {
     validateAccount, undefined
   );
 
-  export var info : ApiT.LoginResponse;
+  export var getLoginInfo : JQueryDeferred<ApiT.LoginResponse>;
+  export var info : ApiT.LoginResponse; // set by getLoginInfo upon success
 
   export function loggedIn() {
     return watchableAccount.isValid();
@@ -61,6 +62,7 @@ module Esper.Login {
 
   /* Send a Logout request. */
   export function logout() {
+    getLoginInfo = undefined;
     if (loggedIn()) {
       var googleAccountId = myGoogleAccountId();
       setAccount(undefined);
