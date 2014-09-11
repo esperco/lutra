@@ -7,8 +7,9 @@ module Esper.InsertTime {
     anchor.each(function (i, div) {
       div = $(div); // each gives us raw elements, not $ selections
 
-      // If we haven't added a menu to this one yet.
-      if (div.children().length === 1) {
+      // If we haven't added a menu to this one yet and it is not a
+      // new compose interface.
+      if (!Gmail.newCompose(div) && div.children().length === 1) {
         var controls = esperToolbar();
         div.prepend(controls.bar);
         div.height(70);
