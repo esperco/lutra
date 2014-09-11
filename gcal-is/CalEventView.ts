@@ -200,7 +200,7 @@ module Esper.CalEventView {
     Api.getLinkedThreads(teamid, fullEventId.eventId)
       .done(function(linkedThrids) {
         var thrids = linkedThrids.linked_threads;
-        Deferred.join(
+        Promise.join(
           List.map(thrids, function(thrid) {
             return Api.getThreadDetails(thrid);
           })

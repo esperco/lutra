@@ -44,7 +44,7 @@ SHARED_SOURCES = \
   ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
-  ../common/ts/Deferred \
+  ../common/ts/Promise \
   ../common/ts/XDate \
   ../common/ts/Log \
   ../common/ts/LRU \

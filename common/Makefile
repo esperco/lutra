@@ -9,7 +9,7 @@ SOURCES = \
   Lazy \
   Util \
   Watchable \
-  Deferred \
+  Promise \
   XDate \
   Log \
   LRU \
