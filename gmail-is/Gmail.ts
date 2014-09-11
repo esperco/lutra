@@ -51,4 +51,26 @@ module Esper.Gmail {
   export function containingTable(div) {
     return div.closest("div.M9");
   }
+
+  /** Finds the toolbar with the attach button and friends if it
+   *  *isn't* inside the given div. This deals with the fact that
+   *  there are at least two GMail UI variants in the wild:
+   *
+   *  - one where that menu only appears on hover
+   *  - one where the menu is always there
+   *
+   *  The first one has the menu in a different place, which means it
+   *  overlaps our new Esper toolbar (for inserting times and such).
+   *
+   *  Since the problem is that this on hover toolbar is not a child
+   *  of the toolbar div, that's how we discriminate between the two
+   *  cases. If it's the second case, this returns an empty selection.
+   */
+  export function mouseoverReplyToolbar(div) {
+    if (div.find(".wG.J-Z-I").length === 0) { // class for non-hover container
+      return div.closest(".eq"); // class for hover container
+    } else {
+      return $();
+    }
+  }
 }
