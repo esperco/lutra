@@ -347,16 +347,10 @@ module Esper.CalTab {
     }
     var events = active.calendars;
     var activeEvents = [];
-    Log.d("TEAM:");
-    Log.d(team);
     List.iter(team.team_calendars, function(calid : string) {
-      Log.d("Checking " + calid);
       var eventsForCal = events[calid];
-      if (eventsForCal !== undefined) {
-        Log.d("Found!");
-        Log.d(eventsForCal);
+      if (eventsForCal !== undefined)
         activeEvents = activeEvents.concat(eventsForCal);
-      }
     });
     if (activeEvents === []) {
       renderNone();
@@ -364,14 +358,8 @@ module Esper.CalTab {
     }
 
     Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
-      Log.d("ACTIVE");
-      Log.d(activeEvents);
-      Log.d("CREATED");
-      Log.d(created);
       var eventsForTeam: Types.Visited<Types.FullEventId>[] =
         mergeActiveWithCreated(activeEvents, created.created_events);
-      Log.d("MERGED");
-      Log.d(eventsForTeam);
 
       var getEventCalls =
         List.filterMap(
