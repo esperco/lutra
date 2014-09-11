@@ -67,7 +67,7 @@ module Esper.CalEventView {
       Api.unlinkEvent(teamid, threadId, eventId)
         .done(function() {
           view.remove();
-          Api.getEventDetails(teamid, eventId)
+          Api.getEventDetails(teamid, fullEventId.calendarId, eventId)
             .done(function(event) {
               mergeDescription(event);
               Log.d("Updated description textarea.");
@@ -152,6 +152,7 @@ module Esper.CalEventView {
     subject.text(thread.subject);
 
     var threadId = thread.threadId;
+    var calendarId = fullEventId.calendarId;
     var eventId = fullEventId.eventId;
     linkButton.click(function() {
       Api.linkEventForMe(teamid, threadId, eventId)
@@ -159,10 +160,10 @@ module Esper.CalEventView {
           updateView(fullEventId);
           Api.linkEventForTeam(teamid, threadId, eventId)
             .done(function() {
-              Api.syncEvent(teamid, threadId, eventId)
+              Api.syncEvent(teamid, threadId, calendarId, eventId)
                 .done(function() {
                   updateView(fullEventId);
-                  Api.getEventDetails(teamid, eventId)
+                  Api.getEventDetails(teamid, calendarId, eventId)
                     .done(function(event) {
                       mergeDescription(event);
                       Log.d("Link and sync complete.");
@@ -245,7 +246,7 @@ module Esper.CalEventView {
     var rootElement = insertEsperRoot();
     /* For each team that uses this calendar */
     Login.myTeams().forEach(function(team) {
-      if (team.team_calendar.google_calendar_id === fullEventId.calendarId) {
+      if (List.mem(team.team_calendars, fullEventId.calendarId)) {
         var rowElements = renderEventControls(team, fullEventId);
         rootElement
           .append(rowElements.th)

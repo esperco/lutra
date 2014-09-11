@@ -37,16 +37,15 @@ module Esper.Sidebar {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
-  <div #teamListCalendar class="esper-click-safe esper-team-list-calendar"/>
   <div #teamListName class="esper-click-safe esper-team-list-name"/>
+  <div #teamListExec class="esper-click-safe esper-team-list-exec"/>
 </li>
 '''
-    var name = team.team_calendar.google_calendar_id;
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    teamListCalendar.text(name);
-    teamListName.text(exec.display_name);
+    teamListName.text(team.team_name);
+    teamListExec.text(exec.display_name);
 
     if (team.teamid === myTeamId) {
       selector.addClass("selected");
@@ -59,7 +58,7 @@ module Esper.Sidebar {
     teamsSection.append(selector);
   }
 
-  function displayDock(rootElement, sidebar, team: ApiT.Team) {
+  function displayDock(rootElement, sidebar, team: ApiT.Team, profiles) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -115,7 +114,7 @@ module Esper.Sidebar {
       sizeIcon.addClass("minimize");
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, currentThreadId);
+        displayTeamSidebar(rootElement, toTeam, currentThreadId, profiles);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -125,7 +124,12 @@ module Esper.Sidebar {
     });
 
 
-    var name = team.team_calendar.google_calendar_id;
+    var name = team.team_name;
+    if (name === null || name === undefined) {
+      var execProf = profiles[team.team_executive];
+      if (execProf !== null && execProf !== undefined)
+        name = execProf.display_name;
+    }
     teamName.text(name);
 
     footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
@@ -281,7 +285,7 @@ module Esper.Sidebar {
     return Deferred.join(profileLists);
   }
 
-  function displayTeamSidebar(rootElement, team, threadId) {
+  function displayTeamSidebar(rootElement, team, threadId, profiles) {
     Log.d("displayTeamSidebar()");
     rootElement.children().remove();
     Api.getLinkedEvents(team.teamid, threadId)
@@ -291,7 +295,7 @@ module Esper.Sidebar {
             displayUpdateDock(rootElement, status_.download_page);
           } else {
             var sidebar = displaySidebar(rootElement, team, linkedEvents);
-            displayDock(rootElement, sidebar, team);
+            displayDock(rootElement, sidebar, team, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
           }
         });
@@ -299,7 +303,7 @@ module Esper.Sidebar {
   }
 
   /* We do something if we detect a new msg ID. */
-  function maybeUpdateView() {
+  function maybeUpdateView(profiles) {
     function retry() {
       Log.d("Trying to display Esper sidebar...");
       var emailData = gmail.get.email_data();
@@ -319,7 +323,7 @@ module Esper.Sidebar {
 
           var firstTeam = Login.myTeams()[0];
           if (firstTeam !== undefined && firstTeam !== null)
-            displayTeamSidebar(rootElement, firstTeam, threadId);
+            displayTeamSidebar(rootElement, firstTeam, threadId, profiles);
           return true;
         }
       }
@@ -330,15 +334,15 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
-  function listen() {
+  function listen(profiles) {
     gmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
-      maybeUpdateView();
+      maybeUpdateView(profiles);
     });
     window.onhashchange = function() {
       Log.d("URL changed");
       currentThreadId = null;
-      maybeUpdateView();
+      maybeUpdateView(profiles);
     };
   }
 
@@ -351,8 +355,8 @@ module Esper.Sidebar {
       getAllProfiles(Login.myTeams()).done(function(profLists) {
         profiles = List.concat(profLists);
         Log.d(profiles);
-        listen();
-        maybeUpdateView();
+        listen(profiles);
+        maybeUpdateView(profiles);
       });
     }
   }

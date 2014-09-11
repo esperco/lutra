@@ -234,9 +234,7 @@ module Esper.CalSearch {
     clearImg.attr("data", Init.esperRootUrl + "img/clear.svg");
     clear.click(function() { resetSearch(_view) });
 
-    var cal = team.team_calendar.google_calendar_id;
-    searchInstructions.text("Start typing above to find upcoming events on " +
-      "calendar " + cal + ".");
+    searchInstructions.text("Start typing above to find upcoming events.");
 
     modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 

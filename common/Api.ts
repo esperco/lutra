@@ -82,22 +82,24 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function syncEvent(teamid, threadId, eventId):
+  export function syncEvent(teamid, threadId, calid, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId
+      + "/" + calid
       + "/" + eventId;
     return JsonHttp.put(url, "");
   }
 
-  export function unsyncEvent(teamid, threadId, eventId):
+  export function unsyncEvent(teamid, threadId, calid, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId
+      + "/" + calid
       + "/" + eventId;
     return JsonHttp.delete_(url);
   }
@@ -131,20 +133,22 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEventDetails(teamid, eventid):
+  export function getEventDetails(teamid, calid, eventid):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/event/details/" + Login.myUid()
       + "/" + teamid
+      + "/" + encodeURIComponent(calid)
       + "/" + encodeURIComponent(eventid);
     return JsonHttp.get(url);
   }
 
-  export function createNewLinkedEvent(teamid, threadId):
+  export function createNewLinkedEvent(teamid, calid, threadId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
       + "/" + teamid
+      + "/" + encodeURIComponent(calid)
       + "/" + threadId;
     return JsonHttp.post(url, "");
   }

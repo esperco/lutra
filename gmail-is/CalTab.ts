@@ -37,7 +37,8 @@ module Esper.CalTab {
         refreshRecentsList(team, threadId, eventsTab, profiles);
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-            Api.syncEvent(team.teamid, threadId, e.google_event_id);
+          Api.syncEvent(team.teamid, threadId,
+                        e.google_cal_id, e.google_event_id);
           });
       });
   }
@@ -309,15 +310,11 @@ module Esper.CalTab {
     return view;
   }
 
-  interface EventId {
-    eventId: string;
-  }
-
   function mergeActiveWithCreated(active: Types.Visited<Types.FullEventId>[],
                                   created: ApiT.CreatedCalendarEvent[]) {
     var createdTimed = List.map(created, function(e) {
       var time = XDate.ofString(e.creation_time).getTime() / 1000;
-      var item = { eventId: e.google_event_id };
+      var item = { calendarId: e.google_cal_id, eventId: e.google_event_id };
       return { id: e.google_event_id, item: item, lastVisited: time };
     });
     return Visited.merge(active, createdTimed, 5);
@@ -349,15 +346,32 @@ module Esper.CalTab {
       return;
     }
     var events = active.calendars;
-    var activeEvents = events[team.team_calendar.google_calendar_id];
-    if (activeEvents === undefined) {
+    var activeEvents = [];
+    Log.d("TEAM:");
+    Log.d(team);
+    List.iter(team.team_calendars, function(calid : string) {
+      Log.d("Checking " + calid);
+      var eventsForCal = events[calid];
+      if (eventsForCal !== undefined) {
+        Log.d("Found!");
+        Log.d(eventsForCal);
+        activeEvents = activeEvents.concat(eventsForCal);
+      }
+    });
+    if (activeEvents === []) {
       renderNone();
       return;
     }
 
     Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
-      var eventsForTeam: Types.Visited<EventId>[] =
+      Log.d("ACTIVE");
+      Log.d(activeEvents);
+      Log.d("CREATED");
+      Log.d(created);
+      var eventsForTeam: Types.Visited<Types.FullEventId>[] =
         mergeActiveWithCreated(activeEvents, created.created_events);
+      Log.d("MERGED");
+      Log.d(eventsForTeam);
 
       var getEventCalls =
         List.filterMap(
@@ -365,7 +379,8 @@ module Esper.CalTab {
           function(e) {
             var item = e.item; // compatibility check
             if (item !== undefined) {
-              return Api.getEventDetails(team.teamid, item.eventId);
+              return Api.getEventDetails(team.teamid, item.calendarId,
+                                         item.eventId);
             } else {
               renderNone();
               return;
@@ -563,18 +578,21 @@ module Esper.CalTab {
     createEvent.click(function() {
       var newTab = window.open("");
       newTab.document.write("Creating new linked event, please wait...");
-      Api.createNewLinkedEvent(team.teamid, threadId).done(function(e) {
-        var eventId = e.google_event_id;
-        if (eventId !== null && eventId !== undefined) {
-          newTab.document.write(" done! Syncing thread to description...");
-          Api.syncEvent(team.teamid, threadId, eventId).done(function() {
-            refreshLinkedList(team, threadId, eventsTab, profiles);
-            var url = e.google_cal_url;
-            if (url !== null && url !== undefined)
-              newTab.location.assign(url);
-          });
-        }
-      });
+      var firstCalendar = team.team_calendars[0];
+      Api.createNewLinkedEvent(team.teamid, firstCalendar, threadId)
+        .done(function(e) {
+          var eventId = e.google_event_id;
+          if (eventId !== null && eventId !== undefined) {
+            newTab.document.write(" done! Syncing thread to description...");
+            Api.syncEvent(team.teamid, threadId, firstCalendar, eventId)
+              .done(function() {
+                refreshLinkedList(team, threadId, eventsTab, profiles);
+                var url = e.google_cal_url;
+                if (url !== null && url !== undefined)
+                  newTab.location.assign(url);
+              });
+          }
+        });
     });
 
     linkEvent.click(function() {
