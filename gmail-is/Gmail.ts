@@ -67,8 +67,10 @@ module Esper.Gmail {
    *  cases. If it's the second case, this returns an empty selection.
    */
   export function mouseoverReplyToolbar(div) {
-    if (div.find(".wG.J-Z-I").length === 0) { // class for non-hover container
-      return div.closest(".eq"); // class for hover container
+    var container = containingTable(div);
+
+    if (div.parent().find("td.ZGHj2e.gU").length === 0) { // container for non-hover buttons
+      return container.find(".eq"); // container for hover container
     } else {
       return $();
     }
