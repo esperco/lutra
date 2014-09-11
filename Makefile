@@ -9,11 +9,17 @@ dev: manifest.json
 	$(MAKE) dev-build
 	$(MAKE) install
 
+
+tikhon: manifest.json
+	$(MAKE) tikhon-build
+	$(MAKE) install
+
 # Make a production build; see full instructions in README.md.
 release:
 	$(MAKE) clean
 	$(MAKE) prod
 	$(MAKE) zip
+
 
 
 prod: manifest.json
@@ -28,6 +34,10 @@ zip:
 	rm -rf esper esper.zip
 	cp -a pub esper
 	zip -r esper esper
+
+tikhon-build:
+	$(MAKE) -C common tikhon-conf
+	$(MAKE) build
 
 dev-build:
 	$(MAKE) -C common dev-conf

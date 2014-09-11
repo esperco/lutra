@@ -24,6 +24,7 @@
 @orange_bg: #f4e3d3;
 @orange_hover: #e87400;
 @purple: #a25cc6;
+@purple_logo: #7D419C;
 @purple_active: #7d3ca0;
 @purple_bg: #FEFBFF;
 @purple_bg_hover: #F5EBF8;
@@ -674,6 +675,29 @@ ul.esper-ev-dropdown {
   color: @gray_30;
 }
 
+/** Composition Toolbar **/
+
+.esper-composition-toolbar {
+  padding : 4px 10px 0px;
+
+  img { /* Esper logo */
+    position : relative;
+    top : 2px;
+  }
+
+  span { /* x linked events */
+    display : inline-block;
+    text-align : center;
+    width : 15em;
+  }
+
+  button { /* insert */
+    color : white;
+    font-weight : bold;
+    background : @purple_logo;
+    border-radius : 4px;
+  }
+}
 
 /** Modals **/
 

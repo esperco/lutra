@@ -64,6 +64,7 @@ APP_SOURCES = \
   ActiveThreads \
   CalSearch \
   CalTab \
+  InsertTime \
   Tab2Content \
   Tab3Content \
   Menu \
