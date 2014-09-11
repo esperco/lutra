@@ -363,7 +363,7 @@ module Esper.CalTab {
         List.filterMap(
           eventsForTeam,
           function(e) {
-          var item = e.item; // compatibility check
+            var item = e.item; // compatibility check
             if (item !== undefined) {
               return Api.getEventDetails(team.teamid, item.eventId);
             } else {
