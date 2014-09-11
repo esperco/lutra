@@ -1,7 +1,7 @@
 module Esper.CalTab {
 
   /** The events currently displayed as "linked" in the sidebar. */
-  export var currentEvents : ApiT.EventWithSyncInfo[]
+  export var currentEvents : ApiT.EventWithSyncInfo[] = []
 
   var currentEventsListeners = []
 
