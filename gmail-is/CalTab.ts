@@ -29,17 +29,15 @@ module Esper.CalTab {
                             profiles, view) {
     Api.linkEventForMe(team.teamid, threadId, e.google_event_id)
       .done(function() {
+        // TODO Report something, handle failure, etc.
+        view.link.hide();
+        view.spinner.hide();
+        view.linked.show();
+        refreshLinkedList(team, threadId, eventsTab, profiles);
+        refreshRecentsList(team, threadId, eventsTab, profiles);
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
             Api.syncEvent(team.teamid, threadId, e.google_event_id)
-              .done(function() {
-                // TODO Report something, handle failure, etc.
-                view.link.hide();
-                view.spinner.hide();
-                view.linked.show();
-                refreshLinkedList(team, threadId, eventsTab, profiles);
-                refreshRecentsList(team, threadId, eventsTab, profiles);
-              });
           });
       });
   }
@@ -311,26 +309,18 @@ module Esper.CalTab {
     return view;
   }
 
-  interface TimedEventId {
+  interface EventId {
     eventId: string;
-    time: number;
   }
 
   function mergeActiveWithCreated(active: Types.Visited<Types.FullEventId>[],
                                   created: ApiT.CreatedCalendarEvent[]) {
-    var activeTimed = List.map(active, function(e) {
-      return { eventId: e.item.eventId, time: e.lastVisited };
-    });
     var createdTimed = List.map(created, function(e) {
       var time = XDate.ofString(e.creation_time).getTime() / 1000;
-      return { eventId: e.google_event_id, time: time };
+      var item = { eventId: e.google_event_id };
+      return { id: e.google_event_id, item: item, lastVisited: time };
     });
-    function cmp(e1: TimedEventId, e2: TimedEventId) {
-      if (e2.time < e1.time) return -1;
-      else if (e2.time > e1.time) return 1;
-      else return 0;
-    }
-    return activeTimed.concat(createdTimed).sort(cmp);
+    return Visited.merge(active, createdTimed, 5);
   }
 
   export function refreshRecentsList(team, threadId, eventsTab, profiles) {
@@ -365,16 +355,16 @@ module Esper.CalTab {
     }
 
     Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
-      var eventsForTeam: TimedEventId[] =
+      var eventsForTeam: Types.Visited<EventId>[] =
         mergeActiveWithCreated(activeEvents, created.created_events);
 
       var getEventCalls =
         List.filterMap(
-          eventsForTeam.slice(0, 5),
+          eventsForTeam,
           function(e) {
-            var eventId = e.eventId;
-            if (eventId !== undefined) {
-              return Api.getEventDetails(team.teamid, eventId);
+          var item = e.item; // compatibility check
+            if (item !== undefined) {
+              return Api.getEventDetails(team.teamid, item.eventId);
             } else {
               renderNone();
               return;

@@ -35,7 +35,7 @@ module Esper.ActiveEvents {
   export function handleNewActiveEvent(x: Types.FullEventId) {
     add({
       lastVisited: Date.now() / 1000,
-      id: x.calendarId + "/" + x.eventId,
+      id: x.eventId,
       item: x
     });
     var esperMessage : Message.Message = {
