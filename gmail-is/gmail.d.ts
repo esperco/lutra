@@ -32,13 +32,14 @@ declare module gmail.get {
     total_emails: number;
     total_threads: string[]; // gmail message IDs
 
-/*  TypeScript has no tuples, screw this.
-
+    /*  TypeScript has no tuples
     people_involved: [
       ["Kartik Talwar", "hi@kartikt.com"],
       ["California", "california@gmail.com"]
     ],
-*/
+    */
+    people_involved: string[][];
+
     subject: string;
 
     /* MESSAGES of the thread, not threads */
