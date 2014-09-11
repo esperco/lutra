@@ -52,6 +52,7 @@ SHARED_SOURCES = \
   ../common/ts/EsperStorage \
   ../common/ts/Message \
   ../common/ts/Login \
+  ../common/ts/Profile \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \
   ../common/ts/Api

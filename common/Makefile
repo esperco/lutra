@@ -16,6 +16,7 @@ SOURCES = \
   Visited \
   EsperStorage \
   Message \
+  Profile \
   Login \
   JsonHttp \
   ApiT \

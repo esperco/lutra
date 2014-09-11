@@ -261,26 +261,6 @@ module Esper.Sidebar {
     rootElement.append(view);
   }
 
-  function getTeamProfiles(team: ApiT.Team): JQueryDeferred<ApiT.Profile[]> {
-    var teamMembers = List.copy(team.team_assistants);
-    teamMembers.push(team.team_executive);
-    var l =
-      List.map(teamMembers, function(uid) {
-        return Api.getProfile(uid, team.teamid);
-      });
-    return Deferred.join(l);
-  }
-
-  function getAllProfiles(teams : ApiT.Team[])
-    : JQueryDeferred<ApiT.Profile[][]>
-  {
-    var profileLists =
-      List.map(teams, function(team) {
-        return getTeamProfiles(team);
-      });
-    return Deferred.join(profileLists);
-  }
-
   function displayTeamSidebar(rootElement, team, threadId) {
     Log.d("displayTeamSidebar()");
     rootElement.children().remove();
@@ -348,7 +328,7 @@ module Esper.Sidebar {
     if (! alreadyInitialized) {
       alreadyInitialized = true;
       Log.d("Sidebar.init()");
-      getAllProfiles(Login.myTeams()).done(function(profLists) {
+      Profile.getAllProfiles(Login.myTeams()).done(function(profLists) {
         profiles = List.concat(profLists);
         Log.d(profiles);
         listen();
