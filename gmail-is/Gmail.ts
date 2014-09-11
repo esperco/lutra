@@ -52,6 +52,13 @@ module Esper.Gmail {
     return div.closest("div.M9");
   }
 
+  /** Returns true if the given div is part of a new compose window
+   *  (as opposed to a reply in a thread).
+   */
+  export function newCompose(div) {
+    return div.closest(".AD").length > 0;
+  }
+
   /** Finds the toolbar with the attach button and friends if it
    *  *isn't* inside the given div. This deals with the fact that
    *  there are at least two GMail UI variants in the wild:
