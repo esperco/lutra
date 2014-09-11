@@ -1,7 +1,7 @@
 /*
   Gmail thread view
 */
-module Esper.MsgView {
+module Esper.Sidebar {
   export var currentThreadId : string;
 
   // Profiles of everyone on all the viewer's teams
@@ -347,7 +347,7 @@ module Esper.MsgView {
   export function init() {
     if (! alreadyInitialized) {
       alreadyInitialized = true;
-      Log.d("MsgView.init()");
+      Log.d("Sidebar.init()");
       getAllProfiles(Login.myTeams()).done(function(profLists) {
         profiles = List.concat(profLists);
         Log.d(profiles);
