@@ -16,6 +16,11 @@ module Esper.InsertTime {
         var containing = Gmail.containingTable(div);
         containing.css("padding-bottom", 30);
 
+        // Fix for overlapping menu; selection will be empty if this
+        // is unnecessary
+        var overlappingSpan = Gmail.mouseoverReplyToolbar(div);
+        overlappingSpan.css("margin-top", 16);
+
         updateEventsLabel(controls);
         CalTab.onEventsChanged(function () {
           updateEventsLabel(controls)
