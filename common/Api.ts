@@ -148,4 +148,13 @@ module Esper.Api {
       + "/" + threadId;
     return JsonHttp.post(url, "");
   }
+
+  export function getRecentlyCreatedEvents(teamid):
+  JQueryDeferred<ApiT.CreatedCalendarEvents> {
+    var url =
+      Conf.Api.url + "/api/calendar/events/" + Login.myUid()
+      + "/" + teamid
+      + "/recently-created";
+    return JsonHttp.get(url);
+  }
 }

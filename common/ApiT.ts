@@ -129,4 +129,12 @@ module Esper.ApiT {
     google_events: googleEvent[];
   }
 
+  export interface CreatedCalendarEvent {
+    google_event_id: string;
+    creation_time: string; /* timestamp */
+  }
+
+  export interface CreatedCalendarEvents {
+    created_events: CreatedCalendarEvent[];
+  }
 }
