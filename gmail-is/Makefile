@@ -62,6 +62,7 @@ SHARED_SOURCES = \
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
   Gmail \
+  Thread \
   ActiveThreads \
   CalSearch \
   CalTab \
