@@ -26,6 +26,12 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  function calIds(teamCalendars: ApiT.Calendar[]): string[] {
+    return List.map(teamCalendars, function(cal) {
+      return cal.google_cal_id;
+    });
+  }
+
   export function getThreadDetails(threadId):
   JQueryDeferred<ApiT.EmailThread> {
     var url =
@@ -43,13 +49,15 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getLinkedEvents(teamid, threadId):
+  export function getLinkedEvents(teamid, threadId,
+                                  teamCalendars: ApiT.Calendar[]):
   JQueryDeferred<ApiT.LinkedCalendarEvents> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId;
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(cals));
   }
 
   export function linkEventForMe(teamid, threadId, eventId):
@@ -82,22 +90,24 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function syncEvent(teamid, threadId, eventId):
+  export function syncEvent(teamid, threadId, calid, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId
+      + "/" + calid
       + "/" + eventId;
     return JsonHttp.put(url, "");
   }
 
-  export function unsyncEvent(teamid, threadId, eventId):
+  export function unsyncEvent(teamid, threadId, calid, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId
+      + "/" + calid
       + "/" + eventId;
     return JsonHttp.delete_(url);
   }
@@ -112,13 +122,14 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function eventSearch(teamid, query):
+  export function eventSearch(teamid, teamCalendars, query):
   JQueryDeferred<ApiT.CalendarEventList> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(query);
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(cals));
   }
 
 
@@ -131,30 +142,35 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEventDetails(teamid, eventid):
+  export function getEventDetails(teamid, calid,
+                                  teamCalendars: ApiT.Calendar[], eventid):
   JQueryDeferred<ApiT.CalendarEvent> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/event/details/" + Login.myUid()
       + "/" + teamid
+      + "/" + encodeURIComponent(calid)
       + "/" + encodeURIComponent(eventid);
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function createNewLinkedEvent(teamid, threadId):
+  export function createNewLinkedEvent(teamid, cal: ApiT.Calendar, threadId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
       + "/" + teamid
+      + "/" + encodeURIComponent(cal.google_cal_id)
       + "/" + threadId;
     return JsonHttp.post(url, "");
   }
 
-  export function getRecentlyCreatedEvents(teamid):
+  export function getRecentlyCreatedEvents(teamid, teamCalendars):
   JQueryDeferred<ApiT.CreatedCalendarEvents> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/events/" + Login.myUid()
       + "/" + teamid
       + "/recently-created";
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(cals));
   }
 }

@@ -22,7 +22,12 @@ module Esper.ApiT {
     team_name: string;
     team_executive: string;
     team_assistants: string[];
-    team_calendar: TeamCalendar;
+    team_calendars: Calendar[];
+  }
+
+  export interface Calendar {
+    google_cal_id: string;
+    calendar_title: string;
   }
 
   export interface Phone {
@@ -130,11 +135,16 @@ module Esper.ApiT {
   }
 
   export interface CreatedCalendarEvent {
+    google_cal_id: string;
     google_event_id: string;
     creation_time: string; /* timestamp */
   }
 
   export interface CreatedCalendarEvents {
     created_events: CreatedCalendarEvent[];
+  }
+
+  export interface TeamCalendars {
+    google_cal_ids: string[];
   }
 }

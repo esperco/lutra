@@ -37,7 +37,8 @@ module Esper.CalTab {
         refreshRecentsList(team, threadId, eventsTab, profiles);
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-            Api.syncEvent(team.teamid, threadId, e.google_event_id);
+          Api.syncEvent(team.teamid, threadId,
+                        e.google_cal_id, e.google_event_id);
           });
       });
   }
@@ -309,15 +310,11 @@ module Esper.CalTab {
     return view;
   }
 
-  interface EventId {
-    eventId: string;
-  }
-
   function mergeActiveWithCreated(active: Types.Visited<Types.FullEventId>[],
                                   created: ApiT.CreatedCalendarEvent[]) {
     var createdTimed = List.map(created, function(e) {
       var time = XDate.ofString(e.creation_time).getTime() / 1000;
-      var item = { eventId: e.google_event_id };
+      var item = { calendarId: e.google_cal_id, eventId: e.google_event_id };
       return { id: e.google_event_id, item: item, lastVisited: time };
     });
     return Visited.merge(active, createdTimed, 5);
@@ -349,44 +346,51 @@ module Esper.CalTab {
       return;
     }
     var events = active.calendars;
-    var activeEvents = events[team.team_calendar.google_calendar_id];
-    if (activeEvents === undefined) {
+    var activeEvents = [];
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var eventsForCal = events[cal.google_cal_id];
+      if (eventsForCal !== undefined)
+        activeEvents = activeEvents.concat(eventsForCal);
+    });
+    if (activeEvents === []) {
       renderNone();
       return;
     }
 
-    Api.getRecentlyCreatedEvents(team.teamid).done(function(created) {
-      var eventsForTeam: Types.Visited<EventId>[] =
-        mergeActiveWithCreated(activeEvents, created.created_events);
+    Api.getRecentlyCreatedEvents(team.teamid, team.team_calendars)
+      .done(function(created) {
+        var eventsForTeam: Types.Visited<Types.FullEventId>[] =
+          mergeActiveWithCreated(activeEvents, created.created_events);
 
-      var getEventCalls =
-        List.filterMap(
-          eventsForTeam,
-          function(e) {
-            var item = e.item; // compatibility check
-            if (item !== undefined) {
-              return Api.getEventDetails(team.teamid, item.eventId);
-            } else {
-              renderNone();
-              return;
-            }
-        });
+        var getEventCalls =
+          List.filterMap(
+            eventsForTeam,
+            function(e) {
+              var item = e.item; // compatibility check
+              if (item !== undefined) {
+                return Api.getEventDetails(team.teamid, item.calendarId,
+                                           team.team_calendars, item.eventId);
+              } else {
+                renderNone();
+                return;
+              }
+          });
 
-      Promise.join(getEventCalls).done(function(activeEvents) {
-        var i = 0;
-        var last = false;
-        var recent = true;
-        activeEvents.forEach(function(e: ApiT.CalendarEvent) {
-          if (i === activeEvents.length - 1)
-            last = true;
-          eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                        threadId, eventsTab, profiles));
-          i++;
-        });
+        Promise.join(getEventCalls).done(function(activeEvents) {
+          var i = 0;
+          var last = false;
+          var recent = true;
+          activeEvents.forEach(function(e: ApiT.CalendarEvent) {
+            if (i === activeEvents.length - 1)
+              last = true;
+            eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
+                                          threadId, eventsTab, profiles));
+            i++;
+          });
+        eventsTab.recentsList.append(eventsList);
+        eventsTab.recentsSpinner.hide();
+        eventsTab.refreshRecents.removeClass("disabled");
       });
-      eventsTab.recentsList.append(eventsList);
-      eventsTab.recentsSpinner.hide();
-      eventsTab.refreshRecents.removeClass("disabled");
     });
   }
 
@@ -400,7 +404,7 @@ module Esper.CalTab {
     eventsTab.refreshLinked.addClass("disabled");
     eventsTab.linkedList.children().remove();
     eventsTab.linkedSpinner.show();
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         updateEvents(linkedEvents.linked_events);
 
@@ -425,7 +429,7 @@ module Esper.CalTab {
 
   /* Refresh only linked events, fetching linked events from the server. */
   export function refreshLinkedList(team, threadId, eventsTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
       });
@@ -433,7 +437,7 @@ module Esper.CalTab {
 
   /* Refresh only recent events, fetching linked events from the server. */
   export function refreshRecentsList(team, threadId, eventsTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
       });
@@ -442,7 +446,7 @@ module Esper.CalTab {
   /* Refresh linked events and recent events, fetching linked events from
      the server. */
   export function refreshEventLists(team, threadId, eventsTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
         displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
@@ -563,18 +567,21 @@ module Esper.CalTab {
     createEvent.click(function() {
       var newTab = window.open("");
       newTab.document.write("Creating new linked event, please wait...");
-      Api.createNewLinkedEvent(team.teamid, threadId).done(function(e) {
-        var eventId = e.google_event_id;
-        if (eventId !== null && eventId !== undefined) {
-          newTab.document.write(" done! Syncing thread to description...");
-          Api.syncEvent(team.teamid, threadId, eventId).done(function() {
-            refreshLinkedList(team, threadId, eventsTab, profiles);
-            var url = e.google_cal_url;
-            if (url !== null && url !== undefined)
-              newTab.location.assign(url);
-          });
-        }
-      });
+      var firstCalendar = team.team_calendars[0];
+      Api.createNewLinkedEvent(team.teamid, firstCalendar, threadId)
+        .done(function(e) {
+          var eventId = e.google_event_id;
+          if (eventId !== null && eventId !== undefined) {
+            newTab.document.write(" done! Syncing thread to description...");
+            Api.syncEvent(team.teamid, threadId, firstCalendar, eventId)
+              .done(function() {
+                refreshLinkedList(team, threadId, eventsTab, profiles);
+                var url = e.google_cal_url;
+                if (url !== null && url !== undefined)
+                  newTab.location.assign(url);
+              });
+          }
+        });
     });
 
     linkEvent.click(function() {
