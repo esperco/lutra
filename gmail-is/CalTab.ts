@@ -347,8 +347,8 @@ module Esper.CalTab {
     }
     var events = active.calendars;
     var activeEvents = [];
-    List.iter(team.team_calendars, function(calid : string) {
-      var eventsForCal = events[calid];
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var eventsForCal = events[cal.google_cal_id];
       if (eventsForCal !== undefined)
         activeEvents = activeEvents.concat(eventsForCal);
     });

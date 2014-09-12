@@ -26,6 +26,12 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  function calIds(teamCalendars: ApiT.Calendar[]): string[] {
+    return List.map(teamCalendars, function(cal) {
+      return cal.google_cal_id;
+    });
+  }
+
   export function getThreadDetails(threadId):
   JQueryDeferred<ApiT.EmailThread> {
     var url =
@@ -43,9 +49,10 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getLinkedEvents(teamid, threadId, teamCalendars):
+  export function getLinkedEvents(teamid, threadId,
+                                  teamCalendars: ApiT.Calendar[]):
   JQueryDeferred<ApiT.LinkedCalendarEvents> {
-    var cals = { google_cal_ids: teamCalendars };
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
@@ -117,7 +124,7 @@ module Esper.Api {
 
   export function eventSearch(teamid, teamCalendars, query):
   JQueryDeferred<ApiT.CalendarEventList> {
-    var cals = { google_cal_ids: teamCalendars };
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
@@ -135,9 +142,10 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEventDetails(teamid, calid, teamCalendars, eventid):
+  export function getEventDetails(teamid, calid,
+                                  teamCalendars: ApiT.Calendar[], eventid):
   JQueryDeferred<ApiT.CalendarEvent> {
-    var cals = { google_cal_ids: teamCalendars };
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/event/details/" + Login.myUid()
       + "/" + teamid
@@ -146,19 +154,19 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function createNewLinkedEvent(teamid, calid, threadId):
+  export function createNewLinkedEvent(teamid, cal: ApiT.Calendar, threadId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
       + "/" + teamid
-      + "/" + encodeURIComponent(calid)
+      + "/" + encodeURIComponent(cal.google_cal_id)
       + "/" + threadId;
     return JsonHttp.post(url, "");
   }
 
   export function getRecentlyCreatedEvents(teamid, teamCalendars):
   JQueryDeferred<ApiT.CreatedCalendarEvents> {
-    var cals = { google_cal_ids: teamCalendars };
+    var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/events/" + Login.myUid()
       + "/" + teamid

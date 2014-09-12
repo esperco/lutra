@@ -22,7 +22,12 @@ module Esper.ApiT {
     team_name: string;
     team_executive: string;
     team_assistants: string[];
-    team_calendars: string[];
+    team_calendars: Calendar[];
+  }
+
+  export interface Calendar {
+    google_cal_id: string;
+    calendar_title: string;
   }
 
   export interface Phone {

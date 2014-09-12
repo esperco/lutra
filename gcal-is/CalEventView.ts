@@ -39,7 +39,7 @@ module Esper.CalEventView {
   }
 
   function renderLinkedThread(
-    team,
+    team : ApiT.Team,
     thread: ApiT.EmailThread,
     fullEventId: Types.FullEventId
   ): JQuery {
@@ -250,7 +250,10 @@ module Esper.CalEventView {
     var rootElement = insertEsperRoot();
     /* For each team that uses this calendar */
     Login.myTeams().forEach(function(team) {
-      if (List.mem(team.team_calendars, fullEventId.calendarId)) {
+      var teamCalendars = List.map(team.team_calendars, function(cal) {
+        return cal.google_cal_id;
+      });
+      if (List.mem(teamCalendars, fullEventId.calendarId)) {
         var rowElements = renderEventControls(team, fullEventId);
         rootElement
           .append(rowElements.th)
