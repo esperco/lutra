@@ -99,6 +99,10 @@ module Esper.Gcal {
       else {
         var domain = ar[1];
         switch (ar[1]) {
+        case "g":
+          /* "r4g8agd0umm5te8h8ftmn605v0@group.calendar.google.com" */
+          domain = "group.calendar.google.com";
+          break;
         case "m":
           /* "mjambon@gmail.com" */
           domain = "gmail.com";
