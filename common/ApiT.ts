@@ -138,4 +138,8 @@ module Esper.ApiT {
   export interface CreatedCalendarEvents {
     created_events: CreatedCalendarEvent[];
   }
+
+  export interface TeamCalendars {
+    google_cal_ids: string[];
+  }
 }

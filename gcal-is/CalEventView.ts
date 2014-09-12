@@ -39,7 +39,7 @@ module Esper.CalEventView {
   }
 
   function renderLinkedThread(
-    teamid,
+    team,
     thread: ApiT.EmailThread,
     fullEventId: Types.FullEventId
   ): JQuery {
@@ -61,13 +61,15 @@ module Esper.CalEventView {
     subject.text(thread.subject);
     snippet.html(thread.snippet);
 
+    var teamid = team.teamid;
     var threadId = thread.gmail_thrid;
     var eventId = fullEventId.eventId;
     unlinkButton.click(function() {
       Api.unlinkEvent(teamid, threadId, eventId)
         .done(function() {
           view.remove();
-          Api.getEventDetails(teamid, fullEventId.calendarId, eventId)
+          Api.getEventDetails(teamid, fullEventId.calendarId,
+                              team.team_calendars, eventId)
             .done(function(event) {
               mergeDescription(event);
               Log.d("Updated description textarea.");
@@ -130,7 +132,7 @@ module Esper.CalEventView {
   }
 
   function renderActiveThread(
-    teamid,
+    team,
     thread: Types.GmailThread,
     fullEventId: Types.FullEventId
   ): JQuery {
@@ -151,6 +153,7 @@ module Esper.CalEventView {
     linkButton.attr("src", Init.esperRootUrl + "img/unlinked.png");
     subject.text(thread.subject);
 
+    var teamid = team.teamid;
     var threadId = thread.threadId;
     var calendarId = fullEventId.calendarId;
     var eventId = fullEventId.eventId;
@@ -163,7 +166,8 @@ module Esper.CalEventView {
               Api.syncEvent(teamid, threadId, calendarId, eventId)
                 .done(function() {
                   updateView(fullEventId);
-                  Api.getEventDetails(teamid, calendarId, eventId)
+                  Api.getEventDetails(teamid, calendarId,
+                                      team.team_calendars, eventId)
                     .done(function(event) {
                       mergeDescription(event);
                       Log.d("Link and sync complete.");
@@ -207,7 +211,7 @@ module Esper.CalEventView {
           })
         ).done(function(threads) {
           List.iter(threads, function(thread) {
-            var threadView = renderLinkedThread(teamid, thread, fullEventId);
+            var threadView = renderLinkedThread(team, thread, fullEventId);
             linked.append(threadView);
           });
 
@@ -223,7 +227,7 @@ module Esper.CalEventView {
                     return thread.threadId === thrid;
                   })) {
                     var threadView =
-                      renderActiveThread(teamid, thread, fullEventId);
+                      renderActiveThread(team, thread, fullEventId);
                     linkable.append(threadView);
                   }
                 }

@@ -155,7 +155,8 @@ module Esper.CalSearch {
           }
         })
       }
-      Api.eventSearch(team.teamid, searchView.searchbox.val())
+      Api.eventSearch(team.teamid, team.team_calendars,
+                      searchView.searchbox.val())
         .done(function(results) {
           displayLinkableEvents(events, results.events, team,
                                 searchView, eventsTab, profiles);
@@ -220,7 +221,7 @@ module Esper.CalSearch {
 
     title.text("Link to existing event");
 
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         setupSearch(linkedEvents.linked_events, team,
                     searchView, eventsTab, profiles);

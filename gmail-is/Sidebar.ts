@@ -288,7 +288,7 @@ module Esper.Sidebar {
   function displayTeamSidebar(rootElement, team, threadId, profiles) {
     Log.d("displayTeamSidebar()");
     rootElement.children().remove();
-    Api.getLinkedEvents(team.teamid, threadId)
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         Api.checkVersion().done(function(status_) {
           if (status_.must_upgrade === true) {

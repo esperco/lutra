@@ -43,13 +43,13 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getLinkedEvents(teamid, threadId):
+  export function getLinkedEvents(teamid, threadId, teamCalendars):
   JQueryDeferred<ApiT.LinkedCalendarEvents> {
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId;
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(teamCalendars));
   }
 
   export function linkEventForMe(teamid, threadId, eventId):
@@ -114,13 +114,13 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function eventSearch(teamid, query):
+  export function eventSearch(teamid, teamCalendars, query):
   JQueryDeferred<ApiT.CalendarEventList> {
     var url =
       Conf.Api.url + "/api/calendar/search/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(query);
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(teamCalendars));
   }
 
 
@@ -133,14 +133,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEventDetails(teamid, calid, eventid):
+  export function getEventDetails(teamid, calid, teamCalendars, eventid):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/event/details/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(calid)
       + "/" + encodeURIComponent(eventid);
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(teamCalendars));
   }
 
   export function createNewLinkedEvent(teamid, calid, threadId):
@@ -153,12 +153,12 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-  export function getRecentlyCreatedEvents(teamid):
+  export function getRecentlyCreatedEvents(teamid, teamCalendars):
   JQueryDeferred<ApiT.CreatedCalendarEvents> {
     var url =
       Conf.Api.url + "/api/calendar/events/" + Login.myUid()
       + "/" + teamid
       + "/recently-created";
-    return JsonHttp.get(url);
+    return JsonHttp.post(url, JSON.stringify(teamCalendars));
   }
 }
