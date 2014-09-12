@@ -3,8 +3,7 @@
 */
 module Esper.Thread {
 
-  function makeEmailTeamTable(teams: ApiT.Team[],
-                              thread: gmail.get.Thread):
+  function makeEmailTeamTable(teams: ApiT.Team[]):
   JQueryPromise<{ [email: string]: ApiT.Team }> {
 
     var tbl: { [email: string]: ApiT.Team } = {};
@@ -33,21 +32,23 @@ module Esper.Thread {
   }
 
   function findTeamInThread(thread: gmail.get.Thread,
-                            tbl: { [email: string]: ApiT.Team }) {
-    var email;
+                            tbl: { [email: string]: ApiT.Team }):
+  ApiT.Team {
+    var team;
     var nameEmail =
       List.find(thread.people_involved, function(nameEmail: string[]) {
-        email = nameEmail[1];
-        return email !== undefined;
+        var email = nameEmail[1];
+        team = tbl[email];
+        return team !== undefined;
       });
-    return email;
+    return team;
   }
 
   export function detectTeam(teams: ApiT.Team[],
                              thread: gmail.get.Thread):
   JQueryPromise<ApiT.Team> {
 
-    return makeEmailTeamTable(teams, thread)
+    return makeEmailTeamTable(teams)
       .then(function(tbl) {
         return findTeamInThread(thread, tbl);
       });
