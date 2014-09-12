@@ -58,7 +58,8 @@ module Esper.Sidebar {
     teamsSection.append(selector);
   }
 
-  function displayDock(rootElement, sidebar, team: ApiT.Team, profiles) {
+  function displayDock(rootElement, sidebar,
+                       team: ApiT.Team, isCorrectTeam: boolean, profiles) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -114,7 +115,7 @@ module Esper.Sidebar {
       sizeIcon.addClass("minimize");
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, currentThreadId, profiles);
+        displayTeamSidebar(rootElement, toTeam, true, currentThreadId, profiles);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -131,6 +132,10 @@ module Esper.Sidebar {
         name = execProf.display_name;
     }
     teamName.text(name);
+    if (isCorrectTeam)
+      teamName.removeClass("esper-team-name-danger");
+    else
+      teamName.addClass("esper-team-name-danger");
 
     footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
@@ -265,27 +270,31 @@ module Esper.Sidebar {
     rootElement.append(view);
   }
 
-  function getTeamProfiles(team: ApiT.Team): JQueryDeferred<ApiT.Profile[]> {
+  function getTeamProfiles(team: ApiT.Team): JQueryPromise<ApiT.Profile[]> {
     var teamMembers = List.copy(team.team_assistants);
     teamMembers.push(team.team_executive);
     var l =
       List.map(teamMembers, function(uid) {
         return Api.getProfile(uid, team.teamid);
       });
-    return Deferred.join(l);
+    return Promise.join(l);
   }
 
   function getAllProfiles(teams : ApiT.Team[])
-    : JQueryDeferred<ApiT.Profile[][]>
+    : JQueryPromise<ApiT.Profile[][]>
   {
     var profileLists =
       List.map(teams, function(team) {
         return getTeamProfiles(team);
       });
-    return Deferred.join(profileLists);
+    return Promise.join(profileLists);
   }
 
-  function displayTeamSidebar(rootElement, team, threadId, profiles) {
+  function displayTeamSidebar(rootElement,
+                              team: ApiT.Team,
+                              isCorrectTeam: boolean,
+                              threadId,
+                              profiles) {
     Log.d("displayTeamSidebar()");
     rootElement.children().remove();
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
@@ -295,7 +304,7 @@ module Esper.Sidebar {
             displayUpdateDock(rootElement, status_.download_page);
           } else {
             var sidebar = displaySidebar(rootElement, team, linkedEvents);
-            displayDock(rootElement, sidebar, team, profiles);
+            displayDock(rootElement, sidebar, team, isCorrectTeam, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
           }
         });
@@ -321,9 +330,26 @@ module Esper.Sidebar {
           Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
           ActiveThreads.handleNewActiveThread(threadId, subject);
 
-          var firstTeam = Login.myTeams()[0];
-          if (firstTeam !== undefined && firstTeam !== null)
-            displayTeamSidebar(rootElement, firstTeam, threadId, profiles);
+          var teams = Login.myTeams();
+          Thread.detectTeam(teams, emailData)
+            .done(function(team) {
+              Log.d("Detected team:", team);
+
+              if (team === undefined && teams.length === 1) {
+                Log.w("Team not detected, using one and only team.");
+                team = teams[0];
+              }
+
+              var correctTeam = team !== undefined;
+
+              if (!correctTeam && teams.length >= 1) {
+                Log.w("Team not detected, defaulting to arbitrary team.");
+                team = teams[0];
+              }
+
+              if (team !== undefined)
+                displayTeamSidebar(rootElement, team, correctTeam, threadId, profiles);
+            });
           return true;
         }
       }
@@ -352,7 +378,7 @@ module Esper.Sidebar {
     if (! alreadyInitialized) {
       alreadyInitialized = true;
       Log.d("Sidebar.init()");
-      getAllProfiles(Login.myTeams()).done(function(profLists) {
+      Profile.getAllProfiles(Login.myTeams()).done(function(profLists) {
         profiles = List.concat(profLists);
         Log.d(profiles);
         listen(profiles);

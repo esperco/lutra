@@ -376,7 +376,7 @@ module Esper.CalTab {
               }
           });
 
-        Deferred.join(getEventCalls).done(function(activeEvents) {
+        Promise.join(getEventCalls).done(function(activeEvents) {
           var i = 0;
           var last = false;
           var recent = true;
@@ -387,11 +387,11 @@ module Esper.CalTab {
                                           threadId, eventsTab, profiles));
             i++;
           });
-        });
         eventsTab.recentsList.append(eventsList);
         eventsTab.recentsSpinner.hide();
         eventsTab.refreshRecents.removeClass("disabled");
       });
+    });
   }
 
   /* reuse the view created for the team, update list of linked events */

@@ -30,7 +30,7 @@ module Esper.Gmail {
       return anchor;
     }
   }
-  
+
   /** Returns the tbody that contains the composition toolbar. This is
    *  the bar with the send button, the attachment tool and so
    *  on. Since there can be any number of these on the page at a
@@ -50,6 +50,13 @@ module Esper.Gmail {
   /** Given a div, returns the top-level table for that message in the thread. */
   export function containingTable(div) {
     return div.closest("div.M9");
+  }
+
+  /** Returns true if the given div is part of a new compose window
+   *  (as opposed to a reply in a thread).
+   */
+  export function newCompose(div) {
+    return div.closest(".AD").length > 0;
   }
 
   /** Finds the toolbar with the attach button and friends if it

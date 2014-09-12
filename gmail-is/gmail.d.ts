@@ -5,8 +5,7 @@
 
 declare module gmail.get {
 
-  /* yeah it's a message, not a thread. */
-  export interface Thread {
+  export interface Message {
     reply_to_id: string;
     is_deleted: boolean;
     from: string; // name
@@ -21,7 +20,7 @@ declare module gmail.get {
     content_html: string;
   }
 
-  export interface EmailData {
+  export interface Thread {
     first_email: string;
       /* gmail thread ID (hex-encoded).
          This is the gmail message ID of the root message of the thread,
@@ -33,15 +32,18 @@ declare module gmail.get {
     total_emails: number;
     total_threads: string[]; // gmail message IDs
 
-/*  TypeScript has no tuples, screw this.
-
+    /*  TypeScript has no tuples
     people_involved: [
       ["Kartik Talwar", "hi@kartikt.com"],
       ["California", "california@gmail.com"]
     ],
-*/
+    */
+    people_involved: string[][];
+
     subject: string;
-    threads: { [threadId: string]: Thread }
+
+    /* MESSAGES of the thread, not threads */
+    threads: { [threadId: string]: Message }
   }
 
   export function user_email(): string;
@@ -49,7 +51,7 @@ declare module gmail.get {
   export function email_subject(): string;
   export function email_id(): string;
   export function email_ids(): string[];
-  export function email_data(): EmailData;
+  export function email_data(): Thread;
 }
 
 
