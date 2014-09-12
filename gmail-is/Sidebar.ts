@@ -125,7 +125,6 @@ module Esper.Sidebar {
       displayTeamSelector(teamsSection, team.teamid, otherTeam, onTeamSwitch);
     });
 
-
     var name = team.team_calendar.google_calendar_id;
     teamName.text(name);
     if (isCorrectTeam)
@@ -157,10 +156,10 @@ module Esper.Sidebar {
         options.tooltip("enable");
       } else {
         dismissDropdowns();
-        dropdown.toggle();
         options
           .addClass("open")
           .tooltip("disable");
+        dropdown.show();
       }
     }
 
