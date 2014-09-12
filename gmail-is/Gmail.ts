@@ -30,7 +30,7 @@ module Esper.Gmail {
       return anchor;
     }
   }
-  
+
   /** Returns the tbody that contains the composition toolbar. This is
    *  the bar with the send button, the attachment tool and so
    *  on. Since there can be any number of these on the page at a

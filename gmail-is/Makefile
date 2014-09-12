@@ -44,7 +44,7 @@ SHARED_SOURCES = \
   ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
-  ../common/ts/Deferred \
+  ../common/ts/Promise \
   ../common/ts/XDate \
   ../common/ts/Log \
   ../common/ts/LRU \
@@ -52,6 +52,7 @@ SHARED_SOURCES = \
   ../common/ts/EsperStorage \
   ../common/ts/Message \
   ../common/ts/Login \
+  ../common/ts/Profile \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \
   ../common/ts/Api
@@ -61,6 +62,7 @@ SHARED_SOURCES = \
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
   Gmail \
+  Thread \
   ActiveThreads \
   CalSearch \
   CalTab \

@@ -372,7 +372,7 @@ module Esper.CalTab {
             }
         });
 
-      Deferred.join(getEventCalls).done(function(activeEvents) {
+      Promise.join(getEventCalls).done(function(activeEvents) {
         var i = 0;
         var last = false;
         var recent = true;
