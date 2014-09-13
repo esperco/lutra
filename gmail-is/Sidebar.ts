@@ -297,18 +297,18 @@ module Esper.Sidebar {
                               profiles) {
     Log.d("displayTeamSidebar()");
     rootElement.children().remove();
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        Api.checkVersion().done(function(status_) {
-          if (status_.must_upgrade === true) {
-            displayUpdateDock(rootElement, status_.download_page);
-          } else {
+    Api.checkVersion().done(function(status_) {
+      if (status_.must_upgrade === true) {
+        displayUpdateDock(rootElement, status_.download_page);
+      } else {
+        Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+          .done(function(linkedEvents) {
             var sidebar = displaySidebar(rootElement, team, linkedEvents);
             displayDock(rootElement, sidebar, team, isCorrectTeam, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
-          }
         });
-      });
+      }
+    });
   }
 
   /* We do something if we detect a new msg ID. */
