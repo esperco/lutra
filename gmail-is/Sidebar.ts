@@ -161,10 +161,10 @@ module Esper.Sidebar {
         options.tooltip("enable");
       } else {
         dismissDropdowns();
-        dropdown.toggle();
         options
           .addClass("open")
           .tooltip("disable");
+        dropdown.show();
       }
     }
 
