@@ -39,11 +39,26 @@ module Esper.InsertTime {
             var end   = new Date(events[i].event.end.local);
             var range = XDate.rangeWithoutYear(start, end);
 
-            textField.html(textField.html() + "<br />" + XDate.weekDay(start) + ", " + range + "<br />");
+            if (Gmail.caretInField(textField)) {
+              insertAtCaret(XDate.weekDay(start) + ", " + range + "\n");
+            }
           }
         });
       }
     });
+  }
+
+  /** Inserts the given HTML string at the caret of a contenteditable
+   * element.
+   */
+  function insertAtCaret(text) {
+    var selection = window.getSelection();
+    var range     = selection.getRangeAt(0);
+    
+    range.deleteContents();
+
+    var node = document.createTextNode(text);
+    range.insertNode(node);
   }
 
   function updateEventsLabel(controls) {
