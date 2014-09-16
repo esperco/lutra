@@ -173,4 +173,11 @@ module Esper.Api {
       + "/recently-created";
     return JsonHttp.post(url, JSON.stringify(cals));
   }
+
+  export function postCalendarShow(teamCalendars):
+  JQueryDeferred<void> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
+    var url = Conf.Api.url + "/api/calendar/show/" + Login.myUid();
+    return JsonHttp.post(url, JSON.stringify(cals));
+  }
 }
