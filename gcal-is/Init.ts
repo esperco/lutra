@@ -42,7 +42,7 @@ module Esper.Init {
     $("#esper-team-selector").remove();
   }
 
-  function insertTeamSelector(teams) {
+  function insertTeamSelector(teams : ApiT.Team[]) {
     removeTeamSelector();
     var anchor = Gcal.findAnchorForTeamSelector();
     var selDiv = $("<div id='esper-team-selector'/>");
