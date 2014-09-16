@@ -47,7 +47,7 @@ module Esper.Init {
     var anchor = Gcal.findAnchorForTeamSelector();
     var selDiv = $("<div id='esper-team-selector'/>");
     var selector = $("<select>");
-    selector.append($("<option value='0'>Select Esper team...</option>"));
+    selector.append($("<option value='-1'>Select Esper team...</option>"));
     for (var i = 0; i < teams.length; i++) {
       var team : ApiT.Team = teams[i];
       var option =
