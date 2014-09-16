@@ -55,7 +55,7 @@ module Esper.Init {
     }
     selector.change(function() {
       var i = $(this).val();
-      if (i === -1) return;
+      if (i < 0) return;
       var calendars = teams[i].team_calendars;
       Api.postCalendarShow(calendars).done(function() {
         window.location.reload();
