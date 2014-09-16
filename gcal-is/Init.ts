@@ -38,12 +38,40 @@ module Esper.Init {
     }
   }
 
+  function removeTeamSelector() {
+    $("#esper-team-selector").remove();
+  }
+
+  function insertTeamSelector(teams : ApiT.Team[]) {
+    removeTeamSelector();
+    var anchor = Gcal.findAnchorForTeamSelector();
+    var selDiv = $("<div id='esper-team-selector'/>");
+    var selector = $("<select>");
+    selector.append($("<option value='-1'>Select Esper team...</option>"));
+    for (var i = 0; i < teams.length; i++) {
+      var option =
+        $("<option value='" + i + "'>" + teams[i].team_name + "</option>");
+      selector.append(option);
+    }
+    selector.change(function() {
+      var i = $(this).val();
+      if (i < 0) return;
+      var calendars = teams[i].team_calendars;
+      Api.postCalendarShow(calendars).done(function() {
+        window.location.reload();
+      });
+    });
+    selDiv.append(selector);
+    selDiv.insertAfter(anchor);
+  }
+
   function injectEsperControls() {
     Login.printStatus();
     if (Login.loggedIn()) {
       Api.getLoginInfo()
         .done(function(loginInfo) {
           Login.info = loginInfo;
+          insertTeamSelector(loginInfo.teams);
           CalEventView.init();
         });
     }
