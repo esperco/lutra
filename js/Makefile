@@ -60,6 +60,9 @@ APP_SOURCES = \
   route.js \
   main.js
 
+TS_LIBS = \
+  jquery.d
+
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
@@ -76,7 +79,9 @@ EXECUTIVE_TS_OBLIVION = \
   $(addprefix ts/,$(notdir $(EXECUTIVE_TS_SRC)))
 
 # Input to tsc
-EXECUTIVE_TS = $(EXECUTIVE_TS_OBLIVION)
+EXECUTIVE_TS = \
+  $(EXECUTIVE_TS_OBLIVION) \
+  $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS)))
 
 # These don't get minified
 PROD_FLAGS = prod_flags.js

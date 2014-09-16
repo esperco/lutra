@@ -1,4 +1,10 @@
 module Esper.ExecutivePreferences {
+
+  $(function () {
+    var example = form("Example");
+    $("#categories").append(example.container);
+  });
+  
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -9,7 +15,7 @@ module Esper.ExecutivePreferences {
    *  The given title will be used for the form's header. The icon,
    *  if passed in, will go at the top.
    */
-  export function form(title) {
+  export function form(title, icon) {
 '''
 <li #container>
   <h1 #header>  </h1>
