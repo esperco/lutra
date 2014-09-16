@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="google-site-verification" content="xfwpmNt2I3wd1UzPCkvTnfjmJyuyjiKBFA-9WGTHqXQ" />
 
-    <link rel="stylesheet" href="/assets/css/app.css" media="screen" />
+    <link rel="stylesheet" href="file:///home/tikhon/Documents/work/esper/otter/pub/css/app.css" media="screen" />
+    <link rel="stylesheet" href="file:///home/tikhon/Documents/work/esper/otter/pub/css/executive-preferences.css" media="screen" />
   </head>
   <body>
     <ul class="preference-categories">
@@ -17,24 +18,162 @@
       <li class="calls">
         <ul class="preference-options">
           <li class="phone">
-            <img src="/assets/img/phone.svg" alt="" />
+            <img src="file:///home/tikhon/Documents/work/esper/otter/pub/img/phone-placeholder.png" alt="" />
             <h1> Phone Call </h1>
-            <div class="toggle"></div>
-            <label>
-              Duration:
-              <select class="durations">
-                <option value="0:30">0:30</option>
-                <option value="1:00">1:00</option>
-                <option value="1:30">1:30</option>
-              </select>
-            </label>
+            <div class="toggle">
+              <div class="toggle-button off">No</div>
+              <div class="toggle-button on">Yes</div>
+            </div>
+            <div class="durations">
+              <label>
+                Preferred duration
+                <select>
+                  <option value="any" selected>any</option>
+                  <option value="0:10">0:10</option>
+                  <option value="0:20">0:20</option>
+                  <option value="0:30">0:30</option>
+                  <option value="0:40">0:40</option>
+                  <option value="1:00">1:00</option>
+                  <option value="1:30">1:30</option>
+                  <option value="2:00">2:00</option>
+                  <option value="2:30">2:30</option>
+                </select>
+              </label>
+            </div>
+            <div class="customize-availability">
+              <a href="#">Customize availability</a>
+            </div>
+            <hr />
+            <select class="phone-type">
+              <option value="mobile" selected>mobile</option>
+              <option value="work">work</option>
+              <option value="home">home</option>
+              <option value="other">other</option>
+            </select>
+            <input type="text" class="phone-number" />
+            <br />
+            <a href="#">Add another phone number</a>
           </li>
           <li class="video">
-            
+            <img src="file:///home/tikhon/Documents/work/esper/otter/pub/img/video-placeholder.png" alt="" />
+            <h1> Video Call </h1>
+            <div class="toggle">
+              <div class="toggle-button off">No</div>
+              <div class="toggle-button on">Yes</div>
+            </div>
+            <div class="durations">
+              <label>
+                Preferred duration
+                <select>
+                  <option value="any" selected>any</option>
+                  <option value="0:10">0:10</option>
+                  <option value="0:20">0:20</option>
+                  <option value="0:30">0:30</option>
+                  <option value="0:40">0:40</option>
+                  <option value="1:00">1:00</option>
+                  <option value="1:30">1:30</option>
+                  <option value="2:00">2:00</option>
+                  <option value="2:30">2:30</option>
+                </select>
+              </label>
+            </div>
+            <div class="customize-availability">
+              <a href="#">Customize availability</a>
+            </div>
+            <hr />
+            <select class="phone-type">
+              <option value="mobile" selected>mobile</option>
+              <option value="work">work</option>
+              <option value="home">home</option>
+              <option value="other">other</option>
+            </select>
+            <input type="text" class="phone-number" />
+            <br />
+            <a href="#">Add another phone number</a>
           </li>
         </ul>
       </li>
       <li class="meals">
+        <ul class="preference-options">
+          <li class="breakfast">
+            <h1> Breakfast </h1>
+            <div class="toggle">
+              <div class="toggle-button off">No</div>
+              <div class="toggle-button on">Yes</div>
+            </div>
+            <div class="durations">
+              <label>
+                Preferred duration
+                <select>
+                  <option value="any" selected>any</option>
+                  <option value="0:10">0:10</option>
+                  <option value="0:20">0:20</option>
+                  <option value="0:30">0:30</option>
+                  <option value="0:40">0:40</option>
+                  <option value="1:00">1:00</option>
+                  <option value="1:30">1:30</option>
+                  <option value="2:00">2:00</option>
+                  <option value="2:30">2:30</option>
+                </select>
+              </label>
+            </div>
+            <div class="customize-availability">
+              <a href="#">Customize availability</a>
+            </div>
+          </li>
+          <li class="Lunch">
+            <h1> Lunch </h1>
+            <div class="toggle">
+              <div class="toggle-button off">No</div>
+              <div class="toggle-button on">Yes</div>
+            </div>
+            <div class="durations">
+              <label>
+                Preferred duration
+                <select>
+                  <option value="any" selected>any</option>
+                  <option value="0:10">0:10</option>
+                  <option value="0:20">0:20</option>
+                  <option value="0:30">0:30</option>
+                  <option value="0:40">0:40</option>
+                  <option value="1:00">1:00</option>
+                  <option value="1:30">1:30</option>
+                  <option value="2:00">2:00</option>
+                  <option value="2:30">2:30</option>
+                </select>
+              </label>
+            </div>
+            <div class="customize-availability">
+              <a href="#">Customize availability</a>
+            </div>
+          </li>
+          <li class="Dinner">
+            <h1> Dinner </h1>
+            <div class="toggle">
+              <div class="toggle-button off">No</div>
+              <div class="toggle-button on">Yes</div>
+            </div>
+            <div class="durations">
+              <label>
+                Preferred duration
+                <select>
+                  <option value="any" selected>any</option>
+                  <option value="0:10">0:10</option>
+                  <option value="0:20">0:20</option>
+                  <option value="0:30">0:30</option>
+                  <option value="0:40">0:40</option>
+                  <option value="1:00">1:00</option>
+                  <option value="1:30">1:30</option>
+                  <option value="2:00">2:00</option>
+                  <option value="2:30">2:30</option>
+                </select>
+              </label>
+            </div>
+            <div class="customize-availability">
+              <a href="#">Customize availability</a>
+            </div>
+          </li>
+        </ul>
       </li>
     </ul>
   </body>

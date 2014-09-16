@@ -8,6 +8,7 @@ FILES = \
   app \
   guest-app \
   datepicker \
+  executive-preferences
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))
