@@ -69,7 +69,7 @@ module Esper.Gcal {
   }
 
   export function findAnchorForTeamSelector(): JQuery {
-    var anchor = $("#dp_0");
+    var anchor = $("#dp_0"); // The mini-calendar in the left sidebar
     if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper team selector.");
       return $();
