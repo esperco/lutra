@@ -49,9 +49,8 @@ module Esper.Init {
     var selector = $("<select>");
     selector.append($("<option value='-1'>Select Esper team...</option>"));
     for (var i = 0; i < teams.length; i++) {
-      var team = teams[i];
       var option =
-        $("<option value='" + i + "'>" + team.team_name + "</option>");
+        $("<option value='" + i + "'>" + teams[i].team_name + "</option>");
       selector.append(option);
     }
     selector.change(function() {
