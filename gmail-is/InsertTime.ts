@@ -36,13 +36,14 @@ module Esper.InsertTime {
 
           textField.focus();
 
+          insertAtCaret("<br />");
           for (var i = 0; i < events.length; i++) {
             var start = new Date(events[i].event.start.local);
             var end   = new Date(events[i].event.end.local);
             var range = XDate.rangeWithoutYear(start, end);
 
             if (Gmail.caretInField(textField)) {
-              insertAtCaret(XDate.weekDay(start) + ", " + range + "\n");
+              insertAtCaret(XDate.weekDay(start) + ", " + range + "<br />");
             }
           }
         });
@@ -53,13 +54,15 @@ module Esper.InsertTime {
   /** Inserts the given HTML string at the caret of a contenteditable
    * element.
    */
-  function insertAtCaret(text) {
+  function insertAtCaret(html) {
     var selection = window.getSelection(); 
-   var range     = selection.getRangeAt(0);
+    var range     = selection.getRangeAt(0);
+
+    html = "<span>" + html + "</span>";
     
     range.deleteContents();
 
-    var node = document.createTextNode(text);
+    var node = $(html)[0];
     range.insertNode(node);
   }
 
