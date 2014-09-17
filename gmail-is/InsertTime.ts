@@ -34,6 +34,8 @@ module Esper.InsertTime {
 
           var events = CalTab.currentEvents;
 
+          textField.focus();
+
           for (var i = 0; i < events.length; i++) {
             var start = new Date(events[i].event.start.local);
             var end   = new Date(events[i].event.end.local);
@@ -52,8 +54,8 @@ module Esper.InsertTime {
    * element.
    */
   function insertAtCaret(text) {
-    var selection = window.getSelection();
-    var range     = selection.getRangeAt(0);
+    var selection = window.getSelection(); 
+   var range     = selection.getRangeAt(0);
     
     range.deleteContents();
 

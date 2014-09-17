@@ -87,6 +87,7 @@ module Esper.Gmail {
    * GMail reply text field.
    */
   export function caretInField(field) {
-    return $(window.getSelection().baseNode).closest(field).length > 0;
+    console.log(window.getSelection().anchorNode);
+    return $(window.getSelection().anchorNode).closest(field).length > 0;
   }
 }
