@@ -24,6 +24,12 @@ object {
 .clearfix:after {
   clear: both;
 }
+.left {
+  float: left;
+}
+.right {
+  float: right;
+}
 hr {
   border: 0;
   height: 1px;
@@ -165,11 +171,11 @@ button.button-secondary:active {
 }
 button.button-tertiary {
   color: white;
-  background: rgba(255, 255, 255, 0.2);
+  background: none;
   border: 1px solid white;
 }
 button.button-tertiary:hover {
-  background: rgba(255, 255, 255, 0.4);
+  opacity: 0.5;
 }
 /** Input **/
 input {
@@ -203,36 +209,53 @@ input.disabled {
   height: 75px;
   background: white;
 }
-.navbar {
+.navbar,
+.splash-navbar,
+.about-navbar {
   max-width: 1280px;
   margin: 0 auto;
+}
+.navbar {
   padding: 20px 36px;
 }
+.splash-navbar {
+  padding: 28px 36px 14px 36px;
+}
+.about-navbar {
+  padding: 0 36px;
+}
 .navbar a,
-.splash-navbar a {
+.splash-navbar a,
+.about-navbar a {
   -webkit-transition: .2s;
   -moz-transition: .2s;
   -ms-transition: .2s;
   -o-transition: .2s;
   transition: .2s;
 }
+.cta {
+  margin-left: 28px;
+}
 .nav-link {
-  margin-right: 16px;
   font-weight: 600;
 }
-.nav-link.left {
-  float: left;
+.nav-link.primary {
+  margin: 8px 0 0 28px;
 }
-.nav-link.right {
-  float: right;
+.nav-link.primary:hover {
+  opacity: 0.5;
 }
-.nav-link.text {
-  margin-top: 3px;
+.nav-link.secondary {
+  margin: 3px 0 0 16px;
   padding: 6px 12px;
+  font-size: 12px;
   border-radius: 3px;
 }
-.nav-link.text:hover {
-  background: rgba(255, 255, 255, 0.2);
+.nav-link.secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.nav-link.secondary.active {
+  background: rgba(0, 0, 0, 0.2);
 }
 .navbar .nav-link {
   color: #a7a9ac;
@@ -290,6 +313,10 @@ input.disabled {
   position: absolute;
   z-index: 1;
 }
+.splash.purple {
+  height: 100%;
+  background: #785988;
+}
 @media (min-width: 800px) {
   .splash {
     width: 100%;
@@ -326,15 +353,6 @@ input.disabled {
   -ms-transition: .2s;
   -o-transition: .2s;
   transition: .2s;
-}
-.splash-navbar {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 28px 36px;
-}
-.splash-navbar .navbar-join,
-.footer-right-container .navbar-join {
-  float: right;
 }
 .splash-text {
   max-width: 1280px;

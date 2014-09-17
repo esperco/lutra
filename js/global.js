@@ -2,7 +2,7 @@ function slider() {
   $(window).scroll(slideNavbar);
 
   function slideNavbar() {
-    if (document.body.scrollTop >= 400)
+    if (document.body.scrollTop >= 325)
       $(".navbar-container").slideDown();
     else
       $(".navbar-container").slideUp();

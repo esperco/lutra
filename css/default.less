@@ -5,6 +5,8 @@ object { pointer-events: none; }
 *, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
 .clearfix:before, .clearfix:after { content: " "; display: table; }
 .clearfix:after { clear: both; }
+.left { float: left; }
+.right { float: right; }
 hr {
   border: 0;
   height: 1px;
@@ -117,9 +119,10 @@ button.button-secondary {
 }
 button.button-tertiary {
   color: white;
-  background: rgba(255,255,255,0.2);
+  background: none;
+  // background: rgba(255,255,255,0.2);
   border: 1px solid white;
-  &:hover { background: rgba(255,255,255,0.4); }
+  &:hover { opacity:0.5; }
 }
 
 /** Input **/
@@ -161,13 +164,15 @@ input.disabled {
   background: white;
 }
 
-.navbar {
+.navbar, .splash-navbar, .about-navbar {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 20px 36px;
 }
+.navbar { padding: 20px 36px; }
+.splash-navbar { padding: 28px 36px 14px 36px; }
+.about-navbar { padding: 0 36px; }
 
-.navbar a, .splash-navbar a {
+.navbar a, .splash-navbar a, .about-navbar a {
   -webkit-transition:.2s;
      -moz-transition:.2s;
       -ms-transition:.2s;
@@ -175,16 +180,24 @@ input.disabled {
           transition:.2s;
 }
 
+.cta { margin-left: 28px; }
+
 .nav-link {
-  margin-right: 16px;
   font-weight: 600;
-  &.left { float: left; }
-  &.right { float: right; }
-  &.text {
-    margin-top: 3px;
+  &.primary {
+    margin: 8px 0 0 28px;
+    &:hover { opacity: 0.5; }
+  }
+  &.secondary {
+    margin: 3px 0 0 16px;
     padding: 6px 12px;
+    font-size: 12px;
     border-radius: 3px;
-    &:hover { background: rgba(255,255,255,0.2); }
+    &:hover { background: rgba(0,0,0,0.1); }
+    &.active {
+      background: rgba(0,0,0,0.2);
+      pointer-events: none;
+    }
   }
 }
 
@@ -252,6 +265,11 @@ input.disabled {
   z-index: 1;
 }
 
+.splash.purple {
+  height: 100%;
+  background: #785988;
+}
+
 @media (min-width:800px) {
   .splash { width: 100%; }
 }
@@ -281,17 +299,6 @@ input.disabled {
       -ms-transition:.2s;
        -o-transition:.2s;
           transition:.2s;
-}
-
-.splash-navbar {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 28px 36px;
-}
-
-.splash-navbar .navbar-join,
-.footer-right-container .navbar-join {
-  float: right;
 }
 
 .splash-text {
