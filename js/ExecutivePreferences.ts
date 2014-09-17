@@ -1,8 +1,7 @@
 module Esper.ExecutivePreferences {
 
   $(function () {
-    var example = form("Example");
-    $("#categories").append(example.container);
+    $("#categories ul").append(phoneForm());
   });
   
   /** The basic form widget which has a prominent on/off toggle and a
@@ -15,9 +14,10 @@ module Esper.ExecutivePreferences {
    *  The given title will be used for the form's header. The icon,
    *  if passed in, will go at the top.
    */
-  export function form(title, icon) {
+  export function form(title) {
 '''
 <li #container>
+  <div #iconDiv></div>
   <h1 #header>  </h1>
     <form #form class="toggle">
     <label>  <input type="radio" name="toggle" /> <span>No</span> </label>
@@ -35,10 +35,15 @@ module Esper.ExecutivePreferences {
 </li>
 '''    
 
-    if (icon) container.prepend(icon);
+    // if (icon) container.prepend(icon);
 
     header.text(title);
     form.append(durations().label);
+
+    var possibleDurations = durations();
+    form.after(possibleDurations.container);
+
+    return _view;
   }
 
   /** Returns a drop-down menu for possible meeting durations. */
@@ -61,6 +66,15 @@ module Esper.ExecutivePreferences {
 '''    
 
     return _view;
+  }
+
+  /** Returns the element containing the whole phone form. */
+  export function phoneForm() {
+    var phone = form("Phone");
+    phone.rest.append(phoneWidget().container);
+    phone.iconDiv.append($("<img src='/home/tikhon/Documents/work/esper/otter/pub/img/phone-placeholder.png' alt='' />"));
+
+    return phone.container;
   }
 
   /** A widget for entering any number of phone numbers.
@@ -92,9 +106,7 @@ module Esper.ExecutivePreferences {
     <option value="home">home</option>
     <option value="other">other</option>
   </select>
-  <div #numbers>
-    <input type="text" class="phone-number" />
-  </div>
+  <input type="text" class="phone-number" />
 </div>
 '''
 
