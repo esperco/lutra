@@ -1,10 +1,16 @@
 module Esper.ExecutivePreferences {
 
+  var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
+
   $(function () {
-    $("#categories ul").append(phoneForm());
-    $("#categories ul").append(videoForm());
+    $(".preference-categories li.calls ul").append(phoneForm());
+    $(".preference-categories li.calls ul").append(videoForm());
+
+    meals.map(mealForm).forEach(function (element) {
+      $(".preference-categories li.meals ul").append(element);
+    });
   });
-  
+
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -99,6 +105,7 @@ module Esper.ExecutivePreferences {
     return _view;
   }
 
+  /** The select and textbox for a phone number of some sort. */
   export function phoneNumber() {
 '''
 <div class="phone-number" #container>
@@ -115,6 +122,7 @@ module Esper.ExecutivePreferences {
     return _view;
   }
 
+  /** The form for adding accounts for video chat. */
   export function videoWidget() {
 '''
 <div class="video-widget" #container>
@@ -143,6 +151,7 @@ module Esper.ExecutivePreferences {
     return video.container;
   }
 
+  /** The individual entry for each type of account. */
   export function videoAccount() {
 '''
 <div class="video-account" #container>
@@ -158,5 +167,39 @@ module Esper.ExecutivePreferences {
     return _view;
   }  
 
+  /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
+  export function mealForm(mealName) {
+    var meal = form(mealName);
+
+    meal.rest.append(restaurantWidget().container);
+
+    return meal.container;
+  }
+
+  /** A place to enter a bunch of restaurants to prefer. */
+  export function restaurantWidget() {
+'''
+<div #container>
+  <div #restaurants>
+  </div>
+  <br />
+  <a href="#" #anotherRestaurant>Add another favorite location.</a>
+</div>
+'''
+
+    restaurants.append(restaurantEntry());
+
+    anotherRestaurant.click(function () {
+      restaurants.append(restaurantEntry());
+      return false;
+    });
+
+    return _view;
+  }
+
+  /** Returns the input element for a restaurant. */
+  export function restaurantEntry() {
+    return $("<input type='text' class='restaurant-entry' />");
+  }
 }
 
