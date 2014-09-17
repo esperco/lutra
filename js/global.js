@@ -2,7 +2,7 @@ function slider() {
   $(window).scroll(slideNavbar);
 
   function slideNavbar() {
-    if (document.body.scrollTop >= 500)
+    if (document.body.scrollTop >= 400)
       $(".navbar-container").slideDown();
     else
       $(".navbar-container").slideUp();
@@ -19,13 +19,13 @@ function resizer() {
   window.addEventListener("resize", resizeCanvas, false);
 
   function resizeCanvas() {
-    if (window.innerWidth < 1000) {
+    if (window.innerWidth < 800) {
       splash
         .css("clip", "auto")
-        .css("margin-left", (window.innerWidth - 1000)/2 + "px");
+        .css("margin-left", (window.innerWidth - 800)/2 + "px");
     } else {
       splash
-        .css("clip", "rect(0," + window.innerWidth + "px,500px,0")
+        .css("clip", "rect(0," + window.innerWidth + "px,400px,0)")
         .css("margin-left", 0);
     }
   }

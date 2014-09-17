@@ -5,7 +5,7 @@ set -e
 # exactly in our S3 bucket used to serve pages for http://esper.co/
 
 # List of files to install
-html="index.html aboutus.html privacypolicy.html termsofuse.html careers.html"
+html="index.html about.html privacy-policy.html terms-of-use.html jobs.html"
 css="*.css"
 fonts="*.eot *.svg *.ttf *.woff"
 img="*.jpg *.svg *.ico *.png"

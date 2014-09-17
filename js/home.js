@@ -41,6 +41,8 @@ function resizer() {
 
   function resizeCanvas() {
     var windowRatio = window.innerHeight/window.innerWidth;
+    console.log("imgRatio: " + imgRatio);
+    console.log("windowRatio: " + windowRatio);
     if (windowRatio < imgRatio) {
       fullSplash
         .css("width", "100%")
@@ -50,7 +52,7 @@ function resizer() {
       fullSplash
         .css("width", "auto")
         .css("height", "100%")
-        .css("margin-left", (window.innerWidth - fullSplashWidth)/2 + "px");
+        .css("margin-left", -Math.abs(window.innerWidth - fullSplashWidth)/2 + "px");
     }
     fullSplashText
       .css("margin-top", (window.innerHeight - fullSplashText.height())/3 + "px");
