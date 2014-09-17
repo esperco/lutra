@@ -43,6 +43,88 @@ module Esper.CalTab {
       });
   }
 
+  function viewPersonInvolved(peopleInvolved, email, name) {
+'''
+<li #viewPerson>
+  <input #checkPerson type="checkbox"/>
+  <label #labelPerson/>
+</li>
+'''
+    var forID = Util.randomString();
+    checkPerson.attr("id",  forID);
+    labelPerson.attr("for", forID);
+
+    labelPerson.text(0 < name.length ? name + " <" + email + ">"
+                                     : email);
+    checkPerson.change(function() {
+      if (undefined === peopleInvolved[email]) {
+        peopleInvolved[email] = name;
+      } else {
+        delete peopleInvolved[email];
+      }
+    });
+    return viewPerson;
+  }
+
+  function pubInviteView(team, e, threadid, eventsTab, profiles) {
+'''
+<div #pubInvite class="esper-section esper-pub">
+  <div class="esper-section-header clearfix open">
+    Public Duplicate
+  </div>
+  <div class="esper-section-container">
+    <p><input #pubTitle/></p>
+    <p><textarea #pubDescription/></p>
+    <p>Guests</p>
+    <ul #viewPeopleInvolved/>
+    <p align="right">
+      <button #discard>Discard</button><button #create>Create</button>
+    </p>
+  </div>
+</div>
+'''
+    pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
+    if (undefined !== e.description) {
+      pubDescription.val(e.description);
+    }
+
+    var peopleInvolved = [];
+    var emailData = gmail.get.email_data();
+    if (emailData !== undefined && emailData.first_email !== undefined) {
+      List.iter(emailData.people_involved, function(pair) {
+        var v = viewPersonInvolved(peopleInvolved, pair[1], pair[0]);
+        viewPeopleInvolved.append(v);
+      });
+    }
+
+    create.click(function() {
+      var guests = [];
+      for (var email in peopleInvolved) {
+        guests.push({email: email, display_name: peopleInvolved[email]});
+      }
+      var ev = {
+        google_cal_id: e.google_cal_id,
+        start:         e.start,
+        end:           e.end,
+        title:         pubTitle.val(),
+        description:   pubDescription.val(),
+        location:      e.location,
+        all_day:       e.all_day,
+        guests:        guests,
+      };
+      Api.createLinkedEvent(team.teamid, ev, threadid)
+      .done(function() {
+        refreshLinkedList(team, threadid, eventsTab, profiles);
+      });
+      pubInvite.remove();
+    });
+    discard.click(function() {
+      pubInvite.remove();
+    });
+
+    return pubInvite;
+  }
+
   function displayLinkOptions(e: ApiT.CalendarEvent,
                               linkedEvents, team, threadId,
                               eventsTab: EventsTab,
@@ -99,7 +181,7 @@ module Esper.CalTab {
         Edit
       </li>
       <li #duplicateEvent
-          class="esper-li disabled">
+          class="esper-li">
         Duplicate
       </li>
       <li #unlinkEvent
@@ -218,6 +300,11 @@ module Esper.CalTab {
         disclose.addClass("open");
       }
     })
+
+    duplicateEvent.click(function() {
+      $(".esper-pub").remove();
+      view.append(pubInviteView(team, e, threadId, eventsTab, profiles));
+    });
 
     unlinkEvent.click(function() {
       view.addClass("disabled");
@@ -568,7 +655,7 @@ module Esper.CalTab {
       var newTab = window.open("");
       newTab.document.write("Creating new linked event, please wait...");
       var firstCalendar = team.team_calendars[0];
-      Api.createNewLinkedEvent(team.teamid, firstCalendar, threadId)
+      Api.createEmptyLinkedEvent(team.teamid, firstCalendar, threadId)
         .done(function(e) {
           var eventId = e.google_event_id;
           if (eventId !== null && eventId !== undefined) {
