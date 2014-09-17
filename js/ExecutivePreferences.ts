@@ -85,7 +85,7 @@ module Esper.ExecutivePreferences {
   export function phoneForm() {
     var phone = form("Phone");
     phone.rest.append(phoneWidget().container);
-    phone.iconDiv.append($("<img src='/home/tikhon/Documents/work/esper/otter/pub/img/phone-placeholder.png' alt='' />"));
+    phone.iconDiv.append($("<img src='/assets/img/phone-placeholder.png' alt='' />"));
 
     return phone.container;
   }
@@ -152,7 +152,7 @@ module Esper.ExecutivePreferences {
     var video = form("Video");
 
     video.rest.append(videoWidget().container);
-    video.iconDiv.append($("<img src='/home/tikhon/Documents/work/esper/otter/pub/img/video-placeholder.png' alt='' />"));
+    video.iconDiv.append($("<img src='/assets/img/video-placeholder.png' alt='' />"));
 
     return video.container;
   }
