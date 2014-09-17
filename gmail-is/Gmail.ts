@@ -82,4 +82,12 @@ module Esper.Gmail {
       return $();
     }
   }
+
+  /** Returns whether the currently focused cursor is in the given
+   * GMail reply text field.
+   */
+  export function caretInField(field) {
+    console.log(window.getSelection().anchorNode);
+    return $(window.getSelection().anchorNode).closest(field).length > 0;
+  }
 }
