@@ -104,23 +104,86 @@ fieldset[disabled] .btn-default.active {
   background-color: #f1f2f2;
   border: none;
 }
+
 .btn-primary {
   color: white;
-  background-color: #a25cc6;
-  border: none;
+  background-color: transparent;
+  border-color: white;
+  border-radius: 5px;
 }
 .btn-primary:hover,
 .btn-primary:focus {
-  color: white;
-  background-color: #8c42ad;
-  border: none;
+  color: black;
+  background-color: white;
+  border-color: white;
+  border-radius: 5px;
 }
 .btn-primary:active,
 .btn-primary.active {
+  color: black;
+  background-color: white;
+  border-color: white;
+  border-radius: 5px;
+}
+
+.btn-join {
+  color: black;
+  background-color: white;
+  border-color: black;
+  border-radius: 5px;
+}
+.btn-join:hover,
+.btn-join:focus {
+  color: gray;
+  background-color: white;
+  border-color: gray;
+  border-radius: 5px;
+}
+.btn-join:active,
+.btn-join.active {
+  color: gray;
+  background-color: white;
+  border-color: gray;
+  border-radius: 5px;
+}
+
+.btn-description {
   color: white;
-  background-color: #7d3ca0;
-  border: none;
-  box-shadow: none;
+  background-color: #a25cc6;
+}
+.btn-description:hover,
+.btn-description:focus {
+  color: black;
+  background-color: #a25cc6;
+
+}
+.btn-description:active,
+.btn-description.active {
+  color: gray;
+  background-color: #a25cc6;
+}
+
+.btn-signup {
+  color: black;
+  font-size: 18px;
+  background-color: white;
+  border-color: black;
+  border-radius: 5px;
+}
+.btn-signup:hover,
+.btn-signup:focus {
+  color: gray;
+  background-color: white;
+  border-color: gray;
+  border-radius: 5px;
+
+}
+.btn-signup:active,
+.btn-signup.active {
+  color: gray;
+  background-color: white;
+  border-color: gray;
+  border-radius: 5px;
 }
 .btn-primary.disabled,
 .btn-primary[disabled],
