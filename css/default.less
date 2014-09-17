@@ -25,14 +25,14 @@ body {
           font-smoothing: antialiased;
 }
 
-h1, h2 {font-weight: 300; }
-h3, h4 { font-weight: 600; }
+h2 {font-weight: 300; }
+h1, h3, h4 { font-weight: 600; }
 
 @media (min-width:768px) {
   h1 { font-size: 42px; }
-  h2 { font-size: 24px; }
-  h3 { font-size: 20px; }
-  h4 { font-size: 16px; }
+  h2 { font-size: 36px; }
+  h3 { font-size: 24px; }
+  h4 { font-size: 20px; }
   p { font-size: 14px; }
 }
 
@@ -61,11 +61,11 @@ a:hover { color: #5F5665; }
 
 button {
   margin: 0;
-  padding: 8px 12px 8px 16px;
+  padding: 8px 16px;
   border-radius: 3px;
   font-family: "Open Sans";
   font-size: 13px;
-  letter-spacing: 3px;
+  font-weight: 600;
   border: none;
   outline: none;
   cursor: pointer;
@@ -157,15 +157,14 @@ input.disabled {
   z-index: 10;
   top: 0;
   width: 100%;
-  height: 54px;
+  height: 75px;
   background: white;
-  border-bottom: 1px solid #d1d3d4;
 }
 
 .navbar {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 10px 36px;
+  padding: 20px 36px;
 }
 
 .navbar a, .splash-navbar a {
@@ -177,12 +176,16 @@ input.disabled {
 }
 
 .nav-link {
-  margin-right: 40px;
+  margin-right: 16px;
   font-weight: 600;
-  &:hover { opacity: 0.5; }
   &.left { float: left; }
   &.right { float: right; }
-  &.text { margin-top: 8px; }
+  &.text {
+    margin-top: 3px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    &:hover { background: rgba(255,255,255,0.2); }
+  }
 }
 
 .navbar .nav-link { color: #a7a9ac; }
@@ -193,23 +196,22 @@ input.disabled {
 /* Footer */
 
 .footer-container {
-  background: #585858;
+  background: white;
 }
 
 .footer {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 20px 36px 60px 36px;
 }
 
 .footer-col {
   float: left;
-  margin: 20px 120px 20px 0;
+  margin: 20px 100px 20px 0;
   padding: 0;
   li, a {
-    color: white;
     list-style: none;
-    line-height: 2.2;
+    line-height: 2.0;
   }
   a:hover {
     opacity: 0.5;
@@ -238,7 +240,7 @@ input.disabled {
   z-index: 1;
   width: 100%;
   overflow: hidden;
-  clip: rect(0px,100%,300px,0px);
+  clip: rect(0px,100%,400px,0px);
   &.fullscreen {
     height: 100%;
     clip: auto;
@@ -250,22 +252,22 @@ input.disabled {
   z-index: 1;
 }
 
-@media (min-width:1000px) {
+@media (min-width:800px) {
   .splash { width: 100%; }
 }
-@media (max-width:999px) {
-  .splash { height: 500px; }
+@media (max-width:799px) {
+  .splash { height: 400px; }
 }
 
 .splash-content {
   position: relative;
   z-index: 2;
-  height: 500px;
+  height: 400px;
   color: white;
   &.fullscreen { height: 100%; }
 }
 .splash-content-gray {
-  height: 300px;
+  height: 400px;
   background: #a7a9ac;
   color: white;
   .splash-label { color: #a7a9ac; }
@@ -282,9 +284,9 @@ input.disabled {
 }
 
 .splash-navbar {
-  max-width: 1240px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 48px 36px;
+  padding: 28px 36px;
 }
 
 .splash-navbar .navbar-join,
@@ -293,10 +295,15 @@ input.disabled {
 }
 
 .splash-text {
-  max-width: 900px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 0 36px;
-  text-align: center;
+  @media (min-width:768px) { padding: 0 80px; }
+  @media (max-width:767px) { padding: 0 36px; }
+  text-align: left;
+}
+
+.splash-headline {
+  max-width: 1000px;
 }
 
 .splash-label {
@@ -333,7 +340,7 @@ input.disabled {
 .section-container.gray { background: #f8f8f8; }
 
 .section-content {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 64px 36px;
   &.narrow { max-width: 660px; }
@@ -406,16 +413,30 @@ input.disabled {
 
 /* About Us */
 
+.photo-container {
+  margin-right: 60px;
+  -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+          box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+}
+
 .esper-team-photo {
   width: 240px;
   height: 240px;
-  margin-right: 60px;
   background: url('../img/team-photo.jpg');
   background-size: 240px 240px;
   background-repeat: no-repeat;
   border: 1px solid #d1d3d4;
-  border-radius: 100%;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
 }
+
+.photo-caption {
+  padding: 10px;
+  background: white;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
 .about-right-col {
   max-width: 400px;
   text-align: left;
@@ -473,4 +494,11 @@ input.disabled {
 
 .job-listing {
   padding: 10px 0;
+}
+
+/* Terms of Use */
+
+.last-modified {
+  font-size: 12px;
+  opacity: 0.7;
 }
