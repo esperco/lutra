@@ -194,7 +194,12 @@ module Esper.ApiT {
 
   export interface TimeOnDay {
     day: string; /* Sun, Mon, Tue... */
-    time: string; /* HH:MM:SS.SSS */
+    time: HourMinute;
+  }
+
+  export interface HourMinute {
+    hour : number; /* 0 to 23 */
+    minute: string;
   }
 
   export interface Availability {

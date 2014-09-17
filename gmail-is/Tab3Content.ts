@@ -1,16 +1,28 @@
 module Esper.Tab3Content {
 
-  function textOfAvailability(availabilities) {
-    var text = "";
+  function formatTime(hourMinute) {
+    var hour = hourMinute.hour;
+    var minute = hourMinute.minute;
+    if (minute < 10) minute = "0" + minute;
+    var ampm = hour < 12 ? "am" : "pm";
+    if (hour > 12) hour = hour - 12;
+    return hour + ":" + minute + ampm;
+  }
+
+  function formatTimeRange(fromDay, fromHourMinute, toDay, toHourMinute) {
+    var fromTime = formatTime(fromHourMinute);
+    var toTime = formatTime(toHourMinute);
+    if (fromDay === toDay) toDay = "";
+    return [fromDay, fromTime, "to", toDay, toTime].join(" ");
+  }
+
+  function displayAvailability(view, availabilities) {
     List.iter(availabilities, function(a : ApiT.Availability) {
-      text += [
-        a.avail_from.day.slice(0, 5),
-        a.avail_from.time.slice(0, 5), "to",
-        a.avail_to.day.slice(0, 5),
-        a.avail_to.time.slice(0, 5)
-      ].join(" ") + "; ";
+      var text = formatTimeRange(a.avail_from.day, a.avail_from.time,
+                                 a.avail_to.day, a.avail_to.time);
+      $("<li>" + text + "</li>")
+        .appendTo(view);
     });
-    return text === "" ? text : text.slice(0, -2);
   }
 
   function displayWorkplace(workInfo, workplace) {
@@ -18,13 +30,15 @@ module Esper.Tab3Content {
 <div #view>
   <div #loc class="esper-location">Location: </div>
   <div #duration class="esper-duration">Duration: </div>
-  <div #availability class="esper-availability">Availability: </div>
+  <div class="esper-availability">Availability:
+    <ul #avail />
+  </div>
 </div>
 '''
     loc.append(workplace.location.address);
     var atWork = Number(workplace.duration / 60 / 60).toFixed(2);
     duration.append(atWork + " hours");
-    availability.append(textOfAvailability(workplace.availability));
+    displayAvailability(avail, workplace.availability);
     workInfo.children().remove();
     workInfo.append(view);
   }
