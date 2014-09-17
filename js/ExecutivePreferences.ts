@@ -9,6 +9,8 @@ module Esper.ExecutivePreferences {
     meals.map(mealForm).forEach(function (element) {
       $(".preference-categories li.meals ul").append(element);
     });
+
+    $(".preference-categories li.locations ul").append(locationForm());
   });
 
   /** The basic form widget which has a prominent on/off toggle and a
@@ -200,6 +202,46 @@ module Esper.ExecutivePreferences {
   /** Returns the input element for a restaurant. */
   export function restaurantEntry() {
     return $("<input type='text' class='restaurant-entry' />");
+  }
+
+  export function locationForm() {
+'''
+<div #details class="location-details">
+  <label>
+    <span> Type: </span>
+    <input type="text" />
+  </label>
+  <br />
+  <label>
+    <span> Address: </span>
+    <input type="text" />
+  </label>
+  <a href="#" #anotherLocation class="another-location"> Add another location. </a>
+</div>
+'''    
+    
+    var location = form("Location");
+
+    location.rest.append(details);
+
+    
+    anotherLocation.click(function () {
+      $(".preference-categories li.locations ul").append(locationForm());
+      return false;
+    });
+
+    return location.container;
+  }
+
+  export function miscForm() {
+'''
+<div class="misc-preferences" #container>
+  <h1 #header>Misc</h1>
+  <textarea></textarea>
+</div>
+'''
+
+    return container;
   }
 }
 
