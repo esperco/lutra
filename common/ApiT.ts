@@ -155,7 +155,7 @@ module Esper.ApiT {
 
   export interface Workplace {
     location: Location;
-    duration: number;
+    duration: HourMinute;
     availability: Availability[];
   }
 
@@ -171,7 +171,7 @@ module Esper.ApiT {
   }
 
   export interface PhoneInfo {
-    duration: number;
+    duration: HourMinute;
     availability: Availability[];
     phones: PhoneNumber[];
   }
@@ -182,7 +182,7 @@ module Esper.ApiT {
   }
 
   export interface VideoInfo {
-    duration: number;
+    duration: HourMinute;
     availability: Availability[];
     accounts: VideoAccount[];
   }
@@ -208,7 +208,7 @@ module Esper.ApiT {
   }
 
   export interface MealInfo {
-    duration: number;
+    duration: HourMinute;
     availability: Availability[];
     favorites: Location[];
   }
