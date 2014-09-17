@@ -58,6 +58,11 @@ module Esper.ApiT {
     image_url?: string;
   }
 
+  export interface Guest {
+    display_name?: string;
+    email: string;
+  }
+
   export interface LoginResponse {
     uid: string;
     api_secret: string;
@@ -96,6 +101,18 @@ module Esper.ApiT {
     location?: Location;
     all_day?: boolean;
     transparent?: boolean;
+  }
+
+  export interface CalendarEventEdit {
+    google_event_id?: string;
+    google_cal_id?: string;
+    start: CalendarTime;
+    end: CalendarTime;
+    title?: string;
+    description?: string;
+    location?: Location;
+    all_day?: boolean;
+    guests: Guest[];
   }
 
   export interface SyncedThread {
