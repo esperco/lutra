@@ -33,8 +33,8 @@ module Esper.ExecutivePreferences {
     <label>  <input type="radio" name="toggle" checked /> <span>Yes</span> </label>
   </form>
 
-  <div class="customize-availability">
-    <a href="#">Customize availability</a>
+  <div #availabilityContainer class="customize-availability">
+    <a #availability href="#">Customize availability</a>
   </div>
 
   <hr />
@@ -51,6 +51,10 @@ module Esper.ExecutivePreferences {
 
     var possibleDurations = durations();
     form.after(possibleDurations.container);
+
+    availability.click(function () {
+      availabilityContainer.append(availabilityEntry());
+    });
 
     return _view;
   }
@@ -240,6 +244,21 @@ module Esper.ExecutivePreferences {
   <textarea></textarea>
 </div>
 '''
+
+    return container;
+  }
+
+  /** A single day/time range for entering a single available block of
+   * time. It expects the day in MTWRFSU format.
+   */
+  export function availabilityEntry() {
+'''
+<div #container class="availability">
+  <input type="text" class="day"></input> at 
+  <input type="text" class="start"></input> :
+  <input type="text" class="end"></input>
+</div>
+'''    
 
     return container;
   }
