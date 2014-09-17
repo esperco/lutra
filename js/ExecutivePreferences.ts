@@ -2,6 +2,7 @@ module Esper.ExecutivePreferences {
 
   $(function () {
     $("#categories ul").append(phoneForm());
+    $("#categories ul").append(videoForm());
   });
   
   /** The basic form widget which has a prominent on/off toggle and a
@@ -30,7 +31,7 @@ module Esper.ExecutivePreferences {
 
   <hr />
 
-  <div #rest>
+  <div class="rest" #rest>
   </div>
 </li>
 '''    
@@ -92,6 +93,7 @@ module Esper.ExecutivePreferences {
 
     anotherNumber.click(function () {
       phoneNumbers.append(phoneNumber().container);
+      return false;
     });
 
     return _view;
@@ -112,5 +114,49 @@ module Esper.ExecutivePreferences {
 
     return _view;
   }
+
+  export function videoWidget() {
+'''
+<div class="video-widget" #container>
+ <div #videoAccounts>
+ </div>
+ <br />
+ <a href="#" #anotherAccount>Add another account</a>
+</div>
+'''
+    videoAccounts.append(videoAccount().container);
+
+    anotherAccount.click(function () {
+      videoAccounts.append(videoAccount().container);
+      return false;
+    });
+
+    return _view;
+  }
+
+  export function videoForm() {
+    var video = form("Video");
+
+    video.rest.append(videoWidget().container);
+    video.iconDiv.append($("<img src='/home/tikhon/Documents/work/esper/otter/pub/img/video-placeholder.png' alt='' />"));
+
+    return video.container;
+  }
+
+  export function videoAccount() {
+'''
+<div class="video-account" #container>
+  <select class="account-type" #select>
+    <option value="google" selected>google</option>
+    <option value="skype">skype</option>
+    <option value="other">other</option>
+  </select>
+  <input type="text" class="video-account" />
+</div>
+'''
+
+    return _view;
+  }  
+
 }
 
