@@ -131,8 +131,10 @@ module Esper.Tab3Content {
         if (text !== "") text += ": ";
         text += l.address;
       }
-      if (l.instructions !== "")
-        text += " (" + l.instructions + ")";
+      if (l.public_notes !== undefined)
+        text += " (" + l.public_notes + ")";
+      if (l.private_notes !== undefined)
+        text += " [Note: " + l.private_notes + "]";
       $("<li>" + text + "</li>")
         .appendTo(ul);
     });

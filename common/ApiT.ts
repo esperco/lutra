@@ -78,7 +78,8 @@ module Esper.ApiT {
   export interface Location {
     title: string;
     address: string;
-    instructions: string;
+    public_notes?: string;
+    private_notes?: string;
     coord: Latlon; // optional
     timezone: string; // required if coordinates are missing
   }
