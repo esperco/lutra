@@ -83,7 +83,8 @@ module Esper.ApiT {
   export interface Location {
     title: string;
     address: string;
-    instructions: string;
+    public_notes?: string;
+    private_notes?: string;
     coord: Latlon; // optional
     timezone: string; // required if coordinates are missing
   }
@@ -163,5 +164,70 @@ module Esper.ApiT {
 
   export interface TeamCalendars {
     google_cal_ids: string[];
+  }
+
+  export interface Preferences {
+    workplaces: Workplace[];
+    meeting_types: MeetingTypes;
+  }
+
+  export interface Workplace {
+    location: Location;
+    duration: HourMinute;
+    availability: Availability[];
+  }
+
+  export interface MeetingTypes {
+    phone_call?: PhoneInfo;
+    video_call?: VideoInfo;
+    breakfast?: MealInfo;
+    brunch?: MealInfo;
+    lunch?: MealInfo;
+    coffee?: MealInfo;
+    dinner?: MealInfo;
+    drinks?: MealInfo;
+  }
+
+  export interface PhoneInfo {
+    duration: HourMinute;
+    availability: Availability[];
+    phones: PhoneNumber[];
+  }
+
+  export interface PhoneNumber {
+    phone_type: string;
+    phone_number: string;
+  }
+
+  export interface VideoInfo {
+    duration: HourMinute;
+    availability: Availability[];
+    accounts: VideoAccount[];
+  }
+
+  export interface VideoAccount {
+    video_type: string;
+    video_username: string;
+  }
+
+  export interface TimeOnDay {
+    day: string; /* Sun, Mon, Tue... */
+    time: HourMinute;
+  }
+
+  export interface HourMinute {
+    hour : number; /* 0 to 23 */
+    minute: string;
+  }
+
+  export interface Availability {
+    avail_from: TimeOnDay;
+    avail_to: TimeOnDay;
+  }
+
+  export interface MealInfo {
+    duration: HourMinute;
+    availability: Availability[];
+    favorites: Location[];
   }
 }

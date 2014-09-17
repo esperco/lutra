@@ -247,7 +247,7 @@ module Esper.Sidebar {
 
     CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
-    Tab3Content.displayTab3ComingSoon(content3);
+    Tab3Content.displayPreferencesTab(content3, team, profiles);
 
     rootElement.append(view);
 
