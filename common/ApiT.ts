@@ -147,4 +147,64 @@ module Esper.ApiT {
   export interface TeamCalendars {
     google_cal_ids: string[];
   }
+
+  export interface Preferences {
+    workplaces: Workplace[];
+    meeting_types: MeetingTypes;
+  }
+
+  export interface Workplace {
+    location: Location;
+    duration: number;
+    availability: Availability[];
+  }
+
+  export interface MeetingTypes {
+    phone_call?: PhoneInfo;
+    video_call?: VideoInfo;
+    breakfast?: MealInfo;
+    brunch?: MealInfo;
+    lunch?: MealInfo;
+    coffee?: MealInfo;
+    dinner?: MealInfo;
+    drinks?: MealInfo;
+  }
+
+  export interface PhoneInfo {
+    duration: number;
+    availability: Availability[];
+    phones: PhoneNumber[];
+  }
+
+  export interface PhoneNumber {
+    phone_type: string;
+    phone_number: string;
+  }
+
+  export interface VideoInfo {
+    duration: number;
+    availability: Availability[];
+    accounts: VideoAccount[];
+  }
+
+  export interface VideoAccount {
+    video_type: string;
+    video_username: string;
+  }
+
+  export interface TimeOnDay {
+    day: string; /* Sun, Mon, Tue... */
+    time: string; /* HH:MM:SS.SSS */
+  }
+
+  export interface Availability {
+    avail_from: TimeOnDay;
+    avail_to: TimeOnDay;
+  }
+
+  export interface MealInfo {
+    duration: number;
+    availability: Availability[];
+    favorites: Location[];
+  }
 }

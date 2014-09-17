@@ -180,4 +180,20 @@ module Esper.Api {
     var url = Conf.Api.url + "/api/calendar/show/" + Login.myUid();
     return JsonHttp.post(url, JSON.stringify(cals));
   }
+
+  export function getPreferences(teamid):
+  JQueryDeferred<ApiT.Preferences> {
+    var url =
+      Conf.Api.url + "/api/preferences/" + Login.myUid()
+      + "/" + teamid;
+    return JsonHttp.get(url);
+  }
+
+  export function putPreferences(teamid, prefs):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/preferences/" + Login.myUid()
+      + "/" + teamid;
+    return JsonHttp.put(url, JSON.stringify(prefs));
+  }
 }
