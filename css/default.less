@@ -347,8 +347,11 @@ input.disabled {
   z-index: 1;
 }
 
-.splash.purple {
-  height: 100%;
+.splash-purple {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 400px;
   background: #785988;
 }
 
@@ -593,6 +596,27 @@ input.disabled {
 .about-right-col {
   max-width: 400px;
   text-align: left;
+}
+
+.contact-card {
+  float: left;
+  width: 260px;
+  margin: 10px 15px;
+  padding: 30px 20px;
+  background: white;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  a { color: @gray_90; }
+  a:hover { color: @purple; }
+
+}
+
+.icon-placeholder {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  background: @gray_60;
+  border-radius: 100%;
 }
 
 #esper-map {

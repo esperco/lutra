@@ -364,8 +364,11 @@ input.disabled {
   position: absolute;
   z-index: 1;
 }
-.splash.purple {
-  height: 100%;
+.splash-purple {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 400px;
   background: #785988;
 }
 @media (min-width: 800px) {
@@ -635,6 +638,28 @@ input.disabled {
 .about-right-col {
   max-width: 400px;
   text-align: left;
+}
+.contact-card {
+  float: left;
+  width: 260px;
+  margin: 10px 15px;
+  padding: 30px 20px;
+  background: white;
+  border: 1px solid #d1d3d4;
+  border-radius: 3px;
+}
+.contact-card a {
+  color: #414042;
+}
+.contact-card a:hover {
+  color: #a25cc6;
+}
+.icon-placeholder {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  background: #808285;
+  border-radius: 100%;
 }
 #esper-map {
   width: 100%;
