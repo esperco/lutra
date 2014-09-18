@@ -519,8 +519,16 @@ input.disabled {
   font-family: "Montserrat";
   font-size: 56px;
   text-align: center;
-  border: 4px solid #a25cc6;
   border-radius: 100%;
+}
+.number.purple {
+  border: 4px solid #a25cc6;
+}
+.number.orange {
+  border: 4px solid #f7941e;
+}
+.number.green {
+  border: 4px solid #2bb673;
 }
 .connector {
   position: absolute;
@@ -539,6 +547,7 @@ input.disabled {
 }
 .step-description {
   width: 50%;
+  max-width: 500px;
   padding-left: 100px;
   text-align: left;
 }
