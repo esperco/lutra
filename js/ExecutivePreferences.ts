@@ -1,9 +1,18 @@
 module Esper.ExecutivePreferences {
 
+  var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
+
   $(function () {
-    $("#categories ul").append(phoneForm());
+    $(".preference-categories li.calls ul").append(phoneForm());
+    $(".preference-categories li.calls ul").append(videoForm());
+
+    meals.map(mealForm).forEach(function (element) {
+      $(".preference-categories li.meals ul").append(element);
+    });
+
+    $(".preference-categories li.locations ul").append(locationForm());
   });
-  
+
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -24,13 +33,13 @@ module Esper.ExecutivePreferences {
     <label>  <input type="radio" name="toggle" checked /> <span>Yes</span> </label>
   </form>
 
-  <div class="customize-availability">
-    <a href="#">Customize availability</a>
+  <div #availabilityContainer class="customize-availability">
+    <a #availability href="#">Customize availability</a>
   </div>
 
   <hr />
 
-  <div #rest>
+  <div class="rest" #rest>
   </div>
 </li>
 '''    
@@ -42,6 +51,10 @@ module Esper.ExecutivePreferences {
 
     var possibleDurations = durations();
     form.after(possibleDurations.container);
+
+    availability.click(function () {
+      availabilityContainer.append(availabilityEntry());
+    });
 
     return _view;
   }
@@ -72,7 +85,7 @@ module Esper.ExecutivePreferences {
   export function phoneForm() {
     var phone = form("Phone");
     phone.rest.append(phoneWidget().container);
-    phone.iconDiv.append($("<img src='/home/tikhon/Documents/work/esper/otter/pub/img/phone-placeholder.png' alt='' />"));
+    phone.iconDiv.append($("<img src='/assets/img/phone-placeholder.png' alt='' />"));
 
     return phone.container;
   }
@@ -92,11 +105,13 @@ module Esper.ExecutivePreferences {
 
     anotherNumber.click(function () {
       phoneNumbers.append(phoneNumber().container);
+      return false;
     });
 
     return _view;
   }
 
+  /** The select and textbox for a phone number of some sort. */
   export function phoneNumber() {
 '''
 <div class="phone-number" #container>
@@ -111,6 +126,141 @@ module Esper.ExecutivePreferences {
 '''
 
     return _view;
+  }
+
+  /** The form for adding accounts for video chat. */
+  export function videoWidget() {
+'''
+<div class="video-widget" #container>
+ <div #videoAccounts>
+ </div>
+ <br />
+ <a href="#" #anotherAccount>Add another account</a>
+</div>
+'''
+    videoAccounts.append(videoAccount().container);
+
+    anotherAccount.click(function () {
+      videoAccounts.append(videoAccount().container);
+      return false;
+    });
+
+    return _view;
+  }
+
+  export function videoForm() {
+    var video = form("Video");
+
+    video.rest.append(videoWidget().container);
+    video.iconDiv.append($("<img src='/assets/img/video-placeholder.png' alt='' />"));
+
+    return video.container;
+  }
+
+  /** The individual entry for each type of account. */
+  export function videoAccount() {
+'''
+<div class="video-account" #container>
+  <select class="account-type" #select>
+    <option value="google" selected>google</option>
+    <option value="skype">skype</option>
+    <option value="other">other</option>
+  </select>
+  <input type="text" class="video-account" />
+</div>
+'''
+
+    return _view;
+  }  
+
+  /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
+  export function mealForm(mealName) {
+    var meal = form(mealName);
+
+    meal.rest.append(restaurantWidget().container);
+
+    return meal.container;
+  }
+
+  /** A place to enter a bunch of restaurants to prefer. */
+  export function restaurantWidget() {
+'''
+<div #container>
+  <div #restaurants>
+  </div>
+  <br />
+  <a href="#" #anotherRestaurant>Add another favorite location.</a>
+</div>
+'''
+
+    restaurants.append(restaurantEntry());
+
+    anotherRestaurant.click(function () {
+      restaurants.append(restaurantEntry());
+      return false;
+    });
+
+    return _view;
+  }
+
+  /** Returns the input element for a restaurant. */
+  export function restaurantEntry() {
+    return $("<input type='text' class='restaurant-entry' />");
+  }
+
+  export function locationForm() {
+'''
+<div #details class="location-details">
+  <label>
+    <span> Type: </span>
+    <input type="text" />
+  </label>
+  <br />
+  <label>
+    <span> Address: </span>
+    <input type="text" />
+  </label>
+  <a href="#" #anotherLocation class="another-location"> Add another location. </a>
+</div>
+'''    
+    
+    var location = form("Location");
+
+    location.rest.append(details);
+
+    
+    anotherLocation.click(function () {
+      $(".preference-categories li.locations ul").append(locationForm());
+      return false;
+    });
+
+    return location.container;
+  }
+
+  export function miscForm() {
+'''
+<div class="misc-preferences" #container>
+  <h1 #header>Misc</h1>
+  <textarea></textarea>
+</div>
+'''
+
+    return container;
+  }
+
+  /** A single day/time range for entering a single available block of
+   * time. It expects the day in MTWRFSU format.
+   */
+  export function availabilityEntry() {
+'''
+<div #container class="availability">
+  <input type="text" class="day"></input> at 
+  <input type="text" class="start"></input> :
+  <input type="text" class="end"></input>
+</div>
+'''    
+
+    return container;
   }
 }
 
