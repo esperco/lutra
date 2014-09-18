@@ -1,5 +1,5 @@
 /* Do the right thing based on the URL */
-
+console.log("Whoo");
 var route = (function() {
 
   var mod = {};
@@ -32,11 +32,12 @@ var route = (function() {
       withLogin(function() { window.close(); }, undefined, data.email);
     },
 
+    /* various pages */
+
     "preferences" : function (data) {
+      console.log("Preferences!");
       withLogin(function () { });
     },
-
-    /* various pages */
 
     "test route": function(data) {
       page.test.load();
