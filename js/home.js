@@ -61,14 +61,7 @@ function resizer() {
   resizeCanvas();
 }
 
-function loadElements() {
-  $(".footer-container").load("footer.html");
-  $(".index-navbar-container").load("navbar.html");
-  $(".splash-navbar").load("splash-navbar.html");
-}
-
 function main() {
-  loadElements();
   resizer();
   scroller();
   slider();
