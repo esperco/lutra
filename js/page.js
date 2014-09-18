@@ -3,7 +3,8 @@ var page = (function() {
   var mod = {
     settings: {},
     close: {},
-    test: {}
+    test: {},
+    preferences: {}
   };
 
   /*
