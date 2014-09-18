@@ -69,7 +69,7 @@ module Esper.Init {
       }
 
       Api.postCalendarShow(calendars).done(function() {
-        window.location.reload();
+        window.location.assign("https://www.google.com/calendar/render");
       });
     });
 
