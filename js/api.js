@@ -252,5 +252,13 @@ var api = (function () {
     return jsonHttpGet(url);
   };
 
+  /*** Executive Preferences ***/
+  
+  /** Sets the preferences given the correct JSON object. */
+  mod.setPreferences = function(teamid, preferences) {
+    var url = "/api/preferences/" + login.me() + "/" + teamid;
+    return jsonHttpPut(url, JSON.stringify(preferences));
+  }
+
   return mod;
 })();

@@ -15,6 +15,25 @@ module Esper.ExecutivePreferences {
     $(".preference-categories li.locations ul").append(locationForm());
   }
 
+  /** Returns the current values in the forms as JSON. */
+  export function currentPreferences() {
+    // Locations:
+    var locations = [];
+    $(".location-details").each(function (i, e) {
+      locations.push({
+        location : $(".location-address").val(),
+        duration : JSON.parse($(".duration").val())
+      });
+    });
+
+    return locations;
+  }
+
+  /** The HTML controls for saving the executive's preferences. */
+  export function saveButton() {
+    
+  }
+
  /** Returns the ul element onto which everything else is added. */
   export function scaffolding() {
 '''
@@ -89,15 +108,10 @@ module Esper.ExecutivePreferences {
 <label class="durations" #container>
   Preferred duration
   <select #select>
-    <option value="any" selected>any</option>
-    <option value="0:10">0:10</option>
-    <option value="0:20">0:20</option>
-    <option value="0:30">0:30</option>
-    <option value="0:40">0:40</option>
-    <option value="1:00">1:00</option>
-    <option value="1:30">1:30</option>
-    <option value="2:00">2:00</option>
-    <option value="2:30">2:30</option>
+    <option value="{ hour : 0, minute : 10 }">0:10</option>
+    <option value="{ hour : 0, minute : 30 }">0:30</option>
+    <option value="{ hour : 1, minute : 00 }">1:00</option>
+    <option value="{ hour : 2, minute : 00 }">2:00</option>
   </select>
 </label>
 '''    
@@ -140,7 +154,7 @@ module Esper.ExecutivePreferences {
 '''
 <div class="phone-number" #container>
   <select class="phone-type" #select>
-    <option value="mobile" selected>mobile</option>
+    <option value="{ hour : mobile" selected>mobile</option>
     <option value="work">work</option>
     <option value="home">home</option>
     <option value="other">other</option>
@@ -236,13 +250,13 @@ module Esper.ExecutivePreferences {
 '''
 <div #details class="location-details">
   <label>
-    <span> Type: </span>
-    <input type="text" />
+    <span> Type, minute :  </span }>
+    <input class="location-type" type="text" />
   </label>
   <br />
   <label>
     <span> Address: </span>
-    <input type="text" />
+    <input class="location-address" type="text" />
   </label>
   <a href="#" #anotherLocation class="another-location"> Add another location. </a>
 </div>
