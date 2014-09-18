@@ -44,17 +44,11 @@ hr {
   height: 1px;
   background: #d1d3d4;
 }
-hr .fancy {
-  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
-}
 /* Text */
 body {
   font-family: "Open Sans";
   font-size: 14px;
-  color: #5F5665;
+  color: #5f5665;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
@@ -122,7 +116,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #5F5665;
+  color: #5f5665;
 }
 a.toggle {
   float: left;
@@ -165,29 +159,12 @@ button.button-primary:hover {
   color: white;
   background: #8c42ad;
 }
-button.button-primary:active {
-  -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-}
 button.button-secondary {
-  color: #5F5665;
-  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #f1f1f1 100%);
-  background-image: linear-gradient(top, #f5f5f5 0%, #f1f1f1 100%);
-  border: 1px solid #C5C5C5;
+  color: #414042;
+  background: white;
 }
 button.button-secondary:hover {
-  background-image: -webkit-linear-gradient(top, #f8f8f8 0%, #f1f1f1 100%);
-  background-image: linear-gradient(top, #f8f8f8 0%, #f1f1f1 100%);
-  border: 1px solid #C6C6C6;
-  -webkit-box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
-}
-button.button-secondary:active {
-  background-image: -webkit-linear-gradient(top, #f8f8f8 0%, #f1f1f1 100%);
-  background-image: linear-gradient(top, #f8f8f8 0%, #f1f1f1 100%);
-  border: 1px solid #C6C6C6;
-  -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  opacity: 0.5;
 }
 button.button-tertiary {
   color: white;
@@ -202,7 +179,7 @@ button.toggle {
 }
 button.toggle.active {
   background: white;
-  color: #5F5665;
+  color: #5f5665;
   pointer-events: none;
 }
 button.toggle-left {
@@ -230,8 +207,9 @@ button.toggle-right {
 }
 /** Input **/
 input {
-  height: 32px;
-  padding: 0 8px;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 16px;
   border: 1px solid #d1d3d4;
   border-radius: 3px;
   -webkit-box-shadow: none;
@@ -456,7 +434,7 @@ input.disabled {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: #5F5665;
+  color: #5f5665;
   border-radius: 3px;
   background: white;
 }
@@ -484,6 +462,9 @@ input.disabled {
 }
 .section-container.gray {
   background: #f8f8f8;
+}
+.section-container.dark {
+  background: #414042;
 }
 .section-content {
   max-width: 1280px;
@@ -542,7 +523,7 @@ input.disabled {
   width: 4px;
   height: 60px;
   margin-left: -2px;
-  background: #5F5665;
+  background: #5f5665;
 }
 .step-title {
   width: 50%;
