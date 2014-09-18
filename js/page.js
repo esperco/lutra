@@ -15,7 +15,8 @@ var page = (function() {
   var pageSelector = show.create({
     "settings": {ids:["settings-page"]},
     "test": {ids:["test-page"]},
-    "token": {ids:["token-page"]}
+    "token": {ids:["token-page"]},
+    "preferences": {ids:["preferences-page"]}
   });
 
   function showPage(k) {
@@ -38,6 +39,14 @@ var page = (function() {
     $("#test-content").children().remove();
     showPage("test");
     test.load();
+    util.focus();
+  };
+
+  mod.preferences.load = function () {
+    pageSelector.hideAll();
+    showPage("preferences");
+    log("ExecutivePreferences.load()");
+    ExecutivePreferences.load();
     util.focus();
   };
 
