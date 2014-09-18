@@ -46,8 +46,8 @@ var page = (function() {
   mod.preferences.load = function () {
     pageSelector.hideAll();
     showPage("preferences");
-    log("ExecutivePreferences.load()");
-    ExecutivePreferences.load();
+    log("Loaded executive preferences!");
+    Esper.ExecutivePreferences.load();
     util.focus();
   };
 

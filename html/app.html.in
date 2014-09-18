@@ -12,11 +12,14 @@
     <link rel="stylesheet" href="/assets/css/app.css" media="screen">
     <link rel="stylesheet" href="/assets/css/animate.min.css">
     <link rel="stylesheet" href="/assets/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/executive-preferences.css">
     <link rel="shortcut icon" href="/assets/img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon">
 
     <!-- Mixpanel JS loader file, copied from js/mixpanel.js -->
     <script href="/assets/js/mixpanel.js"></script>
+
+    <script src="/assets/js/executive-preferences.js"></script>
   </head>
 
   <body>
@@ -42,7 +45,7 @@
     <!-- Settings page -->
     <div id="settings-page" class="hide"></div>
 
-    <!-- Executive preferences: a form for meeting time and place preferences. -->
+    <!-- Executive preferences: a form for meeting time, place and format preferences. -->
     <div id="preferences-page" class="hide"></div>
 
     <!-- Pusher client library -->
