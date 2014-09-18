@@ -2,7 +2,9 @@ module Esper.ExecutivePreferences {
 
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
 
-  $(function () {
+  export function load() {
+    $("#preferences-page");
+
     $(".preference-categories li.calls ul").append(phoneForm());
     $(".preference-categories li.calls ul").append(videoForm());
 
@@ -11,7 +13,29 @@ module Esper.ExecutivePreferences {
     });
 
     $(".preference-categories li.locations ul").append(locationForm());
-  });
+  }
+
+ /** Returns the ul element onto which everything else is added. */
+  export function scaffolding() {
+'''
+<ul #container class="preference-categories">
+  <li class="calls">
+    <ul class="preference-options">
+    </ul>
+  </li>
+  <li class="meals">
+    <ul class="preference-options">
+    </ul>
+  </li>
+  <li class="locations">
+    <ul class="preference-options">
+    </ul>
+  </li>
+</ul>
+'''    
+
+    return container;
+  }
 
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
