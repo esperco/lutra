@@ -14,14 +14,12 @@
 @gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
+
 @gray_80: #58595b;
 @gray_90: #414042;
-@green: #2bb673;
-@green_hover: #1e9b5c;
-@orange: #f7941e;
-@orange_bg: #f4e3d3;
-@orange_hover: #e87400;
 
+@green: #2bb673;
+@orange: #f7941e;
 @purple: #a25cc6;
 
 @purple_active: #7d3ca0;
@@ -33,7 +31,9 @@
 @purple_gradient: #a464c6;
 @purple_hover: #8c42ad;
 @purple_hover_light: #be89d7;
+
 @purple_text: #5F5665;
+
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
@@ -60,12 +60,6 @@ hr {
   border: 0;
   height: 1px;
   background: @gray_20;
-  .fancy {
-    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
-    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
-    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
-    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
-  }
 }
 
 
@@ -74,7 +68,7 @@ hr {
 body {
   font-family: "Open Sans";
   font-size: 14px;
-  color: #5F5665;
+  color: @purple_text;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
           font-smoothing: antialiased;
@@ -104,15 +98,13 @@ h3 { letter-spacing: 2px; }
 h4 { letter-spacing: 3px; }
 li, p { line-height: 2; }
 
-li, p { color: #58595b; }
+li, p { color: @gray_80; }
 
 a {
-
-  color: #a25cc6;
-
+  color: @purple;
   text-decoration: none;
 }
-a:hover { color: #5F5665; }
+a:hover { color: @purple_text; }
 a.toggle { float: left; }
 
 .bold { font-weight: 600; }
@@ -147,38 +139,17 @@ button {
 
 button.button-primary {
   color: white;
-
-  background: #a25cc6;
-
+  background: @purple;
   &:hover {
     color: white;
     background: #8c42ad;
   }
-  &:active {
-    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
-            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
-  }
 }
 
 button.button-secondary {
-  color: #5F5665;
-  background-image: -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
-  background-image:         linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
-  border: 1px solid #C5C5C5;
-  &:hover {
-    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    border: 1px solid #C6C6C6;
-    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
-            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
-  }
-  &:active {
-    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    border: 1px solid #C6C6C6;
-    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
-            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
-  }
+  color: @gray_90;
+  background: white;
+  &:hover { opacity: 0.5; }
 }
 
 button.button-tertiary {
@@ -192,7 +163,7 @@ button.toggle {
   margin-right: -1px;
   &.active {
     background: white;
-    color: #5F5665;
+    color: @purple_text;
     pointer-events: none;
   }
 }
@@ -223,8 +194,9 @@ button.toggle-right {
 /** Input **/
 
 input {
-  height: 32px;
-  padding: 0 8px;
+  height: 40px;
+  padding: 0 12px;
+  font-size: 16px;
   border: 1px solid #d1d3d4;
   border-radius: 3px;
   -webkit-box-shadow: none;
@@ -329,7 +301,7 @@ input.disabled {
     list-style: none;
     line-height: 2.0;
   }
-  a { color: #58595b; }
+  a { color: @gray_80; }
   a:hover {
     opacity: 0.5;
   }
@@ -435,7 +407,7 @@ input.disabled {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: #5F5665;
+  color: @purple_text;
   border-radius: 3px;
   background: white;
 }
@@ -460,7 +432,8 @@ input.disabled {
 
 .section-container { text-align: center; }
 .section-container.left-align { text-align: left; }
-.section-container.gray { background: #f8f8f8; }
+.section-container.gray { background: @gray_f8; }
+.section-container.dark { background: @gray_90; }
 
 .section-content {
   max-width: 1280px;
@@ -512,7 +485,7 @@ input.disabled {
   width: 4px;
   height: 60px;
   margin-left: -2px;
-  background: #5F5665;
+  background: @purple_text;
 }
 
 .step-title {
