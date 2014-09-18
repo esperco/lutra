@@ -21,12 +21,79 @@ module Esper.ExecutivePreferences {
     var locations = [];
     $(".location-details").each(function (i, e) {
       locations.push({
-        location : $(".location-address").val(),
-        duration : JSON.parse($(".duration").val())
+        location : {
+          title   : $(e).find(".location-address").val(),
+          address : ""
+        },
+        duration : findDuration($(e))
       });
     });
 
+    var meetings = {
+      phone_call : {
+        duration : findDuration($(".phone-widget")),
+        phones   : phoneNumberList()
+      },
+      video_call : {
+        duration : findDuration(".video-widget"),
+        accounts : videoAccountList()
+      }
+    };
+
+    meals.forEach(function (meal) {
+      meetings[meal] = mealInfo(meal);
+    });
+    
+    console.log("meetings", meetings);    
     return locations;
+
+    function findDuration(element) {
+      return JSON.parse($(element).closest("li").find(".durations select").val());
+    }
+
+    function phoneNumberList() {
+      var res = [];
+
+      $(".phone-widget div.phone-number").each(function (i, e) {
+        res.push({
+          phone_type   : $(e).find("select").val(),
+          phone_number : $(e).find("input").val()
+        });
+      });
+
+      return res;
+    }
+
+    function videoAccountList() {
+      var res = [];
+
+      $(".video-widget div.video-account").each(function (i, e) {
+        res.push({
+          video_type    : $(e).find("select").val(),
+          video_usernam : $(e).find("input").val()
+        });
+      });
+
+      return res;
+    }
+
+    function mealInfo(meal) {
+      var element = $("." + meal);
+
+      var locations = [];
+      element.find("input.restaurant-entry").each(function (i, e) {
+        // Most fields not used, for now.
+        locations.push({
+          title   : $(e).val(),
+          address : ""
+        });
+      });
+
+      return {
+        duration : findDuration(element),
+        favorites : locations
+      };
+    }
   }
 
   /** The HTML controls for saving the executive's preferences. */
@@ -108,10 +175,14 @@ module Esper.ExecutivePreferences {
 <label class="durations" #container>
   Preferred duration
   <select #select>
-    <option value="{ hour : 0, minute : 10 }">0:10</option>
-    <option value="{ hour : 0, minute : 30 }">0:30</option>
-    <option value="{ hour : 1, minute : 00 }">1:00</option>
-    <option value="{ hour : 2, minute : 00 }">2:00</option>
+    <option value='{ "hour" : 0, "minute" : 10 }'>0:10</option>
+    <option value='{ "hour" : 0, "minute" : 20 }'>0:20</option>
+    <option value='{ "hour" : 0, "minute" : 30 }'>0:30</option>
+    <option value='{ "hour" : 0, "minute" : 40 }'>0:40</option>
+    <option value='{ "hour" : 1, "minute" : 0 }'>1:00</option>
+    <option value='{ "hour" : 1, "minute" : 30 }'>1:30</option>
+    <option value='{ "hour" : 2, "minute" : 0 }'>2:00</option>
+    <option value='{ "hour" : 2, "minute" : 30 }'>2:30</option>
   </select>
 </label>
 '''    
@@ -154,7 +225,7 @@ module Esper.ExecutivePreferences {
 '''
 <div class="phone-number" #container>
   <select class="phone-type" #select>
-    <option value="{ hour : mobile" selected>mobile</option>
+    <option value="mobile" selected>mobile</option>
     <option value="work">work</option>
     <option value="home">home</option>
     <option value="other">other</option>
@@ -217,6 +288,8 @@ module Esper.ExecutivePreferences {
 
     meal.rest.append(restaurantWidget().container);
 
+    meal.container.addClass(mealName);
+
     return meal.container;
   }
 
@@ -250,7 +323,7 @@ module Esper.ExecutivePreferences {
 '''
 <div #details class="location-details">
   <label>
-    <span> Type, minute :  </span }>
+    <span> Type:  </span>
     <input class="location-type" type="text" />
   </label>
   <br />
