@@ -32,6 +32,10 @@ var route = (function() {
       withLogin(function() { window.close(); }, undefined, data.email);
     },
 
+    "preferences" : function (data) {
+      withLogin(function () { });
+    },
+
     /* various pages */
 
     "test route": function(data) {

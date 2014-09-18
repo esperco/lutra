@@ -3,7 +3,7 @@ module Esper.ExecutivePreferences {
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
 
   export function load() {
-    $("#preferences-page");
+    $("#preferences-page").append(scaffolding());
 
     $(".preference-categories li.calls ul").append(phoneForm());
     $(".preference-categories li.calls ul").append(videoForm());
