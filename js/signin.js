@@ -222,7 +222,7 @@ var signin = (function() {
             var landingUrl = document.URL;
             checkGooglePermissions(landingUrl)
               .done(function(ok) {
-                page.settings.load();
+                whenDone();
               });
           }
         });
