@@ -154,8 +154,6 @@ module Esper.ExecutivePreferences {
 </li>
 '''    
 
-    // if (icon) container.prepend(icon);
-
     header.text(title);
     form.append(durations().label);
 
@@ -164,6 +162,7 @@ module Esper.ExecutivePreferences {
 
     availability.click(function () {
       availabilityContainer.append(availabilityEntry());
+      return false;
     });
 
     return _view;
