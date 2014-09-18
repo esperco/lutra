@@ -42,6 +42,9 @@ object {
 hr {
   border: 0;
   height: 1px;
+  background: #d1d3d4;
+}
+hr .fancy {
   background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
   background-image: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
   background-image: -ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
@@ -213,6 +216,18 @@ button.toggle-right {
   border-top-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+.social {
+  opacity: 0.5;
+  -webkit-filter: grayscale(100%);
+  -moz-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+.social:hover {
+  opacity: 1;
+  -webkit-filter: none;
+  -moz-filter: none;
+  filter: none;
+}
 /** Input **/
 input {
   height: 32px;
@@ -340,30 +355,20 @@ input.disabled {
 .footer-right-container {
   padding: 20px 0;
 }
-.footer-logo {
+.footer-right-container .footer-logo {
   margin-top: 12px;
 }
-.copyright {
+.footer-right-container .copyright {
   padding: 15px 0 30px 0;
   font-size: 12px;
   color: #a7a9ac;
   text-align: right;
 }
-.social {
+.footer-right-container .social {
   margin: 20px 0 0 28px;
-  opacity: 0.5;
-  -webkit-filter: grayscale(100%);
-  -moz-filter: grayscale(100%);
-  filter: grayscale(100%);
 }
-.social img {
+.footer-right-container .social img {
   height: 32px;
-}
-.social:hover {
-  opacity: 1;
-  -webkit-filter: none;
-  -moz-filter: none;
-  filter: none;
 }
 /* Splash */
 .splash-container {
@@ -600,7 +605,11 @@ input.disabled {
 }
 /* About */
 .photo-container {
-  margin-right: 60px;
+  float: left;
+  width: 240px;
+  margin: 20px 30px;
+  border: 1px solid #d1d3d4;
+  border-radius: 3px;
   -webkit-box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.1);
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.1);
 }
@@ -614,11 +623,33 @@ input.disabled {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
 }
+.employee-photo {
+  width: 238px;
+  height: 238px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
 .photo-caption {
   padding: 10px;
   background: white;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+  text-align: left;
+}
+.photo-caption h2,
+.photo-caption p {
+  margin: 0;
+}
+.photo-caption h2 {
+  font-size: 22px;
+}
+.photo-caption .name,
+.photo-caption .social-footer {
+  padding: 6px 10px;
+}
+.photo-caption .social img {
+  height: 20px;
+  margin-right: 10px;
 }
 .about-right-col {
   max-width: 400px;
