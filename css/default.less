@@ -35,6 +35,7 @@
 /* General */
 
 html, body { width:100%; height:100%; padding: 0; margin: 0;}
+body { overflow-x: hidden; }
 object { pointer-events: none; }
 *, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
 .clearfix:before, .clearfix:after { content: " "; display: table; }
@@ -301,6 +302,7 @@ input.disabled {
   margin: 0;
   padding: 0;
   background: rgba(62,37,74,0.9);
+  overflow-y: auto;
   li {
     display: block;
     margin: 30px 18px;
@@ -322,7 +324,7 @@ input.disabled {
 }
 
 .nav-menu-close {
-  position: absolute;
+  position: fixed;
   left: 0;
   margin: 36px 18px;
   cursor: pointer;

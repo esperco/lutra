@@ -1,10 +1,10 @@
 function toggleNavMenu() {
   if ($(".nav-menu").css("display") === "none") {
     $(".nav-menu").fadeIn("fast");
-    $(document.body).css("overflow", "hidden");
+    $(document.body).css("overflow-y", "hidden");
   } else {
     $(".nav-menu").fadeOut("fast");
-    $(document.body).css("overflow", "auto");
+    $(document.body).css("overflow-y", "auto");
   }
 }
 
