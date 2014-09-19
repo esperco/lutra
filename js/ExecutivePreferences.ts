@@ -23,10 +23,16 @@ module Esper.ExecutivePreferences {
   }
 
   export function save() {
-    var teamid      = login.getTeam().teamid;
-    var preferences = currentPreferences();
+    try {
+      var teamid      = login.getTeam().teamid;
+      var preferences = currentPreferences();
 
-    api.setPreferences(teamid, preferences);
+      api.setPreferences(teamid, preferences);
+    } catch (e) {
+      if (e !== "typo") {
+        throw e;
+      }
+    }
   }
 
   /** Returns the current values in the forms as JSON. */
@@ -39,21 +45,21 @@ module Esper.ExecutivePreferences {
           title   : $(e).find(".location-address").val(),
           address : ""
         },
-        duration : findDuration($(e)),
-        availability : []
+        duration     : findDuration($(e)),
+        availability : findAvailability($(e))
       });
     });
 
     var meetings = {
       phone_call : {
-        duration : findDuration($(".phone-widget")),
-        phones   : phoneNumberList(),
-        availability : []
+        duration     : findDuration($(".phone-widget")),
+        phones       : phoneNumberList(),
+        availability : findAvailability($(".phone-widget"))
       },
       video_call : {
-        duration : findDuration(".video-widget"),
-        accounts : videoAccountList(),
-        availability : []
+        duration     : findDuration($(".video-widget")),
+        accounts     : videoAccountList(),
+        availability : findAvailability($(".video-widget"))
       }
     };
 
@@ -67,7 +73,86 @@ module Esper.ExecutivePreferences {
     };
 
     function findDuration(element) {
-      return JSON.parse($(element).closest("li").find(".durations select").val());
+      return JSON.parse($(element).closest("li"). find(".durations select").val());
+    }
+
+    function findAvailability(element) {
+      var availabilityWidget = $(element).closest("li").find(".customize-availability");
+      
+      var availabilities = []
+
+      availabilityWidget.find(".availability").each(function(i, e) {
+        var days  = $($(e).find("input")[0]).val();
+        var start = $($(e).find("input")[1]).val();
+        var end   = $($(e).find("input")[2]).val();
+
+        if (days !== "" || start !== "" || end !== "") {
+
+          start = toTime(start);
+          end = toTime(end);
+
+          if (start === null || end === null) {
+            typo($(e));
+          } else {
+            days = days.split("").map(function (day) {
+              switch (day.toLowerCase()) {
+              case "m": return "Mon";
+              case "t": return "Tue";
+              case "w": return "Wed";
+              case "r": return "Thu";
+              case "f": return "Fri";
+              case "s": return "Sat";
+              case "u": return "Sun";
+
+              default : return null;
+              }
+            });
+
+            days.forEach(function (day) {
+              if (day) {
+                availabilities.push({
+                  avail_from : {
+                    day : day,
+                    time : start
+                  },
+                  avail_to : {
+                    day : day,
+                    time : end
+                  }
+                });
+              } else {
+                typo($(e));
+              }
+            });
+          }
+        }
+      });
+
+      return availabilities;
+
+      function toTime(str) {
+        str = str.replace(/\s/g, "").toLowerCase();
+        var parts = [0, 0];
+
+
+        if (/\d\d?:\d\d/.test(str)) {
+          parts = str.split(":");
+        } else if (/\d\d?/.test(str)) {
+          parts[0] = str;
+        } else {
+          return null;
+        }
+        
+        return {
+          hour   : parts[0],
+          minute : parts[1]
+        }
+      }
+
+      function typo(element) {
+        element.css("background", "#A83245");
+        throw "typo";
+      }
     }
 
     function phoneNumberList() {
@@ -109,9 +194,9 @@ module Esper.ExecutivePreferences {
       });
 
       return {
-        duration : findDuration(element),
-        availability : [],
-        favorites : locations
+        duration     : findDuration(element),
+        availability : findAvailability(element),
+        favorites    : locations
       };
     }
   }
@@ -393,8 +478,8 @@ module Esper.ExecutivePreferences {
   export function availabilityEntry() {
 '''
 <div #container class="availability">
-  <input type="text" class="day"></input> at 
-  <input type="text" class="start"></input> :
+  <input type="text" class="day"></input>, from 
+  <input type="text" class="start"></input> to
   <input type="text" class="end"></input>
 </div>
 '''    
