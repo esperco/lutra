@@ -590,7 +590,8 @@ input.disabled {
 .photo-grid {
   display: inline-block;
   width: 1200px;
-  margin: 0 auto 36px auto;
+  @media (min-width:768px) { margin: 0 auto 64px auto; }
+  @media (max-width:767px) { margin: 0 auto 48px auto; }
   @media (max-width:1199px) { width: 900px; }
   @media (max-width:899px)  { width: 600px; }
   @media (max-width:599px)  { width: 300px; }
@@ -670,10 +671,21 @@ input.disabled {
 
 /* Contact */
 
+.contact-grid {
+  display: inline-block;
+  width: 870px;
+  @media (min-width:768px) { margin: 64px auto; }
+  @media (max-width:767px) { margin: 48px auto; }
+  @media (max-width: 941px) { width: 510px; }
+  @media (max-width: 509px) { width: 320px; }
+}
+
 .contact-card {
   float: left;
   width: 260px;
-  margin: 10px 15px;
+  @media (max-width: 941px) { width: 480px; }
+  @media (max-width: 509px) { width: 290px; }
+  margin: 15px;
   padding: 30px 20px;
   background: white;
   border: 1px solid @gray_20;
