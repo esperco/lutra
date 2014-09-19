@@ -203,7 +203,7 @@ module Esper.ExecutivePreferences {
   /** The HTML controls for saving the executive's preferences. */
   export function saveButton() {
 '''
-<div class="save">
+<div #container class="save-controls">
   <select #teamSelect>
   </select>
   <a href="#" #save>Save</a>
@@ -229,7 +229,7 @@ module Esper.ExecutivePreferences {
       return false;
     });
     
-    return save;
+    return container;
   }
 
  /** Returns the ul element onto which everything else is added. */
