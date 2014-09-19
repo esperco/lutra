@@ -3,6 +3,8 @@ module Esper.ExecutivePreferences {
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
 
   export function load() {
+    $("#preferences-page").append(saveButton());
+
     $("#preferences-page").append(scaffolding());
 
     $(".preference-categories li.calls ul").append(phoneForm());
@@ -13,6 +15,13 @@ module Esper.ExecutivePreferences {
     });
 
     $(".preference-categories li.locations ul").append(locationForm());
+  }
+
+  export function save() {
+    var teamid      = login.getTeam().teamid;
+    var preferences = currentPreferences();
+
+    api.setPreferences(teamid, preferences);
   }
 
   /** Returns the current values in the forms as JSON. */
@@ -41,11 +50,13 @@ module Esper.ExecutivePreferences {
     };
 
     meals.forEach(function (meal) {
-      meetings[meal] = mealInfo(meal);
+      meetings[meal.toLowerCase()] = mealInfo(meal);
     });
-    
-    console.log("meetings", meetings);    
-    return locations;
+
+    return {
+      workplaces    : locations,
+      meeting_types : meetings
+    };
 
     function findDuration(element) {
       return JSON.parse($(element).closest("li").find(".durations select").val());
@@ -98,7 +109,16 @@ module Esper.ExecutivePreferences {
 
   /** The HTML controls for saving the executive's preferences. */
   export function saveButton() {
+'''
+<a href="#" #save>Save</a>
+'''    
+    save.click(function () {
+      save();
+
+      return false;
+    });
     
+    return save;
   }
 
  /** Returns the ul element onto which everything else is added. */
