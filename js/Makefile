@@ -129,6 +129,7 @@ prod-install:
 	mkdir -p ../pub/js
 	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp prod.js ../pub/js/app.js
+	cp js/executive-preferences.js ../pub/js
 
 clean:
 	rm -f *~ prod.js includes-*.html run-tests.js
