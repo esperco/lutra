@@ -20,9 +20,10 @@ function resizer() {
 
   function resizeCanvas() {
     if (window.innerWidth < 800) {
+      var offset = Math.abs(window.innerWidth - 800)/2;
       splash
-        .css("clip", "auto")
-        .css("margin-left", (window.innerWidth - 800)/2 + "px");
+        .css("clip", "rect(0px," + (window.innerWidth + offset) + "px,400px," + offset + "px)")
+        .css("margin-left", -offset + "px");
     } else {
       splash
         .css("clip", "rect(0," + window.innerWidth + "px,400px,0)")

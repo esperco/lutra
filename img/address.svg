@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100px" height="100px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>address</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="address" sketch:type="MSArtboardGroup">
+            <circle id="Oval-1" stroke="#A25CC6" stroke-width="2" sketch:type="MSShapeGroup" cx="50" cy="50" r="49"></circle>
+            <path d="M70,38.46 C70,28.27 61.05,20 50,20 C38.955,20 30,28.27 30,38.46 C30,41.825 30.995,44.975 32.7,47.69 L32.675,47.69 L50,80 L67.335,47.695 L67.305,47.695 C69.015,44.975 70,41.83 70,38.46 L70,38.46 Z M50.005,47.695 C44.48,47.695 40.005,43.56 40.005,38.465 C40.005,33.365 44.48,29.235 50.005,29.235 C55.525,29.235 60.005,33.37 60.005,38.465 C60.01,43.555 55.525,47.695 50.005,47.695 L50.005,47.695 Z" id="Shape" fill="#A25CC6" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>
