@@ -144,6 +144,10 @@ button {
   -o-transition: .2s;
   transition: .2s;
 }
+button.large {
+  padding: 8px 40px;
+  border-radius: 5px;
+}
 button:disabled {
   opacity: 0.2;
   pointer-events: none;
@@ -170,6 +174,9 @@ button.button-tertiary {
   color: white;
   background: none;
   border: 1px solid white;
+}
+button.button-tertiary.large {
+  border-width: 2px;
 }
 button.button-tertiary:hover {
   opacity: 0.5;
@@ -337,7 +344,7 @@ input.disabled {
   margin-top: 12px;
 }
 .footer-right-container .copyright {
-  padding: 15px 0 30px 0;
+  padding: 15px 0 46px 0;
   font-size: 12px;
   color: #a7a9ac;
   text-align: right;
@@ -390,13 +397,15 @@ input.disabled {
 .splash-content.fullscreen {
   height: 100%;
 }
-.splash-content-gray {
+.splash-content {
   height: 400px;
-  background: #a7a9ac;
   color: white;
 }
-.splash-content-gray .splash-label {
-  color: #a7a9ac;
+.splash-content .splash-label {
+  color: #5f5665;
+}
+.splash-content .splash-label:hover {
+  opacity: 0.5;
 }
 .splash-content a,
 .splash-content-gray a {
@@ -475,7 +484,7 @@ input.disabled {
   padding: 64px 36px;
 }
 .section-content.narrow {
-  max-width: 768px;
+  max-width: 800px;
 }
 .section-content-fixed {
   display: inline-block;
@@ -497,6 +506,9 @@ input.disabled {
 }
 .step {
   height: 180px;
+}
+.step.last {
+  height: 120px;
 }
 .number {
   position: absolute;
@@ -696,16 +708,35 @@ input.disabled {
 /* Careers */
 .benefit {
   float: left;
-  width: 50%;
-  padding: 30px 60px;
+  text-align: left;
+}
+@media (min-width: 768px) {
+  .benefit {
+    width: 50%;
+    padding: 30px 60px;
+  }
+}
+@media (max-width: 767px) {
+  .benefit {
+    width: 100%;
+    padding: 20px 0;
+  }
+}
+.benefit h4 {
+  color: #a7a9ac;
 }
 .were-hiring {
-  width: 426px;
-  height: 330px;
-  margin: 30px 60px 0 0;
+  width: 350px;
+  margin: 30px 80px 0 0;
 }
 .job-listing {
-  padding: 10px 0;
+  padding: 20px 0;
+}
+.job-listing h2 {
+  margin: 0;
+}
+.job-listing p {
+  margin-top: 0;
 }
 /* Terms of Use */
 .last-modified {
