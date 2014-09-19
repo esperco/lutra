@@ -786,6 +786,59 @@ input.disabled {
   text-align: center;
 }
 /* Jobs */
+.job-listings-container {
+  display: inline-block;
+}
+@media (min-width: 768px) {
+  .job-listings-container {
+    padding: 64px 36px;
+  }
+}
+@media (max-width: 767px) {
+  .job-listings-container {
+    width: 100%;
+    padding: 48px 20px;
+  }
+}
+@media (min-width: 768px) {
+  .were-hiring {
+    width: 350px;
+    margin: 30px 80px 0 0;
+  }
+}
+@media (max-width: 767px) {
+  .were-hiring {
+    width: 200px;
+    margin-bottom: 20px;
+  }
+}
+.job-listing {
+  padding: 20px 0;
+}
+.job-listing h2 {
+  margin: 0;
+}
+.job-listing p {
+  margin-top: 0;
+}
+@media (min-width: 768px) {
+  .jobs-left-col,
+  .jobs-right-col {
+    float: left;
+  }
+}
+@media (min-width: 768px) {
+  .jobs-right-col {
+    max-width: 400px;
+    text-align: left;
+  }
+}
+@media (max-width: 767px) {
+  .jobs-right-col {
+    width: 100%;
+    text-align: center;
+  }
+}
 .benefit {
   float: left;
   text-align: left;
@@ -804,27 +857,6 @@ input.disabled {
 }
 .benefit h4 {
   color: #a7a9ac;
-}
-.were-hiring {
-  width: 350px;
-  margin: 30px 80px 0 0;
-}
-.job-listing {
-  padding: 20px 0;
-}
-.job-listing h2 {
-  margin: 0;
-}
-.job-listing p {
-  margin-top: 0;
-}
-.jobs-left-col,
-.jobs-right-col {
-  float: left;
-}
-.jobs-right-col {
-  max-width: 400px;
-  text-align: left;
 }
 /* Contact */
 .contact-grid {
