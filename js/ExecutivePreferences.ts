@@ -34,18 +34,21 @@ module Esper.ExecutivePreferences {
           title   : $(e).find(".location-address").val(),
           address : ""
         },
-        duration : findDuration($(e))
+        duration : findDuration($(e)),
+        availability : []
       });
     });
 
     var meetings = {
       phone_call : {
         duration : findDuration($(".phone-widget")),
-        phones   : phoneNumberList()
+        phones   : phoneNumberList(),
+        availability : []
       },
       video_call : {
         duration : findDuration(".video-widget"),
-        accounts : videoAccountList()
+        accounts : videoAccountList(),
+        availability : []
       }
     };
 
@@ -102,6 +105,7 @@ module Esper.ExecutivePreferences {
 
       return {
         duration : findDuration(element),
+        availability : [],
         favorites : locations
       };
     }
