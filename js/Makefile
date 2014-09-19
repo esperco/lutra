@@ -67,20 +67,20 @@ TS_LIBS = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 # for executive preferences page
-EXECUTIVE_TS_SOURCES = \
+TS_SOURCES = \
   ExecutivePreferences
 
 # Complete oblivion/TypeScript source file names for executive preferences page
-EXECUTIVE_TS_SRC = \
-  $(addsuffix .ts,$(EXECUTIVE_TS_SOURCES))
+TS_SRC = \
+  $(addsuffix .ts,$(TS_SOURCES))
 
 # Result of preprocessing by oblivion
-EXECUTIVE_TS_OBLIVION = \
-  $(addprefix ts/,$(notdir $(EXECUTIVE_TS_SRC)))
+TS_OBLIVION = \
+  $(addprefix ts/,$(notdir $(TS_SRC)))
 
 # Input to tsc
-EXECUTIVE_TS = \
-  $(EXECUTIVE_TS_OBLIVION) \
+TS = \
+  $(TS_OBLIVION) \
   $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS)))
 
 # These don't get minified
@@ -101,9 +101,9 @@ ts/%.ts: %.ts
 	@mkdir -p ts
 	../setup/bin/oblivion -ts $< -o $@
 
-js/executive-preferences.js: $(EXECUTIVE_TS)
+js/executive-preferences.js: $(TS)
 	@mkdir -p js
-	tsc --out js/executive-preferences.js $(EXECUTIVE_TS)
+	tsc --out js/executive-preferences.js $(TS) || (rm js/executive-preferences.js; exit 1)
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)

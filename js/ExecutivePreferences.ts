@@ -1,3 +1,6 @@
+declare var api : any;
+declare var login : any;
+
 module Esper.ExecutivePreferences {
 
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
@@ -271,7 +274,7 @@ module Esper.ExecutivePreferences {
   <h1 #header>  </h1>
     <form #form class="toggle">
     <label>  <input type="radio" name="toggle" /> <span>No</span> </label>
-    <label>  <input type="radio" name="toggle" checked /> <span>Yes</span> </label>
+    <label>  <input type="radio" name="toggle" checked="checked" /> <span>Yes</span> </label>
   </form>
 
   <div #availabilityContainer class="customize-availability">
@@ -286,7 +289,6 @@ module Esper.ExecutivePreferences {
 '''    
 
     header.text(title);
-    form.append(durations().label);
 
     var possibleDurations = durations();
     form.after(possibleDurations.container);
@@ -355,7 +357,7 @@ module Esper.ExecutivePreferences {
 '''
 <div class="phone-number" #container>
   <select class="phone-type" #select>
-    <option value="Mobile" selected>mobile</option>
+    <option value="Mobile" selected="selected">mobile</option>
     <option value="Work">work</option>
     <option value="Home">home</option>
     <option value="Other">other</option>
@@ -401,7 +403,7 @@ module Esper.ExecutivePreferences {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
-    <option value="Google" selected>google</option>
+    <option value="Google" selected="selected">google</option>
     <option value="Skype">skype</option>
   </select>
   <input type="text" class="video-account" />
