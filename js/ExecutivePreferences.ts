@@ -22,9 +22,8 @@ module Esper.ExecutivePreferences {
     }
   }
 
-  export function save() {
+  export function save(teamid) {
     try {
-      var teamid      = login.getTeam().teamid;
       var preferences = currentPreferences();
 
       api.setPreferences(teamid, preferences);
@@ -204,10 +203,28 @@ module Esper.ExecutivePreferences {
   /** The HTML controls for saving the executive's preferences. */
   export function saveButton() {
 '''
-<a href="#" #save>Save</a>
+<div class="save">
+  <select #teamSelect>
+  </select>
+  <a href="#" #save>Save</a>
+</div>
 '''    
+    login.getTeams().forEach(function (team) {
+      var name   = team.team_name;
+      var teamid = team.teamid;
+      var option = $('<option value="' + teamid + '">').text(name);
+
+      teamSelect.append(option);
+    });
+
     save.click(function () {
-      save();
+      var teamid = teamSelect.val();
+
+      if (teamid) {
+        save(teamid);
+      } else {
+        alert("No valid team!");
+      }
 
       return false;
     });
