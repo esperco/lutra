@@ -1,5 +1,4 @@
 /* Do the right thing based on the URL */
-console.log("Whoo");
 var route = (function() {
 
   var mod = {};
