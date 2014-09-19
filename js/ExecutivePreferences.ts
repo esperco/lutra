@@ -1,20 +1,25 @@
 module Esper.ExecutivePreferences {
 
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
+  var loaded = false;
 
   export function load() {
-    $("#preferences-page").append(saveButton());
+    if (!loaded) {
+      $("#preferences-page").append(saveButton());
 
-    $("#preferences-page").append(scaffolding());
+      $("#preferences-page").append(scaffolding());
 
-    $(".preference-categories li.calls ul").append(phoneForm());
-    $(".preference-categories li.calls ul").append(videoForm());
+      $(".preference-categories li.calls ul").append(phoneForm());
+      $(".preference-categories li.calls ul").append(videoForm());
 
-    meals.map(mealForm).forEach(function (element) {
-      $(".preference-categories li.meals ul").append(element);
-    });
+      meals.map(mealForm).forEach(function (element) {
+        $(".preference-categories li.meals ul").append(element);
+      });
 
-    $(".preference-categories li.locations ul").append(locationForm());
+      $(".preference-categories li.locations ul").append(locationForm());
+
+      loaded = true;
+    }
   }
 
   export function save() {
@@ -168,8 +173,8 @@ module Esper.ExecutivePreferences {
   </form>
 
   <div #availabilityContainer class="customize-availability">
-    <a #availability href="#">Customize availability</a>
   </div>
+  <a #availability href="#">Add availability</a>
 
   <hr />
 
