@@ -22,9 +22,11 @@ module Esper.ExecutivePreferences {
     }
   }
 
-  export function save(teamid) {
+  export function saveToServer(teamid) {
     try {
       var preferences = currentPreferences();
+
+      console.log(preferences);
 
       api.setPreferences(teamid, preferences);
     } catch (e) {
@@ -221,7 +223,7 @@ module Esper.ExecutivePreferences {
       var teamid = teamSelect.val();
 
       if (teamid) {
-        save(teamid);
+        saveToServer(teamid);
       } else {
         alert("No valid team!");
       }
@@ -355,10 +357,10 @@ module Esper.ExecutivePreferences {
 '''
 <div class="phone-number" #container>
   <select class="phone-type" #select>
-    <option value="mobile" selected>mobile</option>
-    <option value="work">work</option>
-    <option value="home">home</option>
-    <option value="other">other</option>
+    <option value="Mobile" selected>mobile</option>
+    <option value="Work">work</option>
+    <option value="Home">home</option>
+    <option value="Other">other</option>
   </select>
   <input type="text" class="phone-number" />
 </div>
@@ -401,9 +403,8 @@ module Esper.ExecutivePreferences {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
-    <option value="google" selected>google</option>
-    <option value="skype">skype</option>
-    <option value="other">other</option>
+    <option value="Google" selected>google</option>
+    <option value="Skype">skype</option>
   </select>
   <input type="text" class="video-account" />
 </div>
