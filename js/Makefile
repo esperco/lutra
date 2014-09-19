@@ -125,7 +125,7 @@ dev-install: $(COMMON_JS) $(APP_JS) js/executive-preferences.js
 	cp $(APP_JS) ../pub/js
 	cp js/executive-preferences.js ../pub/js
 
-prod-install:
+prod-install: js/executive-preferences.js
 	mkdir -p ../pub/js
 	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp prod.js ../pub/js/app.js
