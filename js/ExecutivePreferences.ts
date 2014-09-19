@@ -26,8 +26,6 @@ module Esper.ExecutivePreferences {
     try {
       var preferences = currentPreferences();
 
-      console.log(preferences);
-
       api.setPreferences(teamid, preferences);
     } catch (e) {
       if (e !== "typo") {
@@ -174,8 +172,8 @@ module Esper.ExecutivePreferences {
 
       $(".video-widget div.video-account").each(function (i, e) {
         res.push({
-          video_type    : $(e).find("select").val(),
-          video_usernam : $(e).find("input").val()
+          video_type     : $(e).find("select").val(),
+          video_username : $(e).find("input").val()
         });
       });
 
