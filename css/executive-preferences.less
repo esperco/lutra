@@ -1,0 +1,180 @@
+ul.preference-categories, ul.preference-options {
+  padding-left : 0;
+}
+
+.preference-options {
+  position : relative;
+
+  text-align : center;
+  
+  margin-bottom : 20px;
+
+  li {
+    width : 350px;
+
+    vertical-align : top;
+    margin-left : 10px;
+    margin-right : 10px;
+
+    display : inline-block;
+
+    padding : 4px;
+    padding-top : 30px;
+
+    border : 2px solid grey;
+    border-radius : 8px;
+    
+    .another-location {
+      display : block;
+      margin-top : 20px;
+    }
+
+    .rest {
+      height : 125px;
+      overflow : auto;
+    }
+
+    .location-details {
+      label {
+        display : block;
+
+        height : 25px;
+        margin-bottom : 4px;
+        padding-top : 4px;
+
+        font-size : 16px;
+
+        input[type="text"] {
+          float : right;
+
+          width : 60%;
+        }
+
+        span {
+          float : left;
+        }
+      }
+    }
+  }
+}
+
+.meals, .locations {
+  ul.preference-options li {
+    height : 500px;
+    padding-top : 100px;
+  }
+}
+
+.preference-options {
+  font-family : "Open Sans", sans-serif;
+
+  h1 {
+    font-size : 28px;
+  }
+
+  .toggle {
+    width : 350px;
+    height : 30px;
+    
+    margin-bottom : 10px;
+
+    font-size : 18px;
+
+    label {
+      input[type="radio"] {
+        display : none;
+
+        & + span {
+          display : inline-block;
+          width : 150px;
+
+          padding-top : 8px;
+          padding-bottom : 4px;
+
+          border : 2px solid grey;
+        }
+        
+        &:checked + span {
+          background : green;
+
+          color : white;
+        }
+      }
+
+      &:first-child span {
+        margin-right : -4px;
+
+        border-top-left-radius : 8px;
+        border-bottom-left-radius : 8px;
+      }
+
+      &:last-child span {
+        margin-left : -4px;
+
+        border-top-right-radius : 8px;
+        border-bottom-right-radius : 8px;
+      }
+    }
+  }
+
+  .durations {
+    margin-top : 30px;
+
+    color : grey;
+    font-size : 16px;
+  }
+
+  select {
+    width : 100px;
+
+    margin : 10px;
+  }
+
+  hr {
+    width : 80%;
+
+    margin-top : 18px;
+    margin-bottom : 10px;
+  }
+}
+
+.customize-availability {
+  height : 50px;
+  overflow : auto;
+
+  a {
+    display : block;
+    margin-bottom : 4px;
+  }
+
+  .availability {
+    input[type="text"] {
+      width : 3em;
+    }
+  }
+}
+
+.save-controls {
+  border : 2px solid grey;
+  border-radius : 8px;
+
+  margin-left : auto;
+  margin-right : auto;
+  margin-bottom : 15px;
+
+  height : 50px;
+  width : 300px;
+
+  padding : 10px;
+
+  select {
+    margin-left : 20px;
+    font-size : 16px;
+  }
+  
+  a {
+    margin-right : 30px;
+    font-size : 18px;
+    float : right;
+  }
+}

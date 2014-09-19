@@ -60,6 +60,29 @@ APP_SOURCES = \
   route.js \
   main.js
 
+TS_LIBS = \
+  jquery.d
+
+# TypeScript sources that need to be preprocessed with 'oblivion'
+# and then compiled into JavaScript by tsc.
+# Output Javascript files are put into the js/ subdirectory.
+# for executive preferences page
+TS_SOURCES = \
+  ExecutivePreferences
+
+# Complete oblivion/TypeScript source file names for executive preferences page
+TS_SRC = \
+  $(addsuffix .ts,$(TS_SOURCES))
+
+# Result of preprocessing by oblivion
+TS_OBLIVION = \
+  $(addprefix ts/,$(notdir $(TS_SRC)))
+
+# Input to tsc
+TS = \
+  $(TS_OBLIVION) \
+  $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS)))
+
 # These don't get minified
 PROD_FLAGS = prod_flags.js
 DEV_FLAGS = dev_flags.js
@@ -74,6 +97,14 @@ js/%.js: %.js
 	@mkdir -p js
 	../setup/bin/oblivion $< -o $@
 
+ts/%.ts: %.ts
+	@mkdir -p ts
+	../setup/bin/oblivion -ts $< -o $@
+
+js/executive-preferences.js: $(TS)
+	@mkdir -p js
+	tsc --out js/executive-preferences.js $(TS) || (rm js/executive-preferences.js; exit 1)
+
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
 includes-dev.html: Makefile mkloader
@@ -87,11 +118,12 @@ includes-prod.html: Makefile mkloader
 prod.js: $(COMMON_JS) $(APP_JS)
 	cat $(COMMON_JS) $(APP_JS) | uglifyjs -o $@
 
-dev-install: $(COMMON_JS) $(APP_JS)
+dev-install: $(COMMON_JS) $(APP_JS) js/executive-preferences.js
 	mkdir -p ../pub/js
 	cp $(DEV_FLAGS) ../pub/js/flags.js
 	cp $(COMMON_JS) ../pub/js
 	cp $(APP_JS) ../pub/js
+	cp js/executive-preferences.js ../pub/js
 
 prod-install:
 	mkdir -p ../pub/js
