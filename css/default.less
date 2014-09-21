@@ -1,13 +1,8 @@
 /*** Colors ***/
-@border: #ebebeb;
 @gray_f8: #f8f8f8;
-@gray_05: #f1f2f2;
-@gray_10: #e6e7e8;
 @gray_20: #d1d3d4;
-@gray_30: #bcbec0;
 @gray_40: #a7a9ac;
 @gray_60: #808285;
-
 @gray_80: #58595b;
 @gray_90: #414042;
 
@@ -26,10 +21,6 @@
 @purple_hover_light: #be89d7;
 
 @purple_text: #5F5665;
-
-@red: #d9534f;
-@red_disabled: #eba8a7;
-@red_hover: #d2322d;
 
 
 /* General */
@@ -99,6 +90,7 @@ li, p {
 a {
   color: @purple;
   text-decoration: none;
+  cursor: pointer;
   &:hover { color: @purple_text; }
   &.toggle { float: left; }
 }
@@ -175,19 +167,15 @@ button.toggle-left {
 button.toggle-middle { border-radius: 0; }
 button.toggle-right {
   border-top-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .social {
-  opacity: 0.5;
-  -webkit-filter: grayscale(100%);
-     -moz-filter: grayscale(100%);
-          filter: grayscale(100%);
+  .default { display: inline-block; }
+  .hover { display: none; }
   &:hover {
-    opacity: 1;
-    -webkit-filter: none;
-       -moz-filter: none;
-            filter: none;
+    .default { display: none; }
+    .hover { display: inline-block; }
   }
 }
 
@@ -240,12 +228,16 @@ input.disabled {
   max-width: 1280px;
   margin: 0 auto;
 }
+
+.desktop-nav-links, .nav-menu-toggle { display: none; }
+@media (min-width:768px) { .desktop-nav-links {display: block; } }
+@media (max-width:767px) { .nav-menu-toggle { display: block; } }
+
 .navbar {
   @media (min-width:768px) { padding: 18px 36px; }
   @media (max-width:767px) { padding: 18px; }
 }
 .splash-navbar {
-  display: none;
   height: 78px;
   @media (min-width:768px) { padding: 28px 36px 14px 36px; }
   @media (max-width:767px) { padding: 28px 18px 14px 18px; }
@@ -317,7 +309,7 @@ input.disabled {
     }
   }
   .social {
-    margin-left: 18px;
+    margin-left: 28px;
     opacity: 1;
     &:hover { opacity: 0.5; }
   }
@@ -331,9 +323,6 @@ input.disabled {
   &:hover { opacity: 0.5; }
   &:active { opacity: 0.5; }
 }
-
-@media (min-width:768px) { .splash-navbar.desktop { display: block; } }
-@media (max-width:767px) { .splash-navbar.mobile { display: block; } }
 
 
 /* Footer */
@@ -412,12 +401,8 @@ input.disabled {
   background: #785988;
 }
 
-@media (min-width:800px) {
-  .splash { width: 100%; }
-}
-@media (max-width:799px) {
-  .splash { height: 400px; }
-}
+@media (min-width:800px) { .splash { width: 100%; } }
+@media (max-width:799px) { .splash { height: 400px; } }
 
 .splash-content {
   position: relative;
@@ -425,25 +410,21 @@ input.disabled {
   height: 400px;
   color: white;
   &.fullscreen { height: 100%; }
-}
-.splash-content {
-  height: 400px;
-  color: white;
   .splash-label {
     color: @purple_text;
     &:hover { opacity: 0.5; }
   }
+  a {
+    color: white;
+    -webkit-transition:.2s;
+       -moz-transition:.2s;
+        -ms-transition:.2s;
+         -o-transition:.2s;
+            transition:.2s;
+  }
 }
 
-.splash-content a, .splash-content-gray a {
-  display: inline-block;
-  color: white;
-  -webkit-transition:.2s;
-     -moz-transition:.2s;
-      -ms-transition:.2s;
-       -o-transition:.2s;
-          transition:.2s;
-}
+.splash-content 
 
 .splash-text-container {
   position: absolute;
@@ -569,15 +550,44 @@ input.disabled {
 
 /* Discover */
 
-#dream-team {
-  margin-bottom: -4px;
-  padding-bottom: 0;
+.dream-team-container {
+  display: inline-block;
+  vertical-align: bottom;
+  @media (min-width:768px) {
+    padding: 64px 36px 0 36px;
+  }
+  @media (max-width:767px) {
+    width: 100%;
+    padding: 48px 18px 0 18px;
+  }
 }
 
-.dream-team-faces {
-  @media (min-width:480px) { width: 440px; }
-  @media (max-width:479px) { width: 280px; }
-  margin-top: 30px;
+.dream-team-faces { vertical-align: bottom; }
+
+@media (min-width:880px) {
+  .dream-team-faces {
+    width: 345px;
+  }
+  .dream-team-left-col {
+    float: right;
+    margin-right: 60px;
+  }
+  .dream-team-right-col {
+    float: right;
+    width: 400px;
+    padding-top: 30px;
+    text-align: left;
+  }
+}
+@media (max-width:879px) {
+  .dream-team-faces {
+    width: 230px;
+    margin-top: 20px;
+  }
+  .dream-team-right-col {
+    max-width: 728px;
+    text-align: center;
+  }
 }
 
 
@@ -681,6 +691,8 @@ input.disabled {
 
 /* Jobs */
 
+.jobs-tagline { font-family: monospace; }
+
 .job-listings-container {
   display: inline-block;
   @media (min-width:768px) {
@@ -692,13 +704,13 @@ input.disabled {
   }
 }
 
-.were-hiring {
+.hiring {
   @media (min-width:768px) {
-    width: 350px;
-    margin: 30px 80px 0 0;
+    width: 324px;
+    margin: 54px 80px 0 0;
   }
   @media (max-width:767px) {
-    width: 200px;
+    width: 216px;
     margin-bottom: 20px;
   }
 }
@@ -814,6 +826,7 @@ input.disabled {
 /* Terms of Use */
 
 .last-modified {
+  margin-top: 10px;
   font-size: 12px;
   opacity: 0.7;
 }

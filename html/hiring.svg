@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="678px" height="520px" viewBox="0 0 678 520" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>hiring</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-1">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
+            <feMerge>
+                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="Graphics" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="hiring" sketch:type="MSArtboardGroup">
+            <rect id="Rectangle-2" stroke="#979797" fill="#FFFFFF" sketch:type="MSShapeGroup" x="0" y="0" width="678" height="520"></rect>
+            <path d="M88.5,138.5 C88.5,138.5 290.882812,5.14843748 338,5.14843749 C385.117188,5.14843749 565.5,113.5 565.5,113.5" id="Line" stroke="#979797" stroke-width="4" stroke-linecap="square" sketch:type="MSShapeGroup"></path>
+            <g id="Group" sketch:type="MSLayerGroup" transform="translate(338.000000, 271.000000) rotate(-3.000000) translate(-338.000000, -271.000000) translate(33.000000, 63.000000)">
+                <rect id="Rectangle-1" stroke="#FFFFFF" stroke-width="20" fill="#A71E22" filter="url(#filter-1)" sketch:type="MSShapeGroup" x="8.8817842e-16" y="46" width="610" height="370" rx="40"></rect>
+                <text id="We’re" sketch:type="MSTextLayer" font-family="Arial" font-size="72" font-weight="bold" fill="#FFFFFF">
+                    <tspan x="359" y="216">We’re</tspan>
+                </text>
+                <text id="Come-in" sketch:type="MSTextLayer" transform="translate(193.000000, 138.768677) rotate(-15.000000) translate(-193.000000, -138.768677) " font-family="Wolf in the City" font-size="200" font-style="italic" font-weight="normal" fill="#FFFFFF">
+                    <tspan x="31" y="188.768677">Come in</tspan>
+                </text>
+                <text id="HIRING" sketch:type="MSTextLayer" font-family="Arial" font-size="144" font-weight="bold" sketch:alignment="middle" fill="#FFFFFF">
+                    <tspan x="53.5" y="359">HIRING</tspan>
+                </text>
+            </g>
+            <circle id="Oval-1" stroke="#979797" fill="#D8D8D8" filter="url(#filter-2)" sketch:type="MSShapeGroup" cx="338" cy="8" r="7"></circle>
+        </g>
+    </g>
+</svg>

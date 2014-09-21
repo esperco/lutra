@@ -117,6 +117,7 @@ p {
 a {
   color: #a25cc6;
   text-decoration: none;
+  cursor: pointer;
 }
 a:hover {
   color: #5f5665;
@@ -201,19 +202,19 @@ button.toggle-middle {
 }
 button.toggle-right {
   border-top-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
-.social {
-  opacity: 0.5;
-  -webkit-filter: grayscale(100%);
-  -moz-filter: grayscale(100%);
-  filter: grayscale(100%);
+.social .default {
+  display: inline-block;
 }
-.social:hover {
-  opacity: 1;
-  -webkit-filter: none;
-  -moz-filter: none;
-  filter: none;
+.social .hover {
+  display: none;
+}
+.social:hover .default {
+  display: none;
+}
+.social:hover .hover {
+  display: inline-block;
 }
 /** Input **/
 input {
@@ -269,6 +270,20 @@ input.disabled {
   max-width: 1280px;
   margin: 0 auto;
 }
+.desktop-nav-links,
+.nav-menu-toggle {
+  display: none;
+}
+@media (min-width: 768px) {
+  .desktop-nav-links {
+    display: block;
+  }
+}
+@media (max-width: 767px) {
+  .nav-menu-toggle {
+    display: block;
+  }
+}
 @media (min-width: 768px) {
   .navbar {
     padding: 18px 36px;
@@ -280,7 +295,6 @@ input.disabled {
   }
 }
 .splash-navbar {
-  display: none;
   height: 78px;
 }
 @media (min-width: 768px) {
@@ -380,7 +394,7 @@ input.disabled {
   opacity: 0.5;
 }
 .nav-menu .social {
-  margin-left: 18px;
+  margin-left: 28px;
   opacity: 1;
 }
 .nav-menu .social:hover {
@@ -397,16 +411,6 @@ input.disabled {
 }
 .nav-menu-close:active {
   opacity: 0.5;
-}
-@media (min-width: 768px) {
-  .splash-navbar.desktop {
-    display: block;
-  }
-}
-@media (max-width: 767px) {
-  .splash-navbar.mobile {
-    display: block;
-  }
 }
 /* Footer */
 .footer-container {
@@ -511,19 +515,13 @@ input.disabled {
 .splash-content.fullscreen {
   height: 100%;
 }
-.splash-content {
-  height: 400px;
-  color: white;
-}
 .splash-content .splash-label {
   color: #5f5665;
 }
 .splash-content .splash-label:hover {
   opacity: 0.5;
 }
-.splash-content a,
-.splash-content-gray a {
-  display: inline-block;
+.splash-content a {
   color: white;
   -webkit-transition: .2s;
   -moz-transition: .2s;
@@ -531,7 +529,7 @@ input.disabled {
   -o-transition: .2s;
   transition: .2s;
 }
-.splash-text-container {
+.splash-content .splash-text-container {
   position: absolute;
   top: 140px;
   width: 100%;
@@ -694,21 +692,47 @@ input.disabled {
   }
 }
 /* Discover */
-#dream-team {
-  margin-bottom: -4px;
-  padding-bottom: 0;
+.dream-team-container {
+  display: inline-block;
+  vertical-align: bottom;
 }
-.dream-team-faces {
-  margin-top: 30px;
-}
-@media (min-width: 480px) {
-  .dream-team-faces {
-    width: 440px;
+@media (min-width: 768px) {
+  .dream-team-container {
+    padding: 64px 36px 0 36px;
   }
 }
-@media (max-width: 479px) {
+@media (max-width: 767px) {
+  .dream-team-container {
+    width: 100%;
+    padding: 48px 18px 0 18px;
+  }
+}
+.dream-team-faces {
+  vertical-align: bottom;
+}
+@media (min-width: 880px) {
   .dream-team-faces {
-    width: 280px;
+    width: 345px;
+  }
+  .dream-team-left-col {
+    float: right;
+    margin-right: 60px;
+  }
+  .dream-team-right-col {
+    float: right;
+    width: 400px;
+    padding-top: 30px;
+    text-align: left;
+  }
+}
+@media (max-width: 879px) {
+  .dream-team-faces {
+    width: 230px;
+    margin-top: 20px;
+  }
+  .dream-team-right-col {
+    max-width: 728px;
+    text-align: center;
   }
 }
 /* Join the waiting list */
@@ -852,6 +876,9 @@ input.disabled {
   text-align: center;
 }
 /* Jobs */
+.jobs-tagline {
+  font-family: monospace;
+}
 .job-listings-container {
   display: inline-block;
 }
@@ -867,14 +894,14 @@ input.disabled {
   }
 }
 @media (min-width: 768px) {
-  .were-hiring {
-    width: 350px;
-    margin: 30px 80px 0 0;
+  .hiring {
+    width: 324px;
+    margin: 54px 80px 0 0;
   }
 }
 @media (max-width: 767px) {
-  .were-hiring {
-    width: 200px;
+  .hiring {
+    width: 216px;
     margin-bottom: 20px;
   }
 }
@@ -1015,6 +1042,7 @@ input.disabled {
 }
 /* Terms of Use */
 .last-modified {
+  margin-top: 10px;
   font-size: 12px;
   opacity: 0.7;
 }
