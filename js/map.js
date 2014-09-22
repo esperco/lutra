@@ -80,7 +80,7 @@ function init() {
   var mapElement = document.getElementById("esper-map");
   var map = new google.maps.Map(mapElement, mapOptions);
   marker = new google.maps.Marker({
-    icon: '../img/marker.png',
+    icon: '../img/marker.svg',
     position: new google.maps.LatLng(37.4494339, -122.158983),
     clickable: false,
     map: map
