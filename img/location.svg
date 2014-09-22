@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>location</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="location" sketch:type="MSArtboardGroup" stroke="#A25CC6" stroke-width="1.66101695">
+            <path d="M27.6101695,67 L11,109 L109,109 L92.3898305,67 L27.6101695,67 Z" id="Rectangle-11" fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
+            <path d="M85,34.075 C85,21.3375 73.8125,11 60,11 C46.19375,11 35,21.3375 35,34.075 C35,38.28125 36.24375,42.21875 38.375,45.6125 L38.34375,45.6125 L60,86 L81.66875,45.61875 L81.63125,45.61875 C83.76875,42.21875 85,38.2875 85,34.075 L85,34.075 Z M60.00625,45.61875 C53.1,45.61875 47.50625,40.45 47.50625,34.08125 C47.50625,27.70625 53.1,22.54375 60.00625,22.54375 C66.90625,22.54375 72.50625,27.7125 72.50625,34.08125 C72.5125,40.44375 66.90625,45.61875 60.00625,45.61875 L60.00625,45.61875 Z" id="Shape" fill="#E3CDEE" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

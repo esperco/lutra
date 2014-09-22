@@ -54,7 +54,6 @@ function loadElements() {
     });
   });
   $(".about-navbar").load("about-navbar.html", function() {
-    console.log($(".about-navbar").attr("id"));
     var page = $(".about-navbar").attr("id");
     $("." + page).addClass("active");
   })

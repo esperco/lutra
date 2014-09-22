@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="120px" height="120px" viewBox="0 0 120 120" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>healthcare</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="healthcare" sketch:type="MSArtboardGroup" stroke="#A25CC6" stroke-width="1.66101695">
+            <rect id="Rectangle-6" sketch:type="MSShapeGroup" x="11" y="34" width="98" height="75" rx="6.6440678"></rect>
+            <path d="M45.8708052,17.9607319 C44.2853033,17.9607319 43,19.2463774 43,20.8286727 L43,34.0024671 L76,34.0024671 L76,20.449652 C76,19.0750594 74.8831217,17.9607319 73.5061094,17.9607319 L45.8708052,17.9607319 Z" id="Rectangle-8" sketch:type="MSShapeGroup"></path>
+            <path d="M41.639614,11 C37.9726564,11 35,13.9835813 35,17.653249 L35,34.0024065 C35,34.0024065 85,34.0024065 85,34.0024065 L85,17.653249 C85,13.9787611 82.0220089,11 78.360386,11 L41.639614,11 Z" id="Rectangle-6" sketch:type="MSShapeGroup"></path>
+            <path d="M53.3333333,78.6666667 L36.6635895,78.6666667 C35.7456087,78.6666667 35,77.9226907 35,77.0049498 L35,66.9950502 C35,66.0691835 35.7448144,65.3333333 36.6635895,65.3333333 L53.3333333,65.3333333 L53.3333333,48.6635895 C53.3333333,47.7456087 54.0773093,47 54.9950502,47 L65.0049498,47 C65.9308165,47 66.6666667,47.7448144 66.6666667,48.6635895 L66.6666667,65.3333333 L83.3364105,65.3333333 C84.2543913,65.3333333 85,66.0773093 85,66.9950502 L85,77.0049498 C85,77.9308165 84.2551856,78.6666667 83.3364105,78.6666667 L66.6666667,78.6666667 L66.6666667,95.3364105 C66.6666667,96.2543913 65.9226907,97 65.0049498,97 L54.9950502,97 C54.0691835,97 53.3333333,96.2551856 53.3333333,95.3364105 L53.3333333,78.6666667 Z" id="Rectangle-7" fill="#E3CDEE" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

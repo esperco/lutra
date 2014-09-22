@@ -1,25 +1,15 @@
 /*** Colors ***/
-@gray_f8: #f8f8f8;
-@gray_20: #d1d3d4;
-@gray_40: #a7a9ac;
+@gray_f8: #F8F8F8;
+@gray_20: #D1D3D4;
+@gray_40: #A7A9AC;
 @gray_60: #808285;
-@gray_80: #58595b;
-@gray_90: #414042;
-
-@green: #2bb673;
-@orange: #f7941e;
-@purple: #a25cc6;
-
-@purple_active: #7d3ca0;
-@purple_bg: #FEFBFF;
-@purple_bg_hover: #F5EBF8;
-@purple_bg_active: #faf7fc;
-@purple_disabled: #ceb3e5;
-@purple_focus: #c08add;
-@purple_gradient: #a464c6;
-@purple_hover: #8c42ad;
-@purple_hover_light: #be89d7;
-
+@gray_80: #58595B;
+@green: #2BB673;
+@orange: #F7941E;
+@purple: #A25CC6;
+@purple_focus: #C08ADD;
+@purple_hover: #8C42AD;
+@purple_splash: #785988;
 @purple_text: #5F5665;
 
 
@@ -134,12 +124,12 @@ button.button-primary {
   background: @purple;
   &:hover {
     color: white;
-    background: #8c42ad;
+    background: @purple_hover;
   }
 }
 
 button.button-secondary {
-  color: @gray_90;
+  color: @purple_text;
   background: white;
   &:hover { opacity: 0.5; }
 }
@@ -188,18 +178,18 @@ input {
   font-family: "Open Sans";
   @media (min-width:768px) { font-size: 16px; }
   @media (max-width:767px) { font-size: 14px; }
-  border: 1px solid #d1d3d4;
+  border: 1px solid @gray_20;
   border-radius: 3px;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
 
 input:hover {
-  border: 1px solid #a7a9ac;
+  border: 1px solid @gray_40;
 }
 
 input:focus {
-  border-color: #c08add;
+  border-color: @purple_focus;
   outline: 0;
   -webkit-box-shadow: none;
           box-shadow: none;
@@ -281,7 +271,7 @@ input.disabled {
   }
 }
 
-.navbar .nav-link { color: #a7a9ac; }
+.navbar .nav-link { color: @gray_40; }
 
 .nav-menu {
   display: none;
@@ -398,7 +388,7 @@ input.disabled {
   z-index: 1;
   width: 100%;
   height: 400px;
-  background: #785988;
+  background: @purple_splash;
 }
 
 @media (min-width:800px) { .splash { width: 100%; } }
@@ -461,7 +451,7 @@ input.disabled {
 .section-container { text-align: center; }
 .section-container.left-align { text-align: left; }
 .section-container.gray { background: @gray_f8; }
-.section-container.dark { background: @gray_90; }
+.section-container.dark { background: @purple_text; }
 
 .section-content {
   max-width: 1280px;
@@ -656,7 +646,7 @@ input.disabled {
   float: left;
   width: 240px;
   margin: 20px 30px;
-  border: 1px solid #d1d3d4;
+  border: 1px solid @gray_20;
   border-radius: 3px;
   -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.10);
           box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.10);
@@ -739,15 +729,26 @@ input.disabled {
   }
 }
 
+.benefits-row { text-align: center; }
+
 .benefit {
-  float: left;
-  @media (min-width:768px) {
-    width: 50%;
-    padding: 30px 60px;
+  img {
+    float: left;
+    margin-top: 35px;
   }
-  @media (max-width:767px) {
-    width: 100%;
+  @media (min-width:1000px) {
+    float: left;
+    width: 50%;
+    padding: 20px 30px;
+    img { width: 120px; }
+    .benefit-text { margin-left: 160px; }
+  }
+  @media (max-width:999px) {
+    display: inline-block;
+    max-width: 600px;
     padding: 20px 0;
+    img { width: 80px; }
+    .benefit-text { margin-left: 100px; }
   }
   text-align: left;
   h4 { color: @gray_40; }
@@ -775,17 +776,9 @@ input.disabled {
   background: white;
   border: 1px solid @gray_20;
   border-radius: 3px;
-  a { color: @gray_90; }
+  a { color: @purple_text; }
   a:hover { color: @purple; }
 
-}
-
-.icon-placeholder {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto;
-  background: @gray_60;
-  border-radius: 100%;
 }
 
 #esper-map {
@@ -793,35 +786,7 @@ input.disabled {
   height: 450px;
 }
 
-.gm-style-iw * {
-  display: block;
-  width: 100%;
-}
-
-.gm-style-iw h4, .gm-style-iw p {
-  margin: 0;
-  padding: 0;
-}
-
-.gm-style-iw a {
-  color: #4272db;
-}
-
-.map-container{
-  position: relative;
-}
-
-.map-title{
-  position: absolute;
-  z-index: 10;
-  top: 0;
-  right: 0;
-  height: 450px;
-  padding: 40px 40px 40px 160px;
-  color: white;
-  background-image: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1));
-  a { color: white; }
-}
+.map-container { position: relative; }
 
 
 /* Terms of Use */
