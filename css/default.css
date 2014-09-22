@@ -326,6 +326,9 @@ input.disabled {
   -o-transition: .2s;
   transition: .2s;
 }
+.logo {
+  width: 28px;
+}
 .cta {
   margin-left: 28px;
 }
@@ -397,12 +400,16 @@ input.disabled {
   margin-left: 28px;
   opacity: 1;
 }
+.nav-menu .social img {
+  height: 32px;
+}
 .nav-menu .social:hover {
   opacity: 0.5;
 }
 .nav-menu-close {
   position: fixed;
   left: 0;
+  width: 30px;
   margin: 36px 18px;
   cursor: pointer;
 }
@@ -459,6 +466,7 @@ input.disabled {
   padding: 20px 0;
 }
 .footer-right-container .footer-logo {
+  height: 14px;
   margin-top: 12px;
 }
 .footer-right-container .copyright {
@@ -1018,6 +1026,10 @@ input.disabled {
 }
 .contact-card a {
   color: #5f5665;
+}
+.contact-card a img {
+  width: 100px;
+  margin: 0 auto;
 }
 .contact-card a:hover {
   color: #a25cc6;
