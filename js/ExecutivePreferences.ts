@@ -8,6 +8,8 @@ module Esper.ExecutivePreferences {
 
   export function load() {
     if (!loaded) {
+      var startingPreferences = loadPreferences();
+
       $("#preferences-page").append(saveButton());
 
       $("#preferences-page").append(scaffolding());
@@ -23,6 +25,64 @@ module Esper.ExecutivePreferences {
 
       loaded = true;
     }
+  }
+
+  /** Returns an object that contains the preferences for a form that
+   *  hasn't been filled out at all.
+   */
+  export function defaultPreferences() {
+    var defaultDuration = {
+      hour   : 1,
+      minute : 0
+    };
+
+    var defaultLocation = {
+      title   : "",
+      address : ""
+    };
+
+    var defaults    = {
+      meeting_types : {
+        phone_call : {
+          availability : [],
+          duration     : defaultDuration,
+          phones       : [
+            {
+              phone_number : "",
+              phone_type   : ""
+            }
+          ]
+        },
+        video_call : {
+          availability : [],
+          duration     : defaultDuration,
+          accounts     : {
+            video_type     : "Google",
+            video_username : ""
+          }
+        }
+      },
+      workplaces    : [
+        {
+          availability : [],
+          duration     : defaultDuration,
+          location     : defaultLocation
+        }
+      ]
+    };
+
+    var defaultMealInfo = {
+      availability : [],
+      duration     : defaultDuration,
+      favorites    : [ defaultLocation ]
+    };
+
+    meals.forEach(function (meal) {
+      defaults.meeting_types[meal] = defaultMealInfo;
+    });
+
+    // Deep copy object to return a new instance:
+    return $.extend(true, {}, defaults);
   }
 
   export function saveToServer(teamid) {
@@ -207,7 +267,7 @@ module Esper.ExecutivePreferences {
   export function saveButton() {
 '''
 <div #container class="save-controls">
-  <select #teamSelect>
+  <select id="teamSelect" #teamSelect>
   </select>
   <a href="#" #save>Save</a>
 </div>
