@@ -73,6 +73,7 @@ module Esper.ExecutivePreferences {
           .append(videoForm(startingPreferences.meeting_types.video_call));
 
         meals.map(function (meal) {
+          console.log("Starting preferences", startingPreferences);
           return mealForm(meal, startingPreferences.meeting_types[meal]);
         }).forEach(function (element) {
           $(".preference-categories li.meals ul").append(element);
@@ -105,7 +106,7 @@ module Esper.ExecutivePreferences {
       console.log(preferences);
       console.log($.extend(defaultPreferences(), preferences));
 
-      callback($.extend(defaultPreferences(), preferences));
+      callback($.extend(true, defaultPreferences(), preferences));
     });
   }
 
