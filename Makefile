@@ -4,6 +4,7 @@ install: s3
 
 # Copy public files into pub/
 local-install:
+	$(MAKE) -C css
 	./local-install
 
 # Copy pub/ into S3 bucket
