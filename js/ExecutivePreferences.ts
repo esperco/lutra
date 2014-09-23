@@ -55,7 +55,7 @@ module Esper.ExecutivePreferences {
 
   function fromTime(time) {
     var minute = time.minute.toString();
-    var paddedMinute = minute.length < 2 : "0" + minute : minute;
+    var paddedMinute = minute.length < 2 ? "0" + minute : minute;
     
     return time.hour + ":" + paddedMinute;
   }
@@ -168,7 +168,7 @@ module Esper.ExecutivePreferences {
         }
       ]
     };
-
+ 
     var defaultMealInfo = {
       availability : [defaultAvailability],
       duration     : defaultDuration,
@@ -203,8 +203,8 @@ module Esper.ExecutivePreferences {
     $(".location-details").each(function (i, e) {
       locations.push({
         location : {
-          title   : $(e).find(".location-address").val(),
-          address : ""
+          title   : $(e).find(".location-type").val(),
+          address : $(e).find(".location-address").val()
         },
         duration     : findDuration($(e)),
         availability : findAvailability($(e))
