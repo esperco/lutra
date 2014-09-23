@@ -6,25 +6,97 @@ module Esper.ExecutivePreferences {
   var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
   var loaded = false;
 
+  export function dayToThreeLetter(day) {
+    switch (day.toLowerCase()) {
+    case "m": return "Mon";
+    case "t": return "Tue";
+    case "w": return "Wed";
+    case "r": return "Thu";
+    case "f": return "Fri";
+    case "s": return "Sat";
+    case "u": return "Sun";
+
+    default : return null;
+    }
+  }
+
+  export function dayFromThreeLetter(day) {
+    switch (day.toLowerCase()) {
+    case "mon": return "m";
+    case "tue": return "t";
+    case "wed": return "w";
+    case "thu": return "r";
+    case "fri": return "f";
+    case "sat": return "s";
+    case "sun": return "u";
+
+    default : return null;
+    }
+  }
+
+  function toTime(str) {
+    str = str.replace(/\s/g, "").toLowerCase();
+    var parts = [0, 0];
+
+
+    if (/\d\d?:\d\d/.test(str)) {
+      parts = str.split(":");
+    } else if (/\d\d?/.test(str)) {
+      parts[0] = str;
+    } else {
+      return null;
+    }
+    
+    return {
+      hour   : parts[0],
+      minute : parts[1]
+    }
+  }
+
+  function fromTime(time) {
+    return time.hour + ":" + time.minute;
+  }
+
   export function load() {
     if (!loaded) {
-      var startingPreferences = loadPreferences();
+      // loadPreferences(function (startingPreferences) {
+      var startingPreferences = defaultPreferences();
 
-      $("#preferences-page").append(saveButton());
+        $("#preferences-page").append(saveButton());
 
-      $("#preferences-page").append(scaffolding());
+        $("#preferences-page").append(scaffolding());
 
-      $(".preference-categories li.calls ul").append(phoneForm());
-      $(".preference-categories li.calls ul").append(videoForm());
+        $(".preference-categories li.calls ul").append(phoneForm(startingPreferences.meeting_types.phone_call));
+        $(".preference-categories li.calls ul").append(videoForm(startingPreferences.meeting_types.video_call));
 
-      meals.map(mealForm).forEach(function (element) {
-        $(".preference-categories li.meals ul").append(element);
-      });
+        meals.map(function (meal) {
+          return mealForm(meal, startingPreferences.meeting_types[meal]);
+        }).forEach(function (element) {
+          $(".preference-categories li.meals ul").append(element);
+        });
 
-      $(".preference-categories li.locations ul").append(locationForm());
+        startingPreferences.workplaces.forEach(function (place) {
+          $(".preference-categories li.locations ul").append(locationForm(place));
+        });
 
-      loaded = true;
+        loaded = true;
+      // });
     }
+  }
+
+  /** Loads the preferences stored on the sever, filling them out any
+   *  missing fields with the default preferences. Then passes them
+   *  into the given callback.
+   */
+  export function loadPreferences(callback) {
+    var teamid      = $("#teamSelect").val();
+    var preferences = api.getPreferences(teamid);
+
+    preferences.done(function () {
+      preferences = preferences.responseJSON || {};
+
+      callback($.extend(preferences, defaultPreferences()));
+    });
   }
 
   /** Returns an object that contains the preferences for a form that
@@ -41,30 +113,49 @@ module Esper.ExecutivePreferences {
       address : ""
     };
 
+    var defaultAvailability = {
+      avail_from : {
+        day : "Mon",
+        time : {
+          hour : 11,
+          minute : 0
+        }
+      },
+      avail_to : {
+        day : "Mon",
+        time : {
+          hour : 12,
+          minute : 0
+        }
+      },
+    };
+
     var defaults    = {
       meeting_types : {
         phone_call : {
-          availability : [],
+          availability : [defaultAvailability],
           duration     : defaultDuration,
           phones       : [
             {
               phone_number : "",
-              phone_type   : ""
+              phone_type   : "Mobile"
             }
           ]
         },
         video_call : {
-          availability : [],
+          availability : [defaultAvailability],
           duration     : defaultDuration,
-          accounts     : {
-            video_type     : "Google",
-            video_username : ""
-          }
+          accounts     : [
+            {
+              video_type     : "Google",
+              video_username : ""
+            }
+          ]
         }
       },
       workplaces    : [
         {
-          availability : [],
+          availability : [defaultAvailability],
           duration     : defaultDuration,
           location     : defaultLocation
         }
@@ -72,7 +163,7 @@ module Esper.ExecutivePreferences {
     };
 
     var defaultMealInfo = {
-      availability : [],
+      availability : [defaultAvailability],
       duration     : defaultDuration,
       favorites    : [ defaultLocation ]
     };
@@ -156,19 +247,7 @@ module Esper.ExecutivePreferences {
           if (start === null || end === null) {
             typo($(e));
           } else {
-            days = days.split("").map(function (day) {
-              switch (day.toLowerCase()) {
-              case "m": return "Mon";
-              case "t": return "Tue";
-              case "w": return "Wed";
-              case "r": return "Thu";
-              case "f": return "Fri";
-              case "s": return "Sat";
-              case "u": return "Sun";
-
-              default : return null;
-              }
-            });
+            days = days.split("").map(dayToThreeLetter);
 
             days.forEach(function (day) {
               if (day) {
@@ -191,25 +270,6 @@ module Esper.ExecutivePreferences {
       });
 
       return availabilities;
-
-      function toTime(str) {
-        str = str.replace(/\s/g, "").toLowerCase();
-        var parts = [0, 0];
-
-
-        if (/\d\d?:\d\d/.test(str)) {
-          parts = str.split(":");
-        } else if (/\d\d?/.test(str)) {
-          parts[0] = str;
-        } else {
-          return null;
-        }
-        
-        return {
-          hour   : parts[0],
-          minute : parts[1]
-        }
-      }
 
       function typo(element) {
         element.css("background", "#A83245");
@@ -327,7 +387,7 @@ module Esper.ExecutivePreferences {
    *  The given title will be used for the form's header. The icon,
    *  if passed in, will go at the top.
    */
-  export function form(title) {
+  export function form(title, defaults) {
 '''
 <li #container>
   <div #iconDiv></div>
@@ -358,6 +418,12 @@ module Esper.ExecutivePreferences {
       return false;
     });
 
+    setDuration(possibleDurations.select, defaults.duration);
+
+    defaults.availability.forEach(function (availability) {
+      addAvailability(_view, availability); // currying would have made this prettier...
+    });
+
     return _view;
   }
 
@@ -367,14 +433,14 @@ module Esper.ExecutivePreferences {
 <label class="durations" #container>
   Preferred duration
   <select #select>
-    <option value='{ "hour" : 0, "minute" : 10 }'>0:10</option>
-    <option value='{ "hour" : 0, "minute" : 20 }'>0:20</option>
-    <option value='{ "hour" : 0, "minute" : 30 }'>0:30</option>
-    <option value='{ "hour" : 0, "minute" : 40 }'>0:40</option>
-    <option value='{ "hour" : 1, "minute" : 0 }'>1:00</option>
-    <option value='{ "hour" : 1, "minute" : 30 }'>1:30</option>
-    <option value='{ "hour" : 2, "minute" : 0 }'>2:00</option>
-    <option value='{ "hour" : 2, "minute" : 30 }'>2:30</option>
+    <option value='{"hour":0,"minute":10}'>0:10</option>
+    <option value='{"hour":0,"minute":20}'>0:20</option>
+    <option value='{"hour":0,"minute":30}'>0:30</option>
+    <option value='{"hour":0,"minute":40}'>0:40</option>
+    <option value='{"hour":1,"minute":0}'>1:00</option>
+    <option value='{"hour":1,"minute":30}'>1:30</option>
+    <option value='{"hour":2,"minute":0}'>2:00</option>
+    <option value='{"hour":2,"minute":30}'>2:30</option>
   </select>
 </label>
 '''    
@@ -382,10 +448,31 @@ module Esper.ExecutivePreferences {
     return _view;
   }
 
-  /** Returns the element containing the whole phone form. */
-  export function phoneForm() {
-    var phone = form("Phone");
-    phone.rest.append(phoneWidget().container);
+  /** Sets the given duration dropdown to the given time JSON
+   * value.
+   */
+  export function setDuration(select, duration) {
+    select.find('option[value="' + JSON.stringify(duration) + '"]').attr("selected", "selected");
+  }
+
+  /** Adds an availiability entry prefilled with the given values. */
+  export function addAvailability(form, availability) {
+    var element = availabilityEntry();
+    form.availabilityContainer.append(element);
+
+    element.find(".day").val(dayFromThreeLetter(availability.avail_from.day));
+    element.find(".start").val(fromTime(availability.avail_from.time));
+    element.find(".end").val(fromTime(availability.avail_to.time));
+  }
+
+  /** Returns the element containing the whole phone form, with the
+   *  values preset to the given set of defaults (which should be the
+   *  phone_info object directly).
+   */
+  export function phoneForm(defaults) {
+    var phone  = form("Phone", defaults);
+    var widget = phoneWidget(defaults.phones);
+    phone.rest.append(widget.container);
     phone.iconDiv.append($("<img src='/assets/img/phone-placeholder.png' alt='' />"));
 
     return phone.container;
@@ -393,7 +480,7 @@ module Esper.ExecutivePreferences {
 
   /** A widget for entering any number of phone numbers.
    */
-  export function phoneWidget() {
+  export function phoneWidget(phones) {
 '''
 <div class="phone-widget" #container>
   <div #phoneNumbers>
@@ -402,7 +489,14 @@ module Esper.ExecutivePreferences {
   <a href="#" #anotherNumber>Add another phone number</a>
 </div>
 '''
-    phoneNumbers.append(phoneNumber().container);
+    phones.forEach(function (phone) {
+      var element = phoneNumber().container;
+
+      element.find('option[type="' + phone.phone_type + '"]').attr("selected", "selected");
+      element.find('input[type="text"]').val(phone.phone_number);
+
+      phoneNumbers.append(element);
+    });
 
     anotherNumber.click(function () {
       phoneNumbers.append(phoneNumber().container);
@@ -430,7 +524,7 @@ module Esper.ExecutivePreferences {
   }
 
   /** The form for adding accounts for video chat. */
-  export function videoWidget() {
+  export function videoWidget(defaults) {
 '''
 <div class="video-widget" #container>
  <div #videoAccounts>
@@ -439,45 +533,52 @@ module Esper.ExecutivePreferences {
  <a href="#" #anotherAccount>Add another account</a>
 </div>
 '''
-    videoAccounts.append(videoAccount().container);
+    defaults.accounts.forEach(function (account) {
+      var type     = account.video_type;
+      var username = account.video_username;
+
+      videoAccounts.append(videoAccount(type, username).container);
+    });
 
     anotherAccount.click(function () {
-      videoAccounts.append(videoAccount().container);
+      videoAccounts.append(videoAccount("google", "").container);
       return false;
     });
 
     return _view;
   }
 
-  export function videoForm() {
-    var video = form("Video");
+  export function videoForm(defaults) {
+    var video = form("Video", defaults);
 
-    video.rest.append(videoWidget().container);
+    video.rest.append(videoWidget(defaults).container);
     video.iconDiv.append($("<img src='/assets/img/video-placeholder.png' alt='' />"));
 
     return video.container;
   }
 
   /** The individual entry for each type of account. */
-  export function videoAccount() {
+  export function videoAccount(type, username) {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
     <option value="Google" selected="selected">google</option>
     <option value="Skype">skype</option>
   </select>
-  <input type="text" class="video-account" />
+  <input #account type="text" class="video-account" />
 </div>
 '''
+    container.find('option[value="' + type + '"]').attr("selected", "selected");
+    account.val(username);
 
     return _view;
   }  
 
   /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
-  export function mealForm(mealName) {
-    var meal = form(mealName);
+  export function mealForm(mealName, defaults) {
+    var meal = form(mealName, defaults);
 
-    meal.rest.append(restaurantWidget().container);
+    meal.rest.append(restaurantWidget(defaults).container);
 
     meal.container.addClass(mealName);
 
@@ -485,7 +586,7 @@ module Esper.ExecutivePreferences {
   }
 
   /** A place to enter a bunch of restaurants to prefer. */
-  export function restaurantWidget() {
+  export function restaurantWidget(defaults) {
 '''
 <div #container>
   <div #restaurants>
@@ -494,11 +595,15 @@ module Esper.ExecutivePreferences {
   <a href="#" #anotherRestaurant>Add another favorite location.</a>
 </div>
 '''
-
-    restaurants.append(restaurantEntry());
+    defaults.favorites.forEach(function (favorite) {
+      restaurants.append(restaurantEntry(favorite));
+    });
 
     anotherRestaurant.click(function () {
-      restaurants.append(restaurantEntry());
+      restaurants.append(restaurantEntry({
+ title   : "",
+        address : ""
+      }));
       return false;
     });
 
@@ -506,33 +611,38 @@ module Esper.ExecutivePreferences {
   }
 
   /** Returns the input element for a restaurant. */
-  export function restaurantEntry() {
-    return $("<input type='text' class='restaurant-entry' />");
+  export function restaurantEntry(location) {
+    var element = $("<input type='text' class='restaurant-entry' />");
+    element.val(location.title);
+
+    return element;
   }
 
-  export function locationForm() {
+  export function locationForm(defaults) {
 '''
 <div #details class="location-details">
   <label>
     <span> Type:  </span>
-    <input class="location-type" type="text" />
+    <input #type class="location-type" type="text" />
   </label>
   <br />
   <label>
     <span> Address: </span>
-    <input class="location-address" type="text" />
+    <input #address class="location-address" type="text" />
   </label>
   <a href="#" #anotherLocation class="another-location"> Add another location. </a>
 </div>
 '''    
     
-    var location = form("Location");
+    var location = form("Location", defaults);
 
     location.rest.append(details);
 
+    type.val(defaults.location.title);
+    address.val(defaults.location.address);
     
     anotherLocation.click(function () {
-      $(".preference-categories li.locations ul").append(locationForm());
+      $(".preference-categories li.locations ul").append(locationForm(defaultPreferences().workplaces[0]));
       return false;
     });
 

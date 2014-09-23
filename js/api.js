@@ -260,5 +260,14 @@ var api = (function () {
     return jsonHttpPut(url, JSON.stringify(preferences));
   }
 
+  /** The preferences currently saved for the given team executive, as
+   *  a JSON object.
+   */
+  mod.getPreferences = function(teamid) {
+    var url = "/api/preferences/" + login.me() + "/" + teamid;
+
+    return jsonHttpGet(url);
+  }
+
   return mod;
 })();
