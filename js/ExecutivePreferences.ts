@@ -46,7 +46,7 @@ module Esper.ExecutivePreferences {
     } else {
       return null;
     }
-    
+
     return {
       hour   : parts[0],
       minute : parts[1]
@@ -56,7 +56,7 @@ module Esper.ExecutivePreferences {
   function fromTime(time) {
     var minute = time.minute.toString();
     var paddedMinute = minute.length < 2 ? "0" + minute : minute;
-    
+
     return time.hour + ":" + paddedMinute;
   }
 
@@ -67,8 +67,10 @@ module Esper.ExecutivePreferences {
       $("#preferences-page").append(scaffolding());
 
       loadPreferences(function (startingPreferences) {
-        $(".preference-categories li.calls ul").append(phoneForm(startingPreferences.meeting_types.phone_call));
-        $(".preference-categories li.calls ul").append(videoForm(startingPreferences.meeting_types.video_call));
+        $(".preference-categories li.calls ul")
+          .append(phoneForm(startingPreferences.meeting_types.phone_call));
+        $(".preference-categories li.calls ul")
+          .append(videoForm(startingPreferences.meeting_types.video_call));
 
         meals.map(function (meal) {
           return mealForm(meal, startingPreferences.meeting_types[meal]);
@@ -77,7 +79,8 @@ module Esper.ExecutivePreferences {
         });
 
         startingPreferences.workplaces.forEach(function (place) {
-          $(".preference-categories li.locations ul").append(locationForm(place));
+          $(".preference-categories li.locations ul")
+            .append(locationForm(place));
         });
 
         loaded = true;
@@ -168,7 +171,7 @@ module Esper.ExecutivePreferences {
         }
       ]
     };
- 
+
     var defaultMealInfo = {
       availability : [defaultAvailability],
       duration     : defaultDuration,
@@ -234,12 +237,14 @@ module Esper.ExecutivePreferences {
     };
 
     function findDuration(element) {
-      return JSON.parse($(element).closest("li"). find(".durations select").val());
+      return JSON.parse($(element).closest("li").
+                        find(".durations select").val());
     }
 
     function findAvailability(element) {
-      var availabilityWidget = $(element).closest("li").find(".customize-availability");
-      
+      var availabilityWidget = $(element).closest("li")
+        .find(".customize-availability");
+
       var availabilities = []
 
       availabilityWidget.find(".availability").each(function(i, e) {
@@ -339,7 +344,7 @@ module Esper.ExecutivePreferences {
   </select>
   <a href="#" #save>Save</a>
 </div>
-'''    
+'''
     login.getTeams().forEach(function (team) {
       var name   = team.team_name;
       var teamid = team.teamid;
@@ -359,7 +364,7 @@ module Esper.ExecutivePreferences {
 
       return false;
     });
-    
+
     return container;
   }
 
@@ -380,7 +385,7 @@ module Esper.ExecutivePreferences {
     </ul>
   </li>
 </ul>
-'''    
+'''
 
     return container;
   }
@@ -401,8 +406,14 @@ module Esper.ExecutivePreferences {
   <div #iconDiv></div>
   <h1 #header>  </h1>
     <form #form class="toggle">
-    <label>  <input type="radio" name="toggle" /> <span>No</span> </label>
-    <label>  <input type="radio" name="toggle" checked="checked" /> <span>Yes</span> </label>
+    <label>
+      <input type="radio" name="toggle" />
+      <span>No</span>
+    </label>
+    <label>
+      <input type="radio" name="toggle" checked="checked" />
+      <span>Yes</span>
+    </label>
   </form>
 
   <div #availabilityContainer class="customize-availability">
@@ -414,7 +425,7 @@ module Esper.ExecutivePreferences {
   <div class="rest" #rest>
   </div>
 </li>
-'''    
+'''
 
     header.text(title);
 
@@ -429,7 +440,7 @@ module Esper.ExecutivePreferences {
     setDuration(possibleDurations.select, defaults.duration);
 
     defaults.availability.forEach(function (availability) {
-      addAvailability(_view, availability); // currying would have made this prettier...
+      addAvailability(_view, availability); // currying would make this prettier
     });
 
     return _view;
@@ -451,7 +462,7 @@ module Esper.ExecutivePreferences {
     <option value='{"hour":2,"minute":30}'>2:30</option>
   </select>
 </label>
-'''    
+'''
 
     return _view;
   }
@@ -460,7 +471,8 @@ module Esper.ExecutivePreferences {
    * value.
    */
   export function setDuration(select, duration) {
-    select.find('option[value="' + JSON.stringify(duration) + '"]').attr("selected", "selected");
+    select.find('option[value="' + JSON.stringify(duration) + '"]')
+      .attr("selected", "selected");
   }
 
   /** Adds an availiability entry prefilled with the given values. */
@@ -481,7 +493,8 @@ module Esper.ExecutivePreferences {
     var phone  = form("Phone", defaults);
     var widget = phoneWidget(defaults.phones);
     phone.rest.append(widget.container);
-    phone.iconDiv.append($("<img src='/assets/img/phone-placeholder.png' alt='' />"));
+    phone.iconDiv.append(
+      $("<img src='/assets/img/phone-placeholder.png' alt='' />"));
 
     return phone.container;
   }
@@ -500,7 +513,8 @@ module Esper.ExecutivePreferences {
     phones.forEach(function (phone) {
       var element = phoneNumber().container;
 
-      element.find('option[type="' + phone.phone_type + '"]').attr("selected", "selected");
+      element.find('option[type="' + phone.phone_type + '"]')
+        .attr("selected", "selected");
       element.find('input[type="text"]').val(phone.phone_number);
 
       phoneNumbers.append(element);
@@ -560,7 +574,8 @@ module Esper.ExecutivePreferences {
     var video = form("Video", defaults);
 
     video.rest.append(videoWidget(defaults).container);
-    video.iconDiv.append($("<img src='/assets/img/video-placeholder.png' alt='' />"));
+    video.iconDiv.append(
+      $("<img src='/assets/img/video-placeholder.png' alt='' />"));
 
     return video.container;
   }
@@ -580,11 +595,12 @@ module Esper.ExecutivePreferences {
     account.val(username);
 
     return _view;
-  }  
+  }
 
   /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
   export function mealForm(mealName, defaults) {
-    var meal = form(mealName.charAt(0).toUpperCase() + mealName.slice(1), defaults);
+    var meal = form(mealName.charAt(0).toUpperCase() + mealName.slice(1),
+                    defaults);
 
     meal.rest.append(restaurantWidget(defaults).container);
 
@@ -638,19 +654,22 @@ module Esper.ExecutivePreferences {
     <span> Address: </span>
     <input #address class="location-address" type="text" />
   </label>
-  <a href="#" #anotherLocation class="another-location"> Add another location. </a>
+  <a href="#" #anotherLocation class="another-location">
+    Add another location.
+  </a>
 </div>
-'''    
-    
+'''
+
     var location = form("Location", defaults);
 
     location.rest.append(details);
 
     type.val(defaults.location.title);
     address.val(defaults.location.address);
-    
+
     anotherLocation.click(function () {
-      $(".preference-categories li.locations ul").append(locationForm(defaultPreferences().workplaces[0]));
+      $(".preference-categories li.locations ul")
+        .append(locationForm(defaultPreferences().workplaces[0]));
       return false;
     });
 
@@ -674,13 +693,12 @@ module Esper.ExecutivePreferences {
   export function availabilityEntry() {
 '''
 <div #container class="availability">
-  <input type="text" class="day"></input>, from 
+  <input type="text" class="day"></input>, from
   <input type="text" class="start"></input> to
   <input type="text" class="end"></input>
 </div>
-'''    
+'''
 
     return container;
   }
 }
-
