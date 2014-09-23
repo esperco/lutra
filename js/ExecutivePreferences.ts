@@ -3,7 +3,7 @@ declare var login : any;
 
 module Esper.ExecutivePreferences {
 
-  var meals = ["Breakfast", "Brunch", "Lunch", "Coffee", "Dinner", "Drinks"];
+  var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
   var loaded = false;
 
   export function dayToThreeLetter(day) {
@@ -54,18 +54,19 @@ module Esper.ExecutivePreferences {
   }
 
   function fromTime(time) {
-    return time.hour + ":" + time.minute;
+    var minute = time.minute.toString();
+    var paddedMinute = minute.length < 2 : "0" + minute : minute;
+    
+    return time.hour + ":" + paddedMinute;
   }
 
   export function load() {
     if (!loaded) {
-      // loadPreferences(function (startingPreferences) {
-      var startingPreferences = defaultPreferences();
+      $("#preferences-page").append(saveButton());
 
-        $("#preferences-page").append(saveButton());
+      $("#preferences-page").append(scaffolding());
 
-        $("#preferences-page").append(scaffolding());
-
+      loadPreferences(function (startingPreferences) {
         $(".preference-categories li.calls ul").append(phoneForm(startingPreferences.meeting_types.phone_call));
         $(".preference-categories li.calls ul").append(videoForm(startingPreferences.meeting_types.video_call));
 
@@ -80,7 +81,7 @@ module Esper.ExecutivePreferences {
         });
 
         loaded = true;
-      // });
+      });
     }
   }
 
@@ -89,13 +90,19 @@ module Esper.ExecutivePreferences {
    *  into the given callback.
    */
   export function loadPreferences(callback) {
-    var teamid      = $("#teamSelect").val();
+    var teamid = $("#teamSelect").val();
+    console.log(teamid);
+
     var preferences = api.getPreferences(teamid);
+    console.log(preferences);
 
     preferences.done(function () {
-      preferences = preferences.responseJSON || {};
+      console.log("JSON", JSON.parse(preferences.responseText));
+      preferences = JSON.parse(preferences.responseText) || {};
+      console.log(preferences);
+      console.log($.extend(defaultPreferences(), preferences));
 
-      callback($.extend(preferences, defaultPreferences()));
+      callback($.extend(defaultPreferences(), preferences));
     });
   }
 
@@ -169,6 +176,7 @@ module Esper.ExecutivePreferences {
     };
 
     meals.forEach(function (meal) {
+      console.log("Setting defaults for", meal);
       defaults.meeting_types[meal] = defaultMealInfo;
     });
 
@@ -576,7 +584,7 @@ module Esper.ExecutivePreferences {
 
   /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
   export function mealForm(mealName, defaults) {
-    var meal = form(mealName, defaults);
+    var meal = form(mealName.charAt(0).toUpperCase() + mealName.slice(1), defaults);
 
     meal.rest.append(restaurantWidget(defaults).container);
 
