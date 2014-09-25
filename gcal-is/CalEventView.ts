@@ -354,6 +354,7 @@ module Esper.CalEventView {
       var dialog = $("<div>") // TODO make pretty
         .append(saveButton)
         .append(textarea);
+      textarea.css("box-shadow", "10px 5px 5px #888888");
 
       function sameEmail(r : ApiT.GuestReminder) {
         return r.guest_email === email;
@@ -365,10 +366,11 @@ module Esper.CalEventView {
 
       checkbox.click(function() {
         var current = List.find(event_reminders.guest_reminders, sameEmail);
+        var message = current !== null ? current.reminder_message : null;
         var reminder = {
           guest_email: email,
           guest_name: name === email || name === "" ? null : name,
-          reminder_message: current.reminder_message
+          reminder_message: message
         };
         if (this.checked)
           Api.enableReminderForGuest(eventId, email, reminder);
