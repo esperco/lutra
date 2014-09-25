@@ -1,5 +1,6 @@
-declare var api : any;
-declare var login : any;
+declare var api    : any;
+declare var login  : any;
+declare var status : any;
 
 module Esper.ExecutivePreferences {
 
@@ -234,7 +235,7 @@ module Esper.ExecutivePreferences {
       
       saved = true;
     } catch (e) {
-      alert("Didn't save: typo.");
+      status_.reportError("Didn't save: typo.");
       if (e !== "typo") {
         throw e;
       }
