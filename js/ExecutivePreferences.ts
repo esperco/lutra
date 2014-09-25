@@ -1,6 +1,6 @@
-declare var api    : any;
-declare var login  : any;
-declare var status : any;
+declare var api     : any;
+declare var login   : any;
+declare var status_ : any;
 
 module Esper.ExecutivePreferences {
 
