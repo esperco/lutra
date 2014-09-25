@@ -15,19 +15,17 @@ var status_ = (function() {
     elt
       .text(msg)
       .addClass("alert alert-" + kind)
-      .addClass("fadeInDown")
-      .removeClass("fadeOutUp hide")
+      .show()
       setTimeout(function() {
-        elt.addClass("fadeOutUp")
-           .removeClass("fadeInDown");
-      },3000);
+        elt.hide();
+      }, 3000);
       // .click(function() {
       //   elt.addClass("fadeOutUp")
       //      .removeClass("fadeInDown");
       // });
   };
 
-  mod.reportError = function(msg) {
+   mod.reportError = function(msg) {
     mod.report(msg, "danger");
   };
 
@@ -36,7 +34,7 @@ var status_ = (function() {
   };
 
   mod.clear = function() {
-    $("#error").addClass("fadeOutUp");
+    $("#error").hide();
   };
 
   /*
@@ -66,7 +64,7 @@ var status_ = (function() {
   /* Any click in the browser's window hides the status area */
   mod.init = function() {
     $("body").click(function() {
-      $("#global-status").addClass("fadeOutUp");
+      $("#global-status").hide();
       return true;
     });
   };
