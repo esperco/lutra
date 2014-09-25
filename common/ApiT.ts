@@ -230,4 +230,16 @@ module Esper.ApiT {
     availability: Availability[];
     favorites: Location[];
   }
+
+  export interface GuestReminder {
+    guest_email: string;
+    guest_name?: string;
+    reminder_message?: string;
+  }
+
+  export interface EventReminders {
+    event_start_time: string;
+    reminder_time: string;
+    guest_reminders: GuestReminder[];
+  }
 }
