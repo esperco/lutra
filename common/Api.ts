@@ -207,4 +207,51 @@ module Esper.Api {
       + "/" + teamid;
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
+
+  export function setReminderTime(teamid, calid, eventid, secs):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/event/set-reminder-time/" + Login.myUid()
+      + "/" + teamid
+      + "/" + calid
+      + "/" + eventid
+      + "/" + secs;
+    return JsonHttp.post(url, "");
+  }
+
+  export function unsetReminderTime(eventid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/event/unset-reminder-time/" + Login.myUid()
+      + "/" + eventid;
+    return JsonHttp.post(url, "");
+  }
+
+  export function getReminders(calid, eventid):
+  JQueryDeferred<ApiT.EventReminders> {
+    var url =
+      Conf.Api.url + "/api/event/reminders/" + Login.myUid()
+      + "/" + calid
+      + "/" + eventid;
+    return JsonHttp.get(url);
+  }
+
+  export function enableReminderForGuest(eventid, email,
+                                         guest_reminder : ApiT.GuestReminder):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/event/remind/" + Login.myUid()
+      + "/" + eventid
+      + "/" + email;
+    return JsonHttp.put(url, JSON.stringify(guest_reminder));
+  }
+
+  export function disableReminderForGuest(eventid, email):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/event/remind/" + Login.myUid()
+      + "/" + eventid
+      + "/" + email;
+    return JsonHttp.delete_(url);
+  }
 }

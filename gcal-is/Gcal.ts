@@ -77,6 +77,26 @@ module Esper.Gcal {
     else return anchor;
   }
 
+  export function findAnchorForReminderDropdown(): JQuery {
+    var heading = $(".ep-gl-guests-header"); // The word "Guests"
+    if (heading.length !== 1) {
+      Log.e("Cannot find anchor point for the Esper reminder dropdown.");
+      return $();
+    }
+    else return heading.parent();
+  }
+
+  export function waitForGuestsToLoad(callback: (x: JQuery) => void) {
+    Util.every(300, function() {
+      var guests = $("div[class*='ep-gc-chip']");
+      if (guests.length > 0) {
+        callback(guests);
+        return true;
+      }
+      else return false;
+    });
+  }
+
   export module Event {
 
     export function equal(a: Types.FullEventId, b: Types.FullEventId): boolean {
