@@ -192,6 +192,12 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
+  export function postCalendarShowAll():
+  JQueryDeferred<void> {
+    var url = Conf.Api.url + "/api/calendar/show-all/" + Login.myUid();
+    return JsonHttp.post(url, "");
+  }
+
   export function getPreferences(teamid):
   JQueryDeferred<ApiT.Preferences> {
     var url =

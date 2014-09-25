@@ -53,24 +53,32 @@ module Esper.Init {
         $("<option value='" + i + "'>" + teams[i].team_name + "</option>");
       selector.append(option);
     }
-    selector.append($("<option value='all'>Show all teams</option>"));
+    selector.append($("<option value='teams'>Show all teams</option>"));
+    selector.append($("<option value='all'>Show all calendars</option>"));
 
     selector.change(function() {
       var value = $(this).val();
       if (value === "hdr") return;
 
       var calendars = [];
-      if (value === "all") {
+      if (value === "teams") {
         List.iter(teams, function(team) {
           calendars = calendars.concat(team.team_calendars);
         });
-      } else {
+      } else if (value !== "all") {
         calendars = teams[value].team_calendars;
       }
 
-      Api.postCalendarShow(calendars).done(function() {
-        window.location.assign("https://www.google.com/calendar/render");
-      });
+      var url = "https://www.google.com/calendar/render";
+      if (value === "all") {
+        Api.postCalendarShowAll().done(function() {
+          window.location.assign(url);
+        });
+      } else {
+        Api.postCalendarShow(calendars).done(function() {
+          window.location.assign(url);
+        });
+      }
     });
 
     selDiv.append(selector);
