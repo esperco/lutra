@@ -20,17 +20,6 @@ module Esper.CalEventView {
     });
   }
 
-  function waitForGuestsToLoad(callback: (x: JQuery) => void) {
-    Util.every(300, function() {
-      var guests = $("div[class*='ep-gc-chip']");
-      if (guests.length > 0) {
-        callback(guests);
-        return true;
-      }
-      else return false;
-    });
-  }
-
   function removeEsperRoot() {
     $("#esper-event-root").remove();
   }
@@ -390,7 +379,7 @@ module Esper.CalEventView {
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
         insertReminderDropdown(fullEventId, event_reminders);
         $(".esper-guest-reminder").remove(); // Yes this is necessary
-        waitForGuestsToLoad(function(guests) {
+        Gcal.waitForGuestsToLoad(function(guests) {
           var reminders = guests.find(".esper-guest-reminder");
           if (reminders.length === 0) {
             insertGuestReminderOptions(eventId, event_reminders, guests);
