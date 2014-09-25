@@ -3,6 +3,7 @@
 */
 module Esper.CalEventView {
   var currentEventId : Types.FullEventId;
+  var remindFromTeam : ApiT.Team;
 
   function checkForNewEventId(callback: (x: Types.FullEventId) => void) {
     var oldEventId = currentEventId;
@@ -16,6 +17,17 @@ module Esper.CalEventView {
   function listenForNewEventId(callback: (x: Types.FullEventId) => void) {
     Util.every(300, function() {
       checkForNewEventId(callback);
+    });
+  }
+
+  function waitForGuestsToLoad(callback: (x: JQuery) => void) {
+    Util.every(300, function() {
+      var guests = $("div[class*='ep-gc-chip']");
+      if (guests.length > 0) {
+        callback(guests);
+        return true;
+      }
+      else return false;
     });
   }
 
@@ -246,10 +258,149 @@ module Esper.CalEventView {
     return { th: th, td: td };
   }
 
+  function removeReminderDropdown() {
+    $("#esper-reminder-dropdown").remove();
+  }
+
+  function insertReminderDropdown(fullEventId, event_reminders) {
+'''
+<select #dropdown>
+  <option class="esper-remind" value="-1">Never</option>
+  <option class="esper-remind" value="3600">1 hour before</option>
+  <option class="esper-remind" value="7200">2 hours before</option>
+  <option class="esper-remind" value="14400">4 hours before</option>
+  <option class="esper-remind" value="28800">8 hours before</option>
+  <option class="esper-remind" value="86400">24 hours before</option>
+</select>
+'''
+    removeReminderDropdown();
+    var anchor = Gcal.findAnchorForReminderDropdown();
+    var view = $("<div id='esper-reminder-dropdown'>Send reminders: </div>");
+    var eventId = fullEventId.eventId;
+    var calendarId = fullEventId.calendarId;
+
+    /* Without this stupid hack, Google intercepts the event somewhere,
+       and the select won't drop down. */
+    dropdown.mousedown(function(e) { e.stopPropagation(); });
+
+    dropdown.change(function() {
+      var secs = $(this).val();
+      $(".esper-remind-extra").remove();
+      if (secs > 0)
+        Api.setReminderTime(remindFromTeam.teamid, calendarId, eventId, secs);
+      else
+        Api.unsetReminderTime(eventId);
+    });
+
+    // Select the current scheduled time, and disable any times in the past
+    var startDate = new Date(event_reminders.event_start_time);
+    var remind = event_reminders.reminder_time;
+    var curSecs;
+    if (remind !== undefined) {
+      var remindDate = new Date(remind);
+      curSecs = startDate.getTime() / 1000 - remindDate.getTime() / 1000;
+    }
+    var maxSecs = startDate.getTime() / 1000 - Date.now() / 1000;
+    Log.d("curSecs:", curSecs, "maxSecs:", maxSecs);
+    dropdown.find(".esper-remind").each(function() {
+      var that = $(this);
+      var secs = that.val();
+      if (Number(secs) === curSecs) that.attr("selected", "selected");
+      if (secs > maxSecs) that.attr("disabled", "true");
+    });
+
+    /* If the event was moved after scheduling a reminder time,
+       it may no longer match any of the menu options...
+       in this case, create a custom option for it,
+       so we have something to select besides Never. */
+    if (curSecs !== undefined && dropdown.val() < 0) {
+      var extraOption =
+        $("<option class='esper-remind-extra'" + "value='" + curSecs + "'>" +
+          curSecs / 60 + " minutes before" + "</option>");
+      extraOption.appendTo(dropdown);
+      extraOption.attr("selected", "selected");
+    }
+
+    view.append(dropdown);
+    anchor.append(view);
+  }
+
+  function insertTeamSelector(teams : ApiT.Team[]) {
+    var anchor = Gcal.findAnchorForReminderDropdown();
+    var view = $("<div id='esper-remind-from-team'>Remind from team: </div>");
+    var dropdown = $("<select>");
+
+    /* Without this stupid hack again, Google intercepts the event somewhere,
+       and the select won't drop down. */
+    dropdown.mousedown(function(e) { e.stopPropagation(); });
+
+    for (var i = 0; i < teams.length; i++) {
+      var team = teams[i];
+      $("<option value='" + i + "'>" + team.team_name + "</option>")
+        .appendTo(dropdown);
+    }
+    dropdown.change(function() {
+      var i = $(this).val();
+      remindFromTeam = teams[i]; // a variable of CalEventView
+    });
+
+    view.append(dropdown);
+    anchor.append(view);
+  }
+
+  function insertGuestReminderOptions(eventId, event_reminders,
+                                      guests : JQuery) {
+    guests.each(function() {
+      var guest = $(this);
+      var email = guest.attr("title");
+      var view = $("<div class='esper-guest-reminder'>Remind: </div>");
+      var checkbox = $("<input type='checkbox'/>")
+        .appendTo(view);
+      function sameEmail(r : ApiT.GuestReminder) {
+        return r.guest_email === email;
+      }
+
+      if (List.exists(event_reminders.guest_reminders, sameEmail))
+        checkbox.attr("checked", "checked");
+      else
+        checkbox.attr("checked", false);
+
+      checkbox.click(function() {
+        var reminder = { guest_email: email };
+        if (this.checked)
+          Api.enableReminderForGuest(eventId, email, reminder);
+        else
+          Api.disableReminderForGuest(eventId, email);
+      });
+
+      guest.append(view);
+    });
+  }
+
   function updateView(fullEventId) {
     var rootElement = insertEsperRoot();
+    var teams = Login.myTeams();
+    var calendarId = fullEventId.calendarId;
+    var eventId = fullEventId.eventId;
+
+    if (teams.length > 0) {
+      remindFromTeam = teams[0];
+      insertTeamSelector(teams);
+
+      Api.getReminders(calendarId, eventId).done(function(event_reminders) {
+        insertReminderDropdown(fullEventId, event_reminders);
+        $(".esper-guest-reminder").remove(); // Yes this is necessary
+        waitForGuestsToLoad(function(guests) {
+          var reminders = guests.find(".esper-guest-reminder");
+          if (reminders.length === 0) {
+            insertGuestReminderOptions(eventId, event_reminders, guests);
+          }
+        });
+      });
+    }
+
     /* For each team that uses this calendar */
-    Login.myTeams().forEach(function(team) {
+    teams.forEach(function(team) {
       var teamCalendars = List.map(team.team_calendars, function(cal) {
         return cal.google_cal_id;
       });
