@@ -13,6 +13,7 @@ build: js/gcal-is.js
 # The chrome library is part of the environment provided by Chrome.
 JS_LIBS = \
   jquery \
+  jqueryui \
   sha1
 
 # External TypeScript libraries and type definitions for

@@ -242,4 +242,8 @@ module Esper.ApiT {
     reminder_time: string;
     guest_reminders: GuestReminder[];
   }
+
+  export interface DefaultReminder {
+    default_message: string;
+  }
 }
