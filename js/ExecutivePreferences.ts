@@ -359,6 +359,10 @@ module Esper.ExecutivePreferences {
 
       if (teamid) {
         saveToServer(teamid);
+        container.css("background-color", "green");
+        setTimeout(function () {
+          container.css("background-color", "white");
+        }, 300);
       } else {
         alert("No valid team!");
       }
