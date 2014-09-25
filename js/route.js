@@ -34,7 +34,6 @@ var route = (function() {
     /* various pages */
 
     "preferences route" : function (data) {
-      console.log("Preferences!");
       withLogin(page.preferences.load);
     },
 
