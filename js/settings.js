@@ -661,7 +661,7 @@ var settings = (function() {
       <li class="footer-header">Esper</li>
       <li><a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog"
              target="_blank" class="gray-link">Install</a></li>
-      <li><a href="http://esper.com/aboutus.html" target="_blank"
+      <li><a href="http://esper.com/team.html" target="_blank"
              class="gray-link">About us</a></li>
       <li><a href="http://blog.esper.com" target="_blank"
              class="gray-link">Blog</a></li>
@@ -670,11 +670,11 @@ var settings = (function() {
     </ul>
     <ul class="col-xs-2">
       <li class="footer-header">Support</li>
-      <li><a href="http://esper.com" target="_blank"
+      <li><a href="http://esper.com/discover.html" target="_blank"
              class="gray-link">Getting started</a></li>
-      <li><a href="http://esper.com/privacypolicy.html" target="_blank"
+      <li><a href="http://esper.com/privacy-policy.html" target="_blank"
              class="gray-link">Privacy</a></li>
-      <li><a href="http://esper.com/termsofuse.html" target="_blank"
+      <li><a href="http://esper.com/terms-of-use.html" target="_blank"
              class="gray-link">Terms</a></li>
       <li><a #contact href="#" class="gray-link">Contact us</a></li>
     </ul>
