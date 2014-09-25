@@ -234,6 +234,7 @@ module Esper.ExecutivePreferences {
       
       saved = true;
     } catch (e) {
+      alert("Didn't save: typo.");
       if (e !== "typo") {
         throw e;
       }
