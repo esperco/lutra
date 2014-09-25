@@ -4,7 +4,9 @@ declare var login : any;
 module Esper.ExecutivePreferences {
 
   var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
+
   var loaded = false;
+  var saved  = true;
 
   export function dayToThreeLetter(day) {
     switch (day.toLowerCase()) {
@@ -61,10 +63,18 @@ module Esper.ExecutivePreferences {
   }
 
   export function load() {
-    if (!loaded) {
-      $("#preferences-page").append(saveButton());
+    $("#preferences-page").append(saveButton());
 
-      $("#preferences-page").append(scaffolding());
+    var container = $("<div class='preference-form'>");
+    $("#preferences-page").append(container);
+
+    loadForm();
+  }
+
+  /** Loads the actual preferences form, with saved data prefilled. */
+  export function loadForm() {
+    if (!loaded) {
+      $(".preference-form").append(scaffolding());
 
       loadPreferences(function (startingPreferences) {
         $(".preference-categories li.calls ul")
@@ -73,7 +83,6 @@ module Esper.ExecutivePreferences {
           .append(videoForm(startingPreferences.meeting_types.video_call));
 
         meals.map(function (meal) {
-          console.log("Starting preferences", startingPreferences);
           return mealForm(meal, startingPreferences.meeting_types[meal]);
         }).forEach(function (element) {
           $(".preference-categories li.meals ul").append(element);
@@ -84,8 +93,43 @@ module Esper.ExecutivePreferences {
             .append(locationForm(place));
         });
 
+        // Turn off saved flag if anything is modified:
+        $(".preference-categories input, .preference-categories select")
+          .change(function () {
+            saved = false;
+        });
+        $(".preference-categories a").click(function () {
+          saved = false;
+          return false;
+        });
+
         loaded = true;
       });
+    }
+  }
+
+  /** Remove the preference forms (but not the team select widget). */
+  export function unloadForm() {
+    if (loaded) {
+      $("#preferences-page div.preference-form").empty();
+
+      loaded = false;
+    }
+  }
+
+  /** Reload the preference form. This refetches saved data for the
+   *  currently selected team.
+   */
+  export function reloadForm() {
+    var go = true;
+
+    if (!saved) {
+      go = confirm("Not saved. Continue without saving?");
+    }
+
+    if (go) {
+      unloadForm();
+      loadForm();
     }
   }
 
@@ -95,16 +139,11 @@ module Esper.ExecutivePreferences {
    */
   export function loadPreferences(callback) {
     var teamid = $("#teamSelect").val();
-    console.log(teamid);
 
     var preferences = api.getPreferences(teamid);
-    console.log(preferences);
 
     preferences.done(function () {
-      console.log("JSON", JSON.parse(preferences.responseText));
       preferences = JSON.parse(preferences.responseText) || {};
-      console.log(preferences);
-      console.log($.extend(defaultPreferences(), preferences));
 
       callback($.extend(true, defaultPreferences(), preferences));
     });
@@ -180,7 +219,6 @@ module Esper.ExecutivePreferences {
     };
 
     meals.forEach(function (meal) {
-      console.log("Setting defaults for", meal);
       defaults.meeting_types[meal] = defaultMealInfo;
     });
 
@@ -193,6 +231,8 @@ module Esper.ExecutivePreferences {
       var preferences = currentPreferences();
 
       api.setPreferences(teamid, preferences);
+      
+      saved = true;
     } catch (e) {
       if (e !== "typo") {
         throw e;
@@ -343,7 +383,10 @@ module Esper.ExecutivePreferences {
 <div #container class="save-controls">
   <select id="teamSelect" #teamSelect>
   </select>
-  <a href="#" #save>Save</a>
+  <span class="save-buttons">
+    <a href="#" #save>Save</a>
+    <a href="#" #load>Load</a>
+  </span>
 </div>
 '''
     login.getTeams().forEach(function (team) {
@@ -359,9 +402,19 @@ module Esper.ExecutivePreferences {
 
       if (teamid) {
         saveToServer(teamid);
+        container.css("background-color", "green");
+        setTimeout(function () {
+          container.css("background-color", "white");
+        }, 300);
       } else {
         alert("No valid team!");
       }
+
+      return false;
+    });
+
+    load.click(function () {
+      reloadForm();
 
       return false;
     });
