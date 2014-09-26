@@ -79,7 +79,7 @@ install_js jqueryui jquery-ui-1.11.0.custom/jquery-ui.js "$ROOT"/jquery-freeze
 
 # Bootstrap
 rm -rf bootstrap dist
-unzip bootstrap-3.0.2-dist.zip
+unzip -o bootstrap-3.2.0-dist.zip
 mv dist bootstrap
 install_js bootstrap bootstrap/js/bootstrap.js "$ROOT"/jquery-freeze
 
