@@ -90,7 +90,7 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function syncEvent(teamid, threadId, calid, eventId):
+  export function syncEvent(teamid, threadId, calid : string, eventId):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()

@@ -677,7 +677,7 @@ module Esper.CalTab {
             var eventId = e.google_event_id;
             if (eventId !== null && eventId !== undefined) {
               newTab.document.write(" done! Syncing thread to description...");
-              Api.syncEvent(team.teamid, threadId, cal, eventId)
+              Api.syncEvent(team.teamid, threadId, cal.google_cal_id, eventId)
                 .done(function() {
                   refreshLinkedList(team, threadId, eventsTab, profiles);
                   var url = e.google_cal_url;
