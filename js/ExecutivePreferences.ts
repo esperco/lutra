@@ -42,11 +42,11 @@ module Esper.ExecutivePreferences {
     var parts = [0, 0];
     var pm    = false;
 
-    if (/pm/.test(str)) {
+    if (/pm/i.test(str)) {
       pm = true;
     }
 
-    str = str.replace(/(am|pm)/g, "");
+    str = str.replace(/(am|pm)/ig, "");
 
     if (/^\d\d?:\d\d?$/.test(str)) {
       parts = str.split(":");
@@ -57,7 +57,7 @@ module Esper.ExecutivePreferences {
     }
 
     if (pm) {
-      parts[0] += 12;
+      parts[0] = parts[0] * 1 + 12;
     }
 
     return {
