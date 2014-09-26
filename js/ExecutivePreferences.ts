@@ -40,14 +40,24 @@ module Esper.ExecutivePreferences {
   function toTime(str) {
     str = str.replace(/\s/g, "").toLowerCase();
     var parts = [0, 0];
+    var pm    = false;
 
+    if (/pm/.test(str)) {
+      pm = true;
+    }
 
-    if (/\d\d?:\d\d/.test(str)) {
+    str = str.replace(/(am|pm)/g, "");
+
+    if (/^\d\d?:\d\d?$/.test(str)) {
       parts = str.split(":");
-    } else if (/\d\d?/.test(str)) {
+    } else if (/^\d\d??$/.test(str)) {
       parts[0] = str;
     } else {
       return null;
+    }
+
+    if (pm) {
+      parts[0] += 12;
     }
 
     return {
