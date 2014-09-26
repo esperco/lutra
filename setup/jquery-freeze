@@ -4,4 +4,4 @@ set -e
 
 echo '(function($) { // begin jquery-freeze'
 cat
-echo '})($); // end jquery-freeze'
+echo '})(jQuery); // end jquery-freeze'
