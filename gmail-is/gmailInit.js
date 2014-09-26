@@ -1,4 +1,4 @@
-var gmail = Gmail();
+var gmail = Gmail(jQuery);
 
 gmail.on = {};
 gmail.off = {};
