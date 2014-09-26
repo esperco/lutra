@@ -573,15 +573,21 @@ module Esper.CalTab {
     </div>
     <div #linkActions class="esper-section-actions clearfix">
       <div style="display:inline-block">
-        <div #createEvent class="esper-link-action">
+        <div class="esper-link-action">
           <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-          <div class="esper-link-action-text">Create event</div>
+          <div #createEventToggle class="esper-click-safe esper-dropdown-btn
+                                         esper-clickable esper-link-action-text">
+            Create event
+          </div>
         </div>
         <div class="esper-vertical-divider"/>
         <div #linkEvent class="esper-link-action">
           <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
           <div class="esper-link-action-text">Link event</div>
         </div>
+        <ul #createEvent class="create-event-dropwdown esper-ul">
+          <div class="esper-dropdown-section"/>
+        </ul>
       </div>
     </div>
     <div #linkedEventsContainer class="esper-section-container">
@@ -651,24 +657,37 @@ module Esper.CalTab {
         $(this).text("Hide");
     })
 
-    createEvent.click(function() {
-      var newTab = window.open("");
-      newTab.document.write("Creating new linked event, please wait...");
-      var firstCalendar = team.team_calendars[0];
-      Api.createEmptyLinkedEvent(team.teamid, firstCalendar, threadId)
-        .done(function(e) {
-          var eventId = e.google_event_id;
-          if (eventId !== null && eventId !== undefined) {
-            newTab.document.write(" done! Syncing thread to description...");
-            Api.syncEvent(team.teamid, threadId, firstCalendar, eventId)
-              .done(function() {
-                refreshLinkedList(team, threadId, eventsTab, profiles);
-                var url = e.google_cal_url;
-                if (url !== null && url !== undefined)
-                  newTab.location.assign(url);
-              });
-          }
-        });
+    createEventToggle.click(function() {
+      if (createEventToggle.hasClass("open")) {
+        Sidebar.dismissDropdowns();
+      } else {
+        Sidebar.dismissDropdowns();
+        createEvent.toggle();
+        createEventToggle.addClass("open");
+      }
+    });
+
+    List.iter(team.team_calendars, function(cal) {
+      var li = $("<li class='esper-li'>" + cal.calendar_title + "</li>");
+      li.click(function() {
+        var newTab = window.open("");
+        newTab.document.write("Creating new linked event, please wait...");
+        Api.createEmptyLinkedEvent(team.teamid, cal, threadId)
+          .done(function(e) {
+            var eventId = e.google_event_id;
+            if (eventId !== null && eventId !== undefined) {
+              newTab.document.write(" done! Syncing thread to description...");
+              Api.syncEvent(team.teamid, threadId, cal, eventId)
+                .done(function() {
+                  refreshLinkedList(team, threadId, eventsTab, profiles);
+                  var url = e.google_cal_url;
+                  if (url !== null && url !== undefined)
+                    newTab.location.assign(url);
+                });
+            }
+          });
+      });
+      li.appendTo(createEvent);
     });
 
     linkEvent.click(function() {
