@@ -87,10 +87,13 @@ module Esper.Gcal {
   }
 
   export function waitForGuestsToLoad(callback: (x: JQuery) => void) {
+    var once = false;
     Util.every(300, function() {
       var guests = $("div[class*='ep-gc-chip']");
       if (guests.length > 0) {
         callback(guests);
+        if (once) callback = function() {};
+        once = true;
         return true;
       }
       else return false;

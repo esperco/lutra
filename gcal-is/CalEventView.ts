@@ -253,7 +253,7 @@ module Esper.CalEventView {
 
   function insertReminderDropdown(fullEventId, event_reminders) {
 '''
-<select #dropdown>
+<select id="esper-reminder-time" #dropdown>
   <option class="esper-remind" value="-1">Never</option>
   <option class="esper-remind" value="3600">1 hour before</option>
   <option class="esper-remind" value="7200">2 hours before</option>
@@ -331,35 +331,84 @@ module Esper.CalEventView {
     dropdown.change(function() {
       var i = $(this).val();
       remindFromTeam = teams[i]; // a variable of CalEventView
+      $("#esper-reminder-time").trigger("change");
     });
 
     view.append(dropdown);
     anchor.append(view);
   }
 
-  function insertGuestReminderOptions(eventId, event_reminders,
-                                      guests : JQuery) {
+  function insertGuestReminderOptions(calendarId, eventId,
+                                      event_reminders, guests : JQuery) {
     guests.each(function() {
       var guest = $(this);
       var email = guest.attr("title");
+      var name = guest.find(".ep-gc-chip-text").text().replace(/.\*$/, "");
       var view = $("<div class='esper-guest-reminder'>Remind: </div>");
       var checkbox = $("<input type='checkbox'/>")
         .appendTo(view);
+      var customize = $("<a href='#'>Customize message</a>")
+        .appendTo(view);
+      var textarea = $("<textarea rows='10' cols='72'>");
+      var saveButton = $("<button>Save</button>");
+      var dialog = $("<div>") // TODO make pretty
+        .append(saveButton)
+        .append(textarea);
+      textarea.css("box-shadow", "10px 5px 5px #888888");
+
       function sameEmail(r : ApiT.GuestReminder) {
         return r.guest_email === email;
       }
-
       if (List.exists(event_reminders.guest_reminders, sameEmail))
         checkbox.attr("checked", "checked");
       else
         checkbox.attr("checked", false);
 
       checkbox.click(function() {
-        var reminder = { guest_email: email };
+        var current = List.find(event_reminders.guest_reminders, sameEmail);
+        var message = current !== null ? current.reminder_message : null;
+        var reminder = {
+          guest_email: email,
+          guest_name: name === email || name === "" ? null : name,
+          reminder_message: message
+        };
         if (this.checked)
           Api.enableReminderForGuest(eventId, email, reminder);
         else
           Api.disableReminderForGuest(eventId, email);
+      });
+
+      customize.click(function() {
+        var current = List.find(event_reminders.guest_reminders, sameEmail);
+        if (current !== null) {
+          textarea.text(current.reminder_message);
+          dialog.dialog({});
+        } else {
+          var heading = name === email || name === "" ?
+                        "Hello,\n\n" :
+                        "Hi " + name + ",\n\n";
+          dialog.dialog({});
+          textarea.text("Loading message...");
+          Api.getDefaultReminder(remindFromTeam.teamid, calendarId, eventId)
+            .done(function(x) {
+              textarea.text(heading + x.default_message);
+            });
+        }
+      });
+
+      saveButton.click(function() {
+        dialog.dialog("close");
+        var message = textarea.val();
+        Log.d(message);
+        var current = List.find(event_reminders.guest_reminders, sameEmail);
+        if (current !== null) current.reminder_message = message;
+        var reminder = {
+          guest_email: email,
+          guest_name: name === email || name === "" ? null : name,
+          reminder_message: message
+        };
+        checkbox.attr("checked", "checked");
+        Api.enableReminderForGuest(eventId, email, reminder);
       });
 
       guest.append(view);
@@ -382,7 +431,8 @@ module Esper.CalEventView {
         Gcal.waitForGuestsToLoad(function(guests) {
           var reminders = guests.find(".esper-guest-reminder");
           if (reminders.length === 0) {
-            insertGuestReminderOptions(eventId, event_reminders, guests);
+            insertGuestReminderOptions(calendarId, eventId,
+                                       event_reminders, guests);
           }
         });
       });

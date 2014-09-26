@@ -260,4 +260,14 @@ module Esper.Api {
       + "/" + email;
     return JsonHttp.delete_(url);
   }
+
+  export function getDefaultReminder(teamid, calid, eventid):
+  JQueryDeferred<ApiT.DefaultReminder> {
+    var url =
+      Conf.Api.url + "/api/event/default-reminder/" + Login.myUid()
+      + "/" + teamid
+      + "/" + calid
+      + "/" + eventid;
+    return JsonHttp.get(url);
+  }
 }
