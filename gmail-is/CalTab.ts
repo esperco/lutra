@@ -579,14 +579,15 @@ module Esper.CalTab {
                                          esper-clickable esper-link-action-text">
             Create event
           </div>
-          <ul #createEvent class="esper-ul">
-            <div class="esper-dropdown-section"/>
         </div>
         <div class="esper-vertical-divider"/>
         <div #linkEvent class="esper-link-action">
           <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
           <div class="esper-link-action-text">Link event</div>
         </div>
+        <ul #createEvent class="create-event-dropwdown esper-ul">
+          <div class="esper-dropdown-section"/>
+        </ul>
       </div>
     </div>
     <div #linkedEventsContainer class="esper-section-container">
