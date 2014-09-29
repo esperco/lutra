@@ -72,12 +72,12 @@ module Esper.Auth {
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #about class="about-esper"/>
-    <div #footer class="welcome-footer">
-      <a #disableLink class="disable-link">
+    <div #about class="esper-about"/>
+    <div #footer class="esper-welcome-footer">
+      <a #disableLink class="esper-disable-link">
         Disable Esper for this account
       </a>
-      <button #enableButton class="primary-btn enable-btn">
+      <button #enableButton class="esper-primary-btn esper-enable-btn">
         Enable
       </button>
     </div>
