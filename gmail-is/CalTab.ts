@@ -69,7 +69,7 @@ module Esper.CalTab {
   function pubInviteView(team, e, threadid, eventsTab, profiles) {
 '''
 <div #pubInvite class="esper-section esper-pub">
-  <div class="esper-section-header clearfix open">
+  <div class="esper-section-header esper-clearfix open">
     Public Duplicate
   </div>
   <div class="esper-section-container">
@@ -177,7 +177,7 @@ module Esper.CalTab {
   <ul #dropdown class="esper-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
       <li #editEvent
-          class="esper-li disabled">
+          class="esper-li esper-disabled">
         Edit
       </li>
       <li #duplicateEvent
@@ -189,24 +189,27 @@ module Esper.CalTab {
         Unlink
       </li>
       <li #deleteEvent
-          class="esper-li danger">
+          class="esper-li esper-danger">
         Delete from calendar
       </li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
     <div #syncOption class="esper-click-safe esper-dropdown-section">
-      <li class="esper-click-safe esper-li disabled sync-option">
-        <span class="esper-click-safe sync-option-text">
+      <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
+        <span class="esper-click-safe esper-sync-option-text">
           Description Sync
         </span>
-        <object #info title class="esper-click-safe info"/>
+        <object #info title class="esper-click-safe esper-info"/>
         <input #syncCheckbox
                type="checkbox"
-               class="esper-click-safe sync-checkbox"/>
-        <div #spinner class="esper-click-safe spinner sync-spinner"/>
+               class="esper-click-safe esper-sync-checkbox"/>
+        <div #spinner
+             class="esper-click-safe esper-spinner esper-sync-spinner"/>
       </li>
-      <li #teamSync class="esper-click-safe esper-li disabled sync-users"/>
-      <li #syncNote class="esper-click-safe esper-li disabled sync-note"/>
+      <li #teamSync
+          class="esper-click-safe esper-li esper-disabled esper-sync-users"/>
+      <li #syncNote
+          class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
     </div>
   </ul>
 </div>
@@ -215,7 +218,7 @@ module Esper.CalTab {
 
     if (e.google_cal_url !== undefined) {
       editEvent
-        .removeClass("disabled")
+        .removeClass("esper-disabled")
         .click(function() {
           open(e.google_cal_url, "_blank");
         });
@@ -230,7 +233,7 @@ module Esper.CalTab {
         hide: { effect: "none" },
         "content": infoContent,
         "position": { my: 'center bottom', at: 'center top-5' },
-        "tooltipClass": "top sync-info"
+        "tooltipClass": "esper-top esper-sync-info"
       });
 
     syncCheckbox.change(function() {
@@ -307,7 +310,7 @@ module Esper.CalTab {
     });
 
     unlinkEvent.click(function() {
-      view.addClass("disabled");
+      view.addClass("esper-disabled");
       Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
           refreshLinkedList(team, threadId, eventsTab, profiles);
@@ -316,7 +319,7 @@ module Esper.CalTab {
     });
 
     deleteEvent.click(function() {
-      view.addClass("disabled");
+      view.addClass("esper-disabled");
       Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
           refreshLinkedList(team, threadId, eventsTab, profiles);
@@ -392,7 +395,7 @@ module Esper.CalTab {
     }
 
     if (last)
-      view.addClass("last");
+      view.addClass("esper-last");
 
     return view;
   }
@@ -413,14 +416,14 @@ module Esper.CalTab {
   <div #noEvents class="esper-no-events">No recently viewed events</div>
   <div #eventsList class="esper-events-list"/>
 '''
-    eventsTab.refreshRecents.addClass("disabled");
+    eventsTab.refreshRecents.addClass("esper-disabled");
     eventsTab.recentsList.children().remove();
     eventsTab.recentsSpinner.show();
 
     function renderNone() {
       eventsTab.recentsList.append(noEvents);
       eventsTab.recentsSpinner.hide();
-      eventsTab.refreshRecents.removeClass("disabled");
+      eventsTab.refreshRecents.removeClass("esper-disabled");
     }
 
     if (team === null || team === undefined) {
@@ -476,7 +479,7 @@ module Esper.CalTab {
           });
         eventsTab.recentsList.append(eventsList);
         eventsTab.recentsSpinner.hide();
-        eventsTab.refreshRecents.removeClass("disabled");
+        eventsTab.refreshRecents.removeClass("esper-disabled");
       });
     });
   }
@@ -488,7 +491,7 @@ module Esper.CalTab {
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
 '''
-    eventsTab.refreshLinked.addClass("disabled");
+    eventsTab.refreshLinked.addClass("esper-disabled");
     eventsTab.linkedList.children().remove();
     eventsTab.linkedSpinner.show();
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
@@ -510,7 +513,7 @@ module Esper.CalTab {
           eventsTab.linkedList.append(eventsList);
         }
         eventsTab.linkedSpinner.hide();
-        eventsTab.refreshLinked.removeClass("disabled");
+        eventsTab.refreshLinked.removeClass("esper-disabled");
       });
   }
 
@@ -564,19 +567,21 @@ module Esper.CalTab {
 '''
 <div #view>
   <div class="esper-section">
-    <div #linkedEventsHeader class="esper-section-header clearfix open">
-      <span #showLinkedEvents class="esper-link" style="float:right">Hide</span>
-      <span class="bold" style="float:left">Linked Events</span>
-      <div #refreshLinked class="esper-refresh esper-clickable disabled">
+    <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
+      <span #showLinkedEvents
+            class="esper-link" style="float:right">Hide</span>
+      <span class="esper-bold" style="float:left">Linked Events</span>
+      <div #refreshLinked class="esper-refresh esper-clickable esper-disabled">
         <object #refreshLinkedIcon class="esper-svg-block"/>
       </div>
     </div>
-    <div #linkActions class="esper-section-actions clearfix">
+    <div #linkActions class="esper-section-actions esper-clearfix">
       <div style="display:inline-block">
         <div class="esper-link-action">
           <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-          <div #createEventToggle class="esper-click-safe esper-dropdown-btn
-                                         esper-clickable esper-link-action-text">
+          <div #createEventToggle
+               class="esper-click-safe esper-dropdown-btn
+                      esper-clickable esper-link-action-text">
             Create event
           </div>
         </div>
@@ -585,29 +590,31 @@ module Esper.CalTab {
           <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
           <div class="esper-link-action-text">Link event</div>
         </div>
-        <ul #createEvent class="create-event-dropwdown esper-ul">
+        <ul #createEvent class="esper-create-event-dropdown esper-ul">
           <div class="esper-dropdown-section"/>
         </ul>
       </div>
     </div>
     <div #linkedEventsContainer class="esper-section-container">
       <div #linkedSpinner class="esper-events-list-loading">
-        <div class="spinner list-spinner"/>
+        <div class="esper-spinner esper-list-spinner"/>
       </div>
       <div #linkedList/>
     </div>
   </div>
   <div class="esper-section">
-    <div #recentEventsHeader class="esper-section-header clearfix open">
-      <span #showRecentEvents class="esper-link" style="float:right">Hide</span>
-      <span class="bold" style="float:left">Recents</span>
-      <div #refreshRecents class="esper-refresh esper-clickable disabled">
+    <div #recentEventsHeader class="esper-section-header esper-clearfix open">
+      <span #showRecentEvents
+            class="esper-link" style="float:right">Hide</span>
+      <span class="esper-bold" style="float:left">Recents</span>
+      <div #refreshRecents
+           class="esper-refresh esper-clickable esper-disabled">
         <object #refreshRecentsIcon class="esper-svg-block"/>
       </div>
     </div>
     <div #recentEventsContainer class="esper-section-container">
       <div #recentsSpinner class="esper-events-list-loading">
-        <div class="spinner list-spinner"/>
+        <div class="esper-spinner esper-list-spinner"/>
       </div>
       <div #recentsList/>
     </div>
