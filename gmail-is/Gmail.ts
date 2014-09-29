@@ -5,9 +5,7 @@
 module Esper.Gmail {
 
   /*
-    Find a good insertion point.
-    We return the element containing the name of the logged-in user,
-    e.g. "+Peter". The Esper menu is inserted to the left of that element.
+    Find a good insertion point for the menu icon in the top navigation bar.
   */
   export function findMenuAnchor() {
     var anchor = $('[style*=min-width\\:\\ 195px]');

@@ -10,7 +10,8 @@ function esperSaveGlobals(names) {
   }
 
   function restoreGlobals() {
-    for (var name in state) {
+    for (var k in names) {
+      var name = names[k];
       window[name] = state[name];
     }
   }
