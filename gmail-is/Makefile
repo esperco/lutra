@@ -16,7 +16,9 @@ JS_LIBS = \
   jqueryui \
   gmail \
   sha1 \
-  retina
+  retina \
+  moment \
+  fullCalendar
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
@@ -24,7 +26,9 @@ TS_LIBS = \
   jquery/jquery.d \
   jqueryui/jqueryui.d \
   chrome/chrome.d \
-  cryptojs/cryptojs.d
+  cryptojs/cryptojs.d \
+  moment/moment.d \
+  fullCalendar/fullCalendar.d
 
 # Our own JavaScript code required in edge cases
 APP_JS = \
