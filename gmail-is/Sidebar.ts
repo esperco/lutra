@@ -209,15 +209,15 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li class="esper-active"><a #tab1 href="#tab1" class="first">
+      <li #tab1 class="esper-active esper-first">
         <object #calendar class="esper-svg esper-tab-icon"/>
-      </a></li>
-      <li><a #tab2 href="#tab2">
+      </li>
+      <li #tab2>
         <object #polls class="esper-svg esper-tab-icon"/>
-      </a></li>
-      <li><a #tab3 href="#tab3" class="esper-last">
+      </li>
+      <li #tab3 class="esper-last">
         <object #person class="esper-svg esper-tab-icon"/>
-      </a></li>
+      </li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -227,28 +227,31 @@ module Esper.Sidebar {
   </div>
 </div>
 '''
+    var tabs = [tab1, tab2, tab3];
+    var tabContents = [content1, content2, content3];
+
+    function switchTab(on: number, off: number[]) {
+      List.iter(off, function(i) {
+        tabContents[i].hide().removeClass("esper-active");
+        tabs[i].removeClass("esper-active");
+      });
+      tabContents[on].show().addClass("esper-active");
+      tabs[on].addClass("esper-active");
+    }
 
     tab1.click(function() {
-      switchTab(content1);
+      switchTab(0, [1,2]);
     });
     tab2.click(function() {
-      switchTab(content2);
+      switchTab(1, [0,2]);
     });
     tab3.click(function() {
-      switchTab(content3);
+      switchTab(2, [0,1]);
     });
 
     calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
     polls.attr("data", Init.esperRootUrl + "img/polls.svg");
     person.attr("data", Init.esperRootUrl + "img/person.svg");
-
-    function switchTab(tab) {
-      var currentAttrValue = tab.attr("href");
-      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
-      tab
-        .parent('li').addClass('esper-active')
-        .siblings().removeClass('esper-active');
-    };
 
     CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
