@@ -10,7 +10,7 @@ module Esper.Gmail {
   export function findMenuAnchor() {
     var anchor = $('[style*=min-width\\:\\ 195px]');
     if (anchor.length !== 1) {
-      Log.e("Cannot find anchor point for the Esper menu.");
+      Log.i("Cannot find anchor point for the Esper menu just yet.");
       return $();
     }
     else
