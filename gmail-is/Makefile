@@ -70,6 +70,8 @@ APP_SOURCES = \
   ActiveThreads \
   CalSearch \
   CalTab \
+  CalCache \
+  CalPicker \
   InsertTime \
   Tab2Content \
   Tab3Content \
@@ -120,6 +122,8 @@ js/gmail-is.js: $(ALL_TS)
 install:
 	mkdir -p ../pub/js
 	cp js/gmail-is.js ../pub/js/gmail-is.js
+	mkdir -p ../pub/css
+	cp ../setup/css/fullCalendar.css ../pub/css
 
 clean:
 	rm -f *~

@@ -270,4 +270,13 @@ module Esper.Api {
       + "/" + eventid;
     return JsonHttp.get(url);
   }
+
+  export function postCalendar(teamid, calid, calRequest):
+  JQueryDeferred<ApiT.CalendarView> {
+    var url =
+      Conf.Api.url + "/api/calendar/view/" + Login.myUid()
+      + "/" + teamid
+      + "/" + calid;
+    return JsonHttp.post(url, JSON.stringify(calRequest));
+  }
 }

@@ -246,4 +246,15 @@ module Esper.ApiT {
   export interface DefaultReminder {
     default_message: string;
   }
+
+  export interface CalendarRequest {
+    timezone?: string;
+    window_start: string; // timestamp
+    window_end: string; // timestamp (TODO can we type alias?)
+  }
+
+  export interface CalendarView {
+    timezone?: string;
+    events: CalendarEvent[];
+  }
 }

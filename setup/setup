@@ -37,8 +37,9 @@ install_ts() {
 
 install_css() {
     name="$1"
+    src="$2"
     echo "Importing CSS for $name"
-    cp -a "$name" "$ROOT"/css/"$name"
+    cp -a "$src" "$ROOT"/css/"$name".css
 }
 
 # TypeScript type definitions for some of the JavaScript libraries we're using
