@@ -5,8 +5,13 @@ echo "INSTALL stoat ($*)"
 TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
 
 case "$1" in
-    "prod"|"dev")
-        mode=$1
+    "prod")
+        mode=prod
+        manifest=manifest.json.prod
+        ;;
+    "dev")
+        mode=dev
+        manifest=manifest.json.dev
         ;;
     "")
         mode=dev
@@ -26,8 +31,7 @@ make -C gmail-is install
 make -C gcal-is install
 cp css/*.css pub/css
 cp img/* pub/img
-cp html/popup.html pub/html
-cp manifest.json pub
+cp "$manifest" pub/manifest.json
 
 ### Log info about this installation
 if commit=$(git log -1 2>/dev/null); then
