@@ -24,7 +24,7 @@ module Esper.CalSearch {
     <div #day class="esper-ev-day"></div>
   </div>
   <a #link class="esper-link-event">Link</a>
-  <div #spinner class="spinner link-spinner"/>
+  <div #spinner class="esper-spinner esper-link-spinner"/>
   <div #linked class="esper-linked">
     <object #check class="esper-svg"/>
     <span>Linked</span>
@@ -115,13 +115,13 @@ module Esper.CalSearch {
     searchView.resultsList.append(list);
     if (eventList.length === 0) {
       searchView.searchStats.text("No upcoming events found");
-      searchView.searchStats.addClass("no-events");
+      searchView.searchStats.addClass("esper-no-events");
     } else if (eventList.length === 1) {
       searchView.searchStats.text(eventList.length + " event found");
-      searchView.searchStats.removeClass("no-events");
+      searchView.searchStats.removeClass("esper-no-events");
     } else {
       searchView.searchStats.text(eventList.length + " events found");
-      searchView.searchStats.removeClass("no-events");
+      searchView.searchStats.removeClass("esper-no-events");
     }
     searchView.searchStats.show();
   }
@@ -194,23 +194,23 @@ module Esper.CalSearch {
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div class="clear-search-container">
-      <div #clear class="clear-search">
+    <div class="esper-clear-search-container">
+      <div #clear class="esper-clear-search">
         <object #clearImg class="esper-svg-block"/>
       </div>
     </div>
     <input #searchbox
       type="text" class="esper-searchbox"
       placeholder="Search calendar"/>
-    <div #results class="search-results">
-      <div #searchInstructions class="search-instructions"/>
-      <div #spinner class="spinner search-spinner"/>
+    <div #results class="esper-search-results">
+      <div #searchInstructions class="esper-search-instructions"/>
+      <div #spinner class="esper-spinner esper-search-spinner"/>
       <div #resultsList/>
-      <div #searchStats class="search-stats"/>
+      <div #searchStats class="esper-search-stats"/>
     </div>
-    <div class="search-footer">
-      <button #done class="primary-btn done-btn">Done</button>
-      <object #modalLogo class="esper-svg search-footer-logo"/>
+    <div class="esper-search-footer">
+      <button #done class="esper-primary-btn esper-done-btn">Done</button>
+      <object #modalLogo class="esper-svg esper-search-footer-logo"/>
     </div>
   </div>
 </div>

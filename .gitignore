@@ -5,3 +5,5 @@ esper.zip
 *~
 *.log
 manifest.json
+manifest.json.dev
+manifest.json.prod

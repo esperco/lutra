@@ -48,7 +48,7 @@ module Esper.Sidebar {
     teamListExec.text(exec.display_name);
 
     if (team.teamid === myTeamId) {
-      selector.addClass("selected");
+      selector.addClass("esper-selected");
       teamListCheck.attr("data", Init.esperRootUrl + "img/check.svg");
     } else {
       teamListCheck.hide();
@@ -68,7 +68,8 @@ module Esper.Sidebar {
   </div>
   <ul #dropdown class="esper-ul esper-options-menu">
     <div #teamsSection class="esper-dropdown-section">
-      <li class="esper-click-safe esper-li disabled esper-team-list-title">
+      <li class="esper-click-safe esper-li
+                 esper-disabled esper-team-list-title">
         TEAMS
       </li>
     </div>
@@ -76,7 +77,7 @@ module Esper.Sidebar {
     <div class="esper-dropdown-section">
       <li #settings class="esper-li">Settings</li>
       <a #help class="esper-a" href="mailto:team@esper.com">Help</a>
-      <li #signOut class="esper-li danger">Sign out</li>
+      <li #signOut class="esper-li esper-danger">Sign out</li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
@@ -101,7 +102,8 @@ module Esper.Sidebar {
     </div>
     <div #teamName class="esper-team-name"/>
     <div #size title class="esper-dock-action esper-size">
-      <div #sizeIcon class="esper-dock-action-icon esper-size-icon minimize"/>
+      <div #sizeIcon class="esper-dock-action-icon esper-size-icon
+                            esper-minimize"/>
     </div>
   </div>
 </div>
@@ -109,13 +111,14 @@ module Esper.Sidebar {
     function onTeamSwitch(toTeam) {
       dismissDropdowns();
       wrap.fadeOut(250);
-      sizeIcon.removeClass("minimize");
+      sizeIcon.removeClass("esper-minimize");
       sidebar.hide("slide", { direction: "down" }, 250);
       wrap.fadeIn(250);
-      sizeIcon.addClass("minimize");
+      sizeIcon.addClass("esper-minimize");
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, true, currentThreadId, profiles);
+        displayTeamSidebar(rootElement, toTeam, true,
+                           currentThreadId, profiles);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -171,12 +174,12 @@ module Esper.Sidebar {
     function toggleSidebar() {
       if (sidebar.css("display") === "none") {
         wrap.fadeIn(250);
-        sizeIcon.addClass("minimize");
+        sizeIcon.addClass("esper-minimize");
         size.tooltip("option", "content", "Minimize");
         sidebar.show("slide", { direction: "down" }, 250);
       } else {
         wrap.fadeOut(250);
-        sizeIcon.removeClass("minimize");
+        sizeIcon.removeClass("esper-minimize");
         size.tooltip("option", "content", "Maximize");
         sidebar.hide("slide", { direction: "down" }, 250);
       }
@@ -206,44 +209,49 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li class="active"><a #tab1 href="#tab1" class="first">
+      <li #tab1 class="esper-active esper-first">
         <object #calendar class="esper-svg esper-tab-icon"/>
-      </a></li>
-      <li><a #tab2 href="#tab2">
+      </li>
+      <li #tab2>
         <object #polls class="esper-svg esper-tab-icon"/>
-      </a></li>
-      <li><a #tab3 href="#tab3" class="last">
+      </li>
+      <li #tab3 class="esper-last">
         <object #person class="esper-svg esper-tab-icon"/>
-      </a></li>
+      </li>
     </ul>
   </div>
   <div class="esper-tab-content">
-    <div #content1 id="tab1" class="tab active"/>
-    <div #content2 id="tab2" class="tab"/>
-    <div #content3 id="tab3" class="tab"/>
+    <div #content1 class="esper-tab esper-active"/>
+    <div #content2 class="esper-tab"/>
+    <div #content3 class="esper-tab"/>
   </div>
 </div>
 '''
+    var tabs = [tab1, tab2, tab3];
+    var tabContents = [content1, content2, content3];
+
+    function switchTab(on: number, off: number[]) {
+      List.iter(off, function(i) {
+        tabContents[i].hide().removeClass("esper-active");
+        tabs[i].removeClass("esper-active");
+      });
+      tabContents[on].show().addClass("esper-active");
+      tabs[on].addClass("esper-active");
+    }
 
     tab1.click(function() {
-      switchTab(tab1);
-    })
+      switchTab(0, [1,2]);
+    });
     tab2.click(function() {
-      switchTab(tab2);
-    })
+      switchTab(1, [0,2]);
+    });
     tab3.click(function() {
-      switchTab(tab3);
-    })
+      switchTab(2, [0,1]);
+    });
 
     calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
     polls.attr("data", Init.esperRootUrl + "img/polls.svg");
     person.attr("data", Init.esperRootUrl + "img/person.svg");
-
-    function switchTab(tab) {
-      var currentAttrValue = tab.attr("href");
-      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
-      tab.parent('li').addClass('active').siblings().removeClass('active');
-    };
 
     CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
@@ -348,7 +356,8 @@ module Esper.Sidebar {
               }
 
               if (team !== undefined)
-                displayTeamSidebar(rootElement, team, correctTeam, threadId, profiles);
+                displayTeamSidebar(rootElement, team,
+                                   correctTeam, threadId, profiles);
             });
           return true;
         }

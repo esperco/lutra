@@ -20,7 +20,7 @@ module Esper.Menu {
       .text(text)
       .click(action);
 
-    if (danger) link.addClass("danger");
+    if (danger) link.addClass("esper-danger");
 
     return link;
   }
