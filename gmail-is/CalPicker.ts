@@ -37,32 +37,25 @@ module Esper.CalPicker {
       timezoneView.text(/*timezone.format*/(tz));
 
     _view["timezone"] = tz;
+    _view["events"] = {};
 
-    /*
-      Later _view will also contain the following fields:
-      - eventId
-      - eventStart
-      - eventEnd
-     */
     return _view;
   }
 
   /***** Calendar picker (start/end date-time) *****/
 
   /* Remove event from the calendar view */
-  function removeEvent(picker) {
-    var id = picker.eventId;
-    if (Util.isDefined(id)) {
+  function removeEvent(picker, eventId) {
+    if (picker.events[eventId] !== undefined) {
       picker.calendarView.fullCalendar('removeEvents', function(calEvent) {
-        return calEvent.id === id;
+        return calEvent.id === eventId;
       });
-      delete picker.eventId;
+      delete picker.events[eventId];
     }
   }
 
   function createPickedCalendarEvent(picker, startMoment, endMoment) {
     var eventId = Util.randomString();
-    picker.eventId = eventId;
     var eventData = {
       id: eventId,
       title: "",
@@ -71,6 +64,7 @@ module Esper.CalPicker {
       color: "#A25CC6",
       editable: true
     };
+    picker.events[eventId] = eventData;
     var stick = true;
     picker.calendarView.fullCalendar('renderEvent', eventData, stick);
     picker.calendarView.fullCalendar('unselect');
@@ -121,7 +115,7 @@ module Esper.CalPicker {
     create new calendar event and populate input boxes
   */
   function initEvent(picker, start, end) {
-    removeEvent(picker);
+    //removeEvent(picker);
   }
 
   /*
@@ -146,7 +140,6 @@ module Esper.CalPicker {
   }
 
   function fetchEvents(momentStart, momentEnd, tz, callback) {
-    Log.d("fetching:", momentStart, momentEnd, tz, callback);
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
     var cache = CalCache.getCache(Login.myTeams()[0].teamid);
@@ -162,27 +155,27 @@ module Esper.CalPicker {
     var calendarView = picker.calendarView;
     var calendarJump = picker.dateJumper;
 
-    function setEventMoments(startMoment, endMoment) {
-      removeEvent(picker);
+    function setEventMoments(startMoment, endMoment, eventId) {
+      if (eventId !== undefined) removeEvent(picker, eventId);
       Log.d(startMoment, endMoment);
       createPickedCalendarEvent(picker, startMoment, endMoment);
     }
 
-    function setEvent(dates) {
+    /*function setEvent(dates) {
       setEventMoments(momentOfDate(picker, dates.start),
                       momentOfDate(picker, dates.end));
-    }
+    }*/
 
     function select(startMoment, endMoment) {
-      setEventMoments(startMoment, endMoment);
+      setEventMoments(startMoment, endMoment, undefined);
     }
 
     function eventClick(calEvent, jsEvent, view) {
-      removeEvent(picker);
+      removeEvent(picker, calEvent.id);
     }
 
     function updateEvent(calEvent) {
-      setEventMoments(calEvent.start, calEvent.end);
+      setEventMoments(calEvent.start, calEvent.end, calEvent.id);
     }
 
     function eventDrop(calEvent, revertFunc, jsEvent, ui, view) {
@@ -201,6 +194,7 @@ module Esper.CalPicker {
       },
       defaultDate: defaultDate,
       defaultView: 'agendaWeek',
+      snapDuration: "00:15:00",
       timezone: tz,
       selectable: true,
       selectHelper: true,
@@ -235,7 +229,7 @@ module Esper.CalPicker {
     - withDatePicker, withCalendarPicker: whether
       the corresponding input widgets should be created.
    */
-  export function create(param) {
+  function createPicker(param) {
     var tz = param.timezone;
     var defaultDate = param.defaultDate;
 
@@ -248,9 +242,78 @@ module Esper.CalPicker {
     }
 
     return {
+      events: picker["events"],
       view: picker.view,
       render: render, // to be called after attaching the view to the dom tree
     };
   };
 
+  function calendarTimeOfMoment(localMoment) {
+    var localTime = localMoment.toISOString();
+    localMoment.local();
+    var utcMoment = localMoment.clone();
+    utcMoment.utc();
+    var utcTime = utcMoment.toISOString();
+    return { utc: utcTime, local: localTime };
+  }
+
+  function makeEventEdit(ev) : ApiT.CalendarEventEdit {
+    return {
+      google_cal_id: Login.myTeams()[0].team_calendars[0].google_cal_id,
+      start: calendarTimeOfMoment(ev.start),
+      end: calendarTimeOfMoment(ev.end),
+      guests: []
+    };
+  }
+
+  export function createModal(param) {
+'''
+<div #view>
+  <div #background class="esper-modal-bg"/>
+  <div #modal class="esper-modal esper-calendar-modal">
+    <div class="esper-modal-header">
+      <div #close class="esper-modal-close-container">
+        <object #closeIcon class="esper-svg esper-modal-close-icon"/>
+      </div>
+      <div #title class="esper-modal-title"/>
+    </div>
+    <div #modalBody/>
+    <div class="esper-search-footer">
+      <button #done class="esper-primary-btn esper-done-btn">Done</button>
+      <object #modalLogo class="esper-svg esper-search-footer-logo"/>
+    </div>
+  </div>
+</div>
+'''
+    function closeModal() { view.remove(); }
+
+    title.text("Select meeting times");
+
+    modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
+    closeIcon.attr("data", Init.esperRootUrl + "img/close.svg");
+
+    var picker = createPicker(param);
+    modalBody.append(picker.view);
+
+    background.click(closeModal);
+    close.click(closeModal);
+    done.click(function() {
+      Log.d(picker);
+      var events = [];
+      for (var k in picker.events)
+        events.push(makeEventEdit(picker.events[k]));
+      Log.d(events);
+      var apiCalls = List.map(events, function(ev) {
+        return Api.createLinkedEvent(
+          Login.myTeams()[0].teamid,
+          ev,
+          Sidebar.currentThreadId
+        );
+      });
+      Promise.join(apiCalls).done(closeModal);
+    });
+
+    $("body").append(view);
+    picker.render();
+  }
 }
