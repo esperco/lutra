@@ -7,34 +7,34 @@ module Esper.CalPicker {
 
   export var teamCalendar : ApiT.Calendar;
 
-  function createView(tz) {
+  interface PickerView {
+    view : JQuery;
+    calendarPickerContainer : JQuery;
+    calendarSidebar : JQuery;
+    dateJumper : JQuery;
+    pickerSwitcher : JQuery;
+    calendarView : JQuery;
+    events : { [eventId : string] : FullCalendar.EventObject };
+  }
+
+  function createView() : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
-    <div #calendarSidebar
-         class="esper-cal-sidebar">
-      <div #dateJumper
-           class="esper-date-jumper"/>
-      <div class="esper-time-zone-label-section">
-        <div class="esper-time-zone-label">TIME ZONE:</div>
-        <div #timezoneView class="esper-time-zone-text"/>
-      </div>
+    <div #calendarSidebar class="esper-cal-sidebar">
+      <div #dateJumper class="esper-date-jumper"/>
       <div class="esper-cal-picker-switcher">
         Calendar: <select #pickerSwitcher/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
-        <div #calendarView
-             class="esper-cal-picker-container"/>
+        <div #calendarView class="esper-cal-picker-container"/>
       </div>
     </div>
   </div>
 </div>
 '''
-    if (Util.isDefined(tz))
-      timezoneView.text(/*timezone.format*/(tz));
-
     var calendars = Sidebar.currentTeam.team_calendars;
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
@@ -48,16 +48,15 @@ module Esper.CalPicker {
     });
     teamCalendar = calendars[0];
 
-    _view["timezone"] = tz;
-    _view["events"] = {};
-
-    return _view;
+    var pv = <PickerView> _view;
+    pv.events = {};
+    return pv;
   }
 
   /***** Calendar picker (start/end date-time) *****/
 
   /* Remove event from the calendar view */
-  function removeEvent(picker, eventId) {
+  function removeEvent(picker : PickerView, eventId) {
     if (picker.events[eventId] !== undefined) {
       picker.calendarView.fullCalendar('removeEvents', function(calEvent) {
         return calEvent.id === eventId;
@@ -66,7 +65,8 @@ module Esper.CalPicker {
     }
   }
 
-  function createPickedCalendarEvent(picker, startMoment, endMoment) {
+  function createPickedCalendarEvent(picker : PickerView,
+                                     startMoment, endMoment) {
     var eventId = Util.randomString();
     var eventData = {
       id: eventId,
@@ -84,50 +84,10 @@ module Esper.CalPicker {
   }
 
   /*
-    Ignores the 'Z' suffix and assumes time expressed in the calendar's
-    timezone.
-  */
-  function parseDateUsingCalendarTimezone(picker, dateString) {
-    return picker.calendarView.fullCalendar("moment", dateString);
-  }
-
-  /*
-    Takes a javascript Date representing a local time and converts
-    it into moment (type used by the calendar) using the calendar's timezone.
-
-    (just slightly contrived)
-   */
-  function momentOfDate(picker, d) {
-    var s = XDate.toString(d);
-    return parseDateUsingCalendarTimezone(picker, s);
-  }
-
-  /*
     Convert a Fullcalendar date (Moment library) into a javascript Date
   */
-  function dateOfMoment(m) {
+  function dateOfMoment(m) : Date {
     return m.toDate();
-  }
-
-  function datesOfMoments(startMoment, endMoment) {
-    return {
-      start: dateOfMoment(startMoment),
-      end: dateOfMoment(endMoment)
-    };
-  }
-
-  function createPickedEvent(picker, dates) {
-    var startMoment = momentOfDate(picker, dates.start);
-    var endMoment = momentOfDate(picker, dates.end);
-    createPickedCalendarEvent(picker, startMoment, endMoment);
-  }
-
-  /*
-    Clear previous selection if any,
-    create new calendar event and populate input boxes
-  */
-  function initEvent(picker, start, end) {
-    //removeEvent(picker);
   }
 
   /*
@@ -138,8 +98,8 @@ module Esper.CalPicker {
     Output event type:
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
-  function importEvents(esperEvents) {
-    return List.map(esperEvents, function(x : any) {
+  function importEvents(esperEvents : ApiT.CalendarEvent[]) {
+    return List.map(esperEvents, function(x) {
       var ev = {
         title: x.title, /* required */
         allDay: x.all_day,
@@ -152,20 +112,20 @@ module Esper.CalPicker {
   }
 
   function fetchEvents(momentStart, momentEnd, tz, callback) {
+    // TODO Display tz?
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
     var cache = CalCache.getCache(
       Sidebar.currentTeam.teamid,
       teamCalendar.google_cal_id
     );
-    cache.fetch(start, end)
-      .done(function (esperEvents) {
-        var fullcalEvents = importEvents(esperEvents);
-        callback(fullcalEvents);
-      });
+    cache.fetch(start, end).done(function(esperEvents) {
+      var fullcalEvents = importEvents(esperEvents);
+      callback(fullcalEvents);
+    });
   }
 
-  function setupCalendar(picker, tz, defaultDate) {
+  function setupCalendar(picker : PickerView) {
     var calendarView = picker.calendarView;
     var calendarJump = picker.dateJumper;
 
@@ -202,10 +162,8 @@ module Esper.CalPicker {
         right: 'month,agendaWeek,agendaDay'
       },
       height: 600,
-      defaultDate: defaultDate,
       defaultView: 'agendaWeek',
       snapDuration: "00:15:00",
-      timezone: tz,
       selectable: true,
       selectHelper: true,
       select: select,
@@ -216,9 +174,9 @@ module Esper.CalPicker {
       events: fetchEvents
     });
 
-    function dateJump(date,view){
-        Log.d("Jump");
-        calendarView.fullCalendar('gotoDate',date);
+    function dateJump(date, view) {
+      Log.d("Jump");
+      calendarView.fullCalendar('gotoDate', date);
     }
 
     calendarJump.datepicker({inline : true,
@@ -227,38 +185,32 @@ module Esper.CalPicker {
     picker.calendarPickerContainer.removeClass("hide");
   }
 
+
+  interface Picker {
+    view : JQuery;
+    events : { [eventId : string] : FullCalendar.EventObject };
+    render : () => void;
+  }
+
   /*
     Create date and time picker using user's calendar.
-
-    Parameters:
-    - timezone: IANA timezone in which all local times are expressed;
-      optional if the full calendar is not displayed.
-    - defaultDate:
-        date that determines which calendar page to display initially
-        (default: today)
-    - withDatePicker, withCalendarPicker: whether
-      the corresponding input widgets should be created.
-   */
-  function createPicker(param) {
-    var tz = param.timezone;
-    var defaultDate = param.defaultDate;
-
-    var picker = createView(tz);
-
-    setupCalendar(picker, tz, defaultDate);
+  */
+  function createPicker() : Picker {
+    var pickerView = createView();
+    setupCalendar(pickerView);
 
     function render() {
-      picker.calendarView.fullCalendar("render");
+      pickerView.calendarView.fullCalendar("render");
     }
 
     return {
-      events: picker["events"],
-      view: picker.view,
+      view: pickerView.view,
+      events: pickerView.events,
       render: render, // to be called after attaching the view to the dom tree
     };
   };
 
-  function calendarTimeOfMoment(localMoment) {
+  function calendarTimeOfMoment(localMoment) : ApiT.CalendarTime {
     var localTime = localMoment.toISOString();
     localMoment.local();
     var utcMoment = localMoment.clone();
@@ -267,7 +219,9 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev) : ApiT.CalendarEventEdit {
+  function makeEventEdit(ev : FullCalendar.EventObject)
+    : ApiT.CalendarEventEdit
+  {
     return {
       google_cal_id: teamCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
@@ -277,7 +231,7 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal(param) {
+  export function createModal() : void {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -299,11 +253,10 @@ module Esper.CalPicker {
     function closeModal() { view.remove(); }
 
     title.text("Select meeting times");
-
     modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
     closeIcon.attr("data", Init.esperRootUrl + "img/close.svg");
 
-    var picker = createPicker(param);
+    var picker = createPicker();
     modalBody.append(picker.view);
 
     background.click(closeModal);

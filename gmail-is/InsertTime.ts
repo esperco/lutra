@@ -45,7 +45,7 @@ module Esper.InsertTime {
         });
 
         controls.createButton.click(function() {
-          CalPicker.createModal({});
+          CalPicker.createModal();
         });
       }
     });
