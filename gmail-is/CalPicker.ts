@@ -1,17 +1,11 @@
 /*
   Date-time-duration picker using calendar containing read-only events
   retrieved from the user's calendar.
-
-  Input:
-  - timezone
-
-  Output:
-  - calendarView
 */
 
 module Esper.CalPicker {
 
-  var teamCalendar : ApiT.Calendar;
+  export var teamCalendar : ApiT.Calendar;
 
   function createView(tz) {
 '''
@@ -164,7 +158,7 @@ module Esper.CalPicker {
       Sidebar.currentTeam.teamid,
       teamCalendar.google_cal_id
     );
-    cache.fetch(start, end, tz)
+    cache.fetch(start, end)
       .done(function (esperEvents) {
         var fullcalEvents = importEvents(esperEvents);
         callback(fullcalEvents);

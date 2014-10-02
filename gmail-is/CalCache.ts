@@ -1,6 +1,20 @@
 module Esper.CalCache {
+
+  interface Range {
+    start : Date;
+    end : Date;
+  }
+
+  interface KeyedRange extends Range {
+    key : string;
+  }
+
+  interface PrivateCache {
+    [key : string] : ApiT.CalendarEvent[];
+  }
+
   /* Round down to Saturday 00:00 am */
-  function roundBeginningOfWeek(d) {
+  function roundBeginningOfWeek(d : Date) : Date {
     var dayOfWeek = d.getUTCDay(); /* 0-6 */
     var unixtime = d.getTime() / 1000;
     unixtime = unixtime - unixtime % 86400;
@@ -10,7 +24,7 @@ module Esper.CalCache {
   }
 
   /* Round up to Tuesday 00:00 am */
-  function roundEndOfWeek(d) {
+  function roundEndOfWeek(d : Date) : Date {
     var dayOfWeek = d.getUTCDay(); /* 0-6 */
     var unixtime = d.getTime() / 1000;
     unixtime = unixtime - unixtime % 86400;
@@ -22,7 +36,7 @@ module Esper.CalCache {
   }
 
   /* Round down to 24 hours before beginning of month */
-  function roundBeginningOfMonth(d) {
+  function roundBeginningOfMonth(d : Date) : Date {
     var withinMonth = new Date(d.getTime() + 86400000);
     var year = withinMonth.getUTCFullYear();
     var month = withinMonth.getUTCMonth();
@@ -30,14 +44,14 @@ module Esper.CalCache {
   }
 
   /* Round down to 24 hours after the end of the month */
-  function roundEndOfMonth(d) {
+  function roundEndOfMonth(d : Date) : Date {
     var withinNextMonth = new Date(d.getTime() + 86400000);
     var year = withinNextMonth.getUTCFullYear();
     var month = withinNextMonth.getUTCMonth();
     return new Date(year, month, 2); /* warning: uses local timezone */
   }
 
-  function getDateOnly(d) {
+  function getDateOnly(d : Date) : string {
     var s = ""
       + d.getUTCFullYear() + "-"
       + d.getUTCMonth() + "-"
@@ -54,7 +68,7 @@ module Esper.CalCache {
           to the ends of the week, i.e. the narrowest Sun-Sat range that
           includes the whole month, resulting in 4, 5, or 6 whole weeks.
   */
-  function getRoundRange(localStart, localEnd) {
+  function getRoundRange(localStart : Date, localEnd : Date) : KeyedRange {
     var start = roundBeginningOfWeek(localStart);
     var end = roundEndOfWeek(localEnd);
     var key = getDateOnly(start) + "-" + getDateOnly(end);
@@ -65,7 +79,7 @@ module Esper.CalCache {
     };
   }
 
-  function previousPage(start, end) {
+  function previousPage(start : Date, end : Date) : Range {
     var t1 = start.getTime();
     var t2 = end.getTime();
     return {
@@ -74,7 +88,7 @@ module Esper.CalCache {
     };
   }
 
-  function nextPage(start, end) {
+  function nextPage(start : Date, end : Date) : Range {
     var t1 = start.getTime();
     var t2 = end.getTime();
     return {
@@ -83,30 +97,32 @@ module Esper.CalCache {
     };
   }
 
-  function clear(cache) {
+  function clear(cache : PrivateCache) : void {
     for (var k in cache)
       delete cache[k];
   }
 
   /* Get from the cache only; no refresh takes place */
-  function get(cache, start, end, tz) {
+  function get(cache : PrivateCache, start : Date, end : Date)
+    : ApiT.CalendarEvent[]
+  {
     var range = getRoundRange(start, end);
     var k = range.key;
     var v = cache[k];
-    if (Util.isDefined(v))
-      return v;
-    else
-      return null;
+    if (v !== undefined) return v;
+    else return null;
   }
 
   /* Fetch from server, update the cache when the response arrives. */
-  function refresh(cache, teamid, calid, start, end, tz) {
+  function refresh(cache : PrivateCache, teamid : string, calid : string,
+                   start : Date, end : Date) 
+    : JQueryPromise<ApiT.CalendarEvent[]>
+  {
     var range = getRoundRange(start, end);
     var team = List.find(Login.myTeams(), function(team) {
       return team.teamid === teamid;
     });
     return Api.postCalendar(teamid, calid, {
-      //timezone: tz,
       window_start: range.start,
       window_end: range.end
     })
@@ -124,38 +140,49 @@ module Esper.CalCache {
     but the refresh call is performed anyway and the whenRefreshed
     function is called when the refresh call succeeds.
   */
-  function fetch(cache, teamid, calid, start, end, tz, whenRefreshed) {
+  function fetch(cache : PrivateCache, teamid : string, calid : string,
+                 start : Date, end : Date,
+                 whenRefreshed : (x : ApiT.CalendarEvent[]) =>
+                                 JQueryPromise<ApiT.CalendarEvent[]>)
+    : JQueryPromise<ApiT.CalendarEvent[]>
+  {
     var range = getRoundRange(start, end);
     var k = range.key;
     var v = cache[k];
     function fetchAhead() {
       var prev = previousPage(start, end);
       var next = nextPage(start, end);
-      refresh(cache, teamid, calid, prev.start, prev.end, tz);
-      refresh(cache, teamid, calid, next.start, next.end, tz);
+      refresh(cache, teamid, calid, prev.start, prev.end);
+      refresh(cache, teamid, calid, next.start, next.end);
     }
-    if (Util.isDefined(v)) {
-      var deferredEvents = refresh(cache, teamid, calid, start, end, tz);
-      if (Util.isDefined(whenRefreshed))
+    if (v !== undefined) {
+      var deferredEvents = refresh(cache, teamid, calid, start, end);
+      if (whenRefreshed !== undefined)
         deferredEvents.then(whenRefreshed);
       fetchAhead();
       return Promise.defer(v);
     }
     else {
-      var result = refresh(cache, teamid, calid, start, end, tz);
+      var result = refresh(cache, teamid, calid, start, end);
       fetchAhead();
       return result;
     }
   }
 
-  function create(teamid, calid) {
-    var cache = {};
+  export interface Cache {
+    get : (start : Date, end : Date) => ApiT.CalendarEvent[];
+    fetch : (start : Date, end : Date) => JQueryPromise<ApiT.CalendarEvent[]>;
+    clear : () => void;
+  }
+
+  function create(teamid : string, calid : string) : Cache {
+    var cache = <PrivateCache> {};
     return {
-      get: function(start, end, tz) {
-        return get(cache, start, end, tz);
+      get: function(start, end) {
+        return get(cache, start, end);
       },
-      fetch: function(start, end, tz) {
-        return fetch(cache, teamid, calid, start, end, tz, undefined);
+      fetch: function(start, end) {
+        return fetch(cache, teamid, calid, start, end, undefined);
       },
       clear: function() {
         clear(cache);
@@ -163,17 +190,25 @@ module Esper.CalCache {
     };
   };
 
+  interface AllCaches {
+    [teamid : string] : TeamCaches;
+  }
+
+  interface TeamCaches {
+    [calid : string] : Cache;
+  }
+
   /* One cache per team calendar */
-  var allCaches = {};
+  var allCaches = <AllCaches> {};
 
   /* Create a cache for the team as needed */
-  export function getCache(teamid, calid) {
+  export function getCache(teamid : string, calid : string) : Cache {
     var teamCaches = allCaches[teamid];
-    if (!Util.isDefined(teamCaches)) {
-      teamCaches = allCaches[teamid] = {};
+    if (teamCaches === undefined) {
+      teamCaches = allCaches[teamid] = <TeamCaches> {};
     }
     var cache = teamCaches[calid];
-    if (!Util.isDefined(cache)) {
+    if (cache === undefined) {
       cache = create(teamid, calid);
       teamCaches[calid] = cache;
     }
