@@ -13,6 +13,8 @@ module Esper.CalPicker {
     calendarSidebar : JQuery;
     dateJumper : JQuery;
     pickerSwitcher : JQuery;
+    refreshCal : JQuery;
+    refreshCalIcon : JQuery;
     eventTitle : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
@@ -27,6 +29,13 @@ module Esper.CalPicker {
       <div class="esper-cal-picker-switcher">
         Calendar: <select #pickerSwitcher/>
       </div>
+      <div>
+        <span style="float: left">Refresh calendar:</span>
+        <div #refreshCal class="esper-refresh esper-clickable">
+          <object #refreshCalIcon class="esper-svg"/>
+        </div>
+      </div>
+      <br/>
       <div class="esper-cal-event-title">
         Event title: <input #eventTitle type="text" size=64/>
       </div>
@@ -43,6 +52,10 @@ module Esper.CalPicker {
     teamCalendar = calendars[0];
 
     eventTitle.val("HOLD: " + gmail.get.email_subject());
+    refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshCal.click(function() {
+      calendarView.fullCalendar("refetchEvents");
+    });
 
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
