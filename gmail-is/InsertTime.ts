@@ -29,11 +29,7 @@ module Esper.InsertTime {
 
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField(div);
-          var threadId  = Sidebar.currentThreadId;
-          var team      = Login.myTeams()[0];
-
           var events = CalTab.currentEvents;
-
           textField.focus();
 
           insertAtCaret("<br />");
@@ -46,6 +42,10 @@ module Esper.InsertTime {
               insertAtCaret(XDate.weekDay(start) + ", " + range + "<br />");
             }
           }
+        });
+
+        controls.createButton.click(function() {
+          CalPicker.createModal({});
         });
       }
     });
@@ -91,6 +91,7 @@ module Esper.InsertTime {
   <img #logo alt=""/>
   <span #eventsLabel> No linked events. </span>
   <button #insertButton>Insert</button>
+  <button #createButton>Create meeting options</button>
 </div>
 '''
     logo.attr("src", Init.esperRootUrl + "img/icon16.png");

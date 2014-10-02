@@ -11,6 +11,8 @@
 
 module Esper.CalPicker {
 
+  var teamCalendar : ApiT.Calendar;
+
   function createView(tz) {
 '''
 <div #view>
@@ -22,6 +24,9 @@ module Esper.CalPicker {
       <div class="esper-time-zone-label-section">
         <div class="esper-time-zone-label">TIME ZONE:</div>
         <div #timezoneView class="esper-time-zone-text"/>
+      </div>
+      <div class="esper-cal-picker-switcher">
+        Calendar: <select #pickerSwitcher/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -35,6 +40,19 @@ module Esper.CalPicker {
 '''
     if (Util.isDefined(tz))
       timezoneView.text(/*timezone.format*/(tz));
+
+    var calendars = Sidebar.currentTeam.team_calendars;
+    for (var i = 0; i < calendars.length; i++) {
+      var opt = $("<option value='" + i + "'>" +
+                  calendars[i].calendar_title + "</option>");
+      opt.appendTo(pickerSwitcher);
+    }
+    pickerSwitcher.change(function() {
+      var i = $(this).val();
+      teamCalendar = calendars[i];
+      calendarView.fullCalendar("refetchEvents");
+    });
+    teamCalendar = calendars[0];
 
     _view["timezone"] = tz;
     _view["events"] = {};
@@ -142,13 +160,15 @@ module Esper.CalPicker {
   function fetchEvents(momentStart, momentEnd, tz, callback) {
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
-    var cache = CalCache.getCache(Login.myTeams()[0].teamid);
+    var cache = CalCache.getCache(
+      Sidebar.currentTeam.teamid,
+      teamCalendar.google_cal_id
+    );
     cache.fetch(start, end, tz)
       .done(function (esperEvents) {
         var fullcalEvents = importEvents(esperEvents);
         callback(fullcalEvents);
       });
-    //spinner.spin("Loading calendar...", async);
   }
 
   function setupCalendar(picker, tz, defaultDate) {
@@ -160,11 +180,6 @@ module Esper.CalPicker {
       Log.d(startMoment, endMoment);
       createPickedCalendarEvent(picker, startMoment, endMoment);
     }
-
-    /*function setEvent(dates) {
-      setEventMoments(momentOfDate(picker, dates.start),
-                      momentOfDate(picker, dates.end));
-    }*/
 
     function select(startMoment, endMoment) {
       setEventMoments(startMoment, endMoment, undefined);
@@ -192,6 +207,7 @@ module Esper.CalPicker {
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
+      height: 600,
       defaultDate: defaultDate,
       defaultView: 'agendaWeek',
       snapDuration: "00:15:00",
@@ -259,9 +275,10 @@ module Esper.CalPicker {
 
   function makeEventEdit(ev) : ApiT.CalendarEventEdit {
     return {
-      google_cal_id: Login.myTeams()[0].team_calendars[0].google_cal_id,
+      google_cal_id: teamCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
+      title: "HOLD: " + gmail.get.email_subject(),
       guests: []
     };
   }
@@ -298,19 +315,20 @@ module Esper.CalPicker {
     background.click(closeModal);
     close.click(closeModal);
     done.click(function() {
-      Log.d(picker);
       var events = [];
       for (var k in picker.events)
         events.push(makeEventEdit(picker.events[k]));
-      Log.d(events);
       var apiCalls = List.map(events, function(ev) {
         return Api.createLinkedEvent(
-          Login.myTeams()[0].teamid,
+          Sidebar.currentTeam.teamid,
           ev,
           Sidebar.currentThreadId
         );
       });
-      Promise.join(apiCalls).done(closeModal);
+      Promise.join(apiCalls).done(function() {
+        closeModal();
+        if (events.length > 0) CalTab.refreshLinkedEvents();
+      });
     });
 
     $("body").append(view);

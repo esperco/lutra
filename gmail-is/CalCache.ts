@@ -100,12 +100,11 @@ module Esper.CalCache {
   }
 
   /* Fetch from server, update the cache when the response arrives. */
-  function refresh(cache, teamid, start, end, tz) {
+  function refresh(cache, teamid, calid, start, end, tz) {
     var range = getRoundRange(start, end);
     var team = List.find(Login.myTeams(), function(team) {
       return team.teamid === teamid;
     });
-    var calid = team.team_calendars[0].google_cal_id;
     return Api.postCalendar(teamid, calid, {
       //timezone: tz,
       window_start: range.start,
@@ -125,38 +124,38 @@ module Esper.CalCache {
     but the refresh call is performed anyway and the whenRefreshed
     function is called when the refresh call succeeds.
   */
-  function fetch(cache, teamid, start, end, tz, whenRefreshed) {
+  function fetch(cache, teamid, calid, start, end, tz, whenRefreshed) {
     var range = getRoundRange(start, end);
     var k = range.key;
     var v = cache[k];
     function fetchAhead() {
       var prev = previousPage(start, end);
       var next = nextPage(start, end);
-      refresh(cache, teamid, prev.start, prev.end, tz);
-      refresh(cache, teamid, next.start, next.end, tz);
+      refresh(cache, teamid, calid, prev.start, prev.end, tz);
+      refresh(cache, teamid, calid, next.start, next.end, tz);
     }
     if (Util.isDefined(v)) {
-      var deferredEvents = refresh(cache, teamid, start, end, tz);
+      var deferredEvents = refresh(cache, teamid, calid, start, end, tz);
       if (Util.isDefined(whenRefreshed))
         deferredEvents.then(whenRefreshed);
       fetchAhead();
       return Promise.defer(v);
     }
     else {
-      var result = refresh(cache, teamid, start, end, tz);
+      var result = refresh(cache, teamid, calid, start, end, tz);
       fetchAhead();
       return result;
     }
   }
 
-  function create(teamid) {
+  function create(teamid, calid) {
     var cache = {};
     return {
       get: function(start, end, tz) {
         return get(cache, start, end, tz);
       },
       fetch: function(start, end, tz) {
-        return fetch(cache, teamid, start, end, tz, undefined);
+        return fetch(cache, teamid, calid, start, end, tz, undefined);
       },
       clear: function() {
         clear(cache);
@@ -165,14 +164,18 @@ module Esper.CalCache {
   };
 
   /* One cache per team calendar */
-  var caches = {};
+  var allCaches = {};
 
   /* Create a cache for the team as needed */
-  export function getCache(teamid) {
-    var cache = caches[teamid];
+  export function getCache(teamid, calid) {
+    var teamCaches = allCaches[teamid];
+    if (!Util.isDefined(teamCaches)) {
+      teamCaches = allCaches[teamid] = {};
+    }
+    var cache = teamCaches[calid];
     if (!Util.isDefined(cache)) {
-      cache = create(teamid);
-      caches[teamid] = cache;
+      cache = create(teamid, calid);
+      teamCaches[calid] = cache;
     }
     return cache;
   };
