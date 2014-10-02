@@ -68,7 +68,6 @@ module Esper.CalPicker {
       calendarView.fullCalendar("refetchEvents");
     });
 
-
     var pv = <PickerView> _view;
     pv.events = {};
     return pv;
@@ -205,7 +204,6 @@ module Esper.CalPicker {
 
     picker.calendarPickerContainer.removeClass("hide");
   }
-
 
   interface Picker {
     view : JQuery;

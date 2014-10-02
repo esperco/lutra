@@ -238,19 +238,4 @@ module Esper.Util {
   ) {
     Log.d(toString(find(x, predicate, maxDepth), maxDepth));
   }
-
-  export function isDefined(x) {
-    return x !== undefined;
-  }
-
-  export function isNotNull(x) {
-    return x !== null && x !== undefined;
-  }
-
-  export function option(optValue, defaultValue) {
-    if (isDefined(optValue))
-      return optValue;
-    else
-      return defaultValue;
-  };
 }

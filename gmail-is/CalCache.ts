@@ -198,7 +198,7 @@ module Esper.CalCache {
     [calid : string] : Cache;
   }
 
-  /* One cache per team calendar */
+  /* One cache per calendar per team */
   var allCaches = <AllCaches> {};
 
   /* Create a cache for the team as needed */
