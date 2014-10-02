@@ -284,20 +284,36 @@ module Esper.CalPicker {
 
     background.click(closeModal);
     close.click(closeModal);
+
     done.click(function() {
       var events = [];
       for (var k in picker.events)
         events.push(makeEventEdit(picker.events[k], picker.eventTitle));
-      var apiCalls = List.map(events, function(ev) {
+
+      // Wait for link
+      var linkCalls = List.map(events, function(ev) {
         return Api.createLinkedEvent(
           Sidebar.currentTeam.teamid,
           ev,
           Sidebar.currentThreadId
         );
       });
-      Promise.join(apiCalls).done(function() {
+
+      Promise.join(linkCalls).done(function(linkedEvents) {
         closeModal();
-        if (events.length > 0) CalTab.refreshLinkedEvents();
+        if (linkedEvents.length > 0) CalTab.refreshLinkedEvents();
+
+        // Don't wait for sync
+        var syncCalls =
+          List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
+            return Api.syncEvent(
+              Sidebar.currentTeam.teamid,
+              Sidebar.currentThreadId,
+              ev.google_cal_id,
+              ev.google_event_id
+            );
+          });
+        Promise.join(syncCalls);
       });
     });
 

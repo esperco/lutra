@@ -166,7 +166,7 @@ module Esper.Api {
 
   export function createLinkedEvent(teamid, event: ApiT.CalendarEventEdit,
                                     threadId):
-  JQueryDeferred<void> {
+  JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/put-linked-event/" + Login.myUid()
       + "/" + teamid
