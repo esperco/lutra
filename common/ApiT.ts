@@ -248,13 +248,7 @@ module Esper.ApiT {
   }
 
   export interface CalendarRequest {
-    timezone?: string;
     window_start: string; // timestamp
-    window_end: string; // timestamp (TODO can we type alias?)
-  }
-
-  export interface CalendarView {
-    timezone?: string;
-    events: CalendarEvent[];
+    window_end: string; // timestamp
   }
 }
