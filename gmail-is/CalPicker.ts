@@ -13,6 +13,7 @@ module Esper.CalPicker {
     calendarSidebar : JQuery;
     dateJumper : JQuery;
     pickerSwitcher : JQuery;
+    eventTitle : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
   }
@@ -26,6 +27,9 @@ module Esper.CalPicker {
       <div class="esper-cal-picker-switcher">
         Calendar: <select #pickerSwitcher/>
       </div>
+      <div class="esper-cal-event-title">
+        Event title: <input #eventTitle type="text" size=64/>
+      </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
@@ -36,6 +40,10 @@ module Esper.CalPicker {
 </div>
 '''
     var calendars = Sidebar.currentTeam.team_calendars;
+    teamCalendar = calendars[0];
+
+    eventTitle.val("HOLD: " + gmail.get.email_subject());
+
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
                   calendars[i].calendar_title + "</option>");
@@ -46,7 +54,7 @@ module Esper.CalPicker {
       teamCalendar = calendars[i];
       calendarView.fullCalendar("refetchEvents");
     });
-    teamCalendar = calendars[0];
+
 
     var pv = <PickerView> _view;
     pv.events = {};
@@ -189,6 +197,7 @@ module Esper.CalPicker {
   interface Picker {
     view : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
+    eventTitle : JQuery;
     render : () => void;
   }
 
@@ -206,6 +215,7 @@ module Esper.CalPicker {
     return {
       view: pickerView.view,
       events: pickerView.events,
+      eventTitle: pickerView.eventTitle,
       render: render, // to be called after attaching the view to the dom tree
     };
   };
@@ -219,14 +229,14 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev : FullCalendar.EventObject)
+  function makeEventEdit(ev : FullCalendar.EventObject, eventTitle)
     : ApiT.CalendarEventEdit
   {
     return {
       google_cal_id: teamCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
-      title: "HOLD: " + gmail.get.email_subject(),
+      title: eventTitle.val(),
       guests: []
     };
   }
@@ -264,7 +274,7 @@ module Esper.CalPicker {
     done.click(function() {
       var events = [];
       for (var k in picker.events)
-        events.push(makeEventEdit(picker.events[k]));
+        events.push(makeEventEdit(picker.events[k], picker.eventTitle));
       var apiCalls = List.map(events, function(ev) {
         return Api.createLinkedEvent(
           Sidebar.currentTeam.teamid,

@@ -123,8 +123,8 @@ module Esper.CalCache {
       return team.teamid === teamid;
     });
     return Api.postCalendar(teamid, calid, {
-      window_start: range.start.toString(),
-      window_end: range.end.toString()
+      window_start: range.start.toISOString(),
+      window_end: range.end.toISOString()
     })
       .then(function(apiResult) {
         var events = apiResult.events;
