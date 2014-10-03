@@ -24,7 +24,7 @@ module Esper.CalPicker {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
-    <div #calendarSidebar class="esper-cal-sidebar">
+    <div #calendarSidebar class="esper-cal-sidebar" style="display: none">
       <div #dateJumper class="esper-date-jumper"/>
       <div class="esper-cal-picker-switcher">
         Calendar: <select #pickerSwitcher/>
@@ -181,7 +181,7 @@ module Esper.CalPicker {
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
-      height: 600,
+      height: 400,
       defaultView: 'agendaWeek',
       snapDuration: "00:15:00",
       selectable: true,
