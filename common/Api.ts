@@ -275,7 +275,7 @@ module Esper.Api {
                                calRequest : ApiT.CalendarRequest):
   JQueryDeferred<ApiT.CalendarEventList> {
     var url =
-      Conf.Api.url + "/api/calendar/view/" + Login.myUid()
+      Conf.Api.url + "/api/calendar/events/view/" + Login.myUid()
       + "/" + teamid
       + "/" + calid;
     return JsonHttp.post(url, JSON.stringify(calRequest));
