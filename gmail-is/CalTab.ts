@@ -1,12 +1,13 @@
 module Esper.CalTab {
 
   /* To refresh from outside, like in CalPicker */
-  export var refreshLinkedEvents : () => void
+  export var refreshLinkedEvents : () => void;
+  export var currentEventsTab : EventsTab;
 
   /** The events currently displayed as "linked" in the sidebar. */
-  export var currentEvents : ApiT.EventWithSyncInfo[] = []
+  export var currentEvents : ApiT.EventWithSyncInfo[] = [];
 
-  var currentEventsListeners = []
+  var currentEventsListeners = [];
 
   export function onEventsChanged(callback) {
     currentEventsListeners.push(callback);
@@ -624,7 +625,7 @@ module Esper.CalTab {
   </div>
 </div>
 '''
-    var eventsTab = <EventsTab> _view;
+    var eventsTab = currentEventsTab = <EventsTab> _view;
     var threadId = Sidebar.currentThreadId;
 
     refreshLinkedIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");

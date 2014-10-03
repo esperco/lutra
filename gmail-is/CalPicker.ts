@@ -297,9 +297,13 @@ module Esper.CalPicker {
         );
       });
 
+      closeModal();
+      if (events.length > 0) {
+        CalTab.currentEventsTab.linkedList.children().remove();
+        CalTab.currentEventsTab.linkedSpinner.show();
+      }
       Promise.join(linkCalls).done(function(linkedEvents) {
-        closeModal();
-        if (linkedEvents.length > 0) CalTab.refreshLinkedEvents();
+        if (events.length > 0) CalTab.refreshLinkedEvents();
 
         // Don't wait for sync
         var syncCalls =
