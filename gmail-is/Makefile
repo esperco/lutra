@@ -16,7 +16,9 @@ JS_LIBS = \
   jqueryui \
   gmail \
   sha1 \
-  retina
+  retina \
+  moment \
+  fullCalendar
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
@@ -24,7 +26,9 @@ TS_LIBS = \
   jquery/jquery.d \
   jqueryui/jqueryui.d \
   chrome/chrome.d \
-  cryptojs/cryptojs.d
+  cryptojs/cryptojs.d \
+  moment/moment.d \
+  fullCalendar/fullCalendar.d
 
 # Our own JavaScript code required in edge cases
 APP_JS = \
@@ -66,6 +70,8 @@ APP_SOURCES = \
   ActiveThreads \
   CalSearch \
   CalTab \
+  CalCache \
+  CalPicker \
   InsertTime \
   Tab2Content \
   Tab3Content \
@@ -116,6 +122,8 @@ js/gmail-is.js: $(ALL_TS)
 install:
 	mkdir -p ../pub/js
 	cp js/gmail-is.js ../pub/js/gmail-is.js
+	mkdir -p ../pub/css
+	cp ../setup/css/fullCalendar.css ../pub/css
 
 clean:
 	rm -f *~

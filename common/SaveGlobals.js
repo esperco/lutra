@@ -22,5 +22,5 @@ function esperSaveGlobals(names) {
   Save global variables that are about to be overridden by the Esper extension.
 */
 var esperRestoreGlobals = esperSaveGlobals([
-  "$", "jQuery", "CryptoJS", "Esper"
+  "$", "jQuery", "CryptoJS"
 ]);

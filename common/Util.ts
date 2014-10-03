@@ -238,5 +238,4 @@ module Esper.Util {
   ) {
     Log.d(toString(find(x, predicate, maxDepth), maxDepth));
   }
-
 }

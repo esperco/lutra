@@ -3,6 +3,7 @@
 */
 module Esper.Sidebar {
   export var currentThreadId : string;
+  export var currentTeam : ApiT.Team;
 
   // Profiles of everyone on all the viewer's teams
   var profiles : ApiT.Profile[];
@@ -304,6 +305,7 @@ module Esper.Sidebar {
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
+    currentTeam = team;
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {

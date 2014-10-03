@@ -6,6 +6,7 @@ ROOT=$(pwd)
 mkdir -p "$ROOT"/bin
 mkdir -p "$ROOT"/js
 mkdir -p "$ROOT"/ts
+mkdir -p "$ROOT"/css
 
 # Get archives from our github repository, then unpack them.
 # Prepare two versions of each Javascript file:
@@ -24,14 +25,21 @@ install_js() {
     if [ -z "$cat" ]; then
         cat=cat
     fi
-    echo "Installing $name"
+    echo "Installing JS for $name"
     "$cat" < "$src" > "$ROOT"/js/"$name".js
 }
 
 install_ts() {
     name="$1"
-    echo "Importing $name"
+    echo "Importing TS for $name"
     cp -a "$name" "$ROOT"/ts/"$name"
+}
+
+install_css() {
+    name="$1"
+    src="$2"
+    echo "Importing CSS for $name"
+    cp -a "$src" "$ROOT"/css/"$name".css
 }
 
 # TypeScript type definitions for some of the JavaScript libraries we're using
@@ -48,6 +56,8 @@ install_ts jquery
 install_ts jqueryui
 install_ts chrome
 install_ts cryptojs
+install_ts moment
+install_ts fullCalendar
 
 cd "$ROOT"
 if [ ! -d gmail.js ]; then
@@ -91,6 +101,15 @@ install_js retina retina-1.3.0.js
 
 # Google sign-in button
 (cd google-buttons && unzip -o gplus-assets.zip)
+
+# FullCalendar
+rm -rf fullcalendar
+unzip fullcalendar-2.1.1.zip
+mv fullcalendar-2.1.1 fullcalendar
+install_js fullCalendar fullcalendar/fullcalendar.js "$ROOT"/jquery-freeze
+install_css fullCalendar fullcalendar/fullcalendar.css
+# moment.js
+install_js moment fullcalendar/lib/moment.min.js
 
 
 # oblivion preprocessor, requires ocaml.

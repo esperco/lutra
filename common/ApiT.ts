@@ -246,4 +246,9 @@ module Esper.ApiT {
   export interface DefaultReminder {
     default_message: string;
   }
+
+  export interface CalendarRequest {
+    window_start: string; // timestamp
+    window_end: string; // timestamp
+  }
 }

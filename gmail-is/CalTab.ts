@@ -1,9 +1,13 @@
 module Esper.CalTab {
 
-  /** The events currently displayed as "linked" in the sidebar. */
-  export var currentEvents : ApiT.EventWithSyncInfo[] = []
+  /* To refresh from outside, like in CalPicker */
+  export var refreshLinkedEvents : () => void;
+  export var currentEventsTab : EventsTab;
 
-  var currentEventsListeners = []
+  /** The events currently displayed as "linked" in the sidebar. */
+  export var currentEvents : ApiT.EventWithSyncInfo[] = [];
+
+  var currentEventsListeners = [];
 
   export function onEventsChanged(callback) {
     currentEventsListeners.push(callback);
@@ -621,7 +625,7 @@ module Esper.CalTab {
   </div>
 </div>
 '''
-    var eventsTab = <EventsTab> _view;
+    var eventsTab = currentEventsTab = <EventsTab> _view;
     var threadId = Sidebar.currentThreadId;
 
     refreshLinkedIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -632,13 +636,14 @@ module Esper.CalTab {
     displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
     displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
 
-    refreshLinked.click(function() {
+    refreshLinkedEvents = function() {
       refreshLinkedList(team, threadId, eventsTab, profiles);
       if (linkedEventsContainer.css("display") === "none") {
         toggleList(linkedEventsContainer);
         showLinkedEvents.text("Hide");
       }
-    })
+    };
+    refreshLinked.click(refreshLinkedEvents);
 
     refreshRecents.click(function() {
       refreshRecentsList(team, threadId, eventsTab, profiles);

@@ -10,10 +10,14 @@ module Esper.Main {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/esper.css");
+    var fullCalendarCss = chrome.extension.getURL("css/fullCalendar.css");
     var scriptUrl = chrome.extension.getURL("js/" + scriptName);
     var docHead = $("head");
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
+      .appendTo(docHead);
+    $("<link rel='stylesheet' type='text/css'/>")
+      .attr("href", fullCalendarCss)
       .appendTo(docHead);
     $("<script id='esper-script'/>")
       .attr("src", scriptUrl)

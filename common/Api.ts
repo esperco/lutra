@@ -166,7 +166,7 @@ module Esper.Api {
 
   export function createLinkedEvent(teamid, event: ApiT.CalendarEventEdit,
                                     threadId):
-  JQueryDeferred<void> {
+  JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/put-linked-event/" + Login.myUid()
       + "/" + teamid
@@ -269,5 +269,15 @@ module Esper.Api {
       + "/" + calid
       + "/" + eventid;
     return JsonHttp.get(url);
+  }
+
+  export function postCalendar(teamid, calid,
+                               calRequest : ApiT.CalendarRequest):
+  JQueryDeferred<ApiT.CalendarEventList> {
+    var url =
+      Conf.Api.url + "/api/calendar/events/view/" + Login.myUid()
+      + "/" + teamid
+      + "/" + calid;
+    return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 }
