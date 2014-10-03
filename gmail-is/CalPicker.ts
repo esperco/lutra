@@ -24,8 +24,8 @@ module Esper.CalPicker {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
-    <div #calendarSidebar class="esper-cal-sidebar" style="display: none">
-      <div #dateJumper class="esper-date-jumper"/>
+    <div #calendarSidebar class="esper-cal-sidebar">
+      <div #dateJumper class="esper-date-jumper" style="display: none"/>
       <div class="esper-cal-picker-switcher">
         Calendar: <select #pickerSwitcher/>
       </div>
