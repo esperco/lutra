@@ -9,6 +9,8 @@ module Esper.CalTab {
 
   var currentEventsListeners = [];
 
+  var currentTask : ApiT.Task;
+
   export function onEventsChanged(callback) {
     currentEventsListeners.push(callback);
   }
@@ -548,7 +550,7 @@ module Esper.CalTab {
   }
 
   // Search for matching tasks and display the results in a dropdown
-  function displaySearchResults(task, taskName, dropdown, teamid, query) {
+  function displaySearchResults(taskName, dropdown, teamid, query) {
     var threadid = Sidebar.currentThreadId;
     Api.searchTasks(teamid, query).done(function(response) {
       dropdown.find(".esper-li").remove();
@@ -560,6 +562,7 @@ module Esper.CalTab {
           .appendTo(dropdown)
           .click(function() {
             Api.switchTaskForThread(teamid, threadid, taskid);
+            currentTask = result.task_data;
             taskName.val(title);
             Sidebar.dismissDropdowns();
           });
@@ -570,7 +573,8 @@ module Esper.CalTab {
       changeName
         .appendTo(dropdown)
         .click(function() {
-          Api.setTaskTitle(task.taskid, query);
+          Api.setTaskTitle(currentTask.taskid, query);
+          currentTask.task_title = query;
           taskName.val(query);
           Sidebar.dismissDropdowns();
         });
@@ -676,11 +680,12 @@ module Esper.CalTab {
     displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
 
     Api.getTaskForThread(team.teamid, threadId).done(function(task) {
+      currentTask = task;
       taskName.val(task.task_title);
       Util.afterTyping(taskName, 250, function() {
         var query = taskName.val();
         if (query !== "")
-          displaySearchResults(task, taskName, taskSearch, team.teamid, query);
+          displaySearchResults(taskName, taskSearch, team.teamid, query);
       });
     });
 
