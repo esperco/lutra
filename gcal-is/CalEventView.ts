@@ -438,16 +438,20 @@ module Esper.CalEventView {
       });
     }
 
+    var myUid = Login.myUid();
+
     /* For each team that uses this calendar */
     teams.forEach(function(team) {
-      var teamCalendars = List.map(team.team_calendars, function(cal) {
-        return cal.google_cal_id;
-      });
-      if (List.mem(teamCalendars, fullEventId.calendarId)) {
-        var rowElements = renderEventControls(team, fullEventId);
-        rootElement
-          .append(rowElements.th)
-          .append(rowElements.td);
+      if (team.team_executive !== myUid) {
+        var teamCalendars = List.map(team.team_calendars, function(cal) {
+          return cal.google_cal_id;
+        });
+        if (List.mem(teamCalendars, fullEventId.calendarId)) {
+          var rowElements = renderEventControls(team, fullEventId);
+          rootElement
+            .append(rowElements.th)
+            .append(rowElements.td);
+        }
       }
     });
   }
