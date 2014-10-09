@@ -251,4 +251,36 @@ module Esper.ApiT {
     window_start: string; // timestamp
     window_end: string; // timestamp
   }
+
+  export interface Task {
+    taskid: string;
+    task_title: string;
+    task_teamid: string;
+    task_threads: TaskThread[];
+    task_events: TaskEvent[];
+  }
+
+  export interface TaskThread {
+    task_threadid: string; // hex
+  }
+
+  export interface TaskEvent {
+    task_eventid: string;
+  }
+
+  export interface TaskList {
+    tasks: Task[];
+    next_page?: string; // url
+  }
+
+  export interface TaskSearchResults {
+    search_results: WeightedTask[];
+    search_count: number;
+  }
+
+  export interface WeightedTask {
+    task_data: Task;
+    task_weight: number;
+  }
+
 }

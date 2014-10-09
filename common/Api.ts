@@ -280,4 +280,42 @@ module Esper.Api {
       + "/" + calid;
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
+
+  export function getTaskForThread(teamid, threadid):
+  JQueryDeferred<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/thread/task/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadid;
+    return JsonHttp.get(url);
+  }
+
+  export function switchTaskForThread(teamid, threadid, taskid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/thread/task/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadid
+      + "/" + taskid;
+    return JsonHttp.put(url, "");
+  }
+
+  export function setTaskTitle(taskid, title):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/task/title/" + Login.myUid()
+      + "/" + taskid
+      + "/" + encodeURIComponent(title);
+    return JsonHttp.put(url, "");
+  }
+
+  export function searchTasks(teamid, query):
+  JQueryDeferred<ApiT.TaskSearchResults> {
+    var url =
+      Conf.Api.url + "/api/tasks/search/" + Login.myUid()
+      + "/" + teamid
+      + "/" + encodeURIComponent(query);
+    return JsonHttp.get(url);
+  }
+
 }

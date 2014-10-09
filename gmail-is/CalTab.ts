@@ -9,6 +9,8 @@ module Esper.CalTab {
 
   var currentEventsListeners = [];
 
+  var currentTask : ApiT.Task;
+
   export function onEventsChanged(callback) {
     currentEventsListeners.push(callback);
   }
@@ -547,6 +549,39 @@ module Esper.CalTab {
       });
   }
 
+  // Search for matching tasks and display the results in a dropdown
+  function displaySearchResults(taskName, dropdown, teamid, query) {
+    var threadid = Sidebar.currentThreadId;
+    Api.searchTasks(teamid, query).done(function(response) {
+      dropdown.find(".esper-li").remove();
+      if (!(dropdown.hasClass("open"))) dropdown.toggle();
+      List.iter(response.search_results, function(result) {
+        var taskid = result.task_data.taskid;
+        var title = result.task_data.task_title;
+        $("<li class='esper-li'>" + title + "</li>")
+          .appendTo(dropdown)
+          .click(function() {
+            Api.switchTaskForThread(teamid, threadid, taskid);
+            currentTask = result.task_data;
+            taskName.val(title);
+            Sidebar.dismissDropdowns();
+          });
+      });
+      var changeName =
+        $("<li class='esper-li'><i>Change task name to:</i> "
+          + query + "</li>");
+      changeName
+        .appendTo(dropdown)
+        .click(function() {
+          Api.setTaskTitle(currentTask.taskid, query);
+          currentTask.task_title = query;
+          taskName.val(query);
+          Sidebar.dismissDropdowns();
+        });
+      dropdown.addClass("open");
+    });
+  }
+
   export interface EventsTab {
     view: JQuery;
     refreshLinked: JQuery;
@@ -570,6 +605,14 @@ module Esper.CalTab {
                                      linkedEvents: ApiT.LinkedCalendarEvents) {
 '''
 <div #view>
+  <div class="esper-section">
+    <span class="esper-bold">Task:</span>
+    <input #taskName type="text" size="24"/>
+    <ul #taskSearch
+        class="esper-task-search-dropdown esper-dropdown-btn esper-ul">
+      <div class="esper-dropdown-section"/>
+    </ul>
+  </div>
   <div class="esper-section">
     <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
       <span #showLinkedEvents
@@ -635,6 +678,16 @@ module Esper.CalTab {
 
     displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
     displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
+
+    Api.getTaskForThread(team.teamid, threadId).done(function(task) {
+      currentTask = task;
+      taskName.val(task.task_title);
+      Util.afterTyping(taskName, 250, function() {
+        var query = taskName.val();
+        if (query !== "")
+          displaySearchResults(taskName, taskSearch, team.teamid, query);
+      });
+    });
 
     refreshLinkedEvents = function() {
       refreshLinkedList(team, threadId, eventsTab, profiles);
