@@ -290,13 +290,15 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function switchTaskForThread(teamid, threadid, taskid):
+  export function switchTaskForThread(teamid, threadid,
+                                      old_taskid, new_taskid):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/thread/task/" + Login.myUid()
       + "/" + teamid
       + "/" + threadid
-      + "/" + taskid;
+      + "/" + old_taskid
+      + "/" + new_taskid;
     return JsonHttp.put(url, "");
   }
 

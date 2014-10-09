@@ -556,12 +556,13 @@ module Esper.CalTab {
       dropdown.find(".esper-li").remove();
       if (!(dropdown.hasClass("open"))) dropdown.toggle();
       List.iter(response.search_results, function(result) {
-        var taskid = result.task_data.taskid;
+        var newTaskId = result.task_data.taskid;
         var title = result.task_data.task_title;
         $("<li class='esper-li'>" + title + "</li>")
           .appendTo(dropdown)
           .click(function() {
-            Api.switchTaskForThread(teamid, threadid, taskid);
+            Api.switchTaskForThread(teamid, threadid,
+                                    currentTask.taskid, newTaskId);
             currentTask = result.task_data;
             taskName.val(title);
             Sidebar.dismissDropdowns();
