@@ -55,7 +55,6 @@ var settings = (function() {
       $(this).remove();
     }
 
-    log("team calendars", team.team_calendars);
     list.iter(team.team_calendars, function(cal) {
       var opt = $("<option class='esper-calendar-option'"
                   + "value='" + cal.google_cal_id + "'>"
@@ -65,7 +64,6 @@ var settings = (function() {
     });
 
     api.getCalendarList().done(function(x) {
-      log("all calendars", x);
       list.iter(x.named_calendar_ids, function(cal) {
         var opt = $("<option class='esper-calendar-option'"
                     + "value='" + cal.google_cal_id + "'>"
