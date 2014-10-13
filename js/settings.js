@@ -66,7 +66,7 @@ var settings = (function() {
 
     api.getCalendarList().done(function(x) {
       log("all calendars", x);
-      list.iter(x.calendar_ids, function(cal) {
+      list.iter(x.named_calendar_ids, function(cal) {
         var opt = $("<option class='esper-calendar-option'"
                     + "value='" + cal.google_cal_id + "'>"
                     + cal.calendar_title + "</option>");
@@ -96,7 +96,7 @@ var settings = (function() {
         var teamCalendars = list.map(uniqueCalIDs, function(calID) {
           return calData[calID];
         });
-        api.putTeamCalendars(team.teamid, { calendar_ids: teamCalendars })
+        api.putTeamCalendars(team.teamid, { named_calendar_ids: teamCalendars })
           .done(function() { window.location.reload(); });
       });
 
