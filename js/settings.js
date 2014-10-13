@@ -536,7 +536,7 @@ var settings = (function() {
   function showTeamSettings(team) {
 '''
 <div #modal
-     class="esper-modal modal fade" tabindex="-1"
+     class="modal fade" tabindex="-1"
      role="dialog">
   <div class="modal-dialog team-settings">
     <div class="modal-content">
