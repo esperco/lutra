@@ -239,17 +239,15 @@ var api = (function () {
 
   /*** Scheduling ***/
 
-  function apiSPrefix() {
-    return "/api/s/" + login.data.uid;
+  mod.getCalendarList = function() {
+    var url = "api/calendar/list/" + login.data.uid;
+    return jsonHttpGet(url);
   };
 
-  mod.getCalendarList = function(uid2, optAuthLandingUrl) {
-    var url = apiSPrefix() + "/calendar/"
-      + login.getTeam().teamid + "/" + uid2 + "/list";
-    if (util.isString(optAuthLandingUrl)) {
-      url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
-    }
-    return jsonHttpGet(url);
+  mod.putTeamCalendars = function(teamid, cals) {
+    var url = "api/team/" + login.data.uid
+      + "/" + teamid + "/calendars";
+    return jsonHttpPut(url, JSON.stringify(cals));
   };
 
   /*** Executive Preferences ***/
