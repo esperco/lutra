@@ -28,6 +28,7 @@ module Esper.ApiT {
   export interface Calendar {
     google_cal_id: string;
     calendar_title: string;
+    calendar_timezone?: string;
   }
 
   export interface Phone {

@@ -18,6 +18,8 @@ JS_LIBS = \
   sha1 \
   retina \
   moment \
+  moment-timezone \
+  moment-timezone-data \
   fullCalendar
 
 # External TypeScript libraries and type definitions for
