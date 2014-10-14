@@ -79,9 +79,10 @@ module Esper.CalTab {
     Public Duplicate
   </div>
   <div class="esper-section-container">
-    <p><input #pubTitle/></p>
-    <p><textarea #pubDescription/></p>
-    <p>Guests</p>
+    <p>Title: <input #pubTitle/></p>
+    <p>Description: <textarea #pubDescription rows=5 cols=28 /></p>
+    <p>From: <input #fromEmail/></p>
+    <p>Guests:</p>
     <ul #viewPeopleInvolved/>
     <p align="right">
       <button #discard>Discard</button><button #create>Create</button>
@@ -119,9 +120,10 @@ module Esper.CalTab {
         guests:        guests,
       };
       Api.createLinkedEvent(team.teamid, ev, threadid)
-      .done(function() {
-        refreshLinkedList(team, threadid, eventsTab, profiles);
-      });
+        .done(function(created) {
+          Api.sendEventInvites(team.teamid, fromEmail.val(), guests, created);
+          refreshLinkedList(team, threadid, eventsTab, profiles);
+        });
       pubInvite.remove();
     });
     discard.click(function() {

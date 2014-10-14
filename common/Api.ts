@@ -320,4 +320,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function sendEventInvites(teamid, fromEmail, guests, event):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/event/invite/" + Login.myUid()
+      + "/" + teamid
+      + "/" + encodeURIComponent(fromEmail);
+    var body = { invite_guests: guests, invite_event: event };
+    return JsonHttp.post(url, JSON.stringify(body));
+  }
+
 }
