@@ -37,6 +37,9 @@ module Esper.ExecutivePreferences {
     }
   }
 
+  /** Parses a time from a string, returning null if the input is
+   *  malformed.
+   */
   function toTime(str) {
     str = str.replace(/\s/g, "").toLowerCase();
     var parts = [0, 0];
@@ -71,6 +74,25 @@ module Esper.ExecutivePreferences {
     var paddedMinute = minute.length < 2 ? "0" + minute : minute;
 
     return time.hour + ":" + paddedMinute;
+  }
+
+  /** Parses a duration. If there is a :, it's parsed like a normal
+   *  time; if there isn't, it's treated as minutes. Returns null if
+   *  the input is malformed.
+   */
+  function parseDuration(str) {
+    if (str.indexOf(":") >= 0) {
+      return toTime(str);
+    } else {
+      if (/^\s*\d+\s*$/.test(str)) {
+        return {
+          hour   : 0,
+          minute : str * 1
+        }
+      } else {
+        return null; // should trigger typo warning
+      }
+    }
   }
 
   export function load() {
@@ -245,11 +267,17 @@ module Esper.ExecutivePreferences {
       
       saved = true;
     } catch (e) {
-      status_.reportError("Didn't save: typo.");
+      status_.reportError("Didn't save:", e);
       if (e !== "typo") {
         throw e;
       }
     }
+  }
+
+  /** Signals that there was a typo in the given form. */
+  function typo(element) {
+    element.css("background", "#A83245");
+    throw "typo";
   }
 
   /** Returns the current values in the forms as JSON. */
@@ -290,8 +318,14 @@ module Esper.ExecutivePreferences {
     };
 
     function findDuration(element) {
-      return JSON.parse($(element).closest("li").
-                        find(".durations select").val());
+      var duration = parseDuration($(element).closest("li").
+                                   find(".durations input").val());
+
+      if (duration === null) {
+        typo($(element)); // throws error; no need to return
+      } else {
+        return duration;
+      }
     }
 
     function findAvailability(element) {
@@ -336,11 +370,6 @@ module Esper.ExecutivePreferences {
       });
 
       return availabilities;
-
-      function typo(element) {
-        element.css("background", "#A83245");
-        throw "typo";
-      }
     }
 
     function phoneNumberList() {
@@ -498,12 +527,12 @@ module Esper.ExecutivePreferences {
     var possibleDurations = durations();
     form.after(possibleDurations.container);
 
+    possibleDurations.input.val(fromTime(defaults.duration));
+
     availability.click(function () {
       availabilityContainer.append(availabilityEntry());
       return false;
     });
-
-    setDuration(possibleDurations.select, defaults.duration);
 
     defaults.availability.forEach(function (availability) {
       addAvailability(_view, availability); // currying would make this prettier
@@ -512,33 +541,16 @@ module Esper.ExecutivePreferences {
     return _view;
   }
 
-  /** Returns a drop-down menu for possible meeting durations. */
+  /** Returns a text field for possible meeting durations. */
   export function durations() {
 '''
 <label class="durations" #container>
   Preferred duration
-  <select #select>
-    <option value='{"hour":0,"minute":10}'>0:10</option>
-    <option value='{"hour":0,"minute":20}'>0:20</option>
-    <option value='{"hour":0,"minute":30}'>0:30</option>
-    <option value='{"hour":0,"minute":40}'>0:40</option>
-    <option value='{"hour":1,"minute":0}'>1:00</option>
-    <option value='{"hour":1,"minute":30}'>1:30</option>
-    <option value='{"hour":2,"minute":0}'>2:00</option>
-    <option value='{"hour":2,"minute":30}'>2:30</option>
-  </select>
+  <input #input type="text"></input>
 </label>
 '''
 
     return _view;
-  }
-
-  /** Sets the given duration dropdown to the given time JSON
-   * value.
-   */
-  export function setDuration(select, duration) {
-    select.find('option[value="' + JSON.stringify(duration) + '"]')
-      .attr("selected", "selected");
   }
 
   /** Adds an availiability entry prefilled with the given values. */
