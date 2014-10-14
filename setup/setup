@@ -108,8 +108,11 @@ unzip fullcalendar-2.1.1.zip
 mv fullcalendar-2.1.1 fullcalendar
 install_js fullCalendar fullcalendar/fullcalendar.js "$ROOT"/jquery-freeze
 install_css fullCalendar fullcalendar/fullcalendar.css
+
 # moment.js
 install_js moment fullcalendar/lib/moment.min.js
+install_js moment-timezone moment-timezone-0.0.3.js
+install_js moment-timezone-data moment-timezone-data-2014-03-19.js
 
 
 # oblivion preprocessor, requires ocaml.
