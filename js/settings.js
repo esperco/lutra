@@ -59,8 +59,9 @@ var settings = (function() {
       var opt = $("<option class='esper-calendar-option'"
                   + "value='" + cal.google_cal_id + "'>"
                   + cal.calendar_title + "</option>");
-      opt.appendTo(teamCals)
-         .dblclick(removeOpt);
+      opt.dblclick(removeOpt)
+         .data("timezone", cal.calendar_timezone)
+         .appendTo(teamCals);
     });
 
     api.getCalendarList().done(function(x) {
@@ -69,8 +70,10 @@ var settings = (function() {
                     + "value='" + cal.google_cal_id + "'>"
                     + cal.calendar_title + "</option>");
         opt.appendTo(allCals)
+           .data("timezone", cal.calendar_timezone)
            .dblclick(function() {
              $(this).clone()
+                    .data("timezone", cal.calendar_timezone)
                     .off("dblclick")
                     .dblclick(removeOpt)
                     .appendTo(teamCals);
@@ -87,6 +90,7 @@ var settings = (function() {
           teamCalIDs.push(calID);
           calData[calID] = {
             google_cal_id: calID,
+            calendar_timezone: opt.data("timezone"),
             calendar_title: opt.text()
           };
         });
