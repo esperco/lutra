@@ -318,7 +318,7 @@ module Esper.ExecutivePreferences {
     };
 
     function findDuration(element) {
-      var field    = $(element).closest("li").find(".durations input")
+      var field    = $(element).closest("li").find(".durations input");
       var duration = parseDuration(field.val());
 
       if (duration === null) {
