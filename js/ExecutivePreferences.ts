@@ -318,11 +318,11 @@ module Esper.ExecutivePreferences {
     };
 
     function findDuration(element) {
-      var duration = parseDuration($(element).closest("li").
-                                   find(".durations input").val());
+      var field    = $(element).closest("li").find(".durations input");
+      var duration = parseDuration(field.val());
 
       if (duration === null) {
-        typo($(element)); // throws error; no need to return
+        typo(field); // throws error; no need to return
       } else {
         return duration;
       }
