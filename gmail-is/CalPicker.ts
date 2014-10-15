@@ -51,7 +51,7 @@ module Esper.CalPicker {
     var calendars = Sidebar.currentTeam.team_calendars;
     teamCalendar = calendars[0];
 
-    eventTitle.val("HOLD: " + gmail.get.email_subject());
+    eventTitle.val("HOLD: " + esperGmail.get.email_subject());
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshCal.click(function() {
       calendarView.fullCalendar("refetchEvents");

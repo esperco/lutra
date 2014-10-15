@@ -3,7 +3,7 @@
   (incomplete)
 */
 
-declare module gmail.get {
+declare module esperGmail.get {
 
   export interface Message {
     reply_to_id: string;
@@ -57,7 +57,7 @@ declare module gmail.get {
 
 /* Typable functions defined in gmailInit.js */
 
-declare module gmail.on {
+declare module esperGmail.on {
   export function open_email(
     callback: (id: string,
                url: string,
@@ -86,7 +86,7 @@ declare module gmail.on {
   /* complete as needed */
 }
 
-declare module gmail.off {
+declare module esperGmail.off {
   export function open_email(): void;
   export function star(): void;
   export function unstar(): void;
@@ -94,6 +94,6 @@ declare module gmail.off {
   /* complete as needed */
 }
 
-declare module gmail.check {
+declare module esperGmail.check {
   export function is_inside_email(): boolean;
 }

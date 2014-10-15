@@ -31,7 +31,7 @@ module Esper.Thread {
       });
   }
 
-  function findTeamInThread(thread: gmail.get.Thread,
+  function findTeamInThread(thread: esperGmail.get.Thread,
                             tbl: { [email: string]: ApiT.Team }):
   ApiT.Team {
     var team;
@@ -45,7 +45,7 @@ module Esper.Thread {
   }
 
   export function detectTeam(teams: ApiT.Team[],
-                             thread: gmail.get.Thread):
+                             thread: esperGmail.get.Thread):
   JQueryPromise<ApiT.Team> {
 
     return makeEmailTeamTable(teams)
