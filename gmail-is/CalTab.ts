@@ -95,7 +95,7 @@ module Esper.CalTab {
     if (undefined !== e.description) {
       pubDescription.val(e.description);
     }
-    fromEmail.val(gmail.get.user_email());
+    fromEmail.val(esperGmail.get.user_email());
 
     var firstTeamCal = team.team_calendars[0];
     var publicCalId =
@@ -141,7 +141,7 @@ module Esper.CalTab {
         .done(function(created) {
           pubInvite.remove();
           var from = fromEmail.val();
-          if (from === "") from = gmail.get.user_email();
+          if (from === "") from = esperGmail.get.user_email();
           Api.sendEventInvites(team.teamid, from, guests, created);
           refreshLinkedList(team, threadid, eventsTab, profiles);
         });
