@@ -231,11 +231,38 @@ module Esper.CalPicker {
     };
   };
 
+  /*
+    Add 8 hours if the timezone offset is -08:00.
+    (spend as little time as possible in momentjs whose interface
+    is atrocious)
+  */
+  function utcOfLocal(tz, localMoment) {
+    var m = localMoment.clone();
+    m.tz(tz);
+    var offsetMinutes = m.zone();
+    m.add("minutes", offsetMinutes);
+
+    /* Check if we passed a daylight-savings transition
+       and use the new offset instead.
+       Don't know how to do better given the lack of documentation
+       and examples.
+    */
+    var updatedOffset = m.zone();
+    if (updatedOffset !== offsetMinutes) {
+      Log.d("Correcting offset after daylight savings transition: "
+            + offsetMinutes + " min -> "
+            + updatedOffset + " min");
+      m.add("minutes", updatedOffset - offsetMinutes);
+    }
+
+    return m.toDate();
+  };
+
   function calendarTimeOfMoment(localMoment) : ApiT.CalendarTime {
     var localTime = localMoment.toISOString();
-    localMoment.local();
-    var utcMoment = localMoment.clone();
-    utcMoment.utc();
+    var timeZone = teamCalendar.calendar_timezone;
+    if (timeZone === undefined) timeZone = "UTC"; // or use client tz?
+    var utcMoment = utcOfLocal(teamCalendar.calendar_timezone, localMoment);
     var utcTime = utcMoment.toISOString();
     return { utc: utcTime, local: localTime };
   }
