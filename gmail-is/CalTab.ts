@@ -95,6 +95,7 @@ module Esper.CalTab {
     if (undefined !== e.description) {
       pubDescription.val(e.description);
     }
+    fromEmail.val(gmail.get.user_email());
 
     var firstTeamCal = team.team_calendars[0];
     var publicCalId =
