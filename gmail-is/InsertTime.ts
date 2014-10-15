@@ -105,7 +105,7 @@ module Esper.InsertTime {
    *
    */
   export function init() {
-    gmail.on.reply_forward(function () {
+    esperGmail.on.reply_forward(function () {
       attachControls(Gmail.compositionToolbar());
     });
   }

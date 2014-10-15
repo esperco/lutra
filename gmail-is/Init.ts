@@ -24,7 +24,7 @@ module Esper.Init {
     complications).
   */
   export function obtainCredentials(forceLogin: boolean = false) {
-    var googleAccountId = gmail.get.user_email();
+    var googleAccountId = esperGmail.get.user_email();
     Log.d("Google account ID: " + googleAccountId);
     var type = forceLogin === true ? "LoginRequest" : "CredentialsRequest";
     var esperMessage : Message.Message = {
@@ -78,7 +78,7 @@ module Esper.Init {
     match the current gmail user.
   */
   function filterCredentials(account: Types.Account) {
-    var googleAccountId = gmail.get.user_email();
+    var googleAccountId = esperGmail.get.user_email();
     if (account !== undefined && account.googleAccountId === googleAccountId) {
       Login.setAccount(account);
       injectEsperControls();

@@ -17,7 +17,7 @@ module Esper.ActiveThreads {
 
   function exportActiveThreads(): Types.ActiveThreads {
     return {
-      googleAccountId: gmail.get.user_email(),
+      googleAccountId: esperGmail.get.user_email(),
       threads: getCache().all
     };
   }

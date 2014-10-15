@@ -325,7 +325,7 @@ module Esper.Sidebar {
   function maybeUpdateView(profiles) {
     function retry() {
       Log.d("Trying to display Esper sidebar...");
-      var emailData = gmail.get.email_data();
+      var emailData = esperGmail.get.email_data();
 
       if (emailData !== undefined && emailData.first_email !== undefined) {
 
@@ -372,7 +372,7 @@ module Esper.Sidebar {
   }
 
   function listen(profiles) {
-    gmail.on.open_email(function(id, url, body, xhr) {
+    esperGmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
       maybeUpdateView(profiles);
     });

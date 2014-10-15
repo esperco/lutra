@@ -1,48 +1,52 @@
-var gmail = Gmail(jQuery);
+var esperGmail = Gmail(jQuery);
 
-gmail.on = {};
-gmail.off = {};
+esperGmail.on = {};
+esperGmail.off = {};
 
 /*
   Produce separate functions for each event, making them typable since
   their callbacks have different types.
 
-  specialize("unread") -> gmail.observe.unread.on(callback)
-                          gmail.observe.unread.off()
+  specialize("unread") -> esperGmail.observe.unread.on(callback)
+                          esperGmail.observe.unread.off()
 */
-function specialize(name) {
-  gmail.on[name] = function(callback) { gmail.observe.on(name, callback); };
-  gmail.off[name] = function() { gmail.observe.off(name); };
+function esperGmailSpecialize(name) {
+  esperGmail.on[name] = function(callback) {
+    esperGmail.observe.on(name, callback);
+  };
+  esperGmail.off[name] = function() {
+    esperGmail.observe.off(name);
+  };
 }
 
-specialize("unread");
-specialize("read");
-specialize("delete");
-specialize("mark_as_spam");
-specialize("mark_as_not_spam");
-specialize("label");
-specialize("archive");
-specialize("move_to_inbox");
-specialize("delete_forever");
-specialize("delete_message_in_thread");
-specialize("restore_message_in_thread");
-specialize("star");
-specialize("unstar");
-specialize("mark_as_important");
-specialize("mark_as_not_important");
-specialize("filter_messages_like_these");
-specialize("mute");
-specialize("unmute");
-specialize("add_to_tasks");
-specialize("move_label");
-specialize("save_draft");
-specialize("discard_draft");
-specialize("send_message");
-specialize("expand_categories");
-specialize("delete_label");
-specialize("show_newly_arrived_message");
-specialize("poll");
-specialize("new_email");
-specialize("refresh");
-specialize("open_email");
-specialize("reply_forward");
+esperGmailSpecialize("unread");
+esperGmailSpecialize("read");
+esperGmailSpecialize("delete");
+esperGmailSpecialize("mark_as_spam");
+esperGmailSpecialize("mark_as_not_spam");
+esperGmailSpecialize("label");
+esperGmailSpecialize("archive");
+esperGmailSpecialize("move_to_inbox");
+esperGmailSpecialize("delete_forever");
+esperGmailSpecialize("delete_message_in_thread");
+esperGmailSpecialize("restore_message_in_thread");
+esperGmailSpecialize("star");
+esperGmailSpecialize("unstar");
+esperGmailSpecialize("mark_as_important");
+esperGmailSpecialize("mark_as_not_important");
+esperGmailSpecialize("filter_messages_like_these");
+esperGmailSpecialize("mute");
+esperGmailSpecialize("unmute");
+esperGmailSpecialize("add_to_tasks");
+esperGmailSpecialize("move_label");
+esperGmailSpecialize("save_draft");
+esperGmailSpecialize("discard_draft");
+esperGmailSpecialize("send_message");
+esperGmailSpecialize("expand_categories");
+esperGmailSpecialize("delete_label");
+esperGmailSpecialize("show_newly_arrived_message");
+esperGmailSpecialize("poll");
+esperGmailSpecialize("new_email");
+esperGmailSpecialize("refresh");
+esperGmailSpecialize("open_email");
+esperGmailSpecialize("reply_forward");

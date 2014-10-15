@@ -95,7 +95,7 @@ module Esper.CalTab {
     }
 
     var peopleInvolved = [];
-    var emailData = gmail.get.email_data();
+    var emailData = esperGmail.get.email_data();
     if (emailData !== undefined && emailData.first_email !== undefined) {
       List.iter(emailData.people_involved, function(pair) {
         var v = viewPersonInvolved(peopleInvolved, pair[1], pair[0]);
