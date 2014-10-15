@@ -79,9 +79,11 @@ module Esper.CalTab {
     Public Duplicate
   </div>
   <div class="esper-section-container">
-    <p><input #pubTitle/></p>
-    <p><textarea #pubDescription/></p>
-    <p>Guests</p>
+    <p>Title: <input #pubTitle/></p>
+    <p>Calendar: <select #pubCalendar/></p>
+    <p>Description: <textarea #pubDescription rows=5 cols=28 /></p>
+    <p>From: <input #fromEmail/></p>
+    <p>Guests:</p>
     <ul #viewPeopleInvolved/>
     <p align="right">
       <button #discard>Discard</button><button #create>Create</button>
@@ -93,6 +95,21 @@ module Esper.CalTab {
     if (undefined !== e.description) {
       pubDescription.val(e.description);
     }
+    fromEmail.val(gmail.get.user_email());
+
+    var firstTeamCal = team.team_calendars[0];
+    var publicCalId =
+      firstTeamCal !== undefined ?
+      firstTeamCal.google_cal_id :
+      e.google_cal_id;
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var opt = $("<option value='" + cal.google_cal_id + "'>"
+                  + cal.calendar_title + "</option>");
+      opt.appendTo(pubCalendar);
+    });
+    pubCalendar.change(function() {
+      publicCalId = $(this).val();
+    });
 
     var peopleInvolved = [];
     var emailData = esperGmail.get.email_data();
@@ -104,12 +121,14 @@ module Esper.CalTab {
     }
 
     create.click(function() {
+      create.text("Creating...");
+      create.prop("disabled", true);
       var guests = [];
       for (var email in peopleInvolved) {
         guests.push({email: email, display_name: peopleInvolved[email]});
       }
       var ev = {
-        google_cal_id: e.google_cal_id,
+        google_cal_id: publicCalId,
         start:         e.start,
         end:           e.end,
         title:         pubTitle.val(),
@@ -119,10 +138,13 @@ module Esper.CalTab {
         guests:        guests,
       };
       Api.createLinkedEvent(team.teamid, ev, threadid)
-      .done(function() {
-        refreshLinkedList(team, threadid, eventsTab, profiles);
-      });
-      pubInvite.remove();
+        .done(function(created) {
+          pubInvite.remove();
+          var from = fromEmail.val();
+          if (from === "") from = gmail.get.user_email();
+          Api.sendEventInvites(team.teamid, from, guests, created);
+          refreshLinkedList(team, threadid, eventsTab, profiles);
+        });
     });
     discard.click(function() {
       pubInvite.remove();
