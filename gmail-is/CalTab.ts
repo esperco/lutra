@@ -121,6 +121,8 @@ module Esper.CalTab {
     }
 
     create.click(function() {
+      create.text("Creating...");
+      create.prop("disabled", true);
       var guests = [];
       for (var email in peopleInvolved) {
         guests.push({email: email, display_name: peopleInvolved[email]});
@@ -137,12 +139,12 @@ module Esper.CalTab {
       };
       Api.createLinkedEvent(team.teamid, ev, threadid)
         .done(function(created) {
+          pubInvite.remove();
           var from = fromEmail.val();
           if (from === "") from = gmail.get.user_email();
           Api.sendEventInvites(team.teamid, from, guests, created);
           refreshLinkedList(team, threadid, eventsTab, profiles);
         });
-      pubInvite.remove();
     });
     discard.click(function() {
       pubInvite.remove();
