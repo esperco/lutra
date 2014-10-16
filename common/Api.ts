@@ -214,11 +214,12 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
-  export function setReminderTime(teamid, calid, eventid, secs):
+  export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/event/set-reminder-time/" + Login.myUid()
       + "/" + teamid
+      + "/" + from_email
       + "/" + calid
       + "/" + eventid
       + "/" + secs;

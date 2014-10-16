@@ -23,6 +23,7 @@ module Esper.ApiT {
     team_executive: string;
     team_assistants: string[];
     team_calendars: Calendar[];
+    team_email_aliases: string[];
   }
 
   export interface Calendar {

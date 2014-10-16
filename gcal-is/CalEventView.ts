@@ -4,6 +4,7 @@
 module Esper.CalEventView {
   var currentEventId : Types.FullEventId;
   var remindFromTeam : ApiT.Team;
+  var remindFromEmail : string;
 
   function checkForNewEventId(callback: (x: Types.FullEventId) => void) {
     var oldEventId = currentEventId;
@@ -259,7 +260,9 @@ module Esper.CalEventView {
   <option class="esper-remind" value="7200">2 hours before</option>
   <option class="esper-remind" value="14400">4 hours before</option>
   <option class="esper-remind" value="28800">8 hours before</option>
+  <option class="esper-remind" value="43200">12 hours before</option>
   <option class="esper-remind" value="86400">24 hours before</option>
+  <option class="esper-remind" value="172800">48 hours before</option>
 </select>
 '''
     removeReminderDropdown();
@@ -276,7 +279,8 @@ module Esper.CalEventView {
       var secs = $(this).val();
       $(".esper-remind-extra").remove();
       if (secs > 0)
-        Api.setReminderTime(remindFromTeam.teamid, calendarId, eventId, secs);
+        Api.setReminderTime(remindFromTeam.teamid, remindFromEmail, 
+                            calendarId, eventId, secs);
       else
         Api.unsetReminderTime(eventId);
     });
@@ -316,7 +320,7 @@ module Esper.CalEventView {
 
   function insertTeamSelector(teams : ApiT.Team[]) {
     var anchor = Gcal.findAnchorForReminderDropdown();
-    var view = $("<div id='esper-remind-from-team'>Remind from team: </div>");
+    var view = $("<div id='esper-remind-from-team'>Team: </div>");
     var dropdown = $("<select>");
 
     /* Without this stupid hack again, Google intercepts the event somewhere,
@@ -331,6 +335,40 @@ module Esper.CalEventView {
     dropdown.change(function() {
       var i = $(this).val();
       remindFromTeam = teams[i]; // a variable of CalEventView
+      insertEmailSelector(remindFromTeam.team_email_aliases);
+      $("#esper-reminder-time").trigger("change");
+    });
+
+    view.append(dropdown);
+    anchor.append(view);
+  }
+
+  function insertEmailSelector(emails : string[]) {
+    var anchor = Gcal.findAnchorForReminderDropdown();
+    $("#esper-remind-from-email").remove();
+    var view = $("<div id='esper-remind-from-email'>From: </div>");
+    var dropdown = $("<select>");
+
+    /* Without this stupid hack again, Google intercepts the event somewhere,
+       and the select won't drop down. */
+    dropdown.mousedown(function(e) { e.stopPropagation(); });
+
+    if (emails.length === 0) {
+      remindFromEmail = Login.myEmail();
+      $("<option>" + remindFromEmail + "</option>")
+        .appendTo(dropdown);
+      dropdown.prop("disabled", true);
+    } else {
+      remindFromEmail = emails[0];
+    }
+
+    List.iter(emails, function(email) {
+      $("<option>" + email + "</option>")
+        .appendTo(dropdown);
+    });
+    dropdown.change(function() {
+      var email = $(this).val();
+      remindFromEmail = email; // a variable of CalEventView
       $("#esper-reminder-time").trigger("change");
     });
 
@@ -427,6 +465,7 @@ module Esper.CalEventView {
 
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
         insertReminderDropdown(fullEventId, event_reminders);
+        insertEmailSelector(remindFromTeam.team_email_aliases);
         $(".esper-guest-reminder").remove(); // Yes this is necessary
         Gcal.waitForGuestsToLoad(function(guests) {
           var reminders = guests.find(".esper-guest-reminder");

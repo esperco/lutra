@@ -82,7 +82,7 @@ module Esper.CalTab {
     <p>Title: <input #pubTitle/></p>
     <p>Calendar: <select #pubCalendar/></p>
     <p>Description: <textarea #pubDescription rows=5 cols=28 /></p>
-    <p>From: <input #fromEmail/></p>
+    <p>From: <select #fromSelect/></p>
     <p>Guests:</p>
     <ul #viewPeopleInvolved/>
     <p align="right">
@@ -95,7 +95,6 @@ module Esper.CalTab {
     if (undefined !== e.description) {
       pubDescription.val(e.description);
     }
-    fromEmail.val(esperGmail.get.user_email());
 
     var firstTeamCal = team.team_calendars[0];
     var publicCalId =
@@ -109,6 +108,24 @@ module Esper.CalTab {
     });
     pubCalendar.change(function() {
       publicCalId = $(this).val();
+    });
+
+    var aliases = team.team_email_aliases;
+    var fromEmail;
+    if (aliases.length === 0) {
+      fromEmail = Login.myEmail();
+      $("<option>" + fromEmail + "</option>")
+        .appendTo(fromSelect);
+      fromSelect.prop("disabled", true);
+    } else {
+      fromEmail = aliases[0];
+      List.iter(aliases, function(email : string) {
+        $("<option>" + email + "</option>")
+          .appendTo(fromSelect);
+      });
+    }
+    fromSelect.change(function() {
+      fromEmail = $(this).val();
     });
 
     var peopleInvolved = [];
@@ -140,9 +157,7 @@ module Esper.CalTab {
       Api.createLinkedEvent(team.teamid, ev, threadid)
         .done(function(created) {
           pubInvite.remove();
-          var from = fromEmail.val();
-          if (from === "") from = esperGmail.get.user_email();
-          Api.sendEventInvites(team.teamid, from, guests, created);
+          Api.sendEventInvites(team.teamid, fromEmail, guests, created);
           refreshLinkedList(team, threadid, eventsTab, profiles);
         });
     });
