@@ -38,12 +38,12 @@ var settings = (function() {
   <div style="float: left; width: 40%">
     <div><b>All calendars:</b></div>
     <div style="font-size: 75%">(double-click to add)</div>
-    <select #allCals multiple size=10 />
+    <select #allCals multiple size=5 />
   </div>
   <div>
     <div><b>Team calendars:</b></div>
     <div style="font-size: 75%">(double-click to remove)</div>
-    <select #teamCals multiple size=10 />
+    <select #teamCals multiple size=5 />
   </div>
   <br/>
   <div>
@@ -106,28 +106,57 @@ var settings = (function() {
     });
   }
 
-  function makeCalendarSelector(team, root) {
-    api.getCalendarList(login.me(), null)
-      .done(function(x) {
-        var cal = team.team_calendar;
-        var calId =
-          cal !== null && cal !== undefined ? cal.google_calendar_id : null;
-        var options = [];
-        list.iter(x.items, function(calInfo) {
-          options.push({ label: calInfo.summary, value: calInfo.id });
-        });
-        var sel = select.create({
-          initialKey: calId,
-          defaultAction: function(v) {
-            calId = v;
-            log("Selected calendar is: " + calId);
-            if (util.isString(calId))
-              setTeamCalendar(team, calId);
-          },
-          options: options
-        });
-        root.append(sel.view);
+  function makeAliasSection(team, root) {
+'''
+<div #view>
+  <div style="float: left; width: 40%">
+    <div style="width: 80%">
+      <b>Email addresses for calendar invites and reminders:</b>
+    </div>
+    <select #teamAliases multiple size=3 style="width: 80%"/>
+  </div>
+  <div>
+    <div><b>Add an email address:</b></div>
+    <input #newAlias type="text"/>
+    <button #saveAlias class="button-primary">Add</button>
+  </div>
+</div>
+'''
+    function setTeamEmails() {
+      var teamOpts = teamAliases.find(".esper-email-alias");
+      var teamEmails = [];
+      teamOpts.each(function(i) {
+        var opt = $(teamOpts[i]);
+        teamEmails.push(opt.text());
       });
+      var uniqueEmails = list.union(teamEmails, []); // remove duplicates
+      api.putTeamEmails(team.teamid, { emails: uniqueEmails })
+        .done(function() { team.team_email_aliases = uniqueEmails; });
+    }
+
+    function removeOpt() {
+      $(this).remove();
+      setTeamEmails();
+    }
+
+    list.iter(team.team_email_aliases, function(email) {
+      var opt = $("<option class='esper-email-alias'>"
+                  + email + "</option>");
+      opt.dblclick(removeOpt)
+         .appendTo(teamAliases);
+    });
+
+    saveAlias.click(function() {
+      var email = newAlias.val();
+      if (email === "") return;
+      newAlias.val("");
+      $("<option class='esper-email-alias'>" + email + "</option>")
+        .dblclick(removeOpt)
+        .appendTo(teamAliases);
+      setTeamEmails();
+    });
+
+    root.append(view);
   }
 
   function viewOfCalendarTab(team) {
@@ -136,12 +165,15 @@ var settings = (function() {
   <div class="esper-h1">Team Calendars</div>
   <div #description class="calendar-setting-description"/>
   <div #calendarSelector></div>
+  <br/>
+  <div #emailAliases></div>
 </div>
 '''
     description
       .text("Select the calendars to be used for this team.");
 
     makeCalendarSelectors(team, calendarSelector);
+    makeAliasSection(team, emailAliases);
 
     return view;
   }
