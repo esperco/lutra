@@ -250,6 +250,12 @@ var api = (function () {
     return jsonHttpPut(url, JSON.stringify(cals));
   };
 
+  mod.putTeamEmails = function(teamid, aliases) {
+    var url = "api/team/" + login.data.uid
+      + "/" + teamid + "/emails";
+    return jsonHttpPut(url, JSON.stringify(aliases));
+  };
+
   /*** Executive Preferences ***/
   
   /** Sets the preferences given the correct JSON object. */
