@@ -8,7 +8,7 @@ module Deferred {
   /* wrap an already-computed value into a Deferred object,
      indicating a successful computation. */
   export function defer(x) {
-    var dfd = (<any> $.Deferred());
+    var dfd = (<any> $.Deferred()); // FIXME
     dfd.resolve(x);
     return dfd;
   }
@@ -16,7 +16,7 @@ module Deferred {
   /* wrap an already-computed value into a Deferred object,
      indicating a failed computation. */
   export function fail(x) {
-    var dfd = (<any> $.Deferred());
+    var dfd = (<any> $.Deferred()); // FIXME
     dfd.reject(x);
     return dfd;
   }

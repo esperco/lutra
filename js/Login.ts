@@ -4,7 +4,7 @@
 
 module Login {
 
-  export var data : any = {};
+  export var data : any = {}; // FIXME
 
   export function initLoginInfo() {
     var stored = Store.get("login");
@@ -42,7 +42,7 @@ module Login {
   }
 
   export function setLoginInfo(stored) {
-    if (window["flags"].isProduction) {
+    if (window["flags"].isProduction) { // FIXME plus two lines below
       window["mixpanel"].register({uid: stored.uid}); // Sent with every track()
       window["mixpanel"].track("Login");
     }
@@ -101,7 +101,7 @@ module Login {
     return function(jqXHR) {
       if (data) {
         var unixTime = Math.round(+new Date()/1000).toString();
-        var signature = (<any> window["CryptoJS"]).SHA1(
+        var signature = (<any> window["CryptoJS"]).SHA1( // FIXME
           unixTime
             + ","
             + path

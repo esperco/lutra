@@ -59,7 +59,7 @@ module Select {
     $("<span class='caret'/>").appendTo(button);
 
     var state = null;
-    var tbl : any = {};
+    var tbl : any = {}; // FIXME
     var unsetLabel = "";
 
     function addDivClass() {

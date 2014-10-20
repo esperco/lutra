@@ -5,7 +5,7 @@ module Main {
     Login.initLoginInfo();
     Route.setup();
     Status.init();
-    (<any> $("[data-toggle='tooltip']")).tooltip();
+    (<any> $("[data-toggle='tooltip']")).tooltip(); // FIXME
   }
 
   $(document).ready(main);

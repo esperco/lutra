@@ -179,7 +179,7 @@ module Api {
   };
 
   export function getGoogleAuthInfo(optAuthLandingUrl)
-    : JQueryDeferred<any> // ?
+    : JQueryDeferred<any> // FIXME
   {
     var url = "/api/google/" + Login.me() + "/auth/info";
     if (Util.isString(optAuthLandingUrl)) {
@@ -189,7 +189,7 @@ module Api {
   };
 
   export function postGoogleAuthRevoke()
-    : JQueryDeferred<any> // ?
+    : JQueryDeferred<any> // FIXME
   {
     var url = "/api/google/" + Login.me() + "/auth/revoke";
     return jsonHttpPost(url, "");

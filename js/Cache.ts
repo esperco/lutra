@@ -56,7 +56,7 @@ module Cache {
     }
 
     function defer(x) {
-      var dfd = new (<any> $.Deferred());
+      var dfd = (<any> $.Deferred()); // FIXME
       dfd.resolve(x);
       return dfd;
     }

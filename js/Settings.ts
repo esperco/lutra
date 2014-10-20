@@ -459,7 +459,7 @@ module Settings {
         var warning = $("<img class='svg-block'/>")
           .appendTo(statusContainer);
         Svg.loadImg(warning, "/assets/img/warning.svg");
-        (<any> statusContainer).tooltip();
+        (<any> statusContainer).tooltip(); // FIXME
       }
 
 (function(){ // a block scope, a block scope, my kingdom for a block scope!
@@ -546,7 +546,7 @@ module Settings {
           var warning = $("<img class='svg-block'/>")
             .appendTo(execStatusContainer);
           Svg.loadImg(warning, "/assets/img/warning.svg");
-          (<any> execStatusContainer).tooltip();
+          (<any> execStatusContainer).tooltip(); // FIXME
         }
       });
 
@@ -616,9 +616,9 @@ module Settings {
     content2.append(viewOfLabelSyncTab(team));
     content3.append(viewOfCalendarTab(team));
 
-    done.click(function() { (<any> modal).modal("hide") });
+    done.click(function() { (<any> modal).modal("hide") }); // FIXME
 
-    (<any> modal).modal({});
+    (<any> modal).modal({}); // FIXME
   }
 
   function checkTeamStatus(profiles, statusContainer) {

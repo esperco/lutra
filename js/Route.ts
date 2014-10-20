@@ -1,13 +1,13 @@
 /* Do the right thing based on the URL */
 module Route {
 
-  export var nav : any = {};
+  export var nav : any = {}; // FIXME
 
   function withLogin(whenDone, optInviteCode, optEmail) {
     Signin.signin(whenDone, optInviteCode, optEmail);
   }
 
-  var Router = window["can"].Control({
+  var Router = window["can"].Control({ // FIXME
     init : function(el, options) {
     },
 
@@ -56,7 +56,7 @@ module Route {
   /* Initialization */
   export function setup() {
     var router = new Router(window);
-    window["can"].route.ready();
+    window["can"].route.ready(); // FIXME
   };
 
 }
