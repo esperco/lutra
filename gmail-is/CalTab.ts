@@ -31,6 +31,18 @@ module Esper.CalTab {
     }
   }
 
+  function obtainTaskForThread(teamid, threadId) {
+    if (currentTask !== undefined)
+      return Promise.defer(currentTask);
+    else {
+      return Api.getTaskForThread(teamid, threadId)
+        .then(function(task) {
+          currentTask = task;
+          return task;
+        });
+    }
+  }
+
   export function linkEvent(e, team, threadId, eventsTab,
                             profiles, view) {
     Api.linkEventForMe(team.teamid, threadId, e.google_event_id)
@@ -43,8 +55,9 @@ module Esper.CalTab {
         refreshRecentsList(team, threadId, eventsTab, profiles);
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-          Api.syncEvent(team.teamid, threadId,
-                        e.google_cal_id, e.google_event_id);
+            obtainTaskForThread(team.teamid, threadId);
+            Api.syncEvent(team.teamid, threadId,
+                          e.google_cal_id, e.google_event_id);
           });
       });
   }
@@ -598,8 +611,12 @@ module Esper.CalTab {
         $("<li class='esper-li'>" + title + "</li>")
           .appendTo(dropdown)
           .click(function() {
-            Api.switchTaskForThread(teamid, threadid,
-                                    currentTask.taskid, newTaskId);
+            if (currentTask !== undefined)
+              Api.switchTaskForThread(teamid, threadid,
+                                      currentTask.taskid, newTaskId);
+            else
+              Api.linkThreadToTask(teamid, threadid, newTaskId);
+
             currentTask = result.task_data;
             taskName.val(title);
             Sidebar.dismissDropdowns();
@@ -611,10 +628,13 @@ module Esper.CalTab {
       changeName
         .appendTo(dropdown)
         .click(function() {
-          Api.setTaskTitle(currentTask.taskid, query);
-          currentTask.task_title = query;
-          taskName.val(query);
-          Sidebar.dismissDropdowns();
+          obtainTaskForThread(teamid, threadid)
+            .done(function(task) {
+              Api.setTaskTitle(currentTask.taskid, query);
+              currentTask.task_title = query;
+              taskName.val(query);
+              Sidebar.dismissDropdowns();
+            });
         });
       dropdown.addClass("open");
     });
@@ -717,9 +737,14 @@ module Esper.CalTab {
     displayLinkedList(team, threadId, eventsTab, profiles, linkedEvents);
     displayRecentsList(team, threadId, eventsTab, profiles, linkedEvents);
 
-    Api.getTaskForThread(team.teamid, threadId).done(function(task) {
+    Api.getOptTaskForThread(team.teamid, threadId).done(function(task) {
       currentTask = task;
-      taskName.val(task.task_title);
+      var title = "";
+      if (task !== undefined)
+        title = task.task_title;
+      else
+        title = "not a task"; // TODO get thread subject
+      taskName.val(title);
       Util.afterTyping(taskName, 250, function() {
         var query = taskName.val();
         if (query !== "")

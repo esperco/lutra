@@ -287,8 +287,29 @@ module Esper.Api {
     var url =
       Conf.Api.url + "/api/thread/task/" + Login.myUid()
       + "/" + teamid
-      + "/" + threadid;
+      + "/" + threadid
+      + "?events=true&threads=true";
     return JsonHttp.get(url);
+  }
+
+  export function getOptTaskForThread(teamid, threadid):
+  JQueryDeferred<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/thread/task-opt/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadid
+      + "?events=true&threads=true";
+    return JsonHttp.get(url).then(function(x) { return x.task; });
+  }
+
+  export function linkThreadToTask(teamid, threadid, taskid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/thread/task/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadid
+      + "/" + taskid;
+    return JsonHttp.put(url, "");
   }
 
   export function switchTaskForThread(teamid, threadid,
