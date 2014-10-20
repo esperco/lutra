@@ -35,11 +35,10 @@
 
 */
 
-var signin = (function() {
-  var mod = [];
+module Signin {
 
   function requestGoogleAuth(url) {
-    log("Going off to " + url);
+    Log.p("Going off to " + url);
     window.location = url;
   }
 
@@ -48,29 +47,29 @@ var signin = (function() {
        a single implementation and it's under our control, as opposed
        to whatever broken browser the user might use.
     */
-    return api.random()
+    return Api.random()
       .then(function(x) {
         var loginNonce = x.random;
         if (loginNonce.length >= 64) {
-          store.set("login_nonce", loginNonce);
+          Store.set("login_nonce", loginNonce);
           return loginNonce;
         }
       });
   }
 
   function getLoginNonce() {
-    return store.get("login_nonce");
+    return Store.get("login_nonce");
   }
 
   function clearLoginNonce() {
-    store.remove("login_nonce");
+    Store.remove("login_nonce");
   }
 
   /* Go straight to Google Oauth page without displaying the sign-in button */
   function forceLogin(landingUrl, optInvite, optEmail) {
     setLoginNonce()
       .done(function(loginNonce) {
-        api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
+        Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
           .done(function(x) {
             requestGoogleAuth(x.url);
           });
@@ -110,7 +109,7 @@ var signin = (function() {
   </div>
 </div>
 '''
-    page.hide();
+    Page.hide();
 
     var rootView = $("#onboarding-interface");
     rootView.children().remove();
@@ -119,21 +118,21 @@ var signin = (function() {
 
     var logo = $("<img class='svg-block hero-mark'/>")
       .appendTo(loginLogo);
-    svg.loadImg(logo, "/assets/img/esper-mark.svg");
+    Svg.loadImg(logo, "/assets/img/esper-mark.svg");
 
-    if (util.isString(msg))
+    if (Util.isString(msg))
       msgDiv.text(msg);
 
     var googleG = $("<img class='svg-block'/>")
       .appendTo(google);
-    svg.loadImg(googleG, "/assets/img/google-g.svg");
+    Svg.loadImg(googleG, "/assets/img/google-g.svg");
 
     setLoginNonce()
       .done(function(loginNonce) {
         rootView.removeClass("hide");
 
         button.click(function() {
-          api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
+          Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
             .done(function(x) {
               requestGoogleAuth(x.url);
             });
@@ -146,12 +145,12 @@ var signin = (function() {
   }
 
   function showTokenDetails(loginView, tokenDescription) {
-    Log.d(JSON.stringify(tokenDescription));
+    Log.p(JSON.stringify(tokenDescription));
   }
 
   function useInvite(inviteCode) {
-    log("useInvite");
-    return api.postToken(inviteCode)
+    Log.p("useInvite");
+    return Api.postToken(inviteCode)
       .then(
         /* success */
         function(tokenDescription) {
@@ -161,46 +160,46 @@ var signin = (function() {
         },
         /* failure */
         function() {
-          displayLoginLinks("Invalid invite.", "#!", undefined);
+          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
         }
       );
   }
 
   function loginOrSignup(optEmail) {
-    log("loginOrSignup");
-    var uid = login.me();
+    Log.p("loginOrSignup");
+    var uid = Login.me();
     var landingUrl = document.URL;
-    landingUrl.hash = "#!";
-    if (util.isDefined(optEmail)) {
+    landingUrl["hash"] = "#!";
+    if (Util.isDefined(optEmail)) {
       forceLogin(landingUrl, undefined, optEmail);
-    } else if (util.isDefined(uid)) {
-      return api.getLoginInfo()
+    } else if (Util.isDefined(uid)) {
+      return Api.getLoginInfo()
         .then(
           /* success */
           function(x) {
-            login.setLoginInfo(x);
-            return deferred.defer(true);
+            Login.setLoginInfo(x);
+            return Deferred.defer(true);
           },
           /* failure */
           function() {
             /* useful for testing; may not be ideal in production */
-            login.clearLoginInfo();
+            Login.clearLoginInfo();
             displayLoginLinks("Something's wrong. Please try to sign in.",
                               landingUrl,
                               undefined,
                               optEmail);
-            return deferred.defer(false);
+            return Deferred.defer(false);
           });
     } else {
       displayLoginLinks("Sign in to continue.",
                         landingUrl, undefined, optEmail);
-      return deferred.defer(false);
+      return Deferred.defer(false);
     }
   }
 
   function checkGooglePermissions(landingUrl) {
-    log("checkGooglePermissions");
-    return api.getGoogleAuthInfo(landingUrl)
+    Log.p("checkGooglePermissions");
+    return Api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
         if (info.has_token)
           return true;
@@ -211,9 +210,9 @@ var signin = (function() {
       });
   }
 
-  mod.signin = function(whenDone, optInviteCode, optEmail) {
+  export function signin(whenDone, optInviteCode, optEmail) {
     document.title = "Sign in - Esper";
-    if (util.isString(optInviteCode)) {
+    if (Util.isString(optInviteCode)) {
       useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)
@@ -230,24 +229,24 @@ var signin = (function() {
   };
 
   function goToRelativeUrl(url) {
-    var relativeUrl = parseUrl.toRelative(parseUrl.parse(url));
-    log("Going to " + relativeUrl);
+    var relativeUrl = ParseUrl.toRelative(ParseUrl.parse(url));
+    Log.p("Going to " + relativeUrl);
     $(document).ready(function() {
       window.location.assign(relativeUrl);
       window.location.reload();
     });
   }
 
-  mod.loginOnce = function(uid, landingUrl) {
+  export function loginOnce(uid, landingUrl) {
     var loginNonce = getLoginNonce();
-    log("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
+    Log.p("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
     /*
       TODO: figure out why redirecting to landingUrl causes an infinite loop;
             disabled for now.
      */
-    api.loginOnce(uid, loginNonce)
+    Api.loginOnce(uid, loginNonce)
       .done(function(loginInfo) {
-        login.setLoginInfo(loginInfo);
+        Login.setLoginInfo(loginInfo);
         clearLoginNonce();
         /* Make sure we don't redirect to a phishing URL: discard host. */
         goToRelativeUrl("/#!");
@@ -258,5 +257,4 @@ var signin = (function() {
       });
   };
 
-  return mod;
-})();
+}

@@ -1,30 +1,29 @@
 /* Do the right thing based on the URL */
-var route = (function() {
+module Route {
 
-  var mod = {};
-  mod.nav = {};
+  export var nav : any = {};
 
   function withLogin(whenDone, optInviteCode, optEmail) {
-    signin.signin(whenDone, optInviteCode, optEmail);
+    Signin.signin(whenDone, optInviteCode, optEmail);
   }
 
-  var Router = can.Control({
+  var Router = window["can"].Control({
     init : function(el, options) {
     },
 
     /* default path /!# */
     "route" : function(data){
-      withLogin(page.settings.load);
+      withLogin(Page.settings.load, undefined, undefined);
     },
 
     /* Generic invitation */
     "t/:token route" : function(data) {
-      withLogin(page.settings.load, data.token);
+      withLogin(Page.settings.load, data.token, undefined);
     },
 
     /* Sign-in via Google */
     "login-once/:uid/:hex_landing_url route" : function(data) {
-      signin.loginOnce(data.uid, util.hexDecode(data.hex_landing_url));
+      Signin.loginOnce(data.uid, Util.hexDecode(data.hex_landing_url));
     },
 
     "login/:email route" : function(data) {
@@ -34,11 +33,11 @@ var route = (function() {
     /* various pages */
 
     "preferences route" : function (data) {
-      withLogin(page.preferences.load);
+      withLogin(Page.preferences.load, undefined, undefined);
     },
 
     "test route": function(data) {
-      page.test.load();
+      Page.test.load();
     },
 
   });
@@ -46,19 +45,18 @@ var route = (function() {
   /* Navigation functions (set the URL, let the router react to the changes) */
 
   /* e.g. route.nav.path("#!a/b/c") goes to URL /#!a/b/c  */
-  mod.nav.path = function(frag) {
+  nav.path = function(frag) {
     location.hash = frag;
   };
 
-  mod.nav.home = function() {
+  nav.home = function() {
     location.hash = "#!";
   };
 
   /* Initialization */
-  mod.setup = function() {
+  export function setup() {
     var router = new Router(window);
-    can.route.ready();
+    window["can"].route.ready();
   };
 
-  return mod;
-}());
+}

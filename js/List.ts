@@ -2,18 +2,17 @@
   List operations, similar to those used in OCaml, on Javascript arrays.
 */
 
-var list = (function() {
-  var mod = {};
+module List {
 
   /* iterate over each element (foreach) */
-  mod.iter = function(a, f) {
+  export function iter(a, f) {
     var len = a.length;
     for (var i = 0; i < len; i++)
       f(a[i], i);
   };
 
   /* one-to-one mapping */
-  mod.map = function(a, f) {
+  export function map(a, f) {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++)
@@ -22,7 +21,7 @@ var list = (function() {
   };
 
   /* return true if at least one element equals the given element */
-  mod.mem = function(a, x) {
+  export function mem(a, x) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
       if (a[i] === x) {
@@ -33,16 +32,16 @@ var list = (function() {
   };
 
   function getter(optFunc) {
-    return util.isDefined(optFunc) ? optFunc : function(x) { return x; };
+    return Util.isDefined(optFunc) ? optFunc : function(x) { return x; };
   }
 
   /* convert a list of values into an object keyed by strings;
      If the values are not strings, a function getKey must be provided
      which will extract a string key from each value */
-  mod.toTable = function(a, getKey) {
+  export function toTable(a, getKey) {
     var get = getter(getKey);
     var tbl = {};
-    mod.iter(a, function(v) {
+    iter(a, function(v) {
       var k = get(v);
       tbl[k] = v;
     });
@@ -53,16 +52,16 @@ var list = (function() {
     union of two lists
     (elements occurring in either list, without duplicates)
   */
-  mod.union = function(a, b, getKey) {
+  export function union(a, b, getKey) {
     var get = getter(getKey);
-    var tbl = mod.toTable(a, getKey);
+    var tbl = toTable(a, getKey);
     var resTbl = {};
     var c = [];
     for (var k in tbl)
       c.push(tbl[k]);
-    mod.iter(b, function(v) {
+    iter(b, function(v) {
       var k = get(v);
-      if (! util.isDefined(tbl[k]) && ! util.isDefined(resTbl[k])) {
+      if (! Util.isDefined(tbl[k]) && ! Util.isDefined(resTbl[k])) {
         c.push(v);
         resTbl[k] = v;
       }
@@ -73,14 +72,10 @@ var list = (function() {
   var l1 = ["a", "c", "a", "b", "d"];
   var l2 = ["c", "w", "c", "y"];
 
-  mod.tests = [
-    test.expect("union",
-                function() { return mod.union(l1, l2); }, null,
+  export var tests = [
+    Test.expect("union",
+                function() { return union(l1, l2, undefined); }, null,
                 ["a", "c", "b", "d", "w", "y"]),
-    test.expect("unique",
-                function() { return mod.unique(l1); }, null,
-                ["a", "c", "b", "d"]),
   ];
 
-  return mod;
-}());
+}

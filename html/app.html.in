@@ -18,8 +18,6 @@
 
     <!-- Mixpanel JS loader file, copied from js/mixpanel.js -->
     <script href="/assets/js/mixpanel.js"></script>
-
-    <script src="/assets/js/executive-preferences.js"></script>
   </head>
 
   <body>

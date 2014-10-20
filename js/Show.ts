@@ -40,19 +40,18 @@
   });
 */
 
-var show = (function () {
-  var mod = {};
+module Show {
 
   function defaultShow(k, v, onClass, offClass) {
-    if (util.isDefined(v.ids)) {
-      list.iter(v.ids, function(id) {
+    if (Util.isDefined(v.ids)) {
+      List.iter(v.ids, function(id) {
         $("#" + id)
           .removeClass(offClass)
           .addClass(onClass);
       });
     }
-    if (util.isDefined(v.classes)) {
-      list.iter(v.classes, function(class_) {
+    if (Util.isDefined(v.classes)) {
+      List.iter(v.classes, function(class_) {
         $("." + class_)
           .removeClass(offClass)
           .addClass(onClass);
@@ -61,15 +60,15 @@ var show = (function () {
   }
 
   function defaultHide(k, v, onClass, offClass) {
-    if (util.isDefined(v.ids)) {
-      list.iter(v.ids, function(id) {
+    if (Util.isDefined(v.ids)) {
+      List.iter(v.ids, function(id) {
         $("#" + id)
           .removeClass(onClass)
           .addClass(offClass);
       });
     }
-    if (util.isDefined(v.classes)) {
-      list.iter(v.classes, function(class_) {
+    if (Util.isDefined(v.classes)) {
+      List.iter(v.classes, function(class_) {
         $("." + class_)
           .removeClass(onClass)
           .addClass(offClass);
@@ -85,17 +84,17 @@ var show = (function () {
        (default: 'a = { ids: string list; classes: string list }
        uses the parameters above)
    */
-  mod.create = function(tbl, opt) {
-    var opt = util.isObject(opt) ? opt : {};
-    var onClass = util.isString(opt.onClass) ? opt.onClass : "fadeIn";
-    var offClass = util.isString(opt.offClass) ? opt.offClass : "fadeOut hide";
+  export function create(tbl, opt) {
+    var opt = Util.isObject(opt) ? opt : {};
+    var onClass = Util.isString(opt.onClass) ? opt.onClass : "fadeIn";
+    var offClass = Util.isString(opt.offClass) ? opt.offClass : "fadeOut hide";
     var defaultShowOne =
       function(k, v) { defaultShow(k, v, onClass, offClass); };
     var defaultHideOne =
       function(k, v) { defaultHide(k, v, onClass, offClass); };
 
-    var showOne = util.isDefined(opt.showOne) ? opt.showOne : defaultShowOne;
-    var hideOne = util.isDefined(opt.hideOne) ? opt.hideOne : defaultHideOne;
+    var showOne = Util.isDefined(opt.showOne) ? opt.showOne : defaultShowOne;
+    var hideOne = Util.isDefined(opt.hideOne) ? opt.hideOne : defaultHideOne;
 
     function hideAll() {
       for (var k in tbl) {
@@ -116,15 +115,14 @@ var show = (function () {
           hideOne(k2, v2);
       }
       var v = tbl[k];
-      if (util.isDefined(v))
+      if (Util.isDefined(v))
         showOne(k, v);
       else
-        log("show.js: invalid key " + k);
+        Log.p("show.js: invalid key " + k);
     }
 
     return { hideAll : hideAll,
              show : show };
   }
 
-  return mod;
-}());
+}

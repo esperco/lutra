@@ -5,8 +5,7 @@
   in all its views.
 */
 
-var cache = (function() {
-  var mod = {};
+module Cache {
 
   /*
     Take a time-to-live in seconds and an object providing the methods:
@@ -22,25 +21,25 @@ var cache = (function() {
 
     get and getCached return Deferred values as defined by jQuery.
   */
-  mod.create = function (ttl, missingTtl, access) {
+  export function create(ttl, missingTtl, access) {
     var cache = {};
 
     var get = access.get;
-    var wrap = util.isDefined(access.wrap) ?
+    var wrap = Util.isDefined(access.wrap) ?
       access.wrap : function(deferredV) {
         return deferredV;
       };
-    var update = util.isDefined(access.update) ?
+    var update = Util.isDefined(access.update) ?
       access.update : function(oldDeferredW, newDeferredV) {
         return newDeferredV;
       };
-    var destroy = util.isDefined(access.destroy) ?
+    var destroy = Util.isDefined(access.destroy) ?
       access.destroy : function(oldDeferredW) {};
 
     /* just deferred wrapped value into the table */
     function cacheSet(k, deferredW) {
       cache[k] = {
-        expires: unixtime.now() + ttl,
+        expires: Unixtime.now() + ttl,
         w: deferredW
       };
     }
@@ -49,7 +48,7 @@ var cache = (function() {
     function cacheSetMissing(k) {
       if (missingTtl > 0)
         cache[k] = {
-          expires: unixtime.now() + missingTtl,
+          expires: Unixtime.now() + missingTtl,
           w: null
         };
       else
@@ -57,7 +56,7 @@ var cache = (function() {
     }
 
     function defer(x) {
-      var dfd = new $.Deferred();
+      var dfd = new (<any> $.Deferred());
       dfd.resolve(x);
       return dfd;
     }
@@ -65,8 +64,8 @@ var cache = (function() {
     /* force-update a value in the cache, return wrapped value */
     function setCached(k, deferredV) {
       var x = cache[k];
-      var deferredW0 = util.isDefined(x) ? x.w : null;
-      if (util.isDefined(deferredV)) {
+      var deferredW0 = Util.isDefined(x) ? x.w : null;
+      if (Util.isDefined(deferredV)) {
         var deferredW = deferredW0 !== null ?
           update(deferredW0, deferredV) : wrap(deferredV);
         cacheSet(k, deferredW);
@@ -74,7 +73,7 @@ var cache = (function() {
       }
       else {
         if (deferredW0 !== null)
-          destroy(w0);
+          destroy(deferredW0);
         cacheSetMissing(k);
         return null;
       }
@@ -88,7 +87,7 @@ var cache = (function() {
     /* get cached value if available, otherwise get the current value */
     function getCached(k) {
       var x = cache[k];
-      if (x && unixtime.now() < x.expires) {
+      if (x && Unixtime.now() < x.expires) {
         return x.w;
       }
       else
@@ -97,7 +96,7 @@ var cache = (function() {
 
     /* force-remove a value from the cache */
     function removeCached(k) {
-      return setCached(k);
+      return setCached(k, undefined);
     }
 
     return {
@@ -107,5 +106,4 @@ var cache = (function() {
     }
   }
 
-  return mod;
-})();
+}

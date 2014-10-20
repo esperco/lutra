@@ -34,31 +34,31 @@ APP_PROD_LIBS = $(addsuffix .min.js, $(APP_LIBS))
 # Quasi-Javascript sources that need to be preprocessed with 'oblivion'.
 # Output Javascript files are put into the js/ subdirectory.
 
-COMMON_SOURCES = \
-  test.js \
-  list.js \
-  deferred.js \
-  util.js \
-  log.js \
-  mixpanel.js \
-  gmailCompose.js \
-  status_.js \
-  unixtime.js \
-  cache.js \
-  svg.js \
-  show.js \
-  select.js \
-  store.js
+COMMON_SOURCES =
+#  test.js \
+#  list.js \
+#  log.js \
+#  deferred.js \
+#  util.js \
+#  mixpanel.js \
+#  gmailCompose.js \
+#  status_.js \
+#  unixtime.js \
+#  cache.js \
+#  svg.js \
+#  show.js \
+#  select.js \
+#  store.js
 
-APP_SOURCES = \
-  parseUrl.js \
-  login.js \
-  api.js \
-  settings.js \
-  signin.js \
-  page.js \
-  route.js \
-  main.js
+APP_SOURCES =
+#  parseUrl.js \
+#  login.js \
+#  api.js \
+#  settings.js \
+#  signin.js \
+#  page.js \
+#  route.js \
+#  main.js
 
 TS_LIBS = \
   jquery.d
@@ -68,7 +68,29 @@ TS_LIBS = \
 # Output Javascript files are put into the js/ subdirectory.
 # for executive preferences page
 TS_SOURCES = \
-  ExecutivePreferences
+  Test \
+  List \
+  Log \
+  Deferred \
+  Util \
+  Mixpanel \
+  GmailCompose \
+  Status \
+  Unixtime \
+  Cache \
+  Svg \
+  Show \
+  Select \
+  Store \
+  ParseUrl \
+  Login \
+  Api \
+  Settings \
+  Signin \
+  ExecutivePreferences \
+  Page \
+  Route \
+  Main
 
 # Complete oblivion/TypeScript source file names for executive preferences page
 TS_SRC = \
@@ -101,9 +123,9 @@ ts/%.ts: %.ts
 	@mkdir -p ts
 	../setup/bin/oblivion -ts $< -o $@
 
-js/executive-preferences.js: $(TS)
+js/all-typescript.js: $(TS)
 	@mkdir -p js
-	tsc --out js/executive-preferences.js $(TS) || (rm js/executive-preferences.js; exit 1)
+	tsc --out js/all-typescript.js $(TS) || (rm js/all-typescript.js; exit 1)
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
@@ -118,19 +140,19 @@ includes-prod.html: Makefile mkloader
 prod.js: $(COMMON_JS) $(APP_JS)
 	cat $(COMMON_JS) $(APP_JS) | uglifyjs -o $@
 
-dev-install: $(COMMON_JS) $(APP_JS) js/executive-preferences.js
+dev-install: $(COMMON_JS) $(APP_JS) js/all-typescript.js
 	mkdir -p ../pub/js
 	cp $(DEV_FLAGS) ../pub/js/flags.js
-	cp $(COMMON_JS) ../pub/js
-	cp $(APP_JS) ../pub/js
-	cp js/executive-preferences.js ../pub/js
+	#cp $(COMMON_JS) ../pub/js
+	#cp $(APP_JS) ../pub/js
+	cp js/all-typescript.js ../pub/js
 
-prod-install: js/executive-preferences.js
+prod-install: js/all-typescript.js
 	mkdir -p ../pub/js
 	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp prod.js ../pub/js/app.js
-	cp js/executive-preferences.js ../pub/js
+	cp js/all-typescript.js ../pub/js
 
 clean:
 	rm -f *~ prod.js includes-*.html run-tests.js
-	rm -rf js/
+	rm -rf js/ ts/

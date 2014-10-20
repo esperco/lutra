@@ -6,10 +6,9 @@
   and we cannot override it.
 */
 
-var status_ = (function() {
-  var mod = {};
+module Status {
 
-  mod.report = function(msg, kind) {
+  export function report(msg, kind) {
     var elt = $("#global-status");
     elt.children().remove();
     elt
@@ -25,15 +24,15 @@ var status_ = (function() {
       // });
   };
 
-   mod.reportError = function(msg) {
-    mod.report(msg, "danger");
+  export function reportError(msg) {
+    report(msg, "danger");
   };
 
-  mod.reportSuccess = function(msg) {
-    mod.report(msg, "success");
+  export function reportSuccess(msg) {
+    report(msg, "success");
   };
 
-  mod.clear = function() {
+  export function clear() {
     $("#error").hide();
   };
 
@@ -43,31 +42,30 @@ var status_ = (function() {
 
     If not specified, the error message displayed is the response body.
   */
-  mod.onError = function(statusCode, optMsg) {
+  export function onError(statusCode, optMsg) {
     return function(jqXHR, textStatus, errorThrown) {
       if (statusCode === jqXHR.status) {
-        var msg = util.isString(optMsg) ? optMsg : jqXHR.responseText;
-        mod.reportError(msg);
+        var msg = Util.isString(optMsg) ? optMsg : jqXHR.responseText;
+        reportError(msg);
       }
     };
   };
 
-  mod.onErrors = function(statusCodes, optMsg) {
+  export function onErrors(statusCodes, optMsg) {
     return function(jqXHR, textStatus, errorThrown) {
       if (statusCodes.indexOf(jqXHR.status) != -1) {
-        var msg = util.isString(optMsg) ? optMsg : jqXHR.responseText;
-        mod.reportError(msg);
+        var msg = Util.isString(optMsg) ? optMsg : jqXHR.responseText;
+        reportError(msg);
       }
     };
   };
 
   /* Any click in the browser's window hides the status area */
-  mod.init = function() {
+  export function init() {
     $("body").click(function() {
       $("#global-status").hide();
       return true;
     });
   };
 
-  return mod;
-}());
+}

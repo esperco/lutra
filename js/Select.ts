@@ -2,8 +2,7 @@
   Stylable replacement for <select>
 */
 
-var select = (function() {
-  var mod = {};
+module Select {
 
   /*
     parameters:
@@ -24,23 +23,23 @@ var select = (function() {
    */
 
   function valueOfOption(o) {
-    if (util.isNotNull(o) && util.isDefined(o.value))
+    if (Util.isNotNull(o) && Util.isDefined(o.value))
       return o.value;
     else
       return null;
   }
 
   function keyOfOption(o) {
-    if (util.isString(o.key))
+    if (Util.isString(o.key))
       return o.key;
-    else if (util.isString(o.value))
+    else if (Util.isString(o.value))
       return o.value;
     else
       return null;
   }
 
   function classOfOption(o) {
-    if (util.isNotNull(o) && util.isDefined(o.cls))
+    if (Util.isNotNull(o) && Util.isDefined(o.cls))
       return o.cls;
     else
       return null;
@@ -50,7 +49,7 @@ var select = (function() {
     return keyOfOption(o) !== null;
   }
 
-  mod.create = function(param) {
+  export function create(param) {
     var view = $("<div class='btn-group'>");
     var button = $("<button type='button'/>")
       .addClass("btn btn-default dropdown-toggle")
@@ -60,7 +59,7 @@ var select = (function() {
     $("<span class='caret'/>").appendTo(button);
 
     var state = null;
-    var tbl = {};
+    var tbl : any = {};
     var unsetLabel = "";
 
     function addDivClass() {
@@ -88,16 +87,16 @@ var select = (function() {
 
     function runAction(o, x) {
       var action;
-      if (util.isDefined(o.action))
+      if (Util.isDefined(o.action))
         action = o.action;
-      else if (util.isDefined(param.defaultAction))
+      else if (Util.isDefined(param.defaultAction))
         action = param.defaultAction;
       else
         action = function(x) {};
       action(x);
     }
 
-    list.iter(param.options, function(o) {
+    List.iter(param.options, function(o) {
       var k = keyOfOption(o);
       var v = valueOfOption(o);
       var cls = classOfOption(o);
@@ -105,7 +104,7 @@ var select = (function() {
       if (k !== null)
         tbl[k] = o;
       else
-        unsetLabel = util.isString(o.label) ? o.label : "";
+        unsetLabel = Util.isString(o.label) ? o.label : "";
 
       var li = $("<li/>")
         .addClass(cls)
@@ -131,7 +130,7 @@ var select = (function() {
     }
 
     function set(k, noAction) {
-      var o = util.isString(k) ? tbl[k] : null;
+      var o = Util.isString(k) ? tbl[k] : null;
       state = valueOfOption(o);
       addDivClass();
       addButtonClass();
@@ -140,7 +139,7 @@ var select = (function() {
         runAction(o, state);
     }
 
-    var initialKey = util.isDefined(param.initialKey) ?
+    var initialKey = Util.isDefined(param.initialKey) ?
       param.initialKey
       : keyOfOption(param.options[0]);
 
@@ -153,5 +152,4 @@ var select = (function() {
     };
   };
 
-  return mod;
-}());
+}

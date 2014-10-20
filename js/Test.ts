@@ -2,29 +2,27 @@
   Unit testing
 */
 
-var test = (function() {
-  var mod = {};
+module Test {
 
   function append(nodes) {
     $("#test-content").append(nodes);
   }
 
-  function print() {
-    var a = arguments;
+  function print(...a: any[]) {
     var root = $("#test-content");
     root
       .append($("<hr/>"));
-    list.iter(a, function(x) {
-      log(x);
-      var s = util.toString(x);
+    List.iter(a, function(x) {
+      Log.p(x);
+      var s = Util.toString(x);
       root
         .append($("<pre/>").text(s));
     });
   }
 
-  mod.assert = function(b) {
+  export function assert(b) {
     if (!b) {
-      log("Failed assertion");
+      Log.p("Failed assertion");
       console.trace();
     }
     return b;
@@ -43,7 +41,7 @@ var test = (function() {
     var groupName = x[0];
     print("--- " + groupName + " ---");
     var l = x[1];
-    list.iter(l, function(x) { runOne(groupName, x); });
+    List.iter(l, function(x) { runOne(groupName, x); });
   }
 
   function preparePrintableObject(x) {
@@ -56,7 +54,7 @@ var test = (function() {
   function preparePrintable(x) {
     var s = Object.prototype.toString.call(x);
     if (s === "[object Array]")
-      return list.map(x, preparePrintable);
+      return List.map(x, preparePrintable);
     else if (s === "[object Object]")
       return preparePrintableObject(x);
     else if (s === "[object Function]")
@@ -65,7 +63,7 @@ var test = (function() {
       return x;
   }
 
-  mod.toString = function(x) {
+  export function toString(x) {
     if (x === undefined)
       return "undefined";
     else if (typeof x === "string")
@@ -74,7 +72,7 @@ var test = (function() {
       return JSON.stringify(preparePrintable(x), undefined, 2);
   };
 
-  mod.expect = function(title, f, arg, expected) {
+  export function expect(title, f, arg, expected) {
     var title = typeof title === "string" ? title : JSON.stringify(expected);
     return [title, function() {
       var result = f(arg);
@@ -89,19 +87,18 @@ var test = (function() {
 
   function tests() {
     return [
-      ["list", list.tests],
-      ["util", util.tests],
+      ["list", List.tests],
+      ["util", Util.tests],
     ];
   }
 
   function run() {
     append("<h2>Tests</h2>");
-    list.iter(tests(), runGroup);
+    List.iter(tests(), runGroup);
   };
 
-  mod.load = function() {
+  export function load() {
     run();
   }
 
-  return mod;
-}());
+}

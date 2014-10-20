@@ -2,8 +2,7 @@
  * Replace all SVG images with inline SVG
  */
 
-var svg = (function() {
-  var mod = {};
+module Svg {
 
   var access = {
     get: function(k) {
@@ -15,13 +14,13 @@ var svg = (function() {
     }
   };
 
-  var svgCache = cache.create(300, 30, access);
+  var svgCache = Cache.create(300, 30, access);
 
-  mod.loadImg = function(img, url) {
+  export function loadImg(img, url) {
     return svgCache.getCached(url)
       .then(function(data) {
         if (!data)
-          log("bad result for svgCache.getCached("+ url +"):", data);
+          Log.p("bad result for svgCache.getCached("+ url +"):", data);
         var svgRoot = $(data)
           .attr("id", img.attr("id"))
           .attr("src", url)
@@ -31,13 +30,12 @@ var svg = (function() {
       });
   };
 
-  mod.init = function() {
+  export function init() {
     $('img.svg').each(function(){
       var elt = $(this);
       var url = elt.attr('src');
-      mod.loadImg(elt, url);
+      loadImg(elt, url);
     });
   };
 
-  return mod;
-}());
+}

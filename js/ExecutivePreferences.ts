@@ -1,7 +1,3 @@
-declare var api     : any;
-declare var login   : any;
-declare var status_ : any;
-
 module Esper.ExecutivePreferences {
 
   var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
@@ -173,10 +169,10 @@ module Esper.ExecutivePreferences {
   export function loadPreferences(callback) {
     var teamid = $("#teamSelect").val();
 
-    var preferences = api.getPreferences(teamid);
+    var preferences = Api.getPreferences(teamid);
 
-    preferences.done(function () {
-      preferences = JSON.parse(preferences.responseText) || {};
+    preferences.done(function (x) {
+      var preferences = JSON.parse(preferences.responseText) || {};
 
       callback($.extend(true, defaultPreferences(), preferences));
     });
@@ -263,11 +259,11 @@ module Esper.ExecutivePreferences {
     try {
       var preferences = currentPreferences();
 
-      api.setPreferences(teamid, preferences);
+      Api.setPreferences(teamid, preferences);
       
       saved = true;
     } catch (e) {
-      status_.reportError("Didn't save:", e);
+      //Status.reportError("Didn't save:", e);
       if (e !== "typo") {
         throw e;
       }
@@ -430,7 +426,7 @@ module Esper.ExecutivePreferences {
   </span>
 </div>
 '''
-    login.getTeams().forEach(function (team) {
+    Login.getTeams().forEach(function (team) {
       var name   = team.team_name;
       var teamid = team.teamid;
       var option = $('<option value="' + teamid + '">').text(name);
