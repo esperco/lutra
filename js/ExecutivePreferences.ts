@@ -172,9 +172,10 @@ module Esper.ExecutivePreferences {
     var preferences = Api.getPreferences(teamid);
 
     preferences.done(function (x) {
-      var preferences = JSON.parse(preferences.responseText) || {};
+      // wtf goin on here?
+      //var p = JSON.parse(x.responseText) || {};
 
-      callback($.extend(true, defaultPreferences(), preferences));
+      callback($.extend(true, defaultPreferences(), x));
     });
   }
 
