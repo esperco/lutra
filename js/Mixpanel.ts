@@ -17,7 +17,7 @@ module MP {
   window["mixpanel"].init(token);
 
   export function track(name) {
-    //if (window["flags"].isProduction) window["mixpanel"].track(name);
+    if (window["flags"].isProduction) window["mixpanel"].track(name);
   };
 
 }

@@ -23,13 +23,6 @@ module Settings {
       dismissOverlays();
   });
 
-  function setTeamCalendar(team, calId) {
-    return Api.setTeamCalendar(team.teamid, calId)
-      .done(function() {
-        Log.p("Successfully set team calendar to " + calId);
-      });
-  }
-
   // TODO Styling
   function makeCalendarSelectors(team, root) {
 '''
