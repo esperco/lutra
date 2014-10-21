@@ -768,7 +768,7 @@ module Esper.ExecutivePreferences {
 '''
 <div class="misc-preferences" #container>
   <h1 #header>Misc</h1>
-  <textarea #textBox></textarea>
+  <textarea rows=5 #textBox></textarea>
 </div>
 '''
     textBox.val(text);
