@@ -261,7 +261,7 @@ module Esper.ExecutivePreferences {
       var preferences = currentPreferences();
 
       Api.setPreferences(teamid, preferences);
-      
+
       saved = true;
     } catch (e) {
       //Status.reportError("Didn't save:", e);
@@ -482,6 +482,28 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
+  function showAvailability(defaults) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog team-settings">
+    <div class="modal-content">
+      <div class="modal-header">Customize Availability</div>
+      <div>"Hello, world!"</div>
+      <div class="modal-footer">
+        <button #done class="button-primary">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+
+    done.click(function() { (<any> modal).modal("hide") }); // FIXME
+
+    (<any> modal).modal({}); // FIXME
+  }
+
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -507,10 +529,7 @@ module Esper.ExecutivePreferences {
       <span>Yes</span>
     </label>
   </form>
-
-  <div #availabilityContainer class="customize-availability">
-  </div>
-  <a #availability href="#">Add availability</a>
+  <a #customizeAvailability href="#">Customize availability</a>
 
   <hr />
 
@@ -526,14 +545,16 @@ module Esper.ExecutivePreferences {
 
     possibleDurations.input.val(fromTime(defaults.duration));
 
-    availability.click(function () {
-      availabilityContainer.append(availabilityEntry());
-      return false;
-    });
+    // availability.click(function () {
+    //   availabilityContainer.append(availabilityEntry());
+    //   return false;
+    // });
 
-    defaults.availability.forEach(function (availability) {
-      addAvailability(_view, availability); // currying would make this prettier
-    });
+    // defaults.availability.forEach(function (availability) {
+    //   addAvailability(_view, availability); // currying would make this prettier
+    // });
+
+    customizeAvailability.click(function() { showAvailability(defaults); })
 
     return _view;
   }

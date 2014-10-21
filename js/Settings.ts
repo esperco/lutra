@@ -30,12 +30,12 @@ module Settings {
   <div style="float: left; width: 40%">
     <div><b>All calendars:</b></div>
     <div style="font-size: 75%">(double-click to add)</div>
-    <select #allCals multiple size=5 />
+    <select #allCals multiple="multiple" size=5 />
   </div>
   <div>
     <div><b>Team calendars:</b></div>
     <div style="font-size: 75%">(double-click to remove)</div>
-    <select #teamCals multiple size=5 />
+    <select #teamCals multiple="multiple" size=5 />
   </div>
   <br/>
   <div>
