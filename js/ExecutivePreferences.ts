@@ -140,6 +140,9 @@ module Esper.ExecutivePreferences {
             .append(locationForm(place));
         });
 
+        $(".preference-categories li.notes ul")
+          .append(miscForm(startingPreferences.notes));
+
         // Turn off saved flag if anything is modified:
         $(".preference-categories input, .preference-categories select")
           .change(function () {
@@ -190,6 +193,7 @@ module Esper.ExecutivePreferences {
     var preferences = Api.getPreferences(teamid);
 
     preferences.done(function (x) {
+      Log.p("PREFERENCES", x);
       // wtf goin on here?
       //var p = JSON.parse(x.responseText) || {};
 
@@ -327,9 +331,12 @@ module Esper.ExecutivePreferences {
       meetings[meal.toLowerCase()] = mealInfo(meal);
     });
 
+    var notes = $(".misc-preferences").find("textarea").val();
+
     return {
       workplaces    : locations,
-      meeting_types : meetings
+      meeting_types : meetings,
+      notes         : notes
     };
 
     function findDuration(element) {
@@ -391,9 +398,11 @@ module Esper.ExecutivePreferences {
       var res = [];
 
       $(".phone-widget div.phone-number").each(function (i, e) {
+        var share = $(e).find("input[type='checkbox']").is(":checked");
         res.push({
           phone_type   : $(e).find("select").val(),
-          phone_number : $(e).find("input").val()
+          phone_number : $(e).find("input[type='text']").val(),
+          share_with_guests : share
         });
       });
 
@@ -491,6 +500,10 @@ module Esper.ExecutivePreferences {
     </ul>
   </li>
   <li class="locations">
+    <ul class="preference-options">
+    </ul>
+  </li>
+  <li class="notes">
     <ul class="preference-options">
     </ul>
   </li>
@@ -631,6 +644,10 @@ module Esper.ExecutivePreferences {
         .attr("selected", "selected");
       element.find('input[type="text"]').val(phone.phone_number);
 
+      var checkbox = element.find('input[type="checkbox"]');
+      if (phone.share_with_guests) checkbox.prop("checked", true);
+      else checkbox.prop("checked", false);
+
       phoneNumbers.append(element);
     });
 
@@ -652,7 +669,8 @@ module Esper.ExecutivePreferences {
     <option value="Home">home</option>
     <option value="Other">other</option>
   </select>
-  <input type="text" class="phone-number" />
+  <input type="text" class="phone-number" size=12 />
+  <input type="checkbox" #share /> Share
 </div>
 '''
 
@@ -790,14 +808,14 @@ module Esper.ExecutivePreferences {
     return location.container;
   }
 
-  export function miscForm() {
+  export function miscForm(text) {
 '''
 <div class="misc-preferences" #container>
   <h1 #header>Misc</h1>
-  <textarea></textarea>
+  <textarea rows=5 #textBox></textarea>
 </div>
 '''
-
+    textBox.val(text);
     return container;
   }
 

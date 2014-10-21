@@ -20,13 +20,17 @@ JS_LIBS = \
   bootstrap \
   can \
   sha1 \
-  jquery-ui
+  jquery-ui \
+  moment \
+  fullCalendar
 
 DEV_LIBS = $(addsuffix .js, $(JS_LIBS))
 PROD_LIBS = $(addsuffix .min.js, $(JS_LIBS))
 
 TS_LIBS = \
-  jquery.d
+  fullCalendar.d
+
+# jquery.d
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
@@ -36,6 +40,7 @@ TS_SOURCES = \
   List \
   Log \
   Deferred \
+  Promise \
   Util \
   Mixpanel \
   GmailCompose \
@@ -50,6 +55,7 @@ TS_SOURCES = \
   Login \
   ApiT \
   Api \
+  CalPicker \
   Settings \
   Signin \
   ExecutivePreferences \

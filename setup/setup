@@ -64,7 +64,7 @@ install_js moment-timezone-data moment-timezone-data-2014-03-19.js
 rm -rf fullcalendar
 unzip fullcalendar-2.0.0-beta2.zip
 mv fullcalendar-2.0.0-beta2 fullcalendar
-install_js fullcalendar fullcalendar/fullcalendar/fullcalendar.js
+install_js fullCalendar fullcalendar/fullcalendar/fullcalendar.js
 # TODO: find out what this custom jquery-ui includes
 install_js jquery-ui fullcalendar/lib/jquery-ui.custom.min.js
 
