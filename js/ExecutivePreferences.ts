@@ -92,10 +92,28 @@ module Esper.ExecutivePreferences {
   }
 
   export function load() {
-    $("#preferences-page").append(saveButton());
+'''
+<div #view class="preferences-container">
+  <div class="header clearfix">
+    <a #logoContainer href="http://esper.com" target="_blank"
+       class="img-container-left"/>
+    <div class="header-title">Meeting Preferences</div>
+    <span #signOut class="header-signout clickable">Sign out</span>
+  </div>
+  <div class="divider"/>
+  <div #form class="preference-form"></div>
+</div>
+'''
+    var root = $("#preferences-page");
+    root.children().remove();
+    root.append(view);
+    document.title = "Meeting Preferences - Esper";
 
-    var container = $("<div class='preference-form'>");
-    $("#preferences-page").append(container);
+    var logo = $("<img class='svg-block header-logo'/>")
+      .appendTo(logoContainer);
+    Svg.loadImg(logo, "/assets/img/logo.svg");
+
+    form.append(saveButton());
 
     loadForm();
   }
@@ -681,8 +699,8 @@ module Esper.ExecutivePreferences {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
-    <option value="Google" selected="selected">google</option>
-    <option value="Skype">skype</option>
+    <option value="Google" selected="selected">Google Hangouts</option>
+    <option value="Skype">Skype</option>
   </select>
   <input #account type="text" class="video-account" />
 </div>
