@@ -382,9 +382,11 @@ module Esper.ExecutivePreferences {
       var res = [];
 
       $(".phone-widget div.phone-number").each(function (i, e) {
+        var share = $(e).find("input[type='checkbox']").is(":checked");
         res.push({
           phone_type   : $(e).find("select").val(),
-          phone_number : $(e).find("input").val()
+          phone_number : $(e).find("input[type='text']").val(),
+          share_with_guests : share
         });
       });
 
@@ -605,6 +607,10 @@ module Esper.ExecutivePreferences {
         .attr("selected", "selected");
       element.find('input[type="text"]').val(phone.phone_number);
 
+      var checkbox = element.find('input[type="checkbox"]');
+      if (phone.share_with_guests) checkbox.prop("checked", true);
+      else checkbox.prop("checked", false);
+
       phoneNumbers.append(element);
     });
 
@@ -626,7 +632,8 @@ module Esper.ExecutivePreferences {
     <option value="Home">home</option>
     <option value="Other">other</option>
   </select>
-  <input type="text" class="phone-number" />
+  <input type="text" class="phone-number" size=12 />
+  <input type="checkbox" #share /> Share
 </div>
 '''
 
