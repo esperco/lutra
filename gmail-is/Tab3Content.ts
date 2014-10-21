@@ -72,6 +72,8 @@ module Esper.Tab3Content {
   function displayPhoneNumbers(ul, phoneNumbers) {
     List.iter(phoneNumbers, function(p : ApiT.PhoneNumber) {
       var text = p.phone_type + ": " + p.phone_number;
+      if (p.share_with_guests) text += " (OK to share)";
+      else text += " (private)";
       $("<li>" + text + "</li>")
         .appendTo(ul);
     });
