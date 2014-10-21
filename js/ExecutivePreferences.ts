@@ -126,6 +126,9 @@ module Esper.ExecutivePreferences {
             .append(locationForm(place));
         });
 
+        $(".preference-categories li.notes ul")
+          .append(miscForm(startingPreferences.notes));
+
         // Turn off saved flag if anything is modified:
         $(".preference-categories input, .preference-categories select")
           .change(function () {
@@ -312,9 +315,12 @@ module Esper.ExecutivePreferences {
       meetings[meal.toLowerCase()] = mealInfo(meal);
     });
 
+    var notes = $(".misc-preferences").find("textarea").val();
+
     return {
       workplaces    : locations,
-      meeting_types : meetings
+      meeting_types : meetings,
+      notes         : notes
     };
 
     function findDuration(element) {
@@ -476,6 +482,10 @@ module Esper.ExecutivePreferences {
     </ul>
   </li>
   <li class="locations">
+    <ul class="preference-options">
+    </ul>
+  </li>
+  <li class="notes">
     <ul class="preference-options">
     </ul>
   </li>
@@ -754,14 +764,14 @@ module Esper.ExecutivePreferences {
     return location.container;
   }
 
-  export function miscForm() {
+  export function miscForm(text) {
 '''
 <div class="misc-preferences" #container>
   <h1 #header>Misc</h1>
-  <textarea></textarea>
+  <textarea #textBox></textarea>
 </div>
 '''
-
+    textBox.val(text);
     return container;
   }
 
