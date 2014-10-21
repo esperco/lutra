@@ -200,6 +200,7 @@ module Esper.ApiT {
   export interface PhoneNumber {
     phone_type: string;
     phone_number: string;
+    share_with_guests?: boolean;
   }
 
   export interface VideoInfo {
