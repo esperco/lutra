@@ -208,6 +208,11 @@ module Esper.Tab3Content {
         <option value="header">Select meeting type...</option>
       </select>
       <div #meetInfo/>
+    </div>
+    <hr/>
+    <div>
+      Notes: <pre #notes/>
+    </div>
   </div>
 </div>
 '''
@@ -219,6 +224,8 @@ module Esper.Tab3Content {
 
       var meetingTypes = prefs.meeting_types;
       populateMeetingsDropdown(meetDrop, meetInfo, meetingTypes);
+
+      notes.text(prefs.notes);
     });
 
     tab3.append(view);
