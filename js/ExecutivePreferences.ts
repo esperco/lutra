@@ -92,10 +92,28 @@ module Esper.ExecutivePreferences {
   }
 
   export function load() {
-    $("#preferences-page").append(saveButton());
+'''
+<div #view class="preferences-container">
+  <div class="header clearfix">
+    <a #logoContainer href="http://esper.com" target="_blank"
+       class="img-container-left"/>
+    <div class="header-title">Meeting Preferences</div>
+    <span #signOut class="header-signout clickable">Sign out</span>
+  </div>
+  <div class="divider"/>
+  <div #form class="preference-form"></div>
+</div>
+'''
+    var root = $("#preferences-page");
+    root.children().remove();
+    root.append(view);
+    document.title = "Meeting Preferences - Esper";
 
-    var container = $("<div class='preference-form'>");
-    $("#preferences-page").append(container);
+    var logo = $("<img class='svg-block header-logo'/>")
+      .appendTo(logoContainer);
+    Svg.loadImg(logo, "/assets/img/logo.svg");
+
+    form.append(saveButton());
 
     loadForm();
   }
@@ -265,7 +283,7 @@ module Esper.ExecutivePreferences {
       var preferences = currentPreferences();
 
       Api.setPreferences(teamid, preferences);
-      
+
       saved = true;
     } catch (e) {
       //Status.reportError("Didn't save:", e);
@@ -495,6 +513,28 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
+  function showAvailability(defaults) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog team-settings">
+    <div class="modal-content">
+      <div class="modal-header">Customize Availability</div>
+      <div>"Hello, world!"</div>
+      <div class="modal-footer">
+        <button #done class="button-primary">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+
+    done.click(function() { (<any> modal).modal("hide") }); // FIXME
+
+    (<any> modal).modal({}); // FIXME
+  }
+
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -520,10 +560,7 @@ module Esper.ExecutivePreferences {
       <span>Yes</span>
     </label>
   </form>
-
-  <div #availabilityContainer class="customize-availability">
-  </div>
-  <a #availability href="#">Add availability</a>
+  <a #customizeAvailability href="#">Customize availability</a>
 
   <hr />
 
@@ -539,14 +576,16 @@ module Esper.ExecutivePreferences {
 
     possibleDurations.input.val(fromTime(defaults.duration));
 
-    availability.click(function () {
-      availabilityContainer.append(availabilityEntry());
-      return false;
-    });
+    // availability.click(function () {
+    //   availabilityContainer.append(availabilityEntry());
+    //   return false;
+    // });
 
-    defaults.availability.forEach(function (availability) {
-      addAvailability(_view, availability); // currying would make this prettier
-    });
+    // defaults.availability.forEach(function (availability) {
+    //   addAvailability(_view, availability); // currying would make this prettier
+    // });
+
+    customizeAvailability.click(function() { showAvailability(defaults); })
 
     return _view;
   }
@@ -678,8 +717,8 @@ module Esper.ExecutivePreferences {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
-    <option value="Google" selected="selected">google</option>
-    <option value="Skype">skype</option>
+    <option value="Google" selected="selected">Google Hangouts</option>
+    <option value="Skype">Skype</option>
   </select>
   <input #account type="text" class="video-account" />
 </div>
