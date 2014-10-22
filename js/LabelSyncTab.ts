@@ -97,7 +97,7 @@ module LabelSyncTab {
   export function load(team) {
 '''
 <div #view>
-  <div class="exec-profile clearfix">
+  <div class="esper-tab-description clearfix">
     <div #labelSyncContainer />
     <div #description class="label-sync-description"/>
   </div>

@@ -26,7 +26,7 @@ module TeamSettings {
   function showTeamSettings(team) {
 '''
 <div #view>
-  <div style="padding-left:20px">
+  <div style="padding-left:28px">
     <ul class="esper-tab-links">
       <li class="active"><a #tab1 id="tab1" class="link first">Account</a></li>
       <li><a #tab2 id="tab2" class="link">Preferences</a></li>
