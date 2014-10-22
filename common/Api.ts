@@ -282,7 +282,7 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 
-  export function getTaskForThread(teamid, threadid):
+  export function obtainTaskForThread(teamid, threadid):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task/" + Login.myUid()
@@ -292,7 +292,7 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getOptTaskForThread(teamid, threadid):
+  export function getTaskForThread(teamid, threadid):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-opt/" + Login.myUid()
