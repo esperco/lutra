@@ -273,7 +273,7 @@ module Api {
   };
 
   /*** Executive Preferences ***/
-  
+
   /** Sets the preferences given the correct JSON object. */
   export function setPreferences(teamid, preferences)
     : JQueryDeferred<void>

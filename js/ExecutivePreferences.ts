@@ -514,25 +514,8 @@ module Esper.ExecutivePreferences {
   }
 
   function showAvailability(defaults) {
-'''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog team-settings">
-    <div class="modal-content">
-      <div class="modal-header">Customize Availability</div>
-      <div>"Hello, world!"</div>
-      <div class="modal-footer">
-        <button #done class="button-primary">Done</button>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-
-    done.click(function() { (<any> modal).modal("hide") }); // FIXME
-
-    (<any> modal).modal({}); // FIXME
+    Log.p(defaults);
+    CalPicker.createModal(defaults);
   }
 
   /** The basic form widget which has a prominent on/off toggle and a
