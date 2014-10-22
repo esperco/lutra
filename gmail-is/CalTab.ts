@@ -814,7 +814,7 @@ module Esper.CalTab {
         toggleList(recentEventsContainer);
         showRecentEvents.text("Hide");
       }
-    })
+    });
 
     showLinkedEvents.click(function() {
       toggleList(linkedEventsContainer);
@@ -822,7 +822,7 @@ module Esper.CalTab {
         $(this).text("Show");
       else
         $(this).text("Hide");
-    })
+    });
 
     showRecentEvents.click(function() {
       toggleList(recentEventsContainer);
@@ -830,7 +830,7 @@ module Esper.CalTab {
         $(this).text("Show");
       else
         $(this).text("Hide");
-    })
+    });
 
     createEventToggle.click(function() {
       if (createEventToggle.hasClass("open")) {
