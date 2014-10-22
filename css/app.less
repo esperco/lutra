@@ -400,15 +400,29 @@ input.disabled {
 .header {
   padding: 16px 0;
   border-bottom: 1px solid @gray_20;
+  .arrow-east { margin: 10px 14px; }
 }
 .header-logo {
   width: 24px;
   height: 30px;
 }
 .header-title {
-  display: inline-block;
+  float: left;
   margin: 2px 0 0 24px;
   font-size: 20px;
+}
+a.header-title:hover { text-decoration: underline; }
+.header-exec {
+  float: left;
+  .profile-pic {
+    width: 30px;
+    height: 30px;
+  }
+  .profile-name {
+    margin-top: 2px;
+    margin-left: 8px;
+    font-size: 20px;
+  }
 }
 .header-signout {
   float: right;
@@ -489,6 +503,7 @@ input.disabled {
   width: 50px;
   height: 50px;
   background: @gray_10;
+  background-size: 100% 100%;
   border-radius: 100%;
 }
 .profile-name, .profile-email { margin-left: 64px; }
@@ -546,7 +561,7 @@ input.disabled {
     list-style: none;
   }
   a {
-    width: 148px;
+    width: 100px;
     height: 34px;
     display: inline-block;
     margin: 0 0 -1px -1px;
@@ -590,6 +605,9 @@ input.disabled {
   .tab { display:none; }
   .tab.active { display:block; }
 }
+.esper-tab-description {
+  margin-bottom: 20px;
+}
 
 .exec-profile-name {
   float: left;
@@ -612,7 +630,6 @@ input.disabled {
 }
 
 .table-header {
-  margin-top: 20px;
   padding: 8px 11px;
   color: white;
   font-size: 14px;
@@ -630,7 +647,7 @@ input.disabled {
   text-align: center;
 }
 .table-row {
-  border-bottom: 1px solid @gray_10;
+  border-top: 1px solid @gray_10;
   &.assistants-table { padding: 12px 6px; }
   &.labels-table { padding: 14px 6px; }
 }
@@ -640,6 +657,7 @@ input.disabled {
   padding: 0;
   background: white;
   border: 1px solid @gray_10;
+  border-top: none;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow-y: auto;
