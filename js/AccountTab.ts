@@ -164,7 +164,7 @@ module AccountTab {
   }
 
   export function load(team) {
-
+'''
 <div #view>
   <div class="table-header">Membership & Billing</div>
   <div #payments class="table-list">
@@ -204,7 +204,7 @@ module AccountTab {
   </ul>
   <div #invitationRow/>
 </div>
-
+'''
     spinner.show();
 
     Deferred.join(List.map(team.team_assistants, function(uid) {
