@@ -126,19 +126,20 @@ module CalPicker {
     return hour + ":" + minute + ":00";
   }
 
-  function availableEvents(availabilities) {
-    var i = 0;
+  function availableEvents(picker, availabilities) {
     return List.map(availabilities, function(a) {
-      i++;
+      var eventId = Util.randomString();
       var fromDay = ymdOfDay(a.avail_from.day);
       var toDay = ymdOfDay(a.avail_to.day);
       var fromTime = hmsOfTime(a.avail_from.time);
       var toTime = hmsOfTime(a.avail_to.time);
-      return {
-        id: "available-" + i,
-        start: fromDay + "T" + fromTime,
-        end: toDay + "T" + toTime
+      var eventData = {
+        id: eventId,
+        start: moment(fromDay + "T" + fromTime),
+        end: moment(toDay + "T" + toTime)
       };
+      picker.events[eventId] = eventData;
+      return eventData;
     });
   }
 
@@ -189,7 +190,7 @@ module CalPicker {
       eventResize: eventResize,
       editable: true,
       events: {
-        events: availableEvents(availabilities),
+        events: availableEvents(picker, availabilities),
         color: "#A25CC6"
       }
     });
@@ -311,7 +312,7 @@ module CalPicker {
     }];
   }
 
-  export function createModal(defaults) : void {
+  export function createModal(defaults, element) : void {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -338,7 +339,10 @@ module CalPicker {
       var events = [];
       for (var k in picker.events)
         events = events.concat(makeAvailability(picker.events[k]));
-      Log.p(events);
+
+      element.data("availabilities", events); // ughgh pass data through DOM
+      defaults.availability = events;
+
       (<any> modal).modal("hide"); // FIXME
     });
   }
