@@ -5,7 +5,8 @@
 
 module Esper.CalPicker {
 
-  export var teamCalendar : ApiT.Calendar;
+  export var writeToCalendar : ApiT.Calendar;
+  export var showCalendars : { [calid : string] : any } = {};
 
   interface PickerView {
     view : JQuery;
@@ -13,6 +14,7 @@ module Esper.CalPicker {
     calendarSidebar : JQuery;
     dateJumper : JQuery;
     pickerSwitcher : JQuery;
+    showCalCheckboxes : JQuery;
     refreshCal : JQuery;
     refreshCalIcon : JQuery;
     eventTitle : JQuery;
@@ -27,8 +29,9 @@ module Esper.CalPicker {
     <div #calendarSidebar class="esper-cal-sidebar">
       <div #dateJumper class="esper-date-jumper" style="display: none"/>
       <div class="esper-cal-picker-switcher">
-        Calendar: <select #pickerSwitcher/>
+        Write to calendar: <select #pickerSwitcher/>
       </div>
+      <div #showCalCheckboxes>Show calendars: </div>
       <div>
         <span style="float: left">Refresh calendar:</span>
         <div #refreshCal class="esper-refresh esper-clickable">
@@ -49,7 +52,19 @@ module Esper.CalPicker {
 </div>
 '''
     var calendars = Sidebar.currentTeam.team_calendars;
-    teamCalendar = calendars[0];
+    writeToCalendar = calendars[0];
+    showCalendars[writeToCalendar.google_cal_id] = {};
+    List.iter(calendars, function(cal, i) {
+      var box = $("<input type='checkbox'>");
+      if (i === 0) box.prop("checked", true);
+      box.click(function() {
+        if (this.checked) showCalendars[cal.google_cal_id] = {};
+        else delete showCalendars[cal.google_cal_id];
+        calendarView.fullCalendar("refetchEvents");
+      });
+      box.appendTo(showCalCheckboxes);
+      $("<span>" + cal.calendar_title + "</span>").insertAfter(box);
+    });
 
     eventTitle.val("HOLD: " + esperGmail.get.email_subject());
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -64,7 +79,7 @@ module Esper.CalPicker {
     }
     pickerSwitcher.change(function() {
       var i = $(this).val();
-      teamCalendar = calendars[i];
+      writeToCalendar = calendars[i];
       calendarView.fullCalendar("refetchEvents");
     });
 
@@ -133,13 +148,16 @@ module Esper.CalPicker {
 
   function fetchEvents(momentStart, momentEnd, tz, callback) {
     // TODO Display tz?
+    Log.d(showCalendars);
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
-    var cache = CalCache.getCache(
-      Sidebar.currentTeam.teamid,
-      teamCalendar.google_cal_id
-    );
-    cache.fetch(start, end).done(function(esperEvents) {
+    var cacheFetches =
+      List.map(Object.keys(showCalendars), function(calid) {
+        var cache = CalCache.getCache(Sidebar.currentTeam.teamid, calid);
+        return cache.fetch(start, end);
+      });
+    Promise.join(cacheFetches).done(function(ll) {
+      var esperEvents = List.concat(ll);
       var fullcalEvents = importEvents(esperEvents);
       callback(fullcalEvents);
     });
@@ -260,9 +278,9 @@ module Esper.CalPicker {
 
   function calendarTimeOfMoment(localMoment) : ApiT.CalendarTime {
     var localTime = localMoment.toISOString();
-    var timeZone = teamCalendar.calendar_timezone;
+    var timeZone = writeToCalendar.calendar_timezone;
     if (timeZone === undefined) timeZone = "UTC"; // or use client tz?
-    var utcMoment = utcOfLocal(teamCalendar.calendar_timezone, localMoment);
+    var utcMoment = utcOfLocal(writeToCalendar.calendar_timezone, localMoment);
     var utcTime = utcMoment.toISOString();
     return { utc: utcTime, local: localTime };
   }
@@ -271,7 +289,7 @@ module Esper.CalPicker {
     : ApiT.CalendarEventEdit
   {
     return {
-      google_cal_id: teamCalendar.google_cal_id,
+      google_cal_id: writeToCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
       title: eventTitle.val(),
