@@ -26,26 +26,22 @@ module PreferencesTab {
   export function load(team) {
 '''
 <div #view>
-  <div class="exec-profile clearfix">
-    <div #labelSyncContainer />
-    <div #description class="label-sync-description"/>
-  </div>
   <div class="table-header">Calls</div>
-  <ul #labels class="table-list">
-    <div #tableSpinner class="spinner table-spinner"/>
-    <div #tableEmpty
+  <ul #callsPreferences class="table-list">
+    <div #callsTableSpinner class="spinner table-spinner"/>
+    <div #callsTableEmpty
          class="table-empty">There are no shared labels across this team.</div>
   </ul>
   <div class="table-header">Food & Drinks</div>
-  <ul #labels class="table-list">
-    <div #tableSpinner class="spinner table-spinner"/>
-    <div #tableEmpty
+  <ul #foodPreferences class="table-list">
+    <div #foodTableSpinner class="spinner table-spinner"/>
+    <div #foodTableEmpty
          class="table-empty">There are no shared labels across this team.</div>
   </ul>
   <div class="table-header">Other</div>
-  <ul #labels class="table-list">
-    <div #tableSpinner class="spinner table-spinner"/>
-    <div #tableEmpty
+  <ul #otherPreferences class="table-list">
+    <div #otherTableSpinner class="spinner table-spinner"/>
+    <div #otherTableEmpty
          class="table-empty">There are no shared labels across this team.</div>
   </ul>
   </div>
