@@ -23,31 +23,79 @@ module PreferencesTab {
       dismissOverlays();
   });
 
-  export function load(team) {
+  function toggleSwitch(toggleBg, toggleSwitch) {
+    if (toggleBg.hasClass("on")) {
+      toggleBg.removeClass("on");
+      toggleBg.addClass("off");
+      toggleSwitch.removeClass("on");
+      toggleSwitch.addClass("off");
+    } else {
+      toggleBg.addClass("on");
+      toggleBg.removeClass("off");
+      toggleSwitch.addClass("on");
+      toggleSwitch.removeClass("off");
+    }
+  }
+
+  function viewOfFoodAndDrinksPreferences(teamid) {
 '''
-<div #view>
-  <div class="table-header">Calls</div>
-  <ul #callsPreferences class="table-list">
-    <div #callsTableSpinner class="spinner table-spinner"/>
-    <div #callsTableEmpty
-         class="table-empty">There are no shared labels across this team.</div>
-  </ul>
-  <div class="table-header">Food & Drinks</div>
-  <ul #foodPreferences class="table-list">
-    <div #foodTableSpinner class="spinner table-spinner"/>
-    <div #foodTableEmpty
-         class="table-empty">There are no shared labels across this team.</div>
-  </ul>
-  <div class="table-header">Other</div>
-  <ul #otherPreferences class="table-list">
-    <div #otherTableSpinner class="spinner table-spinner"/>
-    <div #otherTableEmpty
-         class="table-empty">There are no shared labels across this team.</div>
-  </ul>
-  </div>
+<ul #view class="table-list">
+  <li #breakfast class="preference left">
+  </li>
+  <li #brunch class="preference">
+  </li>
+  <li #lunch class="preference left">
+  </li>
+  <li #coffee class="preference">
+  </li>
+  <li #dinner class="preference left">
+  </li>
+  <li #drinks class="preference">
+  </li>
+</div>
+'''
+    return view;
+  }
+
+  function viewOfCallsPreferences(teamid) {
+'''
+<ul #view class="table-list">
+  <li #phone class="preference left">
+    <div #phoneToggle>
+      <div #phoneToggleBg class="preference-toggle-bg on"/>
+      <div #phoneToggleSwitch class="preference-toggle-switch on"/>
+    </div>
+  </li>
+  <li #video class="preference">
+    <div #videoToggle>
+      <div #videoToggleBg class="preference-toggle-bg on"/>
+      <div #videoToggleSwitch class="preference-toggle-switch on"/>
+    </div>
+  </li>
 </div>
 '''
 
+
+    phoneToggle.click(function() { toggleSwitch(phoneToggleBg, phoneToggleSwitch) });
+    videoToggle.click(function() { toggleSwitch(videoToggleBg, videoToggleSwitch) });
+
+    return view;
+  }
+
+  export function load(team) {
+'''
+<div #view>
+  <div #calls>
+    <div class="table-header">Calls</div>
+  </div>
+  <div #foodAndDrinks>
+    <div class="table-header">Food & Drinks</div>
+  </div>
+  </div>
+</div>
+'''
+    calls.append(viewOfCallsPreferences(team.teamid));
+    foodAndDrinks.append(viewOfFoodAndDrinksPreferences(team.teamid));
     return view;
   }
 

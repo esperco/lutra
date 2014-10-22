@@ -651,7 +651,6 @@ a.header-title:hover { text-decoration: underline; }
   &.assistants-table { padding: 12px 6px; }
   &.labels-table { padding: 14px 6px; }
 }
-
 .table-list {
   margin-bottom: 20px;
   padding: 0;
@@ -662,6 +661,7 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom-left-radius: 3px;
   overflow-y: auto;
 }
+
 .assistant-row-status { padding: 10px 12px; }
 .assistant-row-actions {
   padding-top: 9px;
@@ -683,6 +683,49 @@ a.header-title:hover { text-decoration: underline; }
           background-clip: padding-box;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+}
+
+.preference {
+  float: left;
+  width: 50%;
+  height: 200px;
+  padding: 20px;
+  border-top: 1px solid @gray_10;
+  &.left { border-right: 1px solid @gray_10; }
+}
+.preference-toggle-bg {
+  position: absolute;
+  width: 16px;
+  height: 34px;
+  margin: 1px;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+          box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
+  &.on { background: @green; }
+  &.off { background: @red; }
+}
+.preference-toggle-switch {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: @gray_f8;
+  cursor: pointer;
+  -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.50);
+          box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.50);
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
+  &.on { margin-top: 0; }
+  &.off { margin-top: 18px; }
 }
 
 .label-sync-description {

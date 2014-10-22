@@ -457,6 +457,13 @@ module Esper.ExecutivePreferences {
   </span>
 </div>
 '''
+    Login.getTeams().forEach(function (team) {
+      var name   = team.team_name;
+      var teamid = team.teamid;
+      var option = $('<option value="' + teamid + '">').text(name);
+
+      teamSelect.append(option);
+    });
 
     save.click(function () {
       var teamid = teamSelect.val();
