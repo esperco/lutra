@@ -81,27 +81,18 @@ module TeamSettings {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
+    <span #signOut class="header-signout clickable">Sign out</span>
     <a #logoContainer href="#"
        class="img-container-left"/>
-    <div class="header-title">Settings</div>
-    <span #signOut class="header-signout clickable">Sign out</span>
-  </div>
-  <div class="divider"/>
-  <div #main class="clearfix">
-    <div class="exec-profile clearfix">
+    <a href="#" class="header-title">Settings</a>
+    <span #arrowContainer class="img-container-left"/>
+    <div class="header-exec">
       <div #profilePic class="profile-pic"/>
-      <div style="height: 27px">
-        <span #execName class="profile-name exec-profile-name"/>
-        <span class="exec-label">EXECUTIVE</span>
-        <span #execStatusContainer
-         class="exec-status"
-         data-toggle="tooltip"
-         data-placement="right"
-         title="Reauthorization required."/>
-      </div>
-      <div #execEmail class="profile-email gray"/>
+      <span #execName class="profile-name exec-profile-name"/>
     </div>
   </div>
+  <div class="divider"/>
+  <div #main class="clearfix"/>
   <div #footer/>
 </div>
 '''
@@ -112,6 +103,10 @@ module TeamSettings {
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
     Svg.loadImg(logo, "/assets/img/logo.svg");
+
+    var arrowEast = $("<img class='svg-block arrow-east'/>")
+      .appendTo(arrowContainer);
+    Svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
 
     // Temporary to display a default team
     var selectedTeam;
@@ -124,7 +119,6 @@ module TeamSettings {
         document.title = exec.display_name + " - Team Settings";
         profilePic.css("background-image", "url('" + exec.image_url + "')");
         execName.text(exec.display_name);
-        execEmail.text(exec.email);
       });
 
     main.append(showTeamSettings(selectedTeam));
