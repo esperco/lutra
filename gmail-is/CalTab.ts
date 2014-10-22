@@ -327,11 +327,12 @@ module Esper.CalTab {
       else apiCall = Api.unsyncEvent;
       syncCheckbox.hide();
       spinner.show();
-      apiCall(team.teamid, threadId, e.google_event_id).done(function() {
-        spinner.hide();
-        syncCheckbox.show();
-        refreshLinkedList(team.teamid, threadId, calTab, profiles);
-      });
+      apiCall(team.teamid, threadId, e.google_cal_id, e.google_event_id)
+        .done(function() {
+          spinner.hide();
+          syncCheckbox.show();
+          refreshLinkedList(team.teamid, threadId, calTab, profiles);
+        });
     });
 
     var currentSynced = false;
