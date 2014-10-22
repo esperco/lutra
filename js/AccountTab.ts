@@ -167,7 +167,35 @@ module AccountTab {
 '''
 <div #view>
   <div class="table-header">Membership & Billing</div>
-  <div #payments class="table-list"></div>
+  <div #payments class="table-list">
+    <form action="" method="POST" id="payment-form">
+      <span class="payment-errors"></span>
+
+        <div class="form-row">
+          <label><span>Card Number</span>
+            <input type="text" size="20" data-stripe="number" id="form-element-right"/>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label><span>CVC</span>
+            <input type="text" size="4" data-stripe="cvc" id="form-element-right"/>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label><span>Expiration (MM/YYYY)</span>
+          </label>
+          <div id="form-element-right">
+            <input type="text" size="2" data-stripe="exp-month"/>
+          <span> / </span>
+          <input type="text" size="4" data-stripe="exp-year"/>
+        </div>
+      </div>
+        <button type="submit">Submit Payment</button>
+    </form>
+
+  </div>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
     <div #spinner class="spinner table-spinner"/>
