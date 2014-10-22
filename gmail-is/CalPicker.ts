@@ -5,8 +5,16 @@
 
 module Esper.CalPicker {
 
+  // The calendar that the created events go on
   export var writeToCalendar : ApiT.Calendar;
-  export var showCalendars : { [calid : string] : any } = {};
+
+  // The team calendars whose events are currently displayed
+  var showCalendars : { [calid : string] : any } = {};
+
+  /* This should be a parameter to fetchEvents, but fullCalendar calls
+     that function for us, and I can only trigger it by doing
+     x.fullCalendar("refetchEvents"), which takes no other parameters. */
+  var refreshCache = false;
 
   interface PickerView {
     view : JQuery;
@@ -69,6 +77,7 @@ module Esper.CalPicker {
     eventTitle.val("HOLD: " + esperGmail.get.email_subject());
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshCal.click(function() {
+      refreshCache = true;
       calendarView.fullCalendar("refetchEvents");
     });
 
@@ -148,17 +157,23 @@ module Esper.CalPicker {
 
   function fetchEvents(momentStart, momentEnd, tz, callback) {
     // TODO Display tz?
-    Log.d(showCalendars);
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
     var cacheFetches =
       List.map(Object.keys(showCalendars), function(calid) {
         var cache = CalCache.getCache(Sidebar.currentTeam.teamid, calid);
-        return cache.fetch(start, end);
+        if (refreshCache) {
+          return cache.fetch(start, end);
+        } else {
+          var cached = cache.get(start, end);
+          if (cached === null) return cache.fetch(start, end);
+          else return Promise.defer(cached);
+        }
       });
     Promise.join(cacheFetches).done(function(ll) {
       var esperEvents = List.concat(ll);
       var fullcalEvents = importEvents(esperEvents);
+      refreshCache = false;
       callback(fullcalEvents);
     });
   }
