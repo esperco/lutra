@@ -99,7 +99,7 @@ module Esper.CalSearch {
                                  eventList,
                                  team,
                                  searchView: SearchView,
-                                 eventsTab: CalTab.EventsTab,
+                                 eventsTab: CalTab.CalTabView,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
@@ -138,7 +138,7 @@ module Esper.CalSearch {
 
   function setupSearch(events, team,
                        searchView: SearchView,
-                       eventsTab: CalTab.EventsTab,
+                       eventsTab: CalTab.CalTabView,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
@@ -182,7 +182,7 @@ module Esper.CalSearch {
   }
 
   export function openSearchModal(team, threadId,
-                                  eventsTab: CalTab.EventsTab,
+                                  eventsTab: CalTab.CalTabView,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>

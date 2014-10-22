@@ -326,8 +326,8 @@ module Esper.CalPicker {
 
       closeModal();
       if (events.length > 0) {
-        CalTab.currentEventsTab.linkedList.children().remove();
-        CalTab.currentEventsTab.linkedSpinner.show();
+        CalTab.currentCalTab.linkedList.children().remove();
+        CalTab.currentCalTab.linkedSpinner.show();
       }
       Promise.join(linkCalls).done(function(linkedEvents) {
         if (events.length > 0) CalTab.refreshLinkedEvents();
