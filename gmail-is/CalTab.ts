@@ -649,8 +649,12 @@ module Esper.CalTab {
             Sidebar.dismissDropdowns();
           });
       });
+      var changeNameLabel =
+        currentTask !== undefined ?
+          "Change task name to:"
+        : "Create task named:";
       var changeName =
-        $("<li class='esper-li'><i>Change task name to:</i> "
+        $("<li class='esper-li'><i>" + changeNameLabel + "</i> "
           + query + "</li>");
       changeName
         .appendTo(dropdown)
