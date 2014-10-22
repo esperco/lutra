@@ -87,8 +87,8 @@ module Esper.ApiT {
     address: string;
     public_notes?: string;
     private_notes?: string;
-    coord: Latlon; // optional
-    timezone: string; // required if coordinates are missing
+    coord?: Latlon; // optional
+    timezone?: string; // required if coordinates are missing
   }
 
   export interface CalendarEvent {

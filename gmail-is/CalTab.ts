@@ -100,6 +100,7 @@ module Esper.CalTab {
   <div class="esper-section-container">
     <p>Title: <input #pubTitle/></p>
     <p>Calendar: <select #pubCalendar/></p>
+    <p>Location: <input #pubLocation/></p>
     <p>Description: <textarea #pubDescription rows=5 cols=28 /></p>
     <p>From: <select #fromSelect/></p>
     <p>Guests:</p>
@@ -113,6 +114,12 @@ module Esper.CalTab {
     pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
     if (undefined !== e.description) {
       pubDescription.val(e.description);
+    }
+    if (undefined !== e.location) {
+      var loc = e.location.address;
+      if (e.location.title !== "")
+        loc = e.location.title + " - " + loc;
+      pubLocation.val(loc);
     }
 
     var firstTeamCal = team.team_calendars[0];
@@ -163,13 +170,21 @@ module Esper.CalTab {
       for (var email in peopleInvolved) {
         guests.push({email: email, display_name: peopleInvolved[email]});
       }
+      var loc = {
+        /* Right now we don't care about title because this is just text
+           to be displayed in the Google Calendar location box... but in
+           the future we may use it for typeahead or something. */
+        title: "",
+        address: pubLocation.val()
+      };
+      if (loc.address === "") loc = null;
       var ev = {
         google_cal_id: publicCalId,
         start:         e.start,
         end:           e.end,
         title:         pubTitle.val(),
         description:   pubDescription.val(),
-        location:      e.location,
+        location:      loc,
         all_day:       e.all_day,
         guests:        guests,
       };
