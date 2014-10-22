@@ -8,7 +8,7 @@ module Esper.Gmail {
     Find a good insertion point for the menu icon in the top navigation bar.
   */
   export function findMenuAnchor() {
-    var anchor = $('[style*=min-width\\:\\ 195px]');
+    var anchor = $("#gbwa");
     if (anchor.length !== 1) {
       Log.i("Cannot find anchor point for the Esper menu just yet.");
       return $();
