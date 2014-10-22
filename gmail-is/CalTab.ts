@@ -665,8 +665,12 @@ module Esper.CalTab {
             Sidebar.dismissDropdowns();
           });
       });
+      var changeNameLabel =
+        currentTask !== undefined ?
+          "Change task name to:"
+        : "Create task named:";
       var changeName =
-        $("<li class='esper-li'><i>Change task name to:</i> "
+        $("<li class='esper-li'><i>" + changeNameLabel + "</i> "
           + query + "</li>");
       changeName
         .appendTo(dropdown)
@@ -826,7 +830,7 @@ module Esper.CalTab {
         toggleList(recentEventsContainer);
         showRecentEvents.text("Hide");
       }
-    })
+    });
 
     showLinkedEvents.click(function() {
       toggleList(linkedEventsContainer);
@@ -834,7 +838,7 @@ module Esper.CalTab {
         $(this).text("Show");
       else
         $(this).text("Hide");
-    })
+    });
 
     showRecentEvents.click(function() {
       toggleList(recentEventsContainer);
@@ -842,7 +846,7 @@ module Esper.CalTab {
         $(this).text("Show");
       else
         $(this).text("Hide");
-    })
+    });
 
     createEventToggle.click(function() {
       if (createEventToggle.hasClass("open")) {

@@ -106,23 +106,36 @@ module Esper.Util {
       f();
   }
 
+  /*
+    Execute a callback after a click, focus or keydown event,
+    a certain delay after the last of those events.
+
+    In other words, wait until the user is done typing for running the
+    given function.
+  */
   export function afterTyping(elt: JQuery, delayMs: number, func) {
     var lastPressed = Date.now(); // date in milliseconds
+    function callback() {
+      var t1 = lastPressed;
+      var t2 = Date.now();
+      if (lastPressed >= t2)
+        lastPressed = lastPressed + 1;
+      else
+        lastPressed = t2;
+      var lastPressed0 = lastPressed;
+      window.setTimeout(function() {
+        if (lastPressed0 === lastPressed)
+          func();
+      }, delayMs);
+    }
+
     elt
+      .unbind("click")
+      .click(callback)
+      .unbind("focus")
+      .focus(callback)
       .unbind("keydown")
-      .keydown(function() {
-        var t1 = lastPressed;
-        var t2 = Date.now();
-        if (lastPressed >= t2)
-          lastPressed = lastPressed + 1;
-        else
-          lastPressed = t2;
-        var lastPressed0 = lastPressed;
-        window.setTimeout(function() {
-          if (lastPressed0 === lastPressed)
-            func();
-        }, delayMs);
-      });
+      .keydown(callback);
   }
 
   export function randomString() {
