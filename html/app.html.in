@@ -46,6 +46,9 @@
     <!-- Settings page -->
     <div id="settings-page" class="hide"></div>
 
+    <!-- Team Settings page -->
+    <div id="team-settings-page" class="hide"></div>
+
     <!-- Executive preferences: a form for meeting time, place and format preferences. -->
     <div id="preferences-page" class="hide"></div>
 

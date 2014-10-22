@@ -97,7 +97,10 @@ module Esper.ExecutivePreferences {
   <div class="header clearfix">
     <a #logoContainer href="http://esper.com" target="_blank"
        class="img-container-left"/>
-    <div class="header-title">Meeting Preferences</div>
+    <div class="header-title">
+      <span>Meeting Preferences of</span>
+      <span #selector/>
+    </div>
     <span #signOut class="header-signout clickable">Sign out</span>
   </div>
   <div class="divider"/>
@@ -113,7 +116,7 @@ module Esper.ExecutivePreferences {
       .appendTo(logoContainer);
     Svg.loadImg(logo, "/assets/img/logo.svg");
 
-    form.append(saveButton());
+    selector.append(saveButton());
 
     loadForm();
   }
@@ -454,13 +457,6 @@ module Esper.ExecutivePreferences {
   </span>
 </div>
 '''
-    Login.getTeams().forEach(function (team) {
-      var name   = team.team_name;
-      var teamid = team.teamid;
-      var option = $('<option value="' + teamid + '">').text(name);
-
-      teamSelect.append(option);
-    });
 
     save.click(function () {
       var teamid = teamSelect.val();

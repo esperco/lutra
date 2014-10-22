@@ -58,6 +58,12 @@ TS_SOURCES = \
   CalPicker \
   Settings \
   Signin \
+  Footer \
+  TeamSettings \
+  AccountTab \
+  PreferencesTab \
+  CalendarsTab \
+  LabelSyncTab \
   ExecutivePreferences \
   Page \
   Route \

@@ -32,6 +32,10 @@ module Route {
 
     /* various pages */
 
+    "team-settings route" : function (data) {
+      withLogin(Page.teamSettings.load, undefined, undefined);
+    },
+
     "preferences route" : function (data) {
       withLogin(Page.preferences.load, undefined, undefined);
     },

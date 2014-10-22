@@ -561,14 +561,12 @@ input.disabled {
     transition: all linear 0.15s;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    .esper-tab-icon { opacity: 0.4; }
     &.first { border-top-left-radius: 3px; }
     &.last { border-top-right-radius: 3px; }
-    &:hover .esper-tab-icon { opacity: 0.6; }
+    &:hover { text-decoration: none; }
   }
   li.active a, li.active a:hover {
     color: @purple_text;
-    background: @purple_bg;
     border-top: 1px solid @gray_30;
     border-right: 1px solid @gray_30;
     border-bottom: none;
@@ -587,9 +585,7 @@ input.disabled {
 }
 
 .esper-tab-content {
-  height: 412px;
   padding: 28px;
-  background: @purple_bg;
   border-top: 1px solid @gray_30;
   .tab { display:none; }
   .tab.active { display:block; }
@@ -639,8 +635,7 @@ input.disabled {
   &.labels-table { padding: 14px 6px; }
 }
 
-.assistants-list {
-  height: 210px;
+.table-list {
   margin-bottom: 20px;
   padding: 0;
   background: white;

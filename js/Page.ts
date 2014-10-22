@@ -8,6 +8,7 @@ module Page {
   */
   var pageSelector = Show.create({
     "settings": {ids:["settings-page"]},
+    "team-settings": {ids:["team-settings-page"]},
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]}
@@ -30,6 +31,16 @@ module Page {
       showPage("settings");
       Log.p("settings.load()");
       Settings.load();
+      Util.focus();
+    }
+  }
+
+  export var teamSettings : Loadable = {
+    load: function() {
+      pageSelector.hideAll();
+      showPage("team-settings");
+      Log.p("teamSettings.load()");
+      TeamSettings.load();
       Util.focus();
     }
   }
