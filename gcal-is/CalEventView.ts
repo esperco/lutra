@@ -318,7 +318,7 @@ module Esper.CalEventView {
     anchor.append(view);
   }
 
-  function insertTeamSelector(teams : ApiT.Team[]) {
+  function insertTeamSelector(teams : ApiT.Team[], fromEmail : string) {
     var anchor = Gcal.findAnchorForReminderDropdown();
     var view = $("<div id='esper-remind-from-team'>Team: </div>");
     var dropdown = $("<select>");
@@ -330,20 +330,27 @@ module Esper.CalEventView {
     for (var i = 0; i < teams.length; i++) {
       var team = teams[i];
       $("<option value='" + i + "'>" + team.team_name + "</option>")
+        .data("teamid", team.teamid)
         .appendTo(dropdown);
     }
     dropdown.change(function() {
       var i = $(this).val();
       remindFromTeam = teams[i]; // a variable of CalEventView
-      insertEmailSelector(remindFromTeam.team_email_aliases);
+      insertEmailSelector(remindFromTeam.team_email_aliases, fromEmail);
       $("#esper-reminder-time").trigger("change");
+    });
+
+    dropdown.find("option").each(function() {
+      var that = $(this);
+      var teamid = that.data("teamid");
+      if (teamid === remindFromTeam.teamid) that.attr("selected", "selected");
     });
 
     view.append(dropdown);
     anchor.append(view);
   }
 
-  function insertEmailSelector(emails : string[]) {
+  function insertEmailSelector(emails : string[], fromEmail : string) {
     var anchor = Gcal.findAnchorForReminderDropdown();
     $("#esper-remind-from-email").remove();
     var view = $("<div id='esper-remind-from-email'>From: </div>");
@@ -358,9 +365,10 @@ module Esper.CalEventView {
       $("<option>" + remindFromEmail + "</option>")
         .appendTo(dropdown);
       dropdown.prop("disabled", true);
-    } else {
-      remindFromEmail = emails[0];
+    } else if (remindFromEmail !== undefined) {
+      remindFromEmail = fromEmail;
     }
+    if (remindFromEmail === undefined) remindFromEmail = emails[0];
 
     List.iter(emails, function(email) {
       $("<option>" + email + "</option>")
@@ -370,6 +378,12 @@ module Esper.CalEventView {
       var email = $(this).val();
       remindFromEmail = email; // a variable of CalEventView
       $("#esper-reminder-time").trigger("change");
+    });
+
+    dropdown.find("option").each(function() {
+      var that = $(this);
+      var email = that.val();
+      if (email === remindFromEmail) that.attr("selected", "selected");
     });
 
     view.append(dropdown);
@@ -460,12 +474,16 @@ module Esper.CalEventView {
     var eventId = fullEventId.eventId;
 
     if (teams.length > 0) {
-      remindFromTeam = teams[0];
-      insertTeamSelector(teams);
-
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
+        var teamid = event_reminders.remind_from_team;
+        if (teamid === undefined) remindFromTeam = teams[0];
+        else remindFromTeam = List.find(teams, function(t) {
+          return t.teamid === teamid;
+        });
+        var email = event_reminders.remind_from_email;
+        insertTeamSelector(teams, email);
         insertReminderDropdown(fullEventId, event_reminders);
-        insertEmailSelector(remindFromTeam.team_email_aliases);
+        insertEmailSelector(remindFromTeam.team_email_aliases, email);
         $(".esper-guest-reminder").remove(); // Yes this is necessary
         Gcal.waitForGuestsToLoad(function(guests) {
           var reminders = guests.find(".esper-guest-reminder");
