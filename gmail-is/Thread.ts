@@ -3,10 +3,21 @@
 */
 module Esper.Thread {
 
-  function makeEmailTeamTable(teams: ApiT.Team[]):
-  JQueryPromise<{ [email: string]: ApiT.Team }> {
+  interface TeamEmails {
+    team: ApiT.Team;
+    executive: string; // email
+    assistants: string[]; // email
+  }
 
-    var tbl: { [email: string]: ApiT.Team } = {};
+  function getEmail(uid: string, teamid: string) {
+    return Profile.get(uid, teamid)
+      .then(function(profile) {
+        return profile.email;
+      });
+  }
+
+  function getTeamEmails(teams: ApiT.Team[]):
+  JQueryPromise<TeamEmails[]> {
 
     /*
       It looks TypeScript selects the wrong prototype for .then(), resulting
@@ -15,42 +26,60 @@ module Esper.Thread {
     */
     return <any> Login.getLoginInfo
       .then(function(loginInfo) {
-        var jobs =
+        return Promise.join(
           List.map(loginInfo.teams, function(team) {
-            var execUid = team.team_executive;
-            return Profile.get(execUid, team.teamid)
-              .then(function(execProfile) {
-                tbl[execProfile.email] = team;
+            return getEmail(team.team_executive, team.teamid)
+              .then(function(executiveEmail) {
+                return Promise.join(
+                  List.map(team.team_assistants, function(assistantUid) {
+                    return getEmail(assistantUid, team.teamid);
+                  })
+                ).then(function(assistantEmails) {
+                  return {
+                    team: team,
+                    executive: executiveEmail,
+                    assistants: assistantEmails
+                  };
+                });
               });
-          });
-
-        return Promise.join(jobs)
-          .then(function(voidList) {
-            return tbl;
-          });
+          })
+        );
       });
   }
 
   function findTeamInThread(thread: esperGmail.get.Thread,
-                            tbl: { [email: string]: ApiT.Team }):
+                            teamEmailsList: TeamEmails[]):
   ApiT.Team {
     var team;
-    var nameEmail =
-      List.find(thread.people_involved, function(nameEmail: string[]) {
-        var email = nameEmail[1];
-        team = tbl[email];
-        return team !== undefined;
+    var filteredTeams =
+      List.filter(teamEmailsList, function(teamEmails) {
+        var threadMembers = thread.people_involved;
+        var executive = List.find(threadMembers, function(nameEmail) {
+          return teamEmails.executive === nameEmail[1];
+        });
+        var assistant = List.find(threadMembers, function(nameEmail) {
+          var email = nameEmail[1];
+          return List.mem(teamEmails.assistants, email);
+        });
+        Log.e("findTeamInThread", threadMembers, executive, assistant);
+        return executive !== null && assistant !== null;
       });
-    return team;
+    if (filteredTeams.length > 0) {
+      Log.d("Filtered teams:", filteredTeams);
+      /* Arbitrary choice if more than one team matches */
+      return filteredTeams[0].team;
+    }
+    else
+      return;
   }
 
   export function detectTeam(teams: ApiT.Team[],
                              thread: esperGmail.get.Thread):
   JQueryPromise<ApiT.Team> {
 
-    return makeEmailTeamTable(teams)
-      .then(function(tbl) {
-        return findTeamInThread(thread, tbl);
+    return getTeamEmails(teams)
+      .then(function(teamEmailsList) {
+        return findTeamInThread(thread, teamEmailsList);
       });
   }
 }

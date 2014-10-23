@@ -60,7 +60,9 @@ module Esper.Sidebar {
   }
 
   function displayDock(rootElement, sidebar,
-                       team: ApiT.Team, isCorrectTeam: boolean, profiles) {
+                       team: ApiT.Team,
+                       isCorrectTeam: boolean,
+                       profiles) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -121,7 +123,7 @@ module Esper.Sidebar {
       sizeIcon.addClass("esper-minimize");
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, true,
+        displayTeamSidebar(rootElement, toTeam, true, true,
                            currentThreadId, profiles);
       }
       setTimeout(afterAnimation, 250);
@@ -208,7 +210,8 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
-                          linkedEvents: ApiT.LinkedCalendarEvents) {
+                          autoTask: boolean,
+                          linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
@@ -257,7 +260,8 @@ module Esper.Sidebar {
     polls.attr("data", Init.esperRootUrl + "img/polls.svg");
     person.attr("data", Init.esperRootUrl + "img/person.svg");
 
-    CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
+    CalTab.displayCalendarTab(content1, team, autoTask,
+                              profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
     Tab3Content.displayPreferencesTab(content3, team, profiles);
 
@@ -305,6 +309,7 @@ module Esper.Sidebar {
   function displayTeamSidebar(rootElement,
                               team: ApiT.Team,
                               isCorrectTeam: boolean,
+                              autoTask: boolean,
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
@@ -316,8 +321,11 @@ module Esper.Sidebar {
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
           .done(function(linkedEvents) {
-            var sidebar = displaySidebar(rootElement, team, linkedEvents);
-            displayDock(rootElement, sidebar, team, isCorrectTeam, profiles);
+            var sidebar = displaySidebar(rootElement, team,
+                                         autoTask,
+                                         linkedEvents);
+            displayDock(rootElement, sidebar, team,
+                        isCorrectTeam, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
         });
       }
@@ -348,6 +356,8 @@ module Esper.Sidebar {
             .done(function(team) {
               Log.d("Detected team:", team);
 
+              var autoTask = team !== undefined;
+
               if (team === undefined && teams.length === 1) {
                 Log.w("Team not detected, using one and only team.");
                 team = teams[0];
@@ -362,7 +372,9 @@ module Esper.Sidebar {
 
               if (team !== undefined)
                 displayTeamSidebar(rootElement, team,
-                                   correctTeam, threadId, profiles);
+                                   correctTeam,
+                                   autoTask,
+                                   threadId, profiles);
             });
           return true;
         }

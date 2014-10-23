@@ -223,7 +223,7 @@ module Esper.CalSearch {
 
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        setupSearch(linkedEvents.linked_events, team,
+        setupSearch(linkedEvents, team,
                     searchView, eventsTab, profiles);
     });
 
