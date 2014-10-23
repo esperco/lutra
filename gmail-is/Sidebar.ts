@@ -205,7 +205,7 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
-                          linkedEvents: ApiT.LinkedCalendarEvents) {
+                          linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">

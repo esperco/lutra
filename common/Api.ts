@@ -51,13 +51,15 @@ module Esper.Api {
 
   export function getLinkedEvents(teamid, threadId,
                                   teamCalendars: ApiT.Calendar[]):
-  JQueryDeferred<ApiT.LinkedCalendarEvents> {
+  JQueryDeferred<ApiT.EventWithSyncInfo[]> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/thread/events/" + Login.myUid()
       + "/" + teamid
       + "/" + threadId;
-    return JsonHttp.post(url, JSON.stringify(cals));
+    return JsonHttp.post(url, JSON.stringify(cals)).then(function(x) {
+      return x.linked_events;
+    });
   }
 
   export function linkEventForMe(teamid, threadId, eventId):
@@ -300,6 +302,14 @@ module Esper.Api {
       + "/" + threadid
       + "?events=true&threads=true";
     return JsonHttp.get(url).then(function(x) { return x.task; });
+  }
+
+  export function deleteTask(taskid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/task/details/" + Login.myUid()
+      + "/" + taskid;
+    return JsonHttp.delete_(url);
   }
 
   export function linkThreadToTask(teamid, threadid, taskid):
