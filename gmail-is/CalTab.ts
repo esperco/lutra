@@ -746,6 +746,7 @@ module Esper.CalTab {
 
   export function displayCalendarTab(tab1,
                                      team: ApiT.Team,
+                                     teamIsCorrect: boolean,
                                      profiles: ApiT.Profile[],
                                      linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
@@ -824,7 +825,11 @@ module Esper.CalTab {
     displayLinkedList(team, threadId, calTabView, profiles, linkedEvents);
     displayRecentsList(team, threadId, calTabView, profiles, linkedEvents);
 
-    Api.getTaskForThread(team.teamid, threadId).done(function(task) {
+    var apiGetTask = teamIsCorrect ?
+      Api.getAutoTaskForThread
+      : Api.getTaskForThread;
+
+    apiGetTask(team.teamid, threadId).done(function(task) {
       currentTask = task;
       var title = "";
       if (task !== undefined) {

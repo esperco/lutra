@@ -205,6 +205,7 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
+                          teamIsCorrect: boolean,
                           linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
 <div #view class="esper-sidebar">
@@ -254,7 +255,8 @@ module Esper.Sidebar {
     polls.attr("data", Init.esperRootUrl + "img/polls.svg");
     person.attr("data", Init.esperRootUrl + "img/person.svg");
 
-    CalTab.displayCalendarTab(content1, team, profiles, linkedEvents);
+    CalTab.displayCalendarTab(content1, team, teamIsCorrect,
+                              profiles, linkedEvents);
     Tab2Content.displayTab2ComingSoon(content2);
     Tab3Content.displayPreferencesTab(content3, team, profiles);
 
@@ -313,7 +315,8 @@ module Esper.Sidebar {
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
           .done(function(linkedEvents) {
-            var sidebar = displaySidebar(rootElement, team, linkedEvents);
+            var sidebar = displaySidebar(rootElement, team,
+                                         isCorrectTeam, linkedEvents);
             displayDock(rootElement, sidebar, team, isCorrectTeam, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
         });

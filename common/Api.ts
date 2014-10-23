@@ -304,6 +304,16 @@ module Esper.Api {
     return JsonHttp.get(url).then(function(x) { return x.task; });
   }
 
+  export function getAutoTaskForThread(teamid, threadid):
+  JQueryDeferred<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/thread/task-auto/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadid
+      + "?events=true&threads=true";
+    return JsonHttp.get(url).then(function(x) { return x.task; });
+  }
+
   export function deleteTask(taskid):
   JQueryDeferred<void> {
     var url =
