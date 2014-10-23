@@ -1,5 +1,13 @@
 module Esper.InsertTime {
 
+  function eventTimezone(ev) {
+    var teamCal = List.find(Sidebar.currentTeam.team_calendars, function(c) {
+      return c.google_cal_id === ev.google_cal_id;
+    });
+    if (teamCal === null) return undefined;
+    else return teamCal.calendar_timezone;
+  }
+
   /** Attaches the composition controls and sets up the event
    *  handlers.
    */
@@ -34,12 +42,16 @@ module Esper.InsertTime {
 
           insertAtCaret("<br />");
           for (var i = 0; i < events.length; i++) {
-            var start = new Date(events[i].event.start.local);
-            var end   = new Date(events[i].event.end.local);
+            var ev = events[i].event;
+            var start = new Date(ev.start.local);
+            var end   = new Date(ev.end.local);
             var range = XDate.rangeWithoutYear(start, end);
+            var tz =
+              (<any> moment).tz(ev.start.local, eventTimezone(ev)).zoneAbbr();
 
             if (Gmail.caretInField(textField)) {
-              insertAtCaret(XDate.weekDay(start) + ", " + range + "<br />");
+              insertAtCaret(XDate.weekDay(start) + ", " + range
+                            + " " + tz + "<br />");
             }
           }
         });
