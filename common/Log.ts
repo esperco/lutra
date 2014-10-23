@@ -34,6 +34,15 @@ Esper . xxxxxxxx
   function logArray(logFunction, prefix, args) {
     printTimeSeparator(tag + " " + prefix);
 
+    /* If the first argument is a string, print the second argument
+       on the same line.
+       This is useful for filtering lines in the Chrome console.
+    */
+    if (args.length >= 1 && typeof args[0] === "string") {
+      prefix = prefix + " " + args[0];
+      args.shift();
+    }
+
     for (var i = 0; i < args.length; i++)
       if (logFunction != undefined) {
         var x = args[i];
