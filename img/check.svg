@@ -1,13 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
-    <title>check</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="check" sketch:type="MSArtboardGroup">
-            <circle id="Oval-1" fill="#2BB673" sketch:type="MSShapeGroup" cx="8" cy="8" r="8"></circle>
-            <path d="M6.54405172,10.1737619 L11.5457759,4.64880956 C11.725431,4.45033337 12.0161207,4.45033337 12.1964655,4.64919051 L12.5206034,5.00728575 C12.7002586,5.20576194 12.7002586,5.5269048 12.5206034,5.72538099 L6.86991379,11.9703334 C6.69025862,12.1688096 6.39922414,12.1688096 6.21956897,11.9703334 L3.13474138,8.56271432 C2.95508621,8.36423813 2.95508621,8.04309527 3.13474138,7.84461908 L3.45991379,7.48576194 C3.63956897,7.28728575 3.93060345,7.28728575 4.10991379,7.48576194 C4.11025862,7.48538099 6.54439655,10.1745238 6.54405172,10.1737619" id="Imported-Layers" fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
-        </g>
-    </g>
-</svg>
+<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle fill="#2bb673" cx="8" cy="8" r="8"/><path d="m6.544 10.174l5-5.525c.18-.198.47-.198.651 0l.324.358c.18.198.18.52 0 .718l-5.651 6.245c-.18.198-.471.198-.65 0l-3.085-3.408c-.18-.198-.18-.52 0-.718l.325-.359c.18-.198.471-.198.65 0 0 0 2.434 2.689 2.434 2.688" fill="#fff"/></g></svg>

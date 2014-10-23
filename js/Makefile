@@ -61,6 +61,7 @@ TS_SOURCES = \
   Footer \
   TeamSettings \
   AccountTab \
+  Preferences \
   PreferencesTab \
   CalendarsTab \
   LabelSyncTab \

@@ -179,7 +179,7 @@ module CalPicker {
         center: "",
         right: ""
       },
-      height: 600,
+      height: 400,
       defaultView: 'agendaWeek',
       snapDuration: "00:15:00",
       selectable: true,
@@ -322,7 +322,7 @@ module CalPicker {
       <div class="modal-header">Customize Availability</div>
       <div #content></div>
       <div class="modal-footer">
-        <button #done class="button-primary">Done</button>
+        <button #save class="button-primary">Save</button>
       </div>
     </div>
   </div>
@@ -335,7 +335,7 @@ module CalPicker {
     (<any> modal).modal({}); // FIXME
     setTimeout(function() { render(picker); }, 320); // Wait for fade
 
-    done.click(function() {
+    save.click(function() {
       var events = [];
       for (var k in picker.events)
         events = events.concat(makeAvailability(picker.events[k]));
