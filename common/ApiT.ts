@@ -245,6 +245,8 @@ module Esper.ApiT {
     event_start_time: string;
     reminder_time: string;
     guest_reminders: GuestReminder[];
+    remind_from_team?: string; // teamid
+    remind_from_email?: string;
   }
 
   export interface DefaultReminder {
