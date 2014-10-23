@@ -284,33 +284,42 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 
-  export function obtainTaskForThread(teamid, threadid):
+  export function obtainTaskForThread(teamid, threadid,
+                                      withEvents = false,
+                                      withThreads = false):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task/" + Login.myUid()
       + "/" + teamid
       + "/" + threadid
-      + "?events=true&threads=true";
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
     return JsonHttp.get(url);
   }
 
-  export function getTaskForThread(teamid, threadid):
+  export function getTaskForThread(teamid, threadid,
+                                   withEvents = false,
+                                   withThreads = false):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-opt/" + Login.myUid()
       + "/" + teamid
       + "/" + threadid
-      + "?events=true&threads=true";
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
     return JsonHttp.get(url).then(function(x) { return x.task; });
   }
 
-  export function getAutoTaskForThread(teamid, threadid):
+  export function getAutoTaskForThread(teamid, threadid,
+                                       withEvents = false,
+                                       withThreads = false):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-auto/" + Login.myUid()
       + "/" + teamid
       + "/" + threadid
-      + "?events=true&threads=true";
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
     return JsonHttp.get(url).then(function(x) { return x.task; });
   }
 
