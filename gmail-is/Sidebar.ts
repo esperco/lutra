@@ -109,6 +109,9 @@ module Esper.Sidebar {
   </div>
 </div>
 '''
+    dropdown.css("max-height", $(window).height() - 100);
+    dropdown.css("overflow", "auto");
+
     function onTeamSwitch(toTeam) {
       dismissDropdowns();
       wrap.fadeOut(250);
