@@ -55,11 +55,11 @@ module Esper.InsertTime {
    * element.
    */
   function insertAtCaret(html) {
-    var selection = window.getSelection(); 
+    var selection = window.getSelection()
     var range     = selection.getRangeAt(0);
 
     html = "<span>" + html + "</span>";
-    
+
     range.deleteContents();
 
     var node = $(html)[0];

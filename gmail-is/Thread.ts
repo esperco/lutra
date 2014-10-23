@@ -61,11 +61,9 @@ module Esper.Thread {
           var email = nameEmail[1];
           return List.mem(teamEmails.assistants, email);
         });
-        Log.e("findTeamInThread", threadMembers, executive, assistant);
         return executive !== null && assistant !== null;
       });
     if (filteredTeams.length > 0) {
-      Log.d("Filtered teams:", filteredTeams);
       /* Arbitrary choice if more than one team matches */
       return filteredTeams[0].team;
     }

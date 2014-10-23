@@ -58,8 +58,7 @@ module Esper.CalTab {
         view.linked.show();
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-            refreshLinkedList(team, threadId, calTab, profiles);
-            refreshRecentsList(team, threadId, calTab, profiles);
+            refreshEventLists(team, threadId, calTab, profiles);
             obtainTaskForThread(team.teamid, threadId,
                                 calTab);
             Api.syncEvent(team.teamid, threadId,
@@ -401,8 +400,7 @@ module Esper.CalTab {
       view.addClass("esper-disabled");
       Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          refreshLinkedList(team, threadId, calTab, profiles);
-          refreshRecentsList(team, threadId, calTab, profiles);
+          refreshEventLists(team, threadId, calTab, profiles);
         });
     });
 
@@ -410,8 +408,7 @@ module Esper.CalTab {
       view.addClass("esper-disabled");
       Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
         .done(function() {
-          refreshLinkedList(team, threadId, calTab, profiles);
-          refreshRecentsList(team, threadId, calTab, profiles);
+          refreshEventLists(team, threadId, calTab, profiles);
         });
     });
 
@@ -851,6 +848,7 @@ module Esper.CalTab {
       });
     });
 
+    /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEvents = function() {
       refreshLinkedList(team, threadId, calTabView, profiles);
       if (linkedEventsContainer.css("display") === "none") {
