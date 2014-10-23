@@ -286,26 +286,6 @@ module Esper.Sidebar {
     rootElement.append(view);
   }
 
-  function getTeamProfiles(team: ApiT.Team): JQueryPromise<ApiT.Profile[]> {
-    var teamMembers = List.copy(team.team_assistants);
-    teamMembers.push(team.team_executive);
-    var l =
-      List.map(teamMembers, function(uid) {
-        return Api.getProfile(uid, team.teamid);
-      });
-    return Promise.join(l);
-  }
-
-  function getAllProfiles(teams : ApiT.Team[])
-    : JQueryPromise<ApiT.Profile[][]>
-  {
-    var profileLists =
-      List.map(teams, function(team) {
-        return getTeamProfiles(team);
-      });
-    return Promise.join(profileLists);
-  }
-
   function displayTeamSidebar(rootElement,
                               team: ApiT.Team,
                               isCorrectTeam: boolean,
