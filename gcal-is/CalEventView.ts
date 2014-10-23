@@ -365,11 +365,10 @@ module Esper.CalEventView {
       $("<option>" + remindFromEmail + "</option>")
         .appendTo(dropdown);
       dropdown.prop("disabled", true);
-    } else if (fromEmail === undefined && remindFromEmail === undefined) {
-      remindFromEmail = emails[0];
-    } else {
+    } else if (remindFromEmail !== undefined) {
       remindFromEmail = fromEmail;
     }
+    if (remindFromEmail === undefined) remindFromEmail = emails[0];
 
     List.iter(emails, function(email) {
       $("<option>" + email + "</option>")
