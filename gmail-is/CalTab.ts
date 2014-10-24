@@ -557,7 +557,9 @@ module Esper.CalTab {
           var i = 0;
           var last = false;
           var recent = true;
-          activeEvents.forEach(function(e: ApiT.CalendarEvent) {
+          activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
+            var e = response.event_opt;
+            if (e === undefined) return; // event is deleted aka cancelled
             if (i === activeEvents.length - 1)
               last = true;
             eventsList.append(renderEvent(linkedEvents, e, recent, last, team,

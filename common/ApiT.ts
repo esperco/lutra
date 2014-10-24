@@ -106,6 +106,10 @@ module Esper.ApiT {
     transparent?: boolean;
   }
 
+  export interface CalendarEventOpt {
+    event_opt?: CalendarEvent;
+  }
+
   export interface CalendarEventEdit {
     google_event_id?: string;
     google_cal_id?: string;

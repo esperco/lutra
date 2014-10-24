@@ -72,9 +72,11 @@ module Esper.CalEventView {
           view.remove();
           Api.getEventDetails(teamid, fullEventId.calendarId,
                               team.team_calendars, eventId)
-            .done(function(event) {
-              mergeDescription(event);
-              Log.d("Updated description textarea.");
+            .done(function(response) {
+              if (response.event_opt !== undefined) {
+                mergeDescription(response.event_opt);
+                Log.d("Updated description textarea.");
+              }
             });
         });
     });
@@ -170,9 +172,11 @@ module Esper.CalEventView {
                   updateView(fullEventId);
                   Api.getEventDetails(teamid, calendarId,
                                       team.team_calendars, eventId)
-                    .done(function(event) {
-                      mergeDescription(event);
-                      Log.d("Link and sync complete.");
+                    .done(function(response) {
+                      if (response.event_opt !== undefined) {
+                        mergeDescription(response.event_opt);
+                        Log.d("Link and sync complete.");
+                      }
                     });
                 });
             });
