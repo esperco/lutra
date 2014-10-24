@@ -165,15 +165,12 @@ i { color: @gray_60; }
 
 *.unselectable {
   cursor: default;
-  -webkit-user-select: none;
-   -khtml-user-select: none;
-     -moz-user-select: -moz-none;
-  /*
-    Introduced in IE 10.
-    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
-  */
-  -ms-user-select: none;
-      user-select: none;
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .ellipsis {
@@ -400,7 +397,11 @@ input.disabled {
 .header {
   padding: 16px 0;
   border-bottom: 1px solid @gray_20;
-  .arrow-east { margin: 10px 14px; }
+  .arrow-east {
+    width: 6px;
+    height: 10px;
+    margin: 10px 14px;
+  }
 }
 .header-logo {
   width: 24px;
@@ -447,7 +448,7 @@ a.header-title:hover { text-decoration: underline; }
               animation-duration: 1s;
     }
     .close {
-      opacity: 0.5;
+      opacity: 0.2;
       &:hover { opacity: 1; }
     }
     .chrome-logo {
@@ -467,7 +468,11 @@ a.header-title:hover { text-decoration: underline; }
               animation-delay: 0.5s;
       a:hover { text-decoration: underline; }
     }
-    .arrow-east { margin-left: 4px; }
+    .arrow-east {
+      width: 6px;
+      height: 10px;
+      margin-left: 4px;
+    }
   }
 }
 
@@ -540,6 +545,8 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom: 1px solid @gray_10;
   .team-name { font-size: 16px; }
   .team-cog {
+    width: 22px;
+    height: 22px;
     margin-top: 14px;
     opacity: 0.8;
     &:hover { opacity: 1; }
@@ -630,7 +637,7 @@ a.header-title:hover { text-decoration: underline; }
 }
 
 .table-header {
-  padding: 8px 11px;
+  padding: 12px 11px;
   color: white;
   font-size: 14px;
   font-weight: 600;
@@ -651,7 +658,6 @@ a.header-title:hover { text-decoration: underline; }
   &.assistants-table { padding: 12px 6px; }
   &.labels-table { padding: 14px 6px; }
 }
-
 .table-list {
   margin-bottom: 20px;
   padding: 0;
@@ -662,6 +668,18 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom-left-radius: 3px;
   overflow-y: auto;
 }
+@media (min-width:900px) {
+  .table-divider {
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    background: @gray_10;
+  }
+}
+@media (max-width:899px) {
+  .table-divider { display: none; }
+}
+
 .assistant-row-status { padding: 10px 12px; }
 .assistant-row-actions {
   padding-top: 9px;
@@ -671,7 +689,11 @@ a.header-title:hover { text-decoration: underline; }
   display: inline-block;
   &:hover a { text-decoration: underline; }
 }
-.invite-icon { margin: 2px 10px 0 0; }
+.invite-icon {
+  width: 20px;
+  height: 14px;
+  margin: 2px 10px 0 0;
+}
 .invite-options {
   display: none;
   margin-left: 30px;
@@ -683,6 +705,165 @@ a.header-title:hover { text-decoration: underline; }
           background-clip: padding-box;
   -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
           box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+}
+
+.workplace, .preference {
+  position: relative;
+  float: left;
+  @media (min-width:900px) { width: 50%; }
+  @media (max-width:899px) { width: 100%; }
+  border-top: 1px solid @gray_10;
+}
+.workplace { padding: 0; }
+.preference {
+  padding: 20px 20px 0 20px;
+  hr {
+    margin: 10px 0 0 0;
+    border-top: 1px solid @gray_30;
+  }
+}
+
+.workplace-map {
+  position: absolute;
+  width: 100%;
+  height: 180px;
+}
+.workplace-details {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  margin-top: 120px;
+  padding: 10px 20px;
+  color: white;
+  background: rgba(0,0,0,0.5);
+  .workplace-name { font-size: 16px; }
+}
+.workplace-options {
+  height: 134px;
+  margin-top: 180px;
+  padding: 18px 20px 5px 20px;
+}
+.new-workplace {
+  margin: 100px auto;
+  width: 100px;
+  height: 110px;
+  color: @purple;
+  text-align: center;
+  opacity: 1;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+  .add-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 10px 12px 10px;
+    border-radius: 100%;
+    border: 2px dotted @purple;
+  }
+  .add-vertical {
+    position: absolute;
+    top: 15px;
+    left: 36px;
+    width: 4px;
+    height: 46px;
+    background: @purple;
+  }
+  .add-horizontal {
+    position: absolute;
+    top: 36px;
+    left: 15px;
+    width: 46px;
+    height: 4px;
+    background: @purple;
+  }
+}
+
+.preference-toggle-bg {
+  position: absolute;
+  right: 20px;
+  width: 34px;
+  height: 16px;
+  margin: 3px;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+          box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
+  &.on { background: @green; }
+  &.off { background: @red; }
+}
+.preference-toggle-switch {
+  position: absolute;
+  right: 20px;
+  width: 18px;
+  height: 18px;
+  margin: 2px;
+  border-radius: 9px;
+  background: @gray_f8;
+  cursor: pointer;
+  -webkit-box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.50);
+          box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.50);
+  -webkit-transition: all 0.2s ease-out;
+     -moz-transition: all 0.2s ease-out;
+      -ms-transition: all 0.2s ease-out;
+       -o-transition: all 0.2s ease-out;
+          transition: all 0.2s ease-out;
+  &.on { margin-right: 2px; }
+  &.off { margin-right: 20px; }
+}
+.preference-title { font-size: 16px; }
+.preference-options {
+  height: 182px;
+  overflow-y: auto;
+  &.off {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+}
+.preference-option-row {
+  margin: 15px 0;
+}
+.preference-option-icon {
+  width: 24px;
+  height: 24px;
+}
+.preference-option-selector {
+  margin: 3px 0 0 12px;
+}
+.preference-option-link {
+  display: inline-block;
+  margin: 3px 0 0 12px;
+}
+.modal-dialog.team-settings {
+  width: 640px;
+  .fc-toolbar { display: none; }
+}
+.preference-option-list-container {
+  margin-left: 36px;
+  padding: 0;
+  li { padding: 3px 0 7px 0; }
+}
+.preferences-notes {
+  float: left;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid @gray_10;
+  resize: none;
+  &:focus { outline: 0; }
+}
+.save-notes-bar {
+  float: left;
+  width: 100%;
+  padding: 6px 10px;
+  background: @gray_10;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
 .label-sync-description {

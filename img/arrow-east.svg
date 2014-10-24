@@ -1,12 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="6px" height="10px" viewBox="0 0 6 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
-    <title>arrow-east</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="arrow-east" sketch:type="MSArtboardGroup" fill="#808285">
-            <path d="M0.252535817,1.430625 C-0.0834641831,1.103125 -0.0834641831,0.572291667 0.252535817,0.245625 C0.587678674,-0.081875 1.1302501,-0.081875 1.4662501,0.245625 L5.74939296,4.428125 C6.08453582,4.75479167 6.08453582,5.28645833 5.74939296,5.613125 L1.46539296,9.753125 C1.12939296,10.0814583 0.586821531,10.080625 0.251678674,9.753125 C-0.0834641831,9.42645833 -0.0843213259,8.895625 0.251678674,8.568125 L3.92882153,5.020625 L0.252535817,1.430625 Z" id="Shape" sketch:type="MSShapeGroup"></path>
-        </g>
-    </g>
-</svg>
+<svg viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="m.253 1.431c-.336-.328-.336-.858 0-1.185.335-.328.878-.328 1.214 0l4.283 4.182c.335.327.335.858 0 1.185l-4.284 4.14c-.336.328-.879.327-1.214 0-.335-.327-.336-.857 0-1.185l3.677-3.548-3.676-3.59" fill="#808285"/></g></svg>

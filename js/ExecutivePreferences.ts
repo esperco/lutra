@@ -218,27 +218,10 @@ module Esper.ExecutivePreferences {
       address : ""
     };
 
-    var defaultAvailability = {
-      avail_from : {
-        day : "Mon",
-        time : {
-          hour : 11,
-          minute : 0
-        }
-      },
-      avail_to : {
-        day : "Mon",
-        time : {
-          hour : 12,
-          minute : 0
-        }
-      },
-    };
-
     var defaults    = {
       meeting_types : {
         phone_call : {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           phones       : [
             {
@@ -248,7 +231,7 @@ module Esper.ExecutivePreferences {
           ]
         },
         video_call : {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           accounts     : [
             {
@@ -260,7 +243,7 @@ module Esper.ExecutivePreferences {
       },
       workplaces    : [
         {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           location     : defaultLocation
         }
@@ -268,7 +251,7 @@ module Esper.ExecutivePreferences {
     };
 
     var defaultMealInfo = {
-      availability : [defaultAvailability],
+      availability : [],
       duration     : defaultDuration,
       favorites    : [ defaultLocation ]
     };
@@ -357,44 +340,7 @@ module Esper.ExecutivePreferences {
       var availabilityWidget = $(element).closest("li")
         .find(".customize-availability");
 
-      var availabilities = []
-
-      availabilityWidget.find(".availability").each(function(i, e) {
-        var days  = $($(e).find("input")[0]).val();
-        var start = $($(e).find("input")[1]).val();
-        var end   = $($(e).find("input")[2]).val();
-
-        if (days !== "" || start !== "" || end !== "") {
-
-          start = toTime(start);
-          end = toTime(end);
-
-          if (start === null || end === null) {
-            typo($(e));
-          } else {
-            days = days.split("").map(dayToThreeLetter);
-
-            days.forEach(function (day) {
-              if (day) {
-                availabilities.push({
-                  avail_from : {
-                    day : day,
-                    time : start
-                  },
-                  avail_to : {
-                    day : day,
-                    time : end
-                  }
-                });
-              } else {
-                typo($(e));
-              }
-            });
-          }
-        }
-      });
-
-      return availabilities;
+      return availabilityWidget.data("availabilities");
     }
 
     function phoneNumberList() {
@@ -457,6 +403,13 @@ module Esper.ExecutivePreferences {
   </span>
 </div>
 '''
+    Login.getTeams().forEach(function (team) {
+      var name   = team.team_name;
+      var teamid = team.teamid;
+      var option = $('<option value="' + teamid + '">').text(name);
+
+      teamSelect.append(option);
+    });
 
     save.click(function () {
       var teamid = teamSelect.val();
@@ -509,26 +462,8 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
-  function showAvailability(defaults) {
-'''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog team-settings">
-    <div class="modal-content">
-      <div class="modal-header">Customize Availability</div>
-      <div>"Hello, world!"</div>
-      <div class="modal-footer">
-        <button #done class="button-primary">Done</button>
-      </div>
-    </div>
-  </div>
-</div>
-'''
-
-    done.click(function() { (<any> modal).modal("hide") }); // FIXME
-
-    (<any> modal).modal({}); // FIXME
+  function showAvailability(defaults, element) {
+    CalPicker.createModal(defaults, element);
   }
 
   /** The basic form widget which has a prominent on/off toggle and a
@@ -556,7 +491,9 @@ module Esper.ExecutivePreferences {
       <span>Yes</span>
     </label>
   </form>
-  <a #customizeAvailability href="#">Customize availability</a>
+  <a class="customize-availability" #customizeAvailability href="#">
+    Customize availability
+  </a>
 
   <hr />
 
@@ -581,7 +518,10 @@ module Esper.ExecutivePreferences {
     //   addAvailability(_view, availability); // currying would make this prettier
     // });
 
-    customizeAvailability.click(function() { showAvailability(defaults); })
+    customizeAvailability.data("availabilities", defaults.availability);
+    customizeAvailability.click(function() {
+      showAvailability(defaults, customizeAvailability);
+    });
 
     return _view;
   }
