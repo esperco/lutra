@@ -206,6 +206,7 @@ module AccountTab {
     </form>
       <button #submitButton type="button" class="button-primary" >Submit Payment</button>
   </div>
+  </div>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
     <div #spinner class="spinner table-spinner"/>
@@ -224,14 +225,14 @@ module AccountTab {
       var $form = $('#payment-form');
       if (response.error) {
         // Show the errors on the form
-          alert("yo");
-        var yearValid = $["payment"].validateCardNumber($('input.cc-num').val());
+         // alert("yo");
+        //var yearValid = $["payment"].validateCardNumber($('input.cc-num').val());
 
-        if(!yearValid){
-           $form.find('.payment-errors').text("Incorrect Card Number");
-        }
+        //if(!yearValid){
+          // $form.find('.payment-errors').text("Incorrect Card Number");
+        //}
 
-        //$form.find('.payment-errors').text(response.error.message);
+        $form.find('.payment-errors').text(response.error.message);
         $form.find('button').prop('disabled', false);}
       else {
         // token contains id, last4, and card type
