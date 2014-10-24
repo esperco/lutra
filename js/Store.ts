@@ -6,14 +6,13 @@
   Go to the DOM tab and scroll down to "localStorage".
 */
 
-var store = (function() {
-  var mod = {};
+module Store {
 
-  mod.set = function(k, v) {
+  export function set(k, v) {
     localStorage.setItem(k, JSON.stringify(v));
   };
 
-  mod.get = function(k) {
+  export function get(k) {
     var s = localStorage.getItem(k);
     var x;
     if (s) {
@@ -21,19 +20,18 @@ var store = (function() {
         x = JSON.parse(s);
       }
       catch (e) {
-        log ("Cannot parse cached data stored under key '"+ k +"': "+ s);
+        Log.p("Cannot parse cached data stored under key '"+ k +"': "+ s);
       }
     }
     return x;
   };
 
-  mod.remove = function(k) {
+  export function remove(k) {
     localStorage.removeItem(k);
   };
 
-  mod.clear = function() {
+  export function clear() {
     localStorage.clear();
   };
 
-  return mod;
-})();
+}

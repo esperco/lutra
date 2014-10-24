@@ -2,29 +2,28 @@
   Various simple utilities
 */
 
-var util = (function () {
-  var mod = {};
+module Util {
 
   var undef;
 
   // Return a random alphanumeric string
-  mod.randomString = function() {
+  export function randomString() {
     return Math.random().toString(36).slice(2);
   };
 
-  mod.isNotNull = function(x) {
+  export function isNotNull(x) {
     return x !== undef && x !== null;
   };
 
-  mod.isDefined = function(x) {
+  export function isDefined(x) {
     return x !== undef;
   };
 
-  mod.isString = function(x) {
+  export function isString(x) {
     return typeof x === "string";
   };
 
-  mod.isObject = function(x) {
+  export function isObject(x) {
     return Object.prototype.toString.call(x) === "[object Object]";
   };
 
@@ -32,30 +31,29 @@ var util = (function () {
     Merge two objects into one, from left to right.
     A new object is created, leaving the input untouched.
   */
-  mod.mergeObjects = function(/* as many object arguments as you want */) {
-    var l = arguments;
+  export function mergeObjects(...l : any[]) {
     var result = {};
-    list.iter(l, function(obj) {
-      if (mod.isObject(obj)) {
+    List.iter(l, function(obj) {
+      if (isObject(obj)) {
         for (var k in obj)
           result[k] = obj[k];
       }
       else {
-        log("util.mergeObjects ignoring non-object:", obj);
+        Log.p("util.mergeObjects ignoring non-object:", obj);
       }
     });
     return result;
   };
 
-  mod.toString = function(x) {
-    return test.toString(x);
+  export function toString(x) {
+    return Test.toString(x);
   }
 
   /*
     Do something once the user has stopped typing for a certain number
     of milliseconds.
    */
-  mod.afterTyping = function(elt, delayMs, func) {
+  export function afterTyping(elt, delayMs, func) {
     var lastPressed; // date in milliseconds
     elt
       .unbind('keydown')
@@ -79,36 +77,36 @@ var util = (function () {
   var focusOn;
 
   /* Change the element to focus on. */
-  mod.changeFocus = function(elt) {
+  export function changeFocus(elt) {
     focusOn = elt;
     elt.focus(); /* this does nothing if the element is still hidden */
   };
 
   /* Unset the element to focus on. */
-  mod.cancelFocus = function() {
+  export function cancelFocus() {
     focusOn = null;
   };
 
   /* Focus */
-  mod.focus = function() {
-    if (mod.isNotNull(focusOn)) {
+  export function focus() {
+    if (isNotNull(focusOn)) {
       focusOn.focus();
     }
   };
 
   /* Decode a string encode in hexadecimal */
-  mod.hexDecode = function(hex) {
+  export function hexDecode(hex) {
     var s = "";
     for (var i = 0; i < hex.length; i += 2)
       s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return s;
   };
 
-  mod.tests = [
-    test.expect(
+  export var tests = [
+    Test.expect(
       "mergeObjects",
       function() {
-        var m = mod.mergeObjects({x:1, y:2}, {z:3, x:4});
+        var m : any = mergeObjects({x:1, y:2}, {z:3, x:4});
         return m.x === 4 && m.y === 2 && m.z === 3;
       },
       null,
@@ -116,5 +114,4 @@ var util = (function () {
     )
   ];
 
-  return mod;
-})();
+}

@@ -13,13 +13,12 @@
     <link rel="stylesheet" href="/assets/css/animate.min.css">
     <link rel="stylesheet" href="/assets/css/font-awesome.css">
     <link rel="stylesheet" href="/assets/css/executive-preferences.css">
+    <link rel="stylesheet" href="/assets/css/fullcalendar.css">
     <link rel="shortcut icon" href="/assets/img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon">
 
     <!-- Mixpanel JS loader file, copied from js/mixpanel.js -->
     <script href="/assets/js/mixpanel.js"></script>
-
-    <script src="/assets/js/executive-preferences.js"></script>
   </head>
 
   <body>

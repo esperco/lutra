@@ -2,8 +2,7 @@
   Team settings page
 */
 
-var settings = (function() {
-  var mod = {};
+module Settings {
 
   function toggleOverlay(overlay) {
     if (overlay.css("display") === "none")
@@ -24,13 +23,6 @@ var settings = (function() {
       dismissOverlays();
   });
 
-  function setTeamCalendar(team, calId) {
-    return api.setTeamCalendar(team.teamid, calId)
-      .done(function() {
-        log("Successfully set team calendar to " + calId);
-      });
-  }
-
   // TODO Styling
   function makeCalendarSelectors(team, root) {
 '''
@@ -38,12 +30,12 @@ var settings = (function() {
   <div style="float: left; width: 40%">
     <div><b>All calendars:</b></div>
     <div style="font-size: 75%">(double-click to add)</div>
-    <select #allCals multiple size=5 />
+    <select #allCals multiple="multiple" size=5 />
   </div>
   <div>
     <div><b>Team calendars:</b></div>
     <div style="font-size: 75%">(double-click to remove)</div>
-    <select #teamCals multiple size=5 />
+    <select #teamCals multiple="multiple" size=5 />
   </div>
   <br/>
   <div>
@@ -55,7 +47,7 @@ var settings = (function() {
       $(this).remove();
     }
 
-    list.iter(team.team_calendars, function(cal) {
+    List.iter(team.team_calendars, function(cal) {
       var opt = $("<option class='esper-calendar-option'"
                   + "value='" + cal.google_cal_id + "'>"
                   + cal.calendar_title + "</option>");
@@ -64,8 +56,8 @@ var settings = (function() {
          .appendTo(teamCals);
     });
 
-    api.getCalendarList().done(function(x) {
-      list.iter(x.named_calendar_ids, function(cal) {
+    Api.getCalendarList().done(function(x) {
+      List.iter(x.named_calendar_ids, function(cal) {
         var opt = $("<option class='esper-calendar-option'"
                     + "value='" + cal.google_cal_id + "'>"
                     + cal.calendar_title + "</option>");
@@ -94,11 +86,12 @@ var settings = (function() {
             calendar_title: opt.text()
           };
         });
-        var uniqueCalIDs = list.union(teamCalIDs, []); // remove duplicates
-        var teamCalendars = list.map(uniqueCalIDs, function(calID) {
+        // remove duplicates
+        var uniqueCalIDs = List.union(teamCalIDs, [], undefined);
+        var teamCalendars = List.map(uniqueCalIDs, function(calID) {
           return calData[calID];
         });
-        api.putTeamCalendars(team.teamid, { named_calendar_ids: teamCalendars })
+        Api.putTeamCalendars(team.teamid, { named_calendar_ids: teamCalendars })
           .done(function() { window.location.reload(); });
       });
 
@@ -129,8 +122,9 @@ var settings = (function() {
         var opt = $(teamOpts[i]);
         teamEmails.push(opt.text());
       });
-      var uniqueEmails = list.union(teamEmails, []); // remove duplicates
-      api.putTeamEmails(team.teamid, { emails: uniqueEmails })
+      // remove duplicates
+      var uniqueEmails = List.union(teamEmails, [], undefined);
+      Api.putTeamEmails(team.teamid, { emails: uniqueEmails })
         .done(function() { team.team_email_aliases = uniqueEmails; });
     }
 
@@ -139,7 +133,7 @@ var settings = (function() {
       setTeamEmails();
     }
 
-    list.iter(team.team_email_aliases, function(email) {
+    List.iter(team.team_email_aliases, function(email) {
       var opt = $("<option class='esper-email-alias'>"
                   + email + "</option>");
       opt.dblclick(removeOpt)
@@ -223,23 +217,23 @@ var settings = (function() {
 
     function toggleSync() {
       disable();
-      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
-        if (list.mem(syncedLabels.labels, label)) {
+      Api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        if (List.mem(syncedLabels.labels, label)) {
           var index = syncedLabels.labels.indexOf(label);
           if (index != undefined) {
             syncedLabels.labels.splice(index, 1);
           }
-          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+          Api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
             .done(function() { showNotSyncing(); });
         } else {
           syncedLabels.labels.push(label);
-          api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+          Api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
             .done(function() { showSyncing(); });
         }
       });
     }
 
-    if (list.mem(syncedLabelsList, label))
+    if (List.mem(syncedLabelsList, label))
       showSyncing();
     else
       showNotSyncing();
@@ -286,11 +280,11 @@ var settings = (function() {
 '''
     var labelSync = $("<img class='svg-block label-sync-icon'/>")
       .appendTo(labelSyncContainer);
-    svg.loadImg(labelSync, "/assets/img/LabelSync.svg");
+    Svg.loadImg(labelSync, "/assets/img/LabelSync.svg");
 
     var labelIcon = $("<img class='svg-block label-icon'/>")
       .appendTo(labelIconContainer);
-    svg.loadImg(labelIcon, "/assets/img/new-label.svg");
+    Svg.loadImg(labelIcon, "/assets/img/new-label.svg");
 
     description
       .text("LabelSync lets you share email labels across your team. Below " +
@@ -301,15 +295,16 @@ var settings = (function() {
     // local array for keyup function
     var sharedLabelsList;
 
-    api.getSharedLabels(team.teamid).done(function(sharedLabels) {
-      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+    Api.getSharedLabels(team.teamid).done(function(sharedLabels) {
+      Api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
         sharedLabelsList = sharedLabels.labels;
-        var allLabels = list.union(sharedLabels.labels, syncedLabels.labels);
+        var allLabels =
+          List.union(sharedLabels.labels, syncedLabels.labels, undefined);
         tableSpinner.hide();
         if (allLabels.length > 0) {
           labels.children().remove();
           allLabels.sort();
-          list.iter(allLabels, function(label) {
+          List.iter(allLabels, function(label) {
             labels.append(viewOfLabelRow(team, label, syncedLabels.labels));
           });
         } else {
@@ -323,7 +318,7 @@ var settings = (function() {
     });
 
     newLabel.keyup(function() {
-      console.log(newLabel.val());
+      Log.p(newLabel.val());
       if (newLabel.val() != "") {
         if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
           save.attr("disabled", "true");
@@ -342,10 +337,10 @@ var settings = (function() {
       newLabel.addClass("disabled");
       save.attr("disabled", "true");
       var label = newLabel.val();
-      api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+      Api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
         sharedLabelsList.push(label);
         syncedLabels.labels.push(label);
-        api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+        Api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
           .done(function() {
             inlineSpinner.hide();
             toggleOverlay(newLabelPopover);
@@ -372,12 +367,12 @@ var settings = (function() {
   function generateInviteURL(team, role) {
     dismissOverlays();
     var invite = {
-      from_uid: login.me(),
+      from_uid: Login.me(),
       teamid: team.teamid,
       role: role
     };
-    log("Invite:", invite);
-    return api.inviteJoinTeam(invite);
+    Log.p("Invite:", invite);
+    return Api.inviteJoinTeam(invite);
   }
 
   function composeInviteWithURL(url) {
@@ -385,7 +380,7 @@ var settings = (function() {
       "Please click the link and sign in with your Google account:\n\n"
       + "  " + url;
 
-    return gmailCompose.compose({
+    return GmailCompose.compose({
       subject: "Join my team on Esper",
       body: body
     });
@@ -412,7 +407,7 @@ var settings = (function() {
 '''
     var email = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
-    svg.loadImg(email, "/assets/img/email.svg");
+    Svg.loadImg(email, "/assets/img/email.svg");
 
     invite.click(function() { toggleOverlay(inviteOptions); });
 
@@ -429,7 +424,7 @@ var settings = (function() {
   }
 
   function displayAssistants(assistantsList, team, profiles) {
-    list.iter(profiles, function(profile) {
+    List.iter(profiles, function(profile) {
 '''
 <li #row class="table-row assistants-table clearfix">
   <div class="col-xs-6">
@@ -463,12 +458,13 @@ var settings = (function() {
       if (!profile.google_access) {
         var warning = $("<img class='svg-block'/>")
           .appendTo(statusContainer);
-        svg.loadImg(warning, "/assets/img/warning.svg");
-        statusContainer.tooltip();
+        Svg.loadImg(warning, "/assets/img/warning.svg");
+        (<any> statusContainer).tooltip(); // FIXME
       }
 
-      if (memberUid !== login.me()
-          && list.mem(team.team_assistants, memberUid)) {
+(function(){ // a block scope, a block scope, my kingdom for a block scope!
+      if (memberUid !== Login.me()
+          && List.mem(team.team_assistants, memberUid)) {
 '''
 <span #removeSpan>
   <a #removeLink href="#" class="danger-link">Remove</a>
@@ -476,7 +472,7 @@ var settings = (function() {
 '''
         removeLink.appendTo(actions)
         removeLink.click(function() {
-          api.removeAssistant(team.teamid, memberUid)
+          Api.removeAssistant(team.teamid, memberUid)
             .done(function() { refresh(); });
         });
 
@@ -487,7 +483,9 @@ var settings = (function() {
           .append($("<span>" + profile.display_name + "</span>"))
           .append($("<span class='semibold'> (Me)</span>"));
       }
+})();
 
+(function(){
       if (memberUid !== execUid) {
 '''
 <span #makeExecSpan>
@@ -496,10 +494,11 @@ var settings = (function() {
 '''
         makeExecSpan.appendTo(actions);
         makeExecLink.click(function() {
-          api.setExecutive(team.teamid, memberUid)
+          Api.setExecutive(team.teamid, memberUid)
             .done(function() { refresh(); });
         });
       }
+})();
 
       assistantsList.append(row);
     });
@@ -532,10 +531,10 @@ var settings = (function() {
 '''
     spinner.show();
 
-    api.getProfile(team.team_executive, team.teamid)
+    Api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
         profilePic.css("background-image", "url('" + exec.image_url + "')");
-        if (team.team_executive === login.me()) {
+        if (team.team_executive === Login.me()) {
           execName
             .append($("<span>" + exec.display_name + "</span>"))
             .append($("<span class='semibold'> (Me)</span>"));
@@ -546,13 +545,13 @@ var settings = (function() {
         if (!exec.google_access) {
           var warning = $("<img class='svg-block'/>")
             .appendTo(execStatusContainer);
-          svg.loadImg(warning, "/assets/img/warning.svg");
-          execStatusContainer.tooltip();
+          Svg.loadImg(warning, "/assets/img/warning.svg");
+          (<any> execStatusContainer).tooltip(); // FIXME
         }
       });
 
-    deferred.join(list.map(team.team_assistants, function(uid) {
-      return api.getProfile(uid, team.teamid);
+    Deferred.join(List.map(team.team_assistants, function(uid) {
+      return Api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) {
         spinner.hide();
@@ -617,14 +616,14 @@ var settings = (function() {
     content2.append(viewOfLabelSyncTab(team));
     content3.append(viewOfCalendarTab(team));
 
-    done.click(function() { modal.modal("hide") });
+    done.click(function() { (<any> modal).modal("hide") }); // FIXME
 
-    modal.modal({});
+    (<any> modal).modal({}); // FIXME
   }
 
   function checkTeamStatus(profiles, statusContainer) {
     var error = false;
-    list.iter(profiles, function(profile) {
+    List.iter(profiles, function(profile) {
       if (!profile.google_access) {
         error = true;
       }
@@ -632,7 +631,7 @@ var settings = (function() {
     if (error) {
       var warning = $("<img class='svg-block'/>")
         .appendTo(statusContainer);
-      svg.loadImg(warning, "/assets/img/warning.svg");
+      Svg.loadImg(warning, "/assets/img/warning.svg");
       statusContainer.tooltip();
     }
   }
@@ -653,18 +652,19 @@ var settings = (function() {
 '''
     var cog = $("<img class='svg-block team-cog clickable'/>")
       .appendTo(cogContainer);
-    svg.loadImg(cog, "/assets/img/cog.svg");
+    Svg.loadImg(cog, "/assets/img/cog.svg");
 
-    var members = list.union([team.team_executive], team.team_assistants);
-    deferred.join(list.map(members, function(uid) {
-      return api.getProfile(uid, team.teamid);
+    var members =
+      List.union([team.team_executive], team.team_assistants, undefined);
+    Deferred.join(List.map(members, function(uid) {
+      return Api.getProfile(uid, team.teamid);
     }))
       .done(function(profiles) { checkTeamStatus(profiles, statusContainer); });
 
-    api.getProfile(team.team_executive, team.teamid)
+    Api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
         profilePic.css("background-image", "url('" + profile.image_url + "')");
-        if (team.team_executive === login.me()) {
+        if (team.team_executive === Login.me()) {
           name
             .append($("<span>" + profile.display_name + "</span>"))
             .append($("<span class='semibold'> (Me)</span>"));
@@ -695,12 +695,12 @@ var settings = (function() {
 </div>
 '''
     clearSync.click(function() {
-      login.clearAllLoginInfo();
-      signin.signin(function(){});
+      Login.clearAllLoginInfo();
+      Signin.signin(function(){}, undefined, undefined);
     });
 
     button.click(function() {
-      api.inviteCreateTeam()
+      Api.inviteCreateTeam()
         .done(function(x) {
           url
             .val(x.url)
@@ -712,7 +712,7 @@ var settings = (function() {
     return view;
   }
 
-  mod.load = function() {
+  export function load() {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -798,42 +798,42 @@ var settings = (function() {
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
-    svg.loadImg(logo, "/assets/img/logo.svg");
+    Svg.loadImg(logo, "/assets/img/logo.svg");
 
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
-    svg.loadImg(close, "/assets/img/close.svg");
+    Svg.loadImg(close, "/assets/img/close.svg");
 
     var chrome = $("<img class='svg-block chrome-logo'/>")
       .appendTo(chromeLogoContainer);
-    svg.loadImg(chrome, "/assets/img/chrome.svg");
+    Svg.loadImg(chrome, "/assets/img/chrome.svg");
 
     var arrowEast = $("<img class='svg-block arrow-east'/>")
       .appendTo(arrowContainer);
-    svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
+    Svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
 
     var wordMark = $("<img class='svg-block word-mark'/>")
       .appendTo(wordMarkContainer);
-    svg.loadImg(wordMark, "/assets/img/word-mark.svg");
+    Svg.loadImg(wordMark, "/assets/img/word-mark.svg");
 
-    api.getMyProfile()
+    Api.getMyProfile()
       .done(function(profile){
         profilePic.css("background-image", "url('" + profile.image_url + "')");
         myName.text(profile.display_name);
-        myEmail.text(login.myEmail());
+        myEmail.text(Login.myEmail());
       });
 
     uid
       .append("<span>UID: </span>")
-      .append("<span class='gray'>" + login.me() + "</span>");
+      .append("<span class='gray'>" + Login.me() + "</span>");
 
-    list.iter(login.getTeams(), function(team) {
+    List.iter(Login.getTeams(), function(team) {
       teams.append(viewOfTeam(team));
     });
 
     signOut.click(function() {
-      login.clearLoginInfo();
-      signin.signin(function(){});
+      Login.clearLoginInfo();
+      Signin.signin(function(){}, undefined, undefined);
       return false;
     });
 
@@ -850,7 +850,7 @@ var settings = (function() {
     })
 
     revoke.click(function() {
-      api.postGoogleAuthRevoke()
+      Api.postGoogleAuthRevoke()
         .done(function() {
           signOut.click();
         });
@@ -858,23 +858,22 @@ var settings = (function() {
     });
 
     contact.click(function() {
-      gmailCompose.compose({ to: "team@esper.com" });
+      GmailCompose.compose({ to: "team@esper.com" });
     });
 
-    api.getGoogleAuthInfo(document.URL)
+    Api.getGoogleAuthInfo(document.URL)
       .done(function(info) {
         if (info.has_token)
           revoke.removeClass("hide");
         else {
-          window.url = info.google_auth_url;
+          window.location.assign(info.google_auth_url);
         }
       });
 
-    if (login.isAdmin()) {
+    if (Login.isAdmin()) {
       adminBody.append(renderAdminSection());
       adminSection.removeClass("hide");
     }
   }
 
-  return mod;
-})();
+}

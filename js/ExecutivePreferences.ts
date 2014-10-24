@@ -1,7 +1,3 @@
-declare var api     : any;
-declare var login   : any;
-declare var status_ : any;
-
 module Esper.ExecutivePreferences {
 
   var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
@@ -96,10 +92,28 @@ module Esper.ExecutivePreferences {
   }
 
   export function load() {
-    $("#preferences-page").append(saveButton());
+'''
+<div #view class="preferences-container">
+  <div class="header clearfix">
+    <a #logoContainer href="http://esper.com" target="_blank"
+       class="img-container-left"/>
+    <div class="header-title">Meeting Preferences</div>
+    <span #signOut class="header-signout clickable">Sign out</span>
+  </div>
+  <div class="divider"/>
+  <div #form class="preference-form"></div>
+</div>
+'''
+    var root = $("#preferences-page");
+    root.children().remove();
+    root.append(view);
+    document.title = "Meeting Preferences - Esper";
 
-    var container = $("<div class='preference-form'>");
-    $("#preferences-page").append(container);
+    var logo = $("<img class='svg-block header-logo'/>")
+      .appendTo(logoContainer);
+    Svg.loadImg(logo, "/assets/img/logo.svg");
+
+    form.append(saveButton());
 
     loadForm();
   }
@@ -176,12 +190,14 @@ module Esper.ExecutivePreferences {
   export function loadPreferences(callback) {
     var teamid = $("#teamSelect").val();
 
-    var preferences = api.getPreferences(teamid);
+    var preferences = Api.getPreferences(teamid);
 
-    preferences.done(function () {
-      preferences = JSON.parse(preferences.responseText) || {};
+    preferences.done(function (x) {
+      Log.p("PREFERENCES", x);
+      // wtf goin on here?
+      //var p = JSON.parse(x.responseText) || {};
 
-      callback($.extend(true, defaultPreferences(), preferences));
+      callback($.extend(true, defaultPreferences(), x));
     });
   }
 
@@ -199,27 +215,10 @@ module Esper.ExecutivePreferences {
       address : ""
     };
 
-    var defaultAvailability = {
-      avail_from : {
-        day : "Mon",
-        time : {
-          hour : 11,
-          minute : 0
-        }
-      },
-      avail_to : {
-        day : "Mon",
-        time : {
-          hour : 12,
-          minute : 0
-        }
-      },
-    };
-
     var defaults    = {
       meeting_types : {
         phone_call : {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           phones       : [
             {
@@ -229,7 +228,7 @@ module Esper.ExecutivePreferences {
           ]
         },
         video_call : {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           accounts     : [
             {
@@ -241,7 +240,7 @@ module Esper.ExecutivePreferences {
       },
       workplaces    : [
         {
-          availability : [defaultAvailability],
+          availability : [],
           duration     : defaultDuration,
           location     : defaultLocation
         }
@@ -249,7 +248,7 @@ module Esper.ExecutivePreferences {
     };
 
     var defaultMealInfo = {
-      availability : [defaultAvailability],
+      availability : [],
       duration     : defaultDuration,
       favorites    : [ defaultLocation ]
     };
@@ -266,11 +265,11 @@ module Esper.ExecutivePreferences {
     try {
       var preferences = currentPreferences();
 
-      api.setPreferences(teamid, preferences);
-      
+      Api.setPreferences(teamid, preferences);
+
       saved = true;
     } catch (e) {
-      status_.reportError("Didn't save:", e);
+      //Status.reportError("Didn't save:", e);
       if (e !== "typo") {
         throw e;
       }
@@ -338,44 +337,7 @@ module Esper.ExecutivePreferences {
       var availabilityWidget = $(element).closest("li")
         .find(".customize-availability");
 
-      var availabilities = []
-
-      availabilityWidget.find(".availability").each(function(i, e) {
-        var days  = $($(e).find("input")[0]).val();
-        var start = $($(e).find("input")[1]).val();
-        var end   = $($(e).find("input")[2]).val();
-
-        if (days !== "" || start !== "" || end !== "") {
-
-          start = toTime(start);
-          end = toTime(end);
-
-          if (start === null || end === null) {
-            typo($(e));
-          } else {
-            days = days.split("").map(dayToThreeLetter);
-
-            days.forEach(function (day) {
-              if (day) {
-                availabilities.push({
-                  avail_from : {
-                    day : day,
-                    time : start
-                  },
-                  avail_to : {
-                    day : day,
-                    time : end
-                  }
-                });
-              } else {
-                typo($(e));
-              }
-            });
-          }
-        }
-      });
-
-      return availabilities;
+      return availabilityWidget.data("availabilities");
     }
 
     function phoneNumberList() {
@@ -438,7 +400,7 @@ module Esper.ExecutivePreferences {
   </span>
 </div>
 '''
-    login.getTeams().forEach(function (team) {
+    Login.getTeams().forEach(function (team) {
       var name   = team.team_name;
       var teamid = team.teamid;
       var option = $('<option value="' + teamid + '">').text(name);
@@ -497,6 +459,10 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
+  function showAvailability(defaults, element) {
+    CalPicker.createModal(defaults, element);
+  }
+
   /** The basic form widget which has a prominent on/off toggle and a
    *  link for customizing availability. The actual forms like meal
    *  times or calls are extensions of this.
@@ -522,10 +488,9 @@ module Esper.ExecutivePreferences {
       <span>Yes</span>
     </label>
   </form>
-
-  <div #availabilityContainer class="customize-availability">
-  </div>
-  <a #availability href="#">Add availability</a>
+  <a class="customize-availability" #customizeAvailability href="#">
+    Customize availability
+  </a>
 
   <hr />
 
@@ -541,13 +506,18 @@ module Esper.ExecutivePreferences {
 
     possibleDurations.input.val(fromTime(defaults.duration));
 
-    availability.click(function () {
-      availabilityContainer.append(availabilityEntry());
-      return false;
-    });
+    // availability.click(function () {
+    //   availabilityContainer.append(availabilityEntry());
+    //   return false;
+    // });
 
-    defaults.availability.forEach(function (availability) {
-      addAvailability(_view, availability); // currying would make this prettier
+    // defaults.availability.forEach(function (availability) {
+    //   addAvailability(_view, availability); // currying would make this prettier
+    // });
+
+    customizeAvailability.data("availabilities", defaults.availability);
+    customizeAvailability.click(function() {
+      showAvailability(defaults, customizeAvailability);
     });
 
     return _view;
@@ -680,8 +650,8 @@ module Esper.ExecutivePreferences {
 '''
 <div class="video-account" #container>
   <select class="account-type" #select>
-    <option value="Google" selected="selected">google</option>
-    <option value="Skype">skype</option>
+    <option value="Google" selected="selected">Google Hangouts</option>
+    <option value="Skype">Skype</option>
   </select>
   <input #account type="text" class="video-account" />
 </div>

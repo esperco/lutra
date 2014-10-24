@@ -2,9 +2,7 @@
   API client
 */
 
-var api = (function () {
-
-  var mod = {};
+module Api {
 
   // HTTP - response body is interpreted as JSON
 
@@ -21,22 +19,22 @@ var api = (function () {
       };
       switch (xhr.status) {
       case 400:
-        log("Bad request", details);
+        Log.p("Bad request", details);
         break;
       case 401:
-        log("Unauthorized", details);
+        Log.p("Unauthorized", details);
         break;
       case 403:
-        log("Forbidden", details);
+        Log.p("Forbidden", details);
         break;
       case 404:
-        log("Not found", details);
+        Log.p("Not found", details);
         break;
       case 500: /* Server error */
-        log("Server error", details);
+        Log.p("Server error", details);
         break;
       default: /* Fallback */
-        log("Unknown error " + xhr.status, details);
+        Log.p("Unknown error " + xhr.status, details);
       }
     }
 
@@ -50,10 +48,10 @@ var api = (function () {
       type: method,
       data: body,
       dataType: "json",
-      beforeSend: login.setHttpHeaders(url)
+      beforeSend: Login.setHttpHeaders(url)
     };
     if (body && body.length > 0) {
-      request.contentType = "application/json; charset=UTF-8";
+      request["contentType"] = "application/json; charset=UTF-8";
     }
     return $.ajax(request)
             .fail(logError);
@@ -91,39 +89,53 @@ var api = (function () {
 
   /* Esper login and password management */
 
-  mod.getLoginInfo = function() {
-    return jsonHttpGet("/api/login/" + login.me() + "/info");
+  export function getLoginInfo()
+    : JQueryDeferred<ApiT.LoginResponse>
+  {
+    return jsonHttpGet("/api/login/" + Login.me() + "/info");
   };
 
-  mod.loginOnce = function(uid, loginNonce) {
-    return jsonHttpPost("/api/login/" + uid + "/once/" + loginNonce);
+  export function loginOnce(uid, loginNonce)
+    : JQueryDeferred<ApiT.LoginResponse>
+  {
+    return jsonHttpPost("/api/login/" + uid + "/once/" + loginNonce, "");
   };
 
-  mod.random = function() {
-    return jsonHttpPost("/api/random");
+  export function random()
+    : JQueryDeferred<ApiT.Random>
+  {
+    return jsonHttpPost("/api/random", "");
   };
 
   /*** Esper team management ***/
 
-  mod.inviteCreateTeam = function() {
-    var fromUid = login.me();
+  export function inviteCreateTeam()
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    var fromUid = Login.me();
     var invite = { from_uid: fromUid };
     return jsonHttpPost("/api/invite/" + fromUid + "/create-team",
                         JSON.stringify(invite));
   };
 
-  mod.inviteJoinTeam = function(invite) {
-    return jsonHttpPost("/api/invite/" + login.me() + "/join-team",
+  export function inviteJoinTeam(invite)
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    return jsonHttpPost("/api/invite/" + Login.me() + "/join-team",
                         JSON.stringify(invite));
   };
 
-  mod.setExecutive = function(teamid, memberUid) {
-    return jsonHttpPut("/api/team/" + login.me() + "/" + teamid
-                       + "/executive/" + memberUid);
+  export function setExecutive(teamid, memberUid)
+    : JQueryDeferred<void>
+  {
+    return jsonHttpPut("/api/team/" + Login.me() + "/" + teamid
+                       + "/executive/" + memberUid, "");
   };
 
-  mod.removeAssistant = function(teamid, memberUid) {
-    return jsonHttpDelete("/api/team/" + login.me() + "/" + teamid
+  export function removeAssistant(teamid, memberUid)
+    : JQueryDeferred<void>
+  {
+    return jsonHttpDelete("/api/team/" + Login.me() + "/" + teamid
                           + "/member/" + memberUid);
   };
 
@@ -137,73 +149,81 @@ var api = (function () {
     The response describes what has be done and what can be done next.
     This is used for invites and other URLs that are given out to users.
    */
-  mod.postToken = function(token) {
-    return jsonHttpPost("/api/token/" + encodeURIComponent(token));
+  export function postToken(token)
+    : JQueryDeferred<ApiT.LoginResponse>
+  {
+    return jsonHttpPost("/api/token/" + encodeURIComponent(token), "");
   };
 
 
   /***** Google authentication and permissions *****/
 
-  mod.getGoogleAuthUrl = function(optAuthLandingUrl,
+  export function getGoogleAuthUrl(optAuthLandingUrl,
                                   optLoginNonce,
                                   optInvite,
-                                  optEmail) {
+                                  optEmail)
+    : JQueryDeferred<ApiT.UrlResult>
+  {
     var url = "/api/google-auth-url";
     var q = [];
-    if (util.isString(optAuthLandingUrl))
+    if (Util.isString(optAuthLandingUrl))
       q.push("auth_landing=" + encodeURIComponent(optAuthLandingUrl));
-    if (util.isString(optLoginNonce))
+    if (Util.isString(optLoginNonce))
       q.push("login_nonce=" + encodeURIComponent(optLoginNonce));
-    if (util.isString(optInvite))
+    if (Util.isString(optInvite))
       q.push("invite=" + encodeURIComponent(optInvite));
-    if (util.isString(optEmail))
+    if (Util.isString(optEmail))
       q.push("login_hint=" + encodeURIComponent(optEmail));
     url = url + makeQuery(q);
     return jsonHttpGet(url);
   };
 
-  mod.getGoogleAuthInfo = function(optAuthLandingUrl) {
-    var url = "/api/google/" + login.me() + "/auth/info";
-    if (util.isString(optAuthLandingUrl)) {
+  export function getGoogleAuthInfo(optAuthLandingUrl)
+    : JQueryDeferred<any> // FIXME
+  {
+    var url = "/api/google/" + Login.me() + "/auth/info";
+    if (Util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
     return jsonHttpGet(url);
   };
 
-  mod.postGoogleAuthRevoke = function() {
-    var url = "/api/google/" + login.me() + "/auth/revoke";
+  export function postGoogleAuthRevoke()
+    : JQueryDeferred<any> // FIXME
+  {
+    var url = "/api/google/" + Login.me() + "/auth/revoke";
     return jsonHttpPost(url, "");
   };
 
 
   /***** Team label syncing *****/
 
-  mod.getSyncedLabels = function(teamid) {
+  export function getSyncedLabels(teamid)
+    : JQueryDeferred<ApiT.EmailLabels>
+  {
     var url = "/api/labels/synced/" + teamid;
     return jsonHttpGet(url);
   };
 
-  mod.putSyncedLabels = function(teamid, labels) {
+  export function putSyncedLabels(teamid, labels)
+    : JQueryDeferred<void>
+  {
     var url = "/api/labels/synced/" + teamid;
     return jsonHttpPut(url, JSON.stringify(labels));
   };
 
-  mod.getSharedLabels = function(teamid) {
+  export function getSharedLabels(teamid)
+    : JQueryDeferred<ApiT.EmailLabels>
+  {
     var url = "/api/labels/shared/" + teamid;
     return jsonHttpGet(url);
   };
 
-  /***** Team calendar *****/
-
-  mod.setTeamCalendar = function(teamid, calId) {
-    var url = "/api/calendar/select/" + login.me() + "/" + teamid;
-    var data = { calendar_id: calId };
-    return jsonHttpPut(url, JSON.stringify(data));
-  }
-
   /***** Google profile information *****/
 
-  mod.getGoogleEmail = function(myUID, theirUID, teamid) {
+  export function getGoogleEmail(myUID, theirUID, teamid)
+    : JQueryDeferred<ApiT.AccountEmail>
+  {
     var url = "/api/google/email/" + myUID + "/" + theirUID + "/" + teamid;
     return jsonHttpGet(url);
   };
@@ -211,67 +231,66 @@ var api = (function () {
   /*******/
 
   function apiProfilePrefix() {
-    return "/api/profile/" + login.data.uid;
+    return "/api/profile/" + Login.data.uid;
   }
 
-  function apiQPrefix() {
-    return "/api/q/" + login.data.uid;
-  }
-
-  function api_tasks_prefix() {
-    return apiQPrefix() + "/tasks/" + login.getTeam().teamid;
-  }
-
-  function apiTaskProfilePrefix() {
-    return apiQPrefix() + "/profile";
-  }
-
-  mod.getProfile = function(uid, teamid) {
+  export function getProfile(uid, teamid)
+    : JQueryDeferred<ApiT.Profile>
+  {
     return jsonHttpGet(apiProfilePrefix()
                        + "/" + uid
                        + "/" + teamid);
   };
 
-  mod.getMyProfile = function() {
+  export function getMyProfile() {
     return jsonHttpGet(apiProfilePrefix() + "/me");
   };
 
 
   /*** Scheduling ***/
 
-  mod.getCalendarList = function() {
-    var url = "api/calendar/list/" + login.data.uid;
+  export function getCalendarList()
+    : JQueryDeferred<ApiT.NamedCalendarIds>
+  {
+    var url = "api/calendar/list/" + Login.data.uid;
     return jsonHttpGet(url);
   };
 
-  mod.putTeamCalendars = function(teamid, cals) {
-    var url = "api/team/" + login.data.uid
+  export function putTeamCalendars(teamid, cals)
+    : JQueryDeferred<void>
+  {
+    var url = "api/team/" + Login.data.uid
       + "/" + teamid + "/calendars";
     return jsonHttpPut(url, JSON.stringify(cals));
   };
 
-  mod.putTeamEmails = function(teamid, aliases) {
-    var url = "api/team/" + login.data.uid
+  export function putTeamEmails(teamid, aliases)
+    : JQueryDeferred<ApiT.EmailAddresses>
+  {
+    var url = "api/team/" + Login.data.uid
       + "/" + teamid + "/emails";
     return jsonHttpPut(url, JSON.stringify(aliases));
   };
 
   /*** Executive Preferences ***/
-  
+
   /** Sets the preferences given the correct JSON object. */
-  mod.setPreferences = function(teamid, preferences) {
-    var url = "/api/preferences/" + login.me() + "/" + teamid;
+  export function setPreferences(teamid, preferences)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/" + Login.me() + "/" + teamid;
     return jsonHttpPut(url, JSON.stringify(preferences));
   }
 
   /** The preferences currently saved for the given team executive, as
    *  a JSON object.
    */
-  mod.getPreferences = function(teamid) {
-    var url = "/api/preferences/" + login.me() + "/" + teamid;
+  export function getPreferences(teamid)
+    : JQueryDeferred<ApiT.Preferences>
+  {
+    var url = "/api/preferences/" + Login.me() + "/" + teamid;
 
     return jsonHttpGet(url);
   }
 
-  return mod;
-})();
+}

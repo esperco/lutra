@@ -3,28 +3,27 @@
   by HTTP calls)
 */
 
-var deferred = (function() {
-  var mod = {};
+module Deferred {
 
   /* wrap an already-computed value into a Deferred object,
      indicating a successful computation. */
-  mod.defer = function(x) {
-    var dfd = new $.Deferred();
+  export function defer(x) {
+    var dfd = (<any> $.Deferred()); // FIXME
     dfd.resolve(x);
     return dfd;
   }
 
   /* wrap an already-computed value into a Deferred object,
      indicating a failed computation. */
-  mod.fail = function(x) {
-    var dfd = new $.Deferred();
+  export function fail(x) {
+    var dfd = (<any> $.Deferred()); // FIXME
     dfd.reject(x);
     return dfd;
   }
 
   /* take a list of deferred computations and
      return a deferred list of the results */
-  mod.join = function(a) {
+  export function join(a) {
     var len = a.length;
     var b = [];
     function next(i) {
@@ -44,10 +43,9 @@ var deferred = (function() {
           )
       }
       else
-        return mod.defer(b);
+        return defer(b);
     }
     return next(0);
   };
 
-  return mod;
-}());
+}

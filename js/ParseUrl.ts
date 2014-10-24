@@ -2,10 +2,9 @@
   URL parsing
 */
 
-var parseUrl = (function() {
-  var mod = {};
+module ParseUrl {
 
-  mod.parse = function(url) {
+  export function parse(url) {
     var x = document.createElement('a');
     x.href = url;
     return {
@@ -27,12 +26,11 @@ var parseUrl = (function() {
       return s1;
   }
 
-  mod.toRelative = function(x) {
+  export function toRelative(x) {
     var s = x.path;
     s = appendIfNotEmpty(s, "?", x.query);
     s = appendIfNotEmpty(s, "#", x.fragment);
     return s;
   };
 
-  return mod;
-})();
+}
