@@ -3,6 +3,7 @@
 */
 
 module AccountTab {
+  declare var Stripe : any;
 
   function toggleOverlay(overlay) {
     if (overlay.css("display") === "none")
@@ -164,37 +165,46 @@ module AccountTab {
   }
 
   export function load(team) {
+
+
+
+
 '''
 <div #view>
   <div class="table-header">Membership & Billing</div>
   <div #payments class="table-list">
+  <div class="cc-wrapper">
     <form action="" method="POST" id="payment-form">
       <span class="payment-errors"></span>
 
-        <div class="form-row">
-          <label><span>Card Number</span>
-            <input type="text" size="20" data-stripe="number" id="form-element-right"/>
+        <div class="cc-row">
+          <label class="cc-label">
+            <span>Card Number</span>
           </label>
+            <input type="text" size="20" data-stripe="number" class="cc-number"/>
         </div>
 
-        <div class="form-row">
-          <label><span>CVC</span>
-            <input type="text" size="4" data-stripe="cvc" id="form-element-right"/>
+        <div class="cc-row">
+          <label class="cc-label">
+            <span>CVC</span>
           </label>
+
+          <input type="text" size="20" data-stripe="cvc" class="cc-input"/>
+
         </div>
 
-        <div class="form-row">
-          <label><span>Expiration (MM/YYYY)</span>
+        <div class="cc-row">
+          <label class="cc-label"><span>Expiration (MM/YYYY)</span>
           </label>
-          <div id="form-element-right">
-            <input type="text" size="2" data-stripe="exp-month"/>
+          <div class="cc-input">
+            <input type="text" size="2" data-stripe="exp-month" class="expiry-month"/>
           <span> / </span>
-          <input type="text" size="4" data-stripe="exp-year"/>
+          <input type="text" size="4" data-stripe="exp-year" class="expiry-year"/>
         </div>
       </div>
-        <button type="submit">Submit Payment</button>
-    </form>
 
+    </form>
+      <button #submitButton type="button" class="button-primary" >Submit Payment</button>
   </div>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
@@ -204,7 +214,58 @@ module AccountTab {
   </ul>
   <div #invitationRow/>
 </div>
+</div>
 '''
+
+// Setting up stripe
+
+ Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
+  var stripeResponseHandler = function(status, response) {
+      var $form = $('#payment-form');
+      if (response.error) {
+        // Show the errors on the form
+          alert("yo");
+        var yearValid = $["payment"].validateCardNumber($('input.cc-num').val());
+
+        if(!yearValid){
+           $form.find('.payment-errors').text("Incorrect Card Number");
+        }
+
+        //$form.find('.payment-errors').text(response.error.message);
+        $form.find('button').prop('disabled', false);}
+      else {
+        // token contains id, last4, and card type
+
+        var token = response.id;
+        // Insert the token into the form so it gets submitted to the server
+        $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+        // and re-submit
+        alert("Your card was successfully charged, thanks for subscribing to Esper!");
+        (<any> $form.get(0)).reset();
+
+        //Log.p("resubmitting");
+        //(<any> $form.get(0)).submit();
+      }
+    };
+
+    jQuery(function($) {
+      $('#payment-form').submit(function(e){
+              return false;
+      });
+
+      submitButton.click(function(e) {
+        var $form = $('#payment-form');
+        // Disable the submit button to prevent repeated clicks
+        $form.find('button').prop('disabled', true);
+
+        Stripe.card.createToken($form, stripeResponseHandler);
+
+        // Prevent the form from submitting with the default action
+        return false;
+      });
+    });
+
+
     spinner.show();
 
     Deferred.join(List.map(team.team_assistants, function(uid) {
