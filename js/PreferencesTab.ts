@@ -41,8 +41,12 @@ module PreferencesTab {
     }
   }
 
-  function setDividerHeight(divider, rows) {
-    divider.css("height", rows * 250 + "px");
+  function setDividerHeight(category, divider, rows) {
+    if (category == "workplace") {
+      divider.css("height", rows * 315 + "px");
+    } else {
+      divider.css("height", rows * 236 + "px");
+    }
   }
 
 //   function addNewLocation(defaults, element) : void {
@@ -82,6 +86,25 @@ module PreferencesTab {
 
   function showAvailability(defaults, element) {
     CalPicker.createModal(defaults, element);
+  }
+
+  function createDurationSelector(selected) {
+'''
+<select #selector class="preference-option-selector">
+  <option #dur10 value="10">10 min</option>
+  <option #dur15 value="15">15 min</option>
+  <option #dur20 value="20">20 min</option>
+  <option #dur30 value="30">30 min</option>
+  <option #dur45 value="45">45 min</option>
+  <option #dur60 value="60">1 hr</option>
+  <option #dur90 value="90">1 hr 30 min</option>
+  <option #dur120 value="120">2 hr</option>
+  <option #dur150 value="150">2 hr 30 min</option>
+  <option #dur180 value="180">3 hr</option>
+</select>
+'''
+
+    return selector;
   }
 
   function viewOfMealOptions(defaults) {
@@ -152,7 +175,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfPreference(type, defaults) {
+  function viewOfMeetingType(type, defaults) {
 '''
 <li #view class="preference">
   <div #toggle>
@@ -162,20 +185,8 @@ module PreferencesTab {
   <div #title class="preference-title semibold"/>
   <hr/>
   <div #options class="preference-options">
-    <div class="preference-option-row clearfix">
+    <div #durationRow class="preference-option-row clearfix">
       <div #durationContainer class="img-container-left"/>
-      <select class="preference-option-selector" #select>
-        <option #dur10 value="10">10 min</option>
-        <option #dur15 value="15">15 min</option>
-        <option #dur20 value="20">20 min</option>
-        <option #dur30 value="30">30 min</option>
-        <option #dur45 value="45">45 min</option>
-        <option #dur60 value="60">1 hr</option>
-        <option #dur90 value="90">1 hr 30 min</option>
-        <option #dur120 value="120">2 hr</option>
-        <option #dur150 value="150">2 hr 30 min</option>
-        <option #dur180 value="180">3 hr</option>
-      </select>
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
@@ -196,6 +207,8 @@ module PreferencesTab {
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
 
+    durationRow.append(createDurationSelector(defaults.duration));
+
     if (type == "phone") {
       options.append(viewOfPhoneOptions(defaults));
     } else if (type == "video") {
@@ -214,11 +227,57 @@ module PreferencesTab {
     return view;
   }
 
+  function viewOfWorkplace(name, defaults) {
+'''
+<li #view class="workplace">
+  <img src="/assets/img/workplace-map.png" class="workplace-map"/>
+  <div class="workplace-details">
+    <div #title class="workplace-name semibold"/>
+    <div #address>435 Tasso St. #315, Palo Alto, CA 94301</div>
+  </div>
+  <div #options class="workplace-options">
+    <div #help class="gray"/>
+    <div #durationRow class="preference-option-row clearfix">
+      <div #durationContainer class="img-container-left"/>
+    </div>
+    <div class="preference-option-row clearfix">
+      <div #availabilityContainer class="img-container-left"/>
+      <div #customizeAvailability class="link preference-option-link">
+        Customize availability
+      </div>
+    </div>
+  </div>
+</li>
+'''
+    title.text(name);
+
+    help.text("Specify preferences for in-person meetings at this location.");
+
+    var duration = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(durationContainer);
+    Svg.loadImg(duration, "/assets/img/duration.svg");
+
+    var availability = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(availabilityContainer);
+    Svg.loadImg(availability, "/assets/img/availability.svg");
+
+    durationRow.append(createDurationSelector(defaults.duration));
+
+    customizeAvailability.data("availabilities", defaults.availability);
+    customizeAvailability.click(function() {
+      showAvailability(defaults, customizeAvailability);
+    });
+
+    return view;
+  }
+
   export function load(team) {
 '''
 <div #view>
   <div class="table-header">Workplaces</div>
-  <ul #workplaces class="table-list"/>
+  <ul #workplaces class="table-list">
+    <div #workplacesDivider class="table-divider"/>
+  </ul>
   <div class="table-header">Calls</div>
   <ul #calls class="table-list">
     <div #callsDivider class="table-divider"/>
@@ -240,24 +299,48 @@ module PreferencesTab {
 '''
 
     function loadPreferences(startingPreferences) {
+      startingPreferences.workplaces.forEach(function (place) {
+        workplaces.append(viewOfWorkplace("Example", place));
+      });
+'''
+<div #newWorkplace class="workplace">
+  <div class="new-workplace">
+    <div class="add-circle">
+      <div class="add-vertical"/>
+      <div class="add-horizontal"/>
+    </div>
+    <div>Add workplace</div>
+  </div>
+</div>
+'''
+      workplaces.append(newWorkplace);
+      newWorkplace.click(function() {
+        // new workplace modal
+      })
+      setDividerHeight(
+        "workplace",
+        workplacesDivider,
+        Math.round((startingPreferences.workplaces.length + 1)/2));
+
       calls
-        .append(viewOfPreference("phone", startingPreferences.meeting_types.phone_call))
-        .append(viewOfPreference("video", startingPreferences.meeting_types.video_call));
-      setDividerHeight(callsDivider, 1);
+        .append(viewOfMeetingType(
+          "phone",
+          startingPreferences.meeting_types.phone_call))
+        .append(viewOfMeetingType(
+          "video",
+          startingPreferences.meeting_types.video_call));
+      setDividerHeight("calls", callsDivider, 1);
 
       Preferences.meals.map(function (meal) {
-          return viewOfPreference(meal, startingPreferences.meeting_types[meal]);
+          return viewOfMeetingType(
+            meal,
+            startingPreferences.meeting_types[meal]);
         }).forEach(function (element) {
           meals.append(element);
         });
-      setDividerHeight(mealsDivider, 3);
+      setDividerHeight("meals", mealsDivider, 3);
 
       notes.val(startingPreferences.notes);
-
-      // startingPreferences.workplaces.forEach(function (place) {
-      //   $(".preference-categories li.locations ul")
-      //     .append(locationForm(place));
-      // });
     };
 
     var preferences = Api.getPreferences(team.teamid)

@@ -668,11 +668,16 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom-left-radius: 3px;
   overflow-y: auto;
 }
-.table-divider {
-  position: absolute;
-  left: 50%;
-  width: 1px;
-  background: @gray_10;
+@media (min-width:900px) {
+  .table-divider {
+    position: absolute;
+    left: 50%;
+    width: 1px;
+    background: @gray_10;
+  }
+}
+@media (max-width:899px) {
+  .table-divider { display: none; }
 }
 
 .assistant-row-status { padding: 10px 12px; }
@@ -702,22 +707,85 @@ a.header-title:hover { text-decoration: underline; }
           box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
 }
 
-.preference {
+.workplace, .preference {
+  position: relative;
   float: left;
-  width: 50%;
-  padding: 20px 20px 0 20px;
+  @media (min-width:900px) { width: 50%; }
+  @media (max-width:899px) { width: 100%; }
   border-top: 1px solid @gray_10;
-  &.left { border-right: 1px solid @gray_10; }
+}
+.workplace { padding: 0; }
+.preference {
+  padding: 20px 20px 0 20px;
   hr {
-    margin-bottom: 0;
+    margin: 10px 0 0 0;
     border-top: 1px solid @gray_30;
   }
 }
+
+.workplace-map {
+  position: absolute;
+  width: 100%;
+  height: 180px;
+}
+.workplace-details {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  margin-top: 120px;
+  padding: 10px 20px;
+  color: white;
+  background: rgba(0,0,0,0.5);
+  .workplace-name { font-size: 16px; }
+}
+.workplace-options {
+  height: 134px;
+  margin-top: 180px;
+  padding: 18px 20px 5px 20px;
+}
+.new-workplace {
+  margin: 100px auto;
+  width: 100px;
+  height: 110px;
+  color: @purple;
+  text-align: center;
+  opacity: 1;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+  .add-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 10px 12px 10px;
+    border-radius: 100%;
+    border: 2px dotted @purple;
+  }
+  .add-vertical {
+    position: absolute;
+    top: 15px;
+    left: 36px;
+    width: 4px;
+    height: 46px;
+    background: @purple;
+  }
+  .add-horizontal {
+    position: absolute;
+    top: 36px;
+    left: 15px;
+    width: 46px;
+    height: 4px;
+    background: @purple;
+  }
+}
+
 .preference-toggle-bg {
   position: absolute;
-  width: 16px;
-  height: 34px;
-  margin: 1px 4px;
+  right: 20px;
+  width: 34px;
+  height: 16px;
+  margin: 3px;
   border-radius: 8px;
   cursor: pointer;
   -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
@@ -732,9 +800,10 @@ a.header-title:hover { text-decoration: underline; }
 }
 .preference-toggle-switch {
   position: absolute;
+  right: 20px;
   width: 18px;
   height: 18px;
-  margin-left: 3px;
+  margin: 2px;
   border-radius: 9px;
   background: @gray_f8;
   cursor: pointer;
@@ -745,15 +814,12 @@ a.header-title:hover { text-decoration: underline; }
       -ms-transition: all 0.2s ease-out;
        -o-transition: all 0.2s ease-out;
           transition: all 0.2s ease-out;
-  &.on { margin-top: 0; }
-  &.off { margin-top: 18px; }
+  &.on { margin-right: 2px; }
+  &.off { margin-right: 20px; }
 }
-.preference-title {
-  margin: 8px 0 0 36px;
-  font-size: 16px;
-}
+.preference-title { font-size: 16px; }
 .preference-options {
-  height: 183px;
+  height: 182px;
   overflow-y: auto;
   &.off {
     opacity: 0.2;
