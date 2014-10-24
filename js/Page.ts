@@ -22,7 +22,7 @@ module Page {
   /* Load and render different types of pages */
 
   export interface Loadable {
-    load : () => void;
+    load : (...args: any[]) => void;
   }
 
   export var settings : Loadable = {
@@ -36,11 +36,13 @@ module Page {
   }
 
   export var teamSettings : Loadable = {
-    load: function() {
+    load: function(teamid) {
       pageSelector.hideAll();
       showPage("team-settings");
-      Log.p("teamSettings.load()");
-      TeamSettings.load();
+      Log.p("TeamSettings.load()", teamid);
+      // Does this belong here? Doesn't work anyway...
+      //window.location.hash = "#!/team-settings/" + teamid;
+      TeamSettings.load(teamid);
       Util.focus();
     }
   }

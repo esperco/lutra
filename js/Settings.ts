@@ -76,10 +76,8 @@ module Settings {
         email.text(profile.email);
       });;
 
-    // cogContainer.click(function() { showTeamSettings(team); });
-
     cogContainer.click(function() {
-      Page.teamSettings.load;
+      Page.teamSettings.load(team.teamid);
     })
 
     return view;
@@ -102,7 +100,7 @@ module Settings {
 '''
     clearSync.click(function() {
       Login.clearAllLoginInfo();
-      Signin.signin(function(){}, undefined, undefined);
+      Signin.signin(function(){}, undefined, undefined, undefined);
     });
 
     button.click(function() {
@@ -211,7 +209,7 @@ module Settings {
 
     signOut.click(function() {
       Login.clearLoginInfo();
-      Signin.signin(function(){}, undefined, undefined);
+      Signin.signin(function(){}, undefined, undefined, undefined);
       return false;
     });
 

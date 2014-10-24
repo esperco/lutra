@@ -77,14 +77,14 @@ module TeamSettings {
     }
   }
 
-  export function load() {
+  export function load(teamid) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
     <a #logoContainer href="#"
        class="img-container-left"/>
-    <a href="#" class="header-title">Settings</a>
+    <a href="#" #headerTitle class="header-title">Settings</a>
     <span #arrowContainer class="img-container-left"/>
     <div class="header-exec">
       <div #profilePic class="profile-pic"/>
@@ -108,11 +108,10 @@ module TeamSettings {
       .appendTo(arrowContainer);
     Svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
 
-    // Temporary to display a default team
-    var selectedTeam;
-    List.iter(Login.getTeams(), function(team) {
-      selectedTeam = team;
-    });
+    var selectedTeam : ApiT.Team =
+      List.find(Login.getTeams(), function(team : ApiT.Team) {
+        return team.teamid === teamid;
+      });
 
     Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
       .done(function(exec) {
@@ -125,9 +124,11 @@ module TeamSettings {
 
     footer.append(Footer.load());
 
+    headerTitle.click(Page.settings.load);
+
     signOut.click(function() {
       Login.clearLoginInfo();
-      Signin.signin(function(){}, undefined, undefined);
+      Signin.signin(function(){}, undefined, undefined, undefined);
       return false;
     });
   }
