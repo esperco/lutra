@@ -215,9 +215,32 @@ module PreferencesTab {
     return selector;
   }
 
-  function viewOfInfo(type, info) {
-    return $("<li><div class='semibold'>" + type + "</div><div>" + info +
-      "</div></li>");
+  function viewOfInfo(type, label, info, defaults, teamid) {
+'''
+<li #view>
+  <div #editIcon class="img-container-right"/>
+  <div #labelText class="semibold"/>
+  <div #infoText/>
+</li>
+'''
+    labelText.text(label);
+    infoText.text(info);
+
+    var edit = $("<img class='svg-block preference-option-edit'/>")
+      .appendTo(editIcon);
+    Svg.loadImg(edit, "/assets/img/edit.svg");
+
+    editIcon.hover(function(){
+      view.addClass("edit-hover");
+      },function(){
+      view.removeClass("edit-hover");
+    });
+
+    editIcon.click(function() {
+      showInfoModal(type, "Edit", defaults, teamid);
+    })
+
+    return view;
   }
 
   function viewOfMealOptions(defaults, teamid) {
@@ -225,7 +248,7 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #locationContainer class="img-container-left"/>
   <ul #locations class="preference-option-list-container">
-    <li #addLocation class="link">Add favorite location</li>
+    <li><span #addLocation class="link">Add favorite location</span></li>
   </ul>
 </div>
 '''
@@ -233,7 +256,10 @@ module PreferencesTab {
       .appendTo(locationContainer);
     Svg.loadImg(location, "/assets/img/location.svg");
 
-    locations.append(viewOfInfo("Crepevine", "367 University Ave, Palo Alto, CA 94301"));
+    locations.append(viewOfInfo("location",
+                                "Crepevine",
+                                "367 University Ave, Palo Alto, CA 94301",
+                                defaults, teamid));
 
     // TODO: populate locations
 
@@ -249,7 +275,7 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #videoContainer class="img-container-left"/>
   <ul #usernames class="preference-option-list-container">
-    <li #addUsername class="link">Add username</li>
+    <li><span #addUsername class="link">Add username</span></li>
   </ul>
 </div>
 '''
@@ -257,7 +283,10 @@ module PreferencesTab {
       .appendTo(videoContainer);
     Svg.loadImg(video, "/assets/img/video.svg");
 
-    usernames.append(viewOfInfo("Google Hangouts", "john.doe@company.com"));
+    usernames.append(viewOfInfo("video",
+                                "Google Hangouts",
+                                "john.doe@company.com",
+                                defaults, teamid));
 
     // TODO: populate usernames
 
@@ -273,7 +302,7 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #phoneContainer class="img-container-left"/>
   <ul #numbers class="preference-option-list-container">
-    <li #addNumber class="link">Add phone number</li>
+    <li><span #addNumber class="link">Add phone number</span></li>
   </ul>
 </div>
 '''
@@ -281,7 +310,10 @@ module PreferencesTab {
       .appendTo(phoneContainer);
     Svg.loadImg(phone, "/assets/img/phone.svg");
 
-    numbers.append(viewOfInfo("Work", "(555) 555-5555"));
+    numbers.append(viewOfInfo("phone",
+                              "Work",
+                              "(555) 555-5555",
+                              defaults, teamid));
 
     // TODO: populate phone numbers
 

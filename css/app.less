@@ -893,7 +893,18 @@ a.header-title:hover { text-decoration: underline; }
 .preference-option-list-container {
   margin-left: 36px;
   padding: 0;
-  li { padding: 3px 0 7px 0; }
+  li {
+    padding: 3px 0 7px 0;
+    &.edit-hover { background: @gray_f8; }
+    .preference-option-edit {
+      width: 16px;
+      height: 16px;
+      margin: 10px;
+      cursor: pointer;
+      opacity: 0.5;
+      &:hover { opacity: 1; }
+    }
+  }
 }
 
 .preference-modal {
