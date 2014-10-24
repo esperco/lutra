@@ -50,7 +50,7 @@ module PreferencesTab {
   }
 
   function viewOfLocationModalDetails(modal, purpose, defaults, teamid,
-                                      deleteBtn, cancelBtn, primaryBtn) {
+                                      primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
 </div>
@@ -76,7 +76,7 @@ module PreferencesTab {
   }
 
   function viewOfVideoModalDetails(modal, purpose, defaults, teamid,
-                                   deleteBtn, cancelBtn, primaryBtn) {
+                                   primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
 </div>
@@ -102,7 +102,7 @@ module PreferencesTab {
   }
 
   function viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
-                                   deleteBtn, cancelBtn, primaryBtn) {
+                                   primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
   <select class="phone-type" #select>
@@ -148,9 +148,9 @@ module PreferencesTab {
       </div>
       <div #content class="preference-form"/>
       <div class="modal-footer">
-        <button #deleteBtn class="button-secondary">Delete</button>
-        <button #cancelBtn class="button-secondary">Cancel</button>
-        <button #primaryBtn class="button-primary"/>
+        <button #primaryBtn class="button-primary modal-primary"/>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+        <button #deleteBtn class="button-secondary modal-delete">Delete</button>
       </div>
     </div>
   </div>
@@ -160,24 +160,23 @@ module PreferencesTab {
       title.text(purpose + " Phone Number");
       content.append(
         viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
-                                deleteBtn, cancelBtn, primaryBtn));
+                                primaryBtn, cancelBtn, deleteBtn));
     } else if (type == "video") {
       title.text(purpose + " Username");
       content.append(
         viewOfVideoModalDetails(modal, purpose, defaults, teamid,
-                                deleteBtn, cancelBtn, primaryBtn));
+                                primaryBtn, cancelBtn, deleteBtn));
     } else if (type == "location") {
       title.text(purpose + " Favorite Location");
       content.append(
         viewOfLocationModalDetails(modal, purpose, defaults, teamid,
-                                   deleteBtn, cancelBtn, primaryBtn));
+                                   primaryBtn, cancelBtn, deleteBtn));
     }
 
     if (purpose == "Add") {
       primaryBtn.text("Add");
       deleteBtn.css("display", "none");
     } else {
-      // TODO: populate details
       primaryBtn.text("Update");
     }
 
