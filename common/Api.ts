@@ -146,7 +146,7 @@ module Esper.Api {
 
   export function getEventDetails(teamid, calid,
                                   teamCalendars: ApiT.Calendar[], eventid):
-  JQueryDeferred<ApiT.CalendarEvent> {
+  JQueryDeferred<ApiT.CalendarEventOpt> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/event/details/" + Login.myUid()
