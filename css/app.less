@@ -667,7 +667,7 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow-y: auto;
-  &.transportation-table { padding: 10px 0; }
+  &.transportation-table { padding: 10px; }
 }
 @media (min-width:900px) {
   .table-divider {
@@ -895,6 +895,22 @@ a.header-title:hover { text-decoration: underline; }
   padding: 0;
   li { padding: 3px 0 7px 0; }
 }
+
+.preference-modal {
+  position: absolute;
+  top: calc(~"50% - 160px");
+  left: calc(~"50% - 180px");
+  width: 360px;
+  margin: 0;
+  .preference-modal-title { margin-left: 36px; }
+  .modal-content { width: 360px; }
+  .preference-form {
+    height: 185px;
+    padding: 15px;
+    overflow-y: auto;
+  }
+}
+
 .preferences-notes {
   float: left;
   width: 100%;

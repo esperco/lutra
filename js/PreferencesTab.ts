@@ -49,70 +49,76 @@ module PreferencesTab {
     }
   }
 
-//   function addNewLocation(defaults, element) : void {
-// '''
-// <div #modal
-//      class="modal fade" tabindex="-1"
-//      role="dialog">
-//   <div class="modal-dialog team-settings">
-//     <div class="modal-content">
-//       <div class="modal-header">Customize Availability</div>
-//       <div #content></div>
-//       <div class="modal-footer">
-//         <button #save class="button-primary">Save</button>
-//       </div>
-//     </div>
-//   </div>
-// </div>
-// '''
-//     var availabilities = defaults.availability;
-//     var picker = createPicker(availabilities);
-//     content.append(picker.view);
-
-//     (<any> modal).modal({}); // FIXME
-//     setTimeout(function() { render(picker); }, 320); // Wait for fade
-
-//     save.click(function() {
-//       var events = [];
-//       for (var k in picker.events)
-//         events = events.concat(makeAvailability(picker.events[k]));
-
-//       element.data("availabilities", events); // ughgh pass data through DOM
-//       defaults.availability = events;
-
-//       (<any> modal).modal("hide"); // FIXME
-//     });
-//   }
-
-  function showEditLocation() {
+  function showLocationModal(purpose, defaults, teamid) {
 
   }
 
-  function showAddLocation() {
+  function showUsernameModal(purpose, defaults, teamid) {
 
   }
 
-  function showEditUsername() {
+  function showNumberModal(purpose, defaults, teamid) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog preference-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #phoneContainer class="img-container-left"/>
+        <div #title class="preference-modal-title"/>
+      </div>
+      <div #content class="preference-form">
+        <select class="phone-type" #select>
+          <option value="Mobile">mobile</option>
+          <option value="Work">work</option>
+          <option value="Home">home</option>
+          <option value="Other">other</option>
+        </select>
+        <input type="text" class="phone-number" size=12/>
+        <input type="checkbox" #share/> Share
+      </div>
+      <div class="modal-footer">
+        <button #deleteBtn class="button-secondary">Delete</button>
+        <button #cancelBtn class="button-secondary">Cancel</button>
+        <button #primaryBtn class="button-primary"/>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    title.text(purpose + " Phone Number");
 
+    var phone = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(phoneContainer);
+    Svg.loadImg(phone, "/assets/img/phone.svg");
+
+    if (purpose == "Add") {
+      primaryBtn.text("Add");
+      deleteBtn.css("display", "none");
+    } else {
+      // TODO: populate number details
+      primaryBtn.text("Update");
+    }
+
+    primaryBtn.click(function() {
+      // TODO: save phone number
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    deleteBtn.click(function() {
+      // TODO: delete phone number
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    (<any> modal).modal({}); // FIXME
   }
 
-  function showAddUsername() {
-
-  }
-
-  function showEditNumber() {
-
-  }
-
-  function showAddNumber() {
-
-  }
-
-  function showEditWorkplace() {
-
-  }
-
-  function showAddWorkplace() {
+  function showWorkplaceModal(purpose, defaults, teamid) {
 
   }
 
@@ -135,8 +141,14 @@ module PreferencesTab {
   <option #dur180 value="180">3 hr</option>
 </select>
 '''
+    // TODO: mark selected
 
     return selector;
+  }
+
+  function viewOfInfo(type, info) {
+    return $("<li><div class='semibold'>" + type + "</div><div>" + info +
+      "</div></li>");
   }
 
   function viewOfMealOptions(defaults, teamid) {
@@ -144,13 +156,7 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #locationContainer class="img-container-left"/>
   <ul #locations class="preference-option-list-container">
-    <li #example>
-      <div class="semibold">Crepevine</div>
-      <div>367 University Ave, Palo Alto, CA 94301</div>
-    </li>
-    <li #addLocation class="link">
-      Add favorite location
-    </li>
+    <li #addLocation class="link">Add favorite location</li>
   </ul>
 </div>
 '''
@@ -158,7 +164,11 @@ module PreferencesTab {
       .appendTo(locationContainer);
     Svg.loadImg(location, "/assets/img/location.svg");
 
-    addLocation.click();
+    locations.append(viewOfInfo("Crepevine", "367 University Ave, Palo Alto, CA 94301"));
+
+    // TODO: populate locations
+
+    addLocation.click(function() { showLocationModal("Add", defaults, teamid) });
 
     return view;
   }
@@ -168,19 +178,19 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #videoContainer class="img-container-left"/>
   <ul #usernames class="preference-option-list-container">
-    <li #example>
-      <div class="semibold">Google Hangouts</div>
-      <div>john.doe@company.com</div>
-    </li>
-    <li #addUsername class="link">
-      Add username
-    </li>
+    <li #addUsername class="link">Add username</li>
   </ul>
 </div>
 '''
     var video = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(videoContainer);
     Svg.loadImg(video, "/assets/img/video.svg");
+
+    usernames.append(viewOfInfo("Google Hangouts", "john.doe@company.com"));
+
+    // TODO: populate usernames
+
+    addUsername.click(function() { showUsernameModal("Add", defaults, teamid) });
 
     return view;
   }
@@ -190,13 +200,7 @@ module PreferencesTab {
 <div #view class="preference-option-row clearfix">
   <div #phoneContainer class="img-container-left"/>
   <ul #numbers class="preference-option-list-container">
-    <li #example>
-      <div class="semibold">Work</div>
-      <div>(555) 555-5555</div>
-    </li>
-    <li #addNumber class="link">
-      Add phone number
-    </li>
+    <li #addNumber class="link">Add phone number</li>
   </ul>
 </div>
 '''
@@ -204,7 +208,11 @@ module PreferencesTab {
       .appendTo(phoneContainer);
     Svg.loadImg(phone, "/assets/img/phone.svg");
 
-    addNumber.click(function() {showAddNumber})
+    numbers.append(viewOfInfo("Work", "(555) 555-5555"));
+
+    // TODO: populate phone numbers
+
+    addNumber.click(function() { showNumberModal("Add", defaults, teamid) });
 
     return view;
   }

@@ -158,7 +158,10 @@ fieldset[disabled] .form-control {
 }
 /*** Modals ***/
 .modal-backdrop { background: white; }
-.modal-backdrop-in { opacity: 0.8; }
+.modal-backdrop.in {
+  filter: alpha(opacity=80);
+  opacity: .8;
+}
 .modal-content {
   width: 640px;
   border: 1px solid @gray_30;
@@ -177,7 +180,7 @@ fieldset[disabled] .form-control {
        -o-transition: opacity .3s linear, ease-in-out;
           transition: opacity .3s linear, ease-in-out;
 }
-.modal-footer { padding: 20px 28px; }
+.modal-footer { padding: 20px 15px; }
 .modal-header {
   height: 60px;
   font-size: 20px;
