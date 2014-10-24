@@ -23,7 +23,7 @@ module PreferencesTab {
       dismissOverlays();
   });
 
-  function togglePreference(view) {
+  function togglePreference(view, teamid) {
     if (view.toggleBg.hasClass("on")) {
       view.toggleBg.removeClass("on");
       view.toggleBg.addClass("off");
@@ -84,6 +84,38 @@ module PreferencesTab {
 //     });
 //   }
 
+  function showEditLocation() {
+
+  }
+
+  function showAddLocation() {
+
+  }
+
+  function showEditUsername() {
+
+  }
+
+  function showAddUsername() {
+
+  }
+
+  function showEditNumber() {
+
+  }
+
+  function showAddNumber() {
+
+  }
+
+  function showEditWorkplace() {
+
+  }
+
+  function showAddWorkplace() {
+
+  }
+
   function showAvailability(defaults, element) {
     CalPicker.createModal(defaults, element);
   }
@@ -107,7 +139,7 @@ module PreferencesTab {
     return selector;
   }
 
-  function viewOfMealOptions(defaults) {
+  function viewOfMealOptions(defaults, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #locationContainer class="img-container-left"/>
@@ -131,7 +163,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfVideoOptions(defaults) {
+  function viewOfVideoOptions(defaults, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #videoContainer class="img-container-left"/>
@@ -153,7 +185,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfPhoneOptions(defaults) {
+  function viewOfPhoneOptions(defaults, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #phoneContainer class="img-container-left"/>
@@ -172,10 +204,12 @@ module PreferencesTab {
       .appendTo(phoneContainer);
     Svg.loadImg(phone, "/assets/img/phone.svg");
 
+    addNumber.click(function() {showAddNumber})
+
     return view;
   }
 
-  function viewOfMeetingType(type, defaults) {
+  function viewOfMeetingType(type, defaults, teamid) {
 '''
 <li #view class="preference">
   <div #toggle>
@@ -210,14 +244,14 @@ module PreferencesTab {
     durationRow.append(createDurationSelector(defaults.duration));
 
     if (type == "phone") {
-      options.append(viewOfPhoneOptions(defaults));
+      options.append(viewOfPhoneOptions(defaults, teamid));
     } else if (type == "video") {
-      options.append(viewOfVideoOptions(defaults));
+      options.append(viewOfVideoOptions(defaults, teamid));
     } else {
-      options.append(viewOfMealOptions(defaults));
+      options.append(viewOfMealOptions(defaults, teamid));
     }
 
-    toggle.click(function() { togglePreference(_view) });
+    toggle.click(function() { togglePreference(_view, teamid) });
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
@@ -227,7 +261,44 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfWorkplace(name, defaults) {
+  function viewOfTransportationType(type, defaults, teamid) {
+'''
+<li #view class="preference-transportation">
+  <div #transportation class="preference-transportation-button on">
+    <div #checkContainer/>
+    <div #iconContainer/>
+  </div>
+  <div #title/>
+</li>
+'''
+    title.text(type.charAt(0).toUpperCase() + type.slice(1));
+
+    var icon = $("<img class='svg-block preference-transportation-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/" + type + ".svg");
+
+    var check = $("<img class='svg-block preference-transportation-check'/>")
+      .appendTo(checkContainer);
+    Svg.loadImg(check, "/assets/img/check.svg");
+
+    // TODO: mark transportation as on or off based on defaults
+
+    transportation.click(function() {
+      if (transportation.hasClass("on")) {
+        transportation.removeClass("on");
+        transportation.addClass("off");
+        // TODO: update preferences
+      } else {
+        transportation.removeClass("off");
+        transportation.addClass("on");
+        // TODO: update preferences
+      }
+    });
+
+    return view;
+  }
+
+  function viewOfWorkplace(name, defaults, teamid) {
 '''
 <li #view class="workplace">
   <img src="/assets/img/workplace-map.png" class="workplace-map"/>
@@ -278,6 +349,8 @@ module PreferencesTab {
   <ul #workplaces class="table-list">
     <div #workplacesDivider class="table-divider"/>
   </ul>
+  <div class="table-header">Transportation</div>
+  <ul #transportationTypes class="table-list transportation-table"/>
   <div class="table-header">Calls</div>
   <ul #calls class="table-list">
     <div #callsDivider class="table-divider"/>
@@ -298,9 +371,9 @@ module PreferencesTab {
 </div>
 '''
 
-    function loadPreferences(startingPreferences) {
-      startingPreferences.workplaces.forEach(function (place) {
-        workplaces.append(viewOfWorkplace("Example", place));
+    function loadPreferences(initial) {
+      initial.workplaces.forEach(function (place) {
+        workplaces.append(viewOfWorkplace("Example", place, team.teamid));
       });
 '''
 <div #newWorkplace class="workplace">
@@ -320,27 +393,31 @@ module PreferencesTab {
       setDividerHeight(
         "workplace",
         workplacesDivider,
-        Math.round((startingPreferences.workplaces.length + 1)/2));
+        Math.round((initial.workplaces.length + 1)/2));
+
+      Preferences.transportationTypes.map(function (transportation) {
+          return viewOfTransportationType(
+            transportation, initial.meeting_types.phone_call, team.teamid);
+        }).forEach(function (element) {
+          transportationTypes.append(element);
+        });
 
       calls
         .append(viewOfMeetingType(
-          "phone",
-          startingPreferences.meeting_types.phone_call))
+          "phone", initial.meeting_types.phone_call, team.teamid))
         .append(viewOfMeetingType(
-          "video",
-          startingPreferences.meeting_types.video_call));
+          "video", initial.meeting_types.video_call, team.teamid));
       setDividerHeight("calls", callsDivider, 1);
 
       Preferences.meals.map(function (meal) {
           return viewOfMeetingType(
-            meal,
-            startingPreferences.meeting_types[meal]);
+            meal, initial.meeting_types[meal], team.teamid);
         }).forEach(function (element) {
           meals.append(element);
         });
       setDividerHeight("meals", mealsDivider, 3);
 
-      notes.val(startingPreferences.notes);
+      notes.val(initial.notes);
     };
 
     var preferences = Api.getPreferences(team.teamid)

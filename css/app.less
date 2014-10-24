@@ -667,6 +667,7 @@ a.header-title:hover { text-decoration: underline; }
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow-y: auto;
+  &.transportation-table { padding: 10px 0; }
 }
 @media (min-width:900px) {
   .table-divider {
@@ -777,6 +778,51 @@ a.header-title:hover { text-decoration: underline; }
     width: 46px;
     height: 4px;
     background: @purple;
+  }
+}
+
+.preference-transportation {
+  position: relative;
+  float: left;
+  width: 21%;
+  min-width: 100px;
+  margin-top: 10px;
+  margin-right: 2%;
+  margin-bottom: 10px;
+  margin-left: 2%;
+  text-align: center;
+}
+.preference-transportation-button {
+  position: relative;
+  height: 68px;
+  margin-bottom: 4px;
+  padding: 10px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  .preference-transportation-icon {
+    width: 80px;
+    height: 48px;
+    margin: 0 auto;
+  }
+  .preference-transportation-check {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    margin-top: 32px;
+  }
+  &.off {
+    background: white;
+    .preference-transportation-icon { opacity: 0.2; }
+    .preference-transportation-check { display: none; }
+    &:hover {
+      background: @gray_f8;
+      .preference-transportation-icon { opacity: 1; }
+    }
+  }
+  &.on {
+    background: @gray_f8;
+    .preference-transportation-check { display: block; }
+    &:hover { background: @gray_10; }
   }
 }
 

@@ -4,6 +4,8 @@
 
 module Preferences {
 
+  export var transportationTypes = ["walking", "public", "car", "taxi", "zipcar", "uber", "lyft", "sidecar"];
+
   export var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
 
   /** Returns an object that contains the preferences for a form that
