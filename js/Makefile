@@ -29,7 +29,6 @@ PROD_LIBS = $(addsuffix .min.js, $(JS_LIBS))
 
 TS_LIBS = \
   fullCalendar.d
-
 # jquery.d
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
