@@ -49,15 +49,93 @@ module PreferencesTab {
     }
   }
 
-  function showLocationModal(purpose, defaults, teamid) {
+  function viewOfLocationModalDetails(modal, purpose, defaults, teamid,
+                                      deleteBtn, cancelBtn, primaryBtn) {
+'''
+<div #view>
+</div>
+'''
+    if (purpose == "Edit") {
+      // TODO: populate with saved values
+      deleteBtn.click(function() {
+        // TODO: delete location
+        (<any> modal).modal("hide"); // FIXME
+      });
+    }
 
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    primaryBtn.click(function() {
+      // TODO: save location
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    return view;
   }
 
-  function showUsernameModal(purpose, defaults, teamid) {
+  function viewOfVideoModalDetails(modal, purpose, defaults, teamid,
+                                   deleteBtn, cancelBtn, primaryBtn) {
+'''
+<div #view>
+</div>
+'''
+    if (purpose == "Edit") {
+      // TODO: populate with saved values
+      deleteBtn.click(function() {
+        // TODO: delete username
+        (<any> modal).modal("hide"); // FIXME
+      });
+    }
 
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    primaryBtn.click(function() {
+      // TODO: save username
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    return view;
   }
 
-  function showNumberModal(purpose, defaults, teamid) {
+  function viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
+                                   deleteBtn, cancelBtn, primaryBtn) {
+'''
+<div #view>
+  <select class="phone-type" #select>
+    <option value="Mobile">mobile</option>
+    <option value="Work">work</option>
+    <option value="Home">home</option>
+    <option value="Other">other</option>
+  </select>
+  <input type="text" class="phone-number" size=12/>
+  <input type="checkbox" #share>Share</input>
+</div>
+'''
+    if (purpose == "Edit") {
+      // TODO: populate with saved values
+      deleteBtn.click(function() {
+        // TODO: delete phone number
+        (<any> modal).modal("hide"); // FIXME
+      });
+    }
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    primaryBtn.click(function() {
+      // TODO: save phone number
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    return view;
+  }
+
+  function showInfoModal(type, purpose, defaults, teamid) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -65,19 +143,10 @@ module PreferencesTab {
   <div class="modal-dialog preference-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <div #phoneContainer class="img-container-left"/>
+        <div #iconContainer class="img-container-left"/>
         <div #title class="preference-modal-title"/>
       </div>
-      <div #content class="preference-form">
-        <select class="phone-type" #select>
-          <option value="Mobile">mobile</option>
-          <option value="Work">work</option>
-          <option value="Home">home</option>
-          <option value="Other">other</option>
-        </select>
-        <input type="text" class="phone-number" size=12/>
-        <input type="checkbox" #share/> Share
-      </div>
+      <div #content class="preference-form"/>
       <div class="modal-footer">
         <button #deleteBtn class="button-secondary">Delete</button>
         <button #cancelBtn class="button-secondary">Cancel</button>
@@ -87,33 +156,34 @@ module PreferencesTab {
   </div>
 </div>
 '''
-    title.text(purpose + " Phone Number");
-
-    var phone = $("<img class='svg-block preference-option-icon'/>")
-      .appendTo(phoneContainer);
-    Svg.loadImg(phone, "/assets/img/phone.svg");
+    if (type == "phone") {
+      title.text(purpose + " Phone Number");
+      content.append(
+        viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
+                                deleteBtn, cancelBtn, primaryBtn));
+    } else if (type == "video") {
+      title.text(purpose + " Username");
+      content.append(
+        viewOfVideoModalDetails(modal, purpose, defaults, teamid,
+                                deleteBtn, cancelBtn, primaryBtn));
+    } else if (type == "location") {
+      title.text(purpose + " Favorite Location");
+      content.append(
+        viewOfLocationModalDetails(modal, purpose, defaults, teamid,
+                                   deleteBtn, cancelBtn, primaryBtn));
+    }
 
     if (purpose == "Add") {
       primaryBtn.text("Add");
       deleteBtn.css("display", "none");
     } else {
-      // TODO: populate number details
+      // TODO: populate details
       primaryBtn.text("Update");
     }
 
-    primaryBtn.click(function() {
-      // TODO: save phone number
-      (<any> modal).modal("hide"); // FIXME
-    });
-
-    cancelBtn.click(function() {
-      (<any> modal).modal("hide"); // FIXME
-    });
-
-    deleteBtn.click(function() {
-      // TODO: delete phone number
-      (<any> modal).modal("hide"); // FIXME
-    });
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/" + type + ".svg");
 
     (<any> modal).modal({}); // FIXME
   }
@@ -168,7 +238,9 @@ module PreferencesTab {
 
     // TODO: populate locations
 
-    addLocation.click(function() { showLocationModal("Add", defaults, teamid) });
+    addLocation.click(function() {
+      showInfoModal("location", "Add", defaults, teamid);
+    })
 
     return view;
   }
@@ -190,7 +262,9 @@ module PreferencesTab {
 
     // TODO: populate usernames
 
-    addUsername.click(function() { showUsernameModal("Add", defaults, teamid) });
+    addUsername.click(function() {
+      showInfoModal("video", "Add", defaults, teamid);
+    })
 
     return view;
   }
@@ -212,7 +286,9 @@ module PreferencesTab {
 
     // TODO: populate phone numbers
 
-    addNumber.click(function() { showNumberModal("Add", defaults, teamid) });
+    addNumber.click(function() {
+      showInfoModal("phone", "Add", defaults, teamid);
+    })
 
     return view;
   }
