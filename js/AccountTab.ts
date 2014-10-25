@@ -181,23 +181,23 @@ module AccountTab {
           <label class="cc-label">
             <span>Card Number</span>
           </label>
-            <input type="text" size="20" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••"/>
+            <input type="text" size="22" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••" required/>
         </div>
 
         <div class="cc-row">
           <label class="cc-label">
             <span>CVC</span>
           </label>
-          <input type="text" size="20" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••"/>
+          <input type="text" size="22" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••" required/>
         </div>
 
         <div class="cc-row">
           <label class="cc-label"><span>Expiration</span>
           </label>
           <div class="cc-input">
-            <input type="text" size="2" data-stripe="exp-month" class="expiry-month" placeholder="MM"/>
+            <input type="text" size="2" data-stripe="exp-month" class="expiry-month" placeholder="MM" required/>
           <span> / </span>
-          <input type="text" size="4" data-stripe="exp-year" class="expiry-year" placeholder="YYYY"/>
+          <input type="text" size="4" data-stripe="exp-year" class="expiry-year" placeholder="YYYY" required/>
         </div>
       </div>
 
@@ -220,7 +220,9 @@ module AccountTab {
 
 
 //restricts the inputs to numbers
-
+jQuery(function($){
+  $('input.cc-num').payment('formatCardNumber');
+  });
 
 Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
 var stripeResponseHandler = function(status, response) {
