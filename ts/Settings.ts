@@ -364,23 +364,27 @@ module Settings {
     return view;
   }
 
-  function generateInviteURL(team, role) {
+  function generateInviteURL(team: ApiT.Team,
+                             role: string,
+                             toEmail: string) {
     dismissOverlays();
     var invite = {
       from_uid: Login.me(),
       teamid: team.teamid,
-      role: role
+      role: role,
+      force_email: toEmail
     };
     Log.p("Invite:", invite);
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(url) {
+  function composeInviteWithURL(url, emailTo) {
     var body =
       "Please click the link and sign in with your Google account:\n\n"
       + "  " + url;
 
     return GmailCompose.compose({
+      to: emailTo,
       subject: "Join my team on Esper",
       body: body
     });
@@ -396,28 +400,46 @@ module Settings {
       <span class="caret-south click-safe"/>
     </div>
   </div>
-  <ul #inviteOptions class="invite-options overlay-list click-safe">
-    <li class="unselectable click-safe">Select a role:</li>
-    <li><a #assistant href="#" target="_blank"
-           class="click-safe">Assistant</a></li>
-    <li><a #executive href="#" target="_blank"
-           class="click-safe">Executive</a></li>
-  </ul>
+
+  <div #invitePopover class="overlay-popover click-safe">
+    <div>
+      Email:
+      <input #emailInput
+             class="new-label-input click-safe"
+             autofocus placeholder="name@example.com"/>
+    </div>
+    <button #continueButton class="button-secondary click-safe">
+      Continue
+    </button>
+    <ul #roleSelector class="hide invite-options">
+      <li class="unselectable click-safe">Select a role:</li>
+      <li><a #assistant href="#" target="_blank"
+             class="click-safe">Assistant</a></li>
+      <li><a #executive href="#" target="_blank"
+             class="click-safe">Executive</a></li>
+    </ul>
+  </div>
 </div>
 '''
-    var email = $("<img class='svg-block invite-icon'/>")
+    var emailIcon = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
-    Svg.loadImg(email, "/assets/img/email.svg");
+    Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    invite.click(function() { toggleOverlay(inviteOptions); });
+    invite.click(function() { toggleOverlay(invitePopover); });
 
-    generateInviteURL(team, "Assistant")
-      .done(function(x) {
-        assistant.attr("href", composeInviteWithURL(x.url));
-      });
-    generateInviteURL(team, "Executive")
-      .done(function(x) {
-        executive.attr("href", composeInviteWithURL(x.url));
+    continueButton
+      .click(function() {
+        var toEmail = emailInput.val();
+        roleSelector.removeClass("hide");
+        generateInviteURL(team, "Assistant", toEmail)
+          .done(function(x) {
+            assistant.attr("href", composeInviteWithURL(x.url, toEmail));
+          });
+        generateInviteURL(team, "Executive", toEmail)
+          .done(function(x) {
+            executive.attr("href", composeInviteWithURL(x.url, toEmail));
+          });
+        return false;
       });
 
     return view;
