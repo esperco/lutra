@@ -135,6 +135,32 @@ module PreferencesTab {
     return view;
   }
 
+  function viewOfWorkplaceModalDetails(modal, purpose, defaults, teamid,
+                                       primaryBtn, cancelBtn, deleteBtn) {
+'''
+<div #view>
+</div>
+'''
+    if (purpose == "Edit") {
+      // TODO: populate with saved values
+      deleteBtn.click(function() {
+        // TODO: delete workplace
+        (<any> modal).modal("hide"); // FIXME
+      });
+    }
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    primaryBtn.click(function() {
+      // TODO: save workplace
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    return view;
+  }
+
   function showInfoModal(type, purpose, defaults, teamid) {
 '''
 <div #modal
@@ -156,7 +182,12 @@ module PreferencesTab {
   </div>
 </div>
 '''
-    if (type == "phone") {
+    if (type == "workplace") {
+      title.text(purpose + " Workplace");
+      content.append(
+        viewOfWorkplaceModalDetails(modal, purpose, defaults, teamid,
+                                    primaryBtn, cancelBtn, deleteBtn));
+    } else if (type == "phone") {
       title.text(purpose + " Phone Number");
       content.append(
         viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
@@ -228,7 +259,7 @@ module PreferencesTab {
 
     var edit = $("<img class='svg-block preference-option-edit'/>")
       .appendTo(editIcon);
-    Svg.loadImg(edit, "/assets/img/edit.svg");
+    Svg.loadImg(edit, "/assets/img/edit_purple.svg");
 
     editIcon.hover(function(){
       view.addClass("edit-hover");
@@ -417,7 +448,8 @@ module PreferencesTab {
 '''
 <li #view class="workplace">
   <img src="/assets/img/workplace-map.png" class="workplace-map"/>
-  <div class="workplace-details">
+  <div #details class="workplace-details">
+    <div #editIcon class="img-container-right"/>
     <div #title class="workplace-name semibold"/>
     <div #address>435 Tasso St. #315, Palo Alto, CA 94301</div>
   </div>
@@ -439,6 +471,10 @@ module PreferencesTab {
 
     help.text("Specify preferences for in-person meetings at this location.");
 
+    var edit = $("<img class='svg-block workplace-edit'/>")
+      .appendTo(editIcon);
+    Svg.loadImg(edit, "/assets/img/edit_white.svg");
+
     var duration = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(durationContainer);
     Svg.loadImg(duration, "/assets/img/duration.svg");
@@ -446,6 +482,16 @@ module PreferencesTab {
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
+
+    editIcon.hover(function(){
+      details.addClass("edit-hover");
+      },function(){
+      details.removeClass("edit-hover");
+    });
+
+    editIcon.click(function() {
+      showInfoModal("workplace", "Edit", defaults, teamid);
+    })
 
     durationRow.append(createDurationSelector(defaults.duration));
 
@@ -491,7 +537,7 @@ module PreferencesTab {
         workplaces.append(viewOfWorkplace("Example", place, team.teamid));
       });
 '''
-<div #newWorkplace class="workplace">
+<div #addWorkplace class="workplace">
   <div class="new-workplace">
     <div class="add-circle">
       <div class="add-vertical"/>
@@ -501,9 +547,9 @@ module PreferencesTab {
   </div>
 </div>
 '''
-      workplaces.append(newWorkplace);
-      newWorkplace.click(function() {
-        // new workplace modal
+      workplaces.append(addWorkplace);
+      addWorkplace.click(function() {
+        showInfoModal("workplace", "Add", initial.workplaces, team.teamid);
       })
       setDividerHeight(
         "workplace",

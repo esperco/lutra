@@ -737,7 +737,16 @@ a.header-title:hover { text-decoration: underline; }
   padding: 10px 20px;
   color: white;
   background: rgba(0,0,0,0.5);
+  &.edit-hover { background: @gray_80; }
   .workplace-name { font-size: 16px; }
+  .workplace-edit {
+    width: 16px;
+    height: 16px;
+    margin-top: 12px;
+    cursor: pointer;
+    opacity: 0.5;
+    &:hover { opacity: 1; }
+  }
 }
 .workplace-options {
   height: 134px;
