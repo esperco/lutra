@@ -22,8 +22,7 @@
 
     <!-- Stripe loader file -->
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.payment/1.0.2/jquery.payment.js"></script>
-    <script src="/assets/js/jquery.payment.js"></script>
+
     <script>
         Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
     </script>
@@ -66,5 +65,7 @@
     <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js"></script>
     <script src="/assets/js/flags.js"></script>
     INCLUDES
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.payment/1.0.2/jquery.payment.js"></script>
+
   </body>
 </html>

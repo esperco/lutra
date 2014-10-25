@@ -4,7 +4,7 @@
 
 module AccountTab {
   declare var Stripe : any;
-
+  declare var Stripe : any;
   function toggleOverlay(overlay) {
     if (overlay.css("display") === "none")
       overlay.css("display", "inline-block");
@@ -181,25 +181,23 @@ module AccountTab {
           <label class="cc-label">
             <span>Card Number</span>
           </label>
-            <input type="text" size="20" data-stripe="number" class="cc-number"/>
+            <input type="text" size="22" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••" required/>
         </div>
 
         <div class="cc-row">
           <label class="cc-label">
             <span>CVC</span>
           </label>
-
-          <input type="text" size="20" data-stripe="cvc" class="cc-input"/>
-
+          <input type="text" size="22" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••" required/>
         </div>
 
         <div class="cc-row">
-          <label class="cc-label"><span>Expiration (MM/YYYY)</span>
+          <label class="cc-label"><span>Expiration</span>
           </label>
           <div class="cc-input">
-            <input type="text" size="2" data-stripe="exp-month" class="expiry-month"/>
+            <input type="text" size="2" data-stripe="exp-month" class="expiry-month" placeholder="MM" required/>
           <span> / </span>
-          <input type="text" size="4" data-stripe="exp-year" class="expiry-year"/>
+          <input type="text" size="4" data-stripe="exp-year" class="expiry-year" placeholder="YYYY" required/>
         </div>
       </div>
 
@@ -220,34 +218,49 @@ module AccountTab {
 
 // Setting up stripe
 
- Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
-  var stripeResponseHandler = function(status, response) {
-      var $form = $('#payment-form');
-      if (response.error) {
-        // Show the errors on the form
-         // alert("yo");
-        //var yearValid = $["payment"].validateCardNumber($('input.cc-num').val());
 
-        //if(!yearValid){
-          // $form.find('.payment-errors').text("Incorrect Card Number");
-        //}
+//restricts the inputs to numbers
+jQuery(function($){
+  $('input.cc-num').payment('formatCardNumber');
+  });
 
-        $form.find('.payment-errors').text(response.error.message);
-        $form.find('button').prop('disabled', false);}
-      else {
-        // token contains id, last4, and card type
+Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
+var stripeResponseHandler = function(status, response) {
+  var $form = $('#payment-form');
+  if (response.error) {
+    // handles whether the cards are valid, independently of Stripe
+    var validCard = $["payment"].validateCardNumber($('input.cc-num').val());
+    var validCVC = $["payment"].validateCardCVC($('input.cvc-num',$["payment"].cardType('input.cc-num')).val());
+    var validExpiry =$["payment"].validateCardExpiry('input.expiry-month','input.expiry-year');
 
-        var token = response.id;
-        // Insert the token into the form so it gets submitted to the server
-        $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-        // and re-submit
-        alert("Your card was successfully charged, thanks for subscribing to Esper!");
-        (<any> $form.get(0)).reset();
+    if(!validCard){
+       $form.find('.payment-errors').text("Invalid Card Number");
+    }
+    else if(!validCVC){
+      $form.find('.payment-errors').text("Invalid CVC");
+    }
+    else if(!validExpiry){
+      $form.find('.payment-errors').text("Invalid Expiration");
+    }
 
-        //Log.p("resubmitting");
-        //(<any> $form.get(0)).submit();
-      }
-    };
+    //disable button
+    $form.find('button').prop('disabled', false);
+    }
+
+    else {
+    // token contains id, last4, and card type
+
+    var token = response.id;
+    // Insert the token into the form so it gets submitted to the server
+    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+    // and re-submit
+    alert("Your card was successfully charged, thanks for subscribing to Esper!");
+    (<any> $form.get(0)).reset();
+
+    //Log.p("resubmitting");
+    //(<any> $form.get(0)).submit();
+  }
+  };
 
     jQuery(function($) {
       $('#payment-form').submit(function(e){
@@ -265,6 +278,8 @@ module AccountTab {
         return false;
       });
     });
+
+
 
 
     spinner.show();
