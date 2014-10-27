@@ -29,14 +29,14 @@ module PreferencesTab {
       view.toggleBg.addClass("off");
       view.toggleSwitch.removeClass("on");
       view.toggleSwitch.addClass("off");
-      view.title.css("text-decoration", "line-through");
+      view.title.addClass("off");
       view.options.addClass("unselectable off");
     } else {
       view.toggleBg.addClass("on");
       view.toggleBg.removeClass("off");
       view.toggleSwitch.addClass("on");
       view.toggleSwitch.removeClass("off");
-      view.title.css("text-decoration", "none");
+      view.title.removeClass("off");
       view.options.removeClass("unselectable off");
     }
   }

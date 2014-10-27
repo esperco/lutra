@@ -872,7 +872,13 @@ a.header-title:hover { text-decoration: underline; }
   &.on { margin-right: 2px; }
   &.off { margin-right: 20px; }
 }
-.preference-title { font-size: 16px; }
+.preference-title {
+  font-size: 16px;
+  &.off {
+    color: @gray_40;
+    text-decoration: line-through;
+  }
+}
 .preference-options {
   height: 182px;
   overflow-y: auto;
@@ -895,14 +901,6 @@ a.header-title:hover { text-decoration: underline; }
   display: inline-block;
   margin: 3px 0 0 12px;
 }
-.availability-modal {
-  position: absolute;
-  top: calc(~"50% - 252px");
-  left: calc(~"50% - 320px");
-  width: 640px;
-  margin: 0;
-  .fc-toolbar { display: none; }
-}
 .preference-option-list-container {
   margin-left: 36px;
   padding: 0;
@@ -916,27 +914,6 @@ a.header-title:hover { text-decoration: underline; }
       cursor: pointer;
       opacity: 0.5;
       &:hover { opacity: 1; }
-    }
-  }
-}
-
-.preference-modal {
-  position: absolute;
-  top: calc(~"50% - 160px");
-  left: calc(~"50% - 180px");
-  width: 360px;
-  margin: 0;
-  .modal-content { width: 360px; }
-  .preference-form {
-    height: 185px;
-    padding: 15px;
-    overflow-y: auto;
-    .share-number {
-      input { float: left; }
-      span {
-        float: left;
-        margin: 11px 0 0 10px;
-      }
     }
   }
 }
@@ -1020,7 +997,34 @@ a.header-title:hover { text-decoration: underline; }
   float: left;
   color: @red !important;
 }
-
+.availability-modal {
+  position: absolute;
+  top: calc(~"50% - 252px");
+  left: calc(~"50% - 320px");
+  width: 640px;
+  margin: 0;
+  .fc-toolbar { display: none; }
+}
+.preference-modal {
+  position: absolute;
+  top: calc(~"50% - 160px");
+  left: calc(~"50% - 180px");
+  width: 360px;
+  margin: 0;
+  .modal-content { width: 360px; }
+  .preference-form {
+    height: 185px;
+    padding: 15px;
+    overflow-y: auto;
+    .share-number {
+      input { float: left; }
+      span {
+        float: left;
+        margin: 11px 0 0 10px;
+      }
+    }
+  }
+}
 
 /** Spinner **/
 
