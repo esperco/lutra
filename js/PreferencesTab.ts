@@ -169,8 +169,8 @@ module PreferencesTab {
   <div class="modal-dialog preference-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <div #iconContainer class="img-container-left"/>
-        <div #title class="preference-modal-title"/>
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title"/>
       </div>
       <div #content class="preference-form"/>
       <div class="modal-footer">
@@ -222,8 +222,8 @@ module PreferencesTab {
 
   }
 
-  function showAvailability(defaults, element) {
-    CalPicker.createModal(defaults, element);
+  function showAvailability(name, defaults, element) {
+    CalPicker.createModal(name, defaults, element);
   }
 
   function createDurationSelector(selected) {
@@ -377,7 +377,8 @@ module PreferencesTab {
   </div>
 </li>
 '''
-    title.text(type.charAt(0).toUpperCase() + type.slice(1));
+    var name = type.charAt(0).toUpperCase() + type.slice(1);
+    title.text(name);
 
     var duration = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(durationContainer);
@@ -389,20 +390,26 @@ module PreferencesTab {
 
     durationRow.append(createDurationSelector(defaults.duration));
 
+    customizeAvailability.data("availabilities", defaults.availability);
+
     if (type == "phone") {
+      customizeAvailability.click(function() {
+        showAvailability(name + " Calls", defaults, customizeAvailability);
+      });
       options.append(viewOfPhoneOptions(defaults, teamid));
     } else if (type == "video") {
+      customizeAvailability.click(function() {
+        showAvailability(name + " Calls", defaults, customizeAvailability);
+      });
       options.append(viewOfVideoOptions(defaults, teamid));
     } else {
+      customizeAvailability.click(function() {
+        showAvailability(name, defaults, customizeAvailability);
+      });
       options.append(viewOfMealOptions(defaults, teamid));
     }
 
     toggle.click(function() { togglePreference(_view, teamid) });
-
-    customizeAvailability.data("availabilities", defaults.availability);
-    customizeAvailability.click(function() {
-      showAvailability(defaults, customizeAvailability);
-    });
 
     return view;
   }
@@ -497,7 +504,7 @@ module PreferencesTab {
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
-      showAvailability(defaults, customizeAvailability);
+      showAvailability("Meetings at " + name, defaults, customizeAvailability);
     });
 
     return view;

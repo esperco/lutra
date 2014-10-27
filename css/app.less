@@ -895,8 +895,12 @@ a.header-title:hover { text-decoration: underline; }
   display: inline-block;
   margin: 3px 0 0 12px;
 }
-.modal-dialog.team-settings {
+.availability-modal {
+  position: absolute;
+  top: calc(~"50% - 252px");
+  left: calc(~"50% - 320px");
   width: 640px;
+  margin: 0;
   .fc-toolbar { display: none; }
 }
 .preference-option-list-container {
@@ -922,21 +926,11 @@ a.header-title:hover { text-decoration: underline; }
   left: calc(~"50% - 180px");
   width: 360px;
   margin: 0;
-  .preference-modal-title { margin-left: 36px; }
   .modal-content { width: 360px; }
   .preference-form {
     height: 185px;
     padding: 15px;
     overflow-y: auto;
-  }
-  .modal-primary { float: right; }
-  .modal-cancel {
-    float: right;
-    margin-right: 6px;
-  }
-  .modal-delete {
-    float: left;
-    color: @red;
   }
 }
 
@@ -999,6 +993,21 @@ a.header-title:hover { text-decoration: underline; }
 .calendar-setting-description {
   margin: 4px 0 10px 0;
 }
+
+
+/** Modals **/
+.modal-icon { margin-top: 2px; }
+.modal-title { margin-left: 36px; }
+.modal-primary { float: right; }
+.modal-cancel {
+  float: right;
+  margin-right: 6px;
+}
+.modal-delete {
+  float: left;
+  color: @red;
+}
+
 
 /** Spinner **/
 

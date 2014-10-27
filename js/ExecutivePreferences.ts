@@ -462,8 +462,8 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
-  function showAvailability(defaults, element) {
-    CalPicker.createModal(defaults, element);
+  function showAvailability(name, defaults, element) {
+    CalPicker.createModal(name, defaults, element);
   }
 
   /** The basic form widget which has a prominent on/off toggle and a
@@ -520,7 +520,7 @@ module Esper.ExecutivePreferences {
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
-      showAvailability(defaults, customizeAvailability);
+      showAvailability("text", defaults, customizeAvailability);
     });
 
     return _view;

@@ -312,22 +312,32 @@ module CalPicker {
     }];
   }
 
-  export function createModal(defaults, element) : void {
+  export function createModal(name, defaults, element) : void {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
      role="dialog">
-  <div class="modal-dialog team-settings">
+  <div class="modal-dialog availability-modal">
     <div class="modal-content">
-      <div class="modal-header">Customize Availability</div>
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title"/>
+      </div>
       <div #content></div>
       <div class="modal-footer">
-        <button #save class="button-primary">Save</button>
+        <button #saveBtn class="button-primary modal-primary">Save</button>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
       </div>
     </div>
   </div>
 </div>
 '''
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/availability.svg");
+
+    title.text("Customize Availability for " + name);
+
     var availabilities = defaults.availability;
     var picker = createPicker(availabilities);
     content.append(picker.view);
@@ -335,7 +345,7 @@ module CalPicker {
     (<any> modal).modal({}); // FIXME
     setTimeout(function() { render(picker); }, 320); // Wait for fade
 
-    save.click(function() {
+    saveBtn.click(function() {
       var events = [];
       for (var k in picker.events)
         events = events.concat(makeAvailability(picker.events[k]));
@@ -343,6 +353,10 @@ module CalPicker {
       element.data("availabilities", events); // ughgh pass data through DOM
       defaults.availability = events;
 
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
   }
