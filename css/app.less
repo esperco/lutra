@@ -272,7 +272,7 @@ input.disabled {
 }
 
 .overlay-popover {
-  position: relative;
+  position: absolute;
   background: white;
   border: 1px solid @gray_30;
   border-radius: 3px;
@@ -950,10 +950,14 @@ a.header-title:hover { text-decoration: underline; }
   border-radius: 100%;
 }
 .sync-action { text-align: right; }
-.label-icon { margin: -1px 10px 0 0; }
+.label-icon {
+  width: 20px;
+  height: 20px;
+  margin: -1px 10px 0 0;
+}
 .new-label-popover {
   display: none;
-  bottom: 80px;
+  margin-top: -80px;
   margin-left: 30px;
 }
 .new-label-input {
