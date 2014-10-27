@@ -174,21 +174,19 @@ module AccountTab {
   <div class="table-header">Membership & Billing</div>
   <div #payments class="table-list">
   <div class="cc-wrapper">
-    <form action="" method="POST" id="payment-form">
-      <span class="payment-errors"></span>
-
+    <form action="" method="POST" id="payment-form" autocomplete="on">
         <div class="cc-row">
           <label class="cc-label">
             <span>Card Number</span>
           </label>
-            <input type="text" size="22" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••" required/>
+            <input type="tel" size="22" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••" required/>
         </div>
 
         <div class="cc-row">
           <label class="cc-label">
             <span>CVC</span>
           </label>
-          <input type="text" size="22" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••" required/>
+          <input type="text" size="22" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••" required autocomplete="off"/>
         </div>
 
         <div class="cc-row">
@@ -202,7 +200,8 @@ module AccountTab {
       </div>
 
     </form>
-      <button #submitButton type="button" class="button-primary" >Submit Payment</button>
+      <button #submitButton type="button" class="button-primary">Submit Payment</button>
+
   </div>
   </div>
   <div class="table-header">Assistants</div>
@@ -216,13 +215,35 @@ module AccountTab {
 </div>
 '''
 
-// Setting up stripe
-
+//checking the type of card
+// var updateCardType = function(){
+//   var type = $['payment'].cardType('input.cc-num');
+//   if(type == 'visa'){
+//     $('.card-type').append('<img src="assets/img/visa-curved-32px.png">');
+//   };
+// };
 
 //restricts the inputs to numbers
-jQuery(function($){
-  $('input.cc-num').payment('formatCardNumber');
-  });
+// jQuery(function($){
+   //$('input.cc-num')['payment']('formatCardNumber');
+//   });
+
+var checkInput = function(ccInfo, valid, date){
+  var $form = $('#payment-form');
+
+  if(!valid){
+    $form.find(ccInfo).val('');
+    $form.find(ccInfo).addClass('cc-error');
+    if(!date){
+      $form.find(ccInfo).attr("placeholder", "Invalid Number");
+    }
+  }
+  //restores input formatting
+  else{
+    $form.find(ccInfo).removeClass('cc-error');
+    $form.find(ccInfo).attr("placeholder", " ");
+  }
+};
 
 Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
 var stripeResponseHandler = function(status, response) {
@@ -233,15 +254,11 @@ var stripeResponseHandler = function(status, response) {
     var validCVC = $["payment"].validateCardCVC($('input.cvc-num',$["payment"].cardType('input.cc-num')).val());
     var validExpiry =$["payment"].validateCardExpiry('input.expiry-month','input.expiry-year');
 
-    if(!validCard){
-       $form.find('.payment-errors').text("Invalid Card Number");
-    }
-    else if(!validCVC){
-      $form.find('.payment-errors').text("Invalid CVC");
-    }
-    else if(!validExpiry){
-      $form.find('.payment-errors').text("Invalid Expiration");
-    }
+    checkInput('.cc-num', validCard, false);
+    checkInput('.cvc-num', validCVC, false);
+    checkInput('.expiry-month', validExpiry, true);
+    checkInput('.expiry-year', validExpiry, true);
+
 
     //disable button
     $form.find('button').prop('disabled', false);
@@ -254,10 +271,10 @@ var stripeResponseHandler = function(status, response) {
     // Insert the token into the form so it gets submitted to the server
     $form.append($('<input type="hidden" name="stripeToken" />').val(token));
     // and re-submit
-    alert("Your card was successfully charged, thanks for subscribing to Esper!");
+    alert("Your card was successfully charged, thanks for joining Esper!");
+
     (<any> $form.get(0)).reset();
 
-    //Log.p("resubmitting");
     //(<any> $form.get(0)).submit();
   }
   };
