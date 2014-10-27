@@ -378,16 +378,26 @@ module Settings {
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(url, emailTo) {
-    var body =
-      "Please click the link and sign in with your Google account:\n\n"
-      + "  " + url;
+  function composeInviteWithURL(team, role, toEmail, link) {
+    return generateInviteURL(team, role, toEmail)
+      .then(function(urlResult) {
+        var url = urlResult.url;
+        var body =
+          "Please click the link and sign in with your Google account:\n\n"
+          + "  " + url;
 
-    return GmailCompose.compose({
-      to: emailTo,
-      subject: "Join my team on Esper",
-      body: body
-    });
+        var gmailUrl = GmailCompose.makeUrl({
+          to: toEmail,
+          subject: "Join my team on Esper",
+          body: body
+        });
+
+        link.attr("href", gmailUrl);
+        link.removeClass("hide");
+        link.click(function() {
+          link.addClass("hide");
+        });
+      });
   }
 
   function renderInviteDialog(team) {
@@ -396,28 +406,29 @@ module Settings {
   <div class="clearfix">
     <div #emailContainer class="img-container-left"/>
     <div #invite class="invite-action clickable">
-      <a class="link click-safe" style="float:left">Invite new team member</a>
+      <a class="link click-safe" style="float:left">Add new team member</a>
       <span class="caret-south click-safe"/>
     </div>
   </div>
 
-  <div #invitePopover class="overlay-popover click-safe">
-    <div>
+  <div #inviteSection class="hide click-safe invite-section">
+    <div #emailSection>
       Email:
       <input #emailInput
-             class="new-label-input click-safe"
+             class="new-label-input"
              autofocus placeholder="name@example.com"/>
+      <button #continueButton class="hide button-secondary">
+        Continue
+      </button>
     </div>
-    <button #continueButton class="button-secondary click-safe">
-      Continue
-    </button>
-    <ul #roleSelector class="hide invite-options">
-      <li class="unselectable click-safe">Select a role:</li>
-      <li><a #assistant href="#" target="_blank"
-             class="click-safe">Assistant</a></li>
-      <li><a #executive href="#" target="_blank"
-             class="click-safe">Executive</a></li>
-    </ul>
+    <div #roleSelector class="hide">
+      Role:
+      <button #assistant class="button-secondary">Assistant</button>
+      <button #executive class="button-secondary">Executive</button>
+    </div>
+    <a #finishLink target="_blank" class="hide button button-secondary">
+      Review and send invite (optional)
+    </a>
   </div>
 </div>
 '''
@@ -425,21 +436,31 @@ module Settings {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    invite.click(function() { toggleOverlay(invitePopover); });
+    invite.click(function() { inviteSection.removeClass("hide"); });
+
+    Util.afterTyping(emailInput, 300, function() {
+      if (Util.validateEmailAddress(emailInput.val())) {
+        continueButton.removeClass("hide");
+      }
+      else
+        continueButton.addClass("disabled");
+    });
 
     continueButton
       .click(function() {
         var toEmail = emailInput.val();
+        emailSection.addClass("hide");
+        continueButton.addClass("hide");
+
         roleSelector.removeClass("hide");
-        generateInviteURL(team, "Assistant", toEmail)
-          .done(function(x) {
-            assistant.attr("href", composeInviteWithURL(x.url, toEmail));
-          });
-        generateInviteURL(team, "Executive", toEmail)
-          .done(function(x) {
-            executive.attr("href", composeInviteWithURL(x.url, toEmail));
-          });
-        return false;
+        assistant.click(function() {
+          roleSelector.addClass("hide");
+          composeInviteWithURL(team, "Assistant", toEmail, finishLink);
+        });
+        executive.click(function() {
+          roleSelector.addClass("hide");
+          composeInviteWithURL(team, "Executive", toEmail, finishLink);
+        });
       });
 
     return view;
@@ -880,7 +901,7 @@ module Settings {
     });
 
     contact.click(function() {
-      GmailCompose.compose({ to: "team@esper.com" });
+      GmailCompose.makeUrl({ to: "team@esper.com" });
     });
 
     Api.getGoogleAuthInfo(document.URL)

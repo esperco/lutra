@@ -4,13 +4,13 @@
 
 module GmailCompose {
 
-  interface PrefilledMsg {
+  export interface PrefilledMsg {
     to?: string;
     subject?: string;
     body?: string
   }
 
-  function makeUrl(param: PrefilledMsg) {
+  export function makeUrl(param: PrefilledMsg) {
     var url = "https://mail.google.com/mail?view=cm&cs=wh&tf=0";
     if (Util.isString(param.to))
       url += "&to=" + encodeURIComponent(param.to);
@@ -20,9 +20,4 @@ module GmailCompose {
       url += "&body=" + encodeURIComponent(param.body);
     return url;
   };
-
-  export function compose(param) {
-    return makeUrl(param);
-  };
-
 }
