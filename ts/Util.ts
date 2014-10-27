@@ -53,7 +53,9 @@ module Util {
     Do something once the user has stopped typing for a certain number
     of milliseconds.
    */
-  export function afterTyping(elt, delayMs, func) {
+  export function afterTyping(elt: JQuery,
+                              delayMs: number,
+                              func: () => void) {
     var lastPressed; // date in milliseconds
     elt
       .unbind('keydown')
@@ -100,7 +102,12 @@ module Util {
     for (var i = 0; i < hex.length; i += 2)
       s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return s;
-  };
+  }
+
+  export function validateEmailAddress(s: string) {
+    var re = /\S+@\S+\.\S+/;
+    return re.test(s);
+  }
 
   export var tests = [
     Test.expect(

@@ -364,26 +364,40 @@ module Settings {
     return view;
   }
 
-  function generateInviteURL(team, role) {
+  function generateInviteURL(team: ApiT.Team,
+                             role: string,
+                             toEmail: string) {
     dismissOverlays();
     var invite = {
       from_uid: Login.me(),
       teamid: team.teamid,
-      role: role
+      role: role,
+      force_email: toEmail
     };
     Log.p("Invite:", invite);
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(url) {
-    var body =
-      "Please click the link and sign in with your Google account:\n\n"
-      + "  " + url;
+  function composeInviteWithURL(team, role, toEmail, link) {
+    return generateInviteURL(team, role, toEmail)
+      .then(function(urlResult) {
+        var url = urlResult.url;
+        var body =
+          "Please click the link and sign in with your Google account:\n\n"
+          + "  " + url;
 
-    return GmailCompose.compose({
-      subject: "Join my team on Esper",
-      body: body
-    });
+        var gmailUrl = GmailCompose.makeUrl({
+          to: toEmail,
+          subject: "Join my team on Esper",
+          body: body
+        });
+
+        link.attr("href", gmailUrl);
+        link.removeClass("hide");
+        link.click(function() {
+          link.addClass("hide");
+        });
+      });
   }
 
   function renderInviteDialog(team) {
@@ -392,32 +406,61 @@ module Settings {
   <div class="clearfix">
     <div #emailContainer class="img-container-left"/>
     <div #invite class="invite-action clickable">
-      <a class="link click-safe" style="float:left">Invite new team member</a>
+      <a class="link click-safe" style="float:left">Add new team member</a>
       <span class="caret-south click-safe"/>
     </div>
   </div>
-  <ul #inviteOptions class="invite-options overlay-list click-safe">
-    <li class="unselectable click-safe">Select a role:</li>
-    <li><a #assistant href="#" target="_blank"
-           class="click-safe">Assistant</a></li>
-    <li><a #executive href="#" target="_blank"
-           class="click-safe">Executive</a></li>
-  </ul>
+
+  <div #inviteSection class="hide click-safe invite-section">
+    <div #emailSection>
+      Email:
+      <input #emailInput
+             class="new-label-input"
+             autofocus placeholder="name@example.com"/>
+      <button #continueButton class="hide button-secondary">
+        Continue
+      </button>
+    </div>
+    <div #roleSelector class="hide">
+      Role:
+      <button #assistant class="button-secondary">Assistant</button>
+      <button #executive class="button-secondary">Executive</button>
+    </div>
+    <a #finishLink target="_blank" class="hide button button-secondary">
+      Review and send invite (optional)
+    </a>
+  </div>
 </div>
 '''
-    var email = $("<img class='svg-block invite-icon'/>")
+    var emailIcon = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
-    Svg.loadImg(email, "/assets/img/email.svg");
+    Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    invite.click(function() { toggleOverlay(inviteOptions); });
+    invite.click(function() { inviteSection.removeClass("hide"); });
 
-    generateInviteURL(team, "Assistant")
-      .done(function(x) {
-        assistant.attr("href", composeInviteWithURL(x.url));
-      });
-    generateInviteURL(team, "Executive")
-      .done(function(x) {
-        executive.attr("href", composeInviteWithURL(x.url));
+    Util.afterTyping(emailInput, 300, function() {
+      if (Util.validateEmailAddress(emailInput.val())) {
+        continueButton.removeClass("hide");
+      }
+      else
+        continueButton.addClass("disabled");
+    });
+
+    continueButton
+      .click(function() {
+        var toEmail = emailInput.val();
+        emailSection.addClass("hide");
+        continueButton.addClass("hide");
+
+        roleSelector.removeClass("hide");
+        assistant.click(function() {
+          roleSelector.addClass("hide");
+          composeInviteWithURL(team, "Assistant", toEmail, finishLink);
+        });
+        executive.click(function() {
+          roleSelector.addClass("hide");
+          composeInviteWithURL(team, "Executive", toEmail, finishLink);
+        });
       });
 
     return view;
@@ -507,18 +550,35 @@ module Settings {
   function viewOfMembersTab(team) {
 '''
 <div #view>
-  <div class="exec-profile clearfix">
-    <div #profilePic class="profile-pic"/>
-    <div style="height: 27px">
-      <span #execName class="profile-name exec-profile-name"/>
-      <span class="exec-label">EXECUTIVE</span>
-      <span #execStatusContainer
-       class="exec-status"
-       data-toggle="tooltip"
-       data-placement="right"
-       title="Reauthorization required."/>
+  <div class="container exec-profile clearfix">
+    <div class="row">
+      <div class="col-xs-8">
+        <div #profilePic class="profile-pic"/>
+        <div style="height: 27px">
+          <span #execName class="profile-name exec-profile-name"/>
+          <span class="exec-label">EXECUTIVE</span>
+          <span #execStatusContainer
+                class="exec-status"
+                data-toggle="tooltip"
+                data-placement="right"
+                title="Reauthorization required."/>
+        </div>
+        <div #execEmail class="profile-email gray"/>
+      </div>
+      <div class="col-xs-4">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12">
+              Team name:
+            </div>
+          </div>
+          <div class="row">
+            <input #teamNameInput class="col-xs-8" placeholder="Exec Name"/>
+            <button #teamNameSave class="col-xs-4 button-primary">Save</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div #execEmail class="profile-email gray"/>
   </div>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="assistants-list">
@@ -531,9 +591,17 @@ module Settings {
 '''
     spinner.show();
 
+    if (team.team_name !== undefined)
+      teamNameInput.val(team.team_name);
+
+    teamNameSave.click(function() {
+      Api.setTeamName(team.teamid, teamNameInput.val());
+    });
+
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
-        profilePic.css("background-image", "url('" + exec.image_url + "')");
+        if (exec.image_url !== undefined)
+          profilePic.css("background-image", "url('" + exec.image_url + "')");
         if (team.team_executive === Login.me()) {
           execName
             .append($("<span>" + exec.display_name + "</span>"))
@@ -663,7 +731,9 @@ module Settings {
 
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profilePic.css("background-image",
+                         "url('" + profile.image_url + "')");
         if (team.team_executive === Login.me()) {
           name
             .append($("<span>" + profile.display_name + "</span>"))
@@ -818,7 +888,9 @@ module Settings {
 
     Api.getMyProfile()
       .done(function(profile){
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profilePic.css("background-image",
+                         "url('" + profile.image_url + "')");
         myName.text(profile.display_name);
         myEmail.text(Login.myEmail());
       });
@@ -858,7 +930,7 @@ module Settings {
     });
 
     contact.click(function() {
-      GmailCompose.compose({ to: "team@esper.com" });
+      GmailCompose.makeUrl({ to: "team@esper.com" });
     });
 
     Api.getGoogleAuthInfo(document.URL)
