@@ -98,7 +98,7 @@ module LabelSyncTab {
 '''
 <div #view>
   <div class="esper-tab-description clearfix">
-    <div #labelSyncContainer />
+    <div #labelSyncContainer class="img-container-left"/>
     <div #description class="label-sync-description"/>
   </div>
   <div class="table-header">Shared Labels</div>
