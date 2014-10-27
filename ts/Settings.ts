@@ -550,18 +550,35 @@ module Settings {
   function viewOfMembersTab(team) {
 '''
 <div #view>
-  <div class="exec-profile clearfix">
-    <div #profilePic class="profile-pic"/>
-    <div style="height: 27px">
-      <span #execName class="profile-name exec-profile-name"/>
-      <span class="exec-label">EXECUTIVE</span>
-      <span #execStatusContainer
-       class="exec-status"
-       data-toggle="tooltip"
-       data-placement="right"
-       title="Reauthorization required."/>
+  <div class="container exec-profile clearfix">
+    <div class="row">
+      <div class="col-xs-8">
+        <div #profilePic class="profile-pic"/>
+        <div style="height: 27px">
+          <span #execName class="profile-name exec-profile-name"/>
+          <span class="exec-label">EXECUTIVE</span>
+          <span #execStatusContainer
+                class="exec-status"
+                data-toggle="tooltip"
+                data-placement="right"
+                title="Reauthorization required."/>
+        </div>
+        <div #execEmail class="profile-email gray"/>
+      </div>
+      <div class="col-xs-4">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12">
+              Team name:
+            </div>
+          </div>
+          <div class="row">
+            <input #teamNameInput class="col-xs-8" placeholder="Exec Name"/>
+            <button #teamNameSave class="col-xs-4 button-primary">Save</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div #execEmail class="profile-email gray"/>
   </div>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="assistants-list">
@@ -573,6 +590,13 @@ module Settings {
 </div>
 '''
     spinner.show();
+
+    if (team.team_name !== undefined)
+      teamNameInput.val(team.team_name);
+
+    teamNameSave.click(function() {
+      Api.setTeamName(team.teamid, teamNameInput.val());
+    });
 
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
