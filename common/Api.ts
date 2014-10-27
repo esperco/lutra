@@ -286,7 +286,7 @@ module Esper.Api {
 
   export function obtainTaskForThread(teamid, threadid,
                                       withEvents = false,
-                                      withThreads = false):
+                                      withThreads = true):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task/" + Login.myUid()
@@ -299,7 +299,7 @@ module Esper.Api {
 
   export function getTaskForThread(teamid, threadid,
                                    withEvents = false,
-                                   withThreads = false):
+                                   withThreads = true):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-opt/" + Login.myUid()
@@ -312,7 +312,7 @@ module Esper.Api {
 
   export function getAutoTaskForThread(teamid, threadid,
                                        withEvents = false,
-                                       withThreads = false):
+                                       withThreads = true):
   JQueryDeferred<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-auto/" + Login.myUid()

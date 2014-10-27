@@ -266,7 +266,7 @@ module Esper.ApiT {
     taskid: string;
     task_title: string;
     task_teamid: string;
-    task_threads: TaskThread[];
+    task_threads: EmailThread[];
     task_events: TaskEvent[];
   }
 
