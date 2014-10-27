@@ -252,6 +252,7 @@ module Esper.CalTab {
 
   function displayEventOptions(view,
                                ev: ApiT.EventWithSyncInfo,
+                               linkedEvents: ApiT.EventWithSyncInfo[],
                                team: ApiT.Team,
                                threadId: string,
                                calTab: CalTabView,
@@ -277,6 +278,10 @@ module Esper.CalTab {
       <li #deleteEvent
           class="esper-li esper-danger">
         Delete from calendar
+      </li>
+      <li #chooseThisEvent
+          class="esper-li">
+        Choose this event
       </li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
@@ -412,6 +417,24 @@ module Esper.CalTab {
         });
     });
 
+    chooseThisEvent.click(function() {
+      var msg = "Other linked events will be deleted. Are you sure?";
+      if (window.confirm(msg)) { // TODO Style me
+        var thisEventId = e.google_event_id;
+        view.parent().find(".esper-ev").addClass("esper-disabled");
+        var deleteCalls = List.map(linkedEvents, function(ev) {
+          var otherEventId = ev.event.google_event_id;
+          if (otherEventId !== thisEventId)
+            return Api.deleteLinkedEvent(team.teamid, threadId, otherEventId);
+          else
+            return Promise.defer(void(0));
+        });
+        Promise.join(deleteCalls).done(function() {
+          refreshEventLists(team, threadId, calTab, profiles);
+        });
+      }
+    });
+
     return optionsView;
   }
 
@@ -442,8 +465,8 @@ module Esper.CalTab {
                                      threadId, calTab, profiles));
     } else {
       e = ev.event;
-      time.prepend(displayEventOptions(view, ev, team, threadId,
-                                       calTab, profiles));
+      time.prepend(displayEventOptions(view, ev, linkedEvents, team,
+                                       threadId, calTab, profiles));
     }
 
     var start = XDate.ofString(e.start.local);
