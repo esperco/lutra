@@ -53,9 +53,9 @@ module PreferencesTab {
                                       primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
-  <div class="input-label semibold">Location Name</div>
+  <div class="semibold">Location Name</div>
   <input #name class="location-name" type="text"/>
-  <div class="input-label semibold">Address</div>
+  <div class="semibold">Address</div>
   <input #address class="location-address" type="text"/>
 </div>
 '''
@@ -83,11 +83,13 @@ module PreferencesTab {
                                    primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
+  <div class="semibold">Service</div>
   <select class="username-type" #select>
     <option value="Google">Google Hangouts</option>
     <option value="Skype">Skype</option>
     <option value="Other">Other</option>
   </select>
+  <div class="semibold">Username</div>
   <input type="text" class="video-username" size=12/>
 </div>
 '''
@@ -115,14 +117,19 @@ module PreferencesTab {
                                    primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
+  <div class="semibold">Type</div>
   <select class="phone-type" #select>
     <option value="Mobile">Mobile</option>
     <option value="Work">Work</option>
     <option value="Home">Home</option>
     <option value="Other">Other</option>
   </select>
-  <input type="text" class="phone-number" size=12/>
-  <input type="checkbox" #share>Share</input>
+  <div class="semibold">Phone Number</div>
+  <input type="text" class="phone-number" size="12"/>
+  <div class="share-number">
+    <input type="checkbox" #share/>
+    <span>Share this number with guests you meet in person</span>
+  </div>
 </div>
 '''
     if (purpose == "Edit") {
@@ -149,14 +156,12 @@ module PreferencesTab {
                                        primaryBtn, cancelBtn, deleteBtn) {
 '''
 <div #view>
-  <div class="input-label semibold">Workplace Name</div>
+  <div class="semibold">Workplace Name</div>
   <input #name class="location-name" type="text"/>
-  <div class="input-label semibold">Address</div>
+  <div class="semibold">Address</div>
   <input #address class="location-address" type="text"/>
 </div>
 '''
-    name.focus();
-
     if (purpose == "Edit") {
       // TODO: populate with saved values
       deleteBtn.click(function() {
@@ -190,7 +195,7 @@ module PreferencesTab {
       </div>
       <div #content class="preference-form"/>
       <div class="modal-footer">
-        <button #primaryBtn class="button-primary modal-primary"/>
+        <button #primaryBtn class="button-primary modal-primary" disabled/>
         <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
         <button #deleteBtn class="button-secondary modal-delete">Delete</button>
       </div>
@@ -232,10 +237,6 @@ module PreferencesTab {
     Svg.loadImg(icon, "/assets/img/" + type + ".svg");
 
     (<any> modal).modal({}); // FIXME
-  }
-
-  function showWorkplaceModal(purpose, defaults, teamid) {
-
   }
 
   function showAvailability(name, defaults, element) {

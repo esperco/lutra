@@ -931,6 +931,13 @@ a.header-title:hover { text-decoration: underline; }
     height: 185px;
     padding: 15px;
     overflow-y: auto;
+    .share-number {
+      input { float: left; }
+      span {
+        float: left;
+        margin: 11px 0 0 10px;
+      }
+    }
   }
 }
 
@@ -998,11 +1005,12 @@ a.header-title:hover { text-decoration: underline; }
 /** Modals **/
 .modal-icon { margin-top: 2px; }
 .modal-title { margin-left: 36px; }
-.input-label { }
-.location-name, .location-address {
+.preference-form select { margin: 5px 0 15px 0; }
+.preference-form input[type=text] {
   width: 100%;
   margin: 5px 0 15px 0;
 }
+.phone-number { margin-bottom: 8px !important; }
 .modal-primary { float: right; }
 .modal-cancel {
   float: right;
