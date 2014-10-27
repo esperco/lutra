@@ -9,7 +9,7 @@ module Esper.CalTab {
 
   var currentEventsListeners = [];
 
-  var currentTask : ApiT.Task;
+  export var currentTask : ApiT.Task;
 
   export function onEventsChanged(callback) {
     currentEventsListeners.push(callback);

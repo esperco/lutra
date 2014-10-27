@@ -74,7 +74,11 @@ module Esper.CalPicker {
       $("<span>" + cal.calendar_title + "</span>").insertAfter(box);
     });
 
-    eventTitle.val("HOLD: " + esperGmail.get.email_subject());
+    var title =
+      CalTab.currentTask !== undefined ?
+      CalTab.currentTask.task_title :
+      esperGmail.get.email_subject();
+    eventTitle.val("HOLD: " + title);
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshCal.click(function() {
       refreshCache = true;
