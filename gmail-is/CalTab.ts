@@ -776,6 +776,10 @@ module Esper.CalTab {
   <div class="esper-section">
     <span #taskCaption class="esper-bold"/>
     <input #taskName type="text" size="24"/>
+    <div>
+      <span class="esper-bold">Other threads:</span>
+      <div #linkedThreads/>
+    </div>
     <ul #taskSearch
         class="esper-task-search-dropdown esper-dropdown-btn esper-ul">
       <div class="esper-dropdown-section"/>
@@ -851,12 +855,27 @@ module Esper.CalTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
+    function showOtherTaskThreads(task) {
+      List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
+        if (thread.gmail_thrid !== threadId) {
+          var threadLink =
+            $("<div class='esper-link'>" + thread.subject + "</div>");
+          threadLink.click(function(e) {
+            e.stopPropagation();
+            window.location.hash = "#all/" + thread.gmail_thrid;
+          });
+          linkedThreads.append(threadLink);
+        }
+      });
+    }
+
     apiGetTask(team.teamid, threadId).done(function(task) {
       currentTask = task;
       var title = "";
       if (task !== undefined) {
         taskCaption.text("Task:");
         title = task.task_title;
+        showOtherTaskThreads(task);
       }
       else {
         taskCaption.text("Create task:");
