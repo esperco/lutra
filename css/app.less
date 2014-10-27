@@ -716,7 +716,10 @@ a.header-title:hover { text-decoration: underline; }
   @media (max-width:899px) { width: 100%; }
   border-top: 1px solid @gray_10;
 }
-.workplace { padding: 0; }
+.workplace {
+  height: 315px;
+  padding: 0;
+}
 .preference {
   padding: 20px 20px 0 20px;
   hr {
@@ -753,9 +756,12 @@ a.header-title:hover { text-decoration: underline; }
   height: 134px;
   margin-top: 180px;
   padding: 18px 20px 5px 20px;
+  overflow-y: auto;
 }
-.new-workplace {
-  margin: 100px auto;
+.add-workplace {
+  position: absolute;
+  top: calc(~"50% - 55px");
+  left: calc(~"50% - 50px");
   width: 100px;
   height: 110px;
   color: @purple;

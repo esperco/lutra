@@ -561,18 +561,18 @@ module PreferencesTab {
         workplaces.append(viewOfWorkplace("Example", place, team.teamid));
       });
 '''
-<div #addWorkplace class="workplace">
-  <div class="new-workplace">
+<li #addWorkplace class="workplace">
+  <div #addBtn class="add-workplace">
     <div class="add-circle">
       <div class="add-vertical"/>
       <div class="add-horizontal"/>
     </div>
     <div>Add workplace</div>
   </div>
-</div>
+</li>
 '''
       workplaces.append(addWorkplace);
-      addWorkplace.click(function() {
+      addBtn.click(function() {
         showInfoModal("workplace", "Add", initial.workplaces, team.teamid);
       })
       setDividerHeight(
