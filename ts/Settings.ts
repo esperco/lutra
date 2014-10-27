@@ -576,7 +576,8 @@ module Settings {
 
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(exec) {
-        profilePic.css("background-image", "url('" + exec.image_url + "')");
+        if (exec.image_url !== undefined)
+          profilePic.css("background-image", "url('" + exec.image_url + "')");
         if (team.team_executive === Login.me()) {
           execName
             .append($("<span>" + exec.display_name + "</span>"))
@@ -706,7 +707,9 @@ module Settings {
 
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profilePic.css("background-image",
+                         "url('" + profile.image_url + "')");
         if (team.team_executive === Login.me()) {
           name
             .append($("<span>" + profile.display_name + "</span>"))
@@ -861,7 +864,9 @@ module Settings {
 
     Api.getMyProfile()
       .done(function(profile){
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profilePic.css("background-image",
+                         "url('" + profile.image_url + "')");
         myName.text(profile.display_name);
         myEmail.text(Login.myEmail());
       });
