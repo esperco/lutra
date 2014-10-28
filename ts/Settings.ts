@@ -4,16 +4,45 @@
 
 module Settings {
 
-  function toggleOverlay(overlay) {
+  export function resetOverlay(overlay) {
+    if (overlay.view.hasClass("invite-popover")) {
+      console.log("invite popover");
+      overlay.inviteEmail
+        .show()
+        .focus();
+      overlay.review.hide();
+      overlay.addBtn
+        .prop("disabled", true)
+        .show();
+      overlay.continueBtn
+        .prop("disabled", true)
+        .hide();
+      overlay.cancelBtn.text("Cancel");
+    }
+    overlay.view.removeClass("reset");
+  }
+
+  export function togglePopover(overlay) {
+    if (overlay.view.css("display") === "none")
+      overlay.view.css("display", "inline-block");
+    else
+      overlay.view.css("display", "none");
+    if (overlay.view.hasClass("reset"))
+      resetOverlay(overlay);
+  }
+
+  export function toggleList(overlay) {
     if (overlay.css("display") === "none")
       overlay.css("display", "inline-block");
     else
       overlay.css("display", "none");
   }
 
-  function dismissOverlays() {
+  export function dismissOverlays() {
     $(".overlay-list").css("display", "none");
+    $(".overlay-list").addClass("reset");
     $(".overlay-popover").css("display", "none");
+    $(".overlay-popover").addClass("reset");
     $(".overlay-popover input").val("");
     $(".overlay-popover .new-label-error").hide();
   }

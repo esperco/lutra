@@ -5,24 +5,6 @@
 module AccountTab {
   declare var Stripe : any;
   declare var Stripe : any;
-  function toggleOverlay(overlay) {
-    if (overlay.css("display") === "none")
-      overlay.css("display", "inline-block");
-    else
-      overlay.css("display", "none");
-  }
-
-  function dismissOverlays() {
-    $(".overlay-list").css("display", "none");
-    $(".overlay-popover").css("display", "none");
-    $(".overlay-popover input").val("");
-    $(".overlay-popover .new-label-error").hide();
-  }
-
-  $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("click-safe"))
-      dismissOverlays();
-  });
 
   function generateInviteURL(team: ApiT.Team,
                              role: string,
@@ -58,46 +40,30 @@ module AccountTab {
 
   function renderInviteDialog(team, table) {
 '''
-<div #view class="member-row">
-  <div class="clearfix">
-    <div #emailContainer class="img-container-left"/>
-    <a #invite disabled
-       class="link popover-trigger click-safe"
-       style="float:left">Add new team member</a>
-  </div>
-  <div #invitePopover class="invite-popover overlay-popover click-safe">
-    <div class="overlay-popover-header click-safe">Add new team member</div>
-    <div class="overlay-popover-body click-safe">
-      <input #inviteEmail class="invite-input click-safe"
-             autofocus placeholder="name@example.com"/>
-      <div #review class="invite-review click-safe">
-        Review and send invitation (optional)
-      </div>
-      <div class="clearfix click-safe">
-        <button #addBtn class="button-primary label-btn click-safe" disabled>
-          Add
-        </button>
-        <ul #roleSelector class="role-selector overlay-list click-safe">
-          <li class="unselectable click-safe">Select a role:</li>
-          <li><a #assistant class="click-safe">Assistant</a></li>
-          <li><a #executive class="click-safe">Executive</a></li>
-        </ul>
-        <a #continueBtn class="invite-continue button button-primary"
-           target="_blank" disabled>Continue</a>
-        <button #cancelBtn class="button-secondary label-btn">Cancel</button>
+<div #view class="invite-popover overlay-popover click-safe">
+  <div class="overlay-popover-header click-safe">Add new team member</div>
+  <div class="overlay-popover-body click-safe">
+    <input #inviteEmail class="invite-input click-safe"
+           autofocus placeholder="name@example.com"/>
+    <div #review class="invite-review click-safe">
+      Review and send invitation (optional)
     </div>
+    <div class="clearfix click-safe">
+      <button #addBtn class="button-primary label-btn click-safe" disabled>
+        <span>Add</span>
+        <span class="caret-south click-safe"/>
+      </button>
+      <ul #roleSelector class="role-selector overlay-list click-safe">
+        <li class="unselectable click-safe">Select a role:</li>
+        <li><a #assistant class="click-safe">Assistant</a></li>
+        <li><a #executive class="click-safe">Executive</a></li>
+      </ul>
+      <a #continueBtn class="invite-continue button button-primary"
+         target="_blank" disabled>Continue</a>
+      <button #cancelBtn class="button-secondary label-btn">Cancel</button>
   </div>
 </div>
 '''
-    var emailIcon = $("<img class='svg-block invite-icon'/>")
-      .appendTo(emailContainer);
-    Svg.loadImg(emailIcon, "/assets/img/email.svg");
-
-    invite.click(function() {
-      toggleOverlay(invitePopover);
-      inviteEmail.focus();
-    });
-
     Util.afterTyping(inviteEmail, 300, function() {
       if (Util.validateEmailAddress(inviteEmail.val()))
         addBtn.prop("disabled", false);
@@ -105,27 +71,17 @@ module AccountTab {
         addBtn.prop("disabled", true);
     });
 
-    function resetPopover() {
-      toggleOverlay(invitePopover);
-      inviteEmail
-        .val("")
-        .show();
-      review.hide();
-      addBtn
-        .prop("disabled", true)
-        .show();
-      continueBtn
-        .prop("disabled", true)
-        .hide();
-      cancelBtn.text("Cancel");
+    function reset() {
+      view.addClass("reset");
+      Settings.togglePopover(_view);
     }
 
     addBtn.click(function() {
       var toEmail = inviteEmail.val();
-      toggleOverlay(roleSelector);
+      Settings.toggleList(roleSelector);
 
       function selectRole(role) {
-        toggleOverlay(roleSelector);
+        Settings.toggleList(roleSelector);
         review.show();
         inviteEmail.hide();
         cancelBtn.text("Skip");
@@ -138,10 +94,10 @@ module AccountTab {
       executive.click(function() { selectRole("Executive") });
     });
 
-    continueBtn.click(resetPopover);
-    cancelBtn.click(resetPopover);
+    continueBtn.click(reset);
+    cancelBtn.click(reset);
 
-    return view;
+    return _view;
   }
 
   function displayAssistants(team, table, profiles) {
@@ -379,9 +335,18 @@ module AccountTab {
     <div #tableEmpty
          class="table-empty">There are no assistants on this team.</div>
   </ul>
-  <div #invitationRow/>
+  <div class="clearfix">
+    <div #emailContainer class="img-container-left"/>
+    <a #invite disabled
+       class="link popover-trigger click-safe"
+       style="float:left">Add new team member</a>
+  </div>
 </div>
 '''
+    var emailIcon = $("<img class='svg-block invite-icon'/>")
+      .appendTo(emailContainer);
+    Svg.loadImg(emailIcon, "/assets/img/email.svg");
+
     membership.append(displayMembership(team.teamid));
 
     spinner.show();
@@ -397,7 +362,9 @@ module AccountTab {
           tableEmpty.show();
       });
 
-    invitationRow.append(renderInviteDialog(team, _view));
+    var popover = renderInviteDialog(team, _view);
+    view.append(popover.view);
+    invite.click(function() { Settings.togglePopover(popover); });
 
     return view;
   }
