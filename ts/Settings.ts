@@ -4,18 +4,54 @@
 
 module Settings {
 
-  function toggleOverlay(overlay) {
+  export function resetOverlay(overlay) {
+    if (overlay.view.hasClass("invite-popover")) {
+      overlay.inviteEmail.show();
+      overlay.review.hide();
+      overlay.addBtn
+        .prop("disabled", true)
+        .show();
+      overlay.continueBtn
+        .prop("disabled", true)
+        .hide();
+      overlay.cancelBtn.text("Cancel");
+    } else if (overlay.view.hasClass("new-label-popover")) {
+      overlay.newLabel.removeClass("disabled");
+      overlay.error.hide();
+      overlay.inlineSpinner.hide();
+      overlay.save
+        .prop("disabled", true)
+        .show();
+    }
+    overlay.view.removeClass("reset");
+  }
+
+  export function togglePopover(overlay) {
+    if (overlay.view.hasClass("reset"))
+      resetOverlay(overlay);
+    if (overlay.view.css("display") === "none") {
+      overlay.view.css("display", "inline-block");
+      if (overlay.view.hasClass("invite-popover"))
+        overlay.inviteEmail.focus();
+      else if (overlay.view.hasClass("new-label-popover"))
+        overlay.newLabel.focus();
+    } else {
+      overlay.view.css("display", "none");
+    }
+  }
+
+  export function toggleList(overlay) {
     if (overlay.css("display") === "none")
       overlay.css("display", "inline-block");
     else
       overlay.css("display", "none");
   }
 
-  function dismissOverlays() {
+  export function dismissOverlays() {
     $(".overlay-list").css("display", "none");
     $(".overlay-popover").css("display", "none");
+    $(".overlay-popover").addClass("reset");
     $(".overlay-popover input").val("");
-    $(".overlay-popover .new-label-error").hide();
   }
 
   $(document).on('click', function(e) {
