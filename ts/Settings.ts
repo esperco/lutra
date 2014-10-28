@@ -6,10 +6,7 @@ module Settings {
 
   export function resetOverlay(overlay) {
     if (overlay.view.hasClass("invite-popover")) {
-      console.log("invite popover");
-      overlay.inviteEmail
-        .show()
-        .focus();
+      overlay.inviteEmail.show();
       overlay.review.hide();
       overlay.addBtn
         .prop("disabled", true)
@@ -18,17 +15,29 @@ module Settings {
         .prop("disabled", true)
         .hide();
       overlay.cancelBtn.text("Cancel");
+    } else if (overlay.view.hasClass("new-label-popover")) {
+      overlay.newLabel.removeClass("disabled");
+      overlay.error.hide();
+      overlay.inlineSpinner.hide();
+      overlay.save
+        .prop("disabled", true)
+        .show();
     }
     overlay.view.removeClass("reset");
   }
 
   export function togglePopover(overlay) {
-    if (overlay.view.css("display") === "none")
-      overlay.view.css("display", "inline-block");
-    else
-      overlay.view.css("display", "none");
     if (overlay.view.hasClass("reset"))
       resetOverlay(overlay);
+    if (overlay.view.css("display") === "none") {
+      overlay.view.css("display", "inline-block");
+      if (overlay.view.hasClass("invite-popover"))
+        overlay.inviteEmail.focus();
+      else if (overlay.view.hasClass("new-label-popover"))
+        overlay.newLabel.focus();
+    } else {
+      overlay.view.css("display", "none");
+    }
   }
 
   export function toggleList(overlay) {
@@ -40,11 +49,9 @@ module Settings {
 
   export function dismissOverlays() {
     $(".overlay-list").css("display", "none");
-    $(".overlay-list").addClass("reset");
     $(".overlay-popover").css("display", "none");
     $(".overlay-popover").addClass("reset");
     $(".overlay-popover input").val("");
-    $(".overlay-popover .new-label-error").hide();
   }
 
   $(document).on('click', function(e) {

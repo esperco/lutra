@@ -4,25 +4,6 @@
 
 module PreferencesTab {
 
-  function toggleOverlay(overlay) {
-    if (overlay.css("display") === "none")
-      overlay.css("display", "inline-block");
-    else
-      overlay.css("display", "none");
-  }
-
-  function dismissOverlays() {
-    $(".overlay-list").css("display", "none");
-    $(".overlay-popover").css("display", "none");
-    $(".overlay-popover input").val("");
-    $(".overlay-popover .new-label-error").hide();
-  }
-
-  $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("click-safe"))
-      dismissOverlays();
-  });
-
   function togglePreference(view, teamid) {
     if (view.toggleBg.hasClass("on")) {
       view.toggleBg.removeClass("on");

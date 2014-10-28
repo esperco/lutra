@@ -4,24 +4,62 @@
 
 module LabelSyncTab {
 
-  function toggleOverlay(overlay) {
-    if (overlay.css("display") === "none")
-      overlay.css("display", "inline-block");
-    else
-      overlay.css("display", "none");
-  }
+  function renderLabelDialog(team, table, sharedLabelsList) {
+'''
+<div #view class="new-label-popover overlay-popover click-safe">
+  <div class="overlay-popover-header click-safe">New shared label</div>
+  <div class="overlay-popover-body click-safe">
+    <input #newLabel class="new-label-input click-safe"
+           autofocus placeholder="Untitled label"/>
+    <div class="clearfix click-safe">
+      <div #error class="new-label-error click-safe">
+        This label already exists.</div>
+      <button #save class="button-primary label-btn click-safe"
+              disabled>Save</button>
+      <div #inlineSpinner class="spinner inline-spinner"/>
+      <button #cancel class="button-secondary label-btn">Cancel</button>
+  </div>
+</div>
+'''
+    newLabel.keyup(function() {
+      if (newLabel.val() != "") {
+        if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
+          save.prop("disabled", true);
+          error.css("display", "inline-block");
+        } else {
+          save.prop("disabled", false);
+          error.hide();
+        }
+      }
+      else
+        save.prop("disabled", true);
+    });
 
-  function dismissOverlays() {
-    $(".overlay-list").css("display", "none");
-    $(".overlay-popover").css("display", "none");
-    $(".overlay-popover input").val("");
-    $(".overlay-popover .new-label-error").hide();
-  }
+    save.click(function() {
+      inlineSpinner.show();
+      save.hide();
+      newLabel.addClass("disabled");
+      save.attr("disabled", "true");
+      var label = newLabel.val();
+      Api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
+        sharedLabelsList.push(label);
+        syncedLabels.labels.push(label);
+        Api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
+          .done(function() {
+            view.addClass("reset");
+            Settings.togglePopover(_view);
+            table.tableEmpty.hide();
+            var newRow = viewOfLabelRow(team, label, syncedLabels.labels);
+            table.labels.prepend(newRow);
+            newRow.addClass("purple-flash");
+          });
+      });
+    });
 
-  $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("click-safe"))
-      dismissOverlays();
-  });
+    cancel.click(function() { Settings.togglePopover(_view); });
+
+    return _view;
+  }
 
   function viewOfLabelRow(team, label, syncedLabelsList) {
 '''
@@ -113,20 +151,6 @@ module LabelSyncTab {
        class="link popover-trigger click-safe"
        style="float:left">Create new shared label</a>
   </div>
-  <div #newLabelPopover class="new-label-popover overlay-popover click-safe">
-    <div class="overlay-popover-header click-safe">New shared label</div>
-    <div class="overlay-popover-body click-safe">
-      <input #newLabel class="new-label-input click-safe"
-             autofocus placeholder="Untitled label"/>
-      <div class="clearfix click-safe">
-        <div #error class="new-label-error click-safe">
-          This label already exists.</div>
-        <button #save class="button-primary label-btn click-safe"
-                disabled>Save</button>
-        <div #inlineSpinner class="spinner inline-spinner"/>
-        <button #cancel class="button-secondary label-btn">Cancel</button>
-    </div>
-  </div>
 </div>
 '''
     var labelSync = $("<img class='svg-block label-sync-icon'/>")
@@ -161,56 +185,11 @@ module LabelSyncTab {
         } else {
           tableEmpty.show();
         }
-        create.click(function() {
-          toggleOverlay(newLabelPopover);
-          newLabel.focus();
-        });
+        var popover = renderLabelDialog(team, _view, sharedLabelsList);
+        view.append(popover.view);
+        create.click(function() { Settings.togglePopover(popover); });
       });
     });
-
-    newLabel.keyup(function() {
-      Log.p(newLabel.val());
-      if (newLabel.val() != "") {
-        if (sharedLabelsList.indexOf(newLabel.val()) > -1) {
-          save.attr("disabled", "true");
-          error.css("display", "inline-block");
-        } else {
-          save.removeAttr("disabled");
-          error.hide();
-        }
-      }
-      else
-        save.attr("disabled", "true");
-    });
-
-    save.click(function() {
-      inlineSpinner.show();
-      newLabel.addClass("disabled");
-      save.attr("disabled", "true");
-      var label = newLabel.val();
-      Api.getSyncedLabels(team.teamid).done(function(syncedLabels) {
-        sharedLabelsList.push(label);
-        syncedLabels.labels.push(label);
-        Api.putSyncedLabels(team.teamid, { labels: syncedLabels.labels })
-          .done(function() {
-            inlineSpinner.hide();
-            toggleOverlay(newLabelPopover);
-            newLabel
-              .val("")
-              .removeClass("disabled");
-            tableEmpty.hide();
-            var newRow = viewOfLabelRow(team, label, syncedLabels.labels);
-            labels.prepend(newRow);
-            newRow.addClass("purple-flash");
-          });
-      });
-    });
-
-    cancel.click(function() {
-      toggleOverlay(newLabelPopover);
-      newLabel.val("");
-      error.hide();
-    })
 
     return view;
   }
