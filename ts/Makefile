@@ -8,8 +8,8 @@ prod: prod-build
 	$(MAKE) prod-install
 
 # Build only
-dev-build: pp includes-dev.html
-prod-build: prod.js includes-prod.html
+dev-build: js/app.js includes-dev.html
+prod-build: js/app.js includes-prod.html
 
 # Javascript libraries that are made available by the setup process.
 # When available, we use the non-minified version for debugging (DEV),
@@ -93,9 +93,9 @@ ts/%.ts: %.ts
 	@mkdir -p ts
 	../setup/bin/oblivion -ts $< -o $@
 
-js/app.js: $(ALL_TS)
+js/app.js: pp
 	@mkdir -p js
-	tsc --out js/app.js $(ALL_TS) || (rm js/app.js; exit 1)
+	tsc --out js/app.js $(ALL_TS) || (rm -f js/app.js; exit 1)
 
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
@@ -116,5 +116,5 @@ prod-install: js/all-typescript.js
 	cp js/app.js ../pub/js
 
 clean:
-	rm -f *~ prod.js includes-*.html run-tests.js
+	rm -f *~ includes-*.html run-tests.js
 	rm -rf js/ ts/

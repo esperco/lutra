@@ -39,7 +39,7 @@ module Footer {
     Svg.loadImg(wordMark, "/assets/img/word-mark.svg");
 
     contact.click(function() {
-      GmailCompose.compose({ to: "team@esper.com" });
+      GmailCompose.makeUrl({ to: "team@esper.com" });
     });
 
     return view;

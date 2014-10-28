@@ -121,10 +121,10 @@ module LabelSyncTab {
       <div class="clearfix click-safe">
         <div #error class="new-label-error click-safe">
           This label already exists.</div>
-        <button #cancel class="button-secondary label-btn">Cancel</button>
         <button #save class="button-primary label-btn click-safe"
                 disabled>Save</button>
         <div #inlineSpinner class="spinner inline-spinner"/>
+        <button #cancel class="button-secondary label-btn">Cancel</button>
     </div>
   </div>
 </div>

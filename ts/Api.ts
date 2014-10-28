@@ -125,6 +125,15 @@ module Api {
                         JSON.stringify(invite));
   };
 
+  export function setTeamName(teamid, name):
+  JQueryDeferred<void> {
+    var fromUid = Login.me();
+    return jsonHttpPut("/api/team-name/" + fromUid
+                       + "/" + teamid
+                       + "/" + name,
+                       "");
+  };
+
   export function setExecutive(teamid, memberUid)
     : JQueryDeferred<void>
   {

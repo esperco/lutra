@@ -11,12 +11,12 @@ prod: prod-build
 	./install prod 2>&1 | tee -a install.log
 
 dev-build:
-	$(MAKE) -C js dev-build
+	$(MAKE) -C ts dev-build
 	$(MAKE) -C html dev-build
 	$(MAKE) -C css dev-build
 
 prod-build:
-	$(MAKE) -C js prod-build
+	$(MAKE) -C ts prod-build
 	$(MAKE) -C html prod-build
 	$(MAKE) -C css prod-build
 
@@ -27,6 +27,6 @@ setup:
 # Remove derived files
 clean:
 	rm -rf pub *~ */*~
-	$(MAKE) -C js clean
+	$(MAKE) -C ts clean
 	$(MAKE) -C html clean
 	$(MAKE) -C css clean

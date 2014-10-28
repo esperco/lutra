@@ -56,7 +56,7 @@ module ApiT {
     profile_uid: string;
     email: string;
     google_access: boolean;
-    display_name?: string;
+    display_name: string;
     gender?: string; // "Female" or "Male"
     image_url?: string;
   }

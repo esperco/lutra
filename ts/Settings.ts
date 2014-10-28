@@ -47,7 +47,7 @@ module Settings {
        data-toggle="tooltip"
        data-placement="left"
        title="Some team members may need to be reauthorized."/>
-  <div #profilePic class="profile-pic"/>
+  <div #profPic class="profile-pic"/>
   <div #name class="profile-name"/>
   <div #email class="profile-email gray"/>
 </div>
@@ -65,7 +65,8 @@ module Settings {
 
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profPic.css("background-image", "url('" + profile.image_url + "')");
         if (team.team_executive === Login.me()) {
           name
             .append($("<span>" + profile.display_name + "</span>"))
@@ -143,7 +144,7 @@ module Settings {
     <div class="leftCol settings-section col-sm-6">
       <div class="esper-h1 settings-section-title">My Profile</div>
       <div class="clearfix" style="margin-top:16px">
-        <div #profilePic class="profile-pic"/>
+        <div #profPic class="profile-pic"/>
         <div #myName class="profile-name"/>
         <div #myEmail class="profile-email gray"/>
       </div>
@@ -192,7 +193,8 @@ module Settings {
 
     Api.getMyProfile()
       .done(function(profile){
-        profilePic.css("background-image", "url('" + profile.image_url + "')");
+        if (profile.image_url !== undefined)
+          profPic.css("background-image", "url('" + profile.image_url + "')");
         myName.text(profile.display_name);
         myEmail.text(Login.myEmail());
       });

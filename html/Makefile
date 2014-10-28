@@ -7,14 +7,14 @@ guest-app: guest-app-build
 HTML_INCLUDES =
 
 dev-build:
-	sed -e '/INCLUDES/r ../js/includes-dev.html' \
+	sed -e '/INCLUDES/r ../ts/includes-dev.html' \
             -e '/INCLUDES/d' \
           app.html.in \
 	| ./inject-files $(HTML_INCLUDES) \
 	> app.html
 
 prod-build:
-	sed -e '/INCLUDES/r ../js/includes-prod.html' \
+	sed -e '/INCLUDES/r ../ts/includes-prod.html' \
             -e '/INCLUDES/d' \
           app.html.in \
 	| ./inject-files $(HTML_INCLUDES) \

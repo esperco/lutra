@@ -24,66 +24,127 @@ module AccountTab {
       dismissOverlays();
   });
 
-  function generateInviteURL(team, role) {
-    dismissOverlays();
+  function generateInviteURL(team: ApiT.Team,
+                             role: string,
+                             toEmail: string) {
     var invite = {
       from_uid: Login.me(),
       teamid: team.teamid,
-      role: role
+      role: role,
+      force_email: toEmail
     };
     Log.p("Invite:", invite);
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(url) {
-    var body =
-      "Please click the link and sign in with your Google account:\n\n"
-      + "  " + url;
+  function composeInviteWithURL(team, role, toEmail, link) {
+    return generateInviteURL(team, role, toEmail)
+      .then(function(urlResult) {
+        var url = urlResult.url;
+        var body =
+          "Please click the link and sign in with your Google account:\n\n"
+          + "  " + url;
 
-    return GmailCompose.compose({
-      subject: "Join my team on Esper",
-      body: body
-    });
+        var gmailUrl = GmailCompose.makeUrl({
+          to: toEmail,
+          subject: "Join my team on Esper",
+          body: body
+        });
+
+        link.attr("href", gmailUrl);
+        link.prop("disabled", false);
+      });
   }
 
-  function renderInviteDialog(team) {
+  function renderInviteDialog(team, table) {
 '''
 <div #view class="member-row">
   <div class="clearfix">
     <div #emailContainer class="img-container-left"/>
-    <div #invite class="invite-action clickable">
-      <a class="link click-safe" style="float:left">Invite new team member</a>
-      <span class="caret-south click-safe"/>
+    <a #invite disabled
+       class="link popover-trigger click-safe"
+       style="float:left">Add new team member</a>
+  </div>
+  <div #invitePopover class="invite-popover overlay-popover click-safe">
+    <div class="overlay-popover-header click-safe">Add new team member</div>
+    <div class="overlay-popover-body click-safe">
+      <input #inviteEmail class="invite-input click-safe"
+             autofocus placeholder="name@example.com"/>
+      <div #review class="invite-review click-safe">
+        Review and send invitation (optional)
+      </div>
+      <div class="clearfix click-safe">
+        <button #addBtn class="button-primary label-btn click-safe" disabled>
+          Add
+        </button>
+        <ul #roleSelector class="role-selector overlay-list click-safe">
+          <li class="unselectable click-safe">Select a role:</li>
+          <li><a #assistant class="click-safe">Assistant</a></li>
+          <li><a #executive class="click-safe">Executive</a></li>
+        </ul>
+        <a #continueBtn class="invite-continue button button-primary"
+           target="_blank" disabled>Continue</a>
+        <button #cancelBtn class="button-secondary label-btn">Cancel</button>
     </div>
   </div>
-  <ul #inviteOptions class="invite-options overlay-list click-safe">
-    <li class="unselectable click-safe">Select a role:</li>
-    <li><a #assistant href="#" target="_blank"
-           class="click-safe">Assistant</a></li>
-    <li><a #executive href="#" target="_blank"
-           class="click-safe">Executive</a></li>
-  </ul>
 </div>
 '''
-    var email = $("<img class='svg-block invite-icon'/>")
+    var emailIcon = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
-    Svg.loadImg(email, "/assets/img/email.svg");
+    Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    invite.click(function() { toggleOverlay(inviteOptions); });
+    invite.click(function() {
+      toggleOverlay(invitePopover);
+      inviteEmail.focus();
+    });
 
-    generateInviteURL(team, "Assistant")
-      .done(function(x) {
-        assistant.attr("href", composeInviteWithURL(x.url));
-      });
-    generateInviteURL(team, "Executive")
-      .done(function(x) {
-        executive.attr("href", composeInviteWithURL(x.url));
-      });
+    Util.afterTyping(inviteEmail, 300, function() {
+      if (Util.validateEmailAddress(inviteEmail.val()))
+        addBtn.prop("disabled", false);
+      else
+        addBtn.prop("disabled", true);
+    });
+
+    function resetPopover() {
+      toggleOverlay(invitePopover);
+      inviteEmail
+        .val("")
+        .show();
+      review.hide();
+      addBtn
+        .prop("disabled", true)
+        .show();
+      continueBtn
+        .prop("disabled", true)
+        .hide();
+      cancelBtn.text("Cancel");
+    }
+
+    addBtn.click(function() {
+      var toEmail = inviteEmail.val();
+      toggleOverlay(roleSelector);
+
+      function selectRole(role) {
+        toggleOverlay(roleSelector);
+        review.show();
+        inviteEmail.hide();
+        cancelBtn.text("Skip");
+        addBtn.hide();
+        continueBtn.show();
+        composeInviteWithURL(team, role, toEmail, continueBtn);
+      }
+
+      assistant.click(function() { selectRole("Assistant") });
+      executive.click(function() { selectRole("Executive") });
+    });
+
+    continueBtn.click(resetPopover);
+    cancelBtn.click(resetPopover);
 
     return view;
   }
 
-  function displayAssistants(assistantsList, team, profiles) {
+  function displayAssistants(team, table, profiles) {
     List.iter(profiles, function(profile) {
 '''
 <li #row class="table-row assistants-table clearfix">
@@ -160,7 +221,7 @@ module AccountTab {
       }
 })();
 
-      assistantsList.append(row);
+      table.append(row);
     });
   }
 
@@ -320,9 +381,7 @@ module AccountTab {
   </ul>
   <div #invitationRow/>
 </div>
-</div>
 '''
-
     membership.append(displayMembership(team.teamid));
 
     spinner.show();
@@ -333,12 +392,12 @@ module AccountTab {
       .done(function(profiles) {
         spinner.hide();
         if (profiles.length > 0)
-          displayAssistants(assistantsList, team, profiles);
+          displayAssistants(team, assistantsList, profiles);
         else
           tableEmpty.show();
       });
 
-    invitationRow.append(renderInviteDialog(team));
+    invitationRow.append(renderInviteDialog(team, _view));
 
     return view;
   }
