@@ -311,13 +311,49 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function displayMembership(teamid) {
+  function showNameModal(teamid) {
 '''
-<div #view class="">
-  <div>Member since November 2014</div>
-  <div #payment class="link">Change payment method</div>
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog preference-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title">Change Display Name</div>
+      </div>
+      <div #content class="preference-form">
+      </div>
+      <div class="modal-footer">
+        <button #saveBtn class="button-primary modal-primary">Save</button>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>
 '''
+    saveBtn.click(function() {
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    (<any> modal).modal({}); // FIXME
+  }
+
+  function displayMembership(teamid) {
+'''
+<div #view class="membership">
+  <div>Member since November 2014</div>
+  <div><a #changeName class="link">Change display name</a></div>
+  <div><a #payment class="link">Change payment method</a></div>
+  <div><a #suspendAcct class="link">Suspend my account</a></div>
+  <div><a #deleteAcct class="danger-link">Delete my account</a></div>
+</div>
+'''
+    changeName.click(function() { showNameModal(teamid) });
+
     payment.click(function() { showPaymentModal("Change", teamid) });
 
     return view;
