@@ -4,7 +4,7 @@
 
 module Preferences {
 
-  export var transportationTypes = ["walking", "bicycle", "public", "car", "zipcar", "taxi", "uber", "lyft"];
+  export var transportationTypes = ["Walking", "Bicycle", "Public", "Car", "Zipcar", "Taxi", "Uber", "Lyft"];
 
   export var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
 

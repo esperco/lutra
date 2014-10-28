@@ -23,8 +23,8 @@ module PreferencesTab {
       dismissOverlays();
   });
 
-  function togglePreference(view, teamid) {
-    if (view.toggleBg.hasClass("on")) {
+  function togglePreference(view, teamid, forceState) {
+    if (forceState === false || view.toggleBg.hasClass("on")) {
       view.toggleBg.removeClass("on");
       view.toggleBg.addClass("off");
       view.toggleSwitch.removeClass("on");
@@ -258,8 +258,11 @@ module PreferencesTab {
   <option #dur180 value="180">3 hr</option>
 </select>
 '''
-    // TODO: mark selected
-
+    var selectedMinutes = selected.hour * 60 + selected.minute;
+    selector.children().each(function() {
+      if (Number($(this).val()) === selectedMinutes)
+        $(this).prop("selected", true);
+    });
     return selector;
   }
 
@@ -304,12 +307,12 @@ module PreferencesTab {
       .appendTo(locationContainer);
     Svg.loadImg(location, "/assets/img/location.svg");
 
-    locations.append(viewOfInfo("location",
-                                "Crepevine",
-                                "367 University Ave, Palo Alto, CA 94301",
-                                defaults, teamid));
-
-    // TODO: populate locations
+    List.iter(defaults.favorites, function(fav) {
+      locations.append(viewOfInfo("location",
+                                  fav.title,
+                                  fav.address,
+                                  defaults, teamid));
+    });
 
     addLocation.click(function() {
       showInfoModal("location", "Add", defaults, teamid);
@@ -331,12 +334,12 @@ module PreferencesTab {
       .appendTo(videoContainer);
     Svg.loadImg(video, "/assets/img/video.svg");
 
-    usernames.append(viewOfInfo("video",
-                                "Google Hangouts",
-                                "john.doe@company.com",
-                                defaults, teamid));
-
-    // TODO: populate usernames
+    List.iter(defaults.accounts, function(acct) {
+      usernames.append(viewOfInfo("video",
+                                  acct.video_type,
+                                  acct.video_username,
+                                  defaults, teamid));
+    });
 
     addUsername.click(function() {
       showInfoModal("video", "Add", defaults, teamid);
@@ -358,12 +361,12 @@ module PreferencesTab {
       .appendTo(phoneContainer);
     Svg.loadImg(phone, "/assets/img/phone.svg");
 
-    numbers.append(viewOfInfo("phone",
-                              "Work",
-                              "(555) 555-5555",
-                              defaults, teamid));
-
-    // TODO: populate phone numbers
+    List.iter(defaults.phones, function(ph) {
+      numbers.append(viewOfInfo("phone",
+                                ph.phone_type,
+                                ph.phone_number,
+                                defaults, teamid));
+    });
 
     addNumber.click(function() {
       showInfoModal("phone", "Add", defaults, teamid);
@@ -426,7 +429,8 @@ module PreferencesTab {
       options.append(viewOfMealOptions(defaults, teamid));
     }
 
-    toggle.click(function() { togglePreference(_view, teamid) });
+    if (defaults.available === false) togglePreference(_view, teamid, false);
+    toggle.click(function() { togglePreference(_view, teamid, undefined) });
 
     return view;
   }
@@ -441,7 +445,7 @@ module PreferencesTab {
   <div #title/>
 </li>
 '''
-    title.text(type.charAt(0).toUpperCase() + type.slice(1));
+    title.text(type);
 
     var icon = $("<img class='svg-block preference-transportation-icon'/>")
       .appendTo(iconContainer);
@@ -451,16 +455,25 @@ module PreferencesTab {
       .appendTo(checkContainer);
     Svg.loadImg(check, "/assets/img/check.svg");
 
-    // TODO: mark transportation as on or off based on defaults
+    function enable() {
+      transportation.removeClass("off");
+      transportation.addClass("on");
+    }
+
+    function disable() {
+      transportation.removeClass("on");
+      transportation.addClass("off");
+    }
+
+    if (List.mem(defaults, type)) enable();
+    else disable();
 
     transportation.click(function() {
       if (transportation.hasClass("on")) {
-        transportation.removeClass("on");
-        transportation.addClass("off");
+        disable();
         // TODO: update preferences
       } else {
-        transportation.removeClass("off");
-        transportation.addClass("on");
+        enable();
         // TODO: update preferences
       }
     });
@@ -468,14 +481,14 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfWorkplace(name, defaults, teamid) {
+  function viewOfWorkplace(defaults, teamid) {
 '''
 <li #view class="workplace">
   <img src="/assets/img/workplace-map.png" class="workplace-map"/>
   <div #details class="workplace-details">
     <div #editIcon class="img-container-right"/>
     <div #title class="workplace-name semibold"/>
-    <div #address>435 Tasso St. #315, Palo Alto, CA 94301</div>
+    <div #address/>
   </div>
   <div #options class="workplace-options">
     <div #help class="gray"/>
@@ -491,7 +504,9 @@ module PreferencesTab {
   </div>
 </li>
 '''
+    var name = defaults.location.title;
     title.text(name);
+    address.text(defaults.location.address);
 
     help.text("Specify preferences for in-person meetings at this location.");
 
@@ -558,7 +573,7 @@ module PreferencesTab {
 
     function loadPreferences(initial) {
       initial.workplaces.forEach(function (place) {
-        workplaces.append(viewOfWorkplace("Example", place, team.teamid));
+        workplaces.append(viewOfWorkplace(place, team.teamid));
       });
 '''
 <li #addWorkplace class="workplace">
@@ -580,9 +595,9 @@ module PreferencesTab {
         workplacesDivider,
         Math.round((initial.workplaces.length + 1)/2));
 
-      Preferences.transportationTypes.map(function (transportation) {
+      Preferences.transportationTypes.map(function (type) {
           return viewOfTransportationType(
-            transportation, initial.meeting_types.phone_call, team.teamid);
+            type, initial.transportation, team.teamid);
         }).forEach(function (element) {
           transportationTypes.append(element);
         });
