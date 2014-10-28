@@ -34,7 +34,7 @@ git pull --ff-only origin master
 install_js jquery jquery-2.1.0.js
 
 # Bootstrap
-rm -rf bootstrap
+rm -rf bootstrap dist __MACOSX
 unzip bootstrap-3.2.0-dist.zip
 mv dist bootstrap
 install_js bootstrap bootstrap/js/bootstrap.js
