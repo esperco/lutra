@@ -164,46 +164,154 @@ module AccountTab {
     });
   }
 
+  function showPaymentModal(purpose, teamid) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog preference-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title"/>
+      </div>
+      <div #content class="preference-form">
+          <form #paymentForm method="POST" autocomplete="on">
+            <div class="semibold">Card Number</div>
+            <input #ccNum type="tel" size="22" data-stripe="number"
+                   class="preference-input" required/>
+            <div class="payment-col left">
+              <div class="semibold">CVC</div>
+              <input #cvcNum type="text" size="22" data-stripe="cvc"
+                     placeholder="•••" required autocomplete="off"/>
+            </div>
+            <div class="payment-col right">
+              <div class="semibold">Expiration</div>
+              <div>
+                <select #expMonth data-stripe="exp-month"
+                        style="margin-right:6px" required/>
+                <select #expYear data-stripe="exp-year" required/>
+              </div>
+            </div>
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button #primaryBtn class="button-primary modal-primary"/>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    if (purpose == "Add") {
+      title.text("Add Payment Method");
+      primaryBtn.text("Add");
+    } else {
+      title.text("Change Payment Method");
+      primaryBtn.text("Save");
+      ccNum.attr("placeholder", "•••• •••• •••• ••••");
+      cvcNum.attr("placeholder", "•••");
+    }
+
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/creditcard.svg");
+
+    // Restricts the inputs to numbers
+    ccNum['payment']('formatCardNumber');
+    cvcNum['payment']('formatCardCVC');
+
+    for (var i = 1; i < 13; i++) {
+      var month;
+      if (i < 10) {
+        month = "0" + i.toString();
+      } else {
+        month = i.toString();
+      }
+      expMonth.append($("<option value=" + i + ">" + month + "</option>"));
+    }
+
+    var currentYear = (new Date).getFullYear();
+    var limitYear = currentYear + 20;
+    for (var i = currentYear; i < limitYear; i++) {
+      var year = i.toString();
+      expYear.append($("<option value=" + i + ">" + year + "</option>"));
+    }
+
+    Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
+
+    var checkInput = function(ccInfo, valid, date){
+      if(!valid){
+        ccInfo.val("");
+        ccInfo.addClass("cc-error");
+        if(!date){
+          ccInfo.attr("placeholder", "Invalid Number");
+        }
+      } else {
+        ccInfo.removeClass('cc-error');
+        ccInfo.attr("placeholder", "");
+      }
+    };
+
+    var stripeResponseHandler = function(status, response) {
+      if (response.error) {
+        var cardType = $["payment"].cardType(ccNum.val());
+
+        // Handles whether the cards are valid, independent of Stripe
+        var validCard = $["payment"].validateCardNumber(ccNum.val());
+        var validCVC = $["payment"].validateCardCVC(cvcNum.val(), cardType);
+        var validExpiry = $["payment"].validateCardExpiry(expMonth, expYear);
+
+        checkInput(ccNum, validCard, false);
+        checkInput(cvcNum, validCVC, false);
+        checkInput(expMonth, validExpiry, true);
+        checkInput(expYear, validExpiry, true);
+
+        primaryBtn.prop('disabled', false);
+      } else {
+        paymentForm
+          .append($('<input type="hidden" name="stripeToken"/>')
+            .val(response.id));
+
+        alert("Your card was successfully charged. Thanks for joining Esper!");
+
+        (<any> paymentForm.get(0)).reset();
+      }
+    };
+
+    paymentForm.submit(function() { return false; });
+
+    primaryBtn.click(function() {
+      primaryBtn.prop('disabled', true);
+      Stripe.card.createToken(paymentForm, stripeResponseHandler);
+      return false;
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    (<any> modal).modal({}); // FIXME
+  }
+
+  function displayMembership(teamid) {
+'''
+<div #view class="">
+  <div>Member since November 2014</div>
+  <div #payment class="link">Change payment method</div>
+</div>
+'''
+    payment.click(function() { showPaymentModal("Change", teamid) });
+
+    return view;
+  }
+
   export function load(team) {
-
-
-
 
 '''
 <div #view>
   <div class="table-header">Membership & Billing</div>
-  <div #payments class="table-list">
-  <div class="cc-wrapper">
-    <form action="" method="POST" id="payment-form" autocomplete="on">
-        <div class="cc-row">
-          <label class="cc-label">
-            <span>Card Number</span>
-          </label>
-            <input type="tel" size="22" data-stripe="number" class="cc-input cc-num" placeholder="•••• •••• •••• ••••" required/>
-        </div>
-
-        <div class="cc-row">
-          <label class="cc-label">
-            <span>CVC</span>
-          </label>
-          <input type="text" size="22" data-stripe="cvc" class="cc-input cvc-num" placeholder="•••" required autocomplete="off"/>
-        </div>
-
-        <div class="cc-row">
-          <label class="cc-label"><span>Expiration</span>
-          </label>
-          <div class="cc-input">
-            <input type="text" size="2" data-stripe="exp-month" class="expiry-month" placeholder="MM" required/>
-          <span> / </span>
-          <input type="text" size="4" data-stripe="exp-year" class="expiry-year" placeholder="YYYY" required/>
-        </div>
-      </div>
-
-    </form>
-      <button #submitButton type="button" class="button-primary">Submit Payment</button>
-
-  </div>
-  </div>
+  <div #membership class="table-list"/>
   <div class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
     <div #spinner class="spinner table-spinner"/>
@@ -215,89 +323,7 @@ module AccountTab {
 </div>
 '''
 
-//checking the type of card
-// var updateCardType = function(){
-//   var type = $['payment'].cardType('input.cc-num');
-//   if(type == 'visa'){
-//     $('.card-type').append('<img src="assets/img/visa-curved-32px.png">');
-//   };
-// };
-
-//restricts the inputs to numbers
-// jQuery(function($){
-   //$('input.cc-num')['payment']('formatCardNumber');
-//   });
-
-var checkInput = function(ccInfo, valid, date){
-  var $form = $('#payment-form');
-
-  if(!valid){
-    $form.find(ccInfo).val('');
-    $form.find(ccInfo).addClass('cc-error');
-    if(!date){
-      $form.find(ccInfo).attr("placeholder", "Invalid Number");
-    }
-  }
-  //restores input formatting
-  else{
-    $form.find(ccInfo).removeClass('cc-error');
-    $form.find(ccInfo).attr("placeholder", " ");
-  }
-};
-
-Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
-var stripeResponseHandler = function(status, response) {
-  var $form = $('#payment-form');
-  if (response.error) {
-    // handles whether the cards are valid, independently of Stripe
-    var validCard = $["payment"].validateCardNumber($('input.cc-num').val());
-    var validCVC = $["payment"].validateCardCVC($('input.cvc-num',$["payment"].cardType('input.cc-num')).val());
-    var validExpiry =$["payment"].validateCardExpiry('input.expiry-month','input.expiry-year');
-
-    checkInput('.cc-num', validCard, false);
-    checkInput('.cvc-num', validCVC, false);
-    checkInput('.expiry-month', validExpiry, true);
-    checkInput('.expiry-year', validExpiry, true);
-
-
-    //disable button
-    $form.find('button').prop('disabled', false);
-    }
-
-    else {
-    // token contains id, last4, and card type
-
-    var token = response.id;
-    // Insert the token into the form so it gets submitted to the server
-    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-    // and re-submit
-    alert("Your card was successfully charged, thanks for joining Esper!");
-
-    (<any> $form.get(0)).reset();
-
-    //(<any> $form.get(0)).submit();
-  }
-  };
-
-    jQuery(function($) {
-      $('#payment-form').submit(function(e){
-              return false;
-      });
-
-      submitButton.click(function(e) {
-        var $form = $('#payment-form');
-        // Disable the submit button to prevent repeated clicks
-        $form.find('button').prop('disabled', true);
-
-        Stripe.card.createToken($form, stripeResponseHandler);
-
-        // Prevent the form from submitting with the default action
-        return false;
-      });
-    });
-
-
-
+    membership.append(displayMembership(team.teamid));
 
     spinner.show();
 

@@ -54,9 +54,9 @@ module PreferencesTab {
 '''
 <div #view>
   <div class="semibold">Location Name</div>
-  <input #name class="location-name" type="text"/>
+  <input #name class="preference-input" type="text"/>
   <div class="semibold">Address</div>
-  <input #address class="location-address" type="text"/>
+  <input #address class="preference-input" type="text"/>
 </div>
 '''
     if (purpose == "Edit") {
@@ -90,7 +90,7 @@ module PreferencesTab {
     <option value="Other">Other</option>
   </select>
   <div class="semibold">Username</div>
-  <input type="text" class="video-username" size=12/>
+  <input type="text" class="preference-input" size=12/>
 </div>
 '''
     if (purpose == "Edit") {
@@ -125,7 +125,7 @@ module PreferencesTab {
     <option value="Other">Other</option>
   </select>
   <div class="semibold">Phone Number</div>
-  <input type="text" class="phone-number" size="12"/>
+  <input type="text" class="preference-input" size="12"/>
   <div class="share-number">
     <input type="checkbox" #share/>
     <span>Share this number with guests you meet in person</span>
@@ -157,9 +157,9 @@ module PreferencesTab {
 '''
 <div #view>
   <div class="semibold">Workplace Name</div>
-  <input #name class="location-name" type="text"/>
+  <input #name class="preference-input" type="text"/>
   <div class="semibold">Address</div>
-  <input #address class="location-address" type="text"/>
+  <input #address class="preference-input" type="text"/>
 </div>
 '''
     if (purpose == "Edit") {

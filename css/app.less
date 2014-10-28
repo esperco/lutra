@@ -104,6 +104,30 @@ button.button-secondary {
   }
 }
 
+select {
+  float: left;
+  height: 32px;
+  padding: 9px 20px 9px 9px;
+  line-height: 1;
+  background-image: url(/assets/img/select-arrow.svg), -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  background-image: url(/assets/img/select-arrow.svg),        -linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  border: 1px solid #C5C5C5;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:hover {
+    background-image: url(/assets/img/select-arrow.svg), -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image: url(/assets/img/select-arrow.svg),        -linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+}
+
 li { list-style: none; }
 
 i { color: @gray_60; }
@@ -212,6 +236,10 @@ input:focus {
 input.disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+input.cc-error, input.cc-error:hover, input.cc-error:focus{
+  border-color: @red_disabled;
+  outline: 0;
 }
 .left-inner-addon,
 .right-inner-addon,
@@ -449,6 +477,8 @@ a.header-title:hover { text-decoration: underline; }
               animation-duration: 1s;
     }
     .close {
+      width: 10px;
+      height: 10px;
       opacity: 0.2;
       &:hover { opacity: 1; }
     }
@@ -502,7 +532,11 @@ a.header-title:hover { text-decoration: underline; }
 .footer-header {
   font-weight: bold;
 }
-.word-mark { margin-top: 6px; }
+.word-mark {
+  width: 113px;
+  height: 12px;
+  margin-top: 6px;
+}
 
 .profile-pic {
   float: left;
@@ -995,7 +1029,7 @@ a.header-title:hover { text-decoration: underline; }
 .modal-icon { margin-top: 2px; }
 .modal-title { margin-left: 36px; }
 .preference-form select { margin: 5px 0 15px 0; }
-.preference-form input[type=text] {
+.preference-form input.preference-input {
   width: 100%;
   margin: 5px 0 15px 0;
 }
@@ -1008,6 +1042,17 @@ a.header-title:hover { text-decoration: underline; }
 .modal-delete {
   float: left;
   color: @red !important;
+}
+.payment-col {
+  float: left;
+  width: 50%;
+  &.left {
+    padding-right: 20px;
+    input {
+      width: 100%;
+      margin: 5px 0 15px 0;
+    }
+  }
 }
 .availability-modal {
   position: absolute;
@@ -1059,34 +1104,6 @@ a.header-title:hover { text-decoration: underline; }
   width: 20px;
   height: 20px;
   margin-top: 6px;
-}
-
-/* Payment form */
-.cc-wrapper{
-  width: 350px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-.cc-row{
-  margin-top: 15px;
-  margin-bottom: 15px;
-  font-size: 14px;
-  vertical-align: text-bottom;
-}
-.cc-input{
-  float: right;
-}
-.cc-label{
-  vertical-align: center;
-}
-input.cc-error, input.cc-error:hover, input.cc-error:focus{
-  border-color: @red_disabled;
-  outline: 0;
-  -webkit-box-shadow: none;
-          box-shadow: none;
-
 }
 
 
