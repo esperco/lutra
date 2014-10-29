@@ -45,7 +45,7 @@ module PreferencesTab {
     if (category == "workplace") {
       divider.css("height", rows * 315 + "px");
     } else {
-      divider.css("height", rows * 236 + "px");
+      divider.css("height", rows * 240 + "px");
     }
   }
 
@@ -85,11 +85,13 @@ module PreferencesTab {
 '''
 <div #view>
   <div class="semibold">Service</div>
-  <select class="username-type" #select>
-    <option value="Google">Google Hangouts</option>
-    <option value="Skype">Skype</option>
-    <option value="Other">Other</option>
-  </select>
+  <div class="clearfix">
+    <select class="username-type" #select>
+      <option value="Google">Google Hangouts</option>
+      <option value="Skype">Skype</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
   <div class="semibold">Username</div>
   <input #username type="text" class="preference-input" size=12/>
 </div>
@@ -123,14 +125,16 @@ module PreferencesTab {
 '''
 <div #view>
   <div class="semibold">Type</div>
-  <select class="phone-type" #select>
-    <option value="Mobile">Mobile</option>
-    <option value="Work">Work</option>
-    <option value="Home">Home</option>
-    <option value="Other">Other</option>
-  </select>
+  <div class="clearfix">
+    <select class="phone-type" #select>
+      <option value="Mobile">Mobile</option>
+      <option value="Work">Work</option>
+      <option value="Home">Home</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
   <div class="semibold">Phone Number</div>
-  <input #number type="text" class="preference-input" size="12"/>
+  <input #number type="text" class="preference-input phone-input" size="12"/>
   <div class="share-number">
     <input type="checkbox" #share/>
     <span>Share this number with guests you meet in person</span>
@@ -281,22 +285,24 @@ module PreferencesTab {
   function viewOfInfo(type, label, info, defaults, teamid) {
 '''
 <li #view>
-  <div #editIcon class="img-container-right"/>
-  <div #labelText class="semibold"/>
-  <div #infoText/>
+  <div #editIcon class="img-container-right preference-option-edit"/>
+  <div #infoContainer class="preference-info">
+    <div #labelText class="semibold"/>
+    <div #infoText/>
+  </div>
 </li>
 '''
     labelText.text(label);
     infoText.text(info);
 
-    var edit = $("<img class='svg-block preference-option-edit'/>")
+    var edit = $("<img class='svg-block'/>")
       .appendTo(editIcon);
     Svg.loadImg(edit, "/assets/img/edit_purple.svg");
 
     editIcon.hover(function(){
-      view.addClass("edit-hover");
+      infoContainer.addClass("edit-hover");
       },function(){
-      view.removeClass("edit-hover");
+      infoContainer.removeClass("edit-hover");
     });
 
     editIcon.click(function() {

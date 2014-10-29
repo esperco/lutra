@@ -112,8 +112,8 @@ button,
 select {
   float: left;
   height: 32px;
-  padding: 9px 20px 9px 9px;
-  line-height: 1;
+  padding: 6px 20px 6px 9px;
+  line-height: 1.2;
   background-image: url(/assets/img/select-arrow.svg), -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
   background-image: url(/assets/img/select-arrow.svg),        -linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
   background-size: calc(~"200% - 20px") 100%, cover;
@@ -808,7 +808,7 @@ a.header-title:hover { text-decoration: underline; }
 .workplace-options {
   height: 134px;
   margin-top: 180px;
-  padding: 18px 20px 5px 20px;
+  padding: 15px 20px 4px 20px;
   overflow-y: auto;
 }
 .add-workplace {
@@ -940,7 +940,7 @@ a.header-title:hover { text-decoration: underline; }
   }
 }
 .preference-options {
-  height: 182px;
+  height: 186px;
   overflow-y: auto;
   &.off {
     opacity: 0.2;
@@ -972,7 +972,8 @@ a.header-title:hover { text-decoration: underline; }
   padding: 0;
   li {
     padding: 3px 0 7px 0;
-    &.edit-hover { background: @gray_f8; }
+    .preference-info { margin-right: 36px; }
+    .edit-hover { background: @gray_f8; }
     .preference-option-edit {
       width: 16px;
       height: 16px;
@@ -1106,11 +1107,15 @@ a.header-title:hover { text-decoration: underline; }
     height: 185px;
     padding: 15px;
     overflow-y: auto;
+    .phone-input { margin-bottom: 0; }
     .share-number {
-      input { float: left; }
+      input {
+        float: left;
+        margin: 0;
+      }
       span {
         float: left;
-        margin: 11px 0 0 10px;
+        margin: 7px 0 0 7px;
       }
     }
   }
