@@ -27,22 +27,12 @@ module Preferences {
         phone_call : {
           availability : [],
           duration     : defaultDuration,
-          phones       : [
-            {
-              phone_number : "",
-              phone_type   : "Mobile"
-            }
-          ]
+          phones       : []
         },
         video_call : {
           availability : [],
           duration     : defaultDuration,
-          accounts     : [
-            {
-              video_type     : "Google",
-              video_username : ""
-            }
-          ]
+          accounts     : []
         }
       },
       workplaces    : [
@@ -57,7 +47,7 @@ module Preferences {
     var defaultMealInfo = {
       availability : [],
       duration     : defaultDuration,
-      favorites    : [ defaultLocation ]
+      favorites    : []
     };
 
     meals.forEach(function (meal) {

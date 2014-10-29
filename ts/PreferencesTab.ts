@@ -60,7 +60,8 @@ module PreferencesTab {
 </div>
 '''
     if (purpose == "Edit") {
-      // TODO: populate with saved values
+      name.val(defaults.title);
+      address.val(defaults.address);
       deleteBtn.click(function() {
         // TODO: delete location
         (<any> modal).modal("hide"); // FIXME
@@ -90,11 +91,15 @@ module PreferencesTab {
     <option value="Other">Other</option>
   </select>
   <div class="semibold">Username</div>
-  <input type="text" class="preference-input" size=12/>
+  <input #username type="text" class="preference-input" size=12/>
 </div>
 '''
     if (purpose == "Edit") {
-      // TODO: populate with saved values
+      select.children().each(function() {
+        if ($(this).val() === defaults.video_type)
+          $(this).prop("selected", true);
+      });
+      username.val(defaults.video_username);
       deleteBtn.click(function() {
         // TODO: delete username
         (<any> modal).modal("hide"); // FIXME
@@ -318,7 +323,7 @@ module PreferencesTab {
       locations.append(viewOfInfo("location",
                                   fav.title,
                                   fav.address,
-                                  defaults, teamid));
+                                  fav, teamid));
     });
 
     addLocation.click(function() {
@@ -345,7 +350,7 @@ module PreferencesTab {
       usernames.append(viewOfInfo("video",
                                   acct.video_type,
                                   acct.video_username,
-                                  defaults, teamid));
+                                  acct, teamid));
     });
 
     addUsername.click(function() {
