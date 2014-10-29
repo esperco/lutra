@@ -385,7 +385,7 @@ module PreferencesTab {
   <div #title class="preference-title semibold"/>
   <hr/>
   <div #options class="preference-options">
-    <div #durationRow class="preference-option-row clearfix">
+    <div #durationRow class="preference-option-selector-row clearfix">
       <div #durationContainer class="img-container-left"/>
     </div>
     <div class="preference-option-row clearfix">
@@ -492,7 +492,7 @@ module PreferencesTab {
   </div>
   <div #options class="workplace-options">
     <div #help class="gray"/>
-    <div #durationRow class="preference-option-row clearfix">
+    <div #durationRow class="preference-option-selector-row clearfix">
       <div #durationContainer class="img-container-left"/>
     </div>
     <div class="preference-option-row clearfix">

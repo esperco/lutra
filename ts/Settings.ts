@@ -103,18 +103,12 @@ module Settings {
       .done(function(profile) {
         if (profile.image_url !== undefined)
           profPic.css("background-image", "url('" + profile.image_url + "')");
-        if (team.team_executive === Login.me()) {
-          name
-            .append($("<span>" + profile.display_name + "</span>"))
-            .append($("<span class='semibold'> (Me)</span>"));
-        } else {
-          name.text(profile.display_name);
-        }
+        name.text(team.team_name);
         email.text(profile.email);
       });;
 
     cogContainer.click(function() {
-      Page.teamSettings.load(team.teamid);
+      Page.teamSettings.load(team);
     })
 
     return view;

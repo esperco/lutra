@@ -6,6 +6,15 @@ module AccountTab {
   declare var Stripe : any;
   declare var Stripe : any;
 
+  function refresh() {
+    /*
+      Reload the whole document.
+      It could be improved but the team structure known by the login module
+      would need to be refreshed.
+    */
+    location.reload(true);
+  }
+
   function generateInviteURL(team: ApiT.Team,
                              role: string,
                              toEmail: string) {
@@ -50,7 +59,7 @@ module AccountTab {
     </div>
     <div class="clearfix click-safe">
       <button #addBtn class="button-primary label-btn click-safe" disabled>
-        <span>Add</span>
+        <span class="click-safe">Add</span>
         <span class="caret-south click-safe"/>
       </button>
       <ul #roleSelector class="role-selector overlay-list click-safe">
@@ -117,15 +126,6 @@ module AccountTab {
   <div #actions class="col-xs-5 assistant-row-actions"/>
 </li>
 '''
-      function refresh() {
-        /*
-          Reload the whole document.
-          It could be improved but the team structure known by the login module
-          would need to be refreshed.
-        */
-        location.reload(true);
-      }
-
       var execUid = team.team_executive;
       var memberUid = profile.profile_uid;
 
@@ -311,7 +311,7 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showNameModal(teamid) {
+  function showNameModal(team) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -322,7 +322,9 @@ module AccountTab {
         <div #iconContainer class="img-container-left modal-icon"/>
         <div #title class="modal-title">Change Display Name</div>
       </div>
-      <div #content class="preference-form">
+      <div #content class="preference-input">
+        <input #displayName id="display-name" placeholder="Display Name"
+               tabindex="-1" onclick="this.select();"/>
       </div>
       <div class="modal-footer">
         <button #saveBtn class="button-primary modal-primary">Save</button>
@@ -332,17 +334,26 @@ module AccountTab {
   </div>
 </div>
 '''
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/displayname.svg");
+
+    if (team.team_name !== undefined)
+      displayName.val(team.team_name);
+
     saveBtn.click(function() {
+      Api.setTeamName(team.teamid, displayName.val());
+      refresh();
     });
 
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
 
-    (<any> modal).modal({}); // FIXME
+    return _view;
   }
 
-  function displayMembership(teamid) {
+  function displayMembership(team) {
 '''
 <div #view class="membership">
   <div>Member since November 2014</div>
@@ -352,15 +363,19 @@ module AccountTab {
   <div><a #deleteAcct class="danger-link">Delete my account</a></div>
 </div>
 '''
-    changeName.click(function() { showNameModal(teamid) });
+    var nameModal = showNameModal(team);
 
-    payment.click(function() { showPaymentModal("Change", teamid) });
+    changeName.click(function() {
+      (<any> nameModal.modal).modal();
+      nameModal.displayName.click();
+    });
+
+    payment.click(function() { showPaymentModal("Change", team.teamid) });
 
     return view;
   }
 
   export function load(team) {
-
 '''
 <div #view>
   <div class="table-header">Membership & Billing</div>
@@ -383,7 +398,7 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    membership.append(displayMembership(team.teamid));
+    membership.append(displayMembership(team));
 
     spinner.show();
 

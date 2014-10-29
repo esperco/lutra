@@ -77,7 +77,7 @@ module TeamSettings {
     }
   }
 
-  export function load(teamid) {
+  export function load(team) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -88,7 +88,7 @@ module TeamSettings {
     <span #arrowContainer class="img-container-left"/>
     <div class="header-exec">
       <div #profilePic class="profile-pic"/>
-      <span #execName class="profile-name exec-profile-name"/>
+      <span #teamName class="profile-name exec-profile-name"/>
     </div>
   </div>
   <div class="divider"/>
@@ -99,6 +99,8 @@ module TeamSettings {
     var root = $("#team-settings-page");
     root.children().remove();
     root.append(view);
+
+    var teamid = team.teamid;
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
@@ -117,7 +119,7 @@ module TeamSettings {
       .done(function(exec) {
         document.title = exec.display_name + " - Team Settings";
         profilePic.css("background-image", "url('" + exec.image_url + "')");
-        execName.text(exec.display_name);
+        teamName.text(team.team_name);
       });
 
     main.append(showTeamSettings(selectedTeam));
