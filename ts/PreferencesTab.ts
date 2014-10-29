@@ -23,6 +23,19 @@ module PreferencesTab {
       dismissOverlays();
   });
 
+  function currentPreferences() {
+
+  }
+
+  function savePreferences() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var preferences = currentPreferences();
+    Api.setPreferences(teamid, preferences)
+      .done(function() {
+        Log.p("Preferences saved.");
+      });
+  }
+
   function togglePreference(view, teamid, forceState) {
     if (forceState === false || view.toggleBg.hasClass("on")) {
       view.toggleBg.removeClass("on");
@@ -301,7 +314,8 @@ module PreferencesTab {
 
   function createDurationSelector(selected) {
 '''
-<select #selector class="preference-option-selector esper-select">
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-duration">
   <option #dur10 value="10">10 min</option>
   <option #dur15 value="15">15 min</option>
   <option #dur20 value="20">20 min</option>
@@ -349,6 +363,7 @@ module PreferencesTab {
       showInfoModal(type, "Edit", defaults, teamid, view);
     })
 
+    view.addClass("esper-prefs-" + type);
     return view;
   }
 
@@ -490,6 +505,7 @@ module PreferencesTab {
     if (defaults.available === false) togglePreference(_view, teamid, false);
     toggle.click(function() { togglePreference(_view, teamid, undefined) });
 
+    view.addClass("esper-prefs-" + type);
     return view;
   }
 
@@ -547,8 +563,8 @@ module PreferencesTab {
   <img src="/assets/img/workplace-map.png" class="workplace-map"/>
   <div #details class="workplace-details">
     <div #editIcon class="img-container-right"/>
-    <div #title class="workplace-name semibold"/>
-    <div #address/>
+    <div #title class="esper-prefs-workplace-name semibold"/>
+    <div #address class="esper-prefs-workplace-address"/>
   </div>
   <div #options class="workplace-options">
     <div #help class="gray"/>
@@ -557,7 +573,8 @@ module PreferencesTab {
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
-      <div #customizeAvailability class="link preference-option-link">
+      <div #customizeAvailability
+           class="esper-prefs-avail link preference-option-link">
         Customize availability
       </div>
     </div>
@@ -606,7 +623,7 @@ module PreferencesTab {
 '''
 <div #view>
   <div class="table-header">Workplaces</div>
-  <ul #workplaces class="table-list">
+  <ul #workplaces class="table-list esper-prefs-workplaces">
     <div #workplacesDivider class="table-divider"/>
   </ul>
   <div class="table-header">Transportation</div>
@@ -628,6 +645,7 @@ module PreferencesTab {
   <div class="save-notes-bar">
     <button #saveNotes class="button-primary" disabled>Save</button>
   </div>
+  <input type="hidden" class="esper-prefs-teamid"/>
 </div>
 '''
     function loadPreferences(initial) {
