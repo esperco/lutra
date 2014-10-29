@@ -109,7 +109,7 @@ button,
   }
 }
 
-select {
+select.esper-select {
   float: left;
   height: 32px;
   padding: 6px 20px 6px 9px;
@@ -225,7 +225,12 @@ a.disabled {
 }
 
 /** Input **/
-input {
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"] {
   height: 32px;
   padding: 0 8px;
   color: @purple_text;
@@ -233,23 +238,21 @@ input {
   border-radius: 3px;
   -webkit-box-shadow: none;
           box-shadow: none;
-}
-input:hover {
-  border: 1px solid @gray_40;
-}
-input:focus {
-  border-color: @purple_focus;
-  outline: 0;
-  -webkit-box-shadow: none;
-          box-shadow: none;
-}
-input.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-input.cc-error, input.cc-error:hover, input.cc-error:focus{
-  border-color: @red_disabled;
-  outline: 0;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  &.cc-error, &.cc-error:hover, &.cc-error:focus{
+    border-color: @red_disabled;
+    outline: 0;
+  }
 }
 .left-inner-addon,
 .right-inner-addon,
@@ -1215,13 +1218,14 @@ a.header-title:hover { text-decoration: underline; }
     overflow-y: auto;
     .phone-input { margin-bottom: 0; }
     .share-number {
+      margin-top: 3px;
       input {
         float: left;
-        margin: 0;
+        margin-top: 3px;
       }
       span {
         float: left;
-        margin: 7px 0 0 7px;
+        margin-right: 7px;
       }
     }
   }

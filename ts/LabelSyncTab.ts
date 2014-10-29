@@ -9,7 +9,7 @@ module LabelSyncTab {
 <div #view class="new-label-popover overlay-popover click-safe">
   <div class="overlay-popover-header click-safe">New shared label</div>
   <div class="overlay-popover-body click-safe">
-    <input #newLabel class="new-label-input click-safe"
+    <input #newLabel type="text" class="new-label-input click-safe"
            autofocus placeholder="Untitled label"/>
     <div class="clearfix click-safe">
       <div #error class="new-label-error click-safe">

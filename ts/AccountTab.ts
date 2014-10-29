@@ -52,7 +52,7 @@ module AccountTab {
 <div #view class="invite-popover overlay-popover click-safe">
   <div class="overlay-popover-header click-safe">Add new team member</div>
   <div class="overlay-popover-body click-safe">
-    <input #inviteEmail class="invite-input click-safe"
+    <input #inviteEmail type="email" class="invite-input click-safe"
            autofocus placeholder="name@example.com"/>
     <div #review class="invite-review click-safe">
       Review and send invitation (optional)
@@ -249,9 +249,10 @@ module AccountTab {
             <div class="payment-col right">
               <div class="semibold">Expiration</div>
               <div>
-                <select #expMonth data-stripe="exp-month"
+                <select #expMonth data-stripe="exp-month" class="esper-select"
                         style="margin-right:6px" required/>
-                <select #expYear data-stripe="exp-year" required/>
+                <select #expYear data-stripe="exp-year" class="esper-select"
+                        required/>
               </div>
             </div>
           </form>
@@ -499,8 +500,8 @@ module AccountTab {
         <div #title class="modal-title">Change Display Name</div>
       </div>
       <div #content class="preference-input">
-        <input #displayName id="display-name" placeholder="Display Name"
-               tabindex="-1" onclick="this.select();"/>
+        <input #displayName id="display-name" type="text" tabindex="-1"
+               placeholder="Display Name" onclick="this.select();"/>
       </div>
       <div class="modal-footer">
         <button #saveBtn class="button-primary modal-primary">Save</button>

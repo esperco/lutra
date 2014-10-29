@@ -121,7 +121,7 @@ module Settings {
   <div class="generate-row clearfix">
     <button #button
             class="button-primary col-xs-3 generate">Generate</button>
-    <input #url class="generate-input col-xs-9 disabled"
+    <input #url type="text" class="generate-input col-xs-9 disabled"
            onclick="this.select();"/>
   </div>
   <div>

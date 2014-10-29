@@ -97,7 +97,7 @@ module PreferencesTab {
 <div #view>
   <div class="semibold">Service</div>
   <div class="clearfix">
-    <select class="username-type" #select>
+    <select class="username-type esper-select" #select>
       <option value="Google">Google Hangouts</option>
       <option value="Skype">Skype</option>
       <option value="Other">Other</option>
@@ -147,7 +147,7 @@ module PreferencesTab {
 <div #view>
   <div class="semibold">Type</div>
   <div class="clearfix">
-    <select class="phone-type" #select>
+    <select class="phone-type esper-select" #select>
       <option value="Mobile">Mobile</option>
       <option value="Work">Work</option>
       <option value="Home">Home</option>
@@ -301,7 +301,7 @@ module PreferencesTab {
 
   function createDurationSelector(selected) {
 '''
-<select #selector class="preference-option-selector">
+<select #selector class="preference-option-selector esper-select">
   <option #dur10 value="10">10 min</option>
   <option #dur15 value="15">15 min</option>
   <option #dur20 value="20">20 min</option>
