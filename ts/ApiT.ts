@@ -171,7 +171,9 @@ module ApiT {
 
   export interface Preferences {
     workplaces: Workplace[];
+    transportation: string[];
     meeting_types: MeetingTypes;
+    notes?: string;
   }
 
   export interface Workplace {
@@ -193,6 +195,7 @@ module ApiT {
 
   export interface PhoneInfo {
     duration: HourMinute;
+    available: boolean;
     availability: Availability[];
     phones: PhoneNumber[];
   }
@@ -204,6 +207,7 @@ module ApiT {
 
   export interface VideoInfo {
     duration: HourMinute;
+    available: boolean;
     availability: Availability[];
     accounts: VideoAccount[];
   }
@@ -230,6 +234,7 @@ module ApiT {
 
   export interface MealInfo {
     duration: HourMinute;
+    available: boolean;
     availability: Availability[];
     favorites: Location[];
   }

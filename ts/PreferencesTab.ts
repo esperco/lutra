@@ -125,7 +125,7 @@ module PreferencesTab {
     <option value="Other">Other</option>
   </select>
   <div class="semibold">Phone Number</div>
-  <input type="text" class="preference-input" size="12"/>
+  <input #number type="text" class="preference-input" size="12"/>
   <div class="share-number">
     <input type="checkbox" #share/>
     <span>Share this number with guests you meet in person</span>
@@ -133,7 +133,13 @@ module PreferencesTab {
 </div>
 '''
     if (purpose == "Edit") {
-      // TODO: populate with saved values
+      select.children().each(function() {
+        if ($(this).val() === defaults.phone_type)
+          $(this).prop("selected", true);
+      });
+      number.val(defaults.phone_number);
+      if (defaults.share_with_guests)
+        share.prop("checked", true);
       deleteBtn.click(function() {
         // TODO: delete phone number
         (<any> modal).modal("hide"); // FIXME
@@ -163,7 +169,8 @@ module PreferencesTab {
 </div>
 '''
     if (purpose == "Edit") {
-      // TODO: populate with saved values
+      name.val(defaults.location.title);
+      address.val(defaults.location.address);
       deleteBtn.click(function() {
         // TODO: delete workplace
         (<any> modal).modal("hide"); // FIXME
@@ -294,7 +301,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfMealOptions(defaults, teamid) {
+  function viewOfMealOptions(defaults : ApiT.MealInfo, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #locationContainer class="img-container-left"/>
@@ -321,7 +328,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfVideoOptions(defaults, teamid) {
+  function viewOfVideoOptions(defaults : ApiT.VideoInfo, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #videoContainer class="img-container-left"/>
@@ -348,7 +355,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfPhoneOptions(defaults, teamid) {
+  function viewOfPhoneOptions(defaults : ApiT.PhoneInfo, teamid) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #phoneContainer class="img-container-left"/>
@@ -365,7 +372,7 @@ module PreferencesTab {
       numbers.append(viewOfInfo("phone",
                                 ph.phone_type,
                                 ph.phone_number,
-                                defaults, teamid));
+                                ph, teamid));
     });
 
     addNumber.click(function() {
@@ -435,7 +442,9 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfTransportationType(type, defaults, teamid) {
+  function viewOfTransportationType(type,
+                                    defaults : string[],
+                                    teamid) {
 '''
 <li #view class="preference-transportation">
   <div #transportation class="preference-transportation-button on">
@@ -481,7 +490,7 @@ module PreferencesTab {
     return view;
   }
 
-  function viewOfWorkplace(defaults, teamid) {
+  function viewOfWorkplace(defaults : ApiT.Workplace, teamid) {
 '''
 <li #view class="workplace">
   <img src="/assets/img/workplace-map.png" class="workplace-map"/>
