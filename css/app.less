@@ -137,6 +137,11 @@ li { list-style: none; }
 
 i { color: @gray_60; }
 
+a.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .esper-h1 { font-size: 18px; }
 .esper-h2 { font-size: 15px; }
 
@@ -721,7 +726,29 @@ a.header-title:hover { text-decoration: underline; }
   .table-divider { display: none; }
 }
 
-.membership { padding: 12px 11px; }
+.membership-col {
+  float: left;
+  padding: 12px 11px;
+  &.left { width: 40%; }
+  &.right { width: 60%; }
+}
+.membership-badge {
+  float: left;
+  margin: 1px 0 0 6px;
+  padding: 1px 6px 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 2px;
+  &.active { background: @gray_20; }
+  &.free-trial {
+    background: @green;
+    color: white;
+  }
+  &.suspended {
+    background: @orange;
+    color: white;
+  }
+}
 
 .assistant-row-status { padding: 10px 12px; }
 .assistant-row-actions {
@@ -1085,6 +1112,85 @@ a.header-title:hover { text-decoration: underline; }
     input {
       width: 100%;
       margin: 5px 0 15px 0;
+    }
+  }
+}
+.confirmation-modal {
+  position: absolute;
+  top: calc(~"50% - 80px");
+  left: calc(~"50% - 160px");
+  width: 320px;
+  margin: 0;
+  .modal-content { width: 320px; }
+  .confirmation-title {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .confirmation-content {
+    padding: 0 15px;
+    text-align: center;
+  }
+  .modal-footer {
+    border: none;
+    button { width: 140px; }
+    .modal-cancel { margin-right: 8px; }
+  }
+}
+.membership-modal {
+  position: absolute;
+  top: calc(~"50% - 160px");
+  left: calc(~"50% - 326px");
+  width: 652px;
+  margin: 0;
+  .modal-content { width: 652px; }
+  .membership-modal-note {
+    display: none;
+    padding: 15px 15px 0 15px;
+    text-align: center;
+  }
+  .membership-options {
+    padding: 15px 10px;
+    .membership-option {
+      float: left;
+      width: 200px;
+      height: 100px;
+      margin: 0 5px;
+      padding: 20px;
+      background: white;
+      border-radius: 5px;
+      border: 1px solid white;
+      cursor: pointer;
+      opacity: 0.7;
+      &:hover {
+        border: 1px solid @gray_20;
+        opacity: 1;
+      }
+      &.selected {
+        background: @gray_f8;
+        border: 1px solid @gray_f8;
+        opacity: 1;
+        pointer-events: none;
+        .membership-option-check { display: block; }
+      }
+      .membership-name {
+        margin-bottom: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+      }
+      .membership-price {
+        font-size: 14px;
+        text-align: center;
+      }
+      .membership-option-check {
+        display: none;
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        margin-left: -14px;
+      }
     }
   }
 }
