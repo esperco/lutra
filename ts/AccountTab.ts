@@ -181,7 +181,50 @@ module AccountTab {
     });
   }
 
-  function showPaymentModal(purpose, teamid) {
+  function showConfirmationModal(action, originalModal) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog confirmation-modal">
+    <div class="modal-content">
+      <div #title class="confirmation-title"/>
+      <div #content class="confirmation-content"/>
+      <div class="modal-footer">
+        <div class="centered-buttons clearfix">
+          <button #primaryBtn class="button-primary modal-primary"/>
+          <button #cancelBtn class="button-secondary modal-cancel"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    if (action == "suspend") {
+      title.text("Suspend membership?");
+      content
+        .text("You can reactive your membership at any point in the future.");
+      primaryBtn.text("Yes");
+      cancelBtn.text("Cancel");
+    }
+
+    primaryBtn.click(function() {
+      if (action == "suspend") {
+        // TODO: suspend membership
+        (<any> modal).modal("hide"); // FIXME
+        if (originalModal !== undefined)
+          (<any> originalModal).modal("hide"); // FIXME
+      }
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    (<any> modal).modal({}); // FIXME
+  }
+
+  function showPaymentModal(purpose, teamid, membership) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -196,7 +239,8 @@ module AccountTab {
           <form #paymentForm method="POST" autocomplete="on">
             <div class="semibold">Card Number</div>
             <input #ccNum type="tel" size="22" data-stripe="number"
-                   class="preference-input" required/>
+                   class="preference-input" placeholder="•••• •••• •••• ••••"
+                   required/>
             <div class="payment-col left">
               <div class="semibold">CVC</div>
               <input #cvcNum type="text" size="22" data-stripe="cvc"
@@ -226,8 +270,6 @@ module AccountTab {
     } else {
       title.text("Change Payment Method");
       primaryBtn.text("Save");
-      ccNum.attr("placeholder", "•••• •••• •••• ••••");
-      cvcNum.attr("placeholder", "•••");
     }
 
     var icon = $("<img class='svg-block preference-option-icon'/>")
@@ -301,12 +343,146 @@ module AccountTab {
     primaryBtn.click(function() {
       primaryBtn.prop('disabled', true);
       Stripe.card.createToken(paymentForm, stripeResponseHandler);
+
+      if (purpose == "Add") {
+        // TODO: update team membership status to selected choice
+      }
+
       return false;
     });
 
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
+
+    (<any> modal).modal({}); // FIXME
+  }
+
+  function viewOfMembershipOption(membership) {
+'''
+<div #view>
+  <div #name class="membership-name"/>
+  <div #price class="membership-price"/>
+  <div #checkContainer/>
+</div>
+'''
+    var check = $("<img class='svg-block membership-option-check'/>")
+      .appendTo(checkContainer);
+    Svg.loadImg(check, "/assets/img/check.svg");
+
+    name.text(membership);
+
+    if (membership == "Entrepreneur") {
+      price.text("$299/mo");
+    } else if (membership == "Entrepreneur Plus") {
+      price.text("$499/mo");
+    } else if (membership == "VIP") {
+      price.text("$999/mo");
+    }
+
+    return view;
+  }
+
+  function showMembershipModal(team) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog membership-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title">Change Membership</div>
+      </div>
+      <div #content>
+        <div #daysRemaining class="membership-modal-note"/>
+        <div #suspension class="membership-modal-note"/>
+        <div class="membership-options clearfix">
+          <div #entrepreneur class="membership-option"/>
+          <div #entrepreneurPlus class="membership-option"/>
+          <div #VIP class="membership-option"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button #primaryBtn class="button-primary modal-primary" disabled>
+          Update
+        </button>
+        <button #cancelBtn class="button-secondary modal-cancel">
+          Cancel
+        </button>
+        <button #suspendBtn class="button-secondary modal-delete">
+          Suspend Membership
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/membership.svg");
+
+    var membership = "free trial"; // TODO: get membership status
+    if (membership == "free trial") {
+      daysRemaining
+        .append($("<span>There are </span>"))
+        .append($("<span class='bold'>" + "24 days" + "</span>"))
+        .append($("<span> remaining in your free trial.</span><br>"))
+        .append($("<span>Select a membership option below to continue using " +
+          "Esper beyond your trial period.</span>"))
+        .show();
+    } else if (membership == "suspended") {
+      suspension
+        .text("Select a membership option below to reactivate your account.")
+        .show();
+    } else if (membership == "entrepreneur") {
+      entrepreneur.addClass("selected");
+    } else if (membership == "entrepreneur plus") {
+      entrepreneurPlus.addClass("selected");
+    } else if (membership == "vip") {
+      VIP.addClass("selected");
+    }
+
+    entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
+    entrepreneurPlus.append(viewOfMembershipOption("Entrepreneur Plus"));
+    VIP.append(viewOfMembershipOption("VIP"));
+
+    var paymentMethod = false; // TODO: get payment method
+
+    function selectMembership(option) {
+      primaryBtn.prop("disabled", false);
+      entrepreneur.removeClass("selected");
+      entrepreneurPlus.removeClass("selected");
+      VIP.removeClass("selected");
+      option.addClass("selected");
+    }
+
+    entrepreneur.click(function() { selectMembership(entrepreneur); });
+    entrepreneurPlus.click(function() { selectMembership(entrepreneurPlus); });
+    VIP.click(function() { selectMembership(VIP); });
+
+    primaryBtn.click(function() {
+      if (paymentMethod == false) {
+        var selected = "entrepreneur"; // TODO: get selected membership
+        (<any> modal).modal("hide"); // FIXME
+        showPaymentModal("Add", team.teamid, selected);
+      } else {
+        // TODO: update membership status
+        (<any> modal).modal("hide"); // FIXME
+      }
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    if ((membership == "free trial") || (membership == "suspended")) {
+      suspendBtn.hide();
+    } else {
+      suspendBtn.click(function() {
+        showConfirmationModal("suspend", modal);
+      });
+    }
 
     (<any> modal).modal({}); // FIXME
   }
@@ -356,21 +532,53 @@ module AccountTab {
   function displayMembership(team) {
 '''
 <div #view class="membership">
-  <div>Member since November 2014</div>
-  <div><a #changeName class="link">Change display name</a></div>
-  <div><a #payment class="link">Change payment method</a></div>
-  <div><a #suspendAcct class="link">Suspend my account</a></div>
-  <div><a #deleteAcct class="danger-link">Delete my account</a></div>
+  <div class="membership-col left">
+    <div #profPic class="profile-pic"/>
+    <div #name class="profile-name"/>
+    <div #email class="profile-email gray"/>
+  </div>
+  <div class="membership-col right">
+    <div><a #changeName class="link">Change display name</a></div>
+    <div class="clearfix">
+      <a #changeMembership class="link" style="float:left">Change membership</a>
+      <span #membershipBadge class="membership-badge"/>
+    </div>
+    <div><a #changePayment class="link">Change payment method</a></div>
+  </div>
 </div>
 '''
-    var nameModal = showNameModal(team);
+    var teamid = team.teamid;
 
+    Api.getProfile(team.team_executive, teamid)
+      .done(function(profile) {
+        if (profile.image_url !== undefined)
+          profPic.css("background-image", "url('" + profile.image_url + "')");
+        name.text(team.team_name);
+        email.text(profile.email);
+      });;
+
+    var nameModal = showNameModal(team);
     changeName.click(function() {
       (<any> nameModal.modal).modal();
       nameModal.displayName.click();
     });
 
-    payment.click(function() { showPaymentModal("Change", team.teamid) });
+    var membership = "free trial"; // TODO: get membership status
+    if (membership == "free trial") {
+      membershipBadge.addClass("free-trial");
+      changePayment.addClass("disabled");
+    } else if (membership == "suspended") {
+      membershipBadge.addClass("suspended");
+    } else {
+      membershipBadge.addClass("active");
+    }
+
+    membershipBadge.text(membership.toUpperCase());
+    changeMembership.click(function() { showMembershipModal(team) });
+
+    changePayment.click(function() {
+      showPaymentModal("Change", teamid, null)
+    });
 
     return view;
   }
