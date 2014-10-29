@@ -105,12 +105,12 @@ includes-dev.html: Makefile mkloader
 includes-prod.html: Makefile mkloader
 	./mkloader $(PROD_LIBS) flags.js app.js > $@
 
-dev-install: $(COMMON_JS) $(APP_JS) js/app.js
+dev-install: js/app.js
 	mkdir -p ../pub/js
 	cp $(DEV_FLAGS) ../pub/js/flags.js
 	cp js/app.js ../pub/js
 
-prod-install: js/all-typescript.js
+prod-install: js/app.js
 	mkdir -p ../pub/js
 	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp js/app.js ../pub/js
