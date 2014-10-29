@@ -199,7 +199,8 @@ module PreferencesTab {
   }
 
   function viewOfWorkplaceModalDetails(modal, purpose, defaults, teamid,
-                                       primaryBtn, cancelBtn, deleteBtn) {
+                                       primaryBtn, cancelBtn, deleteBtn,
+                                       viewToUpdate) {
 '''
 <div #view>
   <div class="semibold">Workplace Name</div>
@@ -212,7 +213,7 @@ module PreferencesTab {
       name.val(defaults.location.title);
       address.val(defaults.location.address);
       deleteBtn.click(function() {
-        // TODO: delete workplace
+        viewToUpdate.remove();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -222,7 +223,15 @@ module PreferencesTab {
     });
 
     primaryBtn.click(function() {
-      // TODO: save workplace
+      if (defaults.location === undefined)
+        defaults = Preferences.defaultPreferences().workplaces[0];
+      defaults.location.title = name.val();
+      defaults.location.address = address.val();
+      var newView = viewOfWorkplace(defaults, teamid);
+      if (purpose === "Edit")
+        viewToUpdate.replaceWith(newView);
+      else
+        viewToUpdate.append(newView);
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -254,7 +263,7 @@ module PreferencesTab {
       title.text(purpose + " Workplace");
       content.append(
         viewOfWorkplaceModalDetails(modal, purpose, defaults, teamid,
-                                    primaryBtn, cancelBtn, deleteBtn));
+                                    primaryBtn, cancelBtn, deleteBtn, view));
     } else if (type == "phone") {
       title.text(purpose + " Phone Number");
       content.append(
@@ -580,7 +589,7 @@ module PreferencesTab {
     });
 
     editIcon.click(function() {
-      showInfoModal("workplace", "Edit", defaults, teamid, details);
+      showInfoModal("workplace", "Edit", defaults, teamid, view);
     })
 
     durationRow.append(createDurationSelector(defaults.duration));
