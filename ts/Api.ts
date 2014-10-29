@@ -9,14 +9,16 @@ module Api {
   function jsonHttp(method, url, body) {
 
     function logError(xhr, textStatus, err) {
+      var respBody = xhr.responseText;
       var details = {
         code: xhr.status,
         textStatus: textStatus,
         method: method,
         url: url,
         reqBody: body,
-        respBody: xhr.responseText
+        respBody: respBody
       };
+      Status.reportError(respBody);
       switch (xhr.status) {
       case 400:
         Log.p("Bad request", details);

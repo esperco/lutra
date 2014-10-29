@@ -301,7 +301,6 @@ module ApiT {
   export interface AccountEmail {
     email : string;
     email_primary : boolean;
-    email_confirmed : boolean;
   }
 
   export interface NamedCalendarId {

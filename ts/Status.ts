@@ -15,13 +15,12 @@ module Status {
       .text(msg)
       .addClass("alert alert-" + kind)
       .show()
-      setTimeout(function() {
+      .one("click", function() {
         elt.hide();
-      }, 3000);
-      // .click(function() {
-      //   elt.addClass("fadeOutUp")
-      //      .removeClass("fadeInDown");
-      // });
+      });
+    setTimeout(function() {
+      elt.hide();
+    }, 3000);
   };
 
   export function reportError(msg) {
