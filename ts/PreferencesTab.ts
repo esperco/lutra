@@ -50,7 +50,8 @@ module PreferencesTab {
   }
 
   function viewOfLocationModalDetails(modal, purpose, defaults, teamid,
-                                      primaryBtn, cancelBtn, deleteBtn) {
+                                      primaryBtn, cancelBtn, deleteBtn,
+                                      viewToUpdate) {
 '''
 <div #view>
   <div class="semibold">Location Name</div>
@@ -63,7 +64,7 @@ module PreferencesTab {
       name.val(defaults.title);
       address.val(defaults.address);
       deleteBtn.click(function() {
-        // TODO: delete location
+        viewToUpdate.remove();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -73,7 +74,16 @@ module PreferencesTab {
     });
 
     primaryBtn.click(function() {
-      // TODO: save location
+      defaults.title = name.val();
+      defaults.address = address.val();
+      var newView = viewOfInfo("location",
+                               name.val(),
+                               address.val(),
+                               defaults, teamid);
+      if (purpose === "Edit")
+        viewToUpdate.replaceWith(newView);
+      else
+        viewToUpdate.append(newView);
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -81,7 +91,8 @@ module PreferencesTab {
   }
 
   function viewOfVideoModalDetails(modal, purpose, defaults, teamid,
-                                   primaryBtn, cancelBtn, deleteBtn) {
+                                   primaryBtn, cancelBtn, deleteBtn,
+                                   viewToUpdate) {
 '''
 <div #view>
   <div class="semibold">Service</div>
@@ -101,7 +112,7 @@ module PreferencesTab {
       });
       username.val(defaults.video_username);
       deleteBtn.click(function() {
-        // TODO: delete username
+        viewToUpdate.remove();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -111,7 +122,16 @@ module PreferencesTab {
     });
 
     primaryBtn.click(function() {
-      // TODO: save username
+      defaults.video_type = select.val();
+      defaults.video_username = username.val();
+      var newView = viewOfInfo("video",
+                               select.val(),
+                               username.val(),
+                               defaults, teamid);
+      if (purpose === "Edit")
+        viewToUpdate.replaceWith(newView);
+      else
+        viewToUpdate.append(newView);
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -119,7 +139,8 @@ module PreferencesTab {
   }
 
   function viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
-                                   primaryBtn, cancelBtn, deleteBtn) {
+                                   primaryBtn, cancelBtn, deleteBtn,
+                                   viewToUpdate) {
 '''
 <div #view>
   <div class="semibold">Type</div>
@@ -146,7 +167,7 @@ module PreferencesTab {
       if (defaults.share_with_guests)
         share.prop("checked", true);
       deleteBtn.click(function() {
-        // TODO: delete phone number
+        viewToUpdate.remove();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -156,7 +177,17 @@ module PreferencesTab {
     });
 
     primaryBtn.click(function() {
-      // TODO: save phone number
+      defaults.phone_type = select.val();
+      defaults.phone_number = number.val();
+      defaults.share_with_guests = share.is(":checked");
+      var newView = viewOfInfo("phone",
+                               select.val(),
+                               number.val(),
+                               defaults, teamid);
+      if (purpose === "Edit")
+        viewToUpdate.replaceWith(newView);
+      else
+        viewToUpdate.append(newView);
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -194,7 +225,7 @@ module PreferencesTab {
     return view;
   }
 
-  function showInfoModal(type, purpose, defaults, teamid) {
+  function showInfoModal(type, purpose, defaults, teamid, view) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -207,7 +238,7 @@ module PreferencesTab {
       </div>
       <div #content class="preference-form"/>
       <div class="modal-footer">
-        <button #primaryBtn class="button-primary modal-primary" disabled/>
+        <button #primaryBtn class="button-primary modal-primary"/>
         <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
         <button #deleteBtn class="button-secondary modal-delete">Delete</button>
       </div>
@@ -224,17 +255,17 @@ module PreferencesTab {
       title.text(purpose + " Phone Number");
       content.append(
         viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
-                                primaryBtn, cancelBtn, deleteBtn));
+                                primaryBtn, cancelBtn, deleteBtn, view));
     } else if (type == "video") {
       title.text(purpose + " Username");
       content.append(
         viewOfVideoModalDetails(modal, purpose, defaults, teamid,
-                                primaryBtn, cancelBtn, deleteBtn));
+                                primaryBtn, cancelBtn, deleteBtn, view));
     } else if (type == "location") {
       title.text(purpose + " Favorite Location");
       content.append(
         viewOfLocationModalDetails(modal, purpose, defaults, teamid,
-                                   primaryBtn, cancelBtn, deleteBtn));
+                                   primaryBtn, cancelBtn, deleteBtn, view));
     }
 
     if (purpose == "Add") {
@@ -282,8 +313,8 @@ module PreferencesTab {
 '''
 <li #view>
   <div #editIcon class="img-container-right"/>
-  <div #labelText class="semibold"/>
-  <div #infoText/>
+  <div #labelText class="semibold esper-info-label"/>
+  <div #infoText class="esper-info-value"/>
 </li>
 '''
     labelText.text(label);
@@ -300,7 +331,7 @@ module PreferencesTab {
     });
 
     editIcon.click(function() {
-      showInfoModal(type, "Edit", defaults, teamid);
+      showInfoModal(type, "Edit", defaults, teamid, view);
     })
 
     return view;
@@ -327,7 +358,7 @@ module PreferencesTab {
     });
 
     addLocation.click(function() {
-      showInfoModal("location", "Add", defaults, teamid);
+      showInfoModal("location", "Add", defaults, teamid, locations);
     })
 
     return view;
@@ -354,7 +385,7 @@ module PreferencesTab {
     });
 
     addUsername.click(function() {
-      showInfoModal("video", "Add", defaults, teamid);
+      showInfoModal("video", "Add", defaults, teamid, usernames);
     })
 
     return view;
@@ -381,7 +412,7 @@ module PreferencesTab {
     });
 
     addNumber.click(function() {
-      showInfoModal("phone", "Add", defaults, teamid);
+      showInfoModal("phone", "Add", defaults, teamid, numbers);
     })
 
     return view;
@@ -543,7 +574,7 @@ module PreferencesTab {
     });
 
     editIcon.click(function() {
-      showInfoModal("workplace", "Edit", defaults, teamid);
+      showInfoModal("workplace", "Edit", defaults, teamid, details);
     })
 
     durationRow.append(createDurationSelector(defaults.duration));
@@ -580,11 +611,10 @@ module PreferencesTab {
             class="preferences-notes">
   </textarea>
   <div class="save-notes-bar">
-    <button #save-notes class="button-primary" disabled>Save</button>
+    <button #saveNotes class="button-primary" disabled>Save</button>
   </div>
 </div>
 '''
-
     function loadPreferences(initial) {
       initial.workplaces.forEach(function (place) {
         workplaces.append(viewOfWorkplace(place, team.teamid));
@@ -602,19 +632,20 @@ module PreferencesTab {
 '''
       workplaces.append(addWorkplace);
       addBtn.click(function() {
-        showInfoModal("workplace", "Add", initial.workplaces, team.teamid);
-      })
+        showInfoModal(
+          "workplace", "Add", initial.workplaces, team.teamid, workplaces);
+      });
       setDividerHeight(
         "workplace",
         workplacesDivider,
         Math.round((initial.workplaces.length + 1)/2));
 
       Preferences.transportationTypes.map(function (type) {
-          return viewOfTransportationType(
-            type, initial.transportation, team.teamid);
-        }).forEach(function (element) {
-          transportationTypes.append(element);
-        });
+        return viewOfTransportationType(
+          type, initial.transportation, team.teamid);
+      }).forEach(function (element) {
+        transportationTypes.append(element);
+      });
 
       calls
         .append(viewOfMeetingType(
@@ -624,21 +655,21 @@ module PreferencesTab {
       setDividerHeight("calls", callsDivider, 1);
 
       Preferences.meals.map(function (meal) {
-          return viewOfMeetingType(
-            meal, initial.meeting_types[meal], team.teamid);
-        }).forEach(function (element) {
-          meals.append(element);
-        });
+        return viewOfMeetingType(
+          meal, initial.meeting_types[meal], team.teamid);
+      }).forEach(function (element) {
+        meals.append(element);
+      });
       setDividerHeight("meals", mealsDivider, 3);
 
       notes.val(initial.notes);
-    };
+    }; // end sub-function loadPreferences
 
-    var preferences = Api.getPreferences(team.teamid)
-      .done(function(x) {
-        Log.p("PREFERENCES", x);
-        loadPreferences($.extend(true, Preferences.defaultPreferences(), x));
-      });
+    Api.getPreferences(team.teamid).done(function(prefs) {
+      Log.p("PREFERENCES", prefs);
+      loadPreferences(
+        $.extend(true, Preferences.defaultPreferences(), prefs));
+    });
 
     return view;
   }
