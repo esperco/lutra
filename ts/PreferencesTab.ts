@@ -644,10 +644,11 @@ module PreferencesTab {
 </li>
 '''
     title.text(type);
+    var lowerType = type.charAt(0).toLowerCase() + type.slice(1);
 
     var icon = $("<img class='svg-block preference-transportation-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/" + type + ".svg");
+    Svg.loadImg(icon, "/assets/img/" + lowerType + ".svg");
 
     var check = $("<img class='svg-block preference-transportation-check'/>")
       .appendTo(checkContainer);
