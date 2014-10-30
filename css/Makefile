@@ -7,8 +7,7 @@ FILES = \
   custom-bootstrap \
   app \
   guest-app \
-  datepicker \
-  executive-preferences
+  datepicker
 
 LESS = $(addsuffix .less, $(FILES))
 CSS = $(addsuffix .css, $(FILES))

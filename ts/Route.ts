@@ -3,8 +3,13 @@ module Route {
 
   export var nav : any = {}; // FIXME
 
-  function withLogin(whenDone, optInviteCode, optEmail) {
-    Signin.signin(whenDone, optInviteCode, optEmail);
+  function withLogin(whenDone, optArgs, optInviteCode, optEmail) {
+    Signin.signin(whenDone, optArgs, optInviteCode, optEmail);
+  }
+
+  // Version with one argument, so you don't have to type undefined 3 times
+  function withLogin1(whenDone) {
+    withLogin(whenDone, undefined, undefined, undefined);
   }
 
   var Router = window["can"].Control({ // FIXME
@@ -13,12 +18,12 @@ module Route {
 
     /* default path /!# */
     "route" : function(data){
-      withLogin(Page.settings.load, undefined, undefined);
+      withLogin1(Page.settings.load);
     },
 
     /* Generic invitation */
     "t/:token route" : function(data) {
-      withLogin(Page.settings.load, data.token, undefined);
+      withLogin(Page.settings.load, undefined, data.token, undefined);
     },
 
     /* Sign-in via Google */
@@ -27,13 +32,18 @@ module Route {
     },
 
     "login/:email route" : function(data) {
-      withLogin(function() { window.close(); }, undefined, data.email);
+      var close = function() { window.close(); };
+      withLogin(close, undefined, undefined, data.email);
     },
 
     /* various pages */
 
+    "team-settings/:teamid route" : function (data) {
+      withLogin(Page.teamSettings.load, data.teamid, undefined, undefined);
+    },
+
     "preferences route" : function (data) {
-      withLogin(Page.preferences.load, undefined, undefined);
+      withLogin1(Page.preferences.load);
     },
 
     "test route": function(data) {

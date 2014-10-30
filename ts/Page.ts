@@ -8,6 +8,7 @@ module Page {
   */
   var pageSelector = Show.create({
     "settings": {ids:["settings-page"]},
+    "team-settings": {ids:["team-settings-page"]},
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]}
@@ -21,7 +22,7 @@ module Page {
   /* Load and render different types of pages */
 
   export interface Loadable {
-    load : () => void;
+    load : (...args: any[]) => void;
   }
 
   export var settings : Loadable = {
@@ -30,6 +31,18 @@ module Page {
       showPage("settings");
       Log.p("settings.load()");
       Settings.load();
+      Util.focus();
+    }
+  }
+
+  export var teamSettings : Loadable = {
+    load: function(teamid) {
+      pageSelector.hideAll();
+      showPage("team-settings");
+      Log.p("TeamSettings.load()", teamid);
+      // Does this belong here? Doesn't work anyway...
+      //window.location.hash = "#!/team-settings/" + teamid;
+      TeamSettings.load(teamid);
       Util.focus();
     }
   }

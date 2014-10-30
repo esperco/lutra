@@ -97,7 +97,10 @@ module Esper.ExecutivePreferences {
   <div class="header clearfix">
     <a #logoContainer href="http://esper.com" target="_blank"
        class="img-container-left"/>
-    <div class="header-title">Meeting Preferences</div>
+    <div class="header-title">
+      <span>Meeting Preferences of</span>
+      <span #selector/>
+    </div>
     <span #signOut class="header-signout clickable">Sign out</span>
   </div>
   <div class="divider"/>
@@ -113,7 +116,7 @@ module Esper.ExecutivePreferences {
       .appendTo(logoContainer);
     Svg.loadImg(logo, "/assets/img/logo.svg");
 
-    form.append(saveButton());
+    selector.append(saveButton());
 
     loadForm();
   }
@@ -459,8 +462,8 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
-  function showAvailability(defaults, element) {
-    CalPicker.createModal(defaults, element);
+  function showAvailability(name, defaults, element) {
+    CalPicker.createModal(name, defaults, element);
   }
 
   /** The basic form widget which has a prominent on/off toggle and a
@@ -517,7 +520,7 @@ module Esper.ExecutivePreferences {
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
-      showAvailability(defaults, customizeAvailability);
+      showAvailability("text", defaults, customizeAvailability);
     });
 
     return _view;

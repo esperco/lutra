@@ -210,7 +210,7 @@ module Signin {
       });
   }
 
-  export function signin(whenDone, optInviteCode, optEmail) {
+  export function signin(whenDone, optArgs, optInviteCode, optEmail) {
     document.title = "Sign in - Esper";
     if (Util.isString(optInviteCode)) {
       useInvite(optInviteCode);
@@ -221,7 +221,8 @@ module Signin {
             var landingUrl = document.URL;
             checkGooglePermissions(landingUrl)
               .done(function(ok) {
-                whenDone();
+                if (optArgs !== undefined) whenDone(optArgs);
+                else whenDone();
               });
           }
         });

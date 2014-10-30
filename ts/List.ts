@@ -31,6 +31,17 @@ module List {
     return false;
   };
 
+  /* return the first element that satisfies the give predicate */
+  export function find<T>(a: T[], f: (x: T, i?: number) => boolean): T {
+    var len = a.length;
+    for (var i = 0; i < len; i++) {
+      if (f(a[i], i) === true) {
+        return a[i];
+      }
+    }
+    return null;
+  };
+
   function getter(optFunc) {
     return Util.isDefined(optFunc) ? optFunc : function(x) { return x; };
   }

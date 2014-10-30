@@ -29,7 +29,6 @@ PROD_LIBS = $(addsuffix .min.js, $(JS_LIBS))
 
 TS_LIBS = \
   fullCalendar.d
-
 # jquery.d
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
@@ -58,6 +57,13 @@ TS_SOURCES = \
   CalPicker \
   Settings \
   Signin \
+  Footer \
+  TeamSettings \
+  AccountTab \
+  Preferences \
+  PreferencesTab \
+  CalendarsTab \
+  LabelSyncTab \
   ExecutivePreferences \
   Page \
   Route \
