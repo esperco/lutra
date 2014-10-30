@@ -96,25 +96,30 @@ module PreferencesTab {
 
   export function currentPreferences() {
     var workplaces = [];
-    var transportation = [];
-    var meeting_types = {};
-    var notes = "";
     $(".esper-prefs-workplaces").find("li.workplace").each(function() {
       var workplace = readWorkplace($(this));
       if (workplace !== null) workplaces.push(workplace);
     });
+
+    var transportation = [];
     $(".preference-transportation").each(function() {
       var li = $(this);
       var kids = li.children();
       if (kids.eq(0).hasClass("on"))
         transportation.push(kids.eq(1).text());
     });
-    meeting_types["phone"] = readPhonePrefs($(".esper-prefs-phone").eq(0));
-    meeting_types["video"] = readVideoPrefs($(".esper-prefs-video").eq(0));
+
+    var meeting_types = {};
+    meeting_types["phone_call"] =
+      readPhonePrefs($(".esper-prefs-phone").eq(0));
+    meeting_types["video_call"] =
+      readVideoPrefs($(".esper-prefs-video").eq(0));
     Preferences.meals.forEach(function(meal) {
       meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
     });
-    notes = $(".preferences-notes").val();
+
+    var notes = $(".preferences-notes").val();
+
     return {
       workplaces: workplaces,
       transportation: transportation,
@@ -123,7 +128,7 @@ module PreferencesTab {
     };
   }
 
-  function savePreferences() {
+  export function savePreferences() {
     var teamid = $(".esper-prefs-teamid").val();
     var preferences = currentPreferences();
     Api.setPreferences(teamid, preferences)
@@ -174,6 +179,7 @@ module PreferencesTab {
       address.val(defaults.address);
       deleteBtn.click(function() {
         viewToUpdate.remove();
+        savePreferences();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -193,6 +199,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
+      savePreferences();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -224,6 +231,7 @@ module PreferencesTab {
       username.val(defaults.video_username);
       deleteBtn.click(function() {
         viewToUpdate.remove();
+        savePreferences();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -243,6 +251,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
+      savePreferences();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -281,6 +290,7 @@ module PreferencesTab {
         share.prop("checked", true);
       deleteBtn.click(function() {
         viewToUpdate.remove();
+        savePreferences();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -301,6 +311,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
+      savePreferences();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -323,6 +334,7 @@ module PreferencesTab {
       address.val(defaults.location.address);
       deleteBtn.click(function() {
         viewToUpdate.remove();
+        savePreferences();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -341,6 +353,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
+      savePreferences();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -406,6 +419,7 @@ module PreferencesTab {
 
   function showAvailability(name, defaults, element) {
     CalPicker.createModal(name, defaults, element);
+    // TODO save when picked
   }
 
   function createDurationSelector(selected) {
@@ -429,6 +443,7 @@ module PreferencesTab {
       if (Number($(this).val()) === selectedMinutes)
         $(this).prop("selected", true);
     });
+    selector.change(savePreferences);
     return selector;
   }
 
@@ -600,7 +615,10 @@ module PreferencesTab {
     }
 
     if (defaults.available === false) togglePreference(_view, teamid, false);
-    toggle.click(function() { togglePreference(_view, teamid, undefined) });
+    toggle.click(function() {
+      togglePreference(_view, teamid, undefined);
+      savePreferences();
+    });
 
     view.addClass("esper-prefs-" + type);
     return view;
@@ -642,13 +660,11 @@ module PreferencesTab {
     else disable();
 
     transportation.click(function() {
-      if (transportation.hasClass("on")) {
+      if (transportation.hasClass("on"))
         disable();
-        // TODO: update preferences
-      } else {
+      else
         enable();
-        // TODO: update preferences
-      }
+      savePreferences();
     });
 
     return view;
@@ -742,7 +758,6 @@ module PreferencesTab {
   <div class="save-notes-bar">
     <button #saveNotes class="button-primary" disabled>Save</button>
   </div>
-  <input type="hidden" class="esper-prefs-teamid"/>
 </div>
 '''
     function loadPreferences(initial) {
@@ -800,6 +815,10 @@ module PreferencesTab {
       loadPreferences(
         $.extend(true, Preferences.defaultPreferences(), prefs));
     });
+
+    $("<input type='hidden' class='esper-prefs-teamid'/>")
+      .val(team.teamid)
+      .appendTo(view);
 
     return view;
   }
