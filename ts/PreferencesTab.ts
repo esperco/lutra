@@ -48,8 +48,8 @@ module PreferencesTab {
       var num = $(this);
       phoneNumbers.push({
         phone_type: num.find(".esper-info-label").text(),
-        phone_number: num.find(".esper-info-value").text()
-        // TODO share_with_guests
+        phone_number: num.find(".esper-info-value").text(),
+        share_with_guests: num.find(".esper-share-phone").is(":checked")
       });
     });
     return {
@@ -459,6 +459,12 @@ module PreferencesTab {
 '''
     labelText.text(label);
     infoText.text(info);
+    if (type === "phone") {
+      $("<input type='checkbox' class='esper-share-phone'/>")
+        .prop("checked", defaults.share_with_guests)
+        .hide()
+        .appendTo(infoContainer);
+    }
 
     var edit = $("<img class='svg-block'/>")
       .appendTo(editIcon);
@@ -808,10 +814,16 @@ module PreferencesTab {
       setDividerHeight("meals", mealsDivider, 3);
 
       notes.val(initial.notes);
+      Util.afterTyping(notes, 250, function() {
+        saveNotes.prop("disabled", false);
+      });
+      saveNotes.click(function() {
+        savePreferences();
+        saveNotes.prop("disabled", true);
+      });
     }; // end sub-function loadPreferences
 
     Api.getPreferences(team.teamid).done(function(prefs) {
-      Log.p("PREFERENCES", prefs);
       loadPreferences(
         $.extend(true, Preferences.defaultPreferences(), prefs));
     });
