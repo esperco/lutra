@@ -353,6 +353,7 @@ module CalPicker {
       element.data("availabilities", events); // ughgh pass data through DOM
       defaults.availability = events;
 
+      PreferencesTab.savePreferences();
       (<any> modal).modal("hide"); // FIXME
     });
 
