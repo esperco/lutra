@@ -23,8 +23,104 @@ module PreferencesTab {
       dismissOverlays();
   });
 
-  function currentPreferences() {
+  function hourMinute(secs) {
+    return {
+      hour: Math.floor(secs / 60),
+      minute: secs % 60
+    };
+  }
 
+  function readWorkplace(li) {
+    if (li.has("div.add-workplace").length > 0) return null; // skip (+)
+    return {
+      location: {
+        title: li.find(".esper-prefs-workplace-name").text(),
+        address: li.find(".esper-prefs-workplace-address").text()
+      },
+      duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      availability: li.find(".esper-prefs-avail").data("availabilities")
+    };
+  }
+
+  function readPhonePrefs(li) {
+    var phoneNumbers = [];
+    li.find(".esper-prefs-phone-info").each(function() {
+      var num = $(this);
+      phoneNumbers.push({
+        phone_type: num.find(".esper-info-label").text(),
+        phone_number: num.find(".esper-info-value").text()
+        // TODO share_with_guests
+      });
+    });
+    return {
+      duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      available: li.find("div.preference-toggle-switch").hasClass("on"),
+      availability: li.find(".esper-prefs-avail").data("availabilities"),
+      phones: phoneNumbers
+    };
+  }
+
+  function readVideoPrefs(li) {
+    var videoAccounts = [];
+    li.find(".esper-prefs-video-info").each(function() {
+      var acct = $(this);
+      videoAccounts.push({
+        video_type: acct.find(".esper-info-label").text(),
+        video_username: acct.find(".esper-info-value").text()
+      });
+    });
+    return {
+      duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      available: li.find("div.preference-toggle-switch").hasClass("on"),
+      availability: li.find(".esper-prefs-avail").data("availabilities"),
+      accounts: videoAccounts
+    };
+  }
+
+  function readMealPrefs(li) {
+    var favoritePlaces = [];
+    li.find(".esper-prefs-location-info").each(function() {
+      var fav = $(this);
+      favoritePlaces.push({
+        title: fav.find(".esper-info-label").text(),
+        address: fav.find(".esper-info-value").text()
+      });
+    });
+    return {
+      duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      available: li.find("div.preference-toggle-switch").hasClass("on"),
+      availability: li.find(".esper-prefs-avail").data("availabilities"),
+      favorites: favoritePlaces
+    };
+  }
+
+  export function currentPreferences() {
+    var workplaces = [];
+    var transportation = [];
+    var meeting_types = {};
+    var notes = "";
+    $(".esper-prefs-workplaces").find("li.workplace").each(function() {
+      var workplace = readWorkplace($(this));
+      if (workplace !== null) workplaces.push(workplace);
+    });
+    $(".preference-transportation").each(function() {
+      var li = $(this);
+      var kids = li.children();
+      if (kids.eq(0).hasClass("on"))
+        transportation.push(kids.eq(1).text());
+    });
+    meeting_types["phone"] = readPhonePrefs($(".esper-prefs-phone").eq(0));
+    meeting_types["video"] = readVideoPrefs($(".esper-prefs-video").eq(0));
+    Preferences.meals.forEach(function(meal) {
+      meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
+    });
+    notes = $(".preferences-notes").val();
+    return {
+      workplaces: workplaces,
+      transportation: transportation,
+      meeting_types: meeting_types,
+      notes: notes
+    };
   }
 
   function savePreferences() {
@@ -363,7 +459,7 @@ module PreferencesTab {
       showInfoModal(type, "Edit", defaults, teamid, view);
     })
 
-    view.addClass("esper-prefs-" + type);
+    view.addClass("esper-prefs-" + type + "-info");
     return view;
   }
 
@@ -463,7 +559,8 @@ module PreferencesTab {
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
-      <div #customizeAvailability class="link preference-option-link">
+      <div #customizeAvailability
+          class="esper-prefs-avail link preference-option-link">
         Customize availability
       </div>
     </div>
