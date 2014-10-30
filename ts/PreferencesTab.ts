@@ -476,8 +476,9 @@ module PreferencesTab {
       infoContainer.removeClass("edit-hover");
     });
 
+    var defaultsCopy = $.extend(true, {}, defaults);
     editIcon.click(function() {
-      showInfoModal(type, "Edit", defaults, teamid, view);
+      showInfoModal(type, "Edit", defaultsCopy, teamid, view);
     })
 
     view.addClass("esper-prefs-" + type + "-info");
@@ -724,8 +725,9 @@ module PreferencesTab {
       details.removeClass("edit-hover");
     });
 
+    var defaultsCopy = $.extend(true, {}, defaults);
     editIcon.click(function() {
-      showInfoModal("workplace", "Edit", defaults, teamid, view);
+      showInfoModal("workplace", "Edit", defaultsCopy, teamid, view);
     })
 
     durationRow.append(createDurationSelector(defaults.duration));
