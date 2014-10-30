@@ -800,9 +800,13 @@ a.header-title:hover { text-decoration: underline; }
 .workplace, .preference {
   position: relative;
   float: left;
-  @media (min-width:900px) { width: 50%; }
-  @media (max-width:899px) { width: 100%; }
   border-top: 1px solid @gray_10;
+}
+@media (min-width:900px) {
+  .workplace, .preference { width: 50%; }
+}
+@media (max-width:899px) {
+  .workplace, .preference { width: 50%; }
 }
 .workplace {
   height: 315px;
