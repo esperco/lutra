@@ -55,6 +55,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       phones: phoneNumbers
@@ -72,6 +73,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       accounts: videoAccounts
@@ -89,6 +91,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       favorites: favoritePlaces
@@ -448,6 +451,33 @@ module PreferencesTab {
     return selector;
   }
 
+  function createBufferSelector(selected) {
+'''
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-buffer">
+  <option value="0">None</option>
+  <option value="5">5 min</option>
+  <option value="10">10 min</option>
+  <option #initial value="15">15 min</option>
+  <option value="20">20 min</option>
+  <option value="30">30 min</option>
+  <option value="45">45 min</option>
+  <option value="60">1 hr</option>
+</select>
+'''
+    if (selected === undefined) {
+      initial.prop("selected", true);
+    } else {
+      var selectedMinutes = selected.hour * 60 + selected.minute;
+      selector.children().each(function() {
+        if (Number($(this).val()) === selectedMinutes)
+          $(this).prop("selected", true);
+      });
+    }
+    selector.change(savePreferences);
+    return selector;
+  }
+
   function viewOfInfo(type, label, info, defaults, teamid) {
 '''
 <li #view>
@@ -580,6 +610,9 @@ module PreferencesTab {
     <div #durationRow class="preference-option-selector-row clearfix">
       <div #durationContainer class="img-container-left"/>
     </div>
+    <div #bufferRow class="preference-option-selector-row clearfix">
+      <div #bufferContainer class="img-container-left"/>
+    </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
       <div #customizeAvailability
@@ -597,11 +630,16 @@ module PreferencesTab {
       .appendTo(durationContainer);
     Svg.loadImg(duration, "/assets/img/duration.svg");
 
+    var buffer = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(bufferContainer);
+    Svg.loadImg(buffer, "/assets/img/duration.svg"); // TODO icon
+
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
 
     durationRow.append(createDurationSelector(defaults.duration));
+    bufferRow.append(createBufferSelector(defaults.buffer));
 
     customizeAvailability.data("availabilities", defaults.availability);
 
