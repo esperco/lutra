@@ -55,6 +55,7 @@ module ApiT {
   export interface Profile {
     profile_uid: string;
     email: string;
+    other_emails: string[];
     google_access: boolean;
     display_name: string;
     gender?: string; // "Female" or "Male"

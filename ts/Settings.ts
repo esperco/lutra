@@ -85,7 +85,13 @@ module Settings {
        title="Some team members may need to be reauthorized."/>
   <div #profPic class="profile-pic"/>
   <div #name class="profile-name"/>
-  <div #email class="profile-email gray"/>
+  <div class="profile-email gray">
+    Account: <span #email/>
+  </div>
+  <div #aliasSection class="profile-email gray">
+    Aliases: <span #aliases/>
+  </div>
+  <div #addEmail class="profile-email link">Add another email address</div>
 </div>
 '''
     var cog = $("<img class='svg-block team-cog clickable'/>")
@@ -99,13 +105,63 @@ module Settings {
     }))
       .done(function(profiles) { checkTeamStatus(profiles, statusContainer); });
 
+    aliasSection.hide();
     Api.getProfile(team.team_executive, team.teamid)
       .done(function(profile) {
+
         if (profile.image_url !== undefined)
           profPic.css("background-image", "url('" + profile.image_url + "')");
         name.text(team.team_name);
         email.text(profile.email);
-      });;
+        if (profile.other_emails.length > 0) {
+          aliasSection.show();
+          aliases.append(profile.other_emails[0]);
+          List.iter(profile.other_emails.slice(1), function(e) {
+            aliases.append(", " + e);
+          });
+        }
+
+        var currentAliases = profile.other_emails;
+
+        function addAnotherEmail() {
+          // Replace the link with the input box and save button
+          var newEmail = $("<input type='text' class='profile-email' size=20/>");
+          var saveEmail = $("<button class='button-primary'>Save</button>");
+          addEmail.remove();
+          view.append(newEmail).append(" ").append(saveEmail);
+
+          saveEmail.click(function() {
+            var email = newEmail.val();
+            // If given bad data, ignore it and put a red border on the input
+            if (email.length === 0 || !Util.validateEmailAddress(email)) {
+              newEmail.css("border", "medium solid red");
+              return; // Ignore bad data
+            }
+
+            // Save the email to the server and update the current display
+            currentAliases.push(email);
+            var uniqEmails = {
+              emails: List.union(currentAliases, [], undefined)
+            };
+            Api.putAccountEmails(team.teamid, profile.profile_uid, uniqEmails)
+              .done(function() {
+                if (aliases.is(":hidden")) {
+                  aliasSection.show();
+                  aliases.append(email);
+                } else {
+                  aliases.append(", " + email);
+                }
+                // Now remove the input/button and put the link back
+                newEmail.remove();
+                saveEmail.remove();
+                view.append(addEmail.click(addAnotherEmail));
+              });
+          });
+        }
+
+        addEmail.click(addAnotherEmail);
+
+    }); // end of Api.getProfile.done
 
     cogContainer.click(function() {
       Page.teamSettings.load(team);
