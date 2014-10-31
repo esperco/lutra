@@ -55,12 +55,13 @@ module Esper.Thread {
     var filteredTeams =
       List.filter(teamEmailsList, function(teamEmails) {
         var threadMembers = thread.people_involved;
-        var execOrAsst = List.find(threadMembers, function(nameEmail) {
-          var email = nameEmail[1];
-          return List.mem(teamEmails.assistants, email) ||
-                 List.mem(teamEmails.executive, email);
+        var executive = List.find(threadMembers, function(nameEmail) {
+          return List.mem(teamEmails.executive, nameEmail[1]);
         });
-        return execOrAsst !== null;
+        var assistant = List.find(threadMembers, function(nameEmail) {
+          return List.mem(teamEmails.assistants, nameEmail[1]);
+        });
+        return executive !== null && assistant !== null;
       });
     if (filteredTeams.length > 0) {
       /* Arbitrary choice if more than one team matches */
