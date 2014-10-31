@@ -5,14 +5,15 @@ module Esper.Thread {
 
   interface TeamEmails {
     team: ApiT.Team;
-    executive: string; // email
+    executive: string[]; // email
     assistants: string[]; // email
   }
 
   function getEmail(uid: string, teamid: string) {
     return Profile.get(uid, teamid)
       .then(function(profile) {
-        return profile.email;
+        var allEmails = [profile.email].concat(profile.other_emails);
+        return List.unique(allEmails, undefined);
       });
   }
 
@@ -29,7 +30,7 @@ module Esper.Thread {
         return Promise.join(
           List.map(loginInfo.teams, function(team) {
             return getEmail(team.team_executive, team.teamid)
-              .then(function(executiveEmail) {
+              .then(function(executiveEmails) {
                 return Promise.join(
                   List.map(team.team_assistants, function(assistantUid) {
                     return getEmail(assistantUid, team.teamid);
@@ -37,8 +38,8 @@ module Esper.Thread {
                 ).then(function(assistantEmails) {
                   return {
                     team: team,
-                    executive: executiveEmail,
-                    assistants: assistantEmails
+                    executive: executiveEmails,
+                    assistants: List.concat(assistantEmails)
                   };
                 });
               });
@@ -54,14 +55,12 @@ module Esper.Thread {
     var filteredTeams =
       List.filter(teamEmailsList, function(teamEmails) {
         var threadMembers = thread.people_involved;
-        var executive = List.find(threadMembers, function(nameEmail) {
-          return teamEmails.executive === nameEmail[1];
-        });
-        var assistant = List.find(threadMembers, function(nameEmail) {
+        var execOrAsst = List.find(threadMembers, function(nameEmail) {
           var email = nameEmail[1];
-          return List.mem(teamEmails.assistants, email);
+          return List.mem(teamEmails.assistants, email) ||
+                 List.mem(teamEmails.executive, email);
         });
-        return executive !== null && assistant !== null;
+        return execOrAsst !== null;
       });
     if (filteredTeams.length > 0) {
       /* Arbitrary choice if more than one team matches */

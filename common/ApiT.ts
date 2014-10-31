@@ -55,6 +55,7 @@ module Esper.ApiT {
   export interface Profile {
     profile_uid: string;
     email: string;
+    other_emails: string[];
     display_name?: string;
     gender?: string; // "Female" or "Male"
     image_url?: string;
