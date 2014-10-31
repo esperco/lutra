@@ -180,6 +180,7 @@ module ApiT {
   export interface Workplace {
     location: Location;
     duration: HourMinute;
+    distance?: number;
     availability: Availability[];
   }
 

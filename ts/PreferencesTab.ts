@@ -38,6 +38,7 @@ module PreferencesTab {
         address: li.find(".esper-prefs-workplace-address").text()
       },
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      distance: li.find(".esper-prefs-distance").val(),
       availability: li.find(".esper-prefs-avail").data("availabilities")
     };
   }
@@ -678,6 +679,28 @@ module PreferencesTab {
     return view;
   }
 
+  function createDistanceSelector(selected) {
+'''
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-distance">
+  <option value="1">1 mile</option>
+  <option value="2">2 miles</option>
+  <option value="3">3 miles</option>
+  <option value="5">5 miles</option>
+  <option value="10">10 miles</option>
+  <option value="15">15 miles</option>
+  <option value="20">20 miles</option>
+  <option value="30">30+ miles</option>
+</select>
+'''
+    selector.children().each(function() {
+      if (Number($(this).val()) === selected)
+        $(this).prop("selected", true);
+    });
+    selector.change(savePreferences);
+    return selector;
+  }
+
   function viewOfWorkplace(defaults : ApiT.Workplace, teamid) {
 '''
 <li #view class="workplace">
@@ -691,6 +714,9 @@ module PreferencesTab {
     <div #help class="gray"/>
     <div #durationRow class="preference-option-selector-row clearfix">
       <div #durationContainer class="img-container-left"/>
+    </div>
+    <div #distanceRow class="preference-option-selector-row clearfix">
+      <div #distanceContainer class="img-container-left"/>
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
@@ -716,6 +742,10 @@ module PreferencesTab {
       .appendTo(durationContainer);
     Svg.loadImg(duration, "/assets/img/duration.svg");
 
+    var distance = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(distanceContainer);
+    Svg.loadImg(distance, "/assets/img/car.svg");
+
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
@@ -732,6 +762,8 @@ module PreferencesTab {
     })
 
     durationRow.append(createDurationSelector(defaults.duration));
+
+    distanceRow.append(createDistanceSelector(defaults.distance));
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
