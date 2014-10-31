@@ -283,6 +283,14 @@ module Api {
     return jsonHttpPut(url, JSON.stringify(aliases));
   };
 
+  export function putAccountEmails(teamid, theirUID, aliases)
+    : JQueryDeferred<ApiT.EmailAddresses>
+  {
+    var url = "api/account/emails/" + Login.data.uid
+      + "/" + teamid + "/" + theirUID;
+    return jsonHttpPut(url, JSON.stringify(aliases));
+  };
+
   /*** Executive Preferences ***/
 
   /** Sets the preferences given the correct JSON object. */
