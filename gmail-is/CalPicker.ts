@@ -212,6 +212,16 @@ module Esper.CalPicker {
       updateEvent(calEvent);
     }
 
+    function eventRender(calEvent, element) {
+      var loc = calEvent.orig.location;
+      if (loc !== undefined) {
+        var address = loc.address;
+        if (loc.title !== "")
+          address = loc.title + " - " + address;
+        $(element).attr("title", address);
+      }
+    }
+
     calendarView.fullCalendar({
       header: {
         left: 'prev,next today',
@@ -227,6 +237,7 @@ module Esper.CalPicker {
       eventClick: eventClick,
       eventDrop: eventDrop,
       eventResize: eventResize,
+      eventRender: eventRender,
       editable: false,
       events: fetchEvents
     });
