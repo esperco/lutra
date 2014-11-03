@@ -51,6 +51,9 @@ hr {
   background: #d1d3d4;
 }
 /* Text */
+.discover-subheader {
+  width: 400px;
+}
 body {
   font-family: "Open Sans";
   font-size: 16px;
@@ -623,6 +626,13 @@ input.disabled {
 .mid-col {
   margin-right: 5%;
 }
+/* Discover */
+.maximize-time-subheader {
+  max-width: 460px;
+}
+.how-it-works {
+  margin: 0 0 60px 0;
+}
 @media (min-width: 1000px) {
   .step {
     height: 180px;
@@ -641,6 +651,7 @@ input.disabled {
   font-family: "Montserrat";
   font-size: 56px;
   text-align: center;
+  background: white;
   border-radius: 100%;
 }
 .number.purple {
@@ -699,7 +710,6 @@ input.disabled {
     text-align: center;
   }
 }
-/* Discover */
 .dream-team-container {
   display: inline-block;
   vertical-align: bottom;
