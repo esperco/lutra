@@ -213,7 +213,9 @@ module Esper.CalPicker {
     }
 
     function eventRender(calEvent, element) {
-      var loc = calEvent.orig.location;
+      var orig = calEvent.orig;
+      var loc;
+      if (orig !== undefined) loc = orig.location;
       if (loc !== undefined) {
         var address = loc.address;
         if (loc.title !== "")
