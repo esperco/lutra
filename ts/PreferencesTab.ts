@@ -38,6 +38,7 @@ module PreferencesTab {
         address: li.find(".esper-prefs-workplace-address").text()
       },
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       distance: li.find(".esper-prefs-distance").val(),
       availability: li.find(".esper-prefs-avail").data("availabilities")
     };
