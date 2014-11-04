@@ -32,6 +32,9 @@ git pull --ff-only origin master
 
 # jQuery
 install_js jquery jquery-2.1.0.js
+# full jQuery UI
+unzip -o jquery-ui-1.11.0.custom.zip
+install_js jqueryui jquery-ui-1.11.0.custom/jquery-ui.js
 
 # Bootstrap
 rm -rf bootstrap dist __MACOSX

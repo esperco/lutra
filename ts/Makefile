@@ -17,10 +17,10 @@ prod-build: js/app.js includes-prod.html
 
 JS_LIBS = \
   jquery \
+  jquery-ui \
   bootstrap \
   can \
   sha1 \
-  jquery-ui \
   moment \
   fullCalendar
 
@@ -28,8 +28,9 @@ DEV_LIBS = $(addsuffix .js, $(JS_LIBS))
 PROD_LIBS = $(addsuffix .min.js, $(JS_LIBS))
 
 TS_LIBS = \
+	jquery.d \
+  jqueryui.d \
   fullCalendar.d
-# jquery.d
 
 # TypeScript sources that need to be preprocessed with 'oblivion'
 # and then compiled into JavaScript by tsc.
