@@ -288,6 +288,21 @@ input[type="text"] {
   pointer-events: none;
 }
 
+
+/** Tooltip **/
+
+.info-title {
+  float: left;
+  margin-right: 5px;
+}
+
+.info-icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+}
+
+
 /** Overlays **/
 .overlay-list {
   position: absolute;
@@ -809,7 +824,7 @@ a.header-title:hover { text-decoration: underline; }
   .workplace, .preference { width: 50%; }
 }
 .workplace {
-  height: 315px;
+  height: 404px;
   padding: 0;
 }
 .preference {
@@ -845,7 +860,7 @@ a.header-title:hover { text-decoration: underline; }
   }
 }
 .workplace-options {
-  height: 134px;
+  height: 223px;
   margin-top: 180px;
   padding: 15px 20px 4px 20px;
   overflow-y: auto;
@@ -979,7 +994,7 @@ a.header-title:hover { text-decoration: underline; }
   }
 }
 .preference-options {
-  height: 186px;
+  height: 216px;
   overflow-y: auto;
   &.off {
     opacity: 0.2;
@@ -991,9 +1006,12 @@ a.header-title:hover { text-decoration: underline; }
 }
 .preference-option-selector-row {
   margin: 11px 0;
-  .preference-option-icon {
-    margin-top: 4px;
+  .preference-option-col {
+    float: left;
+    width: 50%;
   }
+  .preference-option-title { margin-bottom: 5px; }
+  .preference-option-icon { margin-top: 4px; }
 }
 .preference-option-icon {
   width: 24px;

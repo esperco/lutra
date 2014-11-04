@@ -38,6 +38,8 @@ module PreferencesTab {
         address: li.find(".esper-prefs-workplace-address").text()
       },
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
+      distance: li.find(".esper-prefs-distance").val(),
       availability: li.find(".esper-prefs-avail").data("availabilities")
     };
   }
@@ -54,6 +56,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       phones: phoneNumbers
@@ -71,6 +74,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       accounts: videoAccounts
@@ -88,6 +92,7 @@ module PreferencesTab {
     });
     return {
       duration: hourMinute(li.find(".esper-prefs-duration").val()),
+      buffer: hourMinute(li.find(".esper-prefs-buffer").val()),
       available: li.find("div.preference-toggle-switch").hasClass("on"),
       availability: li.find(".esper-prefs-avail").data("availabilities"),
       favorites: favoritePlaces
@@ -157,9 +162,9 @@ module PreferencesTab {
 
   function setDividerHeight(category, divider, rows) {
     if (category == "workplace") {
-      divider.css("height", rows * 315 + "px");
+      divider.css("height", rows * 404 + "px");
     } else {
-      divider.css("height", rows * 240 + "px");
+      divider.css("height", rows * 270 + "px");
     }
   }
 
@@ -447,6 +452,33 @@ module PreferencesTab {
     return selector;
   }
 
+  function createBufferSelector(selected) {
+'''
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-buffer">
+  <option value="0">None</option>
+  <option value="5">5 min</option>
+  <option value="10">10 min</option>
+  <option #initial value="15">15 min</option>
+  <option value="20">20 min</option>
+  <option value="30">30 min</option>
+  <option value="45">45 min</option>
+  <option value="60">1 hr</option>
+</select>
+'''
+    if (selected === undefined) {
+      initial.prop("selected", true);
+    } else {
+      var selectedMinutes = selected.hour * 60 + selected.minute;
+      selector.children().each(function() {
+        if (Number($(this).val()) === selectedMinutes)
+          $(this).prop("selected", true);
+      });
+    }
+    selector.change(savePreferences);
+    return selector;
+  }
+
   function viewOfInfo(type, label, info, defaults, teamid) {
 '''
 <li #view>
@@ -576,8 +608,22 @@ module PreferencesTab {
   <div #title class="preference-title semibold"/>
   <hr/>
   <div #options class="preference-options">
-    <div #durationRow class="preference-option-selector-row clearfix">
-      <div #durationContainer class="img-container-left"/>
+    <div #timeRow class="preference-option-selector-row clearfix">
+      <div #durationCol class="preference-option-col clearfix">
+        <div class="preference-option-title semibold">Duration</div>
+        <div #durationContainer class="img-container-left"/>
+      </div>
+      <div #bufferCol class="preference-option-col clearfix">
+        <div class="preference-option-title semibold clearfix">
+          <span class="info-title">Buffer time</span>
+          <div #bufferInfo
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Maximum extra time"
+               class="img-container-left buffer-tooltip"/>
+        </div>
+        <div #bufferContainer class="img-container-left"/>
+      </div>
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
@@ -596,11 +642,22 @@ module PreferencesTab {
       .appendTo(durationContainer);
     Svg.loadImg(duration, "/assets/img/duration.svg");
 
+    var buffer = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(bufferContainer);
+    Svg.loadImg(buffer, "/assets/img/buffer.svg");
+
+    var bufferInfoIcon = $("<img class='svg-block info-icon'/>")
+      .appendTo(bufferInfo);
+    Svg.loadImg(bufferInfoIcon, "/assets/img/info.svg");
+
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
 
-    durationRow.append(createDurationSelector(defaults.duration));
+    durationCol.append(createDurationSelector(defaults.duration));
+    bufferCol.append(createBufferSelector(defaults.buffer));
+
+    bufferInfo.tooltip();
 
     customizeAvailability.data("availabilities", defaults.availability);
 
@@ -678,6 +735,29 @@ module PreferencesTab {
     return view;
   }
 
+  function createDistanceSelector(selected) {
+'''
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-distance">
+  <option value="0">0 miles</option>
+  <option value="1">1 mile</option>
+  <option value="2">2 miles</option>
+  <option value="3">3 miles</option>
+  <option value="5">5 miles</option>
+  <option value="10">10 miles</option>
+  <option value="15">15 miles</option>
+  <option value="20">20 miles</option>
+  <option value="30">30+ miles</option>
+</select>
+'''
+    selector.children().each(function() {
+      if (Number($(this).val()) === selected)
+        $(this).prop("selected", true);
+    });
+    selector.change(savePreferences);
+    return selector;
+  }
+
   function viewOfWorkplace(defaults : ApiT.Workplace, teamid) {
 '''
 <li #view class="workplace">
@@ -689,8 +769,33 @@ module PreferencesTab {
   </div>
   <div #options class="workplace-options">
     <div #help class="gray"/>
-    <div #durationRow class="preference-option-selector-row clearfix">
-      <div #durationContainer class="img-container-left"/>
+    <div #timeRow class="preference-option-selector-row clearfix">
+      <div #durationCol class="preference-option-col clearfix">
+        <div class="preference-option-title semibold">Duration</div>
+        <div #durationContainer class="img-container-left"/>
+      </div>
+      <div #bufferCol class="preference-option-col clearfix">
+        <div class="preference-option-title semibold clearfix">
+          <span class="info-title">Buffer time</span>
+          <div #bufferInfo
+               data-toggle="tooltip"
+               data-placement="top"
+               title="Maximum extra time"
+               class="img-container-left buffer-tooltip"/>
+        </div>
+        <div #bufferContainer class="img-container-left"/>
+      </div>
+    </div>
+    <div #distanceRow class="preference-option-selector-row clearfix">
+      <div class="preference-option-title semibold clearfix">
+        <span class="info-title">Distance</span>
+        <div #distanceInfo
+             data-toggle="tooltip"
+             data-placement="right"
+             title="How far away are you willing to meet when based at this Workplace?"
+             class="img-container-left distance-tooltip"/>
+      </div>
+      <div #distanceContainer class="img-container-left"/>
     </div>
     <div class="preference-option-row clearfix">
       <div #availabilityContainer class="img-container-left"/>
@@ -716,6 +821,22 @@ module PreferencesTab {
       .appendTo(durationContainer);
     Svg.loadImg(duration, "/assets/img/duration.svg");
 
+    var buffer = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(bufferContainer);
+    Svg.loadImg(buffer, "/assets/img/buffer.svg");
+
+    var bufferInfoIcon = $("<img class='svg-block info-icon'/>")
+      .appendTo(bufferInfo);
+    Svg.loadImg(bufferInfoIcon, "/assets/img/info.svg");
+
+    var distance = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(distanceContainer);
+    Svg.loadImg(distance, "/assets/img/distance.svg");
+
+    var distanceInfoIcon = $("<img class='svg-block info-icon'/>")
+      .appendTo(distanceInfo);
+    Svg.loadImg(distanceInfoIcon, "/assets/img/info.svg");
+
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
@@ -731,7 +852,14 @@ module PreferencesTab {
       showInfoModal("workplace", "Edit", defaultsCopy, teamid, view);
     })
 
-    durationRow.append(createDurationSelector(defaults.duration));
+    durationCol.append(createDurationSelector(defaults.duration));
+    bufferCol.append(createBufferSelector(defaults.buffer));
+
+    bufferInfo.tooltip();
+
+    distanceRow.append(createDistanceSelector(defaults.distance));
+
+    distanceInfo.tooltip();
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {

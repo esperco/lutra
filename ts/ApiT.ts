@@ -180,6 +180,8 @@ module ApiT {
   export interface Workplace {
     location: Location;
     duration: HourMinute;
+    buffer?: HourMinute;
+    distance?: number;
     availability: Availability[];
   }
 
@@ -196,6 +198,7 @@ module ApiT {
 
   export interface PhoneInfo {
     duration: HourMinute;
+    buffer?: HourMinute;
     available: boolean;
     availability: Availability[];
     phones: PhoneNumber[];
@@ -208,6 +211,7 @@ module ApiT {
 
   export interface VideoInfo {
     duration: HourMinute;
+    buffer?: HourMinute;
     available: boolean;
     availability: Availability[];
     accounts: VideoAccount[];
@@ -235,6 +239,7 @@ module ApiT {
 
   export interface MealInfo {
     duration: HourMinute;
+    buffer?: HourMinute;
     available: boolean;
     availability: Availability[];
     favorites: Location[];
