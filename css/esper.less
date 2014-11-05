@@ -128,6 +128,26 @@ li.esper-li, a.esper-a {
   &.esper-selected:hover { color: black; }
 }
 
+select.esper-select {
+  float: left;
+  height: 32px;
+  padding: 6px 20px 6px 9px;
+  line-height: 1.2;
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  border: 1px solid #C5C5C5;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:hover {
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+}
+
 .esper-bold { font-weight: bold; }
 
 .esper-link {
@@ -199,6 +219,30 @@ li.esper-li, a.esper-a {
   cursor: pointer;
   &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
   &:active { background: linear-gradient(@purple_active, @purple_hover); }
+}
+
+
+/** Input **/
+.esper-input {
+  height: 32px;
+  padding: 0 8px;
+  color: @purple_text;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  box-sizing: border-box;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 
@@ -368,6 +412,8 @@ li.esper-li, a.esper-a {
 
 .esper-team-list-checkmark {
   float: right;
+  width: 12px;
+  height: 11px;
   margin-top: 6px;
 }
 
@@ -430,26 +476,30 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 
 .esper-tab-links {
   display: inline-block;
+  width: 100%;
   margin: 1px 0 0 0;
   padding: 0;
   border-bottom: 1px solid @gray_20;
   li {
-    float:left;
-    list-style:none;
-  }
-  li {
-    width: 83px;
+    float: left;
+    list-style: none;
+    width: 50%;
     height: 34px;
     display: inline-block;
-    margin: 0 0 -1px -1px;
+    margin-bottom: -1px;
     padding: 6px 7px;
     border: 1px solid @google_border_gray;
     background: white;
     color: @purple;
     text-align: center;
+    cursor: pointer;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    .esper-tab-icon { opacity: 0.2; }
+    .esper-tab-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.2;
+    }
     &:hover .esper-tab-icon { opacity: 0.5; }
   }
   li.esper-active, li.esper-active:hover {
@@ -458,6 +508,8 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
     cursor: default;
     .esper-tab-icon { opacity: 1; }
   }
+  .esper-first { border-top-left-radius: 3px; }
+  .esper-last { border-top-right-radius: 3px; }
   &:after {
     display:block;
     clear:both;
@@ -490,6 +542,11 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   padding: 10px;
   background: @gray_f5;
   border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  &.open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 }
 
 .esper-section-actions {
@@ -498,11 +555,38 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   background: @purple_bg;
   border: 1px solid @google_border_gray;
   border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  &.open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.esper-section-selector {
+  padding: 7px 5px;
+  background: @purple_bg;
+  border-bottom: 1px solid @google_border_gray;
 }
 
 .esper-section-container {
   border: 1px solid @google_border_gray;
   border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+
+/** Sidebar Task Management **/
+
+.esper-task-name { width: 100%; }
+
+.esper-task-search-dropdown {
+  z-index: 2;
+  position: absolute;
+  width: 225px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 
@@ -510,6 +594,8 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 
 .esper-refresh {
   float: left;
+  width: 16px;
+  height: 13px;
   padding-left: 8px;
   &.esper-disabled {
     opacity: 0.5;
@@ -525,14 +611,16 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   cursor: pointer;
   .esper-link-action-icon-container {
     float: left;
-    width: 20px;
-    height: 20px;
     padding: 3px;
     border: 1px solid @purple;
     border-radius: 100%;
     box-sizing: border-box;
   }
-  .esper-link-action-icon { float: left; }
+  .esper-link-action-icon {
+    float: left;
+    width: 16px;
+    height: 16px;
+  }
   .esper-link-action-text {
     margin: 1px 0 0 21px;
     font-weight: bold;
@@ -579,6 +667,10 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
     cursor: default;
     border-radius: 12px;
     box-sizing: border-box;
+    .esper-linked-check {
+      width: 12px;
+      height: 11px;
+    }
   }
 }
 
@@ -648,6 +740,7 @@ ul.esper-ev-dropdown {
   position: absolute;
   right: 0;
   margin: 14px 16px 22px 22px;
+  border-radius: 3px;
 }
 
 .esper-sync-option {
@@ -664,6 +757,8 @@ ul.esper-ev-dropdown {
 
 .esper-info {
   float: left;
+  width: 14px;
+  height: 14px;
   opacity: 0.5;
   &:hover { opacity: 1; }
 }
@@ -680,40 +775,63 @@ ul.esper-ev-dropdown {
 }
 
 
-/** Other Tabs **/
+/** Sidebar Preferences **/
 
-.esper-coming-soon {
-  padding: 100px 16px;
-  text-align: center;
+.esper-meeting-preferences {
+  padding: 0 10px;
 }
 
-.esper-coming-soon-text {
-  margin-top: 40px;
-  font-size: 16px;
-  color: @gray_30;
+.esper-preference-row {
+  margin: 15px 0;
+  ul { margin: 28px 0 0 0; }
 }
+
+.esper-preference-icon {
+  float: left;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-preference-title {
+  float: left;
+  margin: 2px 0 0 7px;
+}
+
+.esper-preference-text {
+  float: right;
+  margin-top: 2px;
+}
+
+.esper-preferences-notes {
+  margin: 0;
+  padding: 10px;
+  font-family: "Arial";
+}
+
 
 /** Composition Toolbar **/
 
 .esper-composition-toolbar {
-  padding : 4px 10px 0px;
+  padding: 8px 10px 8px;
+  background: @purple_bg;
+  border-bottom: 1px solid #CFCFCF;
 
   img { /* Esper logo */
-    position : relative;
-    top : 2px;
+    position: relative;
+    top: 2px;
   }
 
   span { /* x linked events */
-    display : inline-block;
-    text-align : center;
-    width : 15em;
+    display: inline-block;
+    text-align: center;
+    width: 15em;
   }
 
   button { /* insert */
-    color : white;
-    font-weight : bold;
-    background : @purple_logo;
-    border-radius : 4px;
+    color: white;
+    font-weight: bold;
+    background: @purple_logo;
+    border-radius: 4px;
   }
 }
 

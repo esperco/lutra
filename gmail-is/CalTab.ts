@@ -1,7 +1,7 @@
 module Esper.CalTab {
 
   /* To refresh from outside, like in CalPicker */
-  export var refreshLinkedEvents : () => void;
+  export var refreshLinkedEventsAction : () => void;
   export var currentCalTab : CalTabView;
 
   /** The events currently displayed as "linked" in the sidebar. */
@@ -20,14 +20,6 @@ module Esper.CalTab {
 
     for (var i = 0; i < currentEventsListeners.length; i++) {
       currentEventsListeners[i]();
-    }
-  }
-
-  function toggleList(container) {
-    if (container.css("display") === "none") {
-      container.slideDown("fast");
-    } else {
-      container.slideUp("fast");
     }
   }
 
@@ -191,7 +183,7 @@ module Esper.CalTab {
         .done(function(created) {
           pubInvite.remove();
           Api.sendEventInvites(team.teamid, fromEmail, guests, created);
-          refreshLinkedList(team, threadid, calTab, profiles);
+          refreshlinkedEventsList(team, threadid, calTab, profiles);
         });
     });
     discard.click(function() {
@@ -220,7 +212,7 @@ module Esper.CalTab {
   <div #link class="esper-link-event esper-clickable">Link to this event</div>
   <div #spinner/>
   <div #linked class="esper-linked">
-    <object #check class="esper-svg"/>
+    <object #check class="esper-svg esper-linked-check"/>
     <span>Linked</span>
   </div>
 </div>
@@ -337,7 +329,7 @@ module Esper.CalTab {
         .done(function() {
           spinner.hide();
           syncCheckbox.show();
-          refreshLinkedList(team.teamid, threadId, calTab, profiles);
+          refreshlinkedEventsList(team.teamid, threadId, calTab, profiles);
         });
     });
 
@@ -597,24 +589,22 @@ module Esper.CalTab {
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function displayLinkedList(team,
-                                    threadId,
-                                    calTab: CalTabView,
-                                    profiles,
-                                    linkedEvents: ApiT.EventWithSyncInfo[]) {
+  export function displayLinkedEventsList(team, threadId, calTab: CalTabView,
+                                          profiles, linkedEvents:
+                                          ApiT.EventWithSyncInfo[]) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
 '''
-    calTab.refreshLinked.addClass("esper-disabled");
-    calTab.linkedList.children().remove();
-    calTab.linkedSpinner.show();
+    calTab.refreshLinkedEvents.addClass("esper-disabled");
+    calTab.linkedEventsList.children().remove();
+    calTab.linkedEventsSpinner.show();
 
     currentEvents = linkedEvents;
     updateEvents(linkedEvents);
 
     if (currentEvents.length === 0) {
-      calTab.linkedList.append(noEvents);
+      calTab.linkedEventsList.append(noEvents);
     } else {
       var i = 0;
       var recent, last = false;
@@ -625,21 +615,45 @@ module Esper.CalTab {
                                       threadId, calTab, profiles));
         i++;
       });
-      calTab.linkedList.append(eventsList);
+      calTab.linkedEventsList.append(eventsList);
     }
-    calTab.linkedSpinner.hide();
-    calTab.refreshLinked.removeClass("esper-disabled");
+    calTab.linkedEventsSpinner.hide();
+    calTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  export function clearLinkedList(team, calTab: CalTabView) {
-    displayLinkedList(team, "", calTab, [], []);
+  export function displayLinkedThreadsList(task, threadId, calTab: CalTabView) {
+'''
+  <div #noThreads class="esper-no-events">No linked threads</div>
+  <div #threadsList class="esper-events-list"/>
+'''
+    calTab.linkedThreadsList.children().remove();
+
+    List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
+      if (thread.gmail_thrid !== threadId) {
+        var threadLink =
+          $("<li class='esper-link'>" + thread.subject + "</div>");
+        threadLink.click(function(e) {
+          e.stopPropagation();
+          window.location.hash = "#all/" + thread.gmail_thrid;
+        });
+      }
+    });
+
+    if (threadsList.children("li").length > 0)
+      calTab.linkedThreadsList.append(threadsList);
+    else
+      calTab.linkedThreadsList.append(noThreads);
+  }
+
+  export function clearlinkedEventsList(team, calTab: CalTabView) {
+    displayLinkedEventsList(team, "", calTab, [], []);
   }
 
   /* Refresh only linked events, fetching linked events from the server. */
-  export function refreshLinkedList(team, threadId, calTab, profiles) {
+  export function refreshlinkedEventsList(team, threadId, calTab, profiles) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayLinkedList(team, threadId, calTab, profiles, linkedEvents);
+        displayLinkedEventsList(team, threadId, calTab, profiles, linkedEvents);
       });
   }
 
@@ -656,13 +670,21 @@ module Esper.CalTab {
   export function refreshEventLists(team, threadId, calTab, profiles) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayLinkedList(team, threadId, calTab, profiles, linkedEvents);
+        displayLinkedEventsList(team, threadId, calTab, profiles, linkedEvents);
+        displayRecentsList(team, threadId, calTab, profiles, linkedEvents);
+      });
+  }
+
+  /* Refresh only recent events, fetching linked events from the server. */
+  export function refreshLinkedThreadsList(team, threadId, calTab, profiles) {
+    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+      .done(function(linkedEvents) {
         displayRecentsList(team, threadId, calTab, profiles, linkedEvents);
       });
   }
 
   // Search for matching tasks and display the results in a dropdown
-  function displaySearchResults(taskName, dropdown,
+  function displaySearchResults(taskName, dropdown, results, actions,
                                 team: ApiT.Team,
                                 query,
                                 profiles: ApiT.Profile[],
@@ -670,13 +692,21 @@ module Esper.CalTab {
     var threadid = Sidebar.currentThreadId;
     var teamid = team.teamid;
     Api.searchTasks(teamid, query).done(function(response) {
-      dropdown.find(".esper-li").remove();
+      results.find(".esper-li").remove();
+'''
+<li #noResults class="esper-li esper-disabled esper-click-safe"/>
+'''
+      noResults
+        .append($("<span>No other tasks are named </span>"))
+        .append($("<span class='esper-bold'>" + query + "</span>"))
+        .appendTo(results);
       if (!(dropdown.hasClass("open"))) dropdown.toggle();
       List.iter(response.search_results, function(result) {
+        noResults.remove();
         var newTaskId = result.task_data.taskid;
         var title = result.task_data.task_title;
         $("<li class='esper-li'>" + title + "</li>")
-          .appendTo(dropdown)
+          .appendTo(results)
           .click(function() {
             var job =
               currentTask !== undefined ?
@@ -687,7 +717,7 @@ module Esper.CalTab {
                                    newTaskId);
 
             job.done(function() {
-              refreshLinkedList(team, threadid, calTab, profiles);
+              refreshlinkedEventsList(team, threadid, calTab, profiles);
             });
 
             currentTask = result.task_data;
@@ -696,15 +726,18 @@ module Esper.CalTab {
           });
       });
 
-      var changeNameLabel =
+      actions.find(".esper-li").remove();
+
+      var renameLabel =
         currentTask !== undefined ?
-          "Change task name to:"
-        : "Create task named:";
-      var changeName =
-        $("<li class='esper-li'><i>" + changeNameLabel + "</i> "
-          + query + "</li>");
-      changeName
-        .appendTo(dropdown)
+          "Rename task as"
+        : "Create a new task named";
+      var rename =
+        $("<li class='esper-li'/>")
+          .append($("<span>" + renameLabel + " </span>"))
+          .append($("<span class='esper-bold'>" + query + "</span>"));
+      rename
+        .appendTo(actions)
         .click(function() {
           obtainTaskForThread(teamid, threadid, calTab)
             .done(function(task) {
@@ -717,18 +750,16 @@ module Esper.CalTab {
 
       function addDeleteOption(task) {
 '''
-<li #li class="esper-li">
-  <i>Delete this task</i>
-</li>
+<li #li class="esper-li esper-danger">Delete this task</li>
 '''
         li
-          .appendTo(dropdown)
+          .appendTo(actions)
           .click(function() {
             Api.deleteTask(task.taskid)
               .done(function() {
                 currentTask = undefined;
                 calTab.taskCaption.text("Create task:");
-                clearLinkedList(team, calTab);
+                clearlinkedEventsList(team, calTab);
                 Sidebar.dismissDropdowns();
               });
           });
@@ -743,11 +774,22 @@ module Esper.CalTab {
   export interface CalTabView {
     taskCaption: JQuery;
     taskName: JQuery;
-    taskSearch: JQuery;
+    taskSearchDropdown: JQuery;
+    taskSearchResults: JQuery;
+    taskSearchActions: JQuery;
+
+    linkedThreadsHeader: JQuery;
+    showLinkedThreads: JQuery;
+    refreshLinkedThreads: JQuery;
+    refreshLinkedThreadsIcon: JQuery;
+    linkedThreadsContainer: JQuery;
+    linkedThreadsSpinner: JQuery;
+    linkedThreadsList: JQuery;
+
     linkedEventsHeader: JQuery;
     showLinkedEvents: JQuery;
-    refreshLinked: JQuery;
-    refreshLinkedIcon: JQuery;
+    refreshLinkedEvents: JQuery;
+    refreshLinkedEventsIcon: JQuery;
     linkActions: JQuery;
     createEventIcon: JQuery;
     createEventToggle: JQuery;
@@ -755,13 +797,14 @@ module Esper.CalTab {
     linkEventIcon: JQuery;
     createEvent: JQuery;
     linkedEventsContainer: JQuery;
-    linkedSpinner: JQuery;
-    linkedList: JQuery;
-    recentEventsHeader: JQuery;
-    showRecentEvents: JQuery;
+    linkedEventsSpinner: JQuery;
+    linkedEventsList: JQuery;
+
+    recentsHeader: JQuery;
+    showRecents: JQuery;
     refreshRecents: JQuery;
     refreshRecentsIcon: JQuery;
-    recentEventsContainer: JQuery;
+    recentsContainer: JQuery;
     recentsSpinner: JQuery;
     recentsList: JQuery;
   }
@@ -774,27 +817,43 @@ module Esper.CalTab {
 '''
 <div #view>
   <div class="esper-section">
-    <span #taskCaption class="esper-bold"/>
-    <input #taskName type="text" size="24"/>
-    <div>
-      <span class="esper-bold">Other threads:</span>
-      <div #linkedThreads/>
-    </div>
-    <ul #taskSearch
-        class="esper-task-search-dropdown esper-dropdown-btn esper-ul">
-      <div class="esper-dropdown-section"/>
+    <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
+    <input #taskName type="text" size="24" class="esper-input esper-task-name"/>
+    <ul #taskSearchDropdown
+        class="esper-ul esper-dropdown-btn esper-task-search-dropdown">
+      <div #taskSearchResults class="esper-dropdown-section"/>
+      <div class="esper-click-safe esper-ul-divider"/>
+      <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
+  </div>
+  <div class="esper-section">
+    <div #linkedThreadsHeader class="esper-section-header esper-clearfix open">
+      <span #showLinkedThreads
+            class="esper-link" style="float:right">Hide</span>
+      <span class="esper-bold" style="float:left">Linked Threads</span>
+      <div #refreshLinkedThreads
+           class="esper-refresh esper-clickable esper-disabled">
+        <object #refreshLinkedThreadsIcon class="esper-svg-block"/>
+      </div>
+    </div>
+    <div #linkedThreadsContainer class="esper-section-container">
+      <div #linkedThreadsSpinner class="esper-events-list-loading">
+        <div class="esper-spinner esper-list-spinner"/>
+      </div>
+      <div #linkedThreadsList/>
+    </div>
   </div>
   <div class="esper-section">
     <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
       <span #showLinkedEvents
             class="esper-link" style="float:right">Hide</span>
       <span class="esper-bold" style="float:left">Linked Events</span>
-      <div #refreshLinked class="esper-refresh esper-clickable esper-disabled">
-        <object #refreshLinkedIcon class="esper-svg-block"/>
+      <div #refreshLinkedEvents
+           class="esper-refresh esper-clickable esper-disabled">
+        <object #refreshLinkedEventsIcon class="esper-svg-block"/>
       </div>
     </div>
-    <div #linkActions class="esper-section-actions esper-clearfix">
+    <div #linkActions class="esper-section-actions esper-clearfix open">
       <div style="display:inline-block">
         <div class="esper-link-action">
           <object #createEventIcon class="esper-svg esper-link-action-icon"/>
@@ -815,15 +874,15 @@ module Esper.CalTab {
       </div>
     </div>
     <div #linkedEventsContainer class="esper-section-container">
-      <div #linkedSpinner class="esper-events-list-loading">
+      <div #linkedEventsSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
-      <div #linkedList/>
+      <div #linkedEventsList/>
     </div>
   </div>
   <div class="esper-section">
-    <div #recentEventsHeader class="esper-section-header esper-clearfix open">
-      <span #showRecentEvents
+    <div #recentsHeader class="esper-section-header esper-clearfix open">
+      <span #showRecents
             class="esper-link" style="float:right">Hide</span>
       <span class="esper-bold" style="float:left">Recents</span>
       <div #refreshRecents
@@ -831,7 +890,7 @@ module Esper.CalTab {
         <object #refreshRecentsIcon class="esper-svg-block"/>
       </div>
     </div>
-    <div #recentEventsContainer class="esper-section-container">
+    <div #recentsContainer class="esper-section-container">
       <div #recentsSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
@@ -843,41 +902,27 @@ module Esper.CalTab {
     var calTabView = currentCalTab = <CalTabView> _view;
     var threadId = Sidebar.currentThreadId;
 
-    refreshLinkedIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
-    displayLinkedList(team, threadId, calTabView, profiles, linkedEvents);
+    displayLinkedEventsList(team, threadId, calTabView, profiles, linkedEvents);
     displayRecentsList(team, threadId, calTabView, profiles, linkedEvents);
 
     var apiGetTask = autoTask ?
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
-    function showOtherTaskThreads(task) {
-      List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
-        if (thread.gmail_thrid !== threadId) {
-          var threadLink =
-            $("<div class='esper-link'>" + thread.subject + "</div>");
-          threadLink.click(function(e) {
-            e.stopPropagation();
-            window.location.hash = "#all/" + thread.gmail_thrid;
-          });
-          linkedThreads.append(threadLink);
-        }
-      });
-    }
-
     apiGetTask(team.teamid, threadId).done(function(task) {
       currentTask = task;
       var title = "";
+      linkedThreadsSpinner.hide();
       if (task !== undefined) {
-        taskCaption.text("Task:");
+        taskCaption.text("Task");
         title = task.task_title;
-        showOtherTaskThreads(task);
-      }
-      else {
+        displayLinkedThreadsList(task, threadId, calTabView);
+      } else {
         taskCaption.text("Create task:");
         var thread = esperGmail.get.email_data();
         if (thread !== undefined && thread !== null)
@@ -887,43 +932,62 @@ module Esper.CalTab {
       Util.afterTyping(taskName, 250, function() {
         var query = taskName.val();
         if (query !== "")
-          displaySearchResults(taskName, taskSearch, team, query,
-                               profiles, calTabView);
+          displaySearchResults(taskName, taskSearchDropdown, taskSearchResults,
+                               taskSearchActions, team, query, profiles,
+                               calTabView);
       });
     });
 
     /* Set function to refresh from outside without passing any arguments  */
-    refreshLinkedEvents = function() {
-      refreshLinkedList(team, threadId, calTabView, profiles);
+    refreshLinkedEventsAction = function() {
+      refreshlinkedEventsList(team, threadId, calTabView, profiles);
       if (linkedEventsContainer.css("display") === "none") {
-        toggleList(linkedEventsContainer);
+        Sidebar.toggleList(linkedEventsContainer);
         showLinkedEvents.text("Hide");
+        linkedEventsHeader.addClass("open");
       }
     };
-    refreshLinked.click(refreshLinkedEvents);
+    refreshLinkedEvents.click(refreshLinkedEventsAction);
 
     refreshRecents.click(function() {
       refreshRecentsList(team, threadId, calTabView, profiles);
-      if (recentEventsContainer.css("display") === "none") {
-        toggleList(recentEventsContainer);
-        showRecentEvents.text("Hide");
+      if (recentsContainer.css("display") === "none") {
+        Sidebar.toggleList(recentsContainer);
+        showRecents.text("Hide");
+      }
+    });
+
+    showLinkedThreads.click(function() {
+      Sidebar.toggleList(linkedThreadsContainer);
+      if (this.innerHTML === "Hide") {
+        $(this).text("Show");
+        linkedThreadsHeader.removeClass("open");
+      } else {
+        $(this).text("Hide");
+        linkedThreadsHeader.addClass("open");
       }
     });
 
     showLinkedEvents.click(function() {
-      toggleList(linkedEventsContainer);
-      if (this.innerHTML === "Hide")
+      Sidebar.toggleList(linkedEventsContainer);
+      if (this.innerHTML === "Hide") {
         $(this).text("Show");
-      else
+        linkActions.removeClass("open");
+      } else {
         $(this).text("Hide");
+        linkActions.addClass("open");
+      }
     });
 
-    showRecentEvents.click(function() {
-      toggleList(recentEventsContainer);
-      if (this.innerHTML === "Hide")
+    showRecents.click(function() {
+      Sidebar.toggleList(recentsContainer);
+      if (this.innerHTML === "Hide") {
         $(this).text("Show");
-      else
+        recentsHeader.removeClass("open");
+      } else {
         $(this).text("Hide");
+        recentsHeader.addClass("open");
+      }
     });
 
     createEventToggle.click(function() {
@@ -948,7 +1012,7 @@ module Esper.CalTab {
               newTab.document.write(" done! Syncing thread to description...");
               Api.syncEvent(team.teamid, threadId, cal.google_cal_id, eventId)
                 .done(function() {
-                  refreshLinkedList(team, threadId, calTabView, profiles);
+                  refreshlinkedEventsList(team, threadId, calTabView, profiles);
                   var url = e.google_cal_url;
                   if (url !== null && url !== undefined)
                     newTab.location.assign(url);

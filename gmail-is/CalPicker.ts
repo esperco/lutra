@@ -363,11 +363,11 @@ module Esper.CalPicker {
 
       closeModal();
       if (events.length > 0) {
-        CalTab.currentCalTab.linkedList.children().remove();
-        CalTab.currentCalTab.linkedSpinner.show();
+        CalTab.currentCalTab.linkedEventsList.children().remove();
+        CalTab.currentCalTab.linkedEventsSpinner.show();
       }
       Promise.join(linkCalls).done(function(linkedEvents) {
-        if (events.length > 0) CalTab.refreshLinkedEvents();
+        if (events.length > 0) CalTab.refreshLinkedEventsAction();
 
         // Don't wait for sync
         var syncCalls =

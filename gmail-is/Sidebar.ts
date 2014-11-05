@@ -8,6 +8,19 @@ module Esper.Sidebar {
   // Profiles of everyone on all the viewer's teams
   var profiles : ApiT.Profile[];
 
+  export function customizeSelectArrow(selector) {
+    var imageUrl = Init.esperRootUrl + "img/select-arrow.svg";
+    selector.css("background-image", "url(" + imageUrl + ")");
+  }
+
+  export function toggleList(container) {
+    if (container.css("display") === "none") {
+      container.slideDown("fast");
+    } else {
+      container.slideUp("fast");
+    }
+  }
+
   export function dismissDropdowns() {
     $(".esper-ul").hide();
     $(".esper-menu-bg").hide();
@@ -219,10 +232,7 @@ module Esper.Sidebar {
       <li #tab1 class="esper-active esper-first">
         <object #calendar class="esper-svg esper-tab-icon"/>
       </li>
-      <li #tab2>
-        <object #polls class="esper-svg esper-tab-icon"/>
-      </li>
-      <li #tab3 class="esper-last">
+      <li #tab2 class="esper-last">
         <object #person class="esper-svg esper-tab-icon"/>
       </li>
     </ul>
@@ -230,12 +240,11 @@ module Esper.Sidebar {
   <div class="esper-tab-content">
     <div #content1 class="esper-tab esper-active"/>
     <div #content2 class="esper-tab"/>
-    <div #content3 class="esper-tab"/>
   </div>
 </div>
 '''
-    var tabs = [tab1, tab2, tab3];
-    var tabContents = [content1, content2, content3];
+    var tabs = [tab1, tab2];
+    var tabContents = [content1, content2];
 
     function switchTab(on: number, off: number[]) {
       List.iter(off, function(i) {
@@ -247,23 +256,18 @@ module Esper.Sidebar {
     }
 
     tab1.click(function() {
-      switchTab(0, [1,2]);
+      switchTab(0, [1]);
     });
     tab2.click(function() {
-      switchTab(1, [0,2]);
-    });
-    tab3.click(function() {
-      switchTab(2, [0,1]);
+      switchTab(1, [0]);
     });
 
     calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
-    polls.attr("data", Init.esperRootUrl + "img/polls.svg");
     person.attr("data", Init.esperRootUrl + "img/person.svg");
 
     CalTab.displayCalendarTab(content1, team, autoTask,
                               profiles, linkedEvents);
-    Tab2Content.displayTab2ComingSoon(content2);
-    Tab3Content.displayPreferencesTab(content3, team, profiles);
+    ExecTab.displayExecutiveTab(content2, team, profiles);
 
     rootElement.append(view);
 

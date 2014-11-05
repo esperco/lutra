@@ -16,11 +16,10 @@ JS_LIBS = \
   jqueryui \
   gmail \
   sha1 \
-  retina \
   moment \
   moment-timezone \
   moment-timezone-data \
-  fullCalendar
+  fullCalendar \
 
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
@@ -70,13 +69,12 @@ APP_SOURCES = \
   Gmail \
   Thread \
   ActiveThreads \
-  CalSearch \
-  CalTab \
   CalCache \
   CalPicker \
+  CalSearch \
+  CalTab \
+  ExecTab \
   InsertTime \
-  Tab2Content \
-  Tab3Content \
   Menu \
   Sidebar \
   Init \

@@ -1,12 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="12px" height="11px" viewBox="0 0 12 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
-    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
-    <title>check</title>
-    <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="check" sketch:type="MSArtboardGroup" fill="#A7A9AC">
-            <path d="M10.9401654,0.162750864 L3.75816539,7.95575086 L0.849165391,5.85975086 C0.579165391,5.76475086 0.271165391,5.86475086 0.115165391,6.09075086 C-0.0508346091,6.32675086 -0.0358346091,6.64175086 0.150165391,6.86475086 L3.40116539,10.7757509 C3.52316539,10.9167509 3.69816539,11.0007509 3.88316539,11.0007509 L3.94916539,10.9967509 C4.12216539,10.9787509 4.28216539,10.8897509 4.38516539,10.7557509 L11.8671654,1.01575086 C12.0671654,0.757750864 12.0391654,0.382750864 11.8001654,0.162750864 C11.5651654,-0.053249136 11.1801654,-0.055249136 10.9401654,0.162750864 Z" id="Imported-Layers-2" sketch:type="MSShapeGroup"></path>
-        </g>
-    </g>
-</svg>
+<svg viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="m10.94.163l-7.182 7.793-2.909-2.096c-.27-.095-.578.005-.734.231-.166.236-.151.551.035.774l3.251 3.911c.122.141.297.225.482.225l.066-.004c.173-.018.333-.107.436-.241l7.482-9.74c.2-.258.172-.633-.067-.853-.235-.216-.62-.218-.86 0" fill="#a7a9ac"/></g></svg>

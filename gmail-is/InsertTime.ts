@@ -20,7 +20,7 @@ module Esper.InsertTime {
       if (!Gmail.newCompose(div) && div.children().length === 1) {
         var controls = esperToolbar();
         div.prepend(controls.bar);
-        div.height(70);
+        div.height(82);
 
         var containing = Gmail.containingTable(div);
         containing.css("padding-bottom", 30);
