@@ -77,7 +77,7 @@ module Esper.CalSearch {
     link.click(function() {
       spinner.show();
       link.hide();
-      CalTab.linkEvent(e, team, threadId, eventsTab, profiles, resultView);
+      TaskTab.linkEvent(e, team, threadId, eventsTab, profiles, resultView);
     });
 
     check.attr("data", Init.esperRootUrl + "img/check.svg");
@@ -99,7 +99,7 @@ module Esper.CalSearch {
                                  eventList,
                                  team,
                                  searchView: SearchView,
-                                 eventsTab: CalTab.CalTabView,
+                                 eventsTab: TaskTab.TaskTabView,
                                  profiles: ApiT.Profile[]) {
     Log.d("displayLinkableEvents()");
     var list = $("<div>");
@@ -138,7 +138,7 @@ module Esper.CalSearch {
 
   function setupSearch(events, team,
                        searchView: SearchView,
-                       eventsTab: CalTab.CalTabView,
+                       eventsTab: TaskTab.TaskTabView,
                        profiles: ApiT.Profile[]) {
     Log.d("setupSearch()");
     resetSearch(searchView);
@@ -182,7 +182,7 @@ module Esper.CalSearch {
   }
 
   export function openSearchModal(team, threadId,
-                                  eventsTab: CalTab.CalTabView,
+                                  eventsTab: TaskTab.TaskTabView,
                                   profiles: ApiT.Profile[]) {
 '''
 <div #view>

@@ -72,11 +72,11 @@ APP_SOURCES = \
   CalCache \
   CalPicker \
   CalSearch \
-  CalTab \
-  ExecTab \
   InsertTime \
   Menu \
   Sidebar \
+  TaskTab \
+  UserTab \
   Init \
   Main
 

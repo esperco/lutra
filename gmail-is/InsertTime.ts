@@ -31,13 +31,13 @@ module Esper.InsertTime {
         overlappingSpan.css("margin-top", 16);
 
         updateEventsLabel(controls);
-        CalTab.onEventsChanged(function () {
+        TaskTab.onEventsChanged(function () {
           updateEventsLabel(controls)
         });
 
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField(div);
-          var events = CalTab.currentEvents;
+          var events = TaskTab.currentEvents;
           textField.focus();
 
           insertAtCaret("<br />");
@@ -79,7 +79,7 @@ module Esper.InsertTime {
   }
 
   function updateEventsLabel(controls) {
-    switch (CalTab.currentEvents.length) {
+    switch (TaskTab.currentEvents.length) {
     case 0:
       controls.eventsLabel.text("No linked events.");
       break;
@@ -87,7 +87,7 @@ module Esper.InsertTime {
       controls.eventsLabel.text("1 linked event.");
       break;
     default:
-      controls.eventsLabel.text(CalTab.currentEvents.length + " linked events.");
+      controls.eventsLabel.text(TaskTab.currentEvents.length + " linked events.");
       break;
     }
   }

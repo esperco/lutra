@@ -175,6 +175,7 @@ module Esper.ApiT {
 
   export interface Preferences {
     workplaces: Workplace[];
+    transportation: string[];
     meeting_types: MeetingTypes;
     notes: string;
   }

@@ -38,6 +38,7 @@ module Esper.Sidebar {
   }
 
   function insertEsperRoot() {
+    Gmail.removeWebClipBanner();
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
     if (anchor.length === 1) {
@@ -229,12 +230,8 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li #tab1 class="esper-active esper-first">
-        <object #calendar class="esper-svg esper-tab-icon"/>
-      </li>
-      <li #tab2 class="esper-last">
-        <object #person class="esper-svg esper-tab-icon"/>
-      </li>
+      <li #tab1 class="esper-active esper-first">Task</li>
+      <li #tab2 class="esper-last">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -262,12 +259,8 @@ module Esper.Sidebar {
       switchTab(1, [0]);
     });
 
-    calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
-    person.attr("data", Init.esperRootUrl + "img/person.svg");
-
-    CalTab.displayCalendarTab(content1, team, autoTask,
-                              profiles, linkedEvents);
-    ExecTab.displayExecutiveTab(content2, team, profiles);
+    TaskTab.displayTaskTab(content1, team, autoTask, profiles, linkedEvents);
+    UserTab.displayUserTab(content2, team, profiles);
 
     rootElement.append(view);
 

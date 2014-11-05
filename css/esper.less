@@ -75,6 +75,11 @@
 
 a { text-decoration: none; }
 
+hr.esper-hr {
+  margin: 20px 0;
+  border-top: 1px solid @gray_20;
+}
+
 ul.esper-ul, li.esper-li { list-style-type: none; }
 
 ul.esper-ul {
@@ -479,15 +484,14 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   width: 100%;
   margin: 1px 0 0 0;
   padding: 0;
-  border-bottom: 1px solid @gray_20;
   li {
     float: left;
     list-style: none;
-    width: 50%;
+    width: 80px;
     height: 34px;
     display: inline-block;
     margin-bottom: -1px;
-    padding: 6px 7px;
+    padding: 8px;
     border: 1px solid @google_border_gray;
     background: white;
     color: @purple;
@@ -526,8 +530,9 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   bottom: 36px;
   padding: 15px 10px;
   background: white;
-  border-right: 1px solid @google_border_gray;
-  border-left: 1px solid @google_border_gray;
+  border: 1px solid @google_border_gray;
+  border-bottom: none;
+  border-top-right-radius: 3px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   .esper-tab { display:none; }
@@ -564,9 +569,14 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 }
 
 .esper-section-selector {
-  padding: 7px 5px;
+  padding: 7px 10px;
   background: @purple_bg;
   border-bottom: 1px solid @google_border_gray;
+}
+
+.esper-show-selector {
+  float: left;
+  margin: 9px 5px 0 0;
 }
 
 .esper-section-container {
@@ -777,13 +787,37 @@ ul.esper-ev-dropdown {
 
 /** Sidebar Preferences **/
 
+.esper-transportation-preferences {
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+  li { border-bottom: 1px solid @google_border_gray; }
+  li.esper-last { border-bottom: none; }
+}
+
+.esper-transportation-type {
+  padding: 10px 0;
+}
+
+.esper-transportation-icon {
+  float: left;
+  width: 40px;
+  height: 40px;
+  opacity: 0.4;
+}
+
+.esper-transportation-title {
+  float: left;
+  margin: 12px 10px;
+  font-size: 14px;
+}
+
 .esper-meeting-preferences {
   padding: 0 10px;
 }
 
-.esper-preference-row {
+.esper-preference-section {
   margin: 15px 0;
-  ul { margin: 28px 0 0 0; }
 }
 
 .esper-preference-icon {
@@ -801,6 +835,8 @@ ul.esper-ev-dropdown {
   float: right;
   margin-top: 2px;
 }
+
+.esper-preference-info { margin-left: 27px; }
 
 .esper-preferences-notes {
   margin: 0;

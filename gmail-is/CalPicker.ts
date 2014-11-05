@@ -75,8 +75,8 @@ module Esper.CalPicker {
     });
 
     var title =
-      CalTab.currentTask !== undefined ?
-      CalTab.currentTask.task_title :
+      TaskTab.currentTask !== undefined ?
+      TaskTab.currentTask.task_title :
       esperGmail.get.email_subject();
     eventTitle.val("HOLD: " + title);
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -376,11 +376,11 @@ module Esper.CalPicker {
 
       closeModal();
       if (events.length > 0) {
-        CalTab.currentCalTab.linkedEventsList.children().remove();
-        CalTab.currentCalTab.linkedEventsSpinner.show();
+        TaskTab.currentTaskTab.linkedEventsList.children().remove();
+        TaskTab.currentTaskTab.linkedEventsSpinner.show();
       }
       Promise.join(linkCalls).done(function(linkedEvents) {
-        if (events.length > 0) CalTab.refreshLinkedEventsAction();
+        if (events.length > 0) TaskTab.refreshLinkedEventsAction();
 
         // Don't wait for sync
         var syncCalls =
