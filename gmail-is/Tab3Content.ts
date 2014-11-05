@@ -228,6 +228,7 @@ module Esper.Tab3Content {
       populateMeetingsDropdown(meetDrop, meetInfo, meetingTypes);
 
       notes.text(prefs.notes);
+      notes.css("white-space", "pre-wrap");
     });
 
     tab3.append(view);
