@@ -11,20 +11,61 @@ module Esper.UserTab {
     return hour + ":" + minute + ampm;
   }
 
-  function formatTimeRange(fromDay, fromHourMinute, toDay, toHourMinute) {
-    var fromTime = formatTime(fromHourMinute);
-    var toTime = formatTime(toHourMinute);
-    if (fromDay === toDay) toDay = "";
-    return [fromDay, fromTime, "to", toDay, toTime].join(" ");
-  }
+  function displayAvailability(meetingPrefs, availabilities, last) {
+'''
+<div #view class="esper-preference-section esper-contains-list esper-clearfix">
+  <div class="esper-clearfix">
+    <span #viewAvailability class="esper-preference-text esper-link">View</span>
+    <object #availabilityIcon class="esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Availability</span>
+  </div>
+  <ul #availability class="esper-preference-list"/>
+</div>
+'''
+    availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
 
-  function displayAvailability(ul, availabilities) {
-    List.iter(availabilities, function(a : ApiT.Availability) {
-      var text = formatTimeRange(a.avail_from.day, a.avail_from.time,
-                                 a.avail_to.day, a.avail_to.time);
-      $("<li>" + text + "</li>")
-        .appendTo(ul);
-    });
+    if (last)
+      view.addClass("esper-last");
+
+    var numAvailabilities = availabilities.length;
+    if (numAvailabilities === 0) {
+      viewAvailability.hide();
+      availability
+        .append($("<li class='esper-empty-list'>No availability</li>"));
+    } else {
+      var i = 0;
+      List.iter(availabilities, function(a : ApiT.Availability) {
+'''
+<li #availabilityRow>
+  <span #fromDayText class="esper-bold"/>
+  <span #fromTimeText/>
+  <span>to</span>
+  <span #toDayText class="esper-bold"/>
+  <span #toTimeText/>
+</li>
+'''
+        if (i == (numAvailabilities -1))
+          availabilityRow.addClass("esper-last");
+
+        var fromDay = a.avail_from.day;
+        var toDay = a.avail_to.day;
+        if (fromDay === toDay) toDay = "";
+
+        fromDayText.text(fromDay);
+        fromTimeText.text(" " + formatTime(a.avail_from.time) + " ");
+        toDayText.text(toDay);
+        toTimeText.text(" " + formatTime(a.avail_to.time) + " ");
+
+        availability.append(availabilityRow);
+        i++;
+      });
+
+      viewAvailability.click(function() {
+        // TODO: open calendar modal
+      });
+    }
+
+    meetingPrefs.append(view);
   }
 
   function formatDuration(hourMinute) {
@@ -40,74 +81,121 @@ module Esper.UserTab {
 
   function displayFavoriteLocations(meetingPrefs, favoriteLocations) {
 '''
-<div #view class="esper-preference-section esper-clearfix">
+<div #view class="esper-preference-section esper-clearfix
+                  esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #locationIcon class="esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Favorite locations</span>
   </div>
-  <ul #locations/>
+  <ul #locations class="esper-preference-list"/>
 </div>
 '''
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
 
-    List.iter(favoriteLocations, function(l : ApiT.Location) {
-      var text = "";
-      if (l.title !== "") text += l.title;
-      if (l.address !== "") {
-        if (text !== "") text += ": ";
-        text += l.address;
-      }
-      if (l.public_notes !== undefined)
-        text += " (" + l.public_notes + ")";
-      if (l.private_notes !== undefined)
-        text += " [Note: " + l.private_notes + "]";
-      $("<li>" + text + "</li>")
-        .appendTo(locations);
-    });
+    var numLocations = favoriteLocations.length;
+    if (numLocations === 0) {
+      locations
+        .append($("<li class='esper-empty-list'>No favorite locations</li>"));
+    } else {
+      var i = 0;
+      List.iter(favoriteLocations, function(l : ApiT.Location) {
+'''
+<li #location>
+  <div #name class="esper-bold"/>
+  <div #address/>
+  <div #publicNotes class="esper-gray"/>
+  <div #privateNotes class="esper-gray"/>
+</li>
+'''
+        if (i == (numLocations -1))
+          location.addClass("esper-last");
+
+        if (l.title !== "") name.text(l.title);
+        if (l.address !== "") address.text(l.address);
+        if (l.public_notes !== undefined) publicNotes.text(l.public_notes);
+        if (l.private_notes !== undefined) privateNotes.text(l.private_notes);
+
+        locations.append(location);
+        i++
+      });
+    }
 
     meetingPrefs.append(view);
   }
 
   function displayVideoUsernames(meetingPrefs, videoUsernames) {
 '''
-<div #view class="esper-preference-section esper-clearfix">
+<div #view class="esper-preference-section esper-clearfix
+                  esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #videoIcon class="esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Usernames</span>
   </div>
-  <ul #usernames/>
+  <ul #usernames class="esper-preference-list"/>
 </div>
 '''
     videoIcon.attr("data", Init.esperRootUrl + "img/video.svg");
 
-    List.iter(videoUsernames, function(v : ApiT.VideoAccount) {
-      var text = v.video_type + ": " + v.video_username;
-      $("<li>" + text + "</li>")
-        .appendTo(usernames);
-    });
+    var numUsernames = videoUsernames.length;
+    if (numUsernames === 0) {
+      usernames.append($("<li class='esper-empty-list'>No usernames</li>"));
+    } else {
+      var i = 0;
+      List.iter(videoUsernames, function(v : ApiT.VideoAccount) {
+'''
+<li #videoUsername>
+  <div #type class="esper-bold"/>
+  <div #username/>
+</li>
+'''
+        if (i == (numUsernames -1))
+          videoUsername.addClass("esper-last");
+        type.text(v.video_type + ": ");
+        username.text(v.video_username);
+        usernames.append(videoUsername);
+        i++;
+      });
+    }
 
     meetingPrefs.append(view);
   }
 
   function displayPhoneNumbers(meetingPrefs, phoneNumbers) {
 '''
-<div #view class="esper-preference-section esper-clearfix">
+<div #view class="esper-preference-section
+                  esper-clearfix esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #phoneIcon class="esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Phone numbers</span>
   </div>
-  <ul #phones/>
+  <ul #phones class="esper-preference-list"/>
 </div>
 '''
     phoneIcon.attr("data", Init.esperRootUrl + "img/phone.svg");
 
-    List.iter(phoneNumbers, function(p : ApiT.PhoneNumber) {
-      var text = p.phone_type + ": " + p.phone_number;
-      if (p.share_with_guests) text += " (OK to share)";
-      else text += " (private)";
-      $("<li>" + text + "</li>")
-        .appendTo(phones);
-    });
+    var numPhones = phoneNumbers.length;
+    if (numPhones === 0) {
+      phones.append($("<li class='esper-empty-list'>No phone numbers</li>"));
+    } else {
+      var i = 0;
+      List.iter(phoneNumbers, function(p : ApiT.PhoneNumber) {
+'''
+<li #phoneNumber>
+  <span #type class="esper-bold"/>
+  <span #number/>
+  <div #note class="esper-gray"/>
+</li>
+'''
+        if (i == (numPhones -1))
+          phoneNumber.addClass("esper-last");
+        type.text(p.phone_type + ": ");
+        number.text(p.phone_number);
+        if (p.share_with_guests) note.text("OK to share with guests");
+        else note.text("Do NOT share with guests");
+        phones.append(phoneNumber);
+        i++;
+      });
+    }
 
     meetingPrefs.append(view);
   }
@@ -125,23 +213,17 @@ module Esper.UserTab {
     <object #bufferIcon class="esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Buffer time</span>
   </div>
-  <div class="esper-preference-section esper-clearfix">
-    <div class="esper-clearfix">
-      <span #viewAvailability class="esper-preference-text esper-link">View</span>
-      <object #availabilityIcon class="esper-preference-icon"/>
-      <span class="esper-preference-title esper-bold">Availability</span>
-    </div>
-    <ul #avail/>
-  </div>
+
 </div>
 '''
-    durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
-    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
-    availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
-
     durationText.text(formatDuration(meetingPrefs.duration));
+    durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
     bufferText.text(formatDuration(meetingPrefs.buffer));
-    displayAvailability(avail, meetingPrefs.availability);
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
+
+    var last = false;
+    displayAvailability(view, meetingPrefs.availability, last);
 
     if (meetingType === "phone")
       displayPhoneNumbers(view, meetingPrefs.phones);
@@ -212,7 +294,7 @@ module Esper.UserTab {
 
   function displayWorkplace(workInfo, workplace) {
 '''
-<div #view class="esper-meeting-preferences">
+<div #view class="esper-workplace-preferences">
   <div class="esper-preference-section">
     <div class="esper-clearfix">
       <span #viewMap class="esper-preference-text esper-link">Map</span>
@@ -231,26 +313,20 @@ module Esper.UserTab {
     <object #bufferIcon class="esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Buffer time</span>
   </div>
-  <div class="esper-preference-section esper-clearfix">
-    <div class="esper-clearfix">
-      <span #viewAvailability class="esper-preference-text esper-link">View</span>
-      <object #availabilityIcon class="esper-preference-icon"/>
-      <span class="esper-preference-title esper-bold">Availability</span>
-    </div>
-    <ul #avail/>
-  </div>
 </div>
 '''
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
-    availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
 
     address.text(workplace.location.address);
     console.log(workplace.duration);
     durationText.text(formatDuration(workplace.duration));
     bufferText.text(formatDuration(workplace.buffer));
-    displayAvailability(avail, workplace.availability);
+
+    var last = true;
+    displayAvailability(view, workplace.availability, last);
+
     workInfo.children().remove();
     workInfo.append(view);
   }
@@ -269,62 +345,105 @@ module Esper.UserTab {
     });
   }
 
+  function viewOfUser(team) {
+'''
+<div #view>
+  <div #spinner>
+    <div class="esper-spinner esper-tab-header-spinner"/>
+  </div>
+  <div #profPic class="esper-profile-pic"/>
+  <div class="esper-profile-row esper-profile-name-row">
+    <span #name class="esper-profile-name"/>
+    <span #membership class="esper-membership-badge"/>
+  </div>
+  <div #email class="esper-profile-row esper-profile-email esper-gray"/>
+</div>
+'''
+    var teamid = team.teamid;
+
+    Api.getProfile(team.team_executive, teamid)
+      .done(function(profile) {
+        spinner.hide();
+        if (profile.image_url !== undefined)
+          profPic.css("background-image", "url('" + profile.image_url + "')");
+        name.text(team.team_name);
+        email.text(profile.email);
+      });;
+
+    var membershipStatus = "free trial"; // TODO: get membership status
+    if (membershipStatus == "free trial")
+      membership.addClass("free-trial");
+    else if (membershipStatus == "suspended")
+      membership.addClass("suspended");
+    else
+      membership.addClass("active");
+
+    membership.text(membershipStatus.toUpperCase());
+
+    return view;
+  }
+
   export function displayUserTab(tab2, team, profiles) {
 '''
 <div #view>
-  <div #preferencesSpinner class="esper-events-list-loading">
-    <div class="esper-spinner esper-list-spinner"/>
-  </div>
-  <div class="esper-section">
-    <div #workplacesHeader class="esper-section-header esper-clearfix open">
-      <span #showWorkplaces
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Workplaces</span>
+  <div #user class="esper-tab-header"/>
+  <div class="esper-tab-overflow">
+    <div #preferencesSpinner class="esper-events-list-loading">
+      <div class="esper-spinner esper-list-spinner"/>
     </div>
-    <div #workplacesContainer class="esper-section-container">
-      <div #workplacesSelector class="esper-section-selector esper-clearfix">
-        <span class="esper-show-selector">Show: </span>
-        <select #workplaceSelector class="esper-select"/>
+    <div class="esper-section">
+      <div #workplacesHeader class="esper-section-header esper-clearfix open">
+        <span #showWorkplaces
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Workplaces</span>
       </div>
-      <div #workplaceInfo/>
-    </div>
-  </div>
-  <div class="esper-section">
-    <div #transportationHeader class="esper-section-header esper-clearfix open">
-      <span #showTransportation
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Transportation</span>
-    </div>
-    <div #transportationContainer class="esper-section-container">
-      <ul #transportationPreferences class="esper-transportation-preferences"/>
-    </div>
-  </div>
-  <div class="esper-section">
-    <div #meetingPreferencesHeader class="esper-section-header esper-clearfix open">
-      <span #showMeetingPreferences
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Meeting Preferences</span>
-    </div>
-    <div #meetingPreferencesContainer class="esper-section-container">
-      <div #meetingPreferencesSelector class="esper-section-selector esper-clearfix">
-        <span class="esper-show-selector">Show: </span>
-        <select #meetingSelector class="esper-select"/>
+      <div #workplacesContainer class="esper-section-container">
+        <div #workplacesSelector class="esper-section-selector esper-clearfix">
+          <span class="esper-show-selector">Show: </span>
+          <select #workplaceSelector class="esper-select"/>
+        </div>
+        <div #workplaceInfo/>
       </div>
-      <div #meetingPreferences/>
     </div>
-  </div>
-  <div class="esper-section">
-    <div #notesHeader class="esper-section-header esper-clearfix open">
-      <span #showNotes
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Notes</span>
+    <div class="esper-section">
+      <div #transportationHeader class="esper-section-header esper-clearfix open">
+        <span #showTransportation
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Transportation</span>
+      </div>
+      <div #transportationContainer class="esper-section-container">
+        <ul #transportationPreferences class="esper-transportation-preferences"/>
+      </div>
     </div>
-    <div #notesContainer class="esper-section-container">
-      <pre #notes class="esper-preferences-notes"/>
+    <div class="esper-section">
+      <div #meetingPreferencesHeader class="esper-section-header esper-clearfix open">
+        <span #showMeetingPreferences
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Meeting Preferences</span>
+      </div>
+      <div #meetingPreferencesContainer class="esper-section-container">
+        <div #meetingPreferencesSelector class="esper-section-selector esper-clearfix">
+          <span class="esper-show-selector">Show: </span>
+          <select #meetingSelector class="esper-select"/>
+        </div>
+        <div #meetingPreferences/>
+      </div>
+    </div>
+    <div class="esper-section">
+      <div #notesHeader class="esper-section-header esper-clearfix open">
+        <span #showNotes
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Notes</span>
+      </div>
+      <div #notesContainer class="esper-section-container">
+        <pre #notes class="esper-preferences-notes"/>
+      </div>
     </div>
   </div>
 </div>
 '''
+    user.append(viewOfUser(team));
+
     Api.getPreferences(team.teamid).done(function(prefs) {
       preferencesSpinner.hide();
       var workplaces = prefs.workplaces;

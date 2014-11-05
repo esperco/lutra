@@ -51,22 +51,22 @@ module Esper.Sidebar {
   function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
 '''
 <li #selector class="esper-click-safe esper-li">
-  <object #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
-  <div #teamListName class="esper-click-safe esper-team-list-name"/>
-  <div #teamListExec class="esper-click-safe esper-team-list-exec"/>
+  <object #teamCheck class="esper-click-safe esper-team-checkmark"/>
+  <div #teamName class="esper-click-safe"/>
+  <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    teamListName.text(team.team_name);
-    teamListExec.text(exec.display_name);
+    teamName.text(team.team_name);
+    teamExecEmail.text(exec.email);
 
     if (team.teamid === myTeamId) {
       selector.addClass("esper-selected");
-      teamListCheck.attr("data", Init.esperRootUrl + "img/check.svg");
+      teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
     } else {
-      teamListCheck.hide();
+      teamCheck.hide();
       selector.click(function() { onTeamSwitch(team); });
     }
 
@@ -85,9 +85,9 @@ module Esper.Sidebar {
   </div>
   <ul #dropdown class="esper-ul esper-options-menu">
     <div #teamsSection class="esper-dropdown-section">
-      <li class="esper-click-safe esper-li
+      <li class="esper-click-safe esper-li esper-bold
                  esper-disabled esper-team-list-title">
-        TEAMS
+        Users
       </li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
@@ -98,9 +98,7 @@ module Esper.Sidebar {
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
-      <a href="http://esper.com">
-        <object #footerLogo class="esper-click-safe esper-footer-logo"/>
-      </a>
+      <object #logo class="esper-click-safe esper-dropdown-footer-logo"/>
       <div class="esper-click-safe esper-dropdown-footer-links">
         <a href="http://esper.com/privacypolicy.html">Privacy</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
@@ -160,7 +158,7 @@ module Esper.Sidebar {
     else
       teamName.addClass("esper-team-name-danger");
 
-    footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
+    logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
     options.tooltip({
       show: { delay: 500, effect: "none" },

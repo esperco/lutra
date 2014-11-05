@@ -32,7 +32,7 @@ module Esper.TaskTab {
         .then(function(task) {
           currentTask = task;
           view.taskCaption.text("Task:");
-          view.taskName.text(task.task_title);
+          view.taskTitle.text(task.task_title);
           return task;
         });
     }
@@ -684,7 +684,7 @@ module Esper.TaskTab {
   }
 
   // Search for matching tasks and display the results in a dropdown
-  function displaySearchResults(taskName, dropdown, results, actions,
+  function displaySearchResults(taskTitle, dropdown, results, actions,
                                 team: ApiT.Team,
                                 query,
                                 profiles: ApiT.Profile[],
@@ -721,7 +721,7 @@ module Esper.TaskTab {
             });
 
             currentTask = result.task_data;
-            taskName.val(title);
+            taskTitle.val(title);
             Sidebar.dismissDropdowns();
           });
       });
@@ -743,7 +743,7 @@ module Esper.TaskTab {
             .done(function(task) {
               Api.setTaskTitle(currentTask.taskid, query);
               currentTask.task_title = query;
-              taskName.val(query);
+              taskTitle.val(query);
               Sidebar.dismissDropdowns();
             });
         });
@@ -773,7 +773,7 @@ module Esper.TaskTab {
 
   export interface TaskTabView {
     taskCaption: JQuery;
-    taskName: JQuery;
+    taskTitle: JQuery;
     taskSearchDropdown: JQuery;
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
@@ -816,9 +816,9 @@ module Esper.TaskTab {
                                  linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
 <div #view>
-  <div class="esper-section">
+  <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
-    <input #taskName type="text" size="24" class="esper-input esper-task-name"/>
+    <input #taskTitle type="text" size="24" class="esper-input esper-task-name"/>
     <ul #taskSearchDropdown
         class="esper-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
@@ -826,76 +826,78 @@ module Esper.TaskTab {
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
   </div>
-  <div class="esper-section">
-    <div #linkedThreadsHeader class="esper-section-header esper-clearfix open">
-      <span #showLinkedThreads
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Linked Threads</span>
-      <div #refreshLinkedThreads
-           class="esper-refresh esper-clickable esper-disabled">
-        <object #refreshLinkedThreadsIcon class="esper-svg-block"/>
+  <div class="esper-tab-overflow">
+    <div class="esper-section">
+      <div #linkedThreadsHeader class="esper-section-header esper-clearfix open">
+        <span #showLinkedThreads
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Linked Threads</span>
+        <div #refreshLinkedThreads
+             class="esper-refresh esper-clickable esper-disabled">
+          <object #refreshLinkedThreadsIcon class="esper-svg-block"/>
+        </div>
+      </div>
+      <div #linkedThreadsContainer class="esper-section-container">
+        <div #linkedThreadsSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
+        </div>
+        <div #linkedThreadsList/>
       </div>
     </div>
-    <div #linkedThreadsContainer class="esper-section-container">
-      <div #linkedThreadsSpinner class="esper-events-list-loading">
-        <div class="esper-spinner esper-list-spinner"/>
+    <div class="esper-section">
+      <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
+        <span #showLinkedEvents
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Linked Events</span>
+        <div #refreshLinkedEvents
+             class="esper-refresh esper-clickable esper-disabled">
+          <object #refreshLinkedEventsIcon class="esper-svg-block"/>
+        </div>
       </div>
-      <div #linkedThreadsList/>
-    </div>
-  </div>
-  <div class="esper-section">
-    <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
-      <span #showLinkedEvents
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Linked Events</span>
-      <div #refreshLinkedEvents
-           class="esper-refresh esper-clickable esper-disabled">
-        <object #refreshLinkedEventsIcon class="esper-svg-block"/>
-      </div>
-    </div>
-    <div #linkActions class="esper-section-actions esper-clearfix open">
-      <div style="display:inline-block">
-        <div class="esper-link-action">
-          <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-          <div #createEventToggle
-               class="esper-click-safe esper-dropdown-btn
-                      esper-clickable esper-link-action-text">
-            Create event
+      <div #linkActions class="esper-section-actions esper-clearfix open">
+        <div style="display:inline-block">
+          <div class="esper-link-action">
+            <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+            <div #createEventToggle
+                 class="esper-click-safe esper-dropdown-btn
+                        esper-clickable esper-link-action-text">
+              Create event
+            </div>
           </div>
+          <div class="esper-vertical-divider"/>
+          <div #linkEvent class="esper-link-action">
+            <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+            <div class="esper-link-action-text">Link event</div>
+          </div>
+          <ul #createEvent class="esper-create-event-dropdown esper-ul">
+            <div class="esper-dropdown-section"/>
+          </ul>
         </div>
-        <div class="esper-vertical-divider"/>
-        <div #linkEvent class="esper-link-action">
-          <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
-          <div class="esper-link-action-text">Link event</div>
+      </div>
+      <div #linkedEventsContainer class="esper-section-container">
+        <div #linkedEventsSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
         </div>
-        <ul #createEvent class="esper-create-event-dropdown esper-ul">
-          <div class="esper-dropdown-section"/>
-        </ul>
+        <div #linkedEventsList/>
       </div>
     </div>
-    <div #linkedEventsContainer class="esper-section-container">
-      <div #linkedEventsSpinner class="esper-events-list-loading">
-        <div class="esper-spinner esper-list-spinner"/>
+    <hr class="esper-hr"/>
+    <div class="esper-section">
+      <div #recentsHeader class="esper-section-header esper-clearfix open">
+        <span #showRecents
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Recents</span>
+        <div #refreshRecents
+             class="esper-refresh esper-clickable esper-disabled">
+          <object #refreshRecentsIcon class="esper-svg-block"/>
+        </div>
       </div>
-      <div #linkedEventsList/>
-    </div>
-  </div>
-  <hr class="esper-hr"/>
-  <div class="esper-section">
-    <div #recentsHeader class="esper-section-header esper-clearfix open">
-      <span #showRecents
-            class="esper-link" style="float:right">Hide</span>
-      <span class="esper-bold" style="float:left">Recents</span>
-      <div #refreshRecents
-           class="esper-refresh esper-clickable esper-disabled">
-        <object #refreshRecentsIcon class="esper-svg-block"/>
+      <div #recentsContainer class="esper-section-container">
+        <div #recentsSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
+        </div>
+        <div #recentsList/>
       </div>
-    </div>
-    <div #recentsContainer class="esper-section-container">
-      <div #recentsSpinner class="esper-events-list-loading">
-        <div class="esper-spinner esper-list-spinner"/>
-      </div>
-      <div #recentsList/>
     </div>
   </div>
 </div>
@@ -920,20 +922,20 @@ module Esper.TaskTab {
       var title = "";
       linkedThreadsSpinner.hide();
       if (task !== undefined) {
-        taskCaption.text("Task");
+        taskCaption.text("Title");
         title = task.task_title;
         displayLinkedThreadsList(task, threadId, taskTabView);
       } else {
-        taskCaption.text("Create task:");
+        taskCaption.text("Create task");
         var thread = esperGmail.get.email_data();
         if (thread !== undefined && thread !== null)
           title = thread.subject;
       }
-      taskName.val(title);
-      Util.afterTyping(taskName, 250, function() {
-        var query = taskName.val();
+      taskTitle.val(title);
+      Util.afterTyping(taskTitle, 250, function() {
+        var query = taskTitle.val();
         if (query !== "")
-          displaySearchResults(taskName, taskSearchDropdown, taskSearchResults,
+          displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
                                taskSearchActions, team, query, profiles,
                                taskTabView);
       });
