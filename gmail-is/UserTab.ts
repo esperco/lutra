@@ -101,7 +101,8 @@ module Esper.UserTab {
       List.iter(favoriteLocations, function(l : ApiT.Location) {
 '''
 <li #location>
-  <div #name class="esper-bold"/>
+  <span #viewMap class="esper-link" style="float:right">Map</span>
+  <div #name class="esper-favorite-location-name esper-bold"/>
   <div #address/>
   <div #publicNotes class="esper-gray"/>
   <div #privateNotes class="esper-gray"/>
@@ -117,6 +118,10 @@ module Esper.UserTab {
 
         locations.append(location);
         i++
+      });
+
+      viewMap.click(function() {
+        // TODO: open Google Maps
       });
     }
 
@@ -326,6 +331,10 @@ module Esper.UserTab {
 
     var last = true;
     displayAvailability(view, workplace.availability, last);
+
+    viewMap.click(function() {
+      // TODO: open Google Maps
+    });
 
     workInfo.children().remove();
     workInfo.append(view);
