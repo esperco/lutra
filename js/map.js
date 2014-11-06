@@ -81,7 +81,7 @@ function init() {
   var map = new google.maps.Map(mapElement, mapOptions);
   marker = new google.maps.Marker({
     icon: '../img/marker.svg',
-    position: new google.maps.LatLng(37.4494339, -122.158983),
+    position: new google.maps.LatLng(37.450692, -122.163285),
     clickable: false,
     map: map
   });
