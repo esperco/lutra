@@ -424,7 +424,6 @@ module PreferencesTab {
 
   function showAvailability(name, defaults, element) {
     CalPicker.createModal(name, defaults, element);
-    // TODO save when picked
   }
 
   function createDurationSelector(selected) {

@@ -38,7 +38,7 @@ module CalendarsTab {
     });
 
     Api.getCalendarList().done(function(x) {
-      List.iter(x.named_calendar_ids, function(cal) {
+      List.iter(x.calendars, function(cal) {
         var opt = $("<option class='esper-calendar-option'"
                     + "value='" + cal.google_cal_id + "'>"
                     + cal.calendar_title + "</option>");
@@ -72,7 +72,7 @@ module CalendarsTab {
         var teamCalendars = List.map(uniqueCalIDs, function(calID) {
           return calData[calID];
         });
-        Api.putTeamCalendars(team.teamid, { named_calendar_ids: teamCalendars })
+        Api.putTeamCalendars(team.teamid, { calendars: teamCalendars })
           .done(function() { window.location.reload(); });
       });
 

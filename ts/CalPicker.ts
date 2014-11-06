@@ -98,7 +98,10 @@ module CalPicker {
 
   function ymdOfMoment(m) {
     var month = m.month() + 1;
-    return m.year() + "-" + month + "-" + m.date();
+    if (month < 10) month = "0" + month;
+    var day = m.date();
+    if (day < 10) day = "0" + day;
+    return m.year() + "-" + month + "-" + day;
   }
 
   function ymdOfDay(d) {
