@@ -392,13 +392,21 @@ module Esper.UserTab {
     return view;
   }
 
-  export function displayUserTab(tab2, team, profiles) {
+  export function viewOfUserTab(team, profiles) {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>
   <div class="esper-tab-overflow">
     <div #preferencesSpinner class="esper-events-list-loading">
       <div class="esper-spinner esper-list-spinner"/>
+    </div>
+    <div #calendarsSection class="esper-section" style="display:none">
+      <div #calendarsHeader class="esper-section-header esper-clearfix open">
+        <span #showCalendars
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Calendars</span>
+      </div>
+      <div #calendarsContainer class="esper-section-container"/>
     </div>
     <div class="esper-section">
       <div #workplacesHeader class="esper-section-header esper-clearfix">
@@ -486,6 +494,17 @@ module Esper.UserTab {
     Sidebar.customizeSelectArrow(workplaceSelector);
     Sidebar.customizeSelectArrow(meetingSelector);
 
+    showCalendars.click(function() {
+      Sidebar.toggleList(calendarsContainer);
+      if (this.innerHTML === "Hide") {
+        $(this).text("Show");
+        calendarsHeader.removeClass("open");
+      } else {
+        $(this).text("Hide");
+        calendarsHeader.addClass("open");
+      }
+    });
+
     showWorkplaces.click(function() {
       Sidebar.toggleList(workplacesContainer);
       if (this.innerHTML === "Hide") {
@@ -530,7 +549,7 @@ module Esper.UserTab {
       }
     });
 
-    tab2.append(view);
+    return _view;
   }
 
 }

@@ -4,9 +4,7 @@
 module Esper.Sidebar {
   export var currentThreadId : string;
   export var currentTeam : ApiT.Team;
-
-  // Profiles of everyone on all the viewer's teams
-  var profiles : ApiT.Profile[];
+  export var profiles : ApiT.Profile[];
 
   export function customizeSelectArrow(selector) {
     var imageUrl = Init.esperRootUrl + "img/select-arrow.svg";
@@ -258,7 +256,7 @@ module Esper.Sidebar {
     });
 
     TaskTab.displayTaskTab(content1, team, autoTask, profiles, linkedEvents);
-    UserTab.displayUserTab(content2, team, profiles);
+    content2.append(UserTab.viewOfUserTab(team, profiles).view);
 
     rootElement.append(view);
 

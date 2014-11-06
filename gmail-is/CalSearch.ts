@@ -209,7 +209,7 @@ module Esper.CalSearch {
       <div #searchStats class="esper-search-stats"/>
     </div>
     <div class="esper-search-footer">
-      <button #done class="esper-primary-btn esper-done-btn">Done</button>
+      <button #done class="esper-btn esper-btn-primary">Done</button>
       <object #modalLogo class="esper-svg esper-search-footer-logo"/>
     </div>
   </div>

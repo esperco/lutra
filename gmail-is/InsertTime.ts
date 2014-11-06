@@ -82,7 +82,7 @@ module Esper.InsertTime {
       controls.insertButton.addClass("esper-none");
       controls.numLinkedEvents.text("0");
       controls.insertButton.tooltip({
-        "content": "No linked events",
+        "content": "No linked events to insert",
         "tooltipClass": "esper-top esper-tooltip"
       });
       break;
