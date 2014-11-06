@@ -314,14 +314,8 @@ module ApiT {
     email_primary : boolean;
   }
 
-  export interface NamedCalendarId {
-    google_cal_id : string;
-    calendar_title : string;
-    calendar_timezone? : string;
-  }
-
-  export interface NamedCalendarIds {
-    named_calendar_ids : NamedCalendarId[];
+  export interface Calendars {
+    calendars : Calendar[];
   }
 
   export interface EmailAddresses {

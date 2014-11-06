@@ -261,7 +261,7 @@ module Api {
   /*** Scheduling ***/
 
   export function getCalendarList()
-    : JQueryDeferred<ApiT.NamedCalendarIds>
+    : JQueryDeferred<ApiT.Calendars>
   {
     var url = "api/calendar/list/" + Login.data.uid;
     return jsonHttpGet(url);
