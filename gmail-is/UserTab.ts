@@ -258,7 +258,7 @@ module Esper.UserTab {
     return view;
   }
 
-  function populateMeetingsDropdown(drop, meetInfo, meetingTypes) {
+  function createMeetingsDropdown(drop, meetInfo, meetingTypes) {
     function option(field, display) {
       $("<option value='" + field + "'>" + display + "</option>")
         .appendTo(drop);
@@ -401,12 +401,13 @@ module Esper.UserTab {
       <div class="esper-spinner esper-list-spinner"/>
     </div>
     <div class="esper-section">
-      <div #workplacesHeader class="esper-section-header esper-clearfix open">
+      <div #workplacesHeader class="esper-section-header esper-clearfix">
         <span #showWorkplaces
-              class="esper-link" style="float:right">Hide</span>
+              class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Workplaces</span>
       </div>
-      <div #workplacesContainer class="esper-section-container">
+      <div #workplacesContainer class="esper-section-container"
+           style="display:none">
         <div #workplacesSelector class="esper-section-selector esper-clearfix">
           <span class="esper-show-selector">Show: </span>
           <select #workplaceSelector class="esper-select"/>
@@ -415,23 +416,28 @@ module Esper.UserTab {
       </div>
     </div>
     <div class="esper-section">
-      <div #transportationHeader class="esper-section-header esper-clearfix open">
+      <div #transportationHeader class="esper-section-header esper-clearfix">
         <span #showTransportation
-              class="esper-link" style="float:right">Hide</span>
+              class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Transportation</span>
       </div>
-      <div #transportationContainer class="esper-section-container">
-        <ul #transportationPreferences class="esper-transportation-preferences"/>
+      <div #transportationContainer class="esper-section-container"
+           style="display:none">
+        <ul #transportationPreferences
+            class="esper-transportation-preferences"/>
       </div>
     </div>
     <div class="esper-section">
-      <div #meetingPreferencesHeader class="esper-section-header esper-clearfix open">
+      <div #meetingPreferencesHeader
+           class="esper-section-header esper-clearfix">
         <span #showMeetingPreferences
-              class="esper-link" style="float:right">Hide</span>
+              class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Meeting Preferences</span>
       </div>
-      <div #meetingPreferencesContainer class="esper-section-container">
-        <div #meetingPreferencesSelector class="esper-section-selector esper-clearfix">
+      <div #meetingPreferencesContainer class="esper-section-container"
+            style="display:none">
+        <div #meetingPreferencesSelector
+             class="esper-section-selector esper-clearfix">
           <span class="esper-show-selector">Show: </span>
           <select #meetingSelector class="esper-select"/>
         </div>
@@ -439,12 +445,12 @@ module Esper.UserTab {
       </div>
     </div>
     <div class="esper-section">
-      <div #notesHeader class="esper-section-header esper-clearfix open">
+      <div #notesHeader class="esper-section-header esper-clearfix">
         <span #showNotes
-              class="esper-link" style="float:right">Hide</span>
+              class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Notes</span>
       </div>
-      <div #notesContainer class="esper-section-container">
+      <div #notesContainer class="esper-section-container" style="display:none">
         <pre #notes class="esper-preferences-notes"/>
       </div>
     </div>
@@ -466,12 +472,12 @@ module Esper.UserTab {
       List.iter(prefs.transportation, function(type) {
         if (i == (transportationTypes -1))
           last = true;
-        viewOfTransportationType(type, last).appendTo(transportationPreferences);
+        transportationPreferences.append(viewOfTransportationType(type, last));
         i++;
       });
 
       var meetingTypes = prefs.meeting_types;
-      populateMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
+      createMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
       displayMeetingPrefs("phone", meetingPreferences, meetingTypes.phone_call);
 
       notes.text(prefs.notes);
