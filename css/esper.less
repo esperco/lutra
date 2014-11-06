@@ -929,28 +929,75 @@ ul.esper-ev-dropdown {
 /** Composition Toolbar **/
 
 .esper-composition-toolbar {
-  padding: 8px 10px 8px;
+  height: 43px;
+  padding: 5px 12px;
   background: @purple_bg;
   border-bottom: 1px solid #CFCFCF;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
 
-  img { /* Esper logo */
-    position: relative;
-    top: 2px;
+.esper-composition-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  margin: 5px 5px 0 0;
+}
+
+.esper-composition-vertical-divider {
+  float: left;
+  width: 1px;
+  height: 20px;
+  margin: 6px 10px;
+  background: @gray_20;
+}
+
+.esper-composition-button {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin: 0 3px;
+  padding: 4px;
+  border: 1px solid @purple_bg;
+  border-radius: 3px;
+  opacity: 0.5;
+  cursor: default;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  &.esper-none:hover {
+    background: @purple_bg;
+    border: 1px solid @purple_bg;
+    opacity: 0.5;
   }
-
-  span { /* x linked events */
-    display: inline-block;
-    text-align: center;
-    width: 15em;
+  &:hover {
+    background: linear-gradient(white, @purple_bg);
+    border: 1px solid #C6C6C6;
+    opacity: 1;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
-
-  button { /* insert */
+  object {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+  }
+  .esper-composition-badge {
+    position: absolute;
+    min-width: 14px;
+    height: 14px;
+    margin: 10px 0 0 10px;
+    padding: 1px 3px;
+    background: @purple;
+    border-radius: 7px;
     color: white;
-    font-weight: bold;
-    background: @purple_logo;
-    border-radius: 4px;
+    font-size: 11px;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
   }
 }
+
 
 /** Modals **/
 

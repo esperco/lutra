@@ -116,12 +116,12 @@ module Esper.UserTab {
         if (l.public_notes !== undefined) publicNotes.text(l.public_notes);
         if (l.private_notes !== undefined) privateNotes.text(l.private_notes);
 
+        viewMap.click(function() {
+          // TODO: open Google Maps
+        });
+
         locations.append(location);
         i++
-      });
-
-      viewMap.click(function() {
-        // TODO: open Google Maps
       });
     }
 

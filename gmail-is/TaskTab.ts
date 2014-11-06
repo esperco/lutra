@@ -485,7 +485,7 @@ module Esper.TaskTab {
           hide: { effect: "none" },
           "content": "Open in Google Calendar",
           "position": { my: 'center bottom', at: 'center top-1' },
-          "tooltipClass": "top esper-tooltip"
+          "tooltipClass": "esper-top esper-tooltip"
         });
       title
         .addClass("esper-link-black")

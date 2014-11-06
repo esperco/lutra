@@ -165,7 +165,7 @@ module Esper.Sidebar {
       hide: { effect: "none" },
       "content": "Options",
       "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "top esper-tooltip"
+      "tooltipClass": "esper-top esper-tooltip"
     });
 
     size.tooltip({
@@ -173,7 +173,7 @@ module Esper.Sidebar {
       hide: { effect: "none" },
       "content": "Minimize",
       "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "top esper-tooltip"
+      "tooltipClass": "esper-top esper-tooltip"
     });
 
     function toggleOptions() {
