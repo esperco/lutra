@@ -1,15 +1,23 @@
 module Esper.JsonHttp {
+  export function sign(unixTime: string,
+                       path: string,
+                       apiSecret: string):
+  string {
+    return CryptoJS.SHA1(
+      unixTime
+        + ","
+        + path
+        + ","
+        + apiSecret
+    ).toString();
+  }
+
   function setHttpHeaders(path) {
     return function(jqXHR) {
       if (Login.loggedIn()) {
         var unixTime = Math.round(Date.now()/1000).toString();
-        var signature = CryptoJS.SHA1(
-          unixTime
-            + ","
-            + path
-            + ","
-            + Login.getAccount().credentials.apiSecret
-        );
+        var apiSecret = Login.getAccount().credentials.apiSecret;
+        var signature = sign(unixTime, path, apiSecret);
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);
         jqXHR.setRequestHeader("Esper-Signature", signature);
