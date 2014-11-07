@@ -18,7 +18,7 @@ module Esper.Gmail {
   }
 
   export function removeWebClipBanner() {
-    var banner = $(".nH .nH .mq");
+    var banner = $(".g .mq");
 
     if (banner.length === 0) {
       Log.w("Web clips are turned off.");

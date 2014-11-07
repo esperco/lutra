@@ -149,6 +149,7 @@ select.esper-select {
   cursor: pointer;
   outline: none;
   -webkit-appearance: none;
+  &:disabled { pointer-events: none; }
   &:hover {
     border: 1px solid #C6C6C6;
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
@@ -270,7 +271,6 @@ button,
 
 /** Input **/
 .esper-input {
-  height: 32px;
   padding: 0 8px;
   color: @purple_text;
   border: 1px solid @gray_20;
@@ -290,7 +290,8 @@ button,
     pointer-events: none;
   }
 }
-
+input.esper-input { height: 32px; }
+textarea.esper-input { resize: none; }
 
 /* Esper Menu (Dropdown) */
 
@@ -1181,6 +1182,42 @@ ul.esper-ev-dropdown {
       width: 12px;
       height: 11px;
     }
+  }
+}
+
+
+/** Duplicate Event Modal **/
+
+.esper-ev-modal-content {
+  max-height: 372px;
+  padding: 10px 15px;
+  overflow-y: auto;
+}
+
+.esper-ev-modal-row {
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.esper-ev-modal-left {
+  float: left;
+  width: 20%;
+  padding: 9px 9px 0 0;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.esper-ev-modal-right {
+  float: left;
+  width: 80%;
+  box-sizing: border-box;
+  input[type="text"], textarea { width: 100%; }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    li { padding-top: 9px; }
+    input[type="checkbox"] { margin-right: 4px; }
   }
 }
 

@@ -66,41 +66,37 @@ module Esper.Auth {
 <div #view>
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-welcome-modal">
-    <div class="esper-modal-header">
-      <div #title class="esper-modal-title"/>
-    </div>
+    <div class="esper-modal-header">Welcome to Esper</div>
     <div #about class="esper-about"/>
-    <div #footer class="esper-welcome-footer">
-      <a #disableLink class="esper-disable-link">
-        Disable Esper for this account
-      </a>
-      <button #enableButton class="esper-primary-btn esper-enable-btn">
+    <div class="esper-modal-footer esper-clearfix">
+      <button #enable class="esper-btn esper-btn-primary modal-primary">
         Enable
+      </button>
+      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
+      </button>
+      <button #disable class="esper-btn esper-btn-secondary modal-delete">
+        Disable for this account
       </button>
     </div>
   </div>
 </div>
 '''
-
-    function closeModal() {
-      view.remove();
-    }
-
-    title.text("Welcome to Esper");
-
-    enableButton
-      .click(function() {
-        closeModal();
-        openLoginTab(account.googleAccountId);
-      });
-
-    disableLink
-      .click(function() {
-        account.declined = true;
-        EsperStorage.saveAccount(account, closeModal);
-      });
+    function closeModal() { view.remove(); }
 
     background.click(closeModal);
+
+    enable.click(function() {
+      closeModal();
+      openLoginTab(account.googleAccountId);
+    });
+
+    cancel.click(closeModal);
+
+    disable.click(function() {
+      account.declined = true;
+      EsperStorage.saveAccount(account, closeModal);
+    });
 
     $("body").append(view);
   }

@@ -82,26 +82,62 @@ module Esper.TaskTab {
     return viewPerson;
   }
 
-  function pubInviteView(team, e, threadid, taskTab, profiles) {
+  function openDuplicateEventModal(team, e, threadid, taskTab, profiles) {
 '''
-<div #pubInvite class="esper-section esper-pub">
-  <div class="esper-section-header esper-clearfix open">
-    Public Duplicate
-  </div>
-  <div class="esper-section-container">
-    <p>Title: <input #pubTitle/></p>
-    <p>Calendar: <select #pubCalendar/></p>
-    <p>Location: <input #pubLocation/></p>
-    <p>Description: <textarea #pubDescription rows=5 cols=28 /></p>
-    <p>From: <select #fromSelect/></p>
-    <p>Guests:</p>
-    <ul #viewPeopleInvolved/>
-    <p align="right">
-      <button #discard>Discard</button><button #create>Create</button>
-    </p>
+<div #view>
+  <div #background class="esper-modal-bg"/>
+  <div #modal class="esper-modal esper-welcome-modal">
+    <div class="esper-modal-header">Create a duplicate event</div>
+    <div class="esper-ev-modal-content">
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Title</div>
+        <div class="esper-ev-modal-right">
+          <input #pubTitle type="text" class="esper-input"/>
+        </div>
+      </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Where</div>
+        <div class="esper-ev-modal-right">
+          <input #pubLocation type="text" class="esper-input"/>
+        </div>
+      </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Calendar</div>
+        <div class="esper-ev-modal-right">
+          <select #pubCalendar class="esper-select"/>
+        </div>
+      </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Created by</div>
+        <div class="esper-ev-modal-right">
+          <select #fromSelect class="esper-select"/>
+        </div>
+      </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Description</div>
+        <div class="esper-ev-modal-right">
+          <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
+        </div>
+      </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Guests</div>
+        <div class="esper-ev-modal-right"><ul #viewPeopleInvolved/></div>
+      </div>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #create class="esper-btn esper-btn-primary modal-primary">
+        Create
+      </button>
+      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+        Create
+      </button>
+    </div>
   </div>
 </div>
 '''
+    Sidebar.customizeSelectArrow(pubCalendar);
+    Sidebar.customizeSelectArrow(fromSelect);
+
     pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
     if (undefined !== e.description) {
       pubDescription.val(e.description);
@@ -148,11 +184,20 @@ module Esper.TaskTab {
     var peopleInvolved = [];
     var emailData = esperGmail.get.email_data();
     if (emailData !== undefined && emailData.first_email !== undefined) {
-      List.iter(emailData.people_involved, function(pair) {
-        var v = viewPersonInvolved(peopleInvolved, pair[1], pair[0]);
-        viewPeopleInvolved.append(v);
-      });
+      if (emailData.people_involved.length === 0) {
+        viewPeopleInvolved
+          .append($("<li class='esper-gray'>No guests found</li>"));
+      } else {
+        List.iter(emailData.people_involved, function(pair) {
+          var v = viewPersonInvolved(peopleInvolved, pair[1], pair[0]);
+          viewPeopleInvolved.append(v);
+        });
+      }
     }
+
+    function closeModal() { view.remove(); }
+
+    background.click(closeModal);
 
     create.click(function() {
       create.text("Creating...");
@@ -181,16 +226,15 @@ module Esper.TaskTab {
       };
       Api.createLinkedEvent(team.teamid, ev, threadid)
         .done(function(created) {
-          pubInvite.remove();
+          closeModal();
           Api.sendEventInvites(team.teamid, fromEmail, guests, created);
           refreshlinkedEventsList(team, threadid, taskTab, profiles);
         });
     });
-    discard.click(function() {
-      pubInvite.remove();
-    });
 
-    return pubInvite;
+    cancel.click(closeModal);
+
+    $("body").append(view);
   }
 
   export interface LinkOptionsView {
@@ -389,8 +433,7 @@ module Esper.TaskTab {
     })
 
     duplicateEvent.click(function() {
-      $(".esper-pub").remove();
-      view.append(pubInviteView(team, e, threadId, taskTab, profiles));
+      openDuplicateEventModal(team, e, threadId, taskTab, profiles);
     });
 
     unlinkEvent.click(function() {
