@@ -334,7 +334,7 @@ module Esper.CalPicker {
   <div #modal class="esper-modal esper-calendar-modal">
     <div class="esper-modal-header">
       <div #refreshCal title class="esper-calendar-modal-refresh">
-        <object #refreshCalIcon/>
+        <object #refreshCalIcon class="esper-svg"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>

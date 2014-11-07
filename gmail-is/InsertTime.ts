@@ -119,11 +119,11 @@ module Esper.InsertTime {
   <object #logo class="esper-composition-logo"/>
   <div class="esper-composition-vertical-divider"/>
   <div #insertButton title class="esper-composition-button">
-    <object #insertIcon class="esper-composition-button-icon"/>
+    <object #insertIcon class="esper-svg esper-composition-button-icon"/>
     <div #numLinkedEvents class="esper-composition-badge"/>
   </div>
   <div #createButton title class="esper-composition-button">
-    <object #createIcon class="esper-composition-button-icon"/>
+    <object #createIcon class="esper-svg esper-composition-button-icon"/>
   </div>
 </div>
 '''

@@ -282,7 +282,7 @@ module Esper.TaskTab {
         <span class="esper-click-safe esper-sync-option-text">
           Description Sync
         </span>
-        <object #info title class="esper-click-safe esper-info"/>
+        <object #info title class="esper-svg esper-click-safe esper-info"/>
         <input #syncCheckbox
                type="checkbox"
                class="esper-click-safe esper-sync-checkbox"/>
@@ -621,7 +621,8 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  export function displayLinkedThreadsList(task, threadId, taskTab: TaskTabView) {
+  export function displayLinkedThreadsList(task, threadId,
+                                           taskTab: TaskTabView) {
 '''
   <div #noThreads class="esper-no-events">No linked threads</div>
   <div #threadsList class="esper-events-list"/>
@@ -653,7 +654,8 @@ module Esper.TaskTab {
   export function refreshlinkedEventsList(team, threadId, taskTab, profiles) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayLinkedEventsList(team, threadId, taskTab, profiles, linkedEvents);
+        displayLinkedEventsList(team, threadId,
+                                taskTab, profiles, linkedEvents);
       });
   }
 
@@ -670,7 +672,8 @@ module Esper.TaskTab {
   export function refreshEventLists(team, threadId, taskTab, profiles) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayLinkedEventsList(team, threadId, taskTab, profiles, linkedEvents);
+        displayLinkedEventsList(team, threadId, taskTab,
+                                profiles, linkedEvents);
         displayRecentsList(team, threadId, taskTab, profiles, linkedEvents);
       });
   }
@@ -791,11 +794,12 @@ module Esper.TaskTab {
     refreshLinkedEvents: JQuery;
     refreshLinkedEventsIcon: JQuery;
     linkActions: JQuery;
+    createEvent: JQuery;
     createEventIcon: JQuery;
-    createEventToggle: JQuery;
+    createEventDropdown: JQuery;
+    calendarList: JQuery;
     linkEvent: JQuery;
     linkEventIcon: JQuery;
-    createEvent: JQuery;
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
@@ -818,7 +822,8 @@ module Esper.TaskTab {
 <div #view>
   <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
-    <input #taskTitle type="text" size="24" class="esper-input esper-task-name"/>
+    <input #taskTitle type="text" size="24"
+           class="esper-input esper-task-name"/>
     <ul #taskSearchDropdown
         class="esper-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
@@ -828,7 +833,8 @@ module Esper.TaskTab {
   </div>
   <div class="esper-tab-overflow">
     <div class="esper-section">
-      <div #linkedThreadsHeader class="esper-section-header esper-clearfix open">
+      <div #linkedThreadsHeader
+           class="esper-section-header esper-clearfix open">
         <span #showLinkedThreads
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Linked Threads</span>
@@ -856,22 +862,21 @@ module Esper.TaskTab {
       </div>
       <div #linkActions class="esper-section-actions esper-clearfix open">
         <div style="display:inline-block">
-          <div class="esper-link-action">
+          <div #createEvent
+               class="esper-link-action esper-dropdown-btn esper-click-safe">
             <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-            <div #createEventToggle
-                 class="esper-click-safe esper-dropdown-btn
-                        esper-clickable esper-link-action-text">
+            <div class="esper-link-action-text esper-click-safe">
               Create event
             </div>
           </div>
+          <ul #createEventDropdown class="esper-ul esper-create-event-dropdown">
+            <div #calendarList class="esper-dropdown-section"/>
+          </ul>
           <div class="esper-vertical-divider"/>
           <div #linkEvent class="esper-link-action">
             <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
             <div class="esper-link-action-text">Link event</div>
           </div>
-          <ul #createEvent class="esper-create-event-dropdown esper-ul">
-            <div class="esper-dropdown-section"/>
-          </ul>
         </div>
       </div>
       <div #linkedEventsContainer class="esper-section-container">
@@ -910,7 +915,8 @@ module Esper.TaskTab {
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
-    displayLinkedEventsList(team, threadId, taskTabView, profiles, linkedEvents);
+    displayLinkedEventsList(team, threadId, taskTabView,
+                            profiles, linkedEvents);
     displayRecentsList(team, threadId, taskTabView, profiles, linkedEvents);
 
     var apiGetTask = autoTask ?
@@ -993,13 +999,13 @@ module Esper.TaskTab {
       }
     });
 
-    createEventToggle.click(function() {
-      if (createEventToggle.hasClass("open")) {
+    createEvent.click(function() {
+      if (createEvent.hasClass("open")) {
         Sidebar.dismissDropdowns();
       } else {
         Sidebar.dismissDropdowns();
-        createEvent.toggle();
-        createEventToggle.addClass("open");
+        createEventDropdown.toggle();
+        createEvent.addClass("open");
       }
     });
 
@@ -1015,7 +1021,8 @@ module Esper.TaskTab {
               newTab.document.write(" done! Syncing thread to description...");
               Api.syncEvent(team.teamid, threadId, cal.google_cal_id, eventId)
                 .done(function() {
-                  refreshlinkedEventsList(team, threadId, taskTabView, profiles);
+                  refreshlinkedEventsList(team, threadId,
+                                          taskTabView, profiles);
                   var url = e.google_cal_url;
                   if (url !== null && url !== undefined)
                     newTab.location.assign(url);
@@ -1023,11 +1030,12 @@ module Esper.TaskTab {
             }
           });
       });
-      li.appendTo(createEvent);
+      li.appendTo(calendarList);
     });
 
     linkEvent.click(function() {
-      var searchModal = CalSearch.viewOfSearchModal(team, threadId, taskTabView, profiles);
+      var searchModal = CalSearch.viewOfSearchModal(team, threadId,
+                                                    taskTabView, profiles);
       $("body").append(searchModal.view);
       searchModal.search.focus();
     });

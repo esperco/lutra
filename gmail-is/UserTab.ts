@@ -16,7 +16,7 @@ module Esper.UserTab {
 <div #view class="esper-preference-section esper-contains-list esper-clearfix">
   <div class="esper-clearfix">
     <span #viewAvailability class="esper-preference-text esper-link">View</span>
-    <object #availabilityIcon class="esper-preference-icon"/>
+    <object #availabilityIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Availability</span>
   </div>
   <ul #availability class="esper-preference-list"/>
@@ -84,7 +84,7 @@ module Esper.UserTab {
 <div #view class="esper-preference-section esper-clearfix
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
-    <object #locationIcon class="esper-preference-icon"/>
+    <object #locationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Favorite locations</span>
   </div>
   <ul #locations class="esper-preference-list"/>
@@ -133,7 +133,7 @@ module Esper.UserTab {
 <div #view class="esper-preference-section esper-clearfix
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
-    <object #videoIcon class="esper-preference-icon"/>
+    <object #videoIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Usernames</span>
   </div>
   <ul #usernames class="esper-preference-list"/>
@@ -170,7 +170,7 @@ module Esper.UserTab {
 <div #view class="esper-preference-section
                   esper-clearfix esper-contains-list esper-last">
   <div class="esper-clearfix">
-    <object #phoneIcon class="esper-preference-icon"/>
+    <object #phoneIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Phone numbers</span>
   </div>
   <ul #phones class="esper-preference-list"/>
@@ -210,12 +210,12 @@ module Esper.UserTab {
 <div #view class="esper-meeting-preferences">
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
-    <object #durationIcon class="esper-preference-icon"/>
+    <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
-    <object #bufferIcon class="esper-preference-icon"/>
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Buffer time</span>
   </div>
 
@@ -244,7 +244,7 @@ module Esper.UserTab {
   function viewOfTransportationType(transportationType, last) {
 '''
 <li #view class="esper-transportation-type esper-clearfix">
-  <object #icon class="esper-transportation-icon"/>
+  <object #icon class="esper-svg esper-transportation-icon"/>
   <span #label class="esper-transportation-title"/>
 </li>
 '''
@@ -303,19 +303,19 @@ module Esper.UserTab {
   <div class="esper-preference-section">
     <div class="esper-clearfix">
       <span #viewMap class="esper-preference-text esper-link">Map</span>
-      <object #locationIcon class="esper-preference-icon"/>
+      <object #locationIcon class="esper-svg esper-preference-icon"/>
       <span class="esper-preference-title esper-bold">Address</span>
     </div>
     <div #address class="esper-preference-info"/>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
-    <object #durationIcon class="esper-preference-icon"/>
+    <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
-    <object #bufferIcon class="esper-preference-icon"/>
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Buffer time</span>
   </div>
 </div>

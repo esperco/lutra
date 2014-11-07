@@ -49,7 +49,7 @@ module Esper.Sidebar {
   function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
 '''
 <li #selector class="esper-click-safe esper-li">
-  <object #teamCheck class="esper-click-safe esper-team-checkmark"/>
+  <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
   <div #teamName class="esper-click-safe"/>
   <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
@@ -96,7 +96,8 @@ module Esper.Sidebar {
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
-      <object #logo class="esper-click-safe esper-dropdown-footer-logo"/>
+      <object #logo
+              class="esper-svg esper-click-safe esper-dropdown-footer-logo"/>
       <div class="esper-click-safe esper-dropdown-footer-links">
         <a href="http://esper.com/privacypolicy.html">Privacy</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
