@@ -203,7 +203,7 @@ module Settings {
     return view;
   }
 
-  export function load() {
+  function reallyLoad(root) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -256,8 +256,6 @@ module Settings {
   <div #footer/>
 </div>
 '''
-    var root = $("#settings-page");
-    root.children().remove();
     root.append(view);
     document.title = "Settings - Esper";
 
@@ -336,4 +334,12 @@ module Settings {
     }
   }
 
+  export function load() {
+    var root = $("#settings-page");
+    root.children().remove();
+    if (Login.data.missing_shared_calendar)
+      CalShare.load(root);
+    else
+      reallyLoad(root);
+  }
 }

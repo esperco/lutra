@@ -70,8 +70,10 @@ module ApiT {
   export interface LoginResponse {
     uid: string;
     api_secret: string;
+    is_admin: boolean;
     email: string;
     teams: Team[];
+    missing_shared_calendar: boolean;
   }
 
   export interface CalendarTime {
@@ -322,4 +324,12 @@ module ApiT {
     emails : string[];
   }
 
+  export interface CalendarAcl {
+    shared_emails: CalendarAclEntry[];
+  }
+
+  export interface CalendarAclEntry {
+    acl_id: string;
+    acl_email: string;
+  }
 }

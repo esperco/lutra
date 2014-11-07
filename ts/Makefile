@@ -56,6 +56,7 @@ TS_SOURCES = \
   ApiT \
   Api \
   CalPicker \
+  CalShare \
   Settings \
   Signin \
   Footer \
