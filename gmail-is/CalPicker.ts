@@ -52,6 +52,7 @@ module Esper.CalPicker {
     var calendars = Sidebar.currentTeam.team_calendars;
     writeToCalendar = calendars[0];
     showCalendars[writeToCalendar.google_cal_id] = {};
+    userSidebar.calendarsContainer.children().remove();
     List.iter(calendars, function(cal, i) {
 '''
 <div #calendarCheckboxRow class="esper-calendar-checkbox">
@@ -222,13 +223,15 @@ module Esper.CalPicker {
       }
     }
 
+    var calHeight = (window.innerHeight * 0.9) - 198;
+
     calendarView.fullCalendar({
       header: {
         left: 'prev,next today',
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
-      height: 400,
+      height: calHeight,
       defaultView: 'agendaWeek',
       snapDuration: "00:15:00",
       selectable: true,
@@ -368,6 +371,13 @@ module Esper.CalPicker {
       "position": { my: 'center bottom', at: 'center top-7' },
       "tooltipClass": "esper-top esper-tooltip"
     });
+
+    window.onresize = function(event) {
+      picker = createPicker(refreshCal, userInfo);
+      calendar.children().remove();
+      calendar.append(picker.view);
+      picker.render();
+    };
 
     background.click(closeModal);
     cancel.click(closeModal);

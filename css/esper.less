@@ -215,7 +215,6 @@ object.esper-svg { pointer-events: none; }
 
 /** Buttons **/
 
-button,
 .esper-btn {
   padding: 6px 16px 8px 16px;
   border-radius: 3px;
@@ -400,8 +399,7 @@ textarea.esper-input { resize: none; }
   color: white;
   background: @purple;
   cursor: default;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   &.esper-update {
     padding: 11px;
     background: @orange;
@@ -429,8 +427,7 @@ textarea.esper-input { resize: none; }
   margin: 6px 0;
   padding: 7px;
   cursor: pointer;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   .esper-dock-action-icon { opacity: 0.6; }
   &:hover {
     background: @purple_hover_light;
@@ -550,8 +547,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
     color: @purple;
     text-align: center;
     cursor: pointer;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
+    box-sizing: border-box;
     &.hover { color: @purple_hover; }
   }
   li.esper-active, li.esper-active:hover {
@@ -581,8 +577,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border: 1px solid @google_border_gray;
   border-bottom: none;
   border-top-right-radius: 3px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   .esper-tab { display:none; }
   .esper-tab.esper-active { display:block; }
 }
@@ -591,8 +586,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   height: 74px;
   padding: 10px;
   border-bottom: 1px solid @google_border_gray;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .esper-tab-overflow {
@@ -603,8 +597,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   padding: 15px 10px 0 10px;
   overflow-x: hidden;
   overflow-y: auto;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .esper-section { margin-bottom: 15px; }
@@ -980,8 +973,7 @@ ul.esper-ev-dropdown {
   padding: 5px 12px;
   background: @purple_bg;
   border-bottom: 1px solid #CFCFCF;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .esper-composition-logo {
@@ -1009,8 +1001,7 @@ ul.esper-ev-dropdown {
   border-radius: 3px;
   opacity: 0.5;
   cursor: default;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   &.esper-none:hover {
     background: @purple_bg;
     border: 1px solid @purple_bg;
@@ -1039,8 +1030,7 @@ ul.esper-ev-dropdown {
     color: white;
     font-size: 11px;
     text-align: center;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
+    box-sizing: border-box;
   }
 }
 
@@ -1079,14 +1069,14 @@ ul.esper-ev-dropdown {
   padding: 16px 14px;
   font-size: 18px;
   border-bottom: 1px solid @gray_10;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .esper-modal-footer {
   padding: 20px 15px;
   text-align: right;
   border-top: 1px solid @gray_10;
+  box-sizing: border-box;
   .modal-primary { float: right; }
   .modal-cancel {
     float: right;
@@ -1229,9 +1219,15 @@ ul.esper-ev-dropdown {
 @calendar_width: 80%;
 
 .esper-calendar-modal {
-  margin-left: -@calendar_width/2;
+  top: 5%;
   width: @calendar_width;
-  top: 10%;
+  height: 90%;
+  margin-left: -@calendar_width/2;
+  .esper-modal-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
 }
 
 .esper-calendar-modal-refresh {
@@ -1261,7 +1257,7 @@ ul.esper-ev-dropdown {
 .esper-calendar-modal-grid {
   width: calc(~"100% - 247px");
   margin-left: 247px;
-  .fc-toolbar { margin: 10px; }
+  .fc-toolbar { margin-bottom: 10px; }
   .esper-calendar-modal-event-settings {
     padding: 10px;
     font-size: 13px;

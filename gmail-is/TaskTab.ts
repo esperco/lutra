@@ -129,7 +129,7 @@ module Esper.TaskTab {
         Create
       </button>
       <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-        Create
+        Cancel
       </button>
     </div>
   </div>
