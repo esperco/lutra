@@ -153,9 +153,9 @@ module Esper.Sidebar {
     }
     teamName.text(name);
     if (isCorrectTeam)
-      teamName.removeClass("esper-team-name-danger");
+      view.removeClass("esper-team-danger");
     else
-      teamName.addClass("esper-team-name-danger");
+      view.addClass("esper-team-danger");
 
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
