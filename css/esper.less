@@ -28,6 +28,7 @@
 @orange: #f7941e;
 @orange_bg: #f4e3d3;
 @orange_hover: #e87400;
+@orange_hover_light: #efba7a;
 @purple: #a25cc6;
 @purple_logo: #7D419C;
 @purple_active: #7d3ca0;
@@ -75,6 +76,14 @@
 
 a { text-decoration: none; }
 
+hr.esper-hr {
+  margin: 20px 0;
+  border-top: 1px solid @gray_10;
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
+}
+
 ul.esper-ul, li.esper-li { list-style-type: none; }
 
 ul.esper-ul {
@@ -82,6 +91,7 @@ ul.esper-ul {
   padding: 0;
   background: white;
   border: 1px solid @google_border_gray;
+  border-radius: 3px;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   .esper-ul-divider {
@@ -93,9 +103,9 @@ ul.esper-ul {
 
 .esper-dropdown-section { padding: 7px 0; }
 
-.esper-create-event-dropwdown {
+.esper-create-event-dropdown {
   position : absolute;
-  top : 75px;
+  margin: 20px 0 0 0;
 }
 
 li.esper-li, a.esper-a {
@@ -128,7 +138,32 @@ li.esper-li, a.esper-a {
   &.esper-selected:hover { color: black; }
 }
 
+select.esper-select {
+  float: left;
+  height: 32px;
+  padding: 6px 20px 6px 9px;
+  line-height: 1.2;
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  border: 1px solid #C5C5C5;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:disabled { pointer-events: none; }
+  &:hover {
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+}
+
+object.esper-svg { pointer-events: none; }
+
 .esper-bold { font-weight: bold; }
+
+.esper-gray { color: @gray_40; }
 
 .esper-link {
   color: @purple;
@@ -163,14 +198,8 @@ li.esper-li, a.esper-a {
   float: left;
   width: 1px;
   height: 16px;
-  margin: 4px;
+  margin: 4px 5px;
   background: @gray_20;
-}
-
-.esper-svg { pointer-events: none; }
-.esper-svg-block {
-  display: block;
-  pointer-events: none;
 }
 
 .esper-clearfix:before,
@@ -186,21 +215,84 @@ li.esper-li, a.esper-a {
 
 /** Buttons **/
 
-.esper-primary-btn {
-  background: linear-gradient(@purple, @purple_hover);
-  border: 1px solid @google_border_gray;
+button,
+.esper-btn {
+  padding: 6px 16px 8px 16px;
   border-radius: 3px;
+  font-size: 13px;
+  &:disabled {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  &:focus { outline: 0 !important; }
+}
+.esper-btn-primary {
   color: white;
-  font-weight: 300;
-  height: 30px;
-  line-height: 0.8;
-  outline: none;
-  padding: 0 20px;
-  cursor: pointer;
-  &:hover { background: linear-gradient(@purple_gradient, @purple_hover); }
-  &:active { background: linear-gradient(@purple_active, @purple_hover); }
+  background-image: -webkit-linear-gradient(top, #A75FCC 0%, #9C59BF 100%);
+  background-image:         linear-gradient(top, #A75FCC 0%, #9C59BF 100%);
+  border: 1px solid #70348F;
+  &:hover {
+    color: white;
+    background-image: -webkit-linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    background-image:         linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    color: white;
+    background-image: -webkit-linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    background-image:         linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+  }
+}
+.esper-btn-secondary {
+  color: @purple_text;
+  background-image: -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  background-image:         linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  border: 1px solid #C5C5C5;
+  &:hover {
+    color: @purple_text;
+    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    color: @purple_text;
+    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
 }
 
+
+/** Input **/
+.esper-input {
+  padding: 0 8px;
+  color: @purple_text;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  box-sizing: border-box;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+input.esper-input { height: 32px; }
+textarea.esper-input { resize: none; }
 
 /* Esper Menu (Dropdown) */
 
@@ -215,6 +307,8 @@ li.esper-li, a.esper-a {
 
 .esper-menu-logo {
   float: left;
+  width: 16px;
+  height: 20px;
   &.esper-menu-white {
     margin: 5px 6px 2px 6px;
   }
@@ -244,7 +338,7 @@ li.esper-li, a.esper-a {
   z-index: 12;
   position: absolute;
   left: 3px;
-  margin-top: 33px;
+  margin-top: 31px;
 }
 
 .esper-menu-dropdown {
@@ -265,6 +359,13 @@ li.esper-li, a.esper-a {
   position: absolute;
   right: 14px;
   bottom: 0;
+  &.esper-team-danger {
+    .esper-dock { background: @orange; }
+    .esper-dock-wrap-left { border-color: transparent transparent @orange_hover transparent; }
+    .esper-dock-wrap-right { border-color: transparent transparent transparent @orange_hover; }
+    .esper-dock-action:hover { background: @orange_hover_light; }
+    .esper-options.open { background: @orange_hover_light; }
+  }
 }
 
 .esper-dock-wrap {
@@ -366,24 +467,26 @@ li.esper-li, a.esper-a {
   margin: 0 20px 0 0;
 }
 
-.esper-team-list-checkmark {
+.esper-team-checkmark {
   float: right;
+  width: 12px;
+  height: 11px;
   margin-top: 6px;
 }
 
-.esper-team-list-exec {
+.esper-team-exec-email {
   color: @gray_60;
   font-size: 11px;
 }
 
-li.esper-li:hover .esper-team-list-exec { color: white; }
-li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
+li.esper-li:hover .esper-team-exec-email { color: white; }
+li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 
 .esper-dropdown-footer { padding: 10px 16px; }
 
 .esper-dropdown-footer-logo {
-  opacity: 0.7;
-  &:hover { opacity: 1; }
+  width: 12px;
+  height: 15px;
 }
 
 .esper-dropdown-footer-links {
@@ -430,34 +533,37 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 
 .esper-tab-links {
   display: inline-block;
+  width: 100%;
   margin: 1px 0 0 0;
   padding: 0;
-  border-bottom: 1px solid @gray_20;
   li {
-    float:left;
-    list-style:none;
-  }
-  li {
-    width: 83px;
+    float: left;
+    list-style: none;
+    width: 80px;
     height: 34px;
     display: inline-block;
-    margin: 0 0 -1px -1px;
-    padding: 6px 7px;
-    border: 1px solid @google_border_gray;
+    margin: 0 -1px 0 0;
+    padding: 8px;
     background: white;
+    border: 1px solid @purple_disabled;
+    border-bottom: 1px solid @google_border_gray;
     color: @purple;
     text-align: center;
+    cursor: pointer;
     -webkit-box-sizing: border-box;
             box-sizing: border-box;
-    .esper-tab-icon { opacity: 0.2; }
-    &:hover .esper-tab-icon { opacity: 0.5; }
+    &.hover { color: @purple_hover; }
   }
   li.esper-active, li.esper-active:hover {
     color: @purple_text;
-    background: @google_border_gray;
+    border: 1px solid @google_border_gray;
+    border-bottom: 1px solid white;
     cursor: default;
     .esper-tab-icon { opacity: 1; }
   }
+  li.esper-active + li { border-left: 1px solid @gray_20; }
+  .esper-first { border-top-left-radius: 3px; }
+  .esper-last { border-top-right-radius: 3px; }
   &:after {
     display:block;
     clear:both;
@@ -468,41 +574,95 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 .esper-tab-content {
   position: absolute;
   z-index: 1;
-  overflow-y: auto;
   width: 100%;
   top: 34px;
   bottom: 36px;
-  padding: 15px 10px;
   background: white;
-  border-right: 1px solid @google_border_gray;
-  border-left: 1px solid @google_border_gray;
+  border: 1px solid @google_border_gray;
+  border-bottom: none;
+  border-top-right-radius: 3px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   .esper-tab { display:none; }
   .esper-tab.esper-active { display:block; }
 }
 
-.esper-section {
-  margin-bottom: 15px;
+.esper-tab-header {
+  height: 74px;
+  padding: 10px;
+  border-bottom: 1px solid @google_border_gray;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
+
+.esper-tab-overflow {
+  position: absolute;
+  width: 100%;
+  top: 74px;
+  bottom: 0;
+  padding: 15px 10px 0 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.esper-section { margin-bottom: 15px; }
 
 .esper-section-header {
   padding: 10px;
   background: @gray_f5;
   border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  &.open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 }
 
 .esper-section-actions {
-  padding: 7px 5px 4px 5px;
+  padding: 7px 0px 2px 0px;
   text-align: center;
   background: @purple_bg;
   border: 1px solid @google_border_gray;
   border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  &.open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+.esper-section-selector {
+  padding: 7px 10px;
+  background: @purple_bg;
+  border-bottom: 1px solid @google_border_gray;
+}
+
+.esper-show-selector {
+  float: left;
+  margin: 9px 5px 0 0;
 }
 
 .esper-section-container {
   border: 1px solid @google_border_gray;
   border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+
+/** Sidebar Task Management **/
+
+.esper-task-name { width: 100%; }
+
+.esper-task-search-dropdown {
+  z-index: 2;
+  position: absolute;
+  width: 225px;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 
@@ -510,6 +670,8 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
 
 .esper-refresh {
   float: left;
+  width: 16px;
+  height: 13px;
   padding-left: 8px;
   &.esper-disabled {
     opacity: 0.5;
@@ -525,14 +687,16 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
   cursor: pointer;
   .esper-link-action-icon-container {
     float: left;
-    width: 20px;
-    height: 20px;
     padding: 3px;
     border: 1px solid @purple;
     border-radius: 100%;
     box-sizing: border-box;
   }
-  .esper-link-action-icon { float: left; }
+  .esper-link-action-icon {
+    float: left;
+    width: 16px;
+    height: 16px;
+  }
   .esper-link-action-text {
     margin: 1px 0 0 21px;
     font-weight: bold;
@@ -579,6 +743,10 @@ li.esper-li.esper-selected:hover .esper-team-list-exec { color: @gray_60; }
     cursor: default;
     border-radius: 12px;
     box-sizing: border-box;
+    .esper-linked-check {
+      width: 12px;
+      height: 11px;
+    }
   }
 }
 
@@ -648,6 +816,7 @@ ul.esper-ev-dropdown {
   position: absolute;
   right: 0;
   margin: 14px 16px 22px 22px;
+  border-radius: 3px;
 }
 
 .esper-sync-option {
@@ -664,6 +833,8 @@ ul.esper-ev-dropdown {
 
 .esper-info {
   float: left;
+  width: 14px;
+  height: 14px;
   opacity: 0.5;
   &:hover { opacity: 1; }
 }
@@ -680,44 +851,212 @@ ul.esper-ev-dropdown {
 }
 
 
-/** Other Tabs **/
+/** Sidebar Preferences **/
 
-.esper-coming-soon {
-  padding: 100px 16px;
-  text-align: center;
+.esper-profile-pic {
+  float: left;
+  width: 44px;
+  height: 44px;
+  margin-top: 5px;
+  background: @gray_10;
+  background-size: 100% 100%;
+  border-radius: 100%;
 }
 
-.esper-coming-soon-text {
-  margin-top: 40px;
-  font-size: 16px;
-  color: @gray_30;
+.esper-profile-row {
+  margin-left: 54px;
+  padding: 3px 0;
 }
+
+.esper-profile-name-row { padding-top: 10px; }
+
+.esper-profile-name {
+  float: left;
+  font-size: 15px;
+}
+
+.esper-profile-email { font-size: 11px; }
+
+.esper-membership-badge {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 2px;
+  &.active { background: @gray_20; }
+  &.free-trial {
+    background: @green;
+    color: white;
+  }
+  &.suspended {
+    background: @orange;
+    color: white;
+  }
+}
+
+.esper-workplace-preferences,
+.esper-meeting-preferences {
+  padding: 0 10px;
+}
+
+.esper-preference-section {
+  padding: 12px 0;
+  border-bottom: 1px solid @gray_20;
+  &.esper-contains-list { padding-bottom: 4px; }
+  &.esper-last { border-bottom: none; }
+}
+
+.esper-preference-icon {
+  float: left;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-preference-title {
+  float: left;
+  margin: 2px 0 0 7px;
+}
+
+.esper-preference-text {
+  float: right;
+  margin-top: 2px;
+}
+
+.esper-preference-info { margin-left: 27px; }
+
+.esper-preference-list {
+  margin: 0;
+  padding: 0 10px 0 27px;
+  list-style: none;
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid @gray_10;
+    &.esper-empty-list {
+      color: @gray_20;
+      border-bottom: none;
+    }
+    &.esper-last { border-bottom: none; }
+  }
+}
+
+.esper-favorite-location-name { margin-right: 35px; }
+
+.esper-transportation-preferences {
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+  li { border-bottom: 1px solid @google_border_gray; }
+  li.esper-last { border-bottom: none; }
+}
+
+.esper-transportation-type {
+  padding: 5px 0;
+}
+
+.esper-transportation-icon {
+  float: left;
+  width: 36px;
+  height: 36px;
+  opacity: 0.4;
+}
+
+.esper-transportation-title {
+  float: left;
+  margin: 10px;
+  font-size: 14px;
+}
+
+.esper-preferences-notes {
+  margin: 0;
+  padding: 10px;
+  font-family: "Arial";
+}
+
 
 /** Composition Toolbar **/
 
 .esper-composition-toolbar {
-  padding : 4px 10px 0px;
+  height: 43px;
+  padding: 5px 12px;
+  background: @purple_bg;
+  border-bottom: 1px solid #CFCFCF;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
 
-  img { /* Esper logo */
-    position : relative;
-    top : 2px;
+.esper-composition-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  margin: 5px 5px 0 0;
+}
+
+.esper-composition-vertical-divider {
+  float: left;
+  width: 1px;
+  height: 20px;
+  margin: 6px 10px;
+  background: @gray_20;
+}
+
+.esper-composition-button {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin: 0 3px;
+  padding: 4px;
+  border: 1px solid @purple_bg;
+  border-radius: 3px;
+  opacity: 0.5;
+  cursor: default;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  &.esper-none:hover {
+    background: @purple_bg;
+    border: 1px solid @purple_bg;
+    opacity: 0.5;
   }
-
-  span { /* x linked events */
-    display : inline-block;
-    text-align : center;
-    width : 15em;
+  &:hover {
+    background: linear-gradient(white, @purple_bg);
+    border: 1px solid #C6C6C6;
+    opacity: 1;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
-
-  button { /* insert */
-    color : white;
-    font-weight : bold;
-    background : @purple_logo;
-    border-radius : 4px;
+  object {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+  }
+  .esper-composition-badge {
+    position: absolute;
+    min-width: 14px;
+    height: 14px;
+    margin: 10px 0 0 10px;
+    padding: 1px 3px;
+    background: @purple;
+    border-radius: 7px;
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
   }
 }
 
+
 /** Modals **/
+
+.esper-modal-bg {
+  z-index: 6;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: white;
+  opacity: 0.8;
+}
 
 .esper-modal {
   /* geometry */
@@ -728,50 +1067,35 @@ ul.esper-ev-dropdown {
 
   /* appearance */
   outline: none;
-  background: #fbfafc;
-  opacity: 1;
-  border: 1px solid @google_border_gray;
-  webkit-box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.esper-modal-bg {
-  z-index: 6;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  background: black;
-  opacity: 0.5;
+  background: white;
+  border: 1px solid @gray_30;
+  border-radius: 5px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+          box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
 }
 
 .esper-modal-header {
-  background: @gray_90;
-  color: white;
-  margin: -1px -1px 0 -1px;
+  height: 52px;
+  padding: 16px 14px;
+  font-size: 18px;
+  border-bottom: 1px solid @gray_10;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
-.esper-modal-close-container {
-  float: right;
-  height: 10px;
-  width: 10px;
-  margin: 6px 5px;
-  padding: 7px;
-  cursor: pointer;
-  .esper-modal-close-icon {
+.esper-modal-footer {
+  padding: 20px 15px;
+  text-align: right;
+  border-top: 1px solid @gray_10;
+  .modal-primary { float: right; }
+  .modal-cancel {
+    float: right;
+    margin-right: 6px;
+  }
+  .modal-delete {
     float: left;
-    opacity: 0.6;
+    color: @red !important;
   }
-  &:hover {
-    background: #737373;
-    .esper-modal-close-icon { opacity: 1; }
-  }
-}
-
-.esper-modal-title {
-  font-size: 14px;
-  padding: 10px 12px;
 }
 
 
@@ -786,29 +1110,23 @@ ul.esper-ev-dropdown {
 
 .esper-about {
   width: 100%;
-  height: 300px;
-  background: @gray_10;
+  height: 224px;
+  padding: 15px;
+  background: @gray_f8;
+  box-sizing: border-box;
 }
 
-.esper-welcome-footer {
-  padding: 10px;
-}
-
-.esper-disable-link {
+.esper-about-text {
   float: left;
-  padding-top: 8px;
-  font-size: 12px;
-  color: @gray_40;
-  cursor: pointer;
-  &:hover {
-    color: @gray_60;
-    text-decoration: underline;
-  }
+  width: 160px;
+  margin: 40px 0 0 15px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.esper-enable-btn {
+.esper-sidebar-screenshot {
   float: right;
-  margin-bottom: 10px;
+  margin-top: 15px;
 }
 
 
@@ -821,55 +1139,31 @@ ul.esper-ev-dropdown {
   width: @search_width;
 }
 
-.esper-searchbox {
-  width: @search_width - 78px;
-  background-color: white !important;
-  border: none;
-  border-top: 1px solid #d8d8d8;
-  border-bottom: 1px solid #d8d8d8;
-  margin-bottom: 12px;
-  padding: 15px 10px 15px 40px;
-  outline: none;
-  &::-webkit-input-placeholder {
-    color: @gray_30;
+.esper-modal-content { padding: 10px; }
+
+.esper-search-modal-input {
+  width: 100%;
+  padding-left: 30px;
+}
+
+.esper-ev-search-dropdown {
+  z-index: 2;
+  position: absolute;
+  width: calc(~"100% - 20px");
+  margin: 0;
+  box-sizing: border-box;
+  .esper-no-results {
+    padding: 20px 10px;
+    color: @gray_20;
+    text-align: center;
   }
-}
-
-.esper-clear-search-container {
-  float: right;
-  background: white;
-  border-top: 1px solid #d8d8d8;
-  border-bottom: 1px solid #d8d8d8;
-  height: 32px;
-  padding: 16px 16px 0 0;
-}
-
-.esper-clear-search {
-  visibility: hidden;
-  opacity: 0.5;
-  cursor: pointer;
-  &:hover { opacity: 1; }
-}
-
-.esper-search-results {
-  height: 240px;
-  background: white;
-  border: 1px solid @google_border_gray;
-  border-radius: 2px;
-  margin: 0 15px;
-  overflow-y:auto;
-}
-
-.esper-search-instructions {
-  margin: 101px 80px;
-  color: @gray_30;
-  text-align: center;
 }
 
 .esper-ev-result {
   padding: 14px 14px 16px 14px;
   border-bottom: 1px solid #d8d8d8;
   cursor: default;
+  &.esper-last { border-bottom: none; }
   .esper-ev-title, .esper-ev-times { margin-right: 74px; }
   .esper-link-event {
     float: right;
@@ -886,36 +1180,104 @@ ul.esper-ev-dropdown {
     color: @gray_30;
     cursor: default;
     margin-top: 10px;
+    .esper-linked-check {
+      width: 12px;
+      height: 11px;
+    }
   }
 }
 
-.esper-search-stats {
-  margin: 20px 20px 40px 20px;
-  color: @gray_30;
-  text-align: center;
-}
 
-.esper-search-stats.esper-no-events { margin-top: 110px; }
+/** Duplicate Event Modal **/
 
-.esper-search-footer {
-  height: 30px;
+.esper-ev-modal-content {
+  max-height: 372px;
   padding: 10px 15px;
+  overflow-y: auto;
 }
 
-.esper-search-footer-logo { margin-top: 5px; }
+.esper-ev-modal-row {
+  margin: 10px 0;
+  font-size: 13px;
+}
 
-.esper-done-btn { float: right; }
+.esper-ev-modal-left {
+  float: left;
+  width: 20%;
+  padding: 9px 9px 0 0;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.esper-ev-modal-right {
+  float: left;
+  width: 80%;
+  box-sizing: border-box;
+  input[type="text"], textarea { width: 100%; }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    li { padding-top: 9px; }
+    input[type="checkbox"] { margin-right: 4px; }
+  }
+}
 
 
 /** Calendar Picker Modal **/
 
-@calendar_width: 800px;
+@calendar_width: 80%;
 
 .esper-calendar-modal {
   margin-left: -@calendar_width/2;
   width: @calendar_width;
   top: 10%;
 }
+
+.esper-calendar-modal-refresh {
+  float: right;
+  width: 22px;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.7;
+  &:hover { opacity: 1; }
+}
+
+.esper-calendar-modal-preferences {
+  position: absolute;
+  top: 53px;
+  bottom: 73px;
+  left: 0;
+  width: 247px;
+  font-size: 13px;
+  background: white;
+  border-right: 1px solid @gray_10;
+  .esper-calendar-checkbox {
+    padding: 10px;
+    span { margin-left: 2px; }
+  }
+}
+
+.esper-calendar-modal-grid {
+  width: calc(~"100% - 247px");
+  margin-left: 247px;
+  .fc-toolbar { margin: 10px; }
+  .esper-calendar-modal-event-settings {
+    padding: 10px;
+    font-size: 13px;
+    background: @gray_f8;
+    border-bottom: 1px solid @gray_10;
+    .esper-event-settings-col {
+      float: left;
+      width: 50%;
+      span {
+        float: left;
+        margin: 8px 8px 0 0;
+      }
+    }
+  }
+}
+
 
 /** Tooltip **/
 
@@ -977,7 +1339,14 @@ ul.esper-ev-dropdown {
   border-radius: 100%;
   -webkit-animation: scaleout 1.0s infinite ease-in-out;
           animation: scaleout 1.0s infinite ease-in-out;
+  &.esper-tab-header-spinner { display: block; }
   &.esper-list-spinner { display: block; }
+}
+
+.esper-tab-header-spinner {
+  margin: 27px auto;
+  width: 20px;
+  height: 20px;
 }
 
 .esper-list-spinner {
@@ -987,7 +1356,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-search-spinner {
-  margin: 110px auto;
+  margin: 19px auto;
   width: 20px;
   height: 20px;
 }

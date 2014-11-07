@@ -19,36 +19,26 @@ module Esper.CalPicker {
   interface PickerView {
     view : JQuery;
     calendarPickerContainer : JQuery;
-    calendarSidebar : JQuery;
     dateJumper : JQuery;
-    pickerSwitcher : JQuery;
-    showCalCheckboxes : JQuery;
-    refreshCal : JQuery;
-    refreshCalIcon : JQuery;
     eventTitle : JQuery;
+    pickerSwitcher : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
   }
 
-  function createView() : PickerView {
+  function createView(refreshCal, userSidebar) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
-    <div #calendarSidebar class="esper-cal-sidebar">
-      <div #dateJumper class="esper-date-jumper" style="display: none"/>
-      <div class="esper-cal-picker-switcher">
-        Write to calendar: <select #pickerSwitcher/>
+    <div #dateJumper class="esper-date-jumper" style="display: none"/>
+    <div class="esper-calendar-modal-event-settings esper-clearfix">
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Event title:</span>
+        <input #eventTitle type="text" size="24" class="esper-input"/>
       </div>
-      <div #showCalCheckboxes>Show calendars: </div>
-      <div>
-        <span style="float: left">Refresh calendar:</span>
-        <div #refreshCal class="esper-refresh esper-clickable">
-          <object #refreshCalIcon class="esper-svg"/>
-        </div>
-      </div>
-      <br/>
-      <div class="esper-cal-event-title">
-        Event title: <input #eventTitle type="text" size=64/>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Save events to:</span>
+        <select #pickerSwitcher class="esper-select"/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -63,27 +53,35 @@ module Esper.CalPicker {
     writeToCalendar = calendars[0];
     showCalendars[writeToCalendar.google_cal_id] = {};
     List.iter(calendars, function(cal, i) {
-      var box = $("<input type='checkbox'>");
-      if (i === 0) box.prop("checked", true);
-      box.click(function() {
+'''
+<div #calendarCheckboxRow class="esper-calendar-checkbox">
+  <input #calendarCheckbox type="checkbox"/>
+  <span #calendarName/>
+</div>
+'''
+      if (i === 0) calendarCheckbox.prop("checked", true);
+      calendarCheckbox.click(function() {
         if (this.checked) showCalendars[cal.google_cal_id] = {};
         else delete showCalendars[cal.google_cal_id];
         calendarView.fullCalendar("refetchEvents");
       });
-      box.appendTo(showCalCheckboxes);
-      $("<span>" + cal.calendar_title + "</span>").insertAfter(box);
+      calendarName.text(cal.calendar_title);
+      calendarCheckboxRow.appendTo(userSidebar.calendarsContainer);
     });
+    userSidebar.calendarsSection.show();
 
-    var title =
-      CalTab.currentTask !== undefined ?
-      CalTab.currentTask.task_title :
-      esperGmail.get.email_subject();
-    eventTitle.val("HOLD: " + title);
-    refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshCal.click(function() {
       refreshCache = true;
       calendarView.fullCalendar("refetchEvents");
     });
+
+    var title =
+      TaskTab.currentTask !== undefined ?
+      TaskTab.currentTask.task_title :
+      esperGmail.get.email_subject();
+    eventTitle.val("HOLD: " + title);
+
+    Sidebar.customizeSelectArrow(pickerSwitcher);
 
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
@@ -265,8 +263,8 @@ module Esper.CalPicker {
   /*
     Create date and time picker using user's calendar.
   */
-  function createPicker() : Picker {
-    var pickerView = createView();
+  function createPicker(refreshCal, userSidebar) : Picker {
+    var pickerView = createView(refreshCal, userSidebar);
     setupCalendar(pickerView);
 
     function render() {
@@ -335,32 +333,46 @@ module Esper.CalPicker {
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-calendar-modal">
     <div class="esper-modal-header">
-      <div #close class="esper-modal-close-container">
-        <object #closeIcon class="esper-svg esper-modal-close-icon"/>
+      <div #refreshCal title class="esper-calendar-modal-refresh">
+        <object #refreshCalIcon class="esper-svg"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #modalBody/>
-    <div class="esper-search-footer">
-      <button #done class="esper-primary-btn esper-done-btn">Done</button>
-      <object #modalLogo class="esper-svg esper-search-footer-logo"/>
+    <div #userSidebar class="esper-calendar-modal-preferences"/>
+    <div #calendar class="esper-calendar-modal-grid"/>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #save class="esper-btn esper-btn-primary modal-primary">
+        Save
+      </button>
+      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
+      </button>
     </div>
   </div>
 </div>
 '''
     function closeModal() { view.remove(); }
 
-    title.text("Select meeting times");
-    modalLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
-    closeIcon.attr("data", Init.esperRootUrl + "img/close.svg");
+    refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    title.text("Create linked events");
 
-    var picker = createPicker();
-    modalBody.append(picker.view);
+    var userInfo = UserTab.viewOfUserTab(Sidebar.currentTeam, Sidebar.profiles);
+    var picker = createPicker(refreshCal, userInfo);
+    calendar.append(picker.view);
+    userSidebar.append(userInfo.view);
+
+    refreshCal.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      "content": "Refresh calendars",
+      "position": { my: 'center bottom', at: 'center top-7' },
+      "tooltipClass": "esper-top esper-tooltip"
+    });
 
     background.click(closeModal);
-    close.click(closeModal);
+    cancel.click(closeModal);
 
-    done.click(function() {
+    save.click(function() {
       var events = [];
       for (var k in picker.events)
         events.push(makeEventEdit(picker.events[k], picker.eventTitle));
@@ -376,11 +388,11 @@ module Esper.CalPicker {
 
       closeModal();
       if (events.length > 0) {
-        CalTab.currentCalTab.linkedList.children().remove();
-        CalTab.currentCalTab.linkedSpinner.show();
+        TaskTab.currentTaskTab.linkedEventsList.children().remove();
+        TaskTab.currentTaskTab.linkedEventsSpinner.show();
       }
       Promise.join(linkCalls).done(function(linkedEvents) {
-        if (events.length > 0) CalTab.refreshLinkedEvents();
+        if (events.length > 0) TaskTab.refreshLinkedEventsAction();
 
         // Don't wait for sync
         var syncCalls =

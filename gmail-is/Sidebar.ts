@@ -4,9 +4,20 @@
 module Esper.Sidebar {
   export var currentThreadId : string;
   export var currentTeam : ApiT.Team;
+  export var profiles : ApiT.Profile[];
 
-  // Profiles of everyone on all the viewer's teams
-  var profiles : ApiT.Profile[];
+  export function customizeSelectArrow(selector) {
+    var imageUrl = Init.esperRootUrl + "img/select-arrow.svg";
+    selector.css("background-image", "url(" + imageUrl + ")");
+  }
+
+  export function toggleList(container) {
+    if (container.css("display") === "none") {
+      container.slideDown("fast");
+    } else {
+      container.slideUp("fast");
+    }
+  }
 
   export function dismissDropdowns() {
     $(".esper-ul").hide();
@@ -25,6 +36,7 @@ module Esper.Sidebar {
   }
 
   function insertEsperRoot() {
+    Gmail.removeWebClipBanner();
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
     if (anchor.length === 1) {
@@ -37,22 +49,22 @@ module Esper.Sidebar {
   function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
 '''
 <li #selector class="esper-click-safe esper-li">
-  <object #teamListCheck class="esper-click-safe esper-team-list-checkmark"/>
-  <div #teamListName class="esper-click-safe esper-team-list-name"/>
-  <div #teamListExec class="esper-click-safe esper-team-list-exec"/>
+  <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
+  <div #teamName class="esper-click-safe"/>
+  <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
     var exec = List.find(profiles, function(prof) {
       return prof.profile_uid === team.team_executive;
     });
-    teamListName.text(team.team_name);
-    teamListExec.text(exec.display_name);
+    teamName.text(team.team_name);
+    teamExecEmail.text(exec.email);
 
     if (team.teamid === myTeamId) {
       selector.addClass("esper-selected");
-      teamListCheck.attr("data", Init.esperRootUrl + "img/check.svg");
+      teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
     } else {
-      teamListCheck.hide();
+      teamCheck.hide();
       selector.click(function() { onTeamSwitch(team); });
     }
 
@@ -71,9 +83,9 @@ module Esper.Sidebar {
   </div>
   <ul #dropdown class="esper-ul esper-options-menu">
     <div #teamsSection class="esper-dropdown-section">
-      <li class="esper-click-safe esper-li
+      <li class="esper-click-safe esper-li esper-bold
                  esper-disabled esper-team-list-title">
-        TEAMS
+        Users
       </li>
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
@@ -84,9 +96,8 @@ module Esper.Sidebar {
     </div>
     <div class="esper-click-safe esper-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
-      <a href="http://esper.com">
-        <object #footerLogo class="esper-click-safe esper-footer-logo"/>
-      </a>
+      <object #logo
+              class="esper-svg esper-click-safe esper-dropdown-footer-logo"/>
       <div class="esper-click-safe esper-dropdown-footer-links">
         <a href="http://esper.com/privacypolicy.html">Privacy</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
@@ -142,18 +153,18 @@ module Esper.Sidebar {
     }
     teamName.text(name);
     if (isCorrectTeam)
-      teamName.removeClass("esper-team-name-danger");
+      view.removeClass("esper-team-danger");
     else
-      teamName.addClass("esper-team-name-danger");
+      view.addClass("esper-team-danger");
 
-    footerLogo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
+    logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
     options.tooltip({
       show: { delay: 500, effect: "none" },
       hide: { effect: "none" },
       "content": "Options",
       "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "top esper-tooltip"
+      "tooltipClass": "esper-top esper-tooltip"
     });
 
     size.tooltip({
@@ -161,7 +172,7 @@ module Esper.Sidebar {
       hide: { effect: "none" },
       "content": "Minimize",
       "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "top esper-tooltip"
+      "tooltipClass": "esper-top esper-tooltip"
     });
 
     function toggleOptions() {
@@ -216,26 +227,18 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li #tab1 class="esper-active esper-first">
-        <object #calendar class="esper-svg esper-tab-icon"/>
-      </li>
-      <li #tab2>
-        <object #polls class="esper-svg esper-tab-icon"/>
-      </li>
-      <li #tab3 class="esper-last">
-        <object #person class="esper-svg esper-tab-icon"/>
-      </li>
+      <li #tab1 class="esper-active esper-first">Task</li>
+      <li #tab2 class="esper-last">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
     <div #content1 class="esper-tab esper-active"/>
     <div #content2 class="esper-tab"/>
-    <div #content3 class="esper-tab"/>
   </div>
 </div>
 '''
-    var tabs = [tab1, tab2, tab3];
-    var tabContents = [content1, content2, content3];
+    var tabs = [tab1, tab2];
+    var tabContents = [content1, content2];
 
     function switchTab(on: number, off: number[]) {
       List.iter(off, function(i) {
@@ -247,23 +250,14 @@ module Esper.Sidebar {
     }
 
     tab1.click(function() {
-      switchTab(0, [1,2]);
+      switchTab(0, [1]);
     });
     tab2.click(function() {
-      switchTab(1, [0,2]);
-    });
-    tab3.click(function() {
-      switchTab(2, [0,1]);
+      switchTab(1, [0]);
     });
 
-    calendar.attr("data", Init.esperRootUrl + "img/calendar.svg");
-    polls.attr("data", Init.esperRootUrl + "img/polls.svg");
-    person.attr("data", Init.esperRootUrl + "img/person.svg");
-
-    CalTab.displayCalendarTab(content1, team, autoTask,
-                              profiles, linkedEvents);
-    Tab2Content.displayTab2ComingSoon(content2);
-    Tab3Content.displayPreferencesTab(content3, team, profiles);
+    TaskTab.displayTaskTab(content1, team, autoTask, profiles, linkedEvents);
+    content2.append(UserTab.viewOfUserTab(team, profiles).view);
 
     rootElement.append(view);
 

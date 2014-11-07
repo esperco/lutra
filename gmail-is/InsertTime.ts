@@ -20,7 +20,7 @@ module Esper.InsertTime {
       if (!Gmail.newCompose(div) && div.children().length === 1) {
         var controls = esperToolbar();
         div.prepend(controls.bar);
-        div.height(70);
+        div.height(86);
 
         var containing = Gmail.containingTable(div);
         containing.css("padding-bottom", 30);
@@ -31,13 +31,13 @@ module Esper.InsertTime {
         overlappingSpan.css("margin-top", 16);
 
         updateEventsLabel(controls);
-        CalTab.onEventsChanged(function () {
+        TaskTab.onEventsChanged(function () {
           updateEventsLabel(controls)
         });
 
         controls.insertButton.click(function (e) {
           var textField = Gmail.replyTextField(div);
-          var events = CalTab.currentEvents;
+          var events = TaskTab.currentEvents;
           textField.focus();
 
           insertAtCaret("<br />");
@@ -56,9 +56,7 @@ module Esper.InsertTime {
           }
         });
 
-        controls.createButton.click(function() {
-          CalPicker.createModal();
-        });
+        controls.createButton.click(function() { CalPicker.createModal(); });
       }
     });
   }
@@ -79,15 +77,33 @@ module Esper.InsertTime {
   }
 
   function updateEventsLabel(controls) {
-    switch (CalTab.currentEvents.length) {
+    switch (TaskTab.currentEvents.length) {
     case 0:
-      controls.eventsLabel.text("No linked events.");
+      controls.numLinkedEvents.text("0");
+      controls.insertButton
+        .addClass("esper-none")
+        .tooltip({
+          "content": "No linked events to insert",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     case 1:
-      controls.eventsLabel.text("1 linked event.");
+      controls.numLinkedEvents.text("1");
+      controls.insertButton
+        .removeClass("esper-none")
+        .tooltip({
+          "content": "Insert 1 linked event",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     default:
-      controls.eventsLabel.text(CalTab.currentEvents.length + " linked events.");
+      controls.numLinkedEvents.text(TaskTab.currentEvents.length.toString());
+      controls.insertButton
+        .removeClass("esper-none")
+        .tooltip({
+          "content": "Insert " + TaskTab.currentEvents.length + " linked events",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     }
   }
@@ -99,14 +115,36 @@ module Esper.InsertTime {
    */
   function esperToolbar() {
 '''
-<div #bar class="esper-composition-toolbar">
-  <img #logo alt=""/>
-  <span #eventsLabel> No linked events. </span>
-  <button #insertButton>Insert</button>
-  <button #createButton>Create meeting options</button>
+<div #bar class="esper-composition-toolbar esper-clearfix">
+  <object #logo class="esper-composition-logo"/>
+  <div class="esper-composition-vertical-divider"/>
+  <div #insertButton title class="esper-composition-button">
+    <object #insertIcon class="esper-svg esper-composition-button-icon"/>
+    <div #numLinkedEvents class="esper-composition-badge"/>
+  </div>
+  <div #createButton title class="esper-composition-button">
+    <object #createIcon class="esper-svg esper-composition-button-icon"/>
+  </div>
 </div>
 '''
-    logo.attr("src", Init.esperRootUrl + "img/icon16.png");
+    logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
+    insertIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
+    createIcon.attr("data", Init.esperRootUrl + "img/composition-create.svg");
+
+    insertButton.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "esper-top esper-tooltip"
+    });
+
+    createButton.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      "content": "Create linked events",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "esper-top esper-tooltip"
+    });
 
     return _view;
   }

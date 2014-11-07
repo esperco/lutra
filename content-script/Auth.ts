@@ -66,46 +66,46 @@ module Esper.Auth {
 <div #view>
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-welcome-modal">
-    <div class="esper-modal-header">
-      <div #close class="esper-modal-close-container">
-        <object #closeImg class="esper-svg esper-modal-close-icon"/>
-      </div>
-      <div #title class="esper-modal-title"/>
+    <div class="esper-modal-header">Welcome to Esper</div>
+    <div #about class="esper-about">
+      <div #aboutText class="esper-about-text"/>
+      <img #sidebarScreenshot class="esper-sidebar-screenshot"/>
     </div>
-    <div #about class="esper-about"/>
-    <div #footer class="esper-welcome-footer">
-      <a #disableLink class="esper-disable-link">
-        Disable Esper for this account
-      </a>
-      <button #enableButton class="esper-primary-btn esper-enable-btn">
+    <div class="esper-modal-footer esper-clearfix">
+      <button #enable class="esper-btn esper-btn-primary modal-primary">
         Enable
+      </button>
+      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
+      </button>
+      <button #disable class="esper-btn esper-btn-secondary modal-delete">
+        Disable for this account
       </button>
     </div>
   </div>
 </div>
 '''
+    aboutText.text("Enable this extension to track tasks, link emails with " +
+      "calendar events, and access your executive's preferences.");
 
-    function closeModal() {
-      view.remove();
-    }
+    sidebarScreenshot
+      .attr("src", $("#esper-script").attr("data-root-url")+"img/sidebar.png");
 
-    title.text("Welcome to Esper");
-
-    enableButton
-      .click(function() {
-        closeModal();
-        openLoginTab(account.googleAccountId);
-      });
-
-    disableLink
-      .click(function() {
-        account.declined = true;
-        EsperStorage.saveAccount(account, closeModal);
-      });
+    function closeModal() { view.remove(); }
 
     background.click(closeModal);
-    closeImg.attr("data", chrome.extension.getURL("img/close.svg"));
-    close.click(closeModal);
+
+    enable.click(function() {
+      closeModal();
+      openLoginTab(account.googleAccountId);
+    });
+
+    cancel.click(closeModal);
+
+    disable.click(function() {
+      account.declined = true;
+      EsperStorage.saveAccount(account, closeModal);
+    });
 
     $("body").append(view);
   }

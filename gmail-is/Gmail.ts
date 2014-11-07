@@ -17,6 +17,18 @@ module Esper.Gmail {
       return anchor;
   }
 
+  export function removeWebClipBanner() {
+    var banner = $(".g .mq");
+
+    if (banner.length === 0) {
+      Log.w("Web clips are turned off.");
+      return $();
+    } else {
+      Log.i("Removing web clip banner.");
+      banner[0].remove();
+    }
+  }
+
   export function findSidebarAnchor() {
     var anchor = $(".nH.g.id");
 
