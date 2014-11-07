@@ -57,7 +57,7 @@ module Esper.Menu {
 '''
 <div #view id="esper-menu" class="esper-menu">
   <div #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo">
-    <object #logoImg class="esper-svg-block"/>
+    <object #logoImg/>
   </div>
   <div #background class="esper-menu-bg"/>
   <object #caret class="esper-click-safe esper-caret"/>

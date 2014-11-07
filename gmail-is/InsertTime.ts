@@ -79,26 +79,31 @@ module Esper.InsertTime {
   function updateEventsLabel(controls) {
     switch (TaskTab.currentEvents.length) {
     case 0:
-      controls.insertButton.addClass("esper-none");
       controls.numLinkedEvents.text("0");
-      controls.insertButton.tooltip({
-        "content": "No linked events to insert",
-        "tooltipClass": "esper-top esper-tooltip"
-      });
+      controls.insertButton
+        .addClass("esper-none")
+        .tooltip({
+          "content": "No linked events to insert",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     case 1:
       controls.numLinkedEvents.text("1");
-      controls.insertButton.tooltip({
-        "content": "Insert 1 linked event",
-        "tooltipClass": "esper-top esper-tooltip"
-      });
+      controls.insertButton
+        .removeClass("esper-none")
+        .tooltip({
+          "content": "Insert 1 linked event",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     default:
       controls.numLinkedEvents.text(TaskTab.currentEvents.length.toString());
-      controls.insertButton.tooltip({
-        "content": "Insert " + TaskTab.currentEvents.length + " linked events",
-        "tooltipClass": "esper-top esper-tooltip"
-      });
+      controls.insertButton
+        .removeClass("esper-none")
+        .tooltip({
+          "content": "Insert " + TaskTab.currentEvents.length + " linked events",
+          "tooltipClass": "esper-top esper-tooltip"
+        });
       break;
     }
   }
@@ -123,7 +128,7 @@ module Esper.InsertTime {
 </div>
 '''
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
-    insertIcon.attr("data", Init.esperRootUrl + "img/composition-create.svg");
+    insertIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
     createIcon.attr("data", Init.esperRootUrl + "img/composition-create.svg");
 
     insertButton.tooltip({

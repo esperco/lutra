@@ -67,9 +67,6 @@ module Esper.Auth {
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-welcome-modal">
     <div class="esper-modal-header">
-      <div #close class="esper-modal-close-container">
-        <object #closeImg class="esper-svg esper-modal-close-icon"/>
-      </div>
       <div #title class="esper-modal-title"/>
     </div>
     <div #about class="esper-about"/>
@@ -104,8 +101,6 @@ module Esper.Auth {
       });
 
     background.click(closeModal);
-    closeImg.attr("data", chrome.extension.getURL("img/close.svg"));
-    close.click(closeModal);
 
     $("body").append(view);
   }

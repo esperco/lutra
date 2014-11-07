@@ -44,7 +44,7 @@ module Esper.UserTab {
   <span #toTimeText/>
 </li>
 '''
-        if (i == (numAvailabilities -1))
+        if (i == (numAvailabilities - 1))
           availabilityRow.addClass("esper-last");
 
         var fromDay = a.avail_from.day;

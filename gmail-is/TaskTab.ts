@@ -1027,7 +1027,9 @@ module Esper.TaskTab {
     });
 
     linkEvent.click(function() {
-      CalSearch.openSearchModal(team, threadId, taskTabView, profiles);
+      var searchModal = CalSearch.viewOfSearchModal(team, threadId, taskTabView, profiles);
+      $("body").append(searchModal.view);
+      searchModal.search.focus();
     });
 
     /* Reuse the same watcherId in order to overwrite the previous
