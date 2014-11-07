@@ -883,7 +883,7 @@ module Esper.TaskTab {
         <span class="esper-bold" style="float:left">Linked Threads</span>
         <div #refreshLinkedThreads
              class="esper-refresh esper-clickable esper-disabled">
-          <object #refreshLinkedThreadsIcon class="esper-svg-block"/>
+          <object #refreshLinkedThreadsIcon class="esper-svg"/>
         </div>
       </div>
       <div #linkedThreadsContainer class="esper-section-container">
@@ -900,7 +900,7 @@ module Esper.TaskTab {
         <span class="esper-bold" style="float:left">Linked Events</span>
         <div #refreshLinkedEvents
              class="esper-refresh esper-clickable esper-disabled">
-          <object #refreshLinkedEventsIcon class="esper-svg-block"/>
+          <object #refreshLinkedEventsIcon class="esper-svg"/>
         </div>
       </div>
       <div #linkActions class="esper-section-actions esper-clearfix open">
@@ -937,7 +937,7 @@ module Esper.TaskTab {
         <span class="esper-bold" style="float:left">Recents</span>
         <div #refreshRecents
              class="esper-refresh esper-clickable esper-disabled">
-          <object #refreshRecentsIcon class="esper-svg-block"/>
+          <object #refreshRecentsIcon class="esper-svg"/>
         </div>
       </div>
       <div #recentsContainer class="esper-section-container">

@@ -67,7 +67,10 @@ module Esper.Auth {
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-welcome-modal">
     <div class="esper-modal-header">Welcome to Esper</div>
-    <div #about class="esper-about"/>
+    <div #about class="esper-about">
+      <div #aboutText class="esper-about-text"/>
+      <img #sidebarScreenshot class="esper-sidebar-screenshot"/>
+    </div>
     <div class="esper-modal-footer esper-clearfix">
       <button #enable class="esper-btn esper-btn-primary modal-primary">
         Enable
@@ -82,6 +85,12 @@ module Esper.Auth {
   </div>
 </div>
 '''
+    aboutText.text("Enable this extension to track tasks, link emails with " +
+      "calendar events, and access your executive's preferences.");
+
+    sidebarScreenshot
+      .attr("src", $("#esper-script").attr("data-root-url")+"img/sidebar.png");
+
     function closeModal() { view.remove(); }
 
     background.click(closeModal);
