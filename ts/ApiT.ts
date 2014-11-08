@@ -73,7 +73,13 @@ module ApiT {
     is_admin: boolean;
     email: string;
     teams: Team[];
+    team_members: TeamMember[];
     missing_shared_calendar: boolean;
+  }
+
+  export interface TeamMember {
+    member_email: string;
+    member_uid: string;
   }
 
   export interface CalendarTime {

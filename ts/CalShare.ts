@@ -2,20 +2,23 @@ module CalShare {
 
   function displayCalendarList(view, calendars) {
     List.iter(calendars, function(cal) {
-      var level = cal.google_access_role;
-      if (level !== "Writer" && level !== "Owner") return;
-
+      if (cal.google_access_role !== "Owner") return;
       var row = $("<div class='esper-cal-row'/>");
       var checkbox = $("<input class='esper-cal-check' type='checkbox'/>");
-      checkbox.data("calendarId", cal.google_cal_id);
+      checkbox.data({
+        calendarId: cal.google_cal_id,
+        timezone: cal.calendar_timezone,
+        title: cal.calendar_title
+      });
       Api.getCalendarShares(cal.google_cal_id).done(function(acl) {
         function isEsperAssistant(x) {
-          return x.acl_email === "brian.jm.esper@gmail.com"
+          var assistantEmail = $(".esper-assistant-email").val();
+          return x.acl_email === assistantEmail;
         }
         var withEsper = List.find(acl.shared_emails, isEsperAssistant);
         if (withEsper !== null) {
           checkbox.prop("checked", true)
-                  .data({ wasChecked: true, aclId: withEsper.acl_id });
+                  .data("aclId", withEsper.acl_id);
         }
         var title =
           $("<span class='esper-cal-title'>" + cal.calendar_title
@@ -30,27 +33,36 @@ module CalShare {
     });
   }
 
-  function saveCalendarShares(view) {
+  function saveCalendarShares(view, team) {
     var calls = [];
+    var teamCals = [];
     view.find(".esper-cal-row").each(function() {
       var row = $(this);
       var checkbox = row.find(".esper-cal-check");
       var isChecked = checkbox.is(":checked");
-      var wasChecked = checkbox.data("wasChecked");
       var calendarId = checkbox.data("calendarId");
-      if (isChecked && !wasChecked) {
-        calls.push(Api.putCalendarShare(calendarId, "brian.jm.esper@gmail.com"));
-      } else if (!isChecked && wasChecked) {
+      var assistantEmail = $(".esper-assistant-email").val();
+      if (isChecked) {
+        teamCals.push({
+          google_cal_id: calendarId,
+          calendar_timezone: checkbox.data("timezone"),
+          calendar_title: checkbox.data("title")
+        });
+        calls.push(Api.putCalendarShare(calendarId, assistantEmail));
+      } else {
         var aclId = checkbox.data("aclId");
         calls.push(Api.deleteCalendarShare(calendarId, aclId));
       }
     });
     Deferred.join(calls).done(function() {
-      window.location.reload();
+      Api.putTeamCalendars(team.teamid, { calendars: teamCals })
+        .done(function() {
+          window.location.reload();
+        });
     });
   }
 
-  export function load(root) {
+  export function load(root, team) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -65,6 +77,7 @@ module CalShare {
       Welcome to Esper! So we can start scheduling, please select
       which calendars to share with your Esper assistant.
     </div>
+    <div>Assistant's email: <input #asst class="esper-assistant-email"/></div>
     <div #calendarView class="esper-loading">Loading...</div>
     <button #share class="button-primary">Share</button>
   </div>
@@ -73,6 +86,7 @@ module CalShare {
 '''
     root.append(view);
     document.title = "Share your calendars - Esper";
+    asst.val("brian.jm.esper@gmail.com");
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
@@ -90,7 +104,7 @@ module CalShare {
       displayCalendarList(calendarView, response.calendars);
     });
 
-    share.click(function() { saveCalendarShares(calendarView); });
+    share.click(function() { saveCalendarShares(calendarView, team); });
   }
 
 }
