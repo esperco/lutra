@@ -347,7 +347,7 @@ module Settings {
   export function load() {
     if (Login.data.missing_shared_calendar) {
       var team = List.find(Login.getTeams(), function(x : ApiT.Team) {
-        return List.mem(x.team_assistants, "0-w_brian____________w");
+        return List.mem(x.team_assistants, "P-wKfcaGEsuwjBnLlGHTIg");
       });
       Page.teamSettings.load(team);
       $("#tab3").click();

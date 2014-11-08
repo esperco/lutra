@@ -138,40 +138,46 @@ module CalendarsTab {
   export function load(team) {
 '''
 <div #view>
-  <div class="esper-h1">Team Calendars</div>
-  <div #description class="calendar-setting-description">
-    Welcome to Esper! So we can start scheduling, please select
-    which calendars to share with your Esper assistant.
+  <div #teamCalendars>
+    <div class="esper-h1">Team Calendars</div>
+    <div #description class="calendar-setting-description">
+      Welcome to Esper! So we can start scheduling, please select
+      which calendars to share with your Esper assistant.
+    </div>
+    <div>Assistant's email: <select #asst class="esper-assistant-email"/></div>
+    <div #calendarView class="esper-loading">Loading...</div>
+    <button #share class="button-primary">Share</button>
   </div>
-  <div>Assistant's email: <select #asst class="esper-assistant-email"/></div>
-  <div #calendarView class="esper-loading">Loading...</div>
-  <button #share class="button-primary">Share</button>
   <br/>
   <div #emailAliases></div>
 </div>
 '''
-    List.iter(team.team_assistants, function(uid) {
-      var tm =
-        List.find(Login.data.team_members, function(x : ApiT.TeamMember) {
-          return x.member_uid === uid;
-        });
-      if (tm !== null) {
-        var opt = $("<option>" + tm.member_email + "</option>");
-        if (tm.member_email === "assistant@esper.com")
-          opt.prop("selected", true);
-        opt.appendTo(asst);
-      }
-    });
+    if (Login.me() !== team.team_executive) {
+      teamCalendars.hide();
+    } else {
+      List.iter(team.team_assistants, function(uid) {
+        var tm =
+          List.find(Login.data.team_members, function(x : ApiT.TeamMember) {
+            return x.member_uid === uid;
+          });
+        if (tm !== null) {
+          var opt = $("<option>" + tm.member_email + "</option>");
+          if (tm.member_email === "assistant@esper.com")
+            opt.prop("selected", true);
+          opt.appendTo(asst);
+        }
+      });
 
-    Api.getCalendarList().done(function(response) {
-      function refreshList() {
-        displayCalendarList(calendarView, response.calendars);
-      }
-      asst.change(refreshList);
-      refreshList();
-    });
+      Api.getCalendarList().done(function(response) {
+        function refreshList() {
+          displayCalendarList(calendarView, response.calendars);
+        }
+        asst.change(refreshList);
+        refreshList();
+      });
 
-    share.click(function() { saveCalendarShares(team, calendarView); });
+      share.click(function() { saveCalendarShares(team, calendarView); });
+    }
 
     makeAliasSection(team, emailAliases);
 
