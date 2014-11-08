@@ -219,7 +219,15 @@ module Esper.CalPicker {
         var address = loc.address;
         if (loc.title !== "")
           address = loc.title + " - " + address;
-        $(element).attr("title", address);
+        element
+          .attr("title", "")
+          .tooltip({
+            show: { effect: "none" },
+            hide: { effect: "none" },
+            "content": address,
+            "position": { my: 'center bottom', at: 'center top-7' },
+            "tooltipClass": "esper-top esper-tooltip"
+          });
       }
     }
 
