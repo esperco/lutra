@@ -6,6 +6,82 @@ module CalendarsTab {
 
   var calendarAcls = {}; // cache of API call results
 
+  // TODO Styling
+  function makeCalendarSelectors(team, root) {
+'''
+<div #view>
+  <div style="float: left; width: 40%">
+    <div><b>All calendars:</b></div>
+    <div style="font-size: 75%">(double-click to add)</div>
+    <select #allCals multiple="multiple" size=5 />
+  </div>
+  <div>
+    <div><b>Team calendars:</b></div>
+    <div style="font-size: 75%">(double-click to remove)</div>
+    <select #teamCals multiple="multiple" size=5 />
+  </div>
+  <br/>
+  <div>
+    <button #saveCals class="button-primary">Save Team Calendars</button>
+  </div>
+</div>
+'''
+    function removeOpt() {
+      $(this).remove();
+    }
+
+    List.iter(team.team_calendars, function(cal) {
+      var opt = $("<option class='esper-calendar-option'"
+                  + "value='" + cal.google_cal_id + "'>"
+                  + cal.calendar_title + "</option>");
+      opt.dblclick(removeOpt)
+         .data("timezone", cal.calendar_timezone)
+         .appendTo(teamCals);
+    });
+
+    Api.getCalendarList().done(function(x) {
+      List.iter(x.calendars, function(cal) {
+        var opt = $("<option class='esper-calendar-option'"
+                    + "value='" + cal.google_cal_id + "'>"
+                    + cal.calendar_title + "</option>");
+        opt.appendTo(allCals)
+           .data("timezone", cal.calendar_timezone)
+           .dblclick(function() {
+             $(this).clone()
+                    .data("timezone", cal.calendar_timezone)
+                    .off("dblclick")
+                    .dblclick(removeOpt)
+                    .appendTo(teamCals);
+           });
+      });
+
+      saveCals.click(function() {
+        var teamOpts = teamCals.find(".esper-calendar-option");
+        var teamCalIDs = [];
+        var calData = {};
+        teamOpts.each(function(i) {
+          var opt = $(teamOpts[i]);
+          var calID = opt.val();
+          teamCalIDs.push(calID);
+          calData[calID] = {
+            google_cal_id: calID,
+            calendar_timezone: opt.data("timezone"),
+            calendar_title: opt.text()
+          };
+        });
+        // remove duplicates
+        var uniqueCalIDs = List.union(teamCalIDs, [], undefined);
+        var teamCalendars = List.map(uniqueCalIDs, function(calID) {
+          return calData[calID];
+        });
+        Api.putTeamCalendars(team.teamid, { calendars: teamCalendars })
+          .done(function() { window.location.reload(); });
+      });
+
+      root.append(view);
+    });
+  }
+
   function displayCalendarList(view, calendars) {
     view.children().remove();
     List.iter(calendars, function(cal) {
@@ -149,13 +225,17 @@ module CalendarsTab {
     <button #share class="button-primary">Share</button>
   </div>
   <br/>
-  <div #emailAliases></div>
+  <div #calendarSelector/>
+  <br/>
+  <div #emailAliases/>
 </div>
 '''
     if (Login.me() !== team.team_executive) {
       teamCalendars.hide();
+      makeCalendarSelectors(team, calendarSelector);
       makeAliasSection(team, emailAliases);
     } else {
+      calendarSelector.hide();
       emailAliases.hide();
       List.iter(team.team_assistants, function(uid) {
         var tm =
