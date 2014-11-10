@@ -154,7 +154,9 @@ module CalendarsTab {
 '''
     if (Login.me() !== team.team_executive) {
       teamCalendars.hide();
+      makeAliasSection(team, emailAliases);
     } else {
+      emailAliases.hide();
       List.iter(team.team_assistants, function(uid) {
         var tm =
           List.find(Login.data.team_members, function(x : ApiT.TeamMember) {
@@ -178,8 +180,6 @@ module CalendarsTab {
 
       share.click(function() { saveCalendarShares(team, calendarView); });
     }
-
-    makeAliasSection(team, emailAliases);
 
     return view;
   }
