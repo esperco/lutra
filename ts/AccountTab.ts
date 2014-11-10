@@ -140,7 +140,7 @@ module AccountTab {
       }
 
 (function(){ // a block scope, a block scope, my kingdom for a block scope!
-      if (memberUid !== Login.me()
+      if ((memberUid !== Login.me() || Login.isAdmin())
           && List.mem(team.team_assistants, memberUid)) {
 '''
 <span #removeSpan>
@@ -154,6 +154,10 @@ module AccountTab {
         });
 
         actions.append($("<span class='text-divider'>|</span>"));
+
+        if (memberUid === Login.me())
+          name.append($("<span class='semibold'> (Me)</span>"));
+
       } else {
         name
           .text("")
