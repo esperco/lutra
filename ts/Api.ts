@@ -267,6 +267,35 @@ module Api {
     return jsonHttpGet(url);
   };
 
+  export function getCalendarShares(calid)
+    : JQueryDeferred<ApiT.CalendarAcl>
+  {
+    var url = "api/calendar/share/list/"
+      + Login.data.uid + "/"
+      + encodeURIComponent(calid);
+    return jsonHttpGet(url);
+  };
+
+  export function putCalendarShare(calid, email)
+    : JQueryDeferred<void>
+  {
+    var url = "api/calendar/share/add/"
+      + Login.data.uid + "/"
+      + encodeURIComponent(calid) + "/"
+      + encodeURIComponent(email);
+    return jsonHttpPut(url, "");
+  };
+
+  export function deleteCalendarShare(calid, rule_id)
+    : JQueryDeferred<void>
+  {
+    var url = "api/calendar/share/remove/"
+      + Login.data.uid + "/"
+      + encodeURIComponent(calid) + "/"
+      + encodeURIComponent(rule_id);
+    return jsonHttpDelete(url);
+  };
+
   export function putTeamCalendars(teamid, cals)
     : JQueryDeferred<void>
   {

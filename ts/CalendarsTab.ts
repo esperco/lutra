@@ -4,6 +4,8 @@
 
 module CalendarsTab {
 
+  var calendarAcls = {}; // cache of API call results
+
   // TODO Styling
   function makeCalendarSelectors(team, root) {
 '''
@@ -80,6 +82,81 @@ module CalendarsTab {
     });
   }
 
+  function displayCalendarList(view, calendars) {
+    view.children().remove();
+    List.iter(calendars, function(cal) {
+      if (cal.google_access_role !== "Owner") return;
+
+      var row = $("<div class='esper-cal-row'/>");
+      var checkbox = $("<input class='esper-cal-check' type='checkbox'/>");
+      checkbox.data({
+        calendarId: cal.google_cal_id,
+        timezone: cal.calendar_timezone,
+        title: cal.calendar_title
+      });
+
+      var cachedAcl = calendarAcls[cal.google_cal_id];
+      var getAcl =
+        cachedAcl === undefined ?
+        Api.getCalendarShares(cal.google_cal_id) :
+        Deferred.defer(cachedAcl);
+
+      getAcl.done(function(acl) {
+        calendarAcls[cal.google_cal_id] = acl;
+
+        function isEsperAssistant(x) {
+          var assistantEmail = $(".esper-assistant-email").val();
+          return x.acl_email === assistantEmail;
+        }
+
+        var withEsper = List.find(acl.shared_emails, isEsperAssistant);
+        if (withEsper !== null) {
+          checkbox.prop("checked", true)
+                  .data("aclId", withEsper.acl_id);
+        }
+        var title =
+          $("<span class='esper-cal-title'>" + cal.calendar_title
+            + "</span>");
+        if (view.hasClass("esper-loading")) {
+          view.text("");
+          view.removeClass("esper-loading");
+        }
+
+        row.append(checkbox).append(" ").append(title)
+           .appendTo(view);
+      });
+    });
+  }
+
+  function saveCalendarShares(team, view) {
+    var calls = [];
+    var teamCals = [];
+    view.find(".esper-cal-row").each(function() {
+      var row = $(this);
+      var checkbox = row.find(".esper-cal-check");
+      var isChecked = checkbox.is(":checked");
+      var calendarId = checkbox.data("calendarId");
+      var assistantEmail = $(".esper-assistant-email").val();
+      if (isChecked) {
+        teamCals.push({
+          google_cal_id: calendarId,
+          calendar_timezone: checkbox.data("timezone"),
+          calendar_title: checkbox.data("title")
+        });
+        calls.push(Api.putCalendarShare(calendarId, assistantEmail));
+      } else {
+        var aclId = checkbox.data("aclId");
+        calls.push(Api.deleteCalendarShare(calendarId, aclId));
+      }
+    });
+    Deferred.join(calls).done(function() {
+      Api.putTeamCalendars(team.teamid, { calendars: teamCals })
+        .done(function() {
+          window.location.reload();
+        });
+    });
+  }
+
   function makeAliasSection(team, root) {
 '''
 <div #view>
@@ -137,18 +214,52 @@ module CalendarsTab {
   export function load(team) {
 '''
 <div #view>
-  <div class="esper-h1">Team Calendars</div>
-  <div #description class="calendar-setting-description"/>
-  <div #calendarSelector></div>
+  <div #teamCalendars>
+    <div class="esper-h1">Team Calendars</div>
+    <div #description class="calendar-setting-description">
+      Welcome to Esper! So we can start scheduling, please select
+      which calendars to share with your Esper assistant.
+    </div>
+    <div>Assistant's email: <select #asst class="esper-assistant-email"/></div>
+    <div #calendarView class="esper-loading">Loading...</div>
+    <button #share class="button-primary">Share</button>
+  </div>
   <br/>
-  <div #emailAliases></div>
+  <div #calendarSelector/>
+  <br/>
+  <div #emailAliases/>
 </div>
 '''
-    description
-      .text("Select the calendars to be used for this team.");
+    if (Login.me() !== team.team_executive) {
+      teamCalendars.hide();
+      makeCalendarSelectors(team, calendarSelector);
+      makeAliasSection(team, emailAliases);
+    } else {
+      calendarSelector.hide();
+      emailAliases.hide();
+      List.iter(team.team_assistants, function(uid) {
+        var tm =
+          List.find(Login.data.team_members, function(x : ApiT.TeamMember) {
+            return x.member_uid === uid;
+          });
+        if (tm !== null) {
+          var opt = $("<option>" + tm.member_email + "</option>");
+          if (tm.member_email === "assistant@esper.com")
+            opt.prop("selected", true);
+          opt.appendTo(asst);
+        }
+      });
 
-    makeCalendarSelectors(team, calendarSelector);
-    makeAliasSection(team, emailAliases);
+      Api.getCalendarList().done(function(response) {
+        function refreshList() {
+          displayCalendarList(calendarView, response.calendars);
+        }
+        asst.change(refreshList);
+        refreshList();
+      });
+
+      share.click(function() { saveCalendarShares(team, calendarView); });
+    }
 
     return view;
   }

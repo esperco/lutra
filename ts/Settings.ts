@@ -203,7 +203,9 @@ module Settings {
     return view;
   }
 
-  export function load() {
+  var firstTime = true;
+
+  function reallyLoad() {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -250,7 +252,7 @@ module Settings {
     </div>
     <div class="rightCol settings-section col-sm-6">
       <div class="esper-h1 settings-section-title">Executive Teams</div>
-      <div #teams class="team-list"/>
+      <div #execTeams class="team-list"/>
     </div>
   </div>
   <div #footer/>
@@ -289,9 +291,15 @@ module Settings {
       .append("<span>UID: </span>")
       .append("<span class='gray'>" + Login.me() + "</span>");
 
-    List.iter(Login.getTeams(), function(team) {
-      teams.append(viewOfTeam(team));
-    });
+    var teams = Login.getTeams();
+    if (teams.length === 1 && firstTime) {
+      firstTime = false;
+      Page.teamSettings.load(teams[0]);
+    } else {
+      List.iter(teams, function(team) {
+        execTeams.append(viewOfTeam(team));
+      });
+    }
 
     footer.append(Footer.load());
 
@@ -336,4 +344,15 @@ module Settings {
     }
   }
 
+  export function load() {
+    if (Login.data.missing_shared_calendar) {
+      var team = List.find(Login.getTeams(), function(x : ApiT.Team) {
+        return List.mem(x.team_assistants, "P-wKfcaGEsuwjBnLlGHTIg");
+      });
+      Page.teamSettings.load(team);
+      $("#tab3").click();
+    } else {
+      reallyLoad();
+    }
+  }
 }
