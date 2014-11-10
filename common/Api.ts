@@ -49,7 +49,8 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getLinkedEvents(teamid, threadId,
+  export function getLinkedEvents(teamid,
+                                  threadId,
                                   teamCalendars: ApiT.Calendar[]):
   JQueryDeferred<ApiT.EventWithSyncInfo[]> {
     var cals = { google_cal_ids: calIds(teamCalendars) };

@@ -21,6 +21,8 @@ module Esper.JsonHttp {
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
         jqXHR.setRequestHeader("Esper-Path", path);
         jqXHR.setRequestHeader("Esper-Signature", signature);
+
+        jqXHR.setRequestHeader("Esper-Version", "stoat-" + Conf.version);
       }
     }
   }
