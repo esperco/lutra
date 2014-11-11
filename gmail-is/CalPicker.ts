@@ -51,6 +51,7 @@ module Esper.CalPicker {
 '''
     var calendars = Sidebar.currentTeam.team_calendars;
     writeToCalendar = calendars[0];
+    showCalendars = {}; // Clear out old entries from previous views
     showCalendars[writeToCalendar.google_cal_id] = {};
     userSidebar.calendarsContainer.children().remove();
     List.iter(calendars, function(cal, i) {
