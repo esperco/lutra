@@ -205,10 +205,18 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #bufferText class="esper-preference-text"/>
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Buffer time</span>
+  </div>
 </div>
 '''
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    bufferText.text(formatDuration(meetingPrefs.buffer));
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
     displayAvailability(view, meetingPrefs.availability, last);
@@ -227,10 +235,18 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #bufferText class="esper-preference-text"/>
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Buffer time</span>
+  </div>
 </div>
 '''
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    bufferText.text(formatDuration(meetingPrefs.buffer));
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
     displayAvailability(view, meetingPrefs.availability, last);
@@ -249,10 +265,18 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #bufferText class="esper-preference-text"/>
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Buffer time</span>
+  </div>
 </div>
 '''
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    bufferText.text(formatDuration(meetingPrefs.buffer));
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
     displayAvailability(view, meetingPrefs.availability, last);
@@ -290,21 +314,25 @@ module Esper.UserTab {
         .appendTo(drop);
     }
 
-    if (meetingTypes.phone_call !== undefined)
+    function available(x: { available: boolean }) {
+      return (x !== undefined && x.available);
+    }
+
+    if (available(meetingTypes.phone_call))
       option("phone_call", "Phone call");
-    if (meetingTypes.video_call !== undefined)
+    if (available(meetingTypes.video_call))
       option("video_call", "Video call");
-    if (meetingTypes.breakfast !== undefined)
+    if (available(meetingTypes.breakfast))
       option("breakfast", "Breakfast");
-    if (meetingTypes.brunch !== undefined)
+    if (available(meetingTypes.brunch))
       option("brunch", "Brunch");
-    if (meetingTypes.lunch !== undefined)
+    if (available(meetingTypes.lunch))
       option("lunch", "Lunch");
-    if (meetingTypes.coffee !== undefined)
+    if (available(meetingTypes.coffee))
       option("coffee", "Coffee");
-    if (meetingTypes.dinner !== undefined)
+    if (available(meetingTypes.dinner))
       option("dinner", "Dinner");
-    if (meetingTypes.drinks !== undefined)
+    if (available(meetingTypes.drinks))
       option("drinks", "Drinks");
 
     drop.change(function() {
