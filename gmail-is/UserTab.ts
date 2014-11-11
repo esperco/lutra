@@ -283,30 +283,28 @@ module Esper.UserTab {
   function createMeetingsDropdown(drop: JQuery,
                                   meetInfo: JQuery,
                                   meetingTypes: ApiT.MeetingTypes) {
-    function option(field, display) {
-      $("<option value='" + field + "'>" + display + "</option>")
+    function option(value, display) {
+      $("<option>")
+        .attr("value", value)
+        .text(display)
         .appendTo(drop);
     }
 
-    function unavailable(type) {
-      return ((type !== undefined) && type.available);
-    }
-
-    if (unavailable(meetingTypes.phone_call))
+    if (meetingTypes.phone_call !== undefined)
       option("phone_call", "Phone call");
-    if (unavailable(meetingTypes.video_call))
+    if (meetingTypes.video_call !== undefined)
       option("video_call", "Video call");
-    if (unavailable(meetingTypes.breakfast))
+    if (meetingTypes.breakfast !== undefined)
       option("breakfast", "Breakfast");
-    if (unavailable(meetingTypes.brunch))
+    if (meetingTypes.brunch !== undefined)
       option("brunch", "Brunch");
-    if (unavailable(meetingTypes.lunch))
+    if (meetingTypes.lunch !== undefined)
       option("lunch", "Lunch");
-    if (unavailable(meetingTypes.coffee))
+    if (meetingTypes.coffee !== undefined)
       option("coffee", "Coffee");
-    if (unavailable(meetingTypes.dinner))
+    if (meetingTypes.dinner !== undefined)
       option("dinner", "Dinner");
-    if (unavailable(meetingTypes.drinks))
+    if (meetingTypes.drinks !== undefined)
       option("drinks", "Drinks");
 
     drop.change(function() {
@@ -361,13 +359,12 @@ module Esper.UserTab {
   function populateWorkplaceDropdown(drop: JQuery,
                                      workInfo: JQuery,
                                      workplaces: ApiT.Workplace[]) {
-    for (var i = 0; i < workplaces.length; i++) {
-      var workplace = workplaces[i];
+    List.iter(workplaces, function(workplace, i) {
       var title = workplace.location.title;
       if (title === "") title = workplace.location.address;
-      $("<option value='" + i + "'>" + title + "</option>")
+      $("<option value='" + i.toString() + "'>" + title + "</option>")
         .appendTo(drop);
-    }
+    });
     drop.change(function() {
       var i = $(this).val();
       displayWorkplace(workInfo, workplaces[i]);
@@ -503,7 +500,8 @@ module Esper.UserTab {
 
       var meetingTypes = prefs.meeting_types;
       createMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
-      displayPhoneInfo(meetingPreferences, meetingTypes.phone_call);
+      if (meetingTypes.phone_call !== undefined)
+        displayPhoneInfo(meetingPreferences, meetingTypes.phone_call);
 
       notes.text(prefs.notes);
     });
