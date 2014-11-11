@@ -2,8 +2,8 @@
   Gmail thread view
 */
 module Esper.Sidebar {
-  export var currentThreadId : string;
   export var currentTeam : ApiT.Team;
+  export var currentThreadId : string;
   export var profiles : ApiT.Profile[];
 
   export function customizeSelectArrow(selector) {
@@ -288,6 +288,7 @@ module Esper.Sidebar {
                               profiles) {
     Log.d("displayTeamSidebar()");
     currentTeam = team;
+    Menu.currentTeam.set(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {

@@ -28,7 +28,7 @@ module Esper.TaskTab {
     if (currentTask !== undefined)
       return Promise.defer(currentTask);
     else {
-      return Api.obtainTaskForThread(teamid, threadId)
+      return Api.obtainTaskForThread(teamid, threadId, false, true)
         .then(function(task) {
           currentTask = task;
           view.taskCaption.text("Task:");
@@ -675,7 +675,7 @@ module Esper.TaskTab {
     List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
       if (thread.gmail_thrid !== threadId) {
         var threadLink =
-          $("<li class='esper-link'>" + thread.subject + "</div>");
+          $("<li class='esper-link'/>").text(thread.subject);
         threadLink.click(function(e) {
           e.stopPropagation();
           window.location.hash = "#all/" + thread.gmail_thrid;
@@ -966,7 +966,7 @@ module Esper.TaskTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
-    apiGetTask(team.teamid, threadId).done(function(task) {
+    apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       currentTask = task;
       var title = "";
       linkedThreadsSpinner.hide();

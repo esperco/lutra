@@ -41,13 +41,14 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    Menu.create();
+    Menu.init();
     if (Login.loggedIn()) {
       if (Login.getLoginInfo === undefined) {
         Login.getLoginInfo = Api.getLoginInfo();
         Login.getLoginInfo
           .done(function(loginInfo) {
-            Login.info = loginInfo;
+            Login.watchableInfo.set(loginInfo);
+            /* menu is then created in reaction to this */
           });
       }
 
@@ -56,6 +57,8 @@ module Esper.Init {
           Sidebar.init();
           InsertTime.init();
         });
+    } else {
+      Menu.create();
     }
   }
 

@@ -277,7 +277,7 @@ module Esper.ApiT {
   }
 
   export interface TaskEvent {
-    task_eventid: string;
+    task_event: CalendarEvent;
   }
 
   export interface TaskList {

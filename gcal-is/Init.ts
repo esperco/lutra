@@ -90,7 +90,7 @@ module Esper.Init {
     if (Login.loggedIn()) {
       Api.getLoginInfo()
         .done(function(loginInfo) {
-          Login.info = loginInfo;
+          Login.watchableInfo.set(loginInfo);
           insertTeamSelector(loginInfo.teams);
           CalEventView.init();
         });

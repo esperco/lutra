@@ -4,6 +4,17 @@
 */
 
 module Esper.Menu {
+  /*
+    The global current team, valid even if there is no current task or thread.
+
+    Switching team in the sidebar results in changing the global team.
+    However, changing the global team does not affect the sidebar.
+  */
+  export var currentTeam = new Esper.Watchable.C<ApiT.Team>(
+    function(team) { return team !== undefined && team !== null; },
+    undefined
+  );
+
   function replace(menu: JQuery) {
     var rightSibling = Gmail.findMenuAnchor();
     if (rightSibling.length === 1) {
@@ -48,6 +59,60 @@ module Esper.Menu {
       .append(helpLink);
   }
 
+  function setupTeamSwitcher(teams: ApiT.Team[],
+                             view: Menu) {
+
+    var team = currentTeam.get();
+    view.currentTeamName
+      .text(team.team_name)
+      .click();
+
+    List.iter(teams, function(team) {
+      $("<li class=''>")
+        .text(team.team_name)
+        .click(function() {
+          currentTeam.set(team);
+          TaskList.display(team, view.tasksLayer);
+        })
+        .appendTo(view.teamSwitcherContent);
+    });
+  }
+
+  function setupTaskListControls(view: Menu) {
+    var teams = Login.myTeams();
+    if (teams === undefined || teams.length === 0) {
+      view.teamSwitcher.addClass("esper-hide");
+      view.tasksButton.addClass("esper-hide");
+    } else {
+      if (currentTeam.get() === undefined) {
+        currentTeam.set(teams[0]);
+      }
+      var team = currentTeam.get();
+      setupTeamSwitcher(teams, view);
+      view.teamSwitcher.removeClass("esper-hide");
+      view.tasksButton
+        .removeClass("esper-hide")
+        .unbind("click")
+        .click(function() { TaskList.display(team, view.tasksLayer); });
+    }
+  }
+
+  export interface Menu {
+    view: JQuery;
+    logo: JQuery;
+    logoImg: JQuery;
+    teamsCaret: JQuery;
+    teamSwitcher: JQuery;
+    currentTeamName: JQuery;
+    teamSwitcherContent: JQuery;
+    tasksButton: JQuery;
+    tasksLayer: JQuery;
+    background: JQuery;
+    menuCaret: JQuery;
+    menuDropdown: JQuery;
+    menuDropdownContent: JQuery;
+  }
+
   /*
     Create and inject the Esper menu.
     It is safe to call this function multiple times. Any old Esper menu
@@ -59,13 +124,22 @@ module Esper.Menu {
   <div #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo">
     <object #logoImg class="esper-svg"/>
   </div>
+  <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
+  <ul #teamSwitcher class="esper-hide esper-ul esper-menu-dropdown">
+    <span #currentTeamName></span>
+    <div #teamSwitcherContent class="esper-dropdown-section"/>
+  </ul>
+  <button #tasksButton class="esper-hide">Tasks</button>
+  <div #tasksLayer></div>
   <div #background class="esper-menu-bg"/>
-  <object #caret class="esper-svg esper-click-safe esper-caret"/>
-  <ul #dropdown class="esper-ul esper-menu-dropdown">
-    <div #dropdownContent class="esper-dropdown-section"/>
+  <object #menuCaret class="esper-svg esper-click-safe esper-caret"/>
+  <ul #menuDropdown class="esper-ul esper-menu-dropdown">
+    <div #menuDropdownContent class="esper-dropdown-section"/>
   </ul>
 </div>
 '''
+
+    var menuView = <Menu> _view;
 
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
@@ -76,9 +150,11 @@ module Esper.Menu {
       logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
     }
 
-    caret.attr("data", Init.esperRootUrl + "img/caret.svg");
+    menuCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
+    updateLinks(menuDropdownContent);
 
-    updateLinks(dropdownContent);
+    teamsCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
+    setupTaskListControls(menuView);
 
     logo.click(function() {
       if (logo.hasClass("open")) {
@@ -86,8 +162,8 @@ module Esper.Menu {
       } else {
         Sidebar.dismissDropdowns();
         background.toggle();
-        caret.toggle();
-        dropdown.toggle();
+        menuCaret.toggle();
+        menuDropdown.toggle();
         logo.addClass("open");
       }
     });
@@ -99,7 +175,11 @@ module Esper.Menu {
         Log.d("Esper menu is now ready.");
       return success;
     });
+  }
 
-    return dropdownContent; /* .append <li> items to it */
+  export function init() {
+    Login.watchableInfo.watch(function(x: ApiT.LoginResponse) {
+      Menu.create();
+    });
   }
 }

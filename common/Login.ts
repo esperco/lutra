@@ -11,7 +11,12 @@ module Esper.Login {
   );
 
   export var getLoginInfo : JQueryDeferred<ApiT.LoginResponse>;
-  export var info : ApiT.LoginResponse; // set by getLoginInfo upon success
+
+  /* set by getLoginInfo upon success */
+  export var watchableInfo = new Esper.Watchable.C<ApiT.LoginResponse>(
+    function(x) { return x !== undefined && x.uid !== undefined; },
+    undefined
+  );
 
   export function loggedIn() {
     return watchableAccount.isValid();
@@ -47,15 +52,15 @@ module Esper.Login {
   }
 
   export function myEmail() {
-    if (info !== undefined)
-      return info.email;
+    if (watchableInfo.get() !== undefined)
+      return watchableInfo.get().email;
     else
       return;
   }
 
   export function myTeams() {
-    if (info !== undefined)
-      return info.teams;
+    if (watchableInfo.get() !== undefined)
+      return watchableInfo.get().teams;
     else
       return;
   }
@@ -63,6 +68,7 @@ module Esper.Login {
   /* Send a Logout request. */
   export function logout() {
     getLoginInfo = undefined;
+    watchableInfo.set(undefined);
     if (loggedIn()) {
       var googleAccountId = myGoogleAccountId();
       setAccount(undefined);
