@@ -85,7 +85,7 @@ module Esper.XDate {
   }
 
   /* "1:30 pm" */
-  function formatTimeOnly(hour, min) {
+  export function formatTimeOnly(hour, min, spacer = " ") {
     var ampm;
     var h;
     if (hour < 12) {
@@ -95,7 +95,7 @@ module Esper.XDate {
       h = 12 < hour ? hour - 12 : 12;
       ampm = "pm";
     }
-    return h.toString() + ":" + pad(min.toString()) + " " + ampm;
+    return h.toString() + ":" + pad(min.toString()) + spacer + ampm;
   }
 
   export function timeOnly(d : Date) : string {
