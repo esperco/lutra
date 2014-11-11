@@ -67,7 +67,9 @@ module Esper.CalPicker {
         else delete showCalendars[cal.google_cal_id];
         calendarView.fullCalendar("refetchEvents");
       });
-      var tz = (<any> moment).tz(moment(), cal.calendar_timezone).zoneAbbr();
+      var tz =
+        cal.calendar_timezone === "UTC" ? "UTC" : // moment-tz can't handle it
+        (<any> moment).tz(moment(), cal.calendar_timezone).zoneAbbr();
       calendarName.text(cal.calendar_title + " (" + tz + ")");
       calendarCheckboxRow.appendTo(userSidebar.calendarsContainer);
     });
