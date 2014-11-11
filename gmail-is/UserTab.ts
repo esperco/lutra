@@ -2,16 +2,13 @@
 
 module Esper.UserTab {
 
-  function formatTime(hourMinute) {
-    var hour = hourMinute.hour;
-    var minute = hourMinute.minute;
-    if (minute < 10) minute = "0" + minute;
-    var ampm = hour < 12 ? "am" : "pm";
-    if (hour > 12) hour = hour - 12;
-    return hour + ":" + minute + ampm;
+  function formatTime(hourMinute: ApiT.HourMinute) {
+    return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
   }
 
-  function displayAvailability(meetingPrefs, availabilities, last) {
+  function displayAvailability(meetingPrefs: JQuery,
+                               availabilities: ApiT.Availability[],
+                               last: boolean) {
 '''
 <div #view class="esper-preference-section esper-contains-list esper-clearfix">
   <div class="esper-clearfix">
@@ -33,8 +30,7 @@ module Esper.UserTab {
       availability
         .append($("<li class='esper-empty-list'>No availability</li>"));
     } else {
-      var i = 0;
-      List.iter(availabilities, function(a : ApiT.Availability) {
+      List.iter(availabilities, function(a : ApiT.Availability, i) {
 '''
 <li #availabilityRow>
   <span #fromDayText class="esper-bold"/>
@@ -57,7 +53,6 @@ module Esper.UserTab {
         toTimeText.text(" " + formatTime(a.avail_to.time) + " ");
 
         availability.append(availabilityRow);
-        i++;
       });
 
       viewAvailability.click(function() {
@@ -97,8 +92,7 @@ module Esper.UserTab {
       locations
         .append($("<li class='esper-empty-list'>No favorite locations</li>"));
     } else {
-      var i = 0;
-      List.iter(favoriteLocations, function(l : ApiT.Location) {
+      List.iter(favoriteLocations, function(l : ApiT.Location, i) {
 '''
 <li #location>
   <span #viewMap class="esper-link" style="float:right">Map</span>
@@ -121,14 +115,14 @@ module Esper.UserTab {
         });
 
         locations.append(location);
-        i++
       });
     }
 
     meetingPrefs.append(view);
   }
 
-  function displayVideoUsernames(meetingPrefs, videoUsernames) {
+  function displayVideoUsernames(meetingPrefs: JQuery,
+                                 videoAccounts: ApiT.VideoAccount[]) {
 '''
 <div #view class="esper-preference-section esper-clearfix
                   esper-contains-list esper-last">
@@ -141,31 +135,30 @@ module Esper.UserTab {
 '''
     videoIcon.attr("data", Init.esperRootUrl + "img/video.svg");
 
-    var numUsernames = videoUsernames.length;
+    var numUsernames = videoAccounts.length;
     if (numUsernames === 0) {
       usernames.append($("<li class='esper-empty-list'>No usernames</li>"));
     } else {
-      var i = 0;
-      List.iter(videoUsernames, function(v : ApiT.VideoAccount) {
+      List.iter(videoAccounts, function(v : ApiT.VideoAccount, i) {
 '''
 <li #videoUsername>
   <div #type class="esper-bold"/>
   <div #username/>
 </li>
 '''
-        if (i == (numUsernames -1))
+        if (i == (numUsernames - 1))
           videoUsername.addClass("esper-last");
         type.text(v.video_type + ": ");
         username.text(v.video_username);
         usernames.append(videoUsername);
-        i++;
       });
     }
 
     meetingPrefs.append(view);
   }
 
-  function displayPhoneNumbers(meetingPrefs, phoneNumbers) {
+  function displayPhoneNumbers(meetingPrefs: JQuery,
+                               phoneNumbers: ApiT.PhoneNumber[]) {
 '''
 <div #view class="esper-preference-section
                   esper-clearfix esper-contains-list esper-last">
@@ -182,8 +175,7 @@ module Esper.UserTab {
     if (numPhones === 0) {
       phones.append($("<li class='esper-empty-list'>No phone numbers</li>"));
     } else {
-      var i = 0;
-      List.iter(phoneNumbers, function(p : ApiT.PhoneNumber) {
+      List.iter(phoneNumbers, function(p : ApiT.PhoneNumber, i) {
 '''
 <li #phoneNumber>
   <span #type class="esper-bold"/>
@@ -198,14 +190,14 @@ module Esper.UserTab {
         if (p.share_with_guests) note.text("OK to share with guests");
         else note.text("Do NOT share with guests");
         phones.append(phoneNumber);
-        i++;
       });
     }
 
     meetingPrefs.append(view);
   }
 
-  function displayMeetingPrefs(meetingType, meetingView, meetingPrefs) {
+  function displayPhoneInfo(meetingView: JQuery,
+                            meetingPrefs: ApiT.PhoneInfo) {
 '''
 <div #view class="esper-meeting-preferences">
   <div class="esper-preference-section esper-clearfix">
@@ -213,35 +205,65 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
-  <div class="esper-preference-section esper-clearfix">
-    <span #bufferText class="esper-preference-text"/>
-    <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Buffer time</span>
-  </div>
-
 </div>
 '''
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
-    bufferText.text(formatDuration(meetingPrefs.buffer));
-    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
-
     var last = false;
     displayAvailability(view, meetingPrefs.availability, last);
-
-    if (meetingType === "phone")
-      displayPhoneNumbers(view, meetingPrefs.phones);
-    else if (meetingType === "video")
-      displayVideoUsernames(view, meetingPrefs.accounts);
-    else if (meetingType === "meal")
-      displayFavoriteLocations(view, meetingPrefs.favorites);
+    displayPhoneNumbers(view, meetingPrefs.phones);
 
     meetingView.children().remove();
     meetingView.append(view);
   }
 
-  function viewOfTransportationType(transportationType, last) {
+  function displayVideoInfo(meetingView: JQuery,
+                            meetingPrefs: ApiT.VideoInfo) {
+'''
+<div #view class="esper-meeting-preferences">
+  <div class="esper-preference-section esper-clearfix">
+    <span #durationText class="esper-preference-text"/>
+    <object #durationIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Duration</span>
+  </div>
+</div>
+'''
+    durationText.text(formatDuration(meetingPrefs.duration));
+    durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    var last = false;
+    displayAvailability(view, meetingPrefs.availability, last);
+    displayVideoUsernames(view, meetingPrefs.accounts);
+
+    meetingView.children().remove();
+    meetingView.append(view);
+  }
+
+  function displayMealInfo(meetingView: JQuery,
+                           meetingPrefs: ApiT.MealInfo) {
+'''
+<div #view class="esper-meeting-preferences">
+  <div class="esper-preference-section esper-clearfix">
+    <span #durationText class="esper-preference-text"/>
+    <object #durationIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">Duration</span>
+  </div>
+</div>
+'''
+    durationText.text(formatDuration(meetingPrefs.duration));
+    durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    var last = false;
+    displayAvailability(view, meetingPrefs.availability, last);
+    displayFavoriteLocations(view, meetingPrefs.favorites);
+
+    meetingView.children().remove();
+    meetingView.append(view);
+  }
+
+  function viewOfTransportationType(transportationType: string,
+                                    last: boolean) {
 '''
 <li #view class="esper-transportation-type esper-clearfix">
   <object #icon class="esper-svg esper-transportation-icon"/>
@@ -258,7 +280,9 @@ module Esper.UserTab {
     return view;
   }
 
-  function createMeetingsDropdown(drop, meetInfo, meetingTypes) {
+  function createMeetingsDropdown(drop: JQuery,
+                                  meetInfo: JQuery,
+                                  meetingTypes: ApiT.MeetingTypes) {
     function option(field, display) {
       $("<option value='" + field + "'>" + display + "</option>")
         .appendTo(drop);
@@ -289,15 +313,16 @@ module Esper.UserTab {
       var field = $(this).val();
       if (field === "header") return;
       else if (field === "phone_call")
-        displayMeetingPrefs("phone", meetInfo, meetingTypes.phone_call);
+        displayPhoneInfo(meetInfo, meetingTypes.phone_call);
       else if (field === "video_call")
-        displayMeetingPrefs("video", meetInfo, meetingTypes.video_call);
+        displayVideoInfo(meetInfo, meetingTypes.video_call);
       else
-        displayMeetingPrefs("meal", meetInfo, meetingTypes[field]);
+        displayMealInfo(meetInfo, meetingTypes[field]);
     });
   }
 
-  function displayWorkplace(workInfo, workplace) {
+  function displayWorkplace(workInfo: JQuery,
+                            workplace: ApiT.Workplace) {
 '''
 <div #view class="esper-workplace-preferences">
   <div class="esper-preference-section">
@@ -313,21 +338,14 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">Duration</span>
   </div>
-  <div class="esper-preference-section esper-clearfix">
-    <span #bufferText class="esper-preference-text"/>
-    <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Buffer time</span>
-  </div>
 </div>
 '''
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
-    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     address.text(workplace.location.address);
     console.log(workplace.duration);
     durationText.text(formatDuration(workplace.duration));
-    bufferText.text(formatDuration(workplace.buffer));
 
     var last = true;
     displayAvailability(view, workplace.availability, last);
@@ -340,7 +358,9 @@ module Esper.UserTab {
     workInfo.append(view);
   }
 
-  function populateWorkplaceDropdown(drop, workInfo, workplaces) {
+  function populateWorkplaceDropdown(drop: JQuery,
+                                     workInfo: JQuery,
+                                     workplaces: ApiT.Workplace[]) {
     for (var i = 0; i < workplaces.length; i++) {
       var workplace = workplaces[i];
       var title = workplace.location.title;
@@ -354,7 +374,7 @@ module Esper.UserTab {
     });
   }
 
-  function viewOfUser(team) {
+  function viewOfUser(team: ApiT.Team) {
 '''
 <div #view>
   <div #spinner>
@@ -392,7 +412,8 @@ module Esper.UserTab {
     return view;
   }
 
-  export function viewOfUserTab(team, profiles) {
+  export function viewOfUserTab(team: ApiT.Team,
+                                profiles: ApiT.Profile[]) {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>
@@ -475,18 +496,14 @@ module Esper.UserTab {
         displayWorkplace(workplaceInfo, workplaces[0]);
 
       var transportationTypes = prefs.transportation.length;
-      var i = 0;
-      var last = false;
-      List.iter(prefs.transportation, function(type) {
-        if (i == (transportationTypes -1))
-          last = true;
+      List.iter(prefs.transportation, function(type, i) {
+        var last = i === prefs.transportation.length - 1;
         transportationPreferences.append(viewOfTransportationType(type, last));
-        i++;
       });
 
       var meetingTypes = prefs.meeting_types;
       createMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
-      displayMeetingPrefs("phone", meetingPreferences, meetingTypes.phone_call);
+      displayPhoneInfo(meetingPreferences, meetingTypes.phone_call);
 
       notes.text(prefs.notes);
     });
