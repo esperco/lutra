@@ -674,19 +674,22 @@ module Esper.TaskTab {
 
     List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
       if (thread.gmail_thrid !== threadId) {
-        var threadLink =
-          $("<li class='esper-link'/>").text(thread.subject);
-        threadLink.click(function(e) {
-          e.stopPropagation();
-          window.location.hash = "#all/" + thread.gmail_thrid;
-        });
+        $("<li class='esper-link'/>")
+          .text(thread.subject)
+          .click(function(e) {
+            e.stopPropagation();
+            window.location.hash = "#all/" + thread.gmail_thrid;
+          })
+          .appendTo(threadsList);
       }
     });
 
-    if (threadsList.children("li").length > 0)
+    if (threadsList.children("li").length > 0) {
       taskTab.linkedThreadsList.append(threadsList);
-    else
+    } else {
       taskTab.linkedThreadsList.append(noThreads);
+      taskTab.showLinkedThreads.click();
+    }
   }
 
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
@@ -1050,6 +1053,34 @@ module Esper.TaskTab {
         createEventDropdown.toggle();
         createEvent.addClass("open");
       }
+    });
+
+    var apiGetTask = autoTask ?
+      Api.getAutoTaskForThread
+      : Api.getTaskForThread;
+
+    apiGetTask(team.teamid, threadId, false, true).done(function(task) {
+      currentTask = task;
+      var title = "";
+      linkedThreadsSpinner.hide();
+      if (task !== undefined) {
+        taskCaption.text("Title");
+        title = task.task_title;
+        displayLinkedThreadsList(task, threadId, taskTabView);
+      } else {
+        taskCaption.text("Create task");
+        var thread = esperGmail.get.email_data();
+        if (thread !== undefined && thread !== null)
+          title = thread.subject;
+      }
+      taskTitle.val(title);
+      Util.afterTyping(taskTitle, 250, function() {
+        var query = taskTitle.val();
+        if (query !== "")
+          displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
+                               taskSearchActions, team, query, profiles,
+                               taskTabView);
+      });
     });
 
     List.iter(team.team_calendars, function(cal) {

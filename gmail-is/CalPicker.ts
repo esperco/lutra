@@ -51,6 +51,7 @@ module Esper.CalPicker {
 '''
     var calendars = Sidebar.currentTeam.team_calendars;
     writeToCalendar = calendars[0];
+    showCalendars = {}; // Clear out old entries from previous views
     showCalendars[writeToCalendar.google_cal_id] = {};
     userSidebar.calendarsContainer.children().remove();
     List.iter(calendars, function(cal, i) {
@@ -66,7 +67,10 @@ module Esper.CalPicker {
         else delete showCalendars[cal.google_cal_id];
         calendarView.fullCalendar("refetchEvents");
       });
-      calendarName.text(cal.calendar_title);
+      var tz =
+        cal.calendar_timezone === "UTC" ? "UTC" : // moment-tz can't handle it
+        (<any> moment).tz(moment(), cal.calendar_timezone).zoneAbbr();
+      calendarName.text(cal.calendar_title + " (" + tz + ")");
       calendarCheckboxRow.appendTo(userSidebar.calendarsContainer);
     });
     userSidebar.calendarsSection.show();

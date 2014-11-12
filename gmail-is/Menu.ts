@@ -18,7 +18,7 @@ module Esper.Menu {
   function replace(menu: JQuery) {
     var rightSibling = Gmail.findMenuAnchor();
     if (rightSibling.length === 1) {
-      $("#esper-menu").remove();
+      $("#esper-menu-root").remove();
       menu.insertBefore(rightSibling);
       return true;
     }
@@ -120,22 +120,37 @@ module Esper.Menu {
    */
   export function create() {
 '''
-<div #view id="esper-menu" class="esper-menu">
-  <div #logo class="esper-click-safe esper-dropdown-btn esper-menu-logo">
-    <object #logoImg class="esper-svg"/>
-  </div>
-  <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
-  <ul #teamSwitcher class="esper-hide esper-ul esper-menu-dropdown">
-    <span #currentTeamName></span>
-    <div #teamSwitcherContent class="esper-dropdown-section"/>
-  </ul>
-  <button #tasksButton class="esper-hide">Tasks</button>
-  <div #tasksLayer></div>
+<div #view id="esper-menu-root" class="esper-menu-root">
+  <!-- fixed elements -->
   <div #background class="esper-menu-bg"/>
-  <object #menuCaret class="esper-svg esper-click-safe esper-caret"/>
-  <ul #menuDropdown class="esper-ul esper-menu-dropdown">
-    <div #menuDropdownContent class="esper-dropdown-section"/>
-  </ul>
+  <div #tasksLayer class="esper-hide esper-tl-tasks-layer"></div>
+
+  <div class="esper-tl-switcher">
+    <div #currentTeamName
+         class="esper-click-safe esper-clickable">
+    </div>
+    <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
+    <ul #teamSwitcher class="esper-hide esper-ul esper-menu-dropdown">
+      <div #teamSwitcherContent class="esper-dropdown-section"/>
+    </ul>
+  </div>
+
+  <button #tasksButton class="esper-hide esper-clickable esper-tl-button">
+    Tasks
+  </button>
+
+  <div class="esper-menu">
+    <div #logo
+         class="esper-click-safe esper-clickable
+                esper-dropdown-btn esper-menu-logo">
+      <object #logoImg class="esper-svg"/>
+    </div>
+    <object #menuCaret class="esper-svg esper-click-safe esper-caret"/>
+    <ul #menuDropdown class="esper-ul esper-menu-dropdown">
+      <div #menuDropdownContent class="esper-dropdown-section"/>
+    </ul>
+  </div>
+
 </div>
 '''
 
