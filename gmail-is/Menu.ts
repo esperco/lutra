@@ -164,7 +164,8 @@ module Esper.Menu {
 
   <div #teamSwitcher class="esper-tl-switcher">
     <div #currentTeamName
-         class="esper-clickable esper-tl-team esper-dropdown-btn">
+         class="esper-clickable esper-tl-team esper-dropdown-btn"
+         title="Select other team">
     </div>
     <object #teamsCaret class="esper-svg esper-click-safe esper-tl-caret"/>
     <ul #teamsDropdown class="esper-drop-ul esper-tl-dropdown">
@@ -172,14 +173,17 @@ module Esper.Menu {
     </ul>
   </div>
 
-  <div #tasksButton class="esper-hide esper-clickable esper-tl-button">
+  <div #tasksButton
+       class="esper-hide esper-clickable esper-tl-button"
+       title="View tasks for this team">
     Tasks
   </div>
 
   <div class="esper-menu">
     <div #logo
          class="esper-click-safe esper-clickable
-                esper-dropdown-btn esper-menu-logo">
+                esper-dropdown-btn esper-menu-logo"
+         title="Esper">
       <object #logoImg class="esper-svg"/>
     </div>
     <object #menuCaret class="esper-svg esper-click-safe esper-menu-caret"/>

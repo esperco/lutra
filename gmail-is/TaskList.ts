@@ -85,7 +85,7 @@ module Esper.TaskList {
     <span #title class="esper-tl-task-title"></span>
     <button #deleteButton class="esper-clickable">Delete</button>
   </div>
-  <div>Threads:</div>
+  <div class="esper-bold">Threads</div>
   <ul #linkedThreadContainer class="esper-ul"></ul>
   <ul #linkedEventContainer class="esper-ul"></ul>
 </li>
