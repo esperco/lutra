@@ -64,10 +64,10 @@ module Esper.Menu {
                              tasksLayer: JQuery) {
 
     var team = currentTeam.get();
-    var isOpen = false;
     view.currentTeamName
       .text(team.team_name)
       .click(function() {
+        var isOpen = false;
         if (isOpen) {
           Log.d("Hide dropdown");
           Sidebar.dismissDropdowns();
@@ -75,9 +75,9 @@ module Esper.Menu {
         } else {
           Log.d("Show dropdown");
           Sidebar.dismissDropdowns();
-          view.background.toggle();
-          view.teamsCaret.toggle();
-          view.teamsDropdown.toggle();
+          view.background.show();
+          view.teamsCaret.show();
+          view.teamsDropdown.show();
           isOpen = true;
         }
     });
@@ -210,9 +210,9 @@ module Esper.Menu {
         isOpen = false;
       } else {
         Sidebar.dismissDropdowns();
-        background.toggle();
-        menuCaret.toggle();
-        menuDropdown.toggle();
+        background.show();
+        menuCaret.show();
+        menuDropdown.show();
         isOpen = true;
       }
     });
