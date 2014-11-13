@@ -60,7 +60,8 @@ module Esper.Menu {
   }
 
   function setupTeamSwitcher(teams: ApiT.Team[],
-                             view: Menu) {
+                             view: Menu,
+                             tasksLayer: JQuery) {
 
     var team = currentTeam.get();
     view.currentTeamName
@@ -72,13 +73,14 @@ module Esper.Menu {
         .text(team.team_name)
         .click(function() {
           currentTeam.set(team);
-          TaskList.display(team, view.tasksLayer);
+          TaskList.display(team, tasksLayer);
         })
         .appendTo(view.teamSwitcherContent);
     });
   }
 
-  function setupTaskListControls(view: Menu) {
+  function setupTaskListControls(view: Menu,
+                                 tasksLayer: JQuery) {
     var teams = Login.myTeams();
     if (teams === undefined || teams.length === 0) {
       view.teamSwitcher.addClass("esper-hide");
@@ -88,12 +90,12 @@ module Esper.Menu {
         currentTeam.set(teams[0]);
       }
       var team = currentTeam.get();
-      setupTeamSwitcher(teams, view);
+      setupTeamSwitcher(teams, view, tasksLayer);
       view.teamSwitcher.removeClass("esper-hide");
       view.tasksButton
         .removeClass("esper-hide")
         .unbind("click")
-        .click(function() { TaskList.display(team, view.tasksLayer); });
+        .click(function() { TaskList.display(team, tasksLayer); });
     }
   }
 
@@ -106,11 +108,26 @@ module Esper.Menu {
     currentTeamName: JQuery;
     teamSwitcherContent: JQuery;
     tasksButton: JQuery;
-    tasksLayer: JQuery;
     background: JQuery;
     menuCaret: JQuery;
     menuDropdown: JQuery;
     menuDropdownContent: JQuery;
+  }
+
+  function createTasksLayer(): JQuery {
+/*
+   This overlay needs to be created near the document's root,
+   otherwise the Google logo and search box are displayed on top of it.
+*/
+    $("#esper-tasks-layer").remove();
+'''
+<div #tasksLayer
+     id="esper-tasks-layer"
+     class="esper-hide esper-tl-tasks-layer">
+</div>
+'''
+    $("body").append(tasksLayer);
+    return tasksLayer;
   }
 
   /*
@@ -123,7 +140,6 @@ module Esper.Menu {
 <div #view id="esper-menu-root" class="esper-menu-root">
   <!-- fixed elements -->
   <div #background class="esper-menu-bg"/>
-  <div #tasksLayer class="esper-hide esper-tl-tasks-layer"></div>
 
   <div class="esper-tl-switcher">
     <div #currentTeamName
@@ -155,6 +171,7 @@ module Esper.Menu {
 '''
 
     var menuView = <Menu> _view;
+    var tasksLayer = createTasksLayer();
 
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
@@ -169,7 +186,7 @@ module Esper.Menu {
     updateLinks(menuDropdownContent);
 
     teamsCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
-    setupTaskListControls(menuView);
+    setupTaskListControls(menuView, tasksLayer);
 
     logo.click(function() {
       if (logo.hasClass("open")) {

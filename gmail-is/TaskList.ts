@@ -2,7 +2,7 @@ module Esper.TaskList {
 
   function renderThreads(threads: ApiT.EmailThread[],
                          closeTaskListLayer: () => void,
-                         parent: JQuery) {
+                         ul: JQuery) {
     List.iter(threads, function(thread) {
       var threadLink =
         $("<li class='esper-link'/>").text(thread.subject);
@@ -12,7 +12,7 @@ module Esper.TaskList {
           window.location.hash = "#all/" + thread.gmail_thrid;
           return false;
         })
-        .appendTo(parent);
+        .appendTo(ul);
     });
   }
 
@@ -81,10 +81,13 @@ module Esper.TaskList {
                       closeTaskListLayer: () => void) {
 '''
 <li #li>
-  <span #title class="esper-tl-task-title"></span>
-  <button #deleteButton>Delete</button>
-  <div #linkedThreadContainer></div>
-  <div #linkedEventContainer></div>
+  <div>
+    <span #title class="esper-tl-task-title"></span>
+    <button #deleteButton class="esper-clickable">Delete</button>
+  </div>
+  <div>Threads:</div>
+  <ul #linkedThreadContainer></ul>
+  <ul #linkedEventContainer></ul>
 </li>
 '''
     title.text(task.task_title);
@@ -103,17 +106,27 @@ module Esper.TaskList {
 
 '''
 <div #container class="esper-tl-task-list">
-  <button #closeButton>Close</button>
+  <h1 class="esper-tl-head">Tasks</h1>
+  <button #closeButton class="esper-tl-close esper-clickable">Close</button>
   <ul #listContainer></ul>
 </div>
 '''
+    parent.removeClass("esper-hide");
+
     function closeTaskListLayer() {
-      container.addClass("esper-hide");
+      parent.addClass("esper-hide");
     }
 
+    container.click(function() {
+      return false; // prevents click events from reaching the parent
+    });
+
+    parent.click(closeTaskListLayer);
     closeButton.click(closeTaskListLayer);
 
-    Api.getTaskList(team.teamid, 1000, true, true)
+    var withEvents = true; // turning this off will speed things up
+    var withThreads = true;
+    Api.getTaskList(team.teamid, 1000, withEvents, withThreads)
       .done(function(x: ApiT.TaskList) {
         List.iter(x.tasks, function(task) {
           renderTask(task, closeTaskListLayer)
