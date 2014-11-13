@@ -103,14 +103,14 @@ module Esper.CalSearch {
     Util.afterTyping(searchView.search, 250, function() {
       searchView.results.find("li").remove();
       if (searchView.search.val() === "") {
-        if (searchView.resultsDropdown.hasClass("open")) {
+        if (searchView.resultsDropdown.hasClass("esper-open")) {
           searchView.resultsDropdown.toggle();
-          searchView.resultsDropdown.removeClass("open");
+          searchView.resultsDropdown.removeClass("esper-open");
         }
       } else {
-        if (!(searchView.resultsDropdown.hasClass("open"))) {
+        if (!(searchView.resultsDropdown.hasClass("esper-open"))) {
           searchView.resultsDropdown.toggle();
-          searchView.resultsDropdown.addClass("open");
+          searchView.resultsDropdown.addClass("esper-open");
         }
         searchView.spinner.show();
         searchView.noResults.hide();

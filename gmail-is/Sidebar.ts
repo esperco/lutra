@@ -23,7 +23,7 @@ module Esper.Sidebar {
     $(".esper-drop-ul").hide();
     $(".esper-menu-bg").hide();
     $(".esper-caret").hide();
-    $(".esper-dropdown-btn").removeClass("open");
+    $(".esper-dropdown-btn").removeClass("esper-open");
   }
 
   $(document).on('click', function(e) {
@@ -176,13 +176,13 @@ module Esper.Sidebar {
     });
 
     function toggleOptions() {
-      if (options.hasClass("open")) {
+      if (options.hasClass("esper-open")) {
         dismissDropdowns();
         options.tooltip("enable");
       } else {
         dismissDropdowns();
         options
-          .addClass("open")
+          .addClass("esper-open")
           .tooltip("disable");
         dropdown.show();
       }

@@ -68,12 +68,12 @@ module Esper.Menu {
     view.currentTeamName
       .text(team.team_name)
       .click(function() {
-        Log.d("yo click");
         if (isOpen) {
+          Log.d("Hide dropdown");
           Sidebar.dismissDropdowns();
           isOpen = false;
         } else {
-          Log.d("yo");
+          Log.d("Show dropdown");
           Sidebar.dismissDropdowns();
           view.background.toggle();
           view.teamsCaret.toggle();
@@ -202,17 +202,18 @@ module Esper.Menu {
 
     teamsCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
     setupTaskListControls(menuView, tasksLayer);
-    menuView.currentTeamName.click(function() { Log.d("wtf"); });
 
     logo.click(function() {
-      if (logo.hasClass("open")) {
+      var isOpen = false;
+      if (isOpen) {
         Sidebar.dismissDropdowns();
+        isOpen = false;
       } else {
         Sidebar.dismissDropdowns();
         background.toggle();
         menuCaret.toggle();
         menuDropdown.toggle();
-        logo.addClass("open");
+        isOpen = true;
       }
     });
 
