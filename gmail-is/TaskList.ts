@@ -86,8 +86,8 @@ module Esper.TaskList {
     <button #deleteButton class="esper-clickable">Delete</button>
   </div>
   <div>Threads:</div>
-  <ul #linkedThreadContainer></ul>
-  <ul #linkedEventContainer></ul>
+  <ul #linkedThreadContainer class="esper-ul"></ul>
+  <ul #linkedEventContainer class="esper-ul"></ul>
 </li>
 '''
     title.text(task.task_title);
@@ -108,7 +108,7 @@ module Esper.TaskList {
 <div #container class="esper-tl-task-list">
   <h1 class="esper-tl-head">Tasks</h1>
   <button #closeButton class="esper-tl-close esper-clickable">Close</button>
-  <ul #listContainer></ul>
+  <ul #listContainer class="esper-ul"></ul>
 </div>
 '''
     parent.removeClass("esper-hide");

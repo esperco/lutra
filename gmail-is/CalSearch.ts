@@ -171,7 +171,7 @@ module Esper.CalSearch {
         type="text" class="esper-input esper-search-modal-input"
         placeholder="Search calendar"/>
       <ul #resultsDropdown
-          class="esper-ul esper-dropdown-btn esper-ev-search-dropdown">
+          class="esper-drop-ul esper-dropdown-btn esper-ev-search-dropdown">
         <div #spinner class="esper-spinner esper-search-spinner"/>
         <div #results>
           <div #noResults class="esper-no-results esper-click-safe">

@@ -64,12 +64,26 @@ module Esper.Menu {
                              tasksLayer: JQuery) {
 
     var team = currentTeam.get();
+    var isOpen = false;
     view.currentTeamName
       .text(team.team_name)
-      .click();
+      .click(function() {
+        Log.d("yo click");
+        if (isOpen) {
+          Sidebar.dismissDropdowns();
+          isOpen = false;
+        } else {
+          Log.d("yo");
+          Sidebar.dismissDropdowns();
+          view.background.toggle();
+          view.teamsCaret.toggle();
+          view.teamsDropdown.toggle();
+          isOpen = true;
+        }
+    });
 
     List.iter(teams, function(team) {
-      $("<li class=''>")
+      $("<li class='esper-li'>")
         .text(team.team_name)
         .click(function() {
           currentTeam.set(team);
@@ -83,7 +97,7 @@ module Esper.Menu {
                                  tasksLayer: JQuery) {
     var teams = Login.myTeams();
     if (teams === undefined || teams.length === 0) {
-      view.teamSwitcher.addClass("esper-hide");
+      view.currentTeamName.addClass("esper-hide");
       view.tasksButton.addClass("esper-hide");
     } else {
       if (currentTeam.get() === undefined) {
@@ -91,7 +105,7 @@ module Esper.Menu {
       }
       var team = currentTeam.get();
       setupTeamSwitcher(teams, view, tasksLayer);
-      view.teamSwitcher.removeClass("esper-hide");
+      view.currentTeamName.removeClass("esper-hide");
       view.tasksButton
         .removeClass("esper-hide")
         .unbind("click")
@@ -103,8 +117,9 @@ module Esper.Menu {
     view: JQuery;
     logo: JQuery;
     logoImg: JQuery;
-    teamsCaret: JQuery;
     teamSwitcher: JQuery;
+    teamsCaret: JQuery;
+    teamsDropdown: JQuery;
     currentTeamName: JQuery;
     teamSwitcherContent: JQuery;
     tasksButton: JQuery;
@@ -141,12 +156,12 @@ module Esper.Menu {
   <!-- fixed elements -->
   <div #background class="esper-menu-bg"/>
 
-  <div class="esper-tl-switcher">
+  <div #teamSwitcher class="esper-tl-switcher">
     <div #currentTeamName
-         class="esper-click-safe esper-clickable esper-tl-team">
+         class="esper-clickable esper-tl-team">
     </div>
     <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
-    <ul #teamSwitcher class="esper-hide esper-ul esper-menu-dropdown">
+    <ul #teamsDropdown class="esper-drop-ul esper-menu-dropdown">
       <div #teamSwitcherContent class="esper-dropdown-section"/>
     </ul>
   </div>
@@ -162,7 +177,7 @@ module Esper.Menu {
       <object #logoImg class="esper-svg"/>
     </div>
     <object #menuCaret class="esper-svg esper-click-safe esper-caret"/>
-    <ul #menuDropdown class="esper-ul esper-menu-dropdown">
+    <ul #menuDropdown class="esper-drop-ul esper-menu-dropdown">
       <div #menuDropdownContent class="esper-dropdown-section"/>
     </ul>
   </div>
@@ -187,6 +202,7 @@ module Esper.Menu {
 
     teamsCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
     setupTaskListControls(menuView, tasksLayer);
+    menuView.currentTeamName.click(function() { Log.d("wtf"); });
 
     logo.click(function() {
       if (logo.hasClass("open")) {

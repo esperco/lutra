@@ -297,7 +297,7 @@ module Esper.TaskTab {
 <div #optionsView>
   <div #disclose class="esper-click-safe esper-dropdown-btn
                    esper-clickable esper-ev-disclose"/>
-  <ul #dropdown class="esper-ul esper-ev-dropdown">
+  <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
       <li #editEvent
           class="esper-li esper-disabled">
@@ -320,7 +320,7 @@ module Esper.TaskTab {
         Choose this event
       </li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div #syncOption class="esper-click-safe esper-dropdown-section">
       <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
         <span class="esper-click-safe esper-sync-option-text">
@@ -871,9 +871,9 @@ module Esper.TaskTab {
     <input #taskTitle type="text" size="24"
            class="esper-input esper-task-name"/>
     <ul #taskSearchDropdown
-        class="esper-ul esper-dropdown-btn esper-task-search-dropdown">
+        class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
-      <div class="esper-click-safe esper-ul-divider"/>
+      <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
   </div>
@@ -915,7 +915,8 @@ module Esper.TaskTab {
               Create event
             </div>
           </div>
-          <ul #createEventDropdown class="esper-ul esper-create-event-dropdown">
+          <ul #createEventDropdown
+              class="esper-drop-ul esper-create-event-dropdown">
             <div #calendarList class="esper-dropdown-section"/>
           </ul>
           <div class="esper-vertical-divider"/>

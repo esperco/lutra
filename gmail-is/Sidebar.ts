@@ -20,7 +20,7 @@ module Esper.Sidebar {
   }
 
   export function dismissDropdowns() {
-    $(".esper-ul").hide();
+    $(".esper-drop-ul").hide();
     $(".esper-menu-bg").hide();
     $(".esper-caret").hide();
     $(".esper-dropdown-btn").removeClass("open");
@@ -81,20 +81,20 @@ module Esper.Sidebar {
     <div #wrapLeft class="esper-dock-wrap-left"/>
     <div #wrapRight class="esper-dock-wrap-right"/>
   </div>
-  <ul #dropdown class="esper-ul esper-options-menu">
+  <ul #dropdown class="esper-drop-ul esper-options-menu">
     <div #teamsSection class="esper-dropdown-section">
       <li class="esper-click-safe esper-li esper-bold
                  esper-disabled esper-team-list-title">
         Users
       </li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div class="esper-dropdown-section">
       <li #settings class="esper-li">Settings</li>
       <a #help class="esper-a" href="mailto:team@esper.com">Help</a>
       <li #signOut class="esper-li esper-danger">Sign out</li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
       <object #logo
               class="esper-svg esper-click-safe esper-dropdown-footer-logo"/>
