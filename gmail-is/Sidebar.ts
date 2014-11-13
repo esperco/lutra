@@ -19,10 +19,16 @@ module Esper.Sidebar {
     }
   }
 
+  /* This is a global operation that affects all the possible dropdowns.
+     TODO: move to a module with global stuff
+     TODO: let each module provide its own local dismissDropdowns()
+           (we should not depend on their implementation details here)
+  */
   export function dismissDropdowns() {
     $(".esper-drop-ul").hide();
     $(".esper-menu-bg").hide();
-    $(".esper-caret").hide();
+    $(".esper-menu-caret").hide();
+    $(".esper-tl-caret").hide();
     $(".esper-dropdown-btn").removeClass("esper-open");
   }
 

@@ -64,23 +64,29 @@ module Esper.Menu {
                              tasksLayer: JQuery) {
 
     var team = currentTeam.get();
+
     view.currentTeamName
       .text(team.team_name)
       .click(function() {
-        var isOpen = false;
-        if (isOpen) {
-          Log.d("Hide dropdown");
+        /*
+          Other controls may hide the dropdown, so inspecting its visibility
+          is the most reliable option.
+        */
+        if (view.teamsDropdown.is(":visible")) {
           Sidebar.dismissDropdowns();
-          isOpen = false;
         } else {
-          Log.d("Show dropdown");
           Sidebar.dismissDropdowns();
           view.background.show();
           view.teamsCaret.show();
           view.teamsDropdown.show();
-          isOpen = true;
         }
-    });
+        return false; // prevents click event from bubbling up
+      });
+
+    currentTeam.watch(function(team) {
+      view.currentTeamName
+        .text(team.team_name);
+    }, "team-switcher-current");
 
     List.iter(teams, function(team) {
       $("<li class='esper-li'>")
@@ -158,17 +164,17 @@ module Esper.Menu {
 
   <div #teamSwitcher class="esper-tl-switcher">
     <div #currentTeamName
-         class="esper-clickable esper-tl-team">
+         class="esper-clickable esper-tl-team esper-dropdown-btn">
     </div>
-    <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
-    <ul #teamsDropdown class="esper-drop-ul esper-menu-dropdown">
+    <object #teamsCaret class="esper-svg esper-click-safe esper-tl-caret"/>
+    <ul #teamsDropdown class="esper-drop-ul esper-tl-dropdown">
       <div #teamSwitcherContent class="esper-dropdown-section"/>
     </ul>
   </div>
 
-  <button #tasksButton class="esper-hide esper-clickable esper-tl-button">
+  <div #tasksButton class="esper-hide esper-clickable esper-tl-button">
     Tasks
-  </button>
+  </div>
 
   <div class="esper-menu">
     <div #logo
@@ -176,7 +182,7 @@ module Esper.Menu {
                 esper-dropdown-btn esper-menu-logo">
       <object #logoImg class="esper-svg"/>
     </div>
-    <object #menuCaret class="esper-svg esper-click-safe esper-caret"/>
+    <object #menuCaret class="esper-svg esper-click-safe esper-menu-caret"/>
     <ul #menuDropdown class="esper-drop-ul esper-menu-dropdown">
       <div #menuDropdownContent class="esper-dropdown-section"/>
     </ul>
@@ -204,16 +210,13 @@ module Esper.Menu {
     setupTaskListControls(menuView, tasksLayer);
 
     logo.click(function() {
-      var isOpen = false;
-      if (isOpen) {
+      if (menuDropdown.is(":visible")) {
         Sidebar.dismissDropdowns();
-        isOpen = false;
       } else {
         Sidebar.dismissDropdowns();
         background.show();
         menuCaret.show();
         menuDropdown.show();
-        isOpen = true;
       }
     });
 
