@@ -143,7 +143,7 @@ module Esper.Menu {
 
   <div class="esper-tl-switcher">
     <div #currentTeamName
-         class="esper-click-safe esper-clickable">
+         class="esper-click-safe esper-clickable esper-tl-team">
     </div>
     <object #teamsCaret class="esper-svg esper-click-safe esper-caret"/>
     <ul #teamSwitcher class="esper-hide esper-ul esper-menu-dropdown">

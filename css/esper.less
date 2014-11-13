@@ -297,29 +297,26 @@ textarea.esper-input { resize: none; }
 
 /* Container of all the Esper controls in the top navigation bar */
 .esper-menu-root {
-  display: inline;
-  margin-left: 5px;
-  margin-right: 5px;
-  height: 30px;
+  height: 24px;
+  margin-top: 2px; /* ad-hoc vertical alignment with existing text */
 }
 
 /* Element containing the Esper logo (right) */
 .esper-menu {
-  display: inline;
-  height: 30px;
+  display: inline-block;
+  height: 24px;
   width: 30px;
+  vertical-align: middle;
 }
 
 /* Task list button (middle) */
 .esper-tl-button {
   display: inline;
-  width: 40px;
 }
 
 /* Team switcher (left) */
 .esper-tl-switcher {
-  display: inline;
-  width: 40px;
+  display: inline-block;
 }
 
 .esper-menu-logo {
@@ -368,6 +365,10 @@ textarea.esper-input { resize: none; }
   font-weight: bold;
 }
 
+.esper-tl-team {
+  vertical-align: middle;
+}
+
 .esper-tl-tasks-layer {
   position: fixed;
   z-index: 10;
@@ -400,8 +401,12 @@ textarea.esper-input { resize: none; }
   bottom: 0;
   &.esper-team-danger {
     .esper-dock { background: @orange; }
-    .esper-dock-wrap-left { border-color: transparent transparent @orange_hover transparent; }
-    .esper-dock-wrap-right { border-color: transparent transparent transparent @orange_hover; }
+    .esper-dock-wrap-left {
+      border-color: transparent transparent @orange_hover transparent;
+    }
+    .esper-dock-wrap-right {
+      border-color: transparent transparent transparent @orange_hover;
+    }
     .esper-dock-action:hover { background: @orange_hover_light; }
     .esper-options.open { background: @orange_hover_light; }
   }
