@@ -437,6 +437,40 @@ module Esper.UserTab {
     return view;
   }
 
+  function displayGeneralPrefs(container : JQuery,
+                               prefs : ApiT.GeneralPrefs) {
+'''
+<div #view>
+  <div>
+    <span>Send exec confirmations:</span>
+    <span class="esper-red" #sendConfirmation>No</span>
+  </div>
+  <div>
+    <span>Send exec reminders:</span>
+    <span class="esper-red" #sendReminder>No</span>
+  </div>
+  <div>
+    <span>Use duplicate events:</span>
+    <span class="esper-red" #useDuplicate>Yes</span>
+  </div>
+</ul>
+'''
+    if (prefs.send_exec_confirmation)
+      sendConfirmation.text("Yes")
+        .removeClass("esper-red")
+        .addClass("esper-green");
+    if (prefs.send_exec_reminder)
+      sendReminder.text("Yes")
+        .removeClass("esper-red")
+        .addClass("esper-green");
+    if (!prefs.use_duplicate_events)
+      useDuplicate.text("No")
+        .removeClass("esper-green")
+        .addClass("esper-red");
+
+    container.append(view);
+  }
+
   export function viewOfUserTab(team: ApiT.Team,
                                 profiles: ApiT.Profile[]) {
 '''
@@ -499,6 +533,16 @@ module Esper.UserTab {
       </div>
     </div>
     <div class="esper-section">
+      <div #generalHeader class="esper-section-header esper-clearfix">
+        <span #showGeneral
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">General Preferences</span>
+      </div>
+      <div #generalContainer
+           class="esper-section-container esper-preferences-general"
+           style="display:none"/>
+    </div>
+    <div class="esper-section">
       <div #notesHeader class="esper-section-header esper-clearfix">
         <span #showNotes
               class="esper-link" style="float:right">Show</span>
@@ -530,6 +574,9 @@ module Esper.UserTab {
       createMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
       if (meetingTypes.phone_call !== undefined)
         displayPhoneInfo(meetingPreferences, meetingTypes.phone_call);
+
+      if (prefs.general !== undefined)
+        displayGeneralPrefs(generalContainer, prefs.general);
 
       notes.text(prefs.notes);
     });
@@ -581,6 +628,17 @@ module Esper.UserTab {
       }
     });
 
+    showGeneral.click(function() {
+      Sidebar.toggleList(generalContainer);
+      if (this.innerHTML === "Hide") {
+        $(this).text("Show");
+        generalContainer.removeClass("open");
+      } else {
+        $(this).text("Hide");
+        generalHeader.addClass("open");
+      }
+    });
+
     showNotes.click(function() {
       Sidebar.toggleList(notesContainer);
       if (this.innerHTML === "Hide") {
@@ -591,6 +649,9 @@ module Esper.UserTab {
         notesHeader.addClass("open");
       }
     });
+
+    showGeneral.click();
+    showNotes.click();
 
     return _view;
   }
