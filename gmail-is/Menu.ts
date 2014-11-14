@@ -109,13 +109,12 @@ module Esper.Menu {
       if (currentTeam.get() === undefined) {
         currentTeam.set(teams[0]);
       }
-      var team = currentTeam.get();
       setupTeamSwitcher(teams, view, tasksLayer);
       view.currentTeamName.removeClass("esper-hide");
       view.tasksButton
         .removeClass("esper-hide")
         .unbind("click")
-        .click(function() { TaskList.display(team, tasksLayer); });
+        .click(function() { TaskList.display(currentTeam.get(), tasksLayer); });
     }
   }
 
