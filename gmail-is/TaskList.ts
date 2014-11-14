@@ -140,7 +140,7 @@ module Esper.TaskList {
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
-    Api.getTaskList(team.teamid, 1000, withEvents, withThreads)
+    Api.getTaskList(team.teamid, 100, withEvents, withThreads)
       .done(function(x: ApiT.TaskList) {
         List.iter(x.tasks, function(task) {
           renderTask(task, closeTaskListLayer)
