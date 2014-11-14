@@ -82,26 +82,28 @@ module Esper.TaskTab {
     return viewPerson;
   }
 
-  function openDuplicateEventModal(team, e, threadid, taskTab, profiles) {
+  function openInviteGuestsModal(team, e, threadid, taskTab, profiles, prefs) {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
   <div #modal class="esper-modal esper-welcome-modal">
-    <div class="esper-modal-header">Create a duplicate event</div>
+    <div #heading class="esper-modal-header">
+      Create a duplicate event for guests
+    </div>
     <div class="esper-ev-modal-content">
-      <div class="esper-ev-modal-row esper-clearfix">
+      <div #titleRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Title</div>
         <div class="esper-ev-modal-right">
           <input #pubTitle type="text" class="esper-input"/>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
+      <div #whereRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Where</div>
         <div class="esper-ev-modal-right">
           <input #pubLocation type="text" class="esper-input"/>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
+      <div #calendarRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Calendar</div>
         <div class="esper-ev-modal-right">
           <select #pubCalendar class="esper-select"/>
@@ -113,7 +115,7 @@ module Esper.TaskTab {
           <select #fromSelect class="esper-select"/>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
+      <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Description</div>
         <div class="esper-ev-modal-right">
           <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
@@ -199,8 +201,21 @@ module Esper.TaskTab {
 
     background.click(closeModal);
 
+    var duplicate =
+      prefs.general !== undefined ?
+      prefs.general.use_duplicate_events :
+      true;
+
+    if (!duplicate) {
+      heading.text("Invite guests to this calendar event");
+      titleRow.hide();
+      whereRow.hide();
+      calendarRow.hide();
+      descriptionRow.hide();
+    }
+
     create.click(function() {
-      create.text("Creating...");
+      create.text(duplicate ? "Creating..." : "Inviting...");
       create.prop("disabled", true);
       var guests = [];
       for (var email in peopleInvolved) {
@@ -224,12 +239,17 @@ module Esper.TaskTab {
         all_day:       e.all_day,
         guests:        guests,
       };
-      Api.createLinkedEvent(team.teamid, ev, threadid)
-        .done(function(created) {
-          closeModal();
-          Api.sendEventInvites(team.teamid, fromEmail, guests, created);
-          refreshlinkedEventsList(team, threadid, taskTab, profiles);
-        });
+      if (duplicate) {
+        Api.createLinkedEvent(team.teamid, ev, threadid)
+          .done(function(created) {
+            closeModal();
+            Api.sendEventInvites(team.teamid, fromEmail, guests, created);
+            refreshlinkedEventsList(team, threadid, taskTab, profiles);
+          });
+      } else {
+        Api.sendEventInvites(team.teamid, fromEmail, guests, e);
+        closeModal();
+      }
     });
 
     cancel.click(closeModal);
@@ -303,9 +323,9 @@ module Esper.TaskTab {
           class="esper-li esper-disabled">
         Edit
       </li>
-      <li #duplicateEvent
+      <li #inviteGuests
           class="esper-li">
-        Duplicate
+        Invite guests
       </li>
       <li #unlinkEvent
           class="esper-li">
@@ -432,8 +452,10 @@ module Esper.TaskTab {
       }
     })
 
-    duplicateEvent.click(function() {
-      openDuplicateEventModal(team, e, threadId, taskTab, profiles);
+    inviteGuests.click(function() {
+      Api.getPreferences(team.teamid).done(function(prefs) {
+        openInviteGuestsModal(team, e, threadId, taskTab, profiles, prefs);
+      });
     });
 
     unlinkEvent.click(function() {
