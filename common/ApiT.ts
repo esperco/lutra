@@ -274,6 +274,9 @@ module Esper.ApiT {
     taskid: string;
     task_title: string;
     task_teamid: string;
+    task_urgent: boolean;
+    task_canceled: boolean;
+    task_unread_emails?: number;
     task_threads: EmailThread[];
     task_events: TaskEvent[];
   }

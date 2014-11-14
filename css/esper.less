@@ -374,6 +374,10 @@ textarea.esper-input { resize: none; }
          box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
 }
 
+.esper-menu-important {
+  font-weight: bold;
+}
+
 .esper-tl-caret {
   display: none;
   z-index: 12;
@@ -397,13 +401,11 @@ textarea.esper-input { resize: none; }
          box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
 }
 
-.esper-menu-important {
-  font-weight: bold;
-}
-
 .esper-tl-team {
   vertical-align: middle;
 }
+
+/*** Task list ***/
 
 .esper-tl-tasks-layer {
   position: fixed;
@@ -415,6 +417,15 @@ textarea.esper-input { resize: none; }
   background-color: rgba(0, 0, 0, 0.6);
 }
 
+.esper-tl-close {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 22px;
+  color: @gray_20;
+  padding: 10px;
+}
+
 .esper-tl-task-list {
   position: relative;
   overflow-y: scroll;
@@ -422,11 +433,59 @@ textarea.esper-input { resize: none; }
   height: 80%;
   left: 30%;
   top: 10%;
-  background-color: #ffffff;
+
+  background-color: white;
   border-radius: 3px;
+  padding: 10px 20px 10px 20px; /* order: TRBL as in TRouBLe aka clockwise */
+}
+
+.esper-tl-list {
+}
+
+.esper-tl-task {
+  margin-bottom: 27px;
 }
 
 .esper-tl-task-title {
+  font-weight: bold;
+}
+
+.esper-label {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+  bottom: 2px;
+  border-radius: 2px;
+}
+
+.esper-tl-urgent {
+  .esper-label;
+  background: @red;
+  color: white;
+}
+
+.esper-tl-canceled {
+  .esper-label;
+  background: @gray_40;
+  color: white;
+}
+
+.esper-tl-threads {
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.esper-tl-thread {
+}
+
+.esper-tl-events {
+}
+
+.esper-tl-event {
+  display: inline-block;
+  padding: 2px 5px 2px 5px;
 }
 
 /*** Esper Dock ***/

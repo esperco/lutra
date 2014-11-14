@@ -2,23 +2,24 @@ module Esper.TaskList {
 
   function renderThreads(threads: ApiT.EmailThread[],
                          closeTaskListLayer: () => void,
-                         ul: JQuery) {
+                         parent: JQuery) {
     List.iter(threads, function(thread) {
-      var threadLink =
-        $("<li class='esper-link'/>").text(thread.subject);
+      var threadLink = $("<div class='esper-link esper-tl-thread'/>")
+        .text(thread.subject)
+        .attr("title", "Jump to this conversation");
       threadLink
         .click(function(e) {
           closeTaskListLayer();
           window.location.hash = "#all/" + thread.gmail_thrid;
           return false;
         })
-        .appendTo(ul);
+        .appendTo(parent);
     });
   }
 
   function renderEvent(e: ApiT.CalendarEvent) {
 '''
-<div #view class="esper-ev">
+<div #view class="esper-tl-event">
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
@@ -80,25 +81,35 @@ module Esper.TaskList {
   function renderTask(task: ApiT.Task,
                       closeTaskListLayer: () => void) {
 '''
-<li #li>
+<div #view class="esper-tl-task">
   <div>
     <span #title class="esper-tl-task-title"></span>
-    <button #deleteButton class="esper-clickable">Delete</button>
+    <span #urgent class="esper-tl-urgent">Urgent</span>
+    <span #canceled class="esper-tl-canceled">Canceled</span>
+    <span #deleteButton
+          class="esper-clickable esper-link-danger"
+          title="Delete this task">
+      Delete
+    </span>
   </div>
-  <div class="esper-bold">Threads</div>
-  <ul #linkedThreadContainer class="esper-ul"></ul>
-  <ul #linkedEventContainer class="esper-ul"></ul>
-</li>
+  <div #linkedThreadContainer class="esper-tl-threads"></div>
+  <div #linkedEventContainer class="esper-tl-events"></div>
+</div>
 '''
+    if (!task.task_urgent)
+      urgent.remove();
+    if (!task.task_canceled)
+      canceled.remove();
+
     title.text(task.task_title);
     deleteButton.click(function() {
       Api.deleteTask(task.taskid);
-      li.remove();
+      view.remove();
     });
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
     renderEvents(task.task_events, linkedEventContainer);
 
-    return li;
+    return view;
   }
 
   export function display(team: ApiT.Team,
@@ -106,16 +117,19 @@ module Esper.TaskList {
 
 '''
 <div #container class="esper-tl-task-list">
-  <h1 class="esper-tl-head">Tasks</h1>
-  <button #closeButton class="esper-tl-close esper-clickable">Close</button>
-  <ul #listContainer class="esper-ul"></ul>
+  <h1 #teamName class="esper-tl-head"></h1>
+  <span #closeButton class="esper-tl-close esper-clickable">×</span>
+  <div #listContainer class="esper-tl-list"></div>
 </div>
 '''
+    parent.children().remove();
     parent.removeClass("esper-hide");
 
     function closeTaskListLayer() {
       parent.addClass("esper-hide");
     }
+
+    teamName.text(team.team_name + " tasks");
 
     container.click(function() {
       return false; // prevents click events from reaching the parent
@@ -124,7 +138,7 @@ module Esper.TaskList {
     parent.click(closeTaskListLayer);
     closeButton.click(closeTaskListLayer);
 
-    var withEvents = true; // turning this off will speed things up
+    var withEvents = true; // turning this off speeds things up
     var withThreads = true;
     Api.getTaskList(team.teamid, 1000, withEvents, withThreads)
       .done(function(x: ApiT.TaskList) {
@@ -133,7 +147,6 @@ module Esper.TaskList {
             .appendTo(listContainer);
         });
         /* TODO: paging, ideally with infinite scroll */
-        parent.children().remove();
         parent.append(container);
       });
   }
