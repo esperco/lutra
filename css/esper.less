@@ -86,15 +86,16 @@ hr.esper-hr {
 
 ul.esper-ul, li.esper-li { list-style-type: none; }
 
-ul.esper-ul {
+ul.esper-drop-ul {
   display: none;
+  list-style-type: none;
   padding: 0;
   background: white;
   border: 1px solid @google_border_gray;
   border-radius: 3px;
   webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  .esper-ul-divider {
+  .esper-drop-ul-divider {
     height: 1px;
     margin: 0 10px;
     background: @gray_20;
@@ -293,15 +294,39 @@ object.esper-svg { pointer-events: none; }
 input.esper-input { height: 32px; }
 textarea.esper-input { resize: none; }
 
-/* Esper Menu (Dropdown) */
+/*** Esper Menu area ***/
 
+/* Container of all the Esper controls in the top navigation bar */
+.esper-menu-root {
+  height: 24px;
+  margin-top: 6px; /* ad-hoc vertical alignment with existing text */
+
+  /* stay away from the non-Esper neighbors;
+     we don't know exactly how far they are because of other extension icons,
+     so we provision more than possibly needed.
+   */
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* Element containing the Esper logo (right) */
 .esper-menu {
+  display: inline-block;
+  position: relative; /* serves as reference for the dropdown positioning */
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+}
+
+/* Task list button (middle) */
+.esper-tl-button {
   display: inline;
-  position: relative;
-  height: 30px;
-  width: 30px;
-  margin-left: 5px;
-  margin-right: 5px;
+}
+
+/* Team switcher (left) */
+.esper-tl-switcher {
+  display: inline-block;
+  position: relative; /* serves as reference for the dropdown positioning */
 }
 
 .esper-menu-logo {
@@ -309,17 +334,11 @@ textarea.esper-input { resize: none; }
   width: 16px;
   height: 20px;
   &.esper-menu-white {
-    margin: 5px 6px 2px 6px;
   }
   &.esper-menu-black {
-    margin: 5px 7px;
     opacity: 0.47;
     &:hover { opacity: 0.85; }
   }
-}
-
-.esper-menu-important {
-  font-weight: bold;
 }
 
 .esper-menu-bg {
@@ -332,24 +351,142 @@ textarea.esper-input { resize: none; }
   left: 0;
 }
 
-.esper-caret {
+.esper-menu-caret {
   display: none;
   z-index: 12;
-  position: absolute;
-  left: 3px;
-  margin-top: 31px;
+  width: 26px;
+  height: 12px;
+
+  position: absolute; /* takes the element out of the flow */
+  left: -4px;
+  top: 31px;
 }
 
 .esper-menu-dropdown {
   z-index: 11;
-  position: relative;
+  position: absolute;
+
+  /* position adjusted to stick to the caret */
   left: -12px;
-  margin-top: 44px;
-  width: 120px;
+  top: 29px;
+
   webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
          box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
 }
 
+.esper-menu-important {
+  font-weight: bold;
+}
+
+.esper-tl-caret {
+  display: none;
+  z-index: 12;
+  width: 26px;
+  height: 12px;
+
+  position: absolute; /* takes the element out of the flow */
+  left: 5px;
+  top: 24px;
+}
+
+.esper-tl-dropdown {
+  z-index: 11;
+  position: absolute; /* takes the element out of the flow */
+
+  /* position adjusted to stick to the caret */
+  left: -3px;
+  top: 22px;
+
+  webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+         box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
+}
+
+.esper-tl-team {
+  vertical-align: middle;
+}
+
+/*** Task list ***/
+
+.esper-tl-tasks-layer {
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.esper-tl-close {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 22px;
+  color: @gray_20;
+  padding: 10px;
+}
+
+.esper-tl-task-list {
+  position: relative;
+  overflow-y: scroll;
+  width: 40%;
+  height: 80%;
+  left: 30%;
+  top: 10%;
+
+  background-color: white;
+  border-radius: 3px;
+  padding: 10px 20px 10px 20px; /* order: TRBL as in TRouBLe aka clockwise */
+}
+
+.esper-tl-list {
+}
+
+.esper-tl-task {
+  margin-bottom: 27px;
+}
+
+.esper-tl-task-title {
+  font-weight: bold;
+}
+
+.esper-label {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+  bottom: 2px;
+  border-radius: 2px;
+}
+
+.esper-tl-urgent {
+  .esper-label;
+  background: @red;
+  color: white;
+}
+
+.esper-tl-canceled {
+  .esper-label;
+  background: @gray_40;
+  color: white;
+}
+
+.esper-tl-threads {
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.esper-tl-thread {
+}
+
+.esper-tl-events {
+}
+
+.esper-tl-event {
+  display: inline-block;
+  padding: 2px 5px 2px 5px;
+}
 
 /*** Esper Dock ***/
 
@@ -360,10 +497,14 @@ textarea.esper-input { resize: none; }
   bottom: 0;
   &.esper-team-danger {
     .esper-dock { background: @orange; }
-    .esper-dock-wrap-left { border-color: transparent transparent @orange_hover transparent; }
-    .esper-dock-wrap-right { border-color: transparent transparent transparent @orange_hover; }
+    .esper-dock-wrap-left {
+      border-color: transparent transparent @orange_hover transparent;
+    }
+    .esper-dock-wrap-right {
+      border-color: transparent transparent transparent @orange_hover;
+    }
     .esper-dock-action:hover { background: @orange_hover_light; }
-    .esper-options.open { background: @orange_hover_light; }
+    .esper-options.esper-open { background: @orange_hover_light; }
   }
 }
 
@@ -447,7 +588,7 @@ textarea.esper-input { resize: none; }
   border-color: transparent transparent white transparent;
 }
 
-.esper-options.open {
+.esper-options.esper-open {
   background: @purple_hover_light;
   .esper-dock-action-icon { opacity: 1; }
 }
@@ -607,7 +748,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   background: @gray_f5;
   border: 1px solid @google_border_gray;
   border-radius: 3px;
-  &.open {
+  &.esper-open {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -621,7 +762,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-top: none;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-  &.open {
+  &.esper-open {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   }
@@ -802,7 +943,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   &:hover { opacity: 1; }
 }
 
-.esper-ev-disclose.open { opacity: 1; }
+.esper-ev-disclose.esper-open { opacity: 1; }
 
 ul.esper-ev-dropdown {
   z-index: 2;

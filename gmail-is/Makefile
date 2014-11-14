@@ -73,6 +73,7 @@ APP_SOURCES = \
   CalPicker \
   CalSearch \
   InsertTime \
+  TaskList \
   Menu \
   Sidebar \
   TaskTab \

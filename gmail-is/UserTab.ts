@@ -447,7 +447,8 @@ module Esper.UserTab {
       <div class="esper-spinner esper-list-spinner"/>
     </div>
     <div #calendarsSection class="esper-section" style="display:none">
-      <div #calendarsHeader class="esper-section-header esper-clearfix open">
+      <div #calendarsHeader
+           class="esper-section-header esper-clearfix esper-open">
         <span #showCalendars
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Calendars</span>
@@ -541,10 +542,10 @@ module Esper.UserTab {
       Sidebar.toggleList(calendarsContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        calendarsHeader.removeClass("open");
+        calendarsHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        calendarsHeader.addClass("open");
+        calendarsHeader.addClass("esper-open");
       }
     });
 
@@ -552,10 +553,10 @@ module Esper.UserTab {
       Sidebar.toggleList(workplacesContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        workplacesHeader.removeClass("open");
+        workplacesHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        workplacesHeader.addClass("open");
+        workplacesHeader.addClass("esper-open");
       }
     });
 
@@ -563,10 +564,10 @@ module Esper.UserTab {
       Sidebar.toggleList(transportationContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        transportationHeader.removeClass("open");
+        transportationHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        transportationHeader.addClass("open");
+        transportationHeader.addClass("esper-open");
       }
     });
 
@@ -574,10 +575,10 @@ module Esper.UserTab {
       Sidebar.toggleList(meetingPreferencesContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        meetingPreferencesHeader.removeClass("open");
+        meetingPreferencesHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        meetingPreferencesHeader.addClass("open");
+        meetingPreferencesHeader.addClass("esper-open");
       }
     });
 
@@ -585,10 +586,10 @@ module Esper.UserTab {
       Sidebar.toggleList(notesContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        notesHeader.removeClass("open");
+        notesHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        notesHeader.addClass("open");
+        notesHeader.addClass("esper-open");
       }
     });
 

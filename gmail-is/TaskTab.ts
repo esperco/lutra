@@ -28,7 +28,7 @@ module Esper.TaskTab {
     if (currentTask !== undefined)
       return Promise.defer(currentTask);
     else {
-      return Api.obtainTaskForThread(teamid, threadId)
+      return Api.obtainTaskForThread(teamid, threadId, false, true)
         .then(function(task) {
           currentTask = task;
           view.taskCaption.text("Task:");
@@ -297,7 +297,7 @@ module Esper.TaskTab {
 <div #optionsView>
   <div #disclose class="esper-click-safe esper-dropdown-btn
                    esper-clickable esper-ev-disclose"/>
-  <ul #dropdown class="esper-ul esper-ev-dropdown">
+  <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
       <li #editEvent
           class="esper-li esper-disabled">
@@ -320,7 +320,7 @@ module Esper.TaskTab {
         Choose this event
       </li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div #syncOption class="esper-click-safe esper-dropdown-section">
       <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
         <span class="esper-click-safe esper-sync-option-text">
@@ -423,12 +423,12 @@ module Esper.TaskTab {
     syncNote.text(notePhrase);
 
     disclose.click(function() {
-      if (disclose.hasClass("open")) {
+      if (disclose.hasClass("esper-open")) {
         Sidebar.dismissDropdowns();
       } else {
         Sidebar.dismissDropdowns();
         dropdown.toggle();
-        disclose.addClass("open");
+        disclose.addClass("esper-open");
       }
     })
 
@@ -749,7 +749,7 @@ module Esper.TaskTab {
         .append($("<span>No other tasks are named </span>"))
         .append($("<span class='esper-bold'>" + query + "</span>"))
         .appendTo(results);
-      if (!(dropdown.hasClass("open"))) dropdown.toggle();
+      if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
       List.iter(response.search_results, function(result) {
         noResults.remove();
         var newTaskId = result.task_data.taskid;
@@ -816,7 +816,7 @@ module Esper.TaskTab {
       if (currentTask !== undefined)
         addDeleteOption(currentTask);
 
-      dropdown.addClass("open");
+      dropdown.addClass("esper-open");
     });
   }
 
@@ -871,16 +871,16 @@ module Esper.TaskTab {
     <input #taskTitle type="text" size="24"
            class="esper-input esper-task-name"/>
     <ul #taskSearchDropdown
-        class="esper-ul esper-dropdown-btn esper-task-search-dropdown">
+        class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
-      <div class="esper-click-safe esper-ul-divider"/>
+      <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
   </div>
   <div class="esper-tab-overflow">
     <div class="esper-section">
       <div #linkedThreadsHeader
-           class="esper-section-header esper-clearfix open">
+           class="esper-section-header esper-clearfix esper-open">
         <span #showLinkedThreads
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Linked Threads</span>
@@ -897,7 +897,8 @@ module Esper.TaskTab {
       </div>
     </div>
     <div class="esper-section">
-      <div #linkedEventsHeader class="esper-section-header esper-clearfix open">
+      <div #linkedEventsHeader
+           class="esper-section-header esper-clearfix esper-open">
         <span #showLinkedEvents
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Linked Events</span>
@@ -906,7 +907,8 @@ module Esper.TaskTab {
           <object #refreshLinkedEventsIcon class="esper-svg"/>
         </div>
       </div>
-      <div #linkActions class="esper-section-actions esper-clearfix open">
+      <div #linkActions
+           class="esper-section-actions esper-clearfix esper-open">
         <div style="display:inline-block">
           <div #createEvent
                class="esper-link-action esper-dropdown-btn esper-click-safe">
@@ -915,7 +917,8 @@ module Esper.TaskTab {
               Create event
             </div>
           </div>
-          <ul #createEventDropdown class="esper-ul esper-create-event-dropdown">
+          <ul #createEventDropdown
+              class="esper-drop-ul esper-create-event-dropdown">
             <div #calendarList class="esper-dropdown-section"/>
           </ul>
           <div class="esper-vertical-divider"/>
@@ -934,7 +937,8 @@ module Esper.TaskTab {
     </div>
     <hr class="esper-hr"/>
     <div class="esper-section">
-      <div #recentsHeader class="esper-section-header esper-clearfix open">
+      <div #recentsHeader
+           class="esper-section-header esper-clearfix esper-open">
         <span #showRecents
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Recents</span>
@@ -971,7 +975,7 @@ module Esper.TaskTab {
       if (linkedEventsContainer.css("display") === "none") {
         Sidebar.toggleList(linkedEventsContainer);
         showLinkedEvents.text("Hide");
-        linkedEventsHeader.addClass("open");
+        linkedEventsHeader.addClass("esper-open");
       }
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
@@ -988,10 +992,10 @@ module Esper.TaskTab {
       Sidebar.toggleList(linkedThreadsContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        linkedThreadsHeader.removeClass("open");
+        linkedThreadsHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        linkedThreadsHeader.addClass("open");
+        linkedThreadsHeader.addClass("esper-open");
       }
     });
 
@@ -999,10 +1003,10 @@ module Esper.TaskTab {
       Sidebar.toggleList(linkedEventsContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        linkActions.removeClass("open");
+        linkActions.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        linkActions.addClass("open");
+        linkActions.addClass("esper-open");
       }
     });
 
@@ -1010,20 +1014,20 @@ module Esper.TaskTab {
       Sidebar.toggleList(recentsContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        recentsHeader.removeClass("open");
+        recentsHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        recentsHeader.addClass("open");
+        recentsHeader.addClass("esper-open");
       }
     });
 
     createEvent.click(function() {
-      if (createEvent.hasClass("open")) {
+      if (createEvent.hasClass("esper-open")) {
         Sidebar.dismissDropdowns();
       } else {
         Sidebar.dismissDropdowns();
         createEventDropdown.toggle();
-        createEvent.addClass("open");
+        createEvent.addClass("esper-open");
       }
     });
 
@@ -1031,7 +1035,7 @@ module Esper.TaskTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
-    apiGetTask(team.teamid, threadId).done(function(task) {
+    apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       currentTask = task;
       var title = "";
       linkedThreadsSpinner.hide();

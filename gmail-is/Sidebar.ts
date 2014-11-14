@@ -2,8 +2,8 @@
   Gmail thread view
 */
 module Esper.Sidebar {
-  export var currentThreadId : string;
   export var currentTeam : ApiT.Team;
+  export var currentThreadId : string;
   export var profiles : ApiT.Profile[];
 
   export function customizeSelectArrow(selector) {
@@ -19,11 +19,17 @@ module Esper.Sidebar {
     }
   }
 
+  /* This is a global operation that affects all the possible dropdowns.
+     TODO: move to a module with global stuff
+     TODO: let each module provide its own local dismissDropdowns()
+           (we should not depend on their implementation details here)
+  */
   export function dismissDropdowns() {
-    $(".esper-ul").hide();
+    $(".esper-drop-ul").hide();
     $(".esper-menu-bg").hide();
-    $(".esper-caret").hide();
-    $(".esper-dropdown-btn").removeClass("open");
+    $(".esper-menu-caret").hide();
+    $(".esper-tl-caret").hide();
+    $(".esper-dropdown-btn").removeClass("esper-open");
   }
 
   $(document).on('click', function(e) {
@@ -81,20 +87,20 @@ module Esper.Sidebar {
     <div #wrapLeft class="esper-dock-wrap-left"/>
     <div #wrapRight class="esper-dock-wrap-right"/>
   </div>
-  <ul #dropdown class="esper-ul esper-options-menu">
+  <ul #dropdown class="esper-drop-ul esper-options-menu">
     <div #teamsSection class="esper-dropdown-section">
       <li class="esper-click-safe esper-li esper-bold
                  esper-disabled esper-team-list-title">
         Users
       </li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div class="esper-dropdown-section">
       <li #settings class="esper-li">Settings</li>
       <a #help class="esper-a" href="mailto:team@esper.com">Help</a>
       <li #signOut class="esper-li esper-danger">Sign out</li>
     </div>
-    <div class="esper-click-safe esper-ul-divider"/>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
     <div class="esper-click-safe esper-dropdown-section esper-dropdown-footer">
       <object #logo
               class="esper-svg esper-click-safe esper-dropdown-footer-logo"/>
@@ -176,13 +182,13 @@ module Esper.Sidebar {
     });
 
     function toggleOptions() {
-      if (options.hasClass("open")) {
+      if (options.hasClass("esper-open")) {
         dismissDropdowns();
         options.tooltip("enable");
       } else {
         dismissDropdowns();
         options
-          .addClass("open")
+          .addClass("esper-open")
           .tooltip("disable");
         dropdown.show();
       }
@@ -288,6 +294,7 @@ module Esper.Sidebar {
                               profiles) {
     Log.d("displayTeamSidebar()");
     currentTeam = team;
+    Menu.currentTeam.set(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {

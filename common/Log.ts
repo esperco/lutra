@@ -38,7 +38,7 @@ Esper . xxxxxxxx
        on the same line.
        This is useful for filtering lines in the Chrome console.
     */
-    if (args.length >= 1 && typeof args[0] === "string") {
+    if (args.length > 1 && typeof args[0] === "string") {
       prefix = prefix + " " + args[0];
       args.shift();
     }
