@@ -182,6 +182,7 @@ module ApiT {
     workplaces: Workplace[];
     transportation: string[];
     meeting_types: MeetingTypes;
+    other: GeneralPrefs;
     notes?: string;
   }
 
@@ -251,6 +252,12 @@ module ApiT {
     available: boolean;
     availability: Availability[];
     favorites: Location[];
+  }
+
+  export interface GeneralPrefs {
+    send_exec_confirmation: boolean;
+    send_exec_reminder: boolean;
+    use_duplicate_events: boolean;
   }
 
   export interface GuestReminder {
