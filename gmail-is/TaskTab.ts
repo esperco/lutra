@@ -969,34 +969,6 @@ module Esper.TaskTab {
                             profiles, linkedEvents);
     displayRecentsList(team, threadId, taskTabView, profiles, linkedEvents);
 
-    var apiGetTask = autoTask ?
-      Api.getAutoTaskForThread
-      : Api.getTaskForThread;
-
-    apiGetTask(team.teamid, threadId, false, true).done(function(task) {
-      currentTask = task;
-      var title = "";
-      linkedThreadsSpinner.hide();
-      if (task !== undefined) {
-        taskCaption.text("Title");
-        title = task.task_title;
-        displayLinkedThreadsList(task, threadId, taskTabView);
-      } else {
-        taskCaption.text("Create task");
-        var thread = esperGmail.get.email_data();
-        if (thread !== undefined && thread !== null)
-          title = thread.subject;
-      }
-      taskTitle.val(title);
-      Util.afterTyping(taskTitle, 250, function() {
-        var query = taskTitle.val();
-        if (query !== "")
-          displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
-                               taskSearchActions, team, query, profiles,
-                               taskTabView);
-      });
-    });
-
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
       refreshlinkedEventsList(team, threadId, taskTabView, profiles);
