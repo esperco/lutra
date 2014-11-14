@@ -99,6 +99,17 @@ module PreferencesTab {
     };
   }
 
+  function readGeneralPrefs(div) {
+    return {
+      send_exec_confirmation:
+        div.find(".esper-prefs-confirmation").is(":checked"),
+      send_exec_reminder:
+        div.find(".esper-prefs-reminder").is(":checked"),
+      use_duplicate_events:
+        div.find(".esper-prefs-duplicate").is(":checked")
+    };
+  }
+
   export function currentPreferences() {
     var workplaces = [];
     $(".esper-prefs-workplaces").find("li.workplace").each(function() {
@@ -123,12 +134,15 @@ module PreferencesTab {
       meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
     });
 
+    var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
+
     var notes = $(".preferences-notes").val();
 
     return {
       workplaces: workplaces,
       transportation: transportation,
       meeting_types: meeting_types,
+      general: general,
       notes: notes
     };
   }
@@ -868,6 +882,45 @@ module PreferencesTab {
     return view;
   }
 
+  function viewOfGeneralPrefs(general : ApiT.GeneralPrefs,
+                              team : ApiT.Team) {
+'''
+  <div #view class="preference esper-prefs-general">
+    <ul>
+      <li>
+        <input #sendConfirmation type="checkbox"
+               class="esper-prefs-confirmation"/>
+        Send confirmation emails to executive
+      </li>
+      <li>
+        <input #sendReminder type="checkbox"
+               class="esper-prefs-reminder"/>
+        Send reminder emails to executive
+      </li>
+      <li>
+        <input #useDuplicate type="checkbox" checked="checked"
+               class="esper-prefs-duplicate"/>
+        Use duplicate calendar events to invite guests
+      </li>
+    </ul>
+  </div>
+'''
+    if (general !== undefined) {
+      if (general.send_exec_confirmation)
+        sendConfirmation.prop("checked", true);
+      if (general.send_exec_reminder)
+        sendReminder.prop("checked", true);
+      if (!general.use_duplicate_events)
+        useDuplicate.prop("checked", false);
+    }
+
+    sendConfirmation.click(savePreferences);
+    sendReminder.click(savePreferences);
+    useDuplicate.click(savePreferences);
+
+    return view;
+  }
+
   export function load(team) {
 '''
 <div #view>
@@ -885,6 +938,8 @@ module PreferencesTab {
   <ul #meals class="table-list">
     <div #mealsDivider class="table-divider"/>
   </ul>
+  <div class="table-header">General Scheduling</div>
+  <div #general class="table-list"/>
   <div class="table-header">Notes</div>
   <textarea #notes
             rows=5
@@ -942,6 +997,8 @@ module PreferencesTab {
         meals.append(element);
       });
       setDividerHeight("meals", mealsDivider, 3);
+
+      general.append(viewOfGeneralPrefs(initial.general, team));
 
       notes.val(initial.notes);
       Util.afterTyping(notes, 250, function() {
