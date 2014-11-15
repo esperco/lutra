@@ -112,6 +112,15 @@ module Esper.TaskList {
     return view;
   }
 
+  function isScrolledIntoView(elt: JQuery,
+                              container: JQuery) {
+    /* Compute offset down from the top of the viewport */
+    var eltTop = elt.offset().top;
+    var containerBottom = container.offset().top + container.outerHeight();;
+
+    return (eltTop < containerBottom);
+  }
+
   export function display(team: ApiT.Team,
                           parent: JQuery) {
 
@@ -142,9 +151,15 @@ module Esper.TaskList {
     var withThreads = true;
     Api.getTaskList(team.teamid, 100, withEvents, withThreads)
       .done(function(x: ApiT.TaskList) {
-        List.iter(x.tasks, function(task) {
+        var scrollTrigger = Math.max(0, x.tasks.length - 4);
+        var triggered = false;
+        List.iter(x.tasks, function(task, i) {
           renderTask(task, closeTaskListLayer)
             .appendTo(listContainer);
+
+          if (i === scrollTrigger) {
+            ...
+          }
         });
         /* TODO: paging, ideally with infinite scroll */
         parent.append(container);
