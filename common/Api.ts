@@ -372,6 +372,11 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getTaskPage(url: string):
+  JQueryDeferred<ApiT.TaskList> {
+    return JsonHttp.get(url);
+  }
+
   export function getTaskList(teamid,
                               pageSize: number,
                               withEvents: boolean,
@@ -383,7 +388,7 @@ module Esper.Api {
       + "/" + pageSize.toString()
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
-    return JsonHttp.get(url);
+    return getTaskPage(url);
   }
 
   export function sendEventInvites(teamid, fromEmail, guests, event):
