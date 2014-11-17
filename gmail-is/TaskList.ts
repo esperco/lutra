@@ -167,7 +167,9 @@ module Esper.TaskList {
     function appendPage(x: ApiT.TaskList) {
       /* Index of the element which, when visible, triggers the API call
          that fetches a new page. */
-      var scrollTrigger = Math.max(0, x.tasks.length - 5);
+      var scrollTrigger =
+        Math.min(x.tasks.length - 1,
+                 Math.max(0, x.tasks.length - fetchAhead));
 
       List.iter(x.tasks, function(task, i) {
         var elt = renderTask(task, closeTaskListLayer);
