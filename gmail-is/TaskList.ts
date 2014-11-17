@@ -112,6 +112,14 @@ module Esper.TaskList {
     return view;
   }
 
+  function isVisible(elt: JQuery,
+                     container: JQuery) {
+    /* Compute offset down from the top of the viewport */
+    var eltTop = elt.offset().top;
+    var containerBottom = container.offset().top + container.outerHeight();
+    return (eltTop < containerBottom);
+  }
+
   export function display(team: ApiT.Team,
                           parent: JQuery) {
 
@@ -124,6 +132,7 @@ module Esper.TaskList {
 '''
     parent.children().remove();
     parent.removeClass("esper-hide");
+    parent.append(container);
 
     function closeTaskListLayer() {
       parent.addClass("esper-hide");
@@ -140,14 +149,44 @@ module Esper.TaskList {
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
-    Api.getTaskList(team.teamid, 100, withEvents, withThreads)
-      .done(function(x: ApiT.TaskList) {
-        List.iter(x.tasks, function(task) {
-          renderTask(task, closeTaskListLayer)
-            .appendTo(listContainer);
-        });
-        /* TODO: paging, ideally with infinite scroll */
-        parent.append(container);
+    var pageSize = 10;     // number of items to fetch at once
+    var fetchAhead = 10;   // minimum number of hidden items
+
+    function refillIfNeeded(triggerElt, url) {
+      var done = false;
+      return function() {
+        if (!done) {
+          if (isVisible(triggerElt, container)) {
+            done = true;
+            Api.getTaskPage(url).done(appendPage);
+          }
+        }
+      }
+    }
+
+    function appendPage(x: ApiT.TaskList) {
+      /* Index of the element which, when visible, triggers the API call
+         that fetches a new page. */
+      var scrollTrigger = Math.max(0, x.tasks.length - 5);
+
+      List.iter(x.tasks, function(task, i) {
+        var elt = renderTask(task, closeTaskListLayer);
+        elt.appendTo(listContainer);
+        var url = x.next_page;
+        if (url !== undefined && i === scrollTrigger) {
+          var lazyRefill = refillIfNeeded(elt, url);
+
+          /* Next page may have to be displayed right way or will
+             be triggered after some scrolling. */
+          lazyRefill();
+          container.off("scroll");
+          container.scroll(lazyRefill);
+        }
       });
+    }
+
+    /* First page */
+    Api.getTaskList(team.teamid, pageSize, withEvents, withThreads)
+      .done(appendPage);
   }
 }
