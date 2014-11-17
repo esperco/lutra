@@ -206,6 +206,11 @@ module Esper.Menu {
       logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
     }
 
+    /* Try to use the same color as Google, which depends on the theme. */
+    var navbarTextColor = Gmail.getNavbarTextColor();
+    currentTeamName.css("color", navbarTextColor);
+    tasksButton.css("color", navbarTextColor);
+
     menuCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
     updateLinks(menuDropdownContent);
 
