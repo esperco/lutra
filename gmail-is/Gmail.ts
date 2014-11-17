@@ -100,4 +100,16 @@ module Esper.Gmail {
     console.log(window.getSelection().anchorNode);
     return $(window.getSelection().anchorNode).closest(field).length > 0;
   }
+
+  /*
+    Get the font color used in the navigation bar, so we can use the same.
+    This is nice when the user uses a custom dark background.
+  */
+  export function getNavbarTextColor() {
+    var plusName = $(".gb_d.gb_f");
+    if (plusName.length === 1)
+      return plusName.css("color");
+    else
+      return "rgb(64, 64, 64)";
+  }
 }
