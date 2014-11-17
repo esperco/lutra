@@ -117,7 +117,6 @@ module Esper.TaskList {
     /* Compute offset down from the top of the viewport */
     var eltTop = elt.offset().top;
     var containerBottom = container.offset().top + container.outerHeight();
-    Log.d("is visible?", eltTop, containerBottom);
     return (eltTop < containerBottom);
   }
 
@@ -157,9 +156,7 @@ module Esper.TaskList {
       var done = false;
       return function() {
         if (!done) {
-          Log.d("refillIfNeeded", url);
           if (isVisible(triggerElt, container)) {
-            Log.d("refill", url);
             done = true;
             Api.getTaskPage(url).done(appendPage);
           }
@@ -168,7 +165,6 @@ module Esper.TaskList {
     }
 
     function appendPage(x: ApiT.TaskList) {
-      Log.d("appendPage");
       /* Index of the element which, when visible, triggers the API call
          that fetches a new page. */
       var scrollTrigger = Math.max(0, x.tasks.length - 5);
@@ -178,7 +174,6 @@ module Esper.TaskList {
         elt.appendTo(listContainer);
         var url = x.next_page;
         if (url !== undefined && i === scrollTrigger) {
-          Log.d("setting up next load", url);
           var lazyRefill = refillIfNeeded(elt, url);
 
           /* Next page may have to be displayed right way or will
