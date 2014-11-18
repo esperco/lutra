@@ -48,9 +48,26 @@ module Esper.Thread {
       });
   }
 
+  function hasMessageFrom(thread: esperGmail.get.Thread,
+                          emailAddresses: string[]):
+  boolean {
+    var messages = thread.threads;
+    for (var k in messages) {
+      var msg: esperGmail.get.Message = messages[k];
+      if (List.mem(emailAddresses, msg.from_email))
+        return true;
+    }
+    return false;
+  }
+
+  export interface DetectedTeam {
+    team: ApiT.Team;
+    hasMsgFromExec: boolean;
+  }
+
   function findTeamInThread(thread: esperGmail.get.Thread,
                             teamEmailsList: TeamEmails[]):
-  ApiT.Team {
+  DetectedTeam {
     var team;
     var filteredTeams =
       List.filter(teamEmailsList, function(teamEmails) {
@@ -64,8 +81,13 @@ module Esper.Thread {
         return executive !== null && assistant !== null;
       });
     if (filteredTeams.length > 0) {
-      /* Arbitrary choice if more than one team matches */
-      return filteredTeams[0].team;
+      /* This is an arbitrary choice if more than one team matches */
+      var teamEmails = filteredTeams[0];
+      var hasMsgFromExec = hasMessageFrom(thread, teamEmails.executive);
+      return {
+        team: teamEmails.team,
+        hasMsgFromExec: hasMsgFromExec
+      };
     }
     else
       return;
@@ -73,7 +95,7 @@ module Esper.Thread {
 
   export function detectTeam(teams: ApiT.Team[],
                              thread: esperGmail.get.Thread):
-  JQueryPromise<ApiT.Team> {
+  JQueryPromise<DetectedTeam> {
 
     return getTeamEmails(teams)
       .then(function(teamEmailsList) {
