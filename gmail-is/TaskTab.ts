@@ -85,7 +85,7 @@ module Esper.TaskTab {
     return viewPerson;
   }
 
-  function openInviteGuestsModal(team, e, threadid, taskTab, profiles, prefs) {
+  function openInviteGuestsModal(team, e, threadId, taskTab, profiles, prefs) {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -243,11 +243,11 @@ module Esper.TaskTab {
         guests:        guests,
       };
       if (duplicate) {
-        Api.createLinkedEvent(team.teamid, ev, threadid)
+        Api.createLinkedEvent(team.teamid, ev, threadId)
           .done(function(created) {
             closeModal();
             Api.sendEventInvites(team.teamid, fromEmail, guests, created);
-            refreshlinkedEventsList(team, threadid, taskTab, profiles);
+            refreshlinkedEventsList(team, threadId, taskTab, profiles);
           });
       } else {
         Api.sendEventInvites(team.teamid, fromEmail, guests, e);
@@ -760,10 +760,10 @@ module Esper.TaskTab {
   // Search for matching tasks and display the results in a dropdown
   function displaySearchResults(taskTitle, dropdown, results, actions,
                                 team: ApiT.Team,
+                                threadId: string,
                                 query,
                                 profiles: ApiT.Profile[],
                                 taskTab: TaskTabView) {
-    var threadid = Sidebar.currentThreadId;
     var teamid = team.teamid;
     Api.searchTasks(teamid, query).done(function(response) {
       results.find(".esper-li").remove();
@@ -784,14 +784,14 @@ module Esper.TaskTab {
           .click(function() {
             var job =
               currentTask !== undefined ?
-              Api.switchTaskForThread(teamid, threadid,
+              Api.switchTaskForThread(teamid, threadId,
                                       currentTask.taskid, newTaskId)
               :
-              Api.linkThreadToTask(teamid, threadid,
+              Api.linkThreadToTask(teamid, threadId,
                                    newTaskId);
 
             job.done(function() {
-              refreshlinkedEventsList(team, threadid, taskTab, profiles);
+              refreshlinkedEventsList(team, threadId, taskTab, profiles);
             });
 
             currentTask = result.task_data;
@@ -813,7 +813,7 @@ module Esper.TaskTab {
       rename
         .appendTo(actions)
         .click(function() {
-          obtainTaskForThread(teamid, threadid, taskTab)
+          obtainTaskForThread(teamid, threadId, taskTab)
             .done(function(task) {
               Api.setTaskTitle(currentTask.taskid, query);
               currentTask.task_title = query;
@@ -886,6 +886,7 @@ module Esper.TaskTab {
 
   export function displayTaskTab(tab1,
                                  team: ApiT.Team,
+                                 threadId: string,
                                  autoTask: boolean,
                                  profiles: ApiT.Profile[],
                                  linkedEvents: ApiT.EventWithSyncInfo[]) {
@@ -983,7 +984,6 @@ module Esper.TaskTab {
 </div>
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
-    var threadId = Sidebar.currentThreadId;
 
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -1079,7 +1079,8 @@ module Esper.TaskTab {
         var query = taskTitle.val();
         if (query !== "")
           displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
-                               taskSearchActions, team, query, profiles,
+                               taskSearchActions, team, threadId,
+                               query, profiles,
                                taskTabView);
       });
     });

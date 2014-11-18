@@ -26,7 +26,8 @@ module Esper.CalPicker {
     events : { [eventId : string] : FullCalendar.EventObject };
   }
 
-  function createView(refreshCal, userSidebar) : PickerView {
+  function createView(refreshCal, userSidebar,
+                      team: ApiT.Team) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
@@ -49,7 +50,7 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    var calendars = Sidebar.currentTeam.team_calendars;
+    var calendars = team.team_calendars;
     writeToCalendar = calendars[0];
     showCalendars = {}; // Clear out old entries from previous views
     showCalendars[writeToCalendar.google_cal_id] = {};
@@ -162,13 +163,14 @@ module Esper.CalPicker {
     });
   }
 
-  function fetchEvents(momentStart, momentEnd, tz, callback) {
+  function fetchEvents(team: ApiT.Team,
+                       momentStart, momentEnd, tz, callback) {
     // TODO Display tz?
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
     var cacheFetches =
       List.map(Object.keys(showCalendars), function(calid) {
-        var cache = CalCache.getCache(Sidebar.currentTeam.teamid, calid);
+        var cache = CalCache.getCache(team.teamid, calid);
         if (refreshCache) {
           return cache.fetch(start, end);
         } else {
@@ -185,7 +187,8 @@ module Esper.CalPicker {
     });
   }
 
-  function setupCalendar(picker : PickerView) {
+  function setupCalendar(team: ApiT.Team,
+                         picker : PickerView) {
     var calendarView = picker.calendarView;
     var calendarJump = picker.dateJumper;
 
@@ -254,7 +257,9 @@ module Esper.CalPicker {
       eventResize: eventResize,
       eventRender: eventRender,
       editable: false,
-      events: fetchEvents
+      events: function(momentStart, momentEnd, tz, callback) {
+        return fetchEvents(team, momentStart, momentEnd, tz, callback);
+      }
     });
 
     function dateJump(date, view) {
@@ -278,9 +283,9 @@ module Esper.CalPicker {
   /*
     Create date and time picker using user's calendar.
   */
-  function createPicker(refreshCal, userSidebar) : Picker {
-    var pickerView = createView(refreshCal, userSidebar);
-    setupCalendar(pickerView);
+  function createPicker(refreshCal, userSidebar, team: ApiT.Team) : Picker {
+    var pickerView = createView(refreshCal, userSidebar, team);
+    setupCalendar(team, pickerView);
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
@@ -342,7 +347,8 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal() : void {
+  export function createModal(team: ApiT.Team,
+                              threadId: string) : void {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -371,8 +377,8 @@ module Esper.CalPicker {
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
 
-    var userInfo = UserTab.viewOfUserTab(Sidebar.currentTeam, Sidebar.profiles);
-    var picker = createPicker(refreshCal, userInfo);
+    var userInfo = UserTab.viewOfUserTab(team, Sidebar.profiles);
+    var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
     userSidebar.append(userInfo.view);
 
@@ -385,7 +391,7 @@ module Esper.CalPicker {
     });
 
     window.onresize = function(event) {
-      picker = createPicker(refreshCal, userInfo);
+      picker = createPicker(refreshCal, userInfo, team);
       calendar.children().remove();
       calendar.append(picker.view);
       picker.render();
@@ -402,9 +408,9 @@ module Esper.CalPicker {
       // Wait for link
       var linkCalls = List.map(events, function(ev) {
         return Api.createLinkedEvent(
-          Sidebar.currentTeam.teamid,
+          team.teamid,
           ev,
-          Sidebar.currentThreadId
+          threadId
         );
       });
 
@@ -420,8 +426,8 @@ module Esper.CalPicker {
         var syncCalls =
           List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
             return Api.syncEvent(
-              Sidebar.currentTeam.teamid,
-              Sidebar.currentThreadId,
+              team.teamid,
+              threadId,
               ev.google_cal_id,
               ev.google_event_id
             );
