@@ -79,6 +79,7 @@ module Esper.Sidebar {
 
   function displayDock(rootElement, sidebar,
                        team: ApiT.Team,
+                       threadId: string,
                        isCorrectTeam: boolean,
                        profiles) {
 '''
@@ -141,7 +142,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
         displayTeamSidebar(rootElement, toTeam, true, true,
-                           currentThreadId, profiles);
+                           threadId, profiles);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -227,6 +228,7 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
+                          threadId: string,
                           autoTask: boolean,
                           linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
@@ -262,7 +264,8 @@ module Esper.Sidebar {
       switchTab(1, [0]);
     });
 
-    TaskTab.displayTaskTab(content1, team, autoTask, profiles, linkedEvents);
+    TaskTab.displayTaskTab(content1, team, threadId,
+                           autoTask, profiles, linkedEvents);
     content2.append(UserTab.viewOfUserTab(team, profiles).view);
 
     rootElement.append(view);
@@ -302,10 +305,10 @@ module Esper.Sidebar {
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
           .done(function(linkedEvents) {
-            var sidebar = displaySidebar(rootElement, team,
+            var sidebar = displaySidebar(rootElement, team, threadId,
                                          autoTask,
                                          linkedEvents);
-            displayDock(rootElement, sidebar, team,
+            displayDock(rootElement, sidebar, team, threadId,
                         isCorrectTeam, profiles);
             sidebar.show("slide", { direction: "down" }, 250);
         });

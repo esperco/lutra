@@ -14,7 +14,7 @@ module Esper.CalSearch {
   }
 
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
-                              team, eventsTab,
+                              team, threadId: string, eventsTab,
                               profiles: ApiT.Profile[], last) {
     Log.d("renderSearchResult()");
 '''
@@ -50,7 +50,6 @@ module Esper.CalSearch {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    var threadId = Sidebar.currentThreadId;
     if (e.title !== undefined)
       title.text(e.title);
     else
@@ -97,7 +96,9 @@ module Esper.CalSearch {
     return view;
   }
 
-  function setupSearch(team, threadId, searchView: SearchView,
+  function setupSearch(team: ApiT.Team,
+                       threadId: string,
+                       searchView: SearchView,
                        eventsTab: TaskTab.TaskTabView,
                        profiles: ApiT.Profile[]) {
     Util.afterTyping(searchView.search, 250, function() {
@@ -127,7 +128,8 @@ module Esper.CalSearch {
 
                 results.events.forEach(function(e) {
                   if (i == (numResults - 1)) last = true;
-                  renderSearchResult(e, events, team, eventsTab, profiles, last)
+                  renderSearchResult(e, events, team, threadId,
+                                     eventsTab, profiles, last)
                     .appendTo(searchView.results);
                   i++;
                 });

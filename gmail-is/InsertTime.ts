@@ -1,8 +1,8 @@
 module Esper.InsertTime {
 
-  function eventTimezone(ev) {
+  function eventTimezone(team: ApiT.Team, ev) {
     var teamCal =
-      List.find(Sidebar.currentTeam.team_calendars, function(c) {
+      List.find(team.team_calendars, function(c) {
         return c.google_cal_id === ev.google_cal_id;
     });
     if (teamCal === null) return undefined;
@@ -12,9 +12,9 @@ module Esper.InsertTime {
   /** Attaches the composition controls and sets up the event
    *  handlers.
    */
-  function attachControls(anchor) {
-    anchor.each(function (i, div) {
-      div = $(div); // each gives us raw elements, not $ selections
+  function attachControls(anchor: JQuery) {
+    anchor.each(function (i, divElt) {
+      var div = $(divElt);
 
       // If we haven't added a menu to this one yet and it is not a
       // new compose interface.
@@ -37,27 +37,37 @@ module Esper.InsertTime {
         });
 
         controls.insertButton.click(function (e) {
-          var textField = Gmail.replyTextField(div);
-          var events = TaskTab.currentEvents;
-          textField.focus();
+          var team = Sidebar.currentTeam;
+          if (team !== null && team !== undefined) {
+            var textField = Gmail.replyTextField(div);
+            var events = TaskTab.currentEvents;
+            textField.focus();
 
-          insertAtCaret("<br />");
-          for (var i = 0; i < events.length; i++) {
-            var ev = events[i].event;
-            var start = new Date(ev.start.local);
-            var end   = new Date(ev.end.local);
-            var range = XDate.rangeWithoutYear(start, end);
-            var tz =
-              (<any> moment).tz(ev.start.local, eventTimezone(ev)).zoneAbbr();
+            insertAtCaret("<br />");
+            for (var i = 0; i < events.length; i++) {
+              var ev = events[i].event;
+              var start = new Date(ev.start.local);
+              var end   = new Date(ev.end.local);
+              var range = XDate.rangeWithoutYear(start, end);
+              var tz =
+                (<any> moment).tz(ev.start.local,
+                                  eventTimezone(team, ev)).zoneAbbr();
 
-            if (Gmail.caretInField(textField)) {
-              insertAtCaret(XDate.weekDay(start) + ", " + range
-                            + " " + tz + "<br />");
+              if (Gmail.caretInField(textField)) {
+                insertAtCaret(XDate.weekDay(start) + ", " + range
+                              + " " + tz + "<br />");
+              }
             }
           }
         });
 
-        controls.createButton.click(function() { CalPicker.createModal(); });
+        controls.createButton.click(function() {
+          var threadId = Sidebar.currentThreadId;
+          var team = Sidebar.currentTeam;
+          if (threadId !== null && threadId !== undefined
+              && team !== null && team !== undefined)
+            CalPicker.createModal(team, threadId);
+        });
       }
     });
   }
