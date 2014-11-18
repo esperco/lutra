@@ -31,15 +31,16 @@ Esper . xxx xxxxx
 Esper . xxxxxxxx
 
    */
-  function logArray(logFunction, prefix, args) {
-    printTimeSeparator(tag + " " + prefix);
+  function logArray(logFunction, level, args) {
+    printTimeSeparator(tag + " " + level);
 
     /* If the first argument is a string, print the second argument
        on the same line.
        This is useful for filtering lines in the Chrome console.
     */
+    var prefix = "";
     if (args.length > 1 && typeof args[0] === "string") {
-      prefix = prefix + " " + args[0];
+      prefix = prefix + args[0];
       args.shift();
     }
 
@@ -48,9 +49,9 @@ Esper . xxxxxxxx
         var x = args[i];
         var s;
         if (i === 0)
-          s = tag + " " + prefix;
+          s = tag + " " + level + " " + prefix;
         else
-          s = tag + " .";
+          s = tag + " . "             + prefix;
         switch (typeof x) {
         case "string":
         case "number":
