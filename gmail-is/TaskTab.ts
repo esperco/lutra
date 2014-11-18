@@ -1,5 +1,8 @@
 module Esper.TaskTab {
 
+  var taskLabelCreate = "Create task";
+  var taskLabelExists = "Title";
+
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
@@ -31,7 +34,7 @@ module Esper.TaskTab {
       return Api.obtainTaskForThread(teamid, threadId, false, true)
         .then(function(task) {
           currentTask = task;
-          view.taskCaption.text("Task:");
+          view.taskCaption.text(taskLabelExists);
           view.taskTitle.text(task.task_title);
           return task;
         });
@@ -829,7 +832,7 @@ module Esper.TaskTab {
             Api.deleteTask(task.taskid)
               .done(function() {
                 currentTask = undefined;
-                taskTab.taskCaption.text("Create task:");
+                taskTab.taskCaption.text(taskLabelCreate);
                 clearlinkedEventsList(team, taskTab);
                 Sidebar.dismissDropdowns();
               });
@@ -1062,11 +1065,11 @@ module Esper.TaskTab {
       var title = "";
       linkedThreadsSpinner.hide();
       if (task !== undefined) {
-        taskCaption.text("Title");
+        taskCaption.text(taskLabelExists);
         title = task.task_title;
         displayLinkedThreadsList(task, threadId, taskTabView);
       } else {
-        taskCaption.text("Create task");
+        taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
         if (thread !== undefined && thread !== null)
           title = thread.subject;
