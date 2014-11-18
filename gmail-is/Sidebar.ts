@@ -334,10 +334,14 @@ module Esper.Sidebar {
 
           var teams = Login.myTeams();
           Thread.detectTeam(teams, emailData)
-            .done(function(team) {
-              Log.d("Detected team:", team);
+            .done(function(x: Thread.DetectedTeam) {
+              Log.d("Detected team:", x);
+              var team =
+                x === undefined ? undefined : x.team;
+              var hasMsgFromExec =
+                x === undefined ? false : x.hasMsgFromExec;
 
-              var autoTask = team !== undefined;
+              var autoTask = hasMsgFromExec;
 
               if (team === undefined && teams.length === 1) {
                 Log.w("Team not detected, using one and only team.");
