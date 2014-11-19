@@ -171,20 +171,28 @@ module Esper.TaskList {
         Math.min(x.tasks.length - 1,
                  Math.max(0, x.tasks.length - fetchAhead));
 
-      List.iter(x.tasks, function(task, i) {
-        var elt = renderTask(task, closeTaskListLayer);
-        elt.appendTo(listContainer);
-        var url = x.next_page;
-        if (url !== undefined && i === scrollTrigger) {
-          var lazyRefill = refillIfNeeded(elt, url);
+      var nextUrl = x.next_page;
+      if (x.tasks.length === 0 && nextUrl !== undefined) {
+        /* This is a problematic case, in which the server returned
+           an empty page but promises more results.
+           We fetch the next page right away. */
+        Api.getTaskPage(nextUrl).done(appendPage);
+      }
+      else {
+        List.iter(x.tasks, function(task, i) {
+          var elt = renderTask(task, closeTaskListLayer);
+          elt.appendTo(listContainer);
+          if (nextUrl !== undefined && i === scrollTrigger) {
+            var lazyRefill = refillIfNeeded(elt, nextUrl);
 
-          /* Next page may have to be displayed right way or will
-             be triggered after some scrolling. */
-          lazyRefill();
-          container.off("scroll");
-          container.scroll(lazyRefill);
-        }
-      });
+            /* Next page may have to be displayed right way or will
+               be triggered after some scrolling. */
+            lazyRefill();
+            container.off("scroll");
+            container.scroll(lazyRefill);
+          }
+        });
+      }
     }
 
     /* First page */
