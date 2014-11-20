@@ -78,34 +78,95 @@ module Esper.TaskList {
     });
   }
 
-  function renderTask(task: ApiT.Task,
+  function getProgressLabel(team: ApiT.Team,
+                            task: ApiT.Task) {
+    switch (task.task_progress) {
+    case "New":
+      return team.team_label_new;
+    case "In_progress":
+      return team.team_label_in_progress;
+    case "Done":
+      return team.team_label_done;
+    case "Canceled":
+      return team.team_label_canceled;
+    default:
+      Log.e("Unknown task progress: " + task.task_progress);
+      return "?";
+    }
+  }
+
+  function getKnownLabels(team: ApiT.Team) {
+    return [
+      team.team_label_urgent,
+      team.team_label_new,
+      team.team_label_in_progress,
+      team.team_label_done,
+      team.team_label_canceled
+    ];
+  }
+
+  function getTeamLabels(team: ApiT.Team) {
+    return List.union(team.team_labels, getKnownLabels(team));
+  }
+
+  /* Labels shared by the team excluding those with a known meaning */
+  function getUnknownTeamLabels(team: ApiT.Team) {
+    return List.diff(team.team_labels, getKnownLabels(team));
+  }
+
+  function renderTask(team: ApiT.Team,
+                      task: ApiT.Task,
                       closeTaskListLayer: () => void) {
 '''
 <div #view class="esper-tl-task">
   <div>
     <span #title class="esper-tl-task-title"></span>
-    <span #urgent class="esper-tl-urgent">Urgent</span>
-    <span #canceled class="esper-tl-canceled">Canceled</span>
+    <span #urgent class="esper-tl-urgent"></span>
+    <span #progress class="esper-tl-progress"></span>
     <span #deleteButton
           class="esper-clickable esper-link-danger"
           title="Delete this task">
       Delete
     </span>
   </div>
+  <div #otherTeamLabels></div>
+  <div #privateLabels></div>
   <div #linkedThreadContainer class="esper-tl-threads"></div>
   <div #linkedEventContainer class="esper-tl-events"></div>
 </div>
 '''
-    if (!task.task_urgent)
-      urgent.remove();
-    if (!task.task_canceled)
-      canceled.remove();
 
     title.text(task.task_title);
     deleteButton.click(function() {
       Api.deleteTask(task.taskid);
       view.remove();
     });
+
+    urgent.text(team.team_label_urgent);
+    if (!task.task_urgent)
+      urgent.remove();
+
+    var progressLabel = getProgressLabel(team, task);
+    progress.text(progressLabel);
+
+    var shared = List.inter(task.task_labels, getUnknownTeamLabels(team));
+    List.iter(shared, function(label: string) {
+      $("<span>")
+        .addClass("esper-tl-shared")
+        .text(label)
+        .attr("title", "Shared label, visible by the executive")
+        .appendTo(otherTeamLabels)
+    });
+
+    var private_ = List.diff(task.task_labels, getTeamLabels(team));
+    List.iter(private_, function(label: string) {
+      $("<span>")
+        .addClass("esper-tl-private")
+        .text(label)
+        .attr("title", "Private label, not visible by the executive")
+        .appendTo(privateLabels)
+    });
+
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
     renderEvents(task.task_events, linkedEventContainer);
 
@@ -175,7 +236,7 @@ module Esper.TaskList {
       }
       else {
         List.iter(tasks, function(task, i) {
-          var elt = renderTask(task, closeTaskListLayer);
+          var elt = renderTask(team, task, closeTaskListLayer);
           elt.appendTo(listContainer);
           if (nextUrl !== undefined && i === scrollTrigger) {
             var lazyRefill = refillIfNeeded(elt, nextUrl);
@@ -204,37 +265,49 @@ module Esper.TaskList {
 <div #view class="esper-tl-task-list">
   <span #closeButton class="esper-tl-close esper-clickable">×</span>
   <span #all class="esper-link esper-tl-all">All</span>
-  <span #urgent class="esper-link esper-tl-urgent">Urgent</span>
-  <span #canceled class="esper-link esper-tl-canceled">Canceled</span>
+  <span #urgent class="esper-link esper-tl-urgent"></span>
+  <span #new_ class="esper-link esper-tl-progress"></span>
+  <span #inProgress class="esper-link esper-tl-progress"></span>
+  <span #done class="esper-link esper-tl-progress"></span>
+  <span #canceled class="esper-link esper-tl-progress"></span>
   <div #list></div>
 </div>
 '''
+    urgent.text(team.team_label_urgent);
+    new_.text(team.team_label_new);
+    inProgress.text(team.team_label_in_progress);
+    done.text(team.team_label_done);
+    canceled.text(team.team_label_canceled);
+
     view.click(function() {
       return false; // prevents click events from reaching the parent
     });
     closeButton.click(closeTaskListLayer);
 
-    function filterAll(task: ApiT.Task) { return true; }
-    function filterUrgent(task: ApiT.Task) { return task.task_urgent; }
-    function filterCanceled(task: ApiT.Task) { return task.task_canceled; }
-
-    function filtered(filter) {
+    function displayFiltered(filter) {
       displayList(team, list, closeTaskListLayer, filter);
     }
 
-    all.click(function() {
-      filtered(filterAll);
-    });
+    function bind(elt: JQuery,
+                  filter: (task: ApiT.Task) => boolean) {
+      elt.click(function() {
+        displayFiltered(filter);
+      });
+    }
 
-    urgent.click(function() {
-      filtered(filterUrgent);
-    });
+    bind(all, function(task) { return true; });
+    bind(urgent, function(task) { return task.task_urgent; });
 
-    canceled.click(function() {
-      filtered(filterCanceled);
-    });
+    function bindProgress(elt, progress) {
+      bind(elt, function(task) { return task.task_progress === progress; });
+    }
 
-    filtered(filterAll);
+    bindProgress(new_, "New");
+    bindProgress(inProgress, "In_progress");
+    bindProgress(done, "Done");
+    bindProgress(canceled, "Canceled");
+
+    all.click();
 
     return view;
   }

@@ -142,7 +142,7 @@ module Esper.List {
   /* convert a list of values into an object keyed by strings;
      If the values are not strings, a function getKey must be provided
      which will extract a string key from each value */
-  export function toTable<T>(a: T[], getKey: (x: T) => string):
+  export function toTable<T>(a: T[], getKey?: (x: T) => string):
   { [k: string]: T } {
     var get = getter(getKey);
     var tbl: { [k: string]: T } = {};
@@ -157,7 +157,7 @@ module Esper.List {
     union of two lists
     (elements occurring in either list, without duplicates)
   */
-  export function union<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
+  export function union<T>(a: T[], b: T[], getKey?: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(a, getKey);
     var resTbl = {};
@@ -177,7 +177,7 @@ module Esper.List {
   /*
     remove duplicates from a list
   */
-  export function unique<T>(a: T[], getKey: (x: T) => string): T[] {
+  export function unique<T>(a: T[], getKey?: (x: T) => string): T[] {
     return union(a, [], getKey);
   }
 
@@ -185,7 +185,7 @@ module Esper.List {
     intersection of two lists
     (elements occurring in both lists)
   */
-  export function inter<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
+  export function inter<T>(a: T[], b: T[], getKey?: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(b, getKey);
     return filter(unique(a, getKey), function(v) {
@@ -198,7 +198,7 @@ module Esper.List {
     set difference of two lists
     (elements occurring in the first list but not in the second list)
   */
-  export function diff<T>(a: T[], b: T[], getKey: (x: T) => string): T[] {
+  export function diff<T>(a: T[], b: T[], getKey?: (x: T) => string): T[] {
     var get = getter(getKey);
     var tbl = toTable(b, getKey);
     return filter(unique(a, getKey), function(v) {
