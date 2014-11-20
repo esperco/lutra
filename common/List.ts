@@ -17,7 +17,7 @@ module Esper.List {
     return b;
   }
 
-  export function sortStrings<string>(a: string[]): string[] {
+  export function sortStrings(a: string[]): string[] {
     var b = copy(a);
     b.sort();
     return b;
