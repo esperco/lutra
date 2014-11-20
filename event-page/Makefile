@@ -1,12 +1,12 @@
-.PHONY: default content-script build install clean
-default: content-script
+.PHONY: default event-page build install clean
+default: event-page
 
 # Build and install javascript files
-content-script: build
+event-page: build
 	$(MAKE) install
 
 # Build only
-build: js/content-script.js
+build: js/event-page.js
 
 # External JavaScript libraries (needed at runtime only).
 # sha1 is part of cryptojs.
@@ -48,8 +48,6 @@ SHARED_SOURCES = \
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
   Update \
-  JsonHttp \
-  Auth \
   Main
 
 # Paths to preprocessed TypeScript files from other directories
@@ -83,14 +81,14 @@ ts/%.ts: %.ts
 	@mkdir -p ts
 	../setup/bin/oblivion -ts $< -o $@
 
-js/content-script.js: $(ALL_TS)
+js/event-page.js: $(ALL_TS)
 	@mkdir -p js
-	tsc --out js/content-script-ts.js $(ALL_TS)
-	cat $(EXTRA_JS) js/content-script-ts.js > $@
+	tsc --out js/event-page-ts.js $(ALL_TS)
+	cat $(EXTRA_JS) js/event-page-ts.js > $@
 
 install:
 	mkdir -p ../pub/js
-	cp js/content-script.js ../pub/js/content-script.js
+	cp js/event-page.js ../pub/js/event-page.js
 
 clean:
 	rm -f *~

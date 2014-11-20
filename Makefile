@@ -56,6 +56,7 @@ prod-build:
 
 build:
 	$(MAKE) -C common
+	$(MAKE) -C event-page build
 	$(MAKE) -C content-script build
 	$(MAKE) -C gmail-is build
 	$(MAKE) -C gcal-is build
@@ -70,6 +71,7 @@ clean:
 	rm -rf pub *~ */*~
 	rm -f manifest.json manifest.json.dev manifest.json.prod
 	$(MAKE) -C common clean
+	$(MAKE) -C event-page clean
 	$(MAKE) -C content-script clean
 	$(MAKE) -C gmail-is clean
 	$(MAKE) -C gcal-is clean
