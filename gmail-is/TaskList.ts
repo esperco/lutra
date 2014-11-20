@@ -120,32 +120,21 @@ module Esper.TaskList {
     return (eltTop < containerBottom);
   }
 
-  export function display(team: ApiT.Team,
-                          parent: JQuery) {
+  export function displayList(team: ApiT.Team,
+                              parent: JQuery,
+                              closeTaskListLayer: () => void,
+                              filter: (task: ApiT.Task) => boolean) {
 
 '''
-<div #container class="esper-tl-task-list">
+<div #container>
   <h1 #teamName class="esper-tl-head"></h1>
-  <span #closeButton class="esper-tl-close esper-clickable">×</span>
   <div #listContainer class="esper-tl-list"></div>
 </div>
 '''
     parent.children().remove();
-    parent.removeClass("esper-hide");
     parent.append(container);
 
-    function closeTaskListLayer() {
-      parent.addClass("esper-hide");
-    }
-
     teamName.text(team.team_name + " tasks");
-
-    container.click(function() {
-      return false; // prevents click events from reaching the parent
-    });
-
-    parent.click(closeTaskListLayer);
-    closeButton.click(closeTaskListLayer);
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
@@ -158,28 +147,34 @@ module Esper.TaskList {
         if (!done) {
           if (isVisible(triggerElt, container)) {
             done = true;
-            Api.getTaskPage(url).done(appendPage);
+            Api.getTaskPage(url).done(function(x) {
+              appendPage(x, closeTaskListLayer);
+            });
           }
         }
       }
     }
 
-    function appendPage(x: ApiT.TaskList) {
+    function appendPage(x: ApiT.TaskList,
+                        closeTaskListLayer: () => void) {
       /* Index of the element which, when visible, triggers the API call
          that fetches a new page. */
+      var tasks = List.filter(x.tasks, filter);
       var scrollTrigger =
-        Math.min(x.tasks.length - 1,
-                 Math.max(0, x.tasks.length - fetchAhead));
+        Math.min(tasks.length - 1,
+                 Math.max(0, tasks.length - fetchAhead));
 
       var nextUrl = x.next_page;
-      if (x.tasks.length === 0 && nextUrl !== undefined) {
+      if (tasks.length === 0 && nextUrl !== undefined) {
         /* This is a problematic case, in which the server returned
            an empty page but promises more results.
            We fetch the next page right away. */
-        Api.getTaskPage(nextUrl).done(appendPage);
+        Api.getTaskPage(nextUrl).done(function(x) {
+          appendPage(x, closeTaskListLayer);
+        });
       }
       else {
-        List.iter(x.tasks, function(task, i) {
+        List.iter(tasks, function(task, i) {
           var elt = renderTask(task, closeTaskListLayer);
           elt.appendTo(listContainer);
           if (nextUrl !== undefined && i === scrollTrigger) {
@@ -197,6 +192,51 @@ module Esper.TaskList {
 
     /* First page */
     Api.getTaskList(team.teamid, pageSize, withEvents, withThreads)
-      .done(appendPage);
+      .done(function(x) {
+        appendPage(x, closeTaskListLayer);
+      });
   }
+
+  export function render(team: ApiT.Team,
+                         parent: JQuery,
+                         closeTaskListLayer: () => void) {
+'''
+<div #view class="esper-tl-task-list">
+  <span #closeButton class="esper-tl-close esper-clickable">×</span>
+  <span #all class="esper-link esper-tl-all">All</span>
+  <span #urgent class="esper-link esper-tl-urgent">Urgent</span>
+  <span #canceled class="esper-link esper-tl-canceled">Canceled</span>
+  <div #list></div>
+</div>
+'''
+    view.click(function() {
+      return false; // prevents click events from reaching the parent
+    });
+    closeButton.click(closeTaskListLayer);
+
+    function filterAll(task: ApiT.Task) { return true; }
+    function filterUrgent(task: ApiT.Task) { return task.task_urgent; }
+    function filterCanceled(task: ApiT.Task) { return task.task_canceled; }
+
+    function filtered(filter) {
+      displayList(team, list, closeTaskListLayer, filter);
+    }
+
+    all.click(function() {
+      filtered(filterAll);
+    });
+
+    urgent.click(function() {
+      filtered(filterUrgent);
+    });
+
+    canceled.click(function() {
+      filtered(filterCanceled);
+    });
+
+    filtered(filterAll);
+
+    return view;
+  }
+
 }
