@@ -48,13 +48,13 @@ module Esper.InsertTime {
               var ev = events[i].event;
               var start = new Date(ev.start.local);
               var end   = new Date(ev.end.local);
-              var range = XDate.rangeWithoutYear(start, end);
+              var range = XDate.range(start, end);
               var tz =
                 (<any> moment).tz(ev.start.local,
                                   eventTimezone(team, ev)).zoneAbbr();
 
               if (Gmail.caretInField(textField)) {
-                insertAtCaret(XDate.weekDay(start) + ", " + range
+                insertAtCaret(XDate.fullWeekDay(start) + ", " + range
                               + " " + tz + "<br />");
               }
             }
