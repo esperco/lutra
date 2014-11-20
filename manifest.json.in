@@ -12,6 +12,11 @@
     "128": "img/icon128.png"
   },
 
+  "background": {
+    "scripts": ["js/event-page.js"],
+    "persistent": false
+  },
+
   "content_scripts": [
     {
       "matches": [

@@ -29,16 +29,13 @@ module Esper.Main {
     Log.tag = "Esper [CS]";
     Log.d("Initializing content script");
 
-    if ((/^https:\/\/mail\.google\.com\//)
-        .test(document.URL))
-
+    if (HostUrl.isGmail(document.URL))
       injectScript("gmail-is.js");
 
-    else if ((/^https:\/\/www\.google\.com\/calendar\//)
-             .test(document.URL))
-
+    else if (HostUrl.isGcal(document.URL))
       injectScript("gcal-is.js");
 
+    Update.init();
     Auth.init();
   }
 }
