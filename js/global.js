@@ -60,10 +60,25 @@ function loadElements() {
   $(".footer-container").load("footer.html");
 }
 
+function showTasks(tasktype, list){
+  $(tasktype).hover(function(){
+      $(list).slideDown('medium');
+    }, function() {
+      $(list).slideUp('medium');
+    }
+  );
+}
+
 function main() {
   loadElements();
   resizer();
   slider();
+  showTasks(".event-example", "ul.event-examples");
+  showTasks(".research-example", "ul.research-examples");
+  showTasks(".office-example", "ul.office-examples");
 }
+
+
+
 
 $(document).ready(main);

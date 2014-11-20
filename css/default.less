@@ -74,8 +74,12 @@ h3, h4 { font-family: "Montserrat"; }
 
 h3, h4 { letter-spacing: 2px; }
 
-li, p {
+p {
   line-height: 2;
+  color: @gray_80;
+}
+li {
+  line-height: 1.5;
   color: @gray_80;
 }
 
@@ -85,6 +89,10 @@ a {
   cursor: pointer;
   &:hover { color: @purple_text; }
   &.toggle { float: left; }
+}
+ul{
+  text-align: left;
+  padding-left: 10px;
 }
 
 .bold { font-weight: 600; }
@@ -340,7 +348,6 @@ input.disabled {
   @media (max-width:767px) { margin-right: 70px; }
   padding: 0;
   li, a {
-    list-style: none;
     line-height: 2.0;
   }
   a { color: @gray_80; }
@@ -466,7 +473,7 @@ input.disabled {
   max-width: 1280px;
   margin: 0 auto;
   @media (min-width:768px) { padding: 64px 36px; }
-  @media (max-width:767px) { padding: 48px 18px; }
+  @media (max-width:767px) { padding: 56px 18px; }
   &.narrow { max-width: 800px; }
 }
 
@@ -479,6 +486,7 @@ input.disabled {
 .left-col, .mid-col, .right-col {
   float: left;
   width: 30%;
+  margin-bottom: 5px;
 }
 
 .left-col, .mid-col { margin-right: 5%; }
@@ -554,6 +562,7 @@ input.disabled {
   }
 }
 
+
 .dream-team-container {
   display: inline-block;
   vertical-align: bottom;
@@ -564,6 +573,23 @@ input.disabled {
     width: 100%;
     padding: 48px 18px 0 18px;
   }
+}
+
+.event-example, .research-example, .office-example {
+  margin-bottom: 0px;
+}
+
+.event-examples, .research-examples, .office-examples{
+  display: none;
+  position: absolute;
+  margin-top: 0px;
+  li{
+    list-style-type: none;
+    margin-left: 0px;
+  }
+}
+.event-examples li{
+    text-decoration: none;
 }
 
 .dream-team-faces { vertical-align: bottom; }
