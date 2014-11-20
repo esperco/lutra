@@ -17,6 +17,12 @@ module Esper.List {
     return b;
   }
 
+  export function sortStrings<string>(a: string[]): string[] {
+    var b = copy(a);
+    b.sort();
+    return b;
+  }
+
   /* iterate over each element (foreach) */
   export function iter<T>(a: T[], f: (x: T, i?: number) => void) {
     var len = a.length;

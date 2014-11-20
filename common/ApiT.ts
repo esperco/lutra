@@ -318,4 +318,7 @@ module Esper.ApiT {
     task_weight: number;
   }
 
+  export interface EmailLabels {
+    labels: string[];
+  }
 }

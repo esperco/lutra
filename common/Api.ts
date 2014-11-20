@@ -391,6 +391,13 @@ module Esper.Api {
     return getTaskPage(url);
   }
 
+  export function getLabels():
+  JQueryDeferred<ApiT.EmailLabels> {
+    var url =
+      Conf.Api.url + "/api/gmail/labels/" + Login.myUid();
+    return JsonHttp.get(url);
+  }
+
   export function sendEventInvites(teamid, fromEmail, guests, event):
   JQueryDeferred<void> {
     var url =

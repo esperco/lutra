@@ -114,6 +114,10 @@ module Esper.TaskList {
     return List.diff(team.team_labels, getKnownLabels(team));
   }
 
+  function sortLabels(l: string[]) {
+    return List.sortStrings(l);
+  }
+
   function renderTask(team: ApiT.Team,
                       task: ApiT.Task,
                       closeTaskListLayer: () => void) {
@@ -150,21 +154,23 @@ module Esper.TaskList {
     progress.text(progressLabel);
 
     var shared = List.inter(task.task_labels, getUnknownTeamLabels(team));
-    List.iter(shared, function(label: string) {
+    List.iter(sortLabels(shared), function(label: string) {
       $("<span>")
         .addClass("esper-tl-shared")
         .text(label)
         .attr("title", "Shared label, visible by the executive")
-        .appendTo(otherTeamLabels)
+        .appendTo(otherTeamLabels);
+      otherTeamLabels.append(" ");
     });
 
     var private_ = List.diff(task.task_labels, getTeamLabels(team));
-    List.iter(private_, function(label: string) {
+    List.iter(sortLabels(private_), function(label: string) {
       $("<span>")
         .addClass("esper-tl-private")
         .text(label)
         .attr("title", "Private label, not visible by the executive")
-        .appendTo(privateLabels)
+        .appendTo(privateLabels);
+      privateLabels.append(" ");
     });
 
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
@@ -270,6 +276,8 @@ module Esper.TaskList {
   <span #inProgress class="esper-link esper-tl-progress"></span>
   <span #done class="esper-link esper-tl-progress"></span>
   <span #canceled class="esper-link esper-tl-progress"></span>
+  <div #otherTeamLabels></div>
+  <div #privateLabels></div>
   <div #list></div>
 </div>
 '''
@@ -306,6 +314,33 @@ module Esper.TaskList {
     bindProgress(inProgress, "In_progress");
     bindProgress(done, "Done");
     bindProgress(canceled, "Canceled");
+
+    var shared = getUnknownTeamLabels(team);
+    List.iter(sortLabels(shared), function(label: string) {
+      var elt = $("<span>")
+        .addClass("esper-link esper-tl-shared")
+        .text(label)
+        .appendTo(otherTeamLabels);
+      bind(elt, function(task) {
+        return List.mem(task.task_labels, label);
+      });
+      otherTeamLabels.append(" ");
+    });
+
+    Api.getLabels()
+      .done(function(x) {
+        var private_ = List.diff(x.labels, getTeamLabels(team));
+        List.iter(sortLabels(private_), function(label: string) {
+          var elt = $("<span>")
+            .addClass("esper-link esper-tl-private")
+            .text(label)
+            .appendTo(privateLabels);
+          bind(elt, function(task) {
+            return List.mem(task.task_labels, label);
+          });
+          privateLabels.append(" ");
+        });
+      });
 
     all.click();
 
