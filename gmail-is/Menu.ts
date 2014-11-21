@@ -59,6 +59,20 @@ module Esper.Menu {
       .append(helpLink);
   }
 
+  function displayTaskList(team: ApiT.Team,
+                           tasksLayer: JQuery) {
+    function closeList() {
+      tasksLayer.addClass("esper-hide");
+      return false;
+    }
+
+    tasksLayer.children().remove();
+    tasksLayer.removeClass("esper-hide");
+    TaskList.render(team, tasksLayer, closeList)
+      .appendTo(tasksLayer);
+    tasksLayer.click(closeList);
+  }
+
   function setupTeamSwitcher(teams: ApiT.Team[],
                              view: Menu,
                              tasksLayer: JQuery) {
@@ -93,7 +107,7 @@ module Esper.Menu {
         .text(team.team_name)
         .click(function() {
           currentTeam.set(team);
-          TaskList.display(team, tasksLayer);
+          displayTaskList(team, tasksLayer);
         })
         .appendTo(view.teamSwitcherContent);
     });
@@ -114,7 +128,7 @@ module Esper.Menu {
       view.tasksButton
         .removeClass("esper-hide")
         .unbind("click")
-        .click(function() { TaskList.display(currentTeam.get(), tasksLayer); });
+        .click(function() { displayTaskList(currentTeam.get(), tasksLayer); });
     }
   }
 

@@ -450,7 +450,7 @@ textarea.esper-input { resize: none; }
   font-weight: bold;
 }
 
-.esper-label {
+.esper-tl-label {
   margin-left: 6px;
   padding: 2px 6px;
   font-size: 10px;
@@ -458,17 +458,28 @@ textarea.esper-input { resize: none; }
   position: relative;
   bottom: 2px;
   border-radius: 2px;
+
+  background: @gray_40;
+  color: white;
 }
 
 .esper-tl-urgent {
-  .esper-label;
+  .esper-tl-label;
   background: @red;
   color: white;
 }
 
-.esper-tl-canceled {
-  .esper-label;
-  background: @gray_40;
+.esper-tl-progress {
+  .esper-tl-label;
+  background: @purple;
+  color: white;
+}
+
+.esper-tl-shared {
+  .esper-tl-label;
+  margin-left: 0px;
+  margin-right: 6px;
+  background: @gray_60;
   color: white;
 }
 

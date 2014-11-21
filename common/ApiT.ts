@@ -22,6 +22,12 @@ module Esper.ApiT {
     team_name: string;
     team_executive: string;
     team_assistants: string[];
+    team_labels: string[];
+    team_label_urgent: string;
+    team_label_new: string;
+    team_label_in_progress: string;
+    team_label_done: string;
+    team_label_canceled: string;
     team_calendars: Calendar[];
     team_email_aliases: string[];
   }
@@ -279,10 +285,11 @@ module Esper.ApiT {
 
   export interface Task {
     taskid: string;
-    task_title: string;
     task_teamid: string;
+    task_title: string;
+    task_labels: string[];
+    task_progress: string; // New | In_progress | Done | Canceled
     task_urgent: boolean;
-    task_canceled: boolean;
     task_unread_emails?: number;
     task_threads: EmailThread[];
     task_events: TaskEvent[];
