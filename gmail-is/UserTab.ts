@@ -370,7 +370,6 @@ module Esper.UserTab {
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
     address.text(workplace.location.address);
-    console.log(workplace.duration);
     durationText.text(formatDuration(workplace.duration));
 
     var last = true;
