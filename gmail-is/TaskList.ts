@@ -259,12 +259,12 @@ module Esper.TaskList {
 '''
 <div #view class="esper-tl-task-list">
   <span #closeButton class="esper-tl-close esper-clickable">×</span>
-  <span #all class="esper-link esper-tl-all">All</span>
-  <span #urgent class="esper-link esper-tl-urgent"></span>
-  <span #new_ class="esper-link esper-tl-progress"></span>
-  <span #inProgress class="esper-link esper-tl-progress"></span>
-  <span #done class="esper-link esper-tl-progress"></span>
-  <span #canceled class="esper-link esper-tl-progress"></span>
+  <span #all class="esper-tl-link esper-tl-all">All</span>
+  <span #urgent class="esper-tl-link esper-tl-urgent"></span>
+  <span #new_ class="esper-tl-link esper-tl-progress"></span>
+  <span #inProgress class="esper-tl-link esper-tl-progress"></span>
+  <span #done class="esper-tl-link esper-tl-progress"></span>
+  <span #canceled class="esper-tl-link esper-tl-progress"></span>
   <div #otherTeamLabels></div>
   <div #list></div>
 </div>
@@ -284,9 +284,15 @@ module Esper.TaskList {
       displayList(team, list, closeTaskListLayer, filter);
     }
 
+    function highlightSelection(elt: JQuery) {
+      $(".esper-tl-selected").removeClass("esper-tl-selected");
+      elt.addClass("esper-tl-selected");
+    }
+
     function bind(elt: JQuery,
                   filter: (task: ApiT.Task) => boolean) {
       elt.click(function() {
+        highlightSelection(elt);
         displayFiltered(filter);
       });
     }
@@ -306,7 +312,7 @@ module Esper.TaskList {
     var shared = getUnknownTeamLabels(team);
     List.iter(sortLabels(shared), function(label: string) {
       var elt = $("<span>")
-        .addClass("esper-link esper-tl-shared")
+        .addClass("esper-tl-link esper-tl-shared")
         .text(label)
         .appendTo(otherTeamLabels);
       bind(elt, function(task) {
