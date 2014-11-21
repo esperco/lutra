@@ -1226,6 +1226,7 @@ ul.esper-ev-dropdown {
 
 /** Modals **/
 
+/* Semi-transparent background of the modal, parent of the popup div */
 .esper-modal-bg {
   z-index: 6;
   position: fixed;
@@ -1233,20 +1234,39 @@ ul.esper-ev-dropdown {
   height: 100%;
   top: 0;
   left: 0;
-  background: white;
-  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
+/*
+  Popup
+  Must be the child of the background of class esper-modal-bg.
+
+  The following must be specified on per-case basis:
+  - @width: ...
+  - width: @width
+  - margin-left: -@width/2
+
+  Optionally, if a fixed height is desired:
+  - top: 50%
+  - @height: ...
+  - height: @height
+  - margin-top: -@height/2
+*/
 .esper-modal {
   /* geometry */
   z-index: 10;
-  position: fixed;
-  top: 20%;
+  position: absolute;
+
+  top: 15%;
+  max-height: 70%;
+  overflow-y: auto;
+
   left: 50%;
+  max-width: 90%;
 
   /* appearance */
   outline: none;
-  background: white;
+  background-color: white;
   border: 1px solid @gray_30;
   border-radius: 5px;
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
@@ -1367,12 +1387,17 @@ ul.esper-ev-dropdown {
 }
 
 
-/** Duplicate Event Modal **/
+/** Modal for duplicating an event **/
+
+.esper-ev-modal {
+  .esper-modal;
+  @width: 480px;
+  width: @width;
+  margin-left: -@width/2;
+}
 
 .esper-ev-modal-content {
-  max-height: 372px;
   padding: 10px 15px;
-  overflow-y: auto;
 }
 
 .esper-ev-modal-row {
