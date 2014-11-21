@@ -164,9 +164,8 @@ module Esper.CalSearch {
                                   eventsTab: TaskTab.TaskTabView,
                                   profiles: ApiT.Profile[]) {
 '''
-<div #view>
-  <div #background class="esper-modal-bg"/>
-  <div #modal class="esper-modal esper-search-modal">
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-search-modal">
     <div class="esper-modal-header">Link to existing event</div>
     <div class="esper-modal-content">
       <input #search
@@ -199,7 +198,6 @@ module Esper.CalSearch {
     var searchView = <SearchView> _view;
 
     setupSearch(team, threadId, searchView, eventsTab, profiles);
-    // search.focus();
 
     search.css(
       "background",
@@ -207,12 +205,12 @@ module Esper.CalSearch {
     );
 
     function closeModal() { view.remove(); }
-    background.click(closeModal);
+    view.click(closeModal);
+    modal.click(function() { return false; });
     done.click(closeModal);
     cancel.click(closeModal);
 
     return _view;
-    // $("body").append(view);
   }
 
 }

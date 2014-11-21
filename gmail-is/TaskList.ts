@@ -257,16 +257,18 @@ module Esper.TaskList {
                          parent: JQuery,
                          closeTaskListLayer: () => void) {
 '''
-<div #view class="esper-tl-task-list">
-  <span #closeButton class="esper-tl-close esper-clickable">×</span>
-  <span #all class="esper-tl-link esper-tl-all">All</span>
-  <span #urgent class="esper-tl-link esper-tl-urgent"></span>
-  <span #new_ class="esper-tl-link esper-tl-progress"></span>
-  <span #inProgress class="esper-tl-link esper-tl-progress"></span>
-  <span #done class="esper-tl-link esper-tl-progress"></span>
-  <span #canceled class="esper-tl-link esper-tl-progress"></span>
-  <div #otherTeamLabels></div>
-  <div #list></div>
+<div #view class="esper-tl-modal">
+  <div class="esper-tl-task-list">
+    <span #closeButton class="esper-tl-close esper-clickable">×</span>
+    <span #all class="esper-tl-link esper-tl-all">All</span>
+    <span #urgent class="esper-tl-link esper-tl-urgent"></span>
+    <span #new_ class="esper-tl-link esper-tl-progress"></span>
+    <span #inProgress class="esper-tl-link esper-tl-progress"></span>
+    <span #done class="esper-tl-link esper-tl-progress"></span>
+    <span #canceled class="esper-tl-link esper-tl-progress"></span>
+    <div #otherTeamLabels></div>
+    <div #list></div>
+  </div>
 </div>
 '''
     urgent.text(team.team_label_urgent);

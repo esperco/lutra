@@ -157,7 +157,7 @@ module Esper.Menu {
 '''
 <div #tasksLayer
      id="esper-tasks-layer"
-     class="esper-hide esper-tl-tasks-layer">
+     class="esper-hide esper-modal-bg">
 </div>
 '''
     $("body").append(tasksLayer);

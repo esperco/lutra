@@ -364,9 +364,8 @@ module Esper.CalPicker {
   export function createModal(team: ApiT.Team,
                               threadId: string) : void {
 '''
-<div #view>
-  <div #background class="esper-modal-bg"/>
-  <div #modal class="esper-modal esper-calendar-modal">
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-calendar-modal">
     <div class="esper-modal-header">
       <div #refreshCal title class="esper-calendar-modal-refresh">
         <object #refreshCalIcon class="esper-svg"/>
@@ -411,7 +410,8 @@ module Esper.CalPicker {
       picker.render();
     };
 
-    background.click(closeModal);
+    view.click(closeModal);
+    modal.click(function() { return false; });
     cancel.click(closeModal);
 
     save.click(function() {

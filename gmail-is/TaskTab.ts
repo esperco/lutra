@@ -88,64 +88,65 @@ module Esper.TaskTab {
   function openInviteGuestsModal(team, e, threadId, taskTab, profiles, prefs) {
 '''
 <div #view>
-  <div #background class="esper-modal-bg"/>
-  <div #modal class="esper-modal esper-welcome-modal">
-    <div #heading class="esper-modal-header">
-      Create a duplicate event for guests
-    </div>
-    <div class="esper-ev-modal-content">
-      <div #titleRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Title</div>
-        <div class="esper-ev-modal-right">
-          <input #pubTitle type="text" class="esper-input"/>
+  <div #background class="esper-modal-bg">
+    <div #modal class="esper-modal esper-welcome-modal">
+      <div #heading class="esper-modal-header">
+        Create a duplicate event for guests
+      </div>
+      <div class="esper-ev-modal-content">
+        <div #titleRow class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Title</div>
+          <div class="esper-ev-modal-right">
+            <input #pubTitle type="text" class="esper-input"/>
+          </div>
+        </div>
+        <div #whereRow class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Where</div>
+          <div class="esper-ev-modal-right">
+            <input #pubLocation type="text" class="esper-input"/>
+          </div>
+        </div>
+        <div #calendarRow class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Calendar</div>
+          <div class="esper-ev-modal-right">
+            <select #pubCalendar class="esper-select"/>
+          </div>
+        </div>
+        <div class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Created by</div>
+          <div class="esper-ev-modal-right">
+            <select #fromSelect class="esper-select"/>
+          </div>
+        </div>
+        <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Description</div>
+          <div class="esper-ev-modal-right">
+            <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
+          </div>
+        </div>
+        <div class="esper-ev-modal-row esper-clearfix">
+          <div class="esper-ev-modal-left esper-bold">Guests</div>
+          <div class="esper-ev-modal-right">
+            <ul #viewPeopleInvolved/>
+            <br/>
+            <input #newGuestName class="esper-input esper-ev-modal-small"
+                   type="text" placeholder="Name"/>
+            <input #newGuestEmail class="esper-input esper-ev-modal-small"
+                   type="text" placeholder="Email"/>
+            <button #addGuest class="esper-btn esper-btn-secondary">
+              Add
+            </button>
+          </div>
         </div>
       </div>
-      <div #whereRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Where</div>
-        <div class="esper-ev-modal-right">
-          <input #pubLocation type="text" class="esper-input"/>
-        </div>
+      <div class="esper-modal-footer esper-clearfix">
+        <button #create class="esper-btn esper-btn-primary modal-primary">
+          Create
+        </button>
+        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+          Cancel
+        </button>
       </div>
-      <div #calendarRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Calendar</div>
-        <div class="esper-ev-modal-right">
-          <select #pubCalendar class="esper-select"/>
-        </div>
-      </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Created by</div>
-        <div class="esper-ev-modal-right">
-          <select #fromSelect class="esper-select"/>
-        </div>
-      </div>
-      <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description</div>
-        <div class="esper-ev-modal-right">
-          <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
-        </div>
-      </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Guests</div>
-        <div class="esper-ev-modal-right">
-          <ul #viewPeopleInvolved/>
-          <br/>
-          <input #newGuestName class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Name"/>
-          <input #newGuestEmail class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Email"/>
-          <button #addGuest class="esper-btn esper-btn-secondary">
-            Add
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="esper-modal-footer esper-clearfix">
-      <button #create class="esper-btn esper-btn-primary modal-primary">
-        Create
-      </button>
-      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-        Cancel
-      </button>
     </div>
   </div>
 </div>
@@ -222,6 +223,7 @@ module Esper.TaskTab {
     function closeModal() { view.remove(); }
 
     background.click(closeModal);
+    modal.click(function() { return false; });
 
     var duplicate =
       prefs.general !== undefined ?
