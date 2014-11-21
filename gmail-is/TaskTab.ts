@@ -126,7 +126,17 @@ module Esper.TaskTab {
       </div>
       <div class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Guests</div>
-        <div class="esper-ev-modal-right"><ul #viewPeopleInvolved/></div>
+        <div class="esper-ev-modal-right">
+          <ul #viewPeopleInvolved/>
+          <br/>
+          <input #newGuestName class="esper-input" type="text"
+                 placeholder="Name"/>
+          <input #newGuestEmail class="esper-input" type="text"
+                 placeholder="Email"/>
+          <button #addGuest class="esper-btn esper-btn-secondary">
+            Add
+          </button>
+        </div>
       </div>
     </div>
     <div class="esper-modal-footer esper-clearfix">
@@ -199,6 +209,17 @@ module Esper.TaskTab {
         });
       }
     }
+    newGuestName.css("width", "40%");
+    newGuestEmail.css("width", "40%");
+    addGuest.click(function() {
+      var name = newGuestName.val();
+      var email = newGuestEmail.val();
+      if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
+      var v = viewPersonInvolved(peopleInvolved, email, name);
+      viewPeopleInvolved.append(v);
+      newGuestName.val("");
+      newGuestEmail.val("");
+    });
 
     function closeModal() { view.remove(); }
 
