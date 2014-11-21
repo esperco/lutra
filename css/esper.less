@@ -1331,11 +1331,11 @@ ul.esper-ev-dropdown {
 
 /** Search Modal **/
 
-@search_width: 480px;
-
 .esper-search-modal {
-  margin-left: -@search_width/2;
+  .esper-modal;
+  @search_width: 480px;
   width: @search_width;
+  margin-left: -@search_width/2;
 }
 
 .esper-modal-content { padding: 10px; }
@@ -1433,13 +1433,19 @@ ul.esper-ev-dropdown {
 
 /** Calendar Picker Modal **/
 
-@calendar_width: 80%;
 
 .esper-calendar-modal {
+  .esper-modal;
+
+  /* Max it out */
   top: 5%;
+  max-height: 90%;
+
+  left: 5%;
+  max-width: 90%;
+  @calendar_width: 90%;
   width: @calendar_width;
-  height: 90%;
-  margin-left: -@calendar_width/2;
+
   .esper-modal-footer {
     position: absolute;
     bottom: 0;
