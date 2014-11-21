@@ -116,7 +116,10 @@ module Esper.XDate {
       h = 12 < hour ? hour - 12 : 12;
       ampm = "pm";
     }
-    var colonMin = short && min > 0 ? ":" + pad(min.toString()) : "";
+    var colonMin =
+      short && min === 0 ?
+      "" :
+      ":" + pad(min.toString());
     return h.toString() + colonMin + spacer + ampm;
   }
 
