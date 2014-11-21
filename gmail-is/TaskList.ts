@@ -134,7 +134,6 @@ module Esper.TaskList {
     </span>
   </div>
   <div #otherTeamLabels></div>
-  <div #privateLabels></div>
   <div #linkedThreadContainer class="esper-tl-threads"></div>
   <div #linkedEventContainer class="esper-tl-events"></div>
 </div>
@@ -161,16 +160,6 @@ module Esper.TaskList {
         .attr("title", "Shared label, visible by the executive")
         .appendTo(otherTeamLabels);
       otherTeamLabels.append(" ");
-    });
-
-    var private_ = List.diff(task.task_labels, getTeamLabels(team));
-    List.iter(sortLabels(private_), function(label: string) {
-      $("<span>")
-        .addClass("esper-tl-private")
-        .text(label)
-        .attr("title", "Private label, not visible by the executive")
-        .appendTo(privateLabels);
-      privateLabels.append(" ");
     });
 
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
@@ -277,7 +266,6 @@ module Esper.TaskList {
   <span #done class="esper-link esper-tl-progress"></span>
   <span #canceled class="esper-link esper-tl-progress"></span>
   <div #otherTeamLabels></div>
-  <div #privateLabels></div>
   <div #list></div>
 </div>
 '''
@@ -326,21 +314,6 @@ module Esper.TaskList {
       });
       otherTeamLabels.append(" ");
     });
-
-    Api.getLabels()
-      .done(function(x) {
-        var private_ = List.diff(x.labels, getTeamLabels(team));
-        List.iter(sortLabels(private_), function(label: string) {
-          var elt = $("<span>")
-            .addClass("esper-link esper-tl-private")
-            .text(label)
-            .appendTo(privateLabels);
-          bind(elt, function(task) {
-            return List.mem(task.task_labels, label);
-          });
-          privateLabels.append(" ");
-        });
-      });
 
     all.click();
 
