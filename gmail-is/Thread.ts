@@ -13,7 +13,7 @@ module Esper.Thread {
     return Profile.get(uid, teamid)
       .then(function(profile) {
         var allEmails = [profile.email].concat(profile.other_emails);
-        return List.unique(allEmails, undefined);
+        return List.unique(allEmails);
       });
   }
 
@@ -68,9 +68,18 @@ module Esper.Thread {
   function findTeamInThread(thread: esperGmail.get.Thread,
                             teamEmailsList: TeamEmails[]):
   DetectedTeam {
-    var team;
+    var myUid = Login.myUid();
+    Log.d("Detect team: Input", thread, teamEmailsList);
     var filteredTeams =
       List.filter(teamEmailsList, function(teamEmails) {
+        /*
+          We require both the executive and an assistant to have their
+          known email addresses present in the thread.
+
+          Being an assistant in that team lifts the requirement of having
+          my email address show up in the thread (I could be Bcc'd or
+          may have received the email on an alias unknown to Esper).
+        */
         var threadMembers = thread.people_involved;
         var executive = List.find(threadMembers, function(nameEmail) {
           return List.mem(teamEmails.executive, nameEmail[1]);
@@ -78,19 +87,48 @@ module Esper.Thread {
         var assistant = List.find(threadMembers, function(nameEmail) {
           return List.mem(teamEmails.assistants, nameEmail[1]);
         });
-        return executive !== null && assistant !== null;
+
+        var team = teamEmails.team;
+        var amExecutive = team.team_executive === myUid;
+        var amAssistant = List.mem(team.team_assistants, myUid) && !amExecutive;
+          /*
+            We make sure to not select test teams where I'm both
+            executive and assistant.
+          */
+
+        var selected =
+          executive !== null && (assistant !== null || amAssistant);
+        return selected;
       });
     if (filteredTeams.length > 0) {
+      var candidates = List.map(filteredTeams, function(teamEmails) {
+        var hasMsgFromExec = hasMessageFrom(thread, teamEmails.executive);
+        return {
+          team: teamEmails.team,
+          hasMsgFromExec: hasMsgFromExec
+        };
+      });
+
+      var candidatesWithMessageFromExec =
+        List.filter(candidates, function(x: DetectedTeam) {
+          return x.hasMsgFromExec;
+        });
+
       /* This is an arbitrary choice if more than one team matches */
-      var teamEmails = filteredTeams[0];
-      var hasMsgFromExec = hasMessageFrom(thread, teamEmails.executive);
-      return {
-        team: teamEmails.team,
-        hasMsgFromExec: hasMsgFromExec
-      };
+      var detected = candidatesWithMessageFromExec.length > 0 ?
+        candidatesWithMessageFromExec[0] :
+        candidates[0];
+
+      Log.d("Detect team: Candidate teams", candidates);
+      Log.d("Detect team: Better candidates", candidatesWithMessageFromExec);
+      Log.d("Detect team: Selected team", detected);
+
+      return detected;
     }
-    else
+    else {
+      Log.d("Detect team: No team detected");
       return;
+    }
   }
 
   export function detectTeam(teams: ApiT.Team[],
