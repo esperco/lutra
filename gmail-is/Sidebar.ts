@@ -141,7 +141,7 @@ module Esper.Sidebar {
       sizeIcon.addClass("esper-minimize");
       sidebar.show("slide", { direction: "down" }, 250);
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, true, true,
+        displayTeamSidebar(rootElement, toTeam, true, false,
                            threadId, profiles);
       }
       setTimeout(afterAnimation, 250);
