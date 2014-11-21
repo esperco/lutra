@@ -408,13 +408,7 @@ textarea.esper-input { resize: none; }
 /*** Task list ***/
 
 .esper-tl-tasks-layer {
-  position: fixed;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
-  left: 0px;
-  top: 0px;
-  background-color: rgba(0, 0, 0, 0.6);
+  .esper-modal-bg;
 }
 
 .esper-tl-close {
@@ -426,16 +420,19 @@ textarea.esper-input { resize: none; }
   padding: 10px;
 }
 
-.esper-tl-task-list {
-  position: relative;
-  overflow-y: scroll;
-  width: 40%;
-  height: 80%;
-  left: 30%;
-  top: 10%;
+.esper-tl-modal {
+  .esper-modal;
 
-  background-color: white;
-  border-radius: 3px;
+  @width: 40%; /* feel free to pick an absolute width here */
+  width: @width;
+  margin-left: -@width/2;
+
+  top: 10%;
+  height: 80%;
+  max-height: 80%;
+}
+
+.esper-tl-task-list {
   padding: 10px 20px 10px 20px; /* order: TRBL as in TRouBLe aka clockwise */
 }
 
