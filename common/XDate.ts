@@ -62,6 +62,14 @@ module Esper.XDate {
     return weekDays[d.getUTCDay()];
   }
 
+  var fullWeekDays =
+    ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  /* "Monday", "Tuesday", ... */
+  export function fullWeekDay(d : Date) : string {
+    return fullWeekDays[d.getUTCDay()];
+  }
+
   var months =
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -69,6 +77,15 @@ module Esper.XDate {
   /* "Jan", "Feb", ... */
   export function month(d : Date) : string {
     return months[d.getUTCMonth()];
+  }
+
+  var fullMonths =
+    ["January", "February", "March", "April", "May", "June",
+     "July", "August", "September", "October", "November", "December"];
+
+  /* "January", "February", ... */
+  export function fullMonth(d : Date) : string {
+    return fullMonths[d.getUTCMonth()];
   }
 
   /* "Aug 13" */
@@ -84,8 +101,12 @@ module Esper.XDate {
       + ", " + year(d).toString();
   }
 
-  /* "1:30 pm" */
-  export function formatTimeOnly(hour, min, spacer = " ") {
+  export function fullMonthDay(d : Date) : string {
+    return fullMonth(d) + " " + day(d).toString();
+  }
+
+  /* "1:30pm" */
+  export function formatTimeOnly(hour, min, short, spacer = "") {
     var ampm;
     var h;
     if (hour < 12) {
@@ -95,28 +116,32 @@ module Esper.XDate {
       h = 12 < hour ? hour - 12 : 12;
       ampm = "pm";
     }
-    return h.toString() + ":" + pad(min.toString()) + spacer + ampm;
+    var colonMin =
+      short && min === 0 ?
+      "" :
+      ":" + pad(min.toString());
+    return h.toString() + colonMin + spacer + ampm;
   }
 
   export function timeOnly(d : Date) : string {
-    return formatTimeOnly(hours(d), minutes(d));
+    return formatTimeOnly(hours(d), minutes(d), false);
+  }
+
+  export function shortTimeOnly(d : Date) : string {
+    return formatTimeOnly(hours(d), minutes(d), true);
   }
 
   export function utcToLocalTimeOnly(d : Date) : string {
-    return formatTimeOnly(d.getHours(), d.getMinutes());
+    return formatTimeOnly(d.getHours(), d.getMinutes(), false);
   }
 
-  /* "Wed Aug 13, 2019 from 12:30pm to 1:30 pm" */
+  /* "August 13, 12:30-1pm" */
   export function range(d1 : Date, d2 : Date) : string {
-  return /*weekDay(d1) +" "+*/ dateOnly(d1) +
-      " from "+ timeOnly(d1) +" to "+ timeOnly(d2);
-  }
-
-
-  /* "Wed Aug 13 from 12:30pm to 1:30 pm" */
-  export function rangeWithoutYear(d1 : Date, d2 : Date) : string {
-  return /*weekDay(d1) +" "+*/ dateOnlyWithoutYear(d1) +
-      " from "+ timeOnly(d1) +" to "+ timeOnly(d2);
+    var t1 = shortTimeOnly(d1);
+    var t2 = shortTimeOnly(d2);
+    if (t1.slice(-2) === t2.slice(-2)) // both am or both pm
+      t1 = t1.slice(0, -2);
+    return fullMonthDay(d1) + ", " + t1 + "-" + t2;
   }
 
   /* "12:30pm to 1:30 pm" */

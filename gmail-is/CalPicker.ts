@@ -22,6 +22,7 @@ module Esper.CalPicker {
     dateJumper : JQuery;
     eventTitle : JQuery;
     pickerSwitcher : JQuery;
+    guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
   }
@@ -40,6 +41,10 @@ module Esper.CalPicker {
       <div class="esper-event-settings-col">
         <span class="esper-bold">Save events to:</span>
         <select #pickerSwitcher class="esper-select"/>
+      </div>
+      <div>
+        <span class="esper-bold">Thread participants:</span>
+        <span #guestNames/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -99,6 +104,15 @@ module Esper.CalPicker {
       writeToCalendar = calendars[i];
       calendarView.fullCalendar("refetchEvents");
     });
+
+    var guests = [];
+    var emailData = esperGmail.get.email_data();
+    if (emailData !== undefined && emailData.people_involved !== undefined) {
+      List.iter(emailData.people_involved, function(pair) {
+        guests.push(pair[0]);
+      });
+    }
+    guestNames.text(guests.join(", "));
 
     var pv = <PickerView> _view;
     pv.events = {};
