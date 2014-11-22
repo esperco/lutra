@@ -222,8 +222,12 @@ module Esper.TaskTab {
 
     function closeModal() { view.remove(); }
 
+    /* FIXME: Commented out until we figure out why this stops checkboxes
+              from working properly... */
+    /*
     background.click(closeModal);
     modal.click(function() { return false; });
+    */
 
     var duplicate =
       prefs.general !== undefined ?
