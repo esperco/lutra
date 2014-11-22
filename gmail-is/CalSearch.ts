@@ -206,7 +206,7 @@ module Esper.CalSearch {
 
     function closeModal() { view.remove(); }
     view.click(closeModal);
-    modal.click(function() { return false; });
+    Util.preventClickPropagation(modal);
     done.click(closeModal);
     cancel.click(closeModal);
 

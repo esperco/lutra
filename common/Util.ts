@@ -251,4 +251,11 @@ module Esper.Util {
   ) {
     Log.d(toString(find(x, predicate, maxDepth), maxDepth));
   }
+
+  /*
+    Prevent the propagation of the click event to the parent element.
+  */
+  export function preventClickPropagation(elt: JQuery) {
+    elt.click(function(event) { event.stopPropagation(); });
+  }
 }

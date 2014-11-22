@@ -81,7 +81,7 @@ module Esper.Menu {
 
     view.currentTeamName
       .text(team.team_name)
-      .click(function() {
+      .click(function(event) {
         /*
           Other controls may hide the dropdown, so inspecting its visibility
           is the most reliable option.
@@ -94,7 +94,7 @@ module Esper.Menu {
           view.teamsCaret.show();
           view.teamsDropdown.show();
         }
-        return false; // prevents click event from bubbling up
+        event.stopPropagation();
       });
 
     currentTeam.watch(function(team) {

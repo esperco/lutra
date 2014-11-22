@@ -277,9 +277,7 @@ module Esper.TaskList {
     done.text(team.team_label_done);
     canceled.text(team.team_label_canceled);
 
-    view.click(function() {
-      return false; // prevents click events from reaching the parent
-    });
+    Util.preventClickPropagation(view);
     closeButton.click(closeTaskListLayer);
 
     function displayFiltered(filter) {

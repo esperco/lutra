@@ -411,7 +411,7 @@ module Esper.CalPicker {
     };
 
     view.click(closeModal);
-    modal.click(function() { return false; });
+    Util.preventClickPropagation(modal);
     cancel.click(closeModal);
 
     save.click(function() {
