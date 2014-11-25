@@ -340,5 +340,17 @@ module Api {
 
     return jsonHttpGet(url);
   }
+  /*** Payment Information ***/
+
+  /** The status of an executive as a JSON object **/
+
+  export function getSubscriptionStatus(uid, teamid)
+    : JQueryDeferred<void>
+    {
+      var url = "/api/pay/status/short/" + uid + "/" + teamid;
+
+      return jsonHttpGet(url);
+
+  }
 
 }

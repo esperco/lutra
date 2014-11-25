@@ -569,6 +569,17 @@ module AccountTab {
     });
 
     var membership = "free trial"; // TODO: get membership status
+
+    //get's the membership info for updating
+    var meemUid = team.team_executive;
+    Api.getSubscriptionStatus(meemUid, teamid)
+      .done(function(customerStatus){
+        Log.p(customerStatus);
+      });
+
+    Log.p("yo");
+
+
     if (membership == "free trial") {
       membershipBadge.addClass("free-trial");
       changePayment.addClass("disabled");
