@@ -112,9 +112,12 @@ h3,
 h4 {
   letter-spacing: 2px;
 }
-li,
 p {
   line-height: 2;
+  color: #58595b;
+}
+li {
+  line-height: 1.5;
   color: #58595b;
 }
 a {
@@ -127,6 +130,10 @@ a:hover {
 }
 a.toggle {
   float: left;
+}
+ul {
+  text-align: left;
+  padding-left: 10px;
 }
 .bold {
   font-weight: 600;
@@ -452,7 +459,6 @@ input.disabled {
 }
 .footer-col li,
 .footer-col a {
-  list-style: none;
   line-height: 2.0;
 }
 .footer-col a {
@@ -597,7 +603,7 @@ input.disabled {
 }
 @media (max-width: 767px) {
   .section-content {
-    padding: 48px 18px;
+    padding: 56px 18px;
   }
 }
 .section-content.narrow {
@@ -621,6 +627,7 @@ input.disabled {
 .right-col {
   float: left;
   width: 30%;
+  margin-bottom: 5px;
 }
 .left-col,
 .mid-col {
@@ -631,7 +638,7 @@ input.disabled {
   max-width: 460px;
 }
 .how-it-works {
-  margin: 0 0 60px 0;
+  margin: 0 0 50px 0;
 }
 @media (min-width: 1000px) {
   .step {
@@ -724,6 +731,27 @@ input.disabled {
     width: 100%;
     padding: 48px 18px 0 18px;
   }
+}
+.event-example,
+.research-example,
+.office-example {
+  margin-bottom: 0px;
+}
+.event-examples,
+.research-examples,
+.office-examples {
+  display: none;
+  position: absolute;
+  margin-top: 0px;
+}
+.event-examples li,
+.research-examples li,
+.office-examples li {
+  list-style-type: none;
+  margin-left: 0px;
+}
+.event-examples li {
+  text-decoration: none;
 }
 .dream-team-faces {
   vertical-align: bottom;
