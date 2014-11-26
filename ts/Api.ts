@@ -347,18 +347,19 @@ module Api {
 
   export function getSubscriptionStatus(uid, teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
-    {
+  {
       var url = "/api/pay/status/short/" + uid + "/" + teamid;
 
       return jsonHttpGet(url);
   }
 
+  /** Sets the subscription for an exec **/
   export function setSubscription(uid, teamid, planid)
   : JQueryDeferred<void>
   {
-    var url = "/api/preferences/" + uid + "/" + teamid + "/" + planid;
+    var url = "/api/pay/subscribe/" + uid + "/" + teamid + "/" + planid;
 
-    return jsonHttpPut(url, JSON.stringify(planid));
+    return jsonHttpPost(url, "");
 
   }
 

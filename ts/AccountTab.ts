@@ -570,20 +570,22 @@ module AccountTab {
 
     var membership = "free trial"; // TODO: get membership status
 
-    //need to set membership status
     //get's the membership info for updating
-    //var membership = "trial"
-    var meemUid = team.team_executive;
+    var membership = "trial"
+    var execUid = team.team_executive;
 
-    //sets the customer status
-    Api.getSubscriptionStatus(meemUid, teamid)
+    //sets the customer status -- JUST FOR TESTING
+    Api.setSubscription(execUid, teamid, 'Executive'); //TODO: change so that it updates
+
+    //retrieves the customer status
+    Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
         Log.p(customerStatus);
         Log.p(customerStatus.status);
-        //membership = customerStatus.status;
+        membership = customerStatus.status;
       });
 
-    if (membership == "free trial") {
+    if (membership == "Trialing") {
       membershipBadge.addClass("free-trial");
       changePayment.addClass("disabled");
     } else if (membership == "suspended") {
