@@ -379,10 +379,10 @@ module AccountTab {
 
     if (membership == "Entrepreneur") {
       price.text("$299/mo");
-    } else if (membership == "Entrepreneur Plus") {
-      price.text("$499/mo");
+    } else if (membership == "Executive") {
+      price.text("$599/mo");
     } else if (membership == "VIP") {
-      price.text("$999/mo");
+      price.text("$1,199/mo");
     }
 
     return view;
@@ -404,7 +404,7 @@ module AccountTab {
         <div #suspension class="membership-modal-note"/>
         <div class="membership-options clearfix">
           <div #entrepreneur class="membership-option"/>
-          <div #entrepreneurPlus class="membership-option"/>
+          <div #executive class="membership-option"/>
           <div #VIP class="membership-option"/>
         </div>
       </div>
@@ -442,14 +442,14 @@ module AccountTab {
         .show();
     } else if (membership == "entrepreneur") {
       entrepreneur.addClass("selected");
-    } else if (membership == "entrepreneur plus") {
-      entrepreneurPlus.addClass("selected");
+    } else if (membership == "executive") {
+      executive.addClass("selected");
     } else if (membership == "vip") {
       VIP.addClass("selected");
     }
 
     entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
-    entrepreneurPlus.append(viewOfMembershipOption("Entrepreneur Plus"));
+    executive.append(viewOfMembershipOption("Executive"));
     VIP.append(viewOfMembershipOption("VIP"));
 
     var paymentMethod = false; // TODO: get payment method
@@ -457,13 +457,13 @@ module AccountTab {
     function selectMembership(option) {
       primaryBtn.prop("disabled", false);
       entrepreneur.removeClass("selected");
-      entrepreneurPlus.removeClass("selected");
+      executive.removeClass("selected");
       VIP.removeClass("selected");
       option.addClass("selected");
     }
 
     entrepreneur.click(function() { selectMembership(entrepreneur); });
-    entrepreneurPlus.click(function() { selectMembership(entrepreneurPlus); });
+    executive.click(function() { selectMembership(executive); });
     VIP.click(function() { selectMembership(VIP); });
 
     primaryBtn.click(function() {
@@ -568,22 +568,19 @@ module AccountTab {
       nameModal.displayName.click();
     });
 
-    var membership = "free trial"; // TODO: get membership status
+    var membership = "free trial"; // TODO: get subscription_status
 
-    //get's the membership info for updating
-    var membership = "trial"
+    var membership = "Trialing"
     var execUid = team.team_executive;
 
-    //sets the customer status -- JUST FOR TESTING
-    Api.setSubscription(execUid, teamid, 'Executive'); //TODO: change so that it updates
-
-    //retrieves the customer status
+    //retrieves the customer plan
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
         Log.p(customerStatus);
         Log.p(customerStatus.status);
         membership = customerStatus.status;
       });
+
 
     if (membership == "Trialing") {
       membershipBadge.addClass("free-trial");

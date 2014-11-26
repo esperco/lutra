@@ -362,6 +362,15 @@ module Api {
     return jsonHttpPost(url, "");
 
   }
+  /** Removes the subscription for an exec **/
+  export function cancelSubscription(uid, teamid)
+  : JQueryDeferred<void>
+  {
+    var url = "/api/pay/unsubscribe/" + uid + "/" + teamid;
+
+    return jsonHttpPost(url, "");
+
+  }
 
 
 }
