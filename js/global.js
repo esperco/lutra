@@ -73,9 +73,9 @@ function main() {
   loadElements();
   resizer();
   slider();
-  showTasks(".event-example", "ul.event-examples");
-  showTasks(".research-example", "ul.research-examples");
-  showTasks(".office-example", "ul.office-examples");
+  showTasks(".tasks-left-col", "ul.event-examples");
+  showTasks(".tasks-mid-col", "ul.research-examples");
+  showTasks(".tasks-right-col", "ul.office-examples");
 }
 
 
