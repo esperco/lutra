@@ -185,7 +185,7 @@ module AccountTab {
     });
   }
 
-  function showConfirmationModal(action, originalModal) {
+  function showConfirmationModal(action, originalModal, team) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -214,7 +214,10 @@ module AccountTab {
 
     primaryBtn.click(function() {
       if (action == "suspend") {
-        // TODO: suspend membership
+        // suspends membership
+        var teamid = team.teamid;
+        var execUid = team.team_executive;
+        Api.cancelSubscription(execUid, teamid);
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
           (<any> originalModal).modal("hide"); // FIXME
@@ -427,11 +430,20 @@ module AccountTab {
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
-    var membership = "free trial"; // TODO: get membership status
+    // Gets membership status
+    var membership = "free trial";
+    var teamid = team.teamid;
+    var execUid = team.team_executive;
+
+    Api.getSubscriptionStatus(execUid, teamid)
+      .done(function(customerStatus){
+        membership = customerStatus.status;
+      });
+
     if (membership == "free trial") {
       daysRemaining
         .append($("<span>There are </span>"))
-        .append($("<span class='bold'>" + "24 days" + "</span>"))
+        .append($("<span class='bold'>" + "24 days" + "</span>")) //TODO: Get remaining days in trial
         .append($("<span> remaining in your free trial.</span><br>"))
         .append($("<span>Select a membership option below to continue using " +
           "Esper beyond your trial period.</span>"))
@@ -485,7 +497,7 @@ module AccountTab {
       suspendBtn.hide();
     } else {
       suspendBtn.click(function() {
-        showConfirmationModal("suspend", modal);
+        showConfirmationModal("suspend", modal, team);
       });
     }
 
