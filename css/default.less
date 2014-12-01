@@ -575,23 +575,6 @@ input.disabled {
   }
 }
 
-.event-example, .research-example, .office-example {
-  margin-bottom: 0px;
-}
-
-.event-examples, .research-examples, .office-examples{
-  display: none;
-  position: absolute;
-  margin-top: 0px;
-  li{
-    list-style-type: none;
-    margin-left: 0px;
-  }
-}
-.event-examples li{
-    text-decoration: none;
-}
-
 .dream-team-faces { vertical-align: bottom; }
 
 @media (min-width:880px) {
@@ -621,6 +604,51 @@ input.disabled {
 }
 
 
+@media(min-width: 449px){
+  .tasks-left-col, .tasks-mid-col, .tasks-right-col {
+      float: left;
+      width: 30%;
+      margin-bottom: 0px;
+      text-align: center;
+    }
+  .tasks-left-col, .tasks-mid-col { margin-right: 5%; }
+}
+
+
+
+@media(max-width:450px){
+  .tasks-left-col{
+    vertical-align: top;
+    margin-bottom: 85px;
+    text-align: center;
+  }
+  .tasks-right-col{
+    vertical-align: middle;
+    text-align: center;
+  }
+  .tasks-mid-col{
+    vertical-align: bottom;
+    margin-bottom: 85px;
+    text-align: center;
+  }
+
+  ul{
+    text-align: center;
+  }
+}
+
+.event-examples, .research-examples, .office-examples{
+  display: none;
+  position: absolute;
+  margin-top: 0px;
+  width: 90%;
+  margin: 0px;
+  li{
+    list-style-type: none;
+    text-decoration: none;
+    margin-left: 0px;
+  }
+}
 /* Join the waiting list */
 
 .waiting-list-form {
