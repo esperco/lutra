@@ -231,7 +231,7 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showPaymentModal(purpose, teamid, membership) {
+  function showPaymentModal(purpose, team, membership) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -319,6 +319,8 @@ module AccountTab {
         ccInfo.attr("placeholder", "");
       }
     };
+    var teamid = team.teamid;
+    var execUid = team.team_executive;
 
     var stripeResponseHandler = function(status, response) {
       if (response.error) {
@@ -342,7 +344,26 @@ module AccountTab {
 
         alert("Your card was successfully charged. Thanks for joining Esper!");
 
+        //checks membership
+        //if(membership == "Entrepreneur"){
+          //Api.setSubscription(execUid, teamid, "Entrepreneur");
+        // }
+        // else if(membership == "Executive"){
+        //   Api.setSubscription(execUid, teamid, "Executive");
+        // }
+        // else if (membership == "VIP"){
+        //   Api.setSubscription(execUid, teamid, "VIP");
+        // }
+        //testing to check if the change went through
+        Api.getSubscriptionStatus(execUid, teamid)
+          .done(function(customerStatus){
+        Log.p(customerStatus);
+        Log.p(customerStatus.status);
+        membership = customerStatus.status;
+      });
+
         (<any> paymentForm.get(0)).reset();
+        (<any> modal).modal("hide"); // FIXME
       }
     };
 
@@ -352,8 +373,20 @@ module AccountTab {
       primaryBtn.prop('disabled', true);
       Stripe.card.createToken(paymentForm, stripeResponseHandler);
 
+
       if (purpose == "Add") {
-        // TODO: update team membership status to selected choice
+        // update team membership status to selected choice
+        if(membership == "entrepreneur"){
+          Api.setSubscription(execUid, teamid, "Entrepreneur");
+        }
+        else if(membership == "executive"){
+          Api.setSubscription(execUid, teamid, "Executive");
+        }
+        else if(membership == "vip"){
+          Api.setSubscription(execUid, teamid, "VIP");
+          Log.p("yoyo");
+          Log.p(Api.getSubscriptionStatus(execUid, teamid));
+        }
       }
 
       return false;
@@ -465,8 +498,9 @@ module AccountTab {
     VIP.append(viewOfMembershipOption("VIP"));
 
     var paymentMethod = false; // TODO: get payment method
-
+    var selectedMembership = ""; //blank unless a choice is made
     function selectMembership(option) {
+      Log.p(selectedMembership);
       primaryBtn.prop("disabled", false);
       entrepreneur.removeClass("selected");
       executive.removeClass("selected");
@@ -474,17 +508,17 @@ module AccountTab {
       option.addClass("selected");
     }
 
+    //updated selectedMembership here
     entrepreneur.click(function() { selectMembership(entrepreneur); });
     executive.click(function() { selectMembership(executive); });
     VIP.click(function() { selectMembership(VIP); });
 
     primaryBtn.click(function() {
       if (paymentMethod == false) {
-        var selected = "entrepreneur"; // TODO: get selected membership
+        //the chosen membership is blank if nothing has been selected
         (<any> modal).modal("hide"); // FIXME
-        showPaymentModal("Add", team.teamid, selected);
+        showPaymentModal("Add", team, selectedMembership); //membership is updated in this modal
       } else {
-        // TODO: update membership status
         (<any> modal).modal("hide"); // FIXME
       }
     });
@@ -492,8 +526,8 @@ module AccountTab {
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
-
-    if ((membership == "free trial") || (membership == "suspended")) {
+    //TODO: change whether this is
+    if ((membership == "Trialing") || (membership == "suspended")) {
       suspendBtn.hide();
     } else {
       suspendBtn.click(function() {
@@ -607,7 +641,7 @@ module AccountTab {
     changeMembership.click(function() { showMembershipModal(team) });
 
     changePayment.click(function() {
-      showPaymentModal("Change", teamid, null)
+      showPaymentModal("Change", team, null)
     });
 
     return view;
