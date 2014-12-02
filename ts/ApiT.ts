@@ -345,4 +345,11 @@ module ApiT {
     acl_id: string;
     acl_email: string;
   }
+  export interface CustomerStatus {
+    teamid : string;
+    active : boolean;
+    plan : string;
+    status : string;
+  }
+
 }

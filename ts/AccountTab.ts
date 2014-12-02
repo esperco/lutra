@@ -244,8 +244,10 @@ module AccountTab {
       </div>
       <div #content class="preference-form">
           <form #paymentForm method="POST" autocomplete="on">
+            <div class="semibold">Name on Card</div>
+            <input type ="text" size="20" required class="preference-input"/>
             <div class="semibold">Card Number</div>
-            <input #ccNum type="tel" size="22" data-stripe="number"
+            <input #ccNum type="tel" size="20" data-stripe="number"
                    class="preference-input" placeholder="•••• •••• •••• ••••"
                    required/>
             <div class="payment-col left">
@@ -344,17 +346,20 @@ module AccountTab {
 
         alert("Your card was successfully charged. Thanks for joining Esper!");
 
-        //checks membership
-        //if(membership == "Entrepreneur"){
-          //Api.setSubscription(execUid, teamid, "Entrepreneur");
-        // }
-        // else if(membership == "Executive"){
-        //   Api.setSubscription(execUid, teamid, "Executive");
-        // }
-        // else if (membership == "VIP"){
-        //   Api.setSubscription(execUid, teamid, "VIP");
-        // }
-        //testing to check if the change went through
+        //updates plan
+        if(membership == "Entrepreneur"){
+          Api.setSubscription(execUid, teamid, "Entrepreneur");
+         }
+        else if(membership == "Executive"){
+           Api.setSubscription(execUid, teamid, "Executive");
+         }
+        else if (membership == "VIP"){
+           Api.setSubscription(execUid, teamid, "VIP");
+        }
+
+        //TODO: Update subscription_status from Trialing to Paid
+
+        //logging the info (customerStatus) as well as the membership status (planid)
         Api.getSubscriptionStatus(execUid, teamid)
           .done(function(customerStatus){
         Log.p(customerStatus);
@@ -463,17 +468,19 @@ module AccountTab {
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
-    // Gets membership status
-    var membership = "free trial";
+    // Gets membership status - default is trialing
+    var membershipStatus = "Trialing";
     var teamid = team.teamid;
     var execUid = team.team_executive;
+    var membershipPlan = "";
 
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
-        membership = customerStatus.status;
+        membershipStatus = customerStatus.status;
+        membershipPlan = customerStatus.plan;
       });
 
-    if (membership == "free trial") {
+    if (membershipStatus == "Trialing") {
       daysRemaining
         .append($("<span>There are </span>"))
         .append($("<span class='bold'>" + "24 days" + "</span>")) //TODO: Get remaining days in trial
@@ -481,16 +488,18 @@ module AccountTab {
         .append($("<span>Select a membership option below to continue using " +
           "Esper beyond your trial period.</span>"))
         .show();
-    } else if (membership == "suspended") {
+    } else if (membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled") {
       suspension
         .text("Select a membership option below to reactivate your account.")
         .show();
-    } else if (membership == "entrepreneur") {
-      entrepreneur.addClass("selected");
-    } else if (membership == "executive") {
+    } else{  //must be active
+      if (<any> membershipPlan == "Entrepreneur") {
+        entrepreneur.addClass("selected");
+      } else if (<any> membershipPlan == "Executive") {
       executive.addClass("selected");
-    } else if (membership == "vip") {
+      } else if (<any> membershipPlan == "VIP") {
       VIP.addClass("selected");
+    }
     }
 
     entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
@@ -500,7 +509,6 @@ module AccountTab {
     var paymentMethod = false; // TODO: get payment method
     var selectedMembership = ""; //blank unless a choice is made
     function selectMembership(option) {
-      Log.p(selectedMembership);
       primaryBtn.prop("disabled", false);
       entrepreneur.removeClass("selected");
       executive.removeClass("selected");
@@ -509,9 +517,15 @@ module AccountTab {
     }
 
     //updated selectedMembership here
-    entrepreneur.click(function() { selectMembership(entrepreneur); });
-    executive.click(function() { selectMembership(executive); });
-    VIP.click(function() { selectMembership(VIP); });
+    entrepreneur.click(function() { selectMembership(entrepreneur);
+      selectedMembership = "Entrepreneur";
+      });
+    executive.click(function() { selectMembership(executive);
+      selectedMembership = "Executive";
+      });
+    VIP.click(function() { selectMembership(VIP);
+      selectedMembership = "VIP";
+      });
 
     primaryBtn.click(function() {
       if (paymentMethod == false) {
@@ -526,8 +540,7 @@ module AccountTab {
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
-    //TODO: change whether this is
-    if ((membership == "Trialing") || (membership == "suspended")) {
+    if ((membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled")) {
       suspendBtn.hide();
     } else {
       suspendBtn.click(function() {
@@ -614,27 +627,25 @@ module AccountTab {
       nameModal.displayName.click();
     });
 
-    var membership = "free trial"; // TODO: get subscription_status
-
-    var membership = "Trialing"
+    //gets the subscription status
+    var membership = "Trialing";
     var execUid = team.team_executive;
 
-    //retrieves the customer plan
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
         Log.p(customerStatus);
         Log.p(customerStatus.status);
-        membership = customerStatus.status;
+        membership = customerStatus.status; //sets membership to status
       });
 
 
     if (membership == "Trialing") {
       membershipBadge.addClass("free-trial");
       changePayment.addClass("disabled");
-    } else if (membership == "suspended") {
+    } else if (membership == "Unpaid") {
       membershipBadge.addClass("suspended");
     } else {
-      membershipBadge.addClass("active");
+      membershipBadge.addClass("Active");
     }
 
     membershipBadge.text(membership.toUpperCase());
