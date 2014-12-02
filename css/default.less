@@ -338,8 +338,12 @@ input.disabled {
 .footer {
   max-width: 1280px;
   margin: 0 auto;
+  ul, li{
+    list-style-type: none;
+  }
   @media (min-width:768px) { padding: 20px 36px 60px 36px; }
   @media (max-width:767px) { padding: 14px 18px 40px 18px; }
+
 }
 
 .footer-col {
@@ -347,8 +351,12 @@ input.disabled {
   margin: 20px 140px 20px 0;
   @media (max-width:767px) { margin-right: 70px; }
   padding: 0;
+  ul{
+    list-style-type: none;
+  }
   li, a {
     line-height: 2.0;
+    list-style-type: none;
   }
   a { color: @gray_80; }
   a:hover {
