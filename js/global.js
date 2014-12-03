@@ -88,7 +88,7 @@ function limitRedeemInput(){
 
 }
 
-function limitLength(){
+function limitRedeemLength(){
   $("#redeem-form").submit(function(e){
     var code = $("#redeem").val().toString();
     if(code.length != 9){
@@ -100,11 +100,12 @@ function limitLength(){
 
   });
 }
+
 function main() {
   loadElements();
   resizer();
   slider();
-  limitLength();
+  limitRedeemLength();
   limitRedeemInput();
   showTasks(".tasks-left-col", "ul.event-examples");
   showTasks(".tasks-mid-col", "ul.research-examples");
