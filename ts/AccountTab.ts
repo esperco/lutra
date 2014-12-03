@@ -214,10 +214,13 @@ module AccountTab {
 
     primaryBtn.click(function() {
       if (action == "suspend") {
-        // suspends membership
+        //suspend membership
         var teamid = team.teamid;
         var execUid = team.team_executive;
         Api.cancelSubscription(execUid, teamid);
+        //TODO: Update subscription status (cancelSubscription doesn't change status)
+        //TODO: Create 'None' plan, set plan to that
+
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
           (<any> originalModal).modal("hide"); // FIXME
@@ -231,7 +234,7 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showPaymentModal(purpose, team, membership) {
+  function showPaymentModal(purpose, team, membership) { //TODO: make Post request handle name to identify customer
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -244,8 +247,6 @@ module AccountTab {
       </div>
       <div #content class="preference-form">
           <form #paymentForm method="POST" autocomplete="on">
-            <div class="semibold">Name on Card</div>
-            <input type ="text" size="20" required class="preference-input"/>
             <div class="semibold">Card Number</div>
             <input #ccNum type="tel" size="20" data-stripe="number"
                    class="preference-input" placeholder="•••• •••• •••• ••••"
@@ -307,7 +308,7 @@ module AccountTab {
       expYear.append($("<option value=" + i + ">" + year + "</option>"));
     }
 
-    Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
+    Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY'); //TODO: Change this to live key
 
     var checkInput = function(ccInfo, valid, date){
       if(!valid){
@@ -356,17 +357,7 @@ module AccountTab {
         else if (membership == "VIP"){
            Api.setSubscription(execUid, teamid, "VIP");
         }
-
         //TODO: Update subscription_status from Trialing to Paid
-
-        //logging the info (customerStatus) as well as the membership status (planid)
-        Api.getSubscriptionStatus(execUid, teamid)
-          .done(function(customerStatus){
-        Log.p(customerStatus);
-        Log.p(customerStatus.status);
-        membership = customerStatus.status;
-      });
-
         (<any> paymentForm.get(0)).reset();
         (<any> modal).modal("hide"); // FIXME
       }
@@ -377,23 +368,6 @@ module AccountTab {
     primaryBtn.click(function() {
       primaryBtn.prop('disabled', true);
       Stripe.card.createToken(paymentForm, stripeResponseHandler);
-
-
-      if (purpose == "Add") {
-        // update team membership status to selected choice
-        if(membership == "entrepreneur"){
-          Api.setSubscription(execUid, teamid, "Entrepreneur");
-        }
-        else if(membership == "executive"){
-          Api.setSubscription(execUid, teamid, "Executive");
-        }
-        else if(membership == "vip"){
-          Api.setSubscription(execUid, teamid, "VIP");
-          Log.p("yoyo");
-          Log.p(Api.getSubscriptionStatus(execUid, teamid));
-        }
-      }
-
       return false;
     });
 
@@ -469,88 +443,88 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
     // Gets membership status - default is trialing
-    var membershipStatus = "Trialing";
     var teamid = team.teamid;
     var execUid = team.team_executive;
-    var membershipPlan = "";
 
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
-        membershipStatus = customerStatus.status;
-        membershipPlan = customerStatus.plan;
+        var memPlan = customerStatus.plan;
+        var memStatus = customerStatus.status;
+        Log.p(memStatus);
+        Log.p(memPlan);
+        updateModal(memStatus, memPlan);
       });
-
-    if (membershipStatus == "Trialing") {
-      daysRemaining
-        .append($("<span>There are </span>"))
-        .append($("<span class='bold'>" + "24 days" + "</span>")) //TODO: Get remaining days in trial
-        .append($("<span> remaining in your free trial.</span><br>"))
-        .append($("<span>Select a membership option below to continue using " +
-          "Esper beyond your trial period.</span>"))
-        .show();
-    } else if (membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled") {
-      suspension
-        .text("Select a membership option below to reactivate your account.")
-        .show();
-    } else{  //must be active
-      if (<any> membershipPlan == "Entrepreneur") {
-        entrepreneur.addClass("selected");
-      } else if (<any> membershipPlan == "Executive") {
-      executive.addClass("selected");
-      } else if (<any> membershipPlan == "VIP") {
-      VIP.addClass("selected");
-    }
-    }
-
-    entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
-    executive.append(viewOfMembershipOption("Executive"));
-    VIP.append(viewOfMembershipOption("VIP"));
-
-    var paymentMethod = false; // TODO: get payment method
-    var selectedMembership = ""; //blank unless a choice is made
-    function selectMembership(option) {
-      primaryBtn.prop("disabled", false);
-      entrepreneur.removeClass("selected");
-      executive.removeClass("selected");
-      VIP.removeClass("selected");
-      option.addClass("selected");
-    }
-
-    //updated selectedMembership here
-    entrepreneur.click(function() { selectMembership(entrepreneur);
-      selectedMembership = "Entrepreneur";
-      });
-    executive.click(function() { selectMembership(executive);
-      selectedMembership = "Executive";
-      });
-    VIP.click(function() { selectMembership(VIP);
-      selectedMembership = "VIP";
-      });
-
-    primaryBtn.click(function() {
-      if (paymentMethod == false) {
-        //the chosen membership is blank if nothing has been selected
-        (<any> modal).modal("hide"); // FIXME
-        showPaymentModal("Add", team, selectedMembership); //membership is updated in this modal
-      } else {
-        (<any> modal).modal("hide"); // FIXME
+    function updateModal(membershipStatus, membershipPlan){
+      if (membershipStatus == "Trialing") {
+        daysRemaining
+          .append($("<span>There are </span>"))
+          .append($("<span class='bold'>" + "24 days" + "</span>")) //TODO: Get remaining days in trial
+          .append($("<span> remaining in your free trial.</span><br>"))
+          .append($("<span>Select a membership option below to continue using " +
+            "Esper beyond your trial period.</span>"))
+          .show();
+      } else if (membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled") {
+        suspension
+          .text("Select a membership option below to reactivate your account.")
+          .show();
+      } else{  //must be active
+        if (membershipPlan == "Entrepreneur") {
+          entrepreneur.addClass("selected");
+        } else if (membershipPlan == "Executive") {
+          executive.addClass("selected");
+        } else if (membershipPlan == "VIP") {
+          VIP.addClass("selected");
       }
-    });
+      }
 
-    cancelBtn.click(function() {
-      (<any> modal).modal("hide"); // FIXME
-    });
-    if ((membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled")) {
-      suspendBtn.hide();
-    } else {
-      suspendBtn.click(function() {
-        showConfirmationModal("suspend", modal, team);
+      entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
+      executive.append(viewOfMembershipOption("Executive"));
+      VIP.append(viewOfMembershipOption("VIP"));
+
+      var paymentMethod = false; // TODO: get payment method
+      var selectedMembership = ""; //blank unless a choice is made
+      function selectMembership(option) {
+        primaryBtn.prop("disabled", false);
+        entrepreneur.removeClass("selected");
+        executive.removeClass("selected");
+        VIP.removeClass("selected");
+        option.addClass("selected");
+      }
+
+      //updated selectedMembership here
+      entrepreneur.click(function() { selectMembership(entrepreneur);
+        selectedMembership = "Entrepreneur";
+        });
+      executive.click(function() { selectMembership(executive);
+        selectedMembership = "Executive";
+        });
+      VIP.click(function() { selectMembership(VIP);
+        selectedMembership = "VIP";
+        });
+
+      primaryBtn.click(function() {
+        if (paymentMethod == false) {
+          (<any> modal).modal("hide"); // FIXME
+          showPaymentModal("Add", team, selectedMembership);
+        } else {
+          (<any> modal).modal("hide"); // FIXME
+        }
       });
+
+      cancelBtn.click(function() {
+        (<any> modal).modal("hide"); // FIXME
+      });
+      if ((membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled")) {
+        suspendBtn.hide();
+      } else {
+        suspendBtn.click(function() {
+          showConfirmationModal("suspend", modal, team);
+        });
+      }
+
+      (<any> modal).modal({}); // FIXME
     }
-
-    (<any> modal).modal({}); // FIXME
   }
-
   function showNameModal(team) {
 '''
 <div #modal
@@ -626,37 +600,49 @@ module AccountTab {
       (<any> nameModal.modal).modal();
       nameModal.displayName.click();
     });
+    //retrieves the membership status
 
-    //gets the subscription status
-    var membership = "Trialing";
+    var membership="";
     var execUid = team.team_executive;
 
+    //gets subscription status
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
-        Log.p(customerStatus);
-        Log.p(customerStatus.status);
-        membership = customerStatus.status; //sets membership to status
+        membership = customerStatus.status;
+        Log.p(membership);
+        updateStatus(membership);
+    });
+
+    //updates the status
+    function updateStatus(mem){
+      if (mem == "Trialing") {
+        Log.p("Great Success!")
+        membershipBadge.addClass("free-trial");
+        changePayment.addClass("disabled");
+      } else if (mem == "Unpaid") {
+        membershipBadge.addClass("suspended");
+      } else if (mem == "Past_due"){
+        membershipBadge.addClass("suspended");
+      } else if (mem == "Canceled"){
+         membershipBadge.addClass("suspended");
+      }
+      else {
+        Log.p("ACTIVATE" + mem);
+        membershipBadge.addClass("Active");
+      }
+      membershipBadge.text(membership.toUpperCase());
+      changeMembership.click(function() { showMembershipModal(team) });
+
+      changePayment.click(function() {
+        showPaymentModal("Change", team, null)
       });
-
-
-    if (membership == "Trialing") {
-      membershipBadge.addClass("free-trial");
-      changePayment.addClass("disabled");
-    } else if (membership == "Unpaid") {
-      membershipBadge.addClass("suspended");
-    } else {
-      membershipBadge.addClass("Active");
     }
 
-    membershipBadge.text(membership.toUpperCase());
-    changeMembership.click(function() { showMembershipModal(team) });
 
-    changePayment.click(function() {
-      showPaymentModal("Change", team, null)
-    });
 
     return view;
   }
+
 
   export function load(team) {
 '''

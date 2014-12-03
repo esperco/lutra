@@ -343,7 +343,7 @@ module Api {
 
   /*** Payment Information ***/
 
-  /** The status of an executive as a JSON object **/
+  /** Gets the status of an executive **/
 
   export function getSubscriptionStatus(uid, teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
@@ -353,7 +353,7 @@ module Api {
       return jsonHttpGet(url);
   }
 
-  /** Sets the subscription for an exec **/
+  /** Sets the subscription for an executive **/
   export function setSubscription(uid, teamid, planid)
   : JQueryDeferred<void>
   {
@@ -362,7 +362,7 @@ module Api {
     return jsonHttpPost(url, "");
 
   }
-  /** Removes the subscription for an exec **/
+  /** Cancels an executive's subscriptions **/
   export function cancelSubscription(uid, teamid)
   : JQueryDeferred<void>
   {
