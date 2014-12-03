@@ -214,7 +214,6 @@ module AccountTab {
 
     primaryBtn.click(function() {
       if (action == "suspend") {
-        //suspend membership
         var teamid = team.teamid;
         var execUid = team.team_executive;
         Api.cancelSubscription(execUid, teamid);
@@ -347,7 +346,6 @@ module AccountTab {
 
         alert("Your card was successfully charged. Thanks for joining Esper!");
 
-        //updates plan
         if(membership == "Entrepreneur"){
           Api.setSubscription(execUid, teamid, "Entrepreneur");
          }
@@ -450,10 +448,9 @@ module AccountTab {
       .done(function(customerStatus){
         var memPlan = customerStatus.plan;
         var memStatus = customerStatus.status;
-        Log.p(memStatus);
-        Log.p(memPlan);
         updateModal(memStatus, memPlan);
       });
+
     function updateModal(membershipStatus, membershipPlan){
       if (membershipStatus == "Trialing") {
         daysRemaining
@@ -482,7 +479,7 @@ module AccountTab {
       VIP.append(viewOfMembershipOption("VIP"));
 
       var paymentMethod = false; // TODO: get payment method
-      var selectedMembership = ""; //blank unless a choice is made
+      var selectedMembership = ""; //empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
         entrepreneur.removeClass("selected");
@@ -491,7 +488,6 @@ module AccountTab {
         option.addClass("selected");
       }
 
-      //updated selectedMembership here
       entrepreneur.click(function() { selectMembership(entrepreneur);
         selectedMembership = "Entrepreneur";
         });
@@ -600,8 +596,8 @@ module AccountTab {
       (<any> nameModal.modal).modal();
       nameModal.displayName.click();
     });
-    //retrieves the membership status
 
+    //retrieves the membership status
     var membership="";
     var execUid = team.team_executive;
 
@@ -609,14 +605,12 @@ module AccountTab {
     Api.getSubscriptionStatus(execUid, teamid)
       .done(function(customerStatus){
         membership = customerStatus.status;
-        Log.p(membership);
         updateStatus(membership);
     });
 
     //updates the status
     function updateStatus(mem){
       if (mem == "Trialing") {
-        Log.p("Great Success!")
         membershipBadge.addClass("free-trial");
         changePayment.addClass("disabled");
       } else if (mem == "Unpaid") {
@@ -627,7 +621,6 @@ module AccountTab {
          membershipBadge.addClass("suspended");
       }
       else {
-        Log.p("ACTIVATE" + mem);
         membershipBadge.addClass("Active");
       }
       membershipBadge.text(membership.toUpperCase());
@@ -638,11 +631,8 @@ module AccountTab {
       });
     }
 
-
-
     return view;
   }
-
 
   export function load(team) {
 '''
