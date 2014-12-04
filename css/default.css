@@ -259,6 +259,9 @@ input.disabled {
   opacity: 0.5;
   pointer-events: none;
 }
+input.incorrect {
+  border-color: #d9534f;
+}
 /* Navbar */
 .index-navbar-container,
 .navbar-container,
@@ -437,6 +440,10 @@ input.disabled {
   max-width: 1280px;
   margin: 0 auto;
 }
+.footer ul,
+.footer li {
+  list-style-type: none;
+}
 @media (min-width: 768px) {
   .footer {
     padding: 20px 36px 60px 36px;
@@ -457,9 +464,13 @@ input.disabled {
     margin-right: 70px;
   }
 }
+.footer-col ul {
+  list-style-type: none;
+}
 .footer-col li,
 .footer-col a {
   line-height: 2.0;
+  list-style-type: none;
 }
 .footer-col a {
   color: #58595b;

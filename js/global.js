@@ -70,7 +70,7 @@ function showTasks(tasktype, list){
 }
 
 function limitRedeemInput(){
-  $("#redeem").keydown(function(e){
+  $("#redeem-code").keydown(function(e){
      // Allow: backspace, delete, tab, escape, enter and .
         if (($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1) ||
              // Allow: Ctrl+A
@@ -85,16 +85,17 @@ function limitRedeemInput(){
             e.preventDefault();
         }
   });
-
 }
 
 function limitRedeemLength(){
   $("#redeem-form").submit(function(e){
-    var code = $("#redeem").val().toString();
+    var code = $("#redeem-code").val().toString();
     if(code.length != 9){
+      $("#redeem-code").addClass("incorrect");
       e.preventDefault();
     }
     else{
+      $("#redeem-code").removeClass("incorrect");
       return true;
     }
 
