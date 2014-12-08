@@ -4,7 +4,7 @@
 
 module AccountTab {
   declare var Stripe : any;
-  declare var Stripe : any;
+  declare var moment : any;
 
   function refresh() {
     /*
@@ -217,8 +217,6 @@ module AccountTab {
         var teamid = team.teamid;
         var execUid = team.team_executive;
         Api.cancelSubscription(execUid, teamid);
-        //TODO: Update subscription status (cancelSubscription doesn't change status)
-        //TODO: Create 'None' plan, set plan to that
 
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
@@ -307,7 +305,7 @@ module AccountTab {
       expYear.append($("<option value=" + i + ">" + year + "</option>"));
     }
 
-    Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY'); //TODO: Change this to live key
+    Stripe.setPublishableKey('pk_test_tDzGbpaybyFQ3A7XGF6ctE3f'); //TODO: Change this to live key
 
     var checkInput = function(ccInfo, valid, date){
       if(!valid){
@@ -340,24 +338,21 @@ module AccountTab {
 
         primaryBtn.prop('disabled', false);
       } else {
-        paymentForm
-          .append($('<input type="hidden" name="stripeToken"/>')
-            .val(response.id));
-
-        alert("Your card was successfully charged. Thanks for joining Esper!");
-
-        if(membership == "Entrepreneur"){
-          Api.setSubscription(execUid, teamid, "Entrepreneur");
-         }
-        else if(membership == "Executive"){
-           Api.setSubscription(execUid, teamid, "Executive");
-         }
-        else if (membership == "VIP"){
-           Api.setSubscription(execUid, teamid, "VIP");
-        }
-        //TODO: Update subscription_status from Trialing to Paid
-        (<any> paymentForm.get(0)).reset();
-        (<any> modal).modal("hide"); // FIXME
+        var stripeToken = response.id;
+        Api.addNewCard(execUid, teamid, stripeToken).done(function() {
+          alert("Your card was successfully charged. Thanks for joining Esper!");
+          if (membership == "Entrepreneur") {
+            Api.setSubscription(execUid, teamid, "Entrepreneur");
+          }
+          else if (membership == "Executive") {
+            Api.setSubscription(execUid, teamid, "Executive");
+          }
+          else if (membership == "VIP") {
+            Api.setSubscription(execUid, teamid, "VIP");
+          }
+          (<any> paymentForm.get(0)).reset();
+          (<any> modal).modal("hide"); // FIXME
+        });
       }
     };
 
@@ -445,26 +440,28 @@ module AccountTab {
     var execUid = team.team_executive;
 
     Api.getSubscriptionStatus(execUid, teamid)
-      .done(function(customerStatus){
-        var memPlan = customerStatus.plan;
-        var memStatus = customerStatus.status;
-        updateModal(memStatus, memPlan);
-      });
+      .done(updateModal);
 
-    function updateModal(membershipStatus, membershipPlan){
+    function updateModal(customerStatus) {
+      var membershipPlan = customerStatus.plan;
+      var membershipStatus = customerStatus.status;
       if (membershipStatus == "Trialing") {
+        var end = customerStatus.trial_end;
+        var timeLeft = moment.duration(moment().diff(end)).humanize();
         daysRemaining
-          .append($("<span>There are </span>"))
-          .append($("<span class='bold'>" + "24 days" + "</span>")) //TODO: Get remaining days in trial
+          .append($("<span>You have </span>"))
+          .append($("<span class='bold'>" + timeLeft + "</span>"))
           .append($("<span> remaining in your free trial.</span><br>"))
           .append($("<span>Select a membership option below to continue using " +
             "Esper beyond your trial period.</span>"))
           .show();
-      } else if (membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled") {
+      } else if (membershipStatus == "Past-due" ||
+                 membershipStatus == "Unpaid" ||
+                 membershipStatus == "Canceled") {
         suspension
           .text("Select a membership option below to reactivate your account.")
           .show();
-      } else{  //must be active
+      } else { // must be active
         if (membershipPlan == "Entrepreneur") {
           entrepreneur.addClass("selected");
         } else if (membershipPlan == "Executive") {
