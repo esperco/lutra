@@ -353,6 +353,14 @@ module Api {
       return jsonHttpGet(url);
   }
 
+  export function getSubscriptionStatusLong(uid, teamid)
+    : JQueryDeferred<ApiT.CustomerDetails>
+  {
+      var url = "/api/pay/status/long/" + uid + "/" + teamid;
+
+      return jsonHttpGet(url);
+  }
+
   /** Sets the subscription for an executive **/
   export function setSubscription(uid, teamid, planid)
   : JQueryDeferred<void>
@@ -369,8 +377,6 @@ module Api {
     var url = "/api/pay/unsubscribe/" + uid + "/" + teamid;
 
     return jsonHttpPost(url, "");
-
   }
-
 
 }

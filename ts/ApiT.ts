@@ -351,5 +351,21 @@ module ApiT {
     plan : string;
     status : string;
   }
+  export interface PaymentCard {
+
+  }
+  export interface CustomerDetails {
+    teamid : string;
+    active : boolean;
+    plan : string;
+    status : string;
+    trial_end : string;
+    trial_start : string;
+    current_period_end : string;
+    current_period_start : string;
+    canceled_at : string;
+    ended_at : string;
+    cards : PaymentCard[];
+  }
 
 }
