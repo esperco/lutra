@@ -560,6 +560,51 @@ module AccountTab {
     return _view;
   }
 
+  function showCardModal(team){
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog card-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title">Account Info</div>
+      </div>
+      <div class="info-col left">
+        <div>Membership: </div>
+        <div>Status: </div>
+      </div>
+      <div class="info-col right">
+        <div #memPlan class="plan"/>
+        <div #memStatus class="status"/>
+      </div>
+      <div class="modal-footer">
+        <button #cancelBtn class="button-secondary modal-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+
+   Api.getSubscriptionStatus(team.team_executive, team.teamid)
+     .done(function(customerStatus){
+       memPlan.append(customerStatus.plan);
+       memStatus.append(customerStatus.status);
+   });
+
+
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/membership.svg");
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+    return _view;
+  }
+
+
   function displayMembership(team) {
 '''
 <div #view class="membership">
@@ -568,13 +613,17 @@ module AccountTab {
     <div #name class="profile-name"/>
     <div #email class="profile-email gray"/>
   </div>
-  <div class="membership-col right">
+  <div class="membership-col center">
     <div><a #changeName class="link">Change display name</a></div>
     <div class="clearfix">
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
     <div><a #changePayment class="link">Change payment method</a></div>
+    <div><a #cardInfo class="link">View Card Information</a></div>
+
+  </div>
+  <div class="membership-col right">
   </div>
 </div>
 '''
@@ -592,6 +641,12 @@ module AccountTab {
     changeName.click(function() {
       (<any> nameModal.modal).modal();
       nameModal.displayName.click();
+    });
+
+    var cardModal = showCardModal(team);
+    cardInfo.click(function() {
+      (<any> cardModal.modal).modal();
+
     });
 
     //retrieves the membership status

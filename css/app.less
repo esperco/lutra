@@ -752,8 +752,12 @@ a.header-title:hover { text-decoration: underline; }
 .membership-col {
   float: left;
   padding: 12px 11px;
-  &.left { width: 40%; }
-  &.right { width: 60%; }
+  &.left { width: 35%; }
+  &.center {width: 30%}
+  &.right {
+    width: 35%;
+    color: @purple;
+  }
 }
 .membership-badge {
   float: left;
@@ -1171,6 +1175,31 @@ a.header-title:hover { text-decoration: underline; }
     padding: 0 15px;
     text-align: center;
   }
+  .modal-footer {
+    border: none;
+    button { width: 140px; }
+    .modal-cancel { margin-right: 8px; }
+  }
+}
+.card-modal {
+  position: absolute;
+  top: calc(~"50% - 80px");
+  left: calc(~"50% - 160px");
+  width: 320px;
+  margin: 0;
+  .modal-content {
+    width: 320px;
+  }
+  .plan, .status{
+    padding-left: 15px;
+    color: @purple;
+  }
+  .info-col {
+  float: left;
+  padding: 12px 11px;
+  &.left { width: 30%; }
+  &.right {width: 70%;}
+}
   .modal-footer {
     border: none;
     button { width: 140px; }
