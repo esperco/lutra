@@ -337,8 +337,23 @@ module Api {
     : JQueryDeferred<ApiT.Preferences>
   {
     var url = "/api/preferences/" + Login.me() + "/" + teamid;
-
     return jsonHttpGet(url);
+  }
+
+  export function getSignature(teamid, theirUid)
+    : JQueryDeferred<ApiT.EmailSignature>
+  {
+    var url = "/api/account/signature/" + Login.me() +
+      "/" + teamid + "/" + theirUid;
+    return jsonHttpGet(url);
+  }
+
+  export function setSignature(teamid, theirUid, sig : ApiT.EmailSignature)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/account/signature/" + Login.me() +
+      "/" + teamid + "/" + theirUid;
+    return jsonHttpPut(url, JSON.stringify(sig));
   }
 
 }
