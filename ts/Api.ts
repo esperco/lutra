@@ -337,19 +337,16 @@ module Api {
     : JQueryDeferred<ApiT.Preferences>
   {
     var url = "/api/preferences/" + Login.me() + "/" + teamid;
-
     return jsonHttpGet(url);
   }
 
   /*** Payment Information ***/
 
   /** Gets the status of an executive **/
-
   export function getSubscriptionStatus(uid, teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
   {
-      var url = "/api/pay/status/short/" + uid + "/" + teamid;
-
+      var url = "/api/pay/status/long/" + uid + "/" + teamid;
       return jsonHttpGet(url);
   }
 
@@ -358,19 +355,26 @@ module Api {
   : JQueryDeferred<void>
   {
     var url = "/api/pay/subscribe/" + uid + "/" + teamid + "/" + planid;
-
     return jsonHttpPost(url, "");
-
   }
+
   /** Cancels an executive's subscriptions **/
   export function cancelSubscription(uid, teamid)
   : JQueryDeferred<void>
   {
     var url = "/api/pay/unsubscribe/" + uid + "/" + teamid;
-
     return jsonHttpPost(url, "");
-
   }
 
+  /** Add a new card to the Stripe account using the one-time token
+    * obtained by the client from Stripe directly. This doesn't change the
+    * customer's default card if there was one already. **/
+  export function addNewCard(uid, teamid, cardToken)
+  : JQueryDeferred<void>
+  {
+    var url = "/api/pay/new-card/" + uid + "/" + teamid
+      + "/" + encodeURIComponent(cardToken);
+    return jsonHttpPost(url, "");
+  }
 
 }
