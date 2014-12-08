@@ -352,7 +352,9 @@ module ApiT {
     status : string;
   }
   export interface PaymentCard {
-
+    id : string;
+    brand : string; //card_brand option
+    last4 : string;
   }
   export interface CustomerDetails {
     teamid : string;

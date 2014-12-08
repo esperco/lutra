@@ -349,7 +349,7 @@ module Api {
       var url = "/api/pay/status/long/" + uid + "/" + teamid;
       return jsonHttpGet(url);
   }
-
+  /** Gets the long status of an executive, including cc info **/
   export function getSubscriptionStatusLong(uid, teamid)
     : JQueryDeferred<ApiT.CustomerDetails>
   {
@@ -384,5 +384,7 @@ module Api {
       + "/" + encodeURIComponent(cardToken);
     return jsonHttpPost(url, "");
   }
+
+
 
 }

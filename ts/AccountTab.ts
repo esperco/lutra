@@ -285,6 +285,7 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/creditcard.svg");
 
     // Restricts the inputs to numbers
+    //TODO: make sure the card hasn't been added already
     ccNum['payment']('formatCardNumber');
     cvcNum['payment']('formatCardCVC');
 
@@ -572,8 +573,9 @@ module AccountTab {
         <div #title class="modal-title">Account Info</div>
       </div>
       <div class="info-col left">
-        <div>Membership: </div>
-        <div>Status: </div>
+        <div>Membership:</div>
+        <div>Status:</div>
+        <div>Cards:</div>
       </div>
       <div class="info-col right">
         <div #memPlan class="plan"/>
@@ -588,10 +590,24 @@ module AccountTab {
 '''
 
    Api.getSubscriptionStatus(team.team_executive, team.teamid)
-     .done(function(customerStatus){
-       memPlan.append(customerStatus.plan);
-       memStatus.append(customerStatus.status);
+    .done(function(customerStatus){
+      memPlan.append(customerStatus.plan);
+      memStatus.append(customerStatus.status);
    });
+
+  Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
+    .done(function(status){
+      Log.p(status.cards);
+      if(status.cards.length < 1){
+        memStatus.append( "<br> No Cards");
+      }
+      else{
+        for(var i=0; i<status.cards.length; i++){
+          memStatus.append("<br> •••• •••• •••• ")
+          memStatus.append(<any>status.cards[i].last4);
+        }
+      }
+    });
 
 
     var icon = $("<img class='svg-block preference-option-icon'/>")
@@ -619,11 +635,10 @@ module AccountTab {
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
-    <div><a #changePayment class="link">Change payment method</a></div>
-    <div><a #cardInfo class="link">View Card Information</a></div>
-
+    <div><a #changePayment class="link">Add payment method</a></div>
   </div>
   <div class="membership-col right">
+    <div><a #cardInfo class="link">View Card Information</a></div>
   </div>
 </div>
 '''
@@ -664,7 +679,7 @@ module AccountTab {
     function updateStatus(mem){
       if (mem == "Trialing") {
         membershipBadge.addClass("free-trial");
-        changePayment.addClass("disabled");
+        //changePayment.addClass("disabled");
       } else if (mem == "Unpaid") {
         membershipBadge.addClass("suspended");
       } else if (mem == "Past_due"){
