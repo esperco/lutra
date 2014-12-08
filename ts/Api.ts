@@ -374,8 +374,6 @@ module Api {
     return jsonHttpPost(url, "");
   }
 
-<<<<<<< HEAD
-=======
   /** Add a new card to the Stripe account using the one-time token
     * obtained by the client from Stripe directly. This doesn't change the
     * customer's default card if there was one already. **/
@@ -387,5 +385,4 @@ module Api {
     return jsonHttpPost(url, "");
   }
 
->>>>>>> FETCH_HEAD
 }
