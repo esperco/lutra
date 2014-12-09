@@ -345,4 +345,8 @@ module ApiT {
     acl_id: string;
     acl_email: string;
   }
+
+  export interface EmailSignature {
+    signature : string;
+  }
 }
