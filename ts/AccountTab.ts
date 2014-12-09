@@ -272,6 +272,7 @@ module AccountTab {
   </div>
 </div>
 '''
+  //TODO: actually change the default card if that's the main action
     if (purpose == "Add") {
       title.text("Add Payment Method");
       primaryBtn.text("Add");
@@ -561,6 +562,7 @@ module AccountTab {
     return _view;
   }
 
+
   function showCardModal(team){
 '''
 <div #modal
@@ -589,11 +591,11 @@ module AccountTab {
 </div>
 '''
 
-   Api.getSubscriptionStatus(team.team_executive, team.teamid)
-    .done(function(customerStatus){
-      memPlan.append(customerStatus.plan);
-      memStatus.append(customerStatus.status);
-   });
+    Api.getSubscriptionStatus(team.team_executive, team.teamid)
+     .done(function(customerStatus){
+       memPlan.append(customerStatus.plan);
+       memStatus.append(customerStatus.status);
+    });
 
   Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
     .done(function(status){
@@ -603,13 +605,23 @@ module AccountTab {
       }
       else{
         for(var i=0; i<status.cards.length; i++){
-          memStatus.append("<br> •••• •••• •••• ")
+          memStatus.append("<br> •••• •••• •••• ");
           memStatus.append(<any>status.cards[i].last4);
+
+'''
+<span #removeCardSpan>
+  <span class="text-divider"></span><a #removeCardLink class="danger-link">Remove</a>
+</span>
+'''
+          removeCardSpan.appendTo(memStatus);
+          removeCardLink.click(function() {
+            Log.p("But is it a banger?");
+            Log.p(status.cards[theNum]);
+            //TODO: figure out which card you need to delete; delete it
+          });
         }
       }
-    });
-
-
+        });
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
@@ -618,8 +630,7 @@ module AccountTab {
       (<any> modal).modal("hide"); // FIXME
     });
     return _view;
-  }
-
+    }
 
   function displayMembership(team) {
 '''
@@ -635,7 +646,7 @@ module AccountTab {
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
-    <div><a #changePayment class="link">Add payment method</a></div>
+    <div><a #changePayment class="link">Change payment method</a></div>
   </div>
   <div class="membership-col right">
     <div><a #cardInfo class="link">View Card Information</a></div>

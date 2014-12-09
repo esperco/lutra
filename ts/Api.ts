@@ -380,11 +380,17 @@ module Api {
   export function addNewCard(uid, teamid, cardToken)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/new-card/" + uid + "/" + teamid
+    var url = "/api/pay/new-card/" + uid + "/" + teamid;
       + "/" + encodeURIComponent(cardToken);
     return jsonHttpPost(url, "");
   }
 
-
+  /** Deletes a credit card **/
+  export function deleteCard(uid, teamid, cardid)
+  : JQueryDeferred<void>
+  {
+    var url = "/api/pay/card/" + uid + "/" + teamid + "/" + cardid;
+    return jsonHttpPost(url, "");
+  }
 
 }
