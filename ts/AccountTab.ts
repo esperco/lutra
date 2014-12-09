@@ -437,7 +437,6 @@ module AccountTab {
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
-    // Gets membership status - default is trialing
     var teamid = team.teamid;
     var execUid = team.team_executive;
 
@@ -497,14 +496,25 @@ module AccountTab {
         selectedMembership = "VIP";
         });
 
-      primaryBtn.click(function() {
-        if (paymentMethod == false) {
+      Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
+    .done(function(status){
+      if(status.cards.length < 1){  //no cards, add payment method
+        primaryBtn.click(function() {
+          if (paymentMethod == false) {
+            (<any> modal).modal("hide"); // FIXME
+            showPaymentModal("Add", team, selectedMembership);
+          } else {
+            (<any> modal).modal("hide"); // FIXME
+          }
+        });
+      }
+      else {  //there are cards to charge
+        primaryBtn.click(function() {
+          Api.setSubscription(execUid, teamid, selectedMembership); // update the membership
           (<any> modal).modal("hide"); // FIXME
-          showPaymentModal("Add", team, selectedMembership);
-        } else {
-          (<any> modal).modal("hide"); // FIXME
-        }
-      });
+        });
+      }
+    });
 
       cancelBtn.click(function() {
         (<any> modal).modal("hide"); // FIXME
@@ -599,7 +609,6 @@ module AccountTab {
 
   Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
     .done(function(status){
-      Log.p(status.cards);
       if(status.cards.length < 1){
         memStatus.append( "<br> No Cards");
       }
@@ -615,8 +624,6 @@ module AccountTab {
 '''
           removeCardSpan.appendTo(memStatus);
           removeCardLink.click(function() {
-            Log.p("But is it a banger?");
-            Log.p(status.cards[theNum]);
             //TODO: figure out which card you need to delete; delete it
           });
         }
@@ -690,7 +697,6 @@ module AccountTab {
     function updateStatus(mem){
       if (mem == "Trialing") {
         membershipBadge.addClass("free-trial");
-        //changePayment.addClass("disabled");
       } else if (mem == "Unpaid") {
         membershipBadge.addClass("suspended");
       } else if (mem == "Past_due"){
