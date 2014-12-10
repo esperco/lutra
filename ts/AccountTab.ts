@@ -231,7 +231,7 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showPaymentModal(purpose, team, membership) { //TODO: make Post request handle name to identify customer
+  function showPaymentModal(purpose, team, membership) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -293,7 +293,7 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/creditcard.svg");
 
     // Restricts the inputs to numbers
-    //TODO: make sure the card hasn't been added already
+    // TODO: handle if card is duplicate
     ccNum['payment']('formatCardNumber');
     cvcNum['payment']('formatCardCVC');
 
@@ -634,7 +634,8 @@ module AccountTab {
             memStatus.append("<br> •••• •••• •••• ");
             memStatus.append(<any>status.cards[i].last4);
         // TODO: make API call to get default card, highlight it
-
+        // if default
+        // memStatus.addClass("default-card");
 '''
 <span #removeCardSpan>
   <span class="text-divider"></span><a #removeCardLink class="danger-link">Remove</a>
