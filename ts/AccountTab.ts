@@ -600,33 +600,48 @@ module AccountTab {
   </div>
 </div>
 '''
+    var execid = team.team_executive;
+    var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(team.team_executive, team.teamid)
+    Api.getSubscriptionStatus(execid, teamid)
      .done(function(customerStatus){
        memPlan.append(customerStatus.plan);
        memStatus.append(customerStatus.status);
     });
 
-  Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
+
+  Api.getSubscriptionStatusLong(execid, teamid)
     .done(function(status){
+
       if(status.cards.length < 1){
         memStatus.append( "<br> No Cards");
       }
       else{
         for(var i=0; i<status.cards.length; i++){
-          memStatus.append("<br> •••• •••• •••• ");
-          memStatus.append(<any>status.cards[i].last4);
+          (function(){  //mmm tastes like block
+            memStatus.append("<br> •••• •••• •••• ");
+            memStatus.append(<any>status.cards[i].last4);
 
 '''
 <span #removeCardSpan>
   <span class="text-divider"></span><a #removeCardLink class="danger-link">Remove</a>
 </span>
 '''
-          removeCardSpan.appendTo(memStatus);
-          removeCardLink.click(function() {
-            //TODO: figure out which card you need to delete; delete it
-          });
-        }
+            memStatus.append(removeCardSpan);
+            var cardid = status.cards[i].id;
+            if(status.cards.length < 2){ // only allow to remove if there is more than one card
+              removeCardLink.removeClass("danger-link");
+            }
+
+            removeCardLink.click(function() {
+              Log.p(execid, teamid, cardid);
+              Api.deleteCard(execid, teamid, cardid)
+               .done(function(){
+                  Log.p("DONE");
+                });
+            });
+        })();
+      }
       }
         });
     var icon = $("<img class='svg-block preference-option-icon'/>")

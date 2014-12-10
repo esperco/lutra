@@ -380,7 +380,7 @@ module Api {
   export function addNewCard(uid, teamid, cardToken)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/new-card/" + uid + "/" + teamid;
+    var url = "/api/pay/new-card/" + uid + "/" + teamid
       + "/" + encodeURIComponent(cardToken);
     return jsonHttpPost(url, "");
   }
@@ -390,7 +390,7 @@ module Api {
   : JQueryDeferred<void>
   {
     var url = "/api/pay/card/" + uid + "/" + teamid + "/" + cardid;
-    return jsonHttpPost(url, "");
+    return jsonHttpDelete(url);
   }
 
 }
