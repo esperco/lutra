@@ -338,8 +338,12 @@ input.disabled {
 .footer {
   max-width: 1280px;
   margin: 0 auto;
+  ul, li{
+    list-style-type: none;
+  }
   @media (min-width:768px) { padding: 20px 36px 60px 36px; }
   @media (max-width:767px) { padding: 14px 18px 40px 18px; }
+
 }
 
 .footer-col {
@@ -347,8 +351,12 @@ input.disabled {
   margin: 20px 140px 20px 0;
   @media (max-width:767px) { margin-right: 70px; }
   padding: 0;
+  ul{
+    list-style-type: none;
+  }
   li, a {
     line-height: 2.0;
+    list-style-type: none;
   }
   a { color: @gray_80; }
   a:hover {
@@ -562,7 +570,6 @@ input.disabled {
   }
 }
 
-
 .dream-team-container {
   display: inline-block;
   vertical-align: bottom;
@@ -573,23 +580,6 @@ input.disabled {
     width: 100%;
     padding: 48px 18px 0 18px;
   }
-}
-
-.event-example, .research-example, .office-example {
-  margin-bottom: 0px;
-}
-
-.event-examples, .research-examples, .office-examples{
-  display: none;
-  position: absolute;
-  margin-top: 0px;
-  li{
-    list-style-type: none;
-    margin-left: 0px;
-  }
-}
-.event-examples li{
-    text-decoration: none;
 }
 
 .dream-team-faces { vertical-align: bottom; }
@@ -609,6 +599,7 @@ input.disabled {
     text-align: left;
   }
 }
+
 @media (max-width:879px) {
   .dream-team-faces {
     width: 230px;
@@ -620,7 +611,51 @@ input.disabled {
   }
 }
 
+@media(min-width: 449px){
+  .tasks-left-col, .tasks-mid-col, .tasks-right-col {
+      float: left;
+      width: 30%;
+      margin-bottom: 0px;
+      text-align: center;
+    }
+  .tasks-left-col, .tasks-mid-col { margin-right: 5%; }
+}
 
+
+
+@media(max-width:450px){
+  .tasks-left-col{
+    vertical-align: top;
+    margin-bottom: 85px;
+    text-align: center;
+  }
+  .tasks-right-col{
+    vertical-align: middle;
+    text-align: center;
+  }
+  .tasks-mid-col{
+    vertical-align: bottom;
+    margin-bottom: 85px;
+    text-align: center;
+  }
+
+  ul{
+    text-align: center;
+  }
+}
+
+.event-examples, .research-examples, .office-examples{
+  display: none;
+  position: absolute;
+  margin-top: 0px;
+  width: 90%;
+  margin: 0px;
+  li{
+    list-style-type: none;
+    text-decoration: none;
+    margin-left: 0px;
+  }
+}
 /* Join the waiting list */
 
 .waiting-list-form {
