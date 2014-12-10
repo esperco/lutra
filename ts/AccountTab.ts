@@ -263,6 +263,14 @@ module AccountTab {
               </div>
             </div>
           </form>
+          <form action="">
+            <div class="payment-col left">
+              <div class="semibold">Make Default Card</div>
+            </div>
+            <div class="payment-col right">
+              <input type="checkbox" name="default" id="default-box" value="card">
+            </div>
+          </form>
       </div>
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary"/>
@@ -272,7 +280,6 @@ module AccountTab {
   </div>
 </div>
 '''
-  //TODO: actually change the default card if that's the main action
     if (purpose == "Add") {
       title.text("Add Payment Method");
       primaryBtn.text("Add");
@@ -341,8 +348,13 @@ module AccountTab {
         primaryBtn.prop('disabled', false);
       } else {
         var stripeToken = response.id;
+        // makes it the default card
+          if($("default-box").prop("checked")){
+            Api.setDefaultCard(execUid, teamid, stripeToken);
+          }
+
         Api.addNewCard(execUid, teamid, stripeToken).done(function() {
-          alert("Your card was successfully charged. Thanks for joining Esper!");
+          alert("Your card was successfully Added!");
           if (membership == "Entrepreneur") {
             Api.setSubscription(execUid, teamid, "Entrepreneur");
           }
@@ -621,6 +633,7 @@ module AccountTab {
           (function(){  //mmm tastes like block
             memStatus.append("<br> •••• •••• •••• ");
             memStatus.append(<any>status.cards[i].last4);
+        // TODO: make API call to get default card, highlight it
 
 '''
 <span #removeCardSpan>

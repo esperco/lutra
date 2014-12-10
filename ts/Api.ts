@@ -393,4 +393,12 @@ module Api {
     return jsonHttpDelete(url);
   }
 
+  /** Sets the default card **/
+  export function setDefaultCard(uid, teamid, cardid)
+  : JQueryDeferred<void>
+  {
+    var url = "/api/pay/card/" + uid + "/" + teamid + "/" + cardid
+    return jsonHttpPut(url,"");
+  }
+
 }
