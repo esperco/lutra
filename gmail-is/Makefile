@@ -73,7 +73,7 @@ APP_SOURCES = \
   CalCache \
   CalPicker \
   CalSearch \
-  InsertTime \
+  ComposeToolbar \
   TaskList \
   Menu \
   Sidebar \

@@ -1,6 +1,22 @@
-module Esper.InsertTime {
+/** Manages all the tools and buttons that appear above the compose
+ *  text box for each message. Note that a single page/thread can have
+ *  *more than one* text box because you can be simultaneously
+ *  drafting replies for more than one message at a time.
+ *
+ *  This module also contains some basic utilities for interacting
+ *  with the text box, like inserting text at the caret. Any future
+ *  interactions of this sort should also go through here.
+ *
+ *  Currently, this does not appear for brand-new messages, just
+ *  replies to messages in a thread. This will probably change in the
+ *  future.
+ */
+module Esper.ComposeToolbar {
 
-  function eventTimezone(team: ApiT.Team, ev) {
+  /** Returns the timezone of the given event. If the event isn't in
+   *  one of the team's calendars, returns undefined.
+   */
+  function eventTimezone(team: ApiT.Team, ev: ApiT.CalendarEvent): string {
     var teamCal =
       List.find(team.team_calendars, function(c) {
         return c.google_cal_id === ev.google_cal_id;
@@ -9,8 +25,15 @@ module Esper.InsertTime {
     else return teamCal.calendar_timezone;
   }
 
-  /** Attaches the composition controls and sets up the event
-   *  handlers.
+  /** Given a set of elements (anchors for each text box), attaches
+   *  the composition controls and sets up the event handlers to each
+   *  one.
+   *
+   *  To change the actual elements inserted, modify `esperToolbar()`. 
+   *
+   *  The event listeners, however, are configured here because they
+   *  need a reference to the containing div. This should probably be
+   *  factored out at some point.
    */
   function attachControls(anchor: JQuery) {
     anchor.each(function (i, divElt) {
@@ -68,12 +91,37 @@ module Esper.InsertTime {
               && team !== null && team !== undefined)
             CalPicker.createModal(team, threadId);
         });
+
+        controls.confirmButton.click(function () {
+          var team = Sidebar.currentTeam;
+          if (team !== null && team !== undefined) {
+            var textField = Gmail.replyTextField(div);
+            var events = TaskTab.currentEvents;
+            var message = "Confirming the following events:<br />";
+
+            textField.focus();
+
+            for (var i = 0; i < events.length; i++) {
+              var ev = events[i].event;
+              var title = ev.title || "";
+              var location = ev.location || "";
+
+              var locationStr = location !== "" ? " at " + locationStr : "";
+              message += title + locationStr + "<br />";
+            }
+
+            if (Gmail.caretInField(textField)) {
+              insertAtCaret(message);
+            }
+          }
+
+        });
       }
     });
   }
 
   /** Inserts the given HTML string at the caret of a contenteditable
-   * element.
+   *  element.
    */
   function insertAtCaret(html) {
     var selection = window.getSelection()
@@ -85,6 +133,19 @@ module Esper.InsertTime {
 
     var node = $(html)[0];
     range.insertNode(node);
+  }
+
+  /** Runs the given callback with the preferences of the current
+   *  team.
+   */
+  function withPreferences(callback) {
+    var team = Sidebar.currentTeam;
+
+    if (team) {
+      Api.getPreferences(team.teamid).done(callback);
+    } else {
+      Log.d("No team detected. Not calling callback.");
+    }
   }
 
   function updateEventsLabel(controls) {
@@ -136,6 +197,9 @@ module Esper.InsertTime {
   <div #createButton title class="esper-composition-button">
     <object #createIcon class="esper-svg esper-composition-button-icon"/>
   </div>
+  <div #confirmButton title class="esper-composition-button esper-exec-confirm">
+    <span> Confirm </span>
+  </div>
 </div>
 '''
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
@@ -155,6 +219,12 @@ module Esper.InsertTime {
       "content": "Create linked events",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "esper-top esper-tooltip"
+    });
+
+    withPreferences(function (preferences) {
+      if (preferences.general.send_exec_confirmation) {
+        confirmButton.show();
+      }
     });
 
     return _view;
