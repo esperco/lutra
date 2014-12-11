@@ -109,6 +109,48 @@ module AccountTab {
     return _view;
   }
 
+  function showSignatureModal(teamid, memberUid, currentSig) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog preference-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title">Edit Email Signature</div>
+      </div>
+      <div #content class="preference-input">
+        <textarea #signature class="fit-parent" rows=5 tabindex="-1"/>
+      </div>
+      <div class="modal-footer">
+        <button #saveBtn class="button-primary modal-primary">Save</button>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/displayname.svg");
+
+    signature.val(currentSig);
+
+    saveBtn.click(function() {
+      Api.setSignature(teamid, memberUid, { signature: signature.val() })
+        .done(function() {
+          (<any> modal).modal("hide"); // FIXME
+        });
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal("hide"); // FIXME
+    });
+
+    return _view;
+  }
+
   function displayAssistants(team, table, profiles) {
     List.iter(profiles, function(profile) {
 '''
@@ -126,6 +168,7 @@ module AccountTab {
   <div #actions class="col-xs-5 assistant-row-actions"/>
 </li>
 '''
+      var myUid = Login.me();
       var execUid = team.team_executive;
       var memberUid = profile.profile_uid;
 
@@ -165,6 +208,26 @@ module AccountTab {
           .append($("<span class='semibold'> (Me)</span>"));
       }
 })();
+
+(function(){
+      if (myUid === execUid || myUid === memberUid) {
+'''
+<span #signatureSpan>
+  <a #signatureLink href="#" class="link">Edit Signature</a>
+</span>
+'''
+        signatureSpan.appendTo(actions);
+        signatureLink.click(function() {
+          Api.getSignature(team.teamid, memberUid).done(function(x) {
+            var view =
+              showSignatureModal(team.teamid, memberUid, x.signature);
+            (<any> view.modal).modal({});
+          });
+        });
+        actions.append($("<span class='text-divider'>|</span>"));
+      }
+})();
+
 
 (function(){
       if (memberUid !== execUid) {

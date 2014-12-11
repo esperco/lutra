@@ -345,6 +345,7 @@ module ApiT {
     acl_id: string;
     acl_email: string;
   }
+
   export interface CustomerStatus {
     teamid : string;
     active : boolean;
@@ -370,4 +371,7 @@ module ApiT {
     cards : PaymentCard[];
   }
 
+  export interface EmailSignature {
+    signature : string;
+  }
 }
