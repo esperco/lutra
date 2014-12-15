@@ -1,7 +1,9 @@
 /** Manages all the tools and buttons that appear above the compose
  *  text box for each message. Note that a single page/thread can have
  *  *more than one* text box because you can be simultaneously
- *  drafting replies for more than one message at a time.
+ *  drafting replies for more than one message at a time. This module
+ *  automatically manages every instance of the composition tools on
+ *  the page.
  *
  *  This module also contains some basic utilities for interacting
  *  with the text box, like inserting text at the caret. Any future
@@ -60,7 +62,7 @@ module Esper.ComposeToolbar {
         });
 
         controls.insertButton.click(function (e) {
-          var team = Sidebar.currentTeam;
+          var team = CurrentThread.team.get();
           if (team !== null && team !== undefined) {
             var textField = Gmail.replyTextField(div);
             var events = TaskTab.currentEvents;
@@ -85,15 +87,15 @@ module Esper.ComposeToolbar {
         });
 
         controls.createButton.click(function() {
-          var threadId = Sidebar.currentThreadId;
-          var team = Sidebar.currentTeam;
+          var threadId = CurrentThread.threadId.get();
+          var team = CurrentThread.team.get();
           if (threadId !== null && threadId !== undefined
               && team !== null && team !== undefined)
             CalPicker.createModal(team, threadId);
         });
 
         controls.confirmButton.click(function () {
-          var team = Sidebar.currentTeam;
+          var team = CurrentThread.team.get();
           if (team !== null && team !== undefined) {
             var textField = Gmail.replyTextField(div);
             var events = TaskTab.currentEvents;
@@ -139,7 +141,7 @@ module Esper.ComposeToolbar {
    *  team.
    */
   function withPreferences(callback) {
-    var team = Sidebar.currentTeam;
+    var team = CurrentThread.team.get();
 
     if (team) {
       Api.getPreferences(team.teamid).done(callback);

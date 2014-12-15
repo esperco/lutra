@@ -1143,7 +1143,7 @@ module Esper.TaskTab {
     */
     var watcherId = "TaskTab-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && threadId === Sidebar.currentThreadId) {
+      if (newValidity === true && threadId === CurrentThread.threadId) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, taskTabView, profiles);
       }
