@@ -298,6 +298,7 @@ module Esper.Sidebar {
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
+    CurrentThread.team.set(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {
