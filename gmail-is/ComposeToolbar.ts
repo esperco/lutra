@@ -57,7 +57,7 @@ module Esper.ComposeToolbar {
         overlappingSpan.css("margin-top", 16);
 
         updateEventsLabel(controls);
-        TaskTab.onEventsChanged(function () {
+        CurrentThread.linkedEvents.watch(function () {
           updateEventsLabel(controls)
         });
 
@@ -65,7 +65,7 @@ module Esper.ComposeToolbar {
           var team = CurrentThread.team.get();
           if (team !== null && team !== undefined) {
             var textField = Gmail.replyTextField(div);
-            var events = TaskTab.currentEvents;
+            var events = CurrentThread.linkedEvents.get();
             textField.focus();
 
             insertAtCaret("<br />");
@@ -98,7 +98,7 @@ module Esper.ComposeToolbar {
           var team = CurrentThread.team.get();
           if (team !== null && team !== undefined) {
             var textField = Gmail.replyTextField(div);
-            var events = TaskTab.currentEvents;
+            var events = CurrentThread.linkedEvents.get();
             var message = "Confirming the following events:<br />";
 
             textField.focus();
@@ -151,7 +151,9 @@ module Esper.ComposeToolbar {
   }
 
   function updateEventsLabel(controls) {
-    switch (TaskTab.currentEvents.length) {
+    var linkedEvents = CurrentThread.linkedEvents.get();
+
+    switch (linkedEvents.length) {
     case 0:
       controls.numLinkedEvents.text("0");
       controls.insertButton
@@ -171,11 +173,11 @@ module Esper.ComposeToolbar {
         });
       break;
     default:
-      controls.numLinkedEvents.text(TaskTab.currentEvents.length.toString());
+      controls.numLinkedEvents.text(linkedEvents.length.toString());
       controls.insertButton
         .removeClass("esper-none")
         .tooltip({
-          "content": "Insert " + TaskTab.currentEvents.length + " linked events",
+          "content": "Insert " + linkedEvents.length + " linked events",
           "tooltipClass": "esper-top esper-tooltip"
         });
       break;

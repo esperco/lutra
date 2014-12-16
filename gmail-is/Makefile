@@ -74,6 +74,7 @@ APP_SOURCES = \
   CalPicker \
   CalSearch \
   ComposeToolbar \
+  CurrentThread \
   TaskList \
   Menu \
   Sidebar \

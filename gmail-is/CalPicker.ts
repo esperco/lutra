@@ -87,8 +87,8 @@ module Esper.CalPicker {
     });
 
     var title =
-      TaskTab.currentTask !== undefined ?
-      TaskTab.currentTask.task_title :
+      CurrentThread.hasTask() ?
+      CurrentThread.task.get().task_title :
       esperGmail.get.email_subject();
     eventTitle.val("HOLD: " + title);
 
