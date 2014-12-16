@@ -378,7 +378,7 @@ module Api {
     * obtained by the client from Stripe directly. This doesn't change the
     * customer's default card if there was one already. **/
   export function addNewCard(uid, teamid, cardToken)
-  : JQueryDeferred<void>
+  : JQueryDeferred<ApiT.PaymentCard>
   {
     var url = "/api/pay/new-card/" + uid + "/" + teamid
       + "/" + encodeURIComponent(cardToken);

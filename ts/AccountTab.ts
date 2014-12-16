@@ -270,7 +270,7 @@ module AccountTab {
     if (action == "suspend") {
       title.text("Suspend membership?");
       content
-        .text("You can reactive your membership at any point in the future.");
+        .text("You can reactivate your membership at any point in the future.");
       primaryBtn.text("Yes");
       cancelBtn.text("Cancel");
     }
@@ -331,7 +331,7 @@ module AccountTab {
               <div class="semibold">Make Default Card</div>
             </div>
             <div class="payment-col right">
-              <input type="checkbox" name="default" id="default-box" value="card">
+              <input #defaultBox type="checkbox" name="default" value="card">
             </div>
           </form>
       </div>
@@ -356,7 +356,6 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/creditcard.svg");
 
     // Restricts the inputs to numbers
-    // TODO: handle if card is duplicate
     ccNum['payment']('formatCardNumber');
     cvcNum['payment']('formatCardCVC');
 
@@ -377,13 +376,14 @@ module AccountTab {
       expYear.append($("<option value=" + i + ">" + year + "</option>"));
     }
 
-    Stripe.setPublishableKey('pk_test_tDzGbpaybyFQ3A7XGF6ctE3f'); //TODO: Change this to live key
+    // TODO: Change this to live key
+    Stripe.setPublishableKey('pk_test_tDzGbpaybyFQ3A7XGF6ctE3f');
 
-    var checkInput = function(ccInfo, valid, date){
-      if(!valid){
+    var checkInput = function(ccInfo, valid, date) {
+      if (!valid) {
         ccInfo.val("");
         ccInfo.addClass("cc-error");
-        if(!date){
+        if (!date) {
           ccInfo.attr("placeholder", "Invalid Number");
         }
       } else {
@@ -411,13 +411,7 @@ module AccountTab {
         primaryBtn.prop('disabled', false);
       } else {
         var stripeToken = response.id;
-        // makes it the default card
-          if($("default-box").prop("checked")){
-            Api.setDefaultCard(execUid, teamid, stripeToken);
-          }
-
-        Api.addNewCard(execUid, teamid, stripeToken).done(function() {
-          alert("Your card was successfully Added!");
+        Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
           if (membership == "Entrepreneur") {
             Api.setSubscription(execUid, teamid, "Entrepreneur");
           }
@@ -429,6 +423,11 @@ module AccountTab {
           }
           (<any> paymentForm.get(0)).reset();
           (<any> modal).modal("hide"); // FIXME
+          if (defaultBox.prop("checked")) {
+            Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
+          } else {
+            refresh();
+          }
         });
       }
     };
@@ -544,15 +543,14 @@ module AccountTab {
           executive.addClass("selected");
         } else if (membershipPlan == "VIP") {
           VIP.addClass("selected");
-      }
+        }
       }
 
       entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
       executive.append(viewOfMembershipOption("Executive"));
       VIP.append(viewOfMembershipOption("VIP"));
 
-      var paymentMethod = false; // TODO: get payment method
-      var selectedMembership = ""; //empty unless a choice is made
+      var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
         entrepreneur.removeClass("selected");
@@ -561,40 +559,42 @@ module AccountTab {
         option.addClass("selected");
       }
 
-      entrepreneur.click(function() { selectMembership(entrepreneur);
+      entrepreneur.click(function() {
+        selectMembership(entrepreneur);
         selectedMembership = "Entrepreneur";
-        });
-      executive.click(function() { selectMembership(executive);
+      });
+      executive.click(function() {
+        selectMembership(executive);
         selectedMembership = "Executive";
-        });
-      VIP.click(function() { selectMembership(VIP);
+      });
+      VIP.click(function() {
+        selectMembership(VIP);
         selectedMembership = "VIP";
-        });
+      });
 
       Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
-    .done(function(status){
-      if(status.cards.length < 1){  //no cards, add payment method
-        primaryBtn.click(function() {
-          if (paymentMethod == false) {
-            (<any> modal).modal("hide"); // FIXME
-            showPaymentModal("Add", team, selectedMembership);
-          } else {
-            (<any> modal).modal("hide"); // FIXME
+        .done(function(status){
+          if (status.cards.length < 1) { // no cards, add payment method
+            primaryBtn.click(function() {
+              (<any> modal).modal("hide"); // FIXME
+              showPaymentModal("Add", team, selectedMembership);
+            });
+          }
+          else { // there are cards to charge
+            primaryBtn.click(function() {
+              Api.setSubscription(execUid, teamid, selectedMembership);
+              (<any> modal).modal("hide"); // FIXME
+            });
           }
         });
-      }
-      else {  //there are cards to charge
-        primaryBtn.click(function() {
-          Api.setSubscription(execUid, teamid, selectedMembership); // update the membership
-          (<any> modal).modal("hide"); // FIXME
-        });
-      }
-    });
 
       cancelBtn.click(function() {
         (<any> modal).modal("hide"); // FIXME
       });
-      if ((membershipStatus == "Past-due" || membershipStatus == "Unpaid" || membershipStatus == "Caneled")) {
+      if (membershipStatus == "Past-due" ||
+          membershipStatus == "Unpaid" ||
+          membershipStatus == "Canceled")
+      {
         suspendBtn.hide();
       } else {
         suspendBtn.click(function() {
@@ -647,8 +647,7 @@ module AccountTab {
     return _view;
   }
 
-
-  function showCardModal(team){
+  function showCardModal(team) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -678,49 +677,40 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(execid, teamid)
-     .done(function(customerStatus){
+    Api.getSubscriptionStatus(execid, teamid).done(function(customerStatus) {
        memPlan.append(customerStatus.plan);
        memStatus.append(customerStatus.status);
     });
 
-
-  Api.getSubscriptionStatusLong(execid, teamid)
-    .done(function(status){
-
-      if(status.cards.length < 1){
+    Api.getSubscriptionStatusLong(execid, teamid).done(function(status) {
+      if (status.cards.length < 1) {
         memStatus.append( "<br> No Cards");
       }
-      else{
-        for(var i=0; i<status.cards.length; i++){
-          (function(){  //mmm tastes like block
+      else {
+        for (var i = 0; i < status.cards.length; i++) {
+(function(){
             memStatus.append("<br> •••• •••• •••• ");
             memStatus.append(<any>status.cards[i].last4);
-        // TODO: make API call to get default card, highlight it
-        // if default
-        // memStatus.addClass("default-card");
 '''
 <span #removeCardSpan>
-  <span class="text-divider"></span><a #removeCardLink class="danger-link">Remove</a>
+  <span class="text-divider"></span><a #removeCardLink>Remove</a>
 </span>
 '''
             memStatus.append(removeCardSpan);
-            var cardid = status.cards[i].id;
-            if(status.cards.length < 2){ // only allow to remove if there is more than one card
-              removeCardLink.removeClass("danger-link");
-            }
 
-            removeCardLink.click(function() {
-              Log.p(execid, teamid, cardid);
-              Api.deleteCard(execid, teamid, cardid)
-               .done(function(){
-                  Log.p("DONE");
-                });
-            });
-        })();
+            if (status.cards.length > 1) {
+              var cardid = status.cards[i].id;
+              removeCardLink.addClass("danger-link");
+              removeCardLink.click(function() {
+                Log.p(execid, teamid, cardid);
+                Api.deleteCard(execid, teamid, cardid).done(refresh);
+              });
+            }
+})();
+        }
       }
-      }
-        });
+    });
+
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
@@ -728,8 +718,9 @@ module AccountTab {
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
     });
+
     return _view;
-    }
+  }
 
   function displayMembership(team) {
 '''
@@ -745,10 +736,10 @@ module AccountTab {
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
-    <div><a #changePayment class="link">Change payment method</a></div>
+    <div><a #changePayment class="link">Add payment method</a></div>
   </div>
   <div class="membership-col right">
-    <div><a #cardInfo class="link">View Card Information</a></div>
+    <div><a #cardInfo class="link">View card information</a></div>
   </div>
 </div>
 '''
@@ -774,32 +765,33 @@ module AccountTab {
 
     });
 
-    //retrieves the membership status
-    var membership="";
     var execUid = team.team_executive;
 
-    //gets subscription status
     Api.getSubscriptionStatus(execUid, teamid)
-      .done(function(customerStatus){
-        membership = customerStatus.status;
-        updateStatus(membership);
+      .done(function(customerStatus) {
+        updateStatus(customerStatus.status);
     });
 
-    //updates the status
-    function updateStatus(mem){
+    function updateStatus(mem) {
       if (mem == "Trialing") {
         membershipBadge.addClass("free-trial");
       } else if (mem == "Unpaid") {
         membershipBadge.addClass("suspended");
-      } else if (mem == "Past_due"){
+      } else if (mem == "Past_due") {
         membershipBadge.addClass("suspended");
-      } else if (mem == "Canceled"){
-         membershipBadge.addClass("suspended");
-      }
-      else {
+      } else if (mem == "Canceled") {
+        membershipBadge.addClass("suspended");
+      } else if (mem === undefined) {
+        membershipBadge.addClass("suspended");
+      } else {
         membershipBadge.addClass("Active");
       }
-      membershipBadge.text(membership.toUpperCase());
+
+      if (mem === undefined)
+        membershipBadge.text("None");
+      else
+        membershipBadge.text(mem.toUpperCase());
+
       changeMembership.click(function() { showMembershipModal(team) });
 
       changePayment.click(function() {
