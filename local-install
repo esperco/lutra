@@ -4,8 +4,28 @@ set -e
 # Copy public files into a directory structure that we will mirror
 # exactly in our S3 bucket used to serve pages for http://esper.com/
 
-# List of files to install
-html="about-navbar.html contact.html discover.html engineer.html faqs.html footer.html index.html intern.html jobs.html nav-menu.html navbar.html privacy-policy.html signup.html splash-navbar.html team.html terms-of-use.html waiting-list.html"
+# Lists of files to install
+
+html="\
+  about-navbar.html \
+  contact.html \
+  discover.html \
+  engineer.html \
+  faqs.html \
+  footer.html \
+  index.html \
+  intern.html \
+  jobs.html \
+  nav-menu.html \
+  navbar.html \
+  privacy-policy.html \
+  signup.html \
+  splash-navbar.html \
+  team.html \
+  terms-of-use.html \
+  waiting-list.html \
+"
+
 css="*.css"
 img="*.jpg *.svg *.ico *.png"
 js="*.js"
@@ -14,8 +34,14 @@ rm -rf pub
 mkdir -p pub
 
 # HTML files go to directly under the server root (https://esper.com/...)
+# Note that they lose their .html extension, except for index.html.
 for x in $html; do
-    cp html/$x pub/$x
+    if [ $x = index.html ]; then
+        name=$x
+    else
+        name=$(basename $x .html)
+    fi
+    cp html/$x pub/$name
 done
 
 # Other files go into /css, /img, /js
