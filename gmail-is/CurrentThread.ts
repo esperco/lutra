@@ -53,4 +53,16 @@ module Esper.CurrentThread {
   export function hasTask() : boolean {
     return isThreadView() && task.isValid();
   }
+
+  /** Runs the given callback with the preferences of the current
+   *  team. If there is no current team, the callback is not executed.
+   */
+  export function withPreferences(callback) {
+    if (team.isValid()) {
+      Api.getPreferences(team.get().teamid).done(callback);
+    } else {
+      Log.d("No team detected. Not calling callback.");
+    }
+  }
+
 }

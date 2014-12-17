@@ -137,19 +137,6 @@ module Esper.ComposeToolbar {
     range.insertNode(node);
   }
 
-  /** Runs the given callback with the preferences of the current
-   *  team.
-   */
-  function withPreferences(callback) {
-    var team = CurrentThread.team.get();
-
-    if (team) {
-      Api.getPreferences(team.teamid).done(callback);
-    } else {
-      Log.d("No team detected. Not calling callback.");
-    }
-  }
-
   function updateEventsLabel(controls) {
     var linkedEvents = CurrentThread.linkedEvents.get();
 
@@ -225,7 +212,7 @@ module Esper.ComposeToolbar {
       "tooltipClass": "esper-top esper-tooltip"
     });
 
-    withPreferences(function (preferences) {
+    CurrentThread.withPreferences(function (preferences) {
       if (preferences.general.send_exec_confirmation) {
         confirmButton.show();
       }
