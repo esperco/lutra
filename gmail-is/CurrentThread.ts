@@ -65,4 +65,19 @@ module Esper.CurrentThread {
     }
   }
 
+  /** Returns the timezone of the given event. If the event isn't in
+   *  one of the current team's calendars, returns undefined.
+   */
+  export function eventTimezone(ev: ApiT.CalendarEvent): string {
+    if (!team.isValid()) return undefined;
+    
+    var teamCal =
+      List.find(team.get().team_calendars, function(c) {
+        return c.google_cal_id === ev.google_cal_id;
+    });
+
+    if (teamCal === null) return undefined;
+
+    return teamCal.calendar_timezone;
+  }
 }

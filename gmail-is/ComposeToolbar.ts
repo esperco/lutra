@@ -15,16 +15,21 @@
  */
 module Esper.ComposeToolbar {
 
-  /** Returns the timezone of the given event. If the event isn't in
-   *  one of the team's calendars, returns undefined.
+  var controlCallbacks = [];
+
+  /** Given a callback that returns a JQuery element, executes the
+   *  callback and inserts the resulting element into the toolbar each
+   *  time a new reply interface is opened.
+   *
+   *  The callback gets an object as an argument with the following
+   *  methods for interacting with the text box:
+   *
+   *    - insertAtCaret : JQuery -> unit
+   *        Inserts the given HTML into the contenteditable element at
+   *        the caret, replacing any selected text inside of it
    */
-  function eventTimezone(team: ApiT.Team, ev: ApiT.CalendarEvent): string {
-    var teamCal =
-      List.find(team.team_calendars, function(c) {
-        return c.google_cal_id === ev.google_cal_id;
-    });
-    if (teamCal === null) return undefined;
-    else return teamCal.calendar_timezone;
+  export function registerControl(callback) {
+    controlCallbacks.push(callback);
   }
 
   /** Given a set of elements (anchors for each text box), attaches
@@ -42,12 +47,37 @@ module Esper.ComposeToolbar {
       var div = $(divElt);
 
       // If we haven't added a menu to this one yet and it is not a
-      // new compose interface.
+      // "new thread" compose interface.
       if (!Gmail.newCompose(div) && div.children().length === 1) {
-        var controls = esperToolbar();
-        div.prepend(controls.bar);
+
+        // methods to control the current compose interface, passed into callback
+        var composeInterface = {
+          /** Inserts the given HTML string at the caret of a contenteditable
+           *  element, replacing the current selection (if any).
+           */
+          insertAtCaret : function (html) {
+            // focus on the correct text box:
+            var textField = Gmail.replyTextField(div);
+            textField.focus();            
+
+            // replace the selection (if any) at the caret:
+            var selection = window.getSelection()
+            var range     = selection.getRangeAt(0);
+
+            html = "<span>" + html + "</span>";
+
+            range.deleteContents();
+
+            var node = $(html)[0];
+            range.insertNode(node);
+          }
+        };
+
+        var container = toolbarContainer();
+        div.prepend(container.bar);
         div.height(86);
 
+        // Makes the toolbar fit on top of the existing GMail toolbar.
         var containing = Gmail.containingTable(div);
         containing.css("padding-bottom", 30);
 
@@ -55,168 +85,27 @@ module Esper.ComposeToolbar {
         // is unnecessary
         var overlappingSpan = Gmail.mouseoverReplyToolbar(div);
         overlappingSpan.css("margin-top", 16);
+        
+        controlCallbacks.forEach(function (callback) {
+          var element = callback(composeInterface);
 
-        updateEventsLabel(controls);
-        CurrentThread.linkedEvents.watch(function () {
-          updateEventsLabel(controls)
-        });
-
-        controls.insertButton.click(function (e) {
-          var team = CurrentThread.team.get();
-          if (team !== null && team !== undefined) {
-            var textField = Gmail.replyTextField(div);
-            var events = CurrentThread.linkedEvents.get();
-            textField.focus();
-
-            insertAtCaret("<br />");
-            for (var i = 0; i < events.length; i++) {
-              var ev = events[i].event;
-              var start = new Date(ev.start.local);
-              var end   = new Date(ev.end.local);
-              var range = XDate.range(start, end);
-              var tz =
-                (<any> moment).tz(ev.start.local,
-                                  eventTimezone(team, ev)).zoneAbbr();
-
-              if (Gmail.caretInField(textField)) {
-                insertAtCaret(XDate.fullWeekDay(start) + ", " + range
-                              + " " + tz + "<br />");
-              }
-            }
-          }
-        });
-
-        controls.createButton.click(function() {
-          var threadId = CurrentThread.threadId.get();
-          var team = CurrentThread.team.get();
-          if (threadId !== null && threadId !== undefined
-              && team !== null && team !== undefined)
-            CalPicker.createModal(team, threadId);
-        });
-
-        controls.confirmButton.click(function () {
-          var team = CurrentThread.team.get();
-          if (team !== null && team !== undefined) {
-            var textField = Gmail.replyTextField(div);
-            var events = CurrentThread.linkedEvents.get();
-            var message = "Confirming the following events:<br />";
-
-            textField.focus();
-
-            for (var i = 0; i < events.length; i++) {
-              var ev = events[i].event;
-              var title = ev.title || "";
-              var location = ev.location || "";
-
-              var locationStr = location !== "" ? " at " + locationStr : "";
-              message += title + locationStr + "<br />";
-            }
-
-            if (Gmail.caretInField(textField)) {
-              insertAtCaret(message);
-            }
-          }
-
+          container.bar.append(element);
         });
       }
     });
   }
 
-  /** Inserts the given HTML string at the caret of a contenteditable
-   *  element.
+  /** Returns a _view that contains a styled toolbar for the
+   *  composition interface, without any of the controls added in.
    */
-  function insertAtCaret(html) {
-    var selection = window.getSelection()
-    var range     = selection.getRangeAt(0);
-
-    html = "<span>" + html + "</span>";
-
-    range.deleteContents();
-
-    var node = $(html)[0];
-    range.insertNode(node);
-  }
-
-  function updateEventsLabel(controls) {
-    var linkedEvents = CurrentThread.linkedEvents.get();
-
-    switch (linkedEvents.length) {
-    case 0:
-      controls.numLinkedEvents.text("0");
-      controls.insertButton
-        .addClass("esper-none")
-        .tooltip({
-          "content": "No linked events to insert",
-          "tooltipClass": "esper-top esper-tooltip"
-        });
-      break;
-    case 1:
-      controls.numLinkedEvents.text("1");
-      controls.insertButton
-        .removeClass("esper-none")
-        .tooltip({
-          "content": "Insert 1 linked event",
-          "tooltipClass": "esper-top esper-tooltip"
-        });
-      break;
-    default:
-      controls.numLinkedEvents.text(linkedEvents.length.toString());
-      controls.insertButton
-        .removeClass("esper-none")
-        .tooltip({
-          "content": "Insert " + linkedEvents.length + " linked events",
-          "tooltipClass": "esper-top esper-tooltip"
-        });
-      break;
-    }
-  }
-
-  /** Returns a _view that contains Esper-specific controls for the
-   *  composition view. (Right now, the only controls are a button for
-   *  inserting the times of linked events and a label with the number
-   *  of linked events.)
-   */
-  function esperToolbar() {
+  function toolbarContainer() {
 '''
 <div #bar class="esper-composition-toolbar esper-clearfix">
   <object #logo class="esper-composition-logo"/>
   <div class="esper-composition-vertical-divider"/>
-  <div #insertButton title class="esper-composition-button">
-    <object #insertIcon class="esper-svg esper-composition-button-icon"/>
-    <div #numLinkedEvents class="esper-composition-badge"/>
-  </div>
-  <div #createButton title class="esper-composition-button">
-    <object #createIcon class="esper-svg esper-composition-button-icon"/>
-  </div>
-  <div #confirmButton title class="esper-composition-button esper-exec-confirm">
-    <span> Confirm </span>
-  </div>
 </div>
 '''
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
-    insertIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
-    createIcon.attr("data", Init.esperRootUrl + "img/composition-create.svg");
-
-    insertButton.tooltip({
-      show: { delay: 500, effect: "none" },
-      hide: { effect: "none" },
-      "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "esper-top esper-tooltip"
-    });
-
-    createButton.tooltip({
-      show: { delay: 500, effect: "none" },
-      hide: { effect: "none" },
-      "content": "Create linked events",
-      "position": { my: 'center bottom', at: 'center top-1' },
-      "tooltipClass": "esper-top esper-tooltip"
-    });
-
-    CurrentThread.withPreferences(function (preferences) {
-      if (preferences.general.send_exec_confirmation) {
-        confirmButton.show();
-      }
-    });
 
     return _view;
   }
