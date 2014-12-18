@@ -398,7 +398,7 @@ module Esper.UserTab {
     });
   }
 
-  function viewOfUser(team: ApiT.Team) {
+  function viewOfUser(team: ApiT.Team, prefs: ApiT.Preferences) {
 '''
 <div #view>
   <div #spinner>
@@ -408,8 +408,10 @@ module Esper.UserTab {
   <div class="esper-profile-row esper-profile-name-row">
     <span #name class="esper-profile-name"/>
     <span #membership class="esper-membership-badge"/>
+    <object #appleLogo class="esper-svg esper-ios-app-icon"/>
   </div>
   <div #email class="esper-profile-row esper-profile-email"/>
+  <div #mobile class="esper-profile-row esper-profile-email"/>
 </div>
 '''
     var teamid = team.teamid;
@@ -421,6 +423,22 @@ module Esper.UserTab {
           profPic.css("background-image", "url('" + profile.image_url + "')");
         name.text(team.team_name);
         email.text(profile.email);
+
+        var phoneInfo = prefs.meeting_types.phone_call;
+        if (phoneInfo !== undefined) {
+          var pubMobile = List.find(phoneInfo.phones, function(p) {
+            return p.phone_type === "Mobile" && p.share_with_guests;
+          });
+          if (pubMobile !== null)
+            mobile.text("Mobile: " + pubMobile.phone_number);
+          else
+            mobile.hide();
+        }
+
+        if (Login.hasiOSApp())
+          appleLogo.attr("data", Init.esperRootUrl + "img/apple.svg");
+        else
+          appleLogo.hide();
       });
 
     var membershipStatus = "free trial"; // TODO: get membership status
@@ -452,10 +470,6 @@ module Esper.UserTab {
     <span>Use duplicate events:</span>
     <span class="esper-green" #useDuplicate>Yes</span>
   </div>
-  <div>
-    <span>Has iOS app:</span>
-    <span class="esper-red" #hasiOSApp>No</span>
-  </div>
 </ul>
 '''
     if (prefs.send_exec_confirmation)
@@ -470,10 +484,6 @@ module Esper.UserTab {
       useDuplicate.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
-    if (Login.hasiOSApp())
-      hasiOSApp.text("Yes")
-        .removeClass("esper-red")
-        .addClass("esper-green");
 
     container.append(view);
   }
@@ -563,10 +573,10 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    user.append(viewOfUser(team));
-
     Api.getPreferences(team.teamid).done(function(prefs) {
       preferencesSpinner.hide();
+      user.append(viewOfUser(team, prefs));
+
       var workplaces = prefs.workplaces;
       populateWorkplaceDropdown(workplaceSelector, workplaceInfo, workplaces);
       if (workplaces.length > 0)
