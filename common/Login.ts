@@ -65,6 +65,13 @@ module Esper.Login {
       return;
   }
 
+  export function hasiOSApp() {
+    if (watchableInfo.get() !== undefined)
+      return watchableInfo.get().has_ios_app;
+    else
+      return false;
+  }
+
   /* Send a Logout request. */
   export function logout() {
     getLoginInfo = undefined;

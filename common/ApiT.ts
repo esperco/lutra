@@ -77,6 +77,7 @@ module Esper.ApiT {
     api_secret: string;
     email: string;
     teams: Team[];
+    has_ios_app: boolean;
   }
 
   export interface CalendarTime {

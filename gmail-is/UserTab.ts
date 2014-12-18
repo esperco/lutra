@@ -409,7 +409,7 @@ module Esper.UserTab {
     <span #name class="esper-profile-name"/>
     <span #membership class="esper-membership-badge"/>
   </div>
-  <div #email class="esper-profile-row esper-profile-email esper-gray"/>
+  <div #email class="esper-profile-row esper-profile-email"/>
 </div>
 '''
     var teamid = team.teamid;
@@ -421,7 +421,7 @@ module Esper.UserTab {
           profPic.css("background-image", "url('" + profile.image_url + "')");
         name.text(team.team_name);
         email.text(profile.email);
-      });;
+      });
 
     var membershipStatus = "free trial"; // TODO: get membership status
     if (membershipStatus == "free trial")
@@ -450,7 +450,11 @@ module Esper.UserTab {
   </div>
   <div>
     <span>Use duplicate events:</span>
-    <span class="esper-red" #useDuplicate>Yes</span>
+    <span class="esper-green" #useDuplicate>Yes</span>
+  </div>
+  <div>
+    <span>Has iOS app:</span>
+    <span class="esper-red" #hasiOSApp>No</span>
   </div>
 </ul>
 '''
@@ -466,6 +470,10 @@ module Esper.UserTab {
       useDuplicate.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
+    if (Login.hasiOSApp())
+      hasiOSApp.text("Yes")
+        .removeClass("esper-red")
+        .addClass("esper-green");
 
     container.append(view);
   }

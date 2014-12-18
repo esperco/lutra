@@ -118,10 +118,10 @@ module Esper.TaskTab {
             <select #fromSelect class="esper-select"/>
           </div>
         </div>
-        <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
+        <div #notesRow class="esper-ev-modal-row esper-clearfix">
           <div class="esper-ev-modal-left esper-bold">Description</div>
           <div class="esper-ev-modal-right">
-            <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
+            <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
           </div>
         </div>
         <div class="esper-ev-modal-row esper-clearfix">
@@ -156,7 +156,9 @@ module Esper.TaskTab {
 
     pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
     if (undefined !== e.description) {
-      pubDescription.val(e.description);
+      var separatorIndex = e.description.search(/=== Conversation ===/);
+      if (separatorIndex !== -1)
+        pubNotes.val(e.description.substring(0, separatorIndex).trim());
     }
     if (undefined !== e.location) {
       var loc = e.location.address;
@@ -235,7 +237,7 @@ module Esper.TaskTab {
       titleRow.hide();
       whereRow.hide();
       calendarRow.hide();
-      descriptionRow.hide();
+      notesRow.hide();
     }
 
     create.click(function() {
@@ -258,7 +260,7 @@ module Esper.TaskTab {
         start:         e.start,
         end:           e.end,
         title:         pubTitle.val(),
-        description:   pubDescription.val(),
+        description:   pubNotes.val(),
         location:      loc,
         all_day:       e.all_day,
         guests:        guests,
