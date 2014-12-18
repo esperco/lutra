@@ -514,7 +514,7 @@ module AccountTab {
     var teamid = team.teamid;
     var execUid = team.team_executive;
 
-    Api.getSubscriptionStatus(execUid, teamid)
+    Api.getSubscriptionStatus(Login.me(), teamid)
       .done(updateModal);
 
     function updateModal(customerStatus) {
@@ -572,7 +572,7 @@ module AccountTab {
         selectedMembership = "VIP";
       });
 
-      Api.getSubscriptionStatusLong(team.team_executive, team.teamid)
+      Api.getSubscriptionStatusLong(Login.me(), team.teamid)
         .done(function(status){
           if (status.cards.length < 1) { // no cards, add payment method
             primaryBtn.click(function() {
@@ -677,12 +677,12 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(execid, teamid).done(function(customerStatus) {
+    Api.getSubscriptionStatus(Login.me(), teamid).done(function(customerStatus) {
        memPlan.append(customerStatus.plan);
        memStatus.append(customerStatus.status);
     });
 
-    Api.getSubscriptionStatusLong(execid, teamid).done(function(status) {
+    Api.getSubscriptionStatusLong(Login.me(), teamid).done(function(status) {
       if (status.cards.length < 1) {
         memStatus.append( "<br> No Cards");
       }
@@ -767,7 +767,7 @@ module AccountTab {
 
     var execUid = team.team_executive;
 
-    Api.getSubscriptionStatus(execUid, teamid)
+    Api.getSubscriptionStatus(Login.me(), teamid)
       .done(function(customerStatus) {
         updateStatus(customerStatus.status);
     });
