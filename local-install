@@ -10,6 +10,7 @@ html="\
   about-navbar.html \
   contact.html \
   discover.html \
+  email-confirmation.html \
   engineer.html \
   faqs.html \
   footer.html \
@@ -18,7 +19,9 @@ html="\
   jobs.html \
   nav-menu.html \
   navbar.html \
+  payment.html \
   privacy-policy.html \
+  redeem.html \
   signup.html \
   splash-navbar.html \
   team.html \
