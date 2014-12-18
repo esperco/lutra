@@ -55,7 +55,7 @@ module Esper.Init {
       Login.getLoginInfo
         .done(function(loginInfo) {
           Sidebar.init();
-          InsertTime.init();
+          ComposeToolbar.init();
         });
     } else {
       Menu.create();

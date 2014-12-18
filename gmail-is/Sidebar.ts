@@ -2,8 +2,7 @@
   Gmail thread view
 */
 module Esper.Sidebar {
-  export var currentTeam : ApiT.Team;
-  export var currentThreadId : string;
+
   export var profiles : ApiT.Profile[];
 
   export function customizeSelectArrow(selector) {
@@ -133,6 +132,8 @@ module Esper.Sidebar {
     dropdown.css("overflow", "auto");
 
     function onTeamSwitch(toTeam) {
+      CurrentThread.team.set(team);
+
       dismissDropdowns();
       wrap.fadeOut(250);
       sizeIcon.removeClass("esper-minimize");
@@ -140,6 +141,7 @@ module Esper.Sidebar {
       wrap.fadeIn(250);
       sizeIcon.addClass("esper-minimize");
       sidebar.show("slide", { direction: "down" }, 250);
+
       function afterAnimation() {
         displayTeamSidebar(rootElement, toTeam, true, false,
                            threadId, profiles);
@@ -296,8 +298,7 @@ module Esper.Sidebar {
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
-    currentTeam = team;
-    Menu.currentTeam.set(team);
+    CurrentThread.team.set(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {
@@ -330,7 +331,7 @@ module Esper.Sidebar {
         }
         else {
           var threadId = emailData.first_email;
-          currentThreadId = threadId;
+          CurrentThread.threadId.set(threadId);
           var subject = emailData.subject;
           Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
           ActiveThreads.handleNewActiveThread(threadId, subject);
@@ -381,7 +382,7 @@ module Esper.Sidebar {
     });
     window.onhashchange = function() {
       Log.d("URL changed");
-      currentThreadId = null;
+      CurrentThread.threadId.set(null);
       maybeUpdateView(profiles);
     };
   }

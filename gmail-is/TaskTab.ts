@@ -6,34 +6,19 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
-
-  /** The events currently displayed as "linked" in the sidebar. */
-  export var currentEvents : ApiT.EventWithSyncInfo[] = [];
-
-  var currentEventsListeners = [];
-
+  
   export var currentTask : ApiT.Task;
-
-  export function onEventsChanged(callback) {
-    currentEventsListeners.push(callback);
-  }
-
-  function updateEvents(newEvents) {
-    currentEvents = newEvents;
-
-    for (var i = 0; i < currentEventsListeners.length; i++) {
-      currentEventsListeners[i]();
-    }
-  }
 
   function obtainTaskForThread(teamid, threadId,
                                view: TaskTabView) {
+    var currentTask = CurrentThread.task.get();
+
     if (currentTask !== undefined)
       return Promise.defer(currentTask);
     else {
       return Api.obtainTaskForThread(teamid, threadId, false, true)
         .then(function(task) {
-          currentTask = task;
+          CurrentThread.task.set(task);
           view.taskCaption.text(taskLabelExists);
           view.taskTitle.text(task.task_title);
           return task;
@@ -689,17 +674,16 @@ module Esper.TaskTab {
     taskTab.linkedEventsList.children().remove();
     taskTab.linkedEventsSpinner.show();
 
-    currentEvents = linkedEvents;
-    updateEvents(linkedEvents);
+    CurrentThread.linkedEvents.set(linkedEvents);
 
-    if (currentEvents.length === 0) {
+    if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
     } else {
       var i = 0;
       var recent, last = false;
-      currentEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
-        if (i === currentEvents.length - 1)
-          last = true;
+      linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+        if (i === linkedEvents.length - 1) last = true;
+
         eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
                                       threadId, taskTab, profiles));
         i++;
@@ -803,6 +787,7 @@ module Esper.TaskTab {
         $("<li class='esper-li'>" + title + "</li>")
           .appendTo(results)
           .click(function() {
+            var currentTask = CurrentThread.task.get();
             var job =
               currentTask !== undefined ?
               Api.switchTaskForThread(teamid, threadId,
@@ -815,7 +800,7 @@ module Esper.TaskTab {
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
             });
 
-            currentTask = result.task_data;
+            CurrentThread.task.set(result.task_data);
             taskTitle.val(title);
             Sidebar.dismissDropdowns();
           });
@@ -823,6 +808,7 @@ module Esper.TaskTab {
 
       actions.find(".esper-li").remove();
 
+      var currentTask = CurrentThread.task.get();
       var renameLabel =
         currentTask !== undefined ?
           "Rename task as"
@@ -852,13 +838,15 @@ module Esper.TaskTab {
           .click(function() {
             Api.deleteTask(task.taskid)
               .done(function() {
-                currentTask = undefined;
+                CurrentThread.task.set(undefined);
                 taskTab.taskCaption.text(taskLabelCreate);
                 clearlinkedEventsList(team, taskTab);
                 Sidebar.dismissDropdowns();
               });
           });
       }
+
+      var currentTask = CurrentThread.task.get();
       if (currentTask !== undefined)
         addDeleteOption(currentTask);
 
@@ -1082,7 +1070,7 @@ module Esper.TaskTab {
       : Api.getTaskForThread;
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
-      currentTask = task;
+      CurrentThread.task.set(task);
       var title = "";
       linkedThreadsSpinner.hide();
       if (task !== undefined) {
@@ -1143,7 +1131,7 @@ module Esper.TaskTab {
     */
     var watcherId = "TaskTab-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && threadId === Sidebar.currentThreadId) {
+      if (newValidity === true && threadId === CurrentThread.threadId.get()) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, taskTabView, profiles);
       }
