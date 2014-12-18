@@ -35,12 +35,6 @@ module Esper.ComposeToolbar {
   /** Given a set of elements (anchors for each text box), attaches
    *  the composition controls and sets up the event handlers to each
    *  one.
-   *
-   *  To change the actual elements inserted, modify `esperToolbar()`. 
-   *
-   *  The event listeners, however, are configured here because they
-   *  need a reference to the containing div. This should probably be
-   *  factored out at some point.
    */
   function attachControls(anchor: JQuery) {
     anchor.each(function (i, divElt) {
