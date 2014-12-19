@@ -94,7 +94,7 @@ module Esper.Gmail {
   }
 
   /** Returns whether the currently focused cursor is in the given
-   * GMail reply text field.
+   *  GMail reply text field.
    */
   export function caretInField(field) {
     return $(window.getSelection().anchorNode).closest(field).length > 0;
@@ -110,5 +110,35 @@ module Esper.Gmail {
       return plusName.css("color");
     else
       return "rgb(64, 64, 64)";
+  }
+
+  /** Opens up a reply dialog in the current thread, by clicking the
+   *  reply link. Optionally inserts the given HTML or text into the
+   *  resulting text field.
+   *
+   *  If the reply field is already open, it should be focused and the
+   *  given html will be inserted.
+   */
+  export function replyToThread(html?) {
+    $(".amn").last().find("span").first().click();
+    replyTextField(compositionToolbar().last()).focus();
+    
+    if (html) insertInFocusedField(html);
+  }
+
+  /** Inserts the given HTML or text into the currently focused input
+   *  field.
+   */
+  export function insertInFocusedField(html) {
+    // replace the selection (if any) at the caret:
+    var selection = window.getSelection()
+    var range     = selection.getRangeAt(0);
+
+    html = "<span>" + html + "</span>";
+
+    range.deleteContents();
+
+    var node = $(html)[0];
+    range.insertNode(node);
   }
 }

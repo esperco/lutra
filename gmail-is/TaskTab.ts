@@ -500,10 +500,21 @@ module Esper.TaskTab {
         Promise.join(deleteCalls).done(function() {
           refreshEventLists(team, threadId, taskTab, profiles);
         });
+
+        chooseEvent();
       }
     });
 
     return optionsView;
+  }
+
+  function chooseEvent() {
+    CurrentThread.withPreferences(function (preferences) {
+      // Pre-fill a confirmation email, if appropriate:
+      if (preferences.general.send_exec_confirmation) {
+        Gmail.replyToThread();
+      }
+    });
   }
 
   function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
