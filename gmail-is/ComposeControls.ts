@@ -120,22 +120,9 @@ module Esper.ComposeControls {
     });
 
     confirmButton.click(function () {
-      if (CurrentThread.team.isValid()) {
-        var team = CurrentThread.team.get();
-        var events = CurrentThread.linkedEvents.get();
-        var message = "Confirming the following events:<br />";
+      var message = CurrentThread.confirmMessage();
 
-        events.forEach(function (ev_) {
-          var ev = ev_.event;
-          var title = ev.title || "";
-          var location = ev.location || "";
-
-          var locationStr = location !== "" ? " at " + locationStr : "";
-          message += title + locationStr + "<br />";
-        });
-        
-        composeControls.insertAtCaret(message);
-      }
+      if (message) composeControls.insertAtCaret(message);
     });
 
     return confirmButton;

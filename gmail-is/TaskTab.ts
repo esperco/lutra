@@ -512,7 +512,7 @@ module Esper.TaskTab {
     CurrentThread.withPreferences(function (preferences) {
       // Pre-fill a confirmation email, if appropriate:
       if (preferences.general.send_exec_confirmation) {
-        Gmail.replyToThread();
+        Gmail.replyToThread(CurrentThread.confirmMessage());
       }
     });
   }
