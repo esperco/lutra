@@ -21,6 +21,7 @@ module Esper.CalPicker {
     calendarPickerContainer : JQuery;
     dateJumper : JQuery;
     eventTitle : JQuery;
+    eventLocation : JQuery;
     pickerSwitcher : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
@@ -37,14 +38,16 @@ module Esper.CalPicker {
       <div class="esper-event-settings-col">
         <span class="esper-bold">Event title:</span>
         <input #eventTitle type="text" size="24" class="esper-input"/>
+        <br/>
+        <span class="esper-bold">Location:</span>
+        <input #eventLocation type="text" size="24" class="esper-input"/>
+        <br/>
+        <span class="esper-bold">Thread participants:</span>
+        <span #guestNames/>
       </div>
       <div class="esper-event-settings-col">
         <span class="esper-bold">Save events to:</span>
         <select #pickerSwitcher class="esper-select"/>
-      </div>
-      <div>
-        <span class="esper-bold">Thread participants:</span>
-        <span #guestNames/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -291,6 +294,7 @@ module Esper.CalPicker {
     view : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
     eventTitle : JQuery;
+    eventLocation : JQuery;
     render : () => void;
   }
 
@@ -309,6 +313,7 @@ module Esper.CalPicker {
       view: pickerView.view,
       events: pickerView.events,
       eventTitle: pickerView.eventTitle,
+      eventLocation: pickerView.eventLocation,
       render: render, // to be called after attaching the view to the dom tree
     };
   };
@@ -349,7 +354,8 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev : FullCalendar.EventObject, eventTitle)
+  function makeEventEdit(ev : FullCalendar.EventObject,
+                         eventTitle, eventLocation)
     : ApiT.CalendarEventEdit
   {
     return {
@@ -357,6 +363,7 @@ module Esper.CalPicker {
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
       title: eventTitle.val(),
+      location: { title: "", address: eventLocation.val() },
       guests: []
     };
   }
@@ -416,8 +423,11 @@ module Esper.CalPicker {
 
     save.click(function() {
       var events = [];
-      for (var k in picker.events)
-        events.push(makeEventEdit(picker.events[k], picker.eventTitle));
+      for (var k in picker.events) {
+        var edit = makeEventEdit(picker.events[k],
+                                 picker.eventTitle, picker.eventLocation);
+        events.push(edit);
+      }
 
       // Wait for link
       var linkCalls = List.map(events, function(ev) {
