@@ -141,4 +141,23 @@ module Esper.Gmail {
     var node = $(html)[0];
     range.insertNode(node);
   }
+
+  /** Given a proportion between 0 and 1, scrolls to that much of the
+   *  thread. 0 scrolls to the top, 0.5 to the middle and 1 to the
+   *  bottom.
+   *
+   *  The optional time argument specifies how long the animation
+   *  should last, in milliseconds. The default is 500 milliseconds.
+   */
+  export function scrollThread(proportion: number, time?: number) {
+    time = time || 500;
+
+    // The extra 100 accounts for the height of our compose toolbar.
+    var threadHeight = $("div.Tm div.nH.aHU").height() + 200;
+
+    $("div.Tm").animate({
+      scrollTop :
+        proportion * (threadHeight - $(window).height())
+    }, time);
+  }
 }

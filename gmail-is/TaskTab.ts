@@ -508,11 +508,13 @@ module Esper.TaskTab {
     return optionsView;
   }
 
-  function chooseEvent() {
+  export function chooseEvent() {
     CurrentThread.withPreferences(function (preferences) {
       // Pre-fill a confirmation email, if appropriate:
       if (preferences.general.send_exec_confirmation) {
         Gmail.replyToThread(CurrentThread.confirmMessage());
+        
+        Gmail.scrollThread(1);
       }
     });
   }
