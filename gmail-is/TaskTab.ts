@@ -70,7 +70,9 @@ module Esper.TaskTab {
     return viewPerson;
   }
 
-  function openInviteGuestsModal(team, e, threadId, taskTab, profiles, prefs) {
+  function openInviteGuestsModal(team: ApiT.Team,
+                                 e: ApiT.CalendarEvent,
+                                 threadId, taskTab, profiles, prefs) {
 '''
 <div #view>
   <div #background class="esper-modal-bg">
@@ -464,7 +466,7 @@ module Esper.TaskTab {
     })
 
     inviteGuests.click(function() {
-      Api.getPreferences(team.teamid).done(function(prefs) {
+      CurrentThread.withPreferences(function(prefs) {
         openInviteGuestsModal(team, e, threadId, taskTab, profiles, prefs);
       });
     });
@@ -501,14 +503,19 @@ module Esper.TaskTab {
           refreshEventLists(team, threadId, taskTab, profiles);
         });
 
-        chooseEvent();
+        chooseEvent(e);
       }
     });
 
     return optionsView;
   }
 
-  export function chooseEvent() {
+  export function chooseEvent(event : ApiT.CalendarEvent) {
+'''
+<div #controls class="esper-below-thread">
+  <div #inviteGuests> Invite Guests </div>
+</div>
+'''
     CurrentThread.withPreferences(function (preferences) {
       // Pre-fill a confirmation email, if appropriate:
       if (preferences.general.send_exec_confirmation) {
@@ -516,6 +523,13 @@ module Esper.TaskTab {
         
         Gmail.scrollThread(1);
       }
+
+      Gmail.threadContainer().after(controls);
+      inviteGuests.click(function () {
+        openInviteGuestsModal(CurrentThread.team.get(), event,
+                              CurrentThread.threadId.get(), currentTaskTab,
+                              Sidebar.profiles, preferences);
+      });
     });
   }
 

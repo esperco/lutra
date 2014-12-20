@@ -142,6 +142,13 @@ module Esper.Gmail {
     range.insertNode(node);
   }
 
+  /** Returns the div that contains all the thread posts and
+   *  composition controls.
+   */
+  export function threadContainer() {
+    return $("div.Tm div.nH.aHU");
+  }
+
   /** Given a proportion between 0 and 1, scrolls to that much of the
    *  thread. 0 scrolls to the top, 0.5 to the middle and 1 to the
    *  bottom.
@@ -153,7 +160,7 @@ module Esper.Gmail {
     time = time || 500;
 
     // The extra 100 accounts for the height of our compose toolbar.
-    var threadHeight = $("div.Tm div.nH.aHU").height() + 200;
+    var threadHeight = threadContainer().height() + 200;
 
     $("div.Tm").animate({
       scrollTop :
