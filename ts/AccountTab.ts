@@ -412,14 +412,14 @@ module AccountTab {
       } else {
         var stripeToken = response.id;
         Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
-          if (membership == "Entrepreneur") {
-            Api.setSubscription(execUid, teamid, "Entrepreneur");
+          if (membership == "Standard") {
+            Api.setSubscription(execUid, teamid, "Standard_20141222");
           }
-          else if (membership == "Executive") {
-            Api.setSubscription(execUid, teamid, "Executive");
+          else if (membership == "Enhanced") {
+            Api.setSubscription(execUid, teamid, "Enhanced_20141222");
           }
-          else if (membership == "VIP") {
-            Api.setSubscription(execUid, teamid, "VIP");
+          else if (membership == "Pro") {
+            Api.setSubscription(execUid, teamid, "Pro_20141222");
           }
           (<any> paymentForm.get(0)).reset();
           (<any> modal).modal("hide"); // FIXME
@@ -461,12 +461,12 @@ module AccountTab {
 
     name.text(membership);
 
-    if (membership == "Entrepreneur") {
-      price.text("$299/mo");
-    } else if (membership == "Executive") {
+    if (membership == "Standard") {
+      price.text("$259/mo");
+    } else if (membership == "Enhanced") {
+      price.text("$399/mo");
+    } else if (membership == "Pro") {
       price.text("$599/mo");
-    } else if (membership == "VIP") {
-      price.text("$1,199/mo");
     }
 
     return view;
@@ -487,9 +487,9 @@ module AccountTab {
         <div #daysRemaining class="membership-modal-note"/>
         <div #suspension class="membership-modal-note"/>
         <div class="membership-options clearfix">
-          <div #entrepreneur class="membership-option"/>
-          <div #executive class="membership-option"/>
-          <div #VIP class="membership-option"/>
+          <div #planLo class="membership-option"/>
+          <div #planMid class="membership-option"/>
+          <div #planHi class="membership-option"/>
         </div>
       </div>
       <div class="modal-footer">
@@ -537,39 +537,39 @@ module AccountTab {
           .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // must be active
-        if (membershipPlan == "Entrepreneur") {
-          entrepreneur.addClass("selected");
-        } else if (membershipPlan == "Executive") {
-          executive.addClass("selected");
-        } else if (membershipPlan == "VIP") {
-          VIP.addClass("selected");
+        if (membershipPlan == "Standard") {
+          planLo.addClass("selected");
+        } else if (membershipPlan == "Enhanced") {
+          planMid.addClass("selected");
+        } else if (membershipPlan == "Pro") {
+          planHi.addClass("selected");
         }
       }
 
-      entrepreneur.append(viewOfMembershipOption("Entrepreneur"));
-      executive.append(viewOfMembershipOption("Executive"));
-      VIP.append(viewOfMembershipOption("VIP"));
+      planLo.append(viewOfMembershipOption("Standard"));
+      planMid.append(viewOfMembershipOption("Enhanced"));
+      planHi.append(viewOfMembershipOption("Pro"));
 
       var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
-        entrepreneur.removeClass("selected");
-        executive.removeClass("selected");
-        VIP.removeClass("selected");
+        planLo.removeClass("selected");
+        planMid.removeClass("selected");
+        planHi.removeClass("selected");
         option.addClass("selected");
       }
 
-      entrepreneur.click(function() {
-        selectMembership(entrepreneur);
-        selectedMembership = "Entrepreneur";
+      planLo.click(function() {
+        selectMembership(planLo);
+        selectedMembership = "Standard";
       });
-      executive.click(function() {
-        selectMembership(executive);
-        selectedMembership = "Executive";
+      planMid.click(function() {
+        selectMembership(planMid);
+        selectedMembership = "Enhanced";
       });
-      VIP.click(function() {
-        selectMembership(VIP);
-        selectedMembership = "VIP";
+      planHi.click(function() {
+        selectMembership(planHi);
+        selectedMembership = "Pro";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
