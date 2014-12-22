@@ -9,7 +9,11 @@ module Esper.CalPicker {
   export var writeToCalendar : ApiT.Calendar;
 
   // The team calendars whose events are currently displayed
-  var showCalendars : { [calid : string] : any } = {};
+  var showCalendars : { [calid : string] : string /* tz */ } = {};
+
+  // The timezone that these calendars are displayed in
+  var showTimezone : string; // America/Los_Angeles, America/New_York, etc.
+  var showZoneAbbr : string; // PST, EDT, etc.
 
   /* This should be a parameter to fetchEvents, but fullCalendar calls
      that function for us, and I can only trigger it by doing
@@ -26,6 +30,12 @@ module Esper.CalPicker {
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
+  }
+
+  function zoneAbbr(zoneName) {
+    return zoneName === "UTC" ?
+      "UTC" : // moment-tz can't handle it
+      (<any> moment).tz(moment(), zoneName).zoneAbbr();
   }
 
   function createView(refreshCal, userSidebar,
@@ -58,11 +68,16 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
+    showCalendars = {}; // Clear out old entries from previous views
+    userSidebar.calendarsContainer.children().remove();
+
     var calendars = team.team_calendars;
     writeToCalendar = calendars[0];
-    showCalendars = {}; // Clear out old entries from previous views
-    showCalendars[writeToCalendar.google_cal_id] = {};
-    userSidebar.calendarsContainer.children().remove();
+    showCalendars[writeToCalendar.google_cal_id] =
+      writeToCalendar.calendar_timezone;
+    showTimezone = writeToCalendar.calendar_timezone;
+    showZoneAbbr = zoneAbbr(showTimezone);
+
     List.iter(calendars, function(cal, i) {
 '''
 <div #calendarCheckboxRow class="esper-calendar-checkbox">
@@ -71,17 +86,22 @@ module Esper.CalPicker {
 </div>
 '''
       if (i === 0) calendarCheckbox.prop("checked", true);
+
+      var abbr = zoneAbbr(cal.calendar_timezone);
+
       calendarCheckbox.click(function() {
-        if (this.checked) showCalendars[cal.google_cal_id] = {};
-        else delete showCalendars[cal.google_cal_id];
+        if (this.checked)
+          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
+        else
+          delete showCalendars[cal.google_cal_id];
         calendarView.fullCalendar("refetchEvents");
       });
-      var tz =
-        cal.calendar_timezone === "UTC" ? "UTC" : // moment-tz can't handle it
-        (<any> moment).tz(moment(), cal.calendar_timezone).zoneAbbr();
-      calendarName.text(cal.calendar_title + " (" + tz + ")");
+
+      calendarName.text(cal.calendar_title + " (" + abbr + ")");
+      calendarCheckboxRow.data("tz", cal.calendar_timezone);
       calendarCheckboxRow.appendTo(userSidebar.calendarsContainer);
     });
+
     userSidebar.calendarsSection.show();
 
     refreshCal.click(function() {
@@ -159,6 +179,24 @@ module Esper.CalPicker {
     return m.toDate();
   }
 
+  /* Given an ISO 8601 timestamp in local time (without timezone info),
+     assume its timezone is fromTZ (the calendar zone)
+     and apply the necessary changes to express it in toTZ (display zone).
+  */
+  function shiftTime(timestamp, fromTZ, toTZ) {
+    var local = timestamp.replace(/Z$/, "");
+    var inCalendarTZ = (<any> moment).tz(local, fromTZ);
+    var inDisplayTZ = (<any> inCalendarTZ).tz(toTZ);
+    return (<any> inDisplayTZ).format();
+  }
+
+  /* An event along with the timezone of the calendar that it's on,
+     so we know how to interpret its local start/end times.
+  */
+  interface TZCalendarEvent extends ApiT.CalendarEvent {
+    calendarTZ : string;
+  }
+
   /*
     Translate calendar events as returned by the API into
     the format supported by Fullcalendar.
@@ -167,33 +205,46 @@ module Esper.CalPicker {
     Output event type:
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
-  function importEvents(esperEvents : ApiT.CalendarEvent[]) {
+  function importEvents(esperEvents : TZCalendarEvent[]) {
     return List.map(esperEvents, function(x) {
       var ev = {
         title: x.title, /* required */
         allDay: x.all_day,
-        start: x.start.local, /* required */
-        end: x.end.local, /* required */
+        start: shiftTime(x.start.local, x.calendarTZ, showTimezone), /* req */
+        end: shiftTime(x.end.local, x.calendarTZ, showTimezone), /* req */
         orig: x /* custom field */
       };
       return ev;
     });
   }
 
+  function addTZToEvents(calid, events) {
+    return List.map(events, function(ev) {
+      (<TZCalendarEvent> ev).calendarTZ = showCalendars[calid];
+      return ev;
+    });
+  }
+
   function fetchEvents(team: ApiT.Team,
                        momentStart, momentEnd, tz, callback) {
-    // TODO Display tz?
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
-    var cacheFetches =
+    var cacheFetches : JQueryPromise<TZCalendarEvent[]>[] =
       List.map(Object.keys(showCalendars), function(calid) {
         var cache = CalCache.getCache(team.teamid, calid);
         if (refreshCache) {
-          return cache.fetch(start, end);
+          return cache.fetch(start, end).then(function(calEvents) {
+            return addTZToEvents(calid, calEvents);
+          });
         } else {
           var cached = cache.get(start, end);
-          if (cached === null) return cache.fetch(start, end);
-          else return Promise.defer(cached);
+          var fetch =
+            (cached === null) ?
+            cache.fetch(start, end) :
+            Promise.defer(cached);
+          return fetch.then(function(calEvents) {
+            return addTZToEvents(calid, calEvents);
+          });
         }
       });
     Promise.join(cacheFetches).done(function(ll) {
@@ -307,6 +358,8 @@ module Esper.CalPicker {
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
+      $(".fc-day-grid").find("td").first()
+        .html("all-day<br/>(" + showZoneAbbr + ")");
     }
 
     return {
