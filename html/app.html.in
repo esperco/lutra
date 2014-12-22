@@ -24,7 +24,7 @@
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 
     <script>
-        Stripe.setPublishableKey('pk_test_QS0EG9icW0OMWao2h4JPgVTY');
+      Stripe.setPublishableKey('pk_live_ntMF09YuECJYPD6A9c4sfdHG');
     </script>
 
   </head>

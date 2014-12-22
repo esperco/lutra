@@ -376,9 +376,6 @@ module AccountTab {
       expYear.append($("<option value=" + i + ">" + year + "</option>"));
     }
 
-    // TODO: Change this to live key
-    Stripe.setPublishableKey('pk_test_tDzGbpaybyFQ3A7XGF6ctE3f');
-
     var checkInput = function(ccInfo, valid, date) {
       if (!valid) {
         ccInfo.val("");
