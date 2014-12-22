@@ -143,9 +143,12 @@ module Esper.TaskTab {
 
     pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
     if (undefined !== e.description) {
+      /*
       var separatorIndex = e.description.search(/=== Conversation ===/);
       if (separatorIndex !== -1)
         pubNotes.val(e.description.substring(0, separatorIndex).trim());
+      */
+      pubNotes.val(e.description);
     }
     if (undefined !== e.location) {
       var loc = e.location.address;
