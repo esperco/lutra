@@ -63,11 +63,11 @@ module Esper.FinalizeEvent {
       return e.event;
     });
     var holds = justHolds(linkedEvents).filter(function (other) {
-      return other.event.google_event_id != id;
+      return other.google_event_id != id;
     });
 
     var deleteCalls = holds.map(function (hold) {
-      var holdId = hold.event.google_event_id;
+      var holdId = hold.google_event_id;
       var threadId = CurrentThread.threadId.get();
 
       return Api.deleteLinkedEvent(team.teamid, threadId, holdId);
@@ -81,12 +81,14 @@ module Esper.FinalizeEvent {
    *  as well as all non-hold events.
    */
   export function confirmMessage(event: ApiT.CalendarEvent): string {
-    if (team.isValid()) {
-      var events = notHolds(linkedEvents.get(), event).concat([event]);
+    if (CurrentThread.team.isValid()) {
+      var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
+        return e.event;
+      });
+      var events = notHolds(linkedEvents).concat([event]);
       var message = "Confirming the following events:<br />";
 
-      return events.reduce(function (message, ev_) {
-        var ev = ev_.event;
+      return events.reduce(function (message, ev) {
         var title = ev.title || "";
         var location = ev.location || "";
         var locationStr = location !== "" ? " at " + locationStr : "";
@@ -115,19 +117,7 @@ module Esper.FinalizeEvent {
    */
   export function inviteGuests(event: ApiT.CalendarEvent,
                                preferences: ApiT.Preferences) {
-'''
-<div #controls class="">
-  <div #inviteGuests> Invite Guests </div>
-</div>
-'''
-    Gmail.threadContainer().after(controls);
-
-    inviteGuests.click(function () {
-      // TODO: Move the invite guests UI into here and out of a modal.
-      TaskTab.openInviteGuestsModal(CurrentThread.team.get(), event,
-                            CurrentThread.threadId.get(), TaskTab.currentTaskTab,
-                            Sidebar.profiles, preferences);
-    });
+    Gmail.threadContainer().after(InviteControls.widget(event));
   }
 
   /** Executes the whole finalize flow on the given event. */
