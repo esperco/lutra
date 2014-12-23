@@ -146,7 +146,7 @@ module Esper.Gmail {
    *  composition controls.
    */
   export function threadContainer() {
-    return $("div.Tm div.nH.aHU");
+    return $("div.Tm div.nH.if");
   }
 
   /** Given a proportion between 0 and 1, scrolls to that much of the

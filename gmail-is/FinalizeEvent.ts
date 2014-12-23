@@ -117,7 +117,7 @@ module Esper.FinalizeEvent {
    */
   export function inviteGuests(event: ApiT.CalendarEvent,
                                preferences: ApiT.Preferences) {
-    Gmail.threadContainer().after(InviteControls.widget(event));
+    Gmail.threadContainer().append(InviteControls.widget(event));
   }
 
   /** Executes the whole finalize flow on the given event. */
