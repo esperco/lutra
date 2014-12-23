@@ -76,6 +76,7 @@ APP_SOURCES = \
   ComposeControls \
   ComposeToolbar \
   CurrentThread \
+  FinalizeEvent \
   TaskList \
   Menu \
   Sidebar \

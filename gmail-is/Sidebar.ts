@@ -3,6 +3,7 @@
 */
 module Esper.Sidebar {
 
+  // TODO: Move this somewhere more logical!
   export var profiles : ApiT.Profile[];
 
   export function customizeSelectArrow(selector) {

@@ -70,7 +70,7 @@ module Esper.TaskTab {
     return viewPerson;
   }
 
-  function openInviteGuestsModal(team: ApiT.Team,
+  export function openInviteGuestsModal(team: ApiT.Team,
                                  e: ApiT.CalendarEvent,
                                  threadId, taskTab, profiles, prefs) {
 '''
@@ -493,47 +493,13 @@ module Esper.TaskTab {
     chooseThisEvent.click(function() {
       var msg = "Other linked events will be deleted. Are you sure?";
       if (window.confirm(msg)) { // TODO Style me
-        var thisEventId = e.google_event_id;
         view.parent().find(".esper-ev").addClass("esper-disabled");
-        var deleteCalls = List.map(linkedEvents, function(ev) {
-          var otherEventId = ev.event.google_event_id;
-          if (otherEventId !== thisEventId)
-            return Api.deleteLinkedEvent(team.teamid, threadId, otherEventId);
-          else
-            return Promise.defer(void(0));
-        });
-        Promise.join(deleteCalls).done(function() {
-          refreshEventLists(team, threadId, taskTab, profiles);
-        });
 
-        chooseEvent(e);
+        FinalizeEvent.finalizeEvent(e);
       }
     });
 
     return optionsView;
-  }
-
-  export function chooseEvent(event : ApiT.CalendarEvent) {
-'''
-<div #controls class="esper-below-thread">
-  <div #inviteGuests> Invite Guests </div>
-</div>
-'''
-    CurrentThread.withPreferences(function (preferences) {
-      // Pre-fill a confirmation email, if appropriate:
-      if (preferences.general.send_exec_confirmation) {
-        Gmail.replyToThread(CurrentThread.confirmMessage());
-        
-        Gmail.scrollThread(1);
-      }
-
-      Gmail.threadContainer().after(controls);
-      inviteGuests.click(function () {
-        openInviteGuestsModal(CurrentThread.team.get(), event,
-                              CurrentThread.threadId.get(), currentTaskTab,
-                              Sidebar.profiles, preferences);
-      });
-    });
   }
 
   function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],

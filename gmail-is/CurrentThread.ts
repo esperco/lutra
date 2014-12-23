@@ -80,25 +80,4 @@ module Esper.CurrentThread {
 
     return teamCal.calendar_timezone;
   }
-
-  /** Returns the text of the message for confirming every linked
-   * event.
-   */
-  export function confirmMessage(): string {
-    if (team.isValid()) {
-      var events = linkedEvents.get();
-      var message = "Confirming the following events:<br />";
-
-      return events.reduce(function (message, ev_) {
-        var ev = ev_.event;
-        var title = ev.title || "";
-        var location = ev.location || "";
-        var locationStr = location !== "" ? " at " + locationStr : "";
-
-        return message + title + locationStr + "<br />";
-      }, message);
-    } else {
-      return null;
-    }
-  }
 }
