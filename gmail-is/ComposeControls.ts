@@ -104,34 +104,9 @@ module Esper.ComposeControls {
     return createButton;
   }
 
-  /** Populates a confirmation message for the exec. Only shows up if
-   *  the "confirm with exec" checkbox in the settings is checked.
-   */
-  function confirmButton(composeControls) {
-'''
-<div #confirmButton title class="esper-composition-button esper-exec-confirm">
-  <span> Confirm </span>
-</div>
-'''
-    CurrentThread.withPreferences(function (preferences) {
-      if (preferences.general.send_exec_confirmation) {
-        confirmButton.show();
-      }
-    });
-
-    confirmButton.click(function () {
-      var message = CurrentThread.confirmMessage();
-
-      if (message) composeControls.insertAtCaret(message);
-    });
-
-    return confirmButton;
-  }
-
   export function init() {
     ComposeToolbar.registerControl(insertButton);
     ComposeToolbar.registerControl(createButton);
-    ComposeToolbar.registerControl(confirmButton);
   }
 
   $(init);
