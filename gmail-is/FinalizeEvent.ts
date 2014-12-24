@@ -50,6 +50,35 @@ module Esper.FinalizeEvent {
     });
   }
 
+  /** Sets whether the given event is a hold or not. Right now, this
+   *  change is accomplished by adding or removing "HOLD: " from the
+   *  event title.
+   */
+  export function setHold(event: ApiT.CalendarEvent, hold: boolean) {
+    var edit = {
+      google_event_id : event.google_event_id,
+      google_cal_id   : event.google_cal_id,
+      guests          : [],
+      summary         : event.title,
+      start           : { dateTime : event.start.local },
+      end             : { dateTime : event.end.local }
+    };
+
+    if (isHold(event) != hold) {
+      if (hold) {
+        edit.summary = "HOLD: " + edit.summary;
+      } else {
+        edit.summary = edit.summary.replace(/^HOLD: /, "");
+      }
+
+      var teamid = CurrentThread.team.get().teamid;
+      var threadId = CurrentThread.threadId.get();
+      return Api.updateLinkedEvent(teamid, threadId, event.google_event_id, edit);
+    } else {
+      return null;
+    }
+  }
+
   /** Deletes all other holds linked to the same task. If this is a
    *  hold itself, turns it into a real event.
    *
@@ -66,19 +95,24 @@ module Esper.FinalizeEvent {
       return other.google_event_id != id;
     });
 
-    var deleteCalls = holds.map(function (hold) {
+    var calls = holds.map(function (hold) {
       var holdId = hold.google_event_id;
       var threadId = CurrentThread.threadId.get();
 
       return Api.deleteLinkedEvent(team.teamid, threadId, holdId);
     });
 
-    Promise.join(deleteCalls).done(done);
+    var updateCall = setHold(event, false);
+    if (updateCall) calls.push(updateCall);
+
+    Promise.join(calls).done(done);
   }
 
 
   /** Returns the text of the message for confirming the given hold,
    *  as well as all non-hold events.
+   *
+   *  Strips "HOLD: " from all event titles.
    */
   export function confirmMessage(event: ApiT.CalendarEvent): string {
     if (CurrentThread.team.isValid()) {
@@ -90,6 +124,8 @@ module Esper.FinalizeEvent {
 
       return events.reduce(function (message, ev) {
         var title = ev.title || "";
+        title = title.replace(/^HOLD: /, "");
+
         var location = ev.location || "";
         var locationStr = location !== "" ? " at " + locationStr : "";
 

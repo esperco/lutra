@@ -125,6 +125,18 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
+  export function updateLinkedEvent(teamid, threadId, eventId, eventEdit):
+  JQueryDeferred<void> {
+    // needed to appease the Gcal_j.event_edit parser.
+    eventEdit.reminders = { useDefault : true };
+    var url =
+      Conf.Api.url + "/api/thread/event/" + Login.myUid()
+      + "/" + teamid
+      + "/" + threadId
+      + "/" + eventId;
+    return JsonHttp.post(url, JSON.stringify(eventEdit));
+  }
+
   export function eventSearch(teamid, teamCalendars, query):
   JQueryDeferred<ApiT.CalendarEventList> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
