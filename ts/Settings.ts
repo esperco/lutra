@@ -187,7 +187,7 @@ module Settings {
 '''
     clearSync.click(function() {
       Login.clearAllLoginInfo();
-      Signin.signin(function(){}, undefined, undefined, undefined);
+      Signin.signin(function(){});
     });
 
     button.click(function() {

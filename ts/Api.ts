@@ -161,9 +161,19 @@ module Api {
     This is used for invites and other URLs that are given out to users.
    */
   export function postToken(token)
-    : JQueryDeferred<ApiT.LoginResponse>
+  : JQueryDeferred<ApiT.TokenInfo>
   {
     return jsonHttpPost("/api/token/" + encodeURIComponent(token), "");
+  };
+
+  export function postTokenEmail(token: string, email: string, name: string)
+  : JQueryDeferred<ApiT.TokenInfo>
+  {
+    var path =
+      "/api/token-email/" + encodeURIComponent(token)
+      + "/" + encodeURIComponent(email)
+      + "/" + encodeURIComponent(name);
+    return jsonHttpPost(path, "");
   };
 
 

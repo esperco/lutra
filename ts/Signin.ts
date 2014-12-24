@@ -165,6 +165,28 @@ module Signin {
       );
   }
 
+  function useInviteWithNameAndEmail(inviteCode: string,
+                                     email: string,
+                                     name: string) {
+    return Api.postTokenEmail(inviteCode, email, name)
+      .then(
+        /* success */
+        function(tokenDescription) {
+          var loginView =
+            displayLoginLinks(
+              "Thanks for signing up! We'll contact you shortly.",
+              "#!",
+              inviteCode,
+              undefined);
+          showTokenDetails(loginView, tokenDescription);
+        },
+        /* failure */
+        function() {
+          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
+        }
+      );
+  }
+
   function loginOrSignup(optEmail) {
     Log.p("loginOrSignup");
     var uid = Login.me();
@@ -210,10 +232,17 @@ module Signin {
       });
   }
 
-  export function signin(whenDone, optArgs, optInviteCode, optEmail) {
+  export function signin(whenDone,
+                         optArgs?,
+                         optInviteCode?: string,
+                         optEmail?: string,
+                         optName?: string) {
     document.title = "Sign in - Esper";
-    if (Util.isString(optInviteCode)) {
-      useInvite(optInviteCode);
+    if (optInviteCode != undefined) {
+      if (optEmail != undefined && optName != undefined)
+        useInviteWithNameAndEmail(optInviteCode, optEmail, optName);
+      else
+        useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)
         .done(function(ok) {
