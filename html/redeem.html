@@ -23,73 +23,66 @@
     <ul class="nav-menu"></ul>
 
     <!-- Splash -->
-    <img class="splash" src="img/splash_holiday.jpg"> <!-- change the src="..." to link to new image -->
+    <img class="splash" src="img/splash_holiday.jpg">
     <div class="splash-content">
       <div class="splash-navbar clearfix"></div>
       <div class="splash-text-container">
         <div class="splash-text">
-          <h1>Happy Holidays!</h1> <!-- Change this to alter the title -->
+          <h1>Happy Holidays!</h1>
         </div>
       </div>
     </div>
 
-    <!-- Join the waiting list -->
     <div id="waiting-list" class="section-container gray">
       <div class="waiting-list-form">
 
-        <div class="waiting-list-description left"> <!-- Edit this text to change the paragraphs on the page -->
-          <p> It's the season of giving, and we'd love to support you with one of our assistants for a free trial period! Just fill out the form to the right, and we'll reach out to you.</p>
+        <div class="waiting-list-description left">
           <p>
-            Sincerely,<br>
-            The Esper Team</p>
+            It's the season of giving, and we'd love to support you
+            with one of our assistants for a free trial period! Just
+            fill out the form to the right, and we'll reach out to you.
+          </p>
+          <p>
+            Sincerely,
+            <br>
+            The Esper Team
+          </p>
        </div>
 
-        <!-- Mailchimp Form -->
-        <div id="mc_embed_signup" class="left">
-          <form id="redeem-form" action="http://esper.us9.list-manage.com/subscribe/post?u=8158de07fd0008052ebb78ee6&amp;id=c9445f1aa2" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-            <div class="name-field left">
-              <input type="text" placeholder="First Name" name="FNAME" class="required" id="mce-FNAME" autofocus>
+        <form id="redeem-form" class="redeem-form">
+          <div class="name-field left">
+            <input id="first-name"
+                   type="text"
+                   placeholder="First Name"
+                   autofocus/>
             </div>
             <div class="name-field right">
-              <input type="text" placeholder="Last Name" name="LNAME" class="required" id="mce-LNAME">
+              <input id="last-name"
+                     type="text"
+                     placeholder="Last Name"/>
             </div>
             <div class="name-field left">
-              <input id="redeem-code" type="text" placeholder="Promotion Code" name="MMERGE5" class="required email" id="mce-MMERGE5" maxlength="9">
+              <input id="redeem-code"
+                     type="text"
+                     placeholder="Promotion Code"
+                     maxlength="9">
             </div>
 
             <div>
-              <input type="email" placeholder="Email Address" name="EMAIL" class="required email" id="mce-EMAIL">
-            </div>
-            <div class="email-platform-row clearfix">
-              <span class="email-platform-label">Email Platform</span>
-              <select name="MMERGE3" class="required" id="mce-MMERGE3">
-                <option value="Google Apps">Google Apps</option>
-                <option value="Microsoft Exchange">Microsoft Exchange</option>
-                <option value="Microsoft Office 365">Microsoft Office 365</option>
-                <option value="IBM (Lotus Notes)">IBM (Lotus) Notes</option>
-                <option value="Other/I Don't Know">Other / I don't know</option>
-              </select>
-            </div>
-            <div id="mce-responses" class="clear">
-              <div class="response" id="mce-error-response" style="display:none"></div>
-              <div class="response" id="mce-success-response" style="display:none"></div>
+              <input id="email"
+                     type="email"
+                     placeholder="Email Address">
             </div>
 
-
-
-             <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
             <div class="clear submit-button-row">
-              <button type="submit" value="Join" name="subscribe" class="button-primary submit-button">Submit</button>
-            </div>
-            <div style="position: absolute; left: -5000px;">
-              <input type="text" name="b_8158de07fd0008052ebb78ee6_31f4c34dec" tabindex="-1" value="">
-            </div>
-            <div>
-              <input type="hidden" value="New" name="USTATUS" id="ustatus">
+              <button type="submit"
+                      class="button-primary submit-button">
+                Submit
+              </button>
             </div>
           </form>
         </div>
-        <!--End mc_embed_signup-->
+
       </div>
     </div>
 
