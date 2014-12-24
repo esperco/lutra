@@ -131,7 +131,7 @@ function checkAndSubmitRedeemForm() {
       e.preventDefault();
     else {
       var url =
-        "https://app.esper.com/#!t/" + encodeURIComponent(code)
+        "https://app.esper.com/#!redeem/" + encodeURIComponent(code)
         + "/" + encodeURIComponent(email)
         + "/" + encodeURIComponent(firstName + " " + lastName);
       console.log(url);
