@@ -77,6 +77,26 @@ module ApiT {
     missing_shared_calendar: boolean;
   }
 
+  export interface TokenInfo {
+    token_is_valid: boolean;
+    token_value: any /* token_response */;
+  }
+
+/*
+type token_response = [
+  | Invite_create_team of invite_create_team
+      (* Invitation to create a team, without specifying which
+         email address must be used for the account.
+      *)
+
+  | Invite_join_team of invite_join_team
+      (* Invitation to join an existing team. *)
+
+  | Login of login_response
+      (* One-time login; usable for password reset. *)
+]
+*/
+
   export interface TeamMember {
     member_email: string;
     member_uid: string;

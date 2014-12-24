@@ -3,13 +3,12 @@ module Route {
 
   export var nav : any = {}; // FIXME
 
-  function withLogin(whenDone, optArgs, optInviteCode, optEmail) {
-    Signin.signin(whenDone, optArgs, optInviteCode, optEmail);
-  }
-
-  // Version with one argument, so you don't have to type undefined 3 times
-  function withLogin1(whenDone) {
-    withLogin(whenDone, undefined, undefined, undefined);
+  function withLogin(whenDone,
+                     optArgs?,
+                     optInviteCode?: string,
+                     optEmail?: string,
+                     optName?: string) {
+    Signin.signin(whenDone, optArgs, optInviteCode, optEmail, optName);
   }
 
   var Router = window["can"].Control({ // FIXME
@@ -18,12 +17,19 @@ module Route {
 
     /* default path /!# */
     "route" : function(data){
-      withLogin1(Page.settings.load);
+      withLogin(Page.settings.load);
     },
 
     /* Generic invitation */
     "t/:token route" : function(data) {
       withLogin(Page.settings.load, undefined, data.token, undefined);
+    },
+
+    /* Gift code (same a generic invitation but collect also
+       an email address and a name */
+    "redeem/:token/:email/:name route" : function(data) {
+      withLogin(Page.settings.load, undefined,
+                data.token, data.email, data.name);
     },
 
     /* Sign-in via Google */
@@ -43,7 +49,7 @@ module Route {
     },
 
     "preferences route" : function (data) {
-      withLogin1(Page.preferences.load);
+      withLogin(Page.preferences.load);
     },
 
     "test route": function(data) {
