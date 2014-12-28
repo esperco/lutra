@@ -745,20 +745,32 @@ input.incorrect{
 }
 
 .redeem-form {
-  max-width: 400px;
+  display: inline-block;
+  max-width: 460px;
   margin: 0 auto;
   padding-top: 20px;
 }
 
 .name-field {
   @media (min-width:768px) {
-    float: left;
     width: 50%;
-    &.left { padding-right: 5px; }
-    &.right { padding-left: 5px; }
+    &.left {
+      padding-right: 5px;
+    }
+    &.right {
+      float: left;
+      padding-left: 5px;
+    }
+    &.row {
+      width: 100%;
+    }
   }
   @media (max-width:767px) { width: 100%; }
   margin-bottom: 14px;
+}
+
+input.email {
+  width: 100%;
 }
 
 #mce-FNAME, #mce-LNAME, #mce-EMAIL { width: 100%; }
@@ -774,9 +786,13 @@ input.incorrect{
 
 #mce-MMERGE3 { float: left; }
 
-.submit-button-row { margin: 0 4px; }
+.submit-button-row {
+  margin: 0 4px;
+}
 
-.submit-button { display: block; }
+.submit-button {
+  display: block;
+}
 
 
 /* Team */
