@@ -401,4 +401,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function getRestrictedDescription(teamid, eventid, guests):
+  JQueryDeferred<ApiT.EventDescription> {
+    var url =
+      Conf.Api.url + "/api/event/description/" + Login.myUid()
+      + "/" + teamid
+      + "/" + encodeURIComponent(eventid);
+    var guestEmails = List.map(guests, function(g : any) { return g.email; });
+    var body = { emails: guestEmails };
+    return JsonHttp.post(url, JSON.stringify(body));
+  }
+
 }

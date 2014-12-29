@@ -47,6 +47,49 @@ module Esper.TaskTab {
       });
   }
 
+  function openDescriptionModal(team, orig, dupe, guests, createAndInvite) {
+'''
+<div #view>
+  <div #background class="esper-modal-bg">
+    <div #modal class="esper-modal esper-description-modal">
+      <div #heading class="esper-modal-header">
+        Review the guest event description
+      </div>
+      <div class="esper-ev-modal-content">
+        <textarea #description rows=24
+                  class="esper-input esper-description-text">
+          Loading...
+        </textarea>
+      </div>
+      <div class="esper-modal-footer esper-clearfix">
+        <button #invite class="esper-btn esper-btn-primary modal-primary">
+          Invite
+        </button>
+        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    Api.getRestrictedDescription(team.teamid, orig.google_event_id, guests)
+      .done(function(desc) {
+        description.val(dupe.description + desc.description_text);
+      });
+
+    function closeModal() { view.remove(); }
+    cancel.click(closeModal);
+
+    invite.click(function() {
+      dupe.description = description.val();
+      invite.text("Inviting...").attr("disabled", true);
+      createAndInvite(dupe, closeModal);
+    });
+
+    $("body").append(view);
+  }
+
   function viewPersonInvolved(peopleInvolved, email, name) {
 '''
 <li #viewPerson>
@@ -104,7 +147,7 @@ module Esper.TaskTab {
           </div>
         </div>
         <div #notesRow class="esper-ev-modal-row esper-clearfix">
-          <div class="esper-ev-modal-left esper-bold">Description</div>
+          <div class="esper-ev-modal-left esper-bold">Notes</div>
           <div class="esper-ev-modal-right">
             <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
           </div>
@@ -125,8 +168,8 @@ module Esper.TaskTab {
         </div>
       </div>
       <div class="esper-modal-footer esper-clearfix">
-        <button #create class="esper-btn esper-btn-primary modal-primary">
-          Create
+        <button #next class="esper-btn esper-btn-primary modal-primary">
+          Next
         </button>
         <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
           Cancel
@@ -140,13 +183,11 @@ module Esper.TaskTab {
     Sidebar.customizeSelectArrow(fromSelect);
 
     pubTitle.val(undefined === e.title ? "Untitled event" : e.title);
+
     if (undefined !== e.description) {
-      /*
       var separatorIndex = e.description.search(/=== Conversation ===/);
       if (separatorIndex !== -1)
         pubNotes.val(e.description.substring(0, separatorIndex).trim());
-      */
-      pubNotes.val(e.description);
     }
     if (undefined !== e.location) {
       var loc = e.location.address;
@@ -222,15 +263,16 @@ module Esper.TaskTab {
 
     if (!duplicate) {
       heading.text("Invite guests to this calendar event");
+      next.text("Invite");
       titleRow.hide();
       whereRow.hide();
       calendarRow.hide();
       notesRow.hide();
     }
 
-    create.click(function() {
-      create.text(duplicate ? "Creating..." : "Inviting...");
-      create.prop("disabled", true);
+    next.click(function() {
+      if (!duplicate) next.text("Inviting...");
+      next.prop("disabled", true);
       var guests = [];
       for (var email in peopleInvolved) {
         guests.push({email: email, display_name: peopleInvolved[email]});
@@ -254,12 +296,16 @@ module Esper.TaskTab {
         guests:        guests,
       };
       if (duplicate) {
-        Api.createLinkedEvent(team.teamid, ev, threadId)
-          .done(function(created) {
-            closeModal();
-            Api.sendEventInvites(team.teamid, fromEmail, guests, created);
-            refreshlinkedEventsList(team, threadId, taskTab, profiles);
-          });
+        function createAndInvite(ev, closeModal) {
+          Api.createLinkedEvent(team.teamid, ev, threadId)
+            .done(function(created) {
+              closeModal();
+              Api.sendEventInvites(team.teamid, fromEmail, guests, created);
+              refreshlinkedEventsList(team, threadId, taskTab, profiles);
+            });
+        }
+        closeModal();
+        openDescriptionModal(team, e, ev, guests, createAndInvite);
       } else {
         Api.sendEventInvites(team.teamid, fromEmail, guests, e);
         closeModal();
