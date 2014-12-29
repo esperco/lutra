@@ -407,7 +407,8 @@ module Esper.Api {
       Conf.Api.url + "/api/event/description/" + Login.myUid()
       + "/" + teamid
       + "/" + encodeURIComponent(eventid);
-    var guestEmails = List.map(guests, function(g : any) { return g.email; });
+    var guestEmails =
+      List.map(guests, function(g : ApiT.Guest) { return g.email; });
     var body = { emails: guestEmails };
     return JsonHttp.post(url, JSON.stringify(body));
   }
