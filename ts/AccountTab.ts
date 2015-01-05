@@ -770,23 +770,16 @@ module AccountTab {
     });
 
     function updateStatus(mem) {
-      if (mem == "Trialing") {
-        membershipBadge.addClass("free-trial");
-      } else if (mem == "Unpaid") {
-        membershipBadge.addClass("suspended");
-      } else if (mem == "Past_due") {
-        membershipBadge.addClass("suspended");
-      } else if (mem == "Canceled") {
+      if (mem == "Trialing" || mem == "Active") {
+        membershipBadge.addClass("active");
+      } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
+        membershipBadge.text("None");
         membershipBadge.addClass("suspended");
-      } else {
-        membershipBadge.addClass("Active");
       }
 
-      if (mem === undefined)
-        membershipBadge.text("None");
-      else
+      if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 
       changeMembership.click(function() { showMembershipModal(team) });
