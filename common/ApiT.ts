@@ -319,4 +319,12 @@ module Esper.ApiT {
     task_weight: number;
   }
 
+  export interface EmailAddresses {
+    emails: string[];
+  }
+
+  export interface EventDescription {
+    description_text: string;
+  }
+
 }
