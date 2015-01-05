@@ -145,7 +145,7 @@ module Esper.FinalizeEvent {
       Gmail.replyToThread(confirmMessage(event));
     }
 
-    Gmail.scrollThread(1);
+    Gmail.scrollThread(0.9);
   }
 
   /** Depending on preferences, this provides controls to duplicate or
@@ -153,7 +153,7 @@ module Esper.FinalizeEvent {
    */
   export function inviteGuests(event: ApiT.CalendarEvent,
                                preferences: ApiT.Preferences) {
-    Gmail.threadContainer().append(InviteControls.widget(event));
+    InviteControls.insertAfterThread(event);
   }
 
   /** Executes the whole finalize flow on the given event. */

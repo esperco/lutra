@@ -146,7 +146,16 @@ module Esper.Gmail {
    *  composition controls.
    */
   export function threadContainer() {
-    return $("div.Tm div.nH.if");
+    return $("div.Tm div.nH.aHU");
+  }
+
+  /** The div containing information like % of inbox used and Google
+   *  copyright notice at the bottom of the GMail thread. For whatever
+   *  reason, this div seems to have extra padding set (right on the
+   *  element, not from a stylesheet) at inopportune times.
+   */
+  export function threadFooter() {
+    return $("div.l2.ov").first();
   }
 
   /** Given a proportion between 0 and 1, scrolls to that much of the
@@ -158,9 +167,7 @@ module Esper.Gmail {
    */
   export function scrollThread(proportion: number, time?: number) {
     time = time || 500;
-
-    // The extra 100 accounts for the height of our compose toolbar.
-    var threadHeight = threadContainer().height() + 200;
+    var threadHeight = threadContainer().parent().height();
 
     $("div.Tm").animate({
       scrollTop :

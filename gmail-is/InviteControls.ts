@@ -197,6 +197,17 @@ module Esper.InviteControls {
     return container;
   }
 
+  /** Inserts a new "Invite Guests" widget after the contents of the
+   *  GMail thread and fixes the formatting of another GMail div that
+   *  was causing problems.
+   */
+  export function insertAfterThread(event) {
+    Gmail.threadContainer().after(widget(event));
+
+    // fix mysteriously appearing padding at end of thread:
+    Gmail.threadFooter().css("padding-bottom", "10px");
+  }
+
   function viewPersonInvolved(peopleInvolved, email, name) {
 '''
 <li #viewPerson>
