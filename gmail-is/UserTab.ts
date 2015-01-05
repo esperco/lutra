@@ -441,15 +441,19 @@ module Esper.UserTab {
           appleLogo.hide();
       });
 
-    var membershipStatus = "free trial"; // TODO: get membership status
-    if (membershipStatus == "free trial")
-      membership.addClass("free-trial");
-    else if (membershipStatus == "suspended")
-      membership.addClass("suspended");
-    else
-      membership.addClass("active");
+    Api.getCustomerStatus(teamid).done(function(customer) {
+      var sub = customer.status;
+      if (sub === "Trialing" || sub === "Active")
+        membership.addClass("esper-active");
+      else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid")
+        membership.addClass("esper-suspended");
+      else {
+        sub = "No Subscription";
+        membership.addClass("esper-suspended");
+      }
 
-    membership.text(membershipStatus.toUpperCase());
+      membership.text(sub.replace("_", "").toUpperCase());
+    });
 
     return view;
   }
