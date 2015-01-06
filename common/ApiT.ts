@@ -65,6 +65,7 @@ module Esper.ApiT {
     display_name?: string;
     gender?: string; // "Female" or "Male"
     image_url?: string;
+    has_ios_app: boolean;
   }
 
   export interface Guest {
