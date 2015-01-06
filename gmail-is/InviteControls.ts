@@ -6,7 +6,7 @@ module Esper.InviteControls {
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences.
    */
-  export function widget(event: ApiT.CalendarEvent) {
+  export function inviteWidget(event: ApiT.CalendarEvent) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -38,7 +38,7 @@ module Esper.InviteControls {
         </div>
       </div>
       <div #notesRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description</div>
+        <div class="esper-ev-modal-left esper-bold">Notes</div>
         <div class="esper-ev-modal-right">
           <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
         </div>
@@ -58,8 +58,8 @@ module Esper.InviteControls {
         </div>
       </div>
       <div class="esper-modal-footer esper-clearfix">
-        <button #create class="esper-btn esper-btn-primary modal-primary">
-          Create
+        <button #next class="esper-btn esper-btn-primary modal-primary">
+          Next
         </button>
         <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
           Cancel
@@ -81,7 +81,11 @@ module Esper.InviteControls {
     Sidebar.customizeSelectArrow(fromSelect);
 
     pubTitle.val(event.title || "Untitled event");
-    pubNotes.val(event.description || "");
+
+    if (event.description) {
+      var separatorIndex = event.description.search(/=== Conversation ===/);
+      pubNotes.val(event.description.substring(0, separatorIndex).trim());
+    }
     
     if (event.location) {
       var address = event.location.address;
@@ -142,19 +146,24 @@ module Esper.InviteControls {
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
+        next.text("Invite");
+
         titleRow.hide();
         whereRow.hide();
         calendarRow.hide();
         notesRow.hide();
       }
 
-      create.click(function() {
-        create.text(duplicate ? "Creating..." : "Inviting...");
-        create.prop("disabled", true);
-        var guests = [];
-        for (var email in peopleInvolved) {
-          guests.push({email: email, display_name: peopleInvolved[email]});
-        }
+      next.click(function() {
+        if (!duplicate) next.text("Inviting...");
+        next.prop("disabled", true);
+
+        var guests = peopleInvolved.map(function (email) {
+          return {
+            email        : email,
+            display_name : peopleInvolved[email]
+          };
+        });
 
         var location = {
           /* Right now we don't care about title because this is just text
@@ -164,6 +173,7 @@ module Esper.InviteControls {
           address : pubLocation.val()
         };
         if (!location.address) location = null;
+
         var eventEdit: ApiT.CalendarEventEdit = {
           google_cal_id : publicCalId,
           start         : event.start,
@@ -175,18 +185,25 @@ module Esper.InviteControls {
           guests        : guests,
         };
 
-        if (duplicate) {
-          Api.createLinkedEvent(team.teamid, eventEdit, threadId)
-            .done(function(created) {
-              Api.sendEventInvites(team.teamid, fromSelect.val(), guests, created);
-              TaskTab.refreshlinkedEventsList(team, threadId,
-                                              TaskTab.currentTaskTab,
-                                              Sidebar.profiles);
+        var from = fromSelect.val();
 
-              close();
-            });
+        if (duplicate) {
+          container.animate({left : -1000}, 1000, function () {
+            close();
+          });
+
+          var editDescription = descriptionWidget(event, eventEdit,
+                                                  guests, from);
+          editDescription.css({
+            left    : 1000,
+            display : "inline-block",
+            width   : "100%",
+            float   : "right"
+          });
+          container.after(editDescription);
+          editDescription.animate({left : 0}, 1000);
         } else {
-          Api.sendEventInvites(team.teamid, fromSelect.val(), guests, event);
+          Api.sendEventInvites(team.teamid, from, guests, event);
           close();
         }
       });
@@ -197,12 +214,68 @@ module Esper.InviteControls {
     return container;
   }
 
+  /** A widget for viewing and editing the whole event description,
+   *  which includes both the notes from the previous widget and the
+   *  synced email thread contents.
+   */
+  export function descriptionWidget(original, duplicate, guests, from) {
+'''
+<div #container class="esper-ev-inline-container">
+  <div #heading class="esper-modal-header">
+    Review the guest event description
+  </div>
+  <div class="esper-ev-modal-content">
+    <textarea #descriptionField
+      rows=24 class="esper-input esper-description-text">
+      Loading...
+    </textarea>
+  </div>
+  <div class="esper-modal-footer esper-clearfix">
+    <button #invite class="esper-btn esper-btn-secondary modal-primary">
+      Invite
+    </button>
+    <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+      Cancel
+    </button>
+  </div>
+</div>
+'''
+    var team = CurrentThread.team.get();
+    var threadId = CurrentThread.threadId.get();
+
+    Api.getRestrictedDescription(team.teamid, original.google_event_id, guests)
+      .done(function (description) {
+        descriptionField.val(duplicate.description + description.description_text);
+      });
+
+    function close() {
+      container.remove();
+    }
+    cancel.click(close);
+
+    invite.click(function () {
+      duplicate.description = descriptionField.val();
+      invite.text("Inviting...").attr("disabled", true);
+      
+      Api.createLinkedEvent(team.teamid, duplicate, threadId)
+        .done(function(created) {
+          Api.sendEventInvites(team.teamid, from, guests, created);
+          TaskTab.refreshlinkedEventsList(team, threadId,
+                                          TaskTab.currentTaskTab,
+                                          Sidebar.profiles);
+          close();
+        });
+    });
+
+    return container;
+  }
+
   /** Inserts a new "Invite Guests" widget after the contents of the
    *  GMail thread and fixes the formatting of another GMail div that
    *  was causing problems.
    */
   export function insertAfterThread(event) {
-    Gmail.threadContainer().after(widget(event));
+    Gmail.threadContainer().after(inviteWidget(event));
 
     // fix mysteriously appearing padding at end of thread:
     Gmail.threadFooter().css("padding-bottom", "10px");
