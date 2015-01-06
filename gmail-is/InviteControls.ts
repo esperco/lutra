@@ -231,7 +231,7 @@ module Esper.InviteControls {
     </textarea>
   </div>
   <div class="esper-modal-footer esper-clearfix">
-    <button #invite class="esper-btn esper-btn-secondary modal-primary">
+    <button #invite class="esper-btn esper-btn-primary modal-primary">
       Invite
     </button>
     <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
