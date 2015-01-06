@@ -327,4 +327,38 @@ module Esper.ApiT {
     description_text: string;
   }
 
+  export interface CustomerStatus {
+    teamid: string;
+    active: boolean;
+    plan?: string;
+    status?: string; // subscription_status
+  }
+
+  export interface CustomerDetails extends CustomerStatus {
+    /* timestamps */
+    trial_end?: string;
+    trial_start?: string;
+    current_period_end?: string;
+    current_period_start?: string;
+    canceled_at?: string;
+    ended_at?: string;
+    cards: PaymentCard[];
+  }
+
+  export interface PaymentCard {
+    id: string;
+    brand?: string;
+    exp_month: number;
+    exp_year: number;
+    last4: string;
+
+    name?: string;
+    address_line1?: string;
+    address_line2?: string;
+    address_city?: string;
+    address_zip?: string;
+    address_state?: string;
+    address_country?: string;
+  }
+
 }
