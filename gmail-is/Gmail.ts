@@ -94,7 +94,7 @@ module Esper.Gmail {
   }
 
   /** Returns whether the currently focused cursor is in the given
-   * GMail reply text field.
+   *  GMail reply text field.
    */
   export function caretInField(field) {
     return $(window.getSelection().anchorNode).closest(field).length > 0;
@@ -110,5 +110,68 @@ module Esper.Gmail {
       return plusName.css("color");
     else
       return "rgb(64, 64, 64)";
+  }
+
+  /** Opens up a reply dialog in the current thread, by clicking the
+   *  reply link. Optionally inserts the given HTML or text into the
+   *  resulting text field.
+   *
+   *  If the reply field is already open, it should be focused and the
+   *  given html will be inserted.
+   */
+  export function replyToThread(html?) {
+    $(".amn").last().find("span").first().click();
+    replyTextField(compositionToolbar().last()).focus();
+    
+    if (html) insertInFocusedField(html);
+  }
+
+  /** Inserts the given HTML or text into the currently focused input
+   *  field.
+   */
+  export function insertInFocusedField(html) {
+    // replace the selection (if any) at the caret:
+    var selection = window.getSelection()
+    var range     = selection.getRangeAt(0);
+
+    html = "<span>" + html + "</span>";
+
+    range.deleteContents();
+
+    var node = $(html)[0];
+    range.insertNode(node);
+  }
+
+  /** Returns the div that contains all the thread posts and
+   *  composition controls.
+   */
+  export function threadContainer() {
+    return $("div.Tm div.nH.aHU");
+  }
+
+  /** The div containing information like % of inbox used and Google
+   *  copyright notice at the bottom of the GMail thread. For whatever
+   *  reason, this div seems to have extra padding set (right on the
+   *  element, not from a stylesheet) at inopportune times.
+   */
+  export function threadFooter() {
+    return $("div.l2.ov").first();
+  }
+
+  /** Given a proportion between 0 and 1, scrolls to that much of the
+   *  thread. 0 scrolls to the top, 0.5 to the middle and 1 to the
+   *  bottom.
+   *
+   *  The optional time argument specifies how long the animation
+   *  should last, in milliseconds. The default is 500 milliseconds.
+   */
+  export function scrollThread(proportion: number, time?: number) {
+    time = time || 500;
+    var threadHeight = threadContainer().parent().height();
+
+    $("div.Tm").animate({
+      scrollTop :
+        proportion * (threadHeight - $(window).height())
+    }, time);
   }
 }

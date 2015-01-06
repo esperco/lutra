@@ -926,6 +926,21 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   }
 }
 
+.esper-ev-inline-container {
+  position : relative;
+
+  margin-top : 20px;
+  margin-left : auto;
+  margin-right : auto;
+
+  padding-left : 10px;
+  padding-right : 10px;
+
+  max-width : 50em;
+
+  border : 1px solid @border;
+}
+
 .esper-ev.esper-disabled {
   pointer-events: none;
   .esper-ev-date,
@@ -1240,6 +1255,17 @@ ul.esper-ev-dropdown {
   display : none;
 }
 
+/* Controls below the thread. */
+.esper-below-thread {
+  margin-left : 50px;
+  margin-top : 25px;
+
+  /* TODO: Maybe redo as a ul? */
+  & > div {
+    display : inline-block;
+    cursor : pointer;
+  }
+}
 
 /** Modals **/
 

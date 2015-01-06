@@ -54,16 +54,7 @@ module Esper.ComposeToolbar {
             var textField = Gmail.replyTextField(div);
             textField.focus();            
 
-            // replace the selection (if any) at the caret:
-            var selection = window.getSelection()
-            var range     = selection.getRangeAt(0);
-
-            html = "<span>" + html + "</span>";
-
-            range.deleteContents();
-
-            var node = $(html)[0];
-            range.insertNode(node);
+            Gmail.insertInFocusedField(html);
           }
         };
 

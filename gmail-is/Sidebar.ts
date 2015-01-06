@@ -3,8 +3,10 @@
 */
 module Esper.Sidebar {
 
+  // TODO: Move this somewhere more logical!
   export var profiles : ApiT.Profile[];
 
+  // TODO: ditto
   export function customizeSelectArrow(selector) {
     var imageUrl = Init.esperRootUrl + "img/select-arrow.svg";
     selector.css("background-image", "url(" + imageUrl + ")");
