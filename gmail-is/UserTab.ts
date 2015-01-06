@@ -435,7 +435,7 @@ module Esper.UserTab {
             mobile.hide();
         }
 
-        if (Login.hasiOSApp())
+        if (profile.has_ios_app)
           appleLogo.attr("data", Init.esperRootUrl + "img/apple.svg");
         else
           appleLogo.hide();
