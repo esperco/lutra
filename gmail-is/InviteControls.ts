@@ -186,22 +186,33 @@ module Esper.InviteControls {
         };
 
         var from = fromSelect.val();
+        var animation = {
+          time : 500,
+          width : container.width() + 100
+        }
 
         if (duplicate) {
-          container.animate({left : -1000}, 1000, function () {
-            close();
-          });
+          container.animate({left : -animation.width}, animation.time);
 
           var editDescription = descriptionWidget(event, eventEdit,
-                                                  guests, from);
+                                                  guests, from, close, back);
           editDescription.css({
-            left    : 1000,
-            display : "inline-block",
-            width   : "100%",
-            float   : "right"
+            "left"       : animation.width,
+            "margin-top" : (-container.height()) + "px"
           });
+          editDescription.parent().css({ "overflow" : "hidden" });
+
           container.after(editDescription);
-          editDescription.animate({left : 0}, 1000);
+          editDescription.animate({left : 0}, animation.time);
+
+          function back() {
+            container.animate({left : 0}, animation.time);
+            next.prop("disabled", false);
+
+            editDescription.animate({left : animation.width}, animation.time, function () {
+              editDescription.remove();
+            });
+          }
         } else {
           Api.sendEventInvites(team.teamid, from, guests, event);
           close();
@@ -218,7 +229,7 @@ module Esper.InviteControls {
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionWidget(original, duplicate, guests, from) {
+  export function descriptionWidget(original, duplicate, guests, from, done, back) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -231,11 +242,11 @@ module Esper.InviteControls {
     </textarea>
   </div>
   <div class="esper-modal-footer esper-clearfix">
-    <button #invite class="esper-btn esper-btn-secondary modal-primary">
+    <button #invite class="esper-btn esper-btn-primary modal-primary">
       Invite
     </button>
     <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-      Cancel
+      Back
     </button>
   </div>
 </div>
@@ -250,8 +261,9 @@ module Esper.InviteControls {
 
     function close() {
       container.remove();
+      done();
     }
-    cancel.click(close);
+    cancel.click(back);
 
     invite.click(function () {
       duplicate.description = descriptionField.val();
