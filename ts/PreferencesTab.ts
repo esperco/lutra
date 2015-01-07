@@ -106,7 +106,9 @@ module PreferencesTab {
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
       use_duplicate_events:
-        div.find(".esper-prefs-duplicate").is(":checked")
+        div.find(".esper-prefs-duplicate").is(":checked"),
+      bcc_exec_on_reply:
+        div.find(".esper-prefs-bcc").is(":checked")
     };
   }
 
@@ -901,6 +903,11 @@ module PreferencesTab {
         <input #useDuplicate type="checkbox" checked="checked"
                class="esper-prefs-duplicate"/>
         Use duplicate calendar events to invite guests
+      </li>
+      <li>
+        <input #bccExec type="checkbox" checked="checked"
+               class="esper-prefs-bcc"/>
+        Bcc exec on first email to guests
       </li>
     </ul>
   </div>
