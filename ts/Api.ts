@@ -200,7 +200,7 @@ module Api {
   };
 
   export function getGoogleAuthInfo(optAuthLandingUrl)
-    : JQueryDeferred<any> // FIXME
+    : JQueryDeferred<ApiT.GoogleAuthInfo>
   {
     var url = "/api/google/" + Login.me() + "/auth/info";
     if (Util.isString(optAuthLandingUrl)) {
