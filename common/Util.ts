@@ -258,4 +258,8 @@ module Esper.Util {
   export function preventClickPropagation(elt: JQuery) {
     elt.click(function(event) { event.stopPropagation(); });
   }
+
+  export function nameOfPlan(id: string /* planid */) {
+    return id.replace(/(.*)_\d+$/, "$1").replace("_", " ");
+  }
 }

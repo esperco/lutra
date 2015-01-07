@@ -443,6 +443,8 @@ module Esper.UserTab {
 
     Api.getCustomerStatus(teamid).done(function(customer) {
       var sub = customer.status;
+      var plan = customer.plan;
+
       if (sub === "Trialing" || sub === "Active")
         membership.addClass("esper-active");
       else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid")
@@ -452,7 +454,10 @@ module Esper.UserTab {
         membership.addClass("esper-suspended");
       }
 
-      membership.text(sub.replace("_", "").toUpperCase());
+      if (sub === "Active" && plan !== undefined)
+        sub = Util.nameOfPlan(plan);
+
+      membership.text(sub.replace("_", " ").toUpperCase());
     });
 
     return view;
