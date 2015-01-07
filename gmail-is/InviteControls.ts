@@ -118,7 +118,7 @@ module Esper.InviteControls {
       });
     }
 
-    var peopleInvolved = [];
+    var peopleInvolved = {};
     var emailData = esperGmail.get.email_data();
     if (emailData !== undefined && emailData.first_email !== undefined) {
       if (emailData.people_involved.length === 0) {
@@ -158,7 +158,7 @@ module Esper.InviteControls {
         if (!duplicate) next.text("Inviting...");
         next.prop("disabled", true);
 
-        var guests = peopleInvolved.map(function (email) {
+        var guests = Object.keys(peopleInvolved).map(function (email) {
           return {
             email        : email,
             display_name : peopleInvolved[email]
