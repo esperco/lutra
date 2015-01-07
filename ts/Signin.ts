@@ -223,7 +223,7 @@ module Signin {
     Log.p("checkGooglePermissions " + landingUrl);
     return Api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
-        if (info.need_google_auth) {
+        if (info.is_assistant && info.need_google_auth) {
           requestGoogleAuth(info.google_auth_url);
           return false;
         }
