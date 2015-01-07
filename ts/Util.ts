@@ -109,12 +109,26 @@ module Util {
     return re.test(s);
   }
 
+  export function nameOfPlan(id: string /* planid */) {
+    return id.replace(/(.*)_\d+$/, "$1").replace("_", " ");
+  }
+
   export var tests = [
     Test.expect(
       "mergeObjects",
       function() {
         var m : any = mergeObjects({x:1, y:2}, {z:3, x:4});
         return m.x === 4 && m.y === 2 && m.z === 3;
+      },
+      null,
+      true
+    ),
+    Test.expect(
+      "nameOfPlan",
+      function() {
+        var p1 = "Standard_20141222", p2 = "Fake_Plan_19860328";
+        var n1 = nameOfPlan(p1), n2 = nameOfPlan(p2);
+        return n1 === "Standard" && n2 === "Fake Plan";
       },
       null,
       true
