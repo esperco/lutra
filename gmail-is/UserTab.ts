@@ -474,6 +474,10 @@ module Esper.UserTab {
     <span>Use duplicate events:</span>
     <span class="esper-green" #useDuplicate>Yes</span>
   </div>
+  <div>
+    <span>Bcc exec:</span>
+    <span class="esper-green" #bccExec>Yes</span>
+  </div>
 </ul>
 '''
     if (prefs.send_exec_confirmation)
@@ -485,6 +489,10 @@ module Esper.UserTab {
         .removeClass("esper-red")
         .addClass("esper-green");
     if (!prefs.use_duplicate_events)
+      useDuplicate.text("No")
+        .removeClass("esper-green")
+        .addClass("esper-red");
+    if (!prefs.bcc_exec_on_reply)
       useDuplicate.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
