@@ -97,6 +97,12 @@ type token_response = [
 ]
 */
 
+  export interface GoogleAuthInfo {
+    has_token: boolean;
+    need_google_auth: boolean;
+    google_auth_url: string;
+  }
+
   export interface TeamMember {
     member_email: string;
     member_uid: string;

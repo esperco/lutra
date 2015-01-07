@@ -220,15 +220,15 @@ module Signin {
   }
 
   function checkGooglePermissions(landingUrl) {
-    Log.p("checkGooglePermissions");
+    Log.p("checkGooglePermissions " + landingUrl);
     return Api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
-        if (info.has_token)
-          return true;
-        else {
+        if (info.need_google_auth) {
           requestGoogleAuth(info.google_auth_url);
           return false;
         }
+        else
+          return true;
       });
   }
 
@@ -258,32 +258,22 @@ module Signin {
     }
   };
 
-  function goToRelativeUrl(url) {
-    var relativeUrl = ParseUrl.toRelative(ParseUrl.parse(url));
-    Log.p("Going to " + relativeUrl);
-    $(document).ready(function() {
-      window.location.assign(relativeUrl);
-      window.location.reload();
-    });
-  }
-
   export function loginOnce(uid, landingUrl) {
     var loginNonce = getLoginNonce();
-    Log.p("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
     /*
       TODO: figure out why redirecting to landingUrl causes an infinite loop;
             disabled for now.
      */
+    Log.p("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
     Api.loginOnce(uid, loginNonce)
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        /* Make sure we don't redirect to a phishing URL: discard host. */
-        goToRelativeUrl("/#!");
+        location.hash = "!";
       })
       .fail(function() {
         clearLoginNonce();
-        goToRelativeUrl("/#!");
+        location.hash = "!";
       });
   };
 
