@@ -260,6 +260,7 @@ module Esper.ApiT {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
     use_duplicate_events: boolean;
+    bcc_exec_on_reply: boolean;
   }
 
   export interface GuestReminder {
