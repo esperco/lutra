@@ -765,11 +765,12 @@ module AccountTab {
     var execUid = team.team_executive;
 
     Api.getSubscriptionStatus(Login.me(), teamid)
-      .done(function(customerStatus) {
-        updateStatus(customerStatus.status);
-    });
+      .done(updateStatus);
 
-    function updateStatus(mem) {
+    function updateStatus(customer) {
+      var mem = customer.status;
+      var plan = customer.plan;
+
       if (mem == "Trialing" || mem == "Active") {
         membershipBadge.addClass("active");
       } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
@@ -779,7 +780,9 @@ module AccountTab {
         membershipBadge.addClass("suspended");
       }
 
-      if (mem !== undefined)
+      if (mem === "Active" && plan !== undefined) {
+        membershipBadge.text(Util.nameOfPlan(plan).toUpperCase());
+      } else if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 
       changeMembership.click(function() { showMembershipModal(team) });
