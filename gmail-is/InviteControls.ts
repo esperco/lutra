@@ -143,7 +143,7 @@ module Esper.InviteControls {
 
     CurrentThread.withPreferences(function (preferences) {
       var duplicate = preferences.general.use_duplicate_events;
-      var reminder  = preferences.general.send_exec_reminder;
+      var reminder  = false;    // TODO: enable reminders again
 
       if (!duplicate && !reminder) next.text("Invite");
 
