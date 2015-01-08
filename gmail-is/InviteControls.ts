@@ -143,10 +143,12 @@ module Esper.InviteControls {
 
     CurrentThread.withPreferences(function (preferences) {
       var duplicate = preferences.general.use_duplicate_events;
+      var reminder  = preferences.general.send_exec_reminder;
+
+      if (!duplicate && !reminder) next.text("Invite");
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
-        next.text("Invite");
 
         titleRow.hide();
         whereRow.hide();
@@ -156,7 +158,6 @@ module Esper.InviteControls {
 
       next.click(function() {
         if (!duplicate) next.text("Inviting...");
-        next.prop("disabled", true);
 
         var guests = peopleInvolved.map(function (email) {
           return {
@@ -191,31 +192,71 @@ module Esper.InviteControls {
           width : container.width() + 100
         }
 
-        if (duplicate) {
-          container.animate({left : -animation.width}, animation.time);
-
-          var editDescription = descriptionWidget(event, eventEdit,
-                                                  guests, from, close, back);
-          editDescription.css({
-            "left"       : animation.width,
-            "margin-top" : (-container.height()) + "px"
+        function slideForward(previous, next) {
+          previous.parent().css({
+            "overflow" : "hidden"
           });
-          editDescription.parent().css({ "overflow" : "hidden" });
+          previous.animate({left : -animation.width}, animation.time);
 
-          container.after(editDescription);
-          editDescription.animate({left : 0}, animation.time);
+          next.css({
+            "left"       : animation.width,
+            "margin-top" : (-previous.height()) + "px"
+          });
+
+          previous.after(next);
+          next.animate({left : 0}, animation.time);
+        }
+
+        function slideBack(previous, next) {
+          previous.animate({left : 0}, animation.time);
+
+          next.animate({left : animation.width}, animation.time, function () {
+            next.remove();
+          });
+        }
+
+        /** Animates from the current widget to the check description
+         *  widget.
+         */
+        function checkDescription(previous) {
+          var next =
+            descriptionWidget(event, eventEdit, guests, from, close, back);
+
+          slideForward(previous, next);
 
           function back() {
-            container.animate({left : 0}, animation.time);
-            next.prop("disabled", false);
-
-            editDescription.animate({left : animation.width}, animation.time, function () {
-              editDescription.remove();
-            });
+            slideBack(previous, next);
           }
-        } else {
+        }
+
+        function checkReminder() {
+          var next = reminderWidget(duplicate, function () {
+            slideBack(container, next);
+          }, function () {
+            if (duplicate) {
+              checkDescription(next);
+            } else {
+              next.remove();
+              inviteGuests();
+            }
+          });
+
+          slideForward(container, next);
+        }
+
+        function inviteGuests() {
           Api.sendEventInvites(team.teamid, from, guests, event);
           close();
+        }
+
+        if (reminder) {
+          checkReminder();
+        } else {
+          if (duplicate) {
+            checkDescription(container);
+          } else {
+            inviteGuests();
+          }
         }
       });
     });
@@ -229,7 +270,8 @@ module Esper.InviteControls {
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionWidget(original, duplicate, guests, from, done, back) {
+  export function descriptionWidget(original, duplicate, guests, from,
+                                    done, backFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -245,7 +287,7 @@ module Esper.InviteControls {
     <button #invite class="esper-btn esper-btn-primary modal-primary">
       Invite
     </button>
-    <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+    <button #back class="esper-btn esper-btn-secondary modal-cancel">
       Back
     </button>
   </div>
@@ -263,12 +305,11 @@ module Esper.InviteControls {
       container.remove();
       done();
     }
-    cancel.click(back);
+    back.click(backFunction);
 
     invite.click(function () {
       duplicate.description = descriptionField.val();
-      invite.text("Inviting...").attr("disabled", true);
-      
+
       Api.createLinkedEvent(team.teamid, duplicate, threadId)
         .done(function(created) {
           Api.sendEventInvites(team.teamid, from, guests, created);
@@ -277,6 +318,65 @@ module Esper.InviteControls {
                                           Sidebar.profiles);
           close();
         });
+    });
+
+    return container;
+  }
+
+  /** A widget for setting an automatic reminder about the event, sent
+   *  to the exec.
+   */
+  function reminderWidget(duplicate, backFunction, nextFunction) {
+'''
+<div #container class="esper-ev-inline-container">
+  <div #heading class="esper-modal-header">
+    Set an automatic reminder for the exec
+  </div>
+  <div class="esper-ev-modal-content">
+    <textarea #reminderField
+      rows=24 class="esper-input esper-reminder-text">
+      A reminder about this event, or something.
+    </textarea>
+    <label>
+      When: <input type="text"> </input>
+    </label>
+    <button #reminderButton class="esper-btn esper-btn-danger">
+      Cancel reminder
+    </button>
+  </div>
+  <div class="esper-modal-footer esper-clearfix">
+    <button #next class="esper-btn esper-btn-primary modal-primary">
+      Next
+    </button>
+    <button #back class="esper-btn esper-btn-secondary modal-cancel">
+      Back
+    </button>
+  </div>
+</div>
+'''
+    if (!duplicate) next.text("Invite");
+
+    back.click(backFunction);
+    next.click(nextFunction);
+
+    var reminderEnabled = true;
+
+    reminderButton.click(function () {
+      if (reminderEnabled) {
+        reminderField.attr("disabled", true);
+
+        reminderButton.removeClass("esper-btn-danger");
+        reminderButton.addClass("esper-btn-safe");
+        reminderButton.text("Enable reminder");
+      } else {
+        reminderField.attr("disabled", false);
+
+        reminderButton.removeClass("esper-btn-safe");
+        reminderButton.addClass("esper-btn-danger");
+        reminderButton.text("Disable reminder");
+      }
+
+      reminderEnabled = !reminderEnabled;
     });
 
     return container;

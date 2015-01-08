@@ -268,6 +268,47 @@ object.esper-svg { pointer-events: none; }
             box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
   }
 }
+.esper-btn-danger {
+  color: white;
+  border: 1px solid #b9332f;
+  background-image: -webkit-linear-gradient(top, #d7524e 0%, #c7423e 100%);
+  background-image:         linear-gradient(top, #d7524e 0%, #c7423e 100%);
+  &:hover {
+    background-image: -webkit-linear-gradient(top, #d14a48 0%, #c13a38 100%);
+    background-image:         linear-gradient(top, #d14a48 0%, #c13a38 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    background-image: -webkit-linear-gradient(top, #d9534f 0%, #c9433f 100%);
+    background-image:         linear-gradient(top, #d9534f 0%, #c9433f 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
+
+.esper-btn-safe {
+  color: white;
+  border: 1px solid #33b92f;
+  background-image: -webkit-linear-gradient(top, #52d74e 0%, #42c73e 100%);
+  background-image:         linear-gradient(top, #52d74e 0%, #42c73e 100%);
+  &:hover {
+    background-image: -webkit-linear-gradient(top, #4ad148 0%, #3ac138 100%);
+    background-image:         linear-gradient(top, #4ad148 0%, #3ac138 100%);
+    border: 1px solid #2eb42b;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    background-image: -webkit-linear-gradient(top, #53d94f 0%, #43c93f 100%);
+    background-image:         linear-gradient(top, #53d94f 0%, #43c93f 100%);
+    border: 1px solid #2eb42b;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+    box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
 
 
 /** Input **/
@@ -1375,8 +1416,14 @@ ul.esper-ev-dropdown {
 .esper-description-text {
   width: 100%;
   font-size: 13px;
+  margin-bottom: 45px;
 }
 
+.esper-reminder-text {
+  width: 100%;
+  font-size: 13px;
+  margin-bottom : 15px;
+}
 
 /** Search Modal **/
 
