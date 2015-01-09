@@ -188,7 +188,7 @@ module Esper.InviteControls {
         var from = fromSelect.val();
         var animation = {
           time : 500,
-          width : container.width() + 100
+          width : Gmail.threadContainer().width() + 100
         }
 
         function slideForward(previous, next) {
