@@ -6,7 +6,7 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
-  
+
   export var currentTask : ApiT.Task;
 
   function obtainTaskForThread(teamid, threadId,
@@ -419,6 +419,7 @@ module Esper.TaskTab {
           var i = 0;
           var last = false;
           var recent = true;
+          taskTab.recentsList.children().remove();
           activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
             var e = response.event_opt;
             if (e === undefined) return; // event is deleted aka cancelled
