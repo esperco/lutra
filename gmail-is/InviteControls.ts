@@ -150,7 +150,6 @@ module Esper.InviteControls {
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
-
         titleRow.hide();
         whereRow.hide();
         calendarRow.hide();
@@ -159,10 +158,6 @@ module Esper.InviteControls {
 
       next.click(function() {
         if (!duplicate) next.text("Inviting...");
-
-        var guests = peopleInvolved.map(function (email) {
-        next.prop("disabled", true);
-
         var guests = Object.keys(peopleInvolved).map(function (email) {
           return {
             email        : email,
