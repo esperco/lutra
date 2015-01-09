@@ -419,7 +419,6 @@ module Esper.TaskTab {
           var i = 0;
           var last = false;
           var recent = true;
-          taskTab.recentsList.children().remove();
           activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
             var e = response.event_opt;
             if (e === undefined) return; // event is deleted aka cancelled
@@ -429,11 +428,12 @@ module Esper.TaskTab {
                                           threadId, taskTab, profiles));
             i++;
           });
-        taskTab.recentsList.append(eventsList);
-        taskTab.recentsSpinner.hide();
-        taskTab.refreshRecents.removeClass("esper-disabled");
+          taskTab.recentsList.children().remove();
+          taskTab.recentsList.append(eventsList);
+          taskTab.recentsSpinner.hide();
+          taskTab.refreshRecents.removeClass("esper-disabled");
+        });
       });
-    });
   }
 
   /* reuse the view created for the team, update list of linked events */
