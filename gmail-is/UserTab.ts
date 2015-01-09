@@ -435,21 +435,30 @@ module Esper.UserTab {
             mobile.hide();
         }
 
-        if (Login.hasiOSApp())
+        if (profile.has_ios_app)
           appleLogo.attr("data", Init.esperRootUrl + "img/apple.svg");
         else
           appleLogo.hide();
       });
 
-    var membershipStatus = "free trial"; // TODO: get membership status
-    if (membershipStatus == "free trial")
-      membership.addClass("free-trial");
-    else if (membershipStatus == "suspended")
-      membership.addClass("suspended");
-    else
-      membership.addClass("active");
+    Api.getCustomerStatus(teamid).done(function(customer) {
+      var sub = customer.status;
+      var plan = customer.plan;
 
-    membership.text(membershipStatus.toUpperCase());
+      if (sub === "Trialing" || sub === "Active")
+        membership.addClass("esper-active");
+      else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid")
+        membership.addClass("esper-suspended");
+      else {
+        sub = "No Subscription";
+        membership.addClass("esper-suspended");
+      }
+
+      if (sub === "Active" && plan !== undefined)
+        sub = Util.nameOfPlan(plan);
+
+      membership.text(sub.replace("_", " ").toUpperCase());
+    });
 
     return view;
   }
@@ -470,6 +479,10 @@ module Esper.UserTab {
     <span>Use duplicate events:</span>
     <span class="esper-green" #useDuplicate>Yes</span>
   </div>
+  <div>
+    <span>Bcc exec:</span>
+    <span class="esper-green" #bccExec>Yes</span>
+  </div>
 </ul>
 '''
     if (prefs.send_exec_confirmation)
@@ -481,6 +494,10 @@ module Esper.UserTab {
         .removeClass("esper-red")
         .addClass("esper-green");
     if (!prefs.use_duplicate_events)
+      useDuplicate.text("No")
+        .removeClass("esper-green")
+        .addClass("esper-red");
+    if (!prefs.bcc_exec_on_reply)
       useDuplicate.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");

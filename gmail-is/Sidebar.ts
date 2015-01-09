@@ -163,10 +163,6 @@ module Esper.Sidebar {
         name = execProf.display_name;
     }
     teamName.text(name);
-    if (isCorrectTeam)
-      view.removeClass("esper-team-danger");
-    else
-      view.addClass("esper-team-danger");
 
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
@@ -227,7 +223,21 @@ module Esper.Sidebar {
       Menu.create();
     });
 
-    rootElement.append(view);
+    Api.getCustomerStatus(team.teamid).done(function(customer) {
+      var sub = customer.status;
+      if (sub === "Past_due" || sub === "Canceled"
+          || sub === "Unpaid" || sub === undefined)
+        view.removeClass("esper-team-warning")
+            .addClass("esper-team-danger");
+      else if (!isCorrectTeam)
+        view.addClass("esper-team-warning")
+            .removeClass("esper-team-danger");
+      else
+        view.removeClass("esper-team-warning")
+            .removeClass("esper-team-danger");
+
+      rootElement.append(view);
+    });
   }
 
   function displaySidebar(rootElement,

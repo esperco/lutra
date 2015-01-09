@@ -425,4 +425,20 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function getCustomerStatus(teamid):
+  JQueryDeferred<ApiT.CustomerStatus> {
+    var url =
+      Conf.Api.url + "/api/pay/status/short/" + Login.myUid()
+      + "/" + teamid;
+    return JsonHttp.get(url);
+  }
+
+  export function getCustomerDetails(teamid):
+  JQueryDeferred<ApiT.CustomerDetails> {
+    var url =
+      Conf.Api.url + "/api/pay/status/long/" + Login.myUid()
+      + "/" + teamid;
+    return JsonHttp.get(url);
+  }
+
 }

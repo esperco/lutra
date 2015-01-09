@@ -567,7 +567,7 @@ textarea.esper-input { resize: none; }
   position: absolute;
   right: 14px;
   bottom: 0;
-  &.esper-team-danger {
+  &.esper-team-warning {
     .esper-dock { background: @orange; }
     .esper-dock-wrap-left {
       border-color: transparent transparent @orange_hover transparent;
@@ -577,6 +577,17 @@ textarea.esper-input { resize: none; }
     }
     .esper-dock-action:hover { background: @orange_hover_light; }
     .esper-options.esper-open { background: @orange_hover_light; }
+  }
+  &.esper-team-danger {
+    .esper-dock { background: @red; }
+    .esper-dock-wrap-left {
+      border-color: transparent transparent @red_hover transparent;
+    }
+    .esper-dock-wrap-right {
+      border-color: transparent transparent transparent @red_hover;
+    }
+    .esper-dock-action:hover { background: @red_hover; }
+    .esper-options.esper-open { background: @red_hover; }
   }
 }
 
@@ -1104,13 +1115,12 @@ ul.esper-ev-dropdown {
   font-size: 10px;
   font-weight: 600;
   border-radius: 2px;
-  &.active { background: @gray_20; }
-  &.free-trial {
+  &.esper-active {
     background: @green;
     color: white;
   }
-  &.suspended {
-    background: @orange;
+  &.esper-suspended {
+    background: @red;
     color: white;
   }
 }
