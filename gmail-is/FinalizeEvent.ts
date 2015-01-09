@@ -60,8 +60,8 @@ module Esper.FinalizeEvent {
       google_cal_id   : event.google_cal_id,
       guests          : [],
       summary         : event.title,
-      start           : { dateTime : event.start.local },
-      end             : { dateTime : event.end.local }
+      start           : { dateTime : event.start.utc },
+      end             : { dateTime : event.end.utc }
     };
 
     if (isHold(event) != hold) {
@@ -145,7 +145,7 @@ module Esper.FinalizeEvent {
       Gmail.replyToThread(confirmMessage(event));
     }
 
-    Gmail.scrollThread(0.9);
+    Gmail.scrollToCompose();
   }
 
   /** Depending on preferences, this provides controls to duplicate or

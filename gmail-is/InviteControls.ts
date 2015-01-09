@@ -80,7 +80,8 @@ module Esper.InviteControls {
     Sidebar.customizeSelectArrow(pubCalendar);
     Sidebar.customizeSelectArrow(fromSelect);
 
-    pubTitle.val(event.title || "Untitled event");
+    var newTitle = event.title || "Untitled event";
+    pubTitle.val(newTitle.replace(/^HOLD: /, ""));
 
     if (event.description) {
       var separatorIndex = event.description.search(/=== Conversation ===/);

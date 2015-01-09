@@ -174,4 +174,25 @@ module Esper.Gmail {
         proportion * (threadHeight - $(window).height())
     }, time);
   }
+
+  /** Scrolls the thread to show the bottom-most compose text box. */
+  export function scrollToCompose(time?: number) {
+    time = time || 500;
+
+    // height of the text box ≈ 225
+    $("div.Tm").animate({
+      scrollTop : $(".nH.aHU").height() - 225
+    }, time);
+  }
+  
+  /** Scrolls to the bottom of the thread to show the invite guests
+   *  widget.
+   */
+  export function scrollToInviteWidget(time?: number) {
+    time = time || 500;
+
+    $("div.Tm").animate({
+      scrollTop : $(".nH.aHU").height() + 50 // extra padding
+    }, time);
+  }
 }

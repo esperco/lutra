@@ -245,7 +245,7 @@ module Esper.TaskTab {
     inviteGuests.click(function() {
       CurrentThread.withPreferences(function(preferences) {
         FinalizeEvent.inviteGuests(e, preferences);
-        Gmail.scrollThread(0.9);
+        Gmail.scrollToInviteWidget();
       });
     });
 
