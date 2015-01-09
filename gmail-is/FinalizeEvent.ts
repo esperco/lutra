@@ -127,7 +127,7 @@ module Esper.FinalizeEvent {
         title = title.replace(/^HOLD: /, "");
 
         var location = ev.location || "";
-        var locationStr = location !== "" ? " at " + locationStr : "";
+        var locationStr = location ? " at " + locationStr : "";
 
         return message + title + locationStr + "<br />";
       }, message);
