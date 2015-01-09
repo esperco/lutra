@@ -6,7 +6,7 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
-  
+
   export var currentTask : ApiT.Task;
 
   function obtainTaskForThread(teamid, threadId,
@@ -428,11 +428,12 @@ module Esper.TaskTab {
                                           threadId, taskTab, profiles));
             i++;
           });
-        taskTab.recentsList.append(eventsList);
-        taskTab.recentsSpinner.hide();
-        taskTab.refreshRecents.removeClass("esper-disabled");
+          taskTab.recentsList.children().remove();
+          taskTab.recentsList.append(eventsList);
+          taskTab.recentsSpinner.hide();
+          taskTab.refreshRecents.removeClass("esper-disabled");
+        });
       });
-    });
   }
 
   /* reuse the view created for the team, update list of linked events */
