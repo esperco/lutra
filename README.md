@@ -45,7 +45,7 @@ $ npm install -g typescript
 
 ```
 $ tsc -v
-Version 1.0.1.0
+Version 1.3.0.0
 ```
 
 ```

@@ -21,14 +21,15 @@ module Esper.CalEventView {
     });
   }
 
-  function removeEsperRoot() {
-    $("#esper-event-root").remove();
+  var emailRowClass = "esper-email-row";
+
+  function removeEsperEmailRows() {
+    $("." + emailRowClass).remove();
   }
 
-  function insertEsperRoot() {
-    removeEsperRoot();
+  function insertEsperEmailRow() {
     var anchor = Gcal.Event.findAnchor();
-    var root = $("<tr id='esper-event-root'/>");
+    var root = $("<tr/>").addClass(emailRowClass);
     root.insertAfter(anchor);
     return root;
   }
@@ -188,26 +189,20 @@ module Esper.CalEventView {
     return view;
   }
 
-  function renderTh(): JQuery {
+  function renderEmail(team: ApiT.Team,
+                       fullEventId: Types.FullEventId) {
 '''
 <th #th class="ep-dp-dt-th">
-  <label>Email</label>
+  <label #label></label>
 </th>
-'''
-    return th;
-  }
-
-  function renderEventControls(team: ApiT.Team,
-                               fullEventId: Types.FullEventId) {
-    var th = renderTh();
-
-'''
 <td #td class="ep-dp-dt-td">
   <div #linked/>
   <div #linkable/>
 </td>
 '''
     var teamid = team.teamid;
+
+    label.text("Email (" + team.team_name + ")");
     Api.getLinkedThreads(teamid, fullEventId.eventId)
       .done(function(linkedThrids) {
         var thrids = linkedThrids.linked_threads;
@@ -494,7 +489,6 @@ module Esper.CalEventView {
   }
 
   function updateView(fullEventId) {
-    var rootElement = insertEsperRoot();
     var teams = Login.myTeams();
     var calendarId = fullEventId.calendarId;
     var eventId = fullEventId.eventId;
@@ -525,6 +519,8 @@ module Esper.CalEventView {
 
     var myUid = Login.myUid();
 
+    removeEsperEmailRows();
+
     /* For each team that uses this calendar */
     teams.forEach(function(team) {
       if (team.team_executive !== myUid) {
@@ -532,10 +528,11 @@ module Esper.CalEventView {
           return cal.google_cal_id;
         });
         if (List.mem(teamCalendars, fullEventId.calendarId)) {
-          var rowElements = renderEventControls(team, fullEventId);
-          rootElement
-            .append(rowElements.th)
-            .append(rowElements.td);
+          var row = insertEsperEmailRow();
+          var cells = renderEmail(team, fullEventId);
+          row
+            .append(cells.th)
+            .append(cells.td);
         }
       }
     });
