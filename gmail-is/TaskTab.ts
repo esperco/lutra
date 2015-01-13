@@ -650,7 +650,6 @@ module Esper.TaskTab {
     linkActions: JQuery;
     createEvent: JQuery;
     createEventIcon: JQuery;
-    createEventDropdown: JQuery;
     calendarList: JQuery;
     linkEvent: JQuery;
     linkEventIcon: JQuery;
@@ -726,10 +725,6 @@ module Esper.TaskTab {
               Create event
             </div>
           </div>
-          <ul #createEventDropdown
-              class="esper-drop-ul esper-create-event-dropdown">
-            <div #calendarList class="esper-dropdown-section"/>
-          </ul>
           <div class="esper-vertical-divider"/>
           <div #linkEvent class="esper-link-action">
             <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
@@ -830,12 +825,10 @@ module Esper.TaskTab {
     });
 
     createEvent.click(function() {
-      if (createEvent.hasClass("esper-open")) {
-        Sidebar.dismissDropdowns();
-      } else {
-        Sidebar.dismissDropdowns();
-        createEventDropdown.toggle();
-        createEvent.addClass("esper-open");
+      if (CurrentThread.threadId.isValid() &&
+          CurrentThread.team.isValid()) {
+        CalPicker.createModal(CurrentThread.team.get(),
+                              CurrentThread.threadId.get());
       }
     });
 
