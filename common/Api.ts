@@ -10,19 +10,30 @@ module Esper.Api {
     return JsonHttp.get(Conf.Api.url + "/api/support/chrome/" + Conf.version);
   }
 
+  /*
+    We call this to avoid making URLs containing "undefined" or "null".
+    This prevents making a bogus API request, and hopefully makes bug
+    detection and prevention easier.
+  */
+  function string(x: string) {
+    console.assert(x !== undefined && x !== null);
+    return x;
+  }
+
   /* Esper login and password management */
 
   export function getLoginInfo():
   JQueryDeferred<ApiT.LoginResponse> {
-    return JsonHttp.get(Conf.Api.url + "/api/login/" + Login.myUid() + "/info");
+    var url = Conf.Api.url + "/api/login/" + string(Login.myUid()) + "/info";
+    return JsonHttp.get(url);
   }
 
   export function getProfile(uid, teamid):
   JQueryDeferred<ApiT.Profile> {
     var url =
-      Conf.Api.url + "/api/profile/" + Login.myUid()
-      + "/" + uid
-      + "/" + teamid;
+      Conf.Api.url + "/api/profile/" + string(Login.myUid())
+      + "/" + string(uid)
+      + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
@@ -35,17 +46,17 @@ module Esper.Api {
   export function getThreadDetails(threadId):
   JQueryDeferred<ApiT.EmailThread> {
     var url =
-      Conf.Api.url + "/api/thread/details/" + Login.myUid()
-      + "/" + threadId;
+      Conf.Api.url + "/api/thread/details/" + string(Login.myUid())
+      + "/" + string(threadId);
     return JsonHttp.get(url);
   }
 
   export function getLinkedThreads(teamid, eventId):
   JQueryDeferred<ApiT.LinkedEmailThreads> {
     var url =
-      Conf.Api.url + "/api/event/threads/" + Login.myUid()
-      + "/" + teamid
-      + "/" + eventId;
+      Conf.Api.url + "/api/event/threads/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(eventId);
     return JsonHttp.get(url);
   }
 
@@ -55,9 +66,9 @@ module Esper.Api {
   JQueryDeferred<ApiT.EventWithSyncInfo[]> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
-      Conf.Api.url + "/api/thread/events/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId;
+      Conf.Api.url + "/api/thread/events/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId);
     return JsonHttp.post(url, JSON.stringify(cals)).then(function(x) {
       return x.linked_events;
     });
@@ -66,62 +77,62 @@ module Esper.Api {
   export function linkEventForMe(teamid, threadId, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(eventId);
     return JsonHttp.put(url, "");
   }
 
   export function linkEventForTeam(teamid, threadId, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(eventId);
     return JsonHttp.post(url, "");
   }
 
   export function unlinkEvent(teamid, threadId, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/link-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(eventId);
     return JsonHttp.delete_(url);
   }
 
   export function syncEvent(teamid, threadId, calid : string, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + calid
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/sync-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(calid)
+      + "/" + string(eventId);
     return JsonHttp.put(url, "");
   }
 
   export function unsyncEvent(teamid, threadId, calid, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/sync-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + calid
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/sync-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(calid)
+      + "/" + string(eventId);
     return JsonHttp.delete_(url);
   }
 
   export function deleteLinkedEvent(teamid, threadId, eventId):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(eventId);
     return JsonHttp.delete_(url);
   }
 
@@ -130,10 +141,10 @@ module Esper.Api {
     // needed to appease the Gcal_j.event_edit parser.
     eventEdit.reminders = { useDefault : true };
     var url =
-      Conf.Api.url + "/api/thread/event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadId
-      + "/" + eventId;
+      Conf.Api.url + "/api/thread/event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadId)
+      + "/" + string(eventId);
     return JsonHttp.post(url, JSON.stringify(eventEdit));
   }
 
@@ -141,8 +152,8 @@ module Esper.Api {
   JQueryDeferred<ApiT.CalendarEventList> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
-      Conf.Api.url + "/api/calendar/search/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/calendar/search/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/" + encodeURIComponent(query);
     return JsonHttp.post(url, JSON.stringify(cals));
   }
@@ -151,9 +162,9 @@ module Esper.Api {
   export function getEventThreads(teamid, eventId):
   JQueryDeferred<ApiT.LinkedEmailThreads> {
     var url =
-      Conf.Api.url + "/api/event/threads/" + Login.myUid()
-      + "/" + teamid
-      + "/" + eventId;
+      Conf.Api.url + "/api/event/threads/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(eventId);
     return JsonHttp.get(url);
   }
 
@@ -162,20 +173,20 @@ module Esper.Api {
   JQueryDeferred<ApiT.CalendarEventOpt> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
-      Conf.Api.url + "/api/event/details-opt/" + Login.myUid()
-      + "/" + teamid
-      + "/" + encodeURIComponent(calid)
-      + "/" + encodeURIComponent(eventid);
+      Conf.Api.url + "/api/event/details-opt/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(calid))
+      + "/" + encodeURIComponent(string(eventid));
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
   export function createEmptyLinkedEvent(teamid, cal: ApiT.Calendar, threadId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
-      Conf.Api.url + "/api/thread/create-linked-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + encodeURIComponent(cal.google_cal_id)
-      + "/" + threadId;
+      Conf.Api.url + "/api/thread/create-linked-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(cal.google_cal_id))
+      + "/" + string(threadId);
     return JsonHttp.post(url, "");
   }
 
@@ -183,10 +194,10 @@ module Esper.Api {
                                     threadId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
-      Conf.Api.url + "/api/thread/put-linked-event/" + Login.myUid()
-      + "/" + teamid
-      + "/" + encodeURIComponent(event.google_cal_id)
-      + "/" + threadId;
+      Conf.Api.url + "/api/thread/put-linked-event/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(event.google_cal_id))
+      + "/" + string(threadId);
     return JsonHttp.post(url, JSON.stringify(event));
   }
 
@@ -194,8 +205,8 @@ module Esper.Api {
   JQueryDeferred<ApiT.CreatedCalendarEvents> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
-      Conf.Api.url + "/api/calendar/events/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/calendar/events/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/recently-created";
     return JsonHttp.post(url, JSON.stringify(cals));
   }
@@ -203,58 +214,58 @@ module Esper.Api {
   export function postCalendarShow(teamCalendars):
   JQueryDeferred<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
-    var url = Conf.Api.url + "/api/calendar/show/" + Login.myUid();
+    var url = Conf.Api.url + "/api/calendar/show/" + string(Login.myUid());
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
   export function postCalendarShowAll():
   JQueryDeferred<void> {
-    var url = Conf.Api.url + "/api/calendar/show-all/" + Login.myUid();
+    var url = Conf.Api.url + "/api/calendar/show-all/" + string(Login.myUid());
     return JsonHttp.post(url, "");
   }
 
   export function getPreferences(teamid):
   JQueryDeferred<ApiT.Preferences> {
     var url =
-      Conf.Api.url + "/api/preferences/" + Login.myUid()
-      + "/" + teamid;
+      Conf.Api.url + "/api/preferences/" + string(Login.myUid())
+      + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function putPreferences(teamid, prefs):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/preferences/" + Login.myUid()
-      + "/" + teamid;
+      Conf.Api.url + "/api/preferences/" + string(Login.myUid())
+      + "/" + string(teamid);
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/event/set-reminder-time/" + Login.myUid()
-      + "/" + teamid
-      + "/" + from_email
-      + "/" + calid
-      + "/" + eventid
-      + "/" + secs;
+      Conf.Api.url + "/api/event/set-reminder-time/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(from_email)
+      + "/" + string(calid)
+      + "/" + string(eventid)
+      + "/" + secs.toString();
     return JsonHttp.post(url, "");
   }
 
   export function unsetReminderTime(eventid):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/event/unset-reminder-time/" + Login.myUid()
-      + "/" + eventid;
+      Conf.Api.url + "/api/event/unset-reminder-time/" + string(Login.myUid())
+      + "/" + string(eventid);
     return JsonHttp.post(url, "");
   }
 
   export function getReminders(calid, eventid):
   JQueryDeferred<ApiT.EventReminders> {
     var url =
-      Conf.Api.url + "/api/event/reminders/" + Login.myUid()
-      + "/" + calid
-      + "/" + eventid;
+      Conf.Api.url + "/api/event/reminders/" + string(Login.myUid())
+      + "/" + string(calid)
+      + "/" + string(eventid);
     return JsonHttp.get(url);
   }
 
@@ -262,28 +273,28 @@ module Esper.Api {
                                          guest_reminder : ApiT.GuestReminder):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/event/remind/" + Login.myUid()
-      + "/" + eventid
-      + "/" + email;
+      Conf.Api.url + "/api/event/remind/" + string(Login.myUid())
+      + "/" + string(eventid)
+      + "/" + string(email);
     return JsonHttp.put(url, JSON.stringify(guest_reminder));
   }
 
   export function disableReminderForGuest(eventid, email):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/event/remind/" + Login.myUid()
-      + "/" + eventid
-      + "/" + email;
+      Conf.Api.url + "/api/event/remind/" + string(Login.myUid())
+      + "/" + string(eventid)
+      + "/" + string(email);
     return JsonHttp.delete_(url);
   }
 
   export function getDefaultReminder(teamid, calid, eventid):
   JQueryDeferred<ApiT.DefaultReminder> {
     var url =
-      Conf.Api.url + "/api/event/default-reminder/" + Login.myUid()
-      + "/" + teamid
-      + "/" + calid
-      + "/" + eventid;
+      Conf.Api.url + "/api/event/default-reminder/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(calid)
+      + "/" + string(eventid);
     return JsonHttp.get(url);
   }
 
@@ -291,9 +302,9 @@ module Esper.Api {
                                calRequest : ApiT.CalendarRequest):
   JQueryDeferred<ApiT.CalendarEventList> {
     var url =
-      Conf.Api.url + "/api/calendar/events/view/" + Login.myUid()
-      + "/" + teamid
-      + "/" + calid;
+      Conf.Api.url + "/api/calendar/events/view/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(calid);
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 
@@ -302,8 +313,8 @@ module Esper.Api {
                                       withThreads: boolean):
   JQueryDeferred<ApiT.Task> {
     var url =
-      Conf.Api.url + "/api/thread/task/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/" + threadid
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
@@ -315,9 +326,9 @@ module Esper.Api {
                                    withThreads: boolean):
   JQueryDeferred<ApiT.Task> {
     var url =
-      Conf.Api.url + "/api/thread/task-opt/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadid
+      Conf.Api.url + "/api/thread/task-opt/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadid)
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
     return JsonHttp.get(url).then(function(x) { return x.task; });
@@ -328,9 +339,9 @@ module Esper.Api {
                                        withThreads: boolean):
   JQueryDeferred<ApiT.Task> {
     var url =
-      Conf.Api.url + "/api/thread/task-auto/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadid
+      Conf.Api.url + "/api/thread/task-auto/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadid)
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
     return JsonHttp.get(url).then(function(x) { return x.task; });
@@ -339,18 +350,18 @@ module Esper.Api {
   export function deleteTask(taskid):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/task/details/" + Login.myUid()
-      + "/" + taskid;
+      Conf.Api.url + "/api/task/details/" + string(Login.myUid())
+      + "/" + string(taskid);
     return JsonHttp.delete_(url);
   }
 
   export function linkThreadToTask(teamid, threadid, taskid):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/task/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadid
-      + "/" + taskid;
+      Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadid)
+      + "/" + string(taskid);
     return JsonHttp.put(url, "");
   }
 
@@ -358,29 +369,29 @@ module Esper.Api {
                                       old_taskid, new_taskid):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/thread/task/" + Login.myUid()
-      + "/" + teamid
-      + "/" + threadid
-      + "/" + old_taskid
-      + "/" + new_taskid;
+      Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadid)
+      + "/" + string(old_taskid)
+      + "/" + string(new_taskid);
     return JsonHttp.put(url, "");
   }
 
   export function setTaskTitle(taskid, title):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/task/title/" + Login.myUid()
-      + "/" + taskid
-      + "/" + encodeURIComponent(title);
+      Conf.Api.url + "/api/task/title/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + encodeURIComponent(string(title));
     return JsonHttp.put(url, "");
   }
 
   export function searchTasks(teamid, query):
   JQueryDeferred<ApiT.TaskSearchResults> {
     var url =
-      Conf.Api.url + "/api/tasks/search/" + Login.myUid()
-      + "/" + teamid
-      + "/" + encodeURIComponent(query);
+      Conf.Api.url + "/api/tasks/search/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(query));
     return JsonHttp.get(url);
   }
 
@@ -395,8 +406,8 @@ module Esper.Api {
                               withThreads: boolean):
   JQueryDeferred<ApiT.TaskList> {
     var url =
-      Conf.Api.url + "/api/tasks/page/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/tasks/page/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/" + pageSize.toString()
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
@@ -406,8 +417,8 @@ module Esper.Api {
   export function sendEventInvites(teamid, fromEmail, guests, event):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/event/invite/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/event/invite/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/" + encodeURIComponent(fromEmail);
     var body = { invite_guests: guests, invite_event: event };
     return JsonHttp.post(url, JSON.stringify(body));
@@ -416,8 +427,8 @@ module Esper.Api {
   export function getRestrictedDescription(teamid, eventid, guests):
   JQueryDeferred<ApiT.EventDescription> {
     var url =
-      Conf.Api.url + "/api/event/description/" + Login.myUid()
-      + "/" + teamid
+      Conf.Api.url + "/api/event/description/" + string(Login.myUid())
+      + "/" + string(teamid)
       + "/" + encodeURIComponent(eventid);
     var guestEmails =
       List.map(guests, function(g : ApiT.Guest) { return g.email; });
@@ -428,16 +439,16 @@ module Esper.Api {
   export function getCustomerStatus(teamid):
   JQueryDeferred<ApiT.CustomerStatus> {
     var url =
-      Conf.Api.url + "/api/pay/status/short/" + Login.myUid()
-      + "/" + teamid;
+      Conf.Api.url + "/api/pay/status/short/" + string(Login.myUid())
+      + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function getCustomerDetails(teamid):
   JQueryDeferred<ApiT.CustomerDetails> {
     var url =
-      Conf.Api.url + "/api/pay/status/long/" + Login.myUid()
-      + "/" + teamid;
+      Conf.Api.url + "/api/pay/status/long/" + string(Login.myUid())
+      + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
