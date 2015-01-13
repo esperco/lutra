@@ -6,11 +6,31 @@
     associated with the current task is extended)
 */
 module Esper.TimeTracker {
-  var currentTask: string; /* task ID */
-  var startTimeMs: number;
-
   var flushIntervalMs = 120000; /* 2 min */
   var checkIntervalMs = 30000;  /* 30 s */
+
+  /* The state of the time tracker */
+  var currentTask: string; /* task ID */
+  var startTimeMs: number;
+  /*
+    Stopped: current task undefined, start time undefined
+    Running: current task defined, start time defined
+    Paused: current task defined, start time undefined
+    illegal state: current task undefined, start time defined
+   */
+
+  function isStopped() {
+    return currentTask === undefined;
+  }
+
+  function isRunning() {
+    return currentTask !== undefined && startTimeMs !== undefined;
+  }
+
+  function isPaused() {
+    return currentTask !== undefined && startTimeMs === undefined;
+  }
+
 
   function startTimer() {
     startTimeMs = Date.now();
@@ -26,7 +46,7 @@ module Esper.TimeTracker {
    */
   function sendToServer() {
     var startTimeSec = toSeconds(startTimeMs);
-    var elapsed = toSeconds(Date.now());
+    var elapsed = toSeconds(Date.now()) - startTimeSec;
     Log.d("Sending time tracking data to server:"
           + " task " + currentTask
           + " started " + startTimeSec
@@ -39,14 +59,13 @@ module Esper.TimeTracker {
   }
 
   function flush() {
-    if (currentTask !== undefined) {
+    if (isRunning()) {
       sendToServer();
     }
   }
 
   function maybeFlush() {
-    if (currentTask !== undefined) {
-      console.assert(startTimeMs !== undefined);
+    if (isRunning()) {
       if (Date.now() - startTimeMs >= flushIntervalMs) {
         flush();
       }
@@ -61,22 +80,52 @@ module Esper.TimeTracker {
     iteration();
   }
 
+  var initialized = false;
+  function initIfNeeded() {
+    if (! initialized) {
+      initialized = true;
+      checkPeriodically();
+    }
+  }
+
   export function stop() {
     var taskid = currentTask;
-    if (taskid !== undefined)
+    if (taskid !== undefined) {
+      Log.d("Stop " + currentTask);
       flush();
+    }
     clear();
+    console.assert(isStopped());
   }
 
+  /* Start a timer for the given task unless one already exists. */
   export function start(taskid: string) {
+    initIfNeeded();
     console.assert(taskid !== undefined);
-    if (currentTask !== undefined)
-      flush();
-    currentTask = taskid;
-    startTimer();
+    if (isRunning() && currentTask === taskid)
+      /* let it run */;
+    else {
+      stop();
+      currentTask = taskid;
+      startTimer();
+      Log.d("Start " + taskid);
+    }
+    console.assert(isRunning());
   }
 
-  export function init() {
-    checkPeriodically();
+  export function pause() {
+    if (isRunning()) {
+      var taskid = currentTask;
+      stop();
+      currentTask = taskid;
+      Log.d("Paused " + currentTask);
+      console.assert(isPaused());
+    }
+  }
+
+  /* Resume from paused state if applicable, otherwise do nothing. */
+  export function resume() {
+    if (isPaused())
+      start(currentTask);
   }
 }

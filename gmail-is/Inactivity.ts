@@ -6,10 +6,16 @@ module Esper.Inactivity {
   var lastActive = 0;
 
   var expireAfterMs = 20000 //300000; /* 5 min */
-  var granularityMs = 5000 //10000;  /* 10 s */
+  var granularityMs = 10000;  /* 10 s */
 
   function signalInactivity() {
-    Log.d("Are you still there?");
+    /*
+      We could ask the user something like "Are you still there?"
+      and if they answer "no", we don't bill those last few minutes.
+      This is a refinement. Let's do this later if necessary.
+    */
+    Log.d("No activity detected. Pausing time tracker.");
+    TimeTracker.pause();
   }
 
   function updateInactivityTimer() {
@@ -26,6 +32,7 @@ module Esper.Inactivity {
   */
   function markActive() {
     Log.d("markActive");
+    TimeTracker.resume();
     lastActive = Date.now();
     setTimeout(waitForActivity, granularityMs);
     updateInactivityTimer();
@@ -36,7 +43,11 @@ module Esper.Inactivity {
     $(window).one("mousemove", markActive);
   }
 
+  var initialized = false;
   export function init() {
-    markActive();
+    if (! initialized) {
+      initialized = true;
+      markActive();
+    }
   }
 }
