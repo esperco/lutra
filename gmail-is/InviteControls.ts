@@ -157,7 +157,7 @@ module Esper.InviteControls {
       }
 
       next.click(function() {
-        if (!duplicate) next.text("Inviting...");
+        if (!duplicate) inviting(next);
         var guests = Object.keys(peopleInvolved).map(function (email) {
           return {
             email        : email,
@@ -265,6 +265,15 @@ module Esper.InviteControls {
     return container;
   }
 
+  /** Disables the button and changes the text to "Inviting..." to
+   *  signify that work is being done in the background (ie over the
+   *  network).
+   */
+  function inviting(button) {
+    button.text("Inviting...");
+    button.attr("disabled", true);
+  }
+
   /** A widget for viewing and editing the whole event description,
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
@@ -307,6 +316,7 @@ module Esper.InviteControls {
     back.click(backFunction);
 
     invite.click(function () {
+      inviting(invite);
       duplicate.description = descriptionField.val();
 
       Api.createLinkedEvent(team.teamid, duplicate, threadId)
@@ -356,7 +366,10 @@ module Esper.InviteControls {
     if (!duplicate) next.text("Invite");
 
     back.click(backFunction);
-    next.click(nextFunction);
+    next.click(function () {
+      if (!duplicate) inviting(next);
+      nextFunction();
+    });
 
     var reminderEnabled = true;
 
