@@ -7,8 +7,6 @@ module Esper.TaskTab {
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
-  export var currentTask : ApiT.Task;
-
   function obtainTaskForThread(teamid, threadId,
                                view: TaskTabView) {
     var currentTask = CurrentThread.task.get();
