@@ -650,7 +650,6 @@ module Esper.TaskTab {
     linkActions: JQuery;
     createEvent: JQuery;
     createEventIcon: JQuery;
-    calendarList: JQuery;
     linkEvent: JQuery;
     linkEventIcon: JQuery;
     linkedEventsContainer: JQuery;
@@ -882,7 +881,6 @@ module Esper.TaskTab {
             }
           });
       });
-      li.appendTo(calendarList);
     });
 
     linkEvent.click(function() {

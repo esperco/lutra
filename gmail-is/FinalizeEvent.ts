@@ -119,18 +119,30 @@ module Esper.FinalizeEvent {
       var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
         return e.event;
       });
-      var events = notHolds(linkedEvents).concat([event]);
-      var message = "Confirming the following events:<br />";
+      // TODO: Support multiple events properly (again)
+      var name  = CurrentThread.team.get().team_name;
 
-      return events.reduce(function (message, ev) {
-        var title = ev.title || "";
-        title = title.replace(/^HOLD: /, "");
+      var eventTimezone = CurrentThread.eventTimezone(event);
 
-        var location = ev.location || "";
-        var locationStr = location ? " at " + locationStr : "";
+      var start    = new Date(event.start.local);
+      var end      = new Date(event.start.local);
+      var range    = XDate.range(start, end);
+      var timezone =
+        (<any> moment).tz(event.start.local, eventTimezone).zoneAbbr();
 
-        return message + title + locationStr + "<br />";
-      }, message);
+      var time = XDate.fullWeekDay(start) + ", " + range + " " + timezone;
+      var location = event.location &&
+        (event.location.title || event.location.address);
+
+      return [
+        "Hi " + name,
+        "",
+        "You are confirmed for " + event.title +
+          " on " + time +
+          (location ? " at " + location : "") +
+          ". " +
+          "Please let me know if you have any questions about this appointment."
+      ].join("<br />");
     } else {
       return null;
     }
