@@ -48,6 +48,15 @@ module Esper.Inactivity {
     if (! initialized) {
       initialized = true;
       markActive();
+      CurrentThread.task.watch(
+        function(task: ApiT.Task, isValid: boolean,
+                 oldTask: ApiT.Task, oldIsValid: boolean) {
+          if (isValid)
+            TimeTracker.start(task.taskid);
+          else
+            TimeTracker.stop();
+        }
+      );
     }
   }
 }
