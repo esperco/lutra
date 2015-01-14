@@ -128,7 +128,7 @@ module CalendarsTab {
     });
   }
 
-  function saveCalendarShares(team, view) {
+  function saveCalendarShares(team, view, share, onboarding) {
     var calls = [];
     var teamCals = [];
     view.find(".esper-cal-row").each(function() {
@@ -149,10 +149,12 @@ module CalendarsTab {
         calls.push(Api.deleteCalendarShare(calendarId, aclId));
       }
     });
+    share.text("Loading...").attr("disabled", "true");
     Deferred.join(calls).done(function() {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
         .done(function() {
-          window.location.reload();
+          if (onboarding) TeamSettings.switchTab(2);
+          else window.location.reload();
         });
     });
   }
@@ -211,7 +213,7 @@ module CalendarsTab {
     root.append(view);
   }
 
-  export function load(team) {
+  export function load(team, onboarding?) {
 '''
 <div #view>
   <div #teamCalendars>
@@ -258,7 +260,10 @@ module CalendarsTab {
         refreshList();
       });
 
-      share.click(function() { saveCalendarShares(team, calendarView); });
+      if (onboarding) share.text("Next Step");
+      share.click(function() {
+        saveCalendarShares(team, calendarView, share, onboarding);
+      });
     }
 
     return view;

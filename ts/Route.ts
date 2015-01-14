@@ -45,7 +45,11 @@ module Route {
     /* various pages */
 
     "team-settings/:teamid route" : function (data) {
-      withLogin(Page.teamSettings.load, data.teamid, undefined, undefined);
+      withLogin(Page.teamSettings.load, data.teamid);
+    },
+
+    "join/:teamid route" : function (data) {
+      withLogin(Page.onboarding.load, data.teamid);
     },
 
     "preferences route" : function (data) {

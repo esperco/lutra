@@ -23,41 +23,60 @@ module TeamSettings {
       dismissOverlays();
   });
 
-  function showTeamSettings(team) {
+  export function switchTab(i) {
+    var tab = $('.esper-tab-content .tab' + i);
+    var link = $('.esper-tab-links .link' + i);
+    tab.show().siblings().hide();
+    if (link.hasClass("disabled"))
+      $('.esper-tab-links .link').addClass("disabled");
+    link.removeClass("disabled");
+    link.parent('li').addClass('active').siblings().removeClass('active');
+  };
+
+  function showTeamSettings(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
   <div style="padding-left:28px">
     <ul class="esper-tab-links">
-      <li class="active"><a #tab1 id="tab1" class="link first">Account</a></li>
-      <li><a #tab2 id="tab2" class="link">Preferences</a></li>
-      <li><a #tab3 id="tab3" class="link">Calendars</a></li>
-      <li><a #tab4 id="tab4" class="link last">LabelSync</a></li>
+      <li class="active"><a #tab1 class="link link1 first">Calendars</a></li>
+      <li><a #tab2 class="link link2">Account</a></li>
+      <li><a #tab3 class="link link3">Preferences</a></li>
+      <li><a #tab4 class="link link4 last">LabelSync</a></li>
     </ul>
   </div>
   <div class="esper-tab-content">
-    <div #content1 id="tab1" class="tab active"/>
-    <div #content2 id="tab2" class="tab"/>
-    <div #content3 id="tab3" class="tab"/>
-    <div #content4 id="tab4" class="tab"/>
+    <div #content1 class="tab tab1 active"/>
+    <div #content2 class="tab tab2"/>
+    <div #content3 class="tab tab3"/>
+    <div #content4 class="tab tab4"/>
   </div>
 </div>
 '''
 
-    tab1.click(function() { switchTab(tab1); });
-    tab2.click(function() { switchTab(tab2); });
-    tab3.click(function() { switchTab(tab3); });
-    tab4.click(function() { switchTab(tab4); });
+    tab1.click(function() { switchTab(1); });
+    tab2.click(function() { switchTab(2); });
+    tab3.click(function() { switchTab(3); });
 
-    function switchTab(tab) {
-      var currentAttrValue = "#" + tab.attr("id");
-      $('.esper-tab-content ' + currentAttrValue).show().siblings().hide();
-      tab.parent('li').addClass('active').siblings().removeClass('active');
-    };
+    content1.append(CalendarsTab.load(team, onboarding));
+    content2.append(AccountTab.load(team, onboarding));
+    content3.append(PreferencesTab.load(team, onboarding, content3));
 
-    content1.append(AccountTab.load(team));
-    content2.append(PreferencesTab.load(team));
-    content3.append(CalendarsTab.load(team));
-    content4.append(LabelSyncTab.load(team));
+    /* We don't have access to executive email accounts,
+     * so executives don't need to configure label sync. */
+    if (Login.me() === team.team_executive) {
+      tab4.remove();
+      content4.remove();
+      tab3.addClass("last");
+    } else {
+      tab4.click(function() { switchTab(4); });
+      content4.append(LabelSyncTab.load(team));
+    }
+
+    if (onboarding) {
+      // We'll guide the exec through each step
+      tab2.off("click").addClass("disabled");
+      tab3.off("click").addClass("disabled");
+    }
 
     return view;
   }
@@ -77,7 +96,7 @@ module TeamSettings {
     }
   }
 
-  export function load(team) {
+  export function load(teamid : string, onboarding? : boolean) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -100,8 +119,6 @@ module TeamSettings {
     root.children().remove();
     root.append(view);
 
-    var teamid = team.teamid;
-
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
     Svg.loadImg(logo, "/assets/img/logo.svg");
@@ -119,14 +136,28 @@ module TeamSettings {
       .done(function(exec) {
         document.title = exec.display_name + " - Team Settings";
         profilePic.css("background-image", "url('" + exec.image_url + "')");
-        teamName.text(team.team_name);
+        teamName.text(selectedTeam.team_name);
       });
 
-    main.append(showTeamSettings(selectedTeam));
-
-    footer.append(Footer.load());
-
     headerTitle.click(Page.settings.load);
+
+    if (onboarding) {
+      Api.getSubscriptionStatus(Login.me(), selectedTeam.teamid)
+        .done(function(customer) {
+          main.append(showTeamSettings(selectedTeam, onboarding));
+          footer.append(Footer.load());
+          if (!Login.data.missing_shared_calendar) {
+            var mem = customer.status;
+            if (mem === "Trialing" || mem === "Active")
+              switchTab(3);
+            else
+              switchTab(2);
+          }
+        });
+    } else {
+      main.append(showTeamSettings(selectedTeam, onboarding));
+      footer.append(Footer.load());
+    }
 
     signOut.click(function() {
       Login.clearLoginInfo();

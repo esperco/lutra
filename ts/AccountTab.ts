@@ -409,21 +409,16 @@ module AccountTab {
       } else {
         var stripeToken = response.id;
         Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
-          if (membership == "Standard") {
-            Api.setSubscription(execUid, teamid, "Standard_20141222");
-          }
-          else if (membership == "Enhanced") {
-            Api.setSubscription(execUid, teamid, "Enhanced_20141222");
-          }
-          else if (membership == "Pro") {
-            Api.setSubscription(execUid, teamid, "Pro_20141222");
-          }
-          (<any> paymentForm.get(0)).reset();
-          (<any> modal).modal("hide"); // FIXME
-          if (defaultBox.prop("checked")) {
-            Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
-          } else {
-            refresh();
+          if (membership !== null) {
+            Api.setSubscription(execUid, teamid, membership);
+            $(".next-step-button").prop("disabled", false);
+            (<any> paymentForm.get(0)).reset();
+            (<any> modal).modal("hide"); // FIXME
+            if (defaultBox.prop("checked")) {
+              Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
+            } else {
+              refresh();
+            }
           }
         });
       }
@@ -558,15 +553,15 @@ module AccountTab {
 
       planLo.click(function() {
         selectMembership(planLo);
-        selectedMembership = "Standard";
+        selectedMembership = "Standard_20141222";
       });
       planMid.click(function() {
         selectMembership(planMid);
-        selectedMembership = "Enhanced";
+        selectedMembership = "Enhanced_20141222";
       });
       planHi.click(function() {
         selectMembership(planHi);
-        selectedMembership = "Pro";
+        selectedMembership = "Pro_20141222";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
@@ -580,6 +575,7 @@ module AccountTab {
           else { // there are cards to charge
             primaryBtn.click(function() {
               Api.setSubscription(execUid, teamid, selectedMembership);
+              $(".next-step-button").prop("disabled", false);
               (<any> modal).modal("hide"); // FIXME
             });
           }
@@ -719,7 +715,7 @@ module AccountTab {
     return _view;
   }
 
-  function displayMembership(team) {
+  function displayMembership(team, next) {
 '''
 <div #view class="membership">
   <div class="membership-col left">
@@ -773,6 +769,7 @@ module AccountTab {
 
       if (mem == "Trialing" || mem == "Active") {
         membershipBadge.addClass("active");
+        next.prop("disabled", false);
       } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
@@ -795,7 +792,7 @@ module AccountTab {
     return view;
   }
 
-  export function load(team) {
+  export function load(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
   <div class="table-header">Membership & Billing</div>
@@ -811,6 +808,9 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
+    <button #next class="next-step-button button-primary" disabled="true">
+      Next Step
+    </button>
   </div>
 </div>
 '''
@@ -818,7 +818,7 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    membership.append(displayMembership(team));
+    membership.append(displayMembership(team, next));
 
     spinner.show();
 
@@ -836,6 +836,11 @@ module AccountTab {
     var popover = renderInviteDialog(team, _view);
     view.append(popover.view);
     invite.click(function() { Settings.togglePopover(popover); });
+
+    if (onboarding)
+      next.click(function() { TeamSettings.switchTab(3); });
+    else
+      next.remove();
 
     return view;
   }
