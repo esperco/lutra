@@ -6,12 +6,13 @@
     associated with the current task is extended)
 */
 module Esper.TimeTracker {
-  var flushIntervalMs = 120000; /* 2 min */
-  var checkIntervalMs = 30000;  /* 30 s */
+  var flushIntervalMs = 30000 // 120000; /* 2 min */
+  var checkIntervalMs = 5000 // 30000;  /* 30 s */
 
   /* The state of the time tracker */
   var currentTask: string; /* task ID */
   var startTimeMs: number;
+  var lastFlushMs: number;
   /*
     Stopped: current task undefined, start time undefined
     Running: current task defined, start time defined
@@ -66,7 +67,12 @@ module Esper.TimeTracker {
 
   function maybeFlush() {
     if (isRunning()) {
-      if (Date.now() - startTimeMs >= flushIntervalMs) {
+      var now = Date.now();
+      var last = startTimeMs;
+      if (lastFlushMs > startTimeMs)
+        last = lastFlushMs;
+      if (now - last >= flushIntervalMs) {
+        lastFlushMs = now;
         flush();
       }
     }
