@@ -1109,19 +1109,21 @@ ul.esper-ev-dropdown {
 
 .esper-profile-email { font-size: 11px; }
 
-.esper-membership-badge {
+.esper-badge {
   margin-left: 6px;
   padding: 2px 6px;
   font-size: 10px;
   font-weight: 600;
   border-radius: 2px;
+  background: @purple;
+  color : white;
+
   &.esper-active {
     background: @green;
-    color: white;
   }
+
   &.esper-suspended {
     background: @red;
-    color: white;
   }
 }
 
@@ -1363,6 +1365,10 @@ ul.esper-ev-dropdown {
   font-size: 18px;
   border-bottom: 1px solid @gray_10;
   box-sizing: border-box;
+
+  .esper-badge {
+    float : right;
+  }
 }
 
 .esper-modal-footer {

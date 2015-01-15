@@ -68,6 +68,7 @@ module Esper.InviteControls {
     </div>
   </div>
 </div>
+<div #notDuplicate class="esper-badge">Not Duplicate</div>
 '''
     /** Removes the widget from the DOM. */
     function close() {
@@ -150,8 +151,7 @@ module Esper.InviteControls {
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
-        titleRow.hide();
-        whereRow.hide();
+        notDuplicate.appendTo(heading);
         calendarRow.hide();
         notesRow.hide();
       }
