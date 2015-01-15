@@ -97,7 +97,7 @@ module Esper.TaskTab {
   }
 
   /** Displays a shortcut for choosing the event without using the menu. */
-  function displayEventChoose(view, event) {
+  function displayEventChoose(view, event: ApiT.CalendarEvent) {
 '''
 <div #choose title="Choose this event." class="esper-choose-event">
   <object #check class="esper-svg esper-linked-check"/>
@@ -325,7 +325,7 @@ module Esper.TaskTab {
                                      threadId, taskTab, profiles));
     } else {
       e = ev.event;
-      time.prepend(displayEventChoose(view, ev));
+      time.prepend(displayEventChoose(view, e));
       time.prepend(displayEventOptions(view, ev, linkedEvents, team,
                                        threadId, taskTab, profiles));
     }
