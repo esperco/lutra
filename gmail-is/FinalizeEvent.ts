@@ -137,7 +137,7 @@ module Esper.FinalizeEvent {
       return [
         "Hi " + name,
         "",
-        "You are confirmed for " + event.title +
+        "You are confirmed for " + event.title.replace(/^HOLD: /, "") +
           " on " + time +
           (location ? " at " + location : "") +
           ". " +

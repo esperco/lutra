@@ -407,7 +407,7 @@ module Esper.UserTab {
   <div #profPic class="esper-profile-pic"/>
   <div class="esper-profile-row esper-profile-name-row">
     <span #name class="esper-profile-name"/>
-    <span #membership class="esper-membership-badge"/>
+    <span #membership class="esper-badge"/>
     <object #appleLogo class="esper-svg esper-ios-app-icon"/>
   </div>
   <div #email class="esper-profile-row esper-profile-email"/>

@@ -96,6 +96,27 @@ module Esper.TaskTab {
     return view;
   }
 
+  /** Displays a shortcut for choosing the event without using the menu. */
+  function displayEventChoose(view, event: ApiT.CalendarEvent) {
+'''
+<div #choose title="Choose this event." class="esper-choose-event">
+  <object #check class="esper-svg esper-linked-check"/>
+</div>
+'''
+    check.attr("data", Init.esperRootUrl + "img/green-check.svg");
+
+    choose.click(function() {
+      var msg = "Other linked events will be deleted. Are you sure?";
+      if (window.confirm(msg)) { // TODO Style me
+        view.parent().find(".esper-ev").addClass("esper-disabled");
+
+        FinalizeEvent.finalizeEvent(event);
+      }
+    });
+
+    return choose;
+  }
+
   function displayEventOptions(view,
                                ev: ApiT.EventWithSyncInfo,
                                linkedEvents: ApiT.EventWithSyncInfo[],
@@ -304,6 +325,7 @@ module Esper.TaskTab {
                                      threadId, taskTab, profiles));
     } else {
       e = ev.event;
+      time.prepend(displayEventChoose(view, e));
       time.prepend(displayEventOptions(view, ev, linkedEvents, team,
                                        threadId, taskTab, profiles));
     }
