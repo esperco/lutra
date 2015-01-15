@@ -68,7 +68,10 @@ module Esper.InviteControls {
     </div>
   </div>
 </div>
-<div #notDuplicate class="esper-badge">Not Duplicate</div>
+<div #notDuplicate class="esper-badge"
+     title="One event will be sent to the exec and the guests.">
+  Not Duplicate
+</div>
 '''
     /** Removes the widget from the DOM. */
     function close() {
