@@ -52,6 +52,7 @@ module Esper.TimeTracker {
           + " task " + currentTask
           + " started " + startTimeSec
           + " elapsed " + elapsed);
+    Api.trackTask(currentTask, startTimeSec, elapsed);
   }
 
   function clear() {
