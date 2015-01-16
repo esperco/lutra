@@ -52,13 +52,18 @@ module Esper.TimeTracker {
     ID with the same start date later.
    */
   function sendToServer() {
-    var startTimeSec = toSeconds(startTimeMs);
-    var elapsed = toSeconds(Date.now()) - startTimeSec;
-    Log.d("Sending time tracking data to server:"
-          + " task " + currentTask
-          + " started " + startTimeSec
-          + " elapsed " + elapsed);
-    Api.trackTask(currentTask, startTimeSec, elapsed);
+    if (Login.loggedIn()) {
+      var startTimeSec = toSeconds(startTimeMs);
+      var elapsed = toSeconds(Date.now()) - startTimeSec;
+      Log.d("Sending time tracking data to server:"
+            + " task " + currentTask
+            + " started " + startTimeSec
+            + " elapsed " + elapsed);
+      Api.trackTask(currentTask, startTimeSec, elapsed);
+    }
+    else {
+      Log.e("Logged out. Can't send time tracking data to server.");
+    }
   }
 
   function clear() {
