@@ -808,7 +808,7 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
-    <button #next class="next-step-button button-primary" disabled="true">
+    <button #next style="float: right" class="next-step-button button-primary" disabled="true">
       Next Step
     </button>
   </div>

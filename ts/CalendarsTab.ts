@@ -260,7 +260,11 @@ module CalendarsTab {
         refreshList();
       });
 
-      if (onboarding) share.text("Next Step");
+      if (onboarding) {
+        share.css("float", "right");
+        share.text("Next Step");
+      }
+
       share.click(function() {
         saveCalendarShares(team, calendarView, share, onboarding);
       });

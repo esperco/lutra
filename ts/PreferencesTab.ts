@@ -957,7 +957,7 @@ module PreferencesTab {
     <button #saveNotes class="button-primary" disabled>Save</button>
   </div>
   <div>
-    <button #next class="button-primary">Finish</button>
+    <button #next style="margin-top: 10px; float: right" class="button-primary">Finish</button>
   </div>
 </div>
 '''

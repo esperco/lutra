@@ -297,7 +297,7 @@ module Settings {
       if (Login.data.missing_shared_calendar)
         // This is a new exec customer who needs to be onboarded
         location.hash = "#!join/" + teams[0].teamid;
-      else
+      else if (teams[0] !== null)
         location.hash = "#!team-settings/" + teams[0].teamid;
       //Page.teamSettings.load(teams[0].teamid);
     } else {
