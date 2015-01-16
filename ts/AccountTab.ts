@@ -835,7 +835,14 @@ module AccountTab {
 
     var popover = renderInviteDialog(team, _view);
     view.append(popover.view);
-    invite.click(function() { Settings.togglePopover(popover); });
+
+    if (Login.me() === team.team_executive) {
+      // Executives are getting confused by this and messing teams up
+      emailContainer.hide();
+      invite.hide();
+    } else {
+      invite.click(function() { Settings.togglePopover(popover); });
+    }
 
     if (onboarding)
       next.click(function() { TeamSettings.switchTab(3); });
