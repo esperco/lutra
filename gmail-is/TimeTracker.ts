@@ -6,8 +6,14 @@
     associated with the current task is extended)
 */
 module Esper.TimeTracker {
-  var flushIntervalMs = 30000 // 120000; /* 2 min */
-  var checkIntervalMs = 5000 // 30000;  /* 30 s */
+  var flushIntervalMs = 120000; /* 2 min */
+  var checkIntervalMs = 30000;  /* 30 s */
+
+  if (!Conf.prod) {
+    /* Reduce delays for faster testing */
+    flushIntervalMs = 30000;
+    checkIntervalMs = 5000;
+  }
 
   /* The state of the time tracker */
   var currentTask: string; /* task ID */

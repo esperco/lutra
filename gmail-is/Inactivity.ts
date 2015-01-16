@@ -5,8 +5,14 @@ module Esper.Inactivity {
   var timer;
   var lastActive = 0;
 
-  var expireAfterMs = 20000 //300000; /* 5 min */
+  var expireAfterMs = 300000; /* 5 min */
   var granularityMs = 10000;  /* 10 s */
+
+  if (!Conf.prod) {
+    /* Reduce delays for faster testing */
+    expireAfterMs = 20000;
+    granularityMs = 5000;
+  }
 
   function signalInactivity() {
     /*
