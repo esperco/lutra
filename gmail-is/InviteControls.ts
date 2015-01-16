@@ -150,17 +150,17 @@ module Esper.InviteControls {
       var duplicate = preferences.general.use_duplicate_events;
       var reminder  = false;    // TODO: enable reminders again
 
-      if (!duplicate && !reminder) next.text("Invite");
+      // if (!duplicate && !reminder) next.text("Invite");
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
         notDuplicate.appendTo(heading);
-        calendarRow.hide();
-        notesRow.hide();
+        // calendarRow.hide();
+        // notesRow.hide();
       }
 
       next.click(function() {
-        if (!duplicate) inviting(next);
+        // if (!duplicate) inviting(next);
         var guests = Object.keys(peopleInvolved).map(function (email) {
           return {
             email        : email,
@@ -235,12 +235,12 @@ module Esper.InviteControls {
           var next = reminderWidget(duplicate, function () {
             slideBack(container, next);
           }, function () {
-            if (duplicate) {
+            // if (duplicate) {
               checkDescription(next);
-            } else {
-              next.remove();
-              inviteGuests();
-            }
+            // } else {
+            //   next.remove();
+            //   inviteGuests();
+            // }
           });
 
           slideForward(container, next);
@@ -254,11 +254,11 @@ module Esper.InviteControls {
         if (reminder) {
           checkReminder();
         } else {
-          if (duplicate) {
+          // if (duplicate) {
             checkDescription(container);
-          } else {
-            inviteGuests();
-          }
+          // } else {
+          //   inviteGuests();
+          // }
         }
       });
     });
@@ -366,11 +366,11 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    if (!duplicate) next.text("Invite");
+    // if (!duplicate) next.text("Invite");
 
     back.click(backFunction);
     next.click(function () {
-      if (!duplicate) inviting(next);
+      // if (!duplicate) inviting(next);
       nextFunction();
     });
 
