@@ -452,4 +452,13 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function trackTask(taskid: string, start: number, duration: number):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/track/task/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + start.toString()
+      + "/" + duration.toString();
+    return JsonHttp.put(url, "");
+  }
 }

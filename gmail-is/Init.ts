@@ -129,6 +129,7 @@ module Esper.Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
+      Inactivity.init();
     }
   }
 }
