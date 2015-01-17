@@ -156,7 +156,6 @@ module Esper.InviteControls {
         heading.text("Invite guests to this calendar event");
         notDuplicate.appendTo(heading);
         calendarRow.hide();
-        notesRow.hide();
       }
 
       next.click(function() {
