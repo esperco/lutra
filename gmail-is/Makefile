@@ -83,6 +83,8 @@ APP_SOURCES = \
   Sidebar \
   TaskTab \
   UserTab \
+  TimeTracker \
+  Inactivity \
   Init \
   Main
 

@@ -8,7 +8,7 @@
  *    - linked task
  */
 module Esper.CurrentThread {
-  
+
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
@@ -70,7 +70,7 @@ module Esper.CurrentThread {
    */
   export function eventTimezone(ev: ApiT.CalendarEvent): string {
     if (!team.isValid()) return undefined;
-    
+
     var teamCal =
       List.find(team.get().team_calendars, function(c) {
         return c.google_cal_id === ev.google_cal_id;

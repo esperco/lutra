@@ -363,4 +363,19 @@ module Esper.ApiT {
     address_country?: string;
   }
 
+  export interface TimeTrack {
+    taskid: string;
+    teamid: string;
+    start: number;
+    duration: number;
+    user: string;
+    ip_addr: string;
+  }
+
+  export interface TimeTrackPeriod {
+    start: number;
+    end: number;
+    items: TimeTrack[];
+  }
+
 }
