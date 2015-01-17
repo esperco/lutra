@@ -188,6 +188,8 @@ module Esper.InviteControls {
         };
 
         var from = fromSelect.val();
+        var title = pubTitle.val();
+        location = pubLocation.val();
         var animation = {
           time : 500,
           width : Gmail.threadContainer().width() + 100
@@ -219,9 +221,9 @@ module Esper.InviteControls {
         /** Animates from the current widget to the check description
          *  widget.
          */
-        function checkDescription(previous) {
+        function checkDescription(previous, title) {
           var next =
-            descriptionWidget(event, eventEdit, duplicate, guests, from, title, close, back);
+            descriptionWidget(event, eventEdit, duplicate, guests, from, title, location, close, back);
 
           slideForward(previous, next);
 
@@ -234,7 +236,8 @@ module Esper.InviteControls {
           var next = reminderWidget(duplicate, function () {
             slideBack(container, next);
           }, function () {
-            checkDescription(next);
+            var title = pubTitle.val();
+            checkDescription(next, title);
           });
 
           slideForward(container, next);
@@ -248,7 +251,8 @@ module Esper.InviteControls {
         if (reminder) {
           checkReminder();
         } else {
-          checkDescription(container);
+          var title = pubTitle.val();
+          checkDescription(container, title);
         }
       });
     });
@@ -272,7 +276,7 @@ module Esper.InviteControls {
    *  synced email thread contents.
    */
   export function descriptionWidget(original, eventEdit, duplicate, guests, from,
-                                    done, backFunction) {
+                                    title, location, done, backFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -311,7 +315,9 @@ module Esper.InviteControls {
     invite.click(function () {
       inviting(invite);
       eventEdit.description = descriptionField.val();
-      eventEdit.title = pubTitle.val();
+      console.log("Event edit title:", title);
+      eventEdit.summary = title;
+      eventEdit.location = location;
 
       if (duplicate) {
         Api.createLinkedEvent(team.teamid, eventEdit, threadId)
