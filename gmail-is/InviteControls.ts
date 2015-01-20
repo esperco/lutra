@@ -174,12 +174,8 @@ module Esper.InviteControls {
 
         var eventEdit = {
           google_cal_id : publicCalId,
-          start         : {
-            dateTime : event.start.utc
-          },
-          end           : {
-            dateTime : event.end.utc
-          },
+          start         : event.start,
+          end           : event.end,
           title         : pubTitle.val(),
           description   : pubNotes.val(),
           location      : location,
@@ -223,7 +219,7 @@ module Esper.InviteControls {
          */
         function checkDescription(previous, title) {
           var next =
-            descriptionWidget(event, eventEdit, duplicate, guests, from, title, location, close, back);
+            descriptionWidget(event, eventEdit, duplicate, guests, from, close, back);
 
           slideForward(previous, next);
 
@@ -276,7 +272,7 @@ module Esper.InviteControls {
    *  synced email thread contents.
    */
   export function descriptionWidget(original, eventEdit, duplicate, guests, from,
-                                    title, location, done, backFunction) {
+                                    done, backFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -315,9 +311,6 @@ module Esper.InviteControls {
     invite.click(function () {
       inviting(invite);
       eventEdit.description = descriptionField.val();
-      console.log("Event edit title:", title);
-      eventEdit.summary = title;
-      eventEdit.location = location;
 
       if (duplicate) {
         Api.createLinkedEvent(team.teamid, eventEdit, threadId)
