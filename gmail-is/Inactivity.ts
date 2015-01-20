@@ -46,7 +46,7 @@ module Esper.Inactivity {
 
   function waitForActivity() {
     Log.d("waitForActivity");
-    $(window).one("mousemove", markActive);
+    $(window).one("mousedown", markActive);
   }
 
   var initialized = false;
