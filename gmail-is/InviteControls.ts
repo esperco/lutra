@@ -150,16 +150,12 @@ module Esper.InviteControls {
       var duplicate = preferences.general.use_duplicate_events;
       var reminder  = false;    // TODO: enable reminders again
 
-      if (!duplicate && !reminder) next.text("Invite");
-
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
         notDuplicate.appendTo(heading);
-        calendarRow.hide();
       }
 
       next.click(function() {
-        if (!duplicate) inviting(next);
         var guests = Object.keys(peopleInvolved).map(function (email) {
           return {
             email        : email,
@@ -176,7 +172,7 @@ module Esper.InviteControls {
         };
         if (!location.address) location = null;
 
-        var eventEdit: ApiT.CalendarEventEdit = {
+        var eventEdit = {
           google_cal_id : publicCalId,
           start         : event.start,
           end           : event.end,
@@ -188,6 +184,8 @@ module Esper.InviteControls {
         };
 
         var from = fromSelect.val();
+        var title = pubTitle.val();
+        location = pubLocation.val();
         var animation = {
           time : 500,
           width : Gmail.threadContainer().width() + 100
@@ -219,9 +217,9 @@ module Esper.InviteControls {
         /** Animates from the current widget to the check description
          *  widget.
          */
-        function checkDescription(previous) {
+        function checkDescription(previous, title) {
           var next =
-            descriptionWidget(event, eventEdit, guests, from, close, back);
+            descriptionWidget(event, eventEdit, duplicate, guests, from, close, back);
 
           slideForward(previous, next);
 
@@ -234,12 +232,8 @@ module Esper.InviteControls {
           var next = reminderWidget(duplicate, function () {
             slideBack(container, next);
           }, function () {
-            if (duplicate) {
-              checkDescription(next);
-            } else {
-              next.remove();
-              inviteGuests();
-            }
+            var title = pubTitle.val();
+            checkDescription(next, title);
           });
 
           slideForward(container, next);
@@ -253,11 +247,8 @@ module Esper.InviteControls {
         if (reminder) {
           checkReminder();
         } else {
-          if (duplicate) {
-            checkDescription(container);
-          } else {
-            inviteGuests();
-          }
+          var title = pubTitle.val();
+          checkDescription(container, title);
         }
       });
     });
@@ -280,7 +271,7 @@ module Esper.InviteControls {
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionWidget(original, duplicate, guests, from,
+  export function descriptionWidget(original, eventEdit, duplicate, guests, from,
                                     done, backFunction) {
 '''
 <div #container class="esper-ev-inline-container">
@@ -308,7 +299,7 @@ module Esper.InviteControls {
 
     Api.getRestrictedDescription(team.teamid, original.google_event_id, guests)
       .done(function (description) {
-        descriptionField.val(duplicate.description + description.description_text);
+        descriptionField.val(eventEdit.description + description.description_text);
       });
 
     function close() {
@@ -319,16 +310,27 @@ module Esper.InviteControls {
 
     invite.click(function () {
       inviting(invite);
-      duplicate.description = descriptionField.val();
+      eventEdit.description = descriptionField.val();
 
-      Api.createLinkedEvent(team.teamid, duplicate, threadId)
-        .done(function(created) {
-          Api.sendEventInvites(team.teamid, from, guests, created);
-          TaskTab.refreshlinkedEventsList(team, threadId,
-                                          TaskTab.currentTaskTab,
-                                          Sidebar.profiles);
-          close();
-        });
+      if (duplicate) {
+        Api.createLinkedEvent(team.teamid, eventEdit, threadId)
+          .done(function(created) {
+            Api.sendEventInvites(team.teamid, from, guests, created);
+            TaskTab.refreshlinkedEventsList(team, threadId,
+                                            TaskTab.currentTaskTab,
+                                            Sidebar.profiles);
+            close();
+          });
+      } else {
+        Api.updateLinkedEvent(team.teamid, threadId, original.google_event_id, eventEdit)
+          .done(function() {
+            Api.sendEventInvites(team.teamid, from, guests, original);
+            TaskTab.refreshlinkedEventsList(team, threadId,
+                                            TaskTab.currentTaskTab,
+                                            Sidebar.profiles);
+            close();
+          });
+      }
     });
 
     return container;
@@ -365,11 +367,11 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    if (!duplicate) next.text("Invite");
+    // if (!duplicate) next.text("Invite");
 
     back.click(backFunction);
     next.click(function () {
-      if (!duplicate) inviting(next);
+      // if (!duplicate) inviting(next);
       nextFunction();
     });
 
