@@ -132,10 +132,11 @@ module Api {
   };
 
   export function inviteJoinTeam(invite)
-    : JQueryDeferred<ApiT.UrlResult>
+    : JQueryPromise<void>
   {
     return jsonHttpPost("/api/invite/" + string(Login.me()) + "/join-team",
-                        JSON.stringify(invite));
+                        JSON.stringify(invite))
+      .then(function(_ignored) {});
   };
 
   export function setTeamName(teamid, name):
