@@ -15,9 +15,10 @@ module AccountTab {
     location.reload(true);
   }
 
-  function generateInviteURL(team: ApiT.Team,
-                             role: string,
-                             toEmail: string) {
+  function sendInvite(team: ApiT.Team,
+                      role: string,
+                      toEmail: string):
+  JQueryPromise<void> {
     var invite = {
       from_uid: Login.me(),
       teamid: team.teamid,
@@ -28,35 +29,26 @@ module AccountTab {
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(team, role, toEmail, link) {
-    return generateInviteURL(team, role, toEmail)
-      .then(function(urlResult) {
-        var url = urlResult.url;
-        var body =
-          "Please click the link and sign in with your Google account:\n\n"
-          + "  " + url;
-
-        var gmailUrl = GmailCompose.makeUrl({
-          to: toEmail,
-          subject: "Join my team on Esper",
-          body: body
-        });
-
-        link.attr("href", gmailUrl);
-        link.prop("disabled", false);
-      });
+  export interface InviteDialog {
+    view: JQuery;
+    inviteEmail: JQuery;
+    invited: JQuery;
+    addBtn: JQuery;
+    roleSelector: JQuery;
+    assistant: JQuery;
+    executive: JQuery;
+    doneBtn: JQuery;
+    cancelBtn: JQuery;
   }
 
-  function renderInviteDialog(team, table) {
+  function renderInviteDialog(team, table): InviteDialog {
 '''
 <div #view class="invite-popover overlay-popover click-safe">
   <div class="overlay-popover-header click-safe">Add new team member</div>
   <div class="overlay-popover-body click-safe">
     <input #inviteEmail type="email" class="invite-input click-safe"
            autofocus placeholder="name@example.com"/>
-    <div #review class="invite-review click-safe">
-      Review and send invitation (optional)
-    </div>
+    <div #invited class="invite-review click-safe"></div>
     <div class="clearfix click-safe">
       <button #addBtn class="button-primary label-btn click-safe" disabled>
         <span class="click-safe">Add</span>
@@ -67,8 +59,8 @@ module AccountTab {
         <li><a #assistant class="click-safe">Assistant</a></li>
         <li><a #executive class="click-safe">Executive</a></li>
       </ul>
-      <a #continueBtn class="invite-continue button button-primary"
-         target="_blank" disabled>Continue</a>
+      <a #doneBtn class="invite-continue button button-primary"
+         target="_blank">Done</a>
       <button #cancelBtn class="button-secondary label-btn">Cancel</button>
   </div>
 </div>
@@ -85,25 +77,29 @@ module AccountTab {
       Settings.togglePopover(_view);
     }
 
+    function selectRole(role: string, toEmail: string) {
+      Settings.toggleList(roleSelector);
+      inviteEmail.hide();
+      addBtn.hide();
+      cancelBtn.hide();
+      sendInvite(team, role, toEmail)
+        .done(function() {
+          var text = Login.isAdmin() ? "Added!" : "Invite sent!";
+          invited.text(text);
+          invited.show();
+          doneBtn.show();
+        });
+    }
+
     addBtn.click(function() {
       var toEmail = inviteEmail.val();
       Settings.toggleList(roleSelector);
 
-      function selectRole(role) {
-        Settings.toggleList(roleSelector);
-        review.show();
-        inviteEmail.hide();
-        cancelBtn.text("Skip");
-        addBtn.hide();
-        continueBtn.show();
-        composeInviteWithURL(team, role, toEmail, continueBtn);
-      }
-
-      assistant.click(function() { selectRole("Assistant") });
-      executive.click(function() { selectRole("Executive") });
+      assistant.click(function() { selectRole("Assistant", toEmail); });
+      executive.click(function() { selectRole("Executive", toEmail); });
     });
 
-    continueBtn.click(reset);
+    doneBtn.click(reset);
     cancelBtn.click(reset);
 
     return _view;

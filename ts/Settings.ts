@@ -7,11 +7,11 @@ module Settings {
   export function resetOverlay(overlay) {
     if (overlay.view.hasClass("invite-popover")) {
       overlay.inviteEmail.show();
-      overlay.review.hide();
+      overlay.invited.hide();
       overlay.addBtn
         .prop("disabled", true)
         .show();
-      overlay.continueBtn
+      overlay.doneBtn
         .prop("disabled", true)
         .hide();
       overlay.cancelBtn.text("Cancel");
