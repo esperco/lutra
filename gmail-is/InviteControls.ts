@@ -105,9 +105,14 @@ module Esper.InviteControls {
     var firstTeamCal = team.team_calendars[0];
     var publicCalId =
       firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-    team.team_calendars.forEach(function(cal : ApiT.Calendar) {
-      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var id = cal.google_cal_id;
+      pubCalendar.append($("<option value='" + id + "'>" +
                            cal.calendar_title + "</option>"));
+      if (cal.calendar_default_dupe) {
+        pubCalendar.val(id);
+        publicCalId = id;
+      }
     });
     pubCalendar.change(function() {
       publicCalId = $(this).val();

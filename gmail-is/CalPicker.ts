@@ -72,7 +72,7 @@ module Esper.CalPicker {
     userSidebar.calendarsContainer.children().remove();
 
     var calendars = team.team_calendars;
-    var shows = [], writes = [];
+    var writes = [];
     List.iter(calendars, function(cal) {
       if (cal.calendar_default_view)
         showCalendars[cal.google_cal_id] = cal.calendar_timezone;
@@ -80,8 +80,6 @@ module Esper.CalPicker {
         writes.push(cal);
     });
     writeToCalendar = writes === [] ? calendars[0] : writes[0];
-    //showCalendars[writeToCalendar.google_cal_id] =
-      //writeToCalendar.calendar_timezone;
     showTimezone = writeToCalendar.calendar_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
