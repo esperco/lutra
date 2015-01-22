@@ -24,7 +24,7 @@ module Esper.FinalizeEvent {
    *
    *  Currently, holds are events with titles starting with "HOLD: ".
    */
-  export function isHold(event: ApiT.CalendarEvent) {
+  export function isHold(event) {
     return event.title && /^HOLD: /.test(event.title);
   }
 
@@ -55,25 +55,28 @@ module Esper.FinalizeEvent {
    *  event title.
    */
   export function setHold(event: ApiT.CalendarEvent, hold: boolean) {
-    var edit = {
+    var edit: ApiT.CalendarEventEdit = {
       google_event_id : event.google_event_id,
       google_cal_id   : event.google_cal_id,
-      guests          : [],
-      summary         : event.title,
-      start           : { dateTime : event.start.utc },
-      end             : { dateTime : event.end.utc }
+      start           : event.start,
+      end             : event.end,
+      title           : event.title,
+      description     : event.description,
+      location        : event.location,
+      all_day         : event.all_day,
+      guests          : []
     };
 
-    if (isHold(event) != hold) {
+    if (isHold(edit) != hold) {
       if (hold) {
-        edit.summary = "HOLD: " + edit.summary;
+        edit.title = "HOLD: " + edit.title;
       } else {
-        edit.summary = edit.summary.replace(/^HOLD: /, "");
+        edit.title = edit.title.replace(/^HOLD: /, "");
       }
 
       var teamid = CurrentThread.team.get().teamid;
       var threadId = CurrentThread.threadId.get();
-      return Api.updateLinkedEvent(teamid, threadId, event.google_event_id, edit);
+      return Api.updateLinkedEvent(teamid, threadId, edit.google_event_id, edit);
     } else {
       return null;
     }
