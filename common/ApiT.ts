@@ -36,6 +36,9 @@ module Esper.ApiT {
     google_cal_id: string;
     calendar_title: string;
     calendar_timezone?: string;
+    calendar_default_view?: boolean;
+    calendar_default_write?: boolean;
+    calendar_default_dupe?: boolean;
   }
 
   export interface Phone {

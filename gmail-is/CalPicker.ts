@@ -72,9 +72,14 @@ module Esper.CalPicker {
     userSidebar.calendarsContainer.children().remove();
 
     var calendars = team.team_calendars;
-    writeToCalendar = calendars[0];
-    showCalendars[writeToCalendar.google_cal_id] =
-      writeToCalendar.calendar_timezone;
+    var writes = [];
+    List.iter(calendars, function(cal) {
+      if (cal.calendar_default_view)
+        showCalendars[cal.google_cal_id] = cal.calendar_timezone;
+      if (cal.calendar_default_write)
+        writes.push(cal);
+    });
+    writeToCalendar = writes === [] ? calendars[0] : writes[0];
     showTimezone = writeToCalendar.calendar_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
@@ -85,7 +90,8 @@ module Esper.CalPicker {
   <span #calendarName/>
 </div>
 '''
-      if (i === 0) calendarCheckbox.prop("checked", true);
+      if (cal.calendar_default_view)
+        calendarCheckbox.prop("checked", true);
 
       var abbr = zoneAbbr(cal.calendar_timezone);
 
@@ -121,6 +127,8 @@ module Esper.CalPicker {
       var opt = $("<option value='" + i + "'>" +
                   calendars[i].calendar_title + "</option>");
       opt.appendTo(pickerSwitcher);
+      if (calendars[i].google_cal_id === writeToCalendar.google_cal_id)
+        pickerSwitcher.val(i);
     }
     pickerSwitcher.change(function() {
       var i = $(this).val();
