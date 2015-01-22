@@ -239,11 +239,6 @@ module Esper.InviteControls {
           slideForward(container, next);
         }
 
-        function inviteGuests() {
-          Api.sendEventInvites(team.teamid, from, guests, event);
-          close();
-        }
-
         if (reminder) {
           checkReminder();
         } else {
@@ -271,8 +266,10 @@ module Esper.InviteControls {
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionWidget(original, eventEdit, duplicate, guests, from,
-                                    done, backFunction) {
+  export function descriptionWidget(original: ApiT.CalendarEvent,
+                                    eventEdit: ApiT.CalendarEventEdit,
+                                    duplicate: boolean,
+                                    guests, from, done, backFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">

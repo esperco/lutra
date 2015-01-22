@@ -136,10 +136,9 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function updateLinkedEvent(teamid, threadId, eventId, eventEdit):
+  export function updateLinkedEvent(teamid, threadId, eventId,
+                                    eventEdit: ApiT.CalendarEventEdit):
   JQueryDeferred<void> {
-    // needed to appease the Gcal_j.event_edit parser.
-    eventEdit.reminders = { useDefault : true };
     var url =
       Conf.Api.url + "/api/thread/event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -414,7 +413,7 @@ module Esper.Api {
     return getTaskPage(url);
   }
 
-  export function sendEventInvites(teamid, fromEmail, guests, event):
+  export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
   JQueryDeferred<void> {
     var url =
       Conf.Api.url + "/api/event/invite/" + string(Login.myUid())
