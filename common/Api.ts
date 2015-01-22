@@ -346,12 +346,20 @@ module Esper.Api {
     return JsonHttp.get(url).then(function(x) { return x.task; });
   }
 
-  export function deleteTask(taskid):
+  export function archiveTask(taskid):
   JQueryDeferred<void> {
     var url =
-      Conf.Api.url + "/api/task/details/" + string(Login.myUid())
+      Conf.Api.url + "/api/task/archive/" + string(Login.myUid())
       + "/" + string(taskid);
-    return JsonHttp.delete_(url);
+    return JsonHttp.put(url, "");
+  }
+
+  export function unarchiveTask(taskid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/task/unarchive/" + string(Login.myUid())
+      + "/" + string(taskid);
+    return JsonHttp.put(url, "");
   }
 
   export function linkThreadToTask(teamid, threadid, taskid):

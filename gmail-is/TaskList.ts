@@ -127,10 +127,10 @@ module Esper.TaskList {
     <span #title class="esper-tl-task-title"></span>
     <span #urgent class="esper-tl-urgent"></span>
     <span #progress class="esper-tl-progress"></span>
-    <span #deleteButton
+    <span #archiveButton
           class="esper-clickable esper-link-danger"
-          title="Delete this task">
-      Delete
+          title="Archive this task">
+      Archive
     </span>
   </div>
   <div #otherTeamLabels></div>
@@ -140,8 +140,8 @@ module Esper.TaskList {
 '''
 
     title.text(task.task_title);
-    deleteButton.click(function() {
-      Api.deleteTask(task.taskid);
+    archiveButton.click(function() {
+      Api.archiveTask(task.taskid);
       view.remove();
     });
 
