@@ -185,7 +185,6 @@ module Esper.Api {
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/thread/put-linked-event/" + string(Login.myUid())
-      + (createdBy !== undefined ? "/" + string(createdBy) : "")
       + "/" + string(teamid)
       + "/" + encodeURIComponent(string(event.google_cal_id))
       + "/" + string(threadId);
@@ -197,14 +196,13 @@ module Esper.Api {
                                         taskId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
-      Conf.Api.url + "/api/thread/create-linked-event/" + string(Login.myUid())
+      Conf.Api.url + "/api/task/put-linked-event/" + string(Login.myUid())
       + "/" + string(createdBy)
       + "/" + string(teamid)
       + "/" + encodeURIComponent(string(cal.google_cal_id))
       + "/" + string(taskId);
     return JsonHttp.post(url, "");
   }
-
 
   export function getRecentlyCreatedEvents(teamid, teamCalendars):
   JQueryDeferred<ApiT.CreatedCalendarEvents> {
