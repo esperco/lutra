@@ -192,14 +192,14 @@ module Esper.Api {
   }
 
   export function createTaskLinkedEvent(createdBy, teamid,
-                                        cal: ApiT.Calendar,
+                                        event: ApiT.CalendarEventEdit,
                                         taskId):
   JQueryDeferred<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/task/put-linked-event/" + string(Login.myUid())
       + "/" + string(createdBy)
       + "/" + string(teamid)
-      + "/" + encodeURIComponent(string(cal.google_cal_id))
+      + "/" + encodeURIComponent(string(event.google_cal_id))
       + "/" + string(taskId);
     return JsonHttp.post(url, "");
   }

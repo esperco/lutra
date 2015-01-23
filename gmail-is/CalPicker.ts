@@ -516,7 +516,7 @@ module Esper.CalPicker {
 
       // Wait for link
       var linkCalls = List.map(events, function(ev) {
-        return Api.createLinkedEvent(
+        return Api.createTaskLinkedEvent(
           createdByEmail,
           team.teamid,
           ev,
