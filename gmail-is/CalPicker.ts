@@ -8,6 +8,9 @@ module Esper.CalPicker {
   // The calendar that the created events go on
   export var writeToCalendar : ApiT.Calendar;
 
+  // Who appears as the creator of events that we write to the calendar
+  var createdByEmail : string;
+
   // The team calendars whose events are currently displayed
   var showCalendars : { [calid : string] : string /* tz */ } = {};
 
@@ -27,6 +30,7 @@ module Esper.CalPicker {
     eventTitle : JQuery;
     eventLocation : JQuery;
     pickerSwitcher : JQuery;
+    createdBy : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
@@ -58,6 +62,10 @@ module Esper.CalPicker {
       <div class="esper-event-settings-col">
         <span class="esper-bold">Save events to:</span>
         <select #pickerSwitcher class="esper-select"/>
+      </div>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Created by:</span>
+        <select #createdBy class="esper-select"/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -135,6 +143,22 @@ module Esper.CalPicker {
       writeToCalendar = calendars[i];
       calendarView.fullCalendar("refetchEvents");
     });
+
+    var aliases = team.team_email_aliases;
+    createdBy.children().remove();
+    if (aliases.length === 0) {
+      $("<option>" + Login.myEmail() + "</option>").appendTo(createdBy);
+      createdBy.prop("disabled", true);
+      createdByEmail = Login.myEmail();
+    } else {
+      aliases.forEach(function(email : string, i) {
+        $("<option>" + email + "</option>").appendTo(createdBy);
+        if (i === 0) createdByEmail = email;
+      });
+      createdBy.change(function() {
+        createdByEmail = $(this).val();
+      });
+    }
 
     var guests = [];
     var emailData = esperGmail.get.email_data();
@@ -429,7 +453,7 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal(team: ApiT.Team,
+  export function createModal(team: ApiT.Team, task: ApiT.Task,
                               threadId: string) : void {
 '''
 <div #view class="esper-modal-bg">
@@ -492,10 +516,11 @@ module Esper.CalPicker {
 
       // Wait for link
       var linkCalls = List.map(events, function(ev) {
-        return Api.createLinkedEvent(
+        return Api.createTaskLinkedEvent(
+          createdByEmail,
           team.teamid,
           ev,
-          threadId
+          task.taskid
         );
       });
 

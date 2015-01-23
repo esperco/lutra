@@ -95,8 +95,10 @@ module Esper.ComposeControls {
 
     createButton.click(function() {
       if (CurrentThread.threadId.isValid() &&
+          CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
         CalPicker.createModal(CurrentThread.team.get(),
+                              CurrentThread.task.get(),
                               CurrentThread.threadId.get());
       }
     });
