@@ -315,7 +315,7 @@ module Esper.InviteControls {
       eventEdit.description = descriptionField.val();
 
       if (duplicate) {
-        Api.createLinkedEvent(team.teamid, eventEdit, threadId)
+        Api.createLinkedEvent(from, team.teamid, eventEdit, threadId)
           .done(function(created) {
             Api.sendEventInvites(team.teamid, from, guests, created);
             TaskTab.refreshlinkedEventsList(team, threadId,

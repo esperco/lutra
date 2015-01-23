@@ -885,7 +885,7 @@ module Esper.TaskTab {
       li.click(function() {
         var newTab = window.open("");
         newTab.document.write("Creating new linked event, please wait...");
-        Api.createEmptyLinkedEvent(team.teamid, cal, threadId)
+        Api.createEmptyLinkedEvent(Login.myEmail(), team.teamid, cal, threadId)
           .done(function(e) {
             var eventId = e.google_event_id;
             if (eventId !== null && eventId !== undefined) {
