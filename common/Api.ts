@@ -179,19 +179,6 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function createEmptyLinkedEvent(createdBy, teamid,
-                                         cal: ApiT.Calendar,
-                                         threadId):
-  JQueryDeferred<ApiT.CalendarEvent> {
-    var url =
-      Conf.Api.url + "/api/thread/create-linked-event/" + string(Login.myUid())
-      + (createdBy !== undefined ? "/" + string(createdBy) : "")
-      + "/" + string(teamid)
-      + "/" + encodeURIComponent(string(cal.google_cal_id))
-      + "/" + string(threadId);
-    return JsonHttp.post(url, "");
-  }
-
   export function createLinkedEvent(createdBy, teamid,
                                     event: ApiT.CalendarEventEdit,
                                     threadId):
@@ -204,6 +191,20 @@ module Esper.Api {
       + "/" + string(threadId);
     return JsonHttp.post(url, JSON.stringify(event));
   }
+
+  export function createTaskLinkedEvent(createdBy, teamid,
+                                        cal: ApiT.Calendar,
+                                        taskId):
+  JQueryDeferred<ApiT.CalendarEvent> {
+    var url =
+      Conf.Api.url + "/api/thread/create-linked-event/" + string(Login.myUid())
+      + "/" + string(createdBy)
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(cal.google_cal_id))
+      + "/" + string(taskId);
+    return JsonHttp.post(url, "");
+  }
+
 
   export function getRecentlyCreatedEvents(teamid, teamCalendars):
   JQueryDeferred<ApiT.CreatedCalendarEvents> {

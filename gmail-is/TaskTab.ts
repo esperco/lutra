@@ -855,8 +855,10 @@ module Esper.TaskTab {
 
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
+          CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
         CalPicker.createModal(CurrentThread.team.get(),
+                              CurrentThread.task.get(),
                               CurrentThread.threadId.get());
       }
     });
@@ -887,29 +889,6 @@ module Esper.TaskTab {
                                taskSearchActions, team, threadId,
                                query, profiles,
                                taskTabView);
-      });
-    });
-
-    List.iter(team.team_calendars, function(cal) {
-      var li = $("<li class='esper-li'>" + cal.calendar_title + "</li>");
-      li.click(function() {
-        var newTab = window.open("");
-        newTab.document.write("Creating new linked event, please wait...");
-        Api.createEmptyLinkedEvent(Login.myEmail(), team.teamid, cal, threadId)
-          .done(function(e) {
-            var eventId = e.google_event_id;
-            if (eventId !== null && eventId !== undefined) {
-              newTab.document.write(" done! Syncing thread to description...");
-              Api.syncEvent(team.teamid, threadId, cal.google_cal_id, eventId)
-                .done(function() {
-                  refreshlinkedEventsList(team, threadId,
-                                          taskTabView, profiles);
-                  var url = e.google_cal_url;
-                  if (url !== null && url !== undefined)
-                    newTab.location.assign(url);
-                });
-            }
-          });
       });
     });
 

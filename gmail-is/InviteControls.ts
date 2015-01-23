@@ -315,14 +315,19 @@ module Esper.InviteControls {
       eventEdit.description = descriptionField.val();
 
       if (duplicate) {
-        Api.createLinkedEvent(from, team.teamid, eventEdit, threadId)
-          .done(function(created) {
-            Api.sendEventInvites(team.teamid, from, guests, created);
-            TaskTab.refreshlinkedEventsList(team, threadId,
-                                            TaskTab.currentTaskTab,
-                                            Sidebar.profiles);
-            close();
-          });
+        if (CurrentThread.task.isValid()) {
+          var task = CurrentThread.task.get();
+          Api.createLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+            .done(function(created) {
+              Api.sendEventInvites(team.teamid, from, guests, created);
+              TaskTab.refreshlinkedEventsList(team, threadId,
+                                              TaskTab.currentTaskTab,
+                                              Sidebar.profiles);
+              close();
+            });
+        } else {
+          Log.e("Can't create a linked event without a valid task");
+        }
       } else {
         Api.updateLinkedEvent(team.teamid, threadId, original.google_event_id, eventEdit)
           .done(function() {

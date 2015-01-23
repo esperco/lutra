@@ -453,7 +453,7 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal(team: ApiT.Team,
+  export function createModal(team: ApiT.Team, task: ApiT.Task,
                               threadId: string) : void {
 '''
 <div #view class="esper-modal-bg">
@@ -520,7 +520,7 @@ module Esper.CalPicker {
           createdByEmail,
           team.teamid,
           ev,
-          threadId
+          task.taskid
         );
       });
 
