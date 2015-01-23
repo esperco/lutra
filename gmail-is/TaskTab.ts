@@ -623,18 +623,28 @@ module Esper.TaskTab {
             });
         });
 
-      function addDeleteOption(task) {
+      function addArchiveOption(task) {
 '''
-<li #li class="esper-li esper-danger">Delete this task</li>
+<li #li class="esper-li"></li>
 '''
+        var apiCall;
+        var finalState = ! task.task_archived;
+        if (task.task_archived) {
+          li.text("Unarchive this task");
+          apiCall = Api.unarchiveTask;
+        }
+        else {
+          li.text("Archive this task");
+          apiCall = Api.archiveTask;
+        }
+
         li
           .appendTo(actions)
           .click(function() {
-            Api.deleteTask(task.taskid)
+            apiCall(task.taskid)
               .done(function() {
-                CurrentThread.task.set(undefined);
-                taskTab.taskCaption.text(taskLabelCreate);
-                clearlinkedEventsList(team, taskTab);
+                task.task_archived = finalState;
+                CurrentThread.task.set(task);
                 Sidebar.dismissDropdowns();
               });
           });
@@ -642,7 +652,7 @@ module Esper.TaskTab {
 
       var currentTask = CurrentThread.task.get();
       if (currentTask !== undefined)
-        addDeleteOption(currentTask);
+        addArchiveOption(currentTask);
 
       dropdown.addClass("esper-open");
     });
@@ -914,13 +924,23 @@ module Esper.TaskTab {
        watcher for that same thread or any other thread,
        since at most one thread is displayed at once.
     */
-    var watcherId = "TaskTab-watcher";
+    var accountWatcherId = "TaskTab-account-watcher";
     Login.watchableAccount.watch(function(newAccount, newValidity) {
       if (newValidity === true && threadId === CurrentThread.threadId.get()) {
         Log.d("Refreshing recently viewed events");
         refreshRecentsList(team, threadId, taskTabView, profiles);
       }
-    }, watcherId);
+    }, accountWatcherId);
+
+    var taskWatcherId = "TaskTab-task-watcher";
+    CurrentThread.task.watch(function(task, valid) {
+      if (valid) {
+        if (task.task_archived && threadId === CurrentThread.threadId.get())
+          taskTitle.addClass("esper-archived");
+        else
+          taskTitle.removeClass("esper-archived");
+      }
+    }, taskWatcherId);
 
     tab1.append(view);
   }
