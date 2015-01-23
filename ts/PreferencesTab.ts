@@ -919,11 +919,14 @@ module PreferencesTab {
         sendReminder.prop("checked", true);
       if (!general.use_duplicate_events)
         useDuplicate.prop("checked", false);
+      if (!general.bcc_exec_on_reply)
+        bccExec.prop("checked", false);
     }
 
     sendConfirmation.click(savePreferences);
     sendReminder.click(savePreferences);
     useDuplicate.click(savePreferences);
+    bccExec.click(savePreferences);
 
     return view;
   }
