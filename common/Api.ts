@@ -201,7 +201,7 @@ module Esper.Api {
       + "/" + string(teamid)
       + "/" + encodeURIComponent(string(event.google_cal_id))
       + "/" + string(taskId);
-    return JsonHttp.post(url, "");
+    return JsonHttp.post(url, JSON.stringify(event));
   }
 
   export function getRecentlyCreatedEvents(teamid, teamCalendars):
