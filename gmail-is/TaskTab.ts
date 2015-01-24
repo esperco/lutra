@@ -488,6 +488,10 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
+  function unlinkThread(taskid, threadId) {
+    ...
+  }
+
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
@@ -500,8 +504,11 @@ module Esper.TaskTab {
       if (thread.gmail_thrid !== threadId) {
 '''
 <li #li class="esper-thread-li">
-  <a #a class="esper-thread-link esper-link"></a>
-  <span #cross class="esper-thread-unlink esper-clickable">×</span>
+  <a #a
+     class="esper-thread-link esper-link"></a>
+  <span #cross
+        class="esper-thread-unlink esper-clickable"
+        title="Unlink thread into a new task">×</span>
 </li>
 '''
         a
@@ -511,6 +518,12 @@ module Esper.TaskTab {
             e.stopPropagation();
             window.location.hash = "#all/" + thread.gmail_thrid;
           });
+
+        cross.click(function() {
+          unlinkThread(task.taskid, threadId).done(function() {
+            li.remove();
+          });
+        });
 
         li.appendTo(threadsList);
       }
