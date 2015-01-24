@@ -491,20 +491,28 @@ module Esper.TaskTab {
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
-  <div #noThreads class="esper-no-events">No linked threads</div>
-  <div #threadsList class="esper-events-list"/>
+  <div #noThreads class="esper-no-threads">No linked threads</div>
+  <ul #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
 
     List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
       if (thread.gmail_thrid !== threadId) {
-        $("<li class='esper-link'/>")
+'''
+<li #li class="esper-thread-li">
+  <a #a class="esper-thread-link esper-link"></a>
+  <span #cross class="esper-thread-unlink esper-clickable">×</span>
+</li>
+'''
+        a
           .text(thread.subject)
+          .attr("title", thread.subject)
           .click(function(e) {
             e.stopPropagation();
             window.location.hash = "#all/" + thread.gmail_thrid;
-          })
-          .appendTo(threadsList);
+          });
+
+        li.appendTo(threadsList);
       }
     });
 
