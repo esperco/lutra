@@ -488,8 +488,12 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  function unlinkThread(taskid, threadId) {
-    ...
+  function unlinkThread(teamid, taskid, threadId) {
+    return Api.unlinkThreadFromTask(teamid, threadId, taskid)
+      .then(function() {
+        /* force the creation of a task for the newly unlinked thread */
+        return Api.obtainTaskForThread(teamid, threadId, false, false);
+      });
   }
 
   export function displayLinkedThreadsList(task, threadId,
@@ -501,7 +505,8 @@ module Esper.TaskTab {
     taskTab.linkedThreadsList.children().remove();
 
     List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
-      if (thread.gmail_thrid !== threadId) {
+      var linkedThreadId = thread.gmail_thrid;
+      if (linkedThreadId !== threadId) {
 '''
 <li #li class="esper-thread-li">
   <a #a
@@ -520,9 +525,14 @@ module Esper.TaskTab {
           });
 
         cross.click(function() {
-          unlinkThread(task.taskid, threadId).done(function() {
-            li.remove();
-          });
+          unlinkThread(task.task_teamid, task.taskid, threadId);
+          /* remove from the list without waiting for completion */
+          li.remove();
+          if (taskTab.linkedThreadsList.children("li").length === 0) {
+            threadsList.remove();
+            taskTab.linkedThreadsList.append(noThreads);
+            taskTab.showLinkedThreads.click();
+          }
         });
 
         li.appendTo(threadsList);
