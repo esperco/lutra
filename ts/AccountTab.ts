@@ -832,7 +832,8 @@ module AccountTab {
     var popover = renderInviteDialog(team, _view);
     view.append(popover.view);
 
-    if (Login.me() === team.team_executive) {
+    var me = Login.me();
+    if (me === team.team_executive && !Util.isEsperAssistant(me)) {
       // Executives are getting confused by this and messing teams up
       emailContainer.hide();
       invite.hide();
