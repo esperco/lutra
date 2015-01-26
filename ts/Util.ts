@@ -113,13 +113,6 @@ module Util {
     return id.replace(/(.*)_\d+$/, "$1").replace("_", " ");
   }
 
-  export function isEsperAssistant(uid: string) {
-    return (
-       uid === "P-wKfcaGEsuwjBnLlGHTIg" // assistant@esper.com
-       || uid === "P8I6YrrRwWRCYOWSjlS_Ow" // blake@esper.com
-    )
-  }
-
   export var tests = [
     Test.expect(
       "mergeObjects",

@@ -130,6 +130,13 @@ module Login {
       return false;
   };
 
+  export function isEsperAssistant() {
+    if (Util.isDefined(data))
+      return data.is_esper_assistant === true;
+    else
+      return false;
+  };
+
   export function myEmail() {
     if (Util.isDefined(data))
       return data.email;

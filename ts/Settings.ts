@@ -345,11 +345,9 @@ module Settings {
   }
 
   export function load() {
-    if (Login.data.missing_shared_calendar) {
-      var team = List.find(Login.getTeams(), function(x : ApiT.Team) {
-        return List.mem(x.team_assistants, "P-wKfcaGEsuwjBnLlGHTIg");
-      });
-      Page.teamSettings.load(team);
+    var teamToLoad = Login.data.missing_shared_calendar;
+    if (Util.isString(teamToLoad)) {
+      Page.teamSettings.load(teamToLoad);
       $("#tab3").click();
     } else {
       reallyLoad();
