@@ -376,6 +376,16 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
+  export function unlinkThreadFromTask(teamid, threadid, taskid):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(threadid)
+      + "/" + string(taskid);
+    return JsonHttp.delete_(url);
+  }
+
   export function switchTaskForThread(teamid, threadid,
                                       old_taskid, new_taskid):
   JQueryDeferred<void> {

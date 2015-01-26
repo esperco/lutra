@@ -939,7 +939,8 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   &:hover { background: @purple_bg_hover; }
 }
 
-.esper-no-events {
+.esper-no-events,
+.esper-no-threads {
   padding: 50px 0;
   font-size: 16px;
   color: @gray_20;
@@ -1312,17 +1313,43 @@ ul.esper-ev-dropdown {
   display : none;
 }
 
-/* Controls below the thread. */
-.esper-below-thread {
-  margin-left : 50px;
-  margin-top : 25px;
 
-  /* TODO: Maybe redo as a ul? */
-  & > div {
-    display : inline-block;
-    cursor : pointer;
+/** Linked threads **/
+
+.esper-thread-list {
+  margin: 0px;
+  padding: 6px 0px 6px 10px;
+}
+
+.esper-thread-li {
+  position: relative; /* needed to position the cross relative to it */
+  list-style-type: none;
+  padding: 2px 0px 0px 0px;
+}
+
+.esper-thread-link {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  margin-right: 26px; /* room for the cross */
+}
+
+/* Cross symbol for unlinking thread */
+.esper-thread-unlink {
+  position: absolute; /* positioned relative to parent li */
+  right: 0px;
+  top: 0px;
+  font-size: 18px;
+  color: @gray_60;
+  opacity: 0.5;
+  padding: 0px 6px;
+  &:hover {
+    opacity: 1;
   }
 }
+
 
 /** Modals **/
 

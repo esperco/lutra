@@ -488,23 +488,54 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
+  function unlinkThread(teamid, taskid, threadId) {
+    return Api.unlinkThreadFromTask(teamid, threadId, taskid)
+      .then(function() {
+        /* force the creation of a task for the newly unlinked thread */
+        return Api.obtainTaskForThread(teamid, threadId, false, false);
+      });
+  }
+
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
-  <div #noThreads class="esper-no-events">No linked threads</div>
-  <div #threadsList class="esper-events-list"/>
+  <div #noThreads class="esper-no-threads">No linked threads</div>
+  <ul #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
 
     List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
-      if (thread.gmail_thrid !== threadId) {
-        $("<li class='esper-link'/>")
+      var linkedThreadId = thread.gmail_thrid;
+      if (linkedThreadId !== threadId) {
+'''
+<li #li class="esper-thread-li">
+  <a #a
+     class="esper-thread-link esper-link"></a>
+  <span #cross
+        class="esper-thread-unlink esper-clickable"
+        title="Unlink thread into a new task">×</span>
+</li>
+'''
+        a
           .text(thread.subject)
+          .attr("title", thread.subject)
           .click(function(e) {
             e.stopPropagation();
             window.location.hash = "#all/" + thread.gmail_thrid;
-          })
-          .appendTo(threadsList);
+          });
+
+        cross.click(function() {
+          unlinkThread(task.task_teamid, task.taskid, threadId);
+          /* remove from the list without waiting for completion */
+          li.remove();
+          if (taskTab.linkedThreadsList.children("li").length === 0) {
+            threadsList.remove();
+            taskTab.linkedThreadsList.append(noThreads);
+            taskTab.showLinkedThreads.click();
+          }
+        });
+
+        li.appendTo(threadsList);
       }
     });
 
