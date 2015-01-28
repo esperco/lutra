@@ -432,9 +432,7 @@ module Esper.CalPicker {
 
   function calendarTimeOfMoment(localMoment) : ApiT.CalendarTime {
     var localTime = localMoment.toISOString();
-    var timeZone = writeToCalendar.calendar_timezone;
-    if (timeZone === undefined) timeZone = "UTC"; // or use client tz?
-    var utcMoment = utcOfLocal(writeToCalendar.calendar_timezone, localMoment);
+    var utcMoment = utcOfLocal(showTimezone, localMoment);
     var utcTime = utcMoment.toISOString();
     return { utc: utcTime, local: localTime };
   }
