@@ -146,7 +146,7 @@ module TeamSettings {
         .done(function(customer) {
           main.append(showTeamSettings(selectedTeam, onboarding));
           footer.append(Footer.load());
-          if (!Login.data.missing_shared_calendar) {
+          if (!Util.isString(Login.data.missing_shared_calendar)) {
             var mem = customer.status;
             if (mem === "Trialing" || mem === "Active")
               switchTab(3);

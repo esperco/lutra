@@ -7,11 +7,11 @@ module Settings {
   export function resetOverlay(overlay) {
     if (overlay.view.hasClass("invite-popover")) {
       overlay.inviteEmail.show();
-      overlay.review.hide();
+      overlay.invited.hide();
       overlay.addBtn
         .prop("disabled", true)
         .show();
-      overlay.continueBtn
+      overlay.doneBtn
         .prop("disabled", true)
         .hide();
       overlay.cancelBtn.text("Cancel");
@@ -294,12 +294,12 @@ module Settings {
     var teams = Login.getTeams();
     if (teams.length === 1 && firstTime) {
       firstTime = false;
-      if (Login.data.missing_shared_calendar)
+      var joinTeam = Login.data.missing_shared_calendar;
+      if (Util.isString(joinTeam))
         // This is a new exec customer who needs to be onboarded
-        location.hash = "#!join/" + teams[0].teamid;
+        location.hash = "#!join/" + joinTeam;
       else if (teams[0] !== null)
         location.hash = "#!team-settings/" + teams[0].teamid;
-      //Page.teamSettings.load(teams[0].teamid);
     } else {
       List.iter(teams, function(team) {
         execTeams.append(viewOfTeam(team));

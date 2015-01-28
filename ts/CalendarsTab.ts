@@ -6,6 +6,31 @@ module CalendarsTab {
 
   var calendarAcls = {}; // cache of API call results
 
+  function makeCalendarRow(cal) {
+'''
+<tr #view class="esper-calendar-option">
+  <td><input #viewBox type="checkbox" class="esper-cal-view"></td>
+  <td><input #writeBox type="checkbox" class="esper-cal-write"></td>
+  <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
+  <td #calName class="esper-cal-name"/>
+</tr>
+'''
+    if (cal.calendar_default_view)
+      viewBox.prop("checked", true);
+    if (cal.calendar_default_write)
+      writeBox.prop("checked", true);
+    if (cal.calendar_default_dupe)
+      dupeBox.prop("checked", true);
+
+    calName.text(cal.calendar_title)
+           .dblclick(function() { $(this).parent().remove(); });
+
+    view.data("calid", cal.google_cal_id)
+        .data("timezone", cal.calendar_timezone);
+
+    return view;
+  }
+
   // TODO Styling
   function makeCalendarSelectors(team, root) {
 '''
@@ -18,7 +43,13 @@ module CalendarsTab {
   <div>
     <div><b>Team calendars:</b></div>
     <div style="font-size: 75%">(double-click to remove)</div>
-    <select #teamCals multiple="multiple" size=5 />
+    <table #teamCals>
+      <tr>
+        <td>View</td>
+        <td>Write</td>
+        <td>Dupe</td>
+      </tr>
+    </table>
   </div>
   <br/>
   <div>
@@ -26,33 +57,17 @@ module CalendarsTab {
   </div>
 </div>
 '''
-    function removeOpt() {
-      $(this).remove();
-    }
-
     List.iter(team.team_calendars, function(cal) {
-      var opt = $("<option class='esper-calendar-option'"
-                  + "value='" + cal.google_cal_id + "'>"
-                  + cal.calendar_title + "</option>");
-      opt.dblclick(removeOpt)
-         .data("timezone", cal.calendar_timezone)
-         .appendTo(teamCals);
+      makeCalendarRow(cal).appendTo(teamCals);
     });
 
     Api.getCalendarList().done(function(x) {
       List.iter(x.calendars, function(cal) {
-        var opt = $("<option class='esper-calendar-option'"
-                    + "value='" + cal.google_cal_id + "'>"
-                    + cal.calendar_title + "</option>");
-        opt.appendTo(allCals)
-           .data("timezone", cal.calendar_timezone)
-           .dblclick(function() {
-             $(this).clone()
-                    .data("timezone", cal.calendar_timezone)
-                    .off("dblclick")
-                    .dblclick(removeOpt)
-                    .appendTo(teamCals);
-           });
+        $("<option>" + cal.calendar_title + "</option>")
+          .appendTo(allCals)
+          .dblclick(function() {
+            makeCalendarRow(cal).appendTo(teamCals);
+          });
       });
 
       saveCals.click(function() {
@@ -60,13 +75,16 @@ module CalendarsTab {
         var teamCalIDs = [];
         var calData = {};
         teamOpts.each(function(i) {
-          var opt = $(teamOpts[i]);
-          var calID = opt.val();
+          var row = $(teamOpts[i]);
+          var calID = row.data("calid");
           teamCalIDs.push(calID);
           calData[calID] = {
             google_cal_id: calID,
-            calendar_timezone: opt.data("timezone"),
-            calendar_title: opt.text()
+            calendar_timezone: row.data("timezone"),
+            calendar_title: row.find(".esper-cal-name").text(),
+            calendar_default_view: row.find(".esper-cal-view").is(":checked"),
+            calendar_default_write: row.find(".esper-cal-write").is(":checked"),
+            calendar_default_dupe: row.find(".esper-cal-dupe").is(":checked")
           };
         });
         // remove duplicates

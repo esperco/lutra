@@ -74,7 +74,7 @@ module ApiT {
     email: string;
     teams: Team[];
     team_members: TeamMember[];
-    missing_shared_calendar: boolean;
+    missing_shared_calendar: string; // teamid
   }
 
   export interface TokenInfo {
