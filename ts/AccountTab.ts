@@ -793,7 +793,7 @@ module AccountTab {
 <div #view>
   <div class="table-header">Membership & Billing</div>
   <div #membership class="table-list"/>
-  <div class="table-header">Assistants</div>
+  <div #assistantsHeader class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
     <div #spinner class="spinner table-spinner"/>
     <div #tableEmpty
@@ -832,8 +832,10 @@ module AccountTab {
     var popover = renderInviteDialog(team, _view);
     view.append(popover.view);
 
-    if (Login.me() === team.team_executive && !Login.isEsperAssistant()) {
+    if (Login.isExecCustomer(team)) {
       // Executives are getting confused by this and messing teams up
+      assistantsHeader.hide();
+      assistantsList.hide();
       emailContainer.hide();
       invite.hide();
     } else {

@@ -154,19 +154,25 @@ module CalendarsTab {
       var checkbox = row.find(".esper-cal-check");
       var isChecked = checkbox.is(":checked");
       var calendarId = checkbox.data("calendarId");
-      var assistantEmail = $(".esper-assistant-email").val();
-      if (isChecked) {
-        teamCals.push({
-          google_cal_id: calendarId,
-          calendar_timezone: checkbox.data("timezone"),
-          calendar_title: checkbox.data("title")
-        });
-        calls.push(Api.putCalendarShare(calendarId, assistantEmail));
-      } else {
-        var aclId = checkbox.data("aclId");
-        calls.push(Api.deleteCalendarShare(calendarId, aclId));
-      }
+
+      List.iter(Login.data.team_members, function(tm : ApiT.TeamMember) {
+        if (List.mem(team.team_assistants, tm.member_uid)) {
+          var assistantEmail = tm.member_email;
+          if (isChecked) {
+            teamCals.push({
+              google_cal_id: calendarId,
+              calendar_timezone: checkbox.data("timezone"),
+              calendar_title: checkbox.data("title")
+            });
+            calls.push(Api.putCalendarShare(calendarId, assistantEmail));
+          } else {
+            var aclId = checkbox.data("aclId");
+            calls.push(Api.deleteCalendarShare(calendarId, aclId));
+          }
+        }
+      });
     });
+
     share.text("Loading...").attr("disabled", "true");
     Deferred.join(calls).done(function() {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
@@ -240,7 +246,6 @@ module CalendarsTab {
       Welcome to Esper! So we can start scheduling, please select
       which calendars to share with your Esper assistant.
     </div>
-    <div>Assistant's email: <select #asst class="esper-assistant-email"/></div>
     <div #calendarView class="esper-loading">Loading...</div>
     <button #share class="button-primary">Share</button>
   </div>
@@ -250,32 +255,16 @@ module CalendarsTab {
   <div #emailAliases/>
 </div>
 '''
-    if (Login.me() !== team.team_executive) {
+    if (!Login.isExecCustomer(team)) {
       teamCalendars.hide();
       makeCalendarSelectors(team, calendarSelector);
       makeAliasSection(team, emailAliases);
     } else {
       calendarSelector.hide();
       emailAliases.hide();
-      List.iter(team.team_assistants, function(uid) {
-        var tm =
-          List.find(Login.data.team_members, function(x : ApiT.TeamMember) {
-            return x.member_uid === uid;
-          });
-        if (tm !== null) {
-          var opt = $("<option>" + tm.member_email + "</option>");
-          if (tm.member_email === "assistant@esper.com")
-            opt.prop("selected", true);
-          opt.appendTo(asst);
-        }
-      });
 
       Api.getCalendarList().done(function(response) {
-        function refreshList() {
-          displayCalendarList(calendarView, response.calendars);
-        }
-        asst.change(refreshList);
-        refreshList();
+        displayCalendarList(calendarView, response.calendars);
       });
 
       if (onboarding) {

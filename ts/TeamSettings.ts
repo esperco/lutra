@@ -78,6 +78,17 @@ module TeamSettings {
       tab3.off("click").addClass("disabled");
     }
 
+    content1.append(AccountTab.load(team));
+    content2.append(PreferencesTab.load(team));
+    content3.append(CalendarsTab.load(team));
+
+    if (Login.isExecCustomer(team)) {
+      tab4.hide();
+      content4.hide();
+    } else {
+      content4.append(LabelSyncTab.load(team));
+    }
+
     return view;
   }
 
