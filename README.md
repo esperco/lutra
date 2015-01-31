@@ -32,6 +32,7 @@ Everyone
 Avoid having to use `sudo` for `npm`:
 ```
 sudo npm remove -g typescript  # in case it's already installed
+sudo npm remove -g uglify-js   # in case it's already installed
 sudo npm remove -g less        # in case it's already installed
 npm config set prefix ~/npm
 ```
@@ -40,16 +41,14 @@ And then add `~/npm/bin` to your `PATH` environment variable.
 
 
 ```
-$ npm install -g typescript
+npm install -g typescript
+npm install -g uglify-js
+npm install -g less
 ```
 
 ```
 $ tsc -v
 Version 1.3.0.0
-```
-
-```
-$ npm install -g less
 ```
 
 ```
