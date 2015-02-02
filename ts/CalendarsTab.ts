@@ -167,7 +167,8 @@ module CalendarsTab {
             calls.push(Api.putCalendarShare(calendarId, assistantEmail));
           } else {
             var aclId = checkbox.data("aclId");
-            calls.push(Api.deleteCalendarShare(calendarId, aclId));
+            if (Util.isString(aclId))
+              calls.push(Api.deleteCalendarShare(calendarId, aclId));
           }
         }
       });
@@ -177,7 +178,7 @@ module CalendarsTab {
     Deferred.join(calls).done(function() {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
         .done(function() {
-          if (onboarding) TeamSettings.switchTab(2);
+          if (onboarding) TeamSettings.switchTab(1);
           else window.location.reload();
         });
     });
@@ -270,6 +271,9 @@ module CalendarsTab {
       if (onboarding) {
         share.css("float", "right");
         share.text("Next Step");
+      } else {
+        description.text("Please select which calendars to share " +
+                         "with your Esper assistant.");
       }
 
       share.click(function() {

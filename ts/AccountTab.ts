@@ -449,8 +449,10 @@ module AccountTab {
 
     name.text(membership);
 
-    if (membership == "Standard") {
-      price.text("$259/mo");
+    if (membership == "Basic") {
+      price.text("Free");
+    } else if (membership == "Standard") {
+      price.text("$199/mo");
     } else if (membership == "Enhanced") {
       price.text("$399/mo");
     } else if (membership == "Pro") {
@@ -475,6 +477,7 @@ module AccountTab {
         <div #daysRemaining class="membership-modal-note"/>
         <div #suspension class="membership-modal-note"/>
         <div class="membership-options clearfix">
+          <div #planFree class="membership-option"/>
           <div #planLo class="membership-option"/>
           <div #planMid class="membership-option"/>
           <div #planHi class="membership-option"/>
@@ -520,20 +523,24 @@ module AccountTab {
           .show();
       } else if (membershipStatus == "Past-due" ||
                  membershipStatus == "Unpaid" ||
-                 membershipStatus == "Canceled") {
+                 membershipStatus == "Canceled" ||
+                 membershipStatus == undefined) {
         suspension
           .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // must be active
-        if (membershipPlan == "Standard") {
+        var planName = Util.nameOfPlan(membershipPlan);
+        if (planName == "Basic" || planName == "Basic Plus")
+          planFree.addClass("selected");
+        else if (planName == "Standard" || planName == "Standard Plus")
           planLo.addClass("selected");
-        } else if (membershipPlan == "Enhanced") {
+        else if (planName == "Enhanced" || planName == "Enhanced Plus")
           planMid.addClass("selected");
-        } else if (membershipPlan == "Pro") {
+        else if (planName == "Pro")
           planHi.addClass("selected");
-        }
       }
 
+      planFree.append(viewOfMembershipOption("Basic"));
       planLo.append(viewOfMembershipOption("Standard"));
       planMid.append(viewOfMembershipOption("Enhanced"));
       planHi.append(viewOfMembershipOption("Pro"));
@@ -541,15 +548,20 @@ module AccountTab {
       var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
+        planFree.removeClass("selected");
         planLo.removeClass("selected");
         planMid.removeClass("selected");
         planHi.removeClass("selected");
         option.addClass("selected");
       }
 
+      planFree.click(function() {
+        selectMembership(planFree);
+        selectedMembership = "Basic_20150123";
+      });
       planLo.click(function() {
         selectMembership(planLo);
-        selectedMembership = "Standard_20141222";
+        selectedMembership = "Standard_20150123";
       });
       planMid.click(function() {
         selectMembership(planMid);
@@ -734,6 +746,10 @@ module AccountTab {
 '''
     var teamid = team.teamid;
 
+    if (Login.isExecCustomer(team)) {
+      changeName.parent().remove();
+    }
+
     Api.getProfile(team.team_executive, teamid)
       .done(function(profile) {
         if (profile.image_url !== undefined)
@@ -751,7 +767,6 @@ module AccountTab {
     var cardModal = showCardModal(team);
     cardInfo.click(function() {
       (<any> cardModal.modal).modal();
-
     });
 
     var execUid = team.team_executive;
@@ -791,6 +806,7 @@ module AccountTab {
   export function load(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
+  <div #notes/>
   <div class="table-header">Membership & Billing</div>
   <div #membership class="table-list"/>
   <div #assistantsHeader class="table-header">Assistants</div>
@@ -813,6 +829,18 @@ module AccountTab {
     var emailIcon = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
+
+    if (onboarding) {
+      var notes = $("<div #notes/>");
+      var p1 = $("<p>Please select an Esper membership level to start your " +
+                 "30-day trial.</p>");
+      var p2 = $("<p>You'll have unlimited use of your Esper assistant during " +
+                 "your trial. Your card will not be charged until your trial " +
+                 "period has ended, and you can cancel at any time.</p>");
+      notes.append(p1);
+      notes.append(p2);
+      view.prepend(notes);
+    }
 
     membership.append(displayMembership(team, next));
 

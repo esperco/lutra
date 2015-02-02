@@ -960,7 +960,9 @@ module PreferencesTab {
     <button #saveNotes class="button-primary" disabled>Save</button>
   </div>
   <div>
-    <button #next style="margin-top: 10px; float: right" class="button-primary">Finish</button>
+    <button #next style="margin-top: 10px; float: right" class="button-primary">
+      Next
+    </button>
   </div>
 </div>
 '''
@@ -1032,15 +1034,20 @@ module PreferencesTab {
       .val(team.teamid)
       .appendTo(view);
 
-    if (onboarding)
+    if (onboarding) {
+      view.prepend("<p>Use this page to customize your scheduling " +
+                   "preferences. When you're finished, press Next " +
+                   "at the bottom.");
       next.click(function() {
+        savePreferences();
         tabView.children().remove();
         $("<p>Thanks for setting up Esper!</p>" +
           "<p>We'll be in touch soon to finalize your account.</p>")
           .appendTo(tabView);
       });
-    else
+    } else {
       next.remove();
+    }
 
     return view;
   }

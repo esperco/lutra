@@ -36,10 +36,10 @@ module TeamSettings {
   function showTeamSettings(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
-  <div style="padding-left:28px">
+  <div #tabsDiv style="padding-left:28px">
     <ul class="esper-tab-links">
-      <li class="active"><a #tab1 class="link link1 first">Calendars</a></li>
-      <li><a #tab2 class="link link2">Account</a></li>
+      <li class="active"><a #tab1 class="link link1 first">Account</a></li>
+      <li><a #tab2 class="link link2">Calendars</a></li>
       <li><a #tab3 class="link link3">Preferences</a></li>
       <li><a #tab4 class="link link4 last">LabelSync</a></li>
     </ul>
@@ -57,35 +57,23 @@ module TeamSettings {
     tab2.click(function() { switchTab(2); });
     tab3.click(function() { switchTab(3); });
 
-    content1.append(CalendarsTab.load(team, onboarding));
-    content2.append(AccountTab.load(team, onboarding));
+    content1.append(AccountTab.load(team, onboarding));
+    content2.append(CalendarsTab.load(team, onboarding));
     content3.append(PreferencesTab.load(team, onboarding, content3));
+
+    if (onboarding) {
+      // We'll guide the exec through each step
+      tabsDiv.remove();
+    }
 
     /* We don't have access to executive email accounts,
      * so executives don't need to configure label sync. */
-    if (Login.me() === team.team_executive) {
+    if (Login.isExecCustomer(team)) {
       tab4.remove();
       content4.remove();
       tab3.addClass("last");
     } else {
       tab4.click(function() { switchTab(4); });
-      content4.append(LabelSyncTab.load(team));
-    }
-
-    if (onboarding) {
-      // We'll guide the exec through each step
-      tab2.off("click").addClass("disabled");
-      tab3.off("click").addClass("disabled");
-    }
-
-    content1.append(AccountTab.load(team));
-    content2.append(PreferencesTab.load(team));
-    content3.append(CalendarsTab.load(team));
-
-    if (Login.isExecCustomer(team)) {
-      tab4.hide();
-      content4.hide();
-    } else {
       content4.append(LabelSyncTab.load(team));
     }
 
@@ -152,23 +140,21 @@ module TeamSettings {
 
     headerTitle.click(Page.settings.load);
 
-    if (onboarding) {
-      Api.getSubscriptionStatus(Login.me(), selectedTeam.teamid)
-        .done(function(customer) {
+    Api.getSubscriptionStatus(Login.me(), selectedTeam.teamid)
+      .done(function(customer) {
+        if (onboarding) {
           main.append(showTeamSettings(selectedTeam, onboarding));
           footer.append(Footer.load());
-          if (!Util.isString(Login.data.missing_shared_calendar)) {
-            var mem = customer.status;
-            if (mem === "Trialing" || mem === "Active")
-              switchTab(3);
-            else
-              switchTab(2);
-          }
-        });
-    } else {
-      main.append(showTeamSettings(selectedTeam, onboarding));
-      footer.append(Footer.load());
-    }
+          var mem = customer.status;
+          if (Login.data.missing_shared_calendar)
+            switchTab(2);
+          else if (mem === "Trialing" || mem === "Active")
+            switchTab(3);
+        } else {
+          main.append(showTeamSettings(selectedTeam, onboarding));
+          footer.append(Footer.load());
+        }
+      });
 
     signOut.click(function() {
       Login.clearLoginInfo();
