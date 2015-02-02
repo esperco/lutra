@@ -98,6 +98,7 @@ function checkAndSubmitRedeemForm() {
     var lastName = $("#last-name").val();
     var code = $("#redeem-code").val();
     var email = $("#email").val();
+    var emailPlatform = $("#platform").val();
     var valid = true;
     if (code.length != 9) {
       valid = false;
@@ -133,7 +134,8 @@ function checkAndSubmitRedeemForm() {
       var url =
         "https://app.esper.com/#!redeem/" + encodeURIComponent(code)
         + "/" + encodeURIComponent(email)
-        + "/" + encodeURIComponent(firstName + " " + lastName);
+        + "/" + encodeURIComponent(firstName + " " + lastName)
+        + "/" + encodeURIComponent(emailPlatform);
       console.log(url);
       open(url);
     }
