@@ -405,21 +405,16 @@ module AccountTab {
       } else {
         var stripeToken = response.id;
         Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
-          if (membership == "Standard") {
-            Api.setSubscription(execUid, teamid, "Standard_20141222");
-          }
-          else if (membership == "Enhanced") {
-            Api.setSubscription(execUid, teamid, "Enhanced_20141222");
-          }
-          else if (membership == "Pro") {
-            Api.setSubscription(execUid, teamid, "Pro_20141222");
-          }
-          (<any> paymentForm.get(0)).reset();
-          (<any> modal).modal("hide"); // FIXME
-          if (defaultBox.prop("checked")) {
-            Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
-          } else {
-            refresh();
+          if (membership !== null) {
+            Api.setSubscription(execUid, teamid, membership);
+            $(".next-step-button").prop("disabled", false);
+            (<any> paymentForm.get(0)).reset();
+            (<any> modal).modal("hide"); // FIXME
+            if (defaultBox.prop("checked")) {
+              Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
+            } else {
+              refresh();
+            }
           }
         });
       }
@@ -454,8 +449,10 @@ module AccountTab {
 
     name.text(membership);
 
-    if (membership == "Standard") {
-      price.text("$259/mo");
+    if (membership == "Basic") {
+      price.text("Free");
+    } else if (membership == "Standard") {
+      price.text("$199/mo");
     } else if (membership == "Enhanced") {
       price.text("$399/mo");
     } else if (membership == "Pro") {
@@ -480,6 +477,7 @@ module AccountTab {
         <div #daysRemaining class="membership-modal-note"/>
         <div #suspension class="membership-modal-note"/>
         <div class="membership-options clearfix">
+          <div #planFree class="membership-option"/>
           <div #planLo class="membership-option"/>
           <div #planMid class="membership-option"/>
           <div #planHi class="membership-option"/>
@@ -525,20 +523,24 @@ module AccountTab {
           .show();
       } else if (membershipStatus == "Past-due" ||
                  membershipStatus == "Unpaid" ||
-                 membershipStatus == "Canceled") {
+                 membershipStatus == "Canceled" ||
+                 membershipStatus == undefined) {
         suspension
           .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // must be active
-        if (membershipPlan == "Standard") {
+        var planName = Util.nameOfPlan(membershipPlan);
+        if (planName == "Basic" || planName == "Basic Plus")
+          planFree.addClass("selected");
+        else if (planName == "Standard" || planName == "Standard Plus")
           planLo.addClass("selected");
-        } else if (membershipPlan == "Enhanced") {
+        else if (planName == "Enhanced" || planName == "Enhanced Plus")
           planMid.addClass("selected");
-        } else if (membershipPlan == "Pro") {
+        else if (planName == "Pro")
           planHi.addClass("selected");
-        }
       }
 
+      planFree.append(viewOfMembershipOption("Basic"));
       planLo.append(viewOfMembershipOption("Standard"));
       planMid.append(viewOfMembershipOption("Enhanced"));
       planHi.append(viewOfMembershipOption("Pro"));
@@ -546,23 +548,28 @@ module AccountTab {
       var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
+        planFree.removeClass("selected");
         planLo.removeClass("selected");
         planMid.removeClass("selected");
         planHi.removeClass("selected");
         option.addClass("selected");
       }
 
+      planFree.click(function() {
+        selectMembership(planFree);
+        selectedMembership = "Basic_20150123";
+      });
       planLo.click(function() {
         selectMembership(planLo);
-        selectedMembership = "Standard";
+        selectedMembership = "Standard_20150123";
       });
       planMid.click(function() {
         selectMembership(planMid);
-        selectedMembership = "Enhanced";
+        selectedMembership = "Enhanced_20141222";
       });
       planHi.click(function() {
         selectMembership(planHi);
-        selectedMembership = "Pro";
+        selectedMembership = "Pro_20141222";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
@@ -576,6 +583,7 @@ module AccountTab {
           else { // there are cards to charge
             primaryBtn.click(function() {
               Api.setSubscription(execUid, teamid, selectedMembership);
+              $(".next-step-button").prop("disabled", false);
               (<any> modal).modal("hide"); // FIXME
             });
           }
@@ -670,9 +678,10 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(Login.me(), teamid).done(function(customerStatus) {
-       memPlan.append(customerStatus.plan);
-       memStatus.append(customerStatus.status);
+    Api.getSubscriptionStatus(Login.me(), teamid)
+      .done(function(customerStatus) {
+        memPlan.append(customerStatus.plan);
+        memStatus.append(customerStatus.status);
     });
 
     Api.getSubscriptionStatusLong(Login.me(), teamid).done(function(status) {
@@ -715,7 +724,7 @@ module AccountTab {
     return _view;
   }
 
-  function displayMembership(team) {
+  function displayMembership(team, next) {
 '''
 <div #view class="membership">
   <div class="membership-col left">
@@ -738,6 +747,10 @@ module AccountTab {
 '''
     var teamid = team.teamid;
 
+    if (Login.isExecCustomer(team)) {
+      changeName.parent().remove();
+    }
+
     Api.getProfile(team.team_executive, teamid)
       .done(function(profile) {
         if (profile.image_url !== undefined)
@@ -755,7 +768,6 @@ module AccountTab {
     var cardModal = showCardModal(team);
     cardInfo.click(function() {
       (<any> cardModal.modal).modal();
-
     });
 
     var execUid = team.team_executive;
@@ -769,6 +781,7 @@ module AccountTab {
 
       if (mem == "Trialing" || mem == "Active") {
         membershipBadge.addClass("active");
+        next.prop("disabled", false);
       } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
@@ -791,9 +804,10 @@ module AccountTab {
     return view;
   }
 
-  export function load(team) {
+  export function load(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
+  <div #notes/>
   <div class="table-header">Membership & Billing</div>
   <div #membership class="table-list"/>
   <div #assistantsHeader class="table-header">Assistants</div>
@@ -807,6 +821,10 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
+    <button #next style="float: right" class="next-step-button button-primary"
+            disabled="true">
+      Next Step
+    </button>
   </div>
 </div>
 '''
@@ -814,7 +832,19 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    membership.append(displayMembership(team));
+    if (onboarding) {
+      var notes = $("<div #notes/>");
+      var p1 = $("<p>Please select an Esper membership level to start your "
+               + "30-day trial.</p>");
+      var p2 = $("<p>You'll have unlimited use of your Esper assistant during "
+               + "your trial. Your card will not be charged until your trial "
+               + "period has ended, and you can cancel at any time.</p>");
+      notes.append(p1);
+      notes.append(p2);
+      view.prepend(notes);
+    }
+
+    membership.append(displayMembership(team, next));
 
     spinner.show();
 
@@ -841,6 +871,11 @@ module AccountTab {
     } else {
       invite.click(function() { Settings.togglePopover(popover); });
     }
+
+    if (onboarding)
+      next.click(function() { TeamSettings.switchTab(3); });
+    else
+      next.remove();
 
     return view;
   }

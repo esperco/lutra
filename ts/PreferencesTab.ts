@@ -931,7 +931,7 @@ module PreferencesTab {
     return view;
   }
 
-  export function load(team) {
+  export function load(team, onboarding, tabView?) {
 '''
 <div #view>
   <div class="table-header">Workplaces</div>
@@ -958,6 +958,11 @@ module PreferencesTab {
   </textarea>
   <div class="save-notes-bar">
     <button #saveNotes class="button-primary" disabled>Save</button>
+  </div>
+  <div>
+    <button #next style="margin-top: 10px; float: right" class="button-primary">
+      Next
+    </button>
   </div>
 </div>
 '''
@@ -1028,6 +1033,21 @@ module PreferencesTab {
     $("<input type='hidden' class='esper-prefs-teamid'/>")
       .val(team.teamid)
       .appendTo(view);
+
+    if (onboarding) {
+      view.prepend("<p>Use this page to customize your scheduling " +
+                   "preferences. When you're finished, press Next " +
+                   "at the bottom.");
+      next.click(function() {
+        savePreferences();
+        tabView.children().remove();
+        $("<p>Thanks for setting up Esper!</p>" +
+          "<p>We'll be in touch soon to finalize your account.</p>")
+          .appendTo(tabView);
+      });
+    } else {
+      next.remove();
+    }
 
     return view;
   }

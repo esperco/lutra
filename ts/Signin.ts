@@ -174,7 +174,7 @@ module Signin {
         function(tokenDescription) {
           var loginView =
             displayLoginLinks(
-              "Thanks for signing up! We'll contact you shortly.",
+              "Thanks for signing up! Please log in to continue.",
               "#!",
               inviteCode,
               undefined);

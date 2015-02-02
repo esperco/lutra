@@ -52,9 +52,17 @@ module Route {
 
     /* Gift code (same as generic invitation but collect also
        an email address and a name */
-    "redeem/:token/:email/:name route" : function(data) {
+    "redeem/:token/:email/:name/:platform route" : function(data) {
+      Log.p(data);
       if (isIOS()) {
         openIOSapp(data.token, data.email, data.name);
+      } else if (data.platform !== "Google Apps") {
+        var msg = $("<p>Thank you for signing up! We're currently working on " +
+                    "support for " + data.platform + ". We'll be in touch as " +
+                    "soon as we're ready!</p>");
+        msg.addClass("sign-in");
+        $(document.body).children().remove();
+        $(document.body).append(msg);
       } else {
         withLogin(Page.settings.load, undefined,
                   data.token, data.email, data.name);
@@ -74,7 +82,11 @@ module Route {
     /* various pages */
 
     "team-settings/:teamid route" : function (data) {
-      withLogin(Page.teamSettings.load, data.teamid, undefined, undefined);
+      withLogin(Page.teamSettings.load, data.teamid);
+    },
+
+    "join/:teamid route" : function (data) {
+      withLogin(Page.onboarding.load, data.teamid);
     },
 
     "preferences route" : function (data) {
