@@ -689,6 +689,15 @@ module Esper.TaskTab {
     });
   }
 
+  function markNewTaskAsInProgress(task) {
+    if (task.task_progress === "New") {
+      var state = "In_progress";
+      /* let this run in the background and assume it succeeds */
+      Api.setTaskProgress(task.taskid, state);
+      task.task_progress = state;
+    }
+  }
+
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
@@ -906,6 +915,7 @@ module Esper.TaskTab {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
         displayLinkedThreadsList(task, threadId, taskTabView);
+        markNewTaskAsInProgress(task);
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
