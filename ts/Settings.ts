@@ -164,7 +164,7 @@ module Settings {
     }); // end of Api.getProfile.done
 
     cogContainer.click(function() {
-      Page.teamSettings.load(team);
+      Page.teamSettings.load(team.teamid);
     })
 
     return view;
