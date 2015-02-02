@@ -142,17 +142,14 @@ module TeamSettings {
 
     Api.getSubscriptionStatus(Login.me(), selectedTeam.teamid)
       .done(function(customer) {
+        main.append(showTeamSettings(selectedTeam, onboarding));
+        footer.append(Footer.load());
         if (onboarding) {
-          main.append(showTeamSettings(selectedTeam, onboarding));
-          footer.append(Footer.load());
           var mem = customer.status;
           if (Login.data.missing_shared_calendar)
             switchTab(2);
           else if (mem === "Trialing" || mem === "Active")
             switchTab(3);
-        } else {
-          main.append(showTeamSettings(selectedTeam, onboarding));
-          footer.append(Footer.load());
         }
       });
 
