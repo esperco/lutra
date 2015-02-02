@@ -565,11 +565,11 @@ module AccountTab {
       });
       planMid.click(function() {
         selectMembership(planMid);
-        selectedMembership = "Enhanced_20141222";
+        selectedMembership = "Enhanced_20150123";
       });
       planHi.click(function() {
         selectMembership(planHi);
-        selectedMembership = "Pro_20141222";
+        selectedMembership = "Pro_20150123";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
