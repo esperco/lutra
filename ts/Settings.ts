@@ -294,7 +294,7 @@ module Settings {
     var teams = Login.getTeams();
     if (teams.length === 1 && firstTime) {
       firstTime = false;
-      Page.teamSettings.load(teams[0]);
+      Page.teamSettings.load(teams[0].teamid);
     } else {
       List.iter(teams, function(team) {
         execTeams.append(viewOfTeam(team));

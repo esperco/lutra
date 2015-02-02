@@ -83,7 +83,7 @@ module TeamSettings {
     }
   }
 
-  export function load(team) {
+  export function load(teamid) {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -106,8 +106,6 @@ module TeamSettings {
     root.children().remove();
     root.append(view);
 
-    var teamid = team.teamid;
-
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
     Svg.loadImg(logo, "/assets/img/logo.svg");
@@ -125,7 +123,7 @@ module TeamSettings {
       .done(function(exec) {
         document.title = exec.display_name + " - Team Settings";
         profilePic.css("background-image", "url('" + exec.image_url + "')");
-        teamName.text(team.team_name);
+        teamName.text(selectedTeam.team_name);
       });
 
     main.append(showTeamSettings(selectedTeam));
