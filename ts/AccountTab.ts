@@ -678,9 +678,10 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(Login.me(), teamid).done(function(customerStatus) {
-       memPlan.append(customerStatus.plan);
-       memStatus.append(customerStatus.status);
+    Api.getSubscriptionStatus(Login.me(), teamid)
+      .done(function(customerStatus) {
+        memPlan.append(customerStatus.plan);
+        memStatus.append(customerStatus.status);
     });
 
     Api.getSubscriptionStatusLong(Login.me(), teamid).done(function(status) {
@@ -820,7 +821,8 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
-    <button #next style="float: right" class="next-step-button button-primary" disabled="true">
+    <button #next style="float: right" class="next-step-button button-primary"
+            disabled="true">
       Next Step
     </button>
   </div>
@@ -832,11 +834,11 @@ module AccountTab {
 
     if (onboarding) {
       var notes = $("<div #notes/>");
-      var p1 = $("<p>Please select an Esper membership level to start your " +
-                 "30-day trial.</p>");
-      var p2 = $("<p>You'll have unlimited use of your Esper assistant during " +
-                 "your trial. Your card will not be charged until your trial " +
-                 "period has ended, and you can cancel at any time.</p>");
+      var p1 = $("<p>Please select an Esper membership level to start your "
+               + "30-day trial.</p>");
+      var p2 = $("<p>You'll have unlimited use of your Esper assistant during "
+               + "your trial. Your card will not be charged until your trial "
+               + "period has ended, and you can cancel at any time.</p>");
       notes.append(p1);
       notes.append(p2);
       view.prepend(notes);
