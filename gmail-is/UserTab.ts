@@ -498,7 +498,7 @@ module Esper.UserTab {
         .removeClass("esper-green")
         .addClass("esper-red");
     if (!prefs.bcc_exec_on_reply)
-      useDuplicate.text("No")
+      bccExec.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
 
