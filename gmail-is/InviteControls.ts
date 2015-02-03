@@ -153,7 +153,7 @@ module Esper.InviteControls {
 
     CurrentThread.withPreferences(function (preferences) {
       var duplicate = preferences.general.use_duplicate_events;
-      var reminder  = false;    // TODO: enable reminders again
+      var reminder  = preferences.general.send_exec_reminder;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -222,9 +222,9 @@ module Esper.InviteControls {
         /** Animates from the current widget to the check description
          *  widget.
          */
-        function checkDescription(previous, title) {
+        function checkDescription(previous, title, reminderSpec?) {
           var next =
-            descriptionWidget(event, eventEdit, duplicate, guests, from, close, back);
+            descriptionWidget(event, eventEdit, duplicate, guests, from, close, back, reminderSpec);
 
           slideForward(previous, next);
 
@@ -234,11 +234,11 @@ module Esper.InviteControls {
         }
 
         function checkReminder() {
-          var next = reminderWidget(duplicate, function () {
+          var next = reminderWidget(function () {
             slideBack(container, next);
-          }, function () {
+          }, function (reminderSpec) {
             var title = pubTitle.val();
-            checkDescription(next, title);
+            checkDescription(next, title, reminderSpec);
           });
 
           slideForward(container, next);
@@ -274,7 +274,7 @@ module Esper.InviteControls {
   export function descriptionWidget(original: ApiT.CalendarEvent,
                                     eventEdit: ApiT.CalendarEventEdit,
                                     duplicate: boolean,
-                                    guests, from, done, backFunction) {
+                                    guests, from, done, backFunction, reminderSpec?) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -333,6 +333,20 @@ module Esper.InviteControls {
             close();
           });
       }
+
+      if (reminderSpec) {
+        Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+          var reminder = {
+            guest_email      : profile.email,
+            reminder_message : reminderSpec.text
+          };
+
+          Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
+
+          Api.setReminderTime(team.teamid, from, original.google_cal_id,
+                              original.google_event_id, reminderSpec.time);
+        });
+      }
     });
 
     return container;
@@ -341,7 +355,7 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(duplicate, backFunction, nextFunction) {
+  function reminderWidget(backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -353,7 +367,7 @@ module Esper.InviteControls {
       A reminder about this event, or something.
     </textarea>
     <label>
-      When: <input type="text"> </input>
+      <input #reminderTime type="text" value="1"> </input> hours before event
     </label>
     <button #reminderButton class="esper-btn esper-btn-danger">
       Cancel reminder
@@ -369,15 +383,19 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    // if (!duplicate) next.text("Invite");
+    var reminderEnabled = true;
 
     back.click(backFunction);
     next.click(function () {
-      // if (!duplicate) inviting(next);
-      nextFunction();
+      if (reminderEnabled) {
+        nextFunction({
+          text : reminderField.val(),
+          time : reminderTime.val() * 60 * 60
+        });
+      } else {
+        nextFunction();
+      }
     });
-
-    var reminderEnabled = true;
 
     reminderButton.click(function () {
       if (reminderEnabled) {
