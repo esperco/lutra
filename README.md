@@ -7,13 +7,17 @@ Setup
 -----
 
 Requirements:
-* UglifyJS (JavaScript minifier)
+* UglifyJS (JavaScript minifier): follow instructions given for
+  https://github.com/esperco/stoat
 * `gawk` (GNU awk)
-* LESS (CSS preprocessor)
+* LESS (CSS preprocessor): follow instructions given for
+  https://github.com/esperco/stoat
+* TypeScript (`tsc`): follow instructions given for
+  https://github.com/esperco/stoat
 
 Ubuntu:
 ```
-sudo apt-get install node-uglify gawk node-less
+sudo apt-get install gawk
 ```
 
 Mac:
