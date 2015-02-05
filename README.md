@@ -32,6 +32,7 @@ Everyone
 Avoid having to use `sudo` for `npm`:
 ```
 sudo npm remove -g typescript  # in case it's already installed
+sudo npm remove -g uglify-js   # in case it's already installed
 sudo npm remove -g less        # in case it's already installed
 npm config set prefix ~/npm
 ```
@@ -40,16 +41,14 @@ And then add `~/npm/bin` to your `PATH` environment variable.
 
 
 ```
-$ npm install -g typescript
+npm install -g typescript
+npm install -g uglify-js
+npm install -g less
 ```
 
 ```
 $ tsc -v
 Version 1.3.0.0
-```
-
-```
-$ npm install -g less
 ```
 
 ```
@@ -60,9 +59,13 @@ lessc 1.7.2 (Less Compiler) [JavaScript]
 HTTPS
 =====
 
-If the extension isn't showing up properly on your local setup, that could be an https issue, since it requests resources from your test server over http. (When in prod mode, it gets them from app.esper.com over https.)
+If the extension isn't showing up properly on your local setup, that
+could be an https issue, since it requests resources from your test
+server over http. (When in prod mode, it gets them from app.esper.com
+over https.)
 
-To enable loading these resources, you can click the little grey shield icon on the righthand side of Chrome's URL bar.
+To enable loading these resources, you can click the little grey
+shield icon on the righthand side of Chrome's URL bar.
 
 How to make a production release
 ================================
