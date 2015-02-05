@@ -30,18 +30,25 @@ module Esper.ComposeControls {
         var events = CurrentThread.linkedEvents.get();
 
         composeControls.insertAtCaret("<br />");
-        for (var i = 0; i < events.length; i++) {
-          var ev = events[i].event;
+        
+        events.filter(function (e) {
+          return new Date(e.event.end.local) > new Date(Date.now());
+        });
+
+        var entry = events.reduce(function (str, event) {
+          var ev    = event.event;
           var start = new Date(ev.start.local);
           var end   = new Date(ev.end.local);
           var range = XDate.range(start, end);
-          var tz =
+          var tz    =
             (<any> moment).tz(ev.start.local,
                               CurrentThread.eventTimezone(ev)).zoneAbbr();
 
-          composeControls.insertAtCaret(
-            XDate.fullWeekDay(start) + ", " + range + " " + tz + "<br />");
-        }
+          var br = str != "" ? "<br />" : ""; // no leading newline
+          return str + br + XDate.fullWeekDay(start) + ", " + range + " " + tz;
+        }, "");
+
+        composeControls.insertAtCaret(entry);
       }
     });
 
