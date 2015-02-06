@@ -340,17 +340,34 @@ module Esper.InviteControls {
       }
 
       if (reminderSpec) {
-        Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-          var reminder = {
-            guest_email      : profile.email,
-            reminder_message : reminderSpec.text
-          };
+        if (reminderSpec.time.exec) {
+          Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+            var reminder = {
+              guest_email      : profile.email,
+              reminder_message : reminderSpec.text
+            };
 
-          Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
+            Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
 
-          Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                              original.google_event_id, reminderSpec.time);
-        });
+            Api.setReminderTime(team.teamid, from, original.google_cal_id,
+                                original.google_event_id, reminderSpec.time.exec);
+          });
+        }
+
+        if (reminderSpec.time.guests) {
+          for (var i = 0; i < guests.length; i++) {
+            var guest    = guests[i];
+            var reminder = {
+              guest_email : guest.email,
+              remdinder_message : reminderSpec.text
+            };
+
+            Api.enableReminderForGuest(original.google_event_id, guest.email, reminder);
+
+            Api.setReminderTime(team.teamid, from, original.google_cal_id,
+                                original.google_event_id, reminderSpec.time.guests);
+          }
+        }
       }
     });
 
@@ -371,12 +388,24 @@ module Esper.InviteControls {
       rows=24 class="esper-input esper-reminder-text">
       A reminder about this event, or something.
     </textarea>
-    <label>
-      <input #reminderTime type="text" value="1"> </input> hours before event
-    </label>
-    <button #reminderButton class="esper-btn esper-btn-danger">
-      Cancel reminder
-    </button>
+    <ul class="esper-reminder-options">
+      <li>
+        <label>
+          <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
+        </label>
+        <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
+          Enabled
+        </button>
+      </li>
+      <li>
+        <label>
+          <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
+        </label>
+        <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
+          Enabled
+        </button>
+      </li>
+    </ul>
   </div>
   <div class="esper-modal-footer esper-clearfix">
     <button #next class="esper-btn esper-btn-primary modal-primary">
@@ -388,39 +417,49 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    var reminderEnabled = true;
+    var execEnabled   = true;
+    var guestsEnabled = true;
 
     back.click(backFunction);
     next.click(function () {
-      if (reminderEnabled) {
+      if (execEnabled || guestsEnabled) {
         nextFunction({
           text : reminderField.val(),
-          time : reminderTime.val() * 60 * 60
+          time : {
+            exec   : execEnabled   && execTime.val() * 60 * 60,
+            guests : guestsEnabled && execTime.val() * 60 * 60,
+          }
         });
       } else {
         nextFunction();
       }
     });
 
-    reminderButton.click(function () {
-      if (reminderEnabled) {
-        reminderField.attr("disabled", true);
+    execButton.click(function () {
+      toggleButton(execButton);
 
-        reminderButton.removeClass("esper-btn-danger");
-        reminderButton.addClass("esper-btn-safe");
-        reminderButton.text("Enable reminder");
-      } else {
-        reminderField.attr("disabled", false);
+      execEnabled = !execEnabled;
+    });
 
-        reminderButton.removeClass("esper-btn-safe");
-        reminderButton.addClass("esper-btn-danger");
-        reminderButton.text("Disable reminder");
-      }
+    guestsButton.click(function () {
+      toggleButton(guestsButton);
 
-      reminderEnabled = !reminderEnabled;
+      guestsEnabled = !guestsEnabled;
     });
 
     return container;
+
+    function toggleButton(reminderButton) {
+      if (reminderButton.hasClass("esper-btn-safe")) {
+        reminderButton.removeClass("esper-btn-safe");
+        reminderButton.addClass("esper-btn-danger");
+        reminderButton.text("Disabled");
+      } else {
+        reminderButton.removeClass("esper-btn-danger");
+        reminderButton.addClass("esper-btn-safe");
+        reminderButton.text("Enabled");
+      }
+    }
   }
 
   /** Inserts a new "Invite Guests" widget after the contents of the
