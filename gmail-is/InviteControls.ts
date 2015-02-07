@@ -423,7 +423,7 @@ module Esper.InviteControls {
           text : reminderField.val(),
           time : {
             exec   : execEnabled   && execTime.val() * 60 * 60,
-            guests : guestsEnabled && execTime.val() * 60 * 60,
+            guests : guestsEnabled && guestsTime.val() * 60 * 60,
           }
         });
       } else {
