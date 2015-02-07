@@ -152,8 +152,8 @@ module Esper.InviteControls {
     });
 
     CurrentThread.withPreferences(function (preferences) {
-      var duplicate = preferences.general.use_duplicate_events;
-      var reminder  = preferences.general.send_exec_reminder;
+      var duplicate    = preferences.general.use_duplicate_events;
+      var execReminder = preferences.general.send_exec_reminder;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -233,23 +233,14 @@ module Esper.InviteControls {
           }
         }
 
-        function checkReminder() {
-          var next = reminderWidget(function () {
-            slideBack(container, next);
-          }, function (reminderSpec) {
-            var title = pubTitle.val();
-            checkDescription(next, title, reminderSpec);
-          });
-
-          slideForward(container, next);
-        }
-
-        if (reminder) {
-          checkReminder();
-        } else {
+        var next = reminderWidget(execReminder, function () {
+          slideBack(container, next);
+        }, function (reminderSpec) {
           var title = pubTitle.val();
-          checkDescription(container, title);
-        }
+          checkDescription(next, title, reminderSpec);
+        });
+
+        slideForward(container, next);
       });
     });
 
@@ -377,7 +368,7 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(backFunction, nextFunction) {
+  function reminderWidget(execReminder, backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -419,6 +410,11 @@ module Esper.InviteControls {
 '''
     var execEnabled   = true;
     var guestsEnabled = true;
+
+    if (!execReminder) {
+      execEnabled = false;
+      toggleButton(execButton);
+    }
 
     back.click(backFunction);
     next.click(function () {
