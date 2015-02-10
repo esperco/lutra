@@ -647,6 +647,8 @@ module Esper.TaskTab {
         .click(function() {
           obtainTaskForThread(teamid, threadId, taskTab)
             .done(function(task) {
+              CurrentThread.task.set(task);
+              currentTask = task;
               Api.setTaskTitle(currentTask.taskid, query);
               currentTask.task_title = query;
               taskTitle.val(query);
