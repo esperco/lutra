@@ -329,6 +329,24 @@ module Esper.Sidebar {
     });
   }
 
+  /* Look for a team that has a task for the given thread.
+   * If there are multiple such teams, return the first one. */
+  function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
+    var getTaskCalls = List.map(teams, function(team) {
+      return Api.getTaskForThread(team.teamid, threadId, false, false);
+    });
+    return Promise.join(getTaskCalls).then(function(teamTasks) {
+      var hasTask = List.find(teamTasks, function(taskOpt) {
+        return taskOpt !== undefined;
+      });
+      if (hasTask !== null)
+        return List.find(teams, function(team) {
+          return team.teamid === hasTask.task_teamid;
+        });
+      else return undefined;
+    });
+  }
+
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView(profiles) {
     function retry() {
@@ -367,15 +385,25 @@ module Esper.Sidebar {
               var correctTeam = team !== undefined;
 
               if (!correctTeam && teams.length >= 1) {
-                Log.w("Team not detected, defaulting to arbitrary team.");
-                team = teams[0];
+                /* If we can't detect the team based on the sender's email,
+                 * check if one of our teams has an existing task for this
+                 * thread. */
+                findTeamWithTask(teams, threadId).done(function(foundTeam) {
+                  if (foundTeam === undefined) {
+                    Log.w("Team not detected, defaulting to arbitrary team.");
+                    team = teams[0];
+                  } else {
+                    Log.w("Selected team based on already existing task.");
+                    correctTeam = true;
+                    team = foundTeam;
+                  }
+                  displayTeamSidebar(rootElement, team, correctTeam,
+                                     autoTask, threadId, profiles);
+                });
+              } else if (team !== undefined) {
+                displayTeamSidebar(rootElement, team, correctTeam,
+                                   autoTask, threadId, profiles);
               }
-
-              if (team !== undefined)
-                displayTeamSidebar(rootElement, team,
-                                   correctTeam,
-                                   autoTask,
-                                   threadId, profiles);
             });
           return true;
         }
