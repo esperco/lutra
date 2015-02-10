@@ -75,7 +75,7 @@ module Esper.Init {
           window.location.assign(url);
         });
       } else {
-        Api.postCalendarShow(calendars).done(function() {
+        Api.postCalendarShow(teams[value].teamid, calendars).done(function() {
           window.location.assign(url);
         });
       }
