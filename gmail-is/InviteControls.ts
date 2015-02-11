@@ -376,9 +376,7 @@ module Esper.InviteControls {
   </div>
   <div class="esper-ev-modal-content">
     <textarea #reminderField
-      rows=24 class="esper-input esper-reminder-text">
-      A reminder about this event, or something.
-    </textarea>
+      rows=24 class="esper-input esper-reminder-text">A reminder about this event, or something. </textarea>
     <ul class="esper-reminder-options">
       <li>
         <label>
