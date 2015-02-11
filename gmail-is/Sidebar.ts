@@ -53,7 +53,7 @@ module Esper.Sidebar {
     }
   }
 
-  function displayTeamSelector(teamsSection, myTeamId, team, onTeamSwitch) {
+  function displayTeamSelector(teamsSection, myTeam, team, onTeamSwitch) {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
@@ -67,7 +67,7 @@ module Esper.Sidebar {
     teamName.text(team.team_name);
     teamExecEmail.text(exec.email);
 
-    if (team.teamid === myTeamId) {
+    if (myTeam !== undefined && team.teamid === myTeam.teamid) {
       selector.addClass("esper-selected");
       teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
     } else {
@@ -134,7 +134,7 @@ module Esper.Sidebar {
     dropdown.css("overflow", "auto");
 
     function onTeamSwitch(toTeam) {
-      CurrentThread.team.set(team);
+      CurrentThread.team.set(toTeam);
 
       dismissDropdowns();
       wrap.fadeOut(250);
@@ -152,17 +152,21 @@ module Esper.Sidebar {
     }
 
     Login.myTeams().forEach(function(otherTeam) {
-      displayTeamSelector(teamsSection, team.teamid, otherTeam, onTeamSwitch);
+      displayTeamSelector(teamsSection, team, otherTeam, onTeamSwitch);
     });
 
 
-    var name = team.team_name;
-    if (name === null || name === undefined) {
-      var execProf = profiles[team.team_executive];
-      if (execProf !== null && execProf !== undefined)
-        name = execProf.display_name;
+    if (team === undefined)
+      teamName.text("UNKNOWN TEAM");
+    else {
+      var name = team.team_name;
+      if (name === null || name === undefined) {
+        var execProf = profiles[team.team_executive];
+        if (execProf !== null && execProf !== undefined)
+          name = execProf.display_name;
+      }
+      teamName.text(name);
     }
-    teamName.text(name);
 
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
@@ -223,21 +227,25 @@ module Esper.Sidebar {
       Menu.create();
     });
 
-    Api.getCustomerStatus(team.teamid).done(function(customer) {
-      var sub = customer.status;
-      if (sub === "Past_due" || sub === "Canceled"
-          || sub === "Unpaid" || sub === undefined)
-        view.removeClass("esper-team-warning")
-            .addClass("esper-team-danger");
-      else if (!isCorrectTeam)
-        view.addClass("esper-team-warning")
-            .removeClass("esper-team-danger");
-      else
-        view.removeClass("esper-team-warning")
-            .removeClass("esper-team-danger");
+    if (team !== undefined) {
+      Api.getCustomerStatus(team.teamid).done(function(customer) {
+        var sub = customer.status;
+        if (sub === "Past_due" || sub === "Canceled"
+            || sub === "Unpaid" || sub === undefined)
+          view.removeClass("esper-team-warning")
+              .addClass("esper-team-danger");
+        else if (!isCorrectTeam)
+          view.addClass("esper-team-warning")
+              .removeClass("esper-team-danger");
+        else
+          view.removeClass("esper-team-warning")
+              .removeClass("esper-team-danger");
 
+        rootElement.append(view);
+      });
+    } else {
       rootElement.append(view);
-    });
+    }
   }
 
   function displaySidebar(rootElement,
@@ -278,9 +286,11 @@ module Esper.Sidebar {
       switchTab(1, [0]);
     });
 
-    TaskTab.displayTaskTab(content1, team, threadId,
-                           autoTask, profiles, linkedEvents);
-    content2.append(UserTab.viewOfUserTab(team, profiles).view);
+    if (team !== undefined) {
+      TaskTab.displayTaskTab(content1, team, threadId,
+                             autoTask, profiles, linkedEvents);
+      content2.append(UserTab.viewOfUserTab(team, profiles).view);
+    }
 
     rootElement.append(view);
 
@@ -310,11 +320,17 @@ module Esper.Sidebar {
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
-    CurrentThread.team.set(team);
+    if (team !== undefined) CurrentThread.team.set(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {
         displayUpdateDock(rootElement, status_.download_page);
+      } else if (team === undefined) {
+        var sidebar = displaySidebar(rootElement, team, threadId,
+                                     autoTask, []);
+        displayDock(rootElement, sidebar, team, threadId,
+                    isCorrectTeam, profiles);
+        $(".esper-dock-wrap").hide();
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
           .done(function(linkedEvents) {
@@ -390,8 +406,7 @@ module Esper.Sidebar {
                  * thread. */
                 findTeamWithTask(teams, threadId).done(function(foundTeam) {
                   if (foundTeam === undefined) {
-                    Log.w("Team not detected, defaulting to arbitrary team.");
-                    team = teams[0];
+                    Log.w("Team not detected.");
                   } else {
                     Log.w("Selected team based on already existing task.");
                     correctTeam = true;
