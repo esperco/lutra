@@ -233,7 +233,7 @@ module Esper.InviteControls {
           }
         }
 
-        var next = reminderWidget(execReminder, function () {
+        var next = reminderWidget(event, team, execReminder, function () {
           slideBack(container, next);
         }, function (reminderSpec) {
           var title = pubTitle.val();
@@ -331,32 +331,32 @@ module Esper.InviteControls {
       }
 
       if (reminderSpec) {
-        if (reminderSpec.time.exec) {
+        if (reminderSpec.exec) {
           Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
             var reminder = {
               guest_email      : profile.email,
-              reminder_message : reminderSpec.text
+              reminder_message : reminderSpec.exec.text
             };
 
             Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
 
             Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                original.google_event_id, reminderSpec.time.exec);
+                                original.google_event_id, reminderSpec.exec.time);
           });
         }
 
-        if (reminderSpec.time.guests) {
+        if (reminderSpec.guests) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
               guest_email : guest.email,
-              remdinder_message : reminderSpec.text
+              remdinder_message : reminderSpec.guests.text
             };
 
             Api.enableReminderForGuest(original.google_event_id, guest.email, reminder);
 
             Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                original.google_event_id, reminderSpec.time.guests);
+                                original.google_event_id, reminderSpec.guests.time);
           }
         }
       }
@@ -368,33 +368,41 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(execReminder, backFunction, nextFunction) {
+  function reminderWidget(event, team, execReminder, backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
     Set an automatic reminder for the exec
   </div>
   <div class="esper-ev-modal-content">
-    <textarea #reminderField
-      rows=24 class="esper-input esper-reminder-text">A reminder about this event, or something. </textarea>
-    <ul class="esper-reminder-options">
-      <li>
-        <label>
-          <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
-        </label>
-        <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
-          Enabled
-        </button>
-      </li>
-      <li>
-        <label>
-          <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
-        </label>
-        <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
-          Enabled
-        </button>
-      </li>
-    </ul>
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
+      </label>
+      <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #execReminderField
+      rows=24 class="esper-input esper-reminder-text">
+Hello|exec|,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+    </textarea>
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
+      </label>
+      <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #guestsReminderField
+       rows=24 class="esper-input esper-reminder-text">
+Hello,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+    </textarea>
   </div>
   <div class="esper-modal-footer esper-clearfix">
     <button #next class="esper-btn esper-btn-primary modal-primary">
@@ -414,14 +422,30 @@ module Esper.InviteControls {
       toggleButton(execButton);
     }
 
+    // Fill out static parts of message template (ie exec name and guests):
+    Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+      var name       = profile.display_name ? " " + profile.display_name : "";
+      var eventTitle = event.title || "a meeting";
+
+      execReminderField.val(execReminderField.val()
+        .replace("|exec|", name)
+        .replace("|event|", eventTitle));
+
+      guestsReminderField.val(guestsReminderField.val()
+        .replace("|event|", eventTitle));
+    });
+
     back.click(backFunction);
     next.click(function () {
       if (execEnabled || guestsEnabled) {
         nextFunction({
-          text : reminderField.val(),
-          time : {
-            exec   : execEnabled   && execTime.val() * 60 * 60,
-            guests : guestsEnabled && execTime.val() * 60 * 60,
+          exec : {
+            text : execReminderField.val(),
+            time : execEnabled && execTime.val() * 60 * 60
+          },
+          guests : {
+            text : guestsReminderField.val(),
+            time : execEnabled && execTime.val() * 60 * 60
           }
         });
       } else {
