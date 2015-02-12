@@ -314,6 +314,7 @@ module Esper.InviteControls {
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
+              setReminders(original.google_event_id, created.google_event_id);
               close();
             });
         } else {
@@ -326,10 +327,15 @@ module Esper.InviteControls {
             TaskTab.refreshlinkedEventsList(team, threadId,
                                             TaskTab.currentTaskTab,
                                             Sidebar.profiles);
+            setReminders(original.google_event_id, original.google_event_id);
             close();
           });
       }
+    });
 
+    return container;
+
+    function setReminders(execEventId, guestsEventId) {
       if (reminderSpec) {
         if (reminderSpec.exec) {
           Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
@@ -338,10 +344,10 @@ module Esper.InviteControls {
               reminder_message : reminderSpec.exec.text
             };
 
-            Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
+            Api.enableReminderForGuest(execEventId, profile.email, reminder);
 
             Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                original.google_event_id, reminderSpec.exec.time);
+                                execEventId, reminderSpec.exec.time);
           });
         }
 
@@ -350,19 +356,21 @@ module Esper.InviteControls {
             var guest    = guests[i];
             var reminder = {
               guest_email : guest.email,
-              remdinder_message : reminderSpec.guests.text
+              reminder_message : reminderSpec.guests.text
             };
 
-            Api.enableReminderForGuest(original.google_event_id, guest.email, reminder);
+            if (duplicate) {
+              Api.enableReminderForGuest(guestsEventId, guest.email, reminder);
+            } else {
+              Api.enableReminderForGuest(execEventId, guest.email, reminder);
+            }
 
             Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                original.google_event_id, reminderSpec.guests.time);
+                                execEventId, reminderSpec.guests.time);
           }
         }
       }
-    });
-
-    return container;
+    }
   }
 
   /** A widget for setting an automatic reminder about the event, sent
@@ -426,6 +434,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
       var eventTitle = event.title || "a meeting";
+      eventTitle = eventTitle.replace(/HOLD: /, "");
 
       execReminderField.val(execReminderField.val()
         .replace("|exec|", name)
