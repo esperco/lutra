@@ -233,14 +233,14 @@ module Esper.InviteControls {
           }
         }
 
-        var next = reminderWidget(execReminder, function () {
-          slideBack(container, next);
-        }, function (reminderSpec) {
-          var title = pubTitle.val();
-          checkDescription(next, title, reminderSpec);
-        });
+        // var next = reminderWidget(event, team, execReminder, function () {
+        //   slideBack(container, next);
+        // }, function (reminderSpec) {
+        //   var title = pubTitle.val();
+        //   checkDescription(next, title, reminderSpec);
+        // });
 
-        slideForward(container, next);
+        checkDescription(container, pubTitle.val());
       });
     });
 
