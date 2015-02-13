@@ -314,7 +314,7 @@ module Esper.InviteControls {
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
-              setReminders(original.google_event_id, original.google_event_id);
+              setReminders(original.google_event_id, created.google_event_id);
               close();
             });
         } else {
@@ -448,11 +448,11 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         nextFunction({
           exec : {
             text : execReminderField.val(),
-            time : execEnabled && execTime.val() * 60 * 60
+            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
           },
           guests : {
             text : guestsReminderField.val(),
-            time : execEnabled && execTime.val() * 60 * 60
+            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
           }
         });
       } else {
