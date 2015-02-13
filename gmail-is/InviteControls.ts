@@ -395,8 +395,7 @@ module Esper.InviteControls {
       rows=24 class="esper-input esper-reminder-text">
 Hello|exec|,
 
-This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
-    </textarea>
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.</textarea>
     <div class="esper-reminder-options">
       <label>
         <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
@@ -409,8 +408,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
        rows=24 class="esper-input esper-reminder-text">
 Hello,
 
-This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
-    </textarea>
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.</textarea>
   </div>
   <div class="esper-modal-footer esper-clearfix">
     <button #next class="esper-btn esper-btn-primary modal-primary">
