@@ -310,7 +310,8 @@ module Esper.InviteControls {
           var task = CurrentThread.task.get();
           Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
             .done(function(created) {
-              Api.sendEventInvites(team.teamid, from, guests, created);
+              // TODO: figure out why two invites were being sent
+              // Api.sendEventInvites(team.teamid, from, guests, created);
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
