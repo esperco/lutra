@@ -314,7 +314,7 @@ module Esper.InviteControls {
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
-              setReminders(original.google_event_id, created.google_event_id);
+              setReminders(original.google_event_id, original.google_event_id);
               close();
             });
         } else {
