@@ -6,6 +6,39 @@
  */
 module Esper.ComposeControls {
 
+  var singleEventTemplate =
+    "Hi <b>GUEST</b>," +
+    "<br/><br/>" +
+    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Would |offer| work for you? " +
+    "If not, please let me know some times that would work better for you. " +
+    "I can send an invite once we confirm a time." +
+    "<br/><br/>" +
+    "Can you also provide the best number to reach you at in case of any " +
+    "last-minute coordination? " +
+    "<b>[Remove if we have their number.]</b>" +
+    "<br/><br/>" +
+    "Thanks,<br/>" +
+    "|assistant|";
+
+  var multipleEventTemplate =
+    "Hi <b>GUEST</b>," +
+    "<br/><br/>" +
+    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Would one of the following times work for you?" +
+    "<br/><br/>" +
+    "|offer|" +
+    "<br/><br/>" +
+    "If not, please let me know some times that would work better for you. " +
+    "I can send an invite once we confirm a time." +
+    "<br/><br/>" +
+    "Can you also provide the best number to reach you at in case of any " +
+    "last-minute coordination? " +
+    "<b>[Remove if we have their number.]</b>" +
+    "<br/><br/>" +
+    "Thanks,<br/>" +
+    "|assistant|";
+
   /** Inserts the date of each linked event into the text box. */
   function insertButton(composeControls) {
 '''
@@ -39,16 +72,29 @@ module Esper.ComposeControls {
           var ev    = event.event;
           var start = new Date(ev.start.local);
           var end   = new Date(ev.end.local);
-          var range = XDate.range(start, end);
+          var wday = XDate.fullWeekDay(start);
+          var time = XDate.justStartTime(start);
           var tz    =
             (<any> moment).tz(ev.start.local,
                               CurrentThread.eventTimezone(ev)).zoneAbbr();
 
           var br = str != "" ? "<br />" : ""; // no leading newline
-          return str + br + XDate.fullWeekDay(start) + ", " + range + " " + tz;
+          return str + br + wday + ", " + time + " " + tz +
+            " at <b>LOCATION</b>";
         }, "");
 
-        composeControls.insertAtCaret(entry);
+        var template =
+          events.length > 1 ?
+          multipleEventTemplate.slice(0) :
+          singleEventTemplate.slice(0); // using slice to copy string
+
+        Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
+          .done(function(prof) {
+            var eaName = prof.display_name;
+            var filledTemplate = template.replace("|offer|", entry)
+                                         .replace("|assistant|", eaName);
+            composeControls.insertAtCaret(filledTemplate);
+          });
       }
     });
 
