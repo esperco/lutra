@@ -149,10 +149,10 @@ module Esper.XDate {
     return utcToLocalTimeOnly(d1) +" to "+ utcToLocalTimeOnly(d2);
   }
 
-  /* "Wed Aug 13, 2019 at 12:30pm" */
+  /* "August 13 at 12:30 pm" */
   export function justStartTime(d1 : Date) : string {
-    return weekDay(d1) +" "+ dateOnly(d1) +
-      " at "+ timeOnly(d1);
+    return fullMonthDay(d1) + " at " +
+      formatTimeOnly(hours(d1), minutes(d1), false, " ");
   }
 
   export function timeWithoutYear(d1 : Date) : string {
