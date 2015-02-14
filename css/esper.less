@@ -997,6 +997,26 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border : 1px solid @border;
 }
 
+.esper-reminder-options {
+  margin-top : 10px;
+  margin-bottom : 5px;
+
+  span.esper-reminder-label {
+    display : inline-block;
+    width : 100px;
+
+    font-weight : bold;
+  }
+
+  input {
+    width : 2em;
+  }
+
+  button {
+    margin-left : 42px;
+  }
+}
+
 .esper-ev.esper-disabled {
   pointer-events: none;
   .esper-ev-date,
@@ -1115,7 +1135,11 @@ ul.esper-ev-dropdown {
   padding: 3px 0;
 }
 
-.esper-profile-name-row { padding-top: 10px; }
+.esper-profile-name-row {
+  padding-top: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
 
 .esper-profile-name {
   float: left;
@@ -1480,6 +1504,7 @@ ul.esper-ev-dropdown {
   width: 100%;
   font-size: 13px;
   margin-bottom : 15px;
+  height : 4.2cm;
 }
 
 /** Search Modal **/

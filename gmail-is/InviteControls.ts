@@ -152,8 +152,8 @@ module Esper.InviteControls {
     });
 
     CurrentThread.withPreferences(function (preferences) {
-      var duplicate = preferences.general.use_duplicate_events;
-      var reminder  = preferences.general.send_exec_reminder;
+      var duplicate    = preferences.general.use_duplicate_events;
+      var execReminder = preferences.general.send_exec_reminder;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -233,23 +233,14 @@ module Esper.InviteControls {
           }
         }
 
-        function checkReminder() {
-          var next = reminderWidget(function () {
-            slideBack(container, next);
-          }, function (reminderSpec) {
-            var title = pubTitle.val();
-            checkDescription(next, title, reminderSpec);
-          });
-
-          slideForward(container, next);
-        }
-
-        if (reminder) {
-          checkReminder();
-        } else {
+        var next = reminderWidget(event, team, execReminder, function () {
+          slideBack(container, next);
+        }, function (reminderSpec) {
           var title = pubTitle.val();
-          checkDescription(container, title);
-        }
+          checkDescription(next, title, reminderSpec);
+        });
+
+        slideForward(container, next);
       });
     });
 
@@ -319,10 +310,12 @@ module Esper.InviteControls {
           var task = CurrentThread.task.get();
           Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
             .done(function(created) {
-              Api.sendEventInvites(team.teamid, from, guests, created);
+              // TODO: figure out why two invites were being sent
+              // Api.sendEventInvites(team.teamid, from, guests, created);
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
+              setReminders(original.google_event_id, created.google_event_id);
               close();
             });
         } else {
@@ -335,48 +328,86 @@ module Esper.InviteControls {
             TaskTab.refreshlinkedEventsList(team, threadId,
                                             TaskTab.currentTaskTab,
                                             Sidebar.profiles);
+            setReminders(original.google_event_id, original.google_event_id);
             close();
           });
-      }
-
-      if (reminderSpec) {
-        Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-          var reminder = {
-            guest_email      : profile.email,
-            reminder_message : reminderSpec.text
-          };
-
-          Api.enableReminderForGuest(original.google_event_id, profile.email, reminder);
-
-          Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                              original.google_event_id, reminderSpec.time);
-        });
       }
     });
 
     return container;
+
+    function setReminders(execEventId, guestsEventId) {
+      if (reminderSpec) {
+        if (reminderSpec.exec) {
+          Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+            var reminder = {
+              guest_email      : profile.email,
+              reminder_message : reminderSpec.exec.text
+            };
+
+            Api.enableReminderForGuest(execEventId, profile.email, reminder);
+
+            Api.setReminderTime(team.teamid, from, original.google_cal_id,
+                                execEventId, reminderSpec.exec.time);
+          });
+        }
+
+        if (reminderSpec.guests) {
+          for (var i = 0; i < guests.length; i++) {
+            var guest    = guests[i];
+            var reminder = {
+              guest_email : guest.email,
+              reminder_message : reminderSpec.guests.text
+            };
+
+            Api.enableReminderForGuest(guestsEventId, guest.email, reminder);
+
+            Api.setReminderTime(team.teamid, from, original.google_cal_id,
+                                guestsEventId, reminderSpec.guests.time);
+          }
+        }
+      }
+    }
   }
 
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(backFunction, nextFunction) {
+  function reminderWidget(event, team, execReminder, backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
     Set an automatic reminder for the exec
   </div>
   <div class="esper-ev-modal-content">
-    <textarea #reminderField
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
+      </label>
+      <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #execReminderField
       rows=24 class="esper-input esper-reminder-text">
-      A reminder about this event, or something.
-    </textarea>
-    <label>
-      <input #reminderTime type="text" value="1"> </input> hours before event
-    </label>
-    <button #reminderButton class="esper-btn esper-btn-danger">
-      Cancel reminder
-    </button>
+Hello|exec|,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+</textarea>
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
+      </label>
+      <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #guestsReminderField
+       rows=24 class="esper-input esper-reminder-text">
+Hello,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+</textarea>
   </div>
   <div class="esper-modal-footer esper-clearfix">
     <button #next class="esper-btn esper-btn-primary modal-primary">
@@ -388,39 +419,71 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    var reminderEnabled = true;
+    var execEnabled   = true;
+    var guestsEnabled = true;
+
+    if (!execReminder) {
+      execEnabled = false;
+      toggleButton(execButton);
+    }
+
+    // Fill out static parts of message template (ie exec name and guests):
+    Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+      var name       = profile.display_name ? " " + profile.display_name : "";
+      var eventTitle = event.title || "a meeting";
+      eventTitle = eventTitle.replace(/HOLD: /, "");
+
+      execReminderField.val(execReminderField.val()
+        .replace("|exec|", name)
+        .replace("|event|", eventTitle));
+
+      guestsReminderField.val(guestsReminderField.val()
+        .replace("|event|", eventTitle));
+    });
 
     back.click(backFunction);
     next.click(function () {
-      if (reminderEnabled) {
+      if (execEnabled || guestsEnabled) {
         nextFunction({
-          text : reminderField.val(),
-          time : reminderTime.val() * 60 * 60
+          exec : {
+            text : execReminderField.val(),
+            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+          },
+          guests : {
+            text : guestsReminderField.val(),
+            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+          }
         });
       } else {
         nextFunction();
       }
     });
 
-    reminderButton.click(function () {
-      if (reminderEnabled) {
-        reminderField.attr("disabled", true);
+    execButton.click(function () {
+      toggleButton(execButton);
 
-        reminderButton.removeClass("esper-btn-danger");
-        reminderButton.addClass("esper-btn-safe");
-        reminderButton.text("Enable reminder");
-      } else {
-        reminderField.attr("disabled", false);
+      execEnabled = !execEnabled;
+    });
 
-        reminderButton.removeClass("esper-btn-safe");
-        reminderButton.addClass("esper-btn-danger");
-        reminderButton.text("Disable reminder");
-      }
+    guestsButton.click(function () {
+      toggleButton(guestsButton);
 
-      reminderEnabled = !reminderEnabled;
+      guestsEnabled = !guestsEnabled;
     });
 
     return container;
+
+    function toggleButton(reminderButton) {
+      if (reminderButton.hasClass("esper-btn-safe")) {
+        reminderButton.removeClass("esper-btn-safe");
+        reminderButton.addClass("esper-btn-danger");
+        reminderButton.text("Disabled");
+      } else {
+        reminderButton.removeClass("esper-btn-danger");
+        reminderButton.addClass("esper-btn-safe");
+        reminderButton.text("Enabled");
+      }
+    }
   }
 
   /** Inserts a new "Invite Guests" widget after the contents of the
