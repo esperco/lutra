@@ -16,10 +16,7 @@ module Esper.ComposeControls {
     "<br/><br/>" +
     "Can you also provide the best number to reach you at in case of any " +
     "last-minute coordination? " +
-    "<b>[Remove if we have their number.]</b>" +
-    "<br/><br/>" +
-    "Thanks,<br/>" +
-    "|assistant|";
+    "<b>[Remove if we have their number.]</b>";
 
   var multipleEventTemplate =
     "Hi <b>GUEST</b>," +
@@ -34,10 +31,7 @@ module Esper.ComposeControls {
     "<br/><br/>" +
     "Can you also provide the best number to reach you at in case of any " +
     "last-minute coordination? " +
-    "<b>[Remove if we have their number.]</b>" +
-    "<br/><br/>" +
-    "Thanks,<br/>" +
-    "|assistant|";
+    "<b>[Remove if we have their number.]</b>";
 
   /** Inserts the date of each linked event into the text box. */
   function insertButton(composeControls) {
@@ -91,8 +85,7 @@ module Esper.ComposeControls {
         Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
           .done(function(prof) {
             var eaName = prof.display_name;
-            var filledTemplate = template.replace("|offer|", entry)
-                                         .replace("|assistant|", eaName);
+            var filledTemplate = template.replace("|offer|", entry);
             composeControls.insertAtCaret(filledTemplate);
           });
       }
