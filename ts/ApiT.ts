@@ -287,7 +287,7 @@ type token_response = [
     send_exec_reminder: boolean;
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
-	exec_daily_agenda: boolean;
+    exec_daily_agenda: boolean;
   }
 
   export interface GuestReminder {
