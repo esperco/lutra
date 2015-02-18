@@ -106,7 +106,9 @@ module PreferencesTab {
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
       use_duplicate_events:
-        div.find(".esper-prefs-duplicate").is(":checked")
+        div.find(".esper-prefs-duplicate").is(":checked"),
+      exec_daily_agenda:
+        div.find(".esper-prefs-agenda").is(":checked")
     };
   }
 
@@ -902,6 +904,11 @@ module PreferencesTab {
                class="esper-prefs-duplicate"/>
         Use duplicate calendar events to invite guests
       </li>
+      <li>
+        <input #dailyAgenda type="checkbox"
+               class="esper-prefs-agenda"/>
+        Receive daily agenda of events and updates on in progress tasks
+      </li>
     </ul>
   </div>
 '''
@@ -912,11 +919,14 @@ module PreferencesTab {
         sendReminder.prop("checked", true);
       if (!general.use_duplicate_events)
         useDuplicate.prop("checked", false);
+      if (general.exec_daily_agenda)
+        dailyAgenda.prop("checked", true);
     }
 
     sendConfirmation.click(savePreferences);
     sendReminder.click(savePreferences);
     useDuplicate.click(savePreferences);
+    dailyAgenda.click(savePreferences);
 
     return view;
   }
