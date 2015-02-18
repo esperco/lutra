@@ -61,6 +61,7 @@ object { pointer-events: none; }
 
 button,
 .button {
+  cursor: pointer;
   padding: 6px 16px;
   border-radius: 3px;
   &:disabled {
@@ -676,6 +677,10 @@ a.header-title:hover { text-decoration: underline; }
     clear:both;
     content:'';
   }
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .esper-tab-content {
@@ -770,13 +775,12 @@ a.header-title:hover { text-decoration: underline; }
   font-size: 10px;
   font-weight: 600;
   border-radius: 2px;
-  &.active { background: @gray_20; }
-  &.free-trial {
+  &.active {
     background: @green;
     color: white;
   }
   &.suspended {
-    background: @orange;
+    background: @red;
     color: white;
   }
 }
@@ -1229,10 +1233,10 @@ a.header-title:hover { text-decoration: underline; }
     padding: 15px 10px;
     .membership-option {
       float: left;
-      width: 200px;
+      width: 150px;
       height: 100px;
-      margin: 0 5px;
-      padding: 20px;
+      margin: 0 3px;
+      padding: 15px;
       background: white;
       border-radius: 5px;
       border: 1px solid white;

@@ -130,6 +130,22 @@ module Login {
       return false;
   };
 
+  export function isEsperAssistant() {
+    if (Util.isDefined(data))
+      return data.is_esper_assistant === true;
+    else
+      return false;
+  };
+
+  export function isExecCustomer(team) {
+    if (Util.isDefined(data))
+      return data.uid === team.team_executive
+        && !isAdmin()
+        && !isEsperAssistant();
+    else
+      return false;
+  };
+
   export function myEmail() {
     if (Util.isDefined(data))
       return data.email;

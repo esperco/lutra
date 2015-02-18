@@ -7,11 +7,11 @@ module Settings {
   export function resetOverlay(overlay) {
     if (overlay.view.hasClass("invite-popover")) {
       overlay.inviteEmail.show();
-      overlay.review.hide();
+      overlay.invited.hide();
       overlay.addBtn
         .prop("disabled", true)
         .show();
-      overlay.continueBtn
+      overlay.doneBtn
         .prop("disabled", true)
         .hide();
       overlay.cancelBtn.text("Cancel");
@@ -164,7 +164,7 @@ module Settings {
     }); // end of Api.getProfile.done
 
     cogContainer.click(function() {
-      Page.teamSettings.load(team);
+      location.hash = "#!team-settings/" + team.teamid;
     })
 
     return view;
@@ -205,7 +205,7 @@ module Settings {
 
   var firstTime = true;
 
-  function reallyLoad() {
+  export function load() {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
@@ -294,7 +294,12 @@ module Settings {
     var teams = Login.getTeams();
     if (teams.length === 1 && firstTime) {
       firstTime = false;
-      Page.teamSettings.load(teams[0]);
+      var joinTeam = Login.data.missing_shared_calendar;
+      if (Util.isString(joinTeam))
+        // This is a new exec customer who needs to be onboarded
+        location.hash = "#!join/" + joinTeam;
+      else if (teams[0] !== null)
+        location.hash = "#!team-settings/" + teams[0].teamid;
     } else {
       List.iter(teams, function(team) {
         execTeams.append(viewOfTeam(team));
@@ -341,18 +346,6 @@ module Settings {
     if (Login.isAdmin()) {
       adminBody.append(renderAdminSection());
       adminSection.removeClass("hide");
-    }
-  }
-
-  export function load() {
-    if (Login.data.missing_shared_calendar) {
-      var team = List.find(Login.getTeams(), function(x : ApiT.Team) {
-        return List.mem(x.team_assistants, "P-wKfcaGEsuwjBnLlGHTIg");
-      });
-      Page.teamSettings.load(team);
-      $("#tab3").click();
-    } else {
-      reallyLoad();
     }
   }
 }

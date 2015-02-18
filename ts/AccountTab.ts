@@ -15,9 +15,10 @@ module AccountTab {
     location.reload(true);
   }
 
-  function generateInviteURL(team: ApiT.Team,
-                             role: string,
-                             toEmail: string) {
+  function sendInvite(team: ApiT.Team,
+                      role: string,
+                      toEmail: string):
+  JQueryPromise<void> {
     var invite = {
       from_uid: Login.me(),
       teamid: team.teamid,
@@ -28,35 +29,26 @@ module AccountTab {
     return Api.inviteJoinTeam(invite);
   }
 
-  function composeInviteWithURL(team, role, toEmail, link) {
-    return generateInviteURL(team, role, toEmail)
-      .then(function(urlResult) {
-        var url = urlResult.url;
-        var body =
-          "Please click the link and sign in with your Google account:\n\n"
-          + "  " + url;
-
-        var gmailUrl = GmailCompose.makeUrl({
-          to: toEmail,
-          subject: "Join my team on Esper",
-          body: body
-        });
-
-        link.attr("href", gmailUrl);
-        link.prop("disabled", false);
-      });
+  export interface InviteDialog {
+    view: JQuery;
+    inviteEmail: JQuery;
+    invited: JQuery;
+    addBtn: JQuery;
+    roleSelector: JQuery;
+    assistant: JQuery;
+    executive: JQuery;
+    doneBtn: JQuery;
+    cancelBtn: JQuery;
   }
 
-  function renderInviteDialog(team, table) {
+  function renderInviteDialog(team, table): InviteDialog {
 '''
 <div #view class="invite-popover overlay-popover click-safe">
   <div class="overlay-popover-header click-safe">Add new team member</div>
   <div class="overlay-popover-body click-safe">
     <input #inviteEmail type="email" class="invite-input click-safe"
            autofocus placeholder="name@example.com"/>
-    <div #review class="invite-review click-safe">
-      Review and send invitation (optional)
-    </div>
+    <div #invited class="invite-review click-safe"></div>
     <div class="clearfix click-safe">
       <button #addBtn class="button-primary label-btn click-safe" disabled>
         <span class="click-safe">Add</span>
@@ -67,8 +59,8 @@ module AccountTab {
         <li><a #assistant class="click-safe">Assistant</a></li>
         <li><a #executive class="click-safe">Executive</a></li>
       </ul>
-      <a #continueBtn class="invite-continue button button-primary"
-         target="_blank" disabled>Continue</a>
+      <a #doneBtn class="invite-continue button button-primary"
+         target="_blank">Done</a>
       <button #cancelBtn class="button-secondary label-btn">Cancel</button>
   </div>
 </div>
@@ -85,25 +77,29 @@ module AccountTab {
       Settings.togglePopover(_view);
     }
 
+    function selectRole(role: string, toEmail: string) {
+      Settings.toggleList(roleSelector);
+      inviteEmail.hide();
+      addBtn.hide();
+      cancelBtn.hide();
+      sendInvite(team, role, toEmail)
+        .done(function() {
+          var text = Login.isAdmin() ? "Added!" : "Invite sent!";
+          invited.text(text);
+          invited.show();
+          doneBtn.show();
+        });
+    }
+
     addBtn.click(function() {
       var toEmail = inviteEmail.val();
       Settings.toggleList(roleSelector);
 
-      function selectRole(role) {
-        Settings.toggleList(roleSelector);
-        review.show();
-        inviteEmail.hide();
-        cancelBtn.text("Skip");
-        addBtn.hide();
-        continueBtn.show();
-        composeInviteWithURL(team, role, toEmail, continueBtn);
-      }
-
-      assistant.click(function() { selectRole("Assistant") });
-      executive.click(function() { selectRole("Executive") });
+      assistant.click(function() { selectRole("Assistant", toEmail); });
+      executive.click(function() { selectRole("Executive", toEmail); });
     });
 
-    continueBtn.click(reset);
+    doneBtn.click(reset);
     cancelBtn.click(reset);
 
     return _view;
@@ -409,21 +405,16 @@ module AccountTab {
       } else {
         var stripeToken = response.id;
         Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
-          if (membership == "Standard") {
-            Api.setSubscription(execUid, teamid, "Standard_20141222");
-          }
-          else if (membership == "Enhanced") {
-            Api.setSubscription(execUid, teamid, "Enhanced_20141222");
-          }
-          else if (membership == "Pro") {
-            Api.setSubscription(execUid, teamid, "Pro_20141222");
-          }
-          (<any> paymentForm.get(0)).reset();
-          (<any> modal).modal("hide"); // FIXME
-          if (defaultBox.prop("checked")) {
-            Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
-          } else {
-            refresh();
+          if (membership !== null) {
+            Api.setSubscription(execUid, teamid, membership);
+            $(".next-step-button").prop("disabled", false);
+            (<any> paymentForm.get(0)).reset();
+            (<any> modal).modal("hide"); // FIXME
+            if (defaultBox.prop("checked")) {
+              Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
+            } else {
+              refresh();
+            }
           }
         });
       }
@@ -458,8 +449,10 @@ module AccountTab {
 
     name.text(membership);
 
-    if (membership == "Standard") {
-      price.text("$259/mo");
+    if (membership == "Basic") {
+      price.text("Free");
+    } else if (membership == "Standard") {
+      price.text("$199/mo");
     } else if (membership == "Enhanced") {
       price.text("$399/mo");
     } else if (membership == "Pro") {
@@ -484,6 +477,7 @@ module AccountTab {
         <div #daysRemaining class="membership-modal-note"/>
         <div #suspension class="membership-modal-note"/>
         <div class="membership-options clearfix">
+          <div #planFree class="membership-option"/>
           <div #planLo class="membership-option"/>
           <div #planMid class="membership-option"/>
           <div #planHi class="membership-option"/>
@@ -529,20 +523,24 @@ module AccountTab {
           .show();
       } else if (membershipStatus == "Past-due" ||
                  membershipStatus == "Unpaid" ||
-                 membershipStatus == "Canceled") {
+                 membershipStatus == "Canceled" ||
+                 membershipStatus == undefined) {
         suspension
           .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // must be active
-        if (membershipPlan == "Standard") {
+        var planName = Util.nameOfPlan(membershipPlan);
+        if (planName == "Basic" || planName == "Basic Plus")
+          planFree.addClass("selected");
+        else if (planName == "Standard" || planName == "Standard Plus")
           planLo.addClass("selected");
-        } else if (membershipPlan == "Enhanced") {
+        else if (planName == "Enhanced" || planName == "Enhanced Plus")
           planMid.addClass("selected");
-        } else if (membershipPlan == "Pro") {
+        else if (planName == "Pro")
           planHi.addClass("selected");
-        }
       }
 
+      planFree.append(viewOfMembershipOption("Basic"));
       planLo.append(viewOfMembershipOption("Standard"));
       planMid.append(viewOfMembershipOption("Enhanced"));
       planHi.append(viewOfMembershipOption("Pro"));
@@ -550,23 +548,28 @@ module AccountTab {
       var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
+        planFree.removeClass("selected");
         planLo.removeClass("selected");
         planMid.removeClass("selected");
         planHi.removeClass("selected");
         option.addClass("selected");
       }
 
+      planFree.click(function() {
+        selectMembership(planFree);
+        selectedMembership = "Basic_20150123";
+      });
       planLo.click(function() {
         selectMembership(planLo);
-        selectedMembership = "Standard";
+        selectedMembership = "Standard_20150123";
       });
       planMid.click(function() {
         selectMembership(planMid);
-        selectedMembership = "Enhanced";
+        selectedMembership = "Enhanced_20150123";
       });
       planHi.click(function() {
         selectMembership(planHi);
-        selectedMembership = "Pro";
+        selectedMembership = "Pro_20150123";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
@@ -580,6 +583,7 @@ module AccountTab {
           else { // there are cards to charge
             primaryBtn.click(function() {
               Api.setSubscription(execUid, teamid, selectedMembership);
+              $(".next-step-button").prop("disabled", false);
               (<any> modal).modal("hide"); // FIXME
             });
           }
@@ -674,9 +678,10 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(Login.me(), teamid).done(function(customerStatus) {
-       memPlan.append(customerStatus.plan);
-       memStatus.append(customerStatus.status);
+    Api.getSubscriptionStatus(Login.me(), teamid)
+      .done(function(customerStatus) {
+        memPlan.append(customerStatus.plan);
+        memStatus.append(customerStatus.status);
     });
 
     Api.getSubscriptionStatusLong(Login.me(), teamid).done(function(status) {
@@ -719,7 +724,7 @@ module AccountTab {
     return _view;
   }
 
-  function displayMembership(team) {
+  function displayMembership(team, next) {
 '''
 <div #view class="membership">
   <div class="membership-col left">
@@ -742,6 +747,10 @@ module AccountTab {
 '''
     var teamid = team.teamid;
 
+    if (Login.isExecCustomer(team)) {
+      changeName.parent().remove();
+    }
+
     Api.getProfile(team.team_executive, teamid)
       .done(function(profile) {
         if (profile.image_url !== undefined)
@@ -759,34 +768,30 @@ module AccountTab {
     var cardModal = showCardModal(team);
     cardInfo.click(function() {
       (<any> cardModal.modal).modal();
-
     });
 
     var execUid = team.team_executive;
 
     Api.getSubscriptionStatus(Login.me(), teamid)
-      .done(function(customerStatus) {
-        updateStatus(customerStatus.status);
-    });
+      .done(updateStatus);
 
-    function updateStatus(mem) {
-      if (mem == "Trialing") {
-        membershipBadge.addClass("free-trial");
-      } else if (mem == "Unpaid") {
-        membershipBadge.addClass("suspended");
-      } else if (mem == "Past_due") {
-        membershipBadge.addClass("suspended");
-      } else if (mem == "Canceled") {
+    function updateStatus(customer) {
+      var mem = customer.status;
+      var plan = customer.plan;
+
+      if (mem == "Trialing" || mem == "Active") {
+        membershipBadge.addClass("active");
+        next.prop("disabled", false);
+      } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
+        membershipBadge.text("None");
         membershipBadge.addClass("suspended");
-      } else {
-        membershipBadge.addClass("Active");
       }
 
-      if (mem === undefined)
-        membershipBadge.text("None");
-      else
+      if (mem === "Active" && plan !== undefined) {
+        membershipBadge.text(Util.nameOfPlan(plan).toUpperCase());
+      } else if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 
       changeMembership.click(function() { showMembershipModal(team) });
@@ -799,12 +804,13 @@ module AccountTab {
     return view;
   }
 
-  export function load(team) {
+  export function load(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
+  <div #notes/>
   <div class="table-header">Membership & Billing</div>
   <div #membership class="table-list"/>
-  <div class="table-header">Assistants</div>
+  <div #assistantsHeader class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
     <div #spinner class="spinner table-spinner"/>
     <div #tableEmpty
@@ -815,6 +821,10 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
+    <button #next style="float: right" class="next-step-button button-primary"
+            disabled="true">
+      Next Step
+    </button>
   </div>
 </div>
 '''
@@ -822,7 +832,19 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    membership.append(displayMembership(team));
+    if (onboarding) {
+      var notes = $("<div #notes/>");
+      var p1 = $("<p>Please select an Esper membership level to start your "
+               + "30-day trial.</p>");
+      var p2 = $("<p>You'll have unlimited use of your Esper assistant during "
+               + "your trial. Your card will not be charged until your trial "
+               + "period has ended, and you can cancel at any time.</p>");
+      notes.append(p1);
+      notes.append(p2);
+      view.prepend(notes);
+    }
+
+    membership.append(displayMembership(team, next));
 
     spinner.show();
 
@@ -839,7 +861,21 @@ module AccountTab {
 
     var popover = renderInviteDialog(team, _view);
     view.append(popover.view);
-    invite.click(function() { Settings.togglePopover(popover); });
+
+    if (Login.isExecCustomer(team)) {
+      // Executives are getting confused by this and messing teams up
+      assistantsHeader.hide();
+      assistantsList.hide();
+      emailContainer.hide();
+      invite.hide();
+    } else {
+      invite.click(function() { Settings.togglePopover(popover); });
+    }
+
+    if (onboarding)
+      next.click(function() { TeamSettings.switchTab(3); });
+    else
+      next.remove();
 
     return view;
   }

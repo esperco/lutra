@@ -4,6 +4,16 @@
 
 module Api {
 
+  /*
+    We call this to avoid making URLs containing "undefined" or "null".
+    This prevents making a bogus API request, and hopefully makes bug
+    detection and prevention easier.
+  */
+  function string(x: string) {
+    console.assert(x !== undefined && x !== null);
+    return x;
+  }
+
   // HTTP - response body is interpreted as JSON
 
   function jsonHttp(method, url, body) {
@@ -94,13 +104,14 @@ module Api {
   export function getLoginInfo()
     : JQueryDeferred<ApiT.LoginResponse>
   {
-    return jsonHttpGet("/api/login/" + Login.me() + "/info");
+    return jsonHttpGet("/api/login/" + string(Login.me()) + "/info");
   };
 
   export function loginOnce(uid, loginNonce)
     : JQueryDeferred<ApiT.LoginResponse>
   {
-    return jsonHttpPost("/api/login/" + uid + "/once/" + loginNonce, "");
+    return jsonHttpPost("/api/login/" + string(uid)
+                        + "/once/" + string(loginNonce), "");
   };
 
   export function random()
@@ -116,23 +127,24 @@ module Api {
   {
     var fromUid = Login.me();
     var invite = { from_uid: fromUid };
-    return jsonHttpPost("/api/invite/" + fromUid + "/create-team",
+    return jsonHttpPost("/api/invite/" + string(fromUid) + "/create-team",
                         JSON.stringify(invite));
   };
 
   export function inviteJoinTeam(invite)
-    : JQueryDeferred<ApiT.UrlResult>
+    : JQueryPromise<void>
   {
-    return jsonHttpPost("/api/invite/" + Login.me() + "/join-team",
-                        JSON.stringify(invite));
+    return jsonHttpPost("/api/invite/" + string(Login.me()) + "/join-team",
+                        JSON.stringify(invite))
+      .then(function(_ignored) {});
   };
 
   export function setTeamName(teamid, name):
   JQueryDeferred<void> {
     var fromUid = Login.me();
-    return jsonHttpPut("/api/team-name/" + fromUid
-                       + "/" + teamid
-                       + "/" + name,
+    return jsonHttpPut("/api/team-name/" + string(fromUid)
+                       + "/" + string(teamid)
+                       + "/" + string(name),
                        "");
   };
 
@@ -146,8 +158,9 @@ module Api {
   export function removeAssistant(teamid, memberUid)
     : JQueryDeferred<void>
   {
-    return jsonHttpDelete("/api/team/" + Login.me() + "/" + teamid
-                          + "/member/" + memberUid);
+    return jsonHttpDelete("/api/team/" + string(Login.me())
+                          + "/" + string(teamid)
+                          + "/member/" + string(memberUid));
   };
 
   /***** Opaque URLs with unique token *****/
@@ -163,16 +176,16 @@ module Api {
   export function postToken(token)
   : JQueryDeferred<ApiT.TokenInfo>
   {
-    return jsonHttpPost("/api/token/" + encodeURIComponent(token), "");
+    return jsonHttpPost("/api/token/" + encodeURIComponent(string(token)), "");
   };
 
   export function postTokenEmail(token: string, email: string, name: string)
   : JQueryDeferred<ApiT.TokenInfo>
   {
     var path =
-      "/api/token-email/" + encodeURIComponent(token)
-      + "/" + encodeURIComponent(email)
-      + "/" + encodeURIComponent(name);
+      "/api/token-email/" + encodeURIComponent(string(token))
+      + "/" + encodeURIComponent(string(email))
+      + "/" + encodeURIComponent(string(name));
     return jsonHttpPost(path, "");
   };
 
@@ -200,9 +213,9 @@ module Api {
   };
 
   export function getGoogleAuthInfo(optAuthLandingUrl)
-    : JQueryDeferred<any> // FIXME
+    : JQueryDeferred<ApiT.GoogleAuthInfo>
   {
-    var url = "/api/google/" + Login.me() + "/auth/info";
+    var url = "/api/google/" + string(Login.me()) + "/auth/info";
     if (Util.isString(optAuthLandingUrl)) {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
@@ -212,7 +225,7 @@ module Api {
   export function postGoogleAuthRevoke()
     : JQueryDeferred<any> // FIXME
   {
-    var url = "/api/google/" + Login.me() + "/auth/revoke";
+    var url = "/api/google/" + string(Login.me()) + "/auth/revoke";
     return jsonHttpPost(url, "");
   };
 
@@ -222,21 +235,21 @@ module Api {
   export function getSyncedLabels(teamid)
     : JQueryDeferred<ApiT.EmailLabels>
   {
-    var url = "/api/labels/synced/" + teamid;
+    var url = "/api/labels/synced/" + string(teamid);
     return jsonHttpGet(url);
   };
 
   export function putSyncedLabels(teamid, labels)
     : JQueryDeferred<void>
   {
-    var url = "/api/labels/synced/" + teamid;
+    var url = "/api/labels/synced/" + string(teamid);
     return jsonHttpPut(url, JSON.stringify(labels));
   };
 
   export function getSharedLabels(teamid)
     : JQueryDeferred<ApiT.EmailLabels>
   {
-    var url = "/api/labels/shared/" + teamid;
+    var url = "/api/labels/shared/" + string(teamid);
     return jsonHttpGet(url);
   };
 
@@ -245,22 +258,25 @@ module Api {
   export function getGoogleEmail(myUID, theirUID, teamid)
     : JQueryDeferred<ApiT.AccountEmail>
   {
-    var url = "/api/google/email/" + myUID + "/" + theirUID + "/" + teamid;
+    var url =
+      "/api/google/email/" + string(myUID)
+      + "/" + string(theirUID)
+      + "/" + string(teamid);
     return jsonHttpGet(url);
   };
 
   /*******/
 
   function apiProfilePrefix() {
-    return "/api/profile/" + Login.data.uid;
+    return "/api/profile/" + string(Login.data.uid);
   }
 
   export function getProfile(uid, teamid)
     : JQueryDeferred<ApiT.Profile>
   {
     return jsonHttpGet(apiProfilePrefix()
-                       + "/" + uid
-                       + "/" + teamid);
+                       + "/" + string(uid)
+                       + "/" + string(teamid));
   };
 
   export function getMyProfile() {
@@ -273,7 +289,7 @@ module Api {
   export function getCalendarList()
     : JQueryDeferred<ApiT.Calendars>
   {
-    var url = "api/calendar/list/" + Login.data.uid;
+    var url = "api/calendar/list/" + string(Login.data.uid);
     return jsonHttpGet(url);
   };
 
@@ -281,8 +297,8 @@ module Api {
     : JQueryDeferred<ApiT.CalendarAcl>
   {
     var url = "api/calendar/share/list/"
-      + Login.data.uid + "/"
-      + encodeURIComponent(calid);
+      + string(Login.data.uid) + "/"
+      + encodeURIComponent(string(calid));
     return jsonHttpGet(url);
   };
 
@@ -290,9 +306,9 @@ module Api {
     : JQueryDeferred<void>
   {
     var url = "api/calendar/share/add/"
-      + Login.data.uid + "/"
-      + encodeURIComponent(calid) + "/"
-      + encodeURIComponent(email);
+      + string(Login.data.uid) + "/"
+      + encodeURIComponent(string(calid)) + "/"
+      + encodeURIComponent(string(email));
     return jsonHttpPut(url, "");
   };
 
@@ -300,33 +316,33 @@ module Api {
     : JQueryDeferred<void>
   {
     var url = "api/calendar/share/remove/"
-      + Login.data.uid + "/"
-      + encodeURIComponent(calid) + "/"
-      + encodeURIComponent(rule_id);
+      + string(Login.data.uid) + "/"
+      + encodeURIComponent(string(calid)) + "/"
+      + encodeURIComponent(string(rule_id));
     return jsonHttpDelete(url);
   };
 
   export function putTeamCalendars(teamid, cals)
     : JQueryDeferred<void>
   {
-    var url = "api/team/" + Login.data.uid
-      + "/" + teamid + "/calendars";
+    var url = "api/team/" + string(Login.data.uid)
+      + "/" + string(teamid) + "/calendars";
     return jsonHttpPut(url, JSON.stringify(cals));
   };
 
   export function putTeamEmails(teamid, aliases)
     : JQueryDeferred<ApiT.EmailAddresses>
   {
-    var url = "api/team/" + Login.data.uid
-      + "/" + teamid + "/emails";
+    var url = "api/team/" + string(Login.data.uid)
+      + "/" + string(teamid) + "/emails";
     return jsonHttpPut(url, JSON.stringify(aliases));
   };
 
   export function putAccountEmails(teamid, theirUID, aliases)
     : JQueryDeferred<ApiT.EmailAddresses>
   {
-    var url = "api/account/emails/" + Login.data.uid
-      + "/" + teamid + "/" + theirUID;
+    var url = "api/account/emails/" + string(Login.data.uid)
+      + "/" + string(teamid) + "/" + string(theirUID);
     return jsonHttpPut(url, JSON.stringify(aliases));
   };
 
@@ -336,7 +352,7 @@ module Api {
   export function setPreferences(teamid, preferences)
     : JQueryDeferred<void>
   {
-    var url = "/api/preferences/" + Login.me() + "/" + teamid;
+    var url = "/api/preferences/" + string(Login.me()) + "/" + string(teamid);
     return jsonHttpPut(url, JSON.stringify(preferences));
   }
 
@@ -346,7 +362,7 @@ module Api {
   export function getPreferences(teamid)
     : JQueryDeferred<ApiT.Preferences>
   {
-    var url = "/api/preferences/" + Login.me() + "/" + teamid;
+    var url = "/api/preferences/" + string(Login.me()) + "/" + string(teamid);
     return jsonHttpGet(url);
   }
 
@@ -356,14 +372,14 @@ module Api {
   export function getSubscriptionStatus(uid, teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
   {
-      var url = "/api/pay/status/long/" + uid + "/" + teamid;
+      var url = "/api/pay/status/long/" + string(uid) + "/" + string(teamid);
       return jsonHttpGet(url);
   }
   /** Gets the long status of an executive, including cc info **/
   export function getSubscriptionStatusLong(uid, teamid)
     : JQueryDeferred<ApiT.CustomerDetails>
   {
-      var url = "/api/pay/status/long/" + uid + "/" + teamid;
+      var url = "/api/pay/status/long/" + string(uid) + "/" + string(teamid);
 
       return jsonHttpGet(url);
   }
@@ -372,7 +388,9 @@ module Api {
   export function setSubscription(uid, teamid, planid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/subscribe/" + uid + "/" + teamid + "/" + planid;
+    var url = "/api/pay/subscribe/" + string(uid)
+      + "/" + string(teamid)
+      + "/" + string(planid);
     return jsonHttpPost(url, "");
   }
 
@@ -380,7 +398,7 @@ module Api {
   export function cancelSubscription(uid, teamid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/unsubscribe/" + uid + "/" + teamid;
+    var url = "/api/pay/unsubscribe/" + string(uid) + "/" + string(teamid);
     return jsonHttpPost(url, "");
   }
 
@@ -390,8 +408,9 @@ module Api {
   export function addNewCard(uid, teamid, cardToken)
   : JQueryDeferred<ApiT.PaymentCard>
   {
-    var url = "/api/pay/new-card/" + uid + "/" + teamid
-      + "/" + encodeURIComponent(cardToken);
+    var url = "/api/pay/new-card/" + string(uid)
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(cardToken));
     return jsonHttpPost(url, "");
   }
 
@@ -399,7 +418,9 @@ module Api {
   export function deleteCard(uid, teamid, cardid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/card/" + uid + "/" + teamid + "/" + cardid;
+    var url = "/api/pay/card/" + string(uid)
+      + "/" + string(teamid)
+      + "/" + string(cardid);
     return jsonHttpDelete(url);
   }
 
@@ -407,23 +428,27 @@ module Api {
   export function setDefaultCard(uid, teamid, cardid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/card/" + uid + "/" + teamid + "/" + cardid
+    var url = "/api/pay/card/" + string(uid)
+      + "/" + string(teamid)
+      + "/" + string(cardid);
     return jsonHttpPut(url,"");
   }
 
   export function getSignature(teamid, theirUid)
     : JQueryDeferred<ApiT.EmailSignature>
   {
-    var url = "/api/account/signature/" + Login.me() +
-      "/" + teamid + "/" + theirUid;
+    var url = "/api/account/signature/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(theirUid);
     return jsonHttpGet(url);
   }
 
   export function setSignature(teamid, theirUid, sig : ApiT.EmailSignature)
     : JQueryDeferred<void>
   {
-    var url = "/api/account/signature/" + Login.me() +
-      "/" + teamid + "/" + theirUid;
+    var url = "/api/account/signature/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(theirUid);
     return jsonHttpPut(url, JSON.stringify(sig));
   }
 

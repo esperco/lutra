@@ -74,7 +74,7 @@ module ApiT {
     email: string;
     teams: Team[];
     team_members: TeamMember[];
-    missing_shared_calendar: boolean;
+    missing_shared_calendar: string; // teamid
   }
 
   export interface TokenInfo {
@@ -96,6 +96,14 @@ type token_response = [
       (* One-time login; usable for password reset. *)
 ]
 */
+
+  export interface GoogleAuthInfo {
+    has_token: boolean;
+    is_assistant: boolean;
+    is_executive: boolean;
+    need_google_auth: boolean;
+    google_auth_url: string;
+  }
 
   export interface TeamMember {
     member_email: string;
@@ -278,7 +286,8 @@ type token_response = [
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
     use_duplicate_events: boolean;
-    exec_daily_agenda: boolean;
+    bcc_exec_on_reply: boolean;
+	exec_daily_agenda: boolean;
   }
 
   export interface GuestReminder {

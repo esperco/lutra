@@ -107,7 +107,9 @@ module PreferencesTab {
         div.find(".esper-prefs-reminder").is(":checked"),
       use_duplicate_events:
         div.find(".esper-prefs-duplicate").is(":checked"),
-      exec_daily_agenda:
+      bcc_exec_on_reply:
+        div.find(".esper-prefs-bcc").is(":checked"),
+	  exec_daily_agenda:
         div.find(".esper-prefs-agenda").is(":checked")
     };
   }
@@ -905,6 +907,11 @@ module PreferencesTab {
         Use duplicate calendar events to invite guests
       </li>
       <li>
+        <input #bccExec type="checkbox" checked="checked"
+               class="esper-prefs-bcc"/>
+        Bcc exec on first email to guests
+      </li>
+	  <li>
         <input #dailyAgenda type="checkbox"
                class="esper-prefs-agenda"/>
         Receive daily agenda of events and updates on in progress tasks
@@ -919,19 +926,22 @@ module PreferencesTab {
         sendReminder.prop("checked", true);
       if (!general.use_duplicate_events)
         useDuplicate.prop("checked", false);
-      if (general.exec_daily_agenda)
+      if (!general.bcc_exec_on_reply)
+        bccExec.prop("checked", false);
+	  if (general.exec_daily_agenda)
         dailyAgenda.prop("checked", true);
     }
 
     sendConfirmation.click(savePreferences);
     sendReminder.click(savePreferences);
     useDuplicate.click(savePreferences);
-    dailyAgenda.click(savePreferences);
+    bccExec.click(savePreferences);
+	dailyAgenda.click(savePreferences);
 
     return view;
   }
 
-  export function load(team) {
+  export function load(team, onboarding, tabView?) {
 '''
 <div #view>
   <div class="table-header">Workplaces</div>
@@ -958,6 +968,11 @@ module PreferencesTab {
   </textarea>
   <div class="save-notes-bar">
     <button #saveNotes class="button-primary" disabled>Save</button>
+  </div>
+  <div>
+    <button #next style="margin-top: 10px; float: right" class="button-primary">
+      Next
+    </button>
   </div>
 </div>
 '''
@@ -1028,6 +1043,21 @@ module PreferencesTab {
     $("<input type='hidden' class='esper-prefs-teamid'/>")
       .val(team.teamid)
       .appendTo(view);
+
+    if (onboarding) {
+      view.prepend("<p>Use this page to customize your scheduling " +
+                   "preferences. When you're finished, press Next " +
+                   "at the bottom.");
+      next.click(function() {
+        savePreferences();
+        tabView.children().remove();
+        $("<p>Thanks for setting up Esper!</p>" +
+          "<p>We'll be in touch soon to finalize your account.</p>")
+          .appendTo(tabView);
+      });
+    } else {
+      next.remove();
+    }
 
     return view;
   }

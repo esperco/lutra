@@ -40,9 +40,18 @@ module Page {
       pageSelector.hideAll();
       showPage("team-settings");
       Log.p("TeamSettings.load()", teamid);
-      // Does this belong here? Doesn't work anyway...
-      //window.location.hash = "#!/team-settings/" + teamid;
       TeamSettings.load(teamid);
+      Util.focus();
+    }
+  }
+
+  export var onboarding : Loadable = {
+    load: function(teamid) {
+      pageSelector.hideAll();
+      showPage("team-settings");
+      Log.p("TeamSettings.load()", teamid);
+      var onboarding = true;
+      TeamSettings.load(teamid, onboarding);
       Util.focus();
     }
   }
