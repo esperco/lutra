@@ -108,7 +108,9 @@ module PreferencesTab {
       use_duplicate_events:
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
-        div.find(".esper-prefs-bcc").is(":checked")
+        div.find(".esper-prefs-bcc").is(":checked"),
+      exec_daily_agenda:
+        div.find(".esper-prefs-agenda").is(":checked")
     };
   }
 
@@ -909,6 +911,11 @@ module PreferencesTab {
                class="esper-prefs-bcc"/>
         Bcc exec on first email to guests
       </li>
+      <li>
+        <input #dailyAgenda type="checkbox"
+               class="esper-prefs-agenda"/>
+        Receive daily agenda of events and updates on in progress tasks
+      </li>
     </ul>
   </div>
 '''
@@ -921,12 +928,15 @@ module PreferencesTab {
         useDuplicate.prop("checked", false);
       if (!general.bcc_exec_on_reply)
         bccExec.prop("checked", false);
+      if (general.exec_daily_agenda)
+        dailyAgenda.prop("checked", true);
     }
 
     sendConfirmation.click(savePreferences);
     sendReminder.click(savePreferences);
     useDuplicate.click(savePreferences);
     bccExec.click(savePreferences);
+    dailyAgenda.click(savePreferences);
 
     return view;
   }
