@@ -158,6 +158,7 @@ module Esper.InviteControls {
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
         notDuplicate.appendTo(heading);
+        calendarRow.remove();
       }
 
       next.click(function() {
@@ -178,7 +179,7 @@ module Esper.InviteControls {
         if (!location.address) location = null;
 
         var eventEdit = {
-          google_cal_id : publicCalId,
+          google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
           start         : event.start,
           end           : event.end,
           title         : pubTitle.val(),
