@@ -288,6 +288,7 @@ type token_response = [
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
     exec_daily_agenda: boolean;
+    current_timezone: string;
   }
 
   export interface GuestReminder {
