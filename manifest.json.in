@@ -23,6 +23,7 @@
         "http://127.0.0.1/*",
         "http://localhost/*",
         "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
+        "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
         "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
@@ -38,6 +39,7 @@
       "http://127.0.0.1/*",
       "http://localhost/*",
       "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
+      "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
       "https://app.esper.com/*",
       "https://www.google.com/calendar/*",
       "https://mail.google.com/mail/*"
