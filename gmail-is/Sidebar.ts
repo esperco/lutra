@@ -391,12 +391,12 @@ module Esper.Sidebar {
               return false;
             }
           });
-          List.map(threadLinks, function(link) {
+          List.iter(threadLinks, function(link) {
             var url = $(link).attr("href");
-            var l = url.length;
+            var len = url.length;
             $(link).click(function(e) {
               e.stopPropagation();
-              window.location.hash = "#all/" + url.substring(l - 16, l);
+              window.location.hash = "#all/" + url.substring(len - 16, len);
               return false;
             });
           });
