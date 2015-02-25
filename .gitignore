@@ -7,3 +7,4 @@ esper.zip
 manifest.json
 manifest.json.dev
 manifest.json.prod
+.DS_Store
