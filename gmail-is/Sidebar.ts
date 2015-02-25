@@ -382,6 +382,25 @@ module Esper.Sidebar {
           Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
           ActiveThreads.handleNewActiveThread(threadId, subject);
 
+          var links = $("div").find("a");
+          var threadLinks = List.filter(links, function(link) {
+            var url = $(link).attr("href");
+            if (typeof url === "string") {
+              return url.substring(0,30) === "http://mail.google.com/mail/u/";
+            } else {
+              return false;
+            }
+          });
+          List.map(threadLinks, function(link) {
+            var url = $(link).attr("href");
+            var l = url.length;
+            $(link).click(function(e) {
+              e.stopPropagation();
+              window.location.hash = "#all/" + url.substring(l - 16, l);
+              return false;
+            });
+          });
+
           var teams = Login.myTeams();
           Thread.detectTeam(teams, emailData)
             .done(function(x: Thread.DetectedTeam) {
