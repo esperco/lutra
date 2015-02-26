@@ -587,6 +587,17 @@ module Esper.TaskTab {
       });
   }
 
+  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
+    Sidebar.dismissDropdowns();
+    obtainTaskForThread(teamid, threadId, taskTab)
+      .done(function(task) {
+        Api.setTaskTitle(task.taskid, query);
+        task.task_title = query;
+        CurrentThread.task.set(task);
+        taskTitle.val(query);
+      });
+  }
+
   // Search for matching tasks and display the results in a dropdown
   function displaySearchResults(taskTitle, dropdown, results, actions,
                                 team: ApiT.Team,
@@ -645,15 +656,7 @@ module Esper.TaskTab {
       rename
         .appendTo(actions)
         .click(function() {
-          obtainTaskForThread(teamid, threadId, taskTab)
-            .done(function(task) {
-              CurrentThread.task.set(task);
-              currentTask = task;
-              Api.setTaskTitle(currentTask.taskid, query);
-              currentTask.task_title = query;
-              taskTitle.val(query);
-              Sidebar.dismissDropdowns();
-            });
+          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query);
         });
 
       function addArchiveOption(task) {
@@ -932,6 +935,14 @@ module Esper.TaskTab {
                                taskSearchActions, team, threadId,
                                query, profiles,
                                taskTabView);
+      });
+      taskTitle.keydown(function(pressed) {
+        var name = taskTitle.val();
+        if (pressed.which === 13) { // Enter key
+          pressed.stopPropagation();
+          createOrRenameTask(taskTitle, team.teamid, threadId,
+                             taskTabView, name);
+        }
       });
     });
 
