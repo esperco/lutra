@@ -151,7 +151,13 @@ module Esper.Sidebar {
       setTimeout(afterAnimation, 250);
     }
 
-    Login.myTeams().forEach(function(otherTeam) {
+    var teams = Login.myTeams().slice(0); // make a copy
+    teams.sort(function(t1, t2) {
+      if (t1.team_name > t2.team_name) return 1;
+      else if (t2.team_name > t1.team_name) return -1;
+      else return 0;
+    });
+    teams.forEach(function(otherTeam) {
       displayTeamSelector(teamsSection, team, otherTeam, onTeamSwitch);
     });
 
