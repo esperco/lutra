@@ -938,7 +938,8 @@ module Esper.TaskTab {
       });
       taskTitle.keydown(function(pressed) {
         var name = taskTitle.val();
-        if (pressed.which === 13) { // Enter key
+        var isEnterKey = pressed.which === 13;
+        if (isEnterKey) {
           pressed.stopPropagation();
           createOrRenameTask(taskTitle, team.teamid, threadId,
                              taskTabView, name);
