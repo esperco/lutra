@@ -8,16 +8,20 @@ module Route {
     return os === "iPhone" || os === "iPad" || os === "iPod";
   }
 
+  function fallbackOnAppStore() {
+    //TODO: Change to the actual URL once the app is available at App Store.
+    var appUrl = "http://itunes.com/";
+    // Go to App Store if we fail to open the app in half a second.
+    window.setTimeout(function(){ window.location.href = appUrl; }, 500);
+  }
+
   function openIOSapp(inviteCode: string,
                       optEmail?: string,
                       optName?: string) {
     var email = optEmail == undefined ? "" : optEmail;
     var name  = optName  == undefined ? "" : optName;
 
-    //TODO: Change to the actual URL once the app is available at App Store.
-    var appUrl = "http://itunes.com/";
-    // Go to App Store if we fail to open the app in half a second.
-    window.setTimeout(function(){ window.location.href = appUrl; }, 500);
+    fallbackOnAppStore();
 
     window.location.href = "esper:token/" + encodeURIComponent(inviteCode)
                          + "/" + encodeURIComponent(email)
@@ -71,7 +75,12 @@ module Route {
 
     /* Sign-in via Google */
     "login-once/:uid/:hex_landing_url route" : function(data) {
-      Signin.loginOnce(data.uid, Util.hexDecode(data.hex_landing_url));
+      if (isIOS()) {
+        fallbackOnAppStore();
+        window.location.href = "esper:login1/" + data.uid;
+      } else {
+        Signin.loginOnce(data.uid, Util.hexDecode(data.hex_landing_url));
+      }
     },
 
     "login/:email route" : function(data) {
