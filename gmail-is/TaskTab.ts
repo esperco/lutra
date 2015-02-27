@@ -547,6 +547,35 @@ module Esper.TaskTab {
     }
   }
 
+  export function displayTaskProgress(task, taskTab: TaskTabView) {
+'''
+  <div #taskProgress class="esper-section-selector esper-clearfix">
+    <span class="esper-show-selector">Progress Label: </span>
+    <select #taskProgressSelector class="esper-select"/>
+  </div>
+'''
+
+    Sidebar.customizeSelectArrow(taskProgressSelector);
+    var statuses = [
+      {label:"New", state:"New"},
+      {label:"In Progress", state:"In_progress"},
+      {label:"Canceled", state:"Canceled"},
+      {label:"Done", state:"Done"}
+    ];
+    List.iter(statuses, function(status) {
+      $("<option value='" + status.state + "'>" + status.label + "</option>")
+        .appendTo(taskProgressSelector);
+    });
+    taskProgressSelector.val(task.task_progress);
+    taskProgressSelector.change(function() {
+      var i = $(this).val();
+      Api.setTaskProgress(task.taskid, i);
+      task.task_progress = i;
+    });
+
+    taskTab.taskProgressContainer.append(taskProgress);
+  }
+
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
     displayLinkedEventsList(team, "", taskTab, [], []);
   }
@@ -707,6 +736,14 @@ module Esper.TaskTab {
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
 
+    taskProgressHeader: JQuery;
+    showTaskProgress: JQuery;
+    refreshTaskProgress: JQuery;
+    refreshTaskProgressIcon: JQuery;
+    taskProgressContainer: JQuery;
+    taskProgressSpinner: JQuery;
+    taskProgressList: JQuery;
+
     linkedThreadsHeader: JQuery;
     showLinkedThreads: JQuery;
     refreshLinkedThreads: JQuery;
@@ -757,6 +794,25 @@ module Esper.TaskTab {
     </ul>
   </div>
   <div class="esper-tab-overflow">
+    <div class="esper-section">
+      <div #taskProgressHeader
+           class="esper-section-header esper-clearfix esper-open">
+        <span #showTaskProgress
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Task Progress</span>
+        <div #refreshTaskProgress
+             class="esper-refresh esper-clickable esper-disabled">
+          <object #refreshTaskProgressIcon class="esper-svg"/>
+        </div>
+      </div>
+      <div #taskProgressContainer class="esper-section-container">
+        <div #taskProgressSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
+        </div>
+        <div #taskProgressList/>
+      </div>
+    </div>
+    <hr class="esper-hr"/>
     <div class="esper-section">
       <div #linkedThreadsHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -862,6 +918,17 @@ module Esper.TaskTab {
       }
     });
 
+    showTaskProgress.click(function() {
+      Sidebar.toggleList(taskProgressContainer);
+      if(this.innerHTML === "Hide") {
+        $(this).text("Show");
+        taskProgressHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        taskProgressHeader.addClass("esper-open");
+      }
+    });
+
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
       if (this.innerHTML === "Hide") {
@@ -913,11 +980,13 @@ module Esper.TaskTab {
       CurrentThread.task.set(task);
       var title = "";
       linkedThreadsSpinner.hide();
+      taskProgressSpinner.hide();
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
+        displayTaskProgress(task, taskTabView);
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
