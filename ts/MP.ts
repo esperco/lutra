@@ -17,8 +17,8 @@ module MP {
   window["mixpanel"].init(token); // FIXME (also end of line above)
 
   export function track(name) {
-    // FIXME double-garbage
-    if (window["flags"].isProduction) window["mixpanel"].track(name);
+    if (Conf.prod)
+      window["mixpanel"].track(name); // FIXME
   };
 
 }

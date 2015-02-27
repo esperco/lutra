@@ -5,6 +5,7 @@ module Main {
     Login.initLoginInfo();
     Route.setup();
     Status.init();
+    Pay.init();
     (<any> $("[data-toggle='tooltip']")).tooltip(); // FIXME
   }
 
