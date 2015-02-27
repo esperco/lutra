@@ -90,10 +90,6 @@ ALL_TS = \
   $(APP_TS) \
   $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS)))
 
-# These don't get minified
-PROD_CONF = ProdConf.ts
-DEV_CONF = DevConf.ts
-
 .PHONY: pp
 pp: $(APP_TS)
 
