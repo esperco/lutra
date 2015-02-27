@@ -452,7 +452,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           },
           guests : {
             text : guestsReminderField.val(),
-            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
           }
         });
       } else {
