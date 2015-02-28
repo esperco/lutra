@@ -383,7 +383,9 @@ module Esper.InviteControls {
   <div class="esper-ev-modal-content">
     <div class="esper-reminder-options">
       <label>
-        <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
+        <span class="esper-reminder-label">Executive</span>
+        <span #execWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #execTime type="text" value="24"> </input> hours before event
       </label>
       <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
         Enabled
@@ -397,7 +399,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 </textarea>
     <div class="esper-reminder-options">
       <label>
-        <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
+        <span class="esper-reminder-label">Guests</span>
+        <span #guestsWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #guestsTime type="text" value="24"> </input> hours before event
       </label>
       <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
         Enabled
@@ -444,6 +448,29 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
     back.click(backFunction);
     next.click(function () {
+      var execInvalid   = isNaN(execTime.val() * 1);
+      var guestsInvalid = isNaN(guestsTime.val() * 1);
+
+      // If one of the entries is an invalid number, highlight it and
+      // don't go to the next slide.
+      if (execInvalid || guestsInvalid) {
+        if (execInvalid) {
+          execTime.addClass("esper-danger");
+          execWarning.show();
+        }
+        if (guestsInvalid) {
+          guestsTime.addClass("esper-danger");
+          guestsWarning.show();
+        }
+
+        return;
+      } else {
+        execTime.removeClass("esper-danger");
+        execWarning.hide();
+        guestsTime.removeClass("esper-danger");
+        guestsWarning.hide();
+      }
+
       if (execEnabled || guestsEnabled) {
         nextFunction({
           exec : {
@@ -452,7 +479,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           },
           guests : {
             text : guestsReminderField.val(),
-            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
           }
         });
       } else {
