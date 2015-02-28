@@ -8,8 +8,13 @@ prod: prod-build
 	$(MAKE) prod-install
 
 # Build only
-dev-build: js/app.js includes-dev.html
-prod-build: js/app.js includes-prod.html
+dev-build:
+	cp DevConf.ts Conf.ts
+	$(MAKE) js/app.js includes-dev.html
+
+prod-build:
+	cp ProdConf.ts Conf.ts
+	$(MAKE) js/app.js includes-prod.html
 
 # Javascript libraries that are made available by the setup process.
 # When available, we use the non-minified version for debugging (DEV),
@@ -28,7 +33,7 @@ DEV_LIBS = $(addsuffix .js, $(JS_LIBS))
 PROD_LIBS = $(addsuffix .min.js, $(JS_LIBS))
 
 TS_LIBS = \
-	jquery.d \
+  jquery.d \
   jqueryui.d \
   fullCalendar.d
 
@@ -36,14 +41,16 @@ TS_LIBS = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 TS_SOURCES = \
+  Conf \
   Test \
   List \
   Log \
   Deferred \
   Promise \
   Util \
-  Mixpanel \
+  MP \
   GmailCompose \
+  Pay \
   Status \
   Unixtime \
   Cache \
@@ -83,10 +90,6 @@ ALL_TS = \
   $(APP_TS) \
   $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS)))
 
-# These don't get minified
-PROD_FLAGS = prod_flags.js
-DEV_FLAGS = dev_flags.js
-
 .PHONY: pp
 pp: $(APP_TS)
 
@@ -101,21 +104,19 @@ js/app.js: pp
 # Development: keep each file separate for easier debugging
 # (preserve source locations)
 includes-dev.html: Makefile mkloader
-	./mkloader $(DEV_LIBS) flags.js app.js > $@
+	./mkloader $(DEV_LIBS) app.js > $@
 
 includes-prod.html: Makefile mkloader
-	./mkloader $(PROD_LIBS) flags.js app.js > $@
+	./mkloader $(PROD_LIBS) app.js > $@
 
 dev-install: js/app.js
 	mkdir -p ../pub/js
-	cp $(DEV_FLAGS) ../pub/js/flags.js
 	cp js/app.js ../pub/js
 
 prod-install: js/app.js
 	mkdir -p ../pub/js
-	cp $(PROD_FLAGS) ../pub/js/flags.js
 	cp js/app.js ../pub/js
 
 clean:
-	rm -f *~ includes-*.html run-tests.js
+	rm -f *~ includes-*.html run-tests.js Conf.ts
 	rm -rf js/ ts/

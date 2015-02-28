@@ -42,7 +42,8 @@ module Login {
   }
 
   export function setLoginInfo(stored) {
-    if (window["flags"].isProduction) { // FIXME plus two lines below
+    if (Conf.prod) {
+      // FIXME two lines below
       window["mixpanel"].register({uid: stored.uid}); // Sent with every track()
       window["mixpanel"].track("Login");
     }
