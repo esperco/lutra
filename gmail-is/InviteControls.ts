@@ -339,7 +339,7 @@ module Esper.InviteControls {
 
     function setReminders(execEventId, guestsEventId) {
       if (reminderSpec) {
-        if (reminderSpec.exec) {
+        if (reminderSpec.exec.time) {
           Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
             var reminder = {
               guest_email      : profile.email,
@@ -353,7 +353,7 @@ module Esper.InviteControls {
           });
         }
 
-        if (reminderSpec.guests) {
+        if (reminderSpec.guests.time) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
