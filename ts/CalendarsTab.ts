@@ -178,8 +178,15 @@ module CalendarsTab {
     Deferred.join(calls).done(function() {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
         .done(function() {
-          if (onboarding) TeamSettings.switchTab(1);
-          else window.location.reload();
+          if (onboarding) {
+            if (team.team_name === "") TeamSettings.switchTab(1);
+            else {
+              /* During onboarding, create a "ghost calendar" for the EA to
+                 keep negative time (no scheduling), notes, etc. */
+              Api.createTeamCalendar(team.teamid, team.team_name + " Ghost")
+                .done(function() { TeamSettings.switchTab(1); });
+            }
+          } else window.location.reload();
         });
     });
   }

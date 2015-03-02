@@ -322,6 +322,16 @@ module Api {
     return jsonHttpDelete(url);
   };
 
+  export function createTeamCalendar(teamid, name)
+    : JQueryDeferred<void>
+  {
+    var url = "api/calendar/share/create/"
+      + string(Login.data.uid) + "/"
+      + encodeURIComponent(string(teamid)) + "/"
+      + encodeURIComponent(string(name));
+    return jsonHttpPost(url, "");
+  };
+
   export function putTeamCalendars(teamid, cals)
     : JQueryDeferred<void>
   {
