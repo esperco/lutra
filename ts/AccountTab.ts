@@ -724,7 +724,7 @@ module AccountTab {
     return _view;
   }
 
-  function displayMembership(team, next) {
+  function displayMembership(team) {
 '''
 <div #view class="membership">
   <div class="membership-col left">
@@ -781,7 +781,6 @@ module AccountTab {
 
       if (mem == "Trialing" || mem == "Active") {
         membershipBadge.addClass("active");
-        next.prop("disabled", false);
       } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
@@ -804,7 +803,7 @@ module AccountTab {
     return view;
   }
 
-  export function load(team : ApiT.Team, onboarding? : boolean) {
+  export function load(team : ApiT.Team) {
 '''
 <div #view>
   <div #notes/>
@@ -821,10 +820,6 @@ module AccountTab {
     <a #invite disabled
        class="link popover-trigger click-safe"
        style="float:left">Add new team member</a>
-    <button #next style="float: right" class="next-step-button button-primary"
-            disabled="true">
-      Next Step
-    </button>
   </div>
 </div>
 '''
@@ -832,19 +827,7 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    if (onboarding) {
-      var notes = $("<div #notes/>");
-      var p1 = $("<p>Please select an Esper membership level to start your "
-               + "30-day trial.</p>");
-      var p2 = $("<p>You'll have unlimited use of your Esper assistant during "
-               + "your trial. Your card will not be charged until your trial "
-               + "period has ended, and you can cancel at any time.</p>");
-      notes.append(p1);
-      notes.append(p2);
-      view.prepend(notes);
-    }
-
-    membership.append(displayMembership(team, next));
+    membership.append(displayMembership(team));
 
     spinner.show();
 
@@ -871,11 +854,6 @@ module AccountTab {
     } else {
       invite.click(function() { Settings.togglePopover(popover); });
     }
-
-    if (onboarding)
-      next.click(function() { TeamSettings.switchTab(3); });
-    else
-      next.remove();
 
     return view;
   }
