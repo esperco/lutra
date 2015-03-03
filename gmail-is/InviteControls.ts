@@ -316,7 +316,16 @@ module Esper.InviteControls {
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
-              setReminders(original.google_event_id, created.google_event_id);
+
+              var execIds = {
+                calendarId : original.google_cal_id,
+                eventId    : original.google_event_id
+              };
+              var guestsIds = {
+                calendarId : created.google_cal_id,
+                eventId    : created.google_event_id
+              };
+              setReminders(execIds, guestsIds);
               close();
             });
         } else {
@@ -329,7 +338,12 @@ module Esper.InviteControls {
             TaskTab.refreshlinkedEventsList(team, threadId,
                                             TaskTab.currentTaskTab,
                                             Sidebar.profiles);
-            setReminders(original.google_event_id, original.google_event_id);
+
+            var execIds = {
+              calendarId : original.google_cal_id,
+              eventId    : original.google_event_id
+            };
+            setReminders(execIds, execIds);
             close();
           });
       }
@@ -337,23 +351,23 @@ module Esper.InviteControls {
 
     return container;
 
-    function setReminders(execEventId, guestsEventId) {
+    function setReminders(execIds, guestsIds) {
       if (reminderSpec) {
-        if (reminderSpec.exec) {
+        if (reminderSpec.exec.time) {
           Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
             var reminder = {
               guest_email      : profile.email,
               reminder_message : reminderSpec.exec.text
             };
 
-            Api.enableReminderForGuest(execEventId, profile.email, reminder);
+            Api.enableReminderForGuest(execIds.eventId, profile.email, reminder);
 
-            Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                execEventId, reminderSpec.exec.time);
+            Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                execIds.eventId, reminderSpec.exec.time);
           });
         }
 
-        if (reminderSpec.guests) {
+        if (reminderSpec.guests.time) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
@@ -361,10 +375,10 @@ module Esper.InviteControls {
               reminder_message : reminderSpec.guests.text
             };
 
-            Api.enableReminderForGuest(guestsEventId, guest.email, reminder);
+            Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
 
-            Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                guestsEventId, reminderSpec.guests.time);
+            Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
+                                guestsIds.eventId, reminderSpec.guests.time);
           }
         }
       }
