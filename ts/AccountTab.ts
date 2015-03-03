@@ -724,7 +724,7 @@ module AccountTab {
     return _view;
   }
 
-  function displayMembership(team, next) {
+  function displayMembership(team) {
 '''
 <div #view class="membership">
   <div class="membership-col left">
@@ -781,7 +781,6 @@ module AccountTab {
 
       if (mem == "Trialing" || mem == "Active") {
         membershipBadge.addClass("active");
-        next.prop("disabled", false);
       } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
         membershipBadge.addClass("suspended");
       } else if (mem === undefined) {
@@ -828,7 +827,7 @@ module AccountTab {
       .appendTo(emailContainer);
     Svg.loadImg(emailIcon, "/assets/img/email.svg");
 
-    membership.append(displayMembership(team, next));
+    membership.append(displayMembership(team));
 
     spinner.show();
 
