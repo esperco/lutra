@@ -425,6 +425,7 @@ module AccountTab {
     primaryBtn.click(function() {
       primaryBtn.prop('disabled', true);
       Stripe.card.createToken(paymentForm, stripeResponseHandler);
+      (<any> modal).modal("hide"); // FIXME
       return false;
     });
 
