@@ -174,17 +174,25 @@ module CalendarsTab {
       });
     });
 
-    share.text("Loading...").attr("disabled", "true");
+    function finishOnboarding() {
+      var freePlan = "Basic_20150123";
+      Api.setSubscription(team.team_executive, team.teamid, freePlan)
+        .done(function() {
+          window.location.hash = "#!team-settings/" + team.teamid;
+        });
+    }
+
+    share.text("Sharing...").attr("disabled", "true");
     Deferred.join(calls).done(function() {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
         .done(function() {
           if (onboarding) {
-            if (team.team_name === "") TeamSettings.switchTab(1);
+            if (team.team_name === "") finishOnboarding();
             else {
               /* During onboarding, create a "ghost calendar" for the EA to
                  keep negative time (no scheduling), notes, etc. */
               Api.createTeamCalendar(team.teamid, team.team_name + " Ghost")
-                .done(function() { TeamSettings.switchTab(1); });
+                .done(finishOnboarding);
             }
           } else window.location.reload();
         });
@@ -255,7 +263,7 @@ module CalendarsTab {
       which calendars to share with your Esper assistant.
     </div>
     <div #calendarView class="esper-loading">Loading...</div>
-    <button #share class="button-primary">Share</button>
+    <button #share class="button-primary">Share Calendars</button>
   </div>
   <br/>
   <div #calendarSelector/>
@@ -277,7 +285,6 @@ module CalendarsTab {
 
       if (onboarding) {
         share.css("float", "right");
-        share.text("Next Step");
       } else {
         description.text("Please select which calendars to share " +
                          "with your Esper assistant.");

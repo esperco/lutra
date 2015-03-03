@@ -57,9 +57,9 @@ module TeamSettings {
     tab2.click(function() { switchTab(2); });
     tab3.click(function() { switchTab(3); });
 
-    content1.append(AccountTab.load(team, onboarding));
+    content1.append(AccountTab.load(team));
     content2.append(CalendarsTab.load(team, onboarding));
-    content3.append(PreferencesTab.load(team, onboarding, content3));
+    content3.append(PreferencesTab.load(team, content3));
 
     if (onboarding) {
       // We'll guide the exec through each step
@@ -144,13 +144,7 @@ module TeamSettings {
       .done(function(customer) {
         main.append(showTeamSettings(selectedTeam, onboarding));
         footer.append(Footer.load());
-        if (onboarding) {
-          var mem = customer.status;
-          if (Login.data.missing_shared_calendar)
-            switchTab(2);
-          else if (mem === "Trialing" || mem === "Active")
-            switchTab(3);
-        }
+        if (onboarding) switchTab(2);
       });
 
     signOut.click(function() {
