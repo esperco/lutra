@@ -263,39 +263,37 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li #tab1 class="esper-active esper-first">Task</li>
-      <li #tab2 class="esper-last">User</li>
+      <li class="esper-active esper-first">Task</li>
+      <li class="esper-last">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
-    <div #content1 class="esper-tab esper-active"/>
-    <div #content2 class="esper-tab"/>
+    <div #taskContent class="esper-tab esper-active"/>
+    <div #userContent class="esper-tab"/>
   </div>
 </div>
 '''
-    var tabs = [tab1, tab2];
-    var tabContents = [content1, content2];
+    var tabs = view.find(".esper-tab-links > li");
+    var tabContents = view.find(".esper-tab-content > div");
 
-    function switchTab(on: number, off: number[]) {
-      List.iter(off, function(i) {
-        tabContents[i].hide().removeClass("esper-active");
-        tabs[i].removeClass("esper-active");
+    function switchTab(active: number) {
+      tabs.each(function (i, tab) {
+        tabContents.eq(i).hide().removeClass("esper-active");
+        $(tab).removeClass("esper-active");
       });
-      tabContents[on].show().addClass("esper-active");
-      tabs[on].addClass("esper-active");
+      
+      tabContents.eq(active).show().addClass("esper-active");
+      tabs.eq(active).addClass("esper-active");
     }
 
-    tab1.click(function() {
-      switchTab(0, [1]);
-    });
-    tab2.click(function() {
-      switchTab(1, [0]);
+    tabs.each(function (i, tab) {
+      $(tab).click(function () { console.log(i); switchTab(i) });
     });
 
     if (team !== undefined) {
-      TaskTab.displayTaskTab(content1, team, threadId,
+      TaskTab.displayTaskTab(taskContent, team, threadId,
                              autoTask, profiles, linkedEvents);
-      content2.append(UserTab.viewOfUserTab(team, profiles).view);
+      userContent.append(UserTab.viewOfUserTab(team, profiles).view);
     }
 
     rootElement.append(view);
