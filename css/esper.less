@@ -982,7 +982,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   }
 }
 
-.esper-ev-inline-container {
+.esper-centered-container {
   position : relative;
 
   margin-top : 20px;
@@ -992,9 +992,13 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   padding-left : 10px;
   padding-right : 10px;
 
-  max-width : 50em;
-
   border : 1px solid @border;
+}
+
+.esper-ev-inline-container {
+  .esper-centered-container;
+
+  max-width : 50em;
 }
 
 .esper-reminder-options {

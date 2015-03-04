@@ -454,7 +454,7 @@ module Esper.CalPicker {
   export function createInline(team: ApiT.Team, task: ApiT.Task,
                                threadId: string) : void {
 '''
-<div #view>
+<div #view class="esper-centered-container">
   <div #inline>
     <div class="esper-modal-header">
       <div #refreshCal title class="esper-calendar-refresh">
@@ -463,12 +463,12 @@ module Esper.CalPicker {
       <div #title class="esper-modal-title"/>
     </div>
     <div #calendar class="esper-calendar-grid"/>
-    <div class="esper-clearfix">
-      <button #save class="esper-btn esper-btn-primary">
-        Save
-      </button>
+    <div class="esper-modal-footer esper-clearfix">
       <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
+      </button>
+      <button #save class="esper-btn esper-btn-primary">
+        Save
       </button>
     </div>
   </div>
@@ -542,5 +542,6 @@ module Esper.CalPicker {
 
     Gmail.threadContainer().append(view);
     picker.render();
+    Gmail.scrollToMeetingOffers();
   }
 }
