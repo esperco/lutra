@@ -190,9 +190,9 @@ module Esper.ComposeControls {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
-        CalPicker.createModal(CurrentThread.team.get(),
-                              CurrentThread.task.get(),
-                              CurrentThread.threadId.get());
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
       }
     });
 

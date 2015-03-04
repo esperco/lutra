@@ -451,31 +451,30 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal(team: ApiT.Team, task: ApiT.Task,
-                              threadId: string) : void {
+  export function createInline(team: ApiT.Team, task: ApiT.Task,
+                               threadId: string) : void {
 '''
-<div #view class="esper-modal-bg">
-  <div #modal class="esper-calendar-modal">
+<div #view>
+  <div #inline>
     <div class="esper-modal-header">
-      <div #refreshCal title class="esper-calendar-modal-refresh">
+      <div #refreshCal title class="esper-calendar-refresh">
         <object #refreshCalIcon class="esper-svg"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #userSidebar class="esper-calendar-modal-preferences"/>
-    <div #calendar class="esper-calendar-modal-grid"/>
-    <div class="esper-modal-footer esper-clearfix">
-      <button #save class="esper-btn esper-btn-primary modal-primary">
+    <div #calendar class="esper-calendar-grid"/>
+    <div class="esper-clearfix">
+      <button #save class="esper-btn esper-btn-primary">
         Save
       </button>
-      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+      <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
       </button>
     </div>
   </div>
 </div>
 '''
-    function closeModal() { view.remove(); }
+    function closeView() { view.remove(); }
 
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
@@ -483,7 +482,6 @@ module Esper.CalPicker {
     var userInfo = UserTab.viewOfUserTab(team, Sidebar.profiles);
     var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
-    userSidebar.append(userInfo.view);
 
     refreshCal.tooltip({
       show: { delay: 500, effect: "none" },
@@ -500,9 +498,7 @@ module Esper.CalPicker {
       picker.render();
     };
 
-    view.click(closeModal);
-    Util.preventClickPropagation(modal);
-    cancel.click(closeModal);
+    cancel.click(closeView);
 
     save.click(function() {
       var events = [];
@@ -522,7 +518,7 @@ module Esper.CalPicker {
         );
       });
 
-      closeModal();
+      closeView();
       if (events.length > 0) {
         TaskTab.currentTaskTab.linkedEventsList.children().remove();
         TaskTab.currentTaskTab.linkedEventsSpinner.show();
@@ -544,7 +540,7 @@ module Esper.CalPicker {
       });
     });
 
-    $("body").append(view);
+    Gmail.threadContainer().append(view);
     picker.render();
   }
 }
