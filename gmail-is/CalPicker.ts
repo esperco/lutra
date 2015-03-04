@@ -474,7 +474,10 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    function closeView() { view.remove(); }
+    function closeView() {
+      Sidebar.selectTaskTab();
+      view.remove();
+    }
 
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
@@ -542,6 +545,7 @@ module Esper.CalPicker {
 
     Gmail.threadContainer().append(view);
     picker.render();
+    Sidebar.selectUserTab();
     Gmail.scrollToMeetingOffers();
   }
 }
