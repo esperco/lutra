@@ -18,6 +18,16 @@ module Api {
 
   function jsonHttp(method, url, body) {
 
+    var id = Util.randomString();
+
+    function logResponse(method: string, path: string, respBody, latency) {
+      Log.p("API response " + id
+            + " " + method
+            + " " + path
+            + " [" + latency + "s]",
+            respBody);
+    }
+
     function logError(xhr, textStatus, err) {
       var respBody = xhr.responseText;
       var details = {
@@ -65,8 +75,16 @@ module Api {
     if (body && body.length > 0) {
       request["contentType"] = "application/json; charset=UTF-8";
     }
+
+    Log.p("API request " + id + " " + method + " " + url, request);
+
+    var startTime = Date.now();
     return $.ajax(request)
-            .fail(logError);
+            .fail(logError)
+            .done(function(respBody) {
+              var latency = (Date.now() - startTime) / 1000;
+              logResponse(method, url, respBody, latency);
+            });
   }
 
   function jsonHttpGet(url) {
@@ -378,67 +396,70 @@ module Api {
 
   /*** Payment Information ***/
 
-  /** Gets the status of an executive **/
-  export function getSubscriptionStatus(uid, teamid)
+  /** Gets the status of a team **/
+  export function getSubscriptionStatus(teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
   {
-      var url = "/api/pay/status/long/" + string(uid) + "/" + string(teamid);
-      return jsonHttpGet(url);
+    var url = "/api/pay/status/long/" + string(Login.me())
+      + "/" + string(teamid);
+    return jsonHttpGet(url);
   }
-  /** Gets the long status of an executive, including cc info **/
-  export function getSubscriptionStatusLong(uid, teamid)
+  /** Gets the long status of a team, including cc info **/
+  export function getSubscriptionStatusLong(teamid)
     : JQueryDeferred<ApiT.CustomerDetails>
   {
-      var url = "/api/pay/status/long/" + string(uid) + "/" + string(teamid);
+    var url = "/api/pay/status/long/" + string(Login.me())
+      + "/" + string(teamid);
 
       return jsonHttpGet(url);
   }
 
-  /** Sets the subscription for an executive **/
-  export function setSubscription(uid, teamid, planid)
+  /** Sets the subscription for a team **/
+  export function setSubscription(teamid, planid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/subscribe/" + string(uid)
+    var url = "/api/pay/subscribe/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(planid);
     return jsonHttpPost(url, "");
   }
 
-  /** Cancels an executive's subscriptions **/
-  export function cancelSubscription(uid, teamid)
+  /** Cancels a team's subscriptions **/
+  export function cancelSubscription(teamid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/unsubscribe/" + string(uid) + "/" + string(teamid);
+    var url = "/api/pay/unsubscribe/" + string(Login.me())
+      + "/" + string(teamid);
     return jsonHttpPost(url, "");
   }
 
   /** Add a new card to the Stripe account using the one-time token
     * obtained by the client from Stripe directly. This doesn't change the
     * customer's default card if there was one already. **/
-  export function addNewCard(uid, teamid, cardToken)
+  export function addNewCard(teamid, cardToken)
   : JQueryDeferred<ApiT.PaymentCard>
   {
-    var url = "/api/pay/new-card/" + string(uid)
+    var url = "/api/pay/new-card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + encodeURIComponent(string(cardToken));
     return jsonHttpPost(url, "");
   }
 
   /** Deletes a credit card **/
-  export function deleteCard(uid, teamid, cardid)
+  export function deleteCard(teamid, cardid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/card/" + string(uid)
+    var url = "/api/pay/card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(cardid);
     return jsonHttpDelete(url);
   }
 
   /** Sets the default card **/
-  export function setDefaultCard(uid, teamid, cardid)
+  export function setDefaultCard(teamid, cardid)
   : JQueryDeferred<void>
   {
-    var url = "/api/pay/card/" + string(uid)
+    var url = "/api/pay/card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(cardid);
     return jsonHttpPut(url,"");
