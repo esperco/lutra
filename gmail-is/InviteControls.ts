@@ -235,7 +235,7 @@ module Esper.InviteControls {
           }
         }
 
-        var next = reminderWidget(event, team, execReminder, function () {
+        var next = reminderWidget(event, eventEdit, team, execReminder, duplicate, function () {
           slideBack(container, next);
         }, function (reminderSpec) {
           var title = pubTitle.val();
@@ -388,7 +388,7 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(event, team, execReminder, backFunction, nextFunction) {
+  function reminderWidget(event, eventEdit, team, execReminder, duplicate, backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -449,7 +449,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     // Fill out static parts of message template (ie exec name and guests):
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
-      var eventTitle = event.title || "a meeting";
+      var eventTitle = (duplicate ? event.title : eventEdit.title) || "a meeting";
+      var guestTitle = eventEdit.title || "a meeting";
       eventTitle = eventTitle.replace(/HOLD: /, "");
 
       execReminderField.val(execReminderField.val()
@@ -457,7 +458,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         .replace("|event|", eventTitle));
 
       guestsReminderField.val(guestsReminderField.val()
-        .replace("|event|", eventTitle));
+        .replace("|event|", guestTitle));
     });
 
     back.click(backFunction);
