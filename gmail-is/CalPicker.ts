@@ -521,6 +521,18 @@ module Esper.CalPicker {
         );
       });
 
+      // If the task title was never set, update it based on the event
+      var emailSubject = esperGmail.get.email_subject();
+      var taskTitle = task.task_title;
+      var eventTitle = picker.eventTitle.val();
+      if (taskTitle === emailSubject) {
+        var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
+        Api.setTaskTitle(task.taskid, newTaskTitle);
+        task.task_title = newTaskTitle;
+        CurrentThread.task.set(task);
+        $(".esper-task-name").val(newTaskTitle);
+      }
+
       closeView();
       if (events.length > 0) {
         TaskTab.currentTaskTab.linkedEventsList.children().remove();
