@@ -30,6 +30,7 @@ module ApiT {
     google_cal_id: string;
     calendar_title: string;
     calendar_timezone?: string;
+    is_primary: boolean;
   }
 
   export interface Phone {

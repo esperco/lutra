@@ -146,7 +146,7 @@ module CalendarsTab {
     });
   }
 
-  function saveCalendarShares(team, view, share, onboarding) {
+  function saveCalendarShares(team, view, share, allCals, onboarding) {
     var calls = [];
     var teamCals = [];
     view.find(".esper-cal-row").each(function() {
@@ -191,7 +191,18 @@ module CalendarsTab {
             else {
               /* During onboarding, create a "ghost calendar" for the EA to
                  keep negative time (no scheduling), notes, etc. */
-              Api.createTeamCalendar(team.teamid, team.team_name + " Ghost")
+              var primary = List.find(allCals, function(cal : ApiT.Calendar) {
+                return cal.is_primary;
+              });
+              var tz = primary.calendar_timezone;
+              if (tz === undefined) tz = "America/Los_Angeles";
+              /* Because we're onboarding, this team has an Esper assistant.
+                 It should be the first (and only) assistant.
+                 This may change in the future, and then we'd have to check.
+              */
+              var esperAsst = team.team_assistants[0];
+              Api.createTeamCalendar(esperAsst, team.teamid, tz,
+                                     team.team_name + " Ghost")
                 .done(finishOnboarding);
             }
           } else window.location.reload();
@@ -281,6 +292,11 @@ module CalendarsTab {
 
       Api.getCalendarList().done(function(response) {
         displayCalendarList(calendarView, response.calendars);
+
+        share.click(function() {
+          saveCalendarShares(team, calendarView, share,
+                             response.calendars, onboarding);
+        });
       });
 
       if (onboarding) {
@@ -289,10 +305,6 @@ module CalendarsTab {
         description.text("Please select which calendars to share " +
                          "with your Esper assistant.");
       }
-
-      share.click(function() {
-        saveCalendarShares(team, calendarView, share, onboarding);
-      });
     }
 
     return view;

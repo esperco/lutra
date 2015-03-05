@@ -340,12 +340,14 @@ module Api {
     return jsonHttpDelete(url);
   };
 
-  export function createTeamCalendar(teamid, name)
+  export function createTeamCalendar(forUid, teamid, tz, name)
     : JQueryDeferred<void>
   {
     var url = "api/calendar/share/create/"
       + string(Login.data.uid) + "/"
+      + string(forUid) + "/"
       + encodeURIComponent(string(teamid)) + "/"
+      + encodeURIComponent(string(tz)) + "/"
       + encodeURIComponent(string(name));
     return jsonHttpPost(url, "");
   };
