@@ -18,6 +18,16 @@ module Api {
 
   function jsonHttp(method, url, body) {
 
+    var id = Util.randomString();
+
+    function logResponse(method: string, path: string, respBody, latency) {
+      Log.p("API response " + id
+            + " " + method
+            + " " + path
+            + " [" + latency + "s]",
+            respBody);
+    }
+
     function logError(xhr, textStatus, err) {
       var respBody = xhr.responseText;
       var details = {
@@ -65,8 +75,16 @@ module Api {
     if (body && body.length > 0) {
       request["contentType"] = "application/json; charset=UTF-8";
     }
+
+    Log.p("API request " + id + " " + method + " " + url, request);
+
+    var startTime = Date.now();
     return $.ajax(request)
-            .fail(logError);
+            .fail(logError)
+            .done(function(respBody) {
+              var latency = (Date.now() - startTime) / 1000;
+              logResponse(method, url, respBody, latency);
+            });
   }
 
   function jsonHttpGet(url) {
