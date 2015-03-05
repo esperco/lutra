@@ -140,7 +140,7 @@ module TeamSettings {
 
     headerTitle.click(Page.settings.load);
 
-    Api.getSubscriptionStatus(Login.me(), selectedTeam.teamid)
+    Api.getSubscriptionStatus(selectedTeam.teamid)
       .done(function(customer) {
         main.append(showTeamSettings(selectedTeam, onboarding));
         footer.append(Footer.load());

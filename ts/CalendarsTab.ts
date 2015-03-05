@@ -176,7 +176,7 @@ module CalendarsTab {
 
     function finishOnboarding() {
       var freePlan = "Basic_20150123";
-      Api.setSubscription(team.team_executive, team.teamid, freePlan)
+      Api.setSubscription(team.teamid, freePlan)
         .done(function() {
           window.location.hash = "#!team-settings/" + team.teamid;
         });

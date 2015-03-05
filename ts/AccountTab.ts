@@ -274,8 +274,7 @@ module AccountTab {
     primaryBtn.click(function() {
       if (action == "suspend") {
         var teamid = team.teamid;
-        var execUid = team.team_executive;
-        Api.cancelSubscription(execUid, teamid);
+        Api.cancelSubscription(teamid);
 
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
@@ -385,7 +384,6 @@ module AccountTab {
       }
     };
     var teamid = team.teamid;
-    var execUid = team.team_executive;
 
     var stripeResponseHandler = function(status, response) {
       if (response.error) {
@@ -404,14 +402,14 @@ module AccountTab {
         primaryBtn.prop('disabled', false);
       } else {
         var stripeToken = response.id;
-        Api.addNewCard(execUid, teamid, stripeToken).done(function(card) {
+        Api.addNewCard(teamid, stripeToken).done(function(card) {
           if (membership !== null) {
-            Api.setSubscription(execUid, teamid, membership);
+            Api.setSubscription(teamid, membership);
             $(".next-step-button").prop("disabled", false);
             (<any> paymentForm.get(0)).reset();
             (<any> modal).modal("hide"); // FIXME
             if (defaultBox.prop("checked")) {
-              Api.setDefaultCard(execUid, teamid, card.id).done(refresh);
+              Api.setDefaultCard(teamid, card.id).done(refresh);
             } else {
               refresh();
             }
@@ -513,7 +511,6 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
     var teamid = team.teamid;
-    var execUid = team.team_executive;
 
     /*
       Employee plan is only shown to admins and to users already under
@@ -522,7 +519,7 @@ module AccountTab {
     if (Login.isAdmin())
       planX.removeClass("hide");
 
-    Api.getSubscriptionStatus(Login.me(), teamid)
+    Api.getSubscriptionStatus(teamid)
       .done(updateModal);
 
     function updateModal(customerStatus) {
@@ -609,7 +606,7 @@ module AccountTab {
         selectedMembership = "Employee_20150304";
       });
 
-      Api.getSubscriptionStatusLong(Login.me(), team.teamid)
+      Api.getSubscriptionStatusLong(team.teamid)
         .done(function(status){
           if (status.cards.length < 1) { // no cards, add payment method
             primaryBtn.click(function() {
@@ -619,7 +616,7 @@ module AccountTab {
           }
           else { // there are cards to charge
             primaryBtn.click(function() {
-              Api.setSubscription(execUid, teamid, selectedMembership);
+              Api.setSubscription(teamid, selectedMembership);
               $(".next-step-button").prop("disabled", false);
               (<any> modal).modal("hide"); // FIXME
             });
@@ -715,37 +712,35 @@ module AccountTab {
     var execid = team.team_executive;
     var teamid = team.teamid;
 
-    Api.getSubscriptionStatus(Login.me(), teamid)
+    Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
         memPlan.append(customerStatus.plan);
         memStatus.append(customerStatus.status);
     });
 
-    Api.getSubscriptionStatusLong(Login.me(), teamid).done(function(status) {
+    Api.getSubscriptionStatusLong(teamid).done(function(status) {
       if (status.cards.length < 1) {
         memStatus.append( "<br> No Cards");
       }
       else {
         for (var i = 0; i < status.cards.length; i++) {
-(function(){
-            memStatus.append("<br> •••• •••• •••• ");
-            memStatus.append(<any>status.cards[i].last4);
-'''
+          memStatus.append("<br> •••• •••• •••• ");
+          memStatus.append(<any>status.cards[i].last4);
+'''rmCardView
 <span #removeCardSpan>
   <span class="text-divider"></span><a #removeCardLink>Remove</a>
 </span>
 '''
-            memStatus.append(removeCardSpan);
+          memStatus.append(removeCardSpan);
 
-            if (status.cards.length > 1) {
-              var cardid = status.cards[i].id;
-              removeCardLink.addClass("danger-link");
-              removeCardLink.click(function() {
-                Log.p(execid, teamid, cardid);
-                Api.deleteCard(execid, teamid, cardid).done(refresh);
-              });
-            }
-})();
+          if (status.cards.length > 1) {
+            var cardid = status.cards[i].id;
+            removeCardLink.addClass("danger-link");
+            removeCardLink.click(function() {
+              Log.p(execid, teamid, cardid);
+              Api.deleteCard(teamid, cardid).done(refresh);
+            });
+          }
         }
       }
     });
@@ -809,7 +804,7 @@ module AccountTab {
 
     var execUid = team.team_executive;
 
-    Api.getSubscriptionStatus(Login.me(), teamid)
+    Api.getSubscriptionStatus(teamid)
       .done(updateStatus);
 
     function updateStatus(customer) {
