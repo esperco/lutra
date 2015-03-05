@@ -181,7 +181,7 @@ module Esper.Gmail {
 
     // height of the text box ≈ 225
     $("div.Tm").animate({
-      scrollTop : $(".nH.aHU").height() - 225
+      scrollTop : threadContainer().height() - 225
     }, time);
   }
   
@@ -192,7 +192,17 @@ module Esper.Gmail {
     time = time || 500;
 
     $("div.Tm").animate({
-      scrollTop : $(".nH.aHU").height() + 50 // extra padding
+      scrollTop : threadContainer().height() + 50 // extra padding
+    }, time);
+  }
+
+  export function scrollToMeetingOffers(time?: number) {
+    time = time || 500;
+    var calHeight = (window.innerHeight * 0.9) - 198;
+    var extraPadding = 225; // interface above calendar grid
+
+    $("div.Tm").animate({
+      scrollTop : threadContainer().height() - calHeight - extraPadding
     }, time);
   }
 }
