@@ -450,14 +450,22 @@ module AccountTab {
 
     name.text(membership);
 
-    if (membership == "Basic") {
+    switch(membership) {
+    case "Basic":
       price.text("Free");
-    } else if (membership == "Standard") {
+      break;
+    case "Standard":
       price.text("$199/mo");
-    } else if (membership == "Enhanced") {
+      break;
+    case "Enhanced":
       price.text("$399/mo");
-    } else if (membership == "Pro") {
+      break;
+    case "Pro":
       price.text("$599/mo");
+      break;
+    case "Employee":
+      price.text("Free");
+      break;
     }
 
     return view;
@@ -482,6 +490,7 @@ module AccountTab {
           <div #planLo class="membership-option"/>
           <div #planMid class="membership-option"/>
           <div #planHi class="membership-option"/>
+          <div #planX class="membership-option hide"/>
         </div>
       </div>
       <div class="modal-footer">
@@ -505,6 +514,13 @@ module AccountTab {
 
     var teamid = team.teamid;
     var execUid = team.team_executive;
+
+    /*
+      Employee plan is only shown to admins and to users already under
+      that plan.
+     */
+    if (Login.isAdmin())
+      planX.removeClass("hide");
 
     Api.getSubscriptionStatus(Login.me(), teamid)
       .done(updateModal);
@@ -531,20 +547,35 @@ module AccountTab {
           .show();
       } else { // must be active
         var planName = Util.nameOfPlan(membershipPlan);
-        if (planName == "Basic" || planName == "Basic Plus")
+        switch(planName) {
+        case "Basic":
+        case "Basic Plus":
           planFree.addClass("selected");
-        else if (planName == "Standard" || planName == "Standard Plus")
+          break;
+        case "Standard":
+        case "Standard Plus":
           planLo.addClass("selected");
-        else if (planName == "Enhanced" || planName == "Enhanced Plus")
+          break;
+        case "Enhanced":
+        case "Enhanced Plus":
           planMid.addClass("selected");
-        else if (planName == "Pro")
+          break;
+        case "Pro":
           planHi.addClass("selected");
+          break;
+        case "Employee":
+          planX
+            .removeClass("hide")
+            .addClass("selected");
+          break;
+        }
       }
 
       planFree.append(viewOfMembershipOption("Basic"));
       planLo.append(viewOfMembershipOption("Standard"));
       planMid.append(viewOfMembershipOption("Enhanced"));
       planHi.append(viewOfMembershipOption("Pro"));
+      planX.append(viewOfMembershipOption("Employee"));
 
       var selectedMembership = ""; // empty unless a choice is made
       function selectMembership(option) {
@@ -553,6 +584,7 @@ module AccountTab {
         planLo.removeClass("selected");
         planMid.removeClass("selected");
         planHi.removeClass("selected");
+        planX.removeClass("selected");
         option.addClass("selected");
       }
 
@@ -571,6 +603,10 @@ module AccountTab {
       planHi.click(function() {
         selectMembership(planHi);
         selectedMembership = "Pro_20150123";
+      });
+      planX.click(function() {
+        selectMembership(planX);
+        selectedMembership = "Employee_20150304";
       });
 
       Api.getSubscriptionStatusLong(Login.me(), team.teamid)
