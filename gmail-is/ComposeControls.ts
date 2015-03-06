@@ -7,7 +7,7 @@
 module Esper.ComposeControls {
 
   var singleEventTemplate =
-    "Hi |guest|," +
+    "Hi <b>GUEST</b>," +
     "<br/><br/>" +
     "Happy to help you and |exec| find a time. " +
     "Would |offer| work for you? " +
@@ -19,7 +19,7 @@ module Esper.ComposeControls {
     "<b>[Remove if we have their number.]</b>";
 
   var multipleEventTemplate =
-    "Hi |guest|," +
+    "Hi <b>GUEST</b>," +
     "<br/><br/>" +
     "Happy to help you and |exec| find a time. " +
     "Would one of the following times work for you?" +
@@ -168,13 +168,6 @@ module Esper.ComposeControls {
         var execProf = List.find(Sidebar.profiles, function(prof) {
           return prof.profile_uid === team.team_executive;
         });
-        var displayed = esperGmail.get.email_data();
-        var curMsg = displayed.threads[displayed.last_email];
-        var toWhom = curMsg.to[0];
-        var guestName =
-          toWhom === undefined ?
-          "<b>GUEST</b>" :
-          toWhom.replace(/ .*$/, "");
 
         Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
           .done(function(prof) {
@@ -182,7 +175,6 @@ module Esper.ComposeControls {
             if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
             var filledTemplate =
               template.replace("|offer|", entry)
-                      .replace("|guest|", guestName)
                       .replace("|exec|", execName);
             composeControls.insertAtCaret(filledTemplate);
           });
