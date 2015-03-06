@@ -490,6 +490,10 @@ module AccountTab {
           <div #planHi class="membership-option"/>
           <div #planX class="membership-option hide"/>
         </div>
+        <label>
+          <input #noEsper type="checkbox"></input>
+          no Esper branding
+        </label>
       </div>
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary" disabled>
@@ -543,7 +547,7 @@ module AccountTab {
           .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // must be active
-        var planName = Util.nameOfPlan(membershipPlan);
+        var planName = Plan.nameOfPlan(membershipPlan);
         switch(planName) {
         case "Basic":
         case "Basic Plus":
@@ -575,6 +579,7 @@ module AccountTab {
       planX.append(viewOfMembershipOption("Employee"));
 
       var selectedMembership = ""; // empty unless a choice is made
+      var isFreeMembership = true;
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
         planFree.removeClass("selected");
@@ -587,41 +592,42 @@ module AccountTab {
 
       planFree.click(function() {
         selectMembership(planFree);
-        selectedMembership = "Basic_20150123";
+        selectedMembership = noEsper.prop("checked") ?
+          Plan.basicPlus : Plan.basic;
       });
       planLo.click(function() {
         selectMembership(planLo);
-        selectedMembership = "Standard_20150123";
+        selectedMembership = noEsper.prop("checked") ?
+          Plan.standardPlus : Plan.standard;
       });
       planMid.click(function() {
         selectMembership(planMid);
-        selectedMembership = "Enhanced_20150123";
+        selectedMembership = noEsper.prop("checked") ?
+          Plan.enhancedPlus : Plan.enhanced;
       });
       planHi.click(function() {
         selectMembership(planHi);
-        selectedMembership = "Pro_20150123";
+        selectedMembership = Plan.pro;
       });
       planX.click(function() {
         selectMembership(planX);
-        selectedMembership = "Employee_20150304";
+        selectedMembership = Plan.employee;
       });
 
-      Api.getSubscriptionStatusLong(team.teamid)
-        .done(function(status){
-          if (status.cards.length < 1) { // no cards, add payment method
-            primaryBtn.click(function() {
-              (<any> modal).modal("hide"); // FIXME
-              showPaymentModal("Add", team, selectedMembership);
-            });
-          }
-          else { // there are cards to charge
-            primaryBtn.click(function() {
-              Api.setSubscription(teamid, selectedMembership);
-              $(".next-step-button").prop("disabled", false);
-              (<any> modal).modal("hide"); // FIXME
-            });
-          }
-        });
+      primaryBtn.click(function() {
+        $(".next-step-button").prop("disabled", false);
+        (<any> modal).modal("hide"); // FIXME
+        Api.setSubscription(teamid, selectedMembership)
+          .done(function() {
+            if (!isFreeMembership) {
+              Api.getSubscriptionStatusLong(team.teamid)
+                .done(function(status){
+                  if (status.cards.length === 0)
+                    showPaymentModal("Add", team, selectedMembership);
+                });
+            }
+          });
+      });
 
       cancelBtn.click(function() {
         (<any> modal).modal("hide"); // FIXME
@@ -821,7 +827,7 @@ module AccountTab {
       }
 
       if (mem === "Active" && plan !== undefined) {
-        membershipBadge.text(Util.nameOfPlan(plan).toUpperCase());
+        membershipBadge.text(Plan.nameOfPlan(plan).toUpperCase());
       } else if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 

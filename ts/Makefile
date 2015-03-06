@@ -67,6 +67,7 @@ TS_SOURCES = \
   Signin \
   Footer \
   TeamSettings \
+  Plan \
   AccountTab \
   Preferences \
   PreferencesTab \

@@ -87,8 +87,9 @@ module Test {
 
   function tests() {
     return [
-      ["list", List.tests],
-      ["util", Util.tests],
+      ["List", List.tests],
+      ["Util", Util.tests],
+      ["Plan", Plan.tests]
     ];
   }
 
