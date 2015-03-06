@@ -87,7 +87,7 @@ module Esper.CalPicker {
       if (cal.calendar_default_write)
         writes.push(cal);
     });
-    writeToCalendar = writes === [] ? calendars[0] : writes[0];
+    writeToCalendar = writes[0] || calendars[0];
     showTimezone = writeToCalendar.calendar_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
