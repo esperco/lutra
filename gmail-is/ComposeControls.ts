@@ -174,15 +174,16 @@ module Esper.ComposeControls {
         var guestName =
           toWhom === undefined ?
           "<b>GUEST</b>" :
-          toWhom.replace(/ <[^>]*>$/, "");
+          toWhom.replace(/ .*$/, "");
 
         Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
           .done(function(prof) {
-            var eaName = prof.display_name;
+            var execName = execProf.display_name.replace(/ .*$/, "");
+            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
             var filledTemplate =
               template.replace("|offer|", entry)
                       .replace("|guest|", guestName)
-                      .replace("|exec|", execProf.display_name);
+                      .replace("|exec|", execName);
             composeControls.insertAtCaret(filledTemplate);
           });
       }
