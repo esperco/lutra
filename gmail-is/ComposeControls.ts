@@ -7,9 +7,9 @@
 module Esper.ComposeControls {
 
   var singleEventTemplate =
-    "Hi <b>GUEST</b>," +
+    "Hi |guest|," +
     "<br/><br/>" +
-    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Happy to help you and |exec| find a time. " +
     "Would |offer| work for you? " +
     "If not, please let me know some times that would work better for you. " +
     "I can send an invite once we confirm a time." +
@@ -19,9 +19,9 @@ module Esper.ComposeControls {
     "<b>[Remove if we have their number.]</b>";
 
   var multipleEventTemplate =
-    "Hi <b>GUEST</b>," +
+    "Hi |guest|," +
     "<br/><br/>" +
-    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Happy to help you and |exec| find a time. " +
     "Would one of the following times work for you?" +
     "<br/><br/>" +
     "|offer|" +
@@ -147,9 +147,17 @@ module Esper.ComposeControls {
             (<any> moment).tz(ev.start.local,
                               CurrentThread.eventTimezone(ev)).zoneAbbr();
 
+          var loc;
+          if (ev.location !== undefined) {
+            loc = ev.location.address;
+            if (ev.location.title !== "")
+              loc = ev.location.title + " - " + loc;
+          } else {
+            loc = "<b>LOCATION</b>";
+          }
+
           var br = str != "" ? "<br />" : ""; // no leading newline
-          return str + br + wday + ", " + time + " " + tz +
-            " at <b>LOCATION</b>";
+          return str + br + wday + ", " + time + " " + tz + " at " + loc;
         }, "");
 
         var template =
@@ -157,10 +165,24 @@ module Esper.ComposeControls {
           multipleEventTemplate.slice(0) :
           singleEventTemplate.slice(0); // using slice to copy string
 
+        var execProf = List.find(Sidebar.profiles, function(prof) {
+          return prof.profile_uid === team.team_executive;
+        });
+        var displayed = esperGmail.get.email_data();
+        var curMsg = displayed.threads[displayed.last_email];
+        var toWhom = curMsg.to[0];
+        var guestName =
+          toWhom === undefined ?
+          "<b>GUEST</b>" :
+          toWhom.replace(/ <[^>]*>$/, "");
+
         Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
           .done(function(prof) {
             var eaName = prof.display_name;
-            var filledTemplate = template.replace("|offer|", entry);
+            var filledTemplate =
+              template.replace("|offer|", entry)
+                      .replace("|guest|", guestName)
+                      .replace("|exec|", execProf.display_name);
             composeControls.insertAtCaret(filledTemplate);
           });
       }
