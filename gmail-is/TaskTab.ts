@@ -1010,6 +1010,8 @@ module Esper.TaskTab {
         var isEnterKey = pressed.which === 13;
         if (isEnterKey) {
           pressed.stopPropagation();
+          taskTitle.blur();
+          Gmail.threadContainer().focus();
           createOrRenameTask(taskTitle, team.teamid, threadId,
                              taskTabView, name);
         }
