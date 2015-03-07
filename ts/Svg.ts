@@ -20,7 +20,7 @@ module Svg {
     return svgCache.getCached(url)
       .then(function(data) {
         if (!data)
-          Log.p("bad result for svgCache.getCached("+ url +"):", data);
+          Log.d("bad result for svgCache.getCached("+ url +"):", data);
         var svgRoot = $(data)
           .attr("id", img.attr("id"))
           .attr("src", url)

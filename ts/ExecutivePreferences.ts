@@ -196,7 +196,7 @@ module Esper.ExecutivePreferences {
     var preferences = Api.getPreferences(teamid);
 
     preferences.done(function (x) {
-      Log.p("PREFERENCES", x);
+      Log.d("PREFERENCES", x);
       // wtf goin on here?
       //var p = JSON.parse(x.responseText) || {};
 

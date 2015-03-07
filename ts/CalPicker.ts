@@ -152,7 +152,7 @@ module CalPicker {
 
     function setEventMoments(startMoment, endMoment, eventId) {
       if (eventId !== undefined) removeEvent(picker, eventId);
-      Log.p(startMoment, endMoment, eventId);
+      Log.d(startMoment, endMoment, eventId);
       createPickedCalendarEvent(picker, startMoment, endMoment);
     }
 
@@ -199,7 +199,7 @@ module CalPicker {
     });
 
     function dateJump(date, view) {
-      Log.p("Jump");
+      Log.d("Jump");
       calendarView.fullCalendar('gotoDate', date);
     }
 
@@ -251,7 +251,7 @@ module CalPicker {
     */
     var updatedOffset = m.zone();
     if (updatedOffset !== offsetMinutes) {
-      Log.p("Correcting offset after daylight savings transition: "
+      Log.d("Correcting offset after daylight savings transition: "
             + offsetMinutes + " min -> "
             + updatedOffset + " min");
       m.add("minutes", updatedOffset - offsetMinutes);

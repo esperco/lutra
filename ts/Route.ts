@@ -57,7 +57,7 @@ module Route {
     /* Gift code (same as generic invitation but collect also
        an email address and a name */
     "redeem/:token/:email/:name/:platform route" : function(data) {
-      Log.p(data);
+      Log.d(data);
       if (isIOS()) {
         openIOSapp(data.token, data.email, data.name);
       } else if (data.platform !== "Google Apps") {

@@ -20,7 +20,7 @@ module Store {
         x = JSON.parse(s);
       }
       catch (e) {
-        Log.p("Cannot parse cached data stored under key '"+ k +"': "+ s);
+        Log.d("Cannot parse cached data stored under key '"+ k +"': "+ s);
       }
     }
     return x;

@@ -39,7 +39,7 @@ module Util {
           result[k] = obj[k];
       }
       else {
-        Log.p("util.mergeObjects ignoring non-object:", obj);
+        Log.d("util.mergeObjects ignoring non-object:", obj);
       }
     });
     return result;

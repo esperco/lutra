@@ -158,7 +158,7 @@ module PreferencesTab {
     var preferences = currentPreferences();
     Api.setPreferences(teamid, preferences)
       .done(function() {
-        Log.p("Preferences saved.");
+        Log.d("Preferences saved.");
       });
   }
 

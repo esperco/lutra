@@ -118,7 +118,7 @@ module Show {
       if (Util.isDefined(v))
         showOne(k, v);
       else
-        Log.p("show.js: invalid key " + k);
+        Log.d("show.js: invalid key " + k);
     }
 
     return { hideAll : hideAll,
