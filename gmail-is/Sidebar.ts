@@ -312,8 +312,8 @@ module Esper.Sidebar {
     $(".esper-sidebar-user-tab").click();
   }
 
-  export function selectUserTab() {
-    $(".esper-sidebar-user-tab").click();
+  export function selectGroupTab() {
+    $(".esper-sidebar-group-tab").click();
   }
 
   function displayUpdateDock(rootElement, url) {
