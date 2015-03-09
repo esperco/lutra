@@ -31,6 +31,7 @@ module Esper.CalPicker {
     eventLocation : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
+    displayTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
@@ -40,6 +41,11 @@ module Esper.CalPicker {
     return zoneName === "UTC" ?
       "UTC" : // moment-tz can't handle it
       (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
+  function updateZoneAbbrDisplay() {
+    $(".fc-day-grid").find("td").first()
+      .html("all-day<br/>(" + showZoneAbbr + ")");
   }
 
   function createView(refreshCal, userSidebar,
@@ -67,6 +73,10 @@ module Esper.CalPicker {
         <span class="esper-bold">Created by:</span>
         <select #createdBy class="esper-select"/>
       </div>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Display timezone:</span>
+        <select #displayTz class="esper-select"/>
+      </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
@@ -76,6 +86,7 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
+
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
 
@@ -159,6 +170,31 @@ module Esper.CalPicker {
         createdByEmail = $(this).val();
       });
     }
+
+    var dispZones = [
+      "America/New_York",
+      "America/Chicago",
+      "America/Denver",
+      "America/Los_Angeles"
+    ];
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var tz = cal.calendar_timezone;
+      if (tz !== undefined && !List.mem(dispZones, tz))
+        dispZones.push(tz);
+    });
+    List.iter(dispZones, function(tz) {
+      var abbr = zoneAbbr(tz);
+      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
+        .attr("selected", tz === showTimezone)
+        .appendTo(displayTz);
+    });
+    displayTz.change(function() {
+      var tz = $(this).val();
+      showTimezone = tz;
+      showZoneAbbr = zoneAbbr(tz);
+      updateZoneAbbrDisplay();
+      calendarView.fullCalendar("refetchEvents");
+    });
 
     var guests = [];
     var emailData = esperGmail.get.email_data();
@@ -390,8 +426,7 @@ module Esper.CalPicker {
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
-      $(".fc-day-grid").find("td").first()
-        .html("all-day<br/>(" + showZoneAbbr + ")");
+      updateZoneAbbrDisplay();
     }
 
     return {
