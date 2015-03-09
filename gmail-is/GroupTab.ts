@@ -57,7 +57,7 @@ module Esper.GroupTab {
 
     nameInput.keyup(function (e) {
       // Monitoring for the ENTER key
-      if (e.keyCode == 13 && nameInput.val() !== "") {
+      if (e.keyCode == 13) {
         addNewGuest();
       }
     });
@@ -79,14 +79,16 @@ module Esper.GroupTab {
     }
 
     function addNewGuest() {
-      var newGuest = {
-        name         : nameInput.val(),
-        availability : GroupScheduling.Availability.none
-      };
+      if (nameInput.val() !== "") {
+        var newGuest = {
+          name         : nameInput.val(),
+          availability : GroupScheduling.Availability.none
+        };
 
-      onAddGuest(newGuest);
-      addGuestWidget(newGuest, true);
-      nameInput.val("");
+        onAddGuest(newGuest);
+        addGuestWidget(newGuest, true);
+        nameInput.val("");
+      }
     }
   }
 
