@@ -45,6 +45,11 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
+@availability_yes: #7ED470;
+@availability_maybe: #F7E191;
+@availability_no: #EA7768;
+@availability_none: #d8d8d8;
+
 
 /*** Google (Gmail or Calendar?) ***/
 .dw .nH .nH .no { margin-right: 256px; }
@@ -826,6 +831,25 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   box-sizing: border-box;
 }
 
+.esper-tab-container {
+  padding : 10px;
+
+  h1 {
+    font-weight : bold;
+    font-size : 10pt;
+    margin : 0 0 4px 0;
+  }
+
+  input {
+    width : 100%;
+  }
+
+  .esper-hide-section {
+    display : inline-block;
+    float : right;
+  }
+}
+
 .esper-tab-overflow {
   position: absolute;
   width: 100%;
@@ -847,6 +871,10 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   &.esper-open {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  h1 {
+    float : left;
   }
 }
 
@@ -882,6 +910,64 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-bottom-left-radius: 3px;
 }
 
+
+/** Group Scheduling stuff **/
+ul.esper-group-people {
+  list-style : none;
+  padding : 3px;
+  margin-top : 0;
+
+  li {
+    margin-bottom : 2px;
+    padding : 4px;
+
+    cursor : pointer;
+
+    background : @availability_none;
+    border : 1px solid @google_border_gray;
+    border-radius : 3px;
+
+    &.esper-availability-none {
+      background : @availability_none;
+
+      &:hover { background : lighten(@availability_none, 4%); }
+    }
+
+    &.esper-availability-yes {
+      background : @availability_yes;
+
+      &:hover { background : lighten(@availability_yes, 10%); }
+    }
+
+    &.esper-availability-no {
+      background : @availability_no;
+
+      &:hover { background : lighten(@availability_no, 7%); }
+    }
+
+    &.esper-availability-maybe {
+      background : @availability_maybe;
+
+      &:hover { background : lighten(@availability_maybe, 6%); }
+    }
+
+    .esper-close {
+      position : relative;
+      display : inline-block;
+      float : right;
+
+      padding : 2px;
+      margin-right : 3px;
+      bottom : 3px;
+
+      color : #666666;
+
+      &:hover, &:active {
+        color : black;
+      }
+    }
+  }
+}
 
 /** Sidebar Task Management **/
 

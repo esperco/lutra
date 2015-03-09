@@ -264,12 +264,14 @@ module Esper.Sidebar {
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
       <li class="esper-active esper-first esper-sidebar-task-tab">Task</li>
-      <li class="esper-last esper-sidebar-user-tab">User</li>
+      <li class="esper-sidebar-user-tab">User</li>
+      <li class="esper-last esper-sidebar-user-tab">Group</li>
     </ul>
   </div>
   <div class="esper-tab-content">
     <div #taskContent class="esper-tab esper-active"/>
     <div #userContent class="esper-tab"/>
+    <div #groupContent class="esper-tab"/>
   </div>
 </div>
 '''
@@ -294,6 +296,7 @@ module Esper.Sidebar {
       TaskTab.displayTaskTab(taskContent, team, threadId,
                              autoTask, profiles, linkedEvents);
       userContent.append(UserTab.viewOfUserTab(team, profiles).view);
+      groupContent.append(GroupTab.container());
     }
 
     rootElement.append(view);
@@ -303,6 +306,10 @@ module Esper.Sidebar {
 
   export function selectTaskTab() {
     $(".esper-sidebar-task-tab").click();
+  }
+
+  export function selectUserTab() {
+    $(".esper-sidebar-user-tab").click();
   }
 
   export function selectUserTab() {
