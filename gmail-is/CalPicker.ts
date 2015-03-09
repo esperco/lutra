@@ -87,7 +87,7 @@ module Esper.CalPicker {
       if (cal.calendar_default_write)
         writes.push(cal);
     });
-    writeToCalendar = writes === [] ? calendars[0] : writes[0];
+    writeToCalendar = writes[0] || calendars[0];
     showTimezone = writeToCalendar.calendar_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
@@ -451,31 +451,33 @@ module Esper.CalPicker {
     };
   }
 
-  export function createModal(team: ApiT.Team, task: ApiT.Task,
-                              threadId: string) : void {
+  export function createInline(team: ApiT.Team, task: ApiT.Task,
+                               threadId: string) : void {
 '''
-<div #view class="esper-modal-bg">
-  <div #modal class="esper-calendar-modal">
+<div #view class="esper-centered-container">
+  <div #inline>
     <div class="esper-modal-header">
-      <div #refreshCal title class="esper-calendar-modal-refresh">
+      <div #refreshCal title class="esper-calendar-refresh">
         <object #refreshCalIcon class="esper-svg"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #userSidebar class="esper-calendar-modal-preferences"/>
-    <div #calendar class="esper-calendar-modal-grid"/>
+    <div #calendar class="esper-calendar-grid"/>
     <div class="esper-modal-footer esper-clearfix">
-      <button #save class="esper-btn esper-btn-primary modal-primary">
-        Save
-      </button>
-      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+      <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
+      </button>
+      <button #save class="esper-btn esper-btn-primary">
+        Save
       </button>
     </div>
   </div>
 </div>
 '''
-    function closeModal() { view.remove(); }
+    function closeView() {
+      Sidebar.selectTaskTab();
+      view.remove();
+    }
 
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
@@ -483,7 +485,6 @@ module Esper.CalPicker {
     var userInfo = UserTab.viewOfUserTab(team, Sidebar.profiles);
     var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
-    userSidebar.append(userInfo.view);
 
     refreshCal.tooltip({
       show: { delay: 500, effect: "none" },
@@ -500,9 +501,7 @@ module Esper.CalPicker {
       picker.render();
     };
 
-    view.click(closeModal);
-    Util.preventClickPropagation(modal);
-    cancel.click(closeModal);
+    cancel.click(closeView);
 
     save.click(function() {
       var events = [];
@@ -522,7 +521,19 @@ module Esper.CalPicker {
         );
       });
 
-      closeModal();
+      // If the task title was never set, update it based on the event
+      var emailSubject = esperGmail.get.email_subject();
+      var taskTitle = task.task_title;
+      var eventTitle = picker.eventTitle.val();
+      if (taskTitle === emailSubject) {
+        var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
+        Api.setTaskTitle(task.taskid, newTaskTitle);
+        task.task_title = newTaskTitle;
+        CurrentThread.task.set(task);
+        $(".esper-task-name").val(newTaskTitle);
+      }
+
+      closeView();
       if (events.length > 0) {
         TaskTab.currentTaskTab.linkedEventsList.children().remove();
         TaskTab.currentTaskTab.linkedEventsSpinner.show();
@@ -544,7 +555,9 @@ module Esper.CalPicker {
       });
     });
 
-    $("body").append(view);
+    Gmail.threadContainer().append(view);
     picker.render();
+    Sidebar.selectUserTab();
+    Gmail.scrollToMeetingOffers();
   }
 }

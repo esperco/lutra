@@ -969,9 +969,9 @@ module Esper.TaskTab {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
-        CalPicker.createModal(CurrentThread.team.get(),
-                              CurrentThread.task.get(),
-                              CurrentThread.threadId.get());
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
       }
     });
 
@@ -1010,6 +1010,8 @@ module Esper.TaskTab {
         var isEnterKey = pressed.which === 13;
         if (isEnterKey) {
           pressed.stopPropagation();
+          taskTitle.blur();
+          Gmail.threadContainer().focus();
           createOrRenameTask(taskTitle, team.teamid, threadId,
                              taskTabView, name);
         }

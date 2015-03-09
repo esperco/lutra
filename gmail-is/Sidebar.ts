@@ -263,8 +263,8 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li class="esper-active esper-first">Task</li>
-      <li class="esper-last">User</li>
+      <li class="esper-active esper-first esper-sidebar-task-tab">Task</li>
+      <li class="esper-last esper-sidebar-user-tab">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -299,6 +299,14 @@ module Esper.Sidebar {
     rootElement.append(view);
 
     return view;
+  }
+
+  export function selectTaskTab() {
+    $(".esper-sidebar-task-tab").click();
+  }
+
+  export function selectUserTab() {
+    $(".esper-sidebar-user-tab").click();
   }
 
   function displayUpdateDock(rootElement, url) {
