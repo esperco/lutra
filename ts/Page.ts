@@ -29,7 +29,7 @@ module Page {
     load: function() {
       pageSelector.hideAll();
       showPage("settings");
-      Log.p("settings.load()");
+      Log.d("settings.load()");
       Settings.load();
       Util.focus();
     }
@@ -39,7 +39,7 @@ module Page {
     load: function(teamid) {
       pageSelector.hideAll();
       showPage("team-settings");
-      Log.p("TeamSettings.load()", teamid);
+      Log.d("TeamSettings.load()", teamid);
       TeamSettings.load(teamid);
       Util.focus();
     }
@@ -49,7 +49,7 @@ module Page {
     load: function(teamid) {
       pageSelector.hideAll();
       showPage("team-settings");
-      Log.p("TeamSettings.load()", teamid);
+      Log.d("TeamSettings.load()", teamid);
       var onboarding = true;
       TeamSettings.load(teamid, onboarding);
       Util.focus();
@@ -70,7 +70,7 @@ module Page {
     load: function() {
       pageSelector.hideAll();
       showPage("preferences");
-      Log.p("Loaded executive preferences!");
+      Log.d("Loaded executive preferences!");
       Esper.ExecutivePreferences.load();
       Util.focus();
     }

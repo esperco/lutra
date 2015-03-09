@@ -21,7 +21,7 @@ module Api {
     var id = Util.randomString();
 
     function logResponse(method: string, path: string, respBody, latency) {
-      Log.p("API response " + id
+      Log.d("API response " + id
             + " " + method
             + " " + path
             + " [" + latency + "s]",
@@ -41,22 +41,22 @@ module Api {
       Status.reportError(respBody);
       switch (xhr.status) {
       case 400:
-        Log.p("Bad request", details);
+        Log.d("Bad request", details);
         break;
       case 401:
-        Log.p("Unauthorized", details);
+        Log.d("Unauthorized", details);
         break;
       case 403:
-        Log.p("Forbidden", details);
+        Log.d("Forbidden", details);
         break;
       case 404:
-        Log.p("Not found", details);
+        Log.d("Not found", details);
         break;
       case 500: /* Server error */
-        Log.p("Server error", details);
+        Log.d("Server error", details);
         break;
       default: /* Fallback */
-        Log.p("Unknown error " + xhr.status, details);
+        Log.d("Unknown error " + xhr.status, details);
       }
     }
 
@@ -76,7 +76,7 @@ module Api {
       request["contentType"] = "application/json; charset=UTF-8";
     }
 
-    Log.p("API request " + id + " " + method + " " + url, request);
+    Log.d("API request " + id + " " + method + " " + url, request);
 
     var startTime = Date.now();
     return $.ajax(request)

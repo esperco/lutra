@@ -18,7 +18,7 @@ module Login {
   /* Pass UID and API secret to the Esper extension */
   function postLoginInfo() {
     var x = data;
-    Log.p("postLoginInfo:", x);
+    Log.d("postLoginInfo:", x);
     if (Util.isDefined(x)
         && Util.isDefined(x.api_secret)
         && Util.isDefined(x.uid)) {
@@ -34,9 +34,9 @@ module Login {
           declined: false
         }
       };
-      Log.p("esperMessage:", esperMessage);
+      Log.d("esperMessage:", esperMessage);
 
-      Log.p("sending message using window.postMessage");
+      Log.d("sending message using window.postMessage");
       window.postMessage(esperMessage, "*");
     }
   }
@@ -68,7 +68,7 @@ module Login {
       type: "Logout",
       value: { googleAccountId: data.email }
     };
-    Log.p("esperMessage:", esperMessage);
+    Log.d("esperMessage:", esperMessage);
     window.postMessage(esperMessage, "*");
 
     Store.remove("login");

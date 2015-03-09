@@ -25,7 +25,7 @@ module AccountTab {
       role: role,
       force_email: toEmail
     };
-    Log.p("Invite:", invite);
+    Log.d("Invite:", invite);
     return Api.inviteJoinTeam(invite);
   }
 
@@ -149,7 +149,7 @@ module AccountTab {
 
   function displayAssistants(team, table, profiles) {
     List.iter(profiles, function(profile) {
-'''
+'''assistantView
 <li #row class="table-row assistants-table clearfix">
   <div class="col-xs-6">
     <div #name/>
@@ -178,10 +178,9 @@ module AccountTab {
         (<any> statusContainer).tooltip(); // FIXME
       }
 
-(function(){ // a block scope, a block scope, my kingdom for a block scope!
       if ((memberUid !== Login.me() || Login.isAdmin())
           && List.mem(team.team_assistants, memberUid)) {
-'''
+'''removeLinkView
 <span #removeSpan>
   <a #removeLink href="#" class="danger-link">Remove</a>
 </span>
@@ -203,11 +202,9 @@ module AccountTab {
           .append($("<span>" + profile.display_name + "</span>"))
           .append($("<span class='semibold'> (Me)</span>"));
       }
-})();
 
-(function(){
       if (myUid === execUid || myUid === memberUid) {
-'''
+'''sigLinkView
 <span #signatureSpan>
   <a #signatureLink href="#" class="link">Edit Signature</a>
 </span>
@@ -222,12 +219,9 @@ module AccountTab {
         });
         actions.append($("<span class='text-divider'>|</span>"));
       }
-})();
 
-
-(function(){
       if (memberUid !== execUid) {
-'''
+'''makeExecView
 <span #makeExecSpan>
   <a #makeExecLink href="#" class="link">Make Executive</a>
 </span>
@@ -238,8 +232,6 @@ module AccountTab {
             .done(function() { refresh(); });
         });
       }
-})();
-
       table.append(row);
     });
   }
@@ -490,6 +482,11 @@ module AccountTab {
           <div #planHi class="membership-option"/>
           <div #planX class="membership-option hide"/>
         </div>
+        <label class="checkbox membership-modal-check">
+          <input #noEsper type="checkbox"></input>
+          no Esper branding in external email communications
+          <span #noEsperPrice></span>
+        </label>
       </div>
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary" disabled>
@@ -520,20 +517,26 @@ module AccountTab {
       planX.removeClass("hide");
 
     Api.getSubscriptionStatus(teamid)
-      .done(updateModal);
+      .done(initModal);
 
-    function updateModal(customerStatus) {
+    function initModal(customerStatus) {
       var membershipPlan = customerStatus.plan;
       var membershipStatus = customerStatus.status;
-      if (membershipStatus == "Trialing") {
+      var isFreeMembership = true;
+      if (membershipStatus === "Trialing" && membershipPlan === undefined) {
         var end = customerStatus.trial_end;
         var timeLeft = moment.duration(moment().diff(end)).humanize();
+'''trialMsgView
+<span #trialMsg>
+  You have <span class="bold">{{timeLeft}}</span>
+  remaining in your free trial.
+  <br>
+  Select a membership option below to continue using
+  Esper beyond your trial period.
+</span>
+'''
         daysRemaining
-          .append($("<span>You have </span>"))
-          .append($("<span class='bold'>" + timeLeft + "</span>"))
-          .append($("<span> remaining in your free trial.</span><br>"))
-          .append($("<span>Select a membership option below to continue using " +
-            "Esper beyond your trial period.</span>"))
+          .append(trialMsg)
           .show();
       } else if (membershipStatus == "Past-due" ||
                  membershipStatus == "Unpaid" ||
@@ -542,104 +545,177 @@ module AccountTab {
         suspension
           .text("Select a membership option below to reactivate your account.")
           .show();
-      } else { // must be active
-        var planName = Util.nameOfPlan(membershipPlan);
-        switch(planName) {
+      } else { // already picked a plan
+        var planName = Plan.nameOfPlan(membershipPlan);
+        var selectedPlanId = membershipPlan;
+
+        switch(Plan.nameOfPlan(selectedPlanId)) {
         case "Basic":
+          selectFree();
+          break;
         case "Basic Plus":
-          planFree.addClass("selected");
+          noEsper.prop("checked", true);
+          selectFree();
           break;
         case "Standard":
+          selectLo();
+          break;
         case "Standard Plus":
-          planLo.addClass("selected");
+          noEsper.prop("checked", true);
+          selectLo();
           break;
         case "Enhanced":
+          selectMid();
+          break;
         case "Enhanced Plus":
-          planMid.addClass("selected");
+          noEsper.prop("checked", true);
+          selectMid();
           break;
         case "Pro":
-          planHi.addClass("selected");
+          selectHi();
           break;
         case "Employee":
-          planX
-            .removeClass("hide")
-            .addClass("selected");
+          selectX();
           break;
+        default:
+          Log.e("Unknown plan type: ", membershipPlan);
         }
-      }
 
-      planFree.append(viewOfMembershipOption("Basic"));
-      planLo.append(viewOfMembershipOption("Standard"));
-      planMid.append(viewOfMembershipOption("Enhanced"));
-      planHi.append(viewOfMembershipOption("Pro"));
-      planX.append(viewOfMembershipOption("Employee"));
-
-      var selectedMembership = ""; // empty unless a choice is made
-      function selectMembership(option) {
-        primaryBtn.prop("disabled", false);
-        planFree.removeClass("selected");
-        planLo.removeClass("selected");
-        planMid.removeClass("selected");
-        planHi.removeClass("selected");
-        planX.removeClass("selected");
-        option.addClass("selected");
-      }
-
-      planFree.click(function() {
-        selectMembership(planFree);
-        selectedMembership = "Basic_20150123";
-      });
-      planLo.click(function() {
-        selectMembership(planLo);
-        selectedMembership = "Standard_20150123";
-      });
-      planMid.click(function() {
-        selectMembership(planMid);
-        selectedMembership = "Enhanced_20150123";
-      });
-      planHi.click(function() {
-        selectMembership(planHi);
-        selectedMembership = "Pro_20150123";
-      });
-      planX.click(function() {
-        selectMembership(planX);
-        selectedMembership = "Employee_20150304";
-      });
-
-      Api.getSubscriptionStatusLong(team.teamid)
-        .done(function(status){
-          if (status.cards.length < 1) { // no cards, add payment method
-            primaryBtn.click(function() {
-              (<any> modal).modal("hide"); // FIXME
-              showPaymentModal("Add", team, selectedMembership);
-            });
+        function readCheckBox() {
+          var checked = noEsper.prop("checked");
+          switch(Plan.nameOfPlan(selectedPlanId)) {
+          case "Basic":
+            if (checked)
+              selectedPlanId = Plan.basicPlus;
+            break;
+          case "Basic Plus":
+            if (!checked)
+              selectedPlanId = Plan.basic;
+            break;
+          case "Standard":
+            if (checked)
+              selectedPlanId = Plan.standardPlus;
+            break;
+          case "Standard Plus":
+            if (!checked)
+              selectedPlanId = Plan.standard;
+            break;
+          case "Enhanced":
+            if (checked)
+              selectedPlanId = Plan.enhancedPlus;
+            break;
+          case "Enhanced Plus":
+            if (!checked)
+              selectedPlanId = Plan.enhanced;
+            break;
+          case "Pro":
+          case "Employee":
+            break;
+          default:
+            Log.e("Unknown plan ID: ", selectedPlanId);
           }
-          else { // there are cards to charge
-            primaryBtn.click(function() {
-              Api.setSubscription(teamid, selectedMembership);
-              $(".next-step-button").prop("disabled", false);
-              (<any> modal).modal("hide"); // FIXME
-            });
+        }
+
+        planFree.append(viewOfMembershipOption("Basic"));
+        planLo.append(viewOfMembershipOption("Standard"));
+        planMid.append(viewOfMembershipOption("Enhanced"));
+        planHi.append(viewOfMembershipOption("Pro"));
+        planX.append(viewOfMembershipOption("Employee"));
+
+        function selectMembership(option) {
+          primaryBtn.prop("disabled", false);
+          planFree.removeClass("selected");
+          planLo.removeClass("selected");
+          planMid.removeClass("selected");
+          planHi.removeClass("selected");
+          planX.removeClass("selected");
+          option.addClass("selected");
+          noEsper.removeClass("hide");
+        }
+
+        function selectFree() {
+          selectMembership(planFree);
+          noEsperPrice.text("for $99/mo");
+          if (noEsper.prop("checked")) {
+            selectedPlanId = Plan.basicPlus;
+            isFreeMembership = false;
+          } else {
+            selectedPlanId = Plan.basic;
+            isFreeMembership = true;
           }
+        }
+        function selectLo() {
+          selectMembership(planLo);
+          noEsperPrice.text("for $99/mo");
+          isFreeMembership = false;
+          selectedPlanId = noEsper.prop("checked") ?
+            Plan.standardPlus : Plan.standard;
+        }
+        function selectMid() {
+          selectMembership(planMid);
+          noEsperPrice.text("for $49/mo");
+          isFreeMembership = false;
+          selectedPlanId = noEsper.prop("checked") ?
+            Plan.enhancedPlus : Plan.enhanced;
+        }
+        function selectHi() {
+          selectMembership(planHi);
+          noEsperPrice.text("- included");
+          isFreeMembership = false;
+          noEsper.addClass("hide");
+          selectedPlanId = Plan.pro;
+        }
+        function selectX() {
+          planX.removeClass("hide");
+          selectMembership(planX);
+          noEsperPrice.text("- not available for this plan");
+          isFreeMembership = true;
+          noEsper.addClass("hide");
+          selectedPlanId = Plan.employee;
+        }
+
+        planFree.click(selectFree);
+        planLo.click(selectLo);
+        planMid.click(selectMid);
+        planHi.click(selectHi);
+        planX.click(selectX);
+
+        primaryBtn.click(function() {
+          $(".next-step-button").prop("disabled", false);
+          (<any> modal).modal("hide"); // FIXME
+          readCheckBox();
+          Log.d("Selected plan ID: " + selectedPlanId);
+          Api.setSubscription(teamid, selectedPlanId)
+            .done(function() {
+              if (!isFreeMembership) {
+                Api.getSubscriptionStatusLong(team.teamid)
+                  .done(function(status){
+                    if (status.cards.length === 0)
+                      showPaymentModal("Add", team, selectedPlanId);
+                  });
+              }
+            });
         });
 
-      cancelBtn.click(function() {
-        (<any> modal).modal("hide"); // FIXME
-      });
-      if (membershipStatus == "Past-due" ||
-          membershipStatus == "Unpaid" ||
-          membershipStatus == "Canceled")
-      {
-        suspendBtn.hide();
-      } else {
-        suspendBtn.click(function() {
-          showConfirmationModal("suspend", modal, team);
+        cancelBtn.click(function() {
+          (<any> modal).modal("hide"); // FIXME
         });
-      }
+        if (membershipStatus == "Past-due" ||
+            membershipStatus == "Unpaid" ||
+            membershipStatus == "Canceled")
+        {
+          suspendBtn.hide();
+        } else {
+          suspendBtn.click(function() {
+            showConfirmationModal("suspend", modal, team);
+          });
+        }
 
-      (<any> modal).modal({}); // FIXME
+        (<any> modal).modal({}); // FIXME
+      }
     }
   }
+
   function showNameModal(team) {
 '''
 <div #modal
@@ -737,7 +813,7 @@ module AccountTab {
             var cardid = status.cards[i].id;
             removeCardLink.addClass("danger-link");
             removeCardLink.click(function() {
-              Log.p(execid, teamid, cardid);
+              Log.d(execid, teamid, cardid);
               Api.deleteCard(teamid, cardid).done(refresh);
             });
           }
@@ -821,7 +897,7 @@ module AccountTab {
       }
 
       if (mem === "Active" && plan !== undefined) {
-        membershipBadge.text(Util.nameOfPlan(plan).toUpperCase());
+        membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
       } else if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 

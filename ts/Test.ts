@@ -13,7 +13,7 @@ module Test {
     root
       .append($("<hr/>"));
     List.iter(a, function(x) {
-      Log.p(x);
+      Log.d(x);
       var s = Util.toString(x);
       root
         .append($("<pre/>").text(s));
@@ -22,7 +22,7 @@ module Test {
 
   export function assert(b) {
     if (!b) {
-      Log.p("Failed assertion");
+      Log.d("Failed assertion");
       console.trace();
     }
     return b;
@@ -87,8 +87,9 @@ module Test {
 
   function tests() {
     return [
-      ["list", List.tests],
-      ["util", Util.tests],
+      ["List", List.tests],
+      ["Util", Util.tests],
+      ["Plan", Plan.tests]
     ];
   }
 

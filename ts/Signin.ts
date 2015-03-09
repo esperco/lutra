@@ -38,7 +38,7 @@
 module Signin {
 
   function requestGoogleAuth(url) {
-    Log.p("Going off to " + url);
+    Log.d("Going off to " + url);
     window.location = url;
   }
 
@@ -145,11 +145,11 @@ module Signin {
   }
 
   function showTokenDetails(loginView, tokenDescription) {
-    Log.p(JSON.stringify(tokenDescription));
+    Log.d(JSON.stringify(tokenDescription));
   }
 
   function useInvite(inviteCode) {
-    Log.p("useInvite");
+    Log.d("useInvite");
     return Api.postToken(inviteCode)
       .then(
         /* success */
@@ -188,7 +188,7 @@ module Signin {
   }
 
   function loginOrSignup(optEmail) {
-    Log.p("loginOrSignup");
+    Log.d("loginOrSignup");
     var uid = Login.me();
     var landingUrl = document.URL;
     landingUrl["hash"] = "#!";
@@ -220,7 +220,7 @@ module Signin {
   }
 
   function checkGooglePermissions(landingUrl) {
-    Log.p("checkGooglePermissions " + landingUrl);
+    Log.d("checkGooglePermissions " + landingUrl);
     return Api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
         if (info.is_assistant && info.need_google_auth) {
@@ -264,7 +264,7 @@ module Signin {
       TODO: figure out why redirecting to landingUrl causes an infinite loop;
             disabled for now.
      */
-    Log.p("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
+    Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
     Api.loginOnce(uid, loginNonce)
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
