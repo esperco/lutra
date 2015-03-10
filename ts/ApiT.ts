@@ -290,6 +290,12 @@ type token_response = [
     bcc_exec_on_reply: boolean;
     exec_daily_agenda: boolean;
     current_timezone: string;
+    hold_event_color?: CalendarEventColor;
+  }
+
+  export interface CalendarEventColor {
+    key: string;
+    color: string;
   }
 
   export interface GuestReminder {
@@ -405,5 +411,9 @@ type token_response = [
 
   export interface EmailSignature {
     signature : string;
+  }
+
+  export interface CalendarEventPalette {
+    palette : CalendarEventColor[];
   }
 }
