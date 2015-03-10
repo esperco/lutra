@@ -7,43 +7,17 @@ module Esper.TaskTab {
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
-  function obtainTaskForThread(teamid, threadId,
-                               view: TaskTabView) {
-    var currentTask = CurrentThread.task.get();
-
-    if (currentTask !== undefined)
-      return Promise.defer(currentTask);
-    else {
-      return Api.obtainTaskForThread(teamid, threadId, false, true)
-        .then(function(task) {
-          CurrentThread.task.set(task);
+  CurrentThread.task.watch(
+    function (task: ApiT.Task, isValid: boolean,
+              oldTask: ApiT.Task, oldIsValid: boolean) {
+      if (isValid)
           view.taskCaption.text(taskLabelExists);
           view.taskTitle.text(task.task_title);
-          return task;
-        });
+      else
+          view.taskCaption.text(taskLabelCreate);
+          view.taskTitle.text("");
     }
-  }
-
-  export function linkEvent(e, team, threadId,
-                            taskTab: TaskTabView,
-                            profiles,
-                            view: LinkOptionsView) {
-    Api.linkEventForMe(team.teamid, threadId, e.google_event_id)
-      .done(function() {
-        // TODO Report something, handle failure, etc.
-        view.link.hide();
-        view.spinner.hide();
-        view.linked.show();
-        Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
-          .done(function() {
-            refreshEventLists(team, threadId, taskTab, profiles);
-            obtainTaskForThread(team.teamid, threadId,
-                                taskTab);
-            Api.syncEvent(team.teamid, threadId,
-                          e.google_cal_id, e.google_event_id);
-          });
-      });
-  }
+  );
 
   export interface LinkOptionsView {
     view: JQuery;
@@ -618,7 +592,7 @@ module Esper.TaskTab {
 
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
-    obtainTaskForThread(teamid, threadId, taskTab)
+    CurrentThread.obtainTaskForThread(teamid, threadId, taskTab)
       .done(function(task) {
         Api.setTaskTitle(task.taskid, query);
         task.task_title = query;
