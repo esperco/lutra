@@ -49,6 +49,25 @@ module Esper.CurrentThread {
     null
   );
 
+  /** If there is no current task, fetches it from the server and
+   *  updates the cached value.
+   *
+   *  Returns the updated task.
+   */
+  export function refreshTaskForThread() {
+    var currentTask = task.get();
+
+    if (!currentTask) {
+      return Api.obtainTaskForThread(teamid, threadId, false, true)
+        .then(function(task) {
+          CurrentThread.task.set(task);
+          return task;
+        });
+    } else {
+      return currentTask;
+    }
+  }
+
   /** Does the current thread have a valid task attached to it? */
   export function hasTask() : boolean {
     return isThreadView() && task.isValid();

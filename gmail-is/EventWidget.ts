@@ -12,8 +12,7 @@ module Esper.EventWidget {
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
             // refreshEventLists(team, threadId, taskTab, profiles);
-            // obtainTaskForThread(team.teamid, threadId,
-            //                     taskTab);
+            CurrentThread.refreshTaskForThread();
             Api.syncEvent(team.teamid, threadId,
                           e.google_cal_id, e.google_event_id);
           });
