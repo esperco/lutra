@@ -274,6 +274,7 @@ module Esper.CalPicker {
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
   function importEvents(esperEvents : TZCalendarEvent[]) {
+    var team = CurrentThread.team.get();
     return List.map(esperEvents, function(x) {
       var ev = {
         title: x.title, /* required */
@@ -282,6 +283,13 @@ module Esper.CalPicker {
         end: shiftTime(x.end.local, x.calendarTZ, showTimezone), /* req */
         orig: x /* custom field */
       };
+      // Display ghost calendar events in gray
+      var evCal =
+        List.find(team.team_calendars, function(cal : ApiT.Calendar) {
+          return cal.google_cal_id === x.google_cal_id;
+        });
+      if (/ Ghost$/.test(evCal.calendar_title))
+        ev["color"] = "#BCBEC0"; // @gray_30
       return ev;
     });
   }
