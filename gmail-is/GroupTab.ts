@@ -15,8 +15,55 @@ module Esper.GroupTab {
     <div #guestSection class="esper-section-container">
     </div>
   </div>
+  <div class="esper-section">
+    <div class="esper-section-header esper-clearfix esper-open">
+      <h1> Linked Events </h1>
+      <span class="esper-hide-section esper-link">Hide</span>
+    </div>
+    <div #linkActions
+         class="esper-section-actions esper-clearfix esper-open">
+      <div style="display:inline-block">
+        <div #createEvent
+             class="esper-link-action esper-dropdown-btn esper-click-safe">
+          <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+          <div class="esper-link-action-text esper-click-safe">
+            Create event
+          </div>
+        </div>
+        <div class="esper-vertical-divider"/>
+        <div #linkEvent class="esper-link-action">
+          <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+          <div class="esper-link-action-text">Link event</div>
+        </div>
+      </div>
+    </div>
+    <div #timeSection class="esper-section-container">
+    </div>
+  </div>
 </div>
 '''
+    createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
+    linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
+
+    createEvent.click(function() {
+      if (CurrentThread.threadId.isValid() &&
+          CurrentThread.task.isValid() &&
+          CurrentThread.team.isValid()) {
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
+      }
+    });
+
+    linkEvent.click(function() {
+      var team        = CurrentThread.team.get();
+      var threadId    = CurrentThread.threadId.get();
+      var searchModal = CalSearch.viewOfSearchModal(team, threadId, container, Sidebar.profiles);
+
+      $("body").append(searchModal.view);
+      searchModal.search.focus();
+    });
+
     var sections = container.find(".esper-section");
     sections.each(function (i, section) {
       $(section).find(".esper-hide-section").click(function () {
