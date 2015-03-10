@@ -71,17 +71,14 @@ module Esper.GroupTab {
       });
     });
 
-    var guests = [{ name : "Peter Esper", availability : GroupScheduling.Availability.none },
-                  { name : "Lois Esper",  availability : GroupScheduling.Availability.none },
-                  { name : "Foo Bar",     availability : GroupScheduling.Availability.none }];
+    var mockGuests = [{ name : "Peter Esper", availability : GroupScheduling.Availability.none },
+                      { name : "Lois Esper",  availability : GroupScheduling.Availability.none },
+                      { name : "Foo Bar",     availability : GroupScheduling.Availability.none }];
+    mockGuests.forEach(GroupScheduling.addGuest);
 
-    guestSection.append(guestsList(guests, addGuest));
+    guestSection.append(guestsList(GroupScheduling.guests, GroupScheduling.addGuest));
 
     return container;
-
-    function addGuest(guest) {
-      guests.push(guest);
-    }
   }
 
   export function guestsList(guests: GroupScheduling.Guest[],
