@@ -13,7 +13,7 @@ module Esper.GroupScheduling {
   export var guests: Guests[] = [];
 
   /** Add a guest to be considered. */
-  export addGuest(guest: Guest) {
+  export function addGuest(guest: Guest) {
     guests.push(guest);
   }
 
@@ -23,7 +23,7 @@ module Esper.GroupScheduling {
    *  Chances are this will change to a more intelligent comparison
    *  function in the near future.
    */
-  export removeGuest(guest: Guest) {
+  export function removeGuest(guest: Guest) {
     var index  = guests.indexOf(guest);
 
     if (index >= 0) {
