@@ -2,6 +2,32 @@
  *  creating a duplicate.
  */
 module Esper.InviteControls {
+
+  /* If the exec wants to share his phone number with guests,
+     insert the number into the notes box for the EA.
+  */
+  function appendExecPublicPhone(team, notesBox) {
+    Profile.get(team.team_executive, team.teamid).done(function(prof) {
+      Api.getPreferences(team.teamid).done(function(prefs) {
+        var phoneInfo = prefs.meeting_types.phone_call;
+        if (phoneInfo !== undefined) {
+          var pubMobile = List.find(phoneInfo.phones, function(p) {
+            return p.phone_type === "Mobile" && p.share_with_guests;
+          });
+          if (pubMobile !== null) {
+            var curText = notesBox.val();
+            var execName = prof.display_name.replace(/ .*$/, "");
+            var toAppend = execName + ": " + pubMobile.phone_number;
+            if (curText.length > 0)
+              notesBox.val(curText + "\n\n" + toAppend);
+            else
+              notesBox.val(toAppend);
+          }
+        }
+      });
+    });
+  }
+
   /** Returns a widget for inviting guests to the current event or to
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences.
@@ -91,6 +117,8 @@ module Esper.InviteControls {
       var separatorIndex = event.description.search(/=== Conversation ===/);
       pubNotes.val(event.description.substring(0, separatorIndex).trim());
     }
+    // Include exec's phone number in description if preferences allow it
+    appendExecPublicPhone(team, pubNotes);
     
     if (event.location) {
       var address = event.location.address;
