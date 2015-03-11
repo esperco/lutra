@@ -43,11 +43,64 @@ module Esper.CurrentThread {
     []
   );
 
+  var linkedEventsListeners = [];
+
+  /** Add a listener to be notified when the list of linked events
+   *  associated with the current thread changes.
+   */
+  export function onLinkedEventsChanged(listener) {
+    linkedEventsListeners.push(listener);
+  }
+
+  /** Send out an event that the list of linked events has changed. */
+  export function linkedEventsChanged() {
+    linkedEventsListeners.forEach(function (listener) {
+      listener();
+    });
+  }
+
+  export function linkEvent(e, profiles) {
+    var teamid = team.get().teamid;
+
+    Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
+      .done(function() {
+        // TODO Report something, handle failure, etc.
+        Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
+          .done(function() {
+            CurrentThread.refreshTaskForThread();
+            Api.syncEvent(teamid, threadId.get(),
+                          e.google_cal_id, e.google_event_id);
+
+            linkedEventsChanged();
+          });
+      });
+  }
+
   /** The task associated with the current thread, if any. */
   export var task = new Esper.Watchable.C<ApiT.Task>(
     function (task) { return task !== null && task !== undefined },
     null
   );
+
+  /** If there is no current task, fetches it from the server and
+   *  updates the cached value.
+   *
+   *  Returns the updated task.
+   */
+  export function refreshTaskForThread() {
+    var currentTask = task.get();
+    var teamid      = team.get().teamid;
+
+    if (!currentTask) {
+      return Api.obtainTaskForThread(teamid, threadId, false, true)
+        .then(function(newTask) {
+          task.set(newTask);
+          return newTask;
+        });
+    } else {
+      return Promise.defer(currentTask);
+    }
+  }
 
   /** Does the current thread have a valid task attached to it? */
   export function hasTask() : boolean {
