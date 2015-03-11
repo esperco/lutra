@@ -2,30 +2,14 @@
  *  sidebar.
  */
 module Esper.EventWidget {
-  export function linkEvent(e, team, threadId, profiles) {
-    Api.linkEventForMe(team.teamid, threadId, e.google_event_id)
-      .done(function() {
-        // TODO Report something, handle failure, etc.
-        view.link.hide();
-        view.spinner.hide();
-        view.linked.show();
-        Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
-          .done(function() {
-            // refreshEventLists(team, threadId, taskTab, profiles);
-            CurrentThread.refreshTaskForThread();
-            Api.syncEvent(team.teamid, threadId,
-                          e.google_cal_id, e.google_event_id);
-          });
-      });
-  }
 
   /** Displays an oval button to link unlinked (recent) events. */
-  function displayLinkOptions(e: ApiT.CalendarEvent,
+  export function displayLinkOptions(e: ApiT.CalendarEvent,
                               linkedEvents: ApiT.EventWithSyncInfo[],
                               team,
                               threadId,
                               profiles: ApiT.Profile[],
-                              onLinkEvent: (e:ApiT.CalendarEvent) => any) {
+                              onLinkEvent?: (e:ApiT.CalendarEvent) => any) {
 '''
 <div #view>
   <div #link class="esper-link-event esper-clickable">Link to this event</div>
@@ -55,14 +39,14 @@ module Esper.EventWidget {
         .removeClass("esper-link-event")
         .addClass("esper-linked")
         .text("Linking...");
-      linkEvent(e, team, threadId, taskTab, profiles, _view);
+      CurrentThread.linkEvent(e, profiles);
     });
 
     return view;
   }
 
   /** Displays a shortcut for choosing the event without using the menu. */
-  function displayEventChoose(view, event: ApiT.CalendarEvent) {
+  export function displayEventChoose(view, event: ApiT.CalendarEvent) {
 '''
 <div #choose title="Choose this event." class="esper-choose-event">
   <object #check class="esper-svg esper-linked-check"/>
@@ -82,59 +66,58 @@ module Esper.EventWidget {
     return choose;
   }
 
-  function displayEventOptions(view,
+  export function displayEventOptions(view,
                                ev: ApiT.EventWithSyncInfo,
                                linkedEvents: ApiT.EventWithSyncInfo[],
                                team: ApiT.Team,
                                threadId: string,
-                               taskTab: TaskTabView,
                                profiles: ApiT.Profile[]) {
-    '''
+'''
 <div #optionsView>
-<div #disclose class="esper-click-safe esper-dropdown-btn
-esper-clickable esper-ev-disclose"/>
-<ul #dropdown class="esper-drop-ul esper-ev-dropdown">
-<div class="esper-dropdown-section">
-<li #editEvent
-class="esper-li esper-disabled">
-Edit
-</li>
-<li #inviteGuests
-class="esper-li">
-Invite guests
-</li>
-<li #unlinkEvent
-class="esper-li">
-Unlink
-</li>
-<li #deleteEvent
-class="esper-li esper-danger">
-Delete from calendar
-</li>
-<li #chooseThisEvent
-class="esper-li">
-Choose this event
-</li>
-</div>
-<div class="esper-click-safe esper-drop-ul-divider"/>
-<div #syncOption class="esper-click-safe esper-dropdown-section">
-<li class="esper-click-safe esper-li esper-disabled esper-sync-option">
-<span class="esper-click-safe esper-sync-option-text">
-Description Sync
-</span>
-<object #info title class="esper-svg esper-click-safe esper-info"/>
-<input #syncCheckbox
-type="checkbox"
-class="esper-click-safe esper-sync-checkbox"/>
-<div #spinner
-class="esper-click-safe esper-spinner esper-sync-spinner"/>
-</li>
-<li #teamSync
-class="esper-click-safe esper-li esper-disabled esper-sync-users"/>
-<li #syncNote
-class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
-</div>
-</ul>
+  <div #disclose class="esper-click-safe esper-dropdown-btn
+                   esper-clickable esper-ev-disclose"/>
+  <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
+    <div class="esper-dropdown-section">
+      <li #editEvent
+          class="esper-li esper-disabled">
+        Edit
+      </li>
+      <li #inviteGuests
+          class="esper-li">
+        Invite guests
+      </li>
+      <li #unlinkEvent
+          class="esper-li">
+        Unlink
+      </li>
+      <li #deleteEvent
+          class="esper-li esper-danger">
+        Delete from calendar
+      </li>
+      <li #chooseThisEvent
+          class="esper-li">
+        Choose this event
+      </li>
+    </div>
+    <div class="esper-click-safe esper-drop-ul-divider"/>
+    <div #syncOption class="esper-click-safe esper-dropdown-section">
+      <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
+        <span class="esper-click-safe esper-sync-option-text">
+          Description Sync
+        </span>
+        <object #info title class="esper-svg esper-click-safe esper-info"/>
+        <input #syncCheckbox
+               type="checkbox"
+               class="esper-click-safe esper-sync-checkbox"/>
+        <div #spinner
+             class="esper-click-safe esper-spinner esper-sync-spinner"/>
+      </li>
+      <li #teamSync
+          class="esper-click-safe esper-li esper-disabled esper-sync-users"/>
+      <li #syncNote
+          class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
+    </div>
+  </ul>
 </div>
 '''
     var e = ev.event;
@@ -169,7 +152,6 @@ class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
         .done(function() {
           spinner.hide();
           syncCheckbox.show();
-          refreshlinkedEventsList(team.teamid, threadId, taskTab, profiles);
         });
     });
 
@@ -237,18 +219,16 @@ class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
 
     unlinkEvent.click(function() {
       view.addClass("esper-disabled");
-      Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
-        .done(function() {
-          refreshEventLists(team, threadId, taskTab, profiles);
-        });
+      Api.unlinkEvent(team.teamid, threadId, e.google_event_id).done(function () {
+        CurrentThread.linkedEventsChanged();
+      });
     });
 
     deleteEvent.click(function() {
       view.addClass("esper-disabled");
-      Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
-        .done(function() {
-          refreshEventLists(team, threadId, taskTab, profiles);
-        });
+      Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id).done(function () {
+        CurrentThread.linkedEventsChanged();
+      });
     });
 
     chooseThisEvent.click(function() {
@@ -263,10 +243,9 @@ class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
     return optionsView;
   }
 
-  function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
+  export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                        ev, recent, last, team: ApiT.Team,
-                       threadId: string, taskTab: TaskTabView,
-                       profiles: ApiT.Profile[]) {
+                       threadId: string, profiles: ApiT.Profile[]) {
 '''
 <div #view class="esper-ev">
   <div #date title class="esper-ev-date">
@@ -286,13 +265,11 @@ class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
     var e = ev;
 
     if (recent) {
-      view.append(displayLinkOptions(ev, linkedEvents, team,
-                                     threadId, taskTab, profiles));
+      view.append(displayLinkOptions(ev, linkedEvents, team, threadId, profiles));
     } else {
       e = ev.event;
       time.prepend(displayEventChoose(view, e));
-      time.prepend(displayEventOptions(view, ev, linkedEvents, team,
-                                       threadId, taskTab, profiles));
+      time.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
     }
 
     var start = XDate.ofString(e.start.local);
