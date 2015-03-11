@@ -100,6 +100,10 @@ module PreferencesTab {
   }
 
   function readGeneralPrefs(div) {
+    var colorBox =
+      $(".esper-prefs-hold-color").is(":checked") ?
+      $(".esper-event-color-selected") :
+      undefined;
     return {
       send_exec_confirmation:
         div.find(".esper-prefs-confirmation").is(":checked"),
@@ -112,7 +116,12 @@ module PreferencesTab {
       exec_daily_agenda:
         div.find(".esper-prefs-agenda").is(":checked"),
       current_timezone:
-        div.find(".esper-prefs-timezone").val()
+        div.find(".esper-prefs-timezone").val(),
+      hold_event_color: (
+        colorBox ?
+        { key: colorBox.data("key"), color: colorBox.data("color") } :
+        undefined
+      )
     };
   }
 
@@ -1159,6 +1168,51 @@ module PreferencesTab {
     return view;
   }
 
+  var eventColors = {
+    "Bold_blue": "#5484ed",
+    "Blue": "#a4bdfc",
+    "Turquoise": "#46d6db",
+    "Green": "#7ae7bf",
+    "Bold_green": "#51b749",
+    "Yellow": "#fbd75b",
+    "Orange": "#ffb878",
+    "Red": "#ff887c",
+    "Bold_red": "#dc2127",
+    "Purple": "#dbadff",
+    "Gray": "#e1e1e1"
+  };
+
+  function showEventColorPicker(picker, checkbox, saved) {
+    Api.getEventColors().done(function(colors) {
+      List.iter(colors.palette, function(col) {
+
+        var box = $("<div class='esper-event-color'/>");
+        box.data("key", col.key)
+           .data("color", col.color)
+           .css("background-color", eventColors[col.color]);
+        if (saved !== undefined && saved.color === col.color)
+          box.addClass("esper-event-color-selected");
+
+        box.mouseover(function() {
+          if (!box.hasClass("esper-event-color-selected"))
+            box.addClass("esper-event-color-hover");
+        });
+        box.mouseout(function() {
+          box.removeClass("esper-event-color-hover");
+        });
+        box.click(function() {
+          $(".esper-event-color").removeClass("esper-event-color-selected");
+          box.removeClass("esper-event-color-hover")
+             .addClass("esper-event-color-selected");
+          checkbox.prop("checked", true);
+          savePreferences();
+        });
+
+        picker.append(box);
+      });
+    });
+  }
+
   function viewOfGeneralPrefs(general : ApiT.GeneralPrefs,
                               team : ApiT.Team) {
 '''
@@ -1192,6 +1246,12 @@ module PreferencesTab {
                class="esper-prefs-agenda"/>
         Receive daily agenda of events and updates on in progress tasks
       </li>
+      <li>
+        <input #holdColor type="checkbox"
+               class="esper-prefs-hold-color"/>
+        Use a different color for HOLD events
+        <div #colorPicker/>
+      </li>
     </ul>
   </div>
 </li>
@@ -1208,6 +1268,8 @@ module PreferencesTab {
         bccExec.prop("checked", false);
       if (general.exec_daily_agenda)
         dailyAgenda.prop("checked", true);
+      if (general.hold_event_color !== undefined)
+        holdColor.prop("checked", true);
     }
 
     sendConfirmation.click(savePreferences);
@@ -1215,6 +1277,16 @@ module PreferencesTab {
     useDuplicate.click(savePreferences);
     bccExec.click(savePreferences);
     dailyAgenda.click(savePreferences);
+
+    var savedColor = general.hold_event_color;
+    showEventColorPicker(colorPicker, holdColor, savedColor);
+    holdColor.click(function() {
+      var check = holdColor.is(":checked");
+      if (!check)
+        $(".esper-event-color").removeClass("esper-event-color-selected");
+      if (!check || $(".esper-event-color-selected").length > 0)
+        savePreferences();
+    });
 
     return view;
   }

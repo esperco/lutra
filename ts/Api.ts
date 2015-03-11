@@ -485,4 +485,10 @@ module Api {
     return jsonHttpPut(url, JSON.stringify(sig));
   }
 
+  export function getEventColors()
+    : JQueryDeferred<ApiT.CalendarEventPalette>
+  {
+    var url = "/api/gcal/colors/event/" + string(Login.me());
+    return jsonHttpGet(url);
+  }
 }
