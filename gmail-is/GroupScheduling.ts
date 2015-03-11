@@ -10,7 +10,7 @@ module Esper.GroupScheduling {
   }
 
   /** All the guests in the group event. */
-  export var guests: Guests[] = [];
+  export var guests: Guest[] = [];
 
   /** Add a guest to be considered. */
   export function addGuest(guest: Guest) {
