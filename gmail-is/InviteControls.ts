@@ -183,6 +183,7 @@ module Esper.InviteControls {
     CurrentThread.withPreferences(function (preferences) {
       var duplicate    = preferences.general.use_duplicate_events;
       var execReminder = preferences.general.send_exec_reminder;
+      var holdColor = preferences.general.hold_event_color;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -207,19 +208,21 @@ module Esper.InviteControls {
         };
         if (!location.address) location = null;
 
-        var eventEdit = {
+        var title = pubTitle.val();
+        var eventEdit : ApiT.CalendarEventEdit = {
           google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
           start         : event.start,
           end           : event.end,
-          title         : pubTitle.val(),
+          title         : title,
           description   : pubNotes.val(),
           location      : location,
           all_day       : event.all_day,
-          guests        : guests,
+          guests        : guests
         };
+        if (holdColor && /^HOLD: /.test(title))
+          eventEdit.color_id = holdColor.key;
 
         var from = fromSelect.val();
-        var title = pubTitle.val();
         location = pubLocation.val();
         var animation = {
           time : 500,

@@ -54,7 +54,8 @@ module Esper.FinalizeEvent {
    *  change is accomplished by adding or removing "HOLD: " from the
    *  event title.
    */
-  export function setHold(event: ApiT.CalendarEvent, hold: boolean) {
+  export function setHold(event: ApiT.CalendarEvent, prefs: ApiT.Preferences,
+                          hold: boolean) {
     var edit: ApiT.CalendarEventEdit = {
       google_event_id : event.google_event_id,
       google_cal_id   : event.google_cal_id,
@@ -70,6 +71,9 @@ module Esper.FinalizeEvent {
     if (isHold(edit) != hold) {
       if (hold) {
         edit.title = "HOLD: " + edit.title;
+        var gen = prefs.general;
+        if (gen && gen.hold_event_color)
+          edit.color_id = gen.hold_event_color.key;
       } else {
         edit.title = edit.title.replace(/^HOLD: /, "");
       }
@@ -87,7 +91,7 @@ module Esper.FinalizeEvent {
    *
    *  Calls the `done' callback after the delete API calls are done.
    */
-  export function deleteHolds(event: ApiT.CalendarEvent, done) {
+  export function deleteHolds(event: ApiT.CalendarEvent, prefs, done) {
     var team = CurrentThread.team.get();
     var id = event.google_event_id;
 
@@ -105,7 +109,7 @@ module Esper.FinalizeEvent {
       return Api.deleteLinkedEvent(team.teamid, threadId, holdId);
     });
 
-    var updateCall = setHold(event, false);
+    var updateCall = setHold(event, prefs, false);
     if (updateCall) calls.push(updateCall);
 
     Promise.join(calls).done(done);
@@ -179,7 +183,7 @@ module Esper.FinalizeEvent {
       var taskTab = TaskTab.currentTaskTab;
       var profiles = Sidebar.profiles;
 
-      deleteHolds(event, function () {
+      deleteHolds(event, preferences, function () {
         TaskTab.refreshEventLists(team, threadId, taskTab, profiles);
       });
 
