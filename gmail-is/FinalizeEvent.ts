@@ -144,7 +144,7 @@ module Esper.FinalizeEvent {
           " on " + time +
           (location ? " at " + location : "") +
           ". " +
-          "Please let me know if you have any questions about this appointment."
+          "Please let me know if you have any questions about this appointment.<br />"
       ].join("<br />");
     } else {
       return null;
