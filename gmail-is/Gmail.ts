@@ -113,14 +113,17 @@ module Esper.Gmail {
   }
 
   /** Opens up a reply dialog in the current thread, by clicking the
-   *  reply link. Optionally inserts the given HTML or text into the
-   *  resulting text field.
+   *  forward link. We use the "forward" link instead of the "reply"
+   *  link so that the recipients are not pre-filled incorrectly.
+   *
+   *  Optionally inserts the given HTML or text into the resulting
+   *  text field.
    *
    *  If the reply field is already open, it should be focused and the
    *  given html will be inserted.
    */
   export function replyToThread(html?) {
-    $(".amn").last().find("span").first().click();
+    $(".amn").last().find("span").last().click();
     replyTextField(compositionToolbar().last()).focus();
     
     if (html) insertInFocusedField(html);

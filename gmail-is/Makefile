@@ -79,6 +79,7 @@ APP_SOURCES = \
   FinalizeEvent \
   InviteControls \
   TaskList \
+  EventWidget \
   Menu \
   Sidebar \
   TaskTab \

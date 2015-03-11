@@ -480,22 +480,29 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev : FullCalendar.EventObject,
-                         eventTitle, eventLocation)
+  function makeEventEdit(ev : FullCalendar.EventObject, eventTitle,
+                         eventLocation, prefs: ApiT.Preferences)
     : ApiT.CalendarEventEdit
   {
-    return {
+    var title = eventTitle.val();
+    var eventEdit : ApiT.CalendarEventEdit = {
       google_cal_id: writeToCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
-      title: eventTitle.val(),
+      title: title,
       location: { title: "", address: eventLocation.val() },
       guests: []
     };
+    var gen = prefs.general;
+    if (gen && gen.hold_event_color && /^HOLD: /.test(title))
+      eventEdit.color_id = gen.hold_event_color.key;
+    return eventEdit;
   }
 
   export function createInline(team: ApiT.Team, task: ApiT.Task,
-                               threadId: string) : void {
+                               threadId: string, prefs: ApiT.Preferences)
+    : void
+  {
 '''
 <div #view class="esper-centered-container">
   <div #inline>
@@ -549,8 +556,8 @@ module Esper.CalPicker {
     save.click(function() {
       var events = [];
       for (var k in picker.events) {
-        var edit = makeEventEdit(picker.events[k],
-                                 picker.eventTitle, picker.eventLocation);
+        var edit = makeEventEdit(picker.events[k], picker.eventTitle,
+                                 picker.eventLocation, prefs);
         events.push(edit);
       }
 

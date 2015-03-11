@@ -205,9 +205,12 @@ module Esper.ComposeControls {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
-        CalPicker.createInline(CurrentThread.team.get(),
-                               CurrentThread.task.get(),
-                               CurrentThread.threadId.get());
+        CurrentThread.withPreferences(function(prefs) {
+          CalPicker.createInline(CurrentThread.team.get(),
+                                 CurrentThread.task.get(),
+                                 CurrentThread.threadId.get(),
+                                 prefs);
+        });
       }
     });
 

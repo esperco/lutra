@@ -132,6 +132,7 @@ module Esper.ApiT {
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
+    color_id?: string;
   }
 
   export interface SyncedThread {
@@ -264,6 +265,14 @@ module Esper.ApiT {
     send_exec_reminder: boolean;
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
+    exec_daily_agenda: boolean;
+    current_timezone: string;
+    hold_event_color?: CalendarEventColor;
+  }
+
+  export interface CalendarEventColor {
+    key: string;
+    color: string;
   }
 
   export interface GuestReminder {
