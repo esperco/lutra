@@ -79,12 +79,55 @@ module Esper.GroupTab {
                       { name : "Foo Bar",     availability : GroupScheduling.Availability.none }];
     mockGuests.forEach(GroupScheduling.addGuest);
 
-    guestSection.append(guestsList(GroupScheduling.guests, GroupScheduling.addGuest));
+    guestSection.append(guestList(GroupScheduling.guests, GroupScheduling.addGuest));
+    timeSection.append(timeList());
 
     return container;
   }
 
-  export function guestsList(guests: GroupScheduling.Guest[],
+  /** The list of possible times for the group event which current
+   *  corresponds to the linked events of the current task.
+   */
+  export function timeList() {
+'''
+<div #container class="esper-group-options">
+  <div #spinner class="esper-events-list-loading">
+    <div class="esper-spinner esper-list-spinner"/>
+  </div>
+  <ul #list>
+  </ul>
+</div>
+'''
+    populate();
+    CurrentThread.onLinkedEventsChanged(populate);
+
+    return container;
+
+    function populate() {
+      list.hide();
+      list.empty();
+      spinner.show();
+
+      var team     = CurrentThread.team.get();
+      var threadId = CurrentThread.threadId.get();
+      var profiles = Sidebar.profiles;
+
+      Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+        .done(function (events) {
+          spinner.hide();
+          list.show();
+
+          events.forEach(function (event: ApiT.EventWithSyncInfo) {
+            var widget = EventWidget.renderEvent(events, event, false, false,
+                                                 team, threadId, profiles);
+
+            list.append($("<li>").append(widget));
+          });
+      });
+    }
+  }
+
+  export function guestList(guests: GroupScheduling.Guest[],
                              onAddGuest: (guest:GroupScheduling.Guest) => any) {
 '''
 <ul #list class="esper-group-people">

@@ -112,7 +112,9 @@ module Esper.TaskTab {
             if (e === undefined) return; // event is deleted aka cancelled
             if (i === activeEvents.length - 1)
               last = true;
-            eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
+
+            var ev = { event : e, synced_threads : [] };
+            eventsList.append(EventWidget.renderEvent(linkedEvents, ev, recent, last,
                                                       team, threadId, profiles));
             i++;
           });

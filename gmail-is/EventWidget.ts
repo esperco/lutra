@@ -244,8 +244,8 @@ module Esper.EventWidget {
   }
 
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
-                       ev, recent, last, team: ApiT.Team,
-                       threadId: string, profiles: ApiT.Profile[]) {
+                              ev: ApiT.EventWithSyncInfo,
+                              recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
 '''
 <div #view class="esper-ev">
   <div #date title class="esper-ev-date">
@@ -262,12 +262,11 @@ module Esper.EventWidget {
   </div>
 </div>
 '''
-    var e = ev;
+    var e = ev.event;
 
     if (recent) {
-      view.append(displayLinkOptions(ev, linkedEvents, team, threadId, profiles));
+      view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
     } else {
-      e = ev.event;
       time.prepend(displayEventChoose(view, e));
       time.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
     }
