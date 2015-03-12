@@ -1249,7 +1249,7 @@ module PreferencesTab {
       <li>
         <input #holdColor type="checkbox"
                class="esper-prefs-hold-color"/>
-        Use a different color for HOLD events
+        Use a different color for HOLD/unconfirmed events
         <div #colorPicker/>
       </li>
     </ul>
