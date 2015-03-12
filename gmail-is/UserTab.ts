@@ -6,6 +6,27 @@ module Esper.UserTab {
     return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
   }
 
+  function displayAssistantAlias(container: JQuery, alias: string[]) {
+'''
+<div #view>
+  <div>
+    <span class="esper-bold">Name:</span>
+    <span #aliasName></span>
+  </div>
+  <div>
+    <span class="esper-bold">Email:</span>
+    <span #aliasEmail></span>
+  </div>
+</div>
+'''
+    if (alias !== undefined) {
+      aliasName.text(alias[0]);
+      aliasEmail.text(alias[1]);
+
+      container.append(view);
+    }
+  }
+
   function displayAvailability(meetingPrefs: JQuery,
                                availabilities: ApiT.Availability[],
                                last: boolean) {
@@ -304,9 +325,10 @@ module Esper.UserTab {
     return view;
   }
 
-  function createMeetingsDropdown(drop: JQuery,
+  function populateMeetingsDropdown(drop: JQuery,
                                   meetInfo: JQuery,
-                                  meetingTypes: ApiT.MeetingTypes) {
+                                  meetingTypes: ApiT.MeetingTypes,
+                                  workplaces: ApiT.Workplace[]) {
     function option(value, display) {
       $("<option>")
         .attr("value", value)
@@ -335,6 +357,15 @@ module Esper.UserTab {
     if (available(meetingTypes.drinks))
       option("drinks", "Drinks");
 
+    $("<option disabled>──────</option>").appendTo(drop);
+
+    List.iter(workplaces, function(workplace, i) {
+      var title = workplace.location.title;
+      if (title === "") title = workplace.location.address;
+      $("<option value='" + i.toString() + "'>" + title + "</option>")
+        .appendTo(drop);
+    });
+
     drop.change(function() {
       var field = $(this).val();
       if (field === "header") return;
@@ -342,6 +373,8 @@ module Esper.UserTab {
         displayPhoneInfo(meetInfo, meetingTypes.phone_call);
       else if (field === "video_call")
         displayVideoInfo(meetInfo, meetingTypes.video_call);
+      else if (!isNaN(field))
+        displayWorkplace(meetInfo, workplaces[field]);
       else
         displayMealInfo(meetInfo, meetingTypes[field]);
     });
@@ -381,21 +414,6 @@ module Esper.UserTab {
 
     workInfo.children().remove();
     workInfo.append(view);
-  }
-
-  function populateWorkplaceDropdown(drop: JQuery,
-                                     workInfo: JQuery,
-                                     workplaces: ApiT.Workplace[]) {
-    List.iter(workplaces, function(workplace, i) {
-      var title = workplace.location.title;
-      if (title === "") title = workplace.location.address;
-      $("<option value='" + i.toString() + "'>" + title + "</option>")
-        .appendTo(drop);
-    });
-    drop.change(function() {
-      var i = $(this).val();
-      displayWorkplace(workInfo, workplaces[i]);
-    });
   }
 
   function viewOfUser(team: ApiT.Team, prefs: ApiT.Preferences) {
@@ -463,7 +481,7 @@ module Esper.UserTab {
     return view;
   }
 
-  function displayGeneralPrefs(container : JQuery,
+  function displayDetailedGeneralPrefs(container : JQuery,
                                prefs : ApiT.GeneralPrefs) {
 '''
 <div #view>
@@ -505,6 +523,24 @@ module Esper.UserTab {
     container.append(view);
   }
 
+  function displayGeneralPrefs(container : JQuery,
+                               prefs : ApiT.GeneralPrefs) {
+'''
+<div #view>
+  <div>
+    <span>Bcc exec:</span>
+    <span class="esper-green" #bccExec>Yes</span>
+  </div>
+</ul>
+'''
+    if (!prefs.bcc_exec_on_reply)
+      bccExec.text("No")
+        .removeClass("esper-green")
+        .addClass("esper-red");
+
+    container.append(view);
+  }
+
   export function viewOfUserTab(team: ApiT.Team,
                                 profiles: ApiT.Profile[]) {
 '''
@@ -513,6 +549,40 @@ module Esper.UserTab {
   <div class="esper-tab-overflow">
     <div #preferencesSpinner class="esper-events-list-loading">
       <div class="esper-spinner esper-list-spinner"/>
+    </div>
+    <div class="esper-section">
+      <div #aliasHeader class="esper-section-header esper-clearfix">
+        <span #showAlias
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Assistant Alias</span>
+      </div>
+      <div #aliasContainer
+           class="esper-section-container esper-preferences-general"
+           style="display:none"/>
+    </div>
+    <div class="esper-section">
+      <div #generalHeader
+           class="esper-section-header esper-open esper-clearfix">
+        <span #showGeneral
+              class="esper-link" style="float:right">Show More</span>
+        <span class="esper-bold" style="float:left">General Preferences</span>
+      </div>
+      <div #generalContainer
+           class="esper-section-container esper-preferences-general"/>
+      <div #generalDetailedContainer
+           class="esper-section-container esper-preferences-general"
+           style="display:none"/>
+    </div>
+    <div class="esper-section">
+      <div #teamMembersHeader class="esper-section-header esper-clearfix">
+        <span #showTeamMembers
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Team Members</span>
+      </div>
+      <div #teamMembersContainer class="esper-section-container"
+           style="display:none">
+        <pre #teamMembers class="esper-preferences-notes"/>
+      </div>
     </div>
     <div #calendarsSection class="esper-section" style="display:none">
       <div #calendarsHeader
@@ -524,18 +594,18 @@ module Esper.UserTab {
       <div #calendarsContainer class="esper-section-container"/>
     </div>
     <div class="esper-section">
-      <div #workplacesHeader class="esper-section-header esper-clearfix">
-        <span #showWorkplaces
+      <div #meetingsHeader class="esper-section-header esper-clearfix">
+        <span #showMeetings
               class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Workplaces</span>
+        <span class="esper-bold" style="float:left">Meetings</span>
       </div>
-      <div #workplacesContainer class="esper-section-container"
+      <div #meetingsContainer class="esper-section-container"
            style="display:none">
-        <div #workplacesSelector class="esper-section-selector esper-clearfix">
+        <div #meetingsSelector class="esper-section-selector esper-clearfix">
           <span class="esper-show-selector">Show: </span>
-          <select #workplaceSelector class="esper-select"/>
+          <select #meetingSelector class="esper-select"/>
         </div>
-        <div #workplaceInfo/>
+        <div #meetingInfo/>
       </div>
     </div>
     <div class="esper-section">
@@ -551,33 +621,6 @@ module Esper.UserTab {
       </div>
     </div>
     <div class="esper-section">
-      <div #meetingPreferencesHeader
-           class="esper-section-header esper-clearfix">
-        <span #showMeetingPreferences
-              class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Meeting Preferences</span>
-      </div>
-      <div #meetingPreferencesContainer class="esper-section-container"
-            style="display:none">
-        <div #meetingPreferencesSelector
-             class="esper-section-selector esper-clearfix">
-          <span class="esper-show-selector">Show: </span>
-          <select #meetingSelector class="esper-select"/>
-        </div>
-        <div #meetingPreferences/>
-      </div>
-    </div>
-    <div class="esper-section">
-      <div #generalHeader class="esper-section-header esper-clearfix">
-        <span #showGeneral
-              class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">General Preferences</span>
-      </div>
-      <div #generalContainer
-           class="esper-section-container esper-preferences-general"
-           style="display:none"/>
-    </div>
-    <div class="esper-section">
       <div #notesHeader class="esper-section-header esper-clearfix">
         <span #showNotes
               class="esper-link" style="float:right">Show</span>
@@ -590,14 +633,26 @@ module Esper.UserTab {
   </div>
 </div>
 '''
+    var emailData = esperGmail.get.email_data();
+    var threadMembers = emailData.people_involved;
+    var aliasesUsed = List.filterMap(threadMembers, function(m) {
+      if (List.mem(team.team_email_aliases, m[1])) return m;
+      else return null;
+    });
+    displayAssistantAlias(aliasContainer, aliasesUsed[0]);
+
     Api.getPreferences(team.teamid).done(function(prefs) {
       preferencesSpinner.hide();
       user.append(viewOfUser(team, prefs));
 
+      var meetingTypes = prefs.meeting_types;
       var workplaces = prefs.workplaces;
-      populateWorkplaceDropdown(workplaceSelector, workplaceInfo, workplaces);
+      populateMeetingsDropdown(meetingSelector, meetingInfo,
+        meetingTypes, workplaces);
       if (workplaces.length > 0)
-        displayWorkplace(workplaceInfo, workplaces[0]);
+        displayWorkplace(meetingInfo, workplaces[0]);
+      else if (meetingTypes.phone_call !== undefined)
+        displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
 
       var transportationTypes = prefs.transportation.length;
       List.iter(prefs.transportation, function(type, i) {
@@ -605,19 +660,26 @@ module Esper.UserTab {
         transportationPreferences.append(viewOfTransportationType(type, last));
       });
 
-      var meetingTypes = prefs.meeting_types;
-      createMeetingsDropdown(meetingSelector, meetingPreferences, meetingTypes);
-      if (meetingTypes.phone_call !== undefined)
-        displayPhoneInfo(meetingPreferences, meetingTypes.phone_call);
-
       if (prefs.general !== undefined)
         displayGeneralPrefs(generalContainer, prefs.general);
+        displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
 
+      teamMembers.text(prefs.team_members);
       notes.text(prefs.notes);
     });
 
-    Sidebar.customizeSelectArrow(workplaceSelector);
     Sidebar.customizeSelectArrow(meetingSelector);
+
+    showAlias.click(function() {
+      Sidebar.toggleList(aliasContainer);
+      if (this.innerHTML === "Hide") {
+        $(this).text("Show");
+        aliasHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        aliasHeader.addClass("esper-open");
+      }
+    });
 
     showCalendars.click(function() {
       Sidebar.toggleList(calendarsContainer);
@@ -630,14 +692,14 @@ module Esper.UserTab {
       }
     });
 
-    showWorkplaces.click(function() {
-      Sidebar.toggleList(workplacesContainer);
+    showMeetings.click(function() {
+      Sidebar.toggleList(meetingsContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        workplacesHeader.removeClass("esper-open");
+        meetingsHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        workplacesHeader.addClass("esper-open");
+        meetingsHeader.addClass("esper-open");
       }
     });
 
@@ -652,25 +714,24 @@ module Esper.UserTab {
       }
     });
 
-    showMeetingPreferences.click(function() {
-      Sidebar.toggleList(meetingPreferencesContainer);
-      if (this.innerHTML === "Hide") {
-        $(this).text("Show");
-        meetingPreferencesHeader.removeClass("esper-open");
+    showGeneral.click(function() {
+      Sidebar.toggleList(generalContainer);
+      Sidebar.toggleList(generalDetailedContainer);
+      if (this.innerHTML === "Show Less") {
+        $(this).text("Show More");
       } else {
-        $(this).text("Hide");
-        meetingPreferencesHeader.addClass("esper-open");
+        $(this).text("Show Less");
       }
     });
 
-    showGeneral.click(function() {
-      Sidebar.toggleList(generalContainer);
+    showTeamMembers.click(function() {
+      Sidebar.toggleList(teamMembersContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        generalContainer.removeClass("open");
+        teamMembersHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        generalHeader.addClass("open");
+        teamMembersHeader.addClass("esper-open");
       }
     });
 
@@ -685,8 +746,9 @@ module Esper.UserTab {
       }
     });
 
-    showGeneral.click();
     showNotes.click();
+    if (aliasContainer.text() !== "")showAlias.click();
+    if (teamMembers.text() !== "") showTeamMembers.click();
 
     return _view;
   }

@@ -190,6 +190,7 @@ module Esper.ApiT {
     transportation: string[];
     meeting_types: MeetingTypes;
     general: GeneralPrefs;
+    team_members: string;
     notes: string;
   }
 
