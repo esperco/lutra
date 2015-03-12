@@ -9,7 +9,7 @@ dev: dev-build
 prod: prod-build
 	rm -rf pub
 	./install prod 2>&1 | tee -a install.log
-	@echo "*** 'make prod' is only an alias for 'make prod-build'."
+	@echo "*** 'make prod' only builds otter files for production."
 	@echo ""
 	@echo "*** otter and wolverine files can be installed without a"
 	@echo "*** server restart using the command:"
