@@ -92,7 +92,7 @@ module Esper.CurrentThread {
     var teamid      = team.get().teamid;
 
     if (!currentTask) {
-      return Api.obtainTaskForThread(teamid, threadId, false, true)
+      return Api.obtainTaskForThread(teamid, threadId.get(), false, true)
         .then(function(newTask) {
           task.set(newTask);
           return newTask;
