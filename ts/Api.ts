@@ -14,6 +14,11 @@ module Api {
     return x;
   }
 
+  function number(x: number): string {
+    console.assert(x !== undefined && x !== null);
+    return x.toString();
+  }
+
   // HTTP - response body is interpreted as JSON
 
   function jsonHttp(method, url, body) {
@@ -396,7 +401,7 @@ module Api {
     return jsonHttpGet(url);
   }
 
-  /*** Payment Information ***/
+  /*** Payments ***/
 
   export function getSubscriptionStatus(teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
@@ -458,6 +463,58 @@ module Api {
       + "/" + string(cardid);
     return jsonHttpPut(url,"");
   }
+
+  /*** Usage tracking ***/
+
+  export function getPeriodList(teamid: string):
+  JQueryDeferred<ApiT.TaskUsageList> {
+    var url = "/api/usage/period-list/" + string(Login.me())
+      + "/" + string(teamid);
+    return jsonHttpGet(url);
+  }
+
+  export function getUsageEdit(teamid: string,
+                               periodStart: number):
+  JQueryDeferred<ApiT.TaskUsage> {
+    var url = "/api/usage/edit/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + number(periodStart);
+    return jsonHttpGet(url);
+  }
+
+  export function putUsageEdit(teamid: string,
+                               periodStart: number,
+                               tu: ApiT.TaskUsage):
+  JQueryDeferred<ApiT.TaskUsage> {
+    var url = "/api/usage/edit/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + number(periodStart);
+    return jsonHttpPut(url, tu);
+  }
+
+  export function getUsageExtraCharge(teamid: string,
+                                      periodStart: number,
+                                      revision: number):
+  JQueryDeferred<ApiT.ExtraCharge> {
+    var url = "/api/usage/extra-charge/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + number(periodStart)
+      + "/" + number(revision);
+    return jsonHttpGet(url);
+  }
+
+  export function postUsageExtraCharge(teamid: string,
+                                       periodStart: number,
+                                       revision: number):
+  JQueryDeferred<void> {
+    var url = "/api/usage/extra-charge/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + number(periodStart)
+      + "/" + number(revision);
+    return jsonHttpPost(url, "");
+  }
+
+  /***/
 
   export function getSignature(teamid, theirUid)
     : JQueryDeferred<ApiT.EmailSignature>

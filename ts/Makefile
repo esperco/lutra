@@ -74,6 +74,8 @@ TS_SOURCES = \
   CalendarsTab \
   LabelSyncTab \
   ExecutivePreferences \
+  Usage \
+  UsagePeriod \
   Page \
   Route \
   Main

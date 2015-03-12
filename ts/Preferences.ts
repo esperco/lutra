@@ -4,9 +4,11 @@
 
 module Preferences {
 
-  export var transportationTypes = ["Walking", "Bicycle", "Public", "Car", "Zipcar", "Taxi", "Uber", "Lyft"];
+  export var transportationTypes = ["Walking", "Bicycle", "Public", "Car",
+                                    "Zipcar", "Taxi", "Uber", "Lyft"];
 
-  export var meals = ["breakfast", "brunch", "lunch", "coffee", "dinner", "drinks"];
+  export var meals = ["breakfast", "brunch", "lunch", "coffee",
+                      "dinner", "drinks"];
 
   /** Returns an object that contains the preferences for a form that
    *  hasn't been filled out at all.
