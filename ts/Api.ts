@@ -398,7 +398,6 @@ module Api {
 
   /*** Payment Information ***/
 
-  /** Gets the status of a team **/
   export function getSubscriptionStatus(teamid)
     : JQueryDeferred<ApiT.CustomerStatus>
   {
@@ -406,7 +405,7 @@ module Api {
       + "/" + string(teamid);
     return jsonHttpGet(url);
   }
-  /** Gets the long status of a team, including cc info **/
+
   export function getSubscriptionStatusLong(teamid)
     : JQueryDeferred<ApiT.CustomerDetails>
   {
@@ -416,7 +415,6 @@ module Api {
       return jsonHttpGet(url);
   }
 
-  /** Sets the subscription for a team **/
   export function setSubscription(teamid, planid)
   : JQueryDeferred<void>
   {
@@ -426,7 +424,6 @@ module Api {
     return jsonHttpPost(url, "");
   }
 
-  /** Cancels a team's subscriptions **/
   export function cancelSubscription(teamid)
   : JQueryDeferred<void>
   {
@@ -435,9 +432,6 @@ module Api {
     return jsonHttpPost(url, "");
   }
 
-  /** Add a new card to the Stripe account using the one-time token
-    * obtained by the client from Stripe directly. This doesn't change the
-    * customer's default card if there was one already. **/
   export function addNewCard(teamid, cardToken)
   : JQueryDeferred<ApiT.PaymentCard>
   {
@@ -447,7 +441,6 @@ module Api {
     return jsonHttpPost(url, "");
   }
 
-  /** Deletes a credit card **/
   export function deleteCard(teamid, cardid)
   : JQueryDeferred<void>
   {
@@ -457,7 +450,6 @@ module Api {
     return jsonHttpDelete(url);
   }
 
-  /** Sets the default card **/
   export function setDefaultCard(teamid, cardid)
   : JQueryDeferred<void>
   {
