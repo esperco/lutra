@@ -151,7 +151,7 @@ module PreferencesTab {
 
     var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
 
-    var team_members = $(".team-members-textbox").val();
+    var coworkers = $(".coworkers-textbox").val();
     var notes = $(".preferences-notes").val();
 
     return {
@@ -159,7 +159,7 @@ module PreferencesTab {
       transportation: transportation,
       meeting_types: meeting_types,
       general: general,
-      team_members: team_members,
+      coworkers: coworkers,
       notes: notes
     };
   }
@@ -1348,16 +1348,16 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
   <ul #general class="table-list esper-prefs-general">
     <div #generalDivider class="table-divider"/>
   </ul>
-  <div class="table-header">Team Members</div>
+  <div class="table-header">Coworkers</div>
   <div>
-  <div class="preferences-team-members">
-    <textarea #teamMembers
+  <div class="preferences-coworkers">
+    <textarea #coworkers
               rows=5
-              placeholder="Leave notes about team members here"
-              class="team-members-textbox">
+              placeholder="Leave notes about coworkers here"
+              class="coworkers-textbox">
     </textarea>
-    <div class="save-team-members-bar">
-      <button #saveTeamMembers class="button-primary" disabled>Save</button>
+    <div class="save-coworkers-bar">
+      <button #saveCoworkers class="button-primary" disabled>Save</button>
     </div>
   </div>
   <div class="table-header">Notes</div>
@@ -1422,13 +1422,13 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
       //setDividerHeight("general", generalDivider, 1);
 
-      teamMembers.val(initial.team_members);
-      Util.afterTyping(teamMembers, 250, function() {
-        saveTeamMembers.prop("disabled", false);
+      coworkers.val(initial.coworkers);
+      Util.afterTyping(coworkers, 250, function() {
+        saveCoworkers.prop("disabled", false);
       });
-      saveTeamMembers.click(function() {
+      saveCoworkers.click(function() {
         savePreferences();
-        saveTeamMembers.prop("disabled", true);
+        saveCoworkers.prop("disabled", true);
       });
 
       notes.val(initial.notes);
