@@ -574,14 +574,14 @@ module Esper.UserTab {
            style="display:none"/>
     </div>
     <div class="esper-section">
-      <div #teamMembersHeader class="esper-section-header esper-clearfix">
-        <span #showTeamMembers
+      <div #coworkersHeader class="esper-section-header esper-clearfix">
+        <span #showCoworkers
               class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Team Members</span>
+        <span class="esper-bold" style="float:left">Coworkers</span>
       </div>
-      <div #teamMembersContainer class="esper-section-container"
+      <div #coworkersContainer class="esper-section-container"
            style="display:none">
-        <pre #teamMembers class="esper-preferences-notes"/>
+        <pre #coworkers class="esper-preferences-notes"/>
       </div>
     </div>
     <div #calendarsSection class="esper-section" style="display:none">
@@ -664,10 +664,10 @@ module Esper.UserTab {
         displayGeneralPrefs(generalContainer, prefs.general);
         displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
 
-      teamMembers.text(prefs.team_members);
+      coworkers.text(prefs.coworkers);
       notes.text(prefs.notes);
 
-      if (prefs.team_members !== "") showTeamMembers.click();
+      if (prefs.coworkers !== "") showCoworkers.click();
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
@@ -726,14 +726,14 @@ module Esper.UserTab {
       }
     });
 
-    showTeamMembers.click(function() {
-      Sidebar.toggleList(teamMembersContainer);
+    showCoworkers.click(function() {
+      Sidebar.toggleList(coworkersContainer);
       if (this.innerHTML === "Hide") {
         $(this).text("Show");
-        teamMembersHeader.removeClass("esper-open");
+        coworkersHeader.removeClass("esper-open");
       } else {
         $(this).text("Hide");
-        teamMembersHeader.addClass("esper-open");
+        coworkersHeader.addClass("esper-open");
       }
     });
 
