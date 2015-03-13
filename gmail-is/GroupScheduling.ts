@@ -20,14 +20,14 @@ module Esper.GroupScheduling {
     event: ApiT.CalendarEvent;
   }
 
-  var statusListeners = [];
+  var timesListeners = [];
 
-  export function onStatusChanged(listener) {
-    statusListeners.push(listener);
+  export function onTimesChanged(listener) {
+    timesListeners.push(listener);
   }
 
-  function statusChanged() {
-    statusListeners.forEach(function (listener) {
+  function timesChanged() {
+    timesListeners.forEach(function (listener) {
       listener();
     });
   }
@@ -71,6 +71,8 @@ module Esper.GroupScheduling {
         availability : defaultAvailability
       });
     });
+
+    timesChanged();
   }
 
   /** Returns a string representation of a guest that depends on
@@ -87,7 +89,7 @@ module Esper.GroupScheduling {
    *  function in the near future.
    */
   export function removeGuest(guest: ApiT.Guest) {
-    var index  = guests.indexOf(guest);
+    var index = guests.indexOf(guest);
 
     if (index >= 0) {
       guests.slice(index, 1);
@@ -119,7 +121,7 @@ module Esper.GroupScheduling {
         var newAvailability = availability || nextAvailability(status.availability);
         status.availability = newAvailability;
 
-        statusChanged();
+        timesChanged();
       } else {
         Log.d("Could not find the given guest on the given event.", guest, event);
       }

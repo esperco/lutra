@@ -130,7 +130,7 @@ module Esper.GroupTab {
               var availability = guestStatus.availability;
               var pip = $("<li>").addClass(availabilityClass(availability));
 
-              GroupScheduling.onStatusChanged(function () {
+              GroupScheduling.onTimesChanged(function () {
                 pip.removeClass(availabilityClass(availability));
                 availability = guestStatus.availability;
                 pip.addClass(availabilityClass(availability));
