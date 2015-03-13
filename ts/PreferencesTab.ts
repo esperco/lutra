@@ -151,6 +151,7 @@ module PreferencesTab {
 
     var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
 
+    var team_members = $(".team-members-textbox").val();
     var notes = $(".preferences-notes").val();
 
     return {
@@ -158,6 +159,7 @@ module PreferencesTab {
       transportation: transportation,
       meeting_types: meeting_types,
       general: general,
+      team_members: team_members,
       notes: notes
     };
   }
@@ -1346,6 +1348,18 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
   <ul #general class="table-list esper-prefs-general">
     <div #generalDivider class="table-divider"/>
   </ul>
+  <div class="table-header">Team Members</div>
+  <div>
+  <div class="preferences-team-members">
+    <textarea #teamMembers
+              rows=5
+              placeholder="Leave notes about team members here"
+              class="team-members-textbox">
+    </textarea>
+    <div class="save-team-members-bar">
+      <button #saveTeamMembers class="button-primary" disabled>Save</button>
+    </div>
+  </div>
   <div class="table-header">Notes</div>
   <textarea #notes
             rows=5
@@ -1407,6 +1421,15 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
       general.append(viewOfGeneralPrefs(initial.general, team));
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
       //setDividerHeight("general", generalDivider, 1);
+
+      teamMembers.val(initial.team_members);
+      Util.afterTyping(teamMembers, 250, function() {
+        saveTeamMembers.prop("disabled", false);
+      });
+      saveTeamMembers.click(function() {
+        savePreferences();
+        saveTeamMembers.prop("disabled", true);
+      });
 
       notes.val(initial.notes);
       Util.afterTyping(notes, 250, function() {
