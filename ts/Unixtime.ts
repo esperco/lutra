@@ -1,7 +1,10 @@
 module Unixtime {
 
-  export function now() {
-    return (new Date()).getTime() / 1000;
-  };
+  export function ofDate(x: Date) {
+    return x.getTime() / 1000;
+  }
 
+  export function now() {
+    return ofDate(new Date());
+  }
 }
