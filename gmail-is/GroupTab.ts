@@ -100,7 +100,6 @@ module Esper.GroupTab {
 '''
     populate();
     CurrentThread.onLinkedEventsChanged(function () {
-      console.error("Populating!");
       populate();
     });
 
@@ -126,27 +125,46 @@ module Esper.GroupTab {
 '''
             GroupScheduling.addEvent(event.event);
             var status = GroupScheduling.getEventStatus(event.event);
-            status.guests.forEach(function (guestStatus) {
-              var availability = guestStatus.availability;
-              var pip = $("<li>").addClass(availabilityClass(availability));
+            populateGraph();
 
-              GroupScheduling.onTimesChanged(function () {
-                pip.removeClass(availabilityClass(availability));
-                availability = guestStatus.availability;
-                pip.addClass(availabilityClass(availability));
-              });
-
-              pip.click(function () {
-                GroupScheduling.changeAvailability(event.event, guestStatus.guest);
-              });
-
-              statusGraph.append(pip);
+            GroupScheduling.onGuestsChanged(function () {
+              statusGraph.empty();
+              populateGraph();
             });
 
             var widget = EventWidget.base(events, event, false, false,
                                           team, threadId, profiles, statusGraph);
 
             list.append($("<li>").append(widget));
+
+            function populateGraph() {
+              status.guests.forEach(function (guestStatus) {
+                var availability = guestStatus.availability;
+                var pip = $("<li>").addClass(availabilityClass(availability));
+                var label = GroupScheduling.guestLabel(guestStatus.guest);
+
+                pip.tooltip({
+                  show: { delay : 50, effect: "none" },
+                  hide: { effect: "none" },
+                  items: "li",
+                  "content": label,
+                  "position": { my: 'center bottom', at: 'center top-5' },
+                  "tooltipClass": "esper-top esper-tooltip"
+                });
+
+                GroupScheduling.onTimesChanged(function () {
+                  pip.removeClass(availabilityClass(availability));
+                  availability = guestStatus.availability;
+                  pip.addClass(availabilityClass(availability));
+                });
+
+                pip.click(function () {
+                  GroupScheduling.changeAvailability(event.event, guestStatus.guest);
+                });
+
+                statusGraph.append(pip);
+              });
+            }
           });
       });
     }

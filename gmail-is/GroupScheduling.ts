@@ -20,6 +20,18 @@ module Esper.GroupScheduling {
     event: ApiT.CalendarEvent;
   }
 
+  var guestsListeners = [];
+
+  export function onGuestsChanged(listener) {
+    guestsListeners.push(listener);
+  }
+
+  function guestsChanged() {
+    guestsListeners.forEach(function (listener) {
+      listener();
+    });
+  }
+
   var timesListeners = [];
 
   export function onTimesChanged(listener) {
@@ -72,7 +84,7 @@ module Esper.GroupScheduling {
       });
     });
 
-    timesChanged();
+    guestsChanged();
   }
 
   /** Returns a string representation of a guest that depends on
@@ -108,7 +120,7 @@ module Esper.GroupScheduling {
         }
       });
 
-      timesChanged();
+      guestsChanged();
     } else {
       Log.d("Tried to remove a guest that was not in the group:", guest);
     }

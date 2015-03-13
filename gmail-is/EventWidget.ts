@@ -255,6 +255,8 @@ module Esper.EventWidget {
          .click(function() {
            open(ev.event.google_cal_url, "_blank");
          });
+
+    return base(linkedEvents, ev, recent, last, team, threadId, profiles, title);
   }
 
   /** The base event widget with the given payload in the main div. */
