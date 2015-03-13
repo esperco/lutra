@@ -121,8 +121,18 @@ module Esper.GroupTab {
           list.show();
 
           events.forEach(function (event: ApiT.EventWithSyncInfo) {
-            var widget = EventWidget.renderEvent(events, event, false, false,
-                                                 team, threadId, profiles);
+'''
+<ul #statusGraph class="esper-availability-graph"></ul>
+'''
+            GroupScheduling.addEvent(event.event);
+            var status = GroupScheduling.getEventStatus(event.event);
+            status.guests.forEach(function (guestStatus) {
+              var pip = $("<li>").addClass(availabilityClass(guestStatus.availability));
+              statusGraph.append(pip);
+            });
+
+            var widget = EventWidget.base(events, event, false, false,
+                                          team, threadId, profiles, statusGraph);
 
             list.append($("<li>").append(widget));
           });
@@ -157,9 +167,9 @@ module Esper.GroupTab {
 
     return list;
 
-    function addGuestWidget(guest, animate?) {
-      var newWidget = personWidget(guest.name, function () {
-        guest.availability = GroupScheduling.Availability.none;
+    function addGuestWidget(guest: ApiT.Guest, animate?: boolean) {
+      var newWidget = personWidget(GroupScheduling.guestLabel(guest), function () {
+        GroupScheduling.removeGuest(guest);
       });
 
       addGuest.before(newWidget);

@@ -247,13 +247,29 @@ module Esper.EventWidget {
                               ev: ApiT.EventWithSyncInfo,
                               recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
 '''
+<span #title/>
+'''
+    title.text(ev.event.title || "Untitled Event");
+
+    title.addClass("esper-link-black")
+         .click(function() {
+           open(ev.event.google_cal_url, "_blank");
+         });
+  }
+
+  /** The base event widget with the given payload in the main div. */
+  export function base(linkedEvents: ApiT.EventWithSyncInfo[],
+                       ev: ApiT.EventWithSyncInfo,
+                       recent, last, team: ApiT.Team, threadId: string,
+                       profiles: ApiT.Profile[], payload?) {
+'''
 <div #view class="esper-ev">
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
   </div>
   <div>
-    <div class="esper-ev-title"><span #title/></div>
+    <div #main class="esper-ev-title"></div>
     <div #time class="esper-ev-times">
       <span #startTime class="esper-ev-start"/>
       &rarr;
@@ -263,6 +279,8 @@ module Esper.EventWidget {
 </div>
 '''
     var e = ev.event;
+
+    main.append(payload);
 
     if (recent) {
       view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
@@ -279,11 +297,6 @@ module Esper.EventWidget {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    if (e.title !== undefined)
-      title.text(e.title);
-    else
-      title.text("Untitled event");
-
     if (e.google_cal_url !== undefined) {
       date
         .addClass("esper-clickable")
@@ -297,11 +310,7 @@ module Esper.EventWidget {
           "position": { my: 'center bottom', at: 'center top-1' },
           "tooltipClass": "esper-top esper-tooltip"
         });
-      title
-        .addClass("esper-link-black")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
+
     }
 
     if (last)
