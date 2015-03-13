@@ -4,17 +4,24 @@ module Esper.GroupScheduling {
     none, yes, no, maybe
   }
 
-  export interface Guest {
-    name: string;
-    availability: Availability;
+  export interface PossibleTime {
+    guests: ApiT.Guest[];
+    event: ApiT.CalendarEvent;
   }
 
   /** All the guests in the group event. */
-  export var guests: Guest[] = [];
+  export var guests: ApiT.Guest[] = [];
 
   /** Add a guest to be considered. */
-  export function addGuest(guest: Guest) {
+  export function addGuest(guest: ApiT.Guest) {
     guests.push(guest);
+  }
+
+  /** Returns a string representation of a guest that depends on
+   *  whether we have a display name for them.
+   */
+  export function guestLabel(guest: ApiT.Guest): string {
+    return guest.display_name || guest.email;
   }
 
   /** Remove the given guest. Just uses normal JS equality for now,
@@ -23,7 +30,7 @@ module Esper.GroupScheduling {
    *  Chances are this will change to a more intelligent comparison
    *  function in the near future.
    */
-  export function removeGuest(guest: Guest) {
+  export function removeGuest(guest: ApiT.Guest) {
     var index  = guests.indexOf(guest);
 
     if (index >= 0) {

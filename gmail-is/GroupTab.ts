@@ -74,9 +74,9 @@ module Esper.GroupTab {
       });
     });
 
-    var mockGuests = [{ name : "Peter Esper", availability : GroupScheduling.Availability.none },
-                      { name : "Lois Esper",  availability : GroupScheduling.Availability.none },
-                      { name : "Foo Bar",     availability : GroupScheduling.Availability.none }];
+    var mockGuests = [{ display_name : "Peter Esper", email : "peter.tj.esper@gmail.com" },
+                      { display_name : "Lois Esper",  email : "lois.tj.esper@gmail.com" },
+                      { display_name : "Foo Bar",     email : "foo.esper@gmail.com" }];
     mockGuests.forEach(GroupScheduling.addGuest);
 
     guestSection.append(guestList(GroupScheduling.guests, GroupScheduling.addGuest));
@@ -99,7 +99,10 @@ module Esper.GroupTab {
 </div>
 '''
     populate();
-    CurrentThread.onLinkedEventsChanged(populate);
+    CurrentThread.onLinkedEventsChanged(function () {
+      console.error("Populating!");
+      populate();
+    });
 
     return container;
 
@@ -127,8 +130,8 @@ module Esper.GroupTab {
     }
   }
 
-  export function guestList(guests: GroupScheduling.Guest[],
-                             onAddGuest: (guest:GroupScheduling.Guest) => any) {
+  export function guestList(guests: ApiT.Guest[],
+                             onAddGuest: (guest:ApiT.Guest) => any) {
 '''
 <ul #list class="esper-group-people">
   <li #addGuest class="esper-group-add-guests">
@@ -171,8 +174,8 @@ module Esper.GroupTab {
     function addNewGuest() {
       if (nameInput.val() !== "") {
         var newGuest = {
-          name         : nameInput.val(),
-          availability : GroupScheduling.Availability.none
+          display_name : nameInput.val(),
+          email : ""
         };
 
         onAddGuest(newGuest);
