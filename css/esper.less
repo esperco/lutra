@@ -959,20 +959,23 @@ ul.esper-group-people {
 }
 
 ul.esper-availability-graph {
+  position : relative;
+  bottom : 8px;
+
   li {
     display : inline-block;
 
-    margin : 0px 1px;
+    margin : 0px 1px 4px 1px;
 
-    height : 10px;
-    width : 10px;
+    height : 14px;
+    width : 14px;
 
     border-radius : 3px;
 
     &.esper-availability-yes {
       background : @availability_yes;
 
-      height : 13px;
+      height : 17px;
 
       &:hover { background : lighten(@availability_yes, 10%); }
     }
@@ -981,7 +984,7 @@ ul.esper-availability-graph {
       background : @availability_no;
 
       position : relative;
-      height : 13px;
+      height : 17px;
       top : 3px;
 
       &:hover { background : lighten(@availability_no, 7%); }
