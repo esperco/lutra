@@ -1222,34 +1222,46 @@ module PreferencesTab {
   <div #options class="preference-options">
     <ul>
       <li>
-        <input #sendConfirmation type="checkbox"
-               class="esper-prefs-confirmation"/>
-        Send confirmation emails to executive
+        <label class="checkbox esper-preference-check">
+          <input #sendConfirmation type="checkbox"
+                 class="esper-prefs-confirmation"/>
+          Send confirmation emails to executive
+        </label>
       </li>
       <li>
-        <input #sendReminder type="checkbox"
-               class="esper-prefs-reminder"/>
-        Send reminder emails to executive
+        <label class="checkbox esper-preference-check">
+          <input #sendReminder type="checkbox"
+                 class="esper-prefs-reminder"/>
+          Send reminder emails to executive
+        </label>
       </li>
       <li>
-        <input #useDuplicate type="checkbox" checked="checked"
-               class="esper-prefs-duplicate"/>
-        Use duplicate calendar events to invite guests
+        <label class="checkbox esper-preference-check">
+          <input #useDuplicate type="checkbox" checked="checked"
+                 class="esper-prefs-duplicate"/>
+          Use duplicate calendar events to invite guests
+        </label>
       </li>
       <li>
-        <input #bccExec type="checkbox" checked="checked"
-               class="esper-prefs-bcc"/>
-        Bcc exec on first email to guests
+        <label class="checkbox esper-preference-check">
+          <input #bccExec type="checkbox" checked="checked"
+                 class="esper-prefs-bcc"/>
+          Bcc exec on first email to guests
+        </label>
       </li>
       <li>
-        <input #dailyAgenda type="checkbox"
-               class="esper-prefs-agenda"/>
-        Receive daily agenda of events and updates on in progress tasks
+        <label class="checkbox esper-preference-check">
+          <input #dailyAgenda type="checkbox"
+                 class="esper-prefs-agenda"/>
+          Receive daily agenda of events and updates on in progress tasks
+        </label>
       </li>
       <li>
-        <input #holdColor type="checkbox"
-               class="esper-prefs-hold-color"/>
-        Use a different color for HOLD/unconfirmed events
+        <label class="checkbox esper-preference-check">
+          <input #holdColor type="checkbox"
+                 class="esper-prefs-hold-color"/>
+          Use a different color for HOLD/unconfirmed events
+        </label>
         <div #colorPicker/>
       </li>
     </ul>
