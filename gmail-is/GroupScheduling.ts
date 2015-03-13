@@ -89,10 +89,26 @@ module Esper.GroupScheduling {
    *  function in the near future.
    */
   export function removeGuest(guest: ApiT.Guest) {
-    var index = guests.indexOf(guest);
+    var index = List.findIndex(guests, function (guest2) {
+      return guest.email        === guest2.email &&
+             guest.display_name === guest2.display_name;
+    });
 
     if (index >= 0) {
-      guests.slice(index, 1);
+      guests.splice(index, 1);
+
+      times.forEach(function (time) {
+        var index = List.findIndex(time.guests, function (status) {
+          return status.guest.email        === guest.email &&
+                 status.guest.display_name === guest.display_name;
+        });
+
+        if (index >= 0) {
+          time.guests.splice(index, 1);
+        }
+      });
+
+      timesChanged();
     } else {
       Log.d("Tried to remove a guest that was not in the group:", guest);
     }
