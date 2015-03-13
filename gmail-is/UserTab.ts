@@ -666,6 +666,8 @@ module Esper.UserTab {
 
       teamMembers.text(prefs.team_members);
       notes.text(prefs.notes);
+
+      if (prefs.team_members !== "") showTeamMembers.click();
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
@@ -747,8 +749,7 @@ module Esper.UserTab {
     });
 
     showNotes.click();
-    if (aliasContainer.text() !== "")showAlias.click();
-    if (teamMembers.text() !== "") showTeamMembers.click();
+    if (aliasesUsed[0] !== undefined) showAlias.click();
 
     return _view;
   }

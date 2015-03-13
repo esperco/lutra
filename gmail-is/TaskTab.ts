@@ -167,7 +167,7 @@ module Esper.TaskTab {
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
-  <div #noThreads class="esper-no-threads">No linked threads</div>
+  <div #noThreads class="esper-no-threads">No linked emails</div>
   <ul #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
