@@ -46,7 +46,7 @@
 @red_hover: #d2322d;
 
 @availability_yes: #7ED470;
-@availability_maybe: #F7E191;
+@availability_maybe: #E0C208;
 @availability_no: #EA7768;
 @availability_none: #d8d8d8;
 
@@ -925,30 +925,6 @@ ul.esper-group-people {
     border : 1px solid @google_border_gray;
     border-radius : 3px;
 
-    &.esper-availability-none {
-      background : @availability_none;
-
-      &:hover { background : lighten(@availability_none, 4%); }
-    }
-
-    &.esper-availability-yes {
-      background : @availability_yes;
-
-      &:hover { background : lighten(@availability_yes, 10%); }
-    }
-
-    &.esper-availability-no {
-      background : @availability_no;
-
-      &:hover { background : lighten(@availability_no, 7%); }
-    }
-
-    &.esper-availability-maybe {
-      background : @availability_maybe;
-
-      &:hover { background : lighten(@availability_maybe, 6%); }
-    }
-
     .esper-close {
       position : relative;
       display : inline-block;
@@ -978,6 +954,43 @@ ul.esper-group-people {
         bottom : 2px;
         font-size : 125%;
       }
+    }
+  }
+}
+
+ul.esper-availability-graph {
+  li {
+    display : inline-block;
+
+    margin : 0px 1px;
+
+    height : 10px;
+    width : 10px;
+
+    border-radius : 3px;
+
+    &.esper-availability-yes {
+      background : @availability_yes;
+
+      height : 13px;
+
+      &:hover { background : lighten(@availability_yes, 10%); }
+    }
+
+    &.esper-availability-no {
+      background : @availability_no;
+
+      position : relative;
+      height : 13px;
+      top : 3px;
+
+      &:hover { background : lighten(@availability_no, 7%); }
+    }
+
+    &.esper-availability-maybe {
+      background : @availability_maybe;
+
+      &:hover { background : lighten(@availability_maybe, 6%); }
     }
   }
 }

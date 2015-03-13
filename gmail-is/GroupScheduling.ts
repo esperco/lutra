@@ -20,6 +20,18 @@ module Esper.GroupScheduling {
     event: ApiT.CalendarEvent;
   }
 
+  var statusListeners = [];
+
+  export function onStatusChanged(listener) {
+    statusListeners.push(listener);
+  }
+
+  function statusChanged() {
+    statusListeners.forEach(function (listener) {
+      listener();
+    });
+  }
+
   export var times: PossibleTime[] = [];
 
   export function getEventStatus(event: ApiT.CalendarEvent): PossibleTime {
@@ -106,6 +118,8 @@ module Esper.GroupScheduling {
       if (status) {
         var newAvailability = availability || nextAvailability(status.availability);
         status.availability = newAvailability;
+
+        statusChanged();
       } else {
         Log.d("Could not find the given guest on the given event.", guest, event);
       }

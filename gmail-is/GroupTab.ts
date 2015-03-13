@@ -127,7 +127,19 @@ module Esper.GroupTab {
             GroupScheduling.addEvent(event.event);
             var status = GroupScheduling.getEventStatus(event.event);
             status.guests.forEach(function (guestStatus) {
-              var pip = $("<li>").addClass(availabilityClass(guestStatus.availability));
+              var availability = guestStatus.availability;
+              var pip = $("<li>").addClass(availabilityClass(availability));
+
+              GroupScheduling.onStatusChanged(function () {
+                pip.removeClass(availabilityClass(availability));
+                availability = guestStatus.availability;
+                pip.addClass(availabilityClass(availability));
+              });
+
+              pip.click(function () {
+                GroupScheduling.changeAvailability(event.event, guestStatus.guest);
+              });
+
               statusGraph.append(pip);
             });
 
