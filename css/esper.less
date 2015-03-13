@@ -48,8 +48,6 @@
 @availability_yes: #7ED470;
 @availability_maybe: #E0C208;
 @availability_no: #EA7768;
-@availability_none: #d8d8d8;
-
 
 /*** Google (Gmail or Calendar?) ***/
 .dw .nH .nH .no { margin-right: 256px; }
@@ -921,7 +919,7 @@ ul.esper-group-people {
     margin-bottom : 2px;
     padding : 4px;
 
-    background : @availability_none;
+    background : @google_bg_gray;
     border : 1px solid @google_border_gray;
     border-radius : 3px;
 
@@ -948,6 +946,9 @@ ul.esper-group-people {
 
       input {
         width : 85%;
+        margin : 1px;
+
+        border : none;
       }
 
       .esper-close {

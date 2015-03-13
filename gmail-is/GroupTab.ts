@@ -144,7 +144,7 @@ module Esper.GroupTab {
                 var label = GroupScheduling.guestLabel(guestStatus.guest);
 
                 pip.tooltip({
-                  show: { delay : 50, effect: "none" },
+                  show: { effect: "none" },
                   hide: { effect: "none" },
                   items: "li",
                   "content": label,
