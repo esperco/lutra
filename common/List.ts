@@ -90,6 +90,19 @@ module Esper.List {
     return null;
   };
 
+  /** Returns the index of the first element that satisfies the given
+   *  predicated or -1 if no such element is found.
+   */
+  export function findIndex<T>(a: T[], f: (x: T, i?: number) => boolean): number {
+    var len = a.length;
+    for (var i = 0; i < len; i++) {
+      if (f(a[i], i) === true) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   /* return true if at least one element satisfies the given predicate */
   export function exists<T>(a: T[], f: (x: T, i?: number) => boolean): boolean {
     var len = a.length;
