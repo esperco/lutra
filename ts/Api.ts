@@ -482,14 +482,13 @@ module Api {
     return jsonHttpGet(url);
   }
 
-  export function putUsageEdit(teamid: string,
-                               periodStart: number,
-                               tu: ApiT.TaskUsage):
+  export function putUsageEdit(tu: ApiT.TaskUsage):
   JQueryDeferred<ApiT.TaskUsage> {
+    var periodStart = Unixtime.ofRFC3339(tu.start);
     var url = "/api/usage/edit/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(tu.teamid)
       + "/" + number(periodStart);
-    return jsonHttpPut(url, tu);
+    return jsonHttpPut(url, JSON.stringify(tu));
   }
 
   export function getUsageExtraCharge(teamid: string,

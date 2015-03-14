@@ -91,7 +91,7 @@ module Page {
     load: function(teamid, periodStart) {
       pageSelector.hideAll();
       showPage("usage-period");
-      UsagePeriod.load(teamid, periodStart);
+      UsagePeriod.load(teamid, parseInt(periodStart));
       Util.focus();
     }
   }

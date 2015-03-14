@@ -33,8 +33,7 @@ module Usage {
       var endDate = new Date(tu.end);
 
       var url = "#!usage-period/" + teamid
-        + "/" + Unixtime.ofDate(startDate).toString()
-        + "/" + tu.revision.toString();
+        + "/" + Unixtime.ofDate(startDate).toString();
       link.attr("href", url);
 
       start.text(startDate.toString());
