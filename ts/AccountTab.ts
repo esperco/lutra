@@ -462,7 +462,6 @@ module AccountTab {
   }
 
   function showMembershipModal(team) {
-    Log.d("showMembershipModal");
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -881,11 +880,9 @@ module AccountTab {
     var execUid = team.team_executive;
 
     Api.getSubscriptionStatus(teamid)
-      .done(function(x) { Log.d("getSubscriptionStatus.done");
-                          updateStatus(x); });
+      .done(updateStatus);
 
     function updateStatus(customer) {
-      Log.d("updateStatus");
       var mem = customer.status;
       var plan = customer.plan;
 
