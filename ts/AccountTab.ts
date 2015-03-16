@@ -580,139 +580,138 @@ module AccountTab {
         default:
           Log.e("Unknown plan type: ", membershipPlan);
         }
-
-        function readCheckBox() {
-          var checked = noEsper.prop("checked");
-          switch(Plan.nameOfPlan(selectedPlanId)) {
-          case "Basic":
-            if (checked)
-              selectedPlanId = Plan.basicPlus;
-            break;
-          case "Basic Plus":
-            if (!checked)
-              selectedPlanId = Plan.basic;
-            break;
-          case "Standard":
-            if (checked)
-              selectedPlanId = Plan.standardPlus;
-            break;
-          case "Standard Plus":
-            if (!checked)
-              selectedPlanId = Plan.standard;
-            break;
-          case "Enhanced":
-            if (checked)
-              selectedPlanId = Plan.enhancedPlus;
-            break;
-          case "Enhanced Plus":
-            if (!checked)
-              selectedPlanId = Plan.enhanced;
-            break;
-          case "Pro":
-          case "Employee":
-            break;
-          default:
-            Log.e("Unknown plan ID: ", selectedPlanId);
-          }
-        }
-
-        planFree.append(viewOfMembershipOption("Basic"));
-        planLo.append(viewOfMembershipOption("Standard"));
-        planMid.append(viewOfMembershipOption("Enhanced"));
-        planHi.append(viewOfMembershipOption("Pro"));
-        planX.append(viewOfMembershipOption("Employee"));
-
-        function selectMembership(option) {
-          primaryBtn.prop("disabled", false);
-          planFree.removeClass("selected");
-          planLo.removeClass("selected");
-          planMid.removeClass("selected");
-          planHi.removeClass("selected");
-          planX.removeClass("selected");
-          option.addClass("selected");
-          noEsper.removeClass("hide");
-        }
-
-        function selectFree() {
-          selectMembership(planFree);
-          noEsperPrice.text("for $99/mo");
-          if (noEsper.prop("checked")) {
-            selectedPlanId = Plan.basicPlus;
-            isFreeMembership = false;
-          } else {
-            selectedPlanId = Plan.basic;
-            isFreeMembership = true;
-          }
-        }
-        function selectLo() {
-          selectMembership(planLo);
-          noEsperPrice.text("for $99/mo");
-          isFreeMembership = false;
-          selectedPlanId = noEsper.prop("checked") ?
-            Plan.standardPlus : Plan.standard;
-        }
-        function selectMid() {
-          selectMembership(planMid);
-          noEsperPrice.text("for $49/mo");
-          isFreeMembership = false;
-          selectedPlanId = noEsper.prop("checked") ?
-            Plan.enhancedPlus : Plan.enhanced;
-        }
-        function selectHi() {
-          selectMembership(planHi);
-          noEsperPrice.text("- included");
-          isFreeMembership = false;
-          noEsper.addClass("hide");
-          selectedPlanId = Plan.pro;
-        }
-        function selectX() {
-          planX.removeClass("hide");
-          selectMembership(planX);
-          noEsperPrice.text("- not available for this plan");
-          isFreeMembership = true;
-          noEsper.addClass("hide");
-          selectedPlanId = Plan.employee;
-        }
-
-        planFree.click(selectFree);
-        planLo.click(selectLo);
-        planMid.click(selectMid);
-        planHi.click(selectHi);
-        planX.click(selectX);
-
-        primaryBtn.click(function() {
-          $(".next-step-button").prop("disabled", false);
-          (<any> modal).modal("hide"); // FIXME
-          readCheckBox();
-          Log.d("Selected plan ID: " + selectedPlanId);
-          Api.setSubscription(teamid, selectedPlanId)
-            .done(function() {
-              if (!isFreeMembership) {
-                Api.getSubscriptionStatusLong(team.teamid)
-                  .done(function(status){
-                    if (status.cards.length === 0)
-                      showPaymentModal("Add", team, selectedPlanId);
-                  });
-              }
-            });
-        });
-
-        cancelBtn.click(function() {
-          (<any> modal).modal("hide"); // FIXME
-        });
-        if (membershipStatus == "Past-due" ||
-            membershipStatus == "Unpaid" ||
-            membershipStatus == "Canceled")
-        {
-          suspendBtn.hide();
-        } else {
-          suspendBtn.click(function() {
-            showConfirmationModal("suspend", modal, team);
-          });
-        }
-
-        (<any> modal).modal({}); // FIXME
       }
+
+      function readCheckBox() {
+        var checked = noEsper.prop("checked");
+        switch(Plan.nameOfPlan(selectedPlanId)) {
+        case "Basic":
+          if (checked)
+            selectedPlanId = Plan.basicPlus;
+          break;
+        case "Basic Plus":
+          if (!checked)
+            selectedPlanId = Plan.basic;
+          break;
+        case "Standard":
+          if (checked)
+            selectedPlanId = Plan.standardPlus;
+          break;
+        case "Standard Plus":
+          if (!checked)
+            selectedPlanId = Plan.standard;
+          break;
+        case "Enhanced":
+          if (checked)
+            selectedPlanId = Plan.enhancedPlus;
+          break;
+        case "Enhanced Plus":
+          if (!checked)
+            selectedPlanId = Plan.enhanced;
+          break;
+        case "Pro":
+        case "Employee":
+          break;
+        default:
+          Log.e("Unknown plan ID: ", selectedPlanId);
+        }
+      }
+
+      planFree.append(viewOfMembershipOption("Basic"));
+      planLo.append(viewOfMembershipOption("Standard"));
+      planMid.append(viewOfMembershipOption("Enhanced"));
+      planHi.append(viewOfMembershipOption("Pro"));
+      planX.append(viewOfMembershipOption("Employee"));
+
+      function selectMembership(option) {
+        primaryBtn.prop("disabled", false);
+        planFree.removeClass("selected");
+        planLo.removeClass("selected");
+        planMid.removeClass("selected");
+        planHi.removeClass("selected");
+        planX.removeClass("selected");
+        option.addClass("selected");
+        noEsper.removeClass("hide");
+      }
+
+      function selectFree() {
+        selectMembership(planFree);
+        noEsperPrice.text("for $99/mo");
+        if (noEsper.prop("checked")) {
+          selectedPlanId = Plan.basicPlus;
+          isFreeMembership = false;
+        } else {
+          selectedPlanId = Plan.basic;
+          isFreeMembership = true;
+        }
+      }
+      function selectLo() {
+        selectMembership(planLo);
+        noEsperPrice.text("for $99/mo");
+        isFreeMembership = false;
+        selectedPlanId = noEsper.prop("checked") ?
+          Plan.standardPlus : Plan.standard;
+      }
+      function selectMid() {
+        selectMembership(planMid);
+        noEsperPrice.text("for $49/mo");
+        isFreeMembership = false;
+        selectedPlanId = noEsper.prop("checked") ?
+          Plan.enhancedPlus : Plan.enhanced;
+      }
+      function selectHi() {
+        selectMembership(planHi);
+        noEsperPrice.text("- included");
+        isFreeMembership = false;
+        noEsper.addClass("hide");
+        selectedPlanId = Plan.pro;
+      }
+      function selectX() {
+        planX.removeClass("hide");
+        selectMembership(planX);
+        noEsperPrice.text("- not available for this plan");
+        isFreeMembership = true;
+        noEsper.addClass("hide");
+        selectedPlanId = Plan.employee;
+      }
+
+      planFree.click(selectFree);
+      planLo.click(selectLo);
+      planMid.click(selectMid);
+      planHi.click(selectHi);
+      planX.click(selectX);
+
+      primaryBtn.click(function() {
+        $(".next-step-button").prop("disabled", false);
+        (<any> modal).modal("hide"); // FIXME
+        readCheckBox();
+        Log.d("Selected plan ID: " + selectedPlanId);
+        Api.setSubscription(teamid, selectedPlanId)
+          .done(function() {
+            if (!isFreeMembership) {
+              Api.getSubscriptionStatusLong(team.teamid)
+                .done(function(status){
+                  if (status.cards.length === 0)
+                    showPaymentModal("Add", team, selectedPlanId);
+                });
+            }
+          });
+      });
+
+      cancelBtn.click(function() {
+        (<any> modal).modal("hide"); // FIXME
+      });
+      if (membershipStatus == "Past-due" ||
+          membershipStatus == "Unpaid" ||
+          membershipStatus == "Canceled") {
+        suspendBtn.hide();
+      } else {
+        suspendBtn.click(function() {
+          showConfirmationModal("suspend", modal, team);
+        });
+      }
+
+      (<any> modal).modal({}); // FIXME
     }
   }
 
@@ -901,7 +900,7 @@ module AccountTab {
       } else if (mem !== undefined)
         membershipBadge.text(mem.toUpperCase());
 
-      changeMembership.click(function() { showMembershipModal(team) });
+      changeMembership.click(function() { showMembershipModal(team); });
 
       changePayment.click(function() {
         showPaymentModal("Change", team, null)
