@@ -151,6 +151,7 @@ module PreferencesTab {
 
     var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
 
+    var coworkers = $(".coworkers-textbox").val();
     var notes = $(".preferences-notes").val();
 
     return {
@@ -158,6 +159,7 @@ module PreferencesTab {
       transportation: transportation,
       meeting_types: meeting_types,
       general: general,
+      coworkers: coworkers,
       notes: notes
     };
   }
@@ -1346,6 +1348,18 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
   <ul #general class="table-list esper-prefs-general">
     <div #generalDivider class="table-divider"/>
   </ul>
+  <div class="table-header">Coworkers</div>
+  <div>
+  <div class="preferences-coworkers">
+    <textarea #coworkers
+              rows=5
+              placeholder="Leave notes about coworkers here"
+              class="coworkers-textbox">
+    </textarea>
+    <div class="save-coworkers-bar">
+      <button #saveCoworkers class="button-primary" disabled>Save</button>
+    </div>
+  </div>
   <div class="table-header">Notes</div>
   <textarea #notes
             rows=5
@@ -1407,6 +1421,15 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
       general.append(viewOfGeneralPrefs(initial.general, team));
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
       //setDividerHeight("general", generalDivider, 1);
+
+      coworkers.val(initial.coworkers);
+      Util.afterTyping(coworkers, 250, function() {
+        saveCoworkers.prop("disabled", false);
+      });
+      saveCoworkers.click(function() {
+        savePreferences();
+        saveCoworkers.prop("disabled", true);
+      });
 
       notes.val(initial.notes);
       Util.afterTyping(notes, 250, function() {
