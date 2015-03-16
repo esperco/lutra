@@ -196,13 +196,10 @@ module Esper.CalPicker {
       calendarView.fullCalendar("refetchEvents");
     });
 
-    var guests = [];
-    var emailData = esperGmail.get.email_data();
-    if (emailData !== undefined && emailData.people_involved !== undefined) {
-      List.iter(emailData.people_involved, function(pair) {
-        guests.push(pair[0]);
-      });
-    }
+    var guests = CurrentThread.getParticipants().map(function(guest) {
+      // With a fallback if the display name is not set:
+      return guest.display_name || guest.email;
+    });
     guestNames.text(guests.join(", "));
 
     var pv = <PickerView> _view;
