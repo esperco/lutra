@@ -74,10 +74,7 @@ module Esper.GroupTab {
       });
     });
 
-    var mockGuests = [{ display_name : "Peter Esper", email : "peter.tj.esper@gmail.com" },
-                      { display_name : "Lois Esper",  email : "lois.tj.esper@gmail.com" },
-                      { display_name : "Foo Bar",     email : "foo.esper@gmail.com" }];
-    mockGuests.forEach(GroupScheduling.addGuest);
+    CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
 
     guestSection.append(guestList(GroupScheduling.guests, GroupScheduling.addGuest));
     timeSection.append(timeList());
