@@ -113,14 +113,17 @@ module Esper.Gmail {
   }
 
   /** Opens up a reply dialog in the current thread, by clicking the
-   *  reply link. Optionally inserts the given HTML or text into the
-   *  resulting text field.
+   *  forward link. We use the "forward" link instead of the "reply"
+   *  link so that the recipients are not pre-filled incorrectly.
+   *
+   *  Optionally inserts the given HTML or text into the resulting
+   *  text field.
    *
    *  If the reply field is already open, it should be focused and the
    *  given html will be inserted.
    */
   export function replyToThread(html?) {
-    $(".amn").last().find("span").first().click();
+    $(".amn").last().find("span").last().click();
     replyTextField(compositionToolbar().last()).focus();
     
     if (html) insertInFocusedField(html);
@@ -181,7 +184,7 @@ module Esper.Gmail {
 
     // height of the text box ≈ 225
     $("div.Tm").animate({
-      scrollTop : $(".nH.aHU").height() - 225
+      scrollTop : threadContainer().height() - 225
     }, time);
   }
   
@@ -192,7 +195,17 @@ module Esper.Gmail {
     time = time || 500;
 
     $("div.Tm").animate({
-      scrollTop : $(".nH.aHU").height() + 50 // extra padding
+      scrollTop : threadContainer().height() + 50 // extra padding
+    }, time);
+  }
+
+  export function scrollToMeetingOffers(time?: number) {
+    time = time || 500;
+    var calHeight = (window.innerHeight * 0.9) - 198;
+    var extraPadding = 225; // interface above calendar grid
+
+    $("div.Tm").animate({
+      scrollTop : threadContainer().height() - calHeight - extraPadding
     }, time);
   }
 }

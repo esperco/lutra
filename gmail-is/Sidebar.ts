@@ -151,7 +151,13 @@ module Esper.Sidebar {
       setTimeout(afterAnimation, 250);
     }
 
-    Login.myTeams().forEach(function(otherTeam) {
+    var teams = Login.myTeams().slice(0); // make a copy
+    teams.sort(function(t1, t2) {
+      if (t1.team_name > t2.team_name) return 1;
+      else if (t2.team_name > t1.team_name) return -1;
+      else return 0;
+    });
+    teams.forEach(function(otherTeam) {
       displayTeamSelector(teamsSection, team, otherTeam, onTeamSwitch);
     });
 
@@ -257,8 +263,10 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li #tab1 class="esper-active esper-first">Task</li>
-      <li #tab2 class="esper-last">User</li>
+      <li #tab1 class="esper-active esper-first esper-sidebar-task-tab">
+        Task
+      </li>
+      <li #tab2 class="esper-last esper-sidebar-user-tab">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -295,6 +303,14 @@ module Esper.Sidebar {
     rootElement.append(view);
 
     return view;
+  }
+
+  export function selectTaskTab() {
+    $(".esper-sidebar-task-tab").click();
+  }
+
+  export function selectUserTab() {
+    $(".esper-sidebar-user-tab").click();
   }
 
   function displayUpdateDock(rootElement, url) {
@@ -381,6 +397,25 @@ module Esper.Sidebar {
           var subject = emailData.subject;
           Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
           ActiveThreads.handleNewActiveThread(threadId, subject);
+
+          var links = $("div").find("a");
+          var threadLinks = List.filter(links, function(link) {
+            var url = $(link).attr("href");
+            if (typeof url === "string") {
+              return url.substring(0,30) === "http://mail.google.com/mail/u/";
+            } else {
+              return false;
+            }
+          });
+          List.iter(threadLinks, function(link) {
+            var url = $(link).attr("href");
+            var len = url.length;
+            $(link).click(function(e) {
+              e.stopPropagation();
+              window.location.hash = "#all/" + url.substring(len - 16, len);
+              return false;
+            });
+          });
 
           var teams = Login.myTeams();
           Thread.detectTeam(teams, emailData)

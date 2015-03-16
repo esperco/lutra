@@ -31,6 +31,7 @@ module Esper.CalPicker {
     eventLocation : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
+    displayTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : FullCalendar.EventObject };
@@ -40,6 +41,11 @@ module Esper.CalPicker {
     return zoneName === "UTC" ?
       "UTC" : // moment-tz can't handle it
       (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
+  function updateZoneAbbrDisplay() {
+    $(".fc-day-grid").find("td").first()
+      .html("all-day<br/>(" + showZoneAbbr + ")");
   }
 
   function createView(refreshCal, userSidebar,
@@ -67,6 +73,10 @@ module Esper.CalPicker {
         <span class="esper-bold">Created by:</span>
         <select #createdBy class="esper-select"/>
       </div>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Display timezone:</span>
+        <select #displayTz class="esper-select"/>
+      </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
@@ -76,6 +86,7 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
+
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
 
@@ -87,7 +98,7 @@ module Esper.CalPicker {
       if (cal.calendar_default_write)
         writes.push(cal);
     });
-    writeToCalendar = writes === [] ? calendars[0] : writes[0];
+    writeToCalendar = writes[0] || calendars[0];
     showTimezone = writeToCalendar.calendar_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
@@ -159,6 +170,31 @@ module Esper.CalPicker {
         createdByEmail = $(this).val();
       });
     }
+
+    var dispZones = [
+      "America/New_York",
+      "America/Chicago",
+      "America/Denver",
+      "America/Los_Angeles"
+    ];
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      var tz = cal.calendar_timezone;
+      if (tz !== undefined && !List.mem(dispZones, tz))
+        dispZones.push(tz);
+    });
+    List.iter(dispZones, function(tz) {
+      var abbr = zoneAbbr(tz);
+      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
+        .attr("selected", tz === showTimezone)
+        .appendTo(displayTz);
+    });
+    displayTz.change(function() {
+      var tz = $(this).val();
+      showTimezone = tz;
+      showZoneAbbr = zoneAbbr(tz);
+      updateZoneAbbrDisplay();
+      calendarView.fullCalendar("refetchEvents");
+    });
 
     var guests = [];
     var emailData = esperGmail.get.email_data();
@@ -238,6 +274,7 @@ module Esper.CalPicker {
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
   function importEvents(esperEvents : TZCalendarEvent[]) {
+    var team = CurrentThread.team.get();
     return List.map(esperEvents, function(x) {
       var ev = {
         title: x.title, /* required */
@@ -246,6 +283,13 @@ module Esper.CalPicker {
         end: shiftTime(x.end.local, x.calendarTZ, showTimezone), /* req */
         orig: x /* custom field */
       };
+      // Display ghost calendar events in gray
+      var evCal =
+        List.find(team.team_calendars, function(cal : ApiT.Calendar) {
+          return cal.google_cal_id === x.google_cal_id;
+        });
+      if (/ Ghost$/.test(evCal.calendar_title))
+        ev["color"] = "#BCBEC0"; // @gray_30
       return ev;
     });
   }
@@ -390,8 +434,7 @@ module Esper.CalPicker {
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
-      $(".fc-day-grid").find("td").first()
-        .html("all-day<br/>(" + showZoneAbbr + ")");
+      updateZoneAbbrDisplay();
     }
 
     return {
@@ -437,45 +480,54 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev : FullCalendar.EventObject,
-                         eventTitle, eventLocation)
+  function makeEventEdit(ev : FullCalendar.EventObject, eventTitle,
+                         eventLocation, prefs: ApiT.Preferences)
     : ApiT.CalendarEventEdit
   {
-    return {
+    var title = eventTitle.val();
+    var eventEdit : ApiT.CalendarEventEdit = {
       google_cal_id: writeToCalendar.google_cal_id,
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
-      title: eventTitle.val(),
+      title: title,
       location: { title: "", address: eventLocation.val() },
       guests: []
     };
+    var gen = prefs.general;
+    if (gen && gen.hold_event_color && /^HOLD: /.test(title))
+      eventEdit.color_id = gen.hold_event_color.key;
+    return eventEdit;
   }
 
-  export function createModal(team: ApiT.Team, task: ApiT.Task,
-                              threadId: string) : void {
+  export function createInline(team: ApiT.Team, task: ApiT.Task,
+                               threadId: string, prefs: ApiT.Preferences)
+    : void
+  {
 '''
-<div #view class="esper-modal-bg">
-  <div #modal class="esper-calendar-modal">
+<div #view class="esper-centered-container">
+  <div #inline>
     <div class="esper-modal-header">
-      <div #refreshCal title class="esper-calendar-modal-refresh">
+      <div #refreshCal title class="esper-calendar-refresh">
         <object #refreshCalIcon class="esper-svg"/>
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #userSidebar class="esper-calendar-modal-preferences"/>
-    <div #calendar class="esper-calendar-modal-grid"/>
+    <div #calendar class="esper-calendar-grid"/>
     <div class="esper-modal-footer esper-clearfix">
-      <button #save class="esper-btn esper-btn-primary modal-primary">
-        Save
-      </button>
-      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+      <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
+      </button>
+      <button #save class="esper-btn esper-btn-primary">
+        Save
       </button>
     </div>
   </div>
 </div>
 '''
-    function closeModal() { view.remove(); }
+    function closeView() {
+      Sidebar.selectTaskTab();
+      view.remove();
+    }
 
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
@@ -483,7 +535,6 @@ module Esper.CalPicker {
     var userInfo = UserTab.viewOfUserTab(team, Sidebar.profiles);
     var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
-    userSidebar.append(userInfo.view);
 
     refreshCal.tooltip({
       show: { delay: 500, effect: "none" },
@@ -500,15 +551,13 @@ module Esper.CalPicker {
       picker.render();
     };
 
-    view.click(closeModal);
-    Util.preventClickPropagation(modal);
-    cancel.click(closeModal);
+    cancel.click(closeView);
 
     save.click(function() {
       var events = [];
       for (var k in picker.events) {
-        var edit = makeEventEdit(picker.events[k],
-                                 picker.eventTitle, picker.eventLocation);
+        var edit = makeEventEdit(picker.events[k], picker.eventTitle,
+                                 picker.eventLocation, prefs);
         events.push(edit);
       }
 
@@ -522,7 +571,19 @@ module Esper.CalPicker {
         );
       });
 
-      closeModal();
+      // If the task title was never set, update it based on the event
+      var emailSubject = esperGmail.get.email_subject();
+      var taskTitle = task.task_title;
+      var eventTitle = picker.eventTitle.val();
+      if (taskTitle === emailSubject) {
+        var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
+        Api.setTaskTitle(task.taskid, newTaskTitle);
+        task.task_title = newTaskTitle;
+        CurrentThread.task.set(task);
+        $(".esper-task-name").val(newTaskTitle);
+      }
+
+      closeView();
       if (events.length > 0) {
         TaskTab.currentTaskTab.linkedEventsList.children().remove();
         TaskTab.currentTaskTab.linkedEventsSpinner.show();
@@ -544,7 +605,9 @@ module Esper.CalPicker {
       });
     });
 
-    $("body").append(view);
+    Gmail.threadContainer().append(view);
     picker.render();
+    Sidebar.selectUserTab();
+    Gmail.scrollToMeetingOffers();
   }
 }

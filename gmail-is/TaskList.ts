@@ -126,7 +126,7 @@ module Esper.TaskList {
   <div>
     <span #title class="esper-tl-task-title"></span>
     <span #urgent class="esper-tl-urgent"></span>
-    <span #progress class="esper-tl-progress"></span>
+    <select #progress class="esper-tl-progress"/>
     <span #archiveButton
           class="esper-clickable esper-link-danger"
           title="Archive this task">
@@ -149,8 +149,22 @@ module Esper.TaskList {
     if (!task.task_urgent)
       urgent.remove();
 
-    var progressLabel = getProgressLabel(team, task);
-    progress.text(progressLabel);
+    var progressChoices = [
+      { label: team.team_label_new, value: "New" },
+      { label: team.team_label_in_progress, value: "In_progress" },
+      { label: team.team_label_done, value: "Done" },
+      { label: team.team_label_canceled, value: "Canceled" }
+    ];
+    List.iter(progressChoices, function(choice) {
+      $("<option value='" + choice.value + "'>" + choice.label + "</option>")
+        .appendTo(progress);
+    });
+    progress.val(task.task_progress);
+    progress.change(function() {
+      var progressValue = $(this).val();
+      Api.setTaskProgress(task.taskid, progressValue);
+      task.task_progress = progressValue;
+    });
 
     var shared = List.inter(task.task_labels, getUnknownTeamLabels(team));
     List.iter(sortLabels(shared), function(label: string) {

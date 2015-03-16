@@ -2,6 +2,32 @@
  *  creating a duplicate.
  */
 module Esper.InviteControls {
+
+  /* If the exec wants to share his phone number with guests,
+     insert the number into the notes box for the EA.
+  */
+  function appendExecPublicPhone(team, notesBox) {
+    Profile.get(team.team_executive, team.teamid).done(function(prof) {
+      Api.getPreferences(team.teamid).done(function(prefs) {
+        var phoneInfo = prefs.meeting_types.phone_call;
+        if (phoneInfo !== undefined) {
+          var pubMobile = List.find(phoneInfo.phones, function(p) {
+            return p.phone_type === "Mobile" && p.share_with_guests;
+          });
+          if (pubMobile !== null) {
+            var curText = notesBox.val();
+            var execName = prof.display_name.replace(/ .*$/, "");
+            var toAppend = execName + ": " + pubMobile.phone_number;
+            if (curText.length > 0)
+              notesBox.val(curText + "\n\n" + toAppend);
+            else
+              notesBox.val(toAppend);
+          }
+        }
+      });
+    });
+  }
+
   /** Returns a widget for inviting guests to the current event or to
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences.
@@ -91,6 +117,8 @@ module Esper.InviteControls {
       var separatorIndex = event.description.search(/=== Conversation ===/);
       pubNotes.val(event.description.substring(0, separatorIndex).trim());
     }
+    // Include exec's phone number in description if preferences allow it
+    appendExecPublicPhone(team, pubNotes);
     
     if (event.location) {
       var address = event.location.address;
@@ -114,6 +142,7 @@ module Esper.InviteControls {
         publicCalId = id;
       }
     });
+
     pubCalendar.change(function() {
       publicCalId = $(this).val();
     });
@@ -154,6 +183,7 @@ module Esper.InviteControls {
     CurrentThread.withPreferences(function (preferences) {
       var duplicate    = preferences.general.use_duplicate_events;
       var execReminder = preferences.general.send_exec_reminder;
+      var holdColor = preferences.general.hold_event_color;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -178,19 +208,21 @@ module Esper.InviteControls {
         };
         if (!location.address) location = null;
 
-        var eventEdit = {
+        var title = pubTitle.val();
+        var eventEdit : ApiT.CalendarEventEdit = {
           google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
           start         : event.start,
           end           : event.end,
-          title         : pubTitle.val(),
+          title         : title,
           description   : pubNotes.val(),
           location      : location,
           all_day       : event.all_day,
-          guests        : guests,
+          guests        : guests
         };
+        if (holdColor && /^HOLD: /.test(title))
+          eventEdit.color_id = holdColor.key;
 
         var from = fromSelect.val();
-        var title = pubTitle.val();
         location = pubLocation.val();
         var animation = {
           time : 500,
@@ -234,7 +266,7 @@ module Esper.InviteControls {
           }
         }
 
-        var next = reminderWidget(event, team, execReminder, function () {
+        var next = reminderWidget(event, eventEdit, team, execReminder, duplicate, function () {
           slideBack(container, next);
         }, function (reminderSpec) {
           var title = pubTitle.val();
@@ -311,12 +343,20 @@ module Esper.InviteControls {
           var task = CurrentThread.task.get();
           Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
             .done(function(created) {
-              // TODO: figure out why two invites were being sent
-              // Api.sendEventInvites(team.teamid, from, guests, created);
+              Api.sendEventInvites(team.teamid, from, guests, created);
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
-              setReminders(original.google_event_id, created.google_event_id);
+
+              var execIds = {
+                calendarId : original.google_cal_id,
+                eventId    : original.google_event_id
+              };
+              var guestsIds = {
+                calendarId : created.google_cal_id,
+                eventId    : created.google_event_id
+              };
+              setReminders(execIds, guestsIds);
               close();
             });
         } else {
@@ -329,7 +369,12 @@ module Esper.InviteControls {
             TaskTab.refreshlinkedEventsList(team, threadId,
                                             TaskTab.currentTaskTab,
                                             Sidebar.profiles);
-            setReminders(original.google_event_id, original.google_event_id);
+
+            var execIds = {
+              calendarId : original.google_cal_id,
+              eventId    : original.google_event_id
+            };
+            setReminders(execIds, execIds);
             close();
           });
       }
@@ -337,23 +382,23 @@ module Esper.InviteControls {
 
     return container;
 
-    function setReminders(execEventId, guestsEventId) {
+    function setReminders(execIds, guestsIds) {
       if (reminderSpec) {
-        if (reminderSpec.exec) {
+        if (reminderSpec.exec.time) {
           Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
             var reminder = {
               guest_email      : profile.email,
               reminder_message : reminderSpec.exec.text
             };
 
-            Api.enableReminderForGuest(execEventId, profile.email, reminder);
+            Api.enableReminderForGuest(execIds.eventId, profile.email, reminder);
 
-            Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                execEventId, reminderSpec.exec.time);
+            Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                execIds.eventId, reminderSpec.exec.time);
           });
         }
 
-        if (reminderSpec.guests) {
+        if (reminderSpec.guests.time) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
@@ -361,10 +406,10 @@ module Esper.InviteControls {
               reminder_message : reminderSpec.guests.text
             };
 
-            Api.enableReminderForGuest(guestsEventId, guest.email, reminder);
+            Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
 
-            Api.setReminderTime(team.teamid, from, original.google_cal_id,
-                                guestsEventId, reminderSpec.guests.time);
+            Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
+                                guestsIds.eventId, reminderSpec.guests.time);
           }
         }
       }
@@ -374,7 +419,7 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(event, team, execReminder, backFunction, nextFunction) {
+  function reminderWidget(event, eventEdit, team, execReminder, duplicate, backFunction, nextFunction) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -383,7 +428,9 @@ module Esper.InviteControls {
   <div class="esper-ev-modal-content">
     <div class="esper-reminder-options">
       <label>
-        <span class="esper-reminder-label">Executive</span> <input #execTime type="text" value="1"> </input> hours before event
+        <span class="esper-reminder-label">Executive</span>
+        <span #execWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #execTime type="text" value="24"> </input> hours before event
       </label>
       <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
         Enabled
@@ -397,7 +444,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 </textarea>
     <div class="esper-reminder-options">
       <label>
-        <span class="esper-reminder-label">Guests</span> <input #guestsTime type="text" value="1"> </input> hours before event
+        <span class="esper-reminder-label">Guests</span>
+        <span #guestsWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #guestsTime type="text" value="24"> </input> hours before event
       </label>
       <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
         Enabled
@@ -431,7 +480,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     // Fill out static parts of message template (ie exec name and guests):
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
-      var eventTitle = event.title || "a meeting";
+      var eventTitle = (duplicate ? event.title : eventEdit.title) || "a meeting";
+      var guestTitle = eventEdit.title || "a meeting";
       eventTitle = eventTitle.replace(/HOLD: /, "");
 
       execReminderField.val(execReminderField.val()
@@ -439,11 +489,34 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         .replace("|event|", eventTitle));
 
       guestsReminderField.val(guestsReminderField.val()
-        .replace("|event|", eventTitle));
+        .replace("|event|", guestTitle));
     });
 
     back.click(backFunction);
     next.click(function () {
+      var execInvalid   = isNaN(execTime.val() * 1);
+      var guestsInvalid = isNaN(guestsTime.val() * 1);
+
+      // If one of the entries is an invalid number, highlight it and
+      // don't go to the next slide.
+      if (execInvalid || guestsInvalid) {
+        if (execInvalid) {
+          execTime.addClass("esper-danger");
+          execWarning.show();
+        }
+        if (guestsInvalid) {
+          guestsTime.addClass("esper-danger");
+          guestsWarning.show();
+        }
+
+        return;
+      } else {
+        execTime.removeClass("esper-danger");
+        execWarning.hide();
+        guestsTime.removeClass("esper-danger");
+        guestsWarning.hide();
+      }
+
       if (execEnabled || guestsEnabled) {
         nextFunction({
           exec : {
@@ -452,7 +525,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           },
           guests : {
             text : guestsReminderField.val(),
-            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
           }
         });
       } else {

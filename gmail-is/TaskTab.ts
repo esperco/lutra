@@ -7,21 +7,12 @@ module Esper.TaskTab {
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
-  function obtainTaskForThread(teamid, threadId,
-                               view: TaskTabView) {
-    var currentTask = CurrentThread.task.get();
-
-    if (currentTask !== undefined)
-      return Promise.defer(currentTask);
-    else {
-      return Api.obtainTaskForThread(teamid, threadId, false, true)
-        .then(function(task) {
-          CurrentThread.task.set(task);
-          view.taskCaption.text(taskLabelExists);
-          view.taskTitle.text(task.task_title);
-          return task;
-        });
-    }
+  export interface LinkOptionsView {
+    view: JQuery;
+    link: JQuery;
+    spinner: JQuery;
+    linked: JQuery;
+    check: JQuery;
   }
 
   export function linkEvent(e, team, threadId,
@@ -37,334 +28,11 @@ module Esper.TaskTab {
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
             refreshEventLists(team, threadId, taskTab, profiles);
-            obtainTaskForThread(team.teamid, threadId,
-                                taskTab);
+            CurrentThread.refreshTaskForThread();
             Api.syncEvent(team.teamid, threadId,
                           e.google_cal_id, e.google_event_id);
           });
       });
-  }
-
-  export interface LinkOptionsView {
-    view: JQuery;
-    link: JQuery;
-    spinner: JQuery;
-    linked: JQuery;
-    check: JQuery;
-  }
-
-  function displayLinkOptions(e: ApiT.CalendarEvent,
-                              linkedEvents: ApiT.EventWithSyncInfo[],
-                              team,
-                              threadId,
-                              taskTab: TaskTabView,
-                              profiles: ApiT.Profile[]) {
-'''
-<div #view>
-  <div #link class="esper-link-event esper-clickable">Link to this event</div>
-  <div #spinner/>
-  <div #linked class="esper-linked">
-    <object #check class="esper-svg esper-linked-check"/>
-    <span>Linked</span>
-  </div>
-</div>
-'''
-    check.attr("data", Init.esperRootUrl + "img/check.svg");
-
-    var alreadyLinked = linkedEvents.filter(function(ev) {
-      return ev.event.google_event_id === e.google_event_id;
-    })
-
-    if (alreadyLinked.length > 0) {
-      link.hide();
-      linked.show();
-    } else {
-      link.show();
-      linked.hide();
-    }
-
-    link.click(function() {
-      link
-        .removeClass("esper-link-event")
-        .addClass("esper-linked")
-        .text("Linking...");
-      linkEvent(e, team, threadId, taskTab, profiles, _view);
-    });
-
-    return view;
-  }
-
-  /** Displays a shortcut for choosing the event without using the menu. */
-  function displayEventChoose(view, event: ApiT.CalendarEvent) {
-'''
-<div #choose title="Choose this event." class="esper-choose-event">
-  <object #check class="esper-svg esper-linked-check"/>
-</div>
-'''
-    check.attr("data", Init.esperRootUrl + "img/green-check.svg");
-
-    choose.click(function() {
-      var msg = "Other linked events will be deleted. Are you sure?";
-      if (window.confirm(msg)) { // TODO Style me
-        view.parent().find(".esper-ev").addClass("esper-disabled");
-
-        FinalizeEvent.finalizeEvent(event);
-      }
-    });
-
-    return choose;
-  }
-
-  function displayEventOptions(view,
-                               ev: ApiT.EventWithSyncInfo,
-                               linkedEvents: ApiT.EventWithSyncInfo[],
-                               team: ApiT.Team,
-                               threadId: string,
-                               taskTab: TaskTabView,
-                               profiles: ApiT.Profile[]) {
-'''
-<div #optionsView>
-  <div #disclose class="esper-click-safe esper-dropdown-btn
-                   esper-clickable esper-ev-disclose"/>
-  <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
-    <div class="esper-dropdown-section">
-      <li #editEvent
-          class="esper-li esper-disabled">
-        Edit
-      </li>
-      <li #inviteGuests
-          class="esper-li">
-        Invite guests
-      </li>
-      <li #unlinkEvent
-          class="esper-li">
-        Unlink
-      </li>
-      <li #deleteEvent
-          class="esper-li esper-danger">
-        Delete from calendar
-      </li>
-      <li #chooseThisEvent
-          class="esper-li">
-        Choose this event
-      </li>
-    </div>
-    <div class="esper-click-safe esper-drop-ul-divider"/>
-    <div #syncOption class="esper-click-safe esper-dropdown-section">
-      <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
-        <span class="esper-click-safe esper-sync-option-text">
-          Description Sync
-        </span>
-        <object #info title class="esper-svg esper-click-safe esper-info"/>
-        <input #syncCheckbox
-               type="checkbox"
-               class="esper-click-safe esper-sync-checkbox"/>
-        <div #spinner
-             class="esper-click-safe esper-spinner esper-sync-spinner"/>
-      </li>
-      <li #teamSync
-          class="esper-click-safe esper-li esper-disabled esper-sync-users"/>
-      <li #syncNote
-          class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
-    </div>
-  </ul>
-</div>
-'''
-    var e = ev.event;
-
-    if (e.google_cal_url !== undefined) {
-      editEvent
-        .removeClass("esper-disabled")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
-    }
-
-    var infoContent = "Automatically synchronizes the event's " +
-      "description with the contents of this email conversation.";
-    info
-      .attr("data", Init.esperRootUrl + "img/info.svg")
-      .tooltip({
-        show: { effect: "none" },
-        hide: { effect: "none" },
-        "content": infoContent,
-        "position": { my: 'center bottom', at: 'center top-5' },
-        "tooltipClass": "esper-top esper-sync-info"
-      });
-
-    syncCheckbox.change(function() {
-      var apiCall;
-      if(this.checked) apiCall = Api.syncEvent;
-      else apiCall = Api.unsyncEvent;
-      syncCheckbox.hide();
-      spinner.show();
-      apiCall(team.teamid, threadId, e.google_cal_id, e.google_event_id)
-        .done(function() {
-          spinner.hide();
-          syncCheckbox.show();
-          refreshlinkedEventsList(team.teamid, threadId, taskTab, profiles);
-        });
-    });
-
-    var currentSynced = false;
-    var syncedUsers = [];
-
-    List.iter(profiles, function(prof) {
-      var synced = List.exists(ev.synced_threads, function(x) {
-        return x.esper_uid === prof.profile_uid;
-      });
-      if (synced && prof.profile_uid === Login.myUid()) {
-        syncCheckbox.attr("checked", true);
-        currentSynced = true;
-        syncedUsers.unshift("You");
-      } else if (synced) {
-        syncedUsers.push(prof.display_name);
-      }
-    });
-
-    var teamPhrase = "";
-    if ((syncedUsers.length === 0) ||
-        (syncedUsers.length === 1 && syncedUsers[0] === "You")) {
-      teamPhrase = "No other team members are ";
-      syncNote.hide();
-    } else if (syncedUsers.length === 1) {
-      teamPhrase = syncedUsers[0] + " is ";
-    } else if (syncedUsers.length === 2) {
-      teamPhrase = syncedUsers[0] + " and " + syncedUsers[1] + " are ";
-    } else {
-      for (var i = 0; i < syncedUsers.length; i++) {
-        if (i < syncedUsers.length - 1)
-          teamPhrase += syncedUsers[i] + ", ";
-        else
-          teamPhrase += "and " + syncedUsers[i] + " are ";
-      }
-    }
-    teamSync.text(teamPhrase += " syncing messages with this event.");
-
-    var notePhrase = "";
-    if (!currentSynced && syncedUsers.length > 0) {
-      notePhrase = "Turn on Description Sync to also include messages from " +
-        "your version of this email conversation. Duplicate messages will be " +
-        "automatically excluded.";
-    } else if (syncedUsers.length > 1) {
-      notePhrase = "Duplicate messages are automatically excluded.";
-    }
-    syncNote.text(notePhrase);
-
-    disclose.click(function() {
-      if (disclose.hasClass("esper-open")) {
-        Sidebar.dismissDropdowns();
-      } else {
-        Sidebar.dismissDropdowns();
-        dropdown.toggle();
-        disclose.addClass("esper-open");
-      }
-    })
-
-    inviteGuests.click(function() {
-      CurrentThread.withPreferences(function(preferences) {
-        FinalizeEvent.inviteGuests(e, preferences);
-        Gmail.scrollToInviteWidget();
-      });
-    });
-
-    unlinkEvent.click(function() {
-      view.addClass("esper-disabled");
-      Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
-        .done(function() {
-          refreshEventLists(team, threadId, taskTab, profiles);
-        });
-    });
-
-    deleteEvent.click(function() {
-      view.addClass("esper-disabled");
-      Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
-        .done(function() {
-          refreshEventLists(team, threadId, taskTab, profiles);
-        });
-    });
-
-    chooseThisEvent.click(function() {
-      var msg = "Other linked events will be deleted. Are you sure?";
-      if (window.confirm(msg)) { // TODO Style me
-        view.parent().find(".esper-ev").addClass("esper-disabled");
-
-        FinalizeEvent.finalizeEvent(e);
-      }
-    });
-
-    return optionsView;
-  }
-
-  function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
-                       ev, recent, last, team: ApiT.Team,
-                       threadId: string, taskTab: TaskTabView,
-                       profiles: ApiT.Profile[]) {
-'''
-<div #view class="esper-ev">
-  <div #date title class="esper-ev-date">
-    <div #month class="esper-ev-month"/>
-    <div #day class="esper-ev-day"/>
-  </div>
-  <div>
-    <div class="esper-ev-title"><span #title/></div>
-    <div #time class="esper-ev-times">
-      <span #startTime class="esper-ev-start"/>
-      &rarr;
-      <span #endTime class="esper-ev-end"/>
-    </div>
-  </div>
-</div>
-'''
-    var e = ev;
-
-    if (recent) {
-      view.append(displayLinkOptions(ev, linkedEvents, team,
-                                     threadId, taskTab, profiles));
-    } else {
-      e = ev.event;
-      time.prepend(displayEventChoose(view, e));
-      time.prepend(displayEventOptions(view, ev, linkedEvents, team,
-                                       threadId, taskTab, profiles));
-    }
-
-    var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end.local);
-
-    month.text(XDate.month(start).toUpperCase());
-    day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
-
-    if (e.title !== undefined)
-      title.text(e.title);
-    else
-      title.text("Untitled event");
-
-    if (e.google_cal_url !== undefined) {
-      date
-        .addClass("esper-clickable")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        })
-        .tooltip({
-          show: { delay: 500, effect: "none" },
-          hide: { effect: "none" },
-          "content": "Open in Google Calendar",
-          "position": { my: 'center bottom', at: 'center top-1' },
-          "tooltipClass": "esper-top esper-tooltip"
-        });
-      title
-        .addClass("esper-link-black")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
-    }
-
-    if (last)
-      view.addClass("esper-last");
-
-    return view;
   }
 
   function mergeActiveWithCreated(active: Types.Visited<Types.FullEventId>[],
@@ -444,8 +112,8 @@ module Esper.TaskTab {
             if (e === undefined) return; // event is deleted aka cancelled
             if (i === activeEvents.length - 1)
               last = true;
-            eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                          threadId, taskTab, profiles));
+            eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
+                                                      team, threadId, profiles));
             i++;
           });
           taskTab.recentsList.children().remove();
@@ -478,8 +146,8 @@ module Esper.TaskTab {
       linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
         if (i === linkedEvents.length - 1) last = true;
 
-        eventsList.append(renderEvent(linkedEvents, e, recent, last, team,
-                                      threadId, taskTab, profiles));
+        eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
+                                                  team, threadId, profiles));
         i++;
       });
       taskTab.linkedEventsList.append(eventsList);
@@ -547,6 +215,35 @@ module Esper.TaskTab {
     }
   }
 
+  export function displayTaskProgress(task, taskTab: TaskTabView) {
+'''
+  <div #taskProgress class="esper-section-selector esper-clearfix">
+    <span class="esper-show-selector">Progress Label: </span>
+    <select #taskProgressSelector class="esper-select"/>
+  </div>
+'''
+
+    Sidebar.customizeSelectArrow(taskProgressSelector);
+    var statuses = [
+      {label:"New", state:"New"},
+      {label:"In Progress", state:"In_progress"},
+      {label:"Canceled", state:"Canceled"},
+      {label:"Done", state:"Done"}
+    ];
+    List.iter(statuses, function(status) {
+      $("<option value='" + status.state + "'>" + status.label + "</option>")
+        .appendTo(taskProgressSelector);
+    });
+    taskProgressSelector.val(task.task_progress);
+    taskProgressSelector.change(function() {
+      var i = $(this).val();
+      Api.setTaskProgress(task.taskid, i);
+      task.task_progress = i;
+    });
+
+    taskTab.taskProgressContainer.append(taskProgress);
+  }
+
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
     displayLinkedEventsList(team, "", taskTab, [], []);
   }
@@ -584,6 +281,17 @@ module Esper.TaskTab {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayRecentsList(team, threadId, taskTab, profiles, linkedEvents);
+      });
+  }
+
+  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
+    Sidebar.dismissDropdowns();
+    CurrentThread.refreshTaskForThread()
+      .done(function(task) {
+        Api.setTaskTitle(task.taskid, query);
+        task.task_title = query;
+        CurrentThread.task.set(task);
+        taskTitle.val(query);
       });
   }
 
@@ -645,15 +353,7 @@ module Esper.TaskTab {
       rename
         .appendTo(actions)
         .click(function() {
-          obtainTaskForThread(teamid, threadId, taskTab)
-            .done(function(task) {
-              CurrentThread.task.set(task);
-              currentTask = task;
-              Api.setTaskTitle(currentTask.taskid, query);
-              currentTask.task_title = query;
-              taskTitle.val(query);
-              Sidebar.dismissDropdowns();
-            });
+          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query);
         });
 
       function addArchiveOption(task) {
@@ -707,6 +407,14 @@ module Esper.TaskTab {
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
 
+    taskProgressHeader: JQuery;
+    showTaskProgress: JQuery;
+    refreshTaskProgress: JQuery;
+    refreshTaskProgressIcon: JQuery;
+    taskProgressContainer: JQuery;
+    taskProgressSpinner: JQuery;
+    taskProgressList: JQuery;
+
     linkedThreadsHeader: JQuery;
     showLinkedThreads: JQuery;
     refreshLinkedThreads: JQuery;
@@ -757,6 +465,25 @@ module Esper.TaskTab {
     </ul>
   </div>
   <div class="esper-tab-overflow">
+    <div class="esper-section">
+      <div #taskProgressHeader
+           class="esper-section-header esper-clearfix esper-open">
+        <span #showTaskProgress
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Task Progress</span>
+        <div #refreshTaskProgress
+             class="esper-refresh esper-clickable esper-disabled">
+          <object #refreshTaskProgressIcon class="esper-svg"/>
+        </div>
+      </div>
+      <div #taskProgressContainer class="esper-section-container">
+        <div #taskProgressSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
+        </div>
+        <div #taskProgressList/>
+      </div>
+    </div>
+    <hr class="esper-hr"/>
     <div class="esper-section">
       <div #linkedThreadsHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -834,6 +561,23 @@ module Esper.TaskTab {
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
 
+    CurrentThread.task.watch(
+      function (task: ApiT.Task, isValid: boolean,
+                oldTask: ApiT.Task, oldIsValid: boolean) {
+        if (isValid) {
+          taskTabView.taskCaption.text(taskLabelExists);
+          taskTabView.taskTitle.text(task.task_title);
+        } else {
+          taskTabView.taskCaption.text(taskLabelCreate);
+          taskTabView.taskTitle.text("");
+        }
+      }
+    );
+
+    CurrentThread.onLinkedEventsChanged(function () {
+      refreshEventLists(team, threadId, taskTabView, profiles);
+    });
+
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
@@ -859,6 +603,17 @@ module Esper.TaskTab {
       if (recentsContainer.css("display") === "none") {
         Sidebar.toggleList(recentsContainer);
         showRecents.text("Hide");
+      }
+    });
+
+    showTaskProgress.click(function() {
+      Sidebar.toggleList(taskProgressContainer);
+      if(this.innerHTML === "Hide") {
+        $(this).text("Show");
+        taskProgressHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        taskProgressHeader.addClass("esper-open");
       }
     });
 
@@ -899,9 +654,12 @@ module Esper.TaskTab {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
-        CalPicker.createModal(CurrentThread.team.get(),
-                              CurrentThread.task.get(),
-                              CurrentThread.threadId.get());
+        CurrentThread.withPreferences(function(prefs) {
+          CalPicker.createInline(CurrentThread.team.get(),
+                                 CurrentThread.task.get(),
+                                 CurrentThread.threadId.get(),
+                                 prefs);
+        });
       }
     });
 
@@ -913,11 +671,13 @@ module Esper.TaskTab {
       CurrentThread.task.set(task);
       var title = "";
       linkedThreadsSpinner.hide();
+      taskProgressSpinner.hide();
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
+        displayTaskProgress(task, taskTabView);
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
@@ -932,6 +692,17 @@ module Esper.TaskTab {
                                taskSearchActions, team, threadId,
                                query, profiles,
                                taskTabView);
+      });
+      taskTitle.keydown(function(pressed) {
+        var name = taskTitle.val();
+        var isEnterKey = pressed.which === 13;
+        if (isEnterKey) {
+          pressed.stopPropagation();
+          taskTitle.blur();
+          Gmail.threadContainer().focus();
+          createOrRenameTask(taskTitle, team.teamid, threadId,
+                             taskTabView, name);
+        }
       });
     });
 

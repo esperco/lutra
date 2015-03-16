@@ -9,7 +9,7 @@ module Esper.ComposeControls {
   var singleEventTemplate =
     "Hi <b>GUEST</b>," +
     "<br/><br/>" +
-    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Happy to help you and |exec| find a time. " +
     "Would |offer| work for you? " +
     "If not, please let me know some times that would work better for you. " +
     "I can send an invite once we confirm a time." +
@@ -21,7 +21,7 @@ module Esper.ComposeControls {
   var multipleEventTemplate =
     "Hi <b>GUEST</b>," +
     "<br/><br/>" +
-    "Happy to help you and <b>EXECUTIVE</b> find a time. " +
+    "Happy to help you and |exec| find a time. " +
     "Would one of the following times work for you?" +
     "<br/><br/>" +
     "|offer|" +
@@ -56,8 +56,6 @@ module Esper.ComposeControls {
         var team = CurrentThread.team.get();
         var events = CurrentThread.linkedEvents.get();
 
-        composeControls.insertAtCaret("<br />");
-        
         events.filter(function (e) {
           return new Date(e.event.end.local) > new Date(Date.now());
         });
@@ -73,21 +71,10 @@ module Esper.ComposeControls {
                               CurrentThread.eventTimezone(ev)).zoneAbbr();
 
           var br = str != "" ? "<br />" : ""; // no leading newline
-          return str + br + wday + ", " + time + " " + tz +
-            " at <b>LOCATION</b>";
+          return str + br + wday + ", " + time + " " + tz;
         }, "");
 
-        var template =
-          events.length > 1 ?
-          multipleEventTemplate.slice(0) :
-          singleEventTemplate.slice(0); // using slice to copy string
-
-        Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
-          .done(function(prof) {
-            var eaName = prof.display_name;
-            var filledTemplate = template.replace("|offer|", entry);
-            composeControls.insertAtCaret(filledTemplate);
-          });
+        composeControls.insertAtCaret(entry);
       }
     });
 
@@ -122,6 +109,81 @@ module Esper.ComposeControls {
     return insertButton;
   }
 
+  /** Inserts a canned response template into the text box. */
+  function templateButton(composeControls) {
+'''
+<div #templateButton title class="esper-composition-button">
+  <object #templateIcon class="esper-svg esper-composition-button-icon"/>
+  <div #templateBadge class="esper-composition-badge">...</div>
+</div>
+'''
+
+    templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
+
+    templateButton.tooltip({
+      show: { delay: 500, effect: "none" },
+      hide: { effect: "none" },
+      content: "Insert canned response template",
+      "position": { my: 'center bottom', at: 'center top-1' },
+      "tooltipClass": "esper-top esper-tooltip"
+    });
+
+    templateButton.click(function (e) {
+      if (CurrentThread.team.isValid()) {
+        var team = CurrentThread.team.get();
+        var events = CurrentThread.linkedEvents.get();
+
+        events.filter(function (e) {
+          return new Date(e.event.end.local) > new Date(Date.now());
+        });
+
+        var entry = events.reduce(function (str, event) {
+          var ev    = event.event;
+          var start = new Date(ev.start.local);
+          var end   = new Date(ev.end.local);
+          var wday = XDate.fullWeekDay(start);
+          var time = XDate.justStartTime(start);
+          var tz    =
+            (<any> moment).tz(ev.start.local,
+                              CurrentThread.eventTimezone(ev)).zoneAbbr();
+
+          var loc;
+          if (ev.location !== undefined) {
+            loc = ev.location.address;
+            if (ev.location.title !== "")
+              loc = ev.location.title + " - " + loc;
+          } else {
+            loc = "<b>LOCATION</b>";
+          }
+
+          var br = str != "" ? "<br />" : ""; // no leading newline
+          return str + br + wday + ", " + time + " " + tz + " at " + loc;
+        }, "");
+
+        var template =
+          events.length > 1 ?
+          multipleEventTemplate.slice(0) :
+          singleEventTemplate.slice(0); // using slice to copy string
+
+        var execProf = List.find(Sidebar.profiles, function(prof) {
+          return prof.profile_uid === team.team_executive;
+        });
+
+        Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
+          .done(function(prof) {
+            var execName = execProf.display_name.replace(/ .*$/, "");
+            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+            var filledTemplate =
+              template.replace("|offer|", entry)
+                      .replace("|exec|", execName);
+            composeControls.insertAtCaret(filledTemplate);
+          });
+      }
+    });
+
+    return templateButton;
+  }
+
   /** Creates and links a new event to the current task. */
   function createButton(composeControls) {
 '''
@@ -143,9 +205,12 @@ module Esper.ComposeControls {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
-        CalPicker.createModal(CurrentThread.team.get(),
-                              CurrentThread.task.get(),
-                              CurrentThread.threadId.get());
+        CurrentThread.withPreferences(function(prefs) {
+          CalPicker.createInline(CurrentThread.team.get(),
+                                 CurrentThread.task.get(),
+                                 CurrentThread.threadId.get(),
+                                 prefs);
+        });
       }
     });
 
@@ -154,6 +219,7 @@ module Esper.ComposeControls {
 
   export function init() {
     ComposeToolbar.registerControl(insertButton);
+    ComposeToolbar.registerControl(templateButton);
     ComposeToolbar.registerControl(createButton);
   }
 

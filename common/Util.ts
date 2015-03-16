@@ -115,7 +115,7 @@ module Esper.Util {
   */
   export function afterTyping(elt: JQuery, delayMs: number, func) {
     var lastPressed = Date.now(); // date in milliseconds
-    function callback() {
+    function callback(event) {
       var t1 = lastPressed;
       var t2 = Date.now();
       if (lastPressed >= t2)
@@ -124,7 +124,8 @@ module Esper.Util {
         lastPressed = t2;
       var lastPressed0 = lastPressed;
       window.setTimeout(function() {
-        if (lastPressed0 === lastPressed)
+        var isEnterKey = event.which === 13;
+        if (lastPressed0 === lastPressed && !isEnterKey)
           func();
       }, delayMs);
     }
