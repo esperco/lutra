@@ -212,6 +212,7 @@ type token_response = [
     transportation: string[];
     meeting_types: MeetingTypes;
     other: GeneralPrefs;
+    coworkers?: string;
     notes?: string;
   }
 
