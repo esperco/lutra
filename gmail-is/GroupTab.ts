@@ -152,6 +152,8 @@ module Esper.GroupTab {
                   "tooltipClass": "esper-top esper-tooltip"
                 });
 
+                pip.attr("title", label);
+
                 GroupScheduling.onTimesChanged(function () {
                   pip.removeClass(availabilityClass(availability));
                   availability = guestStatus.availability;
