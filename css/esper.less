@@ -968,33 +968,54 @@ ul.esper-availability-graph {
 
     margin : 0px 1px 4px 1px;
 
-    height : 14px;
+    height : 16px;
     width : 14px;
 
     border-radius : 3px;
 
+    &::before {
+      position : relative;
+      left : 2px;
+      color : #666;
+    }
+
     &.esper-availability-yes {
       background : @availability_yes;
 
-      height : 17px;
+      height : 19px;
 
       &:hover { background : lighten(@availability_yes, 10%); }
+
+      &::before {
+        content : "Y";
+        top : 2px;
+      }
     }
 
     &.esper-availability-no {
       background : @availability_no;
 
       position : relative;
-      height : 17px;
-      top : 3px;
+      height : 19px;
+      top : 5px;
 
       &:hover { background : lighten(@availability_no, 7%); }
+
+      &::before {
+        content : "N";
+        top : 2px;
+      }
     }
 
     &.esper-availability-maybe {
       background : @availability_maybe;
 
       &:hover { background : lighten(@availability_maybe, 6%); }
+
+      &::before {
+        content : "?";
+        left : 3px;
+      }
     }
   }
 }
