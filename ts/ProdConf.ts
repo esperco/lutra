@@ -1,4 +1,4 @@
 module Conf {
-  export var prod = false;
+  export var prod = true;
   export var publicStripeKey = "pk_live_ntMF09YuECJYPD6A9c4sfdHG";
 }
