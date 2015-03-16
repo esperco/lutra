@@ -250,10 +250,10 @@ module Signin {
             var landingUrl = document.URL;
             checkGooglePermissions(landingUrl)
               .done(function(ok) {
-                if (optArgs !== undefined)
+                if (Array.isArray(optArgs)) // how it should be.
                   whenDone.apply(this, optArgs);
-                else
-                  whenDone();
+                else // it's a bug but whatever.
+                  whenDone(optArgs);
               });
           }
         });
