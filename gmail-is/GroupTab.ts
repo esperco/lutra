@@ -212,10 +212,7 @@ module Esper.GroupTab {
 
     function addNewGuest() {
       if (nameInput.val() !== "") {
-        var newGuest = {
-          display_name : nameInput.val(),
-          email : ""
-        };
+        var newGuest = GroupScheduling.parseGuest(nameInput.val());
 
         onAddGuest(newGuest);
         addGuestWidget(newGuest, true);

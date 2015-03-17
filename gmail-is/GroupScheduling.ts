@@ -94,6 +94,33 @@ module Esper.GroupScheduling {
     return guest.display_name || guest.email;
   }
 
+  /** Parses a guest from a string. There are three possible formats:
+   *
+   *  "Display Name <email@example.com>"
+   *  "email@example.com" (display_name will be undefined—it's an optional field)
+   *  "Display Name" (email will be "")
+   *
+   *  This function tells the latter two cases apart simply by looking
+   *  for a "@"; if it finds it, it assumes that it's looking at an
+   *  email address.
+   */
+  export function parseGuest(str: string): ApiT.Guest {
+    var full = str.match(/(.*)<[^>]*>/);
+    if (full) return {
+      email        : full[2],
+      display_name : full[1].trim()
+    };
+
+    if (str.indexOf("@") >= 0) return {
+      email : str.trim()
+    };
+
+    return {
+      email        : "",
+      display_name : str.trim()
+    };
+  }
+
   /** Remove the given guest. Just uses normal JS equality for now,
    *  which is based on the object's identity.
    *
