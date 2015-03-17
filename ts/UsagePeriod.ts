@@ -1,6 +1,8 @@
 module UsagePeriod {
   interface MainView {
     view: JQuery;
+    subStatusContainer: JQuery;
+    periodSummary: JQuery;
     taskListContainer: JQuery;
     chargesContainer: JQuery;
     approveSection: JQuery;
@@ -10,6 +12,8 @@ module UsagePeriod {
   export function load(teamid: string, periodStart: number) {
 '''mainView
 <div #view>
+  <div #periodSummary></div>
+  <div #subStatusContainer></div>
   <div #taskListContainer></div>
   <div #chargesContainer></div>
   <div #approveSection class="hide"></div>
@@ -21,6 +25,11 @@ module UsagePeriod {
     root.append(view);
     document.title = "Billing Period - Esper";
 
+    Api.getSubscriptionStatusLong(teamid)
+      .done(function(cusDetails) {
+        updateSubStatusContainer(subStatusContainer, cusDetails);
+      });
+
     Api.getUsageEdit(teamid, periodStart)
       .done(function(tu) {
         renderTaskUsage(mainView, tu);
@@ -28,20 +37,44 @@ module UsagePeriod {
       });
   }
 
+  function updateSubStatusContainer(subStatusContainer: JQuery,
+                                    cusDetails: ApiT.CustomerDetails) {
+    /* note this is the current customer status, not the start plan
+       and end plan applicable to the billing period being reviewed. */
+'''
+<div #view>
+  <div #unfinished></div>
+  <div #noCard></div>
+</div>
+'''
+    subStatusContainer.children().remove();
+
+    if (cusDetails.cards.length === 0) {
+      noCard.text("No payment card on file. Customer needs to enter one.");
+    }
+    subStatusContainer.append(view);
+  }
+
   function updateCharges(mainView: MainView,
                          tu: ApiT.TaskUsage) {
     if (tu.stripe_charge !== undefined) {
       mainView.approveSection.addClass("hide");
       mainView.approvedSection.removeClass("hide");
-      mainView.approvedSection.text("Approved!");
+      mainView.approvedSection.text(
+        "Approved extra charge of "
+          + (tu.charge_amount / 100).toString()
+          + " USD."
+      );
     }
     else {
       mainView.approvedSection.addClass("hide");
-      mainView.approveSection.removeClass("hide");
-      Api.getUsageExtraCharge(tu.teamid,
-                              Unixtime.ofRFC3339(tu.start),
-                              tu.revision)
-        .done(function(xch) {
+      var endDate = new Date(tu.end);
+      if (!Conf.prod || endDate.getTime() < Date.now()) {
+        mainView.approveSection.removeClass("hide");
+        Api.getUsageExtraCharge(tu.teamid,
+                                Unixtime.ofRFC3339(tu.start),
+                                tu.revision)
+          .done(function(xch) {
 '''
 <div #view>
   <div>
@@ -53,19 +86,20 @@ module UsagePeriod {
   </div>
 </div>
 '''
-          amount.text((xch.amount_due / 100).toString());
-          mainView.approveSection.children().remove();
-          mainView.approveSection.append(view);
-          approve.click(function() {
-            var startUnixtime = Unixtime.ofRFC3339(tu.start);
-            Api.postUsageExtraCharge(tu.teamid,
-                                     startUnixtime,
-                                     tu.revision)
-              .done(function() {
-                load(tu.teamid, startUnixtime);
-              });
+            amount.text((xch.amount_due / 100).toString());
+            mainView.approveSection.children().remove();
+            mainView.approveSection.append(view);
+            approve.click(function() {
+              var startUnixtime = Unixtime.ofRFC3339(tu.start);
+              Api.postUsageExtraCharge(tu.teamid,
+                                       startUnixtime,
+                                       tu.revision)
+                .done(function() {
+                  load(tu.teamid, startUnixtime);
+                });
+            });
           });
-        });
+      }
     }
   }
 
@@ -80,9 +114,34 @@ module UsagePeriod {
 
   function renderTaskUsage(mainView: MainView,
                            tu: ApiT.TaskUsage) {
+    renderPeriodSummary(mainView, tu);
     List.iter(tu.tasks, function(stu) {
       renderSingleTaskUsage(mainView.taskListContainer, mainView, tu, stu);
     });
+  }
+
+  function renderPeriodSummary(mainView: MainView,
+                               tu: ApiT.TaskUsage) {
+'''
+<div #view>
+  Billing period
+  <span #start></span>
+  &mdash;
+  <span #end></span>
+  <span #ongoing></span>
+</div>
+'''
+    var startDate = new Date(tu.start);
+    var endDate = new Date(tu.end);
+
+    start.text(startDate.toString());
+    end.text(endDate.toString());
+
+    if (Date.now() < endDate.getTime())
+      ongoing.text("(ongoing period)");
+
+    mainView.periodSummary.children().remove();
+    mainView.periodSummary.append(view);
   }
 
   function renderSingleTaskUsage(container: JQuery,

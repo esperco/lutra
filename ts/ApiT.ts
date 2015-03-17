@@ -425,6 +425,7 @@ type token_response = [
     approval?: Approval;
     frozen: boolean;
     stripe_charge?: string;
+    charge_amount?: number;
     start_planid: string;
     end_planid: string;
     tasks: SingleTaskUsage[];
