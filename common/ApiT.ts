@@ -391,4 +391,25 @@ module Esper.ApiT {
     items: TimeTrack[];
   }
 
+  // Smarter Scheduling
+
+  export enum Status {
+    yes, no, maybe
+  }
+
+  /** The status of a guest at some specific event. */
+  export interface GuestStatus {
+    guest        : Guest;
+    availability : Status;
+  }
+
+  export interface PossibleTime {
+    guests : GuestStatus[];
+    event  : CalendarEvent;
+  }
+
+  export interface GroupEvent {
+    guests : Guest[];
+    times  : PossibleTime[];
+  }
 }

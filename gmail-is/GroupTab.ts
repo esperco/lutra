@@ -250,7 +250,7 @@ module Esper.GroupTab {
     return widget;
   }
 
-  function availabilityClass(availability: GroupScheduling.Availability) {
-    return "esper-availability-" + GroupScheduling.Availability[availability];
+  function availabilityClass(availability: ApiT.Status) {
+    return "esper-availability-" + ApiT.Status[availability];
   }
 }

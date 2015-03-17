@@ -1,24 +1,9 @@
 /** Domain logic for group scheduling. */
 module Esper.GroupScheduling {
-  export enum Availability {
-    yes, no, maybe
-  }
-
-  var defaultAvailability = Availability.yes;
+  var defaultAvailability = ApiT.Status.yes;
 
   /** All the guests in the group event. */
   export var guests: ApiT.Guest[] = [];
-
-  /** The status of a guest at some specific event. */
-  export interface Status {
-    guest: ApiT.Guest;
-    availability: Availability;
-  }
-
-  export interface PossibleTime {
-    guests: Status[];
-    event: ApiT.CalendarEvent;
-  }
 
   var guestsListeners = [];
 
@@ -44,9 +29,9 @@ module Esper.GroupScheduling {
     });
   }
 
-  export var times: PossibleTime[] = [];
+  export var times: ApiT.PossibleTime[] = [];
 
-  export function getEventStatus(event: ApiT.CalendarEvent): PossibleTime {
+  export function getEventStatus(event: ApiT.CalendarEvent): ApiT.PossibleTime {
     return List.find(times, function (time) {
       return time.event.google_event_id == event.google_event_id;
     });
@@ -59,7 +44,7 @@ module Esper.GroupScheduling {
     if (!List.exists(times, function (possible) {
       return possible.event.google_event_id == event.google_event_id;
     })) {
-      var guestStatuses: Status[] = guests.map(function (guest) {
+      var guestStatuses: ApiT.GuestStatus[] = guests.map(function (guest) {
         return {
           guest  : guest,
           availability : defaultAvailability
@@ -162,7 +147,7 @@ module Esper.GroupScheduling {
    */
   export function changeAvailability(event: ApiT.CalendarEvent,
                                      guest: ApiT.Guest,
-                                     availability?: Availability) {
+                                     availability?: ApiT.Status) {
     var time = List.find(times, function (time) {
       return time.event.google_event_id == event.google_event_id;
     });
@@ -188,7 +173,7 @@ module Esper.GroupScheduling {
   /** Cycles through the possible availabilities in "yes", "no",
    * "maybe".
    */
-  export function nextAvailability(current: Availability): Availability {
-    return Availability[current + 1] ? current + 1  : Availability.yes;
+  export function nextAvailability(current: ApiT.Status): ApiT.Status {
+    return ApiT.Status[current + 1] ? current + 1  : ApiT.Status.yes;
   }
 }
