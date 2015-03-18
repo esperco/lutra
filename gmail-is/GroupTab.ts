@@ -45,6 +45,8 @@ module Esper.GroupTab {
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
+    GroupScheduling.initialize();
+
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
@@ -73,8 +75,6 @@ module Esper.GroupTab {
         $(section).find(".esper-section-container").slideToggle("fast");
       });
     });
-
-    CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
 
     guestSection.append(guestList(GroupScheduling.guests, GroupScheduling.addGuest));
     timeSection.append(timeList());
@@ -125,8 +125,11 @@ module Esper.GroupTab {
             populateGraph();
 
             GroupScheduling.onGuestsChanged(function () {
-              statusGraph.empty();
-              populateGraph();
+              // XXX: Timeout used as a hack to fix a loading problem:
+              setTimeout(function () {
+                status = GroupScheduling.getEventStatus(event.event);
+                populateGraph();
+              }, 100);
             });
 
             var widget = EventWidget.base(events, event, false, false,
@@ -135,6 +138,8 @@ module Esper.GroupTab {
             list.append($("<li>").append(widget));
 
             function populateGraph() {
+              statusGraph.empty();
+
               status.guests.forEach(function (guestStatus) {
                 var availability = guestStatus.availability;
                 var pip = $("<li>").addClass(availabilityClass(availability));
@@ -194,10 +199,25 @@ module Esper.GroupTab {
       }
     });
 
+    GroupScheduling.onGuestsChanged(function (added, removed) {
+      removed.forEach(function (removedGuest) {
+        var label = GroupScheduling.guestLabel(removedGuest);
+        $("ul.esper-group-people li").each(function (i, e) {
+          if ($(e).data("esper-group-guest-name") === label) {
+            $(e).slideUp("fast");
+          }
+        });
+      });
+
+      added.forEach(function (newGuest) {
+        addGuestWidget(newGuest, true);
+      });
+    });
+
     return list;
 
     function addGuestWidget(guest: ApiT.Guest, animate?: boolean) {
-      var newWidget = personWidget(GroupScheduling.guestLabel(guest), function () {
+      var newWidget = personWidget(guest, function () {
         GroupScheduling.removeGuest(guest);
       });
 
@@ -214,9 +234,13 @@ module Esper.GroupTab {
       if (nameInput.val() !== "") {
         var newGuest = GroupScheduling.parseGuest(nameInput.val());
 
-        onAddGuest(newGuest);
-        addGuestWidget(newGuest, true);
-        nameInput.val("");
+        if (newGuest) {
+          onAddGuest(newGuest);
+          nameInput.val("");
+          nameInput.removeClass("esper-danger");
+        } else {
+          nameInput.addClass("esper-danger");
+        }
       }
     }
   }
@@ -224,14 +248,17 @@ module Esper.GroupTab {
   /** A list element that contains a person's name and can be delete
    *  from the list with an "x".
    */
-  export function personWidget(name: string, onClose) {
+  export function personWidget(guest: ApiT.Guest, onClose) {
 '''
 <li #widget>
   <span #nameSpan> </span>
   <div #close class="esper-close">x</div>
 </li>
 '''
+    var name = GroupScheduling.guestLabel(guest);
+
     nameSpan.text(name);
+    widget.data("esper-group-guest-name", name);
 
     widget.mousedown(function (e) {
       e.preventDefault()
@@ -240,8 +267,6 @@ module Esper.GroupTab {
 
     close.click(function () {
       onClose(name);
-      widget.slideUp();
-
       return false;
     });
 

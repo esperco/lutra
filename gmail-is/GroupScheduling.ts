@@ -7,13 +7,17 @@ module Esper.GroupScheduling {
 
   var guestsListeners = [];
 
+  /** Listen for changes to the guest list. The listener is passed two
+   *  lists: the first of guests added and the second of guests
+   *  removed.
+   */
   export function onGuestsChanged(listener) {
     guestsListeners.push(listener);
   }
 
-  function guestsChanged() {
+  function guestsChanged(newGuests: ApiT.Guest[], removedGuests: ApiT.Guest[]) {
     guestsListeners.forEach(function (listener) {
-      listener();
+      listener(newGuests, removedGuests);
     });
   }
 
@@ -69,7 +73,51 @@ module Esper.GroupScheduling {
       });
     });
 
-    guestsChanged();
+    guestsChanged([guest], []);
+  }
+
+  /** Populate the guests and times from the server. If the sever has
+   *  no data, prefill the guests with participants from the current
+   *  thread.
+   */
+  export function initialize() {
+    if (CurrentThread.task.isValid()) {
+      var taskid = CurrentThread.task.get().taskid;
+
+      Api.getGroupEvent(taskid).done(function (groupEvent) {
+        if (!groupEvent.guests && !groupEvent.times) {
+          CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
+          updateServer();
+        } else {
+          var oldGuests = guests;
+          guests = groupEvent.guests;
+          guestsChanged(guests, oldGuests);
+
+          groupEvent.times.forEach(function (time) {
+            var existing = List.find(times, function (t) {
+              return t.event.google_event_id == time.event.google_event_id;
+            });
+
+            if (existing) {
+              existing.guests = time.guests || [];
+            } else {
+              times.push(time);
+            }
+          });
+          timesChanged();
+        }
+
+        onTimesChanged(updateServer);
+        onGuestsChanged(updateServer);
+      });
+
+      function updateServer() {
+        return Api.putGroupEvent(taskid, { guests : guests, times : times });
+      }
+    } else {
+      Log.d("Tried to initialize group tab with an invalid current task. Retrying in 300ms.");
+      setTimeout(initialize, 300);
+    }
   }
 
   /** Returns a string representation of a guest that depends on
@@ -90,7 +138,7 @@ module Esper.GroupScheduling {
    *  email address.
    */
   export function parseGuest(str: string): ApiT.Guest {
-    var full = str.match(/(.*)<[^>]*>/);
+    var full = str.match(/(.*)<([^>]*)>/);
     if (full) return {
       email        : full[2],
       display_name : full[1].trim()
@@ -100,10 +148,7 @@ module Esper.GroupScheduling {
       email : str.trim()
     };
 
-    return {
-      email        : "",
-      display_name : str.trim()
-    };
+    return null;
   }
 
   /** Remove the given guest. Just uses normal JS equality for now,
@@ -132,7 +177,7 @@ module Esper.GroupScheduling {
         }
       });
 
-      guestsChanged();
+      guestsChanged([], [guest]);
     } else {
       Log.d("Tried to remove a guest that was not in the group:", guest);
     }
