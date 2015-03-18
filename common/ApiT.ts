@@ -393,14 +393,23 @@ module Esper.ApiT {
 
   // Smarter Scheduling
 
-  export enum Status {
-    yes, no, maybe
+  export class Status {
+    static yes   = "yes";
+    static no    = "no";
+    static maybe = "maybe";
+
+    static next(current) {
+      var availabilities = ["yes", "no", "maybe"];
+      var nextIndex = availabilities.indexOf(current) + 1;
+
+      return availabilities[nextIndex % availabilities.length];
+    }
   }
 
   /** The status of a guest at some specific event. */
   export interface GuestStatus {
     guest        : Guest;
-    availability : Status;
+    availability : string; // "yes", "no" or "maybe"
   }
 
   export interface PossibleTime {

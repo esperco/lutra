@@ -97,6 +97,7 @@ module Esper.GroupTab {
 '''
     populate();
     CurrentThread.onLinkedEventsChanged(function () {
+      console.error("Populating!");
       populate();
     });
 
@@ -275,7 +276,7 @@ module Esper.GroupTab {
     return widget;
   }
 
-  function availabilityClass(availability: ApiT.Status) {
-    return "esper-availability-" + ApiT.Status[availability];
+  function availabilityClass(availability: string) {
+    return "esper-availability-" + availability;
   }
 }

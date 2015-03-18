@@ -565,7 +565,10 @@ module Esper.CalPicker {
           team.teamid,
           ev,
           task.taskid
-        );
+        ).then(function (event) {
+          CurrentThread.linkedEventsChanged();
+          return event;
+        });
       });
 
       // If the task title was never set, update it based on the event

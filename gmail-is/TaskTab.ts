@@ -657,7 +657,6 @@ module Esper.TaskTab {
           CurrentThread.task.isValid() &&
           CurrentThread.team.isValid()) {
         CurrentThread.withPreferences(function(prefs) {
-          CurrentThread.linkedEventsChanged();
           CalPicker.createInline(CurrentThread.team.get(),
                                  CurrentThread.task.get(),
                                  CurrentThread.threadId.get(),

@@ -192,7 +192,7 @@ module Esper.GroupScheduling {
    */
   export function changeAvailability(event: ApiT.CalendarEvent,
                                      guest: ApiT.Guest,
-                                     availability?: ApiT.Status) {
+                                     availability?: string) {
     var time = List.find(times, function (time) {
       return time.event.google_event_id == event.google_event_id;
     });
@@ -203,7 +203,8 @@ module Esper.GroupScheduling {
       });
 
       if (status) {
-        var newAvailability = availability || nextAvailability(status.availability);
+        var newAvailability = availability ||
+                              ApiT.Status.next(status.availability);
         status.availability = newAvailability;
 
         timesChanged();
@@ -213,12 +214,5 @@ module Esper.GroupScheduling {
     } else {
       Log.d("Could not find the event in the group scheduling times list.", event);
     }
-  }
-
-  /** Cycles through the possible availabilities in "yes", "no",
-   * "maybe".
-   */
-  export function nextAvailability(current: ApiT.Status): ApiT.Status {
-    return ApiT.Status[current + 1] ? current + 1  : ApiT.Status.yes;
   }
 }
