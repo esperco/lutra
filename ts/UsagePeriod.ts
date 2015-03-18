@@ -44,14 +44,16 @@ module UsagePeriod {
 '''
 <div #view>
   <div #unfinished></div>
-  <div #noCard></div>
+  <div #noCard class="hide">
+    No payment card on file. Please ask the customer needs to enter one.
+  </div>
 </div>
 '''
     subStatusContainer.children().remove();
 
-    if (cusDetails.cards.length === 0) {
-      noCard.text("No payment card on file. Customer needs to enter one.");
-    }
+    if (cusDetails.cards.length === 0)
+      noCard.removeClass("hide");
+
     subStatusContainer.append(view);
   }
 
