@@ -13,12 +13,19 @@ module Esper.CalSearch {
     endTime: JQuery;
   }
 
+  function zoneAbbr(zoneName) {
+  return zoneName === "UTC" ?
+    "UTC" : // moment-tz can't handle it
+    (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
-                              team, threadId: string, eventsTab,
+                              team: ApiT.Team, threadId: string, eventsTab,
                               profiles: ApiT.Profile[], last) {
     Log.d("renderSearchResult()");
 '''
 <li #view class="esper-ev-result esper-click-safe">
+  <div #weekday class="esper-ev-weekday esper-click-safe"/>
   <div #date title class="esper-ev-date esper-clickable esper-click-safe">
     <div #month class="esper-ev-month esper-click-safe"></div>
     <div #day class="esper-ev-day esper-click-safe"></div>
@@ -35,6 +42,7 @@ module Esper.CalSearch {
       <span #startTime class="esper-ev-start esper-click-safe"></span>
       &rarr;
       <span #endTime class="esper-ev-end esper-click-safe"></span>
+      <span #timezone class="esper-ev-tz esper-click-safe"/>
     </div>
   </div>
 </li>
@@ -45,10 +53,16 @@ module Esper.CalSearch {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
+    weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
+
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    timezone.text(zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined)
       title.text(e.title);

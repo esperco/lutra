@@ -243,6 +243,12 @@ module Esper.EventWidget {
     return optionsView;
   }
 
+  function zoneAbbr(zoneName) {
+    return zoneName === "UTC" ?
+      "UTC" : // moment-tz can't handle it
+      (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
                               recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
@@ -266,6 +272,7 @@ module Esper.EventWidget {
                        profiles: ApiT.Profile[], payload?) {
 '''
 <div #view class="esper-ev">
+  <div #weekday class="esper-ev-weekday"/>
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
@@ -276,6 +283,7 @@ module Esper.EventWidget {
       <span #startTime class="esper-ev-start"/>
       &rarr;
       <span #endTime class="esper-ev-end"/>
+      <span #timezone class="esper-ev-tz"/>
     </div>
   </div>
 </div>
@@ -294,10 +302,21 @@ module Esper.EventWidget {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
+    weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
+
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    timezone.text(zoneAbbr(calendar.calendar_timezone));
+
+    if (e.title !== undefined)
+      title.text(e.title);
+    else
+      title.text("Untitled event");
 
     if (e.google_cal_url !== undefined) {
       date
