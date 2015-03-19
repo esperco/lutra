@@ -115,6 +115,8 @@ module PreferencesTab {
         div.find(".esper-prefs-bcc").is(":checked"),
       exec_daily_agenda:
         div.find(".esper-prefs-agenda").is(":checked"),
+      exec_tasks_update:
+        div.find(".esper-prefs-update").is(":checked"),
       current_timezone:
         div.find(".esper-prefs-timezone").val(),
       hold_event_color: (
@@ -1255,7 +1257,14 @@ module PreferencesTab {
         <label class="checkbox esper-preference-check">
           <input #dailyAgenda type="checkbox"
                  class="esper-prefs-agenda"/>
-          Receive daily agenda of events and updates on in progress tasks
+          Receive daily agenda of events
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
+          <input #tasksUpdate type="checkbox"
+                 class="esper-prefs-update"/>
+          Receive daily updates on completed and in progress tasks
         </label>
       </li>
       <li>
@@ -1282,6 +1291,8 @@ module PreferencesTab {
         bccExec.prop("checked", false);
       if (general.exec_daily_agenda)
         dailyAgenda.prop("checked", true);
+      if (general.exec_tasks_update)
+        tasksUpdate.prop("checked", true);
       if (general.hold_event_color !== undefined)
         holdColor.prop("checked", true);
     }
@@ -1291,6 +1302,7 @@ module PreferencesTab {
     useDuplicate.click(savePreferences);
     bccExec.click(savePreferences);
     dailyAgenda.click(savePreferences);
+    tasksUpdate.click(savePreferences);
 
     var savedColor = general.hold_event_color;
     showEventColorPicker(colorPicker, holdColor, savedColor);

@@ -290,6 +290,7 @@ type token_response = [
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
     exec_daily_agenda: boolean;
+    exec_tasks_update: boolean;
     current_timezone: string;
     hold_event_color?: CalendarEventColor;
   }
