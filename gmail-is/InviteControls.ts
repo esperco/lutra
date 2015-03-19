@@ -158,18 +158,18 @@ module Esper.InviteControls {
     }
 
     var peopleInvolved = {};
-    var emailData = esperGmail.get.email_data();
-    if (emailData !== undefined && emailData.first_email !== undefined) {
-      if (emailData.people_involved.length === 0) {
-        viewPeopleInvolved
-          .append($("<li class='esper-gray'>No guests found</li>"));
-      } else {
-        List.iter(emailData.people_involved, function(pair) {
-          var v = viewPersonInvolved(peopleInvolved, pair[1], pair[0]);
-          viewPeopleInvolved.append(v);
-        });
-      }
+    var participants = CurrentThread.getParticipants();
+    if (participants) {
+      List.iter(participants, function (participant) {
+        var name = participant.display_name || "";
+        var v = viewPersonInvolved(peopleInvolved, participant.email, name);
+        viewPeopleInvolved.append(v);
+      });
+    } else {
+      viewPeopleInvolved
+        .append($("<li class='esper-gray'>No guests found</li>"));
     }
+
     addGuest.click(function() {
       var name = newGuestName.val();
       var email = newGuestEmail.val();

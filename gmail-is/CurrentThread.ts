@@ -37,6 +37,27 @@ module Esper.CurrentThread {
     return threadId.isValid();
   }
 
+  /** Returns a list of all the people involved in the current
+   *  thread. (Includes the exec and assistant if appropriate.)
+   *
+   *  Returns [] if we can't get the thread data for some reason (ie
+   *  gmail js has a problem);
+   */
+  export function getParticipants() : ApiT.Guest[] {
+    var thread = esperGmail.get.email_data();
+
+    if (thread && thread.first_email) {
+      return thread.people_involved.map(function (person) {
+        return {
+          display_name : person[0] || null, // "" treated as no display name
+          email        : person[1]
+        };
+      });
+    } else {
+      return [];
+    }
+  }
+
   /** All the events linked with the current thread. */
   export var linkedEvents = new Esper.Watchable.C<ApiT.EventWithSyncInfo[]>(
     function () { return true }, // should always be valid!
