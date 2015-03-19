@@ -456,6 +456,7 @@ type token_response = [
   }
 
   export interface ExtraCharge {
+    unlimited_usage: boolean;
     amount_due: number; // cents
     description: string;
     statement_descriptor: string;

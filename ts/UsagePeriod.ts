@@ -59,7 +59,7 @@ module UsagePeriod {
 
   function updateCharges(mainView: MainView,
                          tu: ApiT.TaskUsage) {
-    if (tu.stripe_charge !== undefined) {
+    if (tu.charge_amount !== undefined) {
       mainView.approveSection.addClass("hide");
       mainView.approvedSection.removeClass("hide");
       mainView.approvedSection.text(
@@ -77,8 +77,26 @@ module UsagePeriod {
                                 Unixtime.ofRFC3339(tu.start),
                                 tu.revision)
           .done(function(xch) {
+            mainView.approveSection.children().remove();
+            mainView.approveSection.append(renderExtraCharge(tu, xch));
+          });
+      }
+    }
+  }
+
+  function renderExtraCharge(tu: ApiT.TaskUsage,
+                             xch: ApiT.ExtraCharge): JQuery {
+    if (xch.unlimited_usage) {
+'''option1
+<div #view1>
+Unlimited usage. Nothing to approve.
+</div>
 '''
-<div #view>
+      return view1;
+    }
+    else {
+'''option2
+<div #view2>
   <div>
     Extra charges due:
     <span #amount></span> USD
@@ -88,20 +106,17 @@ module UsagePeriod {
   </div>
 </div>
 '''
-            amount.text((xch.amount_due / 100).toString());
-            mainView.approveSection.children().remove();
-            mainView.approveSection.append(view);
-            approve.click(function() {
-              var startUnixtime = Unixtime.ofRFC3339(tu.start);
-              Api.postUsageExtraCharge(tu.teamid,
-                                       startUnixtime,
-                                       tu.revision)
-                .done(function() {
-                  load(tu.teamid, startUnixtime);
-                });
-            });
+      amount.text((xch.amount_due / 100).toString());
+      approve.click(function() {
+        var startUnixtime = Unixtime.ofRFC3339(tu.start);
+        Api.postUsageExtraCharge(tu.teamid,
+                                 startUnixtime,
+                                 tu.revision)
+          .done(function() {
+            load(tu.teamid, startUnixtime);
           });
-      }
+      });
+      return view2;
     }
   }
 
