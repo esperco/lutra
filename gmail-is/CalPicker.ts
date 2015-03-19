@@ -565,10 +565,7 @@ module Esper.CalPicker {
           team.teamid,
           ev,
           task.taskid
-        ).then(function (event) {
-          CurrentThread.linkedEventsChanged();
-          return event;
-        });
+        );
       });
 
       // If the task title was never set, update it based on the event
@@ -590,6 +587,8 @@ module Esper.CalPicker {
       }
       Promise.join(linkCalls).done(function(linkedEvents) {
         if (events.length > 0) TaskTab.refreshLinkedEventsAction();
+
+        CurrentThread.linkedEventsChanged();
 
         // Don't wait for sync
         var syncCalls =
