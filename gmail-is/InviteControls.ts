@@ -347,6 +347,7 @@ module Esper.InviteControls {
               TaskTab.refreshlinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab,
                                               Sidebar.profiles);
+              CurrentThread.linkedEventsChanged();
 
               var execIds = {
                 calendarId : original.google_cal_id,
