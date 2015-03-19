@@ -294,11 +294,6 @@ module Esper.EventWidget {
     });
     timezone.text(zoneAbbr(calendar.calendar_timezone));
 
-    if (e.title !== undefined)
-      title.text(e.title);
-    else
-      title.text("Untitled event");
-
     if (e.google_cal_url !== undefined) {
       date
         .addClass("esper-clickable")
