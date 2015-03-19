@@ -45,6 +45,9 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
+@availability_yes: #7ED470;
+@availability_maybe: #E0C208;
+@availability_no: #EA7768;
 
 /*** Google (Gmail or Calendar?) ***/
 .dw .nH .nH .no { margin-right: 256px; }
@@ -823,8 +826,26 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 .esper-tab-header {
   height: 74px;
   padding: 10px;
-  border-bottom: 1px solid @google_border_gray;
   box-sizing: border-box;
+}
+
+.esper-tab-container {
+  padding : 10px;
+
+  h1 {
+    font-weight : bold;
+    font-size : 10pt;
+    margin : 0 0 4px 0;
+  }
+
+  input {
+    width : 100%;
+  }
+
+  .esper-hide-section {
+    display : inline-block;
+    float : right;
+  }
 }
 
 .esper-tab-overflow {
@@ -848,6 +869,10 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   &.esper-open {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  h1 {
+    float : left;
   }
 }
 
@@ -883,6 +908,130 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-bottom-left-radius: 3px;
 }
 
+
+/** Group Scheduling stuff **/
+ul.esper-group-people {
+  list-style : none;
+  padding : 3px;
+  margin-top : 0;
+
+  input.esper-danger {
+    background-color : @red_disabled;
+  }
+
+  li {
+    margin-bottom : 2px;
+    padding : 4px;
+
+    background : @google_bg_gray;
+    border : 1px solid @google_border_gray;
+    border-radius : 3px;
+
+    .esper-close {
+      position : relative;
+      display : inline-block;
+      float : right;
+
+      cursor : pointer;
+
+      padding : 2px;
+      margin-right : 3px;
+      bottom : 3px;
+
+      color : #666666;
+
+      &:hover, &:active {
+        color : black;
+      }
+    }
+
+    &.esper-group-add-guests {
+      padding : 2px;
+
+      input {
+        width : 85%;
+        margin : 1px;
+
+        border : none;
+      }
+
+      .esper-close {
+        bottom : 2px;
+        font-size : 125%;
+      }
+    }
+  }
+}
+
+ul.esper-availability-graph {
+  position : relative;
+  bottom : 8px;
+
+  li {
+    display : inline-block;
+
+    margin : 0px 1px 4px 1px;
+
+    height : 16px;
+    width : 14px;
+
+    border-radius : 3px;
+
+    &::before {
+      position : relative;
+      left : 2px;
+      color : #666;
+    }
+
+    &.esper-availability-yes {
+      background : @availability_yes;
+
+      height : 19px;
+
+      &:hover { background : lighten(@availability_yes, 10%); }
+
+      &::before {
+        content : "Y";
+        top : 2px;
+      }
+    }
+
+    &.esper-availability-no {
+      background : @availability_no;
+
+      position : relative;
+      height : 19px;
+      top : 5px;
+
+      &:hover { background : lighten(@availability_no, 7%); }
+
+      &::before {
+        content : "N";
+        top : 2px;
+      }
+    }
+
+    &.esper-availability-maybe {
+      background : @availability_maybe;
+
+      &:hover { background : lighten(@availability_maybe, 6%); }
+
+      &::before {
+        content : "?";
+        left : 3px;
+      }
+    }
+  }
+}
+
+.esper-group-options {
+  ul {
+    margin : 0;
+    padding : 4px 10px;
+
+    list-style : none;
+  }
+}
 
 /** Sidebar Task Management **/
 

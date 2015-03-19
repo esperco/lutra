@@ -588,6 +588,8 @@ module Esper.CalPicker {
       Promise.join(linkCalls).done(function(linkedEvents) {
         if (events.length > 0) TaskTab.refreshLinkedEventsAction();
 
+        CurrentThread.linkedEventsChanged();
+
         // Don't wait for sync
         var syncCalls =
           List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
