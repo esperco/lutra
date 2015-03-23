@@ -21,9 +21,9 @@ module Esper.BackgroundEvents {
         var times = [];
 
         for (var i = 0; i < days.length; i++) {
-          var day    = days[i];
-          var moment = startOfWeek.add("days", i);
-          var events = meeting.availability.filter(function (availability) {
+          var day       = days[i];
+          var dayMoment = moment(startOfWeek).add("days", i);
+          var events    = meeting.availability.filter(function (availability) {
             return availability.avail_from.day === day;
           }).map(function (availability) {
             var startHours   = availability.avail_from.hour;
@@ -33,8 +33,12 @@ module Esper.BackgroundEvents {
 
             return {
               title     : eventType,
-              start     : moment.add("hours", startHours).add("minutes", startMinutes).format(),
-              end       : moment.add("hours", endHours).add("minutes", endMinutes).format(),
+              start     : moment(dayMoment).add("hours",   startHours)
+                                           .add("minutes", startMinutes)
+                                           .format(),
+              end       : moment(dayMoment).add("hours",   endHours)
+                                           .add("minutes", endMinutes)
+                                           .format(),
               editable  : false,
               rendering : "background",
               overlap   : true
