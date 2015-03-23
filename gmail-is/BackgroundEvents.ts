@@ -12,28 +12,28 @@ module Esper.BackgroundEvents {
    *  the week). The preferences will be calculated with this
    *  assumption.
    */
-  function meetingTimes(eventType: string, startOfWeek: Moment) {
+  export function meetingTimes(eventType: string, startOfWeek: Moment, callback) {
     var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     CurrentThread.withPreferences(function (preferences) {
-      var meeting = preferences.meeting_types[eventType];
-      if (meeting && meeting.availabile && meeting.availability) {
+      var meeting  = preferences.meeting_types[eventType];
+      if (meeting && meeting.available && meeting.availability) {
         var times = [];
 
         for (var i = 0; i < days.length; i++) {
           var day       = days[i];
-          var dayMoment = moment(startOfWeek).add("days", i);
+          var dayMoment = moment(startOfWeek).add("days", i).startOf('day');
           var events    = meeting.availability.filter(function (availability) {
             return availability.avail_from.day === day;
           }).map(function (availability) {
-            var startHours   = availability.avail_from.hour;
-            var startMinutes = parseInt(availability.avail_from.minutes, 10);
-            var endHours     = availability.avail_to.hour;
-            var endMinutes   = parseInt(availability.avail_to.minutes, 10);
+            var startHours   = availability.avail_from.time.hour;
+            var startMinutes = parseInt(availability.avail_from.time.minutes, 10);
+            var endHours     = availability.avail_to.time.hour;
+            var endMinutes   = parseInt(availability.avail_to.time.minutes, 10);
 
             return {
               title     : eventType,
-              start     : moment(dayMoment).add("hours",   startHours)
+              start     : moment(dayMoment).add("hours", startHours)
                                            .add("minutes", startMinutes)
                                            .format(),
               end       : moment(dayMoment).add("hours",   endHours)
@@ -48,9 +48,9 @@ module Esper.BackgroundEvents {
           times = times.concat(events);
         }
 
-        return times;
+        callback(times);
       } else {
-        return []; // unknown meeting type; no set preferences
+        callback([]); // unknown meeting type; no set preferences
       }
     });
   }
