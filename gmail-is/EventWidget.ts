@@ -243,31 +243,58 @@ module Esper.EventWidget {
     return optionsView;
   }
 
+  function zoneAbbr(zoneName) {
+    return zoneName === "UTC" ?
+      "UTC" : // moment-tz can't handle it
+      (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
-                       ev, recent, last, team: ApiT.Team,
-                       threadId: string, profiles: ApiT.Profile[]) {
+                              ev: ApiT.EventWithSyncInfo,
+                              recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
+'''
+<span #title/>
+'''
+    title.text(ev.event.title || "Untitled Event");
+
+    title.addClass("esper-link-black")
+         .click(function() {
+           open(ev.event.google_cal_url, "_blank");
+         });
+
+    return base(linkedEvents, ev, recent, last, team, threadId, profiles, title);
+  }
+
+  /** The base event widget with the given payload in the main div. */
+  export function base(linkedEvents: ApiT.EventWithSyncInfo[],
+                       ev: ApiT.EventWithSyncInfo,
+                       recent, last, team: ApiT.Team, threadId: string,
+                       profiles: ApiT.Profile[], payload?) {
 '''
 <div #view class="esper-ev">
+  <div #weekday class="esper-ev-weekday"/>
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
   </div>
   <div>
-    <div class="esper-ev-title"><span #title/></div>
+    <div #main class="esper-ev-title"></div>
     <div #time class="esper-ev-times">
       <span #startTime class="esper-ev-start"/>
       &rarr;
       <span #endTime class="esper-ev-end"/>
+      <span #timezone class="esper-ev-tz"/>
     </div>
   </div>
 </div>
 '''
-    var e = ev;
+    var e = ev.event;
+
+    main.append(payload);
 
     if (recent) {
-      view.append(displayLinkOptions(ev, linkedEvents, team, threadId, profiles));
+      view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
     } else {
-      e = ev.event;
       time.prepend(displayEventChoose(view, e));
       time.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
     }
@@ -275,15 +302,16 @@ module Esper.EventWidget {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
+    weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    if (e.title !== undefined)
-      title.text(e.title);
-    else
-      title.text("Untitled event");
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    timezone.text(zoneAbbr(calendar.calendar_timezone));
 
     if (e.google_cal_url !== undefined) {
       date
@@ -298,11 +326,7 @@ module Esper.EventWidget {
           "position": { my: 'center bottom', at: 'center top-1' },
           "tooltipClass": "esper-top esper-tooltip"
         });
-      title
-        .addClass("esper-link-black")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
+
     }
 
     if (last)

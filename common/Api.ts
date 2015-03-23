@@ -492,4 +492,16 @@ module Esper.Api {
       + "/" + duration.toString();
     return JsonHttp.put(url, "");
   }
+
+  // Smarter Scheduling:
+  export function getGroupEvent(taskid: string): JQueryDeferred<ApiT.GroupEvent> {
+    var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
+    return JsonHttp.get(url);
+  }
+
+  export function putGroupEvent(taskid: string, groupEvent: ApiT.GroupEvent):
+  JQueryDeferred<void> {
+    var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
+    return JsonHttp.put(url, JSON.stringify(groupEvent));
+  }
 }

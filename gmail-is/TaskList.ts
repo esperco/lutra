@@ -17,9 +17,16 @@ module Esper.TaskList {
     });
   }
 
-  function renderEvent(e: ApiT.CalendarEvent) {
+  function zoneAbbr(zoneName) {
+  return zoneName === "UTC" ?
+    "UTC" : // moment-tz can't handle it
+    (<any> moment).tz(moment(), zoneName).zoneAbbr();
+  }
+
+  function renderEvent(team: ApiT.Team, e: ApiT.CalendarEvent) {
 '''
 <div #view class="esper-tl-event">
+  <div #weekday class="esper-ev-weekday"/>
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
     <div #day class="esper-ev-day"/>
@@ -30,6 +37,7 @@ module Esper.TaskList {
       <span #startTime class="esper-ev-start"/>
       &rarr;
       <span #endTime class="esper-ev-end"/>
+      <span #timezone class="esper-ev-tz"/>
     </div>
   </div>
 </div>
@@ -37,10 +45,16 @@ module Esper.TaskList {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end.local);
 
+    weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
+
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    timezone.text(zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined)
       title.text(e.title);
@@ -70,10 +84,11 @@ module Esper.TaskList {
     return view;
   }
 
-  function renderEvents(events: ApiT.TaskEvent[],
+  function renderEvents(team: ApiT.Team,
+                        events: ApiT.TaskEvent[],
                         parent: JQuery) {
     List.iter(events, function(event) {
-      renderEvent(event.task_event)
+      renderEvent(team, event.task_event)
         .appendTo(parent);
     });
   }
@@ -177,7 +192,7 @@ module Esper.TaskList {
     });
 
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
-    renderEvents(task.task_events, linkedEventContainer);
+    renderEvents(team, task.task_events, linkedEventContainer);
 
     return view;
   }

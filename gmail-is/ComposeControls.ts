@@ -6,6 +6,14 @@
  */
 module Esper.ComposeControls {
 
+  var endOfTemplate =
+    "Can you also provide the best number to reach you at in case of any " +
+    "last-minute coordination? " +
+    "<b>OR</b> " +
+    "Is <b>xxx-xxx-xxxx</b> the best number to reach you at in case of any " +
+    "last-minute coordination? " +
+    "<b>[Choose 1 sentence]</b>";
+
   var singleEventTemplate =
     "Hi <b>GUEST</b>," +
     "<br/><br/>" +
@@ -14,9 +22,7 @@ module Esper.ComposeControls {
     "If not, please let me know some times that would work better for you. " +
     "I can send an invite once we confirm a time." +
     "<br/><br/>" +
-    "Can you also provide the best number to reach you at in case of any " +
-    "last-minute coordination? " +
-    "<b>[Remove if we have their number.]</b>";
+    endOfTemplate;
 
   var multipleEventTemplate =
     "Hi <b>GUEST</b>," +
@@ -29,9 +35,7 @@ module Esper.ComposeControls {
     "If not, please let me know some times that would work better for you. " +
     "I can send an invite once we confirm a time." +
     "<br/><br/>" +
-    "Can you also provide the best number to reach you at in case of any " +
-    "last-minute coordination? " +
-    "<b>[Remove if we have their number.]</b>";
+    endOfTemplate;
 
   /** Inserts the date of each linked event into the text box. */
   function insertButton(composeControls) {
