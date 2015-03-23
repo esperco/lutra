@@ -5,6 +5,9 @@
 
 module Esper.BackgroundEvents {
 
+  /** The color for suggested times based on meeting preferences. */
+  export var suggestionColor = "#FFA858"; // light orange
+
   /** Returns possible meeting times in the given time range based on
    *  executive preferences for the given tyep of event.
    *
@@ -41,7 +44,8 @@ module Esper.BackgroundEvents {
                                            .format(),
               editable  : false,
               rendering : "background",
-              overlap   : true
+              overlap   : true,
+              color     : suggestionColor
             }
           });
 
