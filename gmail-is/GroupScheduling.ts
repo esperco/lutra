@@ -1,6 +1,6 @@
 /** Domain logic for group scheduling. */
 module Esper.GroupScheduling {
-  var defaultAvailability = ApiT.Status.yes;
+  var defaultAvailability = ApiT.Status.maybe;
 
   /** All the guests in the group event. */
   export var guests: ApiT.Guest[] = [];
