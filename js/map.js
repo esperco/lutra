@@ -2,7 +2,7 @@ google.maps.event.addDomListener(window, 'load', init);
 var map;
 function init() {
   var mapOptions = {
-    center: new google.maps.LatLng(37.454148,-122.162791),
+    center: new google.maps.LatLng(37.4870029,-122.2309239),
     zoom: 11,
     zoomControl: true,
     zoomControlOptions: {
@@ -81,7 +81,7 @@ function init() {
   var map = new google.maps.Map(mapElement, mapOptions);
   marker = new google.maps.Marker({
     icon: '../img/marker.svg',
-    position: new google.maps.LatLng(37.450692, -122.163285),
+    position: new google.maps.LatLng(37.4870029,-122.2309239),
     clickable: false,
     map: map
   });
