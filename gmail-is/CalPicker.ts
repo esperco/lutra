@@ -322,9 +322,13 @@ module Esper.CalPicker {
       });
     Promise.join(cacheFetches).done(function(ll) {
       var esperEvents = List.concat(ll);
-      var fullcalEvents = importEvents(esperEvents);
       refreshCache = false;
-      callback(fullcalEvents);
+      var normalEvents = importEvents(esperEvents);
+      // TODO: Support different meeting types!
+      BackgroundEvents.meetingTimes("lunch", momentStart, function (backgroundEvents) {
+        console.error(normalEvents, backgroundEvents);
+        callback(normalEvents.concat(backgroundEvents));
+      });
     });
   }
 

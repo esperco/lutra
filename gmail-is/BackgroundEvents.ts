@@ -15,7 +15,7 @@ module Esper.BackgroundEvents {
    *  the week). The preferences will be calculated with this
    *  assumption.
    */
-  export function meetingTimes(eventType: string, startOfWeek: Moment, callback) {
+  export function meetingTimes(eventType: string, startOfWeek: Moment, resolve) {
     var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     CurrentThread.withPreferences(function (preferences) {
@@ -35,13 +35,12 @@ module Esper.BackgroundEvents {
             var endMinutes   = parseInt(availability.avail_to.time.minutes, 10);
 
             return {
-              title     : eventType,
               start     : moment(dayMoment).add("hours", startHours)
-                                           .add("minutes", startMinutes)
-                                           .format(),
+                .add("minutes", startMinutes)
+                .format(),
               end       : moment(dayMoment).add("hours",   endHours)
-                                           .add("minutes", endMinutes)
-                                           .format(),
+                .add("minutes", endMinutes)
+                .format(),
               editable  : false,
               rendering : "background",
               overlap   : true,
@@ -52,9 +51,9 @@ module Esper.BackgroundEvents {
           times = times.concat(events);
         }
 
-        callback(times);
+        resolve(times);
       } else {
-        callback([]); // unknown meeting type; no set preferences
+        resolve([]); // unknown meeting type; no set preferences
       }
     });
   }
