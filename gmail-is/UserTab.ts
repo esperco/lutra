@@ -565,7 +565,7 @@ module Esper.UserTab {
            class="esper-section-header esper-open esper-clearfix">
         <span #showGeneral
               class="esper-link" style="float:right">Show More</span>
-        <span class="esper-bold" style="float:left">General Preferences</span>
+        <span class="esper-bold" style="float:left">General</span>
       </div>
       <div #generalContainer
            class="esper-section-container esper-preferences-general"/>
@@ -573,7 +573,7 @@ module Esper.UserTab {
            class="esper-section-container esper-preferences-general"
            style="display:none"/>
     </div>
-    <div class="esper-section">
+    <div #coworkerSection class="esper-section">
       <div #coworkersHeader class="esper-section-header esper-clearfix">
         <span #showCoworkers
               class="esper-link" style="float:right">Show</span>
@@ -664,10 +664,13 @@ module Esper.UserTab {
         displayGeneralPrefs(generalContainer, prefs.general);
         displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
 
-      coworkers.text(prefs.coworkers);
-      notes.text(prefs.notes);
+      if (prefs.coworkers !== "") {
+        coworkers.text(prefs.coworkers);
+      } else {
+        coworkerSection.hide()
+      }
 
-      if (prefs.coworkers !== "") showCoworkers.click();
+      notes.text(prefs.notes);
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
@@ -749,6 +752,7 @@ module Esper.UserTab {
     });
 
     showNotes.click();
+    showCoworkers.click();
     if (aliasesUsed[0] !== undefined) showAlias.click();
 
     return _view;
