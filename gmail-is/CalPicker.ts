@@ -48,6 +48,27 @@ module Esper.CalPicker {
       .html("all-day<br/>(" + showZoneAbbr + ")");
   }
 
+  /** A set of 9 (!) buttons to choose the meeting type. */
+  function meetingTypeMenu() {
+'''
+<div #container class="fc-button-group">
+</div>
+'''
+    var types = ["phone", "video", "breakfast", "brunch", "lunch",
+                 "coffee", "dinner", "drinks", "other"];
+    types.forEach(function (type) {
+'''
+<button #button class="fc-button"></button>
+'''
+      button.text(type);
+      container.append(button);
+    });
+    container.children().first().addClass("fc-corner-left");
+    container.children().last().addClass("fc-corner-right");
+
+    return container;
+  }
+
   function createView(refreshCal, userSidebar,
                       team: ApiT.Team) : PickerView {
 '''
@@ -204,6 +225,7 @@ module Esper.CalPicker {
 
     var pv = <PickerView> _view;
     pv.events = {};
+
     return pv;
   }
 
@@ -431,6 +453,9 @@ module Esper.CalPicker {
   function createPicker(refreshCal, userSidebar, team: ApiT.Team) : Picker {
     var pickerView = createView(refreshCal, userSidebar, team);
     setupCalendar(team, pickerView);
+                            
+    // add the meeting type menu:
+    pickerView.view.find(".fc-left").append(meetingTypeMenu());
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
