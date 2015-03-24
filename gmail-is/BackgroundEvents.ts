@@ -41,6 +41,7 @@ module Esper.BackgroundEvents {
               end       : moment(dayMoment).add("hours",   endHours)
                 .add("minutes", endMinutes)
                 .format(),
+              title     : eventType,
               editable  : false,
               rendering : "background",
               overlap   : true,
