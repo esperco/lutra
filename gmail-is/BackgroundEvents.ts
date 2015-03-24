@@ -15,19 +15,18 @@ module Esper.BackgroundEvents {
    *  the week). The preferences will be calculated with this
    *  assumption.
    */
-  export function meetingTimes(eventType: string, startOfWeek: Moment, resolve) {
-    var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  export function meetingTimes(eventType: string, start: Moment, end: Moment, resolve) {
+    var start = start.startOf('day');
+    var end   = end.startOf('day');
 
     CurrentThread.withPreferences(function (preferences) {
       var meeting  = preferences.meeting_types[eventType];
       if (meeting && meeting.available && meeting.availability) {
         var times = [];
 
-        for (var i = 0; i < days.length; i++) {
-          var day       = days[i];
-          var dayMoment = moment(startOfWeek).add("days", i).startOf('day');
-          var events    = meeting.availability.filter(function (availability) {
-            return availability.avail_from.day === day;
+        for (var day = moment(start); day.isBefore(end); day.add("days", 1)) {
+          var events = meeting.availability.filter(function (availability) {
+            return availability.avail_from.day === day.format("ddd");
           }).map(function (availability) {
             var startHours   = availability.avail_from.time.hour;
             var startMinutes = parseInt(availability.avail_from.time.minutes, 10);
@@ -35,10 +34,10 @@ module Esper.BackgroundEvents {
             var endMinutes   = parseInt(availability.avail_to.time.minutes, 10);
 
             return {
-              start     : moment(dayMoment).add("hours", startHours)
+              start     : moment(day).add("hours", startHours)
                 .add("minutes", startMinutes)
                 .format(),
-              end       : moment(dayMoment).add("hours",   endHours)
+              end       : moment(day).add("hours",   endHours)
                 .add("minutes", endMinutes)
                 .format(),
               title     : eventType,
