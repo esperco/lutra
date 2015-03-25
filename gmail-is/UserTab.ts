@@ -541,6 +541,18 @@ module Esper.UserTab {
     container.append(view);
   }
 
+  function displayTeamLabel(container : JQuery,
+                             teamLabel : string) {
+'''
+<div #view>
+  <span #label>
+</div>
+'''
+
+    label.text(teamLabel)
+    container.append(view)
+  }
+
   export function viewOfUserTab(team: ApiT.Team,
                                 profiles: ApiT.Profile[]) {
 '''
@@ -572,6 +584,17 @@ module Esper.UserTab {
       <div #generalDetailedContainer
            class="esper-section-container esper-preferences-general"
            style="display:none"/>
+    </div>
+    <div #teamLabelsSection class="esper-section">
+      <div #teamLabelsHeader class="esper-section-header esper-clearfix">
+        <span #showTeamLabels
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Labels</span>
+      </div>
+      <div #teamLabelsContainer class="esper-section-container
+           esper-preferences-general"
+           style="display:none">
+      </div>
     </div>
     <div #coworkerSection class="esper-section">
       <div #coworkersHeader class="esper-section-header esper-clearfix">
@@ -640,6 +663,10 @@ module Esper.UserTab {
       else return null;
     });
     displayAssistantAlias(aliasContainer, aliasesUsed[0]);
+
+    team.team_labels.forEach(function(label) {
+      displayTeamLabel(teamLabelsContainer, label);
+    })
 
     Api.getPreferences(team.teamid).done(function(prefs) {
       preferencesSpinner.hide();
@@ -729,6 +756,17 @@ module Esper.UserTab {
       }
     });
 
+    showTeamLabels.click(function() {
+      Sidebar.toggleList(teamLabelsContainer);
+      if (this.innerHTML === "Hide") {
+        $(this).text("Show");
+        teamLabelsHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        teamLabelsHeader.addClass("esper-open");
+      }
+    });
+
     showCoworkers.click(function() {
       Sidebar.toggleList(coworkersContainer);
       if (this.innerHTML === "Hide") {
@@ -754,6 +792,7 @@ module Esper.UserTab {
     showNotes.click();
     showCoworkers.click();
     if (aliasesUsed[0] !== undefined) showAlias.click();
+    if (team.team_labels.length > 0) showTeamLabels.click();
 
     return _view;
   }
