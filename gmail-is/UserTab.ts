@@ -704,7 +704,7 @@ module Esper.UserTab {
 
     showAlias.click(function() {
       Sidebar.toggleList(aliasContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         aliasHeader.removeClass("esper-open");
       } else {
@@ -715,7 +715,7 @@ module Esper.UserTab {
 
     showCalendars.click(function() {
       Sidebar.toggleList(calendarsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         calendarsHeader.removeClass("esper-open");
       } else {
@@ -726,7 +726,7 @@ module Esper.UserTab {
 
     showMeetings.click(function() {
       Sidebar.toggleList(meetingsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         meetingsHeader.removeClass("esper-open");
       } else {
@@ -737,7 +737,7 @@ module Esper.UserTab {
 
     showTransportation.click(function() {
       Sidebar.toggleList(transportationContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         transportationHeader.removeClass("esper-open");
       } else {
@@ -749,7 +749,7 @@ module Esper.UserTab {
     showGeneral.click(function() {
       Sidebar.toggleList(generalContainer);
       Sidebar.toggleList(generalDetailedContainer);
-      if (this.innerHTML === "Show Less") {
+      if ($(this).text() === "Show Less") {
         $(this).text("Show More");
       } else {
         $(this).text("Show Less");
@@ -758,7 +758,7 @@ module Esper.UserTab {
 
     showTeamLabels.click(function() {
       Sidebar.toggleList(teamLabelsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         teamLabelsHeader.removeClass("esper-open");
       } else {
@@ -769,7 +769,7 @@ module Esper.UserTab {
 
     showCoworkers.click(function() {
       Sidebar.toggleList(coworkersContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         coworkersHeader.removeClass("esper-open");
       } else {
@@ -780,7 +780,7 @@ module Esper.UserTab {
 
     showNotes.click(function() {
       Sidebar.toggleList(notesContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         notesHeader.removeClass("esper-open");
       } else {
