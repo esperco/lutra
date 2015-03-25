@@ -85,7 +85,7 @@ module Esper.GroupScheduling {
       var taskid = CurrentThread.task.get().taskid;
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
-        if (!groupEvent.guests && !groupEvent.times) {
+        if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
           CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
           updateServer();
         } else {
