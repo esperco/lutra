@@ -610,7 +610,7 @@ module Esper.TaskTab {
 
     showTaskProgress.click(function() {
       Sidebar.toggleList(taskProgressContainer);
-      if(this.innerHTML === "Hide") {
+      if($(this).text() === "Hide") {
         $(this).text("Show");
         taskProgressHeader.removeClass("esper-open");
       } else {
@@ -621,7 +621,7 @@ module Esper.TaskTab {
 
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         linkedThreadsHeader.removeClass("esper-open");
       } else {
@@ -632,7 +632,7 @@ module Esper.TaskTab {
 
     showLinkedEvents.click(function() {
       Sidebar.toggleList(linkedEventsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         linkActions.removeClass("esper-open");
       } else {
@@ -643,7 +643,7 @@ module Esper.TaskTab {
 
     showRecents.click(function() {
       Sidebar.toggleList(recentsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         recentsHeader.removeClass("esper-open");
       } else {
