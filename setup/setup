@@ -98,8 +98,8 @@ install_js jstz jstz-2013-04-01-f9e3e30e.js
 
 # FullCalendar
 rm -rf fullcalendar
-unzip fullcalendar-2.1.1.zip
-mv fullcalendar-2.1.1 fullcalendar
+unzip fullcalendar-2.3.1.zip
+mv fullcalendar-2.3.1 fullcalendar
 install_js fullCalendar fullcalendar/fullcalendar.js "$ROOT"/jquery-freeze
 install_css fullCalendar fullcalendar/fullcalendar.css
 

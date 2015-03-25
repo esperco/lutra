@@ -86,6 +86,7 @@ APP_SOURCES = \
   UserTab \
   GroupTab \
   GroupScheduling \
+  BackgroundEvents \
   TimeTracker \
   Inactivity \
   Init \
