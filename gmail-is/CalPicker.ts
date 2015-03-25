@@ -350,7 +350,6 @@ module Esper.CalPicker {
       var esperEvents = List.concat(ll);
       refreshCache = false;
       var normalEvents = importEvents(esperEvents);
-      // TODO: Support different meeting types!
       BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd, function (backgroundEvents) {
         callback(normalEvents.concat(backgroundEvents));
       });
