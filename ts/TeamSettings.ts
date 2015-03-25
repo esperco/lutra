@@ -41,7 +41,7 @@ module TeamSettings {
       <li class="active"><a #tab1 class="link link1 first">Account</a></li>
       <li><a #tab2 class="link link2">Calendars</a></li>
       <li><a #tab3 class="link link3">Preferences</a></li>
-      <li><a #tab4 class="link link4 last">LabelSync</a></li>
+      <li><a #tab4 class="link link4 last">Labels</a></li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -74,7 +74,7 @@ module TeamSettings {
       tab3.addClass("last");
     } else {
       tab4.click(function() { switchTab(4); });
-      content4.append(LabelSyncTab.load(team));
+      content4.append(LabelsTab.load(team));
     }
 
     return view;
