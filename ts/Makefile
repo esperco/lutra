@@ -72,7 +72,7 @@ TS_SOURCES = \
   Preferences \
   PreferencesTab \
   CalendarsTab \
-  LabelSyncTab \
+  LabelsTab \
   ExecutivePreferences \
   Page \
   Route \
