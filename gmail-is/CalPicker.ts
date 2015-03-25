@@ -23,6 +23,9 @@ module Esper.CalPicker {
      x.fullCalendar("refetchEvents"), which takes no other parameters. */
   var refreshCache = false;
 
+  // ditto
+  var meetingType = "other";
+
   interface PickerView {
     view : JQuery;
     calendarPickerContainer : JQuery;
@@ -51,20 +54,21 @@ module Esper.CalPicker {
   /** A set of 9 (!) buttons to choose the meeting type. */
   function meetingTypeMenu() {
 '''
-<div #container class="fc-button-group">
+<select #container class="esper-select">
 </div>
 '''
-    var types = ["phone", "video", "breakfast", "brunch", "lunch",
-                 "coffee", "dinner", "drinks", "other"];
+    var types = ["other", "phone_call", "video_call", "breakfast",
+                 "brunch", "lunch", "coffee", "dinner", "drinks"];
     types.forEach(function (type) {
 '''
-<button #button class="fc-button"></button>
+<option #option></option>
 '''
-      button.text(type);
-      container.append(button);
+      option.text(type.replace("_", " "));
+      option.attr("value", type);
+      container.append(option);
     });
-    container.children().first().addClass("fc-corner-left");
-    container.children().last().addClass("fc-corner-right");
+
+    Sidebar.customizeSelectArrow(container);
 
     return container;
   }
@@ -347,7 +351,7 @@ module Esper.CalPicker {
       refreshCache = false;
       var normalEvents = importEvents(esperEvents);
       // TODO: Support different meeting types!
-      BackgroundEvents.meetingTimes("lunch", momentStart, momentEnd, function (backgroundEvents) {
+      BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd, function (backgroundEvents) {
         callback(normalEvents.concat(backgroundEvents));
       });
     });
@@ -455,7 +459,12 @@ module Esper.CalPicker {
     setupCalendar(team, pickerView);
                             
     // add the meeting type menu:
-    pickerView.view.find(".fc-left").append(meetingTypeMenu());
+    var menu = meetingTypeMenu();
+    pickerView.view.find(".fc-left").append(menu);
+    menu.change(function () {
+      meetingType = menu.val();
+      pickerView.calendarView.fullCalendar("refetchEvents");
+    });
 
     function render() {
       pickerView.calendarView.fullCalendar("render");
