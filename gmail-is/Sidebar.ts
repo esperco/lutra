@@ -265,7 +265,7 @@ module Esper.Sidebar {
     <ul class="esper-tab-links">
       <li class="esper-active esper-first esper-sidebar-task-tab">Task</li>
       <li class="esper-sidebar-user-tab">User</li>
-      <li class="esper-last esper-sidebar-user-tab">Group</li>
+      <li class="esper-last esper-sidebar-group-tab">Group</li>
     </ul>
   </div>
   <div class="esper-tab-content">
