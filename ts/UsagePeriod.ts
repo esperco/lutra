@@ -5,8 +5,8 @@ module UsagePeriod {
     periodSummary: JQuery;
     taskListContainer: JQuery;
     chargesContainer: JQuery;
-    approveSection: JQuery;
-    approvedSection: JQuery;
+    approveButtonSection: JQuery;
+    approvedMsgSection: JQuery;
   }
 
   export function load(teamid: string, periodStart: number) {
@@ -16,8 +16,8 @@ module UsagePeriod {
   <div #subStatusContainer></div>
   <div #taskListContainer></div>
   <div #chargesContainer></div>
-  <div #approveSection class="hide"></div>
-  <div #approvedSection class="hide"></div>
+  <div #approveButtonSection class="hide"></div>
+  <div #approvedMsgSection class="hide"></div>
 </div>
 '''
     var root = $("#usage-period-page");
@@ -60,25 +60,25 @@ module UsagePeriod {
   function updateCharges(mainView: MainView,
                          tu: ApiT.TaskUsage) {
     if (tu.charge_amount !== undefined) {
-      mainView.approveSection.addClass("hide");
-      mainView.approvedSection.removeClass("hide");
-      mainView.approvedSection.text(
+      mainView.approveButtonSection.addClass("hide");
+      mainView.approvedMsgSection.removeClass("hide");
+      mainView.approvedMsgSection.text(
         "Approved extra charge of "
           + (tu.charge_amount / 100).toString()
           + " USD."
       );
     }
     else {
-      mainView.approvedSection.addClass("hide");
+      mainView.approvedMsgSection.addClass("hide");
       var endDate = new Date(tu.end);
       if (!Conf.prod || endDate.getTime() < Date.now()) {
-        mainView.approveSection.removeClass("hide");
+        mainView.approveButtonSection.removeClass("hide");
         Api.getUsageExtraCharge(tu.teamid,
                                 Unixtime.ofRFC3339(tu.start),
                                 tu.revision)
           .done(function(xch) {
-            mainView.approveSection.children().remove();
-            mainView.approveSection.append(renderExtraCharge(tu, xch));
+            mainView.approveButtonSection.children().remove();
+            mainView.approveButtonSection.append(renderExtraCharge(tu, xch));
           });
       }
     }
