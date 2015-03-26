@@ -29,7 +29,7 @@ module Route {
   }
 
   function withLogin(whenDone,
-                     optArgs?,
+                     optArgs?: any[],
                      optInviteCode?: string,
                      optEmail?: string,
                      optName?: string) {
@@ -95,11 +95,19 @@ module Route {
     },
 
     "join/:teamid route" : function (data) {
-      withLogin(Page.onboarding.load, data.teamid);
+      withLogin(Page.onboarding.load, [data.teamid]);
     },
 
     "preferences route" : function (data) {
       withLogin(Page.preferences.load);
+    },
+
+    "usage/:teamid route" : function (data) {
+      withLogin(Page.usage.load, [data.teamid]);
+    },
+
+    "usage-period/:teamid/:start route" : function (data) {
+      withLogin(Page.usagePeriod.load, [data.teamid, data.start]);
     },
 
     "test route": function(data) {

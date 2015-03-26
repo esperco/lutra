@@ -50,6 +50,25 @@ module Util {
   }
 
   /*
+    Strict parser for well-formed floats that represent integers,
+    because the built-in parseInt() tolerate and discards
+    garbage after the number.
+  */
+  export function intOfString(s: string): number {
+    if (s.length === 0 || s === null)
+      return NaN;
+    else {
+      var x = +s;
+      if (x % 1 === 0)
+        return x;
+      else
+        return NaN;
+    }
+    /* Then we have -[] === 0.
+       Just don't violate the type system. */
+  }
+
+  /*
     Do something once the user has stopped typing for a certain number
     of milliseconds.
    */
@@ -118,6 +137,14 @@ module Util {
       },
       null,
       true
-    )
+    ),
+    Test.expect("intOfString '123'", intOfString, "123", 123),
+    Test.expect("intOfString '-123'", intOfString, "-123", -123),
+    Test.expect("intOfString '12e34'", intOfString, "12e34", 12e34),
+    Test.expect("intOfString '3.21'", intOfString, "3.21", NaN),
+    Test.expect("intOfString '32!'", intOfString, "32!", NaN),
+    Test.expect("intOfString ''", intOfString, "", NaN),
+    Test.expect("intOfString null", intOfString, null, NaN),
+    Test.expect("intOfString undefined", intOfString, undefined, NaN),
   ];
 }

@@ -392,11 +392,13 @@ type token_response = [
     plan : string;
     status : string;
   }
+
   export interface PaymentCard {
     id : string;
     brand : string; //card_brand option
     last4 : string;
   }
+
   export interface CustomerDetails {
     teamid : string;
     active : boolean;
@@ -409,6 +411,56 @@ type token_response = [
     canceled_at : string;
     ended_at : string;
     cards : PaymentCard[];
+  }
+
+  export interface TaskUsageList {
+    items: TaskUsage[];
+  }
+
+  export interface TaskUsage {
+    teamid: string;
+    start: string; // RFC-3339 timestamp
+    end: string; // RFC-3339 timestamp
+
+    revision: number;
+    approval?: Approval;
+    frozen: boolean;
+    stripe_charge?: string;
+    charge_amount?: number;
+    start_planid: string;
+    end_planid: string;
+    tasks: SingleTaskUsage[];
+  }
+
+  export interface Approval {
+    approved_by: string; // uid
+    approved_on: string; // timestamp
+  }
+
+  export interface SingleTaskUsage {
+    taskid: string;
+    title?: string;
+    creation_date: string; // timestamp
+    created_during_period: boolean;
+
+    auto_scheduling_tasks_created: number;
+    scheduling_tasks_created: number;
+
+    auto_scheduling_time: number; // seconds
+    scheduling_time: number; // seconds
+
+    auto_generic_tasks_created: number;
+    generic_tasks_created: number;
+
+    auto_generic_time: number; // seconds
+    generic_time: number; // seconds
+  }
+
+  export interface ExtraCharge {
+    unlimited_usage: boolean;
+    amount_due: number; // cents
+    description: string;
+    statement_descriptor: string;
   }
 
   export interface EmailSignature {

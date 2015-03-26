@@ -232,8 +232,8 @@ module Signin {
       });
   }
 
-  export function signin(whenDone,
-                         optArgs?,
+  export function signin(whenDone: { (...any): void },
+                         optArgs?: any[],
                          optInviteCode?: string,
                          optEmail?: string,
                          optName?: string) {
@@ -250,8 +250,10 @@ module Signin {
             var landingUrl = document.URL;
             checkGooglePermissions(landingUrl)
               .done(function(ok) {
-                if (optArgs !== undefined) whenDone(optArgs);
-                else whenDone();
+                if (Array.isArray(optArgs)) // how it should be.
+                  whenDone.apply(this, optArgs);
+                else // it's a bug but whatever.
+                  whenDone(optArgs);
               });
           }
         });

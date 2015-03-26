@@ -11,7 +11,9 @@ module Page {
     "team-settings": {ids:["team-settings-page"]},
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
-    "preferences": {ids:["preferences-page"]}
+    "preferences": {ids:["preferences-page"]},
+    "usage": {ids:["usage-page"]},
+    "usage-period": {ids:["usage-period-page"]}
   }, undefined);
 
   function showPage(k) {
@@ -72,6 +74,24 @@ module Page {
       showPage("preferences");
       Log.d("Loaded executive preferences!");
       Esper.ExecutivePreferences.load();
+      Util.focus();
+    }
+  }
+
+  export var usage : Loadable = {
+    load: function(teamid) {
+      pageSelector.hideAll();
+      showPage("usage");
+      Usage.load(teamid);
+      Util.focus();
+    }
+  }
+
+  export var usagePeriod : Loadable = {
+    load: function(teamid, periodStart) {
+      pageSelector.hideAll();
+      showPage("usage-period");
+      UsagePeriod.load(teamid, parseInt(periodStart));
       Util.focus();
     }
   }
