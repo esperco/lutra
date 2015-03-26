@@ -45,7 +45,7 @@ module UsagePeriod {
 <div #view>
   <div #unfinished></div>
   <div #noCard class="hide">
-    No payment card on file. Please ask the customer needs to enter one.
+    No payment card on file. Please ask the customer to enter one.
   </div>
 </div>
 '''
