@@ -58,7 +58,7 @@ module Util {
     if (s.length === 0 || s === null)
       return NaN;
     else {
-      var x = -(- <any>s); // F*ck yeah. (parseInt would discard the decimals)
+      var x = +s;
       if (x % 1 === 0)
         return x;
       else
