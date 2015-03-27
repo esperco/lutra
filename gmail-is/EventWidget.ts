@@ -295,8 +295,8 @@ module Esper.EventWidget {
     if (recent) {
       view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
     } else {
-      time.prepend(displayEventChoose(view, e));
-      time.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
+      main.prepend(displayEventChoose(view, e));
+      main.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
     }
 
     var start = XDate.ofString(e.start.local);

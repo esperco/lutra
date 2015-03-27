@@ -220,7 +220,7 @@ module Esper.TaskTab {
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
   <div #taskProgress class="esper-section-selector esper-clearfix">
-    <span class="esper-show-selector">Progress Label: </span>
+    <span class="esper-show-selector">Progress: </span>
     <select #taskProgressSelector class="esper-select"/>
   </div>
 '''
