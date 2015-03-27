@@ -158,7 +158,7 @@ module Esper.InviteControls {
     }
 
     var peopleInvolved = {};
-    var participants = CurrentThread.getParticipants();
+    var participants = CurrentThread.getExternalParticipants();
     if (participants) {
       List.iter(participants, function (participant) {
         var name = participant.display_name || "";
@@ -192,12 +192,7 @@ module Esper.InviteControls {
       }
 
       next.click(function() {
-        var guests = Object.keys(peopleInvolved).map(function (email) {
-          return {
-            email        : email,
-            display_name : peopleInvolved[email]
-          };
-        });
+        var guests = CurrentThread.getParticipants();
 
         var location = {
           /* Right now we don't care about title because this is just text

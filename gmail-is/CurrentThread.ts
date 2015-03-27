@@ -17,10 +17,20 @@ module Esper.CurrentThread {
     undefined
   );
 
+  export var executive = new Esper.Watchable.C<ApiT.Profile>(
+    function (exec) { return exec !== undefined && exec !== null; },
+    undefined
+  );
+
   // Updates Menu.currentTeam when this one changes.
   // TODO: Consolidate this and Menu.currentTeam?
   team.watch(function (newTeam) {
     Menu.currentTeam.set(newTeam);
+
+    executive.set(null); // invalid until reloaded via API
+    Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
+      executive.set(newExec);
+    });
   });
 
   /** The GMail threadId of the current thread. If there is no thread,
@@ -52,6 +62,24 @@ module Esper.CurrentThread {
           display_name : person[0] || null, // "" treated as no display name
           email        : person[1]
         };
+      });
+    } else {
+      return [];
+    }
+  }
+
+  /** Returns a list of all the poeple invloved in the current thread
+   *  excluding the exec and any assistants.
+   *
+   *  Returns [] if we can't get the thread data for some reason (ie
+   *  gmail js has a problem).
+   */
+  export function getExternalParticipants() : ApiT.Guest[] {
+    if (team.isValid() && executive.isValid()) {
+      var all = getParticipants();
+      return all.filter(function (participant) {
+        return participant.email != executive.get().email &&
+               team.get().team_email_aliases.indexOf(participant.email) == -1;
       });
     } else {
       return [];
