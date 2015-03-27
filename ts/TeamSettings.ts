@@ -144,6 +144,8 @@ module TeamSettings {
     if (! (Login.isEsperAssistant() || Login.isAdmin())) {
       tabViewUsg.shown = false;
       tabUsg.addClass("hide");
+    } else {
+      contentUsg.append(UsageTab.load(team));
     }
 
     var last = findLastShown(tabViews);

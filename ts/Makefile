@@ -74,7 +74,7 @@ TS_SOURCES = \
   CalendarsTab \
   LabelsTab \
   ExecutivePreferences \
-  Usage \
+  UsageTab \
   UsagePeriod \
   Page \
   Route \

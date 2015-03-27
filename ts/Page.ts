@@ -78,15 +78,6 @@ module Page {
     }
   }
 
-  export var usage : Loadable = {
-    load: function(teamid) {
-      pageSelector.hideAll();
-      showPage("usage");
-      Usage.load(teamid);
-      Util.focus();
-    }
-  }
-
   export var usagePeriod : Loadable = {
     load: function(teamid, periodStart) {
       pageSelector.hideAll();
