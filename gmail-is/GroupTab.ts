@@ -97,7 +97,6 @@ module Esper.GroupTab {
 '''
     populate();
     CurrentThread.onLinkedEventsChanged(function () {
-      console.error("Populating!");
       populate();
     });
 

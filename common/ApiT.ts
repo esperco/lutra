@@ -414,8 +414,8 @@ module Esper.ApiT {
   }
 
   export interface PossibleTime {
-    guests : GuestStatus[];
-    event  : CalendarEvent;
+    guests   : GuestStatus[];
+    event_id : string;
   }
 
   export interface GroupEvent {
