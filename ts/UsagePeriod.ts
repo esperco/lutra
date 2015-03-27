@@ -10,6 +10,71 @@ module UsagePeriod {
   }
 
   export function load(teamid: string, periodStart: number) {
+'''
+<div #view class="settings-container">
+  <div class="header clearfix">
+    <span #signOut class="header-signout clickable">Sign out</span>
+    <a #logoContainer href="#"
+       class="img-container-left"/>
+    <a href="#!" #headerSettings class="header-title">Settings</a>
+    <span #arrowContainer1 class="img-container-left"/>
+    <div class="header-exec">
+      <div #profilePic class="profile-pic"/>
+      <a #teamName class="profile-name exec-profile-name"/>
+    </div>
+    <span #arrowContainer2 class="img-container-left"/>
+    <div class="header-title2">Usage</div>
+  </div>
+  <div class="divider"/>
+  <div #main class="clearfix"/>
+  <div #footer/>
+</div>
+'''
+    var root = $("#usage-period-page");
+    root.children().remove();
+    root.append(view);
+
+    var logo = $("<img class='svg-block header-logo'/>")
+      .appendTo(logoContainer);
+    Svg.loadImg(logo, "/assets/img/logo.svg");
+
+    var arrowEast1 = $("<img class='svg-block arrow-east'/>")
+      .appendTo(arrowContainer1);
+    Svg.loadImg(arrowEast1, "/assets/img/arrow-east.svg");
+
+    var arrowEast2 = $("<img class='svg-block arrow-east'/>")
+      .appendTo(arrowContainer2);
+    Svg.loadImg(arrowEast2, "/assets/img/arrow-east.svg");
+
+    var selectedTeam : ApiT.Team =
+      List.find(Login.getTeams(), function(team : ApiT.Team) {
+        return team.teamid === teamid;
+      });
+
+    Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
+      .done(function(exec) {
+        document.title = exec.display_name + " - Usage";
+        profilePic.css("background-image", "url('" + exec.image_url + "')");
+        teamName.text(selectedTeam.team_name);
+      });
+
+    teamName.attr("href", "#!team-settings/" + teamid);
+
+    loadContent(teamid, periodStart)
+      .done(function(content) {
+        main.append(content);
+        footer.append(Footer.load());
+      });
+
+    signOut.click(function() {
+      Login.clearLoginInfo();
+      Signin.signin(function(){}, undefined, undefined, undefined);
+      return false;
+    });
+  }
+
+  export function loadContent(teamid: string, periodStart: number):
+  JQueryPromise<JQuery> {
 '''mainView
 <div #view>
   <div #periodSummary></div>
@@ -20,9 +85,6 @@ module UsagePeriod {
   <div #approvedMsgSection class="hide"></div>
 </div>
 '''
-    var root = $("#usage-period-page");
-    root.children().remove();
-    root.append(view);
     document.title = "Billing Period - Esper";
 
     Api.getSubscriptionStatusLong(teamid)
@@ -30,10 +92,11 @@ module UsagePeriod {
         updateSubStatusContainer(subStatusContainer, cusDetails);
       });
 
-    Api.getUsageEdit(teamid, periodStart)
-      .done(function(tu) {
+    return Api.getUsageEdit(teamid, periodStart)
+      .then(function(tu) {
         renderTaskUsage(mainView, tu);
         updateCharges(mainView, tu);
+        return view;
       });
   }
 

@@ -849,9 +849,6 @@ module AccountTab {
   </div>
   <div class="membership-col right">
     <div><a #cardInfo class="link">View card information</a></div>
-    <div #monthlyUsageSection class="hide">
-      <a #monthlyUsageLink class="link">Review monthly usage</a>
-    </div>
   </div>
 </div>
 '''
@@ -879,11 +876,6 @@ module AccountTab {
     cardInfo.click(function() {
       (<any> cardModal.modal).modal();
     });
-
-    if (Login.isEsperAssistant() || Login.isAdmin()) {
-      monthlyUsageLink.attr("href", "#!usage/" + team.teamid);
-      monthlyUsageSection.removeClass("hide");
-    }
 
     var execUid = team.team_executive;
 
