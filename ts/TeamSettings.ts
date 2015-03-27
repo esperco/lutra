@@ -56,6 +56,8 @@ module TeamSettings {
     });
     if (sel === undefined)
       Log.e("Undefined tab " + name);
+    else if (!tabViews[sel].shown)
+      Log.e("Cannot switch to hidden tab " + name);
     else
       switchTab(sel);
   }
@@ -137,6 +139,11 @@ module TeamSettings {
       tabLab.addClass("hide");
     } else {
       contentLab.append(LabelsTab.load(team));
+    }
+
+    if (! (Login.isEsperAssistant() || Login.isAdmin())) {
+      tabViewUsg.shown = false;
+      tabUsg.addClass("hide");
     }
 
     var last = findLastShown(tabViews);
