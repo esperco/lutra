@@ -23,7 +23,7 @@ module UsageTab {
   <span #status_></span>
   <a #link>
     <span #start></span>
-    &mdash;
+    &ndash;
     <span #end></span>
   </a>
 </div>
@@ -42,8 +42,8 @@ module UsageTab {
         + "/" + Unixtime.ofDate(startDate).toString();
       link.attr("href", url);
 
-      start.text(startDate.toString());
-      end.text(endDate.toString());
+      start.text(XDate.dateOnly(startDate));
+      end.text(XDate.dateOnly(endDate));
 
       listContainer.append(item);
     });

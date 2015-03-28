@@ -47,6 +47,7 @@ TS_SOURCES = \
   Log \
   Deferred \
   Promise \
+  XDate \
   Util \
   MP \
   GmailCompose \

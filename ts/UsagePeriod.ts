@@ -106,10 +106,10 @@ module UsagePeriod {
        and end plan applicable to the billing period being reviewed. */
 '''
 <div #view>
-  <div #unfinished></div>
-  <div #noCard class="hide">
-    No payment card on file. Please ask the customer to enter one.
-  </div>
+  <p #noCard class="hide">
+    No payment card on file. Please ask the customer to enter one
+    if anything is due.
+  </p>
 </div>
 '''
     subStatusContainer.children().remove();
@@ -204,21 +204,22 @@ Unlimited usage. Nothing to approve.
                                tu: ApiT.TaskUsage) {
 '''
 <div #view>
-  Billing period
-  <span #start></span>
-  &mdash;
-  <span #end></span>
-  <span #ongoing></span>
+  <h2>Billing period
+    <span #start></span>
+    &ndash;
+    <span #end></span>
+    <span #ongoing></span>
+  </h2>
 </div>
 '''
     var startDate = new Date(tu.start);
     var endDate = new Date(tu.end);
 
-    start.text(startDate.toString());
-    end.text(endDate.toString());
+    start.text(XDate.dateOnly(startDate));
+    end.text(XDate.dateOnly(endDate));
 
     if (Date.now() < endDate.getTime())
-      ongoing.text("(ongoing period)");
+      ongoing.text("(ongoing)");
 
     mainView.periodSummary.children().remove();
     mainView.periodSummary.append(view);
@@ -253,24 +254,97 @@ Unlimited usage. Nothing to approve.
       function(x) { stu.generic_tasks_created = x; save(mainView, tu); }
     );
 
+    var tipScheduling = tooltip(
+      "Applies if this task was about setting up a meeting"
+    );
+
+    var tipGeneric = tooltip(
+      "Applies if this task wasn't about setting up a meeting"
+    );
+
+    var tipSchedTime = tooltip(
+      "Time spent on this scheduling task during the billing period. " +
+      "It is determined automatically based on the activity of the " +
+      "assistants using the Esper extension for Gmail. " +
+      "If a significant amount of time is spent working on the task " +
+      "outside of Gmail, it should be added manually in the input box."
+    );
+
+    var tipGenericTime = tooltip(
+      "Time spent on this generic task during the billing period. " +
+      "It is determined automatically based on the activity of the " +
+      "assistants using the Esper extension for Gmail. " +
+      "If a significant amount of time is spent working on the task " +
+      "outside of Gmail, it should be added manually in the input box."
+    );
+
+    var tipSchedCount = tooltip(
+      "Count 1 if the task is a scheduling task AND was started " +
+      "during this billing period. If multiple meetings were organized " +
+      "under the same email thread, count 1 for each meeting."
+    );
+
+    var tipGenericCount = tooltip(
+      "Count 1 if the task is a generic task AND was started " +
+      "during this billing period. If multiple tasks were performed " +
+      "under the same email thread, count 1 for each actual task."
+    );
+
 '''
 <div #taskView>
-  <div>{{stu.title}}</div>
-  <div>
-    Scheduling tasks time:
-    <span>{ stu.auto_scheduling_time.toString() }</span>
-    {{schedTimeBox}}
-    created:
-    <span>{ stu.auto_scheduling_tasks_created.toString() }</span>
-    {{schedCountBox}}
+  <h3>{stu.title}</h3>
+  <div class="row">
+    <div class="col-md-2">
+      Scheduling {{tipScheduling}}
+    </div>
+    <div class="col-md-2">
+      time spent in seconds {{tipSchedTime}}
+    </div>
+    <div class="col-md-1">
+      <span>{ stu.auto_scheduling_time.toString() } (auto)</span>
+    </div>
+    <div class="col-md-1">
+      {{schedTimeBox}} (edited)
+    </div>
+    <div class="col-md-1">
+
+    </div>
+    <div class="col-md-3">
+      number of tasks created {{tipSchedCount}}
+    </div>
+    <div class="col-md-1">
+      <span>{ stu.auto_scheduling_tasks_created.toString() } (auto)</span>
+    </div>
+    <div class="col-md-1">
+      {{schedCountBox}} (edited)
+    </div>
   </div>
-  <div>
-    Generic tasks time:
-    <span>{ stu.auto_generic_time.toString() }</span>
-    {{genericTimeBox}}
-    created:
-    <span>{ stu.auto_generic_tasks_created.toString() }</span>
-    {{genericCountBox}}
+
+  <div class="row">
+    <div class="col-md-2">
+      Generic {{tipGeneric}}
+    </div>
+    <div class="col-md-2">
+      time spent in seconds {{tipGenericTime}}
+    </div>
+    <div class="col-md-1">
+      <span>{ stu.auto_generic_time.toString() } (auto)</span>
+    </div>
+    <div class="col-md-1">
+      {{genericTimeBox}} (edited)
+    </div>
+    <div class="col-md-1">
+
+    </div>
+    <div class="col-md-3">
+      number of tasks created {{tipGenericCount}}
+    </div>
+    <div class="col-md-1">
+      <span>{ stu.auto_generic_tasks_created.toString() } (auto)</span>
+    </div>
+    <div class="col-md-1">
+      {{genericCountBox}} (edited)
+    </div>
   </div>
 </div>
 '''
@@ -279,11 +353,13 @@ Unlimited usage. Nothing to approve.
 
   function createPosIntEditor(orig: number,
                               init: number,
+                              class_: string,
                               set: { (x: number): void }): JQuery {
 '''
-<input #box type="text"/>
+<input #box class="usage-box" type="text"/>
 '''
     box.val(init.toString());
+    box.addClass(class_);
 
     function checkInput() {
       var x = Util.intOfString(box.val());
@@ -302,6 +378,19 @@ Unlimited usage. Nothing to approve.
       }
     }
 
+    /* Increase/decrease values using keyboard arrows. */
+    box.keydown(function(event) {
+      var key = event.which;
+      var n = Util.intOfString(box.val());
+      if (key === 38 /* up arrow */) {
+        if (n >= 0)
+          box.val((n + 1).toString());
+      } else if (key === 40 /* down arrow */) {
+        if (n >= 0)
+          box.val(Math.max(0, n - 1).toString());
+      }
+    });
+
     Util.afterTyping(box, 300, function() {
       var x = checkInput();
       if (x !== undefined)
@@ -311,7 +400,33 @@ Unlimited usage. Nothing to approve.
     return box;
   }
 
-  /* Right now, the time editor is just the number of seconds. */
-  var createTimeEditor = createPosIntEditor;
-  var createCountEditor = createPosIntEditor;
+  function createTimeEditor(orig: number,
+                            init: number,
+                            set: { (x: number): void }): JQuery {
+    return createPosIntEditor(orig, init, "usage-time-box", set);
+  }
+
+  function createCountEditor(orig: number,
+                            init: number,
+                            set: { (x: number): void }): JQuery {
+    return createPosIntEditor(orig, init, "usage-count-box", set);
+  }
+
+  function tooltip(title: string):
+  JQuery {
+'''
+<div #container
+  data-toggle="tooltip"
+  data-placement="top"
+  class="img-container-inline"/>
+'''
+    container.attr("title", title);
+    var infoIcon = $("<img class='svg-block info-icon'/>")
+      .appendTo(container);
+    Svg.loadImg(infoIcon, "/assets/img/info.svg");
+
+    container.tooltip();
+
+    return container;
+  }
 }
