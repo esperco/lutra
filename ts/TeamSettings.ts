@@ -23,43 +23,109 @@ module TeamSettings {
       dismissOverlays();
   });
 
-  export function switchTab(i) {
-    var tab = $('.esper-tab-content .tab' + i);
-    var link = $('.esper-tab-links .link' + i);
-    tab.show().siblings().hide();
-    if (link.hasClass("disabled"))
-      $('.esper-tab-links .link').addClass("disabled");
-    link.removeClass("disabled");
-    link.parent('li').addClass('active').siblings().removeClass('active');
+  interface TabView {
+    name: string;
+    tab: JQuery;
+    content: JQuery;
+    shown: boolean; // whether the tab is shown to this user at all
+  }
+
+  var tabViews : TabView[];
+
+  function switchTab(selected: number) {
+    List.iter(tabViews, function(x, i) {
+      x.tab
+        .removeClass("active");
+      x.content
+        .addClass("hide")
+        .removeClass("active");
+    });
+    var sel = tabViews[selected];
+    sel.tab
+      .addClass("active");
+    sel.content
+      .removeClass("hide")
+      .addClass("active");
   };
+
+  export function switchTabByName(name: string) {
+    var sel;
+    List.iter(tabViews, function(x, i) {
+      if (x.name === name)
+        sel = i;
+    });
+    if (sel === undefined)
+      Log.e("Undefined tab " + name);
+    else if (!tabViews[sel].shown)
+      Log.e("Cannot switch to hidden tab " + name);
+    else
+      switchTab(sel);
+  }
+
+  function findLastShown(tabs: TabView[]): TabView {
+    var lastShown = tabs[0];
+    List.iter(tabs, function(x) {
+      if (x.shown)
+        lastShown = x;
+    });
+    return lastShown;
+  }
+
+  function makeTabView(name: string,
+                       tab: JQuery,
+                       content: JQuery,
+                       shown: boolean):
+  TabView {
+    return {
+      name: name,
+      tab: tab,
+      content: content,
+      shown: shown
+    };
+  }
 
   function showTeamSettings(team : ApiT.Team, onboarding? : boolean) {
 '''
 <div #view>
   <div #tabsDiv style="padding-left:28px">
     <ul class="esper-tab-links">
-      <li class="active"><a #tab1 class="link link1 first">Account</a></li>
-      <li><a #tab2 class="link link2">Calendars</a></li>
-      <li><a #tab3 class="link link3">Preferences</a></li>
-      <li><a #tab4 class="link link4 last">Labels</a></li>
+      <li #tabAcc class="active"><a class="link first">Account</a></li>
+      <li #tabCal><a class="link">Calendars</a></li>
+      <li #tabPrf><a class="link">Preferences</a></li>
+      <li #tabLab><a class="link">Labels</a></li>
+      <li #tabUsg><a class="link">Usage</a></li>
     </ul>
   </div>
   <div class="esper-tab-content">
-    <div #content1 class="tab tab1 active"/>
-    <div #content2 class="tab tab2"/>
-    <div #content3 class="tab tab3"/>
-    <div #content4 class="tab tab4"/>
+    <div #contentAcc class="tab-content active"/>
+    <div #contentCal class="tab-content"/>
+    <div #contentPrf class="tab-content"/>
+    <div #contentLab class="tab-content"/>
+    <div #contentUsg class="tab-content"/>
   </div>
 </div>
 '''
 
-    tab1.click(function() { switchTab(1); });
-    tab2.click(function() { switchTab(2); });
-    tab3.click(function() { switchTab(3); });
+    var tabViewAcc = makeTabView("acc", tabAcc, contentAcc, true);
+    var tabViewCal = makeTabView("cal", tabCal, contentCal, true);
+    var tabViewPrf = makeTabView("prf", tabPrf, contentPrf, true);
+    var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
+    var tabViewUsg = makeTabView("usg", tabUsg, contentUsg, true);
+    tabViews /* global */ = [
+      tabViewAcc,
+      tabViewCal,
+      tabViewPrf,
+      tabViewLab,
+      tabViewUsg
+    ];
 
-    content1.append(AccountTab.load(team));
-    content2.append(CalendarsTab.load(team, onboarding));
-    content3.append(PreferencesTab.load(team, content3));
+    List.iter(tabViews, function(x: TabView, i) {
+      x.tab.click(function() { switchTab(i); });
+    });
+
+    contentAcc.append(AccountTab.load(team));
+    contentCal.append(CalendarsTab.load(team, onboarding));
+    contentPrf.append(PreferencesTab.load(team, contentPrf));
 
     if (onboarding) {
       // We'll guide the exec through each step
@@ -69,13 +135,22 @@ module TeamSettings {
     /* We don't have access to executive email accounts,
      * so executives don't need to configure label sync. */
     if (Login.isExecCustomer(team)) {
-      tab4.remove();
-      content4.remove();
-      tab3.addClass("last");
+      tabViewLab.shown = false;
+      tabLab.addClass("hide");
     } else {
-      tab4.click(function() { switchTab(4); });
-      content4.append(LabelsTab.load(team));
+      contentLab.append(LabelsTab.load(team));
     }
+
+    if (! (Login.isEsperAssistant() || Login.isAdmin())) {
+      tabViewUsg.shown = false;
+      tabUsg.addClass("hide");
+    } else {
+      contentUsg.append(UsageTab.load(team));
+    }
+
+    var last = findLastShown(tabViews);
+    last.tab.children() // the <a> element
+      .addClass("last");
 
     return view;
   }
@@ -144,7 +219,7 @@ module TeamSettings {
       .done(function(customer) {
         main.append(showTeamSettings(selectedTeam, onboarding));
         footer.append(Footer.load());
-        if (onboarding) switchTab(2);
+        if (onboarding) switchTabByName("cal");
       });
 
     signOut.click(function() {

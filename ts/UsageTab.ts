@@ -1,19 +1,17 @@
-module Usage {
-  export function load(teamid: string) {
+module UsageTab {
+  export function load(team: ApiT.Team): JQuery {
 '''
 <div #view>
+  <h3>Billing periods</h3>
   <div #listContainer></div>
 </div>
 '''
-    var root = $("#usage-page");
-    root.children().remove();
-    root.append(view);
-    document.title = "Monthly Usage - Esper";
-
+    var teamid = team.teamid;
     Api.getPeriodList(teamid)
       .done(function(x: ApiT.TaskUsageList) {
         renderBillingPeriods(teamid, listContainer, x.items);
       });
+    return view;
   }
 
   function renderBillingPeriods(teamid: string,
@@ -22,9 +20,10 @@ module Usage {
     List.iter(l, function(tu) {
 '''
 <div #item>
+  <span #status_></span>
   <a #link>
     <span #start></span>
-    &mdash;
+    &ndash;
     <span #end></span>
   </a>
 </div>
@@ -32,12 +31,19 @@ module Usage {
       var startDate = new Date(tu.start);
       var endDate = new Date(tu.end);
 
+      if (tu.frozen || tu.unlimited_usage)
+        status_.text("✓");
+      else if (Date.now() < endDate.getTime())
+        status_.text("★");
+      else
+        status_.text("?");
+
       var url = "#!usage-period/" + teamid
         + "/" + Unixtime.ofDate(startDate).toString();
       link.attr("href", url);
 
-      start.text(startDate.toString());
-      end.text(endDate.toString());
+      start.text(XDate.dateOnly(startDate));
+      end.text(XDate.dateOnly(endDate));
 
       listContainer.append(item);
     });

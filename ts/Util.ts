@@ -77,7 +77,6 @@ module Util {
                               func: () => void) {
     var lastPressed; // date in milliseconds
     elt
-      .unbind('keydown')
       .keydown(function() {
         var t1 = lastPressed;
         var t2 = Date.now();

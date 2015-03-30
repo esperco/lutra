@@ -47,6 +47,7 @@ TS_SOURCES = \
   Log \
   Deferred \
   Promise \
+  XDate \
   Util \
   MP \
   GmailCompose \
@@ -74,7 +75,7 @@ TS_SOURCES = \
   CalendarsTab \
   LabelsTab \
   ExecutivePreferences \
-  Usage \
+  UsageTab \
   UsagePeriod \
   Page \
   Route \

@@ -429,6 +429,7 @@ type token_response = [
     charge_amount?: number;
     start_planid: string;
     end_planid: string;
+    unlimited_usage: boolean;
     tasks: SingleTaskUsage[];
   }
 

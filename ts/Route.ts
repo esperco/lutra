@@ -102,10 +102,6 @@ module Route {
       withLogin(Page.preferences.load);
     },
 
-    "usage/:teamid route" : function (data) {
-      withLogin(Page.usage.load, [data.teamid]);
-    },
-
     "usage-period/:teamid/:start route" : function (data) {
       withLogin(Page.usagePeriod.load, [data.teamid, data.start]);
     },

@@ -167,7 +167,7 @@ input.invalid {
 }
 
 input.modified {
-  background-color: @blue_bg;
+  background-color: @orange_bg;
 }
 
 .link {
@@ -487,6 +487,11 @@ input[type="text"] {
   margin: 2px 0 0 24px;
   font-size: 20px;
 }
+.header-title2 {
+  float: left;
+  margin: 2px 0 0 2px;
+  font-size: 20px;
+}
 a.header-title:hover { text-decoration: underline; }
 .header-exec {
   float: left;
@@ -694,8 +699,8 @@ a.header-title:hover { text-decoration: underline; }
 .esper-tab-content {
   padding: 28px;
   border-top: 1px solid @gray_30;
-  .tab { display:none; }
-  .tab.active { display:block; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 }
 .esper-tab-description {
   margin-bottom: 20px;
@@ -1362,6 +1367,20 @@ a.header-title:hover { text-decoration: underline; }
 
 .esper-event-color-hover {
   border: 1px solid black;
+}
+
+/** Usage and usage period **/
+
+.usage-box {
+  text-align: right;
+}
+
+.usage-count-box {
+  width: 3em;
+}
+
+.usage-time-box {
+  width: 5em;
 }
 
 /** Spinner **/
