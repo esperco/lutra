@@ -113,8 +113,16 @@ module Esper.GroupScheduling {
         onGuestsChanged(updateServer);
       });
 
+      var throttled = false;
+
       function updateServer() {
-        return Api.putGroupEvent(taskid, { guests : guests, times : times });
+        if (!throttled) {
+          throttled = true;
+          setTimeout(function () {
+            throttled = false;
+            Api.putGroupEvent(taskid, { guests : guests, times : times });
+          }, 1000);
+        }
       }
     } else {
       Log.d("Tried to initialize group tab with an invalid current task. Retrying in 300ms.");
