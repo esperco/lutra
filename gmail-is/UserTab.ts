@@ -541,6 +541,18 @@ module Esper.UserTab {
     container.append(view);
   }
 
+  function displayTeamLabel(container : JQuery,
+                             teamLabel : string) {
+'''
+<div #view>
+  <span #label>
+</div>
+'''
+
+    label.text(teamLabel)
+    container.append(view)
+  }
+
   export function viewOfUserTab(team: ApiT.Team,
                                 profiles: ApiT.Profile[]) {
 '''
@@ -565,7 +577,7 @@ module Esper.UserTab {
            class="esper-section-header esper-open esper-clearfix">
         <span #showGeneral
               class="esper-link" style="float:right">Show More</span>
-        <span class="esper-bold" style="float:left">General Preferences</span>
+        <span class="esper-bold" style="float:left">General</span>
       </div>
       <div #generalContainer
            class="esper-section-container esper-preferences-general"/>
@@ -573,7 +585,18 @@ module Esper.UserTab {
            class="esper-section-container esper-preferences-general"
            style="display:none"/>
     </div>
-    <div class="esper-section">
+    <div #teamLabelsSection class="esper-section">
+      <div #teamLabelsHeader class="esper-section-header esper-clearfix">
+        <span #showTeamLabels
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Labels</span>
+      </div>
+      <div #teamLabelsContainer class="esper-section-container
+           esper-preferences-general"
+           style="display:none">
+      </div>
+    </div>
+    <div #coworkerSection class="esper-section">
       <div #coworkersHeader class="esper-section-header esper-clearfix">
         <span #showCoworkers
               class="esper-link" style="float:right">Show</span>
@@ -641,6 +664,10 @@ module Esper.UserTab {
     });
     displayAssistantAlias(aliasContainer, aliasesUsed[0]);
 
+    team.team_labels.forEach(function(label) {
+      displayTeamLabel(teamLabelsContainer, label);
+    })
+
     Api.getPreferences(team.teamid).done(function(prefs) {
       preferencesSpinner.hide();
       user.append(viewOfUser(team, prefs));
@@ -664,17 +691,20 @@ module Esper.UserTab {
         displayGeneralPrefs(generalContainer, prefs.general);
         displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
 
-      coworkers.text(prefs.coworkers);
-      notes.text(prefs.notes);
+      if (prefs.coworkers !== "") {
+        coworkers.text(prefs.coworkers);
+      } else {
+        coworkerSection.hide()
+      }
 
-      if (prefs.coworkers !== "") showCoworkers.click();
+      notes.text(prefs.notes);
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
 
     showAlias.click(function() {
       Sidebar.toggleList(aliasContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         aliasHeader.removeClass("esper-open");
       } else {
@@ -685,7 +715,7 @@ module Esper.UserTab {
 
     showCalendars.click(function() {
       Sidebar.toggleList(calendarsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         calendarsHeader.removeClass("esper-open");
       } else {
@@ -696,7 +726,7 @@ module Esper.UserTab {
 
     showMeetings.click(function() {
       Sidebar.toggleList(meetingsContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         meetingsHeader.removeClass("esper-open");
       } else {
@@ -707,7 +737,7 @@ module Esper.UserTab {
 
     showTransportation.click(function() {
       Sidebar.toggleList(transportationContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         transportationHeader.removeClass("esper-open");
       } else {
@@ -719,16 +749,27 @@ module Esper.UserTab {
     showGeneral.click(function() {
       Sidebar.toggleList(generalContainer);
       Sidebar.toggleList(generalDetailedContainer);
-      if (this.innerHTML === "Show Less") {
+      if ($(this).text() === "Show Less") {
         $(this).text("Show More");
       } else {
         $(this).text("Show Less");
       }
     });
 
+    showTeamLabels.click(function() {
+      Sidebar.toggleList(teamLabelsContainer);
+      if ($(this).text() === "Hide") {
+        $(this).text("Show");
+        teamLabelsHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        teamLabelsHeader.addClass("esper-open");
+      }
+    });
+
     showCoworkers.click(function() {
       Sidebar.toggleList(coworkersContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         coworkersHeader.removeClass("esper-open");
       } else {
@@ -739,7 +780,7 @@ module Esper.UserTab {
 
     showNotes.click(function() {
       Sidebar.toggleList(notesContainer);
-      if (this.innerHTML === "Hide") {
+      if ($(this).text() === "Hide") {
         $(this).text("Show");
         notesHeader.removeClass("esper-open");
       } else {
@@ -749,7 +790,9 @@ module Esper.UserTab {
     });
 
     showNotes.click();
+    showCoworkers.click();
     if (aliasesUsed[0] !== undefined) showAlias.click();
+    if (team.team_labels.length > 0) showTeamLabels.click();
 
     return _view;
   }

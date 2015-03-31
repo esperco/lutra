@@ -17,6 +17,11 @@ module Esper.CurrentThread {
     undefined
   );
 
+  export var executive = new Esper.Watchable.C<ApiT.Profile>(
+    function (exec) { return exec !== undefined && exec !== null; },
+    undefined
+  );
+
   // Updates Menu.currentTeam when this one changes.
   // TODO: Consolidate this and Menu.currentTeam?
   team.watch(function (newTeam) {
@@ -36,6 +41,10 @@ module Esper.CurrentThread {
   function isThreadView() : boolean {
     return threadId.isValid();
   }
+
+  threadId.watch(function (newThreadId) {
+    GroupScheduling.initialize();
+  });
 
   /** Returns a list of all the people involved in the current
    *  thread. (Includes the exec and assistant if appropriate.)

@@ -1,6 +1,6 @@
 /** Domain logic for group scheduling. */
 module Esper.GroupScheduling {
-  var defaultAvailability = ApiT.Status.yes;
+  var defaultAvailability = ApiT.Status.maybe;
 
   /** All the guests in the group event. */
   export var guests: ApiT.Guest[] = [];
@@ -37,7 +37,7 @@ module Esper.GroupScheduling {
 
   export function getEventStatus(event: ApiT.CalendarEvent): ApiT.PossibleTime {
     return List.find(times, function (time) {
-      return time.event.google_event_id == event.google_event_id;
+      return time.event_id == event.google_event_id;
     });
   }
 
@@ -46,7 +46,7 @@ module Esper.GroupScheduling {
    */
   export function addEvent(event: ApiT.CalendarEvent) {
     if (!List.exists(times, function (possible) {
-      return possible.event.google_event_id == event.google_event_id;
+      return possible.event_id == event.google_event_id;
     })) {
       var guestStatuses: ApiT.GuestStatus[] = guests.map(function (guest) {
         return {
@@ -56,9 +56,11 @@ module Esper.GroupScheduling {
       });
 
       times.push({
-        guests : guestStatuses,
-        event  : event
+        guests  : guestStatuses,
+        event_id : event.google_event_id
       });
+
+      timesChanged();
     }
   }
 
@@ -85,7 +87,7 @@ module Esper.GroupScheduling {
       var taskid = CurrentThread.task.get().taskid;
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
-        if (!groupEvent.guests && !groupEvent.times) {
+        if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
           CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
           updateServer();
         } else {
@@ -95,7 +97,7 @@ module Esper.GroupScheduling {
 
           groupEvent.times.forEach(function (time) {
             var existing = List.find(times, function (t) {
-              return t.event.google_event_id == time.event.google_event_id;
+              return t.event_id == time.event_id;
             });
 
             if (existing) {
@@ -111,8 +113,16 @@ module Esper.GroupScheduling {
         onGuestsChanged(updateServer);
       });
 
+      var throttled = false;
+
       function updateServer() {
-        return Api.putGroupEvent(taskid, { guests : guests, times : times });
+        if (!throttled) {
+          throttled = true;
+          setTimeout(function () {
+            throttled = false;
+            Api.putGroupEvent(taskid, { guests : guests, times : times });
+          }, 1000);
+        }
       }
     } else {
       Log.d("Tried to initialize group tab with an invalid current task. Retrying in 300ms.");
@@ -194,7 +204,7 @@ module Esper.GroupScheduling {
                                      guest: ApiT.Guest,
                                      availability?: string) {
     var time = List.find(times, function (time) {
-      return time.event.google_event_id == event.google_event_id;
+      return time.event_id == event.google_event_id;
     });
 
     if (time) {
