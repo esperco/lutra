@@ -4,6 +4,7 @@ module Esper.TaskTab {
   var taskLabelExists = "Title";
 
   /* To refresh from outside, like in CalPicker */
+  export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
@@ -224,6 +225,7 @@ module Esper.TaskTab {
     <select #taskProgressSelector class="esper-select"/>
   </div>
 '''
+    taskTab.taskProgressContainer.children().remove();
 
     Sidebar.customizeSelectArrow(taskProgressSelector);
     var statuses = [
@@ -278,11 +280,25 @@ module Esper.TaskTab {
       });
   }
 
-  /* Refresh only recent events, fetching linked events from the server. */
-  export function refreshLinkedThreadsList(team, threadId, taskTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        displayRecentsList(team, threadId, taskTab, profiles, linkedEvents);
+  /* Refresh linked threads, fetching linked threads from the server. */
+  export function refreshLinkedThreadsList(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, true)
+      .done(function(task) {
+        displayLinkedThreadsList(task, threadId, taskTab);
+        if ((task.task_threads.length > 1 &&
+                  taskTab.showLinkedThreads.text() === "Show") ||
+                  (task.task_threads.length <= 1 &&
+                  taskTab.showLinkedThreads.text() === "Hide")) {
+          taskTab.showLinkedThreads.click();
+        }
+      });
+  }
+
+  /* Refresh task progress, fetching task progress from the server. */
+  export function refreshTaskProgressSelection(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, false)
+      .done(function(task) {
+        displayTaskProgress(task, taskTab);
       });
   }
 
@@ -335,6 +351,8 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
+              refreshTaskProgressSelection(team, threadId, taskTab);
+              refreshLinkedThreadsList(team, threadId, taskTab);
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
             });
 
@@ -513,7 +531,7 @@ module Esper.TaskTab {
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Linked Emails</span>
         <div #refreshLinkedThreads
-             class="esper-refresh esper-clickable esper-disabled">
+             class="esper-refresh esper-clickable">
           <object #refreshLinkedThreadsIcon class="esper-svg"/>
         </div>
       </div>
@@ -600,6 +618,8 @@ module Esper.TaskTab {
       refreshEventLists(team, threadId, taskTabView, profiles);
     });
 
+    refreshLinkedThreadsIcon.attr("data",
+      Init.esperRootUrl + "img/refresh.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
@@ -608,6 +628,17 @@ module Esper.TaskTab {
     displayLinkedEventsList(team, threadId, taskTabView,
                             profiles, linkedEvents);
     displayRecentsList(team, threadId, taskTabView, profiles, linkedEvents);
+
+    /* Set function to refresh from outside without passing any arguments  */
+    refreshLinkedThreadsAction = function() {
+      refreshLinkedThreadsList(team, threadId, taskTabView);
+      if (linkedThreadsContainer.css("display") === "none") {
+        Sidebar.toggleList(linkedThreadsContainer);
+        showLinkedEvents.text("Hide");
+        linkedEventsHeader.addClass("esper-open");
+      }
+    };
+    refreshLinkedThreads.click(refreshLinkedThreadsAction);
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
