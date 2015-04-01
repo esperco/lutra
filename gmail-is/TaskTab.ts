@@ -294,6 +294,9 @@ module Esper.TaskTab {
         task.task_title = query;
         CurrentThread.task.set(task);
         taskTitle.val(query);
+        markNewTaskAsInProgress(task);
+        displayTaskProgress(task, taskTab);
+        displayLinkedThreadsList(task, threadId, taskTab);
       });
   }
 
