@@ -211,6 +211,7 @@ type token_response = [
     workplaces: Workplace[];
     transportation: string[];
     meeting_types: MeetingTypes;
+    email_types?: EmailTypes;
     other: GeneralPrefs;
     coworkers?: string;
     notes?: string;
@@ -284,13 +285,21 @@ type token_response = [
     favorites: Location[];
   }
 
+  export interface EmailTypes {
+    daily_agenda: EmailPref;
+    tasks_update: EmailPref;
+  }
+
+  export interface EmailPref {
+    enabled: boolean;
+    recipients: string[];
+  }
+
   export interface GeneralPrefs {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
-    exec_daily_agenda: boolean;
-    exec_tasks_update: boolean;
     current_timezone: string;
     hold_event_color?: CalendarEventColor;
   }
