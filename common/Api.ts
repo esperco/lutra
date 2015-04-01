@@ -408,6 +408,15 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
+  export function setTaskStatus(taskid, status):
+  JQueryDeferred<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/task/status/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + string(status);
+    return JsonHttp.put(url, "");
+  }
+
   export function setTaskProgress(taskid, progress):
   JQueryDeferred<ApiT.Task> {
     var url =

@@ -220,7 +220,7 @@ module Esper.TaskTab {
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
   <div #taskProgress class="esper-section-selector esper-clearfix">
-    <span class="esper-show-selector">Progress Label: </span>
+    <span class="esper-show-selector">Progress: </span>
     <select #taskProgressSelector class="esper-select"/>
   </div>
 '''
@@ -468,6 +468,23 @@ module Esper.TaskTab {
   </div>
   <div class="esper-tab-overflow">
     <div class="esper-section">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Task Status</span>
+      </div>
+      <div class="esper-section-notes">
+        <textarea #taskStatus rows=5
+              maxlength=140
+              placeholder="Leave some brief notes about the task status here"
+              class="esper-text-notes"/>
+      </div>
+      <div class="esper-section-footer esper-clearfix">
+        <span #statusCharCount class="esper-char-count">140</span>
+        <div #saveTaskStatus class="esper-save-status esper-save-disabled">
+          Save
+        </div>
+      </div>
+    </div>
+    <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
         <span #showTaskProgress
@@ -669,17 +686,43 @@ module Esper.TaskTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
+    function taskStatusKeyUp(status) {
+      var left = 140 - taskStatus.val().length;
+      statusCharCount.text(left);
+      if (taskStatus.val() === status) {
+        saveTaskStatus.addClass("esper-save-disabled");
+        saveTaskStatus.removeClass("esper-save-enabled");
+        saveTaskStatus.removeClass("esper-clickable");
+      } else {
+        saveTaskStatus.addClass("esper-clickable");
+        saveTaskStatus.addClass("esper-save-enabled");
+        saveTaskStatus.removeClass("esper-save-disabled");
+      }
+    }
+
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.task.set(task);
       var title = "";
+      var status = "";
       linkedThreadsSpinner.hide();
       taskProgressSpinner.hide();
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
+        status = task.task_status;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTabView);
+        saveTaskStatus.click(function() {
+          if ($(this).hasClass("esper-save-enabled")) {
+            var status = taskStatus.val();
+            Api.setTaskStatus(task.taskid, status);
+            saveTaskStatus.addClass("esper-save-disabled");
+            saveTaskStatus.removeClass("esper-save-enabled");
+            saveTaskStatus.removeClass("esper-clickable");
+            taskStatus.keyup(function() {taskStatusKeyUp(status);});
+          }
+        });
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
@@ -687,6 +730,9 @@ module Esper.TaskTab {
           title = thread.subject;
       }
       taskTitle.val(title);
+      taskStatus.val(status);
+      statusCharCount.text(140 - status.length);
+      taskStatus.keyup(function() {taskStatusKeyUp(status);});
       Util.afterTyping(taskTitle, 250, function() {
         var query = taskTitle.val();
         if (query !== "")
