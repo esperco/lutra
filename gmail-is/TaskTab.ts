@@ -278,11 +278,17 @@ module Esper.TaskTab {
       });
   }
 
-  /* Refresh only recent events, fetching linked events from the server. */
-  export function refreshLinkedThreadsList(team, threadId, taskTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        displayRecentsList(team, threadId, taskTab, profiles, linkedEvents);
+  /* Refresh linked threads, fetching linked threads from the server. */
+  export function refreshLinkedThreadsList(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, true)
+      .done(function(task) {
+        displayLinkedThreadsList(task, threadId, taskTab);
+        if ((task.task_threads.length > 1 &&
+                  taskTab.showLinkedThreads.text() === "Show") ||
+                  (task.task_threads.length <= 1 &&
+                  taskTab.showLinkedThreads.text() === "Hide")) {
+          taskTab.showLinkedThreads.click();
+        }
       });
   }
 
@@ -333,6 +339,7 @@ module Esper.TaskTab {
 
             job.done(function() {
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
+              refreshLinkedThreadsList(team, threadId, taskTab)
             });
 
             CurrentThread.task.set(result.task_data);
