@@ -43,7 +43,7 @@ module Esper.CurrentThread {
   }
 
   threadId.watch(function (newThreadId) {
-    GroupScheduling.initialize();
+    GroupScheduling.reset();
   });
 
   /** Returns a list of all the people involved in the current

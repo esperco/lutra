@@ -201,9 +201,8 @@ module Esper.GroupTab {
 
     GroupScheduling.onGuestsChanged(function (added, removed) {
       removed.forEach(function (removedGuest) {
-        var label = GroupScheduling.guestLabel(removedGuest);
         $("ul.esper-group-people li").each(function (i, e) {
-          if ($(e).data("esper-group-guest-name") === label) {
+          if ($(e).data("esper-group-guest-name") == removedGuest) {
             $(e).slideUp("fast");
           }
         });
@@ -258,7 +257,7 @@ module Esper.GroupTab {
     var name = GroupScheduling.guestLabel(guest);
 
     nameSpan.text(name);
-    widget.data("esper-group-guest-name", name);
+    widget.data("esper-group-guest-name", guest);
 
     widget.mousedown(function (e) {
       e.preventDefault()
@@ -266,7 +265,7 @@ module Esper.GroupTab {
     });
 
     close.click(function () {
-      onClose(name);
+      onClose();
       return false;
     });
 
