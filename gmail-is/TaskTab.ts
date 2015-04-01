@@ -225,6 +225,7 @@ module Esper.TaskTab {
     <select #taskProgressSelector class="esper-select"/>
   </div>
 '''
+    taskTab.taskProgressContainer.children().remove();
 
     Sidebar.customizeSelectArrow(taskProgressSelector);
     var statuses = [
@@ -293,6 +294,14 @@ module Esper.TaskTab {
       });
   }
 
+  /* Refresh task progress, fetching task progress from the server. */
+  export function refreshTaskProgressSelection(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, false)
+      .done(function(task) {
+        displayTaskProgress(task, taskTab);
+      });
+  }
+
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
     CurrentThread.refreshTaskForThread()
@@ -339,8 +348,9 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
+              refreshTaskProgressSelection(team, threadId, taskTab);
+              refreshLinkedThreadsList(team, threadId, taskTab);
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
-              refreshLinkedThreadsList(team, threadId, taskTab)
             });
 
             CurrentThread.task.set(result.task_data);
