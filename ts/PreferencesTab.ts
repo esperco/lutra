@@ -99,6 +99,20 @@ module PreferencesTab {
     };
   }
 
+  function readEmailPrefs(li) {
+    var sendTo = [];
+    li.find(".esper-preference-check").each(function() {
+      var email = $(this);
+      if (email.find(".esper-prefs-email").prop("checked")) {
+        sendTo.push(email.text().trim());
+      }
+    });
+    return {
+      enabled: li.find("div.preference-toggle-switch").hasClass("on"),
+      recipients: sendTo
+    }
+  }
+
   function readGeneralPrefs(div) {
     var colorBox =
       $(".esper-prefs-hold-color").is(":checked") ?
@@ -113,10 +127,6 @@ module PreferencesTab {
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
         div.find(".esper-prefs-bcc").is(":checked"),
-      exec_daily_agenda:
-        div.find(".esper-prefs-agenda").is(":checked"),
-      exec_tasks_update:
-        div.find(".esper-prefs-update").is(":checked"),
       current_timezone:
         div.find(".esper-prefs-timezone").val(),
       hold_event_color: (
@@ -151,6 +161,12 @@ module PreferencesTab {
       meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
     });
 
+    var email_types = {};
+    email_types["daily_agenda"] =
+      readEmailPrefs($(".esper-prefs-daily-agenda").eq(0));
+    email_types["tasks_update"] =
+      readEmailPrefs($(".esper-prefs-tasks-update").eq(0));
+
     var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
 
     var coworkers = $(".coworkers-textbox").val();
@@ -160,6 +176,7 @@ module PreferencesTab {
       workplaces: workplaces,
       transportation: transportation,
       meeting_types: meeting_types,
+      email_types: email_types,
       general: general,
       coworkers: coworkers,
       notes: notes
@@ -991,6 +1008,74 @@ module PreferencesTab {
     return view;
   }
 
+  function createEmailTeamMemberOption(email, send) {
+'''
+<li #view>
+  <label #teamMember class="checkbox esper-preference-check">
+    <input #check type="checkbox" class="esper-prefs-email"/>
+  </label>
+</li>
+'''
+    check.prop("checked", send);
+    check.click(savePreferences);
+
+    teamMember.append(email);
+    return view;
+  }
+
+  function viewOfEmailType(type, defaults, team) {
+'''
+<li #view class="preference">
+  <div #toggle>
+    <div #toggleBg class="preference-toggle-bg on"/>
+    <div #toggleSwitch class="preference-toggle-switch on"/>
+  </div>
+  <div #title class="preference-title semibold"/>
+  <hr/>
+  <div #options class="preference-options">
+    <div class="preference-option-selector-row clearfix">
+      <div class="preference-option-col clearfix">
+        <div class="preference-option-title semibold">Send To</div>
+        <ul #teamMembers>
+          <div #spinner class="spinner table-spinner"/>
+        </ul>
+      </div>
+    </div>
+  </div>
+</li>
+'''
+    function capitalize(word) {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+    var name = type.split("-").map(capitalize).join(" ");
+    title.text(name);
+
+    spinner.show();
+
+    var team_members =
+      List.union([team.team_executive], team.team_assistants, undefined);
+    Deferred.join(List.map(team_members, function(uid) {
+      return Api.getProfile(uid, team.teamid);
+    }))
+      .done(function(profiles) {
+        spinner.hide();
+        profiles.forEach(function(profile) {
+          var email = profile.email;
+          var send = List.mem(defaults.recipients, email);
+          teamMembers.append(createEmailTeamMemberOption(email, send));
+        });
+      });
+
+    if (defaults.enabled === false) togglePreference(_view, team.teamid, false);
+    toggle.click(function() {
+      togglePreference(_view, team.teamid, undefined);
+      savePreferences();
+    });
+
+    view.addClass("esper-prefs-" + type);
+    return view;
+  }
+
   function viewOfTransportationType(type,
                                     defaults : string[],
                                     teamid) {
@@ -1255,20 +1340,6 @@ module PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
-          <input #dailyAgenda type="checkbox"
-                 class="esper-prefs-agenda"/>
-          Receive daily agenda of events
-        </label>
-      </li>
-      <li>
-        <label class="checkbox esper-preference-check">
-          <input #tasksUpdate type="checkbox"
-                 class="esper-prefs-update"/>
-          Receive daily updates on completed and in progress tasks
-        </label>
-      </li>
-      <li>
-        <label class="checkbox esper-preference-check">
           <input #holdColor type="checkbox"
                  class="esper-prefs-hold-color"/>
           Use a different color for HOLD/unconfirmed events
@@ -1289,10 +1360,6 @@ module PreferencesTab {
         useDuplicate.prop("checked", false);
       if (!general.bcc_exec_on_reply)
         bccExec.prop("checked", false);
-      if (general.exec_daily_agenda)
-        dailyAgenda.prop("checked", true);
-      if (general.exec_tasks_update)
-        tasksUpdate.prop("checked", true);
       if (general.hold_event_color !== undefined)
         holdColor.prop("checked", true);
     }
@@ -1301,8 +1368,6 @@ module PreferencesTab {
     sendReminder.click(savePreferences);
     useDuplicate.click(savePreferences);
     bccExec.click(savePreferences);
-    dailyAgenda.click(savePreferences);
-    tasksUpdate.click(savePreferences);
 
     var savedColor = general.hold_event_color;
     showEventColorPicker(colorPicker, holdColor, savedColor);
@@ -1355,6 +1420,10 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
   <div class="table-header">Food & Drinks</div>
   <ul #meals class="table-list">
     <div #mealsDivider class="table-divider"/>
+  </ul>
+  <div class="table-header">Email Preferences</div>
+  <ul #emails class="table-list">
+    <div #emailsDivider class="table-divider"/>
   </ul>
   <div class="table-header">General Scheduling</div>
   <ul #general class="table-list esper-prefs-general">
@@ -1429,6 +1498,16 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
         meals.append(element);
       });
       setDividerHeight("meals", mealsDivider, 3);
+
+
+      if (initial.email_types !== undefined) {
+        emails
+          .append(viewOfEmailType(
+            "daily-agenda", initial.email_types.daily_agenda, team))
+          .append(viewOfEmailType(
+            "tasks-update", initial.email_types.tasks_update, team))
+        setDividerHeight("emails", emailsDivider, 1);
+      }
 
       general.append(viewOfGeneralPrefs(initial.general, team));
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
