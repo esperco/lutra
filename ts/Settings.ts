@@ -300,11 +300,10 @@ module Settings {
         location.hash = "#!join/" + joinTeam;
       else if (teams[0] !== null)
         location.hash = "#!team-settings/" + teams[0].teamid;
-    } else {
-      List.iter(teams, function(team) {
-        execTeams.append(viewOfTeam(team));
-      });
     }
+    List.iter(teams, function(team) {
+      execTeams.append(viewOfTeam(team));
+    });
 
     footer.append(Footer.load());
 
