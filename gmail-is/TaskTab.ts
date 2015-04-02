@@ -743,7 +743,7 @@ module Esper.TaskTab {
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
-        status = task.task_status;
+        if (task.task_status !== undefined) status = task.task_status;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTabView);
