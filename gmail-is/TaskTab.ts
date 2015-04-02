@@ -220,7 +220,7 @@ module Esper.TaskTab {
 
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
-  <div #taskProgress class="esper-section-selector esper-clearfix">
+  <div #view class="esper-clearfix esper-task-progress">
     <span class="esper-show-selector">Progress: </span>
     <select #taskProgressSelector class="esper-select"/>
   </div>
@@ -245,7 +245,7 @@ module Esper.TaskTab {
       task.task_progress = i;
     });
 
-    taskTab.taskProgressContainer.append(taskProgress);
+    taskTab.taskProgressContainer.append(view);
   }
 
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
