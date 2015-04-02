@@ -220,7 +220,7 @@ module Esper.TaskTab {
 
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
-  <div #taskProgress class="esper-section-selector esper-clearfix">
+  <div #view class="esper-clearfix esper-task-progress">
     <span class="esper-show-selector">Progress: </span>
     <select #taskProgressSelector class="esper-select"/>
   </div>
@@ -245,7 +245,7 @@ module Esper.TaskTab {
       task.task_progress = i;
     });
 
-    taskTab.taskProgressContainer.append(taskProgress);
+    taskTab.taskProgressContainer.append(view);
   }
 
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
@@ -743,7 +743,7 @@ module Esper.TaskTab {
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
-        status = task.task_status;
+        if (task.task_status !== undefined) status = task.task_status;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTabView);
