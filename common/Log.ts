@@ -5,6 +5,21 @@ module Esper.Log {
   */
   export var tag = "Esper";
 
+  /** The possible log levels in order, corresponding to the Log.d,
+   *  Log.i, Log.w and Log.e functions respectively.
+   */
+  export enum Level {
+    debug, info, warn, error
+  }
+
+  /** The current log level. We will only log anything at this level
+   *  or above.
+   *
+   *  By default, it's set to "info" in production and "debug" for
+   *  development.
+   */
+  export var level: Level = Conf.prod ? Level.info : Level.debug;
+
   function prefixLines(prefix, text) {
     return text.replace(/\n/mg, "\n" + prefix);
   }
@@ -77,31 +92,30 @@ Esper . xxxxxxxx
 
   /* debug */
   export function d(...a: any[]) {
-    //if (! Conf.prod)
-      logArray(console_log, "D", a);
+    if (level <= Level.debug) logArray(console_log, "D", a);
   }
 
   /* info */
   export function i(...a: any[]) {
-    logArray(console_info, "I", a);
+    if (level <= Level.info) logArray(console_info, "I", a);
   }
 
   /* warning */
   export function w(...a: any[]) {
-    logArray(console_warn, "W", a);
+    if (level <= Level.warn) logArray(console_warn, "W", a);
   }
 
   /* error */
   export function e(...a: any[]) {
-    logArray(console_error, "E", a);
+    if (level <= Level.error) logArray(console_error, "E", a);
   }
 
-  /* Log the beginning and the end of something */
+  /* Log the beginning and the end of something at the "debug" level. */
   export function start(...a: any[]): { (): void } {
     var id = Util.randomString();
-    logArray(console_log, "BEGIN " + id, a);
+    if (level <= Level.debug) logArray(console_log, "BEGIN " + id, a);
     return function() {
-      logArray(console_log, "END " + id, a);
+      if (level <= Level.debug) logArray(console_log, "END " + id, a);
     }
   }
 }
