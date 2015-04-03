@@ -127,21 +127,24 @@ module Api {
   export function getLoginInfo()
     : JQueryDeferred<ApiT.LoginResponse>
   {
-    return jsonHttpGet("/api/login/" + string(Login.me()) + "/info");
-  };
+    return jsonHttpGet("/api/login/" + string(Login.me())
+                       + "/info?msc=true");
+  }
 
   export function loginOnce(uid, loginNonce)
     : JQueryDeferred<ApiT.LoginResponse>
   {
     return jsonHttpPost("/api/login/" + string(uid)
-                        + "/once/" + string(loginNonce), "");
-  };
+                        + "/once/" + string(loginNonce)
+                        + "?msc=true",
+                        "");
+  }
 
   export function random()
     : JQueryDeferred<ApiT.Random>
   {
     return jsonHttpPost("/api/random", "");
-  };
+  }
 
   /*** Esper team management ***/
 
@@ -152,7 +155,7 @@ module Api {
     var invite = { from_uid: fromUid };
     return jsonHttpPost("/api/invite/" + string(fromUid) + "/create-team",
                         JSON.stringify(invite));
-  };
+  }
 
   export function inviteJoinTeam(invite)
     : JQueryPromise<void>
@@ -160,7 +163,7 @@ module Api {
     return jsonHttpPost("/api/invite/" + string(Login.me()) + "/join-team",
                         JSON.stringify(invite))
       .then(function(_ignored) {});
-  };
+  }
 
   export function setTeamName(teamid, name):
   JQueryDeferred<void> {
@@ -169,14 +172,14 @@ module Api {
                        + "/" + string(teamid)
                        + "/" + string(name),
                        "");
-  };
+  }
 
   export function setExecutive(teamid, memberUid)
     : JQueryDeferred<void>
   {
     return jsonHttpPut("/api/team/" + Login.me() + "/" + teamid
                        + "/executive/" + memberUid, "");
-  };
+  }
 
   export function removeAssistant(teamid, memberUid)
     : JQueryDeferred<void>
@@ -184,7 +187,7 @@ module Api {
     return jsonHttpDelete("/api/team/" + string(Login.me())
                           + "/" + string(teamid)
                           + "/member/" + string(memberUid));
-  };
+  }
 
   /***** Opaque URLs with unique token *****/
 
@@ -200,7 +203,7 @@ module Api {
   : JQueryDeferred<ApiT.TokenInfo>
   {
     return jsonHttpPost("/api/token/" + encodeURIComponent(string(token)), "");
-  };
+  }
 
   export function postTokenEmail(token: string, email: string, name: string)
   : JQueryDeferred<ApiT.TokenInfo>
@@ -210,7 +213,7 @@ module Api {
       + "/" + encodeURIComponent(string(email))
       + "/" + encodeURIComponent(string(name));
     return jsonHttpPost(path, "");
-  };
+  }
 
 
   /***** Google authentication and permissions *****/
@@ -233,7 +236,7 @@ module Api {
       q.push("login_hint=" + encodeURIComponent(optEmail));
     url = url + makeQuery(q);
     return jsonHttpGet(url);
-  };
+  }
 
   export function getGoogleAuthInfo(optAuthLandingUrl)
     : JQueryDeferred<ApiT.GoogleAuthInfo>
@@ -243,14 +246,14 @@ module Api {
       url = url + "?auth_landing=" + encodeURIComponent(optAuthLandingUrl);
     }
     return jsonHttpGet(url);
-  };
+  }
 
   export function postGoogleAuthRevoke()
     : JQueryDeferred<any> // FIXME
   {
     var url = "/api/google/" + string(Login.me()) + "/auth/revoke";
     return jsonHttpPost(url, "");
-  };
+  }
 
 
   /***** Team label syncing *****/
@@ -260,21 +263,21 @@ module Api {
   {
     var url = "/api/labels/synced/" + string(teamid);
     return jsonHttpGet(url);
-  };
+  }
 
   export function putSyncedLabels(teamid, labels)
     : JQueryDeferred<void>
   {
     var url = "/api/labels/synced/" + string(teamid);
     return jsonHttpPut(url, JSON.stringify(labels));
-  };
+  }
 
   export function getSharedLabels(teamid)
     : JQueryDeferred<ApiT.EmailLabels>
   {
     var url = "/api/labels/shared/" + string(teamid);
     return jsonHttpGet(url);
-  };
+  }
 
   /***** Google profile information *****/
 
@@ -286,7 +289,7 @@ module Api {
       + "/" + string(theirUID)
       + "/" + string(teamid);
     return jsonHttpGet(url);
-  };
+  }
 
   /*******/
 
@@ -300,11 +303,11 @@ module Api {
     return jsonHttpGet(apiProfilePrefix()
                        + "/" + string(uid)
                        + "/" + string(teamid));
-  };
+  }
 
   export function getMyProfile() {
     return jsonHttpGet(apiProfilePrefix() + "/me");
-  };
+  }
 
 
   /*** Scheduling ***/
@@ -314,7 +317,7 @@ module Api {
   {
     var url = "api/calendar/list/" + string(Login.data.uid);
     return jsonHttpGet(url);
-  };
+  }
 
   export function getCalendarShares(calid)
     : JQueryDeferred<ApiT.CalendarAcl>
@@ -323,7 +326,7 @@ module Api {
       + string(Login.data.uid) + "/"
       + encodeURIComponent(string(calid));
     return jsonHttpGet(url);
-  };
+  }
 
   export function putCalendarShare(calid, email)
     : JQueryDeferred<void>
@@ -333,7 +336,7 @@ module Api {
       + encodeURIComponent(string(calid)) + "/"
       + encodeURIComponent(string(email));
     return jsonHttpPut(url, "");
-  };
+  }
 
   export function deleteCalendarShare(calid, rule_id)
     : JQueryDeferred<void>
@@ -343,7 +346,7 @@ module Api {
       + encodeURIComponent(string(calid)) + "/"
       + encodeURIComponent(string(rule_id));
     return jsonHttpDelete(url);
-  };
+  }
 
   export function createTeamCalendar(forUid, teamid, tz, name)
     : JQueryDeferred<void>
@@ -355,7 +358,7 @@ module Api {
       + encodeURIComponent(string(tz)) + "/"
       + encodeURIComponent(string(name));
     return jsonHttpPost(url, "");
-  };
+  }
 
   export function putTeamCalendars(teamid, cals)
     : JQueryDeferred<void>
@@ -363,7 +366,7 @@ module Api {
     var url = "api/team/" + string(Login.data.uid)
       + "/" + string(teamid) + "/calendars";
     return jsonHttpPut(url, JSON.stringify(cals));
-  };
+  }
 
   export function putTeamEmails(teamid, aliases)
     : JQueryDeferred<ApiT.EmailAddresses>
@@ -371,7 +374,7 @@ module Api {
     var url = "api/team/" + string(Login.data.uid)
       + "/" + string(teamid) + "/emails";
     return jsonHttpPut(url, JSON.stringify(aliases));
-  };
+  }
 
   export function putAccountEmails(teamid, theirUID, aliases)
     : JQueryDeferred<ApiT.EmailAddresses>
@@ -379,7 +382,7 @@ module Api {
     var url = "api/account/emails/" + string(Login.data.uid)
       + "/" + string(teamid) + "/" + string(theirUID);
     return jsonHttpPut(url, JSON.stringify(aliases));
-  };
+  }
 
   /*** Executive Preferences ***/
 
