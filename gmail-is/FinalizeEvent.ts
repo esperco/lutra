@@ -29,7 +29,7 @@ module Esper.FinalizeEvent {
   }
 
   /** Given a list of events, returns just the ones that are holds.
-   *  
+   *
    *  The optional except argument takes an event and will also filter
    *  out events with the same id.
    */
