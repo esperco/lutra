@@ -85,8 +85,12 @@ module Esper.GroupScheduling {
   }
 
   export function reset() {
-    guests = [];
-    times = [];
+    guests   = [];
+    times    = [];
+
+    timesListeners  = [];
+    guestsListeners = [];
+
     initialize();
   }
 
@@ -95,13 +99,12 @@ module Esper.GroupScheduling {
    *  thread.
    */
   export function initialize() {
-    if (CurrentThread.task.isValid()) {
+    if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
       var taskid = CurrentThread.task.get().taskid;
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
           CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
-          updateServer();
         } else {
           var oldGuests = guests;
           guests = groupEvent.guests;
@@ -137,7 +140,6 @@ module Esper.GroupScheduling {
         }
       }
     } else {
-      Log.d("Tried to initialize group tab with an invalid current task. Retrying in 300ms.");
       setTimeout(initialize, 300);
     }
   }
