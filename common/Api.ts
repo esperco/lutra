@@ -214,10 +214,11 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function postCalendarShow(teamCalendars):
+  export function postCalendarShow(teamid, teamCalendars):
   JQueryDeferred<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
-    var url = Conf.Api.url + "/api/calendar/show/" + string(Login.myUid());
+    var url = Conf.Api.url + "/api/calendar/show/" + string(Login.myUid())
+      + "/" + string(teamid);
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
@@ -404,6 +405,15 @@ module Esper.Api {
       Conf.Api.url + "/api/task/title/" + string(Login.myUid())
       + "/" + string(taskid)
       + "/" + encodeURIComponent(string(title));
+    return JsonHttp.put(url, "");
+  }
+
+  export function setTaskStatus(taskid, status):
+  JQueryDeferred<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/task/status/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + string(status);
     return JsonHttp.put(url, "");
   }
 

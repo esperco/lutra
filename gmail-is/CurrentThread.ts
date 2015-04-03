@@ -47,6 +47,12 @@ module Esper.CurrentThread {
     return threadId.isValid();
   }
 
+  threadId.watch(function (newThreadId) {
+    if (!newThreadId) task.set(null);
+
+    GroupScheduling.reset();
+  });
+
   /** Returns a list of all the people involved in the current
    *  thread. (Includes the exec and assistant if appropriate.)
    *

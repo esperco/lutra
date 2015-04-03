@@ -64,18 +64,34 @@ module Esper.GroupScheduling {
     }
   }
 
-  /** Add a guest to be considered. */
+  /** Add a guest to be considered if they are not already in the
+   *  list. If they are, nothing happens.
+   */
   export function addGuest(guest: ApiT.Guest) {
-    guests.push(guest);
+    if (!List.exists(guests, function (existing) {
+      return existing.email == guest.email;
+    })) {
+      guests.push(guest);
 
-    times.forEach(function (time) {
-      time.guests.push({
-        guest : guest,
-        availability : defaultAvailability
+      times.forEach(function (time) {
+        time.guests.push({
+          guest : guest,
+          availability : defaultAvailability
+        });
       });
-    });
 
-    guestsChanged([guest], []);
+      guestsChanged([guest], []);
+    }
+  }
+
+  export function reset() {
+    guests   = [];
+    times    = [];
+
+    timesListeners  = [];
+    guestsListeners = [];
+
+    initialize();
   }
 
   /** Populate the guests and times from the server. If the sever has
@@ -83,13 +99,12 @@ module Esper.GroupScheduling {
    *  thread.
    */
   export function initialize() {
-    if (CurrentThread.task.isValid()) {
+    if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
       var taskid = CurrentThread.task.get().taskid;
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
           CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
-          updateServer();
         } else {
           var oldGuests = guests;
           guests = groupEvent.guests;
@@ -113,11 +128,18 @@ module Esper.GroupScheduling {
         onGuestsChanged(updateServer);
       });
 
+      var throttled = false;
+
       function updateServer() {
-        return Api.putGroupEvent(taskid, { guests : guests, times : times });
+        if (!throttled) {
+          throttled = true;
+          setTimeout(function () {
+            throttled = false;
+            Api.putGroupEvent(taskid, { guests : guests, times : times });
+          }, 1000);
+        }
       }
     } else {
-      Log.d("Tried to initialize group tab with an invalid current task. Retrying in 300ms.");
       setTimeout(initialize, 300);
     }
   }
@@ -161,8 +183,7 @@ module Esper.GroupScheduling {
    */
   export function removeGuest(guest: ApiT.Guest) {
     var index = List.findIndex(guests, function (guest2) {
-      return guest.email        === guest2.email &&
-             guest.display_name === guest2.display_name;
+      return guest.email === guest2.email;
     });
 
     if (index >= 0) {
@@ -170,8 +191,7 @@ module Esper.GroupScheduling {
 
       times.forEach(function (time) {
         var index = List.findIndex(time.guests, function (status) {
-          return status.guest.email        === guest.email &&
-                 status.guest.display_name === guest.display_name;
+          return status.guest.email === guest.email;
         });
 
         if (index >= 0) {

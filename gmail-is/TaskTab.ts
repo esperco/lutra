@@ -4,6 +4,7 @@ module Esper.TaskTab {
   var taskLabelExists = "Title";
 
   /* To refresh from outside, like in CalPicker */
+  export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
@@ -191,14 +192,14 @@ module Esper.TaskTab {
           .attr("title", thread.subject)
           .click(function(e) {
             e.stopPropagation();
-            window.location.hash = "#all/" + thread.gmail_thrid;
+            window.location.hash = "#all/" + linkedThreadId;
           });
 
         cross.click(function() {
-          unlinkThread(task.task_teamid, task.taskid, threadId);
+          unlinkThread(task.task_teamid, task.taskid, linkedThreadId);
           /* remove from the list without waiting for completion */
           li.remove();
-          if (taskTab.linkedThreadsList.children("li").length === 0) {
+          if (threadsList.children("li").length === 0) {
             threadsList.remove();
             taskTab.linkedThreadsList.append(noThreads);
             taskTab.showLinkedThreads.click();
@@ -219,11 +220,12 @@ module Esper.TaskTab {
 
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
-  <div #taskProgress class="esper-section-selector esper-clearfix">
-    <span class="esper-show-selector">Progress Label: </span>
+  <div #view class="esper-clearfix esper-task-progress">
+    <span class="esper-show-selector">Progress: </span>
     <select #taskProgressSelector class="esper-select"/>
   </div>
 '''
+    taskTab.taskProgressContainer.children().remove();
 
     Sidebar.customizeSelectArrow(taskProgressSelector);
     var statuses = [
@@ -243,7 +245,7 @@ module Esper.TaskTab {
       task.task_progress = i;
     });
 
-    taskTab.taskProgressContainer.append(taskProgress);
+    taskTab.taskProgressContainer.append(view);
   }
 
   export function clearlinkedEventsList(team, taskTab: TaskTabView) {
@@ -278,11 +280,25 @@ module Esper.TaskTab {
       });
   }
 
-  /* Refresh only recent events, fetching linked events from the server. */
-  export function refreshLinkedThreadsList(team, threadId, taskTab, profiles) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        displayRecentsList(team, threadId, taskTab, profiles, linkedEvents);
+  /* Refresh linked threads, fetching linked threads from the server. */
+  export function refreshLinkedThreadsList(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, true)
+      .done(function(task) {
+        displayLinkedThreadsList(task, threadId, taskTab);
+        if ((task.task_threads.length > 1 &&
+                  taskTab.showLinkedThreads.text() === "Show") ||
+                  (task.task_threads.length <= 1 &&
+                  taskTab.showLinkedThreads.text() === "Hide")) {
+          taskTab.showLinkedThreads.click();
+        }
+      });
+  }
+
+  /* Refresh task progress, fetching task progress from the server. */
+  export function refreshTaskProgressSelection(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, false)
+      .done(function(task) {
+        displayTaskProgress(task, taskTab);
       });
   }
 
@@ -294,6 +310,9 @@ module Esper.TaskTab {
         task.task_title = query;
         CurrentThread.task.set(task);
         taskTitle.val(query);
+        markNewTaskAsInProgress(task);
+        displayTaskProgress(task, taskTab);
+        displayLinkedThreadsList(task, threadId, taskTab);
       });
   }
 
@@ -332,6 +351,8 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
+              refreshTaskProgressSelection(team, threadId, taskTab);
+              refreshLinkedThreadsList(team, threadId, taskTab);
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
             });
 
@@ -468,6 +489,23 @@ module Esper.TaskTab {
   </div>
   <div class="esper-tab-overflow">
     <div class="esper-section">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Task Status</span>
+      </div>
+      <div class="esper-section-notes">
+        <textarea #taskStatus rows=5
+              maxlength=140
+              placeholder="Leave some brief notes about the task status here"
+              class="esper-text-notes"/>
+      </div>
+      <div class="esper-section-footer esper-clearfix">
+        <span #statusCharCount class="esper-char-count">140</span>
+        <div #saveTaskStatus class="esper-save-status esper-save-disabled">
+          Save
+        </div>
+      </div>
+    </div>
+    <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
         <span #showTaskProgress
@@ -493,7 +531,7 @@ module Esper.TaskTab {
               class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Linked Emails</span>
         <div #refreshLinkedThreads
-             class="esper-refresh esper-clickable esper-disabled">
+             class="esper-refresh esper-clickable">
           <object #refreshLinkedThreadsIcon class="esper-svg"/>
         </div>
       </div>
@@ -580,6 +618,8 @@ module Esper.TaskTab {
       refreshEventLists(team, threadId, taskTabView, profiles);
     });
 
+    refreshLinkedThreadsIcon.attr("data",
+      Init.esperRootUrl + "img/refresh.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
@@ -588,6 +628,17 @@ module Esper.TaskTab {
     displayLinkedEventsList(team, threadId, taskTabView,
                             profiles, linkedEvents);
     displayRecentsList(team, threadId, taskTabView, profiles, linkedEvents);
+
+    /* Set function to refresh from outside without passing any arguments  */
+    refreshLinkedThreadsAction = function() {
+      refreshLinkedThreadsList(team, threadId, taskTabView);
+      if (linkedThreadsContainer.css("display") === "none") {
+        Sidebar.toggleList(linkedThreadsContainer);
+        showLinkedEvents.text("Hide");
+        linkedEventsHeader.addClass("esper-open");
+      }
+    };
+    refreshLinkedThreads.click(refreshLinkedThreadsAction);
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
@@ -669,17 +720,43 @@ module Esper.TaskTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
+    function taskStatusKeyUp(status) {
+      var left = 140 - taskStatus.val().length;
+      statusCharCount.text(left);
+      if (taskStatus.val() === status) {
+        saveTaskStatus.addClass("esper-save-disabled");
+        saveTaskStatus.removeClass("esper-save-enabled");
+        saveTaskStatus.removeClass("esper-clickable");
+      } else {
+        saveTaskStatus.addClass("esper-clickable");
+        saveTaskStatus.addClass("esper-save-enabled");
+        saveTaskStatus.removeClass("esper-save-disabled");
+      }
+    }
+
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.task.set(task);
       var title = "";
+      var status = "";
       linkedThreadsSpinner.hide();
       taskProgressSpinner.hide();
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
+        if (task.task_status !== undefined) status = task.task_status;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTabView);
+        saveTaskStatus.click(function() {
+          if ($(this).hasClass("esper-save-enabled")) {
+            var status = taskStatus.val();
+            Api.setTaskStatus(task.taskid, status);
+            saveTaskStatus.addClass("esper-save-disabled");
+            saveTaskStatus.removeClass("esper-save-enabled");
+            saveTaskStatus.removeClass("esper-clickable");
+            taskStatus.keyup(function() {taskStatusKeyUp(status);});
+          }
+        });
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
@@ -687,6 +764,9 @@ module Esper.TaskTab {
           title = thread.subject;
       }
       taskTitle.val(title);
+      taskStatus.val(status);
+      statusCharCount.text(140 - status.length);
+      taskStatus.keyup(function() {taskStatusKeyUp(status);});
       Util.afterTyping(taskTitle, 250, function() {
         var query = taskTitle.val();
         if (query !== "")

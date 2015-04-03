@@ -883,6 +883,63 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   }
 }
 
+.esper-text-notes {
+  border: none;
+  width: 100%;
+  white-space: pre-wrap;
+  resize: none;
+  &:focus{ outline: 0; }
+}
+
+.esper-section-notes {
+  padding: 10px;
+  margin: 0;
+  border: 1px solid @google_border_gray;
+  border-top: none;
+  border-bottom: none;
+}
+
+.esper-section-footer {
+  padding: 6px 10px;
+  background: @gray_f5;
+  border: 1px solid @google_border_gray;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.esper-save-status {
+  display: block;
+  float: right;
+  font-size: 12px;
+  height: 22px;
+  width: 44px;
+  padding: 4px;
+  text-align: center;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  &.esper-save-enabled {
+    color: white;
+    background: @purple;
+    &:hover { background: @purple_hover; }
+  }
+
+  &.esper-save-disabled {
+    color: @gray_30;
+    background: @gray_10;
+  }
+}
+
+.esper-char-count {
+  float: left;
+  padding-top: 4px;
+  color: @gray_30;
+}
+
+.esper-task-progress {
+  padding: 7px 10px;
+}
+
 .esper-section-actions {
   padding: 7px 0px 2px 0px;
   text-align: center;
