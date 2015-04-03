@@ -192,14 +192,14 @@ module Esper.TaskTab {
           .attr("title", thread.subject)
           .click(function(e) {
             e.stopPropagation();
-            window.location.hash = "#all/" + thread.gmail_thrid;
+            window.location.hash = "#all/" + linkedThreadId;
           });
 
         cross.click(function() {
-          unlinkThread(task.task_teamid, task.taskid, threadId);
+          unlinkThread(task.task_teamid, task.taskid, linkedThreadId);
           /* remove from the list without waiting for completion */
           li.remove();
-          if (taskTab.linkedThreadsList.children("li").length === 0) {
+          if (threadsList.children("li").length === 0) {
             threadsList.remove();
             taskTab.linkedThreadsList.append(noThreads);
             taskTab.showLinkedThreads.click();
