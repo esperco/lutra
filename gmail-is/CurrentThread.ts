@@ -43,6 +43,8 @@ module Esper.CurrentThread {
   }
 
   threadId.watch(function (newThreadId) {
+    if (!newThreadId) task.set(null);
+
     GroupScheduling.reset();
   });
 
