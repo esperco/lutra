@@ -658,6 +658,7 @@ module Esper.UserTab {
 '''
     var emailData = esperGmail.get.email_data();
     var threadMembers = emailData.people_involved;
+    if (threadMembers === undefined) threadMembers = [];
     var aliasesUsed = List.filterMap(threadMembers, function(m) {
       if (List.mem(team.team_email_aliases, m[1])) return m;
       else return null;
