@@ -131,11 +131,11 @@ module Api {
                        + "/info?msc=true");
   }
 
-  export function loginAs(theirUid)
+  export function loginAs(theirEmail)
     : JQueryDeferred<ApiT.LoginResponse>
   {
     return jsonHttpGet("/api/login-as/" + string(Login.me())
-                       + "/" + string(theirUid)
+                       + "/" + string(theirEmail)
                        + "?msc=true");
   }
 
