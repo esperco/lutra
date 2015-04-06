@@ -17,12 +17,6 @@ module Esper.TaskList {
     });
   }
 
-  function zoneAbbr(zoneName) {
-  return zoneName === "UTC" ?
-    "UTC" : // moment-tz can't handle it
-    (<any> moment).tz(moment(), zoneName).zoneAbbr();
-  }
-
   function renderEvent(team: ApiT.Team, e: ApiT.CalendarEvent) {
 '''
 <div #view class="esper-tl-event">
@@ -54,7 +48,7 @@ module Esper.TaskList {
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
     });
-    timezone.text(zoneAbbr(calendar.calendar_timezone));
+    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined)
       title.text(e.title);
