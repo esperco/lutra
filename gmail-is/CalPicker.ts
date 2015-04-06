@@ -275,7 +275,6 @@ module Esper.CalPicker {
      and apply the necessary changes to express it in toTZ (display zone).
   */
   function shiftTime(timestamp, fromTZ, toTZ) {
-    console.log(fromTZ, toTZ);
     var local = timestamp.replace(/Z$/, "");
     var inCalendarTZ =
       /UTC$/.test(fromTZ) || /GMT$/.test(fromTZ) ?
