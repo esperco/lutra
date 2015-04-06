@@ -173,9 +173,21 @@ module Settings {
   function renderAdminSection() {
 '''
 <div #view style="margin-top:16px">
+
+  <div class="esper-h2">Login as another user</div>
+  <div class="loginas-row clearfix">
+    <input #loginEmail type="text"
+           placeholder="name@example.com"
+           class="loginas-input col-xs-9"/>
+    <button #loginButton
+            class="button-primary col-xs-3 loginas">
+      Login
+    </button>
+  </div>
+
   <div class="esper-h2">New Team Invitation URL</div>
   <div class="generate-row clearfix">
-    <button #button
+    <button #generateButton
             class="button-primary col-xs-3 generate">Generate</button>
     <input #url type="text" class="generate-input col-xs-9 disabled"
            onclick="this.select();"/>
@@ -185,12 +197,11 @@ module Settings {
   </div>
 </div>
 '''
-    clearSync.click(function() {
-      Login.clearAllLoginInfo();
-      Signin.signin(function(){});
+    loginButton.click(function() {
+      Signin.loginAs(loginEmail.val());
     });
 
-    button.click(function() {
+    generateButton.click(function() {
       Api.inviteCreateTeam()
         .done(function(x) {
           url
@@ -198,6 +209,11 @@ module Settings {
             .removeClass("disabled")
             .select();
         });
+    });
+
+    clearSync.click(function() {
+      Login.clearAllLoginInfo();
+      Signin.signin(function(){});
     });
 
     return view;
