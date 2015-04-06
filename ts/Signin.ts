@@ -219,6 +219,15 @@ module Signin {
     }
   }
 
+  /* Logged-in user with the admin privilege can login as any other user. */
+  export function loginAs(email: string) {
+    Api.loginAs(email)
+      .done(function(loginResponse) {
+        Login.setLoginInfo(loginResponse);
+        location.reload();
+      });
+  }
+
   function checkGooglePermissions(landingUrl) {
     Log.d("checkGooglePermissions " + landingUrl);
     return Api.getGoogleAuthInfo(landingUrl)

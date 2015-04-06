@@ -613,6 +613,18 @@ a.header-title:hover { text-decoration: underline; }
   border-radius: 3px;
 }
 
+.loginas-row { margin: 10px 0 20px 0; }
+.loginas {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+.loginas-input {
+  border-right: none !important;
+  border-top-right-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+  cursor: default;
+}
+
 .generate-row { margin: 10px 0 20px 0; }
 .generate {
   border-top-right-radius: 0;
@@ -620,8 +632,8 @@ a.header-title:hover { text-decoration: underline; }
 }
 .generate-input {
   border-left: none;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border-top-left-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
   cursor: default;
   &:hover { border-left: none; }
 }

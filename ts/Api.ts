@@ -131,6 +131,14 @@ module Api {
                        + "/info?msc=true");
   }
 
+  export function loginAs(theirEmail)
+    : JQueryDeferred<ApiT.LoginResponse>
+  {
+    return jsonHttpGet("/api/login-as/" + string(Login.me())
+                       + "/" + string(theirEmail)
+                       + "?msc=true");
+  }
+
   export function loginOnce(uid, loginNonce)
     : JQueryDeferred<ApiT.LoginResponse>
   {
