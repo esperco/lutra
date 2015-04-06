@@ -303,6 +303,10 @@ module Settings {
     }
     List.iter(teams, function(team) {
       execTeams.append(viewOfTeam(team));
+      var uid = Login.me();
+      if (team.team_executive === uid) {
+        install.hide();
+      }
     });
 
     footer.append(Footer.load());
