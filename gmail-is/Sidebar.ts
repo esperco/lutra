@@ -367,19 +367,18 @@ module Esper.Sidebar {
   /* Look for a team that has a task for the given thread.
    * If there are multiple such teams, return the first one. */
   function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
-    var getTaskCalls = List.map(teams, function(team) {
-      return Api.getTaskForThread(team.teamid, threadId, false, false);
-    });
-    return Promise.join(getTaskCalls).then(function(teamTasks) {
-      var hasTask = List.find(teamTasks, function(taskOpt) {
-        return taskOpt !== undefined;
+    return Api.getTaskListForThread(threadId, false, false)
+      .then(function(tasks) {
+        var hasTask = tasks.length > 0;
+        if (hasTask) {
+          var task = tasks[0];
+          return List.find(teams, function(team) {
+            return team.teamid === task.task_teamid;
+          });
+        }
+        else
+          return undefined;
       });
-      if (hasTask !== null)
-        return List.find(teams, function(team) {
-          return team.teamid === hasTask.task_teamid;
-        });
-      else return undefined;
-    });
   }
 
   /* We do something if we detect a new msg ID. */
