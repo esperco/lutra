@@ -183,12 +183,144 @@ module PreferencesTab {
     };
   }
 
+  export function currentWorkplaces() {
+    var workplaces = [];
+    $(".esper-prefs-workplaces").find("li.workplace").each(function() {
+      var workplace = readWorkplace($(this));
+      if (workplace !== null) workplaces.push(workplace);
+    });
+    return {workplace_list: workplaces};
+  }
+
+  export function currentTransportation() {
+    var transportation = [];
+    $(".preference-transportation").each(function() {
+      var li = $(this);
+      var kids = li.children();
+      if (kids.eq(0).hasClass("on"))
+        transportation.push(kids.eq(1).text());
+    });
+    return {transportation_list: transportation};
+  }
+
+  export function currentMeetingTypes() {
+    var meeting_types = {};
+    meeting_types["phone_call"] =
+      readPhonePrefs($(".esper-prefs-phone").eq(0));
+    meeting_types["video_call"] =
+      readVideoPrefs($(".esper-prefs-video").eq(0));
+    Preferences.meals.forEach(function(meal) {
+      meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
+    });
+    return meeting_types;
+  }
+
+  export function currentEmailTypes() {
+    var email_types = {};
+    email_types["daily_agenda"] =
+      readEmailPrefs($(".esper-prefs-daily-agenda").eq(0));
+    email_types["tasks_update"] =
+      readEmailPrefs($(".esper-prefs-tasks-update").eq(0));
+    return email_types;
+  }
+
+  export function currentGeneralPrefs() {
+    return readGeneralPrefs($(".esper-prefs-general").eq(0));
+  }
+
+  export function currentCoworkers() {
+    return $(".coworkers-textbox").val();
+  }
+
+  export function currentNotes() {
+    return $(".preferences-notes").val();
+  }
+
   export function savePreferences() {
     var teamid = $(".esper-prefs-teamid").val();
     var preferences = currentPreferences();
     Api.setPreferences(teamid, preferences)
       .done(function() {
         Log.d("Preferences saved.");
+      });
+  }
+
+  export function addWorkplaces(workplaces) {
+    var teamid = $(".esper-prefs-teamid").val();
+    Api.addWorkplaces(teamid, workplaces)
+      .done(function() {
+        Log.d("Added workplaces saved.");
+      });
+  }
+
+  export function removeWorkplaces(workplaces) {
+    var teamid = $(".esper-prefs-teamid").val();
+    Api.removeWorkplaces(teamid, workplaces)
+      .done(function() {
+        Log.d("Removed workplaces saved.");
+      });
+  }
+
+  export function saveWorkplaces() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var workplaces = currentWorkplaces();
+    Api.setWorkplaces(teamid, workplaces)
+      .done(function() {
+        Log.d("Workplaces saved.");
+      });
+  }
+
+  export function saveTransportation() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var transportation = currentTransportation();
+    Api.setTransportation(teamid, transportation)
+      .done(function() {
+        Log.d("Transportation saved.");
+      });
+  }
+
+  export function saveMeetingTypes() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var meeting_types = currentMeetingTypes();
+    Api.setMeetingTypes(teamid, meeting_types)
+      .done(function() {
+        Log.d("Meeting types saved.");
+      });
+  }
+
+  export function saveEmailTypes() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var email_types = currentEmailTypes();
+    Api.setEmailTypes(teamid, email_types)
+      .done(function() {
+        Log.d("Email types saved.");
+      });
+  }
+
+  export function saveGeneralPrefs() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var general_prefs = currentGeneralPrefs();
+    Api.setGeneralPrefs(teamid, general_prefs)
+      .done(function() {
+        Log.d("General prefs saved.");
+      });
+  }
+
+  export function saveCoworkersPref() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var coworkers = currentCoworkers();
+    Api.setCoworkers(teamid, coworkers)
+      .done(function() {
+        Log.d("Coworkers saved.");
+      });
+  }
+
+  export function saveNotesPref() {
+    var teamid = $(".esper-prefs-teamid").val();
+    var notes = currentNotes();
+    Api.setNotes(teamid, notes)
+      .done(function() {
+        Log.d("Notes saved.");
       });
   }
 
@@ -234,7 +366,7 @@ module PreferencesTab {
       address.val(defaults.address);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        savePreferences();
+        saveMeetingTypes();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -254,7 +386,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      savePreferences();
+      saveMeetingTypes();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -286,7 +418,7 @@ module PreferencesTab {
       username.val(defaults.video_username);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        savePreferences();
+        saveMeetingTypes();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -306,7 +438,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      savePreferences();
+      saveMeetingTypes();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -345,7 +477,7 @@ module PreferencesTab {
         share.prop("checked", true);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        savePreferences();
+        saveMeetingTypes();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -366,7 +498,7 @@ module PreferencesTab {
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      savePreferences();
+      saveMeetingTypes();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -388,8 +520,8 @@ module PreferencesTab {
       name.val(defaults.location.title);
       address.val(defaults.location.address);
       deleteBtn.click(function() {
+        removeWorkplaces({workplace_list: [readWorkplace(viewToUpdate)]});
         viewToUpdate.remove();
-        savePreferences();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -404,11 +536,13 @@ module PreferencesTab {
       defaults.location.title = name.val();
       defaults.location.address = address.val();
       var newView = viewOfWorkplace(defaults, teamid);
-      if (purpose === "Edit")
+      if (purpose === "Edit") {
         viewToUpdate.replaceWith(newView);
-      else
+        saveWorkplaces();
+      } else {
         viewToUpdate.append(newView);
-      savePreferences();
+        addWorkplaces({workplace_list: [readWorkplace(newView)]});
+      }
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -472,11 +606,11 @@ module PreferencesTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showAvailability(name, defaults, element) {
-    CalPicker.createModal(name, defaults, element);
+  function showAvailability(name, defaults, element, save) {
+    CalPicker.createModal(name, defaults, element, save);
   }
 
-  function createDurationSelector(selected) {
+  function createDurationSelector(selected, save) {
 '''
 <select #selector
     class="preference-option-selector esper-select esper-prefs-duration">
@@ -497,11 +631,11 @@ module PreferencesTab {
       if (Number($(this).val()) === selectedMinutes)
         $(this).prop("selected", true);
     });
-    selector.change(savePreferences);
+    selector.change(save);
     return selector;
   }
 
-  function createBufferSelector(selected) {
+  function createBufferSelector(selected, save) {
 '''
 <select #selector
     class="preference-option-selector esper-select esper-prefs-buffer">
@@ -524,7 +658,7 @@ module PreferencesTab {
           $(this).prop("selected", true);
       });
     }
-    selector.change(savePreferences);
+    selector.change(save);
     return selector;
   }
 
@@ -795,7 +929,7 @@ module PreferencesTab {
       if (Number($(this).val()) === selected)
         $(this).prop("selected", true);
     });
-    currentTimezone.change(savePreferences);
+    currentTimezone.change(saveGeneralPrefs);
     return currentTimezone;
   }
 
@@ -974,8 +1108,10 @@ module PreferencesTab {
       .appendTo(availabilityContainer);
     Svg.loadImg(availability, "/assets/img/availability.svg");
 
-    durationCol.append(createDurationSelector(defaults.duration));
-    bufferCol.append(createBufferSelector(defaults.buffer));
+    durationCol.append(
+      createDurationSelector(defaults.duration, saveMeetingTypes)
+    );
+    bufferCol.append(createBufferSelector(defaults.buffer, saveMeetingTypes));
 
     bufferInfo.tooltip();
 
@@ -983,17 +1119,20 @@ module PreferencesTab {
 
     if (type == "phone") {
       customizeAvailability.click(function() {
-        showAvailability(name + " Calls", defaults, customizeAvailability);
+        showAvailability(name + " Calls", defaults, customizeAvailability,
+          saveMeetingTypes);
       });
       options.append(viewOfPhoneOptions(defaults, teamid));
     } else if (type == "video") {
       customizeAvailability.click(function() {
-        showAvailability(name + " Calls", defaults, customizeAvailability);
+        showAvailability(name + " Calls", defaults, customizeAvailability,
+          saveMeetingTypes);
       });
       options.append(viewOfVideoOptions(defaults, teamid));
     } else {
       customizeAvailability.click(function() {
-        showAvailability(name, defaults, customizeAvailability);
+        showAvailability(name, defaults, customizeAvailability,
+          saveMeetingTypes);
       });
       options.append(viewOfMealOptions(defaults, teamid));
     }
@@ -1001,7 +1140,7 @@ module PreferencesTab {
     if (defaults.available === false) togglePreference(_view, teamid, false);
     toggle.click(function() {
       togglePreference(_view, teamid, undefined);
-      savePreferences();
+      saveMeetingTypes();
     });
 
     view.addClass("esper-prefs-" + type);
@@ -1017,7 +1156,7 @@ module PreferencesTab {
 </li>
 '''
     check.prop("checked", send);
-    check.click(savePreferences);
+    check.click(saveEmailTypes);
 
     teamMember.append(email);
     return view;
@@ -1069,7 +1208,7 @@ module PreferencesTab {
     if (defaults.enabled === false) togglePreference(_view, team.teamid, false);
     toggle.click(function() {
       togglePreference(_view, team.teamid, undefined);
-      savePreferences();
+      saveEmailTypes();
     });
 
     view.addClass("esper-prefs-" + type);
@@ -1117,7 +1256,7 @@ module PreferencesTab {
         disable();
       else
         enable();
-      savePreferences();
+      saveTransportation();
     });
 
     return view;
@@ -1142,7 +1281,7 @@ module PreferencesTab {
       if (Number($(this).val()) === selected)
         $(this).prop("selected", true);
     });
-    selector.change(savePreferences);
+    selector.change(saveWorkplaces);
     return selector;
   }
 
@@ -1240,8 +1379,10 @@ module PreferencesTab {
       showInfoModal("workplace", "Edit", defaultsCopy, teamid, view);
     })
 
-    durationCol.append(createDurationSelector(defaults.duration));
-    bufferCol.append(createBufferSelector(defaults.buffer));
+    durationCol.append(
+      createDurationSelector(defaults.duration, saveWorkplaces)
+    );
+    bufferCol.append(createBufferSelector(defaults.buffer, saveWorkplaces));
 
     bufferInfo.tooltip();
 
@@ -1251,7 +1392,8 @@ module PreferencesTab {
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
-      showAvailability("Meetings at " + name, defaults, customizeAvailability);
+      showAvailability("Meetings at " + name, defaults, customizeAvailability,
+        saveWorkplaces);
     });
 
     return view;
@@ -1294,7 +1436,7 @@ module PreferencesTab {
           box.removeClass("esper-event-color-hover")
              .addClass("esper-event-color-selected");
           checkbox.prop("checked", true);
-          savePreferences();
+          saveGeneralPrefs();
         });
 
         picker.append(box);
@@ -1364,10 +1506,10 @@ module PreferencesTab {
         holdColor.prop("checked", true);
     }
 
-    sendConfirmation.click(savePreferences);
-    sendReminder.click(savePreferences);
-    useDuplicate.click(savePreferences);
-    bccExec.click(savePreferences);
+    sendConfirmation.click(saveGeneralPrefs);
+    sendReminder.click(saveGeneralPrefs);
+    useDuplicate.click(saveGeneralPrefs);
+    bccExec.click(saveGeneralPrefs);
 
     var savedColor = general.hold_event_color;
     showEventColorPicker(colorPicker, holdColor, savedColor);
@@ -1376,7 +1518,7 @@ module PreferencesTab {
       if (!check)
         $(".esper-event-color").removeClass("esper-event-color-selected");
       if (!check || $(".esper-event-color-selected").length > 0)
-        savePreferences();
+        saveGeneralPrefs();
     });
 
     return view;
@@ -1399,7 +1541,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
       timezoneCol.find(".esper-prefs-timezone").val(general.current_timezone);
     }
 
-    timezoneCol.click(savePreferences);
+    timezoneCol.click(saveGeneralPrefs);
 
     return view;
   }
@@ -1518,7 +1660,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
         saveCoworkers.prop("disabled", false);
       });
       saveCoworkers.click(function() {
-        savePreferences();
+        saveCoworkersPref();
         saveCoworkers.prop("disabled", true);
       });
 
@@ -1527,7 +1669,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
         saveNotes.prop("disabled", false);
       });
       saveNotes.click(function() {
-        savePreferences();
+        saveNotesPref();
         saveNotes.prop("disabled", true);
       });
     }; // end sub-function loadPreferences

@@ -140,7 +140,7 @@ module Esper.ExecutivePreferences {
 
         startingPreferences.workplaces.forEach(function (place) {
           $(".preference-categories li.locations ul")
-            .append(locationForm(place));
+            .append(locationForm(place, PreferencesTab.saveWorkplaces));
         });
 
         $(".preference-categories li.notes ul")
@@ -462,8 +462,8 @@ module Esper.ExecutivePreferences {
     return container;
   }
 
-  function showAvailability(name, defaults, element) {
-    CalPicker.createModal(name, defaults, element);
+  function showAvailability(name, defaults, element, save) {
+    CalPicker.createModal(name, defaults, element, save);
   }
 
   /** The basic form widget which has a prominent on/off toggle and a
@@ -476,7 +476,7 @@ module Esper.ExecutivePreferences {
    *  The given title will be used for the form's header. The icon,
    *  if passed in, will go at the top.
    */
-  export function form(title, defaults) {
+  export function form(title, defaults, save) {
 '''
 <li #container>
   <div #iconDiv></div>
@@ -520,7 +520,7 @@ module Esper.ExecutivePreferences {
 
     customizeAvailability.data("availabilities", defaults.availability);
     customizeAvailability.click(function() {
-      showAvailability("text", defaults, customizeAvailability);
+      showAvailability("text", defaults, customizeAvailability, save);
     });
 
     return _view;
@@ -553,7 +553,7 @@ module Esper.ExecutivePreferences {
    *  phone_info object directly).
    */
   export function phoneForm(defaults) {
-    var phone  = form("Phone", defaults);
+    var phone  = form("Phone", defaults, PreferencesTab.saveMeetingTypes);
     var widget = phoneWidget(defaults.phones);
     phone.rest.append(widget.container);
     phone.iconDiv.append(
@@ -639,7 +639,7 @@ module Esper.ExecutivePreferences {
   }
 
   export function videoForm(defaults) {
-    var video = form("Video", defaults);
+    var video = form("Video", defaults, PreferencesTab.saveMeetingTypes);
 
     video.rest.append(videoWidget(defaults).container);
     video.iconDiv.append(
@@ -668,7 +668,7 @@ module Esper.ExecutivePreferences {
   /** Creates a form for the given meal (ie "breakfast" or "lunch"). */
   export function mealForm(mealName, defaults) {
     var meal = form(mealName.charAt(0).toUpperCase() + mealName.slice(1),
-                    defaults);
+                    defaults, PreferencesTab.saveMeetingTypes);
 
     meal.rest.append(restaurantWidget(defaults).container);
 
@@ -710,7 +710,7 @@ module Esper.ExecutivePreferences {
     return element;
   }
 
-  export function locationForm(defaults) {
+  export function locationForm(defaults, save) {
 '''
 <div #details class="location-details">
   <label>
@@ -728,7 +728,7 @@ module Esper.ExecutivePreferences {
 </div>
 '''
 
-    var location = form("Location", defaults);
+    var location = form("Location", defaults, save);
 
     location.rest.append(details);
 
@@ -737,7 +737,7 @@ module Esper.ExecutivePreferences {
 
     anotherLocation.click(function () {
       $(".preference-categories li.locations ul")
-        .append(locationForm(defaultPreferences().workplaces[0]));
+        .append(locationForm(defaultPreferences().workplaces[0], save));
       return false;
     });
 
