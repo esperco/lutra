@@ -325,6 +325,18 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getTaskListForThread(threadid,
+                                       withEvents: boolean,
+                                       withThreads: boolean):
+  JQueryDeferred<ApiT.Task[]> {
+    var url =
+      Conf.Api.url + "/api/thread/task-list/" + string(Login.myUid())
+      + "/" + string(threadid)
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
+    return JsonHttp.get(url).then(function(x) { return x.tasks; });
+  }
+
   export function getTaskForThread(teamid, threadid,
                                    withEvents: boolean,
                                    withThreads: boolean):
