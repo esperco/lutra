@@ -243,12 +243,6 @@ module Esper.EventWidget {
     return optionsView;
   }
 
-  function zoneAbbr(zoneName) {
-    return zoneName === "UTC" ?
-      "UTC" : // moment-tz can't handle it
-      (<any> moment).tz(moment(), zoneName).zoneAbbr();
-  }
-
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
                               recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
@@ -311,7 +305,7 @@ module Esper.EventWidget {
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
     });
-    timezone.text(zoneAbbr(calendar.calendar_timezone));
+    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
     if (e.google_cal_url !== undefined) {
       date
