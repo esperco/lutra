@@ -157,6 +157,18 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
+  export function eventRange(teamid, teamCalendars,
+                             from: number, until: number):
+  JQueryDeferred<ApiT.CalendarEventList> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
+    var url =
+      Conf.Api.url + "/api/calendar/range/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + from.toString()
+      + "/" + until.toString();
+    return JsonHttp.post(url, JSON.stringify(cals));
+  }
+
 
   export function getEventThreads(teamid, eventId):
   JQueryDeferred<ApiT.LinkedEmailThreads> {

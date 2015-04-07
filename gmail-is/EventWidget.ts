@@ -45,8 +45,19 @@ module Esper.EventWidget {
     return view;
   }
 
+  function stringOfEvent(ev: ApiT.CalendarEvent) {
+    var title = "Untitled";
+    if (ev.title !== undefined) title = ev.title;
+
+    var start = XDate.ofString(ev.start.local);
+    var end = XDate.ofString(ev.end.local);
+
+    return title + ": " + XDate.range(start, end);
+  }
+
   /** Displays a shortcut for choosing the event without using the menu. */
-  export function displayEventChoose(view, event: ApiT.CalendarEvent) {
+  export function displayEventChoose(view, event: ApiT.CalendarEvent,
+                                     team: ApiT.Team) {
 '''
 <div #choose title="Choose this event." class="esper-choose-event">
   <object #check class="esper-svg esper-linked-check"/>
@@ -55,12 +66,36 @@ module Esper.EventWidget {
     check.attr("data", Init.esperRootUrl + "img/green-check.svg");
 
     choose.click(function() {
-      var msg = "Other linked events will be deleted. Are you sure?";
-      if (window.confirm(msg)) { // TODO Style me
-        view.parent().find(".esper-ev").addClass("esper-disabled");
+      var start = Math.floor(Date.parse(event.start.utc)/1000);
+      var end = Math.floor(Date.parse(event.end.utc)/1000);
+      Api.eventRange(team.teamid, team.team_calendars, start, end)
+        .done(function(results) {
+          var numResults = results.events.length;
+          var msg = "";
 
-        FinalizeEvent.finalizeEvent(event);
-      }
+          if (numResults <= 1) {
+            msg = "Other linked events will be deleted. Are you sure?";
+          }
+          else {
+            var events = List.filter(results.events, function(ev) {
+              return ev.google_event_id !== event.google_event_id;
+            });
+            var event_strings = List.map(events, stringOfEvent);
+            var events_string = event_strings.join("\n");
+            var event_string = stringOfEvent(event);
+            msg = "You are trying to finalize the following event: \n\n" +
+                  event_string + "\n\nHowever there are other events on the " +
+                  "calendar during this time frame:\n\n" + events_string +
+                  "\n\nOther linked events will also be deleted. Are you sure" +
+                  " you wish to proceed?";
+          }
+
+          if (window.confirm(msg)) { // TODO Style me
+            view.parent().find(".esper-ev").addClass("esper-disabled");
+
+            FinalizeEvent.finalizeEvent(event);
+          }
+        });
     });
 
     return choose;
@@ -289,7 +324,7 @@ module Esper.EventWidget {
     if (recent) {
       view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
     } else {
-      main.prepend(displayEventChoose(view, e));
+      main.prepend(displayEventChoose(view, e, team));
       main.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
     }
 
