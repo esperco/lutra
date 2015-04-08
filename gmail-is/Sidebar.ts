@@ -482,7 +482,7 @@ module Esper.Sidebar {
 
   function listen(profiles) {
     esperGmail.on.open_email(throttle(function(id, url, body, xhr) {
-      Log.d();
+      Log.d("Opened email " + id, url, body);
       maybeUpdateView(profiles);
     }));
     window.onhashchange = throttle(function() {
