@@ -686,9 +686,10 @@ module Esper.UserTab {
         transportationPreferences.append(viewOfTransportationType(type, last));
       });
 
-      if (prefs.general !== undefined)
+      if (prefs.general !== undefined) {
         displayGeneralPrefs(generalContainer, prefs.general);
         displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
+      }
 
       if (prefs.coworkers !== "") {
         coworkers.text(prefs.coworkers);
