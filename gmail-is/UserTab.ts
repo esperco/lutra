@@ -677,10 +677,8 @@ module Esper.UserTab {
       var workplaces = prefs.workplaces;
       populateMeetingsDropdown(meetingSelector, meetingInfo,
         meetingTypes, workplaces);
-      if (workplaces.length > 0)
-        displayWorkplace(meetingInfo, workplaces[0]);
-      else if (meetingTypes.phone_call !== undefined)
-        displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
+
+      displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
 
       var transportationTypes = prefs.transportation.length;
       List.iter(prefs.transportation, function(type, i) {
