@@ -244,6 +244,14 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
+  export function getPreferenceChanges(teamid, from: number, until: number):
+  JQueryDeferred<ApiT.PreferenceChanges> {
+    var url =
+      Conf.Api.url + "/api/preferences/changes/" + string(Login.myUid())
+      + "/" + string(teamid) + "/" + from.toString() + "/" + until.toString();
+    return JsonHttp.get(url);
+  }
+
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryDeferred<void> {
     var url =

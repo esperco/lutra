@@ -276,6 +276,19 @@ module Esper.ApiT {
     color: string;
   }
 
+  export interface PreferenceChange {
+    uid?: string;
+    teamid: string;
+    execid: string;
+    changeid: string;
+    timestamp: string;
+    change_type : string[];
+  }
+
+  export interface PreferenceChanges {
+    change_log: PreferenceChange[];
+  }
+
   export interface GuestReminder {
     guest_email: string;
     guest_name?: string;
