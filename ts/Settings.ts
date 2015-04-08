@@ -231,7 +231,7 @@ module Settings {
     <span #signOut class="header-signout clickable">Sign out</span>
   </div>
   <div class="divider"/>
-  <div #install class="install clearfix">
+  <div #installContainer class="install clearfix hide">
     <div #closeContainer class="img-container-right close clickable"/>
     <div #chromeLogoContainer
          class="img-container-right chrome-logo-container animated fadeIn"/>
@@ -256,7 +256,7 @@ module Settings {
         <a #toggleAdvanced href="#" class="link">Show advanced</a>
       </div>
       <div #advanced class="profile-advanced">
-        <div #uid/>
+        <div #uidDiv/>
         <a #revoke
            href="#"
            class="danger-link">Deauthorize this account</a>
@@ -303,7 +303,7 @@ module Settings {
         myEmail.text(Login.myEmail());
       });
 
-    uid
+    uidDiv
       .append("<span>UID: </span>")
       .append("<span class='gray'>" + Login.me() + "</span>");
 
@@ -317,12 +317,17 @@ module Settings {
       else if (teams[0] !== null)
         location.hash = "#!team-settings/" + teams[0].teamid;
     }
+    var uid = Login.me();
+    var isExec = false;
+    List.iter(teams, function(team) {
+      if (team.team_executive === uid)
+        isExec = true;
+    });
+    if (isExec || teams.length === 0)
+      installContainer.hide();
+
     List.iter(teams, function(team) {
       execTeams.append(viewOfTeam(team));
-      var uid = Login.me();
-      if (team.team_executive === uid) {
-        install.hide();
-      }
     });
 
     footer.append(Footer.load());
@@ -333,7 +338,7 @@ module Settings {
       return false;
     });
 
-    closeContainer.click(function() { install.slideUp(); });
+    closeContainer.click(function() { installContainer.slideUp(); });
 
     toggleAdvanced.click(function() {
       if (advanced.css("display") === "none") {
