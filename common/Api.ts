@@ -157,6 +157,18 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
+  export function eventRange(teamid, teamCalendars,
+                             from: number, until: number):
+  JQueryDeferred<ApiT.CalendarEventList> {
+    var cals = { google_cal_ids: calIds(teamCalendars) };
+    var url =
+      Conf.Api.url + "/api/calendar/range/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + from.toString()
+      + "/" + until.toString();
+    return JsonHttp.post(url, JSON.stringify(cals));
+  }
+
 
   export function getEventThreads(teamid, eventId):
   JQueryDeferred<ApiT.LinkedEmailThreads> {
@@ -323,6 +335,18 @@ module Esper.Api {
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
     return JsonHttp.get(url);
+  }
+
+  export function getTaskListForThread(threadid,
+                                       withEvents: boolean,
+                                       withThreads: boolean):
+  JQueryDeferred<ApiT.Task[]> {
+    var url =
+      Conf.Api.url + "/api/thread/task-list/" + string(Login.myUid())
+      + "/" + string(threadid)
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
+    return JsonHttp.get(url).then(function(x) { return x.tasks; });
   }
 
   export function getTaskForThread(teamid, threadid,

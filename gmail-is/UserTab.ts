@@ -658,6 +658,7 @@ module Esper.UserTab {
 '''
     var emailData = esperGmail.get.email_data();
     var threadMembers = emailData.people_involved;
+    if (threadMembers === undefined) threadMembers = [];
     var aliasesUsed = List.filterMap(threadMembers, function(m) {
       if (List.mem(team.team_email_aliases, m[1])) return m;
       else return null;
@@ -676,10 +677,8 @@ module Esper.UserTab {
       var workplaces = prefs.workplaces;
       populateMeetingsDropdown(meetingSelector, meetingInfo,
         meetingTypes, workplaces);
-      if (workplaces.length > 0)
-        displayWorkplace(meetingInfo, workplaces[0]);
-      else if (meetingTypes.phone_call !== undefined)
-        displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
+
+      displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
 
       var transportationTypes = prefs.transportation.length;
       List.iter(prefs.transportation, function(type, i) {
@@ -687,9 +686,10 @@ module Esper.UserTab {
         transportationPreferences.append(viewOfTransportationType(type, last));
       });
 
-      if (prefs.general !== undefined)
+      if (prefs.general !== undefined) {
         displayGeneralPrefs(generalContainer, prefs.general);
         displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
+      }
 
       if (prefs.coworkers !== "") {
         coworkers.text(prefs.coworkers);

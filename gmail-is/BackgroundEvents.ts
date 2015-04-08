@@ -29,17 +29,17 @@ module Esper.BackgroundEvents {
             return availability.avail_from.day === day.format("ddd");
           }).map(function (availability) {
             var startHours   = availability.avail_from.time.hour;
-            var startMinutes = parseInt(availability.avail_from.time.minutes, 10);
+            var startMinutes = availability.avail_from.time.minute;
             var endHours     = availability.avail_to.time.hour;
-            var endMinutes   = parseInt(availability.avail_to.time.minutes, 10);
+            var endMinutes   = availability.avail_to.time.minute;
 
             return {
-              start     : moment(day).add("hours", startHours)
-                .add("minutes", startMinutes)
-                .format(),
-              end       : moment(day).add("hours",   endHours)
-                .add("minutes", endMinutes)
-                .format(),
+              start     : moment(day).add("hours", startHours * 1)
+                                     .add("minutes", startMinutes * 1)
+                                     .format(),
+              end       : moment(day).add("hours", endHours * 1)
+                                     .add("minutes", endMinutes * 1)
+                                     .format(),
               title     : eventType,
               editable  : false,
               rendering : "background",

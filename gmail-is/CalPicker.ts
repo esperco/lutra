@@ -40,8 +40,8 @@ module Esper.CalPicker {
     events : { [eventId : string] : FullCalendar.EventObject };
   }
 
-  function zoneAbbr(zoneName) {
-    return zoneName === "UTC" ?
+  export function zoneAbbr(zoneName) {
+    return /UTC$/.test(zoneName) || /GMT$/.test(zoneName) ?
       "UTC" : // moment-tz can't handle it
       (<any> moment).tz(moment(), zoneName).zoneAbbr();
   }
@@ -276,8 +276,14 @@ module Esper.CalPicker {
   */
   function shiftTime(timestamp, fromTZ, toTZ) {
     var local = timestamp.replace(/Z$/, "");
-    var inCalendarTZ = (<any> moment).tz(local, fromTZ);
-    var inDisplayTZ = (<any> inCalendarTZ).tz(toTZ);
+    var inCalendarTZ =
+      /UTC$/.test(fromTZ) || /GMT$/.test(fromTZ) ?
+      (<any> moment).utc(local) :
+      (<any> moment).tz(local, fromTZ);
+    var inDisplayTZ =
+      /UTC$/.test(toTZ) || /GMT$/.test(toTZ) ?
+      (<any> inCalendarTZ.utc()) :
+      (<any> inCalendarTZ).tz(toTZ);
     return (<any> inDisplayTZ).format();
   }
 

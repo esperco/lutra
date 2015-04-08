@@ -13,12 +13,6 @@ module Esper.CalSearch {
     endTime: JQuery;
   }
 
-  function zoneAbbr(zoneName) {
-  return zoneName === "UTC" ?
-    "UTC" : // moment-tz can't handle it
-    (<any> moment).tz(moment(), zoneName).zoneAbbr();
-  }
-
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
                               team: ApiT.Team, threadId: string, eventsTab,
                               profiles: ApiT.Profile[], last) {
@@ -62,7 +56,7 @@ module Esper.CalSearch {
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
     });
-    timezone.text(zoneAbbr(calendar.calendar_timezone));
+    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined)
       title.text(e.title);
