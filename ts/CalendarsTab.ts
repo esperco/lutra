@@ -174,11 +174,11 @@ module CalendarsTab {
       });
     });
 
-    function finishOnboarding() {
+    function goToAboutPage() {
       var freePlan = "Basic_20150123";
       Api.setSubscription(team.teamid, freePlan)
         .done(function() {
-          window.location.hash = "#!team-settings/" + team.teamid;
+          TeamSettings.switchTabByName("abt");
         });
     }
 
@@ -187,7 +187,7 @@ module CalendarsTab {
       Api.putTeamCalendars(team.teamid, { calendars: teamCals })
         .done(function() {
           if (onboarding) {
-            if (team.team_name === "") finishOnboarding();
+            if (team.team_name === "") goToAboutPage();
             else {
               /* During onboarding, create a "ghost calendar" for the EA to
                  keep negative time (no scheduling), notes, etc. */
@@ -203,7 +203,7 @@ module CalendarsTab {
               var esperAsst = team.team_assistants[0];
               Api.createTeamCalendar(esperAsst, team.teamid, tz,
                                      team.team_name + " Ghost")
-                .done(finishOnboarding);
+                .done(goToAboutPage);
             }
           } else window.location.reload();
         });

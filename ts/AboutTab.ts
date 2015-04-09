@@ -4,7 +4,11 @@
 
 module AboutTab {
 
-  export function load(team : ApiT.Team) {
+  function finishOnboarding(team) {
+    window.location.hash = "#!team-settings/" + team.teamid;
+  }
+
+  export function load(team : ApiT.Team, onboarding : boolean) {
 '''
 <div #view>
   <div class="table-header">Understanding How Esper Works</div>
@@ -93,8 +97,17 @@ module AboutTab {
       </div>
     </li>
   </ul>
+  <button #done class="button-primary done-button">Done</button>
 </div>
 '''
+    if (!onboarding) done.remove();
+    else {
+      done.click(function() {
+        done.text("Loading...").attr("disabled", "true");
+        finishOnboarding(team);
+      });
+    }
+
     return view;
   }
 

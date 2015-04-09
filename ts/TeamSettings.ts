@@ -130,7 +130,7 @@ module TeamSettings {
     contentAcc.append(AccountTab.load(team));
     contentCal.append(CalendarsTab.load(team, onboarding));
     contentPrf.append(PreferencesTab.load(team, contentPrf));
-    contentAbt.append(AboutTab.load(team));
+    contentAbt.append(AboutTab.load(team, onboarding));
 
     if (onboarding) {
       // We'll guide the exec through each step
