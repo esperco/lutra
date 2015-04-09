@@ -159,9 +159,10 @@ module Esper.InviteControls {
 
     var peopleInvolved = {};
     var participants = CurrentThread.getExternalParticipants();
-    if (participants) {
+    if (participants.length > 0) {
       List.iter(participants, function (participant) {
         var name = participant.display_name || "";
+        peopleInvolved[participant.email] = name;
         var v = viewPersonInvolved(peopleInvolved, participant.email, name);
         viewPeopleInvolved.append(v);
       });
@@ -171,9 +172,11 @@ module Esper.InviteControls {
     }
 
     addGuest.click(function() {
-      var name = newGuestName.val();
+      var name  = newGuestName.val();
       var email = newGuestEmail.val();
+      peopleInvolved[email] = name;
       if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
+
       var v = viewPersonInvolved(peopleInvolved, email, name);
       viewPeopleInvolved.append(v);
       newGuestName.val("");
@@ -183,7 +186,7 @@ module Esper.InviteControls {
     CurrentThread.withPreferences(function (preferences) {
       var duplicate    = preferences.general.use_duplicate_events;
       var execReminder = preferences.general.send_exec_reminder;
-      var holdColor = preferences.general.hold_event_color;
+      var holdColor    = preferences.general.hold_event_color;
 
       if (!duplicate) {
         heading.text("Invite guests to this calendar event");
@@ -192,7 +195,15 @@ module Esper.InviteControls {
       }
 
       next.click(function() {
-        var guests = CurrentThread.getParticipants();
+        var guests = [];
+        for (var person in peopleInvolved) {
+          if (peopleInvolved.hasOwnProperty(person)) {
+            guests.push({
+              display_name : peopleInvolved[person] || null,
+              email        : person
+            });
+          }
+        }
 
         var location = {
           /* Right now we don't care about title because this is just text
@@ -570,22 +581,25 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   function viewPersonInvolved(peopleInvolved, email, name) {
 '''
 <li #viewPerson>
-  <input #checkPerson type="checkbox"/>
-  <label #labelPerson/>
+  <label #labelPerson>
+    <input #checkPerson type="checkbox" checked />
+  </label>
 </li>
 '''
-    var forID = Util.randomString();
-    checkPerson.attr("id",  forID);
-    labelPerson.attr("for", forID);
+    var display = 0 < name.length ? name + " <" + email + ">" : email;
+    // createTextNode escapes the text, preventing potential injection attacks
+    labelPerson.append(document.createTextNode(display));
 
-    labelPerson.text(0 < name.length ? name + " <" + email + ">" : email);
     checkPerson.change(function() {
-      if (undefined === peopleInvolved[email]) {
+      if (undefined === peopleInvolved[email] && checkPerson.val() == "on") {
         peopleInvolved[email] = name;
-      } else {
+      } else if (checkPerson.val() == "off") {
         delete peopleInvolved[email];
       }
+
+      // do nothing if the guest is already correctly included or not
     });
+
     return viewPerson;
   }
 }
