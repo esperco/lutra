@@ -143,11 +143,7 @@ module Esper.CurrentThread {
   );
 
   export function findTeam() {
-    if (team.isValid()) {
-      return Promise.defer(team.get());
-    } else {
-      return Sidebar.findTeamWithTask(Login.myTeams(), threadId.get());
-    }
+    return Sidebar.findTeamWithTask(Login.myTeams(), threadId.get());
   }
 
   /** If there is no current task, fetches it from the server and
