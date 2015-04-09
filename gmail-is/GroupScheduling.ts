@@ -106,8 +106,6 @@ module Esper.GroupScheduling {
       var task = CurrentThread.task.get();
       var taskid = task.taskid;
 
-      console.error("Initializing with valid threadId and", task);
-
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
           CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
