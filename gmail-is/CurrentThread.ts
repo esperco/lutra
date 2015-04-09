@@ -48,9 +48,14 @@ module Esper.CurrentThread {
   }
 
   threadId.watch(function (newThreadId) {
-    if (!newThreadId) task.set(null);
-
-    GroupScheduling.reset();
+    if (!newThreadId) {
+      task.set(null);
+      GroupScheduling.clear();
+    } else {
+      refreshTaskForThread().done(function () {
+        GroupScheduling.reset();
+      });
+    }
   });
 
   /** Returns a list of all the people involved in the current
@@ -122,7 +127,7 @@ module Esper.CurrentThread {
         // TODO Report something, handle failure, etc.
         Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
           .done(function() {
-            CurrentThread.refreshTaskForThread();
+            refreshTaskForThread();
             Api.syncEvent(teamid, threadId.get(),
                           e.google_cal_id, e.google_event_id);
 
@@ -137,24 +142,35 @@ module Esper.CurrentThread {
     null
   );
 
+  export function findTeam() {
+    if (team.isValid()) {
+      return Promise.defer(team.get());
+    } else {
+      return Sidebar.findTeamWithTask(Login.myTeams(), threadId.get());
+    }
+  }
+
   /** If there is no current task, fetches it from the server and
    *  updates the cached value.
    *
    *  Returns the updated task.
    */
-  export function refreshTaskForThread() {
-    var currentTask = task.get();
-    var teamid      = team.get().teamid;
+  export function refreshTaskForThread(): JQueryPromise<ApiT.Task> {
+    return findTeam().then(function (team) {
+      var currentTask = task.get();
+      var teamid      = team.teamid;
 
-    if (!currentTask) {
-      return Api.obtainTaskForThread(teamid, threadId.get(), false, true)
-        .then(function(newTask) {
-          task.set(newTask);
-          return newTask;
-        });
-    } else {
-      return Promise.defer(currentTask);
-    }
+      // cast to <any> needed because promises are implicitly flattened (!)
+      if (!currentTask) {
+        return (<any> Api.obtainTaskForThread(teamid, threadId.get(), false, true)
+          .then(function(newTask) {
+            task.set(newTask);
+            return newTask;
+          }));
+      } else {
+        return (<any> Promise.defer(currentTask));
+      }
+    });
   }
 
   /** Does the current thread have a valid task attached to it? */

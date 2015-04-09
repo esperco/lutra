@@ -84,13 +84,16 @@ module Esper.GroupScheduling {
     }
   }
 
-  export function reset() {
+  export function clear() {
     guests   = [];
     times    = [];
 
     timesListeners  = [];
     guestsListeners = [];
+  }
 
+  export function reset() {
+    clear();
     initialize();
   }
 
@@ -98,9 +101,12 @@ module Esper.GroupScheduling {
    *  no data, prefill the guests with participants from the current
    *  thread.
    */
-  export function initialize() {
+  function initialize() {
     if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
-      var taskid = CurrentThread.task.get().taskid;
+      var task = CurrentThread.task.get();
+      var taskid = task.taskid;
+
+      console.error("Initializing with valid threadId and", task);
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {

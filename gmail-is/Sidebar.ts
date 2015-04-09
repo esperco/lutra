@@ -366,7 +366,7 @@ module Esper.Sidebar {
 
   /* Look for a team that has a task for the given thread.
    * If there are multiple such teams, return the first one. */
-  function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
+  export function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
     return Api.getTaskListForThread(threadId, false, false)
       .then(function(tasks) {
         var hasTask = tasks.length > 0;
