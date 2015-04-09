@@ -1,5 +1,5 @@
 /*
-  Team Settings - Account Tab
+  Team Settings - About Tab
 */
 
 module AboutTab {
