@@ -8,7 +8,7 @@ module AboutTab {
 '''
 <div #view>
   <div class="table-header">Understanding How Esper Works</div>
-  <ul #understanding class="table-list">
+  <ul class="table-list">
     <li class="table-row clearfix" >
       <div class="about-paragraph">
         You can Cc or email your assistants directly to help with any
