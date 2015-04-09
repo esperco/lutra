@@ -591,9 +591,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     labelPerson.append(document.createTextNode(display));
 
     checkPerson.change(function() {
-      if (undefined === peopleInvolved[email] && checkPerson.val() == "on") {
+      if (undefined === peopleInvolved[email] && checkPerson.is(":checked")) {
         peopleInvolved[email] = name;
-      } else if (checkPerson.val() == "off") {
+      } else if (!checkPerson.is(":checked")) {
         delete peopleInvolved[email];
       }
 
