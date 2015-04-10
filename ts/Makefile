@@ -76,6 +76,7 @@ TS_SOURCES = \
   LabelsTab \
   ExecutivePreferences \
   UsageTab \
+  AboutTab \
   UsagePeriod \
   Page \
   Route \

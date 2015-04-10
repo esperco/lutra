@@ -94,6 +94,7 @@ module TeamSettings {
       <li #tabPrf><a class="link">Preferences</a></li>
       <li #tabLab><a class="link">Labels</a></li>
       <li #tabUsg><a class="link">Usage</a></li>
+      <li #tabAbt><a class="link">About</a></li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -102,6 +103,7 @@ module TeamSettings {
     <div #contentPrf class="tab-content"/>
     <div #contentLab class="tab-content"/>
     <div #contentUsg class="tab-content"/>
+    <div #contentAbt class="tab-content"/>
   </div>
 </div>
 '''
@@ -111,12 +113,14 @@ module TeamSettings {
     var tabViewPrf = makeTabView("prf", tabPrf, contentPrf, true);
     var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
     var tabViewUsg = makeTabView("usg", tabUsg, contentUsg, true);
+    var tabViewAbt = makeTabView("abt", tabAbt, contentAbt, true);
     tabViews /* global */ = [
       tabViewAcc,
       tabViewCal,
       tabViewPrf,
       tabViewLab,
-      tabViewUsg
+      tabViewUsg,
+      tabViewAbt
     ];
 
     List.iter(tabViews, function(x: TabView, i) {
@@ -126,6 +130,7 @@ module TeamSettings {
     contentAcc.append(AccountTab.load(team));
     contentCal.append(CalendarsTab.load(team, onboarding));
     contentPrf.append(PreferencesTab.load(team, contentPrf));
+    contentAbt.append(AboutTab.load(team, onboarding));
 
     if (onboarding) {
       // We'll guide the exec through each step
