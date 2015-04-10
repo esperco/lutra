@@ -750,11 +750,12 @@ module Esper.TaskTab {
         saveTaskStatus.click(function() {
           if ($(this).hasClass("esper-save-enabled")) {
             var status = taskStatus.val();
-            Api.setTaskStatus(task.taskid, status);
-            saveTaskStatus.addClass("esper-save-disabled");
-            saveTaskStatus.removeClass("esper-save-enabled");
-            saveTaskStatus.removeClass("esper-clickable");
-            taskStatus.keyup(function() {taskStatusKeyUp(status);});
+            Api.setTaskStatus(task.taskid, status).done(function() {
+              saveTaskStatus.addClass("esper-save-disabled");
+              saveTaskStatus.removeClass("esper-save-enabled");
+              saveTaskStatus.removeClass("esper-clickable");
+              taskStatus.keyup(function() {taskStatusKeyUp(status);});
+            });
           }
         });
       } else {

@@ -437,7 +437,7 @@ module Esper.Api {
     var url =
       Conf.Api.url + "/api/task/status/" + string(Login.myUid())
       + "/" + string(taskid)
-      + "/" + string(status);
+      + "/" + encodeURIComponent(string(status));
     return JsonHttp.put(url, "");
   }
 
