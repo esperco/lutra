@@ -17,7 +17,7 @@ module Esper.TaskList {
     });
   }
 
-  function renderEvent(team: ApiT.Team, e: ApiT.CalendarEvent) {
+  export function renderEvent(team: ApiT.Team, e: ApiT.CalendarEvent) {
 '''
 <div #view class="esper-tl-event">
   <div #weekday class="esper-ev-weekday"/>
