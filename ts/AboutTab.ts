@@ -85,14 +85,14 @@ module AboutTab {
           assistant. Example tasks include:
         </p>
         <ul class="small-task-types">
-          <li>» Restaurant reservations</li>
-          <li>» Travel arrangements/research (trains, planes, cars, etc.)</li>
-          <li>» Tracking down missing packages</li>
-          <li>» Event research: venues, caterers, activities</li>
-          <li>» Send you reminders</li>
-          <li>» Research on miles and points cards</li>
-          <li>» Compile shopping list from recipes</li>
-          <li>» Populate spreadsheets with readily available data</li>
+          <li>• Restaurant reservations</li>
+          <li>• Travel arrangements/research (trains, planes, cars, etc.)</li>
+          <li>• Tracking down missing packages</li>
+          <li>• Event research: venues, caterers, activities</li>
+          <li>• Send you reminders</li>
+          <li>• Research on miles and points cards</li>
+          <li>• Compile shopping list from recipes</li>
+          <li>• Populate spreadsheets with readily available data</li>
         </ul>
       </div>
     </li>
