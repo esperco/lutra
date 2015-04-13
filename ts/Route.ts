@@ -9,8 +9,7 @@ module Route {
   }
 
   function fallbackOnAppStore() {
-    //TODO: Change to the actual URL once the app is available at App Store.
-    var appUrl = "http://itunes.com/";
+    var appUrl = "https://itunes.apple.com/us/app/esper-executive-assistant/id969190370";
     // Go to App Store if we fail to open the app in half a second.
     window.setTimeout(function(){ window.location.href = appUrl; }, 500);
   }
