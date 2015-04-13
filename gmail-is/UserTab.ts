@@ -896,11 +896,12 @@ module Esper.UserTab {
           );
         });
 
-        if (prefs.general !== undefined)
+        if (prefs.general !== undefined) {
           displayGeneralPrefs(generalContainer, prefs.general, general_changes);
           displayDetailedGeneralPrefs(generalDetailedContainer,
                                       prefs.general,
                                       general_changes);
+        }
 
         if (prefs.coworkers !== "") {
           coworkers.text(prefs.coworkers);

@@ -135,8 +135,9 @@ module Esper.GroupScheduling {
           throttled = true;
           setTimeout(function () {
             throttled = false;
+            console.info("updating server!");
             Api.putGroupEvent(taskid, { guests : guests, times : times });
-          }, 1000);
+          }, 2500);
         }
       }
     } else {

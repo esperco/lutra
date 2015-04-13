@@ -367,19 +367,18 @@ module Esper.Sidebar {
   /* Look for a team that has a task for the given thread.
    * If there are multiple such teams, return the first one. */
   function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
-    var getTaskCalls = List.map(teams, function(team) {
-      return Api.getTaskForThread(team.teamid, threadId, false, false);
-    });
-    return Promise.join(getTaskCalls).then(function(teamTasks) {
-      var hasTask = List.find(teamTasks, function(taskOpt) {
-        return taskOpt !== undefined;
+    return Api.getTaskListForThread(threadId, false, false)
+      .then(function(tasks) {
+        var hasTask = tasks.length > 0;
+        if (hasTask) {
+          var task = tasks[0];
+          return List.find(teams, function(team) {
+            return team.teamid === task.task_teamid;
+          });
+        }
+        else
+          return undefined;
       });
-      if (hasTask !== null)
-        return List.find(teams, function(team) {
-          return team.teamid === hasTask.task_teamid;
-        });
-      else return undefined;
-    });
   }
 
   /* We do something if we detect a new msg ID. */
@@ -468,16 +467,31 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
+  var isThrottled = false;
+  function throttle(body): any {
+    return function () {
+      if (!isThrottled) {
+        isThrottled = true;
+        body();
+        setTimeout(function () {
+          isThrottled = false;
+        }, 1000);
+      }
+    }
+  }
+
   function listen(profiles) {
-    esperGmail.on.open_email(function(id, url, body, xhr) {
+    esperGmail.on.open_email(throttle(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
       maybeUpdateView(profiles);
+    }));
+    window.onhashchange = throttle(function() {
+      if (!isThrottled) {
+        Log.d("URL changed");
+        CurrentThread.threadId.set(null);
+        maybeUpdateView(profiles);
+      }
     });
-    window.onhashchange = function() {
-      Log.d("URL changed");
-      CurrentThread.threadId.set(null);
-      maybeUpdateView(profiles);
-    };
   }
 
   var alreadyInitialized = false;
