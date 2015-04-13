@@ -462,8 +462,8 @@ module Api {
     : JQueryDeferred<void>
   {
     var url = "/api/preferences/coworkers/" + string(Login.me()) + "/" +
-      string(teamid) + "/" + encodeURIComponent(string(coworkers));
-    return jsonHttpPut(url, "");
+      string(teamid);
+    return jsonHttpPut(url, string(coworkers));
   }
 
   /** Sets notes given the correct JSON object. */
@@ -471,8 +471,8 @@ module Api {
     : JQueryDeferred<void>
   {
     var url = "/api/preferences/notes/" + string(Login.me()) + "/" +
-      string(teamid) + "/" + encodeURIComponent(string(notes));
-    return jsonHttpPut(url, "");
+      string(teamid);
+    return jsonHttpPut(url, string(notes));
   }
 
   /** The preferences currently saved for the given team executive, as
