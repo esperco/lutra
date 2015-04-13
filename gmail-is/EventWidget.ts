@@ -45,14 +45,21 @@ module Esper.EventWidget {
     return view;
   }
 
-  function stringOfEvent(ev: ApiT.CalendarEvent) {
-    var title = "Untitled";
-    if (ev.title !== undefined) title = ev.title;
+  function confirmEvent(view,
+                        event: ApiT.CalendarEvent,
+                        team: ApiT.Team) {
+    var start = Math.floor(Date.parse(event.start.utc)/1000);
+    var end = Math.floor(Date.parse(event.end.utc)/1000);
 
-    var start = XDate.ofString(ev.start.local);
-    var end = XDate.ofString(ev.end.local);
+    Api.eventRange(team.teamid, team.team_calendars, start, end)
+      .done(function(results) {
+        var events = List.filter(results.events, function(ev) {
+          return ev.google_event_id !== event.google_event_id;
+        });
 
-    return title + ": " + XDate.range(start, end);
+        var confirmModal = displayConfirmEventModal(view, event, events, team);
+        $("body").append(confirmModal.view);
+      });
   }
 
   /** Displays a shortcut for choosing the event without using the menu. */
@@ -65,40 +72,65 @@ module Esper.EventWidget {
 '''
     check.attr("data", Init.esperRootUrl + "img/green-check.svg");
 
-    choose.click(function() {
-      var start = Math.floor(Date.parse(event.start.utc)/1000);
-      var end = Math.floor(Date.parse(event.end.utc)/1000);
-      Api.eventRange(team.teamid, team.team_calendars, start, end)
-        .done(function(results) {
-          var numResults = results.events.length;
-          var msg = "";
-
-          if (numResults <= 1) {
-            msg = "Other linked events will be deleted. Are you sure?";
-          }
-          else {
-            var events = List.filter(results.events, function(ev) {
-              return ev.google_event_id !== event.google_event_id;
-            });
-            var event_strings = List.map(events, stringOfEvent);
-            var events_string = event_strings.join("\n");
-            var event_string = stringOfEvent(event);
-            msg = "You are trying to finalize the following event: \n\n" +
-                  event_string + "\n\nHowever there are other events on the " +
-                  "calendar during this time frame:\n\n" + events_string +
-                  "\n\nOther linked events will also be deleted. Are you sure" +
-                  " you wish to proceed?";
-          }
-
-          if (window.confirm(msg)) { // TODO Style me
-            view.parent().find(".esper-ev").addClass("esper-disabled");
-
-            FinalizeEvent.finalizeEvent(event);
-          }
-        });
-    });
+    choose.click(function(){confirmEvent(view, event, team)});
 
     return choose;
+  }
+
+  function displayConfirmEventModal(eventView, event: ApiT.CalendarEvent,
+                                    conflictingEvents: ApiT.CalendarEvent[],
+                                    team: ApiT.Team) {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-event-modal">
+    <div class="esper-modal-header">Finalize Event</div>
+    <div #noConflicts class="esper-modal-content">
+      <p>Other linked events will be deleted. Are you sure?</p>
+    </div>
+    <div #eventConflicts class="esper-modal-content">
+      <p>You are trying to finalize the following event:</p>
+      <div #confirmingEvent class="esper-events-list"/>
+      <p>However there are other events on the calendar during this time frame:
+      </p>
+      <div #conflictingEventsList class="esper-events-list"/>
+      <p>Other linked events will also be deleted. Are you sure you wish to
+      proceed?</p>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #yesButton class="esper-btn esper-btn-primary modal-primary">
+        Yes
+      </button>
+      <button #noButton class="esper-btn esper-btn-secondary modal-cancel">
+        No
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    if (conflictingEvents.length > 0) {
+      noConflicts.hide();
+      confirmingEvent.append(TaskList.renderEvent(team, event));
+
+      conflictingEvents.forEach(function(ev) {
+        conflictingEventsList.append(TaskList.renderEvent(team, ev));
+      });
+    } else {
+      eventConflicts.hide();
+    }
+
+    function yesOption() {
+      eventView.parent().find(".esper-ev").addClass("esper-disabled");
+      FinalizeEvent.finalizeEvent(event);
+      view.remove();
+    }
+    function noOption() { view.remove(); }
+
+    view.click(noOption);
+    Util.preventClickPropagation(modal);
+    yesButton.click(yesOption);
+    noButton.click(noOption);
+
+    return _view;
   }
 
   export function displayEventOptions(view,
@@ -266,14 +298,7 @@ module Esper.EventWidget {
       });
     });
 
-    chooseThisEvent.click(function() {
-      var msg = "Other linked events will be deleted. Are you sure?";
-      if (window.confirm(msg)) { // TODO Style me
-        view.parent().find(".esper-ev").addClass("esper-disabled");
-
-        FinalizeEvent.finalizeEvent(e);
-      }
-    });
+    chooseThisEvent.click(function(){confirmEvent(view, e, team)});
 
     return optionsView;
   }

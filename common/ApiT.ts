@@ -276,6 +276,19 @@ module Esper.ApiT {
     color: string;
   }
 
+  export interface PreferenceChange {
+    uid?: string;
+    teamid: string;
+    execid: string;
+    changeid: string;
+    timestamp: string;
+    change_type : string[];
+  }
+
+  export interface PreferenceChanges {
+    change_log: PreferenceChange[];
+  }
+
   export interface GuestReminder {
     guest_email: string;
     guest_name?: string;
@@ -303,7 +316,7 @@ module Esper.ApiT {
     taskid: string;
     task_teamid: string;
     task_title: string;
-    task_status: string;
+    task_notes: string;
     task_archived: boolean;
     task_labels: string[];
     task_progress: string; // New | In_progress | Done | Canceled

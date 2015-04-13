@@ -302,6 +302,14 @@ module Esper.TaskTab {
       });
   }
 
+  /* Refresh task notes, fetching task notes from the server. */
+  export function refreshTaskNotes(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, false)
+      .done(function(task) {
+        taskTab.taskNotes.val(task.task_notes);
+      });
+  }
+
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
     CurrentThread.refreshTaskForThread()
@@ -310,6 +318,7 @@ module Esper.TaskTab {
         task.task_title = query;
         CurrentThread.task.set(task);
         taskTitle.val(query);
+        taskTab.taskNotes.val(task.task_notes);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTab);
         displayLinkedThreadsList(task, threadId, taskTab);
@@ -351,6 +360,7 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
+              refreshTaskNotes(team, threadId, taskTab);
               refreshTaskProgressSelection(team, threadId, taskTab);
               refreshLinkedThreadsList(team, threadId, taskTab);
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
@@ -490,17 +500,17 @@ module Esper.TaskTab {
   <div class="esper-tab-overflow">
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
-        <span class="esper-bold" style="float:left">Task Status</span>
+        <span class="esper-bold" style="float:left">Task Notes</span>
       </div>
       <div class="esper-section-notes">
-        <textarea #taskStatus rows=5
+        <textarea #taskNotes rows=5
               maxlength=140
-              placeholder="Leave some brief notes about the task status here"
+              placeholder="Leave some brief notes about the task here"
               class="esper-text-notes"/>
       </div>
       <div class="esper-section-footer esper-clearfix">
-        <span #statusCharCount class="esper-char-count">140</span>
-        <div #saveTaskStatus class="esper-save-status esper-save-disabled">
+        <span #notesCharCount class="esper-char-count">140</span>
+        <div #saveTaskNotes class="esper-save-notes esper-save-disabled">
           Save
         </div>
       </div>
@@ -720,41 +730,42 @@ module Esper.TaskTab {
       Api.getAutoTaskForThread
       : Api.getTaskForThread;
 
-    function taskStatusKeyUp(status) {
-      var left = 140 - taskStatus.val().length;
-      statusCharCount.text(left);
-      if (taskStatus.val() === status) {
-        saveTaskStatus.addClass("esper-save-disabled");
-        saveTaskStatus.removeClass("esper-save-enabled");
-        saveTaskStatus.removeClass("esper-clickable");
+    function taskNotesKeyUp(notes) {
+      var left = 140 - taskNotes.val().length;
+      notesCharCount.text(left);
+      if (taskNotes.val() === notes) {
+        saveTaskNotes.addClass("esper-save-disabled");
+        saveTaskNotes.removeClass("esper-save-enabled");
+        saveTaskNotes.removeClass("esper-clickable");
       } else {
-        saveTaskStatus.addClass("esper-clickable");
-        saveTaskStatus.addClass("esper-save-enabled");
-        saveTaskStatus.removeClass("esper-save-disabled");
+        saveTaskNotes.addClass("esper-clickable");
+        saveTaskNotes.addClass("esper-save-enabled");
+        saveTaskNotes.removeClass("esper-save-disabled");
       }
     }
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.task.set(task);
       var title = "";
-      var status = "";
+      var notes = "";
       linkedThreadsSpinner.hide();
       taskProgressSpinner.hide();
       if (task !== undefined) {
         taskCaption.text(taskLabelExists);
         title = task.task_title;
-        if (task.task_status !== undefined) status = task.task_status;
+        if (task.task_notes !== undefined) notes = task.task_notes;
         displayLinkedThreadsList(task, threadId, taskTabView);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTabView);
-        saveTaskStatus.click(function() {
+        saveTaskNotes.click(function() {
           if ($(this).hasClass("esper-save-enabled")) {
-            var status = taskStatus.val();
-            Api.setTaskStatus(task.taskid, status);
-            saveTaskStatus.addClass("esper-save-disabled");
-            saveTaskStatus.removeClass("esper-save-enabled");
-            saveTaskStatus.removeClass("esper-clickable");
-            taskStatus.keyup(function() {taskStatusKeyUp(status);});
+            var notes = taskNotes.val();
+            Api.setTaskNotes(task.taskid, notes).done(function() {
+              saveTaskNotes.addClass("esper-save-disabled");
+              saveTaskNotes.removeClass("esper-save-enabled");
+              saveTaskNotes.removeClass("esper-clickable");
+              taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+            });
           }
         });
       } else {
@@ -764,9 +775,9 @@ module Esper.TaskTab {
           title = thread.subject;
       }
       taskTitle.val(title);
-      taskStatus.val(status);
-      statusCharCount.text(140 - status.length);
-      taskStatus.keyup(function() {taskStatusKeyUp(status);});
+      taskNotes.val(notes);
+      notesCharCount.text(140 - notes.length);
+      taskNotes.keyup(function() {taskNotesKeyUp(notes);});
       Util.afterTyping(taskTitle, 250, function() {
         var query = taskTitle.val();
         if (query !== "")

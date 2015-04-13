@@ -256,6 +256,14 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
+  export function getPreferenceChanges(teamid, from: number, until: number):
+  JQueryDeferred<ApiT.PreferenceChanges> {
+    var url =
+      Conf.Api.url + "/api/preferences/changes/" + string(Login.myUid())
+      + "/" + string(teamid) + "/" + from.toString() + "/" + until.toString();
+    return JsonHttp.get(url);
+  }
+
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryDeferred<void> {
     var url =
@@ -432,13 +440,12 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
-  export function setTaskStatus(taskid, status):
+  export function setTaskNotes(taskid, notes):
   JQueryDeferred<ApiT.Task> {
     var url =
-      Conf.Api.url + "/api/task/status/" + string(Login.myUid())
-      + "/" + string(taskid)
-      + "/" + string(status);
-    return JsonHttp.put(url, "");
+      Conf.Api.url + "/api/task/notes/" + string(Login.myUid())
+      + "/" + string(taskid);
+    return JsonHttp.put(url, string(notes));
   }
 
   export function setTaskProgress(taskid, progress):

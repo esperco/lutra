@@ -29,17 +29,23 @@ module Esper.UserTab {
 
   function displayAvailability(meetingPrefs: JQuery,
                                availabilities: ApiT.Availability[],
-                               last: boolean) {
+                               last: boolean,
+                               changes) {
 '''
 <div #view class="esper-preference-section esper-contains-list esper-clearfix">
   <div class="esper-clearfix">
     <span #viewAvailability class="esper-preference-text esper-link">View</span>
     <object #availabilityIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Availability</span>
+    <span #title class="esper-preference-title esper-bold"></span>
   </div>
   <ul #availability class="esper-preference-list"/>
 </div>
 '''
+    if (changes.length > 0)
+      title.text("Availability*");
+    else
+      title.text("Availability");
+
     availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
 
     if (last)
@@ -95,17 +101,23 @@ module Esper.UserTab {
     return text;
   }
 
-  function displayFavoriteLocations(meetingPrefs, favoriteLocations) {
+  function displayFavoriteLocations(meetingPrefs, favoriteLocations,
+                                    changes) {
 '''
 <div #view class="esper-preference-section esper-clearfix
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #locationIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Favorite locations</span>
+    <span #title class="esper-preference-title esper-bold"></span>
   </div>
   <ul #locations class="esper-preference-list"/>
 </div>
 '''
+    if (changes.length > 0)
+      title.text("Favorite locations*");
+    else
+      title.text("Favorite locations");
+
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
 
     var numLocations = favoriteLocations.length;
@@ -143,17 +155,23 @@ module Esper.UserTab {
   }
 
   function displayVideoUsernames(meetingPrefs: JQuery,
-                                 videoAccounts: ApiT.VideoAccount[]) {
+                                 videoAccounts: ApiT.VideoAccount[],
+                                 changes) {
 '''
 <div #view class="esper-preference-section esper-clearfix
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #videoIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Usernames</span>
+    <span #title class="esper-preference-title esper-bold"></span>
   </div>
   <ul #usernames class="esper-preference-list"/>
 </div>
 '''
+    if (changes.length > 0)
+      title.text("Usernames*");
+    else
+      title.text("Usernames");
+
     videoIcon.attr("data", Init.esperRootUrl + "img/video.svg");
 
     var numUsernames = videoAccounts.length;
@@ -179,17 +197,23 @@ module Esper.UserTab {
   }
 
   function displayPhoneNumbers(meetingPrefs: JQuery,
-                               phoneNumbers: ApiT.PhoneNumber[]) {
+                               phoneNumbers: ApiT.PhoneNumber[],
+                               changes) {
 '''
 <div #view class="esper-preference-section
                   esper-clearfix esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #phoneIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Phone numbers</span>
+    <span #title class="esper-preference-title esper-bold"></span>
   </div>
   <ul #phones class="esper-preference-list"/>
 </div>
 '''
+    if (changes.length > 0)
+      title.text("Phone numbers*");
+    else
+      title.text("Phone numbers");
+
     phoneIcon.attr("data", Init.esperRootUrl + "img/phone.svg");
 
     var numPhones = phoneNumbers.length;
@@ -218,106 +242,154 @@ module Esper.UserTab {
   }
 
   function displayPhoneInfo(meetingView: JQuery,
-                            meetingPrefs: ApiT.PhoneInfo) {
+                            meetingPrefs: ApiT.PhoneInfo,
+                            changes) {
 '''
 <div #view class="esper-meeting-preferences">
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Duration</span>
+    <span #duration class="esper-preference-title esper-bold"></span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Buffer time</span>
+    <span #buffer class="esper-preference-title esper-bold"></span>
   </div>
 </div>
 '''
+    if (getSubPreferenceChanges("Duration", changes).length > 0)
+      duration.text("Duration*");
+    else
+      duration.text("Duration");
+
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+      buffer.text("Buffer time*");
+    else
+      buffer.text("Buffer time");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
-    displayAvailability(view, meetingPrefs.availability, last);
-    displayPhoneNumbers(view, meetingPrefs.phones);
+    displayAvailability(view, meetingPrefs.availability, last,
+      getSubPreferenceChanges("Availability", changes));
+    displayPhoneNumbers(view, meetingPrefs.phones,
+      getSubPreferenceChanges("Phones", changes));
 
     meetingView.children().remove();
     meetingView.append(view);
   }
 
   function displayVideoInfo(meetingView: JQuery,
-                            meetingPrefs: ApiT.VideoInfo) {
+                            meetingPrefs: ApiT.VideoInfo,
+                            changes) {
 '''
 <div #view class="esper-meeting-preferences">
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Duration</span>
+    <span #duration class="esper-preference-title esper-bold"></span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Buffer time</span>
+    <span #buffer class="esper-preference-title esper-bold"></span>
   </div>
 </div>
 '''
+    if (getSubPreferenceChanges("Duration", changes).length > 0)
+      duration.text("Duration*");
+    else
+      duration.text("Duration");
+
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+      buffer.text("Buffer time*");
+    else
+      buffer.text("Buffer time");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
-    displayAvailability(view, meetingPrefs.availability, last);
-    displayVideoUsernames(view, meetingPrefs.accounts);
+    displayAvailability(view, meetingPrefs.availability, last,
+      getSubPreferenceChanges("Availability", changes));
+    displayVideoUsernames(view, meetingPrefs.accounts,
+      getSubPreferenceChanges("Accounts", changes));
 
     meetingView.children().remove();
     meetingView.append(view);
   }
 
   function displayMealInfo(meetingView: JQuery,
-                           meetingPrefs: ApiT.MealInfo) {
+                           meetingPrefs: ApiT.MealInfo,
+                           changes) {
 '''
 <div #view class="esper-meeting-preferences">
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Duration</span>
+    <span #duration class="esper-preference-title esper-bold"></span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Buffer time</span>
+    <span #buffer class="esper-preference-title esper-bold"></span>
   </div>
 </div>
 '''
+    if (getSubPreferenceChanges("Duration", changes).length > 0)
+      duration.text("Duration*");
+    else
+      duration.text("Duration");
+
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+
+    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+      buffer.text("Buffer time*");
+    else
+      buffer.text("Buffer time");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
 
     var last = false;
-    displayAvailability(view, meetingPrefs.availability, last);
-    displayFavoriteLocations(view, meetingPrefs.favorites);
+    displayAvailability(view, meetingPrefs.availability, last,
+      getSubPreferenceChanges("Availability", changes));
+    displayFavoriteLocations(view, meetingPrefs.favorites,
+      getSubPreferenceChanges("Favorites", changes));
 
     meetingView.children().remove();
     meetingView.append(view);
   }
 
   function viewOfTransportationType(transportationType: string,
-                                    last: boolean) {
+                                    last: boolean,
+                                    changes) {
 '''
 <li #view class="esper-transportation-type esper-clearfix">
   <object #icon class="esper-svg esper-transportation-icon"/>
   <span #label class="esper-transportation-title"/>
 </li>
 '''
+    var new_transports = getSubPreferenceChanges("Added", changes);
+
+    var transportation_text = "";
+    if (List.mem(new_transports, transportationType))
+      transportation_text = transportationType + "*";
+    else
+      transportation_text = transportationType;
+
     var imageFile = transportationType.toLowerCase();
     icon.attr("data", Init.esperRootUrl + "img/" + imageFile + ".svg");
-    label.text(transportationType);
+    label.text(transportation_text);
 
     if (last)
       view.addClass("esper-last");
@@ -328,8 +400,13 @@ module Esper.UserTab {
   function populateMeetingsDropdown(drop: JQuery,
                                   meetInfo: JQuery,
                                   meetingTypes: ApiT.MeetingTypes,
-                                  workplaces: ApiT.Workplace[]) {
+                                  workplaces: ApiT.Workplace[],
+                                  meeting_changes,
+                                  workplace_changes) {
     function option(value, display) {
+      var type = display.split(" ")[0];
+      if (getSubPreferenceChanges(type, meeting_changes).length > 0)
+        display = display + "*";
       $("<option>")
         .attr("value", value)
         .text(display)
@@ -359,46 +436,101 @@ module Esper.UserTab {
 
     $("<option disabled>──────</option>").appendTo(drop);
 
+    var new_changes = getSubPreferenceChanges("Change", workplace_changes);
+
     List.iter(workplaces, function(workplace, i) {
       var title = workplace.location.title;
       if (title === "") title = workplace.location.address;
+
+      var added_changes = List.filterMap(new_changes, function(change) {
+        var added = List.filter(change.workplaces_added, function(w) {
+          return (w["location"].title === title || w["location"].address === title);
+        });
+        if (added.length > 0) return added;
+        else return null;
+      });
+      var relevant_changes = List.filter(workplace_changes, function(change) {
+        return (change[1].meeting_title === title);
+      });
+
+      if (relevant_changes.length > 0 || added_changes.length > 0)
+        title = title + "*";
+
       $("<option value='" + i.toString() + "'>" + title + "</option>")
         .appendTo(drop);
     });
 
     drop.change(function() {
       var field = $(this).val();
-      if (field === "header") return;
-      else if (field === "phone_call")
-        displayPhoneInfo(meetInfo, meetingTypes.phone_call);
-      else if (field === "video_call")
-        displayVideoInfo(meetInfo, meetingTypes.video_call);
-      else if (!isNaN(field))
-        displayWorkplace(meetInfo, workplaces[field]);
-      else
-        displayMealInfo(meetInfo, meetingTypes[field]);
+      if (field === "header") {
+        return;
+      } else if (field === "phone_call") {
+        var phone_changes = getSubPreferenceChanges("Phone", meeting_changes);
+        displayPhoneInfo(meetInfo, meetingTypes.phone_call, phone_changes);
+      } else if (field === "video_call") {
+        var video_changes = getSubPreferenceChanges("Video", meeting_changes);
+        displayVideoInfo(meetInfo, meetingTypes.video_call, video_changes);
+      } else if (!isNaN(field)) {
+        displayWorkplace(meetInfo, workplaces[field], workplace_changes);
+      }
+      else {
+        var meal = field.charAt(0).toUpperCase() + field.substring(1);
+        var meal_changes = getSubPreferenceChanges(meal, meeting_changes);
+        displayMealInfo(meetInfo, meetingTypes[field], meal_changes);
+      }
     });
   }
 
   function displayWorkplace(workInfo: JQuery,
-                            workplace: ApiT.Workplace) {
+                            workplace: ApiT.Workplace,
+                            changes) {
 '''
 <div #view class="esper-workplace-preferences">
   <div class="esper-preference-section">
     <div class="esper-clearfix">
       <span #viewMap class="esper-preference-text esper-link">Map</span>
       <object #locationIcon class="esper-svg esper-preference-icon"/>
-      <span class="esper-preference-title esper-bold">Address</span>
+      <span #addressTitle class="esper-preference-title esper-bold"></span>
     </div>
     <div #address class="esper-preference-info"/>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span class="esper-preference-title esper-bold">Duration</span>
+    <span #duration class="esper-preference-title esper-bold"></span>
   </div>
 </div>
 '''
+    var title = "";
+    if (workplace.location.title === "") title = workplace.location.address;
+    else title = workplace.location.title;
+
+    var location_changes =
+      List.filterMap(getSubPreferenceChanges("Location", changes),
+        function(change) {
+          return (change.meeting_title === title);
+        });
+    var duration_changes =
+      List.filterMap(getSubPreferenceChanges("Duration", changes),
+        function(change) {
+          return (change.meeting_title === title);
+        });
+    var availability_changes =
+      List.filter(getSubPreferenceChanges("Availability", changes),
+        function(change) {
+          return (change.meeting_title === title);
+        });
+
+    if (location_changes.length > 0)
+      addressTitle.text("Address*");
+    else
+      addressTitle.text("Address");
+
+    if (duration_changes.length > 0)
+      duration.text("Duration*");
+    else
+      duration.text("Duration");
+
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
@@ -406,7 +538,8 @@ module Esper.UserTab {
     durationText.text(formatDuration(workplace.duration));
 
     var last = true;
-    displayAvailability(view, workplace.availability, last);
+    displayAvailability(view, workplace.availability, last,
+      availability_changes);
 
     viewMap.click(function() {
       // TODO: open Google Maps
@@ -482,27 +615,37 @@ module Esper.UserTab {
   }
 
   function displayDetailedGeneralPrefs(container : JQuery,
-                               prefs : ApiT.GeneralPrefs) {
+                               prefs : ApiT.GeneralPrefs,
+                               changes) {
 '''
 <div #view>
   <div>
-    <span>Send exec confirmations:</span>
+    <span #conf>Send exec confirmations:</span>
     <span class="esper-red" #sendConfirmation>No</span>
   </div>
   <div>
-    <span>Send exec reminders:</span>
+    <span #remind>Send exec reminders:</span>
     <span class="esper-red" #sendReminder>No</span>
   </div>
   <div>
-    <span>Use duplicate events:</span>
+    <span #dupe>Use duplicate events:</span>
     <span class="esper-green" #useDuplicate>Yes</span>
   </div>
   <div>
-    <span>Bcc exec:</span>
+    <span #bcc>Bcc exec:</span>
     <span class="esper-green" #bccExec>Yes</span>
   </div>
 </ul>
 '''
+    if(getSubPreferenceChanges("Confirmation", changes).length > 0)
+      conf.text("*" + conf.text());
+    if(getSubPreferenceChanges("Reminder", changes).length > 0)
+      remind.text("*" + remind.text());
+    if(getSubPreferenceChanges("Duplicate", changes).length > 0)
+      dupe.text("*" + dupe.text());
+    if(getSubPreferenceChanges("Bcc", changes).length > 0)
+      bcc.text("*" + bcc.text());
+
     if (prefs.send_exec_confirmation)
       sendConfirmation.text("Yes")
         .removeClass("esper-red")
@@ -524,15 +667,19 @@ module Esper.UserTab {
   }
 
   function displayGeneralPrefs(container : JQuery,
-                               prefs : ApiT.GeneralPrefs) {
+                               prefs : ApiT.GeneralPrefs,
+                               changes) {
 '''
 <div #view>
   <div>
-    <span>Bcc exec:</span>
+    <span #bcc>Bcc exec:</span>
     <span class="esper-green" #bccExec>Yes</span>
   </div>
 </ul>
 '''
+    if(getSubPreferenceChanges("Bcc", changes).length > 0)
+      bcc.text("*" + bcc.text());
+
     if (!prefs.bcc_exec_on_reply)
       bccExec.text("No")
         .removeClass("esper-green")
@@ -551,6 +698,26 @@ module Esper.UserTab {
 
     label.text(teamLabel)
     container.append(view)
+  }
+
+  function getSubPreferenceChanges(change_type : string,
+                                   changes) {
+    return List.filterMap(changes, function(change) {
+      if (change[0] === change_type)
+        return change[1];
+      else
+        return null;
+    });
+  }
+
+  function getPreferencesChanges(change_type : string,
+                                changes : ApiT.PreferenceChange[]) {
+    return List.filterMap(changes, function(change) {
+      if (change.change_type[0] === change_type)
+        return change.change_type[1];
+      else
+        return null;
+    });
   }
 
   export function viewOfUserTab(team: ApiT.Team,
@@ -578,6 +745,7 @@ module Esper.UserTab {
         <span #showGeneral
               class="esper-link" style="float:right">Show More</span>
         <span class="esper-bold" style="float:left">General</span>
+        <span #generalNew class="esper-new-marker">NEW</span>
       </div>
       <div #generalContainer
            class="esper-section-container esper-preferences-general"/>
@@ -601,6 +769,7 @@ module Esper.UserTab {
         <span #showCoworkers
               class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Coworkers</span>
+        <span #coworkersNew class="esper-new-marker">NEW</span>
       </div>
       <div #coworkersContainer class="esper-section-container"
            style="display:none">
@@ -621,6 +790,7 @@ module Esper.UserTab {
         <span #showMeetings
               class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Meetings</span>
+        <span #meetingsNew class="esper-new-marker">NEW</span>
       </div>
       <div #meetingsContainer class="esper-section-container"
            style="display:none">
@@ -636,6 +806,7 @@ module Esper.UserTab {
         <span #showTransportation
               class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Transportation</span>
+        <span #transportationNew class="esper-new-marker">NEW</span>
       </div>
       <div #transportationContainer class="esper-section-container"
            style="display:none">
@@ -648,6 +819,7 @@ module Esper.UserTab {
         <span #showNotes
               class="esper-link" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Notes</span>
+        <span #notesNew class="esper-new-marker">NEW</span>
       </div>
       <div #notesContainer class="esper-section-container" style="display:none">
         <pre #notes class="esper-preferences-notes"/>
@@ -670,34 +842,75 @@ module Esper.UserTab {
     })
 
     Api.getPreferences(team.teamid).done(function(prefs) {
-      preferencesSpinner.hide();
-      user.append(viewOfUser(team, prefs));
+      var until = Math.floor(XDate.now()/1000);
+      var from = until - 432000; // 5 days
+      Api.getPreferenceChanges(team.teamid, from, until)
+      .done(function(changes) {
+        var workplace_changes =
+          getPreferencesChanges("Workplace", changes.change_log);
+        var transportation_changes =
+          getPreferencesChanges("Transportation", changes.change_log);
+        var meeting_changes =
+          getPreferencesChanges("Meeting", changes.change_log);
+        var general_changes =
+          getPreferencesChanges("General", changes.change_log);
+        var coworkers_changes =
+          getPreferencesChanges("Coworkers", changes.change_log);
+        var notes_changes =
+          getPreferencesChanges("Notes", changes.change_log);
 
-      var meetingTypes = prefs.meeting_types;
-      var workplaces = prefs.workplaces;
-      populateMeetingsDropdown(meetingSelector, meetingInfo,
-        meetingTypes, workplaces);
+        if (workplace_changes.length + meeting_changes.length === 0)
+          meetingsNew.hide();
+        if (transportation_changes.length === 0)
+          transportationNew.hide();
+        if (general_changes.length === 0)
+          generalNew.hide();
+        if (coworkers_changes.length === 0)
+          coworkersNew.hide();
+        if (notes_changes.length === 0)
+          notesNew.hide();
 
-      displayPhoneInfo(meetingInfo, meetingTypes.phone_call);
+        preferencesSpinner.hide();
+        user.append(viewOfUser(team, prefs));
 
-      var transportationTypes = prefs.transportation.length;
-      List.iter(prefs.transportation, function(type, i) {
-        var last = i === prefs.transportation.length - 1;
-        transportationPreferences.append(viewOfTransportationType(type, last));
+        var meetingTypes = prefs.meeting_types;
+        var workplaces = prefs.workplaces;
+        populateMeetingsDropdown(meetingSelector, meetingInfo,
+          meetingTypes, workplaces, meeting_changes, workplace_changes);
+        if (workplaces.length > 0) {
+          displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
+          meetingSelector.val(0);
+        }
+        else if (meetingTypes.phone_call !== undefined) {
+          displayPhoneInfo(meetingInfo,
+                           meetingTypes.phone_call,
+                           meeting_changes);
+          meetingSelector.val("phone_call");
+        }
+
+        var transportationTypes = prefs.transportation.length;
+        List.iter(prefs.transportation, function(type, i) {
+          var last = i === prefs.transportation.length - 1;
+          transportationPreferences.append(
+            viewOfTransportationType(type, last, transportation_changes)
+          );
+        });
+
+        if (prefs.general !== undefined) {
+          displayGeneralPrefs(generalContainer, prefs.general, general_changes);
+          displayDetailedGeneralPrefs(generalDetailedContainer,
+                                      prefs.general,
+                                      general_changes);
+        }
+
+        if (prefs.coworkers !== "") {
+          coworkers.text(prefs.coworkers);
+        } else {
+          coworkerSection.hide()
+        }
+
+        notes.text(prefs.notes);
       });
-
-      if (prefs.general !== undefined) {
-        displayGeneralPrefs(generalContainer, prefs.general);
-        displayDetailedGeneralPrefs(generalDetailedContainer, prefs.general);
-      }
-
-      if (prefs.coworkers !== "") {
-        coworkers.text(prefs.coworkers);
-      } else {
-        coworkerSection.hide()
-      }
-
-      notes.text(prefs.notes);
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
