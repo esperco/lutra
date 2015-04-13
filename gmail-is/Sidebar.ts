@@ -134,7 +134,7 @@ module Esper.Sidebar {
     dropdown.css("overflow", "auto");
 
     function onTeamSwitch(toTeam) {
-      CurrentThread.team.set(toTeam);
+      CurrentThread.setTeam(toTeam);
 
       dismissDropdowns();
       wrap.fadeOut(250);
@@ -296,7 +296,9 @@ module Esper.Sidebar {
       TaskTab.displayTaskTab(taskContent, team, threadId,
                              autoTask, profiles, linkedEvents);
       userContent.append(UserTab.viewOfUserTab(team, profiles).view);
-      groupContent.append(GroupTab.container());
+      GroupScheduling.afterInitialize(function () {
+        groupContent.append(GroupTab.container());
+      });
     }
 
     rootElement.append(view);
@@ -339,7 +341,7 @@ module Esper.Sidebar {
                               threadId,
                               profiles) {
     Log.d("displayTeamSidebar()");
-    if (team !== undefined) CurrentThread.team.set(team);
+    if (team !== undefined) CurrentThread.setTeam(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade === true) {
@@ -395,7 +397,7 @@ module Esper.Sidebar {
         }
         else {
           var threadId = emailData.first_email;
-          CurrentThread.threadId.set(threadId);
+          CurrentThread.setThreadId(threadId);
           var subject = emailData.subject;
           Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
           ActiveThreads.handleNewActiveThread(threadId, subject);
@@ -488,7 +490,7 @@ module Esper.Sidebar {
     window.onhashchange = throttle(function() {
       if (!isThrottled) {
         Log.d("URL changed");
-        CurrentThread.threadId.set(null);
+        CurrentThread.setThreadId(null);
         maybeUpdateView(profiles);
       }
     });
