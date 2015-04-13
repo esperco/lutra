@@ -302,6 +302,14 @@ module Esper.TaskTab {
       });
   }
 
+  /* Refresh task notes, fetching task notes from the server. */
+  export function refreshTaskNotes(team, threadId, taskTab) {
+    Api.getTaskForThread(team.teamid, threadId, false, false)
+      .done(function(task) {
+        taskTab.taskNotes.val(task.task_notes);
+      });
+  }
+
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
     CurrentThread.refreshTaskForThread()
@@ -310,6 +318,7 @@ module Esper.TaskTab {
         task.task_title = query;
         CurrentThread.task.set(task);
         taskTitle.val(query);
+        taskTab.taskNotes.val(task.task_notes);
         markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTab);
         displayLinkedThreadsList(task, threadId, taskTab);
@@ -351,6 +360,7 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
+              refreshTaskNotes(team, threadId, taskTab);
               refreshTaskProgressSelection(team, threadId, taskTab);
               refreshLinkedThreadsList(team, threadId, taskTab);
               refreshlinkedEventsList(team, threadId, taskTab, profiles);
