@@ -315,7 +315,7 @@ module CalPicker {
     }];
   }
 
-  export function createModal(name, defaults, element) : void {
+  export function createModal(name, defaults, element, save) : void {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -356,7 +356,7 @@ module CalPicker {
       element.data("availabilities", events); // ughgh pass data through DOM
       defaults.availability = events;
 
-      PreferencesTab.savePreferences();
+      save();
       (<any> modal).modal("hide"); // FIXME
     });
 

@@ -402,6 +402,87 @@ module Api {
     return jsonHttpPut(url, JSON.stringify(preferences));
   }
 
+  /** Adds workplaces given the correct JSON object. */
+  export function addWorkplaces(teamid, workplaces)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/workplace/add/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(workplaces));
+  }
+
+  /** Removes workplaces given the correct JSON object. */
+  export function removeWorkplaces(teamid, workplaces)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/workplace/remove/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(workplaces));
+  }
+
+  /** Sets workplaces given the correct JSON object. */
+  export function setWorkplaces(teamid, workplaces)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/workplace/change/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(workplaces));
+  }
+
+  /** Sets transportation given the correct JSON object. */
+  export function setTransportation(teamid, transportation)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/transportation/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(transportation));
+  }
+
+  /** Sets meeting types given the correct JSON object. */
+  export function setMeetingTypes(teamid, meeting_types)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/meetings/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(meeting_types));
+  }
+
+  /** Sets email types given the correct JSON object. */
+  export function setEmailTypes(teamid, email_types)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/emails/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(email_types));
+  }
+
+  /** Sets general prefs given the correct JSON object. */
+  export function setGeneralPrefs(teamid, general_prefs)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/general/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, JSON.stringify(general_prefs));
+  }
+
+  /** Sets coworkers given the correct JSON object. */
+  export function setCoworkers(teamid, coworkers)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/coworkers/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, string(coworkers));
+  }
+
+  /** Sets notes given the correct JSON object. */
+  export function setNotes(teamid, notes)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/preferences/notes/" + string(Login.me()) + "/" +
+      string(teamid);
+    return jsonHttpPut(url, string(notes));
+  }
+
   /** The preferences currently saved for the given team executive, as
    *  a JSON object.
    */

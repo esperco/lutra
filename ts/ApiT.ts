@@ -217,6 +217,14 @@ type token_response = [
     notes?: string;
   }
 
+  export interface UserWorkplaces {
+    workplace_list: Workplace[];
+  }
+
+  export interface UserTransportation {
+    transportation_list: string[];
+  }
+
   export interface Workplace {
     location: Location;
     duration: HourMinute;
