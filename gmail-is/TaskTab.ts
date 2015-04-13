@@ -302,7 +302,7 @@ module Esper.TaskTab {
       });
   }
 
-  /* Refresh task progress, fetching task progress from the server. */
+  /* Refresh task notes, fetching task notes from the server. */
   export function refreshTaskNotes(team, threadId, taskTab) {
     Api.getTaskForThread(team.teamid, threadId, false, false)
       .done(function(task) {
