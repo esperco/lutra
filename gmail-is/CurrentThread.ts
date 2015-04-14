@@ -40,7 +40,8 @@ module Esper.CurrentThread {
       team.set(null);
       GroupScheduling.clear();
     } else {
-      findTeam(newThreadId).done(function () {
+      findTeam(newThreadId).done(function (newTeam) {
+        setTeam(newTeam);
         refreshTaskForThread(newThreadId).done(function () {
           GroupScheduling.reset();
         });
