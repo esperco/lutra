@@ -5,7 +5,7 @@ module Esper.Inactivity {
   var timer;
   var lastActive = 0;
 
-  var expireAfterMs = 120000; /* 2 min */
+  var expireAfterMs = 300000; /* 5 min */
   var granularityMs =  10000; /* 10 s */
 
   if (!Conf.prod) {
@@ -15,13 +15,9 @@ module Esper.Inactivity {
   }
 
   function signalInactivity() {
-    /*
-      We could ask the user something like "Are you still there?"
-      and if they answer "no", we don't bill those last few minutes.
-      This is a refinement. Let's do this later if necessary.
-    */
+    /* We deduce the last minutes of inactivity. */
     Log.d("No activity detected. Pausing time tracker.");
-    TimeTracker.pause();
+    TimeTracker.pause(-expireAfterMs);
   }
 
   function updateInactivityTimer() {

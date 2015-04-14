@@ -19,6 +19,7 @@ module Esper.TimeTracker {
   var currentTask: string; /* task ID */
   var startTimeMs: number;
   var lastFlushMs: number;
+  var extraDurationMs: number; /* positive or negative */
   /*
     Stopped: current task undefined, start time undefined
     Running: current task defined, start time defined
@@ -54,7 +55,8 @@ module Esper.TimeTracker {
   function sendToServer() {
     if (Login.loggedIn()) {
       var startTimeSec = toSeconds(startTimeMs);
-      var elapsed = toSeconds(Date.now()) - startTimeSec;
+      var elapsed =
+        Math.max(0, toSeconds(Date.now()) - startTimeSec + extraDurationMs);
       Log.d("Sending time tracking data to server:"
             + " task " + currentTask
             + " started " + startTimeSec
@@ -69,6 +71,7 @@ module Esper.TimeTracker {
   function clear() {
     currentTask = undefined;
     startTimeMs = undefined;
+    extraDurationMs = 0;
   }
 
   function flush() {
@@ -131,9 +134,11 @@ module Esper.TimeTracker {
     console.assert(isRunning());
   }
 
-  export function pause() {
+  export function pause(extraMs = 0) {
+    /* extraMs is used to add or subtract some time. */
     if (isRunning()) {
       var taskid = currentTask;
+      extraDurationMs = extraMs;
       stop();
       currentTask = taskid;
       Log.d("Paused " + currentTask);
