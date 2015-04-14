@@ -56,7 +56,8 @@ module Esper.TimeTracker {
     if (Login.loggedIn()) {
       var startTimeSec = toSeconds(startTimeMs);
       var elapsed =
-        Math.max(0, toSeconds(Date.now()) - startTimeSec + extraDurationMs);
+        Math.max(0, toSeconds(Date.now()) - startTimeSec
+                 + toSeconds(extraDurationMs));
       Log.d("Sending time tracking data to server:"
             + " task " + currentTask
             + " started " + startTimeSec
