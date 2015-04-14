@@ -5,6 +5,20 @@ module Esper.GroupScheduling {
   /** All the guests in the group event. */
   export var guests: ApiT.Guest[] = [];
 
+  var initializeListeners = [];
+
+  // listener will only be called *once*, then removed
+  export function afterInitialize(callback) {
+    initializeListeners.push(callback);
+  }
+
+  function initialized() {
+    initializeListeners.forEach(function (listener) {
+      listener();
+    });
+    initializeListeners = [];
+  }
+
   var guestsListeners = [];
 
   /** Listen for changes to the guest list. The listener is passed two
@@ -84,13 +98,16 @@ module Esper.GroupScheduling {
     }
   }
 
-  export function reset() {
+  export function clear() {
     guests   = [];
     times    = [];
 
-    timesListeners  = [];
-    guestsListeners = [];
+    timesListeners      = [];
+    guestsListeners     = [];
+  }
 
+  export function reset() {
+    clear();
     initialize();
   }
 
@@ -98,9 +115,10 @@ module Esper.GroupScheduling {
    *  no data, prefill the guests with participants from the current
    *  thread.
    */
-  export function initialize() {
+  function initialize() {
     if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
-      var taskid = CurrentThread.task.get().taskid;
+      var task = CurrentThread.task.get();
+      var taskid = task.taskid;
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
@@ -140,6 +158,8 @@ module Esper.GroupScheduling {
           }, 2500);
         }
       }
+
+      initialized();
     } else {
       setTimeout(initialize, 300);
     }

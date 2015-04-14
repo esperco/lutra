@@ -17,21 +17,39 @@ module Esper.CurrentThread {
     undefined
   );
 
-  export var executive = new Esper.Watchable.C<ApiT.Profile>(
+  var executive = new Esper.Watchable.C<ApiT.Profile>(
     function (exec) { return exec !== undefined && exec !== null; },
     undefined
   );
 
-  // Updates Menu.currentTeam when this one changes.
-  // TODO: Consolidate this and Menu.currentTeam?
-  team.watch(function (newTeam) {
-    Menu.currentTeam.set(newTeam);
-
+  export function setTeam(newTeam: ApiT.Team) {
     executive.set(null); // invalid until reloaded via API
     Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
       executive.set(newExec);
+      team.set(newTeam);
+      Menu.currentTeam.set(newTeam);
     });
-  });
+  }
+
+  /** Sets the threadId, making sure to update the team, executive and
+   *  task as well.
+   */
+  export function setThreadId(newThreadId) {
+    if (!newThreadId) {
+      task.set(null);
+      team.set(null);
+      GroupScheduling.clear();
+    } else {
+      findTeam(newThreadId).done(function (newTeam) {
+        setTeam(newTeam);
+        refreshTaskForThread(newThreadId).done(function () {
+          GroupScheduling.reset();
+        });
+      });
+    }
+
+    threadId.set(newThreadId);
+  }
 
   /** The GMail threadId of the current thread. If there is no thread,
    *  this is undefined. You can check if there is an open thread with
@@ -46,12 +64,6 @@ module Esper.CurrentThread {
   function isThreadView() : boolean {
     return threadId.isValid();
   }
-
-  threadId.watch(function (newThreadId) {
-    if (!newThreadId) task.set(null);
-
-    GroupScheduling.reset();
-  });
 
   /** Returns a list of all the people involved in the current
    *  thread. (Includes the exec and assistant if appropriate.)
@@ -122,7 +134,7 @@ module Esper.CurrentThread {
         // TODO Report something, handle failure, etc.
         Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
           .done(function() {
-            CurrentThread.refreshTaskForThread();
+            refreshTaskForThread();
             Api.syncEvent(teamid, threadId.get(),
                           e.google_cal_id, e.google_event_id);
 
@@ -137,24 +149,32 @@ module Esper.CurrentThread {
     null
   );
 
+  export function findTeam(threadId) {
+    if (team.isValid()) {
+      return Promise.defer(team.get());
+    } else {
+      return Sidebar.findTeamWithTask(Login.myTeams(), threadId);
+    }
+  }
+
   /** If there is no current task, fetches it from the server and
    *  updates the cached value.
    *
    *  Returns the updated task.
    */
-  export function refreshTaskForThread() {
-    var currentTask = task.get();
-    var teamid      = team.get().teamid;
+  export function refreshTaskForThread(newThreadId?): JQueryPromise<ApiT.Task> {
+    var newThreadId = newThreadId || threadId.get();
 
-    if (!currentTask) {
-      return Api.obtainTaskForThread(teamid, threadId.get(), false, true)
-        .then(function(newTask) {
-          task.set(newTask);
-          return newTask;
-        });
-    } else {
-      return Promise.defer(currentTask);
-    }
+    return findTeam(newThreadId).then(function (team) {
+      var teamid = team.teamid;
+
+      // cast to <any> needed because promises are implicitly flattened (!)
+      return (<any> Api.obtainTaskForThread(teamid, newThreadId, false, true)
+              .then(function(newTask) {
+                task.set(newTask);
+                return newTask;
+              }));
+    });
   }
 
   /** Does the current thread have a valid task attached to it? */
