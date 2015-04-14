@@ -158,14 +158,14 @@ module Esper.CurrentThread {
    *
    *  Returns the updated task.
    */
-  export function refreshTaskForThread(threadId?): JQueryPromise<ApiT.Task> {
-    var threadId = threadId || threadId.get();
+  export function refreshTaskForThread(newThreadId?): JQueryPromise<ApiT.Task> {
+    var newThreadId = newThreadId || threadId.get();
 
-    return findTeam(threadId).then(function (team) {
+    return findTeam(newThreadId).then(function (team) {
       var teamid = team.teamid;
 
       // cast to <any> needed because promises are implicitly flattened (!)
-      return (<any> Api.obtainTaskForThread(teamid, threadId, false, true)
+      return (<any> Api.obtainTaskForThread(teamid, newThreadId, false, true)
               .then(function(newTask) {
                 task.set(newTask);
                 return newTask;
