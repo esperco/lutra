@@ -538,6 +538,173 @@ module Esper.CalPicker {
     return eventEdit;
   }
 
+  //make event with data available so that it can be rendered in the UI
+  function makeFakeEvent(ev : FullCalendar.EventObject, eventTitle,
+                         eventLocation)
+    : ApiT.CalendarEvent
+  {
+    var title = eventTitle.val();
+    var event : ApiT.CalendarEvent = {
+      google_event_id: "",
+      google_cal_id: writeToCalendar.google_cal_id,
+      start: calendarTimeOfMoment(ev.start),
+      end: calendarTimeOfMoment(ev.end),
+      title: title,
+      location: { title: "", address: eventLocation.val() },
+      guests: []
+    };
+    return event;
+  }
+
+  //save events added in the picker
+  function saveEvents(closePicker, picker,
+                      team: ApiT.Team,
+                      task: ApiT.Task,
+                      threadId: string,
+                      prefs: ApiT.Preferences) {
+    var events = [];
+    for (var k in picker.events) {
+      var edit = makeEventEdit(picker.events[k], picker.eventTitle,
+                               picker.eventLocation, prefs);
+      events.push(edit);
+    }
+
+    // Wait for link
+    var linkCalls = List.map(events, function(ev) {
+      return Api.createTaskLinkedEvent(
+        createdByEmail,
+        team.teamid,
+        ev,
+        task.taskid
+      );
+    });
+
+    // If the task title was never set, update it based on the event
+    var emailSubject = esperGmail.get.email_subject();
+    var taskTitle = task.task_title;
+    var eventTitle = picker.eventTitle.val();
+    if (taskTitle === emailSubject) {
+      var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
+      Api.setTaskTitle(task.taskid, newTaskTitle);
+      task.task_title = newTaskTitle;
+      CurrentThread.task.set(task);
+      $(".esper-task-name").val(newTaskTitle);
+    }
+
+    closePicker();
+    if (events.length > 0) {
+      TaskTab.currentTaskTab.linkedEventsList.children().remove();
+      TaskTab.currentTaskTab.linkedEventsSpinner.show();
+    }
+    Promise.join(linkCalls).done(function(linkedEvents) {
+      if (events.length > 0) TaskTab.refreshLinkedEventsAction();
+
+      CurrentThread.linkedEventsChanged();
+
+      // Don't wait for sync
+      var syncCalls =
+        List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
+          return Api.syncEvent(
+            team.teamid,
+            threadId,
+            ev.google_cal_id,
+            ev.google_event_id
+          );
+        });
+      Promise.join(syncCalls);
+    });
+  }
+
+  function confirmEvents(view, closePicker,
+                        picker, team: ApiT.Team,
+                        task: ApiT.Task,
+                        threadId: string,
+                        prefs: ApiT.Preferences) {
+    var events = [];
+    for (var k in picker.events) {
+      var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
+                               picker.eventLocation);
+      events.push(edit);
+    }
+
+    Promise.join(
+      List.map(events, function(event) {
+        var start = Math.floor(Date.parse(event.start.utc)/1000);
+        var end = Math.floor(Date.parse(event.end.utc)/1000);
+        return Api.eventRange(team.teamid, team.team_calendars, start, end);
+      })
+    ).done(function(all_results) {
+      var filtered_results = List.filterMap(all_results, function(result, i) {
+        if (result.events.length > 0) return [i, result.events];
+        else return null;
+      });
+
+      if (filtered_results.length > 0) {
+        var confirmModal = displayConfirmEventModal(view, closePicker, events,
+          filtered_results, picker, team, task, threadId, prefs);
+        $("body").append(confirmModal.view);
+      } else {
+        saveEvents(closePicker, picker, team, task, threadId, prefs);
+      }
+    });
+  }
+
+  function displayConfirmEventModal(eventView, closePicker,
+                                    events: ApiT.CalendarEvent[],
+                                    results,
+                                    picker, team: ApiT.Team,
+                                    task: ApiT.Task,
+                                    threadId: string,
+                                    prefs: ApiT.Preferences) {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-event-modal">
+    <div class="esper-modal-header">Finalize Event</div>
+    <div class="esper-modal-content">
+      <p>You are trying to create the following events:</p>
+      <div #creatingEvents class="esper-events-list"/>
+      <p>However there are other events on the calendar during these time
+      frames:</p>
+      <div #conflictingEvents class="esper-events-list"/>
+      <p>Are you sure you wish to proceed?</p>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #yesButton class="esper-btn esper-btn-primary modal-primary">
+        Yes
+      </button>
+      <button #noButton class="esper-btn esper-btn-secondary modal-cancel">
+        No
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    var creating = List.map(results, function(result){ return events[result[0]]; });
+    creating.forEach(function(ev) {
+      creatingEvents.append(TaskList.renderEvent(team, ev));
+    });
+
+    var conflicting = List.map(results, function(result){ return result[1]; });
+    conflicting.forEach(function(evs) {
+      evs.forEach(function(ev) {
+        conflictingEvents.append(TaskList.renderEvent(team, ev));
+      });
+    });
+
+    function yesOption() {
+      saveEvents(closePicker, picker, team, task, threadId, prefs);
+      view.remove();
+    }
+    function noOption() { view.remove(); }
+
+    view.click(noOption);
+    Util.preventClickPropagation(modal);
+    yesButton.click(yesOption);
+    noButton.click(noOption);
+
+    return _view;
+  }
+
   export function createInline(team: ApiT.Team, task: ApiT.Task,
                                threadId: string, prefs: ApiT.Preferences)
     : void
@@ -593,57 +760,7 @@ module Esper.CalPicker {
     cancel.click(closeView);
 
     save.click(function() {
-      var events = [];
-      for (var k in picker.events) {
-        var edit = makeEventEdit(picker.events[k], picker.eventTitle,
-                                 picker.eventLocation, prefs);
-        events.push(edit);
-      }
-
-      // Wait for link
-      var linkCalls = List.map(events, function(ev) {
-        return Api.createTaskLinkedEvent(
-          createdByEmail,
-          team.teamid,
-          ev,
-          task.taskid
-        );
-      });
-
-      // If the task title was never set, update it based on the event
-      var emailSubject = esperGmail.get.email_subject();
-      var taskTitle = task.task_title;
-      var eventTitle = picker.eventTitle.val();
-      if (taskTitle === emailSubject) {
-        var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
-        Api.setTaskTitle(task.taskid, newTaskTitle);
-        task.task_title = newTaskTitle;
-        CurrentThread.task.set(task);
-        $(".esper-task-name").val(newTaskTitle);
-      }
-
-      closeView();
-      if (events.length > 0) {
-        TaskTab.currentTaskTab.linkedEventsList.children().remove();
-        TaskTab.currentTaskTab.linkedEventsSpinner.show();
-      }
-      Promise.join(linkCalls).done(function(linkedEvents) {
-        if (events.length > 0) TaskTab.refreshLinkedEventsAction();
-
-        CurrentThread.linkedEventsChanged();
-
-        // Don't wait for sync
-        var syncCalls =
-          List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
-            return Api.syncEvent(
-              team.teamid,
-              threadId,
-              ev.google_cal_id,
-              ev.google_event_id
-            );
-          });
-        Promise.join(syncCalls);
-      });
+      confirmEvents(view, closeView, picker, team, task, threadId, prefs);
     });
 
     Gmail.threadContainer().append(view);
