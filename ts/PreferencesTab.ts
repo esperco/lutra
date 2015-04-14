@@ -127,6 +127,8 @@ module PreferencesTab {
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
         div.find(".esper-prefs-bcc").is(":checked"),
+      exec_daily_agenda: false;
+      exec_tasks_update: false;
       current_timezone:
         div.find(".esper-prefs-timezone").val(),
       hold_event_color: (
