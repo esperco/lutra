@@ -727,7 +727,7 @@ module Esper.TaskTab {
     });
 
     var apiGetTask = autoTask ?
-      Api.getAutoTaskForThread
+      Api.obtainTaskForThread
       : Api.getTaskForThread;
 
     function taskNotesKeyUp(notes) {
