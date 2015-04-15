@@ -454,7 +454,7 @@ module Esper.Sidebar {
                   displayTeamSidebar(rootElement, team, correctTeam,
                                      autoTask, threadId, profiles);
                 });
-              } else if (team !== undefined) {
+              } else if (correctTeam) {
                 displayTeamSidebar(rootElement, team, correctTeam,
                                    autoTask, threadId, profiles);
               }
