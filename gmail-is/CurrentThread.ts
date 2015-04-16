@@ -42,7 +42,7 @@ module Esper.CurrentThread {
     } else {
       findTeam(newThreadId).done(function (newTeam) {
         setTeam(newTeam);
-        refreshTaskForThread(newThreadId).done(function () {
+        refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
         });
       });
@@ -134,7 +134,7 @@ module Esper.CurrentThread {
         // TODO Report something, handle failure, etc.
         Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
           .done(function() {
-            refreshTaskForThread();
+            refreshTaskForThread(false);
             Api.syncEvent(teamid, threadId.get(),
                           e.google_cal_id, e.google_event_id);
 
@@ -160,16 +160,21 @@ module Esper.CurrentThread {
   /** If there is no current task, fetches it from the server and
    *  updates the cached value.
    *
+   *  If forceTask is true, a task is created when none exists.
+   *
    *  Returns the updated task.
    */
-  export function refreshTaskForThread(newThreadId?): JQueryPromise<ApiT.Task> {
+  export function refreshTaskForThread(forceTask: boolean,
+                                       newThreadId?: string):
+  JQueryPromise<ApiT.Task> {
     var newThreadId = newThreadId || threadId.get();
 
     return findTeam(newThreadId).then(function (team) {
       var teamid = team.teamid;
+      var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
 
       // cast to <any> needed because promises are implicitly flattened (!)
-      return (<any> Api.getTaskForThread(teamid, newThreadId, false, true)
+      return (<any> getTask(teamid, newThreadId, false, true)
               .then(function(newTask) {
                 task.set(newTask);
                 return newTask;
