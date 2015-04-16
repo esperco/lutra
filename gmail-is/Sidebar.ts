@@ -469,31 +469,16 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
-  var isThrottled = false;
-  function throttle(body): any {
-    return function () {
-      if (!isThrottled) {
-        isThrottled = true;
-        body();
-        setTimeout(function () {
-          isThrottled = false;
-        }, 1000);
-      }
-    }
-  }
-
   function listen(profiles) {
-    esperGmail.on.open_email(throttle(function(id, url, body, xhr) {
+    esperGmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
       maybeUpdateView(profiles);
-    }));
-    window.onhashchange = throttle(function() {
-      if (!isThrottled) {
-        Log.d("URL changed");
-        CurrentThread.setThreadId(null);
-        maybeUpdateView(profiles);
-      }
     });
+    window.onhashchange = function() {
+      Log.d("URL changed");
+      CurrentThread.setThreadId(null);
+      maybeUpdateView(profiles);
+    };
   }
 
   var alreadyInitialized = false;
