@@ -169,14 +169,13 @@ module Esper.ComposeControls {
           multipleEventTemplate.slice(0) :
           singleEventTemplate.slice(0); // using slice to copy string
 
-        CurrentThread.withPreferences(function(preferences) {
-          var execName = preferences.display_name.replace(/ .*$/, "");
-          if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-          var filledTemplate =
-            template.replace("|offer|", entry)
-            .replace("|exec|", execName);
-          composeControls.insertAtCaret(filledTemplate);
-        });
+        var team = CurrentThread.team.get();
+        var execName = team.team_name.replace(/ .*$/, "");
+        if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+        var filledTemplate =
+          template.replace("|offer|", entry)
+          .replace("|exec|", execName);
+        composeControls.insertAtCaret(filledTemplate);
       }
     });
 
