@@ -169,7 +169,7 @@ module Esper.CurrentThread {
       var teamid = team.teamid;
 
       // cast to <any> needed because promises are implicitly flattened (!)
-      return (<any> Api.obtainTaskForThread(teamid, newThreadId, false, true)
+      return (<any> Api.getTaskForThread(teamid, newThreadId, false, true)
               .then(function(newTask) {
                 task.set(newTask);
                 return newTask;
