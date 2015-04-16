@@ -475,11 +475,9 @@ module Esper.Sidebar {
       maybeUpdateView(profiles);
     });
     window.onhashchange = function() {
-      if (!isThrottled) {
-        Log.d("URL changed");
-        CurrentThread.setThreadId(null);
-        maybeUpdateView(profiles);
-      }
+      Log.d("URL changed");
+      CurrentThread.setThreadId(null);
+      maybeUpdateView(profiles);
     };
   }
 
