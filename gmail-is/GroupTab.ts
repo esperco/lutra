@@ -61,7 +61,7 @@ module Esper.GroupTab {
     linkEvent.click(function() {
       var team        = CurrentThread.team.get();
       var threadId    = CurrentThread.threadId.get();
-      var searchModal = CalSearch.viewOfSearchModal(team, threadId, container, Sidebar.profiles);
+      var searchModal = CalSearch.viewOfSearchModal(team, threadId, container);
 
       $("body").append(searchModal.view);
       searchModal.search.focus();
@@ -107,7 +107,6 @@ module Esper.GroupTab {
 
       var team     = CurrentThread.team.get();
       var threadId = CurrentThread.threadId.get();
-      var profiles = Sidebar.profiles;
 
       Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
         .done(function (events) {
@@ -131,7 +130,7 @@ module Esper.GroupTab {
             });
 
             var widget = EventWidget.base(events, event, false, false,
-                                          team, threadId, profiles, statusGraph);
+                                          team, threadId, statusGraph);
 
             list.append($("<li>").append(widget));
 

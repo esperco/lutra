@@ -181,10 +181,9 @@ module Esper.FinalizeEvent {
       var team = CurrentThread.team.get();
       var threadId = CurrentThread.threadId.get();
       var taskTab = TaskTab.currentTaskTab;
-      var profiles = Sidebar.profiles;
 
       deleteHolds(event, preferences, function () {
-        TaskTab.refreshEventLists(team, threadId, taskTab, profiles);
+        TaskTab.refreshEventLists(team, threadId, taskTab);
       });
 
       confirmEvent(event, preferences);

@@ -17,7 +17,7 @@ module Esper.CurrentThread {
     undefined
   );
 
-  var executive = new Esper.Watchable.C<ApiT.Profile>(
+  export var executive = new Esper.Watchable.C<ApiT.Profile>(
     function (exec) { return exec !== undefined && exec !== null; },
     undefined
   );
@@ -126,7 +126,7 @@ module Esper.CurrentThread {
     });
   }
 
-  export function linkEvent(e, profiles) {
+  export function linkEvent(e) {
     var teamid = team.get().teamid;
 
     Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
