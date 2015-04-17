@@ -24,11 +24,17 @@ module Esper.CurrentThread {
 
   export function setTeam(newTeam: ApiT.Team) {
     executive.set(null); // invalid until reloaded via API
-    Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
-      executive.set(newExec);
-      team.set(newTeam);
-      Menu.currentTeam.set(newTeam);
-    });
+
+    if (newTeam) {
+      Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
+        executive.set(newExec);
+        team.set(newTeam);
+        Menu.currentTeam.set(newTeam);
+      });
+    } else {
+      team.set(null);
+      Menu.currentTeam.set(null);
+    }
   }
 
   /** Sets the threadId, making sure to update the team, executive and
@@ -41,9 +47,9 @@ module Esper.CurrentThread {
       GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
-        setTeam(newTeam);
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
+          setTeam(newTeam);
         });
       });
     }
