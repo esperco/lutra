@@ -4,8 +4,28 @@
  *    - threadId of current thread (or undefined if not on a thread)
  *    - team for the current thread
  *      - preferences info for that team
+ *      - the executive profile for that team
  *    - linked events
  *    - linked task
+ *
+ *  The information gets loaded as follows:
+ *    - when you go to a new thread, threadId changes
+ *      - then it tries to load a task and a team
+ *        - if it's successful, onTeamChanged and onTaskChanged events
+ *          fire as appropriate
+ *      - onThreadId change event fires
+ *    - the task and team might not be valid for a given thread
+ *      - onTeamChanged fires when the team is chosen manually
+ *      - onTaskChanged fires when a task is created manually
+ *    - the executive profile and preferences are updated whenever a
+ *      team is loaded, before the teamChanged event fires
+ *
+ *  The goal is to ensure that everything *valid* is *consistent* by
+ *  the time any events fire.
+ *
+ *  It's tricky because either both task and team or just task can be
+ *  invalid in an open thread. However, since a task contains a team,
+ *  if task is valid then team should always be valid as well
  */
 module Esper.CurrentThread {
 
@@ -42,7 +62,7 @@ module Esper.CurrentThread {
     } else {
       findTeam(newThreadId).done(function (newTeam) {
         setTeam(newTeam);
-        refreshTaskForThread(newThreadId).done(function () {
+        refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
         });
       });
@@ -134,7 +154,7 @@ module Esper.CurrentThread {
         // TODO Report something, handle failure, etc.
         Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
           .done(function() {
-            refreshTaskForThread();
+            refreshTaskForThread(false);
             Api.syncEvent(teamid, threadId.get(),
                           e.google_cal_id, e.google_event_id);
 
@@ -160,16 +180,21 @@ module Esper.CurrentThread {
   /** If there is no current task, fetches it from the server and
    *  updates the cached value.
    *
+   *  If forceTask is true, a task is created when none exists.
+   *
    *  Returns the updated task.
    */
-  export function refreshTaskForThread(newThreadId?): JQueryPromise<ApiT.Task> {
+  export function refreshTaskForThread(forceTask: boolean,
+                                       newThreadId?: string):
+  JQueryPromise<ApiT.Task> {
     var newThreadId = newThreadId || threadId.get();
 
     return findTeam(newThreadId).then(function (team) {
       var teamid = team.teamid;
+      var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
 
       // cast to <any> needed because promises are implicitly flattened (!)
-      return (<any> Api.obtainTaskForThread(teamid, newThreadId, false, true)
+      return (<any> getTask(teamid, newThreadId, false, true)
               .then(function(newTask) {
                 task.set(newTask);
                 return newTask;

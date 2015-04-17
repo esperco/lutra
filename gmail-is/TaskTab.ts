@@ -308,7 +308,8 @@ module Esper.TaskTab {
 
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
-    CurrentThread.refreshTaskForThread()
+    var force = true;
+    CurrentThread.refreshTaskForThread(force)
       .done(function(task) {
         Api.setTaskTitle(task.taskid, query);
         task.task_title = query;
