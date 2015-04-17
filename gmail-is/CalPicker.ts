@@ -738,7 +738,7 @@ module Esper.CalPicker {
     refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     title.text("Create linked events");
 
-    var userInfo = UserTab.viewOfUserTab(team, Sidebar.profiles);
+    var userInfo = UserTab.viewOfUserTab(team);
     var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
 

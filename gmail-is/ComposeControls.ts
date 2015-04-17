@@ -169,19 +169,13 @@ module Esper.ComposeControls {
           multipleEventTemplate.slice(0) :
           singleEventTemplate.slice(0); // using slice to copy string
 
-        var execProf = List.find(Sidebar.profiles, function(prof) {
-          return prof.profile_uid === team.team_executive;
-        });
-
-        Profile.get(Login.myUid(), CurrentThread.team.get().teamid)
-          .done(function(prof) {
-            var execName = execProf.display_name.replace(/ .*$/, "");
-            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-            var filledTemplate =
-              template.replace("|offer|", entry)
-                      .replace("|exec|", execName);
-            composeControls.insertAtCaret(filledTemplate);
-          });
+        var team = CurrentThread.team.get();
+        var execName = team.team_name.replace(/ .*$/, "");
+        if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+        var filledTemplate =
+          template.replace("|offer|", entry)
+          .replace("|exec|", execName);
+        composeControls.insertAtCaret(filledTemplate);
       }
     });
 

@@ -720,8 +720,7 @@ module Esper.UserTab {
     });
   }
 
-  export function viewOfUserTab(team: ApiT.Team,
-                                profiles: ApiT.Profile[]) {
+  export function viewOfUserTab(team: ApiT.Team) {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>

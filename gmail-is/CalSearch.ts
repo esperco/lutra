@@ -14,8 +14,7 @@ module Esper.CalSearch {
   }
 
   function renderSearchResult(e: ApiT.CalendarEvent, linkedEvents,
-                              team: ApiT.Team, threadId: string, eventsTab,
-                              profiles: ApiT.Profile[], last) {
+                              team: ApiT.Team, threadId: string, eventsTab, last) {
     Log.d("renderSearchResult()");
 '''
 <li #view class="esper-ev-result esper-click-safe">
@@ -86,7 +85,7 @@ module Esper.CalSearch {
     link.click(function() {
       spinner.show();
       link.hide();
-      TaskTab.linkEvent(e, team, threadId, eventsTab, profiles, resultView);
+      TaskTab.linkEvent(e, team, threadId, eventsTab, resultView);
     });
 
     check.attr("data", Init.esperRootUrl + "img/check.svg");
@@ -107,8 +106,7 @@ module Esper.CalSearch {
   function setupSearch(team: ApiT.Team,
                        threadId: string,
                        searchView: SearchView,
-                       eventsTab: TaskTab.TaskTabView,
-                       profiles: ApiT.Profile[]) {
+                       eventsTab: TaskTab.TaskTabView) {
     Util.afterTyping(searchView.search, 250, function() {
       searchView.results.find("li").remove();
       if (searchView.search.val() === "") {
@@ -136,8 +134,7 @@ module Esper.CalSearch {
 
                 results.events.forEach(function(e) {
                   if (i == (numResults - 1)) last = true;
-                  renderSearchResult(e, events, team, threadId,
-                                     eventsTab, profiles, last)
+                  renderSearchResult(e, events, team, threadId, eventsTab, last)
                     .appendTo(searchView.results);
                   i++;
                 });
@@ -169,8 +166,7 @@ module Esper.CalSearch {
   }
 
   export function viewOfSearchModal(team, threadId,
-                                  eventsTab: TaskTab.TaskTabView,
-                                  profiles: ApiT.Profile[]) {
+                                  eventsTab: TaskTab.TaskTabView) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-search-modal">
@@ -205,7 +201,7 @@ module Esper.CalSearch {
 '''
     var searchView = <SearchView> _view;
 
-    setupSearch(team, threadId, searchView, eventsTab, profiles);
+    setupSearch(team, threadId, searchView, eventsTab);
 
     search.css(
       "background",

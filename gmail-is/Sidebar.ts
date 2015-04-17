@@ -2,10 +2,6 @@
   Gmail thread view
 */
 module Esper.Sidebar {
-
-  // TODO: Move this somewhere more logical!
-  export var profiles : ApiT.Profile[];
-
   // TODO: ditto
   export function customizeSelectArrow(selector) {
     var imageUrl = Init.esperRootUrl + "img/select-arrow.svg";
@@ -61,11 +57,8 @@ module Esper.Sidebar {
   <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
-    var exec = List.find(profiles, function(prof) {
-      return prof.profile_uid === team.team_executive;
-    });
     teamName.text(team.team_name);
-    teamExecEmail.text(exec.email);
+    teamExecEmail.text(CurrentThread.executive.get().email);
 
     if (myTeam !== undefined && team.teamid === myTeam.teamid) {
       selector.addClass("esper-selected");
@@ -81,8 +74,7 @@ module Esper.Sidebar {
   function displayDock(rootElement, sidebar,
                        team: ApiT.Team,
                        threadId: string,
-                       isCorrectTeam: boolean,
-                       profiles) {
+                       isCorrectTeam: boolean) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -145,8 +137,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, true, false,
-                           threadId, profiles);
+        displayTeamSidebar(rootElement, toTeam, true, false, threadId);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -165,12 +156,8 @@ module Esper.Sidebar {
     if (team === undefined)
       teamName.text("UNKNOWN TEAM");
     else {
-      var name = team.team_name;
-      if (name === null || name === undefined) {
-        var execProf = profiles[team.team_executive];
-        if (execProf !== null && execProf !== undefined)
-          name = execProf.display_name;
-      }
+      // note if name is not set so that the assistant can fix it
+      var name = team.team_name || "Team name not set";
       teamName.text(name);
     }
 
@@ -293,9 +280,8 @@ module Esper.Sidebar {
     });
 
     if (team !== undefined) {
-      TaskTab.displayTaskTab(taskContent, team, threadId,
-                             autoTask, profiles, linkedEvents);
-      userContent.append(UserTab.viewOfUserTab(team, profiles).view);
+      TaskTab.displayTaskTab(taskContent, team, threadId, autoTask, linkedEvents);
+      userContent.append(UserTab.viewOfUserTab(team).view);
       GroupScheduling.afterInitialize(function () {
         groupContent.append(GroupTab.container());
       });
@@ -338,8 +324,7 @@ module Esper.Sidebar {
                               team: ApiT.Team,
                               isCorrectTeam: boolean,
                               autoTask: boolean,
-                              threadId,
-                              profiles) {
+                              threadId) {
     Log.d("displayTeamSidebar()");
     if (team !== undefined) CurrentThread.setTeam(team);
     rootElement.children().remove();
@@ -349,8 +334,7 @@ module Esper.Sidebar {
       } else if (team === undefined) {
         var sidebar = displaySidebar(rootElement, team, threadId,
                                      autoTask, []);
-        displayDock(rootElement, sidebar, team, threadId,
-                    isCorrectTeam, profiles);
+        displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
         $(".esper-dock-wrap").hide();
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
@@ -358,8 +342,7 @@ module Esper.Sidebar {
             var sidebar = displaySidebar(rootElement, team, threadId,
                                          autoTask,
                                          linkedEvents);
-            displayDock(rootElement, sidebar, team, threadId,
-                        isCorrectTeam, profiles);
+            displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
             sidebar.show("slide", { direction: "down" }, 250);
         });
       }
@@ -384,7 +367,7 @@ module Esper.Sidebar {
   }
 
   /* We do something if we detect a new msg ID. */
-  function maybeUpdateView(profiles) {
+  function maybeUpdateView() {
     function retry() {
       Log.d("Trying to display Esper sidebar...");
       var emailData = esperGmail.get.email_data();
@@ -451,12 +434,10 @@ module Esper.Sidebar {
                     correctTeam = true;
                     team = foundTeam;
                   }
-                  displayTeamSidebar(rootElement, team, correctTeam,
-                                     autoTask, threadId, profiles);
+                  displayTeamSidebar(rootElement, team, correctTeam, autoTask, threadId);
                 });
               } else if (correctTeam) {
-                displayTeamSidebar(rootElement, team, correctTeam,
-                                   autoTask, threadId, profiles);
+                displayTeamSidebar(rootElement, team, correctTeam, autoTask, threadId);
               }
             });
           return true;
@@ -469,30 +450,26 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
-  function listen(profiles) {
+  function listen() {
     esperGmail.on.open_email(function(id, url, body, xhr) {
       Log.d("Opened email " + id, url, body);
-      maybeUpdateView(profiles);
+      maybeUpdateView();
     });
     window.onhashchange = function() {
       Log.d("URL changed");
       CurrentThread.setThreadId(null);
-      maybeUpdateView(profiles);
+      maybeUpdateView();
     };
   }
 
   var alreadyInitialized = false;
 
   export function init() {
-    if (! alreadyInitialized) {
+    if (!alreadyInitialized) {
       alreadyInitialized = true;
       Log.d("Sidebar.init()");
-      Profile.getAllProfiles(Login.myTeams()).done(function(profLists) {
-        profiles = List.concat(profLists);
-        Log.d(profiles);
-        listen(profiles);
-        maybeUpdateView(profiles);
-      });
+      listen();
+      maybeUpdateView();
     }
   }
 }

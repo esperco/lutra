@@ -4,8 +4,28 @@
  *    - threadId of current thread (or undefined if not on a thread)
  *    - team for the current thread
  *      - preferences info for that team
+ *      - the executive profile for that team
  *    - linked events
  *    - linked task
+ *
+ *  The information gets loaded as follows:
+ *    - when you go to a new thread, threadId changes
+ *      - then it tries to load a task and a team
+ *        - if it's successful, onTeamChanged and onTaskChanged events
+ *          fire as appropriate
+ *      - onThreadId change event fires
+ *    - the task and team might not be valid for a given thread
+ *      - onTeamChanged fires when the team is chosen manually
+ *      - onTaskChanged fires when a task is created manually
+ *    - the executive profile and preferences are updated whenever a
+ *      team is loaded, before the teamChanged event fires
+ *
+ *  The goal is to ensure that everything *valid* is *consistent* by
+ *  the time any events fire.
+ *
+ *  It's tricky because either both task and team or just task can be
+ *  invalid in an open thread. However, since a task contains a team,
+ *  if task is valid then team should always be valid as well
  */
 module Esper.CurrentThread {
 
@@ -17,7 +37,7 @@ module Esper.CurrentThread {
     undefined
   );
 
-  var executive = new Esper.Watchable.C<ApiT.Profile>(
+  export var executive = new Esper.Watchable.C<ApiT.Profile>(
     function (exec) { return exec !== undefined && exec !== null; },
     undefined
   );
@@ -126,7 +146,7 @@ module Esper.CurrentThread {
     });
   }
 
-  export function linkEvent(e, profiles) {
+  export function linkEvent(e) {
     var teamid = team.get().teamid;
 
     Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)

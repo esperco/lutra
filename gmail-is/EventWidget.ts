@@ -8,7 +8,6 @@ module Esper.EventWidget {
                               linkedEvents: ApiT.EventWithSyncInfo[],
                               team,
                               threadId,
-                              profiles: ApiT.Profile[],
                               onLinkEvent?: (e:ApiT.CalendarEvent) => any) {
 '''
 <div #view>
@@ -39,7 +38,7 @@ module Esper.EventWidget {
         .removeClass("esper-link-event")
         .addClass("esper-linked")
         .text("Linking...");
-      CurrentThread.linkEvent(e, profiles);
+      CurrentThread.linkEvent(e);
     });
 
     return view;
@@ -137,8 +136,7 @@ module Esper.EventWidget {
                                ev: ApiT.EventWithSyncInfo,
                                linkedEvents: ApiT.EventWithSyncInfo[],
                                team: ApiT.Team,
-                               threadId: string,
-                               profiles: ApiT.Profile[]) {
+                               threadId: string) {
 '''
 <div #optionsView>
   <div #disclose class="esper-click-safe esper-dropdown-btn
@@ -167,23 +165,6 @@ module Esper.EventWidget {
       </li>
     </div>
     <div class="esper-click-safe esper-drop-ul-divider"/>
-    <div #syncOption class="esper-click-safe esper-dropdown-section">
-      <li class="esper-click-safe esper-li esper-disabled esper-sync-option">
-        <span class="esper-click-safe esper-sync-option-text">
-          Description Sync
-        </span>
-        <object #info title class="esper-svg esper-click-safe esper-info"/>
-        <input #syncCheckbox
-               type="checkbox"
-               class="esper-click-safe esper-sync-checkbox"/>
-        <div #spinner
-             class="esper-click-safe esper-spinner esper-sync-spinner"/>
-      </li>
-      <li #teamSync
-          class="esper-click-safe esper-li esper-disabled esper-sync-users"/>
-      <li #syncNote
-          class="esper-click-safe esper-li esper-disabled esper-sync-note"/>
-    </div>
   </ul>
 </div>
 '''
@@ -196,76 +177,6 @@ module Esper.EventWidget {
           open(e.google_cal_url, "_blank");
         });
     }
-
-    var infoContent = "Automatically synchronizes the event's " +
-      "description with the contents of this email conversation.";
-    info
-      .attr("data", Init.esperRootUrl + "img/info.svg")
-      .tooltip({
-        show: { effect: "none" },
-        hide: { effect: "none" },
-        "content": infoContent,
-        "position": { my: 'center bottom', at: 'center top-5' },
-        "tooltipClass": "esper-top esper-sync-info"
-      });
-
-    syncCheckbox.change(function() {
-      var apiCall;
-      if(this.checked) apiCall = Api.syncEvent;
-      else apiCall = Api.unsyncEvent;
-      syncCheckbox.hide();
-      spinner.show();
-      apiCall(team.teamid, threadId, e.google_cal_id, e.google_event_id)
-        .done(function() {
-          spinner.hide();
-          syncCheckbox.show();
-        });
-    });
-
-    var currentSynced = false;
-    var syncedUsers = [];
-
-    List.iter(profiles, function(prof) {
-      var synced = List.exists(ev.synced_threads, function(x) {
-        return x.esper_uid === prof.profile_uid;
-      });
-      if (synced && prof.profile_uid === Login.myUid()) {
-        syncCheckbox.attr("checked", true);
-        currentSynced = true;
-        syncedUsers.unshift("You");
-      } else if (synced) {
-        syncedUsers.push(prof.display_name);
-      }
-    });
-
-    var teamPhrase = "";
-    if ((syncedUsers.length === 0) ||
-        (syncedUsers.length === 1 && syncedUsers[0] === "You")) {
-      teamPhrase = "No other team members are ";
-      syncNote.hide();
-    } else if (syncedUsers.length === 1) {
-      teamPhrase = syncedUsers[0] + " is ";
-    } else if (syncedUsers.length === 2) {
-      teamPhrase = syncedUsers[0] + " and " + syncedUsers[1] + " are ";
-    } else {
-      for (var i = 0; i < syncedUsers.length; i++) {
-        if (i < syncedUsers.length - 1)
-          teamPhrase += syncedUsers[i] + ", ";
-        else
-          teamPhrase += "and " + syncedUsers[i] + " are ";
-      }
-    }
-    teamSync.text(teamPhrase += " syncing messages with this event.");
-
-    var notePhrase = "";
-    if (!currentSynced && syncedUsers.length > 0) {
-      notePhrase = "Turn on Description Sync to also include messages from " +
-        "your version of this email conversation. Duplicate messages will be " +
-        "automatically excluded.";
-    } else if (syncedUsers.length > 1) {
-      notePhrase = "Duplicate messages are automatically excluded.";
-    }
-    syncNote.text(notePhrase);
 
     disclose.click(function() {
       if (disclose.hasClass("esper-open")) {
@@ -305,7 +216,7 @@ module Esper.EventWidget {
 
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
-                              recent, last, team: ApiT.Team, threadId: string, profiles: ApiT.Profile[]) {
+                              recent, last, team: ApiT.Team, threadId: string) {
 '''
 <span #title/>
 '''
@@ -316,14 +227,14 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, recent, last, team, threadId, profiles, title);
+    return base(linkedEvents, ev, recent, last, team, threadId, title);
   }
 
   /** The base event widget with the given payload in the main div. */
   export function base(linkedEvents: ApiT.EventWithSyncInfo[],
                        ev: ApiT.EventWithSyncInfo,
                        recent, last, team: ApiT.Team, threadId: string,
-                       profiles: ApiT.Profile[], payload?) {
+                       payload?) {
 '''
 <div #view class="esper-ev">
   <div #weekday class="esper-ev-weekday"/>
@@ -347,10 +258,10 @@ module Esper.EventWidget {
     main.append(payload);
 
     if (recent) {
-      view.append(displayLinkOptions(e, linkedEvents, team, threadId, profiles));
+      view.append(displayLinkOptions(e, linkedEvents, team, threadId));
     } else {
       main.prepend(displayEventChoose(view, e, team));
-      main.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId, profiles));
+      main.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId));
     }
 
     var start = XDate.ofString(e.start.local);
