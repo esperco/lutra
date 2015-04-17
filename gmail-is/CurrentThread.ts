@@ -175,6 +175,13 @@ module Esper.CurrentThread {
     null
   );
 
+  // If we have a new task, we should ensure the team is consistent with it:
+  task.watch(function (newTask) {
+    setTeam(List.find(Login.myTeams(), function (team) {
+      return team.teamid == newTask.task_teamid;
+    }));
+  });
+
   export function findTeam(threadId) {
     if (team.isValid()) {
       return Promise.defer(team.get());
