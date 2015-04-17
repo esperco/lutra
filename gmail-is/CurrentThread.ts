@@ -44,11 +44,17 @@ module Esper.CurrentThread {
 
   export function setTeam(newTeam: ApiT.Team) {
     executive.set(null); // invalid until reloaded via API
-    Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
-      executive.set(newExec);
-      team.set(newTeam);
-      Menu.currentTeam.set(newTeam);
-    });
+
+    if (newTeam) {
+      Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
+        executive.set(newExec);
+        team.set(newTeam);
+        Menu.currentTeam.set(newTeam);
+      });
+    } else {
+      team.set(null);
+      Menu.currentTeam.set(null);
+    }
   }
 
   /** Sets the threadId, making sure to update the team, executive and
@@ -61,9 +67,9 @@ module Esper.CurrentThread {
       GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
-        setTeam(newTeam);
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
+          setTeam(newTeam);
         });
       });
     }
@@ -168,6 +174,15 @@ module Esper.CurrentThread {
     function (task) { return task !== null && task !== undefined },
     null
   );
+
+  // If we have a new task, we should ensure the team is consistent with it:
+  task.watch(function (newTask, isValid) {
+    if (isValid) {
+      setTeam(List.find(Login.myTeams(), function (team) {
+        return team.teamid == newTask.task_teamid;
+      }));
+    }
+  });
 
   export function findTeam(threadId) {
     if (team.isValid()) {
