@@ -184,6 +184,7 @@ module Esper.CurrentThread {
     }
   });
 
+  /** Returns the team for the current thread, if any. */
   export function findTeam(threadId) {
     if (team.isValid()) {
       return Promise.defer(team.get());
@@ -193,11 +194,13 @@ module Esper.CurrentThread {
   }
 
   /** If there is no current task, fetches it from the server and
-   *  updates the cached value.
+   *  updates the cached value, as long as there is a valid team.
+   *
+   *  If there is no valid team, returns null and nothing happens.
    *
    *  If forceTask is true, a task is created when none exists.
    *
-   *  Returns the updated task.
+   *  Returns the updated task or null if there is no valid team.
    */
   export function refreshTaskForThread(forceTask: boolean,
                                        newThreadId?: string):
@@ -205,15 +208,20 @@ module Esper.CurrentThread {
     var newThreadId = newThreadId || threadId.get();
 
     return findTeam(newThreadId).then(function (team) {
-      var teamid = team.teamid;
-      var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
+      if (team) {
+        var teamid = team.teamid;
+        var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
 
-      // cast to <any> needed because promises are implicitly flattened (!)
-      return (<any> getTask(teamid, newThreadId, false, true)
-              .then(function(newTask) {
-                task.set(newTask);
-                return newTask;
-              }));
+        // cast to <any> needed because promises are implicitly flattened (!)
+        return (<any> getTask(teamid, newThreadId, false, true)
+                .then(function(newTask) {
+                  task.set(newTask);
+                  return newTask;
+                }));
+      } else {
+        Log.i("Could not refresh task because no valid team was detected for the thread.");
+        return Promise.defer(null);
+      }
     });
   }
 
