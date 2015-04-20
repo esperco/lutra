@@ -57,8 +57,10 @@ module Esper.Sidebar {
   <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
+    var email = Login.getExecutive(team).email;
+
     teamName.text(team.team_name);
-    teamExecEmail.text(Teams.getExecutive(team));
+    teamExecEmail.text(email || "unknown email");
 
     if (myTeam !== undefined && team.teamid === myTeam.teamid) {
       selector.addClass("esper-selected");

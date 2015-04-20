@@ -65,6 +65,13 @@ module Esper.Login {
       return;
   }
 
+  /** Return the profile of the executive for the given team, as long
+   *  as the team is in your logged-in list of teams.
+   */
+  export function executiveProfile(team : ApiT.Team): JQueryDeferred<ApiT.Profile> {
+    return Api.getProfile(team.team_executive, team);
+  }
+
   /* Send a Logout request. */
   export function logout() {
     getLoginInfo = undefined;
