@@ -101,7 +101,7 @@ module Esper.Menu {
       if (isValid) {
         view.currentTeamName.text(team.team_name);
       } else {
-        view.currentTeamName.text("UNKOWN TEAM");
+        view.currentTeamName.text("UNKNOWN TEAM");
       }
     }, "team-switcher-current");
 
