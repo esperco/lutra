@@ -57,7 +57,8 @@ module Esper.Sidebar {
   <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
-    var email = Teams.getProfile(team.team_executive).email;
+    var profile = Teams.getProfile(team.team_executive);
+    var email = profile && profile.email;
 
     teamName.text(team.team_name);
     teamExecEmail.text(email || "unknown email");
