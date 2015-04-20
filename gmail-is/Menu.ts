@@ -97,9 +97,12 @@ module Esper.Menu {
         event.stopPropagation();
       });
 
-    currentTeam.watch(function(team) {
-      view.currentTeamName
-        .text(team.team_name);
+    currentTeam.watch(function(team, isValid) {
+      if (isValid) {
+        view.currentTeamName.text(team.team_name);
+      } else {
+        view.currentTeamName.text("UNKOWN TEAM");
+      }
     }, "team-switcher-current");
 
     List.iter(teams, function(team) {

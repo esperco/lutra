@@ -58,7 +58,7 @@ module Esper.Sidebar {
 </li>
 '''
     teamName.text(team.team_name);
-    teamExecEmail.text(CurrentThread.executive.get().email);
+    teamExecEmail.text(Teams.getExecutive(team));
 
     if (myTeam !== undefined && team.teamid === myTeam.teamid) {
       selector.addClass("esper-selected");
