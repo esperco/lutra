@@ -79,6 +79,7 @@ APP_SOURCES = \
   FinalizeEvent \
   InviteControls \
   TaskList \
+  Teams \
   EventWidget \
   Menu \
   Sidebar \

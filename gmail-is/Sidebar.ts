@@ -57,7 +57,7 @@ module Esper.Sidebar {
   <div #teamExecEmail class="esper-click-safe esper-team-exec-email"/>
 </li>
 '''
-    var email = Login.getExecutive(team).email;
+    var email = Teams.getProfile(team.team_executive).email;
 
     teamName.text(team.team_name);
     teamExecEmail.text(email || "unknown email");
@@ -469,6 +469,7 @@ module Esper.Sidebar {
   export function init() {
     if (!alreadyInitialized) {
       alreadyInitialized = true;
+      Teams.initialize();
       Log.d("Sidebar.init()");
       listen();
       maybeUpdateView();
