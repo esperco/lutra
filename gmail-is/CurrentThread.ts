@@ -185,7 +185,7 @@ module Esper.CurrentThread {
   });
 
   /** Returns the team for the current thread, if any. */
-  export function findTeam(threadId) {
+  export function findTeam(threadId): JQueryPromise<ApiT.Team> {
     if (team.isValid()) {
       return Promise.defer(team.get());
     } else {
