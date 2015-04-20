@@ -306,19 +306,30 @@ module Esper.TaskTab {
       });
   }
 
+  /** Creates or renames a task, explicitly triggered by a UI action.
+   *
+   *  Will fail if a task cannot be created, such as if there is no
+   *  valid team. Since this is initiated from the sidebar UI, this
+   *  should not happen and is logged as an error.
+   */
+  // TODO: Update using centralized model at CurrentThread
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
     var force = true;
     CurrentThread.refreshTaskForThread(force)
       .done(function(task) {
-        Api.setTaskTitle(task.taskid, query);
-        task.task_title = query;
-        CurrentThread.task.set(task);
-        taskTitle.val(query);
-        taskTab.taskNotes.val(task.task_notes);
-        markNewTaskAsInProgress(task);
-        displayTaskProgress(task, taskTab);
-        displayLinkedThreadsList(task, threadId, taskTab);
+        if (task) {
+          Api.setTaskTitle(task.taskid, query);
+          task.task_title = query;
+          CurrentThread.task.set(task);
+          taskTitle.val(query);
+          taskTab.taskNotes.val(task.task_notes);
+          markNewTaskAsInProgress(task);
+          displayTaskProgress(task, taskTab);
+          displayLinkedThreadsList(task, threadId, taskTab);
+        } else {
+          Log.e("Task failed to create—perhaps the current team is not set correctly?");
+        }
       });
   }
 
