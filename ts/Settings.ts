@@ -59,7 +59,7 @@ module Settings {
       dismissOverlays();
   });
 
-  function checkTeamStatus(profiles, statusContainer) {
+  function checkTeamStatus(profiles: ApiT.Profile[], statusContainer) {
     var error = false;
     List.iter(profiles, function(profile) {
       if (!profile.google_access) {

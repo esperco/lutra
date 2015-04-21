@@ -100,7 +100,7 @@ module CalendarsTab {
     });
   }
 
-  function displayCalendarList(view, calendars) {
+  function displayCalendarList(view, calendars: ApiT.Calendar[]) {
     view.children().remove();
     List.iter(calendars, function(cal) {
       if (cal.google_access_role !== "Owner") return;

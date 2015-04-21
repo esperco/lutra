@@ -129,7 +129,7 @@ module CalPicker {
     return hour + ":" + minute + ":00";
   }
 
-  function availableEvents(picker, availabilities) {
+  function availableEvents(picker, availabilities: ApiT.Availability[]) {
     return List.map(availabilities, function(a) {
       var eventId = Util.randomString();
       var fromDay = ymdOfDay(a.avail_from.day);
