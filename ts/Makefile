@@ -44,6 +44,7 @@ TS_SOURCES = \
   Conf \
   Test \
   List \
+  Watchable \
   Log \
   Deferred \
   Promise \
@@ -57,7 +58,6 @@ TS_SOURCES = \
   Cache \
   Svg \
   Show \
-  Select \
   Store \
   ParseUrl \
   Login \

@@ -147,7 +147,8 @@ module AccountTab {
     return _view;
   }
 
-  function displayAssistants(team, table, profiles) {
+  function displayAssistants(team, table,
+                             profiles: ApiT.Profile[]) {
     List.iter(profiles, function(profile) {
 '''assistantView
 <li #row class="table-row assistants-table clearfix">

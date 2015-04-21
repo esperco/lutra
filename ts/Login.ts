@@ -154,14 +154,14 @@ module Login {
       return;
   };
 
-  export function getTeams() {
+  export function getTeams(): ApiT.Team[] {
     if (Util.isDefined(data))
       return data.teams;
     else
       return [];
   };
 
-  export function getTeam() {
+  export function getTeam(): ApiT.Team {
     if (Util.isDefined(data))
       return data.team;
   };
