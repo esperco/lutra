@@ -298,18 +298,18 @@ Unlimited usage. Nothing to approve.
       Scheduling {{tipScheduling}}
     </div>
     <div class="col-md-2">
-      time spent in seconds {{tipSchedTime}}
+      time spent {{tipSchedTime}}
     </div>
     <div class="col-md-1">
-      <span>{ stu.auto_scheduling_time.toString() } (auto)</span>
+      <span>{ formatTime(stu.auto_scheduling_time) } (auto)</span>
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
       {{schedTimeBox}} (edited)
     </div>
     <div class="col-md-1">
 
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       number of tasks created {{tipSchedCount}}
     </div>
     <div class="col-md-1">
@@ -325,18 +325,18 @@ Unlimited usage. Nothing to approve.
       Generic {{tipGeneric}}
     </div>
     <div class="col-md-2">
-      time spent in seconds {{tipGenericTime}}
+      time spent {{tipGenericTime}}
     </div>
     <div class="col-md-1">
-      <span>{ stu.auto_generic_time.toString() } (auto)</span>
+      <span>{ formatTime(stu.auto_generic_time) } (auto)</span>
     </div>
-    <div class="col-md-1">
+    <div class="col-md-2">
       {{genericTimeBox}} (edited)
     </div>
     <div class="col-md-1">
 
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       number of tasks created {{tipGenericCount}}
     </div>
     <div class="col-md-1">
@@ -349,6 +349,23 @@ Unlimited usage. Nothing to approve.
 </div>
 '''
     container.append(taskView);
+  }
+
+  function pad2(x: number): string {
+    var s = x.toString();
+    return s.length === 1 ? "0" + s : s;
+  }
+
+  function formatSec(x: number) {
+    return pad2(x % 60);
+  }
+
+  function formatMin(x: number) {
+    return Math.floor(x / 60).toString();
+  }
+
+  function formatTime(x: number) {
+    return formatMin(x) + ":" + formatSec(x);
   }
 
   function createPosIntEditor(orig: number,
@@ -400,15 +417,100 @@ Unlimited usage. Nothing to approve.
     return box;
   }
 
+  function createMinSecEditor(orig: number,
+                              init: number,
+                              set: { (x: number): void }):
+  JQuery {
+
+'''
+<div #container class="usage-box-time">
+  <input #boxMin class="usage-box usage-minute-box" type="text"/> :
+  <input #boxSec class="usage-box usage-second-box" type="text"/>
+</div>
+'''
+
+    function fillBoxes(time: number) {
+      boxMin.val(formatMin(time));
+      boxSec.val(formatSec(time));
+    }
+
+    function readBoxes() {
+      return (Util.intOfString(boxMin.val()) * 60
+              + Util.intOfString(boxSec.val()));
+    }
+
+    function validate(x: number) {
+      return (x >= 0 && isFinite(x));
+    }
+
+    function changeHandler(x: number) {
+      if (validate(x)) {
+        container.removeClass("invalid");
+        if (x !== orig)
+          container.addClass("modified");
+        else
+          container.removeClass("modified");
+
+        set(x);
+        fillBoxes(x);
+      }
+      else {
+        container.removeClass("modified");
+        container.addClass("invalid");
+      }
+    }
+
+    /* Total number of seconds */
+    var t = new Esper.Watchable.C<number>(function(x) { return true; },
+                                          init);
+    t.watch(changeHandler);
+    fillBoxes(init);
+
+    function update() {
+      t.set(readBoxes());
+    }
+
+    /* Increase/decrease values using keyboard arrows. */
+    function listenToArrows(box: JQuery) {
+      box.keydown(function(event) {
+        var key = event.which;
+        var n = Util.intOfString(box.val());
+        if (key === 38 /* up arrow */) {
+          if (n >= 0) {
+            box.val((n + 1).toString());
+            update();
+          }
+        } else if (key === 40 /* down arrow */) {
+          if (n >= 0) {
+            box.val(Math.max(0, n - 1).toString());
+            update();
+          }
+        }
+      });
+    }
+
+    listenToArrows(boxMin);
+    listenToArrows(boxSec);
+
+    Util.afterTyping(boxMin, 300, function() {
+      update();
+    });
+    Util.afterTyping(boxSec, 300, function() {
+      update();
+    });
+
+    return container;
+  }
+
   function createTimeEditor(orig: number,
                             init: number,
                             set: { (x: number): void }): JQuery {
-    return createPosIntEditor(orig, init, "usage-time-box", set);
+    return createMinSecEditor(orig, init, set);
   }
 
   function createCountEditor(orig: number,
-                            init: number,
-                            set: { (x: number): void }): JQuery {
+                             init: number,
+                             set: { (x: number): void }): JQuery {
     return createPosIntEditor(orig, init, "usage-count-box", set);
   }
 
