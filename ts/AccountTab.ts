@@ -485,7 +485,7 @@ module AccountTab {
         </div>
         <label class="checkbox membership-modal-check">
           <input #noEsper type="checkbox"></input>
-          no Esper branding in external email communications
+          own company branding
           <span #noEsperPrice></span>
         </label>
       </div>
@@ -637,7 +637,7 @@ module AccountTab {
 
       function selectFree() {
         selectMembership(planFree);
-        noEsperPrice.text("for $99/mo");
+        noEsperPrice.text("for $49/mo");
         if (noEsper.prop("checked")) {
           selectedPlanId = Plan.basicPlus;
           isFreeMembership = false;
@@ -648,14 +648,14 @@ module AccountTab {
       }
       function selectLo() {
         selectMembership(planLo);
-        noEsperPrice.text("for $99/mo");
+        noEsperPrice.text("for $49/mo");
         isFreeMembership = false;
         selectedPlanId = noEsper.prop("checked") ?
           Plan.standardPlus : Plan.standard;
       }
       function selectMid() {
         selectMembership(planMid);
-        noEsperPrice.text("for $49/mo");
+        noEsperPrice.text("for $29/mo");
         isFreeMembership = false;
         selectedPlanId = noEsper.prop("checked") ?
           Plan.enhancedPlus : Plan.enhanced;
