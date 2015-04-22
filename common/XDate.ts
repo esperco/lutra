@@ -101,6 +101,13 @@ module Esper.XDate {
       + ", " + year(d).toString();
   }
 
+  /* "2019-08-13" */
+  export function dateValue(d: Date): string {
+      return year(d).toString()
+          + "-" + pad(monthNumber(d).toString())
+          + "-" + day(d).toString();
+  }
+
   export function fullMonthDay(d : Date) : string {
     return fullMonth(d) + " " + day(d).toString();
   }

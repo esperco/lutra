@@ -264,6 +264,16 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  /*** Emails ***/
+  export function sendAgenda(teamid, from, until):
+  JQueryDeferred<void> {
+    var url = Conf.Api.url + "/api/agenda/send/" + string(Login.myUid()) +
+      "/" + string(teamid) +
+      "/" + encodeURIComponent(string(from)) +
+      "/" + encodeURIComponent(string(until));
+    return JsonHttp.put(url, "");
+  }
+
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryDeferred<void> {
     var url =

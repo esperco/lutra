@@ -824,9 +824,53 @@ module Esper.UserTab {
         <pre #notes class="esper-preferences-notes"/>
       </div>
     </div>
+    <div class="esper-section">
+      <div #agendaHeader class="esper-section-header esper-clearfix" >
+        <span #showAgenda
+              class="esper-link" style= "float:right">Show</span>
+        <span class="esper-bold" style= "float:left">Agenda</span>
+      </div>
+      <div #agendaContainer class="esper-section-container"style="display:none">
+        <div class="esper-agenda-section">
+          <div class="esper-agenda-title">Time From</div>
+          <input #timeFromDate type= "date" class="esper-email-date-select"/>
+          <div class="esper-agenda-title">Time Until</div>
+          <input #timeUntilDate type= "date" class="esper-email-date-select"/>
+          <div #send class="esper-agenda-send enabled">
+            Send Now
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 '''
+    var date = new Date();
+    var value_date = XDate.dateValue(date);
+    timeFromDate.val(value_date);
+    timeUntilDate.val(XDate.dateValue(date));
+
+    send.click(function() {
+      var from = timeFromDate.val().split("-");
+      var until = timeUntilDate.val().split("-");
+      var f = new Date(from[0], from[1] - 1, from[2]);
+      var u = new Date(until[0], until[1] - 1, until[2]);
+      var f_time = Math.floor(f.getTime() / 1000);
+      var u_time = Math.floor(u.getTime() / 1000);
+
+      send.addClass("disabled");
+      send.removeClass("enabled");
+      send.attr("disabled", true);
+      send.text("Sending...");
+
+      Api.sendAgenda(team.teamid, f_time, u_time).done(function() {
+        send.addClass("enabled");
+        send.removeClass("disabled");
+        send.attr("disabled", false);
+        send.text("Send Now");
+      });
+    });
+
     var emailData = esperGmail.get.email_data();
     var threadMembers = emailData.people_involved;
     if (threadMembers === undefined) threadMembers = [];
@@ -998,6 +1042,17 @@ module Esper.UserTab {
       } else {
         $(this).text("Hide");
         notesHeader.addClass("esper-open");
+      }
+    });
+
+    showAgenda.click(function() {
+      Sidebar.toggleList(agendaContainer);
+      if ($(this).text() === "Hide") {
+        $(this).text("Show");
+        agendaHeader.removeClass("esper-open");
+      } else {
+        $(this).text("Hide");
+        agendaHeader.addClass("esper-open");
       }
     });
 
