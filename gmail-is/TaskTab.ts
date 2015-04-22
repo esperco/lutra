@@ -676,44 +676,44 @@ module Esper.TaskTab {
 
     showTaskProgress.click(function() {
       Sidebar.toggleList(taskProgressContainer);
-      if($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showTaskProgress.text() === "Hide") {
+        showTaskProgress.text("Show");
         taskProgressHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showTaskProgress.text("Hide");
         taskProgressHeader.addClass("esper-open");
       }
     });
 
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showLinkedThreads.text() === "Hide") {
+        showLinkedThreads.text("Show");
         linkedThreadsHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showLinkedThreads.text("Hide");
         linkedThreadsHeader.addClass("esper-open");
       }
     });
 
     showLinkedEvents.click(function() {
       Sidebar.toggleList(linkedEventsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showLinkedEvents.text() === "Hide") {
+        showLinkedEvents.text("Show");
         linkActions.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showLinkedEvents.text("Hide");
         linkActions.addClass("esper-open");
       }
     });
 
     showRecents.click(function() {
       Sidebar.toggleList(recentsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showRecents.text() === "Hide") {
+        showRecents.text("Show");
         recentsHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showRecents.text("Hide");
         recentsHeader.addClass("esper-open");
       }
     });
