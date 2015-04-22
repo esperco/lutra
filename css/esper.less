@@ -1582,6 +1582,44 @@ ul.esper-ev-dropdown {
   display : none;
 }
 
+/* Agenda sender */
+.esper-agenda-title {
+  font-weight: 600;
+}
+
+.esper-email-date-select {
+  border: none;
+  margin-bottom: 5px;
+  outline: none;
+  width: 130px;
+}
+
+.esper-agenda-send {
+  display: block;
+  float: right;
+  font-size: 12px;
+  height: 22px;
+  width: 70px;
+  padding: 4px;
+  text-align: center;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  &.enabled {
+    color: white;
+    background: @purple;
+    &:hover { background: @purple_hover; }
+  }
+
+  &.disabled {
+    color: @gray_30;
+    background: @gray_10;
+  }
+}
+
+.esper-agenda-section {
+  padding: 10px;
+}
 
 /** Linked threads **/
 

@@ -824,9 +824,53 @@ module Esper.UserTab {
         <pre #notes class="esper-preferences-notes"/>
       </div>
     </div>
+    <div class="esper-section">
+      <div #agendaHeader class="esper-section-header esper-clearfix" >
+        <span #showAgenda
+              class="esper-link" style= "float:right">Show</span>
+        <span class="esper-bold" style= "float:left">Agenda</span>
+      </div>
+      <div #agendaContainer class="esper-section-container"style="display:none">
+        <div class="esper-agenda-section">
+          <div class="esper-agenda-title">Time From</div>
+          <input #timeFromDate type= "date" class="esper-email-date-select"/>
+          <div class="esper-agenda-title">Time Until</div>
+          <input #timeUntilDate type= "date" class="esper-email-date-select"/>
+          <div #send class="esper-agenda-send enabled">
+            Send Now
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 '''
+    var date = new Date();
+    var value_date = XDate.dateValue(date);
+    timeFromDate.val(value_date);
+    timeUntilDate.val(XDate.dateValue(date));
+
+    send.click(function() {
+      var from = timeFromDate.val().split("-");
+      var until = timeUntilDate.val().split("-");
+      var f = new Date(from[0], from[1] - 1, from[2]);
+      var u = new Date(until[0], until[1] - 1, until[2]);
+      var f_time = Math.floor(f.getTime() / 1000);
+      var u_time = Math.floor(u.getTime() / 1000);
+
+      send.addClass("disabled");
+      send.removeClass("enabled");
+      send.attr("disabled", true);
+      send.text("Sending...");
+
+      Api.sendAgenda(team.teamid, f_time, u_time).done(function() {
+        send.addClass("enabled");
+        send.removeClass("disabled");
+        send.attr("disabled", false);
+        send.text("Send Now");
+      });
+    });
+
     var emailData = esperGmail.get.email_data();
     var threadMembers = emailData.people_involved;
     if (threadMembers === undefined) threadMembers = [];
@@ -916,44 +960,44 @@ module Esper.UserTab {
 
     showAlias.click(function() {
       Sidebar.toggleList(aliasContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showAlias.text() === "Hide") {
+        showAlias.text("Show");
         aliasHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showAlias.text("Hide");
         aliasHeader.addClass("esper-open");
       }
     });
 
     showCalendars.click(function() {
       Sidebar.toggleList(calendarsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showCalendars.text() === "Hide") {
+        showCalendars.text("Show");
         calendarsHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showCalendars.text("Hide");
         calendarsHeader.addClass("esper-open");
       }
     });
 
     showMeetings.click(function() {
       Sidebar.toggleList(meetingsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showMeetings.text() === "Hide") {
+        showMeetings.text("Show");
         meetingsHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showMeetings.text("Hide");
         meetingsHeader.addClass("esper-open");
       }
     });
 
     showTransportation.click(function() {
       Sidebar.toggleList(transportationContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showTransportation.text() === "Hide") {
+        showTransportation.text("Show");
         transportationHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showTransportation.text("Hide");
         transportationHeader.addClass("esper-open");
       }
     });
@@ -961,43 +1005,54 @@ module Esper.UserTab {
     showGeneral.click(function() {
       Sidebar.toggleList(generalContainer);
       Sidebar.toggleList(generalDetailedContainer);
-      if ($(this).text() === "Show Less") {
-        $(this).text("Show More");
+      if (showGeneral.text() === "Show Less") {
+        showGeneral.text("Show More");
       } else {
-        $(this).text("Show Less");
+        showGeneral.text("Show Less");
       }
     });
 
     showTeamLabels.click(function() {
       Sidebar.toggleList(teamLabelsContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showTeamLabels.text() === "Hide") {
+        showTeamLabels.text("Show");
         teamLabelsHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showTeamLabels.text("Hide");
         teamLabelsHeader.addClass("esper-open");
       }
     });
 
     showCoworkers.click(function() {
       Sidebar.toggleList(coworkersContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showCoworkers.text() === "Hide") {
+        showCoworkers.text("Show");
         coworkersHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showCoworkers.text("Hide");
         coworkersHeader.addClass("esper-open");
       }
     });
 
     showNotes.click(function() {
       Sidebar.toggleList(notesContainer);
-      if ($(this).text() === "Hide") {
-        $(this).text("Show");
+      if (showNotes.text() === "Hide") {
+        showNotes.text("Show");
         notesHeader.removeClass("esper-open");
       } else {
-        $(this).text("Hide");
+        showNotes.text("Hide");
         notesHeader.addClass("esper-open");
+      }
+    });
+
+    showAgenda.click(function() {
+      Sidebar.toggleList(agendaContainer);
+      if (showAgenda.text() === "Hide") {
+        showAgenda.text("Show");
+        agendaHeader.removeClass("esper-open");
+      } else {
+        showAgenda.text("Hide");
+        agendaHeader.addClass("esper-open");
       }
     });
 
