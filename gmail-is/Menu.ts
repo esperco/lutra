@@ -49,6 +49,11 @@ module Esper.Menu {
 
     var settingsLink = makeActionLink("Settings", openSettings, false);
 
+    var agendaLink = makeActionLink("Agenda", function() {
+      var agendaModal = displayAgenda();
+      $("body").append(agendaModal.view);
+    }, false);
+
     var helpLink = $("<a class='esper-a'>Help</a>")
       .attr("href", "mailto:team@esper.com");
 
@@ -56,7 +61,80 @@ module Esper.Menu {
     ul
       .append(signInLink)
       .append(settingsLink)
+      .append(agendaLink)
       .append(helpLink);
+  }
+
+  function displayAgenda() {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-event-modal">
+    <div class="esper-modal-header">Send Agenda</div>
+    <div class="esper-modal-content">
+      <label class="esper-agenda-title">
+        Team:
+        <select #teamSelect class="esper-agenda-select"/>
+      </label>
+      <br/>
+      <label class="esper-agenda-title">
+        Time From:
+        <input #timeFromDate type="date" class="esper-email-date-select"/>
+      </label>
+      <br/>
+      <label class="esper-agenda-title">
+        Time Until:
+        <input #timeUntilDate type="date" class="esper-email-date-select"/>
+      </label>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #sendButton class="esper-btn esper-btn-primary modal-primary">
+        Send Now
+      </button>
+      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    var teams = Login.myTeams();
+
+    List.iter(teams, function(team) {
+        var o = $("<option>")
+            .text(team.team_name)
+            .val(team.teamid);
+        if (team === currentTeam.get()) {
+            o.attr("selected", true);
+        }
+        o.appendTo(teamSelect);
+    });
+
+    var date = new Date();
+    var value_date = XDate.dateValue(date);
+    timeFromDate.val(value_date);
+    timeUntilDate.val(XDate.dateValue(date));
+
+    function cancel() { view.remove(); }
+
+    view.click(cancel);
+    Util.preventClickPropagation(modal);
+    cancelButton.click(cancel);
+    sendButton.click(function() {
+      var from = timeFromDate.val().split("-");
+      var until = timeUntilDate.val().split("-");
+      var f = new Date(from[0], from[1] - 1, from[2]);
+      var u = new Date(until[0], until[1] - 1, until[2]);
+      var f_time = Math.floor(f.getTime() / 1000);
+      var u_time = Math.floor(u.getTime() / 1000);
+
+      cancelButton.attr("disabled", true);
+      sendButton.attr("disabled", true);
+      sendButton.text("Sending...");
+
+      Api.sendAgenda(teamSelect.val(), f_time, u_time).done(cancel);
+    });
+
+    return _view;
   }
 
   function displayTaskList(team: ApiT.Team,
