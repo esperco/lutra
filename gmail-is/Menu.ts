@@ -114,6 +114,14 @@ module Esper.Menu {
         o.appendTo(teamSelect);
     });
 
+    teamSelect.change(function() {
+      var team = teamSelect.val();
+      Api.getPreferences(team).done(function(prefs) {
+        var timezone = prefs.general.current_timezone;
+        tzSelect.val(timezone);
+      });
+    });
+
     var teamid = teamSelect.val();
     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
 
@@ -153,7 +161,7 @@ module Esper.Menu {
       var f = new Date(from[0], from[1] - 1, from[2]);
       var u = new Date(until[0], until[1] - 1, until[2]);
       var f_time = Math.floor(f.getTime() / 1000);
-      var u_time = Math.floor(u.getTime() / 1000);
+      var u_time = Math.floor(u.getTime() / 1000) + 86399;
 
       cancelButton.attr("disabled", true);
       sendButton.attr("disabled", true);
