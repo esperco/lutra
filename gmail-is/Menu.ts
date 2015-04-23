@@ -77,6 +77,11 @@ module Esper.Menu {
       </label>
       <br/>
       <label class="esper-agenda-title">
+        Exec Timezone:
+        <select #tzSelect class="esper-agenda-select"/>
+      </label>
+      <br/>
+      <label class="esper-agenda-title">
         Time From:
         <input #timeFromDate type="date" class="esper-email-date-select"/>
       </label>
@@ -107,6 +112,29 @@ module Esper.Menu {
             o.attr("selected", true);
         }
         o.appendTo(teamSelect);
+    });
+
+    var teamid = teamSelect.val();
+    var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
+
+    Api.getPreferences(teamid).done(function(prefs) {
+      var timezone = prefs.general.current_timezone;
+
+      List.iter(timezones, function(tz) {
+          var o = $("<option>")
+              .text(tz)
+              .val(tz);
+          if (tz === timezone) {
+              o.attr("selected", true);
+          }
+          o.appendTo(tzSelect);
+      });
+
+      tzSelect.change(function() {
+        var general = prefs.general;
+        general.current_timezone = tzSelect.val();
+        Api.setGeneralPreferences(teamid, general);
+      });
     });
 
     var date = new Date();

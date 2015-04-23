@@ -256,6 +256,14 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
+  export function setGeneralPreferences(teamid, general_prefs):
+  JQueryDeferred<void> {
+      var url =
+          Conf.Api.url + "/api/preferences/general/" + string(Login.myUid())
+          + "/" + string(teamid);
+      return JsonHttp.put(url, JSON.stringify(general_prefs));
+  }
+
   export function getPreferenceChanges(teamid, from: number, until: number):
   JQueryDeferred<ApiT.PreferenceChanges> {
     var url =
