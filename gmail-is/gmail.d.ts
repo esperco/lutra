@@ -46,6 +46,15 @@ declare module esperGmail.get {
     threads: { [threadId: string]: Message }
   }
 
+  export interface sendMessageData {
+    to: string[];
+    cc: string[];
+    bcc: string[];
+    subject: string;
+    body: string;
+    ishtml: boolean;
+  }
+
   export function user_email(): string;
   export function current_page(): string;
   export function email_subject(): string;
@@ -53,7 +62,6 @@ declare module esperGmail.get {
   export function email_ids(): string[];
   export function email_data(): Thread;
 }
-
 
 /* Typable functions defined in gmailInit.js */
 
@@ -86,8 +94,21 @@ declare module esperGmail.on {
   /* complete as needed */
 }
 
+declare module esperGmail.after {
+  export function send_message(
+    callback: (whatever1: any,
+               url: string,
+               email: esperGmail.get.sendMessageData,
+               whatever2: any,
+               xhr: XMLHttpRequest) => void
+  ): void;
+
+  /* complete as needed */
+}
+
 declare module esperGmail.off {
   export function open_email(): void;
+  export function send_message(): void;
   export function star(): void;
   export function unstar(): void;
 

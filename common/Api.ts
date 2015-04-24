@@ -490,6 +490,15 @@ module Esper.Api {
     return getTaskPage(url);
   }
 
+  export function notifyTaskMessage(task, emails, snippet):
+  JQueryDeferred<void> {
+    var url = Conf.Api.url + "/api/gmail/notify/"
+            + string(Login.myUid()) + "/"
+            + string(task.task_teamid);
+    var body = {taskid: task.taskid, emails:emails, snippet:snippet};
+    return JsonHttp.post(url, JSON.stringify(body));
+  }
+
   export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
   JQueryDeferred<void> {
     var url =

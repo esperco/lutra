@@ -436,4 +436,10 @@ module Esper.ApiT {
     guests : Guest[];
     times  : PossibleTime[];
   }
+
+  export interface TaskMessageNotification {
+    taskid: string;
+    emails: string[];
+    snippet: string;
+  }
 }
