@@ -273,7 +273,7 @@ module Esper.Sidebar {
         tabContents.eq(i).hide().removeClass("esper-active");
         $(tab).removeClass("esper-active");
       });
-      
+
       tabContents.eq(active).show().addClass("esper-active");
       tabs.eq(active).addClass("esper-active");
     }
