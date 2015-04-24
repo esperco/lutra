@@ -78,6 +78,7 @@ APP_SOURCES = \
   CurrentThread \
   FinalizeEvent \
   InviteControls \
+  EventControls \
   TaskList \
   Teams \
   EventWidget \

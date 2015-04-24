@@ -119,7 +119,7 @@ module Esper.InviteControls {
     }
     // Include exec's phone number in description if preferences allow it
     appendExecPublicPhone(team, pubNotes);
-    
+
     if (event.location) {
       var address = event.location.address;
 
