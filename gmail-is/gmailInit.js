@@ -1,6 +1,7 @@
 var esperGmail = Gmail(jQuery);
 
 esperGmail.on = {};
+esperGmail.after = {};
 esperGmail.off = {};
 
 /*
@@ -13,6 +14,9 @@ esperGmail.off = {};
 function esperGmailSpecialize(name) {
   esperGmail.on[name] = function(callback) {
     esperGmail.observe.on(name, callback);
+  };
+  esperGmail.after[name] = function(callback) {
+    esperGmail.observe.after(name, callback);
   };
   esperGmail.off[name] = function() {
     esperGmail.observe.off(name);

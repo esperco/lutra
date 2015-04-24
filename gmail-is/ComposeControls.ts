@@ -141,7 +141,7 @@ module Esper.ComposeControls {
           return new Date(e.event.end.local) > new Date(Date.now());
         });
 
-        var entry = events.reduce(function (str, event) {
+        var entry = events.reduce(function (str, event): string {
           var ev    = event.event;
           var start = new Date(ev.start.local);
           var end   = new Date(ev.end.local);

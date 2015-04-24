@@ -130,6 +130,7 @@ module Esper.Init {
       listenForMessages();
       obtainCredentials();
       Inactivity.init();
+      ObserveMessage.init();
     }
   }
 }
