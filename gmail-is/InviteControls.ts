@@ -340,6 +340,14 @@ module Esper.InviteControls {
     }
     back.click(backFunction);
 
+    function confirmEventIsNotHold(eventEdit) {
+      if (/^HOLD: /.test(eventEdit.title))
+        return window.confirm(
+          "About to invite guests to a HOLD event! Are you sure?"
+        );
+      else return true;
+    }
+
     invite.click(function () {
       inviting(invite);
       eventEdit.description = descriptionField.val();
@@ -347,39 +355,46 @@ module Esper.InviteControls {
       if (duplicate) {
         if (CurrentThread.task.isValid()) {
           var task = CurrentThread.task.get();
-          Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
-            .done(function(created) {
-              Api.sendEventInvites(team.teamid, from, guests, created);
-              TaskTab.refreshlinkedEventsList(team, threadId, TaskTab.currentTaskTab);
-              CurrentThread.linkedEventsChanged();
+          if (confirmEventIsNotHold(eventEdit)) {
+            Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+              .done(function(created) {
+                Api.sendEventInvites(team.teamid, from, guests, created);
+                TaskTab.refreshlinkedEventsList(team, threadId,
+                                                TaskTab.currentTaskTab);
+                CurrentThread.linkedEventsChanged();
+
+                var execIds = {
+                  calendarId : original.google_cal_id,
+                  eventId    : original.google_event_id
+                };
+                var guestsIds = {
+                  calendarId : created.google_cal_id,
+                  eventId    : created.google_event_id
+                };
+                setReminders(execIds, guestsIds);
+                close();
+              });
+          }
+        } else {
+          Log.e("Can't create a linked event without a valid task");
+        }
+      } else {
+        if (confirmEventIsNotHold(eventEdit)) {
+          Api.updateLinkedEvent(team.teamid, threadId,
+                                original.google_event_id, eventEdit)
+            .done(function() {
+              Api.sendEventInvites(team.teamid, from, guests, original);
+              TaskTab.refreshlinkedEventsList(team, threadId,
+                                              TaskTab.currentTaskTab);
 
               var execIds = {
                 calendarId : original.google_cal_id,
                 eventId    : original.google_event_id
               };
-              var guestsIds = {
-                calendarId : created.google_cal_id,
-                eventId    : created.google_event_id
-              };
-              setReminders(execIds, guestsIds);
+              setReminders(execIds, execIds);
               close();
             });
-        } else {
-          Log.e("Can't create a linked event without a valid task");
         }
-      } else {
-        Api.updateLinkedEvent(team.teamid, threadId, original.google_event_id, eventEdit)
-          .done(function() {
-            Api.sendEventInvites(team.teamid, from, guests, original);
-            TaskTab.refreshlinkedEventsList(team, threadId, TaskTab.currentTaskTab);
-
-            var execIds = {
-              calendarId : original.google_cal_id,
-              eventId    : original.google_event_id
-            };
-            setReminders(execIds, execIds);
-            close();
-          });
       }
     });
 

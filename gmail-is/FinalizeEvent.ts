@@ -70,17 +70,18 @@ module Esper.FinalizeEvent {
 
     if (isHold(edit) != hold) {
       if (hold) {
-        edit.title = "HOLD: " + edit.title;
-        var gen = prefs.general;
-        if (gen && gen.hold_event_color)
-          edit.color_id = gen.hold_event_color.key;
+        window.alert(
+          "Error: Attempted to set a confirmed event back to a HOLD. " +
+          "Please report this issue!"
+        );
+        return null;
       } else {
         edit.title = edit.title.replace(/^HOLD: /, "");
+        var teamid = CurrentThread.team.get().teamid;
+        var threadId = CurrentThread.threadId.get();
+        return Api.updateLinkedEvent(teamid, threadId, edit.google_event_id, edit);
       }
 
-      var teamid = CurrentThread.team.get().teamid;
-      var threadId = CurrentThread.threadId.get();
-      return Api.updateLinkedEvent(teamid, threadId, edit.google_event_id, edit);
     } else {
       return null;
     }
