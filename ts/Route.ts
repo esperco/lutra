@@ -74,7 +74,7 @@ module Route {
 
     /* Sign-in via Google */
     "login-once/:uid/:hex_landing_url route" : function(data) {
-      if (isIOS()) {
+      if (isIOS() && data.hex_landing_url.length == 0) {
         fallbackOnAppStore();
         window.location.href = "esper:login1/" + data.uid;
       } else {
