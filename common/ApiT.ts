@@ -197,6 +197,8 @@ module Esper.ApiT {
   export interface Workplace {
     location: Location;
     duration: HourMinute;
+    buffer: HourMinute;
+    distance: number;
     availability: Availability[];
   }
 

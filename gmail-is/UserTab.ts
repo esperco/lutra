@@ -499,6 +499,16 @@ module Esper.UserTab {
     <object #durationIcon class="esper-svg esper-preference-icon"/>
     <span #duration class="esper-preference-title esper-bold"></span>
   </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #bufferText class="esper-preference-text" />
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
+    <span #buffer class="esper-preference-title esper-bold"></span>
+  </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #distanceText class="esper-preference-text"/>
+    <object #distanceIcon class="esper-svg esper-preference-icon"/>
+    <span #distance class="esper-preference-title esper-bold"></span>
+  </div>
 </div>
 '''
     var title = "";
@@ -512,6 +522,16 @@ module Esper.UserTab {
         });
     var duration_changes =
       List.filterMap(getSubPreferenceChanges("Duration", changes),
+        function(change) {
+          return (change.meeting_title === title);
+        });
+    var buffer_changes =
+      List.filterMap(getSubPreferenceChanges("Buffer", changes),
+        function(change) {
+          return (change.meeting_title === title);
+        });
+    var distance_changes =
+      List.filterMap(getSubPreferenceChanges("Distance", changes),
         function(change) {
           return (change.meeting_title === title);
         });
@@ -531,11 +551,25 @@ module Esper.UserTab {
     else
       duration.text("Duration");
 
+    if (buffer_changes.length > 0)
+      buffer.text("Buffer*");
+    else
+      buffer.text("Buffer");
+
+    if (distance_changes.length > 0)
+      distance.text("Distance*");
+    else
+      distance.text("Distance");
+
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
+    distanceIcon.attr("data", Init.esperRootUrl + "img/distance.svg");
 
     address.text(workplace.location.address);
     durationText.text(formatDuration(workplace.duration));
+    bufferText.text(formatDuration(workplace.buffer));
+    distanceText.text(workplace.distance + " miles");
 
     var last = true;
     displayAvailability(view, workplace.availability, last,
