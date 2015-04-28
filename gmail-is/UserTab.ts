@@ -36,15 +36,16 @@ module Esper.UserTab {
   <div class="esper-clearfix">
     <span #viewAvailability class="esper-preference-text esper-link">View</span>
     <object #availabilityIcon class="esper-svg esper-preference-icon"/>
-    <span #title class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Availability
+      <object #availNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <ul #availability class="esper-preference-list"/>
 </div>
 '''
     if (changes.length > 0)
-      title.text("Availability*");
-    else
-      title.text("Availability");
+      availNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
 
@@ -108,15 +109,16 @@ module Esper.UserTab {
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #locationIcon class="esper-svg esper-preference-icon"/>
-    <span #title class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Favorite locations
+      <object #locationsNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <ul #locations class="esper-preference-list"/>
 </div>
 '''
     if (changes.length > 0)
-      title.text("Favorite locations*");
-    else
-      title.text("Favorite locations");
+      locationsNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
 
@@ -162,15 +164,16 @@ module Esper.UserTab {
                   esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #videoIcon class="esper-svg esper-preference-icon"/>
-    <span #title class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Usernames
+      <object #usernameNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <ul #usernames class="esper-preference-list"/>
 </div>
 '''
     if (changes.length > 0)
-      title.text("Usernames*");
-    else
-      title.text("Usernames");
+      usernameNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     videoIcon.attr("data", Init.esperRootUrl + "img/video.svg");
 
@@ -204,15 +207,16 @@ module Esper.UserTab {
                   esper-clearfix esper-contains-list esper-last">
   <div class="esper-clearfix">
     <object #phoneIcon class="esper-svg esper-preference-icon"/>
-    <span #title class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Phone numbers
+      <object #phonesNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <ul #phones class="esper-preference-list"/>
 </div>
 '''
     if (changes.length > 0)
-      title.text("Phone numbers*");
-    else
-      title.text("Phone numbers");
+      phonesNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     phoneIcon.attr("data", Init.esperRootUrl + "img/phone.svg");
 
@@ -249,27 +253,29 @@ module Esper.UserTab {
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span #duration class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Duration
+      <object #durationNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span #buffer class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Buffer
+      <object #bufferNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
 </div>
 '''
     if (getSubPreferenceChanges("Duration", changes).length > 0)
-      duration.text("Duration*");
-    else
-      duration.text("Duration");
+      durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
     if (getSubPreferenceChanges("Buffer", changes).length > 0)
-      buffer.text("Buffer time*");
-    else
-      buffer.text("Buffer time");
+      bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -292,27 +298,29 @@ module Esper.UserTab {
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span #duration class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Duration
+      <object #durationNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span #buffer class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Buffer
+      <object #bufferNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
 </div>
 '''
     if (getSubPreferenceChanges("Duration", changes).length > 0)
-      duration.text("Duration*");
-    else
-      duration.text("Duration");
+      durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
     if (getSubPreferenceChanges("Buffer", changes).length > 0)
-      buffer.text("Buffer time*");
-    else
-      buffer.text("Buffer time");
+      bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -335,27 +343,29 @@ module Esper.UserTab {
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span #duration class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Duration
+      <object #durationNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #bufferText class="esper-preference-text"/>
     <object #bufferIcon class="esper-svg esper-preference-icon"/>
-    <span #buffer class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Buffer
+      <object #bufferNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
 </div>
 '''
     if (getSubPreferenceChanges("Duration", changes).length > 0)
-      duration.text("Duration*");
-    else
-      duration.text("Duration");
+      durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
     if (getSubPreferenceChanges("Buffer", changes).length > 0)
-      buffer.text("Buffer time*");
-    else
-      buffer.text("Buffer time");
+      bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -376,20 +386,19 @@ module Esper.UserTab {
 '''
 <li #view class="esper-transportation-type esper-clearfix">
   <object #icon class="esper-svg esper-transportation-icon"/>
-  <span #label class="esper-transportation-title"/>
+  <span #label class="esper-transportation-title">
+    <object #transportNew class="esper-svg esper-new-preference-icon"/>
+  </span>
 </li>
 '''
     var new_transports = getSubPreferenceChanges("Added", changes);
 
-    var transportation_text = "";
     if (List.mem(new_transports, transportationType))
-      transportation_text = transportationType + "*";
-    else
-      transportation_text = transportationType;
+      transportNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     var imageFile = transportationType.toLowerCase();
     icon.attr("data", Init.esperRootUrl + "img/" + imageFile + ".svg");
-    label.text(transportation_text);
+    label.prepend(transportationType);
 
     if (last)
       view.addClass("esper-last");
@@ -450,7 +459,7 @@ module Esper.UserTab {
         else return null;
       });
       var relevant_changes = List.filter(workplace_changes, function(change) {
-        return (change[1].meeting_title === title);
+        return (change[1].title === title);
       });
 
       if (relevant_changes.length > 0 || added_changes.length > 0)
@@ -490,14 +499,36 @@ module Esper.UserTab {
     <div class="esper-clearfix">
       <span #viewMap class="esper-preference-text esper-link">Map</span>
       <object #locationIcon class="esper-svg esper-preference-icon"/>
-      <span #addressTitle class="esper-preference-title esper-bold"></span>
+      <span class="esper-preference-title esper-bold">
+        Location
+        <object #locationNew class="esper-svg esper-new-preference-icon"/>
+      </span>
     </div>
     <div #address class="esper-preference-info"/>
   </div>
   <div class="esper-preference-section esper-clearfix">
     <span #durationText class="esper-preference-text"/>
     <object #durationIcon class="esper-svg esper-preference-icon"/>
-    <span #duration class="esper-preference-title esper-bold"></span>
+    <span class="esper-preference-title esper-bold">
+      Duration
+      <object #durationNew class="esper-svg esper-new-preference-icon"/>
+    </span>
+  </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #bufferText class="esper-preference-text" />
+    <object #bufferIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold" >
+      Buffer
+      <object #bufferNew class="esper-svg esper-new-preference-icon"/>
+    </span>
+  </div>
+  <div class="esper-preference-section esper-clearfix">
+    <span #distanceText class="esper-preference-text"/>
+    <object #distanceIcon class="esper-svg esper-preference-icon"/>
+    <span class="esper-preference-title esper-bold">
+      Distance
+      <object #distanceNew class="esper-svg esper-new-preference-icon"/>
+    </span>
   </div>
 </div>
 '''
@@ -508,34 +539,50 @@ module Esper.UserTab {
     var location_changes =
       List.filterMap(getSubPreferenceChanges("Location", changes),
         function(change) {
-          return (change.meeting_title === title);
+          return (change.title === title);
         });
     var duration_changes =
       List.filterMap(getSubPreferenceChanges("Duration", changes),
         function(change) {
-          return (change.meeting_title === title);
+          return (change.title === title);
+        });
+    var buffer_changes =
+      List.filterMap(getSubPreferenceChanges("Buffer", changes),
+        function(change) {
+          return (change.title === title);
+        });
+    var distance_changes =
+      List.filterMap(getSubPreferenceChanges("Distance", changes),
+        function(change) {
+          return (change.title === title);
         });
     var availability_changes =
       List.filter(getSubPreferenceChanges("Availability", changes),
         function(change) {
-          return (change.meeting_title === title);
+          return (change.title === title);
         });
 
     if (location_changes.length > 0)
-      addressTitle.text("Address*");
-    else
-      addressTitle.text("Address");
+      locationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     if (duration_changes.length > 0)
-      duration.text("Duration*");
-    else
-      duration.text("Duration");
+      durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+
+    if (buffer_changes.length > 0)
+      bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+
+    if (distance_changes.length > 0)
+      distanceNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
+    bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
+    distanceIcon.attr("data", Init.esperRootUrl + "img/distance.svg");
 
     address.text(workplace.location.address);
     durationText.text(formatDuration(workplace.duration));
+    bufferText.text(formatDuration(workplace.buffer));
+    distanceText.text(workplace.distance + " miles");
 
     var last = true;
     displayAvailability(view, workplace.availability, last,
@@ -620,31 +667,43 @@ module Esper.UserTab {
 '''
 <div #view>
   <div>
-    <span #conf>Send exec confirmations:</span>
+    <span>
+      <object #confNew class="esper-svg esper-new-preference-icon"/>
+      Send exec confirmations:
+    </span>
     <span class="esper-red" #sendConfirmation>No</span>
   </div>
   <div>
-    <span #remind>Send exec reminders:</span>
+    <span>
+      <object #remindNew class="esper-svg esper-new-preference-icon"/>
+      Send exec reminders:
+    </span>
     <span class="esper-red" #sendReminder>No</span>
   </div>
   <div>
-    <span #dupe>Use duplicate events:</span>
+    <span>
+      <object #dupeNew class="esper-svg esper-new-preference-icon"/>
+      Use duplicate events:
+    </span>
     <span class="esper-green" #useDuplicate>Yes</span>
   </div>
   <div>
-    <span #bcc>Bcc exec:</span>
+    <span>
+      <object #bccNew class="esper-svg esper-new-preference-icon"/>
+      Bcc exec:
+    </span>
     <span class="esper-green" #bccExec>Yes</span>
   </div>
 </ul>
 '''
     if(getSubPreferenceChanges("Confirmation", changes).length > 0)
-      conf.text("*" + conf.text());
+      confNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
     if(getSubPreferenceChanges("Reminder", changes).length > 0)
-      remind.text("*" + remind.text());
+      remindNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
     if(getSubPreferenceChanges("Duplicate", changes).length > 0)
-      dupe.text("*" + dupe.text());
+      dupeNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
     if(getSubPreferenceChanges("Bcc", changes).length > 0)
-      bcc.text("*" + bcc.text());
+      bccNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     if (prefs.send_exec_confirmation)
       sendConfirmation.text("Yes")
@@ -672,13 +731,16 @@ module Esper.UserTab {
 '''
 <div #view>
   <div>
-    <span #bcc>Bcc exec:</span>
+    <span>
+      <object #bccNew class="esper-svg esper-new-preference-icon"/>
+      Bcc exec:
+    </span>
     <span class="esper-green" #bccExec>Yes</span>
   </div>
 </ul>
 '''
     if(getSubPreferenceChanges("Bcc", changes).length > 0)
-      bcc.text("*" + bcc.text());
+      bccNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
 
     if (!prefs.bcc_exec_on_reply)
       bccExec.text("No")
