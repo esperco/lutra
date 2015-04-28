@@ -1470,7 +1470,7 @@ module PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
-          <input #useDuplicate type="checkbox" checked="checked"
+          <input #useDuplicate type="checkbox"
                  class="esper-prefs-duplicate"/>
           Use duplicate calendar events to invite guests
         </label>
@@ -1500,8 +1500,8 @@ module PreferencesTab {
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
-      if (!general.use_duplicate_events)
-        useDuplicate.prop("checked", false);
+      if (general.use_duplicate_events)
+        useDuplicate.prop("checked", true);
       if (!general.bcc_exec_on_reply)
         bccExec.prop("checked", false);
       if (general.hold_event_color !== undefined)

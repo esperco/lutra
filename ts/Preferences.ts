@@ -123,7 +123,7 @@ module Preferences {
       general: {
         send_exec_confirmation: true,
         send_exec_reminder: false,
-        use_duplicate_events: true,
+        use_duplicate_events: false,
         bcc_exec_on_reply: true,
         exec_daily_agenda: false
       }
