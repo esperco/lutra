@@ -46,6 +46,7 @@ module Esper.EventWidget {
 
   function confirmEvent(view,
                         event: ApiT.CalendarEvent,
+                        linkedEvents: ApiT.CalendarEvent[],
                         team: ApiT.Team) {
     var start = Math.floor(Date.parse(event.start.utc)/1000);
     var end = Math.floor(Date.parse(event.end.utc)/1000);
@@ -56,13 +57,19 @@ module Esper.EventWidget {
           return ev.google_event_id !== event.google_event_id;
         });
 
-        var confirmModal = displayConfirmEventModal(view, event, events, team);
-        $("body").append(confirmModal.view);
+        if (FinalizeEvent.justHolds(linkedEvents).length > 0) {
+          var confirmModal = displayConfirmEventModal(view, event, events, team);
+          $("body").append(confirmModal.view);
+        } else {
+          view.parent().find(".esper-ev").addClass("esper-disabled");
+          FinalizeEvent.finalizeEvent(event);
+        }
       });
   }
 
   /** Displays a shortcut for choosing the event without using the menu. */
   export function displayEventChoose(view, event: ApiT.CalendarEvent,
+                                     linkedEvents: ApiT.CalendarEvent[],
                                      team: ApiT.Team) {
 '''
 <div #choose title="Choose this event." class="esper-choose-event">
@@ -71,7 +78,7 @@ module Esper.EventWidget {
 '''
     check.attr("data", Init.esperRootUrl + "img/green-check.svg");
 
-    choose.click(function(){confirmEvent(view, event, team)});
+    choose.click(function(){confirmEvent(view, event, linkedEvents, team)});
 
     return choose;
   }
@@ -84,7 +91,7 @@ module Esper.EventWidget {
   <div #modal class="esper-confirm-event-modal">
     <div class="esper-modal-header">Finalize Event</div>
     <div #noConflicts class="esper-modal-content">
-      <p>Other linked events will be deleted. Are you sure?</p>
+      <p>Other HOLD linked events will be deleted. Are you sure?</p>
     </div>
     <div #eventConflicts class="esper-modal-content">
       <p>You are trying to finalize the following event:</p>
@@ -92,7 +99,7 @@ module Esper.EventWidget {
       <p>However there are other events on the calendar during this time frame:
       </p>
       <div #conflictingEventsList class="esper-events-list"/>
-      <p>Other linked events will also be deleted. Are you sure you wish to
+      <p>Other HOLD linked events will also be deleted. Are you sure you wish to
       proceed?</p>
     </div>
     <div class="esper-modal-footer esper-clearfix">
@@ -134,7 +141,7 @@ module Esper.EventWidget {
 
   export function displayEventOptions(view,
                                ev: ApiT.EventWithSyncInfo,
-                               linkedEvents: ApiT.EventWithSyncInfo[],
+                               linkedEvents: ApiT.CalendarEvent[],
                                team: ApiT.Team,
                                threadId: string) {
 '''
@@ -209,7 +216,7 @@ module Esper.EventWidget {
       });
     });
 
-    chooseThisEvent.click(function(){confirmEvent(view, e, team)});
+    chooseThisEvent.click(function(){confirmEvent(view, e, linkedEvents, team)});
 
     return optionsView;
   }
@@ -260,8 +267,9 @@ module Esper.EventWidget {
     if (recent) {
       view.append(displayLinkOptions(e, linkedEvents, team, threadId));
     } else {
-      main.prepend(displayEventChoose(view, e, team));
-      main.prepend(displayEventOptions(view, ev, linkedEvents, team, threadId));
+      var evs = List.map(linkedEvents, function(ev) { return ev.event; });
+      main.prepend(displayEventChoose(view, e, evs, team));
+      main.prepend(displayEventOptions(view, ev, evs, team, threadId));
     }
 
     var start = XDate.ofString(e.start.local);
