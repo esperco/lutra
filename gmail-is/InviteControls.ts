@@ -119,7 +119,7 @@ module Esper.InviteControls {
     }
     // Include exec's phone number in description if preferences allow it
     appendExecPublicPhone(team, pubNotes);
-    
+
     if (event.location) {
       var address = event.location.address;
 
@@ -593,7 +593,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 '''
 <li #viewPerson>
   <label #labelPerson>
-    <input #checkPerson type="checkbox" checked />
+    <input #checkPerson type="checkbox"/>
   </label>
 </li>
 '''
