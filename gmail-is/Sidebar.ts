@@ -283,7 +283,8 @@ module Esper.Sidebar {
     });
 
     if (team !== undefined) {
-      TaskTab.displayTaskTab(taskContent, team, threadId, autoTask, linkedEvents);
+      TaskTab.displayTaskTab(taskContent, team, threadId,
+                             autoTask, linkedEvents);
       userContent.append(UserTab.viewOfUserTab(team).view);
       GroupScheduling.afterInitialize(function () {
         groupContent.append(GroupTab.container());

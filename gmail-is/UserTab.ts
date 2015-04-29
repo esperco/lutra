@@ -751,15 +751,15 @@ module Esper.UserTab {
   }
 
   function displayTeamLabel(container : JQuery,
-                             teamLabel : string) {
+                            teamLabel : string) {
 '''
 <div #view>
   <span #label>
 </div>
 '''
 
-    label.text(teamLabel)
-    container.append(view)
+    label.text(teamLabel);
+    container.append(view);
   }
 
   function getSubPreferenceChanges(change_type : string,
@@ -782,7 +782,52 @@ module Esper.UserTab {
     });
   }
 
-  export function viewOfUserTab(team: ApiT.Team) {
+  export interface UserTabView {
+    view: JQuery;
+    user: JQuery;
+    preferencesSpinner: JQuery;
+    aliasHeader: JQuery;
+    showAlias: JQuery;
+    aliasContainer: JQuery;
+    generalHeader: JQuery;
+    showGeneral: JQuery;
+    generalNew: JQuery;
+    generalContainer: JQuery;
+    generalDetailedContainer: JQuery;
+    teamLabelsSection: JQuery;
+    teamLabelsHeader: JQuery;
+    showTeamLabels: JQuery;
+    teamLabelsContainer: JQuery;
+    coworkerSection: JQuery;
+    coworkersHeader: JQuery;
+    showCoworkers: JQuery;
+    coworkersNew: JQuery;
+    coworkersContainer: JQuery;
+    coworkers: JQuery;
+    calendarsSection: JQuery;
+    calendarsHeader: JQuery;
+    showCalendars: JQuery;
+    calendarsContainer: JQuery;
+    meetingsHeader: JQuery;
+    showMeetings: JQuery;
+    meetingsNew: JQuery;
+    meetingsContainer: JQuery;
+    meetingsSelector: JQuery;
+    meetingSelector: JQuery;
+    meetingInfo: JQuery;
+    transportationHeader: JQuery;
+    showTransportation: JQuery;
+    transportationNew: JQuery;
+    transportationContainer: JQuery;
+    transportationPreferences: JQuery;
+    notesHeader: JQuery;
+    showNotes: JQuery;
+    notesNew: JQuery;
+    notesContainer: JQuery;
+    notes: JQuery;
+  }
+
+  export function viewOfUserTab(team: ApiT.Team): UserTabView {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>

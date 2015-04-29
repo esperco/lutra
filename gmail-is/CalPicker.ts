@@ -73,8 +73,10 @@ module Esper.CalPicker {
     return container;
   }
 
-  function createView(refreshCal, userSidebar,
-                      team: ApiT.Team) : PickerView {
+  function createView(refreshCal: JQuery,
+                      userSidebar: UserTab.UserTabView,
+                      team: ApiT.Team,
+                      prefs: ApiT.Preferences) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
@@ -124,7 +126,7 @@ module Esper.CalPicker {
         writes.push(cal);
     });
     writeToCalendar = writes[0] || calendars[0];
-    showTimezone = writeToCalendar.calendar_timezone;
+    showTimezone = prefs.general.current_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
     List.iter(calendars, function(cal, i) {
@@ -459,10 +461,13 @@ module Esper.CalPicker {
   /*
     Create date and time picker using user's calendar.
   */
-  function createPicker(refreshCal, userSidebar, team: ApiT.Team) : Picker {
-    var pickerView = createView(refreshCal, userSidebar, team);
+  function createPicker(refreshCal: JQuery,
+                        userSidebar: UserTab.UserTabView,
+                        team: ApiT.Team,
+                        prefs: ApiT.Preferences) : Picker {
+    var pickerView = createView(refreshCal, userSidebar, team, prefs);
     setupCalendar(team, pickerView);
-                            
+
     // add the meeting type menu:
     var menu = meetingTypeMenu();
     pickerView.view.find(".fc-left").append(menu);
@@ -705,8 +710,10 @@ module Esper.CalPicker {
     return _view;
   }
 
-  export function createInline(team: ApiT.Team, task: ApiT.Task,
-                               threadId: string, prefs: ApiT.Preferences)
+  export function createInline(team: ApiT.Team,
+                               task: ApiT.Task,
+                               threadId: string,
+                               prefs: ApiT.Preferences)
     : void
   {
 '''
@@ -739,7 +746,7 @@ module Esper.CalPicker {
     title.text("Create linked events");
 
     var userInfo = UserTab.viewOfUserTab(team);
-    var picker = createPicker(refreshCal, userInfo, team);
+    var picker = createPicker(refreshCal, userInfo, team, prefs);
     calendar.append(picker.view);
 
     refreshCal.tooltip({
@@ -751,7 +758,7 @@ module Esper.CalPicker {
     });
 
     window.onresize = function(event) {
-      picker = createPicker(refreshCal, userInfo, team);
+      picker = createPicker(refreshCal, userInfo, team, prefs);
       calendar.children().remove();
       calendar.append(picker.view);
       picker.render();
