@@ -1,4 +1,22 @@
 module Esper.Util {
+  export class Option<E> {
+    value : E
+    some : boolean
+
+    constructor(value : E, some? : boolean) {
+      this.value = value;
+      this.some = some || false;
+    }
+
+    match<A>(noneCase : () => A, someCase : (x:E) => A): A {
+      if (this.some) {
+        return someCase(this.value);
+      } else {
+        return noneCase();
+      }
+    }
+  }
+
   function unsafePreparePrintable(x : any, parents, maxDepth: number) {
     if (parents.length >= maxDepth)
       return "[MAX DEPTH]";
