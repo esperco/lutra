@@ -50,6 +50,7 @@ SHARED_SOURCES = \
   ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
+  ../common/ts/Option \
   ../common/ts/Promise \
   ../common/ts/XDate \
   ../common/ts/Log \
