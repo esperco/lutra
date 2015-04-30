@@ -32,7 +32,7 @@ module Esper.CurrentThread {
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
-  export var team = new Esper.Watchable.C<Esper.Option.T<ApiT.Team>>(
+  export var team = new Esper.Watchable.C<ApiT.Team>(
     function (team) { return team !== undefined && team !== null; },
     undefined
   );

@@ -17,11 +17,11 @@ module Esper.Option {
     }
   }
 
-  export function some<E>(x : E) : Option<E> {
-    return new Option(x, true);
+  export function some<E>(x : E) : T<E> {
+    return new T(x, true);
   }
 
-  export function none<E>() : Option<E> {
-    return new Option(null, false);
+  export function none<E>() : T<E> {
+    return new T(null, false);
   }
 }
