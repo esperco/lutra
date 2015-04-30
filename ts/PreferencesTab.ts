@@ -107,9 +107,13 @@ module PreferencesTab {
         sendTo.push(email.text().trim());
       }
     });
+    var sendTime = li.find(".esper-prefs-send-time").val();
+    var dayOf = li.find(".esper-prefs-day-of").prop("checked");
     return {
       enabled: li.find("div.preference-toggle-switch").hasClass("on"),
-      recipients: sendTo
+      recipients: sendTo,
+      send_time: { hour: parseInt(sendTime), minute: "0" },
+      day_of: dayOf
     }
   }
 
@@ -664,6 +668,49 @@ module PreferencesTab {
     return selector;
   }
 
+  function createEmailTimeSelector(selected, save) {
+'''
+<select #selector
+    class="preference-option-selector esper-select esper-prefs-send-time">
+  <option value="0">12 AM</option>
+  <option value= "1">1 AM</option>
+  <option value= "2">2 AM</option>
+  <option #initial value="3">3 AM</option>
+  <option value="4">4 AM</option>
+  <option value="5">5 AM</option>
+  <option value="6">6 AM</option>
+  <option value="7">7 AM</option>
+  <option value="8">8 AM</option>
+  <option value="9">9 AM</option>
+  <option value="10">10 AM</option>
+  <option value="11">11 AM</option>
+  <option value="12">12 PM</option>
+  <option value="13">1 PM</option>
+  <option value="14">2 PM</option>
+  <option value="15">3 PM</option>
+  <option value="16">4 PM</option>
+  <option value="17">5 PM</option>
+  <option value="18">6 PM</option>
+  <option value="19">7 PM</option>
+  <option value="20">8 PM</option>
+  <option value="21">9 PM</option>
+  <option value="22">10 PM</option>
+  <option value="23">11 PM</option>
+</select>
+'''
+      if (selected === undefined) {
+          initial.prop("selected", true);
+      } else {
+          var selectedHour = selected.hour;
+          selector.children().each(function() {
+              if (Number($(this).val()) === selectedHour)
+                  $(this).prop("selected", true);
+          });
+      }
+      selector.change(save);
+      return selector;
+  }
+
   function createTimezoneSelector(selected) {
 '''
 <select #currentTimezone
@@ -1175,6 +1222,22 @@ module PreferencesTab {
   <hr/>
   <div #options class="preference-options">
     <div class="preference-option-selector-row clearfix">
+      <div #sendCol class="preference-option-col clearfix">
+        <div class="preference-option-title semibold">Send Time</div>
+      </div>
+      <div #agendaOptions class="preference-option-col clearfix">
+        <div class="preference-option-title semibold">Which Day's Events</div>
+        <label class="checkbox esper-preference-check">
+          <input #dayof type= "radio" class="esper-prefs-day-of"/>
+          Day Of
+        </label>
+        <label class="checkbox esper-preference-check">
+          <input #nextday type= "radio"/>
+          Next Day
+        </label>
+      </div>
+    </div>
+    <div class="preference-option-selector-row clearfix">
       <div class="preference-option-col clearfix">
         <div class="preference-option-title semibold">Send To</div>
         <ul #teamMembers>
@@ -1192,6 +1255,25 @@ module PreferencesTab {
     title.text(name);
 
     spinner.show();
+
+    sendCol.append(createEmailTimeSelector(defaults.send_time, saveEmailTypes));
+
+    if (name === "Daily Agenda") {
+      if (defaults.day_of) dayof.prop("checked", true);
+      else nextday.prop("checked", true);
+
+      dayof.change(function() {
+          nextday.prop("checked", !dayof.prop("checked"));
+          saveEmailTypes();
+      });
+      nextday.change(function() {
+          dayof.prop("checked", !nextday.prop("checked"));
+          saveEmailTypes();
+      });
+    } else {
+      agendaOptions.hide();
+    }
+
 
     var team_members =
       List.union([team.team_executive], team.team_assistants, undefined);
@@ -1655,7 +1737,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
 
       general.append(viewOfGeneralPrefs(initial.general, team));
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
-      //setDividerHeight("general", generalDivider, 1);
+      setDividerHeight("general", generalDivider, 1);
 
       coworkers.val(initial.coworkers);
       Util.afterTyping(coworkers, 250, function() {

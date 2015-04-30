@@ -301,6 +301,8 @@ type token_response = [
   export interface EmailPref {
     enabled: boolean;
     recipients: string[];
+    send_time: HourMinute;
+    day_of?: Boolean;
   }
 
   export interface GeneralPrefs {
