@@ -142,6 +142,10 @@ module Esper.XDate {
     return formatTimeOnly(d.getHours(), d.getMinutes(), false);
   }
 
+  export function timeOnly24Hours(d : Date) : string {
+    return pad(d.getUTCHours().toString()) + ":" + pad(d.getUTCMinutes().toString());
+  }
+
   /* "August 13, 12:30-1pm" */
   export function range(d1 : Date, d2 : Date) : string {
     var t1 = shortTimeOnly(d1);

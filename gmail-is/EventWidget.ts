@@ -151,7 +151,7 @@ module Esper.EventWidget {
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
       <li #editEvent
-          class="esper-li esper-disabled">
+          class="esper-li">
         Edit
       </li>
       <li #inviteGuests
@@ -177,14 +177,6 @@ module Esper.EventWidget {
 '''
     var e = ev.event;
 
-    if (e.google_cal_url !== undefined) {
-      editEvent
-        .removeClass("esper-disabled")
-        .click(function() {
-          open(e.google_cal_url, "_blank");
-        });
-    }
-
     disclose.click(function() {
       if (disclose.hasClass("esper-open")) {
         Sidebar.dismissDropdowns();
@@ -194,6 +186,11 @@ module Esper.EventWidget {
         disclose.addClass("esper-open");
       }
     })
+
+    editEvent.click(function() {
+      EventControls.insertAfterThread(e);
+      Gmail.scrollToInviteWidget();
+    });
 
     inviteGuests.click(function() {
       CurrentThread.withPreferences(function(preferences) {
