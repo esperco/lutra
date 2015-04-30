@@ -359,7 +359,7 @@ module Esper.InviteControls {
             Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
               .done(function(created) {
                 Api.sendEventInvites(team.teamid, from, guests, created);
-                TaskTab.refreshlinkedEventsList(team, threadId,
+                TaskTab.refreshLinkedEventsList(team, prefs, threadId,
                                                 TaskTab.currentTaskTab);
                 CurrentThread.linkedEventsChanged();
 
@@ -384,7 +384,7 @@ module Esper.InviteControls {
                                 original.google_event_id, eventEdit)
             .done(function() {
               Api.sendEventInvites(team.teamid, from, guests, original);
-              TaskTab.refreshlinkedEventsList(team, threadId,
+              TaskTab.refreshLinkedEventsList(team, prefs, threadId,
                                               TaskTab.currentTaskTab);
 
               var execIds = {

@@ -272,23 +272,6 @@ module Esper.CalPicker {
     return m.toDate();
   }
 
-  /* Given an ISO 8601 timestamp in local time (without timezone info),
-     assume its timezone is fromTZ (the calendar zone)
-     and apply the necessary changes to express it in toTZ (display zone).
-  */
-  function shiftTime(timestamp, fromTZ, toTZ) {
-    var local = timestamp.replace(/Z$/, "");
-    var inCalendarTZ =
-      /UTC$/.test(fromTZ) || /GMT$/.test(fromTZ) ?
-      (<any> moment).utc(local) :
-      (<any> moment).tz(local, fromTZ);
-    var inDisplayTZ =
-      /UTC$/.test(toTZ) || /GMT$/.test(toTZ) ?
-      (<any> inCalendarTZ.utc()) :
-      (<any> inCalendarTZ).tz(toTZ);
-    return (<any> inDisplayTZ).format();
-  }
-
   /* An event along with the timezone of the calendar that it's on,
      so we know how to interpret its local start/end times.
   */
@@ -310,8 +293,10 @@ module Esper.CalPicker {
       var ev = {
         title: x.title, /* required */
         allDay: x.all_day,
-        start: shiftTime(x.start.local, x.calendarTZ, showTimezone), /* req */
-        end: shiftTime(x.end.local, x.calendarTZ, showTimezone), /* req */
+        start: Timezone.shiftTime(x.start.local,
+                                  x.calendarTZ, showTimezone), /* req */
+        end: Timezone.shiftTime(x.end.local,
+                                x.calendarTZ, showTimezone), /* req */
         orig: x /* custom field */
       };
       // Display ghost calendar events in gray

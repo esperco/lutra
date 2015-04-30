@@ -107,6 +107,7 @@ module Esper.GroupTab {
 
       var team     = CurrentThread.team.get();
       var threadId = CurrentThread.threadId.get();
+      var prefs    = Teams.getPreferences(team.team_executive);
 
       Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
         .done(function (events) {
@@ -130,7 +131,7 @@ module Esper.GroupTab {
             });
 
             var widget = EventWidget.base(events, event, false, false,
-                                          team, threadId, statusGraph);
+                                          team, prefs, threadId, statusGraph);
 
             list.append($("<li>").append(widget));
 

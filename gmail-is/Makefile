@@ -52,6 +52,7 @@ SHARED_SOURCES = \
   ../common/ts/Watchable \
   ../common/ts/Promise \
   ../common/ts/XDate \
+  ../common/ts/Timezone \
   ../common/ts/Log \
   ../common/ts/LRU \
   ../common/ts/Visited \
@@ -59,6 +60,7 @@ SHARED_SOURCES = \
   ../common/ts/Message \
   ../common/ts/Login \
   ../common/ts/Profile \
+  ../common/ts/Preferences \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \
   ../common/ts/Api

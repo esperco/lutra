@@ -223,7 +223,11 @@ module Esper.EventWidget {
 
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
-                              recent, last, team: ApiT.Team, threadId: string) {
+                              recent,
+                              last,
+                              team: ApiT.Team,
+                              prefs: ApiT.Preferences,
+                              threadId: string) {
 '''
 <span #title/>
 '''
@@ -234,13 +238,17 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, recent, last, team, threadId, title);
+    return base(linkedEvents, ev, recent, last, team, prefs, threadId, title);
   }
 
   /** The base event widget with the given payload in the main div. */
   export function base(linkedEvents: ApiT.EventWithSyncInfo[],
                        ev: ApiT.EventWithSyncInfo,
-                       recent, last, team: ApiT.Team, threadId: string,
+                       recent,
+                       last,
+                       team: ApiT.Team,
+                       prefs: ApiT.Preferences,
+                       threadId: string,
                        payload?) {
 '''
 <div #view class="esper-ev">
@@ -272,8 +280,14 @@ module Esper.EventWidget {
       main.prepend(displayEventOptions(view, ev, evs, team, threadId));
     }
 
-    var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end.local);
+    var calTimezone = calendar.calendar_timezone;
+    var showTimezone = prefs.general.current_timezone;
+    var start = XDate.ofString(Timezone.shiftTime(e.start.local,
+                                                  calTimezone,
+                                                  showTimezone));
+    var end = XDate.ofString(Timezone.shiftTime(e.end.local,
+                                                calTimezone,
+                                                showTimezone));
 
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
