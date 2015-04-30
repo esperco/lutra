@@ -1,18 +1,18 @@
 module Esper.Option {
   export class T<E> {
-    value : E
-    some : boolean
+    private value : E
+    private some : boolean
 
     constructor(value : E, some? : boolean) {
       this.value = value;
       this.some = some || false;
     }
 
-    match<A>(noneCase : () => A, someCase : (x:E) => A): A {
+    match<A>(matcher: { none : () => A; some : (x:E) => A }): A {
       if (this.some) {
-        return someCase(this.value);
+        return matcher.some(this.value);
       } else {
-        return noneCase();
+        return matcher.none();
       }
     }
   }
