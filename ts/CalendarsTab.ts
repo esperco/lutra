@@ -12,6 +12,7 @@ module CalendarsTab {
   <td><input #viewBox type="checkbox" class="esper-cal-view"></td>
   <td><input #writeBox type="checkbox" class="esper-cal-write"></td>
   <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
+  <td><input #agendaBox type= "checkbox" class="esper-cal-agenda"></td>
   <td #calName class="esper-cal-name"/>
 </tr>
 '''
@@ -21,6 +22,8 @@ module CalendarsTab {
       writeBox.prop("checked", true);
     if (cal.calendar_default_dupe)
       dupeBox.prop("checked", true);
+    if (cal.calendar_default_agenda)
+      agendaBox.prop("checked", true);
 
     calName.text(cal.calendar_title)
            .dblclick(function() { $(this).parent().remove(); });
@@ -48,6 +51,7 @@ module CalendarsTab {
         <td>View</td>
         <td>Write</td>
         <td>Dupe</td>
+        <td>Agenda</td>
       </tr>
     </table>
   </div>
@@ -84,7 +88,8 @@ module CalendarsTab {
             calendar_title: row.find(".esper-cal-name").text(),
             calendar_default_view: row.find(".esper-cal-view").is(":checked"),
             calendar_default_write: row.find(".esper-cal-write").is(":checked"),
-            calendar_default_dupe: row.find(".esper-cal-dupe").is(":checked")
+            calendar_default_dupe: row.find(".esper-cal-dupe").is(":checked"),
+            calendar_default_agenda: row.find(".esper-cal-agenda").is(":checked")
           };
         });
         // remove duplicates
