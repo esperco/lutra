@@ -32,9 +32,9 @@ module Esper.CurrentThread {
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
-  export var team = new Esper.Watchable.C<ApiT.Team>(
+  export var team = new Esper.Watchable.C<Esper.Option.T<ApiT.Team>>(
     function (team) { return team !== undefined && team !== null; },
-    undefined
+    Esper.Option.none<ApiT.Team>()
   );
 
   export var executive = new Esper.Watchable.C<ApiT.Profile>(
@@ -48,11 +48,11 @@ module Esper.CurrentThread {
     if (newTeam) {
       Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
         executive.set(newExec);
-        team.set(newTeam);
+        team.set(Option.some(newTeam));
         Menu.currentTeam.set(newTeam);
       });
     } else {
-      team.set(null);
+      team.set(Esper.Option.none<ApiT.Team>());
       Menu.currentTeam.set(null);
     }
   }
@@ -63,7 +63,7 @@ module Esper.CurrentThread {
   export function setThreadId(newThreadId) {
     if (!newThreadId) {
       task.set(null);
-      team.set(null);
+      team.set(Esper.Option.none<ApiT.Team>());
       GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
@@ -119,15 +119,20 @@ module Esper.CurrentThread {
    *  gmail js has a problem).
    */
   export function getExternalParticipants() : ApiT.Guest[] {
-    if (team.isValid() && executive.isValid()) {
-      var all = getParticipants();
-      return all.filter(function (participant) {
-        return participant.email != executive.get().email &&
-               team.get().team_email_aliases.indexOf(participant.email) == -1;
-      });
-    } else {
-      return [];
-    }
+    return team.get().match({
+      some : function (team) {
+        if (!executive.isValid()) return [];
+
+        var all = getParticipants();
+        return all.filter(function (participant) {
+          return participant.email != executive.get().email &&
+            team.team_email_aliases.indexOf(participant.email) == -1;
+        });
+      },
+      none : function () {
+        return [];
+      }
+    });
   }
 
   /** All the events linked with the current thread. */
@@ -153,20 +158,27 @@ module Esper.CurrentThread {
   }
 
   export function linkEvent(e) {
-    var teamid = team.get().teamid;
+    team.get().match({
+      some : function (team) {
+        var teamid = team.teamid;
 
-    Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
-      .done(function() {
-        // TODO Report something, handle failure, etc.
-        Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
+        Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
           .done(function() {
-            refreshTaskForThread(false);
-            Api.syncEvent(teamid, threadId.get(),
-                          e.google_cal_id, e.google_event_id);
+            // TODO Report something, handle failure, etc.
+            Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
+              .done(function() {
+                refreshTaskForThread(false);
+                Api.syncEvent(teamid, threadId.get(),
+                              e.google_cal_id, e.google_event_id);
 
-            linkedEventsChanged();
+                linkedEventsChanged();
+              });
           });
-      });
+      },
+      none : function () {
+        window.alert("Could not link event because no team is currently detected.");
+      }
+    });
   }
 
   /** The task associated with the current thread, if any. */
@@ -186,11 +198,14 @@ module Esper.CurrentThread {
 
   /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<ApiT.Team> {
-    if (team.isValid()) {
-      return Promise.defer(team.get());
-    } else {
-      return Sidebar.findTeamWithTask(Login.myTeams(), threadId);
-    }
+    return team.get().match({
+      some : function (team) {
+        return Promise.defer(team);
+      },
+      none : function () {
+        return Sidebar.findTeamWithTask(Login.myTeams(), threadId);
+      }
+    });
   }
 
   /** If there is no current task, fetches it from the server and
@@ -234,26 +249,35 @@ module Esper.CurrentThread {
    *  team. If there is no current team, the callback is not executed.
    */
   export function withPreferences(callback) {
-    if (team.isValid()) {
-      Api.getPreferences(team.get().teamid).done(callback);
-    } else {
-      Log.d("No team detected. Not calling callback.");
-    }
+    team.get().match({
+      some : function (team) {
+        Api.getPreferences(team.teamid).done(callback);
+      },
+      none : function () {
+        alert("Cannot get preferences because no team currently detected.");
+        Log.e("No team detected. Not calling callback.");
+      }
+    });
   }
 
   /** Returns the timezone of the given event. If the event isn't in
-   *  one of the current team's calendars, returns undefined.
+   *  one of the current team's calendars, returns null.
    */
   export function eventTimezone(ev: ApiT.CalendarEvent): string {
-    if (!team.isValid()) return undefined;
+    return team.get().match({
+      some : function (team) {
+        var teamCal =
+          List.find(team.team_calendars, function(c) {
+            return c.google_cal_id === ev.google_cal_id;
+          });
 
-    var teamCal =
-      List.find(team.get().team_calendars, function(c) {
-        return c.google_cal_id === ev.google_cal_id;
+        if (teamCal === null) return null;
+
+        return teamCal.calendar_timezone;
+      },
+      none : function () {
+        return null;
+      }
     });
-
-    if (teamCal === null) return undefined;
-
-    return teamCal.calendar_timezone;
   }
 }

@@ -720,11 +720,9 @@ module Esper.TaskTab {
 
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
-          CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
+          CurrentThread.task.isValid()) {
         CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
+          CalPicker.createInline(CurrentThread.task.get(),
                                  CurrentThread.threadId.get(),
                                  prefs);
         });
