@@ -47,11 +47,9 @@ module Esper.GroupTab {
 
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
-          CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
+          CurrentThread.task.isValid()) {
         CurrentThread.withPreferences(function (preferences) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
+          CalPicker.createInline(CurrentThread.task.get(),
                                  CurrentThread.threadId.get(),
                                  preferences);
         });
@@ -100,73 +98,81 @@ module Esper.GroupTab {
 
     return container;
 
+    // Will fail silently if there is no team set because it is not
+    // critical functionality.
     function populate() {
       list.hide();
       list.empty();
       spinner.show();
 
-      var team     = CurrentThread.team.get();
-      var threadId = CurrentThread.threadId.get();
+      CurrentThread.team.get().match({
+        some : function (team) {
+          var threadId = CurrentThread.threadId.get();
 
-      Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-        .done(function (events) {
-          spinner.hide();
-          list.show();
+          Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+            .done(function (events) {
+              spinner.hide();
+              list.show();
 
-          events.forEach(function (event: ApiT.EventWithSyncInfo) {
+              events.forEach(function (event: ApiT.EventWithSyncInfo) {
 '''
 <ul #statusGraph class="esper-availability-graph"></ul>
 '''
-            GroupScheduling.addEvent(event.event);
-            var status = GroupScheduling.getEventStatus(event.event);
-            populateGraph();
-
-            GroupScheduling.onGuestsChanged(function () {
-              // XXX: Timeout used as a hack to fix a loading problem:
-              setTimeout(function () {
-                status = GroupScheduling.getEventStatus(event.event);
+                GroupScheduling.addEvent(event.event);
+                var status = GroupScheduling.getEventStatus(event.event);
                 populateGraph();
-              }, 100);
-            });
 
-            var widget = EventWidget.base(events, event, false, false,
-                                          team, threadId, statusGraph);
-
-            list.append($("<li>").append(widget));
-
-            function populateGraph() {
-              statusGraph.empty();
-
-              status.guests.forEach(function (guestStatus) {
-                var availability = guestStatus.availability;
-                var pip = $("<li>").addClass(availabilityClass(availability));
-                var label = GroupScheduling.guestLabel(guestStatus.guest);
-
-                pip.tooltip({
-                  show: { effect: "none" },
-                  hide: { effect: "none" },
-                  items: "li",
-                  "content": label,
-                  "position": { my: 'center bottom', at: 'center top-5' },
-                  "tooltipClass": "esper-top esper-tooltip"
+                GroupScheduling.onGuestsChanged(function () {
+                  // XXX: Timeout used as a hack to fix a loading problem:
+                  setTimeout(function () {
+                    status = GroupScheduling.getEventStatus(event.event);
+                    populateGraph();
+                  }, 100);
                 });
 
-                pip.attr("title", label);
+                var widget = EventWidget.base(events, event, false, false,
+                                              team, threadId, statusGraph);
 
-                GroupScheduling.onTimesChanged(function () {
-                  pip.removeClass(availabilityClass(availability));
-                  availability = guestStatus.availability;
-                  pip.addClass(availabilityClass(availability));
-                });
+                list.append($("<li>").append(widget));
 
-                pip.click(function () {
-                  GroupScheduling.changeAvailability(event.event, guestStatus.guest);
-                });
+                function populateGraph() {
+                  statusGraph.empty();
 
-                statusGraph.append(pip);
+                  status.guests.forEach(function (guestStatus) {
+                    var availability = guestStatus.availability;
+                    var pip = $("<li>").addClass(availabilityClass(availability));
+                    var label = GroupScheduling.guestLabel(guestStatus.guest);
+
+                    pip.tooltip({
+                      show: { effect: "none" },
+                      hide: { effect: "none" },
+                      items: "li",
+                      "content": label,
+                      "position": { my: 'center bottom', at: 'center top-5' },
+                      "tooltipClass": "esper-top esper-tooltip"
+                    });
+
+                    pip.attr("title", label);
+
+                    GroupScheduling.onTimesChanged(function () {
+                      pip.removeClass(availabilityClass(availability));
+                      availability = guestStatus.availability;
+                      pip.addClass(availabilityClass(availability));
+                    });
+
+                    pip.click(function () {
+                      GroupScheduling.changeAvailability(event.event, guestStatus.guest);
+                    });
+
+                    statusGraph.append(pip);
+                  });
+                }
               });
-            }
-          });
+            });
+        },
+        none : function () {
+          // Don't do anything
+        }
       });
     }
   }

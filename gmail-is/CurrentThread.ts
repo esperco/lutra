@@ -34,7 +34,7 @@ module Esper.CurrentThread {
    */
   export var team = new Esper.Watchable.C<Esper.Option.T<ApiT.Team>>(
     function (team) { return team !== undefined && team !== null; },
-    undefined
+    Esper.Option.none<ApiT.Team>()
   );
 
   export var executive = new Esper.Watchable.C<ApiT.Profile>(
@@ -48,11 +48,11 @@ module Esper.CurrentThread {
     if (newTeam) {
       Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
         executive.set(newExec);
-        team.set(newTeam);
+        team.set(Option.some(newTeam));
         Menu.currentTeam.set(newTeam);
       });
     } else {
-      team.set(null);
+      team.set(Esper.Option.none<ApiT.Team>());
       Menu.currentTeam.set(null);
     }
   }
@@ -63,7 +63,7 @@ module Esper.CurrentThread {
   export function setThreadId(newThreadId) {
     if (!newThreadId) {
       task.set(null);
-      team.set(null);
+      team.set(Esper.Option.none<ApiT.Team>());
       GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
@@ -176,7 +176,7 @@ module Esper.CurrentThread {
           });
       },
       none : function () {
-        alert("Could not link event because no team is currently detected.");
+        window.alert("Could not link event because no team is currently detected.");
       }
     });
   }
@@ -254,7 +254,8 @@ module Esper.CurrentThread {
         Api.getPreferences(team.teamid).done(callback);
       },
       none : function () {
-        Log.d("No team detected. Not calling callback.");
+        alert("Cannot get preferences because no team currently detected.");
+        Log.e("No team detected. Not calling callback.");
       }
     });
   }

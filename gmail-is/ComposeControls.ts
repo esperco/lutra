@@ -82,7 +82,7 @@ module Esper.ComposeControls {
         },
         none : function () {
           // TODO: Handle missing team more gracefully?
-          alert("Cannot insert template: current team not detected.");
+          window.alert("Cannot insert template: current team not detected.");
         }
       });
     });
@@ -183,7 +183,7 @@ module Esper.ComposeControls {
         },
         none : function () {
           // TODO: Handle more gracefully?
-          alert("Cannot insert template: current team not detected.");
+          window.alert("Cannot insert template: current team not detected.");
         }
       });
     });
@@ -209,23 +209,14 @@ module Esper.ComposeControls {
     });
 
     createButton.click(function() {
-      CurrentThread.team.get().match({
-        some : function (team) {
-          if (CurrentThread.threadId.isValid() &&
-              CurrentThread.task.isValid()) {
-            CurrentThread.withPreferences(function(prefs) {
-              CalPicker.createInline(team,
-                                     CurrentThread.task.get(),
-                                     CurrentThread.threadId.get(),
-                                     prefs);
-            });
-          }
-        },
-        none : function () {
-          // TODO: Handle more gracefully.
-          alert("Could not create event—current team was not detected properly.");
-        }
-      });
+      if (CurrentThread.threadId.isValid() &&
+          CurrentThread.task.isValid()) {
+        CurrentThread.withPreferences(function(prefs) {
+          CalPicker.createInline(CurrentThread.task.get(),
+                                 CurrentThread.threadId.get(),
+                                 prefs);
+        });
+      }
     });
 
     return createButton;

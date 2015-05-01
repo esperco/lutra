@@ -326,7 +326,7 @@ module Esper.CalPicker {
       },
       none : function () {
         // TODO: Handle more gracefully?
-        alert("Cannot fetch events: current team not detected.");
+        window.alert("Cannot fetch events: current team not detected.");
         return [];
       }
     });
@@ -542,8 +542,9 @@ module Esper.CalPicker {
       guests: []
     };
     var gen = prefs.general;
-    if (gen && gen.hold_event_color && /^HOLD: /.test(title))
+    if (gen && gen.hold_event_color && /^HOLD: /.test(title)) {
       eventEdit.color_id = gen.hold_event_color.key;
+    }
     return eventEdit;
   }
 
@@ -714,7 +715,7 @@ module Esper.CalPicker {
     return _view;
   }
 
-  export function createInline(team: ApiT.Team, task: ApiT.Task,
+  export function createInline(task: ApiT.Task,
                                threadId: string, prefs: ApiT.Preferences)
     : void
   {
@@ -739,42 +740,49 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    function closeView() {
-      Sidebar.selectTaskTab();
-      view.remove();
-    }
+    CurrentThread.team.get().match({
+      some : function (team) {
+        function closeView() {
+          Sidebar.selectTaskTab();
+          view.remove();
+        }
 
-    refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
-    title.text("Create linked events");
+        refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+        title.text("Create linked events");
 
-    var userInfo = UserTab.viewOfUserTab(team);
-    var picker = createPicker(refreshCal, userInfo, team);
-    calendar.append(picker.view);
+        var userInfo = UserTab.viewOfUserTab(team);
+        var picker = createPicker(refreshCal, userInfo, team);
+        calendar.append(picker.view);
 
-    refreshCal.tooltip({
-      show: { delay: 500, effect: "none" },
-      hide: { effect: "none" },
-      "content": "Refresh calendars",
-      "position": { my: 'center bottom', at: 'center top-7' },
-      "tooltipClass": "esper-top esper-tooltip"
+        refreshCal.tooltip({
+          show: { delay: 500, effect: "none" },
+          hide: { effect: "none" },
+          "content": "Refresh calendars",
+          "position": { my: 'center bottom', at: 'center top-7' },
+          "tooltipClass": "esper-top esper-tooltip"
+        });
+
+        window.onresize = function(event) {
+          picker = createPicker(refreshCal, userInfo, team);
+          calendar.children().remove();
+          calendar.append(picker.view);
+          picker.render();
+        };
+
+        cancel.click(closeView);
+
+        save.click(function() {
+          confirmEvents(view, closeView, picker, team, task, threadId, prefs);
+        });
+
+        Gmail.threadContainer().append(view);
+        picker.render();
+        Sidebar.selectUserTab();
+        Gmail.scrollToMeetingOffers();
+      },
+      none : function () {
+        window.alert("Cannot create cal picker because no team is currently detected.");
+      }
     });
-
-    window.onresize = function(event) {
-      picker = createPicker(refreshCal, userInfo, team);
-      calendar.children().remove();
-      calendar.append(picker.view);
-      picker.render();
-    };
-
-    cancel.click(closeView);
-
-    save.click(function() {
-      confirmEvents(view, closeView, picker, team, task, threadId, prefs);
-    });
-
-    Gmail.threadContainer().append(view);
-    picker.render();
-    Sidebar.selectUserTab();
-    Gmail.scrollToMeetingOffers();
   }
 }
