@@ -56,30 +56,35 @@ module Esper.ComposeControls {
     });
 
     insertButton.click(function (e) {
-      if (CurrentThread.team.isValid()) {
-        var team = CurrentThread.team.get();
-        var events = CurrentThread.linkedEvents.get();
+      CurrentThread.team.get().match({
+        some : function (team) {
+          var events = CurrentThread.linkedEvents.get();
 
-        events.filter(function (e) {
-          return new Date(e.event.end.local) > new Date(Date.now());
-        });
+          events.filter(function (e) {
+            return new Date(e.event.end.local) > new Date(Date.now());
+          });
 
-        var entry = events.reduce(function (str, event) {
-          var ev    = event.event;
-          var start = new Date(ev.start.local);
-          var end   = new Date(ev.end.local);
-          var wday = XDate.fullWeekDay(start);
-          var time = XDate.justStartTime(start);
-          var tz    =
-            (<any> moment).tz(ev.start.local,
-                              CurrentThread.eventTimezone(ev)).zoneAbbr();
+          var entry = events.reduce(function (str, event) {
+            var ev    = event.event;
+            var start = new Date(ev.start.local);
+            var end   = new Date(ev.end.local);
+            var wday = XDate.fullWeekDay(start);
+            var time = XDate.justStartTime(start);
+            var tz    =
+              (<any> moment).tz(ev.start.local,
+                                CurrentThread.eventTimezone(ev)).zoneAbbr();
 
-          var br = str != "" ? "<br />" : ""; // no leading newline
-          return str + br + wday + ", " + time + " " + tz;
-        }, "");
+            var br = str != "" ? "<br />" : ""; // no leading newline
+            return str + br + wday + ", " + time + " " + tz;
+          }, "");
 
-        composeControls.insertAtCaret(entry);
-      }
+          composeControls.insertAtCaret(entry);
+        },
+        none : function () {
+          // TODO: Handle missing team more gracefully?
+          alert("Cannot insert template: current team not detected.");
+        }
+      });
     });
 
     function updateEventsLabel() {
@@ -133,50 +138,54 @@ module Esper.ComposeControls {
     });
 
     templateButton.click(function (e) {
-      if (CurrentThread.team.isValid()) {
-        var team = CurrentThread.team.get();
-        var events = CurrentThread.linkedEvents.get();
+      CurrentThread.team.get().match({
+        some : function (team) {
+          var events = CurrentThread.linkedEvents.get();
 
-        events.filter(function (e) {
-          return new Date(e.event.end.local) > new Date(Date.now());
-        });
+          events.filter(function (e) {
+            return new Date(e.event.end.local) > new Date(Date.now());
+          });
 
-        var entry = events.reduce(function (str, event): string {
-          var ev    = event.event;
-          var start = new Date(ev.start.local);
-          var end   = new Date(ev.end.local);
-          var wday = XDate.fullWeekDay(start);
-          var time = XDate.justStartTime(start);
-          var tz    =
-            (<any> moment).tz(ev.start.local,
-                              CurrentThread.eventTimezone(ev)).zoneAbbr();
+          var entry = events.reduce(function (str, event): string {
+            var ev    = event.event;
+            var start = new Date(ev.start.local);
+            var end   = new Date(ev.end.local);
+            var wday = XDate.fullWeekDay(start);
+            var time = XDate.justStartTime(start);
+            var tz    =
+              (<any> moment).tz(ev.start.local,
+                                CurrentThread.eventTimezone(ev)).zoneAbbr();
 
-          var loc;
-          if (ev.location !== undefined) {
-            loc = ev.location.address;
-            if (ev.location.title !== "")
-              loc = ev.location.title + " - " + loc;
-          } else {
-            loc = "<b>LOCATION</b>";
-          }
+            var loc;
+            if (ev.location !== undefined) {
+              loc = ev.location.address;
+              if (ev.location.title !== "")
+                loc = ev.location.title + " - " + loc;
+            } else {
+              loc = "<b>LOCATION</b>";
+            }
 
-          var br = str != "" ? "<br />" : ""; // no leading newline
-          return str + br + wday + ", " + time + " " + tz + " at " + loc;
-        }, "");
+            var br = str != "" ? "<br />" : ""; // no leading newline
+            return str + br + wday + ", " + time + " " + tz + " at " + loc;
+          }, "");
 
-        var template =
-          events.length > 1 ?
-          multipleEventTemplate.slice(0) :
-          singleEventTemplate.slice(0); // using slice to copy string
+          var template =
+            events.length > 1 ?
+            multipleEventTemplate.slice(0) :
+            singleEventTemplate.slice(0); // using slice to copy string
 
-        var team = CurrentThread.team.get();
-        var execName = team.team_name.replace(/ .*$/, "");
-        if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-        var filledTemplate =
-          template.replace("|offer|", entry)
-          .replace("|exec|", execName);
-        composeControls.insertAtCaret(filledTemplate);
-      }
+          var execName = team.team_name.replace(/ .*$/, "");
+          if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+          var filledTemplate =
+            template.replace("|offer|", entry)
+            .replace("|exec|", execName);
+          composeControls.insertAtCaret(filledTemplate);
+        },
+        none : function () {
+          // TODO: Handle more gracefully?
+          alert("Cannot insert template: current team not detected.");
+        }
+      });
     });
 
     return templateButton;
@@ -200,16 +209,23 @@ module Esper.ComposeControls {
     });
 
     createButton.click(function() {
-      if (CurrentThread.threadId.isValid() &&
-          CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
-        CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 prefs);
-        });
-      }
+      CurrentThread.team.get().match({
+        some : function (team) {
+          if (CurrentThread.threadId.isValid() &&
+              CurrentThread.task.isValid()) {
+            CurrentThread.withPreferences(function(prefs) {
+              CalPicker.createInline(team,
+                                     CurrentThread.task.get(),
+                                     CurrentThread.threadId.get(),
+                                     prefs);
+            });
+          }
+        },
+        none : function () {
+          // TODO: Handle more gracefully.
+          alert("Could not create event—current team was not detected properly.");
+        }
+      });
     });
 
     return createButton;
