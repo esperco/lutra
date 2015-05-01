@@ -327,6 +327,7 @@ module Esper.CalPicker {
       none : function () {
         // TODO: Handle more gracefully?
         alert("Cannot fetch events: current team not detected.");
+        return [];
       }
     });
   }

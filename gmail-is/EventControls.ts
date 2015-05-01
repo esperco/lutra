@@ -1,6 +1,9 @@
 /** Contains the UI code for the widget for editing an event */
 module Esper.EventControls {
-  /** Returns a widget for editing an event */
+  /** Returns a widget for editing an event. If there is no current
+   *  team, the widget will be blank and say "no team detected".
+   */
+  // TODO: Figure out better way of handling missing team!
   export function eventEditWidget(event: ApiT.CalendarEvent) {
 '''
 <div #container class="esper-ev-inline-container">
@@ -54,123 +57,131 @@ module Esper.EventControls {
   </div>
 </div>
 '''
-    /** Removes the widget from the DOM. */
-    function close() {
-      container.remove();
-    }
-
-    var team = CurrentThread.team.get();
-    var threadId = CurrentThread.threadId.get();
-
-    Sidebar.customizeSelectArrow(fromSelect);
-
-    var newTitle = event.title || "Untitled event";
-    pubTitle.val(newTitle);
-
-    var start = new Date(event.start.local);
-    startDate.val(XDate.dateValue(start));
-    startTime.val(XDate.timeOnly24Hours(start));
-    var end = new Date(event.end.local);
-    endDate.val(XDate.dateValue(end));
-    endTime.val(XDate.timeOnly24Hours(end));
-
-    var timeDiff = end.getTime() - start.getTime();
-
-    function startChange() {
-      var s = new Date(startDate.val() + " " + startTime.val() + "Z");
-      var e = new Date(s.getTime() + timeDiff);
-      endDate.val(XDate.dateValue(e));
-      endTime.val(XDate.timeOnly24Hours(e));
-    }
-    startDate.change(startChange);
-    startTime.change(startChange);
-
-    function endChange() {
-      var s = new Date(startDate.val() + " " + startTime.val() + "Z");
-      var e = new Date(endDate.val() + " " + endTime.val() + "Z");
-      timeDiff = e.getTime() - s.getTime();
-      if (timeDiff < 0) {
-        startDate.val(XDate.dateValue(e));
-        startTime.val(XDate.timeOnly24Hours(e));
-        timeDiff = 0;
-      }
-    }
-    endDate.change(endChange);
-    endTime.change(endChange);
-
-    if (event.location) {
-      var address = event.location.address;
-
-      if (event.location.title !== "") {
-        address = event.location.title + " - " + address;
-      }
-
-      pubLocation.val(address);
-    }
-
-    var aliases = team.team_email_aliases;
-    if (aliases.length === 0) {
-      $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-      fromSelect.prop("disabled", true);
-    } else {
-      aliases.forEach(function (email: string) {
-        $("<option>" + email + "</option>").appendTo(fromSelect);
-      });
-    }
-
-    pubDescription.val(event.description);
-
-    cancel.click(close);
-    save.click(function() {
-      CurrentThread.withPreferences(function(preferences) {
-        var timezone = preferences.general.current_timezone;
-
-        //moment-tz apparently doesn't handle these timezones
-        if (timezone === "US/Eastern") timezone = "America/New_York";
-        else if (timezone === "US/Central") timezone = "America/Chicago";
-        else if (timezone === "US/Mountain") timezone = "America/Denver";
-        else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
-
-        var st = new Date(startDate.val() + " " + startTime.val() + "Z");
-        var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
-        var evStart: ApiT.CalendarTime = {
-            local: XDate.toString(st),
-            utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
-        };
-        var evEnd: ApiT.CalendarTime = {
-            local: XDate.toString(ed),
-            utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
-        };
-
-        var location = {
-            title: "",
-            address: pubLocation.val()
-        };
-        if (!location.address) location = null;
-
-        var e: ApiT.CalendarEventEdit = {
-            google_cal_id: event.google_cal_id,
-            start: evStart,
-            end: evEnd,
-            title: pubTitle.val(),
-            description: pubDescription.val(),
-            location: location,
-            all_day: event.all_day,
-            guests: []
+    return CurrentThread.team.get().match({
+      some : function (team) {
+        /** Removes the widget from the DOM. */
+        function close() {
+          container.remove();
         }
 
-        var alias = fromSelect.val();
+        var threadId = CurrentThread.threadId.get();
 
-        Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-          .done(function() {
-            var taskTab = TaskTab.currentTaskTab;
-            TaskTab.refreshlinkedEventsList(team, threadId, taskTab);
-            close();
+        Sidebar.customizeSelectArrow(fromSelect);
+
+        var newTitle = event.title || "Untitled event";
+        pubTitle.val(newTitle);
+
+        var start = new Date(event.start.local);
+        startDate.val(XDate.dateValue(start));
+        startTime.val(XDate.timeOnly24Hours(start));
+        var end = new Date(event.end.local);
+        endDate.val(XDate.dateValue(end));
+        endTime.val(XDate.timeOnly24Hours(end));
+
+        var timeDiff = end.getTime() - start.getTime();
+
+        function startChange() {
+          var s = new Date(startDate.val() + " " + startTime.val() + "Z");
+          var e = new Date(s.getTime() + timeDiff);
+          endDate.val(XDate.dateValue(e));
+          endTime.val(XDate.timeOnly24Hours(e));
+        }
+        startDate.change(startChange);
+        startTime.change(startChange);
+
+        function endChange() {
+          var s = new Date(startDate.val() + " " + startTime.val() + "Z");
+          var e = new Date(endDate.val() + " " + endTime.val() + "Z");
+          timeDiff = e.getTime() - s.getTime();
+          if (timeDiff < 0) {
+            startDate.val(XDate.dateValue(e));
+            startTime.val(XDate.timeOnly24Hours(e));
+            timeDiff = 0;
+          }
+        }
+        endDate.change(endChange);
+        endTime.change(endChange);
+
+        if (event.location) {
+          var address = event.location.address;
+
+          if (event.location.title !== "") {
+            address = event.location.title + " - " + address;
+          }
+
+          pubLocation.val(address);
+        }
+
+        var aliases = team.team_email_aliases;
+        if (aliases.length === 0) {
+          $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
+          fromSelect.prop("disabled", true);
+        } else {
+          aliases.forEach(function (email: string) {
+            $("<option>" + email + "</option>").appendTo(fromSelect);
           });
-      });
-    });
+        }
 
-    return container;
+        pubDescription.val(event.description);
+
+        cancel.click(close);
+        save.click(function() {
+          CurrentThread.withPreferences(function(preferences) {
+            var timezone = preferences.general.current_timezone;
+
+            //moment-tz apparently doesn't handle these timezones
+            if (timezone === "US/Eastern") timezone = "America/New_York";
+            else if (timezone === "US/Central") timezone = "America/Chicago";
+            else if (timezone === "US/Mountain") timezone = "America/Denver";
+            else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
+
+            var st = new Date(startDate.val() + " " + startTime.val() + "Z");
+            var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
+            var evStart: ApiT.CalendarTime = {
+              local: XDate.toString(st),
+              utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
+            };
+            var evEnd: ApiT.CalendarTime = {
+              local: XDate.toString(ed),
+              utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
+            };
+
+            var location = {
+              title: "",
+              address: pubLocation.val()
+            };
+            if (!location.address) location = null;
+
+            var e: ApiT.CalendarEventEdit = {
+              google_cal_id: event.google_cal_id,
+              start: evStart,
+              end: evEnd,
+              title: pubTitle.val(),
+              description: pubDescription.val(),
+              location: location,
+              all_day: event.all_day,
+              guests: []
+            }
+
+            var alias = fromSelect.val();
+
+            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+              .done(function() {
+                var taskTab = TaskTab.currentTaskTab;
+                TaskTab.refreshlinkedEventsList(team, threadId, taskTab);
+                close();
+              });
+          });
+        });
+
+        return container;
+      },
+      none : function () {
+        container.empty();
+        container.text("No team detected.");
+        return container;
+      }
+    });
   }
 
   /** Inserts a new "Event Event" widget after the contents of the
