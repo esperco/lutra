@@ -1259,8 +1259,10 @@ module PreferencesTab {
     sendCol.append(createEmailTimeSelector(defaults.send_time, saveEmailTypes));
 
     if (name === "Daily Agenda") {
-      if (defaults.day_of) dayof.prop("checked", true);
-      else nextday.prop("checked", true);
+      if (defaults.day_of || defaults.day_of === undefined)
+        dayof.prop("checked", true);
+      else
+        nextday.prop("checked", true);
 
       dayof.change(function() {
           nextday.prop("checked", !dayof.prop("checked"));
