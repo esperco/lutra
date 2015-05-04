@@ -201,8 +201,9 @@ module Esper.FinalizeEvent {
           Api.getEventDetails(team.teamid, event.google_cal_id,
                               team.team_calendars, event.google_event_id)
             .done(function(eventOpt) {
-              if (eventOpt.event_opt !== undefined)
+              if (eventOpt.event_opt !== undefined) {
                 event = eventOpt.event_opt;
+              }
 
               deleteHolds(event, preferences, function () {
                 TaskTab.refreshEventLists(team, threadId, taskTab);
