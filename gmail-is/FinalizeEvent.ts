@@ -198,12 +198,20 @@ module Esper.FinalizeEvent {
           var threadId = CurrentThread.threadId.get();
           var taskTab = TaskTab.currentTaskTab;
 
-          deleteHolds(event, preferences, function () {
-            TaskTab.refreshEventLists(team, threadId, taskTab);
-          });
+          Api.getEventDetails(team.teamid, event.google_cal_id,
+                              team.team_calendars, event.google_event_id)
+            .done(function(eventOpt) {
+              if (eventOpt.event_opt !== undefined) {
+                event = eventOpt.event_opt;
+              }
 
-          confirmEvent(event, preferences);
-          inviteGuests(event, preferences);
+              deleteHolds(event, preferences, function () {
+                TaskTab.refreshEventLists(team, threadId, taskTab);
+              });
+
+              confirmEvent(event, preferences);
+              inviteGuests(event, preferences);
+            });
         });
       },
       none : function () {
