@@ -203,7 +203,18 @@ module Esper.CurrentThread {
         return Promise.defer(team);
       },
       none : function () {
-        return Sidebar.findTeamWithTask(Login.myTeams(), threadId);
+        return Sidebar.findTeamWithTask(Login.myTeams(), threadId).then(function (team) {
+          // <any> needed because promises are automatically flattened
+          if (team) {
+            return <any> team;
+          } else { // detect team based on thread participants
+            var emailData = esperGmail.get.email_data();
+            return <any> Thread.detectTeam(Login.myTeams(), emailData)
+              .then(function (detectedTeam) {
+                return detectedTeam.team;
+              });
+          }
+        });
       }
     });
   }

@@ -23,7 +23,8 @@ module Esper.Thread {
     /*
       It looks TypeScript selects the wrong prototype for .then(), resulting
       in what it thinks is a JQueryPromise<JQueryPromise<...>>.
-      The <any> cast fixes it.
+      The <any> cast fixes it. (Promises are flattened automatically, so
+      JQueryPromise<JQueryPromise<<A>> ≅ JQueryPromise<A>.)
     */
     return <any> Login.getLoginInfo
       .then(function(loginInfo) {
