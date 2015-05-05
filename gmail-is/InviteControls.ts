@@ -368,12 +368,11 @@ module Esper.InviteControls {
               if (confirmEventIsNotHold(eventEdit)) {
                 Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
                   .done(function(created) {
-
                     Api.syncEvent(team.teamid, threadId,
                                   created.google_cal_id,
-                                  created.google_event_id).done(function() {
-                      Api.sendEventInvites(team.teamid, from, guests, created);
-                    });
+                                  created.google_event_id);
+
+                    Api.sendEventInvites(team.teamid, from, guests, created);
 
                     TaskTab.refreshlinkedEventsList(team, threadId,
                                                     TaskTab.currentTaskTab);
