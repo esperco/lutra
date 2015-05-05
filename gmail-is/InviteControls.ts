@@ -370,22 +370,23 @@ module Esper.InviteControls {
                   .done(function(created) {
                     Api.syncEvent(team.teamid, threadId,
                                   created.google_cal_id,
-                                  created.google_event_id);
-                    Api.sendEventInvites(team.teamid, from, guests, created);
-                    TaskTab.refreshlinkedEventsList(team, threadId,
-                                                    TaskTab.currentTaskTab);
-                    CurrentThread.linkedEventsChanged();
+                                  created.google_event_id).done(function() {
+                      Api.sendEventInvites(team.teamid, from, guests, created);
+                      TaskTab.refreshlinkedEventsList(team, threadId,
+                                                      TaskTab.currentTaskTab);
+                      CurrentThread.linkedEventsChanged();
 
-                    var execIds = {
-                      calendarId : original.google_cal_id,
-                      eventId    : original.google_event_id
-                    };
-                    var guestsIds = {
-                      calendarId : created.google_cal_id,
-                      eventId    : created.google_event_id
-                    };
-                    setReminders(execIds, guestsIds);
-                    close();
+                      var execIds = {
+                        calendarId : original.google_cal_id,
+                        eventId    : original.google_event_id
+                      };
+                      var guestsIds = {
+                        calendarId : created.google_cal_id,
+                        eventId    : created.google_event_id
+                      };
+                      setReminders(execIds, guestsIds);
+                      close();
+                    });
                   });
               }
             } else {
