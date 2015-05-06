@@ -164,7 +164,6 @@ module Esper.InviteControls {
         if (participants.length > 0) {
           List.iter(participants, function (participant) {
             var name = participant.display_name || "";
-            peopleInvolved[participant.email] = name;
             var v = viewPersonInvolved(peopleInvolved, participant.email, name);
             viewPeopleInvolved.append(v);
           });
