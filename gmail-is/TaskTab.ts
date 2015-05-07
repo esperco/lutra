@@ -46,7 +46,6 @@ module Esper.TaskTab {
   }
 
   export function displayRecentsList(team: ApiT.Team,
-                                     prefs: ApiT.Preferences,
                                      threadId,
                                      taskTab: TaskTabView,
                                      linkedEvents: ApiT.EventWithSyncInfo[]) {
@@ -117,7 +116,7 @@ module Esper.TaskTab {
             var ev = { event : e, synced_threads : [] };
             eventsList.append(
               EventWidget.renderEvent(linkedEvents, ev, recent, last,
-                                      team, prefs, threadId));
+                                      team, threadId));
             i++;
           });
           taskTab.recentsList.children().remove();
@@ -129,8 +128,7 @@ module Esper.TaskTab {
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function displayLinkedEventsList(team,
-                                          prefs: ApiT.Preferences,
+  export function displayLinkedEventsList(team: ApiT.Team,
                                           threadId, taskTab: TaskTabView,
                                           linkedEvents:
                                           ApiT.EventWithSyncInfo[]) {
@@ -153,7 +151,7 @@ module Esper.TaskTab {
         if (i === linkedEvents.length - 1) last = true;
 
         eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
-                                                  team, prefs, threadId));
+                                                  team, threadId));
         i++;
       });
       taskTab.linkedEventsList.append(eventsList);
@@ -252,28 +250,25 @@ module Esper.TaskTab {
   }
 
   export function clearLinkedEventsList(team: ApiT.Team,
-                                        prefs: ApiT.Preferences,
                                         taskTab: TaskTabView) {
-    displayLinkedEventsList(team, prefs, "", taskTab, []);
+    displayLinkedEventsList(team, "", taskTab, []);
   }
 
   /* Refresh only linked events, fetching linked events from the server. */
   export function refreshLinkedEventsList(team: ApiT.Team,
-                                          prefs: ApiT.Preferences,
                                           threadId, taskTab) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayLinkedEventsList(team, prefs, threadId, taskTab, linkedEvents);
+        displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
       });
   }
 
   /* Refresh only recent events, fetching linked events from the server. */
   export function refreshRecentsList(team: ApiT.Team,
-                                     prefs: ApiT.Preferences,
                                      threadId, taskTab) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
-        displayRecentsList(team, prefs, threadId, taskTab, linkedEvents);
+        displayRecentsList(team, threadId, taskTab, linkedEvents);
       });
   }
 
@@ -347,7 +342,6 @@ module Esper.TaskTab {
   // Search for matching tasks and display the results in a dropdown
   function displaySearchResults(taskTitle, dropdown, results, actions,
                                 team: ApiT.Team,
-                                prefs: ApiT.Preferences,
                                 threadId: string,
                                 query,
                                 taskTab: TaskTabView) {
@@ -382,7 +376,7 @@ module Esper.TaskTab {
               refreshTaskNotes(team, threadId, taskTab);
               refreshTaskProgressSelection(team, threadId, taskTab);
               refreshLinkedThreadsList(team, threadId, taskTab);
-              refreshLinkedEventsList(team, prefs, threadId, taskTab);
+              refreshLinkedEventsList(team, threadId, taskTab);
             });
 
             CurrentThread.task.set(result.task_data);
@@ -499,7 +493,6 @@ module Esper.TaskTab {
 
   export function displayTaskTab(tab1,
                                  team: ApiT.Team,
-                                 prefs: ApiT.Preferences,
                                  threadId: string,
                                  autoTask: boolean,
                                  linkedEvents: ApiT.EventWithSyncInfo[]) {
@@ -670,7 +663,7 @@ module Esper.TaskTab {
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
-      refreshLinkedEventsList(team, prefs, threadId, taskTabView);
+      refreshLinkedEventsList(team, threadId, taskTabView);
       if (linkedEventsContainer.css("display") === "none") {
         Sidebar.toggleList(linkedEventsContainer);
         showLinkedEvents.text("Hide");
@@ -734,14 +727,10 @@ module Esper.TaskTab {
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
-        CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 prefs);
-        });
-      }
+          CurrentThread.team.isValid())
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
     });
 
     var apiGetTask = autoTask ?
@@ -800,7 +789,7 @@ module Esper.TaskTab {
         var query = taskTitle.val();
         if (query !== "")
           displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
-                               taskSearchActions, team, prefs,
+                               taskSearchActions, team,
                                threadId, query, taskTabView);
       });
       taskTitle.keydown(function(pressed) {
@@ -817,7 +806,8 @@ module Esper.TaskTab {
     });
 
     linkEvent.click(function() {
-      var searchModal = CalSearch.viewOfSearchModal(team, threadId, taskTabView);
+      var searchModal =
+        CalSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
     });

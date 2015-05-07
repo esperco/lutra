@@ -202,14 +202,10 @@ module Esper.ComposeControls {
     createButton.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
-        CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 prefs);
-        });
-      }
+          CurrentThread.team.isValid())
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
     });
 
     return createButton;

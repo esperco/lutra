@@ -12,7 +12,6 @@ SOURCES = \
   Watchable \
   Promise \
   XDate \
-  Timezone \
   Log \
   LRU \
   Visited \

@@ -53,8 +53,7 @@ module Esper.Sidebar {
                                myTeam: ApiT.Team,
                                team: ApiT.Team,
                                onTeamSwitch:
-                                 (newTeam: ApiT.Team,
-                                  prefs: ApiT.Preferences) => void) {
+                                 (newTeam: ApiT.Team) => void) {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
@@ -63,7 +62,6 @@ module Esper.Sidebar {
 </li>
 '''
     var profile = Teams.getProfile(team.team_executive);
-    var prefs = Teams.getPreferences(team.team_executive);
     var email = profile && profile.email;
 
     teamName.text(team.team_name);
@@ -134,8 +132,7 @@ module Esper.Sidebar {
     dropdown.css("max-height", $(window).height() - 100);
     dropdown.css("overflow", "auto");
 
-    function onTeamSwitch(toTeam: ApiT.Team,
-                          prefs: ApiT.Preferences) {
+    function onTeamSwitch(toTeam: ApiT.Team) {
       CurrentThread.setTeam(toTeam);
 
       dismissDropdowns();
@@ -147,7 +144,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, prefs, true, false, threadId);
+        displayTeamSidebar(rootElement, toTeam, true, false, threadId);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -253,7 +250,6 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           team: ApiT.Team,
-                          prefs: ApiT.Preferences,
                           threadId: string,
                           autoTask: boolean,
                           linkedEvents: ApiT.EventWithSyncInfo[]) {
@@ -291,7 +287,7 @@ module Esper.Sidebar {
     });
 
     if (team !== undefined) {
-      TaskTab.displayTaskTab(taskContent, team, prefs, threadId,
+      TaskTab.displayTaskTab(taskContent, team, threadId,
                              autoTask, linkedEvents);
       userContent.append(UserTab.viewOfUserTab(team).view);
       GroupScheduling.afterInitialize(function () {
@@ -334,7 +330,6 @@ module Esper.Sidebar {
 
   function displayTeamSidebar(rootElement,
                               team: ApiT.Team,
-                              prefs: ApiT.Preferences,
                               isCorrectTeam: boolean,
                               autoTask: boolean,
                               threadId) {
@@ -345,14 +340,14 @@ module Esper.Sidebar {
       if (status_.must_upgrade === true) {
         displayUpdateDock(rootElement, status_.download_page);
       } else if (team === undefined) {
-        var sidebar = displaySidebar(rootElement, team, prefs, threadId,
+        var sidebar = displaySidebar(rootElement, team, threadId,
                                      autoTask, []);
         displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
         $(".esper-dock-wrap").hide();
       } else {
         Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
           .done(function(linkedEvents) {
-            var sidebar = displaySidebar(rootElement, team, prefs, threadId,
+            var sidebar = displaySidebar(rootElement, team, threadId,
                                          autoTask,
                                          linkedEvents);
             displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
@@ -447,11 +442,11 @@ module Esper.Sidebar {
                     correctTeam = true;
                     team = foundTeam;
                   }
-                  displayTeamSidebar(rootElement, team, prefs,
+                  displayTeamSidebar(rootElement, team,
                                      correctTeam, autoTask, threadId);
                 });
               } else if (correctTeam) {
-                displayTeamSidebar(rootElement, team, prefs,
+                displayTeamSidebar(rootElement, team,
                                    correctTeam, autoTask, threadId);
               }
             });
@@ -477,15 +472,18 @@ module Esper.Sidebar {
     };
   }
 
-  var alreadyInitialized = false;
+  var initJob: JQueryPromise<void>;
 
-  export function init() {
-    if (!alreadyInitialized) {
-      alreadyInitialized = true;
-      Teams.initialize();
-      Log.d("Sidebar.init()");
-      listen();
-      maybeUpdateView();
+  export function init(): JQueryPromise<void> {
+    if (initJob)
+      return initJob;
+    else {
+      Log.d("Initializing sidebar");
+      initJob = Teams.initialize().done(function() {
+        listen();
+        maybeUpdateView();
+      });
+      return initJob;
     }
   }
 }

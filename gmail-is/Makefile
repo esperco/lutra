@@ -52,7 +52,6 @@ SHARED_SOURCES = \
   ../common/ts/Watchable \
   ../common/ts/Promise \
   ../common/ts/XDate \
-  ../common/ts/Timezone \
   ../common/ts/Log \
   ../common/ts/LRU \
   ../common/ts/Visited \
@@ -69,6 +68,7 @@ SHARED_SOURCES = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
+  Timezone \
   Gmail \
   Thread \
   ActiveThreads \

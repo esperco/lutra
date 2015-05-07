@@ -115,34 +115,31 @@ module Esper.Menu {
     });
 
     teamSelect.change(function() {
-      var team = teamSelect.val();
-      Api.getPreferences(team).done(function(prefs) {
-        var timezone = prefs.general.current_timezone;
-        tzSelect.val(timezone);
-      });
+      var teamid = teamSelect.val();
+      var prefs = Teams.getPreferences(teamid);
+      var timezone = prefs.general.current_timezone;
+      tzSelect.val(timezone);
     });
 
     var teamid = teamSelect.val();
     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
+    var prefs = Teams.getPreferences(teamid);
+    var timezone = prefs.general.current_timezone;
 
-    Api.getPreferences(teamid).done(function(prefs) {
-      var timezone = prefs.general.current_timezone;
+    List.iter(timezones, function(tz) {
+      var o = $("<option>")
+        .text(tz)
+        .val(tz);
+      if (tz === timezone) {
+        o.attr("selected", true);
+      }
+      o.appendTo(tzSelect);
+    });
 
-      List.iter(timezones, function(tz) {
-          var o = $("<option>")
-              .text(tz)
-              .val(tz);
-          if (tz === timezone) {
-              o.attr("selected", true);
-          }
-          o.appendTo(tzSelect);
-      });
-
-      tzSelect.change(function() {
-        var general = prefs.general;
-        general.current_timezone = tzSelect.val();
-        Api.setGeneralPreferences(teamid, general);
-      });
+    tzSelect.change(function() {
+      var general = prefs.general;
+      general.current_timezone = tzSelect.val();
+      Api.setGeneralPreferences(teamid, general);
     });
 
     var date = new Date();

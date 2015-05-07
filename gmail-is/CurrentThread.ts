@@ -235,7 +235,7 @@ module Esper.CurrentThread {
    */
   export function withPreferences(callback) {
     if (team.isValid()) {
-      Api.getPreferences(team.get().teamid).done(callback);
+      callback(Teams.getTeamPreferences(team.get()));
     } else {
       Log.d("No team detected. Not calling callback.");
     }

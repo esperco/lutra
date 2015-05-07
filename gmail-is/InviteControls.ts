@@ -7,25 +7,23 @@ module Esper.InviteControls {
      insert the number into the notes box for the EA.
   */
   function appendExecPublicPhone(team, notesBox) {
-    Profile.get(team.team_executive, team.teamid).done(function(prof) {
-      Api.getPreferences(team.teamid).done(function(prefs) {
-        var phoneInfo = prefs.meeting_types.phone_call;
-        if (phoneInfo !== undefined) {
-          var pubMobile = List.find(phoneInfo.phones, function(p) {
-            return p.phone_type === "Mobile" && p.share_with_guests;
-          });
-          if (pubMobile !== null) {
-            var curText = notesBox.val();
-            var execName = prof.display_name.replace(/ .*$/, "");
-            var toAppend = execName + ": " + pubMobile.phone_number;
-            if (curText.length > 0)
-              notesBox.val(curText + "\n\n" + toAppend);
-            else
-              notesBox.val(toAppend);
-          }
-        }
+    var prof = Teams.getProfile(team.team_executive);
+    var prefs = Teams.getTeamPreferences(team);
+    var phoneInfo = prefs.meeting_types.phone_call;
+    if (phoneInfo !== undefined) {
+      var pubMobile = List.find(phoneInfo.phones, function(p) {
+        return p.phone_type === "Mobile" && p.share_with_guests;
       });
-    });
+      if (pubMobile !== null) {
+        var curText = notesBox.val();
+        var execName = prof.display_name.replace(/ .*$/, "");
+        var toAppend = execName + ": " + pubMobile.phone_number;
+        if (curText.length > 0)
+          notesBox.val(curText + "\n\n" + toAppend);
+        else
+          notesBox.val(toAppend);
+      }
+    }
   }
 
   /** Returns a widget for inviting guests to the current event or to
@@ -263,7 +261,8 @@ module Esper.InviteControls {
          */
         function checkDescription(previous, title, reminderSpec?) {
           var next =
-            descriptionWidget(event, eventEdit, duplicate, guests, from, close, back, reminderSpec);
+            descriptionWidget(event, eventEdit, duplicate,
+                              guests, from, close, back, reminderSpec);
 
           slideForward(previous, next);
 
@@ -272,7 +271,8 @@ module Esper.InviteControls {
           }
         }
 
-        var next = reminderWidget(event, eventEdit, team, execReminder, duplicate, function () {
+        var next = reminderWidget(event, eventEdit, team,
+                                  execReminder, duplicate, function () {
           slideBack(container, next);
         }, function (reminderSpec) {
           var title = pubTitle.val();
@@ -304,7 +304,8 @@ module Esper.InviteControls {
   export function descriptionWidget(original: ApiT.CalendarEvent,
                                     eventEdit: ApiT.CalendarEventEdit,
                                     duplicate: boolean,
-                                    guests, from, done, backFunction, reminderSpec?) {
+                                    guests, from, done, backFunction,
+                                    reminderSpec?) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -331,7 +332,8 @@ module Esper.InviteControls {
 
     Api.getRestrictedDescription(team.teamid, original.google_event_id, guests)
       .done(function (description) {
-        descriptionField.val(eventEdit.description + description.description_text);
+        descriptionField.val(eventEdit.description
+                             + description.description_text);
       });
 
     function close() {
@@ -359,7 +361,7 @@ module Esper.InviteControls {
             Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
               .done(function(created) {
                 Api.sendEventInvites(team.teamid, from, guests, created);
-                TaskTab.refreshLinkedEventsList(team, prefs, threadId,
+                TaskTab.refreshLinkedEventsList(team, threadId,
                                                 TaskTab.currentTaskTab);
                 CurrentThread.linkedEventsChanged();
 
@@ -384,7 +386,7 @@ module Esper.InviteControls {
                                 original.google_event_id, eventEdit)
             .done(function() {
               Api.sendEventInvites(team.teamid, from, guests, original);
-              TaskTab.refreshLinkedEventsList(team, prefs, threadId,
+              TaskTab.refreshLinkedEventsList(team, threadId,
                                               TaskTab.currentTaskTab);
 
               var execIds = {

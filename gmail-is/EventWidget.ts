@@ -226,7 +226,6 @@ module Esper.EventWidget {
                               recent,
                               last,
                               team: ApiT.Team,
-                              prefs: ApiT.Preferences,
                               threadId: string) {
 '''
 <span #title/>
@@ -238,7 +237,7 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, recent, last, team, prefs, threadId, title);
+    return base(linkedEvents, ev, recent, last, team, threadId, title);
   }
 
   /** The base event widget with the given payload in the main div. */
@@ -247,7 +246,6 @@ module Esper.EventWidget {
                        recent,
                        last,
                        team: ApiT.Team,
-                       prefs: ApiT.Preferences,
                        threadId: string,
                        payload?) {
 '''
@@ -281,6 +279,7 @@ module Esper.EventWidget {
     }
 
     var calTimezone = calendar.calendar_timezone;
+    var prefs = Teams.getTeamPreferences(team);
     var showTimezone = prefs.general.current_timezone;
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,

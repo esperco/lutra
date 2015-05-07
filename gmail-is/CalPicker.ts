@@ -75,8 +75,7 @@ module Esper.CalPicker {
 
   function createView(refreshCal: JQuery,
                       userSidebar: UserTab.UserTabView,
-                      team: ApiT.Team,
-                      prefs: ApiT.Preferences) : PickerView {
+                      team: ApiT.Team) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
@@ -113,7 +112,7 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-
+    var prefs = Teams.getTeamPreferences(team);
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
 
@@ -448,9 +447,8 @@ module Esper.CalPicker {
   */
   function createPicker(refreshCal: JQuery,
                         userSidebar: UserTab.UserTabView,
-                        team: ApiT.Team,
-                        prefs: ApiT.Preferences) : Picker {
-    var pickerView = createView(refreshCal, userSidebar, team, prefs);
+                        team: ApiT.Team) : Picker {
+    var pickerView = createView(refreshCal, userSidebar, team);
     setupCalendar(team, pickerView);
 
     // add the meeting type menu:
@@ -550,8 +548,8 @@ module Esper.CalPicker {
   function saveEvents(closePicker, picker,
                       team: ApiT.Team,
                       task: ApiT.Task,
-                      threadId: string,
-                      prefs: ApiT.Preferences) {
+                      threadId: string) {
+    var prefs = Teams.getTeamPreferences(team);
     var events = [];
     for (var k in picker.events) {
       var edit = makeEventEdit(picker.events[k], picker.eventTitle,
@@ -608,8 +606,7 @@ module Esper.CalPicker {
   function confirmEvents(view, closePicker,
                         picker, team: ApiT.Team,
                         task: ApiT.Task,
-                        threadId: string,
-                        prefs: ApiT.Preferences) {
+                        threadId: string) {
     var events = [];
     for (var k in picker.events) {
       var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
@@ -631,10 +628,10 @@ module Esper.CalPicker {
 
       if (filtered_results.length > 0) {
         var confirmModal = displayConfirmEventModal(view, closePicker, events,
-          filtered_results, picker, team, task, threadId, prefs);
+          filtered_results, picker, team, task, threadId);
         $("body").append(confirmModal.view);
       } else {
-        saveEvents(closePicker, picker, team, task, threadId, prefs);
+        saveEvents(closePicker, picker, team, task, threadId);
       }
     });
   }
@@ -644,8 +641,7 @@ module Esper.CalPicker {
                                     results,
                                     picker, team: ApiT.Team,
                                     task: ApiT.Task,
-                                    threadId: string,
-                                    prefs: ApiT.Preferences) {
+                                    threadId: string) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
@@ -669,7 +665,8 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    var creating = List.map(results, function(result){ return events[result[0]]; });
+    var creating =
+      List.map(results, function(result){ return events[result[0]]; });
     creating.forEach(function(ev) {
       creatingEvents.append(TaskList.renderEvent(team, ev));
     });
@@ -682,7 +679,7 @@ module Esper.CalPicker {
     });
 
     function yesOption() {
-      saveEvents(closePicker, picker, team, task, threadId, prefs);
+      saveEvents(closePicker, picker, team, task, threadId);
       view.remove();
     }
     function noOption() { view.remove(); }
@@ -697,8 +694,7 @@ module Esper.CalPicker {
 
   export function createInline(team: ApiT.Team,
                                task: ApiT.Task,
-                               threadId: string,
-                               prefs: ApiT.Preferences)
+                               threadId: string)
     : void
   {
 '''
@@ -731,7 +727,7 @@ module Esper.CalPicker {
     title.text("Create linked events");
 
     var userInfo = UserTab.viewOfUserTab(team);
-    var picker = createPicker(refreshCal, userInfo, team, prefs);
+    var picker = createPicker(refreshCal, userInfo, team);
     calendar.append(picker.view);
 
     refreshCal.tooltip({
@@ -743,7 +739,7 @@ module Esper.CalPicker {
     });
 
     window.onresize = function(event) {
-      picker = createPicker(refreshCal, userInfo, team, prefs);
+      picker = createPicker(refreshCal, userInfo, team);
       calendar.children().remove();
       calendar.append(picker.view);
       picker.render();
@@ -752,7 +748,7 @@ module Esper.CalPicker {
     cancel.click(closeView);
 
     save.click(function() {
-      confirmEvents(view, closeView, picker, team, task, threadId, prefs);
+      confirmEvents(view, closeView, picker, team, task, threadId);
     });
 
     Gmail.threadContainer().append(view);

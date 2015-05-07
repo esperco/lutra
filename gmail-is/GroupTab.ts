@@ -48,14 +48,10 @@ module Esper.GroupTab {
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid() &&
-          CurrentThread.team.isValid()) {
-        CurrentThread.withPreferences(function (preferences) {
-          CalPicker.createInline(CurrentThread.team.get(),
-                                 CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 preferences);
-        });
-      }
+          CurrentThread.team.isValid())
+        CalPicker.createInline(CurrentThread.team.get(),
+                               CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
     });
 
     linkEvent.click(function() {
@@ -107,7 +103,7 @@ module Esper.GroupTab {
 
       var team     = CurrentThread.team.get();
       var threadId = CurrentThread.threadId.get();
-      var prefs    = Teams.getPreferences(team.team_executive);
+      var prefs    = Teams.getTeamPreferences(team);
 
       Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
         .done(function (events) {
@@ -131,7 +127,7 @@ module Esper.GroupTab {
             });
 
             var widget = EventWidget.base(events, event, false, false,
-                                          team, prefs, threadId, statusGraph);
+                                          team, threadId, statusGraph);
 
             list.append($("<li>").append(widget));
 
