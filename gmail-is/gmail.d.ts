@@ -89,7 +89,7 @@ declare module esperGmail.on {
 
   // TODO: Support the arguments ($selection, string) to the callback.
   export function reply_forward(
-    callback: () => void): void;
+    callback: (match: JQuery, type: string) => void): void;
 
   /* complete as needed */
 }
