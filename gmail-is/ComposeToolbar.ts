@@ -72,9 +72,12 @@ module Esper.ComposeToolbar {
         overlappingSpan.css("margin-top", 16);
         
         controlCallbacks.forEach(function (callback) {
-          var element = callback(composeInterface);
-
-          container.bar.append(element);
+          callback(composeInterface).match({
+            none: function() {},
+            some: function(element) {
+              container.bar.append(element);
+            }
+          });
         });
       }
     });
@@ -101,7 +104,7 @@ module Esper.ComposeToolbar {
    *
    */
   export function init() {
-    esperGmail.on.reply_forward(function () {
+    esperGmail.on.reply_forward(function (match: JQuery, type: string) {
       attachControls(Gmail.compositionToolbar());
     });
   }

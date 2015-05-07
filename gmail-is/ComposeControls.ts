@@ -115,7 +115,7 @@ module Esper.ComposeControls {
     updateEventsLabel();
     CurrentThread.linkedEvents.watch(updateEventsLabel);
 
-    return insertButton;
+    return Option.some(insertButton);
   }
 
   /** Inserts a canned response template into the text box. */
@@ -188,7 +188,7 @@ module Esper.ComposeControls {
       });
     });
 
-    return templateButton;
+    return Option.some(templateButton);
   }
 
   /** Creates and links a new event to the current task. */
@@ -219,13 +219,43 @@ module Esper.ComposeControls {
       }
     });
 
-    return createButton;
+    return Option.some(createButton);
+  }
+
+  /** */
+  function askExecButton(composeControls) {
+    if (CurrentThread.executive.isValid()
+     && CurrentThread.executive.get().has_ios_app) {
+'''
+<div #askButton title class="esper-composition-button">
+  <object #askIcon class="esper-svg esper-composition-button-icon"/>
+</div>
+'''
+      askIcon.attr("data", Init.esperRootUrl + "img/info.svg");
+
+      askButton.tooltip({
+        show: { delay: 500, effect: "none" },
+        hide: { effect: "none" },
+        "content": "Ask question with choices on phone app",
+        "position": { my: 'center bottom', at: 'center top-1' },
+        "tooltipClass": "esper-top esper-tooltip"
+      });
+
+      askButton.click(function() {
+        Gmail.threadContainer().append(ComposeHashtags.view(composeControls));
+      });
+
+      return Option.some(askButton);
+    } else {
+      return Option.none();
+    }
   }
 
   export function init() {
     ComposeToolbar.registerControl(insertButton);
     ComposeToolbar.registerControl(templateButton);
     ComposeToolbar.registerControl(createButton);
+    ComposeToolbar.registerControl(askExecButton);
   }
 
   $(init);

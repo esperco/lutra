@@ -75,6 +75,7 @@ APP_SOURCES = \
   CalPicker \
   CalSearch \
   ObserveMessage \
+  ComposeHashtags \
   ComposeControls \
   ComposeToolbar \
   CurrentThread \
