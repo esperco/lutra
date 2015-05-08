@@ -180,8 +180,7 @@ module CalendarsTab {
     });
 
     function goToAboutPage() {
-      var freePlan = "Basic_20150123";
-      Api.setSubscription(team.teamid, freePlan)
+      Api.setSubscription(team.teamid, Plan.basic)
         .done(function() {
           TeamSettings.switchTabByName("abt");
         });
