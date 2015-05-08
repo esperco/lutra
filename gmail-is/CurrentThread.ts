@@ -77,6 +77,17 @@ module Esper.CurrentThread {
     threadId.set(newThreadId);
   }
 
+  // Set the thread id when the user navigates around GMail:
+  window.onhashchange = function (e) {
+    setThreadId(esperGmail.get.email_id());
+  };
+
+  // TODO: Make sure the following listener is acutally unnecessary:
+  // esperGmail.on.open_email(function (id, url, body, xhr) {
+  //   Log.d("Opened email " + id, url, body);
+  //   setThreadId(id);
+  // });
+
   /** The GMail threadId of the current thread. If there is no thread,
    *  this is undefined. You can check if there is an open thread with
    *  `isThreadView()`.

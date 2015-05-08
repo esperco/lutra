@@ -472,18 +472,6 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
-  function listen() {
-    esperGmail.on.open_email(function(id, url, body, xhr) {
-      Log.d("Opened email " + id, url, body);
-      maybeUpdateView();
-    });
-    window.onhashchange = function() {
-      Log.d("URL changed");
-      CurrentThread.setThreadId(null);
-      maybeUpdateView();
-    };
-  }
-
   var alreadyInitialized = false;
 
   export function init() {
@@ -491,7 +479,11 @@ module Esper.Sidebar {
       alreadyInitialized = true;
       Teams.initialize();
       Log.d("Sidebar.init()");
-      listen();
+
+      CurrentThread.threadId.watch(function (newThreadId) {
+        maybeUpdateView();
+      });
+
       maybeUpdateView();
     }
   }
