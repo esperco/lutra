@@ -275,6 +275,9 @@ module Esper.EventWidget {
       main.prepend(displayEventOptions(view, ev, evs, team, threadId));
     }
 
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
     var calTimezone = calendar.calendar_timezone;
     var prefs = Teams.getTeamPreferences(team);
     var showTimezone = prefs.general.current_timezone;
@@ -291,10 +294,7 @@ module Esper.EventWidget {
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    var calendar = List.find(team.team_calendars, function(cal) {
-      return cal.google_cal_id === e.google_cal_id;
-    });
-    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
+    timezone.text(CalPicker.zoneAbbr(showTimezone) + " " + showTimezone);
 
     if (e.google_cal_url !== undefined) {
       date

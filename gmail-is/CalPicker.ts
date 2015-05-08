@@ -197,17 +197,24 @@ module Esper.CalPicker {
       });
     }
 
-    var dispZones = [
+    var popularZones = [
       "America/New_York",
       "America/Chicago",
       "America/Denver",
       "America/Los_Angeles"
     ];
-    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-      var tz = cal.calendar_timezone;
-      if (tz !== undefined && !List.mem(dispZones, tz))
-        dispZones.push(tz);
-    });
+    var calendarZones =
+      List.filterMap(team.team_calendars, function(cal : ApiT.Calendar) {
+        return cal.calendar_timezone; // filtered out if undefined
+      });
+
+    /* List of timezones for the dropdown, starting with
+       the default timezone which is the one from
+       the executive's preferences */
+    var dispZones =
+      List.union(List.union([showTimezone], calendarZones),
+                 popularZones);
+
     List.iter(dispZones, function(tz) {
       var abbr = zoneAbbr(tz);
       $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
