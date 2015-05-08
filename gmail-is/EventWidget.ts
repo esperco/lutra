@@ -281,25 +281,19 @@ module Esper.EventWidget {
     var calTimezone = calendar.calendar_timezone;
     var prefs = Teams.getTeamPreferences(team);
     var showTimezone = prefs.general.current_timezone;
-    var s = Timezone.shiftTime(e.start.local,
-                               calTimezone,
-                               showTimezone);
-    var start = XDate.ofString(s);
+    var start = XDate.ofString(Timezone.shiftTime(e.start.local,
+                                                  calTimezone,
+                                                  showTimezone));
     var end = XDate.ofString(Timezone.shiftTime(e.end.local,
                                                 calTimezone,
                                                 showTimezone));
-    Log.d("local: " + e.start.local
-          + " caltz: " + calTimezone
-          + " showtz: " + showTimezone
-          + " unformatted result: " + s
-          + " formatted time: " + XDate.timeOnly(start));
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    timezone.text(CalPicker.zoneAbbr(showTimezone) + " " + showTimezone);
+    timezone.text(CalPicker.zoneAbbr(showTimezone));
 
     if (e.google_cal_url !== undefined) {
       date
