@@ -19,6 +19,7 @@ SOURCES = \
   EsperStorage \
   Message \
   Profile \
+  Preferences \
   Login \
   JsonHttp \
   ApiT \

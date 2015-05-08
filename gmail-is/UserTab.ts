@@ -751,15 +751,15 @@ module Esper.UserTab {
   }
 
   function displayTeamLabel(container : JQuery,
-                             teamLabel : string) {
+                            teamLabel : string) {
 '''
 <div #view>
   <span #label>
 </div>
 '''
 
-    label.text(teamLabel)
-    container.append(view)
+    label.text(teamLabel);
+    container.append(view);
   }
 
   function getSubPreferenceChanges(change_type : string,
@@ -782,7 +782,52 @@ module Esper.UserTab {
     });
   }
 
-  export function viewOfUserTab(team: ApiT.Team) {
+  export interface UserTabView {
+    view: JQuery;
+    user: JQuery;
+    preferencesSpinner: JQuery;
+    aliasHeader: JQuery;
+    showAlias: JQuery;
+    aliasContainer: JQuery;
+    generalHeader: JQuery;
+    showGeneral: JQuery;
+    generalNew: JQuery;
+    generalContainer: JQuery;
+    generalDetailedContainer: JQuery;
+    teamLabelsSection: JQuery;
+    teamLabelsHeader: JQuery;
+    showTeamLabels: JQuery;
+    teamLabelsContainer: JQuery;
+    coworkerSection: JQuery;
+    coworkersHeader: JQuery;
+    showCoworkers: JQuery;
+    coworkersNew: JQuery;
+    coworkersContainer: JQuery;
+    coworkers: JQuery;
+    calendarsSection: JQuery;
+    calendarsHeader: JQuery;
+    showCalendars: JQuery;
+    calendarsContainer: JQuery;
+    meetingsHeader: JQuery;
+    showMeetings: JQuery;
+    meetingsNew: JQuery;
+    meetingsContainer: JQuery;
+    meetingsSelector: JQuery;
+    meetingSelector: JQuery;
+    meetingInfo: JQuery;
+    transportationHeader: JQuery;
+    showTransportation: JQuery;
+    transportationNew: JQuery;
+    transportationContainer: JQuery;
+    transportationPreferences: JQuery;
+    notesHeader: JQuery;
+    showNotes: JQuery;
+    notesNew: JQuery;
+    notesContainer: JQuery;
+    notes: JQuery;
+  }
+
+  export function viewOfUserTab(team: ApiT.Team): UserTabView {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>
@@ -902,76 +947,75 @@ module Esper.UserTab {
       displayTeamLabel(teamLabelsContainer, label);
     })
 
-    Api.getPreferences(team.teamid).done(function(prefs) {
-      var until = Math.floor(XDate.now()/1000);
-      var from = until - 432000; // 5 days
-      Api.getPreferenceChanges(team.teamid, from, until)
-      .done(function(changes) {
-        var workplace_changes =
-          getPreferencesChanges("Workplace", changes.change_log);
-        var transportation_changes =
-          getPreferencesChanges("Transportation", changes.change_log);
-        var meeting_changes =
-          getPreferencesChanges("Meeting", changes.change_log);
-        var general_changes =
-          getPreferencesChanges("General", changes.change_log);
-        var coworkers_changes =
-          getPreferencesChanges("Coworkers", changes.change_log);
-        var notes_changes =
-          getPreferencesChanges("Notes", changes.change_log);
+    var prefs = Teams.getTeamPreferences(team);
+    var until = Math.floor(XDate.now()/1000);
+    var from = until - 432000; // 5 days
+    Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
+      var workplace_changes =
+        getPreferencesChanges("Workplace", changes.change_log);
+      var transportation_changes =
+        getPreferencesChanges("Transportation", changes.change_log);
+      var meeting_changes =
+        getPreferencesChanges("Meeting", changes.change_log);
+      var general_changes =
+        getPreferencesChanges("General", changes.change_log);
+      var coworkers_changes =
+        getPreferencesChanges("Coworkers", changes.change_log);
+      var notes_changes =
+        getPreferencesChanges("Notes", changes.change_log);
 
-        if (workplace_changes.length + meeting_changes.length === 0)
-          meetingsNew.hide();
-        if (transportation_changes.length === 0)
-          transportationNew.hide();
-        if (general_changes.length === 0)
-          generalNew.hide();
-        if (coworkers_changes.length === 0)
-          coworkersNew.hide();
-        if (notes_changes.length === 0)
-          notesNew.hide();
+      if (workplace_changes.length + meeting_changes.length === 0)
+        meetingsNew.hide();
+      if (transportation_changes.length === 0)
+        transportationNew.hide();
+      if (general_changes.length === 0)
+        generalNew.hide();
+      if (coworkers_changes.length === 0)
+        coworkersNew.hide();
+      if (notes_changes.length === 0)
+        notesNew.hide();
 
-        preferencesSpinner.hide();
-        user.append(viewOfUser(team, prefs));
+      preferencesSpinner.hide();
+      user.append(viewOfUser(team, prefs));
 
-        var meetingTypes = prefs.meeting_types;
-        var workplaces = prefs.workplaces;
-        populateMeetingsDropdown(meetingSelector, meetingInfo,
-          meetingTypes, workplaces, meeting_changes, workplace_changes);
-        if (workplaces.length > 0) {
-          displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
-          meetingSelector.val(0);
-        }
-        else if (meetingTypes.phone_call !== undefined) {
-          displayPhoneInfo(meetingInfo,
-                           meetingTypes.phone_call,
-                           meeting_changes);
-          meetingSelector.val("phone_call");
-        }
+      var meetingTypes = prefs.meeting_types;
+      var workplaces = prefs.workplaces;
+      populateMeetingsDropdown(meetingSelector, meetingInfo,
+                               meetingTypes, workplaces,
+                               meeting_changes, workplace_changes);
+      if (workplaces.length > 0) {
+        displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
+        meetingSelector.val(0);
+      }
+      else if (meetingTypes.phone_call !== undefined) {
+        displayPhoneInfo(meetingInfo,
+                         meetingTypes.phone_call,
+                         meeting_changes);
+        meetingSelector.val("phone_call");
+      }
 
-        var transportationTypes = prefs.transportation.length;
-        List.iter(prefs.transportation, function(type, i) {
-          var last = i === prefs.transportation.length - 1;
-          transportationPreferences.append(
-            viewOfTransportationType(type, last, transportation_changes)
-          );
-        });
-
-        if (prefs.general !== undefined) {
-          displayGeneralPrefs(generalContainer, prefs.general, general_changes);
-          displayDetailedGeneralPrefs(generalDetailedContainer,
-                                      prefs.general,
-                                      general_changes);
-        }
-
-        if (prefs.coworkers !== "") {
-          coworkers.text(prefs.coworkers);
-        } else {
-          coworkerSection.hide()
-        }
-
-        notes.text(prefs.notes);
+      var transportationTypes = prefs.transportation.length;
+      List.iter(prefs.transportation, function(type, i) {
+        var last = i === prefs.transportation.length - 1;
+        transportationPreferences.append(
+          viewOfTransportationType(type, last, transportation_changes)
+        );
       });
+
+      if (prefs.general !== undefined) {
+        displayGeneralPrefs(generalContainer, prefs.general, general_changes);
+        displayDetailedGeneralPrefs(generalDetailedContainer,
+                                    prefs.general,
+                                    general_changes);
+      }
+
+      if (prefs.coworkers !== "") {
+        coworkers.text(prefs.coworkers);
+      } else {
+        coworkerSection.hide()
+      }
+
+      notes.text(prefs.notes);
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);

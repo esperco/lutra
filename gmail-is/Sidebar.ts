@@ -49,7 +49,11 @@ module Esper.Sidebar {
     }
   }
 
-  function displayTeamSelector(teamsSection, myTeam, team, onTeamSwitch) {
+  function displayTeamSelector(teamsSection,
+                               myTeam: ApiT.Team,
+                               team: ApiT.Team,
+                               onTeamSwitch:
+                                 (newTeam: ApiT.Team) => void) {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
@@ -128,7 +132,7 @@ module Esper.Sidebar {
     dropdown.css("max-height", $(window).height() - 100);
     dropdown.css("overflow", "auto");
 
-    function onTeamSwitch(toTeam) {
+    function onTeamSwitch(toTeam: ApiT.Team) {
       CurrentThread.setTeam(toTeam);
 
       dismissDropdowns();
@@ -283,7 +287,8 @@ module Esper.Sidebar {
     });
 
     if (team !== undefined) {
-      TaskTab.displayTaskTab(taskContent, team, threadId, autoTask, linkedEvents);
+      TaskTab.displayTaskTab(taskContent, team, threadId,
+                             autoTask, linkedEvents);
       userContent.append(UserTab.viewOfUserTab(team).view);
       GroupScheduling.afterInitialize(function () {
         groupContent.append(GroupTab.container());
@@ -437,10 +442,12 @@ module Esper.Sidebar {
                     correctTeam = true;
                     team = foundTeam;
                   }
-                  displayTeamSidebar(rootElement, team, correctTeam, autoTask, threadId);
+                  displayTeamSidebar(rootElement, team,
+                                     correctTeam, autoTask, threadId);
                 });
               } else if (correctTeam) {
-                displayTeamSidebar(rootElement, team, correctTeam, autoTask, threadId);
+                displayTeamSidebar(rootElement, team,
+                                   correctTeam, autoTask, threadId);
               }
             });
           return true;
@@ -465,15 +472,18 @@ module Esper.Sidebar {
     };
   }
 
-  var alreadyInitialized = false;
+  var initJob: JQueryPromise<void>;
 
-  export function init() {
-    if (!alreadyInitialized) {
-      alreadyInitialized = true;
-      Teams.initialize();
-      Log.d("Sidebar.init()");
-      listen();
-      maybeUpdateView();
+  export function init(): JQueryPromise<void> {
+    if (initJob)
+      return initJob;
+    else {
+      Log.d("Initializing sidebar");
+      initJob = Teams.initialize().done(function() {
+        listen();
+        maybeUpdateView();
+      });
+      return initJob;
     }
   }
 }

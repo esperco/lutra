@@ -220,7 +220,10 @@ module Esper.EventWidget {
 
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
-                              recent, last, team: ApiT.Team, threadId: string) {
+                              recent,
+                              last,
+                              team: ApiT.Team,
+                              threadId: string) {
 '''
 <span #title/>
 '''
@@ -237,7 +240,10 @@ module Esper.EventWidget {
   /** The base event widget with the given payload in the main div. */
   export function base(linkedEvents: ApiT.EventWithSyncInfo[],
                        ev: ApiT.EventWithSyncInfo,
-                       recent, last, team: ApiT.Team, threadId: string,
+                       recent,
+                       last,
+                       team: ApiT.Team,
+                       threadId: string,
                        payload?) {
 '''
 <div #view class="esper-ev">
@@ -269,19 +275,25 @@ module Esper.EventWidget {
       main.prepend(displayEventOptions(view, ev, evs, team, threadId));
     }
 
-    var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end.local);
-
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    var calTimezone = calendar.calendar_timezone;
+    var prefs = Teams.getTeamPreferences(team);
+    var showTimezone = prefs.general.current_timezone;
+    var start = XDate.ofString(Timezone.shiftTime(e.start.local,
+                                                  calTimezone,
+                                                  showTimezone));
+    var end = XDate.ofString(Timezone.shiftTime(e.end.local,
+                                                calTimezone,
+                                                showTimezone));
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
     startTime.text(XDate.timeOnly(start));
     endTime.text(XDate.timeOnly(end));
 
-    var calendar = List.find(team.team_calendars, function(cal) {
-      return cal.google_cal_id === e.google_cal_id;
-    });
-    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
+    timezone.text(CalPicker.zoneAbbr(showTimezone));
 
     if (e.google_cal_url !== undefined) {
       date

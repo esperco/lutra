@@ -168,7 +168,7 @@ module Esper.EventControls {
             Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
               .done(function() {
                 var taskTab = TaskTab.currentTaskTab;
-                TaskTab.refreshlinkedEventsList(team, threadId, taskTab);
+                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
                 close();
               });
           });

@@ -186,6 +186,8 @@ module Esper.ApiT {
   }
 
   export interface Preferences {
+    uid: string;
+    teamid: string;
     workplaces: Workplace[];
     transportation: string[];
     meeting_types: MeetingTypes;
