@@ -8,6 +8,7 @@ SOURCES = \
   Conf \
   List \
   Lazy \
+  Option \
   Util \
   Watchable \
   Promise \

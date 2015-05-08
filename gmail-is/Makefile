@@ -50,6 +50,7 @@ SHARED_SOURCES = \
   ../common/ts/Lazy \
   ../common/ts/Util \
   ../common/ts/Watchable \
+  ../common/ts/Option \
   ../common/ts/Promise \
   ../common/ts/XDate \
   ../common/ts/Log \
@@ -76,11 +77,13 @@ APP_SOURCES = \
   CalPicker \
   CalSearch \
   ObserveMessage \
+  ComposeHashtags \
   ComposeControls \
   ComposeToolbar \
   CurrentThread \
   FinalizeEvent \
   InviteControls \
+  EventControls \
   TaskList \
   Teams \
   EventWidget \

@@ -76,12 +76,18 @@ module Esper.FinalizeEvent {
         );
         return null;
       } else {
-        edit.title = edit.title.replace(/^HOLD: /, "");
-        var teamid = CurrentThread.team.get().teamid;
-        var threadId = CurrentThread.threadId.get();
-        return Api.updateLinkedEvent(teamid, threadId, edit.google_event_id, edit);
+        return CurrentThread.team.get().match({
+          some : function (team) {
+            edit.title = edit.title.replace(/^HOLD: /, "");
+            var threadId = CurrentThread.threadId.get();
+            return Api.updateLinkedEvent(team.teamid, threadId, edit.google_event_id, edit);
+          },
+          none : function () {
+            window.alert("No current team detected.");
+            return null;
+          }
+        });
       }
-
     } else {
       return null;
     }
@@ -93,27 +99,33 @@ module Esper.FinalizeEvent {
    *  Calls the `done' callback after the delete API calls are done.
    */
   export function deleteHolds(event: ApiT.CalendarEvent, prefs, done) {
-    var team = CurrentThread.team.get();
-    var id = event.google_event_id;
+    CurrentThread.team.get().match({
+      some : function (team) {
+        var id = event.google_event_id;
 
-    var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
-      return e.event;
+        var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
+          return e.event;
+        });
+        var holds = justHolds(linkedEvents).filter(function (other) {
+          return other.google_event_id != id;
+        });
+
+        var calls = holds.map(function (hold) {
+          var holdId = hold.google_event_id;
+          var threadId = CurrentThread.threadId.get();
+
+          return Api.deleteLinkedEvent(team.teamid, threadId, holdId);
+        });
+
+        var updateCall = setHold(event, prefs, false);
+        if (updateCall) calls.push(updateCall);
+
+        Promise.join(calls).done(done);
+      },
+      none : function () {
+        window.alert("Cannot delete holds because no team is currently detected.");
+      }
     });
-    var holds = justHolds(linkedEvents).filter(function (other) {
-      return other.google_event_id != id;
-    });
-
-    var calls = holds.map(function (hold) {
-      var holdId = hold.google_event_id;
-      var threadId = CurrentThread.threadId.get();
-
-      return Api.deleteLinkedEvent(team.teamid, threadId, holdId);
-    });
-
-    var updateCall = setHold(event, prefs, false);
-    if (updateCall) calls.push(updateCall);
-
-    Promise.join(calls).done(done);
   }
 
 
@@ -123,37 +135,39 @@ module Esper.FinalizeEvent {
    *  Strips "HOLD: " from all event titles.
    */
   export function confirmMessage(event: ApiT.CalendarEvent): string {
-    if (CurrentThread.team.isValid()) {
-      var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
-        return e.event;
-      });
-      // TODO: Support multiple events properly (again)
-      var name  = CurrentThread.team.get().team_name;
+    return CurrentThread.team.get().match({
+      some : function (team) {
+        var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
+          return e.event;
+        });
+        // TODO: Support multiple events properly (again)
+        var name  = team.team_name;
 
-      var eventTimezone = CurrentThread.eventTimezone(event);
+        var eventTimezone = CurrentThread.eventTimezone(event);
 
-      var start    = new Date(event.start.local);
-      var end      = new Date(event.end.local);
-      var range    = XDate.range(start, end);
-      var timezone =
-        (<any> moment).tz(event.start.local, eventTimezone).zoneAbbr();
+        var start    = new Date(event.start.local);
+        var end      = new Date(event.end.local);
+        var range    = XDate.range(start, end);
+        var timezone =
+          (<any> moment).tz(event.start.local, eventTimezone).zoneAbbr();
 
-      var time = XDate.fullWeekDay(start) + ", " + range + " " + timezone;
-      var location = event.location &&
-        (event.location.title || event.location.address);
+        var time = XDate.fullWeekDay(start) + ", " + range + " " + timezone;
+        var location = event.location &&
+          (event.location.title || event.location.address);
 
-      return [
-        "Hi " + name,
-        "",
-        "You are confirmed for " + event.title.replace(/^HOLD: /, "") +
-          " on " + time +
-          (location ? " at " + location : "") +
-          ". " +
-          "Please let me know if you have any questions about this appointment.<br />"
-      ].join("<br />");
-    } else {
-      return null;
-    }
+        return [
+          "Hi " + name,
+          "",
+          "You are confirmed for " + event.title.replace(/^HOLD: /, "") +
+            " on " + time +
+            (location ? " at " + location : "") +
+            ". " +
+            "Please let me know if you have any questions about this appointment.<br />"
+        ].join("<br />");
+      }, none : function () {
+        return null;
+      }
+    });
   }
 
   /** If the exec asked for an event confirmation, this opens a
@@ -178,17 +192,31 @@ module Esper.FinalizeEvent {
 
   /** Executes the whole finalize flow on the given event. */
   export function finalizeEvent(event: ApiT.CalendarEvent) {
-    CurrentThread.withPreferences(function (preferences) {
-      var team = CurrentThread.team.get();
-      var threadId = CurrentThread.threadId.get();
-      var taskTab = TaskTab.currentTaskTab;
+    CurrentThread.team.get().match({
+      some : function (team) {
+        CurrentThread.withPreferences(function (preferences) {
+          var threadId = CurrentThread.threadId.get();
+          var taskTab = TaskTab.currentTaskTab;
 
-      deleteHolds(event, preferences, function () {
-        TaskTab.refreshEventLists(team, threadId, taskTab);
-      });
+          Api.getEventDetails(team.teamid, event.google_cal_id,
+                              team.team_calendars, event.google_event_id)
+            .done(function(eventOpt) {
+              if (eventOpt.event_opt !== undefined) {
+                event = eventOpt.event_opt;
+              }
 
-      confirmEvent(event, preferences);
-      inviteGuests(event, preferences);
+              deleteHolds(event, preferences, function () {
+                TaskTab.refreshEventLists(team, threadId, taskTab);
+              });
+
+              confirmEvent(event, preferences);
+              inviteGuests(event, preferences);
+            });
+        });
+      },
+      none : function () {
+        window.alert("Cannot finalize event because no team is currently detected.");
+      }
     });
   }
 }

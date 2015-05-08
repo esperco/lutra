@@ -521,6 +521,16 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function updateGoogleEvent(teamid, alias, eventid, event):
+  JQueryDeferred<void> {
+    var url =
+        Conf.Api.url + "/api/event/edit/" + string(Login.myUid())
+        + "/" + string(teamid)
+        + "/" + encodeURIComponent(alias)
+        + "/" + encodeURIComponent(eventid);
+    return JsonHttp.post(url, JSON.stringify(event));
+  }
+
   export function getCustomerStatus(teamid):
   JQueryDeferred<ApiT.CustomerStatus> {
     var url =

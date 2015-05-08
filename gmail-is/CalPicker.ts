@@ -287,25 +287,37 @@ module Esper.CalPicker {
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
   function importEvents(esperEvents : TZCalendarEvent[]) {
-    var team = CurrentThread.team.get();
-    return List.map(esperEvents, function(x) {
-      var ev = {
-        title: x.title, /* required */
-        allDay: x.all_day,
-        start: Timezone.shiftTime(x.start.local,
-                                  x.calendarTZ, showTimezone), /* req */
-        end: Timezone.shiftTime(x.end.local,
-                                x.calendarTZ, showTimezone), /* req */
-        orig: x /* custom field */
-      };
-      // Display ghost calendar events in gray
-      var evCal =
-        List.find(team.team_calendars, function(cal : ApiT.Calendar) {
-          return cal.google_cal_id === x.google_cal_id;
+    return CurrentThread.team.get().match({
+      some : function (team) {
+        return List.map(esperEvents, function(x) {
+          var ev = {
+            title: x.title, /* required */
+            allDay: x.all_day,
+            start: Timezone.shiftTime(x.start.local,
+                                      x.calendarTZ,
+                                      showTimezone), /* req */
+            end: Timezone.shiftTime(x.end.local,
+                                    x.calendarTZ,
+                                    showTimezone), /* req */
+            orig: x /* custom field */
+          };
+
+          // Display ghost calendar events in gray
+          var evCal =
+            List.find(team.team_calendars, function(cal : ApiT.Calendar) {
+              return cal.google_cal_id === x.google_cal_id;
+            });
+          if (/ Ghost$/.test(evCal.calendar_title))
+            ev["color"] = "#BCBEC0"; // @gray_30
+
+          return ev;
         });
-      if (/ Ghost$/.test(evCal.calendar_title))
-        ev["color"] = "#BCBEC0"; // @gray_30
-      return ev;
+      },
+      none : function () {
+        // TODO: Handle more gracefully?
+        window.alert("Cannot fetch events: current team not detected.");
+        return [];
+      }
     });
   }
 
@@ -521,8 +533,9 @@ module Esper.CalPicker {
       guests: []
     };
     var gen = prefs.general;
-    if (gen && gen.hold_event_color && /^HOLD: /.test(title))
+    if (gen && gen.hold_event_color && /^HOLD: /.test(title)) {
       eventEdit.color_id = gen.hold_event_color.key;
+    }
     return eventEdit;
   }
 
@@ -692,8 +705,7 @@ module Esper.CalPicker {
     return _view;
   }
 
-  export function createInline(team: ApiT.Team,
-                               task: ApiT.Task,
+  export function createInline(task: ApiT.Task,
                                threadId: string)
     : void
   {
@@ -718,42 +730,49 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    function closeView() {
-      Sidebar.selectTaskTab();
-      view.remove();
-    }
+    CurrentThread.team.get().match({
+      some : function (team) {
+        function closeView() {
+          Sidebar.selectTaskTab();
+          view.remove();
+        }
 
-    refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
-    title.text("Create linked events");
+        refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+        title.text("Create linked events");
 
-    var userInfo = UserTab.viewOfUserTab(team);
-    var picker = createPicker(refreshCal, userInfo, team);
-    calendar.append(picker.view);
+        var userInfo = UserTab.viewOfUserTab(team);
+        var picker = createPicker(refreshCal, userInfo, team);
+        calendar.append(picker.view);
 
-    refreshCal.tooltip({
-      show: { delay: 500, effect: "none" },
-      hide: { effect: "none" },
-      "content": "Refresh calendars",
-      "position": { my: 'center bottom', at: 'center top-7' },
-      "tooltipClass": "esper-top esper-tooltip"
+        refreshCal.tooltip({
+          show: { delay: 500, effect: "none" },
+          hide: { effect: "none" },
+          "content": "Refresh calendars",
+          "position": { my: 'center bottom', at: 'center top-7' },
+          "tooltipClass": "esper-top esper-tooltip"
+        });
+
+        window.onresize = function(event) {
+          picker = createPicker(refreshCal, userInfo, team);
+          calendar.children().remove();
+          calendar.append(picker.view);
+          picker.render();
+        };
+
+        cancel.click(closeView);
+
+        save.click(function() {
+          confirmEvents(view, closeView, picker, team, task, threadId);
+        });
+
+        Gmail.threadContainer().append(view);
+        picker.render();
+        Sidebar.selectUserTab();
+        Gmail.scrollToMeetingOffers();
+      },
+      none : function () {
+        window.alert("Cannot create cal picker because no team is currently detected.");
+      }
     });
-
-    window.onresize = function(event) {
-      picker = createPicker(refreshCal, userInfo, team);
-      calendar.children().remove();
-      calendar.append(picker.view);
-      picker.render();
-    };
-
-    cancel.click(closeView);
-
-    save.click(function() {
-      confirmEvents(view, closeView, picker, team, task, threadId);
-    });
-
-    Gmail.threadContainer().append(view);
-    picker.render();
-    Sidebar.selectUserTab();
-    Gmail.scrollToMeetingOffers();
   }
 }
