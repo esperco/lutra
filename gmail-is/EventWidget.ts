@@ -58,7 +58,8 @@ module Esper.EventWidget {
         });
 
         if (FinalizeEvent.justHolds(linkedEvents).length > 0) {
-          var confirmModal = displayConfirmEventModal(view, event, events, team);
+          var confirmModal =
+            displayConfirmEventModal(view, event, events, team);
           $("body").append(confirmModal.view);
         } else {
           view.parent().find(".esper-ev").addClass("esper-disabled");
@@ -311,8 +312,9 @@ module Esper.EventWidget {
 
     }
 
-    if (last)
+    if (last) {
       view.addClass("esper-last");
+    }
 
     return view;
   }

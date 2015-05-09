@@ -18,8 +18,9 @@ module Esper.CalCache {
     var dayOfWeek = d.getUTCDay(); /* 0-6 */
     var unixtime = d.getTime() / 1000;
     unixtime = unixtime - unixtime % 86400;
-    if (dayOfWeek < 6)
+    if (dayOfWeek < 6) {
       unixtime = unixtime - (dayOfWeek + 1) * 86400;
+    }
     return new Date(1000 * unixtime);
   }
 
@@ -28,10 +29,11 @@ module Esper.CalCache {
     var dayOfWeek = d.getUTCDay(); /* 0-6 */
     var unixtime = d.getTime() / 1000;
     unixtime = unixtime - unixtime % 86400;
-    if (dayOfWeek < 2)
+    if (dayOfWeek < 2) {
       unixtime = unixtime + (2 - dayOfWeek) * 86400;
-    else
+    } else {
       unixtime = unixtime + (9 - dayOfWeek) * 86400;
+    }
     return new Date(1000 * unixtime);
   }
 
@@ -157,8 +159,9 @@ module Esper.CalCache {
     }
     if (v !== undefined) {
       var deferredEvents = refresh(cache, teamid, calid, start, end);
-      if (whenRefreshed !== undefined)
+      if (whenRefreshed !== undefined) {
         deferredEvents.then(whenRefreshed);
+      }
       fetchAhead();
       return Promise.defer(v);
     }

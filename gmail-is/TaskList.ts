@@ -50,10 +50,11 @@ module Esper.TaskList {
     });
     timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
-    if (e.title !== undefined)
+    if (e.title !== undefined) {
       title.text(e.title);
-    else
+    } else {
       title.text("Untitled event");
+    }
 
     if (e.google_cal_url !== undefined) {
       date
@@ -155,8 +156,9 @@ module Esper.TaskList {
     });
 
     urgent.text(team.team_label_urgent);
-    if (!task.task_urgent)
+    if (!task.task_urgent) {
       urgent.remove();
+    }
 
     var progressChoices = [
       { label: team.team_label_new, value: "New" },

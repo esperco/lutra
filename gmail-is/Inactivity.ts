@@ -21,8 +21,9 @@ module Esper.Inactivity {
   }
 
   function updateInactivityTimer() {
-    if (timer !== undefined)
+    if (timer !== undefined) {
       clearTimeout(timer);
+    }
     timer = setTimeout(signalInactivity, expireAfterMs);
   }
 
@@ -53,10 +54,11 @@ module Esper.Inactivity {
       CurrentThread.task.watch(
         function(task: ApiT.Task, isValid: boolean,
                  oldTask: ApiT.Task, oldIsValid: boolean) {
-          if (isValid)
+          if (isValid) {
             TimeTracker.start(task.taskid);
-          else
+          } else {
             TimeTracker.stop();
+          }
         }
       );
     }

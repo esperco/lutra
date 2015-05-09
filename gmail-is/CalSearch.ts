@@ -57,10 +57,11 @@ module Esper.CalSearch {
     });
     timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
-    if (e.title !== undefined)
+    if (e.title !== undefined) {
       title.text(e.title);
-    else
+    } else {
       title.text("Untitled event");
+    }
 
     if (e.google_cal_url !== undefined) {
       date

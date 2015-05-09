@@ -116,8 +116,9 @@ module Esper.JsonHttp {
   */
   export function makeQuery(argArray) {
     var s = argArray.join("&");
-    if (argArray.length > 0)
+    if (argArray.length > 0) {
       s = "?" + s;
+    }
     return s;
   }
 }

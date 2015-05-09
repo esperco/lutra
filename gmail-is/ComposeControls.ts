@@ -159,8 +159,9 @@ module Esper.ComposeControls {
             var loc;
             if (ev.location !== undefined) {
               loc = ev.location.address;
-              if (ev.location.title !== "")
+              if (ev.location.title !== "") {
                 loc = ev.location.title + " - " + loc;
+              }
             } else {
               loc = "<b>LOCATION</b>";
             }

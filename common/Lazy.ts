@@ -14,10 +14,11 @@ module Esper.Lazy {
 
     function force(): T {
       if (ready) {
-        if (success)
+        if (success) {
           return result;
-        else
+        } else {
           throw exception;
+        }
       }
       else {
         try {

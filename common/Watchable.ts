@@ -27,9 +27,9 @@ module Esper.Watchable {
   function lock(id) {
     var d = locks[id];
     var now = new Date();
-    if (d != null && now.getTime() <= d.getTime() + lockTimeout)
+    if (d != null && now.getTime() <= d.getTime() + lockTimeout) {
       return false;
-    else {
+    } else {
       locks[id] = now;
       return true;
     }
@@ -94,9 +94,9 @@ module Esper.Watchable {
     watch(handler,
           optWatcherId? : string) {
       var id;
-      if (optWatcherId === undefined)
+      if (optWatcherId === undefined) {
         id = createId();
-      else {
+      } else {
         id = optWatcherId;
         this.unwatch(id);
       }

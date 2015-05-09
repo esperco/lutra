@@ -101,8 +101,9 @@ module Esper.Init {
           "ActiveThreads"
         ];
         var isIgnored = List.mem(ignored, request.type);
-        if (! isIgnored)
+        if (! isIgnored) {
           Log.d("Received message:", event.data);
+        }
 
         switch (request.type) {
 
@@ -113,8 +114,9 @@ module Esper.Init {
           break;
 
         default:
-          if (! isIgnored)
+          if (! isIgnored) {
             Log.e("Unknown request type: " + request.type);
+          }
         }
       }
     });

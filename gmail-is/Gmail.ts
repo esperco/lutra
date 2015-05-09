@@ -13,8 +13,9 @@ module Esper.Gmail {
       Log.i("Cannot find anchor point for the Esper menu just yet.");
       return $();
     }
-    else
+    else {
       return anchor;
+    }
   }
 
   export function removeWebClipBanner() {
@@ -86,7 +87,8 @@ module Esper.Gmail {
   export function mouseoverReplyToolbar(div) {
     var container = containingTable(div);
 
-    if (div.parent().find("td.ZGHj2e.gU").length === 0) { // container for non-hover buttons
+    if (div.parent().find("td.ZGHj2e.gU").length === 0) {
+      // container for non-hover buttons
       return container.find(".eq"); // container for hover container
     } else {
       return $();
@@ -106,10 +108,11 @@ module Esper.Gmail {
   */
   export function getNavbarTextColor() {
     var plusName = $(".gb_d.gb_f");
-    if (plusName.length === 1)
+    if (plusName.length === 1) {
       return plusName.css("color");
-    else
+    } else {
       return "rgb(64, 64, 64)";
+    }
   }
 
   /** Opens up a reply dialog in the current thread, by clicking the
@@ -125,7 +128,7 @@ module Esper.Gmail {
   export function replyToThread(html?) {
     $(".amn").last().find("span").last().click();
     replyTextField(compositionToolbar().last()).focus();
-    
+
     if (html) insertInFocusedField(html);
   }
 
