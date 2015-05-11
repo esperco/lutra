@@ -31,7 +31,8 @@ module Esper.Teams {
             preferences[prefs.teamid] = prefs;
           });
         });
-      initJob = Promise.join([profilesJob, prefsJob])
+      // I don't understand the type error that the <any> fixes...
+      initJob = Promise.join([profilesJob, <any> prefsJob])
         .then(function(l) {});
       initJob.done(function() { alreadyInitialized = true; });
       return initJob;
