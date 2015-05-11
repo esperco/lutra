@@ -31,38 +31,43 @@ module Esper.Login {
   }
 
   export function printStatus() {
-    if (loggedIn())
+    if (loggedIn()) {
       Log.d("We are logged in as " + myGoogleAccountId() + ".");
-    else
+    } else {
       Log.d("We are not logged in");
+    }
   }
 
   export function myUid() {
-    if (loggedIn())
+    if (loggedIn()) {
       return getAccount().credentials.uid;
-    else
+    } else {
       return;
+    }
   }
 
   export function myGoogleAccountId() {
-    if (loggedIn())
+    if (loggedIn()) {
       return getAccount().googleAccountId;
-    else
+    } else {
       return;
+    }
   }
 
   export function myEmail() {
-    if (watchableInfo.get() !== undefined)
+    if (watchableInfo.get() !== undefined) {
       return watchableInfo.get().email;
-    else
+    } else {
       return;
+    }
   }
 
   export function myTeams() {
-    if (watchableInfo.get() !== undefined)
+    if (watchableInfo.get() !== undefined) {
       return watchableInfo.get().teams;
-    else
+    } else {
       return;
+    }
   }
 
   /* Send a Logout request. */

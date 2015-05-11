@@ -22,8 +22,9 @@ module Esper.Menu {
       menu.insertBefore(rightSibling);
       return true;
     }
-    else
+    else {
       return false;
+    }
   }
 
   function makeActionLink(text, action, danger) {
@@ -359,8 +360,9 @@ module Esper.Menu {
     Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");
       var success = replace(view);
-      if (success)
+      if (success) {
         Log.d("Esper menu is now ready.");
+      }
       return success;
     });
   }

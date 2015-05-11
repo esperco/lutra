@@ -30,8 +30,9 @@ module Esper.Sidebar {
   }
 
   $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("esper-click-safe"))
+    if (!$(e.target).hasClass("esper-click-safe")) {
       dismissDropdowns();
+    }
   });
 
   function removeEsperRoot() {
@@ -160,9 +161,9 @@ module Esper.Sidebar {
     });
 
 
-    if (team === undefined)
+    if (team === undefined) {
       teamName.text("UNKNOWN TEAM");
-    else {
+    } else {
       // note if name is not set so that the assistant can fix it
       var name = team.team_name || "Team name not set";
       teamName.text(name);
@@ -220,8 +221,9 @@ module Esper.Sidebar {
       window.open(Conf.Api.url);
     })
     signOut.click(function() {
-      if (sidebar.css("display") !== "none")
+      if (sidebar.css("display") !== "none") {
         sidebar.hide("slide", { direction: "down" }, 250);
+      }
       view.fadeOut(250).delay(250);
       Login.logout();
       Menu.create();
@@ -231,16 +233,16 @@ module Esper.Sidebar {
       Api.getCustomerStatus(team.teamid).done(function(customer) {
         var sub = customer.status;
         if (sub === "Past_due" || sub === "Canceled"
-            || sub === "Unpaid" || sub === undefined)
+            || sub === "Unpaid" || sub === undefined) {
           view.removeClass("esper-team-warning")
               .addClass("esper-team-danger");
-        else if (!isCorrectTeam)
+        } else if (!isCorrectTeam) {
           view.addClass("esper-team-warning")
               .removeClass("esper-team-danger");
-        else
+        } else {
           view.removeClass("esper-team-warning")
               .removeClass("esper-team-danger");
-
+        }
         rootElement.append(view);
       });
     } else {
@@ -369,8 +371,9 @@ module Esper.Sidebar {
             return team.teamid === task.task_teamid;
           });
         }
-        else
+        else {
           return undefined;
+        }
       });
   }
 
@@ -453,8 +456,9 @@ module Esper.Sidebar {
           return true;
         }
       }
-      else
+      else {
         return false;
+      }
     }
 
     Util.repeatUntil(20, 500, retry);
@@ -475,9 +479,9 @@ module Esper.Sidebar {
   var initJob: JQueryPromise<void>;
 
   export function init(): JQueryPromise<void> {
-    if (initJob)
+    if (initJob) {
       return initJob;
-    else {
+    } else {
       Log.d("Initializing sidebar");
       initJob = Teams.initialize().done(function() {
         listen();

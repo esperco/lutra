@@ -1,12 +1,12 @@
 module Esper.Util {
   function unsafePreparePrintable(x : any, parents, maxDepth: number) {
-    if (parents.length >= maxDepth)
+    if (parents.length >= maxDepth) {
       return "[MAX DEPTH]";
-    else if (parents.length > 0 && x instanceof Window)
+    } else if (parents.length > 0 && x instanceof Window) {
       return "[WINDOW]";
-    else if (List.mem(parents, x))
+    } else if (List.mem(parents, x)) {
       return "[CYCLE]";
-    else {
+    } else {
       var type = Object.prototype.toString.call(x);
       switch(type) {
 
@@ -71,11 +71,11 @@ module Esper.Util {
   }
 
   export function toString(x, maxDepth: number = 10) {
-    if (x === undefined)
+    if (x === undefined) {
       return "undefined";
-    else if (typeof x === "string")
+    } else if (typeof x === "string") {
       return x;
-    else {
+    } else {
       var prep = preparePrintable(x, [], maxDepth);
       return JSON.stringify(prep, undefined, 2);
     }
@@ -87,10 +87,11 @@ module Esper.Util {
                               delayMs: number,
                               f: () => boolean) {
     if (maxAttempts >= 1) {
-      if (f() !== true)
+      if (f() !== true) {
         setTimeout(function() {
           repeatUntil(maxAttempts - 1, delayMs, f);
         }, delayMs);
+      }
     }
   }
 
@@ -102,8 +103,7 @@ module Esper.Util {
       every(delayMs, f, false);
       f();
     }, delayMs);
-    if (firstTime)
-      f();
+    if (firstTime) f();
   }
 
   /*
@@ -118,15 +118,15 @@ module Esper.Util {
     function callback(event) {
       var t1 = lastPressed;
       var t2 = Date.now();
-      if (lastPressed >= t2)
+      if (lastPressed >= t2) {
         lastPressed = lastPressed + 1;
-      else
+      } else {
         lastPressed = t2;
+      }
       var lastPressed0 = lastPressed;
       window.setTimeout(function() {
         var isEnterKey = event.which === 13;
-        if (lastPressed0 === lastPressed && !isEnterKey)
-          func();
+        if (lastPressed0 === lastPressed && !isEnterKey) func();
       }, delayMs);
     }
 
@@ -178,20 +178,20 @@ module Esper.Util {
         longestPathLength = depth;
       }
 
-      if (depth > maxDepth)
+      if (depth > maxDepth) {
         return;
 
-      else if (parents.length > 0 && x instanceof Window)
+      } else if (parents.length > 0 && x instanceof Window) {
         return;
 
-      else if (List.mem(parents, x))
+      } else if (List.mem(parents, x)) {
         return;
 
-      else {
+      } else {
 
-        if (predicate(x))
+        if (predicate(x)) {
           acc.push({ path: path, node: x });
-        else {
+        } else {
 
           var type = Object.prototype.toString.call(x);
           switch(type) {

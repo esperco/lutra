@@ -12,13 +12,15 @@ module Esper.Gcal {
   function tryJQuerySelection(selection: JQuery) {
     if (selection.length === 1) {
       var text = selection.text();
-      if (validateEmail(text))
+      if (validateEmail(text)) {
         return text;
-      else
+      } else {
         return;
+      }
     }
-    else
+    else {
       return;
+    }
   }
 
   function method0() {
@@ -39,8 +41,9 @@ module Esper.Gcal {
       try {
         Log.d("Extracting logged-in email address using method " + i);
         var x = l[i]();
-        if (x !== undefined && x !== null)
+        if (x !== undefined && x !== null) {
           return x;
+        }
       } catch(e) {}
     }
   }
@@ -57,9 +60,9 @@ module Esper.Gcal {
     like an email address.
   */
   export function getUserEmail() {
-    if (userEmailInit)
+    if (userEmailInit) {
       return userEmail;
-    else {
+    } else {
       userEmail = extractUserEmail();
       if (userEmail !== undefined) {
         userEmailInit = true;
@@ -103,19 +106,21 @@ module Esper.Gcal {
   export module Event {
 
     export function equal(a: Types.FullEventId, b: Types.FullEventId): boolean {
-      if (a === b)
+      if (a === b) {
         return true;
-      else if (a === undefined || b === undefined)
+      } else if (a === undefined || b === undefined) {
         return false;
-      else
+      } else {
         return a.eventId === b.eventId && a.calendarId === b.calendarId;
+      }
     }
 
     function decodeBase64(encoded: string): string {
-      if (encoded !== undefined && encoded !== null)
+      if (encoded !== undefined && encoded !== null) {
         return atob(encoded);
-      else
+      } else {
         return;
+      }
     }
 
     /*
@@ -126,9 +131,9 @@ module Esper.Gcal {
      */
     function fixCalendarId(s) {
       var ar = s.split("@");
-      if (ar.length !== 2)
+      if (ar.length !== 2) {
         return s;
-      else {
+      } else {
         var domain = ar[1];
         switch (ar[1]) {
         case "g":
@@ -175,8 +180,9 @@ module Esper.Gcal {
 
     export function extractFullEventId(): Types.FullEventId {
       var encodedId = $("div.ep[data-eid]").attr("data-eid");
-      if (encodedId !== undefined)
+      if (encodedId !== undefined) {
         return decodeFullEventId(encodedId);
+      }
     }
 
     /* Find a good insertion point: after "Calendar" dropdown row. */
@@ -186,8 +192,9 @@ module Esper.Gcal {
         Log.e("Cannot find anchor point for the Esper event controls.");
         return $();
       }
-      else
+      else {
         return anchor;
+      }
     }
 
     /* Find the textarea used by the event description. */
@@ -197,8 +204,9 @@ module Esper.Gcal {
         Log.e("Cannot find description textarea.");
         return $();
       }
-      else
+      else {
         return sel;
+      }
     }
   }
 }

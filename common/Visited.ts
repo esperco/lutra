@@ -10,22 +10,24 @@ module Esper.Visited {
     Not a method of Visited because Visited needs to be serialized as JSON.
   */
   export function eq<T>(a: Types.Visited<T>, b: Types.Visited<T>): boolean {
-    if (a.id === undefined || b.id === undefined)
+    if (a.id === undefined || b.id === undefined) {
       return false;
-    else
+    } else {
       return a.id === b.id;
+    }
   }
 
   /* Oldest first */
   export function cmp<T>(a: Types.Visited<T>, b: Types.Visited<T>): number {
     var xa = a.lastVisited;
     var xb = b.lastVisited;
-    if (xa < xb)
+    if (xa < xb) {
       return -1;
-    else if (xa > xb)
+    } else if (xa > xb) {
       return 1;
-    else
+    } else {
       return 0; /* covers the case NaN !== NaN */
+    }
   }
 
   /*

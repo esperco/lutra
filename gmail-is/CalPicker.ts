@@ -119,10 +119,12 @@ module Esper.CalPicker {
     var calendars = team.team_calendars;
     var writes = [];
     List.iter(calendars, function(cal) {
-      if (cal.calendar_default_view)
+      if (cal.calendar_default_view) {
         showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-      if (cal.calendar_default_write)
+      }
+      if (cal.calendar_default_write) {
         writes.push(cal);
+      }
     });
     writeToCalendar = writes[0] || calendars[0];
     showTimezone = prefs.general.current_timezone;
@@ -135,16 +137,18 @@ module Esper.CalPicker {
   <span #calendarName/>
 </div>
 '''
-      if (cal.calendar_default_view)
+      if (cal.calendar_default_view) {
         calendarCheckbox.prop("checked", true);
+      }
 
       var abbr = zoneAbbr(cal.calendar_timezone);
 
       calendarCheckbox.click(function() {
-        if (this.checked)
+        if (this.checked) {
           showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-        else
+        } else {
           delete showCalendars[cal.google_cal_id];
+        }
         calendarView.fullCalendar("refetchEvents");
       });
 
@@ -172,8 +176,9 @@ module Esper.CalPicker {
       var opt = $("<option value='" + i + "'>" +
                   calendars[i].calendar_title + "</option>");
       opt.appendTo(pickerSwitcher);
-      if (calendars[i].google_cal_id === writeToCalendar.google_cal_id)
+      if (calendars[i].google_cal_id === writeToCalendar.google_cal_id) {
         pickerSwitcher.val(i);
+      }
     }
     pickerSwitcher.change(function() {
       var i = $(this).val();
@@ -314,8 +319,9 @@ module Esper.CalPicker {
             List.find(team.team_calendars, function(cal : ApiT.Calendar) {
               return cal.google_cal_id === x.google_cal_id;
             });
-          if (/ Ghost$/.test(evCal.calendar_title))
+          if (/ Ghost$/.test(evCal.calendar_title)) {
             ev["color"] = "#BCBEC0"; // @gray_30
+          }
 
           return ev;
         });
@@ -404,8 +410,9 @@ module Esper.CalPicker {
       if (orig !== undefined) loc = orig.location;
       if (loc !== undefined) {
         var address = loc.address;
-        if (loc.title !== "")
+        if (loc.title !== "") {
           address = loc.title + " - " + address;
+        }
         element
           .attr("title", "")
           .tooltip({

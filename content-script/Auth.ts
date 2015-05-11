@@ -17,12 +17,13 @@ module Esper.Auth {
 
   function getPageType() {
     if (pageType === undefined) {
-      if (/^https:\/\/mail.google.com\//.test(document.URL))
+      if (/^https:\/\/mail.google.com\//.test(document.URL)) {
         pageType = PageType.Gmail;
-      else if (/^https:\/\/www.google.com\/calendar\//.test(document.URL))
+      } else if (/^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
         pageType = PageType.Gcal;
-      else
+      } else {
         pageType = PageType.Other;
+      }
     }
     return pageType;
   }
@@ -133,8 +134,9 @@ module Esper.Auth {
 
         var ignored = ["CredentialsResponse"];
         var isIgnored = List.mem(ignored, request.type);
-        if (! isIgnored)
+        if (! isIgnored) {
           Log.d("Received message:", event.data);
+        }
 
         switch (request.type) {
 
@@ -187,8 +189,9 @@ module Esper.Auth {
           break;
 
         default:
-          if (! isIgnored)
+          if (! isIgnored) {
             Log.d("Unknown request type: " + request.type);
+          }
         }
       }
     });

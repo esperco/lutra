@@ -42,8 +42,9 @@ module Esper.Promise {
             }
           )
       }
-      else
+      else {
         return defer(b);
+      }
     }
     return next(0);
   };

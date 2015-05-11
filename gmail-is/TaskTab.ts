@@ -76,8 +76,9 @@ module Esper.TaskTab {
     var activeEvents = [];
     List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
       var eventsForCal = events[cal.google_cal_id];
-      if (eventsForCal !== undefined)
+      if (eventsForCal !== undefined) {
         activeEvents = activeEvents.concat(eventsForCal);
+      }
     });
     if (activeEvents === []) {
       renderNone();
@@ -110,9 +111,9 @@ module Esper.TaskTab {
           activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
             var e = response.event_opt;
             if (e === undefined) return; // event is deleted aka cancelled
-            if (i === activeEvents.length - 1)
+            if (i === activeEvents.length - 1) {
               last = true;
-
+            }
             var ev = { event : e, synced_threads : [] };
             eventsList.append(
               EventWidget.renderEvent(linkedEvents, ev, recent, last,
@@ -430,8 +431,9 @@ module Esper.TaskTab {
       }
 
       var currentTask = CurrentThread.task.get();
-      if (currentTask !== undefined)
+      if (currentTask !== undefined) {
         addArchiveOption(currentTask);
+      }
 
       dropdown.addClass("esper-open");
     });
@@ -777,8 +779,9 @@ module Esper.TaskTab {
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
-        if (thread !== undefined && thread !== null)
+        if (thread !== undefined && thread !== null) {
           title = thread.subject;
+        }
       }
       taskTitle.val(title);
       taskNotes.val(notes);
@@ -786,10 +789,11 @@ module Esper.TaskTab {
       taskNotes.keyup(function() {taskNotesKeyUp(notes);});
       Util.afterTyping(taskTitle, 250, function() {
         var query = taskTitle.val();
-        if (query !== "")
+        if (query !== "") {
           displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
                                taskSearchActions, team,
                                threadId, query, taskTabView);
+        }
       });
       taskTitle.keydown(function(pressed) {
         var name = taskTitle.val();
@@ -826,10 +830,11 @@ module Esper.TaskTab {
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {
       if (valid) {
-        if (task.task_archived && threadId === CurrentThread.threadId.get())
+        if (task.task_archived && threadId === CurrentThread.threadId.get()) {
           taskTitle.addClass("esper-archived");
-        else
+        } else {
           taskTitle.removeClass("esper-archived");
+        }
       }
     }, taskWatcherId);
 

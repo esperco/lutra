@@ -85,8 +85,9 @@ module Esper.TimeTracker {
     if (isRunning()) {
       var now = Date.now();
       var last = startTimeMs;
-      if (lastFlushMs > startTimeMs)
+      if (lastFlushMs > startTimeMs) {
         last = lastFlushMs;
+      }
       if (now - last >= flushIntervalMs) {
         lastFlushMs = now;
         flush();
@@ -124,9 +125,9 @@ module Esper.TimeTracker {
   export function start(taskid: string) {
     initIfNeeded();
     console.assert(taskid !== undefined);
-    if (isRunning() && currentTask === taskid)
-      /* let it run */;
-    else {
+    if (isRunning() && currentTask === taskid) {
+      /* let it run */
+    } else {
       stop();
       currentTask = taskid;
       startTimer();
@@ -149,7 +150,8 @@ module Esper.TimeTracker {
 
   /* Resume from paused state if applicable, otherwise do nothing. */
   export function resume() {
-    if (isPaused())
+    if (isPaused()) {
       start(currentTask);
+    }
   }
 }

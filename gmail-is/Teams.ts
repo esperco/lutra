@@ -15,9 +15,9 @@ module Esper.Teams {
       parameter is passed.
   */
   export function initialize(force = false): JQueryPromise<void> {
-    if (initJob && !force)
+    if (initJob && !force) {
       return initJob;
-    else {
+    } else {
       teams = Login.myTeams();
       var profilesJob =
         Profile.getAllProfiles(teams).done(function (profileList) {
@@ -66,9 +66,9 @@ module Esper.Teams {
   }
 
   export function getTeamPreferences(team: ApiT.Team): ApiT.Preferences {
-    if (team && team.teamid)
+    if (team && team.teamid) {
       return getPreferences(team.teamid);
-    else {
+    } else {
       Log.e("getTeamPreferences: Not a valid team");
       return null;
     }

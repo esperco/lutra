@@ -18,10 +18,11 @@ module Esper.InviteControls {
         var curText = notesBox.val();
         var execName = prof.display_name.replace(/ .*$/, "");
         var toAppend = execName + ": " + pubMobile.phone_number;
-        if (curText.length > 0)
+        if (curText.length > 0) {
           notesBox.val(curText + "\n\n" + toAppend);
-        else
+        } else {
           notesBox.val(toAppend);
+        }
       }
     }
   }
@@ -224,8 +225,9 @@ module Esper.InviteControls {
               all_day       : event.all_day,
               guests        : guests
             };
-            if (holdColor && /^HOLD: /.test(title))
+            if (holdColor && /^HOLD: /.test(title)) {
               eventEdit.color_id = holdColor.key;
+            }
 
             var from = fromSelect.val();
             location = pubLocation.val();
@@ -353,11 +355,13 @@ module Esper.InviteControls {
         back.click(backFunction);
 
         function confirmEventIsNotHold(eventEdit) {
-          if (/^HOLD: /.test(eventEdit.title))
+          if (/^HOLD: /.test(eventEdit.title)) {
             return window.confirm(
               "About to invite guests to a HOLD event! Are you sure?"
             );
-          else return true;
+          } else {
+            return true;
+          }
         }
 
         invite.click(function () {
@@ -368,7 +372,8 @@ module Esper.InviteControls {
             if (CurrentThread.task.isValid()) {
               var task = CurrentThread.task.get();
               if (confirmEventIsNotHold(eventEdit)) {
-                Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+                Api.createTaskLinkedEvent(from, team.teamid, eventEdit,
+                                          task.taskid)
                   .done(function(created) {
                     Api.syncEvent(team.teamid, threadId,
                                   created.google_cal_id,
@@ -420,17 +425,19 @@ module Esper.InviteControls {
         function setReminders(execIds, guestsIds) {
           if (reminderSpec) {
             if (reminderSpec.exec.time) {
-              Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-                var reminder = {
-                  guest_email      : profile.email,
-                  reminder_message : reminderSpec.exec.text
-                };
+              Api.getProfile(team.team_executive, team.teamid)
+                .done(function (profile) {
+                  var reminder = {
+                    guest_email      : profile.email,
+                    reminder_message : reminderSpec.exec.text
+                  };
 
-                Api.enableReminderForGuest(execIds.eventId, profile.email, reminder);
+                  Api.enableReminderForGuest(execIds.eventId, profile.email,
+                                             reminder);
 
-                Api.setReminderTime(team.teamid, from, execIds.calendarId,
-                                    execIds.eventId, reminderSpec.exec.time);
-              });
+                  Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                      execIds.eventId, reminderSpec.exec.time);
+                });
             }
 
             if (reminderSpec.guests.time) {

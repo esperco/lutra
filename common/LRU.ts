@@ -39,10 +39,11 @@ module Esper.LRU {
       sanityCheck(this);
       var i = 0;
       while (i < this.all.length) {
-        if (this.eq(x, this.all[i]))
+        if (this.eq(x, this.all[i])) {
           this.all.splice(i, 1);
-        else
+        } else {
           i++;
+        }
       }
     }
 
