@@ -496,7 +496,10 @@ module AccountTab {
         <button #cancelBtn class="button-secondary modal-cancel">
           Cancel
         </button>
-        <button #suspendBtn class="button-secondary modal-delete">
+
+        <!-- Hidden for now until we find a way for customers
+             to resubscribe later. -->
+        <button #suspendBtn class="hide button-secondary modal-delete">
           Suspend Membership
         </button>
       </div>
