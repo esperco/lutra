@@ -26,6 +26,10 @@ module Esper.CalPicker {
   // ditto
   var meetingType = "other";
 
+  interface TZEventObj extends FullCalendar.EventObject {
+    tz : string; // value of showTimezone when this event was drawn
+  }
+
   interface PickerView {
     view : JQuery;
     calendarPickerContainer : JQuery;
@@ -37,7 +41,7 @@ module Esper.CalPicker {
     displayTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
-    events : { [eventId : string] : FullCalendar.EventObject };
+    events : { [eventId : string] : TZEventObj };
   }
 
   export function zoneAbbr(zoneName) {
@@ -377,10 +381,10 @@ module Esper.CalPicker {
         var startTime = ev.start.toISOString();
         var endTime = ev.end.toISOString();
         ev.start = moment.utc(
-          Timezone.shiftTime(startTime, (<any> ev).tz, showTimezone)
+          Timezone.shiftTime(startTime, ev.tz, showTimezone)
         );
         ev.end = moment.utc(
-          Timezone.shiftTime(endTime, (<any> ev).tz, showTimezone)
+          Timezone.shiftTime(endTime, ev.tz, showTimezone)
         );
         ev.tz = showTimezone;
         movedEdits.push(ev);
