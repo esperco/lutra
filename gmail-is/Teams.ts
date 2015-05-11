@@ -31,10 +31,12 @@ module Esper.Teams {
             preferences[prefs.teamid] = prefs;
           });
         });
-      initJob = Promise.join([profilesJob, prefsJob])
-        .then(function(l) {});
-      initJob.done(function() { alreadyInitialized = true; });
-      return initJob;
+      var ourInitJob = Promise.join([
+        Promise.ignore(profilesJob),
+        Promise.ignore(prefsJob)
+      ]);
+      ourInitJob.done(function() { alreadyInitialized = true; });
+      return Promise.defer(null);
     }
   }
 

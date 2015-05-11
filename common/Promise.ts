@@ -49,4 +49,8 @@ module Esper.Promise {
     return next(0);
   };
 
+  export function ignore<T>(x : JQueryPromise<T>) : JQueryPromise<void> {
+    return x.then(function() { return; });
+  }
+
 }

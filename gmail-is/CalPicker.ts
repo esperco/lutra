@@ -26,6 +26,10 @@ module Esper.CalPicker {
   // ditto
   var meetingType = "other";
 
+  interface TZEventObj extends FullCalendar.EventObject {
+    tz : string; // value of showTimezone when this event was drawn
+  }
+
   interface PickerView {
     view : JQuery;
     calendarPickerContainer : JQuery;
@@ -37,7 +41,7 @@ module Esper.CalPicker {
     displayTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
-    events : { [eventId : string] : FullCalendar.EventObject };
+    events : { [eventId : string] : TZEventObj };
   }
 
   export function zoneAbbr(zoneName) {
@@ -267,10 +271,11 @@ module Esper.CalPicker {
       start: startMoment,
       end: endMoment,
       color: "#A25CC6",
-      editable: true
+      editable: true,
+      tz: showTimezone
     };
     picker.events[eventId] = eventData;
-    var stick = true;
+    var stick = false;
     picker.calendarView.fullCalendar('renderEvent', eventData, stick);
     picker.calendarView.fullCalendar('unselect');
     picker.calendarView.fullCalendar('gotoDate', startMoment);
@@ -341,7 +346,7 @@ module Esper.CalPicker {
     });
   }
 
-  function fetchEvents(team: ApiT.Team,
+  function fetchEvents(team: ApiT.Team, picker,
                        momentStart, momentEnd, tz, callback) {
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
@@ -367,9 +372,30 @@ module Esper.CalPicker {
       var esperEvents = List.concat(ll);
       refreshCache = false;
       var normalEvents = importEvents(esperEvents);
-      BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd, function (backgroundEvents) {
-        callback(normalEvents.concat(backgroundEvents));
-      });
+
+      // Reinterpret drawn events in current showTimezone
+      var movedEdits = [];
+      for (var k in picker.events) {
+        var ev = picker.events[k];
+        removeEvent(picker, ev.google_event_id);
+        var startTime = ev.start.toISOString();
+        var endTime = ev.end.toISOString();
+        ev.start = moment.utc(
+          Timezone.shiftTime(startTime, ev.tz, showTimezone)
+        );
+        ev.end = moment.utc(
+          Timezone.shiftTime(endTime, ev.tz, showTimezone)
+        );
+        ev.tz = showTimezone;
+        movedEdits.push(ev);
+      }
+      var withEdits = normalEvents.concat(movedEdits);
+
+      function invokeCallback(backgroundEvents) {
+        callback(withEdits.concat(backgroundEvents));
+      }
+      BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd,
+                                    invokeCallback);
     });
   }
 
@@ -445,7 +471,8 @@ module Esper.CalPicker {
       eventRender: eventRender,
       editable: false,
       events: function(momentStart, momentEnd, tz, callback) {
-        return fetchEvents(team, momentStart, momentEnd, tz, callback);
+        return fetchEvents(team, picker, momentStart, momentEnd,
+                           tz, callback);
       }
     });
 
