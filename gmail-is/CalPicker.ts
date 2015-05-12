@@ -83,7 +83,10 @@ module Esper.CalPicker {
                                         query, prefs) {
     results.find(".esper-li").remove();
     var locs = Preferences.savedPlaces(prefs);
+    var nums = Preferences.contactInfo(prefs);
+    nums.push("Call GUEST at TBD");
     var hasResult = false;
+
     List.iter(locs, function(loc) {
       var addr = loc.address.slice(0);
       if (loc.title) addr = loc.title + " - " + addr;
@@ -97,6 +100,19 @@ module Esper.CalPicker {
         hasResult = true;
       }
     });
+
+    List.iter(nums, function(num) {
+      if (num.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        $("<li class='esper-li'>" + num + "</li>")
+          .appendTo(results)
+          .click(function() {
+            locationBox.val(num);
+            Sidebar.dismissDropdowns();
+          });
+        hasResult = true;
+      }
+    });
+
     if (hasResult) {
       if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
       dropdown.addClass("esper-open");
