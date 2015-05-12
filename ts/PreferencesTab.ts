@@ -715,10 +715,10 @@ module PreferencesTab {
 '''
 <select #currentTimezone
     class="esper-select esper-prefs-timezone">
-  <option value="US/Pacific">US/Pacific</option>
-  <option value="US/Mountain">US/Mountain</option>
-  <option value="US/Central">US/Central</option>
-  <option value="US/Eastern">US/Eastern</option>
+  <option value="America/Los_Angeles">US/Pacific</option>
+  <option value="America/Denver">US/Mountain</option>
+  <option value="America/Chicago">US/Central</option>
+  <option value="America/New_York">US/Eastern</option>
   <option disabled>────────────────────</option>
   <option value="Pacific/Midway">(GMT-11:00) Midway</option>
   <option value="Pacific/Niue">(GMT-11:00) Niue</option>
