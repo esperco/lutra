@@ -73,12 +73,12 @@ module Test {
   };
 
   export function expect(title, f, arg, expected) {
-    var title = typeof title === "string" ? title : JSON.stringify(expected);
-    return [title, function() {
+    var title2 = typeof title === "string" ? title : JSON.stringify(expected);
+    return [title2, function() {
       var result = f(arg);
       var success = JSON.stringify(result) === JSON.stringify(expected);
       if (!success)
-        print("FAILED " + title,
+        print("FAILED " + title2,
               "-- expected:", expected,
               "-- actual:", result);
       return success;
