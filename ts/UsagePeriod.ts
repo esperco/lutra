@@ -164,12 +164,14 @@ Unlimited usage. Nothing to approve.
     Extra charges due:
     <span #amount></span> USD
   </div>
+  <div>Stripe receipt statement: <span #description/></div>
   <div>
     <button #approve>Approve these charges</button>
   </div>
 </div>
 '''
       amount.text((xch.amount_due / 100).toString());
+      description.text(xch.description);
       approve.click(function() {
         var startUnixtime = Unixtime.ofRFC3339(tu.start);
         Api.postUsageExtraCharge(tu.teamid,
