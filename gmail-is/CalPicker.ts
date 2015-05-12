@@ -167,13 +167,13 @@ module Esper.CalPicker {
     showTimezone = prefs.general.current_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
-    Util.afterTyping(eventLocation, 250, function() {
+    function searchLocation() {
       var query = eventLocation.val();
-      if (query !== "") {
-        displayLocationSearchResults(eventLocation, locationDropdown,
-                                     locationSearchResults, query, prefs);
-      }
-    });
+      displayLocationSearchResults(eventLocation, locationDropdown,
+                                   locationSearchResults, query, prefs);
+    }
+    Util.afterTyping(eventLocation, 250, searchLocation);
+    eventLocation.click(searchLocation);
 
     List.iter(calendars, function(cal, i) {
 '''
