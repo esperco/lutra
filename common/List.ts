@@ -107,8 +107,9 @@ module Esper.List {
   export function exists<T>(a: T[], f: (x: T, i?: number) => boolean): boolean {
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      if (f(a[i], i) === true)
+      if (f(a[i], i) === true) {
         return true;
+      }
     }
     return false;
   };
@@ -117,8 +118,9 @@ module Esper.List {
   export function forAll<T>(a: T[], f: (x: T, i?: number) => boolean) {
     var len = a.length;
     for (var i = 0; i < len; i++) {
-      if (f(a[i], i) !== true)
+      if (f(a[i], i) !== true) {
         return false;
+      }
     }
     return true;
   };

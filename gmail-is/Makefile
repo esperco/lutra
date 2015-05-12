@@ -60,6 +60,7 @@ SHARED_SOURCES = \
   ../common/ts/Message \
   ../common/ts/Login \
   ../common/ts/Profile \
+  ../common/ts/Preferences \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \
   ../common/ts/Api
@@ -68,6 +69,7 @@ SHARED_SOURCES = \
 # and then compiled into JavaScript by tsc.
 # Output Javascript files are put into the js/ subdirectory.
 APP_SOURCES = \
+  Timezone \
   Gmail \
   Thread \
   CalCache \

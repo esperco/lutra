@@ -17,10 +17,11 @@ module Esper.EsperStorage {
     var stop = Log.start("Types.Storage.load()");
     chrome.storage.local.get("esper", function(obj : any) {
       var x : Types.Storage = obj.esper;
-      if (x === undefined)
+      if (x === undefined) {
         x = { accounts: {} };
-      else if (x.accounts === undefined)
+      } else if (x.accounts === undefined) {
         x.accounts = {};
+      }
       Log.d("Loaded Esper storage:", x);
       callback(x);
       stop();
@@ -52,16 +53,18 @@ module Esper.EsperStorage {
       esper.accounts[googleAccountId] = account;
     }
     account.googleAccountId = googleAccountId; // compatibility fix 2014-08-04
-    if (account.activeEvents === undefined)
+    if (account.activeEvents === undefined) {
       account.activeEvents = {
         googleAccountId: googleAccountId,
         calendars: {}
       };
-    if (account.activeThreads === undefined)
+    }
+    if (account.activeThreads === undefined) {
       account.activeThreads = {
         googleAccountId: googleAccountId,
         threads: []
       };
+    }
     Log.d("getAccount returns:", account);
     return account;
   }
@@ -72,12 +75,14 @@ module Esper.EsperStorage {
       var k = x.googleAccountId;
       var account = getAccount(esper, k);
       account.googleAccountId = k;
-      if (x.credentials !== undefined)
+      if (x.credentials !== undefined) {
         account.credentials = x.credentials;
-      if (x.declined === true)
+      }
+      if (x.declined === true) {
         account.declined = true;
-      else
+      } else {
         account.declined = false;
+      }
       return esper;
     }, whenDone);
   }
@@ -91,8 +96,9 @@ module Esper.EsperStorage {
       var updates = x.calendars;
       for (var cal in updates) {
         var oldCal = old[cal];
-        if (old[cal] === undefined)
+        if (old[cal] === undefined) {
           oldCal = [];
+        }
         old[cal] = Visited.merge(updates[cal], oldCal, Visited.maxEvents);
       }
       return esper;
@@ -124,8 +130,9 @@ module Esper.EsperStorage {
   export function deleteCredentials(googleAccountId: string,
                                     whenDone: () => void) {
     load(function(esper) {
-      if (esper.accounts[googleAccountId] !== undefined)
+      if (esper.accounts[googleAccountId] !== undefined) {
         delete esper.accounts[googleAccountId];
+      }
       save(esper, whenDone);
     });
   }

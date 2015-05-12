@@ -141,7 +141,10 @@ module Esper.FinalizeEvent {
           return e.event;
         });
         // TODO: Support multiple events properly (again)
-        var name  = team.team_name;
+        var name  =
+          team.team_name.indexOf(" ") === -1 ?
+          team.team_name :
+          team.team_name.split(" ")[0];
 
         var eventTimezone = CurrentThread.eventTimezone(event);
 

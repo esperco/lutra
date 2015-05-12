@@ -25,9 +25,9 @@ module Esper.Init {
   */
   function obtainCredentials() {
     var googleAccountId = Gcal.getUserEmail();
-    if (googleAccountId === undefined)
+    if (googleAccountId === undefined) {
       Log.e("Cannot extract Google account ID (email address)");
-    else {
+    } else {
       Log.d("Google account ID: " + googleAccountId);
       var esperMessage : Message.Message = {
         sender: "Esper",
@@ -122,8 +122,9 @@ module Esper.Init {
           "ActiveEvents"
         ];
         var isIgnored = List.mem(ignored, request.type);
-        if (! isIgnored)
+        if (! isIgnored) {
           Log.d("Received message:", event.data);
+        }
 
         switch (request.type) {
 
@@ -140,8 +141,9 @@ module Esper.Init {
           break;
 
         default:
-          if (! isIgnored)
+          if (! isIgnored) {
             Log.d("Unknown request type: " + request.type);
+          }
         }
       }
     });

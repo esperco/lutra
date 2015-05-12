@@ -26,6 +26,10 @@ module Esper.CalPicker {
   // ditto
   var meetingType = "other";
 
+  interface TZEventObj extends FullCalendar.EventObject {
+    tz : string; // value of showTimezone when this event was drawn
+  }
+
   interface PickerView {
     view : JQuery;
     calendarPickerContainer : JQuery;
@@ -37,7 +41,7 @@ module Esper.CalPicker {
     displayTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
-    events : { [eventId : string] : FullCalendar.EventObject };
+    events : { [eventId : string] : TZEventObj };
   }
 
   export function zoneAbbr(zoneName) {
@@ -73,7 +77,8 @@ module Esper.CalPicker {
     return container;
   }
 
-  function createView(refreshCal, userSidebar,
+  function createView(refreshCal: JQuery,
+                      userSidebar: UserTab.UserTabView,
                       team: ApiT.Team) : PickerView {
 '''
 <div #view>
@@ -111,20 +116,22 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-
+    var prefs = Teams.getTeamPreferences(team);
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
 
     var calendars = team.team_calendars;
     var writes = [];
     List.iter(calendars, function(cal) {
-      if (cal.calendar_default_view)
+      if (cal.calendar_default_view) {
         showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-      if (cal.calendar_default_write)
+      }
+      if (cal.calendar_default_write) {
         writes.push(cal);
+      }
     });
     writeToCalendar = writes[0] || calendars[0];
-    showTimezone = writeToCalendar.calendar_timezone;
+    showTimezone = prefs.general.current_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
 
     List.iter(calendars, function(cal, i) {
@@ -134,16 +141,18 @@ module Esper.CalPicker {
   <span #calendarName/>
 </div>
 '''
-      if (cal.calendar_default_view)
+      if (cal.calendar_default_view) {
         calendarCheckbox.prop("checked", true);
+      }
 
       var abbr = zoneAbbr(cal.calendar_timezone);
 
       calendarCheckbox.click(function() {
-        if (this.checked)
+        if (this.checked) {
           showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-        else
+        } else {
           delete showCalendars[cal.google_cal_id];
+        }
         calendarView.fullCalendar("refetchEvents");
       });
 
@@ -171,8 +180,9 @@ module Esper.CalPicker {
       var opt = $("<option value='" + i + "'>" +
                   calendars[i].calendar_title + "</option>");
       opt.appendTo(pickerSwitcher);
-      if (calendars[i].google_cal_id === writeToCalendar.google_cal_id)
+      if (calendars[i].google_cal_id === writeToCalendar.google_cal_id) {
         pickerSwitcher.val(i);
+      }
     }
     pickerSwitcher.change(function() {
       var i = $(this).val();
@@ -196,17 +206,24 @@ module Esper.CalPicker {
       });
     }
 
-    var dispZones = [
+    var popularZones = [
       "America/New_York",
       "America/Chicago",
       "America/Denver",
       "America/Los_Angeles"
     ];
-    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-      var tz = cal.calendar_timezone;
-      if (tz !== undefined && !List.mem(dispZones, tz))
-        dispZones.push(tz);
-    });
+    var calendarZones =
+      List.filterMap(team.team_calendars, function(cal : ApiT.Calendar) {
+        return cal.calendar_timezone; // filtered out if undefined
+      });
+
+    /* List of timezones for the dropdown, starting with
+       the default timezone which is the one from
+       the executive's preferences */
+    var dispZones =
+      List.union(List.union([showTimezone], calendarZones),
+                 popularZones);
+
     List.iter(dispZones, function(tz) {
       var abbr = zoneAbbr(tz);
       $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
@@ -254,10 +271,11 @@ module Esper.CalPicker {
       start: startMoment,
       end: endMoment,
       color: "#A25CC6",
-      editable: true
+      editable: true,
+      tz: showTimezone
     };
     picker.events[eventId] = eventData;
-    var stick = true;
+    var stick = false;
     picker.calendarView.fullCalendar('renderEvent', eventData, stick);
     picker.calendarView.fullCalendar('unselect');
     picker.calendarView.fullCalendar('gotoDate', startMoment);
@@ -268,23 +286,6 @@ module Esper.CalPicker {
   */
   function dateOfMoment(m) : Date {
     return m.toDate();
-  }
-
-  /* Given an ISO 8601 timestamp in local time (without timezone info),
-     assume its timezone is fromTZ (the calendar zone)
-     and apply the necessary changes to express it in toTZ (display zone).
-  */
-  function shiftTime(timestamp, fromTZ, toTZ) {
-    var local = timestamp.replace(/Z$/, "");
-    var inCalendarTZ =
-      /UTC$/.test(fromTZ) || /GMT$/.test(fromTZ) ?
-      (<any> moment).utc(local) :
-      (<any> moment).tz(local, fromTZ);
-    var inDisplayTZ =
-      /UTC$/.test(toTZ) || /GMT$/.test(toTZ) ?
-      (<any> inCalendarTZ.utc()) :
-      (<any> inCalendarTZ).tz(toTZ);
-    return (<any> inDisplayTZ).format();
   }
 
   /* An event along with the timezone of the calendar that it's on,
@@ -309,8 +310,12 @@ module Esper.CalPicker {
           var ev = {
             title: x.title, /* required */
             allDay: x.all_day,
-            start: shiftTime(x.start.local, x.calendarTZ, showTimezone), /* req */
-            end: shiftTime(x.end.local, x.calendarTZ, showTimezone), /* req */
+            start: Timezone.shiftTime(x.start.local,
+                                      x.calendarTZ,
+                                      showTimezone), /* req */
+            end: Timezone.shiftTime(x.end.local,
+                                    x.calendarTZ,
+                                    showTimezone), /* req */
             orig: x /* custom field */
           };
 
@@ -319,7 +324,9 @@ module Esper.CalPicker {
             List.find(team.team_calendars, function(cal : ApiT.Calendar) {
               return cal.google_cal_id === x.google_cal_id;
             });
-          if (/ Ghost$/.test(evCal.calendar_title)) ev["color"] = "#BCBEC0"; // @gray_30
+          if (/ Ghost$/.test(evCal.calendar_title)) {
+            ev["color"] = "#BCBEC0"; // @gray_30
+          }
 
           return ev;
         });
@@ -339,7 +346,7 @@ module Esper.CalPicker {
     });
   }
 
-  function fetchEvents(team: ApiT.Team,
+  function fetchEvents(team: ApiT.Team, picker,
                        momentStart, momentEnd, tz, callback) {
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
@@ -365,9 +372,30 @@ module Esper.CalPicker {
       var esperEvents = List.concat(ll);
       refreshCache = false;
       var normalEvents = importEvents(esperEvents);
-      BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd, function (backgroundEvents) {
-        callback(normalEvents.concat(backgroundEvents));
-      });
+
+      // Reinterpret drawn events in current showTimezone
+      var movedEdits = [];
+      for (var k in picker.events) {
+        var ev = picker.events[k];
+        removeEvent(picker, ev.google_event_id);
+        var startTime = ev.start.toISOString();
+        var endTime = ev.end.toISOString();
+        ev.start = moment.utc(
+          Timezone.shiftTime(startTime, ev.tz, showTimezone)
+        );
+        ev.end = moment.utc(
+          Timezone.shiftTime(endTime, ev.tz, showTimezone)
+        );
+        ev.tz = showTimezone;
+        movedEdits.push(ev);
+      }
+      var withEdits = normalEvents.concat(movedEdits);
+
+      function invokeCallback(backgroundEvents) {
+        callback(withEdits.concat(backgroundEvents));
+      }
+      BackgroundEvents.meetingTimes(meetingType, momentStart, momentEnd,
+                                    invokeCallback);
     });
   }
 
@@ -408,8 +436,9 @@ module Esper.CalPicker {
       if (orig !== undefined) loc = orig.location;
       if (loc !== undefined) {
         var address = loc.address;
-        if (loc.title !== "")
+        if (loc.title !== "") {
           address = loc.title + " - " + address;
+        }
         element
           .attr("title", "")
           .tooltip({
@@ -442,7 +471,8 @@ module Esper.CalPicker {
       eventRender: eventRender,
       editable: false,
       events: function(momentStart, momentEnd, tz, callback) {
-        return fetchEvents(team, momentStart, momentEnd, tz, callback);
+        return fetchEvents(team, picker, momentStart, momentEnd,
+                           tz, callback);
       }
     });
 
@@ -468,10 +498,12 @@ module Esper.CalPicker {
   /*
     Create date and time picker using user's calendar.
   */
-  function createPicker(refreshCal, userSidebar, team: ApiT.Team) : Picker {
+  function createPicker(refreshCal: JQuery,
+                        userSidebar: UserTab.UserTabView,
+                        team: ApiT.Team) : Picker {
     var pickerView = createView(refreshCal, userSidebar, team);
     setupCalendar(team, pickerView);
-                            
+
     // add the meeting type menu:
     var menu = meetingTypeMenu();
     pickerView.view.find(".fc-left").append(menu);
@@ -570,8 +602,8 @@ module Esper.CalPicker {
   function saveEvents(closePicker, picker,
                       team: ApiT.Team,
                       task: ApiT.Task,
-                      threadId: string,
-                      prefs: ApiT.Preferences) {
+                      threadId: string) {
+    var prefs = Teams.getTeamPreferences(team);
     var events = [];
     for (var k in picker.events) {
       var edit = makeEventEdit(picker.events[k], picker.eventTitle,
@@ -628,8 +660,7 @@ module Esper.CalPicker {
   function confirmEvents(view, closePicker,
                         picker, team: ApiT.Team,
                         task: ApiT.Task,
-                        threadId: string,
-                        prefs: ApiT.Preferences) {
+                        threadId: string) {
     var events = [];
     for (var k in picker.events) {
       var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
@@ -651,10 +682,10 @@ module Esper.CalPicker {
 
       if (filtered_results.length > 0) {
         var confirmModal = displayConfirmEventModal(view, closePicker, events,
-          filtered_results, picker, team, task, threadId, prefs);
+          filtered_results, picker, team, task, threadId);
         $("body").append(confirmModal.view);
       } else {
-        saveEvents(closePicker, picker, team, task, threadId, prefs);
+        saveEvents(closePicker, picker, team, task, threadId);
       }
     });
   }
@@ -664,8 +695,7 @@ module Esper.CalPicker {
                                     results,
                                     picker, team: ApiT.Team,
                                     task: ApiT.Task,
-                                    threadId: string,
-                                    prefs: ApiT.Preferences) {
+                                    threadId: string) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
@@ -689,7 +719,8 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    var creating = List.map(results, function(result){ return events[result[0]]; });
+    var creating =
+      List.map(results, function(result){ return events[result[0]]; });
     creating.forEach(function(ev) {
       creatingEvents.append(TaskList.renderEvent(team, ev));
     });
@@ -702,7 +733,7 @@ module Esper.CalPicker {
     });
 
     function yesOption() {
-      saveEvents(closePicker, picker, team, task, threadId, prefs);
+      saveEvents(closePicker, picker, team, task, threadId);
       view.remove();
     }
     function noOption() { view.remove(); }
@@ -716,7 +747,7 @@ module Esper.CalPicker {
   }
 
   export function createInline(task: ApiT.Task,
-                               threadId: string, prefs: ApiT.Preferences)
+                               threadId: string)
     : void
   {
 '''
@@ -772,7 +803,7 @@ module Esper.CalPicker {
         cancel.click(closeView);
 
         save.click(function() {
-          confirmEvents(view, closeView, picker, team, task, threadId, prefs);
+          confirmEvents(view, closeView, picker, team, task, threadId);
         });
 
         Gmail.threadContainer().append(view);

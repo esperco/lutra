@@ -103,8 +103,9 @@ module Esper.CalEventView {
     if (split1.length >= 1) {
       description += split1[0];
       if (description.length > 0
-          && description[description.length-1] !== '\n')
+          && description[description.length-1] !== '\n') {
         description += "\n";
+      }
     }
     if (split2.length >= 2) {
       description += delimiter;
@@ -277,11 +278,12 @@ module Esper.CalEventView {
     dropdown.change(function() {
       var secs = $(this).val();
       $(".esper-remind-extra").remove();
-      if (secs > 0)
-        Api.setReminderTime(remindFromTeam.teamid, remindFromEmail, 
+      if (secs > 0) {
+        Api.setReminderTime(remindFromTeam.teamid, remindFromEmail,
                             calendarId, eventId, secs);
-      else
+      } else {
         Api.unsetReminderTime(eventId);
+      }
     });
 
     // Select the current scheduled time, and disable any times in the past
@@ -432,11 +434,11 @@ module Esper.CalEventView {
       function sameEmail(r : ApiT.GuestReminder) {
         return r.guest_email === email;
       }
-      if (List.exists(event_reminders.guest_reminders, sameEmail))
+      if (List.exists(event_reminders.guest_reminders, sameEmail)) {
         checkbox.attr("checked", "checked");
-      else
+      } else {
         checkbox.attr("checked", false);
-
+      }
       checkbox.click(function() {
         var current = List.find(event_reminders.guest_reminders, sameEmail);
         var message = current !== null ? current.reminder_message : null;
@@ -445,10 +447,11 @@ module Esper.CalEventView {
           guest_name: name === email || name === "" ? null : name,
           reminder_message: message
         };
-        if (this.checked)
+        if (this.checked) {
           Api.enableReminderForGuest(eventId, email, reminder);
-        else
+        } else {
           Api.disableReminderForGuest(eventId, email);
+        }
       });
 
       customize.click(function() {

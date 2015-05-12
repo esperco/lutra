@@ -7,25 +7,24 @@ module Esper.InviteControls {
      insert the number into the notes box for the EA.
   */
   function appendExecPublicPhone(team, notesBox) {
-    Profile.get(team.team_executive, team.teamid).done(function(prof) {
-      Api.getPreferences(team.teamid).done(function(prefs) {
-        var phoneInfo = prefs.meeting_types.phone_call;
-        if (phoneInfo !== undefined) {
-          var pubMobile = List.find(phoneInfo.phones, function(p) {
-            return p.phone_type === "Mobile" && p.share_with_guests;
-          });
-          if (pubMobile !== null) {
-            var curText = notesBox.val();
-            var execName = prof.display_name.replace(/ .*$/, "");
-            var toAppend = execName + ": " + pubMobile.phone_number;
-            if (curText.length > 0)
-              notesBox.val(curText + "\n\n" + toAppend);
-            else
-              notesBox.val(toAppend);
-          }
-        }
+    var prof = Teams.getProfile(team.team_executive);
+    var prefs = Teams.getTeamPreferences(team);
+    var phoneInfo = prefs.meeting_types.phone_call;
+    if (phoneInfo !== undefined) {
+      var pubMobile = List.find(phoneInfo.phones, function(p) {
+        return p.phone_type === "Mobile" && p.share_with_guests;
       });
-    });
+      if (pubMobile !== null) {
+        var curText = notesBox.val();
+        var execName = prof.display_name.replace(/ .*$/, "");
+        var toAppend = execName + ": " + pubMobile.phone_number;
+        if (curText.length > 0) {
+          notesBox.val(curText + "\n\n" + toAppend);
+        } else {
+          notesBox.val(toAppend);
+        }
+      }
+    }
   }
 
   /** Returns a widget for inviting guests to the current event or to
@@ -227,8 +226,9 @@ module Esper.InviteControls {
               all_day       : event.all_day,
               guests        : guests
             };
-            if (holdColor && /^HOLD: /.test(title))
+            if (holdColor && /^HOLD: /.test(title)) {
               eventEdit.color_id = holdColor.key;
+            }
 
             var from = fromSelect.val();
             location = pubLocation.val();
@@ -255,7 +255,9 @@ module Esper.InviteControls {
             function slideBack(previous, next) {
               previous.animate({left : 0}, animation.time);
 
-              next.animate({left : animation.width}, animation.time, function () {
+              next.animate({left : animation.width},
+                           animation.time,
+                           function () {
                 next.remove();
               });
             }
@@ -265,7 +267,8 @@ module Esper.InviteControls {
              */
             function checkDescription(previous, title, reminderSpec?) {
               var next =
-                descriptionWidget(event, eventEdit, duplicate, guests, from, close, back, reminderSpec);
+                descriptionWidget(event, eventEdit, duplicate,
+                                  guests, from, close, back, reminderSpec);
 
               slideForward(previous, next);
 
@@ -274,7 +277,8 @@ module Esper.InviteControls {
               }
             }
 
-            var next = reminderWidget(event, eventEdit, team, execReminder, duplicate, function () {
+            var next = reminderWidget(event, eventEdit, team,
+                                      execReminder, duplicate, function () {
               slideBack(container, next);
             }, function (reminderSpec) {
               var title = pubTitle.val();
@@ -313,7 +317,8 @@ module Esper.InviteControls {
   export function descriptionWidget(original: ApiT.CalendarEvent,
                                     eventEdit: ApiT.CalendarEventEdit,
                                     duplicate: boolean,
-                                    guests, from, done, backFunction, reminderSpec?) {
+                                    guests, from, done, backFunction,
+                                    reminderSpec?) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -351,11 +356,13 @@ module Esper.InviteControls {
         back.click(backFunction);
 
         function confirmEventIsNotHold(eventEdit) {
-          if (/^HOLD: /.test(eventEdit.title))
+          if (/^HOLD: /.test(eventEdit.title)) {
             return window.confirm(
               "About to invite guests to a HOLD event! Are you sure?"
             );
-          else return true;
+          } else {
+            return true;
+          }
         }
 
         invite.click(function () {
@@ -366,7 +373,8 @@ module Esper.InviteControls {
             if (CurrentThread.task.isValid()) {
               var task = CurrentThread.task.get();
               if (confirmEventIsNotHold(eventEdit)) {
-                Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+                Api.createTaskLinkedEvent(from, team.teamid, eventEdit,
+                                          task.taskid)
                   .done(function(created) {
                     Api.syncEvent(team.teamid, threadId,
                                   created.google_cal_id,
@@ -374,7 +382,7 @@ module Esper.InviteControls {
 
                     Api.sendEventInvites(team.teamid, from, guests, created);
 
-                    TaskTab.refreshlinkedEventsList(team, threadId,
+                    TaskTab.refreshLinkedEventsList(team, threadId,
                                                     TaskTab.currentTaskTab);
                     CurrentThread.linkedEventsChanged();
 
@@ -399,7 +407,7 @@ module Esper.InviteControls {
                                     original.google_event_id, eventEdit)
                 .done(function() {
                   Api.sendEventInvites(team.teamid, from, guests, original);
-                  TaskTab.refreshlinkedEventsList(team, threadId,
+                  TaskTab.refreshLinkedEventsList(team, threadId,
                                                   TaskTab.currentTaskTab);
 
                   var execIds = {
@@ -418,17 +426,19 @@ module Esper.InviteControls {
         function setReminders(execIds, guestsIds) {
           if (reminderSpec) {
             if (reminderSpec.exec.time) {
-              Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-                var reminder = {
-                  guest_email      : profile.email,
-                  reminder_message : reminderSpec.exec.text
-                };
+              Api.getProfile(team.team_executive, team.teamid)
+                .done(function (profile) {
+                  var reminder = {
+                    guest_email      : profile.email,
+                    reminder_message : reminderSpec.exec.text
+                  };
 
-                Api.enableReminderForGuest(execIds.eventId, profile.email, reminder);
+                  Api.enableReminderForGuest(execIds.eventId, profile.email,
+                                             reminder);
 
-                Api.setReminderTime(team.teamid, from, execIds.calendarId,
-                                    execIds.eventId, reminderSpec.exec.time);
-              });
+                  Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                      execIds.eventId, reminderSpec.exec.time);
+                });
             }
 
             if (reminderSpec.guests.time) {

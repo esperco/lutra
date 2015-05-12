@@ -45,7 +45,8 @@ module Esper.TaskTab {
     return Visited.merge(active, createdTimed, 5);
   }
 
-  export function displayRecentsList(team, threadId,
+  export function displayRecentsList(team: ApiT.Team,
+                                     threadId,
                                      taskTab: TaskTabView,
                                      linkedEvents: ApiT.EventWithSyncInfo[]) {
 '''
@@ -75,8 +76,9 @@ module Esper.TaskTab {
     var activeEvents = [];
     List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
       var eventsForCal = events[cal.google_cal_id];
-      if (eventsForCal !== undefined)
+      if (eventsForCal !== undefined) {
         activeEvents = activeEvents.concat(eventsForCal);
+      }
     });
     if (activeEvents === []) {
       renderNone();
@@ -109,12 +111,13 @@ module Esper.TaskTab {
           activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
             var e = response.event_opt;
             if (e === undefined) return; // event is deleted aka cancelled
-            if (i === activeEvents.length - 1)
+            if (i === activeEvents.length - 1) {
               last = true;
-
+            }
             var ev = { event : e, synced_threads : [] };
-            eventsList.append(EventWidget.renderEvent(linkedEvents, ev, recent, last,
-                                                      team, threadId));
+            eventsList.append(
+              EventWidget.renderEvent(linkedEvents, ev, recent, last,
+                                      team, threadId));
             i++;
           });
           taskTab.recentsList.children().remove();
@@ -126,7 +129,8 @@ module Esper.TaskTab {
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function displayLinkedEventsList(team, threadId, taskTab: TaskTabView,
+  export function displayLinkedEventsList(team: ApiT.Team,
+                                          threadId, taskTab: TaskTabView,
                                           linkedEvents:
                                           ApiT.EventWithSyncInfo[]) {
 '''
@@ -246,12 +250,14 @@ module Esper.TaskTab {
     taskTab.taskProgressContainer.append(view);
   }
 
-  export function clearlinkedEventsList(team, taskTab: TaskTabView) {
+  export function clearLinkedEventsList(team: ApiT.Team,
+                                        taskTab: TaskTabView) {
     displayLinkedEventsList(team, "", taskTab, []);
   }
 
   /* Refresh only linked events, fetching linked events from the server. */
-  export function refreshlinkedEventsList(team, threadId, taskTab) {
+  export function refreshLinkedEventsList(team: ApiT.Team,
+                                          threadId, taskTab) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
@@ -259,7 +265,8 @@ module Esper.TaskTab {
   }
 
   /* Refresh only recent events, fetching linked events from the server. */
-  export function refreshRecentsList(team, threadId, taskTab) {
+  export function refreshRecentsList(team: ApiT.Team,
+                                     threadId, taskTab) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayRecentsList(team, threadId, taskTab, linkedEvents);
@@ -370,7 +377,7 @@ module Esper.TaskTab {
               refreshTaskNotes(team, threadId, taskTab);
               refreshTaskProgressSelection(team, threadId, taskTab);
               refreshLinkedThreadsList(team, threadId, taskTab);
-              refreshlinkedEventsList(team, threadId, taskTab);
+              refreshLinkedEventsList(team, threadId, taskTab);
             });
 
             CurrentThread.task.set(result.task_data);
@@ -424,8 +431,9 @@ module Esper.TaskTab {
       }
 
       var currentTask = CurrentThread.task.get();
-      if (currentTask !== undefined)
+      if (currentTask !== undefined) {
         addArchiveOption(currentTask);
+      }
 
       dropdown.addClass("esper-open");
     });
@@ -657,7 +665,7 @@ module Esper.TaskTab {
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
-      refreshlinkedEventsList(team, threadId, taskTabView);
+      refreshLinkedEventsList(team, threadId, taskTabView);
       if (linkedEventsContainer.css("display") === "none") {
         Sidebar.toggleList(linkedEventsContainer);
         showLinkedEvents.text("Hide");
@@ -721,11 +729,8 @@ module Esper.TaskTab {
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid()) {
-        CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 prefs);
-        });
+        CalPicker.createInline(CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
       }
     });
 
@@ -774,8 +779,9 @@ module Esper.TaskTab {
       } else {
         taskCaption.text(taskLabelCreate);
         var thread = esperGmail.get.email_data();
-        if (thread !== undefined && thread !== null)
+        if (thread !== undefined && thread !== null) {
           title = thread.subject;
+        }
       }
       taskTitle.val(title);
       taskNotes.val(notes);
@@ -783,9 +789,11 @@ module Esper.TaskTab {
       taskNotes.keyup(function() {taskNotesKeyUp(notes);});
       Util.afterTyping(taskTitle, 250, function() {
         var query = taskTitle.val();
-        if (query !== "")
+        if (query !== "") {
           displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
-                               taskSearchActions, team, threadId, query, taskTabView);
+                               taskSearchActions, team,
+                               threadId, query, taskTabView);
+        }
       });
       taskTitle.keydown(function(pressed) {
         var name = taskTitle.val();
@@ -801,7 +809,8 @@ module Esper.TaskTab {
     });
 
     linkEvent.click(function() {
-      var searchModal = CalSearch.viewOfSearchModal(team, threadId, taskTabView);
+      var searchModal =
+        CalSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
     });
@@ -821,10 +830,11 @@ module Esper.TaskTab {
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {
       if (valid) {
-        if (task.task_archived && threadId === CurrentThread.threadId.get())
+        if (task.task_archived && threadId === CurrentThread.threadId.get()) {
           taskTitle.addClass("esper-archived");
-        else
+        } else {
           taskTitle.removeClass("esper-archived");
+        }
       }
     }, taskWatcherId);
 

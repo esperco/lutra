@@ -42,10 +42,15 @@ module Esper.Promise {
             }
           )
       }
-      else
+      else {
         return defer(b);
+      }
     }
     return next(0);
   };
+
+  export function ignore<T>(x : JQueryPromise<T>) : JQueryPromise<void> {
+    return x.then(function() { return; });
+  }
 
 }

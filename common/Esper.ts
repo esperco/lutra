@@ -5,17 +5,17 @@
 */
 
 var esperjQuery;
-if (typeof jQuery !== "undefined")
+if (typeof jQuery !== "undefined") {
   esperjQuery = jQuery;
-
+}
 var esper$;
-if (typeof $ !== "undefined")
+if (typeof $ !== "undefined") {
   esper$ = $;
-
+}
 var esperCryptoJS;
-if (typeof CryptoJS !== "undefined")
+if (typeof CryptoJS !== "undefined") {
   esperCryptoJS = CryptoJS;
-
+}
 module Esper {
   /*
     Reference to those variables from submodules Esper.* is done without
@@ -25,10 +25,13 @@ module Esper {
   export var $;
   export var CryptoJS;
 
-  if (esperjQuery !== undefined)
+  if (esperjQuery !== undefined) {
     jQuery = esperjQuery;
-  if (esper$ !== undefined)
+  }
+  if (esper$ !== undefined) {
     $ = esper$;
-  if (esperCryptoJS !== undefined)
+  }
+  if (esperCryptoJS !== undefined) {
     CryptoJS = esperCryptoJS;
+  }
 }

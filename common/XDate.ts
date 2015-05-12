@@ -48,10 +48,11 @@ module Esper.XDate {
   }
 
   function pad(s : string) : string {
-    if (s.length >= 2)
+    if (s.length >= 2) {
       return s;
-    else
+    } else {
       return "0" + s;
+    }
   }
 
   var weekDays =
@@ -150,8 +151,9 @@ module Esper.XDate {
   export function range(d1 : Date, d2 : Date) : string {
     var t1 = shortTimeOnly(d1);
     var t2 = shortTimeOnly(d2);
-    if (t1.slice(-2) === t2.slice(-2)) // both am or both pm
+    if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
       t1 = t1.slice(0, -2);
+    }
     return fullMonthDay(d1) + ", " + t1 + "-" + t2;
   }
 

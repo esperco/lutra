@@ -159,8 +159,9 @@ module Esper.ComposeControls {
             var loc;
             if (ev.location !== undefined) {
               loc = ev.location.address;
-              if (ev.location.title !== "")
+              if (ev.location.title !== "") {
                 loc = ev.location.title + " - " + loc;
+              }
             } else {
               loc = "<b>LOCATION</b>";
             }
@@ -211,11 +212,8 @@ module Esper.ComposeControls {
     createButton.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid()) {
-        CurrentThread.withPreferences(function(prefs) {
-          CalPicker.createInline(CurrentThread.task.get(),
-                                 CurrentThread.threadId.get(),
-                                 prefs);
-        });
+        CalPicker.createInline(CurrentThread.task.get(),
+                               CurrentThread.threadId.get());
       }
     });
 

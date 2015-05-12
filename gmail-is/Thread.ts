@@ -55,8 +55,9 @@ module Esper.Thread {
     var messages = thread.threads;
     for (var k in messages) {
       var msg: esperGmail.get.Message = messages[k];
-      if (List.mem(emailAddresses, msg.from_email))
+      if (List.mem(emailAddresses, msg.from_email)) {
         return true;
+      }
     }
     return false;
   }

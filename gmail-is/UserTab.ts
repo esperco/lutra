@@ -44,13 +44,15 @@ module Esper.UserTab {
   <ul #availability class="esper-preference-list"/>
 </div>
 '''
-    if (changes.length > 0)
+    if (changes.length > 0) {
       availNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     availabilityIcon.attr("data", Init.esperRootUrl + "img/availability.svg");
 
-    if (last)
+    if (last) {
       view.addClass("esper-last");
+    }
 
     var numAvailabilities = availabilities.length;
     if (numAvailabilities === 0) {
@@ -68,8 +70,9 @@ module Esper.UserTab {
   <span #toTimeText/>
 </li>
 '''
-        if (i == (numAvailabilities - 1))
+        if (i == (numAvailabilities - 1)) {
           availabilityRow.addClass("esper-last");
+        }
 
         var fromDay = a.avail_from.day;
         var toDay = a.avail_to.day;
@@ -95,10 +98,11 @@ module Esper.UserTab {
     var text = "";
     var hour = hourMinute.hour;
     var minute = hourMinute.minute;
-    if (hour > 0)
+    if (hour > 0) {
       text += hour + (hour === 1 ? " hour " : " hours ");
-    if (minute > 0 || hour === 0)
+    } if (minute > 0 || hour === 0) {
       text += minute + (minute === 1 ? " minute" : " minutes");
+    }
     return text;
   }
 
@@ -117,8 +121,9 @@ module Esper.UserTab {
   <ul #locations class="esper-preference-list"/>
 </div>
 '''
-    if (changes.length > 0)
+    if (changes.length > 0) {
       locationsNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
 
@@ -137,8 +142,9 @@ module Esper.UserTab {
   <div #privateNotes class="esper-gray"/>
 </li>
 '''
-        if (i == (numLocations -1))
+        if (i == (numLocations -1)) {
           location.addClass("esper-last");
+        }
 
         if (l.title !== "") name.text(l.title);
         if (l.address !== "") address.text(l.address);
@@ -172,8 +178,9 @@ module Esper.UserTab {
   <ul #usernames class="esper-preference-list"/>
 </div>
 '''
-    if (changes.length > 0)
+    if (changes.length > 0) {
       usernameNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     videoIcon.attr("data", Init.esperRootUrl + "img/video.svg");
 
@@ -188,8 +195,9 @@ module Esper.UserTab {
   <div #username/>
 </li>
 '''
-        if (i == (numUsernames - 1))
+        if (i == (numUsernames - 1)) {
           videoUsername.addClass("esper-last");
+        }
         type.text(v.video_type + ": ");
         username.text(v.video_username);
         usernames.append(videoUsername);
@@ -215,8 +223,9 @@ module Esper.UserTab {
   <ul #phones class="esper-preference-list"/>
 </div>
 '''
-    if (changes.length > 0)
+    if (changes.length > 0) {
       phonesNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     phoneIcon.attr("data", Init.esperRootUrl + "img/phone.svg");
 
@@ -232,8 +241,9 @@ module Esper.UserTab {
   <div #note class="esper-gray"/>
 </li>
 '''
-        if (i == (numPhones -1))
+        if (i == (numPhones -1)) {
           phoneNumber.addClass("esper-last");
+        }
         type.text(p.phone_type + ": ");
         number.text(p.phone_number);
         if (p.share_with_guests) note.text("OK to share with guests");
@@ -268,14 +278,16 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    if (getSubPreferenceChanges("Duration", changes).length > 0)
+    if (getSubPreferenceChanges("Duration", changes).length > 0) {
       durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+}
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
-    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+    if (getSubPreferenceChanges("Buffer", changes).length > 0) {
       bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -313,14 +325,16 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    if (getSubPreferenceChanges("Duration", changes).length > 0)
+    if (getSubPreferenceChanges("Duration", changes).length > 0) {
       durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
-    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+    if (getSubPreferenceChanges("Buffer", changes).length > 0) {
       bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -358,14 +372,16 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    if (getSubPreferenceChanges("Duration", changes).length > 0)
+    if (getSubPreferenceChanges("Duration", changes).length > 0) {
       durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     durationText.text(formatDuration(meetingPrefs.duration));
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
 
-    if (getSubPreferenceChanges("Buffer", changes).length > 0)
+    if (getSubPreferenceChanges("Buffer", changes).length > 0) {
       bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     bufferText.text(formatDuration(meetingPrefs.buffer));
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -393,15 +409,17 @@ module Esper.UserTab {
 '''
     var new_transports = getSubPreferenceChanges("Added", changes);
 
-    if (List.mem(new_transports, transportationType))
+    if (List.mem(new_transports, transportationType)) {
       transportNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
     var imageFile = transportationType.toLowerCase();
     icon.attr("data", Init.esperRootUrl + "img/" + imageFile + ".svg");
     label.prepend(transportationType);
 
-    if (last)
+    if (last) {
       view.addClass("esper-last");
+    }
 
     return view;
   }
@@ -414,8 +432,9 @@ module Esper.UserTab {
                                   workplace_changes) {
     function option(value, display) {
       var type = display.split(" ")[0];
-      if (getSubPreferenceChanges(type, meeting_changes).length > 0)
+      if (getSubPreferenceChanges(type, meeting_changes).length > 0) {
         display = display + "*";
+      }
       $("<option>")
         .attr("value", value)
         .text(display)
@@ -426,22 +445,30 @@ module Esper.UserTab {
       return (x !== undefined && x.available);
     }
 
-    if (available(meetingTypes.phone_call))
+    if (available(meetingTypes.phone_call)) {
       option("phone_call", "Phone call");
-    if (available(meetingTypes.video_call))
+    }
+    if (available(meetingTypes.video_call)) {
       option("video_call", "Video call");
-    if (available(meetingTypes.breakfast))
+    }
+    if (available(meetingTypes.breakfast)) {
       option("breakfast", "Breakfast");
-    if (available(meetingTypes.brunch))
+    }
+    if (available(meetingTypes.brunch)) {
       option("brunch", "Brunch");
-    if (available(meetingTypes.lunch))
+    }
+    if (available(meetingTypes.lunch)) {
       option("lunch", "Lunch");
-    if (available(meetingTypes.coffee))
+    }
+    if (available(meetingTypes.coffee)) {
       option("coffee", "Coffee");
-    if (available(meetingTypes.dinner))
+    }
+    if (available(meetingTypes.dinner)) {
       option("dinner", "Dinner");
-    if (available(meetingTypes.drinks))
+    }
+    if (available(meetingTypes.drinks)) {
       option("drinks", "Drinks");
+    }
 
     $("<option disabled>──────</option>").appendTo(drop);
 
@@ -453,7 +480,8 @@ module Esper.UserTab {
 
       var added_changes = List.filterMap(new_changes, function(change) {
         var added = List.filter(change.workplaces_added, function(w) {
-          return (w["location"].title === title || w["location"].address === title);
+          return (w["location"].title === title
+                  || w["location"].address === title);
         });
         if (added.length > 0) return added;
         else return null;
@@ -462,8 +490,9 @@ module Esper.UserTab {
         return (change[1].title === title);
       });
 
-      if (relevant_changes.length > 0 || added_changes.length > 0)
+      if (relevant_changes.length > 0 || added_changes.length > 0) {
         title = title + "*";
+      }
 
       $("<option value='" + i.toString() + "'>" + title + "</option>")
         .appendTo(drop);
@@ -562,18 +591,18 @@ module Esper.UserTab {
           return (change.title === title);
         });
 
-    if (location_changes.length > 0)
+    if (location_changes.length > 0) {
       locationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-
-    if (duration_changes.length > 0)
+    }
+    if (duration_changes.length > 0) {
       durationNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-
-    if (buffer_changes.length > 0)
+    }
+    if (buffer_changes.length > 0) {
       bufferNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-
-    if (distance_changes.length > 0)
+    }
+    if (distance_changes.length > 0) {
       distanceNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-
+    }
     locationIcon.attr("data", Init.esperRootUrl + "img/location.svg");
     durationIcon.attr("data", Init.esperRootUrl + "img/duration.svg");
     bufferIcon.attr("data", Init.esperRootUrl + "img/buffer.svg");
@@ -617,8 +646,9 @@ module Esper.UserTab {
     Api.getProfile(team.team_executive, teamid)
       .done(function(profile) {
         spinner.hide();
-        if (profile.image_url !== undefined)
+        if (profile.image_url !== undefined) {
           profPic.css("background-image", "url('" + profile.image_url + "')");
+        }
         name.text(team.team_name);
         email.text(profile.email);
 
@@ -627,34 +657,36 @@ module Esper.UserTab {
           var pubMobile = List.find(phoneInfo.phones, function(p) {
             return p.phone_type === "Mobile" && p.share_with_guests;
           });
-          if (pubMobile !== null)
+          if (pubMobile !== null) {
             mobile.text("Mobile: " + pubMobile.phone_number);
-          else
+          } else {
             mobile.hide();
+          }
         }
 
-        if (profile.has_ios_app)
+        if (profile.has_ios_app) {
           appleLogo.attr("data", Init.esperRootUrl + "img/apple.svg");
-        else
+        } else {
           appleLogo.hide();
+        }
       });
 
     Api.getCustomerStatus(teamid).done(function(customer) {
       var sub = customer.status;
       var plan = customer.plan;
 
-      if (sub === "Trialing" || sub === "Active")
+      if (sub === "Trialing" || sub === "Active") {
         membership.addClass("esper-active");
-      else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid")
+      } else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid") {
         membership.addClass("esper-suspended");
-      else {
+      } else {
         sub = "No Subscription";
         membership.addClass("esper-suspended");
       }
 
-      if (sub === "Active" && plan !== undefined)
+      if (sub === "Active" && plan !== undefined) {
         sub = Util.nameOfPlan(plan);
-
+      }
       membership.text(sub.replace("_", " ").toUpperCase());
     });
 
@@ -696,32 +728,39 @@ module Esper.UserTab {
   </div>
 </ul>
 '''
-    if(getSubPreferenceChanges("Confirmation", changes).length > 0)
+    if (getSubPreferenceChanges("Confirmation", changes).length > 0) {
       confNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-    if(getSubPreferenceChanges("Reminder", changes).length > 0)
+    }
+    if (getSubPreferenceChanges("Reminder", changes).length > 0) {
       remindNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-    if(getSubPreferenceChanges("Duplicate", changes).length > 0)
+    }
+    if (getSubPreferenceChanges("Duplicate", changes).length > 0) {
       dupeNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-    if(getSubPreferenceChanges("Bcc", changes).length > 0)
+    }
+    if (getSubPreferenceChanges("Bcc", changes).length > 0) {
       bccNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
-    if (prefs.send_exec_confirmation)
+    if (prefs.send_exec_confirmation) {
       sendConfirmation.text("Yes")
         .removeClass("esper-red")
         .addClass("esper-green");
-    if (prefs.send_exec_reminder)
+    }
+    if (prefs.send_exec_reminder) {
       sendReminder.text("Yes")
         .removeClass("esper-red")
         .addClass("esper-green");
-    if (!prefs.use_duplicate_events)
+    }
+    if (!prefs.use_duplicate_events) {
       useDuplicate.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
-    if (!prefs.bcc_exec_on_reply)
+    }
+    if (!prefs.bcc_exec_on_reply) {
       bccExec.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
-
+    }
     container.append(view);
   }
 
@@ -739,50 +778,99 @@ module Esper.UserTab {
   </div>
 </ul>
 '''
-    if(getSubPreferenceChanges("Bcc", changes).length > 0)
+    if (getSubPreferenceChanges("Bcc", changes).length > 0) {
       bccNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
+    }
 
-    if (!prefs.bcc_exec_on_reply)
+    if (!prefs.bcc_exec_on_reply) {
       bccExec.text("No")
         .removeClass("esper-green")
         .addClass("esper-red");
+    }
 
     container.append(view);
   }
 
   function displayTeamLabel(container : JQuery,
-                             teamLabel : string) {
+                            teamLabel : string) {
 '''
 <div #view>
   <span #label>
 </div>
 '''
 
-    label.text(teamLabel)
-    container.append(view)
+    label.text(teamLabel);
+    container.append(view);
   }
 
   function getSubPreferenceChanges(change_type : string,
                                    changes) {
     return List.filterMap(changes, function(change) {
-      if (change[0] === change_type)
+      if (change[0] === change_type) {
         return change[1];
-      else
+      } else {
         return null;
+      }
     });
   }
 
   function getPreferencesChanges(change_type : string,
                                 changes : ApiT.PreferenceChange[]) {
     return List.filterMap(changes, function(change) {
-      if (change.change_type[0] === change_type)
+      if (change.change_type[0] === change_type) {
         return change.change_type[1];
-      else
+      } else {
         return null;
+      }
     });
   }
 
-  export function viewOfUserTab(team: ApiT.Team) {
+  export interface UserTabView {
+    view: JQuery;
+    user: JQuery;
+    preferencesSpinner: JQuery;
+    aliasHeader: JQuery;
+    showAlias: JQuery;
+    aliasContainer: JQuery;
+    generalHeader: JQuery;
+    showGeneral: JQuery;
+    generalNew: JQuery;
+    generalContainer: JQuery;
+    generalDetailedContainer: JQuery;
+    teamLabelsSection: JQuery;
+    teamLabelsHeader: JQuery;
+    showTeamLabels: JQuery;
+    teamLabelsContainer: JQuery;
+    coworkerSection: JQuery;
+    coworkersHeader: JQuery;
+    showCoworkers: JQuery;
+    coworkersNew: JQuery;
+    coworkersContainer: JQuery;
+    coworkers: JQuery;
+    calendarsSection: JQuery;
+    calendarsHeader: JQuery;
+    showCalendars: JQuery;
+    calendarsContainer: JQuery;
+    meetingsHeader: JQuery;
+    showMeetings: JQuery;
+    meetingsNew: JQuery;
+    meetingsContainer: JQuery;
+    meetingsSelector: JQuery;
+    meetingSelector: JQuery;
+    meetingInfo: JQuery;
+    transportationHeader: JQuery;
+    showTransportation: JQuery;
+    transportationNew: JQuery;
+    transportationContainer: JQuery;
+    transportationPreferences: JQuery;
+    notesHeader: JQuery;
+    showNotes: JQuery;
+    notesNew: JQuery;
+    notesContainer: JQuery;
+    notes: JQuery;
+  }
+
+  export function viewOfUserTab(team: ApiT.Team): UserTabView {
 '''
 <div #view>
   <div #user class="esper-tab-header"/>
@@ -902,76 +990,79 @@ module Esper.UserTab {
       displayTeamLabel(teamLabelsContainer, label);
     })
 
-    Api.getPreferences(team.teamid).done(function(prefs) {
-      var until = Math.floor(XDate.now()/1000);
-      var from = until - 432000; // 5 days
-      Api.getPreferenceChanges(team.teamid, from, until)
-      .done(function(changes) {
-        var workplace_changes =
-          getPreferencesChanges("Workplace", changes.change_log);
-        var transportation_changes =
-          getPreferencesChanges("Transportation", changes.change_log);
-        var meeting_changes =
-          getPreferencesChanges("Meeting", changes.change_log);
-        var general_changes =
-          getPreferencesChanges("General", changes.change_log);
-        var coworkers_changes =
-          getPreferencesChanges("Coworkers", changes.change_log);
-        var notes_changes =
-          getPreferencesChanges("Notes", changes.change_log);
+    var prefs = Teams.getTeamPreferences(team);
+    var until = Math.floor(XDate.now()/1000);
+    var from = until - 432000; // 5 days
+    Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
+      var workplace_changes =
+        getPreferencesChanges("Workplace", changes.change_log);
+      var transportation_changes =
+        getPreferencesChanges("Transportation", changes.change_log);
+      var meeting_changes =
+        getPreferencesChanges("Meeting", changes.change_log);
+      var general_changes =
+        getPreferencesChanges("General", changes.change_log);
+      var coworkers_changes =
+        getPreferencesChanges("Coworkers", changes.change_log);
+      var notes_changes =
+        getPreferencesChanges("Notes", changes.change_log);
 
-        if (workplace_changes.length + meeting_changes.length === 0)
-          meetingsNew.hide();
-        if (transportation_changes.length === 0)
-          transportationNew.hide();
-        if (general_changes.length === 0)
-          generalNew.hide();
-        if (coworkers_changes.length === 0)
-          coworkersNew.hide();
-        if (notes_changes.length === 0)
-          notesNew.hide();
+      if (workplace_changes.length + meeting_changes.length === 0) {
+        meetingsNew.hide();
+      }
+      if (transportation_changes.length === 0) {
+        transportationNew.hide();
+      }
+      if (general_changes.length === 0) {
+        generalNew.hide();
+      }
+      if (coworkers_changes.length === 0) {
+        coworkersNew.hide();
+      }
+      if (notes_changes.length === 0) {
+        notesNew.hide();
+      }
+      preferencesSpinner.hide();
+      user.append(viewOfUser(team, prefs));
 
-        preferencesSpinner.hide();
-        user.append(viewOfUser(team, prefs));
+      var meetingTypes = prefs.meeting_types;
+      var workplaces = prefs.workplaces;
+      populateMeetingsDropdown(meetingSelector, meetingInfo,
+                               meetingTypes, workplaces,
+                               meeting_changes, workplace_changes);
+      if (workplaces.length > 0) {
+        displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
+        meetingSelector.val(0);
+      }
+      else if (meetingTypes.phone_call !== undefined) {
+        displayPhoneInfo(meetingInfo,
+                         meetingTypes.phone_call,
+                         meeting_changes);
+        meetingSelector.val("phone_call");
+      }
 
-        var meetingTypes = prefs.meeting_types;
-        var workplaces = prefs.workplaces;
-        populateMeetingsDropdown(meetingSelector, meetingInfo,
-          meetingTypes, workplaces, meeting_changes, workplace_changes);
-        if (workplaces.length > 0) {
-          displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
-          meetingSelector.val(0);
-        }
-        else if (meetingTypes.phone_call !== undefined) {
-          displayPhoneInfo(meetingInfo,
-                           meetingTypes.phone_call,
-                           meeting_changes);
-          meetingSelector.val("phone_call");
-        }
-
-        var transportationTypes = prefs.transportation.length;
-        List.iter(prefs.transportation, function(type, i) {
-          var last = i === prefs.transportation.length - 1;
-          transportationPreferences.append(
-            viewOfTransportationType(type, last, transportation_changes)
-          );
-        });
-
-        if (prefs.general !== undefined) {
-          displayGeneralPrefs(generalContainer, prefs.general, general_changes);
-          displayDetailedGeneralPrefs(generalDetailedContainer,
-                                      prefs.general,
-                                      general_changes);
-        }
-
-        if (prefs.coworkers !== "") {
-          coworkers.text(prefs.coworkers);
-        } else {
-          coworkerSection.hide()
-        }
-
-        notes.text(prefs.notes);
+      var transportationTypes = prefs.transportation.length;
+      List.iter(prefs.transportation, function(type, i) {
+        var last = i === prefs.transportation.length - 1;
+        transportationPreferences.append(
+          viewOfTransportationType(type, last, transportation_changes)
+        );
       });
+
+      if (prefs.general !== undefined) {
+        displayGeneralPrefs(generalContainer, prefs.general, general_changes);
+        displayDetailedGeneralPrefs(generalDetailedContainer,
+                                    prefs.general,
+                                    general_changes);
+      }
+
+      if (prefs.coworkers !== "") {
+        coworkers.text(prefs.coworkers);
+      } else {
+        coworkerSection.hide()
+      }
+
+      notes.text(prefs.notes);
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);

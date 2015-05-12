@@ -30,8 +30,9 @@ module Esper.Sidebar {
   }
 
   $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("esper-click-safe"))
+    if (!$(e.target).hasClass("esper-click-safe")) {
       dismissDropdowns();
+    }
   });
 
   function removeEsperRoot() {
@@ -49,8 +50,10 @@ module Esper.Sidebar {
     }
   }
 
-  /** Displays the UI entry for a specific team you can switch to. */
-  function displayTeamSelector(teamsSection, team, onTeamSwitch) {
+  function displayTeamSelector(teamsSection,
+                               team: ApiT.Team,
+                               onTeamSwitch:
+                                 (newTeam: ApiT.Team) => void) {
 '''
 <li #selector class="esper-click-safe esper-li">
   <object #teamCheck class="esper-svg esper-click-safe esper-team-checkmark"/>
@@ -139,7 +142,7 @@ module Esper.Sidebar {
     dropdown.css("max-height", $(window).height() - 100);
     dropdown.css("overflow", "auto");
 
-    function onTeamSwitch(toTeam) {
+    function onTeamSwitch(toTeam: ApiT.Team) {
       CurrentThread.setTeam(toTeam);
 
       dismissDropdowns();
@@ -165,7 +168,6 @@ module Esper.Sidebar {
     teams.forEach(function(team) {
       displayTeamSelector(teamsSection, team, onTeamSwitch);
     });
-
 
     CurrentThread.team.get().match({
       some : function (team) {
@@ -230,8 +232,9 @@ module Esper.Sidebar {
       window.open(Conf.Api.url);
     })
     signOut.click(function() {
-      if (sidebar.css("display") !== "none")
+      if (sidebar.css("display") !== "none") {
         sidebar.hide("slide", { direction: "down" }, 250);
+      }
       view.fadeOut(250).delay(250);
       Login.logout();
       Menu.create();
@@ -244,11 +247,14 @@ module Esper.Sidebar {
 
           if (sub === "Past_due" || sub === "Canceled" ||
               sub === "Unpaid" || sub === undefined) {
-            view.removeClass("esper-team-warning").addClass("esper-team-danger");
+            view.removeClass("esper-team-warning")
+                .addClass("esper-team-danger");
           } else if (!isCorrectTeam) {
-            view.addClass("esper-team-warning").removeClass("esper-team-danger");
+            view.addClass("esper-team-warning")
+                .removeClass("esper-team-danger");
           } else {
-            view.removeClass("esper-team-warning").removeClass("esper-team-danger");
+            view.removeClass("esper-team-warning")
+                .removeClass("esper-team-danger");
           }
 
           rootElement.append(view);
@@ -299,7 +305,8 @@ module Esper.Sidebar {
 
     CurrentThread.team.get().match({
       some : function  (team) {
-        TaskTab.displayTaskTab(taskContent, team, threadId, autoTask, linkedEvents);
+        TaskTab.displayTaskTab(taskContent, team, threadId,
+                               autoTask, linkedEvents);
         userContent.append(UserTab.viewOfUserTab(team).view);
         GroupScheduling.afterInitialize(function () {
           groupContent.append(GroupTab.container());
