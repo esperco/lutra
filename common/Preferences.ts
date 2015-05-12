@@ -18,4 +18,18 @@ module Esper.Preferences {
     });
     return Promise.join(l);
   }
+
+  export function savedPlaces(prefs: ApiT.Preferences): ApiT.Location[] {
+    var places = [];
+    List.iter(prefs.workplaces, function(w) { places.push(w.location); });
+    var types = prefs.meeting_types;
+    if (types.breakfast) places = places.concat(types.breakfast.favorites);
+    if (types.brunch) places = places.concat(types.brunch.favorites);
+    if (types.lunch) places = places.concat(types.lunch.favorites);
+    if (types.coffee) places = places.concat(types.coffee.favorites);
+    if (types.dinner) places = places.concat(types.dinner.favorites);
+    if (types.drinks) places = places.concat(types.drinks.favorites);
+    Log.d(places);
+    return places;
+  }
 }

@@ -36,6 +36,8 @@ module Esper.CalPicker {
     dateJumper : JQuery;
     eventTitle : JQuery;
     eventLocation : JQuery;
+    locationDropdown : JQuery;
+    locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
     displayTz : JQuery;
@@ -77,6 +79,33 @@ module Esper.CalPicker {
     return container;
   }
 
+  function displayLocationSearchResults(locationBox, dropdown, results,
+                                        query, prefs) {
+    results.find(".esper-li").remove();
+    var locs = Preferences.savedPlaces(prefs);
+    var hasResult = false;
+    List.iter(locs, function(loc) {
+      var addr = loc.address.slice(0);
+      if (loc.title) addr = loc.title + " - " + addr;
+      if (addr.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        $("<li class='esper-li'>" + addr + "</li>")
+          .appendTo(results)
+          .click(function() {
+            locationBox.val(addr);
+            Sidebar.dismissDropdowns();
+          });
+        hasResult = true;
+      }
+    });
+    if (hasResult) {
+      if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
+      dropdown.addClass("esper-open");
+    } else {
+      if (dropdown.hasClass("esper-open")) dropdown.toggle();
+      dropdown.removeClass("esper-open");
+    }
+  }
+
   function createView(refreshCal: JQuery,
                       userSidebar: UserTab.UserTabView,
                       team: ApiT.Team) : PickerView {
@@ -91,6 +120,10 @@ module Esper.CalPicker {
         <br/>
         <span class="esper-bold">Location:</span>
         <input #eventLocation type="text" size="24" class="esper-input"/>
+        <ul #locationDropdown
+            class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
+          <div #locationSearchResults class="esper-dropdown-section"/>
+        </ul>
         <br/>
         <span class="esper-bold">Thread participants:</span>
         <span #guestNames/>
@@ -133,6 +166,14 @@ module Esper.CalPicker {
     writeToCalendar = writes[0] || calendars[0];
     showTimezone = prefs.general.current_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
+
+    Util.afterTyping(eventLocation, 250, function() {
+      var query = eventLocation.val();
+      if (query !== "") {
+        displayLocationSearchResults(eventLocation, locationDropdown,
+                                     locationSearchResults, query, prefs);
+      }
+    });
 
     List.iter(calendars, function(cal, i) {
 '''
