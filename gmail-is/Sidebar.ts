@@ -151,7 +151,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, true, false, threadId);
+        displayTeamSidebar(rootElement, true, true, threadId);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -372,100 +372,58 @@ module Esper.Sidebar {
     });
   }
 
-  /* Look for a team that has a task for the given thread.
-   * If there are multiple such teams, return the first one. */
-  export function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
-    return Api.getTaskListForThread(threadId, false, false)
-      .then(function(tasks) {
-        var hasTask = tasks.length > 0;
-        if (hasTask) {
-          var task = tasks[0];
-          return List.find(teams, function(team) {
-            return team.teamid === task.task_teamid;
-          });
-        }
-        else
-          return undefined;
-      });
-  }
-
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
     function retry() {
       Log.d("Trying to display Esper sidebar...");
-      var emailData = esperGmail.get.email_data();
-
-      if (emailData !== undefined && emailData.first_email !== undefined) {
-
-        var rootElement = insertEsperRoot();
-        if (rootElement === undefined) {
-          return false;
-        } else {
-          var threadId = emailData.first_email;
-          CurrentThread.setThreadId(threadId);
-          var subject = emailData.subject;
-          Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
-          ActiveThreads.handleNewActiveThread(threadId, subject);
-
-          var links = $("div").find("a");
-          var threadLinks = List.filter(links, function(link) {
-            var url = $(link).attr("href");
-            if (typeof url === "string") {
-              return url.substring(0,30) === "http://mail.google.com/mail/u/";
-            } else {
-              return false;
-            }
-          });
-          List.iter(threadLinks, function(link) {
-            var url = $(link).attr("href");
-            var len = url.length;
-            $(link).click(function(e) {
-              e.stopPropagation();
-              window.location.hash = "#all/" + url.substring(len - 16, len);
-              return false;
-            });
-          });
-
-          var teams = Login.myTeams();
-          Thread.detectTeam(teams, emailData)
-            .done(function(x: Thread.DetectedTeam) {
-              Log.d("Detected team:", x);
-              var team =
-                x === undefined ? undefined : x.team;
-              var hasMsgFromExec =
-                x === undefined ? false : x.hasMsgFromExec;
-
-              var autoTask = hasMsgFromExec;
-
-              if (team === undefined && teams.length === 1) {
-                Log.w("Team not detected, using one and only team.");
-                team = teams[0];
-              }
-
-              var correctTeam = team !== undefined;
-
-              if (!correctTeam && teams.length >= 1) {
-                /* If we can't detect the team based on the sender's email,
-                 * check if one of our teams has an existing task for this
-                 * thread. */
-                findTeamWithTask(teams, threadId).done(function(foundTeam) {
-                  if (foundTeam === undefined) {
-                    Log.w("Team not detected.");
-                  } else {
-                    Log.w("Selected team based on already existing task.");
-                    correctTeam = true;
-                    team = foundTeam;
-                  }
-                  displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
-                });
-              } else if (correctTeam) {
-                displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
-              }
-            });
-          return true;
-        }
-      } else {
+      var rootElement = insertEsperRoot();
+      if (rootElement === undefined) {
         return false;
+      } else {
+        var threadId = CurrentThread.threadId.get();
+
+        var links = $("div").find("a");
+        var threadLinks = List.filter(links, function(link) {
+          var url = $(link).attr("href");
+          if (typeof url === "string") {
+            return url.substring(0,30) === "http://mail.google.com/mail/u/";
+          } else {
+            return false;
+          }
+        });
+        List.iter(threadLinks, function(link) {
+          var url = $(link).attr("href");
+          var len = url.length;
+          $(link).click(function(e) {
+            e.stopPropagation();
+            window.location.hash = "#all/" + url.substring(len - 16, len);
+            return false;
+          });
+        });
+
+        var teams = Login.myTeams();
+
+        // TODO: Determinw whether to create a task.
+        var autoTask = true;
+
+        // TODO: Determine whether the team is "correct" (?)
+        var correctTeam = true;
+
+        CurrentThread.team.get().match({
+          some : function (team) {
+            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+          },
+          none : function () {
+            if (teams.length === 1) {
+              Log.w("Team not detected, using one and only team.");
+              CurrentThread.setTeam(teams[0]);
+            }
+
+            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+          }
+        });
+
+        return true;
       }
     }
 

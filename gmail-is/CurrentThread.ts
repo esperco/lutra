@@ -32,28 +32,29 @@ module Esper.CurrentThread {
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
-  export var team = new Esper.Watchable.C<Esper.Option.T<ApiT.Team>>(
+  export var team = new Esper.Watchable.C<Option.T<ApiT.Team>>(
     function (team) { return team !== undefined && team !== null; },
-    Esper.Option.none<ApiT.Team>()
+    Option.none<ApiT.Team>()
   );
 
-  export var executive = new Esper.Watchable.C<ApiT.Profile>(
-    function (exec) { return exec !== undefined && exec !== null; },
-    undefined
-  );
-
-  export function setTeam(newTeam: ApiT.Team) {
-    executive.set(null); // invalid until reloaded via API
-
+  /** Sets the new team. The promise will return the new team once all
+   *  the needed updates are done and everything is synchronized.
+   *
+   *  Events that depend on the team being set correctly should not be
+   *  fired until this promise returns. (Isn't asynchronous
+   *  programming in JavaScript fun?)
+   */
+  export function setTeam(newTeam: ApiT.Team): JQueryPromise<Option.T<ApiT.Team>> {
     if (newTeam) {
-      Api.getProfile(newTeam.team_executive, newTeam.teamid).done(function (newExec) {
-        executive.set(newExec);
+      return Api.getProfile(newTeam.team_executive, newTeam.teamid).then(function (newExec) {
         team.set(Option.some(newTeam));
         Menu.currentTeam.set(newTeam);
+        return Option.some(newTeam);
       });
     } else {
-      team.set(Esper.Option.none<ApiT.Team>());
+      team.set(Option.none<ApiT.Team>());
       Menu.currentTeam.set(null);
+      return Promise.defer(Option.none());
     }
   }
 
@@ -63,24 +64,37 @@ module Esper.CurrentThread {
   export function setThreadId(newThreadId) {
     if (!newThreadId) {
       task.set(null);
-      team.set(Esper.Option.none<ApiT.Team>());
+      team.set(Option.none<ApiT.Team>());
       GroupScheduling.clear();
+
+      threadId.set(newThreadId);
     } else {
       findTeam(newThreadId).done(function (newTeam) {
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
-          setTeam(newTeam);
+          setTeam(newTeam).done(function (newTeam) {
+            threadId.set(newThreadId);
+          });
         });
       });
     }
-
-    threadId.set(newThreadId);
   }
 
   // Set the thread id when the user navigates around GMail:
   window.onhashchange = function (e) {
     setThreadId(esperGmail.get.email_id());
   };
+
+  // Initialize the threadId when the page is loaded as appropriate:
+  $(function () {
+    // We try to get the threadId from the URL ourselves because
+    // Gmail.js fails until more of the page is loaded.
+    var match = window.location.hash.match(/#[^\/]+\/(.+)/);
+
+    if (match && match.length >= 2) {
+      setThreadId(match[1]);
+    }
+  });
 
   // TODO: Make sure the following listener is acutally unnecessary:
   // esperGmail.on.open_email(function (id, url, body, xhr) {
@@ -123,25 +137,44 @@ module Esper.CurrentThread {
     }
   }
 
+  /** Fetches the executive's profile for the given team. */
+  export function getExecutive(team : ApiT.Team) : JQueryPromise<ApiT.Profile> {
+    return Api.getProfile(team.teamid, team.team_executive);
+  }
+
+  /** Gets the executive of the current team, if any. */
+  export function getCurrentExecutive() : JQueryPromise<Option.T<ApiT.Profile>> {
+    return team.get().match({
+      some : function (team) {
+        return getExecutive(team).then(function (exec) {
+          return Option.some(exec);
+        });
+      },
+      none : function () {
+        return Promise.defer(Option.none());
+      }
+    });
+  }
+
   /** Returns a list of all the poeple invloved in the current thread
    *  excluding the exec and any assistants.
    *
    *  Returns [] if we can't get the thread data for some reason (ie
    *  gmail js has a problem).
    */
-  export function getExternalParticipants() : ApiT.Guest[] {
+  export function getExternalParticipants() : JQueryPromise<ApiT.Guest[]> {
     return team.get().match({
       some : function (team) {
-        if (!executive.isValid()) return [];
-
-        var all = getParticipants();
-        return all.filter(function (participant) {
-          return participant.email != executive.get().email &&
-            team.team_email_aliases.indexOf(participant.email) == -1;
+        return getExecutive(team).then(function (executive) {
+          var all = getParticipants();
+          return all.filter(function (participant) {
+            return participant.email != executive.email &&
+              team.team_email_aliases.indexOf(participant.email) == -1;
+          });
         });
       },
       none : function () {
-        return [];
+        return Promise.defer([]);
       }
     });
   }
@@ -214,21 +247,43 @@ module Esper.CurrentThread {
         return Promise.defer(team);
       },
       none : function () {
-        return Sidebar.findTeamWithTask(Login.myTeams(), threadId).then(function (team) {
-          // <any> needed because promises are automatically flattened
-          if (team) {
-            return <any> team;
-          } else { // detect team based on thread participants
-            var emailData = esperGmail.get.email_data();
-            return <any> Thread.detectTeam(Login.myTeams(), emailData)
-              .then(function (detectedTeam) {
-                return detectedTeam.team;
-              });
-          }
+        return findTeamWithTask(threadId).then(function (team) {
+          return team.match({
+            some : function (team) {
+              return <any> team;
+            },
+            none : function () {
+              var emailData = esperGmail.get.email_data();
+              return <any> Thread.detectTeam(Login.myTeams(), emailData)
+                .then(function (detectedTeam) {
+                  return detectedTeam.team;
+                });
+            }
+          });
         });
       }
     });
   }
+
+
+  /** Look for a team that has a task for the given thread. If there
+   *  are multiple such teams, return the first one.
+   */
+  function findTeamWithTask(threadId : string)
+    : JQueryPromise<Option.T<ApiT.Task>> {
+      return Api.getTaskListForThread(threadId, false, false).then(function(tasks) {
+        var hasTask = tasks.length > 0;
+
+        if (hasTask) {
+          var task = tasks[0];
+          return Option.some(List.find(Login.myTeams(), function(team) {
+            return team.teamid === task.task_teamid;
+          }));
+        } else {
+          return Option.none();
+        }
+      });
+    }
 
   /** If there is no current task, fetches it from the server and
    *  updates the cached value, as long as there is a valid team.
