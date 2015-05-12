@@ -437,19 +437,24 @@ module Esper.Sidebar {
     Util.repeatUntil(20, 500, retry);
   }
 
-  var alreadyInitialized = false;
+  var initJob: JQueryPromise<void>;
 
-  export function init() {
-    if (!alreadyInitialized) {
-      alreadyInitialized = true;
-      Teams.initialize();
-      Log.d("Sidebar.init()");
+  export function init(): JQueryPromise<void> {
+    if (initJob) {
+      return initJob;
+    } else {
+      Log.d("Initializing sidebar");
+      initJob = Teams.initialize().done(function() {
+        Log.d("Sidebar.init()");
 
-      CurrentThread.threadId.watch(function (newThreadId) {
+        CurrentThread.threadId.watch(function (newThreadId) {
+          maybeUpdateView();
+        });
+
         maybeUpdateView();
       });
 
-      maybeUpdateView();
+      return initJob;
     }
   }
 }
