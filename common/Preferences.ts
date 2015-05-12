@@ -34,20 +34,26 @@ module Esper.Preferences {
   }
 
   // Phone and video calls
-  export function contactInfo(prefs: ApiT.Preferences): string[] {
+  export function contactInfo(team, prefs: ApiT.Preferences): string[] {
+    var execName =
+      team.team_name.indexOf(" ") !== -1 ?
+      team.team_name.slice(" ")[0] :
+      team.team_name;
     var contacts = [];
     var types = prefs.meeting_types;
     if (types.phone_call) {
       var numbers = List.filterMap(types.phone_call.phones, function(p) {
         if (p.share_with_guests) {
-          return "Call EXEC at " + p.phone_number + " (" + p.phone_type + ")";
+          return "Call " + execName + " at " +
+                 p.phone_number + " (" + p.phone_type + ")";
         } else return null;
       });
       contacts = contacts.concat(numbers);
     }
     if (types.video_call) {
       var handles = List.map(types.video_call.accounts, function(a) {
-        return "Call EXEC at " + a.video_username + " (" + a.video_type + ")";
+        return "Call " + execName + " at " +
+               a.video_username + " (" + a.video_type + ")";
       });
       contacts = contacts.concat(handles);
     }
