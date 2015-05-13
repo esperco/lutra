@@ -112,7 +112,7 @@ module Esper.CurrentThread {
     }
   }
 
-  /** Returns a list of all the poeple invloved in the current thread
+  /** Returns a list of all the people involved in the current thread
    *  excluding the exec and any assistants.
    *
    *  Returns [] if we can't get the thread data for some reason (ie
