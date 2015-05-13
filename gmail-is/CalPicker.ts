@@ -75,6 +75,9 @@ module Esper.CalPicker {
     });
 
     CurrentThread.withPreferences(function (prefs) {
+'''
+<option #option></option>
+'''
       var places = Preferences.workplaceMap(prefs);
 
       for (var title in places) {
