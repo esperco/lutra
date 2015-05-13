@@ -222,34 +222,33 @@ module Esper.ComposeControls {
 
   /** */
   function askExecButton(composeControls) {
-    CurrentThread.getCurrentExecutive().done(function (exec) {
-      exec.match({
-        some : function (executive) {
+    var exec = CurrentThread.getCurrentExecutive();
+    exec.match({
+      some : function (executive) {
 '''
 <div #askButton title class="esper-composition-button">
   <object #askIcon class="esper-svg esper-composition-button-icon"/>
 </div>
 '''
-          askIcon.attr("data", Init.esperRootUrl + "img/info.svg");
+        askIcon.attr("data", Init.esperRootUrl + "img/info.svg");
 
-          askButton.tooltip({
-            show: { delay: 500, effect: "none" },
-            hide: { effect: "none" },
-            "content": "Ask question with choices on phone app",
-            "position": { my: 'center bottom', at: 'center top-1' },
-            "tooltipClass": "esper-top esper-tooltip"
-          });
+        askButton.tooltip({
+          show: { delay: 500, effect: "none" },
+          hide: { effect: "none" },
+          "content": "Ask question with choices on phone app",
+          "position": { my: 'center bottom', at: 'center top-1' },
+          "tooltipClass": "esper-top esper-tooltip"
+        });
 
-          askButton.click(function() {
-            Gmail.threadContainer().append(ComposeHashtags.view(composeControls));
-          });
+        askButton.click(function() {
+          Gmail.threadContainer().append(ComposeHashtags.view(composeControls));
+        });
 
-          return Option.some(askButton);
-        },
-        none : function () {
-          return Option.none();
-        }
-      });
+        return Option.some(askButton);
+      },
+      none : function () {
+        return Option.none();
+      }
     });
   }
 

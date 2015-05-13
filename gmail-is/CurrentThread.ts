@@ -44,18 +44,17 @@ module Esper.CurrentThread {
    *  fired until this promise returns. (Isn't asynchronous
    *  programming in JavaScript fun?)
    */
-  export function setTeam(newTeam: ApiT.Team): JQueryPromise<Option.T<ApiT.Team>> {
-    if (newTeam) {
-      return Api.getProfile(newTeam.team_executive, newTeam.teamid).then(function (newExec) {
-        team.set(Option.some(newTeam));
+  export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
+    team.set(newTeam);
+
+    newTeam.match({
+      some : function (newTeam) {
         Menu.currentTeam.set(newTeam);
-        return Option.some(newTeam);
-      });
-    } else {
-      team.set(Option.none<ApiT.Team>());
-      Menu.currentTeam.set(null);
-      return Promise.defer(Option.none());
-    }
+      },
+      none : function () {
+        Menu.currentTeam.set(null);
+      }
+    });
   }
 
   /** Sets the threadId, making sure to update the team, executive and
@@ -72,9 +71,8 @@ module Esper.CurrentThread {
       findTeam(newThreadId).done(function (newTeam) {
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
-          setTeam(newTeam).done(function (newTeam) {
-            threadId.set(newThreadId);
-          });
+          setTeam(newTeam);
+          threadId.set(newThreadId);
         });
       });
     }
@@ -138,20 +136,29 @@ module Esper.CurrentThread {
   }
 
   /** Fetches the executive's profile for the given team. */
-  export function getExecutive(team : ApiT.Team) : JQueryPromise<ApiT.Profile> {
-    return Api.getProfile(team.teamid, team.team_executive);
+  export function getExecutive(team : ApiT.Team) : ApiT.Profile {
+    return Teams.getProfile(team.team_executive);
   }
 
   /** Gets the executive of the current team, if any. */
-  export function getCurrentExecutive() : JQueryPromise<Option.T<ApiT.Profile>> {
-    return team.get().match({
-      some : function (team) {
-        return getExecutive(team).then(function (exec) {
-          return Option.some(exec);
-        });
+  export function getCurrentExecutive() : Option.T<ApiT.Profile> {
+    return team.get().flatMap<ApiT.Profile>(function (team) {
+      return Option.wrap<ApiT.Profile>(Teams.getProfile(team.team_executive));
+    });
+  }
+
+    /** Returns whether the current thread has a message from the
+     *  current executive. If there is no team, the result is always
+     *  false.
+     */
+  export function hasMessageFromExecutive() : boolean {
+    return getCurrentExecutive().match({
+      some : function (executive) {
+        var emails = executive.other_emails.concat([executive.email]);
+        return Thread.hasMessageFrom(esperGmail.get.email_data(), emails);
       },
       none : function () {
-        return Promise.defer(Option.none());
+        return false;
       }
     });
   }
@@ -162,19 +169,18 @@ module Esper.CurrentThread {
    *  Returns [] if we can't get the thread data for some reason (ie
    *  gmail js has a problem).
    */
-  export function getExternalParticipants() : JQueryPromise<ApiT.Guest[]> {
+  export function getExternalParticipants() : ApiT.Guest[] {
     return team.get().match({
       some : function (team) {
-        return getExecutive(team).then(function (executive) {
-          var all = getParticipants();
-          return all.filter(function (participant) {
-            return participant.email != executive.email &&
-              team.team_email_aliases.indexOf(participant.email) == -1;
-          });
+        var executive = getExecutive(team);
+        var all = getParticipants();
+        return all.filter(function (participant) {
+          return participant.email != executive.email &&
+            team.team_email_aliases.indexOf(participant.email) == -1;
         });
       },
       none : function () {
-        return Promise.defer([]);
+        return [];
       }
     });
   }
@@ -234,14 +240,14 @@ module Esper.CurrentThread {
   // If we have a new task, we should ensure the team is consistent with it:
   task.watch(function (newTask, isValid) {
     if (isValid) {
-      setTeam(List.find(Login.myTeams(), function (team) {
+      setTeam(Option.wrap(List.find(Login.myTeams(), function (team) {
         return team.teamid == newTask.task_teamid;
-      }));
+      })));
     }
   });
 
   /** Returns the team for the current thread, if any. */
-  export function findTeam(threadId): JQueryPromise<ApiT.Team> {
+  export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return team.get().match({
       some : function (team) {
         return Promise.defer(team);
@@ -250,13 +256,13 @@ module Esper.CurrentThread {
         return findTeamWithTask(threadId).then(function (team) {
           return team.match({
             some : function (team) {
-              return <any> team;
+              return <any> Option.some(team);
             },
             none : function () {
               var emailData = esperGmail.get.email_data();
               return <any> Thread.detectTeam(Login.myTeams(), emailData)
                 .then(function (detectedTeam) {
-                  return detectedTeam.team;
+                  return Option.wrap(detectedTeam);
                 });
             }
           });
@@ -300,20 +306,23 @@ module Esper.CurrentThread {
     var newThreadId = newThreadId || threadId.get();
 
     return findTeam(newThreadId).then(function (team) {
-      if (team) {
-        var teamid = team.teamid;
-        var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
+      return team.match({
+        some : function (team) {
+          var teamid = team.teamid;
+          var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
 
-        // cast to <any> needed because promises are implicitly flattened (!)
-        return (<any> getTask(teamid, newThreadId, false, true)
-                .then(function(newTask) {
-                  task.set(newTask);
-                  return newTask;
-                }));
-      } else {
-        Log.i("Could not refresh task because no valid team was detected for the thread.");
-        return Promise.defer(null);
-      }
+          // cast to <any> needed because promises are implicitly flattened (!)
+          return (<any> getTask(teamid, newThreadId, false, true)
+                  .then(function(newTask) {
+                    task.set(newTask);
+                    return newTask;
+                  }));
+        },
+        none : function () {
+          Log.i("Could not refresh task because no valid team was detected for the thread.");
+          return Promise.defer(null);
+        }
+      });
     });
   }
 

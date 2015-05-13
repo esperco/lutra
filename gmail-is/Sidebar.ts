@@ -143,7 +143,7 @@ module Esper.Sidebar {
     dropdown.css("overflow", "auto");
 
     function onTeamSwitch(toTeam: ApiT.Team) {
-      CurrentThread.setTeam(toTeam);
+      CurrentThread.setTeam(Option.wrap(toTeam));
 
       dismissDropdowns();
       wrap.fadeOut(250);
@@ -410,8 +410,8 @@ module Esper.Sidebar {
 
         var teams = Login.myTeams();
 
-        // TODO: Determinw whether to create a task.
-        var autoTask = true;
+        // TODO: Remove autotask logic from Sidebar.ts?
+        var autoTask = CurrentThread.hasMessageFromExecutive();
 
         // TODO: Determine whether the team is "correct" (?)
         var correctTeam = true;
@@ -423,7 +423,7 @@ module Esper.Sidebar {
           none : function () {
             if (teams.length === 1) {
               Log.w("Team not detected, using one and only team.");
-              CurrentThread.setTeam(teams[0]);
+              CurrentThread.setTeam(Option.wrap(teams[0]));
             }
 
             displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
