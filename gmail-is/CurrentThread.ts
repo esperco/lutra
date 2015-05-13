@@ -256,13 +256,13 @@ module Esper.CurrentThread {
         return findTeamWithTask(threadId).then(function (team) {
           return team.match({
             some : function (team) {
-              return <any> Option.some(team);
+              return Option.some(team);
             },
             none : function () {
               var emailData = esperGmail.get.email_data();
-              return <any> Thread.detectTeam(Login.myTeams(), emailData)
+              return Thread.detectTeam(Login.myTeams(), emailData)
                 .then(function (detectedTeam) {
-                  return Option.wrap(detectedTeam);
+                  return Option.wrap(detectedTeam && detectedTeam.team);
                 });
             }
           });
