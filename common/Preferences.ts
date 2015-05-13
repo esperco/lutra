@@ -37,7 +37,7 @@ module Esper.Preferences {
   export function contactInfo(team, prefs: ApiT.Preferences): string[] {
     var execName =
       team.team_name.indexOf(" ") !== -1 ?
-      team.team_name.slice(" ")[0] :
+      team.team_name.split(" ")[0] :
       team.team_name;
     var contacts = [];
     var types = prefs.meeting_types;
