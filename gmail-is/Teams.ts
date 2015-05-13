@@ -18,6 +18,7 @@ module Esper.Teams {
     if (initJob && !force) {
       return initJob;
     } else {
+      Log.d("Initializing Teams");
       teams = Login.myTeams();
       var profilesJob =
         Profile.getAllProfiles(teams).done(function (profileList) {
@@ -35,8 +36,11 @@ module Esper.Teams {
         Promise.ignore(profilesJob),
         Promise.ignore(prefsJob)
       ]);
-      ourInitJob.done(function() { alreadyInitialized = true; });
-      return Promise.defer(null);
+      return ourInitJob.then(function() {
+        Log.d("Finished initializing teams.");
+        alreadyInitialized = true;
+        return;
+      });
     }
   }
 

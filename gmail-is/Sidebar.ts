@@ -51,7 +51,6 @@ module Esper.Sidebar {
   }
 
   function displayTeamSelector(teamsSection,
-                               myTeam: ApiT.Team,
                                team: ApiT.Team,
                                onTeamSwitch:
                                  (newTeam: ApiT.Team) => void) {
@@ -68,10 +67,21 @@ module Esper.Sidebar {
     teamName.text(team.team_name);
     teamExecEmail.text(email || "unknown email");
 
-    if (myTeam !== undefined && team.teamid === myTeam.teamid) {
-      selector.addClass("esper-selected");
-      teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
-    } else {
+    CurrentThread.team.get().match({
+      some : function (myTeam) {
+        if (team.teamid === myTeam.teamid) {
+          selector.addClass("esper-selected");
+          teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
+        } else {
+          teamNotSelected()
+        }
+      },
+      none : function () {
+        teamNotSelected();
+      }
+    });
+
+    function teamNotSelected() {
       teamCheck.hide();
       selector.click(function() { onTeamSwitch(team); });
     }
@@ -80,7 +90,6 @@ module Esper.Sidebar {
   }
 
   function displayDock(rootElement, sidebar,
-                       team: ApiT.Team,
                        threadId: string,
                        isCorrectTeam: boolean) {
 '''
@@ -134,7 +143,7 @@ module Esper.Sidebar {
     dropdown.css("overflow", "auto");
 
     function onTeamSwitch(toTeam: ApiT.Team) {
-      CurrentThread.setTeam(toTeam);
+      CurrentThread.setTeam(Option.wrap(toTeam));
 
       dismissDropdowns();
       wrap.fadeOut(250);
@@ -145,7 +154,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, toTeam, true, false, threadId);
+        displayTeamSidebar(rootElement, true, true, threadId);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -156,18 +165,20 @@ module Esper.Sidebar {
       else if (t2.team_name > t1.team_name) return -1;
       else return 0;
     });
-    teams.forEach(function(otherTeam) {
-      displayTeamSelector(teamsSection, team, otherTeam, onTeamSwitch);
+    teams.forEach(function(team) {
+      displayTeamSelector(teamsSection, team, onTeamSwitch);
     });
 
-
-    if (team === undefined) {
-      teamName.text("UNKNOWN TEAM");
-    } else {
-      // note if name is not set so that the assistant can fix it
-      var name = team.team_name || "Team name not set";
-      teamName.text(name);
-    }
+    CurrentThread.team.get().match({
+      some : function (team) {
+        // note if name is not set so that the assistant can fix it
+        var name = team.team_name || "Team name not set";
+        teamName.text(name);
+      },
+      none : function () {
+        teamName.text("UNKNOWN TEAM");
+      }
+    });
 
     logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
 
@@ -229,29 +240,33 @@ module Esper.Sidebar {
       Menu.create();
     });
 
-    if (team !== undefined) {
-      Api.getCustomerStatus(team.teamid).done(function(customer) {
-        var sub = customer.status;
-        if (sub === "Past_due" || sub === "Canceled"
-            || sub === "Unpaid" || sub === undefined) {
-          view.removeClass("esper-team-warning")
-              .addClass("esper-team-danger");
-        } else if (!isCorrectTeam) {
-          view.addClass("esper-team-warning")
-              .removeClass("esper-team-danger");
-        } else {
-          view.removeClass("esper-team-warning")
-              .removeClass("esper-team-danger");
-        }
+    CurrentThread.team.get().match({
+      some : function (team) {
+        Api.getCustomerStatus(team.teamid).done(function(customer) {
+          var sub = customer.status;
+
+          if (sub === "Past_due" || sub === "Canceled" ||
+              sub === "Unpaid" || sub === undefined) {
+            view.removeClass("esper-team-warning")
+                .addClass("esper-team-danger");
+          } else if (!isCorrectTeam) {
+            view.addClass("esper-team-warning")
+                .removeClass("esper-team-danger");
+          } else {
+            view.removeClass("esper-team-warning")
+                .removeClass("esper-team-danger");
+          }
+
+          rootElement.append(view);
+        });
+      },
+      none : function () {
         rootElement.append(view);
-      });
-    } else {
-      rootElement.append(view);
-    }
+      }
+    });
   }
 
   function displaySidebar(rootElement,
-                          team: ApiT.Team,
                           threadId: string,
                           autoTask: boolean,
                           linkedEvents: ApiT.EventWithSyncInfo[]) {
@@ -288,14 +303,19 @@ module Esper.Sidebar {
       $(tab).click(function () { console.log(i); switchTab(i) });
     });
 
-    if (team !== undefined) {
-      TaskTab.displayTaskTab(taskContent, team, threadId,
-                             autoTask, linkedEvents);
-      userContent.append(UserTab.viewOfUserTab(team).view);
-      GroupScheduling.afterInitialize(function () {
-        groupContent.append(GroupTab.container());
-      });
-    }
+    CurrentThread.team.get().match({
+      some : function  (team) {
+        TaskTab.displayTaskTab(taskContent, team, threadId,
+                               autoTask, linkedEvents);
+        userContent.append(UserTab.viewOfUserTab(team).view);
+        GroupScheduling.afterInitialize(function () {
+          groupContent.append(GroupTab.container());
+        });
+      },
+      none : function () {
+        // Don't display sidebar if no team is set.
+      }
+    });
 
     rootElement.append(view);
 
@@ -331,149 +351,90 @@ module Esper.Sidebar {
   }
 
   function displayTeamSidebar(rootElement,
-                              team: ApiT.Team,
                               isCorrectTeam: boolean,
                               autoTask: boolean,
                               threadId) {
     Log.d("displayTeamSidebar()");
-    if (team !== undefined) CurrentThread.setTeam(team);
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
-      if (status_.must_upgrade === true) {
+      if (status_.must_upgrade) {
         displayUpdateDock(rootElement, status_.download_page);
-      } else if (team === undefined) {
-        var sidebar = displaySidebar(rootElement, team, threadId,
-                                     autoTask, []);
-        displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
-        $(".esper-dock-wrap").hide();
       } else {
-        Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-          .done(function(linkedEvents) {
-            var sidebar = displaySidebar(rootElement, team, threadId,
-                                         autoTask,
-                                         linkedEvents);
-            displayDock(rootElement, sidebar, team, threadId, isCorrectTeam);
-            sidebar.show("slide", { direction: "down" }, 250);
+        CurrentThread.team.get().match({
+          some : function (team) {
+            Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+              .done(function(linkedEvents) {
+                var sidebar = displaySidebar(rootElement, threadId, autoTask, linkedEvents);
+                displayDock(rootElement, sidebar, threadId, isCorrectTeam);
+                sidebar.show("slide", { direction: "down" }, 250);
+              });
+          },
+          none : function () {
+            var sidebar = displaySidebar(rootElement, threadId, autoTask, []);
+            displayDock(rootElement, sidebar, threadId, isCorrectTeam);
+            $(".esper-dock-wrap").hide();
+          }
         });
       }
     });
-  }
-
-  /* Look for a team that has a task for the given thread.
-   * If there are multiple such teams, return the first one. */
-  export function findTeamWithTask(teams : ApiT.Team[], threadId : string) {
-    return Api.getTaskListForThread(threadId, false, false)
-      .then(function(tasks) {
-        var hasTask = tasks.length > 0;
-        if (hasTask) {
-          var task = tasks[0];
-          return List.find(teams, function(team) {
-            return team.teamid === task.task_teamid;
-          });
-        }
-        else {
-          return undefined;
-        }
-      });
   }
 
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
     function retry() {
       Log.d("Trying to display Esper sidebar...");
-      var emailData = esperGmail.get.email_data();
-
-      if (emailData !== undefined && emailData.first_email !== undefined) {
-
-        var rootElement = insertEsperRoot();
-        if (rootElement === undefined) {
-          return false;
-        }
-        else {
-          var threadId = emailData.first_email;
-          CurrentThread.setThreadId(threadId);
-          var subject = emailData.subject;
-          Log.d("Using new thread ID " + threadId + "; Subject: " + subject);
-          ActiveThreads.handleNewActiveThread(threadId, subject);
-
-          var links = $("div").find("a");
-          var threadLinks = List.filter(links, function(link) {
-            var url = $(link).attr("href");
-            if (typeof url === "string") {
-              return url.substring(0,30) === "http://mail.google.com/mail/u/";
-            } else {
-              return false;
-            }
-          });
-          List.iter(threadLinks, function(link) {
-            var url = $(link).attr("href");
-            var len = url.length;
-            $(link).click(function(e) {
-              e.stopPropagation();
-              window.location.hash = "#all/" + url.substring(len - 16, len);
-              return false;
-            });
-          });
-
-          var teams = Login.myTeams();
-          Thread.detectTeam(teams, emailData)
-            .done(function(x: Thread.DetectedTeam) {
-              Log.d("Detected team:", x);
-              var team =
-                x === undefined ? undefined : x.team;
-              var hasMsgFromExec =
-                x === undefined ? false : x.hasMsgFromExec;
-
-              var autoTask = hasMsgFromExec;
-
-              if (team === undefined && teams.length === 1) {
-                Log.w("Team not detected, using one and only team.");
-                team = teams[0];
-              }
-
-              var correctTeam = team !== undefined;
-
-              if (!correctTeam && teams.length >= 1) {
-                /* If we can't detect the team based on the sender's email,
-                 * check if one of our teams has an existing task for this
-                 * thread. */
-                findTeamWithTask(teams, threadId).done(function(foundTeam) {
-                  if (foundTeam === undefined) {
-                    Log.w("Team not detected.");
-                  } else {
-                    Log.w("Selected team based on already existing task.");
-                    correctTeam = true;
-                    team = foundTeam;
-                  }
-                  displayTeamSidebar(rootElement, team,
-                                     correctTeam, autoTask, threadId);
-                });
-              } else if (correctTeam) {
-                displayTeamSidebar(rootElement, team,
-                                   correctTeam, autoTask, threadId);
-              }
-            });
-          return true;
-        }
-      }
-      else {
+      var rootElement = insertEsperRoot();
+      if (rootElement === undefined) {
         return false;
+      } else {
+        var threadId = CurrentThread.threadId.get();
+
+        var links = $("div").find("a");
+        var threadLinks = List.filter(links, function(link) {
+          var url = $(link).attr("href");
+          if (typeof url === "string") {
+            return url.substring(0,30) === "http://mail.google.com/mail/u/";
+          } else {
+            return false;
+          }
+        });
+        List.iter(threadLinks, function(link) {
+          var url = $(link).attr("href");
+          var len = url.length;
+          $(link).click(function(e) {
+            e.stopPropagation();
+            window.location.hash = "#all/" + url.substring(len - 16, len);
+            return false;
+          });
+        });
+
+        var teams = Login.myTeams();
+
+        // TODO: Remove autotask logic from Sidebar.ts?
+        var autoTask = CurrentThread.hasMessageFromExecutive();
+
+        // TODO: Determine whether the team is "correct" (?)
+        var correctTeam = true;
+
+        CurrentThread.team.get().match({
+          some : function (team) {
+            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+          },
+          none : function () {
+            if (teams.length === 1) {
+              Log.w("Team not detected, using one and only team.");
+              CurrentThread.setTeam(Option.wrap(teams[0]));
+            }
+
+            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+          }
+        });
+
+        return true;
       }
     }
 
     Util.repeatUntil(20, 500, retry);
-  }
-
-  function listen() {
-    esperGmail.on.open_email(function(id, url, body, xhr) {
-      Log.d("Opened email " + id, url, body);
-      maybeUpdateView();
-    });
-    window.onhashchange = function() {
-      Log.d("URL changed");
-      CurrentThread.setThreadId(null);
-      maybeUpdateView();
-    };
   }
 
   var initJob: JQueryPromise<void>;
@@ -484,9 +445,15 @@ module Esper.Sidebar {
     } else {
       Log.d("Initializing sidebar");
       initJob = Teams.initialize().done(function() {
-        listen();
+        Log.d("Sidebar.init()");
+
+        CurrentThread.threadId.watch(function (newThreadId) {
+          maybeUpdateView();
+        });
+
         maybeUpdateView();
       });
+
       return initJob;
     }
   }

@@ -6,7 +6,7 @@ gmail-is: build
 	$(MAKE) install
 
 # Build only
-build: js/gmail-is.js
+build: js/gmail-is.js Makefile
 
 # External JavaScript libraries (needed at runtime only).
 # sha1 is part of cryptojs.
@@ -72,7 +72,6 @@ APP_SOURCES = \
   Timezone \
   Gmail \
   Thread \
-  ActiveThreads \
   CalCache \
   CalPicker \
   CalSearch \
@@ -81,6 +80,7 @@ APP_SOURCES = \
   ComposeControls \
   ComposeToolbar \
   CurrentThread \
+  ActiveThreads \
   FinalizeEvent \
   InviteControls \
   EventControls \
