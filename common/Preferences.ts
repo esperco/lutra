@@ -33,6 +33,17 @@ module Esper.Preferences {
     return places;
   }
 
+  /** Returns a map of workplace names to workplaces. */
+  export function workplaceMap(prefs: ApiT.Preferences) {
+    var map = {};
+
+    prefs.workplaces.forEach(function (workplace) {
+      map[workplace.location.title] = workplace;
+    });
+
+    return map;
+  }
+
   // Phone and video calls
   export function contactInfo(team, prefs: ApiT.Preferences): string[] {
     var execName =

@@ -250,7 +250,7 @@ module Esper.CurrentThread {
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return team.get().match({
       some : function (team) {
-        return Promise.defer(team);
+        return Promise.defer(Option.some(team));
       },
       none : function () {
         return findTeamWithTask(threadId).then(function (team) {
@@ -337,8 +337,9 @@ module Esper.CurrentThread {
   export function withPreferences(callback) {
     team.get().match({
       some : function (team) {
-        var prefs = Teams.getTeamPreferences(team);
-        callback(prefs);
+        Preferences.get(team.teamid).done(function (prefs) {
+          callback(prefs);
+        });
       },
       none : function () {
         alert("Cannot get preferences because no team currently detected.");

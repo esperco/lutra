@@ -57,7 +57,7 @@ module Esper.CalPicker {
       .html("all-day<br/>(" + showZoneAbbr + ")");
   }
 
-  /** A set of 9 (!) buttons to choose the meeting type. */
+  /** The dropdown menu to select a meeting type or workplace. */
   function meetingTypeMenu() {
 '''
 <select #container class="esper-select">
@@ -72,6 +72,19 @@ module Esper.CalPicker {
       option.text(type.replace("_", " "));
       option.attr("value", type);
       container.append(option);
+    });
+
+    CurrentThread.withPreferences(function (prefs) {
+'''
+<option #option></option>
+'''
+      var places = Preferences.workplaceMap(prefs);
+
+      for (var title in places) {
+        option.text(title);
+        option.attr("value", title);
+        container.append(option);
+      }
     });
 
     Sidebar.customizeSelectArrow(container);
