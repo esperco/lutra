@@ -620,7 +620,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Gmail.threadFooter().css("padding-bottom", "10px");
   }
 
-  function viewPersonInvolved(peopleInvolved, email, name) {
+  export function viewPersonInvolved(peopleInvolved, email, name, checked?) {
 '''
 <li #viewPerson>
   <label #labelPerson>
@@ -631,6 +631,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     var display = 0 < name.length ? name + " <" + email + ">" : email;
     // createTextNode escapes the text, preventing potential injection attacks
     labelPerson.append(document.createTextNode(display));
+    if (checked) checkPerson.attr("checked", true);
 
     checkPerson.change(function() {
       if (undefined === peopleInvolved[email] && checkPerson.is(":checked")) {

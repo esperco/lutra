@@ -45,6 +45,20 @@ module Esper.EventControls {
           <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
         </div>
       </div>
+      <div class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Guests</div>
+        <div class="esper-ev-modal-right">
+          <ul #viewPeopleInvolved/>
+          <br/>
+          <input #newGuestName class="esper-input esper-ev-modal-small"
+                 type="text" placeholder="Name"/>
+          <input #newGuestEmail class="esper-input esper-ev-modal-small"
+                 type="text" placeholder="Email"/>
+          <button #addGuest class="esper-btn esper-btn-secondary">
+            Add
+          </button>
+        </div>
+      </div>
       <div class="esper-modal-footer esper-clearfix">
         <button #save class="esper-btn esper-btn-primary modal-primary">
           Save
@@ -122,6 +136,37 @@ module Esper.EventControls {
           });
         }
 
+        var peopleInvolved = {};
+        Log.d(event);
+        var participants = event.guests;
+        if (participants.length > 0) {
+          List.iter(participants, function (participant) {
+            var name = participant.display_name || "";
+            var checked = true;
+            var v = InviteControls.viewPersonInvolved(peopleInvolved,
+                                                      participant.email,
+                                                      name, checked);
+            viewPeopleInvolved.append(v);
+          });
+        } else {
+          viewPeopleInvolved
+            .append($("<li class='esper-gray'>No guests found</li>"));
+        }
+
+        addGuest.click(function() {
+          var name  = newGuestName.val();
+          var email = newGuestEmail.val();
+          peopleInvolved[email] = name;
+          if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
+
+          var checked = true;
+          var v = InviteControls.viewPersonInvolved(peopleInvolved, email,
+                                                    name, checked);
+          viewPeopleInvolved.append(v);
+          newGuestName.val("");
+          newGuestEmail.val("");
+        });
+
         pubDescription.val(event.description);
 
         cancel.click(close);
@@ -152,6 +197,16 @@ module Esper.EventControls {
             };
             if (!location.address) location = null;
 
+            var guests = [];
+            for (var person in peopleInvolved) {
+              if (peopleInvolved.hasOwnProperty(person)) {
+                guests.push({
+                  display_name : peopleInvolved[person] || null,
+                  email        : person
+                });
+              }
+            }
+
             var e: ApiT.CalendarEventEdit = {
               google_cal_id: event.google_cal_id,
               start: evStart,
@@ -160,7 +215,7 @@ module Esper.EventControls {
               description: pubDescription.val(),
               location: location,
               all_day: event.all_day,
-              guests: []
+              guests: guests
             }
 
             var alias = fromSelect.val();
