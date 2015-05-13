@@ -262,8 +262,9 @@ module Esper.CurrentThread {
   export function withPreferences(callback) {
     team.get().match({
       some : function (team) {
-        var prefs = Teams.getTeamPreferences(team);
-        callback(prefs);
+        Preferences.get(team.teamid).done(function (prefs) {
+          callback(prefs);
+        });
       },
       none : function () {
         alert("Cannot get preferences because no team currently detected.");
