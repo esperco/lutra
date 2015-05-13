@@ -49,9 +49,8 @@ module Esper.Thread {
       });
   }
 
-  function hasMessageFrom(thread: esperGmail.get.Thread,
-                          emailAddresses: string[]):
-  boolean {
+  export function hasMessageFrom(thread: esperGmail.get.Thread,
+                          emailAddresses: string[]): boolean {
     var messages = thread.threads;
     for (var k in messages) {
       var msg: esperGmail.get.Message = messages[k];

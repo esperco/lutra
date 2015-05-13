@@ -6,7 +6,7 @@ gcal-is: build
 	$(MAKE) install
 
 # Build only
-build: js/gcal-is.js
+build: js/gcal-is.js Makefile
 
 # External JavaScript libraries (needed at runtime only).
 # sha1 is part of cryptojs.
