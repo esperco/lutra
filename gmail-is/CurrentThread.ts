@@ -250,7 +250,7 @@ module Esper.CurrentThread {
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return team.get().match({
       some : function (team) {
-        return Promise.defer(team);
+        return Promise.defer(Option.some(team));
       },
       none : function () {
         return findTeamWithTask(threadId).then(function (team) {
