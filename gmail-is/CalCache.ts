@@ -175,6 +175,7 @@ module Esper.CalCache {
   export interface Cache {
     get : (start : Date, end : Date) => ApiT.CalendarEvent[];
     fetch : (start : Date, end : Date) => JQueryPromise<ApiT.CalendarEvent[]>;
+    refresh : (start : Date, end : Date) => JQueryPromise<ApiT.CalendarEvent[]>;
     clear : () => void;
   }
 
@@ -186,6 +187,9 @@ module Esper.CalCache {
       },
       fetch: function(start, end) {
         return fetch(cache, teamid, calid, start, end, undefined);
+      },
+      refresh: function(start, end) {
+        return refresh(cache, teamid, calid, start, end);
       },
       clear: function() {
         clear(cache);
