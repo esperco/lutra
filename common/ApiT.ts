@@ -115,6 +115,7 @@ module Esper.ApiT {
     description?: string;
     location?: Location;
     all_day?: boolean;
+    guests: Guest[];
     transparent?: boolean;
   }
 
