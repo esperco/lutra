@@ -34,7 +34,7 @@ module Esper.EventControls {
         </div>
       </div>
       <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Created by</div>
+        <div class="esper-ev-modal-left esper-bold">Edited by</div>
         <div class="esper-ev-modal-right">
           <select #fromSelect class="esper-select"/>
         </div>

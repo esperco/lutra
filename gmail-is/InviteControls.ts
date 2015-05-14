@@ -177,7 +177,8 @@ module Esper.InviteControls {
           peopleInvolved[email] = name;
           if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
 
-          var v = viewPersonInvolved(peopleInvolved, email, name);
+          var checked = true;
+          var v = viewPersonInvolved(peopleInvolved, email, name, checked);
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
@@ -631,7 +632,10 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     var display = 0 < name.length ? name + " <" + email + ">" : email;
     // createTextNode escapes the text, preventing potential injection attacks
     labelPerson.append(document.createTextNode(display));
-    if (checked) checkPerson.attr("checked", true);
+    if (checked) {
+      checkPerson.attr("checked", true);
+      peopleInvolved[email] = name;
+    }
 
     checkPerson.change(function() {
       if (undefined === peopleInvolved[email] && checkPerson.is(":checked")) {
