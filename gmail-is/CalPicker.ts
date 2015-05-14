@@ -40,7 +40,8 @@ module Esper.CalPicker {
     locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
-    displayTz : JQuery;
+    execTz : JQuery;
+    guestTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
@@ -166,8 +167,12 @@ module Esper.CalPicker {
         <select #createdBy class="esper-select"/>
       </div>
       <div class="esper-event-settings-col">
-        <span class="esper-bold">Display timezone:</span>
-        <select #displayTz class="esper-select"/>
+        <span class="esper-bold">Executive timezone:</span>
+        <select #execTz class="esper-select"/>
+      </div>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Guest timezone:</span>
+        <select #guestTz class="esper-select"/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -193,7 +198,14 @@ module Esper.CalPicker {
       }
     });
     writeToCalendar = writes[0] || calendars[0];
-    showTimezone = prefs.general.current_timezone;
+
+    /* showTimezone: timezone used for the executive and for calendar display
+       guestTimezone: timezone used for the guests unless they have
+                      their own individual timezone, set later
+                      during event finalization */
+    showTimezone = eventPrefs.exec_timezone || prefs.general.current_timezone;
+    guestTimezone = eventPrefs.guest_timezone || showTimezone;
+
     showZoneAbbr = zoneAbbr(showTimezone);
 
     function searchLocation() {
@@ -298,9 +310,9 @@ module Esper.CalPicker {
       var abbr = zoneAbbr(tz);
       $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
         .attr("selected", tz === showTimezone)
-        .appendTo(displayTz);
+        .appendTo(execTz);
     });
-    displayTz.change(function() {
+    execTz.change(function() {
       var tz = $(this).val();
       showTimezone = tz;
       showZoneAbbr = zoneAbbr(tz);
