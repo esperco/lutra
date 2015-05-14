@@ -36,6 +36,8 @@ module Esper.CalPicker {
     dateJumper : JQuery;
     eventTitle : JQuery;
     eventLocation : JQuery;
+    locationDropdown : JQuery;
+    locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
     displayTz : JQuery;
@@ -55,7 +57,7 @@ module Esper.CalPicker {
       .html("all-day<br/>(" + showZoneAbbr + ")");
   }
 
-  /** A set of 9 (!) buttons to choose the meeting type. */
+  /** The dropdown menu to select a meeting type or workplace. */
   function meetingTypeMenu() {
 '''
 <select #container class="esper-select">
@@ -72,9 +74,65 @@ module Esper.CalPicker {
       container.append(option);
     });
 
+    CurrentThread.withPreferences(function (prefs) {
+'''
+<option #option></option>
+'''
+      var places = Preferences.workplaceMap(prefs);
+
+      for (var title in places) {
+        option.text(title);
+        option.attr("value", title);
+        container.append(option);
+      }
+    });
+
     Sidebar.customizeSelectArrow(container);
 
     return container;
+  }
+
+  function displayLocationSearchResults(team, locationBox, dropdown,
+                                        results, query, prefs) {
+    results.find(".esper-li").remove();
+    var locs = Preferences.savedPlaces(prefs);
+    var nums = Preferences.contactInfo(team, prefs);
+    nums.push("Call GUEST at TBD");
+    var hasResult = false;
+
+    List.iter(locs, function(loc) {
+      var addr = loc.address.slice(0);
+      if (loc.title) addr = loc.title + " - " + addr;
+      if (addr.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        $("<li class='esper-li'>" + addr + "</li>")
+          .appendTo(results)
+          .click(function() {
+            locationBox.val(addr);
+            Sidebar.dismissDropdowns();
+          });
+        hasResult = true;
+      }
+    });
+
+    List.iter(nums, function(num) {
+      if (num.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+        $("<li class='esper-li'>" + num + "</li>")
+          .appendTo(results)
+          .click(function() {
+            locationBox.val(num);
+            Sidebar.dismissDropdowns();
+          });
+        hasResult = true;
+      }
+    });
+
+    if (hasResult) {
+      if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
+      dropdown.addClass("esper-open");
+    } else {
+      if (dropdown.hasClass("esper-open")) dropdown.toggle();
+      dropdown.removeClass("esper-open");
+    }
   }
 
   function createView(refreshCal: JQuery,
@@ -91,6 +149,10 @@ module Esper.CalPicker {
         <br/>
         <span class="esper-bold">Location:</span>
         <input #eventLocation type="text" size="24" class="esper-input"/>
+        <ul #locationDropdown
+            class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
+          <div #locationSearchResults class="esper-dropdown-section"/>
+        </ul>
         <br/>
         <span class="esper-bold">Thread participants:</span>
         <span #guestNames/>
@@ -133,6 +195,14 @@ module Esper.CalPicker {
     writeToCalendar = writes[0] || calendars[0];
     showTimezone = prefs.general.current_timezone;
     showZoneAbbr = zoneAbbr(showTimezone);
+
+    function searchLocation() {
+      var query = eventLocation.val();
+      displayLocationSearchResults(team, eventLocation, locationDropdown,
+                                   locationSearchResults, query, prefs);
+    }
+    Util.afterTyping(eventLocation, 250, searchLocation);
+    eventLocation.click(searchLocation);
 
     List.iter(calendars, function(cal, i) {
 '''

@@ -20,8 +20,10 @@ module Esper.BackgroundEvents {
     var end   = end.startOf('day');
 
     CurrentThread.withPreferences(function (preferences) {
-      var meeting  = preferences.meeting_types[eventType];
-      if (meeting && meeting.available && meeting.availability) {
+      var places = Preferences.workplaceMap(preferences);
+      var meeting = preferences.meeting_types[eventType] || places[eventType];
+
+      if (meeting && (meeting.available !== false) && meeting.availability) {
         var times = [];
 
         for (var day = moment(start); day.isBefore(end); day.add("days", 1)) {

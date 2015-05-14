@@ -15,6 +15,21 @@ module Esper.Option {
         return matcher.none();
       }
     }
+
+    /** Monadic bind for Option.T, but `bind' is already used in the
+     *  JavaScript standard library for something else, so I called
+     *  this flatMap à la Scala to avoid confusion.
+     */
+    flatMap<B>(f : (x : E) => T<B>) : T<B> {
+      return this.match({
+        some : function (x) {
+          return f(x);
+        },
+        none : function () {
+          return Option.none<B>();
+        }
+      });
+    }
   }
 
   export function some<E>(x : E) : T<E> {
@@ -23,5 +38,16 @@ module Esper.Option {
 
   export function none<E>() : T<E> {
     return new T(null, false);
+  }
+
+  /** Wraps a potentially null value into an Option. It's Option.none
+   *  if the value is null or undefined.
+   */
+  export function wrap<E>(x : E) : T<E> {
+    if (x === null || x === undefined) {
+      return Option.none<E>();
+    } else {
+      return Option.some(x);
+    }
   }
 }

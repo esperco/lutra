@@ -2,6 +2,12 @@ module Esper.ActiveThreads {
 
   var activeEvents: LRU.C<Types.Visited<Types.GmailThread>>;
 
+  CurrentThread.threadId.watch(function (newThreadId) {
+    var subject = esperGmail.get.email_data().subject;
+    Log.d("Using new thread ID " + newThreadId + "; Subject: " + subject);
+    handleNewActiveThread(newThreadId, subject);
+  });
+
   function getCache() {
     if (activeEvents === undefined) {
       activeEvents =
