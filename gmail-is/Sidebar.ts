@@ -154,7 +154,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, true, true, threadId);
+        displayTeamSidebar(rootElement, true, false, threadId);
       }
       setTimeout(afterAnimation, 250);
     }
