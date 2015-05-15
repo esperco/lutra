@@ -470,7 +470,7 @@ module Esper.CalPicker {
       List.map(Object.keys(showCalendars), function(calid) {
         var cache = CalCache.getCache(team.teamid, calid);
         if (refreshCache) {
-          return cache.fetch(start, end).then(function(calEvents) {
+          return cache.refresh(start, end).then(function(calEvents) {
             return addTZToEvents(calid, calEvents);
           });
         } else {
@@ -519,6 +519,7 @@ module Esper.CalPicker {
                          picker : PickerView) {
     var calendarView = picker.calendarView;
     var calendarJump = picker.dateJumper;
+    refreshCache = true;
 
     function setEventMoments(startMoment, endMoment, eventId) {
       if (eventId !== undefined) removeEvent(picker, eventId);
