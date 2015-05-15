@@ -246,6 +246,19 @@ module Esper.CurrentThread {
     }
   });
 
+  /** We cache the event preferences here until the current task changes */
+  var noEventPrefs = Promise.defer(Option.none());
+  export var eventPrefs : JQueryPromise<Option.T<ApiT.EventPreferences>> =
+    noEventPrefs;
+
+  task.watch(function(newTask, isValid) {
+    if (isValid) {
+      eventPrefs = Api.getEventPrefs(newTask.taskid).then(Option.wrap);
+    } else {
+      eventPrefs = noEventPrefs;
+    }
+  });
+
   /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return team.get().match({

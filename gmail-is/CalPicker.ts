@@ -138,7 +138,8 @@ module Esper.CalPicker {
 
   function createView(refreshCal: JQuery,
                       userSidebar: UserTab.UserTabView,
-                      team: ApiT.Team) : PickerView {
+                      team: ApiT.Team,
+                      epref: ApiT.EventPreferences) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
@@ -203,8 +204,8 @@ module Esper.CalPicker {
        guestTimezone: timezone used for the guests unless they have
                       their own individual timezone, set later
                       during event finalization */
-    showTimezone = eventPrefs.exec_timezone || prefs.general.current_timezone;
-    guestTimezone = eventPrefs.guest_timezone || showTimezone;
+    showTimezone = epref.executive_timezone || prefs.general.current_timezone;
+    var guestTimezone = epref.guest_timezone || showTimezone;
 
     showZoneAbbr = zoneAbbr(showTimezone);
 
@@ -299,12 +300,35 @@ module Esper.CalPicker {
         return cal.calendar_timezone; // filtered out if undefined
       });
 
+    var guestPrefs = epref.guest_preferences;
+    var individualGuestZones = List.filterMap(guestPrefs, function(gpref) {
+      return gpref.timezone;
+    });
+
     /* List of timezones for the dropdown, starting with
        the default timezone which is the one from
        the executive's preferences */
     var dispZones =
-      List.union(List.union([showTimezone], calendarZones),
-                 popularZones);
+      List.unique(
+        List.concat([
+          [showTimezone],
+          calendarZones,
+          [guestTimezone],
+          individualGuestZones,
+          popularZones
+        ])
+      );
+
+    var guestZones =
+      List.unique(
+        List.concat([
+          [guestTimezone],
+          individualGuestZones,
+          [showTimezone],
+          calendarZones,
+          popularZones
+        ])
+      );
 
     List.iter(dispZones, function(tz) {
       var abbr = zoneAbbr(tz);
@@ -312,12 +336,22 @@ module Esper.CalPicker {
         .attr("selected", tz === showTimezone)
         .appendTo(execTz);
     });
+
     execTz.change(function() {
-      var tz = $(this).val();
+      var tz = execTz.val();
       showTimezone = tz;
       showZoneAbbr = zoneAbbr(tz);
       updateZoneAbbrDisplay();
       calendarView.fullCalendar("refetchEvents");
+      epref.executive_timezone = tz;
+      Api.putEventPrefs(epref);
+    });
+
+    guestTz.change(function() {
+      var tz = guestTz.val();
+      guestTimezone = tz;
+      epref.guest_timezone = tz;
+      Api.putEventPrefs(epref);
     });
 
     var guests = CurrentThread.getParticipants().map(function(guest) {
@@ -582,8 +616,9 @@ module Esper.CalPicker {
   */
   function createPicker(refreshCal: JQuery,
                         userSidebar: UserTab.UserTabView,
-                        team: ApiT.Team) : Picker {
-    var pickerView = createView(refreshCal, userSidebar, team);
+                        team: ApiT.Team,
+                        epref: ApiT.EventPreferences) : Picker {
+    var pickerView = createView(refreshCal, userSidebar, team, epref);
     setupCalendar(team, pickerView);
 
     // add the meeting type menu:
@@ -828,8 +863,9 @@ module Esper.CalPicker {
     return _view;
   }
 
-  export function createInline(task: ApiT.Task,
-                               threadId: string)
+  function createInlineSync(task: ApiT.Task,
+                            threadId: string,
+                            epref: ApiT.EventPreferences)
     : void
   {
 '''
@@ -864,7 +900,7 @@ module Esper.CalPicker {
         title.text("Create linked events");
 
         var userInfo = UserTab.viewOfUserTab(team);
-        var picker = createPicker(refreshCal, userInfo, team);
+        var picker = createPicker(refreshCal, userInfo, team, epref);
         calendar.append(picker.view);
 
         refreshCal.tooltip({
@@ -876,7 +912,7 @@ module Esper.CalPicker {
         });
 
         window.onresize = function(event) {
-          picker = createPicker(refreshCal, userInfo, team);
+          picker = createPicker(refreshCal, userInfo, team, epref);
           calendar.children().remove();
           calendar.append(picker.view);
           picker.render();
@@ -896,6 +932,21 @@ module Esper.CalPicker {
       none : function () {
         window.alert("Cannot create cal picker because no team is currently detected.");
       }
+    });
+  }
+
+  export function createInline(task: ApiT.Task,
+                               threadId: string): void
+  {
+    CurrentThread.eventPrefs.done(function(opt) {
+      opt.match({
+        some: function(epref) {
+          createInlineSync(task, threadId, epref);
+        },
+        none: function() {
+          alert("Uh oh, event preferences are not available");
+        }
+      });
     });
   }
 }
