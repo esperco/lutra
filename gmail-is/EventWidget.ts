@@ -1,9 +1,8 @@
-/** A widget for summarizing linked or recent events in the
- *  sidebar.
+/** A widget for summarizing linked events in the sidebar.
  */
 module Esper.EventWidget {
 
-  /** Displays an oval button to link unlinked (recent) events. */
+  /** Displays an oval button to link unlinked events. */
   export function displayLinkOptions(e: ApiT.CalendarEvent,
                               linkedEvents: ApiT.EventWithSyncInfo[],
                               team,
@@ -221,7 +220,6 @@ module Esper.EventWidget {
 
   export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
                               ev: ApiT.EventWithSyncInfo,
-                              recent,
                               last,
                               team: ApiT.Team,
                               threadId: string) {
@@ -235,13 +233,12 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, recent, last, team, threadId, title);
+    return base(linkedEvents, ev, last, team, threadId, title);
   }
 
   /** The base event widget with the given payload in the main div. */
   export function base(linkedEvents: ApiT.EventWithSyncInfo[],
                        ev: ApiT.EventWithSyncInfo,
-                       recent,
                        last,
                        team: ApiT.Team,
                        threadId: string,
@@ -268,13 +265,9 @@ module Esper.EventWidget {
 
     main.append(payload);
 
-    if (recent) {
-      view.append(displayLinkOptions(e, linkedEvents, team, threadId));
-    } else {
-      var evs = List.map(linkedEvents, function(ev) { return ev.event; });
-      main.prepend(displayEventChoose(view, e, evs, team));
-      main.prepend(displayEventOptions(view, ev, evs, team, threadId));
-    }
+    var evs = List.map(linkedEvents, function(ev) { return ev.event; });
+    main.prepend(displayEventChoose(view, e, evs, team));
+    main.prepend(displayEventOptions(view, ev, evs, team, threadId));
 
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;

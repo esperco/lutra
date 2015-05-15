@@ -27,7 +27,7 @@ module Esper.TaskTab {
         view.linked.show();
         Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
           .done(function() {
-            refreshEventLists(team, threadId, taskTab);
+            refreshLinkedEventsList(team, threadId, taskTab);
             CurrentThread.refreshTaskForThread(false);
             Api.syncEvent(team.teamid, threadId,
                           e.google_cal_id, e.google_event_id);
@@ -43,89 +43,6 @@ module Esper.TaskTab {
       return { id: e.google_event_id, item: item, lastVisited: time };
     });
     return Visited.merge(active, createdTimed, 5);
-  }
-
-  export function displayRecentsList(team: ApiT.Team,
-                                     threadId,
-                                     taskTab: TaskTabView,
-                                     linkedEvents: ApiT.EventWithSyncInfo[]) {
-'''
-  <div #noEvents class="esper-no-events">No recently viewed events</div>
-  <div #eventsList class="esper-events-list"/>
-'''
-    taskTab.refreshRecents.addClass("esper-disabled");
-    taskTab.recentsList.children().remove();
-    taskTab.recentsSpinner.show();
-
-    function renderNone() {
-      taskTab.recentsList.append(noEvents);
-      taskTab.recentsSpinner.hide();
-      taskTab.refreshRecents.removeClass("esper-disabled");
-    }
-
-    if (team === null || team === undefined) {
-      renderNone();
-      return;
-    }
-    var active = Login.getAccount().activeEvents;
-    if (active === null || active === undefined) {
-      renderNone();
-      return;
-    }
-    var events = active.calendars;
-    var activeEvents = [];
-    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-      var eventsForCal = events[cal.google_cal_id];
-      if (eventsForCal !== undefined) {
-        activeEvents = activeEvents.concat(eventsForCal);
-      }
-    });
-    if (activeEvents === []) {
-      renderNone();
-      return;
-    }
-
-    Api.getRecentlyCreatedEvents(team.teamid, team.team_calendars)
-      .done(function(created) {
-        var eventsForTeam: Types.Visited<Types.FullEventId>[] =
-          mergeActiveWithCreated(activeEvents, created.created_events);
-
-        var getEventCalls =
-          List.filterMap(
-            eventsForTeam,
-            function(e) {
-              var item = e.item; // compatibility check
-              if (item !== undefined) {
-                return Api.getEventDetails(team.teamid, item.calendarId,
-                                           team.team_calendars, item.eventId);
-              } else {
-                renderNone();
-                return;
-              }
-          });
-
-        Promise.join(getEventCalls).done(function(activeEvents) {
-          var i = 0;
-          var last = false;
-          var recent = true;
-          activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
-            var e = response.event_opt;
-            if (e === undefined) return; // event is deleted aka cancelled
-            if (i === activeEvents.length - 1) {
-              last = true;
-            }
-            var ev = { event : e, synced_threads : [] };
-            eventsList.append(
-              EventWidget.renderEvent(linkedEvents, ev, recent, last,
-                                      team, threadId));
-            i++;
-          });
-          taskTab.recentsList.children().remove();
-          taskTab.recentsList.append(eventsList);
-          taskTab.recentsSpinner.hide();
-          taskTab.refreshRecents.removeClass("esper-disabled");
-        });
-      });
   }
 
   /* reuse the view created for the team, update list of linked events */
@@ -147,11 +64,11 @@ module Esper.TaskTab {
       taskTab.linkedEventsList.append(noEvents);
     } else {
       var i = 0;
-      var recent, last = false;
+      var last = false;
       linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
         if (i === linkedEvents.length - 1) last = true;
 
-        eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
+        eventsList.append(EventWidget.renderEvent(linkedEvents, e, last,
                                                   team, threadId));
         i++;
       });
@@ -261,25 +178,6 @@ module Esper.TaskTab {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
-      });
-  }
-
-  /* Refresh only recent events, fetching linked events from the server. */
-  export function refreshRecentsList(team: ApiT.Team,
-                                     threadId, taskTab) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        displayRecentsList(team, threadId, taskTab, linkedEvents);
-      });
-  }
-
-  /* Refresh linked events and recent events, fetching linked events from
-     the server. */
-  export function refreshEventLists(team, threadId, taskTab) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-      .done(function(linkedEvents) {
-        displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
-        displayRecentsList(team, threadId, taskTab, linkedEvents);
       });
   }
 
@@ -483,14 +381,6 @@ module Esper.TaskTab {
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
-
-    recentsHeader: JQuery;
-    showRecents: JQuery;
-    refreshRecents: JQuery;
-    refreshRecentsIcon: JQuery;
-    recentsContainer: JQuery;
-    recentsSpinner: JQuery;
-    recentsList: JQuery;
   }
 
   export function displayTaskTab(tab1,
@@ -601,25 +491,6 @@ module Esper.TaskTab {
         <div #linkedEventsList/>
       </div>
     </div>
-    <hr class="esper-hr"/>
-    <div class="esper-section">
-      <div #recentsHeader
-           class="esper-section-header esper-clearfix esper-open">
-        <span #showRecents
-              class="esper-link" style="float:right">Hide</span>
-        <span class="esper-bold" style="float:left">Recents</span>
-        <div #refreshRecents
-             class="esper-refresh esper-clickable esper-disabled">
-          <object #refreshRecentsIcon class="esper-svg"/>
-        </div>
-      </div>
-      <div #recentsContainer class="esper-section-container">
-        <div #recentsSpinner class="esper-events-list-loading">
-          <div class="esper-spinner esper-list-spinner"/>
-        </div>
-        <div #recentsList/>
-      </div>
-    </div>
   </div>
 </div>
 '''
@@ -639,18 +510,16 @@ module Esper.TaskTab {
     );
 
     CurrentThread.onLinkedEventsChanged(function () {
-      refreshEventLists(team, threadId, taskTabView);
+      refreshLinkedEventsList(team, threadId, taskTabView);
     });
 
     refreshLinkedThreadsIcon.attr("data",
       Init.esperRootUrl + "img/refresh.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
-    refreshRecentsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
     displayLinkedEventsList(team, threadId, taskTabView, linkedEvents);
-    displayRecentsList(team, threadId, taskTabView, linkedEvents);
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedThreadsAction = function() {
@@ -673,14 +542,6 @@ module Esper.TaskTab {
       }
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
-
-    refreshRecents.click(function() {
-      refreshRecentsList(team, threadId, taskTabView);
-      if (recentsContainer.css("display") === "none") {
-        Sidebar.toggleList(recentsContainer);
-        showRecents.text("Hide");
-      }
-    });
 
     showTaskProgress.click(function() {
       Sidebar.toggleList(taskProgressContainer);
@@ -712,17 +573,6 @@ module Esper.TaskTab {
       } else {
         showLinkedEvents.text("Hide");
         linkActions.addClass("esper-open");
-      }
-    });
-
-    showRecents.click(function() {
-      Sidebar.toggleList(recentsContainer);
-      if (showRecents.text() === "Hide") {
-        showRecents.text("Show");
-        recentsHeader.removeClass("esper-open");
-      } else {
-        showRecents.text("Hide");
-        recentsHeader.addClass("esper-open");
       }
     });
 
@@ -814,18 +664,6 @@ module Esper.TaskTab {
       $("body").append(searchModal.view);
       searchModal.search.focus();
     });
-
-    /* Reuse the same watcherId in order to overwrite the previous
-       watcher for that same thread or any other thread,
-       since at most one thread is displayed at once.
-    */
-    var accountWatcherId = "TaskTab-account-watcher";
-    Login.watchableAccount.watch(function(newAccount, newValidity) {
-      if (newValidity === true && threadId === CurrentThread.threadId.get()) {
-        Log.d("Refreshing recently viewed events");
-        refreshRecentsList(team, threadId, taskTabView);
-      }
-    }, accountWatcherId);
 
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {

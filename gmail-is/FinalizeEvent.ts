@@ -209,7 +209,7 @@ module Esper.FinalizeEvent {
               }
 
               deleteHolds(event, preferences, function () {
-                TaskTab.refreshEventLists(team, threadId, taskTab);
+                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
               });
 
               confirmEvent(event, preferences);
