@@ -337,6 +337,13 @@ module Esper.CalPicker {
         .appendTo(execTz);
     });
 
+    List.iter(guestZones, function(tz) {
+      var abbr = zoneAbbr(tz);
+      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
+        .attr("selected", tz === guestTimezone)
+        .appendTo(guestTz);
+    });
+
     execTz.change(function() {
       var tz = execTz.val();
       showTimezone = tz;
