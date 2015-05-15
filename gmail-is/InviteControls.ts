@@ -201,10 +201,9 @@ module Esper.InviteControls {
 
           function searchLocation() {
             var query = pubLocation.val();
-            CalPicker.displayLocationSearchResults(team, pubLocation,
-                                                   locationDropdown,
-                                                   locationSearchResults, query,
-                                                   preferences);
+            LocSearch.displayResults(team, pubLocation, locationDropdown,
+                                     locationSearchResults, query,
+                                     preferences);
           }
           Util.afterTyping(pubLocation, 250, searchLocation);
           pubLocation.click(searchLocation);
