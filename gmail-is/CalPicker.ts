@@ -92,8 +92,8 @@ module Esper.CalPicker {
     return container;
   }
 
-  function displayLocationSearchResults(team, locationBox, dropdown,
-                                        results, query, prefs) {
+  export function displayLocationSearchResults(team, locationBox, dropdown,
+                                               results, query, prefs) {
     results.find(".esper-li").remove();
     var locs = Preferences.savedPlaces(prefs);
     var nums = Preferences.contactInfo(team, prefs);

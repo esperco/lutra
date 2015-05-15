@@ -49,6 +49,10 @@ module Esper.InviteControls {
         <div class="esper-ev-modal-left esper-bold">Location</div>
         <div class="esper-ev-modal-right">
           <input #pubLocation type="text" class="esper-input"/>
+          <ul #locationDropdown
+              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
+            <div #locationSearchResults class="esper-dropdown-section"/>
+          </ul>
         </div>
       </div>
       <div #calendarRow class="esper-ev-modal-row esper-clearfix">
@@ -194,6 +198,16 @@ module Esper.InviteControls {
             notDuplicate.appendTo(heading);
             calendarRow.remove();
           }
+
+          function searchLocation() {
+            var query = pubLocation.val();
+            CalPicker.displayLocationSearchResults(team, pubLocation,
+                                                   locationDropdown,
+                                                   locationSearchResults, query,
+                                                   preferences);
+          }
+          Util.afterTyping(pubLocation, 250, searchLocation);
+          pubLocation.click(searchLocation);
 
           next.click(function() {
             var guests = [];
