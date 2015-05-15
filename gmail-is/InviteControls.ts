@@ -46,7 +46,7 @@ module Esper.InviteControls {
         </div>
       </div>
       <div #whereRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Where</div>
+        <div class="esper-ev-modal-left esper-bold">Location</div>
         <div class="esper-ev-modal-right">
           <input #pubLocation type="text" class="esper-input"/>
         </div>
