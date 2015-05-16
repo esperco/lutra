@@ -80,6 +80,7 @@ APP_SOURCES = \
   ComposeControls \
   ComposeToolbar \
   CurrentThread \
+  PrefTimezone \
   ActiveThreads \
   FinalizeEvent \
   InviteControls \

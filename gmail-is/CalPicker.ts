@@ -946,15 +946,8 @@ module Esper.CalPicker {
   export function createInline(task: ApiT.Task,
                                threadId: string): void
   {
-    CurrentThread.eventPrefs.done(function(opt) {
-      opt.match({
-        some: function(epref) {
-          createInlineSync(task, threadId, epref);
-        },
-        none: function() {
-          alert("Uh oh, event preferences are not available");
-        }
-      });
+    CurrentThread.eventPrefs.then(Option.unwrap).done(function(epref) {
+      createInlineSync(task, threadId, epref);
     });
   }
 }

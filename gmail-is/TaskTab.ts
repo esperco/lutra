@@ -104,35 +104,38 @@ module Esper.TaskTab {
               }
           });
 
-        Promise.join(getEventCalls).done(function(activeEvents) {
-          var i = 0;
-          var last = false;
-          var recent = true;
-          activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
-            var e = response.event_opt;
-            if (e === undefined) return; // event is deleted aka cancelled
-            if (i === activeEvents.length - 1) {
-              last = true;
-            }
-            var ev = { event : e, synced_threads : [] };
-            eventsList.append(
-              EventWidget.renderEvent(linkedEvents, ev, recent, last,
-                                      team, threadId));
-            i++;
+        CurrentThread.eventPrefs.then(Option.unwrap).done(function(epref) {
+          Promise.join(getEventCalls).done(function(activeEvents) {
+            var i = 0;
+            var last = false;
+            var recent = true;
+            activeEvents.forEach(function(response: ApiT.CalendarEventOpt) {
+              var e = response.event_opt;
+              if (e === undefined) return; // event is deleted aka cancelled
+              if (i === activeEvents.length - 1) {
+                last = true;
+              }
+              var ev = { event : e, synced_threads : [] };
+              eventsList.append(
+                EventWidget.renderEvent(linkedEvents, ev, recent, last,
+                                        team, threadId, epref));
+              i++;
+            });
+            taskTab.recentsList.children().remove();
+            taskTab.recentsList.append(eventsList);
+            taskTab.recentsSpinner.hide();
+            taskTab.refreshRecents.removeClass("esper-disabled");
           });
-          taskTab.recentsList.children().remove();
-          taskTab.recentsList.append(eventsList);
-          taskTab.recentsSpinner.hide();
-          taskTab.refreshRecents.removeClass("esper-disabled");
         });
       });
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function displayLinkedEventsList(team: ApiT.Team,
-                                          threadId, taskTab: TaskTabView,
-                                          linkedEvents:
-                                          ApiT.EventWithSyncInfo[]) {
+  export function displayLinkedEventsList(
+    team: ApiT.Team,
+    threadId, taskTab: TaskTabView,
+    linkedEvents: ApiT.EventWithSyncInfo[]
+  ) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
@@ -146,16 +149,20 @@ module Esper.TaskTab {
     if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
     } else {
-      var i = 0;
-      var recent, last = false;
-      linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
-        if (i === linkedEvents.length - 1) last = true;
+      CurrentThread.eventPrefs.then(Option.unwrap).done(function(epref) {
+        var i = 0;
+        var recent, last = false;
+        linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+          if (i === linkedEvents.length - 1) last = true;
 
-        eventsList.append(EventWidget.renderEvent(linkedEvents, e, recent, last,
-                                                  team, threadId));
+          eventsList.append(
+            EventWidget.renderEvent(linkedEvents, e, recent, last,
+                                    team, threadId, epref)
+          );
         i++;
+        });
+        taskTab.linkedEventsList.append(eventsList);
       });
-      taskTab.linkedEventsList.append(eventsList);
     }
     taskTab.linkedEventsSpinner.hide();
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
