@@ -211,6 +211,7 @@ module Esper.CalPicker {
         pickerSwitcher.val(i);
       }
     }
+
     pickerSwitcher.change(function() {
       var i = $(this).val();
       writeToCalendar = calendars[i];
@@ -539,6 +540,12 @@ module Esper.CalPicker {
       meetingType = menu.val();
       pickerView.calendarView.fullCalendar("refetchEvents");
     });
+
+    var type = UserTab.currentMeetingType;
+    if (menu.find("option[value='" + type + "']").length > 0) {
+      meetingType = type;
+      menu.val(type);
+    }
 
     function render() {
       pickerView.calendarView.fullCalendar("render");

@@ -2,6 +2,8 @@
 
 module Esper.UserTab {
 
+  export var currentMeetingType : string = "other";
+
   function formatTime(hourMinute: ApiT.HourMinute) {
     return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
   }
@@ -500,6 +502,13 @@ module Esper.UserTab {
 
     drop.change(function() {
       var field = $(this).val();
+
+      if (isNaN(field)) {
+        currentMeetingType = field.toLowerCase().replace(/ /, "_");
+      } else {
+        currentMeetingType = workplaces[field].location.title;
+      }
+
       if (field === "header") {
         return;
       } else if (field === "phone_call") {
@@ -1030,16 +1039,13 @@ module Esper.UserTab {
       populateMeetingsDropdown(meetingSelector, meetingInfo,
                                meetingTypes, workplaces,
                                meeting_changes, workplace_changes);
+
+      // If we have a workplace, display that as the starting choice.
       if (workplaces.length > 0) {
-        displayWorkplace(meetingInfo, workplaces[0], workplace_changes);
         meetingSelector.val(0);
       }
-      else if (meetingTypes.phone_call !== undefined) {
-        displayPhoneInfo(meetingInfo,
-                         meetingTypes.phone_call,
-                         meeting_changes);
-        meetingSelector.val("phone_call");
-      }
+
+      meetingSelector.change(); // ensure this section is initialized correctly
 
       var transportationTypes = prefs.transportation.length;
       List.iter(prefs.transportation, function(type, i) {
