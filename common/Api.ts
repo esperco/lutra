@@ -216,16 +216,6 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(event));
   }
 
-  export function getRecentlyCreatedEvents(teamid, teamCalendars):
-  JQueryDeferred<ApiT.CreatedCalendarEvents> {
-    var cals = { google_cal_ids: calIds(teamCalendars) };
-    var url =
-      Conf.Api.url + "/api/calendar/events/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/recently-created";
-    return JsonHttp.post(url, JSON.stringify(cals));
-  }
-
   export function postCalendarShow(teamid, teamCalendars):
   JQueryDeferred<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };

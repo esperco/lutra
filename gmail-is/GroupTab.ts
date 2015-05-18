@@ -127,7 +127,7 @@ module Esper.GroupTab {
                   }, 100);
                 });
 
-                var widget = EventWidget.base(events, event, false, false,
+                var widget = EventWidget.base(events, event, false,
                                               team, threadId, statusGraph);
 
                 list.append($("<li>").append(widget));
