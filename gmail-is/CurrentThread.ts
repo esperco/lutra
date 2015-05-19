@@ -315,24 +315,22 @@ module Esper.CurrentThread {
   JQueryPromise<ApiT.Task> {
     var newThreadId = newThreadId || threadId.get();
 
-    return findTeam(newThreadId).then(function (team) {
-      return team.match({
-        some : function (team) {
-          var teamid = team.teamid;
-          var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
+    return team.get().match({
+      some : function (team) {
+        var teamid = team.teamid;
+        var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
 
-          // cast to <any> needed because promises are implicitly flattened (!)
-          return (<any> getTask(teamid, newThreadId, false, true)
-                  .then(function(newTask) {
-                    task.set(newTask);
-                    return newTask;
-                  }));
-        },
-        none : function () {
-          Log.i("Could not refresh task because no valid team was detected for the thread.");
-          return Promise.defer(null);
-        }
-      });
+        // cast to <any> needed because promises are implicitly flattened (!)
+        return (<any> getTask(teamid, newThreadId, false, true)
+                .then(function(newTask) {
+                  task.set(newTask);
+                  return newTask;
+                }));
+      },
+      none : function () {
+        Log.i("Could not refresh task because no valid team was detected for the thread.");
+        return Promise.defer(null);
+      }
     });
   }
 
