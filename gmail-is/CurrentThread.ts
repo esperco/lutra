@@ -48,8 +48,8 @@ module Esper.CurrentThread {
     team.set(newTeam);
 
     newTeam.match({
-      some : function (newTeam) {
-        Menu.currentTeam.set(newTeam);
+      some : function (team) {
+        Menu.currentTeam.set(team);
       },
       none : function () {
         Menu.currentTeam.set(null);
@@ -63,7 +63,7 @@ module Esper.CurrentThread {
   export function setThreadId(newThreadId) {
     if (!newThreadId) {
       task.set(null);
-      team.set(Option.none<ApiT.Team>());
+      setTeam(Option.none<ApiT.Team>());
       GroupScheduling.clear();
 
       threadId.set(newThreadId);
@@ -250,18 +250,28 @@ module Esper.CurrentThread {
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return team.get().match({
       some : function (team) {
+        Log.i("Found team already: " + team.team_name);
         return Promise.defer(Option.some(team));
       },
       none : function () {
         return findTeamWithTask(threadId).then(function (team) {
           return team.match({
             some : function (team) {
+              Log.i("Found team from findTeamWithTask: " + team.team_name);
               return <any> Promise.defer(Option.some(team));
             },
             none : function () {
               var emailData = esperGmail.get.email_data();
               return Thread.detectTeam(Login.myTeams(), emailData)
                 .then(function (detectedTeam) {
+                  if (detectedTeam) {
+                    Log.i("Guessed team with Thread.detectTeam: " +
+                          detectedTeam.team.team_name);
+                  } else {
+                    Log.i("Failed to guess team with Thread.detectTeam. (" +
+                          detectedTeam + ")");
+                  }
+
                   return <any> Option.wrap(detectedTeam && detectedTeam.team);
                 });
             }
