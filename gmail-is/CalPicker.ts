@@ -910,8 +910,8 @@ module Esper.CalPicker {
   export function createInline(task: ApiT.Task,
                                threadId: string): void
   {
-    CurrentThread.eventPrefs.then(Option.unwrap).done(function(epref) {
-      createInlineSync(task, threadId, epref);
+    CurrentThread.taskPrefs.then(Option.unwrap).done(function(tpref) {
+      createInlineSync(task, threadId, tpref);
     });
   }
 }

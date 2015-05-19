@@ -548,19 +548,19 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(groupEvent));
   }
 
-  function eventPrefsUrl(taskid: string) {
-    return Conf.Api.url + "/api/scheduling/event-prefs"
+  function taskPrefsUrl(taskid: string) {
+    return Conf.Api.url + "/api/scheduling/task-prefs"
       + "/" + string(Login.myUid())
       + "/" + string(taskid);
   }
 
-  export function getEventPrefs(taskid: string):
-  JQueryDeferred<ApiT.EventPreferences> {
-    return JsonHttp.get(eventPrefsUrl(taskid));
+  export function getTaskPrefs(taskid: string):
+  JQueryDeferred<ApiT.TaskPreferences> {
+    return JsonHttp.get(taskPrefsUrl(taskid));
   }
 
-  export function putEventPrefs(epref: ApiT.EventPreferences):
-  JQueryDeferred<ApiT.EventPreferences> {
-    return JsonHttp.put(eventPrefsUrl(epref.taskid), JSON.stringify(epref));
+  export function putTaskPrefs(tpref: ApiT.TaskPreferences):
+  JQueryDeferred<ApiT.TaskPreferences> {
+    return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
   }
 }
