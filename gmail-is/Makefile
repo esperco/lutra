@@ -73,6 +73,7 @@ APP_SOURCES = \
   Gmail \
   Thread \
   CalCache \
+  LocSearch \
   CalPicker \
   CalSearch \
   ObserveMessage \
