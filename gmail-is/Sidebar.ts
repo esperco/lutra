@@ -308,8 +308,8 @@ module Esper.Sidebar {
         TaskTab.displayTaskTab(taskContent, team, threadId,
                                autoTask, linkedEvents);
         userContent.append(UserTab.viewOfUserTab(team).view);
-        GroupScheduling.afterInitialize(function (epref) {
-          groupContent.append(GroupTab.container(epref));
+        GroupScheduling.afterInitialize(function (tpref) {
+          groupContent.append(GroupTab.container(tpref));
         });
       },
       none : function () {

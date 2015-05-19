@@ -4,7 +4,7 @@
 module Esper.GroupTab {
 
   /** Returns the top-level container for the group scheduling tab. */
-  export function container(epref: ApiT.EventPreferences) {
+  export function container(tpref: ApiT.TaskPreferences) {
 '''
 <div #container class="esper-tab-container">
   <div class="esper-section">
@@ -71,7 +71,7 @@ module Esper.GroupTab {
 
     guestSection.append(guestList(GroupScheduling.guests,
                                   GroupScheduling.addGuest));
-    timeSection.append(timeList(epref));
+    timeSection.append(timeList(tpref));
 
     return container;
   }
@@ -79,7 +79,7 @@ module Esper.GroupTab {
   /** The list of possible times for the group event which current
    *  corresponds to the linked events of the current task.
    */
-  function timeList(epref: ApiT.EventPreferences) {
+  function timeList(tpref: ApiT.TaskPreferences) {
 '''
 <div #container class="esper-group-options">
   <div #spinner class="esper-events-list-loading">
@@ -129,7 +129,7 @@ module Esper.GroupTab {
                 });
 
                 var widget = EventWidget.base(events, event, false,
-                                              team, threadId, epref,
+                                              team, threadId, tpref,
                                               statusGraph);
 
                 list.append($("<li>").append(widget));

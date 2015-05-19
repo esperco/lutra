@@ -448,7 +448,7 @@ module Esper.ApiT {
     timezone?: string;
   }
 
-  export interface EventPreferences {
+  export interface TaskPreferences {
     taskid: string;
     executive_timezone?: string;
     guest_timezone?: string;

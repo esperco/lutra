@@ -64,7 +64,7 @@ module Esper.TaskTab {
     if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
     } else {
-      CurrentThread.eventPrefs.then(Option.unwrap).done(function(epref) {
+      CurrentThread.taskPrefs.then(Option.unwrap).done(function(tpref) {
         var i = 0;
         var last = false;
         linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
@@ -72,7 +72,7 @@ module Esper.TaskTab {
 
           eventsList.append(
             EventWidget.renderEvent(linkedEvents, e, last,
-                                    team, threadId, epref)
+                                    team, threadId, tpref)
           );
           i++;
         });

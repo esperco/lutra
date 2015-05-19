@@ -223,7 +223,7 @@ module Esper.EventWidget {
                               last,
                               team: ApiT.Team,
                               threadId: string,
-                              epref: ApiT.EventPreferences) {
+                              tpref: ApiT.TaskPreferences) {
 '''
 <span #title/>
 '''
@@ -234,7 +234,7 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, last, team, threadId, epref, title);
+    return base(linkedEvents, ev, last, team, threadId, tpref, title);
   }
 
   /** The base event widget with the given payload in the main div. */
@@ -243,7 +243,7 @@ module Esper.EventWidget {
                        last,
                        team: ApiT.Team,
                        threadId: string,
-                       epref: ApiT.EventPreferences,
+                       tpref: ApiT.TaskPreferences,
                        payload?) {
 '''
 <div #view class="esper-ev">
@@ -276,7 +276,7 @@ module Esper.EventWidget {
     });
     var calTimezone = calendar.calendar_timezone;
     var prefs = Teams.getTeamPreferences(team);
-    var showTimezone = PrefTimezone.execTimezone(prefs, epref);
+    var showTimezone = PrefTimezone.execTimezone(prefs, tpref);
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,
                                                   showTimezone));

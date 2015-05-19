@@ -9,15 +9,15 @@ module Esper.GroupScheduling {
 
   // listener will only be called *once*, then removed
   export function afterInitialize(
-    callback: (epref: ApiT.EventPreferences) => void
+    callback: (tpref: ApiT.TaskPreferences) => void
   )
   {
     initializeListeners.push(callback);
   }
 
-  function initialized(epref: ApiT.EventPreferences) {
+  function initialized(tpref: ApiT.TaskPreferences) {
     initializeListeners.forEach(function (listener) {
-      listener(epref);
+      listener(tpref);
     });
     initializeListeners = [];
   }
@@ -111,8 +111,8 @@ module Esper.GroupScheduling {
 
   export function reset() {
     clear();
-    CurrentThread.eventPrefs.done(function(epref) {
-      initialize(epref);
+    CurrentThread.taskPrefs.done(function(tpref) {
+      initialize(tpref);
     });
   }
 
@@ -120,7 +120,7 @@ module Esper.GroupScheduling {
    *  no data, prefill the guests with participants from the current
    *  thread.
    */
-  function initialize(epref) {
+  function initialize(tpref) {
     if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
       var task = CurrentThread.task.get();
       var taskid = task.taskid;
@@ -164,9 +164,9 @@ module Esper.GroupScheduling {
         }
       }
 
-      initialized(epref);
+      initialized(tpref);
     } else {
-      setTimeout(function() { initialize(epref); }, 300);
+      setTimeout(function() { initialize(tpref); }, 300);
     }
   }
 

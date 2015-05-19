@@ -247,15 +247,15 @@ module Esper.CurrentThread {
   });
 
   /** We cache the event preferences here until the current task changes */
-  var noEventPrefs = Promise.defer(Option.none());
-  export var eventPrefs : JQueryPromise<Option.T<ApiT.EventPreferences>> =
-    noEventPrefs;
+  var noTaskPrefs = Promise.defer(Option.none());
+  export var taskPrefs : JQueryPromise<Option.T<ApiT.TaskPreferences>> =
+    noTaskPrefs;
 
   task.watch(function(newTask, isValid) {
     if (isValid) {
-      eventPrefs = Api.getEventPrefs(newTask.taskid).then(Option.wrap);
+      taskPrefs = Api.getTaskPrefs(newTask.taskid).then(Option.wrap);
     } else {
-      eventPrefs = noEventPrefs;
+      taskPrefs = noTaskPrefs;
     }
   });
 
