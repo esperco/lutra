@@ -21,13 +21,13 @@ module Esper.Teams {
       Log.d("Initializing Teams");
       teams = Login.myTeams();
       var profilesJob =
-        Profile.getAllProfiles(teams).done(function (profileList) {
-          List.concat(profileList).forEach(function (profile) {
+        Profile.fetchAllProfiles().done(function (profileList) {
+          profileList.forEach(function (profile) {
             profiles[profile.profile_uid] = profile;
           });
         });
       var prefsJob =
-        Preferences.getAllPreferences(teams).done(function (prefList) {
+        Preferences.fetchAllPreferences().done(function (prefList) {
           prefList.forEach(function (prefs) {
             preferences[prefs.teamid] = prefs;
           });

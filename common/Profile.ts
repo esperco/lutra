@@ -26,12 +26,14 @@ module Esper.Profile {
     return Promise.join(l);
   }
 
-  export function getAllProfiles(teams : ApiT.Team[]):
-  JQueryPromise<ApiT.Profile[][]> {
-    var profileLists =
-      List.map(teams, function(team) {
-        return getTeamProfiles(team);
+  export function fetchAllProfiles():
+  JQueryPromise<ApiT.Profile[]> {
+    return Api.getAllTeamProfiles().then(function(response) {
+      var profiles = response.profile_list;
+      List.iter(profiles, function(prof) {
+        profiles[prof.profile_uid] = Promise.defer(prof);
       });
-    return Promise.join(profileLists);
+      return profiles;
+    });
   }
 }

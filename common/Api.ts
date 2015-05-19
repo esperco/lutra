@@ -37,6 +37,13 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getAllTeamProfiles():
+  JQueryDeferred<ApiT.ProfileList> {
+    var url =
+      Conf.Api.url + "/api/profile/" + string(Login.myUid());
+    return JsonHttp.get(url);
+  }
+
   function calIds(teamCalendars: ApiT.Calendar[]): string[] {
     return List.map(teamCalendars, function(cal) {
       return cal.google_cal_id;
@@ -228,6 +235,13 @@ module Esper.Api {
   JQueryDeferred<void> {
     var url = Conf.Api.url + "/api/calendar/show-all/" + string(Login.myUid());
     return JsonHttp.post(url, "");
+  }
+
+  export function getAllPreferences():
+  JQueryDeferred<ApiT.PreferencesList> {
+    var url =
+      Conf.Api.url + "/api/preferences/" + string(Login.myUid());
+    return JsonHttp.get(url);
   }
 
   export function getPreferences(teamid):
