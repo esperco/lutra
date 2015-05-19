@@ -37,6 +37,13 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getAllTeamProfiles():
+  JQueryDeferred<ApiT.ProfileList> {
+    var url =
+      Conf.Api.url + "/api/profile/" + string(Login.myUid());
+    return JsonHttp.get(url);
+  }
+
   function calIds(teamCalendars: ApiT.Calendar[]): string[] {
     return List.map(teamCalendars, function(cal) {
       return cal.google_cal_id;

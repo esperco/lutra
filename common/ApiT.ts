@@ -71,6 +71,10 @@ module Esper.ApiT {
     has_ios_app: boolean;
   }
 
+  export interface ProfileList {
+    profile_list: Profile[];
+  }
+
   export interface Guest {
     display_name?: string;
     email: string;
