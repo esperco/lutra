@@ -207,13 +207,13 @@ module Esper.CurrentThread {
     });
   }
 
-  export function linkEvent(e) {
-    team.get().match({
+  export function linkEvent(e): JQueryPromise<void> {
+    return team.get().match({
       some : function (team) {
         var teamid = team.teamid;
 
-        Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
-          .done(function() {
+        return Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
+          .then(function() {
             // TODO Report something, handle failure, etc.
             Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
               .done(function() {
@@ -227,6 +227,7 @@ module Esper.CurrentThread {
       },
       none : function () {
         window.alert("Could not link event because no team is currently detected.");
+        return Promise.defer(null);
       }
     });
   }
