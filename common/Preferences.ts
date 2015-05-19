@@ -11,12 +11,15 @@ module Esper.Preferences {
     return preferences[teamid];
   }
 
-  export function getAllPreferences(teams: ApiT.Team[]):
+  export function fetchAllPreferences():
   JQueryPromise<ApiT.Preferences[]> {
-    var l = List.map(teams, function(team: ApiT.Team) {
-      return get(team.teamid);
+    return Api.getAllPreferences().then(function(response) {
+      var allPrefs = response.preferences_list;
+      List.iter(allPrefs, function(prefs) {
+        preferences[prefs.teamid] = Promise.defer(prefs);
+      });
+      return allPrefs;
     });
-    return Promise.join(l);
   }
 
   // Workplaces and favorites

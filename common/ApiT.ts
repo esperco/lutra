@@ -197,6 +197,10 @@ module Esper.ApiT {
     notes: string;
   }
 
+  export interface PreferencesList {
+    preferences_list: Preferences[];
+  }
+
   export interface Workplace {
     location: Location;
     duration: HourMinute;

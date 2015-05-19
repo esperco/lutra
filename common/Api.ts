@@ -230,6 +230,13 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
+  export function getAllPreferences():
+  JQueryDeferred<ApiT.PreferencesList> {
+    var url =
+      Conf.Api.url + "/api/preferences/" + string(Login.myUid());
+    return JsonHttp.get(url);
+  }
+
   export function getPreferences(teamid):
   JQueryDeferred<ApiT.Preferences> {
     var url =

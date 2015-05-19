@@ -27,7 +27,7 @@ module Esper.Teams {
           });
         });
       var prefsJob =
-        Preferences.getAllPreferences(teams).done(function (prefList) {
+        Preferences.fetchAllPreferences().done(function (prefList) {
           prefList.forEach(function (prefs) {
             preferences[prefs.teamid] = prefs;
           });
