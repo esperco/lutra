@@ -27,10 +27,11 @@ module Esper.TaskTab {
   }
 
   /* reuse the view created for the team, update list of linked events */
-  export function displayLinkedEventsList(team: ApiT.Team,
-                                          threadId, taskTab: TaskTabView,
-                                          linkedEvents:
-                                          ApiT.EventWithSyncInfo[]) {
+  export function displayLinkedEventsList(
+    team: ApiT.Team,
+    threadId, taskTab: TaskTabView,
+    linkedEvents: ApiT.EventWithSyncInfo[]
+  ) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
   <div #eventsList class="esper-events-list"/>
@@ -44,16 +45,20 @@ module Esper.TaskTab {
     if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
     } else {
-      var i = 0;
-      var last = false;
-      linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
-        if (i === linkedEvents.length - 1) last = true;
+      CurrentThread.taskPrefs.then(Option.unwrap).done(function(tpref) {
+        var i = 0;
+        var last = false;
+        linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+          if (i === linkedEvents.length - 1) last = true;
 
-        eventsList.append(EventWidget.renderEvent(linkedEvents, e, last,
-                                                  team, threadId));
-        i++;
+          eventsList.append(
+            EventWidget.renderEvent(linkedEvents, e, last,
+                                    team, threadId, tpref)
+          );
+          i++;
+        });
+        taskTab.linkedEventsList.append(eventsList);
       });
-      taskTab.linkedEventsList.append(eventsList);
     }
     taskTab.linkedEventsSpinner.hide();
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");

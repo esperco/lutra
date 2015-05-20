@@ -40,7 +40,8 @@ module Esper.CalPicker {
     locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
-    displayTz : JQuery;
+    execTz : JQuery;
+    guestTz : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
@@ -94,7 +95,8 @@ module Esper.CalPicker {
 
   function createView(refreshCal: JQuery,
                       userSidebar: UserTab.UserTabView,
-                      team: ApiT.Team) : PickerView {
+                      team: ApiT.Team,
+                      tpref: ApiT.TaskPreferences) : PickerView {
 '''
 <div #view>
   <div #calendarPickerContainer class="hide">
@@ -123,8 +125,12 @@ module Esper.CalPicker {
         <select #createdBy class="esper-select"/>
       </div>
       <div class="esper-event-settings-col">
-        <span class="esper-bold">Display timezone:</span>
-        <select #displayTz class="esper-select"/>
+        <span class="esper-bold">Executive timezone:</span>
+        <select #execTz class="esper-select"/>
+      </div>
+      <div class="esper-event-settings-col">
+        <span class="esper-bold">Guest timezone:</span>
+        <select #guestTz class="esper-select"/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -150,7 +156,14 @@ module Esper.CalPicker {
       }
     });
     writeToCalendar = writes[0] || calendars[0];
-    showTimezone = prefs.general.current_timezone;
+
+    /* showTimezone: timezone used for the executive and for calendar display
+       guestTimezone: timezone used for the guests unless they have
+                      their own individual timezone, set later
+                      during event finalization */
+    showTimezone = tpref.executive_timezone || prefs.general.current_timezone;
+    var guestTimezone = tpref.guest_timezone || showTimezone;
+
     showZoneAbbr = zoneAbbr(showTimezone);
 
     function searchLocation() {
@@ -245,25 +258,65 @@ module Esper.CalPicker {
         return cal.calendar_timezone; // filtered out if undefined
       });
 
+    var guestPrefs = tpref.guest_preferences;
+    var individualGuestZones = List.filterMap(guestPrefs, function(gpref) {
+      return gpref.timezone;
+    });
+
     /* List of timezones for the dropdown, starting with
        the default timezone which is the one from
        the executive's preferences */
     var dispZones =
-      List.union(List.union([showTimezone], calendarZones),
-                 popularZones);
+      List.unique(
+        List.concat([
+          [showTimezone],
+          calendarZones,
+          [guestTimezone],
+          individualGuestZones,
+          popularZones
+        ])
+      );
+
+    var guestZones =
+      List.unique(
+        List.concat([
+          [guestTimezone],
+          individualGuestZones,
+          [showTimezone],
+          calendarZones,
+          popularZones
+        ])
+      );
 
     List.iter(dispZones, function(tz) {
       var abbr = zoneAbbr(tz);
       $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
         .attr("selected", tz === showTimezone)
-        .appendTo(displayTz);
+        .appendTo(execTz);
     });
-    displayTz.change(function() {
-      var tz = $(this).val();
+
+    List.iter(guestZones, function(tz) {
+      var abbr = zoneAbbr(tz);
+      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
+        .attr("selected", tz === guestTimezone)
+        .appendTo(guestTz);
+    });
+
+    execTz.change(function() {
+      var tz = execTz.val();
       showTimezone = tz;
       showZoneAbbr = zoneAbbr(tz);
       updateZoneAbbrDisplay();
       calendarView.fullCalendar("refetchEvents");
+      tpref.executive_timezone = tz;
+      Api.putTaskPrefs(tpref);
+    });
+
+    guestTz.change(function() {
+      var tz = guestTz.val();
+      guestTimezone = tz;
+      tpref.guest_timezone = tz;
+      Api.putTaskPrefs(tpref);
     });
 
     var guests = CurrentThread.getParticipants().map(function(guest) {
@@ -529,8 +582,9 @@ module Esper.CalPicker {
   */
   function createPicker(refreshCal: JQuery,
                         userSidebar: UserTab.UserTabView,
-                        team: ApiT.Team) : Picker {
-    var pickerView = createView(refreshCal, userSidebar, team);
+                        team: ApiT.Team,
+                        tpref: ApiT.TaskPreferences) : Picker {
+    var pickerView = createView(refreshCal, userSidebar, team, tpref);
     setupCalendar(team, pickerView);
 
     // add the meeting type menu:
@@ -781,8 +835,9 @@ module Esper.CalPicker {
     return _view;
   }
 
-  export function createInline(task: ApiT.Task,
-                               threadId: string)
+  function createInlineSync(task: ApiT.Task,
+                            threadId: string,
+                            tpref: ApiT.TaskPreferences)
     : void
   {
 '''
@@ -817,7 +872,7 @@ module Esper.CalPicker {
         title.text("Create linked events");
 
         var userInfo = UserTab.viewOfUserTab(team);
-        var picker = createPicker(refreshCal, userInfo, team);
+        var picker = createPicker(refreshCal, userInfo, team, tpref);
         calendar.append(picker.view);
 
         refreshCal.tooltip({
@@ -829,7 +884,7 @@ module Esper.CalPicker {
         });
 
         window.onresize = function(event) {
-          picker = createPicker(refreshCal, userInfo, team);
+          picker = createPicker(refreshCal, userInfo, team, tpref);
           calendar.children().remove();
           calendar.append(picker.view);
           picker.render();
@@ -849,6 +904,14 @@ module Esper.CalPicker {
       none : function () {
         window.alert("Cannot create cal picker because no team is currently detected.");
       }
+    });
+  }
+
+  export function createInline(task: ApiT.Task,
+                               threadId: string): void
+  {
+    CurrentThread.taskPrefs.then(Option.unwrap).done(function(tpref) {
+      createInlineSync(task, threadId, tpref);
     });
   }
 }

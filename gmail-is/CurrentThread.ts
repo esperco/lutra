@@ -167,7 +167,7 @@ module Esper.CurrentThread {
     });
   }
 
-  /** Returns a list of all the poeple invloved in the current thread
+  /** Returns a list of all the people involved in the current thread
    *  excluding the exec and any assistants.
    *
    *  Returns [] if we can't get the thread data for some reason (ie
@@ -251,9 +251,20 @@ module Esper.CurrentThread {
     }
   });
 
-  /** Finds the team for the current thread, if any. Ignores the
-   *  currently set team (no caching).
-   */
+  /** We cache the event preferences here until the current task changes */
+  var noTaskPrefs = Promise.defer(Option.none());
+  export var taskPrefs : JQueryPromise<Option.T<ApiT.TaskPreferences>> =
+    noTaskPrefs;
+
+  task.watch(function(newTask, isValid) {
+    if (isValid) {
+      taskPrefs = Api.getTaskPrefs(newTask.taskid).then(Option.wrap);
+    } else {
+      taskPrefs = noTaskPrefs;
+    }
+  });
+
+  /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
     return findTeamWithTask(threadId).then(function (team) {
       return team.match({

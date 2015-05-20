@@ -4,7 +4,7 @@
 module Esper.GroupTab {
 
   /** Returns the top-level container for the group scheduling tab. */
-  export function container() {
+  export function container(tpref: ApiT.TaskPreferences) {
 '''
 <div #container class="esper-tab-container">
   <div class="esper-section">
@@ -69,8 +69,9 @@ module Esper.GroupTab {
       });
     });
 
-    guestSection.append(guestList(GroupScheduling.guests, GroupScheduling.addGuest));
-    timeSection.append(timeList());
+    guestSection.append(guestList(GroupScheduling.guests,
+                                  GroupScheduling.addGuest));
+    timeSection.append(timeList(tpref));
 
     return container;
   }
@@ -78,7 +79,7 @@ module Esper.GroupTab {
   /** The list of possible times for the group event which current
    *  corresponds to the linked events of the current task.
    */
-  export function timeList() {
+  function timeList(tpref: ApiT.TaskPreferences) {
 '''
 <div #container class="esper-group-options">
   <div #spinner class="esper-events-list-loading">
@@ -128,7 +129,8 @@ module Esper.GroupTab {
                 });
 
                 var widget = EventWidget.base(events, event, false,
-                                              team, threadId, statusGraph);
+                                              team, threadId, tpref,
+                                              statusGraph);
 
                 list.append($("<li>").append(widget));
 
@@ -174,8 +176,8 @@ module Esper.GroupTab {
     }
   }
 
-  export function guestList(guests: ApiT.Guest[],
-                             onAddGuest: (guest:ApiT.Guest) => any) {
+  function guestList(guests: ApiT.Guest[],
+                     onAddGuest: (guest:ApiT.Guest) => any) {
 '''
 <ul #list class="esper-group-people">
   <li #addGuest class="esper-group-add-guests">
@@ -247,7 +249,7 @@ module Esper.GroupTab {
   /** A list element that contains a person's name and can be delete
    *  from the list with an "x".
    */
-  export function personWidget(guest: ApiT.Guest, onClose) {
+  function personWidget(guest: ApiT.Guest, onClose) {
 '''
 <li #widget>
   <span #nameSpan> </span>
