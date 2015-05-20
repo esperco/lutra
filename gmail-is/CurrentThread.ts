@@ -84,22 +84,25 @@ module Esper.CurrentThread {
     setThreadId(esperGmail.get.email_id());
   };
 
-  // Initialize the threadId when the page is loaded as appropriate:
-  $(function () {
+  /** Reads the threadId from the current URL hash fragment, if
+   *  any. If no threadId is read, returns null.
+   */
+  function readThreadId() : string {
     // We try to get the threadId from the URL ourselves because
-    // Gmail.js fails until more of the page is loaded.
+    // Gmail.js fails until most of the page is loaded.
     var match = window.location.hash.match(/#[^\/]+\/(.+)/);
 
     if (match && match.length >= 2) {
-      setThreadId(match[1]);
+      return match[1];
+    } else {
+      return null;
     }
-  });
+  }
 
-  // TODO: Make sure the following listener is acutally unnecessary:
-  // esperGmail.on.open_email(function (id, url, body, xhr) {
-  //   Log.d("Opened email " + id, url, body);
-  //   setThreadId(id);
-  // });
+  // Get the ball rolling once things are loaded.
+  $(function () {
+    setThreadId(readThreadId());
+  });
 
   /** The GMail threadId of the current thread. If there is no thread,
    *  this is undefined. You can check if there is an open thread with
@@ -107,7 +110,7 @@ module Esper.CurrentThread {
    */
   export var threadId = new Esper.Watchable.C<string>(
     function (threadId) { return threadId && typeof threadId === "string" },
-    undefined
+    readThreadId()
   );
 
   /** Are currently viewing a valid thread? */
