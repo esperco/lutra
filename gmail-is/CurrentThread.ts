@@ -46,7 +46,7 @@ module Esper.CurrentThread {
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     team.set(newTeam);
-    task.set(null);
+    task.set(null); // ensure old task is not accidentally modified for new team
 
     newTeam.match({
       some : function (team) {

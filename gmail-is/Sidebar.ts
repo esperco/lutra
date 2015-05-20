@@ -142,6 +142,7 @@ module Esper.Sidebar {
 
     function onTeamSwitch(toTeam: ApiT.Team) {
       CurrentThread.setTeam(Option.wrap(toTeam));
+      CurrentThread.refreshTaskForThread(false);
 
       dismissDropdowns();
       wrap.fadeOut(250);
