@@ -22,7 +22,7 @@ module Esper.EventWidget {
 
     var alreadyLinked = linkedEvents.filter(function(ev) {
       return ev.event.google_event_id === e.google_event_id;
-    })
+    });
 
     if (alreadyLinked.length > 0) {
       link.hide();
@@ -222,7 +222,8 @@ module Esper.EventWidget {
                               ev: ApiT.EventWithSyncInfo,
                               last,
                               team: ApiT.Team,
-                              threadId: string) {
+                              threadId: string,
+                              tpref: ApiT.TaskPreferences) {
 '''
 <span #title/>
 '''
@@ -233,7 +234,7 @@ module Esper.EventWidget {
            open(ev.event.google_cal_url, "_blank");
          });
 
-    return base(linkedEvents, ev, last, team, threadId, title);
+    return base(linkedEvents, ev, last, team, threadId, tpref, title);
   }
 
   /** The base event widget with the given payload in the main div. */
@@ -242,6 +243,7 @@ module Esper.EventWidget {
                        last,
                        team: ApiT.Team,
                        threadId: string,
+                       tpref: ApiT.TaskPreferences,
                        payload?) {
 '''
 <div #view class="esper-ev">
@@ -274,7 +276,7 @@ module Esper.EventWidget {
     });
     var calTimezone = calendar.calendar_timezone;
     var prefs = Teams.getTeamPreferences(team);
-    var showTimezone = prefs.general.current_timezone;
+    var showTimezone = PrefTimezone.execTimezone(prefs, tpref);
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,
                                                   showTimezone));

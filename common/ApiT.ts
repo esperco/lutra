@@ -450,6 +450,19 @@ module Esper.ApiT {
     times  : PossibleTime[];
   }
 
+  export interface GuestPreferences {
+    taskid: string;
+    email: string;
+    timezone?: string;
+  }
+
+  export interface TaskPreferences {
+    taskid: string;
+    executive_timezone?: string;
+    guest_timezone?: string;
+    guest_preferences: GuestPreferences[];
+  }
+
   export interface TaskMessageNotification {
     taskid: string;
     emails: string[];

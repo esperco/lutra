@@ -16,6 +16,17 @@ module Esper.Option {
       }
     }
 
+    /* Extract the value or fail by raising an exception indicating a bug. */
+    unwrap(): E {
+      if (this.some) {
+        return this.value;
+      } else {
+        /* somewhat gets the job done even if `console.assert`
+           isn't implemented */
+        console.assert(false, "Option.unwrap: missing value");
+      }
+    }
+
     /** Monadic bind for Option.T, but `bind' is already used in the
      *  JavaScript standard library for something else, so I called
      *  this flatMap à la Scala to avoid confusion.
@@ -49,5 +60,10 @@ module Esper.Option {
     } else {
       return Option.some(x);
     }
+  }
+
+  /** For function composition and general interface consistency */
+  export function unwrap<E>(x : T<E>) : E {
+    return x.unwrap();
   }
 }

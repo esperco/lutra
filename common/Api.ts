@@ -198,18 +198,6 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function createLinkedEvent(createdBy, teamid,
-                                    event: ApiT.CalendarEventEdit,
-                                    threadId):
-  JQueryDeferred<ApiT.CalendarEvent> {
-    var url =
-      Conf.Api.url + "/api/thread/put-linked-event/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + encodeURIComponent(string(event.google_cal_id))
-      + "/" + string(threadId);
-    return JsonHttp.post(url, JSON.stringify(event));
-  }
-
   export function createTaskLinkedEvent(createdBy, teamid,
                                         event: ApiT.CalendarEventEdit,
                                         taskId):
@@ -562,7 +550,8 @@ module Esper.Api {
   }
 
   // Smarter Scheduling:
-  export function getGroupEvent(taskid: string): JQueryDeferred<ApiT.GroupEvent> {
+  export function getGroupEvent(taskid: string):
+  JQueryDeferred<ApiT.GroupEvent> {
     var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     return JsonHttp.get(url);
   }
@@ -571,5 +560,21 @@ module Esper.Api {
   JQueryDeferred<void> {
     var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     return JsonHttp.put(url, JSON.stringify(groupEvent));
+  }
+
+  function taskPrefsUrl(taskid: string) {
+    return Conf.Api.url + "/api/scheduling/task-prefs"
+      + "/" + string(Login.myUid())
+      + "/" + string(taskid);
+  }
+
+  export function getTaskPrefs(taskid: string):
+  JQueryDeferred<ApiT.TaskPreferences> {
+    return JsonHttp.get(taskPrefsUrl(taskid));
+  }
+
+  export function putTaskPrefs(tpref: ApiT.TaskPreferences):
+  JQueryDeferred<ApiT.TaskPreferences> {
+    return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
   }
 }
