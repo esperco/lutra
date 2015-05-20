@@ -46,6 +46,7 @@ module Esper.CurrentThread {
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     team.set(newTeam);
+    task.set(null);
 
     newTeam.match({
       some : function (team) {
@@ -69,9 +70,9 @@ module Esper.CurrentThread {
       threadId.set(newThreadId);
     } else {
       findTeam(newThreadId).done(function (newTeam) {
+        setTeam(newTeam);
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
-          setTeam(newTeam);
           threadId.set(newThreadId);
         });
       });
