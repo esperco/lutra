@@ -248,41 +248,34 @@ module Esper.CurrentThread {
     }
   });
 
-  /** Returns the team for the current thread, if any. */
+  /** Finds the team for the current thread, if any. Ignores the
+   *  currently set team (no caching).
+   */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
-    return team.get().match({
-      some : function (team) {
-        Log.i("Found team already: " + team.team_name);
-        return Promise.defer(Option.some(team));
-      },
-      none : function () {
-        return findTeamWithTask(threadId).then(function (team) {
-          return team.match({
-            some : function (team) {
-              Log.i("Found team from findTeamWithTask: " + team.team_name);
-              return <any> Promise.defer(Option.some(team));
-            },
-            none : function () {
-              var emailData = esperGmail.get.email_data();
-              return Thread.detectTeam(Login.myTeams(), emailData)
-                .then(function (detectedTeam) {
-                  if (detectedTeam) {
-                    Log.i("Guessed team with Thread.detectTeam: " +
-                          detectedTeam.team.team_name);
-                  } else {
-                    Log.i("Failed to guess team with Thread.detectTeam. (" +
-                          detectedTeam + ")");
-                  }
+    return findTeamWithTask(threadId).then(function (team) {
+      return team.match({
+        some : function (team) {
+          Log.i("Found team from findTeamWithTask: " + team.team_name);
+          return <any> Promise.defer(Option.some(team));
+        },
+        none : function () {
+          var emailData = esperGmail.get.email_data();
+          return Thread.detectTeam(Login.myTeams(), emailData)
+            .then(function (detectedTeam) {
+              if (detectedTeam) {
+                Log.i("Guessed team with Thread.detectTeam: " +
+                      detectedTeam.team.team_name);
+              } else {
+                Log.i("Failed to guess team with Thread.detectTeam. (" +
+                      detectedTeam + ")");
+              }
 
-                  return <any> Option.wrap(detectedTeam && detectedTeam.team);
-                });
-            }
-          });
-        });
-      }
+              return <any> Option.wrap(detectedTeam && detectedTeam.team);
+            });
+        }
+      });
     });
   }
-
 
   /** Look for a team that has a task for the given thread. If there
    *  are multiple such teams, return the first one.

@@ -89,9 +89,7 @@ module Esper.Sidebar {
     teamsSection.append(selector);
   }
 
-  function displayDock(rootElement, sidebar,
-                       threadId: string,
-                       isCorrectTeam: boolean) {
+  function displayDock(rootElement, sidebar, isCorrectTeam: boolean) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -154,7 +152,7 @@ module Esper.Sidebar {
       sidebar.show("slide", { direction: "down" }, 250);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, true, false, threadId);
+        displayTeamSidebar(rootElement, true, false);
       }
       setTimeout(afterAnimation, 250);
     }
@@ -352,9 +350,10 @@ module Esper.Sidebar {
 
   function displayTeamSidebar(rootElement,
                               isCorrectTeam: boolean,
-                              autoTask: boolean,
-                              threadId) {
-    Log.d("displayTeamSidebar()");
+                              autoTask: boolean) {
+    var threadId = CurrentThread.threadId.get();
+    Log.d("displayTeamSidebar() for thread", threadId);
+
     rootElement.children().remove();
     Api.checkVersion().done(function(status_) {
       if (status_.must_upgrade) {
@@ -365,13 +364,13 @@ module Esper.Sidebar {
             Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
               .done(function(linkedEvents) {
                 var sidebar = displaySidebar(rootElement, threadId, autoTask, linkedEvents);
-                displayDock(rootElement, sidebar, threadId, isCorrectTeam);
+                displayDock(rootElement, sidebar, isCorrectTeam);
                 sidebar.show("slide", { direction: "down" }, 250);
               });
           },
           none : function () {
             var sidebar = displaySidebar(rootElement, threadId, autoTask, []);
-            displayDock(rootElement, sidebar, threadId, isCorrectTeam);
+            displayDock(rootElement, sidebar, isCorrectTeam);
             $(".esper-dock-wrap").hide();
           }
         });
@@ -418,7 +417,7 @@ module Esper.Sidebar {
 
         CurrentThread.team.get().match({
           some : function (team) {
-            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+            displayTeamSidebar(rootElement, correctTeam, autoTask);
           },
           none : function () {
             if (teams.length === 1) {
@@ -426,7 +425,7 @@ module Esper.Sidebar {
               CurrentThread.setTeam(Option.wrap(teams[0]));
             }
 
-            displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
+            displayTeamSidebar(rootElement, correctTeam, autoTask);
           }
         });
 
