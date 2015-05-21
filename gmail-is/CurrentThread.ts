@@ -46,7 +46,7 @@ module Esper.CurrentThread {
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     team.set(newTeam);
-    task.set(null); // ensure old task is not accidentally modified for new team
+    setTask(null); // ensure old task is not accidentally modified for new team
 
     newTeam.match({
       some : function (team) {
@@ -63,7 +63,7 @@ module Esper.CurrentThread {
    */
   export function setThreadId(newThreadId) {
     if (!newThreadId) {
-      task.set(null);
+      setTask(null);
       setTeam(Option.none<ApiT.Team>());
       GroupScheduling.clear();
 
@@ -251,6 +251,23 @@ module Esper.CurrentThread {
     }
   });
 
+  /** Sets the task and updates the currently stored linked events. If
+   *  the given task is null, linkedEvents is set to [].
+   */
+  export function setTask(newTask : ApiT.Task) {
+    task.set(newTask);
+
+    if (newTask) {
+      linkedEvents.set(newTask.task_events.map(function (taskEvent) {
+        return taskEvent.task_event;
+      }));
+    } else {
+      linkedEvents.set([]);
+    }
+
+    linkedEventsChanged();
+  }
+
   /** We cache the event preferences here until the current task changes */
   var noTaskPrefs = Promise.defer(Option.none());
   export var taskPrefs : JQueryPromise<Option.T<ApiT.TaskPreferences>> =
@@ -332,7 +349,7 @@ module Esper.CurrentThread {
         // cast to <any> needed because promises are implicitly flattened (!)
         return (<any> getTask(teamid, newThreadId, false, true)
                 .then(function(newTask) {
-                  task.set(newTask);
+                  setTask(newTask);
                   return newTask;
                 }));
       },

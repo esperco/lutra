@@ -212,7 +212,7 @@ module Esper.TaskTab {
         if (task) {
           Api.setTaskTitle(task.taskid, query);
           task.task_title = query;
-          CurrentThread.task.set(task);
+          CurrentThread.setTask(task);
           taskTitle.val(query);
           taskTab.taskNotes.val(task.task_notes);
           markNewTaskAsInProgress(task);
@@ -264,7 +264,7 @@ module Esper.TaskTab {
               refreshLinkedEventsList(team, threadId, taskTab);
             });
 
-            CurrentThread.task.set(result.task_data);
+            CurrentThread.setTask(result.task_data);
             taskTitle.val(title);
             Sidebar.dismissDropdowns();
           });
@@ -308,7 +308,7 @@ module Esper.TaskTab {
             apiCall(task.taskid)
               .done(function() {
                 task.task_archived = finalState;
-                CurrentThread.task.set(task);
+                CurrentThread.setTask(task);
                 Sidebar.dismissDropdowns();
               });
           });
@@ -589,7 +589,7 @@ module Esper.TaskTab {
     }
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
-      CurrentThread.task.set(task);
+      CurrentThread.setTask(task);
       var title = "";
       var notes = "";
       linkedThreadsSpinner.hide();
