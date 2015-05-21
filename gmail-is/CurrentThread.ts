@@ -37,24 +37,10 @@ module Esper.CurrentThread {
     Option.none<ApiT.Team>()
   );
 
-  /** Sets the new team. The promise will return the new team once all
-   *  the needed updates are done and everything is synchronized.
-   *
-   *  Events that depend on the team being set correctly should not be
-   *  fired until this promise returns. (Isn't asynchronous
-   *  programming in JavaScript fun?)
+  /** Sets the new team.
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     currentTeam.set(newTeam);
-
-    /* If the team is defined, it replaces the team used for task list,
-       otherwise we leave the old one. */
-    newTeam.match({
-      some : function (team) {
-        Menu.currentTeam.set(team);
-      },
-      none : function () {}
-    });
   }
 
   /** Sets the threadId, making sure to update the team, executive and

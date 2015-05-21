@@ -9,10 +9,9 @@ module Esper.Menu {
     in the menu bar.
     Once initialized it must always be set to some team.
 
-    The scope of this team is purely to top menu dropdown
-    and should not be used by external modules.
+    The scope of this team is limited to the elements from the top menu.
   */
-  export var currentTeam = new Esper.Watchable.C<ApiT.Team>(
+  var currentTeam = new Esper.Watchable.C<ApiT.Team>(
     isValidCurrentTeamValue,
     undefined
   );
@@ -376,6 +375,10 @@ module Esper.Menu {
   export function init() {
     Login.watchableInfo.watch(function(x: ApiT.LoginResponse) {
       create();
+    });
+
+    CurrentThread.currentTeam.watch(function(team: ApiT.Team) {
+      if (team) currentTeam.set(team);
     });
   }
 }
