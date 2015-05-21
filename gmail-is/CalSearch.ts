@@ -86,7 +86,11 @@ module Esper.CalSearch {
     link.click(function() {
       spinner.show();
       link.hide();
-      TaskTab.linkEvent(e, team, threadId, eventsTab, resultView);
+      CurrentThread.linkEvent(e).done(function () {
+        resultView.link.hide();
+        resultView.spinner.hide();
+        resultView.linked.show();
+      });
     });
 
     check.attr("data", Init.esperRootUrl + "img/check.svg");

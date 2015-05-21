@@ -46,6 +46,7 @@ module Esper.CurrentThread {
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     team.set(newTeam);
+    task.set(null); // ensure old task is not accidentally modified for new team
 
     newTeam.match({
       some : function (team) {
@@ -69,9 +70,9 @@ module Esper.CurrentThread {
       threadId.set(newThreadId);
     } else {
       findTeam(newThreadId).done(function (newTeam) {
+        setTeam(newTeam);
         refreshTaskForThread(false, newThreadId).done(function () {
           GroupScheduling.reset();
-          setTeam(newTeam);
           threadId.set(newThreadId);
         });
       });
@@ -83,22 +84,25 @@ module Esper.CurrentThread {
     setThreadId(esperGmail.get.email_id());
   };
 
-  // Initialize the threadId when the page is loaded as appropriate:
-  $(function () {
+  /** Reads the threadId from the current URL hash fragment, if
+   *  any. If no threadId is read, returns null.
+   */
+  function readThreadId() : string {
     // We try to get the threadId from the URL ourselves because
-    // Gmail.js fails until more of the page is loaded.
+    // Gmail.js fails until most of the page is loaded.
     var match = window.location.hash.match(/#[^\/]+\/(.+)/);
 
     if (match && match.length >= 2) {
-      setThreadId(match[1]);
+      return match[1];
+    } else {
+      return null;
     }
-  });
+  }
 
-  // TODO: Make sure the following listener is acutally unnecessary:
-  // esperGmail.on.open_email(function (id, url, body, xhr) {
-  //   Log.d("Opened email " + id, url, body);
-  //   setThreadId(id);
-  // });
+  // Get the ball rolling once things are loaded.
+  $(function () {
+    setThreadId(readThreadId());
+  });
 
   /** The GMail threadId of the current thread. If there is no thread,
    *  this is undefined. You can check if there is an open thread with
@@ -106,7 +110,7 @@ module Esper.CurrentThread {
    */
   export var threadId = new Esper.Watchable.C<string>(
     function (threadId) { return threadId && typeof threadId === "string" },
-    undefined
+    readThreadId()
   );
 
   /** Are currently viewing a valid thread? */
@@ -207,13 +211,13 @@ module Esper.CurrentThread {
     });
   }
 
-  export function linkEvent(e) {
-    team.get().match({
+  export function linkEvent(e): JQueryPromise<void> {
+    return team.get().match({
       some : function (team) {
         var teamid = team.teamid;
 
-        Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
-          .done(function() {
+        return Api.linkEventForMe(teamid, threadId.get(), e.google_event_id)
+          .then(function() {
             // TODO Report something, handle failure, etc.
             Api.linkEventForTeam(teamid, threadId.get(), e.google_event_id)
               .done(function() {
@@ -227,6 +231,7 @@ module Esper.CurrentThread {
       },
       none : function () {
         window.alert("Could not link event because no team is currently detected.");
+        return Promise.defer(null);
       }
     });
   }
@@ -261,39 +266,30 @@ module Esper.CurrentThread {
 
   /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
-    return team.get().match({
-      some : function (team) {
-        Log.i("Found team already: " + team.team_name);
-        return Promise.defer(Option.some(team));
-      },
-      none : function () {
-        return findTeamWithTask(threadId).then(function (team) {
-          return team.match({
-            some : function (team) {
-              Log.i("Found team from findTeamWithTask: " + team.team_name);
-              return <any> Promise.defer(Option.some(team));
-            },
-            none : function () {
-              var emailData = esperGmail.get.email_data();
-              return Thread.detectTeam(Login.myTeams(), emailData)
-                .then(function (detectedTeam) {
-                  if (detectedTeam) {
-                    Log.i("Guessed team with Thread.detectTeam: " +
-                          detectedTeam.team.team_name);
-                  } else {
-                    Log.i("Failed to guess team with Thread.detectTeam. (" +
-                          detectedTeam + ")");
-                  }
+    return findTeamWithTask(threadId).then(function (team) {
+      return team.match({
+        some : function (team) {
+          Log.i("Found team from findTeamWithTask: " + team.team_name);
+          return <any> Promise.defer(Option.some(team));
+        },
+        none : function () {
+          var emailData = esperGmail.get.email_data();
+          return Thread.detectTeam(Login.myTeams(), emailData)
+            .then(function (detectedTeam) {
+              if (detectedTeam) {
+                Log.i("Guessed team with Thread.detectTeam: " +
+                      detectedTeam.team.team_name);
+              } else {
+                Log.i("Failed to guess team with Thread.detectTeam. (" +
+                      detectedTeam + ")");
+              }
 
-                  return <any> Option.wrap(detectedTeam && detectedTeam.team);
-                });
-            }
-          });
-        });
-      }
+              return <any> Option.wrap(detectedTeam && detectedTeam.team);
+            });
+        }
+      });
     });
   }
-
 
   /** Look for a team that has a task for the given thread. If there
    *  are multiple such teams, return the first one.

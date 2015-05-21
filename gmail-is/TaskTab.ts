@@ -16,25 +16,6 @@ module Esper.TaskTab {
     check: JQuery;
   }
 
-  export function linkEvent(e, team, threadId,
-                            taskTab: TaskTabView,
-                            view: LinkOptionsView) {
-    Api.linkEventForMe(team.teamid, threadId, e.google_event_id)
-      .done(function() {
-        // TODO Report something, handle failure, etc.
-        view.link.hide();
-        view.spinner.hide();
-        view.linked.show();
-        Api.linkEventForTeam(team.teamid, threadId, e.google_event_id)
-          .done(function() {
-            refreshLinkedEventsList(team, threadId, taskTab);
-            CurrentThread.refreshTaskForThread(false);
-            Api.syncEvent(team.teamid, threadId,
-                          e.google_cal_id, e.google_event_id);
-          });
-      });
-  }
-
   function mergeActiveWithCreated(active: Types.Visited<Types.FullEventId>[],
                                   created: ApiT.CreatedCalendarEvent[]) {
     var createdTimed = List.map(created, function(e) {
