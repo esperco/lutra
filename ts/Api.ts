@@ -246,6 +246,17 @@ module Api {
     return jsonHttpGet(url);
   }
 
+  export function getGoogleAuthUrlForTeam(uid, teamid, optAuthLandingUrl)
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    var url = "/api/google-auth-url/" + string(uid) + "/" + string(teamid);
+    var q = [];
+    if (Util.isString(optAuthLandingUrl))
+      q.push("auth_landing=" + encodeURIComponent(optAuthLandingUrl));
+    url = url + makeQuery(q);
+    return jsonHttpGet(url);
+  }
+
   export function getGoogleAuthInfo(optAuthLandingUrl)
     : JQueryDeferred<ApiT.GoogleAuthInfo>
   {
@@ -320,40 +331,43 @@ module Api {
 
   /*** Scheduling ***/
 
-  export function getCalendarList()
+  export function getCalendarList(teamid)
     : JQueryDeferred<ApiT.Calendars>
   {
-    var url = "api/calendar/list/" + string(Login.data.uid);
+    var url = "api/calendar/list/" + string(Login.data.uid)
+                             + "/" + string(teamid);
     return jsonHttpGet(url);
   }
 
-  export function getCalendarShares(calid)
+  export function getCalendarShares(cal)
     : JQueryDeferred<ApiT.CalendarAcl>
   {
-    var url = "api/calendar/share/list/"
-      + string(Login.data.uid) + "/"
-      + encodeURIComponent(string(calid));
-    return jsonHttpGet(url);
+    var calspec = {google_cal_id: cal.google_cal_id,
+                   authorized_as: cal.authorized_as};
+    var url = "api/calendar/share/list/" + string(Login.data.uid);
+    return jsonHttpPost(url, JSON.stringify(calspec));
   }
 
-  export function putCalendarShare(calid, email)
+  export function putCalendarShare(cal, email)
     : JQueryDeferred<void>
   {
+    var calspec = {google_cal_id: cal.google_cal_id,
+                   authorized_as: cal.authorized_as};
     var url = "api/calendar/share/add/"
       + string(Login.data.uid) + "/"
-      + encodeURIComponent(string(calid)) + "/"
       + encodeURIComponent(string(email));
-    return jsonHttpPut(url, "");
+    return jsonHttpPut(url, JSON.stringify(calspec));
   }
 
-  export function deleteCalendarShare(calid, rule_id)
+  export function deleteCalendarShare(cal, rule_id)
     : JQueryDeferred<void>
   {
+    var calspec = {google_cal_id: cal.google_cal_id,
+                   authorized_as: cal.authorized_as};
     var url = "api/calendar/share/remove/"
       + string(Login.data.uid) + "/"
-      + encodeURIComponent(string(calid)) + "/"
       + encodeURIComponent(string(rule_id));
-    return jsonHttpDelete(url);
+    return jsonHttpPost(url, JSON.stringify(calspec));
   }
 
   export function createTeamCalendar(forUid, teamid, tz, name)
