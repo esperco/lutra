@@ -54,7 +54,7 @@ module Esper.GroupTab {
     });
 
     linkEvent.click(function() {
-      var team        = CurrentThread.team.get();
+      var team        = CurrentThread.currentTeam.get();
       var threadId    = CurrentThread.threadId.get();
       var searchModal = CalSearch.viewOfSearchModal(team, threadId, container);
 
@@ -103,7 +103,7 @@ module Esper.GroupTab {
       list.empty();
       spinner.show();
 
-      CurrentThread.team.get().match({
+      CurrentThread.currentTeam.get().match({
         some : function (team) {
           var threadId = CurrentThread.threadId.get();
 

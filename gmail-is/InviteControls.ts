@@ -103,7 +103,7 @@ module Esper.InviteControls {
   Not Duplicate
 </div>
 '''
-    return CurrentThread.team.get().match({
+    return CurrentThread.currentTeam.get().match({
       some : function (team) {
         /** Removes the widget from the DOM. */
         function close() {
@@ -353,7 +353,7 @@ module Esper.InviteControls {
   </div>
 </div>
 '''
-    return CurrentThread.team.get().match({
+    return CurrentThread.currentTeam.get().match({
       some : function (team) {
         var threadId = CurrentThread.threadId.get();
 

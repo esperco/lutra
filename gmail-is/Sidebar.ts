@@ -67,7 +67,7 @@ module Esper.Sidebar {
     teamName.text(team.team_name);
     teamExecEmail.text(email || "unknown email");
 
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (myTeam) {
         if (team.teamid === myTeam.teamid) {
           selector.addClass("esper-selected");
@@ -169,7 +169,7 @@ module Esper.Sidebar {
       displayTeamSelector(teamsSection, team, onTeamSwitch);
     });
 
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (team) {
         // note if name is not set so that the assistant can fix it
         var name = team.team_name || "Team name not set";
@@ -240,7 +240,7 @@ module Esper.Sidebar {
       Menu.create();
     });
 
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (team) {
         Api.getCustomerStatus(team.teamid).done(function(customer) {
           var sub = customer.status;
@@ -303,7 +303,7 @@ module Esper.Sidebar {
       $(tab).click(function () { console.log(i); switchTab(i) });
     });
 
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function  (team) {
         TaskTab.displayTaskTab(taskContent, team, threadId,
                                autoTask, linkedEvents);
@@ -360,7 +360,7 @@ module Esper.Sidebar {
       if (status_.must_upgrade) {
         displayUpdateDock(rootElement, status_.download_page);
       } else {
-        CurrentThread.team.get().match({
+        CurrentThread.currentTeam.get().match({
           some : function (team) {
             Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
               .done(function(linkedEvents) {
@@ -416,7 +416,7 @@ module Esper.Sidebar {
         // TODO: Determine whether the team is "correct" (?)
         var correctTeam = true;
 
-        CurrentThread.team.get().match({
+        CurrentThread.currentTeam.get().match({
           some : function (team) {
             displayTeamSidebar(rootElement, correctTeam, autoTask, threadId);
           },

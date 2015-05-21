@@ -32,7 +32,7 @@ module Esper.CurrentThread {
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
-  export var team = new Esper.Watchable.C<Option.T<ApiT.Team>>(
+  export var currentTeam = new Esper.Watchable.C<Option.T<ApiT.Team>>(
     function (team) { return team !== undefined && team !== null; },
     Option.none<ApiT.Team>()
   );
@@ -45,15 +45,15 @@ module Esper.CurrentThread {
    *  programming in JavaScript fun?)
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
-    team.set(newTeam);
+    currentTeam.set(newTeam);
 
+    /* If the team is defined, it replaces the team used for task list,
+       otherwise we leave the old one. */
     newTeam.match({
       some : function (team) {
         Menu.currentTeam.set(team);
       },
-      none : function () {
-        Menu.currentTeam.set(null);
-      }
+      none : function () {}
     });
   }
 
@@ -142,7 +142,7 @@ module Esper.CurrentThread {
 
   /** Gets the executive of the current team, if any. */
   export function getCurrentExecutive() : Option.T<ApiT.Profile> {
-    return team.get().flatMap<ApiT.Profile>(function (team) {
+    return currentTeam.get().flatMap<ApiT.Profile>(function (team) {
       return Option.wrap<ApiT.Profile>(Teams.getProfile(team.team_executive));
     });
   }
@@ -170,7 +170,7 @@ module Esper.CurrentThread {
    *  gmail js has a problem).
    */
   export function getExternalParticipants() : ApiT.Guest[] {
-    return team.get().match({
+    return currentTeam.get().match({
       some : function (team) {
         var executive = getExecutive(team);
         var all = getParticipants();
@@ -208,7 +208,7 @@ module Esper.CurrentThread {
   }
 
   export function linkEvent(e) {
-    team.get().match({
+    currentTeam.get().match({
       some : function (team) {
         var teamid = team.teamid;
 
@@ -261,7 +261,7 @@ module Esper.CurrentThread {
 
   /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
-    return team.get().match({
+    return currentTeam.get().match({
       some : function (team) {
         Log.i("Found team already: " + team.team_name);
         return Promise.defer(Option.some(team));
@@ -328,7 +328,7 @@ module Esper.CurrentThread {
   JQueryPromise<ApiT.Task> {
     var newThreadId = newThreadId || threadId.get();
 
-    return team.get().match({
+    return currentTeam.get().match({
       some : function (team) {
         var teamid = team.teamid;
         var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
@@ -356,7 +356,7 @@ module Esper.CurrentThread {
    *  team. If there is no current team, the callback is not executed.
    */
   export function withPreferences(callback) {
-    team.get().match({
+    currentTeam.get().match({
       some : function (team) {
         Preferences.get(team.teamid).done(function (prefs) {
           callback(prefs);
@@ -373,7 +373,7 @@ module Esper.CurrentThread {
    *  one of the current team's calendars, returns null.
    */
   export function eventTimezone(ev: ApiT.CalendarEvent): string {
-    return team.get().match({
+    return currentTeam.get().match({
       some : function (team) {
         var teamCal =
           List.find(team.team_calendars, function(c) {

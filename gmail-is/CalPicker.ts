@@ -385,7 +385,7 @@ module Esper.CalPicker {
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
   function importEvents(esperEvents : TZCalendarEvent[]) {
-    return CurrentThread.team.get().match({
+    return CurrentThread.currentTeam.get().match({
       some : function (team) {
         return List.map(esperEvents, function(x) {
           var ev = {
@@ -861,7 +861,7 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (team) {
         function closeView() {
           Sidebar.selectTaskTab();
