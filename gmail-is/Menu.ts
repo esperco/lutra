@@ -11,7 +11,7 @@ module Esper.Menu {
     However, changing the global team does not affect the sidebar.
   */
   export var currentTeam = new Esper.Watchable.C<ApiT.Team>(
-    function(team) { return team !== undefined && team !== null; },
+    function(team) { return team.isSome(); },
     undefined
   );
 

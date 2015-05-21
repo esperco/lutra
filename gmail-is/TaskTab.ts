@@ -64,20 +64,23 @@ module Esper.TaskTab {
     if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
     } else {
-      CurrentThread.taskPrefs.then(Option.unwrap).done(function(tpref) {
-        var i = 0;
-        var last = false;
-        linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
-          if (i === linkedEvents.length - 1) last = true;
+      CurrentThread.taskPrefs
+        .then(Option.unwrap<ApiT.TaskPreferences>
+              ("taskPrefs (in displayLinkedEventsList)"))
+        .done(function(tpref) {
+          var i = 0;
+          var last = false;
+          linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+            if (i === linkedEvents.length - 1) last = true;
 
-          eventsList.append(
-            EventWidget.renderEvent(linkedEvents, e, last,
-                                    team, threadId, tpref)
-          );
-          i++;
+            eventsList.append(
+              EventWidget.renderEvent(linkedEvents, e, last,
+                                      team, threadId, tpref)
+            );
+            i++;
+          });
+          taskTab.linkedEventsList.append(eventsList);
         });
-        taskTab.linkedEventsList.append(eventsList);
-      });
     }
     taskTab.linkedEventsSpinner.hide();
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
