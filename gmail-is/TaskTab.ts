@@ -593,57 +593,57 @@ module Esper.TaskTab {
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
-      var title = "";
-      var notes = "";
-      linkedThreadsSpinner.hide();
-      taskProgressSpinner.hide();
-      if (task !== undefined) {
-        taskCaption.text(taskLabelExists);
-        title = task.task_title;
-        if (task.task_notes !== undefined) notes = task.task_notes;
-        displayLinkedThreadsList(task, threadId, taskTabView);
-        markNewTaskAsInProgress(task);
-        displayTaskProgress(task, taskTabView);
-        saveTaskNotes.click(function() {
-          if ($(this).hasClass("esper-save-enabled")) {
-            var notes = taskNotes.val();
-            Api.setTaskNotes(task.taskid, notes).done(function() {
-              saveTaskNotes.addClass("esper-save-disabled");
-              saveTaskNotes.removeClass("esper-save-enabled");
-              saveTaskNotes.removeClass("esper-clickable");
-              taskNotes.keyup(function() {taskNotesKeyUp(notes);});
-            });
+      Api.getThreadDetails(threadId).done(function(deets) {
+        var title = "";
+        var notes = "";
+        linkedThreadsSpinner.hide();
+        taskProgressSpinner.hide();
+        if (task !== undefined) {
+          taskCaption.text(taskLabelExists);
+          title = task.task_title;
+          if (task.task_notes !== undefined) notes = task.task_notes;
+          displayLinkedThreadsList(task, threadId, taskTabView);
+          markNewTaskAsInProgress(task);
+          displayTaskProgress(task, taskTabView);
+          saveTaskNotes.click(function() {
+            if ($(this).hasClass("esper-save-enabled")) {
+              var notes = taskNotes.val();
+              Api.setTaskNotes(task.taskid, notes).done(function() {
+                saveTaskNotes.addClass("esper-save-disabled");
+                saveTaskNotes.removeClass("esper-save-enabled");
+                saveTaskNotes.removeClass("esper-clickable");
+                taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+              });
+            }
+          });
+        } else {
+          taskCaption.text(taskLabelCreate);
+          title = deets.subject;
+          if (title === undefined) title = "(no subject)";
+        }
+        taskTitle.val(title);
+        taskNotes.val(notes);
+        notesCharCount.text(140 - notes.length);
+        taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+        Util.afterTyping(taskTitle, 250, function() {
+          var query = taskTitle.val();
+          if (query !== "") {
+            displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
+                                 taskSearchActions, team,
+                                 threadId, query, taskTabView);
           }
         });
-      } else {
-        taskCaption.text(taskLabelCreate);
-        var thread = esperGmail.get.email_data();
-        if (thread !== undefined && thread !== null) {
-          title = thread.subject;
-        }
-      }
-      taskTitle.val(title);
-      taskNotes.val(notes);
-      notesCharCount.text(140 - notes.length);
-      taskNotes.keyup(function() {taskNotesKeyUp(notes);});
-      Util.afterTyping(taskTitle, 250, function() {
-        var query = taskTitle.val();
-        if (query !== "") {
-          displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
-                               taskSearchActions, team,
-                               threadId, query, taskTabView);
-        }
-      });
-      taskTitle.keydown(function(pressed) {
-        var name = taskTitle.val();
-        var isEnterKey = pressed.which === 13;
-        if (isEnterKey) {
-          pressed.stopPropagation();
-          taskTitle.blur();
-          Gmail.threadContainer().focus();
-          createOrRenameTask(taskTitle, team.teamid, threadId,
-                             taskTabView, name);
-        }
+        taskTitle.keydown(function(pressed) {
+          var name = taskTitle.val();
+          var isEnterKey = pressed.which === 13;
+          if (isEnterKey) {
+            pressed.stopPropagation();
+            taskTitle.blur();
+            Gmail.threadContainer().focus();
+            createOrRenameTask(taskTitle, team.teamid, threadId,
+                               taskTabView, name);
+          }
+        });
       });
     });
 
