@@ -3,9 +3,12 @@ module Esper.ActiveThreads {
   var activeEvents: LRU.C<Types.Visited<Types.GmailThread>>;
 
   CurrentThread.threadId.watch(function (newThreadId) {
-    var subject = esperGmail.get.email_data().subject;
-    Log.d("Using new thread ID " + newThreadId + "; Subject: " + subject);
-    handleNewActiveThread(newThreadId, subject);
+    Api.getThreadDetails(newThreadId).done(function(deets) {
+      var subject = deets.subject;
+      if (subject === undefined) subject = "(no subject)";
+      Log.d("Using new thread ID " + newThreadId + "; Subject: " + subject);
+      handleNewActiveThread(newThreadId, subject);
+    });
   });
 
   function getCache() {

@@ -8,7 +8,7 @@ module Esper.UserTab {
     return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
   }
 
-  function displayAssistantAlias(container: JQuery, alias: string[]) {
+  function displayAssistantAlias(container: JQuery, alias: ApiT.Guest) {
 '''
 <div #view>
   <div>
@@ -22,8 +22,8 @@ module Esper.UserTab {
 </div>
 '''
     if (alias !== undefined) {
-      aliasName.text(alias[0]);
-      aliasEmail.text(alias[1]);
+      aliasName.text(alias.display_name);
+      aliasEmail.text(alias.email);
 
       container.append(view);
     }
@@ -986,15 +986,6 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    var emailData = esperGmail.get.email_data();
-    var threadMembers = emailData.people_involved;
-    if (threadMembers === undefined) threadMembers = [];
-    var aliasesUsed = List.filterMap(threadMembers, function(m) {
-      if (List.mem(team.team_email_aliases, m[1])) return m;
-      else return null;
-    });
-    displayAssistantAlias(aliasContainer, aliasesUsed[0]);
-
     team.team_labels.forEach(function(label) {
       displayTeamLabel(teamLabelsContainer, label);
     })
@@ -1162,8 +1153,20 @@ module Esper.UserTab {
 
     showNotes.click();
     showCoworkers.click();
-    if (aliasesUsed[0] !== undefined) showAlias.click();
     if (team.team_labels.length > 0) showTeamLabels.click();
+
+    CurrentThread.getParticipants().done(function(threadMembers) {
+      if (threadMembers === undefined) threadMembers = [];
+      var aliasesUsed = List.filterMap(threadMembers, function(m) {
+        if (List.mem(team.team_email_aliases, m.email)) {
+          return m;
+        } else {
+          return null;
+        }
+      });
+      displayAssistantAlias(aliasContainer, aliasesUsed[0]);
+      if (aliasesUsed[0] !== undefined) showAlias.click();
+    });
 
     return _view;
   }

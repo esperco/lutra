@@ -468,4 +468,15 @@ module Esper.ApiT {
     emails: string[];
     snippet: string;
   }
+
+  export interface ThreadParticipants {
+    messages: MessageParticipants[];
+  }
+
+  export interface MessageParticipants {
+    from: Guest[];
+    to: Guest[];
+    cc: Guest[];
+    bcc: Guest[];
+  }
 }
