@@ -411,23 +411,25 @@ module Esper.Sidebar {
         var teams = Login.myTeams();
 
         // TODO: Remove autotask logic from Sidebar.ts?
-        var autoTask = CurrentThread.hasMessageFromExecutive();
+        CurrentThread.hasMessageFromExecutive().done(function(autoTask) {
 
-        // TODO: Determine whether the team is "correct" (?)
-        var correctTeam = true;
+          // TODO: Determine whether the team is "correct" (?)
+          var correctTeam = true;
 
-        CurrentThread.currentTeam.get().match({
-          some : function (team) {
-            displayTeamSidebar(rootElement, correctTeam, autoTask);
-          },
-          none : function () {
-            if (teams.length === 1) {
-              Log.w("Team not detected, using one and only team.");
-              CurrentThread.setTeam(Option.wrap(teams[0]));
+          CurrentThread.currentTeam.get().match({
+            some : function (team) {
+              displayTeamSidebar(rootElement, correctTeam, autoTask);
+            },
+            none : function () {
+              if (teams.length === 1) {
+                Log.w("Team not detected, using one and only team.");
+                CurrentThread.setTeam(Option.wrap(teams[0]));
+              }
+
+              displayTeamSidebar(rootElement, correctTeam, autoTask);
             }
+          });
 
-            displayTeamSidebar(rootElement, correctTeam, autoTask);
-          }
         });
 
         return true;

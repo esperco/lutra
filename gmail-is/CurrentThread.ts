@@ -104,6 +104,18 @@ module Esper.CurrentThread {
     return threadId.isValid();
   }
 
+  export function peopleInvolved(participants : ApiT.ThreadParticipants):
+  ApiT.Guest[] {
+    var allMessages = participants.messages;
+    return List.unique(
+      List.concat(
+        List.map(allMessages, function(msg) {
+          return List.concat([msg.from, msg.to, msg.cc, msg.bcc]);
+        })
+      )
+    );
+  }
+
   /** Returns a list of all the people involved in the current
    *  thread. (Includes the exec and assistant if appropriate.)
    *
@@ -114,14 +126,7 @@ module Esper.CurrentThread {
     if (threadId.isValid()) {
       var id = threadId.get();
       return Api.getThreadParticipants(id).then(function(response) {
-        var allMessages = response.messages;
-        return List.unique(
-          List.concat(
-            List.map(allMessages, function(msg) {
-              return List.concat([msg.from, msg.to, msg.cc, msg.bcc]);
-            })
-          )
-        );
+        return peopleInvolved(response);
       });
     } else {
       return Promise.defer([]);
@@ -140,18 +145,25 @@ module Esper.CurrentThread {
     });
   }
 
-    /** Returns whether the current thread has a message from the
-     *  current executive. If there is no team, the result is always
-     *  false.
-     */
-  export function hasMessageFromExecutive() : boolean {
+  /** Returns whether the current thread has a message from the
+   *  current executive. If there is no team, the result is always
+   *  false.
+   */
+  export function hasMessageFromExecutive() : JQueryPromise<boolean> {
     return getCurrentExecutive().match({
       some : function (executive) {
-        var emails = executive.other_emails.concat([executive.email]);
-        return Thread.hasMessageFrom(esperGmail.get.email_data(), emails);
+        if (threadId.isValid()) {
+          var id = threadId.get();
+          var emails = executive.other_emails.concat([executive.email]);
+          return Api.getThreadParticipants(id).then(function(participants) {
+            return Thread.hasMessageFrom(participants, emails);
+          });
+        } else {
+          return Promise.defer(false);
+        }
       },
       none : function () {
-        return false;
+        return Promise.defer(false);
       }
     });
   }
@@ -280,8 +292,7 @@ module Esper.CurrentThread {
           return <any> Promise.defer(Option.some(team));
         },
         none : function () {
-          var emailData = esperGmail.get.email_data();
-          return Thread.detectTeam(Login.myTeams(), emailData)
+          return Thread.detectTeam(Login.myTeams(), threadId)
             .then(function (detectedTeam) {
               if (detectedTeam) {
                 Log.i("Guessed team with Thread.detectTeam: " +

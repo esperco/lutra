@@ -49,15 +49,13 @@ module Esper.Thread {
       });
   }
 
-  export function hasMessageFrom(thread: esperGmail.get.Thread,
+  export function hasMessageFrom(participants: ApiT.ThreadParticipants,
                           emailAddresses: string[]): boolean {
-    var messages = thread.threads;
-    for (var k in messages) {
-      var msg: esperGmail.get.Message = messages[k];
-      if (List.mem(emailAddresses, msg.from_email)) {
-        return true;
-      }
-    }
+    var messages = participants.messages;
+    List.iter(messages, function(msg) {
+      let froms = List.map(msg.from, function(guest) { return guest.email; });
+      if (List.inter(emailAddresses, froms).length > 0) return true;
+    });
     return false;
   }
 
@@ -66,11 +64,11 @@ module Esper.Thread {
     hasMsgFromExec: boolean;
   }
 
-  function findTeamInThread(thread: esperGmail.get.Thread,
+  function findTeamInThread(participants: ApiT.ThreadParticipants,
                             teamEmailsList: TeamEmails[]):
   DetectedTeam {
     var myUid = Login.myUid();
-    Log.d("Detect team: Input", thread, teamEmailsList);
+    Log.d("Detect team: Input", participants, teamEmailsList);
     var filteredTeams =
       List.filter(teamEmailsList, function(teamEmails) {
         /*
@@ -81,12 +79,12 @@ module Esper.Thread {
           my email address show up in the thread (I could be Bcc'd or
           may have received the email on an alias unknown to Esper).
         */
-        var threadMembers = thread.people_involved;
+        var threadMembers = CurrentThread.peopleInvolved(participants);
         var executive = List.find(threadMembers, function(nameEmail) {
-          return List.mem(teamEmails.executive, nameEmail[1]);
+          return List.mem(teamEmails.executive, nameEmail.email);
         });
         var assistant = List.find(threadMembers, function(nameEmail) {
-          return List.mem(teamEmails.assistants, nameEmail[1]);
+          return List.mem(teamEmails.assistants, nameEmail.email);
         });
 
         var team = teamEmails.team;
@@ -103,7 +101,7 @@ module Esper.Thread {
       });
     if (filteredTeams.length > 0) {
       var candidates = List.map(filteredTeams, function(teamEmails) {
-        var hasMsgFromExec = hasMessageFrom(thread, teamEmails.executive);
+        var hasMsgFromExec = hasMessageFrom(participants, teamEmails.executive);
         return {
           team: teamEmails.team,
           hasMsgFromExec: hasMsgFromExec
@@ -132,13 +130,13 @@ module Esper.Thread {
     }
   }
 
-  export function detectTeam(teams: ApiT.Team[],
-                             thread: esperGmail.get.Thread):
+  export function detectTeam(teams: ApiT.Team[], threadId):
   JQueryPromise<DetectedTeam> {
-
-    return getTeamEmails(teams)
+    return <any> getTeamEmails(teams) // cast due to promise flattening
       .then(function(teamEmailsList) {
-        return findTeamInThread(thread, teamEmailsList);
+        return Api.getThreadParticipants(threadId).then(function(par) {
+          return findTeamInThread(par, teamEmailsList);
+        });
       });
   }
 }
