@@ -110,18 +110,21 @@ module Esper.CurrentThread {
    *  Returns [] if we can't get the thread data for some reason (ie
    *  gmail js has a problem);
    */
-  export function getParticipants() : ApiT.Guest[] {
-    var thread = esperGmail.get.email_data();
-
-    if (thread && thread.first_email) {
-      return thread.people_involved.map(function (person) {
-        return {
-          display_name : person[0] || null, // "" treated as no display name
-          email        : person[1]
-        };
+  export function getParticipants() : JQueryPromise<ApiT.Guest[]> {
+    if (threadId.isValid()) {
+      var id = threadId.get();
+      return Api.getThreadParticipants(id).then(function(response) {
+        var allMessages = response.messages;
+        return List.unique(
+          List.concat(
+            List.map(allMessages, function(msg) {
+              return List.concat([msg.from, msg.to, msg.cc, msg.bcc]);
+            })
+          )
+        );
       });
     } else {
-      return [];
+      return Promise.defer([]);
     }
   }
 
@@ -159,18 +162,19 @@ module Esper.CurrentThread {
    *  Returns [] if we can't get the thread data for some reason (ie
    *  gmail js has a problem).
    */
-  export function getExternalParticipants() : ApiT.Guest[] {
+  export function getExternalParticipants() : JQueryPromise<ApiT.Guest[]> {
     return currentTeam.get().match({
       some : function (team) {
         var executive = getExecutive(team);
-        var all = getParticipants();
-        return all.filter(function (participant) {
-          return participant.email != executive.email &&
-            team.team_email_aliases.indexOf(participant.email) == -1;
+        return getParticipants().then(function(all) {
+          return all.filter(function (participant) {
+            return participant.email != executive.email &&
+              team.team_email_aliases.indexOf(participant.email) == -1;
+          });
         });
       },
       none : function () {
-        return [];
+        return Promise.defer([]);
       }
     });
   }

@@ -474,14 +474,9 @@ module Esper.ApiT {
   }
 
   export interface MessageParticipants {
-    from: Participant[];
-    to: Participant[];
-    cc: Participant[];
-    bcc: Participant[];
-  }
-
-  export interface Participant {
-    email: string;
-    name?: string;
+    from: Guest[];
+    to: Guest[];
+    cc: Guest[];
+    bcc: Guest[];
   }
 }

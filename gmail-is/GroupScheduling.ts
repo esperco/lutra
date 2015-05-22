@@ -127,7 +127,9 @@ module Esper.GroupScheduling {
 
       Api.getGroupEvent(taskid).done(function (groupEvent) {
         if (groupEvent.guests.length === 0 && groupEvent.times.length === 0) {
-          CurrentThread.getParticipants().forEach(GroupScheduling.addGuest);
+          CurrentThread.getParticipants().done(function(guests) {
+            guests.forEach(GroupScheduling.addGuest);
+          });
         } else {
           var oldGuests = guests;
           guests = groupEvent.guests;
