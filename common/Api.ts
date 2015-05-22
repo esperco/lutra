@@ -494,7 +494,8 @@ module Esper.Api {
   export function getThreadParticipants(threadid):
   JQueryDeferred<ApiT.ThreadParticipants> {
     var url = Conf.Api.url + "/api/gmail/thread/participants/"
-            + string(Login.myUid());
+            + string(Login.myUid())
+            + "/" + string(threadid);
     return JsonHttp.get(url);
   }
 

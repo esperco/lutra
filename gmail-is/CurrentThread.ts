@@ -107,12 +107,13 @@ module Esper.CurrentThread {
   export function peopleInvolved(participants : ApiT.ThreadParticipants):
   ApiT.Guest[] {
     var allMessages = participants.messages;
+    function getKey(x : ApiT.Guest) { return x.email; };
     return List.unique(
       List.concat(
         List.map(allMessages, function(msg) {
           return List.concat([msg.from, msg.to, msg.cc, msg.bcc]);
         })
-      )
+      ), getKey
     );
   }
 
