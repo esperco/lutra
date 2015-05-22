@@ -56,7 +56,7 @@ module Esper.ComposeControls {
     });
 
     insertButton.click(function (e) {
-      CurrentThread.team.get().match({
+      CurrentThread.currentTeam.get().match({
         some : function (team) {
           var events = CurrentThread.linkedEvents.get();
 
@@ -138,7 +138,7 @@ module Esper.ComposeControls {
     });
 
     templateButton.click(function (e) {
-      CurrentThread.team.get().match({
+      CurrentThread.currentTeam.get().match({
         some : function (team) {
           var events = CurrentThread.linkedEvents.get();
 

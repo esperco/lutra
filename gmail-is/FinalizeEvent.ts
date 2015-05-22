@@ -76,7 +76,7 @@ module Esper.FinalizeEvent {
         );
         return null;
       } else {
-        return CurrentThread.team.get().match({
+        return CurrentThread.currentTeam.get().match({
           some : function (team) {
             edit.title = edit.title.replace(/^HOLD: /, "");
             var threadId = CurrentThread.threadId.get();
@@ -99,7 +99,7 @@ module Esper.FinalizeEvent {
    *  Calls the `done' callback after the delete API calls are done.
    */
   export function deleteHolds(event: ApiT.CalendarEvent, prefs, done) {
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (team) {
         var id = event.google_event_id;
 
@@ -135,7 +135,7 @@ module Esper.FinalizeEvent {
    *  Strips "HOLD: " from all event titles.
    */
   export function confirmMessage(event: ApiT.CalendarEvent): string {
-    return CurrentThread.team.get().match({
+    return CurrentThread.currentTeam.get().match({
       some : function (team) {
         var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
           return e.event;
@@ -195,7 +195,7 @@ module Esper.FinalizeEvent {
 
   /** Executes the whole finalize flow on the given event. */
   export function finalizeEvent(event: ApiT.CalendarEvent) {
-    CurrentThread.team.get().match({
+    CurrentThread.currentTeam.get().match({
       some : function (team) {
         CurrentThread.withPreferences(function (preferences) {
           var threadId = CurrentThread.threadId.get();

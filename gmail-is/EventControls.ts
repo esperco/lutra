@@ -75,7 +75,7 @@ module Esper.EventControls {
   </div>
 </div>
 '''
-    return CurrentThread.team.get().match({
+    return CurrentThread.currentTeam.get().match({
       some : function (team) {
         /** Removes the widget from the DOM. */
         function close() {

@@ -5,15 +5,20 @@
 
 module Esper.Menu {
   /*
-    The global current team, valid even if there is no current task or thread.
+    The current team for the purpose of offering a default choice
+    in the menu bar.
+    Once initialized it must always be set to some team.
 
-    Switching team in the sidebar results in changing the global team.
-    However, changing the global team does not affect the sidebar.
+    The scope of this team is limited to the elements from the top menu.
   */
-  export var currentTeam = new Esper.Watchable.C<ApiT.Team>(
-    function(team) { return team !== undefined && team !== null; },
+  var currentTeam = new Esper.Watchable.C<ApiT.Team>(
+    isValidCurrentTeamValue,
     undefined
   );
+
+  function isValidCurrentTeamValue(team: ApiT.Team): boolean {
+    return team !== undefined && team !== null;
+  }
 
   function replace(menu: JQuery) {
     var rightSibling = Gmail.findMenuAnchor();
@@ -369,7 +374,11 @@ module Esper.Menu {
 
   export function init() {
     Login.watchableInfo.watch(function(x: ApiT.LoginResponse) {
-      Menu.create();
+      create();
+    });
+
+    CurrentThread.currentTeam.watch(function(team: ApiT.Team) {
+      if (team) currentTeam.set(team);
     });
   }
 }

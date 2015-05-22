@@ -16,14 +16,22 @@ module Esper.Option {
       }
     }
 
+    isNone<A>() {
+      return !this.some;
+    }
+
+    isSome<A>() {
+      return this.some;
+    }
+
     /* Extract the value or fail by raising an exception indicating a bug. */
-    unwrap(): E {
+    unwrap(name: string): E {
       if (this.some) {
         return this.value;
       } else {
         /* somewhat gets the job done even if `console.assert`
            isn't implemented */
-        console.assert(false, "Option.unwrap: missing value");
+        console.assert(false, "Unwrap error. No value set for " + name);
       }
     }
 
@@ -62,8 +70,13 @@ module Esper.Option {
     }
   }
 
-  /** For function composition and general interface consistency */
-  export function unwrap<E>(x : T<E>) : E {
-    return x.unwrap();
+  /** For function composition and general interface consistency, curried */
+  export function unwrap<E>(name: string): { (opt: T<E>) : E } {
+    return function(opt) { return opt.unwrap(name); }
+  }
+
+  /** Uncurried version */
+  export function unwrap2<E>(name: string, opt: T<E>) : E {
+    return opt.unwrap(name);
   }
 }

@@ -189,7 +189,7 @@ module Esper.Watchable {
       Avoids returning data with only some of the required fields.
     */
     getValidOrNothing() {
-      return this.validity ? this.data : undefined;
+      return this.validity ? this.data : null;
     }
 
   }
