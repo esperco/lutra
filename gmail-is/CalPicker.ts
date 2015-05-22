@@ -718,7 +718,7 @@ module Esper.CalPicker {
       var newTaskTitle = eventTitle.replace(/^HOLD: /, "");
       Api.setTaskTitle(task.taskid, newTaskTitle);
       task.task_title = newTaskTitle;
-      CurrentThread.task.set(task);
+      CurrentThread.setTask(task);
       $(".esper-task-name").val(newTaskTitle);
     }
 
