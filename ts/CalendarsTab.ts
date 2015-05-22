@@ -34,6 +34,29 @@ module CalendarsTab {
     return view;
   }
 
+  function makeAccountSelector(team, root) {
+'''
+<div #view>Accounts<br/>
+  <select #calAccounts size=3 /><br/>
+  <button #addCalAccount>Add calendars from another account</button>
+</div>
+'''
+    $("<option/>").text(Login.data.email).appendTo(calAccounts);
+    List.iter(team.team_calendar_accounts, function(email:string) {
+      $("<option/>").text(email).appendTo(calAccounts);
+    });
+
+    addCalAccount.click(function() {
+      Api.getGoogleAuthUrlForTeam(team.team_executive, team.teamid,
+                                  window.location.href)
+      .done(function(x) {
+        window.location.href = x.url;
+      });
+    });
+
+    root.append(view);
+  }
+
   // TODO Styling
   function makeCalendarSelectors(team, root) {
 '''
@@ -42,6 +65,7 @@ module CalendarsTab {
     <div><b>All calendars:</b></div>
     <div style="font-size: 75%">(double-click to add)</div>
     <select #allCals multiple="multiple" size=5 />
+    <div #accountSelector/>
   </div>
   <div>
     <div><b>Team calendars:</b></div>
@@ -61,11 +85,13 @@ module CalendarsTab {
   </div>
 </div>
 '''
+    makeAccountSelector(team, accountSelector);
+
     List.iter(team.team_calendars, function(cal) {
       makeCalendarRow(cal).appendTo(teamCals);
     });
 
-    Api.getCalendarList().done(function(x) {
+    Api.getCalendarList(team.teamid).done(function(x) {
       List.iter(x.calendars, function(cal) {
         $("<option>" + cal.calendar_title + "</option>")
           .appendTo(allCals)
@@ -113,7 +139,8 @@ module CalendarsTab {
       var row = $("<div class='esper-cal-row'/>");
       var checkbox = $("<input class='esper-cal-check' type='checkbox'/>");
       checkbox.data({
-        calendarId: cal.google_cal_id,
+        calendarSpec: {google_cal_id: cal.google_cal_id,
+                       authorized_as: cal.authorized_as},
         timezone: cal.calendar_timezone,
         title: cal.calendar_title
       });
@@ -121,7 +148,7 @@ module CalendarsTab {
       var cachedAcl = calendarAcls[cal.google_cal_id];
       var getAcl =
         cachedAcl === undefined ?
-        Api.getCalendarShares(cal.google_cal_id) :
+        Api.getCalendarShares(cal) :
         Deferred.defer(cachedAcl);
 
       getAcl.done(function(acl) {
@@ -158,22 +185,22 @@ module CalendarsTab {
       var row = $(this);
       var checkbox = row.find(".esper-cal-check");
       var isChecked = checkbox.is(":checked");
-      var calendarId = checkbox.data("calendarId");
+      var calendarSpec = checkbox.data("calendarSpec");
 
       List.iter(Login.data.team_members, function(tm : ApiT.TeamMember) {
         if (List.mem(team.team_assistants, tm.member_uid)) {
           var assistantEmail = tm.member_email;
           if (isChecked) {
             teamCals.push({
-              google_cal_id: calendarId,
+              google_cal_id: calendarSpec.google_cal_id,
               calendar_timezone: checkbox.data("timezone"),
               calendar_title: checkbox.data("title")
             });
-            calls.push(Api.putCalendarShare(calendarId, assistantEmail));
+            calls.push(Api.putCalendarShare(calendarSpec, assistantEmail));
           } else {
             var aclId = checkbox.data("aclId");
             if (Util.isString(aclId))
-              calls.push(Api.deleteCalendarShare(calendarId, aclId));
+              calls.push(Api.deleteCalendarShare(calendarSpec, aclId));
           }
         }
       });
@@ -282,6 +309,7 @@ module CalendarsTab {
   </div>
   <br/>
   <div #calendarSelector/>
+  <div #accountSelector/>
   <br/>
   <div #emailAliases/>
 </div>
@@ -293,8 +321,10 @@ module CalendarsTab {
     } else {
       calendarSelector.hide();
       emailAliases.hide();
+      makeAccountSelector(team, accountSelector);
 
-      Api.getCalendarList().done(function(response) {
+      Api.getCalendarList(team.teamid)
+      .done(function(response) {
         displayCalendarList(calendarView, response.calendars);
 
         share.click(function() {

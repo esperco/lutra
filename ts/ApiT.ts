@@ -24,10 +24,12 @@ module ApiT {
     team_assistants: string[];
     team_calendars: Calendar[];
     team_email_aliases: string[];
+    team_calendar_accounts: string[];
   }
 
   export interface Calendar {
     google_cal_id: string;
+    authorized_as?: any;
     calendar_title: string;
     calendar_timezone?: string;
     google_access_role?: string;
