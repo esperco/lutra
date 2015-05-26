@@ -499,7 +499,10 @@ module Esper.TaskTab {
     );
 
     CurrentThread.onLinkedEventsChanged(function () {
-      refreshLinkedEventsList(team, threadId, taskTabView);
+      var curThreadId = CurrentThread.threadId.get();
+      if (CurrentThread.threadId.isValid()) {
+        refreshLinkedEventsList(team, curThreadId, taskTabView);
+      }
     });
 
     refreshLinkedThreadsIcon.attr("data",

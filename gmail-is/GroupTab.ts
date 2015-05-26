@@ -105,6 +105,7 @@ module Esper.GroupTab {
 
       CurrentThread.currentTeam.get().match({
         some : function (team) {
+          if (!CurrentThread.threadId.isValid()) return;
           var threadId = CurrentThread.threadId.get();
 
           Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
