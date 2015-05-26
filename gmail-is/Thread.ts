@@ -52,11 +52,12 @@ module Esper.Thread {
   export function hasMessageFrom(participants: ApiT.ThreadParticipants,
                           emailAddresses: string[]): boolean {
     var messages = participants.messages;
+    var match = false;
     List.iter(messages, function(msg) {
-      let froms = List.map(msg.from, function(guest) { return guest.email; });
-      if (List.inter(emailAddresses, froms).length > 0) return true;
+      var froms = List.map(msg.from, function(guest) { return guest.email; });
+      if (List.inter(emailAddresses, froms).length > 0) match = true;
     });
-    return false;
+    return match;
   }
 
   export interface DetectedTeam {
