@@ -320,11 +320,11 @@ module Esper.CalPicker {
     });
 
     CurrentThread.getParticipants().done(function(guests) {
-      List.map(guests, function(guest) {
+      var names = List.map(guests, function(guest) {
         // With a fallback if the display name is not set:
         return guest.display_name || guest.email;
       });
-      guestNames.text(guests.join(", "));
+      guestNames.text(names.join(", "));
     });
 
     var pv = <PickerView> _view;
