@@ -411,7 +411,9 @@ module Esper.Sidebar {
         var teams = Login.myTeams();
 
         // TODO: Remove autotask logic from Sidebar.ts?
-        CurrentThread.hasMessageFromExecutive().done(function(autoTask) {
+        //CurrentThread.hasMessageFromExecutive().done(function(autoTask) {
+          // XXX temporarily disable automatic task creation until bugs fixed
+          var autoTask = false;
 
           // TODO: Determine whether the team is "correct" (?)
           var correctTeam = true;
@@ -430,7 +432,7 @@ module Esper.Sidebar {
             }
           });
 
-        });
+        //});
 
         return true;
       }
