@@ -96,30 +96,6 @@ module Esper.EventControls {
         endDate.val(XDate.dateValue(end));
         endTime.val(XDate.timeOnly24Hours(end));
 
-        var timeDiff = end.getTime() - start.getTime();
-
-        function startChange() {
-          var s = new Date(startDate.val() + " " + startTime.val() + "Z");
-          var e = new Date(s.getTime() + timeDiff);
-          endDate.val(XDate.dateValue(e));
-          endTime.val(XDate.timeOnly24Hours(e));
-        }
-        startDate.change(startChange);
-        startTime.change(startChange);
-
-        function endChange() {
-          var s = new Date(startDate.val() + " " + startTime.val() + "Z");
-          var e = new Date(endDate.val() + " " + endTime.val() + "Z");
-          timeDiff = e.getTime() - s.getTime();
-          if (timeDiff < 0) {
-            startDate.val(XDate.dateValue(e));
-            startTime.val(XDate.timeOnly24Hours(e));
-            timeDiff = 0;
-          }
-        }
-        endDate.change(endChange);
-        endTime.change(endChange);
-
         if (event.location) {
           var address = event.location.address;
 
@@ -196,6 +172,12 @@ module Esper.EventControls {
 
             var st = new Date(startDate.val() + " " + startTime.val() + "Z");
             var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
+            var timeDiff = ed.getTime() - st.getTime();
+            if (timeDiff < 0) {
+              alert("Error: That change would make the event end " +
+                    "before it starts!");
+              return; // exit click handler
+            }
             var evStart: ApiT.CalendarTime = {
               local: XDate.toString(st),
               utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
