@@ -453,6 +453,7 @@ module Esper.Sidebar {
 
         CurrentThread.threadId.watch(function (newThreadId) {
           maybeUpdateView();
+          Log.i("Thread id changed; updating view. " + newThreadId);
         });
 
         maybeUpdateView();

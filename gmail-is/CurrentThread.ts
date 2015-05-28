@@ -55,18 +55,23 @@ module Esper.CurrentThread {
       GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
-        setTeam(newTeam);
-        refreshTaskForThread(false, newThreadId).done(function () {
-          GroupScheduling.reset();
-          threadId.set(newThreadId);
-        });
+        if (newThreadId === readThreadId()) {
+          setTeam(newTeam);
+          refreshTaskForThread(false, newThreadId).done(function () {
+            if (newThreadId === readThreadId()) {
+              GroupScheduling.reset();
+              threadId.set(newThreadId);
+            }
+          });
+        }
       });
     }
   }
 
   // Set the thread id when the user navigates around GMail:
   window.onhashchange = function (e) {
-    setThreadId(esperGmail.get.email_id());
+    var threadId = esperGmail.get.email_id();
+    setThreadId(threadId);
   };
 
   /** Reads the threadId from the current URL hash fragment, if
