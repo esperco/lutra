@@ -377,8 +377,15 @@ module Esper.Menu {
       create();
     });
 
-    CurrentThread.currentTeam.watch(function(team: ApiT.Team) {
-      if (team) currentTeam.set(team);
+    CurrentThread.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
+      team.match({
+        some : function (team) {
+          currentTeam.set(team);
+        },
+        none : function () {
+          // do nothing
+        }
+      });
     });
   }
 }
