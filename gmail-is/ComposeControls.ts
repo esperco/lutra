@@ -223,7 +223,7 @@ module Esper.ComposeControls {
   /** */
   function askExecButton(composeControls) {
     var exec = CurrentThread.getCurrentExecutive();
-    exec.match({
+    return exec.match({
       some : function (executive) {
 '''
 <div #askButton title class="esper-composition-button">
