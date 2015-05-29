@@ -146,10 +146,109 @@ Do write instead:
 
 Why?
 
-Because the `prefWidget` and the rest of the sidebar was created for a given
-team. It displays info about that team. Clicking on the button is
+Because the `prefWidget` and the rest of the sidebar were created for a given
+team. They display data of that team. Clicking on the button is
 expected to apply to data of that team. If the
-current team changes but for some reason the sidebar is not refreshed
+current team changes but for any reason the sidebar is not refreshed
 right away, the old `prefWidget` and other sidebar elements remain
 unchanged. Clicking the Save button should absolutely not save that
-data for the current team, who doesn't own any of that data.
+data for the current team, which doesn't own any of it.
+
+
+Graphical elements: use a functional approach
+---------------------------------------------
+
+Graphical elements are created to display and make editable data
+of a specific owner (e.g. a specific team). It is particularly
+important that the buttons and other controls that save freshly-edited
+data is saved into their rightful owner's account. In order to avoid
+any mixup, create graphical elements in a functional way, by passing
+all the inputs explicitly. See example in the section above on
+referential transparency.
+
+Graphical elements are created immutable in the sense that they won't
+be taken over and mutated to display a totally new set of
+data. Instead, old ones are removed and new ones are created.
+
+In short, this is just about using a functional programming style:
+
+- create object from fully-specified, immutable inputs
+- replace old object with new one as needed
+- remove the object when there's nothing to display
+
+as opposed to an imperative approach:
+
+- create uninitialized object that lives forever
+- initialize each field of the object from some data
+- when new data needs to be displayed, clear the existing fields
+  and initialize the fields with new data
+- somehow clear the fields when there's nothing to display and make it
+  invisible
+
+
+Don't make superfluous API calls
+--------------------------------
+
+When a new read-only resource becomes needed somewhere in the code,
+the solution is usually not to make an API call on the spot.
+Rather one should ensure that the API call is made as early as
+possible so that other parts of the code may also access that data
+without making their own API call.
+
+Don't write this:
+
+```javascript
+  function a(teamid: string) {
+    Api.getSocks(teamid).done(
+      ...
+    );
+  }
+
+  function b(teamid: string) {
+    Api.getSocks(teamid).done(
+      ...
+    );
+  }
+
+  function init(teamid: string) {
+    a(teamid);
+    b(teamid);
+  }
+```
+
+Do write:
+
+```javascript
+  function a(teamid: string, socks: ApiT.Socks) {
+    ...
+  }
+
+  function b(teamid: string, socks: ApiT.Socks) {
+    ...
+  }
+
+  function init(teamid: string) {
+    Api.getSocks(teamid).done(function(socks) {
+      a(teamid, socks);
+      b(teamid, socks);
+    });
+  }
+```
+
+Obviously use that style even if for the moment there's only one place
+where the resource is needed.
+
+Some API calls can be cached, too. Use our `Cache` module and cache
+results as JQuery promises.
+
+Use asserts: program defensively, check your inputs, fail early
+---------------------------------------------------------------
+
+Use `console.assert(...)` at the beginning of a function or piece of
+code that assumes a particular context. It has two benefits:
+
+- documents what context or arguments are expected by a particular
+  function
+- it prevents from executing code in a broken environment and focusing
+  on the correct code rather than focusing on what created the broken
+  environment (the caller).
