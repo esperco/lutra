@@ -37,17 +37,48 @@ module Esper.ComposeControls {
     "<br/><br/>" +
     endOfTemplate;
 
-  function timeInGuestTimezone(time: string, zone: string) {
-    // moment object in guest timezone
-    var guestStart = zone ? (<any> moment)(time).tz(zone) : null;
-    // guest time formatted like 3:45 pm
-    var guestTime = guestStart ? guestStart.format("h:mm a") : null;
-    // add guest timezone abbreviation, like EDT
-    var forGuest =
-      guestStart ?
-      " / " + guestTime + " " + guestStart.zoneAbbr() :
-      "";
-    return forGuest;
+  interface EventTime {
+    forExec: string;
+    forGuest: string;
+  }
+
+  // Display the time from ev.start.utc in both exec and guest timezones
+  function formatStartTime(ev: ApiT.CalendarEvent, execTz: string,
+                           guestTz: string) : EventTime
+  {
+    if (!execTz) execTz = CurrentThread.eventTimezone(ev);
+    var execMoment = (<any> moment)(ev.start.utc).tz(execTz);
+    var forExec = execMoment.format("dddd, MMMM D") + // Saturday, May 30
+                  " at " + execMoment.format("h:mm a") + // 3:45 pm
+                  " " + execMoment.zoneAbbr(); // EDT
+    var forGuest = "";
+    if (guestTz) {
+      var guestMoment = (<any> moment)(ev.start.utc).tz(guestTz);
+      forGuest = " / " + guestMoment.format("h:mm a") +
+                 " " + guestMoment.zoneAbbr();
+    }
+    return { forExec: forExec, forGuest: forGuest };
+  }
+
+  interface TeamAndPreferences {
+    team : ApiT.Team,
+    execPrefs : ApiT.Preferences,
+    taskPrefs : Option.T<ApiT.TaskPreferences>
+  }
+
+  // Combines Preferences with CurrentThread.currentTeam/taskPrefs
+  function getTeamAndPreferences() : JQueryPromise<Option.T<TeamAndPreferences>> {
+    return CurrentThread.currentTeam.get().match({
+      some: function(team) {
+        // Cast due to promise flattening, argh
+        return <any> Preferences.get(team.teamid).then(function(execPrefs) {
+          return CurrentThread.taskPrefs.then(function(prefOpt) {
+            return Option.some({ team: team, execPrefs: execPrefs, taskPrefs: prefOpt });
+          });
+        });
+      },
+      none: function() { return Promise.defer(Option.none()); }
+    });
   }
 
   /** Inserts the date of each linked event into the text box. */
@@ -69,43 +100,38 @@ module Esper.ComposeControls {
     });
 
     insertButton.click(function (e) {
-      CurrentThread.currentTeam.get().match({
-        some : function (team) {
-          var events = CurrentThread.linkedEvents.get();
+      getTeamAndPreferences().done(function(teamAndPrefs) {
+        teamAndPrefs.match({
+          some : function (allPrefs) {
+            var execTz;
+            var general = allPrefs.execPrefs.general;
+            if (general) execTz = general.current_timezone;
 
-          events.filter(function (e) {
-            return new Date(e.event.end.local) > new Date(Date.now());
-          });
+            var events = CurrentThread.linkedEvents.get();
+            events.filter(function (e) {
+              return new Date(e.event.end.local) > new Date(Date.now());
+            });
 
-          CurrentThread.taskPrefs.done(function(prefOpt) {
             var guestTz;
-            prefOpt.match({
-              some : function(tpref) { guestTz = tpref.guest_timezone; },
+            allPrefs.taskPrefs.match({
+              some: function(tpref) { guestTz = tpref.guest_timezone; },
               none: function() { }
             });
 
             var entry = events.reduce(function (str, event) {
               var ev    = event.event;
-              var start = new Date(ev.start.local);
-              var end   = new Date(ev.end.local);
-              var wday = XDate.fullWeekDay(start);
-              var time = XDate.justStartTime(start);
-              var tz    =
-                (<any> moment).tz(ev.start.local,
-                                  CurrentThread.eventTimezone(ev)).zoneAbbr();
-              var forGuest = timeInGuestTimezone(ev.start.utc, guestTz);
-
+              var times = formatStartTime(ev, execTz, guestTz);
               var br = str != "" ? "<br />" : ""; // no leading newline
-              return str + br + wday + ", " + time + " " + tz + forGuest;
+              return str + br + times.forExec + times.forGuest;
             }, "");
 
             composeControls.insertAtCaret(entry);
-          });
-        },
-        none : function () {
-          // TODO: Handle missing team more gracefully?
-          window.alert("Cannot insert template: current team not detected.");
-        }
+          },
+          none : function () {
+            // TODO: Handle missing team more gracefully?
+            window.alert("Cannot insert template: current team not detected.");
+          }
+        });
       });
     });
 
@@ -160,32 +186,27 @@ module Esper.ComposeControls {
     });
 
     templateButton.click(function (e) {
-      CurrentThread.currentTeam.get().match({
-        some : function (team) {
-          var events = CurrentThread.linkedEvents.get();
+      getTeamAndPreferences().done(function(teamAndPrefs) {
+        teamAndPrefs.match({
+          some : function (allPrefs) {
+            var execTz;
+            var general = allPrefs.execPrefs.general;
+            if (general) execTz = general.current_timezone;
 
-          events.filter(function (e) {
-            return new Date(e.event.end.local) > new Date(Date.now());
-          });
+            var events = CurrentThread.linkedEvents.get();
+            events.filter(function (e) {
+              return new Date(e.event.end.local) > new Date(Date.now());
+            });
 
-          CurrentThread.taskPrefs.done(function(prefOpt) {
             var guestTz;
-            prefOpt.match({
-              some : function(tpref) { guestTz = tpref.guest_timezone; },
+            allPrefs.taskPrefs.match({
+              some: function(tpref) { guestTz = tpref.guest_timezone; },
               none: function() { }
             });
 
             var entry = events.reduce(function (str, event): string {
               var ev    = event.event;
-              var start = new Date(ev.start.local);
-              var end   = new Date(ev.end.local);
-              var wday = XDate.fullWeekDay(start);
-              var time = XDate.justStartTime(start);
-              var tz    =
-                (<any> moment).tz(ev.start.local,
-                                  CurrentThread.eventTimezone(ev)).zoneAbbr();
-              var forGuest = timeInGuestTimezone(ev.start.utc, guestTz);
-
+              var times = formatStartTime(ev, execTz, guestTz);
               var loc;
               if (ev.location !== undefined) {
                 loc = ev.location.address;
@@ -195,10 +216,8 @@ module Esper.ComposeControls {
               } else {
                 loc = "<b>LOCATION</b>";
               }
-
               var br = str != "" ? "<br />" : ""; // no leading newline
-              return str + br + wday + ", " + time + " " +
-                     tz + forGuest + " at " + loc;
+              return str + br + times.forExec + times.forGuest + " at " + loc;
             }, "");
 
             var template =
@@ -206,18 +225,18 @@ module Esper.ComposeControls {
               multipleEventTemplate.slice(0) :
               singleEventTemplate.slice(0); // using slice to copy string
 
-            var execName = team.team_name.replace(/ .*$/, "");
+            var execName = allPrefs.team.team_name.replace(/ .*$/, "");
             if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
             var filledTemplate =
               template.replace("|offer|", entry)
               .replace("|exec|", execName);
             composeControls.insertAtCaret(filledTemplate);
-          });
-        },
-        none : function () {
-          // TODO: Handle more gracefully?
-          window.alert("Cannot insert template: current team not detected.");
-        }
+          },
+          none : function () {
+            // TODO: Handle more gracefully?
+            window.alert("Cannot insert template: current team not detected.");
+          }
+        });
       });
     });
 
