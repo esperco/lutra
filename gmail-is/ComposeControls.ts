@@ -37,6 +37,19 @@ module Esper.ComposeControls {
     "<br/><br/>" +
     endOfTemplate;
 
+  function timeInGuestTimezone(time: string, zone: string) {
+    // moment object in guest timezone
+    var guestStart = zone ? (<any> moment)(time).tz(zone) : null;
+    // guest time formatted like 3:45 pm
+    var guestTime = guestStart ? guestStart.format("h:mm a") : null;
+    // add guest timezone abbreviation, like EDT
+    var forGuest =
+      guestStart ?
+      " / " + guestTime + " " + guestStart.zoneAbbr() :
+      "";
+    return forGuest;
+  }
+
   /** Inserts the date of each linked event into the text box. */
   function insertButton(composeControls) {
 '''
@@ -80,22 +93,7 @@ module Esper.ComposeControls {
               var tz    =
                 (<any> moment).tz(ev.start.local,
                                   CurrentThread.eventTimezone(ev)).zoneAbbr();
-
-              // moment object in guest timezone
-              var guestStart =
-                guestTz ?
-                (<any> moment)(ev.start.utc).tz(guestTz) :
-                null;
-              // guest time formatted like 3:45 pm
-              var guestTime =
-                guestStart ?
-                guestStart.format("h:mm a") :
-                null;
-              // add guest timezone abbreviation, like EDT
-              var forGuest =
-                guestStart ?
-                " / " + guestTime + " " + guestStart.zoneAbbr() :
-                "";
+              var forGuest = timeInGuestTimezone(ev.start.utc, guestTz);
 
               var br = str != "" ? "<br />" : ""; // no leading newline
               return str + br + wday + ", " + time + " " + tz + forGuest;
@@ -170,41 +168,51 @@ module Esper.ComposeControls {
             return new Date(e.event.end.local) > new Date(Date.now());
           });
 
-          var entry = events.reduce(function (str, event): string {
-            var ev    = event.event;
-            var start = new Date(ev.start.local);
-            var end   = new Date(ev.end.local);
-            var wday = XDate.fullWeekDay(start);
-            var time = XDate.justStartTime(start);
-            var tz    =
-              (<any> moment).tz(ev.start.local,
-                                CurrentThread.eventTimezone(ev)).zoneAbbr();
+          CurrentThread.taskPrefs.done(function(prefOpt) {
+            var guestTz;
+            prefOpt.match({
+              some : function(tpref) { guestTz = tpref.guest_timezone; },
+              none: function() { }
+            });
 
-            var loc;
-            if (ev.location !== undefined) {
-              loc = ev.location.address;
-              if (ev.location.title !== "") {
-                loc = ev.location.title + " - " + loc;
+            var entry = events.reduce(function (str, event): string {
+              var ev    = event.event;
+              var start = new Date(ev.start.local);
+              var end   = new Date(ev.end.local);
+              var wday = XDate.fullWeekDay(start);
+              var time = XDate.justStartTime(start);
+              var tz    =
+                (<any> moment).tz(ev.start.local,
+                                  CurrentThread.eventTimezone(ev)).zoneAbbr();
+              var forGuest = timeInGuestTimezone(ev.start.utc, guestTz);
+
+              var loc;
+              if (ev.location !== undefined) {
+                loc = ev.location.address;
+                if (ev.location.title !== "") {
+                  loc = ev.location.title + " - " + loc;
+                }
+              } else {
+                loc = "<b>LOCATION</b>";
               }
-            } else {
-              loc = "<b>LOCATION</b>";
-            }
 
-            var br = str != "" ? "<br />" : ""; // no leading newline
-            return str + br + wday + ", " + time + " " + tz + " at " + loc;
-          }, "");
+              var br = str != "" ? "<br />" : ""; // no leading newline
+              return str + br + wday + ", " + time + " " +
+                     tz + forGuest + " at " + loc;
+            }, "");
 
-          var template =
-            events.length > 1 ?
-            multipleEventTemplate.slice(0) :
-            singleEventTemplate.slice(0); // using slice to copy string
+            var template =
+              events.length > 1 ?
+              multipleEventTemplate.slice(0) :
+              singleEventTemplate.slice(0); // using slice to copy string
 
-          var execName = team.team_name.replace(/ .*$/, "");
-          if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-          var filledTemplate =
-            template.replace("|offer|", entry)
-            .replace("|exec|", execName);
-          composeControls.insertAtCaret(filledTemplate);
+            var execName = team.team_name.replace(/ .*$/, "");
+            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+            var filledTemplate =
+              template.replace("|offer|", entry)
+              .replace("|exec|", execName);
+            composeControls.insertAtCaret(filledTemplate);
+          });
         },
         none : function () {
           // TODO: Handle more gracefully?
