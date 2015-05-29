@@ -37,14 +37,9 @@ module Esper.ComposeControls {
     "<br/><br/>" +
     endOfTemplate;
 
-  interface EventTime {
-    forExec: string;
-    forGuest: string;
-  }
-
   // Display the time from ev.start.utc in both exec and guest timezones
   function formatStartTime(ev: ApiT.CalendarEvent, execTz: string,
-                           guestTz: string) : EventTime
+                           guestTz: string) : string
   {
     if (!execTz) execTz = CurrentThread.eventTimezone(ev);
     var execMoment = (<any> moment)(ev.start.utc).tz(execTz);
@@ -57,7 +52,7 @@ module Esper.ComposeControls {
       forGuest = " / " + guestMoment.format("h:mm a") +
                  " " + guestMoment.zoneAbbr();
     }
-    return { forExec: forExec, forGuest: forGuest };
+    return forExec + forGuest;
   }
 
   interface TeamAndPreferences {
@@ -119,10 +114,10 @@ module Esper.ComposeControls {
             });
 
             var entry = events.reduce(function (str, event) {
-              var ev    = event.event;
-              var times = formatStartTime(ev, execTz, guestTz);
+              var ev = event.event;
+              var time = formatStartTime(ev, execTz, guestTz);
               var br = str != "" ? "<br />" : ""; // no leading newline
-              return str + br + times.forExec + times.forGuest;
+              return str + br + time;
             }, "");
 
             composeControls.insertAtCaret(entry);
@@ -205,8 +200,8 @@ module Esper.ComposeControls {
             });
 
             var entry = events.reduce(function (str, event): string {
-              var ev    = event.event;
-              var times = formatStartTime(ev, execTz, guestTz);
+              var ev = event.event;
+              var time = formatStartTime(ev, execTz, guestTz);
               var loc;
               if (ev.location !== undefined) {
                 loc = ev.location.address;
@@ -217,7 +212,7 @@ module Esper.ComposeControls {
                 loc = "<b>LOCATION</b>";
               }
               var br = str != "" ? "<br />" : ""; // no leading newline
-              return str + br + times.forExec + times.forGuest + " at " + loc;
+              return str + br + time + " at " + loc;
             }, "");
 
             var template =
