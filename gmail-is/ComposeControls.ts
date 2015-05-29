@@ -62,13 +62,19 @@ module Esper.ComposeControls {
   }
 
   // Combines Preferences with CurrentThread.currentTeam/taskPrefs
-  function getTeamAndPreferences() : JQueryPromise<Option.T<TeamAndPreferences>> {
+  function getTeamAndPreferences():
+    JQueryPromise<Option.T<TeamAndPreferences>>
+  {
     return CurrentThread.currentTeam.get().match({
       some: function(team) {
         // Cast due to promise flattening, argh
         return <any> Preferences.get(team.teamid).then(function(execPrefs) {
           return CurrentThread.taskPrefs.then(function(prefOpt) {
-            return Option.some({ team: team, execPrefs: execPrefs, taskPrefs: prefOpt });
+            return Option.some({
+              team: team,
+              execPrefs: execPrefs,
+              taskPrefs: prefOpt
+            });
           });
         });
       },
