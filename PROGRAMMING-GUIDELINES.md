@@ -13,7 +13,7 @@ Each named function definition must be explicitly typed. The type of
 each of the arguments as well as the result must be explicitly
 specified. An example is:
 
-```
+```javascript
 function f(x: string, y: ApiT.Team): JQueryPromise<ApiT.Food> {
   ...
 }
@@ -22,7 +22,7 @@ function f(x: string, y: ApiT.Team): JQueryPromise<ApiT.Food> {
 `var` definitions that are not initialized from a function application
 must be type-annotated. Examples of such cases include:
 
-```
+```javascript
 var x: number;
 var p: Point2 = { x: 12, y: -2 };
 ```
@@ -110,7 +110,7 @@ means:
 
 Do not write:
 
-```
+```javascript
   function prefWidget() {
     ...
     saveButton.click(function() {
@@ -127,7 +127,7 @@ Do not write:
 
 Do write instead:
 
-```
+```javascript
   function prefWidget(team: ApiT.Team) {
     ...
     saveButton.click(function() {
@@ -143,3 +143,13 @@ Do write instead:
     prefWidget(team).append(prefContainer);
   }
 ```
+
+Why?
+
+Because the `prefWidget` and the rest of the sidebar was created for a given
+team. It displays info about that team. Clicking on the button is
+expected to apply to data of that team. If the
+current team changes but for some reason the sidebar is not refreshed
+right away, the old `prefWidget` and other sidebar elements remain
+unchanged. Clicking the Save button should absolutely not save that
+data for the current team, who doesn't own any of that data.
