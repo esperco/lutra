@@ -64,21 +64,45 @@ module Esper.ComposeControls {
             return new Date(e.event.end.local) > new Date(Date.now());
           });
 
-          var entry = events.reduce(function (str, event) {
-            var ev    = event.event;
-            var start = new Date(ev.start.local);
-            var end   = new Date(ev.end.local);
-            var wday = XDate.fullWeekDay(start);
-            var time = XDate.justStartTime(start);
-            var tz    =
-              (<any> moment).tz(ev.start.local,
-                                CurrentThread.eventTimezone(ev)).zoneAbbr();
+          CurrentThread.taskPrefs.done(function(prefOpt) {
+            var guestTz;
+            prefOpt.match({
+              some : function(tpref) { guestTz = tpref.guest_timezone; },
+              none: function() { }
+            });
 
-            var br = str != "" ? "<br />" : ""; // no leading newline
-            return str + br + wday + ", " + time + " " + tz;
-          }, "");
+            var entry = events.reduce(function (str, event) {
+              var ev    = event.event;
+              var start = new Date(ev.start.local);
+              var end   = new Date(ev.end.local);
+              var wday = XDate.fullWeekDay(start);
+              var time = XDate.justStartTime(start);
+              var tz    =
+                (<any> moment).tz(ev.start.local,
+                                  CurrentThread.eventTimezone(ev)).zoneAbbr();
 
-          composeControls.insertAtCaret(entry);
+              // moment object in guest timezone
+              var guestStart =
+                guestTz ?
+                (<any> moment)(ev.start.utc).tz(guestTz) :
+                null;
+              // guest time formatted like 3:45 pm
+              var guestTime =
+                guestStart ?
+                guestStart.format("h:mm a") :
+                null;
+              // add guest timezone abbreviation, like EDT
+              var forGuest =
+                guestStart ?
+                " / " + guestTime + " " + guestStart.zoneAbbr() :
+                "";
+
+              var br = str != "" ? "<br />" : ""; // no leading newline
+              return str + br + wday + ", " + time + " " + tz + forGuest;
+            }, "");
+
+            composeControls.insertAtCaret(entry);
+          });
         },
         none : function () {
           // TODO: Handle missing team more gracefully?
@@ -89,9 +113,9 @@ module Esper.ComposeControls {
 
     function updateEventsLabel() {
       var linkedEvents = CurrentThread.linkedEvents.get();
-      
+
       numLinkedEvents.text(linkedEvents.length.toString());
-      
+ 
       var tooltipText = "";
       switch (linkedEvents.length) {
       case 0:
