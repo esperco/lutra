@@ -90,12 +90,56 @@ In order store and watch mutable states, we have a module `Watchable`
 which provides getters and setters for a state, as well a way to
 register functions called when the state changes.
 
-The first rule here, is to use watchable values and watchers to hold
-any mutable state. Additionally, if a state can be undefined
-(e.g. it's a thread ID but we're not in a thread view), the `Option`
+The rule here is to use watchable values and watchers to hold
+any mutable state. Additionally, if a state can be undefined,
+e.g. it's a thread ID but we're not in a thread view, the `Option`
 type must be used as mentioned above.
 
-Managing state changes: maximizing referential transparency
------------------------------------------------------------
+Managing state changes: maximize referential transparency
+---------------------------------------------------------
 
-...
+Functions whose output and effects are entirely determined by their
+inputs are called referentially transparent. For the programmer it
+means:
+
+- it doesn't matter when the function is executed, we know it will
+  work using the arguments that were given to it, and not some future
+  version of them
+- the programmer understands in which context the function is allowed
+  to run, which is any context where the arguments can be provided
+
+Do not write:
+
+```
+  function prefWidget() {
+    ...
+    saveButton.click(function() {
+      Api.savePref(currentTeam.get().unwrap().teamid, pref);
+    });
+    return view;
+  }
+
+  function refreshSidebar() {
+    ...
+    prefWidget().append(prefContainer);
+  }
+```
+
+Do write instead:
+
+```
+  function prefWidget(team: ApiT.Team) {
+    ...
+    saveButton.click(function() {
+      Api.savePref(team.teamid, pref);
+    });
+    return view;
+  }
+
+  /* requires current team to be defined */
+  function refreshSidebar() {
+    var team = currentTeam.get().unwrap();
+    ...
+    prefWidget(team).append(prefContainer);
+  }
+```
