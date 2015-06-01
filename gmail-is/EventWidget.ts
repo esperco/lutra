@@ -47,8 +47,8 @@ module Esper.EventWidget {
                         event: ApiT.CalendarEvent,
                         linkedEvents: ApiT.CalendarEvent[],
                         team: ApiT.Team) {
-    var start = Math.floor(Date.parse(event.start.utc)/1000);
-    var end = Math.floor(Date.parse(event.end.utc)/1000);
+    var start = Math.floor(moment(event.start.utc).unix());
+    var end = Math.floor(moment(event.end.utc).unix());
 
     Api.eventRange(team.teamid, team.team_calendars, start, end)
       .done(function(results) {
