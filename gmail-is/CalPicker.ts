@@ -469,7 +469,7 @@ module Esper.CalPicker {
 
     function eventRender(calEvent, element) {
       var guestTime = "";
-      if (showTimezone === guestTimezone) {
+      if (showTimezone !== guestTimezone) {
         var start = calEvent.start, end = calEvent.end;
         var guestStart =
           Timezone.shiftTime(start.format(), showTimezone, guestTimezone);
@@ -477,7 +477,7 @@ module Esper.CalPicker {
           Timezone.shiftTime(end.format(), showTimezone, guestTimezone);
         guestTime =
           " (" + moment(guestStart).format("h:mm") + " - " +
-          moment(guestEnd).format("h:mm") + " " + guestZoneAbbr + ")";
+          moment(guestEnd).format("h:mm a") + " " + guestZoneAbbr + ")";
       }
 
       var address = "";
