@@ -107,7 +107,6 @@ module Esper.ComposeControls {
             var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
             if (general) execTz = general.current_timezone;
-            var guestTz;
             allPrefs.taskPrefs.match({
               some: function(tpref) {
                 execTz = tpref.executive_timezone; // overrides preferences
@@ -196,7 +195,6 @@ module Esper.ComposeControls {
             var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
             if (general) execTz = general.current_timezone;
-            var guestTz;
             allPrefs.taskPrefs.match({
               some: function(tpref) {
                 execTz = tpref.executive_timezone; // overrides preferences
