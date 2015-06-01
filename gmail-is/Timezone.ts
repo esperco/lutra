@@ -371,17 +371,26 @@ module Esper.Timezone {
 
   export function createTimezoneSelector(selected) {
 '''
-<select #currentTimezone class="esper-select esper-prefs-timezone"/>
+<select #timezone class="esper-select esper-prefs-timezone"/>
 '''
     if (timezoneData === null) timezoneData = addZoneInfo();
 
-    List.iter(timezoneData, function(z) {
-      var name = "(GMT" + z.offset + ") " + z.name;
-      $("<option value='" + z.id + "'>" + name + "</option>")
-        .appendTo(currentTimezone);
+    var alreadySelected = false;
+    List.iter(timezoneData, function(z, i) {
+      if (i === commonTimezones.length) {
+        $("<option disabled>────────────────────────</option>")
+          .appendTo(timezone);
+      }
+      var name = "(GMT" + z.offset + ") " + z.name + " (" + z.abbr + ")";
+      var opt = $("<option value='" + z.id + "'>" + name + "</option>");
+      if (z.id === selected && !alreadySelected) {
+        opt.attr("selected", true);
+        alreadySelected = true;
+      }
+      opt.appendTo(timezone);
     });
 
-    return currentTimezone;
+    return timezone;
   }
 
 }

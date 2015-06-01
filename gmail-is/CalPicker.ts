@@ -40,8 +40,8 @@ module Esper.CalPicker {
     locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     createdBy : JQuery;
-    execTz : JQuery;
-    guestTz : JQuery;
+    execTzDiv : JQuery;
+    guestTzDiv : JQuery;
     guestNames : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
@@ -124,13 +124,11 @@ module Esper.CalPicker {
         <span class="esper-bold">Created by:</span>
         <select #createdBy class="esper-select"/>
       </div>
-      <div class="esper-event-settings-col">
+      <div #execTzDiv class="esper-event-settings-col">
         <span class="esper-bold">Executive timezone:</span>
-        <select #execTz class="esper-select"/>
       </div>
-      <div class="esper-event-settings-col">
+      <div #guestTzDiv class="esper-event-settings-col">
         <span class="esper-bold">Guest timezone:</span>
-        <select #guestTz class="esper-select"/>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -247,60 +245,10 @@ module Esper.CalPicker {
       });
     }
 
-    var popularZones = [
-      "America/New_York",
-      "America/Chicago",
-      "America/Denver",
-      "America/Los_Angeles"
-    ];
-    var calendarZones =
-      List.filterMap(team.team_calendars, function(cal : ApiT.Calendar) {
-        return cal.calendar_timezone; // filtered out if undefined
-      });
-
-    var guestPrefs = tpref.guest_preferences;
-    var individualGuestZones = List.filterMap(guestPrefs, function(gpref) {
-      return gpref.timezone;
-    });
-
-    /* List of timezones for the dropdown, starting with
-       the default timezone which is the one from
-       the executive's preferences */
-    var dispZones =
-      List.unique(
-        List.concat([
-          [showTimezone],
-          calendarZones,
-          [guestTimezone],
-          individualGuestZones,
-          popularZones
-        ])
-      );
-
-    var guestZones =
-      List.unique(
-        List.concat([
-          [guestTimezone],
-          individualGuestZones,
-          [showTimezone],
-          calendarZones,
-          popularZones
-        ])
-      );
-
-    List.iter(dispZones, function(tz) {
-      var abbr = zoneAbbr(tz);
-      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
-        .attr("selected", tz === showTimezone)
-        .appendTo(execTz);
-    });
-
-    List.iter(guestZones, function(tz) {
-      var abbr = zoneAbbr(tz);
-      $("<option value=\"" + tz + "\">" + abbr + " (" + tz + ")</option>")
-        .attr("selected", tz === guestTimezone)
-        .appendTo(guestTz);
-    });
+    var execTz = Timezone.createTimezoneSelector(showTimezone);
+    var guestTz = Timezone.createTimezoneSelector(guestTimezone);
+    execTz.appendTo(execTzDiv);
+    guestTz.appendTo(guestTzDiv);
 
     execTz.change(function() {
       var tz = execTz.val();
