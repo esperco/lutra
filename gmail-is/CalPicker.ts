@@ -468,21 +468,22 @@ module Esper.CalPicker {
     }
 
     function eventRender(calEvent, element) {
-      var start = calEvent.start, end = calEvent.end;
-      var guestStart =
-        Timezone.shiftTime(start.format(), showTimezone, guestTimezone);
-      var guestEnd =
-        Timezone.shiftTime(end.format(), showTimezone, guestTimezone);
-      var guestTime =
-        showTimezone === guestTimezone ?
-        "" :
-        " (" + moment(guestStart).format("h:mm") + " - " +
-        moment(guestEnd).format("h:mm") + " " + guestZoneAbbr + ")";
+      var guestTime = "";
+      if (showTimezone === guestTimezone) {
+        var start = calEvent.start, end = calEvent.end;
+        var guestStart =
+          Timezone.shiftTime(start.format(), showTimezone, guestTimezone);
+        var guestEnd =
+          Timezone.shiftTime(end.format(), showTimezone, guestTimezone);
+        guestTime =
+          " (" + moment(guestStart).format("h:mm") + " - " +
+          moment(guestEnd).format("h:mm") + " " + guestZoneAbbr + ")";
+      }
 
+      var address = "";
       var orig = calEvent.orig;
       var loc;
       if (orig !== undefined) loc = orig.location;
-      var address = "";
       if (loc !== undefined) {
         address = loc.address;
         if (loc.title !== "") {
