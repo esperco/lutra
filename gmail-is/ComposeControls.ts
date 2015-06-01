@@ -104,20 +104,22 @@ module Esper.ComposeControls {
       getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
-            var execTz;
+            var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
             if (general) execTz = general.current_timezone;
+            allPrefs.taskPrefs.match({
+              some: function(tpref) {
+                execTz = tpref.executive_timezone; // overrides preferences
+                guestTz = tpref.guest_timezone;
+              },
+              none: function() { }
+            });
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
               return new Date(e.event.end.local) > new Date(Date.now());
             });
 
-            var guestTz;
-            allPrefs.taskPrefs.match({
-              some: function(tpref) { guestTz = tpref.guest_timezone; },
-              none: function() { }
-            });
 
             var entry = events.reduce(function (str, event) {
               var ev = event.event;
@@ -190,19 +192,20 @@ module Esper.ComposeControls {
       getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
-            var execTz;
+            var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
             if (general) execTz = general.current_timezone;
+            allPrefs.taskPrefs.match({
+              some: function(tpref) {
+                execTz = tpref.executive_timezone; // overrides preferences
+                guestTz = tpref.guest_timezone;
+              },
+              none: function() { }
+            });
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
               return new Date(e.event.end.local) > new Date(Date.now());
-            });
-
-            var guestTz;
-            allPrefs.taskPrefs.match({
-              some: function(tpref) { guestTz = tpref.guest_timezone; },
-              none: function() { }
             });
 
             var entry = events.reduce(function (str, event): string {
