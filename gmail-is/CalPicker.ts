@@ -16,7 +16,9 @@ module Esper.CalPicker {
 
   // The timezone that these calendars are displayed in
   var showTimezone : string; // America/Los_Angeles, America/New_York, etc.
+  var guestTimezone : string;
   var showZoneAbbr : string; // PST, EDT, etc.
+  var guestZoneAbbr : string;
 
   /* This should be a parameter to fetchEvents, but fullCalendar calls
      that function for us, and I can only trigger it by doing
@@ -160,9 +162,10 @@ module Esper.CalPicker {
                       their own individual timezone, set later
                       during event finalization */
     showTimezone = tpref.executive_timezone || prefs.general.current_timezone;
-    var guestTimezone = tpref.guest_timezone || showTimezone;
+    guestTimezone = tpref.guest_timezone || showTimezone;
 
     showZoneAbbr = zoneAbbr(showTimezone);
+    guestZoneAbbr = zoneAbbr(guestTimezone);
 
     function searchLocation() {
       var query = eventLocation.val();
@@ -263,6 +266,8 @@ module Esper.CalPicker {
     guestTz.change(function() {
       var tz = guestTz.val();
       guestTimezone = tz;
+      guestZoneAbbr = zoneAbbr(tz);
+      calendarView.fullCalendar("refetchEvents");
       tpref.guest_timezone = tz;
       Api.putTaskPrefs(tpref);
     });
@@ -463,20 +468,36 @@ module Esper.CalPicker {
     }
 
     function eventRender(calEvent, element) {
+      var guestTime = "";
+      if (showTimezone !== guestTimezone) {
+        var start = calEvent.start, end = calEvent.end;
+        var guestStart =
+          Timezone.shiftTime(start.format(), showTimezone, guestTimezone);
+        var guestEnd =
+          Timezone.shiftTime(end.format(), showTimezone, guestTimezone);
+        guestTime =
+          " (" + moment(guestStart).format("h:mm") + " - " +
+          moment(guestEnd).format("h:mm a") + " " + guestZoneAbbr + ")";
+      }
+
+      var address = "";
       var orig = calEvent.orig;
       var loc;
       if (orig !== undefined) loc = orig.location;
       if (loc !== undefined) {
-        var address = loc.address;
+        address = loc.address;
         if (loc.title !== "") {
           address = loc.title + " - " + address;
         }
+      }
+
+      if (guestTime !== "" || address !== "") {
         element
           .attr("title", "")
           .tooltip({
             show: { effect: "none" },
             hide: { effect: "none" },
-            "content": address,
+            "content": address + guestTime,
             "position": { my: 'center bottom', at: 'center top-7' },
             "tooltipClass": "esper-top esper-tooltip"
           });
