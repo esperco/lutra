@@ -125,7 +125,7 @@ module Esper.EventControls {
             var checked = true;
             var v = InviteControls.viewPersonInvolved(peopleInvolved,
                                                       participant.email,
-                                                      name, checked);
+                                                      name, undefined, checked);
             viewPeopleInvolved.append(v);
           });
         } else {
@@ -141,7 +141,7 @@ module Esper.EventControls {
 
           var checked = true;
           var v = InviteControls.viewPersonInvolved(peopleInvolved, email,
-                                                    name, checked);
+                                                    name, undefined, checked);
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");

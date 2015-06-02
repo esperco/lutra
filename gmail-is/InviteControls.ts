@@ -32,7 +32,8 @@ module Esper.InviteControls {
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteWidget(event: ApiT.CalendarEvent) {
+  export function inviteWidget(event: ApiT.CalendarEvent,
+                               prefs : Option.T<CurrentThread.TeamAndPreferences>) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -103,13 +104,14 @@ module Esper.InviteControls {
   Not Duplicate
 </div>
 '''
-    return CurrentThread.currentTeam.get().match({
-      some : function (team) {
+    return prefs.match({
+      some : function (allPrefs) {
         /** Removes the widget from the DOM. */
         function close() {
           container.remove();
         }
 
+        var team = allPrefs.team;
         var threadId = CurrentThread.threadId.get();
 
         Sidebar.customizeSelectArrow(pubCalendar);
@@ -162,12 +164,40 @@ module Esper.InviteControls {
           });
         }
 
+        var taskPrefs;
+        allPrefs.taskPrefs.match({
+          some: function(prefs) { taskPrefs = prefs; },
+          none: function() { }
+        });
+
+        function timezoneForGuest(email) {
+          var tz;
+          // If we have a guest-specific timezone for this guest, use it
+          var guestPrefs =
+            taskPrefs ?
+            List.find(taskPrefs.guest_preferences, function(x: ApiT.GuestPreferences) {
+              return x.email === email;
+            }) :
+            null;
+          // If none found, try guest_timezone from TaskPreferences
+          if (guestPrefs) {
+            tz = guestPrefs.timezone;
+          } else {
+            tz = taskPrefs.guest_timezone;
+          }
+          // Don't have that either? Use the event's timezone
+          if (!tz) tz = CurrentThread.eventTimezone(event);
+          return tz;
+        }
+
         var peopleInvolved = {};
         CurrentThread.getExternalParticipants().done(function(participants) {
           if (participants.length > 0) {
             List.iter(participants, function (participant) {
               var name = participant.display_name || "";
-              var v = viewPersonInvolved(peopleInvolved, participant.email, name);
+              var email = participant.email;
+              var v = viewPersonInvolved(peopleInvolved, email,
+                                         name, timezoneForGuest(email), taskPrefs);
               viewPeopleInvolved.append(v);
             });
           } else {
@@ -183,124 +213,124 @@ module Esper.InviteControls {
           if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
 
           var checked = true;
-          var v = viewPersonInvolved(peopleInvolved, email, name, checked);
+          var v = viewPersonInvolved(peopleInvolved, email,
+                                     name, timezoneForGuest(email), taskPrefs, checked);
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
         });
 
-        CurrentThread.withPreferences(function (preferences) {
-          var duplicate    = preferences.general.use_duplicate_events;
-          var execReminder = preferences.general.send_exec_reminder;
-          var holdColor    = preferences.general.hold_event_color;
+        var preferences = allPrefs.execPrefs;
+        var duplicate    = preferences.general.use_duplicate_events;
+        var execReminder = preferences.general.send_exec_reminder;
+        var holdColor    = preferences.general.hold_event_color;
 
-          if (!duplicate) {
-            heading.text("Invite guests to this calendar event");
-            notDuplicate.appendTo(heading);
-            calendarRow.remove();
+        if (!duplicate) {
+          heading.text("Invite guests to this calendar event");
+          notDuplicate.appendTo(heading);
+          calendarRow.remove();
+        }
+
+        function searchLocation() {
+          var query = pubLocation.val();
+          LocSearch.displayResults(team, pubLocation, locationDropdown,
+                                   locationSearchResults, query,
+                                   preferences);
+        }
+        Util.afterTyping(pubLocation, 250, searchLocation);
+        pubLocation.click(searchLocation);
+
+        next.click(function() {
+          var guests = [];
+          for (var person in peopleInvolved) {
+            if (peopleInvolved.hasOwnProperty(person)) {
+              guests.push({
+                display_name : peopleInvolved[person] || null,
+                email        : person
+              });
+            }
           }
 
-          function searchLocation() {
-            var query = pubLocation.val();
-            LocSearch.displayResults(team, pubLocation, locationDropdown,
-                                     locationSearchResults, query,
-                                     preferences);
+          var location = {
+            /* Right now we don't care about title because this is just text
+               to be displayed in the Google Calendar location box... but in
+               the future we may use it for typeahead or something. */
+            title   : "",
+            address : pubLocation.val()
+          };
+          if (!location.address) location = null;
+
+          var title = pubTitle.val();
+          var eventEdit : ApiT.CalendarEventEdit = {
+            google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
+            start         : event.start,
+            end           : event.end,
+            title         : title,
+            description   : pubNotes.val(),
+            location      : location,
+            all_day       : event.all_day,
+            guests        : guests
+          };
+          if (holdColor && /^HOLD: /.test(title)) {
+            eventEdit.color_id = holdColor.key;
           }
-          Util.afterTyping(pubLocation, 250, searchLocation);
-          pubLocation.click(searchLocation);
 
-          next.click(function() {
-            var guests = [];
-            for (var person in peopleInvolved) {
-              if (peopleInvolved.hasOwnProperty(person)) {
-                guests.push({
-                  display_name : peopleInvolved[person] || null,
-                  email        : person
-                });
-              }
-            }
+          var from = fromSelect.val();
+          location = pubLocation.val();
+          var animation = {
+            time : 500,
+            width : Gmail.threadContainer().width() + 100
+          }
 
-            var location = {
-              /* Right now we don't care about title because this is just text
-                 to be displayed in the Google Calendar location box... but in
-                 the future we may use it for typeahead or something. */
-              title   : "",
-              address : pubLocation.val()
-            };
-            if (!location.address) location = null;
+          function slideForward(previous, next) {
+            previous.parent().css({
+              "overflow" : "hidden"
+            });
+            previous.animate({left : -animation.width}, animation.time);
 
-            var title = pubTitle.val();
-            var eventEdit : ApiT.CalendarEventEdit = {
-              google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
-              start         : event.start,
-              end           : event.end,
-              title         : title,
-              description   : pubNotes.val(),
-              location      : location,
-              all_day       : event.all_day,
-              guests        : guests
-            };
-            if (holdColor && /^HOLD: /.test(title)) {
-              eventEdit.color_id = holdColor.key;
-            }
-
-            var from = fromSelect.val();
-            location = pubLocation.val();
-            var animation = {
-              time : 500,
-              width : Gmail.threadContainer().width() + 100
-            }
-
-            function slideForward(previous, next) {
-              previous.parent().css({
-                "overflow" : "hidden"
-              });
-              previous.animate({left : -animation.width}, animation.time);
-
-              next.css({
-                "left"       : animation.width,
-                "margin-top" : (-previous.height()) + "px"
-              });
-
-              previous.after(next);
-              next.animate({left : 0}, animation.time);
-            }
-
-            function slideBack(previous, next) {
-              previous.animate({left : 0}, animation.time);
-
-              next.animate({left : animation.width},
-                           animation.time,
-                           function () {
-                next.remove();
-              });
-            }
-
-            /** Animates from the current widget to the check description
-             *  widget.
-             */
-            function checkDescription(previous, title, reminderSpec?) {
-              var next =
-                descriptionWidget(event, eventEdit, duplicate,
-                                  guests, from, close, back, reminderSpec);
-
-              slideForward(previous, next);
-
-              function back() {
-                slideBack(previous, next);
-              }
-            }
-
-            var next = reminderWidget(event, eventEdit, team,
-                                      execReminder, duplicate, function () {
-              slideBack(container, next);
-            }, function (reminderSpec) {
-              var title = pubTitle.val();
-              checkDescription(next, title, reminderSpec);
+            next.css({
+              "left"       : animation.width,
+              "margin-top" : (-previous.height()) + "px"
             });
 
-            slideForward(container, next);
+            previous.after(next);
+            next.animate({left : 0}, animation.time);
+          }
+
+          function slideBack(previous, next) {
+            previous.animate({left : 0}, animation.time);
+
+            next.animate({left : animation.width},
+                         animation.time,
+                         function () {
+              next.remove();
+            });
+          }
+
+          /** Animates from the current widget to the check description
+           *  widget.
+           */
+          function checkDescription(previous, title, reminderSpec?) {
+            var next =
+              descriptionWidget(event, eventEdit, duplicate,
+                                guests, from, close, back, reminderSpec);
+
+            slideForward(previous, next);
+
+            function back() {
+              slideBack(previous, next);
+            }
+          }
+
+          var next = reminderWidget(event, eventEdit, team,
+                                    execReminder, duplicate, function () {
+            slideBack(container, next);
+          }, function (reminderSpec) {
+            var title = pubTitle.val();
+            checkDescription(next, title, reminderSpec);
           });
+
+          slideForward(container, next);
         });
 
         cancel.click(close);
@@ -629,13 +659,16 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    *  was causing problems.
    */
   export function insertAfterThread(event) {
-    Gmail.threadContainer().after(inviteWidget(event));
+    CurrentThread.getTeamAndPreferences().done(function(prefs) {
+      Gmail.threadContainer().after(inviteWidget(event, prefs));
 
-    // fix mysteriously appearing padding at end of thread:
-    Gmail.threadFooter().css("padding-bottom", "10px");
+      // fix mysteriously appearing padding at end of thread:
+      Gmail.threadFooter().css("padding-bottom", "10px");
+    });
   }
 
-  export function viewPersonInvolved(peopleInvolved, email, name, checked?) {
+  export function viewPersonInvolved(peopleInvolved, email,
+                                     name, tz, taskPrefs, checked?) {
 '''
 <li #viewPerson>
   <label #labelPerson>
@@ -660,6 +693,33 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
       // do nothing if the guest is already correctly included or not
     });
+
+    var tzSel = Timezone.createTimezoneSelector(tz);
+
+    // Make it fit properly
+    tzSel.removeClass("esper-select");
+    tzSel.css("float", "right");
+
+    tzSel.change(function() {
+      var tz = tzSel.val();
+      var pref : ApiT.GuestPreferences = {
+        taskid: taskPrefs.taskid,
+        email: email,
+        timezone: tz
+      };
+      var guestPrefs =
+        List.exists(taskPrefs.guest_preferences, function(g : ApiT.GuestPreferences) {
+          return g.email === email;
+        }) ?
+        List.replace(taskPrefs.guest_preferences, pref, function(g : ApiT.GuestPreferences) {
+          return g.email === email;
+        }) :
+        taskPrefs.guest_preferences.concat([pref]);
+      taskPrefs.guest_preferences = guestPrefs;
+      Api.putTaskPrefs(taskPrefs);
+    });
+
+    labelPerson.append(tzSel);
 
     return viewPerson;
   }

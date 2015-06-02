@@ -55,33 +55,6 @@ module Esper.ComposeControls {
     return forExec + forGuest;
   }
 
-  interface TeamAndPreferences {
-    team : ApiT.Team,
-    execPrefs : ApiT.Preferences,
-    taskPrefs : Option.T<ApiT.TaskPreferences>
-  }
-
-  // Combines Preferences with CurrentThread.currentTeam/taskPrefs
-  function getTeamAndPreferences():
-    JQueryPromise<Option.T<TeamAndPreferences>>
-  {
-    return CurrentThread.currentTeam.get().match({
-      some: function(team) {
-        // Cast due to promise flattening, argh
-        return <any> Preferences.get(team.teamid).then(function(execPrefs) {
-          return CurrentThread.taskPrefs.then(function(prefOpt) {
-            return Option.some({
-              team: team,
-              execPrefs: execPrefs,
-              taskPrefs: prefOpt
-            });
-          });
-        });
-      },
-      none: function() { return Promise.defer(Option.none()); }
-    });
-  }
-
   /** Inserts the date of each linked event into the text box. */
   function insertButton(composeControls) {
 '''
@@ -101,7 +74,7 @@ module Esper.ComposeControls {
     });
 
     insertButton.click(function (e) {
-      getTeamAndPreferences().done(function(teamAndPrefs) {
+      CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
             var execTz, guestTz;
@@ -189,7 +162,7 @@ module Esper.ComposeControls {
     });
 
     templateButton.click(function (e) {
-      getTeamAndPreferences().done(function(teamAndPrefs) {
+      CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
             var execTz, guestTz;
