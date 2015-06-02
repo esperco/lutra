@@ -716,14 +716,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         email: email,
         timezone: tz
       };
+
+      function sameEmail(g: ApiT.GuestPreferences) { return g.email === email; }
       var guestPrefs =
-        List.exists(taskPrefs.guest_preferences, function(g : ApiT.GuestPreferences) {
-          return g.email === email;
-        }) ?
-        List.replace(taskPrefs.guest_preferences, pref, function(g : ApiT.GuestPreferences) {
-          return g.email === email;
-        }) :
+        List.exists(taskPrefs.guest_preferences, sameEmail) ?
+        List.replace(taskPrefs.guest_preferences, pref, sameEmail) :
         taskPrefs.guest_preferences.concat([pref]);
+
       taskPrefs.guest_preferences = guestPrefs;
       Api.putTaskPrefs(taskPrefs);
     });
