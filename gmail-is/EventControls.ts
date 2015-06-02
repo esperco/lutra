@@ -4,7 +4,8 @@ module Esper.EventControls {
    *  team, the widget will be blank and say "no team detected".
    */
   // TODO: Figure out better way of handling missing team!
-  export function eventEditWidget(event: ApiT.CalendarEvent) {
+  export function eventEditWidget(event: ApiT.CalendarEvent,
+                                  prefs: Option.T<CurrentThread.TeamAndPreferences>) {
 '''
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
@@ -75,13 +76,14 @@ module Esper.EventControls {
   </div>
 </div>
 '''
-    return CurrentThread.currentTeam.get().match({
-      some : function (team) {
+    return prefs.match({
+      some : function (allPrefs) {
         /** Removes the widget from the DOM. */
         function close() {
           container.remove();
         }
 
+        var team = allPrefs.team;
         var threadId = CurrentThread.threadId.get();
 
         Sidebar.customizeSelectArrow(fromSelect);
@@ -116,16 +118,24 @@ module Esper.EventControls {
           });
         }
 
-        var peopleInvolved = {};
+        var taskPrefs;
+        allPrefs.taskPrefs.match({
+          some: function(prefs) { taskPrefs = prefs; },
+          none: function() { }
+        });
+
+        var peopleInvolved : { [email:string]: string } = {};
         Log.d(event);
         var participants = event.guests;
         if (participants.length > 0) {
           List.iter(participants, function (participant) {
             var name = participant.display_name || "";
+            var email = participant.email;
             var checked = true;
-            var v = InviteControls.viewPersonInvolved(peopleInvolved,
-                                                      participant.email,
-                                                      name, undefined, checked);
+            var tz = InviteControls.timezoneForGuest(email, taskPrefs, event);
+            var v = InviteControls.viewPersonInvolved(peopleInvolved, email,
+                                                      name, tz, taskPrefs,
+                                                      checked);
             viewPeopleInvolved.append(v);
           });
         } else {
@@ -140,8 +150,10 @@ module Esper.EventControls {
           if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
 
           var checked = true;
+          var tz = InviteControls.timezoneForGuest(email, taskPrefs, event);
           var v = InviteControls.viewPersonInvolved(peopleInvolved, email,
-                                                    name, undefined, checked);
+                                                    name, tz, taskPrefs,
+                                                    checked);
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
@@ -149,80 +161,79 @@ module Esper.EventControls {
 
         pubDescription.val(event.description);
 
-        CurrentThread.withPreferences(function(preferences) {
+        var preferences = allPrefs.execPrefs;
 
-          function searchLocation() {
-            var query = pubLocation.val();
-            LocSearch.displayResults(team, pubLocation, locationDropdown,
-                                     locationSearchResults, query,
-                                     preferences);
+        function searchLocation() {
+          var query = pubLocation.val();
+          LocSearch.displayResults(team, pubLocation, locationDropdown,
+                                   locationSearchResults, query,
+                                   preferences);
+        }
+        Util.afterTyping(pubLocation, 250, searchLocation);
+        pubLocation.click(searchLocation);
+
+        cancel.click(close);
+        save.click(function() {
+          var timezone = preferences.general.current_timezone;
+
+          //moment-tz apparently doesn't handle these timezones
+          if (timezone === "US/Eastern") timezone = "America/New_York";
+          else if (timezone === "US/Central") timezone = "America/Chicago";
+          else if (timezone === "US/Mountain") timezone = "America/Denver";
+          else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
+
+          var st = new Date(startDate.val() + " " + startTime.val() + "Z");
+          var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
+          var timeDiff = ed.getTime() - st.getTime();
+          if (timeDiff < 0) {
+            alert("Error: That change would make the event end " +
+                  "before it starts!");
+            return; // exit click handler
           }
-          Util.afterTyping(pubLocation, 250, searchLocation);
-          pubLocation.click(searchLocation);
+          var evStart: ApiT.CalendarTime = {
+            local: XDate.toString(st),
+            utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
+          };
+          var evEnd: ApiT.CalendarTime = {
+            local: XDate.toString(ed),
+            utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
+          };
 
-          cancel.click(close);
-          save.click(function() {
-            var timezone = preferences.general.current_timezone;
+          var location = {
+            title: "",
+            address: pubLocation.val()
+          };
+          if (!location.address) location = null;
 
-            //moment-tz apparently doesn't handle these timezones
-            if (timezone === "US/Eastern") timezone = "America/New_York";
-            else if (timezone === "US/Central") timezone = "America/Chicago";
-            else if (timezone === "US/Mountain") timezone = "America/Denver";
-            else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
-
-            var st = new Date(startDate.val() + " " + startTime.val() + "Z");
-            var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
-            var timeDiff = ed.getTime() - st.getTime();
-            if (timeDiff < 0) {
-              alert("Error: That change would make the event end " +
-                    "before it starts!");
-              return; // exit click handler
-            }
-            var evStart: ApiT.CalendarTime = {
-              local: XDate.toString(st),
-              utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
-            };
-            var evEnd: ApiT.CalendarTime = {
-              local: XDate.toString(ed),
-              utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
-            };
-
-            var location = {
-              title: "",
-              address: pubLocation.val()
-            };
-            if (!location.address) location = null;
-
-            var guests = [];
-            for (var person in peopleInvolved) {
-              if (peopleInvolved.hasOwnProperty(person)) {
-                guests.push({
-                  display_name : peopleInvolved[person] || null,
-                  email        : person
-                });
-              }
-            }
-
-            var e: ApiT.CalendarEventEdit = {
-              google_cal_id: event.google_cal_id,
-              start: evStart,
-              end: evEnd,
-              title: pubTitle.val(),
-              description: pubDescription.val(),
-              location: location,
-              all_day: event.all_day,
-              guests: guests
-            }
-
-            var alias = fromSelect.val();
-
-            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-              .done(function() {
-                var taskTab = TaskTab.currentTaskTab;
-                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-                close();
+          var guests = [];
+          for (var person in peopleInvolved) {
+            if (peopleInvolved.hasOwnProperty(person)) {
+              guests.push({
+                display_name : peopleInvolved[person] || null,
+                email        : person
               });
-          });
+            }
+          }
+
+          var e: ApiT.CalendarEventEdit = {
+            google_cal_id: event.google_cal_id,
+            start: evStart,
+            end: evEnd,
+            title: pubTitle.val(),
+            description: pubDescription.val(),
+            location: location,
+            all_day: event.all_day,
+            guests: guests
+          }
+
+          var alias = fromSelect.val();
+
+          Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+            .done(function() {
+              var taskTab = TaskTab.currentTaskTab;
+              TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+              close();
+            });
         });
 
         return container;
@@ -240,9 +251,11 @@ module Esper.EventControls {
    *  was causing problems.
    */
   export function insertAfterThread(event) {
-    Gmail.threadContainer().after(eventEditWidget(event));
+    CurrentThread.getTeamAndPreferences().done(function(prefs) {
+      Gmail.threadContainer().after(eventEditWidget(event, prefs));
 
-    // fix mysteriously appearing padding at end of thread:
-    Gmail.threadFooter().css("padding-bottom", "10px");
+      // fix mysteriously appearing padding at end of thread:
+      Gmail.threadFooter().css("padding-bottom", "10px");
+    });
   }
 }

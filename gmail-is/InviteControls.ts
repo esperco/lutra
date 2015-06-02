@@ -27,6 +27,29 @@ module Esper.InviteControls {
     }
   }
 
+  // Look up the timezone for this guest from the task preferences
+  export function timezoneForGuest(email: string,
+                                   taskPrefs: ApiT.TaskPreferences,
+                                   event: ApiT.CalendarEvent): string {
+    var tz;
+    // If we have a guest-specific timezone for this guest, use it
+    var guestPrefs =
+      taskPrefs ?
+      List.find(taskPrefs.guest_preferences, function(x: ApiT.GuestPreferences) {
+        return x.email === email;
+      }) :
+      null;
+    if (guestPrefs) {
+      tz = guestPrefs.timezone;
+    // If none found, try guest_timezone from TaskPreferences
+    } else {
+      tz = taskPrefs.guest_timezone;
+    }
+    // Don't have either of those? Fall back to the event's timezone
+    if (!tz) tz = CurrentThread.eventTimezone(event);
+    return tz;
+  }
+
   /** Returns a widget for inviting guests to the current event or to
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences. Will fail with a visible error if there is no
@@ -170,34 +193,15 @@ module Esper.InviteControls {
           none: function() { }
         });
 
-        function timezoneForGuest(email) {
-          var tz;
-          // If we have a guest-specific timezone for this guest, use it
-          var guestPrefs =
-            taskPrefs ?
-            List.find(taskPrefs.guest_preferences, function(x: ApiT.GuestPreferences) {
-              return x.email === email;
-            }) :
-            null;
-          // If none found, try guest_timezone from TaskPreferences
-          if (guestPrefs) {
-            tz = guestPrefs.timezone;
-          } else {
-            tz = taskPrefs.guest_timezone;
-          }
-          // Don't have that either? Use the event's timezone
-          if (!tz) tz = CurrentThread.eventTimezone(event);
-          return tz;
-        }
-
-        var peopleInvolved = {};
+        var peopleInvolved : { [email:string]: string } = {};
         CurrentThread.getExternalParticipants().done(function(participants) {
           if (participants.length > 0) {
             List.iter(participants, function (participant) {
               var name = participant.display_name || "";
               var email = participant.email;
-              var v = viewPersonInvolved(peopleInvolved, email,
-                                         name, timezoneForGuest(email), taskPrefs);
+              var tz = timezoneForGuest(email, taskPrefs, event);
+              var v = viewPersonInvolved(peopleInvolved, email, name,
+                                         tz, taskPrefs);
               viewPeopleInvolved.append(v);
             });
           } else {
@@ -213,8 +217,9 @@ module Esper.InviteControls {
           if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
 
           var checked = true;
-          var v = viewPersonInvolved(peopleInvolved, email,
-                                     name, timezoneForGuest(email), taskPrefs, checked);
+          var tz = timezoneForGuest(email, taskPrefs, event);
+          var v = viewPersonInvolved(peopleInvolved, email, name,
+                                     tz, taskPrefs, checked);
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
@@ -667,8 +672,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     });
   }
 
-  export function viewPersonInvolved(peopleInvolved, email,
-                                     name, tz, taskPrefs, checked?) {
+  export function viewPersonInvolved(peopleInvolved: { [email:string]: string },
+                                     email: string,
+                                     name: string,
+                                     tz: string,
+                                     taskPrefs: ApiT.TaskPreferences,
+                                     checked?: boolean) {
 '''
 <li #viewPerson>
   <label #labelPerson>
