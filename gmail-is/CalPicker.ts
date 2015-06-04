@@ -721,33 +721,62 @@ module Esper.CalPicker {
                         picker, team: ApiT.Team,
                         task: ApiT.Task,
                         threadId: string) {
-    var events = [];
-    for (var k in picker.events) {
-      var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
-                               picker.eventLocation);
-      events.push(edit);
+    if (picker.eventLocation.val() == "") {
+      var locationModal = displayCheckLocationModal();
+      $("body").append(locationModal.view);
+    } else {
+      var events = [];
+      for (var k in picker.events) {
+        var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
+                                 picker.eventLocation);
+        events.push(edit);
+      }
+
+      Promise.join(
+        List.map(events, function(event) {
+          var start = Math.floor(moment(event.start.utc).unix());
+          var end = Math.floor(moment(event.end.utc).unix());
+          return Api.eventRange(team.teamid, team.team_calendars, start, end);
+        })
+      ).done(function(all_results) {
+        var filtered_results = List.filterMap(all_results, function(result, i) {
+          if (result.events.length > 0) return [i, result.events];
+          else return null;
+        });
+
+        if (filtered_results.length > 0) {
+          var confirmModal = displayConfirmEventModal(view, closePicker, events,
+                                                      filtered_results, picker, team, task, threadId);
+          $("body").append(confirmModal.view);
+        } else {
+          saveEvents(closePicker, picker, team, task, threadId);
+        }
+      });
     }
 
-    Promise.join(
-      List.map(events, function(event) {
-        var start = Math.floor(moment(event.start.utc).unix());
-        var end = Math.floor(moment(event.end.utc).unix());
-        return Api.eventRange(team.teamid, team.team_calendars, start, end);
-      })
-    ).done(function(all_results) {
-      var filtered_results = List.filterMap(all_results, function(result, i) {
-        if (result.events.length > 0) return [i, result.events];
-        else return null;
+    function displayCheckLocationModal() {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-modal-warning">
+    <div class="esper-modal-header">Location Missing</div>
+    <div class="esper-modal-conent">
+      <p> The events being created do not have a location set. </p>
+      <p> Events should always have a location. </p>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+     <button #okButton class="esper-btn esper-btn-primary modal-primary">
+       Ok
+     </button>
+    </div>
+  </div>
+</div>
+'''
+      okButton.click(function () {
+        view.remove();
       });
 
-      if (filtered_results.length > 0) {
-        var confirmModal = displayConfirmEventModal(view, closePicker, events,
-          filtered_results, picker, team, task, threadId);
-        $("body").append(confirmModal.view);
-      } else {
-        saveEvents(closePicker, picker, team, task, threadId);
-      }
-    });
+      return _view;
+    }
   }
 
   function displayConfirmEventModal(eventView, closePicker,
