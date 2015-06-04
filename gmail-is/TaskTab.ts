@@ -594,6 +594,20 @@ module Esper.TaskTab {
       }
     }
 
+    saveTaskNotes.click(function() {
+      if ($(this).hasClass("esper-save-enabled")) {
+        var notes = taskNotes.val();
+        apiGetTask(team.teamid, threadId, false, true).done(function(task) {
+          Api.setTaskNotes(task.taskid, notes).done(function() {
+            saveTaskNotes.addClass("esper-save-disabled");
+            saveTaskNotes.removeClass("esper-save-enabled");
+            saveTaskNotes.removeClass("esper-clickable");
+            taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+          });
+        });
+      }
+    });
+
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
       Api.getThreadDetails(threadId).done(function(deets) {
@@ -608,17 +622,6 @@ module Esper.TaskTab {
           displayLinkedThreadsList(task, threadId, taskTabView);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTabView);
-          saveTaskNotes.click(function() {
-            if ($(this).hasClass("esper-save-enabled")) {
-              var notes = taskNotes.val();
-              Api.setTaskNotes(task.taskid, notes).done(function() {
-                saveTaskNotes.addClass("esper-save-disabled");
-                saveTaskNotes.removeClass("esper-save-enabled");
-                saveTaskNotes.removeClass("esper-clickable");
-                taskNotes.keyup(function() {taskNotesKeyUp(notes);});
-              });
-            }
-          });
         } else {
           taskCaption.text(taskLabelCreate);
           title = deets.subject;

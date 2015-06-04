@@ -82,7 +82,9 @@ module Esper.ComposeControls {
             if (general) execTz = general.current_timezone;
             allPrefs.taskPrefs.match({
               some: function(tpref) {
-                execTz = tpref.executive_timezone; // overrides preferences
+                if (tpref.executive_timezone) {
+                  execTz = tpref.executive_timezone; // overrides preferences
+                }
                 guestTz = tpref.guest_timezone;
               },
               none: function() { }
@@ -92,7 +94,6 @@ module Esper.ComposeControls {
             events.filter(function (e) {
               return new Date(e.event.end.local) > new Date(Date.now());
             });
-
 
             var entry = events.reduce(function (str, event) {
               var ev = event.event;
@@ -170,7 +171,9 @@ module Esper.ComposeControls {
             if (general) execTz = general.current_timezone;
             allPrefs.taskPrefs.match({
               some: function(tpref) {
-                execTz = tpref.executive_timezone; // overrides preferences
+                if (tpref.executive_timezone) {
+                  execTz = tpref.executive_timezone; // overrides preferences
+                }
                 guestTz = tpref.guest_timezone;
               },
               none: function() { }
