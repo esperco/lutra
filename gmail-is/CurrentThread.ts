@@ -408,4 +408,31 @@ module Esper.CurrentThread {
       }
     });
   }
+
+  export interface TeamAndPreferences {
+    team : ApiT.Team,
+    execPrefs : ApiT.Preferences,
+    taskPrefs : Option.T<ApiT.TaskPreferences>
+  }
+
+  // Combines Preferences with CurrentThread.currentTeam/taskPrefs
+  export function getTeamAndPreferences():
+    JQueryPromise<Option.T<TeamAndPreferences>>
+  {
+    return currentTeam.get().match({
+      some: function(team) {
+        // Cast due to promise flattening, argh
+        return <any> Preferences.get(team.teamid).then(function(execPrefs) {
+          return taskPrefs.then(function(prefOpt) {
+            return Option.some({
+              team: team,
+              execPrefs: execPrefs,
+              taskPrefs: prefOpt
+            });
+          });
+        });
+      },
+      none: function() { return Promise.defer(Option.none()); }
+    });
+  }
 }
