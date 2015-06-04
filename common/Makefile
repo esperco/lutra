@@ -9,6 +9,7 @@ SOURCES = \
   List \
   Lazy \
   Option \
+  Modal \
   Util \
   Watchable \
   Promise \

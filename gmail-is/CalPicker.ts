@@ -756,26 +756,12 @@ module Esper.CalPicker {
 
     function displayCheckLocationModal() {
 '''
-<div #view class="esper-modal-bg">
-  <div #modal class="esper-modal-warning">
-    <div class="esper-modal-header">Location Missing</div>
-    <div class="esper-modal-conent">
-      <p> The events being created do not have a location set. </p>
-      <p> Events should always have a location. </p>
-    </div>
-    <div class="esper-modal-footer esper-clearfix">
-     <button #okButton class="esper-btn esper-btn-primary modal-primary">
-       Ok
-     </button>
-    </div>
-  </div>
+<div #content>
+  <p> The events being created do not have a location set. </p>
+  <p> Events should always have a location. </p>
 </div>
 '''
-      okButton.click(function () {
-        view.remove();
-      });
-
-      return _view;
+      return Modal.alert("Location Missing", content);
     }
   }
 
