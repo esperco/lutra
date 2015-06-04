@@ -708,6 +708,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     // Make it fit properly
     tzSel.removeClass("esper-select");
     tzSel.css("float", "right");
+    tzSel.css("width", "40%");
 
     tzSel.change(function() {
       var tz = tzSel.val();
