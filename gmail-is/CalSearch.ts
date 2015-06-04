@@ -90,6 +90,21 @@ module Esper.CalSearch {
         resultView.link.hide();
         resultView.spinner.hide();
         resultView.linked.show();
+      }).fail(function () {
+        resultView.link.hide();
+        resultView.spinner.hide();
+
+'''
+<div #body>
+  <p> 
+    The event is likely linked to an existing task.
+  </p>
+  <p>
+  Link this thread to that task instead. 
+  </p>
+</div>
+'''
+        Modal.alert("Could not link event.", body).view.appendTo($("body"));
       });
     });
 
