@@ -901,10 +901,15 @@ module AccountTab {
 
       if (mem === "Active" && plan !== undefined) {
         membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
-      } else if (mem !== undefined)
+      } else if (mem !== undefined) {
         membershipBadge.text(mem.toUpperCase());
+      }
 
-      changeMembership.click(function() { showMembershipModal(team); });
+      if (mem !== "Canceled") {
+        changeMembership.click(function() { showMembershipModal(team); });
+      } else {
+        changeMembership.addClass("disabled");
+      }
 
       changePayment.click(function() {
         showPaymentModal("Change", team, null)
