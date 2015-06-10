@@ -151,8 +151,7 @@ module Esper.FinalizeEvent {
         var start    = new Date(event.start.local);
         var end      = new Date(event.end.local);
         var range    = XDate.range(start, end);
-        var timezone =
-          (<any> moment).tz(event.start.local, eventTimezone).zoneAbbr();
+        var timezone = CalPicker.zoneAbbr(eventTimezone);
 
         var time = XDate.fullWeekDay(start) + ", " + range + " " + timezone;
         var location = event.location &&
