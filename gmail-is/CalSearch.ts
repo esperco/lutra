@@ -97,10 +97,10 @@ module Esper.CalSearch {
 '''
 <div #body>
   <p> 
-    The event is likely linked to an existing task.
+    This event is likely linked to an existing task.
   </p>
   <p>
-  Link this thread to that task instead. 
+    Link this email to that task instead, using the title section at the top of the sidebar.
   </p>
 </div>
 '''
