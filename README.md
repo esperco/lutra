@@ -48,7 +48,7 @@ npm install -g less
 
 ```
 $ tsc -v
-Version 1.3.0.0
+message TS6029: Version 1.5.0-beta
 ```
 
 ```
