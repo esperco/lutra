@@ -152,9 +152,10 @@ function main() {
   resizer();
   slider();
   setupRedeemForm();
-  showTasks(".tasks-left-col", "ul.event-examples");
-  showTasks(".tasks-mid-col", "ul.research-examples");
-  showTasks(".tasks-right-col", "ul.office-examples");
+  // Disabling these hover-lists because they seem gimmicky and make it harder for users to understand
+  // showTasks(".tasks-left-col", "ul.event-examples");
+  // showTasks(".tasks-mid-col", "ul.research-examples");
+  // showTasks(".tasks-right-col", "ul.office-examples");
 }
 
 

@@ -22,11 +22,18 @@ html="\
   payment.html \
   privacy-policy.html \
   redeem.html \
-  signup.html \
   splash-navbar.html \
   team.html \
   terms-of-use.html \
   waiting-list.html \
+  pricing.html \
+  signup.html \
+  signup2.html \
+  signup3.html \
+  signup4.html \
+  signup-sorry.html \
+  signup-done.html \
+
 "
 
 css="*.css"
@@ -42,7 +49,8 @@ for x in $html; do
     if [ $x = index.html ]; then
         name=$x
     else
-        name=$(basename $x .html)
+#original: name=$(basename $x .html) but this is getting annoying
+	name=$x
     fi
     cp html/$x pub/$name
 done
