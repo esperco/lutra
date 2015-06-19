@@ -645,4 +645,11 @@ module Api {
     var url = "/api/gcal/colors/event/" + string(Login.me());
     return jsonHttpGet(url);
   }
+
+  export function signup(email, data : ApiT.Signup)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/signup/" + string(email);
+    return jsonHttpPut(url, JSON.stringify(data));
+  }
 }

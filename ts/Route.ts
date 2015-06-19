@@ -98,6 +98,18 @@ module Route {
       withLogin(Page.onboarding.load, [data.teamid]);
     },
 
+    "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
+      var signup = {
+        first_name: data.fn,
+        last_name: data.ln,
+        phone: data.phone,
+        platform: data.platform
+      };
+      Api.signup(data.email, signup).done(function() {
+        withLogin(Page.settings.load);
+      });
+    },
+
     "preferences route" : function (data) {
       withLogin(Page.preferences.load);
     },
