@@ -16,16 +16,16 @@ module Esper.ComposeHashtags {
 
   function message(question, hashtagTextViews) {
     var conv = $("<span/>");
-    var message = conv.text(question).html() + "\n<ul>";
+    var message = conv.text(question).html() + "\n<p>";
     List.iter(hashtagTextViews, function(view:JQuery) {
       var s = view.val().trim();
       if (s.length > 0) {
         s = s.match(/^\w+$/) ? "#" + s
                              : "#(" + s + ")";
-        message = message + "\n  <li>" + conv.text(s).html() + "</li>";
+        message += conv.text(s).html() + "<br>\n";
       }
     });
-    return message + "\n</ul>";
+    return message + "</p>";
   }
 
   export function view(composeControls) {
@@ -64,6 +64,8 @@ module Esper.ComposeHashtags {
       view.remove();
     });
 
+    hashtags.append(hashtagView(hashtagTextViews));
+    hashtags.append(hashtagView(hashtagTextViews));
     return view;
   }
 }

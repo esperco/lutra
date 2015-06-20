@@ -258,11 +258,9 @@ module Esper.ComposeControls {
       some : function (executive) {
 '''
 <div #askButton title class="esper-composition-button">
-  <object #askIcon class="esper-svg esper-composition-button-icon"/>
+  <img #askIcon alt="#" class="esper-svg esper-composition-button-icon"/>
 </div>
 '''
-        askIcon.attr("data", Init.esperRootUrl + "img/info.svg");
-
         askButton.tooltip({
           show: { delay: 500, effect: "none" },
           hide: { effect: "none" },
@@ -273,6 +271,7 @@ module Esper.ComposeControls {
 
         askButton.click(function() {
           Gmail.threadContainer().append(ComposeHashtags.view(composeControls));
+          Gmail.scrollToCompose();
         });
 
         return Option.some(askButton);
