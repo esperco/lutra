@@ -496,4 +496,11 @@ type token_response = [
   export interface CalendarEventPalette {
     palette : CalendarEventColor[];
   }
+
+  export interface Signup {
+    first_name : string;
+    last_name : string;
+    phone : string;
+    platform : string;
+  }
 }

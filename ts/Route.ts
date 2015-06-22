@@ -98,6 +98,22 @@ module Route {
       withLogin(Page.onboarding.load, [data.teamid]);
     },
 
+    "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
+      var signup = {
+        first_name: data.fn,
+        last_name: data.ln,
+        phone: data.phone,
+        platform: data.platform
+      };
+      if (data.platform === "Google Apps") {
+        Api.signup(data.email, signup).done(function() {
+          Api.createOwnTeam().done(function(response) {
+            window.location.assign(response.url);
+          });
+        });
+      }
+    },
+
     "preferences route" : function (data) {
       withLogin(Page.preferences.load);
     },

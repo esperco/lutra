@@ -173,6 +173,12 @@ module Api {
       .then(function(_ignored) {});
   }
 
+  export function createOwnTeam()
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    return jsonHttpPost("/api/create-own-team", "");
+  }
+
   export function setTeamName(teamid, name):
   JQueryDeferred<void> {
     var fromUid = Login.me();
@@ -644,5 +650,12 @@ module Api {
   {
     var url = "/api/gcal/colors/event/" + string(Login.me());
     return jsonHttpGet(url);
+  }
+
+  export function signup(email, data : ApiT.Signup)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/signup/" + string(email);
+    return jsonHttpPut(url, JSON.stringify(data));
   }
 }
