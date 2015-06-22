@@ -37,22 +37,22 @@
   </div> </p>
    <!-- Mailchimp Form -->
         <div id="mc_embed_signup">
-          <form>
+          <form id="signup-form">
             <div class="name-field left">
-              <input type="text" placeholder="First Name" name="FNAME" class="required" id="mce-FNAME" autofocus>
+              <input type="text" placeholder="First Name" name="FNAME" class="required" id="first-name" autofocus>
             </div>
             <div class="name-field right">
-              <input type="text" placeholder="Last Name" name="LNAME" class="required" id="mce-LNAME">
+              <input type="text" placeholder="Last Name" name="LNAME" class="required" id="last-name">
             </div>
             <div style="color: black">
-              <input type="tel" placeholder="Phone Number" name="PHONE" id="mce-PHONE">
+              <input type="tel" placeholder="Phone Number" name="PHONE" id="phone">
             </div>
             <div style="color: black">
-              <input type="email" placeholder="Email Address" name="EMAIL" class="required" id="mce-EMAIL">
+              <input type="email" placeholder="Email Address" name="EMAIL" class="required" id="email">
             </div>
             <div class="email-platform-row clearfix">
               <span class="email-platform-label">Email Platform: </span>
-              <select name="MMERGE3" class="required" id="mce-MMERGE3" style="color: black">
+              <select name="MMERGE3" class="required" id="platform" style="color: black">
                 <option value="Google Apps">Google Apps</option>
                 <option value="Microsoft Exchange">Microsoft Exchange</option>
                 <option value="Microsoft Office 365">Microsoft Office 365</option>
@@ -60,8 +60,7 @@
                 <option value="Other/I Don't Know">Other / I don't know</option>
               </select>
               <div align="right">
-              <a href = "signup2">
-              <button class="button-secondary" type="button">Create account</button>
+              <button id="signup-btn" class="button-secondary" type="button">Create account</button>
             </a>
             </div>
 

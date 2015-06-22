@@ -147,11 +147,65 @@ function setupRedeemForm() {
   checkAndSubmitRedeemForm();
 }
 
+function checkAndSubmitSignupForm() {
+  $("#signup-btn").click(function(e){
+    var firstName = $("#first-name").val();
+    var lastName = $("#last-name").val();
+    var phone = $("#phone").val();
+    var email = $("#email").val();
+    var emailPlatform = $("#platform").val();
+    var valid = true;
+
+    if (firstName.length === 0) {
+      valid = false;
+      $("#first-name").addClass("incorrect");
+    }
+    else
+      $("#first-name").removeClass("incorrect");
+
+    if (lastName.length === 0) {
+      valid = false;
+      $("#last-name").addClass("incorrect");
+    }
+    else
+      $("#last-name").removeClass("incorrect");
+
+    if (phone.length === 0) {
+      valid = false;
+      $("#phone").addClass("incorrect");
+    }
+    else
+      $("#phone").removeClass("incorrect");
+
+    if (! looksLikeAnEmailAddress(email)) {
+      valid = false;
+      $("#email").addClass("incorrect");
+    }
+    else
+      $("#email").removeClass("incorrect");
+
+    if (!valid)
+      e.preventDefault();
+    else {
+      var url =
+        "https://localhost/#!signup/" + encodeURIComponent(firstName)
+        + "/" + encodeURIComponent(lastName)
+        + "/" + encodeURIComponent(phone)
+        + "/" + encodeURIComponent(email)
+        + "/" + encodeURIComponent(emailPlatform);
+      console.log(url);
+      //open(url);
+      window.location = url;
+    }
+  });
+}
+
 function main() {
   loadElements();
   resizer();
   slider();
   setupRedeemForm();
+  checkAndSubmitSignupForm();
   // Disabling these hover-lists because they seem gimmicky and make it harder for users to understand
   // showTasks(".tasks-left-col", "ul.event-examples");
   // showTasks(".tasks-mid-col", "ul.research-examples");
