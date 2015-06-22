@@ -105,9 +105,13 @@ module Route {
         phone: data.phone,
         platform: data.platform
       };
-      Api.signup(data.email, signup).done(function() {
-        withLogin(Page.settings.load);
-      });
+      if (data.platform === "Google Apps") {
+        Api.signup(data.email, signup).done(function() {
+          Api.createOwnTeam().done(function(response) {
+            window.location.assign(response.url);
+          });
+        });
+      }
     },
 
     "preferences route" : function (data) {

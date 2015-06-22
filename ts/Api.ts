@@ -173,6 +173,12 @@ module Api {
       .then(function(_ignored) {});
   }
 
+  export function createOwnTeam()
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    return jsonHttpPost("/api/create-own-team", "");
+  }
+
   export function setTeamName(teamid, name):
   JQueryDeferred<void> {
     var fromUid = Login.me();
