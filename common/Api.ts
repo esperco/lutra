@@ -499,6 +499,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getThreadParticipantPrefs(threadid):
+  JQueryDeferred<ApiT.TeamPreferencesList> {
+    var url = Conf.Api.url + "/api/gmail/thread/participant/prefs/"
+	    + string(Login.myUid())
+	    + "/" + string(threadid);
+    return JsonHttp.get(url);
+  }
+
   export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
   JQueryDeferred<void> {
     var url =
