@@ -338,6 +338,7 @@ module Esper.TaskTab {
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
+    taskParticipants: JQuery;
     taskSearchDropdown: JQuery;
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
@@ -391,6 +392,15 @@ module Esper.TaskTab {
     </ul>
   </div>
   <div class="esper-tab-overflow">
+
+    <div class="esper-section">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Esper Executives</span>
+      </div>
+      <div #taskParticipants >
+      </div>
+    </div>
+
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Task Notes</span>
@@ -408,6 +418,7 @@ module Esper.TaskTab {
         </div>
       </div>
     </div>
+
     <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -485,6 +496,25 @@ module Esper.TaskTab {
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
 
+      // Apologies for the ugly visuals.
+    var populateTaskParticipants = function(obj) {
+	  taskTabView.taskParticipants.empty();
+	  var add_li = function(x){
+	      var tm = x.team;
+	      var li = $("<li></li>");
+	      var mkSpan = function(x){return $("<span>"+x+"</span>")};
+	      li.append(mkSpan(tm.team_name+": "));
+	      var dv = $("<div></div>");
+	      var br = function(){return $("<br></br>")};
+	      List.iter(tm.team_email_aliases, function(x){ dv.append(mkSpan("&nbsp;&nbsp;"+x),br()) });
+  	      taskTabView.taskParticipants.append(li.append(dv)); 
+	      };
+	  List.iter(obj.team_prefs, add_li);
+      };
+      var doPopulateTaskParticipants = function() { Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants) };
+      doPopulateTaskParticipants();
+      esperGmail.after.send_message(doPopulateTaskParticipants);
+	  
     CurrentThread.task.watch(
       function (task: ApiT.Task, isValid: boolean,
                 oldTask: ApiT.Task, oldIsValid: boolean) {
