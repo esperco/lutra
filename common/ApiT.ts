@@ -205,6 +205,15 @@ module Esper.ApiT {
     preferences_list: Preferences[];
   }
 
+  export interface TeamPreferences {
+    team : Team;
+    prefs: Preferences;
+  }
+
+  export interface TeamPreferencesList {
+      team_prefs: TeamPreferences[];
+  }
+
   export interface Workplace {
     location: Location;
     duration: HourMinute;
