@@ -9,7 +9,6 @@ module WorkflowsTab {
     view : JQuery;
     title : JQuery;
     notes : JQuery;
-    prefs : JQuery;
     checklist : JQuery;
   }
 
@@ -22,40 +21,73 @@ module WorkflowsTab {
     if (newTitle.length > 0) wf.title = newTitle;
     wf.notes = wfv.notes.val();
 
-    if (s) {
+    if (s) { // Are we editing a step?
       var step = List.find(wf.steps, function(x) {
         return x.title === s.title;
       });
       var newStepTitle = sv.title.val();
       if (newStepTitle.length > 0) step.title = newStepTitle;
       step.notes = sv.notes.val();
+
+      var newChecklist = [];
+      sv.checklist.find("input:text").each(function() {
+        var input = $(this).val();
+        if (input.length > 0) {
+          newChecklist.push({ text: input, checked: false });
+        }
+      });
+      step.checklist = newChecklist;
     }
 
     return Api.updateWorkflow(team.teamid, wf.id, wf);
+  }
+
+  function viewOfCheckItem(ci : ApiT.CheckItem) {
+'''
+<li #view>
+  <input type="checkbox" checked disabled/>
+  <input type="text" #text size=60/>
+</li>
+'''
+    text.val(ci.text);
+    return view;
   }
 
   function viewOfStep(s : ApiT.WorkflowStep) : StepView {
 '''
 <div #view>
   <div>
-    Title:
-    <input #title/>
+    <label>Title:</label>
+    <input type="text" #title size=40/>
   </div>
   <div>
-    Notes:
-    <textarea #notes placeholder="Specific notes for this step"/>
+    <label>Notes:</label>
+    <textarea #notes class="preferences-notes"
+                     rows=8 style="width: 80%; float: none; vertical-align: top"
+                     placeholder="Specific notes for this step"/>
   </div>
   <div>
-    Meeting preferences:
-    <div #prefs/>
+    <label>Meeting preferences:</label> <i>TODO</i>
   </div>
   <div>
-    Checklist:
-    <ul #checklist/>
+    <label>Checklist:</label>
+    <ol #checklist/>
+    <button class="button-primary" #newItem>New checklist item</button>
   </div>
 '''
     title.val(s.title);
     if (s.notes.length > 0) notes.val(s.notes);
+    List.iter(s.checklist, function(ci) {
+      checklist.append(viewOfCheckItem(ci));
+    });
+    newItem.click(function() {
+      var ci : ApiT.CheckItem = {
+        text: "",
+        checked: false
+      };
+      checklist.append(viewOfCheckItem(ci));
+    });
+
     return <StepView> _view;
   }
 
@@ -65,33 +97,42 @@ module WorkflowsTab {
 '''
 <div #view>
   <div>
-    Title:
-    <input #title/>
+    <label>Title:</label>
+    <input type="text" #title size=40/>
   </div>
   <div>
-    Notes:
-    <textarea #notes placeholder="General notes for the whole workflow"/>
+    <label>Notes:</label>
+    <textarea #notes class="preferences-notes"
+                     rows=8 style="width: 80%; float: none; vertical-align: top"
+                     placeholder="General notes for the workflow"/>
   </div>
-  <div>
+  <hr style="clear: left"/>
+  <div #chooseStep>
     Choose an existing step to edit:
-    <select multiple #steps/>
+    <select #steps class="esper-select" style="float: none">
+      <option value="header">Select step...</option>
+    </select>
   </div>
   <div #create>
-    Or enter the title of a new step:
-    <input #createTitle placeholder="Step title"/>
-    <button #createButton>Create Step</button>
+    <i>Or</i> enter the title of a new step:
+    <input type="text" #createTitle size=40 placeholder="Step title"/>
+    <button class="button-primary" #createButton>Create Step</button>
   </div>
   <div #edit>
-    <b #nowEditing/>
+    <big #nowEditing/>
   </div>
-  <button #save>Save Workflow</button>
-  <button #cancel>Cancel</button>
+  <hr/>
+  <button class="button-primary" #save>Save Workflow</button>
+  <button class="button-secondary" #cancel>Cancel</button>
 <div>
 '''
+    var stepByTitle : { [title:string] : ApiT.WorkflowStep } = {};
+    var currentStep : ApiT.WorkflowStep;
+    var currentStepView : StepView;
+
     title.val(wf.title);
     if (wf.notes.length > 0) notes.val(wf.notes);
 
-    var stepByTitle : { [title:string] : ApiT.WorkflowStep } = {};
     if (wf.steps.length > 0) {
       List.iter(wf.steps, function(s) {
         var opt = ("<option>" + s.title + "</option>");
@@ -102,14 +143,14 @@ module WorkflowsTab {
       steps.replaceWith($("<i>(No current steps)</i>"));
     }
 
-    var currentStep : ApiT.WorkflowStep;
-    var currentStepView : StepView;
     steps.change(function() {
-      var chosen = steps.find($(":selected"));
-      if (chosen.length === 1) {
-        currentStep = stepByTitle[chosen.text()];
+      var chosen = steps.find($(":selected")).get(0);
+      if ($(chosen).val() !== "header") {
+        chooseStep.hide();
+        create.hide();
+        currentStep = stepByTitle[$(chosen).text()];
         currentStepView = viewOfStep(currentStep);
-        nowEditing.text("Editing step " + currentStep.title);
+        nowEditing.text("Editing step: " + currentStep.title);
         edit.append(currentStepView.view);
       }
     });
@@ -117,15 +158,16 @@ module WorkflowsTab {
     createButton.click(function() {
       var title = createTitle.val();
       if (title.length > 0) {
+        chooseStep.hide();
+        create.hide();
         currentStep = {
           title: title,
           notes: "",
           checklist: []
         };
-        create.after($("<hr/>"));
         nowEditing.text("Editing step: " + title);
         wf.steps.push(currentStep);
-        currentStepView = viewOfStep(newStep);
+        currentStepView = viewOfStep(currentStep);
         edit.append(currentStepView.view);
       }
     });
@@ -149,18 +191,18 @@ module WorkflowsTab {
 '''
 <div #view>
   <div #edit>
-    <b>Choose an existing workflow to edit: </b>
-    <select #editDropdown>
+    Choose an existing workflow to edit:
+    <select class="esper-select" style="float: none" #editDropdown>
       <option value="header">Select workflow...</option>
     </select>
   </div>
   <div #create>
-    <b>Or enter the title of a new workflow: </b>
-    <input #createTitle placeholder="Workflow title"/>
-    <button #createButton>Create Workflow</button>
+    <i>Or</i> enter the title of a new workflow:
+    <input #createTitle type="text" size=40 placeholder="Workflow title"/>
+    <button class="button-primary" #createButton>Create Workflow</button>
   </div>
   <div #workflow>
-    <b #nowEditing/>
+    <big #nowEditing/>
   </div>
 </div>
 '''
