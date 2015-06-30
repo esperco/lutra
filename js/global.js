@@ -147,6 +147,10 @@ function setupRedeemForm() {
   checkAndSubmitRedeemForm();
 }
 
+function changeSubmitButtonType(s) {
+    $("#signup-btn").prop("type", s);
+}
+
 function checkAndSubmitSignupForm() {
   $("#signup-btn").click(function(e){
     var firstName = $("#first-name").val();
@@ -187,13 +191,20 @@ function checkAndSubmitSignupForm() {
     if (!valid)
       e.preventDefault();
     else {
+      if (emailPlatform !== "Google Apps") {
+        changeSubmitButtonType("submit");
+       // var url = "http://localhost:8009/pub/signup-sorry"
+      }
+      else {
+        changeSubmitButtonType("button");
       var url =
-        "https://localhost/#!signup/" + encodeURIComponent(firstName)
+        "http://localhost/#!signup/" + encodeURIComponent(firstName)
         + "/" + encodeURIComponent(lastName)
         + "/" + encodeURIComponent(phone)
         + "/" + encodeURIComponent(email)
         + "/" + encodeURIComponent(emailPlatform);
       console.log(url);
+      }
       //open(url);
       window.location = url;
     }
@@ -206,10 +217,6 @@ function main() {
   slider();
   setupRedeemForm();
   checkAndSubmitSignupForm();
-  // Disabling these hover-lists because they seem gimmicky and make it harder for users to understand
-  // showTasks(".tasks-left-col", "ul.event-examples");
-  // showTasks(".tasks-mid-col", "ul.research-examples");
-  // showTasks(".tasks-right-col", "ul.office-examples");
 }
 
 

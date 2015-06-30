@@ -25,19 +25,22 @@
 
 <!-- Splash -->
 
-<div class="splash-purple"></div>
-<div class="splash-content">
+<div class="splash-purple fullscreen"></div>
+<div class="splash-content fullscreen">
   <div class="splash-navbar clearfix"></div>
   <div class="container">
+    <!-- Progress Bar -->
   <div class="progress">
     <div class="progress-bar progress-bar-info" role="progressbar" style="width:25%">
     </div>
   </div>
-  <p><div> <b>Awesome.</b> First, we're going to need some basic information from you. </p> 
+  <p><div> <b>Awesome.</b> First, we're going to need some basic information from you. </p>
   </div> </p>
-   <!-- Mailchimp Form -->
+   <!-- Signup Form -->
         <div id="mc_embed_signup">
-          <form id="signup-form">
+          <!-- event.keyCode == 13 refers to the Enter key - for typers who don't feel like clicking the button-->
+          <form onkeydown="if (event.keyCode == 13) document.getElementById('signup-btn').click()"
+            action="http://esper.us9.list-manage.com/subscribe/post?u=8158de07fd0008052ebb78ee6&amp;id=31f4c34dec" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
             <div class="name-field left">
               <input type="text" placeholder="First Name" name="FNAME" class="required" id="first-name" autofocus>
             </div>
@@ -56,14 +59,12 @@
                 <option value="Google Apps">Google Apps</option>
                 <option value="Microsoft Exchange">Microsoft Exchange</option>
                 <option value="Microsoft Office 365">Microsoft Office 365</option>
-                <option value="IBM (Lotus Notes)">IBM (Lotus) Notes</option>
+                <option value="IBM (Lotus) Notes">IBM (Lotus) Notes</option>
                 <option value="Other/I Don't Know">Other / I don't know</option>
               </select>
-              <div align="right">
-              <button id="signup-btn" class="button-secondary" type="button">Create account</button>
-            </a>
             </div>
-
+            <div class="submit-button-row" align="right">
+              <button id="signup-btn" class="button-secondary" type="button">Create account</button>
             </div>
             <div id="mce-responses" class="clear">
               <div class="response" id="mce-error-response" style="display:none"></div>
@@ -79,13 +80,9 @@
         </div>
     </div>
 </div>
-
-
-</div>
-
-<!-- Progress Bar -->
 <!-- Footer -->
 <div class="footer-container"></div>
+
 
 </body>
 </html>

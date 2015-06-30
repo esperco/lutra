@@ -509,6 +509,7 @@ input.incorrect{
   height: 400px;
   background: @purple_splash;
     &.light { background: @purple}
+  &.fullscreen { height: 100%; }
 }
 
 @media (min-width:800px) { .splash { width: 100%; } }
@@ -677,6 +678,7 @@ input.incorrect{
 .dream-team-container {
   display: inline-block;
   vertical-align: bottom;
+  text-align: center;
   @media (min-width:768px) {
     padding: 64px 36px 0 36px;
   }
@@ -1024,9 +1026,10 @@ input.incorrect{
 }
 
 .pricing-table {
-	margin:0px;padding:0px;
+	padding:0px 40px; 
+  align: center;
 	width:100%;
-	border:1px solid #ffffff;
+	border:2px solid #ffffff;
 }.pricing-table table{
     border-collapse: collapse;
         border-spacing: 0;
@@ -1045,6 +1048,7 @@ input.incorrect{
 	color:#000000;
 }.pricing-table tr:first-child td{
 	background-color: @purple_splash;
+  font-weight: bold;
 	border:0px solid #ffffff;
 	text-align:center;
 	border-width:0px 0px 1px 1px;
@@ -1052,15 +1056,24 @@ input.incorrect{
 	font-weight:bold;
 	color:#ffffff;
 }
+.pricing-table td:nth-child(n) {  
+  text-align: left;
+  width: 20%; 
+}
+.pricing-table td:nth-child(1) {  
+}  
+
+ 
 
 /* Signup */
 
 .container {
-    width: 60%;
+    padding: 15px;
+    width: 85%;
     align: center;
   }
 
-/** Sign In **/
+/** Sign In (Onboarding) **/
 
 .sign-in {
   width: 400px;
