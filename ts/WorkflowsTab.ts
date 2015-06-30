@@ -23,8 +23,9 @@ module WorkflowsTab {
 
     if (s) { // Are we editing a step?
       var step = List.find(wf.steps, function(x) {
-        return x.title === s.title;
+        return x.id === s.id;
       });
+
       var newStepTitle = sv.title.val();
       if (newStepTitle.length > 0) step.title = newStepTitle;
       step.notes = sv.notes.val();
@@ -77,14 +78,19 @@ module WorkflowsTab {
 '''
     title.val(s.title);
     if (s.notes.length > 0) notes.val(s.notes);
-    List.iter(s.checklist, function(ci) {
-      checklist.append(viewOfCheckItem(ci));
-    });
+    if (s.checklist.length > 0) {
+      List.iter(s.checklist, function(ci) {
+        checklist.append(viewOfCheckItem(ci));
+      });
+    } else {
+      checklist.before($("<i class='empty-checklist'>(Empty)</i>"));
+    }
     newItem.click(function() {
       var ci : ApiT.CheckItem = {
         text: "",
         checked: false
       };
+      view.find(".empty-checklist").remove();
       checklist.append(viewOfCheckItem(ci));
     });
 
@@ -126,7 +132,7 @@ module WorkflowsTab {
   <button class="button-secondary" #cancel>Cancel</button>
 <div>
 '''
-    var stepByTitle : { [title:string] : ApiT.WorkflowStep } = {};
+    var stepById : { [id:string] : ApiT.WorkflowStep } = {};
     var currentStep : ApiT.WorkflowStep;
     var currentStepView : StepView;
 
@@ -135,8 +141,8 @@ module WorkflowsTab {
 
     if (wf.steps.length > 0) {
       List.iter(wf.steps, function(s) {
-        var opt = ("<option>" + s.title + "</option>");
-        stepByTitle[s.title] = s;
+        var opt = ("<option value='" + s.id + "'>" + s.title + "</option>");
+        stepById[s.id] = s;
         steps.append(opt);
       });
     } else {
@@ -144,11 +150,11 @@ module WorkflowsTab {
     }
 
     steps.change(function() {
-      var chosen = steps.find($(":selected")).get(0);
-      if ($(chosen).val() !== "header") {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
         chooseStep.hide();
         create.hide();
-        currentStep = stepByTitle[$(chosen).text()];
+        currentStep = stepById[chosen];
         currentStepView = viewOfStep(currentStep);
         nowEditing.text("Editing step: " + currentStep.title);
         edit.append(currentStepView.view);
@@ -161,6 +167,7 @@ module WorkflowsTab {
         chooseStep.hide();
         create.hide();
         currentStep = {
+          id: Util.randomString(),
           title: title,
           notes: "",
           checklist: []
@@ -207,22 +214,26 @@ module WorkflowsTab {
 </div>
 '''
     Api.listWorkflows(team.teamid).done(function(response) {
-      var wfById : { [wfid:string] : ApiT.Workflow } = {};
-      List.iter(response.workflows, function(wf) {
-        var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
-        wfById[wf.id] = wf;
-        editDropdown.append(opt);
-      });
-      editDropdown.change(function() {
-        var chosen = $(this).val();
-        if (chosen !== "header") {
-          var wf = wfById[chosen];
-          edit.hide();
-          create.hide();
-          nowEditing.text("Editing workflow: " + wf.title);
-          workflow.append(viewOfWorkflow(team, wf, tabContainer));
-        }
-      });
+      if (response.workflows.length > 0) {
+        var wfById : { [wfid:string] : ApiT.Workflow } = {};
+        List.iter(response.workflows, function(wf) {
+          var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
+          wfById[wf.id] = wf;
+          editDropdown.append(opt);
+        });
+        editDropdown.change(function() {
+          var chosen = $(this).val();
+          if (chosen !== "header") {
+            var wf = wfById[chosen];
+            edit.hide();
+            create.hide();
+            nowEditing.text("Editing workflow: " + wf.title);
+            workflow.append(viewOfWorkflow(team, wf, tabContainer));
+          }
+        });
+      } else {
+        editDropdown.replaceWith($("<i>(No current workflows)</i>"));
+      }
     });
 
     createButton.click(function() {

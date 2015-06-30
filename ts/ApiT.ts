@@ -518,6 +518,7 @@ type token_response = [
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
 
   export interface WorkflowStep {
+    id : string;
     title : string;
     notes : string;
     meeting_prefs? : MeetingType;
