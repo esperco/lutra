@@ -76,13 +76,17 @@ module Signin {
       });
   }
 
-  function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
+  function displayLoginLinks(msg, landingUrl, optInvite, optEmail, onboarding = false) {
 '''
 <div #view>
-  <div class="sign-in">
-    <div class="logo-container">
+  <div #signInContainer class="sign-in">
+    <div #logo class="logo-container">
       <div #loginLogo id="sign-in-hero-mark" class="animated fadeInUp"/>
     </div>
+    <div #container >
+      <div #progress class="progress">
+        <div class="progress-bar progress-bar-info" role="progressbar" style="width:50%"/> 
+      </div>
     <div #msgDiv class="sign-in-msg"/>
     <button #button class="button-primary sign-in-btn">
       <div #google class="google-g"/>
@@ -90,7 +94,7 @@ module Signin {
       <div class="sign-in-text">Sign in with Google</div>
     </button>
   </div>
-  <div class="sign-in-footer">
+  <div #footer class="sign-in-footer">
     <div class="copyright">
       &copy; 2014 Esper Technologies, Inc.
       All rights reserved.
@@ -110,7 +114,6 @@ module Signin {
 </div>
 '''
     Page.hide();
-
     var rootView = $("#onboarding-interface");
     rootView.children().remove();
 
@@ -121,7 +124,7 @@ module Signin {
     Svg.loadImg(logo, "/assets/img/esper-mark.svg");
 
     if (Util.isString(msg))
-      msgDiv.text(msg);
+      msgDiv.html(msg);
 
     var googleG = $("<img class='svg-block'/>")
       .appendTo(google);
@@ -139,7 +142,25 @@ module Signin {
         });
 
         rootView.append(view);
-      });
+        });
+
+    if (onboarding) {
+      container.addClass("container");
+      signInContainer.removeClass("sign-in");
+      signInContainer.addClass("onboarding");
+      signInContainer.css("padding-top","78px");
+      msgDiv.removeClass("sign-in-msg");
+      msgDiv.addClass("onboarding-text");
+      msgDiv.css("padding-bottom","16px");
+      signInContainer.css("text-align","center");
+      footer.remove();
+      logo.remove();
+    }
+    else {
+      progress.hide();
+    }
+
+
 
     return _view;
   }
@@ -155,7 +176,7 @@ module Signin {
         /* success */
         function(tokenDescription) {
           var loginView =
-            displayLoginLinks("Valid invite.", "#!", inviteCode, undefined);
+          displayLoginLinks("<b>Great!</b> Next, we'll need you to login to your Google account.", "#!", inviteCode, undefined, true);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */
@@ -250,7 +271,7 @@ module Signin {
     if (optInviteCode != undefined) {
       if (optEmail != undefined && optName != undefined)
         useInviteWithNameAndEmail(optInviteCode, optEmail, optName);
-      else
+        else
         useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)

@@ -28,6 +28,7 @@
 @purple_gradient: #a464c6;
 @purple_hover: #8c42ad;
 @purple_text: #5F5665;
+@purple_splash: #785988;
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
@@ -56,6 +57,17 @@ textarea {
 textarea.fit-parent {
   width: 100%;
 }
+
+
+.splash-purple {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 400px;
+  background: @purple_splash;
+    &.light { background: @purple}
+}
+
 
 object { pointer-events: none; }
 
@@ -713,6 +725,10 @@ a.header-title:hover { text-decoration: underline; }
   border-top: 1px solid @gray_30;
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+    &.fullscreen { 
+    max-width: 100%;
+    min-width: 100%;
+  }
 }
 .esper-tab-description {
   margin-bottom: 20px;
@@ -1484,3 +1500,28 @@ a.header-title:hover { text-decoration: underline; }
   from { background: @purple_disabled; }
     to { background: white; }
 }
+
+/** Onboarding **/
+
+.onboarding {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: @purple_splash;
+  color: white;
+}
+
+.onboarding-text {
+  font-size: 16px;
+}
+
+.container {
+    padding: 15px;
+    width: 85%;
+    align: center;
+}
+
+.esper-cal-title{
+  font-size: 16px;
+}
+
