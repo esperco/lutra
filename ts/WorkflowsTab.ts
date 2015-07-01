@@ -63,8 +63,7 @@ module WorkflowsTab {
   </div>
   <div>
     <label>Notes:</label>
-    <textarea #notes class="preferences-notes"
-                     rows=8 style="width: 80%; float: none; vertical-align: top"
+    <textarea #notes class="workflow-notes" rows=8
                      placeholder="Specific notes for this step"/>
   </div>
   <div>
@@ -108,8 +107,7 @@ module WorkflowsTab {
   </div>
   <div>
     <label>Notes:</label>
-    <textarea #notes class="preferences-notes"
-                     rows=8 style="width: 80%; float: none; vertical-align: top"
+    <textarea #notes class="workflow-notes" rows=8
                      placeholder="General notes for the workflow"/>
   </div>
   <hr style="clear: left"/>
