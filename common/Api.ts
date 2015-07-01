@@ -589,9 +589,9 @@ module Esper.Api {
   export function listWorkflows(teamid)
     : JQueryDeferred<ApiT.UserWorkflows>
   {
-    var url = "/api/workflows/list/" + string(Login.me())
+    var url = "/api/workflows/list/" + string(Login.myUid())
       + "/" + string(teamid);
-    return jsonHttpGet(url);
+    return JsonHttp.get(url);
   }
 
   export function putWorkflowProgress(teamid: string, taskid: string,

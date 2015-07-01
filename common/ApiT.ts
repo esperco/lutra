@@ -505,4 +505,10 @@ module Esper.ApiT {
     text : string;
     checked : boolean;
   }
+
+  export interface TaskWorkflowProgress {
+    workflow_id : string;
+    step_id? : string;
+    checklist : CheckItem[];
+  }
 }

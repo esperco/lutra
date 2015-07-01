@@ -396,7 +396,7 @@ module Esper.TaskTab {
         <span class="esper-bold" style="float:left">Task Notes</span>
       </div>
       <div class="esper-section-notes">
-        <textarea #taskNotes rows=5
+        <textarea #taskNotes rows=3
               maxlength=140
               placeholder="Leave some brief notes about the task here"
               class="esper-text-notes"/>
