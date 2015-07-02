@@ -337,6 +337,7 @@ module Esper.ApiT {
     task_unread_emails?: number;
     task_threads: EmailThread[];
     task_events: TaskEvent[];
+    task_workflow_progress: TaskWorkflowProgress;
   }
 
   export interface TaskThread {

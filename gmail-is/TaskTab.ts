@@ -376,7 +376,8 @@ module Esper.TaskTab {
                                  team: ApiT.Team,
                                  threadId: string,
                                  autoTask: boolean,
-                                 linkedEvents: ApiT.EventWithSyncInfo[]) {
+                                 linkedEvents: ApiT.EventWithSyncInfo[],
+                                 workflows: ApiT.Workflow[]) {
 '''
 <div #view>
   <div class="esper-tab-header">
@@ -389,8 +390,31 @@ module Esper.TaskTab {
       <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
+    <div class="esper-clearfix">
+      <select #workflowSelect class="esper-select" disabled>
+        <option value="header">Select workflow...</option>
+      </select>
+    </div>
   </div>
   <div class="esper-tab-overflow">
+    <div #workflowSection class="esper-section esper-hide">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Workflow</span>
+      </div>
+      <div class="esper-section-container esper-section-notes">
+        <div #workflowNotes class="esper-text-notes"/>
+        <div class="esper-clearfix">
+          <select #stepSelect class="esper-select">
+            <option value="header">Select step...</option>
+          </select>
+        </div>
+        <div #stepNotes class="esper-clearfix esper-hide"/>
+        <div #checklistDiv class="esper-clearfix esper-hide">
+          <b>Checklist:</b>
+          <div #checklist/>
+        </div>
+      </div>
+    </div>
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Task Notes</span>
@@ -491,9 +515,11 @@ module Esper.TaskTab {
         if (isValid) {
           taskTabView.taskCaption.text(taskLabelExists);
           taskTabView.taskTitle.text(task.task_title);
+          workflowSelect.attr("disabled", false);
         } else {
           taskTabView.taskCaption.text(taskLabelCreate);
           taskTabView.taskTitle.text("");
+          workflowSelect.attr("disabled", true);
         }
       }
     );
@@ -608,6 +634,78 @@ module Esper.TaskTab {
       }
     });
 
+    List.iter(workflows, function(wf) {
+      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
+        .appendTo(workflowSelect);
+    });
+
+    workflowSelect.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        var wf = List.find(workflows, function(wf) {
+          return wf.id === chosen;
+        });
+        var task = CurrentThread.task.get();
+        var startingProgress = {
+          workflow_id: wf.id,
+          checklist: []
+        };
+        var progress = task.task_workflow_progress;
+        if (!progress || progress.workflow_id !== wf.id) {
+          progress = startingProgress;
+        }
+        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+
+        workflowNotes.text(wf.notes);
+
+        stepSelect.children().remove();
+        List.iter(wf.steps, function(s) {
+          $("<option value='" + s.id + "'>" + s.title + "</option>")
+            .appendTo(stepSelect);
+        });
+
+        stepSelect.change(function() {
+          var chosen = $(this).val();
+          if (chosen !== "header") {
+            var step = List.find(wf.steps, function(s) {
+              return s.id === chosen;
+            });
+            progress.step_id = step.id;
+            if (progress.checklist.length === 0) {
+              progress.checklist = step.checklist;
+            }
+            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+            stepNotes.text(step.notes);
+            stepNotes.removeClass("esper-hide");
+
+            checklist.children().remove();
+            List.iter(progress.checklist, function(x, i) {
+              var div = $("<div/>");
+              var label = $("<label/>");
+              var box = $("<input type='checkbox'/>")
+              box.prop("checked", x.checked);
+              box.change(function() {
+                var item = progress.checklist[i];
+                item.checked = this.checked;
+                Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+              });
+              label.append(box).append(x.text);
+              div.append(label);
+              checklist.append(div);
+            });
+            checklistDiv.removeClass("esper-hide");
+          }
+        });
+
+        if (progress.step_id) {
+          stepSelect.val(progress.step_id);
+          stepSelect.trigger("change");
+        }
+
+        workflowSection.removeClass("esper-hide");
+      }
+    });
+
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
       Api.getThreadDetails(threadId).done(function(deets) {
@@ -622,6 +720,14 @@ module Esper.TaskTab {
           displayLinkedThreadsList(task, threadId, taskTabView);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTabView);
+
+          var progress = task.task_workflow_progress;
+          if (progress) {
+            workflowSelect.val(progress.workflow_id);
+            workflowSelect.trigger("change");
+          }
+          workflowSelect.attr("disabled", false);
+
         } else {
           taskCaption.text(taskLabelCreate);
           title = deets.subject;

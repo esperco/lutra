@@ -589,7 +589,8 @@ module Esper.Api {
   export function listWorkflows(teamid)
     : JQueryDeferred<ApiT.UserWorkflows>
   {
-    var url = "/api/workflows/list/" + string(Login.myUid())
+    var url =
+      Conf.Api.url + "/api/workflows/list/" + string(Login.myUid())
       + "/" + string(teamid);
     return JsonHttp.get(url);
   }
