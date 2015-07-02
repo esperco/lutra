@@ -585,4 +585,18 @@ module Esper.Api {
   JQueryDeferred<ApiT.TaskPreferences> {
     return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
   }
+
+  export function putFiles(filename: string,
+                           content_type: string,
+                           contents: string):
+  JQueryDeferred<void> {
+    var query = "content_type=" + string(content_type);
+    var url = Conf.Api.url + "/api/files/" + string(Login.myUid()) + "/"
+                                           + string(filename) + "?"
+                                           + string(query);
+
+    // Doing a custom request because I'm sending the file directly
+    // without using JSON.
+    return JsonHttp.put(url, contents);
+  }
 }

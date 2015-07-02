@@ -97,6 +97,13 @@ module Esper.InviteControls {
           <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
         </div>
       </div>
+      <div #attachmentsRow class="esper-ev-modal-row esper-clearfix">
+        <div class="esper-ev-modal-left esper-bold">Attachments</div>
+        <div class="esper-ev-modal-right">
+          <input #attachmentPicker type="file"> Attach files to event. </input>
+          <button #uploadButton type="button"> Upload files </button>
+        </div>
+      </div>
       <div class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Guests</div>
         <div class="esper-ev-modal-right">
@@ -225,7 +232,7 @@ module Esper.InviteControls {
           newGuestEmail.val("");
         });
 
-        var preferences = allPrefs.execPrefs;
+        var preferences  = allPrefs.execPrefs;
         var duplicate    = preferences.general.use_duplicate_events;
         var execReminder = preferences.general.send_exec_reminder;
         var holdColor    = preferences.general.hold_event_color;
@@ -244,6 +251,27 @@ module Esper.InviteControls {
         }
         Util.afterTyping(pubLocation, 250, searchLocation);
         pubLocation.click(searchLocation);
+
+        /** Upload all the files currently selected in attachmentPicker. */
+        function uploadFiles() {
+          // For some reason, .files is a FileList and not a normal Array :(
+          var files = Array.prototype.slice.call(attachmentPicker[0].files);
+
+          files.forEach(function (file) {
+            var name = file.name;
+
+            var reader = new FileReader();
+            reader.readAsBinaryString(file);
+            reader.addEventListener("loadend", function () {
+              console.info("Uploading", name);
+              Api.putFiles(name, file.type, reader.result);
+            });
+          });
+        }
+
+        uploadButton.click(function () {
+          uploadFiles();
+        });
 
         next.click(function() {
           var guests = [];
