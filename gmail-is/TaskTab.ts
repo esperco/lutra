@@ -126,6 +126,17 @@ module Esper.TaskTab {
     }
   }
 
+  function workflowChecklistCompleted() {
+    var allChecked = true;
+    $(".esper-workflow-checklist").find("input").each(function() {
+      if (!($(this).is(":checked"))) {
+        allChecked = false;
+        return;
+      }
+    });
+    return allChecked;
+  }
+
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
   <div #view class="esper-clearfix esper-task-progress">
@@ -149,8 +160,20 @@ module Esper.TaskTab {
     taskProgressSelector.val(task.task_progress);
     taskProgressSelector.change(function() {
       var i = $(this).val();
-      Api.setTaskProgress(task.taskid, i);
-      task.task_progress = i;
+      function applyChange() {
+        Api.setTaskProgress(task.taskid, i);
+        task.task_progress = i;
+      }
+      if (i === "Done") {
+        if (workflowChecklistCompleted()) {
+          applyChange();
+        } else {
+          taskProgressSelector.val(task.task_progress);
+          alert("Please complete all checklist items before finalizing.");
+        }
+      } else {
+        applyChange();
+      }
     });
 
     taskTab.taskProgressContainer.append(view);
@@ -411,7 +434,7 @@ module Esper.TaskTab {
         <div #stepNotes class="esper-clearfix esper-hide"/>
         <div #checklistDiv class="esper-clearfix esper-hide">
           <b>Checklist:</b>
-          <div #checklist/>
+          <div #checklist class="esper-workflow-checklist"/>
         </div>
       </div>
     </div>
@@ -634,6 +657,9 @@ module Esper.TaskTab {
       }
     });
 
+    Sidebar.customizeSelectArrow(workflowSelect);
+    Sidebar.customizeSelectArrow(stepSelect);
+
     List.iter(workflows, function(wf) {
       $("<option value='" + wf.id + "'>" + wf.title + "</option>")
         .appendTo(workflowSelect);
@@ -658,7 +684,7 @@ module Esper.TaskTab {
 
         workflowNotes.text(wf.notes);
 
-        stepSelect.children().remove();
+        stepSelect.children().slice(1).remove();
         List.iter(wf.steps, function(s) {
           $("<option value='" + s.id + "'>" + s.title + "</option>")
             .appendTo(stepSelect);
