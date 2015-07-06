@@ -413,7 +413,7 @@ module Esper.TaskTab {
       <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
-    <div class="esper-clearfix">
+    <div class="esper-clearfix esper-workflow-gap">
       <select #workflowSelect class="esper-select" disabled>
         <option value="header">Select workflow...</option>
       </select>
@@ -426,13 +426,13 @@ module Esper.TaskTab {
       </div>
       <div class="esper-section-container esper-section-notes">
         <div #workflowNotes class="esper-text-notes"/>
-        <div class="esper-clearfix">
+        <div class="esper-clearfix esper-workflow-gap">
           <select #stepSelect class="esper-select">
             <option value="header">Select step...</option>
           </select>
         </div>
-        <div #stepNotes class="esper-clearfix esper-hide"/>
-        <div #checklistDiv class="esper-clearfix esper-hide">
+        <div #stepNotes class="esper-clearfix esper-hide esper-workflow-gap"/>
+        <div #checklistDiv class="esper-clearfix esper-hide esper-workflow-gap">
           <b>Checklist:</b>
           <div #checklist class="esper-workflow-checklist"/>
         </div>
@@ -708,7 +708,7 @@ module Esper.TaskTab {
             List.iter(progress.checklist, function(x, i) {
               var div = $("<div/>");
               var label = $("<label/>");
-              var box = $("<input type='checkbox'/>")
+              var box = $("<input type='checkbox' class='esper-checklist-box'/>")
               box.prop("checked", x.checked);
               box.change(function() {
                 var item = progress.checklist[i];
