@@ -45,7 +45,7 @@ module WorkflowsTab {
 
   function viewOfCheckItem(ci : ApiT.CheckItem) {
 '''
-<li #view>
+<li #view class="bottom-gap">
   <input type="checkbox" checked disabled/>
   <input type="text" #text size=60/>
 </li>
@@ -57,7 +57,7 @@ module WorkflowsTab {
   function viewOfStep(s : ApiT.WorkflowStep) : StepView {
 '''
 <div #view>
-  <div>
+  <div class="bottom-gap top-gap">
     <label>Title:</label>
     <input type="text" #title size=40/>
   </div>
@@ -66,12 +66,12 @@ module WorkflowsTab {
     <textarea #notes class="workflow-notes" rows=8
                      placeholder="Specific notes for this step"/>
   </div>
-  <div>
+  <div class="top-gap">
     <label>Meeting preferences:</label> <i>TODO</i>
   </div>
   <div>
     <label>Checklist:</label>
-    <ol #checklist/>
+    <ul #checklist/>
     <button class="button-primary" #newItem>New checklist item</button>
   </div>
 '''
@@ -101,7 +101,7 @@ module WorkflowsTab {
                           tabContainer : JQuery) {
 '''
 <div #view>
-  <div>
+  <div class="bottom-gap top-gap">
     <label>Title:</label>
     <input type="text" #title size=40/>
   </div>
@@ -111,7 +111,7 @@ module WorkflowsTab {
                      placeholder="General notes for the workflow"/>
   </div>
   <hr style="clear: left"/>
-  <div #chooseStep>
+  <div #chooseStep class="bottom-gap">
     Choose an existing step to edit:
     <select #steps class="esper-select" style="float: none">
       <option value="header">Select step...</option>
@@ -195,7 +195,7 @@ module WorkflowsTab {
   export function load(team, tabContainer) {
 '''
 <div #view>
-  <div #edit>
+  <div #edit class="bottom-gap top-gap">
     Choose an existing workflow to edit:
     <select class="esper-select" style="float: none" #editDropdown>
       <option value="header">Select workflow...</option>
