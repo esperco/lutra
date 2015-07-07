@@ -375,12 +375,16 @@ module Esper.TaskTab {
         .appendTo(workflowSelect);
     });
 
+    var currentWorkflow : ApiT.Workflow;
+    var currentProgress : ApiT.TaskWorkflowProgress;
+
     workflowSelect.change(function() {
       var chosen = $(this).val();
       if (chosen !== "header") {
         var wf = List.find(workflows, function(wf) {
           return wf.id === chosen;
         });
+        currentWorkflow = wf;
         var task = CurrentThread.task.get();
         var startingProgress = {
           workflow_id: wf.id,
@@ -391,56 +395,63 @@ module Esper.TaskTab {
           progress = startingProgress;
         }
         Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-
+        currentProgress = progress;
         workflowNotes.text(wf.notes);
 
         stepSelect.children().slice(1).remove();
+        stepNotes.text("");
+        checklist.children().remove();
+        checklistDiv.addClass("esper-hide");
+
         List.iter(wf.steps, function(s) {
           $("<option value='" + s.id + "'>" + s.title + "</option>")
             .appendTo(stepSelect);
         });
-
-        stepSelect.change(function() {
-          var chosen = $(this).val();
-          if (chosen !== "header") {
-            var step = List.find(wf.steps, function(s) {
-              return s.id === chosen;
-            });
-            progress.step_id = step.id;
-            if (progress.checklist.length === 0) {
-              progress.checklist = step.checklist;
-            }
-            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-            stepNotes.text(step.notes);
-            stepNotes.removeClass("esper-hide");
-
-            checklist.children().remove();
-            List.iter(progress.checklist, function(x, i) {
-              var div = $("<div/>");
-              var label = $("<label/>");
-              var box = $("<input type='checkbox' class='esper-checklist-box'/>")
-              box.prop("checked", x.checked);
-              box.change(function() {
-                var item = progress.checklist[i];
-                item.checked = this.checked;
-                Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-              });
-              label.append(box).append(x.text);
-              div.append(label);
-              checklist.append(div);
-            });
-            checklistDiv.removeClass("esper-hide");
-          }
-        });
-
-        if (progress.step_id) {
-          stepSelect.val(progress.step_id);
-          stepSelect.trigger("change");
-        }
-
-        workflowSection.removeClass("esper-hide");
       }
     });
+
+    stepSelect.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        var wf = currentWorkflow;
+        var progress = currentProgress;
+        var task = CurrentThread.task.get();
+        var step = List.find(wf.steps, function(s) {
+          return s.id === chosen;
+        });
+        if (progress.checklist.length === 0 || progress.step_id !== step.id) {
+          progress.checklist = step.checklist;
+        }
+        progress.step_id = step.id;
+        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+        stepNotes.text(step.notes);
+        stepNotes.removeClass("esper-hide");
+
+        checklist.children().remove();
+        List.iter(progress.checklist, function(x, i) {
+          var div = $("<div/>");
+          var label = $("<label/>");
+          var box = $("<input type='checkbox' class='esper-checklist-box'/>")
+          box.prop("checked", x.checked);
+          box.change(function() {
+            var item = progress.checklist[i];
+            item.checked = this.checked;
+            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+          });
+          label.append(box).append(x.text);
+          div.append(label);
+          checklist.append(div);
+        });
+        checklistDiv.removeClass("esper-hide");
+      }
+    });
+
+    if (currentProgress && currentProgress.step_id) {
+      stepSelect.val(currentProgress.step_id);
+      stepSelect.trigger("change");
+    }
+
+    workflowSection.removeClass("esper-hide");
   }
 
   export interface TaskTabView {
