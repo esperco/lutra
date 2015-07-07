@@ -503,4 +503,30 @@ type token_response = [
     phone : string;
     platform : string;
   }
+
+  export interface Workflow {
+    id : string;
+    title : string;
+    notes : string;
+    steps : WorkflowStep[];
+  }
+
+  export interface UserWorkflows {
+    workflows : Workflow[];
+  }
+
+  type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
+
+  export interface WorkflowStep {
+    id : string;
+    title : string;
+    notes : string;
+    meeting_prefs? : MeetingType;
+    checklist : CheckItem[];
+  }
+
+  export interface CheckItem {
+    text : string;
+    checked : boolean;
+  }
 }

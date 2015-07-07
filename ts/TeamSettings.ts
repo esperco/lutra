@@ -92,6 +92,7 @@ module TeamSettings {
       <li #tabAcc class="active"><a class="link first">Account</a></li>
       <li #tabCal><a class="link">Calendars</a></li>
       <li #tabPrf><a class="link">Preferences</a></li>
+      <li #tabWkf><a class="link">Workflows</a></li>
       <li #tabLab><a class="link">Labels</a></li>
       <li #tabUsg><a class="link">Usage</a></li>
       <li #tabAbt><a class="link">About</a></li>
@@ -101,6 +102,7 @@ module TeamSettings {
     <div #contentAcc class="tab-content active"/>
     <div #contentCal class="tab-content"/>
     <div #contentPrf class="tab-content"/>
+    <div #contentWkf class="tab-content"/>
     <div #contentLab class="tab-content"/>
     <div #contentUsg class="tab-content"/>
     <div #contentAbt class="tab-content"/>
@@ -111,6 +113,7 @@ module TeamSettings {
     var tabViewAcc = makeTabView("acc", tabAcc, contentAcc, true);
     var tabViewCal = makeTabView("cal", tabCal, contentCal, true);
     var tabViewPrf = makeTabView("prf", tabPrf, contentPrf, true);
+    var tabViewWkf = makeTabView("wkf", tabWkf, contentWkf, true);
     var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
     var tabViewUsg = makeTabView("usg", tabUsg, contentUsg, true);
     var tabViewAbt = makeTabView("abt", tabAbt, contentAbt, true);
@@ -118,6 +121,7 @@ module TeamSettings {
       tabViewAcc,
       tabViewCal,
       tabViewPrf,
+      tabViewWkf,
       tabViewLab,
       tabViewUsg,
       tabViewAbt
@@ -130,6 +134,7 @@ module TeamSettings {
     contentAcc.append(AccountTab.load(team));
     contentCal.append(CalendarsTab.load(team, onboarding));
     contentPrf.append(PreferencesTab.load(team, contentPrf));
+    contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentAbt.append(AboutTab.load(team, onboarding));
 
     if (onboarding) {
