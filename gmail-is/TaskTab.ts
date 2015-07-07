@@ -358,6 +358,91 @@ module Esper.TaskTab {
     }
   }
 
+  function displayWorkflow(team : ApiT.Team,
+                           workflows: ApiT.Workflow[],
+                           workflowSection : JQuery,
+                           workflowSelect : JQuery,
+                           workflowNotes : JQuery,
+                           stepSelect : JQuery,
+                           stepNotes : JQuery,
+                           checklistDiv : JQuery,
+                           checklist : JQuery) : void {
+    Sidebar.customizeSelectArrow(workflowSelect);
+    Sidebar.customizeSelectArrow(stepSelect);
+
+    List.iter(workflows, function(wf) {
+      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
+        .appendTo(workflowSelect);
+    });
+
+    workflowSelect.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        var wf = List.find(workflows, function(wf) {
+          return wf.id === chosen;
+        });
+        var task = CurrentThread.task.get();
+        var startingProgress = {
+          workflow_id: wf.id,
+          checklist: []
+        };
+        var progress = task.task_workflow_progress;
+        if (!progress || progress.workflow_id !== wf.id) {
+          progress = startingProgress;
+        }
+        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+
+        workflowNotes.text(wf.notes);
+
+        stepSelect.children().slice(1).remove();
+        List.iter(wf.steps, function(s) {
+          $("<option value='" + s.id + "'>" + s.title + "</option>")
+            .appendTo(stepSelect);
+        });
+
+        stepSelect.change(function() {
+          var chosen = $(this).val();
+          if (chosen !== "header") {
+            var step = List.find(wf.steps, function(s) {
+              return s.id === chosen;
+            });
+            progress.step_id = step.id;
+            if (progress.checklist.length === 0) {
+              progress.checklist = step.checklist;
+            }
+            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+            stepNotes.text(step.notes);
+            stepNotes.removeClass("esper-hide");
+
+            checklist.children().remove();
+            List.iter(progress.checklist, function(x, i) {
+              var div = $("<div/>");
+              var label = $("<label/>");
+              var box = $("<input type='checkbox' class='esper-checklist-box'/>")
+              box.prop("checked", x.checked);
+              box.change(function() {
+                var item = progress.checklist[i];
+                item.checked = this.checked;
+                Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+              });
+              label.append(box).append(x.text);
+              div.append(label);
+              checklist.append(div);
+            });
+            checklistDiv.removeClass("esper-hide");
+          }
+        });
+
+        if (progress.step_id) {
+          stepSelect.val(progress.step_id);
+          stepSelect.trigger("change");
+        }
+
+        workflowSection.removeClass("esper-hide");
+      }
+    });
+  }
+
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
@@ -657,80 +742,10 @@ module Esper.TaskTab {
       }
     });
 
-    Sidebar.customizeSelectArrow(workflowSelect);
-    Sidebar.customizeSelectArrow(stepSelect);
-
-    List.iter(workflows, function(wf) {
-      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
-        .appendTo(workflowSelect);
-    });
-
-    workflowSelect.change(function() {
-      var chosen = $(this).val();
-      if (chosen !== "header") {
-        var wf = List.find(workflows, function(wf) {
-          return wf.id === chosen;
-        });
-        var task = CurrentThread.task.get();
-        var startingProgress = {
-          workflow_id: wf.id,
-          checklist: []
-        };
-        var progress = task.task_workflow_progress;
-        if (!progress || progress.workflow_id !== wf.id) {
-          progress = startingProgress;
-        }
-        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-
-        workflowNotes.text(wf.notes);
-
-        stepSelect.children().slice(1).remove();
-        List.iter(wf.steps, function(s) {
-          $("<option value='" + s.id + "'>" + s.title + "</option>")
-            .appendTo(stepSelect);
-        });
-
-        stepSelect.change(function() {
-          var chosen = $(this).val();
-          if (chosen !== "header") {
-            var step = List.find(wf.steps, function(s) {
-              return s.id === chosen;
-            });
-            progress.step_id = step.id;
-            if (progress.checklist.length === 0) {
-              progress.checklist = step.checklist;
-            }
-            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-            stepNotes.text(step.notes);
-            stepNotes.removeClass("esper-hide");
-
-            checklist.children().remove();
-            List.iter(progress.checklist, function(x, i) {
-              var div = $("<div/>");
-              var label = $("<label/>");
-              var box = $("<input type='checkbox' class='esper-checklist-box'/>")
-              box.prop("checked", x.checked);
-              box.change(function() {
-                var item = progress.checklist[i];
-                item.checked = this.checked;
-                Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-              });
-              label.append(box).append(x.text);
-              div.append(label);
-              checklist.append(div);
-            });
-            checklistDiv.removeClass("esper-hide");
-          }
-        });
-
-        if (progress.step_id) {
-          stepSelect.val(progress.step_id);
-          stepSelect.trigger("change");
-        }
-
-        workflowSection.removeClass("esper-hide");
-      }
-    });
+    displayWorkflow(team, workflows,
+                    workflowSection, workflowSelect, workflowNotes,
+                    stepSelect, stepNotes,
+                    checklistDiv, checklist);
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
