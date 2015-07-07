@@ -528,8 +528,9 @@ module Esper.TaskTab {
             <option value="header">Select step...</option>
           </select>
         </div>
-        <div #stepNotes class="esper-clearfix esper-hide esper-workflow-gap"/>
-        <div #checklistDiv class="esper-clearfix esper-hide esper-workflow-gap">
+        <div #stepNotes
+          class="esper-clearfix esper-hide esper-text-notes"/>
+        <div #checklistDiv class="esper-clearfix esper-hide">
           <b>Checklist:</b>
           <div #checklist class="esper-workflow-checklist"/>
         </div>
