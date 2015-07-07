@@ -407,6 +407,13 @@ module Esper.TaskTab {
           $("<option value='" + s.id + "'>" + s.title + "</option>")
             .appendTo(stepSelect);
         });
+
+        if (currentProgress && currentProgress.step_id) {
+          stepSelect.val(currentProgress.step_id);
+          stepSelect.trigger("change");
+        }
+
+        workflowSection.removeClass("esper-hide");
       }
     });
 
@@ -446,12 +453,6 @@ module Esper.TaskTab {
       }
     });
 
-    if (currentProgress && currentProgress.step_id) {
-      stepSelect.val(currentProgress.step_id);
-      stepSelect.trigger("change");
-    }
-
-    workflowSection.removeClass("esper-hide");
   }
 
   export interface TaskTabView {
