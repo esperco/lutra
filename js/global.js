@@ -211,12 +211,32 @@ function checkAndSubmitSignupForm() {
   });
 }
 
+function getAliasEmailFromHash() {
+  var email = location.hash.split("#")[1];
+  document.getElementById("alias-email").innerHTML = email;
+  $("a").prop("href", "mailto:".concat(email));
+}
+
+function getAliasNameFromHash() {
+  var alias_name = location.hash.split("#")[1].split("@")[0];
+  var formatted_name = alias_name.charAt(0).toUpperCase() + alias_name.slice(1);
+  document.getElementById("alias-name").innerHTML = "Hi ".concat(formatted_name).concat(",");
+}
+
+function getUserFromHash() {
+  var user = location.hash.split('#')[2];
+  document.getElementById("user").innerHTML = user;
+}
+
 function main() {
   loadElements();
   resizer();
   slider();
   setupRedeemForm();
   checkAndSubmitSignupForm();
+  getAliasEmailFromHash();
+  getAliasNameFromHash();
+  getUserFromHash();
 }
 
 
