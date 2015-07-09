@@ -359,6 +359,7 @@ module Esper.TaskTab {
   }
 
   function displayWorkflow(team : ApiT.Team,
+                           prefs : ApiT.Preferences,
                            workflows: ApiT.Workflow[],
                            workflowSection : JQuery,
                            workflowSelect : JQuery,
@@ -416,6 +417,10 @@ module Esper.TaskTab {
           stepSelect.trigger("change");
         }
 
+        var userTabContent = $(".esper-user-tab-content");
+        userTabContent.children().remove();
+        userTabContent.append(UserTab.viewOfUserTab(team).view);
+
         workflowSection.removeClass("esper-hide");
       }
     });
@@ -453,6 +458,28 @@ module Esper.TaskTab {
           checklist.append(div);
         });
         checklistDiv.removeClass("esper-hide");
+
+        if (step.meeting_prefs) {
+          var meetingInfo = $(".esper-user-tab-meeting-info");
+          var meetingSelector = $(".esper-meeting-selector");
+          var showHide = $(".esper-meetings");
+          var meetingTypes = prefs.meeting_types;
+          var workplaces = prefs.workplaces;
+          var opt = step.meeting_prefs[0].toLowerCase();
+          meetingTypes[opt] = step.meeting_prefs[1];
+          meetingInfo.children().remove();
+          meetingSelector.children().remove();
+          UserTab.populateMeetingsDropdown(meetingSelector, meetingInfo,
+                                           meetingTypes, workplaces,
+                                           [], []);
+          meetingSelector.val(opt);
+          meetingSelector.trigger("change");
+          if (showHide.text() === "Show") {
+            showHide.text("Hide");
+            $(".esper-meetings-header").addClass("esper-open");
+            Sidebar.toggleList($(".esper-meetings-container"));
+          }
+        }
       }
     });
 
@@ -758,10 +785,12 @@ module Esper.TaskTab {
       }
     });
 
-    displayWorkflow(team, workflows,
-                    workflowSection, workflowSelect, workflowNotes,
-                    stepSelect, stepNotes,
-                    checklistDiv, checklist);
+    Api.getPreferences(team.teamid).done(function(prefs) {
+      displayWorkflow(team, prefs, workflows,
+                      workflowSection, workflowSelect, workflowNotes,
+                      stepSelect, stepNotes,
+                      checklistDiv, checklist);
+    });
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);

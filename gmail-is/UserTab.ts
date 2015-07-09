@@ -426,12 +426,12 @@ module Esper.UserTab {
     return view;
   }
 
-  function populateMeetingsDropdown(drop: JQuery,
-                                  meetInfo: JQuery,
-                                  meetingTypes: ApiT.MeetingTypes,
-                                  workplaces: ApiT.Workplace[],
-                                  meeting_changes,
-                                  workplace_changes) {
+  export function populateMeetingsDropdown(drop: JQuery,
+                                           meetInfo: JQuery,
+                                           meetingTypes: ApiT.MeetingTypes,
+                                           workplaces: ApiT.Workplace[],
+                                           meeting_changes,
+                                           workplace_changes) {
     function option(value, display) {
       var type = display.split(" ")[0];
       if (getSubPreferenceChanges(type, meeting_changes).length > 0) {
@@ -944,19 +944,21 @@ module Esper.UserTab {
       <div #calendarsContainer class="esper-section-container"/>
     </div>
     <div class="esper-section">
-      <div #meetingsHeader class="esper-section-header esper-clearfix">
+      <div #meetingsHeader
+           class="esper-section-header esper-clearfix esper-meetings-header">
         <span #showMeetings
-              class="esper-link" style="float:right">Show</span>
+              class="esper-link esper-meetings" style="float:right">Show</span>
         <span class="esper-bold" style="float:left">Meetings</span>
         <span #meetingsNew class="esper-new-marker">NEW</span>
       </div>
-      <div #meetingsContainer class="esper-section-container"
+      <div #meetingsContainer
+           class="esper-section-container esper-meetings-container"
            style="display:none">
         <div #meetingsSelector class="esper-section-selector esper-clearfix">
           <span class="esper-show-selector">Show: </span>
-          <select #meetingSelector class="esper-select"/>
+          <select #meetingSelector class="esper-select esper-meeting-selector"/>
         </div>
-        <div #meetingInfo/>
+        <div class="esper-user-tab-meeting-info" #meetingInfo/>
       </div>
     </div>
     <div class="esper-section">
