@@ -54,7 +54,17 @@ module WorkflowsTab {
     return view;
   }
 
-  function viewOfStep(s : ApiT.WorkflowStep) : StepView {
+  // Map from constructor tag to other stuff we need for rendering and saving
+  interface MeetingTypeData {
+    type : string,
+    prefs : any, // PhoneInfo or VideoInfo or MealInfo, depending on type
+    reader : (li:JQuery) => any // same as above
+  }
+  type MeetingTypeMap = { [constr:string] : MeetingTypeData }
+
+  function viewOfStep(team : ApiT.Team,
+                      s : ApiT.WorkflowStep,
+                      prefs : ApiT.Preferences) : StepView {
 '''
 <div #view>
   <div class="bottom-gap top-gap">
@@ -66,8 +76,20 @@ module WorkflowsTab {
     <textarea #notes class="workflow-notes" rows=8
                      placeholder="Specific notes for this step"/>
   </div>
-  <div class="top-gap">
-    <label>Meeting preferences:</label> <i>TODO</i>
+  <div #meetingPrefs class="top-gap">
+    <label>Meeting preferences:</label>
+    <select #meetingType class="esper-select" style="float: none">
+      <option value="header">Select meeting type...</option>
+      <option value="Phone_call">Phone call</option>
+      <option value="Video_call">Video call</option>
+      <option value="Breakfast">Breakfast</option>
+      <option value="Brunch">Brunch</option>
+      <option value="Lunch">Lunch</option>
+      <option value="Coffee">Coffee</option>
+      <option value="Dinner">Dinner</option>
+      <option value="Drinks">Drinks</option>
+      <option value="Meeting">Meeting</option>
+    </select>
   </div>
   <div>
     <label>Checklist:</label>
@@ -75,6 +97,7 @@ module WorkflowsTab {
     <button class="button-primary" #newItem>New checklist item</button>
   </div>
 '''
+    console.log("Step:", s);
     title.val(s.title);
     if (s.notes.length > 0) notes.val(s.notes);
     if (s.checklist.length > 0) {
@@ -93,11 +116,88 @@ module WorkflowsTab {
       checklist.append(viewOfCheckItem(ci));
     });
 
+    var meetingTypes : MeetingTypeMap = {
+      "Phone_call": {
+        type: "phone",
+        prefs: prefs.meeting_types.phone_call,
+        reader: PreferencesTab.readPhonePrefs
+      },
+      "Video_call": {
+        type: "video",
+        prefs: prefs.meeting_types.video_call,
+        reader: PreferencesTab.readVideoPrefs
+      },
+      "Breakfast": {
+        type: "breakfast",
+        prefs: prefs.meeting_types.breakfast,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Brunch": {
+        type: "brunch",
+        prefs: prefs.meeting_types.brunch,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Lunch": {
+        type: "Lunch",
+        prefs: prefs.meeting_types.lunch,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Coffee": {
+        type: "coffee",
+        prefs: prefs.meeting_types.coffee,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Dinner": {
+        type: "dinner",
+        prefs: prefs.meeting_types.dinner,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Drinks": {
+        type: "drinks",
+        prefs: prefs.meeting_types.drinks,
+        reader: PreferencesTab.readMealPrefs
+      },
+      "Meeting": {
+        type: "meeting",
+        prefs: Preferences.defaultPreferences().meeting_types.coffee,
+        reader: PreferencesTab.readMealPrefs
+      }
+    };
+
+    function save(constr) {
+      return function() {
+        var mt = meetingTypes[constr];
+        var cls = ".esper-prefs-" + mt.type;
+        var prefs = mt.reader(meetingPrefs.find(cls).eq(0));
+        s.meeting_prefs = [constr, <any> prefs];
+      }
+    }
+
+    var currentMeetingPrefs = s.meeting_prefs;
+    meetingType.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        meetingPrefs.find(".workflow-meeting-prefs").remove();
+        var mt = meetingTypes[chosen];
+        var data = currentMeetingPrefs ? currentMeetingPrefs[1] : mt.prefs;
+        var meetingView =
+          PreferencesTab.viewOfMeetingType(mt.type, data,
+                                           team.teamid, save(chosen));
+        meetingView.addClass("workflow-meeting-prefs");
+        meetingPrefs.append(meetingView);
+      }
+    });
+    if (currentMeetingPrefs) {
+      meetingType.val(currentMeetingPrefs[0]);
+      meetingType.trigger("change");
+    }
+
     return <StepView> _view;
   }
 
   function viewOfWorkflow(team : ApiT.Team,
                           wf : ApiT.Workflow,
+                          prefs : ApiT.Preferences,
                           tabContainer : JQuery) {
 '''
 <div #view>
@@ -153,7 +253,7 @@ module WorkflowsTab {
         chooseStep.hide();
         create.hide();
         currentStep = stepById[chosen];
-        currentStepView = viewOfStep(currentStep);
+        currentStepView = viewOfStep(team, currentStep, prefs);
         nowEditing.text("Editing step: " + currentStep.title);
         edit.append(currentStepView.view);
       }
@@ -172,7 +272,7 @@ module WorkflowsTab {
         };
         nowEditing.text("Editing step: " + title);
         wf.steps.push(currentStep);
-        currentStepView = viewOfStep(currentStep);
+        currentStepView = viewOfStep(team, currentStep, prefs);
         edit.append(currentStepView.view);
       }
     });
@@ -211,39 +311,43 @@ module WorkflowsTab {
   </div>
 </div>
 '''
-    Api.listWorkflows(team.teamid).done(function(response) {
-      if (response.workflows.length > 0) {
-        var wfById : { [wfid:string] : ApiT.Workflow } = {};
-        List.iter(response.workflows, function(wf) {
-          var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
-          wfById[wf.id] = wf;
-          editDropdown.append(opt);
-        });
-        editDropdown.change(function() {
-          var chosen = $(this).val();
-          if (chosen !== "header") {
-            var wf = wfById[chosen];
+    Api.getPreferences(team.teamid).done(function(prefs) {
+      var preferences = $.extend(true, Preferences.defaultPreferences(), prefs);
+
+      Api.listWorkflows(team.teamid).done(function(response) {
+        if (response.workflows.length > 0) {
+          var wfById : { [wfid:string] : ApiT.Workflow } = {};
+          List.iter(response.workflows, function(wf) {
+            var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
+            wfById[wf.id] = wf;
+            editDropdown.append(opt);
+          });
+          editDropdown.change(function() {
+            var chosen = $(this).val();
+            if (chosen !== "header") {
+              var wf = wfById[chosen];
+              edit.hide();
+              create.hide();
+              nowEditing.text("Editing workflow: " + wf.title);
+              workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+            }
+          });
+        } else {
+          editDropdown.replaceWith($("<i>(No current workflows)</i>"));
+        }
+      });
+
+      createButton.click(function() {
+        var title = createTitle.val();
+        if (title.length > 0) {
+          Api.createWorkflow(team.teamid, title).done(function(wf) {
             edit.hide();
             create.hide();
-            nowEditing.text("Editing workflow: " + wf.title);
-            workflow.append(viewOfWorkflow(team, wf, tabContainer));
-          }
-        });
-      } else {
-        editDropdown.replaceWith($("<i>(No current workflows)</i>"));
-      }
-    });
-
-    createButton.click(function() {
-      var title = createTitle.val();
-      if (title.length > 0) {
-        Api.createWorkflow(team.teamid, title).done(function(wf) {
-          edit.hide();
-          create.hide();
-          nowEditing.text("Editing workflow: " + title);
-          workflow.append(viewOfWorkflow(team, wf, tabContainer));
-        });
-      }
+            nowEditing.text("Editing workflow: " + title);
+            workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+          });
+        }
+      });
     });
 
     return view;
