@@ -411,6 +411,9 @@ module Esper.TaskTab {
         if (currentProgress && currentProgress.step_id) {
           stepSelect.val(currentProgress.step_id);
           stepSelect.trigger("change");
+        } else if (wf.steps.length === 1) {
+          stepSelect.val(wf.steps[0].id);
+          stepSelect.trigger("change");
         }
 
         workflowSection.removeClass("esper-hide");
