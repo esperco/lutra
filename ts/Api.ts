@@ -685,4 +685,13 @@ module Api {
     return jsonHttpPut(url, JSON.stringify(workflow));
   }
 
+  export function deleteWorkflow(teamid, workflowid)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/workflows/delete/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(workflowid);
+    return jsonHttpDelete(url);
+  }
+
 }

@@ -112,6 +112,26 @@ button,
             box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
   }
 }
+.button-danger {
+  color: white;
+  border: 1px solid #b9332f;
+  background-image: -webkit-linear-gradient(top, #d7524e 0%, #c7423e 100%);
+  background-image:         linear-gradient(top, #d7524e 0%, #c7423e 100%);
+  &:hover {
+    background-image: -webkit-linear-gradient(top, #d14a48 0%, #c13a38 100%);
+    background-image:         linear-gradient(top, #d14a48 0%, #c13a38 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    background-image: -webkit-linear-gradient(top, #d9534f 0%, #c9433f 100%);
+    background-image:         linear-gradient(top, #d9534f 0%, #c9433f 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
 
 select.esper-select {
   float: left;
@@ -1116,6 +1136,14 @@ a.header-title:hover { text-decoration: underline; }
   border: 1px solid @gray_10;
   resize: none;
   &:focus { outline: 0; }
+}
+
+.workflow-meeting-prefs {
+  float: none;
+  margin-left: 25%;
+  margin-right: 25%;
+  margin-top: 10px;
+  border: 1px solid @gray_10;
 }
 
 .save-notes-bar {
