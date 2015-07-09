@@ -228,6 +228,9 @@ module WorkflowsTab {
   <hr/>
   <button class="button-primary" #save>Save Workflow</button>
   <button class="button-secondary" #cancel>Cancel</button>
+  <button class="button-danger" #del style="float: right">
+    Delete Workflow
+  </button>
 <div>
 '''
     var stepById : { [id:string] : ApiT.WorkflowStep } = {};
@@ -288,6 +291,12 @@ module WorkflowsTab {
     });
 
     cancel.click(reload);
+
+    del.click(function () {
+      var ok =
+        confirm("Are you sure you want to delete workflow " + wf.title + "?");
+      if (ok) Api.deleteWorkflow(team.teamid, wf.id).done(reload);
+    });
 
     return view;
   }
