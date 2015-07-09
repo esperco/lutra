@@ -88,7 +88,6 @@ module WorkflowsTab {
       <option value="Coffee">Coffee</option>
       <option value="Dinner">Dinner</option>
       <option value="Drinks">Drinks</option>
-      <option value="Meeting">Meeting</option>
     </select>
   </div>
   <div>
@@ -155,11 +154,6 @@ module WorkflowsTab {
       "Drinks": {
         type: "drinks",
         prefs: prefs.meeting_types.drinks,
-        reader: PreferencesTab.readMealPrefs
-      },
-      "Meeting": {
-        type: "meeting",
-        prefs: Preferences.defaultPreferences().meeting_types.coffee,
         reader: PreferencesTab.readMealPrefs
       }
     };
