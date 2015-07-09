@@ -66,7 +66,7 @@ module WorkflowsTab {
                       s : ApiT.WorkflowStep,
                       prefs : ApiT.Preferences) : StepView {
 '''
-<div #view>
+<div class="workflow-step-view" #view>
   <div class="bottom-gap top-gap">
     <label>Title:</label>
     <input type="text" #title size=40/>
@@ -225,10 +225,14 @@ module WorkflowsTab {
   <div #edit>
     <big #nowEditing/>
   </div>
-  <hr/>
+  <button class="button-danger bottom-gap" #deleteStep
+          style="float: right; display: none">
+    Delete Step
+  </button>
+  <hr style="clear: right"/>
   <button class="button-primary" #save>Save Workflow</button>
   <button class="button-secondary" #cancel>Cancel</button>
-  <button class="button-danger" #del style="float: right">
+  <button class="button-danger" #deleteFlow style="float: right">
     Delete Workflow
   </button>
 <div>
@@ -259,6 +263,7 @@ module WorkflowsTab {
         currentStepView = viewOfStep(team, currentStep, prefs);
         nowEditing.text("Editing step: " + currentStep.title);
         edit.append(currentStepView.view);
+        deleteStep.show();
       }
     });
 
@@ -292,7 +297,22 @@ module WorkflowsTab {
 
     cancel.click(reload);
 
-    del.click(function () {
+    deleteStep.click(function() {
+      var ok =
+        confirm("Are you sure you want to delete step " +
+                currentStep.title + "?");
+      if (ok) {
+        wf.steps = List.filterMap(wf.steps, function(s) {
+          if (s.id === currentStep.id) return null;
+          else return s;
+        });
+        currentStep = null;
+        currentStepView = null;
+        save.trigger("click");
+      }
+    });
+
+    deleteFlow.click(function() {
       var ok =
         confirm("Are you sure you want to delete workflow " + wf.title + "?");
       if (ok) Api.deleteWorkflow(team.teamid, wf.id).done(reload);
