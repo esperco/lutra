@@ -56,9 +56,9 @@ module WorkflowsTab {
 
   // Map from constructor tag to other stuff we need for rendering and saving
   interface MeetingTypeData {
-    type : string,
-    prefs : any, // PhoneInfo or VideoInfo or MealInfo, depending on type
-    reader : (li:JQuery) => any // same as above
+    type : string;
+    prefs : any; // PhoneInfo or VideoInfo or MealInfo, depending on type
+    reader : (li:JQuery) => any; // same as above
   }
   type MeetingTypeMap = { [constr:string] : MeetingTypeData }
 
