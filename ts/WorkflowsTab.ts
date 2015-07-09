@@ -169,7 +169,7 @@ module WorkflowsTab {
         var mt = meetingTypes[constr];
         var cls = ".esper-prefs-" + mt.type;
         var prefs = mt.reader(meetingPrefs.find(cls).eq(0));
-        s.meeting_prefs = [constr, <any> prefs];
+        s.meeting_prefs = [constr, prefs];
       }
     }
 
@@ -180,11 +180,13 @@ module WorkflowsTab {
         meetingPrefs.find(".workflow-meeting-prefs").remove();
         var mt = meetingTypes[chosen];
         var data = currentMeetingPrefs ? currentMeetingPrefs[1] : mt.prefs;
+        var setMeetingPrefs = save(chosen);
         var meetingView =
           PreferencesTab.viewOfMeetingType(mt.type, data,
-                                           team.teamid, save(chosen));
+                                           team.teamid, setMeetingPrefs);
         meetingView.addClass("workflow-meeting-prefs");
         meetingPrefs.append(meetingView);
+        setMeetingPrefs();
       }
     });
     if (currentMeetingPrefs) {
