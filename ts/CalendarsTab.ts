@@ -210,7 +210,7 @@ module CalendarsTab {
       Api.setSubscription(team.teamid, Plan.basic)
       .done(function() {
       var alias = team.team_email_aliases[0];
-      var url = "http://www.esper.com//pub/signup-done#";
+      var url = "https://www.esper.com/signup-done#";
       var urlWithAlias = url.concat(alias);
       window.location.href = urlWithAlias;
           });
