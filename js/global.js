@@ -89,7 +89,7 @@ function limitRedeemInput(){
 }
 
 function looksLikeAnEmailAddress(s) {
-  return (/^[^ ]+@[^ ]+$/.test(s));
+  return (/^[^ @]+@{1}[^ @]+[.]{1}[^ .@]+$/.test(s));
 }
 
 function checkAndSubmitRedeemForm() {
@@ -187,6 +187,14 @@ function checkAndSubmitSignupForm() {
     }
     else
       $("#email").removeClass("incorrect");
+    
+    if (emailPlatform === null) {
+      valid = false;
+      $("#platform").addClass("incorrect");
+    }
+    else
+      $("#platform").removeClass("incorrect");
+
 
     if (!valid)
       e.preventDefault();
@@ -211,21 +219,22 @@ function checkAndSubmitSignupForm() {
   });
 }
 
-function getAliasEmailFromHash() {
-  var email = location.hash.split("#")[1];
-  document.getElementById("alias-email").innerHTML = email;
-  $("a").prop("href", "mailto:".concat(email));
-}
-
-function getAliasNameFromHash() {
+function setDonePageFromHash() {
   var alias_name = location.hash.split("#")[1].split("@")[0];
   var formatted_name = alias_name.charAt(0).toUpperCase() + alias_name.slice(1);
-  document.getElementById("alias-name").innerHTML = "Hi ".concat(formatted_name).concat(",");
-}
+  var greeting =  "Hi ".concat(formatted_name).concat(",");
+  document.getElementById("alias-name").innerHTML = greeting;
 
-function getUserFromHash() {
   var user = location.hash.split('#')[2];
   document.getElementById("user").innerHTML = user;
+
+  var email = location.hash.split("#")[1];
+  var intro_email = "mailto:".concat(email).concat("?subject=Nice to meet you, ").concat(formatted_name).concat("!&body=").concat(greeting).concat("%0D%0A%0D%0AIt's great to meet you! I'm excited to have you as an assistant.%0D%0AI'd love to speak with you and learn more about what you can do for me.%0D%0ACan you help find a good time for a phonecall that works for both of us?%0D%0A%0D%0ACheers,%0D%0A").concat(user);
+  document.getElementById("mailto-link").innerHTML = email;
+  $("#mailto-link").prop("href", intro_email);
+  $("#mailto-msg").prop("href", intro_email);
+
+
 }
 
 function main() {
@@ -234,10 +243,7 @@ function main() {
   slider();
   setupRedeemForm();
   checkAndSubmitSignupForm();
-  getAliasEmailFromHash();
-  getAliasNameFromHash();
-  getUserFromHash();
-}
+ }
 
 
 $(document).ready(main);
