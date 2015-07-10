@@ -209,8 +209,10 @@ module CalendarsTab {
     function goToAboutPage() {
       Api.setSubscription(team.teamid, Plan.basic)
       .done(function() {
-      var url = "http://localhost:8009/pub/signup-done";
-      window.location.href = url;
+      var alias = team.team_email_aliases[0];
+      var url = "http://www.esper.com//pub/signup-done#";
+      var urlWithAlias = url.concat(alias);
+      window.location.href = urlWithAlias;
           });
     }
 

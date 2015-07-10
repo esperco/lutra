@@ -311,11 +311,14 @@ module Settings {
     if (teams.length === 1 && firstTime) {
       firstTime = false;
       var joinTeam = Login.data.missing_shared_calendar;
-      if (Util.isString(joinTeam))
+      if (teams[0] !== null) {
+      Login.setTeam(teams[0]); //refresh login data since assistants/aliases may have been added during setup
+        if (Util.isString(joinTeam))
         // This is a new exec customer who needs to be onboarded
-        location.hash = "#!join/" + joinTeam;
-      else if (teams[0] !== null)
+          location.hash = "#!join/" + joinTeam;
+        else
         location.hash = "#!team-settings/" + teams[0].teamid;
+      }
     }
     var uid = Login.me();
     var isExec = false;
