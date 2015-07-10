@@ -38,7 +38,7 @@ module Esper.JsonHttp {
    *  processData controls whether the body is converted to a query
    *  string. It is true by default.
    */
-  function httpRequest(method: string,
+  export function httpRequest(method: string,
                        path: string,
                        body: string,
                        contentType: string,
