@@ -126,6 +126,17 @@ module Esper.TaskTab {
     }
   }
 
+  function workflowChecklistCompleted() {
+    var allChecked = true;
+    $(".esper-workflow-checklist").find("input").each(function() {
+      if (!($(this).is(":checked"))) {
+        allChecked = false;
+        return;
+      }
+    });
+    return allChecked;
+  }
+
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
   <div #view class="esper-clearfix esper-task-progress">
@@ -149,8 +160,20 @@ module Esper.TaskTab {
     taskProgressSelector.val(task.task_progress);
     taskProgressSelector.change(function() {
       var i = $(this).val();
-      Api.setTaskProgress(task.taskid, i);
-      task.task_progress = i;
+      function applyChange() {
+        Api.setTaskProgress(task.taskid, i);
+        task.task_progress = i;
+      }
+      if (i === "Done") {
+        if (workflowChecklistCompleted()) {
+          applyChange();
+        } else {
+          taskProgressSelector.val(task.task_progress);
+          alert("Please complete all checklist items before finalizing.");
+        }
+      } else {
+        applyChange();
+      }
     });
 
     taskTab.taskProgressContainer.append(view);
@@ -335,6 +358,133 @@ module Esper.TaskTab {
     }
   }
 
+  function displayWorkflow(team : ApiT.Team,
+                           prefs : ApiT.Preferences,
+                           workflows: ApiT.Workflow[],
+                           workflowSection : JQuery,
+                           workflowSelect : JQuery,
+                           workflowNotes : JQuery,
+                           stepSelect : JQuery,
+                           stepNotes : JQuery,
+                           checklistDiv : JQuery,
+                           checklist : JQuery) : void {
+    Sidebar.customizeSelectArrow(workflowSelect);
+    Sidebar.customizeSelectArrow(stepSelect);
+
+    List.iter(workflows, function(wf) {
+      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
+        .appendTo(workflowSelect);
+    });
+
+    var currentWorkflow : ApiT.Workflow;
+    var currentProgress : ApiT.TaskWorkflowProgress;
+
+    workflowSelect.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        var wf = List.find(workflows, function(wf) {
+          return wf.id === chosen;
+        });
+        currentWorkflow = wf;
+        var task = CurrentThread.task.get();
+        var startingProgress = {
+          workflow_id: wf.id,
+          checklist: []
+        };
+        var progress = task.task_workflow_progress;
+        if (!progress || progress.workflow_id !== wf.id) {
+          progress = startingProgress;
+        }
+        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+        currentProgress = progress;
+        workflowNotes.text(wf.notes);
+
+        stepSelect.children().slice(1).remove();
+        stepNotes.text("");
+        checklist.children().remove();
+        checklistDiv.addClass("esper-hide");
+
+        List.iter(wf.steps, function(s) {
+          $("<option value='" + s.id + "'>" + s.title + "</option>")
+            .appendTo(stepSelect);
+        });
+
+        if (currentProgress && currentProgress.step_id) {
+          stepSelect.val(currentProgress.step_id);
+          stepSelect.trigger("change");
+        } else if (wf.steps.length === 1) {
+          stepSelect.val(wf.steps[0].id);
+          stepSelect.trigger("change");
+        }
+
+        var userTabContent = $(".esper-user-tab-content");
+        userTabContent.children().remove();
+        userTabContent.append(UserTab.viewOfUserTab(team).view);
+
+        workflowSection.removeClass("esper-hide");
+      }
+    });
+
+    stepSelect.change(function() {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        var wf = currentWorkflow;
+        var progress = currentProgress;
+        var task = CurrentThread.task.get();
+        var step = List.find(wf.steps, function(s) {
+          return s.id === chosen;
+        });
+        if (progress.checklist.length === 0 || progress.step_id !== step.id) {
+          progress.checklist = step.checklist;
+        }
+        progress.step_id = step.id;
+        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+        stepNotes.text(step.notes);
+        stepNotes.removeClass("esper-hide");
+
+        checklist.children().remove();
+        List.iter(progress.checklist, function(x, i) {
+          var div = $("<div/>");
+          var label = $("<label/>");
+          var box = $("<input type='checkbox' class='esper-checklist-box'/>")
+          box.prop("checked", x.checked);
+          box.change(function() {
+            var item = progress.checklist[i];
+            item.checked = this.checked;
+            Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+          });
+          label.append(box).append(x.text);
+          div.append(label);
+          checklist.append(div);
+        });
+        checklistDiv.removeClass("esper-hide");
+
+        if (step.meeting_prefs) {
+          var meetingInfo = $(".esper-user-tab-meeting-info");
+          var meetingSelector = $(".esper-meeting-selector");
+          var showHide = $(".esper-meetings");
+          var meetingTypes = prefs.meeting_types;
+          var workplaces = prefs.workplaces;
+          var opt = step.meeting_prefs[0].toLowerCase();
+          meetingTypes[opt] = step.meeting_prefs[1];
+          meetingInfo.children().remove();
+          meetingSelector.children().remove();
+          UserTab.populateMeetingsDropdown(meetingSelector, meetingInfo,
+                                           meetingTypes, workplaces,
+                                           [], []);
+          meetingSelector.val(opt);
+          meetingSelector.trigger("change");
+          if (showHide.text() === "Show") {
+            showHide.text("Hide");
+            $(".esper-meetings-header").addClass("esper-open");
+            Sidebar.toggleList($(".esper-meetings-container"));
+          }
+        }
+      }
+    });
+
+  }
+
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
@@ -376,7 +526,8 @@ module Esper.TaskTab {
                                  team: ApiT.Team,
                                  threadId: string,
                                  autoTask: boolean,
-                                 linkedEvents: ApiT.EventWithSyncInfo[]) {
+                                 linkedEvents: ApiT.EventWithSyncInfo[],
+                                 workflows: ApiT.Workflow[]) {
 '''
 <div #view>
   <div class="esper-tab-header">
@@ -389,14 +540,38 @@ module Esper.TaskTab {
       <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
+    <div class="esper-clearfix esper-workflow-gap">
+      <select #workflowSelect class="esper-select" disabled>
+        <option value="header">Select workflow...</option>
+      </select>
+    </div>
   </div>
   <div class="esper-tab-overflow">
+    <div #workflowSection class="esper-section esper-hide">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Workflow</span>
+      </div>
+      <div class="esper-section-container esper-section-notes">
+        <div #workflowNotes class="esper-text-notes"/>
+        <div class="esper-clearfix esper-workflow-gap">
+          <select #stepSelect class="esper-select">
+            <option value="header">Select step...</option>
+          </select>
+        </div>
+        <div #stepNotes
+          class="esper-clearfix esper-hide esper-text-notes"/>
+        <div #checklistDiv class="esper-clearfix esper-hide">
+          <b>Checklist:</b>
+          <div #checklist class="esper-workflow-checklist"/>
+        </div>
+      </div>
+    </div>
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Task Notes</span>
       </div>
       <div class="esper-section-notes">
-        <textarea #taskNotes rows=5
+        <textarea #taskNotes rows=3
               maxlength=140
               placeholder="Leave some brief notes about the task here"
               class="esper-text-notes"/>
@@ -491,9 +666,11 @@ module Esper.TaskTab {
         if (isValid) {
           taskTabView.taskCaption.text(taskLabelExists);
           taskTabView.taskTitle.text(task.task_title);
+          workflowSelect.attr("disabled", false);
         } else {
           taskTabView.taskCaption.text(taskLabelCreate);
           taskTabView.taskTitle.text("");
+          workflowSelect.attr("disabled", true);
         }
       }
     );
@@ -608,6 +785,13 @@ module Esper.TaskTab {
       }
     });
 
+    Api.getPreferences(team.teamid).done(function(prefs) {
+      displayWorkflow(team, prefs, workflows,
+                      workflowSection, workflowSelect, workflowNotes,
+                      stepSelect, stepNotes,
+                      checklistDiv, checklist);
+    });
+
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
       Api.getThreadDetails(threadId).done(function(deets) {
@@ -622,6 +806,14 @@ module Esper.TaskTab {
           displayLinkedThreadsList(task, threadId, taskTabView);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTabView);
+
+          var progress = task.task_workflow_progress;
+          if (progress) {
+            workflowSelect.val(progress.workflow_id);
+            workflowSelect.trigger("change");
+          }
+          workflowSelect.attr("disabled", false);
+
         } else {
           taskCaption.text(taskLabelCreate);
           title = deets.subject;

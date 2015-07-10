@@ -586,6 +586,7 @@ module Esper.Api {
     return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
   }
 
+
   export function putFiles(filename: string,
                            content_type: string,
                            contents: string):
@@ -598,5 +599,25 @@ module Esper.Api {
     // Doing a custom request because I'm sending the file directly
     // without using JSON.
     return JsonHttp.put(url, contents);
+  }
+
+  export function listWorkflows(teamid)
+    : JQueryDeferred<ApiT.UserWorkflows>
+  {
+    var url =
+      Conf.Api.url + "/api/workflows/list/" + string(Login.myUid())
+      + "/" + string(teamid);
+    return JsonHttp.get(url);
+  }
+
+  export function putWorkflowProgress(teamid: string, taskid: string,
+                                      progress : ApiT.TaskWorkflowProgress)
+    : JQueryDeferred<void>
+  {
+    var url =
+      Conf.Api.url + "/api/workflows/progress/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(taskid);
+    return JsonHttp.put(url, JSON.stringify(progress));
   }
 }
