@@ -4,7 +4,10 @@
 
 module Footer {
 
-  export function load() {
+/* Added an "onboarding" field so we can hide the footer if we are in onboarding flow .
+Footer.load() can still be called due to default value, only Footer.load(true) will disable. */
+
+export function load(onboarding = false) {
 '''
 <div #view class="footer clearfix">
   <ul class="col-xs-2">
@@ -40,7 +43,11 @@ module Footer {
 
     contact.click(function() {
       GmailCompose.makeUrl({ to: "team@esper.com" });
-    });
+      });
+
+    if (onboarding) {
+      view.hide();
+    }
 
     return view;
   }

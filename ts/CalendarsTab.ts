@@ -36,9 +36,9 @@ module CalendarsTab {
 
   function makeAccountSelector(team, root) {
 '''
-<div #view>Accounts<br/>
-  <select #calAccounts size=3 /><br/>
-  <button #addCalAccount>Add calendars from another account</button>
+<div #view>Accounts:<br/>
+  <select #calAccounts size=3 style="color: black"/><br/><br/>
+  <button #addCalAccount class="button-secondary">Add calendars from another account</button>
 </div>
 '''
     $("<option/>").text(Login.data.email).appendTo(calAccounts);
@@ -208,9 +208,12 @@ module CalendarsTab {
 
     function goToAboutPage() {
       Api.setSubscription(team.teamid, Plan.basic)
-        .done(function() {
-          TeamSettings.switchTabByName("abt");
-        });
+      .done(function() {
+      var alias = team.team_email_aliases[0];
+      var url = "https://www.esper.com/signup-done#";
+      var urlWithAlias = url.concat(alias);
+      window.location.href = urlWithAlias;
+          });
     }
 
     share.text("Sharing...").attr("disabled", "true");
@@ -298,20 +301,24 @@ module CalendarsTab {
   export function load(team, onboarding?) {
 '''
 <div #view>
+  <div #container>
   <div #teamCalendars>
-    <div class="esper-h1">Team Calendars</div>
-    <div #description class="calendar-setting-description">
-      Welcome to Esper! So we can start scheduling, please select
-      which calendars to share with your Esper assistant.
+    <div #header class="esper-h1">Team Calendars</div>
+      <div #progress class="progress">
+        <div class="progress-bar progress-bar-info" role="progressbar" style="width:75%"/>
+      </div>
+      <div #description class="calendar-setting-description">
+        Please select which calendars to share with your Esper assistant.
+      </div>
+      <div #calendarView class="esper-loading">Loading...</div>
+      <button #share class="button-primary" style="margin-top: 10px">Share Calendars</button>
     </div>
-    <div #calendarView class="esper-loading">Loading...</div>
-    <button #share class="button-primary">Share Calendars</button>
+    <br/>
+    <div #calendarSelector/>
+    <div #accountSelector/>
+    <br/>
+    <div #emailAliases/>
   </div>
-  <br/>
-  <div #calendarSelector/>
-  <div #accountSelector/>
-  <br/>
-  <div #emailAliases/>
 </div>
 '''
     if (!Login.isExecCustomer(team)) {
@@ -334,12 +341,21 @@ module CalendarsTab {
       });
 
       if (onboarding) {
-        share.css("float", "right");
-      } else {
-        description.text("Please select which calendars to share " +
-                         "with your Esper assistant.");
+      description.html("<b>You're nearly done!</b> " +
+      "Please select which calendars to share with your Esper assistant.<br>");
+      header.hide();
+      description.addClass("onboarding-text");
+      share.css("float", "right");
+      accountSelector.hide();
+      container.addClass("container");
+      container.css("border","0px");
+      container.css("margin","0x");
+      view.css("padding-top","78px");
       }
-    }
+      else {
+        progress.hide();
+      }
+      }
 
     return view;
   }

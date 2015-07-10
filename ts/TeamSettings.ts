@@ -85,7 +85,7 @@ module TeamSettings {
   }
 
   function showTeamSettings(team : ApiT.Team, onboarding? : boolean) {
-'''
+  '''
 <div #view>
   <div #tabsDiv style="padding-left:28px">
     <ul class="esper-tab-links">
@@ -98,7 +98,7 @@ module TeamSettings {
       <li #tabAbt><a class="link">About</a></li>
     </ul>
   </div>
-  <div class="esper-tab-content">
+  <div #tab class="esper-tab-content">
     <div #contentAcc class="tab-content active"/>
     <div #contentCal class="tab-content"/>
     <div #contentPrf class="tab-content"/>
@@ -138,9 +138,9 @@ module TeamSettings {
     contentAbt.append(AboutTab.load(team, onboarding));
 
     if (onboarding) {
-      // We'll guide the exec through each step
+    // We'll guide the exec through each step
       tabsDiv.remove();
-    }
+      }
 
     /* We don't have access to executive email accounts,
      * so executives don't need to configure label sync. */
@@ -161,6 +161,11 @@ module TeamSettings {
     var last = findLastShown(tabViews);
     last.tab.children() // the <a> element
       .addClass("last");
+
+    if (onboarding) {
+      view.addClass("onboarding");
+      tab.css("padding","0px");
+    }
 
     return view;
   }
@@ -183,7 +188,7 @@ module TeamSettings {
   export function load(teamid : string, onboarding? : boolean) {
 '''
 <div #view class="settings-container">
-  <div class="header clearfix">
+  <div #headerDiv class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
     <a #logoContainer href="#"
        class="img-container-left"/>
@@ -194,7 +199,7 @@ module TeamSettings {
       <span #teamName class="profile-name exec-profile-name"/>
     </div>
   </div>
-  <div class="divider"/>
+  <div #divideLine class="divider"/>
   <div #main class="clearfix"/>
   <div #footer/>
 </div>
@@ -218,17 +223,34 @@ module TeamSettings {
 
     Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
       .done(function(exec) {
-        document.title = exec.display_name + " - Team Settings";
+        document.title = "Sign Up | Esper"
         profilePic.css("background-image", "url('" + exec.image_url + "')");
         teamName.text(selectedTeam.team_name);
       });
 
     headerTitle.click(Page.settings.load);
+    
+    /* document.title = "exec.display_name - Team Settings" if we are not onboarding.
+    If we are onboarding, keep the default 'Sign Up | Esper", to not confuse new onboarding customers */
+
+    if (!onboarding) {
+      Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
+        .done(function(exec) {
+          document.title = exec.display_name + " - Team Settings";
+        });
+      }
+    else {
+    // We'll guide the exec through each step, mimic esper.com/signup css
+        divideLine.remove();
+        headerDiv.remove();
+        view.css("padding","0px");
+        view.css("min-width","100%");
+      }
 
     Api.getSubscriptionStatus(selectedTeam.teamid)
       .done(function(customer) {
         main.append(showTeamSettings(selectedTeam, onboarding));
-        footer.append(Footer.load());
+        footer.append(Footer.load(onboarding));
         if (onboarding) switchTabByName("cal");
       });
 
