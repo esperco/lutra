@@ -44,7 +44,7 @@ module PreferencesTab {
     };
   }
 
-  function readPhonePrefs(li) {
+  export function readPhonePrefs(li) {
     var phoneNumbers = [];
     li.find(".esper-prefs-phone-info").each(function() {
       var num = $(this);
@@ -63,7 +63,7 @@ module PreferencesTab {
     };
   }
 
-  function readVideoPrefs(li) {
+  export function readVideoPrefs(li) {
     var videoAccounts = [];
     li.find(".esper-prefs-video-info").each(function() {
       var acct = $(this);
@@ -81,7 +81,7 @@ module PreferencesTab {
     };
   }
 
-  function readMealPrefs(li) {
+  export function readMealPrefs(li) {
     var favoritePlaces = [];
     li.find(".esper-prefs-location-info").each(function() {
       var fav = $(this);
@@ -358,7 +358,7 @@ module PreferencesTab {
 
   function viewOfLocationModalDetails(modal, purpose, defaults, teamid,
                                       primaryBtn, cancelBtn, deleteBtn,
-                                      viewToUpdate) {
+                                      viewToUpdate, save) {
 '''
 <div #view>
   <div class="semibold">Location Name</div>
@@ -372,7 +372,7 @@ module PreferencesTab {
       address.val(defaults.address);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        saveMeetingTypes();
+        save();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -387,12 +387,12 @@ module PreferencesTab {
       var newView = viewOfInfo("location",
                                name.val(),
                                address.val(),
-                               defaults, teamid);
+                               defaults, teamid, save);
       if (purpose === "Edit")
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      saveMeetingTypes();
+      save();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -401,7 +401,7 @@ module PreferencesTab {
 
   function viewOfVideoModalDetails(modal, purpose, defaults, teamid,
                                    primaryBtn, cancelBtn, deleteBtn,
-                                   viewToUpdate) {
+                                   viewToUpdate, save) {
 '''
 <div #view>
   <div class="semibold">Service</div>
@@ -424,7 +424,7 @@ module PreferencesTab {
       username.val(defaults.video_username);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        saveMeetingTypes();
+        save();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -439,12 +439,12 @@ module PreferencesTab {
       var newView = viewOfInfo("video",
                                select.val(),
                                username.val(),
-                               defaults, teamid);
+                               defaults, teamid, save);
       if (purpose === "Edit")
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      saveMeetingTypes();
+      save();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -453,7 +453,7 @@ module PreferencesTab {
 
   function viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
                                    primaryBtn, cancelBtn, deleteBtn,
-                                   viewToUpdate) {
+                                   viewToUpdate, save) {
 '''
 <div #view>
   <div class="semibold">Type</div>
@@ -483,7 +483,7 @@ module PreferencesTab {
         share.prop("checked", true);
       deleteBtn.click(function() {
         viewToUpdate.remove();
-        saveMeetingTypes();
+        save();
         (<any> modal).modal("hide"); // FIXME
       });
     }
@@ -499,12 +499,12 @@ module PreferencesTab {
       var newView = viewOfInfo("phone",
                                select.val(),
                                number.val(),
-                               defaults, teamid);
+                               defaults, teamid, save);
       if (purpose === "Edit")
         viewToUpdate.replaceWith(newView);
       else
         viewToUpdate.append(newView);
-      saveMeetingTypes();
+      save();
       (<any> modal).modal("hide"); // FIXME
     });
 
@@ -555,7 +555,7 @@ module PreferencesTab {
     return view;
   }
 
-  function showInfoModal(type, purpose, defaults, teamid, view) {
+  function showInfoModal(type, purpose, defaults, teamid, view, save) {
 '''
 <div #modal
      class="modal fade" tabindex="-1"
@@ -585,17 +585,20 @@ module PreferencesTab {
       title.text(purpose + " Phone Number");
       content.append(
         viewOfPhoneModalDetails(modal, purpose, defaults, teamid,
-                                primaryBtn, cancelBtn, deleteBtn, view));
+                                primaryBtn, cancelBtn, deleteBtn,
+                                view, save));
     } else if (type == "video") {
       title.text(purpose + " Username");
       content.append(
         viewOfVideoModalDetails(modal, purpose, defaults, teamid,
-                                primaryBtn, cancelBtn, deleteBtn, view));
+                                primaryBtn, cancelBtn, deleteBtn,
+                                view, save));
     } else if (type == "location") {
       title.text(purpose + " Favorite Location");
       content.append(
         viewOfLocationModalDetails(modal, purpose, defaults, teamid,
-                                   primaryBtn, cancelBtn, deleteBtn, view));
+                                   primaryBtn, cancelBtn, deleteBtn,
+                                   view, save));
     }
 
     if (purpose == "Add") {
@@ -982,7 +985,7 @@ module PreferencesTab {
     return currentTimezone;
   }
 
-  function viewOfInfo(type, label, info, defaults, teamid) {
+  function viewOfInfo(type, label, info, defaults, teamid, save) {
 '''
 <li #view>
   <div #editIcon class="img-container-right preference-option-edit"/>
@@ -1013,14 +1016,14 @@ module PreferencesTab {
 
     var defaultsCopy = $.extend(true, {}, defaults);
     editIcon.click(function() {
-      showInfoModal(type, "Edit", defaultsCopy, teamid, view);
+      showInfoModal(type, "Edit", defaultsCopy, teamid, view, save);
     })
 
     view.addClass("esper-prefs-" + type + "-info");
     return view;
   }
 
-  function viewOfMealOptions(defaults : ApiT.MealInfo, teamid) {
+  function viewOfMealOptions(defaults : ApiT.MealInfo, teamid, save) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #locationContainer class="img-container-left"/>
@@ -1037,17 +1040,17 @@ module PreferencesTab {
       locations.append(viewOfInfo("location",
                                   fav.title,
                                   fav.address,
-                                  fav, teamid));
+                                  fav, teamid, save));
     });
 
     addLocation.click(function() {
-      showInfoModal("location", "Add", defaults, teamid, locations);
+      showInfoModal("location", "Add", defaults, teamid, locations, save);
     })
 
     return view;
   }
 
-  function viewOfVideoOptions(defaults : ApiT.VideoInfo, teamid) {
+  function viewOfVideoOptions(defaults : ApiT.VideoInfo, teamid, save) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #videoContainer class="img-container-left"/>
@@ -1064,17 +1067,17 @@ module PreferencesTab {
       usernames.append(viewOfInfo("video",
                                   acct.video_type,
                                   acct.video_username,
-                                  acct, teamid));
+                                  acct, teamid, save));
     });
 
     addUsername.click(function() {
-      showInfoModal("video", "Add", defaults, teamid, usernames);
+      showInfoModal("video", "Add", defaults, teamid, usernames, save);
     })
 
     return view;
   }
 
-  function viewOfPhoneOptions(defaults : ApiT.PhoneInfo, teamid) {
+  function viewOfPhoneOptions(defaults : ApiT.PhoneInfo, teamid, save) {
 '''
 <div #view class="preference-option-row clearfix">
   <div #phoneContainer class="img-container-left"/>
@@ -1091,17 +1094,17 @@ module PreferencesTab {
       numbers.append(viewOfInfo("phone",
                                 ph.phone_type,
                                 ph.phone_number,
-                                ph, teamid));
+                                ph, teamid, save));
     });
 
     addNumber.click(function() {
-      showInfoModal("phone", "Add", defaults, teamid, numbers);
+      showInfoModal("phone", "Add", defaults, teamid, numbers, save);
     })
 
     return view;
   }
 
-  function viewOfMeetingType(type, defaults, teamid) {
+  export function viewOfMeetingType(type, defaults, teamid, save) {
 '''
 <li #view class="preference">
   <div #toggle>
@@ -1158,9 +1161,9 @@ module PreferencesTab {
     Svg.loadImg(availability, "/assets/img/availability.svg");
 
     durationCol.append(
-      createDurationSelector(defaults.duration, saveMeetingTypes)
+      createDurationSelector(defaults.duration, save)
     );
-    bufferCol.append(createBufferSelector(defaults.buffer, saveMeetingTypes));
+    bufferCol.append(createBufferSelector(defaults.buffer, save));
 
     bufferInfo.tooltip();
 
@@ -1169,27 +1172,26 @@ module PreferencesTab {
     if (type == "phone") {
       customizeAvailability.click(function() {
         showAvailability(name + " Calls", defaults, customizeAvailability,
-          saveMeetingTypes);
+          save);
       });
-      options.append(viewOfPhoneOptions(defaults, teamid));
+      options.append(viewOfPhoneOptions(defaults, teamid, save));
     } else if (type == "video") {
       customizeAvailability.click(function() {
         showAvailability(name + " Calls", defaults, customizeAvailability,
-          saveMeetingTypes);
+          save);
       });
-      options.append(viewOfVideoOptions(defaults, teamid));
+      options.append(viewOfVideoOptions(defaults, teamid, save));
     } else {
       customizeAvailability.click(function() {
-        showAvailability(name, defaults, customizeAvailability,
-          saveMeetingTypes);
+        showAvailability(name, defaults, customizeAvailability, save);
       });
-      options.append(viewOfMealOptions(defaults, teamid));
+      options.append(viewOfMealOptions(defaults, teamid, save));
     }
 
     if (defaults.available === false) togglePreference(_view, teamid, false);
     toggle.click(function() {
       togglePreference(_view, teamid, undefined);
-      saveMeetingTypes();
+      save();
     });
 
     view.addClass("esper-prefs-" + type);
@@ -1462,7 +1464,8 @@ module PreferencesTab {
 
     var defaultsCopy = $.extend(true, {}, defaults);
     editIcon.click(function() {
-      showInfoModal("workplace", "Edit", defaultsCopy, teamid, view);
+      showInfoModal("workplace", "Edit", defaultsCopy, teamid, view,
+        saveWorkplaces);
     })
 
     durationCol.append(
@@ -1698,7 +1701,8 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
       workplaces.append(addWorkplace);
       addBtn.click(function() {
         showInfoModal(
-          "workplace", "Add", initial.workplaces, team.teamid, workplaces);
+          "workplace", "Add", initial.workplaces, team.teamid, workplaces,
+          saveWorkplaces);
       });
       setDividerHeight(
         "workplace",
@@ -1714,14 +1718,17 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
 
       calls
         .append(viewOfMeetingType(
-          "phone", initial.meeting_types.phone_call, team.teamid))
+          "phone", initial.meeting_types.phone_call, team.teamid,
+          saveMeetingTypes))
         .append(viewOfMeetingType(
-          "video", initial.meeting_types.video_call, team.teamid));
+          "video", initial.meeting_types.video_call, team.teamid,
+          saveMeetingTypes));
       setDividerHeight("calls", callsDivider, 1);
 
       Preferences.meals.map(function (meal) {
         return viewOfMeetingType(
-          meal, initial.meeting_types[meal], team.teamid);
+          meal, initial.meeting_types[meal], team.teamid,
+          saveMeetingTypes);
       }).forEach(function (element) {
         meals.append(element);
       });

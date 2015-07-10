@@ -658,4 +658,40 @@ module Api {
     var url = "/api/signup/" + string(email);
     return jsonHttpPut(url, JSON.stringify(data));
   }
+
+  export function listWorkflows(teamid)
+    : JQueryDeferred<ApiT.UserWorkflows>
+  {
+    var url = "/api/workflows/list/" + string(Login.me())
+      + "/" + string(teamid);
+    return jsonHttpGet(url);
+  }
+
+  export function createWorkflow(teamid, title)
+    : JQueryDeferred<ApiT.Workflow>
+  {
+    var url = "/api/workflows/create/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(title);
+    return jsonHttpPost(url, "");
+  }
+
+  export function updateWorkflow(teamid, workflowid, workflow : ApiT.Workflow)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/workflows/update/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(workflowid);
+    return jsonHttpPut(url, JSON.stringify(workflow));
+  }
+
+  export function deleteWorkflow(teamid, workflowid)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/workflows/delete/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(workflowid);
+    return jsonHttpDelete(url);
+  }
+
 }

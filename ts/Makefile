@@ -72,6 +72,7 @@ TS_SOURCES = \
   AccountTab \
   Preferences \
   PreferencesTab \
+  WorkflowsTab \
   CalendarsTab \
   LabelsTab \
   ExecutivePreferences \
