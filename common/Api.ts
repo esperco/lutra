@@ -598,7 +598,7 @@ module Esper.Api {
 
     // Doing a custom request because I'm sending the file directly
     // without using JSON.
-    return JsonHttp.put(url, contents);
+    return JsonHttp.httpRequest("PUT", url, contents, "", false);
   }
 
   export function listWorkflows(teamid)
