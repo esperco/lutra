@@ -206,7 +206,7 @@ function checkAndSubmitSignupForm() {
       else {
         changeSubmitButtonType("button");
       var url =
-        "http://localhost/#!signup/" + encodeURIComponent(firstName)
+        "https://app.esper.com/#!signup/" + encodeURIComponent(firstName)
         + "/" + encodeURIComponent(lastName)
         + "/" + encodeURIComponent(phone)
         + "/" + encodeURIComponent(email)

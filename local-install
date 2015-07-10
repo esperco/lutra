@@ -32,6 +32,7 @@ html="\
   signup-done.html \
   software.html \
   ea-jobs.html \
+  EAQ.html \
 
 "
 
@@ -48,8 +49,10 @@ for x in $html; do
     if [ $x = index.html ]; then
         name=$x
     else
-#original: name=$(basename $x .html) but this is getting annoying
-	name=$x
+#original
+    name=$(basename $x .html)
+#uncomment this for local python servers	
+#name=$x
     fi
     cp html/$x pub/$name
 done
