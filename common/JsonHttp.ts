@@ -27,9 +27,25 @@ module Esper.JsonHttp {
     }
   }
 
-  function jsonHttp(method, path, body) {
-
+  /** Executes an http request using our standard authentication,
+   *  logging and error handling. Can have a custom (ie non-JSON)
+   *  content type.
+   *
+   *  contentType can be "" if the request should not have a
+   *  Content-Type header at all. (This is translated to jQuery as
+   *  `false', which it supports since 1.5.)
+   *
+   *  processData controls whether the body is converted to a query
+   *  string. It is true by default.
+   */
+  function httpRequest(method: string,
+                       path: string,
+                       body: string,
+                       contentType: string,
+                       processData = true) {
     var id = Util.randomString();
+
+    var contentTypeJQ : any = contentType == "" ? false : contentType;
 
     function logResponse(method: string, path: string, respBody, latency) {
       Log.d("API response " + id
@@ -71,16 +87,12 @@ module Esper.JsonHttp {
       Use .done(function(result){...}) to access the result.
       (see jQuery documentation)
     */
-    var contentType;
-    if (body !== undefined && body !== null && body.length > 0) {
-      contentType = "application/json; charset=UTF-8";
-    }
     var request = {
       url: path,
       type: method,
       data: body,
       dataType: "json",
-      contentType: contentType,
+      contentType: contentTypeJQ,
       beforeSend: setHttpHeaders(path)
     };
     Log.d("API request " + id + " " + method + " " + path, request);
@@ -92,6 +104,18 @@ module Esper.JsonHttp {
         var latency = (Date.now() - startTime) / 1000;
         logResponse(method, path, respBody, latency);
       });
+  }
+
+  /** Executes an HTTP request using our standard authentication and
+   *  error handling and a JSON content type.
+   */
+  function jsonHttp(method, path, body) {
+    var contentType;
+    if (body !== undefined && body !== null && body.length > 0) {
+      contentType = "application/json; charset=UTF-8";
+    }
+
+    return httpRequest(method, path, body, contentType);
   }
 
   export function get(path) {
