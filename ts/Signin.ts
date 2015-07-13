@@ -176,7 +176,7 @@ module Signin {
         /* success */
         function(tokenDescription) {
           var loginView =
-          displayLoginLinks("<b>Great!</b> Next, we'll need you to login to your Google account.", "#!", inviteCode, undefined, true);
+          displayLoginLinks("<b>Great!</b> Next, we'll need you to login to your primary Google account.<br>", "#!", inviteCode, undefined, true);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */

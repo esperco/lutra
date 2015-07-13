@@ -312,7 +312,7 @@ module Settings {
       firstTime = false;
       var joinTeam = Login.data.missing_shared_calendar;
       if (teams[0] !== null) {
-      Login.setTeam(teams[0]); //refresh login data since assistants/aliases may have been added during setup
+        Login.setTeam(teams[0]); //refresh login data since assistants/aliases may have been added during setup
         if (Util.isString(joinTeam))
         // This is a new exec customer who needs to be onboarded
           location.hash = "#!join/" + joinTeam;
