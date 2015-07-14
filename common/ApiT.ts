@@ -211,7 +211,7 @@ module Esper.ApiT {
   }
 
   export interface TeamPreferencesList {
-      team_prefs: TeamPreferences[];
+    team_prefs: TeamPreferences[];
   }
 
   export interface Workplace {

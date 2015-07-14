@@ -672,25 +672,41 @@ module Esper.TaskTab {
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
 
-      // Apologies for the ugly visuals.
-    var populateTaskParticipants = function(obj) {
-	  taskTabView.taskParticipants.empty();
-	  var add_li = function(x){
-	      var tm = x.team;
-	      var li = $("<li></li>");
-	      var mkSpan = function(x){return $("<span>"+x+"</span>")};
-	      li.append(mkSpan(tm.team_name+": "));
-	      var dv = $("<div></div>");
-	      var br = function(){return $("<br></br>")};
-	      List.iter(tm.team_email_aliases, function(x){ dv.append(mkSpan("&nbsp;&nbsp;"+x),br()) });
-  	      taskTabView.taskParticipants.append(li.append(dv)); 
-	      };
-	  List.iter(obj.team_prefs, add_li);
-      };
-      var doPopulateTaskParticipants = function() { Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants) };
-      doPopulateTaskParticipants();
-      esperGmail.after.send_message(doPopulateTaskParticipants);
-	  
+    function populateTaskParticipants(obj: ApiT.TeamPreferencesList) {
+      taskTabView.taskParticipants.empty();
+      List.iter(obj.team_prefs, function(x: ApiT.TeamPreferences){
+'''
+<li #li>
+  <span #teamName></span>
+  <div #emails></div>
+</li>
+'''
+	var team = x.team;
+        teamName.text(team.team_name + ": ");
+        List.iter(team.team_email_aliases, function(emailAlias){
+          var div = $('<div class="..."/>');
+          div.text(emailAlias);
+          emails.append(div);
+        });
+  	taskTabView.taskParticipants.append(li);
+      });
+    };
+
+    function refreshTaskParticipants() {
+      Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants);
+    }
+
+    refreshTaskParticipants();
+    esperGmail.after.send_message(function() {
+      refreshTaskParticipants();
+    });
+
+    /* esperGmail.on.show_newly_arrived_message would be more appropriate
+       but doesn't work. */
+    esperGmail.on.new_email(function() {
+      refreshTaskParticipants();
+    });
+
     CurrentThread.task.watch(
       function (task: ApiT.Task, isValid: boolean,
                 oldTask: ApiT.Task, oldIsValid: boolean) {
@@ -857,7 +873,8 @@ module Esper.TaskTab {
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
           if (query !== "") {
-            displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
+            displaySearchResults(taskTitle, taskSearchDropdown,
+                                 taskSearchResults,
                                  taskSearchActions, team,
                                  threadId, query, taskTabView);
           }

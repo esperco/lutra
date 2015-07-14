@@ -66,11 +66,24 @@ declare module esperGmail.get {
 /* Typable functions defined in gmailInit.js */
 
 declare module esperGmail.on {
+  export function new_email(
+    callback: (id: string,
+               url: string,
+               body: string,
+               xhr: XMLHttpRequest) => void
+  ): void;
+
   export function open_email(
     callback: (id: string,
                url: string,
                body: string,
                xhr: XMLHttpRequest) => void
+  ): void;
+
+  export function show_newly_arrived_message(
+    callback: (id: string,
+               url: string,
+               body: string) => void
   ): void;
 
   export function star(
@@ -107,8 +120,10 @@ declare module esperGmail.after {
 }
 
 declare module esperGmail.off {
+  export function new_email(): void;
   export function open_email(): void;
   export function send_message(): void;
+  export function show_newly_arrived_message(): void;
   export function star(): void;
   export function unstar(): void;
 
