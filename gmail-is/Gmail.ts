@@ -190,7 +190,7 @@ module Esper.Gmail {
       scrollTop : threadContainer().height() - 225
     }, time);
   }
-  
+
   /** Scrolls to the bottom of the thread to show the invite guests
    *  widget.
    */
@@ -210,5 +210,12 @@ module Esper.Gmail {
     $("div.Tm").animate({
       scrollTop : threadContainer().height() - calHeight - extraPadding
     }, time);
+  }
+
+  /** The div containing all the messages in a thread. In-thread
+   *  controls are inserted after this div.
+   */
+  export function threadMessages() {
+    return $("div.nH.aHU");
   }
 }
