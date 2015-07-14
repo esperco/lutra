@@ -261,10 +261,13 @@ module Esper.InviteControls {
             var name = file.name;
 
             var reader = new FileReader();
-            reader.readAsBinaryString(file);
+            reader.readAsDataURL(file);
             reader.addEventListener("loadend", function () {
               console.info("Uploading", name);
-              Api.putFiles(name, file.type, reader.result);
+              var result = reader.result;
+              // base64 contents from the data URL, stripping the URL bits:
+              result = result.replace(/data:[^;]*;base64,/, "");
+              Api.putFiles(name, file.type, result);
             });
           });
         }
