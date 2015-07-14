@@ -89,7 +89,7 @@ function limitRedeemInput(){
 }
 
 function looksLikeAnEmailAddress(s) {
-  return (/^[^ ]+@[^ ]+$/.test(s));
+  return (/^[^ @]+@{1}[^ @]+[.]{1}[^ .@]+$/.test(s));
 }
 
 function checkAndSubmitRedeemForm() {
@@ -147,15 +147,103 @@ function setupRedeemForm() {
   checkAndSubmitRedeemForm();
 }
 
+function changeSubmitButtonType(s) {
+    $("#signup-btn").prop("type", s);
+}
+
+function checkAndSubmitSignupForm() {
+  $("#signup-btn").click(function(e){
+    var firstName = $("#first-name").val();
+    var lastName = $("#last-name").val();
+    var phone = $("#phone").val();
+    var email = $("#email").val();
+    var emailPlatform = $("#platform").val();
+    var valid = true;
+
+    if (firstName.length === 0) {
+      valid = false;
+      $("#first-name").addClass("incorrect");
+    }
+    else
+      $("#first-name").removeClass("incorrect");
+
+    if (lastName.length === 0) {
+      valid = false;
+      $("#last-name").addClass("incorrect");
+    }
+    else
+      $("#last-name").removeClass("incorrect");
+
+    if (phone.length === 0) {
+      valid = false;
+      $("#phone").addClass("incorrect");
+    }
+    else
+      $("#phone").removeClass("incorrect");
+
+    if (! looksLikeAnEmailAddress(email)) {
+      valid = false;
+      $("#email").addClass("incorrect");
+    }
+    else
+      $("#email").removeClass("incorrect");
+    
+    if (emailPlatform === null) {
+      valid = false;
+      $("#platform").addClass("incorrect");
+    }
+    else
+      $("#platform").removeClass("incorrect");
+
+
+    if (!valid)
+      e.preventDefault();
+    else {
+      if (emailPlatform !== "Google Apps") {
+        changeSubmitButtonType("submit");
+       // var url = "http://localhost:8009/pub/signup-sorry"
+      }
+      else {
+        changeSubmitButtonType("button");
+      var url =
+        "https://app.esper.com/#!signup/" + encodeURIComponent(firstName)
+        + "/" + encodeURIComponent(lastName)
+        + "/" + encodeURIComponent(phone)
+        + "/" + encodeURIComponent(email)
+        + "/" + encodeURIComponent(emailPlatform);
+      console.log(url);
+      }
+      //open(url);
+      window.location = url;
+    }
+  });
+}
+
+function setDonePageFromHash() {
+  var alias_name = location.hash.split("#")[1].split("@")[0];
+  var formatted_name = alias_name.charAt(0).toUpperCase() + alias_name.slice(1);
+  var greeting =  "Hi ".concat(formatted_name).concat(",");
+  document.getElementById("alias-name").innerHTML = greeting;
+
+  var user = location.hash.split('#')[2];
+  document.getElementById("user").innerHTML = user;
+
+  var email = location.hash.split("#")[1];
+  var intro_email = "mailto:".concat(email).concat("?subject=Nice to meet you, ").concat(formatted_name).concat("!&body=").concat(greeting).concat("%0D%0A%0D%0AIt's great to meet you! I'm excited to have you as an assistant.%0D%0AI'd love to speak with you and learn more about what you can do for me.%0D%0ACan you help find a good time for a phonecall that works for both of us?%0D%0A%0D%0ACheers,%0D%0A").concat(user);
+  document.getElementById("mailto-link").innerHTML = email;
+  $("#mailto-link").prop("href", intro_email);
+  $("#mailto-msg").prop("href", intro_email);
+
+
+}
+
 function main() {
   loadElements();
   resizer();
   slider();
   setupRedeemForm();
-  showTasks(".tasks-left-col", "ul.event-examples");
-  showTasks(".tasks-mid-col", "ul.research-examples");
-  showTasks(".tasks-right-col", "ul.office-examples");
-}
+  checkAndSubmitSignupForm();
+ }
 
 
 $(document).ready(main);

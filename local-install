@@ -22,11 +22,18 @@ html="\
   payment.html \
   privacy-policy.html \
   redeem.html \
-  signup.html \
   splash-navbar.html \
   team.html \
   terms-of-use.html \
   waiting-list.html \
+  pricing.html \
+  signup.html \
+  signup-sorry.html \
+  signup-done.html \
+  software.html \
+  ea-jobs.html \
+  EAQ.html \
+
 "
 
 css="*.css"
@@ -42,7 +49,10 @@ for x in $html; do
     if [ $x = index.html ]; then
         name=$x
     else
-        name=$(basename $x .html)
+#original
+      name=$(basename $x .html)
+#uncomment this for local python servers	
+#name=$x
     fi
     cp html/$x pub/$name
 done

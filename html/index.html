@@ -1,47 +1,153 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Esper</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat">
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="css/default.css" media="screen">
-    <link rel="stylesheet" href="css/animate.min.css">
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-    <script src="js/home.js"></script>
-  </head>
+<head>
+<meta charset="UTF-8">
+<title>Esper</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="css/default.css" media="screen">
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+<link rel="stylesheet" href="css/animate.min.css">
+<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="img/favicon.ico" type="image/x-icon">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<script src="js/global.js"></script>
+</head>
+<body>
 
-  <body>
+<!-- Navbar -->
+<div class="navbar-container"></div>
+<ul class="nav-menu"></ul>
 
-    <div class="splash-container fullscreen">
-      <img class="full-splash" src="img/splash_home.jpg">
+<!-- Splash -->
+<img class="splash" style="height:400px" src="img/splash_home.jpg">
+<div class="splash-content">
+  <div class="splash-navbar clearfix"></div>
+  <div class="splash-text-container" align="center" >
+    <div class="splash-text">
+      <h1>Focus on the important things.</h1>
+      <h2 class="splash-text-subheader">Maximize your time with an Esper assistant.</h2>
+      <h2> </h2>
     </div>
-    <div class="splash-content fullscreen">
-      <div class="splash-navbar clearfix" style="display:block">
-        <a href="" class="left">
-          <object class="svg logo" data="img/logo_white.svg"></object>
-        </a>
-        <a href="signup" class="cta right">
-          <button class="button-tertiary">Join the waiting list</button>
-        </a>
-        <a href="https://app.esper.com" class="nav-link primary right">Sign In</a>
-      </div>
-      <div class="splash-text">
-        <div class="splash-headline">
-          <h1>
-            <span>Esper helps executives and assistants optimize their time without ever touching a calendar.</span>
-          </h1>
-        </div>
-        <a href="discover" class="nav-link left loud">Discover</a>
-        <a href="team" class="nav-link left loud">About</a>
-        <a href="http://blog.esper.com/" class="nav-link left loud">Blog</a>
-      </div>
-    </div>
+    <a href="signup">
+      <button class="button-primary index">
+        <h2>Try Esper for free&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></h2>
+      </button>
+    </a>
+    <a href="pricing">
+    <button class="button-tertiary index">
+        <h2>Plans</h2>
+      </button>
+    </a>
 
-  </body>
+
+  </div>
+
+</div>
+
+
+<!-- Steps -->
+<div class="section-container gray">
+  <div class="section-content clearfix">
+    <h1 class="how-it-works">Scheduling Made Easy</h1>
+    <div class="step">
+      <div class="number purple">1</div>
+      <div class="connector"></div>
+      <h3 class="step-title">CC ESPER</h3>
+      <p class="step-description">Include your Esper Assistant on any email, and get back to work. One message, and you're done.</p>
+    </div>
+    <div class="step">
+      <div class="number orange">2</div>
+      <div class="connector"></div>
+      <h3 class="step-title">WE TAKE CARE OF IT</h3>
+      <p class="step-description">Your Esper Assistant will use your preferences to plan convenient meeting times and complete any basic task.</p>
+    </div>
+    <div class="step last">
+      <div class="number green">3</div>
+      <h3 class="step-title">CHECK YOUR INBOX</h3>
+      <p class="step-description">Once a meeting has been confirmed, your calendar will be automatically updated. </p>
+    </div>
+  </div>
+</div>
+
+<!-- How We CAn Help -->
+<div class="section-container">
+  <div class="section-content narrow">
+    <h3 class="section-title">SMALL TASKS</h3>
+    <p>Besides scheduling, Esper Assistants can help out with a number of tasks. Whether it's travel, reservations, expenses, or online research, our assistants can help free up your time from burdensome administrative tasks.</p>
+    <div class= "tasks-left-col"><h4><a>PLANNING</a></h4><hr>
+      <ul class="event-examples">
+        <li> Dinner Reservations </li>
+        <li> Travel Bookings </li>
+        <li> Event Planning </li>
+      </ul>
+    </div>
+    <div class= "tasks-mid-col"><h4><a>RESEARCH</a></h4><hr>
+      <ul class="research-examples">
+        <li> Document Summaries </li>
+        <li> Comparison Research </li>
+        <li> Contractor Searches </li>
+      </ul>
+    </div>
+    <div class= "tasks-right-col"><h4><a>ADMIN</a></h4><hr>
+      <ul class="office-examples">
+        <li> Office Resupply </li>
+        <li> Expense Reports</li>
+        <li> CRM Tracking</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<br>
+<!-- Meet The Dream Team -->
+<div class="section-container">
+  <div class="dream-team-container">
+    <div class="dream-team-right-col">
+      <h3 class="section-title">MEET THE DREAM TEAM</h3>
+      <p>No machine can replace a human &#8212; especially when it comes to your personal assistant. That's why we've assembled a team of world-class executive assistants and superpowered them with our powerful scheduling software. We'll find the perfect time for any meeting or appointment and complete any small task, ensuring that you never waste another second. </p><br>
+      <p>Are you an experienced executive assistant?<br><a href="ea-jobs"><b>We need your help!</b></a></p>
+    </div>
+    <div class="dream-team-left-col">
+      <img class="dream-team-faces" src="img/nina-assistant.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Our Technology -->
+<div class="section-container gray">
+  <div class="section-content narrow">
+    <h3 class="section-title">OUR TECHNOLOGY</h3>
+    <p>We've worked closely with veteran executive assistants to create tools that bring the inbox and calendar closer together. Our platform supercharges our assistants, allowing them to rapidly link events with email conversations, reach out to colleagues for preferences, and easily keep track of tasks. This all means you'll have perfect context for every meeting and will be able to quickly check on the status of any appointment or task.</p><br>
+    <p>If you're already an executive assistant, <a href="software">see what our software can do for you!</a></p>
+  </div>
+</div>
+
+
+<!-- The Gold Standard -->
+<div class="section-container">
+  <div class="section-content narrow">
+    <h3 class="section-title">THE GOLD STANDARD</h3>
+    <p>We're endlessly committed to improving your productivity. Our service was designed using the industry's best practices, and we're raising the bar even higher by integrating new insights from our users. We not only strive to create better software, but also a better human experience.</p>
+  </div>
+</div>
+
+<!-- Join the waiting list -->
+<div class="section-container dark">
+  <div class="section-content narrow">
+    <a href="signup">
+      <button class="button-tertiary large">
+        <h2>Try Esper risk-free for 14 days&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></h2>
+      </button>
+    </a>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer-container"></div>
+
+</body>
 </html>
+
