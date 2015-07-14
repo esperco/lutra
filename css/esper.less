@@ -828,7 +828,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 }
 
 .esper-tab-header {
-  height: 74px;
+  height: 100px;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -858,7 +858,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 .esper-tab-overflow {
   position: absolute;
   width: 100%;
-  top: 74px;
+  top: 100px;
   bottom: 0;
   padding: 15px 10px 0 10px;
   overflow-x: hidden;
@@ -942,6 +942,14 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   float: left;
   padding-top: 4px;
   color: @gray_30;
+}
+
+.esper-workflow-gap {
+  margin-top: 10px;
+}
+
+.esper-checklist-box {
+  margin-right: 5px;
 }
 
 .esper-task-progress {
@@ -1980,6 +1988,8 @@ ul.esper-ev-dropdown {
         float: left;
         margin: 8px 8px 0 0;
       }
+      div.new-line { margin-top: 25px; }
+      select.esper-select, input.esper-input { width: 50%; }
     }
   }
 }

@@ -346,6 +346,7 @@ module Esper.ApiT {
     task_unread_emails?: number;
     task_threads: EmailThread[];
     task_events: TaskEvent[];
+    task_workflow_progress: TaskWorkflowProgress;
   }
 
   export interface TaskThread {
@@ -487,5 +488,37 @@ module Esper.ApiT {
     to: Guest[];
     cc: Guest[];
     bcc: Guest[];
+  }
+
+  export interface Workflow {
+    id : string;
+    title : string;
+    notes : string;
+    steps : WorkflowStep[];
+  }
+
+  export interface UserWorkflows {
+    workflows : Workflow[];
+  }
+
+  type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
+
+  export interface WorkflowStep {
+    id : string;
+    title : string;
+    notes : string;
+    meeting_prefs? : MeetingType;
+    checklist : CheckItem[];
+  }
+
+  export interface CheckItem {
+    text : string;
+    checked : boolean;
+  }
+
+  export interface TaskWorkflowProgress {
+    workflow_id : string;
+    step_id? : string;
+    checklist : CheckItem[];
   }
 }

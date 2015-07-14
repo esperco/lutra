@@ -45,6 +45,9 @@ module Esper.CalPicker {
     execTzDiv : JQuery;
     guestTzDiv : JQuery;
     guestNames : JQuery;
+    viewCalInput : JQuery;
+    viewCalDropdown : JQuery;
+    viewCalSection : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
   }
@@ -105,32 +108,50 @@ module Esper.CalPicker {
     <div #dateJumper class="esper-date-jumper" style="display: none"/>
     <div class="esper-calendar-modal-event-settings esper-clearfix">
       <div class="esper-event-settings-col">
-        <span class="esper-bold">Event title:</span>
-        <input #eventTitle type="text" size="24" class="esper-input"/>
-        <br/>
-        <span class="esper-bold">Location:</span>
-        <input #eventLocation type="text" size="24" class="esper-input"/>
-        <ul #locationDropdown
-            class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-          <div #locationSearchResults class="esper-dropdown-section"/>
-        </ul>
-        <br/>
-        <span class="esper-bold">Thread participants:</span>
-        <span #guestNames/>
+        <div>
+          <span class="esper-bold">Event title:</span>
+          <input #eventTitle type="text" size="24" class="esper-input"/>
+        </div>
+        <div style="margin-top: 8px">
+          <span class="esper-bold">Location:</span>
+          <input #eventLocation type="text" size="24" class="esper-input"/>
+          <ul #locationDropdown
+              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
+            <div #locationSearchResults class="esper-dropdown-section"/>
+          </ul>
+        </div>
+        <div>
+          <span class="esper-bold">Thread participants:</span>
+          <div style="margin-top: 8px" #guestNames/>
+        </div>
+        <div style="margin-top: 8px">
+          <span class="esper-bold">View calendars:</span>
+          <select #viewCalInput class="esper-select esper-click-safe"/>
+          <ul #viewCalDropdown
+              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn"
+              style="width: 50%">
+            <div #viewCalSection class="esper-dropdown-section"/>
+          </ul>
+        </div>
       </div>
       <div class="esper-event-settings-col">
-        <span class="esper-bold">Save events to:</span>
-        <select #pickerSwitcher class="esper-select"/>
-      </div>
-      <div class="esper-event-settings-col">
-        <span class="esper-bold">Created by:</span>
-        <select #createdBy class="esper-select"/>
-      </div>
-      <div #execTzDiv class="esper-event-settings-col">
-        <span class="esper-bold">Executive timezone:</span>
-      </div>
-      <div #guestTzDiv class="esper-event-settings-col">
-        <span class="esper-bold">Guest timezone:</span>
+        <div>
+          <span class="esper-bold">Save events to:</span>
+          <select #pickerSwitcher class="esper-select"/>
+        </div>
+        <br/>
+        <div class="new-line">
+          <span class="esper-bold">Created by:</span>
+          <select #createdBy class="esper-select"/>
+        </div>
+        <br/>
+        <div class="new-line" #execTzDiv>
+          <span class="esper-bold">Executive timezone:</span>
+        </div>
+        <br/>
+        <div class="new-line" #guestTzDiv>
+          <span class="esper-bold">Guest timezone:</span>
+        </div>
       </div>
     </div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
@@ -175,35 +196,6 @@ module Esper.CalPicker {
     Util.afterTyping(eventLocation, 250, searchLocation);
     eventLocation.click(searchLocation);
 
-    List.iter(calendars, function(cal, i) {
-'''
-<div #calendarCheckboxRow class="esper-calendar-checkbox">
-  <input #calendarCheckbox type="checkbox"/>
-  <span #calendarName/>
-</div>
-'''
-      if (cal.calendar_default_view) {
-        calendarCheckbox.prop("checked", true);
-      }
-
-      var abbr = zoneAbbr(cal.calendar_timezone);
-
-      calendarCheckbox.click(function() {
-        if (this.checked) {
-          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-        } else {
-          delete showCalendars[cal.google_cal_id];
-        }
-        calendarView.fullCalendar("refetchEvents");
-      });
-
-      calendarName.text(cal.calendar_title + " (" + abbr + ")");
-      calendarCheckboxRow.data("tz", cal.calendar_timezone);
-      calendarCheckboxRow.appendTo(userSidebar.calendarsContainer);
-    });
-
-    userSidebar.calendarsSection.show();
-
     refreshCal.click(function() {
       refreshCache = true;
       calendarView.fullCalendar("refetchEvents");
@@ -216,6 +208,8 @@ module Esper.CalPicker {
     eventTitle.val("HOLD: " + title);
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
+    Sidebar.customizeSelectArrow(createdBy);
+    Sidebar.customizeSelectArrow(viewCalInput);
 
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
@@ -230,6 +224,51 @@ module Esper.CalPicker {
       var i = $(this).val();
       writeToCalendar = calendars[i];
       calendarView.fullCalendar("refetchEvents");
+    });
+
+    function updateCalendarViewList() {
+      var curViewList = [];
+      List.iter(calendars, function(cal) {
+        if (showCalendars[cal.google_cal_id]) {
+          curViewList.push(cal.calendar_title);
+        }
+      });
+      viewCalInput.children().remove();
+      viewCalInput.append("<option>" + curViewList.join(", ") + "</option>");
+    }
+    updateCalendarViewList();
+    viewCalInput.mousedown(function(e) {
+      e.preventDefault();
+      viewCalDropdown.show();
+      viewCalDropdown.addClass("esper-open");
+    });
+    List.iter(calendars, function(cal, i) {
+'''
+<li #calendarCheckboxRow class="esper-calendar-checkbox esper-li esper-click-safe">
+  <input #calendarCheckbox type="checkbox" class="esper-click-safe"/>
+  <div style="display: inline" #calendarName class="esper-click-safe"/>
+</li>
+'''
+      if (cal.calendar_default_view) {
+        calendarCheckbox.prop("checked", true);
+      }
+      var abbr = zoneAbbr(cal.calendar_timezone);
+      calendarCheckboxRow.click(function() {
+        calendarCheckbox.trigger("click");
+      });
+      calendarCheckbox.click(function(e) {
+        e.stopPropagation();
+        if (this.checked) {
+          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
+        } else {
+          delete showCalendars[cal.google_cal_id];
+        }
+        calendarView.fullCalendar("refetchEvents");
+        updateCalendarViewList();
+      });
+      calendarName.text(cal.calendar_title + " (" + abbr + ")");
+      calendarCheckboxRow.data("tz", cal.calendar_timezone);
+      calendarCheckboxRow.appendTo(viewCalSection);
     });
 
     var aliases = team.team_email_aliases;
@@ -250,6 +289,8 @@ module Esper.CalPicker {
 
     var execTz = Timezone.createTimezoneSelector(showTimezone);
     var guestTz = Timezone.createTimezoneSelector(guestTimezone);
+    Sidebar.customizeSelectArrow(execTz);
+    Sidebar.customizeSelectArrow(guestTz);
     execTz.appendTo(execTzDiv);
     guestTz.appendTo(guestTzDiv);
 

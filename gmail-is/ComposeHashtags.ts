@@ -2,8 +2,8 @@ module Esper.ComposeHashtags {
 
   function hashtagView(textViews) {
 '''
-  <div #view>
-    * <input #text/> <button #remove>X</button>
+  <div #view class="esper-ev-modal-row esper-clearfix">
+    * <input #text class="esper-input"/> <button #remove>X</button>
   </div>
 '''
     textViews.push(text);
@@ -33,11 +33,13 @@ module Esper.ComposeHashtags {
 <div #view class="esper-centered-container">
   <div #inline>
     <div class="esper-modal-header">
-      <div #title class="esper-modal-title"/>
+      <div #title class="esper-modal-title">Ask Exec</div>
     </div>
-    Question: <input #question/>
+    <div class="esper-ev-modal-row esper-clearfix">
+      Question: <input #question class="esper-input"/>
+    </div>
     <div #hashtags class="esper-calendar-grid"/>
-    <button #addTag>Add</button>
+    <button #addTag class="esper-btn esper-btn-secondary">Add</button>
     <div class="esper-modal-footer esper-clearfix">
       <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
