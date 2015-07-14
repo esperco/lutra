@@ -212,7 +212,7 @@ module CalendarsTab {
       var alias = team.team_email_aliases[0];
       var name = team.team_name;
       var url = "http://www.esper.com/signup-done#";
-      var urlWithAliasName = url.concat(alias).concat(name);
+      var urlWithAliasName = url.concat(alias).concat("#").concat(name);
       window.location.href = urlWithAliasName;
           });
     }
