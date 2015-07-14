@@ -211,7 +211,7 @@ module CalendarsTab {
       .done(function() {
       var alias = team.team_email_aliases[0];
       var name = team.team_name;
-      var url = "https://www.esper.com/signup-done#";
+      var url = "http://www.esper.com/signup-done#";
       var urlWithAliasName = url.concat(alias).concat(name);
       window.location.href = urlWithAliasName;
           });
