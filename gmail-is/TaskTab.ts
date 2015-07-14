@@ -488,6 +488,7 @@ module Esper.TaskTab {
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
+    taskParticipants: JQuery;
     taskSearchDropdown: JQuery;
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
@@ -547,6 +548,16 @@ module Esper.TaskTab {
     </div>
   </div>
   <div class="esper-tab-overflow">
+
+    <div class="esper-section">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Esper Executives</span>
+      </div>
+      <div class="esper-section-container">
+        <ul #taskParticipants class="esper-ul"></ul>
+      </div>
+    </div>
+
     <div #workflowSection class="esper-section esper-hide">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
@@ -566,6 +577,7 @@ module Esper.TaskTab {
         </div>
       </div>
     </div>
+
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Task Notes</span>
@@ -583,6 +595,7 @@ module Esper.TaskTab {
         </div>
       </div>
     </div>
+
     <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -659,6 +672,41 @@ module Esper.TaskTab {
 </div>
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
+
+    function populateTaskParticipants(obj: ApiT.TeamPreferencesList) {
+      taskTabView.taskParticipants.empty();
+      List.iter(obj.team_prefs, function(x: ApiT.TeamPreferences){
+'''
+<li #li class="esper-li">
+  <span #teamName></span>
+  <div #emails></div>
+</li>
+'''
+	var team = x.team;
+        teamName.text(team.team_name + ": ");
+        List.iter(team.team_email_aliases, function(emailAlias){
+          var div = $('<div class="..."/>');
+          div.text(emailAlias);
+          emails.append(div);
+        });
+  	taskTabView.taskParticipants.append(li);
+      });
+    };
+
+    function refreshTaskParticipants() {
+      Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants);
+    }
+
+    refreshTaskParticipants();
+    esperGmail.after.send_message(function() {
+      refreshTaskParticipants();
+    });
+
+    /* esperGmail.on.show_newly_arrived_message would be more appropriate
+       but doesn't work. */
+    esperGmail.on.new_email(function() {
+      refreshTaskParticipants();
+    });
 
     CurrentThread.task.watch(
       function (task: ApiT.Task, isValid: boolean,
@@ -826,7 +874,8 @@ module Esper.TaskTab {
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
           if (query !== "") {
-            displaySearchResults(taskTitle, taskSearchDropdown, taskSearchResults,
+            displaySearchResults(taskTitle, taskSearchDropdown,
+                                 taskSearchResults,
                                  taskSearchActions, team,
                                  threadId, query, taskTabView);
           }
