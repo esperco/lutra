@@ -9,7 +9,6 @@ set -e
 html="\
   about-navbar.html \
   contact.html \
-  discover.html \
   email-confirmation.html \
   engineer.html \
   faqs.html \
@@ -32,7 +31,7 @@ html="\
   signup-done.html \
   software.html \
   ea-jobs.html \
-  EAQ.html \
+  eaq.html \
 
 "
 
@@ -51,8 +50,8 @@ for x in $html; do
     else
 #original
       name=$(basename $x .html)
-#uncomment this for local python servers	
-#name=$x
+#uncomment this for local python servers
+      #name=$x
     fi
     cp html/$x pub/$name
 done
