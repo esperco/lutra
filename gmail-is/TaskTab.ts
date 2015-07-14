@@ -553,7 +553,8 @@ module Esper.TaskTab {
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Esper Executives</span>
       </div>
-      <div #taskParticipants >
+      <div class="esper-section-container">
+        <ul #taskParticipants class="esper-ul"></ul>
       </div>
     </div>
 
@@ -676,7 +677,7 @@ module Esper.TaskTab {
       taskTabView.taskParticipants.empty();
       List.iter(obj.team_prefs, function(x: ApiT.TeamPreferences){
 '''
-<li #li>
+<li #li class="esper-li">
   <span #teamName></span>
   <div #emails></div>
 </li>
