@@ -100,7 +100,7 @@ module Esper.InviteControls {
       <div #attachmentsRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Attachments</div>
         <div class="esper-ev-modal-right">
-          <input #attachmentPicker type="file"> Attach files to event. </input>
+          <input #attachmentPicker type="file" multiple> Attach files to event. </input>
           <button #uploadButton type="button"> Upload files </button>
           <span #uploadingMessage>Uploading...</span>
         </div>
@@ -260,14 +260,13 @@ module Esper.InviteControls {
           // For some reason, .files is a FileList and not a normal Array :(
           var files = Array.prototype.slice.call(attachmentPicker[0].files);
 
-          var reader = new FileReader();
           var promises = files.map(function (file) {
+            var reader = new FileReader();
             var name = file.name;
             var promise = $.Deferred();
 
             reader.readAsDataURL(file);
             reader.addEventListener("loadend", function () {
-              console.info("Uploading", name);
               var result = reader.result;
 
               // base64 contents from the data URL, stripping the URL bits:
@@ -277,7 +276,12 @@ module Esper.InviteControls {
               });
             });
 
-            return promise;
+            return promise.then(function (response) {
+              return {
+                name : name,
+                id : response.id
+              };
+            });
           });
 
           return Promise.join(promises);
@@ -287,9 +291,21 @@ module Esper.InviteControls {
           uploadButton.attr("disabled", true);
           uploadingMessage.show();
 
-          uploadFiles().done(function () {
+          uploadFiles().done(function (fileInfos) {
             uploadButton.attr("disabled", false);
             uploadingMessage.hide();
+
+            fileInfos.forEach(function (fileInfo) {
+              // Not sure how to convince typescript that this is the
+              // fileInfo object from above.
+              var file = <any> fileInfo;
+
+              var link = "https://drive.google.com/file/d/" + file.id +
+                         "/view?usp=sharing";
+              pubNotes.val(function (i, text) {
+                return text + "\n\nAttachment " + file.name + " <" + link + ">";
+              });
+            });
           });
         });
 
