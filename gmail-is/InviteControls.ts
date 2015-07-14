@@ -102,6 +102,7 @@ module Esper.InviteControls {
         <div class="esper-ev-modal-right">
           <input #attachmentPicker type="file"> Attach files to event. </input>
           <button #uploadButton type="button"> Upload files </button>
+          <span #uploadingMessage>Uploading...</span>
         </div>
       </div>
       <div class="esper-ev-modal-row esper-clearfix">
@@ -252,28 +253,44 @@ module Esper.InviteControls {
         Util.afterTyping(pubLocation, 250, searchLocation);
         pubLocation.click(searchLocation);
 
+        uploadingMessage.hide();
+
         /** Upload all the files currently selected in attachmentPicker. */
         function uploadFiles() {
           // For some reason, .files is a FileList and not a normal Array :(
           var files = Array.prototype.slice.call(attachmentPicker[0].files);
 
-          files.forEach(function (file) {
+          var reader = new FileReader();
+          var promises = files.map(function (file) {
             var name = file.name;
+            var promise = $.Deferred();
 
-            var reader = new FileReader();
             reader.readAsDataURL(file);
             reader.addEventListener("loadend", function () {
               console.info("Uploading", name);
               var result = reader.result;
+
               // base64 contents from the data URL, stripping the URL bits:
               result = result.replace(/data:[^;]*;base64,/, "");
-              Api.putFiles(name, file.type, result);
+              Api.putFiles(name, file.type, result).done(function (response) {
+                promise.resolve(response);
+              });
             });
+
+            return promise;
           });
+
+          return Promise.join(promises);
         }
 
         uploadButton.click(function () {
-          uploadFiles();
+          uploadButton.attr("disabled", true);
+          uploadingMessage.show();
+
+          uploadFiles().done(function () {
+            uploadButton.attr("disabled", false);
+            uploadingMessage.hide();
+          });
         });
 
         next.click(function() {
