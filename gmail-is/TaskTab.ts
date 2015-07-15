@@ -8,6 +8,16 @@ module Esper.TaskTab {
   export var refreshLinkedEventsAction : () => void;
   export var currentTaskTab : TaskTabView;
 
+  var refreshTaskParticipants : () => void = function() {};
+  esperGmail.after.send_message(function() {
+    refreshTaskParticipants();
+  });
+  /* esperGmail.on.show_newly_arrived_message would be more appropriate
+     but doesn't work. */
+  esperGmail.on.new_email(function() {
+    refreshTaskParticipants();
+  });
+
   export interface LinkOptionsView {
     view: JQuery;
     link: JQuery;
@@ -693,20 +703,10 @@ module Esper.TaskTab {
       });
     };
 
-    function refreshTaskParticipants() {
+    refreshTaskParticipants = function() {
       Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants);
     }
-
     refreshTaskParticipants();
-    esperGmail.after.send_message(function() {
-      refreshTaskParticipants();
-    });
-
-    /* esperGmail.on.show_newly_arrived_message would be more appropriate
-       but doesn't work. */
-    esperGmail.on.new_email(function() {
-      refreshTaskParticipants();
-    });
 
     CurrentThread.task.watch(
       function (task: ApiT.Task, isValid: boolean,
