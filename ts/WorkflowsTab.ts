@@ -173,7 +173,10 @@ module WorkflowsTab {
       if (chosen !== "header") {
         meetingPrefs.find(".workflow-meeting-prefs").remove();
         var mt = meetingTypes[chosen];
-        var data = currentMeetingPrefs ? currentMeetingPrefs[1] : mt.prefs;
+        var data =
+          currentMeetingPrefs && currentMeetingPrefs[0] === chosen ?
+          currentMeetingPrefs[1] :
+          mt.prefs;
         var setMeetingPrefs = save(chosen);
         var meetingView =
           PreferencesTab.viewOfMeetingType(mt.type, data,
