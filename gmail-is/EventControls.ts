@@ -45,7 +45,11 @@ module Esper.EventControls {
         </div>
       </div>
       <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description</div>
+        <div class="esper-ev-modal-left esper-bold">Description<br/>
+          <button #pickEmails class="esper-btn esper-btn-secondary">
+            Pick Emails
+          </button>
+        </div>
         <div class="esper-ev-modal-right">
           <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
         </div>
@@ -157,6 +161,10 @@ module Esper.EventControls {
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
+        });
+
+        pickEmails.click(function() {
+          $("body").append(TaskMessageList.render(taskPrefs.taskid));
         });
 
         pubDescription.val(event.description);

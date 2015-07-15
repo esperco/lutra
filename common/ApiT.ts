@@ -151,6 +151,16 @@ module Esper.ApiT {
     snippet: string;
   }
 
+  export interface EmailMessage {
+    message_id: string;
+    message_owner: string;
+    message_gmsgid: string;
+    message_date: string;
+    message_sender: string;
+    message_snippet?: string;
+    raw?: string;
+  }
+
   export interface LinkedCalendarEvents {
     linked_events: TaskEvent[];
   }
@@ -340,6 +350,7 @@ module Esper.ApiT {
     task_urgent: boolean;
     task_unread_emails?: number;
     task_threads: EmailThread[];
+    task_messages: EmailMessage[];
     task_events: TaskEvent[];
     task_workflow_progress: TaskWorkflowProgress;
   }

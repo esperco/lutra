@@ -436,6 +436,9 @@ module Esper.InviteControls {
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
     Review the guest event description
+    <button #pickEmails class="esper-btn esper-btn-secondary">
+      Pick Emails
+    </button>
   </div>
   <div class="esper-ev-modal-content">
     <textarea #descriptionField
@@ -529,6 +532,11 @@ module Esper.InviteControls {
                 });
             }
           }
+        });
+
+        pickEmails.click(function() {
+          var task = CurrentThread.task.get();
+          $("body").append(TaskMessageList.render(task.taskid));
         });
 
         return container;

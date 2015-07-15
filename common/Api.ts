@@ -380,6 +380,16 @@ module Esper.Api {
     return JsonHttp.get(url).then(function(x) { return x.task; });
   }
 
+  export function getTask(taskid: string,
+                          withEvents: boolean,
+                          withMessages: boolean): JQueryDeferred<ApiT.Task> {
+    var url = Conf.Api.url + "/api/task/details/" + string(Login.myUid())
+            + "/" + string(taskid)
+            + "?events=" + withEvents.toString()
+            + "&messages=" + (withMessages ? "id" : "no");
+    return JsonHttp.get(url);
+  }
+
   export function archiveTask(taskid):
   JQueryDeferred<void> {
     var url =
@@ -504,6 +514,16 @@ module Esper.Api {
     var url = Conf.Api.url + "/api/gmail/thread/participant/prefs/"
 	    + string(Login.myUid())
 	    + "/" + string(threadid);
+    return JsonHttp.get(url);
+  }
+
+  export function getGmailMessage(teamid, inboxUid, gmailMsgId):
+  JQueryDeferred<ApiT.EmailMessage> {
+    var url =
+      Conf.Api.url + "/api/gmail/message/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(inboxUid)
+      + "/" + string(gmailMsgId);
     return JsonHttp.get(url);
   }
 
