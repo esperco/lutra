@@ -14,7 +14,7 @@ module Esper.LRU {
       Good: List.iter(a, function(x) { cache.add(x); });
 
     */
-    console.assert(this_ !== window);
+    Log.assert(this_ !== window);
   }
 
   export class C<T> {
@@ -66,7 +66,7 @@ module Esper.LRU {
     var cache = new Esper.LRU.C(3, function(a, b) { return a == b; });
 
     function eq(a) {
-      console.assert(JSON.stringify(cache.all) === JSON.stringify(a));
+      Log.assert(JSON.stringify(cache.all) === JSON.stringify(a));
     }
 
     eq([]);

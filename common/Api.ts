@@ -16,7 +16,7 @@ module Esper.Api {
     detection and prevention easier.
   */
   function string(x: string) {
-    console.assert(x !== undefined && x !== null);
+    Log.assert(x !== undefined && x !== null);
     return x;
   }
 
