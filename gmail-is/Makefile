@@ -48,10 +48,11 @@ SHARED_SOURCES = \
   ../common/ts/Conf \
   ../common/ts/List \
   ../common/ts/Lazy \
+  ../common/ts/Option \
+  ../common/ts/EsperCache \
   ../common/ts/Modal \
   ../common/ts/Util \
   ../common/ts/Watchable \
-  ../common/ts/Option \
   ../common/ts/Promise \
   ../common/ts/XDate \
   ../common/ts/Log \
@@ -62,6 +63,7 @@ SHARED_SOURCES = \
   ../common/ts/Login \
   ../common/ts/Profile \
   ../common/ts/Preferences \
+  ../common/ts/TaskPreferences \
   ../common/ts/JsonHttp \
   ../common/ts/ApiT \
   ../common/ts/Api

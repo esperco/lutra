@@ -9,6 +9,7 @@ SOURCES = \
   List \
   Lazy \
   Option \
+  EsperCache \
   Modal \
   Util \
   Watchable \
@@ -21,6 +22,7 @@ SOURCES = \
   Message \
   Profile \
   Preferences \
+  TaskPreferences \
   Login \
   JsonHttp \
   ApiT \
