@@ -78,13 +78,13 @@ module Esper.EsperCache {
 
     var cache = new T<number>(ttl, fetch);
 
-    console.assert(cache.get("a") === 0);
-    console.assert(cache.get("b") === 1);
-    console.assert(cache.get("a") === 0);
-    console.assert(cache.get("b") === 1);
+    Log.assert(cache.get("a") === 0);
+    Log.assert(cache.get("b") === 1);
+    Log.assert(cache.get("a") === 0);
+    Log.assert(cache.get("b") === 1);
     setTimeout(function() {
-      console.assert(cache.get("b") === 2);
-      console.assert(cache.get("a") === 3);
+      Log.assert(cache.get("b") === 2);
+      Log.assert(cache.get("a") === 3);
     }, 1000);
   }
 }

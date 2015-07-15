@@ -29,9 +29,7 @@ module Esper.Option {
       if (this.some) {
         return this.value;
       } else {
-        /* somewhat gets the job done even if `console.assert`
-           isn't implemented */
-        console.assert(false, "Unwrap error. No value set for " + name);
+        Log.assert(false);
       }
     }
 

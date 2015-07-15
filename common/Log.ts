@@ -121,4 +121,11 @@ Esper . xxxxxxxx
       if (level <= Level.debug) logArray(console_log, "END " + id, a);
     }
   }
+
+  export function assert(x: boolean) {
+    /* In Chrome, this prints the same message (in red with a stack trace)
+       as console.assert but interrupts the flow instead of
+       just printing a message. */
+    throw new Error("Assertion failed.");
+  }
 }

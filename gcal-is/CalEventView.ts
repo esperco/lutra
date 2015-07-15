@@ -116,12 +116,12 @@ module Esper.CalEventView {
   }
 
   export function testMergeDescriptionText() {
-    console.assert(mergeDescriptionText("", "") === "");
-    console.assert(mergeDescriptionText("bla", "") === "bla\n");
-    console.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
+    Log.assert(mergeDescriptionText("", "") === "");
+    Log.assert(mergeDescriptionText("bla", "") === "bla\n");
+    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
                                         "=== Conversation ===")
                    === "bla\n=== Conversation ===");
-    console.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
+    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
                                         "=== Conversation ===\nYo!")
                    === "bla\n=== Conversation ===\nYo!");
   }

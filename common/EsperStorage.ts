@@ -46,7 +46,7 @@ module Esper.EsperStorage {
 
   function getAccount(esper: Types.Storage, googleAccountId: string):
   Types.Account {
-    console.assert(esper.accounts !== undefined);
+    Log.assert(esper.accounts !== undefined);
     var account = esper.accounts[googleAccountId];
     if (account === undefined) {
       account = newAccount(googleAccountId);

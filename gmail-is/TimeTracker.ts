@@ -118,13 +118,13 @@ module Esper.TimeTracker {
       flush();
     }
     clear();
-    console.assert(isStopped());
+    Log.assert(isStopped());
   }
 
   /* Start a timer for the given task unless one already exists. */
   export function start(taskid: string) {
     initIfNeeded();
-    console.assert(taskid !== undefined);
+    Log.assert(taskid !== undefined);
     if (isRunning() && currentTask === taskid) {
       /* let it run */
     } else {
@@ -133,7 +133,7 @@ module Esper.TimeTracker {
       startTimer();
       Log.d("Start " + taskid);
     }
-    console.assert(isRunning());
+    Log.assert(isRunning());
   }
 
   export function pause(extraMs = 0) {
@@ -144,7 +144,7 @@ module Esper.TimeTracker {
       stop();
       currentTask = taskid;
       Log.d("Paused " + currentTask);
-      console.assert(isPaused());
+      Log.assert(isPaused());
     }
   }
 
