@@ -577,7 +577,6 @@ module Esper.TaskTab {
         </div>
       </div>
     </div>
-
     <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -810,6 +809,7 @@ module Esper.TaskTab {
           if (title === undefined) title = "(no subject)";
         }
         taskTitle.val(title);
+
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
           if (query !== "") {

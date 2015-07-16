@@ -126,6 +126,8 @@ Esper . xxxxxxxx
     /* In Chrome, this prints the same message (in red with a stack trace)
        as console.assert but interrupts the flow instead of
        just printing a message. */
-    throw new Error("Assertion failed.");
+    if (x !== true) {
+      throw new Error("Assertion failed.");
+    }
   }
 }

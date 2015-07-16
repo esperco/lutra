@@ -89,4 +89,53 @@ module Esper.InThreadControls {
 
     return container;
   }
+
+  /* Pop up a button when selecting text inside Gmail messages,
+   * which copies the selection into the task notes box when clicked.
+   */
+  function enableHighlightToTaskNotes(taskNotes : JQuery,
+                                      saveTaskNotes : JQuery) : void {
+    var container = Gmail.threadContainer();
+    var target = Gmail.messageTextSelector;
+
+    container.off("mouseup", target);
+    container.mousedown(function() {
+      $(".esper-selection-action").remove();
+    });
+    /* We need to use on() here, because we want this action to occur even for
+     * messages that are inserted into the DOM after we bind this handler,
+     * like when the user expands out the thread.
+     */
+    container.on("mouseup", target, function(e) {
+      function afterSelectionActuallyModified() {
+        var selection = window.getSelection();
+        if (selection && !selection.isCollapsed) {
+          var text = selection.toString();
+          var actionDiv = $("<div class='esper-selection-action'/>");
+          actionDiv.css({
+            left: e.pageX + 10,
+            top: e.pageY + 10,
+            position: "absolute"
+          });
+          var button = $("<button class='esper-btn esper-btn-primary'/>");
+          button.text("Copy selection to task notes");
+          button.click(function() {
+            var curNotes = taskNotes.val();
+            var nl = "";
+            if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
+            taskNotes.val(curNotes + nl + text);
+            saveTaskNotes.addClass("esper-save-enabled");
+            saveTaskNotes.trigger("click");
+            actionDiv.remove();
+          });
+          actionDiv.append(button);
+          $("body").append(actionDiv);
+        }
+      }
+      /* Without this, window.getSelection() will still return the previous
+       * selection if we click on the selected text.
+       */
+      window.setTimeout(afterSelectionActuallyModified, 1);
+    });
+  }
 }
