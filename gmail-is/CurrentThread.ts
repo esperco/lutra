@@ -55,7 +55,9 @@ module Esper.CurrentThread {
       var oldOnhashchange = window.onhashchange;
       window.onhashchange = function (e) {
         try {
-          oldOnhashchange.apply(this, arguments);
+          if (typeof oldOnhashchange === "function") {
+            oldOnhashchange.apply(this, arguments);
+          }
         }
         finally {
           updateCurrentThreadId();
