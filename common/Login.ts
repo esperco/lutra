@@ -2,7 +2,7 @@ module Esper.Login {
   /* Cached UID and API secret and user ID.
      They should be used as long as the API doesn't reject it. */
 
-  function validateAccount(account): boolean {
+  function validateAccount(account: Types.Account): boolean {
     return account !== undefined && account.credentials !== undefined;
   }
 
@@ -26,8 +26,24 @@ module Esper.Login {
     return watchableAccount.get();
   }
 
+  function stringifyAccount(a: Types.Account) {
+    if (!a) {
+      return undefined;
+    }
+    else {
+      return JSON.stringify(a.credentials);
+    }
+  }
+
+  function accountEqual(a: Types.Account, b: Types.Account): boolean {
+    return (stringifyAccount(a) === stringifyAccount(b));
+  }
+
   export function setAccount(account: Types.Account) {
-    watchableAccount.set(account);
+    var oldAccount = watchableAccount.get();
+    if (! accountEqual(oldAccount, account)) {
+      watchableAccount.set(account);
+    }
   }
 
   export function printStatus() {
