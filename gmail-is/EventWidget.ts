@@ -4,7 +4,7 @@ module Esper.EventWidget {
 
   /** Displays an oval button to link unlinked events. */
   export function displayLinkOptions(e: ApiT.CalendarEvent,
-                              linkedEvents: ApiT.EventWithSyncInfo[],
+                              linkedEvents: ApiT.TaskEvent[],
                               team,
                               threadId,
                               onLinkEvent?: (e:ApiT.CalendarEvent) => any) {
@@ -21,7 +21,7 @@ module Esper.EventWidget {
     check.attr("data", Init.esperRootUrl + "img/check.svg");
 
     var alreadyLinked = linkedEvents.filter(function(ev) {
-      return ev.event.google_event_id === e.google_event_id;
+      return ev.task_event.google_event_id === e.google_event_id;
     });
 
     if (alreadyLinked.length > 0) {
@@ -140,7 +140,7 @@ module Esper.EventWidget {
   }
 
   export function displayEventOptions(view,
-                               ev: ApiT.EventWithSyncInfo,
+                               ev: ApiT.TaskEvent,
                                linkedEvents: ApiT.CalendarEvent[],
                                team: ApiT.Team,
                                threadId: string) {
@@ -175,7 +175,7 @@ module Esper.EventWidget {
   </ul>
 </div>
 '''
-    var e = ev.event;
+    var e = ev.task_event;
 
     disclose.click(function() {
       if (disclose.hasClass("esper-open")) {
@@ -220,8 +220,8 @@ module Esper.EventWidget {
     return optionsView;
   }
 
-  export function renderEvent(linkedEvents: ApiT.EventWithSyncInfo[],
-                              ev: ApiT.EventWithSyncInfo,
+  export function renderEvent(linkedEvents: ApiT.TaskEvent[],
+                              ev: ApiT.TaskEvent,
                               last,
                               team: ApiT.Team,
                               threadId: string,
@@ -229,19 +229,19 @@ module Esper.EventWidget {
 '''
 <span #title/>
 '''
-    title.text(ev.event.title || "Untitled Event");
+    title.text(ev.task_event.title || "Untitled Event");
 
     title.addClass("esper-link-black")
          .click(function() {
-           open(ev.event.google_cal_url, "_blank");
+           open(ev.task_event.google_cal_url, "_blank");
          });
 
     return base(linkedEvents, ev, last, team, threadId, tpref, title);
   }
 
   /** The base event widget with the given payload in the main div. */
-  export function base(linkedEvents: ApiT.EventWithSyncInfo[],
-                       ev: ApiT.EventWithSyncInfo,
+  export function base(linkedEvents: ApiT.TaskEvent[],
+                       ev: ApiT.TaskEvent,
                        last,
                        team: ApiT.Team,
                        threadId: string,
@@ -265,11 +265,11 @@ module Esper.EventWidget {
   </div>
 </div>
 '''
-    var e = ev.event;
+    var e = ev.task_event;
 
     main.append(payload);
 
-    var evs = List.map(linkedEvents, function(ev) { return ev.event; });
+    var evs = List.map(linkedEvents, function(ev) { return ev.task_event; });
     main.prepend(displayEventChoose(view, e, evs, team));
     main.prepend(displayEventOptions(view, ev, evs, team, threadId));
 

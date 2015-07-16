@@ -228,7 +228,7 @@ module Esper.CurrentThread {
   );
 
   /** All the events linked with the current thread. */
-  export var linkedEvents = new Esper.Watchable.C<ApiT.EventWithSyncInfo[]>(
+  export var linkedEvents = new Esper.Watchable.C<ApiT.TaskEvent[]>(
     function () { return true }, // should always be valid!
     []
   );
@@ -279,17 +279,11 @@ module Esper.CurrentThread {
   export function setTask(newTask : ApiT.Task) {
     task.set(newTask);
 
-    var events : ApiT.EventWithSyncInfo[];
-
     if (newTask) {
-      events =
-        newTask.task_events.map(function(taskEvent: ApiT.TaskEvent) {
-          return { event: taskEvent.task_event };
-        });
+      linkedEvents.set(newTask.task_events);
     } else {
-      events = [];
+      linkedEvents.set([]);
     }
-    linkedEvents.set(events);
   }
 
   /** We cache the event preferences here until the current task changes */

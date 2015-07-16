@@ -268,7 +268,7 @@ module Esper.Sidebar {
   function displaySidebar(rootElement,
                           threadId: string,
                           autoTask: boolean,
-                          linkedEvents: ApiT.EventWithSyncInfo[]) {
+                          linkedEvents: ApiT.TaskEvent[]) {
 '''
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">

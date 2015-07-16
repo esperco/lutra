@@ -104,7 +104,7 @@ module Esper.FinalizeEvent {
         var id = event.google_event_id;
 
         var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
-          return e.event;
+          return e.task_event;
         });
         var holds = justHolds(linkedEvents).filter(function (other) {
           return other.google_event_id != id;
@@ -138,7 +138,7 @@ module Esper.FinalizeEvent {
     return CurrentThread.currentTeam.get().match({
       some : function (team) {
         var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
-          return e.event;
+          return e.task_event;
         });
         // TODO: Support multiple events properly (again)
         var name  =

@@ -40,7 +40,7 @@ module Esper.TaskTab {
   export function displayLinkedEventsList(
     team: ApiT.Team,
     threadId, taskTab: TaskTabView,
-    linkedEvents: ApiT.EventWithSyncInfo[]
+    linkedEvents: ApiT.TaskEvent[]
   ) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
@@ -59,7 +59,7 @@ module Esper.TaskTab {
         .done(function(tpref) {
           var i = 0;
           var last = false;
-          linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+          linkedEvents.forEach(function(e: ApiT.TaskEvent) {
             if (i === linkedEvents.length - 1) last = true;
 
             eventsList.append(
@@ -585,7 +585,7 @@ module Esper.TaskTab {
                                  team: ApiT.Team,
                                  threadId: string,
                                  autoTask: boolean,
-                                 linkedEvents: ApiT.EventWithSyncInfo[],
+                                 linkedEvents: ApiT.TaskEvent[],
                                  workflows: ApiT.Workflow[]) {
 '''
 <div #view>

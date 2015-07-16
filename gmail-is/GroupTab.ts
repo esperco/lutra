@@ -91,7 +91,7 @@ module Esper.GroupTab {
 '''
     populate(CurrentThread.linkedEvents.get());
     CurrentThread.linkedEvents.watch(
-      function(events: ApiT.EventWithSyncInfo[]) {
+      function(events: ApiT.TaskEvent[]) {
         populate(events);
       },
       "GroupTab.populate"
@@ -101,7 +101,7 @@ module Esper.GroupTab {
 
     // Will fail silently if there is no team set because it is not
     // critical functionality.
-    function populate(events: ApiT.EventWithSyncInfo[]) {
+    function populate(events: ApiT.TaskEvent[]) {
       list.hide();
       list.empty();
       spinner.show();
@@ -113,18 +113,18 @@ module Esper.GroupTab {
           spinner.hide();
           list.show();
 
-          events.forEach(function (event: ApiT.EventWithSyncInfo) {
+          events.forEach(function (event: ApiT.TaskEvent) {
 '''
 <ul #statusGraph class="esper-availability-graph"></ul>
 '''
-            GroupScheduling.addEvent(event.event);
-            var status = GroupScheduling.getEventStatus(event.event);
+            GroupScheduling.addEvent(event.task_event);
+            var status = GroupScheduling.getEventStatus(event.task_event);
             populateGraph();
 
             GroupScheduling.onGuestsChanged(function () {
               // XXX: Timeout used as a hack to fix a loading problem:
               setTimeout(function () {
-                status = GroupScheduling.getEventStatus(event.event);
+                status = GroupScheduling.getEventStatus(event.task_event);
                 populateGraph();
               }, 100);
             });
@@ -161,7 +161,8 @@ module Esper.GroupTab {
                 });
 
                 pip.click(function () {
-                  GroupScheduling.changeAvailability(event.event, guestStatus.guest);
+                  GroupScheduling.changeAvailability(event.task_event,
+                                                     guestStatus.guest);
                 });
 
                 statusGraph.append(pip);
