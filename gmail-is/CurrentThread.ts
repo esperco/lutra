@@ -47,6 +47,7 @@ module Esper.CurrentThread {
   );
 
   var initialized = false;
+  /* One-time initialization. It must be done with login info available. */
   export function init() {
     if (!initialized) {
       initialized = true;
@@ -60,11 +61,6 @@ module Esper.CurrentThread {
           updateCurrentThreadId();
         }
       };
-
-      // Set the thread ID as soon as login info becomes available
-      Login.watchableAccount.watch(function() {
-        updateCurrentThreadId();
-      });
 
       updateCurrentThreadId();
     }
