@@ -233,7 +233,8 @@ module Esper.TaskTab {
       });
   }
 
-  function enableHighlightToTaskNotes(taskNotes : JQuery) : void {
+  function enableHighlightToTaskNotes(taskNotes : JQuery,
+                                      saveTaskNotes : JQuery) : void {
     var container = Gmail.threadContainer();
     var target = Gmail.messageTextSelector;
     container.off("mouseup", target);
@@ -255,6 +256,8 @@ module Esper.TaskTab {
           var nl = "";
           if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
           taskNotes.val(curNotes + nl + text);
+          saveTaskNotes.addClass("esper-save-enabled");
+          saveTaskNotes.trigger("click");
           actionDiv.remove();
         });
         actionDiv.append(button);
@@ -624,12 +627,10 @@ module Esper.TaskTab {
       </div>
       <div class="esper-section-notes">
         <textarea #taskNotes rows=3
-              maxlength=140
               placeholder="Leave some brief notes about the task here"
               class="esper-text-notes"/>
       </div>
       <div class="esper-section-footer esper-clearfix">
-        <span #notesCharCount class="esper-char-count">140</span>
         <div #saveTaskNotes class="esper-save-notes esper-save-disabled">
           Save
         </div>
@@ -836,8 +837,6 @@ module Esper.TaskTab {
       : Api.getTaskForThread;
 
     function taskNotesKeyUp(notes) {
-      var left = 140 - taskNotes.val().length;
-      notesCharCount.text(left);
       if (taskNotes.val() === notes) {
         saveTaskNotes.addClass("esper-save-disabled");
         saveTaskNotes.removeClass("esper-save-enabled");
@@ -863,7 +862,7 @@ module Esper.TaskTab {
       }
     });
 
-    enableHighlightToTaskNotes(taskNotes);
+    enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
 
     Api.getPreferences(team.teamid).done(function(prefs) {
       displayWorkflow(team, prefs, workflows,
@@ -901,7 +900,6 @@ module Esper.TaskTab {
         }
         taskTitle.val(title);
         taskNotes.val(notes);
-        notesCharCount.text(140 - notes.length);
         taskNotes.keyup(function() {taskNotesKeyUp(notes);});
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
