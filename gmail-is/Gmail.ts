@@ -155,6 +155,7 @@ module Esper.Gmail {
     return $("div.Tm div.nH.aHU");
   }
 
+  // Inside threadContainer, the divs that contain message bodies
   export var messageTextSelector = ".a3s";
 
   /** The div containing information like % of inbox used and Google
