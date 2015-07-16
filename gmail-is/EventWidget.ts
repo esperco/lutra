@@ -201,16 +201,18 @@ module Esper.EventWidget {
 
     unlinkEvent.click(function() {
       view.addClass("esper-disabled");
-      Api.unlinkEvent(team.teamid, threadId, e.google_event_id).done(function () {
-        CurrentThread.linkedEventsChanged();
-      });
+      Api.unlinkEvent(team.teamid, threadId, e.google_event_id)
+        .done(function () {
+          CurrentThread.linkedEventsChange.set(null);
+        });
     });
 
     deleteEvent.click(function() {
       view.addClass("esper-disabled");
-      Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id).done(function () {
-        CurrentThread.linkedEventsChanged();
-      });
+      Api.deleteLinkedEvent(team.teamid, threadId, e.google_event_id)
+        .done(function () {
+          CurrentThread.linkedEventsChange.set(null);
+        });
     });
 
     chooseThisEvent.click(function(){confirmEvent(view, e, linkedEvents, team)});

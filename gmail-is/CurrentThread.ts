@@ -221,27 +221,17 @@ module Esper.CurrentThread {
     });
   }
 
+  /** Signal that the linked events need to be refetched from the server */
+  export var linkedEventsChange = new Esper.Watchable.C<void>(
+    function () { return true },
+    null
+  );
+
   /** All the events linked with the current thread. */
   export var linkedEvents = new Esper.Watchable.C<ApiT.EventWithSyncInfo[]>(
     function () { return true }, // should always be valid!
     []
   );
-
-  var linkedEventsListeners = [];
-
-  /** Add a listener to be notified when the list of linked events
-   *  associated with the current thread changes.
-   */
-  export function onLinkedEventsChanged(listener) {
-    linkedEventsListeners.push(listener);
-  }
-
-  /** Send out an event that the list of linked events has changed. */
-  export function linkedEventsChanged() {
-    linkedEventsListeners.forEach(function (listener) {
-      listener();
-    });
-  }
 
   export function linkEvent(e): JQueryPromise<void> {
     return currentTeam.get().match({
@@ -257,7 +247,7 @@ module Esper.CurrentThread {
                 Api.syncEvent(teamid, threadId.get(),
                               e.google_cal_id, e.google_event_id);
 
-                linkedEventsChanged();
+                linkedEventsChange.set(null);
               });
           });
       },
@@ -289,15 +279,17 @@ module Esper.CurrentThread {
   export function setTask(newTask : ApiT.Task) {
     task.set(newTask);
 
-    if (newTask) {
-      linkedEvents.set(newTask.task_events.map(function (taskEvent) {
-        return taskEvent.task_event;
-      }));
-    } else {
-      linkedEvents.set([]);
-    }
+    var events : ApiT.EventWithSyncInfo[];
 
-    linkedEventsChanged();
+    if (newTask) {
+      events =
+        newTask.task_events.map(function(taskEvent: ApiT.TaskEvent) {
+          return { event: taskEvent.task_event };
+        });
+    } else {
+      events = [];
+    }
+    linkedEvents.set(events);
   }
 
   /** We cache the event preferences here until the current task changes */

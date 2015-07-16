@@ -494,10 +494,7 @@ module Esper.InviteControls {
                                   created.google_event_id);
 
                     Api.sendEventInvites(team.teamid, from, guests, created);
-
-                    TaskTab.refreshLinkedEventsList(team, threadId,
-                                                    TaskTab.currentTaskTab);
-                    CurrentThread.linkedEventsChanged();
+                    CurrentThread.linkedEventsChange.set(null);
 
                     var execIds = {
                       calendarId : original.google_cal_id,
