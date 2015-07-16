@@ -275,6 +275,9 @@ module Esper.TaskTab {
           $("body").append(actionDiv);
         }
       }
+      /* Without this, window.getSelection() will still return the previous
+       * selection if we click on the selected text.
+       */
       window.setTimeout(afterSelectionActuallyModified, 1);
     });
   }
