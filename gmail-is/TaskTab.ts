@@ -233,11 +233,19 @@ module Esper.TaskTab {
       });
   }
 
+  /* Pop up a button when selecting text inside Gmail messages,
+   * which copies the selection into the task notes box when clicked.
+   */
   function enableHighlightToTaskNotes(taskNotes : JQuery,
                                       saveTaskNotes : JQuery) : void {
     var container = Gmail.threadContainer();
     var target = Gmail.messageTextSelector;
+
     container.off("mouseup", target);
+    /* We need to use on() here, because we want this action to occur even for
+     * messages that are inserted into the DOM after we bind this handler,
+     * like when the user expands out the thread.
+     */
     container.on("mouseup", target, function(e) {
       $(".esper-selection-action").remove();
       var selection = window.getSelection();

@@ -155,7 +155,10 @@ module Esper.Gmail {
     return $("div.Tm div.nH.aHU");
   }
 
-  // Inside threadContainer, the divs that contain message bodies
+  /* Inside threadContainer, the divs that contain message bodies have this
+   * class. We're not returning a JQuery element because we'll use this as the
+   * filtering selector for threadContainer().on().
+   */
   export var messageTextSelector = ".a3s";
 
   /** The div containing information like % of inbox used and Google
