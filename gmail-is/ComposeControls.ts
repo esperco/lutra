@@ -116,7 +116,7 @@ module Esper.ComposeControls {
       var linkedEvents = CurrentThread.linkedEvents.get();
 
       numLinkedEvents.text(linkedEvents.length.toString());
- 
+
       var tooltipText = "";
       switch (linkedEvents.length) {
       case 0:
@@ -138,7 +138,7 @@ module Esper.ComposeControls {
     }
 
     updateEventsLabel();
-    CurrentThread.linkedEvents.watch(updateEventsLabel);
+    CurrentThread.linkedEvents.watch(updateEventsLabel, "updateEventsLabel");
 
     return Option.some(insertButton);
   }
