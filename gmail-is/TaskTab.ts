@@ -233,6 +233,36 @@ module Esper.TaskTab {
       });
   }
 
+  function enableHighlightToTaskNotes(taskNotes : JQuery) : void {
+    var container = Gmail.threadContainer();
+    var target = Gmail.messageTextSelector;
+    container.off("mouseup", target);
+    container.on("mouseup", target, function(e) {
+      $(".esper-selection-action").remove();
+      var selection = window.getSelection();
+      if (selection && !selection.isCollapsed) {
+        var text = selection.toString();
+        var actionDiv = $("<div class='esper-selection-action'/>");
+        actionDiv.css({
+          left: e.pageX + 10,
+          top: e.pageY + 10,
+          position: "absolute"
+        });
+        var button = $("<button class='esper-btn esper-btn-primary'/>");
+        button.text("Copy selection to task notes");
+        button.click(function() {
+          var curNotes = taskNotes.val();
+          var nl = "";
+          if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
+          taskNotes.val(curNotes + nl + text);
+          actionDiv.remove();
+        });
+        actionDiv.append(button);
+        $("body").append(actionDiv);
+      }
+    });
+  }
+
   /** Creates or renames a task, explicitly triggered by a UI action.
    *
    *  Will fail if a task cannot be created, such as if there is no
@@ -832,6 +862,8 @@ module Esper.TaskTab {
         });
       }
     });
+
+    enableHighlightToTaskNotes(taskNotes);
 
     Api.getPreferences(team.teamid).done(function(prefs) {
       displayWorkflow(team, prefs, workflows,

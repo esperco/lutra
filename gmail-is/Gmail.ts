@@ -155,6 +155,8 @@ module Esper.Gmail {
     return $("div.Tm div.nH.aHU");
   }
 
+  export var messageTextSelector = ".a3s";
+
   /** The div containing information like % of inbox used and Google
    *  copyright notice at the bottom of the GMail thread. For whatever
    *  reason, this div seems to have extra padding set (right on the
