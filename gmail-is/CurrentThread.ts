@@ -37,6 +37,39 @@ module Esper.CurrentThread {
     Option.none<ApiT.Team>()
   );
 
+  /** The GMail threadId of the current thread. If there is no thread,
+   *  this is undefined. You can check if there is an open thread with
+   *  `isThreadView()`.
+   */
+  export var threadId = new Esper.Watchable.C<string>(
+    function (threadId) { return threadId && typeof threadId === "string" },
+    readThreadId()
+  );
+
+  var initialized = false;
+  export function init() {
+    if (!initialized) {
+      initialized = true;
+      // Set the thread ID when the user navigates around GMail:
+      var oldOnhashchange = window.onhashchange;
+      window.onhashchange = function (e) {
+        try {
+          oldOnhashchange.apply(this, arguments);
+        }
+        finally {
+          updateCurrentThreadId();
+        }
+      };
+
+      // Set the thread ID as soon as login info becomes available
+      Login.watchableAccount.watch(function() {
+        updateCurrentThreadId();
+      });
+
+      updateCurrentThreadId();
+    }
+  }
+
   /** Sets the new team.
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
@@ -47,7 +80,7 @@ module Esper.CurrentThread {
   /** Sets the threadId, making sure to update the team, executive and
    *  task as well.
    */
-  export function setThreadId(newThreadId) {
+  export function setThreadId(newThreadId: string) {
     if (!newThreadId) {
       threadId.set(newThreadId);
       setTask(null);
@@ -68,11 +101,19 @@ module Esper.CurrentThread {
     }
   }
 
-  // Set the thread id when the user navigates around GMail:
-  window.onhashchange = function (e) {
-    var threadId = esperGmail.get.email_id();
-    setThreadId(threadId);
-  };
+  function clearThreadId() {
+    setThreadId(null);
+  }
+
+  function updateCurrentThreadId() {
+    if (Login.loggedIn()) {
+      var curThreadId = readThreadId();
+      setThreadId(curThreadId);
+    }
+    else {
+      clearThreadId();
+    }
+  }
 
   /** Reads the threadId from the current URL hash fragment, if
    *  any. If no threadId is read, returns null.
@@ -88,20 +129,6 @@ module Esper.CurrentThread {
       return null;
     }
   }
-
-  // Get the ball rolling once things are loaded.
-  $(function () {
-    setThreadId(readThreadId());
-  });
-
-  /** The GMail threadId of the current thread. If there is no thread,
-   *  this is undefined. You can check if there is an open thread with
-   *  `isThreadView()`.
-   */
-  export var threadId = new Esper.Watchable.C<string>(
-    function (threadId) { return threadId && typeof threadId === "string" },
-    readThreadId()
-  );
 
   /** Are currently viewing a valid thread? */
   function isThreadView() : boolean {
