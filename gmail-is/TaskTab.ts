@@ -242,12 +242,14 @@ module Esper.TaskTab {
     var target = Gmail.messageTextSelector;
 
     container.off("mouseup", target);
+    container.mousedown(function() {
+      $(".esper-selection-action").remove();
+    });
     /* We need to use on() here, because we want this action to occur even for
      * messages that are inserted into the DOM after we bind this handler,
      * like when the user expands out the thread.
      */
     container.on("mouseup", target, function(e) {
-      $(".esper-selection-action").remove();
       var selection = window.getSelection();
       if (selection && !selection.isCollapsed) {
         var text = selection.toString();
