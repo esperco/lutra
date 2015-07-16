@@ -1,8 +1,9 @@
 var esperGmail = Gmail(jQuery);
 
 esperGmail.on = {};
-esperGmail.after = {};
 esperGmail.off = {};
+esperGmail.after = {};
+esperGmail.before = {};
 
 /*
   Produce separate functions for each event, making them typable since
@@ -15,11 +16,14 @@ function esperGmailSpecialize(name) {
   esperGmail.on[name] = function(callback) {
     esperGmail.observe.on(name, callback);
   };
+  esperGmail.off[name] = function() {
+    esperGmail.observe.off(name);
+  };
   esperGmail.after[name] = function(callback) {
     esperGmail.observe.after(name, callback);
   };
-  esperGmail.off[name] = function() {
-    esperGmail.observe.off(name);
+  esperGmail.before[name] = function(callback) {
+    esperGmail.observe.before(name, callback);
   };
 }
 

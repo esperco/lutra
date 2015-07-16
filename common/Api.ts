@@ -16,7 +16,7 @@ module Esper.Api {
     detection and prevention easier.
   */
   function string(x: string) {
-    console.assert(x !== undefined && x !== null);
+    Log.assert(x !== undefined && x !== null);
     return x;
   }
 
@@ -499,6 +499,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function getThreadParticipantPrefs(threadid):
+  JQueryDeferred<ApiT.TeamPreferencesList> {
+    var url = Conf.Api.url + "/api/gmail/thread/participant/prefs/"
+	    + string(Login.myUid())
+	    + "/" + string(threadid);
+    return JsonHttp.get(url);
+  }
+
   export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
   JQueryDeferred<void> {
     var url =
@@ -584,6 +592,21 @@ module Esper.Api {
   export function putTaskPrefs(tpref: ApiT.TaskPreferences):
   JQueryDeferred<ApiT.TaskPreferences> {
     return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
+  }
+
+
+  export function putFiles(filename: string,
+                           content_type: string,
+                           contents: string):
+  JQueryDeferred<void> {
+    var query = "content_type=" + string(content_type);
+    var url = Conf.Api.url + "/api/files/" + string(Login.myUid()) + "/"
+                                           + string(filename) + "?"
+                                           + string(query);
+
+    // Doing a custom request because I'm sending the file directly
+    // without using JSON.
+    return JsonHttp.httpRequest("PUT", url, contents, "", false);
   }
 
   export function listWorkflows(teamid)

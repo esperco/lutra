@@ -79,7 +79,7 @@ module Esper.List {
     return b;
   };
 
-  /* return the first element that satisfies the give predicate */
+  /* return the first element that satisfies the given predicate */
   export function find<T>(a: T[], f: (x: T, i?: number) => boolean): T {
     var len = a.length;
     for (var i = 0; i < len; i++) {

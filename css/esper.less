@@ -92,6 +92,11 @@ hr.esper-hr {
 
 ul.esper-ul, li.esper-li { list-style-type: none; }
 
+ul.esper-ul {
+  margin: 0px;
+  padding: 0px;
+}
+
 ul.esper-drop-ul {
   display: none;
   list-style-type: none;
@@ -131,7 +136,6 @@ li.esper-li, a.esper-a {
   position: relative;
   padding: 7px 16px;
   color: black;
-  cursor: pointer;
   line-height: 1;
   text-align: left;
   &:hover {
@@ -154,6 +158,10 @@ li.esper-li, a.esper-a {
     &:hover { color: @gray_30; }
   }
   &.esper-selected:hover { color: black; }
+}
+
+a.esper-a {
+  cursor: pointer;
 }
 
 select.esper-select {
