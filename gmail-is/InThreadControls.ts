@@ -21,12 +21,10 @@ module Esper.InThreadControls {
   </div>
   <div class="esper-section-notes">
     <textarea #taskNotes rows=3
-          maxlength=140
           placeholder="Leave some brief notes about the task here"
           class="esper-text-notes"/>
   </div>
   <div class="esper-section-footer esper-clearfix">
-    <span #notesCharCount class="esper-char-count">140</span>
     <div #saveTaskNotes class="esper-save-notes esper-save-disabled">
       Save
     </div>
@@ -43,7 +41,6 @@ module Esper.InThreadControls {
       }
 
       taskNotes.val(notes);
-      notesCharCount.text(140 - notes.length);
     });
 
     taskNotes.keyup(function() {
@@ -53,8 +50,6 @@ module Esper.InThreadControls {
     enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
 
     function taskNotesKeyUp(notes) {
-      var left = 140 - taskNotes.val().length;
-      notesCharCount.text(left);
       if (taskNotes.val() === notes) {
         saveTaskNotes.addClass("esper-save-disabled");
         saveTaskNotes.removeClass("esper-save-enabled");
