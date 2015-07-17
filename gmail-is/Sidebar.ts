@@ -40,7 +40,6 @@ module Esper.Sidebar {
   }
 
   function insertEsperRoot() {
-    Gmail.removeWebClipBanner();
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
     if (anchor.length === 1) {
@@ -268,7 +267,7 @@ module Esper.Sidebar {
   function displaySidebar(rootElement,
                           threadId: string,
                           autoTask: boolean,
-                          linkedEvents: ApiT.EventWithSyncInfo[]) {
+                          linkedEvents: ApiT.TaskEvent[]) {
 '''
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">

@@ -92,11 +92,11 @@ module Esper.ComposeControls {
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
-              return new Date(e.event.end.local) > new Date(Date.now());
+              return new Date(e.task_event.end.local) > new Date(Date.now());
             });
 
             var entry = events.reduce(function (str, event) {
-              var ev = event.event;
+              var ev = event.task_event;
               var time = formatStartTime(ev, execTz, guestTz);
               var br = str != "" ? "<br />" : ""; // no leading newline
               return str + br + time;
@@ -116,7 +116,7 @@ module Esper.ComposeControls {
       var linkedEvents = CurrentThread.linkedEvents.get();
 
       numLinkedEvents.text(linkedEvents.length.toString());
- 
+
       var tooltipText = "";
       switch (linkedEvents.length) {
       case 0:
@@ -138,7 +138,7 @@ module Esper.ComposeControls {
     }
 
     updateEventsLabel();
-    CurrentThread.linkedEvents.watch(updateEventsLabel);
+    CurrentThread.linkedEvents.watch(updateEventsLabel, "updateEventsLabel");
 
     return Option.some(insertButton);
   }
@@ -181,11 +181,11 @@ module Esper.ComposeControls {
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
-              return new Date(e.event.end.local) > new Date(Date.now());
+              return new Date(e.task_event.end.local) > new Date(Date.now());
             });
 
             var entry = events.reduce(function (str, event): string {
-              var ev = event.event;
+              var ev = event.task_event;
               var time = formatStartTime(ev, execTz, guestTz);
               var loc;
               if (ev.location !== undefined) {
