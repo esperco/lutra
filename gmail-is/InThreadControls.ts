@@ -3,9 +3,7 @@
  *  to be integrated into the assistant's main flow.
  */
 module Esper.InThreadControls {
-  var initialized = false;
-
-  export function initialize() {
+  export function refreshTaskNotes() {
 '''
 <div #controls class="esper-in-thread-controls">
 </div>
@@ -21,9 +19,12 @@ module Esper.InThreadControls {
 
   CurrentThread.currentTeam.watch(function () {
     if (CurrentThread.currentTeam.isValid()) {
-      initialize();
+      refreshTaskNotes();
     }
   });
+
+  // The id for the notes watcher so that only one exists at a time.
+  var notesWatcherId;
 
   function taskNotes() {
 '''
@@ -45,7 +46,7 @@ module Esper.InThreadControls {
 '''
     var notes = "";
 
-    CurrentThread.task.watch(function (task) {
+    notesWatcherId = CurrentThread.task.watch(function (task) {
       if (task) {
         notes = task.task_notes || ""; // "" if task.task_notes is undefined
       } else {
@@ -53,7 +54,7 @@ module Esper.InThreadControls {
       }
 
       taskNotes.val(notes);
-    });
+    }, notesWatcherId);
 
     taskNotes.keyup(function() {
       taskNotesKeyup(notes);
