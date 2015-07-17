@@ -571,7 +571,7 @@ module AccountTab {
                  membershipStatus == "Canceled" ||
                  membershipStatus == undefined) {
         suspension
-        .text("Select a membership option below to reactivate your account.")
+          .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // already picked a plan
         var planName = Plan.nameOfPlan(membershipPlan);
