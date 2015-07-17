@@ -10,14 +10,13 @@ module Esper.InThreadControls {
 <div #controls class="esper-in-thread-controls">
 </div>
 '''
-    if (!initialized) {
-      initialized = true;
+    // Remove any old instances of the controls:
+    $(".esper-in-thread-controls").remove();
 
-      Gmail.threadMessages().after(controls);
+    Gmail.threadMessages().after(controls);
 
-      controls.empty();
-      controls.append(taskNotes());
-    }
+    controls.empty();
+    controls.append(taskNotes());
   }
 
   CurrentThread.currentTeam.watch(function () {
