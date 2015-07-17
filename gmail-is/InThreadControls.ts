@@ -57,12 +57,12 @@ module Esper.InThreadControls {
     });
 
     taskNotes.keyup(function() {
-      taskNotesKeyUp(notes);
+      taskNotesKeyup(notes);
     });
 
     enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
 
-    function taskNotesKeyUp(notes) {
+    function taskNotesKeyup(notes) {
       if (taskNotes.val() === notes) {
         saveTaskNotes.addClass("esper-save-disabled");
         saveTaskNotes.removeClass("esper-save-enabled");
@@ -86,7 +86,7 @@ module Esper.InThreadControls {
                   saveTaskNotes.addClass("esper-save-disabled");
                   saveTaskNotes.removeClass("esper-save-enabled");
                   saveTaskNotes.removeClass("esper-clickable");
-                  taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+                  taskNotes.keyup(function() {taskNotesKeyup(notes);});
                 });
               });
           }
@@ -137,6 +137,8 @@ module Esper.InThreadControls {
             saveTaskNotes.addClass("esper-save-enabled");
             saveTaskNotes.trigger("click");
             actionDiv.remove();
+
+            taskNotes.trigger('keyup');
           });
           actionDiv.append(button);
           $("body").append(actionDiv);
