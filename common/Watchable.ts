@@ -79,7 +79,7 @@ module Esper.Watchable {
       this.changeWatchers = [];
     }
 
-    isValid() {
+    isValid(): boolean {
       return this.validate(this.data);
     }
 
@@ -91,7 +91,8 @@ module Esper.Watchable {
       If there's already a watcher associated with the given watcher ID,
       the old watcher is replaced by the new one.
     */
-    watch(handler,
+    watch(handler: { (newData: T, newValidity: boolean,
+                      oldData: T, oldValidity: boolean): void },
           optWatcherId? : string) {
       var id;
       if (optWatcherId === undefined) {
@@ -108,9 +109,9 @@ module Esper.Watchable {
       Convenience function for registering a handler executed only
       when the data field goes from invalid to valid.
     */
-    watchTurnValid(simpleHandler) {
-      function handler(newData, newValidity,
-                       oldData, oldValidity) {
+    watchTurnValid(simpleHandler: (newData: T, oldData: T) => void) {
+      function handler(newData: T, newValidity: boolean,
+                       oldData: T, oldValidity: boolean) {
         if (newValidity && !oldValidity) {
           simpleHandler(newData, oldData);
         }
@@ -122,9 +123,9 @@ module Esper.Watchable {
       Convenience function for registering a handler executed only
       when the data field goes from valid to invalid.
     */
-    watchTurnInvalid(simpleHandler) {
-      function handler(newData, newValidity,
-                       oldData, oldValidity) {
+    watchTurnInvalid(simpleHandler: (newData: T, oldData: T) => void) {
+      function handler(newData: T, newValidity: boolean,
+                       oldData: T, oldValidity: boolean) {
         if (!newValidity && oldValidity) {
           simpleHandler(newData, oldData);
         }
@@ -132,7 +133,7 @@ module Esper.Watchable {
       this.watch(handler);
     }
 
-    unwatch(watcherId) {
+    unwatch(watcherId: string) {
       this.changeWatchers =
         List.filter(this.changeWatchers, function(watcher) {
           return watcher.id !== watcherId;
@@ -143,7 +144,7 @@ module Esper.Watchable {
       this.changeWatchers = [];
     }
 
-    get() {
+    get(): T {
       return this.data;
     }
 
@@ -155,7 +156,7 @@ module Esper.Watchable {
       optBlockedWatchers is an optional list of watcher IDs that should
       be disabled.
     */
-    set(newData, optBlockedWatchers: string[] = []) {
+    set(newData: T, optBlockedWatchers: string[] = []) {
       var id = this.id;
       var blockedWatchers = objectOfIdArray(optBlockedWatchers);
       if (lock(id)) {
@@ -188,7 +189,7 @@ module Esper.Watchable {
       Get the data only if it is valid, otherwise return null.
       Avoids returning data with only some of the required fields.
     */
-    getValidOrNothing() {
+    getValidOrNothing(): T {
       return this.validity ? this.data : null;
     }
 

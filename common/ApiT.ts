@@ -151,13 +151,8 @@ module Esper.ApiT {
     snippet: string;
   }
 
-  export interface EventWithSyncInfo {
-    event: CalendarEvent;
-    synced_threads: SyncedThread[];
-  }
-
   export interface LinkedCalendarEvents {
-    linked_events: EventWithSyncInfo[];
+    linked_events: TaskEvent[];
   }
 
   export interface LinkedEmailThreads {

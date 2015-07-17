@@ -40,7 +40,7 @@ module Esper.TaskTab {
   export function displayLinkedEventsList(
     team: ApiT.Team,
     threadId, taskTab: TaskTabView,
-    linkedEvents: ApiT.EventWithSyncInfo[]
+    linkedEvents: ApiT.TaskEvent[]
   ) {
 '''
   <div #noEvents class="esper-no-events">No linked events</div>
@@ -49,8 +49,6 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.addClass("esper-disabled");
     taskTab.linkedEventsList.children().remove();
     taskTab.linkedEventsSpinner.show();
-
-    CurrentThread.linkedEvents.set(linkedEvents);
 
     if (linkedEvents.length === 0) {
       taskTab.linkedEventsList.append(noEvents);
@@ -61,7 +59,7 @@ module Esper.TaskTab {
         .done(function(tpref) {
           var i = 0;
           var last = false;
-          linkedEvents.forEach(function(e: ApiT.EventWithSyncInfo) {
+          linkedEvents.forEach(function(e: ApiT.TaskEvent) {
             if (i === linkedEvents.length - 1) last = true;
 
             eventsList.append(
@@ -199,6 +197,7 @@ module Esper.TaskTab {
                                           threadId, taskTab) {
     Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
+        CurrentThread.linkedEvents.set(linkedEvents);
         displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
       });
   }
@@ -586,7 +585,7 @@ module Esper.TaskTab {
                                  team: ApiT.Team,
                                  threadId: string,
                                  autoTask: boolean,
-                                 linkedEvents: ApiT.EventWithSyncInfo[],
+                                 linkedEvents: ApiT.TaskEvent[],
                                  workflows: ApiT.Workflow[]) {
 '''
 <div #view>
@@ -765,27 +764,26 @@ module Esper.TaskTab {
     }
     refreshTaskParticipants();
 
-    CurrentThread.task.watch(
-      function (task: ApiT.Task, isValid: boolean,
-                oldTask: ApiT.Task, oldIsValid: boolean) {
-        if (isValid) {
-          taskTabView.taskCaption.text(taskLabelExists);
-          taskTabView.taskTitle.text(task.task_title);
-          workflowSelect.attr("disabled", false);
-        } else {
-          taskTabView.taskCaption.text(taskLabelCreate);
-          taskTabView.taskTitle.text("");
-          workflowSelect.attr("disabled", true);
-        }
+    function updateTaskHeaders(task: ApiT.Task, isValid: boolean,
+                               oldTask: ApiT.Task, oldIsValid: boolean) {
+      if (isValid) {
+        taskTabView.taskCaption.text(taskLabelExists);
+        taskTabView.taskTitle.text(task.task_title);
+        workflowSelect.attr("disabled", false);
+      } else {
+        taskTabView.taskCaption.text(taskLabelCreate);
+        taskTabView.taskTitle.text("");
+        workflowSelect.attr("disabled", true);
       }
-    );
+    }
+    CurrentThread.task.watch(updateTaskHeaders, "updateTaskHeaders");
 
-    CurrentThread.onLinkedEventsChanged(function () {
+    CurrentThread.linkedEventsChange.watch(function () {
       var curThreadId = CurrentThread.threadId.get();
       if (CurrentThread.threadId.isValid()) {
         refreshLinkedEventsList(team, curThreadId, taskTabView);
       }
-    });
+    }, "TaskTab.refreshLinkedEventsList");
 
     refreshLinkedThreadsIcon.attr("data",
       Init.esperRootUrl + "img/refresh.svg");
