@@ -21,11 +21,10 @@ module Esper.Gmail {
   export function removeWebClipBanner() {
     var banner = $(".g .mq");
 
-    if (banner.length === 0) {
-      Log.w("Web clips are turned off.");
-      return $();
-    } else {
-      Log.i("Removing web clip banner.");
+    /* About Gmail web clips:
+  http://lifehacker.com/5699089/disable-gmails-increasingly-ad-filled-web-clips
+    */
+    if (banner.length > 0) {
       banner[0].remove();
     }
   }
@@ -34,7 +33,7 @@ module Esper.Gmail {
     var anchor = $(".nH.g.id");
 
     if (anchor.length !== 1) {
-      Log.w("Cannot find anchor point for the Esper sidebar.");
+      Log.d("Cannot find anchor point for the Esper sidebar.");
       return $();
     } else {
       Log.i("Found anchor point for the Esper sidebar.");
