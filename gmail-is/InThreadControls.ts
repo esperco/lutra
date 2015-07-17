@@ -3,15 +3,28 @@
  *  to be integrated into the assistant's main flow.
  */
 module Esper.InThreadControls {
-  export function insertInThreadControls() {
+  var initialized = false;
+
+  export function initialize() {
 '''
 <div #controls class="esper-in-thread-controls">
 </div>
 '''
-    controls.append(taskNotes());
+    if (!initialized) {
+      initialized = true;
 
-    Gmail.threadMessages().after(controls);
+      Gmail.threadMessages().after(controls);
+
+      controls.empty();
+      controls.append(taskNotes());
+    }
   }
+
+  CurrentThread.currentTeam.watch(function () {
+    if (CurrentThread.currentTeam.isValid()) {
+      initialize();
+    }
+  });
 
   function taskNotes() {
 '''
