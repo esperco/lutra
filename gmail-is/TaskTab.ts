@@ -736,16 +736,26 @@ module Esper.TaskTab {
 '''
 <li #li class="esper-li">
   <span #teamName></span>
-  <div #emails></div>
+  <ul class="esper-ul" #emails></ul>
 </li>
 '''
 	var team = x.team;
-        teamName.text(team.team_name + ": ");
-        List.iter(team.team_email_aliases, function(emailAlias){
-          var div = $('<div class="..."/>');
-          div.text(emailAlias);
-          emails.append(div);
-        });
+        if (team.team_name.length === 0) {
+          teamName.text("(no name)");
+        }
+        else {
+          teamName.text(team.team_name);
+        }
+        if (team.team_email_aliases.length === 0) {
+          emails.append($('<li>(no email address)</li>'));
+        }
+        else {
+          List.iter(team.team_email_aliases, function(emailAlias){
+            var aliasLine = $('<li/>');
+            aliasLine.text("• " + emailAlias);
+            emails.append(aliasLine);
+          });
+        }
   	taskTabView.taskParticipants.append(li);
       });
     };
