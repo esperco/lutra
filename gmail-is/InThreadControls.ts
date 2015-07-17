@@ -76,7 +76,7 @@ module Esper.InThreadControls {
     saveTaskNotes.click(function() {
       CurrentThread.currentTeam.get().match({
         some : function (team) {
-          if ($(this).hasClass("esper-save-enabled")) {
+          if (saveTaskNotes.hasClass("esper-save-enabled")) {
             var notes = taskNotes.val();
             var threadId = CurrentThread.threadId.get();
             Api.getTaskForThread(team.teamid, threadId, false, true)
