@@ -84,7 +84,7 @@ module TeamSettings {
     };
   }
 
-  function showTeamSettings(team : ApiT.Team, onboarding? : boolean) {
+  function showTeamSettings(team : ApiT.Team, onboarding? : boolean, plans? : boolean, payment? : boolean) {
   '''
 <div #view>
   <div #tabsDiv style="padding-left:28px">
@@ -131,7 +131,7 @@ module TeamSettings {
       x.tab.click(function() { switchTab(i); });
     });
 
-    contentAcc.append(AccountTab.load(team));
+    contentAcc.append(AccountTab.load(team, plans, payment));
     contentCal.append(CalendarsTab.load(team, onboarding));
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
@@ -185,7 +185,7 @@ module TeamSettings {
     }
   }
 
-  export function load(teamid : string, onboarding? : boolean) {
+  export function load(teamid : string, onboarding? : boolean, plans? : boolean, payment? : boolean) {
 '''
 <div #view class="settings-container">
   <div #headerDiv class="header clearfix">
@@ -249,7 +249,7 @@ module TeamSettings {
 
     Api.getSubscriptionStatus(selectedTeam.teamid)
       .done(function(customer) {
-        main.append(showTeamSettings(selectedTeam, onboarding));
+        main.append(showTeamSettings(selectedTeam, onboarding, plans, payment));
         footer.append(Footer.load(onboarding));
         if (onboarding) switchTabByName("cal");
       });

@@ -1320,14 +1320,20 @@ a.header-title:hover { text-decoration: underline; }
 .membership-modal {
   position: absolute;
   top: calc(~"50% - 160px");
-  left: calc(~"50% - 326px");
-  width: 652px;
+  left: calc(~"50% - 426px");
+  width: 852px;
   margin: 0;
-  .modal-content { width: 652px; }
+  .modal-content { width: 852px; }
   .membership-modal-note {
     display: none;
     padding: 15px 15px 0 15px;
     text-align: center;
+  }
+  .membership-modal-subtext {
+    display: block;
+    padding: 5px 5px 0 15px;
+    text-align: center;
+    font-style: italic;
   }
   .membership-modal-check {
     font-weight: normal;
@@ -1339,8 +1345,8 @@ a.header-title:hover { text-decoration: underline; }
     padding: 15px 10px;
     .membership-option {
       float: left;
-      width: 150px;
-      height: 100px;
+      width: 200px;
+      height: 150px;
       margin: 0 3px;
       padding: 15px;
       background: white;
@@ -1366,6 +1372,18 @@ a.header-title:hover { text-decoration: underline; }
         text-align: center;
       }
       .membership-price {
+        font-size: 14px;
+        text-align: center;
+      }
+      .membership-scheduling {
+        font-size: 14px;
+        text-align: center;
+      }
+      .membership-admin-tasks {
+        font-size: 14px;
+        text-align: center;
+      }
+      .membership-response-window {
         font-size: 14px;
         text-align: center;
       }
