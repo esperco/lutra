@@ -36,25 +36,12 @@ module Esper.TaskMessageList {
     return view;
   }
 
-  export function render(taskid, selected, changed) {
+  export function render(taskid, selected) {
 '''
-<div #view class="esper-tl-modal">
-  <div class="esper-tl-task-list">
-    <span #closeButton class="esper-tl-close esper-clickable">×</span>
-    <div #list></div>
-    <button #closeButton2 class="esper-btn esper-btn-primary modal-primary modal-cancel">
-      Close
-    </button>
-  </div>
+<div #view class="esper-tl-task-list">
+  <div #list></div>
 </div>
 '''
-    function closeView() {
-      changed(selected);
-      view.remove();
-    }
-    closeButton .click(closeView);
-    closeButton2.click(closeView);
-
     Api.getTask(taskid, false, true).done(function(task) {
       List.iter(task.task_messages, function(msg) {
         list.append(renderMessage(selected, task.task_teamid,

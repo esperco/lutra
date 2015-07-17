@@ -165,18 +165,18 @@ module Esper.EventControls {
 
         pubDescription.val(event.description);
 
-        var descriptionMessageids = event.description_messageids
-                                  ? event.description_messageids
-                                  : [];
+        var descriptionMessageids = event.description_messageids || [];
         pickEmails.click(function() {
-          $("body").append(TaskMessageList.render(taskPrefs.taskid,
-            descriptionMessageids, function(messageids) {
+          var dialog = Modal.dialog("Task Messages",
+            TaskMessageList.render(taskPrefs.taskid, descriptionMessageids),
+            function() {
               Api.getEventDescriptionWithMessages
-                (pubDescription.val(), messageids)
+                (pubDescription.val(), descriptionMessageids)
               .then(function(desc) {
                 pubDescription.val(desc.description_text);
               });
-            }));
+            });
+          $("body").append(dialog.view);
         });
 
         var preferences = allPrefs.execPrefs;

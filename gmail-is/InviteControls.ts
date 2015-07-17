@@ -535,20 +535,20 @@ module Esper.InviteControls {
         });
 
         pickEmails.click(function() {
-          if (! eventEdit.description_messageids) {
-            eventEdit.description_messageids = original.description_messageids
-                                             ? original.description_messageids
-                                             : [];
-          }
+          eventEdit.description_messageids = original.description_messageids
+                                          || [];
           var task = CurrentThread.task.get();
-          $("body").append(TaskMessageList.render(task.taskid,
-            eventEdit.description_messageids, function(messageids) {
+          var dialog = Modal.dialog("Task Messages",
+            TaskMessageList.render(task.taskid,
+                                   eventEdit.description_messageids),
+            function() {
               Api.getEventDescriptionWithMessages
-                (descriptionField.val(), messageids)
+                (descriptionField.val(), eventEdit.description_messageids)
               .then(function(desc) {
                 descriptionField.val(desc.description_text);
               });
-            }));
+            });
+          $("body").append(dialog.view);
         });
 
         return container;
