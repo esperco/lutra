@@ -58,6 +58,33 @@ module Page {
     }
   }
 
+  export var plans : Loadable = {
+    load: function(teamid) {
+      pageSelector.hideAll();
+      showPage("team-settings");
+      Log.d("TeamSettings.load()", teamid);
+      var onboarding = false;
+      var plans = true;
+      TeamSettings.load(teamid, onboarding, plans);
+      Util.focus();
+    }
+  }
+
+  export var payment : Loadable = {
+    load: function(teamid) {
+      pageSelector.hideAll();
+      showPage("team-settings");
+      Log.d("TeamSettings.load()", teamid);
+      var onboarding = false;
+      var plans = false;
+      var payment = true;
+      TeamSettings.load(teamid, onboarding, plans, payment);
+      Util.focus();
+    }
+  }
+
+
+
   export var test : Loadable = {
     load: function() {
       pageSelector.hideAll();

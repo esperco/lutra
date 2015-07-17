@@ -432,6 +432,9 @@ module AccountTab {
 <div #view>
   <div #name class="membership-name"/>
   <div #price class="membership-price"/>
+  <div #scheduling class="membership-scheduling"/>
+  <div #adminTasks class="membership-admin-tasks"/>
+  <div #responseWindow class="membership-response-window"/>
   <div #checkContainer/>
 </div>
 '''
@@ -444,15 +447,27 @@ module AccountTab {
     switch(membership) {
     case "Basic":
       price.text("Free");
+      scheduling.text("10 meetings included");
+      adminTasks.text("No tasks included");
+      responseWindow.text("2 hour response window");
       break;
     case "Standard":
-      price.text("$199/mo");
+      price.text("$199/month");
+      scheduling.text("Unlimited scheduling");
+      adminTasks.text("No tasks included");
+      responseWindow.text("2 hour response window");
       break;
     case "Enhanced":
-      price.text("$399/mo");
+      price.text("$399/month");
+      scheduling.text("Unlimited scheduling");
+      adminTasks.text("10 hours of tasks");
+      responseWindow.text("1 hour response window");
       break;
     case "Pro":
-      price.text("$599/mo");
+      price.text("$599/month");
+      scheduling.text("Unlimited scheduling");
+      adminTasks.text("20 hours of tasks");
+      responseWindow.text("1 hour response window");
       break;
     case "Employee":
       price.text("Free");
@@ -482,6 +497,15 @@ module AccountTab {
           <div #planMid class="membership-option"/>
           <div #planHi class="membership-option"/>
           <div #planX class="membership-option hide"/>
+        </div>
+        <div #subtext1 class="membership-modal-subtext">
+          All features are on a per-month basis.
+        </div>
+        <div #subtext2 class="membership-modal-subtext">
+          Additional tasks are billed at $8 per 15 minute task (only available on paid memberships).
+        </div>
+        <div #subtext3 class="membership-modal-subtext">
+          Additional scheduling is also available at $8/meeting for free users.
         </div>
         <label class="checkbox membership-modal-check">
           <input #noEsper type="checkbox"></input>
@@ -547,7 +571,7 @@ module AccountTab {
                  membershipStatus == "Canceled" ||
                  membershipStatus == undefined) {
         suspension
-          .text("Select a membership option below to reactivate your account.")
+        .text("Select a membership option below to reactivate your account.")
           .show();
       } else { // already picked a plan
         var planName = Plan.nameOfPlan(membershipPlan);
@@ -919,7 +943,7 @@ module AccountTab {
     return view;
   }
 
-  export function load(team : ApiT.Team) {
+  export function load(team : ApiT.Team, plans? : boolean, payment? : boolean) {
 '''
 <div #view>
   <div #notes/>
@@ -971,6 +995,8 @@ module AccountTab {
       invite.click(function() { Settings.togglePopover(popover); });
     }
 
+    if (plans) showMembershipModal(team);
+    if (payment) showPaymentModal("Change", team, null);
     return view;
   }
 

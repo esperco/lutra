@@ -98,6 +98,14 @@ module Route {
       withLogin(Page.onboarding.load, [data.teamid]);
     },
 
+    "plans/:teamid route" : function (data) {
+      withLogin(Page.plans.load, data.teamid);
+    },
+
+    "payment/:teamid route" : function (data) {
+      withLogin(Page.payment.load, data.teamid);
+    },
+
     "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
       var signup = {
         first_name: data.fn,
