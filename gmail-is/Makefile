@@ -95,6 +95,7 @@ APP_SOURCES = \
   Menu \
   Sidebar \
   TaskTab \
+  InThreadControls \
   UserTab \
   GroupTab \
   GroupScheduling \

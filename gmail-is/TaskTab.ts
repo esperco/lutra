@@ -224,63 +224,6 @@ module Esper.TaskTab {
       });
   }
 
-  /* Refresh task notes, fetching task notes from the server. */
-  export function refreshTaskNotes(team, threadId, taskTab) {
-    Api.getTaskForThread(team.teamid, threadId, false, false)
-      .done(function(task) {
-        taskTab.taskNotes.val(task.task_notes);
-      });
-  }
-
-  /* Pop up a button when selecting text inside Gmail messages,
-   * which copies the selection into the task notes box when clicked.
-   */
-  function enableHighlightToTaskNotes(taskNotes : JQuery,
-                                      saveTaskNotes : JQuery) : void {
-    var container = Gmail.threadContainer();
-    var target = Gmail.messageTextSelector;
-
-    container.off("mouseup", target);
-    container.mousedown(function() {
-      $(".esper-selection-action").remove();
-    });
-    /* We need to use on() here, because we want this action to occur even for
-     * messages that are inserted into the DOM after we bind this handler,
-     * like when the user expands out the thread.
-     */
-    container.on("mouseup", target, function(e) {
-      function afterSelectionActuallyModified() {
-        var selection = window.getSelection();
-        if (selection && !selection.isCollapsed) {
-          var text = selection.toString();
-          var actionDiv = $("<div class='esper-selection-action'/>");
-          actionDiv.css({
-            left: e.pageX + 10,
-            top: e.pageY + 10,
-            position: "absolute"
-          });
-          var button = $("<button class='esper-btn esper-btn-primary'/>");
-          button.text("Copy selection to task notes");
-          button.click(function() {
-            var curNotes = taskNotes.val();
-            var nl = "";
-            if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
-            taskNotes.val(curNotes + nl + text);
-            saveTaskNotes.addClass("esper-save-enabled");
-            saveTaskNotes.trigger("click");
-            actionDiv.remove();
-          });
-          actionDiv.append(button);
-          $("body").append(actionDiv);
-        }
-      }
-      /* Without this, window.getSelection() will still return the previous
-       * selection if we click on the selected text.
-       */
-      window.setTimeout(afterSelectionActuallyModified, 1);
-    });
-  }
-
   /** Creates or renames a task, explicitly triggered by a UI action.
    *
    *  Will fail if a task cannot be created, such as if there is no
@@ -298,7 +241,6 @@ module Esper.TaskTab {
           task.task_title = query;
           CurrentThread.setTask(task);
           taskTitle.val(query);
-          taskTab.taskNotes.val(task.task_notes);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTab);
           displayLinkedThreadsList(task, threadId, taskTab);
@@ -342,7 +284,6 @@ module Esper.TaskTab {
                                    newTaskId);
 
             job.done(function() {
-              refreshTaskNotes(team, threadId, taskTab);
               refreshTaskProgressSelection(team, threadId, taskTab);
               refreshLinkedThreadsList(team, threadId, taskTab);
               refreshLinkedEventsList(team, threadId, taskTab);
@@ -635,23 +576,6 @@ module Esper.TaskTab {
         </div>
       </div>
     </div>
-
-    <div class="esper-section">
-      <div class="esper-section-header esper-clearfix esper-open">
-        <span class="esper-bold" style="float:left">Task Notes</span>
-      </div>
-      <div class="esper-section-notes">
-        <textarea #taskNotes rows=3
-              placeholder="Leave some brief notes about the task here"
-              class="esper-text-notes"/>
-      </div>
-      <div class="esper-section-footer esper-clearfix">
-        <div #saveTaskNotes class="esper-save-notes esper-save-disabled">
-          Save
-        </div>
-      </div>
-    </div>
-
     <div class="esper-section">
       <div #taskProgressHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -860,34 +784,6 @@ module Esper.TaskTab {
       Api.obtainTaskForThread
       : Api.getTaskForThread;
 
-    function taskNotesKeyUp(notes) {
-      if (taskNotes.val() === notes) {
-        saveTaskNotes.addClass("esper-save-disabled");
-        saveTaskNotes.removeClass("esper-save-enabled");
-        saveTaskNotes.removeClass("esper-clickable");
-      } else {
-        saveTaskNotes.addClass("esper-clickable");
-        saveTaskNotes.addClass("esper-save-enabled");
-        saveTaskNotes.removeClass("esper-save-disabled");
-      }
-    }
-
-    saveTaskNotes.click(function() {
-      if ($(this).hasClass("esper-save-enabled")) {
-        var notes = taskNotes.val();
-        apiGetTask(team.teamid, threadId, false, true).done(function(task) {
-          Api.setTaskNotes(task.taskid, notes).done(function() {
-            saveTaskNotes.addClass("esper-save-disabled");
-            saveTaskNotes.removeClass("esper-save-enabled");
-            saveTaskNotes.removeClass("esper-clickable");
-            taskNotes.keyup(function() {taskNotesKeyUp(notes);});
-          });
-        });
-      }
-    });
-
-    enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
-
     Api.getPreferences(team.teamid).done(function(prefs) {
       displayWorkflow(team, prefs, workflows,
                       workflowSection, workflowSelect, workflowNotes,
@@ -899,13 +795,11 @@ module Esper.TaskTab {
       CurrentThread.setTask(task);
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
-        var notes = "";
         linkedThreadsSpinner.hide();
         taskProgressSpinner.hide();
         if (task !== undefined) {
           taskCaption.text(taskLabelExists);
           title = task.task_title;
-          if (task.task_notes !== undefined) notes = task.task_notes;
           displayLinkedThreadsList(task, threadId, taskTabView);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTabView);
@@ -923,8 +817,7 @@ module Esper.TaskTab {
           if (title === undefined) title = "(no subject)";
         }
         taskTitle.val(title);
-        taskNotes.val(notes);
-        taskNotes.keyup(function() {taskNotesKeyUp(notes);});
+
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
           if (query !== "") {
