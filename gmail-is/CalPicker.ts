@@ -693,6 +693,7 @@ module Esper.CalPicker {
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
       title: title,
+      description_messageids: [],
       location: { title: "", address: eventLocation.val() },
       guests: []
     };

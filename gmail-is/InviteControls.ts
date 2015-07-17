@@ -436,6 +436,9 @@ module Esper.InviteControls {
 <div #container class="esper-ev-inline-container">
   <div #heading class="esper-modal-header">
     Review the guest event description
+    <button #pickEmails class="esper-btn esper-btn-secondary">
+      Pick Emails
+    </button>
   </div>
   <div class="esper-ev-modal-content">
     <textarea #descriptionField
@@ -529,6 +532,23 @@ module Esper.InviteControls {
                 });
             }
           }
+        });
+
+        pickEmails.click(function() {
+          eventEdit.description_messageids = original.description_messageids
+                                          || [];
+          var task = CurrentThread.task.get();
+          var dialog = Modal.dialog("Task Messages",
+            TaskMessageList.render(task.taskid,
+                                   eventEdit.description_messageids),
+            function() {
+              Api.getEventDescriptionWithMessages
+                (descriptionField.val(), eventEdit.description_messageids)
+              .then(function(desc) {
+                descriptionField.val(desc.description_text);
+              });
+            });
+          $("body").append(dialog.view);
         });
 
         return container;

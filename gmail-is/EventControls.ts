@@ -45,7 +45,11 @@ module Esper.EventControls {
         </div>
       </div>
       <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description</div>
+        <div class="esper-ev-modal-left esper-bold">Description<br/>
+          <button #pickEmails class="esper-btn esper-btn-secondary">
+            Pick Emails
+          </button>
+        </div>
         <div class="esper-ev-modal-right">
           <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
         </div>
@@ -161,6 +165,20 @@ module Esper.EventControls {
 
         pubDescription.val(event.description);
 
+        var descriptionMessageids = event.description_messageids || [];
+        pickEmails.click(function() {
+          var dialog = Modal.dialog("Task Messages",
+            TaskMessageList.render(taskPrefs.taskid, descriptionMessageids),
+            function() {
+              Api.getEventDescriptionWithMessages
+                (pubDescription.val(), descriptionMessageids)
+              .then(function(desc) {
+                pubDescription.val(desc.description_text);
+              });
+            });
+          $("body").append(dialog.view);
+        });
+
         var preferences = allPrefs.execPrefs;
 
         function searchLocation() {
@@ -221,6 +239,7 @@ module Esper.EventControls {
             end: evEnd,
             title: pubTitle.val(),
             description: pubDescription.val(),
+            description_messageids: descriptionMessageids,
             location: location,
             all_day: event.all_day,
             guests: guests

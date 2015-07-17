@@ -90,6 +90,7 @@ APP_SOURCES = \
   InviteControls \
   EventControls \
   TaskList \
+  TaskMessageList \
   Teams \
   EventWidget \
   Menu \

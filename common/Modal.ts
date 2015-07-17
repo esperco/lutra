@@ -9,7 +9,7 @@ module Esper.Modal {
   }
 
   /** Returns a modal with no header, contents or buttons. */
-  export function empty(onClose? : () => void) : Modal {
+  export function empty() : Modal {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-modal-default">
@@ -19,14 +19,6 @@ module Esper.Modal {
   </div>
 </div>
 '''
-    view.click(function () {
-      if (onClose) {
-        onClose();
-      }
-
-      view.remove();
-    });
-
     return {
       view    : view,
       modal   : modal,
@@ -43,19 +35,58 @@ module Esper.Modal {
   Ok
 </button>
 '''
-    var modal = empty(onClose);
+    var modal = empty();
 
     modal.header.text(title);
     modal.content.append(body);
 
     modal.footer.append(okButton);
-    okButton.click(function () {
+
+    function closeView() {
       if (onClose) {
         onClose();
       }
 
       modal.view.remove();
-    });
+    }
+    okButton.click(closeView);
+    modal.view.click(closeView);
+
+    return modal;
+  }
+
+  function makeCloseBox() {
+'''
+<span #closeBox class="esper-tl-close esper-clickable">×</span>
+'''
+    return closeBox;
+  }
+
+  /** Dialog box with a single Ok button. */
+  export function dialog(title : string, body : JQuery, onClose? : () => void) : Modal {
+'''
+<button #okButton class="esper-btn esper-btn-primary modal-primary">
+  Ok
+</button>
+'''
+    var closeBox = makeCloseBox();
+    var modal = empty();
+
+    modal.header.text(title);
+    modal.header.append(closeBox);
+    modal.content.append(body);
+
+    modal.footer.append(okButton);
+
+    function closeView() {
+      if (onClose) {
+        onClose();
+      }
+
+      modal.view.remove();
+    }
+    okButton.click(closeView);
+    closeBox.click(closeView);
 
     return modal;
   }

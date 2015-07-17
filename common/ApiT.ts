@@ -117,6 +117,7 @@ module Esper.ApiT {
     google_cal_url?: string;
     title?: string;
     description?: string;
+    description_messageids: string[];
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
@@ -134,6 +135,7 @@ module Esper.ApiT {
     end: CalendarTime;
     title?: string;
     description?: string;
+    description_messageids?: string[];
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
@@ -149,6 +151,16 @@ module Esper.ApiT {
     gmail_thrid: string;
     subject: string;
     snippet: string;
+  }
+
+  export interface EmailMessage {
+    message_id: string;
+    message_owner: string;
+    message_gmsgid: string;
+    message_date: string;
+    message_sender: string;
+    message_snippet?: string;
+    raw?: string;
   }
 
   export interface LinkedCalendarEvents {
@@ -340,6 +352,7 @@ module Esper.ApiT {
     task_urgent: boolean;
     task_unread_emails?: number;
     task_threads: EmailThread[];
+    task_messages: EmailMessage[];
     task_events: TaskEvent[];
     task_workflow_progress: TaskWorkflowProgress;
   }
