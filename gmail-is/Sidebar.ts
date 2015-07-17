@@ -40,7 +40,6 @@ module Esper.Sidebar {
   }
 
   function insertEsperRoot() {
-    Gmail.removeWebClipBanner();
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
     if (anchor.length === 1) {

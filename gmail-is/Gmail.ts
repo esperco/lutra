@@ -18,17 +18,6 @@ module Esper.Gmail {
     }
   }
 
-  export function removeWebClipBanner() {
-    var banner = $(".g .mq");
-
-    /* About Gmail web clips:
-  http://lifehacker.com/5699089/disable-gmails-increasingly-ad-filled-web-clips
-    */
-    if (banner.length > 0) {
-      banner[0].remove();
-    }
-  }
-
   export function findSidebarAnchor() {
     var anchor = $(".nH.g.id");
 
