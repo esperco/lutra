@@ -50,6 +50,8 @@ module Esper.InThreadControls {
       taskNotesKeyUp(notes);
     });
 
+    enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
+
     function taskNotesKeyUp(notes) {
       var left = 140 - taskNotes.val().length;
       notesCharCount.text(left);
