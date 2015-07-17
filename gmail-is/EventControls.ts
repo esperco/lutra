@@ -163,8 +163,12 @@ module Esper.EventControls {
           newGuestEmail.val("");
         });
 
+        var descriptionMessageids = event.description_messageids
+                                  ? event.description_messageids
+                                  : [];
         pickEmails.click(function() {
-          $("body").append(TaskMessageList.render(taskPrefs.taskid));
+          $("body").append(TaskMessageList.render(taskPrefs.taskid,
+            descriptionMessageids));
         });
 
         pubDescription.val(event.description);
@@ -229,6 +233,7 @@ module Esper.EventControls {
             end: evEnd,
             title: pubTitle.val(),
             description: pubDescription.val(),
+            description_messageids: descriptionMessageids,
             location: location,
             all_day: event.all_day,
             guests: guests

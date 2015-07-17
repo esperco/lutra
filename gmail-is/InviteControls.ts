@@ -535,8 +535,14 @@ module Esper.InviteControls {
         });
 
         pickEmails.click(function() {
+          if (! eventEdit.description_messageids) {
+            eventEdit.description_messageids = original.description_messageids
+                                             ? original.description_messageids
+                                             : [];
+          }
           var task = CurrentThread.task.get();
-          $("body").append(TaskMessageList.render(task.taskid));
+          $("body").append(TaskMessageList.render(task.taskid,
+            eventEdit.description_messageids));
         });
 
         return container;

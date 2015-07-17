@@ -117,6 +117,7 @@ module Esper.ApiT {
     google_cal_url?: string;
     title?: string;
     description?: string;
+    description_messageids: string[];
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
@@ -134,6 +135,7 @@ module Esper.ApiT {
     end: CalendarTime;
     title?: string;
     description?: string;
+    description_messageids?: string[];
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
