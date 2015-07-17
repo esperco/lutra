@@ -542,7 +542,13 @@ module Esper.InviteControls {
           }
           var task = CurrentThread.task.get();
           $("body").append(TaskMessageList.render(task.taskid,
-            eventEdit.description_messageids));
+            eventEdit.description_messageids, function(messageids) {
+              Api.getEventDescriptionWithMessages
+                (descriptionField.val(), messageids)
+              .then(function(desc) {
+                descriptionField.val(desc.description_text);
+              });
+            }));
         });
 
         return container;

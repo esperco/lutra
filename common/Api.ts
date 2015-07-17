@@ -549,6 +549,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function getEventDescriptionWithMessages(description, messageids):
+  JQueryDeferred<ApiT.EventDescription> {
+    var url = Conf.Api.url + "/api/event/description-with-messages/"
+            + string(Login.myUid());
+    var body = { description: description,
+                 description_messageids: messageids };
+    return JsonHttp.post(url, JSON.stringify(body));
+  }
+
   export function updateGoogleEvent(teamid, alias, eventid, event):
   JQueryDeferred<void> {
     var url =

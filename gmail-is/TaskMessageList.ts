@@ -36,7 +36,7 @@ module Esper.TaskMessageList {
     return view;
   }
 
-  export function render(taskid, selected) {
+  export function render(taskid, selected, changed) {
 '''
 <div #view class="esper-tl-modal">
   <div class="esper-tl-task-list">
@@ -49,6 +49,7 @@ module Esper.TaskMessageList {
 </div>
 '''
     function closeView() {
+      changed(selected);
       view.remove();
     }
     closeButton .click(closeView);
