@@ -122,6 +122,7 @@ module Esper.ApiT {
     all_day?: boolean;
     guests: Guest[];
     transparent?: boolean;
+    recurrence?: Recur;
   }
 
   export interface CalendarEventOpt {

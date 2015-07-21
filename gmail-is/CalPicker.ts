@@ -493,7 +493,40 @@ module Esper.CalPicker {
     }
 
     function eventClick(calEvent, jsEvent, view) {
-      removeEvent(picker, calEvent.id);
+'''
+<div class="esper-event-click-menu" #view>
+  <ul class="esper-ul" #menu/>
+</div>
+'''
+      $(".esper-event-click-menu").remove();
+      menu.css({
+        "background-color": "white",
+        border: "2px solid black",
+        position: "absolute",
+        left: jsEvent.pageX,
+        top: jsEvent.pageY,
+        "z-index": 6
+      });
+      var orig = calEvent.orig;
+      if (orig) {
+        var recur_id = orig.recurring_event_id;
+        if (recur_id) {
+          $("<li class='esper-li'>Edit recurrence...</li>")
+            .click(function() {
+              Recur.editRecurrenceModal(team, orig);
+              view.remove();
+            })
+            .appendTo(menu);
+        }
+      } else {
+        $("<li class='esper-li'>Remove</li>")
+          .click(function() {
+            removeEvent(picker, calEvent.id);
+            view.remove();
+          })
+          .appendTo(menu);
+      }
+      if (menu.find("li").length > 0) view.appendTo($("body"));
     }
 
     function updateEvent(calEvent) {
