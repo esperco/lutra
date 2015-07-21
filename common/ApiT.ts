@@ -529,4 +529,35 @@ module Esper.ApiT {
     step_id? : string;
     checklist : CheckItem[];
   }
+
+  export interface LocalTime {
+    year : number;
+    month : number;
+    day : number;
+    hour : number;
+    min : number;
+    sec : number;
+    string : string;
+  }
+
+  type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
+  type Weekday = string; // Sunday, Monday, ... Saturday
+
+  export interface Recur {
+    freq : Freq;
+    until ?: LocalTime;
+    count ?: number;
+    interval ?: number;
+    bysecond : number[];
+    byminute : number[];
+    byhour : number[];
+    byday : [number, Weekday][];
+    bymonthday : number[];
+    byyearday : number[];
+    byweekno : number[];
+    bymonth : number[];
+    bysetpos : number[];
+    wkst ?: Weekday;
+  }
+
 }
