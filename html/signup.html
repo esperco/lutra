@@ -18,7 +18,7 @@
 <script src="js/global.js"></script>
 </head>
 
-<body>
+<body onload="prefillSignupForm()">
 
 <!-- Navbar -->
 <div class="navbar-container"></div>
@@ -63,7 +63,7 @@
             <div style="color: black">
               <input type="email" placeholder="Email Address" name="EMAIL" class="required" id="email">
             </div>
-            <div class="email-platform-row clearfix">
+            <div class="clearfix">
               <select name="MMERGE3" class="required esper-select" id="platform" onchange="this.className=this.options[this.selectedIndex].className">
                 <option selected disabled value="none">Email Platform</option>
                 <option class="esper-select option-black" value="Google Apps">Google Apps</option>
@@ -72,6 +72,9 @@
                 <option class="esper-select option-black" value="IBM (Lotus) Notes">IBM (Lotus) Notes</option>
                 <option class="esper-select option-black" value="Other/I Don't Know">Other / I don't know</option>
               </select>
+            </div>
+            <div style="color: black">
+              <input type="text" placeholder="Referral Code" name="CODE" id="redeem-code">
             </div>
             <div class="submit-button-row" align="right">
               <button id="signup-btn" class="button-secondary" type="button">Create account</button>

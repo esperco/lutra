@@ -237,6 +237,40 @@ function setDonePageFromHash() {
 
 }
 
+function queryParams() {
+  var q = window.location.search.slice(1).split(/&/);
+  var args = [];
+  for (var i in q) {
+    var a = q[i].split(/=/);
+    if (a.length == 1) {
+      args.push(a);
+    } else if (a.length > 1) {
+      args.push([a[0], decodeURIComponent(a[1])]);
+    }
+  }
+  return args;
+}
+
+function prefillSignupForm() {
+  var args = queryParams();
+  for (var i in args) {
+    switch (args[i][0]) {
+    case "first":
+      $("#first-name").val(args[i][1]);
+      break;
+    case "last":
+      $("#last-name").val(args[i][1]);
+      break;
+    case "email":
+      $("#email").val(args[i][1]);
+      break;
+    case "code":
+      $("#redeem-code").val(args[i][1]);
+      break;
+    }
+  }
+}
+
 function main() {
   loadElements();
   resizer();
