@@ -1,5 +1,107 @@
 module Esper.Recur {
 
+  function summarizeWeekday(wday : ApiT.OrdWkDay) : string {
+    var ord = wday.ord;
+    if (ord) {
+      var nth = "";
+      if (ord === 1) nth = "first";
+      else if (ord === 2) nth = "second";
+      else if (ord === 3) nth = "third";
+      else if (ord === 4) nth = "fourth";
+      else if (ord === 5) nth = "fifth";
+      else if (ord === -1) nth = "last";
+      else if (ord === -2) nth = "second-to-last";
+      else if (ord === -3) nth = "third-to-last"
+      else throw new Error("Unsupported");
+      var noOrd = { ord: null, day: wday.day };
+      return "the " + nth + " " + summarizeWeekday(noOrd);
+    } else {
+      return wday.day;
+    }
+  }
+
+  function hasAllWeekdays(l : ApiT.OrdWkDay[]) : boolean {
+    var weekdays = [
+      { ord: null, day: "Monday" },
+      { ord: null, day: "Tuesday" },
+      { ord: null, day: "Wednesday" },
+      { ord: null, day: "Thursday" },
+      { ord: null, day: "Friday" }
+    ];
+    return List.forAll(weekdays, function(d) { return List.mem(l, d); });
+  }
+
+  function summarizeWeekdays(l : ApiT.OrdWkDay[]) : string {
+    Log.assert(l.length > 0);
+    if (l.length === 1) {
+      return summarizeWeekday(l[0]);
+    } else if (l.length === 2) {
+      return summarizeWeekday(l[0]) + " and " + summarizeWeekday(l[1]);
+    } else {
+      if (hasAllWeekdays(l)) {
+        return "weekdays";
+      } else {
+        var last = l.slice(-1)[0];
+        var rest = l.slice(0, -1);
+        return List.map(rest, summarizeWeekday).join(", ") +
+          ", and " + summarizeWeekday(last);
+      }
+    }
+  }
+
+  function summarizeDate(d : ApiT.LocalTime) {
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return months[d.month - 1] + " " + d.day + ", " + d.year;
+  }
+
+  type byFilter = string | [string, ApiT.OrdWkDay[]] | [string, number[]];
+
+  function extractByFilter(period : ApiT.Freq, rule : ApiT.Recur) : byFilter {
+    var otherFilters = [
+      rule.bysecond, rule.byminute, rule.byhour, rule.byyearday,
+      rule.byweekno, rule.bymonth, rule.bysetpos
+    ];
+    var byDay = List.map(rule.byday, function() { return 0; });
+    var noFilter =
+      List.forAll(otherFilters.concat(rule.bymonthday, byDay), function(x) {
+        return x.length === 0;
+      }) && (!rule.wkst || rule.wkst === "Sunday");
+    var justByDay : [string, ApiT.OrdWkDay[]] =
+      ( List.forAll(otherFilters.concat(rule.bymonthday), function(x) {
+          return x.length === 0;
+        }) && (!rule.wkst || rule.wkst === "Sunday")
+      ) ?
+      ["Byday", rule.byday] :
+      null;
+    var justByMonthDay : [string, number[]] =
+      ( List.forAll(otherFilters.concat(byDay), function(x) {
+          return x.length === 0;
+        }) && (!rule.wkst || rule.wkst === "Sunday")
+      ) ?
+      ["Bymonthday", rule.bymonthday] :
+      null;
+    if (period === "Daily" && noFilter) {
+      return "No_filter";
+    } else if (period === "Weekly" && noFilter) {
+      return "No_filter";
+    } else if (period === "Weekly" && justByDay) {
+      return justByDay;
+    } else if (period === "Monthly" && justByDay && !justByMonthDay) {
+      return justByDay;
+    } else if (period === "Monthly" && !justByDay && justByMonthDay) {
+      return justByMonthDay;
+    } else if (period === "Yearly" && noFilter) {
+      return "No_filter";
+    } else {
+      throw new Error("Unsupported");
+    }
+  }
+
+  function summarizeIfSupported(rule : ApiT.Recur) {
+    // TODO
+  }
+
   export function editRecurrenceModal(team, calEvent) {
 '''
 <div #view class="esper-modal-bg">
@@ -95,6 +197,7 @@ module Esper.Recur {
         var ev = response.event_opt;
         if (ev) {
           Log.d(ev);
+          Log.d(JSON.stringify(ev.recurrence));
           var start = ev.start;
           var startLocal;
           if (start) {

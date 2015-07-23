@@ -548,7 +548,12 @@ module Esper.ApiT {
   }
 
   export type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
-  export type Weekday = string; // Sunday, Monday, ... Saturday
+  export type Weekday = string; // Sunday, Monday, ..., Saturday
+
+  export interface OrdWkDay {
+    ord : number;
+    day : Weekday;
+  }
 
   export interface Recur {
     freq : Freq;
@@ -558,7 +563,7 @@ module Esper.ApiT {
     bysecond : number[];
     byminute : number[];
     byhour : number[];
-    byday : [number, Weekday][];
+    byday : OrdWkDay[];
     bymonthday : number[];
     byyearday : number[];
     byweekno : number[];
