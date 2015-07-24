@@ -537,16 +537,6 @@ module Esper.ApiT {
     rdate : string[];
   }
 
-  export interface LocalTime {
-    year : number;
-    month : number;
-    day : number;
-    hour : number;
-    min : number;
-    sec : number;
-    string : string;
-  }
-
   export type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
   export type Weekday = string; // Sunday, Monday, ..., Saturday
 
@@ -557,7 +547,7 @@ module Esper.ApiT {
 
   export interface Recur {
     freq : Freq;
-    until ?: LocalTime;
+    until ?: string; // local time
     count ?: number;
     interval ?: number;
     bysecond : number[];
