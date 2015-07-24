@@ -72,7 +72,6 @@ module Esper.CurrentThread {
    */
   export function setTeam(newTeam: Option.T<ApiT.Team>) : void {
     currentTeam.set(newTeam);
-    setTask(null); // ensure old task is not accidentally modified for new team
   }
 
   /** Sets the threadId, making sure to update the team, executive and
@@ -280,9 +279,7 @@ module Esper.CurrentThread {
     task.set(newTask);
 
     if (newTask) {
-      linkedEvents.set(newTask.task_events);
-    } else {
-      linkedEvents.set([]);
+      linkedEventsChange.set(null);
     }
   }
 
