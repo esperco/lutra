@@ -24,7 +24,7 @@ module Esper.FinalizeEvent {
    *
    *  Currently, holds are events with titles starting with "HOLD: ".
    */
-  export function isHold(event) {
+  export function isHold(event: ApiT.CalendarEventEdit) {
     return event.title && /^HOLD: /.test(event.title);
   }
 
@@ -103,10 +103,11 @@ module Esper.FinalizeEvent {
       some : function (team) {
         var id = event.google_event_id;
 
-        var linkedEvents = CurrentThread.linkedEvents.get().map(function (e) {
+        var calendarEvents = CurrentThread.linkedEvents.get().map(function (e) {
           return e.task_event;
         });
-        var holds = justHolds(linkedEvents).filter(function (other) {
+
+        var holds = justHolds(calendarEvents).filter(function (other) {
           return other.google_event_id != id;
         });
 
