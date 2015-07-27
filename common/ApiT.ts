@@ -123,6 +123,7 @@ module Esper.ApiT {
     guests: Guest[];
     transparent?: boolean;
     recurrence?: Recurrence;
+    recurring_event_id?: string;
   }
 
   export interface CalendarEventOpt {
@@ -541,7 +542,7 @@ module Esper.ApiT {
   export type Weekday = string; // Sunday, Monday, ..., Saturday
 
   export interface OrdWkDay {
-    ord : number;
+    ord ?: number;
     day : Weekday;
   }
 

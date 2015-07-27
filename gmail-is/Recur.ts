@@ -1,5 +1,20 @@
 module Esper.Recur {
 
+  function defaultRecur() : ApiT.Recur {
+    return {
+      freq: "Daily",
+      bysecond: [], byminute: [], byhour: [], byday: [], bymonthday: [],
+      byyearday: [], byweekno: [], bymonth: [], bysetpos: []
+    };
+  }
+
+  var currentRule = new Esper.Watchable.C<ApiT.Recur>(
+    function (r) { return r !== undefined && r !== null; },
+    defaultRecur()
+  );
+
+  /* Summarizing (translated from OCaml icalendar_recur.ml) */
+
   function summarizeWeekday(wday : ApiT.OrdWkDay) : string {
     var ord = wday.ord;
     if (ord) {
@@ -22,11 +37,11 @@ module Esper.Recur {
 
   function hasAllWeekdays(l : ApiT.OrdWkDay[]) : boolean {
     var weekdays = [
-      { ord: null, day: "Monday" },
-      { ord: null, day: "Tuesday" },
-      { ord: null, day: "Wednesday" },
-      { ord: null, day: "Thursday" },
-      { ord: null, day: "Friday" }
+      { day: "Monday" },
+      { day: "Tuesday" },
+      { day: "Wednesday" },
+      { day: "Thursday" },
+      { day: "Friday" }
     ];
     return List.forAll(weekdays, function(d) { return List.mem(l, d); });
   }
@@ -182,6 +197,72 @@ module Esper.Recur {
     }
   }
 
+  /* Update summary field of modal when currentRule changes.
+     All the views below set currentRule when anything is modified,
+     using a new rule read from the state of the modal. */
+  currentRule.watch(function(rule, isValid) {
+    Log.d("rule", rule);
+    Log.d("isValid", isValid);
+    if (isValid) {
+      $(".esper-recur-summary").text(summarize(rule));
+    }
+  });
+
+
+  /* Views */
+
+  function currentModalState() : ApiT.Recur {
+    var recur = defaultRecur();
+    var freq = $("select.esper-recur-freq").val();
+    var start = $(".esper-recur-start").val();
+    recur.freq = freq;
+
+    var interval = Number($("select.esper-recur-interval").val());
+    if (interval > 1) recur.interval = interval;
+
+    if ($("input.esper-recur-after").is(":checked")) {
+      recur.count = Number($("input.esper-recur-count").val());
+    } else if ($("input.esper-recur-on").is(":checked")) {
+      var fullDate = $("input.esper-recur-start").data("fullDate");
+      var time = fullDate.split("T")[1];
+      recur.until = $("input.esper-recur-until").val() + "T" + time;
+    }
+
+    if (freq === "Weekly") {
+      $("input.esper-recur-day").each(function() {
+        var it = $(this);
+        if (it.is(":checked")) recur.byday.push({ day: it.val() });
+      });
+    } else if (freq === "Monthly") {
+      if ($("input.esper-recur-month").is(":checked")) {
+        recur.bymonthday = [moment(start).date()];
+      } else if ($("input.esper-recur-week").is(":checked")) {
+        var m = moment(start); // Remember, it's mutable :/
+        var day = m.format("dddd");
+        var startMonth = m.month();
+        var ord;
+        if (m.add("weeks", -1).month() !== startMonth) {
+          ord = 1;
+        } else if (m.add("weeks", -1).month() !== startMonth) {
+          ord = 2;
+        } else if (m.add("weeks", -1).month() !== startMonth) {
+          ord = 3;
+        } else if (m.add("weeks", -1).month() !== startMonth) {
+          ord = 4;
+        } else {
+          ord = -1;
+        }
+        recur.byday = [{ ord: ord, day: day }];
+      }
+    }
+
+    return recur;
+  }
+
+  function updateState() : void {
+    currentRule.set(currentModalState());
+  }
+
   function daysOfWeek(rule : ApiT.Recur) : JQuery {
 '''
 <span #view>
@@ -197,18 +278,18 @@ module Esper.Recur {
     List.iter(rule.byday, function(d) {
       view.find("input:checkbox[value=" + d.day + "]").prop("checked", true);
     });
-    $(".esper-recur-day").click(function() {
-      // TODO Update rule, refresh summary
-    });
+    var startDay = moment($(".esper-recur-start").val()).format("dddd");
+    view.find("input:checkbox[value=" + startDay + "]").prop("checked", true);
+    view.find("input").click(updateState);
     return view;
   }
 
   function monthOrWeekChoice(rule : ApiT.Recur) : JQuery {
 '''
 <span #view>
-  <input #month type="radio" name="monthOrWeek" value="month"/>
+  <input #month class="esper-recur-month" type="radio" name="monthOrWeek" value="month" checked/>
   day of the month &nbsp;
-  <input #week type="radio" name="monthOrWeek" value="week"/>
+  <input #week class="esper-recur-week" type="radio" name="monthOrWeek" value="week"/>
   day of the week
 </span>
 '''
@@ -219,10 +300,13 @@ module Esper.Recur {
       month.attr("checked", false);
       week.attr("checked", true);
     }
+    view.find("input").click(updateState);
     return view;
   }
 
-  export function editRecurrenceModal(team, calEvent) {
+  function editRecurrenceModal(team : ApiT.Team,
+                               eventObj : CalPicker.TZEventObj,
+                               startEvent ?: ApiT.CalendarEvent) : JQuery {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
@@ -230,7 +314,7 @@ module Esper.Recur {
     <div class="esper-modal-content" #content>
       <div style="margin-bottom: 10px">
         <label class="esper-recur-modal-label">Repeats:</label>
-        <select #repeats class="esper-select" style="float: none">
+        <select #repeats class="esper-select esper-recur-freq" style="float: none">
           <option>Daily</option>
           <option>Weekly</option>
           <option>Monthly</option>
@@ -239,13 +323,13 @@ module Esper.Recur {
       </div>
       <div style="margin-bottom: 10px">
         <label class="esper-recur-modal-label">Repeat every:</label>
-        <select #repeatEvery class="esper-select" style="float: none"/>
+        <select #repeatEvery class="esper-select esper-recur-interval" style="float: none"/>
         <span #everyText>days</span>
       </div>
       <div #repeatOn style="margin-bottom: 10px"/>
       <div style="margin-bottom: 10px">
         <label class="esper-recur-modal-label">Starts on:</label>
-        <input type="date" #startsOn class="esper-input"/>
+        <input class="esper-recur-start esper-input" type="date" #startsOn/>
       </div>
       <div>
         <label class="esper-recur-modal-label">Ends:</label>
@@ -253,18 +337,20 @@ module Esper.Recur {
           <input #endsNever type="radio" name="ends" value="never" checked/>
             Never
           <br/>
-          <input #endsAfter type="radio" name="ends" value="count"/>
+          <input #endsAfter class="esper-recur-after" type="radio" name="ends" value="count"/>
             After <input #occurrences
                          type="text"
-                         class="esper-input" style="width: 25%"/> occurrences
+                         class="esper-input esper-recur-count"
+                         style="width: 25%"/> occurrences
           <br/>
-          <input #endsOn type="radio" name="ends" value="until"/>
-            On <input #endDate type="date" class="esper-input"/>
+          <input #endsOn class="esper-recur-on" type="radio" name="ends" value="until"/>
+            On <input #endDate type="date"
+                      class="esper-input esper-recur-until"/>
         </div>
       </div>
       <div>
         <label class="esper-recur-modal-label">Summary:</label>
-        <div #summary style="margin-left: 33%; margin-top: -18px;"/>
+        <div #summary class="esper-recur-summary" style="margin-left: 33%; margin-top: -18px;"/>
       </div>
     </div>
     <div class="esper-modal-footer esper-clearfix">
@@ -278,8 +364,7 @@ module Esper.Recur {
   </div>
 </div>
 '''
-    function save() { view.remove(); }
-    function cancel() { view.remove(); }
+    var recur = currentRule.get();
 
     Sidebar.customizeSelectArrow(repeats);
     Sidebar.customizeSelectArrow(repeatEvery);
@@ -288,83 +373,151 @@ module Esper.Recur {
       repeatEvery.append("<option>" + i + "</option>");
     }
 
-    endsAfter.click(function() {
-      endDate.val("");
-      if (occurrences.val().length === 0) occurrences.val("5");
-    });
-
     view.click(cancel);
     Util.preventClickPropagation(modal);
     saveButton.click(save);
     cancelButton.click(cancel);
 
-    Api.getEventDetails(team.teamid, calEvent.google_cal_id,
-                        team.team_calendars, calEvent.recurring_event_id)
-      .done(function(response) {
+    function setRepeats(rep) {
+      var recur = currentRule.get();
+      repeatOn.children().remove();
+      if (rep === "Daily") {
+        everyText.text("days");
+      } else if (rep === "Weekly") {
+        everyText.text("weeks");
+        var lbl = $("<label>")
+        lbl.addClass("esper-recur-modal-label");
+        lbl.text("Repeat on:");
+        repeatOn.append(lbl)
+                .append(daysOfWeek(recur));
+      } else if (rep === "Monthly") {
+        everyText.text("months");
+        var lbl = $("<label>")
+        lbl.addClass("esper-recur-modal-label");
+        lbl.text("Repeat by:");
+        repeatOn.append(lbl)
+                .append(monthOrWeekChoice(recur));
+      } else if (rep === "Yearly") {
+        everyText.text("years");
+      }
+    }
+    repeats.change(function() {
+      var rep = $(this).val();
+      setRepeats(rep);
+      updateState();
+    });
+    repeats.val(recur.freq);
+    setRepeats(recur.freq);
 
-        var ev = response.event_opt;
-        if (ev && ev.recurrence) {
-          Log.d("Event", ev);
-          Log.d("Recurrence", JSON.stringify(ev.recurrence));
-          var recur = ev.recurrence.rrule[0];
+    if (recur.interval) repeatEvery.val(recur.interval);
+    repeatEvery.change(updateState);
 
-          repeats.change(function() {
-            var rep = $(this).val();
-            repeatOn.children().remove();
-            if (rep === "Daily") {
-              everyText.text("days");
-            } else if (rep === "Weekly") {
-              everyText.text("weeks");
-              var lbl = $("<label>")
-              lbl.addClass("esper-recur-modal-label");
-              lbl.text("Repeat on:");
-              repeatOn.append(lbl)
-                      .append(daysOfWeek(recur));
-            } else if (rep === "Monthly") {
-              everyText.text("months");
-              var lbl = $("<label>")
-              lbl.addClass("esper-recur-modal-label");
-              lbl.text("Repeat by:");
-              repeatOn.append(lbl)
-                      .append(monthOrWeekChoice(recur));
-            } else if (rep === "Yearly") {
-              everyText.text("years");
-            }
-          });
-          repeats.val(recur.freq);
-          repeats.trigger("change");
+    if (startEvent) {
+      var fullDate = startEvent.start.local;
+      var startLocalDate = fullDate.split("T")[0];
+      startsOn.val(startLocalDate);
+      startsOn.data("fullDate", fullDate);
+      startsOn.change(updateState);
+    } else {
+      var fullDate = eventObj.start.toISOString();
+      var startLocalDate = fullDate.split("T")[0];
+      startsOn.val(startLocalDate);
+      startsOn.data("fullDate", fullDate);
+      startsOn.prop("disabled", true);
+    }
 
-          if (recur.interval) repeatEvery.val(recur.interval);
+    if (recur.count) {
+      endsNever.prop("checked", false);
+      endsAfter.prop("checked", true);
+      endsOn.prop("checked", false);
+      occurrences.val(recur.count);
+      occurrences.change(updateState);
+    } else if (recur.until) {
+      endsNever.prop("checked", false);
+      endsAfter.prop("checked", false);
+      endsOn.prop("checked", true);
+      endDate.val(recur.until.split("T")[0]);
+      endDate.change(updateState);
+    }
 
-          var start = ev.start;
-          var startLocal = start.local.split("T")[0];
-          startsOn.val(startLocal);
+    endsNever.click(function () {
+      endDate.val("");
+      occurrences.val("");
+      updateState();
+    });
 
-          if (recur.count) {
-            endsNever.prop("checked", false);
-            endsAfter.prop("checked", true);
-            endsOn.prop("checked", false);
-            occurrences.val(recur.count);
-          } else if (recur.until) {
-            endsNever.prop("checked", false);
-            endsAfter.prop("checked", false);
-            endsOn.prop("checked", true);
-            endDate.val(recur.until.split("T")[0]);
+    endsAfter.click(function() {
+      endDate.val("");
+      if (occurrences.val().length === 0) occurrences.val("5");
+      updateState();
+    });
+    occurrences.change(updateState);
+
+    endsOn.click(function() {
+      occurrences.val("");
+      if (endDate.val().length === 0) {
+        var endsOn = moment(startLocalDate).add("days", 5).toISOString();
+        endDate.val(endsOn.split("T")[0]);
+      }
+      updateState();
+    });
+    endDate.change(updateState);
+
+    summary.text(summarize(recur));
+
+    function cancel() {
+      currentRule.set(defaultRecur());
+      view.remove();
+    }
+    function save() {
+      var rule = currentRule.get();
+      if (!startEvent) {
+        eventObj.recurrence = { rrule: [rule], exdate: [], rdate: [] };
+      } else {
+        // TODO Save changes to edited event...
+      }
+      currentRule.set(defaultRecur());
+      view.remove();
+      Log.d("eventObj is now", eventObj);
+    }
+
+    return view;
+  }
+
+  export function load(team : ApiT.Team,
+                       eventObj : CalPicker.TZEventObj,
+                       calEvent ?: ApiT.CalendarEvent) : void {
+    Log.d("eventObj", eventObj);
+    if (!calEvent) {
+      // Creating a recurrence rule for a new event (not on the calendar yet)
+      var modal = editRecurrenceModal(team, eventObj);
+      $("body").append(modal);
+    } else if (calEvent.recurring_event_id) {
+      // Editing the recurrence rule for an already recurring event
+      // TODO Support in event edit, not CalPicker
+      Api.getEventDetails(team.teamid, calEvent.google_cal_id,
+                          team.team_calendars, calEvent.recurring_event_id)
+        .done(function(response) {
+          var ev = response.event_opt;
+          if (ev && ev.recurrence) {
+            Log.d("Event", ev);
+            Log.d("Recurrence", JSON.stringify(ev.recurrence));
+            // TODO Support exceptions, warn about multiple rules, etc.
+            var recur = ev.recurrence.rrule[0];
+            currentRule.set(recur);
+            var modal = editRecurrenceModal(team, eventObj, ev);
+            $("body").append(modal);
+          } else {
+            alert("Failed to load main recurring event. " +
+                  "Please report this error!");
           }
-
-          endsOn.click(function() {
-            occurrences.val("");
-            if (endDate.val().length === 0) {
-              var endsOn = moment(startLocal).add("days", 5).toISOString();
-              endDate.val(endsOn.split("T")[0]);
-            }
-          });
-
-          summary.text(summarize(recur));
-        }
-
-        $("body").append(view);
-      });
+        });
+    } else {
+      // Editing the recurrence rule for a non-recurring existing event
+      // TODO Support in event edit, not CalPicker
+      var modal = editRecurrenceModal(team, eventObj);
+      $("body").append(modal);
+    }
   }
 
 }

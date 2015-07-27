@@ -217,9 +217,10 @@ module Esper.EventControls {
             utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
           };
 
-          var location = {
+          var location : ApiT.Location = {
             title: "",
-            address: pubLocation.val()
+            address: pubLocation.val(),
+            timezone: timezone
           };
           if (!location.address) location = null;
 
@@ -242,7 +243,9 @@ module Esper.EventControls {
             description_messageids: descriptionMessageids,
             location: location,
             all_day: event.all_day,
-            guests: guests
+            guests: guests,
+            recurrence: event.recurrence,
+            recurring_event_id: event.recurring_event_id
           }
 
           var alias = fromSelect.val();
