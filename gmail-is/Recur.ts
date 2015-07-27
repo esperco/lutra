@@ -490,6 +490,10 @@ module Esper.Recur {
     Log.d("eventObj", eventObj);
     if (!calEvent) {
       // Creating a recurrence rule for a new event (not on the calendar yet)
+      var recur = eventObj.recurrence;
+      if (recur && recur.rrule.length > 0) {
+        currentRule.set(recur.rrule[0]);
+      }
       var modal = editRecurrenceModal(team, eventObj);
       $("body").append(modal);
     } else if (calEvent.recurring_event_id) {
