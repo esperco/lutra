@@ -223,9 +223,9 @@ module Esper.Recur {
     if ($("input.esper-recur-after").is(":checked")) {
       recur.count = Number($("input.esper-recur-count").val());
     } else if ($("input.esper-recur-on").is(":checked")) {
-      var fullDate = $("input.esper-recur-start").data("fullDate");
-      var time = fullDate.split("T")[1];
-      recur.until = $("input.esper-recur-until").val() + "T" + time;
+      var untilDate = $("input.esper-recur-until").val();
+      var startUTCTime = $("input.esper-recur-start").data("utcTime");
+      recur.until = untilDate + "T" + startUTCTime;
     }
 
     if (freq === "Weekly") {
@@ -412,17 +412,19 @@ module Esper.Recur {
     if (recur.interval) repeatEvery.val(recur.interval);
     repeatEvery.change(updateState);
 
+    var localDateTime;
     if (startEvent) {
-      var fullDate = startEvent.start.local;
-      var startLocalDate = fullDate.split("T")[0];
-      startsOn.val(startLocalDate);
-      startsOn.data("fullDate", fullDate);
+      localDateTime = startEvent.start.local;
+      startsOn.val(localDateTime.split("T")[0]);
+      var utcDateTime = startEvent.start.utc;
+      startsOn.data("utcTime", utcDateTime.split("T")[1]);
+      // TODO Handle changes, make sure utcTime is updated...
       startsOn.change(updateState);
     } else {
-      var fullDate = eventObj.start.toISOString();
-      var startLocalDate = fullDate.split("T")[0];
-      startsOn.val(startLocalDate);
-      startsOn.data("fullDate", fullDate);
+      localDateTime = eventObj.start.toISOString();
+      startsOn.val(localDateTime.split("T")[0]);
+      var utcDateTime = moment(eventObj.start).utc().toISOString();
+      startsOn.data("utcTime", utcDateTime.split("T")[1]);
       startsOn.prop("disabled", true);
     }
 
@@ -456,7 +458,7 @@ module Esper.Recur {
     endsOn.click(function() {
       occurrences.val("");
       if (endDate.val().length === 0) {
-        var endsOn = moment(startLocalDate).add("days", 5).toISOString();
+        var endsOn = moment(localDateTime).add("days", 5).toISOString();
         endDate.val(endsOn.split("T")[0]);
       }
       updateState();
