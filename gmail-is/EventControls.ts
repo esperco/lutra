@@ -98,11 +98,11 @@ module Esper.EventControls {
             recurNote.text("Note: This is a master recurring event! " +
                            "Changes will apply to ALL instances.");
             recurNote.show();
-          } else if (event.recurring_event_id) {
-            recurNote.text("Note: This is an instance of a recurrence. " +
-                           "Changes will only affect this event.");
-            recurNote.show();
           }
+        } else if (event.recurring_event_id) {
+          recurNote.text("Note: This is an instance of a recurrence. " +
+                         "Changes will only affect this event.");
+          recurNote.show();
         }
 
         var newTitle = event.title || "Untitled event";
