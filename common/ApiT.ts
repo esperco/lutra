@@ -122,6 +122,8 @@ module Esper.ApiT {
     all_day?: boolean;
     guests: Guest[];
     transparent?: boolean;
+    recurrence?: Recurrence;
+    recurring_event_id?: string;
   }
 
   export interface CalendarEventOpt {
@@ -529,4 +531,36 @@ module Esper.ApiT {
     step_id? : string;
     checklist : CheckItem[];
   }
+
+  export interface Recurrence {
+    rrule : Recur[];
+    exdate : string[];
+    rdate : string[];
+  }
+
+  export type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
+  export type Weekday = string; // Sunday, Monday, ..., Saturday
+
+  export interface OrdWkDay {
+    ord ?: number;
+    day : Weekday;
+  }
+
+  export interface Recur {
+    freq : Freq;
+    until ?: string; // local time
+    count ?: number;
+    interval ?: number;
+    bysecond : number[];
+    byminute : number[];
+    byhour : number[];
+    byday : OrdWkDay[];
+    bymonthday : number[];
+    byyearday : number[];
+    byweekno : number[];
+    bymonth : number[];
+    bysetpos : number[];
+    wkst ?: Weekday;
+  }
+
 }

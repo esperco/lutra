@@ -77,6 +77,7 @@ APP_SOURCES = \
   Thread \
   CalCache \
   LocSearch \
+  Recur \
   CalPicker \
   CalSearch \
   ObserveMessage \

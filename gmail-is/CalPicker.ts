@@ -28,8 +28,9 @@ module Esper.CalPicker {
   // ditto
   var meetingType = "other";
 
-  interface TZEventObj extends FullCalendar.EventObject {
+  export interface TZEventObj extends FullCalendar.EventObject {
     tz : string; // value of showTimezone when this event was drawn
+    recurrence : ApiT.Recurrence;
   }
 
   interface PickerView {
@@ -349,7 +350,8 @@ module Esper.CalPicker {
       end: endMoment,
       color: "#A25CC6",
       editable: true,
-      tz: showTimezone
+      tz: showTimezone,
+      recurrence: null
     };
     picker.events[eventId] = eventData;
     var stick = false;
@@ -493,7 +495,39 @@ module Esper.CalPicker {
     }
 
     function eventClick(calEvent, jsEvent, view) {
-      removeEvent(picker, calEvent.id);
+'''
+<div class="esper-event-click-menu" #view>
+  <ul class="esper-ul" #menu/>
+</div>
+'''
+      $(".esper-event-click-menu").remove();
+      menu.css({
+        "background-color": "white",
+        border: "2px solid black",
+        position: "absolute",
+        left: jsEvent.pageX,
+        top: jsEvent.pageY,
+        "z-index": 6
+      });
+      if (!calEvent.orig) {
+        $("<li class='esper-li'>Repeat...</li>")
+          .click(function() {
+            var ev = picker.events[calEvent.id];
+            Recur.load(team, ev);
+            view.remove();
+          })
+          .appendTo(menu);
+        $("<li class='esper-li'>Remove event</li>")
+          .click(function() {
+            removeEvent(picker, calEvent.id);
+            view.remove();
+          })
+          .appendTo(menu);
+        $("<li class='esper-li'>Close menu</li>")
+          .click(function() { view.remove(); })
+          .appendTo(menu);
+        view.appendTo($("body"));
+      }
     }
 
     function updateEvent(calEvent) {
@@ -661,7 +695,7 @@ module Esper.CalPicker {
     return { utc: utcTime, local: localTime };
   }
 
-  function makeEventEdit(ev : FullCalendar.EventObject, eventTitle,
+  function makeEventEdit(ev : TZEventObj, eventTitle,
                          eventLocation, prefs: ApiT.Preferences)
     : ApiT.CalendarEventEdit
   {
@@ -671,8 +705,9 @@ module Esper.CalPicker {
       start: calendarTimeOfMoment(ev.start),
       end: calendarTimeOfMoment(ev.end),
       title: title,
-      location: { title: "", address: eventLocation.val() },
-      guests: []
+      location: { title: "", address: eventLocation.val(), timezone: showTimezone },
+      guests: [],
+      recurrence: ev.recurrence
     };
     var gen = prefs.general;
     if (gen && gen.hold_event_color && /^HOLD: /.test(title)) {

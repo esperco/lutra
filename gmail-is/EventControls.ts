@@ -12,6 +12,7 @@ module Esper.EventControls {
     Edit Event Details
   </div>
   <div class="esper-modal-content">
+    <div #recurNote style="display: none"/>
     <div #titleRow class="esper-ev-modal-row esper-clearfix">
       <div class="esper-ev-modal-left esper-bold">Title</div>
         <div class="esper-ev-modal-right">
@@ -91,6 +92,18 @@ module Esper.EventControls {
         var threadId = CurrentThread.threadId.get();
 
         Sidebar.customizeSelectArrow(fromSelect);
+
+        if (event.recurrence) {
+          if (event.recurrence.rrule.length > 0) {
+            recurNote.text("Note: This is a master recurring event! " +
+                           "Changes will apply to ALL instances.");
+            recurNote.show();
+          } else if (event.recurring_event_id) {
+            recurNote.text("Note: This is an instance of a recurrence. " +
+                           "Changes will only affect this event.");
+            recurNote.show();
+          }
+        }
 
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
@@ -217,9 +230,10 @@ module Esper.EventControls {
             utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
           };
 
-          var location = {
+          var location : ApiT.Location = {
             title: "",
-            address: pubLocation.val()
+            address: pubLocation.val(),
+            timezone: timezone
           };
           if (!location.address) location = null;
 
@@ -242,7 +256,9 @@ module Esper.EventControls {
             description_messageids: descriptionMessageids,
             location: location,
             all_day: event.all_day,
-            guests: guests
+            guests: guests,
+            recurrence: event.recurrence,
+            recurring_event_id: event.recurring_event_id
           }
 
           var alias = fromSelect.val();
