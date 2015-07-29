@@ -35,6 +35,14 @@ module Route {
     Signin.signin(whenDone, optArgs, optInviteCode, optEmail, optName);
   }
 
+  function gotToken(token) {
+    if (isIOS()) {
+      openIOSapp(token, undefined, undefined);
+    } else {
+      withLogin(Page.settings.load, undefined, token, undefined);
+    }
+  }
+
   var Router = window["can"].Control({ // FIXME
     init : function(el, options) {
     },
@@ -46,11 +54,7 @@ module Route {
 
     /* Generic invitation */
     "t/:token route" : function(data) {
-      if (isIOS()) {
-        openIOSapp(data.token, undefined, undefined);
-      } else {
-        withLogin(Page.settings.load, undefined, data.token, undefined);
-      }
+      gotToken(data.token);
     },
 
     /* Gift code (same as generic invitation but collect also
@@ -106,6 +110,7 @@ module Route {
       withLogin(Page.payment.load, data.teamid);
     },
 
+    // superseded by "signup2/..." below
     "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
       var signup = {
         first_name: data.fn,
@@ -118,6 +123,26 @@ module Route {
           Api.createOwnTeam().done(function(response) {
             window.location.assign(response.url);
           });
+        });
+      }
+    },
+
+    "signup2/:fn/:ln/:phone/:email/:platform/:token route" : function (data) {
+      var signup = {
+        first_name: data.fn,
+        last_name: data.ln,
+        phone: data.phone,
+        platform: data.platform
+      };
+      if (data.platform === "Google Apps") {
+        Api.signup(data.email, signup).done(function() {
+          if (data.token.length > 0) {
+            gotToken(data.token);
+          } else {
+            Api.createOwnTeam().done(function(response) {
+              window.location.assign(response.url);
+            });
+          }
         });
       }
     },

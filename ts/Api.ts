@@ -173,6 +173,13 @@ module Api {
       .then(function(_ignored) {});
   }
 
+  export function refer(): JQueryDeferred<ApiT.UrlResult> {
+    var fromUid = Login.me();
+    var refer = { from_uid: fromUid };
+    return jsonHttpPost("/api/invite/" + string(fromUid) + "/refer",
+                        JSON.stringify(refer));
+  }
+
   export function createOwnTeam()
     : JQueryDeferred<ApiT.UrlResult>
   {
