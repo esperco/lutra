@@ -1,5 +1,102 @@
 /** Contains the UI code for the widget for editing an event */
 module Esper.EventControls {
+  function changeRecurringEventModal(team: ApiT.Team,
+                                     alias: string,
+                                     event: ApiT.CalendarEvent,
+                                     edit: ApiT.CalendarEventEdit,
+                                     finish: () => void) : void {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-recur-modal">
+    <div class="esper-modal-header">Edit recurring event</div>
+    <div class="esper-modal-content" #content>
+      <div style="margin-bottom: 10px">
+        Would you like to change only this event,
+        or all events in the series?
+      </div>
+      <table>
+        <tr>
+          <td style="width: 30%; padding: 10px 0">
+            <button #onlyThisEvent
+                    class="esper-btn esper-btn-primary modal-primary"
+                    style="width: 90%">
+              Only this event
+            </button>
+          </td>
+          <td>
+            All other events in the series will remain the same.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button #allEvents
+                    class="esper-btn esper-btn-primary modal-primary"
+                    style="width: 90%">
+              All events
+            </button>
+          </td>
+          <td>
+            All events in the series will be changed.
+            <br/>
+            <small>Any changes made to other events will be
+            <span #keptOrLost>kept</span>.</small>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel this change
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    cancelButton.click(function() { view.remove(); });
+
+    Log.d("event", event);
+    Log.d("edit", edit);
+    var timeChanged = false;
+    if (edit.start.local.replace(/Z$/, "") !== event.start.local ||
+        edit.end.local.replace(/Z$/, "") !== event.end.local) {
+      timeChanged = true;
+      keptOrLost.replaceWith("<b>lost</b>");
+    }
+
+    onlyThisEvent.click(function() {
+
+    });
+
+    allEvents.click(function() {
+      if (event.recurrence && event.recurrence.rrule.length > 0) {
+        // This is the master event
+        Api.updateGoogleEvent(team.teamid, alias,
+                              event.google_event_id, edit)
+          .done(function() { view.remove(); finish(); });
+      } else {
+        Api.getEventDetails(team.teamid, event.google_cal_id,
+                            team.team_calendars, event.recurring_event_id)
+          .done(function(response) {
+            var ev = response.event_opt;
+            if (ev && ev.recurrence) {
+              edit.start = ev.start;
+              edit.end = ev.end;
+              edit.recurrence = ev.recurrence;
+              edit.recurring_event_id = null;
+              Api.updateGoogleEvent(team.teamid, alias,
+                                    ev.google_event_id, edit)
+                .done(function() { view.remove(); finish(); });
+            } else {
+              alert("Failed to load main recurring event. " +
+                    "Please report this error!");
+            }
+          });
+      }
+    });
+
+    $("body").append(view);
+  }
+
   /** Returns a widget for editing an event. If there is no current
    *  team, the widget will be blank and say "no team detected".
    */
@@ -263,12 +360,17 @@ module Esper.EventControls {
 
           var alias = fromSelect.val();
 
-          Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-            .done(function() {
-              var taskTab = TaskTab.currentTaskTab;
-              TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-              close();
-            });
+          function finish() {
+            var taskTab = TaskTab.currentTaskTab;
+            TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+            close();
+          }
+          if (event.recurrence || event.recurring_event_id) {
+            changeRecurringEventModal(team, alias, event, e, finish);
+          } else {
+            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+              .done(finish);
+          }
         });
 
         return container;

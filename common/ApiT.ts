@@ -142,6 +142,8 @@ module Esper.ApiT {
     all_day?: boolean;
     guests: Guest[];
     color_id?: string;
+    recurrence?: Recurrence;
+    recurring_event_id?: string;
   }
 
   export interface SyncedThread {
