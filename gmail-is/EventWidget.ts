@@ -53,7 +53,8 @@ module Esper.EventWidget {
     Api.eventRange(team.teamid, team.team_calendars, start, end)
       .done(function(results) {
         var events = List.filter(results.events, function(ev) {
-          return ev.google_event_id !== event.google_event_id;
+          return (ev.google_event_id !== event.google_event_id &&
+                  ev.recurring_event_id !== event.google_event_id);
         });
 
         if (FinalizeEvent.justHolds(linkedEvents).length > 0) {
