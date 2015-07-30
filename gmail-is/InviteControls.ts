@@ -325,7 +325,8 @@ module Esper.InviteControls {
                to be displayed in the Google Calendar location box... but in
                the future we may use it for typeahead or something. */
             title   : "",
-            address : pubLocation.val()
+            address : pubLocation.val(),
+            timezone : preferences.general.current_timezone
           };
           if (!location.address) location = null;
 
@@ -338,7 +339,9 @@ module Esper.InviteControls {
             description   : pubNotes.val(),
             location      : location,
             all_day       : event.all_day,
-            guests        : guests
+            guests        : guests,
+            recurrence    : event.recurrence,
+            recurring_event_id : event.recurring_event_id
           };
           if (holdColor && /^HOLD: /.test(title)) {
             eventEdit.color_id = holdColor.key;
