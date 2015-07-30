@@ -42,6 +42,81 @@ We have an `Option` module provides an explicit option type. Values
 that can legitimately be undefined (`undefined` or `null`) should be
 encapsulated in an option type.
 
+No uninitialized variables:
+
+Unitialized variables (e.g. `var x : number;`) don't benefit from the
+type system and should be avoided. The option type should be used
+instead. Very occasionally it is impractical to avoid them and we have
+to resort to the following style:
+
+```javascript
+var name: string;
+
+switch(f(x)) { // must initialize `name`
+  "a":
+    ...
+    name = ...;
+    break;
+  "b":
+    ...
+    name = ...;
+    break;
+  "c":
+    name = ...;
+    break;
+  default:
+    /* error */
+}
+```
+
+A way to guarantee the initialization of `name` would be to
+use the `... ? ... : ...` syntax, but it makes the code less readable:
+
+```javascript
+var fx = f(x);
+var name: string =
+  fx === "a" ?
+    function() {
+      ...
+      return ...;
+    }()
+  :
+  fx === "b" ?
+    function() {
+      ...
+      return ...;
+    }()
+  :
+  fx === "c" ?
+    ...
+  :
+  /* error */
+;
+```
+
+As for data returned by libraries and JSON APIs which contain optional
+fields, we leave them as-is if they're used immediately but we wrap
+them into an option if they are passed around or assigned to
+variables:
+
+```javascript
+var data = someLibFunction(arg);
+
+var x = Option.wrap(data.x); // good
+var x = data.x; // bad!
+
+// good:
+if (data.x) {
+  let x = data.x;
+  ...
+}
+
+otherLibFunction(data.x); // good
+ourFunction(data.x); // bad!
+ourFunction(Option.wrap(data.x)); // good
+```
+
+
 General maintainability principles
 ----------------------------------
 
