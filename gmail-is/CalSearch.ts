@@ -44,7 +44,7 @@ module Esper.CalSearch {
 
     var resultView = <ResultView> _view;
     var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end.local);
+    var end = XDate.ofString(e.end ? e.end.local : e.start.local);
 
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());

@@ -111,7 +111,7 @@ module Esper.EventControls {
         var start = new Date(event.start.local);
         startDate.val(XDate.dateValue(start));
         startTime.val(XDate.timeOnly24Hours(start));
-        var end = new Date(event.end.local);
+        var end = event.end ? new Date(event.end.local) : start;
         endDate.val(XDate.dateValue(end));
         endTime.val(XDate.timeOnly24Hours(end));
 
