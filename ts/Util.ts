@@ -55,7 +55,7 @@ module Util {
     garbage after the number.
   */
   export function intOfString(s: string): number {
-    if (s.length === 0 || s === null)
+    if (typeof s === "undefined" || s === null || s.length === 0)
       return NaN;
     else {
       var x = +s;
@@ -143,6 +143,7 @@ module Util {
     Test.expect("intOfString '3.21'", intOfString, "3.21", NaN),
     Test.expect("intOfString '32!'", intOfString, "32!", NaN),
     Test.expect("intOfString ''", intOfString, "", NaN),
+    Test.expect("intOfString 0", intOfString, 0, 0),
     Test.expect("intOfString null", intOfString, null, NaN),
     Test.expect("intOfString undefined", intOfString, undefined, NaN),
   ];
