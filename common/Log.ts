@@ -122,12 +122,12 @@ Esper . xxxxxxxx
     }
   }
 
-  export function assert(x: boolean) {
+  export function assert(x: boolean, message: string = "Assertion failed.") {
     /* In Chrome, this prints the same message (in red with a stack trace)
        as console.assert but interrupts the flow instead of
        just printing a message. */
     if (x !== true) {
-      throw new Error("Assertion failed.");
+      throw new Error(message);
     }
   }
 }
