@@ -4,6 +4,7 @@ module Esper.EventControls {
                                      alias: string,
                                      event: ApiT.CalendarEvent,
                                      edit: ApiT.CalendarEventEdit,
+                                     timezone: string,
                                      finish: () => void) : void {
 '''
 <div #view class="esper-modal-bg">
@@ -79,8 +80,23 @@ module Esper.EventControls {
           .done(function(response) {
             var ev = response.event_opt;
             if (ev && ev.recurrence) {
-              edit.start = ev.start;
-              edit.end = ev.end;
+              Log.d("event started as", event);
+              Log.d("we edited it to", edit);
+              Log.d("applying that to recurring event", ev);
+              var startLocal =
+                XDate.shiftByDifference(event.start.local + "Z", edit.start.local,
+                                        ev.start.local + "Z");
+              var endLocal =
+                XDate.shiftByDifference(event.end.local + "Z", edit.end.local,
+                                        ev.end.local + "Z");
+              edit.start = {
+                utc: (<any> moment).tz(XDate.toString(startLocal).replace(/Z$/, ""), timezone).format(),
+                local: XDate.toString(startLocal)
+              };
+              edit.end = {
+                utc: (<any> moment).tz(XDate.toString(endLocal).replace(/Z$/, ""), timezone).format(),
+                local: XDate.toString(endLocal)
+              }
               edit.recurrence = ev.recurrence;
               edit.recurring_event_id = null;
               Api.updateGoogleEvent(team.teamid, alias,
@@ -366,7 +382,7 @@ module Esper.EventControls {
             close();
           }
           if (event.recurrence || event.recurring_event_id) {
-            changeRecurringEventModal(team, alias, event, e, finish);
+            changeRecurringEventModal(team, alias, event, e, timezone, finish);
           } else {
             Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
               .done(finish);
