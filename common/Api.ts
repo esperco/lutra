@@ -595,16 +595,20 @@ module Esper.Api {
   }
 
   // Smarter Scheduling:
+  // XXX: Disabled until we have time to fix group scheduling.
   export function getGroupEvent(taskid: string):
   JQueryDeferred<ApiT.GroupEvent> {
-    var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
-    return JsonHttp.get(url);
+    // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
+    // return JsonHttp.get(url); 
+    Log.assert(false, "Group scheduling is currently disabled.");
   }
 
+  // XXX: Disabled until we have time to fix group scheduling.
   export function putGroupEvent(taskid: string, groupEvent: ApiT.GroupEvent):
   JQueryDeferred<void> {
-    var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
-    return JsonHttp.put(url, JSON.stringify(groupEvent));
+    // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
+    // return JsonHttp.put(url, JSON.stringify(groupEvent));
+    Log.asasert(false, "Group scheduling is currently disabled.");
   }
 
   function taskPrefsUrl(taskid: string) {
