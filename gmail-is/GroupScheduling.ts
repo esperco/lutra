@@ -121,7 +121,9 @@ module Esper.GroupScheduling {
    *  thread.
    */
   function initialize(tpref) {
-    if (CurrentThread.threadId.isValid() && CurrentThread.task.isValid()) {
+    // XXX: Disabled until we have time to fix group scheduling.
+    // CurrentThread.threadId.isValid() && CurrentThread.task.isValid()
+    if (false) {
       var task = CurrentThread.task.get();
       var taskid = task.taskid;
 
@@ -156,7 +158,9 @@ module Esper.GroupScheduling {
       var throttled = false;
 
       function updateServer() {
-        if (!throttled) {
+        // XXX: Disabled until we have time to fix group scheduling.
+        // !throttled
+        if (false) {
           throttled = true;
           setTimeout(function () {
             throttled = false;
@@ -168,7 +172,7 @@ module Esper.GroupScheduling {
 
       initialized(tpref);
     } else {
-      setTimeout(function() { initialize(tpref); }, 300);
+      // setTimeout(function() { initialize(tpref); }, 300);
     }
   }
 

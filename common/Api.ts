@@ -601,6 +601,7 @@ module Esper.Api {
     // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     // return JsonHttp.get(url); 
     Log.assert(false, "Group scheduling is currently disabled.");
+    return null;
   }
 
   // XXX: Disabled until we have time to fix group scheduling.
@@ -608,7 +609,8 @@ module Esper.Api {
   JQueryDeferred<void> {
     // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     // return JsonHttp.put(url, JSON.stringify(groupEvent));
-    Log.asasert(false, "Group scheduling is currently disabled.");
+    Log.assert(false, "Group scheduling is currently disabled.");
+    return null;
   }
 
   function taskPrefsUrl(taskid: string) {
