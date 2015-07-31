@@ -27,6 +27,10 @@ module.exports = {
   // Distributable HTML, JS, etc.
   pubDir: "pub",
 
+  // Port for live reload server to use. 35729 is the default for most
+  // LiveReload browser extensions
+  liveReloadPort: 35729, 
+
   // Production mode? => this can be set to true within the gulpfile itself
   // by calling the "production" task
   production: false

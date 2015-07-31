@@ -9,6 +9,7 @@ var gulp = require("gulp"),
     cached = require("gulp-cached"),
     exec = require("gulp-exec"),
     gutil = require("gulp-util"),
+    livereload = require("livereload"),
     path = require("path"),
     spawn = require('child_process').spawn,
     temp = require("temp");
@@ -110,8 +111,20 @@ gulp.task("watch-ts", gulp.parallel("watch-oblivion", function(cb) {
   spawnTsc(true, cb);
 }));
 
+// Launch a live-reload server that watches the public directory and sends
+// a websocket notification if things change. Use in conjunction with a
+// LiveReload browser extension. Uses port 35729 by default.
+gulp.task("live-reload", function() {
+  var server = livereload.createServer({
+    port: config.liveReloadPort
+  });
+  server.watch(config.pubDir);
+  return server;
+});
+
 // Ensure initial build betfore watching to set up temp dir
-gulp.task("watch", gulp.series("build-ts", "watch-ts"));
+gulp.task("watch", gulp.series("build-ts", 
+  gulp.parallel("live-reload", "watch-ts")));
 
 gulp.task("build", gulp.series("build-ts"));
 
