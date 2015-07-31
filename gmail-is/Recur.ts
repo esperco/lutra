@@ -64,10 +64,10 @@ module Esper.Recur {
     }
   }
 
-  function summarizeDate(d : string) {
+  function summarizeDate(d : [string, string]) {
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    var m = moment(d);
+    var m = moment(d[1]);
     return months[m.month()] + " " + m.date() + ", " + m.year();
   }
 
@@ -225,7 +225,7 @@ module Esper.Recur {
     } else if ($("input.esper-recur-on").is(":checked")) {
       var untilDate = $("input.esper-recur-until").val();
       var startUTCTime = $("input.esper-recur-start").data("utcTime");
-      recur.until = untilDate + "T" + startUTCTime;
+      recur.until = ["Date_time", untilDate + "T" + startUTCTime];
     }
 
     if (freq === "Weekly") {
@@ -438,7 +438,7 @@ module Esper.Recur {
       endsNever.prop("checked", false);
       endsAfter.prop("checked", false);
       endsOn.prop("checked", true);
-      endDate.val(recur.until.split("T")[0]);
+      endDate.val(recur.until[1].split("T")[0]);
       endDate.change(updateState);
     }
 
