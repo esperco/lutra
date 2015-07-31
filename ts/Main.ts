@@ -1,15 +1,22 @@
 // Include all references prior to Main. If not referenced, TSC will not 
 // bundle into app.js
 
+
 /* Definition files */
 
 /// <reference path="../setup/ts/jquery.d.ts"/>
 /// <reference path="../setup/ts/jqueryui.d.ts"/>
 /// <reference path="../setup/ts/fullCalendar.d.ts"/>
 
-/* Actual modules */
+
+/* Conf.ts is created from DevConf.ts or ProdConf.ts during the corresponding
+   development or producation build process */
 
 /// <reference path="Conf.ts"/>
+
+
+/* Main modules */
+
 /// <reference path="Test.ts"/>
 /// <reference path="List.ts"/>
 /// <reference path="Watchable.ts"/>
@@ -49,6 +56,7 @@
 /// <reference path="UsagePeriod.ts"/>
 /// <reference path="Page.ts"/>
 /// <reference path="Route.ts"/>
+
 
 module Main {
 
