@@ -7,7 +7,28 @@
  */
 module Esper.Slides {
   export function create<T>(startState : T, slides) {
-    
+    var previous = [];
+    var position = 0;
+
+    var animation = {
+      time : 500,
+      width : Gmail.threadContainer().width() + 100
+    }
+
+    function slideForward(previous, next) {
+      previous.parent().css({
+        "overflow" : "hidden"
+      });
+      previous.animate({left : -animation.width}, animation.time);
+
+      next.css({
+        "left"       : animation.width,
+        "margin-top" : (-previous.height()) + "px"
+      });
+
+      previous.after(next);
+      next.animate({left : 0}, animation.time);
+    }
 
     return {
       
