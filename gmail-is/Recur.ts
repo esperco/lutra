@@ -64,7 +64,7 @@ module Esper.Recur {
     }
   }
 
-  function summarizeDate(d : [string, string]) {
+  function summarizeDate(d : [ApiT.DTConstr, string]) {
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var m = moment(d[1]);
