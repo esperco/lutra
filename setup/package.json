@@ -4,7 +4,9 @@
   "description": "\"Esper web assistant (app.esper.com)\"",
   "scripts": {
     "gulp": "gulp",
-    "watch": "gulp watch-ts",
+    "build": "gulp build",
+    "build-production": "gulp build-production",
+    "watch": "gulp watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,10 +20,8 @@
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "gulp-cached": "^1.1.0",
-    "gulp-concat": "^2.6.0",
     "gulp-exec": "^2.1.1",
-    "gulp-remember": "^0.3.0",
-    "gulp-sourcemaps": "^1.5.2",
-    "gulp-typescript": "^2.8.0"
+    "gulp-util": "^3.0.6",
+    "temp": "^0.8.3"
   }
 }
