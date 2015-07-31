@@ -14,8 +14,9 @@ var gulp = require("gulp"),
     ts = require("gulp-typescript");
 
 // Set production mode - use a module-wide variable to determine 
-gulp.task("production", function() {
+gulp.task("production", function(done) {
   config.production = true;
+  done();
 });
 
 // A gulp-typescript project needs to exist in scope outside task to permit
@@ -34,17 +35,22 @@ var tsProject = ts.createProject({
 
 // Compile Typescript
 gulp.task("build-ts", function() {
-  return gulp.src(config.tsGlobs)
+  var ret = gulp.src(config.tsGlobs)
     .pipe(cached('build-ts')) // Only pass through changed files
 
     // Run our TS files through Oblivion pre-processor first.
     .pipe(exec(config.oblivionPath + " -ts <%= file.path %>", {
       continueOnError: false,
       pipeStdout: true
-    }))
+    }));
 
+  // Production => sourcemaps
+  if (! config.production) {
     // Init sourcemap tracking (Oblivion doesn't support / need sourcemaps)
-    .pipe(sourcemaps.init())
+    ret = ret.pipe(sourcemaps.init());
+  }
+
+  ret = ret
 
     // We need to undo caching in order for Typescript compilation to check
     // references (unfortunately)
@@ -54,16 +60,20 @@ gulp.task("build-ts", function() {
     .pipe(ts(tsProject)).js
 
     // Bundle into a single file
-    .pipe(concat(config.tsBundleName))
+    .pipe(concat(config.tsBundleName));
 
+  if (! config.production) {
     // Use `soucemaps.write("./")` to write an external sourceMap, currently
     // omitting a path argument because external sourceMaps are incorrect
     // for some reason. Just make sure that this isn't run in production.
-    .pipe(sourcemaps.write())
-
-    // Write bundle to pubDir
-    .pipe(gulp.dest(config.pubDir));
+    ret = ret.pipe(sourcemaps.write());
+  }
+    
+  // Write bundle to pubDir
+  return ret.pipe(gulp.dest(config.pubDir));
 });
+
+gulp.task("build-ts-production", gulp.series("production", "build-ts"));
 
 gulp.task("watch-ts", function() {
   return gulp.watch(config.tsGlobs, gulp.series("build-ts"));
