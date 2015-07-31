@@ -92,7 +92,11 @@ module Esper.ComposeControls {
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
-              return new Date(e.task_event.end.local) > new Date(Date.now());
+              if (e.task_event.end) {
+                return new Date(e.task_event.end.local) > new Date(Date.now());
+              } else {
+                return new Date(e.task_event.start.local) > new Date(Date.now());
+              }
             });
 
             var entry = events.reduce(function (str, event) {
@@ -181,7 +185,11 @@ module Esper.ComposeControls {
 
             var events = CurrentThread.linkedEvents.get();
             events.filter(function (e) {
-              return new Date(e.task_event.end.local) > new Date(Date.now());
+              if (e.task_event.end) {
+                return new Date(e.task_event.end.local) > new Date(Date.now());
+              } else {
+                return new Date(e.task_event.start.local) > new Date(Date.now());
+              }
             });
 
             var entry = events.reduce(function (str, event): string {

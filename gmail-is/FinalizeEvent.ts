@@ -153,7 +153,10 @@ module Esper.FinalizeEvent {
         var eventTimezone = CurrentThread.eventTimezone(event);
 
         var start    = new Date(event.start.local);
-        var end      = new Date(event.end.local);
+        var end =
+          event.end ?
+          new Date(event.end.local) :
+          new Date(event.start.local);
         var range    = XDate.range(start, end);
         var timezone = CalPicker.zoneAbbr(eventTimezone);
 

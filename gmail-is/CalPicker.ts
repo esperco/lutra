@@ -392,7 +392,7 @@ module Esper.CalPicker {
             start: Timezone.shiftTime(x.start.local,
                                       x.calendarTZ,
                                       showTimezone), /* req */
-            end: Timezone.shiftTime(x.end.local,
+            end: Timezone.shiftTime(x.end ? x.end.local : x.start.local,
                                     x.calendarTZ,
                                     showTimezone), /* req */
             orig: x /* custom field */
@@ -458,7 +458,7 @@ module Esper.CalPicker {
         var ev = picker.events[k];
         removeEvent(picker, ev.google_event_id);
         var startTime = ev.start.toISOString();
-        var endTime = ev.end.toISOString();
+        var endTime = ev.end ? ev.end.toISOString() : ev.start.toISOString();
         ev.start = moment.utc(
           Timezone.shiftTime(startTime, ev.tz, showTimezone)
         );
@@ -549,7 +549,8 @@ module Esper.CalPicker {
         var guestStart =
           Timezone.shiftTime(start.format(), showTimezone, guestTimezone);
         var guestEnd =
-          Timezone.shiftTime(end.format(), showTimezone, guestTimezone);
+          Timezone.shiftTime(end ? end.format() : start.format(),
+                             showTimezone, guestTimezone);
         guestTime =
           " (" + moment(guestStart).format("h:mm") + " - " +
           moment(guestEnd).format("h:mm a") + " " + guestZoneAbbr + ")";
@@ -814,7 +815,9 @@ module Esper.CalPicker {
       Promise.join(
         List.map(events, function(event) {
           var start = Math.floor(moment(event.start.utc).unix());
-          var end = Math.floor(moment(event.end.utc).unix());
+          var end = Math.floor(
+            moment(event.end ? event.end.utc : event.start.utc).unix()
+          );
           return Api.eventRange(team.teamid, team.team_calendars, start, end);
         })
       ).done(function(all_results) {
