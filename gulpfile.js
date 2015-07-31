@@ -121,12 +121,7 @@ var spawnTsc = function(watch, cb) {
   return ps;
 };
 
-gulp.task("build-ts", gulp.series(
-  "build-oblivion", 
-  "build-conf", 
-  function(cb) {
-    spawnTsc(cb);
-}));
+gulp.task("build-ts", gulp.series("build-oblivion", "build-conf", spawnTsc));
 
 // Watcher to call build oblivion (and rebuild if src changes)
 gulp.task("watch-oblivion", function() {
