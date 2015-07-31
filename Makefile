@@ -28,6 +28,7 @@ prod-build:
 
 # Fetch libraries
 setup:
+	npm install
 	$(MAKE) -C setup
 
 # Remove derived files

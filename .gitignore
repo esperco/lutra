@@ -3,3 +3,4 @@ log
 *.log
 pub
 .DS_Store
+node_modules
