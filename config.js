@@ -19,7 +19,7 @@ module.exports = {
 
   // A TS file that references all other TS files -- use this file to control
   // the order in which files are concatenated or referenced
-  tsEntryPoint: "ts/Aardvark.ts",
+  tsEntryPoint: "ts/Main.ts",
 
   // Bundle TS into this file in pubDir
   tsBundleName: "js/app.js",
