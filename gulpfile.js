@@ -7,12 +7,24 @@ var config = require("./config");
 // work with Gulp 3.x or below.
 var gulp = require("gulp"),
     cached = require("gulp-cached"),
+    childProcess = require('child_process'),
     exec = require("gulp-exec"),
     gutil = require("gulp-util"),
     livereload = require("livereload"),
     path = require("path"),
-    spawn = require('child_process').spawn,
     temp = require("temp");
+
+// Helper to just run a short-lived shell command
+var shell = function(cmd, cb) {
+  if (cmd instanceof Array) {
+    cmd = cmd.join(" ");
+  }
+  childProcess.exec(cmd, function (err, stdout, stderr) {
+    console.log(stdout);
+    console.error(stderr);
+    cb(err);
+  });
+};
 
 // Set production mode - use a module-wide variable to determine 
 gulp.task("production", function(done) {
@@ -47,6 +59,18 @@ gulp.task("build-oblivion", function() {
     .pipe(gulp.dest(getTempDir()));
 });
 
+// Uses appropriate conf file based on dev vs production
+gulp.task("build-conf", function(cb) {
+  var confSrc = config.production ? config.prodConf : config.devConf;
+  confSrc = path.relative(config.projectBase, confSrc);
+  confSrc = path.join(getTempDir(), confSrc);
+
+  var confDest = path.relative(config.projectBase, config.confDest);
+  confDest = path.join(getTempDir(), confDest);
+
+  shell(["cp", confSrc, confDest], cb);
+});
+
 // Spawn a TypeScript compiler process that processes the given TS entry
 // point file processed by Oblivion
 // * [watch] - If true, turns on watch mode
@@ -72,7 +96,7 @@ var spawnTsc = function(watch, cb) {
   tscArgs.push(entryPoint);
 
   // Spawn process
-  var ps = spawn(config.tscPath, tscArgs);
+  var ps = childProcess.spawn(config.tscPath, tscArgs);
 
   // Helper for handling end of process events
   var handleEnd = function(code) {
@@ -97,8 +121,11 @@ var spawnTsc = function(watch, cb) {
   return ps;
 };
 
-gulp.task("build-ts", gulp.series("build-oblivion", function(cb) {
-  spawnTsc(cb);
+gulp.task("build-ts", gulp.series(
+  "build-oblivion", 
+  "build-conf", 
+  function(cb) {
+    spawnTsc(cb);
 }));
 
 // Watcher to call build oblivion (and rebuild if src changes)

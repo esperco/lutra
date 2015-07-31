@@ -33,5 +33,10 @@ module.exports = {
 
   // Production mode? => this can be set to true within the gulpfile itself
   // by calling the "production" task
-  production: false
+  production: false,
+
+  // Used to determine which dev/prod file gets copied
+  confDest: "ts/Conf.ts",
+  devConf: "ts/DevConf.ts",
+  prodConf: "ts/ProdConf.ts"
 };
