@@ -31,7 +31,7 @@ npm install -g uglify-js
 Build instructions
 ------------------
 
-Clone next to `wolverine` (`wolvering` and `otter` must be in the same directory):
+Clone next to `wolverine` (`wolverine` and `otter` must be in the same directory):
 ```
 git clone git@github.com:esperco/otter.git
 ```
