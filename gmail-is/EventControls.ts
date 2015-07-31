@@ -98,11 +98,11 @@ module Esper.EventControls {
             recurNote.text("Note: This is a master recurring event! " +
                            "Changes will apply to ALL instances.");
             recurNote.show();
-          } else if (event.recurring_event_id) {
-            recurNote.text("Note: This is an instance of a recurrence. " +
-                           "Changes will only affect this event.");
-            recurNote.show();
           }
+        } else if (event.recurring_event_id) {
+          recurNote.text("Note: This is an instance of a recurrence. " +
+                         "Changes will only affect this event.");
+          recurNote.show();
         }
 
         var newTitle = event.title || "Untitled event";
@@ -111,7 +111,10 @@ module Esper.EventControls {
         var start = new Date(event.start.local);
         startDate.val(XDate.dateValue(start));
         startTime.val(XDate.timeOnly24Hours(start));
-        var end = new Date(event.end.local);
+        var end =
+          event.end ?
+          new Date(event.end.local) :
+          new Date(event.start.local);
         endDate.val(XDate.dateValue(end));
         endTime.val(XDate.timeOnly24Hours(end));
 
@@ -134,6 +137,22 @@ module Esper.EventControls {
             $("<option>" + email + "</option>").appendTo(fromSelect);
           });
         }
+
+        var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
+          fileInfos.forEach(function (fileInfo) {
+            // Not sure how to convince typescript that this is the
+            // fileInfo object from above.
+            var file = <any> fileInfo;
+
+            var link = "https://drive.google.com/file/d/" + file.id +
+              "/view?usp=sharing";
+            // Puts the links at the *top* of the description.
+            pubDescription.val(function (i, text) {
+              return "Attachment " + file.name + " <" + link + ">\n\n" + text;
+            });
+          });
+        });
+        descriptionRow.before(fileUpload);
 
         var taskPrefs;
         allPrefs.taskPrefs.match({

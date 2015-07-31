@@ -48,12 +48,15 @@ module Esper.EventWidget {
                         linkedEvents: ApiT.CalendarEvent[],
                         team: ApiT.Team) {
     var start = Math.floor(moment(event.start.utc).unix());
-    var end = Math.floor(moment(event.end.utc).unix());
+    var end = Math.floor(
+      moment(event.end ? event.end.utc : event.start.utc).unix()
+    );
 
     Api.eventRange(team.teamid, team.team_calendars, start, end)
       .done(function(results) {
         var events = List.filter(results.events, function(ev) {
-          return ev.google_event_id !== event.google_event_id;
+          return (ev.google_event_id !== event.google_event_id &&
+                  ev.recurring_event_id !== event.google_event_id);
         });
 
         if (FinalizeEvent.justHolds(linkedEvents).length > 0) {
@@ -282,7 +285,7 @@ module Esper.EventWidget {
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,
                                                   showTimezone));
-    var end = XDate.ofString(Timezone.shiftTime(e.end.local,
+    var end = XDate.ofString(Timezone.shiftTime(e.end ? e.end.local : e.start.local,
                                                 calTimezone,
                                                 showTimezone));
     weekday.text(XDate.fullWeekDay(start));
