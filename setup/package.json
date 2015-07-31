@@ -4,6 +4,7 @@
   "description": "\"Esper web assistant (app.esper.com)\"",
   "scripts": {
     "gulp": "gulp",
+    "watch": "gulp watch-ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,6 +16,12 @@
   },
   "homepage": "https://github.com/esperco/otter",
   "devDependencies": {
-    "gulp": "git://github.com/gulpjs/gulp.git#4.0"
+    "gulp": "git://github.com/gulpjs/gulp.git#4.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-exec": "^2.1.1",
+    "gulp-remember": "^0.3.0",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-typescript": "^2.8.0"
   }
 }
