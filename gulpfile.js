@@ -84,7 +84,7 @@ var spawnTsc = function(watch, cb) {
   // Put together args for Typescript
   var tscArgs = ["--out", path.join(config.pubDir, config.tsBundleName)];
   if (! config.production) {
-    tscArgs.push("--sourceMap");
+    tscArgs.push("--inlineSourceMap");
   }
   if (watch) {
     tscArgs.push("-w");
