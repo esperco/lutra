@@ -90,6 +90,10 @@ var spawnTsc = function(watch, cb) {
     tscArgs.push("-w");
   }
 
+  // No Implicit Any currently disabled because there are a lot of implicit
+  // any errors to fix
+  // tscArgs.push("--noImplicitAny");
+
   // Get entry point relative to temp directory
   var relPath = path.relative(config.projectBase, config.tsEntryPoint);
   var entryPoint = path.join(getTempDir(), relPath);
