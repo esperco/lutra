@@ -55,6 +55,7 @@ gulp.task("build-oblivion", function() {
       continueOnError: true,
       pipeStdout: true
     }))
+    .pipe(exec.reporter())
     .on("error", gutil.log)
     .pipe(gulp.dest(getTempDir()));
 });
