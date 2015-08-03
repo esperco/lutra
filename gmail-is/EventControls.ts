@@ -1,5 +1,6 @@
 /** Contains the UI code for the widget for editing an event */
 module Esper.EventControls {
+
   function changeRecurringEventModal(team: ApiT.Team,
                                      alias: string,
                                      event: ApiT.CalendarEvent,
@@ -55,8 +56,6 @@ module Esper.EventControls {
 '''
     cancelButton.click(function() { view.remove(); });
 
-    Log.d("event", event);
-    Log.d("edit", edit);
     var timeChanged = false;
     if (edit.start.local.replace(/Z$/, "") !== event.start.local ||
         edit.end.local.replace(/Z$/, "") !== event.end.local) {
@@ -65,43 +64,66 @@ module Esper.EventControls {
     }
 
     onlyThisEvent.click(function() {
-
+      allEvents.prop("disabled", true);
+      onlyThisEvent.prop("disabled", true);
+      if (event.recurrence && event.recurrence.rrule.length > 0) {
+        // This is the master event
+        var timestamp = moment(event.start.utc).utc().toISOString();
+        var nopunct = timestamp.slice(0, 19).replace(/[-:]/g, "");
+        var singleEventId = event.google_event_id + "_" + nopunct + "Z";
+        Api.updateGoogleEvent(team.teamid, alias,
+                              singleEventId, edit)
+          .done(afterUpdate);
+      } else {
+        Api.updateGoogleEvent(team.teamid, alias,
+                              event.google_event_id, edit)
+          .done(afterUpdate);
+      }
     });
 
+    function afterUpdate() {
+      view.remove();
+      finish();
+    }
+
     allEvents.click(function() {
+      allEvents.prop("disabled", true);
+      onlyThisEvent.prop("disabled", true);
       if (event.recurrence && event.recurrence.rrule.length > 0) {
         // This is the master event
         Api.updateGoogleEvent(team.teamid, alias,
                               event.google_event_id, edit)
-          .done(function() { view.remove(); finish(); });
+          .done(afterUpdate);
       } else {
         Api.getEventDetails(team.teamid, event.google_cal_id,
                             team.team_calendars, event.recurring_event_id)
           .done(function(response) {
-            var ev = response.event_opt;
-            if (ev && ev.recurrence) {
-              Log.d("event started as", event);
-              Log.d("we edited it to", edit);
-              Log.d("applying that to recurring event", ev);
+            var rev = response.event_opt;
+            if (rev && rev.recurrence) {
+              // Apply our edits to the master recurring event
               var startLocal =
-                XDate.shiftByDifference(event.start.local + "Z", edit.start.local,
-                                        ev.start.local + "Z");
+                XDate.shiftByDifference(event.start.local + "Z",
+                                        edit.start.local,
+                                        rev.start.local + "Z");
               var endLocal =
-                XDate.shiftByDifference(event.end.local + "Z", edit.end.local,
-                                        ev.end.local + "Z");
+                XDate.shiftByDifference(event.end.local + "Z",
+                                        edit.end.local,
+                                        rev.end.local + "Z");
+              var stNoZ = XDate.toString(startLocal).replace(/Z$/, "");
               edit.start = {
-                utc: (<any> moment).tz(XDate.toString(startLocal).replace(/Z$/, ""), timezone).format(),
+                utc: (<any> moment).tz(stNoZ, timezone).format(),
                 local: XDate.toString(startLocal)
               };
+              var enNoZ = XDate.toString(endLocal).replace(/Z$/, "");
               edit.end = {
-                utc: (<any> moment).tz(XDate.toString(endLocal).replace(/Z$/, ""), timezone).format(),
+                utc: (<any> moment).tz(enNoZ, timezone).format(),
                 local: XDate.toString(endLocal)
               }
-              edit.recurrence = ev.recurrence;
+              edit.recurrence = rev.recurrence;
               edit.recurring_event_id = null;
               Api.updateGoogleEvent(team.teamid, alias,
-                                    ev.google_event_id, edit)
-                .done(function() { view.remove(); finish(); });
+                                    rev.google_event_id, edit)
+                .done(afterUpdate);
             } else {
               alert("Failed to load main recurring event. " +
                     "Please report this error!");
@@ -125,7 +147,6 @@ module Esper.EventControls {
     Edit Event Details
   </div>
   <div class="esper-modal-content">
-    <div #recurNote style="display: none"/>
     <div #titleRow class="esper-ev-modal-row esper-clearfix">
       <div class="esper-ev-modal-left esper-bold">Title</div>
         <div class="esper-ev-modal-right">
@@ -205,18 +226,6 @@ module Esper.EventControls {
         var threadId = CurrentThread.threadId.get();
 
         Sidebar.customizeSelectArrow(fromSelect);
-
-        if (event.recurrence) {
-          if (event.recurrence.rrule.length > 0) {
-            recurNote.text("Note: This is a master recurring event! " +
-                           "Changes will apply to ALL instances.");
-            recurNote.show();
-          }
-        } else if (event.recurring_event_id) {
-          recurNote.text("Note: This is an instance of a recurrence. " +
-                         "Changes will only affect this event.");
-          recurNote.show();
-        }
 
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
