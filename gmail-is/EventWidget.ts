@@ -48,7 +48,9 @@ module Esper.EventWidget {
                         linkedEvents: ApiT.CalendarEvent[],
                         team: ApiT.Team) {
     var start = Math.floor(moment(event.start.utc).unix());
-    var end = Math.floor(moment(event.end.utc).unix());
+    var end = Math.floor(
+      moment(event.end ? event.end.utc : event.start.utc).unix()
+    );
 
     Log.d("event is", event);
     Api.eventRange(team.teamid, team.team_calendars, start, end)
@@ -284,7 +286,7 @@ module Esper.EventWidget {
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,
                                                   showTimezone));
-    var end = XDate.ofString(Timezone.shiftTime(e.end.local,
+    var end = XDate.ofString(Timezone.shiftTime(e.end ? e.end.local : e.start.local,
                                                 calTimezone,
                                                 showTimezone));
     weekday.text(XDate.fullWeekDay(start));

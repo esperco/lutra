@@ -87,6 +87,7 @@ APP_SOURCES = \
   CurrentThread \
   PrefTimezone \
   ActiveThreads \
+  FileUpload \
   FinalizeEvent \
   InviteControls \
   EventControls \
