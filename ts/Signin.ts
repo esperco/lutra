@@ -76,6 +76,15 @@ module Signin {
       });
   }
 
+  // Returns a jQuery Deferred that resolves to a string token to be used
+  // for signup purposes
+  function getSignupToken(): JQueryPromise<string> {
+    return Api.createOwnTeam()
+      .pipe(function(data: ApiT.UrlResult) {
+        return data.url.match(/#!t\/(.+)\/?$/)[1];
+      });
+  };
+
   function displayLoginLinks(msg, landingUrl, optInvite, optEmail, onboarding = false) {
 '''
 <div #view>
@@ -135,10 +144,27 @@ module Signin {
         rootView.removeClass("hide");
 
         button.click(function() {
-          Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
-            .done(function(x) {
-              requestGoogleAuth(x.url);
+          // Helper
+          let goToGoogle = function(): void {
+            Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
+              .done(function(x) {
+                requestGoogleAuth(x.url);
+              });
+          };
+
+          // We should always have an invite token before going to Google --
+          // if one is passed just use that.
+          if (optInvite) {
+            goToGoogle();
+          }
+
+          // Else ask server for one
+          else {
+            getSignupToken().then(function(token) {
+              optInvite = token;
+              goToGoogle();
             });
+          }
         });
 
         rootView.append(view);
