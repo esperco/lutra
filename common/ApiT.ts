@@ -546,9 +546,12 @@ module Esper.ApiT {
     day : Weekday;
   }
 
+  export type DTConstr = string // Date or Date_time
+  export type DateTime = [DTConstr, string]
+
   export interface Recur {
     freq : Freq;
-    until ?: string; // local time
+    until ?: DateTime; // local time
     count ?: number;
     interval ?: number;
     bysecond : number[];
