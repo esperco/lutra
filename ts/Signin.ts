@@ -80,7 +80,7 @@ module Signin {
   // for signup purposes
   function getSignupToken(): JQueryPromise<string> {
     return Api.createOwnTeam()
-      .pipe(function(data: ApiT.UrlResult) {
+      .then(function(data: ApiT.UrlResult) {
         return data.url.match(/#!t\/(.+)\/?$/)[1];
       });
   };
