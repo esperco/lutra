@@ -166,15 +166,16 @@ module Onboarding {
 <div #view>
   <h2>Congratulations!</h2>
   <div>
-    <p>You've signed up for your very own Esper Assistant.</p>
-    <p>
+    <p>You've signed up for your very own Esper Assistant.
       You can get started right away by contacting your assistant at 
-      <b><a #mailToLink></a></b>.
+      <b><a target="_blank" #mailToLink></a></b>.
     </p>
     <p>Click below to send the following email and set up a call:</p>
-    <p><a #mailMsgLink></a></p>
+    <p style="margin-top:40px; cursor:pointer;">
+      <a class="well" style="display:block" target="_blank" #mailMsgLink></a>
+    </p>
   </div>
-  <div align=right style="padding-top:40px">
+  <div align=right style="padding-top:20px; padding-bottom:40px;">
     <a href="faqs">
       <button class="button-primary">
         Learn more about Esper &nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
@@ -192,7 +193,7 @@ module Onboarding {
     asstName = asstName.charAt(0).toUpperCase() + asstName.slice(1);
     var teamName = team.team_name;
 
-    var emailText = `Hi ${asstName},` +
+    var emailText = `Hi ${asstName},\n\n` +
       `Great to meet you! I'm excited to have you as an assistant. ` +
       `I'd love to speak with you and learn more about what you can do for ` +
       `me. Can you help find a good time for a phone call that works for ` +
@@ -202,8 +203,10 @@ module Onboarding {
 
     mailToLink.text(asstEmail);
     mailToLink.attr("href", "mailto:" + asstEmail);
-    mailMsgLink.text(emailText);
-    mailMsgLink.attr("href", "mailto:" + asstEmail);
+    mailMsgLink.html(emailText.replace(/\n/g, "<br />"));
+    mailMsgLink.attr("href", "mailto:" + asstEmail +
+      "?subject=" + encodeURIComponent("Hello!") +
+      "&body=" + encodeURIComponent(emailText));
 
     let content = refs["content"];
     content.append(view);

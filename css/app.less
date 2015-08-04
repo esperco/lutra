@@ -1570,11 +1570,30 @@ a.header-title:hover { text-decoration: underline; }
 
 .onboarding {
   position: absolute;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   background: @purple_splash;
   color: white;
   padding-top: 39px;
+}
+
+.onboarding h2 {
+  font-weight: bold;
+}
+
+.onboarding a, .onboarding a:hover, .onboarding a:focus {
+  color: white;
+  font-weight: bold;
+}
+
+.onboarding a.well {
+  color: @purple;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.onboarding a.well:hover, .onboard a.well:focus {
+  color: @purple_hover;
 }
 
 @media (min-width: 620px) {
