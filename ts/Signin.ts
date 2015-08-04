@@ -85,23 +85,21 @@ module Signin {
       });
   };
 
-  function displayLoginLinks(msg, landingUrl, optInvite, optEmail, onboarding = false) {
+  function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
 <div #view>
   <div #signInContainer class="sign-in">
     <div #logo class="logo-container">
       <div #loginLogo id="sign-in-hero-mark" class="animated fadeInUp"/>
     </div>
-    <div #container >
-      <div #progress class="progress">
-        <div class="progress-bar progress-bar-info" role="progressbar" style="width:50%"/> 
-      </div>
-    <div #msgDiv class="sign-in-msg"/>
-    <button #button class="button-primary sign-in-btn">
-      <div #google class="google-g"/>
-      <div class="btn-divider"/>
-      <div class="sign-in-text">Sign in with Google</div>
-    </button>
+    <div #container>
+      <div #msgDiv class="sign-in-msg"/>
+      <button #button class="button-primary sign-in-btn">
+        <div #google class="google-g"/>
+        <div class="btn-divider"/>
+        <div class="sign-in-text">Sign in with Google</div>
+      </button>
+    </div>
   </div>
   <div #footer class="sign-in-footer">
     <div class="copyright">
@@ -170,24 +168,6 @@ module Signin {
         rootView.append(view);
         });
 
-    if (onboarding) {
-      container.addClass("container");
-      signInContainer.removeClass("sign-in");
-      signInContainer.addClass("onboarding");
-      signInContainer.css("padding-top","78px");
-      msgDiv.removeClass("sign-in-msg");
-      msgDiv.addClass("onboarding-text");
-      msgDiv.css("padding-bottom","16px");
-      signInContainer.css("text-align","center");
-      footer.remove();
-      logo.remove();
-    }
-    else {
-      progress.hide();
-    }
-
-
-
     return _view;
   }
 
@@ -202,7 +182,9 @@ module Signin {
         /* success */
         function(tokenDescription) {
           var loginView =
-          displayLoginLinks("<b>Great!</b> Next, we'll need you to login to your primary Google account.<br>", "#!", inviteCode, undefined, true);
+          displayLoginLinks("Thanks for accepting our invite! " + 
+            "Please sign in with your primary Google account to continue.", 
+            "#!", inviteCode, undefined);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */
@@ -260,7 +242,7 @@ module Signin {
             return Deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Sign in to continue.",
+      displayLoginLinks("Click below to continue.",
                         landingUrl, undefined, optEmail);
       return Deferred.defer(false);
     }
