@@ -177,7 +177,7 @@ module Onboarding {
     </p>
   </div>
   <div align=right style="padding-top:20px; padding-bottom:40px;">
-    <a href="faqs">
+    <a target="_blank" href="http://esper.com/faqs">
       <button class="button-primary">
         Learn more about Esper &nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
       </button>
