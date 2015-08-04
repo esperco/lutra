@@ -71,6 +71,8 @@ module Esper.EventControls {
         var timestamp = moment(event.start.utc).utc().toISOString();
         var nopunct = timestamp.slice(0, 19).replace(/[-:]/g, "");
         var singleEventId = event.google_event_id + "_" + nopunct + "Z";
+        edit.recurrence = null;
+        edit.recurring_event_id = event.google_event_id;
         Api.updateGoogleEvent(team.teamid, alias,
                               singleEventId, edit)
           .done(afterUpdate);
