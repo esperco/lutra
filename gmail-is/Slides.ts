@@ -25,11 +25,17 @@ module Esper.Slides {
 
   export function create<T>(startState : T, slides : (T) => Slide<T>[], 
                             controls : Controls<T>) {
+'''
+<div #topContainer class="esper-ev-inline-container">
+</div>
+'''
     var pastSlides : SlideElement<T>[] = [];
     var position   : number            = 0;
     var current    : SlideElement<T>   = 
       slideElement<T>(position, slides[position](startState));
     var state      : T                 = startState;
+
+    topContainer.append(current.container);
 
     var animation = {
       time  : 500,
@@ -42,6 +48,7 @@ module Esper.Slides {
         position = position + 1;
         var next : SlideElement<T> = 
           slideElement<T>(position, slides[position](current.slide.getState()));
+        topContainer.append(next.container);
 
         slideForward(current.container, next.container);
 
