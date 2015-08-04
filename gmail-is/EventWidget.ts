@@ -52,7 +52,6 @@ module Esper.EventWidget {
       moment(event.end ? event.end.utc : event.start.utc).unix()
     );
 
-    Log.d("event is", event);
     Api.eventRange(team.teamid, team.team_calendars, start, end)
       .done(function(results) {
         var events = List.filter(results.events, function(ev) {
