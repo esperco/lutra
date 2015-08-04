@@ -309,11 +309,11 @@ module Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        location.hash = "!";
+        location.hash = "#!";
       })
       .fail(function() {
         clearLoginNonce();
-        location.hash = "!";
+        location.hash = "#!";
       });
   };
 
