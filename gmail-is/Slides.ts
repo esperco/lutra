@@ -17,14 +17,22 @@ module Esper.Slides {
     finishButtonTitle : string;
   }
 
-  export function create<T>(startState : T, slides : (T) => Slide<T>[], controls : Controls<T>) {
-    var pastSlides = [];
-    var position = 0;
-    var current  = slides[position]();
-    var state    = startState;
+  /** A slide with the JQuery element that contains it and the controls. */
+  interface SlideElement<T> {
+    slide     : Slide<T>;
+    container : JQuery;
+  }
+
+  export function create<T>(startState : T, slides : (T) => Slide<T>[], 
+                            controls : Controls<T>) {
+    var pastSlides : SlideElement<T>[] = [];
+    var position   : number            = 0;
+    var current    : SlideElement<T>   = 
+      slideElement<T>(position, slides[position](startState));
+    var state      : T                 = startState;
 
     var animation = {
-      time : 500,
+      time  : 500,
       width : Gmail.threadContainer().width() + 100
     }
 
@@ -32,12 +40,13 @@ module Esper.Slides {
     function nextSlide() {
       if (position + 1 < slides.length) {
         position = position + 1;
-        var next = slides[position](current.getState);
+        var next : SlideElement<T> = 
+          slideElement<T>(position, slides[position](current.slide.getState()));
 
-        slideForward(current.element, next.element);
+        slideForward(current.container, next.container);
 
         pastSlides.push(current);
-        state = current.onNext();
+        state   = current.slide.getState();
         current = next;
       }
     }
@@ -47,7 +56,7 @@ module Esper.Slides {
         position = position - 1;
         var previous = pastSlides.pop();
 
-        slideBack(previous.element, current.element);
+        slideBack(previous.container, current.container);
 
         current = previous;
       }
@@ -102,7 +111,7 @@ module Esper.Slides {
         next.click(nextSlide);
       } else if (index === slides.length - 1) {
         next.text(controls.finishButtonTitle);
-        next.click(controls.onFinish(current.getState()));
+        next.click(controls.onFinish(current.slide.getState()));
 
         back.click(previousSlide);
       } else {
@@ -111,6 +120,13 @@ module Esper.Slides {
       }
 
       return container;
+    }
+
+    function slideElement<T>(index : number, slide : Slide<T>) {
+      return {
+        slide     : slide,
+        container : slideContainer(index, slide.element)
+      };
     }
   }
 }
