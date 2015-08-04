@@ -106,7 +106,7 @@ module Esper.XDate {
   export function dateValue(d: Date): string {
       return year(d).toString()
           + "-" + pad(monthNumber(d).toString())
-          + "-" + day(d).toString();
+          + "-" + pad(day(d).toString());
   }
 
   export function fullMonthDay(d : Date) : string {
