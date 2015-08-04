@@ -27,8 +27,9 @@ cp setup/js/*.js pub/js
 libs=setup/mink-libs
 cp -a $libs/bootstrap/css pub
 cp -a $libs/bootstrap/fonts pub
+cp $libs/font-awesome/fonts/* pub/fonts
+cp $libs/font-awesome/css/* pub/css
 cp $libs/animate.min.css pub/css
-cp $libs/font-awesome.css pub/css
 cp $libs/fullcalendar/fullcalendar.css pub/css
 cp $libs/fullcalendar/fullcalendar.print.css pub/css
 
