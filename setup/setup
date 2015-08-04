@@ -54,7 +54,10 @@ install_js jquery.timeago jquery.timeago.js
 # Autosize
 install_js jquery.autosize autosize-master/jquery.autosize.js
 
-cp font-awesome-4.0.3.css font-awesome.css
+# FontAwesome
+rm -rf font-awesome
+unzip font-awesome-4.4.0
+mv font-awesome-4.4.0 font-awesome
 
 # Moment (used by both Fullcalendar and Moment-timezone)
 install_js moment moment-2.5.1.js
