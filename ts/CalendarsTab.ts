@@ -268,7 +268,7 @@ module CalendarsTab {
     root.append(view);
   }
 
-  export function load(team, onboarding?) {
+  export function load(team) {
 '''
 <div #view>
   <div #container>
