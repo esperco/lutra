@@ -64,7 +64,7 @@ module Onboarding {
   <div class="row">
     <div class="form-group col-md-offset-2 col-md-8">
       <label for="step0-name">
-        Thanks for signing up for Esper! What should we call you?
+        Thanks for signing up for Esper! What's your name?
       </label>
       <input #name type="text" class="form-control" id="step0-name"
              placeholder="Your Name Here" />
@@ -93,6 +93,7 @@ module Onboarding {
 
     let content = refs["content"];
     content.append(form);
+    name.focus();
   }
 
   /* Step 1 => Share calendars */
@@ -139,7 +140,7 @@ module Onboarding {
                 */
                 var esperAsst = team.team_assistants[0];
                 return Api.createTeamCalendar(esperAsst, team.teamid, tz,
-                  team.team_name + " Ghost")
+                  team.team_name + " Ghost");
               }
             })
 
