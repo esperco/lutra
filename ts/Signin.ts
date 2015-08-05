@@ -99,6 +99,20 @@ module Signin {
         <div class="btn-divider"/>
         <div class="sign-in-text">Sign in with Google</div>
       </button>
+      <div class="advisory">
+        <div>
+          <a href="#!" #googleMsgToggle>
+            Can I use something other than Google?
+          </a>
+        </div>
+        <div #googleMsg>
+          Our assistants need access to your calendar to assist you
+          with scheduling. If you use Microsoft Outlook or 
+          Exchange instead of Google Apps, please contact us at
+          <a href="mailto:support@esper.com">support@esper.com</a> to 
+          get set up.
+        </div>
+      </div>
     </div>
   </div>
   <div #footer class="sign-in-footer">
@@ -106,7 +120,7 @@ module Signin {
       &copy; 2014 Esper Technologies, Inc.
       All rights reserved.
     </div>
-    <a href="mailto:team@esper.com" class="footer-link">Help</a>
+    <a href="mailto:support@esper.com" class="footer-link">Help</a>
     <div class="footer-divider"/>
     <a href="http://esper.com/privacypolicy.html"
        target="blank"
@@ -136,6 +150,13 @@ module Signin {
     var googleG = $("<img class='svg-block'/>")
       .appendTo(google);
     Svg.loadImg(googleG, "/assets/img/google-g.svg");
+
+    googleMsg.hide();
+    googleMsgToggle.click(function() {
+      googleMsg.show();
+      googleMsgToggle.hide();
+      return false;
+    });
 
     setLoginNonce()
       .done(function(loginNonce) {
