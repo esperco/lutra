@@ -301,11 +301,16 @@ module Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        location.hash = "!";
+
+        // NB: CanJS routing doesn't seem to catch this hash change sometimes.
+        // Call settings page load directly.
+        // 
+        // window.location.hash = "!";
+        Page.settings.load();
       })
       .fail(function() {
         clearLoginNonce();
-        location.hash = "!";
+        window.location.hash = "!";
       });
   };
 
