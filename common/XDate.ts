@@ -106,7 +106,7 @@ module Esper.XDate {
   export function dateValue(d: Date): string {
       return year(d).toString()
           + "-" + pad(monthNumber(d).toString())
-          + "-" + day(d).toString();
+          + "-" + pad(day(d).toString());
   }
 
   export function fullMonthDay(d : Date) : string {
@@ -171,5 +171,16 @@ module Esper.XDate {
   export function timeWithoutYear(d1 : Date) : string {
     return weekDay(d1) + " " + dateOnlyWithoutYear(d1) +
       " at " + timeOnly(d1);
+  }
+
+  // shiftByDifference(from, to, target) = target + (to - from)
+  export function shiftByDifference(from : string,
+                                    to : string,
+                                    target : string) : Date {
+    var fromSecs = new Date(from).getTime();
+    var toSecs = new Date(to).getTime();
+    var targetSecs = new Date(target).getTime();
+    var adjusted : number = targetSecs + (toSecs - fromSecs);
+    return new Date(adjusted);
   }
 }

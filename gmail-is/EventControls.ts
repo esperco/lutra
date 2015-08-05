@@ -1,5 +1,142 @@
 /** Contains the UI code for the widget for editing an event */
 module Esper.EventControls {
+
+  function changeRecurringEventModal(team: ApiT.Team,
+                                     alias: string,
+                                     event: ApiT.CalendarEvent,
+                                     edit: ApiT.CalendarEventEdit,
+                                     timezone: string,
+                                     finish: () => void) : void {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-recur-modal">
+    <div class="esper-modal-header">Edit recurring event</div>
+    <div class="esper-modal-content" #content>
+      <div style="margin-bottom: 10px">
+        Would you like to change only this event,
+        or all events in the series?
+      </div>
+      <table>
+        <tr>
+          <td style="width: 30%; padding: 10px 0">
+            <button #onlyThisEvent
+                    class="esper-btn esper-btn-primary modal-primary"
+                    style="width: 90%">
+              Only this event
+            </button>
+          </td>
+          <td>
+            All other events in the series will remain the same.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <button #allEvents
+                    class="esper-btn esper-btn-primary modal-primary"
+                    style="width: 90%">
+              All events
+            </button>
+          </td>
+          <td>
+            All events in the series will be changed.
+            <br/>
+            <small>Any changes made to other events will be
+            <span #keptOrLost>kept</span>.</small>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="esper-modal-footer esper-clearfix">
+      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel this change
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    cancelButton.click(function() { view.remove(); });
+
+    var timeChanged = false;
+    if (edit.start.local.replace(/Z$/, "") !== event.start.local ||
+        edit.end.local.replace(/Z$/, "") !== event.end.local) {
+      timeChanged = true;
+      keptOrLost.replaceWith("<b>lost</b>");
+    }
+
+    onlyThisEvent.click(function() {
+      allEvents.prop("disabled", true);
+      onlyThisEvent.prop("disabled", true);
+      if (event.recurrence && event.recurrence.rrule.length > 0) {
+        // This is the master event
+        var timestamp = moment(event.start.utc).utc().toISOString();
+        var nopunct = timestamp.slice(0, 19).replace(/[-:]/g, "");
+        var singleEventId = event.google_event_id + "_" + nopunct + "Z";
+        edit.recurrence = null;
+        edit.recurring_event_id = event.google_event_id;
+        Api.updateGoogleEvent(team.teamid, alias,
+                              singleEventId, edit)
+          .done(afterUpdate);
+      } else {
+        Api.updateGoogleEvent(team.teamid, alias,
+                              event.google_event_id, edit)
+          .done(afterUpdate);
+      }
+    });
+
+    function afterUpdate() {
+      view.remove();
+      finish();
+    }
+
+    allEvents.click(function() {
+      allEvents.prop("disabled", true);
+      onlyThisEvent.prop("disabled", true);
+      if (event.recurrence && event.recurrence.rrule.length > 0) {
+        // This is the master event
+        Api.updateGoogleEvent(team.teamid, alias,
+                              event.google_event_id, edit)
+          .done(afterUpdate);
+      } else {
+        Api.getEventDetails(team.teamid, event.google_cal_id,
+                            team.team_calendars, event.recurring_event_id)
+          .done(function(response) {
+            var rev = response.event_opt;
+            if (rev && rev.recurrence) {
+              // Apply our edits to the master recurring event
+              var startLocal =
+                XDate.shiftByDifference(event.start.local + "Z",
+                                        edit.start.local,
+                                        rev.start.local + "Z");
+              var endLocal =
+                XDate.shiftByDifference(event.end.local + "Z",
+                                        edit.end.local,
+                                        rev.end.local + "Z");
+              var stNoZ = XDate.toString(startLocal).replace(/Z$/, "");
+              edit.start = {
+                utc: (<any> moment).tz(stNoZ, timezone).format(),
+                local: XDate.toString(startLocal)
+              };
+              var enNoZ = XDate.toString(endLocal).replace(/Z$/, "");
+              edit.end = {
+                utc: (<any> moment).tz(enNoZ, timezone).format(),
+                local: XDate.toString(endLocal)
+              }
+              edit.recurrence = rev.recurrence;
+              edit.recurring_event_id = null;
+              Api.updateGoogleEvent(team.teamid, alias,
+                                    rev.google_event_id, edit)
+                .done(afterUpdate);
+            } else {
+              alert("Failed to load main recurring event. " +
+                    "Please report this error!");
+            }
+          });
+      }
+    });
+
+    $("body").append(view);
+  }
+
   /** Returns a widget for editing an event. If there is no current
    *  team, the widget will be blank and say "no team detected".
    */
@@ -12,7 +149,6 @@ module Esper.EventControls {
     Edit Event Details
   </div>
   <div class="esper-modal-content">
-    <div #recurNote style="display: none"/>
     <div #titleRow class="esper-ev-modal-row esper-clearfix">
       <div class="esper-ev-modal-left esper-bold">Title</div>
         <div class="esper-ev-modal-right">
@@ -92,18 +228,6 @@ module Esper.EventControls {
         var threadId = CurrentThread.threadId.get();
 
         Sidebar.customizeSelectArrow(fromSelect);
-
-        if (event.recurrence) {
-          if (event.recurrence.rrule.length > 0) {
-            recurNote.text("Note: This is a master recurring event! " +
-                           "Changes will apply to ALL instances.");
-            recurNote.show();
-          }
-        } else if (event.recurring_event_id) {
-          recurNote.text("Note: This is an instance of a recurrence. " +
-                         "Changes will only affect this event.");
-          recurNote.show();
-        }
 
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
@@ -282,12 +406,17 @@ module Esper.EventControls {
 
           var alias = fromSelect.val();
 
-          Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-            .done(function() {
-              var taskTab = TaskTab.currentTaskTab;
-              TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-              close();
-            });
+          function finish() {
+            var taskTab = TaskTab.currentTaskTab;
+            TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+            close();
+          }
+          if (event.recurrence || event.recurring_event_id) {
+            changeRecurringEventModal(team, alias, event, e, timezone, finish);
+          } else {
+            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+              .done(finish);
+          }
         });
 
         return container;
