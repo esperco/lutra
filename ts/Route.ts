@@ -99,11 +99,13 @@ module Route {
     },
 
     "join/:teamid route" : function (data) {
+      console.log("join1");
       withLogin(Page.onboarding.load, [data.teamid, 0]);
     },
 
     "join/:teamid/:step route" : function (data) {
-      withLogin(Page.onboarding.load, [data.teamid, data.step]);
+      let step = parseInt(data.step) || 0;
+      withLogin(Page.onboarding.load, [data.teamid, step]);
     },
 
     "plans/:teamid route" : function (data) {
