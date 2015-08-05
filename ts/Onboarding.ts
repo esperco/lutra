@@ -97,8 +97,32 @@ module Onboarding {
     form.submit(function(e) {
       makeBusy(submit);
 
-      // AJAX => change name, then load step 1
-      Api.setTeamName(teamId, name.val())
+      // Get & validate name
+      let nameVal = name.val();
+
+      // Get & validate phone number
+      let phoneVal = phone.val();
+      let phoneTypeVal = phoneType.val();
+
+      // Insert into meetingTypes object because that's what the API expects
+      let meetingTypes = Preferences.defaultPreferences().meeting_types;
+      meetingTypes.phone_call.phones.push({
+        phone_type: phoneTypeVal,
+        phone_number: phoneVal,
+        share_with_guests: false
+      });
+
+      let calls = [
+        Api.setTeamName(teamId, nameVal),
+        Api.setMeetingTypes(teamId, meetingTypes)
+      ];
+
+      // AJAX calls for name and phone nubmer, then load step 1
+      // 
+      // TODO: Create new API endpoint for setting name and phone number
+      // rather than shoehorn two calls together
+      // 
+      Deferred.join(calls)
         .then(function() {
           goToStep(teamId, 1);
         });
