@@ -61,7 +61,7 @@ module Esper.Slides {
           slideForward(current.container, next.container);
 
           pastSlides.push(current);
-          state   = current.slide.getState();
+          state   = nextState;
           current = next;
         }
       } catch (e) {

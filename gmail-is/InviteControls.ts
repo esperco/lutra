@@ -232,6 +232,9 @@ module Esper.InviteControls {
     Sidebar.customizeSelectArrow(pubCalendar);
     Sidebar.customizeSelectArrow(fromSelect);
 
+    pubTitle.val(initialState.title);
+    pubLocation.val(initialState.location);
+
     if (initialState.description) {
       var separatorIndex = event.description.search(/=== Conversation ===/);
       pubNotes.val(event.description.substring(0, separatorIndex).trim());
