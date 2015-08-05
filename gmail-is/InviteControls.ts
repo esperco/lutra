@@ -50,15 +50,120 @@ module Esper.InviteControls {
     return tz;
   }
 
+  interface ReminderSpec {
+    exec?   : { text : string; time : number };
+    guests? : { text : string; time : number };
+  }
+
+  /** An object that contains all the values entered through the
+   *  invite flow.
+   */
+  interface InviteState {
+    // Initial values:
+    event : ApiT.CalendarEvent;
+    prefs : Option.T<CurrentThread.TeamAndPreferences>;
+
+    // Event details, initially populated from event:
+    title       : string;
+    location    : string;
+    calendarId? : string;
+    calendars   : ApiT.Calendar[];
+    createdBy   : string;
+    notes       : string;
+    guests      : ApiT.Guest[];
+
+    // Reminders:
+    reminders? : ReminderSpec;
+
+    // Final description:
+    description? : string;
+  }
+
+  /** Fills out event details for the given event and preferences. */
+  function populateInviteState(
+    team  : ApiT.Team,
+    event : ApiT.CalendarEvent,
+    prefs : Option.T<CurrentThread.TeamAndPreferences>): InviteState {
+
+      var newTitle = event.title || "Untitled Event";
+      newTitle = newTitle.replace(/^HOLD: /, "");
+
+      var location = "";
+      if (event.location) {
+        var address = event.location.address;
+
+        if (event.location.title !== "") {
+          address = event.location.title + " - " + address;
+        }
+
+        location = address;
+      }
+
+      var firstTeamCal = team.team_calendars[0];
+      var calendars    = [];
+      var publicCalId  =
+        firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
+      List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+        calendars.push(cal);
+
+        if (cal.calendar_default_dupe) {
+          publicCalId = cal.google_cal_id;
+        }
+      });
+
+      var author = team.team_email_aliases[0] || Login.myEmail();
+
+      return {
+        event : event,
+        prefs : prefs,
+
+        title       : event.title || "Untitled Event",
+        location    : location,
+        calendarId  : publicCalId,
+        calendars   : calendars,
+        createdBy   : author,
+        notes       : "",
+        guests      : [],
+
+        reminders   : null,
+
+        description : event.description
+      }
+  }
+
+  function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
+    // TODO: Implement this function, finalizing the state into an
+    // actual event edit.
+
+    //     var eventEdit : ApiT.CalendarEventEdit = {
+    //   google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
+    //   start         : event.start,
+    //   end           : event.end,
+    //   title         : title,
+    //   description   : pubNotes.val(),
+    //   location      : location,
+    //   all_day       : event.all_day,
+    //   guests        : guests,
+    //   recurrence    : event.recurrence,
+    //   recurring_event_id : event.recurring_event_id
+    // };
+
+    // if (holdColor && |^HOLD: |.test(title)) {
+    //   eventEdit.color_id = holdColor.key;
+    // }
+
+    return null;
+  }
+
   /** Returns a widget for inviting guests to the current event or to
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteWidget(event: ApiT.CalendarEvent,
-                               prefs : Option.T<CurrentThread.TeamAndPreferences>) {
+  export function inviteSlide(initialState : InviteState):
+  Slides.Slide<InviteState> {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container>
   <div #heading class="esper-modal-header">
     Create a duplicate event for guests
   </div>
@@ -111,14 +216,6 @@ module Esper.InviteControls {
           </button>
         </div>
       </div>
-      <div class="esper-modal-footer esper-clearfix">
-        <button #next class="esper-btn esper-btn-primary modal-primary">
-          Next
-        </button>
-        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-          Cancel
-        </button>
-      </div>
     </div>
   </div>
 </div>
@@ -127,54 +224,32 @@ module Esper.InviteControls {
   Not Duplicate
 </div>
 '''
-    return prefs.match({
+    return initialState.prefs.match({
       some : function (allPrefs) {
-        /** Removes the widget from the DOM. */
-        function close() {
-          container.remove();
-        }
-
-        var team = allPrefs.team;
+        var team     = allPrefs.team;
         var threadId = CurrentThread.threadId.get();
+        var event    = initialState.event;
 
         Sidebar.customizeSelectArrow(pubCalendar);
         Sidebar.customizeSelectArrow(fromSelect);
 
-        var newTitle = event.title || "Untitled event";
-        pubTitle.val(newTitle.replace(/^HOLD: /, ""));
-
-        if (event.description) {
+        if (initialState.description) {
           var separatorIndex = event.description.search(/=== Conversation ===/);
           pubNotes.val(event.description.substring(0, separatorIndex).trim());
         }
         // Include exec's phone number in description if preferences allow it
         appendExecPublicPhone(team, pubNotes);
 
-        if (event.location) {
-          var address = event.location.address;
+        // Initializing the calendar dropdown:
+        var publicCalId = initialState.calendarId;
 
-          if (event.location.title !== "") {
-            address = event.location.title + " - " + address;
-          }
-
-          pubLocation.val(address);
+        if (publicCalId) {
+          pubCalendar.val(publicCalId);
         }
 
-        var firstTeamCal = team.team_calendars[0];
-        var publicCalId =
-          firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-        List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-          var id = cal.google_cal_id;
-          pubCalendar.append($("<option value='" + id + "'>" +
+        initialState.calendars.forEach(function (cal) {
+          pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
                                cal.calendar_title + "</option>"));
-          if (cal.calendar_default_dupe) {
-            pubCalendar.val(id);
-            publicCalId = id;
-          }
-        });
-
-        pubCalendar.change(function() {
-          publicCalId = $(this).val();
         });
 
         var aliases = team.team_email_aliases;
@@ -260,7 +335,7 @@ module Esper.InviteControls {
         });
         notesRow.before(fileUpload);
 
-        next.click(function() {
+        function getState(): InviteState {
           var guests = [];
           for (var person in peopleInvolved) {
             if (peopleInvolved.hasOwnProperty(person)) {
@@ -271,99 +346,35 @@ module Esper.InviteControls {
             }
           }
 
-          var location = {
-            /* Right now we don't care about title because this is just text
-               to be displayed in the Google Calendar location box... but in
-               the future we may use it for typeahead or something. */
-            title   : "",
-            address : pubLocation.val(),
-            timezone : preferences.general.current_timezone
-          };
-          if (!location.address) location = null;
+          return {
+            event : event,
+            prefs : Option.some(allPrefs),
 
-          var title = pubTitle.val();
-          var eventEdit : ApiT.CalendarEventEdit = {
-            google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
-            start         : event.start,
-            end           : event.end,
-            title         : title,
-            description   : pubNotes.val(),
-            location      : location,
-            all_day       : event.all_day,
-            guests        : guests,
-            recurrence    : event.recurrence,
-            recurring_event_id : event.recurring_event_id
-          };
-          if (holdColor && /^HOLD: /.test(title)) {
-            eventEdit.color_id = holdColor.key;
+            title      : pubTitle.val(),
+            // TODO: Use timezone from settings when turning this into an event!
+            location   : pubLocation.val(),
+            calendarId : publicCalId,
+            calendars  : initialState.calendars,
+            createdBy  : fromSelect.val(),
+            notes      : pubNotes.val(),
+            guests     : guests,
+
+            reminders  : null,
+
+            description : null
           }
+        }
 
-          var from = fromSelect.val();
-          location = pubLocation.val();
-          var animation = {
-            time : 500,
-            width : Gmail.threadContainer().width() + 100
-          }
-
-          function slideForward(previous, next) {
-            previous.parent().css({
-              "overflow" : "hidden"
-            });
-            previous.animate({left : -animation.width}, animation.time);
-
-            next.css({
-              "left"       : animation.width,
-              "margin-top" : (-previous.height()) + "px"
-            });
-
-            previous.after(next);
-            next.animate({left : 0}, animation.time);
-          }
-
-          function slideBack(previous, next) {
-            previous.animate({left : 0}, animation.time);
-
-            next.animate({left : animation.width},
-                         animation.time,
-                         function () {
-              next.remove();
-            });
-          }
-
-          /** Animates from the current widget to the check description
-           *  widget.
-           */
-          function checkDescription(previous, title, reminderSpec?) {
-            var next =
-              descriptionWidget(event, eventEdit, duplicate,
-                                guests, from, close, back, reminderSpec);
-
-            slideForward(previous, next);
-
-            function back() {
-              slideBack(previous, next);
-            }
-          }
-
-          var next = reminderWidget(event, eventEdit, team,
-                                    execReminder, duplicate, function () {
-            slideBack(container, next);
-          }, function (reminderSpec) {
-            var title = pubTitle.val();
-            checkDescription(next, title, reminderSpec);
-          });
-
-          slideForward(container, next);
-        });
-
-        cancel.click(close);
-
-        return container;
+        return {
+          element  : container,
+          getState : getState
+        };
       },
       none : function () {
+        // TODO: Cancel slides in this case! (Maybe use exception?)
         container.empty();
         window.alert("Could not invite guests because no team is currently detected.");
-        return container;
+        return null;
       }
     });
   }
@@ -700,7 +711,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    */
   export function insertAfterThread(event) {
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
-      Gmail.threadContainer().after(inviteWidget(event, prefs));
+      // TODO: Insert slides!
+      // Gmail.threadContainer().after(inviteWidget(event, prefs));
 
       // fix mysteriously appearing padding at end of thread:
       Gmail.threadFooter().css("padding-bottom", "10px");

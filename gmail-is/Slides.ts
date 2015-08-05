@@ -96,9 +96,7 @@ module Esper.Slides {
     function slideContainer<T>(index : number, element : JQuery) {
 '''
 <div #container class="esper-ev-inline-container">
-  <div #content class="esper-modal-content">
-  </div>
-  <div class="esper-modal-footer esper-clearfix">
+  <div #footer class="esper-modal-footer esper-clearfix">
     <button #next class="esper-btn esper-btn-primary modal-primary">
       Next
     </button>
@@ -108,7 +106,7 @@ module Esper.Slides {
   </div>
 </div>
 '''
-      content.append(element);
+      footer.before(element);
 
       // Special buttons for the first and last slides:
       if (index === 0) {
