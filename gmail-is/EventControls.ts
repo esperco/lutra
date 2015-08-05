@@ -123,6 +123,9 @@ module Esper.EventControls {
               }
               edit.recurrence = rev.recurrence;
               edit.recurring_event_id = null;
+              edit.location = rev.location;
+              if (!edit.location) edit.location = { title: "", address: "" };
+              edit.location.timezone = timezone;
               Api.updateGoogleEvent(team.teamid, alias,
                                     rev.google_event_id, edit)
                 .done(afterUpdate);
