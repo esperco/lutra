@@ -23,7 +23,11 @@ module Esper.Slides {
     container : JQuery;
   }
 
-  export function create<T>(startState : T, slides : (T) => Slide<T>[], 
+  // When caught, this exception will keep slides from sliding to the
+  // next slide.
+  export var invalidState = { error : "Invalid State" };
+
+  export function create<T>(startState : T, slides : (T) => Slide<T>[],
                             controls : Controls<T>) {
 '''
 <div #topContainer class="esper-ev-inline-container">
@@ -31,7 +35,7 @@ module Esper.Slides {
 '''
     var pastSlides : SlideElement<T>[] = [];
     var position   : number            = 0;
-    var current    : SlideElement<T>   = 
+    var current    : SlideElement<T>   =
       slideElement<T>(position, slides[position](startState));
     var state      : T                 = startState;
 
@@ -44,17 +48,26 @@ module Esper.Slides {
 
     /** Go to the next slide unless there are no more slides. */
     function nextSlide() {
-      if (position + 1 < slides.length) {
-        position = position + 1;
-        var next : SlideElement<T> = 
-          slideElement<T>(position, slides[position](current.slide.getState()));
-        topContainer.append(next.container);
+      try {
+        if (position + 1 < slides.length) {
+          var nextState = current.slide.getState();
+          position = position + 1;
+          var next : SlideElement<T> =
+            slideElement<T>(position, slides[position](nextState));
+          topContainer.append(next.container);
 
-        slideForward(current.container, next.container);
+          slideForward(current.container, next.container);
 
-        pastSlides.push(current);
-        state   = current.slide.getState();
-        current = next;
+          pastSlides.push(current);
+          state   = current.slide.getState();
+          current = next;
+        }
+      } catch (e) {
+        if (e === invalidState) {
+          return;
+        } else {
+          throw e;
+        }
       }
     }
 
