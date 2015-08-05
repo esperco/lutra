@@ -242,7 +242,7 @@ module Signin {
             return Deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Click below to continue.",
+      displayLoginLinks("Click below to sign up or sign in.",
                         landingUrl, undefined, optEmail);
       return Deferred.defer(false);
     }
