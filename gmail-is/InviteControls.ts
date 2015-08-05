@@ -373,15 +373,6 @@ module Esper.InviteControls {
     };
   }
 
-  /** Disables the button and changes the text to "Inviting..." to
-   *  signify that work is being done in the background (ie over the
-   *  network).
-   */
-  function inviting(button) {
-    button.text("Inviting...");
-    button.attr("disabled", true);
-  }
-
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */

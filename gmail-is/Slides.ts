@@ -135,7 +135,10 @@ module Esper.Slides {
       } else if (index === slides.length - 1) {
         next.text(controls.finishButtonTitle);
         next.click(function () {
-          controls.onFinish(current.slide.getState())
+          controls.onFinish(current.slide.getState());
+
+          next.text("Working...");
+          next.attr("disabled", true);
         });
 
         back.click(previousSlide);
