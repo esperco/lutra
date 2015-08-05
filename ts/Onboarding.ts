@@ -60,23 +60,39 @@ module Onboarding {
   function step0(teamId: string, refs: IJQMap): void {
     refs["progress"].width("33%");
 '''
-<form #form class="form">
-  <div class="row">
-    <div class="form-group col-md-offset-2 col-md-8">
-      <label for="step0-name">
-        Thanks for signing up for Esper! What's your name?
-      </label>
-      <input #name type="text" class="form-control" id="step0-name"
-             placeholder="Your Name Here" />
+<div #view class="row"><div class="col-sm-offset-2 col-sm-8">
+  <form #form class="form-horizontal">
+    <div class="form-group" style="text-align: center;">
+      Thanks for signing up for Esper! We'll need some info to get started.
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-offset-2 col-md-8">
+    <div class="form-group">
+      <label class="col-xs-12" for="step0-name">Name</label>
+      <div class="col-xs-12">
+        <input #name type="text" id="step0-name" class="form-control"
+               placeholder="Your Name Here" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="step0-phone" class="col-xs-12">Phone Number</label>
+      <div class="col-sm-4">
+        <select class="form-control" #phoneType>
+          <option value="Mobile" selected="selected">mobile</option>
+          <option value="Work">work</option>
+          <option value="Home">home</option>
+          <option value="Other">other</option>
+        </select>
+      </div>
+      <div class="xs-spacer"></div>
+      <div class="col-sm-8">
+        <input #phone type="text" class="form-control" id="step0-phone"
+               placeholder="555-555-5555" />
+      </div>
+    </div>
+    <div class="form-group"><div class="col-xs-12">
       <button #submit type="submit" class="btn btn-default">Save</button>
-    </div>
-  </div>
-</form>
+    </div></div>
+  </form>
+</div></div>
 '''
     form.submit(function(e) {
       makeBusy(submit);
@@ -92,7 +108,7 @@ module Onboarding {
     });
 
     let content = refs["content"];
-    content.append(form);
+    content.append(view);
     name.focus();
   }
 

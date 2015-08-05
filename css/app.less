@@ -1574,7 +1574,7 @@ a.header-title:hover { text-decoration: underline; }
   width: 100%;
   background: @purple_splash;
   color: white;
-  padding-top: 39px;
+  padding: 40px 15px;
 }
 
 .onboarding h2 {
@@ -1596,8 +1596,8 @@ a.header-title:hover { text-decoration: underline; }
   color: @purple_hover;
 }
 
-@media (min-width: 620px) {
-  .onboarding { padding-top: 78px; }
+@media (min-width: 767px) {
+  .onboarding { padding-top: 80hmakepx; }
 }
 
 .onboarding .progress {
@@ -1608,13 +1608,17 @@ a.header-title:hover { text-decoration: underline; }
   font-size: 16px;
 }
 
-.container {
-    padding: 15px;
-    width: 85%;
-    align: center;
-}
-
 .esper-cal-title{
   font-size: 16px;
 }
 
+// Use to space two columns that get stacked on xs-sized screens in Bootstrap
+.xs-spacer {
+  height: 5px;
+}
+
+@media (min-width: 767px) {
+  .xs-spacer {
+    display: none;
+  }
+}
