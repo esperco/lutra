@@ -61,7 +61,7 @@ module Esper.InviteControls {
   interface InviteState {
     // Initial values:
     event : ApiT.CalendarEvent;
-    prefs : Option.T<CurrentThread.TeamAndPreferences>;
+    prefs : CurrentThread.TeamAndPreferences;
 
     // Event details, initially populated from event:
     title       : string;
@@ -83,52 +83,58 @@ module Esper.InviteControls {
   function populateInviteState(
     team  : ApiT.Team,
     event : ApiT.CalendarEvent,
-    prefs : Option.T<CurrentThread.TeamAndPreferences>): InviteState {
+    prefs : Option.T<CurrentThread.TeamAndPreferences>): Option.T<InviteState> {
+      return prefs.match<Option.T<InviteState>>({
+        some : function (prefs) {
+          var newTitle = event.title || "Untitled Event";
+          newTitle = newTitle.replace(/^HOLD: /, "");
 
-      var newTitle = event.title || "Untitled Event";
-      newTitle = newTitle.replace(/^HOLD: /, "");
+          var location = "";
+          if (event.location) {
+            var address = event.location.address;
 
-      var location = "";
-      if (event.location) {
-        var address = event.location.address;
+            if (event.location.title !== "") {
+              address = event.location.title + " - " + address;
+            }
 
-        if (event.location.title !== "") {
-          address = event.location.title + " - " + address;
-        }
+            location = address;
+          }
 
-        location = address;
-      }
+          var firstTeamCal = team.team_calendars[0];
+          var calendars    = [];
+          var publicCalId  =
+            firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
+          List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+            calendars.push(cal);
 
-      var firstTeamCal = team.team_calendars[0];
-      var calendars    = [];
-      var publicCalId  =
-        firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-      List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-        calendars.push(cal);
+            if (cal.calendar_default_dupe) {
+              publicCalId = cal.google_cal_id;
+            }
+          });
 
-        if (cal.calendar_default_dupe) {
-          publicCalId = cal.google_cal_id;
+          var author = team.team_email_aliases[0] || Login.myEmail();
+
+          return Option.some({
+            event : event,
+            prefs : prefs,
+
+            title       : event.title || "Untitled Event",
+            location    : location,
+            calendarId  : publicCalId,
+            calendars   : calendars,
+            createdBy   : author,
+            notes       : "",
+            guests      : [],
+
+            reminders   : null,
+
+            description : event.description
+          });
+        },
+        none : function () {
+          return Option.none<InviteState>();
         }
       });
-
-      var author = team.team_email_aliases[0] || Login.myEmail();
-
-      return {
-        event : event,
-        prefs : prefs,
-
-        title       : event.title || "Untitled Event",
-        location    : location,
-        calendarId  : publicCalId,
-        calendars   : calendars,
-        createdBy   : author,
-        notes       : "",
-        guests      : [],
-
-        reminders   : null,
-
-        description : event.description
-      }
   }
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
@@ -224,159 +230,150 @@ module Esper.InviteControls {
   Not Duplicate
 </div>
 '''
-    return initialState.prefs.match({
-      some : function (allPrefs) {
-        var team     = allPrefs.team;
-        var threadId = CurrentThread.threadId.get();
-        var event    = initialState.event;
+    var prefs    = initialState.prefs;
+    var team     = prefs.team;
+    var threadId = CurrentThread.threadId.get();
+    var event    = initialState.event;
 
-        Sidebar.customizeSelectArrow(pubCalendar);
-        Sidebar.customizeSelectArrow(fromSelect);
+    Sidebar.customizeSelectArrow(pubCalendar);
+    Sidebar.customizeSelectArrow(fromSelect);
 
-        if (initialState.description) {
-          var separatorIndex = event.description.search(/=== Conversation ===/);
-          pubNotes.val(event.description.substring(0, separatorIndex).trim());
-        }
-        // Include exec's phone number in description if preferences allow it
-        appendExecPublicPhone(team, pubNotes);
+    if (initialState.description) {
+      var separatorIndex = event.description.search(/=== Conversation ===/);
+      pubNotes.val(event.description.substring(0, separatorIndex).trim());
+    }
+    // Include exec's phone number in description if preferences allow it
+    appendExecPublicPhone(team, pubNotes);
 
-        // Initializing the calendar dropdown:
-        var publicCalId = initialState.calendarId;
+    // Initializing the calendar dropdown:
+    var publicCalId = initialState.calendarId;
 
-        if (publicCalId) {
-          pubCalendar.val(publicCalId);
-        }
+    if (publicCalId) {
+      pubCalendar.val(publicCalId);
+    }
 
-        initialState.calendars.forEach(function (cal) {
-          pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
-                               cal.calendar_title + "</option>"));
-        });
+    initialState.calendars.forEach(function (cal) {
+      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
+                           cal.calendar_title + "</option>"));
+    });
 
-        var aliases = team.team_email_aliases;
-        if (aliases.length === 0) {
-          $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-          fromSelect.prop("disabled", true);
-        } else {
-          aliases.forEach(function (email: string) {
-            $("<option>" + email + "</option>").appendTo(fromSelect);
-          });
-        }
+    var aliases = team.team_email_aliases;
+    if (aliases.length === 0) {
+      $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
+      fromSelect.prop("disabled", true);
+    } else {
+      aliases.forEach(function (email: string) {
+        $("<option>" + email + "</option>").appendTo(fromSelect);
+      });
+    }
 
-        var taskPrefs;
-        allPrefs.taskPrefs.match({
-          some: function(prefs) { taskPrefs = prefs; },
-          none: function() { }
-        });
+    var taskPrefs;
+    prefs.taskPrefs.match({
+      some: function(prefs) { taskPrefs = prefs; },
+      none: function() { }
+    });
 
-        var peopleInvolved : { [email:string]: string } = {};
-        CurrentThread.getExternalParticipants().done(function(participants) {
-          if (participants.length > 0) {
-            List.iter(participants, function (participant) {
-              var name = participant.display_name || "";
-              var email = participant.email;
-              var tz = timezoneForGuest(email, taskPrefs, event);
-              var v = viewPersonInvolved(peopleInvolved, email, name,
-                                         tz, taskPrefs);
-              viewPeopleInvolved.append(v);
-            });
-          } else {
-            viewPeopleInvolved
-              .append($("<li class='esper-gray'>No guests found</li>"));
-          }
-        });
-
-        addGuest.click(function() {
-          var name  = newGuestName.val();
-          var email = newGuestEmail.val();
-          peopleInvolved[email] = name;
-          if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
-
-          var checked = true;
+    var peopleInvolved : { [email:string]: string } = {};
+    CurrentThread.getExternalParticipants().done(function(participants) {
+      if (participants.length > 0) {
+        List.iter(participants, function (participant) {
+          var name = participant.display_name || "";
+          var email = participant.email;
           var tz = timezoneForGuest(email, taskPrefs, event);
           var v = viewPersonInvolved(peopleInvolved, email, name,
-                                     tz, taskPrefs, checked);
+                                     tz, taskPrefs);
           viewPeopleInvolved.append(v);
-          newGuestName.val("");
-          newGuestEmail.val("");
         });
-
-        var preferences  = allPrefs.execPrefs;
-        var duplicate    = preferences.general.use_duplicate_events;
-        var execReminder = preferences.general.send_exec_reminder;
-        var holdColor    = preferences.general.hold_event_color;
-
-        if (!duplicate) {
-          heading.text("Invite guests to this calendar event");
-          notDuplicate.appendTo(heading);
-          calendarRow.remove();
-        }
-
-        function searchLocation() {
-          var query = pubLocation.val();
-          LocSearch.displayResults(team, pubLocation, locationDropdown,
-                                   locationSearchResults, query,
-                                   preferences);
-        }
-        Util.afterTyping(pubLocation, 250, searchLocation);
-        pubLocation.click(searchLocation);
-
-        var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
-          fileInfos.forEach(function (fileInfo) {
-            // Not sure how to convince typescript that this is the
-            // fileInfo object from above.
-            var file = <any> fileInfo;
-
-            var link = "https://drive.google.com/file/d/" + file.id +
-              "/view?usp=sharing";
-            pubNotes.val(function (i, text) {
-              return text + "\n\nAttachment " + file.name + " <" + link + ">";
-            });
-          });
-        });
-        notesRow.before(fileUpload);
-
-        function getState(): InviteState {
-          var guests = [];
-          for (var person in peopleInvolved) {
-            if (peopleInvolved.hasOwnProperty(person)) {
-              guests.push({
-                display_name : peopleInvolved[person] || null,
-                email        : person
-              });
-            }
-          }
-
-          return {
-            event : event,
-            prefs : Option.some(allPrefs),
-
-            title      : pubTitle.val(),
-            // TODO: Use timezone from settings when turning this into an event!
-            location   : pubLocation.val(),
-            calendarId : publicCalId,
-            calendars  : initialState.calendars,
-            createdBy  : fromSelect.val(),
-            notes      : pubNotes.val(),
-            guests     : guests,
-
-            reminders  : null,
-
-            description : null
-          }
-        }
-
-        return {
-          element  : container,
-          getState : getState
-        };
-      },
-      none : function () {
-        // TODO: Cancel slides in this case! (Maybe use exception?)
-        container.empty();
-        window.alert("Could not invite guests because no team is currently detected.");
-        return null;
+      } else {
+        viewPeopleInvolved
+          .append($("<li class='esper-gray'>No guests found</li>"));
       }
     });
+
+    addGuest.click(function() {
+      var name  = newGuestName.val();
+      var email = newGuestEmail.val();
+      peopleInvolved[email] = name;
+      if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
+
+      var checked = true;
+      var tz = timezoneForGuest(email, taskPrefs, event);
+      var v = viewPersonInvolved(peopleInvolved, email, name,
+                                 tz, taskPrefs, checked);
+      viewPeopleInvolved.append(v);
+      newGuestName.val("");
+      newGuestEmail.val("");
+    });
+
+    var preferences  = prefs.execPrefs;
+    var duplicate    = preferences.general.use_duplicate_events;
+    var execReminder = preferences.general.send_exec_reminder;
+    var holdColor    = preferences.general.hold_event_color;
+
+    if (!duplicate) {
+      heading.text("Invite guests to this calendar event");
+      notDuplicate.appendTo(heading);
+      calendarRow.remove();
+    }
+
+    function searchLocation() {
+      var query = pubLocation.val();
+      LocSearch.displayResults(team, pubLocation, locationDropdown,
+                               locationSearchResults, query,
+                               preferences);
+    }
+    Util.afterTyping(pubLocation, 250, searchLocation);
+    pubLocation.click(searchLocation);
+
+    var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
+      fileInfos.forEach(function (fileInfo) {
+        // Not sure how to convince typescript that this is the
+        // fileInfo object from above.
+        var file = <any> fileInfo;
+
+        var link = "https://drive.google.com/file/d/" + file.id +
+          "/view?usp=sharing";
+        pubNotes.val(function (i, text) {
+          return text + "\n\nAttachment " + file.name + " <" + link + ">";
+        });
+      });
+    });
+    notesRow.before(fileUpload);
+
+    function getState(): InviteState {
+      var guests = [];
+      for (var person in peopleInvolved) {
+        if (peopleInvolved.hasOwnProperty(person)) {
+          guests.push({
+            display_name : peopleInvolved[person] || null,
+            email        : person
+          });
+        }
+      }
+
+      return {
+        event : event,
+        prefs : prefs,
+
+        title      : pubTitle.val(),
+        // TODO: Use timezone from settings when turning this into an event!
+        location   : pubLocation.val(),
+        calendarId : publicCalId,
+        calendars  : initialState.calendars,
+        createdBy  : fromSelect.val(),
+        notes      : pubNotes.val(),
+        guests     : guests,
+
+        reminders  : null,
+
+        description : null
+      }
+    }
+
+    return {
+      element  : container,
+      getState : getState
+    };
   }
 
   /** Disables the button and changes the text to "Inviting..." to
@@ -386,6 +383,154 @@ module Esper.InviteControls {
   function inviting(button) {
     button.text("Inviting...");
     button.attr("disabled", true);
+  }
+
+  /** A widget for setting an automatic reminder about the event, sent
+   *  to the exec.
+   */
+  function reminderSlide(state : InviteState): Slides.Slide<InviteState> {
+'''
+<div #container>
+  <div #heading class="esper-modal-header">
+    Set an automatic reminder for the exec
+  </div>
+  <div class="esper-ev-modal-content">
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Executive</span>
+        <span #execWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #execTime type="text" value="24"> </input> hours before event
+      </label>
+      <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #execReminderField
+      rows=24 class="esper-input esper-reminder-text">
+Hello|exec|,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+</textarea>
+    <div class="esper-reminder-options">
+      <label>
+        <span class="esper-reminder-label">Guests</span>
+        <span #guestsWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #guestsTime type="text" value="24"> </input> hours before event
+      </label>
+      <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
+        Enabled
+      </button>
+    </div>
+    <textarea #guestsReminderField
+       rows=24 class="esper-input esper-reminder-text">
+Hello,
+
+This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
+</textarea>
+  </div>
+</div>
+'''
+    var execEnabled   = true;
+    var guestsEnabled = true;
+
+    var team      = state.prefs.team;
+    var duplicate = state.prefs.execPrefs.general.use_duplicate_events;
+
+    var execReminder, guestsReminder;
+    if (state.reminders) {
+      execReminder   = state.reminders.exec;
+      guestsReminder = state.reminders.guests;
+    }
+
+    if (!execReminder) {
+      execEnabled = false;
+      toggleButton(execButton);
+    }
+
+    // Fill out static parts of message template (ie exec name and guests):
+    Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
+      var name       = profile.display_name ? " " + profile.display_name : "";
+
+      // TODO: Fix how this works with duplicate events.
+      // By now, state.title should be all set, with "HOLD: " removed.
+      var eventTitle = state.title || "a meeting";
+      var guestTitle = state.title || "a meeting";
+
+      execReminderField.val(execReminderField.val()
+        .replace("|exec|", name)
+        .replace("|event|", eventTitle));
+
+      guestsReminderField.val(guestsReminderField.val()
+        .replace("|event|", guestTitle));
+    });
+
+    function getState(): InviteState {
+      var reminders = null;
+
+      var execInvalid   = isNaN(execTime.val() * 1);
+      var guestsInvalid = isNaN(guestsTime.val() * 1);
+
+      // If one of the entries is an invalid number, highlight it and
+      // don't go to the next slide.
+      if (execInvalid || guestsInvalid) {
+        if (execInvalid) {
+          execTime.addClass("esper-danger");
+          execWarning.show();
+        }
+        if (guestsInvalid) {
+          guestsTime.addClass("esper-danger");
+          guestsWarning.show();
+        }
+
+        throw Slides.invalidState;
+      }
+
+      if (execEnabled || guestsEnabled) {
+        reminders = {
+          exec : {
+            text : execReminderField.val(),
+            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
+          },
+          guests : {
+            text : guestsReminderField.val(),
+            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
+          }
+        };
+      }
+
+      var newState = $.extend({}, state);
+      newState.reminders = reminders;
+      return newState;
+    }
+
+    execButton.click(function () {
+      toggleButton(execButton);
+
+      execEnabled = !execEnabled;
+    });
+
+    guestsButton.click(function () {
+      toggleButton(guestsButton);
+
+      guestsEnabled = !guestsEnabled;
+    });
+
+    return {
+      element  : container,
+      getState : getState
+    };
+
+    function toggleButton(reminderButton) {
+      if (reminderButton.hasClass("esper-btn-safe")) {
+        reminderButton.removeClass("esper-btn-safe");
+        reminderButton.addClass("esper-btn-danger");
+        reminderButton.text("Disabled");
+      } else {
+        reminderButton.removeClass("esper-btn-danger");
+        reminderButton.addClass("esper-btn-safe");
+        reminderButton.text("Enabled");
+      }
+    }
   }
 
   /** A widget for viewing and editing the whole event description,
@@ -559,150 +704,6 @@ module Esper.InviteControls {
         return container;
       }
     });
-  }
-
-  /** A widget for setting an automatic reminder about the event, sent
-   *  to the exec.
-   */
-  function reminderWidget(event, eventEdit, team, execReminder, duplicate, backFunction, nextFunction) {
-'''
-<div #container class="esper-ev-inline-container">
-  <div #heading class="esper-modal-header">
-    Set an automatic reminder for the exec
-  </div>
-  <div class="esper-ev-modal-content">
-    <div class="esper-reminder-options">
-      <label>
-        <span class="esper-reminder-label">Executive</span>
-        <span #execWarning class="esper-reminder-warning"> Invalid time: </span>
-        <input #execTime type="text" value="24"> </input> hours before event
-      </label>
-      <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
-        Enabled
-      </button>
-    </div>
-    <textarea #execReminderField
-      rows=24 class="esper-input esper-reminder-text">
-Hello|exec|,
-
-This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
-</textarea>
-    <div class="esper-reminder-options">
-      <label>
-        <span class="esper-reminder-label">Guests</span>
-        <span #guestsWarning class="esper-reminder-warning"> Invalid time: </span>
-        <input #guestsTime type="text" value="24"> </input> hours before event
-      </label>
-      <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
-        Enabled
-      </button>
-    </div>
-    <textarea #guestsReminderField
-       rows=24 class="esper-input esper-reminder-text">
-Hello,
-
-This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
-</textarea>
-  </div>
-  <div class="esper-modal-footer esper-clearfix">
-    <button #next class="esper-btn esper-btn-primary modal-primary">
-      Next
-    </button>
-    <button #back class="esper-btn esper-btn-secondary modal-cancel">
-      Back
-    </button>
-  </div>
-</div>
-'''
-    var execEnabled   = true;
-    var guestsEnabled = true;
-
-    if (!execReminder) {
-      execEnabled = false;
-      toggleButton(execButton);
-    }
-
-    // Fill out static parts of message template (ie exec name and guests):
-    Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-      var name       = profile.display_name ? " " + profile.display_name : "";
-      var eventTitle = (duplicate ? event.title : eventEdit.title) || "a meeting";
-      var guestTitle = eventEdit.title || "a meeting";
-      eventTitle = eventTitle.replace(/HOLD: /, "");
-
-      execReminderField.val(execReminderField.val()
-        .replace("|exec|", name)
-        .replace("|event|", eventTitle));
-
-      guestsReminderField.val(guestsReminderField.val()
-        .replace("|event|", guestTitle));
-    });
-
-    back.click(backFunction);
-    next.click(function () {
-      var execInvalid   = isNaN(execTime.val() * 1);
-      var guestsInvalid = isNaN(guestsTime.val() * 1);
-
-      // If one of the entries is an invalid number, highlight it and
-      // don't go to the next slide.
-      if (execInvalid || guestsInvalid) {
-        if (execInvalid) {
-          execTime.addClass("esper-danger");
-          execWarning.show();
-        }
-        if (guestsInvalid) {
-          guestsTime.addClass("esper-danger");
-          guestsWarning.show();
-        }
-
-        return;
-      } else {
-        execTime.removeClass("esper-danger");
-        execWarning.hide();
-        guestsTime.removeClass("esper-danger");
-        guestsWarning.hide();
-      }
-
-      if (execEnabled || guestsEnabled) {
-        nextFunction({
-          exec : {
-            text : execReminderField.val(),
-            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
-          },
-          guests : {
-            text : guestsReminderField.val(),
-            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
-          }
-        });
-      } else {
-        nextFunction();
-      }
-    });
-
-    execButton.click(function () {
-      toggleButton(execButton);
-
-      execEnabled = !execEnabled;
-    });
-
-    guestsButton.click(function () {
-      toggleButton(guestsButton);
-
-      guestsEnabled = !guestsEnabled;
-    });
-
-    return container;
-
-    function toggleButton(reminderButton) {
-      if (reminderButton.hasClass("esper-btn-safe")) {
-        reminderButton.removeClass("esper-btn-safe");
-        reminderButton.addClass("esper-btn-danger");
-        reminderButton.text("Disabled");
-      } else {
-        reminderButton.removeClass("esper-btn-danger");
-        reminderButton.addClass("esper-btn-safe");
-        reminderButton.text("Enabled");
-      }
-    }
   }
 
   /** Inserts a new "Invite Guests" widget after the contents of the
