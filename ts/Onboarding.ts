@@ -93,7 +93,16 @@ module Onboarding {
     </div></div>
   </form>
 </div></div>
-'''
+''' 
+    // Set default name (in case we got this info from elsewhere)
+    // NB: It'd be nice if we could check if there was currently a phone
+    // number set too, but it's not worth making an extra API call, especially
+    // if we expect the number of people with pre-set phone numbers to below
+    if (Login.data && Login.data.team && Login.data.team.team_name) {
+      name.attr("value", Login.data.team.team_name);
+    }
+
+    // Submit handler
     form.submit(function(e) {
       makeBusy(submit);
 
