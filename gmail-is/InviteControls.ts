@@ -134,25 +134,34 @@ module Esper.InviteControls {
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
     // TODO: Implement this function, finalizing the state into an
     // actual event edit.
+    var preferences  = state.prefs.execPrefs;
+    var duplicate    = preferences.general.use_duplicate_events;
+    var execReminder = preferences.general.send_exec_reminder;
+    var holdColor    = preferences.general.hold_event_color;
 
-    //     var eventEdit : ApiT.CalendarEventEdit = {
-    //   google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
-    //   start         : event.start,
-    //   end           : event.end,
-    //   title         : title,
-    //   description   : pubNotes.val(),
-    //   location      : location,
-    //   all_day       : event.all_day,
-    //   guests        : guests,
-    //   recurrence    : event.recurrence,
-    //   recurring_event_id : event.recurring_event_id
-    // };
+    var event = state.event;
 
-    // if (holdColor && |^HOLD: |.test(title)) {
-    //   eventEdit.color_id = holdColor.key;
-    // }
+    var eventEdit : ApiT.CalendarEventEdit = {
+      google_cal_id : (duplicate ? state.calendarId : event.google_cal_id),
+      start         : event.start,
+      end           : event.end,
+      title         : state.title,
+      description   : state.description,
+      location      : {
+        title   : "", // We do not support locations with titles yet.
+        address : state.location
+      },
+      all_day       : event.all_day,
+      guests        : state.guests,
+      recurrence    : event.recurrence,
+      recurring_event_id : event.recurring_event_id
+    };
 
-    return null;
+    if (holdColor && /^HOLD: /.test(state.title)) {
+      eventEdit.color_id = holdColor.key;
+    }
+
+    return eventEdit;
   }
 
   /** Returns a widget for inviting guests to the current event or to
