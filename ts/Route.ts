@@ -127,7 +127,7 @@ module Route {
       }
     },
 
-    "signup2/:fn/:ln/:phone/:email/:platform/:token? route" : function (data) {
+    "signup2/:fn/:ln/:phone/:email/:platform/*:token? route" : function (data) {
       var signup = {
         first_name: data.fn,
         last_name: data.ln,
@@ -136,30 +136,13 @@ module Route {
       };
       if (data.platform === "Google Apps") {
         Api.signup(data.email, signup).done(function() {
-          if (data.token.length > 0) {
+          if (data.token && data.token.length > 0) {
             gotToken(data.token);
           } else {
             Api.createOwnTeam().done(function(response) {
               window.location.assign(response.url);
             });
           }
-        });
-      }
-    },
-
-    // No token
-    "signup2/:fn/:ln/:phone/:email/:platform route" : function (data) {
-      var signup = {
-        first_name: data.fn,
-        last_name: data.ln,
-        phone: data.phone,
-        platform: data.platform
-      };
-      if (data.platform === "Google Apps") {
-        Api.signup(data.email, signup).done(function() {
-          Api.createOwnTeam().done(function(response) {
-            window.location.assign(response.url);
-          });
         });
       }
     },
