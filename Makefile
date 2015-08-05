@@ -16,6 +16,7 @@ prod: prod-build
 	@echo "      ~/service/api/master/install"
 
 dev-build:
+	rm -rf pub
 	$(MAKE) -C ts dev-build
 	$(MAKE) -C html dev-build
 	$(MAKE) -C css dev-build
