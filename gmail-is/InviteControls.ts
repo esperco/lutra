@@ -614,7 +614,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           var slides = [inviteSlide, reminderSlide, descriptionSlide];
           var startState = populateInviteState(event, prefs);
           var controls = {
-            onCancel          : function () { console.info("Cancelled"); },
+            onCancel          : function () { /* no actions needed */ },
             onFinish          : function () { console.info("Finished"); },
             finishButtonTitle : "Invite"
           };

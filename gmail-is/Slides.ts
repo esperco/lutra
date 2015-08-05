@@ -127,7 +127,8 @@ module Esper.Slides {
       if (index === 0) {
         back.text("Cancel");
         back.click(function () {
-          controls.onCancel()
+          controls.onCancel();
+          topContainer.remove();
         });
 
         next.click(nextSlide);
