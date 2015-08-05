@@ -27,10 +27,10 @@ module Esper.Slides {
   // next slide.
   export var invalidState = { error : "Invalid State" };
 
-  export function create<T>(startState : T, slides : (T) => Slide<T>[],
+  export function create<T>(startState : T, slides : ((T) => Slide<T>)[],
                             controls : Controls<T>) {
 '''
-<div #topContainer class="esper-ev-inline-container">
+<div #topContainer>
 </div>
 '''
     var pastSlides : SlideElement<T>[] = [];
@@ -45,6 +45,8 @@ module Esper.Slides {
       time  : 500,
       width : Gmail.threadContainer().width() + 100
     }
+
+    return topContainer;
 
     /** Go to the next slide unless there are no more slides. */
     function nextSlide() {
@@ -124,12 +126,16 @@ module Esper.Slides {
       // Special buttons for the first and last slides:
       if (index === 0) {
         back.text("Cancel");
-        back.click(controls.onCancel());
+        back.click(function () {
+          controls.onCancel()
+        });
 
         next.click(nextSlide);
       } else if (index === slides.length - 1) {
         next.text(controls.finishButtonTitle);
-        next.click(controls.onFinish(current.slide.getState()));
+        next.click(function () {
+          controls.onFinish(current.slide.getState())
+        });
 
         back.click(previousSlide);
       } else {
