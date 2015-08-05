@@ -80,61 +80,55 @@ module Esper.InviteControls {
   }
 
   /** Fills out event details for the given event and preferences. */
-  function populateInviteState(
-    team  : ApiT.Team,
-    event : ApiT.CalendarEvent,
-    prefs : Option.T<CurrentThread.TeamAndPreferences>): Option.T<InviteState> {
-      return prefs.match<Option.T<InviteState>>({
-        some : function (prefs) {
-          var newTitle = event.title || "Untitled Event";
-          newTitle = newTitle.replace(/^HOLD: /, "");
+  function populateInviteState(event : ApiT.CalendarEvent,
+                               prefs : CurrentThread.TeamAndPreferences)
+  : InviteState {
+    var team = prefs.team;
 
-          var location = "";
-          if (event.location) {
-            var address = event.location.address;
+    var newTitle = event.title || "Untitled Event";
+    newTitle = newTitle.replace(/^HOLD: /, "");
 
-            if (event.location.title !== "") {
-              address = event.location.title + " - " + address;
-            }
+    var location = "";
+    if (event.location) {
+      var address = event.location.address;
 
-            location = address;
-          }
+      if (event.location.title !== "") {
+        address = event.location.title + " - " + address;
+      }
 
-          var firstTeamCal = team.team_calendars[0];
-          var calendars    = [];
-          var publicCalId  =
-            firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-          List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-            calendars.push(cal);
+      location = address;
+    }
 
-            if (cal.calendar_default_dupe) {
-              publicCalId = cal.google_cal_id;
-            }
-          });
+    var firstTeamCal = team.team_calendars[0];
+    var calendars    = [];
+    var publicCalId  =
+      firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      calendars.push(cal);
 
-          var author = team.team_email_aliases[0] || Login.myEmail();
+      if (cal.calendar_default_dupe) {
+        publicCalId = cal.google_cal_id;
+      }
+    });
 
-          return Option.some({
-            event : event,
-            prefs : prefs,
+    var author = team.team_email_aliases[0] || Login.myEmail();
 
-            title       : event.title || "Untitled Event",
-            location    : location,
-            calendarId  : publicCalId,
-            calendars   : calendars,
-            createdBy   : author,
-            notes       : "",
-            guests      : [],
+    return {
+      event : event,
+      prefs : prefs,
 
-            reminders   : null,
+      title       : event.title || "Untitled Event",
+      location    : location,
+      calendarId  : publicCalId,
+      calendars   : calendars,
+      createdBy   : author,
+      notes       : "",
+      guests      : [],
 
-            description : event.description
-          });
-        },
-        none : function () {
-          return Option.none<InviteState>();
-        }
-      });
+      reminders   : null,
+
+      description : event.description
+    };
   }
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
@@ -537,10 +531,10 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionSlide(state : InviteState) : 
+  export function descriptionSlide(state : InviteState) :
   Slides.Slide<InviteState> {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container>
   <div #heading class="esper-modal-header">
     Review the guest event description
     <button #pickEmails class="esper-btn esper-btn-secondary">
@@ -553,21 +547,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       Loading...
     </textarea>
   </div>
-  <div class="esper-modal-footer esper-clearfix">
-    <button #invite class="esper-btn esper-btn-primary modal-primary">
-      Invite
-    </button>
-    <button #back class="esper-btn esper-btn-secondary modal-cancel">
-      Back
-    </button>
-  </div>
 </div>
 '''
     var team     = state.prefs.team;
     var threadId = CurrentThread.threadId.get();
     var original = state.event;
 
-    Api.getRestrictedDescription(team.teamid, 
+    Api.getRestrictedDescription(team.teamid,
                                  original.google_event_id, state.guests)
       .done(function (description) {
         // TODO: Make sure that state.notes is correct (instead of state.description).
@@ -584,69 +570,17 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    invite.click(function () {
-      inviting(invite);
-      eventEdit.description = descriptionField.val();
-
-      if (duplicate) {
-        if (CurrentThread.task.isValid()) {
-          var task = CurrentThread.task.get();
-          if (confirmEventIsNotHold(eventEdit)) {
-            Api.createTaskLinkedEvent(from, team.teamid, eventEdit,
-                                      task.taskid)
-              .done(function(created) {
-                Api.syncEvent(team.teamid, threadId,
-                              created.google_cal_id,
-                              created.google_event_id);
-
-                Api.sendEventInvites(team.teamid, from, guests, created);
-                CurrentThread.linkedEventsChange.set(null);
-
-                var execIds = {
-                  calendarId : original.google_cal_id,
-                  eventId    : original.google_event_id
-                };
-                var guestsIds = {
-                  calendarId : created.google_cal_id,
-                  eventId    : created.google_event_id
-                };
-                setReminders(execIds, guestsIds);
-                close();
-              });
-          }
-        } else {
-          Log.e("Can't create a linked event without a valid task");
-        }
-      } else {
-        if (confirmEventIsNotHold(eventEdit)) {
-          Api.updateLinkedEvent(team.teamid, threadId,
-                                original.google_event_id, eventEdit)
-            .done(function() {
-              Api.sendEventInvites(team.teamid, from, guests, original);
-              TaskTab.refreshLinkedEventsList(team, threadId,
-                                              TaskTab.currentTaskTab);
-
-              var execIds = {
-                calendarId : original.google_cal_id,
-                eventId    : original.google_event_id
-              };
-              setReminders(execIds, execIds);
-              close();
-            });
-        }
-      }
-    });
+    var descriptionMessageids = [];
 
     pickEmails.click(function() {
-      eventEdit.description_messageids = original.description_messageids
-        || [];
+      descriptionMessageids = original.description_messageids || [];
       var task = CurrentThread.task.get();
       var dialog = Modal.dialog("Task Messages",
                                 TaskMessageList.render(task.taskid,
-                                                       eventEdit.description_messageids),
+                                                       descriptionMessageids),
                                 function() {
                                   Api.getEventDescriptionWithMessages
-                                  (descriptionField.val(), eventEdit.description_messageids)
+                                  (descriptionField.val(), descriptionMessageids)
                                     .then(function(desc) {
                                       descriptionField.val(desc.description_text);
                                     });
@@ -654,42 +588,16 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       $("body").append(dialog.view);
     });
 
-    return container;
-
-    function setReminders(execIds, guestsIds) {
-      if (reminderSpec) {
-        if (reminderSpec.exec.time) {
-          Api.getProfile(team.team_executive, team.teamid)
-            .done(function (profile) {
-              var reminder = {
-                guest_email      : profile.email,
-                reminder_message : reminderSpec.exec.text
-              };
-
-              Api.enableReminderForGuest(execIds.eventId, profile.email,
-                                         reminder);
-
-              Api.setReminderTime(team.teamid, from, execIds.calendarId,
-                                  execIds.eventId, reminderSpec.exec.time);
-            });
-        }
-
-        if (reminderSpec.guests.time) {
-          for (var i = 0; i < guests.length; i++) {
-            var guest    = guests[i];
-            var reminder = {
-              guest_email : guest.email,
-              reminder_message : reminderSpec.guests.text
-            };
-
-            Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
-
-            Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
-                                guestsIds.eventId, reminderSpec.guests.time);
-          }
-        }
-      }
+    function getState() {
+      var newState = $.extend({}, state);
+      newState.description = descriptionField.val();
+      return newState;
     }
+
+    return {
+      element  : container,
+      getState : getState
+    };
   }
 
   /** Inserts a new "Invite Guests" widget after the contents of the
@@ -700,6 +608,25 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
       // TODO: Insert slides!
       // Gmail.threadContainer().after(inviteWidget(event, prefs));
+
+      prefs.match({
+        some : function (prefs) {
+          var slides = [inviteSlide, reminderSlide, descriptionSlide];
+          var startState = populateInviteState(event, prefs);
+          var controls = {
+            onCancel          : function () { console.info("Cancelled"); },
+            onFinish          : function () { console.info("Finished"); },
+            finishButtonTitle : "Invite"
+          };
+
+          var slideWidget =
+            Slides.create<InviteState>(startState, slides, controls);
+          Gmail.threadContainer().after(slideWidget);
+        },
+        none : function () {
+          window.alert("Could not invite guests because no team is currently detected.")
+        }
+      });
 
       // fix mysteriously appearing padding at end of thread:
       Gmail.threadFooter().css("padding-bottom", "10px");
