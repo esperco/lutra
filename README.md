@@ -14,7 +14,7 @@ Call `make setup` to install dependencies.
 Call `npm run watch` to set up a development server that watches source
 files for change.
 
-For produciton builds, you'll also need to install `s3tools` to upload to
+For production builds, you'll also need to install `s3tools` to upload to
 Amazon S3. On a Mac, this is:
 ```
 brew install s3cmd
