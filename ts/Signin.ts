@@ -85,6 +85,60 @@ module Signin {
       });
   };
 
+  // Returns jQuery wrapped HTML code for a Google Button
+  export function googleButton(landingUrl?: string,
+                               optInvite?: string, optEmail?: string):
+    JQuery {
+'''
+<button #button class="button-primary sign-in-btn">
+  <div #google class="google-g"/>
+  <div class="btn-divider"/>
+  <div class="sign-in-text">Sign in with Google</div>
+</button>
+'''
+    var googleG = $("<img class='svg-block'/>")
+      .appendTo(google);
+    Svg.loadImg(googleG, "/assets/img/google-g.svg");
+
+    // Set handler
+    button.click(function() {
+      let nonce = "";
+
+      // Generate login nonce
+      let loginNonceCall = setLoginNonce();
+      loginNonceCall.done(function(loginNonce) {
+        // Assign to higher-scoped variable so our other callbacks can see it
+        nonce = loginNonce;
+      });
+      let calls = [loginNonceCall];
+
+      // We should always have an invite token before going to Google --
+      // if we don't have one, request from server
+      if (!optInvite) {
+        let tokenCall = getSignupToken();
+        tokenCall.done(function(token) {
+          // Assign to higher-scoped variable so our other callbacks can see it
+          optInvite = token;
+        });
+        calls.push(tokenCall);
+      }
+
+      // Run token and nonce calls in parallel
+      Deferred.join(calls)
+        // Get Google endpoint based on nonce and token
+        .then(function() {
+          landingUrl = landingUrl || "#!";
+          return Api.getGoogleAuthUrl(landingUrl, nonce, optInvite, optEmail);
+        }, function(err) { console.error(err); })
+        // Redirect to Google
+        .then(function(x) {
+          // requestGoogleAuth(x.url);
+        }, function(err) { console.error(err); });
+    });
+        
+    return button;
+  };
+
   function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
 <div #view>
@@ -94,25 +148,6 @@ module Signin {
     </div>
     <div #container>
       <div #msgDiv class="sign-in-msg"/>
-      <button #button class="button-primary sign-in-btn">
-        <div #google class="google-g"/>
-        <div class="btn-divider"/>
-        <div class="sign-in-text">Sign in with Google</div>
-      </button>
-      <div class="advisory">
-        <div>
-          <a href="#!" #googleMsgToggle>
-            Can I use something other than Google?
-          </a>
-        </div>
-        <div #googleMsg>
-          Our assistants need access to your calendar to assist you
-          with scheduling. If you use Microsoft Outlook or 
-          Exchange instead of Google Apps, please contact us at
-          <a href="mailto:support@esper.com">support@esper.com</a> to 
-          get set up.
-        </div>
-      </div>
     </div>
   </div>
   <div #footer class="sign-in-footer">
@@ -147,47 +182,10 @@ module Signin {
     if (Util.isString(msg))
       msgDiv.html(msg);
 
-    var googleG = $("<img class='svg-block'/>")
-      .appendTo(google);
-    Svg.loadImg(googleG, "/assets/img/google-g.svg");
+    container.append(googleButton(landingUrl, optInvite, optEmail));
 
-    googleMsg.hide();
-    googleMsgToggle.click(function() {
-      googleMsg.show();
-      googleMsgToggle.hide();
-      return false;
-    });
-
-    setLoginNonce()
-      .done(function(loginNonce) {
-        rootView.removeClass("hide");
-
-        button.click(function() {
-          // Helper
-          let goToGoogle = function(): void {
-            Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
-              .done(function(x) {
-                requestGoogleAuth(x.url);
-              });
-          };
-
-          // We should always have an invite token before going to Google --
-          // if one is passed just use that.
-          if (optInvite) {
-            goToGoogle();
-          }
-
-          // Else ask server for one
-          else {
-            getSignupToken().then(function(token) {
-              optInvite = token;
-              goToGoogle();
-            });
-          }
-        });
-
-        rootView.append(view);
-        });
+    rootView.removeClass("hide");
+    rootView.append(view);
 
     return _view;
   }
