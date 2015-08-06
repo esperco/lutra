@@ -26,7 +26,7 @@ var shell = function(cmd, cb) {
   });
 };
 
-// Set production mode - use a module-wide variable to determine 
+// Set production mode - use a module-wide variable to determine
 gulp.task("production", function(done) {
   config.production = true;
   done();
@@ -47,7 +47,7 @@ var getTempDir = function() {
 // Processes TS files with Oblivion and writes them to a temp directory.
 // Using a temp directory isn't ideal from a streaming perspective, but it's
 // tricky to apply the Oblivion transformation prior to TSify processing
-// the require / reference 
+// the require / reference
 gulp.task("build-oblivion", function() {
   return gulp.src(config.tsGlobs, {base: config.projectBase})
     .pipe(cached('build-oblivion')) // Only pass through changed file
@@ -82,7 +82,7 @@ var spawnTsc = function(watch, cb) {
   if (typeof watch === "function" && !cb) {
     cb = watch;
     watch = false;
-  } 
+  }
 
   // Put together args for Typescript
   var tscArgs = ["--out", path.join(config.pubDir, config.tsBundleName)];
@@ -109,6 +109,7 @@ var spawnTsc = function(watch, cb) {
   var handleEnd = function(code) {
     if (code !== 0) { // Error
       console.error("Error code " + code);
+      process.exit(code);
     }
     cb();
   };
@@ -152,7 +153,7 @@ gulp.task("live-reload", function() {
 });
 
 // Ensure initial build betfore watching to set up temp dir
-gulp.task("watch", gulp.series("build-ts", 
+gulp.task("watch", gulp.series("build-ts",
   gulp.parallel("live-reload", "watch-ts")));
 
 gulp.task("build", gulp.series("build-ts"));
