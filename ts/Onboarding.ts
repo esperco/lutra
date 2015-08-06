@@ -116,8 +116,7 @@ module Onboarding {
 <div #view class="row"><div class="col-sm-offset-2 col-sm-8">
   <form #form class="form-horizontal">
     <div class="form-group" style="text-align: center;">
-      Thanks for signing up!
-      We'll need some additional info to get started.
+      Thanks! We'll need some additional info to continue.
     </div>
     <div class="form-group">
       <label class="col-xs-12" for="step0-name">Name</label>

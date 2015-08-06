@@ -104,8 +104,12 @@ module Route {
     },
 
     "join/:step route" : function (data) {
-      let step = parseInt(data.step) || 1;
-      withLogin(Page.onboarding.load, [step]);
+      let step = parseInt(data.step) || 0;
+      if (step) {
+        withLogin(Page.onboarding.load, [step]);
+      } else {
+        Page.onboarding.load();
+      }
     },
 
     "plans/:teamid route" : function (data) {
