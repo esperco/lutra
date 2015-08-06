@@ -7,6 +7,7 @@ var config = require("./config");
 // work with Gulp 3.x or below.
 var gulp = require("gulp"),
     cached = require("gulp-cached"),
+    filter = require("gulp-filter"),
     less = require("gulp-less"),
     livereload = require("livereload"),
     path = require("path"),
@@ -41,11 +42,15 @@ gulp.task("build-img", function() {
 });
 
 gulp.task("build-html", function() {
-  return gulp.src(path.join(config.htmlDir, "**/*.html"))
-    // Get rid of extension
+  // Get rid of extension, except for index.html
+  var indexFilter = filter(["*", "!index.html"], {restore: true});
+
+  return gulp.src(path.join(config.htmlDir, "**/*.html"))    
+    .pipe(indexFilter)
     .pipe(rename(function (path) {
       path.extname = "";
     }))
+    .pipe(indexFilter.restore)
     .pipe(gulp.dest(config.pubDir));
 });
 

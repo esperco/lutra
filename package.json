@@ -19,6 +19,7 @@
     "ecstatic": "^0.8.0",
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
     "gulp-cached": "^1.1.0",
+    "gulp-filter": "^3.0.0",
     "gulp-less": "^3.0.3",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.5.2",
