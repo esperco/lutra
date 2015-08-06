@@ -124,7 +124,7 @@ module Signin {
       }
 
       // Run token and nonce calls in parallel
-      Deferred.join(calls)
+      Deferred.join(calls, true)
         // Get Google endpoint based on nonce and token
         .then(function() {
           landingUrl = landingUrl || "#!";
@@ -132,7 +132,7 @@ module Signin {
         }, function(err) { console.error(err); })
         // Redirect to Google
         .then(function(x) {
-          // requestGoogleAuth(x.url);
+          requestGoogleAuth(x.url);
         }, function(err) { console.error(err); });
     });
         
