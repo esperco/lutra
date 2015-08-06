@@ -9,6 +9,7 @@
 module Status {
 
   export function report(msg, kind) {
+<<<<<<< Updated upstream
     var elt = $("#global-status");
     elt.children().remove();
     elt
@@ -21,6 +22,33 @@ module Status {
     setTimeout(function() {
       elt.hide();
     }, 3000);
+=======
+    var container = $("#global-status");
+
+    // Relies on bootstrap for event handling
+    var closeButton = $(
+      `<button type="button" class="close" data-dismiss="alert"
+               aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>`);
+
+    var elt = $(`<div />`)
+      .append(closeButton)
+      .append(msg)
+      .addClass("alert alert-dismissible alert-" + kind)
+
+    container.empty().append(elt);
+
+    /*
+      Leave the error message on for a long time when developing
+      so we have time to take a screenshot and whatnot.
+    */
+    var hideAfterMs = Conf.prod ? 20000 : 300000;
+
+    setTimeout(function() {
+      clear();
+    }, hideAfterMs);
+>>>>>>> Stashed changes
   };
 
   export function reportError(msg) {
@@ -32,7 +60,7 @@ module Status {
   };
 
   export function clear() {
-    $("#error").hide();
+    $("#global-status").empty();
   };
 
   /*
@@ -59,12 +87,13 @@ module Status {
     };
   };
 
-  /* Any click in the browser's window hides the status area */
+  /* Any click in the browser's window hides the status area
+     NB: Disabled to allow copying and pasting of errors */
   export function init() {
-    $("body").click(function() {
-      $("#global-status").hide();
-      return true;
-    });
+    // $("body").click(function() {
+    //   clear();
+    //   return true;
+    // });
   };
 
 }
