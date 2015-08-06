@@ -60,6 +60,12 @@ module Onboarding {
   /* Step 0 => Sign in */
   function step0(refs: IJQMap): void {
     refs["progress"].width("25%");
+
+    // Log out if applicable
+    if (Login.data) {
+      Login.clearLoginInfo();
+    }
+
     let button = Signin.googleButton(/* landingUrl */ "#!join/1");
     let content = refs["content"];
     content.append(button);
