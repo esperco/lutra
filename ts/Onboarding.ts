@@ -6,8 +6,8 @@
 
 module Onboarding {
   // Routes to a particular onboarding step
-  export function goToStep(teamId: string, step: number) {
-    Route.nav.path("#!join/" + teamId + "/" + step);
+  export function goToStep(step: number) {
+    Route.nav.path("#!join/" + step);
   }
 
   // Returns the root container object into which we insert onboarding stuff
@@ -43,11 +43,11 @@ module Onboarding {
     };
   }
 
-  let steps = [step0, step1, step2];
+  let steps = [step0, step1, step2, step3];
 
-  export function load(teamId: string, step: number) {
+  export function load(step = 0) {
     var refs = loadContainer();
-    steps[step](teamId, refs);
+    steps[step](refs);
   }
 
   // Takes a JQuery-wrapped submit button and makes it look "busy"
@@ -56,9 +56,41 @@ module Onboarding {
     button.prop("disabled", true);
   }
 
-  /* Step 0 => Confirm executive name */
-  function step0(teamId: string, refs: IJQMap): void {
-    refs["progress"].width("33%");
+  
+  /* Step 0 => Sign in */
+  function step0(refs: IJQMap): void {
+    refs["progress"].width("25%");
+    let button = Signin.googleButton(/* landingUrl */ "#!join/1");
+    let content = refs["content"];
+    content.append(button);
+  }
+
+  // Use to get current team if we're working form Onboarding flow
+  function getTeam(): ApiT.Team {
+    var team = Login.getTeam();
+    if (!team) {
+      let teams = Login.getTeams() || [];
+      if (teams.length) {
+        var joinTeamId = Login.data.missing_shared_calendar;
+        if (joinTeamId) {
+          team = List.find(Login.getTeams(), function(t : ApiT.Team) {
+            return t.teamid === joinTeamId;
+          });
+        } else {
+          team = teams[0];
+        }
+      }
+    }
+
+    if (team) {
+      Login.setTeam(team);
+      return team;
+    }
+  }
+
+  /* Step 1 => Confirm executive name */
+  function step1(refs: IJQMap): void {
+    refs["progress"].width("50%");
 '''
 <div #view class="row"><div class="col-sm-offset-2 col-sm-8">
   <form #form class="form-horizontal">
@@ -98,8 +130,9 @@ module Onboarding {
     // NB: It'd be nice if we could check if there was currently a phone
     // number set too, but it's not worth making an extra API call, especially
     // if we expect the number of people with pre-set phone numbers to below
-    if (Login.data && Login.data.team && Login.data.team.team_name) {
-      name.attr("value", Login.data.team.team_name);
+    let team = getTeam();
+    if (team && team.team_name) {
+      name.attr("value", team.team_name);
     }
 
     // Submit handler
@@ -122,8 +155,8 @@ module Onboarding {
       });
 
       let calls = [
-        Api.setTeamName(teamId, nameVal),
-        Api.setMeetingTypes(teamId, meetingTypes)
+        Api.setTeamName(team.teamid, nameVal),
+        Api.setMeetingTypes(team.teamid, meetingTypes)
       ];
 
       // AJAX calls for name and phone nubmer, then load step 1
@@ -133,7 +166,7 @@ module Onboarding {
       // 
       Deferred.join(calls)
         .then(function() {
-          goToStep(teamId, 1);
+          goToStep(2);
         });
 
       // Prevent page reload
@@ -145,9 +178,9 @@ module Onboarding {
     name.focus();
   }
 
-  /* Step 1 => Share calendars */
-  function step1(teamId: string, refs: IJQMap): void {
-    refs["progress"].width("67%");
+  /* Step 2 => Share calendars */
+  function step2(refs: IJQMap): void {
+    refs["progress"].width("75%");
 '''
 <div #view>
   <div #description class="calendar-setting-description">
@@ -159,12 +192,9 @@ module Onboarding {
   </button>
 </div>
 '''
-    var team : ApiT.Team =
-      List.find(Login.getTeams(), function(t : ApiT.Team) {
-        return t.teamid === teamId;
-      });
+    let team = getTeam();
 
-    Api.getCalendarList(teamId)
+    Api.getCalendarList(team.teamid)
       .done(function(response) {
         CalendarsTab.displayCalendarList(calendarView, response.calendars);
 
@@ -200,7 +230,7 @@ module Onboarding {
 
             // Then redirect to next / final step
             .then(function() {
-              goToStep(teamId, 2);
+              goToStep(3);
             });
         });
       });
@@ -210,7 +240,7 @@ module Onboarding {
   }
 
   /* Step 2 => complete */
-  function step2(teamId: string, refs: IJQMap): void {
+  function step3(refs: IJQMap): void {
     refs["progress"].width("100%");
 '''
 <div #view>
@@ -234,10 +264,7 @@ module Onboarding {
   </div>
 </div>
 '''
-    var team : ApiT.Team =
-      List.find(Login.getTeams(), function(t : ApiT.Team) {
-        return t.teamid === teamId;
-      });
+    let team = getTeam();
     var asstEmail = team.team_email_aliases[0];
     var asstName = asstEmail.split("@")[0];
     asstName = asstName.charAt(0).toUpperCase() + asstName.slice(1);

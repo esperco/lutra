@@ -49,11 +49,11 @@ module Page {
   }
 
   export var onboarding: Loadable = {
-    load: function(teamid: string, step = 0) {
+    load: function(step=0) {
       pageSelector.hideAll();
       showPage("onboarding");
-      Log.d("Onboarding.load()", teamid);
-      Onboarding.load(teamid, step);
+      Log.d("Onboarding.load()");
+      Onboarding.load(step);
       Util.focus();
     }
   };

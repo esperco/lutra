@@ -336,15 +336,15 @@ module Settings {
       if (teams[0] !== null) {
         Login.setTeam(teams[0]); //refresh login data since assistants/aliases may have been added during setup
         if (Util.isString(joinTeam)) {
-          var step = 0;
+          var step = 1;
 
           // Has team name been set yet?
           if (Login.data.email !== Login.data.team.team_name) {
-            step = 1; // Move to calendar step
+            step = 2; // Move to calendar step
           }
 
           // This is a new exec customer who needs to be onboarded
-          location.hash = "#!join/" + joinTeam  + "/" + step;
+          location.hash = "#!join/" + step;
         }
         else {
           location.hash = "#!team-settings/" + teams[0].teamid;

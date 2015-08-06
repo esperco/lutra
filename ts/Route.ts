@@ -98,13 +98,14 @@ module Route {
       withLogin(Page.teamSettings.load, data.teamid);
     },
 
-    "join/:teamid route" : function (data) {
-      withLogin(Page.onboarding.load, [data.teamid, 0]);
+    // Intentionally not requiring login for this
+    "join route": function (data) {
+      Page.onboarding.load();
     },
 
-    "join/:teamid/:step route" : function (data) {
-      let step = parseInt(data.step) || 0;
-      withLogin(Page.onboarding.load, [data.teamid, step]);
+    "join/:step route" : function (data) {
+      let step = parseInt(data.step) || 1;
+      withLogin(Page.onboarding.load, [step]);
     },
 
     "plans/:teamid route" : function (data) {
