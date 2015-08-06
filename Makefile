@@ -4,8 +4,7 @@ install: s3
 
 # Copy public files into pub/
 local-install:
-	$(MAKE) -C css
-	./local-install
+	npm run build
 
 # Copy pub/ into S3 bucket
 s3:
@@ -14,4 +13,3 @@ s3:
 clean:
 	rm -f *~ */*~
 	rm -rf pub
-	$(MAKE) -C css clean
