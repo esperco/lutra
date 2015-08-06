@@ -18,9 +18,16 @@ module Status {
       .one("click", function() {
         elt.hide();
       });
+
+    /*
+      Leave the error message on for a long time when developing
+      so we have time to take a screenshot and whatnot.
+    */
+    var hideAfterMs = Conf.prod ? 6000 : 300000;
+
     setTimeout(function() {
       elt.hide();
-    }, 3000);
+    }, hideAfterMs);
   };
 
   export function reportError(msg) {
