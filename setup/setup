@@ -46,7 +46,7 @@ install_js bootstrap bootstrap/js/bootstrap.js
 install_js sha1 sha1.js
 
 # CanJS
-install_js can can-2.0.5.custom.js
+install_js can can-2.2.7.custom.js
 
 # Timeago
 install_js jquery.timeago jquery.timeago.js
