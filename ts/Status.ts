@@ -9,20 +9,6 @@
 module Status {
 
   export function report(msg, kind) {
-<<<<<<< Updated upstream
-    var elt = $("#global-status");
-    elt.children().remove();
-    elt
-      .text(msg)
-      .addClass("alert alert-" + kind)
-      .show()
-      .one("click", function() {
-        elt.hide();
-      });
-    setTimeout(function() {
-      elt.hide();
-    }, 3000);
-=======
     var container = $("#global-status");
 
     // Relies on bootstrap for event handling
@@ -48,7 +34,6 @@ module Status {
     setTimeout(function() {
       clear();
     }, hideAfterMs);
->>>>>>> Stashed changes
   };
 
   export function reportError(msg) {
