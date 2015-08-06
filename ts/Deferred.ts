@@ -41,7 +41,7 @@ module Deferred {
             /* upon failure we keep going anyway */
             function(err) {
               hasError = true;
-              b[i] = err;
+              b[i] = failOnAny ? err : null;
               return next(i+1);
             }
           )
