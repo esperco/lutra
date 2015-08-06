@@ -40,6 +40,7 @@ module Deferred {
             },
             /* upon failure we keep going anyway */
             function(err) {
+              hasError = true;
               b[i] = err;
               return next(i+1);
             }
