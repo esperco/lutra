@@ -14,6 +14,9 @@ var gulp = require("gulp"),
     path = require("path"),
     temp = require("temp");
 
+// Temp var to denote watch vs. build mode
+var watchMode = false;
+
 // Helper to just run a short-lived shell command
 var shell = function(cmd, cb) {
   if (cmd instanceof Array) {
@@ -109,7 +112,9 @@ var spawnTsc = function(watch, cb) {
   var handleEnd = function(code) {
     if (code !== 0) { // Error
       console.error("Error code " + code);
-      process.exit(code);
+      if (! watchMode) {
+        process.exit(code);
+      }
     }
     cb();
   };
@@ -153,7 +158,10 @@ gulp.task("live-reload", function() {
 });
 
 // Ensure initial build betfore watching to set up temp dir
-gulp.task("watch", gulp.series("build-ts",
+// Set var so we know we're in watch
+gulp.task("watch", gulp.series(
+  function(cb) { watchMode = true; cb(); },
+  "build-ts",
   gulp.parallel("live-reload", "watch-ts")));
 
 gulp.task("build", gulp.series("build-ts"));
