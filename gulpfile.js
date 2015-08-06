@@ -54,4 +54,4 @@ gulp.task("build", gulp.parallel("build-css",
                                  "build-js",
                                  "build-img"));
 
-// gulp.task("default", "build");
+gulp.task("default", gulp.series("build"));
