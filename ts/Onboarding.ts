@@ -65,10 +65,25 @@ module Onboarding {
     if (Login.data) {
       Login.clearLoginInfo();
     }
-
-    let button = Signin.googleButton(/* landingUrl */ "#!join/1");
+'''
+<div #view class="row">
+  <div style="text-align: center" class="col-sm-offset-3 col-sm-6">
+    <div>
+      <strong>Awesome.</strong> Our assistants use Google Calendar to 
+      assist you with scheduling. Please sign in with Google to continue.
+    </div>
+    <div #buttonContainer style="padding:40px 0">
+    </div>
+    <div>
+      Use Microsoft Office or Exchange for calendaring?<br />Contact us at
+      <a href="mailto:support@esper.com">support@esper.com</a> to get set up.
+    </div>
+  </div>
+</div>
+'''
+    buttonContainer.append(Signin.googleButton(/* landingUrl */ "#!join/1"));
     let content = refs["content"];
-    content.append(button);
+    content.append(view);
   }
 
   // Use to get current team if we're working form Onboarding flow
@@ -101,7 +116,8 @@ module Onboarding {
 <div #view class="row"><div class="col-sm-offset-2 col-sm-8">
   <form #form class="form-horizontal">
     <div class="form-group" style="text-align: center;">
-      Thanks for signing up for Esper! We'll need some info to get started.
+      Thanks for signing up!
+      We'll need some additional info to get started.
     </div>
     <div class="form-group">
       <label class="col-xs-12" for="step0-name">Name</label>
