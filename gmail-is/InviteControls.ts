@@ -563,16 +563,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         descriptionField.val(state.notes + description.description_text);
       });
 
-    function confirmEventIsNotHold(eventEdit) {
-      if (/^HOLD: /.test(eventEdit.title)) {
-        return window.confirm(
-          "About to invite guests to a HOLD event! Are you sure?"
-        );
-      } else {
-        return true;
-      }
-    }
-
     var descriptionMessageids = [];
 
     pickEmails.click(function() {
@@ -618,7 +608,15 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           var startState = populateInviteState(event, prefs);
           var controls = {
             onCancel          : function () { /* no actions needed */ },
-            onFinish          : function () { console.info("Finished"); },
+            onFinish          : function (state) {
+              finalizeEvent(state).done(function (done) {
+                if (done) {
+                  slideWidget.remove();
+                } else {
+                  throw Slides.invalidState;
+                }
+              });
+            },
             finishButtonTitle : "Invite"
           };
 
@@ -634,6 +632,121 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       // fix mysteriously appearing padding at end of thread:
       Gmail.threadFooter().css("padding-bottom", "10px");
     });
+  }
+
+  function confirmEventIsNotHold(eventEdit) {
+    if (/^HOLD: /.test(eventEdit.title)) {
+      return window.confirm(
+        "About to invite guests to a HOLD event! Are you sure?"
+      );
+    } else {
+      return true;
+    }
+  }
+
+  /** Actually invite guests to an event and carry out the needed
+   *  modifications.
+   */
+  function finalizeEvent(state : InviteState): JQueryPromise<boolean> {
+    var eventEdit = toEventEdit(state);
+
+    var team     = state.prefs.team;
+    var threadId = CurrentThread.threadId.get();
+
+    var duplicate    = state.prefs.execPrefs.general.use_duplicate_events;
+    var from         = state.createdBy;
+    var guests       = state.guests;
+    var original     = state.event;
+    var reminderSpec = state.reminders;
+
+    if (duplicate) {
+      if (CurrentThread.task.isValid()) {
+        var task = CurrentThread.task.get();
+        if (confirmEventIsNotHold(eventEdit)) {
+          return Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+            .then(function(created) {
+              Api.syncEvent(team.teamid, threadId,
+                            created.google_cal_id,
+                            created.google_event_id);
+
+              Api.sendEventInvites(team.teamid, from, guests, created);
+              CurrentThread.linkedEventsChange.set(null);
+
+              var execIds = {
+                calendarId : original.google_cal_id,
+                eventId    : original.google_event_id
+              };
+              var guestsIds = {
+                calendarId : created.google_cal_id,
+                eventId    : created.google_event_id
+              };
+              setReminders(execIds, guestsIds);
+
+              return true;
+            });
+        } else {
+          return Promise.defer(false);
+        }
+      } else {
+        Log.e("Can't create a linked event without a valid task");
+        return Promise.defer(false);
+      }
+    } else {
+      if (confirmEventIsNotHold(eventEdit)) {
+        return Api.updateLinkedEvent(team.teamid, threadId,
+                              original.google_event_id, eventEdit)
+          .then(function() {
+            Api.sendEventInvites(team.teamid, from, guests, original);
+            TaskTab.refreshLinkedEventsList(team, threadId,
+                                            TaskTab.currentTaskTab);
+
+            var execIds = {
+              calendarId : original.google_cal_id,
+              eventId    : original.google_event_id
+            };
+            setReminders(execIds, execIds);
+
+            return true;
+          });
+      } else {
+        return Promise.defer(false);
+      }
+    }
+
+    function setReminders(execIds, guestsIds) {
+      if (reminderSpec) {
+        if (reminderSpec.exec.time) {
+          Api.getProfile(team.team_executive, team.teamid)
+            .done(function (profile) {
+              var reminder = {
+                guest_email      : profile.email,
+                reminder_message : reminderSpec.exec.text
+              };
+
+              Api.enableReminderForGuest(execIds.eventId, profile.email,
+                                         reminder);
+
+              Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                  execIds.eventId, reminderSpec.exec.time);
+            });
+        }
+
+        if (reminderSpec.guests.time) {
+          for (var i = 0; i < guests.length; i++) {
+            var guest    = guests[i];
+            var reminder = {
+              guest_email : guest.email,
+              reminder_message : reminderSpec.guests.text
+            };
+
+            Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
+
+            Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
+                                guestsIds.eventId, reminderSpec.guests.time);
+          }
+        }
+      }
+    }
   }
 
   export function viewPersonInvolved(peopleInvolved: { [email:string]: string },
