@@ -2,6 +2,10 @@
 default: local-install
 install: s3
 
+# Install dependencies
+setup:
+	npm install
+
 # Copy public files into pub/
 local-install:
 	npm run build

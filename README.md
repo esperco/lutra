@@ -2,10 +2,20 @@ In most cases, HoneyBadger doesn't care. In this case, this directory contains
 the files to run the front-end Esper website (including our jobs page,
 privacy policy, contact us, etc.)
 
+
 Prerequisites
 -------------
 
-Install `s3tools`. On a Mac, this is:
+You need Node and NPM installed (see instructions at
+https://github.com/esperco/stoat).
+
+Call `make setup` to install dependencies.
+
+Call `npm run watch` to set up a development server that watches source
+files for change.
+
+For produciton builds, you'll also need to install `s3tools` to upload to
+Amazon S3. On a Mac, this is:
 ```
 brew install s3cmd
 ```
