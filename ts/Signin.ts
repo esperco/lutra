@@ -148,6 +148,12 @@ module Signin {
     </div>
     <div #container>
       <div #msgDiv class="sign-in-msg"/>
+      <div #buttonContainer />
+      <div class="advisory">
+        Use Microsoft Office or Exchange?
+        Contact us at <a href="mailto:support@esper.com">support@esper.com</a> 
+        for assistance.
+      </div>
     </div>
   </div>
   <div #footer class="sign-in-footer">
@@ -182,7 +188,7 @@ module Signin {
     if (Util.isString(msg))
       msgDiv.html(msg);
 
-    container.append(googleButton(landingUrl, optInvite, optEmail));
+    buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
 
     rootView.removeClass("hide");
     rootView.append(view);
