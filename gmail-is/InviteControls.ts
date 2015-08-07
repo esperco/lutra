@@ -50,15 +50,120 @@ module Esper.InviteControls {
     return tz;
   }
 
+  interface ReminderSpec {
+    exec?   : { text : string; time : number };
+    guests? : { text : string; time : number };
+  }
+
+  /** An object that contains all the values entered through the
+   *  invite flow.
+   */
+  interface InviteState {
+    // Initial values:
+    event : ApiT.CalendarEvent;
+    prefs : CurrentThread.TeamAndPreferences;
+
+    // Event details, initially populated from event:
+    title       : string;
+    location    : ApiT.Location;
+    calendarId? : string;
+    calendars   : ApiT.Calendar[];
+    createdBy   : string;
+    notes       : string;
+    guests      : ApiT.Guest[];
+
+    // Reminders:
+    reminders? : ReminderSpec;
+
+    // Final description:
+    description? : string;
+  }
+
+  /** Fills out event details for the given event and preferences. */
+  function populateInviteState(event : ApiT.CalendarEvent,
+                               prefs : CurrentThread.TeamAndPreferences)
+  : InviteState {
+    var team = prefs.team;
+
+    var newTitle = event.title || "Untitled Event";
+    newTitle = newTitle.replace(/^HOLD: /, "");
+
+    var location = event.location;
+    if (location) {
+      if (location.title !== "") {
+        location.address = location.title + " - " + location.address;
+      }
+    }
+
+    var firstTeamCal = team.team_calendars[0];
+    var calendars    = [];
+    var publicCalId  =
+      firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
+    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
+      calendars.push(cal);
+
+      if (cal.calendar_default_dupe) {
+        publicCalId = cal.google_cal_id;
+      }
+    });
+
+    var author = team.team_email_aliases[0] || Login.myEmail();
+
+    return {
+      event : event,
+      prefs : prefs,
+
+      title       : newTitle,
+      location    : location,
+      calendarId  : publicCalId,
+      calendars   : calendars,
+      createdBy   : author,
+      notes       : "",
+      guests      : [],
+
+      reminders   : null,
+
+      description : event.description
+    };
+  }
+
+  function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
+    var preferences  = state.prefs.execPrefs;
+    var duplicate    = preferences.general.use_duplicate_events;
+    var execReminder = preferences.general.send_exec_reminder;
+    var holdColor    = preferences.general.hold_event_color;
+
+    var event = state.event;
+
+    var eventEdit : ApiT.CalendarEventEdit = {
+      google_cal_id : (duplicate ? state.calendarId : event.google_cal_id),
+      start         : event.start,
+      end           : event.end,
+      title         : state.title,
+      description   : state.description,
+      location      : state.location,
+      all_day       : event.all_day,
+      guests        : state.guests,
+      recurrence    : event.recurrence,
+      recurring_event_id : event.recurring_event_id
+    };
+
+    if (holdColor && /^HOLD: /.test(state.title)) {
+      eventEdit.color_id = holdColor.key;
+    }
+
+    return eventEdit;
+  }
+
   /** Returns a widget for inviting guests to the current event or to
    *  a duplicate event, depending on the relevant setting in the exec
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteWidget(event: ApiT.CalendarEvent,
-                               prefs : Option.T<CurrentThread.TeamAndPreferences>) {
+  export function inviteSlide(initialState : InviteState):
+  Slides.Slide<InviteState> {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container>
   <div #heading class="esper-modal-header">
     Create a duplicate event for guests
   </div>
@@ -111,14 +216,6 @@ module Esper.InviteControls {
           </button>
         </div>
       </div>
-      <div class="esper-modal-footer esper-clearfix">
-        <button #next class="esper-btn esper-btn-primary modal-primary">
-          Next
-        </button>
-        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-          Cancel
-        </button>
-      </div>
     </div>
   </div>
 </div>
@@ -127,435 +224,167 @@ module Esper.InviteControls {
   Not Duplicate
 </div>
 '''
-    return prefs.match({
-      some : function (allPrefs) {
-        /** Removes the widget from the DOM. */
-        function close() {
-          container.remove();
-        }
+    var prefs    = initialState.prefs;
+    var team     = prefs.team;
+    var threadId = CurrentThread.threadId.get();
+    var event    = initialState.event;
 
-        var team = allPrefs.team;
-        var threadId = CurrentThread.threadId.get();
+    Sidebar.customizeSelectArrow(pubCalendar);
+    Sidebar.customizeSelectArrow(fromSelect);
 
-        Sidebar.customizeSelectArrow(pubCalendar);
-        Sidebar.customizeSelectArrow(fromSelect);
+    pubTitle.val(initialState.title);
+    pubLocation.val(initialState.location);
 
-        var newTitle = event.title || "Untitled event";
-        pubTitle.val(newTitle.replace(/^HOLD: /, ""));
+    if (initialState.description) {
+      var separatorIndex = event.description.search(/=== Conversation ===/);
+      pubNotes.val(event.description.substring(0, separatorIndex).trim());
+    }
+    // Include exec's phone number in description if preferences allow it
+    appendExecPublicPhone(team, pubNotes);
 
-        if (event.description) {
-          var separatorIndex = event.description.search(/=== Conversation ===/);
-          pubNotes.val(event.description.substring(0, separatorIndex).trim());
-        }
-        // Include exec's phone number in description if preferences allow it
-        appendExecPublicPhone(team, pubNotes);
+    // Initializing the calendar dropdown:
+    var publicCalId = initialState.calendarId;
 
-        if (event.location) {
-          var address = event.location.address;
+    if (publicCalId) {
+      pubCalendar.val(publicCalId);
+    }
 
-          if (event.location.title !== "") {
-            address = event.location.title + " - " + address;
-          }
+    initialState.calendars.forEach(function (cal) {
+      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
+                           cal.calendar_title + "</option>"));
+    });
 
-          pubLocation.val(address);
-        }
+    var aliases = team.team_email_aliases;
+    if (aliases.length === 0) {
+      $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
+      fromSelect.prop("disabled", true);
+    } else {
+      aliases.forEach(function (email: string) {
+        $("<option>" + email + "</option>").appendTo(fromSelect);
+      });
+    }
 
-        var firstTeamCal = team.team_calendars[0];
-        var publicCalId =
-          firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-        List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-          var id = cal.google_cal_id;
-          pubCalendar.append($("<option value='" + id + "'>" +
-                               cal.calendar_title + "</option>"));
-          if (cal.calendar_default_dupe) {
-            pubCalendar.val(id);
-            publicCalId = id;
-          }
-        });
+    var taskPrefs;
+    prefs.taskPrefs.match({
+      some: function(prefs) { taskPrefs = prefs; },
+      none: function() { }
+    });
 
-        pubCalendar.change(function() {
-          publicCalId = $(this).val();
-        });
-
-        var aliases = team.team_email_aliases;
-        if (aliases.length === 0) {
-          $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-          fromSelect.prop("disabled", true);
-        } else {
-          aliases.forEach(function (email: string) {
-            $("<option>" + email + "</option>").appendTo(fromSelect);
-          });
-        }
-
-        var taskPrefs;
-        allPrefs.taskPrefs.match({
-          some: function(prefs) { taskPrefs = prefs; },
-          none: function() { }
-        });
-
-        var peopleInvolved : { [email:string]: string } = {};
-        CurrentThread.getExternalParticipants().done(function(participants) {
-          if (participants.length > 0) {
-            List.iter(participants, function (participant) {
-              var name = participant.display_name || "";
-              var email = participant.email;
-              var tz = timezoneForGuest(email, taskPrefs, event);
-              var v = viewPersonInvolved(peopleInvolved, email, name,
-                                         tz, taskPrefs);
-              viewPeopleInvolved.append(v);
-            });
-          } else {
-            viewPeopleInvolved
-              .append($("<li class='esper-gray'>No guests found</li>"));
-          }
-        });
-
-        addGuest.click(function() {
-          var name  = newGuestName.val();
-          var email = newGuestEmail.val();
-          peopleInvolved[email] = name;
-          if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
-
-          var checked = true;
+    var peopleInvolved : { [email:string]: string } = {};
+    CurrentThread.getExternalParticipants().done(function(participants) {
+      if (participants.length > 0) {
+        List.iter(participants, function (participant) {
+          var name = participant.display_name || "";
+          var email = participant.email;
           var tz = timezoneForGuest(email, taskPrefs, event);
           var v = viewPersonInvolved(peopleInvolved, email, name,
-                                     tz, taskPrefs, checked);
+                                     tz, taskPrefs);
           viewPeopleInvolved.append(v);
-          newGuestName.val("");
-          newGuestEmail.val("");
         });
-
-        var preferences  = allPrefs.execPrefs;
-        var duplicate    = preferences.general.use_duplicate_events;
-        var execReminder = preferences.general.send_exec_reminder;
-        var holdColor    = preferences.general.hold_event_color;
-
-        if (!duplicate) {
-          heading.text("Invite guests to this calendar event");
-          notDuplicate.appendTo(heading);
-          calendarRow.remove();
-        }
-
-        function searchLocation() {
-          var query = pubLocation.val();
-          LocSearch.displayResults(team, pubLocation, locationDropdown,
-                                   locationSearchResults, query,
-                                   preferences);
-        }
-        Util.afterTyping(pubLocation, 250, searchLocation);
-        pubLocation.click(searchLocation);
-
-        var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
-          fileInfos.forEach(function (fileInfo) {
-            // Not sure how to convince typescript that this is the
-            // fileInfo object from above.
-            var file = <any> fileInfo;
-
-            var link = "https://drive.google.com/file/d/" + file.id +
-              "/view?usp=sharing";
-            pubNotes.val(function (i, text) {
-              return text + "\n\nAttachment " + file.name + " <" + link + ">";
-            });
-          });
-        });
-        notesRow.before(fileUpload);
-
-        next.click(function() {
-          var guests = [];
-          for (var person in peopleInvolved) {
-            if (peopleInvolved.hasOwnProperty(person)) {
-              guests.push({
-                display_name : peopleInvolved[person] || null,
-                email        : person
-              });
-            }
-          }
-
-          var location = {
-            /* Right now we don't care about title because this is just text
-               to be displayed in the Google Calendar location box... but in
-               the future we may use it for typeahead or something. */
-            title   : "",
-            address : pubLocation.val(),
-            timezone : preferences.general.current_timezone
-          };
-          if (!location.address) location = null;
-
-          var title = pubTitle.val();
-          var eventEdit : ApiT.CalendarEventEdit = {
-            google_cal_id : (duplicate ? publicCalId : event.google_cal_id),
-            start         : event.start,
-            end           : event.end,
-            title         : title,
-            description   : pubNotes.val(),
-            location      : location,
-            all_day       : event.all_day,
-            guests        : guests,
-            recurrence    : event.recurrence,
-            recurring_event_id : event.recurring_event_id
-          };
-          if (holdColor && /^HOLD: /.test(title)) {
-            eventEdit.color_id = holdColor.key;
-          }
-
-          var from = fromSelect.val();
-          location = pubLocation.val();
-          var animation = {
-            time : 500,
-            width : Gmail.threadContainer().width() + 100
-          }
-
-          function slideForward(previous, next) {
-            previous.parent().css({
-              "overflow" : "hidden"
-            });
-            previous.animate({left : -animation.width}, animation.time);
-
-            next.css({
-              "left"       : animation.width,
-              "margin-top" : (-previous.height()) + "px"
-            });
-
-            previous.after(next);
-            next.animate({left : 0}, animation.time);
-          }
-
-          function slideBack(previous, next) {
-            previous.animate({left : 0}, animation.time);
-
-            next.animate({left : animation.width},
-                         animation.time,
-                         function () {
-              next.remove();
-            });
-          }
-
-          /** Animates from the current widget to the check description
-           *  widget.
-           */
-          function checkDescription(previous, title, reminderSpec?) {
-            var next =
-              descriptionWidget(event, eventEdit, duplicate,
-                                guests, from, close, back, reminderSpec);
-
-            slideForward(previous, next);
-
-            function back() {
-              slideBack(previous, next);
-            }
-          }
-
-          var next = reminderWidget(event, eventEdit, team,
-                                    execReminder, duplicate, function () {
-            slideBack(container, next);
-          }, function (reminderSpec) {
-            var title = pubTitle.val();
-            checkDescription(next, title, reminderSpec);
-          });
-
-          slideForward(container, next);
-        });
-
-        cancel.click(close);
-
-        return container;
-      },
-      none : function () {
-        container.empty();
-        window.alert("Could not invite guests because no team is currently detected.");
-        return container;
+      } else {
+        viewPeopleInvolved
+          .append($("<li class='esper-gray'>No guests found</li>"));
       }
     });
-  }
 
-  /** Disables the button and changes the text to "Inviting..." to
-   *  signify that work is being done in the background (ie over the
-   *  network).
-   */
-  function inviting(button) {
-    button.text("Inviting...");
-    button.attr("disabled", true);
-  }
+    addGuest.click(function() {
+      var name  = newGuestName.val();
+      var email = newGuestEmail.val();
+      peopleInvolved[email] = name;
+      if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
 
-  /** A widget for viewing and editing the whole event description,
-   *  which includes both the notes from the previous widget and the
-   *  synced email thread contents.
-   */
-  export function descriptionWidget(original: ApiT.CalendarEvent,
-                                    eventEdit: ApiT.CalendarEventEdit,
-                                    duplicate: boolean,
-                                    guests, from, done, backFunction,
-                                    reminderSpec?) {
-'''
-<div #container class="esper-ev-inline-container">
-  <div #heading class="esper-modal-header">
-    Review the guest event description
-    <button #pickEmails class="esper-btn esper-btn-secondary">
-      Pick Emails
-    </button>
-  </div>
-  <div class="esper-ev-modal-content">
-    <textarea #descriptionField
-      rows=24 class="esper-input esper-description-text">
-      Loading...
-    </textarea>
-  </div>
-  <div class="esper-modal-footer esper-clearfix">
-    <button #invite class="esper-btn esper-btn-primary modal-primary">
-      Invite
-    </button>
-    <button #back class="esper-btn esper-btn-secondary modal-cancel">
-      Back
-    </button>
-  </div>
-</div>
-'''
-    return CurrentThread.currentTeam.get().match({
-      some : function (team) {
-        var threadId = CurrentThread.threadId.get();
-
-        Api.getRestrictedDescription(team.teamid, original.google_event_id, guests)
-          .done(function (description) {
-            descriptionField.val(eventEdit.description + description.description_text);
-          });
-
-        function close() {
-          container.remove();
-          done();
-        }
-        back.click(backFunction);
-
-        function confirmEventIsNotHold(eventEdit) {
-          if (/^HOLD: /.test(eventEdit.title)) {
-            return window.confirm(
-              "About to invite guests to a HOLD event! Are you sure?"
-            );
-          } else {
-            return true;
-          }
-        }
-
-        invite.click(function () {
-          inviting(invite);
-          eventEdit.description = descriptionField.val();
-
-          if (duplicate) {
-            if (CurrentThread.task.isValid()) {
-              var task = CurrentThread.task.get();
-              if (confirmEventIsNotHold(eventEdit)) {
-                Api.createTaskLinkedEvent(from, team.teamid, eventEdit,
-                                          task.taskid)
-                  .done(function(created) {
-                    Api.syncEvent(team.teamid, threadId,
-                                  created.google_cal_id,
-                                  created.google_event_id);
-
-                    Api.sendEventInvites(team.teamid, from, guests, created);
-                    CurrentThread.linkedEventsChange.set(null);
-
-                    var execIds = {
-                      calendarId : original.google_cal_id,
-                      eventId    : original.google_event_id
-                    };
-                    var guestsIds = {
-                      calendarId : created.google_cal_id,
-                      eventId    : created.google_event_id
-                    };
-                    setReminders(execIds, guestsIds);
-                    close();
-                  });
-              }
-            } else {
-              Log.e("Can't create a linked event without a valid task");
-            }
-          } else {
-            if (confirmEventIsNotHold(eventEdit)) {
-              Api.updateLinkedEvent(team.teamid, threadId,
-                                    original.google_event_id, eventEdit)
-                .done(function() {
-                  Api.sendEventInvites(team.teamid, from, guests, original);
-                  TaskTab.refreshLinkedEventsList(team, threadId,
-                                                  TaskTab.currentTaskTab);
-
-                  var execIds = {
-                    calendarId : original.google_cal_id,
-                    eventId    : original.google_event_id
-                  };
-                  setReminders(execIds, execIds);
-                  close();
-                });
-            }
-          }
-        });
-
-        pickEmails.click(function() {
-          eventEdit.description_messageids = original.description_messageids
-                                          || [];
-          var task = CurrentThread.task.get();
-          var dialog = Modal.dialog("Task Messages",
-            TaskMessageList.render(task.taskid,
-                                   eventEdit.description_messageids),
-            function() {
-              Api.getEventDescriptionWithMessages
-                (descriptionField.val(), eventEdit.description_messageids)
-              .then(function(desc) {
-                descriptionField.val(desc.description_text);
-              });
-            });
-          $("body").append(dialog.view);
-        });
-
-        return container;
-
-        function setReminders(execIds, guestsIds) {
-          if (reminderSpec) {
-            if (reminderSpec.exec.time) {
-              Api.getProfile(team.team_executive, team.teamid)
-                .done(function (profile) {
-                  var reminder = {
-                    guest_email      : profile.email,
-                    reminder_message : reminderSpec.exec.text
-                  };
-
-                  Api.enableReminderForGuest(execIds.eventId, profile.email,
-                                             reminder);
-
-                  Api.setReminderTime(team.teamid, from, execIds.calendarId,
-                                      execIds.eventId, reminderSpec.exec.time);
-                });
-            }
-
-            if (reminderSpec.guests.time) {
-              for (var i = 0; i < guests.length; i++) {
-                var guest    = guests[i];
-                var reminder = {
-                  guest_email : guest.email,
-                  reminder_message : reminderSpec.guests.text
-                };
-
-                Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
-
-                Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
-                                    guestsIds.eventId, reminderSpec.guests.time);
-              }
-            }
-          }
-        }
-      },
-      none : function () {
-        container.empty();
-        window.alert("Could not fetch description because no team is currently detected.");
-        return container;
-      }
+      var checked = true;
+      var tz = timezoneForGuest(email, taskPrefs, event);
+      var v = viewPersonInvolved(peopleInvolved, email, name,
+                                 tz, taskPrefs, checked);
+      viewPeopleInvolved.append(v);
+      newGuestName.val("");
+      newGuestEmail.val("");
     });
+
+    var preferences  = prefs.execPrefs;
+    var duplicate    = preferences.general.use_duplicate_events;
+    var execReminder = preferences.general.send_exec_reminder;
+    var holdColor    = preferences.general.hold_event_color;
+
+    if (!duplicate) {
+      heading.text("Invite guests to this calendar event");
+      notDuplicate.appendTo(heading);
+      calendarRow.remove();
+    }
+
+    function searchLocation() {
+      var query = pubLocation.val();
+      LocSearch.displayResults(team, pubLocation, locationDropdown,
+                               locationSearchResults, query,
+                               preferences);
+    }
+    Util.afterTyping(pubLocation, 250, searchLocation);
+    pubLocation.click(searchLocation);
+
+    var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
+      fileInfos.forEach(function (fileInfo) {
+        // Not sure how to convince typescript that this is the
+        // fileInfo object from above.
+        var file = <any> fileInfo;
+
+        var link = "https://drive.google.com/file/d/" + file.id +
+          "/view?usp=sharing";
+        pubNotes.val(function (i, text) {
+          return text + "\n\nAttachment " + file.name + " <" + link + ">";
+        });
+      });
+    });
+    notesRow.before(fileUpload);
+
+    function getState(): InviteState {
+      var guests = [];
+      for (var person in peopleInvolved) {
+        if (peopleInvolved.hasOwnProperty(person)) {
+          guests.push({
+            display_name : peopleInvolved[person] || null,
+            email        : person
+          });
+        }
+      }
+
+      return {
+        event : event,
+        prefs : prefs,
+
+        title      : pubTitle.val(),
+        location   : {
+          /* Right now we don't care about title because this is just text
+             to be displayed in the Google Calendar location box... but in
+             the future we may use it for typeahead or something. */
+          title    : "",
+          address  : pubLocation.val(),
+          timezone : preferences.general.current_timezone,
+        },
+        calendarId : publicCalId,
+        calendars  : initialState.calendars,
+        createdBy  : fromSelect.val(),
+        notes      : pubNotes.val(),
+        guests     : guests,
+
+        reminders  : null,
+
+        description : null
+      }
+    }
+
+    return {
+      element  : container,
+      getState : getState
+    };
   }
 
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderWidget(event, eventEdit, team, execReminder, duplicate, backFunction, nextFunction) {
+  function reminderSlide(state : InviteState): Slides.Slide<InviteState> {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container>
   <div #heading class="esper-modal-header">
     Set an automatic reminder for the exec
   </div>
@@ -593,18 +422,19 @@ Hello,
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
 </textarea>
   </div>
-  <div class="esper-modal-footer esper-clearfix">
-    <button #next class="esper-btn esper-btn-primary modal-primary">
-      Next
-    </button>
-    <button #back class="esper-btn esper-btn-secondary modal-cancel">
-      Back
-    </button>
-  </div>
 </div>
 '''
     var execEnabled   = true;
     var guestsEnabled = true;
+
+    var team      = state.prefs.team;
+    var duplicate = state.prefs.execPrefs.general.use_duplicate_events;
+
+    var execReminder, guestsReminder;
+    if (state.reminders) {
+      execReminder   = state.reminders.exec;
+      guestsReminder = state.reminders.guests;
+    }
 
     if (!execReminder) {
       execEnabled = false;
@@ -614,9 +444,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     // Fill out static parts of message template (ie exec name and guests):
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
-      var eventTitle = (duplicate ? event.title : eventEdit.title) || "a meeting";
-      var guestTitle = eventEdit.title || "a meeting";
-      eventTitle = eventTitle.replace(/HOLD: /, "");
+
+      var eventTitle = state.title || "a meeting";
+      var guestTitle = state.title || "a meeting";
 
       execReminderField.val(execReminderField.val()
         .replace("|exec|", name)
@@ -626,8 +456,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         .replace("|event|", guestTitle));
     });
 
-    back.click(backFunction);
-    next.click(function () {
+    function getState(): InviteState {
+      var reminders = null;
+
       var execInvalid   = isNaN(execTime.val() * 1);
       var guestsInvalid = isNaN(guestsTime.val() * 1);
 
@@ -643,16 +474,11 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           guestsWarning.show();
         }
 
-        return;
-      } else {
-        execTime.removeClass("esper-danger");
-        execWarning.hide();
-        guestsTime.removeClass("esper-danger");
-        guestsWarning.hide();
+        throw Slides.invalidState;
       }
 
       if (execEnabled || guestsEnabled) {
-        nextFunction({
+        reminders = {
           exec : {
             text : execReminderField.val(),
             time : execEnabled && Math.floor(execTime.val() * 60 * 60)
@@ -661,11 +487,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
             text : guestsReminderField.val(),
             time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
           }
-        });
-      } else {
-        nextFunction();
+        };
       }
-    });
+
+      var newState = $.extend({}, state);
+      newState.reminders = reminders;
+      return newState;
+    }
 
     execButton.click(function () {
       toggleButton(execButton);
@@ -679,7 +507,10 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       guestsEnabled = !guestsEnabled;
     });
 
-    return container;
+    return {
+      element  : container,
+      getState : getState
+    };
 
     function toggleButton(reminderButton) {
       if (reminderButton.hasClass("esper-btn-safe")) {
@@ -694,17 +525,219 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     }
   }
 
+  /** A widget for viewing and editing the whole event description,
+   *  which includes both the notes from the previous widget and the
+   *  synced email thread contents.
+   */
+  export function descriptionSlide(state : InviteState) :
+  Slides.Slide<InviteState> {
+'''
+<div #container>
+  <div #heading class="esper-modal-header">
+    Review the guest event description
+    <button #pickEmails class="esper-btn esper-btn-secondary">
+      Pick Emails
+    </button>
+  </div>
+  <div class="esper-ev-modal-content">
+    <textarea #descriptionField
+      rows=24 class="esper-input esper-description-text">
+      Loading...
+    </textarea>
+  </div>
+</div>
+'''
+    var team     = state.prefs.team;
+    var threadId = CurrentThread.threadId.get();
+    var original = state.event;
+
+    Api.getRestrictedDescription(team.teamid,
+                                 original.google_event_id, state.guests)
+      .done(function (description) {
+        descriptionField.val(state.notes + description.description_text);
+      });
+
+    var descriptionMessageids = [];
+
+    pickEmails.click(function() {
+      descriptionMessageids = original.description_messageids || [];
+      var task = CurrentThread.task.get();
+      var dialog = Modal.dialog("Task Messages",
+                                TaskMessageList.render(task.taskid,
+                                                       descriptionMessageids),
+                                function() {
+                                  Api.getEventDescriptionWithMessages
+                                  (descriptionField.val(), descriptionMessageids)
+                                    .then(function(desc) {
+                                      descriptionField.val(desc.description_text);
+                                    });
+                                });
+      $("body").append(dialog.view);
+    });
+
+    function getState() {
+      var newState = $.extend({}, state);
+      newState.description = descriptionField.val();
+      return newState;
+    }
+
+    return {
+      element  : container,
+      getState : getState
+    };
+  }
+
   /** Inserts a new "Invite Guests" widget after the contents of the
    *  GMail thread and fixes the formatting of another GMail div that
    *  was causing problems.
    */
   export function insertAfterThread(event) {
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
-      Gmail.threadContainer().after(inviteWidget(event, prefs));
+      prefs.match({
+        some : function (prefs) {
+          var slides = [inviteSlide, reminderSlide, descriptionSlide];
+          var startState = populateInviteState(event, prefs);
+          var controls = {
+            onCancel          : function () { /* no actions needed */ },
+            onFinish          : function (state) {
+              finalizeEvent(state).done(function (done) {
+                if (done) {
+                  slideWidget.remove();
+                } else {
+                  throw Slides.invalidState;
+                }
+              });
+            },
+            finishButtonTitle : "Invite"
+          };
+
+          var slideWidget =
+            Slides.create<InviteState>(startState, slides, controls);
+          Gmail.threadContainer().after(slideWidget);
+        },
+        none : function () {
+          window.alert("Could not invite guests because no team is currently detected.")
+        }
+      });
 
       // fix mysteriously appearing padding at end of thread:
       Gmail.threadFooter().css("padding-bottom", "10px");
     });
+  }
+
+  function confirmEventIsNotHold(eventEdit) {
+    if (/^HOLD: /.test(eventEdit.title)) {
+      return window.confirm(
+        "About to invite guests to a HOLD event! Are you sure?"
+      );
+    } else {
+      return true;
+    }
+  }
+
+  /** Actually invite guests to an event and carry out the needed
+   *  modifications.
+   */
+  function finalizeEvent(state : InviteState): JQueryPromise<boolean> {
+    var eventEdit = toEventEdit(state);
+
+    var team     = state.prefs.team;
+    var threadId = CurrentThread.threadId.get();
+
+    var duplicate    = state.prefs.execPrefs.general.use_duplicate_events;
+    var from         = state.createdBy;
+    var guests       = state.guests;
+    var original     = state.event;
+    var reminderSpec = state.reminders;
+
+    if (duplicate) {
+      if (CurrentThread.task.isValid()) {
+        var task = CurrentThread.task.get();
+        if (confirmEventIsNotHold(eventEdit)) {
+          return Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
+            .then(function(created) {
+              Api.syncEvent(team.teamid, threadId,
+                            created.google_cal_id,
+                            created.google_event_id);
+
+              Api.sendEventInvites(team.teamid, from, guests, created);
+              CurrentThread.linkedEventsChange.set(null);
+
+              var execIds = {
+                calendarId : original.google_cal_id,
+                eventId    : original.google_event_id
+              };
+              var guestsIds = {
+                calendarId : created.google_cal_id,
+                eventId    : created.google_event_id
+              };
+              setReminders(execIds, guestsIds);
+
+              return true;
+            });
+        } else {
+          return Promise.defer(false);
+        }
+      } else {
+        Log.e("Can't create a linked event without a valid task");
+        return Promise.defer(false);
+      }
+    } else {
+      if (confirmEventIsNotHold(eventEdit)) {
+        return Api.updateLinkedEvent(team.teamid, threadId,
+                              original.google_event_id, eventEdit)
+          .then(function() {
+            Api.sendEventInvites(team.teamid, from, guests, original);
+            TaskTab.refreshLinkedEventsList(team, threadId,
+                                            TaskTab.currentTaskTab);
+
+            var execIds = {
+              calendarId : original.google_cal_id,
+              eventId    : original.google_event_id
+            };
+            setReminders(execIds, execIds);
+
+            return true;
+          });
+      } else {
+        return Promise.defer(false);
+      }
+    }
+
+    function setReminders(execIds, guestsIds) {
+      if (reminderSpec) {
+        if (reminderSpec.exec.time) {
+          Api.getProfile(team.team_executive, team.teamid)
+            .done(function (profile) {
+              var reminder = {
+                guest_email      : profile.email,
+                reminder_message : reminderSpec.exec.text
+              };
+
+              Api.enableReminderForGuest(execIds.eventId, profile.email,
+                                         reminder);
+
+              Api.setReminderTime(team.teamid, from, execIds.calendarId,
+                                  execIds.eventId, reminderSpec.exec.time);
+            });
+        }
+
+        if (reminderSpec.guests.time) {
+          for (var i = 0; i < guests.length; i++) {
+            var guest    = guests[i];
+            var reminder = {
+              guest_email : guest.email,
+              reminder_message : reminderSpec.guests.text
+            };
+
+            Api.enableReminderForGuest(guestsIds.eventId, guest.email, reminder);
+
+            Api.setReminderTime(team.teamid, from, guestsIds.calendarId,
+                                guestsIds.eventId, reminderSpec.guests.time);
+          }
+        }
+      }
+    }
   }
 
   export function viewPersonInvolved(peopleInvolved: { [email:string]: string },
