@@ -65,7 +65,7 @@ module Esper.InviteControls {
 
     // Event details, initially populated from event:
     title       : string;
-    location    : string;
+    location    : ApiT.Location;
     calendarId? : string;
     calendars   : ApiT.Calendar[];
     createdBy   : string;
@@ -88,15 +88,11 @@ module Esper.InviteControls {
     var newTitle = event.title || "Untitled Event";
     newTitle = newTitle.replace(/^HOLD: /, "");
 
-    var location = "";
-    if (event.location) {
-      var address = event.location.address;
-
-      if (event.location.title !== "") {
-        address = event.location.title + " - " + address;
+    var location = event.location;
+    if (location) {
+      if (location.title !== "") {
+        location.address = location.title + " - " + location.address;
       }
-
-      location = address;
     }
 
     var firstTeamCal = team.team_calendars[0];
@@ -132,8 +128,6 @@ module Esper.InviteControls {
   }
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
-    // TODO: Implement this function, finalizing the state into an
-    // actual event edit.
     var preferences  = state.prefs.execPrefs;
     var duplicate    = preferences.general.use_duplicate_events;
     var execReminder = preferences.general.send_exec_reminder;
@@ -147,10 +141,7 @@ module Esper.InviteControls {
       end           : event.end,
       title         : state.title,
       description   : state.description,
-      location      : {
-        title   : "", // We do not support locations with titles yet.
-        address : state.location
-      },
+      location      : state.location,
       all_day       : event.all_day,
       guests        : state.guests,
       recurrence    : event.recurrence,
@@ -362,8 +353,14 @@ module Esper.InviteControls {
         prefs : prefs,
 
         title      : pubTitle.val(),
-        // TODO: Use timezone from settings when turning this into an event!
-        location   : pubLocation.val(),
+        location   : {
+          /* Right now we don't care about title because this is just text
+             to be displayed in the Google Calendar location box... but in
+             the future we may use it for typeahead or something. */
+          title    : "",
+          address  : pubLocation.val(),
+          timezone : preferences.general.current_timezone,
+        },
         calendarId : publicCalId,
         calendars  : state.calendars,
         createdBy  : fromSelect.val(),
@@ -448,8 +445,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
 
-      // TODO: Fix how this works with duplicate events.
-      // By now, state.title should be all set, with "HOLD: " removed.
       var eventTitle = state.title || "a meeting";
       var guestTitle = state.title || "a meeting";
 
@@ -559,7 +554,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Api.getRestrictedDescription(team.teamid,
                                  original.google_event_id, state.guests)
       .done(function (description) {
-        // TODO: Make sure that state.notes is correct (instead of state.description).
         descriptionField.val(state.notes + description.description_text);
       });
 
