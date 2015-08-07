@@ -152,7 +152,7 @@ module Onboarding {
     // number set too, but it's not worth making an extra API call, especially
     // if we expect the number of people with pre-set phone numbers to below
     let team = getTeam();
-    if (team && team.team_name) {
+    if (team && team.team_name && team.team_name !== Login.data.email) {
       name.attr("value", team.team_name);
     }
 
