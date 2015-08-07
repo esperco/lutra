@@ -118,17 +118,18 @@ module Onboarding {
     <div class="form-group" style="text-align: center;">
       Thanks! We'll need some additional info to continue.
     </div>
-    <div class="form-group">
-      <label class="col-xs-12" for="step0-name">Name</label>
+    <div #nameGroup class="form-group">
+      <label class="col-xs-12 control-label" for="step0-name">Name</label>
       <div class="col-xs-12">
         <input #name type="text" id="step0-name" class="form-control"
                placeholder="Your Name Here" />
       </div>
     </div>
-    <div class="form-group">
-      <label for="step0-phone" class="col-xs-12">Phone Number</label>
+    <div #phoneGroup class="form-group">
+      <label for="step0-phone" class="col-xs-12 control-label">
+        Phone Number</label>
       <div class="col-sm-4">
-        <select class="form-control" #phoneType>
+        <select class="form-control ignore-error" #phoneType>
           <option value="Mobile" selected="selected">mobile</option>
           <option value="Work">work</option>
           <option value="Home">home</option>
@@ -146,26 +147,46 @@ module Onboarding {
     </div></div>
   </form>
 </div></div>
-''' 
+'''
     // Set default name (in case we got this info from elsewhere)
     // NB: It'd be nice if we could check if there was currently a phone
     // number set too, but it's not worth making an extra API call, especially
     // if we expect the number of people with pre-set phone numbers to below
     let team = getTeam();
-    if (team && team.team_name) {
+    if (team && team.team_name && team.team_name !== Login.data.email) {
       name.attr("value", team.team_name);
     }
 
     // Submit handler
     form.submit(function(e) {
-      makeBusy(submit);
+      let isValid = true;
+
+      // Reset validation
+      nameGroup.removeClass("has-error");
+      phoneGroup.removeClass("has-error");
 
       // Get & validate name
       let nameVal = name.val();
+      if (! nameVal) {
+        nameGroup.addClass("has-error");
+        isValid = false;
+      }
 
       // Get & validate phone number
       let phoneVal = phone.val();
       let phoneTypeVal = phoneType.val();
+      if (! phoneVal) {
+        phoneGroup.addClass("has-error");
+        isValid = false;
+      }
+
+      // Validation failure -> exit
+      if (! isValid) {
+        return false;
+      }
+
+      // Disable submit button, mark as "Saving ..."
+      makeBusy(submit);
 
       // Insert into meetingTypes object because that's what the API expects
       let meetingTypes = Preferences.defaultPreferences().meeting_types;
@@ -181,10 +202,10 @@ module Onboarding {
       ];
 
       // AJAX calls for name and phone nubmer, then load step 1
-      // 
+      //
       // TODO: Create new API endpoint for setting name and phone number
       // rather than shoehorn two calls together
-      // 
+      //
       Deferred.join(calls)
         .then(function() {
           goToStep(2);
