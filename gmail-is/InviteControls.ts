@@ -65,7 +65,7 @@ module Esper.InviteControls {
 
     // Event details, initially populated from event:
     title       : string;
-    location    : string;
+    location    : ApiT.Location;
     calendarId? : string;
     calendars   : ApiT.Calendar[];
     createdBy   : string;
@@ -88,15 +88,11 @@ module Esper.InviteControls {
     var newTitle = event.title || "Untitled Event";
     newTitle = newTitle.replace(/^HOLD: /, "");
 
-    var location = "";
-    if (event.location) {
-      var address = event.location.address;
-
-      if (event.location.title !== "") {
-        address = event.location.title + " - " + address;
+    var location = event.location;
+    if (location) {
+      if (location.title !== "") {
+        location.address = location.title + " - " + location.address;
       }
-
-      location = address;
     }
 
     var firstTeamCal = team.team_calendars[0];
@@ -145,10 +141,7 @@ module Esper.InviteControls {
       end           : event.end,
       title         : state.title,
       description   : state.description,
-      location      : {
-        title   : "", // We do not support locations with titles yet.
-        address : state.location
-      },
+      location      : state.location,
       all_day       : event.all_day,
       guests        : state.guests,
       recurrence    : event.recurrence,
@@ -360,8 +353,14 @@ module Esper.InviteControls {
         prefs : prefs,
 
         title      : pubTitle.val(),
-        // TODO: Use timezone from settings when turning this into an event!
-        location   : pubLocation.val(),
+        location   : {
+          /* Right now we don't care about title because this is just text
+             to be displayed in the Google Calendar location box... but in
+             the future we may use it for typeahead or something. */
+          title    : "",
+          address  : pubLocation.val(),
+          timezone : preferences.general.current_timezone,
+        },
         calendarId : publicCalId,
         calendars  : initialState.calendars,
         createdBy  : fromSelect.val(),
