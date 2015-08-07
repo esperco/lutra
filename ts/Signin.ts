@@ -76,30 +76,92 @@ module Signin {
       });
   }
 
-  function displayLoginLinks(msg, landingUrl, optInvite, optEmail, onboarding = false) {
+  // Returns a jQuery Deferred that resolves to a string token to be used
+  // for signup purposes
+  function getSignupToken(): JQueryPromise<string> {
+    return Api.createOwnTeam()
+      .then(function(data: ApiT.UrlResult) {
+        return data.url.match(/#!t\/(.+)\/?$/)[1];
+      });
+  };
+
+  // Returns jQuery wrapped HTML code for a Google Button
+  export function googleButton(landingUrl?: string,
+                               optInvite?: string, optEmail?: string):
+    JQuery {
+'''
+<button #button class="button-primary sign-in-btn">
+  <div #google class="google-g"/>
+  <div class="btn-divider"/>
+  <div class="sign-in-text">Sign in with Google</div>
+</button>
+'''
+    var googleG = $("<img class='svg-block'/>")
+      .appendTo(google);
+    Svg.loadImg(googleG, "/assets/img/google-g.svg");
+
+    // Set handler
+    button.click(function() {
+      let nonce = "";
+
+      // Generate login nonce
+      let loginNonceCall = setLoginNonce();
+      loginNonceCall.done(function(loginNonce) {
+        // Assign to higher-scoped variable so our other callbacks can see it
+        nonce = loginNonce;
+      });
+      let calls = [loginNonceCall];
+
+      // We should always have an invite token before going to Google --
+      // if we don't have one, request from server
+      if (!optInvite) {
+        let tokenCall = getSignupToken();
+        tokenCall.done(function(token) {
+          // Assign to higher-scoped variable so our other callbacks can see it
+          optInvite = token;
+        });
+        calls.push(tokenCall);
+      }
+
+      // Run token and nonce calls in parallel
+      Deferred.join(calls, true)
+        // Get Google endpoint based on nonce and token
+        .then(function() {
+          landingUrl = landingUrl || "#!";
+          return Api.getGoogleAuthUrl(landingUrl, nonce, optInvite, optEmail);
+        }, function(err) { console.error(err); })
+        // Redirect to Google
+        .then(function(x) {
+          requestGoogleAuth(x.url);
+        }, function(err) { console.error(err); });
+    });
+        
+    return button;
+  };
+
+  function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
 <div #view>
   <div #signInContainer class="sign-in">
     <div #logo class="logo-container">
       <div #loginLogo id="sign-in-hero-mark" class="animated fadeInUp"/>
     </div>
-    <div #container >
-      <div #progress class="progress">
-        <div class="progress-bar progress-bar-info" role="progressbar" style="width:50%"/> 
+    <div #container>
+      <div #msgDiv class="sign-in-msg"/>
+      <div #buttonContainer />
+      <div class="advisory">
+        Use Microsoft Office or Exchange?
+        Contact us at <a href="mailto:support@esper.com">support@esper.com</a> 
+        for assistance.
       </div>
-    <div #msgDiv class="sign-in-msg"/>
-    <button #button class="button-primary sign-in-btn">
-      <div #google class="google-g"/>
-      <div class="btn-divider"/>
-      <div class="sign-in-text">Sign in with Google</div>
-    </button>
+    </div>
   </div>
   <div #footer class="sign-in-footer">
     <div class="copyright">
       &copy; 2014 Esper Technologies, Inc.
       All rights reserved.
     </div>
-    <a href="mailto:team@esper.com" class="footer-link">Help</a>
+    <a href="mailto:support@esper.com" class="footer-link">Help</a>
     <div class="footer-divider"/>
     <a href="http://esper.com/privacypolicy.html"
        target="blank"
@@ -126,41 +188,10 @@ module Signin {
     if (Util.isString(msg))
       msgDiv.html(msg);
 
-    var googleG = $("<img class='svg-block'/>")
-      .appendTo(google);
-    Svg.loadImg(googleG, "/assets/img/google-g.svg");
+    buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
 
-    setLoginNonce()
-      .done(function(loginNonce) {
-        rootView.removeClass("hide");
-
-        button.click(function() {
-          Api.getGoogleAuthUrl(landingUrl, loginNonce, optInvite, optEmail)
-            .done(function(x) {
-              requestGoogleAuth(x.url);
-            });
-        });
-
-        rootView.append(view);
-        });
-
-    if (onboarding) {
-      container.addClass("container");
-      signInContainer.removeClass("sign-in");
-      signInContainer.addClass("onboarding");
-      signInContainer.css("padding-top","78px");
-      msgDiv.removeClass("sign-in-msg");
-      msgDiv.addClass("onboarding-text");
-      msgDiv.css("padding-bottom","16px");
-      signInContainer.css("text-align","center");
-      footer.remove();
-      logo.remove();
-    }
-    else {
-      progress.hide();
-    }
-
-
+    rootView.removeClass("hide");
+    rootView.append(view);
 
     return _view;
   }
@@ -176,7 +207,9 @@ module Signin {
         /* success */
         function(tokenDescription) {
           var loginView =
-          displayLoginLinks("<b>Great!</b> Next, we'll need you to login to your primary Google account.<br>", "#!", inviteCode, undefined, true);
+          displayLoginLinks("Thanks for accepting our invite! " + 
+            "Please sign in with your primary Google account to continue.", 
+            "#!", inviteCode, undefined);
           showTokenDetails(loginView, tokenDescription);
         },
         /* failure */
@@ -234,7 +267,7 @@ module Signin {
             return Deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Sign in to continue.",
+      displayLoginLinks("Click below to sign up or sign in.",
                         landingUrl, undefined, optEmail);
       return Deferred.defer(false);
     }

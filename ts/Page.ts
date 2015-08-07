@@ -9,6 +9,7 @@ module Page {
   var pageSelector = Show.create({
     "settings": {ids:["settings-page"]},
     "team-settings": {ids:["team-settings-page"]},
+    "onboarding": {ids:["onboarding-interface"]},
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
@@ -47,16 +48,26 @@ module Page {
     }
   }
 
-  export var onboarding : Loadable = {
-    load: function(teamid) {
+  export var onboarding: Loadable = {
+    load: function(step=0) {
       pageSelector.hideAll();
-      showPage("team-settings");
-      Log.d("TeamSettings.load()", teamid);
-      var onboarding = true;
-      TeamSettings.load(teamid, onboarding);
+      showPage("onboarding");
+      Log.d("Onboarding.load()");
+      Onboarding.load(step);
       Util.focus();
     }
-  }
+  };
+
+  // export var onboarding : Loadable = {
+  //   load: function(teamid: string, step = 0) {
+  //     pageSelector.hideAll();
+  //     showPage("team-settings");
+  //     Log.d("TeamSettings.load()", teamid);
+  //     var onboarding = true;
+  //     TeamSettings.load(teamid, onboarding);
+  //     Util.focus();
+  //   }
+  // }
 
   export var plans : Loadable = {
     load: function(teamid) {

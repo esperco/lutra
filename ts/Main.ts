@@ -53,6 +53,7 @@
 /// <reference path="ExecutivePreferences.ts"/>
 /// <reference path="UsageTab.ts"/>
 /// <reference path="AboutTab.ts"/>
+/// <reference path="Onboarding.ts"/>
 /// <reference path="UsagePeriod.ts"/>
 /// <reference path="Page.ts"/>
 /// <reference path="Route.ts"/>

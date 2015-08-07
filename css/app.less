@@ -171,7 +171,7 @@ select.esper-select {
 
 li { list-style: none; }
 
-i { color: @gray_60; }
+.empty-checklist { color: @gray_60; }
 
 a.disabled {
   opacity: 0.5;
@@ -409,6 +409,10 @@ input[type="text"] {
   text-align: center;
   border: 1px solid @gray_20;
   border-radius: 6px;
+}
+
+.sign-in .advisory {
+  margin-top: 24px;
 }
 
 .logo-container {
@@ -1570,23 +1574,55 @@ a.header-title:hover { text-decoration: underline; }
 
 .onboarding {
   position: absolute;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   background: @purple_splash;
   color: white;
+  padding: 40px 15px;
+}
+
+.onboarding h2 {
+  font-weight: bold;
+}
+
+.onboarding a, .onboarding a:hover, .onboarding a:focus {
+  color: white;
+  font-weight: bold;
+}
+
+.onboarding a.well {
+  color: @purple;
+  font-weight: normal;
+  font-style: italic;
+}
+
+.onboarding a.well:hover, .onboard a.well:focus {
+  color: @purple_hover;
+}
+
+@media (min-width: 767px) {
+  .onboarding { padding-top: 80hmakepx; }
+}
+
+.onboarding .progress {
+  margin-bottom: 39px;
 }
 
 .onboarding-text {
   font-size: 16px;
 }
 
-.container {
-    padding: 15px;
-    width: 85%;
-    align: center;
-}
-
 .esper-cal-title{
   font-size: 16px;
 }
 
+// Use to space two columns that get stacked on xs-sized screens in Bootstrap
+.xs-spacer {
+  height: 5px;
+}
+
+@media (min-width: 767px) {
+  .xs-spacer {
+    display: none;
+  }
+}

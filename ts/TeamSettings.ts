@@ -132,7 +132,7 @@ module TeamSettings {
     });
 
     contentAcc.append(AccountTab.load(team, plans, payment));
-    contentCal.append(CalendarsTab.load(team, onboarding));
+    contentCal.append(CalendarsTab.load(team));
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentAbt.append(AboutTab.load(team, onboarding));

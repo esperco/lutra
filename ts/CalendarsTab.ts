@@ -131,7 +131,7 @@ module CalendarsTab {
     });
   }
 
-  function displayCalendarList(view, calendars: ApiT.Calendar[]) {
+  export function displayCalendarList(view, calendars: ApiT.Calendar[]) {
     view.children().remove();
     List.iter(calendars, function(cal) {
       if (cal.google_access_role !== "Owner") return;
@@ -178,7 +178,7 @@ module CalendarsTab {
     });
   }
 
-  function saveCalendarShares(team, view, share, allCals, onboarding) {
+  export function saveCalendarShares(team, view, share, allCals) {
     var calls = [];
     var teamCals = [];
     view.find(".esper-cal-row").each(function() {
@@ -206,43 +206,12 @@ module CalendarsTab {
       });
     });
 
-    function goToAboutPage() {
-      Api.setSubscription(team.teamid, Plan.basic)
-      .done(function() {
-      var alias = team.team_email_aliases[0];
-      var name = team.team_name;
-      var url = "http://www.esper.com/signup-done#";
-      var urlWithAliasName = url.concat(alias).concat("#").concat(name);
-      window.location.href = urlWithAliasName;
-          });
-    }
-
     share.text("Sharing...").attr("disabled", "true");
-    Deferred.join(calls).done(function() {
-      Api.putTeamCalendars(team.teamid, { calendars: teamCals })
-        .done(function() {
-          if (onboarding) {
-            if (team.team_name === "") goToAboutPage();
-            else {
-              /* During onboarding, create a "ghost calendar" for the EA to
-                 keep negative time (no scheduling), notes, etc. */
-              var primary = List.find(allCals, function(cal : ApiT.Calendar) {
-                return cal.is_primary;
-              });
-              var tz = primary.calendar_timezone;
-              if (tz === undefined) tz = "America/Los_Angeles";
-              /* Because we're onboarding, this team has an Esper assistant.
-                 It should be the first (and only) assistant.
-                 This may change in the future, and then we'd have to check.
-              */
-              var esperAsst = team.team_assistants[0];
-              Api.createTeamCalendar(esperAsst, team.teamid, tz,
-                                     team.team_name + " Ghost")
-                .done(goToAboutPage);
-            }
-          } else window.location.reload();
-        });
-    });
+
+    return Deferred.join(calls)
+      .then(function() {
+        return Api.putTeamCalendars(team.teamid, { calendars: teamCals });
+      });
   }
 
   function makeAliasSection(team, root) {
@@ -299,15 +268,12 @@ module CalendarsTab {
     root.append(view);
   }
 
-  export function load(team, onboarding?) {
+  export function load(team) {
 '''
 <div #view>
   <div #container>
   <div #teamCalendars>
     <div #header class="esper-h1">Team Calendars</div>
-      <div #progress class="progress">
-        <div class="progress-bar progress-bar-info" role="progressbar" style="width:75%"/>
-      </div>
       <div #description class="calendar-setting-description">
         Please select which calendars to share with your Esper assistant.
       </div>
@@ -337,26 +303,11 @@ module CalendarsTab {
 
         share.click(function() {
           saveCalendarShares(team, calendarView, share,
-                             response.calendars, onboarding);
+                             response.calendars)
+            .then(function() { window.location.reload(); });
         });
       });
-
-      if (onboarding) {
-      description.html("<b>You're nearly done!</b> " +
-      "Please select which calendars to share with your Esper assistant.<br>");
-      header.hide();
-      description.addClass("onboarding-text");
-      share.css("float", "right");
-      accountSelector.hide();
-      container.addClass("container");
-      container.css("border","0px");
-      container.css("margin","0x");
-      view.css("padding-top","78px");
-      }
-      else {
-        progress.hide();
-      }
-      }
+    }
 
     return view;
   }
