@@ -117,7 +117,7 @@ module Esper.InviteControls {
       event : event,
       prefs : prefs,
 
-      title       : event.title || "Untitled Event",
+      title       : newTitle,
       location    : location,
       calendarId  : publicCalId,
       calendars   : calendars,
@@ -599,9 +599,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    */
   export function insertAfterThread(event) {
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
-      // TODO: Insert slides!
-      // Gmail.threadContainer().after(inviteWidget(event, prefs));
-
       prefs.match({
         some : function (prefs) {
           var slides = [inviteSlide, reminderSlide, descriptionSlide];
