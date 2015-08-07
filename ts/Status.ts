@@ -9,29 +9,45 @@
 module Status {
 
   export function report(msg, kind) {
-    var elt = $("#global-status");
-    elt.children().remove();
-    elt
-      .text(msg)
-      .addClass("alert alert-" + kind)
-      .show()
-      .one("click", function() {
-        elt.hide();
-      });
+    var container = $("#global-status");
+
+    // Relies on bootstrap for event handling
+    var closeButton = $(
+      `<button type="button" class="close" data-dismiss="alert"
+               aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>`);
+
+    var elt = $(`<div />`)
+      .append(closeButton)
+      .append(msg)
+      .addClass("alert alert-dismissible alert-" + kind)
+
+    container.empty().append(elt);
 
     /*
       Leave the error message on for a long time when developing
       so we have time to take a screenshot and whatnot.
     */
-    var hideAfterMs = Conf.prod ? 6000 : 300000;
+    var hideAfterMs = Conf.prod ? 20000 : 300000;
 
     setTimeout(function() {
-      elt.hide();
+      clear();
     }, hideAfterMs);
   };
 
-  export function reportError(msg) {
-    report(msg, "danger");
+  export function reportError(msg: string) {
+    let elt = $(`<span>
+        <b><i class="fa fa-warning"></i> Whoops.</b> Something broke. Please
+        email <a href="mailto:support@esper.com?body=${encodeURIComponent(
+          "\n\n----\n\nError Details: " + msg + "\n" +
+          "Location: " + location.href + "\n"
+        )}">support@esper.com</a> and let us know what happened!
+      </span>`);
+    let msgWrapper = $('<span class="error-details"></span>');
+    msgWrapper.append(msg);
+    elt.append(msgWrapper);
+    report(elt, "danger");
   };
 
   export function reportSuccess(msg) {
@@ -39,7 +55,7 @@ module Status {
   };
 
   export function clear() {
-    $("#error").hide();
+    $("#global-status").empty();
   };
 
   /*
@@ -66,12 +82,13 @@ module Status {
     };
   };
 
-  /* Any click in the browser's window hides the status area */
+  /* Any click in the browser's window hides the status area
+     NB: Disabled to allow copying and pasting of errors */
   export function init() {
-    $("body").click(function() {
-      $("#global-status").hide();
-      return true;
-    });
+    // $("body").click(function() {
+    //   clear();
+    //   return true;
+    // });
   };
 
 }
