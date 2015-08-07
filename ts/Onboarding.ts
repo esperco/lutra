@@ -56,7 +56,7 @@ module Onboarding {
     button.prop("disabled", true);
   }
 
-  
+
   /* Step 0 => Sign in */
   function step0(refs: IJQMap): void {
     refs["progress"].width("25%");
@@ -69,18 +69,30 @@ module Onboarding {
 <div #view class="row">
   <div style="text-align: center" class="col-sm-offset-3 col-sm-6">
     <div>
-      <strong>Awesome.</strong> Our assistants use Google Calendar to 
+      <strong>Awesome.</strong> Our assistants use Google Calendar to
       assist you with scheduling. Please sign in with Google to continue.
     </div>
     <div #buttonContainer style="padding:40px 0">
     </div>
     <div>
       Use Microsoft Office or Exchange for calendaring?<br />Contact us at
-      <a href="mailto:support@esper.com">support@esper.com</a> to get set up.
+      <a #exchangeLink href="mailto:support@esper.com">
+        support@esper.com</a> to get set up.
+      <br /><br />
+      <a href="http://esper.com/mailing-list">
+        Use something else? Click here.
+      </a>
     </div>
   </div>
 </div>
 '''
+    var exchangeEmailSubject = "Join Esper (Microsoft Office / Exchange)";
+    var exchangeEmailBody = "Hi, I'd like to sign up for Esper!";
+    exchangeEmailSubject = encodeURIComponent(exchangeEmailSubject);
+    exchangeEmailBody = encodeURIComponent(exchangeEmailBody);
+    exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
+      exchangeEmailSubject + "&body=" + exchangeEmailBody);
+
     buttonContainer.append(Signin.googleButton(/* landingUrl */ "#!join/1"));
     let content = refs["content"];
     content.append(view);
