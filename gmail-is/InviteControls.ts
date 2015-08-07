@@ -132,8 +132,6 @@ module Esper.InviteControls {
   }
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
-    // TODO: Implement this function, finalizing the state into an
-    // actual event edit.
     var preferences  = state.prefs.execPrefs;
     var duplicate    = preferences.general.use_duplicate_events;
     var execReminder = preferences.general.send_exec_reminder;
@@ -448,8 +446,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
       var name       = profile.display_name ? " " + profile.display_name : "";
 
-      // TODO: Fix how this works with duplicate events.
-      // By now, state.title should be all set, with "HOLD: " removed.
       var eventTitle = state.title || "a meeting";
       var guestTitle = state.title || "a meeting";
 
@@ -559,7 +555,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     Api.getRestrictedDescription(team.teamid,
                                  original.google_event_id, state.guests)
       .done(function (description) {
-        // TODO: Make sure that state.notes is correct (instead of state.description).
         descriptionField.val(state.notes + description.description_text);
       });
 
