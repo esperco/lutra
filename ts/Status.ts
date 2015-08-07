@@ -36,8 +36,18 @@ module Status {
     }, hideAfterMs);
   };
 
-  export function reportError(msg) {
-    report(msg, "danger");
+  export function reportError(msg: string) {
+    let elt = $(`<span>
+        <b><i class="fa fa-warning"></i> Whoops.</b> Something broke. Please
+        email <a href="mailto:support@esper.com?body=${encodeURIComponent(
+          "\n\n----\n\nError Details: " + msg + "\n" +
+          "Location: " + location.href + "\n"
+        )}">support@esper.com</a> and let us know what happened!
+      </span>`);
+    let msgWrapper = $('<span class="error-details"></span>');
+    msgWrapper.append(msg);
+    elt.append(msgWrapper);
+    report(elt, "danger");
   };
 
   export function reportSuccess(msg) {

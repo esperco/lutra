@@ -171,7 +171,7 @@ select.esper-select {
 
 li { list-style: none; }
 
-i { color: @gray_60; }
+.empty-checklist { color: @gray_60; }
 
 a.disabled {
   opacity: 0.5;
@@ -273,6 +273,12 @@ a.disabled {
 
 #global-status > * {
   margin: 7px 5px;
+}
+
+#global-status .error-details {
+  font-style: italic;
+  display: block;
+  padding-top: 5px;
 }
 
 /** Input **/
