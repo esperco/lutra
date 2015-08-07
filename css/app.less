@@ -30,6 +30,7 @@
 @purple_text: #5F5665;
 @purple_splash: #785988;
 @red: #d9534f;
+@red_on_purple: #ff534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
@@ -267,6 +268,16 @@ a.disabled {
 
 .fill-div .dropdown-title {
   float: left;
+}
+
+.has-error {
+  .control-label {
+    color: @red;
+  }
+
+  .form-control {
+    border-color: @red;
+  }
 }
 
 /** Error messages **/
@@ -1579,33 +1590,47 @@ a.header-title:hover { text-decoration: underline; }
   background: @purple_splash;
   color: white;
   padding: 40px 15px;
-}
 
-.onboarding h2 {
-  font-weight: bold;
-}
+  h2 {
+    font-weight: bold;
+  }
 
-.onboarding a, .onboarding a:hover, .onboarding a:focus {
-  color: white;
-  font-weight: bold;
-}
+  a, a:hover, a:focus {
+    color: white;
+    font-weight: bold;
+  }
 
-.onboarding a.well {
-  color: @purple;
-  font-weight: normal;
-  font-style: italic;
-}
+  a.well {
+    color: @purple;
+    font-weight: normal;
+    font-style: italic;
 
-.onboarding a.well:hover, .onboard a.well:focus {
-  color: @purple_hover;
+    &:hover, &:focus {
+      color: @purple_hover;
+    }
+  }
+
+  .progress {
+    margin-bottom: 39px;
+  }
+
+  .has-error {
+    .control-label {
+      color: @red_on_purple;
+    }
+
+    .form-control {
+      border-color: @red_on_purple;
+
+      &.ignore-error {
+        border-color: @gray_20;
+      }
+    }
+  }
 }
 
 @media (min-width: 767px) {
   .onboarding { padding-top: 80hmakepx; }
-}
-
-.onboarding .progress {
-  margin-bottom: 39px;
 }
 
 .onboarding-text {
