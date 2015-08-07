@@ -126,18 +126,18 @@ module Onboarding {
     refs["progress"].width("50%");
 '''
 <div #view class="row"><div class="col-sm-offset-2 col-sm-8">
-  <form #form class="form-horizontal">
-    <div class="form-group" style="text-align: center;">
+  <form #form class="form">
+    <div class="form-group row" style="text-align: center;">
       Thanks! We'll need some additional info to continue.
     </div>
-    <div #nameGroup class="form-group">
+    <div #nameGroup class="form-group row">
       <label class="col-xs-12 control-label" for="step0-name">Name</label>
       <div class="col-xs-12">
         <input #name type="text" id="step0-name" class="form-control"
                placeholder="Your Name Here" />
       </div>
     </div>
-    <div #phoneGroup class="form-group">
+    <div #phoneGroup class="form-group row">
       <label for="step0-phone" class="col-xs-12 control-label">
         Phone Number</label>
       <div class="col-sm-4">
@@ -154,7 +154,7 @@ module Onboarding {
                placeholder="555-555-5555" />
       </div>
     </div>
-    <div class="form-group"><div class="col-xs-12">
+    <div class="form-group row"><div class="col-xs-12">
       <button #submit type="submit" class="btn btn-default">Save</button>
     </div></div>
   </form>
