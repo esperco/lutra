@@ -690,7 +690,12 @@ module Esper.CalPicker {
   };
 
   function calendarTimeOfMoment(localMoment) : ApiT.CalendarTime {
-    var localTime = localMoment.toISOString();
+    // Handles FullCalendar's "ambiguous time" moments by setting the
+    // time to midnight for full-day events.
+    var localTime = localMoment.hasTime() ?
+      localMoment.toISOString() :
+      localMoment.time('00:00').toISOString();
+
     var utcMoment = utcOfLocal(showTimezone, localMoment);
     var utcTime = utcMoment.toISOString();
     return { utc: utcTime, local: localTime };
@@ -723,6 +728,15 @@ module Esper.CalPicker {
     : ApiT.CalendarEvent
   {
     var title = eventTitle.val();
+
+    // FullCalendar extends Moment.js with "ambiguous times" which are
+    // dates that do not specify a time. These are used for full-day
+    // events.
+    //
+    // The <any> is a hack because we want to use the FullCalendar
+    // custom moment and DefinitelyTyped has ev.start as a Date.
+    var isFullDay = !(<any> ev.start).hasTime();
+
     var event : ApiT.CalendarEvent = {
       google_event_id: "",
       google_cal_id: writeToCalendar.google_cal_id,
@@ -731,7 +745,8 @@ module Esper.CalPicker {
       title: title,
       description_messageids: [],
       location: { title: "", address: eventLocation.val() },
-      guests: []
+      guests: [],
+      all_day: isFullDay
     };
     return event;
   }
