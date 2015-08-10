@@ -155,6 +155,7 @@ function checkAndSubmitSignupForm() {
   $("#signup-btn").click(function(e){
     var firstName = $("#first-name").val();
     var lastName = $("#last-name").val();
+    var code = $("#redeem-code").val();
     var phone = $("#phone").val();
     var email = $("#email").val();
     var emailPlatform = $("#platform").val();
@@ -173,6 +174,13 @@ function checkAndSubmitSignupForm() {
     }
     else
       $("#last-name").removeClass("incorrect");
+
+    if (code.length != 9 && code.length != 0) {
+      valid = false;
+      $("#redeem-code").addClass("incorrect");
+    }
+    else
+      $("#redeem-code").removeClass("incorrect");
 
     if (phone.length === 0) {
       valid = false;
@@ -206,11 +214,12 @@ function checkAndSubmitSignupForm() {
       else {
         changeSubmitButtonType("button");
       var url =
-        "https://app.esper.com/#!signup/" + encodeURIComponent(firstName)
+        "https://app.esper.com/#!signup2/" + encodeURIComponent(firstName)
         + "/" + encodeURIComponent(lastName)
         + "/" + encodeURIComponent(phone)
         + "/" + encodeURIComponent(email)
-        + "/" + encodeURIComponent(emailPlatform);
+        + "/" + encodeURIComponent(emailPlatform)
+        + "/" + encodeURIComponent(code);
       console.log(url);
       }
       //open(url);
@@ -235,6 +244,40 @@ function setDonePageFromHash() {
   $("#mailto-msg").prop("href", intro_email);
 
 
+}
+
+function queryParams() {
+  var q = window.location.search.slice(1).split(/&/);
+  var args = [];
+  for (var i in q) {
+    var a = q[i].split(/=/);
+    if (a.length == 1) {
+      args.push(a);
+    } else if (a.length > 1) {
+      args.push([a[0], decodeURIComponent(a[1])]);
+    }
+  }
+  return args;
+}
+
+function prefillSignupForm() {
+  var args = queryParams();
+  for (var i in args) {
+    switch (args[i][0]) {
+    case "first":
+      $("#first-name").val(args[i][1]);
+      break;
+    case "last":
+      $("#last-name").val(args[i][1]);
+      break;
+    case "email":
+      $("#email").val(args[i][1]);
+      break;
+    case "code":
+      $("#redeem-code").val(args[i][1]);
+      break;
+    }
+  }
 }
 
 function main() {

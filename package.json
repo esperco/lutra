@@ -1,0 +1,30 @@
+{
+  "name": "honeybadger",
+  "version": "1.0.0",
+  "description": "In most cases, HoneyBadger doesn't care. In this case, this directory contains the files to run the front-end Esper website (including our jobs page, privacy policy, contact us, etc.)",
+  "main": "index.js",
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esperco/honeybadger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/esperco/honeybadger/issues"
+  },
+  "homepage": "https://github.com/esperco/honeybadger",
+  "devDependencies": {
+    "del": "^1.2.0",
+    "ecstatic": "^0.8.0",
+    "gulp": "git://github.com/gulpjs/gulp.git#4.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-filter": "^3.0.0",
+    "gulp-less": "^3.0.3",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "livereload": "^0.3.7",
+    "lodash": "^3.10.1"
+  }
+}
