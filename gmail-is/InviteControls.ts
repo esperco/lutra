@@ -160,7 +160,7 @@ module Esper.InviteControls {
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteSlide(initialState : InviteState):
+  export function inviteSlide(state : InviteState, exec_event : boolean):
   Slides.Slide<InviteState> {
 '''
 <div #container>
@@ -202,7 +202,7 @@ module Esper.InviteControls {
           <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
+      <div #guestsRow class="esper-ev-modal-row esper-clearfix">
         <div class="esper-ev-modal-left esper-bold">Guests</div>
         <div class="esper-ev-modal-right">
           <ul #viewPeopleInvolved/>
@@ -219,23 +219,27 @@ module Esper.InviteControls {
     </div>
   </div>
 </div>
-<div #notDuplicate class="esper-badge"
-     title="One event will be sent to the exec and the guests.">
-  Not Duplicate
+<div #execEventTag class="esper-badge esper-badge-blue"
+     title="This is the event only for the exec.">
+  Exec event
+</div>
+<div #guestsEventTag class="esper-badge esper-badge-orange"
+     title="This is the event duplicated for inviting guests.">
+  Exec event
 </div>
 '''
-    var prefs    = initialState.prefs;
+    var prefs    = state.prefs;
     var team     = prefs.team;
     var threadId = CurrentThread.threadId.get();
-    var event    = initialState.event;
+    var event    = state.event;
 
     Sidebar.customizeSelectArrow(pubCalendar);
     Sidebar.customizeSelectArrow(fromSelect);
 
-    pubTitle.val(initialState.title);
-    pubLocation.val(initialState.location);
+    pubTitle.val(state.title);
+    pubLocation.val(state.location.address);
 
-    if (initialState.description) {
+    if (state.description) {
       var separatorIndex = event.description.search(/=== Conversation ===/);
       pubNotes.val(event.description.substring(0, separatorIndex).trim());
     }
@@ -243,13 +247,13 @@ module Esper.InviteControls {
     appendExecPublicPhone(team, pubNotes);
 
     // Initializing the calendar dropdown:
-    var publicCalId = initialState.calendarId;
+    var publicCalId = state.calendarId;
 
     if (publicCalId) {
       pubCalendar.val(publicCalId);
     }
 
-    initialState.calendars.forEach(function (cal) {
+    state.calendars.forEach(function (cal) {
       pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
                            cal.calendar_title + "</option>"));
     });
@@ -307,10 +311,18 @@ module Esper.InviteControls {
     var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
 
-    if (!duplicate) {
-      heading.text("Invite guests to this calendar event");
-      notDuplicate.appendTo(heading);
+    if (exec_event) {
+      heading.text("Exec Event Details");
       calendarRow.remove();
+
+      if (duplicate) {
+        execEventTag.appendTo(heading);
+        guestsRow.remove();
+      }
+    } else {
+      if (duplicate) {
+        guestsEventTag.appendTo(heading);
+      }
     }
 
     function searchLocation() {
@@ -362,7 +374,7 @@ module Esper.InviteControls {
           timezone : preferences.general.current_timezone,
         },
         calendarId : publicCalId,
-        calendars  : initialState.calendars,
+        calendars  : state.calendars,
         createdBy  : fromSelect.val(),
         notes      : pubNotes.val(),
         guests     : guests,
@@ -587,6 +599,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     };
   }
 
+  // Use two InviteStates, one for exec and one for guest. (Only set reminders once!)
+  interface DualState {
+    exec   : InviteState;
+    guests : InviteState;
+  }
+
   /** Inserts a new "Invite Guests" widget after the contents of the
    *  GMail thread and fixes the formatting of another GMail div that
    *  was causing problems.
@@ -595,25 +613,99 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
       prefs.match({
         some : function (prefs) {
-          var slides = [inviteSlide, reminderSlide, descriptionSlide];
-          var startState = populateInviteState(event, prefs);
-          var controls = {
-            onCancel          : function () { /* no actions needed */ },
-            onFinish          : function (state) {
-              finalizeEvent(state).done(function (done) {
-                if (done) {
-                  slideWidget.remove();
-                } else {
-                  throw Slides.invalidState;
-                }
-              });
-            },
-            finishButtonTitle : "Invite"
-          };
+          var slideWidget;
 
-          var slideWidget =
-            Slides.create<InviteState>(startState, slides, controls);
-          Gmail.threadContainer().after(slideWidget);
+          function nonDuplicateInviteSlide(state) {
+            return inviteSlide(state, false);
+          }
+
+          if (!prefs.execPrefs.general.use_duplicate_events) {
+            var slides = [nonDuplicateInviteSlide, reminderSlide, descriptionSlide];
+            var startState = populateInviteState(event, prefs);
+            var controls = {
+              onCancel : function () { /* no actions needed */ },
+              onFinish : function (state) {
+                finalizeEvent(state).done(function (done) {
+                  if (done) {
+                    slideWidget.remove();
+                  } else {
+                    throw Slides.invalidState;
+                  }
+                });
+              },
+              finishButtonTitle : "Invite"
+            };
+
+            slideWidget =
+              Slides.create<InviteState>(startState, slides, controls);
+            Gmail.threadContainer().after(slideWidget);
+          } else {
+            function wrap(slideFn : (InviteState) => Slides.Slide<InviteState>,
+                          key : string) {
+              return function (state : DualState) : Slides.Slide<DualState> {
+                var slide = slideFn(state[key]);
+                return {
+                  element : slide.element,
+                  getState : function () {
+                    var newState = $.extend({}, state);
+                    newState[key] = slide.getState();
+                    return newState;
+                  }
+                };
+              }
+            }
+
+            function execInviteSlide(state) {
+              return inviteSlide(state, true);
+            }
+
+            function guestsInviteSlide(state) {
+              return inviteSlide(state, false);
+            }
+
+            var dualStartState = {
+              exec   : populateInviteState(event, prefs),
+              guests : populateInviteState(event, prefs),
+            };
+
+            var dualSlides = [
+              wrap(execInviteSlide, "exec"),
+              wrap(descriptionSlide, "exec"),
+
+              wrap(guestsInviteSlide, "guests"),
+              wrap(reminderSlide, "guests"),
+              wrap(descriptionSlide, "guests"),
+            ];
+
+            var controls = {
+              onCancel : function () { /* no actions needed */ },
+              onFinish : function (dualState) {
+                var exec   = dualState.exec;
+                var guests = dualState.guests;
+
+                exec.reminders = null;
+
+                finalizeEvent(exec).done(function (done) {
+                  if (done) {
+                    finalizeEvent(guests, true).done(function (done) {
+                      if (done) {
+                        slideWidget.remove();
+                      } else {
+                        throw Slides.invalidState;
+                      }
+                    });
+                  } else {
+                    throw Slides.invalidState;
+                  }
+                });
+              },
+              finishButtonTitle : "Invite"
+            };
+
+            slideWidget =
+              Slides.create<DualState>(dualStartState, dualSlides, controls);
+            Gmail.threadContainer().after(slideWidget);
+          }
         },
         none : function () {
           window.alert("Could not invite guests because no team is currently detected.")
@@ -638,19 +730,19 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   /** Actually invite guests to an event and carry out the needed
    *  modifications.
    */
-  function finalizeEvent(state : InviteState): JQueryPromise<boolean> {
+  function finalizeEvent(state : InviteState, makeCopy? : boolean)
+  : JQueryPromise<boolean> {
     var eventEdit = toEventEdit(state);
 
     var team     = state.prefs.team;
     var threadId = CurrentThread.threadId.get();
 
-    var duplicate    = state.prefs.execPrefs.general.use_duplicate_events;
     var from         = state.createdBy;
     var guests       = state.guests;
     var original     = state.event;
     var reminderSpec = state.reminders;
 
-    if (duplicate) {
+    if (makeCopy) {
       if (CurrentThread.task.isValid()) {
         var task = CurrentThread.task.get();
         if (confirmEventIsNotHold(eventEdit)) {
