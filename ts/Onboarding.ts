@@ -29,7 +29,9 @@ module Onboarding {
     <div class="progress">
       <div #progress class="progress-bar progress-bar-info" role="progressbar" /> 
     </div>
-    <div #content class="onboarding-text" />
+    <div class="row onboarding-text">
+      <div #content class="col-sm-offset-2 col-sm-8" />
+    </div>
   </div>
 </div>
 '''
@@ -66,23 +68,21 @@ module Onboarding {
       Login.clearLoginInfo();
     }
 '''
-<div #view class="row">
-  <div style="text-align: center" class="col-sm-offset-3 col-sm-6">
-    <div>
-      <strong>Awesome.</strong> Our assistants use Google Calendar to
-      assist you with scheduling. Please sign in with Google to continue.
-    </div>
-    <div #buttonContainer style="padding:40px 0">
-    </div>
-    <div>
-      Use Microsoft Office or Exchange for calendaring?<br />Contact us at
-      <a #exchangeLink href="mailto:support@esper.com">
-        support@esper.com</a> to get set up.
-      <br /><br />
-      <a href="http://esper.com/mailing-list">
-        Use something else? Click here.
-      </a>
-    </div>
+<div #view style="text-align: center">
+  <div>
+    <strong>Awesome.</strong> Our assistants use Google Calendar to
+    assist you with scheduling.<br />Please sign in with Google to continue.
+  </div>
+  <div #buttonContainer style="padding:40px 0">
+  </div>
+  <div>
+    Use Microsoft Office or Exchange for calendaring?<br />Contact us at
+    <a #exchangeLink href="mailto:support@esper.com">
+      support@esper.com</a> to get set up.
+    <br /><br />
+    <a href="http://esper.com/mailing-list">
+      Use something else? Click here.
+    </a>
   </div>
 </div>
 '''
@@ -125,40 +125,38 @@ module Onboarding {
   function step1(refs: IJQMap): void {
     refs["progress"].width("50%");
 '''
-<div #view class="row"><div class="col-sm-offset-2 col-sm-8">
-  <form #form class="form">
-    <div class="form-group row" style="text-align: center;">
-      Thanks! We'll need some additional info to continue.
+<form #form class="form">
+  <div class="form-group row" style="text-align: center;">
+    Thanks! We'll need some additional info to continue.
+  </div>
+  <div #nameGroup class="form-group row">
+    <label class="col-xs-12 control-label" for="step0-name">Name</label>
+    <div class="col-xs-12">
+      <input #name type="text" id="step0-name" class="form-control"
+             placeholder="Your Name Here" />
     </div>
-    <div #nameGroup class="form-group row">
-      <label class="col-xs-12 control-label" for="step0-name">Name</label>
-      <div class="col-xs-12">
-        <input #name type="text" id="step0-name" class="form-control"
-               placeholder="Your Name Here" />
-      </div>
+  </div>
+  <div #phoneGroup class="form-group row">
+    <label for="step0-phone" class="col-xs-12 control-label">
+      Phone Number</label>
+    <div class="col-sm-4">
+      <select class="form-control ignore-error" #phoneType>
+        <option value="Mobile" selected="selected">mobile</option>
+        <option value="Work">work</option>
+        <option value="Home">home</option>
+        <option value="Other">other</option>
+      </select>
     </div>
-    <div #phoneGroup class="form-group row">
-      <label for="step0-phone" class="col-xs-12 control-label">
-        Phone Number</label>
-      <div class="col-sm-4">
-        <select class="form-control ignore-error" #phoneType>
-          <option value="Mobile" selected="selected">mobile</option>
-          <option value="Work">work</option>
-          <option value="Home">home</option>
-          <option value="Other">other</option>
-        </select>
-      </div>
-      <div class="xs-spacer"></div>
-      <div class="col-sm-8">
-        <input #phone type="text" class="form-control" id="step0-phone"
-               placeholder="555-555-5555" />
-      </div>
+    <div class="xs-spacer"></div>
+    <div class="col-sm-8">
+      <input #phone type="text" class="form-control" id="step0-phone"
+             placeholder="555-555-5555" />
     </div>
-    <div class="form-group row"><div class="col-xs-12">
-      <button #submit type="submit" class="btn btn-default">Save</button>
-    </div></div>
-  </form>
-</div></div>
+  </div>
+  <div class="form-group row"><div class="col-xs-12">
+    <button #submit type="submit" class="btn btn-default">Save</button>
+  </div></div>
+</form>
 '''
     // Set default name (in case we got this info from elsewhere)
     // NB: It'd be nice if we could check if there was currently a phone
@@ -228,7 +226,7 @@ module Onboarding {
     });
 
     let content = refs["content"];
-    content.append(view);
+    content.append(form);
     name.focus();
   }
 
@@ -331,13 +329,22 @@ module Onboarding {
       `both of us?\n\n` +
       `Cheers,\n` +
       teamName;
+    var emailSubj = "Nice to meet you";
 
     mailToLink.text(asstEmail);
     mailToLink.attr("href", "mailto:" + asstEmail);
     mailMsgLink.html(emailText.replace(/\n/g, "<br />"));
-    mailMsgLink.attr("href", "mailto:" + asstEmail +
-      "?subject=" + encodeURIComponent("Hello!") +
+
+    // Gmail
+    mailMsgLink.attr("href",
+      "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + asstEmail +
+      "&su=" + encodeURIComponent(emailSubj) +
       "&body=" + encodeURIComponent(emailText));
+
+    // Non-Gmail (add Boolean check when Nylas integration done)
+    // mailMsgLink.attr("href", "mailto:" + asstEmail +
+    //   "?subject=" + encodeURIComponent(emailSubj) +
+    //   "&body=" + encodeURIComponent(emailText));
 
     let content = refs["content"];
     content.append(view);
