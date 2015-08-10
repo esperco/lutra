@@ -2,13 +2,11 @@
   Current plans open to new subscriptions
 */
 module Plan {
-  export var basic = "Basic_20150421";
-  export var basicPlus = "Basic_Plus_20150421";
-  export var standard = "Standard_20150421";
-  export var standardPlus = "Standard_Plus_20150421";
-  export var enhanced = "Enhanced_20150421";
-  export var enhancedPlus = "Enhanced_Plus_20150421";
-  export var pro = "Pro_20150421";
+  export var basic = "Basic_20150805";
+  export var basicPlus = "Basic_Plus_20150805";
+  export var exec = "Executive_20150805";
+  export var execPlus = "Executive_Plus_20150805";
+  export var vip = "VIP_20150805";
   export var employee = "Employee_20150304";
 
   /* Name is "Basic Plus" for plan ID "Basic_Plus_20150123" */

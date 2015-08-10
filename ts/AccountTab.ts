@@ -433,8 +433,10 @@ module AccountTab {
   <div #name class="membership-name"/>
   <div #price class="membership-price"/>
   <div #scheduling class="membership-scheduling"/>
-  <div #adminTasks class="membership-admin-tasks"/>
+  <div class="membership-availability">24/7 Availability</div>
   <div #responseWindow class="membership-response-window"/>
+  <div #adminTasks class="membership-admin-tasks"/>
+  <div #workflows class="membership-workflows"/>
   <div #checkContainer/>
 </div>
 '''
@@ -445,34 +447,31 @@ module AccountTab {
     name.text(membership);
 
     switch(membership) {
-    case "Basic":
-      price.text("Free");
-      scheduling.text("10 meetings included");
-      adminTasks.text("No tasks included");
-      responseWindow.text("2 hour response window");
-      break;
-    case "Standard":
-      price.text("$199/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("No tasks included");
-      responseWindow.text("2 hour response window");
-      break;
-    case "Enhanced":
-      price.text("$399/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("10 hours of tasks");
-      responseWindow.text("1 hour response window");
-      break;
-    case "Pro":
-      price.text("$599/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("20 hours of tasks");
-      responseWindow.text("1 hour response window");
-      break;
-    case "Employee":
-      price.text("Free");
-      break;
-    }
+      case "Basic":
+        price.text("$10 / meeting");
+        scheduling.text("Pay as you go");
+        adminTasks.text("---");
+        responseWindow.text("Same day response");
+        workflows.html("---");
+        break;
+      case "Executive":
+        price.text("$299 / month");
+        scheduling.text("Unlimited scheduling");
+        adminTasks.text("---");
+        responseWindow.text("Response within 2 hours");
+        workflows.html("---");
+        break;
+      case "VIP":
+        price.text("$699 / month");
+        scheduling.text("Unlimited scheduling");
+        adminTasks.text("10 hours of admin tasks included");
+        responseWindow.text("Response within 1 hour");
+        workflows.html("2 scheduling workflows included");
+        break;
+      case "Employee":
+        price.text("Free");
+        break;
+     }
 
     return view;
   }
@@ -491,25 +490,33 @@ module AccountTab {
       <div #content>
         <div #daysRemaining class="membership-modal-note"/>
         <div #suspension class="membership-modal-note"/>
-        <div class="membership-options clearfix">
-          <div #planFree class="membership-option"/>
-          <div #planLo class="membership-option"/>
-          <div #planMid class="membership-option"/>
-          <div #planHi class="membership-option"/>
-          <div #planX class="membership-option hide"/>
+        <div class="membership-options row clearfix">
+          <div class="col-sm-4">
+            <div #planBasic class="membership-option"/>
+          </div>
+          <div class="col-sm-4">
+            <div #planLo class="membership-option"/>
+          </div>
+          <div class="col-sm-4">
+            <div #planHi class="membership-option"/>
+          </div>
+          <div class="col-sm-12 hide">
+            <div #planX class="membership-option"/>
+          </div>
         </div>
         <div #subtext1 class="membership-modal-subtext">
-          All features are on a per-month basis.
+          Additional workflows are billed at $99 per scheduling workflow
+          and $199 per custom workflow for all plans.
         </div>
         <div #subtext2 class="membership-modal-subtext">
-          Additional tasks are billed at $8 per 15 minute task (only available on paid memberships).
-        </div>
-        <div #subtext3 class="membership-modal-subtext">
-          Additional scheduling is also available at $8/meeting for free users.
+          Admin (non-scheduling-related) tasks are billed at<br />
+          $40 / hour for the Basic plan,
+          $35 / hour for the Executive Plan, and
+          $30 / hour for the VIP plan.
         </div>
         <label class="checkbox membership-modal-check">
           <input #noEsper type="checkbox"></input>
-          own company branding
+          Use a custom e-mail address for your assistant
           <span #noEsperPrice></span>
         </label>
       </div>
@@ -578,93 +585,78 @@ module AccountTab {
         var selectedPlanId = membershipPlan;
 
         switch(Plan.nameOfPlan(selectedPlanId)) {
-        case "Basic":
-          selectFree();
-          break;
-        case "Basic Plus":
-          noEsper.prop("checked", true);
-          selectFree();
-          break;
-        case "Standard":
-          selectLo();
-          break;
-        case "Standard Plus":
-          noEsper.prop("checked", true);
-          selectLo();
-          break;
-        case "Enhanced":
-          selectMid();
-          break;
-        case "Enhanced Plus":
-          noEsper.prop("checked", true);
-          selectMid();
-          break;
-        case "Pro":
-          selectHi();
-          break;
-        case "Employee":
-          selectX();
-          break;
-        default:
-          Log.e("Unknown plan type: ", membershipPlan);
+          case "Basic":
+            selectBasic();
+            break;
+          case "Basic Plus":
+            noEsper.prop("checked", true);
+            selectBasic();
+            break;
+          case "Executive":
+            selectLo();
+            break;
+          case "Executive Plus":
+            noEsper.prop("checked", true);
+            selectLo();
+            break;
+          case "VIP":
+            selectHi();
+            break;
+          case "Employee":
+            selectX();
+            break;
+          default:
+            Log.e("Unknown plan type: ", membershipPlan);
         }
       }
 
       function readCheckBox() {
         var checked = noEsper.prop("checked");
         switch(Plan.nameOfPlan(selectedPlanId)) {
-        case "Basic":
-          if (checked)
-            selectedPlanId = Plan.basicPlus;
-          break;
-        case "Basic Plus":
-          if (!checked)
-            selectedPlanId = Plan.basic;
-          break;
-        case "Standard":
-          if (checked)
-            selectedPlanId = Plan.standardPlus;
-          break;
-        case "Standard Plus":
-          if (!checked)
-            selectedPlanId = Plan.standard;
-          break;
-        case "Enhanced":
-          if (checked)
-            selectedPlanId = Plan.enhancedPlus;
-          break;
-        case "Enhanced Plus":
-          if (!checked)
-            selectedPlanId = Plan.enhanced;
-          break;
-        case "Pro":
-        case "Employee":
-          break;
-        default:
-          Log.e("Unknown plan ID: ", selectedPlanId);
+          case "Basic":
+            if (checked)
+              selectedPlanId = Plan.basicPlus;
+            break;
+          case "Basic Plus":
+            if (!checked)
+              selectedPlanId = Plan.basic;
+            break;
+          case "Executive":
+            if (checked)
+              selectedPlanId = Plan.execPlus;
+            break;
+          case "Executive Plus":
+            if (!checked)
+              selectedPlanId = Plan.exec;
+            break;
+          case "VIP":
+            selectedPlanId = Plan.vip;
+            break;
+          case "Employee":
+            break;
+          default:
+            Log.e("Unknown plan ID: ", selectedPlanId);
         }
       }
 
-      planFree.append(viewOfMembershipOption("Basic"));
-      planLo.append(viewOfMembershipOption("Standard"));
-      planMid.append(viewOfMembershipOption("Enhanced"));
-      planHi.append(viewOfMembershipOption("Pro"));
+      planBasic.append(viewOfMembershipOption("Basic"));
+      planLo.append(viewOfMembershipOption("Executive"));
+      planHi.append(viewOfMembershipOption("VIP"));
       planX.append(viewOfMembershipOption("Employee"));
 
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
-        planFree.removeClass("selected");
+        planBasic.removeClass("selected");
         planLo.removeClass("selected");
-        planMid.removeClass("selected");
         planHi.removeClass("selected");
         planX.removeClass("selected");
         option.addClass("selected");
         noEsper.removeClass("hide");
       }
 
-      function selectFree() {
-        selectMembership(planFree);
-        noEsperPrice.text("for $49/mo");
+      function selectBasic() {
+        selectMembership(planBasic);
+        noEsperPrice.text("for $99 / month");
         if (noEsper.prop("checked")) {
           selectedPlanId = Plan.basicPlus;
           isFreeMembership = false;
@@ -675,24 +667,17 @@ module AccountTab {
       }
       function selectLo() {
         selectMembership(planLo);
-        noEsperPrice.text("for $49/mo");
+        noEsperPrice.text("for $49 / month");
         isFreeMembership = false;
         selectedPlanId = noEsper.prop("checked") ?
-          Plan.standardPlus : Plan.standard;
-      }
-      function selectMid() {
-        selectMembership(planMid);
-        noEsperPrice.text("for $29/mo");
-        isFreeMembership = false;
-        selectedPlanId = noEsper.prop("checked") ?
-          Plan.enhancedPlus : Plan.enhanced;
+          Plan.execPlus : Plan.exec;
       }
       function selectHi() {
         selectMembership(planHi);
         noEsperPrice.text("- included");
         isFreeMembership = false;
         noEsper.addClass("hide");
-        selectedPlanId = Plan.pro;
+        selectedPlanId = Plan.vip;
       }
       function selectX() {
         planX.removeClass("hide");
@@ -703,9 +688,8 @@ module AccountTab {
         selectedPlanId = Plan.employee;
       }
 
-      planFree.click(selectFree);
+      planBasic.click(selectBasic);
       planLo.click(selectLo);
-      planMid.click(selectMid);
       planHi.click(selectHi);
       planX.click(selectX);
 
