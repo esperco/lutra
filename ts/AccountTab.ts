@@ -559,16 +559,23 @@ module AccountTab {
     function initModal(customerStatus) {
       var membershipPlan = customerStatus.plan;
       var membershipStatus = customerStatus.status;
-      var isFreeMembership = true;
+      var isFreeMembership = false;
       if (membershipPlan && !List.find(Plan.activePlans, function(p) {
             return p === membershipPlan;
           })) {
+        var endDate = moment("2015-09-11T01:00:00.000-07:00");
+        if (customerStatus.current_period_end) {
+          endDate = moment(customerStatus.current_period_end);
+        }
+        var formatEndDate = endDate.format("MMMM D, YYYY");
+
+        "2015-09-11T11:25:24.000-07:00"
         content.prepend(
           $(`<div class="membership-modal-note alert alert-warning">
             We've updated our pricing. Please select a new subscription plan.
-            Your old plan will remain valid until October 31. If you have not
-            selected a new plan by that time, you will be downgraded to our
-            new Basic plan.
+            Your old plan will remain valid through ${formatEndDate}. If you
+            have not selected a new plan by that time, you will be downgraded
+            to our new Basic plan.
           </div>`));
       }
       else if (membershipStatus === "Trialing") {
@@ -671,23 +678,19 @@ module AccountTab {
         noEsperPrice.text("for $99 / month");
         if (noEsper.prop("checked")) {
           selectedPlanId = Plan.basicPlus;
-          isFreeMembership = false;
         } else {
           selectedPlanId = Plan.basic;
-          isFreeMembership = true;
         }
       }
       function selectLo() {
         selectMembership(planLo);
         noEsperPrice.text("for $49 / month");
-        isFreeMembership = false;
         selectedPlanId = noEsper.prop("checked") ?
           Plan.execPlus : Plan.exec;
       }
       function selectHi() {
         selectMembership(planHi);
         noEsperPrice.text("- included");
-        isFreeMembership = false;
         noEsper.addClass("hide");
         selectedPlanId = Plan.vip;
       }
@@ -707,19 +710,32 @@ module AccountTab {
 
       primaryBtn.click(function() {
         $(".next-step-button").prop("disabled", false);
-        (<any> modal).modal("hide"); // FIXME
+        primaryBtn.prop('disabled', true);
+        primaryBtn.text('Updating');
         readCheckBox();
         Log.d("Selected plan ID: " + selectedPlanId);
-        Api.setSubscription(teamid, selectedPlanId)
-          .done(function() {
-            if (!isFreeMembership) {
-              Api.getSubscriptionStatusLong(team.teamid)
-                .done(function(status){
-                  if (status.cards.length === 0)
-                    showPaymentModal("Add", team, selectedPlanId);
-                });
-            }
-          });
+        if (selectedPlanId) {
+          let setSub = function() {
+            Api.setSubscription(teamid, selectedPlanId)
+              .done(function() { (<any> modal).modal("hide"); });
+          };
+          if (isFreeMembership) {
+            setSub();
+          }
+          else {
+            Api.getSubscriptionStatusLong(team.teamid)
+              .done(function(status){
+                if (status.cards.length === 0) {
+                  (<any> modal).modal("hide"); // FIXME
+                  showPaymentModal("Add", team, selectedPlanId);
+                } else {
+                  setSub();
+                }
+              });
+          }
+        } else {
+          (<any> modal).modal("hide"); // FIXME
+        }
       });
 
       cancelBtn.click(function() {
