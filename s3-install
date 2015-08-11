@@ -7,5 +7,5 @@ s3_bucket=esper.com
 (cd pub && \
     s3cmd put \
       --guess-mime-type \
-      --mime-type=text/html \
+      --default-mime-type=text/html \
       --recursive * s3://$s3_bucket )
