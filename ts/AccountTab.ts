@@ -751,7 +751,7 @@ module AccountTab {
         if (selectedPlanId) {
           let setSub = function() {
             Api.setSubscription(teamid, selectedPlanId)
-              .done(function() { (<any> modal).modal("hide"); });
+              .done(function() { refresh(); });
           };
           if (isFreeMembership) {
             setSub();
