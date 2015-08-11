@@ -282,67 +282,42 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function showPaymentModal(purpose, team, membership) {
+  // Generates a payment form in jQuery that autoatically assigns
+  // membership to team after completion. Takes a callback that returns
+  // with an error argment on error, undefined otherwise.
+  export function getPaymentForm(team, membership, callback) {
 '''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
-  <div class="modal-dialog preference-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div #iconContainer class="img-container-left modal-icon"/>
-        <div #title class="modal-title"/>
-      </div>
-      <div #content class="preference-form">
-          <form #paymentForm method="POST" autocomplete="on">
-            <div class="semibold">Card Number</div>
-            <input #ccNum type="tel" size="20" data-stripe="number"
-                   class="preference-input" placeholder="•••• •••• •••• ••••"
-                   required/>
-            <div class="payment-col left">
-              <div class="semibold">CVC</div>
-              <input #cvcNum type="text" size="22" data-stripe="cvc"
-                     placeholder="•••" required autocomplete="off"/>
-            </div>
-            <div class="payment-col right">
-              <div class="semibold">Expiration</div>
-              <div>
-                <select #expMonth data-stripe="exp-month" class="esper-select"
-                        style="margin-right:6px" required/>
-                <select #expYear data-stripe="exp-year" class="esper-select"
-                        required/>
-              </div>
-            </div>
-          </form>
-          <form action="">
-            <div class="payment-col left">
-              <div class="semibold">Make Default Card</div>
-            </div>
-            <div class="payment-col right">
-              <input #defaultBox type="checkbox" name="default" value="card">
-            </div>
-          </form>
-      </div>
-      <div class="modal-footer">
-        <button #primaryBtn class="button-primary modal-primary"/>
-        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+<div #content class="preference-form">
+  <form #paymentForm method="POST" autocomplete="on">
+    <div class="semibold">Card Number</div>
+    <input #ccNum type="tel" size="20" data-stripe="number"
+           class="preference-input" placeholder="•••• •••• •••• ••••"
+           required/>
+    <div class="payment-col left">
+      <div class="semibold">CVC</div>
+      <input #cvcNum type="text" size="22" data-stripe="cvc"
+             placeholder="•••" required autocomplete="off"/>
+    </div>
+    <div class="payment-col right">
+      <div class="semibold">Expiration</div>
+      <div>
+        <select #expMonth data-stripe="exp-month" class="esper-select"
+                style="margin-right:6px" required/>
+        <select #expYear data-stripe="exp-year" class="esper-select"
+                required/>
       </div>
     </div>
-  </div>
+  </form>
+  <form action="">
+    <div class="payment-col left">
+      <div class="semibold">Make Default Card</div>
+    </div>
+    <div class="payment-col right">
+      <input #defaultBox type="checkbox" name="default" value="card">
+    </div>
+  </form>
 </div>
 '''
-    if (purpose == "Add") {
-      title.text("Add Payment Method");
-      primaryBtn.text("Add");
-    } else {
-      title.text("Change Payment Method");
-      primaryBtn.text("Save");
-    }
-
-    var icon = $("<img class='svg-block preference-option-icon'/>")
-      .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/creditcard.svg");
-
     // Restricts the inputs to numbers
     ccNum['payment']('formatCardNumber');
     cvcNum['payment']('formatCardCVC');
@@ -392,33 +367,87 @@ module AccountTab {
         checkInput(expMonth, validExpiry, true);
         checkInput(expYear, validExpiry, true);
 
-        primaryBtn.prop('disabled', false);
+        callback(response.error);
       } else {
         var stripeToken = response.id;
-        Api.addNewCard(teamid, stripeToken).done(function(card) {
-          if (membership !== null) {
-            Api.setSubscription(teamid, membership);
-            $(".next-step-button").prop("disabled", false);
+        Api.addNewCard(teamid, stripeToken)
+          .then(function(card) {
             (<any> paymentForm.get(0)).reset();
-            (<any> modal).modal("hide"); // FIXME
-            if (defaultBox.prop("checked")) {
-              Api.setDefaultCard(teamid, card.id).done(refresh);
+            if (membership !== null) {
+              var calls = [];
+              calls.push(Api.setSubscription(teamid, membership));
+              if (defaultBox.prop("checked")) {
+                var setDefaultCall = Api.setDefaultCard(teamid, card.id);
+                calls.push(setDefaultCall);
+              }
+              return Deferred.join(calls, true);
             } else {
-              refresh();
+              return false;
             }
-          } else {
-            refresh();
-          }
-        });
+          })
+          .then(function() {
+            callback();
+          }, function(err) {
+            callback(err);
+          });
       }
     };
 
-    paymentForm.submit(function() { return false; });
+    paymentForm.submit(function() {
+      Stripe.card.createToken(paymentForm, stripeResponseHandler);
+      return false;
+    });
+
+    return {
+      content: content,
+      form: paymentForm
+    };
+  }
+
+  function showPaymentModal(purpose, team, membership) {
+'''
+<div #modal
+     class="modal fade" tabindex="-1"
+     role="dialog">
+  <div class="modal-dialog preference-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div #iconContainer class="img-container-left modal-icon"/>
+        <div #title class="modal-title"/>
+      </div>
+      <div #content />
+      <div class="modal-footer">
+        <button #primaryBtn class="button-primary modal-primary"/>
+        <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+'''
+    if (purpose == "Add") {
+      title.text("Add Payment Method");
+      primaryBtn.text("Add");
+    } else {
+      title.text("Change Payment Method");
+      primaryBtn.text("Save");
+    }
+
+    var icon = $("<img class='svg-block preference-option-icon'/>")
+      .appendTo(iconContainer);
+    Svg.loadImg(icon, "/assets/img/creditcard.svg");
+
+    var refs = getPaymentForm(team, membership, function(err) {
+      if (err) {
+        primaryBtn.prop('disabled', false);
+      } else {
+        refresh();
+      }
+    });
+    content.append(refs.content);
 
     primaryBtn.click(function() {
       primaryBtn.prop('disabled', true);
-      Stripe.card.createToken(paymentForm, stripeResponseHandler);
-      // (<any> modal).modal("hide"); // FIXME
+      refs.form.submit();
       return false;
     });
 
