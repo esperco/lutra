@@ -134,7 +134,7 @@ module Onboarding {
   <div class="page-header">
     <h2>
       Thanks!
-      <small>We'll need some additional info to continue.</small>
+      <small>We need some additional info to continue.</small>
     </h2>
   </div>
   <div #nameGroup class="form-group row">
@@ -248,7 +248,7 @@ module Onboarding {
   </div>
   <div #description class="description calendar-setting-description">
     Please select which calendars to share with your Esper assistant.
-    We'll need you to share at least one calendar to get started, but you can
+    We need you to share at least one calendar to get started, but you can
     share or unshare additional calendars later.
   </div>
   <div class="panel panel-default">
