@@ -8,6 +8,7 @@ module Plan {
   export var execPlus = "Executive_Plus_20150805";
   export var vip = "VIP_20150805";
   export var employee = "Employee_20150304";
+  export var activePlans = [basic, basicPlus, exec, execPlus, vip, employee];
 
   /* Name is "Basic Plus" for plan ID "Basic_Plus_20150123" */
   export function nameOfPlan(planId: string) {

@@ -478,9 +478,7 @@ module AccountTab {
 
   function showMembershipModal(team) {
 '''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
+<div #modal class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog membership-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -488,8 +486,6 @@ module AccountTab {
         <div #title class="modal-title">Change Membership</div>
       </div>
       <div #content>
-        <div #daysRemaining class="membership-modal-note"/>
-        <div #suspension class="membership-modal-note"/>
         <div class="membership-options row clearfix">
           <div class="col-sm-4">
             <div #planBasic class="membership-option"/>
@@ -513,6 +509,10 @@ module AccountTab {
           $40 / hour for the Basic plan,
           $35 / hour for the Executive Plan, and
           $30 / hour for the VIP plan.
+        </div>
+        <div #subtext3 class="membership-modal-subtext">
+          See <a href="http://esper.com/pricing">our pricing page</a> for more
+          detail.
         </div>
         <label class="checkbox membership-modal-check">
           <input #noEsper type="checkbox"></input>
@@ -558,29 +558,39 @@ module AccountTab {
       var membershipPlan = customerStatus.plan;
       var membershipStatus = customerStatus.status;
       var isFreeMembership = true;
-      if (membershipStatus === "Trialing" && membershipPlan === undefined) {
+      if (membershipPlan && !List.find(Plan.activePlans, function(p) {
+            return p === membershipPlan;
+          })) {
+        content.prepend(
+          $(`<div class="membership-modal-note alert alert-warning">
+            We've updated our pricing. Please select a new subscription plan.
+            Your old plan will remain valid until October 31. If you have not
+            selected a new plan by that time, you will be downgraded to our
+            new Basic plan.
+          </div>`));
+      }
+      else if (membershipStatus === "Trialing") {
         var end = customerStatus.trial_end;
         var timeLeft = moment.duration(moment().diff(end)).humanize();
-'''trialMsgView
-<span #trialMsg>
-  You have <span class="bold">{{timeLeft}}</span>
-  remaining in your free trial.
-  <br>
-  Select a membership option below to continue using
-  Esper beyond your trial period.
-</span>
-'''
-        daysRemaining
-          .append(trialMsg)
-          .show();
-      } else if (membershipStatus == "Past-due" ||
-                 membershipStatus == "Unpaid" ||
-                 membershipStatus == "Canceled" ||
-                 membershipStatus == undefined) {
-        suspension
-          .text("Select a membership option below to reactivate your account.")
-          .show();
-      } else { // already picked a plan
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          <span>
+            You have <span class="bold">${timeLeft}</span>
+            remaining in your free trial.
+            <br>
+            Select a membership option below to continue using
+            Esper beyond your trial period.
+          </span>
+        </div>`);
+      }
+      else if (membershipStatus == "Past-due" ||
+               membershipStatus == "Unpaid" ||
+               membershipStatus == "Canceled" ||
+               membershipStatus == undefined) {
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to reactivate your account.
+        </div>`);
+      }
+      else { // already picked a plan
         var planName = Plan.nameOfPlan(membershipPlan);
         var selectedPlanId = membershipPlan;
 
@@ -908,7 +918,13 @@ module AccountTab {
       }
 
       if (mem === "Active" && plan !== undefined) {
-        membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
+        if (List.find(Plan.activePlans, function(p) { return p === plan; })) {
+          membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
+        } else {
+          membershipBadge.text("EXPIRING");
+          membershipBadge.removeClass("active");
+          membershipBadge.addClass("suspended");
+        }
       } else if (mem !== undefined) {
         membershipBadge.text(mem.toUpperCase());
       }
