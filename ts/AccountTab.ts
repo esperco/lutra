@@ -288,33 +288,37 @@ module AccountTab {
   export function getPaymentForm(team, membership, callback) {
 '''
 <div #content class="preference-form">
-  <form #paymentForm method="POST" autocomplete="on">
-    <div class="semibold">Card Number</div>
-    <input #ccNum type="tel" size="20" data-stripe="number"
-           class="preference-input" placeholder="•••• •••• •••• ••••"
-           required/>
-    <div class="payment-col left">
-      <div class="semibold">CVC</div>
-      <input #cvcNum type="text" size="22" data-stripe="cvc"
+  <form #paymentForm method="POST" autocomplete="on" class="row">
+    <div #ccNumGroup class="form-group col-xs-12">
+      <label for="cc-num" class="control-label">Card Number</label>
+      <input id="cc-num" #ccNum type="tel" size="20" data-stripe="number"
+             class="preference-input form-control"
+             placeholder="•••• •••• •••• ••••"
+             required/>
+    </div>
+    <div #cvcNumGroup class="form-group col-xs-6">
+      <label class="control-label" for="cvc-num">CVC</label>
+      <input #cvcNum id="cvc-num" type="text" size="22" data-stripe="cvc"
+             class="form-control"
              placeholder="•••" required autocomplete="off"/>
     </div>
-    <div class="payment-col right">
-      <div class="semibold">Expiration</div>
-      <div>
-        <select #expMonth data-stripe="exp-month" class="esper-select"
-                style="margin-right:6px" required/>
-        <select #expYear data-stripe="exp-year" class="esper-select"
-                required/>
+    <div #expDateGroup class="form-group col-xs-6">
+      <div class="row">
+        <label class="control-label col-xs-12" for="exp-month">Expiration</label>
+        <div class="col-xs-6">
+          <select id="exp-month" #expMonth class="form-control esper-select"
+                  data-stripe="exp-month" required/>
+        </div><div class="col-xs-6">
+          <select #expYear class="form-control esper-select"
+                  data-stripe="exp-year" required/>
+        </div>
       </div>
     </div>
   </form>
   <form action="">
-    <div class="payment-col left">
-      <div class="semibold">Make Default Card</div>
-    </div>
-    <div class="payment-col right">
-      <input #defaultBox type="checkbox" name="default" value="card">
-    </div>
+    <input id="default-card"
+           #defaultBox type="checkbox" name="default" value="card" />
+    <label for="default-card">Make Default Card</label>
   </form>
 </div>
 '''
@@ -339,16 +343,11 @@ module AccountTab {
       expYear.append($("<option value=" + i + ">" + year + "</option>"));
     }
 
-    var checkInput = function(ccInfo, valid, date) {
-      if (!valid) {
-        ccInfo.val("");
-        ccInfo.addClass("cc-error");
-        if (!date) {
-          ccInfo.attr("placeholder", "Invalid Number");
-        }
+    var checkInputGroup = function(ccGroup, valid) {
+      if (! valid) {
+        ccGroup.addClass("has-error");
       } else {
-        ccInfo.removeClass('cc-error');
-        ccInfo.attr("placeholder", "");
+        ccGroup.removeClass('has-error');
       }
     };
     var teamid = team.teamid;
@@ -362,11 +361,9 @@ module AccountTab {
         var validCVC = $["payment"].validateCardCVC(cvcNum.val(), cardType);
         var validExpiry = $["payment"].validateCardExpiry(expMonth, expYear);
 
-        checkInput(ccNum, validCard, false);
-        checkInput(cvcNum, validCVC, false);
-        checkInput(expMonth, validExpiry, true);
-        checkInput(expYear, validExpiry, true);
-
+        checkInputGroup(ccNumGroup, validCard);
+        checkInputGroup(cvcNumGroup, validCVC);
+        checkInputGroup(expDateGroup, validExpiry);
         callback(response.error);
       } else {
         var stripeToken = response.id;
