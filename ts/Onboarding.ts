@@ -45,7 +45,7 @@ module Onboarding {
     };
   }
 
-  let steps = [step0, step1, step2, step3];
+  let steps = [step0, step1, step2, step3, step4];
 
   export function load(step = 0) {
     var refs = loadContainer();
@@ -58,10 +58,15 @@ module Onboarding {
     button.prop("disabled", true);
   }
 
+  // Undoes makeBusy
+  function unmakeBusy(button: JQuery, text = "Save"): void {
+    button.text(text);
+    button.prop("disabled", false);
+  }
 
   /* Step 0 => Sign in */
   function step0(refs: IJQMap): void {
-    refs["progress"].width("25%");
+    refs["progress"].width("20%");
 
     // Log out if applicable
     if (Login.data) {
@@ -123,11 +128,14 @@ module Onboarding {
 
   /* Step 1 => Confirm executive name */
   function step1(refs: IJQMap): void {
-    refs["progress"].width("50%");
+    refs["progress"].width("40%");
 '''
 <form #form class="form">
-  <div class="form-group row" style="text-align: center;">
-    Thanks! We'll need some additional info to continue.
+  <div class="page-header">
+    <h2>
+      Thanks!
+      <small>We'll need some additional info to continue.</small>
+    </h2>
   </div>
   <div #nameGroup class="form-group row">
     <label class="col-xs-12 control-label" for="step0-name">Name</label>
@@ -154,7 +162,7 @@ module Onboarding {
     </div>
   </div>
   <div class="form-group row"><div class="col-xs-12">
-    <button #submit type="submit" class="btn btn-default">Save</button>
+    <button #submit type="submit" class="btn btn-primary">Save</button>
   </div></div>
 </form>
 '''
@@ -232,16 +240,21 @@ module Onboarding {
 
   /* Step 2 => Share calendars */
   function step2(refs: IJQMap): void {
-    refs["progress"].width("75%");
+    refs["progress"].width("60%");
 '''
 <div #view>
-  <div #description class="calendar-setting-description">
+  <div class="page-header">
+    <h2>Please share a calendar.</h2>
+  </div>
+  <div #description class="description calendar-setting-description">
     Please select which calendars to share with your Esper assistant.
     We'll need you to share at least one calendar to get started, but you can
     share or unshare additional calendars later.
   </div>
-  <div #calendarView class="esper-loading">Loading...</div>
-  <button #share class="button-primary" style="margin-top: 10px">
+  <div class="panel panel-default">
+    <div #calendarView class="esper-loading panel-body">Loading...</div>
+  </div>
+  <button #share class="button-primary">
     Share Calendars
   </button>
 </div>
@@ -277,11 +290,6 @@ module Onboarding {
               }
             })
 
-            // Then set subscription for new user to basic
-            .then(function() {
-              return Api.setSubscription(team.teamid, Plan.basic);
-            })
-
             // Then redirect to next / final step
             .then(function() {
               goToStep(3);
@@ -293,15 +301,62 @@ module Onboarding {
     content.append(view);
   }
 
-  /* Step 2 => complete */
   function step3(refs: IJQMap): void {
+    refs["progress"].width("80%");
+'''
+<div #view>
+  <div class="page-header">
+    <h2>Please enter in your payment info.</h2>
+  </div>
+  <div class="description">
+    <p>
+      We'll need a credit card to continue. Don't worry though. New users
+      start with a 14-day free trial, during which we won't bill your credit
+      card. After the free trial expires, we'll switch you to a pay-as-you-go
+      plan and will only bill you based on your Esper usage.
+    </p>
+    <p><b>You can change or cancel your plan at any time.</b></p>
+  </div>
+  <div class="panel panel-default">
+    <div #formContainer class="panel-body" />
+  </div>
+  <p>By clicking below, you agree to Esper's
+    <a href="http://esper.com/terms-of-use">Terms of Use.</a>
+  </p>
+  <button #primaryBtn class="button-primary modal-primary"/>
+</div>
+'''
+    var paymentRefs = AccountTab.getPaymentForm(
+      Login.getTeam(), Plan.basic, function(err) {
+        if (err) {
+          unmakeBusy(primaryBtn);
+        } else {
+          goToStep(4);
+        }
+      });
+    formContainer.append(paymentRefs.form);
+
+    unmakeBusy(primaryBtn);
+    primaryBtn.click(function() {
+      makeBusy(primaryBtn);
+      paymentRefs.form.submit();
+    });
+
+    let content = refs["content"];
+    content.append(view);
+  }
+
+  /* Step 4 => complete */
+  function step4(refs: IJQMap): void {
     refs["progress"].width("100%");
 '''
 <div #view>
-  <h2>Congratulations!</h2>
-  <div>
+  <div class="page-header">
+    <h2>Congratulations!</h2>
+  </div>
+  <div class="description">
     <p>You've signed up for your very own Esper Assistant.
-      You can get started right away by contacting your assistant at 
+      You can get started right away by contacting your assistant at
       <b><a target="_blank" #mailToLink></a></b>.
     </p>
     <p>Click below to send the following email and set up a call:</p>
