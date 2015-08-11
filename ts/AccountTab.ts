@@ -811,7 +811,7 @@ module AccountTab {
 
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
-        memPlan.append(customerStatus.plan);
+        memPlan.append(Plan.nameOfPlan(customerStatus.plan));
         memStatus.append(customerStatus.status);
     });
 
