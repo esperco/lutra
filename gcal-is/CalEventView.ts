@@ -21,19 +21,6 @@ module Esper.CalEventView {
     });
   }
 
-  var emailRowClass = "esper-email-row";
-
-  function removeEsperEmailRows() {
-    $("." + emailRowClass).remove();
-  }
-
-  function insertEsperEmailRow() {
-    var anchor = Gcal.Event.findAnchor();
-    var root = $("<tr/>").addClass(emailRowClass);
-    root.insertAfter(anchor);
-    return root;
-  }
-
   function makeGmailThreadUrl(threadId: string) {
     var url =
       "https://mail.google.com/mail/u/" + Gcal.getUserEmail()
@@ -188,64 +175,6 @@ module Esper.CalEventView {
     threadView.attr("href", makeGmailThreadUrl(thread.threadId));
 
     return view;
-  }
-
-  function renderEmail(team: ApiT.Team,
-                       fullEventId: Types.FullEventId) {
-'''
-<th #th class="ep-dp-dt-th">
-  <label #label></label>
-</th>
-<td #td class="ep-dp-dt-td">
-  <div #linked/>
-  <div #linkable/>
-</td>
-'''
-    var teamid = team.teamid;
-
-    label.text("Email (" + team.team_name + ")");
-    Api.getLinkedThreads(teamid, fullEventId.eventId)
-      .done(function(linkedThrids) {
-        var thrids = linkedThrids.linked_threads;
-        Promise.join(
-          List.map(thrids, function(thrid) {
-            return Api.getThreadDetails(thrid);
-          })
-        ).done(function(threads) {
-          List.iter(threads, function(thread) {
-            var threadView = renderLinkedThread(team, thread, fullEventId);
-            linked.append(threadView);
-          });
-
-          function refreshLinkable() {
-            linkable.children().remove();
-            var account = Login.getAccount();
-            var activeThreads = account.activeThreads;
-            if (activeThreads !== undefined) {
-              List.iter(activeThreads.threads, function(v) {
-                var thread = v.item;
-                if (thread !== undefined) {
-                  if (! List.exists(thrids, function(thrid) {
-                    return thread.threadId === thrid;
-                  })) {
-                    var threadView =
-                      renderActiveThread(team, thread, fullEventId);
-                    linkable.append(threadView);
-                  }
-                }
-              });
-            }
-          }
-
-          refreshLinkable();
-          Login.watchableAccount.watch(function(newAccount, newValidity,
-                                                oldAccount, oldValidity) {
-            refreshLinkable();
-          });
-        });
-      });
-
-    return { th: th, td: td };
   }
 
   function removeReminderDropdown() {
@@ -519,26 +448,6 @@ module Esper.CalEventView {
         });
       });
     }
-
-    var myUid = Login.myUid();
-
-    removeEsperEmailRows();
-
-    /* For each team that uses this calendar */
-    teams.forEach(function(team) {
-      if (team.team_executive !== myUid) {
-        var teamCalendars = List.map(team.team_calendars, function(cal) {
-          return cal.google_cal_id;
-        });
-        if (List.mem(teamCalendars, fullEventId.calendarId)) {
-          var row = insertEsperEmailRow();
-          var cells = renderEmail(team, fullEventId);
-          row
-            .append(cells.th)
-            .append(cells.td);
-        }
-      }
-    });
   }
 
   var alreadyInitialized = false;
