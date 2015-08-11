@@ -448,17 +448,6 @@ module Esper.CalEventView {
         });
       });
     }
-
-    var myUid = Login.myUid();
-
-    /* For each team that uses this calendar */
-    teams.forEach(function(team) {
-      if (team.team_executive !== myUid) {
-        var teamCalendars = List.map(team.team_calendars, function(cal) {
-          return cal.google_cal_id;
-        });
-      }
-    });
   }
 
   var alreadyInitialized = false;
