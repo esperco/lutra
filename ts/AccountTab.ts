@@ -585,7 +585,9 @@ module AccountTab {
     function initModal(customerStatus) {
       var membershipPlan = customerStatus.plan;
       var membershipStatus = customerStatus.status;
+      var selectedPlanId = membershipPlan;
       var isFreeMembership = false;
+
       if (membershipPlan && !List.find(Plan.activePlans, function(p) {
             return p === membershipPlan;
           })) {
@@ -607,13 +609,18 @@ module AccountTab {
       else if (membershipStatus === "Trialing") {
         var end = customerStatus.trial_end;
         var timeLeft = moment.duration(moment().diff(end)).humanize();
+        selectPlan();
         content.prepend(`<div class="membership-modal-note alert alert-warning">
           <span>
             You have <span class="bold">${timeLeft}</span>
             remaining in your free trial.
-            <br>
-            Select a membership option below to continue using
-            Esper beyond your trial period.
+            <br />
+            At the end of your trial period, you'll be switched to
+            the plan you pick below.
+            <br />
+            To cancel before then, please notify
+            your assistant or
+            <a href="mailto:support@esper.com">support@esper.com</a>.
           </span>
         </div>`);
       }
@@ -626,10 +633,11 @@ module AccountTab {
         </div>`);
       }
       else { // already picked a plan
-        var planName = Plan.nameOfPlan(membershipPlan);
-        var selectedPlanId = membershipPlan;
+        selectPlan();
+      }
 
-        switch(Plan.nameOfPlan(selectedPlanId)) {
+      function selectPlan() {
+        switch (Plan.nameOfPlan(selectedPlanId)) {
           case "Basic":
             selectBasic();
             break;
