@@ -220,15 +220,16 @@ function checkAndSubmitSignupForm() {
 }
 
 function setDonePageFromHash() {
-  var alias_name = location.hash.split("#")[1].split("@")[0];
+  var hash = location.hash.slice(1);
+  var alias_name = hash.split(";")[0].split("@")[0];
   var formatted_name = alias_name.charAt(0).toUpperCase() + alias_name.slice(1);
   var greeting =  "Hi ".concat(formatted_name).concat(",");
   document.getElementById("alias-name").innerHTML = greeting;
 
-  var user = location.hash.split('#')[2];
+  var user = hash.split(';')[1];
   document.getElementById("user").innerHTML = user;
 
-  var email = location.hash.split("#")[1];
+  var email = hash.split(";")[0];
   var intro_email = "mailto:".concat(email).concat("?subject=Nice to meet you, ").concat(formatted_name).concat("!&body=").concat(greeting).concat("%0D%0A%0D%0AIt's great to meet you! I'm excited to have you as an assistant.%0D%0AI'd love to speak with you and learn more about what you can do for me.%0D%0ACan you help find a good time for a phonecall that works for both of us?%0D%0A%0D%0ACheers,%0D%0A").concat(user);
   document.getElementById("mailto-link").innerHTML = email;
   $("#mailto-link").prop("href", intro_email);
