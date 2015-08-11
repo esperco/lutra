@@ -406,6 +406,8 @@ module AccountTab {
             } else {
               refresh();
             }
+          } else {
+            refresh();
           }
         });
       }
@@ -798,6 +800,7 @@ module AccountTab {
       <div class="info-col right">
         <div #memPlan class="plan"/>
         <div #memStatus class="status"/>
+        <div #memCards class="status" />
       </div>
       <div class="modal-footer">
         <button #cancelBtn class="button-secondary modal-cancel">Close</button>
@@ -817,20 +820,19 @@ module AccountTab {
 
     Api.getSubscriptionStatusLong(teamid).done(function(status) {
       if (status.cards.length < 1) {
-        memStatus.append( "<br> No Cards");
+        memCards.append( "No Cards");
       }
       else {
         for (var i = 0; i < status.cards.length; i++) {
-          memStatus.append("<br> •••• •••• •••• ");
-          memStatus.append(<any>status.cards[i].last4);
+          memCards.append("•••• •••• •••• ");
+          memCards.append(<any>status.cards[i].last4);
 '''rmCardView
 <span #removeCardSpan>
   <span class="text-divider"></span><a #removeCardLink>Remove</a>
 </span>
 '''
-          memStatus.append(removeCardSpan);
-
           if (status.cards.length > 1) {
+            memCards.append(removeCardSpan);
             var cardid = status.cards[i].id;
             removeCardLink.addClass("danger-link");
             removeCardLink.click(function() {
@@ -838,6 +840,7 @@ module AccountTab {
               Api.deleteCard(teamid, cardid).done(refresh);
             });
           }
+          memCards.append('<br />')
         }
       }
     });
