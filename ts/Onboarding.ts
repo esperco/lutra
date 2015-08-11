@@ -88,6 +88,9 @@ module Onboarding {
     <a href="http://esper.com/mailing-list">
       Use something else? Click here.
     </a>
+    <br /><br />
+    By signing in, you agree to Esper's
+    <a href="http://esper.com/terms-of-use">Terms of Use.</a>
   </div>
 </div>
 '''
@@ -310,7 +313,7 @@ module Onboarding {
   </div>
   <div class="description">
     <p>
-      We'll need a credit card to continue. Don't worry though. New users
+      We need a credit card to continue. Don't worry though. New users
       start with a 14-day free trial, during which we won't bill your credit
       card. After the free trial expires, we'll switch you to a pay-as-you-go
       plan and will only bill you based on your Esper usage.
@@ -320,9 +323,6 @@ module Onboarding {
   <div class="panel panel-default">
     <div #formContainer class="panel-body" />
   </div>
-  <p>By clicking below, you agree to Esper's
-    <a href="http://esper.com/terms-of-use">Terms of Use.</a>
-  </p>
   <button #primaryBtn class="button-primary modal-primary"/>
 </div>
 '''
