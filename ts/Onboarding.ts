@@ -279,7 +279,7 @@ module Onboarding {
 
             // Then set subscription for new user to basic
             .then(function() {
-              return Api.setSubscription(team.teamid, Plan.basic);
+              return Api.setSubscription(team.teamid, Plan.vip);
             })
 
             // Then redirect to next / final step
