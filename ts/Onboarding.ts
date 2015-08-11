@@ -237,6 +237,8 @@ module Onboarding {
 <div #view>
   <div #description class="calendar-setting-description">
     Please select which calendars to share with your Esper assistant.
+    We'll need you to share at least one calendar to get started, but you can
+    share or unshare additional calendars later.
   </div>
   <div #calendarView class="esper-loading">Loading...</div>
   <button #share class="button-primary" style="margin-top: 10px">
