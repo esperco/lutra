@@ -5,6 +5,7 @@
   "scripts": {
     "gulp": "gulp",
     "build": "gulp build",
+    "less": "gulp build-less",
     "build-production": "gulp build-production",
     "watch": "gulp watch",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,8 +20,12 @@
   "homepage": "https://github.com/esperco/otter",
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0",
+    "gulp-autoprefixer": "^2.3.1",
     "gulp-cached": "^1.1.0",
     "gulp-exec": "^2.1.1",
+    "gulp-filter": "^3.0.0",
+    "gulp-less": "^3.0.3",
+    "gulp-sourcemaps": "^1.5.2",
     "gulp-util": "^3.0.6",
     "livereload": "^0.3.7",
     "temp": "^0.8.3"

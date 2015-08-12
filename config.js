@@ -24,12 +24,15 @@ module.exports = {
   // Bundle TS into this file in pubDir
   tsBundleName: "js/app.js",
 
+  // Where to look for LESS files
+  lessDir: "css",
+
   // Distributable HTML, JS, etc.
   pubDir: "pub",
 
   // Port for live reload server to use. 35729 is the default for most
   // LiveReload browser extensions
-  liveReloadPort: 35729, 
+  liveReloadPort: 35729,
 
   // Production mode? => this can be set to true within the gulpfile itself
   // by calling the "production" task
