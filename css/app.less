@@ -83,41 +83,35 @@ button,
 }
 .button-primary, .btn-primary {
   color: white;
-  background-image: -webkit-linear-gradient(top, #A75FCC 0%, #9C59BF 100%);
-  background-image:         linear-gradient(top, #A75FCC 0%, #9C59BF 100%);
+  background-image:linear-gradient(to bottom, #A75FCC 0%, #9C59BF 100%);
   border: 1px solid #70348F;
   &:hover {
     color: white;
-    background-image: -webkit-linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
-    background-image:         linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    background-image: linear-gradient(to bottom, #A75FCC 0%, #8A4DAA 100%);
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
   &:active {
     color: white;
-    background-image: -webkit-linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
-    background-image:         linear-gradient(top, #A75FCC 0%, #8A4DAA 100%);
+    background-image: linear-gradient(to bottom, #A75FCC 0%, #8A4DAA 100%);
     -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
             box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
   }
 }
 .button-secondary {
   color: @purple_text;
-  background-image: -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
-  background-image:         linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  background-image: linear-gradient(to bottom, #F5F5F5 0%, #F1F1F1 100%);
   border: 1px solid #C5C5C5;
   &:hover {
     color: @purple_text;
-    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image: linear-gradient(to bottom, #F8F8F8 0%, #F1F1F1 100%);
     border: 1px solid #C6C6C6;
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
   &:active {
     color: @purple_text;
-    background-image: -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    background-image:         linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image: linear-gradient(to bottom, #F8F8F8 0%, #F1F1F1 100%);
     border: 1px solid #C6C6C6;
     -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
             box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
@@ -126,18 +120,15 @@ button,
 .button-danger {
   color: white;
   border: 1px solid #b9332f;
-  background-image: -webkit-linear-gradient(top, #d7524e 0%, #c7423e 100%);
-  background-image:         linear-gradient(top, #d7524e 0%, #c7423e 100%);
+  background-image: linear-gradient(to bottom, #d7524e 0%, #c7423e 100%);
   &:hover {
-    background-image: -webkit-linear-gradient(top, #d14a48 0%, #c13a38 100%);
-    background-image:         linear-gradient(top, #d14a48 0%, #c13a38 100%);
+    background-image: linear-gradient(to bottom, #d14a48 0%, #c13a38 100%);
     border: 1px solid #b42e2b;
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
   &:active {
-    background-image: -webkit-linear-gradient(top, #d9534f 0%, #c9433f 100%);
-    background-image:         linear-gradient(top, #d9534f 0%, #c9433f 100%);
+    background-image: linear-gradient(to bottom, #d9534f 0%, #c9433f 100%);
     border: 1px solid #b42e2b;
     -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
             box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
@@ -149,8 +140,7 @@ select.esper-select {
   height: 32px;
   padding: 6px 20px 6px 9px;
   line-height: 1.2;
-  background-image: url(/assets/img/select-arrow.svg), -webkit-linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
-  background-image: url(/assets/img/select-arrow.svg),        -linear-gradient(top, #F5F5F5 0%, #F1F1F1 100%);
+  background-image: url(/assets/img/select-arrow.svg), linear-gradient(to bottom, #F5F5F5 0%, #F1F1F1 100%);
   background-size: calc(~"200% - 20px") 100%, cover;
   background-repeat: no-repeat;
   border: 1px solid #C5C5C5;
@@ -159,8 +149,7 @@ select.esper-select {
   outline: none;
   -webkit-appearance: none;
   &:hover {
-    background-image: url(/assets/img/select-arrow.svg), -webkit-linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
-    background-image: url(/assets/img/select-arrow.svg),        -linear-gradient(top, #F8F8F8 0%, #F1F1F1 100%);
+    background-image: url(/assets/img/select-arrow.svg), linear-gradient(to bottom, #F8F8F8 0%, #F1F1F1 100%);
     border: 1px solid #C6C6C6;
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
@@ -466,6 +455,7 @@ input[type="text"] {
   float: left;
   width: 14px;
   margin-top: 2px;
+  height: 20px;
 }
 
 .btn-divider {
