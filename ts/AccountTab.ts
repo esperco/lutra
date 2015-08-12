@@ -461,6 +461,7 @@ module AccountTab {
   <div #name class="membership-name"/>
   <div #price class="membership-price"/>
   <div #scheduling class="membership-scheduling"/>
+  <div #schedulingExtra class="membership-scheduling-extra"/>
   <div class="membership-availability">24/7 Availability</div>
   <div #responseWindow class="membership-response-window"/>
   <div #adminTasks class="membership-admin-tasks"/>
@@ -476,24 +477,27 @@ module AccountTab {
 
     switch(membership) {
       case "Basic":
-        price.text("$10 / meeting");
-        scheduling.text("Pay as you go");
+        price.text("Pay as you go");
+        scheduling.html("---");
+        schedulingExtra.html("$10 / meeting");
         adminTasks.text("---");
         responseWindow.text("Same day response");
         workflows.html("---");
         break;
       case "Executive":
         price.text("$299 / month");
-        scheduling.text("Unlimited scheduling");
+        scheduling.html("50 meetings included");
+        schedulingExtra.html("$9 / additional meeting");
         adminTasks.text("---");
-        responseWindow.text("Response within 2 hours");
+        responseWindow.text("< 2 hour response");
         workflows.html("---");
         break;
       case "VIP":
         price.text("$699 / month");
-        scheduling.text("Unlimited scheduling");
+        scheduling.html("<strong>Unlimited scheduling</strong>");
+        schedulingExtra.html("$0 / meeting");
         adminTasks.text("10 hours of admin tasks included");
-        responseWindow.text("Response within 1 hour");
+        responseWindow.text("< 1 hour response");
         workflows.html("2 scheduling workflows included");
         break;
       case "Employee":
