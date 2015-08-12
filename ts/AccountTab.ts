@@ -603,10 +603,10 @@ module AccountTab {
         }
         content.prepend(
           $(`<div class="membership-modal-note alert alert-warning">
-            We've updated our pricing. Please select a new subscription plan.
-            Your old plan will remain valid through ${formatEndDate}. If you
-            have not selected a new plan by that time, you will be downgraded
-            to our new Basic plan.
+            We've updated our pricing. Please select a new membership option.
+            Your old subscription will remain valid through ${formatEndDate}. If
+            you have not selected a new membership option by that time, you will
+            be downgraded to our new Flexible Membership.
           </div>`));
       }
       else if (membershipStatus === "Trialing") {
@@ -619,7 +619,7 @@ module AccountTab {
             remaining in your free trial.
             <br />
             At the end of your trial period, you'll be switched to
-            the plan you pick below.
+            the membership option you pick below.
             <br />
             To cancel before then, please notify
             your assistant or
