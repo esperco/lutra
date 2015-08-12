@@ -2,18 +2,18 @@
   Current plans open to new subscriptions
 */
 module Plan {
-  export var basic = "Basic_20150805";
-  export var lo = "Executive_20150805";
-  export var med = "Silver_20150812";
-  export var hi = "VIP_20150805";
+  export var basic = "Flexible_20150812";
+  export var lo = "Silver_20150812";
+  export var med = "Gold_20150812";
+  export var hi = "Executive_20150812";
   export var employee = "Employee_20150304";
 
   // Plus plans are variants of plans with the custom e-mail option, set.
   // If no plusPlan, then treat the "plus" version of a plan as identical
   // to the non-plus version
   export var plusPlans: {[index: string]: string} = {};
-  plusPlans[basic] = "Basic_Plus_20150805";
-  plusPlans[lo] = "Executive_Plus_20150805";
+  plusPlans[basic] = "Flexible_Plus_20150812";
+  plusPlans[lo] = "Silver_Plus_20150812";
 
   /* Is this a "plus" plan? */
   let plusPlansReversed: {[index: string]: string} = {};

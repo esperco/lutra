@@ -621,7 +621,9 @@ module AccountTab {
         content.prepend(
           $(`<div class="membership-modal-note alert alert-warning">
             We've updated our pricing. Please select a new membership option.
-            Your old subscription will remain valid through ${formatEndDate}. If
+            <br />
+            Your old subscription will remain valid through ${formatEndDate}.
+            <br />If
             you have not selected a new membership option by that time, you will
             be downgraded to our new Flexible Membership.
           </div>`));
