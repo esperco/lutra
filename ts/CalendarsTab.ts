@@ -29,6 +29,7 @@ module CalendarsTab {
            .dblclick(function() { $(this).parent().remove(); });
 
     view.data("calid", cal.google_cal_id)
+        .data("authorized", cal.authorized_as)
         .data("timezone", cal.calendar_timezone);
 
     return view;
@@ -107,9 +108,11 @@ module CalendarsTab {
         teamOpts.each(function(i) {
           var row = $(teamOpts[i]);
           var calID = row.data("calid");
+          var authorizedAs = row.data("authorized");
           teamCalIDs.push(calID);
           calData[calID] = {
             google_cal_id: calID,
+            authorized_as: authorizedAs,
             calendar_timezone: row.data("timezone"),
             calendar_title: row.find(".esper-cal-name").text(),
             calendar_default_view: row.find(".esper-cal-view").is(":checked"),
