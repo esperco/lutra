@@ -455,13 +455,12 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function viewOfMembershipOption(membership) {
+  function viewOfMembershipOption(planId: string) {
 '''
 <div #view>
   <div #name class="membership-name"/>
   <div #price class="membership-price"/>
   <div #scheduling class="membership-scheduling"/>
-  <div #schedulingExtra class="membership-scheduling-extra"/>
   <div class="membership-availability">24/7 Availability</div>
   <div #responseWindow class="membership-response-window"/>
   <div #adminTasks class="membership-admin-tasks"/>
@@ -473,34 +472,41 @@ module AccountTab {
       .appendTo(checkContainer);
     Svg.loadImg(check, "/assets/img/check.svg");
 
-    name.text(membership);
-
-    switch(membership) {
-      case "Basic":
-        price.text("Pay as you go");
-        scheduling.html("---");
-        schedulingExtra.html("$10 / meeting");
+    name.text(Plan.classNameOfPlan(planId));
+    switch(Plan.classOfPlan(planId)) {
+      case "basic":
+        name.text("Flexible");
+        price.text("No monthly charge");
+        scheduling.html("$10 / meeting");
         adminTasks.text("---");
         responseWindow.text("Same day response");
         workflows.html("---");
         break;
-      case "Executive":
+      case "lo":
+        name.text("Silver");
         price.text("$299 / month");
-        scheduling.html("50 meetings included");
-        schedulingExtra.html("$9 / additional meeting");
+        scheduling.html("50 meetings, $9/extra");
         adminTasks.text("---");
         responseWindow.text("< 2 hour response");
         workflows.html("---");
         break;
-      case "VIP":
+      case "med":
+        name.text("Gold");
         price.text("$699 / month");
-        scheduling.html("<strong>Unlimited scheduling</strong>");
-        schedulingExtra.html("$0 / meeting");
-        adminTasks.text("10 hours of admin tasks included");
+        scheduling.html("100 meetings, $9/extra");
+        adminTasks.text("10 hours of admin tasks");
         responseWindow.text("< 1 hour response");
-        workflows.html("2 scheduling workflows included");
+        workflows.html("2 scheduling workflows");
         break;
-      case "Employee":
+      case "hi":
+        name.text("Executive");
+        price.text("$1499 / month");
+        scheduling.html("<strong>Unlimited scheduling</strong>");
+        adminTasks.text("20 hours of admin tasks");
+        responseWindow.text("< 1 hour response");
+        workflows.html("2 scheduling workflows");
+        break;
+      case "employee":
         price.text("Free");
         break;
      }
@@ -519,13 +525,16 @@ module AccountTab {
       </div>
       <div #content>
         <div class="membership-options row clearfix">
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <div #planBasic class="membership-option"/>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
             <div #planLo class="membership-option"/>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-3">
+            <div #planMed class="membership-option"/>
+          </div>
+          <div class="col-sm-3">
             <div #planHi class="membership-option"/>
           </div>
           <div class="col-sm-12 hide">
@@ -533,24 +542,27 @@ module AccountTab {
           </div>
         </div>
         <div #subtext1 class="membership-modal-subtext">
-          Additional workflows are billed at $99 per scheduling workflow
-          and $199 per custom workflow for all plans.
+          Additional admin (non-scheduling-related) tasks, are billed at
+          $40 / hour for the Flexible Membership,<br  />
+          $35 / hour for the Silver Membership, and
+          $30 / hour for the Gold and Executive Memberships.
         </div>
         <div #subtext2 class="membership-modal-subtext">
-          Admin (non-scheduling-related) tasks are billed at<br />
-          $40 / hour for the Basic plan,
-          $35 / hour for the Executive Plan, and
-          $30 / hour for the VIP plan.
+          Additional workflows are billed at $99 per scheduling workflow
+          and $199 per custom workflow for all plans.
         </div>
         <div #subtext3 class="membership-modal-subtext">
           See <a href="http://esper.com/pricing">our pricing page</a> for more
           detail.
         </div>
-        <label class="checkbox membership-modal-check">
-          <input #noEsper type="checkbox"></input>
-          Use a custom e-mail address for your assistant
-          <span #noEsperPrice></span>
-        </label>
+        <div class="membership-modal-check">
+          <input id="no-esper" #noEsper type="checkbox" />
+          <input #noEsperFake type="checkbox" checked="1" disabled="1" />
+          <label for="no-esper">
+            Use a custom e-mail address for your assistant
+            <span #noEsperPrice></span>
+          </label>
+        </div>
       </div>
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary" disabled>
@@ -575,6 +587,13 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
     var teamid = team.teamid;
+    var planElmPairs = [
+      { elm: planBasic, planId: Plan.basic },
+      { elm: planLo, planId: Plan.lo },
+      { elm: planMed, planId: Plan.med },
+      { elm: planHi, planId: Plan.hi },
+      { elm: planX, planId: Plan.employee }
+    ];
 
     /*
       Employee plan is only shown to admins and to users already under
@@ -590,11 +609,9 @@ module AccountTab {
       var membershipPlan = customerStatus.plan;
       var membershipStatus = customerStatus.status;
       var selectedPlanId = membershipPlan;
-      var isFreeMembership = false;
+      noEsperFake.hide();
 
-      if (membershipPlan && !List.find(Plan.activePlans, function(p) {
-            return p === membershipPlan;
-          })) {
+      if (membershipPlan && !Plan.isActive(membershipPlan)) {
         var formatEndDate = "your next billing cycle";
         if (customerStatus.current_period_end) {
           var endDate = moment(customerStatus.current_period_end);
@@ -639,111 +656,69 @@ module AccountTab {
         selectPlan();
       }
 
+      // Update DOM with selectedPlanId
       function selectPlan() {
-        switch (Plan.nameOfPlan(selectedPlanId)) {
-          case "Basic":
-            selectBasic();
-            break;
-          case "Basic Plus":
+        let pair = List.find(planElmPairs, function(pair) {
+          return (pair.planId === selectedPlanId ||
+            Plan.plusPlans[pair.planId] === selectedPlanId);
+        });
+        if (pair) {
+          selectMembership(pair.elm);
+          noEsperFake.hide();
+          noEsper.show();
+
+          // If Plan is a "plus" plan
+          if (Plan.isPlus(selectedPlanId)) {
             noEsper.prop("checked", true);
-            selectBasic();
-            break;
-          case "Executive":
-            selectLo();
-            break;
-          case "Executive Plus":
-            noEsper.prop("checked", true);
-            selectLo();
-            break;
-          case "VIP":
-            selectHi();
-            break;
-          case "Employee":
-            selectX();
-            break;
-          default:
-            Log.e("Unknown plan type: ", membershipPlan);
+          }
+          // If there is no "plus" option
+          else if (!Plan.plusPlans[selectedPlanId]) {
+            noEsper.hide();
+            noEsperFake.show();
+          }
+
+          // Update noEsperPrice text
+          switch (pair.planId) { // Use the base plan, not the plus
+            case Plan.basic:
+              noEsperPrice.text("for $99 / month");
+              break;
+            case Plan.lo:
+              noEsperPrice.text("for $49 / month");
+              break;
+            default:
+              noEsperPrice.text("- included");
+          }
+        } else {
+          Log.e("Unknown plan type: ", selectedPlanId);
         }
       }
-
-      function readCheckBox() {
-        var checked = noEsper.prop("checked");
-        switch(Plan.nameOfPlan(selectedPlanId)) {
-          case "Basic":
-            if (checked)
-              selectedPlanId = Plan.basicPlus;
-            break;
-          case "Basic Plus":
-            if (!checked)
-              selectedPlanId = Plan.basic;
-            break;
-          case "Executive":
-            if (checked)
-              selectedPlanId = Plan.execPlus;
-            break;
-          case "Executive Plus":
-            if (!checked)
-              selectedPlanId = Plan.exec;
-            break;
-          case "VIP":
-            selectedPlanId = Plan.vip;
-            break;
-          case "Employee":
-            break;
-          default:
-            Log.e("Unknown plan ID: ", selectedPlanId);
-        }
-      }
-
-      planBasic.append(viewOfMembershipOption("Basic"));
-      planLo.append(viewOfMembershipOption("Executive"));
-      planHi.append(viewOfMembershipOption("VIP"));
-      planX.append(viewOfMembershipOption("Employee"));
 
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
-        planBasic.removeClass("selected");
-        planLo.removeClass("selected");
-        planHi.removeClass("selected");
-        planX.removeClass("selected");
+        List.iter(planElmPairs, function(pair) {
+          pair.elm.removeClass("selected");
+        });
         option.addClass("selected");
         noEsper.removeClass("hide");
       }
 
-      function selectBasic() {
-        selectMembership(planBasic);
-        noEsperPrice.text("for $99 / month");
-        if (noEsper.prop("checked")) {
-          selectedPlanId = Plan.basicPlus;
-        } else {
-          selectedPlanId = Plan.basic;
+      function readCheckBox() {
+        var checked = noEsper.prop("checked");
+        if (checked) {
+          var plusPlan = Plan.plusPlans[selectedPlanId];
+          if (plusPlan) {
+            selectedPlanId = plusPlan;
+          }
         }
       }
-      function selectLo() {
-        selectMembership(planLo);
-        noEsperPrice.text("for $49 / month");
-        selectedPlanId = noEsper.prop("checked") ?
-          Plan.execPlus : Plan.exec;
-      }
-      function selectHi() {
-        selectMembership(planHi);
-        noEsperPrice.text("- included");
-        noEsper.addClass("hide");
-        selectedPlanId = Plan.vip;
-      }
-      function selectX() {
-        planX.removeClass("hide");
-        selectMembership(planX);
-        noEsperPrice.text("- not available for this plan");
-        isFreeMembership = true;
-        noEsper.addClass("hide");
-        selectedPlanId = Plan.employee;
-      }
 
-      planBasic.click(selectBasic);
-      planLo.click(selectLo);
-      planHi.click(selectHi);
-      planX.click(selectX);
+      List.iter(planElmPairs, function(pair) {
+        pair.elm.click(function() {
+          selectedPlanId = pair.planId;
+          selectPlan();
+        });
+        pair.elm.append(viewOfMembershipOption(pair.planId));
+      });
 
       primaryBtn.click(function() {
         $(".next-step-button").prop("disabled", false);
@@ -756,7 +731,7 @@ module AccountTab {
             Api.setSubscription(teamid, selectedPlanId)
               .done(function() { refresh(); });
           };
-          if (isFreeMembership) {
+          if (Plan.isFree(selectedPlanId)) {
             setSub();
           }
           else {
@@ -867,7 +842,7 @@ module AccountTab {
 
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
-        memPlan.append(Plan.nameOfPlan(customerStatus.plan));
+        memPlan.append(Plan.classNameOfPlan(customerStatus.plan));
         memStatus.append(customerStatus.status);
     });
 
@@ -974,8 +949,8 @@ module AccountTab {
       }
 
       if (mem === "Active" && plan !== undefined) {
-        if (List.find(Plan.activePlans, function(p) { return p === plan; })) {
-          membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
+        if (Plan.isActive(plan)) {
+          membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
         } else {
           membershipBadge.text("EXPIRING");
           membershipBadge.removeClass("active");
