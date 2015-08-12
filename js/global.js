@@ -76,8 +76,18 @@ function setDonePageFromHash() {
   $("#mailto-msg").prop("href", intro_email);
 }
 
+function loadPricingDescription() {
+  $(".pricing-table .description").hide();
+  $(".feature-link").click(function() {
+    var target = $(this).siblings(".description");
+    target.toggle();
+    $(".pricing-table .description").not(target).hide();
+  });
+}
+
 function main() {
   loadElements();
+  loadPricingDescription();
   resizer();
   slider();
  }
