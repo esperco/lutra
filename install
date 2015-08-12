@@ -34,8 +34,9 @@ cp $libs/fullcalendar/fullcalendar.css pub/css
 cp $libs/fullcalendar/fullcalendar.print.css pub/css
 
 ### Build our own code and copy the result into the pub directory
-make -C ts $mode-install
-cp css/*.css pub/css
+# TS and CSS/LESS handled by Gulp/NPM now
+# make -C ts $mode-install
+# cp css/*.css pub/css
 cp html/*.html pub/html
 cp img/* pub/img
 

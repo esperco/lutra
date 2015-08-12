@@ -17,15 +17,13 @@ prod: prod-build
 
 dev-build:
 	rm -rf pub
-	$(MAKE) -C ts dev-build
+	npm run build
 	$(MAKE) -C html dev-build
-	$(MAKE) -C css dev-build
 
 prod-build:
 	rm -rf pub
-	$(MAKE) -C ts prod-build
+	npm run build-production
 	$(MAKE) -C html prod-build
-	$(MAKE) -C css prod-build
 
 # Fetch libraries
 setup:

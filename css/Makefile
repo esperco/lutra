@@ -3,22 +3,11 @@
 .PHONY: default prod-build dev-build css clean
 default: css
 
-FILES = \
-  custom-bootstrap \
-  app \
-  guest-app \
-  datepicker
-
-LESS = $(addsuffix .less, $(FILES))
-CSS = $(addsuffix .css, $(FILES))
-
 prod-build: css
 dev-build: css
 
-css: $(CSS)
-
-$(CSS): %.css: %.less
-	lessc $< $@
+css:
+	$(error 'This has been deprecated. Run `make` in parent dir to build all assets');
 
 clean:
-	rm -f *~ $(CSS)
+	rm -f *.css
