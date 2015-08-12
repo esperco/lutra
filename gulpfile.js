@@ -6,12 +6,16 @@ var config = require("./config");
 // NB: This gulp file is intended to be used with Gulp 4.x and won't
 // work with Gulp 3.x or below.
 var gulp = require("gulp"),
+    autoprefixer = require('gulp-autoprefixer'),
     cached = require("gulp-cached"),
     childProcess = require('child_process'),
     exec = require("gulp-exec"),
+    filter = require("gulp-filter"),
     gutil = require("gulp-util"),
+    less = require("gulp-less"),
     livereload = require("livereload"),
     path = require("path"),
+    sourcemaps = require("gulp-sourcemaps"),
     temp = require("temp");
 
 // Temp var to denote watch vs. build mode
@@ -136,6 +140,19 @@ var spawnTsc = function(watch, cb) {
 
 gulp.task("build-ts", gulp.series("build-oblivion", "build-conf", spawnTsc));
 
+gulp.task("build-less", function() {
+  var partialFilter = filter(['*', '!_*.less']);
+  return gulp.src(config.lessDir + "/**/*.less")
+    .pipe(partialFilter)
+    .pipe(sourcemaps.init())
+    .pipe(less({
+      paths: [ path.join(__dirname, config.lessDir) ]
+    }))
+    .pipe(autoprefixer())
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest(path.join(config.pubDir, "css")));
+});
+
 // Watcher to call build oblivion (and rebuild if src changes)
 gulp.task("watch-oblivion", function() {
   return gulp.watch(config.tsGlobs, gulp.series("build-oblivion"));
@@ -145,6 +162,11 @@ gulp.task("watch-oblivion", function() {
 gulp.task("watch-ts", gulp.parallel("watch-oblivion", function(cb) {
   spawnTsc(true, cb);
 }));
+
+// Watch LESS directory for changes
+gulp.task("watch-less", function() {
+  return gulp.watch(config.lessDir + "/**/*.less", gulp.series("build-less"));
+});
 
 // Launch a live-reload server that watches the public directory and sends
 // a websocket notification if things change. Use in conjunction with a
@@ -157,15 +179,15 @@ gulp.task("live-reload", function() {
   return server;
 });
 
+gulp.task("build", gulp.parallel("build-ts", "build-less"));
+
+gulp.task("build-production", gulp.series("production", "build"));
+
 // Ensure initial build betfore watching to set up temp dir
 // Set var so we know we're in watch
 gulp.task("watch", gulp.series(
   function(cb) { watchMode = true; cb(); },
-  "build-ts",
-  gulp.parallel("live-reload", "watch-ts")));
-
-gulp.task("build", gulp.series("build-ts"));
-
-gulp.task("build-production", gulp.series("production", "build"));
+  "build",
+  gulp.parallel("live-reload", "watch-ts", "watch-less")));
 
 gulp.task("default", gulp.series("build-production"));
