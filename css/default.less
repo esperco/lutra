@@ -522,8 +522,13 @@ input.incorrect{
 .splash-content {
   position: relative;
   z-index: 2;
-  height: 400px;
+  min-height: 400px;
   color: white;
+
+  // Set actual image in HTML style tag with background-image
+  background-size: cover;
+  background-position: center;
+
   &.fullscreen { height: 100%; }
   .splash-label {
     color: @purple_text;
@@ -543,6 +548,14 @@ input.incorrect{
   position: absolute;
   top: 140px;
   width: 100%;
+}
+
+@media (max-width:799px) { 
+  .splash-content .splash-text-container {
+    position: relative;
+    top: 0;
+    padding-bottom: 25px;
+  }
 }
 
 .splash-text {
@@ -590,6 +603,7 @@ input.incorrect{
   @media (min-width:768px) { padding: 64px 36px; }
   @media (max-width:767px) { padding: 56px 18px; }
   &.narrow { max-width: 800px; }
+  &.short { padding: 18px; }
 }
 
 .section-content-fixed {
@@ -1031,14 +1045,15 @@ input.incorrect{
 
 .pricing-table {
   padding:0px 40px;
-  align: center;
+  text-align: center;
   width:100%;
-  border:2px solid #ffffff;
+  overflow-x: auto;
 
   table {
     border-collapse: collapse;
     border-spacing: 0;
     width:100%;
+    min-width:800px;
     height:100%;
     margin:0px;
     padding:0px;
@@ -1056,7 +1071,7 @@ input.incorrect{
   vertical-align:middle;
   border:1px solid #ffffff;
   border-width:0px 1px 1px 0px;
-  text-align:left;
+  text-align:center;
   padding:10px;
   font-size:0.9rem;
   color:#000000;
@@ -1074,7 +1089,6 @@ input.incorrect{
   color:#ffffff;
 }
 .pricing-table td:nth-child(n) {
-  text-align: left;
   width: 20%;
 }
 .pricing-table td:nth-child(1) {
