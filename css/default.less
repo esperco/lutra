@@ -188,6 +188,11 @@ button {
       -ms-transition:.2s;
        -o-transition:.2s;
           transition:.2s;
+  &.index {
+    font-size: 24px;
+    padding: 15px 25px;
+    margin: 0 5px;
+  }
   &.large {
     padding: 8px 40px;
     border-radius: 5px;
@@ -207,16 +212,14 @@ button.button-primary {
     background: @purple_hover;
   }
   &.large { border-width: 2px; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 }
 
 button.button-secondary {
   color: @purple_text;
   background: white;
   &:hover { opacity: 0.5; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 
 }
 
@@ -226,8 +229,7 @@ button.button-tertiary {
   border: 1px solid white;
   &.large { border-width: 2px; }
   &:hover { opacity:0.5; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 
 }
 
