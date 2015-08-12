@@ -595,13 +595,12 @@ module AccountTab {
       if (membershipPlan && !List.find(Plan.activePlans, function(p) {
             return p === membershipPlan;
           })) {
-        var endDate = moment("2015-09-11T01:00:00.000-07:00");
+        var formatEndDate = "your next billing cycle";
         if (customerStatus.current_period_end) {
-          endDate = moment(customerStatus.current_period_end);
+          var endDate = moment(customerStatus.current_period_end);
+          endDate = endDate.add(1, 'month');
+          formatEndDate = endDate.format("MMMM D, YYYY");
         }
-        var formatEndDate = endDate.format("MMMM D, YYYY");
-
-        "2015-09-11T11:25:24.000-07:00"
         content.prepend(
           $(`<div class="membership-modal-note alert alert-warning">
             We've updated our pricing. Please select a new subscription plan.
