@@ -142,6 +142,7 @@ module Login {
     if (Util.isDefined(data))
       return data.uid === team.team_executive
         && !isAdmin()
+        && !isAlias()
         && !isEsperAssistant();
     else
       return false;
