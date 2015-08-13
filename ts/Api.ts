@@ -21,6 +21,8 @@ module Api {
 
   // HTTP - response body is interpreted as JSON
 
+  var suppressWarnings = false; //  Toggled with noWarn()
+
   function jsonHttp(method, url, body) {
 
     var id = Util.randomString();
@@ -84,12 +86,16 @@ module Api {
     Log.d("API request " + id + " " + method + " " + url, request);
 
     var startTime = Date.now();
-    return $.ajax(request)
-            .fail(logError)
-            .done(function(respBody) {
+    var ret = $
+      .ajax(request)
+      .done(function(respBody) {
               var latency = (Date.now() - startTime) / 1000;
               logResponse(method, url, respBody, latency);
             });
+    if (! suppressWarnings) {
+      ret = ret.fail(logError);
+    }
+    return ret;
   }
 
   function jsonHttpGet(url) {
@@ -118,6 +124,15 @@ module Api {
       s = "?" + s;
     return s;
   }
+
+  // Calls a function, but API calls within that call don't have the error 
+  // banner popping up -- use for custom error handling.
+  export function noWarn(callable) {
+    suppressWarnings = true;
+    let ret = callable();
+    suppressWarnings = false;
+    return ret;
+  };
 
   /********************************* API ***************************/
 
