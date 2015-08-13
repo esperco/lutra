@@ -49,25 +49,14 @@ module Page {
   }
 
   export var onboarding: Loadable = {
-    load: function(step=0) {
+    load: function(step=0, fromLogin=false) {
       pageSelector.hideAll();
       showPage("onboarding");
       Log.d("Onboarding.load()");
-      Onboarding.load(step);
+      Onboarding.load(step, fromLogin);
       Util.focus();
     }
   };
-
-  // export var onboarding : Loadable = {
-  //   load: function(teamid: string, step = 0) {
-  //     pageSelector.hideAll();
-  //     showPage("team-settings");
-  //     Log.d("TeamSettings.load()", teamid);
-  //     var onboarding = true;
-  //     TeamSettings.load(teamid, onboarding);
-  //     Util.focus();
-  //   }
-  // }
 
   export var plans : Loadable = {
     load: function(teamid) {
