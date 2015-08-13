@@ -213,7 +213,10 @@ module Signin {
         },
         /* failure */
         function() {
-          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
+          // Set hash -- but also explicitly load since CanJS doesn't always
+          // work properly
+          Page.onboarding.load();
+          window.location.hash = "#!join";
         }
       );
   }
@@ -323,7 +326,7 @@ module Signin {
         if (err['status'] === 403) {
           // See above note re CanJS
           Page.onboarding.load(0, {fromLogin: true});
-          window.location.hash = "#!join";
+          window.location.hash = "#!join-from-login";
         } else {
           // See above note re CanJS
           window.location.hash = "#!";
