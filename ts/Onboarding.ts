@@ -27,7 +27,7 @@ module Onboarding {
 <div #view class="onboarding">
   <div class="container">
     <div class="progress">
-      <div #progress class="progress-bar progress-bar-info" role="progressbar" /> 
+      <div #progress class="progress-bar progress-bar-info" role= "progressbar" />
     </div>
     <div class="row onboarding-text">
       <div #content class="col-sm-offset-2 col-sm-8" />
@@ -47,10 +47,13 @@ module Onboarding {
 
   let steps = [step0, step1, step2, step3, step4];
 
-  export function load(step=0, fromLogin=false) {
+  export function load(step = 0,
+                       opts?: {fromLogin?: boolean, inviteCode?: string}) {
     var refs = loadContainer();
-    if (step === 0) {
-      step0(refs, fromLogin)
+    if (opts && opts.fromLogin) {
+      step0FromLogin(refs);
+    } else if (opts && opts.inviteCode) {
+      step0FromInvite(refs, opts.inviteCode);
     } else {
       steps[step](refs);
     }
@@ -68,8 +71,8 @@ module Onboarding {
     button.prop("disabled", false);
   }
 
-  /* Step 0 => Sign in */
-  function step0(refs: IJQMap, fromLogin=false): void {
+  // Base function for our "step 0" join page -- takes a custom message
+  function _step0(refs: IJQMap, customMsg?: string, inviteCode?: string): void {
     refs["progress"].width("20%");
 
     // Log out if applicable
@@ -79,8 +82,10 @@ module Onboarding {
 '''
 <div #view style="text-align: center">
   <div #msg>
-    <strong>Awesome.</strong> Our assistants use Google Calendar to
-    assist you with scheduling.<br />Please sign in with Google to continue.
+    <strong>Awesome.</strong> Our assistants need access to your calendar to
+    assist you with scheduling.<br />
+    Please sign in with the account tied to your primary calendar
+    to continue.
   </div>
   <div #buttonContainer style="padding:40px 0">
   </div>
@@ -98,9 +103,8 @@ module Onboarding {
   </div>
 </div>
 '''
-    if (fromLogin) {
-      msg.html(`We don't have a registered account for you.<br />
-        Please sign in again to create an account.`);
+    if (customMsg) {
+      msg.html(customMsg);
     }
 
     var exchangeEmailSubject = "Join Esper (Microsoft Office / Exchange)";
@@ -113,11 +117,29 @@ module Onboarding {
     buttonContainer.append(
       Signin.googleButton(
         /* landingUrl */ "#!join/1",
-        /* optInvite  */ undefined,
+        /* optInvite  */ inviteCode,
         /* optEmail   */ undefined,
         /* optSignup  */ true));
+
     let content = refs["content"];
     content.append(view);
+  }
+
+  /* Step 0 => Sign in normally */
+  function step0(refs: IJQMap): void {
+    _step0(refs);
+  }
+
+  function step0FromLogin(refs: IJQMap): void {
+    _step0(refs, `We don't have a registered account for you.<br />
+      Please sign in again to create an account.`);
+  }
+
+  function step0FromInvite(refs: IJQMap, inviteCode: string): void {
+    _step0(refs, `Thanks for accepting our invite!<br />
+      Our assistants need access to your calendar to assist with scheduling.
+      Please sign in with the account tied to your primary calendar to
+      continue.`, inviteCode);
   }
 
   // Use to get current team if we're working form Onboarding flow
