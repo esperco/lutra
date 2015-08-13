@@ -215,8 +215,8 @@ module Signin {
         function() {
           // Set hash -- but also explicitly load since CanJS doesn't always
           // work properly
-          Page.onboarding.load();
           window.location.hash = "#!join";
+          Page.onboarding.load();
         }
       );
   }
