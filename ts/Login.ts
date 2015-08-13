@@ -138,6 +138,13 @@ module Login {
       return false;
   };
 
+  export function isAlias() {
+    if (Util.isDefined(data))
+      return data.is_alias === true;
+    else
+      return false;
+  };
+
   export function isExecCustomer(team) {
     if (Util.isDefined(data))
       return data.uid === team.team_executive
