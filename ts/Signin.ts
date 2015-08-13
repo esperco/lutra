@@ -352,9 +352,9 @@ module Signin {
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
-          // See above note re CanJS -- also, need to change onboarding message
+          // See above note re CanJS
           Page.onboarding.load(0, true);
-          window.location.hash = "#!join";
+          window.location.hash = "#!join-from-login";
         } else {
           // See above note re CanJS
           window.location.hash = "#!";
