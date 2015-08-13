@@ -297,6 +297,11 @@ module AccountTab {
       <i class="fa fa-warning"></i>
       Invalid card data
     </div>
+    <div #ccErrorOther class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Something went wrong. Please contact <a href="mailto:support@esper.com">
+      support@esper.com</a> for assistance.
+    </div>
     <div #ccNumGroup class="form-group col-xs-12">
       <label for="cc-num" class="control-label">Card Number</label>
       <input id="cc-num" #ccNum type="tel" size="20" data-stripe="number"
@@ -335,8 +340,9 @@ module AccountTab {
     cvcNum['payment']('formatCardCVC');
 
     // Hide error message for now
-    ccInvalidMsg.hide(); // Deesn't validate (e.g. expiration date < now)
-    ccDeclineMsg.hide(); // Card valid on-face but declined by Stripe
+    ccInvalidMsg.hide();  // Deesn't validate (e.g. expiration date < now)
+    ccDeclineMsg.hide();  // Card valid on-face but declined by Stripe
+    ccErrorOther.hide();  // Other error
 
     for (var i = 1; i < 13; i++) {
       var month;
@@ -365,6 +371,7 @@ module AccountTab {
     var stripeResponseHandler = function(status, response) {
       ccInvalidMsg.hide();
       ccDeclineMsg.hide();
+      ccErrorOther.hide();
       ccNumGroup.add(cvcNumGroup).add(expDateGroup).removeClass("has-error");
 
       if (response.error) {
@@ -401,8 +408,11 @@ module AccountTab {
           }, function (err) {
             if (err["status"] === 402) {
               ccDeclineMsg.show();
+            } else {
+              console.error(err);
+              ccErrorOther.show();
+              Status.reportError(err["responseText"]);
             }
-            console.error(err);
             return err;
           })
           .then(function() {
