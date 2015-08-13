@@ -103,6 +103,10 @@ module Route {
       Page.onboarding.load();
     },
 
+    "join-from-login route": function (data) {
+      Page.onboarding.load(0, {fromLogin: true});
+    },
+
     "join/:step route" : function (data) {
       let step = parseInt(data.step) || 0;
       if (step) {

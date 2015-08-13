@@ -198,7 +198,7 @@ module Signin {
     return _view;
   }
 
-  function showTokenDetails(loginView, tokenDescription) {
+  function showTokenDetails(tokenDescription) {
     Log.d(JSON.stringify(tokenDescription));
   }
 
@@ -208,11 +208,8 @@ module Signin {
       .then(
         /* success */
         function(tokenDescription) {
-          var loginView =
-          displayLoginLinks("Thanks for accepting our invite! " + 
-            "Please sign in with your primary Google account to continue.", 
-            "#!", inviteCode, undefined);
-          showTokenDetails(loginView, tokenDescription);
+          Page.onboarding.load(0, {inviteCode: inviteCode});
+          showTokenDetails(tokenDescription);
         },
         /* failure */
         function() {
@@ -234,7 +231,7 @@ module Signin {
               "#!",
               inviteCode,
               undefined);
-          showTokenDetails(loginView, tokenDescription);
+          showTokenDetails(tokenDescription);
         },
         /* failure */
         function() {
@@ -348,8 +345,8 @@ module Signin {
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
-          // See above note re CanJS -- also, need to change onboarding message
-          Page.onboarding.load(0, true);
+          // See above note re CanJS
+          Page.onboarding.load(0, {fromLogin: true});
           window.location.hash = "#!join";
         } else {
           // See above note re CanJS
