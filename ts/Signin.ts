@@ -218,28 +218,6 @@ module Signin {
       );
   }
 
-  function useInviteWithNameAndEmail(inviteCode: string,
-                                     email: string,
-                                     name: string) {
-    return Api.postTokenEmail(inviteCode, email, name)
-      .then(
-        /* success */
-        function(tokenDescription) {
-          var loginView =
-            displayLoginLinks(
-              "Thanks for signing up! Please log in to continue.",
-              "#!",
-              inviteCode,
-              undefined);
-          showTokenDetails(tokenDescription);
-        },
-        /* failure */
-        function() {
-          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
-        }
-      );
-  }
-
   function loginOrSignup(optEmail) {
     Log.d("loginOrSignup");
     var uid = Login.me();
@@ -294,17 +272,15 @@ module Signin {
       });
   }
 
+  // NB: optName arg is deprecated. Keep now for compatability.
   export function signin(whenDone: { (...any): void },
                          optArgs?: any[],
                          optInviteCode?: string,
                          optEmail?: string,
                          optName?: string) {
     document.title = "Sign in - Esper";
-    if (optInviteCode != undefined) {
-      if (optEmail != undefined && optName != undefined)
-        useInviteWithNameAndEmail(optInviteCode, optEmail, optName);
-        else
-        useInvite(optInviteCode);
+    if (optInviteCode !== undefined) {
+      useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)
         .done(function(ok) {

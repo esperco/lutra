@@ -57,19 +57,13 @@ module Route {
       gotToken(data.token);
     },
 
-    /* Gift code (same as generic invitation but collect also
-       an email address and a name */
+    /* DEPRECATED - Use signup2 instead.
+       Gift code (same as generic invitation but collect also
+       an email address and a name. */
     "redeem/:token/:email/:name/:platform route" : function(data) {
       Log.d(data);
       if (isIOS()) {
         openIOSapp(data.token, data.email, data.name);
-      } else if (data.platform !== "Google Apps") {
-        var msg = $("<p>Thank you for signing up! We're currently working on " +
-                    "support for " + data.platform + ". We'll be in touch as " +
-                    "soon as we're ready!</p>");
-        msg.addClass("sign-in");
-        $(document.body).children().remove();
-        $(document.body).append(msg);
       } else {
         withLogin(Page.settings.load, undefined,
                   data.token, data.email, data.name);
@@ -124,7 +118,7 @@ module Route {
       withLogin(Page.payment.load, data.teamid);
     },
 
-    // superseded by "signup2/..." below
+    // DEPRECATED - use signup2 or join instead
     "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
       var signup = {
         first_name: data.fn,
