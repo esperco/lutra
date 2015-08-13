@@ -198,7 +198,7 @@ module Signin {
     return _view;
   }
 
-  function showTokenDetails(loginView, tokenDescription) {
+  function showTokenDetails(tokenDescription) {
     Log.d(JSON.stringify(tokenDescription));
   }
 
@@ -208,37 +208,15 @@ module Signin {
       .then(
         /* success */
         function(tokenDescription) {
-          var loginView =
-          displayLoginLinks("Thanks for accepting our invite! " + 
-            "Please sign in with your primary Google account to continue.", 
-            "#!", inviteCode, undefined);
-          showTokenDetails(loginView, tokenDescription);
+          Page.onboarding.load(0, {inviteCode: inviteCode});
+          showTokenDetails(tokenDescription);
         },
         /* failure */
         function() {
-          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
-        }
-      );
-  }
-
-  function useInviteWithNameAndEmail(inviteCode: string,
-                                     email: string,
-                                     name: string) {
-    return Api.postTokenEmail(inviteCode, email, name)
-      .then(
-        /* success */
-        function(tokenDescription) {
-          var loginView =
-            displayLoginLinks(
-              "Thanks for signing up! Please log in to continue.",
-              "#!",
-              inviteCode,
-              undefined);
-          showTokenDetails(loginView, tokenDescription);
-        },
-        /* failure */
-        function() {
-          displayLoginLinks("Invalid invite.", "#!", undefined, undefined);
+          // Set hash -- but also explicitly load since CanJS doesn't always
+          // work properly
+          window.location.hash = "#!join";
+          Page.onboarding.load();
         }
       );
   }
@@ -297,17 +275,15 @@ module Signin {
       });
   }
 
+  // NB: optName arg is deprecated. Keep now for compatability.
   export function signin(whenDone: { (...any): void },
                          optArgs?: any[],
                          optInviteCode?: string,
                          optEmail?: string,
                          optName?: string) {
     document.title = "Sign in - Esper";
-    if (optInviteCode != undefined) {
-      if (optEmail != undefined && optName != undefined)
-        useInviteWithNameAndEmail(optInviteCode, optEmail, optName);
-        else
-        useInvite(optInviteCode);
+    if (optInviteCode !== undefined) {
+      useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)
         .done(function(ok) {
@@ -348,9 +324,9 @@ module Signin {
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
-          // See above note re CanJS -- also, need to change onboarding message
-          Page.onboarding.load(0, true);
-          window.location.hash = "#!join";
+          // See above note re CanJS
+          Page.onboarding.load(0, {fromLogin: true});
+          window.location.hash = "#!join-from-login";
         } else {
           // See above note re CanJS
           window.location.hash = "#!";

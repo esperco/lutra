@@ -49,11 +49,12 @@ module Page {
   }
 
   export var onboarding: Loadable = {
-    load: function(step=0, fromLogin=false) {
+    load: function(step=0,
+                   opts?: {fromLogin?: boolean, inviteCode?: string}) {
       pageSelector.hideAll();
       showPage("onboarding");
       Log.d("Onboarding.load()");
-      Onboarding.load(step, fromLogin);
+      Onboarding.load(step, opts);
       Util.focus();
     }
   };
