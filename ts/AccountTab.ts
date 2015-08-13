@@ -289,6 +289,14 @@ module AccountTab {
 '''
 <div #content class="preference-form">
   <form #paymentForm method="POST" autocomplete="on" class="row">
+    <div #ccDeclineMsg class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Your credit card was declined.
+    </div>
+    <div #ccInvalidMsg class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Invalid card data
+    </div>
     <div #ccNumGroup class="form-group col-xs-12">
       <label for="cc-num" class="control-label">Card Number</label>
       <input id="cc-num" #ccNum type="tel" size="20" data-stripe="number"
@@ -326,6 +334,10 @@ module AccountTab {
     ccNum['payment']('formatCardNumber');
     cvcNum['payment']('formatCardCVC');
 
+    // Hide error message for now
+    ccInvalidMsg.hide(); // Deesn't validate (e.g. expiration date < now)
+    ccDeclineMsg.hide(); // Card valid on-face but declined by Stripe
+
     for (var i = 1; i < 13; i++) {
       var month;
       if (i < 10) {
@@ -346,13 +358,15 @@ module AccountTab {
     var checkInputGroup = function(ccGroup, valid) {
       if (! valid) {
         ccGroup.addClass("has-error");
-      } else {
-        ccGroup.removeClass('has-error');
       }
     };
     var teamid = team.teamid;
 
     var stripeResponseHandler = function(status, response) {
+      ccInvalidMsg.hide();
+      ccDeclineMsg.hide();
+      ccNumGroup.add(cvcNumGroup).add(expDateGroup).removeClass("has-error");
+
       if (response.error) {
         var cardType = $["payment"].cardType(ccNum.val());
 
@@ -361,14 +375,17 @@ module AccountTab {
         var validCVC = $["payment"].validateCardCVC(cvcNum.val(), cardType);
         var validExpiry = $["payment"].validateCardExpiry(expMonth, expYear);
 
+        ccInvalidMsg.show();
         checkInputGroup(ccNumGroup, validCard);
         checkInputGroup(cvcNumGroup, validCVC);
         checkInputGroup(expDateGroup, validExpiry);
         callback(response.error);
       } else {
         var stripeToken = response.id;
-        Api.addNewCard(teamid, stripeToken)
-          .then(function(card) {
+        Api.noWarn(function() {
+          return Api.addNewCard(teamid, stripeToken)
+        }).then(
+          function(card) {
             (<any> paymentForm.get(0)).reset();
             if (membership !== null) {
               var calls = [];
@@ -381,6 +398,12 @@ module AccountTab {
             } else {
               return false;
             }
+          }, function (err) {
+            if (err["status"] === 402) {
+              ccDeclineMsg.show();
+            }
+            console.error(err);
+            return err;
           })
           .then(function() {
             callback();
