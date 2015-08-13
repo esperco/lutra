@@ -2,6 +2,7 @@
   Current plans open to new subscriptions
 */
 module Plan {
+  export var canceled = "Canceled_20150812";
   export var basic = "Flexible_20150812";
   export var lo = "Silver_20150812";
   export var med = "Gold_20150812";
@@ -33,6 +34,7 @@ module Plan {
   planMap[med] = "med";
   planMap[hi] = "hi";
   planMap[employee] = "employee";
+  planMap[canceled] = "canceled"
   for (var planClass in plusPlans) {
     if (plusPlans.hasOwnProperty(planClass)) {
       planMap[plusPlans[planClass]] = planMap[planClass];
@@ -47,7 +49,9 @@ module Plan {
     basic: "Flexible",
     lo: "Silver",
     med: "Gold",
-    hi: "Executive"
+    hi: "Executive",
+    employee: "Employee",
+    canceled: "Canceled"
   };
   export function classNameOfPlan(planId: string): string {
     return nameMap[classOfPlan(planId)] || "Expired";

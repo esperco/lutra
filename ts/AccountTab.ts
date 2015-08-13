@@ -267,7 +267,7 @@ module AccountTab {
     primaryBtn.click(function() {
       if (action == "suspend") {
         var teamid = team.teamid;
-        Api.cancelSubscription(teamid);
+        Api.cancelSubscription(teamid).done(refresh);
 
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
@@ -572,9 +572,7 @@ module AccountTab {
           Cancel
         </button>
 
-        <!-- Hidden for now until we find a way for customers
-             to resubscribe later. -->
-        <button #suspendBtn class="hide button-secondary modal-delete">
+        <button #suspendBtn class="button-secondary modal-delete">
           Suspend Membership
         </button>
       </div>
@@ -607,11 +605,24 @@ module AccountTab {
 
     function initModal(customerStatus) {
       var membershipPlan = customerStatus.plan;
-      var membershipStatus = customerStatus.status;
+      var membershipStatus = customerStatus.status &&
+        customerStatus.status.toLowerCase();
       var selectedPlanId = membershipPlan;
       noEsperFake.hide();
 
-      if (membershipPlan && !Plan.isActive(membershipPlan)) {
+      if (! membershipStatus) {
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to activate your account.
+        </div>`);
+        suspendBtn.hide();
+      }
+      else if (membershipPlan === Plan.canceled) {
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to reactivate your account.
+        </div>`);
+        suspendBtn.hide();
+      }
+      else if (membershipPlan && !Plan.isActive(membershipPlan)) {
         var formatEndDate = "your next billing cycle";
         if (customerStatus.current_period_end) {
           var endDate = moment(customerStatus.current_period_end);
@@ -628,7 +639,7 @@ module AccountTab {
             be downgraded to our new Flexible Membership.
           </div>`));
       }
-      else if (membershipStatus === "Trialing") {
+      else if (membershipStatus === "trialing") {
         var end = customerStatus.trial_end;
         var timeLeft = moment.duration(moment().diff(end)).humanize();
         selectPlan();
@@ -640,19 +651,27 @@ module AccountTab {
             At the end of your trial period, you'll be switched to
             the membership option you pick below.
             <br />
-            To cancel before then, please notify
-            your assistant or
-            <a href="mailto:support@esper.com">support@esper.com</a>.
+            To cancel before then, click "Suspend Membership" below.
           </span>
         </div>`);
       }
-      else if (membershipStatus == "Past-due" ||
-               membershipStatus == "Unpaid" ||
-               membershipStatus == "Canceled" ||
-               membershipStatus == undefined) {
+      else if (membershipStatus == "past-due" ||
+               membershipStatus == "unpaid" ||
+               membershipStatus == "canceled") {
+        // If we get here, we've encountered a suspended account. No
+        // guarantee Stripe call actually goes through, so let user
+        // know to e-mail us.
+        //
+        // NB: Encountering the "canceled" status on a Stripe call is unusual
+        // since canceled plans should be on a special "Cancel" plan. So warn
+        // user reactivation might not work properly here.
+        //
         content.prepend(`<div class="membership-modal-note alert alert-warning">
-          Select a membership option below to reactivate your account.
+          Select a membership option below to reactivate your account. If
+          you encounter any issues, please contact
+          <a href="mailto:support@esper.com">support@esper.com</a>.
         </div>`);
+        suspendBtn.hide();
       }
       else { // already picked a plan
         selectPlan();
@@ -761,6 +780,7 @@ module AccountTab {
         suspendBtn.hide();
       } else {
         suspendBtn.click(function() {
+          (<any> modal).modal("hide");
           showConfirmationModal("suspend", modal, team);
         });
       }
@@ -845,7 +865,11 @@ module AccountTab {
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
         memPlan.append(Plan.classNameOfPlan(customerStatus.plan));
-        memStatus.append(customerStatus.status);
+        if (customerStatus.plan === Plan.canceled) {
+          memStatus.append("Canceled");
+        } else {
+          memStatus.append(customerStatus.status);
+        }
     });
 
     Api.getSubscriptionStatusLong(teamid).done(function(status) {
@@ -938,36 +962,41 @@ module AccountTab {
       .done(updateStatus);
 
     function updateStatus(customer) {
-      var mem = customer.status;
+      var mem = customer.status && customer.status.toLowerCase();
       var plan = customer.plan;
 
-      if (mem == "Trialing" || mem == "Active") {
+      if (plan === Plan.canceled || mem === 'canceled') {
+        membershipBadge.text("CANCELED");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
+        membershipBadge.text("SUSPENDED");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (! mem) {
+        membershipBadge.text("NONE");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (! Plan.isActive(plan)) {
+        membershipBadge.text("EXPIRING");
+        membershipBadge.addClass("suspended");
+      }
+
+      // Membership must be trialing or active to get here
+      else if (mem === "trialing") {
+        membershipBadge.text("TRIALING");
         membershipBadge.addClass("active");
-      } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
-        membershipBadge.addClass("suspended");
-      } else if (mem === undefined) {
-        membershipBadge.text("None");
-        membershipBadge.addClass("suspended");
       }
 
-      if (mem === "Active" && plan !== undefined) {
-        if (Plan.isActive(plan)) {
-          membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
-        } else {
-          membershipBadge.text("EXPIRING");
-          membershipBadge.removeClass("active");
-          membershipBadge.addClass("suspended");
-        }
-      } else if (mem !== undefined) {
-        membershipBadge.text(mem.toUpperCase());
+      else { // active
+        membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
+        membershipBadge.addClass("active");
       }
 
-      if (mem !== "Canceled") {
-        changeMembership.click(function() { showMembershipModal(team); });
-      } else {
-        changeMembership.addClass("disabled");
-      }
-
+      changeMembership.click(function() { showMembershipModal(team); });
       changePayment.click(function() {
         showPaymentModal("Change", team, null)
       });
