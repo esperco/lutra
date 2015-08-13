@@ -87,7 +87,9 @@ module Signin {
 
   // Returns jQuery wrapped HTML code for a Google Button
   export function googleButton(landingUrl?: string,
-                               optInvite?: string, optEmail?: string):
+                               optInvite?: string,
+                               optEmail?: string,
+                               optSignup?: boolean):
     JQuery {
 '''
 <button #button class="button-primary sign-in-btn">
@@ -112,9 +114,9 @@ module Signin {
       });
       let calls = [loginNonceCall];
 
-      // We should always have an invite token before going to Google --
-      // if we don't have one, request from server
-      if (!optInvite) {
+      // We should always have an invite token before going to Google, but
+      // only if optSignup is true -- if we don't have one, request from server
+      if (optSignup && !optInvite) {
         let tokenCall = getSignupToken();
         tokenCall.done(function(token) {
           // Assign to higher-scoped variable so our other callbacks can see it
@@ -271,7 +273,7 @@ module Signin {
             return Deferred.defer(false);
           });
     } else {
-      displayLoginLinks("Click below to sign up or sign in.",
+      displayLoginLinks("Click below to sign in.",
                         landingUrl, undefined, optEmail);
       return Deferred.defer(false);
     }
@@ -334,19 +336,31 @@ module Signin {
             disabled for now.
      */
     Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
-    Api.loginOnce(uid, loginNonce)
+    var loginCall = Api.noWarn(function() {
+      return Api.loginOnce(uid, loginNonce)
+    });
+    loginCall
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
 
-        window.location.hash = "!";
+        window.location.hash = "#!";
         // NB: CanJS routing doesn't seem to catch this hash change sometimes.
         // Call settings page load directly.
         Page.settings.load();
       })
-      .fail(function() {
+      .fail(function(err) {
         clearLoginNonce();
-        window.location.hash = "!";
+        if (err['status'] === 403) {
+          // See above note re CanJS -- also, need to change onboarding message
+          Page.onboarding.load(0, true);
+          window.location.hash = "#!join";
+        } else {
+          // See above note re CanJS
+          window.location.hash = "#!";
+          displayLoginLinks("We were unable to login.",
+            "#!", undefined, undefined);
+        }
       });
   };
 

@@ -47,9 +47,13 @@ module Onboarding {
 
   let steps = [step0, step1, step2, step3, step4];
 
-  export function load(step = 0) {
+  export function load(step=0, fromLogin=false) {
     var refs = loadContainer();
-    steps[step](refs);
+    if (step === 0) {
+      step0(refs, fromLogin)
+    } else {
+      steps[step](refs);
+    }
   }
 
   // Takes a JQuery-wrapped submit button and makes it look "busy"
@@ -65,7 +69,7 @@ module Onboarding {
   }
 
   /* Step 0 => Sign in */
-  function step0(refs: IJQMap): void {
+  function step0(refs: IJQMap, fromLogin=false): void {
     refs["progress"].width("20%");
 
     // Log out if applicable
@@ -74,7 +78,7 @@ module Onboarding {
     }
 '''
 <div #view style="text-align: center">
-  <div>
+  <div #msg>
     <strong>Awesome.</strong> Our assistants use Google Calendar to
     assist you with scheduling.<br />Please sign in with Google to continue.
   </div>
@@ -94,6 +98,11 @@ module Onboarding {
   </div>
 </div>
 '''
+    if (fromLogin) {
+      msg.html(`We don't have a registered account for you.<br />
+        Please sign in again to create an account.`);
+    }
+
     var exchangeEmailSubject = "Join Esper (Microsoft Office / Exchange)";
     var exchangeEmailBody = "Hi, I'd like to sign up for Esper!";
     exchangeEmailSubject = encodeURIComponent(exchangeEmailSubject);
@@ -101,7 +110,12 @@ module Onboarding {
     exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
       exchangeEmailSubject + "&body=" + exchangeEmailBody);
 
-    buttonContainer.append(Signin.googleButton(/* landingUrl */ "#!join/1"));
+    buttonContainer.append(
+      Signin.googleButton(
+        /* landingUrl */ "#!join/1",
+        /* optInvite  */ undefined,
+        /* optEmail   */ undefined,
+        /* optSignup  */ true));
     let content = refs["content"];
     content.append(view);
   }
