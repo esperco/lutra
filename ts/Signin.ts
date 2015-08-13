@@ -87,7 +87,9 @@ module Signin {
 
   // Returns jQuery wrapped HTML code for a Google Button
   export function googleButton(landingUrl?: string,
-                               optInvite?: string, optEmail?: string):
+                               optInvite?: string,
+                               optEmail?: string,
+                               optSignup?: boolean):
     JQuery {
 '''
 <button #button class="button-primary sign-in-btn">
@@ -112,9 +114,9 @@ module Signin {
       });
       let calls = [loginNonceCall];
 
-      // We should always have an invite token before going to Google --
-      // if we don't have one, request from server
-      if (!optInvite) {
+      // We should always have an invite token before going to Google, but
+      // only if optSignup is true -- if we don't have one, request from server
+      if (optSignup && !optInvite) {
         let tokenCall = getSignupToken();
         tokenCall.done(function(token) {
           // Assign to higher-scoped variable so our other callbacks can see it
@@ -135,7 +137,7 @@ module Signin {
           requestGoogleAuth(x.url);
         }, function(err) { console.error(err); });
     });
-        
+
     return button;
   };
 

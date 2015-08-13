@@ -93,7 +93,12 @@ module Onboarding {
     exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
       exchangeEmailSubject + "&body=" + exchangeEmailBody);
 
-    buttonContainer.append(Signin.googleButton(/* landingUrl */ "#!join/1"));
+    buttonContainer.append(
+      Signin.googleButton(
+        /* landingUrl */ "#!join/1",
+        /* optInvite  */ undefined,
+        /* optEmail   */ undefined,
+        /* optSignup  */ true));
     let content = refs["content"];
     content.append(view);
   }
