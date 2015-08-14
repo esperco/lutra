@@ -152,9 +152,13 @@ module Signin {
       <div #msgDiv class="sign-in-msg"/>
       <div #buttonContainer />
       <div class="advisory">
-        Use Microsoft Office or Exchange?
+        <p>Use Microsoft Office or Exchange?
         Contact us at <a href="mailto:support@esper.com">support@esper.com</a> 
-        for assistance.
+        for assistance.</p>
+        <p>
+          By signing in, you agree to Esper's
+          <a href="http://esper.com/terms-of-use">Terms of Use.</a>
+        </p>
       </div>
     </div>
   </div>

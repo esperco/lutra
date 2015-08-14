@@ -267,7 +267,7 @@ module AccountTab {
     primaryBtn.click(function() {
       if (action == "suspend") {
         var teamid = team.teamid;
-        Api.cancelSubscription(teamid);
+        Api.cancelSubscription(teamid).done(refresh);
 
         (<any> modal).modal("hide"); // FIXME
         if (originalModal !== undefined)
@@ -282,6 +282,158 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
+  // Generates a payment form in jQuery that autoatically assigns
+  // membership to team after completion. Takes a callback that returns
+  // with an error argment on error, undefined otherwise.
+  export function getPaymentForm(team, membership, callback) {
+'''
+<div #content class="preference-form">
+  <form #paymentForm method="POST" autocomplete="on" class="row">
+    <div #ccDeclineMsg class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Your credit card was declined.
+    </div>
+    <div #ccInvalidMsg class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Invalid card data
+    </div>
+    <div #ccErrorOther class="alert alert-danger">
+      <i class="fa fa-warning"></i>
+      Something went wrong. Please contact <a href="mailto:support@esper.com">
+      support@esper.com</a> for assistance.
+    </div>
+    <div #ccNumGroup class="form-group col-xs-12">
+      <label for="cc-num" class="control-label">Card Number</label>
+      <input id="cc-num" #ccNum type="tel" size="20" data-stripe="number"
+             class="preference-input form-control"
+             placeholder="•••• •••• •••• ••••"
+             required/>
+    </div>
+    <div #cvcNumGroup class="form-group col-xs-6">
+      <label class="control-label" for="cvc-num">CVC</label>
+      <input #cvcNum id="cvc-num" type="text" size="22" data-stripe="cvc"
+             class="form-control"
+             placeholder="•••" required autocomplete="off"/>
+    </div>
+    <div #expDateGroup class="form-group col-xs-6">
+      <div class="row">
+        <label class="control-label col-xs-12" for="exp-month">Expiration</label>
+        <div class="col-xs-6">
+          <select id="exp-month" #expMonth class="form-control esper-select"
+                  data-stripe="exp-month" required/>
+        </div><div class="col-xs-6">
+          <select #expYear class="form-control esper-select"
+                  data-stripe="exp-year" required/>
+        </div>
+      </div>
+    </div>
+  </form>
+  <form action="">
+    <input id="default-card"
+           #defaultBox type="checkbox" name="default" value="card" />
+    <label for="default-card">Make Default Card</label>
+  </form>
+</div>
+'''
+    // Restricts the inputs to numbers
+    ccNum['payment']('formatCardNumber');
+    cvcNum['payment']('formatCardCVC');
+
+    // Hide error message for now
+    ccInvalidMsg.hide();  // Deesn't validate (e.g. expiration date < now)
+    ccDeclineMsg.hide();  // Card valid on-face but declined by Stripe
+    ccErrorOther.hide();  // Other error
+
+    for (var i = 1; i < 13; i++) {
+      var month;
+      if (i < 10) {
+        month = "0" + i.toString();
+      } else {
+        month = i.toString();
+      }
+      expMonth.append($("<option value=" + i + ">" + month + "</option>"));
+    }
+
+    var currentYear = (new Date).getFullYear();
+    var limitYear = currentYear + 20;
+    for (var i = currentYear; i < limitYear; i++) {
+      var year = i.toString();
+      expYear.append($("<option value=" + i + ">" + year + "</option>"));
+    }
+
+    var checkInputGroup = function(ccGroup, valid) {
+      if (! valid) {
+        ccGroup.addClass("has-error");
+      }
+    };
+    var teamid = team.teamid;
+
+    var stripeResponseHandler = function(status, response) {
+      ccInvalidMsg.hide();
+      ccDeclineMsg.hide();
+      ccErrorOther.hide();
+      ccNumGroup.add(cvcNumGroup).add(expDateGroup).removeClass("has-error");
+
+      if (response.error) {
+        var cardType = $["payment"].cardType(ccNum.val());
+
+        // Handles whether the cards are valid, independent of Stripe
+        var validCard = $["payment"].validateCardNumber(ccNum.val());
+        var validCVC = $["payment"].validateCardCVC(cvcNum.val(), cardType);
+        var validExpiry = $["payment"].validateCardExpiry(expMonth, expYear);
+
+        ccInvalidMsg.show();
+        checkInputGroup(ccNumGroup, validCard);
+        checkInputGroup(cvcNumGroup, validCVC);
+        checkInputGroup(expDateGroup, validExpiry);
+        callback(response.error);
+      } else {
+        var stripeToken = response.id;
+        Api.noWarn(function() {
+          return Api.addNewCard(teamid, stripeToken)
+        }).then(
+          function(card) {
+            (<any> paymentForm.get(0)).reset();
+            if (membership !== null) {
+              var calls = [];
+              calls.push(Api.setSubscription(teamid, membership));
+              if (defaultBox.prop("checked")) {
+                var setDefaultCall = Api.setDefaultCard(teamid, card.id);
+                calls.push(setDefaultCall);
+              }
+              return Deferred.join(calls, true);
+            } else {
+              return false;
+            }
+          }, function (err) {
+            if (err["status"] === 402) {
+              ccDeclineMsg.show();
+            } else {
+              console.error(err);
+              ccErrorOther.show();
+              Status.reportError(err["responseText"]);
+            }
+            return err;
+          })
+          .then(function() {
+            callback();
+          }, function(err) {
+            callback(err);
+          });
+      }
+    };
+
+    paymentForm.submit(function() {
+      Stripe.card.createToken(paymentForm, stripeResponseHandler);
+      return false;
+    });
+
+    return {
+      content: content,
+      form: paymentForm
+    };
+  }
+
   function showPaymentModal(purpose, team, membership) {
 '''
 <div #modal
@@ -293,36 +445,7 @@ module AccountTab {
         <div #iconContainer class="img-container-left modal-icon"/>
         <div #title class="modal-title"/>
       </div>
-      <div #content class="preference-form">
-          <form #paymentForm method="POST" autocomplete="on">
-            <div class="semibold">Card Number</div>
-            <input #ccNum type="tel" size="20" data-stripe="number"
-                   class="preference-input" placeholder="•••• •••• •••• ••••"
-                   required/>
-            <div class="payment-col left">
-              <div class="semibold">CVC</div>
-              <input #cvcNum type="text" size="22" data-stripe="cvc"
-                     placeholder="•••" required autocomplete="off"/>
-            </div>
-            <div class="payment-col right">
-              <div class="semibold">Expiration</div>
-              <div>
-                <select #expMonth data-stripe="exp-month" class="esper-select"
-                        style="margin-right:6px" required/>
-                <select #expYear data-stripe="exp-year" class="esper-select"
-                        required/>
-              </div>
-            </div>
-          </form>
-          <form action="">
-            <div class="payment-col left">
-              <div class="semibold">Make Default Card</div>
-            </div>
-            <div class="payment-col right">
-              <input #defaultBox type="checkbox" name="default" value="card">
-            </div>
-          </form>
-      </div>
+      <div #content />
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary"/>
         <button #cancelBtn class="button-secondary modal-cancel">Cancel</button>
@@ -343,80 +466,18 @@ module AccountTab {
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/creditcard.svg");
 
-    // Restricts the inputs to numbers
-    ccNum['payment']('formatCardNumber');
-    cvcNum['payment']('formatCardCVC');
-
-    for (var i = 1; i < 13; i++) {
-      var month;
-      if (i < 10) {
-        month = "0" + i.toString();
-      } else {
-        month = i.toString();
-      }
-      expMonth.append($("<option value=" + i + ">" + month + "</option>"));
-    }
-
-    var currentYear = (new Date).getFullYear();
-    var limitYear = currentYear + 20;
-    for (var i = currentYear; i < limitYear; i++) {
-      var year = i.toString();
-      expYear.append($("<option value=" + i + ">" + year + "</option>"));
-    }
-
-    var checkInput = function(ccInfo, valid, date) {
-      if (!valid) {
-        ccInfo.val("");
-        ccInfo.addClass("cc-error");
-        if (!date) {
-          ccInfo.attr("placeholder", "Invalid Number");
-        }
-      } else {
-        ccInfo.removeClass('cc-error');
-        ccInfo.attr("placeholder", "");
-      }
-    };
-    var teamid = team.teamid;
-
-    var stripeResponseHandler = function(status, response) {
-      if (response.error) {
-        var cardType = $["payment"].cardType(ccNum.val());
-
-        // Handles whether the cards are valid, independent of Stripe
-        var validCard = $["payment"].validateCardNumber(ccNum.val());
-        var validCVC = $["payment"].validateCardCVC(cvcNum.val(), cardType);
-        var validExpiry = $["payment"].validateCardExpiry(expMonth, expYear);
-
-        checkInput(ccNum, validCard, false);
-        checkInput(cvcNum, validCVC, false);
-        checkInput(expMonth, validExpiry, true);
-        checkInput(expYear, validExpiry, true);
-
+    var refs = getPaymentForm(team, membership, function(err) {
+      if (err) {
         primaryBtn.prop('disabled', false);
       } else {
-        var stripeToken = response.id;
-        Api.addNewCard(teamid, stripeToken).done(function(card) {
-          if (membership !== null) {
-            Api.setSubscription(teamid, membership);
-            $(".next-step-button").prop("disabled", false);
-            (<any> paymentForm.get(0)).reset();
-            (<any> modal).modal("hide"); // FIXME
-            if (defaultBox.prop("checked")) {
-              Api.setDefaultCard(teamid, card.id).done(refresh);
-            } else {
-              refresh();
-            }
-          }
-        });
+        refresh();
       }
-    };
-
-    paymentForm.submit(function() { return false; });
+    });
+    content.append(refs.content);
 
     primaryBtn.click(function() {
       primaryBtn.prop('disabled', true);
-      Stripe.card.createToken(paymentForm, stripeResponseHandler);
-      (<any> modal).modal("hide"); // FIXME
+      refs.form.submit();
       return false;
     });
 
@@ -427,14 +488,16 @@ module AccountTab {
     (<any> modal).modal({}); // FIXME
   }
 
-  function viewOfMembershipOption(membership) {
+  function viewOfMembershipOption(planId: string) {
 '''
 <div #view>
   <div #name class="membership-name"/>
   <div #price class="membership-price"/>
   <div #scheduling class="membership-scheduling"/>
-  <div #adminTasks class="membership-admin-tasks"/>
+  <div class="membership-availability">24/7 Availability</div>
   <div #responseWindow class="membership-response-window"/>
+  <div #adminTasks class="membership-admin-tasks"/>
+  <div #workflows class="membership-workflows"/>
   <div #checkContainer/>
 </div>
 '''
@@ -442,46 +505,51 @@ module AccountTab {
       .appendTo(checkContainer);
     Svg.loadImg(check, "/assets/img/check.svg");
 
-    name.text(membership);
-
-    switch(membership) {
-    case "Basic":
-      price.text("Free");
-      scheduling.text("10 meetings included");
-      adminTasks.text("No tasks included");
-      responseWindow.text("2 hour response window");
-      break;
-    case "Standard":
-      price.text("$199/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("No tasks included");
-      responseWindow.text("2 hour response window");
-      break;
-    case "Enhanced":
-      price.text("$399/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("10 hours of tasks");
-      responseWindow.text("1 hour response window");
-      break;
-    case "Pro":
-      price.text("$599/month");
-      scheduling.text("Unlimited scheduling");
-      adminTasks.text("20 hours of tasks");
-      responseWindow.text("1 hour response window");
-      break;
-    case "Employee":
-      price.text("Free");
-      break;
-    }
+    name.text(Plan.classNameOfPlan(planId));
+    switch(Plan.classOfPlan(planId)) {
+      case "basic":
+        name.text("Flexible");
+        price.text("No monthly charge");
+        scheduling.html("$10 / meeting");
+        adminTasks.text("---");
+        responseWindow.text("Same day response");
+        workflows.html("---");
+        break;
+      case "lo":
+        name.text("Silver");
+        price.text("$299 / month");
+        scheduling.html("50 meetings, $9/extra");
+        adminTasks.text("---");
+        responseWindow.text("< 2 hour response");
+        workflows.html("---");
+        break;
+      case "med":
+        name.text("Gold");
+        price.text("$699 / month");
+        scheduling.html("100 meetings, $9/extra");
+        adminTasks.text("10 hours of admin tasks");
+        responseWindow.text("< 1 hour response");
+        workflows.html("2 scheduling workflows");
+        break;
+      case "hi":
+        name.text("Executive");
+        price.text("$1499 / month");
+        scheduling.html("<strong>Unlimited scheduling</strong>");
+        adminTasks.text("20 hours of admin tasks");
+        responseWindow.text("< 1 hour response");
+        workflows.html("2 scheduling workflows");
+        break;
+      case "employee":
+        price.text("Free");
+        break;
+     }
 
     return view;
   }
 
   function showMembershipModal(team) {
 '''
-<div #modal
-     class="modal fade" tabindex="-1"
-     role="dialog">
+<div #modal class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog membership-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -489,29 +557,45 @@ module AccountTab {
         <div #title class="modal-title">Change Membership</div>
       </div>
       <div #content>
-        <div #daysRemaining class="membership-modal-note"/>
-        <div #suspension class="membership-modal-note"/>
-        <div class="membership-options clearfix">
-          <div #planFree class="membership-option"/>
-          <div #planLo class="membership-option"/>
-          <div #planMid class="membership-option"/>
-          <div #planHi class="membership-option"/>
-          <div #planX class="membership-option hide"/>
+        <div class="membership-options row clearfix">
+          <div class="col-sm-3">
+            <div #planBasic class="membership-option"/>
+          </div>
+          <div class="col-sm-3">
+            <div #planLo class="membership-option"/>
+          </div>
+          <div class="col-sm-3">
+            <div #planMed class="membership-option"/>
+          </div>
+          <div class="col-sm-3">
+            <div #planHi class="membership-option"/>
+          </div>
+          <div class="col-sm-12 hide">
+            <div #planX class="membership-option"/>
+          </div>
         </div>
         <div #subtext1 class="membership-modal-subtext">
-          All features are on a per-month basis.
+          Additional admin (non-scheduling-related) tasks, are billed at
+          $40 / hour for the Flexible Membership,<br  />
+          $35 / hour for the Silver Membership, and
+          $30 / hour for the Gold and Executive Memberships.
         </div>
         <div #subtext2 class="membership-modal-subtext">
-          Additional tasks are billed at $8 per 15 minute task (only available on paid memberships).
+          Additional workflows are billed at $99 per scheduling workflow
+          and $199 per custom workflow for all plans.
         </div>
         <div #subtext3 class="membership-modal-subtext">
-          Additional scheduling is also available at $8/meeting for free users.
+          See <a href="http://esper.com/pricing">our pricing page</a> for more
+          detail.
         </div>
-        <label class="checkbox membership-modal-check">
-          <input #noEsper type="checkbox"></input>
-          own company branding
-          <span #noEsperPrice></span>
-        </label>
+        <div class="membership-modal-check">
+          <input id="no-esper" #noEsper type="checkbox" />
+          <input #noEsperFake type="checkbox" checked="1" disabled="1" />
+          <label for="no-esper">
+            Use a custom e-mail address for your assistant
+            <span #noEsperPrice></span>
+          </label>
+        </div>
       </div>
       <div class="modal-footer">
         <button #primaryBtn class="button-primary modal-primary" disabled>
@@ -521,9 +605,7 @@ module AccountTab {
           Cancel
         </button>
 
-        <!-- Hidden for now until we find a way for customers
-             to resubscribe later. -->
-        <button #suspendBtn class="hide button-secondary modal-delete">
+        <button #suspendBtn class="button-secondary modal-delete">
           Suspend Membership
         </button>
       </div>
@@ -536,6 +618,13 @@ module AccountTab {
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
     var teamid = team.teamid;
+    var planElmPairs = [
+      { elm: planBasic, planId: Plan.basic },
+      { elm: planLo, planId: Plan.lo },
+      { elm: planMed, planId: Plan.med },
+      { elm: planHi, planId: Plan.hi },
+      { elm: planX, planId: Plan.employee }
+    ];
 
     /*
       Employee plan is only shown to admins and to users already under
@@ -549,181 +638,174 @@ module AccountTab {
 
     function initModal(customerStatus) {
       var membershipPlan = customerStatus.plan;
-      var membershipStatus = customerStatus.status;
-      var isFreeMembership = true;
-      if (membershipStatus === "Trialing" && membershipPlan === undefined) {
+      var membershipStatus = customerStatus.status &&
+        customerStatus.status.toLowerCase();
+      var selectedPlanId = membershipPlan;
+      noEsperFake.hide();
+
+      if (! membershipStatus) {
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to activate your account.
+        </div>`);
+        suspendBtn.hide();
+      }
+      else if (membershipPlan === Plan.canceled) {
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to reactivate your account.
+        </div>`);
+        suspendBtn.hide();
+      }
+      else if (membershipPlan && !Plan.isActive(membershipPlan)) {
+        var cutOffDate = moment("2015-09-18");
+        var formatEndDate = "your next billing cycle following " +
+           cutOffDate.format("MMMM D, YYYY");;
+        if (customerStatus.current_period_end) {
+          var endDate = moment(customerStatus.current_period_end);
+          if ((endDate) < cutOffDate) {
+            endDate = endDate.add(1, 'month');
+          }
+          formatEndDate = endDate.format("MMMM D, YYYY");
+        }
+        content.prepend(
+          $(`<div class="membership-modal-note alert alert-warning">
+            We've updated our pricing. Please select a new membership option.
+            <br />
+            Your old subscription will remain valid through ${formatEndDate}.
+            <br />If
+            you have not selected a new membership option by that time, you will
+            be downgraded to our new Flexible Membership.
+          </div>`));
+      }
+      else if (membershipStatus === "trialing") {
         var end = customerStatus.trial_end;
         var timeLeft = moment.duration(moment().diff(end)).humanize();
-'''trialMsgView
-<span #trialMsg>
-  You have <span class="bold">{{timeLeft}}</span>
-  remaining in your free trial.
-  <br>
-  Select a membership option below to continue using
-  Esper beyond your trial period.
-</span>
-'''
-        daysRemaining
-          .append(trialMsg)
-          .show();
-      } else if (membershipStatus == "Past-due" ||
-                 membershipStatus == "Unpaid" ||
-                 membershipStatus == "Canceled" ||
-                 membershipStatus == undefined) {
-        suspension
-          .text("Select a membership option below to reactivate your account.")
-          .show();
-      } else { // already picked a plan
-        var planName = Plan.nameOfPlan(membershipPlan);
-        var selectedPlanId = membershipPlan;
-
-        switch(Plan.nameOfPlan(selectedPlanId)) {
-        case "Basic":
-          selectFree();
-          break;
-        case "Basic Plus":
-          noEsper.prop("checked", true);
-          selectFree();
-          break;
-        case "Standard":
-          selectLo();
-          break;
-        case "Standard Plus":
-          noEsper.prop("checked", true);
-          selectLo();
-          break;
-        case "Enhanced":
-          selectMid();
-          break;
-        case "Enhanced Plus":
-          noEsper.prop("checked", true);
-          selectMid();
-          break;
-        case "Pro":
-          selectHi();
-          break;
-        case "Employee":
-          selectX();
-          break;
-        default:
-          Log.e("Unknown plan type: ", membershipPlan);
-        }
+        selectPlan();
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          <span>
+            You have <span class="bold">${timeLeft}</span>
+            remaining in your free trial.
+            <br />
+            At the end of your trial period, you'll be switched to
+            the membership option you pick below.
+            <br />
+            To cancel before then, click "Suspend Membership" below.
+          </span>
+        </div>`);
+      }
+      else if (membershipStatus == "past-due" ||
+               membershipStatus == "unpaid" ||
+               membershipStatus == "canceled") {
+        // If we get here, we've encountered a suspended account. No
+        // guarantee Stripe call actually goes through, so let user
+        // know to e-mail us.
+        //
+        // NB: Encountering the "canceled" status on a Stripe call is unusual
+        // since canceled plans should be on a special "Cancel" plan. So warn
+        // user reactivation might not work properly here.
+        //
+        content.prepend(`<div class="membership-modal-note alert alert-warning">
+          Select a membership option below to reactivate your account. If
+          you encounter any issues, please contact
+          <a href="mailto:support@esper.com">support@esper.com</a>.
+        </div>`);
+        suspendBtn.hide();
+      }
+      else { // already picked a plan
+        selectPlan();
       }
 
-      function readCheckBox() {
-        var checked = noEsper.prop("checked");
-        switch(Plan.nameOfPlan(selectedPlanId)) {
-        case "Basic":
-          if (checked)
-            selectedPlanId = Plan.basicPlus;
-          break;
-        case "Basic Plus":
-          if (!checked)
-            selectedPlanId = Plan.basic;
-          break;
-        case "Standard":
-          if (checked)
-            selectedPlanId = Plan.standardPlus;
-          break;
-        case "Standard Plus":
-          if (!checked)
-            selectedPlanId = Plan.standard;
-          break;
-        case "Enhanced":
-          if (checked)
-            selectedPlanId = Plan.enhancedPlus;
-          break;
-        case "Enhanced Plus":
-          if (!checked)
-            selectedPlanId = Plan.enhanced;
-          break;
-        case "Pro":
-        case "Employee":
-          break;
-        default:
-          Log.e("Unknown plan ID: ", selectedPlanId);
+      // Update DOM with selectedPlanId
+      function selectPlan() {
+        let pair = List.find(planElmPairs, function(pair) {
+          return (pair.planId === selectedPlanId ||
+            Plan.plusPlans[pair.planId] === selectedPlanId);
+        });
+        if (pair) {
+          selectMembership(pair.elm);
+          noEsperFake.hide();
+          noEsper.show();
+
+          // If Plan is a "plus" plan
+          if (Plan.isPlus(selectedPlanId)) {
+            noEsper.prop("checked", true);
+          }
+          // If there is no "plus" option
+          else if (!Plan.plusPlans[selectedPlanId]) {
+            noEsper.hide();
+            noEsperFake.show();
+          }
+
+          // Update noEsperPrice text
+          switch (pair.planId) { // Use the base plan, not the plus
+            case Plan.basic:
+              noEsperPrice.text("for $99 / month");
+              break;
+            case Plan.lo:
+              noEsperPrice.text("for $49 / month");
+              break;
+            default:
+              noEsperPrice.text("- included");
+          }
+        } else {
+          Log.e("Unknown plan type: ", selectedPlanId);
         }
       }
-
-      planFree.append(viewOfMembershipOption("Basic"));
-      planLo.append(viewOfMembershipOption("Standard"));
-      planMid.append(viewOfMembershipOption("Enhanced"));
-      planHi.append(viewOfMembershipOption("Pro"));
-      planX.append(viewOfMembershipOption("Employee"));
 
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
-        planFree.removeClass("selected");
-        planLo.removeClass("selected");
-        planMid.removeClass("selected");
-        planHi.removeClass("selected");
-        planX.removeClass("selected");
+        List.iter(planElmPairs, function(pair) {
+          pair.elm.removeClass("selected");
+        });
         option.addClass("selected");
         noEsper.removeClass("hide");
       }
 
-      function selectFree() {
-        selectMembership(planFree);
-        noEsperPrice.text("for $49/mo");
-        if (noEsper.prop("checked")) {
-          selectedPlanId = Plan.basicPlus;
-          isFreeMembership = false;
-        } else {
-          selectedPlanId = Plan.basic;
-          isFreeMembership = true;
+      function readCheckBox() {
+        var checked = noEsper.prop("checked");
+        if (checked) {
+          var plusPlan = Plan.plusPlans[selectedPlanId];
+          if (plusPlan) {
+            selectedPlanId = plusPlan;
+          }
         }
       }
-      function selectLo() {
-        selectMembership(planLo);
-        noEsperPrice.text("for $49/mo");
-        isFreeMembership = false;
-        selectedPlanId = noEsper.prop("checked") ?
-          Plan.standardPlus : Plan.standard;
-      }
-      function selectMid() {
-        selectMembership(planMid);
-        noEsperPrice.text("for $29/mo");
-        isFreeMembership = false;
-        selectedPlanId = noEsper.prop("checked") ?
-          Plan.enhancedPlus : Plan.enhanced;
-      }
-      function selectHi() {
-        selectMembership(planHi);
-        noEsperPrice.text("- included");
-        isFreeMembership = false;
-        noEsper.addClass("hide");
-        selectedPlanId = Plan.pro;
-      }
-      function selectX() {
-        planX.removeClass("hide");
-        selectMembership(planX);
-        noEsperPrice.text("- not available for this plan");
-        isFreeMembership = true;
-        noEsper.addClass("hide");
-        selectedPlanId = Plan.employee;
-      }
 
-      planFree.click(selectFree);
-      planLo.click(selectLo);
-      planMid.click(selectMid);
-      planHi.click(selectHi);
-      planX.click(selectX);
+      List.iter(planElmPairs, function(pair) {
+        pair.elm.click(function() {
+          selectedPlanId = pair.planId;
+          selectPlan();
+        });
+        pair.elm.append(viewOfMembershipOption(pair.planId));
+      });
 
       primaryBtn.click(function() {
         $(".next-step-button").prop("disabled", false);
-        (<any> modal).modal("hide"); // FIXME
+        primaryBtn.prop('disabled', true);
+        primaryBtn.text('Updating');
         readCheckBox();
         Log.d("Selected plan ID: " + selectedPlanId);
-        Api.setSubscription(teamid, selectedPlanId)
-          .done(function() {
-            if (!isFreeMembership) {
-              Api.getSubscriptionStatusLong(team.teamid)
-                .done(function(status){
-                  if (status.cards.length === 0)
-                    showPaymentModal("Add", team, selectedPlanId);
-                });
-            }
-          });
+        if (selectedPlanId) {
+          let setSub = function() {
+            Api.setSubscription(teamid, selectedPlanId)
+              .done(function() { refresh(); });
+          };
+          if (Plan.isFree(selectedPlanId)) {
+            setSub();
+          }
+          else {
+            Api.getSubscriptionStatusLong(team.teamid)
+              .done(function(status){
+                if (status.cards.length === 0) {
+                  (<any> modal).modal("hide"); // FIXME
+                  showPaymentModal("Add", team, selectedPlanId);
+                } else {
+                  setSub();
+                }
+              });
+          }
+        } else {
+          (<any> modal).modal("hide"); // FIXME
+        }
       });
 
       cancelBtn.click(function() {
@@ -735,6 +817,7 @@ module AccountTab {
         suspendBtn.hide();
       } else {
         suspendBtn.click(function() {
+          (<any> modal).modal("hide");
           showConfirmationModal("suspend", modal, team);
         });
       }
@@ -804,6 +887,7 @@ module AccountTab {
       <div class="info-col right">
         <div #memPlan class="plan"/>
         <div #memStatus class="status"/>
+        <div #memCards class="status" />
       </div>
       <div class="modal-footer">
         <button #cancelBtn class="button-secondary modal-cancel">Close</button>
@@ -817,26 +901,29 @@ module AccountTab {
 
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
-        memPlan.append(customerStatus.plan);
-        memStatus.append(customerStatus.status);
+        memPlan.append(Plan.classNameOfPlan(customerStatus.plan));
+        if (customerStatus.plan === Plan.canceled) {
+          memStatus.append("Canceled");
+        } else {
+          memStatus.append(customerStatus.status);
+        }
     });
 
     Api.getSubscriptionStatusLong(teamid).done(function(status) {
       if (status.cards.length < 1) {
-        memStatus.append( "<br> No Cards");
+        memCards.append( "No Cards");
       }
       else {
         for (var i = 0; i < status.cards.length; i++) {
-          memStatus.append("<br> •••• •••• •••• ");
-          memStatus.append(<any>status.cards[i].last4);
+          memCards.append("•••• •••• •••• ");
+          memCards.append(<any>status.cards[i].last4);
 '''rmCardView
 <span #removeCardSpan>
   <span class="text-divider"></span><a #removeCardLink>Remove</a>
 </span>
 '''
-          memStatus.append(removeCardSpan);
-
           if (status.cards.length > 1) {
+            memCards.append(removeCardSpan);
             var cardid = status.cards[i].id;
             removeCardLink.addClass("danger-link");
             removeCardLink.click(function() {
@@ -844,6 +931,7 @@ module AccountTab {
               Api.deleteCard(teamid, cardid).done(refresh);
             });
           }
+          memCards.append('<br />')
         }
       }
     });
@@ -911,30 +999,41 @@ module AccountTab {
       .done(updateStatus);
 
     function updateStatus(customer) {
-      var mem = customer.status;
+      var mem = customer.status && customer.status.toLowerCase();
       var plan = customer.plan;
 
-      if (mem == "Trialing" || mem == "Active") {
+      if (plan === Plan.canceled || mem === 'canceled') {
+        membershipBadge.text("CANCELED");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
+        membershipBadge.text("SUSPENDED");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (! mem) {
+        membershipBadge.text("NONE");
+        membershipBadge.addClass("suspended");
+      }
+
+      else if (! Plan.isActive(plan)) {
+        membershipBadge.text("EXPIRING");
+        membershipBadge.addClass("suspended");
+      }
+
+      // Membership must be trialing or active to get here
+      else if (mem === "trialing") {
+        membershipBadge.text("TRIALING");
         membershipBadge.addClass("active");
-      } else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
-        membershipBadge.addClass("suspended");
-      } else if (mem === undefined) {
-        membershipBadge.text("None");
-        membershipBadge.addClass("suspended");
       }
 
-      if (mem === "Active" && plan !== undefined) {
-        membershipBadge.text(Plan.classOfPlan(plan).toUpperCase());
-      } else if (mem !== undefined) {
-        membershipBadge.text(mem.toUpperCase());
+      else { // active
+        membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
+        membershipBadge.addClass("active");
       }
 
-      if (mem !== "Canceled") {
-        changeMembership.click(function() { showMembershipModal(team); });
-      } else {
-        changeMembership.addClass("disabled");
-      }
-
+      changeMembership.click(function() { showMembershipModal(team); });
       changePayment.click(function() {
         showPaymentModal("Change", team, null)
       });

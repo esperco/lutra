@@ -34,8 +34,6 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
-
-
 /*** General ***/
 
 body {
@@ -83,7 +81,7 @@ button,
   }
   &:focus { outline: 0 !important; }
 }
-.button-primary {
+.button-primary, .btn-primary {
   color: white;
   background-image:linear-gradient(to bottom, #A75FCC 0%, #9C59BF 100%);
   border: 1px solid #70348F;
@@ -1254,11 +1252,11 @@ a.header-title:hover { text-decoration: underline; }
   padding: 15px;
   input { width: 100%; }
 }
-.preference-form select { margin: 5px 0 15px 0; }
-.preference-form input.preference-input {
-  width: 100%;
-  margin: 5px 0 15px 0;
-}
+// .preference-form select { margin: 5px 0 15px 0; }
+// .preference-form input.preference-input {
+//   width: 100%;
+//   margin: 5px 0 15px 0;
+// }
 .phone-number { margin-bottom: 8px !important; }
 .modal-primary { float: right; }
 .modal-cancel {
@@ -1268,17 +1266,6 @@ a.header-title:hover { text-decoration: underline; }
 .modal-delete {
   float: left;
   color: @red !important;
-}
-.payment-col {
-  float: left;
-  width: 50%;
-  &.left {
-    padding-right: 20px;
-    input {
-      width: 100%;
-      margin: 5px 0 15px 0;
-    }
-  }
 }
 .confirmation-modal {
   position: absolute;
@@ -1331,14 +1318,14 @@ a.header-title:hover { text-decoration: underline; }
 }
 .membership-modal {
   position: absolute;
-  top: calc(~"50% - 160px");
+  top: 10%;
+  // top: calc(~"50% - 320px");
   left: calc(~"50% - 426px");
   width: 852px;
   margin: 0;
   .modal-content { width: 852px; }
   .membership-modal-note {
-    display: none;
-    padding: 15px 15px 0 15px;
+    margin: 15px 15px 0 15px;
     text-align: center;
   }
   .membership-modal-subtext {
@@ -1348,18 +1335,18 @@ a.header-title:hover { text-decoration: underline; }
     font-style: italic;
   }
   .membership-modal-check {
-    font-weight: normal;
-    padding: 15px 15px 0 15px;
+    font-weight: bold;
+    padding: 0 15px 0 15px;
     text-align: center;
     cursor: pointer;
   }
   .membership-options {
-    padding: 15px 10px;
-    .membership-option {
+    padding: 15px 20px;
+    .membership-option {b
       float: left;
-      width: 200px;
-      height: 150px;
-      margin: 0 3px;
+      font-size: 14px;
+      text-align: center;
+      // margin: 0 3px;
       padding: 15px;
       background: white;
       border-radius: 5px;
@@ -1381,22 +1368,6 @@ a.header-title:hover { text-decoration: underline; }
         margin-bottom: 8px;
         font-size: 18px;
         font-weight: 600;
-        text-align: center;
-      }
-      .membership-price {
-        font-size: 14px;
-        text-align: center;
-      }
-      .membership-scheduling {
-        font-size: 14px;
-        text-align: center;
-      }
-      .membership-admin-tasks {
-        font-size: 14px;
-        text-align: center;
-      }
-      .membership-response-window {
-        font-size: 14px;
         text-align: center;
       }
       .membership-option-check {
@@ -1426,9 +1397,9 @@ a.header-title:hover { text-decoration: underline; }
   margin: 0;
   .modal-content { width: 360px; }
   .preference-form {
-    height: 185px;
+    // height: 185px;
     padding: 15px;
-    overflow-y: auto;
+    // overflow-y: auto;
     .phone-input { margin-bottom: 0; }
     .share-number {
       margin-top: 7px;
@@ -1592,6 +1563,15 @@ a.header-title:hover { text-decoration: underline; }
     font-weight: bold;
   }
 
+  h1 small, h2 small, h3 small, h4 small {
+    color: @gray_10;
+  }
+
+  .description {
+    color: @gray_05;
+    margin-bottom: 20px;
+  }
+
   a, a:hover, a:focus {
     color: white;
     font-weight: bold;
@@ -1605,6 +1585,10 @@ a.header-title:hover { text-decoration: underline; }
     &:hover, &:focus {
       color: @purple_hover;
     }
+  }
+
+  .panel {
+    background: transparent; // Override white default
   }
 
   .progress {
@@ -1623,6 +1607,10 @@ a.header-title:hover { text-decoration: underline; }
         border-color: @gray_20;
       }
     }
+  }
+
+  .button-primary, .btn-primary {
+    margin-top: 10px;
   }
 }
 
