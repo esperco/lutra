@@ -18,6 +18,7 @@ module Page {
   }, undefined);
 
   function showPage(k, properties?: Object) {
+    $('#init-loading').hide();
     pageSelector.show(k);
     Analytics.page(k, properties);
   }

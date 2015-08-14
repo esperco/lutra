@@ -92,7 +92,6 @@ module Login {
   };
 
   export function logout() {
-    MP.track("Logout");
     clearLoginInfo();
   };
 

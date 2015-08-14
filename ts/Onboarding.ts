@@ -114,12 +114,18 @@ module Onboarding {
     exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
       exchangeEmailSubject + "&body=" + exchangeEmailBody);
 
-    buttonContainer.append(
-      Signin.googleButton(
-        /* landingUrl */ "#!join/1",
-        /* optInvite  */ inviteCode,
-        /* optEmail   */ undefined,
-        /* optSignup  */ true));
+    var googleButton = Signin.googleButton(
+      /* landingUrl */ "#!join/1",
+      /* optInvite  */ inviteCode,
+      /* optEmail   */ undefined,
+      /* optSignup  */ true);
+    googleButton.click(function() {
+      Analytics.track(Analytics.Trackable.ClickGoogleSignIn, {
+        optInvite: inviteCode,
+        optSignup: true
+      });
+    });
+    buttonContainer.append(googleButton);
 
     let content = refs["content"];
     content.append(view);
@@ -305,6 +311,7 @@ module Onboarding {
         CalendarsTab.displayCalendarList(calendarView, response.calendars);
 
         share.click(function() {
+          Analytics.track(Analytics.Trackable.ClickShareCalendar);
           let allCals = response.calendars;
           CalendarsTab.saveCalendarShares(team, calendarView, share, allCals)
 
@@ -375,6 +382,7 @@ module Onboarding {
     unmakeBusy(primaryBtn);
     primaryBtn.click(function() {
       makeBusy(primaryBtn);
+      Analytics.track(Analytics.Trackable.ClickCreditCard);
       paymentRefs.form.submit();
     });
 
@@ -401,7 +409,7 @@ module Onboarding {
     </p>
   </div>
   <div align=right style="padding-top:20px; padding-bottom:40px;">
-    <a target="_blank" href="http://esper.com/faqs">
+    <a #faqLink target="_blank" href="http://esper.com/faqs">
       <button class="button-primary">
         Learn more about Esper &nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
       </button>
@@ -438,6 +446,14 @@ module Onboarding {
     // mailMsgLink.attr("href", "mailto:" + asstEmail +
     //   "?subject=" + encodeURIComponent(emailSubj) +
     //   "&body=" + encodeURIComponent(emailText));
+
+    mailMsgLink.click(function() {
+      Analytics.track(Analytics.Trackable.ClickCongratsEmail);
+    });
+
+    faqLink.click(function() {
+      Analytics.track(Analytics.Trackable.ClickLearnMoreAboutEsper);
+    });
 
     let content = refs["content"];
     content.append(view);

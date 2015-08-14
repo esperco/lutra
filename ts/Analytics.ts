@@ -157,4 +157,20 @@ module Analytics {
       });
     }
   }
+
+  // Events to track
+  export enum Trackable {
+    ClickGoogleSignIn,
+    ClickShareCalendar,
+    ClickCreditCard,
+    ClickCongratsEmail,
+    ClickLearnMoreAboutEsper
+  };
+
+  export function track(event: Trackable, properties?: Object) {
+    var eventName = Trackable[event];
+    analytics.ready(function() {
+      analytics.track(eventName, properties);
+    });
+  }
 }
