@@ -98,6 +98,7 @@ module Analytics {
     // Cookie-based user object
     user(): {
       id(): string;
+      logout(): void;
       reset(): void;
     };
   }
@@ -113,23 +114,27 @@ module Analytics {
 
   // If we have a UID, identify ourselves. Otherwise dis-associate
   export function identify() {
-    var me = Login.me();
-    if (me) {
-      // Only identify if we don't have a previous identity
-      if (analytics.user().id() !== me) {
-        analytics.alias(me);
-        analytics.identify(me, {
-          email: Login.data.email
-        });
+    analytics.ready(function() {
+      var me = Login.me();
+      if (me) {
+        // Only identify if we don't have a previous identity
+        if (analytics.user().id() !== me) {
+          analytics.alias(me);
+          analytics.identify(me, {
+            email: Login.data.email
+          });
+        }
+      } else {
+        reset();
       }
-    } else {
-      reset();
-    }
+    });
   }
 
   // Clear tracking IDs
   export function reset() {
-    analytics.user().reset();
+    var user = analytics.user();
+    user.logout();
+    user.reset();
   }
 
   // Track which page you're on
@@ -147,9 +152,9 @@ module Analytics {
         "Credit Card",
         "Send Email"
       ][step] || "Step " + step;
-      analytics.page("onboarding", pageName, properties);
-
-      analytics.user().id()
+      analytics.ready(function() {
+        analytics.page("onboarding", pageName, properties);
+      });
     }
   }
 }

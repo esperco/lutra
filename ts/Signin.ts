@@ -318,7 +318,6 @@ module Signin {
     loginCall
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
-        // Analytics.identify();
         clearLoginNonce();
 
         window.location.hash = "#!";
