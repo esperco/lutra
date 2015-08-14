@@ -121,6 +121,13 @@ module Onboarding {
         /* optEmail   */ undefined,
         /* optSignup  */ true));
 
+    buttonContainer.append(
+      Signin.exchangeButton(
+        /* landingUrl */ "#!join/1",
+        /* optInvite  */ inviteCode,
+        /* optEmail   */ undefined,
+        /* optSignup  */ true));
+
     let content = refs["content"];
     content.append(view);
   }

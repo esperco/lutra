@@ -303,6 +303,15 @@ module Api {
   }
 
 
+  /***** Nylas *****/
+  export function getNylasLoginUrl(email:string)
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    var url = "/api/inbox/login/" + encodeURIComponent(email);
+    return jsonHttpGet(url);
+  }
+
+
   /***** Team label syncing *****/
 
   export function getSyncedLabels(teamid)

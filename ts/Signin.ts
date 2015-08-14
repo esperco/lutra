@@ -92,14 +92,13 @@ module Signin {
                                optSignup?: boolean):
     JQuery {
 '''
-<button #button class="button-primary sign-in-btn">
-  <div #google class="google-g"/>
-  <div class="btn-divider"/>
-  <div class="sign-in-text">Sign in with Google</div>
+<button #button class="button-primary sign-in-btn google-btn">
+  <div #logo class="google-g sign-in-icon"/>
+  <div class="sign-in-text">Google Account</div>
 </button>
 '''
     var googleG = $("<img class='svg-block'/>")
-      .appendTo(google);
+      .appendTo(logo);
     Svg.loadImg(googleG, "/assets/img/google-g.svg");
 
     // Set handler
@@ -140,6 +139,127 @@ module Signin {
 
     return button;
   };
+
+  // Returns jQuery wrapped HTML code for an Exchange / Nylas Button
+  export function exchangeButton(landingUrl?: string,
+                                 optInvite?: string,
+                                 optEmail?: string,
+                                 optSignup?: boolean):
+    JQuery {
+'''
+<button #button class="button-primary sign-in-btn exchange-btn">
+  <div #logo class="sign-in-icon exchange-icon"/>
+  <div class="sign-in-text">Microsoft Exchange</div>
+</button>
+'''
+    var exchangeIcon = $("<img class='svg-block'/>")
+      .appendTo(logo);
+    Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
+
+    // Set handler
+    button.click(function() {
+      showExchangeModal();
+      return false;
+    });
+
+    return button;
+  };
+
+  function showExchangeModal() {
+'''
+<div #modal class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog short exchange-modal">
+    <div class="modal-content">
+      <form #emailForm class="form">
+        <div class="modal-header">
+          <i class="fa fa-fw fa-sign-in"></i>
+          Log in with Exchange or Office 365
+        </div>
+        <div #emailGroup class="modal-body form-group">
+          <label for="exchange-email" class="control-label">
+            Exchange email address</label>
+          <input #emailInput id="exchange-email" type="text" tabindex="0"
+                 placeholder="hello@office365.com" class="form-control" />
+        </div>
+        <div class="modal-footer">
+          <button type="submit" #saveBtn class="button-primary modal-primary">
+            Save</button>
+          <button #cancelBtn class="button-secondary modal-cancel">
+            Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+'''
+    (<any> modal).modal({});
+    (<any> modal).on('shown.bs.modal', function() {
+      emailInput.focus();
+    });
+
+    cancelBtn.click(function() {
+      (<any> modal).modal('hide');
+      return false;
+    });
+
+    emailForm.submit(function() {
+      emailGroup.removeClass("has-error");
+      var email = emailInput.val();
+
+      if (! Util.validateEmailAddress(email)) {
+        emailGroup.addClass("has-error");
+      } else {
+        saveBtn.text("Saving ...");
+        saveBtn.prop("disabled", true);
+        Api.getNylasLoginUrl(email)
+          .then(function(result) {
+            window.location.href = result.url;
+          }, function(err) {
+            console.error(err);
+            saveBtn.text("Save");
+            saveBtn.prop("disabled", false);
+            return err;
+          });
+      }
+
+      // Okay, we have an e-mail, now do something
+      // let nonce = "";
+
+      // // Generate login nonce
+      // let loginNonceCall = setLoginNonce();
+      // loginNonceCall.done(function(loginNonce) {
+      //   // Assign to higher-scoped variable so our other callbacks can see it
+      //   nonce = loginNonce;
+      // });
+      // let calls = [loginNonceCall];
+
+      // // We should always have an invite token before going to Google, but
+      // // only if optSignup is true -- if we don't have one, request from server
+      // if (optSignup && !optInvite) {
+      //   let tokenCall = getSignupToken();
+      //   tokenCall.done(function(token) {
+      //     // Assign to higher-scoped variable so our other callbacks can see it
+      //     optInvite = token;
+      //   });
+      //   calls.push(tokenCall);
+      // }
+
+      // // Run token and nonce calls in parallel
+      // Deferred.join(calls, true)
+      //   // Get Google endpoint based on nonce and token
+      //   .then(function() {
+      //     landingUrl = landingUrl || "#!";
+      //     return Api.getGoogleAuthUrl(landingUrl, nonce, optInvite, optEmail);
+      //   }, function(err) { console.error(err); })
+      //   // Redirect to Google
+      //   .then(function(x) {
+      //     requestGoogleAuth(x.url);
+      //   }, function(err) { console.error(err); });
+      return false;
+    });
+
+    return modal;
+  }
 
   function displayLoginLinks(msg, landingUrl, optInvite, optEmail) {
 '''
@@ -195,6 +315,7 @@ module Signin {
       msgDiv.html(msg);
 
     buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
+    buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
 
     rootView.removeClass("hide");
     rootView.append(view);
