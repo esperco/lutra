@@ -656,10 +656,14 @@ module AccountTab {
         suspendBtn.hide();
       }
       else if (membershipPlan && !Plan.isActive(membershipPlan)) {
-        var formatEndDate = "your next billing cycle";
+        var cutOffDate = moment("2015-09-18");
+        var formatEndDate = "your next billing cycle following " +
+           cutOffDate.format("MMMM D, YYYY");;
         if (customerStatus.current_period_end) {
           var endDate = moment(customerStatus.current_period_end);
-          endDate = endDate.add(1, 'month');
+          if ((endDate) < cutOffDate) {
+            endDate = endDate.add(1, 'month');
+          }
           formatEndDate = endDate.format("MMMM D, YYYY");
         }
         content.prepend(
