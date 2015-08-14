@@ -23,6 +23,9 @@ module Analytics {
   // The actual analytics.js object
   interface ISegment<Integrations> {
 
+    /* Configure Segment with write key */
+    load(writeKey: string);
+
     /* The identify method is how you tie one of your users and their actions
        to a recognizable userId and traits. */
     identify(userId: string, traits?: Object,
@@ -98,6 +101,7 @@ module Analytics {
   // Our actual analytics code /////////////
 
   export function init() {
-    // TODO
+    // Init with write key
+    analytics.load(Conf.segmentKey);
   };
 }
