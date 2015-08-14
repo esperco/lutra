@@ -82,37 +82,32 @@ module Onboarding {
 '''
 <div #view style="text-align: center">
   <div #msg>
-    <strong>Awesome.</strong> Our assistants need access to your calendar to
-    assist you with scheduling.<br />
-    Please sign in with the account tied to your primary calendar
-    to continue.
+    <span class="block-lg">
+      <strong>Awesome.</strong> Our assistants need access to your calendar to
+      assist you with scheduling.
+    </span>
+    <div class="block-lg">
+      Please sign in with the account tied to your
+      primary calendar to continue.
+    </div>
   </div>
   <div #buttonContainer style="padding:40px 0">
   </div>
   <div>
-    Use Microsoft Office or Exchange for calendaring?<br />Contact us at
-    <a #exchangeLink href="mailto:support@esper.com">
-      support@esper.com</a> to get set up.
-    <br /><br />
     <a href="http://esper.com/mailing-list">
-      Use something else? Click here.
+      Don't use Google or Microsoft Exchange?
+      <span class="text-nowrap">Click here.</span>
     </a>
     <br /><br />
     By signing in, you agree to Esper's
-    <a href="http://esper.com/terms-of-use">Terms of Use.</a>
+    <a class="text-nowrap"
+       href="http://esper.com/terms-of-use">Terms of Use.</a>
   </div>
 </div>
 '''
     if (customMsg) {
       msg.html(customMsg);
     }
-
-    var exchangeEmailSubject = "Join Esper (Microsoft Office / Exchange)";
-    var exchangeEmailBody = "Hi, I'd like to sign up for Esper!";
-    exchangeEmailSubject = encodeURIComponent(exchangeEmailSubject);
-    exchangeEmailBody = encodeURIComponent(exchangeEmailBody);
-    exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
-      exchangeEmailSubject + "&body=" + exchangeEmailBody);
 
     buttonContainer.append(
       Signin.googleButton(

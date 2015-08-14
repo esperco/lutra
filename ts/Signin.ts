@@ -315,7 +315,7 @@ module Signin {
       msgDiv.html(msg);
 
     buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
-    buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
+    // buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
 
     rootView.removeClass("hide");
     rootView.append(view);
