@@ -188,6 +188,11 @@ button {
       -ms-transition:.2s;
        -o-transition:.2s;
           transition:.2s;
+  &.index {
+    font-size: 24px;
+    padding: 15px 25px;
+    margin: 0 5px;
+  }
   &.large {
     padding: 8px 40px;
     border-radius: 5px;
@@ -207,16 +212,14 @@ button.button-primary {
     background: @purple_hover;
   }
   &.large { border-width: 2px; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 }
 
 button.button-secondary {
   color: @purple_text;
   background: white;
   &:hover { opacity: 0.5; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 
 }
 
@@ -226,8 +229,7 @@ button.button-tertiary {
   border: 1px solid white;
   &.large { border-width: 2px; }
   &:hover { opacity:0.5; }
-  &.index { border-width: 2px;
-            padding: 2px 16px; }
+  &.index { border-width: 2px; }
 
 }
 
@@ -331,6 +333,8 @@ input.incorrect{
 .navbar {
   @media (min-width:768px) { padding: 18px 36px; }
   @media (max-width:767px) { padding: 18px; }
+  background-color: white;
+  box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.16);
 }
 
 .splash-navbar {
@@ -804,13 +808,13 @@ input.incorrect{
     }
   }
   @media (max-width:767px) { width: 100%; }
-  margin-bottom: 14px;
   color: black;
 }
 
-#first-name, #last-name, #email, #phone { width: 100%; }
-
-#phone { margin-bottom: 14px; }
+#first-name, #last-name, #email, #phone, #redeem-code, #platform {
+  width: 100%;
+  margin-bottom: 14px;
+}
 
 .email-platform-row {
   margin: 12px 8px 20px 0px;
@@ -825,7 +829,7 @@ input.incorrect{
 #platform { float: left; }
 
 .submit-button-row {
-  margin: 0 4px;
+  margin: 6px 4px;
 }
 
 
@@ -1069,10 +1073,10 @@ input.incorrect{
 /* Signup */
 
 .container {
-    padding: 15px;
-    width: 85%;
-    align: center;
-  }
+  padding: 15px;
+  width: 85%;
+  align: center;
+}
 
 /** Sign In (Onboarding) **/
 
@@ -1224,20 +1228,19 @@ select.incorrect{
 
 .signup-form {
   max-width: 623px;
-  margin: 0px;
+  margin: 40px auto;
 }
-.signup-text { display: none; }
 
-@media (min-width:768px) {
-  .signup-text{
-    padding: 0px 0px 0px 30px;
-    float: right;
-    display: inline;
-    width: 50%;
-  }
-  .signup-form{
-    float: left;
-    display: inline;
-    width: 50%;
-  }
-}
+// @media (min-width:768px) {
+//   .signup-text{
+//     padding: 0px 0px 0px 30px;
+//     float: right;
+//     display: inline;
+//     width: 50%;
+//   }
+//   .signup-form{
+//     float: left;
+//     display: inline;
+//     width: 50%;
+//   }
+// }

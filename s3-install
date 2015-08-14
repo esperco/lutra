@@ -4,8 +4,28 @@ set -e
 s3_bucket=esper.com
 
 # Copy the pub/ directory into our S3 bucket used by http://esper.co/
+
+# Do CSS files first with forced mime (mime-magic guesses this incorrectly)
+(cd pub && \
+    s3cmd put \
+      --mime-type=text/css \
+      --exclude="*" \
+      --include="*.css" \
+      --recursive * s3://$s3_bucket )
+
+# Do SVG files next with forced mime (mime-magic guesses this incorrectly)
+(cd pub && \
+    s3cmd put \
+      --mime-type=image/svg+xml \
+      --exclude="*" \
+      --include="*.svg" \
+      --recursive * s3://$s3_bucket )
+
+# Do remainder with guessed mime, defaulting to HTML (because of blanks)
 (cd pub && \
     s3cmd put \
       --guess-mime-type \
-      --mime-type=text/html \
+      --exclude="*.css" \
+      --exclude="*.svg" \
+      --default-mime-type=text/html \
       --recursive * s3://$s3_bucket )

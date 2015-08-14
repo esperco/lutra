@@ -60,165 +60,6 @@ function loadElements() {
   $(".footer-container").load("footer");
 }
 
-function showTasks(tasktype, list){
-  $(tasktype).hover(function(){
-      $(list).slideDown('medium');
-    }, function() {
-      $(list).slideUp('medium');
-    }
-  );
-}
-
-function limitRedeemInput(){
-  $("#redeem-code").keydown(function(e){
-    // Allow: backspace, delete, tab, escape, enter and .
-    if (($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1) ||
-        // Allow: Ctrl+A
-        (e.keyCode == 65 && e.ctrlKey === true) ||
-        // Allow: home, end, left, right
-        (e.keyCode >= 35 && e.keyCode <= 39)) {
-      // let it happen, don't do anything
-      return;
-    }
-    // Ensure that it is a number and stop the keypress
-    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57))
-        && (e.keyCode < 96 || e.keyCode > 105)) {
-      e.preventDefault();
-    }
-  });
-}
-
-function looksLikeAnEmailAddress(s) {
-  return (/^[^ @]+@{1}[^ @]+[.]{1}[^ .@]+$/.test(s));
-}
-
-function checkAndSubmitRedeemForm() {
-  $("#redeem-form").submit(function(e){
-    var firstName = $("#first-name").val();
-    var lastName = $("#last-name").val();
-    var code = $("#redeem-code").val();
-    var email = $("#email").val();
-    var emailPlatform = $("#platform").val();
-    var valid = true;
-    if (code.length != 9) {
-      valid = false;
-      $("#redeem-code").addClass("incorrect");
-    }
-    else
-      $("#redeem-code").removeClass("incorrect");
-
-    if (firstName.length === 0) {
-      valid = false;
-      $("#first-name").addClass("incorrect");
-    }
-    else
-      $("#first-name").removeClass("incorrect");
-
-    if (lastName.length === 0) {
-      valid = false;
-      $("#last-name").addClass("incorrect");
-    }
-    else
-      $("#last-name").removeClass("incorrect");
-
-    if (! looksLikeAnEmailAddress(email)) {
-      valid = false;
-      $("#email").addClass("incorrect");
-    }
-    else
-      $("#email").removeClass("incorrect");
-
-    if (!valid)
-      e.preventDefault();
-    else {
-      var url =
-        "https://app.esper.com/#!redeem/" + encodeURIComponent(code)
-        + "/" + encodeURIComponent(email)
-        + "/" + encodeURIComponent(firstName + " " + lastName)
-        + "/" + encodeURIComponent(emailPlatform);
-      console.log(url);
-      open(url);
-    }
-  });
-}
-
-function setupRedeemForm() {
-  limitRedeemInput();
-  checkAndSubmitRedeemForm();
-}
-
-function changeSubmitButtonType(s) {
-    $("#signup-btn").prop("type", s);
-}
-
-function checkAndSubmitSignupForm() {
-  $("#signup-btn").click(function(e){
-    var firstName = $("#first-name").val();
-    var lastName = $("#last-name").val();
-    var phone = $("#phone").val();
-    var email = $("#email").val();
-    var emailPlatform = $("#platform").val();
-    var valid = true;
-
-    if (firstName.length === 0) {
-      valid = false;
-      $("#first-name").addClass("incorrect");
-    }
-    else
-      $("#first-name").removeClass("incorrect");
-
-    if (lastName.length === 0) {
-      valid = false;
-      $("#last-name").addClass("incorrect");
-    }
-    else
-      $("#last-name").removeClass("incorrect");
-
-    if (phone.length === 0) {
-      valid = false;
-      $("#phone").addClass("incorrect");
-    }
-    else
-      $("#phone").removeClass("incorrect");
-
-    if (! looksLikeAnEmailAddress(email)) {
-      valid = false;
-      $("#email").addClass("incorrect");
-    }
-    else
-      $("#email").removeClass("incorrect");
-    
-    if (emailPlatform === null) {
-      valid = false;
-      $("#platform").addClass("incorrect");
-    }
-    else
-      $("#platform").removeClass("incorrect");
-
-
-    if (!valid)
-      e.preventDefault();
-    else {
-      if (emailPlatform !== "Google Apps") {
-        changeSubmitButtonType("submit");
-       // var url = "http://localhost:8009/pub/signup-sorry"
-      }
-      else {
-        changeSubmitButtonType("button");
-      var url =
-        "https://app.esper.com/#!signup/" + encodeURIComponent(firstName)
-        + "/" + encodeURIComponent(lastName)
-        + "/" + encodeURIComponent(phone)
-        + "/" + encodeURIComponent(email)
-        + "/" + encodeURIComponent(emailPlatform);
-      console.log(url);
-      }
-      //open(url);
-      window.location = url;
-    }
-  });
-}
-
 function setDonePageFromHash() {
   var hash = location.hash.slice(1);
   var alias_name = hash.split(";")[0].split("@")[0];
@@ -234,17 +75,12 @@ function setDonePageFromHash() {
   document.getElementById("mailto-link").innerHTML = email;
   $("#mailto-link").prop("href", intro_email);
   $("#mailto-msg").prop("href", intro_email);
-
-
 }
 
 function main() {
   loadElements();
   resizer();
   slider();
-  setupRedeemForm();
-  checkAndSubmitSignupForm();
  }
-
 
 $(document).ready(main);
