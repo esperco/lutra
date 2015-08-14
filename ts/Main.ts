@@ -19,6 +19,7 @@
 
 /// <reference path="Test.ts"/>
 /// <reference path="List.ts"/>
+/// <reference path="Analytics.ts"/>
 /// <reference path="Watchable.ts"/>
 /// <reference path="Log.ts"/>
 /// <reference path="Deferred.ts"/>
@@ -62,6 +63,7 @@
 module Main {
 
   function main() {
+    Analytics.init();
     Svg.init();
     Login.initLoginInfo();
     Route.setup();
