@@ -94,6 +94,12 @@ module Analytics {
        soon as all of your enabled integrations have loaded. It’s like jQuery’s
        ready method, except for integrations. */
     ready(callback: () => void);
+
+    // Cookie-based user object
+    user(): {
+      id(): string;
+      reset(): void;
+    };
   }
   declare var analytics: ISegment<IIntegrations>;
 
@@ -104,4 +110,46 @@ module Analytics {
     // Init with write key
     analytics.load(Conf.segmentKey);
   };
+
+  // If we have a UID, identify ourselves. Otherwise dis-associate
+  export function identify() {
+    var me = Login.me();
+    if (me) {
+      // Only identify if we don't have a previous identity
+      if (analytics.user().id() !== me) {
+        analytics.alias(me);
+        analytics.identify(me, {
+          email: Login.data.email
+        });
+      }
+    } else {
+      reset();
+    }
+  }
+
+  // Clear tracking IDs
+  export function reset() {
+    analytics.user().reset();
+  }
+
+  // Track which page you're on
+  export function page(page: string, properties?: Object) {
+    properties = properties || {};
+    properties['url'] = location.href; // So hash is included
+
+    // For now, only track onboarding
+    if (page === "onboarding") {
+      var step = properties['step'] || 0;
+      var pageName = [
+        "Signin",
+        "Name & Number",
+        "Calendar",
+        "Credit Card",
+        "Send Email"
+      ][step] || "Step " + step;
+      analytics.page("onboarding", pageName, properties);
+
+      analytics.user().id()
+    }
+  }
 }

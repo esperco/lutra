@@ -1,4 +1,4 @@
-// Include all references prior to Main. If not referenced, TSC will not 
+// Include all references prior to Main. If not referenced, TSC will not
 // bundle into app.js
 
 
