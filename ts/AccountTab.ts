@@ -570,7 +570,7 @@ module AccountTab {
           <div class="col-sm-3">
             <div #planHi class="membership-option"/>
           </div>
-          <div class="col-sm-12 hide">
+          <div #planXWrapper class="col-sm-12 hide">
             <div #planX class="membership-option"/>
           </div>
         </div>
@@ -630,8 +630,9 @@ module AccountTab {
       Employee plan is only shown to admins and to users already under
       that plan.
      */
-    if (Login.isAdmin())
-      planX.removeClass("hide");
+    if (Login.isAdmin()) {
+      planXWrapper.removeClass("hide");
+    }
 
     Api.getSubscriptionStatus(teamid)
       .done(initModal);
@@ -656,10 +657,14 @@ module AccountTab {
         suspendBtn.hide();
       }
       else if (membershipPlan && !Plan.isActive(membershipPlan)) {
-        var formatEndDate = "your next billing cycle";
+        var cutOffDate = moment("2015-09-18");
+        var formatEndDate = "your next billing cycle following " +
+           cutOffDate.format("MMMM D, YYYY");;
         if (customerStatus.current_period_end) {
           var endDate = moment(customerStatus.current_period_end);
-          endDate = endDate.add(1, 'month');
+          if ((endDate) < cutOffDate) {
+            endDate = endDate.add(1, 'month');
+          }
           formatEndDate = endDate.format("MMMM D, YYYY");
         }
         content.prepend(
