@@ -199,6 +199,7 @@ module Signin {
     rootView.removeClass("hide");
     rootView.append(view);
 
+    $('#init-loading').fadeOut(600);
     return _view;
   }
 

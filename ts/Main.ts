@@ -70,6 +70,11 @@ module Main {
     Status.init();
     Pay.init();
     (<any> $("[data-toggle='tooltip']")).tooltip(); // FIXME
+
+    // In case we forgot to hide loading screen somewhere
+    setTimeout(function() {
+      $('#init-loading').fadeOut();
+    }, 5000);
   }
 
   $(document).ready(main);

@@ -27,6 +27,12 @@
   </head>
 
   <body>
+    <div id="init-loading">
+      <div id="init-loading-text">
+        <i class="fa fa-fw fa-circle-o-notch fa-spin"></i>
+        Loading &hellip;
+      </div>
+    </div>
 
     <!-- The div for showing error and status messages. -->
     <div id="global-status"></div>
