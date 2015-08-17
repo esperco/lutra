@@ -18,6 +18,7 @@ module Page {
   }, undefined);
 
   function showPage(k) {
+    $('#init-loading').fadeOut(600);
     pageSelector.show(k);
   }
 
