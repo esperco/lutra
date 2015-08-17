@@ -26,7 +26,6 @@
 /// <reference path="Promise.ts"/>
 /// <reference path="XDate.ts"/>
 /// <reference path="Util.ts"/>
-/// <reference path="MP.ts"/>
 /// <reference path="GmailCompose.ts"/>
 /// <reference path="Pay.ts"/>
 /// <reference path="Status.ts"/>
