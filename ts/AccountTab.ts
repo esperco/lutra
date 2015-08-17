@@ -570,7 +570,7 @@ module AccountTab {
           <div class="col-sm-3">
             <div #planHi class="membership-option"/>
           </div>
-          <div class="col-sm-12 hide">
+          <div #planXWrapper class="col-sm-12 hide">
             <div #planX class="membership-option"/>
           </div>
         </div>
@@ -630,8 +630,9 @@ module AccountTab {
       Employee plan is only shown to admins and to users already under
       that plan.
      */
-    if (Login.isAdmin())
-      planX.removeClass("hide");
+    if (Login.isAdmin()) {
+      planXWrapper.removeClass("hide");
+    }
 
     Api.getSubscriptionStatus(teamid)
       .done(initModal);
