@@ -153,7 +153,7 @@ module Analytics {
         "Send Email"
       ][step] || "Step " + step;
       analytics.ready(function() {
-        analytics.page("onboarding", pageName, properties);
+        analytics.page("onboarding " + pageName, properties);
       });
     }
   }
