@@ -78,10 +78,12 @@ module ApiT {
     uid: string;
     api_secret: string;
     is_admin: boolean;
+    is_nylas: boolean;
     email: string;
     teams: Team[];
     team_members: TeamMember[];
     missing_shared_calendar: string; // teamid
+    waiting_for_sync: boolean;
   }
 
   export interface TokenInfo {
