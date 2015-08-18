@@ -714,7 +714,7 @@ module PreferencesTab {
       return selector;
   }
 
-  function createTimezoneSelector(selected) {
+  export function timeZoneSelectorView() {
 '''
 <select #currentTimezone
     class="esper-select esper-prefs-timezone">
@@ -977,6 +977,11 @@ module PreferencesTab {
   <option value="Pacific/Kiritimati">(GMT+14:00) Kiritimati</option>
 </select>
 '''
+    return currentTimezone;
+  };
+
+  function createTimezoneSelector(selected) {
+    var currentTimezone = timeZoneSelectorView();
     currentTimezone.children().each(function() {
       if (Number($(this).val()) === selected)
         $(this).prop("selected", true);

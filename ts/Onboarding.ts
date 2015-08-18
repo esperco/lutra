@@ -258,13 +258,7 @@ module Onboarding {
   }
 
   /* Step 1 => Confirm executive name and other info */
-  interface IStep1Map extends IJQMap {
-    form: JQuery;
-    name: JQuery;
-    phoneGroup: JQuery;
-  };
-
-  function _stepInfo(): IStep1Map {
+  function _stepInfo(refs: IOnboardingMap, tzSelector?: boolean): void {
 '''
 <form #form class="form">
   <div class="page-header">
@@ -297,11 +291,27 @@ module Onboarding {
              placeholder="555-555-5555" />
     </div>
   </div>
+  <div #tzGroup class="form-group row">
+    <label class="col-xs-12 control-label" for="step0-tz">
+      Preferred Timezone</label>
+    <div #tzSelectorDiv class="col-xs-12 js-tz"></div>
+  </div>
   <div class="form-group row"><div class="col-xs-12">
     <button #submit type="submit" class="btn btn-primary">Save</button>
   </div></div>
 </form>
 '''
+    // Add or hide timezone element
+    var tzSelectorInput;
+    if (tzSelector) {
+      tzSelectorInput = PreferencesTab.timeZoneSelectorView();
+      tzSelectorInput.attr("id", "step0-tz");
+      tzSelectorInput.addClass("form-control");
+      tzSelectorDiv.append(tzSelectorInput);
+    } else {
+      tzGroup.hide();
+    }
+
     // Set default name (in case we got this info from elsewhere)
     // NB: It'd be nice if we could check if there was currently a phone
     // number set too, but it's not worth making an extra API call, especially
@@ -334,6 +344,13 @@ module Onboarding {
         isValid = false;
       }
 
+      // Get & validate timezone
+      let tzVal = tzSelectorInput && tzSelectorInput.val();
+      if (tzSelectorInput && !tzVal) {
+        tzGroup.addClass("has-error");
+        isValid = false;
+      }
+
       // Validation failure -> exit
       if (! isValid) {
         return false;
@@ -355,35 +372,32 @@ module Onboarding {
         Api.setMeetingTypes(team.teamid, meetingTypes)
       ];
 
-      // AJAX calls for name and phone nubmer, then load step 1
+      // Add timezone info for Nylas if applicable
+      if (tzVal) {
+        calls.push(Api.setupNylasCalendar(team.teamid, nameVal, tzVal));
+      }
+
+      // AJAX calls for name and phone number, then load step 1
       //
       // TODO: Create new API endpoint for setting name and phone number
       // rather than shoehorn two calls together
       //
-      Deferred.join(calls).then(goToNext);
+      Deferred.join(calls, true).then(goToNext);
 
       // Prevent page reload
       return false;
     });
 
-    return {
-      form: form,
-      name: name,
-      phoneGroup: phoneGroup
-    };
+    refs.content.append(form);
+    name.focus();
   }
 
   function stepInfoGoogle(refs: IOnboardingMap): void {
-    var stepRefs = _stepInfo();
-    refs.content.append(stepRefs.form);
-    stepRefs.name.focus();
+    _stepInfo(refs, false);
   }
 
   function stepInfoExchange(refs: IOnboardingMap): void {
-    var stepRefs = _stepInfo();
-    stepRefs.phoneGroup.after('<div>hi</div>');
-    refs.content.append(stepRefs.form);
-    stepRefs.name.focus();
+    _stepInfo(refs, true);
   }
 
   /* Step 2 => Share calendars */
