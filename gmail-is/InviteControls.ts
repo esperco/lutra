@@ -185,15 +185,17 @@ module Esper.InviteControls {
         </div>
       </div>
       <div #calendarRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Calendar</div>
-        <div class="esper-ev-modal-right">
-          <select #pubCalendar class="esper-select"/>
+        <div class="esper-ev-modal-side-by-side">
+          <div class="esper-bold">Calendar</div>
+          <div>
+            <select #pubCalendar class="esper-select"/>
+          </div>
         </div>
-      </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Created by</div>
-        <div class="esper-ev-modal-right">
-          <select #fromSelect class="esper-select"/>
+        <div class="esper-ev-modal-side-by-side">
+          <div class="esper-bold">Created by</div>
+          <div>
+            <select #fromSelect class="esper-select"/>
+          </div>
         </div>
       </div>
       <div #notesRow class="esper-ev-modal-row esper-clearfix">
@@ -236,7 +238,13 @@ module Esper.InviteControls {
     Sidebar.customizeSelectArrow(pubCalendar);
     Sidebar.customizeSelectArrow(fromSelect);
 
-    pubTitle.val(state.title);
+    if (execEvent) {
+      pubTitle.val(state.title);
+    } else {
+      pubTitle.val("");
+      pubTitle.attr("placeholder", "Event with " + team.team_name);
+    }
+
     pubLocation.val(state.location.address);
 
     if (state.description) {
