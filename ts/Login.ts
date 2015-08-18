@@ -150,6 +150,13 @@ module Login {
       return false;
   };
 
+  export function isNylas() {
+    if (Util.isDefined(data))
+      return data.is_nylas === true;
+    else
+      return false;
+  };
+
   export function isExecCustomer(team) {
     if (Util.isDefined(data))
       return data.uid === team.team_executive

@@ -213,7 +213,10 @@ module Signin {
         saveBtn.prop("disabled", true);
         Api.getNylasLoginUrl(email)
           .then(function(result) {
-            window.location.href = result.url;
+            setLoginNonce().done(function(loginNonce) {
+              var url = result.url + "&state=" + loginNonce;
+              window.location.href = url;
+            });
           }, function(err) {
             console.error(err);
             saveBtn.text("Save");
@@ -415,13 +418,18 @@ module Signin {
         .done(function(ok) {
           if (ok) {
             var landingUrl = document.URL;
-            checkGooglePermissions(landingUrl)
-              .done(function(ok) {
-                if (Array.isArray(optArgs)) // how it should be.
-                  whenDone.apply(this, optArgs);
-                else // it's a bug but whatever.
-                  whenDone(optArgs);
-              });
+            function done(ok) {
+              if (Array.isArray(optArgs)) // how it should be.
+                whenDone.apply(this, optArgs);
+              else // it's a bug but whatever.
+                whenDone(optArgs);
+            }
+            if (Login.isNylas()) {
+              // TODO Nylas permissions check?
+              done(true);
+            } else {
+              checkGooglePermissions(landingUrl).done(done);
+            }
           }
         });
     }

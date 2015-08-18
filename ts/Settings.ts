@@ -392,14 +392,18 @@ module Settings {
       return false;
     });
 
-    Api.getGoogleAuthInfo(document.URL)
-      .done(function(info) {
-        if (info.has_token)
-          revoke.removeClass("hide");
-        else {
-          window.location.assign(info.google_auth_url);
-        }
-      });
+    if (Login.isNylas()) {
+      // TODO Do we need to do Nylas auth here?
+    } else {
+      Api.getGoogleAuthInfo(document.URL)
+        .done(function(info) {
+          if (info.has_token)
+            revoke.removeClass("hide");
+          else {
+            window.location.assign(info.google_auth_url);
+          }
+        });
+    }
 
     referBody.append(renderReferSection());
 
