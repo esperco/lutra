@@ -17,9 +17,10 @@ module Page {
     "usage-period": {ids:["usage-period-page"]}
   }, undefined);
 
-  function showPage(k) {
+  function showPage(k, properties?: Object) {
     $('#init-loading').fadeOut(600);
     pageSelector.show(k);
+    Analytics.page(k, properties);
   }
 
 
@@ -53,7 +54,7 @@ module Page {
     load: function(step=0,
                    opts?: {fromLogin?: boolean, inviteCode?: string}) {
       pageSelector.hideAll();
-      showPage("onboarding");
+      showPage("onboarding", {step: step, opts: opts});
       Log.d("Onboarding.load()");
       Onboarding.load(step, opts);
       Util.focus();

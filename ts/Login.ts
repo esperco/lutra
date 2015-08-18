@@ -55,6 +55,9 @@ module Login {
     Store.set("login", stored);
     data = stored;
     postLoginInfo();
+
+    // Identify in analytics
+    Analytics.identify();
   };
 
   function saveLoginInfo() {
@@ -73,6 +76,9 @@ module Login {
 
     Store.remove("login");
     delete data;
+
+    // This will clear analytics tracking identity as appropriate
+    Analytics.identify();
   };
 
   export function clearAllLoginInfo() {
@@ -86,7 +92,6 @@ module Login {
   };
 
   export function logout() {
-    MP.track("Logout");
     clearLoginInfo();
   };
 
