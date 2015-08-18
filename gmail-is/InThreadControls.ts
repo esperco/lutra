@@ -8,20 +8,26 @@ module Esper.InThreadControls {
 <div #controls class="esper-in-thread-controls">
 </div>
 '''
-    // Remove any old instances of the controls:
-    $(".esper-in-thread-controls").remove();
+    removeControls();
 
     Gmail.threadMessages().after(controls);
 
-    controls.empty();
     controls.append(taskNotes());
   }
 
   CurrentThread.currentTeam.watch(function () {
-    if (CurrentThread.currentTeam.isValid()) {
+    if (CurrentThread.currentTeam.isValid() &&
+        CurrentThread.currentTeam.get().isSome()) {
       refreshTaskNotes();
+    } else {
+      removeControls();
     }
   });
+
+    // Remove any old instances of the controls:
+  function removeControls () {
+    $(".esper-in-thread-controls").remove();
+  }
 
   // The id for the notes watcher so that only one exists at a time.
   var notesWatcherId;
@@ -46,8 +52,8 @@ module Esper.InThreadControls {
 '''
     var notes = "";
 
-    notesWatcherId = CurrentThread.task.watch(function (task) {
-      if (task) {
+    notesWatcherId = CurrentThread.task.watch(function (task, valid, oldTask) {
+      if (valid && task != oldTask) {
         notes = task.task_notes || ""; // "" if task.task_notes is undefined
       } else {
         notes = "";
