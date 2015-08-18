@@ -259,11 +259,7 @@ module TeamSettings {
         if (onboarding) switchTabByName("cal");
       });
 
-    signOut.click(function() {
-      Login.clearLoginInfo();
-      Signin.signin(function(){}, undefined, undefined, undefined);
-      return false;
-    });
+    signOut.click(Login.logout);
   }
 
 }

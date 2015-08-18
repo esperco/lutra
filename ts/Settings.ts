@@ -229,10 +229,7 @@ module Settings {
         });
     });
 
-    clearSync.click(function() {
-      Login.clearAllLoginInfo();
-      Signin.signin(function(){});
-    });
+    clearSync.click(Login.logout);
 
     return view;
   }
@@ -329,28 +326,16 @@ module Settings {
       .append("<span>UID: </span>")
       .append("<span class='gray'>" + Login.me() + "</span>");
 
+    // If only one team, redirect to that team
     var teams = Login.getTeams();
     if (teams.length === 1 && firstTime) {
       firstTime = false;
-      var joinTeam = Login.data.missing_shared_calendar;
-      if (teams[0] !== null) {
-        Login.setTeam(teams[0]); //refresh login data since assistants/aliases may have been added during setup
-        if (Util.isString(joinTeam)) {
-          var step = 1;
-
-          // Has team name been set yet?
-          if (Login.data.email !== Login.data.team.team_name) {
-            step = 2; // Move to calendar step
-          }
-
-          // This is a new exec customer who needs to be onboarded
-          location.hash = "#!join/" + step;
-        }
-        else {
-          location.hash = "#!team-settings/" + teams[0].teamid;
-        }
+      if (teams[0]) {
+        Login.setTeam(teams[0]);
+        location.hash = "#!team-settings/" + teams[0].teamid;
       }
     }
+
     var uid = Login.me();
     var isExec = false;
     List.iter(teams, function(team) {
@@ -366,11 +351,7 @@ module Settings {
 
     footer.append(Footer.load());
 
-    signOut.click(function() {
-      Login.clearLoginInfo();
-      Signin.signin(function(){}, undefined, undefined, undefined);
-      return false;
-    });
+    signOut.click(Login.logout);
 
     closeContainer.click(function() { installContainer.slideUp(); });
 
@@ -392,9 +373,7 @@ module Settings {
       return false;
     });
 
-    if (Login.isNylas()) {
-      // TODO Do we need to do Nylas auth here?
-    } else {
+    if (! Login.isNylas()) {
       Api.getGoogleAuthInfo(document.URL)
         .done(function(info) {
           if (info.has_token)

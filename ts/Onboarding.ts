@@ -31,9 +31,45 @@ module Onboarding {
     flow: googleSteps
   };
 
+  // Checks if current user needs onboarding. If onboarding is required,
+  // returns false and changes hash to trigger redirect. Else returns true.
+  export function checkStatus(): boolean {
+    // To prevent redirect loop
+    if (location.hash.slice(0, 6) === "#!join") {
+      return true;
+    }
+
+    var teams = Login.getTeams();
+    if (teams.length === 1 && teams[0] !== null) {
+      var team = teams[0];
+
+      if (!Util.isString(team.team_name) ||
+          !team.team_name.trim() ||
+          Login.data.email === team.team_name) {
+        if (Login.isNylas()) {
+          Route.nav.path("join/exchange/1");
+        } else {
+          Route.nav.path("join/1");
+        }
+        return false;
+      }
+
+      else if (Login.data.missing_shared_calendar) {
+        Route.nav.path("join/2"); // calendar step
+        return false;
+      }
+
+      else if (Login.isNylas() && Login.data.waiting_for_sync) {
+        Route.nav.path("join/exchange/" + (exchangeSteps.length - 1));
+        return false;
+      }
+    }
+    return true;
+  }
+
   // Routes to next onboarding step
   export function goToNext() {
-    let basePath = "#!join/";
+    let basePath = "join/";
     if (currentState.flow === exchangeSteps) {
       basePath += "exchange/";
     }
@@ -285,7 +321,7 @@ module Onboarding {
 
       // Get & validate name
       let nameVal = name.val();
-      if (! nameVal) {
+      if (!nameVal || nameVal === Login.data.email) {
         nameGroup.addClass("has-error");
         isValid = false;
       }

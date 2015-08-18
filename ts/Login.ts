@@ -93,6 +93,9 @@ module Login {
 
   export function logout() {
     clearLoginInfo();
+    Route.nav.home();
+    return false; // Allows us to use in forms or links directly and have the
+                  // default browser action be suppressed
   };
 
   /*

@@ -318,7 +318,7 @@ module Signin {
       msgDiv.html(msg);
 
     buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
-    // buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
+    buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
 
     rootView.removeClass("hide");
     rootView.append(view);
@@ -337,15 +337,12 @@ module Signin {
       .then(
         /* success */
         function(tokenDescription) {
-          Page.onboarding.load(0, {inviteCode: inviteCode});
+          Page.onboarding.load(0, { inviteCode: inviteCode });
           showTokenDetails(tokenDescription);
         },
         /* failure */
         function() {
-          // Set hash -- but also explicitly load since CanJS doesn't always
-          // work properly
-          window.location.hash = "#!join";
-          Page.onboarding.load();
+          Route.nav.path("join");
         }
       );
   }
@@ -404,31 +401,22 @@ module Signin {
       });
   }
 
-  // NB: optName arg is deprecated. Keep now for compatability.
-  export function signin(whenDone: { (...any): void },
-                         optArgs?: any[],
-                         optInviteCode?: string,
-                         optEmail?: string,
-                         optName?: string) {
+  export function signin( whenDone?: { (): void },
+                          optInviteCode?: string,
+                          optEmail?: string) {
     document.title = "Sign in - Esper";
     if (optInviteCode !== undefined) {
       useInvite(optInviteCode);
     } else {
       loginOrSignup(optEmail)
-        .done(function(ok) {
+        .done(function(ok) { // Logged in
           if (ok) {
             var landingUrl = document.URL;
-            function done(ok) {
-              if (Array.isArray(optArgs)) // how it should be.
-                whenDone.apply(this, optArgs);
-              else // it's a bug but whatever.
-                whenDone(optArgs);
-            }
+            whenDone = whenDone || function() { };
             if (Login.isNylas()) {
-              // TODO Nylas permissions check?
-              done(true);
+              whenDone();
             } else {
-              checkGooglePermissions(landingUrl).done(done);
+              checkGooglePermissions(landingUrl).done(whenDone);
             }
           }
         });
@@ -449,23 +437,15 @@ module Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-
-        window.location.hash = "#!";
-        // NB: CanJS routing doesn't seem to catch this hash change sometimes.
-        // Call settings page load directly.
-        Page.settings.load();
+        Route.nav.home();
       })
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
-          // See above note re CanJS
-          Page.onboarding.load(0, {fromLogin: true});
-          window.location.hash = "#!join-from-login";
+          Route.nav.path("join-from-login");
         } else {
-          // See above note re CanJS
-          window.location.hash = "#!";
-          displayLoginLinks("We were unable to login.",
-            "#!", undefined, undefined);
+          Route.nav.home();
+          Status.reportError("We were unable to login.");
         }
       });
   };
