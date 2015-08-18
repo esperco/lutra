@@ -52,7 +52,9 @@ module Page {
 
   export var onboarding: Loadable = {
     load: function(step=0,
-                   opts?: {fromLogin?: boolean, inviteCode?: string}) {
+                   opts?: {fromLogin?: boolean,
+                           inviteCode?: string,
+                           exchange?: boolean}) {
       pageSelector.hideAll();
       showPage("onboarding", {step: step, opts: opts});
       Log.d("Onboarding.load()");

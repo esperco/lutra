@@ -5,9 +5,44 @@
 /// <reference path="TeamSettings.ts"/>
 
 module Onboarding {
-  // Routes to a particular onboarding step
-  export function goToStep(step: number) {
-    Route.nav.path("#!join/" + step);
+  // Interface for references from string names to jQuery wrapper
+  interface IJQMap {
+    [index: string]: JQuery;
+  }
+
+  let googleSteps = [ step0,
+                      stepInfoGoogle,
+                      stepCalendar,
+                      stepCC,
+                      stepSendMail ];
+  let exchangeSteps = [  step0,
+                         stepInfoExchange,
+                         // Skip calendar
+                         stepCC,
+                         stepSendMail ];
+
+  // Object to store onboarding state for other functions
+  interface ICurrentState {
+    step: number;
+    flow: { (refs: IJQMap): void; } [];
+  };
+  let currentState: ICurrentState = {
+    step: 0,
+    flow: googleSteps
+  };
+
+  // Routes to next onboarding step
+  export function goToNext() {
+    let basePath = "#!join/";
+    if (currentState.flow === exchangeSteps) {
+      basePath += "exchange/";
+    }
+    let step = currentState.step || 0;
+    step += 1;
+    if (step > currentState.flow.length - 1) {
+      step = 0;
+    }
+    Route.nav.path(basePath + step);
   }
 
   // Returns the root container object into which we insert onboarding stuff
@@ -15,14 +50,15 @@ module Onboarding {
     return $("#onboarding-interface");
   }
 
-  // Interface for references from string names to jQuery wrapper
-  interface IJQMap {
-    [index: string]: JQuery;
-  }
-
   // Loads the main wrapper UX for onboarding, returns a JQuery wrapper for
   // where step-specific content should go
-  function loadContainer(): IJQMap {
+  interface IOnboardingMap extends IJQMap {
+    view: JQuery;
+    progress: JQuery;
+    content: JQuery;
+  };
+
+  function loadContainer(): IOnboardingMap {
 '''
 <div #view class="onboarding">
   <div class="container">
@@ -45,17 +81,23 @@ module Onboarding {
     };
   }
 
-  let steps = [step0, step1, step2, step3, step4];
-
   export function load(step = 0,
-                       opts?: {fromLogin?: boolean, inviteCode?: string}) {
+                       opts?: {fromLogin?: boolean,
+                               inviteCode?: string,
+                               exchange?: boolean}) {
     var refs = loadContainer();
+    currentState.step = step;
+    currentState.flow = (opts && opts.exchange) ? exchangeSteps : googleSteps;
+
+    var progress = Math.round(100 * ((step + 1) / currentState.flow.length));
+    refs.progress.width(progress + "%");
+
     if (opts && opts.fromLogin) {
       step0FromLogin(refs);
     } else if (opts && opts.inviteCode) {
       step0FromInvite(refs, opts.inviteCode);
     } else {
-      steps[step](refs);
+      currentState.flow[step](refs);
     }
   }
 
@@ -73,8 +115,6 @@ module Onboarding {
 
   // Base function for our "step 0" join page -- takes a custom message
   function _step0(refs: IJQMap, customMsg?: string, inviteCode?: string): void {
-    refs["progress"].width("20%");
-
     // Log out if applicable
     if (Login.data) {
       Login.clearLoginInfo();
@@ -124,7 +164,7 @@ module Onboarding {
     buttonContainer.append(googleButton);
 
     var exchangeButton = Signin.exchangeButton(
-      /* landingUrl */ "#!join/1",
+      /* landingUrl */ "#!join/exchange/1",
       /* optInvite  */ inviteCode,
       /* optEmail   */ undefined,
       /* optSignup  */ true);
@@ -142,16 +182,16 @@ module Onboarding {
   }
 
   /* Step 0 => Sign in normally */
-  function step0(refs: IJQMap): void {
+  function step0(refs: IOnboardingMap): void {
     _step0(refs);
   }
 
-  function step0FromLogin(refs: IJQMap): void {
+  function step0FromLogin(refs: IOnboardingMap): void {
     _step0(refs, `We don't have a registered account for you.<br />
       Please sign in again to create an account.`);
   }
 
-  function step0FromInvite(refs: IJQMap, inviteCode: string): void {
+  function step0FromInvite(refs: IOnboardingMap, inviteCode: string): void {
     _step0(refs, `Thanks for accepting our invite!<br />
       Our assistants need access to your calendar to assist with scheduling.
       Please sign in with the account tied to your primary calendar to
@@ -181,9 +221,14 @@ module Onboarding {
     }
   }
 
-  /* Step 1 => Confirm executive name */
-  function step1(refs: IJQMap): void {
-    refs["progress"].width("40%");
+  /* Step 1 => Confirm executive name and other info */
+  interface IStep1Map extends IJQMap {
+    form: JQuery;
+    name: JQuery;
+    phoneGroup: JQuery;
+  };
+
+  function _stepInfo(): IStep1Map {
 '''
 <form #form class="form">
   <div class="page-header">
@@ -279,23 +324,34 @@ module Onboarding {
       // TODO: Create new API endpoint for setting name and phone number
       // rather than shoehorn two calls together
       //
-      Deferred.join(calls)
-        .then(function() {
-          goToStep(2);
-        });
+      Deferred.join(calls).then(goToNext);
 
       // Prevent page reload
       return false;
     });
 
-    let content = refs["content"];
-    content.append(form);
-    name.focus();
+    return {
+      form: form,
+      name: name,
+      phoneGroup: phoneGroup
+    };
+  }
+
+  function stepInfoGoogle(refs: IOnboardingMap): void {
+    var stepRefs = _stepInfo();
+    refs.content.append(stepRefs.form);
+    stepRefs.name.focus();
+  }
+
+  function stepInfoExchange(refs: IOnboardingMap): void {
+    var stepRefs = _stepInfo();
+    stepRefs.phoneGroup.after('<div>hi</div>');
+    refs.content.append(stepRefs.form);
+    stepRefs.name.focus();
   }
 
   /* Step 2 => Share calendars */
-  function step2(refs: IJQMap): void {
-    refs["progress"].width("60%");
+  function stepCalendar(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -348,17 +404,15 @@ module Onboarding {
 
             // Then redirect to next / final step
             .then(function() {
-              goToStep(3);
+              goToNext();
             });
         });
       });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 
-  function step3(refs: IJQMap): void {
-    refs["progress"].width("80%");
+  function stepCC(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -384,7 +438,7 @@ module Onboarding {
         if (err) {
           unmakeBusy(primaryBtn);
         } else {
-          goToStep(4);
+          goToNext();
         }
       });
     formContainer.append(paymentRefs.form);
@@ -396,13 +450,11 @@ module Onboarding {
       paymentRefs.form.submit();
     });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 
   /* Step 4 => complete */
-  function step4(refs: IJQMap): void {
-    refs["progress"].width("100%");
+  function stepSendMail(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -465,7 +517,6 @@ module Onboarding {
       Analytics.track(Analytics.Trackable.ClickLearnMoreAboutEsper);
     });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 }

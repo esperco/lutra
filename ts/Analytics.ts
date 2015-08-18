@@ -105,6 +105,27 @@ module Analytics {
   declare var analytics: ISegment<IIntegrations>;
 
 
+  // Helper to flatten objects into a single level, which works better with
+  // Mixpanel than nested objects
+  interface IFlatProps {
+    [index: string]: number|string|boolean|Date;
+  };
+  function flatten(obj: Object, prefix?: string, ret?: IFlatProps): IFlatProps {
+    ret = ret || {};
+    prefix = prefix ? prefix + "." : "";
+    for (let name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        if (typeof obj[name] === "object") {
+          console.log('hi');
+          ret = flatten(obj[name], prefix + name, ret);
+        } else {
+          ret[prefix + name] = obj[name];
+        }
+      }
+    }
+    return ret;
+  }
+
   // Our actual analytics code /////////////
 
   export function init() {
@@ -139,19 +160,30 @@ module Analytics {
 
   // Track which page you're on
   export function page(page: string, properties?: Object) {
-    properties = properties || {};
+    properties = flatten(properties || {});
     properties['url'] = location.href; // So hash is included
 
     // For now, only track onboarding
     if (page === "onboarding") {
       var step = properties['step'] || 0;
-      var pageName = [
-        "Signin",
-        "Name & Number",
-        "Calendar",
-        "Credit Card",
-        "Send Email"
-      ][step] || "Step " + step;
+      var pageNames;
+      if (properties && properties["exchange"]) {
+        pageNames = [
+          "Signin",
+          "Name & Number",
+          "Credit Card",
+          "Send Email"
+        ];
+      } else {
+        pageNames = [
+          "Signin",
+          "Name & Number",
+          "Calendar",
+          "Credit Card",
+          "Send Email"
+        ];
+      }
+      var pageName = pageNames[step] || "Step " + step;
       analytics.ready(function() {
         analytics.page("onboarding " + pageName, properties);
       });
@@ -161,7 +193,6 @@ module Analytics {
   // Events to track
   export enum Trackable {
     ClickSignIn,
-    ClickSignIn
     ClickShareCalendar,
     ClickCreditCard,
     ClickCongratsEmail,
@@ -171,7 +202,7 @@ module Analytics {
   export function track(event: Trackable, properties?: Object) {
     var eventName = Trackable[event];
     analytics.ready(function() {
-      analytics.track(eventName, properties);
+      analytics.track(eventName, flatten(properties || {}));
     });
   }
 }

@@ -101,12 +101,25 @@ module Route {
       Page.onboarding.load(0, {fromLogin: true});
     },
 
+    "join/exchange route": function (data) {
+      Page.onboarding.load(0, {exchange: true});
+    },
+
     "join/:step route" : function (data) {
       let step = parseInt(data.step) || 0;
       if (step) {
         withLogin(Page.onboarding.load, [step]);
       } else {
         Page.onboarding.load();
+      }
+    },
+
+    "join/exchange/:step route" : function (data) {
+      let step = parseInt(data.step) || 0;
+      if (step) {
+        withLogin(Page.onboarding.load, [step, {exchange: true}]);
+      } else {
+        Page.onboarding.load(0, {exchange: true});
       }
     },
 
