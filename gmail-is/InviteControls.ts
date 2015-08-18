@@ -257,6 +257,14 @@ module Esper.InviteControls {
     // Initializing the calendar dropdown:
     var publicCalId = state.calendarId;
 
+    if (duplicate && !execEvent) {
+      var dupeCal = List.find(team.team_calendars, function (c) {
+        return c.calendar_default_dupe;
+      });
+
+      publicCalId = dupeCal ? dupeCal.google_cal_id : publicCalId;
+    }
+
     if (publicCalId) {
       pubCalendar.val(publicCalId);
     }
