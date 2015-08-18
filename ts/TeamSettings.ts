@@ -132,15 +132,20 @@ module TeamSettings {
     });
 
     contentAcc.append(AccountTab.load(team, plans, payment));
-    contentCal.append(CalendarsTab.load(team));
+    if (Login.isNylas()) {
+      tabCal.remove();
+      contentCal.remove();
+    } else {
+      contentCal.append(CalendarsTab.load(team));
+    }
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentAbt.append(AboutTab.load(team, onboarding));
 
     if (onboarding) {
-    // We'll guide the exec through each step
+      // We'll guide the exec through each step
       tabsDiv.remove();
-      }
+    }
 
     /* We don't have access to executive email accounts,
      * so executives don't need to configure label sync. */

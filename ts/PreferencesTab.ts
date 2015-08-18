@@ -1600,15 +1600,17 @@ module PreferencesTab {
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
 
-    var savedColor = general.hold_event_color;
-    showEventColorPicker(colorPicker, holdColor, savedColor);
-    holdColor.click(function() {
-      var check = holdColor.is(":checked");
-      if (!check)
-        $(".esper-event-color").removeClass("esper-event-color-selected");
-      if (!check || $(".esper-event-color-selected").length > 0)
-        saveGeneralPrefs();
-    });
+    if (!Login.isNylas()) {
+      var savedColor = general.hold_event_color;
+      showEventColorPicker(colorPicker, holdColor, savedColor);
+      holdColor.click(function() {
+        var check = holdColor.is(":checked");
+        if (!check)
+          $(".esper-event-color").removeClass("esper-event-color-selected");
+        if (!check || $(".esper-event-color-selected").length > 0)
+          saveGeneralPrefs();
+      });
+    }
 
     return view;
   }
