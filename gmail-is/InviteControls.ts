@@ -160,7 +160,7 @@ module Esper.InviteControls {
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteSlide(state : InviteState, exec_event : boolean):
+  export function inviteSlide(state : InviteState, execEvent : boolean):
   Slides.Slide<InviteState> {
 '''
 <div #container>
@@ -311,8 +311,8 @@ module Esper.InviteControls {
     var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
 
-    if (exec_event) {
-      heading.text("Exec Event Details");
+    if (execEvent) {
+      heading.text(team.team_name + "'s Event Details");
       calendarRow.remove();
 
       if (duplicate) {
@@ -394,129 +394,96 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderSlide(state : InviteState): Slides.Slide<InviteState> {
+  function reminderSlide(state : InviteState, execEvent? : boolean): Slides.Slide<InviteState> {
 '''
 <div #container>
   <div #heading class="esper-modal-header">
-    Set an automatic reminder for the exec
+    Set an automatic reminder.
   </div>
-  <div class="esper-ev-modal-content">
+  <div #reminderForm class="esper-ev-modal-content">
     <div class="esper-reminder-options">
       <label>
-        <span class="esper-reminder-label">Executive</span>
-        <span #execWarning class="esper-reminder-warning"> Invalid time: </span>
-        <input #execTime type="text" value="24"> </input> hours before event
+        <span class="esper-reminder-label"></span>
+        <span #timeWarning class="esper-reminder-warning"> Invalid time: </span>
+        <input #timeField type="text" value="24"> </input> hours before event
       </label>
-      <button #execButton class="esper-btn esper-btn-safe esper-btn-toggle">
+      <button #reminderButton class="esper-btn esper-btn-safe esper-btn-toggle">
         Enabled
       </button>
     </div>
-    <textarea #execReminderField
+  </div>
+</div>
+<textarea #execField
       rows=24 class="esper-input esper-reminder-text">
-Hello|exec|,
+Hello |exec|,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
 </textarea>
-    <div class="esper-reminder-options">
-      <label>
-        <span class="esper-reminder-label">Guests</span>
-        <span #guestsWarning class="esper-reminder-warning"> Invalid time: </span>
-        <input #guestsTime type="text" value="24"> </input> hours before event
-      </label>
-      <button #guestsButton class="esper-btn esper-btn-safe esper-btn-toggle">
-        Enabled
-      </button>
-    </div>
-    <textarea #guestsReminderField
-       rows=24 class="esper-input esper-reminder-text">
+<textarea #guestField
+      rows=24 class="esper-input esper-reminder-text">
 Hello,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
 </textarea>
-  </div>
-</div>
 '''
-    var execEnabled   = true;
-    var guestsEnabled = true;
-
     var team      = state.prefs.team;
     var duplicate = state.prefs.execPrefs.general.use_duplicate_events;
 
-    var execReminder, guestsReminder;
-    if (state.reminders) {
-      execReminder   = state.reminders.exec;
-      guestsReminder = state.reminders.guests;
+    var key     = execEvent ? "exec" : "guests";
+    var execEnabled = state.reminders && state.reminders.exec;
+
+    var enabled = true;
+
+    var reminderField = execEvent ? execField : guestField;
+    reminderForm.append(reminderField);
+
+    if (!execEnabled && key == "exec") {
+      enabled = false;
+      toggleButton(reminderButton);
     }
 
-    if (!execReminder) {
-      execEnabled = false;
-      toggleButton(execButton);
+    var name = team.team_name;
+
+    if (execEvent) {
+      heading.text("Set an automatic reminder for " + name);
+    } else {
+      heading.text("Set an automatic reminder for the guests.");
     }
 
-    // Fill out static parts of message template (ie exec name and guests):
-    Api.getProfile(team.team_executive, team.teamid).done(function (profile) {
-      var name       = profile.display_name ? " " + profile.display_name : "";
+    var eventTitle = state.title || "a meeting";
 
-      var eventTitle = state.title || "a meeting";
-      var guestTitle = state.title || "a meeting";
-
-      execReminderField.val(execReminderField.val()
-        .replace("|exec|", name)
-        .replace("|event|", eventTitle));
-
-      guestsReminderField.val(guestsReminderField.val()
-        .replace("|event|", guestTitle));
-    });
+    reminderField.val(reminderField.val()
+                      .replace("|exec|", name)
+                      .replace("|event|", eventTitle));
 
     function getState(): InviteState {
-      var reminders = null;
+      var reminders = $.extend({}, state.reminders);
 
-      var execInvalid   = isNaN(execTime.val() * 1);
-      var guestsInvalid = isNaN(guestsTime.val() * 1);
+      var invalidTime = isNaN(timeField.val() * 1);
 
       // If one of the entries is an invalid number, highlight it and
       // don't go to the next slide.
-      if (execInvalid || guestsInvalid) {
-        if (execInvalid) {
-          execTime.addClass("esper-danger");
-          execWarning.show();
-        }
-        if (guestsInvalid) {
-          guestsTime.addClass("esper-danger");
-          guestsWarning.show();
-        }
+      if (invalidTime) {
+        timeField.addClass("esper-danger");
+        timeWarning.show();
 
         throw Slides.invalidState;
       }
 
-      if (execEnabled || guestsEnabled) {
-        reminders = {
-          exec : {
-            text : execReminderField.val(),
-            time : execEnabled && Math.floor(execTime.val() * 60 * 60)
-          },
-          guests : {
-            text : guestsReminderField.val(),
-            time : guestsEnabled && Math.floor(guestsTime.val() * 60 * 60)
-          }
-        };
-      }
+      reminders[key] = {
+        text : reminderField.val(),
+        time : enabled && Math.floor(timeField.val() * 60 * 60)
+      };
 
       var newState = $.extend({}, state);
       newState.reminders = reminders;
       return newState;
     }
 
-    execButton.click(function () {
-      toggleButton(execButton);
+    reminderButton.click(function () {
+      toggleButton(reminderButton);
 
-      execEnabled = !execEnabled;
-    });
-
-    guestsButton.click(function () {
-      toggleButton(guestsButton);
-
-      guestsEnabled = !guestsEnabled;
+      enabled = !enabled;
     });
 
     return {
@@ -640,10 +607,10 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               Slides.create<InviteState>(startState, slides, controls);
             Gmail.threadContainer().after(slideWidget);
           } else {
-            function wrap(slideFn : (InviteState) => Slides.Slide<InviteState>,
+            function wrap(slideFn : (InviteState, boolean?) => Slides.Slide<InviteState>,
                           key : string) {
               return function (state : DualState) : Slides.Slide<DualState> {
-                var slide = slideFn(state[key]);
+                var slide = slideFn(state[key], key == "exec");
                 return {
                   element : slide.element,
                   getState : function () {
@@ -655,24 +622,17 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               }
             }
 
-            function execInviteSlide(state) {
-              return inviteSlide(state, true);
-            }
-
-            function guestsInviteSlide(state) {
-              return inviteSlide(state, false);
-            }
-
             var dualStartState = {
               exec   : populateInviteState(event, prefs),
               guests : populateInviteState(event, prefs),
             };
 
             var dualSlides = [
-              wrap(execInviteSlide, "exec"),
+              wrap(inviteSlide, "exec"),
+              wrap(reminderSlide, "exec"),
               wrap(descriptionSlide, "exec"),
 
-              wrap(guestsInviteSlide, "guests"),
+              wrap(inviteSlide, "guests"),
               wrap(reminderSlide, "guests"),
               wrap(descriptionSlide, "guests"),
             ];
