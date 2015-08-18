@@ -160,7 +160,7 @@ module Esper.InviteControls {
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteSlide(state : InviteState, execEvent : boolean):
+  export function inviteSlide(state : InviteState, duplicate? : boolean, execEvent? : boolean):
   Slides.Slide<InviteState> {
 '''
 <div #container>
@@ -225,7 +225,7 @@ module Esper.InviteControls {
 </div>
 <div #guestsEventTag class="esper-badge esper-badge-orange"
      title="This is the event duplicated for inviting guests.">
-  Exec event
+  Guest event
 </div>
 '''
     var prefs    = state.prefs;
@@ -394,7 +394,8 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderSlide(state : InviteState, execEvent? : boolean): Slides.Slide<InviteState> {
+  function reminderSlide(state : InviteState, duplicate? : boolean, 
+                         execEvent? : boolean): Slides.Slide<InviteState> {
 '''
 <div #container>
   <div #heading class="esper-modal-header">
@@ -425,6 +426,14 @@ Hello,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
 </textarea>
+<div #execEventTag class="esper-badge esper-badge-blue"
+     title="This is the event only for the exec.">
+  Exec event
+</div>
+<div #guestsEventTag class="esper-badge esper-badge-orange"
+     title="This is the event duplicated for inviting guests.">
+  Guest event
+</div>
 '''
     var team      = state.prefs.team;
     var duplicate = state.prefs.execPrefs.general.use_duplicate_events;
@@ -448,6 +457,16 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       heading.text("Set an automatic reminder for " + name);
     } else {
       heading.text("Set an automatic reminder for the guests.");
+    }
+
+    if (execEvent) {
+      if (duplicate) {
+        execEventTag.appendTo(heading);
+      }
+    } else {
+      if (duplicate) {
+        guestsEventTag.appendTo(heading);
+      }
     }
 
     var eventTitle = state.title || "a meeting";
@@ -508,7 +527,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionSlide(state : InviteState) :
+  export function descriptionSlide(state : InviteState, duplicate? : boolean, execEvent? : boolean) :
   Slides.Slide<InviteState> {
 '''
 <div #container>
@@ -525,16 +544,39 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     </textarea>
   </div>
 </div>
+<div #execEventTag class="esper-badge esper-badge-blue"
+     title="This is the event only for the exec.">
+  Exec event
+</div>
+<div #guestsEventTag class="esper-badge esper-badge-orange"
+     title="This is the event duplicated for inviting guests.">
+  Guest event
+</div>
 '''
     var team     = state.prefs.team;
+    var name     = team.team_name;
     var threadId = CurrentThread.threadId.get();
     var original = state.event;
+
+    if (execEvent) {
+      heading.text("Review " + name + "'s event description");
+    }
 
     Api.getRestrictedDescription(team.teamid,
                                  original.google_event_id, state.guests)
       .done(function (description) {
         descriptionField.val(state.notes + description.description_text);
       });
+
+    if (execEvent) {
+      if (duplicate) {
+        execEventTag.appendTo(heading);
+      }
+    } else {
+      if (duplicate) {
+        guestsEventTag.appendTo(heading);
+      }
+    }
 
     var descriptionMessageids = [];
 
@@ -582,12 +624,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         some : function (prefs) {
           var slideWidget;
 
-          function nonDuplicateInviteSlide(state) {
-            return inviteSlide(state, false);
-          }
-
           if (!prefs.execPrefs.general.use_duplicate_events) {
-            var slides = [nonDuplicateInviteSlide, reminderSlide, descriptionSlide];
+            var slides = [inviteSlide, reminderSlide, descriptionSlide];
             var startState = populateInviteState(event, prefs);
             var controls = {
               onCancel : function () { /* no actions needed */ },
@@ -607,10 +645,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               Slides.create<InviteState>(startState, slides, controls);
             Gmail.threadContainer().after(slideWidget);
           } else {
-            function wrap(slideFn : (InviteState, boolean?) => Slides.Slide<InviteState>,
-                          key : string) {
+            function wrap(slideFn : (state : InviteState, duplicate? : boolean, 
+                                     execEvent? : boolean) => Slides.Slide<InviteState>,
+                          key : string) 
+            : (state : DualState) => Slides.Slide<DualState> {
               return function (state : DualState) : Slides.Slide<DualState> {
-                var slide = slideFn(state[key], key == "exec");
+                var slide = slideFn(state[key], true, key == "exec");
                 return {
                   element : slide.element,
                   getState : function () {
