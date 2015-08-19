@@ -116,7 +116,6 @@ module Analytics {
     for (let name in obj) {
       if (obj.hasOwnProperty(name)) {
         if (typeof obj[name] === "object") {
-          console.log('hi');
           ret = flatten(obj[name], prefix + name, ret);
         } else {
           ret[prefix + name] = obj[name];
