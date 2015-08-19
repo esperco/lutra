@@ -167,7 +167,7 @@ module Analytics {
     if (page === "onboarding") {
       var step = properties['step'] || 0;
       var pageNames;
-      if (properties && properties["exchange"]) {
+      if (properties && properties["opts.exchange"]) {
         pageNames = [
           "Signin",
           "Name & Number",
