@@ -577,20 +577,26 @@ module Onboarding {
     // Exchange / Nylas
     if (Login.isNylas()) {
       mailMsgLink.attr("href", "mailto:" + asstEmail +
-      "?subject=" + encodeURIComponent(emailSubj) +
-      "&body=" + encodeURIComponent(emailText));
+        "?subject=" + encodeURIComponent(emailSubj) +
+        "&body=" + encodeURIComponent(emailText));
     }
 
     // Gmail
     else {
       mailMsgLink.attr("href",
       "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + asstEmail +
-      "&su=" + encodeURIComponent(emailSubj) +
-      "&body=" + encodeURIComponent(emailText));
+        "&su=" + encodeURIComponent(emailSubj) +
+        "&body=" + encodeURIComponent(emailText));
     }
 
     mailMsgLink.click(function() {
-      Analytics.track(Analytics.Trackable.ClickCongratsEmail);
+      Analytics.track(Analytics.Trackable.ClickCongratsEmail, {
+        emailType: Login.isNylas() ? "mailto (Exchange)" : "Gmail"
+      });
+    });
+
+    settingsLink.click(function() {
+      Analytics.track(Analytics.Trackable.ClickPostOnboardingPreferencesButton);
     });
 
     faqLink.click(function() {

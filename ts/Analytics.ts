@@ -195,7 +195,8 @@ module Analytics {
     ClickShareCalendar,
     ClickCreditCard,
     ClickCongratsEmail,
-    ClickLearnMoreAboutEsper
+    ClickLearnMoreAboutEsper,
+    ClickPostOnboardingPreferencesButton
   };
 
   export function track(event: Trackable, properties?: Object) {
