@@ -66,11 +66,7 @@ module UsagePeriod {
         footer.append(Footer.load());
       });
 
-    signOut.click(function() {
-      Login.clearLoginInfo();
-      Signin.signin(function(){}, undefined, undefined, undefined);
-      return false;
-    });
+    signOut.click(Login.logout);
   }
 
   export function loadContent(teamid: string, periodStart: number):

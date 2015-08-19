@@ -27,19 +27,34 @@ module Route {
                          + "/" + encodeURIComponent(name);
   }
 
+  // Post-login hooks, get run automatically after each withLogin call
+  // Each hook must return true to proceed to the next
+  var postLoginHooks: { (): boolean; }[] = [
+    Onboarding.checkStatus
+  ];
+
   function withLogin(whenDone,
-                     optArgs?: any[],
                      optInviteCode?: string,
-                     optEmail?: string,
-                     optName?: string) {
-    Signin.signin(whenDone, optArgs, optInviteCode, optEmail, optName);
+                     optEmail?: string) {
+    // Wrap callback with any hooks
+    function callback() {
+      for (let i in postLoginHooks) {
+        if (postLoginHooks.hasOwnProperty(i)) {
+          if (! postLoginHooks[i]()) {
+            return;
+          }
+        }
+      }
+      whenDone();
+    }
+    Signin.signin(callback, optInviteCode, optEmail);
   }
 
   function gotToken(token) {
     if (isIOS()) {
       openIOSapp(token, undefined, undefined);
     } else {
-      withLogin(Page.settings.load, undefined, token, undefined);
+      withLogin(Page.settings.load, token, undefined);
     }
   }
 
@@ -65,8 +80,7 @@ module Route {
       if (isIOS()) {
         openIOSapp(data.token, data.email, data.name);
       } else {
-        withLogin(Page.settings.load, undefined,
-                  data.token, data.email, data.name);
+        withLogin(Page.settings.load, data.token, data.email);
       }
     },
 
@@ -83,13 +97,15 @@ module Route {
 
     "login/:email route" : function(data) {
       var close = function() { window.close(); };
-      withLogin(close, undefined, undefined, data.email);
+      withLogin(close, undefined, data.email);
     },
 
     /* various pages */
 
     "team-settings/:teamid route" : function (data) {
-      withLogin(Page.teamSettings.load, data.teamid);
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid);
+      });
     },
 
     // Intentionally not requiring login for this
@@ -101,12 +117,29 @@ module Route {
       Page.onboarding.load(0, {fromLogin: true});
     },
 
+    "join/exchange route": function (data) {
+      Page.onboarding.load(0, {exchange: true});
+    },
+
     "join/:step route" : function (data) {
       let step = parseInt(data.step) || 0;
       if (step) {
-        withLogin(Page.onboarding.load, [step]);
+        withLogin(function() {
+          Page.onboarding.load(step);
+        });
       } else {
         Page.onboarding.load();
+      }
+    },
+
+    "join/exchange/:step route" : function (data) {
+      let step = parseInt(data.step) || 0;
+      if (step) {
+        withLogin(function() {
+          Page.onboarding.load(step, {exchange: true});
+        });
+      } else {
+        Page.onboarding.load(0, {exchange: true});
       }
     },
 
@@ -115,7 +148,9 @@ module Route {
     },
 
     "payment/:teamid route" : function (data) {
-      withLogin(Page.payment.load, data.teamid);
+      withLogin(function() {
+        Page.payment.load(data.teamid);
+      });
     },
 
     // DEPRECATED - use signup2 or join instead
@@ -160,7 +195,9 @@ module Route {
     },
 
     "usage-period/:teamid/:start route" : function (data) {
-      withLogin(Page.usagePeriod.load, [data.teamid, data.start]);
+      withLogin(function() {
+        Page.usagePeriod.load(data.teamid, data.start);
+      });
     },
 
     "test route": function(data) {
@@ -171,13 +208,18 @@ module Route {
 
   /* Navigation functions (set the URL, let the router react to the changes) */
 
-  /* e.g. route.nav.path("#!a/b/c") goes to URL /#!a/b/c  */
-  nav.path = function(frag) {
+  /* e.g. route.nav.path("#!a/b/c") goes to URL /#!a/b/c */
+  nav.path = function(frag: string) {
+    if (frag[0] === "!") {
+      frag = "#" + frag;
+    } else if (frag[0] !== "#") {
+      frag = "#!" + frag;
+    }
     location.hash = frag;
   };
 
   nav.home = function() {
-    location.hash = "#!";
+    nav.path("#!");
   };
 
   /* Initialization */

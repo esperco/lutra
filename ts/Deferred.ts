@@ -21,10 +21,10 @@ module Deferred {
     return dfd;
   }
 
-  /* Take a list of deferred computations and return a deferred list of the 
+  /* Take a list of deferred computations and return a deferred list of the
      results. Takes an optional failure boolean that fails the joined
      computation if any of its component computations fail. */
-  export function join(a: JQueryDeferred<any>[]|JQueryPromise<any>[], 
+  export function join(a: JQueryDeferred<any>[]|JQueryPromise<any>[],
                        failOnAny?: boolean) {
     var len = a.length;
     var b = []; // Buffer

@@ -102,7 +102,7 @@ module Api {
     return jsonHttp("GET", url, null);
   }
 
-  function jsonHttpPost(url, body) {
+  function jsonHttpPost(url, body:any = "") {
     return jsonHttp("POST", url, body);
   }
 
@@ -300,6 +300,28 @@ module Api {
   {
     var url = "/api/google/" + string(Login.me()) + "/auth/revoke";
     return jsonHttpPost(url, "");
+  }
+
+
+  /***** Nylas *****/
+  export function getNylasLoginUrl(email:string)
+    : JQueryDeferred<ApiT.UrlResult>
+  {
+    var url = "/api/inbox/login/" + encodeURIComponent(email);
+    return jsonHttpGet(url);
+  }
+
+  export function setupNylasCalendar(teamid: string,
+                                     execName: string,
+                                     timezone: string)
+    : JQueryDeferred<void>
+  {
+    var url = "/api/inbox/setup-calendar/" +
+      string(Login.me()) + "/" +
+      encodeURIComponent(teamid) + "/" +
+      encodeURIComponent(execName) + "/" +
+      encodeURIComponent(timezone);
+    return jsonHttpPost(url);
   }
 
 

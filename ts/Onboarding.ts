@@ -5,9 +5,80 @@
 /// <reference path="TeamSettings.ts"/>
 
 module Onboarding {
-  // Routes to a particular onboarding step
-  export function goToStep(step: number) {
-    Route.nav.path("#!join/" + step);
+  // Interface for references from string names to jQuery wrapper
+  interface IJQMap {
+    [index: string]: JQuery;
+  }
+
+  let googleSteps = [ step0,
+                      stepInfoGoogle,
+                      stepCalendar,
+                      stepCC,
+                      stepSendMail ];
+  let exchangeSteps = [  step0,
+                         stepInfoExchange,
+                         // Skip calendar
+                         stepCC,
+                         stepSendMail ];
+
+  // Object to store onboarding state for other functions
+  interface ICurrentState {
+    step: number;
+    flow: { (refs: IJQMap): void; } [];
+  };
+  let currentState: ICurrentState = {
+    step: 0,
+    flow: googleSteps
+  };
+
+  // Checks if current user needs onboarding. If onboarding is required,
+  // returns false and changes hash to trigger redirect. Else returns true.
+  export function checkStatus(): boolean {
+    // To prevent redirect loop
+    if (location.hash.slice(0, 6) === "#!join") {
+      return true;
+    }
+
+    var teams = Login.getTeams();
+    if (teams.length === 1 && teams[0] !== null) {
+      var team = teams[0];
+
+      if (!Util.isString(team.team_name) ||
+          !team.team_name.trim() ||
+          Login.data.email === team.team_name) {
+        if (Login.isNylas()) {
+          Route.nav.path("join/exchange/1");
+        } else {
+          Route.nav.path("join/1");
+        }
+        return false;
+      }
+
+      else if (Login.data.missing_shared_calendar) {
+        Route.nav.path("join/2"); // calendar step
+        return false;
+      }
+
+      else if (Login.isNylas() && Login.data.waiting_for_sync) {
+        Route.nav.path("join/exchange/" + (exchangeSteps.length - 1));
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Routes to next onboarding step
+  export function goToNext() {
+    let basePath = "join/";
+    if (currentState.flow === exchangeSteps) {
+      basePath += "exchange/";
+    }
+    let step = currentState.step || 0;
+    step += 1;
+    if (step > currentState.flow.length - 1) {
+      step = 0;
+    }
+    Route.nav.path(basePath + step);
   }
 
   // Returns the root container object into which we insert onboarding stuff
@@ -15,14 +86,15 @@ module Onboarding {
     return $("#onboarding-interface");
   }
 
-  // Interface for references from string names to jQuery wrapper
-  interface IJQMap {
-    [index: string]: JQuery;
-  }
-
   // Loads the main wrapper UX for onboarding, returns a JQuery wrapper for
   // where step-specific content should go
-  function loadContainer(): IJQMap {
+  interface IOnboardingMap extends IJQMap {
+    view: JQuery;
+    progress: JQuery;
+    content: JQuery;
+  };
+
+  function loadContainer(): IOnboardingMap {
 '''
 <div #view class="onboarding">
   <div class="container">
@@ -45,17 +117,23 @@ module Onboarding {
     };
   }
 
-  let steps = [step0, step1, step2, step3, step4];
-
   export function load(step = 0,
-                       opts?: {fromLogin?: boolean, inviteCode?: string}) {
+                       opts?: {fromLogin?: boolean,
+                               inviteCode?: string,
+                               exchange?: boolean}) {
     var refs = loadContainer();
+    currentState.step = step;
+    currentState.flow = (opts && opts.exchange) ? exchangeSteps : googleSteps;
+
+    var progress = Math.round(100 * ((step + 1) / currentState.flow.length));
+    refs.progress.width(progress + "%");
+
     if (opts && opts.fromLogin) {
       step0FromLogin(refs);
     } else if (opts && opts.inviteCode) {
       step0FromInvite(refs, opts.inviteCode);
     } else {
-      steps[step](refs);
+      currentState.flow[step](refs);
     }
   }
 
@@ -73,8 +151,6 @@ module Onboarding {
 
   // Base function for our "step 0" join page -- takes a custom message
   function _step0(refs: IJQMap, customMsg?: string, inviteCode?: string): void {
-    refs["progress"].width("20%");
-
     // Log out if applicable
     if (Login.data) {
       Login.clearLoginInfo();
@@ -82,24 +158,26 @@ module Onboarding {
 '''
 <div #view style="text-align: center">
   <div #msg>
-    <strong>Awesome.</strong> Our assistants need access to your calendar to
-    assist you with scheduling.<br />
-    Please sign in with the account tied to your primary calendar
-    to continue.
+    <span class="block-lg">
+      <strong>Awesome.</strong> Our assistants need access to your calendar to
+      assist you with scheduling.
+    </span>
+    <div class="block-lg">
+      Please sign in with the account tied to your
+      primary calendar to continue.
+    </div>
   </div>
   <div #buttonContainer style="padding:40px 0">
   </div>
   <div>
-    Use Microsoft Office or Exchange for calendaring?<br />Contact us at
-    <a #exchangeLink href="mailto:support@esper.com">
-      support@esper.com</a> to get set up.
-    <br /><br />
     <a href="http://esper.com/mailing-list">
-      Use something else? Click here.
+      Don't use Google or Microsoft Exchange?
+      <span class="text-nowrap">Click here.</span>
     </a>
     <br /><br />
     By signing in, you agree to Esper's
-    <a href="http://esper.com/terms-of-use">Terms of Use.</a>
+    <a class="text-nowrap"
+       href="http://esper.com/terms-of-use">Terms of Use.</a>
   </div>
 </div>
 '''
@@ -107,41 +185,49 @@ module Onboarding {
       msg.html(customMsg);
     }
 
-    var exchangeEmailSubject = "Join Esper (Microsoft Office / Exchange)";
-    var exchangeEmailBody = "Hi, I'd like to sign up for Esper!";
-    exchangeEmailSubject = encodeURIComponent(exchangeEmailSubject);
-    exchangeEmailBody = encodeURIComponent(exchangeEmailBody);
-    exchangeLink.attr('href', "mailto:support@esper.com?subject=" +
-      exchangeEmailSubject + "&body=" + exchangeEmailBody);
-
     var googleButton = Signin.googleButton(
       /* landingUrl */ "#!join/1",
       /* optInvite  */ inviteCode,
       /* optEmail   */ undefined,
       /* optSignup  */ true);
     googleButton.click(function() {
-      Analytics.track(Analytics.Trackable.ClickGoogleSignIn, {
+      Analytics.track(Analytics.Trackable.ClickSignIn, {
+        signinType: "Google",
         optInvite: inviteCode,
         optSignup: true
       });
     });
     buttonContainer.append(googleButton);
 
+    var exchangeButton = Signin.exchangeButton(
+      /* landingUrl */ "#!join/exchange/1",
+      /* optInvite  */ inviteCode,
+      /* optEmail   */ undefined,
+      /* optSignup  */ true);
+    exchangeButton.click(function() {
+      Analytics.track(Analytics.Trackable.ClickSignIn, {
+        signinType: "Exchange",
+        optInvite: inviteCode,
+        optSignup: true
+      });
+    });
+    buttonContainer.append(exchangeButton);
+
     let content = refs["content"];
     content.append(view);
   }
 
   /* Step 0 => Sign in normally */
-  function step0(refs: IJQMap): void {
+  function step0(refs: IOnboardingMap): void {
     _step0(refs);
   }
 
-  function step0FromLogin(refs: IJQMap): void {
+  function step0FromLogin(refs: IOnboardingMap): void {
     _step0(refs, `We don't have a registered account for you.<br />
       Please sign in again to create an account.`);
   }
 
-  function step0FromInvite(refs: IJQMap, inviteCode: string): void {
+  function step0FromInvite(refs: IOnboardingMap, inviteCode: string): void {
     _step0(refs, `Thanks for accepting our invite!<br />
       Our assistants need access to your calendar to assist with scheduling.
       Please sign in with the account tied to your primary calendar to
@@ -171,9 +257,8 @@ module Onboarding {
     }
   }
 
-  /* Step 1 => Confirm executive name */
-  function step1(refs: IJQMap): void {
-    refs["progress"].width("40%");
+  /* Step 1 => Confirm executive name and other info */
+  function _stepInfo(refs: IOnboardingMap, tzSelector?: boolean): void {
 '''
 <form #form class="form">
   <div class="page-header">
@@ -206,11 +291,27 @@ module Onboarding {
              placeholder="555-555-5555" />
     </div>
   </div>
+  <div #tzGroup class="form-group row">
+    <label class="col-xs-12 control-label" for="step0-tz">
+      Preferred Timezone</label>
+    <div #tzSelectorDiv class="col-xs-12 js-tz"></div>
+  </div>
   <div class="form-group row"><div class="col-xs-12">
     <button #submit type="submit" class="btn btn-primary">Save</button>
   </div></div>
 </form>
 '''
+    // Add or hide timezone element
+    var tzSelectorInput;
+    if (tzSelector) {
+      tzSelectorInput = PreferencesTab.timeZoneSelectorView();
+      tzSelectorInput.attr("id", "step0-tz");
+      tzSelectorInput.addClass("form-control");
+      tzSelectorDiv.append(tzSelectorInput);
+    } else {
+      tzGroup.hide();
+    }
+
     // Set default name (in case we got this info from elsewhere)
     // NB: It'd be nice if we could check if there was currently a phone
     // number set too, but it's not worth making an extra API call, especially
@@ -230,7 +331,7 @@ module Onboarding {
 
       // Get & validate name
       let nameVal = name.val();
-      if (! nameVal) {
+      if (!nameVal || nameVal === Login.data.email) {
         nameGroup.addClass("has-error");
         isValid = false;
       }
@@ -240,6 +341,13 @@ module Onboarding {
       let phoneTypeVal = phoneType.val();
       if (! phoneVal) {
         phoneGroup.addClass("has-error");
+        isValid = false;
+      }
+
+      // Get & validate timezone
+      let tzVal = tzSelectorInput && tzSelectorInput.val();
+      if (tzSelectorInput && !tzVal) {
+        tzGroup.addClass("has-error");
         isValid = false;
       }
 
@@ -264,28 +372,36 @@ module Onboarding {
         Api.setMeetingTypes(team.teamid, meetingTypes)
       ];
 
-      // AJAX calls for name and phone nubmer, then load step 1
+      // Add timezone info for Nylas if applicable
+      if (tzVal) {
+        calls.push(Api.setupNylasCalendar(team.teamid, nameVal, tzVal));
+      }
+
+      // AJAX calls for name and phone number, then load step 1
       //
       // TODO: Create new API endpoint for setting name and phone number
       // rather than shoehorn two calls together
       //
-      Deferred.join(calls)
-        .then(function() {
-          goToStep(2);
-        });
+      Deferred.join(calls, true).then(goToNext);
 
       // Prevent page reload
       return false;
     });
 
-    let content = refs["content"];
-    content.append(form);
+    refs.content.append(form);
     name.focus();
   }
 
+  function stepInfoGoogle(refs: IOnboardingMap): void {
+    _stepInfo(refs, false);
+  }
+
+  function stepInfoExchange(refs: IOnboardingMap): void {
+    _stepInfo(refs, true);
+  }
+
   /* Step 2 => Share calendars */
-  function step2(refs: IJQMap): void {
-    refs["progress"].width("60%");
+  function stepCalendar(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -338,17 +454,15 @@ module Onboarding {
 
             // Then redirect to next / final step
             .then(function() {
-              goToStep(3);
+              goToNext();
             });
         });
       });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 
-  function step3(refs: IJQMap): void {
-    refs["progress"].width("80%");
+  function stepCC(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -374,7 +488,7 @@ module Onboarding {
         if (err) {
           unmakeBusy(primaryBtn);
         } else {
-          goToStep(4);
+          goToNext();
         }
       });
     formContainer.append(paymentRefs.form);
@@ -386,13 +500,11 @@ module Onboarding {
       paymentRefs.form.submit();
     });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 
   /* Step 4 => complete */
-  function step4(refs: IJQMap): void {
-    refs["progress"].width("100%");
+  function stepSendMail(refs: IOnboardingMap): void {
 '''
 <div #view>
   <div class="page-header">
@@ -400,7 +512,14 @@ module Onboarding {
   </div>
   <div class="description">
     <p>You've signed up for your very own Esper Assistant.
-      You can get started right away by contacting your assistant at
+      <span #syncMessage>
+        We're currently syncing your calendar. This may take a few hours,
+        but in the meantime, you can get started by contacting your
+        assistant at
+      </span>
+      <span #readyMessage>
+        You can get started right away by contacting your assistant at
+      </span>
       <b><a target="_blank" #mailToLink></a></b>.
     </p>
     <p>Click below to send the following email and set up a call:</p>
@@ -409,6 +528,14 @@ module Onboarding {
     </p>
   </div>
   <div align=right style="padding-top:20px; padding-bottom:40px;">
+    <div class="left">
+      <a #settingsLink target="_blank" href="#!" style="float:left;">
+        <button class="button-tertiary">
+          <i class="fa fa-fw fa-gear"></i>
+          Set Preferences
+        </button>
+      </a>
+    </div>
     <a #faqLink target="_blank" href="http://esper.com/faqs">
       <button class="button-primary">
         Learn more about Esper &nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
@@ -417,6 +544,17 @@ module Onboarding {
   </div>
 </div>
 '''
+    // Show appropriate message based on Nylas
+    if (Login.isNylas() && Login.data.waiting_for_sync) {
+      syncMessage.show();
+      readyMessage.hide();
+      settingsLink.hide();
+    } else {
+      syncMessage.hide();
+      readyMessage.show();
+      settingsLink.show();
+    }
+
     let team = getTeam();
     var asstEmail = team.team_email_aliases[0];
     var asstName = asstEmail.split("@")[0];
@@ -436,26 +574,35 @@ module Onboarding {
     mailToLink.attr("href", "mailto:" + asstEmail);
     mailMsgLink.html(emailText.replace(/\n/g, "<br />"));
 
-    // Gmail
-    mailMsgLink.attr("href",
-      "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + asstEmail +
-      "&su=" + encodeURIComponent(emailSubj) +
-      "&body=" + encodeURIComponent(emailText));
+    // Exchange / Nylas
+    if (Login.isNylas()) {
+      mailMsgLink.attr("href", "mailto:" + asstEmail +
+        "?subject=" + encodeURIComponent(emailSubj) +
+        "&body=" + encodeURIComponent(emailText));
+    }
 
-    // Non-Gmail (add Boolean check when Nylas integration done)
-    // mailMsgLink.attr("href", "mailto:" + asstEmail +
-    //   "?subject=" + encodeURIComponent(emailSubj) +
-    //   "&body=" + encodeURIComponent(emailText));
+    // Gmail
+    else {
+      mailMsgLink.attr("href",
+      "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + asstEmail +
+        "&su=" + encodeURIComponent(emailSubj) +
+        "&body=" + encodeURIComponent(emailText));
+    }
 
     mailMsgLink.click(function() {
-      Analytics.track(Analytics.Trackable.ClickCongratsEmail);
+      Analytics.track(Analytics.Trackable.ClickCongratsEmail, {
+        emailType: Login.isNylas() ? "mailto (Exchange)" : "Gmail"
+      });
+    });
+
+    settingsLink.click(function() {
+      Analytics.track(Analytics.Trackable.ClickPostOnboardingPreferencesButton);
     });
 
     faqLink.click(function() {
       Analytics.track(Analytics.Trackable.ClickLearnMoreAboutEsper);
     });
 
-    let content = refs["content"];
-    content.append(view);
+    refs.content.append(view);
   }
 }
