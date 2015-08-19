@@ -512,7 +512,14 @@ module Onboarding {
   </div>
   <div class="description">
     <p>You've signed up for your very own Esper Assistant.
-      You can get started right away by contacting your assistant at
+      <span #syncMessage>
+        We're currently syncing your calendar. This may take a few hours,
+        but in the meantime, you can get started by contacting your
+        assistant at
+      </span>
+      <span #readyMessage>
+        You can get started right away by contacting your assistant at
+      </span>
       <b><a target="_blank" #mailToLink></a></b>.
     </p>
     <p>Click below to send the following email and set up a call:</p>
@@ -521,6 +528,14 @@ module Onboarding {
     </p>
   </div>
   <div align=right style="padding-top:20px; padding-bottom:40px;">
+    <div class="left">
+      <a #settingsLink target="_blank" href="#!" style="float:left;">
+        <button class="button-tertiary">
+          <i class="fa fa-fw fa-gear"></i>
+          Set Preferences
+        </button>
+      </a>
+    </div>
     <a #faqLink target="_blank" href="http://esper.com/faqs">
       <button class="button-primary">
         Learn more about Esper &nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
@@ -529,6 +544,17 @@ module Onboarding {
   </div>
 </div>
 '''
+    // Show appropriate message based on Nylas
+    if (Login.isNylas() && Login.data.waiting_for_sync) {
+      syncMessage.show();
+      readyMessage.hide();
+      settingsLink.hide();
+    } else {
+      syncMessage.hide();
+      readyMessage.show();
+      settingsLink.show();
+    }
+
     let team = getTeam();
     var asstEmail = team.team_email_aliases[0];
     var asstName = asstEmail.split("@")[0];
@@ -548,16 +574,20 @@ module Onboarding {
     mailToLink.attr("href", "mailto:" + asstEmail);
     mailMsgLink.html(emailText.replace(/\n/g, "<br />"));
 
+    // Exchange / Nylas
+    if (Login.isNylas()) {
+      mailMsgLink.attr("href", "mailto:" + asstEmail +
+      "?subject=" + encodeURIComponent(emailSubj) +
+      "&body=" + encodeURIComponent(emailText));
+    }
+
     // Gmail
-    mailMsgLink.attr("href",
+    else {
+      mailMsgLink.attr("href",
       "https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + asstEmail +
       "&su=" + encodeURIComponent(emailSubj) +
       "&body=" + encodeURIComponent(emailText));
-
-    // Non-Gmail (add Boolean check when Nylas integration done)
-    // mailMsgLink.attr("href", "mailto:" + asstEmail +
-    //   "?subject=" + encodeURIComponent(emailSubj) +
-    //   "&body=" + encodeURIComponent(emailText));
+    }
 
     mailMsgLink.click(function() {
       Analytics.track(Analytics.Trackable.ClickCongratsEmail);
