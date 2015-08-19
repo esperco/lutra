@@ -224,40 +224,6 @@ module Signin {
             return err;
           });
       }
-
-      // Okay, we have an e-mail, now do something
-      // let nonce = "";
-
-      // // Generate login nonce
-      // let loginNonceCall = setLoginNonce();
-      // loginNonceCall.done(function(loginNonce) {
-      //   // Assign to higher-scoped variable so our other callbacks can see it
-      //   nonce = loginNonce;
-      // });
-      // let calls = [loginNonceCall];
-
-      // // We should always have an invite token before going to Google, but
-      // // only if optSignup is true -- if we don't have one, request from server
-      // if (optSignup && !optInvite) {
-      //   let tokenCall = getSignupToken();
-      //   tokenCall.done(function(token) {
-      //     // Assign to higher-scoped variable so our other callbacks can see it
-      //     optInvite = token;
-      //   });
-      //   calls.push(tokenCall);
-      // }
-
-      // // Run token and nonce calls in parallel
-      // Deferred.join(calls, true)
-      //   // Get Google endpoint based on nonce and token
-      //   .then(function() {
-      //     landingUrl = landingUrl || "#!";
-      //     return Api.getGoogleAuthUrl(landingUrl, nonce, optInvite, optEmail);
-      //   }, function(err) { console.error(err); })
-      //   // Redirect to Google
-      //   .then(function(x) {
-      //     requestGoogleAuth(x.url);
-      //   }, function(err) { console.error(err); });
       return false;
     });
 
