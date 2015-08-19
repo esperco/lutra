@@ -1,0 +1,39 @@
+{
+  "version": "v4",
+  "repo": "esperco/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "jquery/jquery.d.ts": {
+      "commit": "bb45306d0fd8ce0852a8d24c023fd787f4151e65"
+    },
+    "segment-analytics/segment-analytics.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "fullCalendar/fullCalendar.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "jqueryui/jqueryui.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "chrome/chrome.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "webrtc/MediaStream.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "cryptojs/cryptojs.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "moment/moment.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    }
+  }
+}
