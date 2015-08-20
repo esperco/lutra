@@ -2,6 +2,8 @@ marten
 ======
 A marten is not a Martin.
 
+This module contains refactored helper code for Otter, Stoat, etc.
+
 Typescript Definitions
 ----------------------
 The [typings](typings) directory contains various type defitions imported
@@ -13,3 +15,7 @@ If you want to write new definitions for open-source projects, please add to
 our fork of the DefinitelyTyped repo and consider opening a pull request to the
 main (borisyankov) DefinitelyTyped repo.
 
+Gulp Helpers
+------------
+The [marten-gulp-helpers](marten-gulp-helpers) package is embedded within this
+one. Its [README](marten-gulp-helpers/README.md) has details.
