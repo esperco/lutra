@@ -15,6 +15,12 @@ If you want to write new definitions for open-source projects, please add to
 our fork of the DefinitelyTyped repo and consider opening a pull request to the
 main (borisyankov) DefinitelyTyped repo.
 
+Vendor Files
+------------
+Third-party vendor libraries are installed in the [vendor](vendor) directory
+with [Bower](http://bower.io/). If you want to add to this library, install
+Bower with `npm install -g bower` and call `bower install [library] --save`.
+
 Gulp Helpers
 ------------
 The [marten-gulp-helpers](marten-gulp-helpers) package is embedded within this
