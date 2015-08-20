@@ -30,7 +30,8 @@ module.exports = function(gulp) {
 
   // Watch LESS directory for changes
   exports.watch = function(name, config) {
-    return gulp.task("watch-less", function() {
+    name = name || "watch-less";
+    return gulp.task(name, function() {
       return gulp.watch(config.lessDir + "/**/*.less", gulp.series(buildName));
     });
   };
