@@ -21,9 +21,14 @@ module.exports = {
   // TypeScript output directory, relative to pubDir
   tscOutDir: "js",
 
-  // Entry points for LESS compilation. Use improts to bundle any other
-  // LESS files you want
-  lessEntryPoints: [],
+  // Directory with LESS files
+  lessDir: "less",
+
+  // Where to write our LESS files
+  lessOutDir: "css",
+
+  // Where to find simple our html pages
+  htmlDir: "html",
 
   // Port for live reload server to use. 35729 is the default for most
   // LiveReload browser extensions
@@ -49,6 +54,6 @@ fs.writeFileSync("./tsconfig.json", JSON.stringify({
   // This should function as a list of entry-points (use references to
   // include files that should be concatenated within)
   files: [
-    "ts/dev.ts",
+    "ts/app.ts",
   ]
 }));

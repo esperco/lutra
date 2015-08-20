@@ -6,31 +6,36 @@ var config = require("./config");
 // NB: This gulp file is intended to be used with Gulp 4.x and won't
 // work with Gulp 3.x or below.
 var gulp = require("gulp"),
-    mkdirp = require("mkdirp"),
-    path = require("path"),
-    spawnTsc = require("./gulp-helpers/spawn-tsc");
+    helpers = require("marten-gulp-helpers")(gulp);
 
-// TypeScript ///////////////////////////////
+// TypeScript
+helpers.tsc.build("build-ts", config);
+helpers.tsc.watch("watch-ts", config);
 
-gulp.task("build-ts", function(cb) {
-  mkdirp(path.join(config.pubDir, config.tscOutDir), function(err) {
-    if (err) {
-      console.error(err);
-    } else {
-      spawnTsc({}, cb);
-    }
-  });
+// LESS
+helpers.less.build("build-less", config);
+helpers.less.watch("watch-less", config);
+
+// Assets
+gulp.task("build-html", function() {
+  return gulp.src(config.htmlDir + "/**/*.html")
+    .pipe(gulp.dest(config.pubDir));
 });
 
-gulp.task("watch-ts", gulp.series("build-ts", function(cb) {
-  return spawnTsc({watch: true}, cb);
+gulp.task("watch-html", gulp.series("build-html", function() {
+  return gulp.watch(config.htmlDir + "/**/*.html", gulp.series("build-html"));
 }));
+
+// Live-reload servers
+helpers.servers.httpServer("http-server", config);
+helpers.servers.liveReload("live-reload", config);
 
 // General //////////////////////
 
-gulp.task("build", gulp.parallel("build-ts"));
+gulp.task("build", gulp.parallel("build-html", "build-ts", "build-less"));
 
-gulp.task("watch", gulp.parallel("watch-ts"));
+gulp.task("watch", gulp.series("build",
+  gulp.parallel("watch-html", "watch-ts", "watch-less",
+                "http-server", "live-reload")));
 
 gulp.task("default", gulp.series("build"));
-
