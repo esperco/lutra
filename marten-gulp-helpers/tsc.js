@@ -4,7 +4,11 @@ module.exports = function(gulp) {
   var childProcess  = require('child_process'),
       chalk         = require('chalk'),
       mkdirp        = require('mkdirp'),
-      path          = require('path');
+      path          = require('path'),
+      replace       = require('gulp-replace'),
+      sourcemaps    = require('gulp-sourcemaps'),
+      temp          = require('temp'),
+      uglify        = require('gulp-uglify');
 
   var exports = {};
 
@@ -12,6 +16,7 @@ module.exports = function(gulp) {
     * @param {string} [opts.tscPath="tsc"] - Command line arg for tsc
     * @param {boolean} [opts.watch] - If true, turns on watch mode
     * @param {boolean} [opts.cwd] - Working directory to use for our process
+    * @param {string} [opts.outDir] - Pick an output directory
     * @param {boolean} [opts.inlineSources] - Inline sources (use if external
     *   source maps are buggy, but only in dev), else external source map
     * @param {boolean} [opts.exitOnError] - Exit if TSC outputs stderr
@@ -36,6 +41,10 @@ module.exports = function(gulp) {
     }
     if (opts.watch) {
       tscArgs.push("-w");
+    }
+    if (opts.outDir) {
+      tscArgs.push("--outDir");
+      tscArgs.push(opts.outDir);
     }
 
     // Process options
@@ -82,18 +91,59 @@ module.exports = function(gulp) {
     return ps;
   };
 
-  var buildName; // Set this var so knows how to referenec build
+  // Variable to hold a temporary directory created for the duration of this
+  // task. Temp dir will be cleaned up on exit.
+  var tempDir;
+  var getTempDir = function() {
+    if (! tempDir) {
+      temp.track();     // Remove to disable cleanup
+      tempDir = temp.mkdirSync();
+      console.log("Using " + tempDir + " as temp dir");
+    }
+    return tempDir;
+  };
+
+  var buildName; // Set this var so knows how to reference build
   exports.build = function(name, config) {
     buildName = name || "build-ts";
-    return gulp.task(buildName, function(cb) {
-      mkdirp(path.join(config.pubDir, config.tscOutDir), function(err) {
-        if (err) {
-          console.error(err);
-        } else {
-          spawnTsc({inlineSources: !config.production}, cb);
+    return gulp.task(buildName, gulp.series(
+
+      // Use TSC process to write out to file
+      function(cb) {
+        mkdirp(path.join(config.pubDir, config.tscOutDir), function(err) {
+          if (err) {
+            console.error(err);
+          } else {
+            spawnTsc({inlineSources: true,
+                      outDir: config.production ? getTempDir() : null}, cb);
+          }
+        });
+      },
+
+      // If production, above command wrote out to temp dir. Grab temp files,
+      // replace production var and uglify, and then pipe to pub directory.
+      function(cb) {
+        if (config.production) {
+          var ret = gulp.src(path.join(getTempDir(), "**/*.js"))
+            .pipe(sourcemaps.init({loadMaps: true}));
+
+          // Make sure productionVar exists so we don't accidentally replace
+          // a bunch of "undefined"s.
+          if (config.productionVar) {
+            // RegEx does a simple word check -- this isn't totally safe
+            // since var could be in string, so hope that it's unique
+            var regEx = new RegExp("\\b" + config.productionVar + "\\b", "g");
+            ret = ret.pipe(replace(regEx, "true"));
+          }
+
+          return ret
+            .pipe(uglify()) // Should remove unreachable dev only code
+            .pipe(sourcemaps.write("./"))
+            .pipe(gulp.dest(path.join(config.pubDir, config.tscOutDir)));
         }
-      });
-    });
+        else { cb(); /* Nothing to do */ }
+      }
+    ));
   };
 
   exports.watch = function(name) {

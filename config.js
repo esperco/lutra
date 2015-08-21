@@ -63,7 +63,13 @@ module.exports = {
 
   // Production mode => no sourcemaps + uglify -- doesn't have to be set
   // here, can be done programatically with Gulp task
-  production: false
+  production: false,
+
+  // Global variable name used by TS files to determine production mode
+  // We use a pretty dumb regex to find this variable and replace it with
+  // "true" in production, so make sure it's unique and not likely to appear
+  // outside of this use-case
+  productionVar: "__PRODUCTION__"
 };
 
 // Write tsconfig.json data -- we write from config.json instead of writing
