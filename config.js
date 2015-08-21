@@ -34,8 +34,23 @@ module.exports = {
   // vendor JS files
   vendorJSIndex: "vendor/index.js",
 
-  // Where Browserify should write the JS bundle (relate to pubDir)
+  // Where Browserify should write the JS bundle (relative to pubDir)
   vendorJSOut: "js/vendor.js",
+
+  // Vendor CSS files to concatenate and minimize, relative to the vendor
+  // directory set in .bowerrc
+  vendorCSSList: [
+    "font-awesome/css/font-awesome.css",
+    "animate.css/animate.css"
+  ],
+
+  // Path to CSS bundle (relative to pubDir)
+  vendorCSSOut: "css/vendor.css",
+
+  // Vendor assets to copy without any transformation
+  vendorAssets: {
+
+  },
 
   // Port for live reload server to use. 35729 is the default for most
   // LiveReload browser extensions
