@@ -61,7 +61,8 @@ module.exports = {
   // Live server port
   serverPort: 5000,
 
-  // Production mode => no sourcemaps
+  // Production mode => no sourcemaps + uglify -- doesn't have to be set
+  // here, can be done programatically with Gulp task
   production: false
 };
 

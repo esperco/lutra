@@ -38,8 +38,15 @@ helpers.server.liveReload("live-reload", config);
 
 helpers.clean.clean("clean", config);
 
+gulp.task("production", function(cb) {
+  config.production = true;
+  cb();
+});
+
 gulp.task("build", gulp.series("clean",
   gulp.parallel("build-html", "build-vendor", "build-ts", "build-less")));
+
+gulp.task("build-production", gulp.series("production", "build"));
 
 gulp.task("watch", gulp.series("build",
   gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",

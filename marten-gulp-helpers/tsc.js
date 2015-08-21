@@ -13,7 +13,7 @@ module.exports = function(gulp) {
     * @param {boolean} [opts.watch] - If true, turns on watch mode
     * @param {boolean} [opts.cwd] - Working directory to use for our process
     * @param {boolean} [opts.inlineSources] - Inline sources (use if external
-    *   source maps are buggy, but only in dev!)
+    *   source maps are buggy, but only in dev), else external source map
     * @param {boolean} [opts.exitOnError] - Exit if TSC outputs stderr
     * @param {function} cb - Callback when compiler process is complete
   */
@@ -30,6 +30,9 @@ module.exports = function(gulp) {
     if (opts.inlineSources) {
       tscArgs.push("--inlineSourceMap");
       tscArgs.push("--inlineSources");
+    }
+    else {
+      tscArgs.push("--sourceMap");
     }
     if (opts.watch) {
       tscArgs.push("-w");
@@ -87,7 +90,7 @@ module.exports = function(gulp) {
         if (err) {
           console.error(err);
         } else {
-          spawnTsc({inlineSources: !!config.production}, cb);
+          spawnTsc({inlineSources: !config.production}, cb);
         }
       });
     });

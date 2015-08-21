@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "marten-gulp-helpers/link.sh",
     "build": "gulp build",
+    "build-production": "gulp build-production",
     "watch": "gulp watch"
   },
   "repository": {

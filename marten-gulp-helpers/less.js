@@ -5,6 +5,7 @@ module.exports = function(gulp) {
   var autoprefixer = require("gulp-autoprefixer"),
       filter = require("gulp-filter"),
       less = require("gulp-less"),
+      minifyCss = require("gulp-minify-css"),
       path = require("path"),
       sourcemaps = require("gulp-sourcemaps");
 
@@ -16,16 +17,25 @@ module.exports = function(gulp) {
     buildName = name || "build-less";
     return gulp.task(buildName, function() {
       var partialFilter = filter(['*', '!_*.less']);
-      return gulp.src(config.lessDir + "/**/*.less")
+      var ret = gulp.src(config.lessDir + "/**/*.less")
         .pipe(partialFilter)
         .pipe(sourcemaps.init())
         .pipe(less({
           paths: [ path.resolve(config.lessDir) ]
         }))
-        .pipe(autoprefixer())
-        .pipe(sourcemaps.write("./"))
-        .pipe(gulp.dest(path.join(config.pubDir, config.lessOutDir)));
-      });
+        .pipe(autoprefixer());
+
+      if (config.production) {
+        // External source maps + minimize
+        ret = ret.pipe(minifyCss())
+                 .pipe(sourcemaps.write("./"));
+      } else {
+        // Inline source maps
+        ret = ret.pipe(sourcemaps.write());
+      }
+
+      return ret.pipe(gulp.dest(path.join(config.pubDir, config.lessOutDir)));
+    });
   };
 
   // Watch LESS directory for changes
