@@ -20,15 +20,9 @@ helpers.less.watch("watch-less", config);
 helpers.vendor.build("build-vendor", config);
 helpers.vendor.watch("watch-vendor", config);
 
-// Assets
-gulp.task("build-html", function() {
-  return gulp.src(config.htmlDir + "/**/*.html")
-    .pipe(gulp.dest(config.pubDir));
-});
-
-gulp.task("watch-html", gulp.series("build-html", function() {
-  return gulp.watch(config.htmlDir + "/**/*.html", gulp.series("build-html"));
-}));
+// HTML files
+helpers.html.build("build-html", config);
+helpers.html.watch("watch-html", config);
 
 // Live-reload servers
 helpers.server.httpServer("http-server", config);

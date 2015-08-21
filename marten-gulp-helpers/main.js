@@ -6,6 +6,7 @@
 module.exports = function(gulp) {
   return {
     clean: require("./clean")(gulp),
+    html: require("./html")(gulp),
     less: require("./less")(gulp),
     server: require("./server")(gulp),
     tsc: require("./tsc")(gulp),

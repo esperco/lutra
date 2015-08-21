@@ -20,7 +20,7 @@ module.exports = function(gulp) {
 
   // Get the vendor directory used by Bower
   var vendorDir; // Store cached vendor dir
-  var getVendorDir = function() {
+  var getVendorDir = exports.getVendorDir = function() {
     if (! vendorDir) {
       var martenRoot = path.resolve(__dirname + "/..");
       var bowerRc;
@@ -165,7 +165,8 @@ module.exports = function(gulp) {
     name = name || "watch-vendor";
 
     // (A) Watch the vendor index file and (b) the vendor directory
-    var watchTargets = [config.vendorJSIndex, getVendorDir()];
+    var watchTargets = [config.vendorJSIndex,
+                        path.join(getVendorDir(), "**/*.*")];
 
     return gulp.task(name, function() {
       return gulp.watch(watchTargets, gulp.series(buildName));

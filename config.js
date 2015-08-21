@@ -69,7 +69,7 @@ module.exports = {
   // We use a pretty dumb regex to find this variable and replace it with
   // "true" in production, so make sure it's unique and not likely to appear
   // outside of this use-case
-  productionVar: "__PRODUCTION__"
+  productionVar: "__ESPER_PRODUCTION__"
 };
 
 // Write tsconfig.json data -- we write from config.json instead of writing
