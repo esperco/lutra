@@ -14,5 +14,8 @@
   "homepage": "https://github.com/esperco/marten",
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0"
+  },
+  "dependencies": {
+    "page": "^1.6.3"
   }
 }

@@ -6,7 +6,8 @@
 module.exports = function(gulp) {
   return {
     less: require("./less")(gulp),
-    servers: require("./servers")(gulp),
-    tsc: require("./tsc")(gulp)
+    server: require("./server")(gulp),
+    tsc: require("./tsc")(gulp),
+    vendor: require("./vendor")(gulp)
   };
 };

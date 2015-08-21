@@ -10,8 +10,13 @@
     "tests"
   ],
   "dependencies": {
+    "crypto-js": "~3.1.5",
     "jquery": "~2.1.4",
     "bootstrap": "~3.3.5",
-    "font-awesome": "~4.4.0"
+    "font-awesome": "~4.4.0",
+    "moment": "~2.10.6",
+    "fullcalendar": "~2.4.0",
+    "lodash": "~3.10.1",
+    "moment-timezone": "~0.4.0"
   }
 }

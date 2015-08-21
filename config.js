@@ -30,12 +30,22 @@ module.exports = {
   // Where to find simple our html pages
   htmlDir: "html",
 
+  // A Browserify entry point for bundling together our third-party
+  // vendor JS files
+  vendorJSIndex: "vendor/index.js",
+
+  // Where Browserify should write the JS bundle (relate to pubDir)
+  vendorJSOut: "js/vendor.js",
+
   // Port for live reload server to use. 35729 is the default for most
   // LiveReload browser extensions
   liveReloadPort: 35729,
 
   // Live server port
-  serverPort: 5000
+  serverPort: 5000,
+
+  // Production mode => no sourcemaps
+  production: false
 };
 
 // Write tsconfig.json data -- we write from config.json instead of writing

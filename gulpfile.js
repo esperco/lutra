@@ -16,6 +16,10 @@ helpers.tsc.watch("watch-ts", config);
 helpers.less.build("build-less", config);
 helpers.less.watch("watch-less", config);
 
+// Vendor JS
+helpers.vendor.build("build-vendor", config);
+helpers.vendor.watch("watch-vendor", config);
+
 // Assets
 gulp.task("build-html", function() {
   return gulp.src(config.htmlDir + "/**/*.html")
@@ -27,15 +31,16 @@ gulp.task("watch-html", gulp.series("build-html", function() {
 }));
 
 // Live-reload servers
-helpers.servers.httpServer("http-server", config);
-helpers.servers.liveReload("live-reload", config);
+helpers.server.httpServer("http-server", config);
+helpers.server.liveReload("live-reload", config);
 
 // General //////////////////////
 
-gulp.task("build", gulp.parallel("build-html", "build-ts", "build-less"));
+gulp.task("build",
+  gulp.parallel("build-html", "build-vendor", "build-ts", "build-less"));
 
 gulp.task("watch", gulp.series("build",
-  gulp.parallel("watch-html", "watch-ts", "watch-less",
+  gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
                 "http-server", "live-reload")));
 
 gulp.task("default", gulp.series("build"));
