@@ -34,6 +34,15 @@
     },
     "moment/moment-node.d.ts": {
       "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "jasmine/jasmine.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "moment-timezone/moment-timezone.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
     }
   }
 }

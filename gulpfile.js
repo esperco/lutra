@@ -24,6 +24,9 @@ helpers.vendor.watch("watch-vendor", config);
 helpers.html.build("build-html", config);
 helpers.html.watch("watch-html", config);
 
+// Test helpers
+helpers.test.build("build-test-reqs", config);
+
 // Live-reload servers
 helpers.server.httpServer("http-server", config);
 helpers.server.liveReload("live-reload", config);
@@ -38,7 +41,8 @@ gulp.task("production", function(cb) {
 });
 
 gulp.task("build", gulp.series("clean",
-  gulp.parallel("build-html", "build-vendor", "build-ts", "build-less")));
+  gulp.parallel("build-html", "build-test-reqs",
+                "build-vendor", "build-ts", "build-less")));
 
 gulp.task("build-production", gulp.series("production", "build"));
 

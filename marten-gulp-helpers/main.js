@@ -9,6 +9,7 @@ module.exports = function(gulp) {
     html: require("./html")(gulp),
     less: require("./less")(gulp),
     server: require("./server")(gulp),
+    test: require("./test")(gulp),
     tsc: require("./tsc")(gulp),
     vendor: require("./vendor")(gulp)
   };

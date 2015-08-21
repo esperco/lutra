@@ -17,6 +17,7 @@
     "moment": "~2.10.6",
     "fullcalendar": "~2.4.0",
     "lodash": "~3.10.1",
-    "moment-timezone": "~0.4.0"
+    "moment-timezone": "~0.4.0",
+    "jasmine": "~2.3.4"
   }
 }
