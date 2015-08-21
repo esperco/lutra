@@ -36,8 +36,10 @@ helpers.server.liveReload("live-reload", config);
 
 // General //////////////////////
 
-gulp.task("build",
-  gulp.parallel("build-html", "build-vendor", "build-ts", "build-less"));
+helpers.clean.clean("clean", config);
+
+gulp.task("build", gulp.series("clean",
+  gulp.parallel("build-html", "build-vendor", "build-ts", "build-less")));
 
 gulp.task("watch", gulp.series("build",
   gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
