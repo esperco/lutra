@@ -47,9 +47,11 @@ module.exports = {
   // Path to CSS bundle (relative to pubDir)
   vendorCSSOut: "css/vendor.css",
 
-  // Vendor assets to copy without any transformation
+  // Vendor assets to copy without any transformation -- map from
+  // from glob relative to vendor dir to destination directory
   vendorAssets: {
-
+    "bootstrap/fonts/*.*": "fonts",
+    "font-awesome/fonts/*.*": "fonts"
   },
 
   // Port for live reload server to use. 35729 is the default for most

@@ -112,6 +112,38 @@ module.exports = function(gulp) {
     });
   };
 
+  // Copy assets without change (e.g. fonts)
+  var buildAssetsName; // Set so build can find
+  exports.buildAssets = function(name, config) {
+    buildAssetsName = name || "build-vendor-assets";
+
+    // Reverse so destinations are used as keys to array of globs, and
+    // prefix source globs with vendor root
+    var destinations = {};
+    _.each(config.vendorAssets, function(dest, srcGlob) {
+      destinations[dest] = destinations[dest] || [];
+      destinations[dest].push(srcGlob);
+    });
+
+    // Create a separate Gulp task for each destination with a postfix
+    var taskNames = [];
+    _.each(destinations, function(srcGlobList, dest) {
+      var taskName = buildAssetsName + "-" + dest;
+      taskNames.push(taskName);
+      srcGlobList = _.map(srcGlobList, function(srcGlob) {
+        return path.join(getVendorDir(), srcGlob);
+      });
+
+      return gulp.task(taskName, function() {
+        return gulp.src(srcGlobList)
+          .pipe(gulp.dest(path.join(config.pubDir, dest)));
+      });
+    });
+
+    // Gulp task that calls all glob matchers in parallel
+    return gulp.task(buildAssetsName, gulp.parallel(taskNames));
+  };
+
   var buildName; // Set so watch can find
   exports.build = function(name, config) {
     buildName = name || "build-vendor";
@@ -121,7 +153,11 @@ module.exports = function(gulp) {
     if (! buildCSSName) {
       exports.buildCSS(null, config);
     }
-    return gulp.task(buildName, gulp.parallel(buildJSName, buildCSSName));
+    if (! buildAssetsName) {
+      exports.buildAssets(null, config);
+    }
+    return gulp.task(buildName,
+      gulp.parallel(buildJSName, buildCSSName, buildAssetsName));
   };
 
   // Watch and recompile if new vendor files are added
