@@ -26,6 +26,7 @@ module Esper.ApiT {
     team_label_urgent: string;
     team_label_new: string;
     team_label_in_progress: string;
+    team_label_pending: string;
     team_label_done: string;
     team_label_canceled: string;
     team_calendars: Calendar[];
@@ -352,7 +353,7 @@ module Esper.ApiT {
     task_notes: string;
     task_archived: boolean;
     task_labels: string[];
-    task_progress: string; // New | In_progress | Done | Canceled
+    task_progress: string; // New | In_progress | Pending | Done | Canceled
     task_urgent: boolean;
     task_unread_emails?: number;
     task_threads: EmailThread[];

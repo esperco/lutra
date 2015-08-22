@@ -95,6 +95,8 @@ module Esper.TaskList {
       return team.team_label_new;
     case "In_progress":
       return team.team_label_in_progress;
+    case "Pending":
+      return team.team_label_pending;
     case "Done":
       return team.team_label_done;
     case "Canceled":
@@ -163,6 +165,7 @@ module Esper.TaskList {
     var progressChoices = [
       { label: team.team_label_new, value: "New" },
       { label: team.team_label_in_progress, value: "In_progress" },
+      { label: team.team_label_pending, value: "Pending" },
       { label: team.team_label_done, value: "Done" },
       { label: team.team_label_canceled, value: "Canceled" }
     ];
@@ -289,6 +292,7 @@ module Esper.TaskList {
     <span #urgent class="esper-tl-link esper-tl-urgent"></span>
     <span #new_ class="esper-tl-link esper-tl-progress"></span>
     <span #inProgress class="esper-tl-link esper-tl-progress"></span>
+    <span #pending class="esper-tl-link esper-tl-progress"></span>
     <span #done class="esper-tl-link esper-tl-progress"></span>
     <span #canceled class="esper-tl-link esper-tl-progress"></span>
     <div #otherTeamLabels></div>
@@ -299,6 +303,7 @@ module Esper.TaskList {
     urgent.text(team.team_label_urgent);
     new_.text(team.team_label_new);
     inProgress.text(team.team_label_in_progress);
+    pending.text(team.team_label_pending);
     done.text(team.team_label_done);
     canceled.text(team.team_label_canceled);
 
@@ -331,6 +336,7 @@ module Esper.TaskList {
 
     bindProgress(new_, "New");
     bindProgress(inProgress, "In_progress");
+    bindProgress(pending, "Pending");
     bindProgress(done, "Done");
     bindProgress(canceled, "Canceled");
 
