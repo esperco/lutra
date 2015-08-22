@@ -158,6 +158,7 @@ module Esper.TaskTab {
     var statuses = [
       {label:"New", state:"New"},
       {label:"In Progress", state:"In_progress"},
+      {label:"Pending", state:"Pending"},
       {label:"Canceled", state:"Canceled"},
       {label:"Done", state:"Done"}
     ];
