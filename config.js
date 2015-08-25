@@ -91,6 +91,6 @@ fs.writeFileSync("./tsconfig.json", JSON.stringify({
   // This should function as a list of entry-points (use references to
   // include files that should be concatenated within)
   files: [
-    "ts/app.ts",
+    "ts/App.ts",
   ]
 }));
