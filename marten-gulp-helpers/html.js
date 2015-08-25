@@ -3,8 +3,7 @@
 
 module.exports = function(gulp) {
   var minify = require("gulp-minify-html"),
-      preprocess = require("gulp-preprocess"),
-      replace = require("gulp-replace");
+      preprocess = require("gulp-preprocess");
 
   var exports = {};
 
@@ -15,12 +14,6 @@ module.exports = function(gulp) {
     return gulp.task(buildName, function() {
       var ret = gulp.src(config.htmlDir + "/**/*.html")
         .pipe(preprocess({context: config}));
-      if (config.productionVar) {
-        ret = ret.pipe(replace(/<head>/,
-          "<head><script type=\"text/javascript\">" +
-          config.productionVar + " = " + config.production +
-          "</script>"));
-      }
       if (config.production) {
         ret = ret.pipe(minify());
       }

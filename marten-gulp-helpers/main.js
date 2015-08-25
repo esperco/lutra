@@ -11,6 +11,7 @@ module.exports = function(gulp) {
     server: require("./server")(gulp),
     test: require("./test")(gulp),
     tsc: require("./tsc")(gulp),
+    typescript: require("./typescript")(gulp),
     vendor: require("./vendor")(gulp)
   };
 };
