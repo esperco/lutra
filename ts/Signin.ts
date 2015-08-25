@@ -408,7 +408,12 @@ module Signin {
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
-          Route.nav.path("join-from-login");
+          Route.nav.home();
+          Status.report($(`<span>We were unable to log you in. Esper is 
+            currently in private beta. Please contact
+            <a href="mailto:support@esper.com">support@esper.com</a> for
+            information about joining.</span>`), "danger");
+          // Route.nav.path("join-from-login");
         } else {
           Route.nav.home();
           Status.reportError("We were unable to login.");
