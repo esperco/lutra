@@ -5,126 +5,25 @@
   <link rel="stylesheet" href="/css/app.css">
 
   <!-- To prevent reference errors during dev only -->
-  <script src="/test/jasmine.js"></script>
+  <!-- @if !production -->
+    <script type="text/javascript" src="/test/jasmine.js"></script>
+    <script type="text/javascript">
+      /* jshint strict: false */
+      /* globals window: false, jasmineRequire: false */
+      window.jasmine = jasmineRequire.core(jasmineRequire);
+      var env = window.jasmine.getEnv();
+      var jasmineInterface = jasmineRequire.interface(window.jasmine, env);
+      for (var jasmineName in jasmineInterface) {
+        if (jasmineInterface.hasOwnProperty(jasmineName)) {
+          window[jasmineName] = jasmineInterface[jasmineName];
+        }
+      }
+    </script>
+  <!-- @endif -->
 </head>
 <body class="esper">
-  <div class="container">
-    <div class="page-header">
-      <h1>
-        Hello world!
-        <small>Esper Bootstrap Demo</small>
-      </h1>
-    </div>
-
-    <h3>Containers</h3>
-
-    <div class="well">This is a well!</div>
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Panel title</h3>
-      </div>
-      <div class="panel-body">
-        Panel content
-      </div>
-    </div>
-
-    <div class="panel panel-default">
-      <div class="panel-body">
-        Panel content
-      </div>
-      <div class="panel-footer">Panel footer</div>
-    </div>
-
-    <h3>Buttons</h3>
-    <div class="well">
-      <!-- Standard button -->
-      <button type="button" class="btn btn-default">Default</button>
-
-      <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-      <button type="button" class="btn btn-primary">Primary</button>
-
-      <!-- Indicates a successful or positive action -->
-      <button type="button" class="btn btn-success">Success</button>
-
-      <!-- Contextual button for informational alert messages -->
-      <button type="button" class="btn btn-info">Info</button>
-
-      <!-- Indicates caution should be taken with this action -->
-      <button type="button" class="btn btn-warning">Warning</button>
-
-      <!-- Indicates a dangerous or potentially negative action -->
-      <button type="button" class="btn btn-danger">Danger</button>
-
-      <button type="button" class="btn btn-secondary">Secondary</button>
-
-      <!-- Deemphasize a button by making it look like a link while maintaining button behavior -->
-      <button type="button" class="btn btn-link">Link</button>
-    </div>
-
-    <div class="well" style="background: #333;">
-      <!-- Outline, difficult to see unless on solid background -->
-      <button type="button" class="btn btn-tertiary">Tertiary</button>
-    </div>
-
-    <h3>Labels</h3>
-
-    <div class="well">
-      <span class="label label-default">Default</span>
-      <span class="label label-primary">Primary</span>
-      <span class="label label-success">Success</span>
-      <span class="label label-info">Info</span>
-      <span class="label label-warning">Warning</span>
-      <span class="label label-danger">Danger</span>
-    </div>
-
-    <h3>Alerts</h3>
-
-    <div class="alert alert-success" role="alert">Success</div>
-    <div class="alert alert-info" role="alert">Info</div>
-    <div class="alert alert-warning" role="alert">Warning</div>
-    <div class="alert alert-danger" role="alert">Danger</div>
-
-    <h3>Progress Bar</h3>
-
-    <div class="progress">
-      <div class="progress-bar" role="progressbar" aria-valuenow="60"
-           aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-        <span class="sr-only">60% Complete</span>
-      </div>
-    </div>
-
-    <h3>Grid System</h3>
-
-    <div class="row">
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-      <div class="col-md-1 well">.col-md-1</div>
-    </div>
-    <div class="row">
-      <div class="col-sm-8 well">.col-sm-8</div>
-      <div class="col-sm-4 well">.col-sm-4</div>
-    </div>
-    <div class="row">
-      <div class="col-sm-4 well">.col-sm-4</div>
-      <div class="col-sm-4 well">.col-sm-4</div>
-      <div class="col-sm-4 well">.col-sm-4</div>
-    </div>
-    <div class="row">
-      <div class="col-lg-6 well">.col-lg-6</div>
-      <div class="col-lg-6 well">.col-lg-6</div>
-    </div>
-
-
+  <div id="esper-root" class="container">
+    Hello world!
   </div>
   <script type="text/javascript" src="/js/vendor.js"></script>
   <script type="text/javascript" src="/js/App.js"></script>
