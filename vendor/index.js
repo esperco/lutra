@@ -28,14 +28,23 @@ depends.inject({jQuery: jQuery, $: jQuery}, function() {
 });
 
 // Create a global Vesper object with our vendor dependencies
-/* global Vesper: true */
-Vesper = {
-  _:            lodash,
-  $:            jQuery,
-  jQuery:       jQuery,
-  CryptoJS:     { SHA1: SHA1 },
-  fullCalendar: fullCalendar,
-  moment:       moment,
-  momentTz:     momentTz,
-  page:         page
-};
+/* global Esper: true */
+/* global window: false */
+Esper = (function(esperObj) {
+  var assignments = {
+    _:            lodash,
+    $:            jQuery,
+    jQuery:       jQuery,
+    CryptoJS:     { SHA1: SHA1 },
+    fullCalendar: fullCalendar,
+    moment:       moment,
+    momentTz:     momentTz,
+    page:         page
+  };
+  for (var name in assignments) {
+    if (assignments.hasOwnProperty(name)) {
+      esperObj[name] = assignments[name];
+    }
+  }
+  return esperObj;
+})(window.Esper || {});
