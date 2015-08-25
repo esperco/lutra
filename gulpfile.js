@@ -43,8 +43,8 @@ gulp.task("production", function(done) {
 // task. Temp dir will be cleaned up on exit.
 var tempDir;
 var getTempDir = function() {
-  temp.track();     // Remove to disable cleanup
   if (! tempDir) {
+    temp.track();     // Remove to disable cleanup
     tempDir = temp.mkdirSync();
     console.log("Using " + tempDir + " as temp dir");
   }
