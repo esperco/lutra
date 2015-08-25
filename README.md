@@ -52,3 +52,20 @@ This lets the minimizer remove unused production code. Because the regex for
 this isn't very smart, be careful of putting anything that looks like
 `__ESPER_PRODUCTION__` in your TypeScript code if you don't want it
 automatically replaced during minimization.
+
+LESS Bootstrap
+--------------
+The [`less/_custom_bootstrap`](less/_custom_bootstrap.less) partial can be
+imported to get Bootstrap but overriden with Esper-specific style variables.
+You can import this inside a class block to create a namespace of sorts (
+although CSS code with the `!important` declaration may still be able
+to override it):
+
+```
+.esper {
+  @import "_custom_bootstrap";
+  font-family: @font-family-base;
+  background: @body-bg;
+  color: @text-color;
+}
+```

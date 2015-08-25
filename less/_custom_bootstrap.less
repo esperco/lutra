@@ -1,0 +1,41 @@
+/* Imports Bootstrap from vendor dir and overrides variables with the
+   Esper look and feel */
+@import "../vendor/bootstrap/less/bootstrap";
+
+// Override variables
+@import "./_bootstrap_variables";
+
+// Addition classes
+.btn-secondary {
+  color: @brand-text;
+  background: @gray-lighter;
+  border: 1px solid @btn-default-border;
+  transition: color 0.5s, border 0.5s;
+
+  &:hover, &:active {
+    color: @brand-hover;
+    border: 1px solid lighten(@btn-default-border, 5%);
+  }
+}
+
+.btn-tertiary {
+  color: rgba(255, 255, 255, 0.8);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: color 0.5s, border 0.5s;
+
+  &:hover, &:active {
+    color: white;
+    border: 1px solid white;
+  }
+}
+
+// Animations
+.btn-primary, .btn-secondary, .btn-tertiary {
+  transition: color 0.5s, border 0.5s, background-color 0.5s;
+}
+
+// Aliases
+.button-primary { .btn-primary }
+.button-secondary { .btn-secondary }
+.button-tertiary { .btn-tertiary }
