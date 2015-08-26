@@ -3,7 +3,6 @@ module.exports = function(gulp) {
 
   var childProcess  = require('child_process'),
       chalk         = require('chalk'),
-      mkdirp        = require('mkdirp'),
       path          = require('path'),
       replace       = require('gulp-replace'),
       sourcemaps    = require('gulp-sourcemaps'),
@@ -13,15 +12,16 @@ module.exports = function(gulp) {
   var exports = {};
 
   /** Spawn a TSC process or watcher -- use tsconfig.json to configure
-    * @param {string} [opts.tscPath="tsc"] - Command line arg for tsc
-    * @param {boolean} [opts.watch] - If true, turns on watch mode
-    * @param {boolean} [opts.cwd] - Working directory to use for our process
-    * @param {string} [opts.outDir] - Pick an output directory
-    * @param {boolean} [opts.inlineSources] - Inline sources (use if external
-    *   source maps are buggy, but only in dev), else external source map
-    * @param {boolean} [opts.exitOnError] - Exit if TSC outputs stderr
-    * @param {function} cb - Callback when compiler process is complete
-  */
+   *  @param {string} [opts.tscPath="tsc"] - Command line arg for tsc
+   *  @param {boolean} [opts.watch] - If true, turns on watch mode
+   *  @param {boolean} [opts.cwd] - Working directory to use for our process
+   *  @param {string} [opts.out] - Pick a single output file
+   *  @param {string} [opts.outDir] - Pick an output directory
+   *  @param {boolean} [opts.inlineSources] - Inline sources (use if external
+   *    source maps are buggy, but only in dev), else external source map
+   *  @param {boolean} [opts.exitOnError] - Exit if TSC outputs stderr
+   *  @param {function} cb - Callback when compiler process is complete
+   */
   var spawnTsc = function(opts, cb) {
     if (typeof opts === "function" && !cb) {
       cb = opts;
@@ -41,6 +41,10 @@ module.exports = function(gulp) {
     }
     if (opts.watch) {
       tscArgs.push("-w");
+    }
+    if (opts.out) {
+      tscArgs.push("--out");
+      tscArgs.push(opts.out);
     }
     if (opts.outDir) {
       tscArgs.push("--outDir");
@@ -103,54 +107,75 @@ module.exports = function(gulp) {
     return tempDir;
   };
 
-  var buildName; // Set this var so knows how to reference build
+  // Name for intermediate TS bundle in our temp directory
+  var getTempFile = function(config) {
+    return path.join(getTempDir(), path.basename(config.tsOut));
+  };
+
+  // Get the path to the compiler based on config -- use ntsc if set
+  var tscPath = function(config) {
+    var ret;
+    if (config.useNtsc) {
+      ret = path.join(__dirname, "node_modules", ".bin", "ntsc");
+    } else {
+      ret = path.join(__dirname, "node_modules", ".bin", "tsc");
+    }
+    console.log("Using " + ret);
+    return ret;
+  };
+
+  // Gulp code to process concatenated TS bundle
+  var postTsc = function(config) {
+    var bundleDir = path.join(config.pubDir, path.dirname(config.tsOut));
+    var ret = gulp.src(getTempFile(config));
+
+    // Make sure productionVar exists so we don't accidentally replace
+    // a bunch of "undefined"s.
+    if (config.productionVar) {
+      // RegEx does a simple word check -- this isn't totally safe
+      // since var could be in string, so hope that it's unique
+      var regEx = new RegExp("\\b" + config.productionVar + "\\b", "g");
+      ret = ret.pipe(replace(regEx, (!!config.production).toString()));
+    }
+
+    if (config.production) {
+      // loadMaps = true so we can load tsify/browserify sourcemaps
+      ret = ret.pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(uglify()) // Should remove unreachable dev only code
+        .pipe(sourcemaps.write("./"));
+    }
+
+    return ret.pipe(gulp.dest(bundleDir));
+  };
+
   exports.build = function(name, config) {
-    buildName = name || "build-ts";
-    return gulp.task(buildName, gulp.series(
-
-      // Use TSC process to write out to file
+    name = name || "build-ts";
+    return gulp.task(name, gulp.series(
       function(cb) {
-        mkdirp(path.join(config.pubDir, config.tscOutDir), function(err) {
-          if (err) {
-            console.error(err);
-          } else {
-            spawnTsc({inlineSources: true,
-                      outDir: config.production ? getTempDir() : null}, cb);
-          }
-        });
+        spawnTsc({inlineSources: true,
+                  tscPath: tscPath(config),
+                  out: getTempFile(config)}, cb);
       },
-
-      // If production, above command wrote out to temp dir. Grab temp files,
-      // replace production var and uglify, and then pipe to pub directory.
-      function(cb) {
-        if (config.production) {
-          var ret = gulp.src(path.join(getTempDir(), "**/*.js"))
-            .pipe(sourcemaps.init({loadMaps: true}));
-
-          // Make sure productionVar exists so we don't accidentally replace
-          // a bunch of "undefined"s.
-          if (config.productionVar) {
-            // RegEx does a simple word check -- this isn't totally safe
-            // since var could be in string, so hope that it's unique
-            var regEx = new RegExp("\\b" + config.productionVar + "\\b", "g");
-            ret = ret.pipe(replace(regEx, "true"));
-          }
-
-          return ret
-            .pipe(uglify()) // Should remove unreachable dev only code
-            .pipe(sourcemaps.write("./"))
-            .pipe(gulp.dest(path.join(config.pubDir, config.tscOutDir)));
-        }
-        else { cb(); /* Nothing to do */ }
+      function() {
+        return postTsc(config);
       }
     ));
   };
 
-  exports.watch = function(name) {
+  exports.watch = function(name, config) {
     name = name || "watch-ts";
-    return gulp.task(name, function(cb) {
-      return spawnTsc({watch: true, inlineSources: true}, cb);
-    });
+    return gulp.task(name, gulp.parallel(
+      function(cb) {
+        return spawnTsc({ watch: true,
+                          inlineSources: true,
+                          tscPath: tscPath(config),
+                          out: getTempFile(config)}, cb);
+      },
+      function() {
+        return gulp.watch(getTempFile(config), function() {
+          return postTsc(config);
+        });
+      }));
   };
 
   return exports;
