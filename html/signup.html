@@ -4,36 +4,36 @@
     <script type="text/javascript">
       /* jshint strict: false */
       /* jshint browser: true */
-      function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(window.location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-      }
+      // function getParameterByName(name) {
+      //   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      //   var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+      //       results = regex.exec(window.location.search);
+      //   return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+      // }
 
-      var code = getParameterByName("code");
-      var first = getParameterByName("first");
-      var last = getParameterByName("last");
-      var phone = getParameterByName("phone");
-      var email = getParameterByName("email");
+      // var code = getParameterByName("code");
+      // var first = getParameterByName("first");
+      // var last = getParameterByName("last");
+      // var phone = getParameterByName("phone");
+      // var email = getParameterByName("email");
 
       /* globals redirect: true */
-      redirect = "https://app.esper.com/#!join";
+      redirect = "http://esper.com/waiting-list";
 
-      if (code) {
-        redirect = [
-          "https://app.esper.com/#!signup2",
-          encodeURIComponent(first || " "),
-          encodeURIComponent(last  || " "),
-          encodeURIComponent(phone || " "),
-          encodeURIComponent(email || "x@y.com"),
+      // if (code) {
+      //   redirect = [
+      //     "https://app.esper.com/#!signup2",
+      //     encodeURIComponent(first || " "),
+      //     encodeURIComponent(last  || " "),
+      //     encodeURIComponent(phone || " "),
+      //     encodeURIComponent(email || "x@y.com"),
 
-          // This doesn't actually affect actual signup flow, but needs to
-          // be set to get past signup2 checks
-          encodeURIComponent("Google Apps"),
+      //     // This doesn't actually affect actual signup flow, but needs to
+      //     // be set to get past signup2 checks
+      //     encodeURIComponent("Google Apps"),
 
-          encodeURIComponent(code)].join("/");
-      }
+      //     encodeURIComponent(code)].join("/");
+      // }
       window.location = redirect;
     </script>
   </head>
