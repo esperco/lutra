@@ -1,4 +1,5 @@
 /// <reference path="./Esper.ts"/>
+/// <reference path="./Test.ts"/>
 /// <reference path="./TestPage.tsx"/>
 
 module Esper.App {
