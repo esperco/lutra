@@ -290,7 +290,10 @@ module Esper.CurrentThread {
 
   task.watch(function(newTask, isValid) {
     if (isValid) {
-      taskPrefs = TaskPreferences.get(newTask.taskid).then(Option.wrap);
+      var wrap = function(e) {
+        return Option.wrap<ApiT.TaskPreferences>(e);
+      };
+      taskPrefs = TaskPreferences.get(newTask.taskid).then(wrap);
     } else {
       taskPrefs = noTaskPrefs;
     }

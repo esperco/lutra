@@ -341,7 +341,7 @@ module Esper.Timezone {
     { id: "Pacific/Kiritimati", name: "Kiritimati" }
   ];
 
-  function addMomentDataToZone(m: Moment, z: ZoneName): ZoneInfo {
+  function addMomentDataToZone(m: moment.Moment, z: ZoneName): ZoneInfo {
     var mom = (<any> moment).tz(m, z.id);
     return {
       id: z.id,

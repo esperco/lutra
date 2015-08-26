@@ -55,8 +55,11 @@ git pull --ff-only origin master
 install_ts jquery
 install_ts jqueryui
 install_ts chrome
+install_ts webrtc
+install_ts es6-promise
 install_ts cryptojs
 install_ts moment
+install_ts moment-timezone
 install_ts fullCalendar
 
 cd "$ROOT"
