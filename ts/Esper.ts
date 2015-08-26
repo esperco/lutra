@@ -1,12 +1,18 @@
+// This module should be referenced first. It handles bringing in our
+// type definitions, references to external vendor files, and sets up
+// the Esper namespace
+
 /// <reference path="../typings/tsd.d.ts"/>
 declare var __ESPER_PRODUCTION__: boolean;
-declare var Esper: {
-  _: _.LoDashStatic,
-  $: JQueryStatic,
-  jQuery: JQueryStatic,
-  moment: moment.MomentStatic,
-  CryptoJS: CryptoJS.CryptoJSStatic
-};
+
+module Esper {
+  export var _: _.LoDashStatic;
+  export var $: JQueryStatic;
+  export var jQuery: JQueryStatic;
+  export var moment: moment.MomentStatic;
+  export var CryptoJS: CryptoJS.CryptoJSStatic;
+  // export var React: __React;
+}
 
 if (! __ESPER_PRODUCTION__) {
 

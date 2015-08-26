@@ -7,7 +7,6 @@
 
    NB: TypeScript options can also be found in tsconfig.json
 */
-var path = require('path');
 
 // Paths should be relate to config file unless otherwise specified
 module.exports = {
@@ -15,11 +14,19 @@ module.exports = {
   // Root dir for test site
   pubDir: "pub",
 
-  // Path to TypeScript compiler command
-  tscPath: "tsc",
+  // Use NTypescript?
+  useNtsc: true,
 
-  // TypeScript output directory, relative to pubDir
-  tscOutDir: "js",
+  // TypeScript entry point for app
+  tsIn: "ts/App.ts",
+
+  // TypeScript bundle output, relative to pubDir
+  tsOut: "js/app.js",
+
+  // TypeScript options
+  tsCompilerOpts: {
+    noImplicitAny: true
+  },
 
   // Directory with LESS files
   lessDir: "less",
@@ -32,7 +39,7 @@ module.exports = {
 
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
-  vendorJSIndex: "vendor/index.js",
+  vendorJSIndex: "js/vendor.js",
 
   // Where Browserify should write the JS bundle (relative to pubDir)
   vendorJSOut: "js/vendor.js",
@@ -79,11 +86,7 @@ module.exports = {
 // directly ourselves so we can reference config data above (and add comments)
 var fs = require('fs');
 fs.writeFileSync("./tsconfig.json", JSON.stringify({
-  compilerOptions: {
-    noImplicitAny: true,
-    // removeComments: true,
-    outDir: path.join(module.exports.pubDir, module.exports.tscOutDir)
-  },
+  compilerOptions: module.exports.tsCompilerOpts,
 
   // Used by Atom TypeScript and certain IDEs
   compileOnSave: false,
@@ -91,6 +94,6 @@ fs.writeFileSync("./tsconfig.json", JSON.stringify({
   // This should function as a list of entry-points (use references to
   // include files that should be concatenated within)
   files: [
-    "ts/App.ts",
+    module.exports.tsIn
   ]
 }));
