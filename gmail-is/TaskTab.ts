@@ -225,6 +225,20 @@ module Esper.TaskTab {
       });
   }
 
+  function selectMeetingTypeOnUserTab(meetingType : string,
+                                      userTabContent : UserTab.UserTabView)
+  : void {
+    userTabContent.meetingSelector.find("option").each(function(i) {
+      if ($(this).text() === meetingType.replace("_", " ")) {
+        userTabContent.meetingSelector.val($(this).val());
+        userTabContent.meetingSelector.trigger("change");
+        if (userTabContent.showMeetings.text() === "Show") {
+          userTabContent.showMeetings.trigger("click");
+        }
+      }
+    });
+  }
+
   /** Creates or renames a task, explicitly triggered by a UI action.
    *
    *  Will fail if a task cannot be created, such as if there is no
@@ -232,7 +246,8 @@ module Esper.TaskTab {
    *  should not happen and is logged as an error.
    */
   // TODO: Update using centralized model at CurrentThread
-  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
+  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
+                              userTabContent : UserTab.UserTabView) {
     Sidebar.dismissDropdowns();
     Log.d("Creating task with meetingType ", taskTitle.data("meetingType"));
     var force = true;
@@ -245,6 +260,7 @@ module Esper.TaskTab {
           if (meetingType) {
             Api.setTaskMeetingType(task.taskid, meetingType);
             task.task_meeting_type = meetingType;
+            selectMeetingTypeOnUserTab(meetingType, userTabContent);
           }
           CurrentThread.setTask(task);
           taskTitle.val(query);
@@ -262,7 +278,8 @@ module Esper.TaskTab {
                                 team: ApiT.Team,
                                 threadId: string,
                                 query,
-                                taskTab: TaskTabView) {
+                                taskTab: TaskTabView,
+                                userTabContent : UserTab.UserTabView) {
     var teamid = team.teamid;
     Api.searchTasks(teamid, query).done(function(response) {
       results.find(".esper-li").remove();
@@ -316,7 +333,8 @@ module Esper.TaskTab {
       rename
         .appendTo(actions)
         .click(function() {
-          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query);
+          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
+                             userTabContent);
         });
 
       function addArchiveOption(task) {
@@ -547,7 +565,7 @@ module Esper.TaskTab {
     meetingType.change(function() {
       var type = $(this).val();
       taskTitle.data("meetingType", type);
-      taskTitle.val(type + " ");
+      taskTitle.val(type.replace("_", " ") + " ");
       meetingType.hide();
       taskTitle.show();
       taskTitle.focus();
@@ -561,7 +579,8 @@ module Esper.TaskTab {
                                  threadId: string,
                                  autoTask: boolean,
                                  linkedEvents: ApiT.TaskEvent[],
-                                 workflows: ApiT.Workflow[]) {
+                                 workflows: ApiT.Workflow[],
+                                 userTabContent : UserTab.UserTabView) {
 '''
 <div #view>
   <div class="esper-tab-header">
@@ -837,6 +856,9 @@ module Esper.TaskTab {
           displayLinkedThreadsList(task, threadId, taskTabView);
           markNewTaskAsInProgress(task);
           displayTaskProgress(task, taskTabView);
+          if (task.task_meeting_type) {
+            selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+          }
 
           var progress = task.task_workflow_progress;
           if (progress) {
@@ -859,7 +881,8 @@ module Esper.TaskTab {
             displaySearchResults(taskTitle, taskSearchDropdown,
                                  taskSearchResults,
                                  taskSearchActions, team,
-                                 threadId, query, taskTabView);
+                                 threadId, query, taskTabView,
+                                 userTabContent);
           }
         });
         taskTitle.keydown(function(pressed) {
@@ -870,7 +893,7 @@ module Esper.TaskTab {
             taskTitle.blur();
             Gmail.threadContainer().focus();
             createOrRenameTask(taskTitle, team.teamid, threadId,
-                               taskTabView, name);
+                               taskTabView, name, userTabContent);
           }
         });
       });
