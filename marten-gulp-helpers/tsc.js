@@ -1,8 +1,10 @@
 module.exports = function(gulp) {
   "use strict";
 
-  var childProcess  = require('child_process'),
+  var _             = require('lodash'),
+      childProcess  = require('child_process'),
       chalk         = require('chalk'),
+      fs            = require('fs'),
       path          = require('path'),
       replace       = require('gulp-replace'),
       sourcemaps    = require('gulp-sourcemaps'),
@@ -129,15 +131,6 @@ module.exports = function(gulp) {
     var bundleDir = path.join(config.pubDir, path.dirname(config.tsOut));
     var ret = gulp.src(getTempFile(config));
 
-    // Make sure productionVar exists so we don't accidentally replace
-    // a bunch of "undefined"s.
-    if (config.productionVar) {
-      // RegEx does a simple word check -- this isn't totally safe
-      // since var could be in string, so hope that it's unique
-      var regEx = new RegExp("\\b" + config.productionVar + "\\b", "g");
-      ret = ret.pipe(replace(regEx, (!!config.production).toString()));
-    }
-
     if (config.production) {
       // loadMaps = true so we can load tsify/browserify sourcemaps
       ret = ret.pipe(sourcemaps.init({loadMaps: true}))
@@ -151,6 +144,15 @@ module.exports = function(gulp) {
   exports.build = function(name, config) {
     name = name || "build-ts";
     return gulp.task(name, gulp.series(
+      function(cb) {
+        var tsConfig = _.extend({}, config.tsConfig);
+        if (config.production && config.tsInProd) {
+          tsConfig.files = [config.tsInProd];
+        } else {
+          tsConfig.files = [config.tsIn];
+        }
+        fs.writeFile("./tsconfig.json", JSON.stringify(tsConfig), cb);
+      },
       function(cb) {
         spawnTsc({inlineSources: true,
                   tscPath: tscPath(config),

@@ -18,16 +18,11 @@ module.exports = {
   useNtsc: true,
 
   // TypeScript entry point for app
-  tsIn: "ts/App.ts",
+  tsIn: "ts/Dev.ts",
+  tsInProd: "ts/Prod.ts",
 
   // TypeScript bundle output, relative to pubDir
   tsOut: "js/app.js",
-
-  // TypeScript options
-  tsCompilerOpts: {
-    noImplicitAny: true,
-    jsx: "react"
-  },
 
   // Directory with LESS files
   lessDir: "less",
@@ -73,28 +68,18 @@ module.exports = {
   // here, can be done programatically with Gulp task
   production: false,
 
-  // Global variable name used by TS files to determine production mode
-  // We use a pretty dumb regex to find this variable and replace it with
-  // "true" in production, so make sure it's unique and not likely to appear
-  // outside of this use-case
-  productionVar: "__ESPER_PRODUCTION__",
-
   // Where to provision test runner in pubDir
   testDir: "test"
 };
 
-// Write tsconfig.json data -- we write from config.json instead of writing
-// directly ourselves so we can reference config data above (and add comments)
-var fs = require('fs');
-fs.writeFileSync("./tsconfig.json", JSON.stringify({
-  compilerOptions: module.exports.tsCompilerOpts,
+// Set tsconfig options here so we can pull data from above -- don't set
+// files though, use tsIn or tsInProd above
+module.exports.tsConfig = {
+  compilerOptions: {
+    noImplicitAny: true,
+    jsx: "react"
+  },
 
   // Used by Atom TypeScript and certain IDEs
-  compileOnSave: false,
-
-  // This should function as a list of entry-points (use references to
-  // include files that should be concatenated within)
-  files: [
-    module.exports.tsIn
-  ]
-}));
+  compileOnSave: false
+};

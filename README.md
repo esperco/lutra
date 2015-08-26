@@ -22,10 +22,20 @@ main (borisyankov) DefinitelyTyped repo.
 
 TypeScript Modules
 ------------------
-Most of the TypeScript code live in their own modules, each of which are within
-the `Esper` namespace. Some of these modules depend oncertain vendor helpers
-such as jQuery or Lodash / Underscore being added to the Esper namespace (see
-below on how that works);
+Most of the TypeScript code live in their own internal module namepsaces,
+each of which are within the `Esper` namespace. Some of these modules depend
+on certain vendor helpers such as jQuery or Lodash / Underscore being added to
+the Esper namespace (see below on how that works).
+
+The TypeScript build process assumes you use a single file as an "entry-point"
+for all TypeScript files. We don't use a CommonJS- or AMD- style require
+for TypeScripts (although that may change in future versions), but assume
+that all necessary TypeScript files are referenced using
+`/// <reference path="./MyModule.ts"/>`. All referenced files will be
+concatenated based on the referenced paths.
+
+The Marten test app has both a [development entry point](ts/Dev.ts) and an
+example [production entry point](ts/Prod.ts).
 
 Vendor Files
 ------------
@@ -40,18 +50,6 @@ overly pollute the global namespace. See the [vendor index file](js/vendor.js)
 for an example of how to construct an index file that Browserify can use
 as an entry point. The Browserify code and necessary plugins are handled
 by [marten-gulp-helpers/vendor.js](marten-gulp-helpers/vendor.js).
-
-Production Code
----------------
-The TypeScript uses the `__ESPER_PRODUCTION__` global variable to control
-which code is run in production vs. development modes. While you can change
-this in the `config.js` file, a lot of the TypeScript modules implicitly assume
-this is the variable used. In production, this variable isn't set but rather
-replaced with `true` using a simple regular expression.
-This lets the minimizer remove unused production code. Because the regex for
-this isn't very smart, be careful of putting anything that looks like
-`__ESPER_PRODUCTION__` in your TypeScript code if you don't want it
-automatically replaced during minimization.
 
 LESS Bootstrap
 --------------

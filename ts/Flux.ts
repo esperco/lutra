@@ -31,9 +31,11 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
   export enum DataStatus { READY, INFLIGHT };
 
   // Wrapper around items that get stored in Store
-  export interface StoreObject {
+  export interface StoreObject<TData> {
     _id: string;
     dataStatus: DataStatus;
+    lastUpdate: Date;
+    data: TData;
   }
 
 
@@ -43,28 +45,36 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
   // an instance of the store
 
   // Action for inserting a new object into the store
-  export class InsertAction<TObject extends StoreObject> extends Action {
-    object: TObject;
+  export class InsertAction<TData> extends Action {
+    object: StoreObject<TData>;
 
-    constructor(object: TObject) {
+    constructor(object: StoreObject<TData>) {
       super();
       this.object = object;
     }
   }
 
   // Action for updating an object by _id
-  export class UpdateAction<TObject extends StoreObject> extends Action {
+  export class UpdateAction<TData> extends Action {
     _id: string;
-    update: any; // Type-checked in constructor below
+    updateFn: (old: StoreObject<TData>) => StoreObject<TData>;
 
     // Can update either with a function that processes the old object and
     // returns a replacement, or returns a brand new replacement object
-    constructor(_id: string, updateFn: (old: TObject) => TObject);
-    constructor(_id: string, replacement: TObject);
+    constructor(_id: string,
+                updateFn: (old: StoreObject<TData>) => StoreObject<TData>);
+    constructor(_id: string,
+                replacement: StoreObject<TData>);
     constructor(_id: string, update: any) {
       super();
       this._id = _id;
-      this.update = update;
+      if (_.isFunction(update)) {
+        this.updateFn = update;
+      } else {
+        this.updateFn = function(old: StoreObject<TData>) {
+          return update;
+        };
+      }
     }
   }
 
@@ -90,7 +100,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
   }
 
   // Base class for Flux Store
-  export class Store<TObject extends StoreObject> extends Esper.EventEmitter {
+  export class Store<TData> extends Esper.EventEmitter {
 
     /*
       For simplicity we just emit a single change variable whenever any
@@ -104,7 +114,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
 
     // Actual container for data
     private data: {
-      [index: string]: TObject
+      [index: string]: StoreObject<TData>
     };
 
     // Action handlers that get called
@@ -125,15 +135,15 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Returns an instance stored with a particular _id
-    get(_id: string): TObject|void {
+    get(_id: string): StoreObject<TData>|void {
       if (this.exists(_id)) {
         return this.data[_id];
       }
     }
 
     // Return all store objects
-    getAll(): TObject[] {
-      return _.values<TObject>(this.data);
+    getAll(): StoreObject<TData>[] {
+      return _.values<StoreObject<TData>>(this.data);
     }
 
     // Register a callback to handle store changes
@@ -147,8 +157,8 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Register an action subclass
-    handle(actionType: { new (...args: any[]): InsertAction<TObject> }): void;
-    handle(actionType: { new (...args: any[]): UpdateAction<TObject> }): void;
+    handle(actionType: { new (...args: any[]): InsertAction<TData> }): void;
+    handle(actionType: { new (...args: any[]): UpdateAction<TData> }): void;
     handle(actionType: { new (...args: any[]): RemoveAction }): void;
     handle(actionType: { new (...args: any[]): Action },
            handler: (action: Action) => void): void;
@@ -205,7 +215,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Set a given _id to object
-    protected set(_id: string, obj: TObject): void {
+    protected set(_id: string, obj: StoreObject<TData>): void {
       // Forgot set _id by accident, no biggie, just set now
       if (! obj._id) {
         obj._id = _id;
@@ -220,7 +230,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Handle InsertAction
-    protected insert(action: InsertAction<TObject>): void {
+    protected insert(action: InsertAction<TData>): void {
       let obj = action.object;
       if (! obj._id) { // No blank _ids
         throw new Error("_id is required");
@@ -233,15 +243,12 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Handle UpdateAction
-    protected update(action: UpdateAction<TObject>): void {
+    protected update(action: UpdateAction<TData>): void {
       let _id = action._id;
-      let update = action.update;
-
+      let updateFn = action.updateFn;
       if (this.exists(_id)) {
-        if (_.isFunction(update)) {
-          update = update(this.get(_id));
-        }
-        this.set(_id, update);
+        var current = (<StoreObject<TData>> this.get(_id));
+        this.set(_id, updateFn(current));
         this.emitChange();
       }
     }
@@ -257,3 +264,4 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
   }
 }
+
