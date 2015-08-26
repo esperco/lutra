@@ -1,6 +1,12 @@
-// This module should be referenced first. It handles bringing in our
-// type definitions, references to external vendor files, and sets up
-// the Esper namespace
+/*
+  This module should be referenced first by Marten. It handles bringing in our
+  type definitions, references to external vendor files, and sets up
+  the Esper namespace.
+
+  This module should not be referenced outside of Marten unless you actually
+  want to import any all of the dependencies below. You should create something
+  similar to it though.
+*/
 
 /// <reference path="../typings/tsd.d.ts"/>
 declare var __ESPER_PRODUCTION__: boolean;
@@ -8,9 +14,15 @@ declare var __ESPER_PRODUCTION__: boolean;
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
 
+// For classes, refer to class's type
+type DispatcherType = typeof Flux.Dispatcher;
+type EventEmitterType = typeof EventEmitter3.EventEmitter;
+
 declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
+  export var Dispatcher: DispatcherType;
+  export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
@@ -47,6 +59,14 @@ if (! __ESPER_PRODUCTION__) {
 
     it("should not have React defined", function() {
       expect(getGlobal("React")).toBeUndefined();
+    });
+
+    it("should not have flux defined", function() {
+      expect(getGlobal("flux")).toBeUndefined();
+    });
+
+    it("should not have EventEmitter defined", function() {
+      expect(getGlobal("EventEmitter")).toBeUndefined();
     });
 
     // String break prevents RegEx replacement
@@ -86,12 +106,20 @@ if (! __ESPER_PRODUCTION__) {
         .toBe("ab000169b25e0576fe2498c2b2e748d71fa961a2");
     });
 
+    it("should have EventEmitter defined", function() {
+      expect(Esper.EventEmitter).toBeDefined();
+    });
+
     it("should have React defined", function() {
       expect(Esper.React).toBeDefined();
     });
 
     it("should have React addons defined", function() {
       expect(Esper.React.addons).toBeDefined();
+    });
+
+    it("should have a flux Dispatcher defined", function() {
+      expect(Esper.Dispatcher).toBeDefined();
     });
   });
 }

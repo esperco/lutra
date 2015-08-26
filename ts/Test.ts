@@ -1,3 +1,8 @@
+/*
+  Contains helpers for runnings tests using Marten's test runner, Jasmine,
+  and React.
+*/
+
 module Esper {
 
   // Test effectively functions as a module here, but we're creating it

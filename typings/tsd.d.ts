@@ -14,3 +14,5 @@
 /// <reference path="moment-timezone/moment-timezone.d.ts" />
 /// <reference path="react/react-global.d.ts" />
 /// <reference path="react/react-addons-global.d.ts" />
+/// <reference path="eventemitter3/eventemitter3.d.ts" />
+/// <reference path="flux/flux.d.ts" />

@@ -1,4 +1,4 @@
-// Sample React View and Tests
+// Sample React View and Tests. Used to snaity check TSX and React.
 module Esper.TestPage {
   var React = Esper.React;
 
@@ -20,9 +20,7 @@ module Esper.TestPage {
     describe("Index Page", function() {
       it("should be indicate development mode", function() {
         var page = Test.render(<IndexPage />);
-        console.log(page);
         var node = $(React.findDOMNode(page));
-        console.log(node);
         expect(node.find(".mode-span").text().trim()).toBe("development");
       });
     });
