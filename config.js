@@ -25,7 +25,8 @@ module.exports = {
 
   // TypeScript options
   tsCompilerOpts: {
-    noImplicitAny: true
+    noImplicitAny: true,
+    jsx: "react"
   },
 
   // Directory with LESS files

@@ -36,8 +36,8 @@ You can also use `npm install [library] --save` for libraries that aren't
 available on Bower and which will be Browserified for the client.
 
 This package contains helpers for bundling vendor files in a way that doesn't
-overly pollute the global namespace. See the [vendor/index.js](vendor/index.js)
-file for an example of how to construct an index file that Browserify can use
+overly pollute the global namespace. See the [vendor index file](js/vendor.js)
+for an example of how to construct an index file that Browserify can use
 as an entry point. The Browserify code and necessary plugins are handled
 by [marten-gulp-helpers/vendor.js](marten-gulp-helpers/vendor.js).
 

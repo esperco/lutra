@@ -10,8 +10,11 @@ var fullCalendar  = require("fullcalendar"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone");
 
+// React -> get addons
+var react         = require("../vendor/react/react-with-addons.js");
+
 // CryptoJS -> only need SHA-1
-var SHA1          = require("./crypto-js/sha1.js");
+var SHA1          = require("../vendor/crypto-js/sha1.js");
 
 // NB: NPM, not Bower package. Bower package doesn't work well with
 // Browserify unless we want to rewrite its import code.
@@ -27,7 +30,7 @@ depends.inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap");
 });
 
-// Create a global Vesper object with our vendor dependencies
+// Create a global Esper object with our vendor dependencies
 /* global Esper: true */
 /* global window: false */
 Esper = (function(esperObj) {
@@ -39,7 +42,8 @@ Esper = (function(esperObj) {
     fullCalendar: fullCalendar,
     moment:       moment,
     momentTz:     momentTz,
-    page:         page
+    page:         page,
+    React:        react
   };
   for (var name in assignments) {
     if (assignments.hasOwnProperty(name)) {

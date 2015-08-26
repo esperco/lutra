@@ -1,10 +1,18 @@
 /// <reference path="./Esper.ts"/>
+/// <reference path="./TestPage.tsx"/>
 
 module Esper.App {
 
   export function init() {
-    $(window).load(function() {
-      console.log("Super loaded");
+    $(document).ready(function() {
+      var rootElm = $("#esper-root").get(0);
+      if (rootElm) {
+        React.render(
+          React.createElement(TestPage.IndexPage),
+          document.body);
+      } else {
+        console.log("Esper root not found.");
+      }
     });
   }
 }

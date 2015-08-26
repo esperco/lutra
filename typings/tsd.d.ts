@@ -12,3 +12,5 @@
 /// <reference path="jasmine/jasmine.d.ts" />
 /// <reference path="lodash/lodash.d.ts" />
 /// <reference path="moment-timezone/moment-timezone.d.ts" />
+/// <reference path="react/react-global.d.ts" />
+/// <reference path="react/react-addons-global.d.ts" />

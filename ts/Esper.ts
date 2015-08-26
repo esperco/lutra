@@ -5,13 +5,15 @@
 /// <reference path="../typings/tsd.d.ts"/>
 declare var __ESPER_PRODUCTION__: boolean;
 
-module Esper {
+type ReactStatic = typeof React;
+
+declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
-  // export var React: __React;
+  export var React: ReactStatic;
 }
 
 if (! __ESPER_PRODUCTION__) {
@@ -40,6 +42,15 @@ if (! __ESPER_PRODUCTION__) {
 
     it("should not have CryptoJS.SHA1 properly defined", function() {
       expect(getGlobal("CryptoJS")).toBeUndefined();
+    });
+
+    it("should not have React defined", function() {
+      expect(getGlobal("React")).toBeUndefined();
+    });
+
+    // String break prevents RegEx replacement
+    it("should have a false __ESPER_" + "PRODUCTION__ var", function() {
+      expect(__ESPER_PRODUCTION__).toBe(false);
     });
   });
 
@@ -72,6 +83,14 @@ if (! __ESPER_PRODUCTION__) {
     it("should have CryptoJS.SHA1 properly defined", function() {
       expect(Esper.CryptoJS.SHA1("Esper").toString())
         .toBe("ab000169b25e0576fe2498c2b2e748d71fa961a2");
+    });
+
+    it("should have React defined", function() {
+      expect(Esper.React).toBeDefined();
+    });
+
+    it("should have React addons defined", function() {
+      expect(Esper.React.addons).toBeDefined();
     });
   });
 }
