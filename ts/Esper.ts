@@ -5,6 +5,7 @@
 /// <reference path="../typings/tsd.d.ts"/>
 declare var __ESPER_PRODUCTION__: boolean;
 
+// React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
 
 declare module Esper {

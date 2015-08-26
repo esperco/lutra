@@ -1,3 +1,4 @@
+// Sample React View and Tests
 module Esper.TestPage {
   var React = Esper.React;
 
@@ -17,14 +18,12 @@ module Esper.TestPage {
 
   if (! __ESPER_PRODUCTION__) {
     describe("Index Page", function() {
-      beforeEach(function(done) {
-        Test.goTo("/", done);
-      });
-
       it("should be indicate development mode", function() {
-        var testFrame = Test.getTestFrame();
-        expect(testFrame.contents().find(".mode-span").text().trim())
-          .toBe("development");
+        var page = Test.render(<IndexPage />);
+        console.log(page);
+        var node = $(React.findDOMNode(page));
+        console.log(node);
+        expect(node.find(".mode-span").text().trim()).toBe("development");
       });
     });
   }
