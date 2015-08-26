@@ -234,12 +234,18 @@ module Esper.TaskTab {
   // TODO: Update using centralized model at CurrentThread
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
     Sidebar.dismissDropdowns();
+    Log.d("Creating task with meetingType ", taskTitle.data("meetingType"));
     var force = true;
     CurrentThread.refreshTaskForThread(force)
       .done(function(task) {
         if (task) {
           Api.setTaskTitle(task.taskid, query);
           task.task_title = query;
+          var meetingType = taskTitle.data("meetingType");
+          if (meetingType) {
+            Api.setTaskMeetingType(task.taskid, meetingType);
+            task.task_meeting_type = meetingType;
+          }
           CurrentThread.setTask(task);
           taskTitle.val(query);
           markNewTaskAsInProgress(task);
@@ -521,6 +527,33 @@ module Esper.TaskTab {
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
+  }
+
+  function meetingTypeDropdown(taskTitle) {
+'''
+<select #meetingType class="esper-meeting-type esper-select">
+  <option value="header">Select meeting type...</option>
+  <option value="Phone_call">Phone call</option>
+  <option value="Video_call">Video call</option>
+  <option value="Breakfast">Breakfast</option>
+  <option value="Brunch">Brunch</option>
+  <option value="Lunch">Lunch</option>
+  <option value="Coffee">Coffee</option>
+  <option value="Dinner">Dinner</option>
+  <option value="Drinks">Drinks</option>
+  <option value="Meeting">Other meeting</option>
+</select>
+'''
+    meetingType.change(function() {
+      var type = $(this).val();
+      taskTitle.data("meetingType", type);
+      taskTitle.val(type + " ");
+      meetingType.hide();
+      taskTitle.show();
+      taskTitle.focus();
+    });
+    Sidebar.customizeSelectArrow(meetingType);
+    return meetingType;
   }
 
   export function displayTaskTab(tab1,
@@ -811,9 +844,10 @@ module Esper.TaskTab {
             workflowSelect.trigger("change");
           }
           workflowSelect.attr("disabled", false);
-
         } else {
           taskCaption.text(taskLabelCreate);
+          taskTitle.after(meetingTypeDropdown(taskTitle));
+          taskTitle.hide();
           title = deets.subject;
           if (title === undefined) title = "(no subject)";
         }
