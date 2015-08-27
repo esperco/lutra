@@ -8,9 +8,8 @@
   Flux_.dispatcher is a singleton instance of Flux's Dispatcher class, which
   can dispatchers an Action to any registered event handlers.
 
-  Flux_.Store is a base class for a basic key-value store. It stores objects of
-  the form Flux_.StoreObject, which expects an `_id` and an enum indicating
-  whether the object is ready or in-flight. Stores should registered with
+  Flux_.Store is a base class for a basic key-value store. It stores 2-tuples
+  of a particular data type and metadata. Stores should registered with
   the dispatcher so they're updated when Actions are dispatched.
 
   See https://facebook.github.io/flux/docs/overview.html for more details.
@@ -21,7 +20,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
   export class Action {};
 
   // Singleton instance of Dispatcher, tied to a particular payload class
-  export var dispatcher = new Dispatcher<Action>();
+  export var AppDispatcher = new Dispatcher<Action>();
 
 
   ////////////////
@@ -30,12 +29,12 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
   // InFlight => Local changes en route to server
   export enum DataStatus { READY, INFLIGHT };
 
-  // Wrapper around items that get stored in Store
-  export interface StoreObject<TData> {
+  // Metadata that lives alongside the actual object data -- need at least
+  // an identifier
+  export interface StoreMetadata {
     _id: string;
-    dataStatus: DataStatus;
-    lastUpdate: Date;
-    data: TData;
+    dataStatus?: DataStatus;
+    lastUpdate?: Date;
   }
 
 
@@ -46,35 +45,53 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
 
   // Action for inserting a new object into the store
   export class InsertAction<TData> extends Action {
-    object: StoreObject<TData>;
+    data: TData;
+    metadata: StoreMetadata;
 
-    constructor(object: StoreObject<TData>) {
+    constructor(_id: string, data: TData);
+    constructor(data: TData, metadata: StoreMetadata);
+    constructor(firstArg: any, secondArg: any) {
       super();
-      this.object = object;
+      var _id: string;
+      var data: TData;
+      var metadata: StoreMetadata;
+      if (_.isString(firstArg)) {
+        this.metadata = { _id: (<string> firstArg) };
+        this.data = (<TData> secondArg);
+      }
+      else {
+        this.metadata = (<StoreMetadata> secondArg);
+        this.data = (<TData> firstArg);
+      }
     }
+  }
+
+  // An update function is a function that receives data and metadata and
+  // returns either the updated object or an updated object/metadata pairing
+  interface updateFn<TData> {
+    (): TData|[TData, StoreMetadata];
+    (oldData: TData, oldMetadata: StoreMetadata): TData|[TData, StoreMetadata];
   }
 
   // Action for updating an object by _id
   export class UpdateAction<TData> extends Action {
     _id: string;
-    updateFn: (old: StoreObject<TData>) => StoreObject<TData>;
+    updateFn: updateFn<TData>;
+    upsert: boolean;
 
     // Can update either with a function that processes the old object and
     // returns a replacement, or returns a brand new replacement object
-    constructor(_id: string,
-                updateFn: (old: StoreObject<TData>) => StoreObject<TData>);
-    constructor(_id: string,
-                replacement: StoreObject<TData>);
-    constructor(_id: string, update: any) {
+    constructor(_id: string, updateFn: updateFn<TData>, upsert?: boolean);
+    constructor(_id: string, replacement: TData, upsert?: boolean);
+    constructor(_id: string, update: any, upsert?: boolean) {
       super();
       this._id = _id;
       if (_.isFunction(update)) {
         this.updateFn = update;
       } else {
-        this.updateFn = function(old: StoreObject<TData>) {
-          return update;
-        };
+        this.updateFn = function() { return update; };
       }
+      this.upsert = !!upsert;
     }
   }
 
@@ -114,11 +131,14 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
 
     // Actual container for data
     private data: {
-      [index: string]: StoreObject<TData>
+      [index: string]: [TData, StoreMetadata];
     };
 
     // Action handlers that get called
     private handlers: IHandler[];
+
+    // Set when registering with dispatcher, use with waitFor
+    dispatchToken: string;
 
 
     ///////////
@@ -135,15 +155,15 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Returns an instance stored with a particular _id
-    get(_id: string): StoreObject<TData>|void {
+    get(_id: string): [TData, StoreMetadata] {
       if (this.exists(_id)) {
         return this.data[_id];
       }
     }
 
     // Return all store objects
-    getAll(): StoreObject<TData>[] {
-      return _.values<StoreObject<TData>>(this.data);
+    getAll(): [TData, StoreMetadata][] {
+      return _.values<[TData, StoreMetadata]>(this.data);
     }
 
     // Register a callback to handle store changes
@@ -154,6 +174,11 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     // De-register a callback to handle store changes
     removeChangeListener(callback: () => void): void {
       this.removeListener(this.CHANGE_EVENT, callback);
+    }
+
+    // Remove all listeners
+    removeAllChangeListeners(): void {
+      this.removeAllListeners(this.CHANGE_EVENT);
     }
 
     // Register an action subclass
@@ -189,7 +214,7 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     // registered handlers to see if there's a type match.
     register(dispatcher: Flux.Dispatcher<Action>): void {
       let self = this;
-      dispatcher.register(function(action: Action) {
+      self.dispatchToken = dispatcher.register(function(action: Action) {
         _.each(self.handlers, function(handlerObj: IHandler) {
           if (action instanceof handlerObj.actionType) {
             handlerObj.handler.call(self, action);
@@ -215,30 +240,51 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     }
 
     // Set a given _id to object
-    protected set(_id: string, obj: StoreObject<TData>): void {
-      // Forgot set _id by accident, no biggie, just set now
-      if (! obj._id) {
-        obj._id = _id;
+    protected set(_id: string, tuple: [TData, StoreMetadata]): void;
+    protected set(_id: string, data: TData, metadata?: StoreMetadata): void;
+    protected set(_id: string, firstArg: any, secondArg?: any): void {
+      var data: TData;
+      var metadata: StoreMetadata;
+      if (secondArg) {
+        data = (<TData> firstArg);
+        metadata = (<StoreMetadata> secondArg);
+      } else if (firstArg instanceof Array) {
+        data = (<TData> firstArg[0]);
+        metadata = (<StoreMetadata> firstArg[1]);
+      } else {
+        data = (<TData> firstArg);
       }
-
-      // Definitely not intended behavior
-      else if (obj._id !== _id) {
-        throw new Error("Object _id does not match passed _id");
-      }
-
-      this.data[_id] = obj;
+      metadata = this.cleanMetadata(_id, data, metadata);
+      this.data[_id] = [data, metadata];
     }
+
+    // Hook to preset metadata before it's set
+    protected cleanMetadata(_id: string, data: TData, metadata?: StoreMetadata)
+      : StoreMetadata
+    {
+      // Make sure _id matches
+      if (metadata) {
+        metadata._id = _id;
+      }
+      else {
+        metadata = { _id: _id };
+      }
+
+      // Some defaults and overrides
+      metadata.dataStatus = metadata.dataStatus || DataStatus.READY;
+      metadata.lastUpdate = new Date();
+      return metadata;
+    };
 
     // Handle InsertAction
     protected insert(action: InsertAction<TData>): void {
-      let obj = action.object;
-      if (! obj._id) { // No blank _ids
-        throw new Error("_id is required");
+      let data = action.data;
+      let metadata = action.metadata;
+      let _id = metadata._id;
+      if (this.exists(_id)) {
+        throw new Error("Property already exists for store key: " + _id);
       }
-      if (this.exists(obj._id)) {
-        throw new Error("Property already exists for store key");
-      }
-      this.set(obj._id, obj);
+      this.set(metadata._id, [data, metadata]);
       this.emitChange();
     }
 
@@ -246,10 +292,34 @@ module Esper.Flux_ {   // Flux_ because Flux conflicts with Flux definitions
     protected update(action: UpdateAction<TData>): void {
       let _id = action._id;
       let updateFn = action.updateFn;
-      if (this.exists(_id)) {
-        var current = (<StoreObject<TData>> this.get(_id));
-        this.set(_id, updateFn(current));
+      var exists = this.exists(_id);
+      if (exists || action.upsert) {
+        let data: TData;
+        let metadata: StoreMetadata;
+        let current: [TData, StoreMetadata];
+        let response: any;
+
+        if (exists) {
+          current = this.get(_id);
+          response = updateFn(current[0], current[1]);
+        } else {
+          response = updateFn();
+        }
+
+        if (response instanceof Array && response.length === 2) {
+          data = (<[TData, StoreMetadata]> response)[0];
+          metadata = (<[TData, StoreMetadata]> response)[1];
+        } else {
+          data = (<TData> response);
+          metadata = exists ? current[1] : null;
+        }
+
+        this.set(_id, data, metadata);
         this.emitChange();
+      }
+
+      else {
+        throw new Error("Store key does not exist: " + _id);
       }
     }
 
