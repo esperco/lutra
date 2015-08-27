@@ -126,34 +126,7 @@ module Esper.Menu {
         o.appendTo(teamSelect);
     });
 
-    teamSelect.change(function() {
-      var teamid = teamSelect.val();
-      var prefs = Teams.getPreferences(teamid);
-      var timezone = prefs.general.current_timezone;
-      tzSelect.val(timezone);
-    });
-
-    var teamid = teamSelect.val();
-    var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
-    var prefs = Teams.getPreferences(teamid);
-    var timezone = prefs.general.current_timezone;
-    var teamEmails = List.union(
-      [Teams.getProfile(currentTeam.get().team_executive).email],
-      List.map(currentTeam.get().team_assistants, function(assistant) {
-        return Teams.getProfile(assistant).email;
-      }));
-
-    List.iter(timezones, function(tz) {
-      var o = $("<option>")
-        .text(tz)
-        .val(tz);
-      if (tz === timezone) {
-        o.attr("selected", true);
-      }
-      o.appendTo(tzSelect);
-    });
-
-    List.iter(teamEmails, function(email, id) {
+    function addRecipientCheckboxes(email, id) {
       var i = $("<input />")
         .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
         .val(email);
@@ -163,6 +136,44 @@ module Esper.Menu {
         .append($("<br />"));
       i.appendTo(recipients);
       l.appendTo(recipients);
+    }
+
+    teamSelect.change(function() {
+      var teamid = teamSelect.val();
+      var prefs = Teams.getPreferences(teamid);
+      var timezone = prefs.general.current_timezone;
+      tzSelect.val(timezone);
+
+      recipients.empty();
+      var team = List.find(teams, function(team) { return team.teamid === teamid; });
+      var teamEmails = List.union(
+        [Teams.getProfile(team.team_executive).email],
+        List.map(team.team_assistants, function(uid: string) {
+          return Teams.getProfile(uid).email;
+        }));
+      List.iter(teamEmails, addRecipientCheckboxes);
+    });
+
+    var teamid = teamSelect.val();
+    var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
+    var prefs = Teams.getPreferences(teamid);
+    var timezone = prefs.general.current_timezone;
+    var teamEmails = List.union(
+      [Teams.getProfile(currentTeam.get().team_executive).email],
+      List.map(currentTeam.get().team_assistants, function(uid) {
+        return Teams.getProfile(uid).email;
+      }));
+
+    List.iter(teamEmails, addRecipientCheckboxes);
+
+    List.iter(timezones, function(tz) {
+      var o = $("<option>")
+        .text(tz)
+        .val(tz);
+      if (tz === timezone) {
+        o.attr("selected", true);
+      }
+      o.appendTo(tzSelect);
     });
 
     tzSelect.change(function() {
