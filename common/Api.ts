@@ -447,6 +447,15 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
+  export function setTaskMeetingType(taskid, mtype):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/task/meeting-type/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + encodeURIComponent(string(mtype));
+    return JsonHttp.put(url, "");
+  }
+
   export function setTaskNotes(taskid, notes):
   JQueryDeferred<ApiT.Task> {
     var url =

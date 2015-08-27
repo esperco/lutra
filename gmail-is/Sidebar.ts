@@ -305,10 +305,11 @@ module Esper.Sidebar {
       some : function  (team) {
         Api.listWorkflows(team.teamid).done(function(response) {
           var workflows = response.workflows;
-          userContent.append(UserTab.viewOfUserTab(team).view);
+          var userTabContent = UserTab.viewOfUserTab(team);
+          userContent.append(userTabContent.view);
           TaskTab.displayTaskTab(taskContent, team, threadId,
                                  autoTask, linkedEvents,
-                                 workflows);
+                                 workflows, userTabContent);
           GroupScheduling.afterInitialize(function (tpref) {
             groupContent.append(GroupTab.container(tpref));
           });
