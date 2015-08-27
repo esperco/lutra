@@ -14,12 +14,28 @@ module.exports = {
   // Root dir for test site
   pubDir: "pub",
 
-  // Use NTypescript?
-  useNtsc: true,
+  // TypeScript compiler options
+  tsConfig: {
+    noImplicitAny: true,
+    jsx: "react"
+  },
 
-  // TypeScript entry point for app
-  tsIn: "ts/Dev.ts",
-  tsInProd: "ts/Prod.ts",
+  /*
+    Files to include generally speaking -- you can exclude for specific
+    environments using tsDevGlobs and tsProdGlobs. Order shouldn't matter
+    if you use references within TS files to sort.
+
+    For projects outside of Marten, be sure to reference Marten's TS files
+    as well -- Gulp will not look outside these globs for files.
+  */
+  tsGlobs: ["typings/**/*.d.ts", "ts/**/*.ts", "ts/**/*.tsx"],
+
+  // Files to include for dev, prefix with "!" to exclude files
+  tsDevGlobs: ["!ts/Prod.ts"],
+
+  // Files to include for prod, prefix with "!" to exclude files
+  tsProdGlobs: ["!ts/Dev.ts", "!ts/Test.ts",
+                "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
 
   // TypeScript bundle output, relative to pubDir
   tsOut: "js/app.js",
@@ -70,16 +86,4 @@ module.exports = {
 
   // Where to provision test runner in pubDir
   testDir: "test"
-};
-
-// Set tsconfig options here so we can pull data from above -- don't set
-// files though, use tsIn or tsInProd above
-module.exports.tsConfig = {
-  compilerOptions: {
-    noImplicitAny: true,
-    jsx: "react"
-  },
-
-  // Used by Atom TypeScript and certain IDEs
-  compileOnSave: false
 };

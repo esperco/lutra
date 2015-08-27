@@ -9,8 +9,8 @@ var gulp = require("gulp"),
     helpers = require("marten-gulp-helpers")(gulp);
 
 // TypeScript
-helpers.tsc.build("build-ts", config);
-helpers.tsc.watch("watch-ts", config);
+helpers.typescript.build("build-ts", config);
+helpers.typescript.watch("watch-ts", config);
 
 // LESS
 helpers.less.build("build-less", config);
