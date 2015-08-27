@@ -96,6 +96,12 @@ module Esper.Menu {
         Time Until:
         <input #timeUntilDate type="date" class="esper-email-date-select"/>
       </label>
+      <br/>
+      <label class="esper-agenda-title">
+        Send to:
+        <div #recipients class="esper-agenda-section">
+        </div>
+      </label>
     </div>
     <div class="esper-modal-footer esper-clearfix">
       <button #sendButton class="esper-btn esper-btn-primary modal-primary">
@@ -131,6 +137,7 @@ module Esper.Menu {
     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
     var prefs = Teams.getPreferences(teamid);
     var timezone = prefs.general.current_timezone;
+    var teamEmails = currentTeam.get().team_email_aliases;
 
     List.iter(timezones, function(tz) {
       var o = $("<option>")
@@ -140,6 +147,18 @@ module Esper.Menu {
         o.attr("selected", true);
       }
       o.appendTo(tzSelect);
+    });
+
+    List.iter(teamEmails, function(email, id) {
+      var i = $("<input />")
+        .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
+        .val(email);
+      var l = $("<label>")
+        .attr("for", "agenda-recipient" + id)
+        .text(email)
+        .append($("<br />"));
+      i.appendTo(recipients);
+      l.appendTo(recipients);
     });
 
     tzSelect.change(function() {
@@ -165,12 +184,17 @@ module Esper.Menu {
       var u = new Date(until[0], until[1] - 1, until[2]);
       var f_time = Math.floor(f.getTime() / 1000);
       var u_time = Math.floor(u.getTime() / 1000) + 86399;
+      var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
+        return el.value;
+      });
 
       cancelButton.attr("disabled", true);
       sendButton.attr("disabled", true);
+      recipients.children().attr("disabled", true);
       sendButton.text("Sending...");
 
-      Api.sendAgenda(teamSelect.val(), f_time, u_time).done(cancel);
+      console.log(r);
+      Api.sendAgenda(teamSelect.val(), f_time, u_time, r).done(cancel);
     });
 
     return _view;
