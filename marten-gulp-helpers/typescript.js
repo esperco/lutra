@@ -10,54 +10,71 @@ module.exports = function(gulp) {
 
   var exports = {};
 
-  var getTsGlobs = function(config) {
-    var extra = config.production ? config.tsProdGlobs : config.tsDevGlobs;
-    return config.tsGlobs.concat(extra || []);
+  var getTsGlobs = function(proj, config) {
+    var extra = config.production ? proj.prodGlobs : proj.devGlobs;
+    return proj.globs.concat(extra || []);
   };
 
-  var buildName; // Used by watch below
+  // TS project names to keep track of, used by watch
+  var buildNames = [];
   exports.build = function(name, config) {
-    buildName = name || "build-ts";
+    name = name || "build-ts";
 
-    var bundleName = path.basename(config.tsOut);
-    var bundleDir = path.join(config.pubDir, path.dirname(config.tsOut));
-    var tsProject = ts.createProject(_.extend({
-      noExternalResolve: true,
-      sortOutput: true,
-      typescript: ( config.tsConfig && config.tsConfig.jsx ?
-                    require("ntypescript") : require("typescript") ),
-      out: bundleName
-    }, config.tsConfig));
+    _.each(config.tsProjects || [], function(proj) {
+      var bundleName = path.basename(proj.out);
+      var bundleDir = path.join(config.pubDir, path.dirname(proj.out));
+      var tsProject = ts.createProject(_.extend({
+        noExternalResolve: true,
+        sortOutput: true,
+        typescript: ( proj.compilerOptions &&
+                      proj.compilerOptions.jsx ?
+                      require("ntypescript") : require("typescript") ),
+        out: bundleName
+      }, proj.compilerOptions));
 
-    gulp.task(buildName, function() {
-      var ret = gulp.src(getTsGlobs(config), { base: "." })
-        .pipe(sourcemaps.init())
-        .pipe(ts(tsProject));
+      var buildName = name + " " + proj.out;
+      buildNames.push(buildName);
+      gulp.task(buildName, function() {
+        var ret = gulp.src(getTsGlobs(proj, config), { base: "." })
+          .pipe(sourcemaps.init())
+          .pipe(ts(tsProject));
 
-      if (config.production) {
-        // loadMaps = true so we can load tsify/browserify sourcemaps
-        ret = ret
-          .pipe(uglify())
-          // External sourcemaps so we don't defeat the purpose of uglifying
-          .pipe(sourcemaps.write("./"));
-      } else {
-        // Inline sourcemaps for dev because it often doesn't work if
-        // it's external and we care more about proper sourcemaps and less
-        // about file-size in dev than production
-        ret = ret.pipe(sourcemaps.write());
-      }
+        if (config.production) {
+          // loadMaps = true so we can load tsify/browserify sourcemaps
+          ret = ret
+            .pipe(uglify())
+            // External sourcemaps so we don't defeat the purpose of uglifying
+            .pipe(sourcemaps.write("./"));
+        } else {
+          // Inline sourcemaps for dev because it often doesn't work if
+          // it's external and we care more about proper sourcemaps and less
+          // about file-size in dev than production
+          ret = ret.pipe(sourcemaps.write());
+        }
 
-      return ret
-        .on("error", gutil.log)
-        .pipe(gulp.dest(bundleDir));
+        return ret
+          .on("error", gutil.log)
+          .pipe(gulp.dest(bundleDir));
+      });
     });
+
+    gulp.task(name, gulp.parallel.apply(gulp, buildNames));
   };
 
   exports.watch = function(name, config) {
     name = name || "watch-ts";
-    gulp.task(name, function() {
-      return gulp.watch(getTsGlobs(config), gulp.series(buildName));
+
+    var watchNames = [];
+    _.each(config.tsProjects || [], function(proj, index) {
+      var watchName = name + " " + proj.out;
+      watchNames.push(watchName);
+      gulp.task(watchName, function() {
+        return gulp.watch(getTsGlobs(proj, config),
+          gulp.series(buildNames[index]));
+      });
     });
+
+    gulp.task(name, gulp.parallel.apply(gulp, watchNames));
   };
 
   return exports;

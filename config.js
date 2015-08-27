@@ -14,31 +14,38 @@ module.exports = {
   // Root dir for test site
   pubDir: "pub",
 
-  // TypeScript compiler options
-  tsConfig: {
-    noImplicitAny: true,
-    jsx: "react"
-  },
+  // TypeScript projects -- one per concatened JS bundle to emit
+  tsProjects: [
+    { // Project for testing Marten modules
 
-  /*
-    Files to include generally speaking -- you can exclude for specific
-    environments using tsDevGlobs and tsProdGlobs. Order shouldn't matter
-    if you use references within TS files to sort.
+      // Compiler options -- see https://github.com/ivogabe/gulp-typescript
+      // and https://github.com/Microsoft/TypeScript/wiki/Compiler-Options
+      compilerOptions: {
+        noImplicitAny: true,
+        jsx: "react"
+      },
 
-    For projects outside of Marten, be sure to reference Marten's TS files
-    as well -- Gulp will not look outside these globs for files.
-  */
-  tsGlobs: ["typings/**/*.d.ts", "ts/**/*.ts", "ts/**/*.tsx"],
+      /*
+        Files to include generally speaking -- you can exclude for specific
+        environments using tsDevGlobs and tsProdGlobs. Order shouldn't matter
+        if you use references within TS files to sort.
 
-  // Files to include for dev, prefix with "!" to exclude files
-  tsDevGlobs: ["!ts/Prod.ts"],
+        For projects outside of Marten, be sure to reference Marten's TS files
+        as well -- Gulp will not look outside these globs for files.
+      */
+      globs: ["typings/**/*.d.ts", "ts/**/*.ts", "ts/**/*.tsx"],
 
-  // Files to include for prod, prefix with "!" to exclude files
-  tsProdGlobs: ["!ts/Dev.ts", "!ts/Test.ts",
-                "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
+      // Files to include for dev, prefix with "!" to exclude files
+      devGlobs: ["!ts/Prod.ts"],
 
-  // TypeScript bundle output, relative to pubDir
-  tsOut: "js/app.js",
+      // Files to include for prod, prefix with "!" to exclude files
+      prodGlobs: ["!ts/Dev.ts", "!ts/Test.ts",
+                  "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
+
+      // Relative path to bundle from pubDir
+      out: "js/app.js"
+    }
+  ],
 
   // Directory with LESS files
   lessDir: "less",
