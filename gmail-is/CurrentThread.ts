@@ -114,6 +114,10 @@ module Esper.CurrentThread {
 
   /** Reads the threadId from the current URL hash fragment, if
    *  any. If no threadId is read, returns null.
+   *
+   *  Sample inputs:
+   *    https://mail.google.com/mail/u/0/#inbox/14f66fccbcdd8088
+   *    https://mail.google.com/mail/u/0/#label/Baby+Hippos/14f67afc19bfb1d4
    */
   function readThreadId() : string {
     // We try to get the threadId from the URL ourselves because
