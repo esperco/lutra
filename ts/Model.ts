@@ -19,9 +19,14 @@ module Esper.Model {
   // Metadata that lives alongside the actual object data -- need at least
   // an identifier
   export interface StoreMetadata {
-    _id: string;
+    _id?: string;
     dataStatus?: DataStatus;
     lastUpdate?: Date;
+  }
+
+  // Variant on StoreMetadata for new objects (_id is required)
+  export interface StoreMetadataForInsert extends StoreMetadata {
+    _id: string;
   }
 
 
@@ -152,7 +157,7 @@ module Esper.Model {
 
     /* Inserts a new object at key, fails if key already exists */
     insert(_id: string, data: TData): void;
-    insert(data: TData, metadata: StoreMetadata): void;
+    insert(data: TData, metadata: StoreMetadataForInsert): void;
     insert(firstArg: any, secondArg: any): void {
       let data: TData;
       let metadata: StoreMetadata;
@@ -211,7 +216,7 @@ module Esper.Model {
     }
 
     // Remove a key from store
-    protected remove(_id: string): void {
+    remove(_id: string): void {
       if (this.has(_id)) {
         delete this.data[_id];
         this.emitChange();

@@ -30,6 +30,9 @@ module Esper.Model {
     var reset = function() {
       myRabbitStore.reset();
       myRabbitStore.removeAllChangeListeners();
+      if (listener) {
+        listener.calls.reset();
+      }
       jasmine.clock().mockDate(baseTime);
     };
 
@@ -42,6 +45,14 @@ module Esper.Model {
 
 
     /////////////
+
+    beforeAll(function() {
+      jasmine.clock().install();
+    });
+
+    afterAll(function() {
+      jasmine.clock().uninstall();
+    });
 
     describe("Insert with _id", function() {
       beforeAll(function() {
@@ -151,14 +162,161 @@ module Esper.Model {
         insertBrownRabbit();
       });
 
-      xdescribe("with object", function() {
-        // beforeEach(function() {
+      describe("with object", function() {
+        beforeEach(function() {
+          listener = jasmine.createSpy("listener");
+          myRabbitStore.addChangeListener(listener);
+          myRabbitStore.update("brownRabbitId", {
+            uid: "brownRabbitId",
+            carrots: (carrots = getRandInt())
+          })
+        });
 
-        // });
+        it("should replace object", function() {
+          expect(myRabbitStore.get("brownRabbitId")[0].carrots)
+            .toEqual(carrots);
+        });
+
+        it("should call the listener", function() {
+          expect(listener).toHaveBeenCalled();
+        });
       });
 
-      xdescribe("with function", function() {
+      describe("with object and metadata", function() {
+        beforeEach(function() {
+          myRabbitStore.update("brownRabbitId", {
+            uid: "brownRabbitId",
+            carrots: (carrots = getRandInt())
+          }, {
+            _id: "brownRabbitId",
+            dataStatus: DataStatus.INFLIGHT,
+          });
+        });
 
+        it("should replace object", function() {
+          expect(myRabbitStore.get("brownRabbitId")[0].carrots)
+            .toEqual(carrots);
+        });
+
+        it("should replace metadata", function() {
+          expect(myRabbitStore.get("brownRabbitId")[1].dataStatus)
+            .toEqual(DataStatus.INFLIGHT);
+        });
+      });
+
+      describe("with metadata replacing time", function() {
+        beforeEach(function() {
+          jasmine.clock().tick(50);
+          myRabbitStore.update("brownRabbitId", {
+            uid: "brownRabbitId",
+            carrots: carrots
+          }, {
+            _id: "brownRabbitId",
+            lastUpdate: new Date(2020, 5, 5)
+          });
+        });
+
+        it("should ignore provided metadata lastUpdate and use actual time",
+          function() {
+            expect(myRabbitStore.get("brownRabbitId")[1].lastUpdate.getTime())
+              .toEqual(baseTime.getTime() + 50);
+          });
+      });
+
+      describe("with function", function() {
+        beforeEach(function() {
+          this.oldRabbit = myRabbitStore.get("brownRabbitId");
+          this.updateFn = jasmine.createSpy('updateFn').and.returnValue({
+            uid: "brownRabbitId",
+            carrots: (carrots = getRandInt())
+          });
+          myRabbitStore.update("brownRabbitId", this.updateFn);
+        });
+
+        it("should update the object", function() {
+          expect(myRabbitStore.get("brownRabbitId")[0].carrots)
+            .toEqual(carrots);
+        });
+
+        it("should call the function with old data, metadata", function() {
+          expect(this.updateFn).toHaveBeenCalledWith(
+            this.oldRabbit[0], this.oldRabbit[1]);
+        });
+      });
+
+      describe("with function updating metadata", function() {
+        beforeEach(function() {
+          myRabbitStore.update("brownRabbitId", function() {
+            return [{
+              uid: "brownRabbitId",
+              carrots: (carrots = getRandInt())
+            }, {
+              _id: "brownRabbitId",
+              dataStatus: DataStatus.INFLIGHT
+            }];
+          });
+        });
+
+        it("should update the object", function() {
+          expect(myRabbitStore.get("brownRabbitId")[0].carrots)
+            .toEqual(carrots);
+        });
+
+        it("should update the metadata", function() {
+          expect(myRabbitStore.get("brownRabbitId")[1].dataStatus)
+            .toEqual(DataStatus.INFLIGHT);
+        });
+      });
+
+      describe("with function doing mutations", function() {
+        beforeEach(function() {
+          this.oldRabbit = myRabbitStore.get("brownRabbitId");
+          this.oldCarrots = this.oldRabbit[0].carrots;
+          myRabbitStore.update("brownRabbitId", function(data, metadata) {
+            data.carrots = getRandInt();
+            metadata.dataStatus = DataStatus.INFLIGHT;
+            return [data, metadata];
+          });
+        });
+
+        it("should not modify old data", function() {
+          expect(this.oldRabbit[0].carrots).toBe(this.oldCarrots);
+        });
+
+        it("should not modify old metadata", function() {
+          expect(this.oldRabbit[1].dataStatus).toBe(DataStatus.READY);
+        });
+      });
+    });
+
+    describe("Remove existing _id", function() {
+      beforeAll(function() {
+        reset();
+        insertBrownRabbit();
+        listener = jasmine.createSpy("listener");
+        myRabbitStore.addChangeListener(listener);
+        myRabbitStore.remove("brownRabbitId");
+      });
+
+      it("should remove object from store", function() {
+        expect(myRabbitStore.get("brownRabbitId")).toBeUndefined();
+      });
+
+      it("should call listener", function() {
+        expect(listener).toHaveBeenCalled();
+      });
+    });
+
+    describe("Remove non-existent _id", function() {
+      beforeAll(function() {
+        reset();
+        listener = jasmine.createSpy("listener");
+        myRabbitStore.addChangeListener(listener);
+        myRabbitStore.remove("brownRabbitId");
+      });
+
+      it("should not call listener", function() {
+        expect(listener).not.toHaveBeenCalled();
       });
     });
 
