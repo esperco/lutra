@@ -137,7 +137,8 @@ module Esper.Menu {
     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
     var prefs = Teams.getPreferences(teamid);
     var timezone = prefs.general.current_timezone;
-    var teamEmails = currentTeam.get().team_email_aliases;
+    var teamEmails = List.union([Teams.getProfile(currentTeam.get().team_executive).email],
+      currentTeam.get().team_email_aliases);
 
     List.iter(timezones, function(tz) {
       var o = $("<option>")
