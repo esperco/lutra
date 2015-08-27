@@ -1,8 +1,10 @@
 /* This module is used for the Marten app created to test individual modules */
 
 /// <reference path="./Esper.ts"/>
+/// <reference path="./Util.ts"/>
+/// <reference path="./Model.ts"/>
 /// <reference path="./IndexPage.tsx"/>
-/// <reference path="./Flux.ts"/>
+
 
 module Esper.App {
 

@@ -1,5 +1,5 @@
 /* Test Flux module */
-module Esper.Flux_ {
+module Esper.Model {
 
   // Set up a sample Flux store for testing ///////////////////
 
@@ -12,18 +12,7 @@ module Esper.Flux_ {
   class RabbitStore extends Store<Rabbit> {}
   var myRabbitStore = new RabbitStore();
 
-  // Export store-related actions and connect them to store
-  export class Insert extends InsertAction<Rabbit> {}
-  myRabbitStore.handle(Insert);
-  export class Update extends UpdateAction<Rabbit> {}
-  myRabbitStore.handle(Update);
-  export class Remove extends RemoveAction {}
-  myRabbitStore.handle(Remove);
-
-  // Connect default RabbitStore actions to dispatcher
-  myRabbitStore.register(AppDispatcher);
-
-  describe("Flux_.Store", function() {
+  describe("Model.Store", function() {
 
     // Not crypto-secure, but just for testing
     var getRandInt = function() {
@@ -45,10 +34,10 @@ module Esper.Flux_ {
     };
 
     var insertBrownRabbit = function() {
-      AppDispatcher.dispatch(new Insert("brownRabbitId", {
+      myRabbitStore.insert("brownRabbitId", {
         uid: "brownRabbitId",
         carrots: (carrots = getRandInt())
-      }));
+      });
     };
 
 
@@ -89,13 +78,13 @@ module Esper.Flux_ {
     describe("Insert with explicit metadata", function() {
       beforeAll(function() {
         reset();
-        AppDispatcher.dispatch(new Insert({
+        myRabbitStore.insert({
           uid: "brownRabbitId",
           carrots: (carrots = getRandInt())
         }, {
           _id: "brownRabbitId",
           dataStatus: DataStatus.INFLIGHT
-        }));
+        });
       });
 
       it("should allow us to get object by _id", function() {
@@ -111,31 +100,31 @@ module Esper.Flux_ {
       })
     });
 
-    describe("Update without prior insert if upsert var is not specified",
+    describe("Update without prior insert",
       function() {
         beforeAll(reset);
 
         it("should fail", function() {
           expect(function() {
-            AppDispatcher.dispatch(new Update("brownRabbitId", {
+            myRabbitStore.update("brownRabbitId", {
               uid: "brownRabbitId",
               carrots: 12345
-            }));
+            });
           }).toThrow();
         });
       }
     );
 
-    describe("Update without prior insert if upsert var is specified",
+    describe("Upsert without prior insert",
       function() {
         beforeAll(function() {
           reset();
           listener = jasmine.createSpy("listener");
           myRabbitStore.addChangeListener(listener);
-          AppDispatcher.dispatch(new Update("brownRabbitId", {
+          myRabbitStore.upsert("brownRabbitId", {
             uid: "brownRabbitId",
             carrots: (carrots = getRandInt())
-          }, /* upsert = */ true));
+          });
         });
 
         it("should insert a new object", function() {
