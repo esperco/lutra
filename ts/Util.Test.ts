@@ -8,7 +8,7 @@ module Esper.Util {
         expect(o.x).toBe(5);
       });
 
-      it("should prevent shallow removals", function() {
+      it("should prevent shallow additions", function() {
         var o: any = deepFreeze({ x: 5 });
         o.y === 6;
         expect(o.y).toBeUndefined();
