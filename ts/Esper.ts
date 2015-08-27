@@ -14,13 +14,11 @@
 type ReactStatic = typeof React;
 
 // For classes, refer to class's type
-type DispatcherType = typeof Flux.Dispatcher;
 type EventEmitterType = typeof EventEmitter3.EventEmitter;
 
 declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
-  export var Dispatcher: DispatcherType;
   export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;

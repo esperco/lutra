@@ -30,10 +30,6 @@ describe("globals", function() {
     expect(getGlobal("React")).toBeUndefined();
   });
 
-  it("should not have flux defined", function() {
-    expect(getGlobal("flux")).toBeUndefined();
-  });
-
   it("should not have EventEmitter defined", function() {
     expect(getGlobal("EventEmitter")).toBeUndefined();
   });
@@ -80,9 +76,5 @@ describe("Esper", function() {
 
   it("should have React addons defined", function() {
     expect(Esper.React.addons).toBeDefined();
-  });
-
-  it("should have a flux Dispatcher defined", function() {
-    expect(Esper.Dispatcher).toBeDefined();
   });
 });

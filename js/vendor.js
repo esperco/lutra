@@ -5,7 +5,6 @@ var depends       = require("./depends");
 
 // Bower packages
 var EventEmitter  = require("eventemitter3"),
-    flux          = require("flux"),
     fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
@@ -41,7 +40,6 @@ Esper = (function(esperObj) {
     $:            jQuery,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
-    Dispatcher:   flux.Dispatcher,
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,
     moment:       moment,
