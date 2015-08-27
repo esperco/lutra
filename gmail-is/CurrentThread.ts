@@ -118,7 +118,7 @@ module Esper.CurrentThread {
   function readThreadId() : string {
     // We try to get the threadId from the URL ourselves because
     // Gmail.js fails until most of the page is loaded.
-    var match = window.location.hash.match(/#.*\/([^\/]+)$/);
+    var match = window.location.hash.match(/#.*\/([0-9a-f]{16})$/);
 
     if (match && match.length >= 2) {
       return match[1];
