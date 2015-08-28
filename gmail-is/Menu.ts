@@ -104,6 +104,8 @@ module Esper.Menu {
       </label>
     </div>
     <div class="esper-modal-footer esper-clearfix">
+      <div #errorMessages>
+      </div>
       <button #sendButton class="esper-btn esper-btn-primary modal-primary">
         Send Now
       </button>
@@ -193,6 +195,7 @@ module Esper.Menu {
     Util.preventClickPropagation(modal);
     cancelButton.click(cancel);
     sendButton.click(function() {
+      errorMessages.empty();
       var from = timeFromDate.val().split("-");
       var until = timeUntilDate.val().split("-");
       var f = new Date(from[0], from[1] - 1, from[2]);
@@ -202,6 +205,14 @@ module Esper.Menu {
       var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
         return el.value;
       });
+
+      if (r.length == 0) {
+        var e = $("<span>")
+          .addClass("esper-agenda-error")
+          .html("You must select at least one recipient");
+        e.appendTo(errorMessages);
+        return;
+      }
 
       cancelButton.attr("disabled", true);
       sendButton.attr("disabled", true);

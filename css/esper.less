@@ -1626,14 +1626,30 @@ ul.esper-ev-dropdown {
 }
 
 .esper-email-date-select {
-  border: none;
+  border: 1px solid @gray_20;
   margin-bottom: 5px;
   outline: none;
   width: 145px;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .esper-agenda-select {
   margin-bottom: 5px;
+}
+
+.esper-agenda-error {
+  color: @red;
+  font-size: 12px;
 }
 
 .esper-agenda-send {
