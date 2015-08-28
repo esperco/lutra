@@ -1,7 +1,7 @@
 /* jshint strict: false */
 
 // Helper
-var depends       = require("./depends");
+var depends       = require("../js/depends");
 
 // Bower packages
 var EventEmitter  = require("eventemitter3"),

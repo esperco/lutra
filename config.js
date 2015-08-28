@@ -33,14 +33,16 @@ module.exports = {
         For projects outside of Marten, be sure to reference Marten's TS files
         as well -- Gulp will not look outside these globs for files.
       */
-      globs: ["typings/**/*.d.ts", "ts/**/*.ts", "ts/**/*.tsx"],
+      globs: ["typings/**/*.d.ts",
+              "app/**/*.ts", "app/**/*.tsx",
+              "ts/**/*.ts", "ts/**/*.tsx"],
 
       // Files to include for dev, prefix with "!" to exclude files
-      devGlobs: ["!ts/Prod.ts"],
+      devGlobs: ["!app/Prod.ts"],
 
       // Files to include for prod, prefix with "!" to exclude files
-      prodGlobs: ["!ts/Dev.ts", "!ts/Test.ts",
-                  "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
+      prodGlobs: ["!app/Dev.ts", "!app/**/*.Test.tsx",
+                  "!ts/Test.ts", "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
 
       // Relative path to bundle from pubDir
       out: "js/app.js",
@@ -56,23 +58,23 @@ module.exports = {
   oblivionPath: "setup/bin/oblivion",
 
   // Directory with LESS files
-  lessDir: "less",
+  lessDir: "app",
 
   // Where to write our LESS files
   lessOutDir: "css",
 
   // Where to find simple our html pages
-  htmlDir: "html",
+  htmlDir: "app",
 
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
-  vendorJSIndex: "js/vendor.js",
+  vendorJSIndex: "app/vendor.js",
 
   // Where Browserify should write the JS bundle (relative to pubDir)
   vendorJSOut: "js/vendor.js",
 
   // Vendor CSS files to concatenate and minimize, relative to the vendor
-  // directory set in .bowerrc
+  // directory set in Marten's .bowerrc
   vendorCSSList: [
     "font-awesome/css/font-awesome.css",
     "animate.css/animate.css"
