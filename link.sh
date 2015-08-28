@@ -9,6 +9,9 @@ OLD_PWD="$(pwd)"
 # Get local dir of package
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Make setup Marten
+cd $DIR/setup && make setup
+
 # NPM link marten-gulp-helpers package
 cd $DIR/gulp-helpers && npm link
 cd $OLD_PWD && npm link marten-gulp-helpers
