@@ -13,10 +13,10 @@ var EventEmitter  = require("eventemitter3"),
     momentTz      = require("moment-timezone");
 
 // React -> get addons
-var react         = require("marten/vendor/react/react-with-addons.js");
+var react         = require("./marten/vendor/react/react-with-addons.js");
 
 // CryptoJS -> only need SHA-1
-var SHA1          = require("marten/vendor/crypto-js/sha1.js");
+var SHA1          = require("./marten/vendor/crypto-js/sha1.js");
 
 // NB: NPM, not Bower package. Bower package doesn't work well with
 // Browserify unless we want to rewrite its import code.

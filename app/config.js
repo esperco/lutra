@@ -47,14 +47,14 @@ module.exports = {
       out: "js/app.js",
 
       // Preprocess with Oblivion?
-      oblivion: false
+      oblivion: true
     }
   ],
 
   // Path to oblivion executable for pre-processing TS files. Oblivion is not
   // provided via Gulp or NPM, and we assume Oblivion has been correctly
   // setup already via the Makefile
-  oblivionPath: "../setup/bin/oblivion",
+  oblivionPath: "marten/setup/bin/oblivion",
 
   // Directory with LESS files
   lessDir: "less",

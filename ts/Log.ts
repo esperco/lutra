@@ -20,7 +20,7 @@ module Esper.Log {
   // Log level - change to set min threshhold for logging
   // Level.BOOM -> means don't log (exceptions only)
   export enum Level { DEBUG, INFO, WARN, ERROR, BOOM };
-  export var threshold: Level;
+  export var level: Level;
 
   /*
     Print a separator if a lot of time has elapsed since the last time
@@ -40,7 +40,7 @@ module Esper.Log {
                    level: Level, prefix: string, args: any[]) {
 
     // Don't log if silenced
-    var minLevel: Level = threshold;
+    var minLevel: Level = level;
     if (typeof minLevel === "undefined") {
       // Default to warn & above for production
       minLevel = Esper.PRODUCTION ? Level.WARN : Level.DEBUG;
@@ -105,6 +105,13 @@ module Esper.Log {
     return function() {
       logBase(console.info, Level.INFO, "END",
         a.concat([(new Date()).getTime()]));
+    }
+  }
+
+  /* Throws an error if something failed */
+  export function assert(x: boolean, message: string = "Assertion failed.") {
+    if (x !== true) {
+      throw new Error(message);
     }
   }
 }
