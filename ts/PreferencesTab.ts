@@ -1239,20 +1239,20 @@ module PreferencesTab {
       <div #agendaOptions class="preference-option-col clearfix">
         <div class="preference-option-title semibold">Which Day's Events</div>
         <label class="checkbox esper-preference-check">
-          <input #dayof type= "radio" class="esper-prefs-day-of"/>
+          <input #dayof type="radio" name="which-day" class="esper-prefs-day-of"/>
           Day Of
         </label>
         <label class="checkbox esper-preference-check">
-          <input #nextday type= "radio"/>
+          <input #nextday type="radio" name="which-day"/>
           Next Day
         </label>
         <div class="preference-option-title semibold">Agenda Format</div>
         <label class="checkbox esper-preference-check">
-          <input #htmlFormat type= "radio" class="esper-prefs-html-format"/>
+          <input #htmlFormat type="radio" name="agenda-format" class="esper-prefs-html-format"/>
           HTML
         </label>
         <label class="checkbox esper-preference-check">
-          <input #textFormat type= "radio"/>
+          <input #textFormat type="radio" name="agenda-format"/>
           Plain Text
         </label>
         <br />
@@ -1290,11 +1290,9 @@ module PreferencesTab {
         nextday.prop("checked", true);
 
       dayof.change(function() {
-        nextday.prop("checked", !dayof.prop("checked"));
         saveEmailTypes();
       });
       nextday.change(function() {
-        dayof.prop("checked", !nextday.prop("checked"));
         saveEmailTypes();
       });
 
@@ -1304,11 +1302,9 @@ module PreferencesTab {
         textFormat.prop("checked", true);
 
       htmlFormat.change(function() {
-        textFormat.prop("checked", !htmlFormat.prop("checked"));
         saveEmailTypes();
       });
       textFormat.change(function() {
-        htmlFormat.prop("checked", !textFormat.prop("checked"));
         saveEmailTypes();
       });
       includeTaskNotes.change(function() {
