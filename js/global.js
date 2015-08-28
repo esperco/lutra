@@ -8,6 +8,7 @@ function toggleNavMenu() {
   }
 }
 
+/*
 function slider() {
   $(window).scroll(slideNavbar);
 
@@ -22,7 +23,7 @@ function slider() {
   $(".navbar-container").hide();
   $(".navbar-container-mobile").hide();
   slideNavbar();
-}
+}*/
 
 function resizer() {
   var splash = $(".splash");
@@ -91,7 +92,6 @@ function main() {
   loadElements();
   loadPricingDescription();
   resizer();
-  slider();
  }
 
 $(document).ready(main);

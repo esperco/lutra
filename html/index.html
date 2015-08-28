@@ -16,29 +16,26 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 <script src="js/global.js"></script>
 </head>
-<body>
 
 <!-- Navbar -->
 <div class="navbar-container"></div>
 <ul class="nav-menu"></ul>
 
 <!-- Splash -->
+<body>
 <div class="splash-content large" style="background-image:url(img/splash_home.jpg)">
-  <div class="splash-navbar clearfix"></div>
   <div class="splash-text-container" align="center" >
-    <div class="splash-text">
+    <div class="splash-text" style="padding-bottom: 30px">
       <h1>Focus on the important things.</h1>
-      <h2 class="splash-text-subheader">Maximize your productivity with Esper.</h2>
-      <h2> </h2>
-      <h2> </h2>
+      <h2 class="splash-text-subheader" style="font-style:italic;font-size:28px">Maximize your productivity with Esper.</h2>
     </div>
      <a href="waiting-list">
-      <button class="button-green index">
+      <button class="button-primary index green">
        Request Demo</i>
       </button>
     </a>
     <span class="xs-spacer"></span>
-    <a href="index">
+    <a href="index#learn">
       <button class="button-tertiary index">
         Learn More
       </button>
@@ -50,46 +47,54 @@
 
 
 <!--Prominent Users-->
+<!-- Note for Andrew Fong : use FlexBoxes perhaps !-->
 <div class="section-container">
   <div class="users-container">
-    <h2 class="users-text">Proudly used by EAs at</h2>
-    		<a href="http://facebook.com/esperco" target="_blank" class="users-logo-container">
-			<img class="default" src="img/facebook_gray.svg">
-		</a>
-	  <a href="http://twitter.com/esper_co" target="_blank" class="users-logo-container">
+<div class="row">
+  <div class="col-md-3">
+    <h2 class="users-text" style="padding-left:30px">Proudly used by EAs at</h2>
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
 	  	<img class="default" src="img/twitter_gray.svg">
 	  </a>
-	  <a href="http://linkedin.com/company/esper-inc-" target="_blank" class="users-logo-container">
-	  	<img class="default" src="img/linkedin_gray.svg">
-	  </a>
-      <a href="http://facebook.com/esperco" target="_blank" class="users-logo-container">
-			<img class="default" src="img/facebook_gray.svg">
-		</a>
-	  <a href="http://twitter.com/esper_co" target="_blank" class="users-logo-container">
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
 	  	<img class="default" src="img/twitter_gray.svg">
 	  </a>
-
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	<img class="default" src="img/twitter_gray.svg">
+	  </a>
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	<img class="default" src="img/twitter_gray.svg">
+	  </a>
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	<img class="default" src="img/twitter_gray.svg">
+	  </a>
+  </div>
+  <div class="col-md-1">
+    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	<img class="default" src="img/twitter_gray.svg">
+	  </a>
+  </div>
+  <div class="col-md-3">
+  </div>
+</div>
   </div>
 </div>
 
-<div class="container">
-      <h2 class="users-text">Proudly used by EAs at</h2>
-    		<a href="http://facebook.com/esperco" target="_blank" class="users-logo-container">
-			<img class="default" src="img/facebook_gray.svg">
-		</a>
-	  <a href="http://twitter.com/esper_co" target="_blank" class="users-logo-container">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-	  <a href="http://linkedin.com/company/esper-inc-" target="_blank" class="users-logo-container">
-	  	<img class="default" src="img/linkedin_gray.svg">
-	  </a>
-      <a href="http://facebook.com/esperco" target="_blank" class="users-logo-container">
-			<img class="default" src="img/facebook_gray.svg">
-		</a>
-	  <a href="http://twitter.com/esper_co" target="_blank" class="users-logo-container">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
+<a name="learn"></a>
+<div class="section-container gray">
+  <h2 class="splash-text" style="padding-top:75px"> Heyo I'm a section! Wow! Learn stuff! </h2>
+</div>
+
 
 <!-- Meet The Dream Team -->
 <div class="section-container">
@@ -130,7 +135,7 @@
     <h2></h2>
     <h2></h2>
     <a href="waiting-list">
-      <button class="button-green index">
+      <button class="button-primary green index">
        Request Demo</i>
       </button>
     </a>

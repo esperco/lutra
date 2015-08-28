@@ -44,6 +44,7 @@ html, body {
 }
 
 body {
+  padding-top: 75px;
   overflow-x: hidden;
 }
 
@@ -213,12 +214,7 @@ button.button-primary {
   }
   &.large { border-width: 2px; }
   &.index { border-width: 2px; }
-}
-
-button.button-green {
-  color: white;
-  background: @green;
-  &.index { border-width: 2px; }
+  &.green { background: @green; }
 }
 
 button.button-secondary {
@@ -236,7 +232,7 @@ button.button-tertiary {
   &.large { border-width: 2px; }
   &:hover { opacity:0.5; }
   &.index { border-width: 2px; }
-
+  &.green { background: @green; }
 }
 
 button.toggle {
@@ -318,7 +314,6 @@ input.incorrect{
 .navbar, .splash-navbar { font-size: 14px; }
 
 .navbar, .splash-navbar, .about-navbar {
-  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -1306,6 +1301,11 @@ select.incorrect{
 }
 
 .users-logo-container {
+  float: center;
+  text-align: center;
+}
+
+.users-logo {
   img { height: 36px; }
   margin: 50px 0 0 70px;
 }
