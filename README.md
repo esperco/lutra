@@ -2,7 +2,13 @@ marten
 ======
 A marten is not a Martin.
 
-This module contains refactored helper code for Otter, Stoat, etc.
+This repo contains refactored helper code for Otter, Stoat, etc.
+
+Test App
+--------
+The [app](app) folder contains a sample app that links to and relies on
+various parts of Marten. You can build it by calling `make` inside the app
+directory.
 
 Gulp Helpers
 ------------
@@ -27,15 +33,12 @@ each of which are within the `Esper` namespace. Some of these modules depend
 on certain vendor helpers such as jQuery or Lodash / Underscore being added to
 the Esper namespace (see below on how that works).
 
-The TypeScript build process assumes you use a single file as an "entry-point"
-for all TypeScript files. We don't use a CommonJS- or AMD- style require
-for TypeScripts (although that may change in future versions), but assume
-that all necessary TypeScript files are referenced using
-`/// <reference path="./MyModule.ts"/>`. All referenced files will be
-concatenated based on the referenced paths.
-
-The Marten test app has both a [development entry point](ts/Dev.ts) and an
-example [production entry point](ts/Prod.ts).
+The TypeScript build process uses globs to determine which TypeScript files
+get concatenated together and allows for separate globs for development and
+production (see [app/config.js](app/config.js) for an example).
+We don't use a CommonJS- or AMD- style require
+for TypeScripts (although that may change in future versions), but rely
+upon references (`/// <reference path="./MyModule.ts"/>`) to control ordering.
 
 Vendor Files
 ------------

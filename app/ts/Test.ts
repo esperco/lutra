@@ -18,6 +18,12 @@ module Esper.Test {
     frame.attr("src", href);
   }
 
+  // Returns JQuery-wrapped test frame's content doc to inspect
+  export function getTestDoc() {
+    var frame = getTestFrame();
+    return $((<any> frame.get(0)).contentDocument);
+  }
+
   // Render a React Component into a DOM
   export function render(elm: React.ReactElement<any>) {
     var TestUtils = React.addons.TestUtils;
