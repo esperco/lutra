@@ -2,6 +2,7 @@
 
 /// <reference path="./Esper.ts"/>
 /// <reference path="./Util.ts"/>
+/// <reference path="./Log.ts"/>
 /// <reference path="./Model.ts"/>
 /// <reference path="./IndexPage.tsx"/>
 
@@ -16,7 +17,7 @@ module Esper.App {
           React.createElement(IndexPage.IndexPage),
           document.body);
       } else {
-        console.log("Esper root not found.");
+        Log.info("Esper root not found.");
       }
     });
   }

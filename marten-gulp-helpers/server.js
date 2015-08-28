@@ -12,10 +12,11 @@ module.exports = function(gulp) {
   exports.httpServer = function(name, config) {
     name = name || "http-server";
     return gulp.task(name, function() {
-      return http.createServer(
+      http.createServer(
         ecstatic({ root: path.resolve(config.pubDir),
                    contentType: 'text/html' })
       ).listen(config.serverPort);
+      console.log("Server listening at http://localhost:" + config.serverPort);
     });
   };
 
