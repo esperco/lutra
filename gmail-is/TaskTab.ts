@@ -228,8 +228,10 @@ module Esper.TaskTab {
   function selectMeetingTypeOnUserTab(meetingType : string,
                                       userTabContent : UserTab.UserTabView)
   : void {
+    var found = false;
     userTabContent.meetingSelector.find("option").each(function(i) {
       if ($(this).text() === meetingType.replace("_", " ")) {
+        found = true;
         userTabContent.meetingSelector.val($(this).val());
         userTabContent.meetingSelector.trigger("change");
         if (userTabContent.showMeetings.text() === "Show") {
@@ -237,6 +239,19 @@ module Esper.TaskTab {
         }
       }
     });
+    if (!found) {
+      var opt = $("<option value='" + meetingType + "' disabled>"
+                  + meetingType.replace("_", " ") + "</option>");
+      var drop = userTabContent.meetingSelector;
+      drop.append($("<option disabled>──────</option>"));
+      drop.append(opt);
+      drop.val(opt.val());
+      userTabContent.meetingInfo.hide();
+      userTabContent.noMeetingPrefs.show();
+      if (userTabContent.showMeetings.text() === "Show") {
+        userTabContent.showMeetings.trigger("click");
+      }
+    }
   }
 
   /** Creates or renames a task, explicitly triggered by a UI action.
@@ -548,8 +563,7 @@ module Esper.TaskTab {
   }
 
   function meetingTypeDropdown(taskTitle : JQuery,
-                               prefs : ApiT.Preferences)
-  : JQuery {
+                               taskCancel : JQuery) : JQuery {
 '''
 <select #meetingType class="esper-meeting-type esper-select">
   <option value="header">Select meeting type...</option>
@@ -561,28 +575,23 @@ module Esper.TaskTab {
   <option #coffee value="Coffee">Coffee</option>
   <option #dinner value="Dinner">Dinner</option>
   <option #drinks value="Drinks">Drinks</option>
-  <option value="Meeting">Other meeting</option>
+  <option value="Meeting">Meeting</option>
+  <option value="Other">Other</option>
 </select>
 '''
     meetingType.change(function() {
       var type = $(this).val();
-      taskTitle.data("meetingType", type);
-      taskTitle.val(type.replace("_", " ") + " ");
+      if (type === "Other") {
+        taskTitle.val("");
+      } else {
+        taskTitle.data("meetingType", type);
+        taskTitle.val(type.replace("_", " ") + " ");
+      }
       meetingType.hide();
       taskTitle.show();
+      taskCancel.show();
       taskTitle.focus();
     });
-    var mt = prefs.meeting_types;
-    if (mt) {
-      if (!mt.phone_call || !mt.phone_call.available) phone.remove();
-      if (!mt.video_call || !mt.video_call.available) video.remove();
-      if (!mt.breakfast || !mt.breakfast.available) breakfast.remove();
-      if (!mt.brunch || !mt.brunch.available) brunch.remove();
-      if (!mt.lunch || !mt.lunch.available) lunch.remove();
-      if (!mt.coffee || !mt.coffee.available) coffee.remove();
-      if (!mt.dinner || !mt.dinner.available) dinner.remove();
-      if (!mt.drinks || !mt.drinks.available) drinks.remove();
-    }
     Sidebar.customizeSelectArrow(meetingType);
     return meetingType;
   }
@@ -600,6 +609,8 @@ module Esper.TaskTab {
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
     <input #taskTitle type="text" size="24"
            class="esper-input esper-task-name"/>
+    <button #taskCancel
+            class="esper-task-cancel esper-btn-secondary">✕</button>
     <ul #taskSearchDropdown
         class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
@@ -863,6 +874,13 @@ module Esper.TaskTab {
                           stepSelect, stepNotes,
                           checklistDiv, checklist);
 
+          function showMTDrop() {
+            $("select.esper-meeting-type").remove();
+            taskTitle.hide();
+            taskCancel.hide();
+            taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
+          }
+          taskCancel.click(showMTDrop);
           if (task !== undefined) {
             taskCaption.text(taskLabelExists);
             title = task.task_title;
@@ -881,8 +899,7 @@ module Esper.TaskTab {
             workflowSelect.attr("disabled", false);
           } else {
             taskCaption.text(taskLabelCreate);
-            taskTitle.after(meetingTypeDropdown(taskTitle, prefs));
-            taskTitle.hide();
+            showMTDrop();
             title = deets.subject;
             if (title === undefined) title = "(no subject)";
           }
