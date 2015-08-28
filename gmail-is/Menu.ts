@@ -89,12 +89,12 @@ module Esper.Menu {
       <br/>
       <label class="esper-agenda-title">
         Time From:
-        <input #timeFromDate type="date" class="esper-email-date-select"/>
+        <input #timeFromDate type="text" class="esper-email-date-select"/>
       </label>
       <br/>
       <label class="esper-agenda-title">
         Time Until:
-        <input #timeUntilDate type="date" class="esper-email-date-select"/>
+        <input #timeUntilDate type="text" class="esper-email-date-select"/>
       </label>
       <br/>
       <label class="esper-agenda-title">
@@ -185,9 +185,12 @@ module Esper.Menu {
     });
 
     var date = new Date();
-    var value_date = XDate.dateValue(date);
-    timeFromDate.val(value_date);
-    timeUntilDate.val(XDate.dateValue(date));
+    timeFromDate.datepicker();
+    timeUntilDate.datepicker();
+    timeFromDate.datepicker("option", "dateFormat", "yy-mm-dd");
+    timeUntilDate.datepicker("option", "dateFormat", "yy-mm-dd");
+    timeFromDate.datepicker("setDate", date);
+    timeUntilDate.datepicker("setDate", date);
 
     function cancel() { view.remove(); }
 
@@ -196,10 +199,8 @@ module Esper.Menu {
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
-      var from = timeFromDate.val().split("-");
-      var until = timeUntilDate.val().split("-");
-      var f = new Date(from[0], from[1] - 1, from[2]);
-      var u = new Date(until[0], until[1] - 1, until[2]);
+      var f = timeFromDate.datepicker("getDate");
+      var u = timeUntilDate.datepicker("getDate");
       var f_time = Math.floor(f.getTime() / 1000);
       var u_time = Math.floor(u.getTime() / 1000) + 86399;
       var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
