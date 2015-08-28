@@ -21,6 +21,7 @@ cd $DIR/npm-vendors && npm link
 cd $OLD_PWD && npm link marten-npm-vendors
 
 # Create symlink to Marten
+rm -f marten
 cd $OLD_PWD && ln -s $DIR ./marten
 
 # Create .bowerrc file pointing to Marten's vendor dir
