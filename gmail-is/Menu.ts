@@ -207,6 +207,14 @@ module Esper.Menu {
         return el.value;
       });
 
+      if (f > u) {
+        var e = $("<span>")
+          .addClass("esper-agenda-error")
+          .html("Time From cannot be greater than Time Until");
+        e.appendTo(errorMessages);
+        return;
+      }
+
       if (r.length == 0) {
         var e = $("<span>")
           .addClass("esper-agenda-error")
