@@ -827,13 +827,16 @@ module Esper.CalPicker {
         events.push(edit);
       }
 
+      var cals = List.filter(team.team_calendars, function(cal) {
+                   return cal.google_cal_id === writeToCalendar.google_cal_id;
+                 });
       Promise.join(
         List.map(events, function(event) {
           var start = Math.floor(moment(event.start.utc).unix());
           var end = Math.floor(
             moment(event.end ? event.end.utc : event.start.utc).unix()
           );
-          return Api.eventRange(team.teamid, team.team_calendars, start, end);
+          return Api.eventRange(team.teamid, cals, start, end);
         })
       ).done(function(all_results) {
         var filtered_results = List.filterMap(all_results, function(result, i) {
