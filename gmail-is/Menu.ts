@@ -98,6 +98,23 @@ module Esper.Menu {
       </label>
       <br/>
       <label class="esper-agenda-title">
+        Agenda format:
+        <label>
+          <input #htmlFormat type="radio" name="format" />
+          HTML
+        </label>
+        <label>
+          <input #textFormat type="radio" name="format" />
+          Plain text
+        </label>
+      </label>
+      <br/>
+      <label>
+        <input #includeTaskNotes type="checkbox" />
+          Include task notes
+      </label>
+      <br/>
+      <label class="esper-agenda-title">
         Send to:
         <div #recipients class="esper-agenda-section">
         </div>
@@ -117,6 +134,8 @@ module Esper.Menu {
 </div>
 '''
     var teams = Login.myTeams();
+
+    htmlFormat.prop("checked", true);
 
     List.iter(teams, function(team) {
         var o = $("<option>")
@@ -196,6 +215,8 @@ module Esper.Menu {
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
+      var format = htmlFormat.prop("checked");
+      var i = includeTaskNotes.prop("checked");
       var from = timeFromDate.val().split("-");
       var until = timeUntilDate.val().split("-");
       var f = new Date(from[0], from[1] - 1, from[2]);
