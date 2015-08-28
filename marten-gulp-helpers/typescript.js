@@ -1,9 +1,13 @@
 module.exports = function(gulp) {
   'use strict';
 
-  var _             = require("lodash"),
-      gutil         = require("gulp-util"),
+  var _             = require('lodash'),
+      cached        = require('gulp-cached'),
+      exec          = require('gulp-exec'),
+      filter        = require('gulp-filter'),
+      gutil         = require('gulp-util'),
       path          = require('path'),
+      remember      = require('gulp-remember'),
       sourcemaps    = require('gulp-sourcemaps'),
       ts            = require('gulp-typescript'),
       uglify        = require('gulp-uglify');
@@ -35,7 +39,30 @@ module.exports = function(gulp) {
       var buildName = name + " " + proj.out;
       buildNames.push(buildName);
       gulp.task(buildName, function() {
-        var ret = gulp.src(getTsGlobs(proj, config), { base: "." })
+        var ret = gulp.src(getTsGlobs(proj, config), { base: "." });
+
+        /*  Oblivion is a custom JS/TS pre-processor that converts HTML-like
+            code to jQuery DOM insertions -- we should deprecate this, but a
+            lot of existing TS code uses Oblivion, so keep support for now.
+        */
+        if (proj.oblivion) {
+          var filterDefs = filter(['**/*.ts', '!**/*.d.ts'], {restore: true});
+          ret = ret
+            .pipe(cached(buildName + " oblivion"))
+            .pipe(filterDefs)
+            .pipe(exec(config.oblivionPath + " -ts <%= file.path %>", {
+              continueOnError: true,
+              pipeStdout: true
+            }))
+            .pipe(exec.reporter({
+              stdout: false   // Don't report stdout, just pipe to output
+            }))
+            .pipe(filterDefs.restore)
+            .pipe(remember(buildName + " oblivion"))
+            .pipe(gulp.dest(bundleDir));
+        }
+
+        ret = ret
           .pipe(sourcemaps.init())
           .pipe(ts(tsProject));
 

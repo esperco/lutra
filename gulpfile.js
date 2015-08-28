@@ -40,9 +40,13 @@ gulp.task("production", function(cb) {
   cb();
 });
 
-gulp.task("build", gulp.series("clean",
+// Quick build, no vendor
+gulp.task("build-src",
   gulp.parallel("build-html", "build-test-reqs",
-                "build-vendor", "build-ts", "build-less")));
+                "build-ts", "build-less"));
+
+gulp.task("build", gulp.series("clean",
+  gulp.parallel("build-vendor", "build-src")));
 
 gulp.task("build-production", gulp.series("production", "build"));
 
