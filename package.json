@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Refactored code between otter and stoat",
   "scripts": {
-    "postinstall": "marten-gulp-helpers/link.sh",
+    "postinstall": "gulp-helpers/link.sh",
     "build": "gulp build",
     "build-ts": "gulp build-ts",
     "build-src": "gulp build-src",
