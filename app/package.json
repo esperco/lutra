@@ -1,9 +1,9 @@
 {
-  "name": "marten",
+  "name": "marten-app",
   "version": "0.1.0",
-  "description": "Refactored code between otter and stoat",
+  "description": "Test app for marten",
   "scripts": {
-    "postinstall": "gulp-helpers/link.sh",
+    "postinstall": "../link.sh",
     "build": "gulp build",
     "build-ts": "gulp build-ts",
     "build-src": "gulp build-src",
@@ -11,11 +11,6 @@
     "serve": "gulp http-server",
     "watch": "gulp watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/esperco/marten.git"
-  },
-  "homepage": "https://github.com/esperco/marten",
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0"
   },

@@ -30,20 +30,18 @@ module.exports = {
         environments using tsDevGlobs and tsProdGlobs. Order shouldn't matter
         if you use references within TS files to sort.
 
-        For projects outside of Marten, be sure to reference Marten's TS files
-        as well -- Gulp will not look outside these globs for files.
+        Be sure to reference Marten's TS files as well -- Gulp will not look
+        outside these globs for files
       */
-      globs: ["typings/**/*.d.ts",
-              "app/**/*.ts", "app/**/*.tsx",
-              "ts/**/*.ts", "ts/**/*.tsx"],
+      globs: ["marten/typings/**/*.d.ts",
+              "marten/ts/**/*.{ts,tsx}", "ts/**/*.{ts,tsx}"],
 
       // Files to include for dev, prefix with "!" to exclude files
-      devGlobs: ["!app/Prod.ts"],
+      devGlobs: ["!ts/Prod.ts"],
 
       // Files to include for prod, prefix with "!" to exclude files
-      prodGlobs: ["!app/Dev.ts", "!app/Test.ts",
-                  "!app/**/*.Test.ts", "!app/**/*.Test.tsx",
-                  "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
+      prodGlobs: ["!ts/Dev.ts", "!ts/**/*Test.{ts,tsx}",
+                  "!marten/ts/**/*Test.{ts,tsx}"],
 
       // Relative path to bundle from pubDir
       out: "js/app.js",
@@ -56,20 +54,20 @@ module.exports = {
   // Path to oblivion executable for pre-processing TS files. Oblivion is not
   // provided via Gulp or NPM, and we assume Oblivion has been correctly
   // setup already via the Makefile
-  oblivionPath: "setup/bin/oblivion",
+  oblivionPath: "../setup/bin/oblivion",
 
   // Directory with LESS files
-  lessDir: "app",
+  lessDir: "less",
 
   // Where to write our LESS files
   lessOutDir: "css",
 
   // Where to find simple our html pages
-  htmlDir: "app",
+  htmlDir: "html",
 
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
-  vendorJSIndex: "app/vendor.js",
+  vendorJSIndex: "vendor.js",
 
   // Where Browserify should write the JS bundle (relative to pubDir)
   vendorJSOut: "js/vendor.js",

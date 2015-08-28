@@ -9,10 +9,16 @@ OLD_PWD="$(pwd)"
 # Get local dir of package
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Link gulp-helpers
-cd $DIR && npm link
+# NPM link marten-gulp-helpers package
+cd $DIR/gulp-helpers && npm link
 cd $OLD_PWD && npm link marten-gulp-helpers
 
-# Link npm-vendors
-cd $DIR/../npm-vendors && npm link
+# NPM link marten-npm-vendors package
+cd $DIR/npm-vendors && npm link
 cd $OLD_PWD && npm link marten-npm-vendors
+
+# Create symlink to Marten
+cd $OLD_PWD && ln -s $DIR ./marten
+
+# Create .bowerrc file pointing to Marten's vendor dir
+echo "{\"directory\": \"marten/vendor\"}" > .bowerrc

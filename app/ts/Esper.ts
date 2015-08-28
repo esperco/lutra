@@ -8,7 +8,7 @@
   similar to it though.
 */
 
-/// <reference path="../typings/tsd.d.ts"/>
+/// <reference path="../marten/typings/tsd.d.ts"/>
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;

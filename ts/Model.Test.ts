@@ -1,4 +1,6 @@
 /* Test Flux module */
+
+/// <reference path="./Model.ts"/>
 module Esper.Model {
 
   // Set up a sample Flux store for testing ///////////////////

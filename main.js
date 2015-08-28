@@ -1,5 +1,8 @@
-// Make inject function available outside of this function
-module.exports.inject = require("./depends").inject;
+// Link to gulp-helpers function
+module.exports.gulpHelpers = require("./gulp-helpers/main");
+
+// Helper for vendor files
+module.exports.depends = require("./depends");
 
 // Stick packages that we want to Browserify here. Using Bower is actually
 // preferable since it allows us to pull in other vendor assets besides JS
@@ -9,4 +12,6 @@ module.exports.inject = require("./depends").inject;
 // TODO: Look into finding a way to easily freeze NPM dependencies without
 // having to freeze the entire node_modules directory.
 //
-module.exports.page = require("page");
+module.exports.vendors = {
+  page: require("page")
+};

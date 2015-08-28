@@ -1,9 +1,9 @@
 /* This module is used for the Marten app created to test individual modules */
 
 /// <reference path="./Esper.ts"/>
-/// <reference path="../ts/Util.ts"/>
-/// <reference path="../ts/Log.ts"/>
-/// <reference path="../ts/Model.ts"/>
+/// <reference path="../marten/ts/Util.ts"/>
+/// <reference path="../marten/ts/Log.ts"/>
+/// <reference path="../marten/ts/Model.ts"/>
 /// <reference path="./IndexPage.tsx"/>
 
 

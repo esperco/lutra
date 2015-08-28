@@ -1,3 +1,4 @@
+/// <reference path="./Util.ts"/>
 module Esper.Util {
 
   describe("Util", function() {
