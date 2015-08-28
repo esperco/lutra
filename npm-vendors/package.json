@@ -1,0 +1,9 @@
+{
+  "name": "marten-npm-vendors",
+  "version": "0.1.0",
+  "description": "NPM vendor packages",
+  "main": "main.js",
+  "dependencies": {
+    "page": "^1.6.3"
+  }
+}

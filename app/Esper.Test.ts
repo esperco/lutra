@@ -33,6 +33,10 @@ describe("globals", function() {
   it("should not have EventEmitter defined", function() {
     expect(getGlobal("EventEmitter")).toBeUndefined();
   });
+
+  it("should not have page defined", function() {
+    expect(getGlobal("page")).toBeUndefined();
+  });
 });
 
 describe("Esper", function() {
@@ -76,5 +80,9 @@ describe("Esper", function() {
 
   it("should have React addons defined", function() {
     expect(Esper.React.addons).toBeDefined();
+  });
+
+  it("should have page defined", function() {
+    expect(Esper.page).toBeDefined();
   });
 });

@@ -23,7 +23,7 @@ var SHA1          = require("../vendor/crypto-js/sha1.js");
 // TODO: Look into finding a way to easily freeze NPM dependencies without
 // having to freeze the entire node_modules directory.
 //
-var page = require("page");
+var page = require("marten-npm-vendors").page;
 
 // Dependencies that add to jQuery global
 depends.inject({jQuery: jQuery, $: jQuery}, function() {

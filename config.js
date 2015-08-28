@@ -41,8 +41,9 @@ module.exports = {
       devGlobs: ["!app/Prod.ts"],
 
       // Files to include for prod, prefix with "!" to exclude files
-      prodGlobs: ["!app/Dev.ts", "!app/**/*.Test.tsx",
-                  "!ts/Test.ts", "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
+      prodGlobs: ["!app/Dev.ts", "!app/Test.ts",
+                  "!app/**/*.Test.ts", "!app/**/*.Test.tsx",
+                  "!ts/**/*.Test.ts", "!ts/**/*.Test.tsx"],
 
       // Relative path to bundle from pubDir
       out: "js/app.js",

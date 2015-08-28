@@ -52,6 +52,9 @@
     },
     "eventemitter3/eventemitter3.d.ts": {
       "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "page/page.d.ts": {
+      "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
     }
   }
 }
