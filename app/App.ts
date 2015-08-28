@@ -15,7 +15,7 @@ module Esper.App {
       if (rootElm) {
         React.render(
           React.createElement(IndexPage.IndexPage),
-          document.body);
+          rootElm);
       } else {
         Log.info("Esper root not found.");
       }
