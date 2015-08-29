@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="css/bootstrap.css" media"screen">
 <link rel="stylesheet" href="css/default.css" media="screen">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 <link rel="stylesheet" href="css/animate.min.css">
@@ -17,6 +18,7 @@
 <script src="js/global.js"></script>
 </head>
 
+<!--Note for Andrew Fong: For the new fixed navbar to look nice, navbar must be -before- the body section-->
 <!-- Navbar -->
 <div class="navbar-container"></div>
 <ul class="nav-menu"></ul>
@@ -26,7 +28,7 @@
 <div class="splash-content large" style="background-image:url(img/splash_home.jpg)">
   <div class="splash-text-container" align="center" >
     <div class="splash-text" style="padding-bottom: 30px">
-      <h1>Focus on the important things.</h1>
+      <h1 style="padding-bottom: 30px">Focus on the important things.</h1>
       <h2 class="splash-text-subheader" style="font-style:italic;font-size:28px">Maximize your productivity with Esper.</h2>
     </div>
      <a href="waiting-list">
@@ -47,68 +49,120 @@
 
 
 <!--Prominent Users-->
-<!-- Note for Andrew Fong : use FlexBoxes perhaps !-->
-<div class="section-container">
-  <div class="users-container">
-<div class="row">
-  <div class="col-md-3">
-    <h2 class="users-text" style="padding-left:30px">Proudly used by EAs at</h2>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-1">
-    <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
-	  	<img class="default" src="img/twitter_gray.svg">
-	  </a>
-  </div>
-  <div class="col-md-3">
-  </div>
-</div>
+<!-- Note for Andrew Fong : use FlexBoxes perhaps because resizing is mad ugly!-->
+<div class="container" style="padding:50px 0px">
+    <div class="row">
+      <div class="col-sm-3">
+        <h2 class="users-text">Proudly used by EAs at</h2>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/facebook_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/food.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/github_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/healthcare.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/twitter_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/faqs.svg">
+	      </a>
+      </div>
+      <div class="col-sm-3">
+      </div>
   </div>
 </div>
 
 <a name="learn"></a>
-<div class="section-container gray">
-  <h2 class="splash-text" style="padding-top:75px"> Heyo I'm a section! Wow! Learn stuff! </h2>
+<div class="section-container gray" style="padding:150px 0px">
+  <h1 class="splash-text">Features</h1>
+  <h2 class="splash-text" style="padding:50px 0px">Heyo I'm a section with content! Learn stuff! Wow!</h2>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        <b>Calendar Scheduling</b><br>
+        This is a thing!<br>
+        Wow!
+      </div>
+      <div class="col-sm-3">
+        <b>Task Lists</b><br>
+        This is a thing!<br>
+        Cool!
+      </div>
+      <div class="col-sm-3">
+        <b>We got an app!</b><br>
+        This is another thing!<br>
+        Haha!
+      </div>
+      <div class="col-sm-3">
+        <b>Purple things!</b><br>
+        It's a good color.<br>
+        Yeah!
+      </div>
+
+    </div>
+  </div>
 </div>
 
 
-<!-- Meet The Dream Team -->
+<!-- (THIS WILL EVENTUALLY BECOME THE FEATURE CONTAINERS. Lazily just based it on Dream Team Container -->
 <div class="section-container">
   <div class="dream-team-container">
     <div class="dream-team-right-col">
       <h3 class="section-title">MEET THE DREAM TEAM</h3>
       <p>No machine can replace a human &#8212; especially when it comes to your personal assistant. That's why we've assembled a team of world-class executive assistants and superpowered them with our powerful scheduling software. We'll find the perfect time for any meeting or appointment and complete any small task, ensuring that you never waste another second. </p><br>
-      <p>Are you an experienced executive assistant?<br><a href="ea-jobs"><b>We need your help!</b></a></p>
     </div>
     <div class="dream-team-left-col">
       <img class="dream-team-faces" src="img/dream-team-esper.jpg">
     </div>
   </div>
 </div>
+
+<!-- Meet The Green Bean (Feature container) -->
+<div class="section-container">
+  <div class="dream-team-container">
+    <div class="dream-team-right-col">
+      <h3 class="section-title">MEET THE GREEN BEAN</h3>
+      <p>Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans
+     Beans beans beans Beans beans beans Beans beans beans </p><br>
+    </div>
+    <div class="dream-team-left-col">
+      <img class="dream-team-faces" src="img/green-beans.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Meet The Green Bean (Feature container) -->
+<div class="section-container">
+  <div class="dream-team-container">
+    <div class="dream-team-right-col">
+      <h3 class="section-title">MEET THE GREEN BEAN</h3>
+      <p>Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans Beans beans beans
+     Beans beans beans Beans beans beans Beans beans beans </p><br>
+    </div>
+    <div class="dream-team-left-col">
+      <img class="dream-team-faces" src="img/green-beans.jpg">
+    </div>
+  </div>
+</div>
+
 
 <!-- Our Technology -->
 <div class="section-container gray">
