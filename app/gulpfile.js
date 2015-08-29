@@ -18,6 +18,7 @@ helpers.less.watch("watch-less", config);
 
 // Vendor JS
 helpers.vendor.build("build-vendor", config);
+helpers.vendor.buildOnce("build-vendor-once", config);
 helpers.vendor.watch("watch-vendor", config);
 
 // HTML files
@@ -41,16 +42,16 @@ gulp.task("production", function(cb) {
 });
 
 // Quick build, no vendor
-gulp.task("build-src",
-  gulp.parallel("build-html", "build-test-reqs",
-                "build-ts", "build-less"));
+var buildBase = gulp.parallel(
+  "build-html", "build-test-reqs", "build-ts", "build-less");
 
-gulp.task("build", gulp.series("clean",
-  gulp.parallel("build-vendor", "build-src")));
+gulp.task("build", gulp.parallel("build-vendor", buildBase));
+
+gulp.task("build-src", gulp.parallel("build-vendor-once", buildBase));
 
 gulp.task("build-production", gulp.series("production", "build"));
 
-gulp.task("watch", gulp.series("build",
+gulp.task("watch", gulp.series("build-src",
   gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
                 "http-server", "live-reload")));
 

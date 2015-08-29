@@ -18,6 +18,10 @@ module.exports = function(gulp) {
 
   var exports = {};
 
+  // This variable can be set by the build-once task and allows us to skip
+  // time-consuming Gulp tasks if there's already a JS bundle
+  var skip = false;
+
   // Get the vendor directory used by Bower
   var vendorDir; // Store cached vendor dir
   var getVendorDir = exports.getVendorDir = function() {
@@ -47,6 +51,8 @@ module.exports = function(gulp) {
         bundleDir   = path.dirname(config.vendorJSOut);
 
     return gulp.task(buildJSName, function() {
+      if (skip) { return; }
+
       // Debug => true, get sourceMaps. We'll rely on sourcemaps to pull out
       // into external file for production
       var ret = browserify(config.vendorJSIndex, {debug: true})
@@ -92,6 +98,8 @@ module.exports = function(gulp) {
         bundleDir   = path.dirname(config.vendorCSSOut);
 
     return gulp.task(buildCSSName, function() {
+      if (skip) { return; }
+
       var cssList = _.map(config.vendorCSSList, function(f) {
         return path.join(getVendorDir(), f);
       });
@@ -135,6 +143,7 @@ module.exports = function(gulp) {
       });
 
       return gulp.task(taskName, function() {
+        if (skip) { return; }
         return gulp.src(srcGlobList)
           .pipe(gulp.dest(path.join(config.pubDir, dest)));
       });
@@ -158,6 +167,25 @@ module.exports = function(gulp) {
     }
     return gulp.task(buildName,
       gulp.parallel(buildJSName, buildCSSName, buildAssetsName));
+  };
+
+  // Vendor building takes a while and is infrequent -- this only builds if
+  // there are no existing vendor JS files
+  exports.buildOnce = function(name, config) {
+    name = name || "build-vendor-once";
+    if (! buildName) {
+      exports.build(null, config);
+    }
+    return gulp.task(name, gulp.series(function(cb) {
+      var fullPath = path.join(config.pubDir, config.vendorJSOut);
+      skip = true;
+      try {
+        fs.statSync(fullPath);
+      } catch (err) {
+        skip = false;
+      }
+      cb();
+    }, buildName));
   };
 
   // Watch and recompile if new vendor files are added

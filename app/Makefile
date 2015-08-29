@@ -5,11 +5,15 @@ default: dev
 setup:
 	npm install
 
-dev:
+# Do a quick build, don't rebuild vendor files if not necessary
+src:
+	npm run src
+
+# Full build -- rebuild vendor files if necessary
+build:
 	npm run build
 
-src:
-	npm run build-src
+dev: src
 
 prod:
 	npm run build-production

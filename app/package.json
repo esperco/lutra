@@ -6,10 +6,9 @@
     "postinstall": "../link.sh",
     "test": "pwd",
     "build": "gulp build",
-    "build-ts": "gulp build-ts",
-    "build-src": "gulp build-src",
     "build-production": "gulp build-production",
     "serve": "gulp http-server",
+    "src": "gulp build-src",
     "watch": "gulp watch"
   },
   "devDependencies": {
