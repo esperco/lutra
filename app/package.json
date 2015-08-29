@@ -4,7 +4,6 @@
   "description": "Test app for marten",
   "scripts": {
     "postinstall": "../link.sh",
-    "test": "pwd",
     "build": "gulp build",
     "build-production": "gulp build-production",
     "serve": "gulp http-server",

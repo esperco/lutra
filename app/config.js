@@ -2,10 +2,8 @@
 
 /* Configuration options for Gulp and other NodeJS-based build processes
    These settings are used primarily for developing Marten or unit-testing
-   its individual components. You should use a separate broad process that
+   its individual components. You should use a separate build process that
    imports in the raw Marten assets for things that rely on it.
-
-   NB: TypeScript options can also be found in tsconfig.json
 */
 
 // Paths should be relate to config file unless otherwise specified
