@@ -1,0 +1,27 @@
+{
+  "name": "gmail.js",
+  "homepage": "https://github.com/esperco/gmail.js",
+  "authors": [
+    "Kartik Talwar <github@kartikt.com>"
+  ],
+  "description": "JavaScript API for Gmail",
+  "main": "src/gmail.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "*/*.min.js",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "4d30d36150",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "4d30d3615074cf615b211335abbdb5084b3232cf"
+  },
+  "_source": "git@github.com:esperco/gmail.js.git",
+  "_target": "master",
+  "_originalSource": "git@github.com:esperco/gmail.js.git"
+}

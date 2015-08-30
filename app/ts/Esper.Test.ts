@@ -37,6 +37,10 @@ describe("globals", function() {
   it("should not have page defined", function() {
     expect(getGlobal("page")).toBeUndefined();
   });
+
+  it("should not have Gmail defined", function() {
+    expect(getGlobal("Gmail")).toBeUndefined();
+  });
 });
 
 describe("Esper", function() {
@@ -84,5 +88,9 @@ describe("Esper", function() {
 
   it("should have page defined", function() {
     expect(Esper.page).toBeDefined();
+  });
+
+  it("should have gmailJs defined", function() {
+    expect((<any> Esper)["gmailJs"]).toBeDefined();
   });
 });
