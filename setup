@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+# Ensure we are in the setup/ subdirectory of the project
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $ROOT
+
+# Check for Marten Git repository in sibling directory
+if [ ! -d ../../marten ]; then
+    git clone git@github.com:esperco/marten.git
+fi
+
+cd $ROOT/../../marten
+git checkout master
+git pull --ff-only origin master
+
+# Go to project directory and link Marten from there
+cd $ROOT/..
+bash ../marten/link.sh

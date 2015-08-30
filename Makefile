@@ -62,14 +62,16 @@ build:
 	$(MAKE) -C gcal-is build
 	$(MAKE) -C css
 
-# Fetch libraries
+# Fetch Marten and install NPM dependencies
 setup:
-	$(MAKE) -C setup
+	npm install
+	./setup
 
 # Remove derived files
 clean:
 	rm -rf pub *~ */*~
 	rm -f manifest.json manifest.json.dev manifest.json.prod
+	rm node_modules
 	$(MAKE) -C common clean
 	$(MAKE) -C event-page clean
 	$(MAKE) -C content-script clean
