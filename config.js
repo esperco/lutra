@@ -19,21 +19,23 @@ module.exports = {
       },
 
       /*
-        Files to include generally speaking -- you can exclude for specific
-        environments using tsDevGlobs and tsProdGlobs. Order shouldn't matter
-        if you use references within TS files to sort.
+        Files to include generally speaking. These globs should be over-
+        inclusive. You can use the devIn and prodIn params to designate entry
+        points that limit which files are included. Use references within TS
+        files to sorting for concatenation.
 
         Be sure to reference Marten's TS files as well -- Gulp will not look
-        outside these globs for files
+        outside these globs for files.
       */
       globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
               "common/*.{ts,tsx}", "content-script/*.{ts,tsx}"],
 
-      // Files to include for dev, prefix with "!" to exclude files
-      devGlobs: ["!common/ProdConf.ts"],
+      // Entry point for dev -- all files must be referenced directly or
+      // indirectly from these files to be bundled
+      devIn: ["content-script/Main.ts"],
 
-      // Files to include for prod, prefix with "!" to exclude files
-      prodGlobs: ["!common/DevConf.ts", "!**/*Test.{ts,tsx}"],
+      // Same as devIn, but for production
+      prodIn: ["content-script/Main.ts"],
 
       // Relative path to bundle from pubDir
       out: "js/content-script.js",

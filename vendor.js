@@ -7,6 +7,7 @@ var inject        = vendors.inject;
 // Bower packages
 var EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
+    gmailJs       = require("gmail.js"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
@@ -43,6 +44,7 @@ Esper = (function(esperObj) {
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,
+    gmailJs:      gmailJs,
     moment:       moment,
     momentTz:     momentTz,
     page:         page,

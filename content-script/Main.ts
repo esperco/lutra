@@ -5,6 +5,27 @@
     https://developer.chrome.com/extensions/content_scripts
 */
 
+/// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../marten/typings/chrome/chrome.d.ts" />
+/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+
+/// <reference path="../common/Esper.ts" />
+/// <reference path="../common/HostUrl.ts" />
+/// <reference path="../common/Types.ts" />
+/// <reference path="../common/Conf.ts" />
+/// <reference path="../common/List.ts" />
+/// <reference path="../common/Util.ts" />
+/// <reference path="../common/Log.ts" />
+/// <reference path="../common/LRU.ts" />
+/// <reference path="../common/Visited.ts" />
+/// <reference path="../common/EsperStorage.ts" />
+/// <reference path="../common/Message.ts" />
+
+/// <reference path="./Update.ts" />
+/// <reference path="./JsonHttp.ts" />
+/// <reference path="./Auth.ts" />
+
 module Esper.Main {
   function injectScript(scriptName) {
     Log.d("Injecting script " + scriptName);

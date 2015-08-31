@@ -8,14 +8,6 @@ gcal-is: build
 # Build only
 build: js/gcal-is.js Makefile
 
-# External JavaScript libraries (needed at runtime only).
-# sha1 is part of cryptojs.
-# The chrome library is part of the environment provided by Chrome.
-JS_LIBS = \
-  jquery \
-  jqueryui \
-  sha1
-
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
 TS_LIBS = \
@@ -76,14 +68,13 @@ APP_TS = \
 
 # Input to TypeScript compiler
 ALL_TS = \
-  $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS))) \
+  $(addsuffix .ts,$(addprefix ../marten/typings/,$(TS_LIBS))) \
   $(addsuffix .ts,$(APP_DEFS)) \
   $(SHARED_TS) \
   $(APP_TS)
 
 # All JavaScript code not derived from our TypeScript files
 EXTRA_JS = \
-  $(addsuffix .js,$(addprefix ../setup/js/,$(JS_LIBS))) \
   $(addsuffix .js,$(APP_JS))
 
 .PHONY: pp
@@ -91,7 +82,7 @@ pp: $(APP_TS)
 
 ts/%.ts: %.ts
 	@mkdir -p ts
-	../setup/bin/oblivion -ts $< -o $@
+	../marten/setup/bin/oblivion -ts $< -o $@
 
 js/gcal-is.js: $(ALL_TS)
 	@mkdir -p js

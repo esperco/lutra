@@ -8,3 +8,6 @@ manifest.json
 manifest.json.dev
 manifest.json.prod
 .DS_Store
+.bowerrc
+node_modules
+marten

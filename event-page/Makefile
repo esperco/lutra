@@ -8,14 +8,10 @@ event-page: build
 # Build only
 build: js/event-page.js
 
-# External JavaScript libraries (needed at runtime only).
-# sha1 is part of cryptojs.
-# The chrome library is part of the environment provided by Chrome.
-JS_LIBS = \
-  jquery
-
 # External TypeScript libraries and type definitions for
 # the external JavaScript libraries (needed at compile time).
+# sha1 is part of cryptojs.
+# The chrome library is part of the environment provided by Chrome.
 TS_LIBS = \
   jquery/jquery.d \
   jqueryui/jqueryui.d \
@@ -64,14 +60,13 @@ APP_TS = \
 
 # Input to the TypeScript compiler
 ALL_TS = \
-  $(addsuffix .ts,$(addprefix ../setup/ts/,$(TS_LIBS))) \
+  $(addsuffix .ts,$(addprefix ../marten/typings/,$(TS_LIBS))) \
   $(addsuffix .ts,$(APP_DEFS)) \
   $(SHARED_TS) \
   $(APP_TS)
 
 # All JavaScript code not derived from our TypeScript files
 EXTRA_JS = \
-  $(addsuffix .js,$(addprefix ../setup/js/,$(JS_LIBS))) \
   $(addsuffix .js,$(APP_JS))
 
 .PHONY: pp
@@ -79,7 +74,7 @@ pp: $(APP_TS)
 
 ts/%.ts: %.ts
 	@mkdir -p ts
-	../setup/bin/oblivion -ts $< -o $@
+	../marten/setup/bin/oblivion -ts $< -o $@
 
 js/event-page.js: $(ALL_TS)
 	@mkdir -p js

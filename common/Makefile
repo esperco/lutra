@@ -70,7 +70,7 @@ pp: $(TS)
 
 ts/%.ts: %.ts
 	@mkdir -p ts
-	../setup/bin/oblivion $< -o $@
+	../marten/setup/bin/oblivion $< -o $@
 
 clean:
 	rm -f *~

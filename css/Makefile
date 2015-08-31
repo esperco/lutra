@@ -1,5 +1,8 @@
 # Compile LESS files into CSS
 
+# NB: This Makefile is being deprecated in favor of using Gulp's LESS
+# pipeline. Keeping this around mostly to run `make clean`.
+
 .PHONY: default css clean
 default: css
 

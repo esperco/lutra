@@ -8,13 +8,12 @@
   },
   "homepage": "https://github.com/esperco/stoat",
   "scripts": {
-    "postinstall": "../marten/link.sh",
     "build": "gulp build",
     "build-production": "gulp build-production",
-    "src": "gulp build-src",
+    "rebuild": "gulp rebuild",
     "watch": "gulp watch"
   },
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0"
-  },
+  }
 }
