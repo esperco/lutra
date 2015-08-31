@@ -50,8 +50,8 @@ module.exports = function(gulp) {
     var bundleName  = path.basename(config.vendorJSOut),
         bundleDir   = path.dirname(config.vendorJSOut);
 
-    return gulp.task(buildJSName, function() {
-      if (skip) { return; }
+    return gulp.task(buildJSName, function(cb) {
+      if (skip) { cb(); return; }
 
       // Debug => true, get sourceMaps. We'll rely on sourcemaps to pull out
       // into external file for production
@@ -97,8 +97,8 @@ module.exports = function(gulp) {
     var bundleName  = path.basename(config.vendorCSSOut),
         bundleDir   = path.dirname(config.vendorCSSOut);
 
-    return gulp.task(buildCSSName, function() {
-      if (skip) { return; }
+    return gulp.task(buildCSSName, function(cb) {
+      if (skip) { cb(); return; }
 
       var cssList = _.map(config.vendorCSSList, function(f) {
         return path.join(getVendorDir(), f);
@@ -142,8 +142,8 @@ module.exports = function(gulp) {
         return path.join(getVendorDir(), srcGlob);
       });
 
-      return gulp.task(taskName, function() {
-        if (skip) { return; }
+      return gulp.task(taskName, function(cb) {
+        if (skip) { cb(); return; }
         return gulp.src(srcGlobList)
           .pipe(gulp.dest(path.join(config.pubDir, dest)));
       });
