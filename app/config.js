@@ -24,11 +24,13 @@ module.exports = {
       },
 
       /*
-        Files to include generally speaking -- you can use the devIn and prodIn
-        params to designate entry points and references within TS files to sort.
+        Files to include generally speaking. These globs should be over-
+        inclusive. You can use the devIn and prodIn params to designate entry
+        points that limit which files are included. Use references within TS
+        files to sorting for concatenation.
 
         Be sure to reference Marten's TS files as well -- Gulp will not look
-        outside these globs for files
+        outside these globs for files.
       */
       globs: ["marten/typings/**/*.d.ts",
               "marten/ts/**/*.{ts,tsx}", "ts/**/*.{ts,tsx}"],

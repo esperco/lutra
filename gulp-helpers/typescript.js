@@ -11,6 +11,7 @@ module.exports = function(gulp) {
       remember      = require('gulp-remember'),
       sourcemaps    = require('gulp-sourcemaps'),
       ts            = require('gulp-typescript'),
+      tsRef         = require('gulp-typescript-ref'),
       uglify        = require('gulp-uglify');
 
   var exports = {};
@@ -38,8 +39,8 @@ module.exports = function(gulp) {
         sortOutput: true,
         typescript: ( proj.compilerOptions &&
                       proj.compilerOptions.jsx ?
-                      require("ntypescript") : require("typescript") )
-        // out: bundleName --> use concat
+                      require("ntypescript") : require("typescript") ),
+        out: bundleName
       }, proj.compilerOptions));
 
       var buildName = name + " " + proj.out;
@@ -67,21 +68,15 @@ module.exports = function(gulp) {
             .pipe(remember(buildName + " oblivion"));
         }
 
-        ret = ret.pipe(sourcemaps.init());
-
-        // Weirdly, we have to have undefined as second arg to make filters work
         if (config.production && proj.prodIn) {
-          ret = ret.pipe(ts(tsProject, undefined))
-                   .pipe(ts.filter(tsProject, {referencedFrom: proj.prodIn}));
+          ret = ret.pipe(tsRef(proj.prodIn));
+        } else if (proj.devIn) {
+          ret = ret.pipe(tsRef(proj.devIn));
         }
-        else if (proj.devIn) {
-          ret = ret.pipe(ts(tsProject, undefined))
-                   .pipe(ts.filter(tsProject, {referencedFrom: proj.devIn}));
-        }
-        else {
-          ret = ret.pipe(ts.filter(tsProject));
-        }
-        ret = ret.pipe(concat(bundleName));
+
+        ret = ret
+          .pipe(sourcemaps.init())
+          .pipe(ts(tsProject));
 
         if (config.production) {
           // loadMaps = true so we can load tsify/browserify sourcemaps
