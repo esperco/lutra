@@ -240,8 +240,8 @@ module Esper.Menu {
       recipients.children().attr("disabled", true);
       sendButton.text("Sending...");
 
-      console.log(r);
-      Api.sendAgenda(teamSelect.val(), f_time, u_time, r).done(cancel);
+      var pref = { recipients: r, html_format: format, include_task_notes: i};
+      Api.sendAgenda(teamSelect.val(), f_time, u_time, pref).done(cancel);
     });
 
     return _view;
