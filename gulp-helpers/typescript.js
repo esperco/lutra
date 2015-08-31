@@ -3,6 +3,7 @@ module.exports = function(gulp) {
 
   var _             = require('lodash'),
       cached        = require('gulp-cached'),
+      concat        = require('gulp-concat'),
       exec          = require('gulp-exec'),
       filter        = require('gulp-filter'),
       gutil         = require('gulp-util'),
@@ -14,9 +15,14 @@ module.exports = function(gulp) {
 
   var exports = {};
 
+  // Concatenate entry points to globs to ensure more consistent ordering
   var getTsGlobs = function(proj, config) {
-    var extra = config.production ? proj.prodGlobs : proj.devGlobs;
-    return proj.globs.concat(extra || []);
+    if (config.production && proj.prodIn) {
+      return proj.prodIn.concat(proj.globs);
+    } else if (proj.devIn) {
+      return proj.devIn.concat(proj.globs);
+    }
+    return proj.globs;
   };
 
   // TS project names to keep track of, used by watch
@@ -32,8 +38,8 @@ module.exports = function(gulp) {
         sortOutput: true,
         typescript: ( proj.compilerOptions &&
                       proj.compilerOptions.jsx ?
-                      require("ntypescript") : require("typescript") ),
-        out: bundleName
+                      require("ntypescript") : require("typescript") )
+        // out: bundleName --> use concat
       }, proj.compilerOptions));
 
       var buildName = name + " " + proj.out;
@@ -58,13 +64,24 @@ module.exports = function(gulp) {
               stdout: false   // Don't report stdout, just pipe to output
             }))
             .pipe(filterDefs.restore)
-            .pipe(remember(buildName + " oblivion"))
-            .pipe(gulp.dest(bundleDir));
+            .pipe(remember(buildName + " oblivion"));
         }
 
-        ret = ret
-          .pipe(sourcemaps.init())
-          .pipe(ts(tsProject));
+        ret = ret.pipe(sourcemaps.init());
+
+        // Weirdly, we have to have undefined as second arg to make filters work
+        if (config.production && proj.prodIn) {
+          ret = ret.pipe(ts(tsProject, undefined))
+                   .pipe(ts.filter(tsProject, {referencedFrom: proj.prodIn}));
+        }
+        else if (proj.devIn) {
+          ret = ret.pipe(ts(tsProject, undefined))
+                   .pipe(ts.filter(tsProject, {referencedFrom: proj.devIn}));
+        }
+        else {
+          ret = ret.pipe(ts.filter(tsProject));
+        }
+        ret = ret.pipe(concat(bundleName));
 
         if (config.production) {
           // loadMaps = true so we can load tsify/browserify sourcemaps
