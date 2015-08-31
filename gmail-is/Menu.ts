@@ -192,6 +192,13 @@ module Esper.Menu {
     timeFromDate.datepicker("setDate", date);
     timeUntilDate.datepicker("setDate", date);
 
+    // Add an Esper class to help namespace CSS, especially since the
+    // Datepicker widget seems to be absolutely positioned outside of
+    // our DOM elements. Datepicker might actually be re-using the same
+    // widget so we don't need to addClass twice, but whatever.
+    timeFromDate.datepicker("widget").addClass("esper");
+    timeUntilDate.datepicker("widget").addClass("esper");
+
     function cancel() { view.remove(); }
 
     view.click(cancel);
