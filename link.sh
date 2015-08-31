@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Script to npm link this package.
 # Call from root of package you want to link from.
