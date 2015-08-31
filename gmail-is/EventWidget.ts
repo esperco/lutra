@@ -52,7 +52,10 @@ module Esper.EventWidget {
       moment(event.end ? event.end.utc : event.start.utc).unix()
     );
 
-    Api.eventRange(team.teamid, team.team_calendars, start, end)
+    var calendars = List.filter(team.team_calendars, function(cal) {
+                      return cal.google_cal_id === event.google_cal_id;
+                    });
+    Api.eventRange(team.teamid, calendars, start, end)
       .done(function(results) {
         var events = List.filter(results.events, function(ev) {
           return (ev.google_event_id !== event.google_event_id &&
