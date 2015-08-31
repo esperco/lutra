@@ -16,6 +16,7 @@ TS_LIBS = \
   chrome/chrome.d \
   cryptojs/cryptojs.d \
   moment/moment.d \
+  moment-timezone/moment-timezone.d \
   fullCalendar/fullCalendar.d
 
 # Our own JavaScript code required in edge cases

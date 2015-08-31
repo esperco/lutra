@@ -1123,7 +1123,15 @@ ul.esper-availability-graph {
 
 /** Sidebar Task Management **/
 
-.esper-task-name { width: 100%; }
+.esper-task-name { width: 80%; }
+
+.esper-task-cancel {
+  height: 32px;
+  padding: 6px 9px 6px 9px;
+  font-size: 100%;
+}
+
+.esper-meeting-type { width: 80%; margin-bottom: 10px; }
 
 .esper-task-search-dropdown {
   z-index: 2;
@@ -1177,6 +1185,7 @@ ul.esper-availability-graph {
 }
 
 .esper-no-events,
+.esper-no-prefs,
 .esper-no-threads {
   padding: 50px 0;
   font-size: 16px;
@@ -1624,14 +1633,30 @@ ul.esper-ev-dropdown {
 }
 
 .esper-email-date-select {
-  border: none;
+  border: 1px solid @gray_20;
   margin-bottom: 5px;
   outline: none;
   width: 145px;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .esper-agenda-select {
   margin-bottom: 5px;
+}
+
+.esper-agenda-error {
+  color: @red;
+  font-size: 12px;
 }
 
 .esper-agenda-send {
@@ -2203,6 +2228,113 @@ ul.esper-ev-dropdown {
   color: #777;
 }
 
+/** Date picker dropdown **/
+
+.ui-datepicker.esper {
+  background-color: #fff;
+  border: 1px solid #66AFE9;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(102,175,233,.6);
+  display: none;
+  margin-top: 4px;
+  padding: 10px;
+  width: 240px;
+
+  a, a:hover {
+    text-decoration: none;
+  }
+
+  a:hover, td:hover a {
+    color: #2A6496;
+    -webkit-transition: color 0.1s ease-in-out;
+       -moz-transition: color 0.1s ease-in-out;
+         -o-transition: color 0.1s ease-in-out;
+            transition: color 0.1s ease-in-out;
+  }
+
+  .ui-datepicker-header {
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .ui-datepicker-title {
+    font-weight: 700;
+  }
+
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    cursor: pointer;
+    // font-family: 'Glyphicons Halflings'; // TODO: Provision Glyphics fonts
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    height: 20px;
+    line-height: 1;
+    margin-top: 2px;
+    width: 30px;
+  }
+  .ui-datepicker-prev {
+    float: left;
+    text-align: left;
+  }
+  .ui-datepicker-next {
+    float: right;
+    text-align: right;
+  }
+
+  // TODO Provision Glyphicon fonts before using these
+  /* .ui-datepicker-prev:before {
+    content: "\e079";
+  }
+  .ui-datepicker-next:before {
+    content: "\e080";
+  } */
+
+  // Ugly, but works without Glyphicons
+  .ui-datepicker-prev:before {
+    content: "\21D0";
+  }
+  .ui-datepicker-next:before {
+    content: "\21D2";
+  }
+
+  .ui-icon {
+    display: none;
+  }
+  .ui-datepicker-calendar {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .ui-datepicker-calendar th,
+  .ui-datepicker-calendar td {
+    text-align: center;
+    padding: 4px 0;
+  }
+  .ui-datepicker-calendar td {
+    border-radius: 4px;
+    -webkit-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+       -moz-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+         -o-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+  }
+  .ui-datepicker-calendar td:hover {
+    background-color: #eee;
+    cursor: pointer;
+  }
+  .ui-datepicker-calendar td a {
+    text-decoration: none;
+  }
+  .ui-datepicker-current-day {
+    background-color: #4289cc;
+  }
+  .ui-datepicker-current-day a {
+    color: #fff
+  }
+  .ui-datepicker-calendar .ui-datepicker-unselectable:hover {
+    background-color: #fff;
+    cursor: default;
+  }
+}
 
 /*** Banner inviting the user the reload the page when needed ***/
 

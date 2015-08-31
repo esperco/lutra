@@ -225,6 +225,35 @@ module Esper.TaskTab {
       });
   }
 
+  function selectMeetingTypeOnUserTab(meetingType : string,
+                                      userTabContent : UserTab.UserTabView)
+  : void {
+    var found = false;
+    userTabContent.meetingSelector.find("option").each(function(i) {
+      if ($(this).text() === meetingType.replace("_", " ")) {
+        found = true;
+        userTabContent.meetingSelector.val($(this).val());
+        userTabContent.meetingSelector.trigger("change");
+        if (userTabContent.showMeetings.text() === "Show") {
+          userTabContent.showMeetings.trigger("click");
+        }
+      }
+    });
+    if (!found) {
+      var opt = $("<option value='" + meetingType + "' disabled>"
+                  + meetingType.replace("_", " ") + "</option>");
+      var drop = userTabContent.meetingSelector;
+      drop.append($("<option disabled>──────</option>"));
+      drop.append(opt);
+      drop.val(opt.val());
+      userTabContent.meetingInfo.hide();
+      userTabContent.noMeetingPrefs.show();
+      if (userTabContent.showMeetings.text() === "Show") {
+        userTabContent.showMeetings.trigger("click");
+      }
+    }
+  }
+
   /** Creates or renames a task, explicitly triggered by a UI action.
    *
    *  Will fail if a task cannot be created, such as if there is no
@@ -232,14 +261,22 @@ module Esper.TaskTab {
    *  should not happen and is logged as an error.
    */
   // TODO: Update using centralized model at CurrentThread
-  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query) {
+  function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
+                              userTabContent : UserTab.UserTabView) {
     Sidebar.dismissDropdowns();
+    Log.d("Creating task with meetingType ", taskTitle.data("meetingType"));
     var force = true;
     CurrentThread.refreshTaskForThread(force)
       .done(function(task) {
         if (task) {
           Api.setTaskTitle(task.taskid, query);
           task.task_title = query;
+          var meetingType = taskTitle.data("meetingType");
+          if (meetingType) {
+            Api.setTaskMeetingType(task.taskid, meetingType);
+            task.task_meeting_type = meetingType;
+            selectMeetingTypeOnUserTab(meetingType, userTabContent);
+          }
           CurrentThread.setTask(task);
           taskTitle.val(query);
           markNewTaskAsInProgress(task);
@@ -256,7 +293,8 @@ module Esper.TaskTab {
                                 team: ApiT.Team,
                                 threadId: string,
                                 query,
-                                taskTab: TaskTabView) {
+                                taskTab: TaskTabView,
+                                userTabContent : UserTab.UserTabView) {
     var teamid = team.teamid;
     Api.searchTasks(teamid, query).done(function(response) {
       results.find(".esper-li").remove();
@@ -310,7 +348,8 @@ module Esper.TaskTab {
       rename
         .appendTo(actions)
         .click(function() {
-          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query);
+          createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
+                             userTabContent);
         });
 
       function addArchiveOption(task) {
@@ -523,18 +562,55 @@ module Esper.TaskTab {
     linkedEventsList: JQuery;
   }
 
+  function meetingTypeDropdown(taskTitle : JQuery,
+                               taskCancel : JQuery) : JQuery {
+'''
+<select #meetingType class="esper-meeting-type esper-select">
+  <option value="header">Select meeting type...</option>
+  <option #phone value="Phone_call">Phone call</option>
+  <option #video value="Video_call">Video call</option>
+  <option #breakfast value="Breakfast">Breakfast</option>
+  <option #brunch value="Brunch">Brunch</option>
+  <option #lunch value="Lunch">Lunch</option>
+  <option #coffee value="Coffee">Coffee</option>
+  <option #dinner value="Dinner">Dinner</option>
+  <option #drinks value="Drinks">Drinks</option>
+  <option value="Meeting">Meeting</option>
+  <option value="Other">Other</option>
+</select>
+'''
+    meetingType.change(function() {
+      var type = $(this).val();
+      if (type === "Other") {
+        taskTitle.val("");
+      } else {
+        taskTitle.data("meetingType", type);
+        taskTitle.val(type.replace("_", " ") + " ");
+      }
+      meetingType.hide();
+      taskTitle.show();
+      taskCancel.show();
+      taskTitle.focus();
+    });
+    Sidebar.customizeSelectArrow(meetingType);
+    return meetingType;
+  }
+
   export function displayTaskTab(tab1,
                                  team: ApiT.Team,
                                  threadId: string,
                                  autoTask: boolean,
                                  linkedEvents: ApiT.TaskEvent[],
-                                 workflows: ApiT.Workflow[]) {
+                                 workflows: ApiT.Workflow[],
+                                 userTabContent : UserTab.UserTabView) {
 '''
 <div #view>
   <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
     <input #taskTitle type="text" size="24"
            class="esper-input esper-task-name"/>
+    <button #taskCancel
+            class="esper-task-cancel esper-btn-secondary">✕</button>
     <ul #taskSearchDropdown
         class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
@@ -785,39 +861,50 @@ module Esper.TaskTab {
       Api.obtainTaskForThread
       : Api.getTaskForThread;
 
-    Api.getPreferences(team.teamid).done(function(prefs) {
-      displayWorkflow(team, prefs, workflows,
-                      workflowSection, workflowSelect, workflowNotes,
-                      stepSelect, stepNotes,
-                      checklistDiv, checklist);
-    });
-
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
         linkedThreadsSpinner.hide();
         taskProgressSpinner.hide();
-        if (task !== undefined) {
-          taskCaption.text(taskLabelExists);
-          title = task.task_title;
-          displayLinkedThreadsList(task, threadId, taskTabView);
-          markNewTaskAsInProgress(task);
-          displayTaskProgress(task, taskTabView);
 
-          var progress = task.task_workflow_progress;
-          if (progress) {
-            workflowSelect.val(progress.workflow_id);
-            workflowSelect.trigger("change");
+        Api.getPreferences(team.teamid).done(function(prefs) {
+          displayWorkflow(team, prefs, workflows,
+                          workflowSection, workflowSelect, workflowNotes,
+                          stepSelect, stepNotes,
+                          checklistDiv, checklist);
+
+          function showMTDrop() {
+            $("select.esper-meeting-type").remove();
+            taskTitle.hide();
+            taskCancel.hide();
+            taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
           }
-          workflowSelect.attr("disabled", false);
+          taskCancel.click(showMTDrop);
+          if (task !== undefined) {
+            taskCaption.text(taskLabelExists);
+            title = task.task_title;
+            displayLinkedThreadsList(task, threadId, taskTabView);
+            markNewTaskAsInProgress(task);
+            displayTaskProgress(task, taskTabView);
+            if (task.task_meeting_type) {
+              selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+            }
 
-        } else {
-          taskCaption.text(taskLabelCreate);
-          title = deets.subject;
-          if (title === undefined) title = "(no subject)";
-        }
-        taskTitle.val(title);
+            var progress = task.task_workflow_progress;
+            if (progress) {
+              workflowSelect.val(progress.workflow_id);
+              workflowSelect.trigger("change");
+            }
+            workflowSelect.attr("disabled", false);
+          } else {
+            taskCaption.text(taskLabelCreate);
+            showMTDrop();
+            title = deets.subject;
+            if (title === undefined) title = "(no subject)";
+          }
+          taskTitle.val(title);
+        });
 
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
@@ -825,7 +912,8 @@ module Esper.TaskTab {
             displaySearchResults(taskTitle, taskSearchDropdown,
                                  taskSearchResults,
                                  taskSearchActions, team,
-                                 threadId, query, taskTabView);
+                                 threadId, query, taskTabView,
+                                 userTabContent);
           }
         });
         taskTitle.keydown(function(pressed) {
@@ -836,7 +924,7 @@ module Esper.TaskTab {
             taskTitle.blur();
             Gmail.threadContainer().focus();
             createOrRenameTask(taskTitle, team.teamid, threadId,
-                               taskTabView, name);
+                               taskTabView, name, userTabContent);
           }
         });
       });

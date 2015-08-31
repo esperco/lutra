@@ -265,13 +265,14 @@ module Esper.Api {
   }
 
   /*** Emails ***/
-  export function sendAgenda(teamid, from, until):
+  export function sendAgenda(teamid, from, until, recipients: string[]):
   JQueryDeferred<void> {
-    var url = Conf.Api.url + "/api/agenda/send/" + string(Login.myUid()) +
+    var url = Conf.Api.url + "/api/agenda/send-v2/" + string(Login.myUid()) +
       "/" + string(teamid) +
       "/" + encodeURIComponent(string(from)) +
       "/" + encodeURIComponent(string(until));
-    return JsonHttp.put(url, "");
+    var rec = { emails: recipients };
+    return JsonHttp.put(url, JSON.stringify(rec));
   }
 
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
@@ -444,6 +445,15 @@ module Esper.Api {
       Conf.Api.url + "/api/task/title/" + string(Login.myUid())
       + "/" + string(taskid)
       + "/" + encodeURIComponent(string(title));
+    return JsonHttp.put(url, "");
+  }
+
+  export function setTaskMeetingType(taskid, mtype):
+  JQueryDeferred<void> {
+    var url =
+      Conf.Api.url + "/api/task/meeting-type/" + string(Login.myUid())
+      + "/" + string(taskid)
+      + "/" + encodeURIComponent(string(mtype));
     return JsonHttp.put(url, "");
   }
 

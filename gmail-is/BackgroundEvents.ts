@@ -15,7 +15,8 @@ module Esper.BackgroundEvents {
    *  the week). The preferences will be calculated with this
    *  assumption.
    */
-  export function meetingTimes(eventType: string, start: Moment, end: Moment, resolve) {
+  export function meetingTimes(eventType: string,
+    start: moment.Moment, end: moment.Moment, resolve) {
     var start = start.startOf('day');
     var end   = end.startOf('day');
 

@@ -89,15 +89,23 @@ module Esper.Menu {
       <br/>
       <label class="esper-agenda-title">
         Time From:
-        <input #timeFromDate type="date" class="esper-email-date-select"/>
+        <input #timeFromDate type="text" class="esper-email-date-select"/>
       </label>
       <br/>
       <label class="esper-agenda-title">
         Time Until:
-        <input #timeUntilDate type="date" class="esper-email-date-select"/>
+        <input #timeUntilDate type="text" class="esper-email-date-select"/>
+      </label>
+      <br/>
+      <label class="esper-agenda-title">
+        Send to:
+        <div #recipients class="esper-agenda-section">
+        </div>
       </label>
     </div>
     <div class="esper-modal-footer esper-clearfix">
+      <div #errorMessages>
+      </div>
       <button #sendButton class="esper-btn esper-btn-primary modal-primary">
         Send Now
       </button>
@@ -120,17 +128,45 @@ module Esper.Menu {
         o.appendTo(teamSelect);
     });
 
+    function addRecipientCheckboxes(email, id) {
+      var i = $("<input />")
+        .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
+        .val(email);
+      var l = $("<label>")
+        .attr("for", "agenda-recipient" + id)
+        .text(email)
+        .append($("<br />"));
+      i.appendTo(recipients);
+      l.appendTo(recipients);
+    }
+
     teamSelect.change(function() {
       var teamid = teamSelect.val();
       var prefs = Teams.getPreferences(teamid);
       var timezone = prefs.general.current_timezone;
       tzSelect.val(timezone);
+
+      recipients.empty();
+      var team = List.find(teams, function(team) { return team.teamid === teamid; });
+      var teamEmails = List.union(
+        [Teams.getProfile(team.team_executive).email],
+        List.map(team.team_assistants, function(uid: string) {
+          return Teams.getProfile(uid).email;
+        }));
+      List.iter(teamEmails, addRecipientCheckboxes);
     });
 
     var teamid = teamSelect.val();
     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
     var prefs = Teams.getPreferences(teamid);
     var timezone = prefs.general.current_timezone;
+    var teamEmails = List.union(
+      [Teams.getProfile(currentTeam.get().team_executive).email],
+      List.map(currentTeam.get().team_assistants, function(uid) {
+        return Teams.getProfile(uid).email;
+      }));
+
+    List.iter(teamEmails, addRecipientCheckboxes);
 
     List.iter(timezones, function(tz) {
       var o = $("<option>")
@@ -149,9 +185,19 @@ module Esper.Menu {
     });
 
     var date = new Date();
-    var value_date = XDate.dateValue(date);
-    timeFromDate.val(value_date);
-    timeUntilDate.val(XDate.dateValue(date));
+    timeFromDate.datepicker();
+    timeUntilDate.datepicker();
+    timeFromDate.datepicker("option", "dateFormat", "yy-mm-dd");
+    timeUntilDate.datepicker("option", "dateFormat", "yy-mm-dd");
+    timeFromDate.datepicker("setDate", date);
+    timeUntilDate.datepicker("setDate", date);
+
+    // Add an Esper class to help namespace CSS, especially since the
+    // Datepicker widget seems to be absolutely positioned outside of
+    // our DOM elements. Datepicker might actually be re-using the same
+    // widget so we don't need to addClass twice, but whatever.
+    timeFromDate.datepicker("widget").addClass("esper");
+    timeUntilDate.datepicker("widget").addClass("esper");
 
     function cancel() { view.remove(); }
 
@@ -159,18 +205,38 @@ module Esper.Menu {
     Util.preventClickPropagation(modal);
     cancelButton.click(cancel);
     sendButton.click(function() {
-      var from = timeFromDate.val().split("-");
-      var until = timeUntilDate.val().split("-");
-      var f = new Date(from[0], from[1] - 1, from[2]);
-      var u = new Date(until[0], until[1] - 1, until[2]);
+      errorMessages.empty();
+      var f = timeFromDate.datepicker("getDate");
+      var u = timeUntilDate.datepicker("getDate");
       var f_time = Math.floor(f.getTime() / 1000);
       var u_time = Math.floor(u.getTime() / 1000) + 86399;
+      var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
+        return el.value;
+      });
+
+      if (f > u) {
+        var e = $("<span>")
+          .addClass("esper-agenda-error")
+          .html("Time From cannot be greater than Time Until");
+        e.appendTo(errorMessages);
+        return;
+      }
+
+      if (r.length == 0) {
+        var e = $("<span>")
+          .addClass("esper-agenda-error")
+          .html("You must select at least one recipient");
+        e.appendTo(errorMessages);
+        return;
+      }
 
       cancelButton.attr("disabled", true);
       sendButton.attr("disabled", true);
+      recipients.children().attr("disabled", true);
       sendButton.text("Sending...");
 
-      Api.sendAgenda(teamSelect.val(), f_time, u_time).done(cancel);
+      console.log(r);
+      Api.sendAgenda(teamSelect.val(), f_time, u_time, r).done(cancel);
     });
 
     return _view;

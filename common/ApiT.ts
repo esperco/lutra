@@ -360,6 +360,7 @@ module Esper.ApiT {
     task_messages: EmailMessage[];
     task_events: TaskEvent[];
     task_workflow_progress: TaskWorkflowProgress;
+    task_meeting_type?: string;
   }
 
   export interface TaskThread {

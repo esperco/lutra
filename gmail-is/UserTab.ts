@@ -511,7 +511,12 @@ module Esper.UserTab {
 
       if (field === "header") {
         return;
-      } else if (field === "phone_call") {
+      } else {
+        meetInfo.show();
+        $(".esper-no-prefs").hide();
+      }
+
+      if (field === "phone_call") {
         var phone_changes = getSubPreferenceChanges("Phone", meeting_changes);
         displayPhoneInfo(meetInfo, meetingTypes.phone_call, phone_changes);
       } else if (field === "video_call") {
@@ -866,6 +871,7 @@ module Esper.UserTab {
     meetingsContainer: JQuery;
     meetingsSelector: JQuery;
     meetingSelector: JQuery;
+    noMeetingPrefs: JQuery;
     meetingInfo: JQuery;
     transportationHeader: JQuery;
     showTransportation: JQuery;
@@ -958,6 +964,7 @@ module Esper.UserTab {
           <span class="esper-show-selector">Show: </span>
           <select #meetingSelector class="esper-select esper-meeting-selector"/>
         </div>
+        <div #noMeetingPrefs style="display: none" class="esper-no-prefs"/>
         <div class="esper-user-tab-meeting-info" #meetingInfo/>
       </div>
     </div>
@@ -991,6 +998,13 @@ module Esper.UserTab {
     team.team_labels.forEach(function(label) {
       displayTeamLabel(teamLabelsContainer, label);
     })
+
+    var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
+    var noPrefsLink = $("<a href='" + noPrefsURL + "'>Edit settings?</a>");
+    noPrefsLink.addClass("esper-link");
+    var noPrefsDescr = $("<span>Executive is marked unavailable " +
+                         "for this meeting type. </span>");
+    noMeetingPrefs.append(noPrefsDescr).append(noPrefsLink);
 
     var prefs = Teams.getTeamPreferences(team);
     var until = Math.floor(XDate.now()/1000);
