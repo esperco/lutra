@@ -3,7 +3,11 @@
 // Definitions by: Neil Stalker <https://github.com/nestalk>, Marcelo Camargo <https://github.com/hasellcamargo>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="../jquery/jquery.d.ts"/>
+// NB: This Type Definition file has been modified by Esper to include some
+// changes made in FullCalendar 2.x, but it is far from complete!
+
+/// <reference path="../jquery/jquery.d.ts" />
+/// <reference path="../moment/moment.d.ts" />
 
 declare module FullCalendar {
     export interface Calendar {
@@ -34,7 +38,7 @@ declare module FullCalendar {
         version: string;
     }
 
-    export interface Options {
+    export interface DisplayOptions {
 
         // General display - http://arshaw.com/fullcalendar/docs/display/
 
@@ -189,13 +193,13 @@ declare module FullCalendar {
     export interface AgendaOptions {
         allDaySlot?: boolean;
         allDayText?: string;
-        axisFormat?: string;
-        slotMinutes?: number;
-        snapMinutes?: number;
-        defaultEventMinutes?: number;
-        firstHour?: number;
-        minTime?: any; // Integer/String
-        maxTime?: any; // Integer/String
+        slotDuration?: moment.Duration|string;
+        slotLabelFormat?: string;
+        slotLabelInterval?: moment.Duration|string;
+        snapDuration?: moment.Duration|string;
+        scrollTime?: moment.Duration|string;
+        minTime?: moment.Duration|string;
+        maxTime?: moment.Duration|string;
         slotEventOverlap?: boolean;
     }
 
@@ -248,6 +252,10 @@ declare module FullCalendar {
         eventTransform?: any;
         startParam?: string;
         endParam?: string
+    }
+
+    export interface Options extends DisplayOptions, AgendaOptions {
+
     }
 
 }
