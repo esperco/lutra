@@ -70,7 +70,6 @@ setup:
 clean:
 	rm -rf pub *~ */*~
 	rm -f manifest.json manifest.json.dev manifest.json.prod
-	rm -rf node_modules
 	$(MAKE) -C common clean
 	$(MAKE) -C event-page clean
 	$(MAKE) -C content-script clean

@@ -30,7 +30,8 @@ var page = vendors.page;
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("jquery-ui");
-  // require("bootstrap");
+  // require("bootstrap"); // TODO: Fix incompatabilities between our old code
+                           // and official Bootstrap code
 });
 
 // Create a global Esper object with our vendor dependencies
