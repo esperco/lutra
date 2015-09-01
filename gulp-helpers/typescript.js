@@ -37,9 +37,7 @@ module.exports = function(gulp) {
       var tsProject = ts.createProject(_.extend({
         noExternalResolve: true,
         sortOutput: true,
-        typescript: ( proj.compilerOptions &&
-                      proj.compilerOptions.jsx ?
-                      require("ntypescript") : require("typescript") ),
+        typescript: require("typescript"),
         out: bundleName
       }, proj.compilerOptions));
 
