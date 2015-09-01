@@ -197,7 +197,11 @@ module.exports = function(gulp) {
                         path.join(getVendorDir(), "**/*.*")];
 
     return gulp.task(name, function() {
-      return gulp.watch(watchTargets, gulp.series(buildName));
+      return gulp.watch(watchTargets, gulp.series(function(cb) {
+        // Force build on watch changes
+        skip = false;
+        cb();
+      }, buildName));
     });
   };
 
