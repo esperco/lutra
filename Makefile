@@ -45,30 +45,21 @@ zip:
 
 tikhon-build:
 	$(MAKE) -C common tikhon-conf
-	$(MAKE) build-old
 	npm run build
 
 dev-build:
 	$(MAKE) -C common dev-conf
-	$(MAKE) build-old
 	npm run build
 
 # Build doesn't rebuild vendor files -- run rebuild to take care of those
 # Dev only, production is always a rebuild
 dev-rebuild:
 	$(MAKE) -C common dev-conf
-	$(MAKE) build-old
 	npm run rebuild
 
 prod-build:
 	$(MAKE) -C common prod-conf
-	$(MAKE) build-old
 	npm run build-production
-
-build-old:
-	$(MAKE) -C common
-	$(MAKE) -C gmail-is build
-	$(MAKE) -C gcal-is build
 
 # Fetch Marten and install NPM dependencies
 setup:
@@ -79,7 +70,7 @@ setup:
 clean:
 	rm -rf pub *~ */*~
 	rm -f manifest.json manifest.json.dev manifest.json.prod
-	rm node_modules
+	rm -rf node_modules
 	$(MAKE) -C common clean
 	$(MAKE) -C event-page clean
 	$(MAKE) -C content-script clean

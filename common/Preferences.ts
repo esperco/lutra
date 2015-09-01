@@ -1,6 +1,7 @@
 /*
   Cached executive preferences
 */
+
 module Esper.Preferences {
   var preferences: { [teamid: string]: JQueryPromise<ApiT.Preferences> } = {};
 

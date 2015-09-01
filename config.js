@@ -73,6 +73,60 @@ module.exports = {
 
       // Preprocess with Oblivion?
       oblivion: true
+    },
+
+
+    // GCAL-IS /////////////////////////////////////////////
+
+    { // Project for script injected into Google Calendar page
+
+      compilerOptions: {
+        noImplicitAny: false,
+        jsx: "react"
+      },
+
+      globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
+              "common/*.{ts,tsx}", "gcal-is/*.{ts,tsx}"],
+
+      // Entry point for dev -- all files must be referenced directly or
+      // indirectly from these files to be bundled
+      devIn: ["gcal-is/Main.ts"],
+
+      // Same as devIn, but for production
+      prodIn: ["gcal-is/Main.ts"],
+
+      // Relative path to bundle from pubDir
+      out: "js/gcal-is.js",
+
+      // Preprocess with Oblivion?
+      oblivion: true
+    },
+
+
+    // GMAIL-IS /////////////////////////////////////////////
+
+    { // Project for script injected into Gmail page
+
+      compilerOptions: {
+        noImplicitAny: false,
+        jsx: "react"
+      },
+
+      globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
+              "common/*.{ts,tsx}", "gmail-is/*.{ts,tsx}"],
+
+      // Entry point for dev -- all files must be referenced directly or
+      // indirectly from these files to be bundled
+      devIn: ["gmail-is/Main.ts"],
+
+      // Same as devIn, but for production
+      prodIn: ["gmail-is/Main.ts"],
+
+      // Relative path to bundle from pubDir
+      out: "js/gmail-is.js",
+
+      // Preprocess with Oblivion?
+      oblivion: true
     }
   ],
 

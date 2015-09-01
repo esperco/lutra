@@ -610,8 +610,7 @@ module Esper.CalPicker {
       calendarView.fullCalendar('gotoDate', date);
     }
 
-    calendarJump.datepicker({inline : true,
-                             onSelect : dateJump});
+    calendarJump.datepicker({onSelect : dateJump});
 
     picker.calendarPickerContainer.removeClass("hide");
   }
