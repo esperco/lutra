@@ -205,7 +205,7 @@ module Esper.CalPicker {
     var title =
       CurrentThread.hasTask() ?
       CurrentThread.task.get().task_title :
-      esperGmail.get.email_subject();
+      GmailJs.get.email_subject();
     eventTitle.val("HOLD: " + title);
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
@@ -774,7 +774,7 @@ module Esper.CalPicker {
     });
 
     // If the task title was never set, update it based on the event
-    var emailSubject = esperGmail.get.email_subject();
+    var emailSubject = GmailJs.get.email_subject();
     var taskTitle = task.task_title;
     var eventTitle = picker.eventTitle.val();
     if (taskTitle === emailSubject) {

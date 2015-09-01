@@ -37,6 +37,15 @@ declare module Esper {
   // for this in the gmail-is code.
 
   export var PRODUCTION: boolean;
+
+  // vendorReady is set to true by our vendor file after it has been loaded.
+  // If onVendorReady is defined prior to the vendor file loading, it will be
+  // called by the vendor file after loading.
+  export var vendorReady: boolean;
+  export var onVendorReady: () => void;
 }
 
-Esper.PRODUCTION = false; // default (this gets changed by Conf files)
+(function(Esper) {
+  Esper.PRODUCTION = false; // default (this gets changed by Conf files)
+})(Esper || {});
+

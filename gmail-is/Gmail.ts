@@ -215,8 +215,70 @@ module Esper.Gmail {
     return $("div.nH.aHU");
   }
 
+  /*
+  Produce separate functions for each event, making them typable since
+    their callbacks have different types.
+
+    specialize("unread") -> esperGmail.observe.unread.on(callback)
+                            esperGmail.observe.unread.off()
+  */
+  var gmailJsSpecialize = function(name: string) {
+    Esper.GmailJs.on[name] = function(callback) {
+      Esper.GmailJs.observe.on(name, callback);
+    };
+
+    Esper.GmailJs.off[name] = function() {
+      Esper.GmailJs.observe.off(name);
+    };
+
+    Esper.GmailJs.after[name] = function(callback) {
+      Esper.GmailJs.observe.after(name, callback);
+    };
+
+    Esper.GmailJs.before[name] = function(callback) {
+      Esper.GmailJs.observe.before(name, callback);
+    };
+  }
+
   /* Initializes the GmailJS library */
   export function init() {
     Esper.GmailJs = Esper.gmailJs(Esper.jQuery);
+    Esper.GmailJs.on = <GmailJs.GmailJsOn> {};
+    Esper.GmailJs.off = <GmailJs.GmailJsOff> {};
+    Esper.GmailJs.after = <GmailJs.GmailJsAfter> {};
+    Esper.GmailJs.before = <GmailJs.GmailJsBefore> {};
+
+    // Specialization
+    gmailJsSpecialize("unread");
+    gmailJsSpecialize("read");
+    gmailJsSpecialize("delete");
+    gmailJsSpecialize("mark_as_spam");
+    gmailJsSpecialize("mark_as_not_spam");
+    gmailJsSpecialize("label");
+    gmailJsSpecialize("archive");
+    gmailJsSpecialize("move_to_inbox");
+    gmailJsSpecialize("delete_forever");
+    gmailJsSpecialize("delete_message_in_thread");
+    gmailJsSpecialize("restore_message_in_thread");
+    gmailJsSpecialize("star");
+    gmailJsSpecialize("unstar");
+    gmailJsSpecialize("mark_as_important");
+    gmailJsSpecialize("mark_as_not_important");
+    gmailJsSpecialize("filter_messages_like_these");
+    gmailJsSpecialize("mute");
+    gmailJsSpecialize("unmute");
+    gmailJsSpecialize("add_to_tasks");
+    gmailJsSpecialize("move_label");
+    gmailJsSpecialize("save_draft");
+    gmailJsSpecialize("discard_draft");
+    gmailJsSpecialize("send_message");
+    gmailJsSpecialize("expand_categories");
+    gmailJsSpecialize("delete_label");
+    gmailJsSpecialize("show_newly_arrived_message");
+    gmailJsSpecialize("poll");
+    gmailJsSpecialize("new_email");
+    gmailJsSpecialize("refresh");
+    gmailJsSpecialize("open_email");
+    gmailJsSpecialize("reply_forward");
   }
 }

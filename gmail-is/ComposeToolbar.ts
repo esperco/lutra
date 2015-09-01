@@ -104,7 +104,7 @@ module Esper.ComposeToolbar {
    *
    */
   export function init() {
-    esperGmail.on.reply_forward(function (match: JQuery, type: string) {
+    GmailJs.on.reply_forward(function (match: JQuery, type: string) {
       attachControls(Gmail.compositionToolbar());
     });
   }

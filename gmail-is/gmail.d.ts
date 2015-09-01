@@ -101,6 +101,16 @@ declare module GmailJs {
   }
 
   /* Not part of gmail.Js proper but defined by Gmail.init */
+  interface GmailJsOff {
+    new_email(): void;
+    open_email(): void;
+    send_message(): void;
+    show_newly_arrived_message(): void;
+    star(): void;
+    unstar(): void;
+  }
+
+  /* Not part of gmail.Js proper but defined by Gmail.init */
   interface GmailJsAfter {
     // NB: Apears to be reversed from documentation? May cause weird
     // errors if we update our gmail.js library
@@ -114,20 +124,24 @@ declare module GmailJs {
   }
 
   /* Not part of gmail.Js proper but defined by Gmail.init */
-  interface GmailJsOff {
-    new_email(): void;
-    open_email(): void;
-    send_message(): void;
-    show_newly_arrived_message(): void;
-    star(): void;
-    unstar(): void;
+  interface GmailJsBefore {
+    /* complete as needed */
   }
 
   interface GmailJsStatic {
     get: GmailJsGet;
     check: GmailJsCheck;
     on: GmailJsOn;
+    off: GmailJsOff;
     after: GmailJsAfter;
+    before: GmailJsBefore;
+
+    observe: {
+      on(action: string, callback: (...args: any[]) => void): void;
+      off(action: string|void, type?: string): void;
+      after(action: string, callback: (...args: any[]) => void): void;
+      before(action: string, callback: (...args: any[]) => void): void;
+    }
   }
 
   interface Factory {
@@ -142,5 +156,3 @@ declare module Esper {
   // Library created by Gmail.init function
   export var GmailJs: GmailJs.GmailJsStatic;
 }
-
-declare var esperGmail: GmailJs.GmailJsStatic;

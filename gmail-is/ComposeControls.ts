@@ -296,6 +296,4 @@ module Esper.ComposeControls {
     ComposeToolbar.registerControl(createButton);
     ComposeToolbar.registerControl(askExecButton);
   }
-
-  $(init);
 }

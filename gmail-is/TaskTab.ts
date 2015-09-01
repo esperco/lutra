@@ -9,14 +9,17 @@ module Esper.TaskTab {
   export var currentTaskTab : TaskTabView;
 
   var refreshTaskParticipants : () => void = function() {};
-  esperGmail.after.send_message(function() {
-    refreshTaskParticipants();
-  });
-  /* esperGmail.on.show_newly_arrived_message would be more appropriate
-     but doesn't work. */
-  esperGmail.on.new_email(function() {
-    refreshTaskParticipants();
-  });
+
+  export function init() {
+    GmailJs.after.send_message(function() {
+      refreshTaskParticipants();
+    });
+    /* GmailJs.on.show_newly_arrived_message would be more appropriate
+       but doesn't work. */
+    GmailJs.on.new_email(function() {
+      refreshTaskParticipants();
+    });
+  }
 
   export interface LinkOptionsView {
     view: JQuery;

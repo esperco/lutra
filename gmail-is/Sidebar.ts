@@ -29,12 +29,6 @@ module Esper.Sidebar {
     $(".esper-dropdown-btn").removeClass("esper-open");
   }
 
-  $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("esper-click-safe")) {
-      dismissDropdowns();
-    }
-  });
-
   function removeEsperRoot() {
     $("#esper").remove();
   }
@@ -448,6 +442,12 @@ module Esper.Sidebar {
   var initJob: JQueryPromise<void>;
 
   export function init(): JQueryPromise<void> {
+    $(document).on('click', function(e) {
+      if (!$(e.target).hasClass("esper-click-safe")) {
+        dismissDropdowns();
+      }
+    });
+
     if (initJob) {
       return initJob;
     } else {
