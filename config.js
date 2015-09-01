@@ -9,7 +9,10 @@ module.exports = {
 
   // TypeScript projects -- one per concatened JS bundle to emit
   tsProjects: [
-    { // Project for testing Marten modules
+
+    // CONTENT SCRIPT /////////////////////////////////////////////
+
+    { // Project for content-script (which injects gcal-is and gmail-is)
 
       // Compiler options -- see https://github.com/ivogabe/gulp-typescript
       // and https://github.com/Microsoft/TypeScript/wiki/Compiler-Options
@@ -42,6 +45,34 @@ module.exports = {
 
       // Preprocess with Oblivion?
       oblivion: true
+    },
+
+
+    // EVENT PAGE /////////////////////////////////////////////
+
+    { // Project for event-page (which sits in the background and waits for
+      // event calls -- see above for comments re items below
+
+      compilerOptions: {
+        noImplicitAny: false,
+        jsx: "react"
+      },
+
+      globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
+              "common/*.{ts,tsx}", "event-page/*.{ts,tsx}"],
+
+      // Entry point for dev -- all files must be referenced directly or
+      // indirectly from these files to be bundled
+      devIn: ["event-page/Main.ts"],
+
+      // Same as devIn, but for production
+      prodIn: ["event-page/Main.ts"],
+
+      // Relative path to bundle from pubDir
+      out: "js/event-page.js",
+
+      // Preprocess with Oblivion?
+      oblivion: true
     }
   ],
 
@@ -70,7 +101,7 @@ module.exports = {
   // directory set in Marten's .bowerrc
   vendorCSSList: [
     "font-awesome/css/font-awesome.css",
-    "animate.css/animate.css"
+    "fullcalendar/fullcalendar.css"
   ],
 
   // Path to CSS bundle (relative to pubDir)

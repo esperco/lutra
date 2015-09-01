@@ -31,14 +31,19 @@ module Esper.Main {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/esper.css");
-    var fullCalendarCss = chrome.extension.getURL("css/fullCalendar.css");
+    var vendorCssUrl = chrome.extension.getURL("css/vendor.css");
     var scriptUrl = chrome.extension.getURL("js/" + scriptName);
+    var vendorScriptUrl = chrome.extension.getURL("js/vendor.js");
     var docHead = $("head");
+    $("<link rel='stylesheet' type='text/css'/>")
+      .attr("href", vendorCssUrl)
+      .appendTo(docHead);
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
       .appendTo(docHead);
-    $("<link rel='stylesheet' type='text/css'/>")
-      .attr("href", fullCalendarCss)
+    $("<script id='esper-vendor-script'/>")
+      .attr("src", vendorScriptUrl)
+      .attr("data-root-url", rootUrl)
       .appendTo(docHead);
     $("<script id='esper-script'/>")
       .attr("src", scriptUrl)

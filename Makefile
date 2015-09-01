@@ -14,6 +14,10 @@ dev: manifest.json.dev
 	$(MAKE) dev-build
 	$(MAKE) install-dev
 
+rebuild: manifest.json.dev
+	$(MAKE) dev-rebuild
+	$(MAKE) install-dev
+
 tikhon: manifest.json.dev
 	$(MAKE) tikhon-build
 	$(MAKE) install-dev
@@ -63,7 +67,6 @@ prod-build:
 
 build-old:
 	$(MAKE) -C common
-	$(MAKE) -C event-page build
 	$(MAKE) -C gmail-is build
 	$(MAKE) -C gcal-is build
 

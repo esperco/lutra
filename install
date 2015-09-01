@@ -24,7 +24,6 @@ esac
 mkdir -p pub/css pub/js pub/img pub/html
 
 ### Build our own code and copy the result into the pub directory
-make -C event-page install
 make -C gmail-is install
 make -C gcal-is install
 cp img/* pub/img
