@@ -98,6 +98,23 @@ module Esper.Menu {
       </label>
       <br/>
       <label class="esper-agenda-title">
+        Agenda format:
+        <label>
+          <input #htmlFormat type="radio" name="format" />
+          HTML
+        </label>
+        <label>
+          <input #textFormat type="radio" name="format" />
+          Plain text
+        </label>
+      </label>
+      <br/>
+      <!-- <label>
+        <input #includeTaskNotes type="checkbox" />
+          Include task notes
+      </label>
+      <br/> -->
+      <label class="esper-agenda-title">
         Send to:
         <div #recipients class="esper-agenda-section">
         </div>
@@ -117,6 +134,8 @@ module Esper.Menu {
 </div>
 '''
     var teams = Login.myTeams();
+
+    htmlFormat.prop("checked", true);
 
     List.iter(teams, function(team) {
         var o = $("<option>")
@@ -206,6 +225,8 @@ module Esper.Menu {
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
+      var format = htmlFormat.prop("checked");
+      // var i = includeTaskNotes.prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       var f_time = Math.floor(f.getTime() / 1000);
@@ -235,8 +256,8 @@ module Esper.Menu {
       recipients.children().attr("disabled", true);
       sendButton.text("Sending...");
 
-      console.log(r);
-      Api.sendAgenda(teamSelect.val(), f_time, u_time, r).done(cancel);
+      var pref = { recipients: r, html_format: format, include_task_notes: false};
+      Api.sendAgenda(teamSelect.val(), f_time, u_time, pref).done(cancel);
     });
 
     return _view;
