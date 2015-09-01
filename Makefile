@@ -7,5 +7,4 @@ setup:
 
 clean:
 	rm -f *~ */*~
-	rm -rf node_modules
 	$(MAKE) -C setup clean
