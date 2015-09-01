@@ -2,6 +2,8 @@
   Extraction of data from the Gmail document and JavaScript environment.
 */
 
+/// <reference path="./gmail.d.ts" />
+
 module Esper.Gmail {
 
   /*
@@ -211,5 +213,10 @@ module Esper.Gmail {
    */
   export function threadMessages() {
     return $("div.nH.aHU");
+  }
+
+  /* Initializes the GmailJS library */
+  export function init() {
+    Esper.GmailJs = Esper.gmailJs(Esper.jQuery);
   }
 }

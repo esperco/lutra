@@ -4,16 +4,6 @@
   as required by gmail.js.
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../marten/typings/moment/moment.d.ts" />
-/// <reference path="../marten/typings/moment-timezone/moment-timezone.d.ts" />
-/// <reference path="../marten/typings/fullCalendar/fullCalendar.d.ts" />
-
-/// <reference path="./gmail.d.ts" />
-
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
