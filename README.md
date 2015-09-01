@@ -6,7 +6,7 @@ Esper extension for Google Chrome
 Setup
 =====
 
-Recent versions of Node.js, npm, and TypeScript are required.
+Recent versions of Node.js and NPM are required.
 
 See the following URL for details on how to install nodejs and and
 npm:
@@ -23,7 +23,7 @@ $ sudo apt-get install python-software-properties python g++ make nodejs
 
 ```
 $ nodejs --version
-v0.10.28
+v0.10.37
 ```
 
 Everyone
@@ -31,30 +31,28 @@ Everyone
 
 Avoid having to use `sudo` for `npm`:
 ```
-sudo npm remove -g typescript  # in case it's already installed
-sudo npm remove -g uglify-js   # in case it's already installed
-sudo npm remove -g less        # in case it's already installed
 npm config set prefix ~/npm
 ```
 
 And then add `~/npm/bin` to your `PATH` environment variable.
 
+Once Node is properly installed, run `make setup`.
 
-```
-npm install -g typescript
-npm install -g uglify-js
-npm install -g less
-```
+Build
+=====
 
-```
-$ tsc -v
-message TS6029: Version 1.5.0-beta
-```
+Run `make` to create an unpacked version of the extension for development
+in the `pub` directory.
 
-```
-$ lessc -v
-lessc 1.7.2 (Less Compiler) [JavaScript]
-```
+If you change any third-party vendor requirements, you will need to run
+`make rebuild` once as well.
+
+You can also run `npm run watch` to set up a process that watches and re-
+compiles your TypeScript or LESS files on save.
+
+Once the package is built, load the Chrome extension by following the
+directions at https://developer.chrome.com/extensions/getstarted#unpacked.
+
 
 HTTPS
 =====
@@ -66,6 +64,7 @@ over https.)
 
 To enable loading these resources, you can click the little grey
 shield icon on the righthand side of Chrome's URL bar.
+
 
 How to make a production release
 ================================

@@ -1,4 +1,6 @@
 /*
+  DEPRECATED: Use lodash if possible.
+
   List operations, similar to those used in OCaml, on Javascript arrays.
 */
 
