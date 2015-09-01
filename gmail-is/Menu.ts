@@ -109,11 +109,11 @@ module Esper.Menu {
         </label>
       </label>
       <br/>
-      <label>
+      <!-- <label>
         <input #includeTaskNotes type="checkbox" />
           Include task notes
       </label>
-      <br/>
+      <br/> -->
       <label class="esper-agenda-title">
         Send to:
         <div #recipients class="esper-agenda-section">
@@ -226,7 +226,7 @@ module Esper.Menu {
     sendButton.click(function() {
       errorMessages.empty();
       var format = htmlFormat.prop("checked");
-      var i = includeTaskNotes.prop("checked");
+      // var i = includeTaskNotes.prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       var f_time = Math.floor(f.getTime() / 1000);
@@ -256,7 +256,7 @@ module Esper.Menu {
       recipients.children().attr("disabled", true);
       sendButton.text("Sending...");
 
-      var pref = { recipients: r, html_format: format, include_task_notes: i};
+      var pref = { recipients: r, html_format: format, include_task_notes: false};
       Api.sendAgenda(teamSelect.val(), f_time, u_time, pref).done(cancel);
     });
 
