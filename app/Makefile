@@ -24,5 +24,4 @@ watch:
 clean:
 	rm -f *~ */*~
 	rm -rf pub
-	rm -rf node_modules
 
