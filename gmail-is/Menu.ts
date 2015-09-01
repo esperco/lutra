@@ -123,7 +123,7 @@ module Esper.Menu {
             .text(team.team_name)
             .val(team.teamid);
         if (team === currentTeam.get()) {
-            o.attr("selected", true);
+            o.prop("selected", true);
         }
         o.appendTo(teamSelect);
     });
@@ -173,7 +173,7 @@ module Esper.Menu {
         .text(tz)
         .val(tz);
       if (tz === timezone) {
-        o.attr("selected", true);
+        o.prop("selected", true);
       }
       o.appendTo(tzSelect);
     });
@@ -230,9 +230,9 @@ module Esper.Menu {
         return;
       }
 
-      cancelButton.attr("disabled", true);
-      sendButton.attr("disabled", true);
-      recipients.children().attr("disabled", true);
+      cancelButton.prop("disabled", true);
+      sendButton.prop("disabled", true);
+      recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
 
       console.log(r);

@@ -1,3 +1,4 @@
+
 module Esper.ObserveMessage {
 
   function addEmails(emails, es) {
@@ -15,7 +16,7 @@ module Esper.ObserveMessage {
     esperGmail.after.send_message(function(
         whatever1: any,
         url: string,
-        em: esperGmail.get.sendMessageData,
+        em: GmailJs.SendMessageData,
         whatever2: any,
         xhr: XMLHttpRequest) {
       if (CurrentThread.task.isValid()) {

@@ -394,7 +394,7 @@ module Esper.Sidebar {
         var threadId = CurrentThread.threadId.get();
 
         var links = $("div").find("a");
-        var threadLinks = List.filter(links, function(link) {
+        var threadLinks = List.filter(links, function(link: HTMLElement): boolean {
           var url = $(link).attr("href");
           if (typeof url === "string") {
             return url.substring(0,30) === "http://mail.google.com/mail/u/";

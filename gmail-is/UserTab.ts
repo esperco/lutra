@@ -1049,7 +1049,7 @@ module Esper.UserTab {
 
       // If we have a workplace, display that as the starting choice.
       if (workplaces.length > 0) {
-        meetingSelector.val(0);
+        meetingSelector.val("0");
       }
 
       meetingSelector.change(); // ensure this section is initialized correctly

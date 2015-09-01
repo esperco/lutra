@@ -217,7 +217,7 @@ module Esper.CalPicker {
                   calendars[i].calendar_title + "</option>");
       opt.appendTo(pickerSwitcher);
       if (calendars[i].google_cal_id === writeToCalendar.google_cal_id) {
-        pickerSwitcher.val(i);
+        pickerSwitcher.val(i.toString());
       }
     }
 
@@ -418,7 +418,7 @@ module Esper.CalPicker {
     });
   }
 
-  function addTZToEvents(calid, events) {
+  function addTZToEvents(calid: string, events: ApiT.CalendarEvent[]) {
     return List.map(events, function(ev) {
       (<TZCalendarEvent> ev).calendarTZ = showCalendars[calid];
       return ev;
@@ -494,7 +494,7 @@ module Esper.CalPicker {
       setEventMoments(startMoment, endMoment, undefined);
     }
 
-    function eventClick(calEvent, jsEvent, view) {
+    function eventClick(calEvent, jsEvent, viewObj) {
 '''
 <div class="esper-event-click-menu" #view>
   <ul class="esper-ul" #menu/>

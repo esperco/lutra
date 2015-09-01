@@ -8,7 +8,7 @@ module Esper.Promise {
   /* wrap an already-computed value into a Promise object,
      indicating a successful computation. */
   export function defer<T>(x : T) : JQueryPromise<T> {
-    var dfd = new $.Deferred();
+    var dfd = $.Deferred();
     dfd.resolve(x);
     return dfd;
   }
@@ -16,7 +16,7 @@ module Esper.Promise {
   /* wrap an already-computed value into a Promise object,
      indicating a failed computation. */
   export function fail<T>(x : T) : JQueryPromise<T> {
-    var dfd = new $.Deferred();
+    var dfd = $.Deferred();
     dfd.reject(x);
     return dfd;
   }

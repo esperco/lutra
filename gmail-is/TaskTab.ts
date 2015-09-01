@@ -770,11 +770,11 @@ module Esper.TaskTab {
       if (isValid) {
         taskTabView.taskCaption.text(taskLabelExists);
         taskTabView.taskTitle.text(task.task_title);
-        workflowSelect.attr("disabled", false);
+        workflowSelect.prop("disabled", false);
       } else {
         taskTabView.taskCaption.text(taskLabelCreate);
         taskTabView.taskTitle.text("");
-        workflowSelect.attr("disabled", true);
+        workflowSelect.prop("disabled", true);
       }
     }
     CurrentThread.task.watch(updateTaskHeaders, "updateTaskHeaders");
@@ -896,7 +896,7 @@ module Esper.TaskTab {
               workflowSelect.val(progress.workflow_id);
               workflowSelect.trigger("change");
             }
-            workflowSelect.attr("disabled", false);
+            workflowSelect.prop("disabled", false);
           } else {
             taskCaption.text(taskLabelCreate);
             showMTDrop();

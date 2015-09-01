@@ -53,14 +53,16 @@ module Esper.GroupTab {
       }
     });
 
-    linkEvent.click(function() {
-      var team        = CurrentThread.currentTeam.get();
-      var threadId    = CurrentThread.threadId.get();
-      var searchModal = CalSearch.viewOfSearchModal(team, threadId, container);
+    // XXX: This block of code breaks type checking and since GroupTabs aren't
+    // in use right now, let's ignore this for now
+    // linkEvent.click(function() {
+    //   var team        = CurrentThread.currentTeam.get();
+    //   var threadId    = CurrentThread.threadId.get();
+    //   var searchModal = CalSearch.viewOfSearchModal(team, threadId, container);
 
-      $("body").append(searchModal.view);
-      searchModal.search.focus();
-    });
+    //   $("body").append(searchModal.view);
+    //   searchModal.search.focus();
+    // });
 
     var sections = container.find(".esper-section");
     sections.each(function (i, section) {

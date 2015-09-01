@@ -101,7 +101,7 @@ declare module GmailJs {
   }
 
   /* Not part of gmail.Js proper but defined by Gmail.init */
-  interface GmailJsAFter {
+  interface GmailJsAfter {
     // NB: Apears to be reversed from documentation? May cause weird
     // errors if we update our gmail.js library
     send_message(callback: (body: any,
@@ -127,6 +127,7 @@ declare module GmailJs {
     get: GmailJsGet;
     check: GmailJsCheck;
     on: GmailJsOn;
+    after: GmailJsAfter;
   }
 
   interface Factory {

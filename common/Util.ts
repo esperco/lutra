@@ -145,7 +145,7 @@ module Esper.Util {
 
   /* Inspect DOM tree */
   export function findTextInDom(text: string) {
-    var sel = $(":contains(" + JSON.stringify(text) + ")");
+    var sel: any[] = <any> $(":contains(" + JSON.stringify(text) + ")");
     List.iter(sel, function(elt, i) {
       Esper.Log.d("========= [" + i + "] =========", $(elt).text());
     });

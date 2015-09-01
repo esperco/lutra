@@ -136,14 +136,14 @@ module Esper.Slides {
         next.text(controls.finishButtonTitle);
         next.click(function () {
           next.text("Working...");
-          next.attr("disabled", true);
+          next.prop("disabled", true);
 
           try {
             controls.onFinish(current.slide.getState());
           } catch (e) {
             if (e === Slides.invalidState) {
               next.text(controls.finishButtonTitle);
-              next.attr("disabled", false);
+              next.prop("disabled", false);
             } else {
               throw e;
             }

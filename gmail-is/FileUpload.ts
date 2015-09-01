@@ -21,12 +21,13 @@ module Esper.FileUpload {
     /** Upload all the files currently selected in attachmentPicker. */
     function uploadFiles() {
       // For some reason, .files is a FileList and not a normal Array :(
-      var files = Array.prototype.slice.call(attachmentPicker[0].files);
+      var files = Array.prototype.slice.call(
+        (<HTMLInputElement> attachmentPicker[0]).files);
 
       var promises = files.map(function (file) {
         var reader = new FileReader();
         var name = file.name;
-        var promise = $.Deferred();
+        var promise = $.Deferred<{ name: string, id: string }>();
 
         reader.readAsDataURL(file);
         reader.addEventListener("loadend", function () {
@@ -35,7 +36,7 @@ module Esper.FileUpload {
           // base64 contents from the data URL, stripping the URL bits:
           result = result.replace(/data:[^;]*;base64,/, "");
           Api.putFiles(name, file.type, result).done(function (response) {
-            promise.resolve(response);
+            promise.resolve({ id: response.id, name: "" }); // Name filled in below
           });
         });
 
@@ -51,11 +52,11 @@ module Esper.FileUpload {
     }
 
     uploadButton.click(function () {
-      uploadButton.attr("disabled", true);
+      uploadButton.prop("disabled", true);
       uploadingMessage.show();
 
       uploadFiles().done(function (fileInfos) {
-        uploadButton.attr("disabled", false);
+        uploadButton.prop("disabled", false);
         uploadingMessage.hide();
 
         onUpload(fileInfos);

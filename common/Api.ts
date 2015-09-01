@@ -6,7 +6,7 @@ module Esper.Api {
   }
 
   export function checkVersion():
-  JQueryDeferred<ApiT.ChromeSupport> {
+  JQueryPromise<ApiT.ChromeSupport> {
     return JsonHttp.get(Conf.Api.url + "/api/support/chrome/" + Conf.version);
   }
 
@@ -23,13 +23,13 @@ module Esper.Api {
   /* Esper login and password management */
 
   export function getLoginInfo():
-  JQueryDeferred<ApiT.LoginResponse> {
+  JQueryPromise<ApiT.LoginResponse> {
     var url = Conf.Api.url + "/api/login/" + string(Login.myUid()) + "/info";
     return JsonHttp.get(url);
   }
 
   export function getProfile(uid, teamid):
-  JQueryDeferred<ApiT.Profile> {
+  JQueryPromise<ApiT.Profile> {
     var url =
       Conf.Api.url + "/api/profile/" + string(Login.myUid())
       + "/" + string(uid)
@@ -38,7 +38,7 @@ module Esper.Api {
   }
 
   export function getAllTeamProfiles():
-  JQueryDeferred<ApiT.ProfileList> {
+  JQueryPromise<ApiT.ProfileList> {
     var url =
       Conf.Api.url + "/api/profile/" + string(Login.myUid());
     return JsonHttp.get(url);
@@ -51,7 +51,7 @@ module Esper.Api {
   }
 
   export function getThreadDetails(threadId):
-  JQueryDeferred<ApiT.EmailThread> {
+  JQueryPromise<ApiT.EmailThread> {
     var url =
       Conf.Api.url + "/api/thread/details/" + string(Login.myUid())
       + "/" + string(threadId);
@@ -59,7 +59,7 @@ module Esper.Api {
   }
 
   export function getLinkedThreads(teamid, eventId):
-  JQueryDeferred<ApiT.LinkedEmailThreads> {
+  JQueryPromise<ApiT.LinkedEmailThreads> {
     var url =
       Conf.Api.url + "/api/event/threads/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -70,7 +70,7 @@ module Esper.Api {
   export function getLinkedEvents(teamid,
                                   threadId,
                                   teamCalendars: ApiT.Calendar[]):
-  JQueryDeferred<ApiT.TaskEvent[]> {
+  JQueryPromise<ApiT.TaskEvent[]> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/thread/events/" + string(Login.myUid())
@@ -82,7 +82,7 @@ module Esper.Api {
   }
 
   export function linkEventForMe(teamid, threadId, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -92,7 +92,7 @@ module Esper.Api {
   }
 
   export function linkEventForTeam(teamid, threadId, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -102,7 +102,7 @@ module Esper.Api {
   }
 
   export function unlinkEvent(teamid, threadId, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/link-event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -112,7 +112,7 @@ module Esper.Api {
   }
 
   export function syncEvent(teamid, threadId, calid : string, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -123,7 +123,7 @@ module Esper.Api {
   }
 
   export function unsyncEvent(teamid, threadId, calid, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/sync-event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -134,7 +134,7 @@ module Esper.Api {
   }
 
   export function deleteLinkedEvent(teamid, threadId, eventId):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -145,7 +145,7 @@ module Esper.Api {
 
   export function updateLinkedEvent(teamid, threadId, eventId,
                                     eventEdit: ApiT.CalendarEventEdit):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/event/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -155,7 +155,7 @@ module Esper.Api {
   }
 
   export function eventSearch(teamid, teamCalendars, query):
-  JQueryDeferred<ApiT.CalendarEventList> {
+  JQueryPromise<ApiT.CalendarEventList> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/search/" + string(Login.myUid())
@@ -166,7 +166,7 @@ module Esper.Api {
 
   export function eventRange(teamid, teamCalendars,
                              from: number, until: number):
-  JQueryDeferred<ApiT.CalendarEventList> {
+  JQueryPromise<ApiT.CalendarEventList> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/calendar/range/" + string(Login.myUid())
@@ -178,7 +178,7 @@ module Esper.Api {
 
 
   export function getEventThreads(teamid, eventId):
-  JQueryDeferred<ApiT.LinkedEmailThreads> {
+  JQueryPromise<ApiT.LinkedEmailThreads> {
     var url =
       Conf.Api.url + "/api/event/threads/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -188,7 +188,7 @@ module Esper.Api {
 
   export function getEventDetails(teamid, calid,
                                   teamCalendars: ApiT.Calendar[], eventid):
-  JQueryDeferred<ApiT.CalendarEventOpt> {
+  JQueryPromise<ApiT.CalendarEventOpt> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url =
       Conf.Api.url + "/api/event/details-opt/" + string(Login.myUid())
@@ -201,7 +201,7 @@ module Esper.Api {
   export function createTaskLinkedEvent(createdBy, teamid,
                                         event: ApiT.CalendarEventEdit,
                                         taskId):
-  JQueryDeferred<ApiT.CalendarEvent> {
+  JQueryPromise<ApiT.CalendarEvent> {
     var url =
       Conf.Api.url + "/api/task/put-linked-event/" + string(Login.myUid())
       + "/" + string(createdBy)
@@ -212,7 +212,7 @@ module Esper.Api {
   }
 
   export function postCalendarShow(teamid, teamCalendars):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
     var url = Conf.Api.url + "/api/calendar/show/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -220,20 +220,20 @@ module Esper.Api {
   }
 
   export function postCalendarShowAll():
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url = Conf.Api.url + "/api/calendar/show-all/" + string(Login.myUid());
     return JsonHttp.post(url, "");
   }
 
   export function getAllPreferences():
-  JQueryDeferred<ApiT.PreferencesList> {
+  JQueryPromise<ApiT.PreferencesList> {
     var url =
       Conf.Api.url + "/api/preferences/" + string(Login.myUid());
     return JsonHttp.get(url);
   }
 
   export function getPreferences(teamid):
-  JQueryDeferred<ApiT.Preferences> {
+  JQueryPromise<ApiT.Preferences> {
     var url =
       Conf.Api.url + "/api/preferences/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -241,7 +241,7 @@ module Esper.Api {
   }
 
   export function putPreferences(teamid, prefs):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/preferences/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -249,7 +249,7 @@ module Esper.Api {
   }
 
   export function setGeneralPreferences(teamid, general_prefs):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
       var url =
           Conf.Api.url + "/api/preferences/general/" + string(Login.myUid())
           + "/" + string(teamid);
@@ -257,7 +257,7 @@ module Esper.Api {
   }
 
   export function getPreferenceChanges(teamid, from: number, until: number):
-  JQueryDeferred<ApiT.PreferenceChanges> {
+  JQueryPromise<ApiT.PreferenceChanges> {
     var url =
       Conf.Api.url + "/api/preferences/changes/" + string(Login.myUid())
       + "/" + string(teamid) + "/" + from.toString() + "/" + until.toString();
@@ -266,7 +266,7 @@ module Esper.Api {
 
   /*** Emails ***/
   export function sendAgenda(teamid, from, until, recipients: string[]):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url = Conf.Api.url + "/api/agenda/send-v2/" + string(Login.myUid()) +
       "/" + string(teamid) +
       "/" + encodeURIComponent(string(from)) +
@@ -276,7 +276,7 @@ module Esper.Api {
   }
 
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/set-reminder-time/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -288,7 +288,7 @@ module Esper.Api {
   }
 
   export function unsetReminderTime(eventid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/unset-reminder-time/" + string(Login.myUid())
       + "/" + string(eventid);
@@ -296,7 +296,7 @@ module Esper.Api {
   }
 
   export function getReminders(calid, eventid):
-  JQueryDeferred<ApiT.EventReminders> {
+  JQueryPromise<ApiT.EventReminders> {
     var url =
       Conf.Api.url + "/api/event/reminders/" + string(Login.myUid())
       + "/" + string(calid)
@@ -306,7 +306,7 @@ module Esper.Api {
 
   export function enableReminderForGuest(eventid, email,
                                          guest_reminder : ApiT.GuestReminder):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/remind/" + string(Login.myUid())
       + "/" + string(eventid)
@@ -315,7 +315,7 @@ module Esper.Api {
   }
 
   export function disableReminderForGuest(eventid, email):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/remind/" + string(Login.myUid())
       + "/" + string(eventid)
@@ -324,7 +324,7 @@ module Esper.Api {
   }
 
   export function getDefaultReminder(teamid, calid, eventid):
-  JQueryDeferred<ApiT.DefaultReminder> {
+  JQueryPromise<ApiT.DefaultReminder> {
     var url =
       Conf.Api.url + "/api/event/default-reminder/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -335,7 +335,7 @@ module Esper.Api {
 
   export function postCalendar(teamid, calid,
                                calRequest : ApiT.CalendarRequest):
-  JQueryDeferred<ApiT.CalendarEventList> {
+  JQueryPromise<ApiT.CalendarEventList> {
     var url =
       Conf.Api.url + "/api/calendar/events/view/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -346,7 +346,7 @@ module Esper.Api {
   export function obtainTaskForThread(teamid, threadid,
                                       withEvents: boolean,
                                       withThreads: boolean):
-  JQueryDeferred<ApiT.Task> {
+  JQueryPromise<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -359,7 +359,7 @@ module Esper.Api {
   export function getTaskListForThread(threadid,
                                        withEvents: boolean,
                                        withThreads: boolean):
-  JQueryDeferred<ApiT.Task[]> {
+  JQueryPromise<ApiT.Task[]> {
     var url =
       Conf.Api.url + "/api/thread/task-list/" + string(Login.myUid())
       + "/" + string(threadid)
@@ -371,7 +371,7 @@ module Esper.Api {
   export function getTaskForThread(teamid, threadid,
                                    withEvents: boolean,
                                    withThreads: boolean):
-  JQueryDeferred<ApiT.Task> {
+  JQueryPromise<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/thread/task-opt/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -383,7 +383,7 @@ module Esper.Api {
 
   export function getTask(taskid: string,
                           withEvents: boolean,
-                          withMessages: boolean): JQueryDeferred<ApiT.Task> {
+                          withMessages: boolean): JQueryPromise<ApiT.Task> {
     var url = Conf.Api.url + "/api/task/details/" + string(Login.myUid())
             + "/" + string(taskid)
             + "?events=" + withEvents.toString()
@@ -392,7 +392,7 @@ module Esper.Api {
   }
 
   export function archiveTask(taskid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/task/archive/" + string(Login.myUid())
       + "/" + string(taskid);
@@ -400,7 +400,7 @@ module Esper.Api {
   }
 
   export function unarchiveTask(taskid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/task/unarchive/" + string(Login.myUid())
       + "/" + string(taskid);
@@ -408,7 +408,7 @@ module Esper.Api {
   }
 
   export function linkThreadToTask(teamid, threadid, taskid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -418,7 +418,7 @@ module Esper.Api {
   }
 
   export function unlinkThreadFromTask(teamid, threadid, taskid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -429,7 +429,7 @@ module Esper.Api {
 
   export function switchTaskForThread(teamid, threadid,
                                       old_taskid, new_taskid):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/thread/task/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -440,7 +440,7 @@ module Esper.Api {
   }
 
   export function setTaskTitle(taskid, title):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/task/title/" + string(Login.myUid())
       + "/" + string(taskid)
@@ -449,7 +449,7 @@ module Esper.Api {
   }
 
   export function setTaskMeetingType(taskid, mtype):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/task/meeting-type/" + string(Login.myUid())
       + "/" + string(taskid)
@@ -458,7 +458,7 @@ module Esper.Api {
   }
 
   export function setTaskNotes(taskid, notes):
-  JQueryDeferred<ApiT.Task> {
+  JQueryPromise<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/task/notes/" + string(Login.myUid())
       + "/" + string(taskid);
@@ -466,7 +466,7 @@ module Esper.Api {
   }
 
   export function setTaskProgress(taskid, progress):
-  JQueryDeferred<ApiT.Task> {
+  JQueryPromise<ApiT.Task> {
     var url =
       Conf.Api.url + "/api/task/label/progress/" + string(Login.myUid())
       + "/" + string(taskid)
@@ -475,7 +475,7 @@ module Esper.Api {
   }
 
   export function searchTasks(teamid, query):
-  JQueryDeferred<ApiT.TaskSearchResults> {
+  JQueryPromise<ApiT.TaskSearchResults> {
     var url =
       Conf.Api.url + "/api/tasks/search/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -484,7 +484,7 @@ module Esper.Api {
   }
 
   export function getTaskPage(url: string):
-  JQueryDeferred<ApiT.TaskList> {
+  JQueryPromise<ApiT.TaskList> {
     return JsonHttp.get(url);
   }
 
@@ -492,7 +492,7 @@ module Esper.Api {
                               pageSize: number,
                               withEvents: boolean,
                               withThreads: boolean):
-  JQueryDeferred<ApiT.TaskList> {
+  JQueryPromise<ApiT.TaskList> {
     var url =
       Conf.Api.url + "/api/tasks/page/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -503,7 +503,7 @@ module Esper.Api {
   }
 
   export function notifyTaskMessage(task, emails, snippet):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url = Conf.Api.url + "/api/gmail/notify/"
             + string(Login.myUid()) + "/"
             + string(task.task_teamid);
@@ -512,7 +512,7 @@ module Esper.Api {
   }
 
   export function getThreadParticipants(threadid):
-  JQueryDeferred<ApiT.ThreadParticipants> {
+  JQueryPromise<ApiT.ThreadParticipants> {
     var url = Conf.Api.url + "/api/gmail/thread/participants/"
             + string(Login.myUid())
             + "/" + string(threadid);
@@ -520,7 +520,7 @@ module Esper.Api {
   }
 
   export function getThreadParticipantPrefs(threadid):
-  JQueryDeferred<ApiT.TeamPreferencesList> {
+  JQueryPromise<ApiT.TeamPreferencesList> {
     var url = Conf.Api.url + "/api/gmail/thread/participant/prefs/"
 	    + string(Login.myUid())
 	    + "/" + string(threadid);
@@ -528,7 +528,7 @@ module Esper.Api {
   }
 
   export function getGmailMessage(teamid, inboxUid, gmailMsgId):
-  JQueryDeferred<ApiT.EmailMessage> {
+  JQueryPromise<ApiT.EmailMessage> {
     var url =
       Conf.Api.url + "/api/gmail/message/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -538,7 +538,7 @@ module Esper.Api {
   }
 
   export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/invite/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -548,7 +548,7 @@ module Esper.Api {
   }
 
   export function getRestrictedDescription(teamid, eventid, guests):
-  JQueryDeferred<ApiT.EventDescription> {
+  JQueryPromise<ApiT.EventDescription> {
     var url =
       Conf.Api.url + "/api/event/description/" + string(Login.myUid())
       + "/" + string(teamid)
@@ -560,7 +560,7 @@ module Esper.Api {
   }
 
   export function getEventDescriptionWithMessages(description, messageids):
-  JQueryDeferred<ApiT.EventDescription> {
+  JQueryPromise<ApiT.EventDescription> {
     var url = Conf.Api.url + "/api/event/description-with-messages/"
             + string(Login.myUid());
     var body = { description: description,
@@ -569,7 +569,7 @@ module Esper.Api {
   }
 
   export function updateGoogleEvent(teamid, alias, eventid, event):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
         Conf.Api.url + "/api/event/edit/" + string(Login.myUid())
         + "/" + string(teamid)
@@ -579,7 +579,7 @@ module Esper.Api {
   }
 
   export function getCustomerStatus(teamid):
-  JQueryDeferred<ApiT.CustomerStatus> {
+  JQueryPromise<ApiT.CustomerStatus> {
     var url =
       Conf.Api.url + "/api/pay/status/short/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -587,7 +587,7 @@ module Esper.Api {
   }
 
   export function getCustomerDetails(teamid):
-  JQueryDeferred<ApiT.CustomerDetails> {
+  JQueryPromise<ApiT.CustomerDetails> {
     var url =
       Conf.Api.url + "/api/pay/status/long/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -595,7 +595,7 @@ module Esper.Api {
   }
 
   export function trackTask(taskid: string, start: number, duration: number):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/track/task/" + string(Login.myUid())
       + "/" + string(taskid)
@@ -607,7 +607,7 @@ module Esper.Api {
   // Smarter Scheduling:
   // XXX: Disabled until we have time to fix group scheduling.
   export function getGroupEvent(taskid: string):
-  JQueryDeferred<ApiT.GroupEvent> {
+  JQueryPromise<ApiT.GroupEvent> {
     // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     // return JsonHttp.get(url); 
     Log.assert(false, "Group scheduling is currently disabled.");
@@ -616,7 +616,7 @@ module Esper.Api {
 
   // XXX: Disabled until we have time to fix group scheduling.
   export function putGroupEvent(taskid: string, groupEvent: ApiT.GroupEvent):
-  JQueryDeferred<void> {
+  JQueryPromise<void> {
     // var url = Conf.Api.url + "/api/scheduling/group-event/" + string(taskid);
     // return JsonHttp.put(url, JSON.stringify(groupEvent));
     Log.assert(false, "Group scheduling is currently disabled.");
@@ -630,12 +630,12 @@ module Esper.Api {
   }
 
   export function getTaskPrefs(taskid: string):
-  JQueryDeferred<ApiT.TaskPreferences> {
+  JQueryPromise<ApiT.TaskPreferences> {
     return JsonHttp.get(taskPrefsUrl(taskid));
   }
 
   export function putTaskPrefs(tpref: ApiT.TaskPreferences):
-  JQueryDeferred<ApiT.TaskPreferences> {
+  JQueryPromise<ApiT.TaskPreferences> {
     return JsonHttp.put(taskPrefsUrl(tpref.taskid), JSON.stringify(tpref));
   }
 
@@ -643,7 +643,7 @@ module Esper.Api {
   export function putFiles(filename: string,
                            content_type: string,
                            contents: string):
-  JQueryDeferred<void> {
+  JQueryPromise<Esper.ApiT.GoogleDriveApi.File> {
     var query = "content_type=" + string(content_type);
     var url = Conf.Api.url + "/api/files/" + string(Login.myUid()) + "/"
                                            + string(filename) + "?"
@@ -655,7 +655,7 @@ module Esper.Api {
   }
 
   export function listWorkflows(teamid)
-    : JQueryDeferred<ApiT.UserWorkflows>
+    : JQueryPromise<ApiT.UserWorkflows>
   {
     var url =
       Conf.Api.url + "/api/workflows/list/" + string(Login.myUid())
@@ -665,7 +665,7 @@ module Esper.Api {
 
   export function putWorkflowProgress(teamid: string, taskid: string,
                                       progress : ApiT.TaskWorkflowProgress)
-    : JQueryDeferred<void>
+    : JQueryPromise<void>
   {
     var url =
       Conf.Api.url + "/api/workflows/progress/" + string(Login.myUid())
