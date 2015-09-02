@@ -530,7 +530,6 @@ module Esper.TaskTab {
   export interface TaskTabView {
     taskCaption: JQuery;
     taskTitle: JQuery;
-    taskParticipants: JQuery;
     taskSearchDropdown: JQuery;
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
@@ -628,15 +627,6 @@ module Esper.TaskTab {
   </div>
   <div class="esper-tab-overflow">
 
-    <div class="esper-section">
-      <div class="esper-section-header esper-clearfix esper-open">
-        <span class="esper-bold" style="float:left">Esper Executives</span>
-      </div>
-      <div class="esper-section-container">
-        <ul #taskParticipants class="esper-ul"></ul>
-      </div>
-    </div>
-
     <div #workflowSection class="esper-section esper-hide">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
@@ -732,41 +722,6 @@ module Esper.TaskTab {
 </div>
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
-
-    function populateTaskParticipants(obj: ApiT.TeamPreferencesList) {
-      taskTabView.taskParticipants.empty();
-      List.iter(obj.team_prefs, function(x: ApiT.TeamPreferences){
-'''
-<li #li class="esper-li">
-  <span #teamName></span>
-  <ul class="esper-ul" #emails></ul>
-</li>
-'''
-	var team = x.team;
-        if (team.team_name.length === 0) {
-          teamName.text("(no name)");
-        }
-        else {
-          teamName.text(team.team_name);
-        }
-        if (team.team_email_aliases.length === 0) {
-          emails.append($('<li>(no email address)</li>'));
-        }
-        else {
-          List.iter(team.team_email_aliases, function(emailAlias){
-            var aliasLine = $('<li/>');
-            aliasLine.text("• " + emailAlias);
-            emails.append(aliasLine);
-          });
-        }
-  	taskTabView.taskParticipants.append(li);
-      });
-    };
-
-    refreshTaskParticipants = function() {
-      Api.getThreadParticipantPrefs(threadId).done(populateTaskParticipants);
-    }
-    refreshTaskParticipants();
 
     function updateTaskHeaders(task: ApiT.Task, isValid: boolean,
                                oldTask: ApiT.Task, oldIsValid: boolean) {
