@@ -155,7 +155,7 @@ module.exports = {
   // directory set in Marten's .bowerrc
   vendorCSSList: [
     "font-awesome/css/font-awesome.css",
-    "fullcalendar/fullcalendar.css"
+    "fullcalendar/dist/fullcalendar.css"
   ],
 
   // Path to CSS bundle (relative to pubDir)
