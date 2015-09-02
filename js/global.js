@@ -49,10 +49,8 @@ function resizer() {
 function loadElements() {
   $(".nav-menu").load("nav-menu");
   $(".navbar-container").load("navbar", function() {
-    $(".splash-navbar").load("splash-navbar", function() {
-      $(".nav-menu").click(function() { toggleNavMenu(); });
-      $(".nav-menu-toggle").click(function() { toggleNavMenu(); });
-    });
+    $(".nav-menu").click(function() { toggleNavMenu(); });
+    $(".nav-menu-toggle").click(function() { toggleNavMenu(); });
   });
   $(".about-navbar").load("about-navbar", function() {
     var page = $(".about-navbar").attr("id");
