@@ -101,7 +101,7 @@ module Esper.Menu {
         Agenda format:
         <label>
           <input #htmlFormat type="radio" name="format" />
-          HTML
+          Stylized
         </label>
         <label>
           <input #textFormat type="radio" name="format" />
@@ -153,6 +153,7 @@ module Esper.Menu {
         .val(email);
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
+        .addClass("esper-agenda-recipient")
         .text(email)
         .append($("<br />"));
       i.appendTo(recipients);
