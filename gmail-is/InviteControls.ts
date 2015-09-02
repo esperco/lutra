@@ -241,8 +241,9 @@ module Esper.InviteControls {
     if (execEvent) {
       pubTitle.val(state.title);
     } else {
-      pubTitle.val("");
-      pubTitle.attr("placeholder", "Event with " + team.team_name);
+      var defaultTitle = "Event with " + team.team_name;
+      pubTitle.val(defaultTitle);
+      pubTitle.attr("placeholder", defaultTitle);
     }
 
     pubLocation.val(state.location.address);
