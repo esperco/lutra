@@ -268,13 +268,11 @@ module Esper.Sidebar {
     <ul class="esper-tab-links">
       <li class="esper-active esper-first esper-sidebar-task-tab">Task</li>
       <li class="esper-sidebar-user-tab">User</li>
-      <li class="esper-last esper-sidebar-group-tab">Group</li>
     </ul>
   </div>
   <div class="esper-tab-content">
     <div #taskContent class="esper-tab esper-active"/>
     <div #userContent class="esper-tab esper-user-tab-content"/>
-    <div #groupContent class="esper-tab"/>
   </div>
 </div>
 '''
@@ -292,7 +290,7 @@ module Esper.Sidebar {
     }
 
     tabs.each(function (i, tab) {
-      $(tab).click(function () { console.log(i); switchTab(i) });
+      $(tab).click(function() { Log.d("Switch to tab " + i); switchTab(i); });
     });
 
     CurrentThread.currentTeam.get().match({
@@ -304,9 +302,6 @@ module Esper.Sidebar {
           TaskTab.displayTaskTab(taskContent, team, threadId,
                                  autoTask, linkedEvents,
                                  workflows, userTabContent);
-          GroupScheduling.afterInitialize(function (tpref) {
-            groupContent.append(GroupTab.container(tpref));
-          });
         });
       },
       none : function () {
@@ -325,10 +320,6 @@ module Esper.Sidebar {
 
   export function selectUserTab() {
     $(".esper-sidebar-user-tab").click();
-  }
-
-  export function selectGroupTab() {
-    $(".esper-sidebar-group-tab").click();
   }
 
   function displayUpdateDock(rootElement, url) {
