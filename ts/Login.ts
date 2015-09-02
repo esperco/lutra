@@ -42,12 +42,6 @@ module Login {
   }
 
   export function setLoginInfo(stored) {
-    if (Conf.prod) {
-      // FIXME two lines below
-      window["mixpanel"].register({uid: stored.uid}); // Sent with every track()
-      window["mixpanel"].track("Login");
-    }
-
     if (!Util.isDefined(stored.team) && Util.isDefined(stored.teams[0]))
       stored.team = stored.teams[0];
 
