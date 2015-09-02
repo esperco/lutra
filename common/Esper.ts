@@ -1,37 +1,51 @@
 /*
-  Capture global variables into the Esper object (TypeScript module)
-  such that it's ok for other extensions to override them without
-  affecting Esper.
+  This module defines the type definitions for the various vendor files
+  that have been named-spaced via the vendor.js file, and sets up a base
+  Esper module.
 */
 
-var esperjQuery;
-if (typeof jQuery !== "undefined") {
-  esperjQuery = jQuery;
-}
-var esper$;
-if (typeof $ !== "undefined") {
-  esper$ = $;
-}
-var esperCryptoJS;
-if (typeof CryptoJS !== "undefined") {
-  esperCryptoJS = CryptoJS;
-}
-module Esper {
-  /*
-    Reference to those variables from submodules Esper.* is done without
-    the "Esper." prefix, which is added by the compiler as needed.
-  */
-  export var jQuery;
-  export var $;
-  export var CryptoJS;
+/// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../marten/typings/chrome/chrome.d.ts" />
+/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../marten/typings/moment/moment.d.ts" />
+/// <reference path="../marten/typings/moment-timezone/moment-timezone.d.ts" />
+/// <reference path="../marten/typings/fullCalendar/fullCalendar.d.ts" />
+/// <reference path="../marten/typings/page/page.d.ts" />
+/// <reference path="../marten/typings/lodash/lodash.d.ts" />
+/// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
+/// <reference path="../marten/typings/react/react-global.d.ts" />
+/// <reference path="../marten/typings/react/react-addons-global.d.ts" />
 
-  if (esperjQuery !== undefined) {
-    jQuery = esperjQuery;
-  }
-  if (esper$ !== undefined) {
-    $ = esper$;
-  }
-  if (esperCryptoJS !== undefined) {
-    CryptoJS = esperCryptoJS;
-  }
+// React is a namespace, so we need a way to refer to its type
+type ReactStatic = typeof React;
+
+// For classes, refer to class's type
+type EventEmitterType = typeof EventEmitter3.EventEmitter;
+
+declare module Esper {
+  export var _: _.LoDashStatic;
+  export var $: JQueryStatic;
+  export var EventEmitter: EventEmitterType;
+  export var jQuery: JQueryStatic;
+  export var moment: moment.MomentStatic;
+  export var CryptoJS: CryptoJS.CryptoJSStatic;
+  export var React: ReactStatic;
+  export var page: PageJS.Static;
+
+  // NB: Esper.gmailJs is defined as well, but we'll set the type definitions
+  // for this in the gmail-is code.
+
+  export var PRODUCTION: boolean;
+
+  // vendorReady is set to true by our vendor file after it has been loaded.
+  // If onVendorReady is defined prior to the vendor file loading, it will be
+  // called by the vendor file after loading.
+  export var vendorReady: boolean;
+  export var onVendorReady: () => void;
 }
+
+(function(Esper) {
+  Esper.PRODUCTION = false; // default (this gets changed by Conf files)
+})(Esper || {});
+

@@ -1,40 +1,8 @@
-.PHONY: default pp clean dev-conf tikhon-conf prod-conf
-default: pp
+.PHONY: clean dev-conf tikhon-conf prod-conf
+default: Conf.ts
 
-SOURCES = \
-  Esper \
-  HostUrl \
-  Types \
-  Conf \
-  List \
-  Lazy \
-  Option \
-  EsperCache \
-  Modal \
-  Util \
-  Watchable \
-  Promise \
-  XDate \
-  Log \
-  LRU \
-  Visited \
-  EsperStorage \
-  Message \
-  Profile \
-  Preferences \
-  TaskPreferences \
-  Login \
-  JsonHttp \
-  ApiT \
-  Api
-
-# Paths to .ts source files
-TS_SRC = \
-  $(addsuffix .ts,$(SOURCES))
-
-# Paths to .ts preprocessed files
-TS = \
-  $(addprefix ts/,$(TS_SRC))
+# NB: Use NPM to build
+# Makefile just here to set up Conf files and clean up
 
 TikhonConf.ts: TikhonConf.ts.in ../VERSION
 	sed -e "s:@@VERSION@@:`cat ../VERSION`:g" TikhonConf.ts.in > $@
@@ -65,12 +33,6 @@ prod-conf:
 # Allow a local 'make' after a 'make clean' for dev purposes
 Conf.ts: DevConf.ts
 	cp DevConf.ts Conf.ts
-
-pp: $(TS)
-
-ts/%.ts: %.ts
-	@mkdir -p ts
-	../setup/bin/oblivion $< -o $@
 
 clean:
 	rm -f *~

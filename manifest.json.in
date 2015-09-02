@@ -29,7 +29,7 @@
         "https://www.google.com/calendar/*",
         "https://mail.google.com/mail/*"
       ],
-      "js": ["js/content-script.js"],
+      "js": ["js/vendor.js", "js/content-script.js"],
 
       "run_at": "document_end"
     }
@@ -49,10 +49,12 @@
   },
 
   "web_accessible_resources": [
+    "js/vendor.js",
     "js/gmail-is.js",
     "js/gcal-is.js",
     "css/esper.css",
     "css/fullCalendar.css",
+    "css/vendor.css",
     "img/*"
   ],
 

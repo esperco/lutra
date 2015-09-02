@@ -1,3 +1,4 @@
+
 module Esper.ObserveMessage {
 
   function addEmails(emails, es) {
@@ -12,10 +13,10 @@ module Esper.ObserveMessage {
     var reQuoted = /^On(?:.|[\r\n])*wrote:$(?:[\r\n]*^>.*$)+[\r\n]*/gm;
     var reSpaces = /\s+/g;
 
-    esperGmail.after.send_message(function(
+    GmailJs.after.send_message(function(
         whatever1: any,
         url: string,
-        em: esperGmail.get.sendMessageData,
+        em: GmailJs.SendMessageData,
         whatever2: any,
         xhr: XMLHttpRequest) {
       if (CurrentThread.task.isValid()) {

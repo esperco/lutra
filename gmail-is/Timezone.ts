@@ -384,7 +384,7 @@ module Esper.Timezone {
       var name = "(GMT" + z.offset + ") " + z.name + " (" + z.abbr + ")";
       var opt = $("<option value='" + z.id + "'>" + name + "</option>");
       if (z.id === selected && !alreadySelected) {
-        opt.attr("selected", true);
+        opt.prop("selected", true);
         alreadySelected = true;
       }
       opt.appendTo(timezone);

@@ -267,15 +267,6 @@ module Esper.CurrentThread {
     null
   );
 
-  // If we have a new task, we should ensure the team is consistent with it:
-  task.watch(function (newTask, isValid) {
-    if (isValid) {
-      setTeam(Option.wrap(List.find(Login.myTeams(), function (team) {
-        return team.teamid == newTask.task_teamid;
-      })));
-    }
-  });
-
   /** Sets the task and updates the currently stored linked events. If
    *  the given task is null, linkedEvents is set to [].
    */
@@ -287,21 +278,9 @@ module Esper.CurrentThread {
     }
   }
 
-  /** We cache the event preferences here until the current task changes */
-  var noTaskPrefs = Promise.defer(Option.none());
-  export var taskPrefs : JQueryPromise<Option.T<ApiT.TaskPreferences>> =
-    noTaskPrefs;
-
-  task.watch(function(newTask, isValid) {
-    if (isValid) {
-      var wrap = function(e) {
-        return Option.wrap<ApiT.TaskPreferences>(e);
-      };
-      taskPrefs = TaskPreferences.get(newTask.taskid).then(wrap);
-    } else {
-      taskPrefs = noTaskPrefs;
-    }
-  });
+  /** We cache the event preferences here until the current task changes.
+      Initialized during preInit */
+  export var taskPrefs: JQueryPromise<Option.T<ApiT.TaskPreferences>>;
 
   /** Returns the team for the current thread, if any. */
   export function findTeam(threadId): JQueryPromise<Option.T<ApiT.Team>> {
@@ -448,6 +427,34 @@ module Esper.CurrentThread {
         });
       },
       none: function() { return Promise.defer(Option.none()); }
+    });
+  }
+
+  // Set up watchers -- can be done before login info is available
+  export function preInit() {
+
+    // If we have a new task, we should ensure the team is consistent with it:
+    task.watch(function (newTask, isValid) {
+      if (isValid) {
+        setTeam(Option.wrap(List.find(Login.myTeams(), function (team) {
+          return team.teamid == newTask.task_teamid;
+        })));
+      }
+    });
+
+    /** We cache the event preferences here until the current task changes */
+    var noTaskPrefs = Promise.defer(Option.none());
+    taskPrefs = noTaskPrefs;
+
+    task.watch(function(newTask, isValid) {
+      if (isValid) {
+        var wrap = function(e) {
+          return Option.wrap<ApiT.TaskPreferences>(e);
+        };
+        taskPrefs = TaskPreferences.get(newTask.taskid).then(wrap);
+      } else {
+        taskPrefs = noTaskPrefs;
+      }
     });
   }
 }

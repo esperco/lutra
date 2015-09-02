@@ -550,8 +550,8 @@ module Esper.ApiT {
     day : Weekday;
   }
 
-  export type DTConstr = string // Date or Date_time
-  export type DateTime = [DTConstr, string]
+  export type DTConstr = string; // Date or Date_time
+  export type DateTime = [DTConstr, string];
 
   export interface Recur {
     freq : Freq;
@@ -570,4 +570,13 @@ module Esper.ApiT {
     wkst ?: Weekday;
   }
 
+}
+
+module Esper.ApiT.GoogleDriveApi {
+  export interface File {
+    id: string;
+    title: string;          // "" if none
+    description: string;    // "" if none
+    version: number;
+  }
 }

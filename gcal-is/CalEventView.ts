@@ -276,7 +276,7 @@ module Esper.CalEventView {
 
     dropdown.find("option").each(function() {
       var that = $(this);
-      var teamid = that.data("teamid");
+      var teamid: string = that.data("teamid");
       if (teamid === remindFromTeam.teamid) that.attr("selected", "selected");
     });
 
@@ -364,9 +364,9 @@ module Esper.CalEventView {
         return r.guest_email === email;
       }
       if (List.exists(event_reminders.guest_reminders, sameEmail)) {
-        checkbox.attr("checked", "checked");
+        checkbox.prop("checked", true);
       } else {
-        checkbox.attr("checked", false);
+        checkbox.prop("checked", false);
       }
       checkbox.click(function() {
         var current = List.find(event_reminders.guest_reminders, sameEmail);

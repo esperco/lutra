@@ -23,14 +23,7 @@ esac
 
 mkdir -p pub/css pub/js pub/img pub/html
 
-### Copy third-party libraries into the pub directory
-
 ### Build our own code and copy the result into the pub directory
-make -C event-page install
-make -C content-script install
-make -C gmail-is install
-make -C gcal-is install
-cp css/*.css pub/css
 cp img/* pub/img
 cp "$manifest" pub/manifest.json
 

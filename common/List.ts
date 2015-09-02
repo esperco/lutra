@@ -1,11 +1,15 @@
 /*
+  DEPRECATED: Use lodash if possible.
+
   List operations, similar to those used in OCaml, on Javascript arrays.
 */
 
 module Esper.List {
 
   /* copy */
-  export function copy<T>(a: T[]): T[] { return a.slice(0); };
+  export function copy(a: JQuery): JQuery;
+  export function copy<T>(a: T[]): T[];
+  export function copy(a: any): any { return a.slice(0); };
 
   /* reversal */
   export function rev<T>(a: T[]): T[] { return a.reverse(); };
@@ -24,7 +28,9 @@ module Esper.List {
   }
 
   /* iterate over each element (foreach) */
-  export function iter<T>(a: T[], f: (x: T, i?: number) => void) {
+  export function iter(a: JQuery, f: (x: HTMLElement, i?: number) => void);
+  export function iter<T>(a: T[], f: (x: T, i?: number) => void);
+  export function iter(a: any, f: any) {
     var len = a.length;
     for (var i = 0; i < len; i++)
       f(a[i], i);
@@ -45,7 +51,9 @@ module Esper.List {
   };
 
   /* one-to-one mapping */
-  export function map<T, U>(a: T[], f: (x: T, i?: number) => U): U[] {
+  export function map<U>(a: JQuery, f: (x: HTMLElement, i?: number) => U): U[];
+  export function map<T, U>(a: T[], f: (x: T, i?: number) => U): U[];
+  export function map(a: any, f: any): any[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++)
@@ -54,7 +62,9 @@ module Esper.List {
   };
 
   /* map, remove null or undefined elements */
-  export function filterMap<T, U>(a: T[], f: (x: T, i?: number) => U): U[] {
+  export function filterMap<U>(a: JQuery, f: (x: HTMLElement, i?: number) => U): U[];
+  export function filterMap<T, U>(a: T[], f: (x: T, i?: number) => U): U[];
+  export function filterMap(a: any, f: any): any[] {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {
@@ -67,7 +77,10 @@ module Esper.List {
   };
 
   /* keep only elements that satisfy the predicate */
-  export function filter<T>(a: T[], f: (x: T, i?: number) => boolean): T[] {
+  export function filter(a: JQuery,
+                         f: (x: HTMLElement, i?: number) => boolean): JQuery;
+  export function filter<T>(a: T[], f: (x: T, i?: number) => boolean): T[];
+  export function filter(a: any, f: any): any {
     var b = [];
     var len = a.length;
     for (var i = 0; i < len; i++) {

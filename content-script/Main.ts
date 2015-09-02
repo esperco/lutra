@@ -5,19 +5,45 @@
     https://developer.chrome.com/extensions/content_scripts
 */
 
+/// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../marten/typings/chrome/chrome.d.ts" />
+/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+
+/// <reference path="../common/Esper.ts" />
+/// <reference path="../common/HostUrl.ts" />
+/// <reference path="../common/Types.ts" />
+/// <reference path="../common/Conf.ts" />
+/// <reference path="../common/List.ts" />
+/// <reference path="../common/Util.ts" />
+/// <reference path="../common/Log.ts" />
+/// <reference path="../common/LRU.ts" />
+/// <reference path="../common/Visited.ts" />
+/// <reference path="../common/EsperStorage.ts" />
+/// <reference path="../common/Message.ts" />
+
+/// <reference path="./Update.ts" />
+/// <reference path="./JsonHttp.ts" />
+/// <reference path="./Auth.ts" />
+
 module Esper.Main {
   function injectScript(scriptName) {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/esper.css");
-    var fullCalendarCss = chrome.extension.getURL("css/fullCalendar.css");
+    var vendorCssUrl = chrome.extension.getURL("css/vendor.css");
     var scriptUrl = chrome.extension.getURL("js/" + scriptName);
+    var vendorScriptUrl = chrome.extension.getURL("js/vendor.js");
     var docHead = $("head");
+    $("<link rel='stylesheet' type='text/css'/>")
+      .attr("href", vendorCssUrl)
+      .appendTo(docHead);
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
       .appendTo(docHead);
-    $("<link rel='stylesheet' type='text/css'/>")
-      .attr("href", fullCalendarCss)
+    $("<script id='esper-vendor-script'/>")
+      .attr("src", vendorScriptUrl)
+      .attr("data-root-url", rootUrl)
       .appendTo(docHead);
     $("<script id='esper-script'/>")
       .attr("src", scriptUrl)

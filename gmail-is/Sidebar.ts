@@ -29,12 +29,6 @@ module Esper.Sidebar {
     $(".esper-dropdown-btn").removeClass("esper-open");
   }
 
-  $(document).on('click', function(e) {
-    if (!$(e.target).hasClass("esper-click-safe")) {
-      dismissDropdowns();
-    }
-  });
-
   function removeEsperRoot() {
     $("#esper").remove();
   }
@@ -394,7 +388,7 @@ module Esper.Sidebar {
         var threadId = CurrentThread.threadId.get();
 
         var links = $("div").find("a");
-        var threadLinks = List.filter(links, function(link) {
+        var threadLinks = List.filter(links, function(link: HTMLElement): boolean {
           var url = $(link).attr("href");
           if (typeof url === "string") {
             return url.substring(0,30) === "http://mail.google.com/mail/u/";
@@ -448,6 +442,12 @@ module Esper.Sidebar {
   var initJob: JQueryPromise<void>;
 
   export function init(): JQueryPromise<void> {
+    $(document).on('click', function(e) {
+      if (!$(e.target).hasClass("esper-click-safe")) {
+        dismissDropdowns();
+      }
+    });
+
     if (initJob) {
       return initJob;
     } else {

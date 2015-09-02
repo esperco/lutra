@@ -294,11 +294,11 @@ module Esper.Recur {
 </span>
 '''
     if (rule.byday.length > 0) {
-      month.attr("checked", true);
-      week.attr("checked", false);
+      month.prop("checked", true);
+      week.prop("checked", false);
     } else if (rule.bymonthday.length > 0) {
-      month.attr("checked", false);
-      week.attr("checked", true);
+      month.prop("checked", false);
+      week.prop("checked", true);
     }
     view.find("input").click(updateState);
     return view;
@@ -409,7 +409,7 @@ module Esper.Recur {
     repeats.val(recur.freq);
     setRepeats(recur.freq);
 
-    if (recur.interval) repeatEvery.val(recur.interval);
+    if (recur.interval) repeatEvery.val(recur.interval.toString());
     repeatEvery.change(updateState);
 
     var localDateTime;
@@ -434,7 +434,7 @@ module Esper.Recur {
       endsNever.prop("checked", false);
       endsAfter.prop("checked", true);
       endsOn.prop("checked", false);
-      occurrences.val(recur.count);
+      occurrences.val(recur.count.toString());
       occurrences.change(updateState);
     } else if (recur.until) {
       endsNever.prop("checked", false);

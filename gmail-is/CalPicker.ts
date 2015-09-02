@@ -205,7 +205,7 @@ module Esper.CalPicker {
     var title =
       CurrentThread.hasTask() ?
       CurrentThread.task.get().task_title :
-      esperGmail.get.email_subject();
+      GmailJs.get.email_subject();
     eventTitle.val("HOLD: " + title);
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
@@ -217,7 +217,7 @@ module Esper.CalPicker {
                   calendars[i].calendar_title + "</option>");
       opt.appendTo(pickerSwitcher);
       if (calendars[i].google_cal_id === writeToCalendar.google_cal_id) {
-        pickerSwitcher.val(i);
+        pickerSwitcher.val(i.toString());
       }
     }
 
@@ -418,7 +418,7 @@ module Esper.CalPicker {
     });
   }
 
-  function addTZToEvents(calid, events) {
+  function addTZToEvents(calid: string, events: ApiT.CalendarEvent[]) {
     return List.map(events, function(ev) {
       (<TZCalendarEvent> ev).calendarTZ = showCalendars[calid];
       return ev;
@@ -494,7 +494,7 @@ module Esper.CalPicker {
       setEventMoments(startMoment, endMoment, undefined);
     }
 
-    function eventClick(calEvent, jsEvent, view) {
+    function eventClick(calEvent, jsEvent, viewObj) {
 '''
 <div class="esper-event-click-menu" #view>
   <ul class="esper-ul" #menu/>
@@ -610,8 +610,7 @@ module Esper.CalPicker {
       calendarView.fullCalendar('gotoDate', date);
     }
 
-    calendarJump.datepicker({inline : true,
-                             onSelect : dateJump});
+    calendarJump.datepicker({onSelect : dateJump});
 
     picker.calendarPickerContainer.removeClass("hide");
   }
@@ -775,7 +774,7 @@ module Esper.CalPicker {
     });
 
     // If the task title was never set, update it based on the event
-    var emailSubject = esperGmail.get.email_subject();
+    var emailSubject = GmailJs.get.email_subject();
     var taskTitle = task.task_title;
     var eventTitle = picker.eventTitle.val();
     if (taskTitle === emailSubject) {

@@ -9,14 +9,17 @@ module Esper.TaskTab {
   export var currentTaskTab : TaskTabView;
 
   var refreshTaskParticipants : () => void = function() {};
-  esperGmail.after.send_message(function() {
-    refreshTaskParticipants();
-  });
-  /* esperGmail.on.show_newly_arrived_message would be more appropriate
-     but doesn't work. */
-  esperGmail.on.new_email(function() {
-    refreshTaskParticipants();
-  });
+
+  export function init() {
+    GmailJs.after.send_message(function() {
+      refreshTaskParticipants();
+    });
+    /* GmailJs.on.show_newly_arrived_message would be more appropriate
+       but doesn't work. */
+    GmailJs.on.new_email(function() {
+      refreshTaskParticipants();
+    });
+  }
 
   export interface LinkOptionsView {
     view: JQuery;
@@ -770,11 +773,11 @@ module Esper.TaskTab {
       if (isValid) {
         taskTabView.taskCaption.text(taskLabelExists);
         taskTabView.taskTitle.text(task.task_title);
-        workflowSelect.attr("disabled", false);
+        workflowSelect.prop("disabled", false);
       } else {
         taskTabView.taskCaption.text(taskLabelCreate);
         taskTabView.taskTitle.text("");
-        workflowSelect.attr("disabled", true);
+        workflowSelect.prop("disabled", true);
       }
     }
     CurrentThread.task.watch(updateTaskHeaders, "updateTaskHeaders");
@@ -896,7 +899,7 @@ module Esper.TaskTab {
               workflowSelect.val(progress.workflow_id);
               workflowSelect.trigger("change");
             }
-            workflowSelect.attr("disabled", false);
+            workflowSelect.prop("disabled", false);
           } else {
             taskCaption.text(taskLabelCreate);
             showMTDrop();

@@ -10,7 +10,7 @@ module Esper.Login {
     validateAccount, undefined
   );
 
-  export var getLoginInfo : JQueryDeferred<ApiT.LoginResponse>;
+  export var getLoginInfo : JQueryPromise<ApiT.LoginResponse>;
 
   /* set by getLoginInfo upon success */
   export var watchableInfo = new Esper.Watchable.C<ApiT.LoginResponse>(

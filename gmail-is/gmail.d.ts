@@ -3,9 +3,9 @@
   (incomplete)
 */
 
-declare module esperGmail.get {
+declare module GmailJs {
 
-  export interface Message {
+  interface Message {
     reply_to_id: string;
     is_deleted: boolean;
     from: string; // name
@@ -20,7 +20,7 @@ declare module esperGmail.get {
     content_html: string;
   }
 
-  export interface Thread {
+  interface Thread {
     first_email: string;
       /* gmail thread ID (hex-encoded).
          This is the gmail message ID of the root message of the thread,
@@ -32,13 +32,13 @@ declare module esperGmail.get {
     total_emails: number;
     total_threads: string[]; // gmail message IDs
 
-    /*  TypeScript has no tuples
+    /*  Name, email tuple
     people_involved: [
       ["Kartik Talwar", "hi@kartikt.com"],
       ["California", "california@gmail.com"]
-    ],
+    ]
     */
-    people_involved: string[][];
+    people_involved: [string, string][];
 
     subject: string;
 
@@ -46,7 +46,7 @@ declare module esperGmail.get {
     threads: { [threadId: string]: Message }
   }
 
-  export interface sendMessageData {
+  interface SendMessageData {
     to: string[];
     cc: string[];
     bcc: string[];
@@ -55,81 +55,104 @@ declare module esperGmail.get {
     ishtml: boolean;
   }
 
-  export function user_email(): string;
-  export function current_page(): string;
-  export function email_subject(): string;
-  export function email_id(): string;
-  export function email_ids(): string[];
-  export function email_data(): Thread;
+  interface GmailJsGet {
+    user_email(): string;
+    current_page(): string;
+    email_subject(): string;
+    email_id(): string;
+    email_ids(): string[];
+    email_data(): Thread;
+  }
+
+  interface GmailJsCheck {
+    is_inside_email(): boolean;
+  }
+
+  /* Not part of gmail.Js proper but defined by Gmail.init */
+  interface GmailJsOn {
+    new_email(callback: (id: string,
+                         url: string,
+                         body: string,
+                         xhr: XMLHttpRequest) => void): void;
+
+    open_email(callback: (id: string,
+                          url: string,
+                          body: string,
+                          xhr: XMLHttpRequest) => void): void;
+
+    show_newly_arrived_message(callback: (id: string,
+                                          url: string,
+                                          body: string) => void): void;
+
+    star(callback: (id: string,
+                    url: string,
+                    body: string,
+                    xhr: XMLHttpRequest) => void): void;
+
+    unstar(callback: (id: string,
+                      url: string,
+                      body: string,
+                      xhr: XMLHttpRequest) => void): void;
+
+    // TODO: Support the arguments ($selection, string) to the callback.
+    reply_forward(callback: (match: JQuery, type: string) => void): void;
+
+    /* complete as needed */
+  }
+
+  /* Not part of gmail.Js proper but defined by Gmail.init */
+  interface GmailJsOff {
+    new_email(): void;
+    open_email(): void;
+    send_message(): void;
+    show_newly_arrived_message(): void;
+    star(): void;
+    unstar(): void;
+  }
+
+  /* Not part of gmail.Js proper but defined by Gmail.init */
+  interface GmailJsAfter {
+    // NB: Apears to be reversed from documentation? May cause weird
+    // errors if we update our gmail.js library
+    send_message(callback: (body: any,
+                            url: string,
+                            data: SendMessageData,
+                            response: any,
+                            xhr: XMLHttpRequest) => void): void;
+
+    /* complete as needed */
+  }
+
+  /* Not part of gmail.Js proper but defined by Gmail.init */
+  interface GmailJsBefore {
+    /* complete as needed */
+  }
+
+  interface GmailJsStatic {
+    get: GmailJsGet;
+    check: GmailJsCheck;
+    on: GmailJsOn;
+    off: GmailJsOff;
+    after: GmailJsAfter;
+    before: GmailJsBefore;
+
+    observe: {
+      on(action: string, callback: (...args: any[]) => void): void;
+      off(action: string|void, type?: string): void;
+      after(action: string, callback: (...args: any[]) => void): void;
+      before(action: string, callback: (...args: any[]) => void): void;
+    }
+  }
+
+  interface Factory {
+    (jQuery: JQueryStatic): GmailJsStatic;
+  }
 }
 
-/* Typable functions defined in gmailInit.js */
+declare module Esper {
+  // Factory added by vendor
+  export var gmailJs: GmailJs.Factory;
 
-declare module esperGmail.on {
-  export function new_email(
-    callback: (id: string,
-               url: string,
-               body: string,
-               xhr: XMLHttpRequest) => void
-  ): void;
-
-  export function open_email(
-    callback: (id: string,
-               url: string,
-               body: string,
-               xhr: XMLHttpRequest) => void
-  ): void;
-
-  export function show_newly_arrived_message(
-    callback: (id: string,
-               url: string,
-               body: string) => void
-  ): void;
-
-  export function star(
-    callback: (id: string,
-               url: string,
-               body: string,
-               xhr: XMLHttpRequest) => void
-  ): void;
-
-  export function unstar(
-    callback: (id: string,
-               url: string,
-               body: string,
-               xhr: XMLHttpRequest) => void
-  ): void;
-
-  // TODO: Support the arguments ($selection, string) to the callback.
-  export function reply_forward(
-    callback: (match: JQuery, type: string) => void): void;
-
-  /* complete as needed */
-}
-
-declare module esperGmail.after {
-  export function send_message(
-    callback: (whatever1: any,
-               url: string,
-               email: esperGmail.get.sendMessageData,
-               whatever2: any,
-               xhr: XMLHttpRequest) => void
-  ): void;
-
-  /* complete as needed */
-}
-
-declare module esperGmail.off {
-  export function new_email(): void;
-  export function open_email(): void;
-  export function send_message(): void;
-  export function show_newly_arrived_message(): void;
-  export function star(): void;
-  export function unstar(): void;
-
-  /* complete as needed */
-}
-
-declare module esperGmail.check {
-  export function is_inside_email(): boolean;
+  // Library created by Gmail.init function
+  export var GmailJs: GmailJs.GmailJsStatic;
 }
