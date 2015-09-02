@@ -101,7 +101,7 @@ module Esper.Menu {
         Agenda format:
         <label>
           <input #htmlFormat type="radio" name="format" />
-          HTML
+          Stylized
         </label>
         <label>
           <input #textFormat type="radio" name="format" />
@@ -109,11 +109,11 @@ module Esper.Menu {
         </label>
       </label>
       <br/>
-      <!-- <label>
+      <label>
         <input #includeTaskNotes type="checkbox" />
           Include task notes
       </label>
-      <br/> -->
+      <br/>
       <label class="esper-agenda-title">
         Send to:
         <div #recipients class="esper-agenda-section">
@@ -153,7 +153,9 @@ module Esper.Menu {
         .val(email);
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
+        .addClass("esper-agenda-recipient")
         .text(email)
+        .addClass("esper-agenda-recipient")
         .append($("<br />"));
       i.appendTo(recipients);
       l.appendTo(recipients);
@@ -226,7 +228,7 @@ module Esper.Menu {
     sendButton.click(function() {
       errorMessages.empty();
       var format = htmlFormat.prop("checked");
-      // var i = includeTaskNotes.prop("checked");
+      var i = includeTaskNotes.prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       var f_time = Math.floor(f.getTime() / 1000);
@@ -256,7 +258,7 @@ module Esper.Menu {
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
 
-      var pref = { recipients: r, html_format: format, include_task_notes: false};
+      var pref = { recipients: r, html_format: format, include_task_notes: i};
       Api.sendAgenda(teamSelect.val(), f_time, u_time, pref).done(cancel);
     });
 
