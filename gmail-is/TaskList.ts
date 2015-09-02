@@ -88,6 +88,18 @@ module Esper.TaskList {
     });
   }
 
+  function renderTaskNotes(notes: string,
+                           parent: JQuery) {
+    $("<h4/>")
+      .html("Task Notes")
+      .appendTo(parent);
+    if (notes !== "" || notes !== undefined) {
+      $("<p/>")
+        .html(notes)
+        .appendTo(parent);
+    }
+  }
+
   function getProgressLabel(team: ApiT.Team,
                             task: ApiT.Task) {
     switch (task.task_progress) {
@@ -148,6 +160,7 @@ module Esper.TaskList {
   <div #otherTeamLabels></div>
   <div #linkedThreadContainer class="esper-tl-threads"></div>
   <div #linkedEventContainer class="esper-tl-events"></div>
+  <div #taskNotesContainer class="esper-tl-task-notes"></div>
 </div>
 '''
 
@@ -192,6 +205,7 @@ module Esper.TaskList {
 
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
     renderEvents(team, task.task_events, linkedEventContainer);
+    renderTaskNotes(task.task_notes, taskNotesContainer);
 
     return view;
   }
