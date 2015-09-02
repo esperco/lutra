@@ -2,6 +2,8 @@ marten
 ======
 A marten is not a Martin.
 
+![Pine marten](https://farm3.staticflickr.com/2804/4361362178_edb7a73df0_n.jpg)
+
 This repo contains refactored helper code for Otter, Stoat, etc.
 
 Test App
