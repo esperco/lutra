@@ -255,6 +255,11 @@ module Esper.InviteControls {
     appendExecPublicPhone(team, pubNotes);
 
     // Initializing the calendar dropdown:
+    state.calendars.forEach(function (cal) {
+      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
+                           cal.calendar_title + "</option>"));
+    });
+
     var publicCalId = state.calendarId;
 
     if (duplicate && !execEvent) {
@@ -268,11 +273,6 @@ module Esper.InviteControls {
     if (publicCalId) {
       pubCalendar.val(publicCalId);
     }
-
-    state.calendars.forEach(function (cal) {
-      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
-                           cal.calendar_title + "</option>"));
-    });
 
     var aliases = team.team_email_aliases;
     if (aliases.length === 0) {
