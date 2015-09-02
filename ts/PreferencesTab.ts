@@ -109,11 +109,15 @@ module PreferencesTab {
     });
     var sendTime = li.find(".esper-prefs-send-time").val();
     var dayOf = li.find(".esper-prefs-day-of").prop("checked");
+    var format = li.find(".esper-prefs-html-format").prop("checked");
+    var includeTaskNotes = li.find(".esper-prefs-include-task-notes").prop("checked");
     return {
       enabled: li.find("div.preference-toggle-switch").hasClass("on"),
       recipients: sendTo,
       send_time: { hour: parseInt(sendTime), minute: "0" },
-      day_of: dayOf
+      day_of: dayOf,
+      html_format: format,
+      include_task_notes: includeTaskNotes
     }
   }
 
@@ -1235,12 +1239,26 @@ module PreferencesTab {
       <div #agendaOptions class="preference-option-col clearfix">
         <div class="preference-option-title semibold">Which Day's Events</div>
         <label class="checkbox esper-preference-check">
-          <input #dayof type= "radio" class="esper-prefs-day-of"/>
+          <input #dayof type="radio" name="which-day" class="esper-prefs-day-of"/>
           Day Of
         </label>
         <label class="checkbox esper-preference-check">
-          <input #nextday type= "radio"/>
+          <input #nextday type="radio" name="which-day"/>
           Next Day
+        </label>
+        <div class="preference-option-title semibold">Agenda Format</div>
+        <label class="checkbox esper-preference-check">
+          <input #htmlFormat type="radio" name="agenda-format" class="esper-prefs-html-format"/>
+          HTML
+        </label>
+        <label class="checkbox esper-preference-check">
+          <input #textFormat type="radio" name="agenda-format"/>
+          Plain Text
+        </label>
+        <br />
+        <label class="checkbox esper-preference-check">
+          <input #includeTaskNotes type= "checkbox" class="esper-prefs-include-task-notes"/>
+          Include Task Notes
         </label>
       </div>
     </div>
@@ -1272,12 +1290,25 @@ module PreferencesTab {
         nextday.prop("checked", true);
 
       dayof.change(function() {
-          nextday.prop("checked", !dayof.prop("checked"));
-          saveEmailTypes();
+        saveEmailTypes();
       });
       nextday.change(function() {
-          dayof.prop("checked", !nextday.prop("checked"));
-          saveEmailTypes();
+        saveEmailTypes();
+      });
+
+      if (defaults.htmlFormat || defaults.htmlFormat === undefined)
+        htmlFormat.prop("checked", true);
+      else
+        textFormat.prop("checked", true);
+
+      htmlFormat.change(function() {
+        saveEmailTypes();
+      });
+      textFormat.change(function() {
+        saveEmailTypes();
+      });
+      includeTaskNotes.change(function() {
+        saveEmailTypes();
       });
     } else {
       agendaOptions.hide();
