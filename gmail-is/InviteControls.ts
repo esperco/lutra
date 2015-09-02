@@ -815,7 +815,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
     function setReminders(execIds, guestsIds) {
       if (reminderSpec) {
-        if (reminderSpec.exec.time) {
+        if (reminderSpec.exec && reminderSpec.exec.time) {
           Api.getProfile(team.team_executive, team.teamid)
             .done(function (profile) {
               var reminder = {
@@ -831,7 +831,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
             });
         }
 
-        if (reminderSpec.guests.time) {
+        if (reminderSpec.guests && reminderSpec.guests.time) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
