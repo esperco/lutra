@@ -59,7 +59,6 @@
 /// <reference path="./TaskTab.ts" />
 /// <reference path="./InThreadControls.ts" />
 /// <reference path="./UserTab.ts" />
-/// <reference path="./GroupTab.ts" />
 /// <reference path="./GroupScheduling.ts" />
 /// <reference path="./BackgroundEvents.ts" />
 /// <reference path="./TimeTracker.ts" />

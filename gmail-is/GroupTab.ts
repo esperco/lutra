@@ -1,4 +1,7 @@
-/** This is the toplevel module for the UI that contains tools to help
+/**
+ * CURRENTLY NOT IN USE
+ *
+ * This is the toplevel module for the UI that contains tools to help
  * with group scheduling.
  */
 module Esper.GroupTab {

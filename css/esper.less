@@ -77,6 +77,11 @@
 /*** General ***/
 
 @sidebar_width: 247px;
+@sidebar_tab_height: 34px;
+@sidebar_tab_count: 2;
+@sidebar_tab_base_width: floor(@sidebar_width / @sidebar_tab_count);
+@sidebar_tab_remainder_width: @sidebar_width - (
+  @sidebar_tab_base_width * (@sidebar_tab_count - 1));
 
 #esper { font-size: 13px; }
 
@@ -777,10 +782,11 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   li {
     float: left;
     list-style: none;
-    width: 80px;
-    height: 34px;
-    display: inline-block;
+    // Make sidebar a little larger and use negative margin to get overap
+    width: (@sidebar_tab_base_width + 1);
     margin: 0 -1px 0 0;
+    height: @sidebar_tab_height;
+    display: inline-block;
     padding: 8px;
     background: white;
     border: 1px solid @purple_disabled;
@@ -789,18 +795,25 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
     text-align: center;
     cursor: pointer;
     box-sizing: border-box;
-    &.hover { color: @purple_hover; }
+    &:hover { color: @purple_hover; }
+    &:first-child {
+      border-top-left-radius: 3px;
+    }
+    &:last-child {
+      border-top-right-radius: 3px;
+      // Don't add border width since negative right margin on last child
+      // doesn't do anything
+      width: @sidebar_tab_remainder_width;
+    }
   }
   li.esper-active, li.esper-active:hover {
     color: @purple_text;
     border: 1px solid @google_border_gray;
-    border-bottom: 1px solid white;
+    border-bottom: 0;
     cursor: default;
     .esper-tab-icon { opacity: 1; }
   }
   li.esper-active + li { border-left: 1px solid @gray_20; }
-  .esper-first { border-top-left-radius: 3px; }
-  .esper-last { border-top-right-radius: 3px; }
   &:after {
     display:block;
     clear:both;
@@ -812,12 +825,13 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   position: absolute;
   z-index: 1;
   width: 100%;
-  top: 34px;
+  top: @sidebar_tab_height;
   bottom: 36px;
   background: white;
-  border: 1px solid @google_border_gray;
+  border-color: @google_border_gray;
+  border-style: solid;
+  border-width: 0 1px 1px 1px;
   border-bottom: none;
-  border-top-right-radius: 3px;
   box-sizing: border-box;
   .esper-tab { display:none; }
   .esper-tab.esper-active { display:block; }
