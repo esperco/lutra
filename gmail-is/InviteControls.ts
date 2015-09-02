@@ -548,8 +548,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   Slides.Slide<InviteState> {
 '''
 <div #container>
-  <div #heading class="esper-modal-header">
-    Review the guest event description
+  <div class="esper-modal-header">
+    <span #heading>Review the guest event description</span>
     <button #pickEmails class="esper-btn esper-btn-secondary">
       Pick Emails
     </button>
