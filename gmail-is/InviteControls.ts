@@ -241,8 +241,9 @@ module Esper.InviteControls {
     if (execEvent) {
       pubTitle.val(state.title);
     } else {
-      pubTitle.val("");
-      pubTitle.attr("placeholder", "Event with " + team.team_name);
+      var defaultTitle = "Event with " + team.team_name;
+      pubTitle.val(defaultTitle);
+      pubTitle.attr("placeholder", defaultTitle);
     }
 
     pubLocation.val(state.location.address);
@@ -255,6 +256,11 @@ module Esper.InviteControls {
     appendExecPublicPhone(team, pubNotes);
 
     // Initializing the calendar dropdown:
+    state.calendars.forEach(function (cal) {
+      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
+                           cal.calendar_title + "</option>"));
+    });
+
     var publicCalId = state.calendarId;
 
     if (duplicate && !execEvent) {
@@ -268,11 +274,6 @@ module Esper.InviteControls {
     if (publicCalId) {
       pubCalendar.val(publicCalId);
     }
-
-    state.calendars.forEach(function (cal) {
-      pubCalendar.append($("<option value='" + cal.google_cal_id + "'>" +
-                           cal.calendar_title + "</option>"));
-    });
 
     var aliases = team.team_email_aliases;
     if (aliases.length === 0) {
@@ -547,8 +548,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   Slides.Slide<InviteState> {
 '''
 <div #container>
-  <div #heading class="esper-modal-header">
-    Review the guest event description
+  <div class="esper-modal-header">
+    <span #heading>Review the guest event description</span>
     <button #pickEmails class="esper-btn esper-btn-secondary">
       Pick Emails
     </button>
@@ -814,7 +815,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
     function setReminders(execIds, guestsIds) {
       if (reminderSpec) {
-        if (reminderSpec.exec.time) {
+        if (reminderSpec.exec && reminderSpec.exec.time) {
           Api.getProfile(team.team_executive, team.teamid)
             .done(function (profile) {
               var reminder = {
@@ -830,7 +831,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
             });
         }
 
-        if (reminderSpec.guests.time) {
+        if (reminderSpec.guests && reminderSpec.guests.time) {
           for (var i = 0; i < guests.length; i++) {
             var guest    = guests[i];
             var reminder = {
