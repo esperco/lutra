@@ -85,6 +85,18 @@
 
 #esper { font-size: 13px; }
 
+#esper p {
+  margin: 10px 0;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:empty {
+    margin: 0;
+  }
+}
+
 a { text-decoration: none; }
 
 hr.esper-hr {
@@ -188,6 +200,7 @@ select.esper-select {
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
   &:focus { border: 1px solid @purple; }
+  &.esper-select-fullwidth { width: 100%; }
 }
 
 object.esper-svg { pointer-events: none; }
@@ -837,12 +850,6 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   .esper-tab.esper-active { display:block; }
 }
 
-.esper-tab-header {
-  height: 100px;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
 .esper-tab-container {
   padding : 10px;
   height : 100%;
@@ -865,15 +872,39 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   }
 }
 
-.esper-tab-overflow {
+.esper-tab-flexbox {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Stretch everything to width/height 100% without worrying too much
+  // about parent element
   position: absolute;
-  width: 100%;
-  top: 100px;
+  top: 0;
   bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.esper-tab-header {
+  padding: 10px;
+  box-sizing: border-box;
+  border-bottom: 1px solid @google_border_gray;
+  background: white;
+  flex-grow: 0;
+  flex-shrink: 0;
+  z-index: 1;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.16);
+}
+
+.esper-tab-overflow {
+  flex-shrink: 1;
+  flex-grow: 0;
   padding: 15px 10px 0 10px;
   overflow-x: hidden;
   overflow-y: auto;
   box-sizing: border-box;
+  background: white;
 }
 
 .esper-section { margin-bottom: 15px; }
@@ -915,6 +946,12 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border: 1px solid @google_border_gray;
   border-top: none;
   border-bottom: none;
+}
+
+.esper-subheading {
+  display: block;
+  margin: 10px 0;
+  font-weight: bold;
 }
 
 .esper-section-footer {
@@ -963,21 +1000,14 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 }
 
 .esper-task-progress {
-  padding: 7px 10px;
+  padding: 7px 0 0;
 }
 
 .esper-section-actions {
   padding: 7px 0px 2px 0px;
   text-align: center;
   background: @purple_bg;
-  border: 1px solid @google_border_gray;
-  border-top: none;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-  &.esper-open {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
+  border-bottom: 1px solid @google_border_gray;
 }
 
 .esper-section-selector {

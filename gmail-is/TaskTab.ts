@@ -1,7 +1,7 @@
 module Esper.TaskTab {
 
-  var taskLabelCreate = "Create task";
-  var taskLabelExists = "Title";
+  var taskLabelCreate = "Create Task";
+  var taskLabelExists = "Task Name";
 
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedThreadsAction : () => void;
@@ -151,8 +151,9 @@ module Esper.TaskTab {
   export function displayTaskProgress(task, taskTab: TaskTabView) {
 '''
   <div #view class="esper-clearfix esper-task-progress">
-    <span class="esper-show-selector">Progress: </span>
-    <select #taskProgressSelector class="esper-select"/>
+    <select #taskProgressSelector class="esper-select esper-select-fullwidth">
+      <option value="" disabled>--- Task Status ---</option>
+    </select>
   </div>
 '''
     taskTab.taskProgressContainer.children().remove();
@@ -499,7 +500,11 @@ module Esper.TaskTab {
           div.append(label);
           checklist.append(div);
         });
-        checklistDiv.removeClass("esper-hide");
+        if (progress.checklist.length) {
+          checklistDiv.removeClass("esper-hide");
+        } else {
+          checklistDiv.addClass("esper-hide");
+        }
 
         if (step.meeting_prefs) {
           var meetingInfo = $(".esper-user-tab-meeting-info");
@@ -534,13 +539,8 @@ module Esper.TaskTab {
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
 
-    taskProgressHeader: JQuery;
-    showTaskProgress: JQuery;
-    refreshTaskProgress: JQuery;
-    refreshTaskProgressIcon: JQuery;
     taskProgressContainer: JQuery;
     taskProgressSpinner: JQuery;
-    taskProgressList: JQuery;
 
     linkedThreadsHeader: JQuery;
     showLinkedThreads: JQuery;
@@ -606,7 +606,7 @@ module Esper.TaskTab {
                                  workflows: ApiT.Workflow[],
                                  userTabContent : UserTab.UserTabView) {
 '''
-<div #view>
+<div #view class="esper-tab-flexbox">
   <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
     <input #taskTitle type="text" size="24"
@@ -619,52 +619,13 @@ module Esper.TaskTab {
       <div class="esper-click-safe esper-drop-ul-divider"/>
       <div #taskSearchActions class="esper-dropdown-section"/>
     </ul>
-    <div class="esper-clearfix esper-workflow-gap">
-      <select #workflowSelect class="esper-select" disabled>
-        <option value="header">Select workflow...</option>
-      </select>
+    <div #taskProgressContainer>
+      <div #taskProgressSpinner class="esper-events-list-loading">
+        <div class="esper-spinner esper-list-spinner"/>
+      </div>
     </div>
   </div>
   <div class="esper-tab-overflow">
-
-    <div #workflowSection class="esper-section esper-hide">
-      <div class="esper-section-header esper-clearfix esper-open">
-        <span class="esper-bold" style="float:left">Workflow</span>
-      </div>
-      <div class="esper-section-container esper-section-notes">
-        <div #workflowNotes class="esper-text-notes"/>
-        <div class="esper-clearfix esper-workflow-gap">
-          <select #stepSelect class="esper-select">
-            <option value="header">Select step...</option>
-          </select>
-        </div>
-        <div #stepNotes
-          class="esper-clearfix esper-hide esper-text-notes"/>
-        <div #checklistDiv class="esper-clearfix esper-hide">
-          <b>Checklist:</b>
-          <div #checklist class="esper-workflow-checklist"/>
-        </div>
-      </div>
-    </div>
-    <div class="esper-section">
-      <div #taskProgressHeader
-           class="esper-section-header esper-clearfix esper-open">
-        <span #showTaskProgress
-              class="esper-link" style="float:right">Hide</span>
-        <span class="esper-bold" style="float:left">Task Progress</span>
-        <div #refreshTaskProgress
-             class="esper-refresh esper-clickable esper-disabled">
-          <object #refreshTaskProgressIcon class="esper-svg"/>
-        </div>
-      </div>
-      <div #taskProgressContainer class="esper-section-container">
-        <div #taskProgressSpinner class="esper-events-list-loading">
-          <div class="esper-spinner esper-list-spinner"/>
-        </div>
-        <div #taskProgressList/>
-      </div>
-    </div>
-    <hr class="esper-hr"/>
     <div class="esper-section">
       <div #linkedThreadsHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -694,28 +655,53 @@ module Esper.TaskTab {
           <object #refreshLinkedEventsIcon class="esper-svg"/>
         </div>
       </div>
-      <div #linkActions
-           class="esper-section-actions esper-clearfix esper-open">
-        <div style="display:inline-block">
-          <div #createEvent
-               class="esper-link-action esper-dropdown-btn esper-click-safe">
-            <object #createEventIcon class="esper-svg esper-link-action-icon"/>
-            <div class="esper-link-action-text esper-click-safe">
-              Create event
+      <div #linkedEventsContainer class="esper-section-container">
+        <div #linkActions
+             class="esper-section-actions esper-clearfix esper-open">
+          <div style="display:inline-block">
+            <div #createEvent
+                 class="esper-link-action esper-dropdown-btn esper-click-safe">
+              <object #createEventIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text esper-click-safe">
+                Create
+              </div>
+            </div>
+            <div class="esper-vertical-divider"/>
+            <div #linkEvent class="esper-link-action">
+              <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text">Link</div>
             </div>
           </div>
-          <div class="esper-vertical-divider"/>
-          <div #linkEvent class="esper-link-action">
-            <object #linkEventIcon class="esper-svg esper-link-action-icon"/>
-            <div class="esper-link-action-text">Link event</div>
-          </div>
         </div>
-      </div>
-      <div #linkedEventsContainer class="esper-section-container">
         <div #linkedEventsSpinner class="esper-events-list-loading">
           <div class="esper-spinner esper-list-spinner"/>
         </div>
         <div #linkedEventsList/>
+      </div>
+    </div>
+
+    <hr class="esper-hr"/>
+    <div class="esper-clearfix esper-workflow-gap esper-section">
+      <select #workflowSelect class="esper-select esper-select-fullwidth" disabled>
+        <option value="header">Select workflow...</option>
+      </select>
+    </div>
+    <div #workflowSection class="esper-section esper-hide">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span class="esper-bold" style="float:left">Workflow</span>
+      </div>
+      <div class="esper-section-container esper-section-notes">
+        <p #workflowNotes class="esper-text-notes"/>
+        <div class="esper-clearfix esper-workflow-gap">
+          <select #stepSelect class="esper-select esper-select-fullwidth">
+            <option value="header">Select step...</option>
+          </select>
+        </div>
+        <p #stepNotes class="esper-hide esper-text-notes"/>
+        <div #checklistDiv class="esper-hide">
+          <span class="esper-subheading">Checklist</span>
+          <div #checklist class="esper-workflow-checklist"/>
+        </div>
       </div>
     </div>
   </div>
@@ -773,17 +759,6 @@ module Esper.TaskTab {
       }
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
-
-    showTaskProgress.click(function() {
-      Sidebar.toggleList(taskProgressContainer);
-      if (showTaskProgress.text() === "Hide") {
-        showTaskProgress.text("Show");
-        taskProgressHeader.removeClass("esper-open");
-      } else {
-        showTaskProgress.text("Hide");
-        taskProgressHeader.addClass("esper-open");
-      }
-    });
 
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
