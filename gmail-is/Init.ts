@@ -41,7 +41,6 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    ComposeControls.init();
     Menu.init();
     if (Login.loggedIn()) {
       if (Login.getLoginInfo === undefined) {
@@ -132,6 +131,7 @@ module Esper.Init {
       Gmail.init();
       CurrentThread.preInit();
       esperRootUrl = $("#esper-script").attr("data-root-url");
+      ComposeControls.init();
       alreadyInitialized = true;
       TaskTab.init();
       listenForMessages();
