@@ -293,12 +293,15 @@ module Esper.TaskTab {
   }
 
   // Search for matching tasks and display the results in a dropdown
+  var lastQuery = "";
   function displaySearchResults(taskTitle, dropdown, results, actions,
                                 team: ApiT.Team,
                                 threadId: string,
                                 query,
                                 taskTab: TaskTabView,
                                 userTabContent : UserTab.UserTabView) {
+    if (lastQuery === query && dropdown.hasClass("esper-open")) return;
+    lastQuery = query;
     var teamid = team.teamid;
     Api.searchTasks(teamid, query).done(function(response) {
       results.find(".esper-li").remove();
@@ -314,7 +317,7 @@ module Esper.TaskTab {
         noResults.remove();
         var newTaskId = result.task_data.taskid;
         var title = result.task_data.task_title;
-        $("<li class='esper-li'>" + title + "</li>")
+        $("<li class='esper-li'>Link to " + title + "</li>")
           .appendTo(results)
           .click(function() {
             var currentTask = CurrentThread.task.get();
@@ -386,6 +389,17 @@ module Esper.TaskTab {
       var currentTask = CurrentThread.task.get();
       if (currentTask !== undefined) {
         addArchiveOption(currentTask);
+      }
+
+      var test = results.find(".esper-li").not(".esper-disabled");
+      if (test.length) {
+        test.first().addClass("selected");
+        actions.removeClass("active");
+        results.addClass("active");
+      } else {
+        actions.find(".esper-li").first().addClass("selected");
+        results.removeClass("active");
+        actions.addClass("active");
       }
 
       dropdown.addClass("esper-open");
@@ -851,13 +865,41 @@ module Esper.TaskTab {
         });
         taskTitle.keydown(function(pressed) {
           var name = taskTitle.val();
-          var isEnterKey = pressed.which === 13;
-          if (isEnterKey) {
+          if (pressed.keyCode == 13) { //Enter
             pressed.stopPropagation();
             taskTitle.blur();
             Gmail.threadContainer().focus();
             createOrRenameTask(taskTitle, team.teamid, threadId,
                                taskTabView, name, userTabContent);
+          } else if (pressed.keyCode == 40) { //Down
+            pressed.preventDefault();
+            var localNext = $(".selected").next();
+            var sectionNext = $(".active").nextAll(".esper-dropdown-section:first");
+            if (localNext.length) {
+              $(".selected").removeClass("selected");
+              localNext.addClass("selected");
+            } else if (sectionNext.length) {
+              $(".active").removeClass("active");
+              sectionNext.addClass("active");
+              $(".selected").removeClass("selected");
+              sectionNext.find(".esper-li").first().addClass("selected");
+            }
+          } else if (pressed.keyCode == 38) { //Up
+            pressed.preventDefault();
+            var localPrev = $(".selected").prev();
+            var sectionPrev = $(".active").prevAll(".esper-dropdown-section:first");
+            if (localPrev.length) {
+              $(".selected").removeClass("selected");
+              localPrev.addClass("selected");
+            } else if (sectionPrev.length) {
+              var disabledItems = sectionPrev.find(".esper-li").not(".esper-disabled");
+              if (!(disabledItems.length)) {
+                $(".active").removeClass("active");
+                sectionPrev.addClass("active");
+                $(".selected").removeClass("selected");
+                disabledItems.last().addClass("selected");
+              }
+            }
           }
         });
       });
