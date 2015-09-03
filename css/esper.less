@@ -114,20 +114,25 @@ ul.esper-ul {
   padding: 0px;
 }
 
-ul.esper-drop-ul {
-  display: none;
+ul.esper-ul-results, ul.esper-drop-ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
   background: white;
-  border: 1px solid @google_border_gray;
-  border-radius: 3px;
-  webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
   .esper-drop-ul-divider {
     height: 1px;
     margin: 0 10px;
     background: @gray_20;
   }
+}
+
+ul.esper-drop-ul {
+  display: none;
+  border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .esper-dropdown-section { padding: 7px 0; }
@@ -1815,6 +1820,22 @@ ul.esper-ev-dropdown {
   border-radius: 5px;
   -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
           box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+
+  &.esper-modal-flexbox {
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    > .esper-modal-content {
+      flex-shrink: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
 }
 
 .esper-modal-header {
@@ -1930,6 +1951,8 @@ ul.esper-ev-dropdown {
 
 .esper-search-modal {
   .esper-modal;
+  top: 10%;
+  max-height: 80%;
   @search_width: 480px;
   width: @search_width;
   margin-left: -@search_width/2;
@@ -1942,12 +1965,7 @@ ul.esper-ev-dropdown {
   padding-left: 30px;
 }
 
-.esper-ev-search-dropdown {
-  z-index: 2;
-  position: absolute;
-  width: calc(~"100% - 20px");
-  margin: 0;
-  box-sizing: border-box;
+.esper-ev-search-results {
   .esper-no-results {
     padding: 20px 10px;
     color: @gray_20;

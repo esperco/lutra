@@ -129,14 +129,14 @@ module Esper.CalSearch {
                        eventsTab: TaskTab.TaskTabView) {
     Util.afterTyping(searchView.search, 250, function() {
       searchView.results.find("li").remove();
-      if (searchView.search.val() === "") {
+      if (searchView.search.val().trim() === "") {
+        searchView.resultsDropdown.hide();
         if (searchView.resultsDropdown.hasClass("esper-open")) {
-          searchView.resultsDropdown.toggle();
           searchView.resultsDropdown.removeClass("esper-open");
         }
       } else {
+        searchView.resultsDropdown.show();
         if (!(searchView.resultsDropdown.hasClass("esper-open"))) {
-          searchView.resultsDropdown.toggle();
           searchView.resultsDropdown.addClass("esper-open");
         }
         searchView.spinner.show();
@@ -189,14 +189,13 @@ module Esper.CalSearch {
                                   eventsTab: TaskTab.TaskTabView) {
 '''
 <div #view class="esper-modal-bg">
-  <div #modal class="esper-search-modal">
+  <div #modal class="esper-search-modal esper-modal-flexbox">
     <div class="esper-modal-header">Link to existing event</div>
     <div class="esper-modal-content">
       <input #search
         type="text" class="esper-input esper-search-modal-input"
         placeholder="Search calendar"/>
-      <ul #resultsDropdown
-          class="esper-drop-ul esper-dropdown-btn esper-ev-search-dropdown">
+      <ul #resultsDropdown class="esper-ev-search-results esper-ul-results">
         <div #spinner class="esper-spinner esper-search-spinner"/>
         <div #results>
           <div #noResults class="esper-no-results esper-click-safe">
