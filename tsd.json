@@ -55,6 +55,9 @@
     },
     "page/page.d.ts": {
       "commit": "68374669bf0ef6eb20d5aff2ea4d96dca83e4621"
+    },
+    "FileSaver/FileSaver.d.ts": {
+      "commit": "212584a623b2315947eabb1100423396daf9031a"
     }
   }
 }
