@@ -484,7 +484,7 @@ module Onboarding {
 </div>
 '''
     var paymentRefs = AccountTab.getPaymentForm(
-      Login.getTeam(), Plan.basic, function(err) {
+      Login.getTeam(), Plan.canceled, function(err) {
         if (err) {
           unmakeBusy(primaryBtn);
         } else {

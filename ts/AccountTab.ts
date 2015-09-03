@@ -491,13 +491,12 @@ module AccountTab {
   function viewOfMembershipOption(planId: string) {
 '''
 <div #view>
-  <div #name class="membership-name"/>
-  <div #price class="membership-price"/>
-  <div #scheduling class="membership-scheduling"/>
-  <div class="membership-availability">24/7 Availability</div>
+  <div class="membership-name" #name />
+  <div #price />
+  <div #hours />
+  <div>24/7 Availability</div>
   <div #responseWindow class="membership-response-window"/>
-  <div #adminTasks class="membership-admin-tasks"/>
-  <div #workflows class="membership-workflows"/>
+  <div #overage />
   <div #checkContainer/>
 </div>
 '''
@@ -507,37 +506,26 @@ module AccountTab {
 
     name.text(Plan.classNameOfPlan(planId));
     switch(Plan.classOfPlan(planId)) {
-      case "basic":
-        name.text("Flexible");
-        price.text("No monthly charge");
-        scheduling.html("$10 / meeting");
-        adminTasks.text("---");
-        responseWindow.text("Same day response");
-        workflows.html("---");
-        break;
       case "lo":
         name.text("Silver");
         price.text("$299 / month");
-        scheduling.html("50 meetings, $9/extra");
-        adminTasks.text("---");
+        hours.text("10 hours of service");
         responseWindow.text("< 2 hour response");
-        workflows.html("---");
+        overage.text("Additional hours $35 / hour")
         break;
       case "med":
         name.text("Gold");
         price.text("$699 / month");
-        scheduling.html("100 meetings, $9/extra");
-        adminTasks.text("10 hours of admin tasks");
+        hours.text("25 hours of service");
         responseWindow.text("< 1 hour response");
-        workflows.html("2 scheduling workflows");
+        overage.text("Additional hours $32 / hour")
         break;
       case "hi":
         name.text("Executive");
         price.text("$1499 / month");
-        scheduling.html("<strong>Unlimited scheduling</strong>");
-        adminTasks.text("20 hours of admin tasks");
+        hours.text("58 hours of service");
         responseWindow.text("< 1 hour response");
-        workflows.html("2 scheduling workflows");
+        overage.text("Additional hours $30 / hour")
         break;
       case "employee":
         price.text("Free");
@@ -558,35 +546,18 @@ module AccountTab {
       </div>
       <div #content>
         <div class="membership-options row clearfix">
-          <div class="col-sm-3">
-            <div #planBasic class="membership-option"/>
-          </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <div #planLo class="membership-option"/>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <div #planMed class="membership-option"/>
           </div>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <div #planHi class="membership-option"/>
           </div>
           <div #planXWrapper class="col-sm-12 hide">
             <div #planX class="membership-option"/>
           </div>
-        </div>
-        <div #subtext1 class="membership-modal-subtext">
-          Additional admin (non-scheduling-related) tasks, are billed at
-          $40 / hour for the Flexible Membership,<br  />
-          $35 / hour for the Silver Membership, and
-          $30 / hour for the Gold and Executive Memberships.
-        </div>
-        <div #subtext2 class="membership-modal-subtext">
-          Additional workflows are billed at $99 per scheduling workflow
-          and $199 per custom workflow for all plans.
-        </div>
-        <div #subtext3 class="membership-modal-subtext">
-          See <a href="http://esper.com/pricing">our pricing page</a> for more
-          detail.
         </div>
         <div class="membership-modal-check">
           <input id="no-esper" #noEsper type="checkbox" />
@@ -619,7 +590,6 @@ module AccountTab {
 
     var teamid = team.teamid;
     var planElmPairs = [
-      { elm: planBasic, planId: Plan.basic },
       { elm: planLo, planId: Plan.lo },
       { elm: planMed, planId: Plan.med },
       { elm: planHi, planId: Plan.hi },
@@ -738,9 +708,6 @@ module AccountTab {
 
           // Update noEsperPrice text
           switch (pair.planId) { // Use the base plan, not the plus
-            case Plan.basic:
-              noEsperPrice.text("for $99 / month");
-              break;
             case Plan.lo:
               noEsperPrice.text("for $49 / month");
               break;
