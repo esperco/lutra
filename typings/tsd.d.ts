@@ -16,4 +16,3 @@
 /// <reference path="react/react-addons-global.d.ts" />
 /// <reference path="eventemitter3/eventemitter3.d.ts" />
 /// <reference path="page/page.d.ts" />
-/// <reference path="FileSaver/FileSaver.d.ts" />
