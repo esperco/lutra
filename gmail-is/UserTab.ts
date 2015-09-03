@@ -887,7 +887,7 @@ module Esper.UserTab {
 
   export function viewOfUserTab(team: ApiT.Team): UserTabView {
 '''
-<div #view>
+<div #view class="esper-tab-flexbox">
   <div #user class="esper-tab-header"/>
   <div class="esper-tab-overflow">
     <div #preferencesSpinner class="esper-events-list-loading">
