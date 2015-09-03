@@ -3,7 +3,6 @@ module.exports = function(gulp) {
 
   var _             = require('lodash'),
       cached        = require('gulp-cached'),
-      concat        = require('gulp-concat'),
       exec          = require('gulp-exec'),
       filter        = require('gulp-filter'),
       gutil         = require('gulp-util'),
@@ -11,7 +10,6 @@ module.exports = function(gulp) {
       remember      = require('gulp-remember'),
       sourcemaps    = require('gulp-sourcemaps'),
       ts            = require('gulp-typescript'),
-      tsRef         = require('gulp-typescript-ref'),
       uglify        = require('gulp-uglify');
 
   var exports = {};
@@ -66,15 +64,16 @@ module.exports = function(gulp) {
             .pipe(remember(buildName + " oblivion"));
         }
 
+        var tsRefFilter;
         if (config.production && proj.prodIn) {
-          ret = ret.pipe(tsRef(proj.prodIn));
+          tsRefFilter = {referencedFrom: proj.prodIn};
         } else if (proj.devIn) {
-          ret = ret.pipe(tsRef(proj.devIn));
+          tsRefFilter = {referencedFrom: proj.devIn};
         }
 
         ret = ret
           .pipe(sourcemaps.init())
-          .pipe(ts(tsProject));
+          .pipe(ts(tsProject, tsRefFilter));
 
         if (config.production) {
           // loadMaps = true so we can load tsify/browserify sourcemaps
