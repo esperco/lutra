@@ -61,5 +61,5 @@ Esper = (function(esperObj) {
 
 if (Esper._.isFunction(Esper.onVendorReady)) {
   Esper.onVendorReady();
-  Esper.vendorReady = true;
 }
+Esper.vendorReady = true;
