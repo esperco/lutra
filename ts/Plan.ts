@@ -3,7 +3,6 @@
 */
 module Plan {
   export var canceled = "Canceled_20150812";
-  export var basic = "Flexible_20150812";
   export var lo = "Silver_20150812";
   export var med = "Gold_20150812";
   export var hi = "Executive_20150812";
@@ -13,7 +12,6 @@ module Plan {
   // If no plusPlan, then treat the "plus" version of a plan as identical
   // to the non-plus version
   export var plusPlans: {[index: string]: string} = {};
-  plusPlans[basic] = "Flexible_Plus_20150812";
   plusPlans[lo] = "Silver_Plus_20150812";
 
   /* Is this a "plus" plan? */
@@ -29,7 +27,6 @@ module Plan {
 
   /* Class is "lo" for plans matching lo and loPlus */
   let planMap: {[index: string]: string} = {};
-  planMap[basic] = "basic";
   planMap[lo] = "lo";
   planMap[med] = "med";
   planMap[hi] = "hi";
@@ -46,7 +43,6 @@ module Plan {
 
   /* Human readable names for plans */
   let nameMap = {
-    basic: "Flexible",
     lo: "Silver",
     med: "Gold",
     hi: "Executive",
@@ -58,7 +54,7 @@ module Plan {
   }
 
   /* Is this an active plan? */
-  var activePlans = [basic, lo, med, hi, employee];
+  var activePlans = [lo, med, hi, employee];
   for (var planClass in plusPlans) {
     if (plusPlans.hasOwnProperty(planClass)) {
       activePlans.push(plusPlans[planClass]);
@@ -82,20 +78,20 @@ module Plan {
   // Add isActive test
   export var tests = [
     Test.expect(
-      "classOfPlan - basic",
+      "classOfPlan - lo",
       function() {
-        return classOfPlan(basic);
+        return classOfPlan(lo);
       },
       null,
-      "basic"
+      "lo"
     ),
     Test.expect(
-      "classOfPlan - basic plus",
+      "classOfPlan - lo plus",
       function() {
-        return classOfPlan(plusPlans[basic]);
+        return classOfPlan(plusPlans[lo]);
       },
       null,
-      "basic"
+      "lo"
     ),
     Test.expect(
       "classNameOfPlan - lo",
@@ -116,7 +112,7 @@ module Plan {
     Test.expect(
       "isActive",
       function() {
-        return isActive(basic) && !isActive("something_else");
+        return isActive(lo) && !isActive("something_else");
       },
       null,
       true
