@@ -1,7 +1,7 @@
 module Esper.TaskTab {
 
-  var taskLabelCreate = "Create Task";
-  var taskLabelExists = "Task Name";
+  var taskLabelCreate = "Create or Link to Other Task";
+  var taskLabelExists = "Edit or Link to Other Task";
 
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedThreadsAction : () => void;
