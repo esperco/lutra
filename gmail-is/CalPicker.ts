@@ -981,10 +981,10 @@ module Esper.CalPicker {
           confirmEvents(view, closeView, picker, team, task, threadId);
         });
 
-        Gmail.threadContainer().append(view);
+        InThreadControls.setEventControlContainer(view);
         picker.render();
         Sidebar.selectUserTab();
-        Gmail.scrollToMeetingOffers();
+        Gmail.scrollToEventControl();
       },
       none : function () {
         window.alert("Cannot create cal picker because no team is currently detected.");

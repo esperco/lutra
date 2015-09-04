@@ -438,7 +438,7 @@ module Esper.EventControls {
    */
   export function insertAfterThread(event) {
     CurrentThread.getTeamAndPreferences().done(function(prefs) {
-      Gmail.threadContainer().after(eventEditWidget(event, prefs));
+      InThreadControls.setEventControlContainer(eventEditWidget(event, prefs));
 
       // fix mysteriously appearing padding at end of thread:
       Gmail.threadFooter().css("padding-bottom", "10px");

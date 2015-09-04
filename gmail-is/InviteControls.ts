@@ -660,7 +660,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
             slideWidget =
               Slides.create<InviteState>(startState, slides, controls);
-            Gmail.threadContainer().after(slideWidget);
+            InThreadControls.setEventControlContainer(slideWidget);
           } else {
             function wrap(slideFn : (state : InviteState, duplicate? : boolean, 
                                      execEvent? : boolean) => Slides.Slide<InviteState>,
@@ -721,7 +721,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
             slideWidget =
               Slides.create<DualState>(dualStartState, dualSlides, controls);
-            Gmail.threadContainer().after(slideWidget);
+            InThreadControls.setEventControlContainer(slideWidget);
           }
         },
         none : function () {

@@ -195,13 +195,13 @@ module Esper.EventWidget {
 
     editEvent.click(function() {
       EventControls.insertAfterThread(e);
-      Gmail.scrollToInviteWidget();
+      Gmail.scrollToEventControl();
     });
 
     inviteGuests.click(function() {
       CurrentThread.withPreferences(function(preferences) {
         FinalizeEvent.inviteGuests(e, preferences);
-        Gmail.scrollToInviteWidget();
+        Gmail.scrollToEventControl();
       });
     });
 

@@ -342,6 +342,14 @@ object.esper-svg { pointer-events: none; }
   }
 }
 
+.esper-remove-button, .esper-remove-btn {
+  .esper-btn;
+  .esper-btn-secondary;
+  &::before {
+    content: "\03a7";
+  }
+}
+
 .esper-btn-safe {
   color: white;
   border: 1px solid #33b92f;
@@ -1692,8 +1700,33 @@ ul.esper-ev-dropdown {
 /** The in-thread controls which go right after the thread messages. */
 .esper-in-thread-controls {
   margin-top : 8px;
-  padding-left : 52px;
+  position: relative;
+  z-index: 1; // To fix issue with overlapping with sidebar
+}
+
+// Align with right edge with reply / forward (pre-click)
+.esper-task-notes-container {
   padding-right : 14px;
+}
+
+.esper-event-control-container {
+  border-top: 1px solid @google_border_gray;
+
+  &:empty {
+    border-top: 0;
+  }
+}
+
+.esper-compose-hashtags-container {
+  margin-bottom: 15px;
+
+  // Align with edges of actual compose box
+  padding-left: 35px;
+  padding-right: 9px;
+
+  &:empty {
+    margin-bottom: 0;
+  }
 }
 
 .esper-email-date-select {
@@ -1925,7 +1958,12 @@ ul.esper-ev-dropdown {
 .esper-description-text {
   width: 100%;
   font-size: 13px;
-  margin-bottom: 45px;
+  padding: 15px;
+}
+
+textarea.esper-description-text {
+  resize: vertical;
+  height: 200px;
 }
 
 .esper-reminder-text {
@@ -2036,19 +2074,20 @@ ul.esper-ev-dropdown {
 
 .esper-ev-modal-side-by-side {
   display : inline-block;
-  width : 40%;
+  width : 38%;
+  padding: 0;
+  margin: 0;
 
   &:first-child {
-    margin-left : 95px;
-  }
-
-  div {
-    display : inline-block;
+    margin-left : 20%;
   }
 
   div:first-child {
-    position : relative;
-    bottom : 10px;
+    padding-bottom: 10px;
+  }
+
+  div select {
+    width: 100%;
   }
 }
 
@@ -2071,6 +2110,10 @@ ul.esper-ev-dropdown {
     list-style: none;
     li { padding-top: 9px; }
     input[type="checkbox"] { margin-right: 4px; }
+  }
+
+  textarea {
+    padding: 9px;
   }
 }
 
@@ -2269,6 +2312,33 @@ ul.esper-ev-dropdown {
     transform: scale(1.0);
     -webkit-transform: scale(1.0);
     opacity: 0;
+  }
+}
+
+
+/** Flexbox input boxes -- simple box for having everything stay static
+    with except certain elements */
+.esper-flex-row {
+  display: flex;
+
+  > * {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  > .esper-flex-expand {
+    flex-grow: 1;
+  }
+
+  .esper-left-label {
+    min-width: 10%;
+    padding: 9px;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .esper-remove-button, .esper-remove-btn {
+    margin-left: 9px;
   }
 }
 

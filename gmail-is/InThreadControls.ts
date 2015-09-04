@@ -3,16 +3,59 @@
  *  to be integrated into the assistant's main flow.
  */
 module Esper.InThreadControls {
-  export function refreshTaskNotes() {
+  export function getContainer() {
+    var jQ = $(".esper-in-thread-controls")
+    if (jQ.length === 0) {
 '''
 <div #controls class="esper-in-thread-controls">
+  <div class="esper-in-thread-control esper-compose-hashtags-container" />
+  <div class="esper-in-thread-control esper-task-notes-container" />
+  <div class="esper-in-thread-control esper-event-control-container" />
 </div>
 '''
-    removeControls();
+      Gmail.threadMessages().after(controls);
+      return controls;
+    }
+    // Already exists, use this
+    return jQ;
+  }
 
-    Gmail.threadMessages().after(controls);
+  // Stick all event controls in here -- DON'T APPEND THINGS IN HERE. Use
+  // setEventControlContainer to empty out existing things first.
+  export function getEventControlContainer() {
+    return getContainer().find('.esper-event-control-container');
+  }
 
-    controls.append(taskNotes());
+  // Update the event control container -- this empties the container first
+  // to prevent infinite appending of random event controls
+  export function setEventControlContainer(view: JQuery) {
+    return getEventControlContainer()
+      .empty()
+      .append(view);
+  }
+
+  // Stick the hash-tag / ask an exec thing in here -- DON'T APPEND THINGS IN
+  // here. Use setHashTagContainer to empty out existing things first
+  export function getHashTagContainer() {
+    return getContainer().find('.esper-compose-hashtags-container');
+  }
+
+  // Update the hash tag container after emptying first
+  export function setHashTagContainer(view: JQuery) {
+    return getHashTagContainer()
+      .empty()
+      .append(view);
+  }
+
+  // Get the task notes container
+  export function getTaskNotesContainer() {
+    return getContainer().find('.esper-task-notes-container');
+  }
+
+  export function refreshTaskNotes() {
+    return getTaskNotesContainer()
+      .empty()
+      .append(taskNotes());
   }
 
   CurrentThread.currentTeam.watch(function () {
@@ -24,9 +67,14 @@ module Esper.InThreadControls {
     }
   });
 
-    // Remove any old instances of the controls:
+  // Remove any old instances of the controls:
   function removeControls () {
     $(".esper-in-thread-controls").remove();
+  }
+
+  // Return a specific after-control
+  function update(view) {
+
   }
 
   // The id for the notes watcher so that only one exists at a time.
