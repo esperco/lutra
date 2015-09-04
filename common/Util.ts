@@ -125,8 +125,9 @@ module Esper.Util {
       }
       var lastPressed0 = lastPressed;
       window.setTimeout(function() {
-        var isEnterKey = event.which === 13;
-        if (lastPressed0 === lastPressed && !isEnterKey) func();
+        var isEnterKey = (event.which === 13 || event.keyCode === 13);
+        var isEscKey = (event.which === 27 || event.keyCode === 27);
+        if (lastPressed0 === lastPressed && !isEnterKey && !isEscKey) func();
       }, delayMs);
     }
 

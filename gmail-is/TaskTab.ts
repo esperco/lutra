@@ -874,7 +874,7 @@ module Esper.TaskTab {
             Gmail.threadContainer().focus();
             $(".esper-dropdown-section>li.selected").click();
 
-          } else if (pressed.keyCode == 40) { //Down
+          } else if (pressed.keyCode == 40) { // Down
             pressed.preventDefault();
             var localNext = $(".esper-dropdown-section>li.selected").next();
             var sectionNext = $(".active").nextAll(".esper-dropdown-section:first");
@@ -888,7 +888,7 @@ module Esper.TaskTab {
               sectionNext.find(".esper-li").first().addClass("selected");
             }
 
-          } else if (pressed.keyCode == 38) { //Up
+          } else if (pressed.keyCode == 38) { // Up
             pressed.preventDefault();
             var localPrev = $(".esper-dropdown-section>li.selected").prev();
             var sectionPrev = $(".active").prevAll(".esper-dropdown-section:first");
@@ -904,6 +904,17 @@ module Esper.TaskTab {
                 notDisabled.last().addClass("selected");
               }
             }
+          } else if (pressed.keyCode == 27) { // Esc
+            pressed.stopPropagation();
+            var currentTask = CurrentThread.task.get();
+            if (currentTask) {
+              taskTitle.val(currentTask.task_title);
+            } else {
+              taskTitle.val("");
+            }
+            taskTitle.blur();
+            Gmail.threadContainer().focus();
+            Sidebar.dismissDropdowns();
           }
         });
       });
