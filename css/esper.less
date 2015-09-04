@@ -1692,8 +1692,21 @@ ul.esper-ev-dropdown {
 /** The in-thread controls which go right after the thread messages. */
 .esper-in-thread-controls {
   margin-top : 8px;
-  padding-left : 52px;
+  position: relative;
+  z-index: 1; // To fix issue with overlapping with sidebar
+}
+
+// Align with right edge with reply / forward
+.esper-task-notes-container {
   padding-right : 14px;
+}
+
+.esper-event-control-container {
+  border-top: 1px solid @google_border_gray;
+
+  &:empty {
+    border-top: 0;
+  }
 }
 
 .esper-email-date-select {

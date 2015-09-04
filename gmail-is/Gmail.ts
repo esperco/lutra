@@ -187,24 +187,17 @@ module Esper.Gmail {
     }, time);
   }
 
-  /** Scrolls to the bottom of the thread to show the invite guests
-   *  widget.
+  /** Scrolls to the bottom of the thread to show the current event widget
    */
-  export function scrollToInviteWidget(time?: number) {
+  export function scrollToEventControl(time?: number) {
     time = time || 500;
 
+    var threadContainerTop = $("div.Tm").scrollTop() +
+      threadContainer().position().top;
+    var scrollTo = InThreadControls.getEventControlContainer().offset().top -
+      threadContainer().offset().top + threadContainerTop;
     $("div.Tm").animate({
-      scrollTop : threadContainer().height() + 50 // extra padding
-    }, time);
-  }
-
-  export function scrollToMeetingOffers(time?: number) {
-    time = time || 500;
-    var calHeight = (window.innerHeight * 0.9) - 198;
-    var extraPadding = 225; // interface above calendar grid
-
-    $("div.Tm").animate({
-      scrollTop : threadContainer().height() - calHeight - extraPadding
+      scrollTop : scrollTo
     }, time);
   }
 
