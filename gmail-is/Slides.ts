@@ -86,13 +86,15 @@ module Esper.Slides {
 
     function slideForward(previous, next) {
       previous.parent().css({
-        "overflow" : "hidden"
+        "overflow" : "hidden",
+        "height"   : next.outerHeight(true)
       });
       previous.animate({left : -animation.width}, animation.time);
 
+      var previousTop = parseInt(previous.css("top")) || 0;
       next.css({
-        "left"       : animation.width,
-        "margin-top" : (-previous.height()) + "px"
+        "left": animation.width,
+        "top" : (previousTop - previous.outerHeight(true)) + "px"
       });
 
       previous.after(next);

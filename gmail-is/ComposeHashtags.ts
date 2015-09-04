@@ -2,10 +2,15 @@ module Esper.ComposeHashtags {
 
   function hashtagView(textViews) {
 '''
-  <div #view class="esper-ev-modal-row esper-clearfix">
-    * <input #text class="esper-input"/> <button #remove>X</button>
+  <div #view class="esper-ev-modal-row esper-clearfix esper-flex-row ">
+    <label #label class="esper-left-label">Choice</label>
+    <input #text class="esper-input esper-flex-expand"/>
+    <button class="esper-remove-btn" #remove />
   </div>
 '''
+    var randomId = Util.randomString();
+    text.attr("id", randomId);
+    label.attr("for", randomId);
     textViews.push(text);
     remove.click(function () {
       textViews.splice(textViews.indexOf(text), 1);
@@ -35,11 +40,16 @@ module Esper.ComposeHashtags {
     <div class="esper-modal-header">
       <div #title class="esper-modal-title">Ask Exec</div>
     </div>
-    <div class="esper-ev-modal-row esper-clearfix">
-      Question: <input #question class="esper-input"/>
+    <div class="esper-modal-content">
+      <div class="esper-ev-modal-row esper-clearfix esper-flex-row">
+        <label class="esper-left-label"
+               for="esper-ask-exec-question">Question</label>
+        <input #question id="esper-ask-exec-question"
+               class="esper-input esper-flex-expand"/>
+      </div>
+      <div #hashtags class="esper-calendar-grid"/>
+      <button #addTag class="esper-btn esper-btn-secondary">Add Choice</button>
     </div>
-    <div #hashtags class="esper-calendar-grid"/>
-    <button #addTag class="esper-btn esper-btn-secondary">Add</button>
     <div class="esper-modal-footer esper-clearfix">
       <button #cancel class="esper-btn esper-btn-secondary">
         Cancel

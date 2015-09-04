@@ -179,25 +179,22 @@ module Esper.Gmail {
 
   /** Scrolls the thread to show the bottom-most compose text box. */
   export function scrollToCompose(time?: number) {
-    time = time || 500;
-
-    // height of the text box ≈ 225
-    $("div.Tm").animate({
-      scrollTop : threadContainer().height() - 225
-    }, time);
+    scrollToJQElm(InThreadControls.getHashTagContainer(), time);
   }
 
   /** Scrolls to the bottom of the thread to show the current event widget
    */
   export function scrollToEventControl(time?: number) {
+    scrollToJQElm(InThreadControls.getEventControlContainer(), time);
+  }
+
+  /** Scrolls to a jQuery-wrapped element */
+  export function scrollToJQElm(elm: JQuery, time?: number): void {
     time = time || 500;
 
-    var threadContainerTop = $("div.Tm").scrollTop() +
-      threadContainer().position().top;
-    var scrollTo = InThreadControls.getEventControlContainer().offset().top -
-      threadContainer().offset().top + threadContainerTop;
     $("div.Tm").animate({
-      scrollTop : scrollTo
+      scrollTop : elm.offset().top -
+        $("div.Tm").children().first().offset().top
     }, time);
   }
 

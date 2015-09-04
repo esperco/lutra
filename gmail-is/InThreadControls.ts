@@ -8,6 +8,7 @@ module Esper.InThreadControls {
     if (jQ.length === 0) {
 '''
 <div #controls class="esper-in-thread-controls">
+  <div class="esper-in-thread-control esper-compose-hashtags-container" />
   <div class="esper-in-thread-control esper-task-notes-container" />
   <div class="esper-in-thread-control esper-event-control-container" />
 </div>
@@ -29,6 +30,19 @@ module Esper.InThreadControls {
   // to prevent infinite appending of random event controls
   export function setEventControlContainer(view: JQuery) {
     return getEventControlContainer()
+      .empty()
+      .append(view);
+  }
+
+  // Stick the hash-tag / ask an exec thing in here -- DON'T APPEND THINGS IN
+  // here. Use setHashTagContainer to empty out existing things first
+  export function getHashTagContainer() {
+    return getContainer().find('.esper-compose-hashtags-container');
+  }
+
+  // Update the hash tag container after emptying first
+  export function setHashTagContainer(view: JQuery) {
+    return getHashTagContainer()
       .empty()
       .append(view);
   }

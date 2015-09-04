@@ -278,7 +278,8 @@ module Esper.ComposeControls {
         });
 
         askButton.click(function() {
-          Gmail.threadContainer().append(ComposeHashtags.view(composeControls));
+          InThreadControls.setHashTagContainer(
+            ComposeHashtags.view(composeControls));
           Gmail.scrollToCompose();
         });
 

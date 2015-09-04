@@ -581,7 +581,8 @@ module Esper.TaskTab {
   function meetingTypeDropdown(taskTitle : JQuery,
                                taskCancel : JQuery) : JQuery {
 '''
-<select #meetingType class="esper-meeting-type esper-select">
+<select #meetingType
+        class="esper-meeting-type esper-select esper-select-fullwidth">
   <option value="header">Select meeting type...</option>
   <option #phone value="Phone_call">Phone call</option>
   <option #video value="Video_call">Video call</option>
@@ -623,10 +624,12 @@ module Esper.TaskTab {
 <div #view class="esper-tab-flexbox">
   <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
-    <input #taskTitle type="text" size="24"
-           class="esper-input esper-task-name"/>
-    <button #taskCancel
-            class="esper-task-cancel esper-btn-secondary">✕</button>
+    <div class="esper-flex-row">
+      <input #taskTitle type="text" size="24"
+             class="esper-input esper-task-name esper-flex-expand"/>
+      <button #taskCancel
+              class="esper-task-cancel esper-btn-secondary esper-remove-btn" />
+    </div>
     <ul #taskSearchDropdown
         class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
       <div #taskSearchResults class="esper-dropdown-section"/>
