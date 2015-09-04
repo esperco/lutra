@@ -317,7 +317,7 @@ module Esper.TaskTab {
         noResults.remove();
         var newTaskId = result.task_data.taskid;
         var title = result.task_data.task_title;
-        $("<li class='esper-li'>Link to " + title + "</li>")
+        $("<li class='esper-li dropdown'>Link to " + title + "</li>")
           .appendTo(results)
           .click(function() {
             var currentTask = CurrentThread.task.get();
@@ -349,7 +349,7 @@ module Esper.TaskTab {
           "Rename task as"
         : "Create a new task named";
       var rename =
-        $("<li class='esper-li'/>")
+        $("<li class='esper-li dropdown'/>")
           .append($("<span>" + renameLabel + " </span>"))
           .append($("<span class='esper-bold'>" + query + "</span>"));
       rename
@@ -361,7 +361,7 @@ module Esper.TaskTab {
 
       function addArchiveOption(task) {
 '''
-<li #li class="esper-li"></li>
+<li #li class="esper-li dropdown"></li>
 '''
         var apiCall;
         var finalState = ! task.task_archived;
@@ -391,9 +391,9 @@ module Esper.TaskTab {
         addArchiveOption(currentTask);
       }
 
-      var test = results.find(".esper-li").not(".esper-disabled");
-      if (test.length) {
-        test.first().addClass("selected");
+      var notDisabled = results.find(".esper-li").not(".esper-disabled");
+      if (notDisabled.length) {
+        notDisabled.first().addClass("selected");
         actions.removeClass("active");
         results.addClass("active");
       } else {
@@ -869,8 +869,8 @@ module Esper.TaskTab {
             pressed.stopPropagation();
             taskTitle.blur();
             Gmail.threadContainer().focus();
-            createOrRenameTask(taskTitle, team.teamid, threadId,
-                               taskTabView, name, userTabContent);
+            $(".selected").click();
+
           } else if (pressed.keyCode == 40) { //Down
             pressed.preventDefault();
             var localNext = $(".selected").next();
@@ -884,6 +884,7 @@ module Esper.TaskTab {
               $(".selected").removeClass("selected");
               sectionNext.find(".esper-li").first().addClass("selected");
             }
+
           } else if (pressed.keyCode == 38) { //Up
             pressed.preventDefault();
             var localPrev = $(".selected").prev();
@@ -892,12 +893,12 @@ module Esper.TaskTab {
               $(".selected").removeClass("selected");
               localPrev.addClass("selected");
             } else if (sectionPrev.length) {
-              var disabledItems = sectionPrev.find(".esper-li").not(".esper-disabled");
-              if (!(disabledItems.length)) {
+              var notDisabled = sectionPrev.find(".esper-li").not(".esper-disabled");
+              if (notDisabled.length) {
                 $(".active").removeClass("active");
                 sectionPrev.addClass("active");
                 $(".selected").removeClass("selected");
-                disabledItems.last().addClass("selected");
+                notDisabled.last().addClass("selected");
               }
             }
           }

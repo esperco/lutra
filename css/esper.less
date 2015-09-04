@@ -155,9 +155,23 @@ li.esper-li, a.esper-a {
   color: black;
   line-height: 1;
   text-align: left;
-  &:hover, &.selected {
+  &:hover {
     background: @purple;
     color: white;
+  }
+  &.dropdown {
+    &.selected {
+      background: @purple;
+      color: white;
+      &:hover {
+        background: @purple;
+        color: white; 
+      }
+    }
+    &:hover {
+      background: @purple_bg_hover;
+      color: black;
+    }
   }
   &.esper-danger {
     color: @red;
