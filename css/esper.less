@@ -1938,7 +1938,12 @@ ul.esper-ev-dropdown {
 .esper-description-text {
   width: 100%;
   font-size: 13px;
-  margin-bottom: 45px;
+  padding: 15px;
+}
+
+textarea.esper-description-text {
+  resize: vertical;
+  height: 200px;
 }
 
 .esper-reminder-text {
@@ -2049,19 +2054,20 @@ ul.esper-ev-dropdown {
 
 .esper-ev-modal-side-by-side {
   display : inline-block;
-  width : 40%;
+  width : 38%;
+  padding: 0;
+  margin: 0;
 
   &:first-child {
-    margin-left : 95px;
-  }
-
-  div {
-    display : inline-block;
+    margin-left : 20%;
   }
 
   div:first-child {
-    position : relative;
-    bottom : 10px;
+    padding-bottom: 10px;
+  }
+
+  div select {
+    width: 100%;
   }
 }
 
@@ -2084,6 +2090,10 @@ ul.esper-ev-dropdown {
     list-style: none;
     li { padding-top: 9px; }
     input[type="checkbox"] { margin-right: 4px; }
+  }
+
+  textarea {
+    padding: 9px;
   }
 }
 
