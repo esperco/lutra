@@ -869,35 +869,35 @@ module Esper.TaskTab {
             pressed.stopPropagation();
             taskTitle.blur();
             Gmail.threadContainer().focus();
-            $(".selected").click();
+            $(".esper-dropdown-section>li.selected").click();
 
           } else if (pressed.keyCode == 40) { //Down
             pressed.preventDefault();
-            var localNext = $(".selected").next();
+            var localNext = $(".esper-dropdown-section>li.selected").next();
             var sectionNext = $(".active").nextAll(".esper-dropdown-section:first");
             if (localNext.length) {
-              $(".selected").removeClass("selected");
+              $(".esper-dropdown-section>li.selected").removeClass("selected");
               localNext.addClass("selected");
             } else if (sectionNext.length) {
-              $(".active").removeClass("active");
+              $(".esper-drop-ul>.active").removeClass("active");
               sectionNext.addClass("active");
-              $(".selected").removeClass("selected");
+              $(".esper-dropdown-section>li.selected").removeClass("selected");
               sectionNext.find(".esper-li").first().addClass("selected");
             }
 
           } else if (pressed.keyCode == 38) { //Up
             pressed.preventDefault();
-            var localPrev = $(".selected").prev();
+            var localPrev = $(".esper-dropdown-section>li.selected").prev();
             var sectionPrev = $(".active").prevAll(".esper-dropdown-section:first");
             if (localPrev.length) {
-              $(".selected").removeClass("selected");
+              $(".esper-dropdown-section>li.selected").removeClass("selected");
               localPrev.addClass("selected");
             } else if (sectionPrev.length) {
               var notDisabled = sectionPrev.find(".esper-li").not(".esper-disabled");
               if (notDisabled.length) {
-                $(".active").removeClass("active");
+                $(".esper-drop-ul>div.active").removeClass("active");
                 sectionPrev.addClass("active");
-                $(".selected").removeClass("selected");
+                $(".esper-dropdown-section>li.selected").removeClass("selected");
                 notDisabled.last().addClass("selected");
               }
             }
