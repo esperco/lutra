@@ -62,7 +62,7 @@ module.exports = {
   lessOutDir: "css",
 
   // Where to find simple our html pages
-  htmlDir: "html",
+  htmlDirs: ["html"],
 
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
