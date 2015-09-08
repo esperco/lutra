@@ -3,5 +3,6 @@
 /// <reference path="./App.ts"/>
 /// <reference path="./Test.ts"/>
 /// <reference path="./Esper.Test.ts"/>
+/// <reference path="./Bootstrap.Test.ts"/>
 /// <reference path="../marten/ts/Util.Test.ts"/>
 /// <reference path="../marten/ts/Model.Test.ts"/>
