@@ -151,6 +151,12 @@ module Esper.InThreadControls {
       });
     });
 
+    var resizeTextarea = function(el) {
+        var offset = el.offsetHeight - el.clientHeight;
+        $(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+    };
+    taskNotes.on('keyup input click', function() { resizeTextarea(this); });
+
     return container;
   }
 
