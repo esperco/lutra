@@ -1,4 +1,4 @@
-/* Test Flux module */
+/* Test Model.Store */
 
 /// <reference path="./Model.ts"/>
 module Esper.Model {

@@ -6,3 +6,4 @@
 /// <reference path="./Bootstrap.Test.ts"/>
 /// <reference path="../marten/ts/Util.Test.ts"/>
 /// <reference path="../marten/ts/Model.Test.ts"/>
+/// <reference path="../marten/ts/Model.Capped.Test.ts"/>
