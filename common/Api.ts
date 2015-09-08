@@ -503,13 +503,15 @@ module Esper.Api {
 
   export function sendTaskList(teamid,
                                progress: string[],
-                               labels: string[]):
+                               labels: string[],
+                               recipients: string[]):
   JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/tasks/send/" + string(Login.myUid())
       + "/" + string(teamid)
       + "?progress=" + progress.toString()
-      + "&labels=" + labels.toString();
+      + "&labels=" + labels.toString()
+      + "&recipients=" + recipients.toString();
     return JsonHttp.get(url);  
   }
 
