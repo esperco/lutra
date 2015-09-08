@@ -6,6 +6,11 @@
 
   "description": "Link between Gmail and Google Calendar",
 
+  "options_ui": {
+    "page": "html/options.html",
+    "chrome_style": true
+  },
+
   "icons": {
     "16": "img/icon16.png",
     "64": "img/icon64.png",

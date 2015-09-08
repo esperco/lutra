@@ -127,6 +127,32 @@ module.exports = {
 
       // Preprocess with Oblivion?
       oblivion: true
+    },
+
+    // OPTIONS-PAGE //////////////
+
+    { // Project for the options page saving script
+
+      compilerOptions: {
+        noImplicitAny: true,
+        jsx: "react"
+      },
+
+      globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
+              "common/*.{ts,tsx}", "options-page/*.{ts,tsx}"],
+
+      // Entry point for dev -- all files must be referenced directly or
+      // indirectly from these files to be bundled
+      devIn: ["options-page/Main.ts"],
+
+      // Same as devIn, but for production
+      prodIn: ["options-page/Main.ts"],
+
+      // Relative path to bundle from pubDir
+      out: "js/options.js",
+
+      // Preprocess with Oblivion?
+      oblivion: false
     }
   ],
 
@@ -142,7 +168,7 @@ module.exports = {
   lessOutDir: "css",
 
   // Where to find simple our html pages
-  htmlDir: "html",
+  htmlDirs: ["options-page"],
 
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
