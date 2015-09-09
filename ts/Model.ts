@@ -50,10 +50,10 @@ module Esper.Model {
       updating the actual DOM, and it makes reasoning about our code a lot
       easier.
     */
-    private CHANGE_EVENT: string = "CHANGE";
+    protected CHANGE_EVENT: string = "CHANGE";
 
     // Actual container for data
-    private data: {
+    protected data: {
       [index: string]: [TData, StoreMetadata];
     };
 
@@ -221,6 +221,11 @@ module Esper.Model {
         delete this.data[_id];
         this.emitChange();
       }
+    }
+
+    // Alias for remove
+    unset(_id: string): void {
+      this.remove(_id);
     }
   }
 }
