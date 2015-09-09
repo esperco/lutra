@@ -332,7 +332,7 @@ module Esper.TaskList {
     emailButton.click(function() {
       emailButton.prop("disabled", true);
       emailButton.text("Sending...");
-      Api.sendTaskList(team.teamid, [currentTaskProgress], [currentTaskLabel], [GmailJs.get.user_email()]).done(function(){
+      Api.sendTaskList(team.teamid, currentTaskProgress.split(","), [currentTaskLabel], [GmailJs.get.user_email()]).done(function(){
         emailButton.prop("disabled", false);
         emailButton.text("Email");
       });
@@ -358,11 +358,14 @@ module Esper.TaskList {
     }
 
     all.attr("data-task-label", "all");
+    all.attr("data-task-progress", "New,In_progress,Pending");
     urgent.attr("data-task-label", "urgent");
+    urgent.attr("data-task-progress", "New,In_progress,Pending");
     bind(all, function(task) { return true; });
     bind(urgent, function(task) { return task.task_urgent; });
 
     function bindProgress(elt, progress) {
+      elt.attr("data-task-label", "all");
       elt.attr("data-task-progress", progress);
       bind(elt, function(task) { return task.task_progress === progress; });
     }
@@ -378,6 +381,7 @@ module Esper.TaskList {
       var elt = $("<span>")
         .addClass("esper-tl-link esper-tl-shared")
         .attr("data-task-label", label)
+        .attr("data-task-progress", "New,In_progress,Pending")
         .text(label)
         .appendTo(otherTeamLabels);
       bind(elt, function(task) {

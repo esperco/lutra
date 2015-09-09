@@ -508,11 +508,12 @@ module Esper.Api {
   JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/tasks/send/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "?progress=" + progress.toString()
-      + "&labels=" + labels.toString()
-      + "&recipients=" + recipients.toString();
-    return JsonHttp.get(url);  
+      + "/" + string(teamid);
+    var params = { labels: labels,
+                   progress: progress,
+                   recipients: recipients
+                 };
+    return JsonHttp.post(url, JSON.stringify(params));  
   }
 
   export function notifyTaskMessage(task, emails, snippet):
