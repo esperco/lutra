@@ -32,4 +32,19 @@ module Esper.Util {
 
     return o;
   };
+
+  // Push to a capped list -- removes duplicates -- returns shifted element
+  // if cap reached or exceeded
+  export function pushToCapped<T>(list: T[], newVal: T, cap: number,
+                                  eq?: (a: T, b: T) => boolean): T|void
+  {
+    eq = eq || _.eq;
+    _.remove(list, function(oldVal) {
+      return eq(oldVal, newVal);
+    });
+    list.push(newVal);
+    if (list.length > cap) {
+      return list.shift();
+    }
+  }
 }

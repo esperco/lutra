@@ -83,12 +83,12 @@ module Esper.Model {
     }
 
     // Register a callback to handle store changes
-    addChangeListener(callback: () => void): void {
+    addChangeListener(callback: (_ids: string[]) => void): void {
       this.on(this.CHANGE_EVENT, callback);
     }
 
     // De-register a callback to handle store changes
-    removeChangeListener(callback: () => void): void {
+    removeChangeListener(callback: (_ids: string[]) => void): void {
       this.removeListener(this.CHANGE_EVENT, callback);
     }
 
@@ -99,8 +99,12 @@ module Esper.Model {
 
     // Call this whenever the store is changed. This class is protected so
     // that we can modify or override in derived classes
-    protected emitChange(): void {
-      this.emit(this.CHANGE_EVENT);
+    protected emitChange(_ids?: string[]): void {
+      if (_ids) {
+        this.emit(this.CHANGE_EVENT, _ids);
+      } else {
+        this.emit(this.CHANGE_EVENT);
+      }
     }
 
 
@@ -131,7 +135,7 @@ module Esper.Model {
       metadata = this.cleanMetadata(_id, data, metadata);
       // Store data in immutable fashion
       this.data[_id] = Util.deepFreeze<[TData,StoreMetadata]>([data, metadata]);
-      this.emitChange();
+      this.emitChange([_id]);
     }
 
     // Hook to preset metadata before it's set
@@ -219,7 +223,7 @@ module Esper.Model {
     remove(_id: string): void {
       if (this.has(_id)) {
         delete this.data[_id];
-        this.emitChange();
+        this.emitChange([_id]);
       }
     }
 

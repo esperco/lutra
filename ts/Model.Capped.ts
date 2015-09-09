@@ -5,6 +5,7 @@
 */
 
 /// <reference path="./Model.ts" />
+/// <reference path="./Util.ts" />
 
 module Esper.Model {
 
@@ -32,13 +33,12 @@ module Esper.Model {
     set(_id: string, data: TData, metadata?: StoreMetadata): void;
     set(_id: string, firstArg: any, secondArg?: any): void {
       super.set(_id, firstArg, secondArg);
-      this.capList = _.without(this.capList, _id);
-      this.capList.push(_id);
-      if (this.capList.length > this.cap) {
+      var shift = Util.pushToCapped(this.capList, _id, this.cap);
+      if (shift) {
         // Don't call this.remove because we don't necessarily want to emit
         // a change event if the element is already rendered in the DOM. Just
         // remove from internal data reference.
-        delete this.data[this.capList.shift()];
+        delete this.data[(<string> shift)];
       }
     }
 

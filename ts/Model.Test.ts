@@ -83,8 +83,8 @@ module Esper.Model {
           .toEqual(oldCarrots);
       });
 
-      it("should call the listener", function() {
-        expect(listener).toHaveBeenCalled();
+      it("should call the listener with the _id", function() {
+        expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
       });
     });
 
@@ -152,8 +152,8 @@ module Esper.Model {
           expect(metadata.lastUpdate).toEqual(baseTime);
         });
 
-        it("should call the listener", function() {
-          expect(listener).toHaveBeenCalled();
+        it("should call the listener with the _id", function() {
+          expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
         });
       }
     );
@@ -179,8 +179,8 @@ module Esper.Model {
             .toEqual(carrots);
         });
 
-        it("should call the listener", function() {
-          expect(listener).toHaveBeenCalled();
+        it("should call the listener with the _id", function() {
+          expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
         });
       });
 
@@ -304,8 +304,8 @@ module Esper.Model {
         expect(myRabbitStore.get("brownRabbitId")).toBeUndefined();
       });
 
-      it("should call listener", function() {
-        expect(listener).toHaveBeenCalled();
+      it("should call listener with the _id", function() {
+        expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
       });
     });
 
