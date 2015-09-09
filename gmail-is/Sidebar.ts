@@ -111,7 +111,7 @@ module Esper.Sidebar {
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
         <a href="http://esper.com/termsofuse.html">Terms</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
-        <span class="esper-click-safe esper-copyright">&copy; 2014 Esper</span>
+        <span class="esper-click-safe esper-copyright">&copy; 2015 Esper</span>
       </div>
     </div>
   </ul>
