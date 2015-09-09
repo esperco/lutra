@@ -1,5 +1,8 @@
 module Esper.TaskList {
 
+  var currentTaskProgress = "";
+  var currentTaskLabel = "all";
+
   function renderThreads(threads: ApiT.EmailThread[],
                          closeTaskListLayer: () => void,
                          parent: JQuery) {
@@ -302,6 +305,9 @@ module Esper.TaskList {
 <div #view class="esper-tl-modal">
   <div class="esper-tl-task-list">
     <span #closeButton class="esper-tl-close esper-clickable">×</span>
+    <button #emailButton
+      class="esper-tl-email esper-btn esper-btn-secondary esper-clickable"
+      title="Email all tasks with the current label to yourself">Email to myself</button>
     <span #all class="esper-tl-link esper-tl-all">All</span>
     <span #urgent class="esper-tl-link esper-tl-urgent"></span>
     <span #new_ class="esper-tl-link esper-tl-progress"></span>
@@ -323,6 +329,17 @@ module Esper.TaskList {
 
     Util.preventClickPropagation(view);
     closeButton.click(closeTaskListLayer);
+    emailButton.click(function() {
+      emailButton.prop("disabled", true);
+      emailButton.text("Sending...");
+      Api.sendTaskList(team.teamid,
+        currentTaskProgress.split(","),
+        [currentTaskLabel],
+        [GmailJs.get.user_email()]).done(function(){
+        emailButton.prop("disabled", false);
+        emailButton.text("Email to myself");
+      });
+    });
 
     function displayFiltered(filter) {
       displayList(team, list, closeTaskListLayer, filter);
@@ -336,15 +353,23 @@ module Esper.TaskList {
     function bind(elt: JQuery,
                   filter: (task: ApiT.Task) => boolean) {
       elt.click(function() {
+        currentTaskProgress = elt.attr("data-task-progress");
+        currentTaskLabel = elt.attr("data-task-label");
         highlightSelection(elt);
         displayFiltered(filter);
       });
     }
 
+    all.attr("data-task-label", "all");
+    all.attr("data-task-progress", "New,In_progress,Pending");
+    urgent.attr("data-task-label", "urgent");
+    urgent.attr("data-task-progress", "New,In_progress,Pending");
     bind(all, function(task) { return true; });
     bind(urgent, function(task) { return task.task_urgent; });
 
     function bindProgress(elt, progress) {
+      elt.attr("data-task-label", "all");
+      elt.attr("data-task-progress", progress);
       bind(elt, function(task) { return task.task_progress === progress; });
     }
 
@@ -358,6 +383,8 @@ module Esper.TaskList {
     List.iter(sortLabels(shared), function(label: string) {
       var elt = $("<span>")
         .addClass("esper-tl-link esper-tl-shared")
+        .attr("data-task-label", label)
+        .attr("data-task-progress", "New,In_progress,Pending")
         .text(label)
         .appendTo(otherTeamLabels);
       bind(elt, function(task) {
