@@ -35,13 +35,12 @@ module Esper.Model {
   // An update function is a function that receives data and metadata and
   // returns either the updated object or an updated object/metadata pairing.
   // Used in update function below
-  interface UpdateFn<TData> {
+  export interface UpdateFn<TData> {
     (oldData: TData, oldMetadata: StoreMetadata): TData|[TData, StoreMetadata];
   }
 
-  // Base class for Model Stores
-  export class Store<TData> extends EventEmitter {
-
+  // Base class for Store-like classes with EventEmitters
+  export class StoreBase<TData> extends EventEmitter {
     /*
       For simplicity we just emit a single change variable whenever any
       modification happens to a store. We can pass along a list of _id changes
@@ -51,6 +50,35 @@ module Esper.Model {
       actual DOM, and it makes reasoning about our code a lot easier.
     */
     protected CHANGE_EVENT: string = "CHANGE";
+
+    // Register a callback to handle store changes
+    addChangeListener(callback: (_ids: string[]) => void): void {
+      this.on(this.CHANGE_EVENT, callback);
+    }
+
+    // De-register a callback to handle store changes
+    removeChangeListener(callback: (_ids: string[]) => void): void {
+      this.removeListener(this.CHANGE_EVENT, callback);
+    }
+
+    // Remove all listeners
+    removeAllChangeListeners(): void {
+      this.removeAllListeners(this.CHANGE_EVENT);
+    }
+
+    // Call this whenever the store is changed. This class is protected so
+    // that we can modify or override in derived classes
+    protected emitChange(_ids?: string[]): void {
+      if (_ids) {
+        this.emit(this.CHANGE_EVENT, _ids);
+      } else {
+        this.emit(this.CHANGE_EVENT);
+      }
+    }
+  }
+
+  // Base class for Model Stores
+  export class Store<TData> extends StoreBase<TData> {
 
     // Actual container for data
     protected data: {
@@ -80,31 +108,6 @@ module Esper.Model {
     // Return all store objects
     getAll(): [TData, StoreMetadata][] {
       return _.values<[TData, StoreMetadata]>(this.data);
-    }
-
-    // Register a callback to handle store changes
-    addChangeListener(callback: (_ids: string[]) => void): void {
-      this.on(this.CHANGE_EVENT, callback);
-    }
-
-    // De-register a callback to handle store changes
-    removeChangeListener(callback: (_ids: string[]) => void): void {
-      this.removeListener(this.CHANGE_EVENT, callback);
-    }
-
-    // Remove all listeners
-    removeAllChangeListeners(): void {
-      this.removeAllListeners(this.CHANGE_EVENT);
-    }
-
-    // Call this whenever the store is changed. This class is protected so
-    // that we can modify or override in derived classes
-    protected emitChange(_ids?: string[]): void {
-      if (_ids) {
-        this.emit(this.CHANGE_EVENT, _ids);
-      } else {
-        this.emit(this.CHANGE_EVENT);
-      }
     }
 
 
