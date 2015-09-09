@@ -1,112 +1,138 @@
 /*
-  Team Settings - About Tab
+  Team Settings - Templates Tab
 */
 
 module TemplatesTab {
 
-  function finishOnboarding(team) {
-    window.location.hash = "#!team-settings/" + team.teamid;
+  interface WorkflowView {
+    title: JQuery;
+    notes: JQuery;
   }
 
-  export function load(team : ApiT.Team, onboarding : boolean) {
+  function saveChanges(team: ApiT.Team,
+                       wf: ApiT.Workflow,
+                       wfv: WorkflowView,
+                       s: ApiT.WorkflowStep,
+                       sv: StepView): JQueryPromise<void> {
+    var newTitle = wfv.title.val();
+    if (newTitle.length > 0) wf.title = newTitle;
+    wf.notes = wfv.notes.val();
+
+    if (s) { // Are we editing a step?
+      var step = List.find(wf.steps, function(x) {
+        return x.id === s.id;
+      });
+
+      var newStepTitle = sv.title.val();
+      if (newStepTitle.length > 0) step.title = newStepTitle;
+      step.notes = sv.notes.val();
+
+      var newChecklist = [];
+      sv.checklist.find("input:text").each(function() {
+        var input = $(this).val();
+        if (input.length > 0) {
+          newChecklist.push({ text: input, checked: false });
+        }
+      });
+      step.checklist = newChecklist;
+    }
+
+    return Api.updateWorkflow(team.teamid, wf.id, wf);
+  }
+
+  function viewOfWorkflow(team: ApiT.Team,
+                          wf: ApiT.Workflow,
+                          prefs: ApiT.Preferences,
+                          tabContainer: JQuery) {
 '''
 <div #view>
-  <div class="table-header">Understanding How Esper Works</div>
-  <ul class="table-list">
-    <li class="table-row clearfix" >
-      <div class="about-paragraph">
-        You can Cc or email your assistants directly to help with any
-        scheduling task. Your assistant will use your calendar and preferences
-        to pick times that work best for you and propose these to your guest.
-        Esper will respond to any email within 1 hour.
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="about-quote">
-        <p>Hi Riki,</p>
-        <p>Happy to help you and Tavin find a time. Would one of the following
-           times work for you?</p>
-        <p>
-          Wednesday, April 8 at 11:30 am PDT<br/>
-          Thursday, April 9 at 4:00 pm PDT<br/>
-          Saturday, April 11 at 11:00 am PDT
-        </p>
-        <p>If not, please let me know some times that would work better for
-           you. I can send an invite once we confirm a time.</p>
-        <p>Is <span class="fake-link">909-999-9999</span> the best number
-           to reach you at in case of any last-minute coordination?</p>
-        <p>
-          Thanks,<br/>
-          Blake Esper<br/>
-          <em>Powered by <span class="fake-link">Esper</span></em>
-        <p>
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="about-paragraph">
-        Once the guest responds and a date is settled, we will send a
-        calendar invite to your guest and finalize the event on your
-        calendar.
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="no-whitespace">
-        <img src="/assets/img/sample-calendar.png" alt="Sample calendar">
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="about-paragraph">
-        24 hours before the event, your guest will receive a reminder about
-        the meeting, ensuring they show up on time.
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="about-quote">
-        <p>Hi Riki,</p>
-        <p>This is a friendly reminder that you are scheduled for Call with
-           Tavin. The details are below, please feel free to contact me if
-           you have any questions regarding this meeting.
-        </p>
-        <p>
-          Call with Tavin<br/>
-          Wednesday, April 8 at 11:30 am Pacific Time<br/>
-          Tavin to call Riki at <span class="fake-link">909-999-9999</span>
-        </p>
-        <p>
-          Thanks,<br/>
-          Blake Esper
-        </p>
-      </div>
-    </li>
-    <li class="table-row clearfix">
-      <div class="about-paragraph">
-        <p>
-          You can also send small non-scheduling tasks directly to your
-          assistant. Example tasks include:
-        </p>
-        <ul class="small-task-types">
-          <li>• Restaurant reservations</li>
-          <li>• Travel arrangements/research (trains, planes, cars, etc.)</li>
-          <li>• Tracking down missing packages</li>
-          <li>• Event research: venues, caterers, activities</li>
-          <li>• Send you reminders</li>
-          <li>• Research on miles and points cards</li>
-          <li>• Compile shopping list from recipes</li>
-          <li>• Populate spreadsheets with readily available data</li>
-        </ul>
-      </div>
-    </li>
-  </ul>
-  <button #done class="button-primary done-button">Done</button>
+  <div class="bottom-gap top-gap">
+    <label>Title:</label>
+    <input type="text" #title size=40/>
+  </div>
+  <div>
+    <label>Notes:</label>
+    <textarea #notes class="workflow-notes" rows=8
+                     placeholder="General notes for the workflow"/>
+  </div>
+  <button class="button-primary" #save>Save Workflow</button>
+  <button class="button-secondary" #cancel>Cancel</button>
 </div>
 '''
-    if (!onboarding) done.remove();
-    else {
-      done.click(function() {
-        done.text("Loading...").attr("disabled", "true");
-        finishOnboarding(team);
-      });
+
+    title.val(wf.title);
+    if (wf.notes.length > 0) notes.val(wf.notes);
+
+    function reload() {
+      tabContainer.children().remove();
+      tabContainer.append(load(team, tabContainer));
     }
+
+    save.click(function() {
+      var wfv = <WorkflowView> _view;
+      saveChanges(team, wf, wfv, currentStep, currentStepView).done(reload);
+    });
+
+    cancel.click(reload);
+
+    return view;
+  }
+
+  export function load(team : ApiT.Team, tabContainer) {
+'''
+<div #view>
+  <div #edit class="bottom-gap top-gap" >
+    Choose an existing workflow to edit:
+    <select class="esper-select" style= "float: none" #editDropdown>
+      <option value="header">Select workflow...</option>
+    </select>
+  </div>
+  <div #create>
+    <input #createTitle type="text" size=40 placeholder="Template title" />
+    <button class="button-primary" #createButton> Create Template</button>
+  </div>
+  <div #workflow>
+    <big #nowEditing/>
+  </div>
+</div>
+'''
+    Api.getPreferences(team.teamid).done(function(prefs) {
+      var preferences = $.extend(true, Preferences.defaultPreferences(), prefs);
+
+      Api.listWorkflows(team.teamid).done(function(response) {
+        if (response.workflows.length > 0) {
+          var wfById: { [wfid: string]: ApiT.Workflow } = {};
+          List.iter(response.workflows, function(wf) {
+            var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
+            wfById[wf.id] = wf;
+            editDropdown.append(opt);
+          });
+          editDropdown.change(function() {
+            var chosen = $(this).val();
+            if (chosen !== "header") {
+              var wf = wfById[chosen];
+              edit.hide();
+              create.hide();
+              nowEditing.text("Editing workflow: " + wf.title);
+              workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+            }
+          });
+        } else {
+          editDropdown.replaceWith($("<i>(No current workflows)</i>"));
+        }
+      });
+
+      createButton.click(function() {
+        var title = createTitle.val();
+        if (title.length > 0) {
+          Api.createWorkflow(team.teamid, title).done(function(wf) {
+            create.hide();
+            nowEditing.text("Editing workflow: " + title);
+            workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+          });
+        }
+      });
+    });
 
     return view;
   }

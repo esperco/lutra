@@ -738,4 +738,35 @@ module Api {
     return jsonHttpDelete(url);
   }
 
+  export function listTemplates(teamid)
+      : JQueryDeferred<ApiT.UserTemplates> {
+      var url = "/api/templates/list/" + string(Login.me())
+          + "/" + string(teamid);
+      return jsonHttpGet(url);
+  }
+
+  export function createTemplate(teamid, title)
+      : JQueryDeferred<ApiT.Template> {
+      var url = "/api/templates/create/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(title);
+      return jsonHttpPost(url, "");
+  }
+
+  export function updateTemplate(teamid, templateid, workflow: ApiT.Template)
+      : JQueryDeferred<void> {
+      var url = "/api/templates/update/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(templateid);
+      return jsonHttpPut(url, JSON.stringify(workflow));
+  }
+
+  export function deleteTemplate(teamid, workflowid)
+      : JQueryDeferred<void> {
+      var url = "/api/templates/delete/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(templateid);
+      return jsonHttpDelete(url);
+  }
+
 }
