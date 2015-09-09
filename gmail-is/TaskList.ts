@@ -307,7 +307,7 @@ module Esper.TaskList {
     <span #closeButton class="esper-tl-close esper-clickable">×</span>
     <button #emailButton
       class="esper-tl-email esper-btn esper-btn-secondary esper-clickable"
-      title="Email all tasks with the current label to yourself">Email</button>
+      title="Email all tasks with the current label to yourself">Email to myself</button>
     <span #all class="esper-tl-link esper-tl-all">All</span>
     <span #urgent class="esper-tl-link esper-tl-urgent"></span>
     <span #new_ class="esper-tl-link esper-tl-progress"></span>
@@ -337,7 +337,7 @@ module Esper.TaskList {
         [currentTaskLabel],
         [GmailJs.get.user_email()]).done(function(){
         emailButton.prop("disabled", false);
-        emailButton.text("Email");
+        emailButton.text("Email to myself");
       });
     });
 
