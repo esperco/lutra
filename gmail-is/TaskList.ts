@@ -332,7 +332,10 @@ module Esper.TaskList {
     emailButton.click(function() {
       emailButton.prop("disabled", true);
       emailButton.text("Sending...");
-      Api.sendTaskList(team.teamid, currentTaskProgress.split(","), [currentTaskLabel], [GmailJs.get.user_email()]).done(function(){
+      Api.sendTaskList(team.teamid,
+        currentTaskProgress.split(","),
+        [currentTaskLabel],
+        [GmailJs.get.user_email()]).done(function(){
         emailButton.prop("disabled", false);
         emailButton.text("Email");
       });
