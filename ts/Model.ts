@@ -44,11 +44,11 @@ module Esper.Model {
 
     /*
       For simplicity we just emit a single change variable whenever any
-      modification happens to a store and let the handler re-query as
-      appropriate to figure out what's different. This is a little inefficient,
-      but it's insignificant relative to round-trip time to a server or
-      updating the actual DOM, and it makes reasoning about our code a lot
-      easier.
+      modification happens to a store. We can pass along a list of _id changes
+      but otherwise we let the handler re-query as appropriate to figure out
+      what's different. This may be a little inefficient, but it's
+      insignificant relative to round-trip time to a server or updating the
+      actual DOM, and it makes reasoning about our code a lot easier.
     */
     protected CHANGE_EVENT: string = "CHANGE";
 
