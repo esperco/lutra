@@ -232,28 +232,32 @@ module Esper.TaskTab {
   function selectMeetingTypeOnUserTab(meetingType : string,
                                       userTabContent : UserTab.UserTabView)
   : void {
-    var found = false;
-    userTabContent.meetingSelector.find("option").each(function(i) {
-      if ($(this).text() === meetingType.replace("_", " ")) {
-        found = true;
-        userTabContent.meetingSelector.val($(this).val());
-        userTabContent.meetingSelector.trigger("change");
+    // Use the default option for generic "meeting".
+    if (meetingType.toLowerCase() !== "meeting") {
+      var found = false;
+      userTabContent.meetingSelector.find("option").each(function(i) {
+        var value = $(this).val();
+        if (value && value.toLowerCase() === meetingType.toLowerCase()) {
+          found = true;
+          userTabContent.meetingSelector.val(value);
+          userTabContent.meetingSelector.trigger("change");
+          if (userTabContent.showMeetings.text() === "Show") {
+            userTabContent.showMeetings.trigger("click");
+          }
+        }
+      });
+      if (!found) {
+        var opt = $("<option value='" + meetingType + "' disabled>"
+                    + meetingType.replace("_", " ") + "</option>");
+        var drop = userTabContent.meetingSelector;
+        drop.append($("<option disabled>──────</option>"));
+        drop.append(opt);
+        drop.val(opt.val());
+        userTabContent.meetingInfo.hide();
+        userTabContent.noMeetingPrefs.show();
         if (userTabContent.showMeetings.text() === "Show") {
           userTabContent.showMeetings.trigger("click");
         }
-      }
-    });
-    if (!found) {
-      var opt = $("<option value='" + meetingType + "' disabled>"
-                  + meetingType.replace("_", " ") + "</option>");
-      var drop = userTabContent.meetingSelector;
-      drop.append($("<option disabled>──────</option>"));
-      drop.append(opt);
-      drop.val(opt.val());
-      userTabContent.meetingInfo.hide();
-      userTabContent.noMeetingPrefs.show();
-      if (userTabContent.showMeetings.text() === "Show") {
-        userTabContent.showMeetings.trigger("click");
       }
     }
   }
@@ -321,13 +325,21 @@ module Esper.TaskTab {
           .appendTo(results)
           .click(function() {
             var currentTask = CurrentThread.task.get();
-            var job =
-              currentTask !== undefined ?
-              Api.switchTaskForThread(teamid, threadId,
-                                      currentTask.taskid, newTaskId)
-              :
-              Api.linkThreadToTask(teamid, threadId,
-                                   newTaskId);
+            var job;
+            if (currentTask !== undefined) {
+              job = Api.switchTaskForThread(teamid, threadId,
+                                            currentTask.taskid, newTaskId);
+              var meetingType = currentTask.task_meeting_type;
+              if (meetingType && ! result.task_data.task_meeting_type) {
+                job.done(function() {
+                  return Api.setTaskMeetingType(newTaskId, meetingType);
+                });
+                result.task_data.task_meeting_type = meetingType;
+                selectMeetingTypeOnUserTab(meetingType, userTabContent);
+              }
+            } else {
+              job = Api.linkThreadToTask(teamid, threadId, newTaskId);
+            }
 
             job.done(function() {
               refreshTaskProgressSelection(team, threadId, taskTab);
@@ -602,7 +614,8 @@ module Esper.TaskTab {
         taskTitle.val("");
       } else {
         taskTitle.data("meetingType", type);
-        taskTitle.val(type.replace("_", " ") + " ");
+        type = type === "Phone_call" ? "Call" : type.replace("_", " ");
+        taskTitle.val(type + " ");
       }
       meetingType.hide();
       taskTitle.show();
