@@ -108,9 +108,26 @@ module Esper.Model {
       }
     }
 
+    // Returns just the value and not the metadata
+    val(_id: string): TData {
+      if (this.has(_id)) {
+        return this.data[_id][0];
+      }
+    }
+
+    metadata(_id: string): StoreMetadata {
+      if (this.has(_id)) {
+        return this.data[_id][1];
+      }
+    }
+
     // Return all store objects
     getAll(): [TData, StoreMetadata][] {
       return _.values<[TData, StoreMetadata]>(this.data);
+    }
+
+    valAll(): TData[] {
+      return _.map(this.getAll(), function(tuple) { return tuple[0]; });
     }
 
 
