@@ -247,6 +247,7 @@ module Esper.TaskTab {
         }
       });
       if (!found) {
+        UserTab.currentMeetingType = meetingType.toLowerCase().replace(/ /,"_");
         var opt = $("<option value='" + meetingType + "' disabled>"
                     + meetingType.replace("_", " ") + "</option>");
         var drop = userTabContent.meetingSelector;
