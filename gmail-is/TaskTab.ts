@@ -535,6 +535,7 @@ module Esper.TaskTab {
         if (step.meeting_prefs) {
           var meetingInfo = $(".esper-user-tab-meeting-info");
           var meetingSelector = $(".esper-meeting-selector");
+          var noMeetingPrefs = $(".esper-no-prefs");
           var showHide = $(".esper-meetings");
           var meetingTypes = prefs.meeting_types;
           var workplaces = prefs.workplaces;
@@ -543,6 +544,7 @@ module Esper.TaskTab {
           meetingInfo.children().remove();
           meetingSelector.children().remove();
           UserTab.populateMeetingsDropdown(meetingSelector, meetingInfo,
+                                           noMeetingPrefs,
                                            meetingTypes, workplaces,
                                            [], []);
           meetingSelector.val(opt);
