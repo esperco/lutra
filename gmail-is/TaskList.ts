@@ -93,9 +93,6 @@ module Esper.TaskList {
 
   function renderTaskNotes(notes: string,
                            parent: JQuery) {
-    $("<h4/>")
-      .html("Task Notes")
-      .appendTo(parent);
     if (notes !== "" || notes !== undefined) {
       $("<p/>")
         .html(notes)
