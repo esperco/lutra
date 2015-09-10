@@ -9,6 +9,5 @@
 /// <reference path="../marten/ts/Model.Test.ts"/>
 /// <reference path="../marten/ts/Model.Capped.Test.ts"/>
 /// <reference path="../marten/ts/Model.StoreOne.Test.ts"/>
-/// <reference path="../marten/ts/Delta.Test.ts"/>
 /// <reference path="../marten/ts/JQStore.Test.ts"/>
 
