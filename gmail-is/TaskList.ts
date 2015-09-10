@@ -333,8 +333,9 @@ module Esper.TaskList {
       emailButton.prop("disabled", true);
       emailButton.text("Sending...");
       Api.sendTaskList(team.teamid,
-        currentTaskProgress.split(","),
         [currentTaskLabel],
+        currentTaskProgress.split(","),
+        true,
         [GmailJs.get.user_email()]).done(function(){
         emailButton.prop("disabled", false);
         emailButton.text("Email to myself");
@@ -345,17 +346,13 @@ module Esper.TaskList {
       displayList(team, list, closeTaskListLayer, filter);
     }
 
-    function highlightSelection(elt: JQuery) {
-      $(".esper-tl-selected").removeClass("esper-tl-selected");
-      elt.addClass("esper-tl-selected");
-    }
-
     function bind(elt: JQuery,
                   filter: (task: ApiT.Task) => boolean) {
       elt.click(function() {
         currentTaskProgress = elt.attr("data-task-progress");
         currentTaskLabel = elt.attr("data-task-label");
-        highlightSelection(elt);
+        $(".esper-tl-selected").removeClass("esper-tl-selected");
+        elt.addClass("esper-tl-selected");
         displayFiltered(filter);
       });
     }

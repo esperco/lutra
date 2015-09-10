@@ -60,6 +60,11 @@ module Esper.Menu {
       $("body").append(agendaModal.view);
     }, false);
 
+    var getTaskListLink = makeActionLink("Task List", function() {
+      var taskListModal = displayGetTask();
+      $("body").append(taskListModal.view);
+    }, false);
+
     var helpLink = $("<a class='esper-a'>Help</a>")
       .attr("href", "mailto:team@esper.com");
 
@@ -68,7 +73,250 @@ module Esper.Menu {
       .append(signInLink)
       .append(settingsLink)
       .append(agendaLink)
+      .append(getTaskListLink)
       .append(helpLink);
+  }
+
+  function displayGetTask() {
+'''
+<div #view class="esper-modal-bg">
+  <div #modal class="esper-confirm-event-modal">
+    <div class="esper-modal-header">Get Task List</div>
+    <table class="esper-modal-content">
+      <tr>
+        <td>
+          <label class="esper-agenda-title">
+            Executive Team:
+          </label>
+        </td>
+        <td>
+          <select #teamSelect class="esper-agenda-select"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label class="esper-agenda-title">
+            Task Progress:
+          </label>
+        </td>
+        <td #progressSelect class="esper-tl-progress-select">
+          <span #new_ class="esper-tl-link esper-tl-progress"></span>
+          <span #inProgress class="esper-tl-link esper-tl-progress esper-tl-selected"></span>
+          <span #pending class="esper-tl-link esper-tl-progress"></span>
+          <span #done class="esper-tl-link esper-tl-progress"></span>
+          <span #canceled class="esper-tl-link esper-tl-progress"></span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label class="esper-agenda-title">
+            Task Labels:
+          </label>
+        </td>
+        <td #labelSelect class="esper-tl-labels-select">
+          <span #all class="esper-tl-link esper-tl-all esper-tl-selected">All</span>
+          <span #urgent class="esper-tl-link esper-tl-urgent"></span>
+        </td>
+      </tr>
+      <tr>
+        <label class="esper-agenda-title">
+          Task List Format:
+        </label>
+      </tr>
+      <tr>
+        <label>
+          <input #htmlFormat type="radio" name="format" />
+          HTML
+        </label>
+        <label>
+          <input #textFormat type="radio" name="format" />
+          Plain text
+        </label>
+      </tr>
+      <tr>
+        <label class="esper-agenda-title">
+          Send to:
+          <div #recipients class="esper-agenda-section" style="width: 100%">
+          </div>
+        </label>
+      </tr>
+    </table>
+    <div class="esper-modal-footer esper-clearfix">
+      <div #errorMessages>
+      </div>
+      <button #sendButton class="esper-btn esper-btn-primary modal-primary">
+        Send Now
+      </button>
+      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+'''
+    var teams = Login.myTeams();
+
+    function bind(elt: JQuery, label: string, is_progress: boolean) {
+      if (is_progress) {
+        elt.attr("data-task-progress", label);
+      } else {
+        elt.attr("data-task-label", label)
+      }
+      elt.click(function() {
+        if (elt.hasClass("esper-tl-selected")) {
+          elt.removeClass("esper-tl-selected");
+        } else {
+          if (!is_progress) {
+            all.removeClass("esper-tl-selected");
+          }
+          elt.addClass("esper-tl-selected");
+          elt.attr("style", "cursor: pointer;");
+        }
+      });
+    }
+
+    bind(new_, "New", true);
+    bind(inProgress, "In_progress", true);
+    bind(pending, "Pending", true);
+    bind(done, "Done", true);
+    bind(canceled, "Canceled", true);
+    bind(urgent, "urgent", false);
+
+    all.attr("data-task-label", "all")
+       .click(function() {
+         if (all.hasClass("esper-tl-selected")) {
+          all.removeClass("esper-tl-selected");
+         } else {
+          labelSelect.children().removeClass("esper-tl-selected");
+          all.addClass("esper-tl-selected");
+          all.attr("style", "cursor: pointer;");
+         }
+       });
+
+    List.iter(currentTeam.get().team_labels, function(label) {
+      var elt = $("<span>").addClass("esper-tl-link esper-tl-shared")
+                    .attr("data-task-label", label)
+                    .text(label);
+      bind(elt, label, false);
+      labelSelect.append(elt);
+    });
+
+    urgent.text(currentTeam.get().team_label_urgent);
+    new_.text(currentTeam.get().team_label_new);
+    inProgress.text(currentTeam.get().team_label_in_progress);
+    pending.text(currentTeam.get().team_label_pending);
+    done.text(currentTeam.get().team_label_done);
+    canceled.text(currentTeam.get().team_label_canceled);
+
+    htmlFormat.prop("checked", true);
+
+    List.iter(teams, function(team) {
+        var o = $("<option>")
+            .text(team.team_name)
+            .val(team.teamid);
+        if (team === currentTeam.get()) {
+            o.prop("selected", true);
+        }
+        o.appendTo(teamSelect);
+    });
+
+    function addRecipientCheckboxes(email, id) {
+      var i = $("<input />")
+        .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
+        .val(email);
+      var l = $("<label>")
+        .attr("for", "agenda-recipient" + id)
+        .addClass("esper-agenda-recipient")
+        .text(email)
+        .append($("<br />"));
+      i.appendTo(recipients);
+      l.appendTo(recipients);
+    }
+
+    teamSelect.change(function() {
+      var teamid = teamSelect.val();
+
+      recipients.empty();
+      var team = List.find(teams, function(team) { return team.teamid === teamid; });
+      var teamEmails = List.union(
+        [Teams.getProfile(team.team_executive).email],
+        List.map(team.team_assistants, function(uid: string) {
+          return Teams.getProfile(uid).email;
+        }));
+      List.iter(teamEmails, addRecipientCheckboxes);
+
+      new_.text(team.team_label_new);
+      inProgress.text(team.team_label_in_progress);
+      pending.text(team.team_label_pending);
+      done.text(team.team_label_done);
+      canceled.text(team.team_label_canceled);
+
+      all.detach();
+      urgent.detach();
+      labelSelect.empty();
+
+      urgent.text(team.team_label_urgent);
+      labelSelect.append(all).append(urgent);
+      List.iter(team.team_labels, function(label) {
+        var elt = $("<span>").addClass("esper-tl-link esper-tl-shared")
+                    .attr("data-task-label", label)
+                    .text(label);
+        bind(elt, label, false);
+        labelSelect.append(elt);
+      });
+    });
+
+    var teamid = teamSelect.val();
+    var prefs = Teams.getPreferences(teamid);
+    var teamEmails = List.union(
+      [Teams.getProfile(currentTeam.get().team_executive).email],
+      List.map(currentTeam.get().team_assistants, function(uid) {
+        return Teams.getProfile(uid).email;
+      }));
+
+    List.iter(teamEmails, addRecipientCheckboxes);
+
+    function cancel() { view.remove(); }
+
+    view.click(cancel);
+    Util.preventClickPropagation(modal);
+    cancelButton.click(cancel);
+    sendButton.click(function() {
+      errorMessages.empty();
+      var l = List.map(labelSelect.children(".esper-tl-selected"), function(el: HTMLLabelElement){
+        return el.getAttribute("data-task-label");
+      });
+      var p = List.map(progressSelect.children(".esper-tl-selected"), function(el: HTMLLabelElement){
+        return el.getAttribute("data-task-progress");
+      });
+      var f = htmlFormat.prop("checked");
+      var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
+        return el.value;
+      });
+
+      function validateLists(list, arg) {
+        if (list.length == 0) {
+          var e = $("<span>")
+            .addClass("esper-agenda-error")
+            .html("You must select at least one " + arg);
+          e.appendTo(errorMessages);
+          return;
+        }
+      }
+
+      validateLists(p, "progress label");
+      validateLists(l, "task label");
+      validateLists(r, "recipient");
+
+      cancelButton.prop("disabled", true);
+      sendButton.prop("disabled", true);
+      recipients.children().prop("disabled", true);
+      sendButton.text("Sending...");
+
+      Api.sendTaskList(teamSelect.val(), l, p, f, r).done(cancel);
+    });
+
+    return _view;
   }
 
   function displayAgenda() {
@@ -155,7 +403,6 @@ module Esper.Menu {
         .attr("for", "agenda-recipient" + id)
         .addClass("esper-agenda-recipient")
         .text(email)
-        .addClass("esper-agenda-recipient")
         .append($("<br />"));
       i.appendTo(recipients);
       l.appendTo(recipients);
