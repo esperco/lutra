@@ -44,8 +44,8 @@ module Esper.Delta {
       });
     }
 
-    toString(): string {
-      return JSON.stringify(this.deltaList);
+    serialize(): Array<[string, string, T]> {
+      return this.deltaList;
     }
 
     // Use to temporarily disable our changeListener while making updates
@@ -55,8 +55,7 @@ module Esper.Delta {
       this.active = true;
     }
 
-    process(update: string) {
-      var updates: Array<[string, string, T]> = JSON.parse(update);
+    parse(updates: Array<[string, string, T]>) {
       var self = this;
 
       _.each(updates, function(tuple) {

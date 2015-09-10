@@ -31,16 +31,16 @@ module Esper.Delta {
       // updated. Delta pub has a limited cap.
       this.deltaPub = new SyncWrap(myRabbits, 3);
 
-      // Wrapper around store to process delta pubs
+      // Wrapper around store to parse delta pubs
       this.deltaSub = new SyncWrap(yourRabbits, 3);
     });
 
-    describe("after serializing and processing inserts", function() {
+    describe("after serializing and parsing inserts", function() {
       beforeEach(function() {
         myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
         myRabbits.insert("rabbit_1", { uid: "rabbit_1" });
-        this.serialized = this.deltaPub.toString();
-        this.deltaSub.process(this.serialized);
+        this.serialized = this.deltaPub.serialize();
+        this.deltaSub.parse(this.serialized);
       });
 
       it("updates the wrapped store", function() {
@@ -52,7 +52,7 @@ module Esper.Delta {
       describe("twice", function() {
         beforeEach(function() {
           this.listener.calls.reset();
-          this.deltaSub.process(this.serialized);
+          this.deltaSub.parse(this.serialized);
         });
 
         it("only emits an event once for each updated key", function() {
@@ -62,29 +62,29 @@ module Esper.Delta {
 
       describe("re-serialization by receiving SyncWrap", function() {
         beforeEach(function() {
-          this.serialized2 = this.deltaSub.toString();
+          this.serialized2 = this.deltaSub.serialize();
           jasmine.addCustomEqualityTester(_.isEqual);
         });
 
         it("should use the same update _ids as the previous serialization",
         function() {
-          var serialized1 = _.map(JSON.parse(this.serialized),
+          var serialized1 = _.map(this.serialized,
             function(tuple) { return (<any> tuple)[0]; });
-          var serialized2 = _.map(JSON.parse(this.serialized2),
+          var serialized2 = _.map(this.serialized2,
             function(tuple) { return (<any> tuple)[0]; });
           expect(serialized1).toEqual(serialized2);
         });
       });
     });
 
-    describe("after processing more serialized inserts than cap", function() {
+    describe("after parsing more serialized inserts than cap", function() {
       beforeEach(function() {
         myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
         myRabbits.insert("rabbit_1", { uid: "rabbit_1" });
         myRabbits.insert("rabbit_2", { uid: "rabbit_2" });
         myRabbits.insert("rabbit_3", { uid: "rabbit_3" });
-        this.serialized = this.deltaPub.toString();
-        this.deltaSub.process(this.serialized);
+        this.serialized = this.deltaPub.serialize();
+        this.deltaSub.parse(this.serialized);
       });
 
       it("only updates the last X=cap updates", function() {
@@ -102,8 +102,8 @@ module Esper.Delta {
         myRabbits.insert("rabbit_1", { uid: "rabbit_1" });
         myRabbits.update("rabbit_1", { uid: "rabbit_1", chubby: true });
         myRabbits.insert("rabbit_2", { uid: "rabbit_2" });
-        this.serialized = this.deltaPub.toString();
-        this.deltaSub.process(this.serialized);
+        this.serialized = this.deltaPub.serialize();
+        this.deltaSub.parse(this.serialized);
       });
 
       it("consolidates the updates to avoid cap", function() {
@@ -113,28 +113,28 @@ module Esper.Delta {
       });
     });
 
-    describe("when serializing and processing removals", function() {
+    describe("when serializing and parsing removals", function() {
       beforeEach(function() {
         myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
         yourRabbits.insert("rabbit_0", { uid: "rabbit_0" });
         myRabbits.remove("rabbit_0");
-        this.serialized = this.deltaPub.toString();
-        this.deltaSub.process(this.serialized);
+        this.serialized = this.deltaPub.serialize();
+        this.deltaSub.parse(this.serialized);
       });
 
-      it("processes deletes", function() {
+      it("parsees deletes", function() {
         expect(yourRabbits.has("rabbit_0")).toBe(false);
       });
     });
 
-    describe("when processing own serialized updates", function() {
+    describe("when parsing own serialized updates", function() {
       beforeEach(function() {
         myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
         myRabbits.insert("rabbit_1", { uid: "rabbit_1" });
         myRabbits.insert("rabbit_2", { uid: "rabbit_2" });
         this.listener = jasmine.createSpy("listener");
         myRabbits.addChangeListener(this.listener);
-        this.deltaPub.process(this.deltaPub.toString());
+        this.deltaPub.parse(this.deltaPub.serialize());
       });
 
       it("should not trigger any updates", function() {
