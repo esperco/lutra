@@ -9,6 +9,7 @@
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
+/// <reference path="../common/ExtensionOptions.Storage.ts" />
 
 module Esper.Main {
 
@@ -93,9 +94,5 @@ module Esper.Main {
   }
 }
 
-/* Called once per page, but wait for vendor files to load */
-if (Esper.vendorReady) {
-  Esper.Main.init();
-} else {
-  Esper.onVendorReady = Esper.Main.init;
-}
+/* Called once per page */
+Esper.Main.init();

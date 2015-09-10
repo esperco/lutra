@@ -138,6 +138,7 @@ module Esper.Init {
       obtainCredentials();
       Inactivity.init();
       ObserveMessage.init();
+      ExtensionOptions.init();
     }
   }
 }

@@ -59,7 +59,15 @@ Esper = (function(esperObj) {
   return esperObj;
 })(window.Esper || {});
 
-if (Esper._.isFunction(Esper.onVendorReady)) {
-  Esper.onVendorReady();
+// Load post-vendor script based on data attributes attached to the script
+var vendorScript = Esper.$("#esper-vendor-script");
+if (vendorScript.length) {
+  var attrs = vendorScript.data("load-next");
+  if (attrs) {
+    if (typeof attrs === "string") {
+      attrs = JSON.parse(attrs);
+    }
+    var nextScript = Esper.$('<script />');
+    nextScript.attr(attrs).appendTo(Esper.$('head'));
+  }
 }
-Esper.vendorReady = true;
