@@ -7,6 +7,9 @@
   of a particular data type and metadata. Stores should registered with
   the dispatcher so they're updated when Actions are dispatched.
 */
+
+/// <reference path="./Util.ts" />
+
 module Esper.Model {
 
 
