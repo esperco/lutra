@@ -45,6 +45,7 @@ module Esper.Slides {
       time  : 500,
       width : Gmail.threadContainer().width() + 100
     }
+    var currentHeight: number;
 
     return topContainer;
 
@@ -56,6 +57,10 @@ module Esper.Slides {
           position = position + 1;
           var next : SlideElement<T> =
             slideElement<T>(position, slides[position](nextState));
+
+          // Get current height before we append container (which may
+          // change height)
+          currentHeight = topContainer.height();
           topContainer.append(next.container);
 
           slideForward(current.container, next.container);
@@ -85,9 +90,12 @@ module Esper.Slides {
     }
 
     function slideForward(previous, next) {
+      // Expand parent to accomodate larger objects but never shrink (so slide
+      // back doesn't cut off
       previous.parent().css({
         "overflow" : "hidden",
-        "height"   : next.outerHeight(true)
+        "height"   : Math.max(next.outerHeight(true) + 50, /* 50px buffer */
+                              currentHeight) + "px"
       });
       previous.animate({left : -animation.width}, animation.time);
 
