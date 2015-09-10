@@ -82,6 +82,19 @@ module Esper.Sidebar {
     teamsSection.append(selector);
   }
 
+  /* Check preferences on whether to display sidebar */
+  function shouldDisplaySidebar(): boolean {
+    var data = threadState.get(CurrentThread.threadId.get());
+    var show = ExtensionOptions.SidebarOpts.SHOW;
+    if (data) {
+      var ret = data[0] === show;
+    } else {
+      var defaultState = ExtensionOptions.store.get();
+      var ret = (defaultState && defaultState[0].defaultSidebarState === show);
+    }
+    return ret;
+  }
+
   function displayDock(rootElement, sidebar, isCorrectTeam: boolean) {
 '''
 <div #view class="esper-dock-container">
@@ -138,17 +151,22 @@ module Esper.Sidebar {
       CurrentThread.refreshTaskForThread(false);
 
       dismissDropdowns();
-      wrap.fadeOut(250);
-      sizeIcon.removeClass("esper-minimize");
-      sidebar.hide("slide", { direction: "down" }, 250);
-      wrap.fadeIn(250);
-      sizeIcon.addClass("esper-minimize");
-      sidebar.show("slide", { direction: "down" }, 250);
+      var timeout = 0;
+      if (sidebar.is(":visible")) {
+        hideSidebar();
+        timeout = 250;
+      }
+
+      // Team switch => treat as if we've chosen to show the sidebar
+      var threadId = Esper.CurrentThread.threadId.get();
+      if (threadId) {
+        threadState.upsert(threadId, ExtensionOptions.SidebarOpts.SHOW);
+      }
 
       function afterAnimation() {
         displayTeamSidebar(rootElement, true, false);
       }
-      setTimeout(afterAnimation, 250);
+      setTimeout(afterAnimation, timeout);
     }
 
     var teams = Login.myTeams().slice(0); // make a copy
@@ -203,17 +221,36 @@ module Esper.Sidebar {
       }
     }
 
-    function toggleSidebar() {
-      if (sidebar.css("display") === "none") {
-        wrap.fadeIn(250);
-        sizeIcon.addClass("esper-minimize");
-        size.tooltip("option", "content", "Minimize");
-        sidebar.show("slide", { direction: "down" }, 250);
-      } else {
-        wrap.fadeOut(250);
+    // Start with sidebar wrap in "off" state
+    wrap.hide();
+
+    function showSidebar() {
+      wrap.fadeIn(250);
+      sizeIcon.addClass("esper-minimize");
+      size.tooltip("option", "content", "Minimize");
+      sidebar.show("slide", { direction: "down" }, 250);
+      var threadId = Esper.CurrentThread.threadId.get();
+      if (threadId) {
+        threadState.upsert(threadId, ExtensionOptions.SidebarOpts.SHOW);
+      }
+    }
+
+    function hideSidebar() {
+      wrap.fadeOut(250);
         sizeIcon.removeClass("esper-minimize");
-        size.tooltip("option", "content", "Maximize");
-        sidebar.hide("slide", { direction: "down" }, 250);
+      size.tooltip("option", "content", "Maximize");
+      sidebar.hide("slide", { direction: "down" }, 250);
+      var threadId = Esper.CurrentThread.threadId.get();
+      if (threadId) {
+        threadState.upsert(threadId, ExtensionOptions.SidebarOpts.HIDE);
+      }
+    }
+
+    function toggleSidebar() {
+      if (sidebar.is(":visible")) {
+        hideSidebar();
+      } else {
+        showSidebar();
       }
     }
 
@@ -232,6 +269,15 @@ module Esper.Sidebar {
       Menu.create();
     });
 
+    var insertDock = function(someTeam=true) {
+      rootElement.append(view);
+      if (someTeam && shouldDisplaySidebar()) {
+        showSidebar();
+      } else {
+        hideSidebar();
+      }
+    };
+
     CurrentThread.currentTeam.get().match({
       some : function (team) {
         Api.getCustomerStatus(team.teamid).done(function(customer) {
@@ -249,11 +295,11 @@ module Esper.Sidebar {
                 .removeClass("esper-team-danger");
           }
 
-          rootElement.append(view);
+          insertDock();
         });
       },
-      none : function () {
-        rootElement.append(view);
+      none: function() {
+        insertDock(false);
       }
     });
   }
@@ -355,13 +401,11 @@ module Esper.Sidebar {
               .done(function(linkedEvents) {
                 var sidebar = displaySidebar(rootElement, threadId, autoTask, linkedEvents);
                 displayDock(rootElement, sidebar, isCorrectTeam);
-                sidebar.show("slide", { direction: "down" }, 250);
               });
           },
           none : function () {
             var sidebar = displaySidebar(rootElement, threadId, autoTask, []);
             displayDock(rootElement, sidebar, isCorrectTeam);
-            $(".esper-dock-wrap").hide();
           }
         });
       }
