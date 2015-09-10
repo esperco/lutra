@@ -35,6 +35,19 @@ module Esper.Delta {
       this.deltaSub = new SyncWrap(yourRabbits, 3);
     });
 
+    describe("after serializing inserts", function() {
+      beforeEach(function() {
+        this.deltaListener = jasmine.createSpy("deltaListener");
+        this.deltaPub.addChangeListener(this.deltaListener);
+        myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
+        myRabbits.insert("rabbit_1", { uid: "rabbit_1" });
+      });
+
+      it("should emit changes", function() {
+        expect(this.deltaListener.calls.count()).toEqual(2);
+      });
+    });
+
     describe("after serializing and parsing inserts", function() {
       beforeEach(function() {
         myRabbits.insert("rabbit_0", { uid: "rabbit_0" });
@@ -122,7 +135,7 @@ module Esper.Delta {
         this.deltaSub.parse(this.serialized);
       });
 
-      it("parsees deletes", function() {
+      it("parses deletes", function() {
         expect(yourRabbits.has("rabbit_0")).toBe(false);
       });
     });

@@ -15,7 +15,7 @@ module Esper.Delta {
   // A wrapper around a Model.Store that listens to its changes and can be
   // used to publish serialized updates or process updates from other SyncWrap
   // instances wrapping the Model.Store class
-  export class SyncWrap<T> {
+  export class SyncWrap<T> extends Model.StoreBase<T> {
     // Deltas are 3-tuples of delta UID, ID for store object, and object data
     protected deltaList: Array<[string, string, T]> = [];
 
@@ -24,6 +24,7 @@ module Esper.Delta {
     protected active: boolean = true;
 
     constructor(public store: Model.Store<T>, public cap=DEFAULT_CAP) {
+      super();
       this.store.addChangeListener(this.changeListener.bind(this));
     }
 
@@ -42,6 +43,7 @@ module Esper.Delta {
             return a[1] === b[1];
           });
       });
+      this.emitChange(_ids);
     }
 
     serialize(): Array<[string, string, T]> {
