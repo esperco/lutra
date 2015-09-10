@@ -7,9 +7,9 @@ module Esper.Message {
     SettingsUpdate,
 
     // Request and push updates to Gmail ThreadState
-    RequestThreadState,        // Request thread state from storage
-    ThreadStateStorageUpdate,  // Post update from storage
-    ThreadStateUserUpdate      // Update from user to save to storage
+    RequestThreadState,  // Request thread state from storage
+    ThreadStateData,     // Data from storage
+    ThreadStateUpdate    // Update from user to save to storage
   }
 
   export interface Message {

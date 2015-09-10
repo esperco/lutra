@@ -17,21 +17,50 @@ module Esper.ThreadState {
   export var store =
      new Model.CappedStore<ExtensionOptions.SidebarOpts>(cap);
 
+  // A list of threadId, state pairs
+  type ThreadData = Array<[string, ExtensionOptions.SidebarOpts]>;
+
+  // Promise that resolves when initial thread state is loaded
+  var loadDeferred = $.Deferred();
+  export var loaded = loadDeferred.promise();
+
+  // Var we can toggle to keep listener fro posting changes to Content Script
+  var quiet = false;
+
+  // Change listener that posts thread state to Content Script
+  var storeChanges = function(_ids: string[]) {
+    if (!quiet) {
+      Message.post(Message.Type.ThreadStateUpdate, _.map(_ids, function(_id) {
+        return [_id, store.val(_id)];
+      }));
+    }
+  };
+
   export function init() {
-    // Updates to model get posted to Content Script
-    // deltaWrap.addChangeListener(function() {
-    //   Message.post(
-    //     Message.Type.ThreadStateUserUpdate,
-    //     deltaWrap.serialize());
-    // });
+    // Add our post-to-CS listener
+    store.addChangeListener(storeChanges);
 
-    // // Update options based on value from posted messages from Content Script
-    // Message.listen(Message.Type.ThreadStateStorageUpdate,
-    //   function(data: Array<[string, string, ExtensionOptions.SidebarOpts]>) {
-    //     deltaWrap.parse(data);
-    //   });
+    // Update options based on value from posted messages from Content Script
+    Message.listen(Message.Type.ThreadStateData, function(data: ThreadData) {
+      if (loadDeferred.state() === "pending") {
+        loadDeferred.resolve();
+      }
 
-    // // Post initial request for data
-    // Message.post(Message.Type.RequestThreadState);
+      // Silence listener while initializing
+      quiet = true;
+
+      _.each(data, function(datum) {
+        var _id = datum[0];
+        var state = datum[1];
+        if (!store.has(_id)) { // Don't override existing local state
+          store.insert(_id, state);
+        }
+      });
+
+      quiet = false;
+    });
+
+    // Post initial request for data (response handled by listener above)
+    Message.post(Message.Type.RequestThreadState);
   }
 }
