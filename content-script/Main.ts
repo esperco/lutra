@@ -27,6 +27,8 @@
 /// <reference path="./Update.ts" />
 /// <reference path="./JsonHttp.ts" />
 /// <reference path="./Auth.ts" />
+/// <reference path="./ThreadState.Storage.ts" />
+
 
 module Esper.Main {
   function injectScript(scriptName) {
@@ -70,6 +72,7 @@ module Esper.Main {
     Update.init();
     Auth.init();
     ExtensionOptions.init();
+    ThreadState.init();
   }
 }
 

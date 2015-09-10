@@ -139,6 +139,7 @@ module Esper.Init {
       Inactivity.init();
       ObserveMessage.init();
       ExtensionOptions.init();
+      ThreadState.init();
     }
   }
 }

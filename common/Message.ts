@@ -2,8 +2,14 @@ module Esper.Message {
 
   // Types used by Message
   export enum Type { // NB: Start at 1 so all types are truthy
-    RequestSettings = 1, // Request extension settings object
-    SettingsUpdate
+    // Request and push updates to extension settings
+    RequestSettings = 1,
+    SettingsUpdate,
+
+    // Request and push updates to Gmail ThreadState
+    RequestThreadState,        // Request thread state from storage
+    ThreadStateStorageUpdate,  // Post update from storage
+    ThreadStateUserUpdate      // Update from user to save to storage
   }
 
   export interface Message {
