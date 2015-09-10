@@ -82,12 +82,12 @@ module Esper.CalPicker {
     });
 
     CurrentThread.withPreferences(function (prefs) {
-'''
-<option #option></option>
-'''
       var places = Preferences.workplaceMap(prefs);
 
       for (var title in places) {
+'''
+<option #option></option>
+'''
         option.text(title);
         option.attr("value", title);
         container.append(option);

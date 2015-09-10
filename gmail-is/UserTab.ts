@@ -428,6 +428,7 @@ module Esper.UserTab {
 
   export function populateMeetingsDropdown(drop: JQuery,
                                            meetInfo: JQuery,
+                                           noMeetingPrefs: JQuery,
                                            meetingTypes: ApiT.MeetingTypes,
                                            workplaces: ApiT.Workplace[],
                                            meeting_changes,
@@ -513,7 +514,7 @@ module Esper.UserTab {
         return;
       } else {
         meetInfo.show();
-        $(".esper-no-prefs").hide();
+        noMeetingPrefs.hide();
       }
 
       if (field === "phone_call") {
@@ -1043,7 +1044,7 @@ module Esper.UserTab {
 
       var meetingTypes = prefs.meeting_types;
       var workplaces = prefs.workplaces;
-      populateMeetingsDropdown(meetingSelector, meetingInfo,
+      populateMeetingsDropdown(meetingSelector, meetingInfo, noMeetingPrefs,
                                meetingTypes, workplaces,
                                meeting_changes, workplace_changes);
 
