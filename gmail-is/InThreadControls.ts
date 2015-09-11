@@ -2,6 +2,9 @@
  *  after the messages of a thread. It is for parts of the UI that need
  *  to be integrated into the assistant's main flow.
  */
+
+/// <reference path="../marten/ts/JQStore.ts" />
+
 module Esper.InThreadControls {
   export function getContainer() {
     var jQ = $(".esper-in-thread-controls")
@@ -52,16 +55,25 @@ module Esper.InThreadControls {
     return getContainer().find('.esper-task-notes-container');
   }
 
+  // Adds Task Notes UI, replaces existing UI if any
   export function refreshTaskNotes() {
     return getTaskNotesContainer()
       .empty()
       .append(taskNotes());
   }
 
-  CurrentThread.currentTeam.watch(function () {
-    if (CurrentThread.currentTeam.isValid() &&
-        CurrentThread.currentTeam.get().isSome()) {
-      refreshTaskNotes();
+  // Adds Task Notes UI, but only if it's not already present
+  export function insertTaskNotes() {
+    var elm = getTaskNotesContainer().filter(":empty");
+    if (elm.length > 0) {
+      elm.append(taskNotes());
+    }
+  }
+
+  // Insert task notes
+  CurrentThread.currentTeam.watch(function (team, valid) {
+    if (valid && team.isSome()) {
+      insertTaskNotes();
     } else {
       removeControls();
     }
@@ -76,6 +88,25 @@ module Esper.InThreadControls {
   function update(view) {
 
   }
+
+  // Reference to the current task note elements
+  var taskNoteElms = {
+    taskNotes: new JQStore(),
+    saveTaskNotes: new JQStore()
+  };
+
+  // Watcher for whether we're in the middle of saving task notes
+  var savingTaskNotes = new Watchable.C<boolean>(
+    function() { return true; }, false
+  );
+
+  savingTaskNotes.watch(function(saving) {
+    if (saving) {
+      // 
+    } else {
+      // 
+    }
+  });
 
   // The id for the notes watcher so that only one exists at a time.
   var notesWatcherId;
@@ -100,13 +131,26 @@ module Esper.InThreadControls {
 '''
     var notes = "";
 
+    // TODO: Loading state should live outside of this function since the
+    // entire task is loading, not just the task notes, but we'll need
+    // to provided some place to store that first.
+    var loading = true;
+    taskNotes.val("Loading ...");
+    taskNotes.prop("disabled", true);
+
     notesWatcherId = CurrentThread.task.watch(function (task, valid, oldTask) {
-      if (valid && task != oldTask) {
-        notes = task.task_notes || ""; // "" if task.task_notes is undefined
+      if (loading) {
+        loading = false;
+        taskNotes.prop("disabled", false);
+      }
+      if (savingTaskNotes.get()) {     // In the middle of saving, don't set
+        return;
+      }
+      if (valid && task !== oldTask) {
+        notes = task.task_notes || ""; // "" if task_notes is undefined
       } else {
         notes = "";
       }
-
       taskNotes.val(notes);
     }, notesWatcherId);
 
@@ -131,12 +175,14 @@ module Esper.InThreadControls {
     saveTaskNotes.click(function() {
       CurrentThread.currentTeam.get().match({
         some : function (team) {
+          savingTaskNotes.set(true);
           if (saveTaskNotes.hasClass("esper-save-enabled")) {
             var notes = taskNotes.val();
             var threadId = CurrentThread.threadId.get();
             CurrentThread.getTaskForThread()
               .done(function(task) {
                 Api.setTaskNotes(task.taskid, notes).done(function() {
+                  savingTaskNotes.set(false);
                   saveTaskNotes.addClass("esper-save-disabled");
                   saveTaskNotes.removeClass("esper-save-enabled");
                   saveTaskNotes.removeClass("esper-clickable");
