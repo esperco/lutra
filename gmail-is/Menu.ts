@@ -156,8 +156,8 @@ module Esper.Menu {
 '''
     var teams = Login.myTeams();
 
-    function bind(elt: JQuery, label: string, is_progress: boolean) {
-      if (is_progress) {
+    function bind(elt: JQuery, label: string, isProgress: boolean) {
+      if (isProgress) {
         elt.attr("data-task-progress", label);
       } else {
         elt.attr("data-task-label", label)
@@ -166,7 +166,7 @@ module Esper.Menu {
         if (elt.hasClass("esper-tl-selected")) {
           elt.removeClass("esper-tl-selected");
         } else {
-          if (!is_progress) {
+          if (!isProgress) {
             all.removeClass("esper-tl-selected");
           }
           elt.addClass("esper-tl-selected");
