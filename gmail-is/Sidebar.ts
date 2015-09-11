@@ -377,26 +377,6 @@ module Esper.Sidebar {
         return false;
       } else {
         var threadId = CurrentThread.threadId.get();
-
-        var links = $("div").find("a");
-        var threadLinks = List.filter(links, function(link: HTMLElement): boolean {
-          var url = $(link).attr("href");
-          if (typeof url === "string") {
-            return url.substring(0,30) === "http://mail.google.com/mail/u/";
-          } else {
-            return false;
-          }
-        });
-        List.iter(threadLinks, function(link) {
-          var url = $(link).attr("href");
-          var len = url.length;
-          $(link).click(function(e) {
-            e.stopPropagation();
-            window.location.hash = "#all/" + url.substring(len - 16, len);
-            return false;
-          });
-        });
-
         var teams = Login.myTeams();
 
         // TODO: Remove autotask logic from Sidebar.ts?
