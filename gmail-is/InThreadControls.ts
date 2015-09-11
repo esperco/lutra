@@ -55,13 +55,6 @@ module Esper.InThreadControls {
     return getContainer().find('.esper-task-notes-container');
   }
 
-  // Adds Task Notes UI, replaces existing UI if any
-  export function refreshTaskNotes() {
-    return getTaskNotesContainer()
-      .empty()
-      .append(taskNotes());
-  }
-
   // Adds Task Notes UI, but only if it's not already present
   export function insertTaskNotes() {
     var elm = getTaskNotesContainer().filter(":empty");
