@@ -328,6 +328,18 @@ module Esper.CurrentThread {
       });
     }
 
+  /** Returns a promise that resolves to the task for the current team/thread
+   *  and creates that task if necessary
+   */
+  export function getTaskForThread(): JQueryPromise<ApiT.Task> {
+    var taskObj = task.get();
+    if (taskObj) {
+      return Promise.defer(taskObj);
+    } else {
+      return refreshTaskForThread(true);
+    }
+  }
+
   /** If there is no current task, fetches it from the server and
    *  updates the cached value, as long as there is a valid team.
    *

@@ -134,7 +134,7 @@ module Esper.InThreadControls {
           if (saveTaskNotes.hasClass("esper-save-enabled")) {
             var notes = taskNotes.val();
             var threadId = CurrentThread.threadId.get();
-            Api.getTaskForThread(team.teamid, threadId, false, true)
+            CurrentThread.getTaskForThread()
               .done(function(task) {
                 Api.setTaskNotes(task.taskid, notes).done(function() {
                   saveTaskNotes.addClass("esper-save-disabled");
