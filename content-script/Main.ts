@@ -21,10 +21,14 @@
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
 /// <reference path="../common/Message.ts" />
+/// <reference path="../common/ExtensionOptions.ts" />
+/// <reference path="../common/ExtensionOptions.Storage.ts" />
 
 /// <reference path="./Update.ts" />
 /// <reference path="./JsonHttp.ts" />
 /// <reference path="./Auth.ts" />
+/// <reference path="./ThreadState.Storage.ts" />
+
 
 module Esper.Main {
   function injectScript(scriptName) {
@@ -41,13 +45,16 @@ module Esper.Main {
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
       .appendTo(docHead);
+
+    // Load vendor script with attributes that tell it how to load the
+    // injected Esper script
+    var esperScriptAttrs = {};
+    esperScriptAttrs["id"] = "esper-script";
+    esperScriptAttrs["src"] = scriptUrl;
+    esperScriptAttrs["data-root-url"] = rootUrl;
     $("<script id='esper-vendor-script'/>")
       .attr("src", vendorScriptUrl)
-      .attr("data-root-url", rootUrl)
-      .appendTo(docHead);
-    $("<script id='esper-script'/>")
-      .attr("src", scriptUrl)
-      .attr("data-root-url", rootUrl)
+      .attr("data-load-next", JSON.stringify(esperScriptAttrs))
       .appendTo(docHead);
   }
 
@@ -64,6 +71,8 @@ module Esper.Main {
 
     Update.init();
     Auth.init();
+    ExtensionOptions.init();
+    ThreadState.init();
   }
 }
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Esper Extension Options</title>
+  <style>
+    body: { padding: 10px; }
+
+    .form-description {
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+      line-height: 1.75em;
+    }
+
+    .form-group input[type=radio] {
+      vertical-align: text-bottom;
+    }
+
+    #load-status {
+      position: fixed;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      padding: 5px;
+      text-align: center;
+      background: #e8d9ee;
+    }
+
+    #save-status {
+      padding-left: 10px;
+      line-height: 2em;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="load-status">Loading ...</div>
+  <form id="options-form">
+    <h3>Default Sidebar State</h3>
+    <div class="form-description">
+      This setting controls how the Esper sidebar is displayed in Gmail. You
+      can always minimize and maximize the sidebar on a per-thread basis.
+      Task notes will still be visible even if the sidebar is minimized.
+    </div>
+    <div class="form-group">
+      <input type="radio" name="default-sidebar-state"
+             id="default-sidebar-show" />
+      <label for="default-sidebar-show">
+        Show the sidebar by default.
+      </label>
+      <br />
+      <input type="radio" name="default-sidebar-state"
+             id="default-sidebar-hide" />
+      <label for="default-sidebar-hide">
+        Minimize the sidebar by default.
+      </label>
+    </div>
+    <button id="save-btn">Save</button>
+    <span id="save-status"></span>
+  </form>
+
+  <script type="text/javascript" src="/js/vendor.js"></script>
+  <script type="text/javascript" src="/js/options.js"></script>
+</body>
+</html>

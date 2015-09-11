@@ -29,6 +29,8 @@
 /// <reference path="../common/Preferences.ts" />
 /// <reference path="../common/TaskPreferences.ts" />
 /// <reference path="../common/JsonHttp.ts" />
+/// <reference path="../common/ExtensionOptions.ts" />
+/// <reference path="../common/ExtensionOptions.Model.ts" />
 
 /// <reference path="./Timezone.ts" />
 /// <reference path="./Gmail.ts" />
@@ -55,6 +57,7 @@
 /// <reference path="./Teams.ts" />
 /// <reference path="./EventWidget.ts" />
 /// <reference path="./Menu.ts" />
+/// <reference path="./ThreadState.ts" />
 /// <reference path="./Sidebar.ts" />
 /// <reference path="./TaskTab.ts" />
 /// <reference path="./InThreadControls.ts" />
@@ -73,9 +76,5 @@ module Esper.Main {
   }
 }
 
-/* Called once per page, but wait for vendor files to load */
-if (Esper.vendorReady) {
-  Esper.Main.init();
-} else {
-  Esper.onVendorReady = Esper.Main.init;
-}
+/* Called once per page */
+Esper.Main.init();

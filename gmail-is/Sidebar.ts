@@ -1,6 +1,9 @@
 /*
   Gmail thread view
 */
+
+/// <reference path="../marten/ts/JQStore.ts" />
+
 module Esper.Sidebar {
   // TODO: ditto
   export function customizeSelectArrow(selector) {
@@ -82,6 +85,88 @@ module Esper.Sidebar {
     teamsSection.append(selector);
   }
 
+  /* Check preferences on whether to display sidebar */
+  function shouldDisplaySidebar(): boolean {
+    var threadId = CurrentThread.threadId.get();
+    if (!threadId) { return false; }
+
+    var data = ThreadState.store.get(threadId);
+    var show = ExtensionOptions.SidebarOpts.SHOW;
+    if (data) {
+      return data[0] === show;
+    } else {
+      var defaultState = ExtensionOptions.store.get();
+      return (defaultState && defaultState[0].defaultSidebarState === show);
+    }
+  }
+
+  // Module level references to jQuery sidebar elements (these get set by
+  // the displayDock function and cleaned up on de-render so we don't have
+  // to worry about memory leaks)
+  var sidebarElms = {
+    wrap:     new JQStore(),
+    sizeIcon: new JQStore(),
+    size:     new JQStore(),
+    sidebar:  new JQStore()
+  };
+
+  function showSidebar() {
+    var wrap = sidebarElms.wrap.get();
+    var size = sidebarElms.size.get();
+    var sizeIcon = sidebarElms.sizeIcon.get();
+    var sidebar = sidebarElms.sidebar.get();
+
+    if (!sidebar.is(":visible")) {
+      wrap.fadeIn(250);
+      sizeIcon.addClass("esper-minimize");
+      size.tooltip("option", "content", "Minimize");
+      sidebar.show("slide", { direction: "down" }, 250);
+    }
+  }
+
+  function hideSidebar() {
+    var wrap = sidebarElms.wrap.get();
+    var size = sidebarElms.size.get();
+    var sizeIcon = sidebarElms.sizeIcon.get();
+    var sidebar = sidebarElms.sidebar.get();
+
+    if (sidebar.is(":visible")) {
+      wrap.fadeOut(250);
+      sizeIcon.removeClass("esper-minimize");
+      size.tooltip("option", "content", "Maximize");
+      sidebar.hide("slide", { direction: "down" }, 250);
+    }
+  }
+
+  /* Listen to ThreadState changes and hide/show sidebar as appropriate.
+     Call during init.
+  */
+  function listenToThreadState() {
+    ThreadState.store.addChangeListener(function() {
+      if (shouldDisplaySidebar()) {
+        showSidebar();
+      } else {
+        hideSidebar();
+      }
+    });
+  }
+
+  /* Manipulate ThreadState for current thread */
+  function setCurrentThreadState(state: ExtensionOptions.SidebarOpts) {
+    var currentThreadId = CurrentThread.threadId.get();
+    if (currentThreadId) {
+      ThreadState.store.upsert(currentThreadId, state);
+    }
+  }
+
+  function toggleSidebar() {
+    if (shouldDisplaySidebar()) {
+      setCurrentThreadState(ExtensionOptions.SidebarOpts.HIDE);
+    } else {
+      setCurrentThreadState(ExtensionOptions.SidebarOpts.SHOW);
+    }
+  }
+
   function displayDock(rootElement, sidebar, isCorrectTeam: boolean) {
 '''
 <div #view class="esper-dock-container">
@@ -111,7 +196,7 @@ module Esper.Sidebar {
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
         <a href="http://esper.com/termsofuse.html">Terms</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
-        <span class="esper-click-safe esper-copyright">&copy; 2014 Esper</span>
+        <span class="esper-click-safe esper-copyright">&copy; 2015 Esper</span>
       </div>
     </div>
   </ul>
@@ -133,22 +218,29 @@ module Esper.Sidebar {
     dropdown.css("max-height", $(window).height() - 100);
     dropdown.css("overflow", "auto");
 
+    sidebarElms.sidebar.set(sidebar);
+    sidebarElms.wrap.set(wrap);
+    sidebarElms.size.set(size);
+    sidebarElms.sizeIcon.set(sizeIcon);
+
     function onTeamSwitch(toTeam: ApiT.Team) {
       CurrentThread.setTeam(Option.wrap(toTeam));
       CurrentThread.refreshTaskForThread(false);
 
       dismissDropdowns();
-      wrap.fadeOut(250);
-      sizeIcon.removeClass("esper-minimize");
-      sidebar.hide("slide", { direction: "down" }, 250);
-      wrap.fadeIn(250);
-      sizeIcon.addClass("esper-minimize");
-      sidebar.show("slide", { direction: "down" }, 250);
+      var timeout = 0;
+      if (sidebar.is(":visible")) {
+        hideSidebar();
+        timeout = 250;
+      }
+
+      // Team switch => treat as if user's explicitly chosen to show sidebar
+      setCurrentThreadState(ExtensionOptions.SidebarOpts.SHOW);
 
       function afterAnimation() {
         displayTeamSidebar(rootElement, true, false);
       }
-      setTimeout(afterAnimation, 250);
+      setTimeout(afterAnimation, timeout);
     }
 
     var teams = Login.myTeams().slice(0); // make a copy
@@ -203,23 +295,11 @@ module Esper.Sidebar {
       }
     }
 
-    function toggleSidebar() {
-      if (sidebar.css("display") === "none") {
-        wrap.fadeIn(250);
-        sizeIcon.addClass("esper-minimize");
-        size.tooltip("option", "content", "Minimize");
-        sidebar.show("slide", { direction: "down" }, 250);
-      } else {
-        wrap.fadeOut(250);
-        sizeIcon.removeClass("esper-minimize");
-        size.tooltip("option", "content", "Maximize");
-        sidebar.hide("slide", { direction: "down" }, 250);
-      }
-    }
+    // Start with sidebar wrap in "off" state
+    wrap.hide();
 
     options.click(toggleOptions);
     size.click(toggleSidebar);
-
     settings.click(function() {
       window.open(Conf.Api.url);
     })
@@ -231,6 +311,15 @@ module Esper.Sidebar {
       Login.logout();
       Menu.create();
     });
+
+    var insertDock = function(someTeam=true) {
+      rootElement.append(view);
+      if (someTeam && shouldDisplaySidebar()) {
+        showSidebar();
+      } else {
+        hideSidebar();
+      }
+    };
 
     CurrentThread.currentTeam.get().match({
       some : function (team) {
@@ -249,11 +338,11 @@ module Esper.Sidebar {
                 .removeClass("esper-team-danger");
           }
 
-          rootElement.append(view);
+          insertDock();
         });
       },
-      none : function () {
-        rootElement.append(view);
+      none: function() {
+        insertDock(false);
       }
     });
   }
@@ -355,13 +444,11 @@ module Esper.Sidebar {
               .done(function(linkedEvents) {
                 var sidebar = displaySidebar(rootElement, threadId, autoTask, linkedEvents);
                 displayDock(rootElement, sidebar, isCorrectTeam);
-                sidebar.show("slide", { direction: "down" }, 250);
               });
           },
           none : function () {
             var sidebar = displaySidebar(rootElement, threadId, autoTask, []);
             displayDock(rootElement, sidebar, isCorrectTeam);
-            $(".esper-dock-wrap").hide();
           }
         });
       }
@@ -433,6 +520,7 @@ module Esper.Sidebar {
             Log.i("Thread id changed; updating view. " + newThreadId);
           }
         });
+        listenToThreadState();
 
         maybeUpdateView();
       });

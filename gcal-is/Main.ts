@@ -41,9 +41,5 @@ module Esper.Main {
   }
 }
 
-/* Called once per page, but wait for vendor files to load */
-if (Esper.vendorReady) {
-  Esper.Main.init();
-} else {
-  Esper.onVendorReady = Esper.Main.init;
-}
+/* Called once per page */
+Esper.Main.init();

@@ -19,6 +19,10 @@ helpers.vendor.build("build-vendor", config);
 helpers.vendor.buildOnce("build-vendor-once", config);
 helpers.vendor.watch("watch-vendor", config);
 
+// HTML pages
+helpers.html.build("build-html", config);
+helpers.html.watch("watch-html", config);
+
 
 // General //////////////////////
 
@@ -30,7 +34,7 @@ gulp.task("production", function(cb) {
 });
 
 // Quick build, no vendor
-var buildBase = gulp.parallel("build-ts", "build-less");
+var buildBase = gulp.parallel("build-ts", "build-less", "build-html");
 
 gulp.task("build", gulp.parallel("build-vendor-once", buildBase));
 
@@ -39,6 +43,6 @@ gulp.task("rebuild", gulp.parallel("build-vendor", buildBase));
 gulp.task("build-production", gulp.series("production", "rebuild"));
 
 gulp.task("watch", gulp.series("build",
-  gulp.parallel("watch-ts", "watch-less", "watch-vendor")));
+  gulp.parallel("watch-ts", "watch-less", "watch-html", "watch-vendor")));
 
 gulp.task("default", gulp.series("build"));

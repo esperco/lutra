@@ -45,7 +45,7 @@ declare module Esper {
   export var onVendorReady: () => void;
 }
 
-(function(Esper) {
+(function(Esper: any) {
   Esper.PRODUCTION = false; // default (this gets changed by Conf files)
 })(Esper || {});
 

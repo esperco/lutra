@@ -1,3 +1,5 @@
+/// <reference path="../marten/ts/Util.ts" />
+
 module Esper.Util {
   function unsafePreparePrintable(x : any, parents, maxDepth: number) {
     if (parents.length >= maxDepth) {
@@ -140,9 +142,10 @@ module Esper.Util {
       .keydown(callback);
   }
 
-  export function randomString() {
-    return Math.random().toString(36).slice(2);
-  }
+  // NB: Moved randomString() to Marten
+  // export function randomString() {
+  //   return Math.random().toString(36).slice(2);
+  // }
 
   /* Inspect DOM tree */
   export function findTextInDom(text: string) {
