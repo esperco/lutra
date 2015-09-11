@@ -364,5 +364,30 @@ module Esper.Model {
       });
     });
 
+    describe("Change listeners trying to update existing keys", function() {
+      beforeAll(function() {
+        reset();
+        var called = false;
+        myRabbitStore.addChangeListener(function() {
+          if (! called) {
+            called = true; // To prevent infinite loop
+            myRabbitStore.update("brownRabbitId", {
+              uid: "brownRabbitId",
+              carrots: 12345
+            });
+          }
+        });
+      });
+
+      /*
+        Store changes that result in further updates to that same store are
+        difficult to reason about and can trigger cascading loops, hence
+        the error.
+      */
+      it("should throw a unidirectional flow error", function() {
+        expect(insertBrownRabbit).toThrowError(/flow error/);
+      });
+    });
+
   });
 }

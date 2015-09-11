@@ -69,13 +69,31 @@ module Esper.Model {
       this.removeAllListeners(this.CHANGE_EVENT);
     }
 
-    // Call this whenever the store is changed. This class is protected so
-    // that we can modify or override in derived classes
+    /*
+      Use to track whether emitChange has been called during an emitChange
+      cycle. The purpose of this is maintain unidirectional data flow. State
+      changes trigger event callbacks that further update the state are
+      difficult to reason about. They also run the risk of setting off an
+      infinite loop.
+    */
+    protected alreadyEmitted = false;
+
+    // Call this whenever the store is changed.
     protected emitChange(_ids?: string[]): void {
-      if (_ids) {
-        this.emit(this.CHANGE_EVENT, _ids);
-      } else {
-        this.emit(this.CHANGE_EVENT);
+      if (this.alreadyEmitted) {
+        throw new Error("Unidirectional data flow error: Cannot update " +
+          "store via change handler");
+      }
+
+      this.alreadyEmitted = true;
+      try {
+        if (_ids) {
+          this.emit(this.CHANGE_EVENT, _ids);
+        } else {
+          this.emit(this.CHANGE_EVENT);
+        }
+      } finally {
+        this.alreadyEmitted = false;
       }
     }
   }
