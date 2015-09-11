@@ -7,6 +7,9 @@
   of a particular data type and metadata. Stores should registered with
   the dispatcher so they're updated when Actions are dispatched.
 */
+
+/// <reference path="./Util.ts" />
+
 module Esper.Model {
 
 
@@ -35,25 +38,53 @@ module Esper.Model {
   // An update function is a function that receives data and metadata and
   // returns either the updated object or an updated object/metadata pairing.
   // Used in update function below
-  interface UpdateFn<TData> {
+  export interface UpdateFn<TData> {
     (oldData: TData, oldMetadata: StoreMetadata): TData|[TData, StoreMetadata];
   }
 
-  // Base class for Model Stores
-  export class Store<TData> extends EventEmitter {
-
+  // Base class for Store-like classes with EventEmitters
+  export class StoreBase<TData> extends EventEmitter {
     /*
       For simplicity we just emit a single change variable whenever any
-      modification happens to a store and let the handler re-query as
-      appropriate to figure out what's different. This is a little inefficient,
-      but it's insignificant relative to round-trip time to a server or
-      updating the actual DOM, and it makes reasoning about our code a lot
-      easier.
+      modification happens to a store. We can pass along a list of _id changes
+      but otherwise we let the handler re-query as appropriate to figure out
+      what's different. This may be a little inefficient, but it's
+      insignificant relative to round-trip time to a server or updating the
+      actual DOM, and it makes reasoning about our code a lot easier.
     */
-    private CHANGE_EVENT: string = "CHANGE";
+    protected CHANGE_EVENT: string = "CHANGE";
+
+    // Register a callback to handle store changes
+    addChangeListener(callback: (_ids: string[]) => void): void {
+      this.on(this.CHANGE_EVENT, callback);
+    }
+
+    // De-register a callback to handle store changes
+    removeChangeListener(callback: (_ids: string[]) => void): void {
+      this.removeListener(this.CHANGE_EVENT, callback);
+    }
+
+    // Remove all listeners
+    removeAllChangeListeners(): void {
+      this.removeAllListeners(this.CHANGE_EVENT);
+    }
+
+    // Call this whenever the store is changed. This class is protected so
+    // that we can modify or override in derived classes
+    protected emitChange(_ids?: string[]): void {
+      if (_ids) {
+        this.emit(this.CHANGE_EVENT, _ids);
+      } else {
+        this.emit(this.CHANGE_EVENT);
+      }
+    }
+  }
+
+  // Base class for Model Stores
+  export class Store<TData> extends StoreBase<TData> {
 
     // Actual container for data
-    private data: {
+    protected data: {
       [index: string]: [TData, StoreMetadata];
     };
 
@@ -77,30 +108,26 @@ module Esper.Model {
       }
     }
 
+    // Returns just the value and not the metadata
+    val(_id: string): TData {
+      if (this.has(_id)) {
+        return this.data[_id][0];
+      }
+    }
+
+    metadata(_id: string): StoreMetadata {
+      if (this.has(_id)) {
+        return this.data[_id][1];
+      }
+    }
+
     // Return all store objects
     getAll(): [TData, StoreMetadata][] {
       return _.values<[TData, StoreMetadata]>(this.data);
     }
 
-    // Register a callback to handle store changes
-    addChangeListener(callback: () => void): void {
-      this.on(this.CHANGE_EVENT, callback);
-    }
-
-    // De-register a callback to handle store changes
-    removeChangeListener(callback: () => void): void {
-      this.removeListener(this.CHANGE_EVENT, callback);
-    }
-
-    // Remove all listeners
-    removeAllChangeListeners(): void {
-      this.removeAllListeners(this.CHANGE_EVENT);
-    }
-
-    // Call this whenever the store is changed. This class is protected so
-    // that we can modify or override in derived classes
-    protected emitChange(): void {
-      this.emit(this.CHANGE_EVENT);
+    valAll(): TData[] {
+      return _.map(this.getAll(), function(tuple) { return tuple[0]; });
     }
 
 
@@ -131,7 +158,7 @@ module Esper.Model {
       metadata = this.cleanMetadata(_id, data, metadata);
       // Store data in immutable fashion
       this.data[_id] = Util.deepFreeze<[TData,StoreMetadata]>([data, metadata]);
-      this.emitChange();
+      this.emitChange([_id]);
     }
 
     // Hook to preset metadata before it's set
@@ -219,8 +246,13 @@ module Esper.Model {
     remove(_id: string): void {
       if (this.has(_id)) {
         delete this.data[_id];
-        this.emitChange();
+        this.emitChange([_id]);
       }
+    }
+
+    // Alias for remove
+    unset(_id: string): void {
+      this.remove(_id);
     }
   }
 }

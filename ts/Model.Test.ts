@@ -1,4 +1,4 @@
-/* Test Flux module */
+/* Test Model.Store */
 
 /// <reference path="./Model.ts"/>
 module Esper.Model {
@@ -69,8 +69,19 @@ module Esper.Model {
           .toEqual(carrots);
       });
 
+      it("should allow us to get only the value by _id", function() {
+        expect(myRabbitStore.val("brownRabbitId").carrots).toEqual(carrots);
+      });
+
       it("should allow us to get metadata", function() {
         var metadata = myRabbitStore.get("brownRabbitId")[1];
+        expect(metadata._id).toBe("brownRabbitId");
+        expect(metadata.dataStatus).toBe(DataStatus.READY);
+        expect(metadata.lastUpdate).toEqual(baseTime);
+      });
+
+      it("should allow us to get only the metadata by _id", function() {
+        var metadata = myRabbitStore.metadata("brownRabbitId");
         expect(metadata._id).toBe("brownRabbitId");
         expect(metadata.dataStatus).toBe(DataStatus.READY);
         expect(metadata.lastUpdate).toEqual(baseTime);
@@ -83,8 +94,39 @@ module Esper.Model {
           .toEqual(oldCarrots);
       });
 
-      it("should call the listener", function() {
-        expect(listener).toHaveBeenCalled();
+      it("should call the listener with the _id", function() {
+        expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
+      });
+    });
+
+    describe("Insert multiple", function() {
+      beforeAll(function() {
+        reset();
+        myRabbitStore.insert("albinoRabbitId", {
+          uid: "albinoRabbitId", carrots: 2
+        });
+        myRabbitStore.insert("brownRabbitId", {
+          uid: "brownRabbitId", carrots: 1
+        });
+        jasmine.addCustomEqualityTester(_.eq);
+      });
+
+      it("should let us get all inserted data", function() {
+        var rabbits = myRabbitStore.getAll();
+        var rabbitIds = _.map(rabbits, function(r) { return r[0].uid; }).sort();
+        expect(rabbitIds).toEqual(["albinoRabbitId", "brownRabbitId"]);
+      });
+
+      it("should let us get all inserted metadata", function() {
+        var rabbits = myRabbitStore.getAll();
+        var rabbitIds = _.map(rabbits, function(r) { return r[1]._id; }).sort();
+        expect(rabbitIds).toEqual(["albinoRabbitId", "brownRabbitId"]);
+      });
+
+      it("should let us get all inserted data only", function() {
+        var rabbits = myRabbitStore.valAll();
+        var rabbitIds = _.map(rabbits, function(r) { return r.uid; }).sort();
+        expect(rabbitIds).toEqual(["albinoRabbitId", "brownRabbitId"]);
       });
     });
 
@@ -152,8 +194,8 @@ module Esper.Model {
           expect(metadata.lastUpdate).toEqual(baseTime);
         });
 
-        it("should call the listener", function() {
-          expect(listener).toHaveBeenCalled();
+        it("should call the listener with the _id", function() {
+          expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
         });
       }
     );
@@ -179,8 +221,8 @@ module Esper.Model {
             .toEqual(carrots);
         });
 
-        it("should call the listener", function() {
-          expect(listener).toHaveBeenCalled();
+        it("should call the listener with the _id", function() {
+          expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
         });
       });
 
@@ -304,8 +346,8 @@ module Esper.Model {
         expect(myRabbitStore.get("brownRabbitId")).toBeUndefined();
       });
 
-      it("should call listener", function() {
-        expect(listener).toHaveBeenCalled();
+      it("should call listener with the _id", function() {
+        expect(listener).toHaveBeenCalledWith(["brownRabbitId"]);
       });
     });
 
