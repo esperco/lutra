@@ -510,15 +510,6 @@ textarea.esper-input { resize: none; }
   .esper-modal-bg;
 }
 
-.esper-tl-close {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  font-size: 22px;
-  color: @gray_20;
-  padding: 10px;
-}
-
 .esper-tl-modal {
   .esper-modal;
 
@@ -1752,6 +1743,10 @@ ul.esper-ev-dropdown {
   }
 }
 
+.esper-agenda-format {
+  margin-left: 15px;
+}
+
 .esper-agenda-select {
   margin-bottom: 5px;
 }
@@ -1907,15 +1902,24 @@ ul.esper-ev-dropdown {
   text-align: right;
   border-top: 1px solid @gray_10;
   box-sizing: border-box;
-  .modal-primary { float: right; }
+  .modal-primary { float: left; }
   .modal-cancel {
-    float: right;
-    margin-right: 6px;
+    float: left;
+    margin-left: 6px;
   }
   .modal-delete {
     float: left;
     color: @red !important;
   }
+}
+
+.esper-modal-close {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 22px;
+  color: @gray_20;
+  padding: 10px;
 }
 
 

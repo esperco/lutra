@@ -82,6 +82,7 @@ module Esper.Menu {
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
     <div class="esper-modal-header">Get Task List</div>
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <table class="esper-modal-content">
       <tr>
         <td>
@@ -323,51 +324,71 @@ module Esper.Menu {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
-    <div class="esper-modal-header">Send Agenda</div>
-    <div class="esper-modal-content">
-      <label class="esper-agenda-title">
-        Team:
-        <select #teamSelect class="esper-agenda-select"/>
-      </label>
-      <br/>
-      <label class="esper-agenda-title">
-        Exec Timezone:
-        <select #tzSelect class="esper-agenda-select"/>
-      </label>
-      <br/>
-      <label class="esper-agenda-title">
-        Time From:
-        <input #timeFromDate type="text" class="esper-email-date-select"/>
-      </label>
-      <br/>
-      <label class="esper-agenda-title">
-        Time Until:
-        <input #timeUntilDate type="text" class="esper-email-date-select"/>
-      </label>
-      <br/>
-      <label class="esper-agenda-title">
-        Agenda format:
-        <label>
-          <input #htmlFormat type="radio" name="format" />
-          Stylized
-        </label>
-        <label>
-          <input #textFormat type="radio" name="format" />
-          Plain text
-        </label>
-      </label>
-      <br/>
-      <label>
-        <input #includeTaskNotes type="checkbox" />
-          Include task notes
-      </label>
-      <br/>
-      <label class="esper-agenda-title">
-        Send to:
-        <div #recipients class="esper-agenda-section">
-        </div>
-      </label>
-    </div>
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
+    <div class="esper-modal-header">Agenda</div>
+    <table class="esper-modal-content">
+      <tr>
+        <td>
+          <label class="esper-agenda-title">
+            Executive Team:
+          </label>
+        </td>
+          <select #teamSelect class="esper-agenda-select"/>
+        <td>
+      </tr>
+      <tr>
+        <td>
+          <label class="esper-agenda-title">
+            Executive Timezone:
+          </label>
+        </td>
+        <td>
+          <select #tzSelect class="esper-agenda-select"/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <input #timeFromDate type="text" class="esper-email-date-select"/>
+          <span>to</span>
+          <input #timeUntilDate type="text" class="esper-email-date-select"/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label class="esper-agenda-title">
+            Agenda Format:
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="esper-agenda-format">
+            <label>
+              <input #htmlFormat type="radio" name="format" />
+              HTML
+            </label>
+            <label>
+              <input #textFormat type="radio" name="format" />
+              Plain Text
+            </label>
+            <br/>
+            <label>
+              <input #includeTaskNotes type="checkbox" />
+                Include task notes
+            </label>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label class="esper-agenda-title">
+            Send to:
+            <div #recipients class="esper-agenda-section">
+            </div>
+          </label>
+        </td>
+      </tr>
+    </table>
     <div class="esper-modal-footer esper-clearfix">
       <div #errorMessages>
       </div>
@@ -402,10 +423,10 @@ module Esper.Menu {
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
         .addClass("esper-agenda-recipient")
-        .text(email)
-        .append($("<br />"));
+        .text(email);
       i.appendTo(recipients);
       l.appendTo(recipients);
+      $("<br />").appendTo(recipients);
     }
 
     teamSelect.change(function() {
@@ -470,6 +491,7 @@ module Esper.Menu {
     function cancel() { view.remove(); }
 
     view.click(cancel);
+    closeButton.click(cancel);
     Util.preventClickPropagation(modal);
     cancelButton.click(cancel);
     sendButton.click(function() {
