@@ -301,7 +301,7 @@ module Esper.TaskList {
 '''
 <div #view class="esper-tl-modal">
   <div class="esper-tl-task-list">
-    <span #closeButton class="esper-tl-close esper-clickable">×</span>
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <button #emailButton
       class="esper-tl-email esper-btn esper-btn-secondary esper-clickable"
       title="Email all tasks with the current label to yourself">Email to myself</button>

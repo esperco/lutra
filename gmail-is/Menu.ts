@@ -82,6 +82,7 @@ module Esper.Menu {
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
     <div class="esper-modal-header">Get Task List</div>
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <table class="esper-modal-content">
       <tr>
         <td>
@@ -323,7 +324,8 @@ module Esper.Menu {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
-    <div class="esper-modal-header">Send Agenda</div>
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
+    <div class="esper-modal-header">Agenda</div>
     <table class="esper-modal-content">
       <tr>
         <td>
@@ -345,53 +347,46 @@ module Esper.Menu {
         </td>
       </tr>
       <tr>
-        <td>
-          <label class="esper-agenda-title">
-            Time From:
-          </label>
-        </td>
-        <td>
+        <td colspan="2">
           <input #timeFromDate type="text" class="esper-email-date-select"/>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label class="esper-agenda-title">
-            Time Until:
-          </label>
-        </td>
-        <td>
+          <span>to</span>
           <input #timeUntilDate type="text" class="esper-email-date-select"/>
         </td>
       </tr>
       <tr>
-        <label class="esper-agenda-title">
-          Agenda Format:
-        </label>
+        <td colspan="2">
+          <label class="esper-agenda-title">
+            Agenda Format:
+          </label>
+        </td>
       </tr>
       <tr>
-        <div class="esper-agenda-format">
-          <label>
-            <input #htmlFormat type="radio" name="format" />
-            HTML
-          </label>
-          <label>
-            <input #textFormat type="radio" name="format" />
-            Plain Text
-          </label>
-          <br/>
-          <label>
-            <input #includeTaskNotes type="checkbox" />
-              Include task notes
-          </label>
-        </div>
-      </tr>
-      <tr>
-        <label class="esper-agenda-title">
-          Send to:
-          <div #recipients class="esper-agenda-section">
+        <td colspan="2">
+          <div class="esper-agenda-format">
+            <label>
+              <input #htmlFormat type="radio" name="format" />
+              HTML
+            </label>
+            <label>
+              <input #textFormat type="radio" name="format" />
+              Plain Text
+            </label>
+            <br/>
+            <label>
+              <input #includeTaskNotes type="checkbox" />
+                Include task notes
+            </label>
           </div>
-        </label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <label class="esper-agenda-title">
+            Send to:
+            <div #recipients class="esper-agenda-section">
+            </div>
+          </label>
+        </td>
       </tr>
     </table>
     <div class="esper-modal-footer esper-clearfix">
@@ -428,10 +423,10 @@ module Esper.Menu {
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
         .addClass("esper-agenda-recipient")
-        .text(email)
-        .append($("<br />"));
+        .text(email);
       i.appendTo(recipients);
       l.appendTo(recipients);
+      $("<br />").appendTo(recipients);
     }
 
     teamSelect.change(function() {
@@ -496,6 +491,7 @@ module Esper.Menu {
     function cancel() { view.remove(); }
 
     view.click(cancel);
+    closeButton.click(cancel);
     Util.preventClickPropagation(modal);
     cancelButton.click(cancel);
     sendButton.click(function() {
