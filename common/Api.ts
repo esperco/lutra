@@ -502,8 +502,9 @@ module Esper.Api {
   }
 
   export function sendTaskList(teamid,
-                               progress: string[],
                                labels: string[],
+                               progress: string[],
+                               html_format: boolean,
                                recipients: string[]):
   JQueryPromise<void> {
     var url =
@@ -511,6 +512,7 @@ module Esper.Api {
       + "/" + string(teamid);
     var params = { labels: labels,
                    progress: progress,
+                   html_format: html_format,
                    recipients: recipients
                  };
     return JsonHttp.post(url, JSON.stringify(params));  
