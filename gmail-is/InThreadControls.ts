@@ -2,6 +2,9 @@
  *  after the messages of a thread. It is for parts of the UI that need
  *  to be integrated into the assistant's main flow.
  */
+
+/// <reference path="../marten/ts/JQStore.ts" />
+
 module Esper.InThreadControls {
   export function getContainer() {
     var jQ = $(".esper-in-thread-controls")
@@ -52,16 +55,18 @@ module Esper.InThreadControls {
     return getContainer().find('.esper-task-notes-container');
   }
 
-  export function refreshTaskNotes() {
-    return getTaskNotesContainer()
-      .empty()
-      .append(taskNotes());
+  // Adds Task Notes UI, but only if it's not already present
+  export function insertTaskNotes() {
+    var elm = getTaskNotesContainer().filter(":empty");
+    if (elm.length > 0) {
+      elm.append(taskNotes());
+    }
   }
 
-  CurrentThread.currentTeam.watch(function () {
-    if (CurrentThread.currentTeam.isValid() &&
-        CurrentThread.currentTeam.get().isSome()) {
-      refreshTaskNotes();
+  // Insert task notes
+  CurrentThread.currentTeam.watch(function (team, valid) {
+    if (valid && team.isSome()) {
+      insertTaskNotes();
     } else {
       removeControls();
     }
@@ -77,6 +82,27 @@ module Esper.InThreadControls {
 
   }
 
+  // Reference to the current task note elements
+  var taskNoteElms = {
+    textarea: new JQStore(),
+    status: new JQStore(),
+    button: new JQStore()
+  };
+
+  // Watcher for whether we're in the middle of saving task notes
+  var savingTaskNotes = new Watchable.C<boolean>(
+    function() { return true; }, false
+  );
+
+  savingTaskNotes.watch(function(saving) {
+    if (saving) {
+      taskNoteElms.status.get().html("Saving &hellip;")
+      taskNoteElms.button.get().prop("disabled", true);
+    } else {
+      taskNoteElms.status.get().html("");
+    }
+  });
+
   // The id for the notes watcher so that only one exists at a time.
   var notesWatcherId;
 
@@ -87,26 +113,37 @@ module Esper.InThreadControls {
     <span class="esper-bold" style="float:left">Task Notes</span>
   </div>
   <div class="esper-section-notes">
-    <textarea #taskNotes rows=5
+    <textarea #taskNotes rows=5 disabled
           placeholder="Leave some brief notes about the task here"
-          class="esper-text-notes"/>
+          class="esper-text-notes" >
+        Loading &hellip;
+    </textarea>
   </div>
   <div class="esper-section-footer esper-clearfix">
-    <div #saveTaskNotes class="esper-save-notes esper-save-disabled">
+    <span #saveStatus class="esper-save-status" />
+    <button #saveTaskNotes disabled
+            class="esper-btn esper-btn-primary esper-save-notes">
       Save
-    </div>
+    </button>
   </div>
 </div>
 '''
+    taskNoteElms.button.set(saveTaskNotes);
+    taskNoteElms.status.set(saveStatus);
+    taskNoteElms.textarea.set(taskNotes);
+
     var notes = "";
 
     notesWatcherId = CurrentThread.task.watch(function (task, valid, oldTask) {
-      if (valid && task != oldTask) {
-        notes = task.task_notes || ""; // "" if task.task_notes is undefined
+      taskNotes.prop("disabled", false);
+      if (savingTaskNotes.get()) {     // In the middle of saving, don't set
+        return;
+      }
+      if (valid && task !== oldTask) {
+        notes = task.task_notes || ""; // "" if task_notes is undefined
       } else {
         notes = "";
       }
-
       taskNotes.val(notes);
     }, notesWatcherId);
 
@@ -118,32 +155,26 @@ module Esper.InThreadControls {
 
     function taskNotesKeyup(notes) {
       if (taskNotes.val() === notes) {
-        saveTaskNotes.addClass("esper-save-disabled");
-        saveTaskNotes.removeClass("esper-save-enabled");
-        saveTaskNotes.removeClass("esper-clickable");
+        saveTaskNotes.prop("disabled", true);
       } else {
-        saveTaskNotes.addClass("esper-clickable");
-        saveTaskNotes.addClass("esper-save-enabled");
-        saveTaskNotes.removeClass("esper-save-disabled");
+        saveTaskNotes.prop("disabled", false);
       }
     }
 
     saveTaskNotes.click(function() {
       CurrentThread.currentTeam.get().match({
         some : function (team) {
-          if (saveTaskNotes.hasClass("esper-save-enabled")) {
-            var notes = taskNotes.val();
-            var threadId = CurrentThread.threadId.get();
-            Api.getTaskForThread(team.teamid, threadId, false, true)
-              .done(function(task) {
-                Api.setTaskNotes(task.taskid, notes).done(function() {
-                  saveTaskNotes.addClass("esper-save-disabled");
-                  saveTaskNotes.removeClass("esper-save-enabled");
-                  saveTaskNotes.removeClass("esper-clickable");
-                  taskNotes.keyup(function() {taskNotesKeyup(notes);});
-                });
+          savingTaskNotes.set(true);
+          var notes = taskNotes.val();
+          var threadId = CurrentThread.threadId.get();
+          CurrentThread.getTaskForThread()
+            .done(function(task) {
+              Api.setTaskNotes(task.taskid, notes).done(function() {
+                savingTaskNotes.set(false);
+                saveTaskNotes.prop("disabled", true);
+                taskNotes.keyup(function() {taskNotesKeyup(notes);});
               });
-          }
+            });
         },
         none : function () {
           return;
@@ -194,7 +225,7 @@ module Esper.InThreadControls {
             var nl = "";
             if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
             taskNotes.val(curNotes + nl + text);
-            saveTaskNotes.addClass("esper-save-enabled");
+            saveTaskNotes.prop("disabled", false);
             saveTaskNotes.trigger("click");
             actionDiv.remove();
 
