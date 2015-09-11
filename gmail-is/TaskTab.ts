@@ -232,6 +232,8 @@ module Esper.TaskTab {
   function selectMeetingTypeOnUserTab(meetingType : string,
                                       userTabContent : UserTab.UserTabView)
   : void {
+    userTabContent.meetingSelector.find(".extra").remove();
+
     // Use the default option for generic "meeting".
     if (meetingType.toLowerCase() !== "meeting") {
       var found = false;
@@ -248,10 +250,10 @@ module Esper.TaskTab {
       });
       if (!found) {
         UserTab.currentMeetingType = meetingType.toLowerCase().replace(/ /,"_");
-        var opt = $("<option value='" + meetingType + "' disabled>"
+        var opt = $("<option value='" + meetingType + "' disabled class='extra'>"
                     + meetingType.replace("_", " ") + "</option>");
         var drop = userTabContent.meetingSelector;
-        drop.append($("<option disabled>──────</option>"));
+        drop.append($("<option disabled class='extra'>──────</option>"));
         drop.append(opt);
         drop.val(opt.val());
         userTabContent.meetingInfo.hide();
@@ -336,7 +338,6 @@ module Esper.TaskTab {
                   return Api.setTaskMeetingType(newTaskId, meetingType);
                 });
                 result.task_data.task_meeting_type = meetingType;
-                selectMeetingTypeOnUserTab(meetingType, userTabContent);
               }
             } else {
               job = Api.linkThreadToTask(teamid, threadId, newTaskId);
@@ -350,6 +351,8 @@ module Esper.TaskTab {
 
             CurrentThread.setTask(result.task_data);
             taskTitle.val(title);
+            selectMeetingTypeOnUserTab(result.task_data.task_meeting_type,
+                                       userTabContent);
             Sidebar.dismissDropdowns();
           });
       });
