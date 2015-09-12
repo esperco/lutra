@@ -751,6 +751,13 @@ module Esper.TaskTab {
         taskTabView.taskCaption.text(taskLabelExists);
         taskTabView.taskTitle.text(task.task_title);
         workflowSelect.prop("disabled", false);
+        displayTaskProgress(task, taskTabView);
+        taskTitle.show();
+        taskCancel.show();
+        if (task.task_meeting_type) {
+          selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+        }
+        view.find("select.esper-meeting-type").hide();
       } else {
         taskTabView.taskCaption.text(taskLabelCreate);
         taskTabView.taskTitle.text("");
