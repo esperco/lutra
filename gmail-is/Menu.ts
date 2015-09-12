@@ -301,14 +301,17 @@ module Esper.Menu {
             .addClass("esper-agenda-error")
             .html("You must select at least one " + arg);
           e.appendTo(errorMessages);
-          return;
+          return false;
         }
+        return true;
       }
 
-      validateLists(p, "progress label");
-      validateLists(l, "task label");
-      validateLists(r, "recipient");
-
+      if (!validateLists(p, "progress label")
+          || !validateLists(l, "task label")
+          || !validateLists(r, "recipient")) {
+        return;
+      }
+      
       cancelButton.prop("disabled", true);
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
