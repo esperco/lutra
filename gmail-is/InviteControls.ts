@@ -165,7 +165,7 @@ module Esper.InviteControls {
 '''
 <div #container>
   <div #heading class="esper-modal-header">
-    Create a duplicate event for guests
+    Invite Guests
   </div>
   <div class="esper-modal-content">
     <div #titleRow class="esper-ev-modal-row esper-clearfix">
@@ -238,14 +238,23 @@ module Esper.InviteControls {
     Sidebar.customizeSelectArrow(pubCalendar);
     Sidebar.customizeSelectArrow(fromSelect);
 
-    if (execEvent) {
-      pubTitle.val(state.title);
+    var headingText: string;
+    var defaultTitle: string;
+    if (duplicate) {
+      if (execEvent) {
+        headingText = team.team_name + "'s Event Details"
+        defaultTitle = state.title;
+      } else {
+        headingText = "Create a duplicate event for guests";
+        defaultTitle = "Event with " + team.team_name;
+      }
     } else {
-      var defaultTitle = "Event with " + team.team_name;
-      pubTitle.val(defaultTitle);
-      pubTitle.attr("placeholder", defaultTitle);
+      headingText = "Invite guests to " + team.team_name + "'s event";
+      defaultTitle = state.title;
     }
-
+    heading.text(headingText);
+    pubTitle.val(defaultTitle);
+    pubTitle.attr("placeholder", defaultTitle);
     pubLocation.val(state.location.address);
 
     if (state.description) {
@@ -328,16 +337,12 @@ module Esper.InviteControls {
     var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
 
-    if (execEvent) {
-      heading.text(team.team_name + "'s Event Details");
-      calendarRow.remove();
-
-      if (duplicate) {
+    if (duplicate) {
+      if (execEvent) {
+        calendarRow.remove();
         execEventTag.appendTo(heading);
         guestsRow.remove();
-      }
-    } else {
-      if (duplicate) {
+      } else {
         guestsEventTag.appendTo(heading);
       }
     }
@@ -662,9 +667,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               Slides.create<InviteState>(startState, slides, controls);
             InThreadControls.setEventControlContainer(slideWidget);
           } else {
-            function wrap(slideFn : (state : InviteState, duplicate? : boolean, 
+            function wrap(slideFn : (state : InviteState, duplicate? : boolean,
                                      execEvent? : boolean) => Slides.Slide<InviteState>,
-                          key : string) 
+                          key : string)
             : (state : DualState) => Slides.Slide<DualState> {
               return function (state : DualState) : Slides.Slide<DualState> {
                 var slide = slideFn(state[key], true, key == "exec");
