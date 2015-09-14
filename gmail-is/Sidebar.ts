@@ -513,7 +513,6 @@ module Esper.Sidebar {
       initJob = Teams.initialize().done(function() {
         Log.d("Sidebar.init()");
 
-        CurrentThread.init();
         CurrentThread.threadId.watch(function (newThreadId, v, oldThreadId) {
           if (newThreadId !== oldThreadId) {
             maybeUpdateView();
@@ -522,7 +521,7 @@ module Esper.Sidebar {
         });
         listenToThreadState();
 
-        maybeUpdateView();
+        CurrentThread.init();
       });
 
       return initJob;

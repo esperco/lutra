@@ -43,7 +43,7 @@ module Esper.CurrentThread {
    */
   export var threadId = new Esper.Watchable.C<string>(
     function (threadId) { return threadId && typeof threadId === "string" },
-    readThreadId()
+    undefined
   );
 
   var initialized = false;
@@ -63,7 +63,6 @@ module Esper.CurrentThread {
           updateCurrentThreadId();
         }
       };
-
       updateCurrentThreadId();
     }
   }
