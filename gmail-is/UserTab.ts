@@ -8,27 +8,6 @@ module Esper.UserTab {
     return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
   }
 
-  function displayAssistantAlias(container: JQuery, alias: ApiT.Guest) {
-'''
-<div #view>
-  <div>
-    <span class="esper-bold">Name:</span>
-    <span #aliasName></span>
-  </div>
-  <div>
-    <span class="esper-bold">Email:</span>
-    <span #aliasEmail></span>
-  </div>
-</div>
-'''
-    if (alias !== undefined) {
-      aliasName.text(alias.display_name);
-      aliasEmail.text(alias.email);
-
-      container.append(view);
-    }
-  }
-
   function displayAvailability(meetingPrefs: JQuery,
                                availabilities: ApiT.Availability[],
                                last: boolean,
@@ -396,34 +375,6 @@ module Esper.UserTab {
 
     meetingView.children().remove();
     meetingView.append(view);
-  }
-
-  function viewOfTransportationType(transportationType: string,
-                                    last: boolean,
-                                    changes) {
-'''
-<li #view class="esper-transportation-type esper-clearfix">
-  <object #icon class="esper-svg esper-transportation-icon"/>
-  <span #label class="esper-transportation-title">
-    <object #transportNew class="esper-svg esper-new-preference-icon"/>
-  </span>
-</li>
-'''
-    var new_transports = getSubPreferenceChanges("Added", changes);
-
-    if (List.mem(new_transports, transportationType)) {
-      transportNew.attr("data", Init.esperRootUrl + "img/new_pref.svg");
-    }
-
-    var imageFile = transportationType.toLowerCase();
-    icon.attr("data", Init.esperRootUrl + "img/" + imageFile + ".svg");
-    label.prepend(transportationType);
-
-    if (last) {
-      view.addClass("esper-last");
-    }
-
-    return view;
   }
 
   export function populateMeetingsDropdown(drop: JQuery,
@@ -844,14 +795,6 @@ module Esper.UserTab {
     view: JQuery;
     user: JQuery;
     preferencesSpinner: JQuery;
-    aliasHeader: JQuery;
-    showAlias: JQuery;
-    aliasContainer: JQuery;
-    generalHeader: JQuery;
-    showGeneral: JQuery;
-    generalNew: JQuery;
-    generalContainer: JQuery;
-    generalDetailedContainer: JQuery;
     teamLabelsSection: JQuery;
     teamLabelsHeader: JQuery;
     showTeamLabels: JQuery;
@@ -874,11 +817,6 @@ module Esper.UserTab {
     meetingSelector: JQuery;
     noMeetingPrefs: JQuery;
     meetingInfo: JQuery;
-    transportationHeader: JQuery;
-    showTransportation: JQuery;
-    transportationNew: JQuery;
-    transportationContainer: JQuery;
-    transportationPreferences: JQuery;
     notesHeader: JQuery;
     showNotes: JQuery;
     notesNew: JQuery;
@@ -895,28 +833,23 @@ module Esper.UserTab {
       <div class="esper-spinner esper-list-spinner"/>
     </div>
     <div class="esper-section">
-      <div #aliasHeader class="esper-section-header esper-clearfix">
-        <span #showAlias
-              class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Assistant Alias</span>
+      <div #meetingsHeader
+           class="esper-section-header esper-clearfix esper-meetings-header">
+        <span #showMeetings
+              class="esper-link esper-meetings" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Meetings</span>
+        <span #meetingsNew class="esper-new-marker">NEW</span>
       </div>
-      <div #aliasContainer
-           class="esper-section-container esper-preferences-general"
-           style="display:none"/>
-    </div>
-    <div class="esper-section">
-      <div #generalHeader
-           class="esper-section-header esper-open esper-clearfix">
-        <span #showGeneral
-              class="esper-link" style="float:right">Show More</span>
-        <span class="esper-bold" style="float:left">General</span>
-        <span #generalNew class="esper-new-marker">NEW</span>
+      <div #meetingsContainer
+           class="esper-section-container esper-meetings-container"
+           style="display:none">
+        <div #meetingsSelector class="esper-section-selector esper-clearfix">
+          <span class="esper-show-selector">Show: </span>
+          <select #meetingSelector class="esper-select esper-meeting-selector"/>
+        </div>
+        <div #noMeetingPrefs style="display: none" class="esper-no-prefs"/>
+        <div class="esper-user-tab-meeting-info" #meetingInfo/>
       </div>
-      <div #generalContainer
-           class="esper-section-container esper-preferences-general"/>
-      <div #generalDetailedContainer
-           class="esper-section-container esper-preferences-general"
-           style="display:none"/>
     </div>
     <div #teamLabelsSection class="esper-section">
       <div #teamLabelsHeader class="esper-section-header esper-clearfix">
@@ -950,96 +883,61 @@ module Esper.UserTab {
       </div>
       <div #calendarsContainer class="esper-section-container"/>
     </div>
-    <div class="esper-section">
-      <div #meetingsHeader
-           class="esper-section-header esper-clearfix esper-meetings-header">
-        <span #showMeetings
-              class="esper-link esper-meetings" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Meetings</span>
-        <span #meetingsNew class="esper-new-marker">NEW</span>
-      </div>
-      <div #meetingsContainer
-           class="esper-section-container esper-meetings-container"
-           style="display:none">
-        <div #meetingsSelector class="esper-section-selector esper-clearfix">
-          <span class="esper-show-selector">Show: </span>
-          <select #meetingSelector class="esper-select esper-meeting-selector"/>
-        </div>
-        <div #noMeetingPrefs style="display: none" class="esper-no-prefs"/>
-        <div class="esper-user-tab-meeting-info" #meetingInfo/>
-      </div>
-    </div>
-    <div class="esper-section">
-      <div #transportationHeader class="esper-section-header esper-clearfix">
-        <span #showTransportation
-              class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Transportation</span>
-        <span #transportationNew class="esper-new-marker">NEW</span>
-      </div>
-      <div #transportationContainer class="esper-section-container"
-           style="display:none">
-        <ul #transportationPreferences
-            class="esper-transportation-preferences"/>
-      </div>
-    </div>
-    <div class="esper-section">
+    <div #notesSection class="esper-section">
       <div #notesHeader class="esper-section-header esper-clearfix">
         <span #showNotes
               class="esper-link" style="float:right">Show</span>
-        <span class="esper-bold" style="float:left">Notes</span>
+        <span class="esper-bold" style="float:left">User Notes</span>
         <span #notesNew class="esper-new-marker">NEW</span>
       </div>
       <div #notesContainer class="esper-section-container" style="display:none">
         <pre #notes class="esper-preferences-notes"/>
       </div>
     </div>
+    <div class="esper-section" style="text-align: center">
+      <a #morePrefsLink class="esper-link">
+        Click here to view and edit additional preferences
+      </a>
+    </div>
   </div>
 </div>
 '''
-    team.team_labels.forEach(function(label) {
-      displayTeamLabel(teamLabelsContainer, label);
-    })
-
     var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
     var noPrefsLink = $("<a href='" + noPrefsURL + "'>Edit settings?</a>");
     noPrefsLink.addClass("esper-link");
     var noPrefsDescr = $("<span>Executive is marked unavailable " +
                          "for this meeting type. </span>");
     noMeetingPrefs.append(noPrefsDescr).append(noPrefsLink);
+    morePrefsLink.attr("href", noPrefsURL);
 
     var prefs = Teams.getTeamPreferences(team);
     var until = Math.floor(XDate.now()/1000);
     var from = until - 432000; // 5 days
+
+    meetingsNew.hide();
+    coworkersNew.hide();
+    notesNew.hide();
     Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
       var workplace_changes =
         getPreferencesChanges("Workplace", changes.change_log);
-      var transportation_changes =
-        getPreferencesChanges("Transportation", changes.change_log);
       var meeting_changes =
         getPreferencesChanges("Meeting", changes.change_log);
-      var general_changes =
-        getPreferencesChanges("General", changes.change_log);
       var coworkers_changes =
         getPreferencesChanges("Coworkers", changes.change_log);
       var notes_changes =
         getPreferencesChanges("Notes", changes.change_log);
 
-      if (workplace_changes.length + meeting_changes.length === 0) {
-        meetingsNew.hide();
+      if (workplace_changes.length + meeting_changes.length > 0) {
+        meetingsNew.show();
       }
-      if (transportation_changes.length === 0) {
-        transportationNew.hide();
+      if (coworkers_changes.length > 0) {
+        coworkersNew.show();
       }
-      if (general_changes.length === 0) {
-        generalNew.hide();
-      }
-      if (coworkers_changes.length === 0) {
-        coworkersNew.hide();
-      }
-      if (notes_changes.length === 0) {
-        notesNew.hide();
+      if (notes_changes.length > 0) {
+        notesNew.show();
       }
       preferencesSpinner.hide();
+
       user.append(viewOfUser(team, prefs));
 
       var meetingTypes = prefs.meeting_types;
@@ -1055,42 +953,35 @@ module Esper.UserTab {
 
       meetingSelector.change(); // ensure this section is initialized correctly
 
-      var transportationTypes = prefs.transportation.length;
-      List.iter(prefs.transportation, function(type, i) {
-        var last = i === prefs.transportation.length - 1;
-        transportationPreferences.append(
-          viewOfTransportationType(type, last, transportation_changes)
-        );
-      });
+      // NB: Triggering click event is a bit hacky since meetings show always
+      // start open, but this should be fine for now.
+      showMeetings.click();
 
-      if (prefs.general !== undefined) {
-        displayGeneralPrefs(generalContainer, prefs.general, general_changes);
-        displayDetailedGeneralPrefs(generalDetailedContainer,
-                                    prefs.general,
-                                    general_changes);
+      if (team.team_labels.length > 0) {
+        team.team_labels.forEach(function(label) {
+          displayTeamLabel(teamLabelsContainer, label);
+        });
+        showTeamLabels.click();
+      } else {
+        teamLabelsSection.hide();
       }
 
-      if (prefs.coworkers !== "") {
+      if (prefs.coworkers) {
         coworkers.text(prefs.coworkers);
+        showCoworkers.click();
       } else {
         coworkerSection.hide()
       }
 
-      notes.text(prefs.notes);
+      if (prefs.notes && prefs.notes.trim()) {
+        notes.text(prefs.notes);
+        showNotes.click();
+      } else {
+        notesSection.hide();
+      }
     });
 
     Sidebar.customizeSelectArrow(meetingSelector);
-
-    showAlias.click(function() {
-      Sidebar.toggleList(aliasContainer);
-      if (showAlias.text() === "Hide") {
-        showAlias.text("Show");
-        aliasHeader.removeClass("esper-open");
-      } else {
-        showAlias.text("Hide");
-        aliasHeader.addClass("esper-open");
-      }
-    });
 
     showCalendars.click(function() {
       Sidebar.toggleList(calendarsContainer);
@@ -1111,27 +1002,6 @@ module Esper.UserTab {
       } else {
         showMeetings.text("Hide");
         meetingsHeader.addClass("esper-open");
-      }
-    });
-
-    showTransportation.click(function() {
-      Sidebar.toggleList(transportationContainer);
-      if (showTransportation.text() === "Hide") {
-        showTransportation.text("Show");
-        transportationHeader.removeClass("esper-open");
-      } else {
-        showTransportation.text("Hide");
-        transportationHeader.addClass("esper-open");
-      }
-    });
-
-    showGeneral.click(function() {
-      Sidebar.toggleList(generalContainer);
-      Sidebar.toggleList(generalDetailedContainer);
-      if (showGeneral.text() === "Show Less") {
-        showGeneral.text("Show More");
-      } else {
-        showGeneral.text("Show Less");
       }
     });
 
@@ -1166,23 +1036,6 @@ module Esper.UserTab {
         showNotes.text("Hide");
         notesHeader.addClass("esper-open");
       }
-    });
-
-    showNotes.click();
-    showCoworkers.click();
-    if (team.team_labels.length > 0) showTeamLabels.click();
-
-    CurrentThread.getParticipants().done(function(threadMembers) {
-      if (threadMembers === undefined) threadMembers = [];
-      var aliasesUsed = List.filterMap(threadMembers, function(m) {
-        if (List.mem(team.team_email_aliases, m.email)) {
-          return m;
-        } else {
-          return null;
-        }
-      });
-      displayAssistantAlias(aliasContainer, aliasesUsed[0]);
-      if (aliasesUsed[0] !== undefined) showAlias.click();
     });
 
     return _view;
