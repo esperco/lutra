@@ -883,7 +883,7 @@ module Esper.UserTab {
       </div>
       <div #calendarsContainer class="esper-section-container"/>
     </div>
-    <div class="esper-section">
+    <div #notesSection class="esper-section">
       <div #notesHeader class="esper-section-header esper-clearfix">
         <span #showNotes
               class="esper-link" style="float:right">Show</span>
@@ -892,12 +892,12 @@ module Esper.UserTab {
       </div>
       <div #notesContainer class="esper-section-container" style="display:none">
         <pre #notes class="esper-preferences-notes"/>
-        <span #noNotes class="esper-no-notes">
-          <a class="esper-link" #noNotesLink>
-            No notes found. Open this user's settings page to add.
-          </a>
-        </span>
       </div>
+    </div>
+    <div class="esper-section" style="text-align: center">
+      <a #morePrefsLink class="esper-link">
+        Click here to view and edit additional preferences
+      </a>
     </div>
   </div>
 </div>
@@ -905,10 +905,10 @@ module Esper.UserTab {
     var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
     var noPrefsLink = $("<a href='" + noPrefsURL + "'>Edit settings?</a>");
     noPrefsLink.addClass("esper-link");
-    noNotesLink.attr("href", noPrefsURL);
     var noPrefsDescr = $("<span>Executive is marked unavailable " +
                          "for this meeting type. </span>");
     noMeetingPrefs.append(noPrefsDescr).append(noPrefsLink);
+    morePrefsLink.attr("href", noPrefsURL);
 
     var prefs = Teams.getTeamPreferences(team);
     var until = Math.floor(XDate.now()/1000);
@@ -975,11 +975,9 @@ module Esper.UserTab {
 
       if (prefs.notes && prefs.notes.trim()) {
         notes.text(prefs.notes);
-        noNotes.hide();
         showNotes.click();
       } else {
-        notes.hide();
-        noNotes.show();
+        notesSection.hide();
       }
     });
 
