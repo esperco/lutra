@@ -48,7 +48,9 @@ module Esper.ComposeHashtags {
                class="esper-input esper-flex-expand"/>
       </div>
       <div #hashtags class="esper-calendar-grid"/>
-      <button #addTag class="esper-btn esper-btn-secondary">Add Choice</button>
+      <button #addTag class="esper-btn esper-btn-secondary">
+        <i class="fa fa-fw fa-plus"></i> Add Choice
+      </button>
     </div>
     <div class="esper-modal-footer esper-clearfix">
       <button #cancel class="esper-btn esper-btn-secondary">

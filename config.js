@@ -180,8 +180,8 @@ module.exports = {
   // Vendor CSS files to concatenate and minimize, relative to the vendor
   // directory set in Marten's .bowerrc
   vendorCSSList: [
-    "font-awesome/css/font-awesome.css",
-    "fullcalendar/dist/fullcalendar.css"
+    // NB: Intentionally left blank -- CSS files are namespaced and imported
+    // via LESS files
   ],
 
   // Path to CSS bundle (relative to pubDir)

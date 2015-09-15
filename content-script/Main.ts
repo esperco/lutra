@@ -35,13 +35,9 @@ module Esper.Main {
     Log.d("Injecting script " + scriptName);
     var rootUrl = chrome.extension.getURL("");
     var cssUrl = chrome.extension.getURL("css/esper.css");
-    var vendorCssUrl = chrome.extension.getURL("css/vendor.css");
     var scriptUrl = chrome.extension.getURL("js/" + scriptName);
     var vendorScriptUrl = chrome.extension.getURL("js/vendor.js");
     var docHead = $("head");
-    $("<link rel='stylesheet' type='text/css'/>")
-      .attr("href", vendorCssUrl)
-      .appendTo(docHead);
     $("<link rel='stylesheet' type='text/css'/>")
       .attr("href", cssUrl)
       .appendTo(docHead);

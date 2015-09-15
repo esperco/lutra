@@ -1,9 +1,70 @@
 /*
-  LESS stylesheet for the Esper Chrome extension
+  LESS stylesheet for the Esper Chrome extension.
 
-  All our classes start with esper-
-
+  All our classes either start with esper- or should be a child of an #esper
+  or .esper element.
 */
+
+/*** Imports ***/
+
+/* Imports in our standard customized version of Boostrap, but only as applied
+   to elements within an esper-bs class. Ideally, we'd like to use
+   Bootstrap on all of our Esper components but there's a lot of legacy
+   legacy code to edit for compatability.
+*/
+.esper-bs {
+  @import "../marten/less/_custom_bootstrap";
+  // TODO: Override certain Bootstrap settings like font-family
+
+  // Creates an arrow for dropdown menus
+  .dropdown-arrow-top {
+    &:before {
+      position: absolute;
+      top: -8px;
+      left: 10px;
+      display: inline-block;
+      border-right: 8.5px solid transparent;
+      border-bottom: 8.5px solid #ccc;
+      border-left: 8.5px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+      content: '';
+    }
+
+    &:after {
+      position: absolute;
+      top: -7px;
+      left: 10px;
+      display: inline-block;
+      border-right: 8.5px solid transparent;
+      border-bottom: 8.5px solid #ffffff;
+      border-left: 8.5px solid transparent;
+      content: '';
+    }
+
+    &.dropdown-menu-right {
+      &:before {
+        left: auto;
+        right: 10px;
+      }
+
+      &:after {
+        left: auto;
+        right: 10px;
+      }
+    }
+  }
+}
+
+/* Imports in some other vendor CSS files, but only as applied to elements with
+   a .esper wrapper. Unlike Bootstrap, these CSS changes are pretty well
+   namespaced already (at least relative to our elements), so let's make
+   them available to all Esper elements without specifically needing to call
+   them out.
+*/
+.esper {
+  @import "../marten/vendor/font-awesome/less/font-awesome";
+  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
+}
 
 /*** Colors ***/
 @blue: #0080ce;
@@ -346,7 +407,13 @@ object.esper-svg { pointer-events: none; }
   .esper-btn;
   .esper-btn-secondary;
   &::before {
-    content: "\03a7";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f00d";
   }
 }
 
@@ -417,6 +484,14 @@ textarea.esper-input { resize: none; }
   vertical-align: middle;
 }
 
+/* Menu adjustments */
+.esper-bs .esper-menu .dropdown-menu.dropdown-menu-right {
+  right: -8px;
+  left: auto;
+  margin-top: 5px;
+  min-width: 100px;
+}
+
 /* Task list button (middle) */
 .esper-tl-button {
   display: inline;
@@ -450,54 +525,8 @@ textarea.esper-input { resize: none; }
   left: 0;
 }
 
-.esper-menu-caret {
-  display: none;
-  z-index: 12;
-  width: 26px;
-  height: 12px;
-
-  position: absolute; /* takes the element out of the flow */
-  left: -4px;
-  top: 31px;
-}
-
-.esper-menu-dropdown {
-  z-index: 11;
-  position: absolute;
-
-  /* position adjusted to stick to the caret */
-  left: -12px;
-  top: 29px;
-
-  webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-         box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-}
-
 .esper-menu-important {
   font-weight: bold;
-}
-
-.esper-tl-caret {
-  display: none;
-  z-index: 12;
-  width: 26px;
-  height: 12px;
-
-  position: absolute; /* takes the element out of the flow */
-  left: 5px;
-  top: 24px;
-}
-
-.esper-tl-dropdown {
-  z-index: 11;
-  position: absolute; /* takes the element out of the flow */
-
-  /* position adjusted to stick to the caret */
-  left: -3px;
-  top: 22px;
-
-  webkit-box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-         box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
 }
 
 .esper-tl-team {

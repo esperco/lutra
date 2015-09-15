@@ -40,7 +40,7 @@ module Esper.Sidebar {
     removeEsperRoot();
     var anchor = Gmail.findSidebarAnchor();
     if (anchor.length === 1) {
-      var root = $("<div id='esper'/>");
+      var root = $("<div id='esper' class='esper'/>");
       anchor.prepend(root);
       return root;
     }

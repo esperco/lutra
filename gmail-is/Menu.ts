@@ -557,24 +557,7 @@ module Esper.Menu {
 
     var team = currentTeam.get();
 
-    view.currentTeamName
-      .text(team.team_name)
-      .click(function(event) {
-        /*
-          Other controls may hide the dropdown, so inspecting its visibility
-          is the most reliable option.
-        */
-        if (view.teamsDropdown.is(":visible")) {
-          Sidebar.dismissDropdowns();
-        } else {
-          Sidebar.dismissDropdowns();
-          view.background.show();
-          view.teamsCaret.show();
-          view.teamsDropdown.show();
-        }
-        event.stopPropagation();
-      });
-
+    view.currentTeamName.text(team.team_name);
     currentTeam.watch(function(team, isValid) {
       if (isValid) {
         view.currentTeamName.text(team.team_name);
@@ -618,13 +601,11 @@ module Esper.Menu {
     logo: JQuery;
     logoImg: JQuery;
     teamSwitcher: JQuery;
-    teamsCaret: JQuery;
     teamsDropdown: JQuery;
     currentTeamName: JQuery;
     teamSwitcherContent: JQuery;
     tasksButton: JQuery;
     background: JQuery;
-    menuCaret: JQuery;
     menuDropdown: JQuery;
     menuDropdownContent: JQuery;
   }
@@ -652,17 +633,16 @@ module Esper.Menu {
    */
   export function create() {
 '''
-<div #view id="esper-menu-root" class="esper-menu-root">
+<div #view id="esper-menu-root" class="esper-menu-root esper-bs">
   <!-- fixed elements -->
   <div #background class="esper-menu-bg"/>
 
-  <div #teamSwitcher class="esper-tl-switcher">
-    <div #currentTeamName
-         class="esper-clickable esper-tl-team esper-dropdown-btn"
+  <div #teamSwitcher class="esper-tl-switcher dropdown">
+    <div #currentTeamName data-toggle="dropdown"
+         class="esper-clickable esper-tl-team"
          title="Select other team">
     </div>
-    <object #teamsCaret class="esper-svg esper-click-safe esper-tl-caret"/>
-    <ul #teamsDropdown class="esper-drop-ul esper-tl-dropdown">
+    <ul #teamsDropdown class="dropdown-menu dropdown-arrow-top">
       <div #teamSwitcherContent class="esper-dropdown-section"/>
     </ul>
   </div>
@@ -673,15 +653,14 @@ module Esper.Menu {
     Tasks
   </div>
 
-  <div class="esper-menu">
-    <div #logo
-         class="esper-click-safe esper-clickable
-                esper-dropdown-btn esper-menu-logo"
+  <div class="esper-menu dropdown">
+    <div #logo data-toggle="dropdown"
+         class="esper-clickable esper-menu-logo"
          title="Esper">
       <object #logoImg class="esper-svg"/>
     </div>
-    <object #menuCaret class="esper-svg esper-click-safe esper-menu-caret"/>
-    <ul #menuDropdown class="esper-drop-ul esper-menu-dropdown">
+    <ul #menuDropdown
+        class="dropdown-menu dropdown-menu-right dropdown-arrow-top">
       <div #menuDropdownContent class="esper-dropdown-section"/>
     </ul>
   </div>
@@ -706,22 +685,12 @@ module Esper.Menu {
     currentTeamName.css("color", navbarTextColor);
     tasksButton.css("color", navbarTextColor);
 
-    menuCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
     updateLinks(menuDropdownContent);
 
-    teamsCaret.attr("data", Init.esperRootUrl + "img/caret.svg");
     setupTaskListControls(menuView, tasksLayer);
 
-    logo.click(function() {
-      if (menuDropdown.is(":visible")) {
-        Sidebar.dismissDropdowns();
-      } else {
-        Sidebar.dismissDropdowns();
-        background.show();
-        menuCaret.show();
-        menuDropdown.show();
-      }
-    });
+    currentTeamName.dropdown();
+    logo.dropdown();
 
     Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");

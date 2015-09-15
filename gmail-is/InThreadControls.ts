@@ -10,7 +10,7 @@ module Esper.InThreadControls {
     var jQ = $(".esper-in-thread-controls")
     if (jQ.length === 0) {
 '''
-<div #controls class="esper-in-thread-controls">
+<div #controls class="esper-in-thread-controls esper">
   <div class="esper-in-thread-control esper-compose-hashtags-container" />
   <div class="esper-in-thread-control esper-task-notes-container" />
   <div class="esper-in-thread-control esper-event-control-container" />
