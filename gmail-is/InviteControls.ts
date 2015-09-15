@@ -95,29 +95,15 @@ module Esper.InviteControls {
       }
     }
 
-    var firstTeamCal = team.team_calendars[0];
-    var calendars    = [];
-    var publicCalId  =
-      firstTeamCal ? firstTeamCal.google_cal_id : event.google_cal_id;
-    List.iter(team.team_calendars, function(cal : ApiT.Calendar) {
-      calendars.push(cal);
-
-      if (cal.calendar_default_dupe) {
-        publicCalId = cal.google_cal_id;
-      }
-    });
-
-    var author = team.team_email_aliases[0] || Login.myEmail();
-
     return {
       event : event,
       prefs : prefs,
 
       title       : newTitle,
       location    : location,
-      calendarId  : publicCalId,
-      calendars   : calendars,
-      createdBy   : author,
+      calendarId  : event.google_cal_id,
+      calendars   : team.team_calendars,
+      createdBy   : team.team_email_aliases[0] || Login.myEmail(),
       notes       : "",
       guests      : [],
 
@@ -129,14 +115,13 @@ module Esper.InviteControls {
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
     var preferences  = state.prefs.execPrefs;
-    var duplicate    = preferences.general.use_duplicate_events;
     var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
 
     var event = state.event;
 
     var eventEdit : ApiT.CalendarEventEdit = {
-      google_cal_id : (duplicate ? state.calendarId : event.google_cal_id),
+      google_cal_id : state.calendarId,
       start         : event.start,
       end           : event.end,
       title         : state.title,
@@ -271,15 +256,6 @@ module Esper.InviteControls {
     });
 
     var publicCalId = state.calendarId;
-
-    if (duplicate && !execEvent) {
-      var dupeCal = List.find(team.team_calendars, function (c) {
-        return c.calendar_default_dupe;
-      });
-
-      publicCalId = dupeCal ? dupeCal.google_cal_id : publicCalId;
-    }
-
     if (publicCalId) {
       pubCalendar.val(publicCalId);
     }
@@ -684,9 +660,18 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               }
             }
 
+            var execState = populateInviteState(event, prefs);
+            var guestState = populateInviteState(event, prefs);
+            var dupeCal = _.find(prefs.team.team_calendars, function(c) {
+              return c.calendar_default_dupe;
+            });
+            if (dupeCal) {
+              guestState.calendarId = dupeCal.google_cal_id;
+            }
+
             var dualStartState = {
-              exec   : populateInviteState(event, prefs),
-              guests : populateInviteState(event, prefs),
+              exec   : execState,
+              guests : guestState
             };
 
             var dualSlides = [
