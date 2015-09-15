@@ -1,9 +1,31 @@
 /*
-  LESS stylesheet for the Esper Chrome extension
+  LESS stylesheet for the Esper Chrome extension.
 
-  All our classes start with esper-
-
+  All our classes either start with esper- or should be a child of an #esper
+  or .esper element.
 */
+
+/*** Imports ***/
+
+/* Imports in our standard customized version of Boostrap, but only as applied
+   to elements within an esper-bs class. Ideally, we'd like to use
+   Bootstrap on all of our Esper components but there's a lot of legacy
+   legacy code to edit for compatability.
+*/
+.esper-bs {
+  @import "../marten/less/_custom_bootstrap";
+  // TODO: Override certain Bootstrap settings like font-family
+}
+
+/* Imports in font-awesome, but only as applied to elements with a .esper or
+   #esper wrapper. Unlike Bootstrap, Font-Awesome's CSS changes are pretty
+   well namespaced already, so let's make FA available to all Esper elements
+   without specifically needing to call it out.
+*/
+.esper {
+  @import "../marten/vendor/font-awesome/less/font-awesome";
+  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
+}
 
 /*** Colors ***/
 @blue: #0080ce;

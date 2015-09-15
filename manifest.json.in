@@ -60,7 +60,8 @@
     "css/esper.css",
     "css/fullCalendar.css",
     "css/vendor.css",
-    "img/*"
+    "img/*",
+    "fonts/*"
   ],
 
   "permissions": [
