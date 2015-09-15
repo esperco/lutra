@@ -557,24 +557,7 @@ module Esper.Menu {
 
     var team = currentTeam.get();
 
-    view.currentTeamName
-      .text(team.team_name)
-      .click(function(event) {
-        /*
-          Other controls may hide the dropdown, so inspecting its visibility
-          is the most reliable option.
-        */
-        if (view.teamsDropdown.is(":visible")) {
-          Sidebar.dismissDropdowns();
-        } else {
-          Sidebar.dismissDropdowns();
-          view.background.show();
-          view.teamsCaret.show();
-          view.teamsDropdown.show();
-        }
-        event.stopPropagation();
-      });
-
+    view.currentTeamName.text(team.team_name);
     currentTeam.watch(function(team, isValid) {
       if (isValid) {
         view.currentTeamName.text(team.team_name);
@@ -618,13 +601,11 @@ module Esper.Menu {
     logo: JQuery;
     logoImg: JQuery;
     teamSwitcher: JQuery;
-    teamsCaret: JQuery;
     teamsDropdown: JQuery;
     currentTeamName: JQuery;
     teamSwitcherContent: JQuery;
     tasksButton: JQuery;
     background: JQuery;
-    menuCaret: JQuery;
     menuDropdown: JQuery;
     menuDropdownContent: JQuery;
   }
@@ -708,17 +689,8 @@ module Esper.Menu {
 
     setupTaskListControls(menuView, tasksLayer);
 
+    currentTeamName.dropdown();
     logo.dropdown();
-    // logo.click(function() {
-    //   if (menuDropdown.is(":visible")) {
-    //     Sidebar.dismissDropdowns();
-    //   } else {
-    //     Sidebar.dismissDropdowns();
-    //     background.show();
-    //     menuCaret.show();
-    //     menuDropdown.show();
-    //   }
-    // });
 
     Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");
