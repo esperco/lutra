@@ -53,7 +53,17 @@ module Esper.Menu {
       window.open(Conf.Api.url);
     }
 
-    var settingsLink = makeActionLink("Settings", openSettings, false);
+    var settingsLink = makeActionLink("Team & Exec Settings",
+                                      openSettings, false);
+
+    function openOptionsPage() {
+      // Can't call Chrome API to open options page directly,
+      // post to Event Script
+      Message.post(Message.Type.OpenExtensionOptions);
+    }
+
+    var optionsLink = makeActionLink("Extension Options",
+                                     openOptionsPage, false);
 
     var agendaLink = makeActionLink("Agenda", function() {
       var agendaModal = displayAgenda();
@@ -72,6 +82,7 @@ module Esper.Menu {
     ul
       .append(signInLink)
       .append(settingsLink)
+      .append(optionsLink)
       .append(agendaLink)
       .append(getTaskListLink)
       .append(helpLink);
