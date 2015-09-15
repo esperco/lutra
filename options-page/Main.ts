@@ -64,8 +64,16 @@ module Esper.Main {
       defaultSidebarState = ExtensionOptions.SidebarOpts.SHOW;
     }
 
+    var displayComposeControls: ExtensionOptions.ComposeControlsOpts;
+    if ($('#compose-toolbar-hide').prop("checked")) {
+      displayComposeControls = ExtensionOptions.ComposeControlsOpts.HIDE;
+    } else {
+      displayComposeControls = ExtensionOptions.ComposeControlsOpts.SHOW;
+    }
+
     var opts: ExtensionOptions.Options = {
-      defaultSidebarState: defaultSidebarState
+      defaultSidebarState: defaultSidebarState,
+      displayComposeControls: displayComposeControls
     };
 
     ExtensionOptions.save(opts, function() {
@@ -83,6 +91,13 @@ module Esper.Main {
         $('#default-sidebar-hide').prop("checked", true)
       } else { // show
         $('#default-sidebar-show').prop("checked", true);
+      }
+
+      if (opts.displayComposeControls ===
+          ExtensionOptions.ComposeControlsOpts.HIDE) {
+        $('#compose-toolbar-hide').prop("checked", true)
+      } else { // show
+        $('#compose-toolbar-show').prop("checked", true);
       }
       setLoading(false);
     });
