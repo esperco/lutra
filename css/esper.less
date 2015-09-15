@@ -15,6 +15,44 @@
 .esper-bs {
   @import "../marten/less/_custom_bootstrap";
   // TODO: Override certain Bootstrap settings like font-family
+
+  // Creates an arrow for dropdown menus
+  .dropdown-arrow-top {
+    &:before {
+      position: absolute;
+      top: -8px;
+      left: 10px;
+      display: inline-block;
+      border-right: 8.5px solid transparent;
+      border-bottom: 8.5px solid #ccc;
+      border-left: 8.5px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+      content: '';
+    }
+
+    &:after {
+      position: absolute;
+      top: -7px;
+      left: 10px;
+      display: inline-block;
+      border-right: 8.5px solid transparent;
+      border-bottom: 8.5px solid #ffffff;
+      border-left: 8.5px solid transparent;
+      content: '';
+    }
+
+    &.dropdown-menu-right {
+      &:before {
+        left: auto;
+        right: 10px;
+      }
+
+      &:after {
+        left: auto;
+        right: 10px;
+      }
+    }
+  }
 }
 
 /* Imports in font-awesome, but only as applied to elements with a .esper or
@@ -443,6 +481,14 @@ textarea.esper-input { resize: none; }
   height: 20px;
   width: 20px;
   vertical-align: middle;
+}
+
+/* Menu adjustments */
+.esper-bs .esper-menu .dropdown-menu.dropdown-menu-right {
+  right: -8px;
+  left: auto;
+  margin-top: 5px;
+  min-width: 100px;
 }
 
 /* Task list button (middle) */
