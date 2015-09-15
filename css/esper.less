@@ -55,10 +55,11 @@
   }
 }
 
-/* Imports in font-awesome, but only as applied to elements with a .esper or
-   #esper wrapper. Unlike Bootstrap, Font-Awesome's CSS changes are pretty
-   well namespaced already, so let's make FA available to all Esper elements
-   without specifically needing to call it out.
+/* Imports in some other vendor CSS files, but only as applied to elements with
+   a .esper wrapper. Unlike Bootstrap, these CSS changes are pretty well
+   namespaced already (at least relative to our elements), so let's make
+   them available to all Esper elements without specifically needing to call
+   them out.
 */
 .esper {
   @import "../marten/vendor/font-awesome/less/font-awesome";
