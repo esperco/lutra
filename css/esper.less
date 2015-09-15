@@ -368,7 +368,13 @@ object.esper-svg { pointer-events: none; }
   .esper-btn;
   .esper-btn-secondary;
   &::before {
-    content: "\03a7";
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f00d";
   }
 }
 
