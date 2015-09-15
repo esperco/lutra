@@ -358,6 +358,9 @@ module Esper.InviteControls {
         }
       }
 
+      var calendarId = pubCalendar.is(":visible") ?
+        (pubCalendar.val() || publicCalId) : publicCalId;
+
       return {
         event : event,
         prefs : prefs,
@@ -371,7 +374,7 @@ module Esper.InviteControls {
           address  : pubLocation.val(),
           timezone : preferences.general.current_timezone,
         },
-        calendarId : publicCalId,
+        calendarId : calendarId,
         calendars  : state.calendars,
         createdBy  : fromSelect.val(),
         notes      : pubNotes.val(),
