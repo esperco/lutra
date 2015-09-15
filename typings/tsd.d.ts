@@ -17,3 +17,4 @@
 /// <reference path="eventemitter3/eventemitter3.d.ts" />
 /// <reference path="page/page.d.ts" />
 /// <reference path="bootstrap/bootstrap.d.ts" />
+/// <reference path="quill/quill.d.ts" />
