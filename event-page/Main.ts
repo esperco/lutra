@@ -24,15 +24,21 @@
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
 /// <reference path="../common/Message.ts" />
+/// <reference path="../common/Message.Chrome.ts" />
 
 /// <reference path="./Update.ts" />
-
 module Esper.Main {
 
   export function init() : void {
     Log.tag = "Esper [EP]";
     Log.d("Initializing event page");
     Update.init();
+
+    // Handle calls to open option page (for some reason this is event page
+    // only call)
+    Message.listenToExtension(Message.Type.OpenExtensionOptions, function() {
+      chrome.runtime.openOptionsPage();
+    });
   }
 }
 
