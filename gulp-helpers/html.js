@@ -3,6 +3,7 @@
 
 module.exports = function(gulp) {
   var _ = require("lodash"),
+      cached = require("gulp-cached"),
       minify = require("gulp-minify-html"),
       path = require("path"),
       preprocess = require("gulp-preprocess");
@@ -21,13 +22,16 @@ module.exports = function(gulp) {
   var buildName; // Set so watch-html can find
   exports.build = function(name, config) {
     buildName = name || "build-html";
+    var outDir = (config.htmlOutDir ?
+      path.join(config.pubDir, config.htmlOutDir): config.pubDir);
     return gulp.task(buildName, function() {
       var ret = gulp.src(getHtmlGlobs(config))
+        .pipe(cached(buildName))
         .pipe(preprocess({context: config}));
       if (config.production) {
         ret = ret.pipe(minify());
       }
-      return ret.pipe(gulp.dest(config.pubDir));
+      return ret.pipe(gulp.dest(outDir));
     });
   };
 

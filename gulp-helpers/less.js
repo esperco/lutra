@@ -2,7 +2,8 @@
 /* Use to create LESS-related tasks for Gulp v4 */
 
 module.exports = function(gulp) {
-  var autoprefixer = require("gulp-autoprefixer"),
+  var _ = require("lodash"),
+      autoprefixer = require("gulp-autoprefixer"),
       filter = require("gulp-filter"),
       less = require("gulp-less"),
       minifyCss = require("gulp-minify-css"),
@@ -11,17 +12,27 @@ module.exports = function(gulp) {
 
   var exports = {};
 
+  // Returns LESS globs based on lessDir(s) props in the config object
+  var getLessGlobs = function(config) {
+    var lessDirs = config.lessDirs || [config.lessDir];
+    return _.map(lessDirs, function(dir) {
+      return path.join(dir, "**/*.less");
+    });
+  };
+
   /* Build LESS files that don't start with a "_" (partials) */
   var buildName; // Set so watch-less can find
   exports.build = function(name, config) {
     buildName = name || "build-less";
     return gulp.task(buildName, function() {
       var partialFilter = filter(['*', '!_*.less']);
-      var ret = gulp.src(config.lessDir + "/**/*.less")
+      var ret = gulp.src(getLessGlobs(config))
         .pipe(partialFilter)
         .pipe(sourcemaps.init())
         .pipe(less({
-          paths: [ path.resolve(config.lessDir) ]
+          paths: _.map(config.lessDirs || [config.lessDir], function(p) {
+            return path.resolve(p);
+          })
         }))
         .pipe(autoprefixer());
 
@@ -42,7 +53,7 @@ module.exports = function(gulp) {
   exports.watch = function(name, config) {
     name = name || "watch-less";
     return gulp.task(name, function() {
-      return gulp.watch(config.lessDir + "/**/*.less", gulp.series(buildName));
+      return gulp.watch(getLessGlobs(config), gulp.series(buildName));
     });
   };
 
