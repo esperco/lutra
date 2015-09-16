@@ -56,7 +56,7 @@ module.exports = {
   oblivionPath: "marten/setup/bin/oblivion",
 
   // Directory with LESS files
-  lessDir: "less",
+  lessDirs: ["less"],
 
   // Where to write our LESS files
   lessOutDir: "css",
