@@ -108,29 +108,154 @@ module Esper.InThreadControls {
 
   function taskNotes() {
 '''
-<div #container class="esper-section">
+<div #container class="esper esper-section">
   <div class="esper-section-header esper-clearfix esper-open">
     <span class="esper-bold" style="float:left">Task Notes</span>
   </div>
-  <div class="esper-section-notes">
-    <textarea #taskNotes rows=5 disabled
+  <div #editorContainer class="esper-section-notes">
+    <div #taskNotes rows=5 disabled
           placeholder="Leave some brief notes about the task here"
-          class="esper-text-notes" >
-        Loading &hellip;
-    </textarea>
+          class="esper-text-notes">
+    </div>
   </div>
   <div class="esper-section-footer esper-clearfix">
-    <span #saveStatus class="esper-save-status" />
-    <button #saveTaskNotes disabled
-            class="esper-btn esper-btn-primary esper-save-notes">
-      Save
-    </button>
+    <div #toolbar class="toolbar-container">
+      <span class="ql-format-group">
+        <select title="Font" class="ql-font">
+          <option value="sans-serif" selected>Sans Serif</option>
+          <option value="Georgia, serif">Serif</option>
+          <option value="Monaco, 'Courier New', monospace">Monospace</option>
+        </select>
+        <select title="Size" class="ql-size">
+          <option value="10px">Small</option>
+          <option value="13px" selected>Normal</option>
+          <option value="18px">Large</option>
+          <option value="32px">Huge</option>
+        </select>
+      </span>
+      <span class="ql-format-group">
+        <span title="Bold" class="ql-format-button ql-bold"></span>
+        <span class="ql-format-separator"></span>
+        <span title="Italic" class="ql-format-button ql-italic"></span>
+        <span class="ql-format-separator"></span>
+        <span title="Underline" class="ql-format-button ql-underline"></span>
+      </span>
+      <span class="ql-format-group">
+        <select title="Text Color" class="ql-color">
+          <option value="rgb(0, 0, 0)" selected></option>
+          <option value="rgb(230, 0, 0)"></option>
+          <option value="rgb(255, 153, 0)"></option>
+          <option value="rgb(255, 255, 0)"></option>
+          <option value="rgb(0, 138, 0)"></option>
+          <option value="rgb(0, 102, 204)"></option>
+          <option value="rgb(153, 51, 255)"></option>
+          <option value="rgb(255, 255, 255)"></option>
+          <option value="rgb(250, 204, 204)"></option>
+          <option value="rgb(255, 235, 204)"></option>
+          <option value="rgb(255, 255, 204)"></option>
+          <option value="rgb(204, 232, 204)"></option>
+          <option value="rgb(204, 224, 245)"></option>
+          <option value="rgb(235, 214, 255)"></option>
+          <option value="rgb(187, 187, 187)"></option>
+          <option value="rgb(240, 102, 102)"></option>
+          <option value="rgb(255, 194, 102)"></option>
+          <option value="rgb(255, 255, 102)"></option>
+          <option value="rgb(102, 185, 102)"></option>
+          <option value="rgb(102, 163, 224)"></option>
+          <option value="rgb(194, 133, 255)"></option>
+          <option value="rgb(136, 136, 136)"></option>
+          <option value="rgb(161, 0, 0)"></option>
+          <option value="rgb(178, 107, 0)"></option>
+          <option value="rgb(178, 178, 0)"></option>
+          <option value="rgb(0, 97, 0)"></option>
+          <option value="rgb(0, 71, 178)"></option>
+          <option value="rgb(107, 36, 178)"></option>
+          <option value="rgb(68, 68, 68)"></option>
+          <option value="rgb(92, 0, 0)"></option>
+          <option value="rgb(102, 61, 0)"></option>
+          <option value="rgb(102, 102, 0)"></option>
+          <option value="rgb(0, 55, 0)"></option>
+          <option value="rgb(0, 41, 102)"></option>
+          <option value="rgb(61, 20, 102)"></option>
+        </select>
+        <span class="ql-format-separator"></span>
+        <select title="Background Color" class="ql-background">
+          <option value="rgb(0, 0, 0)"></option>
+          <option value="rgb(230, 0, 0)"></option>
+          <option value="rgb(255, 153, 0)"></option>
+          <option value="rgb(255, 255, 0)"></option>
+          <option value="rgb(0, 138, 0)"></option>
+          <option value="rgb(0, 102, 204)"></option>
+          <option value="rgb(153, 51, 255)"></option>
+          <option value="rgb(255, 255, 255)" selected></option>
+          <option value="rgb(250, 204, 204)"></option>
+          <option value="rgb(255, 235, 204)"></option>
+          <option value="rgb(255, 255, 204)"></option>
+          <option value="rgb(204, 232, 204)"></option>
+          <option value="rgb(204, 224, 245)"></option>
+          <option value="rgb(235, 214, 255)"></option>
+          <option value="rgb(187, 187, 187)"></option>
+          <option value="rgb(240, 102, 102)"></option>
+          <option value="rgb(255, 194, 102)"></option>
+          <option value="rgb(255, 255, 102)"></option>
+          <option value="rgb(102, 185, 102)"></option>
+          <option value="rgb(102, 163, 224)"></option>
+          <option value="rgb(194, 133, 255)"></option>
+          <option value="rgb(136, 136, 136)"></option>
+          <option value="rgb(161, 0, 0)"></option>
+          <option value="rgb(178, 107, 0)"></option>
+          <option value="rgb(178, 178, 0)"></option>
+          <option value="rgb(0, 97, 0)"></option>
+          <option value="rgb(0, 71, 178)"></option>
+          <option value="rgb(107, 36, 178)"></option>
+          <option value="rgb(68, 68, 68)"></option>
+          <option value="rgb(92, 0, 0)"></option>
+          <option value="rgb(102, 61, 0)"></option>
+          <option value="rgb(102, 102, 0)"></option>
+          <option value="rgb(0, 55, 0)"></option>
+          <option value="rgb(0, 41, 102)"></option>
+          <option value="rgb(61, 20, 102)"></option>
+        </select>
+        <span class="ql-format-separator"></span>
+        <select title="Text Alignment" class="ql-align">
+          <option value="left" selected></option>
+          <option value="center"></option>
+          <option value="right"></option>
+          <option value="justify"></option>
+        </select>
+      </span>
+      <span class="ql-format-group">
+        <span title="Link" class="ql-format-button ql-link"></span>
+        <span class="ql-format-separator"></span>
+        <span title="Image" class="ql-format-button ql-image"></span>
+        <span class="ql-format-separator"></span>
+        <span title="List" class="ql-format-button ql-list"></span>
+        <span class="ql-format-separator"></span>
+        <button #saveTaskNotes disabled
+        class="esper-btn esper-btn-primary esper-save-notes" >
+        Save
+        </button>
+      </span>
+    </div>
   </div>
+  <span #saveStatus class="esper-save-status" />
 </div>
 '''
     taskNoteElms.button.set(saveTaskNotes);
     taskNoteElms.status.set(saveStatus);
     taskNoteElms.textarea.set(taskNotes);
+
+    var editor = new quill(taskNotes.get(0), {
+      modules: {
+        'toolbar': {
+          container: toolbar.get(0)
+        },
+        'link-tooltip': true,
+        'image-tooltip': true
+      },
+      styles: false,
+      theme: 'snow'
+    });
 
     var notes = "";
 
@@ -144,17 +269,28 @@ module Esper.InThreadControls {
       } else {
         notes = "";
       }
-      taskNotes.val(notes);
+
+      //
+      try {
+        var deltaObject = JSON.parse(notes);
+        editor.setContents(deltaObject);
+      } catch (e) {
+        editor.setText(notes);
+      }
     }, notesWatcherId);
 
-    taskNotes.keyup(function() {
+    editor.on('text-change', function(delta, source) {
+      if (source === 'api') {
+        return;
+      }
       taskNotesKeyup(notes);
+      console.log(JSON.stringify(editor.getContents()));
     });
 
-    enableHighlightToTaskNotes(taskNotes, saveTaskNotes);
+    enableHighlightToTaskNotes(editor, saveTaskNotes);
 
     function taskNotesKeyup(notes) {
-      if (taskNotes.val() === notes) {
+      if (editor.getHTML() === notes) {
         saveTaskNotes.prop("disabled", true);
       } else {
         saveTaskNotes.prop("disabled", false);
@@ -165,14 +301,13 @@ module Esper.InThreadControls {
       CurrentThread.currentTeam.get().match({
         some : function (team) {
           savingTaskNotes.set(true);
-          var notes = taskNotes.val();
+          var notes = JSON.stringify(editor.getContents());
           var threadId = CurrentThread.threadId.get();
           CurrentThread.getTaskForThread()
             .done(function(task) {
               Api.setTaskNotes(task.taskid, notes).done(function() {
                 savingTaskNotes.set(false);
                 saveTaskNotes.prop("disabled", true);
-                taskNotes.keyup(function() {taskNotesKeyup(notes);});
               });
             });
         },
@@ -182,19 +317,13 @@ module Esper.InThreadControls {
       });
     });
 
-    var resizeTextarea = function(el) {
-        var offset = el.offsetHeight - el.clientHeight;
-        $(el).css('height', 'auto').css('height', el.scrollHeight + offset);
-    };
-    taskNotes.on('keyup input click', function() { resizeTextarea(this); });
-
     return container;
   }
 
   /* Pop up a button when selecting text inside Gmail messages,
    * which copies the selection into the task notes box when clicked.
    */
-  function enableHighlightToTaskNotes(taskNotes : JQuery,
+  function enableHighlightToTaskNotes(taskNotes : any,
                                       saveTaskNotes : JQuery) : void {
     var container = Gmail.threadContainer();
     var target = Gmail.messageTextSelector;
@@ -221,15 +350,16 @@ module Esper.InThreadControls {
           var button = $("<button class='esper-btn esper-btn-primary'/>");
           button.text("Copy selection to task notes");
           button.click(function() {
-            var curNotes = taskNotes.val();
+            var curNotes = taskNotes.getHTML();
             var nl = "";
-            if (curNotes.length > 0 && curNotes.slice(-1) !== "\n") nl = "\n";
-            taskNotes.val(curNotes + nl + text);
+            if (curNotes === "<div><br></div>") { //ie. empty task notes
+              taskNotes.setHTML(text);
+            } else {
+              taskNotes.setHTML(curNotes + text);
+            }
             saveTaskNotes.prop("disabled", false);
             saveTaskNotes.trigger("click");
             actionDiv.remove();
-
-            taskNotes.trigger('keyup');
           });
           actionDiv.append(button);
           $("body").append(actionDiv);

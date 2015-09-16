@@ -9,6 +9,7 @@
 /// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
 /// <reference path="../marten/typings/chrome/chrome.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../marten/typings/quill/quill.d.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
