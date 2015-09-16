@@ -26,13 +26,12 @@ module.exports = function(gulp) {
     buildName = name || "build-less";
     return gulp.task(buildName, function() {
       var partialFilter = filter(['*', '!_*.less']);
+      var lessDirs = config.lessDirs || [config.lessDir];
       var ret = gulp.src(getLessGlobs(config))
         .pipe(partialFilter)
         .pipe(sourcemaps.init())
         .pipe(less({
-          paths: _.map(config.lessDirs || [config.lessDir], function(p) {
-            return path.resolve(p);
-          })
+          paths: _.map(lessDirs, function(d) { path.resolve(d); })
         }))
         .pipe(autoprefixer());
 
