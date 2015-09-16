@@ -5,6 +5,7 @@
 // gulp module
 module.exports = function(gulp) {
   return {
+    assets: require("./assets")(gulp),
     clean: require("./clean")(gulp),
     html: require("./html")(gulp),
     less: require("./less")(gulp),
