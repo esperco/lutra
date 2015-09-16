@@ -2,7 +2,7 @@
   Team Settings - Preferences Tab
 */
 
-module PreferencesTab {
+module Esper.PreferencesTab {
 
   function toggleOverlay(overlay) {
     if (overlay.css("display") === "none")

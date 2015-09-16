@@ -2,7 +2,7 @@
   Team Settings - Preferences
 */
 
-module Preferences {
+module Esper.Preferences {
 
   export var transportationTypes = ["Walking", "Bicycle", "Public", "Car",
                                     "Zipcar", "Taxi", "Uber", "Lyft"];

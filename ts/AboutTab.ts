@@ -2,7 +2,7 @@
   Team Settings - About Tab
 */
 
-module AboutTab {
+module Esper.AboutTab {
 
   function finishOnboarding(team) {
     window.location.hash = "#!team-settings/" + team.teamid;

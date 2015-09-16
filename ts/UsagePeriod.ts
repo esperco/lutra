@@ -1,4 +1,4 @@
-module UsagePeriod {
+module Esper.UsagePeriod {
   interface MainView {
     view: JQuery;
     subStatusContainer: JQuery;

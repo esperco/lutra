@@ -2,7 +2,7 @@
   Team settings page
 */
 
-module TeamSettings {
+module Esper.TeamSettings {
 
   function toggleOverlay(overlay) {
     if (overlay.css("display") === "none")

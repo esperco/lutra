@@ -1,5 +1,5 @@
 /* Do the right thing based on the URL */
-module Route {
+module Esper.Route {
 
   export var nav : any = {}; // FIXME
 

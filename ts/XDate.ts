@@ -1,7 +1,7 @@
 /*
   Local time handling and formatting.
 */
-module XDate {
+module Esper.XDate {
   export function copy(d : Date) : Date {
     return new Date(d.getTime());
   }

@@ -2,7 +2,7 @@
   Login and team management
 */
 
-module Login {
+module Esper.Login {
 
   export var data : any = {}; // FIXME
 

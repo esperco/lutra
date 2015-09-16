@@ -1,8 +1,11 @@
-.PHONY: default setup dev prod dev-build prod-build clean
+.PHONY: default setup dev rebuild prod dev-build dev-rebuild prod-build clean
 default: dev
 
 # Copy public files into the pub/ directory without minifying
 dev: dev-build
+	./install dev 2>&1 | tee -a install.log
+
+rebuild: dev-rebuild
 	./install dev 2>&1 | tee -a install.log
 
 # Clean installation for production purposes
@@ -16,14 +19,15 @@ prod: prod-build
 	@echo "      ~/service/api/master/install"
 
 dev-build:
-	rm -rf pub
 	npm run build
-	$(MAKE) -C html dev-build
+
+dev-rebuild:
+	rm -rf pub
+	npm run rebuild
 
 prod-build:
 	rm -rf pub
 	npm run build-production
-	$(MAKE) -C html prod-build
 
 # Fetch libraries
 setup:

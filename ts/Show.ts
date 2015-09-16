@@ -40,7 +40,7 @@
   });
 */
 
-module Show {
+module Esper.Show {
 
   function defaultShow(k, v, onClass, offClass) {
     if (Util.isDefined(v.ids)) {

@@ -1,4 +1,4 @@
-module Page {
+module Esper.Page {
 
   /*
     Elements to be shown or hidden for each page are defined by the
@@ -105,7 +105,7 @@ module Page {
       pageSelector.hideAll();
       showPage("preferences");
       Log.d("Loaded executive preferences!");
-      Esper.ExecutivePreferences.load();
+      ExecutivePreferences.load();
       Util.focus();
     }
   }
