@@ -62,8 +62,7 @@ module.exports = {
   // Static assets -- map from glob relative to root to destination direcory
   // in pub
   assets: {
-    "img/**/*.*": "img",
-    "js/**/*.*": "js"
+    "img/**/*.*": "img"
   },
 
   // A Browserify entry point for bundling together our third-party

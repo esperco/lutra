@@ -14,7 +14,7 @@ module Esper.UsagePeriod {
 <div #view class="settings-container">
   <div class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
-    <a #logoContainer href="#"
+    <a #logoContainer href="#!"
        class="img-container-left"/>
     <a href="#!" #headerSettings class="header-title">Settings</a>
     <span #arrowContainer1 class="img-container-left"/>

@@ -52,7 +52,7 @@ Esper = (function(esperObj) {
     fullCalendar: fullCalendar,
     moment:       moment,
     momentTz:     momentTz,
-    page:         page,
+    pageJs:       page,
     React:        react
   };
   for (var name in assignments) {

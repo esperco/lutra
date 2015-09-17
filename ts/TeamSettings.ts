@@ -195,7 +195,7 @@ module Esper.TeamSettings {
 <div #view class="settings-container">
   <div #headerDiv class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
-    <a #logoContainer href="#"
+    <a #logoContainer href="#!"
        class="img-container-left"/>
     <a href="#" #headerTitle class="header-title">Settings</a>
     <span #arrowContainer class="img-container-left"/>

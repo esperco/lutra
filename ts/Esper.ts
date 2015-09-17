@@ -30,7 +30,7 @@ declare module Esper {
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
-  export var page: PageJS.Static;
+  export var pageJs: PageJS.Static;
   export var PRODUCTION: boolean;
 }
 
