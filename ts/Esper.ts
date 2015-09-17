@@ -5,7 +5,6 @@
 */
 
 /// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 /// <reference path="../marten/typings/moment/moment.d.ts" />

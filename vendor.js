@@ -28,12 +28,9 @@ var page = vendors.page;
 
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
-  require("jquery-ui");
-
-  // Bootstrap has some conflicts with jQuery-UI. Default to jQuery-UI's
-  // version for now
+  // NB: Bootstrap only -- if jQuery-UI required, require path to jquery-ui
+  // component as needed
   require("bootstrap");
-  jQuery.fn.tooltip.noConflict();
 });
 
 // Create a global Esper object with our vendor dependencies
