@@ -101,7 +101,7 @@ module Esper.Menu {
           Team
           <i class="fa fa-chevron-down"></i>
         </button>
-        <ul #teamSelect class="dropdown-menu esper-modal-select">
+        <ul #teamSelect class="dropdown-menu esper-dropdown-select">
           <li #allTeams>
             <label for="esper-modal-team-all">
               <input id="esper-modal-team-all" type="checkbox" value="" />
@@ -115,7 +115,7 @@ module Esper.Menu {
           Progress
           <i class="fa fa-chevron-down"></i>
         </button>
-        <ul #progressSelect class="dropdown-menu esper-modal-select" >
+        <ul #progressSelect class="dropdown-menu esper-dropdown-select" >
           <li #allProgress>
             <label for="esper-modal-progress-all">
               <input id="esper-modal-progress-all" type="checkbox" value="" />
@@ -154,7 +154,7 @@ module Esper.Menu {
           Label
           <i class="fa fa-chevron-down"></i>
         </button>
-        <ul #labelSelect class="dropdown-menu esper-modal-select">
+        <ul #labelSelect class="dropdown-menu esper-dropdown-select">
           <li #allLabels>
             <label for="esper-modal-label-all">
               <input id="esper-modal-label-all" type="checkbox" value="all" checked />
