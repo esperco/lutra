@@ -80,69 +80,114 @@ module Esper.Menu {
   function displayGetTask() {
 '''
 <div #view class="esper-modal-bg">
-  <div #modal class="esper-confirm-event-modal">
-    <div class="esper-modal-header">Get Task List</div>
+  <div #modal class="esper-tl-modal">
+    <div class="esper-modal-header"><h2 style="margin: 0px;">Task List</h2></div>
     <span #closeButton class="esper-modal-close esper-clickable">×</span>
-    <table class="esper-modal-content">
-      <tr>
-        <td>
-          <label class="esper-agenda-title">
-            Executive Team:
-          </label>
-        </td>
-        <td>
-          <select #teamSelect class="esper-agenda-select"/>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label class="esper-agenda-title">
-            Task Progress:
-          </label>
-        </td>
-        <td #progressSelect class="esper-tl-progress-select">
-          <span #new_ class="esper-tl-link esper-tl-progress"></span>
-          <span #inProgress class="esper-tl-link esper-tl-progress esper-tl-selected"></span>
-          <span #pending class="esper-tl-link esper-tl-progress"></span>
-          <span #done class="esper-tl-link esper-tl-progress"></span>
-          <span #canceled class="esper-tl-link esper-tl-progress"></span>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label class="esper-agenda-title">
-            Task Labels:
-          </label>
-        </td>
-        <td #labelSelect class="esper-tl-labels-select">
-          <span #all class="esper-tl-link esper-tl-all esper-tl-selected">All</span>
-          <span #urgent class="esper-tl-link esper-tl-urgent"></span>
-        </td>
-      </tr>
-      <tr>
+    <div class="esper-modal-filter esper-bs esper">
+      Show
+      <div #teamDropdown class="dropdown esper-dropdown">
+        <button #teamSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Team
+          <i class="fa fa-chevron-down"></i>
+        </button>
+        <ul #teamSelect class="dropdown-menu esper-modal-select">
+          <li #allTeams>
+            <label for="esper-modal-team-all">
+              <input id="esper-modal-team-all" type="checkbox" value="" />
+              (Select All)
+            </label>
+        </ul>
+      </div>
+      's tasks that are
+      <div #progressDropdown class="dropdown esper-dropdown">
+        <button #progressSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Progress
+          <i class="fa fa-chevron-down"></i>
+        </button>
+        <ul #progressSelect class="dropdown-menu esper-modal-select" >
+          <li #allProgress>
+            <label for="esper-modal-progress-all">
+              <input id="esper-modal-progress-all" type="checkbox" value="" />
+              (Select All)
+            </label>
+          </li>
+          <li #new_>
+            <label for="esper-modal-progress-new">
+              <input id="esper-modal-progress-new" type="checkbox" value="New" />
+            </label>
+          </li>
+          <li #inProgress>
+            <label for="esper-modal-progress-in-progress">
+              <input id="esper-modal-progress-in-progress" type="checkbox" value="In_progress" checked />
+            </label>
+          </li>
+          <li #pending>
+            <label for="esper-modal-progress-pending">
+              <input id="esper-modal-progress-pending" type="checkbox" value="Pending" />
+            </label>
+          </li>
+          <li #canceled>
+            <label for="esper-modal-progress-canceled">
+              <input id="esper-modal-progress-canceled" type="checkbox" value="Canceled" />
+            </label>
+          </li>
+          <li #done>
+            <label for="esper-modal-progress-done">
+              <input id="esper-modal-progress-done" type="checkbox" value="Done" />
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div #labelDropdown class="dropdown esper-dropdown">
+        <button #labelSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Label
+          <i class="fa fa-chevron-down"></i>
+        </button>
+        <ul #labelSelect class="dropdown-menu esper-modal-select">
+          <li #allLabels>
+            <label for="esper-modal-label-all">
+              <input id="esper-modal-label-all" type="checkbox" value="all" checked />
+              (Select All)
+            </label>
+          </li>
+          <li #urgent>
+            <label for="esper-modal-label-urgent">
+              <input id="esper-modal-label-urgent" type="checkbox" value="urgent" />
+            </label>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div #tasksContainer class="esper-modal-content" style="height: 45%; overflow-y: auto;">
+    </div>
+    <div class="esper-modal-footer esper-clearfix" style="text-align: left;">
+      <div #recipientsContainer class="esper-modal-recipients">
         <label class="esper-agenda-title">
           Task List Format:
         </label>
-      </tr>
-      <tr>
         <label>
-          <input #htmlFormat type="radio" name="format" />
+          <input #htmlFormat type="radio" name="format" checked />
           HTML
         </label>
         <label>
           <input #textFormat type="radio" name="format" />
           Plain text
         </label>
-      </tr>
-      <tr>
-        <label class="esper-agenda-title">
-          Send to:
-          <div #recipients class="esper-agenda-section" style="width: 100%">
-          </div>
-        </label>
-      </tr>
-    </table>
-    <div class="esper-modal-footer esper-clearfix">
+        <br />
+        <table>
+          <tr>
+            <td valign="top" align="left" style="padding: 0; min-width: 80px;">
+              <label class="esper-agenda-title">
+                To:
+              </label>
+            </td>
+            <td>
+              <div #recipients />
+              <textarea #recipientEmails rows="6" cols="50" />
+            </td>
+          </tr>
+        </table>
+      </div>
       <div #errorMessages>
       </div>
       <button #sendButton class="esper-btn esper-btn-primary modal-primary">
@@ -156,146 +201,161 @@ module Esper.Menu {
 </div>
 '''
     var teams = Login.myTeams();
+    teamSelectToggle.dropdown();
+    progressSelectToggle.dropdown();
+    labelSelectToggle.dropdown();
 
-    function bind(elt: JQuery, label: string, isProgress: boolean) {
-      if (isProgress) {
-        elt.attr("data-task-progress", label);
-      } else {
-        elt.attr("data-task-label", label)
-      }
-      elt.click(function() {
-        if (elt.hasClass("esper-tl-selected")) {
-          elt.removeClass("esper-tl-selected");
-        } else {
-          if (!isProgress) {
-            all.removeClass("esper-tl-selected");
-          }
-          elt.addClass("esper-tl-selected");
-          elt.attr("style", "cursor: pointer;");
-        }
+    urgent.children("label").append(currentTeam.get().team_label_urgent);
+    new_.children("label").append(currentTeam.get().team_label_new);
+    inProgress.children("label").append(currentTeam.get().team_label_in_progress);
+    pending.children("label").append(currentTeam.get().team_label_pending);
+    canceled.children("label").append(currentTeam.get().team_label_canceled);
+    done.children("label").append(currentTeam.get().team_label_done);
+
+    function cancel() { view.remove(); }
+
+    function getCheckedValues(ul: JQuery) {
+      return _.filter(_.map(ul.find("label > input:checked"), function(el) {
+          return el.value;
+        }), function(s) {
+        return s !== "";
       });
     }
 
-    bind(new_, "New", true);
-    bind(inProgress, "In_progress", true);
-    bind(pending, "Pending", true);
-    bind(done, "Done", true);
-    bind(canceled, "Canceled", true);
-    bind(urgent, "urgent", false);
+    function renderTasks() {
+      tasksContainer.children(".esper-tl-list").remove();
+      var teams = _.filter(Login.myTeams(), function(team) {
+        return _.some(getCheckedValues(teamSelect),
+          function(teamid) {return team.teamid === teamid;} );
+      });
+      var progress = getCheckedValues(progressSelect);
+      var labels = getCheckedValues(labelSelect);
 
-    all.attr("data-task-label", "all")
-       .click(function() {
-         if (all.hasClass("esper-tl-selected")) {
-          all.removeClass("esper-tl-selected");
-         } else {
-          labelSelect.children().removeClass("esper-tl-selected");
-          all.addClass("esper-tl-selected");
-          all.attr("style", "cursor: pointer;");
-         }
-       });
+      _.forEach(teams, function(team) {
+        TaskList.displayList(team,
+          tasksContainer,
+          cancel,
+          function(task) {
+            return _.some(progress, function(p) {
+              return task.task_progress === p;
+            }) && _.some(labels, function(l) {
+              if (l === "all")
+                return true;
+              else if (l === "urgent")
+                return task.task_urgent;
+              else
+                return _.some(task.task_labels,
+                  function(label) {return label === l});
+            });
+          });
+      });
+    }
 
-    List.iter(currentTeam.get().team_labels, function(label) {
-      var elt = $("<span>").addClass("esper-tl-link esper-tl-shared")
-                    .attr("data-task-label", label)
-                    .text(label);
-      bind(elt, label, false);
-      labelSelect.append(elt);
+    teamDropdown.click(renderTasks);
+    progressDropdown.click(renderTasks);
+    labelDropdown.click(renderTasks);
+
+    TaskList.displayList(currentTeam.get(),
+      tasksContainer,
+      cancel,
+      function(task) {return task.task_progress == "In_progress"});
+
+    List.iter(currentTeam.get().team_labels, function(label, id) {
+      var l = $("<label>")
+          .attr("for", "esper-modal-label" + id)
+          .append($("<input>")
+            .attr({"type": "checkbox", "id": "esper-modal-label" + id})
+            .val(label)
+          ).append(label);
+      var li = $("<li>")
+          .append(l)
+          .appendTo(labelSelect);
     });
 
-    urgent.text(currentTeam.get().team_label_urgent);
-    new_.text(currentTeam.get().team_label_new);
-    inProgress.text(currentTeam.get().team_label_in_progress);
-    pending.text(currentTeam.get().team_label_pending);
-    done.text(currentTeam.get().team_label_done);
-    canceled.text(currentTeam.get().team_label_canceled);
-
-    htmlFormat.prop("checked", true);
-
-    List.iter(teams, function(team) {
-        var o = $("<option>")
-            .text(team.team_name)
-            .val(team.teamid);
-        if (team === currentTeam.get()) {
-            o.prop("selected", true);
-        }
-        o.appendTo(teamSelect);
+    List.iter(teams, function(team, id) {
+      var i = $("<input>")
+          .attr({"type": "checkbox", "id": "esper-modal-team" + id})
+          .val(team.teamid);
+      var l = $("<label>")
+          .attr("for", "esper-modal-team" + id)
+          .append(i)
+          .append(team.team_name);
+      var li = $("<li>")
+          .append(l);
+      if (team === currentTeam.get()) {
+          i.prop("checked", true);
+      }
+      li.appendTo(teamSelect);
     });
+
+    allProgress.change(function() {
+      if (!$(this).is(":checked"))
+        progressSelect.find("label > input").prop("checked", true);
+    });
+
+    allLabels.change(function() {
+      if (!$(this).is(":checked"))
+        labelSelect.find("label > input").prop("checked", true);
+    });
+
+    progressSelect.find("label > input[value!='']").change(function() {
+      if (!$(this).is(":checked"))
+        allProgress.find("label > input").prop("checked", false);
+    });
+
+    labelSelect.find("label > input[value!='all']").change(function() {
+      if (!$(this).is(":checked"))
+        allLabels.find("label > input").prop("checked", false);
+    });
+
+    function appendEmailToTextarea() {
+      var emails = recipientEmails.val();
+      if ($(this).is(":checked"))
+        if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
+          recipientEmails.val(emails + $(this).val() + ", ");
+        else
+          recipientEmails.val(emails + ", " + $(this).val() + ", ");
+      else
+        recipientEmails.val(emails.replace($(this).val() + ", ", ""));
+    }
 
     function addRecipientCheckboxes(email, id) {
-      var i = $("<input />")
+      var s = $("<span>")
+        .css("display", "inline-block");
+      var i = $("<input>")
         .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
-        .val(email);
+        .val(email)
+        .change(appendEmailToTextarea)
+        .appendTo(s);
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
         .addClass("esper-agenda-recipient")
         .text(email)
-        .append($("<br />"));
-      i.appendTo(recipients);
-      l.appendTo(recipients);
+        .appendTo(s);
+      s.appendTo(recipients);
     }
 
-    teamSelect.change(function() {
-      var teamid = teamSelect.val();
-
-      recipients.empty();
-      var team = List.find(teams, function(team) { return team.teamid === teamid; });
-      var teamEmails = List.union(
-        [Teams.getProfile(team.team_executive).email],
-        List.map(team.team_assistants, function(uid: string) {
-          return Teams.getProfile(uid).email;
-        }));
-      List.iter(teamEmails, addRecipientCheckboxes);
-
-      new_.text(team.team_label_new);
-      inProgress.text(team.team_label_in_progress);
-      pending.text(team.team_label_pending);
-      done.text(team.team_label_done);
-      canceled.text(team.team_label_canceled);
-
-      all.detach();
-      urgent.detach();
-      labelSelect.empty();
-
-      urgent.text(team.team_label_urgent);
-      labelSelect.append(all).append(urgent);
-      List.iter(team.team_labels, function(label) {
-        var elt = $("<span>").addClass("esper-tl-link esper-tl-shared")
-                    .attr("data-task-label", label)
-                    .text(label);
-        bind(elt, label, false);
-        labelSelect.append(elt);
-      });
-    });
-
-    var teamid = teamSelect.val();
-    var prefs = Teams.getPreferences(teamid);
-    var teamEmails = List.union(
-      [Teams.getProfile(currentTeam.get().team_executive).email],
-      List.map(currentTeam.get().team_assistants, function(uid) {
+    List.iter(teams, function(team) {
+      var teamEmails = _.map(team.team_assistants, function(uid: string){
         return Teams.getProfile(uid).email;
-      }));
-
-    List.iter(teamEmails, addRecipientCheckboxes);
-
-    function cancel() { view.remove(); }
+      });
+      List.iter(teamEmails, addRecipientCheckboxes);
+    });
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
+    closeButton.click(cancel);
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
-      var l = List.map(labelSelect.children(".esper-tl-selected"), function(el: HTMLLabelElement){
-        return el.getAttribute("data-task-label");
-      });
-      var p = List.map(progressSelect.children(".esper-tl-selected"), function(el: HTMLLabelElement){
-        return el.getAttribute("data-task-progress");
-      });
+      var t = getCheckedValues(teamSelect);
+      var l = getCheckedValues(labelSelect);
+      var p = getCheckedValues(progressSelect);
       var f = htmlFormat.prop("checked");
-      var r = List.map(recipients.children(":checked"), function(el: HTMLInputElement) {
-        return el.value;
-      });
+      var r = _.filter(recipientEmails.val().split(/, /),
+        function(s: string) { return s !== ""; });
 
-      function validateLists(list, arg) {
+      function notEmpty(list, arg) {
         if (list.length == 0) {
           var e = $("<span>")
             .addClass("esper-agenda-error")
@@ -306,9 +366,24 @@ module Esper.Menu {
         return true;
       }
 
-      if (!validateLists(p, "progress label")
-          || !validateLists(l, "task label")
-          || !validateLists(r, "recipient")) {
+      function validateEmails(arr: string[]) {
+        return _.every(arr, function(s) {
+          if (s.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i) === null) {
+            var e = $("<span>")
+              .addClass("esper-agenda-error")
+              .html("Invalid email address: " + s);
+            e.appendTo(errorMessages);
+            return false;
+          }
+          return true;
+        });
+      }
+
+      if (!notEmpty(t, "team")
+          || !notEmpty(p, "progress label")
+          || !notEmpty(l, "task label")
+          || !notEmpty(r, "recipient")
+          || !validateEmails(r)) {
         return;
       }
       
@@ -317,7 +392,7 @@ module Esper.Menu {
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
 
-      Api.sendTaskList(teamSelect.val(), l, p, f, r).done(cancel);
+      Api.sendTaskList(t, l, p, f, r).done(cancel);
     });
 
     return _view;
@@ -325,7 +400,7 @@ module Esper.Menu {
 
   function displayAgenda() {
 '''
-<div #view class="esper-modal-bg">
+<div #view class="esper-modal-bg esper">
   <div #modal class="esper-confirm-event-modal">
     <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <div class="esper-modal-header">Agenda</div>
@@ -352,8 +427,10 @@ module Esper.Menu {
       <tr>
         <td colspan="2">
           <input #timeFromDate type="text" class="esper-email-date-select"/>
+          <i #timeFromIcon class="fa fa-lg fa-calendar esper-calendar-icon"></i>
           <span>to</span>
           <input #timeUntilDate type="text" class="esper-email-date-select"/>
+          <i #timeUntilIcon class="fa fa-lg fa-calendar esper-calendar-icon"></i>
         </td>
       </tr>
       <tr>
@@ -483,6 +560,14 @@ module Esper.Menu {
     timeUntilDate.datepicker("option", "dateFormat", "yy-mm-dd");
     timeFromDate.datepicker("setDate", date);
     timeUntilDate.datepicker("setDate", date);
+
+    timeFromIcon.click(function() {
+      timeFromDate.datepicker("show");
+    });
+
+    timeUntilIcon.click(function() {
+      timeUntilDate.datepicker("show");
+    });
 
     // Add an Esper class to help namespace CSS, especially since the
     // Datepicker widget seems to be absolutely positioned outside of
