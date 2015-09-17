@@ -152,7 +152,7 @@ module Esper.Menu {
           </li>
           <li #urgent>
             <label for="esper-modal-label-urgent">
-              <input id="esper-modal-label-urgent" type="checkbox" value="urgent" />
+              <input id="esper-modal-label-urgent" type="checkbox" value="urgent" checked />
             </label>
           </li>
         </ul>
@@ -216,7 +216,7 @@ module Esper.Menu {
 
     function getCheckedValues(ul: JQuery) {
       return _.filter(_.map(ul.find("label > input:checked"), function(el) {
-          return el.value;
+          return $(el).val();
         }), function(s) {
         return s !== "";
       });
@@ -225,6 +225,8 @@ module Esper.Menu {
     function renderTasks() {
       tasksContainer.children(".esper-tl-list").remove();
       var teams = _.filter(Login.myTeams(), function(team) {
+        // Filter all teams that the user is in, only returning
+        // those who have the selected teamid in the checkboxes
         return _.some(getCheckedValues(teamSelect),
           function(teamid) {return team.teamid === teamid;} );
       });
@@ -237,13 +239,19 @@ module Esper.Menu {
           cancel,
           function(task) {
             return _.some(progress, function(p) {
+              // If the task matches at least one of the checked
+              // process labels
               return task.task_progress === p;
             }) && _.some(labels, function(l) {
               if (l === "all")
+                // User wants all tasks regardless of task labels
                 return true;
               else if (l === "urgent")
+                // User only wants tasks that are urgent
                 return task.task_urgent;
               else
+                // If there is at least one task label that is in
+                // one of the selected task labels in the checkboxes
                 return _.some(task.task_labels,
                   function(label) {return label === l});
             });
@@ -266,6 +274,7 @@ module Esper.Menu {
           .append($("<input>")
             .attr({"type": "checkbox", "id": "esper-modal-label" + id})
             .val(label)
+            .prop("checked", true)
           ).append(label);
       var li = $("<li>")
           .append(l)
@@ -310,13 +319,18 @@ module Esper.Menu {
 
     function appendEmailToTextarea() {
       var emails = recipientEmails.val();
-      if ($(this).is(":checked"))
+      if ($(this).is(":checked")) {
         if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
+          // If the current textarea of emails is blank
+          // or if there is a comma at the end, don't prepend comma
           recipientEmails.val(emails + $(this).val() + ", ");
         else
           recipientEmails.val(emails + ", " + $(this).val() + ", ");
-      else
-        recipientEmails.val(emails.replace($(this).val() + ", ", ""));
+      } else {
+        // Match against the email and the tailing comma and whitespaces
+        var regex = new RegExp($(this).val() + ",? *", "i");
+        recipientEmails.val(emails.replace(regex, ""));
+      }
     }
 
     function addRecipientCheckboxes(email, id) {
