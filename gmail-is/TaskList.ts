@@ -92,8 +92,14 @@ module Esper.TaskList {
   }
 
   function renderTaskNotes(notes: string,
+                           notesQuill: string,
                            parent: JQuery) {
-    if (notes !== "" || notes !== undefined) {
+    if (notesQuill !== "" || notesQuill !== undefined) {
+      $("<p/>")
+        .html(notesQuill)
+        .appendTo(parent);
+    }
+    else if (notes !== "" || notes !== undefined) {
       $("<p/>")
         .html(notes)
         .appendTo(parent);
@@ -205,7 +211,7 @@ module Esper.TaskList {
 
     renderThreads(task.task_threads, closeTaskListLayer, linkedThreadContainer);
     renderEvents(team, task.task_events, linkedEventContainer);
-    renderTaskNotes(task.task_notes, taskNotesContainer);
+    renderTaskNotes(task.task_notes, task.task_notes_quill, taskNotesContainer);
 
     return view;
   }

@@ -351,6 +351,7 @@ module Esper.ApiT {
     task_teamid: string;
     task_title: string;
     task_notes: string;
+    task_notes_quill: string;
     task_archived: boolean;
     task_labels: string[];
     task_progress: string; // New | In_progress | Pending | Done | Canceled

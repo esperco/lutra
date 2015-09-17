@@ -257,7 +257,10 @@ module Esper.InThreadControls {
       theme: 'snow'
     });
 
+    //notes is Old style plaintext notes
+    //notesQuill is new rich text editor (Quilljs) style
     var notes = "";
+    var notesQuill = "";
 
     notesWatcherId = CurrentThread.task.watch(function (task, valid, oldTask) {
       taskNotes.prop("disabled", false);
@@ -266,15 +269,15 @@ module Esper.InThreadControls {
       }
       if (valid && task !== oldTask) {
         notes = task.task_notes || ""; // "" if task_notes is undefined
+        notesQuill = task.task_notes_quill || "";
       } else {
         notes = "";
+        notesQuill = "";
       }
 
-      //
-      try {
-        var deltaObject = JSON.parse(notes);
-        editor.setContents(deltaObject);
-      } catch (e) {
+      if (notesQuill !== "") {
+        editor.setContents(JSON.parse(notesQuill));
+      } else {
         editor.setText(notes);
       }
     }, notesWatcherId);
@@ -284,13 +287,14 @@ module Esper.InThreadControls {
         return;
       }
       taskNotesKeyup(notes);
-      console.log(JSON.stringify(editor.getContents()));
     });
 
     enableHighlightToTaskNotes(editor, saveTaskNotes);
 
     function taskNotesKeyup(notes) {
-      if (editor.getHTML() === notes) {
+      if (editor.getHTML() === notes || 
+          JSON.stringify(editor.getContents()) === notesQuill) 
+      {
         saveTaskNotes.prop("disabled", true);
       } else {
         saveTaskNotes.prop("disabled", false);
@@ -305,7 +309,7 @@ module Esper.InThreadControls {
           var threadId = CurrentThread.threadId.get();
           CurrentThread.getTaskForThread()
             .done(function(task) {
-              Api.setTaskNotes(task.taskid, notes).done(function() {
+              Api.setTaskNotesQuill(task.taskid, notes).done(function() {
                 savingTaskNotes.set(false);
                 saveTaskNotes.prop("disabled", true);
               });
