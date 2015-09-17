@@ -219,20 +219,14 @@ module Esper.TaskList {
   }
 
   export function displayList(team: ApiT.Team,
-                              parent: JQuery,
+                              parentContainer: JQuery,
                               closeTaskListLayer: () => void,
                               filter: (task: ApiT.Task) => boolean) {
 
 '''
-<div #container>
-  <h1 #teamName class="esper-tl-head"></h1>
-  <div #listContainer class="esper-tl-list"></div>
-</div>
+<div #listContainer class="esper-tl-list"></div>
 '''
-    parent.children().remove();
-    parent.append(container);
-
-    teamName.text(team.team_name + " tasks");
+    parentContainer.append(listContainer);
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
@@ -243,7 +237,7 @@ module Esper.TaskList {
       var done = false;
       return function() {
         if (!done) {
-          if (isVisible(triggerElt, container)) {
+          if (isVisible(triggerElt, parentContainer)) {
             done = true;
             Api.getTaskPage(url).done(function(x) {
               appendPage(x, closeTaskListLayer);
@@ -281,8 +275,8 @@ module Esper.TaskList {
             /* Next page may have to be displayed right way or will
                be triggered after some scrolling. */
             lazyRefill();
-            container.off("scroll");
-            container.scroll(lazyRefill);
+            parentContainer.off("scroll");
+            parentContainer.scroll(lazyRefill);
           }
         });
       }
@@ -313,7 +307,9 @@ module Esper.TaskList {
     <span #done class="esper-tl-link esper-tl-progress"></span>
     <span #canceled class="esper-tl-link esper-tl-progress"></span>
     <div #otherTeamLabels></div>
-    <div #list></div>
+    <div #list>
+      <h1 #teamName />
+    </div>
   </div>
 </div>
 '''
@@ -323,13 +319,14 @@ module Esper.TaskList {
     pending.text(team.team_label_pending);
     done.text(team.team_label_done);
     canceled.text(team.team_label_canceled);
+    teamName.text(team.team_name + " tasks");
 
     Util.preventClickPropagation(view);
     closeButton.click(closeTaskListLayer);
     emailButton.click(function() {
       emailButton.prop("disabled", true);
       emailButton.text("Sending...");
-      Api.sendTaskList(team.teamid,
+      Api.sendTaskList([team.teamid],
         [currentTaskLabel],
         currentTaskProgress.split(","),
         true,
@@ -340,6 +337,7 @@ module Esper.TaskList {
     });
 
     function displayFiltered(filter) {
+      list.children(".esper-tl-list").remove();
       displayList(team, list, closeTaskListLayer, filter);
     }
 

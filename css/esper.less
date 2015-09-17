@@ -200,6 +200,10 @@ ul.esper-drop-ul {
 
 .esper-dropdown-section { padding: 7px 0; }
 
+.esper-dropdown {
+  display: inline-block;
+}
+
 .esper-create-event-dropdown {
   position : absolute;
   margin: 20px 0 0 0;
@@ -602,6 +606,9 @@ textarea.esper-input { resize: none; }
 
 .esper-tl-progress {
   .esper-tl-label;
+  select& {
+    float: right;
+  }
   background: @purple;
   color: white;
 }
@@ -776,6 +783,12 @@ textarea.esper-input { resize: none; }
   height: 2px;
   background: white;
   &.esper-minimize { margin-top: 8px; }
+}
+
+.esper-calendar-icon {
+  &:hover {
+    color: @purple_hover;
+  }
 }
 
 .esper-options-menu {
@@ -1713,6 +1726,8 @@ ul.esper-ev-dropdown {
 
 .esper-agenda-recipient {
   font-weight: initial;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 /** The in-thread controls which go right after the thread messages. */
@@ -1917,6 +1932,11 @@ ul.esper-ev-dropdown {
   .esper-badge {
     float : right;
   }
+}
+
+.esper-modal-filter {
+  padding: 10px;
+  border-bottom: 1px solid @gray_10;
 }
 
 .esper-modal-footer {
