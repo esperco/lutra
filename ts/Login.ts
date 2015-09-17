@@ -87,12 +87,8 @@ module Esper.Login {
 
   export function logout() {
     clearLoginInfo();
-    // Reload if we're on main page (since Route.nav.home won't work)
-    var reload = !location.hash || location.hash === "#!";
     Route.nav.home();
-    if (reload) {
-      location.reload();
-    }
+    location.reload();
     return false; // Allows us to use in forms or links directly and have the
                   // default browser action be suppressed
   };

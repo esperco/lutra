@@ -14,7 +14,8 @@ module Esper.Page {
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
     "usage": {ids:["usage-page"]},
-    "usage-period": {ids:["usage-period-page"]}
+    "usage-period": {ids:["usage-period-page"]},
+    "not-found": {ids:["not-found-page"]}
   }, undefined);
 
   function showPage(k, properties?: Object) {
@@ -47,6 +48,14 @@ module Esper.Page {
       Log.d("TeamSettings.load()", teamid);
       TeamSettings.load(teamid);
       Util.focus();
+    }
+  }
+
+  export var notFound: Loadable = {
+    load: function() {
+      pageSelector.hideAll();
+      showPage("not-found");
+      Log.d("notFound.load()");
     }
   }
 
@@ -87,8 +96,6 @@ module Esper.Page {
       Util.focus();
     }
   }
-
-
 
   export var test : Loadable = {
     load: function() {

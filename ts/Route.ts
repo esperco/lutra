@@ -233,7 +233,8 @@ module Esper.Route {
       pageJs.redirect(ctx.path.slice(1));
     } else {
       // 404
-      pageJs.redirect("http://esper.com/404");
+      Page.notFound.load();
+      Log.e(ctx);
     }
   });
 
@@ -241,15 +242,16 @@ module Esper.Route {
 
   /* e.g. route.nav.path("a/b/c") goes to URL /#!/a/b/c */
   nav.path = function(frag: string) {
+    if (frag[0] === "#") {
+      frag = frag.slice(1);
+    }
     if (frag[0] === "!") {
-      frag = "#" + frag;
-    } else if (frag[0] !== "#") {
-      frag = "#!" + frag;
+      frag = frag.slice(1);
     }
-    if (frag[2] !== "/") {
-      frag = "#!/" + frag.slice(2);
+    if (frag[0] !== "/") {
+      frag = "/" + frag;
     }
-    location.hash = frag;
+    pageJs(frag);
   };
 
   nav.home = function() {
