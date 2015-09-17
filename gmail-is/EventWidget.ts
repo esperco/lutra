@@ -151,7 +151,7 @@ module Esper.EventWidget {
                                team: ApiT.Team,
                                threadId: string) {
 '''
-<div #optionsView>
+<div #optionsView class="esper-dropdown-wrapper">
   <div #disclose class="esper-click-safe esper-dropdown-btn
                    esper-clickable esper-ev-disclose"/>
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
