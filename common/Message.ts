@@ -12,7 +12,10 @@ module Esper.Message {
     ThreadStateUpdate,    // Update from user to save to storage
 
     // Open Extension options page
-    OpenExtensionOptions
+    OpenExtensionOptions,
+
+    // Focus on the tab sending this message
+    FocusOnSender
   }
 
   export interface Message {
