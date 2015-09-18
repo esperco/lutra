@@ -11,7 +11,7 @@ module Esper.ReactHelpers {
   // Returns a container into which you can render a React element.
   // When the jQuery object
   export class Container {
-    protected elm: JQuery;
+    elm: JQuery;
 
     constructor(type="<div>") {
       this.elm = $(type);
@@ -21,10 +21,6 @@ module Esper.ReactHelpers {
       this.elm.bind('destroyed', function() {
         React.unmountComponentAtNode(self.elm.get(0));
       });
-    }
-
-    get() {
-      return this.elm;
     }
 
     render(r: React.ReactElement<any>) {

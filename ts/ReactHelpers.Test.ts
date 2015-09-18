@@ -4,7 +4,7 @@
 */
 
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
-/// <reference path="./ReactHelpers.Test.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 module Esper.ReactHelpers {
   // Set listener in scope to use
@@ -31,7 +31,7 @@ module Esper.ReactHelpers {
       this.container = new Container();
       this.listener = listener = jasmine.createSpy("listener");
       this.element = React.createElement(TestComponent);
-      sandbox.append(this.container.get());
+      sandbox.append(this.container.elm);
       this.container.render(this.element);
     });
 
@@ -40,7 +40,7 @@ module Esper.ReactHelpers {
     });
 
     it("should call componentWillUnmount when removed", function() {
-      this.container.get().remove();
+      this.container.elm.remove();
       expect(listener).toHaveBeenCalled();
     });
 
