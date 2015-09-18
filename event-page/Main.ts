@@ -39,6 +39,13 @@ module Esper.Main {
     Message.listenToExtension(Message.Type.OpenExtensionOptions, function() {
       chrome.runtime.openOptionsPage();
     });
+
+    // Handle requests from ContentScript to focus on itself
+    Message.listenToExtension(Message.Type.FocusOnSender,
+      function(data, sender) {
+        chrome.windows.update(sender.tab.windowId, { drawAttention: true });
+        chrome.tabs.update(sender.tab.id, { active: true });
+      });
   }
 }
 

@@ -97,6 +97,7 @@ module Esper.Init {
 
         var ignored = [
           "CredentialsRequest",
+          "LoginRequest",
           "Logout",
           "ActiveThreads"
         ];
