@@ -5,6 +5,7 @@
 
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Model.StoreOne.ts" />
 
 module Esper.ReactHelpers {
   // Set listener in scope to use
@@ -70,6 +71,53 @@ module Esper.ReactHelpers {
         expect($.contains(document.documentElement, this.elm.get(0)))
           .toBeFalsy();
       });
+    });
+  });
+
+
+  /////////////
+
+  var stringStore = new Model.StoreOne<string>();
+
+  // NB: Wrap string in object because React needs an object
+  class StoreComponent extends Component<{}, { val: string }> {
+    static stores = [stringStore];
+
+    getState(init=false) {
+      if (init) {
+        return { val: "initial" };
+      } else {
+        return { val: stringStore.val() };
+      }
+    }
+
+    render() {
+      return React.createElement("div", {}, this.state && this.state.val);
+    }
+  }
+
+  describe("ReactHelpers.Component hooked up to store", function() {
+    beforeEach(function() {
+      this.sandbox = $("<div>").appendTo("body");
+      this.elm = $('<div class="penguin">').appendTo(this.sandbox);
+      stringStore.set("something");
+      this.elm.renderReact(StoreComponent, {});
+      this.component = this.elm.reactComponent();
+    });
+
+    afterEach(function() {
+      stringStore.reset();
+      stringStore.removeAllChangeListeners();
+      this.sandbox.remove();
+    });
+
+    it("should display initial state", function() {
+      expect(this.component.find("div").text()).toBe("initial");
+    });
+
+    it("should display updated state on change", function() {
+      stringStore.set("second");
+      expect(this.component.find("div").text()).toBe("second");
     });
   });
 }

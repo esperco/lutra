@@ -4,6 +4,7 @@
 */
 
 /// <reference path="../typings/react/react-global.d.ts" />
+/// <reference path="./Model.ts" />
 /// <reference path="./JQStore.ts" />
 
 /*
@@ -57,18 +58,57 @@ module Esper.ReactHelpers {
   });
 
   // Subclass of Component with some helper functions
-  export class Component<P,S> extends React.Component<P,S> {
+  export abstract class Component<P,S> extends React.Component<P,S> {
+    // List of stores this component is listening to. Override in sub-class.
+    static stores: Model.StoreBase<any>[] = [];
+
+    constructor(props: P) {
+      super(props);
+      this.state = (<S> this.getState(true));
+    }
+
     // Reference to JQuery-wrapped parent node
     parent(): JQuery {
       return $(React.findDOMNode(this)).parent();
     }
 
+    // Use JQuery to find a DOM element within this compoent
     find(selector: string): JQuery {
       return this.parent().find(selector);
     }
 
+    // Remove jQuery wrapper around this React Component
     removeSelf(): void {
       this.parent().remove();
+    }
+
+    // Connect or disconnect component from declared stores -- remember to
+    // call super() if these are overriden
+    componentDidMount(): void {
+      var self = this;
+      _.each(this.getStores(), function(store) {
+        store.addChangeListener(self.onChange);
+      });
+    }
+
+    componentWillUnmount(): void {
+      var self = this;
+      _.each(this.getStores(), function(store) {
+        store.removeChangeListener(self.onChange);
+      });
+    }
+
+    // Callback to trigger from listeners
+    // Implement as arrow function so "this" value is properly referenced
+    protected onChange = (): void => this.setState(<S> this.getState());
+
+    // Interface for getting State -- passes a boolean = true if this is
+    // called during the initial constructor
+    protected getState(init=false): void|S { return; }
+
+    // Helper to get static store vals from instance
+    protected getStores(): Model.StoreBase<any>[] {
+      return (<typeof Component> this.constructor).stores;
     }
   }
 }
