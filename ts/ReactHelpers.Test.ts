@@ -63,6 +63,13 @@ module Esper.ReactHelpers {
       it("should be able to query itself", function() {
         expect(this.component.find("div").attr("class")).toEqual("cat");
       });
+
+      it("should be able to unmount itself", function() {
+        this.component.removeSelf();
+        expect(listener).toHaveBeenCalled();
+        expect($.contains(document.documentElement, this.elm.get(0)))
+          .toBeFalsy();
+      });
     });
   });
 }

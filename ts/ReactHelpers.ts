@@ -66,5 +66,9 @@ module Esper.ReactHelpers {
     find(selector: string): JQuery {
       return this.parent().find(selector);
     }
+
+    removeSelf(): void {
+      this.parent().remove();
+    }
   }
 }
