@@ -10,7 +10,7 @@ module Esper.ReactHelpers {
   // Set listener in scope to use
   var listener: jasmine.Spy;
 
-  class TestComponent extends React.Component<{}, {}> {
+  class TestComponent extends Component<{}, {}> {
     componentWillUnmount() {
       if (listener) {
         listener();
@@ -18,35 +18,51 @@ module Esper.ReactHelpers {
     }
 
     render() {
-      return React.createElement("div");
+      return React.createElement("div", {className: "cat"});
     }
   }
 
-  describe("ReactHelpers.Container", function() {
+  describe("ReactHelpers.renderReact", function() {
     var sandbox: JQuery;
 
     beforeEach(function() {
       sandbox = $("<div>");
       $("body").append(sandbox);
-      this.container = new Container();
       this.listener = listener = jasmine.createSpy("listener");
-      this.element = React.createElement(TestComponent);
-      sandbox.append(this.container.elm);
-      this.container.render(this.element);
+      this.elm = $('<div class="dog">');
+      sandbox.append(this.elm);
+      this.elm.renderReact(TestComponent, {});
     });
 
     afterEach(function() {
       sandbox.remove();
     });
-
     it("should call componentWillUnmount when removed", function() {
-      this.container.elm.remove();
+      this.elm.remove();
       expect(listener).toHaveBeenCalled();
     });
 
     it("should call componentWillUnmount when parent is removed", function() {
       sandbox.remove();
       expect(listener).toHaveBeenCalled();
+    });
+
+    describe("Component referenced from jQuery element", function() {
+      beforeEach(function() {
+        this.component = this.elm.reactComponent();
+      });
+
+      it("should exist", function() {
+        expect(this.component).toBeDefined();
+      });
+
+      it("should be able to get parent", function() {
+        expect(this.component.parent().attr("class")).toEqual("dog");
+      });
+
+      it("should be able to query itself", function() {
+        expect(this.component.find("div").attr("class")).toEqual("cat");
+      });
     });
   });
 }
