@@ -1,4 +1,6 @@
 /// <reference path="../common/Login.ts" />
+/// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Onboarding.tsx" />
 
 module Esper.Auth {
   /*
@@ -61,7 +63,10 @@ module Esper.Auth {
   // we should focus on this tab on login)
   var loginInProgressFor: string;
 
-  function openLoginTab(googleAccountId) {
+  // Stash a simple variable for checking if we're logged in
+  export var loggedIn: boolean;
+
+  export function openLoginTab(googleAccountId) {
     loginInProgressFor = googleAccountId;
     var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
     Log.d("Going off to " + url);
@@ -70,6 +75,11 @@ module Esper.Auth {
   }
 
   function openWelcomeModal(account: Types.Account) {
+    var div = $('<div>').appendTo('body');
+    div.renderReact(Onboarding.OnboardingModal, account);
+  }
+
+  function openWelcomeModal2(account: Types.Account) {
 '''
 <div #view>
   <div #background class="esper-modal-bg"/>
@@ -235,6 +245,8 @@ module Esper.Auth {
         for (var k in newStorage.accounts) {
           if (loginInProgressFor === k) {
             Login.setAccount(newStorage.accounts[k]);
+            loggedIn = true;
+            Onboarding.handleLogin();
             Message.postToExtension(Message.Type.FocusOnSender);
             break;
           }

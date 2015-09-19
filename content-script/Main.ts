@@ -25,6 +25,7 @@
 /// <reference path="../common/Message.Chrome.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
+/// <reference path="../marten/ts/ReactHelpers.ts" />
 
 /// <reference path="./Update.ts" />
 /// <reference path="./Auth.ts" />

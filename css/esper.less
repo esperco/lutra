@@ -53,6 +53,42 @@
       }
     }
   }
+
+  // Bootstrap uses this class -- vverride some things that Gmail sets
+  .in {
+    color: inherit;
+    cursor: inherit;
+    font-size: inherit;
+    text-decoration: inherit;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // Busy indicator
+  .modal-footer .esper-spinner {
+    float: left;
+    height: 32px;
+    width: 32px;
+  }
+
+  .progress.skinny {
+    height: 3px;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header .esper-modal-icon {
+    line-height: @modal-title-line-height;
+    height: @font-size-h4;
+    width: auto;
+    margin-right: @modal-title-padding;
+  }
+
+  .esper-brand-icon {
+    color: @brand-primary;
+    fill: @brand-primary;
+  }
 }
 
 /* Imports in some other vendor CSS files, but only as applied to elements with
@@ -2583,4 +2619,8 @@ textarea.esper-description-text {
   font-size: 14px;
   color: @purple_text;
   background-color: @purple_bg;
+}
+
+.esper-onboarding {
+  min-height: 300px;
 }
