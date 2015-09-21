@@ -47,7 +47,7 @@ module Esper.Timezone {
     offsetMins: number; // -420, -240, etc. For sorting
   }
 
-  var commonTimezones: ZoneName[] = [
+  export var commonTimezones: ZoneName[] = [
     { id: "America/Los_Angeles", name: "US Pacific Time" },
     { id: "America/Denver", name: "US Mountain Time" },
     { id: "America/Chicago", name: "US Central Time" },
