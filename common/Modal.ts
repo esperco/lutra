@@ -63,7 +63,8 @@ module Esper.Modal {
   }
 
   /** Dialog box with a single Ok button. */
-  export function dialog(title : string, body : JQuery, onClose? : () => void) : Modal {
+  export function dialog(title : string, body : JQuery,
+                         onClose? : () => boolean) : Modal {
 '''
 <button #okButton class="esper-btn esper-btn-primary modal-primary">
   Ok
@@ -79,11 +80,9 @@ module Esper.Modal {
     modal.footer.append(okButton);
 
     function closeView() {
-      if (onClose) {
-        onClose();
+      if (! onClose || onClose()) {
+        modal.view.remove();
       }
-
-      modal.view.remove();
     }
     okButton.click(closeView);
     closeBox.click(closeView);

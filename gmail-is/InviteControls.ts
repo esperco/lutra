@@ -599,6 +599,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                                     .then(function(desc) {
                                       descriptionField.val(desc.description_text);
                                     });
+                                  return true;
                                 });
       $("body").append(dialog.view);
     });
