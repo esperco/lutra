@@ -42,6 +42,10 @@ module Esper.ApiT {
     calendar_default_dupe?: boolean;
   }
 
+  export interface Calendars {
+    calendars: Calendar[];
+  }
+
   export interface Phone {
     title: string;
     number: string;
