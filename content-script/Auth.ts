@@ -55,7 +55,12 @@ module Esper.Auth {
     }
   }
 
+  // Store id of last account we tried logging in for (so we know whether
+  // we should focus on this tab on login)
+  var loginInProgressFor: string;
+
   function openLoginTab(googleAccountId) {
+    loginInProgressFor = googleAccountId;
     var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
     Log.d("Going off to " + url);
     var win = window.open(url, '_blank');
@@ -220,6 +225,19 @@ module Esper.Auth {
             }
           }
         }
+
+        /* Post message to Event Script asking it to focus on current tab if
+           if login data is provided for whatever login is in progress */
+        for (var k in newStorage.accounts) {
+          if (loginInProgressFor === k) {
+            Message.postToExtension(Message.Type.FocusOnSender);
+            break;
+          }
+        }
+
+        // Always unset loginInProgress variable so future logins in other
+        // tabs don't accidentally refocus on this one
+        loginInProgressFor = ""; // Unset
       }
     });
   }

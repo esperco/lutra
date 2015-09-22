@@ -260,6 +260,12 @@ module Esper.InviteControls {
       pubCalendar.val(publicCalId);
     }
 
+    // Temporarily disable calendar selection until we can make a backend
+    // call to change the google_cal_id of a given event
+    if (!duplicate) {
+      calendarRow.hide();
+    }
+
     var aliases = team.team_email_aliases;
     if (aliases.length === 0) {
       $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);

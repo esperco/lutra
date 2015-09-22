@@ -57,7 +57,7 @@ module Esper.ThreadState {
 
   export function load(callback: (state: ThreadData) => void) {
     chrome.storage.sync.get(key, function(data) {
-      var state = (<ThreadData> (<any> data)[key]);
+      var state = (<ThreadData> ((<any> data)[key] || []));
       callback(state);
     });
   }

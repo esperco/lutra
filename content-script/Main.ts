@@ -22,6 +22,7 @@
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
 /// <reference path="../common/Message.ts" />
+/// <reference path="../common/Message.Chrome.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
 
@@ -70,6 +71,9 @@ module Esper.Main {
     Auth.init();
     ExtensionOptions.init();
     ThreadState.init();
+
+    // Miscellaneous messaging setup
+    Message.pipeToExtension(Message.Type.OpenExtensionOptions);
   }
 }
 
