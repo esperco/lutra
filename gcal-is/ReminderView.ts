@@ -1,14 +1,18 @@
 module Esper.ReminderView {
-  interface ReminderState {
+  interface ReminderGuest {
+    email: string;
+    name: string;
+    checked: boolean;
+  }
+  export interface ReminderState {
     enable: boolean;
     bccMe: boolean;
     text: string;
     time: number;
-    fromTeam: ApiT.Team;
-    fromEmail: string;
+    guests: ReminderGuest[];
   }
 
-  export var currentReminderState;
+  export var currentReminderState: ()=>ReminderState;
 
   function toggleButton(reminderButton) {
     if (reminderButton.hasClass("esper-btn-safe")) {
@@ -22,27 +26,32 @@ module Esper.ReminderView {
     }
   }
 
-  function updateSelectEmails(selectEmail, reminderState) {
-    selectEmail.empty();
+  function renderGuest(guest) {
+'''
+<li #view>
+  <input type='checkbox' #check/>
+  <label #label/>
+</li>
+'''
+    var randomId = Util.randomString();
+    check.attr("id", randomId);
+    label.attr("for", randomId);
 
-    if (reminderState.fromTeam.team_email_aliases.length === 0) {
-      $("<option>" + Login.myEmail() + "</option>")
-        .appendTo(selectEmail);
-      selectEmail.attr("selected", "selected");
-      selectEmail.prop("disabled", true);
+    check.prop("checked", guest.checked);
+    check.change(function() {
+      guest.checked = check.is(":checked");
+    });
+
+    if (guest.name && guest.name.length > 0
+     && guest.name !== guest.email) {
+      label.text(guest.name + " <" + guest.email + ">");
     } else {
-      List.iter(reminderState.fromTeam.team_email_aliases, function(email) {
-        var opt = $("<option>" + email + "</option>");
-        selectEmail.append(opt);
-        if (email === reminderState.from_email) {
-          opt.attr("selected", "selected");
-        }
-      });
-      selectEmail.prop("disabled", false);
+      label.text(guest.email);
     }
+    return view;
   }
 
-  export function render(teams: ApiT.Team[], reminderState) {
+  export function render(fromEmail, reminderState) {
 '''
 <div #view>
   <div class="esper-reminder-options">
@@ -55,9 +64,9 @@ module Esper.ReminderView {
       Enabled
     </button>
   </div>
-  <div>Team: <select #selectTeam /></div>
-  <div>From: <select #selectEmail /></div>
+  <div>From: <span #viewFromEmail /></div>
   <div>Bcc me? <input #bcc type='checkbox' /></div>
+  <div>To: <ul #toGuests/></div>
   <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
 Hello,
 
@@ -66,21 +75,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 </div>
 '''
 
-    List.iter(teams, function(team, i) {
-      var opt = $("<option value='" + i + "'>" + team.team_name + "</option>");
-      selectTeam.append(opt);
-      if (reminderState.fromTeam.teamid === team.teamid) {
-        opt.attr("selected", "selected");
-      }
-    });
-    selectTeam.change(function() {
-      var i = $(this).val();
-      reminderState.fromTeam = teams[i];
-      updateSelectEmails(selectEmail, reminderState);
-    });
-    updateSelectEmails(selectEmail, reminderState);
-
+    viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
+
+    List.iter(reminderState.guests, function(guest) {
+      toGuests.append(renderGuest(guest));
+    });
 
     if (0 < reminderState.time) {
       timeField.val(String(Math.round(reminderState.time / 360) / 10));
@@ -94,8 +94,16 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       toggleButton(reminderButton);
     });
 
+    if (reminderState.text) {
+      reminderField.text(reminderState.text);
+    } else {
+      var eventTitle = Gcal.Event.extractEventTitle();
+      if (0 < eventTitle.length) {
+        reminderField.text(reminderField.text().replace("|event|", eventTitle));
+      }
+    }
+
     currentReminderState = (): ReminderState => {
-      reminderState.fromEmail = selectEmail.val();
       reminderState.bccMe = bcc.is(":checked");
       reminderState.text = reminderField.text();
       reminderState.time = parseFloat(timeField.val()) * 3600;
