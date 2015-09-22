@@ -360,11 +360,11 @@ module Esper.Menu {
       s.appendTo(recipients);
     }
 
-    List.iter(teams, function(team) {
+    _.forEach(teams, function(team) {
       var teamEmails = _.map(team.team_assistants, function(uid: string){
         return Teams.getProfile(uid).email;
       });
-      List.iter(teamEmails, addRecipientCheckboxes);
+      _.forEach(teamEmails, addRecipientCheckboxes);
     });
 
     view.click(cancel);
@@ -525,7 +525,7 @@ module Esper.Menu {
       });
     }
 
-    List.iter(teams, function(team, id) {
+    _.forEach(teams, function(team, id) {
       var i = $("<input>")
           .attr({"type": "checkbox", "id": "esper-modal-team" + id})
           .val(team.teamid);
@@ -544,11 +544,13 @@ module Esper.Menu {
     timeFromDate.datepicker({
       onSelect: function(dateText, inst) {
         $(this).parent().contents().first().replaceWith(dateText);
+        // renderEvents();
       }
     });
     timeUntilDate.datepicker({
       onSelect: function(dateText, inst) {
         $(this).parent().contents().first().replaceWith(dateText);
+        // renderEvents();
       }
     });
 
@@ -631,12 +633,43 @@ module Esper.Menu {
       s.appendTo(recipients);
     }
 
-    List.iter(teams, function(team) {
+    _.forEach(teams, function(team) {
       var teamEmails = _.map(team.team_assistants, function(uid: string){
         return Teams.getProfile(uid).email;
       });
-      List.iter(teamEmails, addRecipientCheckboxes);
+      _.forEach(teamEmails, addRecipientCheckboxes);
     });
+
+    // Api.eventRange(currentTeam.get().teamid,
+    //                currentTeam.get().team_calendars,
+    //                Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
+    //                Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
+    //   .done(function(r) {
+    //     console.log(r);
+    //   });
+
+    // function renderEvents() {
+    //   eventsContainer.empty();
+    //   var teamids = getCheckedValues(teamSelect);
+    //   var teams = _.filter(Login.myTeams(), function(team: ApiT.Team) {
+    //     return _.some(teamids, function(teamid) {
+    //       return team.teamid === teamid;
+    //     });
+    //   });
+    //   var f = timeFromDate.datepicker("getDate");
+    //   var u = timeUntilDate.datepicker("getDate");
+    //   _.forEach(teams, function(team: ApiT.Team) {
+    //     Api.eventRange(team.teamid,
+    //                    team.team_calendars,
+    //                    Math.floor(f.getTime() / 1000),
+    //                    Math.floor(u.getTime()/ 1000 + 86399))
+    //       .done(function(result) {
+    //         _.forEach(result.events, function(ev: ApiT.CalendarEvent) {
+    //           eventsContainer.append(TaskList.renderEvent(team, ev));
+    //         });
+    //       });
+    //   });
+    // }
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
@@ -704,125 +737,6 @@ module Esper.Menu {
 
     return _view;
   }
-
-//   function displayAgenda() {
-// '''
-// <div #view class="esper-modal-bg esper">
-//   <div #modal class="esper-confirm-event-modal">
-//     <span #closeButton class="esper-modal-close esper-clickable">×</span>
-//     <div class="esper-modal-header">Agenda</div>
-//     <table class="esper-modal-content">
-//       <tr>
-//         <td>
-//           <label class="esper-agenda-title">
-//             Executive Team:
-//           </label>
-//         </td>
-//           <select #teamSelect class="esper-agenda-select"/>
-//         <td>
-//       </tr>
-//       <tr>
-//         <td>
-//           <label class="esper-agenda-title">
-//             Executive Timezone:
-//           </label>
-//         </td>
-//         <td>
-//           <select #tzSelect class="esper-agenda-select"/>
-//         </td>
-//       </tr>
-//       <tr>
-//         <td colspan="2">
-//           <span>to</span>
-//         </td>
-//       </tr>
-//       <tr>
-//         <td colspan="2">
-//           <label class="esper-agenda-title">
-//             Agenda Format:
-//           </label>
-//         </td>
-//       </tr>
-//       <tr>
-//         <td colspan="2">
-//           <div class="esper-agenda-format">
-//             <label>
-//               <input #htmlFormat type="radio" name="format" />
-//               HTML
-//             </label>
-//             <label>
-//               <input #textFormat type="radio" name="format" />
-//               Plain Text
-//             </label>
-//             <br/>
-//             <label>
-//               <input #includeTaskNotes type="checkbox" />
-//                 Include task notes
-//             </label>
-//           </div>
-//         </td>
-//       </tr>
-//       <tr>
-//         <td colspan="2">
-//           <label class="esper-agenda-title">
-//             Send to:
-//             <div #recipients class="esper-agenda-section">
-//             </div>
-//           </label>
-//         </td>
-//       </tr>
-//     </table>
-//     <div class="esper-modal-footer esper-clearfix">
-//       <div #errorMessages>
-//       </div>
-//       <button #sendButton class="esper-btn esper-btn-primary modal-primary">
-//         Send Now
-//       </button>
-//       <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
-//         Cancel
-//       </button>
-//     </div>
-//   </div>
-// </div>
-// '''
-
-//     var teamid = teamSelect.val();
-//     var timezones = ["US/Pacific", "US/Mountain", "US/Central", "US/Eastern"];
-//     var prefs = Teams.getPreferences(teamid);
-//     var timezone = prefs.general.current_timezone;
-//     var teamEmails = List.union(
-//       [Teams.getProfile(currentTeam.get().team_executive).email],
-//       List.map(currentTeam.get().team_assistants, function(uid) {
-//         return Teams.getProfile(uid).email;
-//       }));
-
-//     List.iter(teamEmails, addRecipientCheckboxes);
-
-//     List.iter(timezones, function(tz) {
-//       var o = $("<option>")
-//         .text(tz)
-//         .val(tz);
-//       if (tz === timezone) {
-//         o.prop("selected", true);
-//       }
-//       o.appendTo(tzSelect);
-//     });
-
-//     tzSelect.change(function() {
-//       var general = prefs.general;
-//       general.current_timezone = tzSelect.val();
-//       Api.setGeneralPreferences(teamid, general);
-//     });
-
-//     function cancel() { view.remove(); }
-
-//     view.click(cancel);
-//     closeButton.click(cancel);
-//     Util.preventClickPropagation(modal);
-//     cancelButton.click(cancel);
-
-//     return _view;
-//   }
 
   function displayTaskList(team: ApiT.Team,
                            tasksLayer: JQuery) {
