@@ -6,7 +6,7 @@
   during the creation process.
 */
 
-module Esper.Esper.Watchable {
+module Esper.Watchable {
 
   /* Global counter used to generate unique watcher IDs */
   var idCounter = 0;

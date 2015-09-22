@@ -459,7 +459,7 @@ Unlimited usage. Nothing to approve.
     }
 
     /* Total number of seconds */
-    var t = new Esper.Watchable.C<number>(function(x) { return true; },
+    var t = new Watchable.C<number>(function(x) { return true; },
                                           init);
     t.watch(changeHandler);
     fillBoxes(init);
