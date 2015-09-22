@@ -8,7 +8,7 @@
 module Esper.Model {
 
   // Base class for Model Stores
-  export class StoreOne<TData> extends StoreBase<TData> {
+  export class StoreOne<TData> extends StoreBase {
 
     // Actual data object
     protected data: [TData, StoreMetadata];

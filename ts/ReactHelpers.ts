@@ -4,7 +4,7 @@
 */
 
 /// <reference path="../typings/react/react-global.d.ts" />
-/// <reference path="./Model.ts" />
+/// <reference path="./Emit.ts" />
 /// <reference path="./JQStore.ts" />
 
 /*
@@ -60,7 +60,7 @@ module Esper.ReactHelpers {
   // Subclass of Component with some helper functions
   export abstract class Component<P,S> extends React.Component<P,S> {
     // List of stores this component is listening to. Override in sub-class.
-    static stores: Model.StoreBase<any>[] = [];
+    static sources: Emit.EmitBase[] = [];
 
     constructor(props: P) {
       super(props);
@@ -86,14 +86,14 @@ module Esper.ReactHelpers {
     // call super() if these are overriden
     componentDidMount(): void {
       var self = this;
-      _.each(this.getStores(), function(store) {
+      _.each(this.getSources(), function(store) {
         store.addChangeListener(self.onChange);
       });
     }
 
     componentWillUnmount(): void {
       var self = this;
-      _.each(this.getStores(), function(store) {
+      _.each(this.getSources(), function(store) {
         store.removeChangeListener(self.onChange);
       });
     }
@@ -102,13 +102,13 @@ module Esper.ReactHelpers {
     // Implement as arrow function so "this" value is properly referenced
     protected onChange = (): void => this.setState(<S> this.getState());
 
-    // Interface for getting State -- passes a boolean = true if this is
+    // Interface for getting State -- passed a boolean = true if this is
     // called during the initial constructor
     protected getState(init=false): void|S { return; }
 
     // Helper to get static store vals from instance
-    protected getStores(): Model.StoreBase<any>[] {
-      return (<typeof Component> this.constructor).stores;
+    protected getSources(): Emit.EmitBase[] {
+      return (<typeof Component> this.constructor).sources;
     }
   }
 }

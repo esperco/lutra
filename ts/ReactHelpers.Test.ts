@@ -81,7 +81,7 @@ module Esper.ReactHelpers {
 
   // NB: Wrap string in object because React needs an object
   class StoreComponent extends Component<{}, { val: string }> {
-    static stores = [stringStore];
+    static sources = [stringStore];
 
     getState(init=false) {
       if (init) {

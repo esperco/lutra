@@ -9,6 +9,7 @@
 */
 
 /// <reference path="./Util.ts" />
+/// <reference path="./Emit.ts" />
 
 module Esper.Model {
 
@@ -43,63 +44,23 @@ module Esper.Model {
   }
 
   // Base class for Store-like classes with EventEmitters
-  export class StoreBase<TData> extends EventEmitter {
-    /*
-      For simplicity we just emit a single change variable whenever any
-      modification happens to a store. We can pass along a list of _id changes
-      but otherwise we let the handler re-query as appropriate to figure out
-      what's different. This may be a little inefficient, but it's
-      insignificant relative to round-trip time to a server or updating the
-      actual DOM, and it makes reasoning about our code a lot easier.
-    */
-    protected CHANGE_EVENT: string = "CHANGE";
-
-    // Register a callback to handle store changes
+  export class StoreBase extends Emit.EmitBase {
+    // More explicit typing on listeners
     addChangeListener(callback: (_ids: string[]) => void): void {
-      this.on(this.CHANGE_EVENT, callback);
+      super.addChangeListener(callback);
     }
 
-    // De-register a callback to handle store changes
     removeChangeListener(callback: (_ids: string[]) => void): void {
-      this.removeListener(this.CHANGE_EVENT, callback);
+      super.removeChangeListener(callback);
     }
 
-    // Remove all listeners
-    removeAllChangeListeners(): void {
-      this.removeAllListeners(this.CHANGE_EVENT);
-    }
-
-    /*
-      Use to track whether emitChange has been called during an emitChange
-      cycle. The purpose of this is maintain unidirectional data flow. State
-      changes trigger event callbacks that further update the state are
-      difficult to reason about. They also run the risk of setting off an
-      infinite loop.
-    */
-    protected alreadyEmitted = false;
-
-    // Call this whenever the store is changed.
     protected emitChange(_ids?: string[]): void {
-      if (this.alreadyEmitted) {
-        throw new Error("Unidirectional data flow error: Cannot update " +
-          "store via change handler");
-      }
-
-      this.alreadyEmitted = true;
-      try {
-        if (_ids) {
-          this.emit(this.CHANGE_EVENT, _ids);
-        } else {
-          this.emit(this.CHANGE_EVENT);
-        }
-      } finally {
-        this.alreadyEmitted = false;
-      }
+      super.emitChange(_ids);
     }
   }
 
   // Base class for Model Stores
-  export class Store<TData> extends StoreBase<TData> {
+  export class Store<TData> extends StoreBase {
 
     // Actual container for data
     protected data: {
