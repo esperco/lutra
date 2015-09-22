@@ -83,18 +83,18 @@ module Esper.ReactHelpers {
     }
 
     // Connect or disconnect component from declared stores -- remember to
-    // call super() if these are overriden
+    // call super() if these are overridden
     componentDidMount(): void {
       var self = this;
-      _.each(this.getSources(), function(store) {
-        store.addChangeListener(self.onChange);
+      _.each(this.getSources(), function(source) {
+        source.addChangeListener(self.onChange);
       });
     }
 
     componentWillUnmount(): void {
       var self = this;
-      _.each(this.getSources(), function(store) {
-        store.removeChangeListener(self.onChange);
+      _.each(this.getSources(), function(source) {
+        source.removeChangeListener(self.onChange);
       });
     }
 
@@ -106,7 +106,7 @@ module Esper.ReactHelpers {
     // called during the initial constructor
     protected getState(init=false): void|S { return; }
 
-    // Helper to get static store vals from instance
+    // Helper to get static source vals from instance
     protected getSources(): Emit.EmitBase[] {
       return (<typeof Component> this.constructor).sources;
     }
