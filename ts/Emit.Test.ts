@@ -3,40 +3,63 @@
 
 module Esper.Emit {
 
-  class TestEmit extends EmitBase {}
-
-  class TestPipe extends EmitPipeBase {
-    addSubListeners() {}
-    removeSubListeners() {}
-  };
+  class TestSource extends EmitBase {
+    cough() {
+      this.emitChange();
+    }
+  }
+  class TestPipe extends EmitPipeBase {};
 
   describe("Emit.EmitPipeBase", function() {
     beforeEach(function() {
-      this.pipe = new TestPipe();
-      spyOn(this.pipe, "addSubListeners");
-      spyOn(this.pipe, "removeSubListeners");
+      this.source1 = new TestSource();
+      this.source2 = new TestSource();
+      this.pipe = new TestPipe([this.source1, this.source2]);
+    });
+
+    it("should call listeners when sub-listeners emit", function() {
+      var l = jasmine.createSpy("l");
+      this.pipe.addChangeListener(l);
+
+      this.source1.cough();
+      this.source2.cough();
+      expect(l.calls.count()).toEqual(2);
     });
 
     it("should add sublisteners only once", function() {
-      var l1 = function() { };
-      var l2 = function() { };
+      var l1 = jasmine.createSpy('l1');
+      var l2 = jasmine.createSpy('l2');
       this.pipe.addChangeListener(l1);
-      expect(this.pipe.addSubListeners).toHaveBeenCalled();
-
       this.pipe.addChangeListener(l2);
-      expect(this.pipe.addSubListeners.calls.count()).toEqual(1);
+
+      this.source1.cough();
+      expect(l1.calls.count()).toEqual(1);
+      expect(l2.calls.count()).toEqual(1);
     });
 
-    it("should remove sublisteners only if no listeners remain", function() {
-      var l1 = function() { };
-      var l2 = function() { };
+    it("should not remove sublisteners so long as listeners remain", function() {
+      var l1 = jasmine.createSpy('l1');
+      var l2 = jasmine.createSpy('l2');
       this.pipe.addChangeListener(l1);
       this.pipe.addChangeListener(l2);
       this.pipe.removeChangeListener(l1);
-      expect(this.pipe.removeSubListeners).not.toHaveBeenCalled();
 
+      this.source1.cough();
+      expect(l1).not.toHaveBeenCalled();
+      expect(l2).toHaveBeenCalled();
+    });
+
+    it("should remove sublisteners if all listeners removed", function() {
+      var l1 = jasmine.createSpy('l1');
+      var l2 = jasmine.createSpy('l2');
+      this.pipe.addChangeListener(l1);
+      this.pipe.addChangeListener(l2);
+      this.pipe.removeChangeListener(l1);
       this.pipe.removeChangeListener(l2);
-      expect(this.pipe.removeSubListeners).toHaveBeenCalled();
+
+      spyOn(this.pipe, "emitChange");
+      this.source1.cough();
+      expect(this.pipe.emitChange).not.toHaveBeenCalled();
     });
 
     it("should remove sublisteners if removeAllListeners called", function() {
@@ -45,7 +68,10 @@ module Esper.Emit {
       this.pipe.addChangeListener(l1);
       this.pipe.addChangeListener(l2);
       this.pipe.removeAllChangeListeners();
-      expect(this.pipe.removeSubListeners).toHaveBeenCalled();
+
+      spyOn(this.pipe, "emitChange");
+      this.source1.cough();
+      expect(this.pipe.emitChange).not.toHaveBeenCalled()
     });
   });
 

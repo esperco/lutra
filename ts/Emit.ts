@@ -3,6 +3,7 @@
   changes.
 */
 
+/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
 declare module Esper {
   export var EventEmitter: typeof EventEmitter3.EventEmitter;
@@ -72,14 +73,30 @@ module Esper.Emit {
     once anything listening to it stops listening.
   */
   export abstract class EmitPipeBase extends EmitBase {
+    // List of sources attached to this instance
+    sources: Emit.EmitBase[];
 
-    // Override this function is a subclass -- it will be called if a new
-    // listener is added and we need to (re-)setup listeners from this class
-    // to other event emitters.
-    protected abstract addSubListeners(): void;
+    constructor(sources?: Emit.EmitBase[]) {
+      super();
+      this.sources = sources || [];
+    }
+
+    // Called if a new listener is added and we need to (re-)setup listeners
+    // from this class to other event emitters.
+    protected addSubListeners(): void {
+      var self = this;
+      _.each(this.sources, function(source) {
+        source.addChangeListener(self.onChange);
+      });
+    }
 
     // Same as above, but for removal
-    protected abstract removeSubListeners(): void;
+    protected removeSubListeners(): void {
+      var self = this;
+      _.each(this.sources, function(source) {
+        source.removeChangeListener(self.onChange);
+      });
+    }
 
     // Call addSubListeners if necessary
     addChangeListener(callback: (...args: any[]) => void): void {
@@ -102,6 +119,11 @@ module Esper.Emit {
       this.removeAllListeners(this.CHANGE_EVENT);
       this.removeSubListeners();
     }
+
+    // Callback to trigger from listeners
+    // Implement as arrow function so we can pass around a reference to this
+    // function that retains properly bound "this".
+    protected onChange = (): void => this.emitChange();
   }
 
 }

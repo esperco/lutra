@@ -85,8 +85,8 @@ module Esper.Query {
         });
     }
 
-    constructor() {
-      super();
+    constructor(sources?: Emit.EmitBase[]) {
+      super(sources);
       this.callsInProgress = [];
     }
 
