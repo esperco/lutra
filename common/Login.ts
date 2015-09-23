@@ -118,4 +118,10 @@ module Esper.Login {
       window.postMessage(esperMessage, "*");
     }
   }
+
+  watchableAccount.watch(function(newAccount, newValid, oldAccount, oldValid) {
+    if (newValid) {
+      Analytics.identify();
+    }
+  });
 }
