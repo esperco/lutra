@@ -19,6 +19,11 @@ module Esper.Modal {
   </div>
 </div>
 '''
+    modal.click(function(event) {
+      // Click modal => don't bubble to modal-bg
+      event.stopPropagation();
+    });
+
     return {
       view    : view,
       modal   : modal,
@@ -57,7 +62,7 @@ module Esper.Modal {
 
   function makeCloseBox() {
 '''
-<span #closeBox class="esper-tl-close esper-clickable">×</span>
+<span #closeBox class="esper-modal-close esper-clickable">×</span>
 '''
     return closeBox;
   }
@@ -86,6 +91,7 @@ module Esper.Modal {
     }
     okButton.click(closeView);
     closeBox.click(closeView);
+    modal.view.click(closeView);
 
     return modal;
   }
