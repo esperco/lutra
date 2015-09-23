@@ -14,8 +14,8 @@ directory.
 
 Gulp Helpers
 ------------
-The [marten-gulp-helpers](marten-gulp-helpers) package is embedded within this
-one. Its [README](marten-gulp-helpers/README.md) has details.
+The [gulp-helpers](gulp-helpers) package is embedded within this
+one. Its [README](gulp-helpers/README.md) has details.
 
 TypeScript Definitions
 ----------------------
@@ -54,7 +54,7 @@ This package contains helpers for bundling vendor files in a way that doesn't
 overly pollute the global namespace. See the [vendor index file](js/vendor.js)
 for an example of how to construct an index file that Browserify can use
 as an entry point. The Browserify code and necessary plugins are handled
-by [marten-gulp-helpers/vendor.js](marten-gulp-helpers/vendor.js).
+by [gulp-helpers/vendor.js](gulp-helpers/vendor.js).
 
 LESS Bootstrap
 --------------
