@@ -26,6 +26,7 @@ module Esper.Model {
     _id?: string;
     dataStatus?: DataStatus;
     lastUpdate?: Date;
+    aliases?: string[];
   }
 
   // Variant on StoreMetadata for new objects (_id is required)
@@ -67,6 +68,11 @@ module Esper.Model {
       [index: string]: [TData, StoreMetadata];
     };
 
+    // Alias map
+    protected aliases: {
+      [index: string]: string;
+    };
+
 
     ///////////
 
@@ -78,10 +84,12 @@ module Esper.Model {
     // Clears all data in store
     reset(): void {
       this.data = {};
+      this.aliases = {};
     }
 
     // Returns an instance stored with a particular _id
     get(_id: string): [TData, StoreMetadata] {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id];
       }
@@ -89,15 +97,21 @@ module Esper.Model {
 
     // Returns just the value and not the metadata
     val(_id: string): TData {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id][0];
       }
     }
 
     metadata(_id: string): StoreMetadata {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id][1];
       }
+    }
+
+    protected aliasOrId(_id: string): string {
+      return this.aliases[_id] || _id;
     }
 
     // Return all store objects
@@ -109,6 +123,16 @@ module Esper.Model {
       return _.map(this.getAll(), function(tuple) { return tuple[0]; });
     }
 
+    // Alias two _ids -- e.g. for when we assign a random _id to a model
+    // for temp display and then need to associate the same model with the
+    // new (real) _id
+    alias(currentId: string, newId: string): void {
+      if (this.has(currentId)) {
+        this.aliases[newId] = currentId;
+        this.updateMetadata(currentId, {}, true);
+      }
+    }
+
 
     ////////////
 
@@ -116,6 +140,7 @@ module Esper.Model {
 
     // Returns true if an item exists
     has(_id: string): boolean {
+      _id = this.aliasOrId(_id);
       return this.data.hasOwnProperty(_id);
     }
 
@@ -123,6 +148,9 @@ module Esper.Model {
     set(_id: string, tuple: [TData, StoreMetadata]): void;
     set(_id: string, data: TData, metadata?: StoreMetadata): void;
     set(_id: string, firstArg: any, secondArg?: any): void {
+      var origId = _id;
+      _id = this.aliasOrId(_id);
+
       var data: TData;
       var metadata: StoreMetadata;
       if (secondArg) {
@@ -134,14 +162,17 @@ module Esper.Model {
       } else {
         data = (<TData> firstArg);
       }
-      metadata = this.cleanMetadata(_id, data, metadata);
+      metadata = this.cleanMetadata(_id, metadata);
       // Store data in immutable fashion
-      this.data[_id] = Util.deepFreeze<[TData,StoreMetadata]>([data, metadata]);
-      this.emitChange([_id]);
+      this.data[_id] = [
+        Util.deepFreeze<TData>(data),
+        Util.deepFreeze<StoreMetadata>(metadata)
+      ];
+      this.emitChange([origId]);
     }
 
     // Hook to preset metadata before it's set
-    protected cleanMetadata(_id: string, data: TData, metadata?: StoreMetadata)
+    protected cleanMetadata(_id: string, metadata?: StoreMetadata)
       : StoreMetadata
     {
       // Make sure _id matches
@@ -158,8 +189,26 @@ module Esper.Model {
       // Some defaults and overrides
       metadata.dataStatus = metadata.dataStatus || DataStatus.READY;
       metadata.lastUpdate = new Date();
+      metadata.aliases = [];
+      _.each(this.aliases, function(val, key) {
+        if (val === _id) {
+          metadata.aliases.push(key);
+        }
+      });
       return metadata;
     };
+
+    // Update metadata for a given _id -- can do so without emiting
+    protected updateMetadata(_id: string, metadata?: StoreMetadata,
+                             silent=false) {
+      if (this.has(_id)) {
+        metadata = this.cleanMetadata(_id, metadata);
+        this.data[_id][1] = metadata;
+        if (! silent) {
+          this.emitChange([_id]);
+        }
+      }
+    }
 
     /* Inserts a new object at key, fails if key already exists */
     insert(_id: string, data: TData): void;
@@ -191,6 +240,7 @@ module Esper.Model {
     update(_id: string, data: TData, metadata?: StoreMetadata): void;
     update(_id: string, update: any, metadata?: StoreMetadata): void {
       if (this.has(_id)) {
+        _id = this.aliasOrId(_id);
         this.upsert(_id, update, metadata);
       }
       else {
@@ -224,8 +274,23 @@ module Esper.Model {
     // Remove a key from store
     remove(_id: string): void {
       if (this.has(_id)) {
+        var origId = _id;
+        var aliases = this.aliases;
+        if (aliases[_id]) {
+          _id = aliases[_id];
+          delete aliases[_id];
+        }
+
+        // This is clunky, but if we aren't storing a lot of data, iteration
+        // is fine.
+        _.each(aliases, function(val, key) {
+          if (val === _id) {
+            delete aliases[key];
+          }
+        });
+
         delete this.data[_id];
-        this.emitChange([_id]);
+        this.emitChange([origId]);
       }
     }
 

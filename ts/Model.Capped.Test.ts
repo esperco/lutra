@@ -92,6 +92,29 @@ module Esper.Model {
           });
         });
       });
+
+      describe("with aliases", function() {
+        beforeEach(function() {
+          rabbitHat.alias("rabbit_2", "rabbit_3");
+        });
+
+        it("should not count aliases towards cap", function() {
+          rabbitHat.upsert("rabbit_3", { uid: "rabbit_3" });
+          expect(rabbitHat.has("rabbit_0")).toBe(true);
+          expect(rabbitHat.has("rabbit_1")).toBe(true);
+          expect(rabbitHat.has("rabbit_2")).toBe(true);
+          expect(rabbitHat.has("rabbit_3")).toBe(true);
+        });
+
+        it("should count non-aliased towards cap", function() {
+          rabbitHat.upsert("rabbit_4", { uid: "rabbit_4" });
+          expect(rabbitHat.has("rabbit_0")).toBe(false);
+          expect(rabbitHat.has("rabbit_1")).toBe(true);
+          expect(rabbitHat.has("rabbit_2")).toBe(true);
+          expect(rabbitHat.has("rabbit_3")).toBe(true);
+          expect(rabbitHat.has("rabbit_4")).toBe(true);
+        });
+      });
     });
   });
 }

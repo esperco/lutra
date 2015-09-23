@@ -33,7 +33,11 @@ module Esper.Model {
     set(_id: string, data: TData, metadata?: StoreMetadata): void;
     set(_id: string, firstArg: any, secondArg?: any): void {
       super.set(_id, firstArg, secondArg);
-      var shift = Util.pushToCapped(this.capList, _id, this.cap);
+      var aliases = this.aliases;
+      var shift = Util.pushToCapped(this.capList, _id, this.cap,
+        function(a, b): boolean {
+          return (aliases[a] || a) === (aliases[b] || b);
+        });
       if (shift) {
         // Don't call this.remove because we don't necessarily want to emit
         // a change event if the element is already rendered in the DOM. Just
