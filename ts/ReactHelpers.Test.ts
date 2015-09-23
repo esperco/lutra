@@ -81,8 +81,6 @@ module Esper.ReactHelpers {
 
   // NB: Wrap string in object because React needs an object
   class StoreComponent extends Component<{}, { val: string }> {
-    static sources = [stringStore];
-
     getState(init=false) {
       if (init) {
         return { val: "initial" };
@@ -93,6 +91,10 @@ module Esper.ReactHelpers {
 
     render() {
       return React.createElement("div", {}, this.state && this.state.val);
+    }
+
+    componentDidMount(): void {
+      this.setSources([stringStore]);
     }
   }
 

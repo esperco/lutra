@@ -59,11 +59,12 @@ module Esper.ReactHelpers {
 
   // Subclass of Component with some helper functions
   export class Component<P,S> extends React.Component<P,S> {
-    // List of stores this component is listening to. Override in sub-class.
-    static sources: Emit.EmitBase[] = [];
+    // List of stores this component is listening to. Set via getSources.
+    sources: Emit.EmitBase[];
 
     constructor(props: P) {
       super(props);
+      this.sources = [];
       this.state = (<S> this.getState(true));
     }
 
@@ -82,19 +83,23 @@ module Esper.ReactHelpers {
       this.parent().remove();
     }
 
-    // Connect or disconnect component from declared stores -- remember to
-    // call super() if these are overridden
-    componentDidMount(): void {
-      var self = this;
-      _.each(this.getSources(), function(source) {
-        source.addChangeListener(self.onChange);
-      });
+    // Connect or disconnect component from all sources -- remember to
+    // call super if overridden
+    componentWillUnmount(): void {
+      this.setSources([]);
     }
 
-    componentWillUnmount(): void {
+    // Call to change the sources this component is listening to. Adds and
+    // removes listeners as appropriate.
+    protected setSources(newSources: Emit.EmitBase[]): void {
       var self = this;
-      _.each(this.getSources(), function(source) {
+      _.each(this.sources || [], function(source) {
         source.removeChangeListener(self.onChange);
+      });
+
+      this.sources = newSources;
+      _.each(this.sources, function(source) {
+        source.addChangeListener(self.onChange);
       });
     }
 
@@ -105,10 +110,5 @@ module Esper.ReactHelpers {
     // Interface for getting State -- passed a boolean = true if this is
     // called during the initial constructor
     protected getState(init=false): void|S { return; }
-
-    // Helper to get static source vals from instance
-    protected getSources(): Emit.EmitBase[] {
-      return (<typeof Component> this.constructor).sources;
-    }
   }
 }
