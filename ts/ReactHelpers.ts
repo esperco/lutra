@@ -58,7 +58,7 @@ module Esper.ReactHelpers {
   });
 
   // Subclass of Component with some helper functions
-  export abstract class Component<P,S> extends React.Component<P,S> {
+  export class Component<P,S> extends React.Component<P,S> {
     // List of stores this component is listening to. Override in sub-class.
     static sources: Emit.EmitBase[] = [];
 
