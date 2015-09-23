@@ -2,7 +2,11 @@
   Module for managing the onboarding flow within the extension
 */
 
+/// <reference path="../common/Esper.ts" />
+/// <reference path="../common/Api.ts" />
+/// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../marten/ts/Query.ts" />
 
 module Esper.Onboarding {
   // Sort of annoying but needed to make namespaced React work with JSX
@@ -11,8 +15,7 @@ module Esper.Onboarding {
   // Store for currentSlide that non-React code can tap into
   export var CurrentSlide = new Model.StoreOne<number>();
 
-  // Initialize
-  CurrentSlide.set(0);
+  CurrentSlide.set(0); // Initialize
 
   function nextSlide() {
     CurrentSlide.set(function(oldVal) {
@@ -39,7 +42,7 @@ module Esper.Onboarding {
 
   export class OnboardingModal
       extends ReactHelpers.Component<Types.Account, OnboardingState> {
-    static stores = [CurrentSlide];
+    static sources = [CurrentSlide];
 
     render() {
       var slideElm = React.createElement(slides[this.state.currentSlide], {
@@ -167,6 +170,9 @@ module Esper.Onboarding {
     }
   }
 
+
+  ///////////
+
   // Slide 0 => welcome slide
   class WelcomeSlide extends OnboardingSlide {
     static handleSubmit<T>(instance: OnboardingModal):JQueryPromise<T> {
@@ -180,6 +186,9 @@ module Esper.Onboarding {
     }
   }
 
+
+  ///////////
+
   // Slide 1 => get permissions
   class PermissionSlide extends OnboardingSlide {
     static handleSubmit<T>(instance: OnboardingModal):JQueryPromise<T> {
@@ -189,23 +198,24 @@ module Esper.Onboarding {
     }
 
     render() {
+      var url = chrome.extension.getURL;
       var content: JSX.Element;
       if (Auth.loggedIn) {
-        content = (<div>
+        content = (<div className="message">
           You are logged in as {this.props.account.googleAccountId}.
         </div>);
       } else {
         content = (<div>
-          Waiting for {this.props.account.googleAccountId} to sign in.
-          <br /><br />
+          <div className="message">
+            Waiting for {this.props.account.googleAccountId} to sign in
+          </div>
 
-          <button className="btn btn-primary sign-in-btn google-btn">
-            <div className="sign-in-text">Sign In With Google</div>
-          </button>
+          <button className="esper-google-btn"
+                  onClick={this.openLoginTab.bind(this)}></button>
         </div>);
       }
 
-      return (<div className="text-center">{content}</div>);
+      return (<div className="simple-content">{content}</div>);
     }
 
     componentDidMount() {
@@ -213,14 +223,49 @@ module Esper.Onboarding {
 
       // Open a new page for Google OAuth if we're not logged in
       if (! Auth.loggedIn) {
-        this.props.parent.makeBusy();
-        Auth.openLoginTab(this.props.account.googleAccountId);
+        this.openLoginTab();
       }
+    }
+
+    openLoginTab() {
+      this.props.parent.makeBusy();
+      Auth.openLoginTab(this.props.account.googleAccountId);
     }
   }
 
+
+  //////////
+
+  // Store for holding calendars associated with UIDs
+  var CurrentCalendars = new Model.Store<ApiT.Calendars>();
+
+  // Query manager for getting calendars for the *current* user
+  class CalendarQuery extends Query.Manager<{}, ApiT.Calendars> {
+    getAsync(): JQueryPromise<any> {
+      return Api.getCalendarList()
+        .then(function(calendars) {
+          CurrentCalendars.upsert(Login.myUid(), calendars);
+        });
+    }
+
+    getData(): ApiT.Calendars {
+      return CurrentCalendars.val(Login.myUid());
+    }
+
+    // Only fetch async if no data -- unlikely calendars have changed in
+    // between calls
+    shouldGetAsync(data, key): boolean {
+      return !data;
+    }
+  }
+
+  // Singleton instance
+  var calendarQuery = new CalendarQuery([CurrentCalendars]);
+
   // Slide 2 => set calendar
   class CalendarSlide extends OnboardingSlide {
+    static sources = [calendarQuery];
+
     static handleSubmit<T>(instance: OnboardingModal):JQueryPromise<T> {
       var d = $.Deferred<any>();
       setTimeout(function() {
@@ -229,10 +274,16 @@ module Esper.Onboarding {
       return d.promise();
     }
 
+    protected getState(init = false) { console.error("getState", init); }
+
     render() {
+      console.error(calendarQuery.get({}));
       return <div>Calendar stuff goes here.</div>;
     }
   }
+
+
+  ///////////
 
   // Slide 3 => videos + final stuff
   class FinishSlide extends OnboardingSlide {
@@ -246,6 +297,7 @@ module Esper.Onboarding {
       return <div>This is the last slide.</div>;
     }
   }
+
 
   // Index of slides
   var slides: (typeof OnboardingSlide)[] = [

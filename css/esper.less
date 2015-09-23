@@ -18,27 +18,26 @@
 
   // Creates an arrow for dropdown menus
   .dropdown-arrow-top {
-    &:before {
+    &:before, &:after {
       position: absolute;
-      top: -8px;
       left: 10px;
       display: inline-block;
       border-right: 8.5px solid transparent;
       border-bottom: 8.5px solid #ccc;
       border-left: 8.5px solid transparent;
-      border-bottom-color: rgba(0, 0, 0, 0.2);
       content: '';
     }
 
+    // Outer arrow (border / outline)
+    &:before {
+      top: -8px;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+    }
+
+    // Inner arrow (white / fill)
     &:after {
-      position: absolute;
       top: -7px;
-      left: 10px;
-      display: inline-block;
-      border-right: 8.5px solid transparent;
-      border-bottom: 8.5px solid #ffffff;
-      border-left: 8.5px solid transparent;
-      content: '';
+      border-bottom-color: #fff;
     }
 
     &.dropdown-menu-right {
@@ -85,6 +84,19 @@
     margin-right: @modal-title-padding;
   }
 
+  .modal-content .simple-content {
+    padding: @line-height-computed;
+    padding-bottom: (2 * @line-height-computed);
+    text-align: center;
+
+    .message {
+      font-size: @font-size-h5;
+      color: @gray;
+      margin-bottom: @line-height-computed;
+    }
+  }
+
+  // Doesn't work unless we insert SVG inline (need to bring in Svg.ts)
   .esper-brand-icon {
     color: @brand-primary;
     fill: @brand-primary;
@@ -2624,3 +2636,20 @@ textarea.esper-description-text {
 .esper-onboarding {
   min-height: 300px;
 }
+
+.esper-google-btn {
+  background: url("../img/btn_google_signin_light_normal_web.png");
+  width: 193px;
+  height: 48px;
+  cursor: pointer;
+  border-width: 0;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:active {
+    background: url("../img/btn_google_signin_light_pressed_web.png");
+  }
+}
+>>>>>>> Google signin button + some Marten react stuff

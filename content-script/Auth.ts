@@ -1,5 +1,6 @@
 /// <reference path="../common/Login.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="./Onboarding.tsx" />
 
 module Esper.Auth {
@@ -79,67 +80,70 @@ module Esper.Auth {
     div.renderReact(Onboarding.OnboardingModal, account);
   }
 
-  function openWelcomeModal2(account: Types.Account) {
-'''
-<div #view>
-  <div #background class="esper-modal-bg"/>
-  <div #modal class="esper-modal esper-welcome-modal">
-    <div class="esper-modal-header">Welcome to Esper</div>
-    <div #about class="esper-about">
-      <div #aboutText class="esper-about-text"/>
-      <img #sidebarScreenshot class="esper-sidebar-screenshot"/>
-    </div>
-    <div class="esper-modal-footer esper-clearfix">
-      <button #enable class="esper-btn esper-btn-primary modal-primary">
-        Enable
-      </button>
-      <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-        Cancel
-      </button>
-      <button #disable class="esper-btn esper-btn-secondary modal-delete">
-        Disable for this account
-      </button>
-    </div>
-  </div>
-</div>
-'''
-    aboutText.text("Enable this extension to track tasks, link emails with " +
-      "calendar events, and access your executive's preferences.");
+//   function openWelcomeModal2(account: Types.Account) {
+// '''
+// <div #view>
+//   <div #background class="esper-modal-bg"/>
+//   <div #modal class="esper-modal esper-welcome-modal">
+//     <div class="esper-modal-header">Welcome to Esper</div>
+//     <div #about class="esper-about">
+//       <div #aboutText class="esper-about-text"/>
+//       <img #sidebarScreenshot class="esper-sidebar-screenshot"/>
+//     </div>
+//     <div class="esper-modal-footer esper-clearfix">
+//       <button #enable class="esper-btn esper-btn-primary modal-primary">
+//         Enable
+//       </button>
+//       <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
+//         Cancel
+//       </button>
+//       <button #disable class="esper-btn esper-btn-secondary modal-delete">
+//         Disable for this account
+//       </button>
+//     </div>
+//   </div>
+// </div>
+// '''
+//     aboutText.text("Enable this extension to track tasks, link emails with " +
+//       "calendar events, and access your executive's preferences.");
 
-    sidebarScreenshot
-      .attr("src", $("#esper-script").attr("data-root-url")+"img/sidebar.png");
+//     sidebarScreenshot
+//       .attr("src", $("#esper-script").attr("data-root-url")+"img/sidebar.png");
 
-    function closeModal() { view.remove(); }
+//     function closeModal() { view.remove(); }
 
-    background.click(closeModal);
+//     background.click(closeModal);
 
-    enable.click(function() {
-      closeModal();
-      openLoginTab(account.googleAccountId);
-    });
+//     enable.click(function() {
+//       closeModal();
+//       openLoginTab(account.googleAccountId);
+//     });
 
-    cancel.click(closeModal);
+//     cancel.click(closeModal);
 
-    disable.click(function() {
-      account.declined = true;
-      EsperStorage.saveAccount(account, closeModal);
-    });
+//     disable.click(function() {
+//       account.declined = true;
+//       EsperStorage.saveAccount(account, closeModal);
+//     });
 
-    $("body").append(view);
-  }
+//     $("body").append(view);
+//   }
 
   function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: Types.Account) {
-        if (!x.declined || forceLogin) {
-          if (x.credentials !== undefined) {
-            Login.setAccount(x);
-            sendCredentialsResponse(x);
-          }
-          else {
-            openWelcomeModal(x);
-          }
+        if (x.credentials !== undefined
+            || (x.declined === true && ! forceLogin)) {
+          Login.setAccount(x);
+          loggedIn = true;
+          sendCredentialsResponse(x);
+
+          openWelcomeModal(x); // Remove when done with onboarding stuff
+        }
+        else {
+          loggedIn = false;
+          openWelcomeModal(x);
         }
     });
   }
