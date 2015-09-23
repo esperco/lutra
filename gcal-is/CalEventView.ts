@@ -258,6 +258,7 @@ module Esper.CalEventView {
           guests: []
         };
         Gcal.waitForGuestsToLoad(function(guests) {
+          reminderState.guests = [];
           guests.each(function() {
             var guest = $(this);
             var guestEmail = guest.attr("title");
