@@ -179,7 +179,7 @@ module Esper.CalEventView {
     reminderState: ReminderView.ReminderState) {
 '''
 <div #view>
-  <button #openReminder class="esper-btn">Reminder</button>
+  <button #openReminder class="esper-btn esper-btn-primary">Reminder</button>
 </div>
 '''
     openReminder.click(function () {
