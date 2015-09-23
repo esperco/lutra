@@ -185,6 +185,12 @@ module Esper.Gcal {
       }
     }
 
+    export function extractEventTitle() {
+      var title = $(".ep-title").text().trim();
+      return 0 < title.length ? title
+           : $(".ep-title input").val().trim();
+    }
+
     /* Find a good insertion point: after "Calendar" dropdown row. */
     export function findAnchor(): JQuery {
       var anchor = $("[id*=calendar-row]");
