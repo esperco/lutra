@@ -123,8 +123,8 @@ module Esper.InThreadControls {
       <span class="ql-format-group">
         <select title="Font" class="ql-font">
           <option value="sans-serif" selected>Sans Serif</option>
-          <option value="Georgia, serif">Serif</option>
-          <option value="Monaco, 'Courier New', monospace">Monospace</option>
+          <option value="serif">Serif</option>
+          <option value="monospace">Monospace</option>
         </select>
         <select title="Size" class="ql-size">
           <option value="10px">Small</option>
@@ -286,6 +286,7 @@ module Esper.InThreadControls {
       if (source === 'api') {
         return;
       }
+      //console.log(JSON.stringify(editor.getContents()));
       taskNotesKeyup(notes);
     });
 
