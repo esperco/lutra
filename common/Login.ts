@@ -1,3 +1,5 @@
+/// <reference path="./ApiT.ts" />
+/// <reference path="./Analytics.ts" />
 /// <reference path="./Watchable.ts" />
 
 module Esper.Login {

@@ -11,6 +11,7 @@
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 /// <reference path="../marten/typings/quill/quill.d.ts" />
 
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />

@@ -1,4 +1,7 @@
-module Analytics {
+
+/// <reference path="./Login.ts" />
+
+module Esper.Analytics {
   export function init() {
     analytics.load(Conf.segmentKey);
   }
@@ -30,6 +33,7 @@ module Analytics {
 
   // Events to track
   export enum Trackable {
+    ClickEsperLogo,
     ClickSendAgenda,
     ClickSendTaskList
   };
@@ -37,7 +41,7 @@ module Analytics {
   export function track(event: Trackable, properties?: Object) {
     var eventName = Trackable[event];
     analytics.ready(function() {
-      analytics.track(eventName, flatten(properties || {}));
+      analytics.track(eventName, properties || {});
     });
   }
 }
