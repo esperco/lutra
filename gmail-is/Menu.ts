@@ -517,6 +517,11 @@ module Esper.Menu {
 
     function cancel() { view.remove(); }
 
+    function closeDropdowns() {
+      teamDropdown.removeClass("open");
+      timezoneDropdown.removeClass("open");
+    }
+
     function getCheckedValues(ul: JQuery) {
       return _.filter(_.map(ul.find("label > input:checked"), function(el) {
           return $(el).val();
@@ -670,6 +675,10 @@ module Esper.Menu {
     //       });
     //   });
     // }
+
+    modal.click(closeDropdowns);
+    Util.preventClickPropagation(teamSelectToggle);
+    Util.preventClickPropagation(timezoneSelectToggle);
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
