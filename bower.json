@@ -10,6 +10,7 @@
     "tests"
   ],
   "dependencies": {
+    "analytics": "~2.11.0",
     "bootstrap": "~3.3.5",
     "crypto-js": "~3.1.5",
     "eventemitter3": "~1.1.1",
