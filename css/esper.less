@@ -53,12 +53,13 @@
     }
   }
 
-  // Bootstrap uses this class -- vverride some things that Gmail sets
+  // Bootstrap uses this class -- override some things that Gmail sets
   .in {
     color: inherit;
     cursor: inherit;
     font-size: inherit;
     text-decoration: inherit;
+    white-space: normal;
     &:hover {
       text-decoration: none;
     }
@@ -67,6 +68,7 @@
   // Busy indicator
   .modal-footer .esper-spinner {
     float: left;
+    display: block;
     height: 32px;
     width: 32px;
   }
@@ -100,6 +102,34 @@
   .esper-brand-icon {
     color: @brand-primary;
     fill: @brand-primary;
+  }
+
+  label.group-heading {
+    display: block;
+  }
+
+  // Overrides
+  .radio, .checkbox {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  // Use to add spacing within columns
+  .esper-col-spacer {
+    padding: 0 5px;
+  }
+
+  // Custom helpers
+  .form-set {
+    border-bottom: 1px solid @google_border_gray;
+    margin-bottom: @form-group-margin-bottom;
+  }
+
+  .modal-content {
+    .esper-subheading {
+      font-weight: bold;
+    }
   }
 }
 
@@ -478,6 +508,14 @@ object.esper-svg { pointer-events: none; }
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\f00d";
+  }
+}
+
+.esper-remove-link {
+  cursor: pointer;
+  color: @gray_30;
+  &:hover {
+    color: @red_hover;
   }
 }
 
@@ -2652,4 +2690,3 @@ textarea.esper-description-text {
     background: url("../img/btn_google_signin_light_pressed_web.png");
   }
 }
->>>>>>> Google signin button + some Marten react stuff

@@ -64,9 +64,6 @@ module Esper.Auth {
   // we should focus on this tab on login)
   var loginInProgressFor: string;
 
-  // Stash a simple variable for checking if we're logged in
-  export var loggedIn: boolean;
-
   export function openLoginTab(googleAccountId) {
     loginInProgressFor = googleAccountId;
     var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
@@ -80,54 +77,6 @@ module Esper.Auth {
     div.renderReact(Onboarding.OnboardingModal, account);
   }
 
-//   function openWelcomeModal2(account: Types.Account) {
-// '''
-// <div #view>
-//   <div #background class="esper-modal-bg"/>
-//   <div #modal class="esper-modal esper-welcome-modal">
-//     <div class="esper-modal-header">Welcome to Esper</div>
-//     <div #about class="esper-about">
-//       <div #aboutText class="esper-about-text"/>
-//       <img #sidebarScreenshot class="esper-sidebar-screenshot"/>
-//     </div>
-//     <div class="esper-modal-footer esper-clearfix">
-//       <button #enable class="esper-btn esper-btn-primary modal-primary">
-//         Enable
-//       </button>
-//       <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-//         Cancel
-//       </button>
-//       <button #disable class="esper-btn esper-btn-secondary modal-delete">
-//         Disable for this account
-//       </button>
-//     </div>
-//   </div>
-// </div>
-// '''
-//     aboutText.text("Enable this extension to track tasks, link emails with " +
-//       "calendar events, and access your executive's preferences.");
-
-//     sidebarScreenshot
-//       .attr("src", $("#esper-script").attr("data-root-url")+"img/sidebar.png");
-
-//     function closeModal() { view.remove(); }
-
-//     background.click(closeModal);
-
-//     enable.click(function() {
-//       closeModal();
-//       openLoginTab(account.googleAccountId);
-//     });
-
-//     cancel.click(closeModal);
-
-//     disable.click(function() {
-//       account.declined = true;
-//       EsperStorage.saveAccount(account, closeModal);
-//     });
-
-//     $("body").append(view);
-//   }
 
   function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
@@ -136,13 +85,11 @@ module Esper.Auth {
         if (x.credentials !== undefined
             || (x.declined === true && ! forceLogin)) {
           Login.setAccount(x);
-          loggedIn = true;
           sendCredentialsResponse(x);
 
           openWelcomeModal(x); // Remove when done with onboarding stuff
         }
         else {
-          loggedIn = false;
           openWelcomeModal(x);
         }
     });
@@ -249,7 +196,6 @@ module Esper.Auth {
         for (var k in newStorage.accounts) {
           if (loginInProgressFor === k) {
             Login.setAccount(newStorage.accounts[k]);
-            loggedIn = true;
             Onboarding.handleLogin();
             Message.postToExtension(Message.Type.FocusOnSender);
             break;

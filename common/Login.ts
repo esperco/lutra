@@ -1,4 +1,6 @@
 /// <reference path="./Watchable.ts" />
+/// <reference path="../marten/ts/Query.ts" />
+/// <reference path="../marten/ts/Model.StoreOne.ts" />
 
 module Esper.Login {
   /* Cached UID and API secret and user ID.
@@ -14,7 +16,7 @@ module Esper.Login {
 
   var _loginInfo: JQueryPromise<ApiT.LoginResponse>;
   export function getLoginInfo(): JQueryPromise<ApiT.LoginResponse> {
-    if (!_loginInfo) {
+    if (! _loginInfo) {
       _loginInfo = Api.getLoginInfo()
         .then(function(loginInfo) {
           watchableInfo.set(loginInfo);
