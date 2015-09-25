@@ -43,17 +43,11 @@ module Esper.Menu {
   }
 
   function updateLinks(ul) {
-    var loggedIn = Login.loggedIn();
-
-    var signInLink = loggedIn?
-      makeActionLink("Sign out", Login.logout, true)
-      : makeActionLink("Sign in", Init.login, false);
-
     function openSettings() {
       window.open(Conf.Api.url);
     }
 
-    var settingsLink = makeActionLink("Team & Exec Settings",
+    var settingsLink = makeActionLink("Edit Settings",
                                       openSettings, false);
 
     function openOptionsPage() {
@@ -65,26 +59,28 @@ module Esper.Menu {
     var optionsLink = makeActionLink("Extension Options",
                                      openOptionsPage, false);
 
-    var agendaLink = makeActionLink("Agenda", function() {
+    var agendaLink = makeActionLink("Get Agenda", function() {
       var agendaModal = displayAgenda();
       $("body").append(agendaModal.view);
     }, false);
 
-    var getTaskListLink = makeActionLink("Task List", function() {
+    var getTaskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = displayGetTask();
       $("body").append(taskListModal.view);
     }, false);
 
-    var helpLink = $("<a class='esper-a'>Help</a>")
-      .attr("href", "mailto:team@esper.com");
+    var hr = $("<hr>").addClass("esper-menu-hr");
+
+    var helpLink = $("<a class='esper-a'>Get Help</a>")
+      .attr("href", "mailto:support@esper.com");
 
     ul.children().remove();
     ul
-      .append(signInLink)
-      .append(settingsLink)
-      .append(optionsLink)
       .append(agendaLink)
       .append(getTaskListLink)
+      .append(settingsLink)
+      .append(optionsLink)
+      .append(hr)
       .append(helpLink);
   }
 
@@ -170,7 +166,7 @@ module Esper.Menu {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="height: 50%; overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content" style="height: calc(100% - 400px); overflow-y: auto;">
       <div #taskSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
@@ -315,14 +311,16 @@ module Esper.Menu {
       li.appendTo(teamSelect);
     });
 
-    allProgress.change(function() {
-      if (!$(this).is(":checked"))
-        progressSelect.find("label > input").prop("checked", true);
+    allProgress.find("label > input").change(function(e) {
+      e.stopPropagation();
+      progressSelect.find("label > input").prop("checked", this.checked);
+      renderTasks();
     });
 
-    allLabels.change(function() {
-      if (!$(this).is(":checked"))
-        labelSelect.find("label > input").prop("checked", true);
+    allLabels.find("label > input").change(function(e) {
+      e.stopPropagation();
+      labelSelect.find("label > input").prop("checked", this.checked);
+      renderTasks();
     });
 
     progressSelect.find("label > input[value!='']").change(function() {
