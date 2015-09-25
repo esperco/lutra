@@ -1,5 +1,3 @@
-/// <reference path="../marten/ts/JQStore.ts" />
-
 module Esper.TaskTab {
 
   var taskLabelCreate = "Create or Link to Other Task";
@@ -9,8 +7,8 @@ module Esper.TaskTab {
   export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
 
-  // Replace with JQStore or something else cleans up references when
-  // removed from DOM
+  // TODO: Replace with JQStore or something else cleans up references when
+  // removed from DOM?
   export var currentTaskTab : TaskTabView;
 
   var refreshTaskParticipants : () => void = function() {};
@@ -460,48 +458,49 @@ module Esper.TaskTab {
 
     workflowSelect.change(function() {
       var chosen = $(this).val();
-      if (chosen !== "header") {
-        var wf = List.find(workflows, function(wf) {
-          return wf.id === chosen;
-        });
-        currentWorkflow = wf;
-        var task = CurrentThread.task.get();
-        var startingProgress = {
-          workflow_id: wf.id,
-          checklist: []
-        };
-        var progress = task.task_workflow_progress;
-        if (!progress || progress.workflow_id !== wf.id) {
-          progress = startingProgress;
+      CurrentThread.getTaskForThread().done(function(task) {
+        if (chosen !== "header") {
+          var wf = List.find(workflows, function(wf) {
+            return wf.id === chosen;
+          });
+          currentWorkflow = wf;
+          var startingProgress = {
+            workflow_id: wf.id,
+            checklist: []
+          };
+          var progress = task.task_workflow_progress;
+          if (!progress || progress.workflow_id !== wf.id) {
+            progress = startingProgress;
+          }
+          Api.putWorkflowProgress(team.teamid, task.taskid, progress);
+          currentProgress = progress;
+          workflowNotes.text(wf.notes);
+
+          stepSelect.children().slice(1).remove();
+          stepNotes.text("");
+          checklist.children().remove();
+          checklistDiv.addClass("esper-hide");
+
+          List.iter(wf.steps, function(s) {
+            $("<option value='" + s.id + "'>" + s.title + "</option>")
+              .appendTo(stepSelect);
+          });
+
+          if (currentProgress && currentProgress.step_id) {
+            stepSelect.val(currentProgress.step_id);
+            stepSelect.trigger("change");
+          } else if (wf.steps.length === 1) {
+            stepSelect.val(wf.steps[0].id);
+            stepSelect.trigger("change");
+          }
+
+          var userTabContent = $(".esper-user-tab-content");
+          userTabContent.children().remove();
+          userTabContent.append(UserTab.viewOfUserTab(team).view);
+
+          workflowSection.removeClass("esper-hide");
         }
-        Api.putWorkflowProgress(team.teamid, task.taskid, progress);
-        currentProgress = progress;
-        workflowNotes.text(wf.notes);
-
-        stepSelect.children().slice(1).remove();
-        stepNotes.text("");
-        checklist.children().remove();
-        checklistDiv.addClass("esper-hide");
-
-        List.iter(wf.steps, function(s) {
-          $("<option value='" + s.id + "'>" + s.title + "</option>")
-            .appendTo(stepSelect);
-        });
-
-        if (currentProgress && currentProgress.step_id) {
-          stepSelect.val(currentProgress.step_id);
-          stepSelect.trigger("change");
-        } else if (wf.steps.length === 1) {
-          stepSelect.val(wf.steps[0].id);
-          stepSelect.trigger("change");
-        }
-
-        var userTabContent = $(".esper-user-tab-content");
-        userTabContent.children().remove();
-        userTabContent.append(UserTab.viewOfUserTab(team).view);
-
-        workflowSection.removeClass("esper-hide");
-      }
+      });
     });
 
     stepSelect.change(function() {
@@ -577,6 +576,9 @@ module Esper.TaskTab {
     taskSearchResults: JQuery;
     taskSearchActions: JQuery;
 
+    taskSpinner: JQuery;
+    headerContent: JQuery;
+
     taskProgressContainer: JQuery;
     taskProgressSpinner: JQuery;
 
@@ -638,30 +640,17 @@ module Esper.TaskTab {
     return meetingType;
   }
 
-  var taskTabRef = new JQStore();
-  var taskSpinnerRef = new JQStore();
-
   export function showTaskSpinner() {
-    var taskTabViewElm = taskTabRef.get();
-    if (taskTabViewElm) {
-      taskTabViewElm.hide();
-    }
-
-    var taskTabSpinnerElm = taskSpinnerRef.get();
-    if (taskTabSpinnerElm) {
-      taskTabSpinnerElm.show();
+    if (currentTaskTab) {
+      currentTaskTab.headerContent.hide();
+      currentTaskTab.taskSpinner.show();
     }
   }
 
   export function hideTaskSpinner() {
-    var taskTabViewElm = taskTabRef.get();
-    if (taskTabViewElm) {
-      taskTabViewElm.show();
-    }
-
-    var taskTabSpinnerElm = taskSpinnerRef.get();
-    if (taskTabSpinnerElm) {
-      taskTabSpinnerElm.hide();
+    if (currentTaskTab) {
+      currentTaskTab.headerContent.show();
+      currentTaskTab.taskSpinner.hide();
     }
   }
 
@@ -673,27 +662,28 @@ module Esper.TaskTab {
                                  workflows: ApiT.Workflow[],
                                  userTabContent : UserTab.UserTabView) {
 '''
-<div #mainSpinner class="esper-tab-flexbox">
-  <div class="esper-spinner esper-sidebar-spinner" />
-</div>
 <div #view class="esper-tab-flexbox">
   <div class="esper-tab-header">
-    <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
-    <div class="esper-flex-row">
-      <input #taskTitle type="text" size="24"
-             class="esper-input esper-task-name esper-flex-expand"/>
-      <button #taskCancel
-              class="esper-task-cancel esper-btn-secondary esper-remove-btn" />
-    </div>
-    <ul #taskSearchDropdown
-        class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
-      <div #taskSearchResults class="esper-dropdown-section"/>
-      <div class="esper-click-safe esper-drop-ul-divider"/>
-      <div #taskSearchActions class="esper-dropdown-section"/>
-    </ul>
-    <div #taskProgressContainer>
-      <div #taskProgressSpinner class="esper-events-list-loading">
-        <div class="esper-spinner esper-list-spinner"/>
+    <div #taskSpinner class="esper-spinner esper-tab-header-spinner"
+      style="display:none;" />
+    <div #headerContent class="esper-tab-header-content">
+      <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
+      <div class="esper-flex-row">
+        <input #taskTitle type="text" size="24"
+               class="esper-input esper-task-name esper-flex-expand"/>
+        <button #taskCancel
+                class="esper-task-cancel esper-btn-secondary esper-remove-btn" />
+      </div>
+      <ul #taskSearchDropdown
+          class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
+        <div #taskSearchResults class="esper-dropdown-section"/>
+        <div class="esper-click-safe esper-drop-ul-divider"/>
+        <div #taskSearchActions class="esper-dropdown-section"/>
+      </ul>
+      <div #taskProgressContainer>
+        <div #taskProgressSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
+        </div>
       </div>
     </div>
   </div>
@@ -754,7 +744,7 @@ module Esper.TaskTab {
 
     <hr class="esper-hr"/>
     <div class="esper-clearfix esper-workflow-gap esper-section">
-      <select #workflowSelect class="esper-select esper-select-fullwidth" disabled>
+      <select #workflowSelect class="esper-select esper-select-fullwidth">
         <option value="header">Select workflow...</option>
       </select>
     </div>
@@ -786,7 +776,6 @@ module Esper.TaskTab {
       if (isValid) {
         taskTabView.taskCaption.text(taskLabelExists);
         taskTabView.taskTitle.text(task.task_title);
-        workflowSelect.prop("disabled", false);
         displayTaskProgress(task, taskTabView);
         taskTitle.show();
         taskCancel.show();
@@ -797,7 +786,6 @@ module Esper.TaskTab {
       } else {
         taskTabView.taskCaption.text(taskLabelCreate);
         taskTabView.taskTitle.text("");
-        workflowSelect.prop("disabled", true);
       }
     }
     CurrentThread.task.watch(updateTaskHeaders, "updateTaskHeaders");
@@ -908,7 +896,6 @@ module Esper.TaskTab {
               workflowSelect.val(progress.workflow_id);
               workflowSelect.trigger("change");
             }
-            workflowSelect.prop("disabled", false);
           } else {
             taskCaption.text(taskLabelCreate);
             showMTDrop();
@@ -1000,11 +987,7 @@ module Esper.TaskTab {
       }
     }, taskWatcherId);
 
-    tab1.append(mainSpinner);
     tab1.append(view);
-    mainSpinner.hide();
-    taskSpinnerRef.set(mainSpinner);
-    taskTabRef.set(view);
   }
 
 }
