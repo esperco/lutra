@@ -82,13 +82,14 @@ module Esper.Auth {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: Types.Account) {
-        if (x.credentials !== undefined
-            || (x.declined === true && ! forceLogin)) {
-          Login.setAccount(x);
-          sendCredentialsResponse(x);
-        }
-        else {
-          openWelcomeModal(x);
+        if (!x.declined || forceLogin) {
+          if (x.credentials !== undefined) {
+            Login.setAccount(x);
+            sendCredentialsResponse(x);
+          }
+          else {
+            openWelcomeModal(x);
+          }
         }
     });
   }
