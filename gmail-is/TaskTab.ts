@@ -1,3 +1,5 @@
+/// <reference path="../marten/ts/JQStore.ts" />
+
 module Esper.TaskTab {
 
   var taskLabelCreate = "Create or Link to Other Task";
@@ -6,6 +8,9 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
+
+  // Replace with JQStore or something else cleans up references when
+  // removed from DOM
   export var currentTaskTab : TaskTabView;
 
   var refreshTaskParticipants : () => void = function() {};
@@ -235,6 +240,7 @@ module Esper.TaskTab {
     userTabContent.meetingSelector.find(".extra").remove();
 
     // Use the default option for generic "meeting".
+    meetingType = meetingType || ""; // In case it's non-existent for old tasks
     if (meetingType.toLowerCase() !== "meeting") {
       var found = false;
       userTabContent.meetingSelector.find("option").each(function(i) {
@@ -279,23 +285,23 @@ module Esper.TaskTab {
     var force = true;
     CurrentThread.refreshTaskForThread(force)
       .done(function(task) {
-        if (task) {
-          Api.setTaskTitle(task.taskid, query);
-          task.task_title = query;
-          var meetingType = taskTitle.data("meetingType");
-          if (meetingType) {
-            Api.setTaskMeetingType(task.taskid, meetingType);
-            task.task_meeting_type = meetingType;
-            selectMeetingTypeOnUserTab(meetingType, userTabContent);
-          }
-          CurrentThread.setTask(task);
-          taskTitle.val(query);
-          markNewTaskAsInProgress(task);
-          displayTaskProgress(task, taskTab);
-          displayLinkedThreadsList(task, threadId, taskTab);
-        } else {
-          Log.e("Task failed to create—perhaps the current team is not set correctly?");
+        Api.setTaskTitle(task.taskid, query);
+        task.task_title = query;
+        var meetingType = taskTitle.data("meetingType");
+        if (meetingType) {
+          Api.setTaskMeetingType(task.taskid, meetingType);
+          task.task_meeting_type = meetingType;
+          selectMeetingTypeOnUserTab(meetingType, userTabContent);
         }
+        CurrentThread.setTask(task);
+        taskTitle.val(query);
+        markNewTaskAsInProgress(task);
+        displayTaskProgress(task, taskTab);
+        displayLinkedThreadsList(task, threadId, taskTab);
+      })
+      .fail(function() {
+        Log.e("Task failed to create—perhaps the current " +
+              "team is not set correctly?");
       });
   }
 
@@ -632,6 +638,33 @@ module Esper.TaskTab {
     return meetingType;
   }
 
+  var taskTabRef = new JQStore();
+  var taskSpinnerRef = new JQStore();
+
+  export function showTaskSpinner() {
+    var taskTabViewElm = taskTabRef.get();
+    if (taskTabViewElm) {
+      taskTabViewElm.hide();
+    }
+
+    var taskTabSpinnerElm = taskSpinnerRef.get();
+    if (taskTabSpinnerElm) {
+      taskTabSpinnerElm.show();
+    }
+  }
+
+  export function hideTaskSpinner() {
+    var taskTabViewElm = taskTabRef.get();
+    if (taskTabViewElm) {
+      taskTabViewElm.show();
+    }
+
+    var taskTabSpinnerElm = taskSpinnerRef.get();
+    if (taskTabSpinnerElm) {
+      taskTabSpinnerElm.hide();
+    }
+  }
+
   export function displayTaskTab(tab1,
                                  team: ApiT.Team,
                                  threadId: string,
@@ -640,6 +673,9 @@ module Esper.TaskTab {
                                  workflows: ApiT.Workflow[],
                                  userTabContent : UserTab.UserTabView) {
 '''
+<div #mainSpinner class="esper-tab-flexbox">
+  <div class="esper-spinner esper-sidebar-spinner" />
+</div>
 <div #view class="esper-tab-flexbox">
   <div class="esper-tab-header">
     <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
@@ -826,11 +862,11 @@ module Esper.TaskTab {
     });
 
     createEvent.click(function() {
-      if (CurrentThread.threadId.isValid() &&
-          CurrentThread.task.isValid()) {
-        CalPicker.createInline(CurrentThread.task.get(),
-                               CurrentThread.threadId.get());
-      }
+      CurrentThread.getTaskForThread()
+        .done(function(task) {
+          CalPicker.createInline(task,
+            CurrentThread.threadId.get());
+        });
     });
 
     var apiGetTask = autoTask ?
@@ -964,7 +1000,11 @@ module Esper.TaskTab {
       }
     }, taskWatcherId);
 
+    tab1.append(mainSpinner);
     tab1.append(view);
+    mainSpinner.hide();
+    taskSpinnerRef.set(mainSpinner);
+    taskTabRef.set(view);
   }
 
 }
