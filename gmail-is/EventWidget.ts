@@ -164,6 +164,10 @@ module Esper.EventWidget {
           class="esper-li">
         Invite guests
       </li>
+      <li #reminder
+          class="esper-li">
+        Reminder
+      </li>
       <li #unlinkEvent
           class="esper-li">
         Unlink
@@ -203,6 +207,10 @@ module Esper.EventWidget {
         FinalizeEvent.inviteGuests(e, preferences);
         Gmail.scrollToEventControl();
       });
+    });
+
+    reminder.click(function() {
+      open(e.google_cal_url, "_blank");
     });
 
     unlinkEvent.click(function() {

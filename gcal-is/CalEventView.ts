@@ -3,8 +3,6 @@
 */
 module Esper.CalEventView {
   var currentEventId : Types.FullEventId;
-  var remindFromTeam : ApiT.Team;
-  var remindFromEmail : string;
 
   function checkForNewEventId(callback: (x: Types.FullEventId) => void) {
     var oldEventId = currentEventId;
@@ -177,247 +175,63 @@ module Esper.CalEventView {
     return view;
   }
 
-  function removeReminderDropdown() {
-    $("#esper-reminder-dropdown").remove();
-  }
-
-  function insertReminderDropdown(fullEventId, event_reminders) {
+  function insertReminderButton(fromTeamId, fromEmail, execIds,
+    reminderState: ReminderView.ReminderState) {
 '''
-<select id="esper-reminder-time" #dropdown>
-  <option class="esper-remind" value="-1">Never</option>
-  <option class="esper-remind" value="3600">1 hour before</option>
-  <option class="esper-remind" value="7200">2 hours before</option>
-  <option class="esper-remind" value="14400">4 hours before</option>
-  <option class="esper-remind" value="28800">8 hours before</option>
-  <option class="esper-remind" value="43200">12 hours before</option>
-  <option class="esper-remind" value="86400">24 hours before</option>
-  <option class="esper-remind" value="172800">48 hours before</option>
-</select>
+<div #view>
+  <button #openReminder class="esper-btn esper-btn-primary">Reminder</button>
+</div>
 '''
-    removeReminderDropdown();
-    var anchor = Gcal.findAnchorForReminderDropdown();
-    var view = $("<div id='esper-reminder-dropdown'>Send reminders: </div>");
-    var eventId = fullEventId.eventId;
-    var calendarId = fullEventId.calendarId;
-
-    /* Without this stupid hack, Google intercepts the event somewhere,
-       and the select won't drop down. */
-    dropdown.mousedown(function(e) { e.stopPropagation(); });
-
-    dropdown.change(function() {
-      var secs = $(this).val();
-      $(".esper-remind-extra").remove();
-      if (secs > 0) {
-        Api.setReminderTime(remindFromTeam.teamid, remindFromEmail,
-                            calendarId, eventId, secs);
-      } else {
-        Api.unsetReminderTime(eventId);
-      }
-    });
-
-    // Select the current scheduled time, and disable any times in the past
-    var startDate = new Date(event_reminders.event_start_time);
-    var remind = event_reminders.reminder_time;
-    var curSecs;
-    if (remind !== undefined) {
-      var remindDate = new Date(remind);
-      curSecs = startDate.getTime() / 1000 - remindDate.getTime() / 1000;
-    }
-    var maxSecs = startDate.getTime() / 1000 - Date.now() / 1000;
-    Log.d("curSecs:", curSecs, "maxSecs:", maxSecs);
-    dropdown.find(".esper-remind").each(function() {
-      var that = $(this);
-      var secs = that.val();
-      if (Number(secs) === curSecs) that.attr("selected", "selected");
-      if (secs > maxSecs) that.attr("disabled", "true");
-    });
-
-    /* If the event was moved after scheduling a reminder time,
-       it may no longer match any of the menu options...
-       in this case, create a custom option for it,
-       so we have something to select besides Never. */
-    if (curSecs !== undefined && dropdown.val() < 0) {
-      var extraOption =
-        $("<option class='esper-remind-extra'" + "value='" + curSecs + "'>" +
-          curSecs / 60 + " minutes before" + "</option>");
-      extraOption.appendTo(dropdown);
-      extraOption.attr("selected", "selected");
-    }
-
-    view.append(dropdown);
-    anchor.append(view);
-  }
-
-  function insertTeamSelector(eventId,
-                              teams : ApiT.Team[],
-                              fromEmail : string) {
-    var anchor = Gcal.findAnchorForReminderDropdown();
-    var view = $("<div id='esper-remind-from-team'>Team: </div>");
-    var dropdown = $("<select>");
-
-    /* Without this stupid hack again, Google intercepts the event somewhere,
-       and the select won't drop down. */
-    dropdown.mousedown(function(e) { e.stopPropagation(); });
-
-    for (var i = 0; i < teams.length; i++) {
-      var team = teams[i];
-      $("<option value='" + i + "'>" + team.team_name + "</option>")
-        .data("teamid", team.teamid)
-        .appendTo(dropdown);
-    }
-    dropdown.change(function() {
-      var i = $(this).val();
-      remindFromTeam = teams[i]; // a variable of CalEventView
-      insertEmailSelector(eventId,
-                          remindFromTeam.team_email_aliases,
-                          fromEmail);
-      $("#esper-reminder-time").trigger("change");
-    });
-
-    dropdown.find("option").each(function() {
-      var that = $(this);
-      var teamid: string = that.data("teamid");
-      if (teamid === remindFromTeam.teamid) that.attr("selected", "selected");
-    });
-
-    view.append(dropdown);
-    anchor.append(view);
-  }
-
-  function insertEmailSelector(eventId,
-                               emails : string[],
-                               fromEmail : string) {
-    var anchor = Gcal.findAnchorForReminderDropdown();
-    $("#esper-remind-from-email").remove();
-    var view = $("<div id='esper-remind-from-email'/>");
-    var dropdownDiv = $("<div>From: </div>");
-    var dropdown = $("<select>").appendTo(dropdownDiv);
-    var checkboxDiv = $("<div>Bcc me? </div>");
-    var checkbox = $("<input type='checkbox'/>").appendTo(checkboxDiv);
-    /* Without this stupid hack again, Google intercepts the event somewhere,
-       and the select won't drop down. */
-    dropdown.mousedown(function(e) { e.stopPropagation(); });
-
-    if (emails.length === 0) {
-      remindFromEmail = Login.myEmail();
-      $("<option>" + remindFromEmail + "</option>")
-        .appendTo(dropdown);
-      dropdown.prop("disabled", true);
-    } else if (remindFromEmail !== undefined) {
-      remindFromEmail = fromEmail;
-    }
-    if (remindFromEmail === undefined) remindFromEmail = emails[0];
-
-    List.iter(emails, function(email) {
-      $("<option>" + email + "</option>")
-        .appendTo(dropdown);
-    });
-    dropdown.change(function() {
-      var email = $(this).val();
-      if (checkbox.is(":checked")) {
-        var reminder = { guest_email: email };
-        Api.disableReminderForGuest(eventId, remindFromEmail);
-        Api.enableReminderForGuest(eventId, email, reminder);
-      }
-      remindFromEmail = email; // a variable of CalEventView
-      $("#esper-reminder-time").trigger("change");
-    });
-    dropdown.find("option").each(function() {
-      var that = $(this);
-      var email = that.val();
-      if (email === remindFromEmail) that.attr("selected", "selected");
-    });
-    view.append(dropdownDiv);
-
-    checkbox.click(function() {
-      if (this.checked) {
-        var reminder = { guest_email: remindFromEmail };
-        Api.enableReminderForGuest(eventId, remindFromEmail, reminder);
-      } else {
-        Api.disableReminderForGuest(eventId, remindFromEmail);
-      }
-    });
-    view.append(checkboxDiv);
-
-    anchor.append(view);
-  }
-
-  function insertGuestReminderOptions(calendarId, eventId,
-                                      event_reminders, guests : JQuery) {
-    guests.each(function() {
-      var guest = $(this);
-      var email = guest.attr("title");
-      var name = guest.find(".ep-gc-chip-text").text().replace(/.\*$/, "");
-      var view = $("<div class='esper-guest-reminder'>Remind: </div>");
-      var checkbox = $("<input type='checkbox'/>")
-        .appendTo(view);
-      var customize = $("<a href='#'>Customize message</a>")
-        .appendTo(view);
-      var textarea = $("<textarea rows='10' cols='72'>");
-      var saveButton = $("<button>Save</button>");
-      var dialog = $("<div>") // TODO make pretty
-        .append(saveButton)
-        .append(textarea);
-      textarea.css("box-shadow", "10px 5px 5px #888888");
-
-      function sameEmail(r : ApiT.GuestReminder) {
-        return r.guest_email === email;
-      }
-      if (List.exists(event_reminders.guest_reminders, sameEmail)) {
-        checkbox.prop("checked", true);
-      } else {
-        checkbox.prop("checked", false);
-      }
-      checkbox.click(function() {
-        var current = List.find(event_reminders.guest_reminders, sameEmail);
-        var message = current !== null ? current.reminder_message : null;
-        var reminder = {
-          guest_email: email,
-          guest_name: name === email || name === "" ? null : name,
-          reminder_message: message
-        };
-        if (this.checked) {
-          Api.enableReminderForGuest(eventId, email, reminder);
-        } else {
-          Api.disableReminderForGuest(eventId, email);
-        }
-      });
-
-      customize.click(function() {
-        var current = List.find(event_reminders.guest_reminders, sameEmail);
-        if (current !== null) {
-          textarea.text(current.reminder_message);
-          dialog.dialog({});
-        } else {
-          var heading = name === email || name === "" ?
-                        "Hello,\n\n" :
-                        "Hi " + name + ",\n\n";
-          dialog.dialog({});
-          textarea.text("Loading message...");
-          Api.getDefaultReminder(remindFromTeam.teamid, calendarId, eventId)
-            .done(function(x) {
-              textarea.text(heading + x.default_message);
+    openReminder.click(function () {
+      var dialog = Modal.dialog("Set an automatic reminder",
+        ReminderView.render(fromEmail, reminderState),
+        function() {
+          reminderState = ReminderView.currentReminderState();
+          if (! reminderState.enable) {
+            Api.unsetReminderTime(execIds.eventId);
+            return true;
+          } else if (0 < reminderState.time) {
+            Api.setReminderTime(fromTeamId, fromEmail,
+                                execIds.calendarId, execIds.eventId,
+                                reminderState.time);
+            if (reminderState.bccMe) {
+              var bccReminder = {
+                guest_email: fromEmail,
+                reminder_message: reminderState.text
+              };
+              Api.enableReminderForGuest(execIds.eventId,
+                bccReminder.guest_email, bccReminder);
+            } else {
+              Api.disableReminderForGuest(execIds.eventId, fromEmail);
+            }
+            List.iter(reminderState.guests, function(guest) {
+              if (guest.checked) {
+                var guestReminder = {
+                  guest_email: guest.email,
+                  guest_name: guest.name,
+                  reminder_message: reminderState.text
+                }
+                Api.enableReminderForGuest(execIds.eventId,
+                  guestReminder.guest_email, guestReminder);
+              } else {
+                Api.disableReminderForGuest(execIds.eventId, guest.email);
+              }
             });
-        }
-      });
-
-      saveButton.click(function() {
-        dialog.dialog("close");
-        var message = textarea.val();
-        Log.d(message);
-        var current = List.find(event_reminders.guest_reminders, sameEmail);
-        if (current !== null) current.reminder_message = message;
-        var reminder = {
-          guest_email: email,
-          guest_name: name === email || name === "" ? null : name,
-          reminder_message: message
-        };
-        checkbox.attr("checked", "checked");
-        Api.enableReminderForGuest(eventId, email, reminder);
-      });
-
-      guest.append(view);
+            return true;
+          } else {
+            return false;
+          }
+        });
+      $("body").append(dialog.view);
     });
+
+    Gcal.findAnchorForReminderDropdown().append(view);
+  }
+
+  function sameEmail(email) {
+    return function(r : ApiT.GuestReminder) {
+      return r.guest_email === email;
+    };
   }
 
   function updateView(fullEventId) {
@@ -427,25 +241,37 @@ module Esper.CalEventView {
 
     if (teams.length > 0) {
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
-        var teamid = event_reminders.remind_from_team;
-        if (teamid === undefined) remindFromTeam = teams[0];
-        else remindFromTeam = List.find(teams, function(t) {
-          return t.teamid === teamid;
-        });
-        var email = event_reminders.remind_from_email;
-        insertTeamSelector(eventId, teams, email);
-        insertReminderDropdown(fullEventId, event_reminders);
-        insertEmailSelector(eventId,
-                            remindFromTeam.team_email_aliases,
-                            email);
-        $(".esper-guest-reminder").remove(); // Yes this is necessary
+        var teamid = event_reminders.remind_from_team || teams[0].teamid;
+        var email = event_reminders.remind_from_email || Login.myEmail();
+        var evSecs = new Date(event_reminders.event_start_time).getTime();
+        var rmSecs = new Date(event_reminders.reminder_time).getTime();
+        var time = (evSecs - rmSecs) / 1000;
+        var enable = 0 < event_reminders.guest_reminders.length && 0 < time;
+        var text = 0 < event_reminders.guest_reminders.length
+                 ? event_reminders.guest_reminders[0].reminder_message
+                 : null;
+        var reminderState: ReminderView.ReminderState = {
+          enable: enable,
+          bccMe: List.exists(event_reminders.guest_reminders, sameEmail(email)),
+          text: text,
+          time: time,
+          guests: []
+        };
         Gcal.waitForGuestsToLoad(function(guests) {
-          var reminders = guests.find(".esper-guest-reminder");
-          if (reminders.length === 0) {
-            insertGuestReminderOptions(calendarId, eventId,
-                                       event_reminders, guests);
-          }
+          reminderState.guests = [];
+          guests.each(function() {
+            var guest = $(this);
+            var guestEmail = guest.attr("title");
+            var state = {
+              email: guestEmail,
+              name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
+              checked: List.exists(event_reminders.guest_reminders,
+                                   sameEmail(guestEmail))
+            };
+            reminderState.guests.push(state);
+          });
         });
+        insertReminderButton(teamid, email, fullEventId, reminderState);
       });
     }
   }

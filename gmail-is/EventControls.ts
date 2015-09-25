@@ -334,6 +334,7 @@ module Esper.EventControls {
               .then(function(desc) {
                 pubDescription.val(desc.description_text);
               });
+              return true;
             });
           $("body").append(dialog.view);
         });
