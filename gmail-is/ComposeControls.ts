@@ -170,6 +170,11 @@ module Esper.ComposeControls {
       CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
+
+            // We can insert template right away, but start task creation
+            // in he background.
+            CurrentThread.getTaskForThread();
+
             var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
             if (general) execTz = general.current_timezone;
