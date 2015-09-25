@@ -94,9 +94,16 @@ module Esper.TaskList {
   function renderTaskNotes(notes: string,
                            notesQuill: string,
                            parent: JQuery) {
+'''
+<div #taskNotes />
+'''
+    
     if (notesQuill !== "" || notesQuill !== undefined) {
+      console.log(notesQuill);
+      var editor = new quill(taskNotes.get(0));
+      editor.setContents(JSON.parse(notesQuill));
       $("<p/>")
-        .html(notesQuill)
+        .html(editor.getHTML())
         .appendTo(parent);
     }
     else if (notes !== "" || notes !== undefined) {
