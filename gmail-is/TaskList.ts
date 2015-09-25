@@ -221,12 +221,16 @@ module Esper.TaskList {
   export function displayList(team: ApiT.Team,
                               parentContainer: JQuery,
                               closeTaskListLayer: () => void,
-                              filter: (task: ApiT.Task) => boolean) {
+                              filter: (task: ApiT.Task) => boolean,
+                              spinnerEl?: JQuery) {
 
 '''
 <div #listContainer class="esper-tl-list"></div>
 '''
     parentContainer.append(listContainer);
+    if (spinnerEl !== undefined) {
+      spinnerEl.show();
+    }
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
@@ -279,6 +283,9 @@ module Esper.TaskList {
             parentContainer.scroll(lazyRefill);
           }
         });
+        if (spinnerEl !== undefined && tasks.length !== 0) {
+          spinnerEl.hide();
+        }
       }
     }
 

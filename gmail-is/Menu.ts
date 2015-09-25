@@ -112,7 +112,7 @@ module Esper.Menu {
       's tasks that are
       <div #progressDropdown class="dropdown esper-dropdown">
         <button #progressSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Progress
+          In Progress
           <i class="fa fa-chevron-down"></i>
         </button>
         <ul #progressSelect class="dropdown-menu esper-dropdown-select" >
@@ -149,6 +149,7 @@ module Esper.Menu {
           </li>
         </ul>
       </div>
+      and
       <div #labelDropdown class="dropdown esper-dropdown">
         <button #labelSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
           Label
@@ -169,7 +170,10 @@ module Esper.Menu {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="height: 45%; overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content" style="height: 50%; overflow-y: auto;">
+      <div #taskSpinner class="esper-events-list-loading">
+        <div class="esper-spinner esper-list-spinner"/>
+      </div>
     </div>
     <div class="esper-modal-footer esper-clearfix" style="text-align: left;">
       <div #recipientsContainer class="esper-modal-recipients">
@@ -194,7 +198,7 @@ module Esper.Menu {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientEmails rows="6" cols="50" />
+              <textarea #recipientEmails rows="4" cols="50" />
             </td>
           </tr>
         </table>
@@ -224,6 +228,12 @@ module Esper.Menu {
     done.children("label").append(currentTeam.get().team_label_done);
 
     function cancel() { view.remove(); }
+
+    function closeDropdowns() {
+      teamDropdown.removeClass("open");
+      progressDropdown.removeClass("open");
+      labelDropdown.removeClass("open");
+    }
 
     function getCheckedValues(ul: JQuery) {
       return _.filter(_.map(ul.find("label > input:checked"), function(el) {
@@ -266,18 +276,15 @@ module Esper.Menu {
                 return _.some(task.task_labels,
                   function(label) {return label === l});
             });
-          });
+          },
+          taskSpinner);
       });
     }
 
-    teamDropdown.click(renderTasks);
-    progressDropdown.click(renderTasks);
-    labelDropdown.click(renderTasks);
-
-    TaskList.displayList(currentTeam.get(),
-      tasksContainer,
-      cancel,
-      function(task) {return task.task_progress == "In_progress"});
+    teamSelectToggle.contents().first().replaceWith(currentTeam.get().team_name);
+    teamSelect.click(renderTasks);
+    progressSelect.click(renderTasks);
+    labelSelect.click(renderTasks);
 
     List.iter(currentTeam.get().team_labels, function(label, id) {
       var l = $("<label>")
@@ -367,7 +374,12 @@ module Esper.Menu {
       List.iter(teamEmails, addRecipientCheckboxes);
     });
 
+    renderTasks();
     view.click(cancel);
+    modal.click(closeDropdowns);
+    Util.preventClickPropagation(teamDropdown);
+    Util.preventClickPropagation(progressDropdown);
+    Util.preventClickPropagation(labelDropdown);
     Util.preventClickPropagation(modal);
     closeButton.click(cancel);
     cancelButton.click(cancel);
