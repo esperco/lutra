@@ -235,6 +235,7 @@ li.esper-li, a.esper-a {
   color: black;
   line-height: 1;
   text-align: left;
+  cursor: pointer;
   &:hover {
     background: @purple;
     color: white;
@@ -271,8 +272,8 @@ li.esper-li, a.esper-a {
   &.esper-selected:hover { color: black; }
 }
 
-a.esper-a {
-  cursor: pointer;
+a.esper-a:hover {
+  text-decoration: none;
 }
 
 select.esper-select {
@@ -504,6 +505,10 @@ textarea.esper-input { resize: none; }
   left: auto;
   margin-top: 5px;
   min-width: 80px;
+}
+
+.esper-bs .esper-menu .esper-menu-hr {
+  margin: 5px 0px;
 }
 
 /* Task list button (middle) */
@@ -2317,8 +2322,7 @@ textarea.esper-description-text {
   position: relative;
   background-color: @purple;
   border-radius: 100%;
-  -webkit-animation: scaleout 1.0s infinite ease-in-out;
-          animation: scaleout 1.0s infinite ease-in-out;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
   &.esper-tab-header-spinner { display: block; }
   &.esper-list-spinner { display: block; }
 }

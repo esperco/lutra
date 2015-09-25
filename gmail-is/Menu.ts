@@ -43,17 +43,11 @@ module Esper.Menu {
   }
 
   function updateLinks(ul) {
-    var loggedIn = Login.loggedIn();
-
-    var signInLink = loggedIn?
-      makeActionLink("Sign out", Login.logout, true)
-      : makeActionLink("Sign in", Init.login, false);
-
     function openSettings() {
       window.open(Conf.Api.url);
     }
 
-    var settingsLink = makeActionLink("Team & Exec Settings",
+    var settingsLink = makeActionLink("Edit Settings",
                                       openSettings, false);
 
     function openOptionsPage() {
@@ -65,26 +59,28 @@ module Esper.Menu {
     var optionsLink = makeActionLink("Extension Options",
                                      openOptionsPage, false);
 
-    var agendaLink = makeActionLink("Agenda", function() {
+    var agendaLink = makeActionLink("Get Agenda", function() {
       var agendaModal = displayAgenda();
       $("body").append(agendaModal.view);
     }, false);
 
-    var getTaskListLink = makeActionLink("Task List", function() {
+    var getTaskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = displayGetTask();
       $("body").append(taskListModal.view);
     }, false);
 
-    var helpLink = $("<a class='esper-a'>Help</a>")
-      .attr("href", "mailto:team@esper.com");
+    var hr = $("<hr>").addClass("esper-menu-hr");
+
+    var helpLink = $("<a class='esper-a'>Get Help</a>")
+      .attr("href", "mailto:support@esper.com");
 
     ul.children().remove();
     ul
-      .append(signInLink)
-      .append(settingsLink)
-      .append(optionsLink)
       .append(agendaLink)
       .append(getTaskListLink)
+      .append(settingsLink)
+      .append(optionsLink)
+      .append(hr)
       .append(helpLink);
   }
 
@@ -112,7 +108,7 @@ module Esper.Menu {
       's tasks that are
       <div #progressDropdown class="dropdown esper-dropdown">
         <button #progressSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Progress
+          In Progress
           <i class="fa fa-chevron-down"></i>
         </button>
         <ul #progressSelect class="dropdown-menu esper-dropdown-select" >
@@ -149,6 +145,7 @@ module Esper.Menu {
           </li>
         </ul>
       </div>
+      and
       <div #labelDropdown class="dropdown esper-dropdown">
         <button #labelSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
           Label
@@ -169,7 +166,10 @@ module Esper.Menu {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="height: 45%; overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content" style="height: calc(100% - 400px); overflow-y: auto;">
+      <div #taskSpinner class="esper-events-list-loading">
+        <div class="esper-spinner esper-list-spinner"/>
+      </div>
     </div>
     <div class="esper-modal-footer esper-clearfix" style="text-align: left;">
       <div #recipientsContainer class="esper-modal-recipients">
@@ -194,7 +194,7 @@ module Esper.Menu {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientEmails rows="6" cols="50" />
+              <textarea #recipientEmails rows="4" cols="50" />
             </td>
           </tr>
         </table>
@@ -224,6 +224,12 @@ module Esper.Menu {
     done.children("label").append(currentTeam.get().team_label_done);
 
     function cancel() { view.remove(); }
+
+    function closeDropdowns() {
+      teamDropdown.removeClass("open");
+      progressDropdown.removeClass("open");
+      labelDropdown.removeClass("open");
+    }
 
     function getCheckedValues(ul: JQuery) {
       return _.filter(_.map(ul.find("label > input:checked"), function(el) {
@@ -266,18 +272,15 @@ module Esper.Menu {
                 return _.some(task.task_labels,
                   function(label) {return label === l});
             });
-          });
+          },
+          taskSpinner);
       });
     }
 
-    teamDropdown.click(renderTasks);
-    progressDropdown.click(renderTasks);
-    labelDropdown.click(renderTasks);
-
-    TaskList.displayList(currentTeam.get(),
-      tasksContainer,
-      cancel,
-      function(task) {return task.task_progress == "In_progress"});
+    teamSelectToggle.contents().first().replaceWith(currentTeam.get().team_name);
+    teamSelect.click(renderTasks);
+    progressSelect.click(renderTasks);
+    labelSelect.click(renderTasks);
 
     List.iter(currentTeam.get().team_labels, function(label, id) {
       var l = $("<label>")
@@ -308,14 +311,16 @@ module Esper.Menu {
       li.appendTo(teamSelect);
     });
 
-    allProgress.change(function() {
-      if (!$(this).is(":checked"))
-        progressSelect.find("label > input").prop("checked", true);
+    allProgress.find("label > input").change(function(e) {
+      e.stopPropagation();
+      progressSelect.find("label > input").prop("checked", this.checked);
+      renderTasks();
     });
 
-    allLabels.change(function() {
-      if (!$(this).is(":checked"))
-        labelSelect.find("label > input").prop("checked", true);
+    allLabels.find("label > input").change(function(e) {
+      e.stopPropagation();
+      labelSelect.find("label > input").prop("checked", this.checked);
+      renderTasks();
     });
 
     progressSelect.find("label > input[value!='']").change(function() {
@@ -367,7 +372,12 @@ module Esper.Menu {
       List.iter(teamEmails, addRecipientCheckboxes);
     });
 
+    renderTasks();
     view.click(cancel);
+    modal.click(closeDropdowns);
+    Util.preventClickPropagation(teamDropdown);
+    Util.preventClickPropagation(progressDropdown);
+    Util.preventClickPropagation(labelDropdown);
     Util.preventClickPropagation(modal);
     closeButton.click(cancel);
     cancelButton.click(cancel);
