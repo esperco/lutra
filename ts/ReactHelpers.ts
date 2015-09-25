@@ -69,19 +69,24 @@ module Esper.ReactHelpers {
     }
 
     // Reference to JQuery-wrapped parent node
-    parent(): JQuery {
-      return $(React.findDOMNode(this)).parent();
+    jQuery(): JQuery {
+      return $(React.findDOMNode(this));
     }
 
     // Use JQuery to find a DOM element within this compoent
     find(selector: string): JQuery {
-      return this.parent().find(selector);
+      return this.jQuery().find(selector);
     }
 
-    // Remove jQuery wrapper around this React Component
-    removeSelf(): void {
-      this.parent().remove();
+    // Use for getting a unique-ish id for HTML elements that need it (like
+    // labels and inputs)
+    protected getId(key: string): string {
+      if (! this._idPrefix) {
+        this._idPrefix = Util.randomString();
+      }
+      return "id-" + this._idPrefix + "-" + key;
     }
+    private _idPrefix: string;
 
     // Connect or disconnect component from all sources -- remember to
     // call super if overridden

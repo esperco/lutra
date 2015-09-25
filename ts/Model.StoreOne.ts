@@ -31,11 +31,15 @@ module Esper.Model {
     }
 
     val(): TData {
-      return this.get()[0];
+      if (this.isSet()) {
+        return this.get()[0];
+      }
     }
 
     metadata(): StoreMetadata {
-      return this.get()[1];
+      if (this.isSet()) {
+        return this.get()[1];
+      }
     }
 
     // Returns true if an item exists

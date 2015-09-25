@@ -16,9 +16,12 @@ module Esper.Model {
 
   ////////////////
 
-  // Ready => Local state accurately reflects server (as far as we know)
-  // InFlight => Local changes en route to server
-  export enum DataStatus { READY, INFLIGHT };
+  export enum DataStatus {
+    READY = 1,  // Local state accurately reflects server (as far as we know)
+    UNSAVED,    // Local state has changes not yet pushed to server
+    INFLIGHT,   // Push to server in progress
+    FETCHING    // Pull from server in progress
+  };
 
   // Metadata that lives alongside the actual object data -- need at least
   // an identifier

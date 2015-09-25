@@ -79,8 +79,12 @@ module Esper.Query {
       }
 
       var self = this;
+      // Use separate callback with success and failure modes to ensure
+      // unset only happens after any chained async events resolve as well.
       this.getAsync(key)
-        .always(function() {
+        .then(function() {
+          self.unsetAsyncInProgress(key);
+        }, function() {
           self.unsetAsyncInProgress(key);
         });
     }
@@ -92,15 +96,13 @@ module Esper.Query {
 
     get(key: K): [V, Metadata] {
       var ret = this.getData(key);
-      var metadata: Metadata = {
-        updateInProgress: false
-      };
-
       if (this.shouldGetAsync(ret, key)) {
-        metadata.updateInProgress = true;
         this.scheduleAsync(key);
       }
 
+      var metadata: Metadata = {
+        updateInProgress: this.asyncInProgress(key)
+      };
       return [ret, metadata];
     }
   }
