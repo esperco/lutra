@@ -86,8 +86,6 @@ module Esper.Auth {
             || (x.declined === true && ! forceLogin)) {
           Login.setAccount(x);
           sendCredentialsResponse(x);
-
-          openWelcomeModal(x); // Remove when done with onboarding stuff
         }
         else {
           openWelcomeModal(x);
