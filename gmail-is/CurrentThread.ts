@@ -249,8 +249,6 @@ module Esper.CurrentThread {
                 refreshTaskForThread(false);
                 Api.syncEvent(teamid, threadId.get(),
                               e.google_cal_id, e.google_event_id);
-
-                linkedEventsChange.set(null);
               });
           });
       },
