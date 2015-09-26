@@ -850,11 +850,7 @@ module Esper.TaskTab {
     });
 
     createEvent.click(function() {
-      CurrentThread.getTaskForThread()
-        .done(function(task) {
-          CalPicker.createInline(task,
-            CurrentThread.threadId.get());
-        });
+      CalPicker.createInline();
     });
 
     var apiGetTask = autoTask ?

@@ -51,8 +51,7 @@ module Esper.GroupTab {
     createEvent.click(function() {
       if (CurrentThread.threadId.isValid() &&
           CurrentThread.task.isValid()) {
-        CalPicker.createInline(CurrentThread.task.get(),
-                               CurrentThread.threadId.get());
+        CalPicker.createInline();
       }
     });
 

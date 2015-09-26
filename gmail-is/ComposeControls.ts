@@ -172,7 +172,7 @@ module Esper.ComposeControls {
           some : function (allPrefs) {
 
             // We can insert template right away, but start task creation
-            // in he background.
+            // in the background.
             CurrentThread.getTaskForThread();
 
             var execTz, guestTz;
@@ -254,11 +254,7 @@ module Esper.ComposeControls {
     });
 
     createButton.click(function() {
-      if (CurrentThread.threadId.isValid() &&
-          CurrentThread.task.isValid()) {
-        CalPicker.createInline(CurrentThread.task.get(),
-                               CurrentThread.threadId.get());
-      }
+      CalPicker.createInline();
     });
 
     return Option.some(createButton);
@@ -283,6 +279,10 @@ module Esper.ComposeControls {
         });
 
         askButton.click(function() {
+          // We can ask question right away, but start task creation
+          // in the background.
+          CurrentThread.getTaskForThread();
+
           InThreadControls.setHashTagContainer(
             ComposeHashtags.view(composeControls));
           Gmail.scrollToCompose();
