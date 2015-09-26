@@ -992,13 +992,41 @@ module Esper.CalPicker {
     });
   }
 
-  export function createInline(task: ApiT.Task,
-                               threadId: string): void
+  export function createInline(): void
   {
-    CurrentThread.taskPrefs
-      .then(Option.unwrap<ApiT.TaskPreferences>("taskPrefs (in createInline)"))
-      .done(function(tpref) {
-        createInlineSync(task, threadId, tpref);
+    var threadId = CurrentThread.threadId.get();
+    if (!threadId) { return; }
+
+    var showSpinner = true;
+    CurrentThread.getTaskForThread()
+      .then(function(task) {
+        showSpinner = false;  // See below
+        CurrentThread.taskPrefs
+          .then(Option.unwrap<ApiT.TaskPreferences>(
+            "taskPrefs (in createInline)"))
+          .done(function(tpref) {
+            createInlineSync(task, threadId, tpref);
+          });
+      }, function() {
+        hideCalPickerSpinner();
       });
+
+    /*
+      If Task already exists, then above call to getTaskForThread will resolve
+      promise synchronously and showSpinner will be false.
+    */
+    if (showSpinner) {
+      showCalPickerSpinner();
+    }
+  }
+
+  function showCalPickerSpinner(): void {
+    var spinner = $(`<div class="esper-spinner esper-inline-spinner"></div>`);
+    InThreadControls.setEventControlContainer(spinner);
+    Gmail.scrollToEventControl();
+  }
+
+  function hideCalPickerSpinner(): void {
+    InThreadControls.setEventControlContainer($(`<span />`));
   }
 }

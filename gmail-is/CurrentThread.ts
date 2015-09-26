@@ -86,7 +86,7 @@ module Esper.CurrentThread {
       findTeam(newThreadId).done(function (newTeam) {
         if (newThreadId === readThreadId()) {
           setTeam(newTeam);
-          refreshTaskForThread(false, newThreadId).done(function () {
+          refreshTaskForThread(false, newThreadId).always(function () {
             if (newThreadId === readThreadId()) {
               GroupScheduling.reset();
               threadId.set(newThreadId);
@@ -249,8 +249,6 @@ module Esper.CurrentThread {
                 refreshTaskForThread(false);
                 Api.syncEvent(teamid, threadId.get(),
                               e.google_cal_id, e.google_event_id);
-
-                linkedEventsChange.set(null);
               });
           });
       },
@@ -352,6 +350,7 @@ module Esper.CurrentThread {
                                        newThreadId?: string):
   JQueryPromise<ApiT.Task> {
     var newThreadId = newThreadId || threadId.get();
+    TaskTab.showTaskSpinner();
 
     return currentTeam.get().match({
       some : function (team) {
@@ -360,14 +359,23 @@ module Esper.CurrentThread {
 
         // cast to <any> needed because promises are implicitly flattened (!)
         return (<any> getTask(teamid, newThreadId, false, true)
+
+                // Ensure task actually exists, else return Promise failure
                 .then(function(newTask) {
+                  if (! newTask) {
+                    return Promise.fail(null);
+                  }
                   setTask(newTask);
                   return newTask;
+                })
+
+                .always(function() {
+                  TaskTab.hideTaskSpinner();
                 }));
       },
       none : function () {
         Log.i("Could not refresh task because no valid team was detected for the thread.");
-        return Promise.defer(null);
+        return Promise.fail(null);
       }
     });
   }
