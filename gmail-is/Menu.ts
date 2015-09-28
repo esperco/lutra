@@ -231,12 +231,10 @@ module Esper.Menu {
       labelDropdown.removeClass("open");
     }
 
-    function getCheckedValues(ul: JQuery) {
-      return _.filter(_.map(ul.find("label > input:checked"), function(el) {
-          return $(el).val();
-        }), function(s) {
-        return s !== "";
-      });
+    function getCheckedBoxes(ul: JQuery): HTMLInputElement[] {
+      return _.map(ul.find("label > input:checked"), function(el) {
+          return el;
+        });
     }
 
     function renderTasks() {
@@ -244,11 +242,46 @@ module Esper.Menu {
       var teams = _.filter(Login.myTeams(), function(team) {
         // Filter all teams that the user is in, only returning
         // those who have the selected teamid in the checkboxes
-        return _.some(getCheckedValues(teamSelect),
-          function(teamid) {return team.teamid === teamid;} );
+        return _.some(getCheckedBoxes(teamSelect),
+          function(box) {return team.teamid === box.value;} );
       });
-      var progress = getCheckedValues(progressSelect);
-      var labels = getCheckedValues(labelSelect);
+      var progressBoxes = getCheckedBoxes(progressSelect);
+      var labelBoxes = getCheckedBoxes(labelSelect);
+
+      if (teams.length === 0) {
+        teamSelectToggle.contents().first().replaceWith("Team");
+      } else if (teams.length === 1) {
+        teamSelectToggle.contents().first().replaceWith(teams[0].team_name);
+      } else {
+        teamSelectToggle.contents().first().replaceWith("Multiple teams");
+      }
+
+      if (progressBoxes.length === 0) {
+        progressSelectToggle.contents().first().replaceWith("Status");
+      } else if (progressBoxes.length === 1) {
+        // This extracts the text from the text node that follows the label.
+        // If the text node position changes, this will have to be updated accordingly.
+        progressSelectToggle.contents().first().replaceWith(progressBoxes[0].parentElement.textContent.trim());
+      } else {
+        progressSelectToggle.contents().first().replaceWith("Multiple statuses");
+      }
+
+      if (labelBoxes.length === 0) {
+        labelSelectToggle.contents().first().replaceWith("Label");
+      } else if (labelBoxes.length === 1) {
+        // This extracts the text from the text node that follows the label.
+        // If the text node position changes, this will have to be updated accordingly.
+        labelSelectToggle.contents().first().replaceWith(labelBoxes[0].parentElement.textContent.trim());
+      } else {
+        labelSelectToggle.contents().first().replaceWith("Multiple labels");
+      }
+
+      var progress = _.map(progressBoxes, function(box) {
+        return box.value;
+      });
+      var labels = _.map(labelBoxes, function(box) {
+        return box.value;
+      });
 
       _.forEach(teams, function(team) {
         TaskList.displayList(team,
@@ -383,9 +416,15 @@ module Esper.Menu {
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
-      var t = getCheckedValues(teamSelect);
-      var l = getCheckedValues(labelSelect);
-      var p = getCheckedValues(progressSelect);
+      var t = _.map(getCheckedBoxes(teamSelect), function(box) {
+        return box.value;
+      });
+      var l = _.map(getCheckedBoxes(labelSelect), function(box) {
+        return box.value;
+      });
+      var p = _.map(getCheckedBoxes(progressSelect), function(box) {
+        return box.value;
+      });
       var f = htmlFormat.prop("checked");
       var r = _.filter(recipientEmails.val().split(/, /),
         function(s: string) { return s !== ""; });
