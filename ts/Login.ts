@@ -37,7 +37,11 @@ module Esper.Login {
       Log.d("esperMessage:", esperMessage);
 
       Log.d("sending message using window.postMessage");
-      window.postMessage(esperMessage, "*");
+
+      // Post only to same domain (this is readable by the Chrome Extension
+      // but not by a hostile iFrame)
+      var target = window.location.protocol + "//" + window.location.host;
+      window.postMessage(esperMessage, target);
     }
   }
 
