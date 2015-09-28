@@ -43,6 +43,12 @@ module Esper.Menu {
   }
 
   function updateLinks(ul) {
+    var loggedIn = Login.loggedIn();
+
+    var signIOLink = loggedIn?
+      makeActionLink("Sign out", Login.logout, false)
+      : makeActionLink("Sign in", Init.login, false);
+
     function openSettings() {
       window.open(Conf.Api.url);
     }
@@ -81,7 +87,8 @@ module Esper.Menu {
       .append(settingsLink)
       .append(optionsLink)
       .append(hr)
-      .append(helpLink);
+      .append(helpLink)
+      .append(signIOLink);
   }
 
   function displayGetTask() {
