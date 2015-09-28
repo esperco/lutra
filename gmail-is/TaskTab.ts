@@ -152,6 +152,9 @@ module Esper.TaskTab {
   }
 
   export function displayTaskProgress(task, taskTab: TaskTabView) {
+    // We should always set "new" to "in progress".
+    markNewTaskAsInProgress(task);
+
 '''
   <div #view class="esper-clearfix esper-task-progress">
     <select #taskProgressSelector class="esper-select esper-select-fullwidth">
@@ -293,7 +296,6 @@ module Esper.TaskTab {
         }
         CurrentThread.setTask(task);
         taskTitle.val(query);
-        markNewTaskAsInProgress(task);
         displayTaskProgress(task, taskTab);
         displayLinkedThreadsList(task, threadId, taskTab);
       })
@@ -881,7 +883,6 @@ module Esper.TaskTab {
             taskCaption.text(taskLabelExists);
             title = task.task_title;
             displayLinkedThreadsList(task, threadId, taskTabView);
-            markNewTaskAsInProgress(task);
             displayTaskProgress(task, taskTabView);
             if (task.task_meeting_type) {
               selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
