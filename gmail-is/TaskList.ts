@@ -222,7 +222,8 @@ module Esper.TaskList {
                               parentContainer: JQuery,
                               closeTaskListLayer: () => void,
                               filter: (task: ApiT.Task) => boolean,
-                              spinnerEl?: JQuery) {
+                              spinnerEl?: JQuery,
+                              noTasksMsgEl?: JQuery) {
 
 '''
 <div #listContainer class="esper-tl-list"></div>
@@ -230,6 +231,9 @@ module Esper.TaskList {
     parentContainer.append(listContainer);
     if (spinnerEl !== undefined) {
       spinnerEl.show();
+    }
+    if (noTasksMsgEl !== undefined) {
+      noTasksMsgEl.hide();
     }
 
     var withEvents = true; // turning this off speeds things up
@@ -255,7 +259,7 @@ module Esper.TaskList {
                         closeTaskListLayer: () => void) {
       /* Index of the element which, when visible, triggers the API call
          that fetches a new page. */
-      var tasks = List.filter(x.tasks, filter);
+      var tasks = _.filter(x.tasks, filter);
       var scrollTrigger =
         Math.min(tasks.length - 1,
                  Math.max(0, tasks.length - fetchAhead));
@@ -268,8 +272,14 @@ module Esper.TaskList {
         Api.getTaskPage(nextUrl).done(function(x) {
           appendPage(x, closeTaskListLayer);
         });
-      }
-      else {
+      } else {
+        if (tasks.length === 0) {
+          if (noTasksMsgEl !== undefined)
+            noTasksMsgEl.show();
+        } else {
+          if (noTasksMsgEl !== undefined)
+            noTasksMsgEl.hide();
+        }
         List.iter(tasks, function(task, i) {
           var elt = renderTask(team, task, closeTaskListLayer);
           elt.appendTo(listContainer);
@@ -283,9 +293,8 @@ module Esper.TaskList {
             parentContainer.scroll(lazyRefill);
           }
         });
-        if (spinnerEl !== undefined && tasks.length !== 0) {
+        if (spinnerEl !== undefined)
           spinnerEl.hide();
-        }
       }
     }
 

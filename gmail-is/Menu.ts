@@ -170,6 +170,7 @@ module Esper.Menu {
       <div #taskSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
+      <span #noTasks>No tasks matched this search.</span>
     </div>
     <div class="esper-modal-footer esper-clearfix" style="text-align: left;">
       <div #recipientsContainer class="esper-modal-recipients">
@@ -306,7 +307,8 @@ module Esper.Menu {
                   function(label) {return label === l});
             });
           },
-          taskSpinner);
+          taskSpinner,
+          noTasks);
       });
     }
 
