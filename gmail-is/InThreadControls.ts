@@ -112,11 +112,7 @@ module Esper.InThreadControls {
   <div class="esper-section-header esper-clearfix esper-open">
     <span class="esper-bold" style="float:left">Task Notes</span>
   </div>
-  <div #editorContainer class="esper-section-notes">
-    <div #taskNotes rows=5 disabled
-          placeholder="Leave some brief notes about the task here"
-          class="esper-text-notes">
-    </div>
+  <div #taskNotes rows=5 class="esper-section-notes">
   </div>
   <div class="esper-section-footer esper-clearfix">
     <div #toolbar class="toolbar-container">
