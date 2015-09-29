@@ -25,12 +25,12 @@
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Login.ts" />
+/// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/JsonHttp.ts" />
 /// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
 
 /// <reference path="./Gcal.ts" />
-/// <reference path="./ReminderView.ts" />
 /// <reference path="./ActiveEvents.ts" />
 /// <reference path="./CalEventView.ts" />
 /// <reference path="./Init.ts" />
