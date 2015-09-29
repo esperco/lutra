@@ -227,8 +227,6 @@ module Esper.InThreadControls {
       <span class="ql-format-group">
         <span title="Link" class="ql-format-button ql-link"></span>
         <span class="ql-format-separator"></span>
-        <span title="Image" class="ql-format-button ql-image"></span>
-        <span class="ql-format-separator"></span>
         <span title="List" class="ql-format-button ql-list"></span>
         <span class="ql-format-separator"></span>
         <button #saveTaskNotes disabled
