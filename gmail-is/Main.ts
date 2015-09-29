@@ -27,6 +27,7 @@
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Profile.ts" />
 /// <reference path="../common/Preferences.ts" />
+/// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/TaskPreferences.ts" />
 /// <reference path="../common/JsonHttp.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />

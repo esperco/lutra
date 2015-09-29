@@ -209,9 +209,15 @@ module Esper.EventWidget {
       });
     });
 
-    reminder.click(function() {
-      open(e.google_cal_url, "_blank");
+    var reminderGuests = List.map(e.guests, function(guest) {
+      return {
+        name:  guest.display_name,
+        email: guest.email,
+        checked: false
+      };
     });
+    ReminderView.openReminderOnClick(reminder,
+      e.google_cal_id, e.google_event_id, e.title, reminderGuests);
 
     unlinkEvent.click(function() {
       view.addClass("esper-disabled");

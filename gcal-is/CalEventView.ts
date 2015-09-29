@@ -175,105 +175,31 @@ module Esper.CalEventView {
     return view;
   }
 
-  function insertReminderButton(fromTeamId, fromEmail, execIds,
-    reminderState: ReminderView.ReminderState) {
+  function updateView(fullEventId) {
+    Gcal.waitForGuestsToLoad(function(guests) {
+      var guestsState = [];
+      guests.each(function() {
+        var guest = $(this);
+        var guestEmail = guest.attr("title");
+        var state: ReminderView.ReminderGuest = {
+          email: guest.attr("title"),
+          name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
+          checked: false
+        };
+        guestsState.push(state);
+      });
 '''
-<div #view>
-  <button #openReminder class="esper-btn esper-btn-primary">Reminder</button>
+<div #view class="reminder-button">
+  <button #reminderButton class="esper-btn esper-btn-primary">Reminder</button>
 </div>
 '''
-    openReminder.click(function () {
-      var dialog = Modal.dialog("Set an automatic reminder",
-        ReminderView.render(fromEmail, reminderState),
-        function() {
-          reminderState = ReminderView.currentReminderState();
-          if (! reminderState.enable) {
-            Api.unsetReminderTime(execIds.eventId);
-            return true;
-          } else if (0 < reminderState.time) {
-            Api.setReminderTime(fromTeamId, fromEmail,
-                                execIds.calendarId, execIds.eventId,
-                                reminderState.time);
-            if (reminderState.bccMe) {
-              var bccReminder = {
-                guest_email: fromEmail,
-                reminder_message: reminderState.text
-              };
-              Api.enableReminderForGuest(execIds.eventId,
-                bccReminder.guest_email, bccReminder);
-            } else {
-              Api.disableReminderForGuest(execIds.eventId, fromEmail);
-            }
-            List.iter(reminderState.guests, function(guest) {
-              if (guest.checked) {
-                var guestReminder = {
-                  guest_email: guest.email,
-                  guest_name: guest.name,
-                  reminder_message: reminderState.text
-                }
-                Api.enableReminderForGuest(execIds.eventId,
-                  guestReminder.guest_email, guestReminder);
-              } else {
-                Api.disableReminderForGuest(execIds.eventId, guest.email);
-              }
-            });
-            return true;
-          } else {
-            return false;
-          }
-        });
-      $("body").append(dialog.view);
+      ReminderView.openReminderOnClick(reminderButton,
+        fullEventId.calendarId, fullEventId.eventId,
+        Gcal.Event.extractEventTitle(),
+        guestsState);
+      $(".reminder-button").remove();
+      Gcal.findAnchorForReminderDropdown().append(view);
     });
-
-    Gcal.findAnchorForReminderDropdown().append(view);
-  }
-
-  function sameEmail(email) {
-    return function(r : ApiT.GuestReminder) {
-      return r.guest_email === email;
-    };
-  }
-
-  function updateView(fullEventId) {
-    var teams = Login.myTeams();
-    var calendarId = fullEventId.calendarId;
-    var eventId = fullEventId.eventId;
-
-    if (teams.length > 0) {
-      Api.getReminders(calendarId, eventId).done(function(event_reminders) {
-        var teamid = event_reminders.remind_from_team || teams[0].teamid;
-        var email = event_reminders.remind_from_email || Login.myEmail();
-        var evSecs = new Date(event_reminders.event_start_time).getTime();
-        var rmSecs = new Date(event_reminders.reminder_time).getTime();
-        var time = (evSecs - rmSecs) / 1000;
-        var enable = 0 < event_reminders.guest_reminders.length && 0 < time;
-        var text = 0 < event_reminders.guest_reminders.length
-                 ? event_reminders.guest_reminders[0].reminder_message
-                 : null;
-        var reminderState: ReminderView.ReminderState = {
-          enable: enable,
-          bccMe: List.exists(event_reminders.guest_reminders, sameEmail(email)),
-          text: text,
-          time: time,
-          guests: []
-        };
-        Gcal.waitForGuestsToLoad(function(guests) {
-          reminderState.guests = [];
-          guests.each(function() {
-            var guest = $(this);
-            var guestEmail = guest.attr("title");
-            var state = {
-              email: guestEmail,
-              name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
-              checked: List.exists(event_reminders.guest_reminders,
-                                   sameEmail(guestEmail))
-            };
-            reminderState.guests.push(state);
-          });
-        });
-        insertReminderButton(teamid, email, fullEventId, reminderState);
-      });
-    }
   }
 
   var alreadyInitialized = false;
