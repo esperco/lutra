@@ -7,7 +7,7 @@
     "build": "gulp build",
     "build-production": "gulp build-production",
     "serve": "gulp http-server",
-    "src": "gulp build-src",
+    "rebuild": "gulp rebuild",
     "watch": "gulp watch"
   },
   "devDependencies": {
