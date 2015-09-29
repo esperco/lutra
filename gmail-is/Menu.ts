@@ -66,7 +66,7 @@ module Esper.Menu {
                                      openOptionsPage, false);
 
     var agendaLink = makeActionLink("Get Agenda", function() {
-      var agendaModal = displayAgenda();
+      var agendaModal = displayGetAgenda();
       $("body").append(agendaModal.view);
     }, false);
 
@@ -440,7 +440,7 @@ module Esper.Menu {
     return _view;
   }
 
-  function displayAgenda() {
+  function displayGetAgenda() {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-tl-modal">
@@ -764,93 +764,13 @@ module Esper.Menu {
     return _view;
   }
 
-  function displayTaskList(team: ApiT.Team,
-                           tasksLayer: JQuery) {
-    function closeList() {
-      tasksLayer.addClass("esper-hide");
-      return false;
-    }
-
-    tasksLayer.children().remove();
-    tasksLayer.removeClass("esper-hide");
-    TaskList.render(team, tasksLayer, closeList)
-      .appendTo(tasksLayer);
-    tasksLayer.click(closeList);
-  }
-
-  function setupTeamSwitcher(teams: ApiT.Team[],
-                             view: Menu,
-                             tasksLayer: JQuery) {
-
-    var team = currentTeam.get();
-
-    view.currentTeamName.text(team.team_name);
-    currentTeam.watch(function(team, isValid) {
-      if (isValid) {
-        view.currentTeamName.text(team.team_name);
-      } else {
-        view.currentTeamName.text("UNKNOWN TEAM");
-      }
-    }, "team-switcher-current");
-
-    List.iter(teams, function(team) {
-      $("<li class='esper-li'>")
-        .text(team.team_name)
-        .click(function() {
-          currentTeam.set(team);
-          displayTaskList(team, tasksLayer);
-        })
-        .appendTo(view.teamSwitcherContent);
-    });
-  }
-
-  function setupTaskListControls(view: Menu,
-                                 tasksLayer: JQuery) {
-    var teams = Login.myTeams();
-    if (teams === undefined || teams.length === 0) {
-      view.currentTeamName.addClass("esper-hide");
-      view.tasksButton.addClass("esper-hide");
-    } else {
-      if (currentTeam.get() === undefined) {
-        currentTeam.set(teams[0]);
-      }
-      setupTeamSwitcher(teams, view, tasksLayer);
-      view.currentTeamName.removeClass("esper-hide");
-      view.tasksButton
-        .removeClass("esper-hide")
-        .unbind("click")
-        .click(function() { displayTaskList(currentTeam.get(), tasksLayer); });
-    }
-  }
-
   export interface Menu {
     view: JQuery;
     logo: JQuery;
     logoImg: JQuery;
-    teamSwitcher: JQuery;
-    teamsDropdown: JQuery;
-    currentTeamName: JQuery;
-    teamSwitcherContent: JQuery;
-    tasksButton: JQuery;
     background: JQuery;
     menuDropdown: JQuery;
     menuDropdownContent: JQuery;
-  }
-
-  function createTasksLayer(): JQuery {
-/*
-   This overlay needs to be created near the document's root,
-   otherwise the Google logo and search box are displayed on top of it.
-*/
-    $("#esper-tasks-layer").remove();
-'''
-<div #tasksLayer
-     id="esper-tasks-layer"
-     class="esper-hide esper-modal-bg">
-</div>
-'''
-    $("body").append(tasksLayer);
-    return tasksLayer;
   }
 
   /*
@@ -863,22 +783,6 @@ module Esper.Menu {
 <div #view id="esper-menu-root" class="esper-menu-root esper-bs">
   <!-- fixed elements -->
   <div #background class="esper-menu-bg"/>
-
-  <div #teamSwitcher class="esper-tl-switcher dropdown">
-    <div #currentTeamName data-toggle="dropdown"
-         class="esper-clickable esper-tl-team"
-         title="Select other team">
-    </div>
-    <ul #teamsDropdown class="dropdown-menu dropdown-arrow-top">
-      <div #teamSwitcherContent class="esper-dropdown-section"/>
-    </ul>
-  </div>
-
-  <div #tasksButton
-       class="esper-hide esper-clickable esper-tl-button"
-       title="View tasks for this team">
-    Tasks
-  </div>
 
   <div class="esper-menu dropdown">
     <div #logo data-toggle="dropdown"
@@ -896,7 +800,11 @@ module Esper.Menu {
 '''
 
     var menuView = <Menu> _view;
-    var tasksLayer = createTasksLayer();
+    var teams = Login.myTeams();
+
+    if (currentTeam.get() === undefined) {
+      currentTeam.set(teams[0]);
+    }
 
     var theme = $("div.gb_Dc.gb_sb");
     if (theme.hasClass("gb_l")) {
@@ -909,14 +817,9 @@ module Esper.Menu {
 
     /* Try to use the same color as Google, which depends on the theme. */
     var navbarTextColor = Gmail.getNavbarTextColor();
-    currentTeamName.css("color", navbarTextColor);
-    tasksButton.css("color", navbarTextColor);
 
     updateLinks(menuDropdownContent);
 
-    setupTaskListControls(menuView, tasksLayer);
-
-    currentTeamName.dropdown();
     logo.dropdown();
 
     Util.repeatUntil(10, 1000, function() {
