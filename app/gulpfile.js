@@ -45,13 +45,13 @@ gulp.task("production", function(cb) {
 var buildBase = gulp.parallel(
   "build-html", "build-test-reqs", "build-ts", "build-less");
 
-gulp.task("build", gulp.parallel("build-vendor", buildBase));
+gulp.task("rebuild", gulp.parallel("build-vendor", buildBase));
 
-gulp.task("build-src", gulp.parallel("build-vendor-once", buildBase));
+gulp.task("build", gulp.parallel("build-vendor-once", buildBase));
 
 gulp.task("build-production", gulp.series("production", "build"));
 
-gulp.task("watch", gulp.series("build-src",
+gulp.task("watch", gulp.series("build",
   gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
                 "http-server", "live-reload")));
 
