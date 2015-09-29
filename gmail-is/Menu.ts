@@ -368,6 +368,8 @@ module Esper.Menu {
         allLabels.find("label > input").prop("checked", false);
     });
 
+    recipientEmails.val(Login.myEmail() + ", ");
+
     function appendEmailToTextarea() {
       var emails = recipientEmails.val();
       if ($(this).is(":checked")) {
@@ -392,6 +394,9 @@ module Esper.Menu {
         .val(email)
         .change(appendEmailToTextarea)
         .appendTo(s);
+      if (Login.myEmail() === email) {
+        i.prop("checked", true);
+      }
       var l = $("<label>")
         .attr("for", "agenda-recipient" + id)
         .addClass("esper-agenda-recipient")
