@@ -184,7 +184,10 @@ module.exports = function(gulp) {
       } catch (err) {
         skip = false;
       }
-      cb();
+
+      // Weirdly, calling cb too quickly (e.g. directly or with
+      // process.nextTick) triggers a stack overflow.
+      setTimeout(cb, 100);
     }, buildName));
   };
 
