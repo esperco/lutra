@@ -1,8 +1,5 @@
 module Esper.TaskList {
 
-  var currentTaskProgress = "";
-  var currentTaskLabel = "all";
-
   function renderThreads(threads: ApiT.EmailThread[],
                          closeTaskListLayer: () => void,
                          parent: JQuery) {
@@ -234,12 +231,16 @@ module Esper.TaskList {
   export function displayList(team: ApiT.Team,
                               parentContainer: JQuery,
                               closeTaskListLayer: () => void,
-                              filter: (task: ApiT.Task) => boolean) {
+                              filter: (task: ApiT.Task) => boolean,
+                              spinnerEl?: JQuery) {
 
 '''
 <div #listContainer class="esper-tl-list"></div>
 '''
     parentContainer.append(listContainer);
+    if (spinnerEl !== undefined) {
+      spinnerEl.show();
+    }
 
     var withEvents = true; // turning this off speeds things up
     var withThreads = true;
@@ -292,6 +293,9 @@ module Esper.TaskList {
             parentContainer.scroll(lazyRefill);
           }
         });
+        if (spinnerEl !== undefined && tasks.length !== 0) {
+          spinnerEl.hide();
+        }
       }
     }
 
@@ -300,107 +304,6 @@ module Esper.TaskList {
       .done(function(x) {
         appendPage(x, closeTaskListLayer);
       });
-  }
-
-  export function render(team: ApiT.Team,
-                         parent: JQuery,
-                         closeTaskListLayer: () => void) {
-'''
-<div #view class="esper-tl-modal">
-  <div class="esper-tl-task-list">
-    <span #closeButton class="esper-modal-close esper-clickable">×</span>
-    <button #emailButton
-      class="esper-tl-email esper-btn esper-btn-secondary esper-clickable"
-      title="Email all tasks with the current label to yourself">Email to myself</button>
-    <span #all class="esper-tl-link esper-tl-all">All</span>
-    <span #urgent class="esper-tl-link esper-tl-urgent"></span>
-    <span #new_ class="esper-tl-link esper-tl-progress"></span>
-    <span #inProgress class="esper-tl-link esper-tl-progress"></span>
-    <span #pending class="esper-tl-link esper-tl-progress"></span>
-    <span #done class="esper-tl-link esper-tl-progress"></span>
-    <span #canceled class="esper-tl-link esper-tl-progress"></span>
-    <div #otherTeamLabels></div>
-    <div #list>
-      <h1 #teamName />
-    </div>
-  </div>
-</div>
-'''
-    urgent.text(team.team_label_urgent);
-    new_.text(team.team_label_new);
-    inProgress.text(team.team_label_in_progress);
-    pending.text(team.team_label_pending);
-    done.text(team.team_label_done);
-    canceled.text(team.team_label_canceled);
-    teamName.text(team.team_name + " tasks");
-
-    Util.preventClickPropagation(view);
-    closeButton.click(closeTaskListLayer);
-    emailButton.click(function() {
-      emailButton.prop("disabled", true);
-      emailButton.text("Sending...");
-      Api.sendTaskList([team.teamid],
-        [currentTaskLabel],
-        currentTaskProgress.split(","),
-        true,
-        [GmailJs.get.user_email()]).done(function(){
-        emailButton.prop("disabled", false);
-        emailButton.text("Email to myself");
-      });
-    });
-
-    function displayFiltered(filter) {
-      list.children(".esper-tl-list").remove();
-      displayList(team, list, closeTaskListLayer, filter);
-    }
-
-    function bind(elt: JQuery,
-                  filter: (task: ApiT.Task) => boolean) {
-      elt.click(function() {
-        currentTaskProgress = elt.attr("data-task-progress");
-        currentTaskLabel = elt.attr("data-task-label");
-        $(".esper-tl-selected").removeClass("esper-tl-selected");
-        elt.addClass("esper-tl-selected");
-        displayFiltered(filter);
-      });
-    }
-
-    all.attr("data-task-label", "all");
-    all.attr("data-task-progress", "New,In_progress,Pending");
-    urgent.attr("data-task-label", "urgent");
-    urgent.attr("data-task-progress", "New,In_progress,Pending");
-    bind(all, function(task) { return true; });
-    bind(urgent, function(task) { return task.task_urgent; });
-
-    function bindProgress(elt, progress) {
-      elt.attr("data-task-label", "all");
-      elt.attr("data-task-progress", progress);
-      bind(elt, function(task) { return task.task_progress === progress; });
-    }
-
-    bindProgress(new_, "New");
-    bindProgress(inProgress, "In_progress");
-    bindProgress(pending, "Pending");
-    bindProgress(done, "Done");
-    bindProgress(canceled, "Canceled");
-
-    var shared = getUnknownTeamLabels(team);
-    List.iter(sortLabels(shared), function(label: string) {
-      var elt = $("<span>")
-        .addClass("esper-tl-link esper-tl-shared")
-        .attr("data-task-label", label)
-        .attr("data-task-progress", "New,In_progress,Pending")
-        .text(label)
-        .appendTo(otherTeamLabels);
-      bind(elt, function(task) {
-        return List.mem(task.task_labels, label);
-      });
-      otherTeamLabels.append(" ");
-    });
-
-    all.click();
-
-    return view;
   }
 
 }

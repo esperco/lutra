@@ -237,6 +237,7 @@ li.esper-li, a.esper-a {
   color: black;
   line-height: 1;
   text-align: left;
+  cursor: pointer;
   &:hover {
     background: @purple;
     color: white;
@@ -273,8 +274,8 @@ li.esper-li, a.esper-a {
   &.esper-selected:hover { color: black; }
 }
 
-a.esper-a {
-  cursor: pointer;
+a.esper-a:hover {
+  text-decoration: none;
 }
 
 select.esper-select {
@@ -506,6 +507,10 @@ textarea.esper-input { resize: none; }
   left: auto;
   margin-top: 5px;
   min-width: 80px;
+}
+
+.esper-bs .esper-menu .esper-menu-hr {
+  margin: 5px 0px;
 }
 
 /* Task list button (middle) */
@@ -796,6 +801,7 @@ textarea.esper-input { resize: none; }
 }
 
 .esper-calendar-icon {
+  float: right;
   &:hover {
     color: @purple_hover;
   }
@@ -986,7 +992,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 
 .esper-tab-overflow {
   flex-shrink: 1;
-  flex-grow: 0;
+  flex-grow: 1;
   padding: 15px 10px 0 10px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -2319,10 +2325,21 @@ textarea.esper-description-text {
   position: relative;
   background-color: @purple;
   border-radius: 100%;
-  -webkit-animation: scaleout 1.0s infinite ease-in-out;
-          animation: scaleout 1.0s infinite ease-in-out;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
   &.esper-tab-header-spinner { display: block; }
   &.esper-list-spinner { display: block; }
+  &.esper-inline-spinner {
+    display: block;
+    width: 75px;
+    height: 75px;
+    margin: 50px auto;
+  }
+}
+
+.esper-sidebar-spinner {
+  margin: 25% auto 0;
+  width: 60px;
+  height: 60px;
 }
 
 .esper-tab-header-spinner {

@@ -265,13 +265,25 @@ module Esper.Api {
   }
 
   /*** Emails ***/
-  export function sendAgenda(teamid, from, until, pref):
+  export function sendAgenda(teams,
+                             timezone,
+                             time_from: string,
+                             time_until: string,
+                             html_format,
+                             include_task_notes,
+                             recipients):
   JQueryPromise<void> {
-    var url = Conf.Api.url + "/api/agenda/send-v2/" + string(Login.myUid()) +
-      "/" + string(teamid) +
-      "/" + encodeURIComponent(string(from)) +
-      "/" + encodeURIComponent(string(until));
-    return JsonHttp.put(url, JSON.stringify(pref));
+    var url = Conf.Api.url + "/api/agenda/send/" + string(Login.myUid());
+    var pref = {
+      teams: teams,
+      timezone: timezone,
+      time_from: time_from,
+      time_until: time_until,
+      html_format: html_format,
+      include_task_notes: include_task_notes,
+      recipients: recipients
+    }
+    return JsonHttp.post(url, JSON.stringify(pref));
   }
 
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
