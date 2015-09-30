@@ -53,6 +53,12 @@ module Esper.InviteControls {
   interface ReminderSpec {
     exec?   : { text : string; time : number };
     guests? : { text : string; time : number };
+
+    // Keep separate from exec and guests interface above so we can
+    // enable in the state and have other functions modify state to include
+    // defaults.
+    execEnabled?: boolean;
+    guestsEnabled?: boolean;
   }
 
   /** An object that contains all the values entered through the
@@ -107,7 +113,9 @@ module Esper.InviteControls {
       notes       : "",
       guests      : [],
 
-      reminders   : null,
+      reminders   : {
+        execEnabled: prefs.execPrefs.general.send_exec_reminder
+      },
 
       description : event.description
     };
@@ -115,7 +123,6 @@ module Esper.InviteControls {
 
   function toEventEdit(state : InviteState): ApiT.CalendarEventEdit {
     var preferences  = state.prefs.execPrefs;
-    var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
 
     var event = state.event;
@@ -145,8 +152,9 @@ module Esper.InviteControls {
    *  preferences. Will fail with a visible error if there is no
    *  detected current team.
    */
-  export function inviteSlide(state : InviteState, duplicate? : boolean, execEvent? : boolean):
-  Slides.Slide<InviteState> {
+  export function inviteSlide(state: InviteState,
+    duplicate=false, execEvent=true): Slides.Slide<InviteState>
+  {
 '''
 <div #container>
   <div #heading class="esper-modal-header">
@@ -367,29 +375,21 @@ module Esper.InviteControls {
       var calendarId = pubCalendar.is(":visible") ?
         (pubCalendar.val() || publicCalId) : publicCalId;
 
-      return {
-        event : event,
-        prefs : prefs,
-
-        title      : pubTitle.val(),
-        location   : {
+      return <InviteState> _.extend({}, state, {
+        title: pubTitle.val(),
+        location: {
           /* Right now we don't care about title because this is just text
              to be displayed in the Google Calendar location box... but in
              the future we may use it for typeahead or something. */
-          title    : "",
-          address  : pubLocation.val(),
-          timezone : preferences.general.current_timezone,
+          title: "",
+          address: pubLocation.val(),
+          timezone: preferences.general.current_timezone,
         },
-        calendarId : calendarId,
-        calendars  : state.calendars,
-        createdBy  : fromSelect.val(),
-        notes      : pubNotes.val(),
-        guests     : guests,
-
-        reminders  : null,
-
-        description : null
-      }
+        calendarId: calendarId,
+        createdBy: fromSelect.val(),
+        notes: pubNotes.val(),
+        guests: guests
+      });
     }
 
     return {
@@ -401,8 +401,10 @@ module Esper.InviteControls {
   /** A widget for setting an automatic reminder about the event, sent
    *  to the exec.
    */
-  function reminderSlide(state : InviteState, duplicate? : boolean, 
-                         execEvent? : boolean): Slides.Slide<InviteState> {
+  function reminderSlide(state: InviteState,
+                         duplicate = false, execEvent = true):
+    Slides.Slide<InviteState>
+  {
 '''
 <div #container>
   <div #heading class="esper-modal-header">
@@ -446,7 +448,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     var duplicate = state.prefs.execPrefs.general.use_duplicate_events;
 
     var key     = execEvent ? "exec" : "guests";
-    var execEnabled = state.reminders && state.reminders.exec;
+    var execEnabled = state.reminders && state.reminders.execEnabled;
 
     var enabled = true;
 
@@ -463,15 +465,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     if (execEvent) {
       heading.text("Set an automatic reminder for " + name);
     } else {
-      heading.text("Set an automatic reminder for the guests.");
+      heading.text("Set an automatic reminder for the guests");
     }
 
-    if (execEvent) {
-      if (duplicate) {
+    if (duplicate) {
+      if (execEvent) {
         execEventTag.appendTo(heading);
-      }
-    } else {
-      if (duplicate) {
+      } else {
         guestsEventTag.appendTo(heading);
       }
     }
@@ -500,6 +500,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         text : reminderField.val(),
         time : enabled && Math.floor(timeField.val() * 60 * 60)
       };
+
+      if (key === "exec") {
+        reminders.execEnabled = enabled;
+      } else {
+        reminders.guestsEnabled = enabled;
+      }
 
       var newState = $.extend({}, state);
       newState.reminders = reminders;
@@ -534,12 +540,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
    *  which includes both the notes from the previous widget and the
    *  synced email thread contents.
    */
-  export function descriptionSlide(state : InviteState, duplicate? : boolean, execEvent? : boolean) :
+  export function descriptionSlide(state: InviteState,
+                                   duplicate=false, execEvent=true) :
   Slides.Slide<InviteState> {
 '''
 <div #container>
   <div class="esper-modal-header">
-    <span #heading>Review the guest event description</span>
+    <span #heading>Review event description</span>
     <button #pickEmails class="esper-btn esper-btn-secondary">
       Pick Emails
     </button>
@@ -565,8 +572,12 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     var threadId = CurrentThread.threadId.get();
     var original = state.event;
 
-    if (execEvent) {
-      heading.text("Review " + name + "'s event description");
+    if (duplicate) {
+      if (execEvent) {
+        heading.text("Review " + name + "'s event description");
+      } else {
+        heading.text("Review the guest event description");
+      }
     }
 
     Api.getRestrictedDescription(team.teamid,
@@ -633,7 +644,21 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           var slideWidget;
 
           if (!prefs.execPrefs.general.use_duplicate_events) {
-            var slides = [inviteSlide, reminderSlide, descriptionSlide];
+
+            function execReminderSlide(state: InviteState) {
+              return reminderSlide(state,
+                                   /* duplicate= */ false,
+                                   /* execEvent= */ true);
+            }
+
+            function guestsReminderSlide(state: InviteState) {
+              return reminderSlide(state,
+                                   /* duplicate= */ false,
+                                   /* execEvent= */ false);
+            }
+
+            var slides = [inviteSlide, execReminderSlide, guestsReminderSlide,
+                          descriptionSlide];
             var startState = populateInviteState(event, prefs);
             var controls = {
               onCancel : function () { /* no actions needed */ },
@@ -699,8 +724,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
               onFinish : function (dualState) {
                 var exec   = dualState.exec;
                 var guests = dualState.guests;
-
-                exec.reminders = null;
 
                 finalizeEvent(exec).done(function (done) {
                   if (done) {
