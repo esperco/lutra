@@ -15,7 +15,6 @@ module Esper.Analytics {
 
     // Listen for posted messages to track
     Message.listen(Message.Type.Track, function(data: TrackMessage) {
-      console.error(data);
       track(data.event, data.properties);
     });
   }
