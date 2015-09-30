@@ -9,15 +9,19 @@
 */
 
 /// <reference path="./Util.ts" />
+/// <reference path="./Emit.ts" />
 
 module Esper.Model {
 
 
   ////////////////
 
-  // Ready => Local state accurately reflects server (as far as we know)
-  // InFlight => Local changes en route to server
-  export enum DataStatus { READY, INFLIGHT };
+  export enum DataStatus {
+    READY = 1,  // Local state accurately reflects server (as far as we know)
+    UNSAVED,    // Local state has changes not yet pushed to server
+    INFLIGHT,   // Push to server in progress
+    FETCHING    // Pull from server in progress
+  };
 
   // Metadata that lives alongside the actual object data -- need at least
   // an identifier
@@ -25,6 +29,7 @@ module Esper.Model {
     _id?: string;
     dataStatus?: DataStatus;
     lastUpdate?: Date;
+    aliases?: string[];
   }
 
   // Variant on StoreMetadata for new objects (_id is required)
@@ -43,67 +48,32 @@ module Esper.Model {
   }
 
   // Base class for Store-like classes with EventEmitters
-  export class StoreBase<TData> extends EventEmitter {
-    /*
-      For simplicity we just emit a single change variable whenever any
-      modification happens to a store. We can pass along a list of _id changes
-      but otherwise we let the handler re-query as appropriate to figure out
-      what's different. This may be a little inefficient, but it's
-      insignificant relative to round-trip time to a server or updating the
-      actual DOM, and it makes reasoning about our code a lot easier.
-    */
-    protected CHANGE_EVENT: string = "CHANGE";
-
-    // Register a callback to handle store changes
+  export class StoreBase extends Emit.EmitBase {
+    // More explicit typing on listeners
     addChangeListener(callback: (_ids: string[]) => void): void {
-      this.on(this.CHANGE_EVENT, callback);
+      super.addChangeListener(callback);
     }
 
-    // De-register a callback to handle store changes
     removeChangeListener(callback: (_ids: string[]) => void): void {
-      this.removeListener(this.CHANGE_EVENT, callback);
+      super.removeChangeListener(callback);
     }
 
-    // Remove all listeners
-    removeAllChangeListeners(): void {
-      this.removeAllListeners(this.CHANGE_EVENT);
-    }
-
-    /*
-      Use to track whether emitChange has been called during an emitChange
-      cycle. The purpose of this is maintain unidirectional data flow. State
-      changes trigger event callbacks that further update the state are
-      difficult to reason about. They also run the risk of setting off an
-      infinite loop.
-    */
-    protected alreadyEmitted = false;
-
-    // Call this whenever the store is changed.
     protected emitChange(_ids?: string[]): void {
-      if (this.alreadyEmitted) {
-        throw new Error("Unidirectional data flow error: Cannot update " +
-          "store via change handler");
-      }
-
-      this.alreadyEmitted = true;
-      try {
-        if (_ids) {
-          this.emit(this.CHANGE_EVENT, _ids);
-        } else {
-          this.emit(this.CHANGE_EVENT);
-        }
-      } finally {
-        this.alreadyEmitted = false;
-      }
+      super.emitChange(_ids);
     }
   }
 
   // Base class for Model Stores
-  export class Store<TData> extends StoreBase<TData> {
+  export class Store<TData> extends StoreBase {
 
     // Actual container for data
     protected data: {
       [index: string]: [TData, StoreMetadata];
+    };
+
+    // Alias map
+    protected aliases: {
+      [index: string]: string;
     };
 
 
@@ -117,10 +87,12 @@ module Esper.Model {
     // Clears all data in store
     reset(): void {
       this.data = {};
+      this.aliases = {};
     }
 
     // Returns an instance stored with a particular _id
     get(_id: string): [TData, StoreMetadata] {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id];
       }
@@ -128,15 +100,21 @@ module Esper.Model {
 
     // Returns just the value and not the metadata
     val(_id: string): TData {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id][0];
       }
     }
 
     metadata(_id: string): StoreMetadata {
+      _id = this.aliasOrId(_id);
       if (this.has(_id)) {
         return this.data[_id][1];
       }
+    }
+
+    protected aliasOrId(_id: string): string {
+      return this.aliases[_id] || _id;
     }
 
     // Return all store objects
@@ -148,6 +126,16 @@ module Esper.Model {
       return _.map(this.getAll(), function(tuple) { return tuple[0]; });
     }
 
+    // Alias two _ids -- e.g. for when we assign a random _id to a model
+    // for temp display and then need to associate the same model with the
+    // new (real) _id
+    alias(currentId: string, newId: string): void {
+      if (this.has(currentId)) {
+        this.aliases[newId] = currentId;
+        this.updateMetadata(currentId, {}, true);
+      }
+    }
+
 
     ////////////
 
@@ -155,6 +143,7 @@ module Esper.Model {
 
     // Returns true if an item exists
     has(_id: string): boolean {
+      _id = this.aliasOrId(_id);
       return this.data.hasOwnProperty(_id);
     }
 
@@ -162,6 +151,9 @@ module Esper.Model {
     set(_id: string, tuple: [TData, StoreMetadata]): void;
     set(_id: string, data: TData, metadata?: StoreMetadata): void;
     set(_id: string, firstArg: any, secondArg?: any): void {
+      var origId = _id;
+      _id = this.aliasOrId(_id);
+
       var data: TData;
       var metadata: StoreMetadata;
       if (secondArg) {
@@ -173,14 +165,17 @@ module Esper.Model {
       } else {
         data = (<TData> firstArg);
       }
-      metadata = this.cleanMetadata(_id, data, metadata);
+      metadata = this.cleanMetadata(_id, metadata);
       // Store data in immutable fashion
-      this.data[_id] = Util.deepFreeze<[TData,StoreMetadata]>([data, metadata]);
-      this.emitChange([_id]);
+      this.data[_id] = [
+        Util.deepFreeze<TData>(data),
+        Util.deepFreeze<StoreMetadata>(metadata)
+      ];
+      this.emitChange([origId]);
     }
 
     // Hook to preset metadata before it's set
-    protected cleanMetadata(_id: string, data: TData, metadata?: StoreMetadata)
+    protected cleanMetadata(_id: string, metadata?: StoreMetadata)
       : StoreMetadata
     {
       // Make sure _id matches
@@ -197,8 +192,26 @@ module Esper.Model {
       // Some defaults and overrides
       metadata.dataStatus = metadata.dataStatus || DataStatus.READY;
       metadata.lastUpdate = new Date();
+      metadata.aliases = [];
+      _.each(this.aliases, function(val, key) {
+        if (val === _id) {
+          metadata.aliases.push(key);
+        }
+      });
       return metadata;
     };
+
+    // Update metadata for a given _id -- can do so without emiting
+    protected updateMetadata(_id: string, metadata?: StoreMetadata,
+                             silent=false) {
+      if (this.has(_id)) {
+        metadata = this.cleanMetadata(_id, metadata);
+        this.data[_id][1] = metadata;
+        if (! silent) {
+          this.emitChange([_id]);
+        }
+      }
+    }
 
     /* Inserts a new object at key, fails if key already exists */
     insert(_id: string, data: TData): void;
@@ -230,6 +243,7 @@ module Esper.Model {
     update(_id: string, data: TData, metadata?: StoreMetadata): void;
     update(_id: string, update: any, metadata?: StoreMetadata): void {
       if (this.has(_id)) {
+        _id = this.aliasOrId(_id);
         this.upsert(_id, update, metadata);
       }
       else {
@@ -263,8 +277,23 @@ module Esper.Model {
     // Remove a key from store
     remove(_id: string): void {
       if (this.has(_id)) {
+        var origId = _id;
+        var aliases = this.aliases;
+        if (aliases[_id]) {
+          _id = aliases[_id];
+          delete aliases[_id];
+        }
+
+        // This is clunky, but if we aren't storing a lot of data, iteration
+        // is fine.
+        _.each(aliases, function(val, key) {
+          if (val === _id) {
+            delete aliases[key];
+          }
+        });
+
         delete this.data[_id];
-        this.emitChange([_id]);
+        this.emitChange([origId]);
       }
     }
 

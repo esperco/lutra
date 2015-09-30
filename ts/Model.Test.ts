@@ -1,5 +1,6 @@
 /* Test Model.Store */
 
+/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Model.ts"/>
 module Esper.Model {
 
@@ -386,6 +387,49 @@ module Esper.Model {
       */
       it("should throw a unidirectional flow error", function() {
         expect(insertBrownRabbit).toThrowError(/flow error/);
+      });
+    });
+
+    describe("Alias", function() {
+      beforeAll(function() {
+        reset();
+        insertBrownRabbit();
+        myRabbitStore.alias("brownRabbitId", "brownBunnyId");
+      });
+
+      it("should allow retrieval by original _id", function() {
+        expect(myRabbitStore.val("brownRabbitId").carrots).toEqual(carrots);
+      });
+
+      it("should update the alias metadata", function() {
+        var aliasList = myRabbitStore.metadata("brownRabbitId").aliases;
+        expect(aliasList).toContain("brownBunnyId");
+      });
+
+      it("should allow retrieval by new alias", function() {
+        expect(myRabbitStore.val("brownBunnyId").carrots).toEqual(carrots);
+      });
+
+      describe("removing by original _id", function() {
+        beforeAll(function() {
+          myRabbitStore.remove("brownRabbitId");
+        });
+
+        it("should remove alias", function() {
+          expect(myRabbitStore.has("brownBunnyId")).toBeFalsy();
+        });
+
+        it("should allow inserting of new data detached from alias",
+          function() {
+            myRabbitStore.insert("brownBunnyId", {
+              uid: "brownBunnyId",
+              carrots: 123
+            });
+            var retrieved = myRabbitStore.val("brownBunnyId");
+            expect(retrieved.uid).toBe("brownBunnyId");
+            expect(retrieved.carrots).toBe(123);
+            expect(myRabbitStore.has("brownRabbitId")).toBeFalsy();
+        });
       });
     });
 

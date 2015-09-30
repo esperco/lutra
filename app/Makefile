@@ -6,14 +6,14 @@ setup:
 	npm install
 
 # Do a quick build, don't rebuild vendor files if not necessary
-src:
-	npm run src
-
-# Full build -- rebuild vendor files if necessary
 build:
 	npm run build
 
-dev: src
+dev: build
+
+# Full build -- rebuild vendor files if necessary
+rebuild:
+	npm run rebuild
 
 prod:
 	npm run build-production
