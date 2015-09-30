@@ -34,11 +34,8 @@ declare module Esper {
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
   export var page: PageJS.Static;
-<<<<<<< HEAD
   export var quill: QuillStatic;
-=======
   export var analytics: SegmentAnalytics.AnalyticsJS;
->>>>>>> Fix build errors
 
   // NB: Esper.gmailJs is defined as well, but we'll set the type definitions
   // for this in the gmail-is code.
