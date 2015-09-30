@@ -2,16 +2,24 @@
   Wrapper around jQuery objects that delete references to the jQuery object
   when their corresponding DOM elements are removed. This helps prevent
   memory leaks.
-
-  REQUIRES JQUERY-UI TO WORK PROPERLY. If removing jQuery-UI as a dependency,
-  look into http://stackoverflow.com/a/10172676 for a possible way to do this
-  with just pure jQuery.
 */
 
 /// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
 
 module Esper {
+
+  // http://stackoverflow.com/a/10172676
+  (function($: any) { /* Should of type JQueryStatic but that doesn't support
+                         special events */
+    $.event.special.destroyed = {
+      remove: function(o: any) {
+        if (o.handler) {
+          o.handler()
+        }
+      }
+    };
+  })(jQuery);
+
   export class JQStore {
     protected elm: JQuery;
 
@@ -21,7 +29,7 @@ module Esper {
 
     set(val: JQuery) {
       this.elm = val;
-      this.elm.on("remove", this.unset.bind(this));
+      this.elm.bind('destroyed', this.unset.bind(this));
     }
 
     unset() {

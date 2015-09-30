@@ -3,10 +3,13 @@
 /// <reference path="./Esper.ts"/>
 /// <reference path="../marten/ts/Util.ts"/>
 /// <reference path="../marten/ts/Log.ts"/>
+/// <reference path="../marten/ts/Emit.ts"/>
 /// <reference path="../marten/ts/Model.ts"/>
 /// <reference path="../marten/ts/Model.Capped.ts"/>
 /// <reference path="../marten/ts/Model.StoreOne.ts"/>
 /// <reference path="../marten/ts/JQStore.ts"/>
+/// <reference path="../marten/ts/Query.ts"/>
+/// <reference path="../marten/ts/ReactHelpers.ts"/>
 /// <reference path="./IndexPage.tsx"/>
 
 
