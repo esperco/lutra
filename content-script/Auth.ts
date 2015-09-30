@@ -1,3 +1,5 @@
+/// <reference path="../common/Login.ts" />
+
 module Esper.Auth {
   /*
     The user's API secret is stored using chrome.storage.local.
@@ -120,12 +122,14 @@ module Esper.Auth {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: Types.Account) {
-        if (x.credentials !== undefined
-            || (x.declined === true && ! forceLogin)) {
-          sendCredentialsResponse(x);
-        }
-        else {
-          openWelcomeModal(x);
+        if (!x.declined || forceLogin) {
+          if (x.credentials !== undefined) {
+            Login.setAccount(x);
+            sendCredentialsResponse(x);
+          }
+          else {
+            openWelcomeModal(x);
+          }
         }
     });
   }
@@ -230,6 +234,7 @@ module Esper.Auth {
            if login data is provided for whatever login is in progress */
         for (var k in newStorage.accounts) {
           if (loginInProgressFor === k) {
+            Login.setAccount(newStorage.accounts[k]);
             Message.postToExtension(Message.Type.FocusOnSender);
             break;
           }

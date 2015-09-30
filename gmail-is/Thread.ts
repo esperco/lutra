@@ -26,7 +26,7 @@ module Esper.Thread {
       The <any> cast fixes it. (Promises are flattened automatically, so
       JQueryPromise<JQueryPromise<<A>> ≅ JQueryPromise<A>.)
     */
-    return <any> Login.getLoginInfo
+    return <any> Login.getLoginInfo()
       .then(function(loginInfo) {
         return Promise.join(
           List.map(loginInfo.teams, function(team) {

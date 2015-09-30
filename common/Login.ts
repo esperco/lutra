@@ -1,3 +1,5 @@
+/// <reference path="./Watchable.ts" />
+
 module Esper.Login {
   /* Cached UID and API secret and user ID.
      They should be used as long as the API doesn't reject it. */
@@ -6,14 +8,24 @@ module Esper.Login {
     return account !== undefined && account.credentials !== undefined;
   }
 
-  export var watchableAccount = new Esper.Watchable.C<Types.Account>(
+  export var watchableAccount = new Watchable.C<Types.Account>(
     validateAccount, undefined
   );
 
-  export var getLoginInfo : JQueryPromise<ApiT.LoginResponse>;
+  var _loginInfo: JQueryPromise<ApiT.LoginResponse>;
+  export function getLoginInfo(): JQueryPromise<ApiT.LoginResponse> {
+    if (!_loginInfo) {
+      _loginInfo = Api.getLoginInfo()
+        .then(function(loginInfo) {
+          watchableInfo.set(loginInfo);
+          return loginInfo;
+        });
+    }
+    return _loginInfo;
+  }
 
   /* set by getLoginInfo upon success */
-  export var watchableInfo = new Esper.Watchable.C<ApiT.LoginResponse>(
+  export var watchableInfo = new Watchable.C<ApiT.LoginResponse>(
     function(x) { return x !== undefined && x.uid !== undefined; },
     undefined
   );
@@ -43,6 +55,10 @@ module Esper.Login {
     var oldAccount = watchableAccount.get();
     if (! accountEqual(oldAccount, account)) {
       watchableAccount.set(account);
+      watchableInfo.set(undefined);
+      if (account && account.credentials) {
+        getLoginInfo();
+      }
     }
   }
 
@@ -88,7 +104,7 @@ module Esper.Login {
 
   /* Send a Logout request. */
   export function logout() {
-    getLoginInfo = undefined;
+    _loginInfo = undefined;
     watchableInfo.set(undefined);
     if (loggedIn()) {
       var googleAccountId = myGoogleAccountId();

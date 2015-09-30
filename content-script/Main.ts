@@ -13,6 +13,7 @@
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
+/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
@@ -26,7 +27,6 @@
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
 
 /// <reference path="./Update.ts" />
-/// <reference path="./JsonHttp.ts" />
 /// <reference path="./Auth.ts" />
 /// <reference path="./ThreadState.Storage.ts" />
 
