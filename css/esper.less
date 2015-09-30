@@ -69,6 +69,7 @@
 /*** Colors ***/
 @blue: #0080ce;
 @blue_bg: #dfeff7;
+@blue_text: #2A6496;
 @border: #ebebeb;
 @dark_gray: #282828;
 @google_bg_gray: #f5f5f5;
@@ -2462,17 +2463,16 @@ textarea.esper-description-text {
 
   a, a:hover {
     text-decoration: none;
+    font-size: 16px;
   }
 
-  a:hover, td:hover a {
-    color: #2A6496;
-    -webkit-transition: color 0.1s ease-in-out;
-       -moz-transition: color 0.1s ease-in-out;
-         -o-transition: color 0.1s ease-in-out;
-            transition: color 0.1s ease-in-out;
+  span {
+    font-size: 16px;
   }
 
   .ui-datepicker-header {
+    background: none;
+    border: none;
     margin-bottom: 4px;
     text-align: center;
   }
@@ -2492,6 +2492,11 @@ textarea.esper-description-text {
     line-height: 1;
     margin-top: 2px;
     width: 30px;
+    background: none;
+    border: none;
+    &:hover {
+      color: @blue_text;
+    }
   }
   .ui-datepicker-prev {
     float: left;
@@ -2532,23 +2537,32 @@ textarea.esper-description-text {
   }
   .ui-datepicker-calendar td {
     border-radius: 4px;
-    -webkit-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
-       -moz-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
-         -o-transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
-            transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
   }
   .ui-datepicker-calendar td:hover {
     background-color: #eee;
     cursor: pointer;
   }
+  .ui-datepicker-calendar td:hover a {
+    background: none;
+    color: @blue_text;
+    font-weight: normal;
+    transition: color 0.1s ease-in-out;
+  }
   .ui-datepicker-calendar td a {
+    border: none;
+    background: none;
+    text-align: center;
     text-decoration: none;
+    color: @purple;
   }
-  .ui-datepicker-current-day {
-    background-color: #4289cc;
+  .ui-datepicker-calendar .ui-datepicker-current-day {
+    background-color: @purple;
   }
-  .ui-datepicker-current-day a {
-    color: #fff
+  .ui-datepicker-calendar .ui-datepicker-current-day a {
+    background: none;
+    color: #fff;
+    font-weight: normal;
   }
   .ui-datepicker-calendar .ui-datepicker-unselectable:hover {
     background-color: #fff;
