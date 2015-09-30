@@ -103,6 +103,10 @@ module.exports = function(gulp) {
       var cssList = _.map(config.vendorCSSList, function(f) {
         return path.join(getVendorDir(), f);
       });
+      if (!cssList || !cssList.length) {
+        cb(); return;
+      }
+
       var ret = gulp.src(cssList)
         .pipe(sourcemaps.init())
         .pipe(concat(bundleName));
