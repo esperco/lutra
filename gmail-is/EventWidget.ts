@@ -210,9 +210,21 @@ module Esper.EventWidget {
     });
 
     var reminderGuests = List.map(e.guests, function(guest) {
+      var response;
+      var x = guest.response.toLowerCase();
+      if (x === "tentative") {
+        response = ReminderView.GuestResponse.Maybe;
+      } else if (x === "accepted") {
+        response = ReminderView.GuestResponse.Yes;
+      } else if (x === "declined") {
+        response = ReminderView.GuestResponse.No;
+      } else {
+        response = ReminderView.GuestResponse.WaitingForReply;
+      }
       return {
         name:  guest.display_name,
         email: guest.email,
+        response: response,
         checked: false
       };
     });

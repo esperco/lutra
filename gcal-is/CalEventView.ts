@@ -180,10 +180,20 @@ module Esper.CalEventView {
       var guestsState = [];
       guests.each(function() {
         var guest = $(this);
-        var guestEmail = guest.attr("title");
+        var response;
+        if (guest.siblings(".ep-gc-response-maybe").length > 0) {
+          response = ReminderView.GuestResponse.Maybe;
+        } else if (guest.siblings(".ep-gc-response-yes").length > 0) {
+          response = ReminderView.GuestResponse.Yes;
+        } else if (guest.siblings(".ep-gc-response-no").length > 0) {
+          response = ReminderView.GuestResponse.No;
+        } else {
+          response = ReminderView.GuestResponse.WaitingForReply;
+        }
         var state: ReminderView.ReminderGuest = {
           email: guest.attr("title"),
           name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
+          response: response,
           checked: false
         };
         guestsState.push(state);
