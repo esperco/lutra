@@ -1,5 +1,4 @@
 /// <reference path="./ApiT.ts" />
-/// <reference path="./Analytics.ts" />
 /// <reference path="./Watchable.ts" />
 
 module Esper.Login {
@@ -120,10 +119,4 @@ module Esper.Login {
       window.postMessage(esperMessage, "*");
     }
   }
-
-  watchableAccount.watch(function(newAccount, newValid, oldAccount, oldValid) {
-    if (newValid) {
-      Analytics.identify();
-    }
-  });
 }

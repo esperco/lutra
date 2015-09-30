@@ -129,7 +129,6 @@ module Esper.Init {
       TaskTab.init();
       listenForMessages();
       obtainCredentials();
-      Analytics.init();
       Inactivity.init();
       ObserveMessage.init();
       ExtensionOptions.init();

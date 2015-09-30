@@ -11,9 +11,7 @@ var EventEmitter  = require("eventemitter3"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
-    quill         = require("quill"),
-    analytics     = require("analytics"),
-    momentTz      = require("moment-timezone");
+    quill         = require("quill");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -46,8 +44,7 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     React:        react,
-    quill:        quill,
-    analytics:    analytics
+    quill:        quill
   };
   for (var name in assignments) {
     if (assignments.hasOwnProperty(name)) {
@@ -56,6 +53,27 @@ Esper = (function(esperObj) {
   }
   return esperObj;
 })(window.Esper || {});
+
+/*
+  Analytics.js is weird and is tricky to import in a namespace safe manner
+  because of how its build script works. It also seems to rely on import via
+  CDN to set the write key. That's not a viable option for Chrome extensions
+  because of how Chrome's security model works, so we're assuming that
+  analytics.js has already been loaded via another method (e.g. the
+  manifest.json) and we're going to add a load function we can call with the
+  proper writeKey.
+*/
+(function(analytics) {
+  if (! analytics.load) { // Don't override an existing analytics.load
+                          // function (e.g. in case vendor file loaded via an
+                          // injected script and Gmail already defines this)
+    analytics.load = function(writeKey) {
+      this.initialize({
+        "Segment.io": {"apiKey": writeKey}
+      }, {});
+    };
+  }
+})(window.analytics || {});
 
 // Load post-vendor script based on data attributes attached to the script
 var vendorScript = Esper.$("#esper-vendor-script");
