@@ -1,3 +1,8 @@
+/*
+  This file is deprecated. Require packages with
+  require("marten-npm-vendors/package") instead.
+*/
+
 // Make inject function available outside of this function
 module.exports.inject = require("./depends").inject;
 
