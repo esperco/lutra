@@ -16,6 +16,7 @@
 /// <reference path="../marten/typings/lodash/lodash.d.ts" />
 /// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
 /// <reference path="../marten/typings/react/react-global.d.ts" />
+/// <reference path="../marten/typings/quill/quill.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
@@ -32,6 +33,7 @@ declare module Esper {
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
   export var page: PageJS.Static;
+  export var quill: QuillStatic;
 
   // NB: Esper.gmailJs is defined as well, but we'll set the type definitions
   // for this in the gmail-is code.
