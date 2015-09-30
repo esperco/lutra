@@ -848,7 +848,7 @@ module Esper.Menu {
     var menuView = <Menu> _view;
     var teams = Login.myTeams();
 
-    if (currentTeam.get() === undefined) {
+    if (currentTeam.get() === undefined && teams) {
       currentTeam.set(teams[0]);
     }
 

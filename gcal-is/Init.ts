@@ -88,9 +88,8 @@ module Esper.Init {
   function injectEsperControls() {
     Login.printStatus();
     if (Login.loggedIn()) {
-      Api.getLoginInfo()
+      Login.getLoginInfo()
         .done(function(loginInfo) {
-          Login.watchableInfo.set(loginInfo);
           insertTeamSelector(loginInfo.teams);
           CalEventView.init();
         });

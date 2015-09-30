@@ -1,3 +1,7 @@
+/// <reference path="./JsonHttp.ts" />
+/// <reference path="./ApiT.ts" />
+/// <reference path="./Login.ts" />
+
 module Esper.Api {
 
   export function echo(serializable) {

@@ -43,16 +43,8 @@ module Esper.Init {
     Login.printStatus();
     Menu.init();
     if (Login.loggedIn()) {
-      if (Login.getLoginInfo === undefined) {
-        Login.getLoginInfo = Api.getLoginInfo();
-        Login.getLoginInfo
-          .done(function(loginInfo) {
-            Login.watchableInfo.set(loginInfo);
-            /* menu is then created in reaction to this */
-          });
-      }
-
-      Login.getLoginInfo
+      /* menu is then created in reaction to this */
+      Login.getLoginInfo()
         .done(function(loginInfo) {
           Sidebar.init().done(function() {
             ComposeToolbar.init();
