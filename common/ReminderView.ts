@@ -1,7 +1,9 @@
 module Esper.ReminderView {
+  export enum GuestResponse {WaitingForReply, No, Maybe, Yes}
   export interface ReminderGuest {
     email: string;
     name: string;
+    response: GuestResponse;
     checked: boolean;
   }
   interface ReminderState {
@@ -66,7 +68,10 @@ module Esper.ReminderView {
   </div>
   <div>From: <span #viewFromEmail /></div>
   <div>Bcc me? <input #bcc type='checkbox' /></div>
-  <div>To: <ul #toGuests/></div>
+  <div #yesGuests>Yes<br/><ul #yesGuestsList/></div>
+  <div #noGuests>No<br/><ul #noGuestsList/></div>
+  <div #maybeGuests>Maybe<br/><ul #maybeGuestsList/></div>
+  <div #noreplyGuests>Waiting for Reply<br/><ul #noreplyGuestsList/></div>
   <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
 Hello,
 
@@ -78,9 +83,34 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
 
-    List.iter(reminderState.guests, function(guest) {
-      toGuests.append(renderGuest(guest));
+    List.iter(reminderState.guests, function(guest:ReminderGuest) {
+      switch (guest.response) {
+      case GuestResponse.Yes:
+        yesGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.No:
+        noGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.Maybe:
+        maybeGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.WaitingForReply:
+        noreplyGuestsList.append(renderGuest(guest));
+        break;
+      }
     });
+    if (yesGuestsList.is(":empty")) {
+      yesGuests.hide();
+    }
+    if (noGuestsList.is(":empty")) {
+      noGuests.hide();
+    }
+    if (maybeGuestsList.is(":empty")) {
+      maybeGuests.hide();
+    }
+    if (noreplyGuestsList.is(":empty")) {
+      noreplyGuests.hide();
+    }
 
     if (0 < reminderState.time) {
       timeField.val(String(Math.round(reminderState.time / 360) / 10));
