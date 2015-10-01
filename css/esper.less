@@ -66,6 +66,15 @@
   @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
   @import (less) "../marten/vendor/quill/dist/quill.snow.css";
   @import (less) "../marten/vendor/quill/dist/quill.base.css";
+
+  // Override some Quill theming
+  .ql-snow.ql-toolbar {
+    padding: 0; // Use surrounding div for padding
+  }
+
+  .ql-container {
+    min-height: 100px;
+  }
 }
 
 /*** Colors ***/
@@ -1047,6 +1056,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 
 .esper-section-footer {
   padding: 6px 10px;
+  line-height: 2.25em;
   background: @gray_f5;
   border: 1px solid @google_border_gray;
   border-bottom-right-radius: 3px;
@@ -1054,8 +1064,8 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 }
 
 .esper-save-notes {
-  display: block;
-  float: right;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .esper-save-notes,
@@ -1749,6 +1759,11 @@ ul.esper-ev-dropdown {
   margin-top : 8px;
   position: relative;
   z-index: 1; // To fix issue with overlapping with sidebar
+  font-size: 0.8rem;
+}
+
+.esper-cal-picker-container {
+  font-size: 1rem; // Undo previous font-size setting and defer to FC's theming
 }
 
 // Align with right edge with reply / forward (pre-click)
