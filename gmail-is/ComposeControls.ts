@@ -247,6 +247,7 @@ module Esper.ComposeControls {
                 .replace(/\|EXEC\|/g, execName);
               
               composeControls.insertAtCaret(filledTemplate);
+              Analytics.track(Analytics.Trackable.ClickTemplateIcon);
             },
             none : function () {
               // TODO: Handle more gracefully?
