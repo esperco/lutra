@@ -35,7 +35,9 @@ module Esper.Menu {
     }
   }
 
-  function makeActionLink(text, action, danger) {
+  function makeActionLink(text: string,
+                          action: () => void,
+                          danger: boolean) {
     var link = $("<li class='esper-li'/>")
       .text(text)
       .click(action);
@@ -54,6 +56,7 @@ module Esper.Menu {
 
     function openSettings() {
       window.open(Conf.Api.url);
+      Analytics.track(Analytics.Trackable.ClickMenuEditSettings);
     }
 
     var settingsLink = makeActionLink("Edit Settings",
@@ -63,6 +66,7 @@ module Esper.Menu {
       // Can't call Chrome API to open options page directly,
       // post to Event Script
       Message.post(Message.Type.OpenExtensionOptions);
+      Analytics.track(Analytics.Trackable.ClickMenuExtensionOptions);
     }
 
     var optionsLink = makeActionLink("Extension Options",
@@ -71,17 +75,22 @@ module Esper.Menu {
     var agendaLink = makeActionLink("Get Agenda", function() {
       var agendaModal = Agenda.renderModal(currentTeam.get());
       $("body").append(agendaModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
     }, false);
 
     var getTaskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = displayGetTask();
       $("body").append(taskListModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     }, false);
 
     var hr = $("<hr>").addClass("esper-menu-hr");
 
     var helpLink = $("<a class='esper-a'>Get Help</a>")
-      .attr("href", "mailto:support@esper.com");
+      .attr("href", "mailto:support@esper.com")
+      .click(function() {
+        Analytics.track(Analytics.Trackable.ClickMenuGetHelp);
+      });
 
     ul.children().remove();
     ul
@@ -482,6 +491,7 @@ module Esper.Menu {
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
+      Analytics.track(Analytics.Trackable.ClickSendTaskList);
 
       Api.sendTaskList(t, l, p, f, r).done(cancel);
     });
@@ -547,7 +557,7 @@ module Esper.Menu {
 
     logo.dropdown();
     logo.click(function() {
-      Analytics.track(Analytics.Trackable.ClickEsperLogo);
+      Analytics.track(Analytics.Trackable.ClickEsperLogoMenu);
     });
 
     Util.repeatUntil(10, 1000, function() {
