@@ -30,13 +30,22 @@ module TemplatesTab {
     <input type="text" #title size=40/>
   </div>
   <div>
-    <label>Notes:</label>
+    <div #help class="bottom-gap top-gap">
+      Use these tags to construct a template:
+      <button #exec class="button-primary">{EXEC}</button>
+      <button #event class="button-primary">{EVENT}</button>
+    </div>
+    <label>Text:</label>
+    <div #editor class="workflow-notes"/>
     <textarea #notes class="workflow-notes" rows=8
                      placeholder="General notes for the workflow"/>
   </div>
+  <hr style="clear: left"/>
   <button class="button-primary" #save>Save Template</button>
   <button class="button-secondary" #cancel>Cancel</button>
   <button class="button-danger" #deleteTemplate style="float: right">
+  Delete Template
+  </button>
 </div>
 '''
 
@@ -47,6 +56,10 @@ module TemplatesTab {
       tabContainer.children().remove();
       tabContainer.append(load(team, tabContainer));
     }
+
+    exec.click(function() {
+
+    });
 
     save.click(function() {
       var tmpv = <TemplateView> _view;
@@ -68,9 +81,9 @@ module TemplatesTab {
 '''
 <div #view>
   <div #edit class="bottom-gap top-gap" >
-    Choose an existing workflow to edit:
+    Choose an existing template to edit:
     <select class="esper-select" style= "float: none" #editDropdown>
-      <option value="header">Select workflow...</option>
+      <option value="header">Select template...</option>
     </select>
   </div>
   <div #create>
