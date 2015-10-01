@@ -155,6 +155,7 @@ module Esper.ComposeControls {
   <div #templateBadge class="esper-composition-badge">...</div>
   <option value="header">Select template...</option>
 </select>
+<div #editorText/>
 '''
 
     templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
@@ -235,13 +236,16 @@ module Esper.ComposeControls {
                 return str + br + time + " at " + loc;
               }, "");
 
-              var template = tmp.notes;
+              var template = tmp.content;
+              var editor = new quill(editorText.get(0));
+              editor.setContents(JSON.parse(template));
 
               var execName = allPrefs.team.team_name.replace(/ .*$/, "");
               if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
               var filledTemplate =
-                template.replace("|offer|", entry)
-                .replace("|exec|", execName);
+                editor.getHTML().replace(/\|EVENT\|/g, entry)
+                .replace(/\|EXEC\|/g, execName);
+              
               composeControls.insertAtCaret(filledTemplate);
             },
             none : function () {
