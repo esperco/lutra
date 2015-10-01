@@ -829,7 +829,6 @@ module Esper.TaskTab {
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
-    displayEmptyLinkedThreadsList(taskTabView);
     displayLinkedEventsList(team, threadId, taskTabView, linkedEvents);
 
     /* Set function to refresh from outside without passing any arguments  */
@@ -923,6 +922,7 @@ module Esper.TaskTab {
             showMTDrop();
             title = deets.subject;
             if (title === undefined) title = "(no subject)";
+            displayEmptyLinkedThreadsList(taskTabView);
           }
           taskTitle.val(title);
         });
