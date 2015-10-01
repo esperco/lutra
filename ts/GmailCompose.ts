@@ -2,7 +2,7 @@
   Open a Gmail composition window
 */
 
-module GmailCompose {
+module Esper.GmailCompose {
 
   export interface PrefilledMsg {
     to?: string;

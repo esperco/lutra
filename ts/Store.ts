@@ -6,7 +6,7 @@
   Go to the DOM tab and scroll down to "localStorage".
 */
 
-module Store {
+module Esper.Store {
 
   export function set(k, v) {
     localStorage.setItem(k, JSON.stringify(v));

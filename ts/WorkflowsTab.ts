@@ -1,4 +1,4 @@
-module WorkflowsTab {
+module Esper.WorkflowsTab {
 
   interface WorkflowView {
     title : JQuery;

@@ -1,4 +1,4 @@
-module Unixtime {
+module Esper.Unixtime {
 
   export function ofDate(x: Date) {
     return x.getTime() / 1000;

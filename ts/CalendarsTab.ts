@@ -2,7 +2,7 @@
   Team Settings - Calendars Tab
 */
 
-module CalendarsTab {
+module Esper.CalendarsTab {
 
   var calendarAcls = {}; // cache of API call results
 

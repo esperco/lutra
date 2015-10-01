@@ -2,7 +2,7 @@
   Settings Footer
 */
 
-module Footer {
+module Esper.Footer {
 
 /* Added an "onboarding" field so we can hide the footer if we are in onboarding flow .
 Footer.load() can still be called due to default value, only Footer.load(true) will disable. */

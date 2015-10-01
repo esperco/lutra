@@ -2,7 +2,7 @@
   Team Settings - Labels Tab
 */
 
-module LabelsTab {
+module Esper.LabelsTab {
 
   function renderLabelDialog(team, table, teamLabels) {
 '''

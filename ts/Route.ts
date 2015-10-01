@@ -1,5 +1,10 @@
-/* Do the right thing based on the URL */
-module Route {
+/*
+  Do the right thing based on the URL.
+
+  See https://visionmedia.github.io/page.js/ for details on Routing.
+
+*/
+module Esper.Route {
 
   export var nav : any = {}; // FIXME
 
@@ -58,24 +63,17 @@ module Route {
     }
   }
 
-  var Router = window["can"].Control({ // FIXME
-    init : function(el, options) {
-    },
-
-    /* default path /!# */
-    "route" : function(data){
-      withLogin(Page.settings.load);
-    },
+  var paths = {
 
     /* Generic invitation */
-    "t/:token route" : function(data) {
+    "t/:token" : function(data) {
       gotToken(data.token);
     },
 
     /* DEPRECATED - Use signup2 instead.
        Gift code (same as generic invitation but collect also
        an email address and a name. */
-    "redeem/:token/:email/:name/:platform route" : function(data) {
+    "redeem/:token/:email/:name/:platform" : function(data) {
       Log.d(data);
       if (isIOS()) {
         openIOSapp(data.token, data.email, data.name);
@@ -85,7 +83,7 @@ module Route {
     },
 
     /* Sign-in via Google */
-    "login-once/:uid/:hex_landing_url route" : function(data) {
+    "login-once/:uid/:hex_landing_url" : function(data) {
       var landing_url = Util.hexDecode(data.hex_landing_url);
       if (isIOS() && landing_url == "esper:login1") {
         fallbackOnAppStore();
@@ -95,33 +93,33 @@ module Route {
       }
     },
 
-    "login/:email route" : function(data) {
+    "login/:email" : function(data) {
       var close = function() { window.close(); };
       withLogin(close, undefined, data.email);
     },
 
     /* various pages */
 
-    "team-settings/:teamid route" : function (data) {
+    "team-settings/:teamid" : function (data) {
       withLogin(function() {
         Page.teamSettings.load(data.teamid);
       });
     },
 
     // Intentionally not requiring login for this
-    "join route": function (data) {
+    "join": function (data) {
       Page.onboarding.load();
     },
 
-    "join-from-login route": function (data) {
+    "join-from-login": function (data) {
       Page.onboarding.load(0, {fromLogin: true});
     },
 
-    "join/exchange route": function (data) {
+    "join/exchange": function (data) {
       Page.onboarding.load(0, {exchange: true});
     },
 
-    "join/:step route" : function (data) {
+    "join/:step" : function (data) {
       let step = parseInt(data.step) || 0;
       if (step) {
         withLogin(function() {
@@ -132,7 +130,7 @@ module Route {
       }
     },
 
-    "join/exchange/:step route" : function (data) {
+    "join/exchange/:step" : function (data) {
       let step = parseInt(data.step) || 0;
       if (step) {
         withLogin(function() {
@@ -143,18 +141,18 @@ module Route {
       }
     },
 
-    "plans/:teamid route" : function (data) {
+    "plans/:teamid" : function (data) {
       withLogin(Page.plans.load, data.teamid);
     },
 
-    "payment/:teamid route" : function (data) {
+    "payment/:teamid" : function (data) {
       withLogin(function() {
         Page.payment.load(data.teamid);
       });
     },
 
     // DEPRECATED - use signup2 or join instead
-    "signup/:fn/:ln/:phone/:email/:platform route" : function (data) {
+    "signup/:fn/:ln/:phone/:email/:platform" : function (data) {
       var signup = {
         first_name: data.fn,
         last_name: data.ln,
@@ -170,7 +168,7 @@ module Route {
       }
     },
 
-    "signup2/:fn/:ln/:phone/:email/:platform/*:token? route" : function (data) {
+    "signup2/:fn/:ln/:phone/:email/:platform/*:token?" : function (data) {
       var signup = {
         first_name: data.fn,
         last_name: data.ln,
@@ -190,42 +188,82 @@ module Route {
       }
     },
 
-    "preferences route" : function (data) {
+    "preferences" : function (data) {
       withLogin(Page.preferences.load);
     },
 
-    "usage-period/:teamid/:start route" : function (data) {
+    "usage-period/:teamid/:start" : function (data) {
       withLogin(function() {
         Page.usagePeriod.load(data.teamid, data.start);
       });
     },
 
-    "test route": function(data) {
-      Page.test.load();
+    "settings": function(data) {
+      withLogin(Page.settings.load);
     },
 
+    "test": function(data) {
+      Page.test.load();
+    }
+  };
+
+  // Use pageJs to connect old paths in hash above to routing
+  _.each(paths, function(callback: (data: any) => void, pathStr: string) {
+    if (pathStr[0] !== "/") { pathStr = "/" + pathStr; }
+    pageJs(pathStr, function(context) {
+      callback(context.params);
+    });
+  });
+
+  // Home page -- distinguish between "#" (does nothing) and "#!" (home)
+  var init = true;
+  pageJs("", function(ctx) {
+    if (init || ctx.pathname.indexOf("!") >= 0) {
+      init = false;
+      pageJs.redirect("/settings");
+    }
+  });
+
+  // Catch all
+  pageJs("*", function(ctx) {
+    // Correct random prefix errors
+    if (ctx.path[0] !== "/") {
+      pageJs.redirect("/" + ctx.path);
+    } else if (ctx.path.slice(0,2) === "//") {
+      pageJs.redirect(ctx.path.slice(1));
+    } else {
+      // 404
+      Page.notFound.load();
+      Log.e(ctx);
+    }
   });
 
   /* Navigation functions (set the URL, let the router react to the changes) */
 
-  /* e.g. route.nav.path("#!a/b/c") goes to URL /#!a/b/c */
+  /* e.g. route.nav.path("a/b/c") goes to URL /#!/a/b/c */
   nav.path = function(frag: string) {
-    if (frag[0] === "!") {
-      frag = "#" + frag;
-    } else if (frag[0] !== "#") {
-      frag = "#!" + frag;
+    if (frag[0] === "#") {
+      frag = frag.slice(1);
     }
-    location.hash = frag;
+    if (frag[0] === "!") {
+      frag = frag.slice(1);
+    }
+    if (frag[0] !== "/") {
+      frag = "/" + frag;
+    }
+    pageJs(frag);
   };
 
   nav.home = function() {
-    nav.path("#!");
+    nav.path("");
   };
 
   /* Initialization */
   export function setup() {
-    var router = new Router(window);
-    window["can"].route.ready(); // FIXME
+    pageJs({
+      click: false,
+      hashbang: true
+    });
   };
 
 }

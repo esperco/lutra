@@ -2,7 +2,7 @@
   Segment client
 */
 
-module Analytics {
+module Esper.Analytics {
 
   // Type definitions - consider moving to its own d.ts file ////////////
   // https://segment.com/docs/libraries/analytics.js/

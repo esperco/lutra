@@ -1,7 +1,7 @@
 /*
   Current plans open to new subscriptions
 */
-module Plan {
+module Esper.Plan {
   export var canceled = "Canceled_20150812";
   export var lo = "Silver_20150812";
   export var med = "Gold_20150812";

@@ -3,7 +3,7 @@
   by HTTP calls)
 */
 
-module Promise {
+module Esper.Promise {
 
   /* wrap an already-computed value into a Promise object,
      indicating a successful computation. */
