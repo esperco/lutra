@@ -2,7 +2,7 @@
   Unit testing
 */
 
-module Test {
+module Esper.Test {
 
   function append(nodes) {
     $("#test-content").append(nodes);

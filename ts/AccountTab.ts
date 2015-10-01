@@ -2,7 +2,7 @@
   Team Settings - Account Tab
 */
 
-module AccountTab {
+module Esper.AccountTab {
   declare var Stripe : any;
   declare var moment : any;
 

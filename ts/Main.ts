@@ -1,19 +1,6 @@
 // Include all references prior to Main. If not referenced, TSC will not
-// bundle into app.js
-
-
-/* Definition files */
-
-/// <reference path="../setup/ts/jquery.d.ts"/>
-/// <reference path="../setup/ts/jqueryui.d.ts"/>
-/// <reference path="../setup/ts/fullCalendar.d.ts"/>
-
-
-/* Conf.ts is created from DevConf.ts or ProdConf.ts during the corresponding
-   development or producation build process */
-
-/// <reference path="Conf.ts"/>
-
+// bundle into app.js. Main is in turn loaded from the Dev or Prod files
+// accordingly.
 
 /* Main modules */
 
@@ -60,7 +47,9 @@
 /// <reference path="Route.ts"/>
 
 
-module Main {
+
+
+module Esper.Main {
 
   function main() {
     Analytics.init();

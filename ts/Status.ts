@@ -6,7 +6,7 @@
   and we cannot override it.
 */
 
-module Status {
+module Esper.Status {
 
   export function report(msg, kind) {
     var container = $("#global-status");

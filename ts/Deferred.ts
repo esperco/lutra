@@ -3,7 +3,7 @@
   by HTTP calls)
 */
 
-module Deferred {
+module Esper.Deferred {
 
   /* wrap an already-computed value into a Deferred object,
      indicating a successful computation. */

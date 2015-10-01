@@ -5,7 +5,7 @@
   in all its views.
 */
 
-module Cache {
+module Esper.Cache {
 
   /*
     Take a time-to-live in seconds and an object providing the methods:

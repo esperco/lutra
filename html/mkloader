@@ -1,5 +1,0 @@
-#! /bin/sh
-
-for x in $*; do
-    echo "    <script src=\"/assets/js/$x\"></script>"
-done

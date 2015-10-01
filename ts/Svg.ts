@@ -2,7 +2,7 @@
  * Replace all SVG images with inline SVG
  */
 
-module Svg {
+module Esper.Svg {
 
   var access = {
     get: function(k) {

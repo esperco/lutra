@@ -2,7 +2,7 @@
   Various simple utilities
 */
 
-module Util {
+module Esper.Util {
 
   var undef;
 

@@ -3,7 +3,7 @@
   retrieved from the user's calendar.
 */
 
-module CalPicker {
+module Esper.CalPicker {
 
   export var teamCalendar : ApiT.Calendar;
 

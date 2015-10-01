@@ -1,4 +1,4 @@
-module UsageTab {
+module Esper.UsageTab {
   export function load(team: ApiT.Team): JQuery {
 '''
 <div #view>

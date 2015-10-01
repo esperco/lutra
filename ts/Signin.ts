@@ -35,7 +35,7 @@
 
 */
 
-module Signin {
+module Esper.Signin {
 
   function requestGoogleAuth(url) {
     Log.d("Going off to " + url);

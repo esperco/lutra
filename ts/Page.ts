@@ -1,4 +1,4 @@
-module Page {
+module Esper.Page {
 
   /*
     Elements to be shown or hidden for each page are defined by the
@@ -14,7 +14,8 @@ module Page {
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
     "usage": {ids:["usage-page"]},
-    "usage-period": {ids:["usage-period-page"]}
+    "usage-period": {ids:["usage-period-page"]},
+    "not-found": {ids:["not-found-page"]}
   }, undefined);
 
   function showPage(k, properties?: Object) {
@@ -47,6 +48,14 @@ module Page {
       Log.d("TeamSettings.load()", teamid);
       TeamSettings.load(teamid);
       Util.focus();
+    }
+  }
+
+  export var notFound: Loadable = {
+    load: function() {
+      pageSelector.hideAll();
+      showPage("not-found");
+      Log.d("notFound.load()");
     }
   }
 
@@ -88,8 +97,6 @@ module Page {
     }
   }
 
-
-
   export var test : Loadable = {
     load: function() {
       pageSelector.hideAll();
@@ -105,7 +112,7 @@ module Page {
       pageSelector.hideAll();
       showPage("preferences");
       Log.d("Loaded executive preferences!");
-      Esper.ExecutivePreferences.load();
+      ExecutivePreferences.load();
       Util.focus();
     }
   }

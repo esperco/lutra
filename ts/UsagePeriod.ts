@@ -1,4 +1,4 @@
-module UsagePeriod {
+module Esper.UsagePeriod {
   interface MainView {
     view: JQuery;
     subStatusContainer: JQuery;
@@ -14,7 +14,7 @@ module UsagePeriod {
 <div #view class="settings-container">
   <div class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
-    <a #logoContainer href="#"
+    <a #logoContainer href="#!"
        class="img-container-left"/>
     <a href="#!" #headerSettings class="header-title">Settings</a>
     <span #arrowContainer1 class="img-container-left"/>
@@ -459,7 +459,7 @@ Unlimited usage. Nothing to approve.
     }
 
     /* Total number of seconds */
-    var t = new Esper.Watchable.C<number>(function(x) { return true; },
+    var t = new Watchable.C<number>(function(x) { return true; },
                                           init);
     t.watch(changeHandler);
     fillBoxes(init);

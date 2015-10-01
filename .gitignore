@@ -4,3 +4,5 @@ log
 pub
 .DS_Store
 node_modules
+.bowerrc
+marten

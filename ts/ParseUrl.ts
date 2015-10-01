@@ -2,7 +2,7 @@
   URL parsing
 */
 
-module ParseUrl {
+module Esper.ParseUrl {
 
   export function parse(url) {
     var x = document.createElement('a');

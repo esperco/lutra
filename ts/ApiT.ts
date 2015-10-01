@@ -1,4 +1,4 @@
-module ApiT {
+module Esper.ApiT {
   /*
     The following type definitions were translated manually
     from wolverine/types/api.atd.

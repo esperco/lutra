@@ -2,7 +2,7 @@
   Main settings page
 */
 
-module Settings {
+module Esper.Settings {
 
   export function resetOverlay(overlay) {
     if (overlay.view.hasClass("invite-popover")) {

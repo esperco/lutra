@@ -4,7 +4,7 @@
 
 /// <reference path="TeamSettings.ts"/>
 
-module Onboarding {
+module Esper.Onboarding {
   // Interface for references from string names to jQuery wrapper
   interface IJQMap {
     [index: string]: JQuery;
