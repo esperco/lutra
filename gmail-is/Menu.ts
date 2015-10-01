@@ -214,7 +214,7 @@ module Esper.Menu {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientEmails rows="4" cols="50" />
+              <textarea #recipientTextArea rows="4" cols="50" />
             </td>
           </tr>
         </table>
@@ -387,21 +387,21 @@ module Esper.Menu {
         allLabels.find("label > input").prop("checked", false);
     });
 
-    recipientEmails.val(Login.myEmail() + ", ");
+    recipientTextArea.val(Login.myEmail() + ", ");
 
     function appendEmailToTextarea() {
-      var emails = recipientEmails.val();
+      var emails = recipientTextArea.val();
       if ($(this).is(":checked")) {
         if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
           // If the current textarea of emails is blank
           // or if there is a comma at the end, don't prepend comma
-          recipientEmails.val(emails + $(this).val() + ", ");
+          recipientTextArea.val(emails + $(this).val() + ", ");
         else
-          recipientEmails.val(emails + ", " + $(this).val() + ", ");
+          recipientTextArea.val(emails + ", " + $(this).val() + ", ");
       } else {
         // Match against the email and the tailing comma and whitespaces
         var regex = new RegExp($(this).val() + ",? *", "i");
-        recipientEmails.val(emails.replace(regex, ""));
+        recipientTextArea.val(emails.replace(regex, ""));
       }
     }
 
@@ -424,12 +424,12 @@ module Esper.Menu {
       s.appendTo(recipients);
     }
 
-    _.forEach(teams, function(team) {
-      var teamEmails = _.map(team.team_assistants, function(uid: string){
+    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
+      var teamEmails = _.map(team.team_assistants, function(uid: string) {
         return Teams.getProfile(uid).email;
       });
-      _.forEach(teamEmails, addRecipientCheckboxes);
-    });
+    }));
+    _.forEach(recipientEmails, addRecipientCheckboxes);
 
     renderTasks();
     view.click(cancel);
@@ -452,7 +452,7 @@ module Esper.Menu {
         return box.value;
       });
       var f = htmlFormat.prop("checked");
-      var r = _.filter(recipientEmails.val().split(/, /),
+      var r = _.filter(recipientTextArea.val().split(/, /),
         function(s: string) { return s !== ""; });
 
       function notEmpty(list, arg) {

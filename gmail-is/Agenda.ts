@@ -212,7 +212,7 @@ module Esper.Agenda {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientEmails rows="4" cols="50" />
+              <textarea #recipientTextArea rows="4" cols="50" />
             </td>
           </tr>
         </table>
@@ -233,7 +233,7 @@ module Esper.Agenda {
     teamSelectToggle.dropdown();
     timezoneSelectToggle.dropdown();
     filterSelectToggle.dropdown();
-    recipientEmails.val(Login.myEmail() + ", ");
+    recipientTextArea.val(Login.myEmail() + ", ");
 
     function cancel() { view.remove(); }
 
@@ -329,18 +329,18 @@ module Esper.Agenda {
     });
 
     function appendEmailToTextarea() {
-      var emails = recipientEmails.val();
+      var emails = recipientTextArea.val();
       if ($(this).is(":checked")) {
         if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
           // If the current textarea of emails is blank
           // or if there is a comma at the end, don't prepend comma
-          recipientEmails.val(emails + $(this).val() + ", ");
+          recipientTextArea.val(emails + $(this).val() + ", ");
         else
-          recipientEmails.val(emails + ", " + $(this).val() + ", ");
+          recipientTextArea.val(emails + ", " + $(this).val() + ", ");
       } else {
         // Match against the email and the tailing comma and whitespaces
         var regex = new RegExp($(this).val() + ",? *", "i");
-        recipientEmails.val(emails.replace(regex, ""));
+        recipientTextArea.val(emails.replace(regex, ""));
       }
     }
 
@@ -363,12 +363,12 @@ module Esper.Agenda {
       s.appendTo(recipients);
     }
 
-    _.forEach(teams, function(team) {
-      var teamEmails = _.map(team.team_assistants, function(uid: string){
+    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
+      return _.map(team.team_assistants, function(uid: string) {
         return Teams.getProfile(uid).email;
       });
-      _.forEach(teamEmails, addRecipientCheckboxes);
-    });
+    }));
+    _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.eventRange(currentTeam.teamid,
                    currentTeam.team_calendars,
@@ -438,7 +438,7 @@ module Esper.Agenda {
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       u.setHours(23, 59, 59, 999);
-      var r = _.filter(recipientEmails.val().split(/, /),
+      var r = _.filter(recipientTextArea.val().split(/, /),
         function(s: string) { return s !== ""; });
 
       function notEmpty(list, arg) {
