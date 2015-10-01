@@ -97,9 +97,12 @@ module Esper.InThreadControls {
   savingTaskNotes.watch(function(saving) {
     if (saving) {
       taskNoteElms.status.get().show()
-      taskNoteElms.button.get().prop("disabled", true);
+      taskNoteElms.button.get()
+        .prop("disabled", true)
+        .text("Saving");
     } else {
       taskNoteElms.status.get().hide();
+      taskNoteElms.button.get().text("Saved");
     }
   });
 
@@ -294,6 +297,7 @@ module Esper.InThreadControls {
         saveTaskNotes.prop("disabled", true);
       } else {
         saveTaskNotes.prop("disabled", false);
+        saveTaskNotes.text("Save");
       }
 
       // Set a timer to save after 1 second of not typing
