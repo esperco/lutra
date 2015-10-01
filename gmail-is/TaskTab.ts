@@ -89,6 +89,13 @@ module Esper.TaskTab {
       });
   }
 
+  function displayEmptyLinkedThreadsList(taskTab: TaskTabView) {
+'''
+<div #noThreads class="esper-no-threads"> No linked emails</div>
+'''
+    taskTab.linkedThreadsList.empty().append(noThreads);
+  }
+
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
@@ -97,7 +104,7 @@ module Esper.TaskTab {
 '''
     taskTab.linkedThreadsList.children().remove();
 
-    List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
+    List.iter(task.task_threads || [], function(thread : ApiT.EmailThread) {
       var linkedThreadId = thread.gmail_thrid;
       if (linkedThreadId !== threadId) {
 '''
@@ -123,7 +130,7 @@ module Esper.TaskTab {
           li.remove();
           if (threadsList.children("li").length === 0) {
             threadsList.remove();
-            taskTab.linkedThreadsList.append(noThreads);
+            displayEmptyLinkedThreadsList(taskTab);
             taskTab.showLinkedThreads.click();
           }
         });
@@ -135,7 +142,7 @@ module Esper.TaskTab {
     if (threadsList.children("li").length > 0) {
       taskTab.linkedThreadsList.append(threadsList);
     } else {
-      taskTab.linkedThreadsList.append(noThreads);
+      displayEmptyLinkedThreadsList(taskTab);
       taskTab.showLinkedThreads.click();
     }
   }
@@ -805,6 +812,7 @@ module Esper.TaskTab {
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
+    displayEmptyLinkedThreadsList(taskTabView);
     displayLinkedEventsList(team, threadId, taskTabView, linkedEvents);
 
     /* Set function to refresh from outside without passing any arguments  */
