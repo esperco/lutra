@@ -546,8 +546,8 @@ module Esper.Menu {
       logo.addClass("esper-menu-white");
       logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-white.svg");
     } else {
-      logo.addClass("esper-menu-black");
-      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
+      logo.addClass("esper-menu-purple");
+      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-purple.svg");
     }
 
     /* Try to use the same color as Google, which depends on the theme. */
