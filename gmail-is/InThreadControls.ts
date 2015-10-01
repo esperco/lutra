@@ -286,17 +286,25 @@ module Esper.InThreadControls {
 
     enableHighlightToTaskNotes(editor, saveTaskNotes);
 
+    var timer: number;
     function taskNotesKeyup(notes) {
-      if (editor.getHTML() === notes || 
-          JSON.stringify(editor.getContents()) === notesQuill) 
+      if (editor.getHTML() === notes ||
+          JSON.stringify(editor.getContents()) === notesQuill)
       {
         saveTaskNotes.prop("disabled", true);
       } else {
         saveTaskNotes.prop("disabled", false);
       }
+
+      // Set a timer to save after 1 second of not typing
+      clearTimeout(timer);
+      timer = setTimeout(saveTaskNotesAction, 1000);
     }
 
-    saveTaskNotes.click(function() {
+    function saveTaskNotesAction() {
+      if (savingTaskNotes.get()) { // Already saving => don't save twice
+        return;
+      }
       CurrentThread.currentTeam.get().match({
         some : function (team) {
           savingTaskNotes.set(true);
@@ -314,7 +322,9 @@ module Esper.InThreadControls {
           return;
         }
       });
-    });
+    }
+
+    saveTaskNotes.click(saveTaskNotesAction);
 
     return container;
   }
