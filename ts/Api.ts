@@ -753,15 +753,15 @@ module Api {
       return jsonHttpPost(url, "");
   }
 
-  export function updateTemplate(teamid, templateid, workflow: ApiT.Template)
+  export function updateTemplate(teamid, templateid, template: ApiT.Template)
       : JQueryDeferred<void> {
       var url = "/api/templates/update/" + string(Login.me())
           + "/" + string(teamid)
           + "/" + string(templateid);
-      return jsonHttpPut(url, JSON.stringify(workflow));
+      return jsonHttpPut(url, JSON.stringify(template));
   }
 
-  export function deleteTemplate(teamid, workflowid)
+  export function deleteTemplate(teamid, templateid)
       : JQueryDeferred<void> {
       var url = "/api/templates/delete/" + string(Login.me())
           + "/" + string(teamid)

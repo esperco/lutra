@@ -4,44 +4,23 @@
 
 module TemplatesTab {
 
-  interface WorkflowView {
+  interface TemplateView {
     title: JQuery;
     notes: JQuery;
   }
 
   function saveChanges(team: ApiT.Team,
-                       wf: ApiT.Workflow,
-                       wfv: WorkflowView,
-                       s: ApiT.WorkflowStep,
-                       sv: StepView): JQueryPromise<void> {
-    var newTitle = wfv.title.val();
-    if (newTitle.length > 0) wf.title = newTitle;
-    wf.notes = wfv.notes.val();
+                       tmp: ApiT.Template,
+                       tmpv: TemplateView): JQueryPromise<void> {
+    var newTitle = tmpv.title.val();
+    if (newTitle.length > 0) tmp.title = newTitle;
+    tmp.notes = tmpv.notes.val();
 
-    if (s) { // Are we editing a step?
-      var step = List.find(wf.steps, function(x) {
-        return x.id === s.id;
-      });
-
-      var newStepTitle = sv.title.val();
-      if (newStepTitle.length > 0) step.title = newStepTitle;
-      step.notes = sv.notes.val();
-
-      var newChecklist = [];
-      sv.checklist.find("input:text").each(function() {
-        var input = $(this).val();
-        if (input.length > 0) {
-          newChecklist.push({ text: input, checked: false });
-        }
-      });
-      step.checklist = newChecklist;
-    }
-
-    return Api.updateWorkflow(team.teamid, wf.id, wf);
+    return Api.updateTemplate(team.teamid, tmp.id, tmp);
   }
 
-  function viewOfWorkflow(team: ApiT.Team,
-                          wf: ApiT.Workflow,
+  function viewOfTemplate(team: ApiT.Team,
+                          tmp: ApiT.Template,
                           prefs: ApiT.Preferences,
                           tabContainer: JQuery) {
 '''
@@ -55,13 +34,14 @@ module TemplatesTab {
     <textarea #notes class="workflow-notes" rows=8
                      placeholder="General notes for the workflow"/>
   </div>
-  <button class="button-primary" #save>Save Workflow</button>
+  <button class="button-primary" #save>Save Template</button>
   <button class="button-secondary" #cancel>Cancel</button>
+  <button class="button-danger" #deleteTemplate style="float: right">
 </div>
 '''
 
-    title.val(wf.title);
-    if (wf.notes.length > 0) notes.val(wf.notes);
+    title.val(tmp.title);
+    if (tmp.notes.length > 0) notes.val(tmp.notes);
 
     function reload() {
       tabContainer.children().remove();
@@ -69,11 +49,17 @@ module TemplatesTab {
     }
 
     save.click(function() {
-      var wfv = <WorkflowView> _view;
-      saveChanges(team, wf, wfv, currentStep, currentStepView).done(reload);
+      var tmpv = <TemplateView> _view;
+      saveChanges(team, tmp, tmpv).done(reload);
     });
 
     cancel.click(reload);
+
+    deleteTemplate.click(function() {
+      var ok =
+        confirm("Are you sure you want to delete template " + tmp.title + "?");
+      if (ok) Api.deleteTemplate(team.teamid, tmp.id).done(reload);
+    });
 
     return view;
   }
@@ -91,7 +77,7 @@ module TemplatesTab {
     <input #createTitle type="text" size=40 placeholder="Template title" />
     <button class="button-primary" #createButton> Create Template</button>
   </div>
-  <div #workflow>
+  <div #template>
     <big #nowEditing/>
   </div>
 </div>
@@ -99,36 +85,36 @@ module TemplatesTab {
     Api.getPreferences(team.teamid).done(function(prefs) {
       var preferences = $.extend(true, Preferences.defaultPreferences(), prefs);
 
-      Api.listWorkflows(team.teamid).done(function(response) {
-        if (response.workflows.length > 0) {
-          var wfById: { [wfid: string]: ApiT.Workflow } = {};
-          List.iter(response.workflows, function(wf) {
-            var opt = ("<option value='" + wf.id + "'>" + wf.title + "</option>");
-            wfById[wf.id] = wf;
+      Api.listTemplates(team.teamid).done(function(response) {
+        if (response.templates.length > 0) {
+          var tmpById: { [tmpid: string]: ApiT.Template } = {};
+          List.iter(response.templates, function(tmp) {
+            var opt = ("<option value='" + tmp.id + "'>" + tmp.title + "</option>");
+            tmpById[tmp.id] = tmp;
             editDropdown.append(opt);
           });
           editDropdown.change(function() {
             var chosen = $(this).val();
             if (chosen !== "header") {
-              var wf = wfById[chosen];
+              var tmp = tmpById[chosen];
               edit.hide();
               create.hide();
-              nowEditing.text("Editing workflow: " + wf.title);
-              workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+              nowEditing.text("Editing template: " + tmp.title);
+              template.append(viewOfTemplate(team, tmp, preferences, tabContainer));
             }
           });
         } else {
-          editDropdown.replaceWith($("<i>(No current workflows)</i>"));
+          editDropdown.replaceWith($("<i>(No current templates)</i>"));
         }
       });
 
       createButton.click(function() {
         var title = createTitle.val();
         if (title.length > 0) {
-          Api.createWorkflow(team.teamid, title).done(function(wf) {
+          Api.createTemplate(team.teamid, title).done(function(tmp) {
             create.hide();
-            nowEditing.text("Editing workflow: " + title);
-            workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
+            nowEditing.text("Editing template: " + title);
+            template.append(viewOfTemplate(team, tmp, preferences, tabContainer));
           });
         }
       });

@@ -517,6 +517,16 @@ type token_response = [
     workflows : Workflow[];
   }
 
+  export interface Template {
+    id: string;
+    title: string;
+    notes: string;
+  }
+
+  export interface UserTemplates {
+    templates: Template[];
+  }
+
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
 
   export interface WorkflowStep {
