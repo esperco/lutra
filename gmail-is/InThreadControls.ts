@@ -96,10 +96,10 @@ module Esper.InThreadControls {
 
   savingTaskNotes.watch(function(saving) {
     if (saving) {
-      taskNoteElms.status.get().html("Saving &hellip;")
+      taskNoteElms.status.get().show()
       taskNoteElms.button.get().prop("disabled", true);
     } else {
-      taskNoteElms.status.get().html("");
+      taskNoteElms.status.get().hide();
     }
   });
 
@@ -230,9 +230,9 @@ module Esper.InThreadControls {
         Save
         </button>
       </span>
+      <span #saveStatus class="esper-spinner esper-save-status" />
     </div>
   </div>
-  <span #saveStatus class="esper-save-status" />
 </div>
 '''
     taskNoteElms.button.set(saveTaskNotes);
