@@ -1,8 +1,7 @@
 /* jshint strict: false */
 
 // Helpers
-var vendors       = require("marten-npm-vendors");
-var inject        = vendors.inject;
+var inject        = require("marten-npm-vendors/depends").inject;
 
 // Bower packages
 var EventEmitter  = require("eventemitter3"),
@@ -24,7 +23,7 @@ var SHA1          = require("./marten/vendor/crypto-js/sha1.js");
 // TODO: Look into finding a way to easily freeze NPM dependencies without
 // having to freeze the entire node_modules directory.
 //
-var page = vendors.page;
+var page = require("marten-npm-vendors/page");
 
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
