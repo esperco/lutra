@@ -968,13 +968,6 @@ module Esper.CalPicker {
           "tooltipClass": "esper-top esper-tooltip"
         });
 
-        window.onresize = function(event) {
-          picker = createPicker(refreshCal, userInfo, team, tpref);
-          calendar.children().remove();
-          calendar.append(picker.view);
-          picker.render();
-        };
-
         cancel.click(closeView);
 
         save.click(function() {
