@@ -95,4 +95,41 @@ module Esper.Modal {
 
     return modal;
   }
+
+  /** Dialog box with Ok and Cancel buttons. */
+  export function okCancelDialog(title : string, body : JQuery,
+                                 onCommit? : () => boolean) : Modal {
+'''
+<button #cancelButton class="esper-btn">
+  Cancel
+</button>
+<button #okButton class="esper-btn esper-btn-primary modal-primary">
+  Ok
+</button>
+'''
+    var closeBox = makeCloseBox();
+    var modal = empty();
+
+    modal.header.text(title);
+    modal.header.append(closeBox);
+    modal.content.append(body);
+
+    modal.footer.append(cancelButton);
+    modal.footer.append(okButton);
+
+    function commitView() {
+      if (! onCommit || onCommit()) {
+        modal.view.remove();
+      }
+    }
+    function closeView() {
+      modal.view.remove();
+    }
+    okButton.click(commitView);
+    cancelButton.click(closeView);
+    closeBox.click(closeView);
+    modal.view.click(closeView);
+
+    return modal;
+  }
 }
