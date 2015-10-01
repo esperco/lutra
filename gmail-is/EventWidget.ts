@@ -156,29 +156,29 @@ module Esper.EventWidget {
                    esper-clickable esper-ev-disclose"/>
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
-      <li #editEvent
-          class="esper-li">
-        Edit
-      </li>
       <li #inviteGuests
           class="esper-li">
         Invite guests
       </li>
-      <li #reminder
-          class="esper-li">
-        Reminder
-      </li>
-      <li #unlinkEvent
-          class="esper-li">
-        Unlink
-      </li>
-      <li #deleteEvent
-          class="esper-li esper-danger">
-        Delete from calendar
-      </li>
       <li #chooseThisEvent
           class="esper-li">
         Choose this event
+      </li>
+      <li #editEvent
+          class="esper-li">
+        Edit event
+      </li>
+      <li #reminder
+          class="esper-li">
+        Set reminder
+      </li>
+      <li #unlinkEvent
+          class="esper-li">
+        Unlink event
+      </li>
+      <li #deleteEvent
+          class="esper-li esper-danger">
+        Delete event
       </li>
     </div>
     <div class="esper-click-safe esper-drop-ul-divider"/>
