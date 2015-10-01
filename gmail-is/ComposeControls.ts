@@ -150,87 +150,107 @@ module Esper.ComposeControls {
   /** Inserts a canned response template into the text box. */
   function templateButton(composeControls) {
 '''
-<div #templateButton title class="esper-composition-button">
+<select #templateButton title class="esper-select esper-composition-button">
   <object #templateIcon class="esper-svg esper-composition-button-icon"/>
   <div #templateBadge class="esper-composition-badge">...</div>
-</div>
+  <option value="header">Select template...</option>
+</select>
 '''
 
     templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
 
+    var templates: ApiT.Template[];
+
+    CurrentThread.currentTeam.get().match({
+      some: function(team) {
+        Api.listTemplates(team.teamid).done(function(response) {
+          templates = response.templates;
+          List.iter(templates, function(tmp) {
+            $("<option value='" + tmp.id + "'>" + tmp.title + "</option>")
+              .appendTo(templateButton);
+          });
+        });
+      },
+      none: function() {}
+    });
+
     templateButton.tooltip({
       show: { delay: 500, effect: "none" },
       hide: { effect: "none" },
-      content: "Insert canned response template",
+      content: "Insert custom template",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "esper-top esper-tooltip"
     });
 
-    templateButton.click(function (e) {
-      CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
-        teamAndPrefs.match({
-          some : function (allPrefs) {
+    templateButton.change(function (e) {
+      var chosen = $(this).val();
+      if (chosen !== "header") {
+        CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
+          teamAndPrefs.match({
+            some : function (allPrefs) {
 
-            // We can insert template right away, but start task creation
-            // in the background.
-            CurrentThread.getTaskForThread();
+              // We can insert template right away, but start task creation
+              // in the background.
+              CurrentThread.getTaskForThread();
 
-            var execTz, guestTz;
-            var general = allPrefs.execPrefs.general;
-            if (general) execTz = general.current_timezone;
-            allPrefs.taskPrefs.match({
-              some: function(tpref) {
-                if (tpref.executive_timezone) {
-                  execTz = tpref.executive_timezone; // overrides preferences
+              var tmp = List.find(templates, function(tmp) {
+                return tmp.id === chosen;
+              });
+
+              var execTz, guestTz;
+              var general = allPrefs.execPrefs.general;
+              if (general) execTz = general.current_timezone;
+              allPrefs.taskPrefs.match({
+                some: function(tpref) {
+                  if (tpref.executive_timezone) {
+                    execTz = tpref.executive_timezone; // overrides preferences
+                  }
+                  guestTz = tpref.guest_timezone;
+                },
+                none: function() { }
+              });
+
+              var events = CurrentThread.linkedEvents.get();
+              events.filter(function (e) {
+                if (e.task_event.end) {
+                  return new Date(e.task_event.end.local) > new Date(Date.now());
+                } else {
+                  return new Date(e.task_event.start.local) > new Date(Date.now());
                 }
-                guestTz = tpref.guest_timezone;
-              },
-              none: function() { }
-            });
+              });
 
-            var events = CurrentThread.linkedEvents.get();
-            events.filter(function (e) {
-              if (e.task_event.end) {
-                return new Date(e.task_event.end.local) > new Date(Date.now());
-              } else {
-                return new Date(e.task_event.start.local) > new Date(Date.now());
-              }
-            });
-
-            var entry = events.reduce(function (str, event): string {
-              var ev = event.task_event;
-              var time = formatStartTime(ev, execTz, guestTz);
-              var loc;
-              if (ev.location !== undefined) {
-                loc = ev.location.address;
-                if (ev.location.title !== "") {
-                  loc = ev.location.title + " - " + loc;
+              var entry = events.reduce(function (str, event): string {
+                var ev = event.task_event;
+                var time = formatStartTime(ev, execTz, guestTz);
+                var loc;
+                if (ev.location !== undefined) {
+                  loc = ev.location.address;
+                  if (ev.location.title !== "") {
+                    loc = ev.location.title + " - " + loc;
+                  }
+                } else {
+                  loc = "<b>LOCATION</b>";
                 }
-              } else {
-                loc = "<b>LOCATION</b>";
-              }
-              var br = str != "" ? "<br />" : ""; // no leading newline
-              return str + br + time + " at " + loc;
-            }, "");
+                var br = str != "" ? "<br />" : ""; // no leading newline
+                return str + br + time + " at " + loc;
+              }, "");
 
-            var template =
-              events.length > 1 ?
-              multipleEventTemplate.slice(0) :
-              singleEventTemplate.slice(0); // using slice to copy string
+              var template = tmp.notes;
 
-            var execName = allPrefs.team.team_name.replace(/ .*$/, "");
-            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-            var filledTemplate =
-              template.replace("|offer|", entry)
-              .replace("|exec|", execName);
-            composeControls.insertAtCaret(filledTemplate);
-          },
-          none : function () {
-            // TODO: Handle more gracefully?
-            window.alert("Cannot insert template: current team not detected.");
-          }
+              var execName = allPrefs.team.team_name.replace(/ .*$/, "");
+              if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+              var filledTemplate =
+                template.replace("|offer|", entry)
+                .replace("|exec|", execName);
+              composeControls.insertAtCaret(filledTemplate);
+            },
+            none : function () {
+              // TODO: Handle more gracefully?
+              window.alert("Cannot insert template: current team not detected.");
+            }
+          });
         });
-      });
+      }
     });
 
     return Option.some(templateButton);
