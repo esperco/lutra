@@ -1,6 +1,7 @@
 module Esper.Conf {
   export var prod = true;
   export var version = "@@VERSION@@";
+  export var segmentKey = "ZxAl2zWkKLGVJesGQiIxEU1JKm0dPNd8";
   export module Api {
     export var url = "https://app.esper.com";
   }

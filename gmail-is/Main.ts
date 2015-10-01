@@ -7,6 +7,7 @@
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
+/// <reference path="../common/Analytics.IS.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/Conf.ts" />

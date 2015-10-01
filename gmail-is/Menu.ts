@@ -3,6 +3,9 @@
   (on the right hand side of the top bar)
 */
 
+/// <reference path="../common/Analytics.ts" />
+/// <reference path="./Agenda.ts" />
+
 module Esper.Menu {
   /*
     The current team for the purpose of offering a default choice
@@ -32,7 +35,9 @@ module Esper.Menu {
     }
   }
 
-  function makeActionLink(text, action, danger) {
+  function makeActionLink(text: string,
+                          action: () => void,
+                          danger: boolean) {
     var link = $("<li class='esper-li'/>")
       .text(text)
       .click(action);
@@ -51,6 +56,7 @@ module Esper.Menu {
 
     function openSettings() {
       window.open(Conf.Api.url);
+      Analytics.track(Analytics.Trackable.ClickMenuEditSettings);
     }
 
     var settingsLink = makeActionLink("Edit Settings",
@@ -60,25 +66,31 @@ module Esper.Menu {
       // Can't call Chrome API to open options page directly,
       // post to Event Script
       Message.post(Message.Type.OpenExtensionOptions);
+      Analytics.track(Analytics.Trackable.ClickMenuExtensionOptions);
     }
 
     var optionsLink = makeActionLink("Extension Options",
                                      openOptionsPage, false);
 
     var agendaLink = makeActionLink("Get Agenda", function() {
-      var agendaModal = displayGetAgenda();
+      var agendaModal = Agenda.renderModal(currentTeam.get());
       $("body").append(agendaModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
     }, false);
 
     var getTaskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = displayGetTask();
       $("body").append(taskListModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     }, false);
 
     var hr = $("<hr>").addClass("esper-menu-hr");
 
     var helpLink = $("<a class='esper-a'>Get Help</a>")
-      .attr("href", "mailto:support@esper.com");
+      .attr("href", "mailto:support@esper.com")
+      .click(function() {
+        Analytics.track(Analytics.Trackable.ClickMenuGetHelp);
+      });
 
     ul.children().remove();
     ul
@@ -202,7 +214,7 @@ module Esper.Menu {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientEmails rows="4" cols="50" />
+              <textarea #recipientTextArea rows="4" cols="50" />
             </td>
           </tr>
         </table>
@@ -375,21 +387,21 @@ module Esper.Menu {
         allLabels.find("label > input").prop("checked", false);
     });
 
-    recipientEmails.val(Login.myEmail() + ", ");
+    recipientTextArea.val(Login.myEmail() + ", ");
 
     function appendEmailToTextarea() {
-      var emails = recipientEmails.val();
+      var emails = recipientTextArea.val();
       if ($(this).is(":checked")) {
         if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
           // If the current textarea of emails is blank
           // or if there is a comma at the end, don't prepend comma
-          recipientEmails.val(emails + $(this).val() + ", ");
+          recipientTextArea.val(emails + $(this).val() + ", ");
         else
-          recipientEmails.val(emails + ", " + $(this).val() + ", ");
+          recipientTextArea.val(emails + ", " + $(this).val() + ", ");
       } else {
         // Match against the email and the tailing comma and whitespaces
         var regex = new RegExp($(this).val() + ",? *", "i");
-        recipientEmails.val(emails.replace(regex, ""));
+        recipientTextArea.val(emails.replace(regex, ""));
       }
     }
 
@@ -412,12 +424,12 @@ module Esper.Menu {
       s.appendTo(recipients);
     }
 
-    _.forEach(teams, function(team) {
-      var teamEmails = _.map(team.team_assistants, function(uid: string){
+    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
+      var teamEmails = _.map(team.team_assistants, function(uid: string) {
         return Teams.getProfile(uid).email;
       });
-      _.forEach(teamEmails, addRecipientCheckboxes);
-    });
+    }));
+    _.forEach(recipientEmails, addRecipientCheckboxes);
 
     renderTasks();
     view.click(cancel);
@@ -440,7 +452,7 @@ module Esper.Menu {
         return box.value;
       });
       var f = htmlFormat.prop("checked");
-      var r = _.filter(recipientEmails.val().split(/, /),
+      var r = _.filter(recipientTextArea.val().split(/, /),
         function(s: string) { return s !== ""; });
 
       function notEmpty(list, arg) {
@@ -479,332 +491,9 @@ module Esper.Menu {
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
+      Analytics.track(Analytics.Trackable.ClickSendTaskList);
 
       Api.sendTaskList(t, l, p, f, r).done(cancel);
-    });
-
-    return _view;
-  }
-
-  function displayGetAgenda() {
-'''
-<div #view class="esper-modal-bg">
-  <div #modal class="esper-tl-modal">
-    <div class="esper-modal-header"><h2 style="margin: 0px;">Agenda</h2></div>
-    <span #closeButton class="esper-modal-close esper-clickable">×</span>
-    <div class="esper-modal-filter esper-bs esper">
-      Show
-      <div #teamDropdown class="dropdown esper-dropdown">
-        <button #teamSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Team
-          <i class="fa fa-chevron-down"></i>
-        </button>
-        <ul #teamSelect class="dropdown-menu esper-dropdown-select">
-          <li #allTeams>
-            <label for="esper-modal-team-all">
-              <input id="esper-modal-team-all" type="checkbox" value="" />
-              (Select All)
-            </label>
-          </li>
-        </ul>
-      </div>
-      's agenda from
-      <button #timeFromButton class="btn btn-default dropdown-toggle">
-        <input #timeFromDate type="hidden"/>
-        <i class="fa fa-calendar esper-calendar-icon"></i>
-      </button>
-      to
-      <button #timeUntilButton class="btn btn-default dropdown-toggle">
-        <input #timeUntilDate type="hidden"/>
-        <i class="fa fa-calendar esper-calendar-icon"></i>
-      </button>
-      in
-      <div #timezoneDropdown class="dropdown esper-dropdown">
-        <button #timezoneSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Timezone
-          <i class="fa fa-chevron-down"></i>
-        </button>
-        <ul #timezoneSelect class="dropdown-menu esper-dropdown-select">
-        </ul>
-      </div>
-    </div>
-    <div #eventsContainer class="esper-modal-content" style="height: 45%; overflow-y: auto;">
-    </div>
-    <div class="esper-modal-footer esper-clearfix" style="text-align: left;">
-      <div #recipientsContainer class="esper-modal-recipients">
-        <label class="esper-agenda-title">
-          Task List Format:
-        </label>
-        <label>
-          <input #htmlFormat type="radio" name="format" checked />
-          HTML
-        </label>
-        <label>
-          <input #textFormat type="radio" name="format" />
-          Plain text
-        </label>
-        <br />
-        <label>
-          <input #includeTaskNotes type="checkbox" />
-          Include task notes
-        <label>
-        <table>
-           <tr>
-            <td valign="top" align="left" style="padding: 0; min-width: 80px;">
-              <label class="esper-agenda-title">
-                To:
-              </label>
-            </td>
-            <td>
-              <div #recipients />
-              <textarea #recipientEmails rows="6" cols="50" />
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div #errorMessages>
-      </div>
-      <button #sendButton class="esper-btn esper-btn-primary modal-primary">
-        Send Now
-      </button>
-      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
-'''
-    var teams = Login.myTeams();
-    teamSelectToggle.dropdown();
-    timezoneSelectToggle.dropdown();
-
-    function cancel() { view.remove(); }
-
-    function closeDropdowns() {
-      teamDropdown.removeClass("open");
-      timezoneDropdown.removeClass("open");
-    }
-
-    function getCheckedValues(ul: JQuery) {
-      return _.filter(_.map(ul.find("label > input:checked"), function(el) {
-          return $(el).val();
-        }), function(s) {
-        return s !== "";
-      });
-    }
-
-    _.forEach(teams, function(team, id) {
-      var i = $("<input>")
-          .attr({"type": "checkbox", "id": "esper-modal-team" + id})
-          .val(team.teamid);
-      var l = $("<label>")
-          .attr("for", "esper-modal-team" + id)
-          .append(i)
-          .append(team.team_name);
-      var li = $("<li>").append(l);
-      if (team === currentTeam.get()) {
-          i.prop("checked", true);
-      }
-      li.appendTo(teamSelect);
-    });
-
-    var date = new Date();
-    timeFromDate.datepicker({
-      onSelect: function(dateText, inst) {
-        $(this).parent().contents().first().replaceWith(dateText);
-        // renderEvents();
-      }
-    });
-    timeUntilDate.datepicker({
-      onSelect: function(dateText, inst) {
-        $(this).parent().contents().first().replaceWith(dateText);
-        // renderEvents();
-      }
-    });
-
-    timeFromDate.datepicker("option", "dateFormat", "yy-mm-dd");
-    timeUntilDate.datepicker("option", "dateFormat", "yy-mm-dd");
-    timeFromDate.datepicker("setDate", date);
-    timeUntilDate.datepicker("setDate", date);
-
-    timeFromButton
-      .prepend(timeFromDate.val())
-      .click(function() {
-        timeFromDate.datepicker("show");
-    });
-
-    timeUntilButton
-      .prepend(timeUntilDate.val())
-      .click(function() {
-        timeUntilDate.datepicker("show");
-    });
-
-    // Add an Esper class to help namespace CSS, especially since the
-    // Datepicker widget seems to be absolutely positioned outside of
-    // our DOM elements. Datepicker might actually be re-using the same
-    // widget so we don't need to addClass twice, but whatever LOL.
-    timeFromDate.datepicker("widget").addClass("esper");
-    timeUntilDate.datepicker("widget").addClass("esper");
-
-    var timezone = Teams.getPreferences(currentTeam.get().teamid).general.current_timezone;
-
-    _.forEach(Timezone.commonTimezones, function(tz, id) {
-      var i = $("<input>")
-          .attr({"type": "radio",
-            "id": "esper-modal-timezone"+id,
-            "name": "esper-timezone"})
-          .val(tz.id);
-      var l = $("<label>")
-        .attr("for", "esper-modal-timezone"+id)
-        .append(i)
-        .append(tz.name)
-        .click(function() {
-          timezoneSelectToggle.contents().first().replaceWith(tz.name);
-        });
-      if (tz.id === timezone) {
-        i.prop("checked", true);
-        timezoneSelectToggle.contents().first().replaceWith(tz.name);
-      }
-      var li = $("<li>").append(l);
-      li.appendTo(timezoneSelect);
-    });
-
-    function appendEmailToTextarea() {
-      var emails = recipientEmails.val();
-      if ($(this).is(":checked")) {
-        if (emails.search(/(^\s*$)|(?:,\s*$)/) != -1)
-          // If the current textarea of emails is blank
-          // or if there is a comma at the end, don't prepend comma
-          recipientEmails.val(emails + $(this).val() + ", ");
-        else
-          recipientEmails.val(emails + ", " + $(this).val() + ", ");
-      } else {
-        // Match against the email and the tailing comma and whitespaces
-        var regex = new RegExp($(this).val() + ",? *", "i");
-        recipientEmails.val(emails.replace(regex, ""));
-      }
-    }
-
-    function addRecipientCheckboxes(email, id) {
-      var s = $("<span>")
-        .css("display", "inline-block");
-      var i = $("<input>")
-        .attr({ "type": "checkbox", "id": "agenda-recipient" + id})
-        .val(email)
-        .change(appendEmailToTextarea)
-        .appendTo(s);
-      var l = $("<label>")
-        .attr("for", "agenda-recipient" + id)
-        .addClass("esper-agenda-recipient")
-        .text(email)
-        .appendTo(s);
-      s.appendTo(recipients);
-    }
-
-    _.forEach(teams, function(team) {
-      var teamEmails = _.map(team.team_assistants, function(uid: string){
-        return Teams.getProfile(uid).email;
-      });
-      _.forEach(teamEmails, addRecipientCheckboxes);
-    });
-
-    // Api.eventRange(currentTeam.get().teamid,
-    //                currentTeam.get().team_calendars,
-    //                Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
-    //                Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
-    //   .done(function(r) {
-    //     console.log(r);
-    //   });
-
-    // function renderEvents() {
-    //   eventsContainer.empty();
-    //   var teamids = getCheckedValues(teamSelect);
-    //   var teams = _.filter(Login.myTeams(), function(team: ApiT.Team) {
-    //     return _.some(teamids, function(teamid) {
-    //       return team.teamid === teamid;
-    //     });
-    //   });
-    //   var f = timeFromDate.datepicker("getDate");
-    //   var u = timeUntilDate.datepicker("getDate");
-    //   _.forEach(teams, function(team: ApiT.Team) {
-    //     Api.eventRange(team.teamid,
-    //                    team.team_calendars,
-    //                    Math.floor(f.getTime() / 1000),
-    //                    Math.floor(u.getTime()/ 1000 + 86399))
-    //       .done(function(result) {
-    //         _.forEach(result.events, function(ev: ApiT.CalendarEvent) {
-    //           eventsContainer.append(TaskList.renderEvent(team, ev));
-    //         });
-    //       });
-    //   });
-    // }
-
-    modal.click(closeDropdowns);
-    Util.preventClickPropagation(teamSelectToggle);
-    Util.preventClickPropagation(timezoneSelectToggle);
-
-    view.click(cancel);
-    Util.preventClickPropagation(modal);
-    closeButton.click(cancel);
-    cancelButton.click(cancel);
-    sendButton.click(function() {
-      errorMessages.empty();
-      var t = getCheckedValues(teamSelect);
-      var tz = _.first(getCheckedValues(timezoneSelect));
-      var format = htmlFormat.prop("checked");
-      var i = includeTaskNotes.prop("checked");
-      var f = timeFromDate.datepicker("getDate");
-      var u = timeUntilDate.datepicker("getDate");
-      u.setHours(23, 59, 59, 999);
-      var r = _.filter(recipientEmails.val().split(/, /),
-        function(s: string) { return s !== ""; });
-
-      function notEmpty(list, arg) {
-        if (list.length == 0) {
-          var e = $("<span>")
-            .addClass("esper-agenda-error")
-            .html("You must select at least one " + arg);
-          e.appendTo(errorMessages);
-          return false;
-        }
-        return true;
-      }
-
-      function validateEmails(arr: string[]) {
-        return _.every(arr, function(s) {
-          if (s.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i) === null) {
-            var e = $("<span>")
-              .addClass("esper-agenda-error")
-              .html("Invalid email address: " + s);
-            e.appendTo(errorMessages);
-            return false;
-          }
-          return true;
-        });
-      }
-
-      if (!notEmpty(t, "team")
-          || !notEmpty(r, "recipient")
-          || !validateEmails(r)) {
-        return;
-      }
-
-      if (f > u) {
-        var e = $("<span>")
-          .addClass("esper-agenda-error")
-          .html("Time From cannot be greater than Time Until");
-        e.appendTo(errorMessages);
-        return;
-      }
-
-      timeFromButton.prop("disabled", true);
-      timeUntilButton.prop("disabled", true);
-      cancelButton.prop("disabled", true);
-      sendButton.prop("disabled", true);
-      recipients.children().prop("disabled", true);
-      sendButton.text("Sending...");
-
-      Api.sendAgenda(t, tz, f.toJSON(), u.toJSON(), format, i, r).done(cancel);
     });
 
     return _view;
@@ -857,8 +546,8 @@ module Esper.Menu {
       logo.addClass("esper-menu-white");
       logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-white.svg");
     } else {
-      logo.addClass("esper-menu-black");
-      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-black.svg");
+      logo.addClass("esper-menu-purple");
+      logoImg.attr("data", Init.esperRootUrl + "img/menu-logo-purple.svg");
     }
 
     /* Try to use the same color as Google, which depends on the theme. */
@@ -867,6 +556,9 @@ module Esper.Menu {
     updateLinks(menuDropdownContent);
 
     logo.dropdown();
+    logo.click(function() {
+      Analytics.track(Analytics.Trackable.ClickEsperLogoMenu);
+    });
 
     Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");

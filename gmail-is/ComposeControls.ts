@@ -107,6 +107,7 @@ module Esper.ComposeControls {
             }, "");
 
             composeControls.insertAtCaret(entry);
+            Analytics.track(Analytics.Trackable.ClickInsertIcon);
           },
           none : function () {
             // TODO: Handle missing team more gracefully?
@@ -280,6 +281,7 @@ module Esper.ComposeControls {
 
     createButton.click(function() {
       CalPicker.createInline();
+      Analytics.track(Analytics.Trackable.ClickCreateIcon);
     });
 
     return Option.some(createButton);
@@ -311,6 +313,7 @@ module Esper.ComposeControls {
           InThreadControls.setHashTagContainer(
             ComposeHashtags.view(composeControls));
           Gmail.scrollToCompose();
+          Analytics.track(Analytics.Trackable.ClickAskExecIcon);
         });
 
         return Option.some(askButton);

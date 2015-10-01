@@ -81,6 +81,12 @@ module Esper.ApiT {
     email: string;
   }
 
+  export interface Attendee {
+    display_name?: string;
+    email: string;
+    response: string; // NeedsAction | Declined | Tentative | Accepted
+  }
+
   export interface LoginResponse {
     uid: string;
     api_secret: string;
@@ -121,7 +127,7 @@ module Esper.ApiT {
     description_messageids: string[];
     location?: Location;
     all_day?: boolean;
-    guests: Guest[];
+    guests: Attendee[];
     transparent?: boolean;
     recurrence?: Recurrence;
     recurring_event_id?: string;

@@ -96,10 +96,10 @@ module Esper.InThreadControls {
 
   savingTaskNotes.watch(function(saving) {
     if (saving) {
-      taskNoteElms.status.get().html("Saving &hellip;")
+      taskNoteElms.status.get().show()
       taskNoteElms.button.get().prop("disabled", true);
     } else {
-      taskNoteElms.status.get().html("");
+      taskNoteElms.status.get().hide();
     }
   });
 
@@ -230,14 +230,18 @@ module Esper.InThreadControls {
         Save
         </button>
       </span>
+      <span #saveStatus class="esper-spinner esper-save-status" />
     </div>
   </div>
-  <span #saveStatus class="esper-save-status" />
 </div>
 '''
     taskNoteElms.button.set(saveTaskNotes);
     taskNoteElms.status.set(saveStatus);
     taskNoteElms.textarea.set(taskNotes);
+
+    taskNotes.focus(function() {
+      Analytics.track(Analytics.Trackable.EditTaskNotes);
+    });
 
     var editor = new quill(taskNotes.get(0), {
       modules: {
@@ -309,6 +313,7 @@ module Esper.InThreadControls {
                 saveTaskNotes.prop("disabled", true);
               });
             });
+           Analytics.track(Analytics.Trackable.SaveTaskNotes);
         },
         none : function () {
           return;

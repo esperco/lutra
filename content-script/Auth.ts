@@ -1,3 +1,4 @@
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Login.ts" />
 
 module Esper.Auth {
@@ -125,6 +126,7 @@ module Esper.Auth {
         if (!x.declined || forceLogin) {
           if (x.credentials !== undefined) {
             Login.setAccount(x);
+            Analytics.identify();
             sendCredentialsResponse(x);
           }
           else {

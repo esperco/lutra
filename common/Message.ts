@@ -15,7 +15,10 @@ module Esper.Message {
     OpenExtensionOptions,
 
     // Focus on the tab sending this message
-    FocusOnSender
+    FocusOnSender,
+
+    // Post an analytics tracking call
+    Track
   }
 
   export interface Message {

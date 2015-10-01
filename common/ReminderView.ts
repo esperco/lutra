@@ -1,7 +1,9 @@
 module Esper.ReminderView {
+  export enum GuestResponse {WaitingForReply, No, Maybe, Yes}
   export interface ReminderGuest {
     email: string;
     name: string;
+    response: GuestResponse;
     checked: boolean;
   }
   interface ReminderState {
@@ -13,18 +15,6 @@ module Esper.ReminderView {
   }
 
   var currentReminderState: ()=>ReminderState;
-
-  function toggleButton(reminderButton) {
-    if (reminderButton.hasClass("esper-btn-safe")) {
-      reminderButton.removeClass("esper-btn-safe");
-      reminderButton.addClass("esper-btn-danger");
-      reminderButton.text("Disabled");
-    } else {
-      reminderButton.removeClass("esper-btn-danger");
-      reminderButton.addClass("esper-btn-safe");
-      reminderButton.text("Enabled");
-    }
-  }
 
   function renderGuest(guest) {
 '''
@@ -51,22 +41,57 @@ module Esper.ReminderView {
     return view;
   }
 
+  function setupGuestGroup(groupView, groupCheck, groupList) {
+    if (groupList.is(":empty")) {
+      groupView.hide();
+    } else {
+      groupCheck.prop("checked", groupList.find("input:checkbox:not(:checked)")
+                                 .length <= 0);
+      groupCheck.change(function() {
+        var checkboxes = groupList.find("input:checkbox");
+        checkboxes.prop("checked", groupCheck.is(":checked"));
+        checkboxes.trigger("change");
+      });
+    }
+  }
+
   function render(fromEmail, reminderState, eventTitle) {
 '''
 <div #view>
   <div class="esper-reminder-options">
-    <label>
-      <span class="esper-reminder-label"></span>
-      <span #timeWarning class="esper-reminder-warning"> Invalid time: </span>
-      <input #timeField type="text" value="24"> </input> hours before event
-    </label>
-    <button #reminderButton class="esper-btn esper-btn-safe esper-btn-toggle">
-      Enabled
-    </button>
+    <select id="esper-reminder-time" #selectTime>
+      <option class="esper-remind" value="-1">Never</option>
+      <option class="esper-remind" value="3600">1 hour before</option>
+      <option class="esper-remind" value="7200">2 hours before</option>
+      <option class="esper-remind" value="14400">4 hours before</option>
+      <option class="esper-remind" value="28800">8 hours before</option>
+      <option class="esper-remind" value="43200">12 hours before</option>
+      <option class="esper-remind" value="86400">24 hours before</option>
+      <option class="esper-remind" value="172800">48 hours before</option>
+    </select>
   </div>
   <div>From: <span #viewFromEmail /></div>
   <div>Bcc me? <input #bcc type='checkbox' /></div>
-  <div>To: <ul #toGuests/></div>
+  <div #yesGuests>
+    <input #yesCheck type='checkbox' id='yesCheck'/>
+    <label for='yesCheck'>Yes</label><br/>
+    <ul #yesGuestsList/>
+  </div>
+  <div #noGuests>
+    <input #noCheck type='checkbox' id='noCheck'/>
+    <label for='noCheck'>No</label><br/>
+    <ul #noGuestsList/>
+  </div>
+  <div #maybeGuests>
+    <input #maybeCheck type='checkbox' id='maybeCheck'/>
+    <label for='maybeCheck'>Maybe</label><br/>
+    <ul #maybeGuestsList/>
+  </div>
+  <div #noreplyGuests>
+    <input #noreplyCheck type='checkbox' id='noreplyCheck'/>
+    <label for='noreplyCheck'>Waiting for Reply</label><br/>
+    <ul #noreplyGuestsList/>
+  </div>
   <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
 Hello,
 
@@ -78,21 +103,39 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
 
-    List.iter(reminderState.guests, function(guest) {
-      toGuests.append(renderGuest(guest));
+    List.iter(reminderState.guests, function(guest:ReminderGuest) {
+      switch (guest.response) {
+      case GuestResponse.Yes:
+        yesGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.No:
+        noGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.Maybe:
+        maybeGuestsList.append(renderGuest(guest));
+        break;
+      case GuestResponse.WaitingForReply:
+        noreplyGuestsList.append(renderGuest(guest));
+        break;
+      }
     });
+    setupGuestGroup(    yesGuests,     yesCheck,     yesGuestsList);
+    setupGuestGroup(     noGuests,      noCheck,      noGuestsList);
+    setupGuestGroup(  maybeGuests,   maybeCheck,   maybeGuestsList);
+    setupGuestGroup(noreplyGuests, noreplyCheck, noreplyGuestsList);
 
-    if (0 < reminderState.time) {
-      timeField.val(String(Math.round(reminderState.time / 360) / 10));
+    if (reminderState.enable) {
+      var selTime = 172800;
+      selectTime.find("option").each(function(i, opt) {
+        var v = parseFloat(opt.getAttribute("value"));
+        if (reminderState.time <= v && v < selTime) {
+          selTime = v;
+        }
+      });
+      selectTime.val(String(selTime));
+    } else {
+      selectTime.val("-1");
     }
-
-    if (! reminderState.enable) {
-      toggleButton(reminderButton);
-    }
-    reminderButton.click(function () {
-      reminderState.enable = ! reminderState.enable;
-      toggleButton(reminderButton);
-    });
 
     if (reminderState.text) {
       reminderField.text(reminderState.text);
@@ -101,13 +144,11 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     }
 
     currentReminderState = (): ReminderState => {
+      var selTime = parseFloat(selectTime.val());
+      reminderState.enable = 0 <= selTime;
+      reminderState.time = selTime;
       reminderState.bccMe = bcc.is(":checked");
       reminderState.text = reminderField.text();
-      reminderState.time = parseFloat(timeField.val()) * 3600;
-      if (! (0 < reminderState.time)) {
-        timeField.addClass("esper-danger");
-        timeWarning.show();
-      }
       return reminderState;
     };
 
@@ -116,7 +157,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
   function openReminder(fromTeamId, fromEmail, calendarId, eventId,
                         eventTitle, reminderState:ReminderState) {
-    var dialog = Modal.dialog("Set an automatic reminder",
+    var dialog = Modal.okCancelDialog("Set an automatic reminder",
       render(fromEmail, reminderState, eventTitle),
       function() {
         reminderState = currentReminderState();

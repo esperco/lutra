@@ -66,6 +66,15 @@
   @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
   @import (less) "../marten/vendor/quill/dist/quill.snow.css";
   @import (less) "../marten/vendor/quill/dist/quill.base.css";
+
+  // Override some Quill theming
+  .ql-snow.ql-toolbar {
+    padding: 0; // Use surrounding div for padding
+  }
+
+  .ql-container {
+    min-height: 100px;
+  }
 }
 
 /*** Colors ***/
@@ -531,7 +540,7 @@ textarea.esper-input { resize: none; }
   height: 20px;
   &.esper-menu-white {
   }
-  &.esper-menu-black {
+  &.esper-menu-black, &.esper-menu-purple {
     opacity: 0.47;
     &:hover { opacity: 0.85; }
   }
@@ -1047,6 +1056,7 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 
 .esper-section-footer {
   padding: 6px 10px;
+  line-height: 2.25em;
   background: @gray_f5;
   border: 1px solid @google_border_gray;
   border-bottom-right-radius: 3px;
@@ -1054,16 +1064,19 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
 }
 
 .esper-save-notes {
-  display: block;
-  float: right;
-}
-
-.esper-save-notes,
-.esper-save-status {
-  font-size: 12px;
-  line-height: 22px;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.8rem;
+  line-height: 2.25em;
   padding-bottom: 0;
   padding-top: 0;
+}
+
+.esper-save-status.esper-spinner {
+  height: 2.25em;
+  width: 2.25em;
+  float: right;
+  vertical-align: middle;
 }
 
 .esper-char-count {
@@ -1429,13 +1442,13 @@ ul.esper-availability-graph {
 }
 
 .esper-ev-title {
-  font-size: 14px;
+  font-weight: bold;
   margin-left: 48px;
   padding: 3px 0 1px 0;
 }
 
 .esper-ev-times {
-  color: @gray_60;
+  color: @purple;
   margin-left: 48px;
   padding: 1px 0 2px 0;
 }
@@ -1443,6 +1456,16 @@ ul.esper-availability-graph {
 .esper-ev-tz {
   font-size: 9px;
   letter-spacing: -1px;
+}
+
+.esper-ev-location {
+  color: @gray_60;
+  margin-left: 48px;
+  padding: 3px 0 1px 0;
+}
+
+.esper-ev-task-notes {
+  margin: 0;
 }
 
 .esper-ev-disclose {
@@ -1738,6 +1761,10 @@ ul.esper-ev-dropdown {
   font-weight: 600;
 }
 
+.esper-agenda-event {
+  padding: 2px 5px 2px 5px;
+}
+
 .esper-agenda-recipient {
   font-weight: initial;
   margin-left: 5px;
@@ -1749,6 +1776,11 @@ ul.esper-ev-dropdown {
   margin-top : 8px;
   position: relative;
   z-index: 1; // To fix issue with overlapping with sidebar
+  font-size: 0.8rem;
+}
+
+.esper-cal-picker-container {
+  font-size: 1rem; // Undo previous font-size setting and defer to FC's theming
 }
 
 // Align with right edge with reply / forward (pre-click)
@@ -2332,6 +2364,13 @@ textarea.esper-description-text {
     height: 75px;
     margin: 50px auto;
   }
+}
+
+.esper-modal-footer .esper-spinner {
+  float: left;
+  display: block;
+  height: 32px;
+  width: 32px;
 }
 
 .esper-sidebar-spinner {
