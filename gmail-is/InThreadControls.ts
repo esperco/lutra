@@ -239,6 +239,10 @@ module Esper.InThreadControls {
     taskNoteElms.status.set(saveStatus);
     taskNoteElms.textarea.set(taskNotes);
 
+    taskNotes.focus(function() {
+      Analytics.track(Analytics.Trackable.EditTaskNotes);
+    });
+
     var editor = new quill(taskNotes.get(0), {
       modules: {
         'toolbar': {
@@ -309,6 +313,7 @@ module Esper.InThreadControls {
                 saveTaskNotes.prop("disabled", true);
               });
             });
+           Analytics.track(Analytics.Trackable.SaveTaskNotes);
         },
         none : function () {
           return;
