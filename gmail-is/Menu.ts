@@ -3,6 +3,7 @@
   (on the right hand side of the top bar)
 */
 
+/// <reference path="../common/Analytics.ts" />
 module Esper.Menu {
   /*
     The current team for the purpose of offering a default choice
@@ -867,6 +868,9 @@ module Esper.Menu {
     updateLinks(menuDropdownContent);
 
     logo.dropdown();
+    logo.click(function() {
+      Analytics.track(Analytics.Trackable.ClickEsperLogo);
+    });
 
     Util.repeatUntil(10, 1000, function() {
       Log.d("Inserting Esper menu...");
