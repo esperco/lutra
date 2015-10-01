@@ -211,18 +211,31 @@ module Esper.TaskTab {
   }
 
   /* Refresh only linked events, fetching linked events from the server. */
-  export function refreshLinkedEventsList(team: ApiT.Team,
-                                          threadId, taskTab) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+  export function refreshLinkedEventsList(team: ApiT.Team, threadId: string,
+      taskTab: TaskTabView)
+  {
+    taskTab = taskTab || currentTaskTab;
+    taskTab.linkedEventsSpinner.show();
+    taskTab.linkedEventsList.hide();
+    return Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         CurrentThread.linkedEvents.set(linkedEvents);
         displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
+      })
+      .always(function() {
+        taskTab.linkedEventsSpinner.hide();
+        taskTab.linkedEventsList.show();
       });
   }
 
   /* Refresh linked threads, fetching linked threads from the server. */
-  export function refreshLinkedThreadsList(team, threadId, taskTab) {
-    Api.getTaskForThread(team.teamid, threadId, false, true)
+  export function refreshLinkedThreadsList(team: ApiT.Team, threadId: string,
+      taskTab: TaskTabView)
+  {
+    taskTab = taskTab || currentTaskTab;
+    taskTab.linkedThreadsSpinner.show();
+    taskTab.linkedThreadsList.hide();
+    return Api.getTaskForThread(team.teamid, threadId, false, true)
       .done(function(task) {
         displayLinkedThreadsList(task, threadId, taskTab);
         if ((task.task_threads.length > 1 &&
@@ -231,6 +244,10 @@ module Esper.TaskTab {
                   taskTab.showLinkedThreads.text() === "Hide")) {
           taskTab.showLinkedThreads.click();
         }
+      })
+      .always(function() {
+        taskTab.linkedThreadsSpinner.hide();
+        taskTab.linkedThreadsList.show();
       });
   }
 
