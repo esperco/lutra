@@ -5,6 +5,7 @@
 
 /// <reference path="./Analytics.ts" />
 /// <reference path="./Message.ts" />
+/// <reference path="./ApiT.ts" />
 
 module Esper.Analytics {
   export function track(event: Trackable, properties?: Object) {
@@ -12,5 +13,13 @@ module Esper.Analytics {
       event: event,
       properties: properties
     }));
+  }
+
+  export function trackCreateTask(team: ApiT.Team, threadId: string) {
+    track(Trackable.CreateTask, {
+      teamId: team.teamid,
+      teamName: team.team_name,
+      threadId: threadId
+    });
   }
 }

@@ -6,7 +6,8 @@ module Esper.Analytics {
   export enum Trackable {
     ClickEsperLogo = 1,
     ClickSendAgenda,
-    ClickSendTaskList
+    ClickSendTaskList,
+    CreateTask
   };
 
   export interface TrackMessage {

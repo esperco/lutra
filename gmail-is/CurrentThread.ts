@@ -27,6 +27,8 @@
  *  invalid in an open thread. However, since a task contains a team,
  *  if task is valid then team should always be valid as well
  */
+
+/// <reference path="../common/Analytics.IS.ts" />
 module Esper.CurrentThread {
 
   /** The team that is detected for the current thread. I am not sure
@@ -356,6 +358,10 @@ module Esper.CurrentThread {
       some : function (team) {
         var teamid = team.teamid;
         var getTask = forceTask ? Api.obtainTaskForThread : Api.getTaskForThread;
+
+        if (forceTask) {
+          Analytics.trackCreateTask(team, threadId.get());
+        }
 
         // cast to <any> needed because promises are implicitly flattened (!)
         return (<any> getTask(teamid, newThreadId, false, true)
