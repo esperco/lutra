@@ -291,6 +291,7 @@ module Esper.TaskList {
         List.iter(tasks, function(task, i) {
           var elt = renderTask(team, task, closeTaskListLayer);
           elt.appendTo(listContainer);
+          $("<hr>").appendTo(listContainer);
           if (nextUrl !== undefined && i === scrollTrigger) {
             var lazyRefill = refillIfNeeded(elt, nextUrl);
 
@@ -514,7 +515,7 @@ module Esper.TaskList {
       });
 
       _.forEach(teams, function(team) {
-        TaskList.displayList(team,
+        displayList(team,
           tasksContainer,
           cancel,
           function(task) {
