@@ -29,13 +29,38 @@ module Esper.Analytics {
     });
   }
 
-  // If we have a UID, identify ourselves. Otherwise dis-associate
+  // If we have a UID, identify ourselves -- should be called after login
+  // info set to get the most info available
   export function identify() {
+    var uid = Login.myUid();
+    if (!uid) {
+      Log.e("Unable to identify -- not logged in.");
+      return;
+    }
+
+    if (!Login.watchableInfo.isValid()) {
+      Log.w("Login info unavailable for identification. UID only.");
+    }
+
     analytics.identify({
       userId: Login.myUid(),
       traits: {
-        email: Login.myEmail()
+        email: Login.myEmail() || Login.myGoogleAccountId(),
+        teams: _.pluck(Login.myTeams(), 'teamid')
       }
+    });
+
+    // Associate users with team groups
+    var teams = Login.myTeams();
+    _.each(teams, function(team) {
+      analytics.group({
+        userId: uid,
+        groupId: team.teamid,
+        traits: {
+          name: team.team_name,
+          execId: team.team_executive
+        }
+      });
     });
   }
 
