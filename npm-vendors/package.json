@@ -4,6 +4,8 @@
   "description": "NPM vendor packages",
   "main": "main.js",
   "dependencies": {
+    "analytics-node": "^2.0.0",
+    "brfs": "^1.4.1",
     "page": "^1.6.3"
   }
 }
