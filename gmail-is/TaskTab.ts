@@ -89,6 +89,13 @@ module Esper.TaskTab {
       });
   }
 
+  function displayEmptyLinkedThreadsList(taskTab: TaskTabView) {
+'''
+<div #noThreads class="esper-no-threads"> No linked emails</div>
+'''
+    taskTab.linkedThreadsList.empty().append(noThreads);
+  }
+
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
@@ -97,7 +104,7 @@ module Esper.TaskTab {
 '''
     taskTab.linkedThreadsList.children().remove();
 
-    List.iter(task.task_threads, function(thread : ApiT.EmailThread) {
+    List.iter(task.task_threads || [], function(thread : ApiT.EmailThread) {
       var linkedThreadId = thread.gmail_thrid;
       if (linkedThreadId !== threadId) {
 '''
@@ -123,7 +130,7 @@ module Esper.TaskTab {
           li.remove();
           if (threadsList.children("li").length === 0) {
             threadsList.remove();
-            taskTab.linkedThreadsList.append(noThreads);
+            displayEmptyLinkedThreadsList(taskTab);
             taskTab.showLinkedThreads.click();
           }
         });
@@ -135,7 +142,7 @@ module Esper.TaskTab {
     if (threadsList.children("li").length > 0) {
       taskTab.linkedThreadsList.append(threadsList);
     } else {
-      taskTab.linkedThreadsList.append(noThreads);
+      displayEmptyLinkedThreadsList(taskTab);
       taskTab.showLinkedThreads.click();
     }
   }
@@ -194,6 +201,9 @@ module Esper.TaskTab {
         applyChange();
       }
     });
+    taskProgressSelector.click(function() {
+      Analytics.track(Analytics.Trackable.SelectWorkflow);
+    });
 
     taskTab.taskProgressContainer.append(view);
   }
@@ -204,18 +214,31 @@ module Esper.TaskTab {
   }
 
   /* Refresh only linked events, fetching linked events from the server. */
-  export function refreshLinkedEventsList(team: ApiT.Team,
-                                          threadId, taskTab) {
-    Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+  export function refreshLinkedEventsList(team: ApiT.Team, threadId: string,
+      taskTab: TaskTabView)
+  {
+    taskTab = taskTab || currentTaskTab;
+    taskTab.linkedEventsSpinner.show();
+    taskTab.linkedEventsList.hide();
+    return Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
       .done(function(linkedEvents) {
         CurrentThread.linkedEvents.set(linkedEvents);
         displayLinkedEventsList(team, threadId, taskTab, linkedEvents);
+      })
+      .always(function() {
+        taskTab.linkedEventsSpinner.hide();
+        taskTab.linkedEventsList.show();
       });
   }
 
   /* Refresh linked threads, fetching linked threads from the server. */
-  export function refreshLinkedThreadsList(team, threadId, taskTab) {
-    Api.getTaskForThread(team.teamid, threadId, false, true)
+  export function refreshLinkedThreadsList(team: ApiT.Team, threadId: string,
+      taskTab: TaskTabView)
+  {
+    taskTab = taskTab || currentTaskTab;
+    taskTab.linkedThreadsSpinner.show();
+    taskTab.linkedThreadsList.hide();
+    return Api.getTaskForThread(team.teamid, threadId, false, true)
       .done(function(task) {
         displayLinkedThreadsList(task, threadId, taskTab);
         if ((task.task_threads.length > 1 &&
@@ -224,6 +247,10 @@ module Esper.TaskTab {
                   taskTab.showLinkedThreads.text() === "Hide")) {
           taskTab.showLinkedThreads.click();
         }
+      })
+      .always(function() {
+        taskTab.linkedThreadsSpinner.hide();
+        taskTab.linkedThreadsList.show();
       });
   }
 
@@ -638,6 +665,9 @@ module Esper.TaskTab {
       taskCancel.show();
       taskTitle.focus();
     });
+    meetingType.click(function() {
+      Analytics.track(Analytics.Trackable.SelectMeetingType);
+    });
     Sidebar.customizeSelectArrow(meetingType);
     return meetingType;
   }
@@ -853,6 +883,7 @@ module Esper.TaskTab {
 
     createEvent.click(function() {
       CalPicker.createInline();
+      Analytics.track(Analytics.Trackable.CreateLinkedEvent);
     });
 
     var apiGetTask = autoTask ?
@@ -898,6 +929,7 @@ module Esper.TaskTab {
             showMTDrop();
             title = deets.subject;
             if (title === undefined) title = "(no subject)";
+            displayEmptyLinkedThreadsList(taskTabView);
           }
           taskTitle.val(title);
         });
@@ -971,6 +1003,7 @@ module Esper.TaskTab {
         CalSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
+      Analytics.track(Analytics.Trackable.LinkEvent);
     });
 
     var taskWatcherId = "TaskTab-task-watcher";

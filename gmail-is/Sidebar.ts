@@ -69,7 +69,7 @@ module Esper.Sidebar {
           selector.addClass("esper-selected");
           teamCheck.attr("data", Init.esperRootUrl + "img/check.svg");
         } else {
-          teamNotSelected()
+          teamNotSelected();
         }
       },
       none : function () {
@@ -79,7 +79,10 @@ module Esper.Sidebar {
 
     function teamNotSelected() {
       teamCheck.hide();
-      selector.click(function() { onTeamSwitch(team); });
+      selector.click(function() {
+        onTeamSwitch(team);
+        Analytics.track(Analytics.Trackable.ChangeTeam);
+      });
     }
 
     teamsSection.append(selector);
@@ -162,8 +165,10 @@ module Esper.Sidebar {
   function toggleSidebar() {
     if (shouldDisplaySidebar()) {
       setCurrentThreadState(ExtensionOptions.SidebarOpts.HIDE);
+      Analytics.track(Analytics.Trackable.HideSidebar);
     } else {
       setCurrentThreadState(ExtensionOptions.SidebarOpts.SHOW);
+      Analytics.track(Analytics.Trackable.ShowSidebar);
     }
   }
 
@@ -192,9 +197,9 @@ module Esper.Sidebar {
       <object #logo
               class="esper-svg esper-click-safe esper-dropdown-footer-logo"/>
       <div class="esper-click-safe esper-dropdown-footer-links">
-        <a href="http://esper.com/privacypolicy.html">Privacy</a>
+        <a #privacy href="http://esper.com/privacypolicy.html">Privacy</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
-        <a href="http://esper.com/termsofuse.html">Terms</a>
+        <a #terms href="http://esper.com/termsofuse.html">Terms</a>
         <div class="esper-click-safe esper-dropdown-footer-divider"/>
         <span class="esper-click-safe esper-copyright">&copy; 2015 Esper</span>
       </div>
@@ -286,12 +291,14 @@ module Esper.Sidebar {
       if (options.hasClass("esper-open")) {
         dismissDropdowns();
         options.tooltip("enable");
+        Analytics.track(Analytics.Trackable.HideSidebarOptions);
       } else {
         dismissDropdowns();
         options
           .addClass("esper-open")
           .tooltip("disable");
         dropdown.show();
+        Analytics.track(Analytics.Trackable.ShowSidebarOptions);
       }
     }
 
@@ -302,6 +309,7 @@ module Esper.Sidebar {
     size.click(toggleSidebar);
     settings.click(function() {
       window.open(Conf.Api.url);
+      Analytics.track(Analytics.Trackable.ClickSidebarOptionsSettings);
     })
     signOut.click(function() {
       if (sidebar.css("display") !== "none") {
@@ -310,6 +318,14 @@ module Esper.Sidebar {
       view.fadeOut(250).delay(250);
       Login.logout();
       Menu.create();
+    });
+
+    privacy.click(function() {
+      Analytics.track(Analytics.Trackable.ClickSidebarPrivacyPolicy);
+    });
+
+    terms.click(function() {
+      Analytics.track(Analytics.Trackable.ClickSidebarTermsOfUse);
     });
 
     var insertDock = function(someTeam=true) {
@@ -355,8 +371,8 @@ module Esper.Sidebar {
 <div #view class="esper-sidebar">
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
-      <li class="esper-active esper-first esper-sidebar-task-tab">Task</li>
-      <li class="esper-sidebar-user-tab">User</li>
+      <li #taskTab class="esper-active esper-first esper-sidebar-task-tab">Task</li>
+      <li #userTab class="esper-sidebar-user-tab">User</li>
     </ul>
   </div>
   <div class="esper-tab-content">
@@ -380,6 +396,14 @@ module Esper.Sidebar {
 
     tabs.each(function (i, tab) {
       $(tab).click(function() { Log.d("Switch to tab " + i); switchTab(i); });
+    });
+
+    taskTab.click(function() {
+      Analytics.track(Analytics.Trackable.ClickTaskTab);
+    });
+
+    userTab.click(function() {
+      Analytics.track(Analytics.Trackable.ClickUserTab);
     });
 
     CurrentThread.currentTeam.get().match({

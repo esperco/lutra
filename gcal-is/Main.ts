@@ -29,6 +29,7 @@
 /// <reference path="../common/JsonHttp.ts" />
 /// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
+/// <reference path="../common/Analytics.IS.ts" />
 
 /// <reference path="./Gcal.ts" />
 /// <reference path="./ActiveEvents.ts" />

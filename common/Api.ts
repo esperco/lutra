@@ -489,6 +489,14 @@ module Esper.Api {
     return JsonHttp.put(url, string(notes));
   }
 
+  export function setTaskNotesQuill(taskid, notes):
+    JQueryPromise<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/task/notes/quill/" + string(Login.myUid())
+      + "/" + string(taskid);
+    return JsonHttp.put(url, string(notes));
+  }
+
   export function setTaskProgress(taskid, progress):
   JQueryPromise<ApiT.Task> {
     var url =

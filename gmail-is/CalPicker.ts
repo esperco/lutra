@@ -8,6 +8,12 @@ module Esper.CalPicker {
   // The calendar that the created events go on
   export var writeToCalendar : ApiT.Calendar;
 
+  // An "error" to signal that the user has canceled an action or that event
+  // validation has failed that we can pass via callback -- this is used
+  // to turn off the busy spinner. Use to distinguish from a server or other
+  // error.
+  class HaltEventSave extends Error {}
+
   // Who appears as the creator of events that we write to the calendar
   var createdByEmail : string;
 
@@ -751,10 +757,8 @@ module Esper.CalPicker {
   }
 
   //save events added in the picker
-  function saveEvents(closePicker, picker,
-                      team: ApiT.Team,
-                      task: ApiT.Task,
-                      threadId: string) {
+  function saveEvents(picker, team: ApiT.Team, task: ApiT.Task,
+                      threadId: string, callback: (err?: Error) => void) {
     var prefs = Teams.getTeamPreferences(team);
     var events = [];
     for (var k in picker.events) {
@@ -785,12 +789,12 @@ module Esper.CalPicker {
       $(".esper-task-name").val(newTaskTitle);
     }
 
-    closePicker();
     if (events.length > 0) {
       TaskTab.currentTaskTab.linkedEventsList.children().remove();
       TaskTab.currentTaskTab.linkedEventsSpinner.show();
     }
     Promise.join(linkCalls).done(function(linkedEvents) {
+      callback();
       if (events.length > 0) TaskTab.refreshLinkedEventsAction();
 
       // Signal that the linked events have changed
@@ -808,16 +812,18 @@ module Esper.CalPicker {
           );
         });
       Promise.join(syncCalls);
+    }).fail(function(err) {
+      callback(err);
     });
   }
 
-  function confirmEvents(view, closePicker,
-                        picker, team: ApiT.Team,
-                        task: ApiT.Task,
-                        threadId: string) {
+  function confirmEvents(view, picker, team: ApiT.Team, task: ApiT.Task,
+                         threadId: string,
+                         callback: (err?: Error) => void) {
     if (picker.eventLocation.val() == "") {
       var locationModal = displayCheckLocationModal();
       $("body").append(locationModal.view);
+      callback(new HaltEventSave("Location needed"));
     } else {
       var events = [];
       for (var k in picker.events) {
@@ -844,12 +850,15 @@ module Esper.CalPicker {
         });
 
         if (filtered_results.length > 0) {
-          var confirmModal = displayConfirmEventModal(view, closePicker, events,
-                                                      filtered_results, picker, team, task, threadId);
+          var confirmModal = displayConfirmEventModal(
+            view, events, filtered_results, picker, team, task, threadId,
+            callback);
           $("body").append(confirmModal.view);
         } else {
-          saveEvents(closePicker, picker, team, task, threadId);
+          saveEvents(picker, team, task, threadId, callback);
         }
+      }).fail(function(err) {
+        callback(new Error(err));
       });
     }
 
@@ -864,12 +873,11 @@ module Esper.CalPicker {
     }
   }
 
-  function displayConfirmEventModal(eventView, closePicker,
-                                    events: ApiT.CalendarEvent[],
+  function displayConfirmEventModal(eventView, events: ApiT.CalendarEvent[],
                                     results,
                                     picker, team: ApiT.Team,
-                                    task: ApiT.Task,
-                                    threadId: string) {
+                                    task: ApiT.Task, threadId: string,
+                                    callback: (err?: Error) => void) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
@@ -907,10 +915,13 @@ module Esper.CalPicker {
     });
 
     function yesOption() {
-      saveEvents(closePicker, picker, team, task, threadId);
+      saveEvents(picker, team, task, threadId, callback);
       view.remove();
     }
-    function noOption() { view.remove(); }
+    function noOption() {
+      view.remove();
+      callback(new HaltEventSave("Did not confirm"));
+    }
 
     view.click(noOption);
     Util.preventClickPropagation(modal);
@@ -936,6 +947,7 @@ module Esper.CalPicker {
     </div>
     <div #calendar class="esper-calendar-grid"/>
     <div class="esper-modal-footer esper-clearfix">
+      <span #busySpinner class="esper-spinner"></span>
       <button #cancel class="esper-btn esper-btn-secondary">
         Cancel
       </button>
@@ -946,12 +958,24 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
+
     CurrentThread.currentTeam.get().match({
       some : function (team) {
         function closeView() {
           Sidebar.selectTaskTab();
           view.remove();
         }
+
+        function makeBusy() {
+          busySpinner.show();
+          save.prop("disabled", true);
+        }
+
+        function unmakeBusy() {
+          busySpinner.hide();
+          save.prop("disabled", false);
+        }
+        unmakeBusy();
 
         refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
         title.text("Create linked events");
@@ -968,17 +992,18 @@ module Esper.CalPicker {
           "tooltipClass": "esper-top esper-tooltip"
         });
 
-        window.onresize = function(event) {
-          picker = createPicker(refreshCal, userInfo, team, tpref);
-          calendar.children().remove();
-          calendar.append(picker.view);
-          picker.render();
-        };
-
         cancel.click(closeView);
 
         save.click(function() {
-          confirmEvents(view, closeView, picker, team, task, threadId);
+          makeBusy();
+          confirmEvents(view, picker, team, task, threadId,
+            function(err: Error) {
+              if (err) {
+                unmakeBusy();
+              } else {
+                closeView();
+              }
+            });
         });
 
         InThreadControls.setEventControlContainer(view);

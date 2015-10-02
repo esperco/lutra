@@ -156,29 +156,29 @@ module Esper.EventWidget {
                    esper-clickable esper-ev-disclose"/>
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
-      <li #editEvent
-          class="esper-li">
-        Edit
-      </li>
       <li #inviteGuests
           class="esper-li">
         Invite guests
       </li>
-      <li #reminder
-          class="esper-li">
-        Reminder
-      </li>
-      <li #unlinkEvent
-          class="esper-li">
-        Unlink
-      </li>
-      <li #deleteEvent
-          class="esper-li esper-danger">
-        Delete from calendar
-      </li>
       <li #chooseThisEvent
           class="esper-li">
         Choose this event
+      </li>
+      <li #editEvent
+          class="esper-li">
+        Edit event
+      </li>
+      <li #reminder
+          class="esper-li">
+        Set reminder
+      </li>
+      <li #unlinkEvent
+          class="esper-li">
+        Unlink event
+      </li>
+      <li #deleteEvent
+          class="esper-li esper-danger">
+        Delete event
       </li>
     </div>
     <div class="esper-click-safe esper-drop-ul-divider"/>
@@ -210,9 +210,21 @@ module Esper.EventWidget {
     });
 
     var reminderGuests = List.map(e.guests, function(guest) {
+      var response;
+      var x = guest.response.toLowerCase();
+      if (x === "tentative") {
+        response = ReminderView.GuestResponse.Maybe;
+      } else if (x === "accepted") {
+        response = ReminderView.GuestResponse.Yes;
+      } else if (x === "declined") {
+        response = ReminderView.GuestResponse.No;
+      } else {
+        response = ReminderView.GuestResponse.WaitingForReply;
+      }
       return {
         name:  guest.display_name,
         email: guest.email,
+        response: response,
         checked: false
       };
     });

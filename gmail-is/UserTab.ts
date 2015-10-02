@@ -908,7 +908,10 @@ module Esper.UserTab {
     var noPrefsDescr = $("<span>Executive is marked unavailable " +
                          "for this meeting type. </span>");
     noMeetingPrefs.append(noPrefsDescr).append(noPrefsLink);
-    morePrefsLink.attr("href", noPrefsURL);
+    morePrefsLink.attr("href", noPrefsURL)
+                 .click(function() {
+                   Analytics.track(Analytics.Trackable.ClickUserTabPreferences);
+                 });
 
     var prefs = Teams.getTeamPreferences(team);
     var until = Math.floor(XDate.now()/1000);
