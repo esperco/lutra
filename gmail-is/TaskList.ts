@@ -644,7 +644,6 @@ module Esper.TaskList {
         })
       )
     );
-    console.log(recipientEmails);
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     renderTasks();
