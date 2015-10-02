@@ -520,7 +520,7 @@ type token_response = [
   export interface Template {
     id: string;
     title: string;
-    notes: string;
+    content: string;
   }
 
   export interface UserTemplates {
