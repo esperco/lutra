@@ -191,8 +191,7 @@ module.exports = {
   // from glob relative to vendor dir to destination directory
   vendorAssets: {
     "bootstrap/fonts/*.*": "fonts",
-    "font-awesome/fonts/*.*": "fonts",
-    "analytics/analytics.js": "js"
+    "font-awesome/fonts/*.*": "fonts"
   },
 
   // Production mode => no sourcemaps + uglify -- doesn't have to be set

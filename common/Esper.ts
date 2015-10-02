@@ -16,6 +16,7 @@
 /// <reference path="../marten/typings/lodash/lodash.d.ts" />
 /// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
 /// <reference path="../marten/typings/react/react-global.d.ts" />
+/// <reference path="../marten/typings/segment-analytics/segment-analytics-node.d.ts" />
 /// <reference path="../marten/typings/quill/quill.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
@@ -27,6 +28,7 @@ type EventEmitterType = typeof EventEmitter3.EventEmitter;
 declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
+  export var AnalyticsJs: typeof SegmentAnalytics.Analytics;
   export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
