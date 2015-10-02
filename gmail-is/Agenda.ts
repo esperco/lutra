@@ -179,7 +179,7 @@ module Esper.Agenda {
         </ul>
       </div>
     </div>
-    <div #eventsContainer class="esper-modal-content" style="height: calc(100% - 400px); overflow-y: auto;">
+    <div #eventsContainer class="esper-modal-content" style="height: calc(100% - 360px); overflow-y: auto;">
       <div #eventSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
@@ -363,11 +363,15 @@ module Esper.Agenda {
       s.appendTo(recipients);
     }
 
-    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
-      return _.map(team.team_assistants, function(uid: string) {
-        return Teams.getProfile(uid).email;
-      });
-    }));
+    var recipientEmails = _.uniq(
+      _.flatten(
+        _.map(teams, function(team: ApiT.Team) {
+          return _.map(team.team_assistants, function(uid: string) {
+            return Teams.getProfile(uid).email;
+          });
+        })
+      )
+    );
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.eventRange(currentTeam.teamid,
