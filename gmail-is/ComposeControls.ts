@@ -47,7 +47,7 @@ module Esper.ComposeControls {
                   " at " + execMoment.format("h:mm a") + // 3:45 pm
                   " " + execMoment.zoneAbbr(); // EDT
     var forGuest = "";
-    if (guestTz) {
+    if (guestTz && guestTz !== execTz) {
       var guestMoment = (<any> moment)(ev.start.utc).tz(guestTz);
       forGuest = " / " + guestMoment.format("h:mm a") +
                  " " + guestMoment.zoneAbbr();
