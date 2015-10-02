@@ -396,7 +396,7 @@ module Esper.TaskList {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="height: calc(100% - 400px); overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content" style="height: calc(100% - 300px); overflow-y: auto;">
       <div #taskSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
@@ -425,7 +425,7 @@ module Esper.TaskList {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientTextArea rows="4" cols="50" />
+              <textarea #recipientTextArea rows="2" cols="50" />
             </td>
           </tr>
         </table>
@@ -635,11 +635,16 @@ module Esper.TaskList {
       s.appendTo(recipients);
     }
 
-    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
-      var teamEmails = _.map(team.team_assistants, function(uid: string) {
-        return Teams.getProfile(uid).email;
-      });
-    }));
+    var recipientEmails = _.uniq(
+      _.flatten(
+        _.map(teams, function(team: ApiT.Team) {
+          return _.map(team.team_assistants, function(uid: string) {
+            return Teams.getProfile(uid).email;
+          });
+        })
+      )
+    );
+    console.log(recipientEmails);
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     renderTasks();
