@@ -151,22 +151,20 @@ module Esper.ComposeControls {
   /** Inserts a canned response template into the text box. */
   function templateButton(composeControls) {
 '''
-<select #templateButton title class="esper-select esper-composition-button">
-  <object #templateIcon class="esper-svg esper-composition-button-icon"/>
-  <div #templateBadge class="esper-composition-badge">...</div>
+<select #templateButton title class="esper-select">
   <option value="header">Select template...</option>
 </select>
 <div #editorText/>
 '''
 
-    templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
+    //templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
 
     var templates: ApiT.Template[];
 
     CurrentThread.currentTeam.get().match({
       some: function(team) {
         Api.listTemplates(team.teamid).done(function(response) {
-          templates = response.templates;
+          templates = response.items;
           List.iter(templates, function(tmp) {
             $("<option value='" + tmp.id + "'>" + tmp.title + "</option>")
               .appendTo(templateButton);
@@ -244,8 +242,8 @@ module Esper.ComposeControls {
               var execName = allPrefs.team.team_name.replace(/ .*$/, "");
               if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
               var filledTemplate =
-                editor.getHTML().replace(/\|EVENT\|/g, entry)
-                .replace(/\|EXEC\|/g, execName);
+                editor.getHTML().replace(/\{EVENT\}/g, entry)
+                .replace(/\{EXEC\}/g, execName);
               
               composeControls.insertAtCaret(filledTemplate);
               Analytics.track(Analytics.Trackable.ClickTemplateIcon);

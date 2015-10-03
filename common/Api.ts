@@ -704,9 +704,9 @@ module Esper.Api {
   }
 
   export function listTemplates(teamid)
-    : JQueryPromise<ApiT.UserTemplates> {
+    : JQueryPromise<ApiT.UserTemplate> {
     var url =
-      Conf.Api.url + "/api/templates/list/" + string(Login.myUid())
+      Conf.Api.url + "/api/template/list/" + string(Login.myUid())
       + "/" + string(teamid);
     return JsonHttp.get(url);
   }

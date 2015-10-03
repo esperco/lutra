@@ -528,8 +528,8 @@ module Esper.ApiT {
     content: string;
   }
 
-  export interface UserTemplates {
-    templates: Template[];
+  export interface UserTemplate {
+    items: Template[];
   }
 
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
