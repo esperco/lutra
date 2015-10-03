@@ -145,7 +145,7 @@ module Esper.TeamSettings {
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentAbt.append(AboutTab.load(team, onboarding));
-    contentTmp.append(TemplatesTab.load(team, contentTmp))
+    contentTmp.append(TemplateTab.load(team, contentTmp))
 
     if (onboarding) {
       // We'll guide the exec through each step

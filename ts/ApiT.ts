@@ -523,8 +523,8 @@ type token_response = [
     content: string;
   }
 
-  export interface UserTemplates {
-    templates: Template[];
+  export interface UserTemplate {
+    items: Template[];
   }
 
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];

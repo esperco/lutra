@@ -2,11 +2,11 @@
   Team Settings - Templates Tab
 */
 
-module Esper.TemplatesTab {
+module Esper.TemplateTab {
 
   interface TemplateView {
     title: JQuery;
-    notes: JQuery;
+    content: JQuery;
   }
 
   function viewOfTemplate(team: ApiT.Team,
@@ -22,8 +22,8 @@ module Esper.TemplatesTab {
   <div>
     <div #help class="bottom-gap top-gap">
       Use these tags to construct a template:
-      <button #exec class="button-primary tag">|EXEC|</button>
-      <button #event class="button-primary tag">|EVENT|</button>
+      <button #exec class="button-primary tag">\{EXEC}</button>
+      <button #event class="button-primary tag">\{EVENT}</button>
     </div>
     <label>Text:</label>
     <div #templateText class="workflow-notes"/>
@@ -173,13 +173,13 @@ module Esper.TemplatesTab {
     exec.click(function() {
       editor.focus();
       var range = editor.getSelection();
-      editor.insertText(range.start, "|EXEC|");
+      editor.insertText(range.start, "{EXEC}");
     });
 
     event.click(function() {
       editor.focus();
       var range = editor.getSelection();
-      editor.insertText(range.start, "|EVENT|");
+      editor.insertText(range.start, "{EVENT}");
     });
 
     save.click(function() {
@@ -222,9 +222,9 @@ module Esper.TemplatesTab {
       var preferences = $.extend(true, Preferences.defaultPreferences(), prefs);
 
       Api.listTemplates(team.teamid).done(function(response) {
-        if (response.templates.length > 0) {
+        if (response.items.length > 0) {
           var tmpById: { [tmpid: string]: ApiT.Template } = {};
-          List.iter(response.templates, function(tmp) {
+          List.iter(response.items, function(tmp) {
             var opt = ("<option value='" + tmp.id + "'>" + tmp.title + "</option>");
             tmpById[tmp.id] = tmp;
             editDropdown.append(opt);

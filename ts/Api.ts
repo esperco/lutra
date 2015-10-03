@@ -739,15 +739,15 @@ module Esper.Api {
   }
 
   export function listTemplates(teamid)
-      : JQueryPromise<ApiT.UserTemplates> {
-      var url = "/api/templates/list/" + string(Login.me())
+      : JQueryPromise<ApiT.UserTemplate> {
+      var url = "/api/template/list/" + string(Login.me())
           + "/" + string(teamid);
       return jsonHttpGet(url);
   }
 
   export function createTemplate(teamid, title)
       : JQueryPromise<ApiT.Template> {
-      var url = "/api/templates/create/" + string(Login.me())
+      var url = "/api/template/create/" + string(Login.me())
           + "/" + string(teamid)
           + "/" + string(title);
       return jsonHttpPost(url, "");
@@ -755,7 +755,7 @@ module Esper.Api {
 
   export function updateTemplate(teamid, templateid, template: ApiT.Template)
       : JQueryPromise<void> {
-      var url = "/api/templates/update/" + string(Login.me())
+      var url = "/api/template/" + string(Login.me())
           + "/" + string(teamid)
           + "/" + string(templateid);
       return jsonHttpPut(url, JSON.stringify(template));
@@ -763,7 +763,7 @@ module Esper.Api {
 
   export function deleteTemplate(teamid, templateid)
       : JQueryPromise<void> {
-      var url = "/api/templates/delete/" + string(Login.me())
+      var url = "/api/template/" + string(Login.me())
           + "/" + string(teamid)
           + "/" + string(templateid);
       return jsonHttpDelete(url);
