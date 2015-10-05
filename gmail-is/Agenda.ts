@@ -202,7 +202,7 @@ module Esper.Agenda {
         <label>
           <input #includeTaskNotes type="checkbox" />
           Include task notes
-        <label>
+        </label>
         <table>
            <tr>
             <td valign="top" align="left" style="padding: 0; min-width: 80px;">
