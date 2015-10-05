@@ -437,6 +437,8 @@ module Esper.Agenda {
 
     function renderEvents() {
       eventsContainer.children().remove(".esper-agenda-event, hr");
+      eventSpinner.show();
+      noEvents.hide();
       var teamids = getCheckedValues(teamSelect);
       var teams = _.filter(Login.myTeams(), function(team: ApiT.Team) {
         return _.some(teamids, function(teamid) {
