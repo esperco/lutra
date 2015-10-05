@@ -363,11 +363,15 @@ module Esper.Agenda {
       s.appendTo(recipients);
     }
 
-    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
-      return _.map(team.team_assistants, function(uid: string) {
-        return Teams.getProfile(uid).email;
-      });
-    }));
+    var recipientEmails = _.uniq(
+      _.flatten(
+        _.map(teams, function(team: ApiT.Team) {
+          return _.map(team.team_assistants, function(uid: string) {
+            return Teams.getProfile(uid).email;
+          });
+        })
+      )
+    );
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.eventRange(currentTeam.teamid,
