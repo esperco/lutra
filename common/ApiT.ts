@@ -126,7 +126,6 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     location?: Location;
-    task_notes?: string;
     all_day?: boolean;
     guests: Attendee[];
     transparent?: boolean;
