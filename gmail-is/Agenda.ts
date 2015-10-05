@@ -243,6 +243,39 @@ module Esper.Agenda {
       filterDropdown.removeClass("open");
     }
 
+    function displayEventProperties(filter: string[]) {
+      // Display all event properties
+      if (_.includes(filter, "all")) {
+        eventsContainer
+          .find(".esper-ev-date, .esper-ev-weekday, .esper-ev-title, .esper-ev-location, .esper-ev-times")
+          .show();
+        return;
+      }
+
+      if (_.includes(filter, "date")) {
+        eventsContainer.find(".esper-ev-date").show();
+        eventsContainer.find(".esper-ev-weekday").show();
+      } else {
+        eventsContainer.find(".esper-ev-date").hide();
+        eventsContainer.find(".esper-ev-weekday").hide();
+      }
+
+      if (_.includes(filter, "title"))
+        eventsContainer.find(".esper-ev-title").show();
+      else
+        eventsContainer.find(".esper-ev-title").hide();
+
+      if (_.includes(filter, "location"))
+        eventsContainer.find(".esper-ev-location").show();
+      else
+        eventsContainer.find(".esper-ev-location").hide();
+
+      if (_.includes(filter, "time"))
+        eventsContainer.find(".esper-ev-times").show();
+      else
+        eventsContainer.find(".esper-ev-times").hide();
+    }
+
     _.forEach(teams, function(team, id) {
       var i = $("<input>")
           .attr({"type": "checkbox", "id": "esper-modal-team" + id})
@@ -320,12 +353,22 @@ module Esper.Agenda {
     });
 
     allFilter.find("label > input").change(function(e) {
+      e.stopPropagation();
       filterSelect.find("label > input").prop("checked", this.checked);
+      displayEventProperties(getCheckedValues(filterSelect));
     });
 
-    filterSelect.find("label > input[value!='all']").change(function() {
-      if (!$(this).is(":checked"))
+    filterSelect.find("label > input[value!='all']").change(function(e) {
+      if (!$(this).is(":checked")) {
+        e.stopPropagation();
         allFilter.find("label > input").prop("checked", false);
+        displayEventProperties(getCheckedValues(filterSelect));
+      }
+    });
+
+    filterSelect.click(function() {
+      var filter = getCheckedValues(filterSelect);
+      displayEventProperties(filter);
     });
 
     function appendEmailToTextarea() {
@@ -426,6 +469,7 @@ module Esper.Agenda {
     modal.click(closeDropdowns);
     Util.preventClickPropagation(teamSelectToggle);
     Util.preventClickPropagation(timezoneSelectToggle);
+    Util.preventClickPropagation(filterSelectToggle);
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
