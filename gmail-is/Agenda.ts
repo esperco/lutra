@@ -206,11 +206,6 @@ module Esper.Agenda {
           <input #textFormat type="radio" name="format" />
           Plain text
         </label>
-        <br />
-        <label>
-          <input #includeTaskNotes type="checkbox" />
-          Include task notes
-        </label>
         <table>
            <tr>
             <td valign="top" align="left" style="padding: 0; min-width: 80px;">
@@ -497,7 +492,7 @@ module Esper.Agenda {
       var t = getCheckedValues(teamSelect);
       var tz = _.first(getCheckedValues(timezoneSelect));
       var format = htmlFormat.prop("checked");
-      var i = includeTaskNotes.prop("checked");
+      var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       u.setHours(23, 59, 59, 999);
