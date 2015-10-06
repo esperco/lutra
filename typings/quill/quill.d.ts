@@ -12,6 +12,7 @@ interface Delta {
     getHTML(): string;
     setText(html: string, source?: string): void;
     on(arg: string, arg2: Function): void;
+    focus(): void;
 }
 
 interface Range {
