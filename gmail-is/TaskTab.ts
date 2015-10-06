@@ -387,6 +387,7 @@ module Esper.TaskTab {
             selectMeetingTypeOnUserTab(result.task_data.task_meeting_type,
                                        userTabContent);
             Sidebar.dismissDropdowns();
+            Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
           });
       });
 
@@ -406,6 +407,7 @@ module Esper.TaskTab {
         .click(function() {
           createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
                              userTabContent);
+          Analytics.track(Analytics.Trackable.RenameTaskTabTask);
         });
 
       function addArchiveOption(task) {
@@ -431,6 +433,10 @@ module Esper.TaskTab {
                 task.task_archived = finalState;
                 CurrentThread.setTask(task);
                 Sidebar.dismissDropdowns();
+                if (finalState)
+                  Analytics.track(Analytics.Trackable.ArchiveTaskTabTask);
+                else
+                  Analytics.track(Analytics.Trackable.UnarchiveTaskTabTask);
               });
           });
       }
@@ -909,7 +915,10 @@ module Esper.TaskTab {
             taskCancel.hide();
             taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
           }
-          taskCancel.click(showMTDrop);
+          taskCancel.click(function() {
+            showMTDrop();
+            Analytics.track(Analytics.Trackable.CancelTaskTabTask);
+          });
           if (task !== undefined) {
             taskCaption.text(taskLabelExists);
             title = task.task_title;

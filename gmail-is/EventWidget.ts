@@ -84,7 +84,10 @@ module Esper.EventWidget {
 '''
     check.attr("data", Init.esperRootUrl + "img/green-check.svg");
 
-    choose.click(function(){confirmEvent(view, event, linkedEvents, team)});
+    choose.click(function() {
+      confirmEvent(view, event, linkedEvents, team);
+      Analytics.track(Analytics.Trackable.ChooseTaskTabEvent);
+    });
 
     return choose;
   }
