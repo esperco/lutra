@@ -98,6 +98,10 @@ module.exports = {
   // here, can be done programatically with Gulp task
   production: false,
 
+  // Watch mode => don't exit automatically on errors because we're re-
+  // compiling, is changed programmatically with Gulp task
+  watchMode: false,
+
   // Where to provision test runner in pubDir
   testDir: "test"
 };

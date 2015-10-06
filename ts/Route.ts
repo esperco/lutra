@@ -35,7 +35,7 @@ module Esper.Route {
   // Post-login hooks, get run automatically after each withLogin call
   // Each hook must return true to proceed to the next
   var postLoginHooks: { (): boolean; }[] = [
-    Onboarding.checkStatus
+    // Insert functions here
   ];
 
   function withLogin(whenDone,
@@ -70,18 +70,6 @@ module Esper.Route {
       gotToken(data.token);
     },
 
-    /* DEPRECATED - Use signup2 instead.
-       Gift code (same as generic invitation but collect also
-       an email address and a name. */
-    "redeem/:token/:email/:name/:platform" : function(data) {
-      Log.d(data);
-      if (isIOS()) {
-        openIOSapp(data.token, data.email, data.name);
-      } else {
-        withLogin(Page.settings.load, data.token, data.email);
-      }
-    },
-
     /* Sign-in via Google */
     "login-once/:uid/:hex_landing_url" : function(data) {
       var landing_url = Util.hexDecode(data.hex_landing_url);
@@ -106,41 +94,6 @@ module Esper.Route {
       });
     },
 
-    // Intentionally not requiring login for this
-    "join": function (data) {
-      Page.onboarding.load();
-    },
-
-    "join-from-login": function (data) {
-      Page.onboarding.load(0, {fromLogin: true});
-    },
-
-    "join/exchange": function (data) {
-      Page.onboarding.load(0, {exchange: true});
-    },
-
-    "join/:step" : function (data) {
-      let step = parseInt(data.step) || 0;
-      if (step) {
-        withLogin(function() {
-          Page.onboarding.load(step);
-        });
-      } else {
-        Page.onboarding.load();
-      }
-    },
-
-    "join/exchange/:step" : function (data) {
-      let step = parseInt(data.step) || 0;
-      if (step) {
-        withLogin(function() {
-          Page.onboarding.load(step, {exchange: true});
-        });
-      } else {
-        Page.onboarding.load(0, {exchange: true});
-      }
-    },
-
     "plans/:teamid" : function (data) {
       withLogin(Page.plans.load, data.teamid);
     },
@@ -149,43 +102,6 @@ module Esper.Route {
       withLogin(function() {
         Page.payment.load(data.teamid);
       });
-    },
-
-    // DEPRECATED - use signup2 or join instead
-    "signup/:fn/:ln/:phone/:email/:platform" : function (data) {
-      var signup = {
-        first_name: data.fn,
-        last_name: data.ln,
-        phone: data.phone,
-        platform: data.platform
-      };
-      if (data.platform === "Google Apps") {
-        Api.signup(data.email, signup).done(function() {
-          Api.createOwnTeam().done(function(response) {
-            window.location.assign(response.url);
-          });
-        });
-      }
-    },
-
-    "signup2/:fn/:ln/:phone/:email/:platform/*:token?" : function (data) {
-      var signup = {
-        first_name: data.fn,
-        last_name: data.ln,
-        phone: data.phone,
-        platform: data.platform
-      };
-      if (data.platform === "Google Apps") {
-        Api.signup(data.email, signup).done(function() {
-          if (data.token && data.token.length > 0) {
-            gotToken(data.token);
-          } else {
-            Api.createOwnTeam().done(function(response) {
-              window.location.assign(response.url);
-            });
-          }
-        });
-      }
     },
 
     "preferences" : function (data) {

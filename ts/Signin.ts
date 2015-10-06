@@ -76,20 +76,10 @@ module Esper.Signin {
       });
   }
 
-  // Returns a jQuery Deferred that resolves to a string token to be used
-  // for signup purposes
-  function getSignupToken(): JQueryPromise<string> {
-    return Api.createOwnTeam()
-      .then(function(data: ApiT.UrlResult) {
-        return data.url.match(/#!t\/(.+)\/?$/)[1];
-      });
-  };
-
   // Returns jQuery wrapped HTML code for a Google Button
   export function googleButton(landingUrl?: string,
                                optInvite?: string,
-                               optEmail?: string,
-                               optSignup?: boolean):
+                               optEmail?: string):
     JQuery {
 '''
 <button #button class="button-primary sign-in-btn google-btn">
@@ -113,17 +103,6 @@ module Esper.Signin {
       });
       let calls = [loginNonceCall];
 
-      // We should always have an invite token before going to Google, but
-      // only if optSignup is true -- if we don't have one, request from server
-      if (optSignup && !optInvite) {
-        let tokenCall = getSignupToken();
-        tokenCall.done(function(token) {
-          // Assign to higher-scoped variable so our other callbacks can see it
-          optInvite = token;
-        });
-        calls.push(tokenCall);
-      }
-
       // Run token and nonce calls in parallel
       Deferred.join(calls, true)
         // Get Google endpoint based on nonce and token
@@ -143,8 +122,7 @@ module Esper.Signin {
   // Returns jQuery wrapped HTML code for an Exchange / Nylas Button
   export function exchangeButton(landingUrl?: string,
                                  optInvite?: string,
-                                 optEmail?: string,
-                                 optSignup?: boolean):
+                                 optEmail?: string):
     JQuery {
 '''
 <button #button class="button-primary sign-in-btn exchange-btn">
@@ -303,12 +281,21 @@ module Esper.Signin {
       .then(
         /* success */
         function(tokenDescription) {
-          Page.onboarding.load(0, { inviteCode: inviteCode });
           showTokenDetails(tokenDescription);
+
+          // Log out if applicable
+          if (Login.data) {
+            Login.clearLoginInfo();
+          }
+
+          // Show login data
+          displayLoginLinks("Welcome to Esper! Please sign in.",
+            "#!", inviteCode, null);
         },
         /* failure */
         function() {
-          Route.nav.path("join");
+          Route.nav.home();
+          Status.reportError("Invalid invite code");
         }
       );
   }
