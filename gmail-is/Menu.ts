@@ -161,7 +161,7 @@ module Esper.Menu {
 
     logo.dropdown();
     logo.click(function() {
-      Analytics.track(Analytics.Trackable.ClickEsperLogoMenu);
+      Analytics.track(Analytics.Trackable.ClickMenuEsperLogo);
     });
 
     Util.repeatUntil(10, 1000, function() {
