@@ -5,7 +5,7 @@ module Esper.Analytics {
   // Events to track
   export enum Trackable {
     // Most trackable events have the form
-    // (Verb)(Module)(Element)
+    // (Verb)(Module)(Icon/HTMLElement)
     // Anything that deviates from the above form should
     // always be immediately obvious as to where the event
     // is fired from, e.g. SaveTaskNotes - there is only one
@@ -32,13 +32,13 @@ module Esper.Analytics {
     CreateTask,
     CreateTaskTabLinkedEvent,
     EditTaskNotes,
-    HideSidebar,
-    HideSidebarOptions,
+    MinimizeSidebar,
+    MinimizeSidebarOptions,
     SaveTaskNotes,
     SelectTaskTabMeetingType,
     SelectTaskTabWorkflow,
-    ShowSidebar,
-    ShowSidebarOptions,
+    MaximizeSidebar,
+    MaximizeSidebarOptions,
     LinkTaskTabEvent
   };
 
