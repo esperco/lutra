@@ -275,6 +275,31 @@ module Esper.Signin {
     Log.d(JSON.stringify(tokenDescription));
   }
 
+  function useInvite(inviteCode) {
+    Log.d("useInvite");
+    return Api.postToken(inviteCode)
+      .then(
+        /* success */
+        function(tokenDescription) {
+          showTokenDetails(tokenDescription);
+
+          // Log out if applicable
+          if (Login.data) {
+            Login.clearLoginInfo();
+          }
+
+          // Show login data
+          displayLoginLinks("Welcome to Esper! Please sign in.",
+            "#!", inviteCode, null);
+        },
+        /* failure */
+        function() {
+          Route.nav.home();
+          Status.reportError("Invalid invite code");
+        }
+      );
+  }
+
   function loginOrSignup(optEmail) {
     Log.d("loginOrSignup");
     var uid = Login.me();
@@ -330,20 +355,25 @@ module Esper.Signin {
   }
 
   export function signin( whenDone?: { (): void },
+                          optInviteCode?: string,
                           optEmail?: string) {
     document.title = "Sign in - Esper";
-    loginOrSignup(optEmail)
-      .done(function(ok) { // Logged in
-        if (ok) {
-          var landingUrl = document.URL;
-          whenDone = whenDone || function() { };
-          if (Login.isNylas()) {
-            whenDone();
-          } else {
-            checkGooglePermissions(landingUrl).done(whenDone);
+    if (optInviteCode !== undefined) {
+      useInvite(optInviteCode);
+    } else {
+      loginOrSignup(optEmail)
+        .done(function(ok) { // Logged in
+          if (ok) {
+            var landingUrl = document.URL;
+            whenDone = whenDone || function() { };
+            if (Login.isNylas()) {
+              whenDone();
+            } else {
+              checkGooglePermissions(landingUrl).done(whenDone);
+            }
           }
-        }
-      });
+        });
+    }
   };
 
   export function loginOnce(uid, landingUrl) {

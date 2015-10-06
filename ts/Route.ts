@@ -52,7 +52,7 @@ module Esper.Route {
       }
       whenDone();
     }
-    Signin.signin(callback, optEmail);
+    Signin.signin(callback, optInviteCode, optEmail);
   }
 
   function gotToken(token) {
