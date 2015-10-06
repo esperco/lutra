@@ -324,7 +324,7 @@ module Esper.Agenda {
 
     var tzSel = Timezone.createTimezoneSelector(timezone);
     tzSel.removeClass("esper-select");
-    tzSel.addClass("esper-agenda-select");
+    tzSel.addClass("esper-agenda-timezone-select");
     tzSel.val(timezone);
     timezoneDropdown.append(tzSel);
 
