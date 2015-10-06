@@ -203,12 +203,13 @@ module.exports = function(gulp) {
     var watchTargets = [config.vendorJSIndex,
                         path.join(getVendorDir(), "**/*.*")];
 
-    return gulp.task(name, function() {
-      return gulp.watch(watchTargets, gulp.series(function(cb) {
+    return gulp.task(name, function(cb) {
+      gulp.watch(watchTargets, gulp.series(function(cb) {
         // Force build on watch changes
         skip = false;
         cb();
       }, buildName));
+      cb();
     });
   };
 

@@ -38,8 +38,9 @@ module.exports = function(gulp) {
   // Watch HTML directory for changes
   exports.watch = function(name, config) {
     name = name || "watch-html";
-    return gulp.task(name, function() {
-      return gulp.watch(getHtmlGlobs(config), gulp.series(buildName));
+    return gulp.task(name, function(cb) {
+      gulp.watch(getHtmlGlobs(config), gulp.series(buildName));
+      cb();
     });
   };
 

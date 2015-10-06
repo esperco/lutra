@@ -5,7 +5,6 @@ module.exports = function(gulp) {
       cached        = require('gulp-cached'),
       exec          = require('gulp-exec'),
       filter        = require('gulp-filter'),
-      gutil         = require('gulp-util'),
       path          = require('path'),
       remember      = require('gulp-remember'),
       sourcemaps    = require('gulp-sourcemaps'),
@@ -71,9 +70,36 @@ module.exports = function(gulp) {
           tsRefFilter = {referencedFrom: proj.devIn};
         }
 
+        /*
+          TypeScript error/success reporter -- alternatives include:
+            - ts.reporter.nullReporter()
+            - ts.reporter.longReporter()
+            - ts.reporter.fullReporter()
+        */
+        var reporter = ts.reporter.defaultReporter();
+
+        /*
+          Wrap reporter so that not watching files and automatically re-
+          compiling, we throw a non-zero error code on failure
+        */
+        if (! config.watchMode) {
+          var oldHandler = reporter.finish;
+          reporter.finish = function(results) {
+            oldHandler.call(this, results);
+            if (results.transpileErrors ||
+                results.syntaxErrors ||
+                results.globalErrors ||
+                results.semanticErrors ||
+                results.emitErrors ||
+                results.emitSkipped) {
+              process.exit(1);
+            }
+          };
+        }
+
         ret = ret
           .pipe(sourcemaps.init())
-          .pipe(ts(tsProject, tsRefFilter));
+          .pipe(ts(tsProject, tsRefFilter, reporter));
 
         if (config.production) {
           // loadMaps = true so we can load tsify/browserify sourcemaps
@@ -89,7 +115,6 @@ module.exports = function(gulp) {
         }
 
         return ret
-          .on("error", gutil.log)
           .pipe(gulp.dest(bundleDir));
       });
     });
@@ -104,9 +129,11 @@ module.exports = function(gulp) {
     _.each(config.tsProjects || [], function(proj, index) {
       var watchName = name + " " + proj.out;
       watchNames.push(watchName);
-      gulp.task(watchName, function() {
-        return gulp.watch(getTsGlobs(proj, config),
+      gulp.task(watchName, function(cb) {
+        config.watchMode = true;
+        gulp.watch(getTsGlobs(proj, config),
           gulp.series(buildNames[index]));
+        cb();
       });
     });
 
