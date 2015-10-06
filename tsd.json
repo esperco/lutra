@@ -59,8 +59,8 @@
     "bootstrap/bootstrap.d.ts": {
       "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
     },
-    "segment-analytics/segment-analytics-node.d.ts": {
-      "commit": "08a41b3385308e74c904559e9e652a3d69b7842c"
+    "analytics-node/analytics-node.d.ts": {
+      "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
     }
   }
 }

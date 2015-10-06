@@ -18,4 +18,4 @@
 /// <reference path="page/page.d.ts" />
 /// <reference path="bootstrap/bootstrap.d.ts" />
 /// <reference path="quill/quill.d.ts" />
-/// <reference path="segment-analytics/segment-analytics-node.d.ts" />
+/// <reference path="analytics-node/analytics-node.d.ts" />
