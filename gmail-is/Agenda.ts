@@ -10,6 +10,7 @@ module Esper.Agenda {
                        filter: string[]) {
 '''
 <div #view class="esper-agenda-event">
+  <h4 #name></h4>
   <div #weekday class="esper-ev-weekday"/>
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
@@ -30,6 +31,7 @@ module Esper.Agenda {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end ? e.end.local : e.start.local);
 
+    name.text(team.team_name + "'s Event");
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
@@ -42,6 +44,8 @@ module Esper.Agenda {
       title.hide();
     if (!_.includes(filter, "location") && !_.includes(filter, "all"))
       location.hide();
+    if (!_.includes(filter, "task_notes") && !_.includes(filter, "all"))
+      taskNotes.hide();
     if (!_.includes(filter, "date") && !_.includes(filter, "all")) {
       date.hide();
       weekday.hide();
@@ -79,6 +83,10 @@ module Esper.Agenda {
 
     if (e.location !== undefined) {
       location.text(e.location.address);
+    }
+
+    if (e.task_notes !== undefined) {
+      taskNotes.html(e.task_notes);
     }
 
     return view;
@@ -163,12 +171,12 @@ module Esper.Agenda {
               Location
             </label>
           </li>
-          <!-- <li #taskNotesFilter>
+          <li #taskNotesFilter>
             <label for="esper-modal-filter-task-notes">
               <input id="esper-modal-filter-task-notes" type="checkbox" value="task_notes" checked />
               Task notes
             </label>
-          </li> -->
+          </li>
         </ul>
       </div>
     </div>
@@ -190,11 +198,6 @@ module Esper.Agenda {
         <label>
           <input #textFormat type="radio" name="format" />
           Plain text
-        </label>
-        <br />
-        <label>
-          <input #includeTaskNotes type="checkbox" />
-          Include task notes
         </label>
         <table>
            <tr>
@@ -265,6 +268,11 @@ module Esper.Agenda {
         eventsContainer.find(".esper-ev-times").show();
       else
         eventsContainer.find(".esper-ev-times").hide();
+
+      if (_.includes(filter, "task_notes"))
+        eventsContainer.find(".esper-ev-task-notes").show();
+      else
+        eventsContainer.find(".esper-ev-task-notes").hide();
     }
 
     _.forEach(teams, function(team, id) {
@@ -459,7 +467,7 @@ module Esper.Agenda {
       var t = getCheckedValues(teamSelect);
       var tz = tzSel.val();
       var format = htmlFormat.prop("checked");
-      var i = includeTaskNotes.prop("checked");
+      var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       u.setHours(23, 59, 59, 999);
