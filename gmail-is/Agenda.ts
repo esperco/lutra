@@ -125,14 +125,7 @@ module Esper.Agenda {
         <i class="fa fa-calendar esper-calendar-icon"></i>
       </button>
       in
-      <div #timezoneDropdown class="dropdown esper-dropdown">
-        <button #timezoneSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Timezone
-          <i class="fa fa-chevron-down"></i>
-        </button>
-        <ul #timezoneSelect class="dropdown-menu esper-dropdown-select">
-        </ul>
-      </div>
+      <span #timezoneDropdown />
       timezone with
       <div #filterDropdown class="dropdown esper-dropdown">
         <button #filterSelectToggle class="btn btn-default  dropdown-toggle" data-toggle="d ropdown">
@@ -231,7 +224,6 @@ module Esper.Agenda {
 '''
     var teams = Login.myTeams();
     teamSelectToggle.dropdown();
-    timezoneSelectToggle.dropdown();
     filterSelectToggle.dropdown();
     recipientTextArea.val(Login.myEmail() + ", ");
 
@@ -239,7 +231,6 @@ module Esper.Agenda {
 
     function closeDropdowns() {
       teamDropdown.removeClass("open");
-      timezoneDropdown.removeClass("open");
       filterDropdown.removeClass("open");
     }
 
@@ -331,26 +322,11 @@ module Esper.Agenda {
 
     var timezone = Teams.getPreferences(currentTeam.teamid).general.current_timezone;
 
-    _.forEach(Timezone.commonTimezones, function(tz, id) {
-      var i = $("<input>")
-          .attr({"type": "radio",
-            "id": "esper-modal-timezone"+id,
-            "name": "esper-timezone"})
-          .val(tz.id);
-      var l = $("<label>")
-        .attr("for", "esper-modal-timezone"+id)
-        .append(i)
-        .append(tz.name)
-        .click(function() {
-          timezoneSelectToggle.contents().first().replaceWith(tz.name);
-        });
-      if (tz.id === timezone) {
-        i.prop("checked", true);
-        timezoneSelectToggle.contents().first().replaceWith(tz.name);
-      }
-      var li = $("<li>").append(l);
-      li.appendTo(timezoneSelect);
-    });
+    var tzSel = Timezone.createTimezoneSelector(timezone);
+    tzSel.removeClass("esper-select");
+    tzSel.addClass("esper-agenda-select");
+    tzSel.val(timezone);
+    timezoneDropdown.append(tzSel);
 
     allFilter.find("label > input").change(function(e) {
       e.stopPropagation();
@@ -470,7 +446,6 @@ module Esper.Agenda {
 
     modal.click(closeDropdowns);
     Util.preventClickPropagation(teamSelectToggle);
-    Util.preventClickPropagation(timezoneSelectToggle);
     Util.preventClickPropagation(filterSelectToggle);
 
     view.click(cancel);
@@ -482,7 +457,7 @@ module Esper.Agenda {
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = _.first(getCheckedValues(timezoneSelect));
+      var tz = tzSel.val();
       var format = htmlFormat.prop("checked");
       var i = includeTaskNotes.prop("checked");
       var f = timeFromDate.datepicker("getDate");
