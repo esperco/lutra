@@ -32,7 +32,7 @@ declare module Esper {
   export var React: ReactStatic;
   export var pageJs: PageJS.Static;
   export var PRODUCTION: boolean;
-  export var quill: any;
+  export var quill: QuillStatic;
 }
 
 (function(Esper: any) {
