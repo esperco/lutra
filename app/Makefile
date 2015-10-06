@@ -8,6 +8,7 @@ setup:
 # Do a quick build, don't rebuild vendor files if not necessary
 build:
 	npm run build
+	echo "Build successful"
 
 dev: build
 

@@ -51,8 +51,9 @@ module.exports = function(gulp) {
   // Watch LESS directory for changes
   exports.watch = function(name, config) {
     name = name || "watch-less";
-    return gulp.task(name, function() {
-      return gulp.watch(getLessGlobs(config), gulp.series(buildName));
+    return gulp.task(name, function(cb) {
+      gulp.watch(getLessGlobs(config), gulp.series(buildName));
+      cb();
     });
   };
 

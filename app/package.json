@@ -4,11 +4,11 @@
   "description": "Test app for marten",
   "scripts": {
     "postinstall": "../link.sh",
-    "build": "gulp build",
-    "build-production": "gulp build-production",
+    "build": "gulp build --timeout 30000",
+    "build-production": "gulp build-production --timeout 30000",
     "serve": "gulp http-server",
     "rebuild": "gulp rebuild",
-    "watch": "gulp watch"
+    "watch": "gulp watch --timeout 30000"
   },
   "devDependencies": {
     "gulp": "git://github.com/gulpjs/gulp.git#4.0"
