@@ -214,7 +214,13 @@ button.button-primary {
   }
   &.large { border-width: 2px; }
   &.index { border-width: 2px; }
-  &.green { background: @green; }
+  &.green {
+    background: @green;
+    &.shadow { box-shadow: 2px 5px 5px #888888; }
+    &:hover {
+      background: @green_hover;
+    }
+  }
 }
 
 button.button-secondary {
