@@ -95,6 +95,7 @@ module Esper.TeamSettings {
       <li #tabWkf><a class="link">Workflows</a></li>
       <li #tabLab><a class="link">Labels</a></li>
       <li #tabUsg><a class="link">Usage</a></li>
+      <li #tabTmp><a class="link">Templates</a></li>
       <li #tabAbt><a class="link">About</a></li>
     </ul>
   </div>
@@ -105,6 +106,7 @@ module Esper.TeamSettings {
     <div #contentWkf class="tab-content"/>
     <div #contentLab class="tab-content"/>
     <div #contentUsg class="tab-content"/>
+    <div #contentTmp class="tab-content"/>
     <div #contentAbt class="tab-content"/>
   </div>
 </div>
@@ -116,6 +118,7 @@ module Esper.TeamSettings {
     var tabViewWkf = makeTabView("wkf", tabWkf, contentWkf, true);
     var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
     var tabViewUsg = makeTabView("usg", tabUsg, contentUsg, true);
+    var tabViewTmp = makeTabView("tmp", tabTmp, contentTmp, true);
     var tabViewAbt = makeTabView("abt", tabAbt, contentAbt, true);
     tabViews /* global */ = [
       tabViewAcc,
@@ -124,6 +127,7 @@ module Esper.TeamSettings {
       tabViewWkf,
       tabViewLab,
       tabViewUsg,
+      tabViewTmp,
       tabViewAbt
     ];
 
@@ -141,6 +145,7 @@ module Esper.TeamSettings {
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentAbt.append(AboutTab.load(team, onboarding));
+    contentTmp.append(TemplateTab.load(team, contentTmp))
 
     if (onboarding) {
       // We'll guide the exec through each step

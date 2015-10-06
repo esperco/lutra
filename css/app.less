@@ -34,6 +34,14 @@
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
 
+/*** Imports ***/
+.esper {
+  @import "../marten/vendor/font-awesome/less/font-awesome";
+  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
+  @import (less) "../marten/vendor/quill/dist/quill.snow.css";
+  @import (less) "../marten/vendor/quill/dist/quill.base.css";
+}
+
 /*** General ***/
 
 body {
@@ -86,6 +94,11 @@ button,
   background-image:linear-gradient(to bottom, #A75FCC 0%, #9C59BF 100%);
   border: 1px solid #70348F;
   transition: background-image 0.6s, box-shadow 0.6s;
+  &.tag {
+    height: 25px;
+    vertical-align: middle;
+    padding-top: 2px;
+  }
   &:hover {
     color: white;
     background-image: linear-gradient(to bottom, #A75FCC 0%, #8A4DAA 100%);

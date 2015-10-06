@@ -732,4 +732,35 @@ module Esper.Api {
     return jsonHttpDelete(url);
   }
 
+  export function listTemplates(teamid)
+      : JQueryPromise<ApiT.UserTemplate> {
+      var url = "/api/template-list/" + string(Login.me())
+          + "/" + string(teamid);
+      return jsonHttpGet(url);
+  }
+
+  export function createTemplate(teamid, title)
+      : JQueryPromise<ApiT.Template> {
+      var url = "/api/template-create/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(title);
+      return jsonHttpPost(url, "");
+  }
+
+  export function updateTemplate(teamid, templateid, template: ApiT.Template)
+      : JQueryPromise<void> {
+      var url = "/api/template/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(templateid);
+      return jsonHttpPut(url, JSON.stringify(template));
+  }
+
+  export function deleteTemplate(teamid, templateid)
+      : JQueryPromise<void> {
+      var url = "/api/template/" + string(Login.me())
+          + "/" + string(teamid)
+          + "/" + string(templateid);
+      return jsonHttpDelete(url);
+  }
+
 }

@@ -9,7 +9,8 @@ var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
-    momentTz      = require("moment-timezone");
+    momentTz      = require("moment-timezone"),
+    quill         = require("quill");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -49,7 +50,8 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,
-    React:        react
+    React:        react,
+    quill:        quill
   };
   for (var name in assignments) {
     if (assignments.hasOwnProperty(name)) {
