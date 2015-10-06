@@ -522,6 +522,16 @@ module Esper.ApiT {
     workflows : Workflow[];
   }
 
+  export interface Template {
+    id: string;
+    title: string;
+    content: string;
+  }
+
+  export interface UserTemplate {
+    items: Template[];
+  }
+
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
 
   export interface WorkflowStep {
