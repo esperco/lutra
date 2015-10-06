@@ -151,27 +151,56 @@ module Esper.ComposeControls {
   /** Inserts a canned response template into the text box. */
   function templateButton(composeControls) {
 '''
-<select #templateButton title class="esper-select">
-  <option value="header">Select template...</option>
-</select>
+<div #templateButton class="esper-composition-button">
+  <object #templateIcon class="esper-svg esper-composition-button-icon"/>
+  <div #templateBadge class="esper-composition-badge">...</div>
+  <ul #templateDropdown class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
+    <div #viewTemplates class="esper-dropdown-section"/>
+  </ul>
+</div>
 <div #editorText/>
 '''
 
-    //templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
+    templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
 
     var templates: ApiT.Template[];
 
-    CurrentThread.currentTeam.get().match({
-      some: function(team) {
-        Api.listTemplates(team.teamid).done(function(response) {
-          templates = response.items;
-          List.iter(templates, function(tmp) {
-            $("<option value='" + tmp.id + "'>" + tmp.title + "</option>")
-              .appendTo(templateButton);
-          });
+    function getTemplates() {
+      $("<li class='esper-li'>Customize...</li>")
+        .appendTo(viewTemplates)
+        .click(function(e) {
+          e.stopPropagation();
+          window.open("https://app.esper.com");
         });
-      },
-      none: function() {}
+      CurrentThread.currentTeam.get().match({
+        some: function(team) {
+          Api.listTemplates(team.teamid).done(function(response) {
+            templates = response.items;
+            List.iter(templates, function(tmp) {
+              $("<li class='esper-li' value='" + tmp.id + "'>" + tmp.title + "</li>")
+                .appendTo(viewTemplates)
+                .click(function(e) {
+                  e.stopPropagation();
+                  displayTemplate(tmp.id);
+                });
+            });
+          });
+        },
+        none: function() { }
+      });
+    }
+
+    templateButton.click(function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      templateDropdown.toggle();
+      if(!(templateDropdown.hasClass("esper-open"))) {
+        templateDropdown.addClass("esper-open");
+        viewTemplates.find(".esper-li").remove();
+        getTemplates();
+      } else {
+        templateDropdown.removeClass("esper-open");
+      }
     });
 
     templateButton.tooltip({
@@ -182,80 +211,77 @@ module Esper.ComposeControls {
       "tooltipClass": "esper-top esper-tooltip"
     });
 
-    templateButton.change(function (e) {
-      var chosen = $(this).val();
-      if (chosen !== "header") {
-        CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
-          teamAndPrefs.match({
-            some : function (allPrefs) {
+    function displayTemplate(chosen) {
+      CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
+        teamAndPrefs.match({
+          some : function (allPrefs) {
 
-              // We can insert template right away, but start task creation
-              // in the background.
-              CurrentThread.getTaskForThread();
+            // We can insert template right away, but start task creation
+            // in the background.
+            CurrentThread.getTaskForThread();
 
-              var tmp = List.find(templates, function(tmp) {
-                return tmp.id === chosen;
-              });
+            var tmp = List.find(templates, function(tmp) {
+              return tmp.id === chosen;
+            });
 
-              var execTz, guestTz;
-              var general = allPrefs.execPrefs.general;
-              if (general) execTz = general.current_timezone;
-              allPrefs.taskPrefs.match({
-                some: function(tpref) {
-                  if (tpref.executive_timezone) {
-                    execTz = tpref.executive_timezone; // overrides preferences
-                  }
-                  guestTz = tpref.guest_timezone;
-                },
-                none: function() { }
-              });
-
-              var events = CurrentThread.linkedEvents.get();
-              events.filter(function (e) {
-                if (e.task_event.end) {
-                  return new Date(e.task_event.end.local) > new Date(Date.now());
-                } else {
-                  return new Date(e.task_event.start.local) > new Date(Date.now());
+            var execTz, guestTz;
+            var general = allPrefs.execPrefs.general;
+            if (general) execTz = general.current_timezone;
+            allPrefs.taskPrefs.match({
+              some: function(tpref) {
+                if (tpref.executive_timezone) {
+                  execTz = tpref.executive_timezone; // overrides preferences
                 }
-              });
+                guestTz = tpref.guest_timezone;
+              },
+              none: function() { }
+            });
 
-              var entry = events.reduce(function (str, event): string {
-                var ev = event.task_event;
-                var time = formatStartTime(ev, execTz, guestTz);
-                var loc;
-                if (ev.location !== undefined) {
-                  loc = ev.location.address;
-                  if (ev.location.title !== "") {
-                    loc = ev.location.title + " - " + loc;
-                  }
-                } else {
-                  loc = "<b>LOCATION</b>";
+            var events = CurrentThread.linkedEvents.get();
+            events.filter(function (e) {
+              if (e.task_event.end) {
+                return new Date(e.task_event.end.local) > new Date(Date.now());
+              } else {
+                return new Date(e.task_event.start.local) > new Date(Date.now());
+              }
+            });
+
+            var entry = events.reduce(function (str, event): string {
+              var ev = event.task_event;
+              var time = formatStartTime(ev, execTz, guestTz);
+              var loc;
+              if (ev.location !== undefined) {
+                loc = ev.location.address;
+                if (ev.location.title !== "") {
+                  loc = ev.location.title + " - " + loc;
                 }
-                var br = str != "" ? "<br />" : ""; // no leading newline
-                return str + br + time + " at " + loc;
-              }, "");
+              } else {
+                loc = "<b>LOCATION</b>";
+              }
+              var br = str != "" ? "<br />" : ""; // no leading newline
+              return str + br + time + " at " + loc;
+            }, "");
 
-              var template = tmp.content;
-              var editor = new quill(editorText.get(0));
-              editor.setContents(JSON.parse(template));
+            var template = tmp.content;
+            var editor = new quill(editorText.get(0));
+            editor.setContents(JSON.parse(template));
 
-              var execName = allPrefs.team.team_name.replace(/ .*$/, "");
-              if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
-              var filledTemplate =
-                editor.getHTML().replace(/\{EVENT\}/g, entry)
-                .replace(/\{EXEC\}/g, execName);
-              
-              composeControls.insertAtCaret(filledTemplate);
-              Analytics.track(Analytics.Trackable.ClickTemplateIcon);
-            },
-            none : function () {
-              // TODO: Handle more gracefully?
-              window.alert("Cannot insert template: current team not detected.");
-            }
-          });
+            var execName = allPrefs.team.team_name.replace(/ .*$/, "");
+            if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
+            var filledTemplate =
+              editor.getHTML().replace(/\{EVENT\}/g, entry)
+              .replace(/\{EXEC\}/g, execName);
+            
+            composeControls.insertAtCaret(filledTemplate);
+            Analytics.track(Analytics.Trackable.ClickTemplateIcon);
+          },
+          none : function () {
+            // TODO: Handle more gracefully?
+            window.alert("Cannot insert template: current team not detected.");
+          }
         });
-      }
-    });
+      });
+    }
 
     return Option.some(templateButton);
   }
