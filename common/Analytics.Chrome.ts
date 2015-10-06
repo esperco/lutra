@@ -4,7 +4,7 @@
   Analytics.js library because it works better with Chrome extensions.
 */
 
-/// <reference path="../marten/typings/segment-analytics/segment-analytics-node.d.ts" />
+/// <reference path="../marten/typings/analytics-node/analytics-node.d.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Conf.ts" />
 /// <reference path="./Analytics.ts" />
@@ -13,7 +13,7 @@
 
 module Esper.Analytics {
   // Reference to Analytics NodeJS library
-  var analytics: SegmentAnalytics.Analytics;
+  var analytics: AnalyticsNode.Analytics;
 
   export function init() {
     // Initialize Analytics instance
