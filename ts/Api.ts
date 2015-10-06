@@ -740,14 +740,14 @@ module Esper.Api {
 
   export function listTemplates(teamid)
       : JQueryPromise<ApiT.UserTemplate> {
-      var url = "/api/template/list/" + string(Login.me())
+      var url = "/api/template-list/" + string(Login.me())
           + "/" + string(teamid);
       return jsonHttpGet(url);
   }
 
   export function createTemplate(teamid, title)
       : JQueryPromise<ApiT.Template> {
-      var url = "/api/template/create/" + string(Login.me())
+      var url = "/api/template-create/" + string(Login.me())
           + "/" + string(teamid)
           + "/" + string(title);
       return jsonHttpPost(url, "");

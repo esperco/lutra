@@ -22,8 +22,8 @@ module Esper.TemplateTab {
   <div>
     <div #help class="bottom-gap top-gap">
       Use these tags to construct a template:
-      <button #exec class="button-primary tag">\{EXEC}</button>
-      <button #event class="button-primary tag">\{EVENT}</button>
+      <button #exec class="button-primary tag">Exec's first name.</button>
+      <button #event class="button-primary tag">Events Date at Time</button>
     </div>
     <label>Text:</label>
     <div #templateText class="workflow-notes"/>
