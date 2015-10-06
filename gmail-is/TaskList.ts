@@ -576,6 +576,12 @@ module Esper.TaskList {
       li.appendTo(teamSelect);
     });
 
+    allTeams.find("label > input").change(function(e) {
+      e.stopPropagation();
+      teamSelect.find("label > input").prop("checked", this.checked);
+      renderTasks();
+    });
+
     allProgress.find("label > input").change(function(e) {
       e.stopPropagation();
       progressSelect.find("label > input").prop("checked", this.checked);
@@ -596,6 +602,11 @@ module Esper.TaskList {
     labelSelect.find("label > input[value!='all']").change(function() {
       if (!$(this).is(":checked"))
         allLabels.find("label > input").prop("checked", false);
+    });
+
+    teamSelect.find("label > input[value!='']").change(function() {
+      if (!$(this).is(":checked"))
+        allTeams.find("label > input").prop("checked", false);
     });
 
     recipientTextArea.val(Login.myEmail() + ", ");

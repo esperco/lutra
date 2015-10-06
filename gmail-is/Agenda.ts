@@ -336,6 +336,12 @@ module Esper.Agenda {
     tzSel.val(timezone);
     timezoneDropdown.append(tzSel);
 
+    allTeams.find("label > input").change(function(e) {
+      e.stopPropagation();
+      teamSelect.find("label > input").prop("checked", this.checked);
+      renderEvents();
+    });
+
     allFilter.find("label > input").change(function(e) {
       e.stopPropagation();
       filterSelect.find("label > input").prop("checked", this.checked);
@@ -349,6 +355,14 @@ module Esper.Agenda {
         displayEventProperties(getCheckedValues(filterSelect));
       }
     });
+
+    filterSelect.find("label > input[value!='']").change(function(e) {
+      if (!$(this).is(":checked")) {
+        e.stopPropagation();
+        allTeams.find("label > input").prop("checked", false);
+        renderEvents();
+      }
+    })
 
     filterSelect.click(function() {
       var filter = getCheckedValues(filterSelect);
