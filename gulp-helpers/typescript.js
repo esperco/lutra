@@ -5,7 +5,6 @@ module.exports = function(gulp) {
       cached        = require('gulp-cached'),
       exec          = require('gulp-exec'),
       filter        = require('gulp-filter'),
-      // gutil         = require('gulp-util'),
       path          = require('path'),
       remember      = require('gulp-remember'),
       sourcemaps    = require('gulp-sourcemaps'),
