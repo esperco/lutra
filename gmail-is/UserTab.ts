@@ -956,6 +956,10 @@ module Esper.UserTab {
 
       meetingSelector.change(); // ensure this section is initialized correctly
 
+      meetingSelector.click(function() {
+        Analytics.track(Analytics.Trackable.ClickUserTabMeetingsDropdown);
+      });
+
       // NB: Triggering click event is a bit hacky since meetings show always
       // start open, but this should be fine for now.
       showMeetings.click();

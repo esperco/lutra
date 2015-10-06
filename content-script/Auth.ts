@@ -86,7 +86,7 @@ module Esper.Auth {
         if (!x.declined || forceLogin) {
           if (x.credentials !== undefined) {
             Login.setAccount(x);
-            Analytics.identify();
+            Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
           }
           else {

@@ -712,6 +712,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function listTemplates(teamid)
+    : JQueryPromise<ApiT.UserTemplate> {
+    var url =
+      Conf.Api.url + "/api/template-list/" + string(Login.myUid())
+      + "/" + string(teamid);
+    return JsonHttp.get(url);
+  }
+
   export function putWorkflowProgress(teamid: string, taskid: string,
                                       progress : ApiT.TaskWorkflowProgress)
     : JQueryPromise<void>

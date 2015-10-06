@@ -90,7 +90,7 @@ module Esper.Login {
   }
 
   export function myEmail() {
-    if (watchableInfo.get() !== undefined) {
+    if (watchableInfo.isValid()) {
       return watchableInfo.get().email;
     } else {
       return;
@@ -98,7 +98,7 @@ module Esper.Login {
   }
 
   export function myTeams() {
-    if (watchableInfo.get() !== undefined) {
+    if (watchableInfo.isValid()) {
       return watchableInfo.get().teams;
     } else {
       return;

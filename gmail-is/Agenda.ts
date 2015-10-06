@@ -10,6 +10,7 @@ module Esper.Agenda {
                        filter: string[]) {
 '''
 <div #view class="esper-agenda-event">
+  <h4 #name></h4>
   <div #weekday class="esper-ev-weekday"/>
   <div #date title class="esper-ev-date">
     <div #month class="esper-ev-month"/>
@@ -30,6 +31,7 @@ module Esper.Agenda {
     var start = XDate.ofString(e.start.local);
     var end = XDate.ofString(e.end ? e.end.local : e.start.local);
 
+    name.text(team.team_name + "'s Event");
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
@@ -42,6 +44,8 @@ module Esper.Agenda {
       title.hide();
     if (!_.includes(filter, "location") && !_.includes(filter, "all"))
       location.hide();
+    if (!_.includes(filter, "task_notes") && !_.includes(filter, "all"))
+      taskNotes.hide();
     if (!_.includes(filter, "date") && !_.includes(filter, "all")) {
       date.hide();
       weekday.hide();
@@ -79,6 +83,10 @@ module Esper.Agenda {
 
     if (e.location !== undefined) {
       location.text(e.location.address);
+    }
+
+    if (e.task_notes !== undefined) {
+      taskNotes.html(e.task_notes);
     }
 
     return view;
@@ -125,14 +133,7 @@ module Esper.Agenda {
         <i class="fa fa-calendar esper-calendar-icon"></i>
       </button>
       in
-      <div #timezoneDropdown class="dropdown esper-dropdown">
-        <button #timezoneSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-          Timezone
-          <i class="fa fa-chevron-down"></i>
-        </button>
-        <ul #timezoneSelect class="dropdown-menu esper-dropdown-select">
-        </ul>
-      </div>
+      <span #timezoneDropdown />
       timezone with
       <div #filterDropdown class="dropdown esper-dropdown">
         <button #filterSelectToggle class="btn btn-default  dropdown-toggle" data-toggle="d ropdown">
@@ -170,12 +171,12 @@ module Esper.Agenda {
               Location
             </label>
           </li>
-          <!-- <li #taskNotesFilter>
+          <li #taskNotesFilter>
             <label for="esper-modal-filter-task-notes">
               <input id="esper-modal-filter-task-notes" type="checkbox" value="task_notes" checked />
               Task notes
             </label>
-          </li> -->
+          </li>
         </ul>
       </div>
     </div>
@@ -198,11 +199,6 @@ module Esper.Agenda {
           <input #textFormat type="radio" name="format" />
           Plain text
         </label>
-        <br />
-        <label>
-          <input #includeTaskNotes type="checkbox" />
-          Include task notes
-        <label>
         <table>
            <tr>
             <td valign="top" align="left" style="padding: 0; min-width: 80px;">
@@ -231,7 +227,6 @@ module Esper.Agenda {
 '''
     var teams = Login.myTeams();
     teamSelectToggle.dropdown();
-    timezoneSelectToggle.dropdown();
     filterSelectToggle.dropdown();
     recipientTextArea.val(Login.myEmail() + ", ");
 
@@ -239,8 +234,45 @@ module Esper.Agenda {
 
     function closeDropdowns() {
       teamDropdown.removeClass("open");
-      timezoneDropdown.removeClass("open");
       filterDropdown.removeClass("open");
+    }
+
+    function displayEventProperties(filter: string[]) {
+      // Display all event properties
+      if (_.includes(filter, "all")) {
+        eventsContainer
+          .find(".esper-ev-date, .esper-ev-weekday, .esper-ev-title, .esper-ev-location, .esper-ev-times")
+          .show();
+        return;
+      }
+
+      if (_.includes(filter, "date")) {
+        eventsContainer.find(".esper-ev-date").show();
+        eventsContainer.find(".esper-ev-weekday").show();
+      } else {
+        eventsContainer.find(".esper-ev-date").hide();
+        eventsContainer.find(".esper-ev-weekday").hide();
+      }
+
+      if (_.includes(filter, "title"))
+        eventsContainer.find(".esper-ev-title").show();
+      else
+        eventsContainer.find(".esper-ev-title").hide();
+
+      if (_.includes(filter, "location"))
+        eventsContainer.find(".esper-ev-location").show();
+      else
+        eventsContainer.find(".esper-ev-location").hide();
+
+      if (_.includes(filter, "time"))
+        eventsContainer.find(".esper-ev-times").show();
+      else
+        eventsContainer.find(".esper-ev-times").hide();
+
+      if (_.includes(filter, "task_notes"))
+        eventsContainer.find(".esper-ev-task-notes").show();
+      else
+        eventsContainer.find(".esper-ev-task-notes").hide();
     }
 
     _.forEach(teams, function(team, id) {
@@ -298,34 +330,29 @@ module Esper.Agenda {
 
     var timezone = Teams.getPreferences(currentTeam.teamid).general.current_timezone;
 
-    _.forEach(Timezone.commonTimezones, function(tz, id) {
-      var i = $("<input>")
-          .attr({"type": "radio",
-            "id": "esper-modal-timezone"+id,
-            "name": "esper-timezone"})
-          .val(tz.id);
-      var l = $("<label>")
-        .attr("for", "esper-modal-timezone"+id)
-        .append(i)
-        .append(tz.name)
-        .click(function() {
-          timezoneSelectToggle.contents().first().replaceWith(tz.name);
-        });
-      if (tz.id === timezone) {
-        i.prop("checked", true);
-        timezoneSelectToggle.contents().first().replaceWith(tz.name);
-      }
-      var li = $("<li>").append(l);
-      li.appendTo(timezoneSelect);
-    });
+    var tzSel = Timezone.createTimezoneSelector(timezone);
+    tzSel.removeClass("esper-select");
+    tzSel.addClass("esper-agenda-timezone-select");
+    tzSel.val(timezone);
+    timezoneDropdown.append(tzSel);
 
     allFilter.find("label > input").change(function(e) {
+      e.stopPropagation();
       filterSelect.find("label > input").prop("checked", this.checked);
+      displayEventProperties(getCheckedValues(filterSelect));
     });
 
-    filterSelect.find("label > input[value!='all']").change(function() {
-      if (!$(this).is(":checked"))
+    filterSelect.find("label > input[value!='all']").change(function(e) {
+      if (!$(this).is(":checked")) {
+        e.stopPropagation();
         allFilter.find("label > input").prop("checked", false);
+        displayEventProperties(getCheckedValues(filterSelect));
+      }
+    });
+
+    filterSelect.click(function() {
+      var filter = getCheckedValues(filterSelect);
+      displayEventProperties(filter);
     });
 
     function appendEmailToTextarea() {
@@ -363,11 +390,15 @@ module Esper.Agenda {
       s.appendTo(recipients);
     }
 
-    var recipientEmails = _.union(_.map(teams, function(team: ApiT.Team) {
-      return _.map(team.team_assistants, function(uid: string) {
-        return Teams.getProfile(uid).email;
-      });
-    }));
+    var recipientEmails = _.uniq(
+      _.flatten(
+        _.map(teams, function(team: ApiT.Team) {
+          return _.map(team.team_assistants, function(uid: string) {
+            return Teams.getProfile(uid).email;
+          });
+        })
+      )
+    );
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.eventRange(currentTeam.teamid,
@@ -390,6 +421,8 @@ module Esper.Agenda {
 
     function renderEvents() {
       eventsContainer.children().remove(".esper-agenda-event, hr");
+      eventSpinner.show();
+      noEvents.hide();
       var teamids = getCheckedValues(teamSelect);
       var teams = _.filter(Login.myTeams(), function(team: ApiT.Team) {
         return _.some(teamids, function(teamid) {
@@ -421,7 +454,7 @@ module Esper.Agenda {
 
     modal.click(closeDropdowns);
     Util.preventClickPropagation(teamSelectToggle);
-    Util.preventClickPropagation(timezoneSelectToggle);
+    Util.preventClickPropagation(filterSelectToggle);
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
@@ -432,9 +465,9 @@ module Esper.Agenda {
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = _.first(getCheckedValues(timezoneSelect));
+      var tz = tzSel.val();
       var format = htmlFormat.prop("checked");
-      var i = includeTaskNotes.prop("checked");
+      var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       u.setHours(23, 59, 59, 999);
@@ -485,7 +518,7 @@ module Esper.Agenda {
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
-      Analytics.track(Analytics.Trackable.ClickSendAgenda);
+      Analytics.track(Analytics.Trackable.ClickModalSendAgenda);
 
       Api.sendAgenda(t, tz, f.toJSON(), u.toJSON(), format, i, r).done(cancel);
     });

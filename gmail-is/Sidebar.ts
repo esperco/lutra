@@ -81,7 +81,7 @@ module Esper.Sidebar {
       teamCheck.hide();
       selector.click(function() {
         onTeamSwitch(team);
-        Analytics.track(Analytics.Trackable.ChangeTeam);
+        Analytics.track(Analytics.Trackable.ChangeSidebarTeam);
       });
     }
 
@@ -165,10 +165,10 @@ module Esper.Sidebar {
   function toggleSidebar() {
     if (shouldDisplaySidebar()) {
       setCurrentThreadState(ExtensionOptions.SidebarOpts.HIDE);
-      Analytics.track(Analytics.Trackable.HideSidebar);
+      Analytics.track(Analytics.Trackable.MinimizeSidebar);
     } else {
       setCurrentThreadState(ExtensionOptions.SidebarOpts.SHOW);
-      Analytics.track(Analytics.Trackable.ShowSidebar);
+      Analytics.track(Analytics.Trackable.MaximizeSidebar);
     }
   }
 
@@ -291,14 +291,14 @@ module Esper.Sidebar {
       if (options.hasClass("esper-open")) {
         dismissDropdowns();
         options.tooltip("enable");
-        Analytics.track(Analytics.Trackable.HideSidebarOptions);
+        Analytics.track(Analytics.Trackable.MinimizeSidebarOptions);
       } else {
         dismissDropdowns();
         options
           .addClass("esper-open")
           .tooltip("disable");
         dropdown.show();
-        Analytics.track(Analytics.Trackable.ShowSidebarOptions);
+        Analytics.track(Analytics.Trackable.MaximizeSidebarOptions);
       }
     }
 

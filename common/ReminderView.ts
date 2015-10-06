@@ -57,50 +57,85 @@ module Esper.ReminderView {
 
   function render(fromEmail, reminderState, eventTitle) {
 '''
-<div #view>
-  <div class="esper-reminder-options">
-    <select id="esper-reminder-time" #selectTime>
-      <option class="esper-remind" value="-1">Never</option>
-      <option class="esper-remind" value="3600">1 hour before</option>
-      <option class="esper-remind" value="7200">2 hours before</option>
-      <option class="esper-remind" value="14400">4 hours before</option>
-      <option class="esper-remind" value="28800">8 hours before</option>
-      <option class="esper-remind" value="43200">12 hours before</option>
-      <option class="esper-remind" value="86400">24 hours before</option>
-      <option class="esper-remind" value="172800">48 hours before</option>
-    </select>
-  </div>
-  <div>From: <span #viewFromEmail /></div>
-  <div>Bcc me? <input #bcc type='checkbox' /></div>
-  <div #yesGuests>
-    <input #yesCheck type='checkbox' id='yesCheck'/>
-    <label for='yesCheck'>Yes</label><br/>
-    <ul #yesGuestsList/>
-  </div>
-  <div #noGuests>
-    <input #noCheck type='checkbox' id='noCheck'/>
-    <label for='noCheck'>No</label><br/>
-    <ul #noGuestsList/>
-  </div>
-  <div #maybeGuests>
-    <input #maybeCheck type='checkbox' id='maybeCheck'/>
-    <label for='maybeCheck'>Maybe</label><br/>
-    <ul #maybeGuestsList/>
-  </div>
-  <div #noreplyGuests>
-    <input #noreplyCheck type='checkbox' id='noreplyCheck'/>
-    <label for='noreplyCheck'>Waiting for Reply</label><br/>
-    <ul #noreplyGuestsList/>
-  </div>
-  <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
+<table #view class="esper-reminder-table">
+  <!-- <div>From: <span #viewFromEmail /></div> -->
+  <tr>
+    <td colspan="2">
+      <span>
+        Enter the message you would like to send to the guests of this event.
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td>To:</td>
+    <td>
+      <div #yesGuests>
+        <input #yesCheck type='checkbox' id='yesCheck'/>
+        <label for='yesCheck'>Yes</label><br/>
+        <ul #yesGuestsList/>
+      </div>
+      <div #noGuests>
+        <input #noCheck type='checkbox' id='noCheck'/>
+        <label for='noCheck'>No</label><br/>
+        <ul #noGuestsList/>
+      </div>
+      <div #maybeGuests>
+        <input #maybeCheck type='checkbox' id='maybeCheck'/>
+        <label for='maybeCheck'>Maybe</label><br/>
+        <ul #maybeGuestsList/>
+      </div>
+      <div #noreplyGuests>
+        <input #noreplyCheck type='checkbox' id='noreplyCheck'/>
+        <label for='noreplyCheck'>Waiting for Reply</label><br/>
+        <ul #noreplyGuestsList/>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <span>
+        Send reminder
+        <select id="esper-reminder-time" #selectTime>
+          <option class="esper-remind" value="-1">Never</option>
+          <option class="esper-remind" value="3600">1 hour</option>
+          <option class="esper-remind" value="7200">2 hours</option>
+          <option class="esper-remind" value="14400">4 hours</option>
+          <option class="esper-remind" value="28800">8 hours</option>
+          <option class="esper-remind" value="43200">12 hours</option>
+          <option class="esper-remind" value="86400">24 hours</option>
+          <option class="esper-remind" value="172800">48 hours</option>
+        </select>
+        prior to event
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td>Message:</td>
+    <td>
+      <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
 Hello,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
-  </textarea>
-</div>
+      </textarea>
+    </td>
+  </tr>
+  <tr>
+    <td/>
+    <td>
+      <span>
+        Note: event information will be included in the message
+      </span>
+      <br/>
+      <label>
+        <input #bcc type='checkbox' />
+        Send copy to myself
+      </label>
+    </td>
+  </tr>
+</table>
 '''
 
-    viewFromEmail.text(fromEmail);
+    // viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
 
     List.iter(reminderState.guests, function(guest:ReminderGuest) {
@@ -157,7 +192,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
   function openReminder(fromTeamId, fromEmail, calendarId, eventId,
                         eventTitle, reminderState:ReminderState) {
-    var dialog = Modal.okCancelDialog("Set an automatic reminder",
+    var dialog = Modal.okCancelDialog("Send timed reminder to guests",
       render(fromEmail, reminderState, eventTitle),
       function() {
         reminderState = currentReminderState();
@@ -195,7 +230,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         } else {
           return false;
         }
-      });
+      },
+      "Set reminder");
     $("body").append(dialog.view);
   }
 

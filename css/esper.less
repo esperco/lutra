@@ -151,7 +151,12 @@
   }
 
   .ql-container {
-    min-height: 100px;
+    padding: 0;
+
+    .ql-editor {
+      padding: 12px 15px;
+      min-height: 100px;
+    }
   }
 }
 
@@ -383,6 +388,27 @@ select.esper-select {
     border: 1px solid #C6C6C6;
     -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
             box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+  &.esper-select-fullwidth { width: 100%; }
+}
+
+.esper-agenda-timezone-select {
+  width: 33%;
+  padding: 8px 0 9px 8px;
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  background-color: white;
+  border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:disabled { pointer-events: none; }
+  &:hover {
+    border: 1px solid #C6C6C6;
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
   }
   &:focus { border: 1px solid @purple; }
   &.esper-select-fullwidth { width: 100%; }
@@ -659,7 +685,7 @@ textarea.esper-input { resize: none; }
 .esper-tl-modal {
   .esper-modal;
 
-  @width: 40%; /* feel free to pick an absolute width here */
+  @width: 65%; /* feel free to pick an absolute width here */
   width: @width;
   margin-left: -@width/2;
 
@@ -1153,9 +1179,9 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   display: inline-block;
   vertical-align: middle;
   font-size: 0.8rem;
-  line-height: 2.25em;
-  padding-bottom: 0;
-  padding-top: 0;
+  line-height: 1.8em;
+  padding: 0 8px;
+  min-width: 5em;
 }
 
 .esper-save-status.esper-spinner {
@@ -2149,16 +2175,23 @@ textarea.esper-description-text {
   height: 200px;
 }
 
+.esper-reminder-table {
+  width: 100%;
+  td {
+    vertical-align: top;
+    padding-top: 20px;
+  }
+}
+
 .esper-reminder-text {
   width: 100%;
   font-size: 13px;
-  margin-bottom : 15px;
   height : 4.2cm;
 }
 
 .esper-modal-default {
   .esper-modal;
-  @search_width: 480px;
+  @search_width: 640px;
   width: @search_width;
   margin-left: -@search_width/2;
   padding: 10px;

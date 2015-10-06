@@ -42,7 +42,8 @@ gulp.task("rebuild", gulp.parallel("build-vendor", buildBase));
 
 gulp.task("build-production", gulp.series("production", "rebuild"));
 
-gulp.task("watch", gulp.series("build",
+gulp.task("watch", gulp.series(
+  function(cb) { config.watchMode = true; cb(); }, "build",
   gulp.parallel("watch-ts", "watch-less", "watch-html", "watch-vendor")));
 
 gulp.task("default", gulp.series("build"));

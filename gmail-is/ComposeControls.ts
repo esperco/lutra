@@ -47,7 +47,7 @@ module Esper.ComposeControls {
                   " at " + execMoment.format("h:mm a") + // 3:45 pm
                   " " + execMoment.zoneAbbr(); // EDT
     var forGuest = "";
-    if (guestTz) {
+    if (guestTz && guestTz !== execTz) {
       var guestMoment = (<any> moment)(ev.start.utc).tz(guestTz);
       forGuest = " / " + guestMoment.format("h:mm a") +
                  " " + guestMoment.zoneAbbr();
@@ -107,7 +107,7 @@ module Esper.ComposeControls {
             }, "");
 
             composeControls.insertAtCaret(entry);
-            Analytics.track(Analytics.Trackable.ClickInsertIcon);
+            Analytics.track(Analytics.Trackable.ClickComposeBarInsertIcon);
           },
           none : function () {
             // TODO: Handle missing team more gracefully?
@@ -151,23 +151,67 @@ module Esper.ComposeControls {
   /** Inserts a canned response template into the text box. */
   function templateButton(composeControls) {
 '''
-<div #templateButton title class="esper-composition-button">
+<div #templateButton class="esper-composition-button">
   <object #templateIcon class="esper-svg esper-composition-button-icon"/>
   <div #templateBadge class="esper-composition-badge">...</div>
+  <ul #templateDropdown class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
+    <div #viewTemplates class="esper-dropdown-section"/>
+  </ul>
 </div>
+<div #editorText/>
 '''
 
     templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
 
+    var templates: ApiT.Template[];
+
+    function getTemplates() {
+      $("<li class='esper-li'>Customize...</li>")
+        .appendTo(viewTemplates)
+        .click(function(e) {
+          e.stopPropagation();
+          window.open("https://app.esper.com");
+        });
+      CurrentThread.currentTeam.get().match({
+        some: function(team) {
+          Api.listTemplates(team.teamid).done(function(response) {
+            templates = response.items;
+            List.iter(templates, function(tmp) {
+              $("<li class='esper-li' value='" + tmp.id + "'>" + tmp.title + "</li>")
+                .appendTo(viewTemplates)
+                .click(function(e) {
+                  e.stopPropagation();
+                  displayTemplate(tmp.id);
+                });
+            });
+          });
+        },
+        none: function() { }
+      });
+    }
+
+    templateButton.click(function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      templateDropdown.toggle();
+      if(!(templateDropdown.hasClass("esper-open"))) {
+        templateDropdown.addClass("esper-open");
+        viewTemplates.find(".esper-li").remove();
+        getTemplates();
+      } else {
+        templateDropdown.removeClass("esper-open");
+      }
+    });
+
     templateButton.tooltip({
       show: { delay: 500, effect: "none" },
       hide: { effect: "none" },
-      content: "Insert canned response template",
+      content: "Insert custom template",
       "position": { my: 'center bottom', at: 'center top-1' },
       "tooltipClass": "esper-top esper-tooltip"
     });
 
-    templateButton.click(function (e) {
+    function displayTemplate(chosen) {
       CurrentThread.getTeamAndPreferences().done(function(teamAndPrefs) {
         teamAndPrefs.match({
           some : function (allPrefs) {
@@ -175,6 +219,10 @@ module Esper.ComposeControls {
             // We can insert template right away, but start task creation
             // in the background.
             CurrentThread.getTaskForThread();
+
+            var tmp = List.find(templates, function(tmp) {
+              return tmp.id === chosen;
+            });
 
             var execTz, guestTz;
             var general = allPrefs.execPrefs.general;
@@ -214,18 +262,18 @@ module Esper.ComposeControls {
               return str + br + time + " at " + loc;
             }, "");
 
-            var template =
-              events.length > 1 ?
-              multipleEventTemplate.slice(0) :
-              singleEventTemplate.slice(0); // using slice to copy string
+            var template = tmp.content;
+            var editor = new quill(editorText.get(0));
+            editor.setContents(JSON.parse(template));
 
             var execName = allPrefs.team.team_name.replace(/ .*$/, "");
             if (entry === "") entry = "<b>ADD EVENT DETAILS</b>";
             var filledTemplate =
-              template.replace("|offer|", entry)
-              .replace("|exec|", execName);
+              editor.getHTML().replace(/\{EVENT\}/g, entry)
+              .replace(/\{EXEC\}/g, execName);
+            
             composeControls.insertAtCaret(filledTemplate);
-            Analytics.track(Analytics.Trackable.ClickTemplateIcon);
+            Analytics.track(Analytics.Trackable.ClickComposeBarTemplateIcon);
           },
           none : function () {
             // TODO: Handle more gracefully?
@@ -233,7 +281,7 @@ module Esper.ComposeControls {
           }
         });
       });
-    });
+    }
 
     return Option.some(templateButton);
   }
@@ -257,7 +305,7 @@ module Esper.ComposeControls {
 
     createButton.click(function() {
       CalPicker.createInline();
-      Analytics.track(Analytics.Trackable.ClickCreateIcon);
+      Analytics.track(Analytics.Trackable.ClickComposeBarCreateIcon);
     });
 
     return Option.some(createButton);
@@ -289,7 +337,7 @@ module Esper.ComposeControls {
           InThreadControls.setHashTagContainer(
             ComposeHashtags.view(composeControls));
           Gmail.scrollToCompose();
-          Analytics.track(Analytics.Trackable.ClickAskExecIcon);
+          Analytics.track(Analytics.Trackable.ClickComposeBarAskExecIcon);
         });
 
         return Option.some(askButton);

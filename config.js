@@ -191,13 +191,16 @@ module.exports = {
   // from glob relative to vendor dir to destination directory
   vendorAssets: {
     "bootstrap/fonts/*.*": "fonts",
-    "font-awesome/fonts/*.*": "fonts",
-    "analytics/analytics.js": "js"
+    "font-awesome/fonts/*.*": "fonts"
   },
 
   // Production mode => no sourcemaps + uglify -- doesn't have to be set
   // here, can be done programatically with Gulp task
   production: false,
+
+  // Watch mode => don't exit automatically on errors because we're re-
+  // compiling, is changed programmatically with Gulp task
+  watchMode: false,
 
   // Where to provision test runner in pubDir
   testDir: "test"

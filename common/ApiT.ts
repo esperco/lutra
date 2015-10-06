@@ -130,6 +130,7 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     location?: Location;
+    task_notes?: string;
     all_day?: boolean;
     guests: Attendee[];
     transparent?: boolean;
@@ -524,6 +525,16 @@ module Esper.ApiT {
 
   export interface UserWorkflows {
     workflows : Workflow[];
+  }
+
+  export interface Template {
+    id: string;
+    title: string;
+    content: string;
+  }
+
+  export interface UserTemplate {
+    items: Template[];
   }
 
   type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];

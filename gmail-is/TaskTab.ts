@@ -202,7 +202,7 @@ module Esper.TaskTab {
       }
     });
     taskProgressSelector.click(function() {
-      Analytics.track(Analytics.Trackable.SelectWorkflow);
+      Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
     taskTab.taskProgressContainer.append(view);
@@ -387,6 +387,7 @@ module Esper.TaskTab {
             selectMeetingTypeOnUserTab(result.task_data.task_meeting_type,
                                        userTabContent);
             Sidebar.dismissDropdowns();
+            Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
           });
       });
 
@@ -406,6 +407,7 @@ module Esper.TaskTab {
         .click(function() {
           createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
                              userTabContent);
+          Analytics.track(Analytics.Trackable.RenameTaskTabTask);
         });
 
       function addArchiveOption(task) {
@@ -431,6 +433,10 @@ module Esper.TaskTab {
                 task.task_archived = finalState;
                 CurrentThread.setTask(task);
                 Sidebar.dismissDropdowns();
+                if (finalState)
+                  Analytics.track(Analytics.Trackable.ArchiveTaskTabTask);
+                else
+                  Analytics.track(Analytics.Trackable.UnarchiveTaskTabTask);
               });
           });
       }
@@ -666,7 +672,7 @@ module Esper.TaskTab {
       taskTitle.focus();
     });
     meetingType.click(function() {
-      Analytics.track(Analytics.Trackable.SelectMeetingType);
+      Analytics.track(Analytics.Trackable.SelectTaskTabMeetingType);
     });
     Sidebar.customizeSelectArrow(meetingType);
     return meetingType;
@@ -883,7 +889,7 @@ module Esper.TaskTab {
 
     createEvent.click(function() {
       CalPicker.createInline();
-      Analytics.track(Analytics.Trackable.CreateLinkedEvent);
+      Analytics.track(Analytics.Trackable.CreateTaskTabLinkedEvent);
     });
 
     var apiGetTask = autoTask ?
@@ -909,7 +915,10 @@ module Esper.TaskTab {
             taskCancel.hide();
             taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
           }
-          taskCancel.click(showMTDrop);
+          taskCancel.click(function() {
+            showMTDrop();
+            Analytics.track(Analytics.Trackable.CancelTaskTabTask);
+          });
           if (task !== undefined) {
             taskCaption.text(taskLabelExists);
             title = task.task_title;
@@ -1003,7 +1012,7 @@ module Esper.TaskTab {
         CalSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
-      Analytics.track(Analytics.Trackable.LinkEvent);
+      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
     });
 
     var taskWatcherId = "TaskTab-task-watcher";
