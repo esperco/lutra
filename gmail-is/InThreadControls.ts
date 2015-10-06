@@ -119,6 +119,11 @@ module Esper.InThreadControls {
   </div>
   <div class="esper-section-footer esper-clearfix">
     <div #toolbar class="toolbar-container">
+      <button #saveTaskNotes disabled
+      class="esper-btn esper-btn-primary esper-save-notes">
+      Save
+      </button>
+      <span class="ql-format-separator"></span>
       <span class="ql-format-group">
         <select title="Font" class="ql-font">
           <option value="sans-serif" selected>Sans Serif</option>
@@ -227,11 +232,6 @@ module Esper.InThreadControls {
         <span title="Link" class="ql-format-button ql-link"></span>
         <span class="ql-format-separator"></span>
         <span title="List" class="ql-format-button ql-list"></span>
-        <span class="ql-format-separator"></span>
-        <button #saveTaskNotes disabled
-        class="esper-btn esper-btn-primary esper-save-notes" >
-        Save
-        </button>
       </span>
       <span #saveStatus class="esper-spinner esper-save-status" />
     </div>
