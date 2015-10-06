@@ -195,12 +195,6 @@ module Esper.Api {
                         JSON.stringify(refer));
   }
 
-  export function createOwnTeam()
-    : JQueryPromise<ApiT.UrlResult>
-  {
-    return jsonHttpPost("/api/create-own-team", "");
-  }
-
   export function setTeamName(teamid, name):
   JQueryPromise<void> {
     var fromUid = Login.me();

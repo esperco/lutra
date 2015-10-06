@@ -192,6 +192,8 @@ module Esper.Analytics {
   // Events to track
   export enum Trackable {
     ClickSignIn,
+
+    /* Trackables are deprecated with removal of exec onboarding */
     ClickShareCalendar,
     ClickCreditCard,
     ClickCongratsEmail,
