@@ -706,7 +706,7 @@ module Esper.TaskList {
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
-      Analytics.track(Analytics.Trackable.ClickSendTaskList);
+      Analytics.track(Analytics.Trackable.ClickModalSendTaskList);
 
       Api.sendTaskList(t, l, p, f, r).done(cancel);
     });

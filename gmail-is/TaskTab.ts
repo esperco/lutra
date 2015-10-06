@@ -202,7 +202,7 @@ module Esper.TaskTab {
       }
     });
     taskProgressSelector.click(function() {
-      Analytics.track(Analytics.Trackable.SelectWorkflow);
+      Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
     taskTab.taskProgressContainer.append(view);
@@ -666,7 +666,7 @@ module Esper.TaskTab {
       taskTitle.focus();
     });
     meetingType.click(function() {
-      Analytics.track(Analytics.Trackable.SelectMeetingType);
+      Analytics.track(Analytics.Trackable.SelectTaskTabMeetingType);
     });
     Sidebar.customizeSelectArrow(meetingType);
     return meetingType;
@@ -883,7 +883,7 @@ module Esper.TaskTab {
 
     createEvent.click(function() {
       CalPicker.createInline();
-      Analytics.track(Analytics.Trackable.CreateLinkedEvent);
+      Analytics.track(Analytics.Trackable.CreateTaskTabLinkedEvent);
     });
 
     var apiGetTask = autoTask ?
@@ -1003,7 +1003,7 @@ module Esper.TaskTab {
         CalSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
-      Analytics.track(Analytics.Trackable.LinkEvent);
+      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
     });
 
     var taskWatcherId = "TaskTab-task-watcher";

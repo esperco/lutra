@@ -81,7 +81,7 @@ module Esper.Sidebar {
       teamCheck.hide();
       selector.click(function() {
         onTeamSwitch(team);
-        Analytics.track(Analytics.Trackable.ChangeTeam);
+        Analytics.track(Analytics.Trackable.ChangeSidebarTeam);
       });
     }
 

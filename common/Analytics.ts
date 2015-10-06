@@ -4,36 +4,42 @@
 module Esper.Analytics {
   // Events to track
   export enum Trackable {
-    ClickAskExecIcon = 1,
-    ClickCreateIcon,
-    ClickEsperLogoMenu,
-    ClickInsertIcon,
+    // Most trackable events have the form
+    // (Verb)(Module)(Element)
+    // Anything that deviates from the above form should
+    // always be immediately obvious as to where the event
+    // is fired from, e.g. SaveTaskNotes - there is only one
+    // place where you can save your task notes
+    ClickComposeBarAskExecIcon = 1,
+    ClickComposeBarCreateIcon,
+    ClickComposeBarInsertIcon,
+    ClickComposeBarTemplateIcon,
     ClickMenuEditSettings,
+    ClickMenuEsperLogo,
     ClickMenuExtensionOptions,
     ClickMenuGetAgenda,
     ClickMenuGetHelp,
     ClickMenuGetTaskList,
-    ClickSendAgenda,
-    ClickSendTaskList,
+    ClickModalSendAgenda,
+    ClickModalSendTaskList,
     ClickSidebarOptionsSettings,
     ClickSidebarPrivacyPolicy,
     ClickSidebarTermsOfUse,
     ClickTaskTab,
-    ClickTemplateIcon,
     ClickUserTab,
     ClickUserTabPreferences,
-    ChangeTeam,
-    CreateLinkedEvent,
+    ChangeSidebarTeam,
     CreateTask,
+    CreateTaskTabLinkedEvent,
     EditTaskNotes,
     HideSidebar,
     HideSidebarOptions,
-    LinkEvent,
     SaveTaskNotes,
-    SelectMeetingType,
-    SelectWorkflow,
+    SelectTaskTabMeetingType,
+    SelectTaskTabWorkflow,
     ShowSidebar,
-    ShowSidebarOptions
+    ShowSidebarOptions,
+    LinkTaskTabEvent
   };
 
   export interface TrackMessage {

@@ -535,7 +535,7 @@ module Esper.Agenda {
       sendButton.prop("disabled", true);
       recipients.children().prop("disabled", true);
       sendButton.text("Sending...");
-      Analytics.track(Analytics.Trackable.ClickSendAgenda);
+      Analytics.track(Analytics.Trackable.ClickModalSendAgenda);
 
       Api.sendAgenda(t, tz, f.toJSON(), u.toJSON(), format, i, r).done(cancel);
     });

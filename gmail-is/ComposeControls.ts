@@ -107,7 +107,7 @@ module Esper.ComposeControls {
             }, "");
 
             composeControls.insertAtCaret(entry);
-            Analytics.track(Analytics.Trackable.ClickInsertIcon);
+            Analytics.track(Analytics.Trackable.ClickComposeBarInsertIcon);
           },
           none : function () {
             // TODO: Handle missing team more gracefully?
@@ -225,7 +225,7 @@ module Esper.ComposeControls {
               template.replace("|offer|", entry)
               .replace("|exec|", execName);
             composeControls.insertAtCaret(filledTemplate);
-            Analytics.track(Analytics.Trackable.ClickTemplateIcon);
+            Analytics.track(Analytics.Trackable.ClickComposeBarTemplateIcon);
           },
           none : function () {
             // TODO: Handle more gracefully?
@@ -257,7 +257,7 @@ module Esper.ComposeControls {
 
     createButton.click(function() {
       CalPicker.createInline();
-      Analytics.track(Analytics.Trackable.ClickCreateIcon);
+      Analytics.track(Analytics.Trackable.ClickComposeBarCreateIcon);
     });
 
     return Option.some(createButton);
@@ -289,7 +289,7 @@ module Esper.ComposeControls {
           InThreadControls.setHashTagContainer(
             ComposeHashtags.view(composeControls));
           Gmail.scrollToCompose();
-          Analytics.track(Analytics.Trackable.ClickAskExecIcon);
+          Analytics.track(Analytics.Trackable.ClickComposeBarAskExecIcon);
         });
 
         return Option.some(askButton);
