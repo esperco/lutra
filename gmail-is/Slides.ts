@@ -162,8 +162,14 @@ module Esper.Slides {
 
         back.click(previousSlide);
       } else {
-        back.click(previousSlide);
-        next.click(nextSlide);
+        back.click(function() {
+          previousSlide();
+          Analytics.track(Analytics.Trackable.ClickSlidesBackButton);
+        });
+        next.click(function() {
+          nextSlide();
+          Analytics.track(Analytics.Trackable.ClickSlidesNextButton);
+        });
       }
 
       return container;
