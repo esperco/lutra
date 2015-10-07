@@ -35,7 +35,24 @@ module Esper.Route {
   // Post-login hooks, get run automatically after each withLogin call
   // Each hook must return true to proceed to the next
   var postLoginHooks: { (): boolean; }[] = [
-    // Insert functions here
+
+    // If there are unapproved teams and user is an exec, redirect user to
+    // approve teams
+    function checkApproval(): boolean {
+      var hasUnapproved = false;
+      _.each(Login.data.teams || [], function(team: ApiT.Team) {
+        if (team.team_executive === Login.me() && !team.team_approved) {
+          hasUnapproved = true;
+        }
+      });
+      if (hasUnapproved) {
+        Log.d("Unapproved team -- redirecting");
+        Route.nav.path("approve-team");
+        return false;
+      } else {
+        return true;
+      }
+    }
   ];
 
   function withLogin(whenDone,
@@ -92,6 +109,10 @@ module Esper.Route {
       withLogin(function() {
         Page.teamSettings.load(data.teamid);
       });
+    },
+
+    "approve-team": function(data) {
+      Page.approveTeam.load();
     },
 
     "plans/:teamid" : function (data) {

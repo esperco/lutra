@@ -249,7 +249,7 @@ module Esper.Signin {
 </div>
 '''
     Page.hide();
-    var rootView = $("#onboarding-interface");
+    var rootView = $("#login-interface");
     rootView.children().remove();
 
     $("#login-status").addClass("hide");
@@ -301,7 +301,7 @@ module Esper.Signin {
   }
 
   function loginOrSignup(optEmail) {
-    Log.d("loginOrSignup");
+    Log.d("loginOrSignup - " + optEmail);
     var uid = Login.me();
     var landingUrl = document.URL;
     landingUrl["hash"] = "#!";

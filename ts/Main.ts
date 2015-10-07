@@ -42,6 +42,7 @@
 /// <reference path="AboutTab.ts"/>
 /// <reference path="TemplateTab.ts"/>
 /// <reference path="UsagePeriod.ts"/>
+/// <reference path="ApproveTeam.ts"/>
 /// <reference path="Page.ts"/>
 /// <reference path="Route.ts"/>
 

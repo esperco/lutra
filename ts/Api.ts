@@ -204,6 +204,11 @@ module Esper.Api {
                        "");
   }
 
+  export function approveTeam(teamid: string): JQueryPromise<void> {
+    return jsonHttpPut("/api/team-approve/" + string(Login.me()) + "/" +
+      string(teamid) + "/true", "");
+  }
+
   export function setExecutive(teamid, memberUid)
     : JQueryPromise<void>
   {
@@ -366,6 +371,12 @@ module Esper.Api {
     return jsonHttpGet(apiProfilePrefix()
                        + "/" + string(uid)
                        + "/" + string(teamid));
+  }
+
+  export function getAllProfiles()
+    : JQueryPromise<ApiT.ProfileList>
+  {
+    return jsonHttpGet(apiProfilePrefix());
   }
 
   export function getMyProfile() {
@@ -761,6 +772,19 @@ module Esper.Api {
           + "/" + string(teamid)
           + "/" + string(templateid);
       return jsonHttpDelete(url);
+  }
+
+  /* Support */
+
+  export function sendSupportEmail(msg: string): JQueryPromise<void> {
+    var url = "/api/support/email";
+    var feedback: {body: string, user?: string} = { body: msg };
+    var uid = Login.me();
+    if (uid) {
+      url += ("/" + uid);
+      feedback.user = uid;
+    }
+    return jsonHttpPost(url, JSON.stringify(feedback));
   }
 
 }

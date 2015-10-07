@@ -9,12 +9,13 @@ module Esper.Page {
   var pageSelector = Show.create({
     "settings": {ids:["settings-page"]},
     "team-settings": {ids:["team-settings-page"]},
-    "onboarding": {ids:["onboarding-interface"]},
+    "login": { ids: ["login-interface"] },
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
     "usage": {ids:["usage-page"]},
     "usage-period": {ids:["usage-period-page"]},
+    "approve-team": {ids:["approve-team"]},
     "not-found": {ids:["not-found-page"]}
   }, undefined);
 
@@ -110,6 +111,14 @@ module Esper.Page {
       showPage("usage-period");
       UsagePeriod.load(teamid, parseInt(periodStart));
       Util.focus();
+    }
+  }
+
+  export var approveTeam: Loadable = {
+    load: function() {
+      pageSelector.hideAll();
+      showPage("approve-team");
+      ApproveTeam.load();
     }
   }
 
