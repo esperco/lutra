@@ -317,7 +317,7 @@ module Esper.TaskList {
   export function renderModal(currentTeam: ApiT.Team) {
 '''
 <div #view class="esper-modal-bg">
-  <div #modal class="esper-tl-modal">
+  <div #modal class="esper-tl-modal esper-modal-flexbox">
     <div class="esper-modal-header"><h2 style="margin: 0px;">Task List</h2></div>
     <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <div class="esper-modal-filter esper-bs esper">
@@ -396,7 +396,7 @@ module Esper.TaskList {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="height: calc(100% - 300px); overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content" style="flex-grow: 1; overflow-y: auto;">
       <div #taskSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
