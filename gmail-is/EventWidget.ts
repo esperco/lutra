@@ -203,6 +203,7 @@ module Esper.EventWidget {
     editEvent.click(function() {
       EventControls.insertAfterThread(e);
       Gmail.scrollToEventControl();
+      Analytics.track(Analytics.Trackable.ClickTaskTabEditEvent);;
     });
 
     inviteGuests.click(function() {
@@ -210,6 +211,7 @@ module Esper.EventWidget {
         FinalizeEvent.inviteGuests(e, preferences);
         Gmail.scrollToEventControl();
       });
+      Analytics.track(Analytics.Trackable.ClickTaskTabInviteGuests);
     });
 
     var reminderGuests = List.map(e.guests, function(guest) {
@@ -240,6 +242,7 @@ module Esper.EventWidget {
         .done(function () {
           CurrentThread.linkedEventsChange.set(null);
         });
+      Analytics.track(Analytics.Trackable.ClickTaskTabUnlinkEvent);
     });
 
     deleteEvent.click(function() {
@@ -248,9 +251,13 @@ module Esper.EventWidget {
         .done(function () {
           CurrentThread.linkedEventsChange.set(null);
         });
+      Analytics.track(Analytics.Trackable.ClickTaskTabDeleteEvent);
     });
 
-    chooseThisEvent.click(function(){confirmEvent(view, e, linkedEvents, team)});
+    chooseThisEvent.click(function(){
+      confirmEvent(view, e, linkedEvents, team);
+      Analytics.track(Analytics.Trackable.ChooseTaskTabEvent);
+    });
 
     return optionsView;
   }
