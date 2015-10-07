@@ -12,6 +12,7 @@ module Esper.Analytics {
     // place where you can save your task notes
     ArchiveTaskTabTask = 1,
     CancelTaskTabTask,
+    ClickCalendarPickerSave,
     ClickComposeBarAskExecIcon,
     ClickComposeBarCreateIcon,
     ClickComposeBarInsertIcon,

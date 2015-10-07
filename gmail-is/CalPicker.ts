@@ -1004,6 +1004,7 @@ module Esper.CalPicker {
                 closeView();
               }
             });
+          Analytics.track(Analytics.Trackable.ClickCalendarPickerSave);
         });
 
         InThreadControls.setEventControlContainer(view);
