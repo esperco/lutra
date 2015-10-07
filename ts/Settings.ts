@@ -164,7 +164,7 @@ module Esper.Settings {
     }); // end of Api.getProfile.done
 
     cogContainer.click(function() {
-      location.hash = "#!team-settings/" + team.teamid;
+      Route.nav.path("team-settings/" + team.teamid);
     })
 
     return view;
@@ -332,7 +332,7 @@ module Esper.Settings {
       firstTime = false;
       if (teams[0]) {
         Login.setTeam(teams[0]);
-        location.hash = "#!team-settings/" + teams[0].teamid;
+        Route.nav.path("team-settings/" + teams[0].teamid);
       }
     }
 
