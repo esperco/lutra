@@ -126,7 +126,6 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     location?: Location;
-    task_notes?: string;
     all_day?: boolean;
     guests: Attendee[];
     transparent?: boolean;
@@ -152,6 +151,15 @@ module Esper.ApiT {
     color_id?: string;
     recurrence?: Recurrence;
     recurring_event_id?: string;
+  }
+
+  export interface AgendaEvent {
+    event: CalendarEvent;
+    notes?: string;
+  }
+
+  export interface AgendaEventList {
+    agenda_events: AgendaEvent[];
   }
 
   export interface SyncedThread {

@@ -290,6 +290,17 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(pref));
   }
 
+  export function agendaRange(teamid,
+                              from: number,
+                              until: number):
+  JQueryPromise<ApiT.AgendaEventList> {
+    var url = Conf.Api.url + "/api/agenda/range/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + from.toString()
+      + "/" + until.toString();
+    return JsonHttp.get(url);
+  }
+
   export function setReminderTime(teamid, from_email, calid, eventid, secs):
   JQueryPromise<void> {
     var url =
