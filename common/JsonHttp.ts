@@ -98,12 +98,14 @@ module Esper.JsonHttp {
     Log.d("API request " + id + " " + method + " " + path, request);
 
     var startTime = Date.now();
-    return $.ajax(request)
+    var apiPromise = $.ajax(request);
+    apiPromise
       .fail(logError)
       .done(function(respBody) {
         var latency = (Date.now() - startTime) / 1000;
         logResponse(method, path, respBody, latency);
       });
+    return apiPromise;
   }
 
   /** Executes an HTTP request using our standard authentication and

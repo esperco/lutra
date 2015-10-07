@@ -4,6 +4,8 @@
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/Api.ts" />
+/// <reference path="../common/Log.ts" />
+/// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Types.ts" />
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
@@ -75,13 +77,20 @@ module Esper.Onboarding {
   }
 
   // Interface for team creation requests
-  // TODO: Conform to backend type
+  enum TeamRequestError {
+    Duplicate = 1, // Exec already exists
+    Unknown        // Unknown error
+  }
+
   interface TeamRequest {
     teamid?: string;       // _id server responds with after team creation
-    name?: string;          // team name
-    email?: string;         // e-mail address for sec
+    name?: string;         // team name
+    email?: string;        // e-mail address for sec
     defaultCal?: string;   // google_cal_id of primary calendar
     calendars?: [string];  // google_cal_ids of all other calendars
+
+    // Why last save request failed
+    error?: TeamRequestError
 
     createdOn: Date;       // For sorting purposes
   }
@@ -150,7 +159,8 @@ module Esper.Onboarding {
         account: this.props,
         index: this.state.slideIndex,
         onFinish: function() {
-          self.jQuery().modal('hide');
+          // Reload page to force injected script to reload data
+          location.reload();
         },
 
         data: {
@@ -343,7 +353,7 @@ module Esper.Onboarding {
   class Header extends ReactHelpers.Component<HeaderProps, {}> {
     render() {
       return (<div className="modal-header">
-        <i className="fa fa-close close btn btn-secondary" 
+        <i className="fa fa-close close btn btn-secondary"
            data-dismiss="modal"></i>
         <h4 className="modal-title">
           <img className="esper-modal-icon esper-brand-icon"
@@ -409,14 +419,26 @@ module Esper.Onboarding {
   class WelcomeSlide extends Slide<{}> {
     render() {
       return (<div>
-        <h5 className="esper-subheading">Thanks for installing Esper!</h5>
         <p>
-          We'll need you to login with Google to get started. Esper requires
-          access to your Google Calendar and Gmail to function properly.
-          Click next to continue.
-        </p><p className="text-center">
-          <span className="esper-link" onClick={this.disable.bind(this)}>
-            You can disabled Esper for this Gmail account by clicking here.
+          We are here to supercharge your inbox so you can quickly and expertly
+          handle any task. With Esper, you can now:
+          <ul>
+            <li>Send and edit calendar invites directly from your inbox</li>
+            <li>Set customized confirmations and reminder emails for events</li>
+            <li>Stay organized with automatically compiled Agendas and Task
+            Lists</li>
+          </ul>
+        </p>
+        <p>
+          To get started, Esper needs your permission to sync with your Google
+          Calendar and Gmail. {" "}
+          <span className="text-center esper-link" onClick={nextSlide}>
+            Click next to continue.
+          </span>
+        </p>
+        <p className="text-center">
+          <span className="esper-remove-link" onClick={this.disable.bind(this)}>
+            Or disable Esper for this Gmail account by clicking here.
           </span>
         </p>
       </div>);
@@ -431,7 +453,7 @@ module Esper.Onboarding {
 
   var welcomeSlideLogic: SlideLogic = {
     view: WelcomeSlide,
-    title: "Welcome to Esper"
+    title: "Thank you for installing Esper!"
   };
 
 
@@ -445,14 +467,14 @@ module Esper.Onboarding {
       if (Login.loggedIn()) {
         content = (<div className="message">
           You are logged in as {this.props.account.googleAccountId}.<br />
-          Click next to continue.
+          <span className="esper-link"
+                onClick={nextSlide}>Click next to continue.</span>
         </div>);
       } else {
         content = (<div>
           <div className="message">
             Waiting for {this.props.account.googleAccountId} to sign in
           </div>
-
           <button className="esper-google-btn"
                   onClick={this.openLoginTab.bind(this)}></button>
         </div>);
@@ -594,15 +616,25 @@ module Esper.Onboarding {
 
     next: function(instance: SlideWrapper) {
       var slide = instance.currentSlide as CalendarSlide;
-      var isValid = true;
       var teamStore = instance.props.data.teamStore;
+
+      // Set to false if ANY of our teams are invalid
+      var isValid = true;
+
+      // A list of new team creation requests to send
       var newRequests: [string, TeamRequest][] = [];
+
+      // Validate each team and save if status is unsaved
       _.each(slide.teamForms, function(form: TeamForm, _id: string) {
-        var request = form.validate();
-        if (request) {
-          newRequests.push([_id, request]);
-        } else {
-          isValid = false;
+        var oldMetadata = teamStore.metadata(_id);
+        if (oldMetadata &&
+            oldMetadata.dataStatus === Model.DataStatus.UNSAVED) {
+          var request = form.validate();
+          if (request) {
+            newRequests.push([_id, request]);
+          } else {
+            isValid = false;
+          }
         }
       });
 
@@ -614,14 +646,67 @@ module Esper.Onboarding {
       });
 
       if (isValid) {
-        // TODO: Backend call
-        var t = $.Deferred();
-        t.resolve();
-        return t.promise();
-      } else {
-        var d = $.Deferred();
-        d.reject();
-        return d.promise();
+        var promises = [];
+        _.each(newRequests, function(tuple) {
+          let localId = tuple[0];
+          let request = tuple[1];
+          teamStore.update(localId, request, {
+            dataStatus: Model.DataStatus.INFLIGHT
+          });
+
+          let promise = Api.createTeam(request.email, request.name)
+            .then(function(team) {
+              // Put calendars
+              var calendars = _.map<string, ApiT.Calendar>(
+                _.without(request.calendars, request.defaultCal),
+                function(calId) {
+                  return {
+                    google_cal_id: calId,
+                    calendar_title: "", // This gets replaced with actual
+                    // calendar title elsewhere
+                    calendar_default_agenda: true,
+                    calendar_default_view: true
+                  };
+                });
+              calendars.push({
+                google_cal_id: request.defaultCal,
+                calendar_title: "", // This gets replaced with actual calendar
+                // title elsewhere
+                is_primary: true,
+                calendar_default_view: true,
+                calendar_default_write: true,
+                calendar_default_agenda: true
+              });
+              return Api.putTeamCalendars(team.teamid, calendars);
+            })
+
+            .then(function(team) {
+              let updatedRequest = _.extend({}, request, {
+                teamid: team.teamid
+              }) as TeamRequest;
+              teamStore.update(localId, updatedRequest, {
+                dataStatus: Model.DataStatus.READY
+              });
+            }, function(err) {
+              Log.e(err);
+              var error: TeamRequestError = TeamRequestError.Unknown;
+              if (err.status === 403) {
+                error = TeamRequestError.Duplicate;
+              }
+              let updatedRequest = _.extend({}, request, {
+                error: error
+              }) as TeamRequest;
+              teamStore.update(localId, updatedRequest, {
+                dataStatus: Model.DataStatus.UNSAVED
+              });
+              return err;
+            });
+          promises.push(promise);
+        });
+        return Promise.join2(promises);
+      }
+      else {
+        return Promise.fail(null);
       }
     }
   };
@@ -654,11 +739,39 @@ module Esper.Onboarding {
 
     render() {
       var team = this.props.team;
+
+      // Disable editing unless this is not yet saved
+      // TODO: Allow editing of already created teams
+      var disabled = (
+        this.props.metadata.dataStatus !== Model.DataStatus.UNSAVED);
+      var saved = (
+        this.props.metadata.dataStatus === Model.DataStatus.READY);
+
+      // Display appropriate error message -- save function will store error
+      // in status
+      var errorMsg: JSX.Element;
+      if (team.error === TeamRequestError.Duplicate) {
+        errorMsg = (<span>
+          A team already exists for this executive. Please ask an existing
+          member of the team to add you or {" "}
+          <a href="http://esper.com/contact">contact Esper for support</a>.
+        </span>);
+      } else if (team.error) {
+        errorMsg = (<span>
+          There was an error while creating this team. Please {" "}
+          <a href="http://esper.com/contact">contact Esper for support</a>.
+        </span>);
+      }
+      errorMsg = errorMsg && (<div className="alert alert-danger">
+        {errorMsg}
+      </div>);
+
       var calCheckboxes = _.map(this.props.calendars, function(cal) {
         var checked = _.includes(team.calendars, cal.google_cal_id);
         return (<div className="checkbox">
           <label>
             <input type="checkbox" value={cal.google_cal_id}
+              disabled={disabled}
               name="calendars" defaultChecked={checked} />
             {cal.calendar_title}
           </label>
@@ -671,54 +784,72 @@ module Esper.Onboarding {
         </option>);
       });
 
-      return (<div className="row clearfix form-set">
-        <div className="col-sm-6"><div className="esper-col-spacer">
-          <div className={"form-group " +
-              (this.state.nameHasError ? "has-error" : "")}>
-            <label htmlFor={this.getId("name")}
-              className="control-label">Name</label>
-            <input id={this.getId("name")} name="name"
-              type="text" className="form-control"
-              defaultValue={team.name}
-              placeholder="Tony Stark" />
-          </div>
-          <div className={"form-group " +
-              (this.state.emailHasError ? "has-error" : "")}>
-            <label htmlFor={this.getId("email")}
-              className="control-label">Email</label>
-            <input id={this.getId("email") } type="email" name="email"
-              defaultValue={team.email}
-              className="form-control" placeholder="tony@stark.com" />
-          </div>
-          <div className="form-group">
-            <label htmlFor={this.getId("default-cal")}
-              className="control-label">Default Calendar</label>
-            <select id={this.getId("default-cal")}
-              value={team.defaultCal}
-              name="default-cal"
-              className="form-control">
-              {calOptions}
-            </select>
-          </div>
-          <div className="esper-remove-link form-group"
-               onClick={this.props.remove}>
-            <i className="fa fa-fw fa-close"></i>
-            Remove
-          </div>
-        </div></div>
-        <div className="col-sm-6 form-group">
-          <div className="esper-col-spacer">
-            <label className="group-heading">Other Calendars</label>
-            <div>{calCheckboxes}</div>
+      return (<div>
+        {errorMsg}
+        <div className="row clearfix form-set">
+          <div className="col-sm-6"><div className="esper-col-spacer">
+            <div className={"form-group " +
+                (this.state.nameHasError ? "has-error" : "")}>
+              <label htmlFor={this.getId("name")}
+                className="control-label">Name</label>
+              <input id={this.getId("name")} name="name"
+                type="text" className="form-control"
+                defaultValue={team.name}
+                disabled={disabled}
+                placeholder="Tony Stark" />
+            </div>
+            <div className={"form-group " +
+                (this.state.emailHasError ? "has-error" : "")}>
+              <label htmlFor={this.getId("email")}
+                className="control-label">Email</label>
+              <input id={this.getId("email") } type="email" name="email"
+                defaultValue={team.email}
+                disabled={disabled}
+                className="form-control" placeholder="tony@stark.com" />
+            </div>
+            <div className="form-group">
+              <label htmlFor={this.getId("default-cal")}
+                className="control-label">Default Calendar</label>
+              <select id={this.getId("default-cal")}
+                value={team.defaultCal}
+                name="default-cal"
+                disabled={disabled}
+                className="form-control">
+                {calOptions}
+              </select>
+            </div>
+            {
+              disabled ? "" :
+              <div className="esper-remove-link form-group"
+                onClick={this.props.remove}>
+                <i className="fa fa-fw fa-close"></i>
+                Remove
+              </div>
+            }
+            {
+              saved ?
+              <div className="label label-success form-group">
+                <i className="fa fa-fw fa-check"></i>
+                Team Created
+              </div> : ""
+            }
+          </div></div>
+          <div className="col-sm-6 form-group">
+            <div className="esper-col-spacer">
+              <label className="group-heading">Other Calendars</label>
+              <div>{calCheckboxes}</div>
             </div>
           </div>
-        </div>);
+        </div>
+      </div>);
     }
 
     // Validate inputs for this component, set error state if invalid, and
     // return the TeamRequest if valid. Called by SlideLogic.next for this
     // slide.
     validate(): TeamRequest {
+      /* Using jQuery selectors here is unfortunately not type-checkable.
+         TODO: Use React's ref attribute with enums or properties */
       var name = this.find("input[name=name]").val();
       var nameIsValid = !!name;
 
@@ -745,7 +876,7 @@ module Esper.Onboarding {
         this.setState({
           nameHasError: !nameIsValid,
           emailHasError: !emailIsValid
-        })
+        });
       }
     }
   }
@@ -757,12 +888,41 @@ module Esper.Onboarding {
   class FinishSlide extends Slide<{}> {
     render() {
       return (<div>
-        <div className="esper-subheading">This is the last slide.</div>
-        <div className="text-center">
-          <iframe width="560" height="315"
-            src="https://www.youtube.com/embed/fqqXBM6yMD8"
-            frameBorder="0" allowFullScreen={true}></iframe>
-        </div>
+        <p>Let’s face it, most of us already use our inbox as a task list.
+        So why not embrace it? At Esper, we do exactly that. Esper is built on
+        Tasks. Tasks are comprised of emails and events that you can link
+        together. Finally, your inbox works seamlessly with your calendar!</p>
+
+        <p>When you open a Gmail thread, the Esper Sidebar will pop up on the
+        right side of your screen.From the Esper Sidebar, you can create Tasks,
+        create Linked Events, send Invitations, see Executive Preferences and
+        more directly from your inbox!</p>
+
+        <p>Check out our videos to learn how you can become an Esper scheduling
+        expert!</p>
+
+        <ol>
+          <li><a href="https://youtu.be/HjSvKdw8j-A">
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            Creating Tasks
+          </a></li>
+          <li><a href="https://youtu.be/wJ-CX7q7Tu0">
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            Creating Events
+          </a></li>
+          <li><a href="https://youtu.be/n12EPAC3DIE">
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            Composing an Email
+          </a></li>
+          <li><a href="https://youtu.be/7QCyGYdyV6A">
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            Sending an Invitation
+          </a></li>
+          <li><a href="https://youtu.be/ZtX-87KAYtg">
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            Setting Preferences
+          </a></li>
+        </ol>
       </div>);
     }
   }

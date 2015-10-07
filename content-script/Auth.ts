@@ -88,6 +88,7 @@ module Esper.Auth {
             Login.setAccount(x);
             Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
+            openWelcomeModal(x);
           }
           else {
             openWelcomeModal(x);

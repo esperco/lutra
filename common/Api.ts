@@ -730,4 +730,23 @@ module Esper.Api {
       + "/" + string(taskid);
     return JsonHttp.put(url, JSON.stringify(progress));
   }
+
+  /* Team creation */
+  export function createTeam(execEmail: string, execName: string)
+    : JQueryPromise<ApiT.Team>
+  {
+    var url = Conf.Api.url + "/api/team-create/" + string(Login.myUid());
+    return JsonHttp.post(url, JSON.stringify({
+      executive_email: string(execEmail),
+      executive_name: string(execName)
+    }));
+  }
+
+  export function putTeamCalendars(teamid: string, cals: ApiT.Calendar[])
+    : JQueryPromise<ApiT.Team> {
+    var url = Conf.Api.url + "/api/team/" + string(Login.myUid())
+      + "/" + string(teamid) + "/calendars";
+    return JsonHttp.put(url, JSON.stringify({ calendars: cals }));
+  }
+
 }
