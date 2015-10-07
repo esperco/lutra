@@ -6,7 +6,7 @@
 module Esper.Agenda {
 
   function renderEvent(team: ApiT.Team,
-                       e: ApiT.CalendarEvent,
+                       e: ApiT.AgendaEvent,
                        filter: string[]) {
 '''
 <div #view class="esper-agenda-event">
@@ -28,8 +28,8 @@ module Esper.Agenda {
   </div>
 </div>
 '''
-    var start = XDate.ofString(e.start.local);
-    var end = XDate.ofString(e.end ? e.end.local : e.start.local);
+    var start = XDate.ofString(e.event.start.local);
+    var end = XDate.ofString(e.event.end ? e.event.end.local : e.event.start.local);
 
     name.text(team.team_name + "'s Event");
     weekday.text(XDate.fullWeekDay(start));
@@ -52,20 +52,20 @@ module Esper.Agenda {
     }
 
     var calendar = List.find(team.team_calendars, function(cal) {
-      return cal.google_cal_id === e.google_cal_id;
+      return cal.google_cal_id === e.event.google_cal_id;
     });
 
-    if (e.title !== undefined) {
-      title.text(e.title);
+    if (e.event.title !== undefined) {
+      title.text(e.event.title);
     } else {
       title.text("Untitled event");
     }
 
-    if (e.google_cal_url !== undefined) {
+    if (e.event.google_cal_url !== undefined) {
         date
         .addClass("esper-clickable")
         .click(function() {
-          open(e.google_cal_url, "_blank");
+          open(e.event.google_cal_url, "_blank");
         })
         .tooltip({
           show: { delay: 500, effect: "none" },
@@ -77,16 +77,16 @@ module Esper.Agenda {
       title
         .addClass("esper-link-black")
         .click(function() {
-          open(e.google_cal_url, "_blank");
+          open(e.event.google_cal_url, "_blank");
         });
     }
 
-    if (e.location !== undefined) {
-      location.text(e.location.address);
+    if (e.event.location !== undefined) {
+      location.text(e.event.location.address);
     }
 
-    if (e.task_notes !== undefined) {
-      taskNotes.html(e.task_notes);
+    if (e.notes !== undefined) {
+      taskNotes.text(e.notes);
     }
 
     return view;
@@ -415,16 +415,15 @@ module Esper.Agenda {
     );
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
-    Api.eventRange(currentTeam.teamid,
-                   currentTeam.team_calendars,
+    Api.agendaRange(currentTeam.teamid,
                    Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
                    Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
       .done(function(result) {
-        if (result.events.length === 0) {
+        if (result.agenda_events.length === 0) {
           noEvents.show();
         } else {
           noEvents.hide();
-          _.forEach(result.events, function(ev: ApiT.CalendarEvent) {
+          _.forEach(result.agenda_events, function(ev: ApiT.AgendaEvent) {
             var filter = getCheckedValues(filterSelect);
             eventsContainer.append(renderEvent(currentTeam, ev, filter));
             eventsContainer.append($("<hr>"));
@@ -446,16 +445,15 @@ module Esper.Agenda {
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
       _.forEach(teams, function(team: ApiT.Team) {
-        Api.eventRange(team.teamid,
-                       team.team_calendars,
+        Api.agendaRange(team.teamid,
                        Math.floor(f.getTime() / 1000),
                        Math.floor(u.getTime()/ 1000 + 86399))
           .done(function(result) {
-            if (result.events.length === 0) {
+            if (result.agenda_events.length === 0) {
               noEvents.show();
             } else {
               noEvents.hide();
-              _.forEach(result.events, function(ev: ApiT.CalendarEvent) {
+              _.forEach(result.agenda_events, function(ev: ApiT.AgendaEvent) {
                 var filter = getCheckedValues(filterSelect);
                 eventsContainer.append(renderEvent(team, ev, filter));
                 eventsContainer.append($("<hr>"));
