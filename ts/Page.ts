@@ -9,6 +9,7 @@ module Esper.Page {
   var pageSelector = Show.create({
     "settings": {ids:["settings-page"]},
     "team-settings": {ids:["team-settings-page"]},
+    "login": { ids: ["login-interface"] },
     "test": {ids:["test-page"]},
     "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
