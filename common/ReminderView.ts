@@ -269,6 +269,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         button.click(function() {
           openReminder(teamid, email, calendarId, eventId, eventTitle,
                        reminderState);
+          Analytics.track(Analytics.Trackable.ClickReminderButton);
         });
       });
     }

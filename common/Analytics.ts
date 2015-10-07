@@ -24,6 +24,7 @@ module Esper.Analytics {
     ClickMenuGetTaskList,
     ClickModalSendAgenda,
     ClickModalSendTaskList,
+    ClickReminderButton,
     ClickSidebarOptionsSettings,
     ClickSidebarPrivacyPolicy,
     ClickSidebarTermsOfUse,
