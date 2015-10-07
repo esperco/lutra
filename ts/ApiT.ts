@@ -20,6 +20,7 @@ module Esper.ApiT {
   export interface Team {
     teamid: string;
     team_name: string;
+    team_approved: boolean;
     team_executive: string;
     team_assistants: string[];
     team_calendars: Calendar[];
@@ -67,6 +68,10 @@ module Esper.ApiT {
     display_name: string;
     gender?: string; // "Female" or "Male"
     image_url?: string;
+  }
+
+  export interface ProfileList {
+    profile_list: Profile[];
   }
 
   export interface Guest {
