@@ -538,7 +538,7 @@ module Esper.TaskTab {
       });
     });
 
-    workflowSelect.click({
+    workflowSelect.click(function () {
       Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
