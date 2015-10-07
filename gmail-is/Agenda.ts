@@ -180,7 +180,7 @@ module Esper.Agenda {
         </ul>
       </div>
     </div>
-    <div #eventsContainer class="esper-modal-content" style="flex-grow: 1; overflow-y: auto;">
+    <div #eventsContainer class="esper-modal-content">
       <div #eventSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>

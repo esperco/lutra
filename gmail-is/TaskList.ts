@@ -396,7 +396,7 @@ module Esper.TaskList {
         </ul>
       </div>
     </div>
-    <div #tasksContainer class="esper-modal-content" style="flex-grow: 1; overflow-y: auto;">
+    <div #tasksContainer class="esper-modal-content">
       <div #taskSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
