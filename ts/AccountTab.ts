@@ -179,6 +179,7 @@ module Esper.AccountTab {
         (<any> statusContainer).tooltip(); // FIXME
       }
 
+      var hasRemoveLink = false;
       if ((memberUid !== Login.me() || Login.isAdmin())
           && List.mem(team.team_assistants, memberUid)) {
 '''removeLinkView
@@ -192,8 +193,7 @@ module Esper.AccountTab {
             .done(function() { refresh(); });
         });
 
-        actions.append($("<span class='text-divider'>|</span>"));
-
+        hasRemoveLink = true;
         if (memberUid === Login.me())
           name.append($("<span class='semibold'> (Me)</span>"));
 
@@ -210,6 +210,9 @@ module Esper.AccountTab {
   <a #signatureLink href="#" class="link">Edit Signature</a>
 </span>
 '''
+        if (hasRemoveLink) {
+          actions.append($("<span class='text-divider'>|</span>"));
+        }
         signatureSpan.appendTo(actions);
         signatureLink.click(function() {
           Api.getSignature(team.teamid, memberUid).done(function(x) {
@@ -218,15 +221,15 @@ module Esper.AccountTab {
             (<any> view.modal).modal({});
           });
         });
-        actions.append($("<span class='text-divider'>|</span>"));
       }
 
-      if (memberUid !== execUid) {
+      if (Login.isAdmin() && memberUid !== execUid) {
 '''makeExecView
 <span #makeExecSpan>
   <a #makeExecLink href="#" class="link">Make Executive</a>
 </span>
 '''
+        actions.append($("<span class='text-divider'>|</span>"));
         makeExecSpan.appendTo(actions);
         makeExecLink.click(function() {
           Api.setExecutive(team.teamid, memberUid)
