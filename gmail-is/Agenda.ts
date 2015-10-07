@@ -352,21 +352,16 @@ module Esper.Agenda {
       if (!$(this).is(":checked")) {
         e.stopPropagation();
         allFilter.find("label > input").prop("checked", false);
-        displayEventProperties(getCheckedValues(filterSelect));
       }
+      displayEventProperties(getCheckedValues(filterSelect));
     });
 
-    filterSelect.find("label > input[value!='']").change(function(e) {
+    teamSelect.find("label > input[value!='']").change(function(e) {
       if (!$(this).is(":checked")) {
         e.stopPropagation();
         allTeams.find("label > input").prop("checked", false);
-        renderEvents();
       }
-    })
-
-    filterSelect.click(function() {
-      var filter = getCheckedValues(filterSelect);
-      displayEventProperties(filter);
+      renderEvents();
     });
 
     function appendEmailToTextarea() {
