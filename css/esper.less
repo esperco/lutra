@@ -606,6 +606,12 @@ textarea.esper-input { resize: none; }
   top: 10%;
   height: 80%;
   max-height: 80%;
+  &.esper-modal-flexbox {
+    > .esper-modal-content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+  }
 }
 
 .esper-tl-task-list {

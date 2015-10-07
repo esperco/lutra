@@ -103,7 +103,7 @@ module Esper.Agenda {
   export function renderModal(currentTeam: ApiT.Team) {
 '''
 <div #view class="esper-modal-bg">
-  <div #modal class="esper-tl-modal">
+  <div #modal class="esper-tl-modal esper-modal-flexbox">
     <div class="esper-modal-header"><h2 style="margin: 0px;">Agenda</h2></div>
     <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <div class="esper-modal-filter esper-bs esper">
@@ -180,7 +180,7 @@ module Esper.Agenda {
         </ul>
       </div>
     </div>
-    <div #eventsContainer class="esper-modal-content" style="height: calc(100% - 400px); overflow-y: auto;">
+    <div #eventsContainer class="esper-modal-content">
       <div #eventSpinner class="esper-events-list-loading">
         <div class="esper-spinner esper-list-spinner"/>
       </div>
@@ -208,7 +208,7 @@ module Esper.Agenda {
             </td>
             <td>
               <div #recipients />
-              <textarea #recipientTextArea rows="4" cols="50" />
+              <textarea #recipientTextArea rows="2" cols="50" />
             </td>
           </tr>
         </table>
