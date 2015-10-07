@@ -78,7 +78,6 @@ module Esper.Auth {
     div.renderReact(Onboarding.OnboardingModal, account);
   }
 
-
   function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
       googleAccountId,
@@ -96,6 +95,19 @@ module Esper.Auth {
     });
   }
 
+  // Exported helper function to open welcome modal for dev
+  export function devWelcomeModal(googleAccountId: string) {
+    EsperStorage.loadCredentials(
+      googleAccountId,
+      function(x: Types.Account) {
+          if (x.credentials !== undefined) {
+            Login.setAccount(x);
+            Login.getLoginInfo().always(Analytics.identify);
+            sendCredentialsResponse(x);
+          }
+          openWelcomeModal(x);
+      });
+  }
 
   function listenForMessages() {
     Log.d("listenForMessages()");
