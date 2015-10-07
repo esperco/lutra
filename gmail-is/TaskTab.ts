@@ -202,7 +202,7 @@ module Esper.TaskTab {
       }
     });
     taskProgressSelector.click(function() {
-      Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
+      Analytics.track(Analytics.Trackable.SelectTaskTabTaskProgress);
     });
 
     taskTab.taskProgressContainer.append(view);
@@ -536,6 +536,10 @@ module Esper.TaskTab {
           workflowSection.removeClass("esper-hide");
         }
       });
+    });
+
+    workflowSelect.click({
+      Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
     stepSelect.change(function() {

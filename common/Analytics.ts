@@ -46,6 +46,7 @@ module Esper.Analytics {
     RenameTaskTabTask,
     SaveTaskNotes,
     SelectTaskTabMeetingType,
+    SelectTaskTabTaskProgress,
     SelectTaskTabWorkflow,
     UnarchiveTaskTabTask
   };
