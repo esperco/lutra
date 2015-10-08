@@ -1,6 +1,11 @@
 /** This module keeps track of all of the teams associated with the
  *  active account.
  */
+
+/// <reference path="./Profile.ts" />
+/// <reference path="./Promise.ts" />
+/// <reference path="./Preferences.ts" />
+
 module Esper.Teams {
   var teams : ApiT.Team[] = [];
   var profiles = {};

@@ -267,4 +267,13 @@ module Esper.Util {
   export function nameOfPlan(id: string /* planid */) {
     return id.replace(/(.*)_\d+$/, "$1").replace("_", " ");
   }
+
+  /*
+    Query string helpers
+  */
+  export function getQueryParam(name) {
+    var match = new RegExp('[?&]' + name + '=([^&#]*)')
+      .exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  }
 }
