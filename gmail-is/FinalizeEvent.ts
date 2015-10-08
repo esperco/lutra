@@ -69,7 +69,8 @@ module Esper.FinalizeEvent {
       recurrence      : event.recurrence,
       recurring_event_id: event.recurring_event_id
     };
-    edit.location.timezone = prefs.general.current_timezone;
+    if (edit.location)
+      edit.location.timezone = prefs.general.current_timezone;
 
     if (isHold(edit) != hold) {
       if (hold) {

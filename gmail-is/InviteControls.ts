@@ -248,7 +248,8 @@ module Esper.InviteControls {
     heading.text(headingText);
     pubTitle.val(defaultTitle);
     pubTitle.attr("placeholder", defaultTitle);
-    pubLocation.val(state.location.address);
+    if (state.location)
+      pubLocation.val(state.location.address);
 
     if (state.description) {
       var separatorIndex = event.description.search(/=== Conversation ===/);
