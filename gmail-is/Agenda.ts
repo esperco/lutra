@@ -330,11 +330,9 @@ module Esper.Agenda {
 
     var timezone = Teams.getPreferences(currentTeam.teamid).general.current_timezone;
 
-    var tzSel = Timezone.createTimezoneSelector(timezone);
+    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone);
     tzSel.removeClass("esper-select");
     tzSel.addClass("esper-agenda-timezone-select");
-    tzSel.val(timezone);
-    timezoneDropdown.append(tzSel);
 
     allTeams.find("label > input").change(function(e) {
       e.stopPropagation();
@@ -472,7 +470,7 @@ module Esper.Agenda {
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = tzSel.val();
+      var tz = Timezone.selectedTimezone(tzSel);
       var format = htmlFormat.prop("checked");
       var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");

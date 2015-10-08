@@ -40,20 +40,6 @@ module Esper.Timezone {
     name: string; // Full customary name
   }
 
-  // With data added from moment-timezone library
-  interface ZoneInfo extends ZoneName {
-    abbr: string; // PST, EDT, etc.
-    offset: string; // -08:00, +10:30, etc. For people
-    offsetMins: number; // -420, -240, etc. For sorting
-  }
-
-  var commonTimezones: ZoneName[] = [
-    { id: "America/Los_Angeles", name: "US Pacific Time" },
-    { id: "America/Denver", name: "US Mountain Time" },
-    { id: "America/Chicago", name: "US Central Time" },
-    { id: "America/New_York", name: "US Eastern Time" }
-  ]
-
   /* We need this because moment-timezone doesn't supply the full names,
      and we want to show those in our menu.
   */
@@ -341,56 +327,56 @@ module Esper.Timezone {
     { id: "Pacific/Kiritimati", name: "Kiritimati" }
   ];
 
-  function addMomentDataToZone(m: moment.Moment, z: ZoneName): ZoneInfo {
-    var mom = (<any> moment).tz(m, z.id);
-    return {
-      id: z.id,
-      name: z.name,
-      abbr: mom.format("z"),
-      offset: mom.format("Z"),
-      offsetMins: mom._offset
-    };
+  interface Dictionary {
+    [index: string]: string;
+  }
+  var idOfValue: Dictionary;
+  var valueOfId: Dictionary;
+  var timezones: Bloodhound<string>;
+
+  export function init() {
+    var values: string[] = [];
+    valueOfId = {};
+    idOfValue = {};
+    List.iter(supportedTimezones, function(z) {
+      var mom = (<any> moment).tz(moment(), z.id);
+      var offset = mom.format("Z"), abbr = mom.format("z");
+      var value = "(GMT" + offset + ") " + z.name + " (" + abbr + ")";
+
+      values.push(value);
+      idOfValue[value] = z.id;
+      valueOfId[z.id] = value;
+    });
+
+    timezones = new Esper.bloodhound({
+      local: function(){return values;},
+      queryTokenizer: Esper.bloodhound.tokenizers.whitespace,
+      datumTokenizer: Esper.bloodhound.tokenizers.whitespace
+    });
   }
 
-  function addZoneInfo(): ZoneInfo[] {
-    var now = moment();
-    var zonesWithInfo = List.map(supportedTimezones, function(z) {
-      return addMomentDataToZone(now, z);
-    });
-    var commonWithInfo = List.map(commonTimezones, function(z) {
-      return addMomentDataToZone(now, z);
-    });
-    var sortedZones = List.sort(zonesWithInfo, function(x, y) {
-      return x.offsetMins - y.offsetMins;
-    });
-    return commonWithInfo.concat(sortedZones);
-  }
-
-  // We only want to run addZoneInfo once per refresh
-  var timezoneData: ZoneInfo[] = null;
-
-  export function createTimezoneSelector(selected) {
+  export function appendTimezoneSelector(parent, selected) {
 '''
-<select #timezone class="esper-select esper-prefs-timezone"/>
+<input #selector class="typeahead" type="text"/>
 '''
-    if (timezoneData === null) timezoneData = addZoneInfo();
-
-    var alreadySelected = false;
-    List.iter(timezoneData, function(z, i) {
-      if (i === commonTimezones.length) {
-        $("<option disabled>────────────────────────</option>")
-          .appendTo(timezone);
+    parent.append(selector);
+    selector.typeahead(
+      { highlight: true
+      },
+      { name: "timezones",
+        source: function(query, sync, async) {
+          timezones.search(query, sync, async);
+        }
       }
-      var name = "(GMT" + z.offset + ") " + z.name + " (" + z.abbr + ")";
-      var opt = $("<option value='" + z.id + "'>" + name + "</option>");
-      if (z.id === selected && !alreadySelected) {
-        opt.prop("selected", true);
-        alreadySelected = true;
-      }
-      opt.appendTo(timezone);
-    });
-
-    return timezone;
+    );
+    var value = valueOfId[selected];
+    if (value) {
+      selector.typeahead('val', value);
+    }
+    return selector;
   }
 
+  export function selectedTimezone(selector) {
+    return idOfValue[selector.typeahead('val')];
+  }
 }
