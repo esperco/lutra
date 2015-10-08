@@ -131,6 +131,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-confirmation").is(":checked"),
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
+      double_booking_warning:
+        div.find(".esper-prefs-double-booking").is(":checked"),
       use_duplicate_events:
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
@@ -1593,6 +1595,13 @@ module Esper.PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
+          <input #doubleBookingWarning type="checkbox"
+                 class="esper-prefs-double-booking"/>
+          Warn me if I try to schedule events on top of other events
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
           <input #useDuplicate type="checkbox"
                  class="esper-prefs-duplicate"/>
           Use duplicate calendar events to invite guests
@@ -1623,6 +1632,8 @@ module Esper.PreferencesTab {
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
+      if (general.double_booking_warning)
+        doubleBookingWarning.prop("checked", true);
       if (general.use_duplicate_events)
         useDuplicate.prop("checked", true);
       if (!general.bcc_exec_on_reply)
@@ -1633,6 +1644,7 @@ module Esper.PreferencesTab {
 
     sendConfirmation.click(saveGeneralPrefs);
     sendReminder.click(saveGeneralPrefs);
+    doubleBookingWarning.click(saveGeneralPrefs);
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
 
