@@ -100,7 +100,7 @@ module Esper.TaskTab {
                                            taskTab: TaskTabView) {
 '''
   <div #noThreads class="esper-no-threads">No linked emails</div>
-  <ul #threadsList class="esper-thread-list"/>
+  <ol #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
 
@@ -134,9 +134,16 @@ module Esper.TaskTab {
             taskTab.showLinkedThreads.click();
           }
         });
-
-        li.appendTo(threadsList);
+      } else {
+'''
+<li #li class="esper-thread-li current">
+  <a #a class="esper-thread-link current"></a>
+  <span #cross />
+</li>
+'''
+        a.text(thread.subject).attr("title", thread.subject);
       }
+      li.appendTo(threadsList);
     });
 
     if (threadsList.children("li").length > 0) {
