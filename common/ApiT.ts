@@ -319,6 +319,7 @@ module Esper.ApiT {
   export interface GeneralPrefs {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
+    double_booking_warning: boolean;
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
     exec_daily_agenda: boolean;
