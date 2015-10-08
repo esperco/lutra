@@ -272,8 +272,7 @@ module Esper.InThreadControls {
         notes = task.task_notes || ""; // "" if task_notes is undefined
         notesQuill = task.task_notes_quill || "";
       } else {
-        notes = "";
-        notesQuill = "";
+        return;
       }
 
       if (notesQuill !== "") {
