@@ -201,7 +201,10 @@ module Esper.CalPicker {
                                locationSearchResults, query, prefs);
     }
     Util.afterTyping(eventLocation, 250, searchLocation);
-    eventLocation.click(searchLocation);
+    eventLocation.click(function() {
+      searchLocation();
+      Analytics.track(Analytics.Trackable.EditCalendarPickerLocation);
+    });
 
     refreshCal.click(function() {
       refreshCache = true;
@@ -213,6 +216,9 @@ module Esper.CalPicker {
       CurrentThread.task.get().task_title :
       GmailJs.get.email_subject();
     eventTitle.val("HOLD: " + title);
+    eventTitle.click(function() {
+      Analytics.track(Analytics.Trackable.EditCalendarPickerEventTitle);
+    });
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
     Sidebar.customizeSelectArrow(createdBy);
@@ -233,6 +239,10 @@ module Esper.CalPicker {
       calendarView.fullCalendar("refetchEvents");
     });
 
+    pickerSwitcher.click(function() {
+      Analytics.track(Analytics.Trackable.ClickCalendarPickerSaveEventsTo);
+    });
+
     function updateCalendarViewList() {
       var curViewList = [];
       List.iter(calendars, function(cal) {
@@ -248,6 +258,7 @@ module Esper.CalPicker {
       e.preventDefault();
       viewCalDropdown.show();
       viewCalDropdown.addClass("esper-open");
+      Analytics.track(Analytics.Trackable.ClickCalendarPickerViewCalendar);
     });
     List.iter(calendars, function(cal, i) {
 '''
@@ -310,6 +321,9 @@ module Esper.CalPicker {
       tpref.executive_timezone = tz;
       Api.putTaskPrefs(tpref);
     });
+    execTz.click(function() {
+      Analytics.track(Analytics.Trackable.SelectCalendarPickerExecutiveTimezone);
+    });
 
     guestTz.change(function() {
       var tz = guestTz.val();
@@ -318,6 +332,9 @@ module Esper.CalPicker {
       calendarView.fullCalendar("refetchEvents");
       tpref.guest_timezone = tz;
       Api.putTaskPrefs(tpref);
+    });
+    guestTz.click(function() {
+      Analytics.track(Analytics.Trackable.SelectCalendarPickerGuestTimezone);
     });
 
     CurrentThread.getParticipants().done(function(guests) {
@@ -646,6 +663,9 @@ module Esper.CalPicker {
       meetingType = menu.val();
       pickerView.calendarView.fullCalendar("refetchEvents");
     });
+    menu.click(function() {
+      Analytics.track(Analytics.Trackable.SelectCalendarPickerMeetingType);
+    })
 
     var type = UserTab.currentMeetingType;
     if (menu.find("option[value='" + type + "']").length > 0) {
@@ -992,7 +1012,10 @@ module Esper.CalPicker {
           "tooltipClass": "esper-top esper-tooltip"
         });
 
-        cancel.click(closeView);
+        cancel.click(function() {
+          closeView();
+          Analytics.track(Analytics.Trackable.ClickCalendarPickerCancel);
+        });
 
         save.click(function() {
           makeBusy();
