@@ -1597,7 +1597,7 @@ module Esper.PreferencesTab {
         <label class="checkbox esper-preference-check">
           <input #doubleBookingWarning type="checkbox"
                  class="esper-prefs-double-booking"/>
-          Warn me if I try to schedule events on top of other events
+          Warn me if I try to schedule conflicting events
         </label>
       </li>
       <li>
