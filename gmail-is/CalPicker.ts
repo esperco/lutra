@@ -838,6 +838,7 @@ module Esper.CalPicker {
   function confirmEvents(view, picker, team: ApiT.Team, task: ApiT.Task,
                          threadId: string,
                          callback: (err?: Error) => void) {
+    var prefs = Teams.getTeamPreferences(team).general;
     if (picker.eventLocation.val() == "") {
       var locationModal = displayCheckLocationModal();
       $("body").append(locationModal.view);
@@ -867,7 +868,7 @@ module Esper.CalPicker {
           else return null;
         });
 
-        if (filtered_results.length > 0) {
+        if (filtered_results.length > 0 && prefs.double_booking_warning) {
           var confirmModal = displayConfirmEventModal(
             view, events, filtered_results, picker, team, task, threadId,
             callback);
