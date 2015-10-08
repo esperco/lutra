@@ -6,7 +6,7 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "jquery/jquery.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
     },
     "segment-analytics/segment-analytics.d.ts": {
       "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
@@ -60,6 +60,9 @@
       "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
     },
     "analytics-node/analytics-node.d.ts": {
+      "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
+    },
+    "typeahead/typeahead.d.ts": {
       "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
     }
   }
