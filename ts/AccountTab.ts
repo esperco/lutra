@@ -34,9 +34,6 @@ module Esper.AccountTab {
     inviteEmail: JQuery;
     invited: JQuery;
     addBtn: JQuery;
-    roleSelector: JQuery;
-    assistant: JQuery;
-    executive: JQuery;
     doneBtn: JQuery;
     cancelBtn: JQuery;
   }
@@ -44,7 +41,7 @@ module Esper.AccountTab {
   function renderInviteDialog(team, table): InviteDialog {
 '''
 <div #view class="invite-popover overlay-popover click-safe">
-  <div class="overlay-popover-header click-safe">Add new team member</div>
+  <div class="overlay-popover-header click-safe">Add new assistant</div>
   <div class="overlay-popover-body click-safe">
     <input #inviteEmail type="email" class="invite-input click-safe"
            autofocus placeholder="name@example.com"/>
@@ -52,13 +49,7 @@ module Esper.AccountTab {
     <div class="clearfix click-safe">
       <button #addBtn class="button-primary label-btn click-safe" disabled>
         <span class="click-safe">Add</span>
-        <span class="caret-south click-safe"/>
       </button>
-      <ul #roleSelector class="role-selector overlay-list click-safe">
-        <li class="unselectable click-safe">Select a role:</li>
-        <li><a #assistant class="click-safe">Assistant</a></li>
-        <li><a #executive class="click-safe">Executive</a></li>
-      </ul>
       <a #doneBtn class="invite-continue button button-primary"
          target="_blank">Done</a>
       <button #cancelBtn class="button-secondary label-btn">Cancel</button>
@@ -77,26 +68,20 @@ module Esper.AccountTab {
       Settings.togglePopover(_view);
     }
 
-    function selectRole(role: string, toEmail: string) {
-      Settings.toggleList(roleSelector);
+    addBtn.click(function() {
+      var toEmail = inviteEmail.val();
       inviteEmail.hide();
       addBtn.hide();
       cancelBtn.hide();
-      sendInvite(team, role, toEmail)
+      invited.html("Sending &hellip;")
+      invited.show();
+      sendInvite(team, "Assistant", toEmail)
         .done(function() {
           var text = Login.isAdmin() ? "Added!" : "Invite sent!";
           invited.text(text);
           invited.show();
           doneBtn.show();
         });
-    }
-
-    addBtn.click(function() {
-      var toEmail = inviteEmail.val();
-      Settings.toggleList(roleSelector);
-
-      assistant.click(function() { selectRole("Assistant", toEmail); });
-      executive.click(function() { selectRole("Executive", toEmail); });
     });
 
     doneBtn.click(reset);
@@ -1029,7 +1014,7 @@ module Esper.AccountTab {
     <div #emailContainer class="img-container-left"/>
     <a #invite disabled
        class="link popover-trigger click-safe"
-       style="float:left">Add new team member</a>
+       style="float:left">Add new assistant</a>
   </div>
 </div>
 '''
