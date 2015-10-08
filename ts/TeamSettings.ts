@@ -103,7 +103,6 @@ module Esper.TeamSettings {
     <div #contentPrf class="tab-content"/>
     <div #contentWkf class="tab-content"/>
     <div #contentLab class="tab-content"/>
-    <div #contentUsg class="tab-content"/>
     <div #contentTmp class="tab-content"/>
   </div>
 </div>
