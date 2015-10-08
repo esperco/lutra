@@ -11,8 +11,7 @@ var EventEmitter  = require("eventemitter3"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
-    quill         = require("quill"),
-    typeahead     = require("typeahead.js");
+    quill         = require("quill");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -20,9 +19,12 @@ var react         = require("./marten/vendor/react/react-with-addons.js");
 // CryptoJS -> only need SHA-1
 var SHA1          = require("./marten/vendor/crypto-js/sha1.js");
 
+var typehead;
+
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("jquery-ui");
+  typeahead = require("typeahead.js");
 
   // Bootstrap has some conflicts with jQuery-UI. Default to jQuery-UI's
   // version for now
