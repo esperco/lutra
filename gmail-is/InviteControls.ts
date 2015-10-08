@@ -661,7 +661,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                           descriptionSlide];
             var startState = populateInviteState(event, prefs);
             var controls = {
-              onCancel : function () { /* no actions needed */ },
+              onCancel : function () { Analytics.track(Analytics.Trackable.ClickInviteCancelButton); },
               onFinish : function (state) {
                 finalizeEvent(state).done(function (done) {
                   if (done) {
@@ -670,6 +670,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                     throw Slides.invalidState;
                   }
                 });
+                Analytics.track(Analytics.Trackable.ClickInviteButton);
               },
               finishButtonTitle : "Invite"
             };
@@ -720,7 +721,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
             ];
 
             var controls = {
-              onCancel : function () { /* no actions needed */ },
+              onCancel : function () { Analytics.track(Analytics.Trackable.ClickInviteCancelButton); },
               onFinish : function (dualState) {
                 var exec   = dualState.exec;
                 var guests = dualState.guests;
@@ -738,6 +739,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                     throw Slides.invalidState;
                   }
                 });
+                Analytics.track(Analytics.Trackable.ClickInviteButton);
               },
               finishButtonTitle : "Invite"
             };
