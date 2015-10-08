@@ -94,9 +94,7 @@ module Esper.TeamSettings {
       <li #tabPrf><a class="link">Preferences</a></li>
       <li #tabWkf><a class="link">Workflows</a></li>
       <li #tabLab><a class="link">Labels</a></li>
-      <li #tabUsg><a class="link">Usage</a></li>
       <li #tabTmp><a class="link">Templates</a></li>
-      <li #tabAbt><a class="link">About</a></li>
     </ul>
   </div>
   <div #tab class="esper-tab-content">
@@ -105,9 +103,7 @@ module Esper.TeamSettings {
     <div #contentPrf class="tab-content"/>
     <div #contentWkf class="tab-content"/>
     <div #contentLab class="tab-content"/>
-    <div #contentUsg class="tab-content"/>
     <div #contentTmp class="tab-content"/>
-    <div #contentAbt class="tab-content"/>
   </div>
 </div>
 '''
@@ -117,18 +113,14 @@ module Esper.TeamSettings {
     var tabViewPrf = makeTabView("prf", tabPrf, contentPrf, true);
     var tabViewWkf = makeTabView("wkf", tabWkf, contentWkf, true);
     var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
-    var tabViewUsg = makeTabView("usg", tabUsg, contentUsg, true);
     var tabViewTmp = makeTabView("tmp", tabTmp, contentTmp, true);
-    var tabViewAbt = makeTabView("abt", tabAbt, contentAbt, true);
     tabViews /* global */ = [
       tabViewAcc,
       tabViewCal,
       tabViewPrf,
       tabViewWkf,
       tabViewLab,
-      tabViewUsg,
       tabViewTmp,
-      tabViewAbt
     ];
 
     List.iter(tabViews, function(x: TabView, i) {
@@ -144,7 +136,6 @@ module Esper.TeamSettings {
     }
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
-    contentAbt.append(AboutTab.load(team, onboarding));
     contentTmp.append(TemplateTab.load(team, contentTmp))
 
     if (onboarding) {
@@ -159,13 +150,6 @@ module Esper.TeamSettings {
       tabLab.addClass("hide");
     } else {
       contentLab.append(LabelsTab.load(team));
-    }
-
-    if (! (Login.isEsperAssistant() || Login.isAdmin())) {
-      tabViewUsg.shown = false;
-      tabUsg.addClass("hide");
-    } else {
-      contentUsg.append(UsageTab.load(team));
     }
 
     var last = findLastShown(tabViews);
@@ -239,30 +223,14 @@ module Esper.TeamSettings {
       });
 
     headerTitle.click(Page.settings.load);
-    
-    /* document.title = "exec.display_name - Team Settings" if we are not onboarding.
-    If we are onboarding, keep the default 'Sign Up | Esper", to not confuse new onboarding customers */
 
-    if (!onboarding) {
-      Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
-        .done(function(exec) {
-          document.title = exec.display_name + " - Team Settings";
-        });
-      }
-    else {
-    // We'll guide the exec through each step, mimic esper.com/signup css
-        divideLine.remove();
-        headerDiv.remove();
-        view.css("padding","0px");
-        view.css("min-width","100%");
-      }
-
-    Api.getSubscriptionStatus(selectedTeam.teamid)
-      .done(function(customer) {
-        main.append(showTeamSettings(selectedTeam, onboarding, plans, payment));
-        footer.append(Footer.load(onboarding));
-        if (onboarding) switchTabByName("cal");
+    Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
+      .done(function(exec) {
+        document.title = exec.display_name + " - Team Settings";
       });
+
+    main.append(showTeamSettings(selectedTeam, onboarding, plans, payment));
+    footer.append(Footer.load());
 
     signOut.click(Login.logout);
   }

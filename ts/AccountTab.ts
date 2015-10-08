@@ -913,15 +913,15 @@ module Esper.AccountTab {
   </div>
   <div class="membership-col center">
     <div><a #changeName class="link">Change display name</a></div>
-    <div class="clearfix">
+    <!-- <div class="clearfix">
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
-    <div><a #changePayment class="link">Add payment method</a></div>
+    <div><a #changePayment class="link">Add payment method</a></div> -->
   </div>
-  <div class="membership-col right">
+  <!-- <div class="membership-col right">
     <div><a #cardInfo class="link">View card information</a></div>
-  </div>
+  </div> -->
 </div>
 '''
     var teamid = team.teamid;
@@ -944,56 +944,56 @@ module Esper.AccountTab {
       nameModal.displayName.click();
     });
 
-    var cardModal = showCardModal(team);
-    cardInfo.click(function() {
-      (<any> cardModal.modal).modal();
-    });
+    // var cardModal = showCardModal(team);
+    // cardInfo.click(function() {
+    //   (<any> cardModal.modal).modal();
+    // });
 
     var execUid = team.team_executive;
 
-    Api.getSubscriptionStatus(teamid)
-      .done(updateStatus);
+    // Api.getSubscriptionStatus(teamid)
+    //   .done(updateStatus);
 
-    function updateStatus(customer) {
-      var mem = customer.status && customer.status.toLowerCase();
-      var plan = customer.plan;
+    // function updateStatus(customer) {
+    //   var mem = customer.status && customer.status.toLowerCase();
+    //   var plan = customer.plan;
 
-      if (plan === Plan.canceled || mem === 'canceled') {
-        membershipBadge.text("CANCELED");
-        membershipBadge.addClass("suspended");
-      }
+    //   if (plan === Plan.canceled || mem === 'canceled') {
+    //     membershipBadge.text("CANCELED");
+    //     membershipBadge.addClass("suspended");
+    //   }
 
-      else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
-        membershipBadge.text("SUSPENDED");
-        membershipBadge.addClass("suspended");
-      }
+    //   else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
+    //     membershipBadge.text("SUSPENDED");
+    //     membershipBadge.addClass("suspended");
+    //   }
 
-      else if (! mem) {
-        membershipBadge.text("NONE");
-        membershipBadge.addClass("suspended");
-      }
+    //   else if (! mem) {
+    //     membershipBadge.text("NONE");
+    //     membershipBadge.addClass("suspended");
+    //   }
 
-      else if (! Plan.isActive(plan)) {
-        membershipBadge.text("EXPIRING");
-        membershipBadge.addClass("suspended");
-      }
+    //   else if (! Plan.isActive(plan)) {
+    //     membershipBadge.text("EXPIRING");
+    //     membershipBadge.addClass("suspended");
+    //   }
 
-      // Membership must be trialing or active to get here
-      else if (mem === "trialing") {
-        membershipBadge.text("TRIALING");
-        membershipBadge.addClass("active");
-      }
+    //   // Membership must be trialing or active to get here
+    //   else if (mem === "trialing") {
+    //     membershipBadge.text("TRIALING");
+    //     membershipBadge.addClass("active");
+    //   }
 
-      else { // active
-        membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
-        membershipBadge.addClass("active");
-      }
+    //   else { // active
+    //     membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
+    //     membershipBadge.addClass("active");
+    //   }
 
-      changeMembership.click(function() { showMembershipModal(team); });
-      changePayment.click(function() {
-        showPaymentModal("Change", team, null)
-      });
-    }
+    //   changeMembership.click(function() { showMembershipModal(team); });
+    //   changePayment.click(function() {
+    //     showPaymentModal("Change", team, null)
+    //   });
+    // }
 
     return view;
   }
@@ -1002,7 +1002,7 @@ module Esper.AccountTab {
 '''
 <div #view>
   <div #notes/>
-  <div class="table-header">Membership & Billing</div>
+  <div class="table-header">Team Information</div>
   <div #membership class="table-list"/>
   <div #assistantsHeader class="table-header">Assistants</div>
   <ul #assistantsList class="table-list">
