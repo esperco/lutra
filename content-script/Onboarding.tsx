@@ -438,7 +438,7 @@ module Esper.Onboarding {
         </p>
         <p className="text-center">
           <span className="esper-remove-link" onClick={this.disable.bind(this)}>
-            Or disable Esper for this Gmail account by clicking here.
+            Or disable Esper for this Google account by clicking here.
           </span>
         </p>
       </div>);
