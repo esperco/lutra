@@ -215,6 +215,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(event));
   }
 
+  export function getCalendarList(teamid?: string)
+    : JQueryPromise<ApiT.Calendars> {
+    var url = Conf.Api.url + "/api/calendar/list/" + string(Login.myUid());
+    if (teamid) {
+      url += "/" + string(teamid);
+    }
+    return JsonHttp.get(url);
+  }
+
   export function postCalendarShow(teamid, teamCalendars):
   JQueryPromise<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
@@ -732,4 +741,23 @@ module Esper.Api {
       + "/" + string(taskid);
     return JsonHttp.put(url, JSON.stringify(progress));
   }
+
+  /* Team creation */
+  export function createTeam(execEmail: string, execName: string)
+    : JQueryPromise<ApiT.Team>
+  {
+    var url = Conf.Api.url + "/api/team-create/" + string(Login.myUid());
+    return JsonHttp.post(url, JSON.stringify({
+      executive_email: string(execEmail),
+      executive_name: string(execName)
+    }));
+  }
+
+  export function putTeamCalendars(teamid: string, cals: ApiT.Calendar[])
+    : JQueryPromise<ApiT.Team> {
+    var url = Conf.Api.url + "/api/team/" + string(Login.myUid())
+      + "/" + string(teamid) + "/calendars";
+    return JsonHttp.put(url, JSON.stringify({ calendars: cals }));
+  }
+
 }

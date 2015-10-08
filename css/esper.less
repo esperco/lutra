@@ -18,27 +18,26 @@
 
   // Creates an arrow for dropdown menus
   .dropdown-arrow-top {
-    &:before {
+    &:before, &:after {
       position: absolute;
-      top: -8px;
       left: 10px;
       display: inline-block;
       border-right: 8.5px solid transparent;
       border-bottom: 8.5px solid #ccc;
       border-left: 8.5px solid transparent;
-      border-bottom-color: rgba(0, 0, 0, 0.2);
       content: '';
     }
 
+    // Outer arrow (border / outline)
+    &:before {
+      top: -8px;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+    }
+
+    // Inner arrow (white / fill)
     &:after {
-      position: absolute;
       top: -7px;
-      left: 10px;
-      display: inline-block;
-      border-right: 8.5px solid transparent;
-      border-bottom: 8.5px solid #ffffff;
-      border-left: 8.5px solid transparent;
-      content: '';
+      border-bottom-color: #fff;
     }
 
     &.dropdown-menu-right {
@@ -51,6 +50,85 @@
         left: auto;
         right: 10px;
       }
+    }
+  }
+
+  // Bootstrap uses this class -- override some things that Gmail sets
+  .in {
+    color: inherit;
+    cursor: inherit;
+    font-size: inherit;
+    text-decoration: inherit;
+    white-space: normal;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // Busy indicator
+  .modal-footer .esper-spinner {
+    float: left;
+    display: block;
+    height: 32px;
+    width: 32px;
+  }
+
+  .progress.skinny {
+    height: 3px;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header .esper-modal-icon {
+    line-height: @modal-title-line-height;
+    height: @font-size-h4;
+    width: auto;
+    margin-right: @modal-title-padding;
+  }
+
+  .modal-content .simple-content {
+    padding: @line-height-computed;
+    padding-bottom: (2 * @line-height-computed);
+    text-align: center;
+
+    .message {
+      font-size: @font-size-h5;
+      color: @gray;
+      margin-bottom: @line-height-computed;
+    }
+  }
+
+  // Doesn't work unless we insert SVG inline (need to bring in Svg.ts)
+  .esper-brand-icon {
+    color: @brand-primary;
+    fill: @brand-primary;
+  }
+
+  label.group-heading {
+    display: block;
+  }
+
+  // Overrides
+  .radio, .checkbox {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  // Use to add spacing within columns
+  .esper-col-spacer {
+    padding: 0 5px;
+  }
+
+  // Custom helpers
+  .form-set {
+    border-bottom: 1px solid @google_border_gray;
+    margin-bottom: @form-group-margin-bottom;
+  }
+
+  .modal-content {
+    .esper-subheading {
+      font-weight: bold;
     }
   }
 }
@@ -66,6 +144,11 @@
   @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
   @import (less) "../marten/vendor/quill/dist/quill.snow.css";
   @import (less) "../marten/vendor/quill/dist/quill.base.css";
+
+  // More spacing on font-awesome left-align icons
+  .fa.fa-la {
+    margin-right: 0.5em;
+  }
 
   // Override some Quill theming
   .ql-snow.ql-toolbar {
@@ -467,6 +550,14 @@ object.esper-svg { pointer-events: none; }
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     content: "\f00d";
+  }
+}
+
+.esper-remove-link {
+  cursor: pointer;
+  color: @gray_30;
+  &:hover {
+    color: @red_hover;
   }
 }
 
@@ -2663,4 +2754,20 @@ textarea.esper-description-text {
   font-size: 14px;
   color: @purple_text;
   background-color: @purple_bg;
+}
+
+.esper-google-btn {
+  background: url("../img/btn_google_signin_light_normal_web.png");
+  width: 193px;
+  height: 48px;
+  cursor: pointer;
+  border-width: 0;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:active {
+    background: url("../img/btn_google_signin_light_pressed_web.png");
+  }
 }

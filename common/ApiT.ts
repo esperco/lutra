@@ -40,6 +40,12 @@ module Esper.ApiT {
     calendar_default_view?: boolean;
     calendar_default_write?: boolean;
     calendar_default_dupe?: boolean;
+    calendar_default_agenda?: boolean;
+    is_primary?: boolean;
+  }
+
+  export interface Calendars {
+    calendars: Calendar[];
   }
 
   export interface Phone {

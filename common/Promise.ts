@@ -49,6 +49,40 @@ module Esper.Promise {
     return next(0);
   };
 
+  /*
+    Variant of join that fails if any its deferreds also fail -- unlike
+    $.when, does not return until all promises complete.
+  */
+  export function join2<T>(a: JQueryPromise<T>[]):
+    JQueryPromise<Array<T|Error>>
+  {
+    var len = a.length;
+    var b : Array<T|Error> = []; // Buffer
+    var hasError = false;
+    function next(i) {
+      if (i < len) {
+        return a[i]
+          .then(
+          /* upon success */
+          function(x) {
+            b[i] = x;
+            return next(i + 1);
+          },
+          /* upon failure we keep going anyway */
+          function(err) {
+            hasError = true;
+            b[i] = err;
+            return next(i + 1);
+          });
+      }
+      else if (hasError)
+        return fail(b);
+      else
+        return defer(b);
+    }
+    return next(0);
+  };
+
   export function ignore<T>(x : JQueryPromise<T>) : JQueryPromise<void> {
     return x.then(function() { return; });
   }
