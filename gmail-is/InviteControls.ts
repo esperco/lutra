@@ -903,15 +903,14 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       // do nothing if the guest is already correctly included or not
     });
 
-    var tzSel = Timezone.createTimezoneSelector(tz);
+    var tzSel = Timezone.appendTimezoneSelector(labelPerson, tz);
 
     // Make it fit properly
     tzSel.removeClass("esper-select");
     tzSel.css("float", "right");
-    tzSel.css("width", "40%");
 
-    tzSel.change(function() {
-      var tz = tzSel.val();
+    tzSel.bind("typeahead:change", function() {
+      var tz = Timezone.selectedTimezone(tzSel);
       var pref : ApiT.GuestPreferences = {
         taskid: taskPrefs.taskid,
         email: email,
@@ -927,8 +926,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       taskPrefs.guest_preferences = guestPrefs;
       Api.putTaskPrefs(taskPrefs);
     });
-
-    labelPerson.append(tzSel);
 
     return viewPerson;
   }

@@ -11,7 +11,8 @@ var EventEmitter  = require("eventemitter3"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
-    quill         = require("quill");
+    quill         = require("quill"),
+    typeahead     = require("typeahead.js");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -48,7 +49,8 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     React:        react,
-    quill:        quill
+    quill:        quill,
+    bloodhound:   typeahead.Bloodhound
   };
   for (var name in assignments) {
     if (assignments.hasOwnProperty(name)) {

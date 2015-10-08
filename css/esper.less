@@ -294,6 +294,7 @@ a.esper-a:hover {
 }
 
 select.esper-select {
+  vertical-align: middle !important;
   float: left;
   height: 32px;
   padding: 6px 20px 6px 9px;
@@ -316,8 +317,9 @@ select.esper-select {
 }
 
 .esper-agenda-timezone-select {
-  width: 33%;
-  padding: 8px 0 9px 8px;
+  vertical-align: middle !important;
+  width: 280px;
+  padding: 8px;
   background-size: calc(~"200% - 20px") 100%, cover;
   background-repeat: no-repeat;
   background-color: white;
@@ -334,6 +336,12 @@ select.esper-select {
   }
   &:focus { border: 1px solid @purple; }
   &.esper-select-fullwidth { width: 100%; }
+}
+
+.tt-menu {
+  background-color: white;
+  width: 280px;
+  border: 1px solid;
 }
 
 object.esper-svg { pointer-events: none; }

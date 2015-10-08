@@ -133,6 +133,7 @@ module Esper.Init {
       ObserveMessage.init();
       ExtensionOptions.init();
       ThreadState.init();
+      Timezone.init();
     }
   }
 }

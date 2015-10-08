@@ -294,15 +294,13 @@ module Esper.CalPicker {
       });
     }
 
-    var execTz = Timezone.createTimezoneSelector(showTimezone);
-    var guestTz = Timezone.createTimezoneSelector(guestTimezone);
+    var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
+    var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
     Sidebar.customizeSelectArrow(execTz);
     Sidebar.customizeSelectArrow(guestTz);
-    execTz.appendTo(execTzDiv);
-    guestTz.appendTo(guestTzDiv);
 
-    execTz.change(function() {
-      var tz = execTz.val();
+    execTz.bind("typeahead:change", function() {
+      var tz = Timezone.selectedTimezone(execTz);
       showTimezone = tz;
       showZoneAbbr = zoneAbbr(tz);
       updateZoneAbbrDisplay();
@@ -311,8 +309,8 @@ module Esper.CalPicker {
       Api.putTaskPrefs(tpref);
     });
 
-    guestTz.change(function() {
-      var tz = guestTz.val();
+    guestTz.bind("typeahead:change", function() {
+      var tz = Timezone.selectedTimezone(guestTz);
       guestTimezone = tz;
       guestZoneAbbr = zoneAbbr(tz);
       calendarView.fullCalendar("refetchEvents");
