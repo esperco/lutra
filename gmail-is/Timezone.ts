@@ -350,8 +350,8 @@ module Esper.Timezone {
 
     timezones = new Esper.bloodhound({
       local: function(){return values;},
-      queryTokenizer: Esper.bloodhound.tokenizers.whitespace,
-      datumTokenizer: Esper.bloodhound.tokenizers.whitespace
+      queryTokenizer: Esper.bloodhound.tokenizers.nonword,
+      datumTokenizer: Esper.bloodhound.tokenizers.nonword
     });
   }
 
