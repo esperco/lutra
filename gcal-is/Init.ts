@@ -1,3 +1,7 @@
+/// <reference path="../common/Login.ts" />
+/// <reference path="../common/Teams.ts" />
+/// <reference path="./CurrentEvent.ts" />
+
 module Esper.Init {
   export var esperRootUrl : string;
     /* URL prefix to access files provided by the extension.
@@ -146,7 +150,6 @@ module Esper.Init {
         }
       }
     });
-
   }
 
   var alreadyInitialized = false;
@@ -158,6 +161,20 @@ module Esper.Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
+
+      // Init team preferences once login info set
+      Login.watchableInfo.watch(function(data, valid, oldData, oldValid) {
+        if (valid && !(oldValid &&
+          data.uid !== oldData.uid &&
+          _.isEqual(data.teams, oldData.teams))) {
+          // When loading teams, we force a reload because boolean above should
+          // ensure we know team data has chagned
+          Teams.initialize(true);
+        }
+      });
+
+      // Initialize watcher of current eventId
+      CurrentEvent.init();
     }
   }
 }

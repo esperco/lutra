@@ -31,6 +31,7 @@
 
 /// <reference path="./Update.ts" />
 /// <reference path="./Auth.ts" />
+/// <reference path="./Location.ts" />
 /// <reference path="./ThreadState.Storage.ts" />
 
 
@@ -77,6 +78,9 @@ module Esper.Main {
 
     // Miscellaneous messaging setup
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);
+
+    // Listen to location changes
+    Location.init();
   }
 }
 

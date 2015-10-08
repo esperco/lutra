@@ -3,6 +3,8 @@
   environment.
 */
 
+/// <reference path="../common/Util.ts" />
+
 module Esper.Gcal {
 
   function validateEmail(s) {
@@ -175,6 +177,33 @@ module Esper.Gcal {
             eventId: eventId
           };
         }
+      }
+    }
+
+    // Is the current URL an event page?
+    export function isEventPage(): boolean {
+      var hash = decodeURI(window.location.hash);
+      return _.startsWith(hash, "#eventpage");
+    }
+
+    // Get the event id from the current hash (only used when navigating
+    // between rendered views within Google Calendar)
+    export function extractFullEventIdFromHash(): Types.FullEventId {
+      var hash = decodeURI(window.location.hash);
+      var re = /\|eid-([a-zA-Z0-9\+\/=]+)/;
+      var match = hash.match(re);
+      var encodedId = match && match[1];
+      if (encodedId) {
+        return decodeFullEventId(encodedId);
+      }
+    }
+
+    // Get the event id from the ?eid param (used to determine the initial
+    // event loaded)
+    export function extractFullEventIdFromParam(): Types.FullEventId {
+      var encodedId = Util.getQueryParam("eid");
+      if (encodedId) {
+        return decodeFullEventId(encodedId);
       }
     }
 

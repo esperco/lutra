@@ -18,7 +18,10 @@ module Esper.Message {
     FocusOnSender,
 
     // Post an analytics tracking call
-    Track
+    Track,
+
+    // Post call from CS to IS that location hash has changed
+    LocationUpdate
   }
 
   export interface Message {
