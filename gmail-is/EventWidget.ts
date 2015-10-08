@@ -122,7 +122,8 @@ module Esper.EventWidget {
   </div>
 </div>
 '''
-    if (conflictingEvents.length > 0) {
+    var prefs = Teams.getTeamPreferences(team).general;
+    if (conflictingEvents.length > 0 && prefs.double_booking_warning) {
       noConflicts.hide();
       confirmingEvent.append(TaskList.renderEvent(team, event));
 
