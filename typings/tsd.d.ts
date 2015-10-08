@@ -19,3 +19,4 @@
 /// <reference path="bootstrap/bootstrap.d.ts" />
 /// <reference path="quill/quill.d.ts" />
 /// <reference path="analytics-node/analytics-node.d.ts" />
+/// <reference path="typeahead/typeahead.d.ts" />
