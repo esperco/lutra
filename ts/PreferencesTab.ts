@@ -133,6 +133,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-reminder").is(":checked"),
       double_booking_warning:
         div.find(".esper-prefs-double-booking").is(":checked"),
+      no_location_warning:
+        div.find(".esper-prefs-no-location").is(":checked"),
       use_duplicate_events:
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
@@ -1602,6 +1604,13 @@ module Esper.PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
+          <input #noLocationWarning type="checkbox"
+                 class="esper-prefs-no-location"/>
+          Warn me if I try to create events with no location set
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
           <input #useDuplicate type="checkbox"
                  class="esper-prefs-duplicate"/>
           Use duplicate calendar events to invite guests
@@ -1634,6 +1643,8 @@ module Esper.PreferencesTab {
         sendReminder.prop("checked", true);
       if (general.double_booking_warning)
         doubleBookingWarning.prop("checked", true);
+      if (general.no_location_warning)
+        noLocationWarning.prop("checked", true);
       if (general.use_duplicate_events)
         useDuplicate.prop("checked", true);
       if (!general.bcc_exec_on_reply)
@@ -1645,6 +1656,7 @@ module Esper.PreferencesTab {
     sendConfirmation.click(saveGeneralPrefs);
     sendReminder.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
+    noLocationWarning.click(saveGeneralPrefs);
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
 
