@@ -823,6 +823,27 @@ textarea.esper-input { resize: none; }
   }
 }
 
+/*** Esper Calendar Sidebar ***/
+
+.esper-cal-sidebar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 110px;
+  width: 300px;
+
+  // Set so this sits on top of every in Google Calendar except the very top
+  // One Google bar
+  z-index: 500;
+
+  // Override this in child elements to make them clickable
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
 /*** Esper Dock ***/
 
 .esper-dock-container {
@@ -859,6 +880,11 @@ textarea.esper-input { resize: none; }
   bottom: 36px;
   width: @sidebar_width + 14px;
   height: 7px;
+
+  transition: opacity 0.3s ease-in-out;
+  &.esper-hide {
+    opacity: 0.0;
+  }
 }
 
 .esper-dock-wrap-left {
@@ -955,6 +981,14 @@ textarea.esper-input { resize: none; }
   margin: 0 20px 0 0;
 }
 
+.esper-dock .dropdown-menu {
+  width: @sidebar_width;
+
+  .esper-dropdown-footer {
+    padding: 3px 15px
+  }
+}
+
 .esper-team-checkmark {
   float: right;
   width: 12px;
@@ -1010,6 +1044,22 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   top: 8px;
   right: 21px;
   bottom: 0;
+
+  // Used for simple sidebar without tabs or anything else
+  &.esper-sidebar-simple {
+    padding: 10px 10px 36px 10px;
+    background: white;
+    border: 1px solid @google_border_gray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: block;
+    transition: top 0.3s;
+
+    // TODO: Refactor transition stuff into all sidebar code?
+    &.esper-hide {
+      top: 100%;
+    }
+  }
 }
 
 .esper-tab {

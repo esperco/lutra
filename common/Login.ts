@@ -15,10 +15,60 @@ module Esper.Login {
     validateAccount, undefined
   );
 
+  /*
+    Function that ensures callback is only triggered after we account info.
+    If you need login info as well, chain to getLoginInfo's promise.
+
+    Callback will be called each time a new user logs in but only if
+    account info is valid.
+  */
+  export function onLogin(callback: (account: Types.Account) => void) {
+    watchableAccount.watch(function(account, valid, oldAccount, oldValid) {
+      if (valid) {
+        if (!oldValid ||
+          oldAccount.credentials.uid !== account.credentials.uid) {
+          callback(account);
+        }
+      }
+    });
+  }
+
+  /*
+    Reference to Deferred that resolves when account has been set to some valid
+    This Deferred is reset whenever we log out or the account is set to
+    something invalid. This allows us to defer taking certain actions until
+    we have some guarantee that we're logged in.
+  */
+  var _accountDeferred: JQueryDeferred<Types.Account>;
+  watchableAccount.watch(function(account, valid, oldAccount, oldValid) {
+    if (!_accountDeferred ||
+        (!valid && _accountDeferred.state() !== "pending")) {
+      _accountDeferred = $.Deferred<Types.Account>();
+    }
+    if (valid) {
+      _accountDeferred.resolve(account);
+    }
+  });
+
+  // Get a promise from the _accountDeferred
+  export function nextLogin(): JQueryPromise<Types.Account> {
+    if (! _accountDeferred) {
+      _accountDeferred = $.Deferred<Types.Account>();
+    }
+    return _accountDeferred.promise();
+  }
+
+  /*
+    Same idea as above, but for loginInfo -- promise resolving guarantees
+    login info is set in addition to login account data
+  */
   var _loginInfo: JQueryPromise<ApiT.LoginResponse>;
   export function getLoginInfo(): JQueryPromise<ApiT.LoginResponse> {
     if (!_loginInfo) {
-      _loginInfo = Api.getLoginInfo()
+      _loginInfo = nextLogin()
+        .then(function() {
+          return Api.getLoginInfo();
+        })
         .then(function(loginInfo) {
           watchableInfo.set(loginInfo);
           return loginInfo;
