@@ -533,6 +533,16 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
+  export function setTaskLabels(teamid: string,
+                                taskid: string,
+                                labels: string[]): JQueryPromise<void> {
+    var url =
+      Conf.Api.url + "/api/task/labels/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(taskid);
+    return JsonHttp.post(url, JSON.stringify({labels:labels}));
+  }
+
   export function searchTasks(teamid, query):
   JQueryPromise<ApiT.TaskSearchResults> {
     var url =
