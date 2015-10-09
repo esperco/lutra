@@ -201,7 +201,8 @@ module Esper.FinalizeEvent {
   }
 
   /** Executes the whole finalize flow on the given event. */
-  export function finalizeEvent(event: ApiT.CalendarEvent) {
+  export function finalizeEvent(event: ApiT.CalendarEvent,
+                                deleteOtherHolds: boolean) {
     CurrentThread.currentTeam.get().match({
       some : function (team) {
         CurrentThread.withPreferences(function (preferences) {
@@ -214,10 +215,12 @@ module Esper.FinalizeEvent {
               if (eventOpt.event_opt !== undefined) {
                 event = eventOpt.event_opt;
               }
-
-              deleteHolds(event, preferences, function () {
-                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-              });
+              if (deleteOtherHolds)
+                deleteHolds(event, preferences, function () {
+                  TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+                });
+              else
+                setHold(event, preferences, false);
 
               confirmEvent(event, preferences);
               inviteGuests(event, preferences);

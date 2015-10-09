@@ -322,6 +322,7 @@ module Esper.ApiT {
     double_booking_warning: boolean;
     no_location_warning: boolean;
     use_duplicate_events: boolean;
+    delete_holds_inquiry: boolean;
     bcc_exec_on_reply: boolean;
     exec_daily_agenda: boolean;
     current_timezone: string;
