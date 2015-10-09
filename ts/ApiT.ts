@@ -322,6 +322,7 @@ type token_response = [
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
     double_booking_warning: boolean;
+    no_location_warning: boolean;
     use_duplicate_events: boolean;
     bcc_exec_on_reply: boolean;
     current_timezone: string;
