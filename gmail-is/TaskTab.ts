@@ -1,3 +1,5 @@
+/// <reference path="./TaskLabels.Gmail.tsx" />
+
 module Esper.TaskTab {
 
   var taskLabelCreate = "Create or Link to Other Task";
@@ -790,6 +792,21 @@ module Esper.TaskTab {
         <div #linkedEventsList/>
       </div>
     </div>
+    <div class="esper-section">
+      <div #taskLabelsSection
+           class="esper-section-header esper-clearfix esper-open">
+        <span #showTaskLabelsren
+              class="esper-link" style="float:right">Show</span>
+        <span class="esper-bold" style="float:left">Labels</span>
+        <div #refreshTaskLabels
+             class="esper-refresh esper-clickable">
+          <object #refreshTaskLabelsIcon class="esper-svg"/>
+        </div>
+      </div>
+      <div #taskLabelsContainer
+        class="esper-section-container esper-label-list">
+      </div>
+    </div>
 
     <hr class="esper-hr"/>
     <div class="esper-clearfix esper-workflow-gap esper-section">
@@ -1024,6 +1041,13 @@ module Esper.TaskTab {
       $("body").append(searchModal.view);
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
+    });
+
+    /* Task Label Stuff */
+
+    window.requestAnimationFrame(function() {
+      taskLabelsContainer.renderReact(
+        React.createElement(TaskLabels.LabelListControl, {}));
     });
 
     var taskWatcherId = "TaskTab-task-watcher";
