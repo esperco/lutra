@@ -108,7 +108,6 @@ module Esper.CalSidebar {
       var task = CurrentEvent.taskStore.val();
       var team = CurrentEvent.teamStore.val();
       var sidebarState = getSidebarState(eventId);
-      sidebarStateStore
       return {
         eventId: eventId,
         task: task,
@@ -184,7 +183,6 @@ module Esper.CalSidebar {
 
   class DockMenu extends Component<DockMenuProps, {}> {
     render() {
-
       // Create list elements for each team
       var selectedTeamId = this.props.selectedTeamId;
       var teamElms = _.map(Login.myTeams(), function(team) {
