@@ -161,6 +161,8 @@ module Esper.ComposeControls {
 <div #editorText/>
 '''
 
+    $(".nH.aHU").css('z-index', 9999); //solve problem of dropdown overlap
+
     templateIcon.attr("data", Init.esperRootUrl + "img/composition-insert.svg");
 
     var templates: ApiT.Template[];
