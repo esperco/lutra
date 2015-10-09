@@ -880,10 +880,11 @@ textarea.esper-input { resize: none; }
   bottom: 36px;
   width: @sidebar_width + 14px;
   height: 7px;
+  opacity: 1;
 
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s;
   &.esper-hide {
-    opacity: 0.0;
+    opacity: 0;
   }
 }
 
@@ -1053,6 +1054,8 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
     transition: top 0.3s;
 
     // TODO: Refactor transition stuff into all sidebar code?
