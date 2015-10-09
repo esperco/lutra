@@ -31,10 +31,15 @@ module Esper.TaskLabels {
 
       return (<div className="esper-bs">
         <div>
-          {labelElms}
+          { labelElms && labelElms.length ? labelElms :
+            <div className="esper-no-labels">No Labels Found</div> }
         </div>
         <div className="esper-subsection-footer">
-          <a href={Conf.Api.url}>Go to Settings to Add Labels</a>
+          {
+            this.props.busy ?
+            <span>Saving &hellip;</span> :
+            <a href={Conf.Api.url}>Go to Settings to Add Labels</a>
+          }
         </div>
       </div>);
     }

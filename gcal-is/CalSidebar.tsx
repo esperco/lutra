@@ -146,7 +146,7 @@ module Esper.CalSidebar {
   }
 
 
-  class LabelListControl extends Component<SidebarAttrs, {}> {
+  class LabelListControl extends Component<SidebarAttrs, {busy: boolean}> {
     /*
       In order to avoid race conditions, we wait until the last update is
       done until we send the next one. Since we're sending over the entire
@@ -159,6 +159,7 @@ module Esper.CalSidebar {
       return <TaskLabels.LabelList
         team={this.props.team}
         task={this.props.task}
+        busy={this.state.busy}
         handleChange={this.handleLabelChange.bind(this) } />
     }
 
@@ -173,14 +174,16 @@ module Esper.CalSidebar {
     }
 
     // Makes actual calls to server
-    // TODO: Need to assess if we're leaving any stray references that need
-    // garbage collecting by keeping the logic within a React component
+    // TODO: Move this out of component so we don't get warning about setting
+    // the state of an unmounted component
     saveToServer() {
+      this.setState({ busy: true });
       if (this.nextUpdate) {
+        var teamId = this.props.team.teamid;
+        var labels = this.nextUpdate;
         this.callInProgress = this.getTask()
           .then(function(task) {
-            // TODO: Update task with taskId
-            return Promise.defer(null);
+            return Api.setTaskLabels(teamId, task.taskid, labels);
           });
 
         // Delete nextUpdate so callback doesn't re-trigger
@@ -188,6 +191,8 @@ module Esper.CalSidebar {
 
         // Once call is done, re-check
         this.callInProgress.done(this.saveToServer.bind(this));
+      } else {
+        this.setState({ busy: false });
       }
     }
 
@@ -203,6 +208,13 @@ module Esper.CalSidebar {
           { task_title: Esper.Gcal.Event.extractEventTitle() },
           false, false);
       }
+    }
+
+    getState(init=false) {
+      if (init) {
+        return { busy: false };
+      }
+      return this.state;
     }
   }
 
