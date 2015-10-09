@@ -155,7 +155,9 @@ module Esper.ComposeControls {
   <object #templateIcon class="esper-svg esper-composition-button-icon"/>
   <div #templateBadge class="esper-composition-badge">...</div>
   <ul #templateDropdown class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
-    <div #viewTemplates class="esper-dropdown-section"/>
+    <div #viewTemplates class="esper-dropdown-section">
+      <li #customizeTemplates class="esper-li">Customize&hellip;</li>
+    </div>
   </ul>
 </div>
 <div #editorText/>
@@ -166,14 +168,13 @@ module Esper.ComposeControls {
     var templates: ApiT.Template[];
 
     function getTemplates() {
-      $("<li class='esper-li'>Customize...</li>")
-        .appendTo(viewTemplates)
-        .click(function(e) {
-          e.stopPropagation();
-          window.open("https://app.esper.com");
-        });
       CurrentThread.currentTeam.get().match({
         some: function(team) {
+          var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
+          customizeTemplates.click(function(e) {
+            e.stopPropagation();
+            window.open(noPrefsURL);
+          });
           Api.listTemplates(team.teamid).done(function(response) {
             templates = response.items;
             List.iter(templates, function(tmp) {
@@ -196,7 +197,7 @@ module Esper.ComposeControls {
       templateDropdown.toggle();
       if(!(templateDropdown.hasClass("esper-open"))) {
         templateDropdown.addClass("esper-open");
-        viewTemplates.find(".esper-li").remove();
+        viewTemplates.find(".esper-li").not(customizeTemplates).remove();
         getTemplates();
       } else {
         templateDropdown.removeClass("esper-open");
