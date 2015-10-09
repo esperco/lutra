@@ -135,6 +135,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-double-booking").is(":checked"),
       no_location_warning:
         div.find(".esper-prefs-no-location").is(":checked"),
+      delete_holds_inquiry:
+        div.find(".esper-prefs-delete-holds").is(":checked"),
       use_duplicate_events:
         div.find(".esper-prefs-duplicate").is(":checked"),
       bcc_exec_on_reply:
@@ -1611,6 +1613,13 @@ module Esper.PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
+          <input #deleteHoldsInquiry type="checkbox"
+                 class="esper-prefs-delete-holds"/>
+          Ask me before deleting event holds
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
           <input #useDuplicate type="checkbox"
                  class="esper-prefs-duplicate"/>
           Use duplicate calendar events to invite guests
@@ -1645,6 +1654,8 @@ module Esper.PreferencesTab {
         doubleBookingWarning.prop("checked", true);
       if (general.no_location_warning)
         noLocationWarning.prop("checked", true);
+      if (general.delete_holds_inquiry)
+        deleteHoldsInquiry.prop("checked", true);
       if (general.use_duplicate_events)
         useDuplicate.prop("checked", true);
       if (!general.bcc_exec_on_reply)
@@ -1657,6 +1668,7 @@ module Esper.PreferencesTab {
     sendReminder.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
     noLocationWarning.click(saveGeneralPrefs);
+    deleteHoldsInquiry.click(saveGeneralPrefs);
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
 
