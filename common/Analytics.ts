@@ -8,7 +8,7 @@ module Esper.Analytics {
     // (Verb)(Module)(Icon/HTMLElement)
     // Anything that deviates from the above form should
     // always be immediately obvious as to where the event
-    // is fired from, e.g. SaveTaskNotes - there is only one
+    // is fired from, e.g. ClickSaveTaskNotes - there is only one
     // place where you can save your task notes
     ArchiveTaskTabTask = 1,
     CancelTaskTabTask,
@@ -31,6 +31,7 @@ module Esper.Analytics {
     ClickModalSendAgenda,
     ClickModalSendTaskList,
     ClickReminderButton,
+    ClickSaveTaskNotes,
     ClickSlidesBackButton,
     ClickSlidesNextButton,
     ClickSidebarOptionsSettings,
@@ -58,7 +59,6 @@ module Esper.Analytics {
     MinimizeSidebar,
     MinimizeSidebarOptions,
     RenameTaskTabTask,
-    SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,
     SelectCalendarPickerGuestTimezone,
     SelectCalendarPickerMeetingType,
