@@ -100,6 +100,7 @@ module Esper.Modal {
   export function okCancelDialog(title : string, body : JQuery,
                                  onCommit? : () => boolean,
                                  okText?: string,
+                                 onCancel? : () => void,
                                  cancelText?: string) : Modal {
 '''
 <button #okButton class="esper-btn esper-btn-primary modal-primary">
@@ -129,6 +130,7 @@ module Esper.Modal {
       }
     }
     function closeView() {
+      if (onCancel !== undefined) onCancel();
       modal.view.remove();
     }
     okButton.click(commitView);
