@@ -324,7 +324,7 @@ module Esper.InThreadControls {
                 saveTaskNotes.prop("disabled", true);
               });
             });
-           Analytics.track(Analytics.Trackable.ClickSaveTaskNotes);
+           Analytics.track(Analytics.Trackable.SaveTaskNotes);
         },
         none : function () {
           return;
