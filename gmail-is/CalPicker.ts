@@ -839,11 +839,7 @@ module Esper.CalPicker {
                          threadId: string,
                          callback: (err?: Error) => void) {
     var prefs = Teams.getTeamPreferences(team).general;
-    if (picker.eventLocation.val() == "") {
-      var locationModal = displayCheckLocationModal();
-      $("body").append(locationModal.view);
-      callback(new HaltEventSave("Location needed"));
-    } else {
+    var onCommit = function() : boolean {
       var events = [];
       for (var k in picker.events) {
         var edit = makeFakeEvent(picker.events[k], picker.eventTitle,
@@ -879,16 +875,27 @@ module Esper.CalPicker {
       }).fail(function(err) {
         callback(new Error(err));
       });
+      return true;
+    };
+    if (picker.eventLocation.val() == "" && prefs.no_location_warning) {
+      var locationModal = displayCheckLocationModal();
+      $("body").append(locationModal.view);
+    } else {
+      onCommit();
     }
 
     function displayCheckLocationModal() {
 '''
 <div #content>
   <p> The events being created do not have a location set. </p>
-  <p> Events should always have a location. </p>
+  <p> Do you still want to proceed? </p>
 </div>
 '''
-      return Modal.alert("Location Missing", content);
+      return Modal.okCancelDialog("Location Missing", content,
+        onCommit,
+        "Yes",
+        function() { callback(new HaltEventSave("Location needed")); },
+        "No");
     }
   }
 
