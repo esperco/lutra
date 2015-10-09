@@ -6,7 +6,9 @@
 /// <reference path="../marten/ts/Model.Capped.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
+/// <reference path="../common/TaskLabels.tsx" />
 /// <reference path="./CurrentEvent.ts" />
 
 module Esper.CalSidebar {
@@ -64,27 +66,37 @@ module Esper.CalSidebar {
 
   //////
 
-  interface SidebarAndDockState {
+  interface SidebarAttrs {
     eventId: Types.FullEventId;
     sidebarState: SidebarState;
     task: ApiT.Task;
     team: ApiT.Team;
   }
 
-  class SidebarAndDock extends Component<{}, SidebarAndDockState> {
+  class SidebarAndDock extends Component<{}, SidebarAttrs> {
     render() {
-      if (Login.loggedIn() && this.state.eventId) {
+      if (Login.loggedIn() && this.state.eventId &&
+          Teams.initialize().state() === "resolved") {
         return (<div>
-          <Sidebar
-            task={this.state.task}
-            team={this.state.team}
-            state={this.state.sidebarState} />
+          {
+            this.state.team ?
+            <Sidebar
+              eventId={this.state.eventId}
+              task={this.state.task}
+              team={this.state.team}
+              sidebarState={this.state.sidebarState} /> :
+            ""
+          }
           <Dock
             eventId={this.state.eventId}
+            task={this.state.task}
             team={this.state.team}
-            state={this.state.sidebarState} />
+            sidebarState={this.state.sidebarState} />
         </div>);
       }
+
+      // TODO: Show "busy" indicator if we're still loading profile info
+      // or teams
 
       // No event (don't render)
       // TODO: Render something for new events
@@ -118,35 +130,89 @@ module Esper.CalSidebar {
   }
 
 
-  interface SidebarProps {
-    task: ApiT.Task;
-    team: ApiT.Team;
-    state: SidebarState;
-  }
-
-  class Sidebar extends Component<SidebarProps, {}> {
+  class Sidebar extends Component<SidebarAttrs, {}> {
     render() {
-      var showSidebar = this.props.state === SidebarState.SHOW;
+      var showSidebar = this.props.sidebarState === SidebarState.SHOW;
       return (<div className={"esper-sidebar esper-sidebar-simple " +
                               (showSidebar ? "" : "esper-hide")}>
-        Hello.
+        <div className="esper-subheading">Labels</div>
+        <LabelListControl
+          team={this.props.team}
+          task={this.props.task}
+          eventId={this.props.eventId}
+          sidebarState={this.props.sidebarState} />
       </div>);
     }
   }
 
 
-  interface DockProps {
-    team: ApiT.Team;
-    eventId: Types.FullEventId;
-    state: SidebarState;
+  class LabelListControl extends Component<SidebarAttrs, {}> {
+    /*
+      In order to avoid race conditions, we wait until the last update is
+      done until we send the next one. Since we're sending over the entire
+      set of labels we only need to store the next immediate update to send.
+    */
+    nextUpdate: string[];
+    callInProgress: JQueryPromise<any>;
+
+    render() {
+      return <TaskLabels.LabelList
+        team={this.props.team}
+        task={this.props.task}
+        handleChange={this.handleLabelChange.bind(this) } />
+    }
+
+    handleLabelChange(labels: string[]) {
+      // If there is an in-progress update, just piggy back off of that
+      this.nextUpdate = labels;
+
+      // Start a request if none in progress
+      if (!this.callInProgress || this.callInProgress.state() !== "pending") {
+        this.saveToServer();
+      }
+    }
+
+    // Makes actual calls to server
+    // TODO: Need to assess if we're leaving any stray references that need
+    // garbage collecting by keeping the logic within a React component
+    saveToServer() {
+      if (this.nextUpdate) {
+        this.callInProgress = this.getTask()
+          .then(function(task) {
+            // TODO: Update task with taskId
+            return Promise.defer(null);
+          });
+
+        // Delete nextUpdate so callback doesn't re-trigger
+        delete this.nextUpdate;
+
+        // Once call is done, re-check
+        this.callInProgress.done(this.saveToServer.bind(this));
+      }
+    }
+
+    // Returns promise to resolves to task
+    getTask(): JQueryPromise<ApiT.Task> {
+      if (this.props.task) {
+        return Promise.defer(this.props.task);
+      } else {
+        return Api.obtainTaskForEvent(
+          this.props.team.teamid,
+          this.props.eventId.calendarId,
+          this.props.eventId.eventId,
+          { task_title: Esper.Gcal.Event.extractEventTitle() },
+          false, false);
+      }
+    }
   }
 
-  class Dock extends Component<DockProps, {}> {
+
+  class Dock extends Component<SidebarAttrs, {}> {
     render() {
       var teamName = (this.props.team ?
         <span>{this.props.team.team_name}</span> :
         <span className="esper-unknown-team">Unknown Team</span>);
-      var showWrap = this.props.state === SidebarState.SHOW;
+      var showWrap = this.props.sidebarState === SidebarState.SHOW;
 
       return (<div className="esper-dock-container">
         <div className={"esper-dock-wrap " + (showWrap ? "" : "esper-hide")}>
@@ -169,7 +235,7 @@ module Esper.CalSidebar {
 
     toggleSidebar() {
       if (this.props.eventId) {
-        var nextState = (this.props.state === SidebarState.HIDE ?
+        var nextState = (this.props.sidebarState === SidebarState.HIDE ?
           SidebarState.SHOW : SidebarState.HIDE);
         setSidebarState(this.props.eventId, nextState);
       }
@@ -195,6 +261,7 @@ module Esper.CalSidebar {
 
         return (<li className={"esper-li " +
                                (selected ? "esper-selected" : "")}
+                    key={team.teamid}
                     onClick={selected ? null : selectTeam}>
           {selected ?
             <object className="esper-svg esper-team-checkmark"

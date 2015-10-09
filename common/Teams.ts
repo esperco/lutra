@@ -19,7 +19,7 @@ module Esper.Teams {
       The resulting promise is cached, and returned unless the `force=true`
       parameter is passed.
   */
-  export function initialize(force = false): JQueryPromise<void> {
+  export function initialize(force=false): JQueryPromise<void> {
     if (initJob && !force) {
       return initJob;
     } else {
@@ -41,6 +41,7 @@ module Esper.Teams {
         Promise.ignore(profilesJob),
         Promise.ignore(prefsJob)
       ]);
+      initJob = <JQueryPromise<any>> ourInitJob;
       return ourInitJob.then(function() {
         Log.d("Finished initializing teams.");
         alreadyInitialized = true;

@@ -70,6 +70,10 @@
     border: 0;
   }
 
+  hr {
+    display: block;
+  }
+
   // Busy indicator
   .modal-footer .esper-spinner {
     float: left;
@@ -1062,6 +1066,17 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
     &.esper-hide {
       top: 100%;
     }
+
+    .esper-subheading {
+      font-weight: bold;
+      padding: 10px 0;
+      border-bottom: 1px solid @google_border_gray;
+      margin: 0 0 10px;
+
+      &:first-child {
+        padding-top: 0;
+      }
+    }
   }
 }
 
@@ -1250,6 +1265,11 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border: 1px solid @google_border_gray;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+}
+
+.esper-subsection-footer {
+  border-top: 1px solid @google_border_gray;
+  padding: 10px 0;
 }
 
 .esper-save-notes {
