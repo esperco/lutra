@@ -387,7 +387,6 @@ module Esper.ApiT {
   }
 
   export interface NewTask {
-    task_teamid: string;
     task_title: string;
 
     // optional
