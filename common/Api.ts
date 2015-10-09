@@ -378,6 +378,22 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 
+  export function obtainTaskForEvent(teamid: string,
+                                     calid: string, eventid: string,
+                                     newTask: ApiT.NewTask,
+                                     withEvents: boolean,
+                                     withThreads: boolean):
+  JQueryPromise<ApiT.Task> {
+    var url =
+      Conf.Api.url + "/api/event/task/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(calid)
+      + "/" + string(eventid)
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
+    return JsonHttp.post(url, JSON.stringify(newTask));
+  }
+
   export function obtainTaskForThread(teamid, threadid,
                                       withEvents: boolean,
                                       withThreads: boolean):

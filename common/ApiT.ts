@@ -386,6 +386,21 @@ module Esper.ApiT {
     task_meeting_type?: string;
   }
 
+  export interface NewTask {
+    task_teamid: string;
+    task_title: string;
+
+    // optional
+    task_notes?: string;
+    task_notes_quill?: string;
+    task_archived?: boolean;
+    task_labels?: string[];
+    task_progress?: string;
+    task_urgent?: boolean;
+    task_workflow_progress?: TaskWorkflowProgress;
+    task_meeting_type?: string;
+  }
+
   export interface TaskThread {
     task_threadid: string; // hex
   }
