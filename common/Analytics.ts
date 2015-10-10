@@ -20,6 +20,8 @@ module Esper.Analytics {
     ClickComposeBarCreateIcon,
     ClickComposeBarInsertIcon,
     ClickComposeBarTemplateIcon,
+    ClickFinalizeEventYesDeleteHolds,
+    ClickFinalizeEventNoKeepHolds,
     ClickInviteButton,
     ClickInviteCancelButton,
     ClickMenuEditSettings,

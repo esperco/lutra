@@ -47,6 +47,7 @@ module Esper.EventWidget {
                         event: ApiT.CalendarEvent,
                         linkedEvents: ApiT.CalendarEvent[],
                         team: ApiT.Team) {
+    var prefs = Teams.getTeamPreferences(team).general;
     var start = Math.floor(moment(event.start.utc).unix());
     var end = Math.floor(
       moment(event.end ? event.end.utc : event.start.utc).unix()
@@ -62,13 +63,16 @@ module Esper.EventWidget {
                   ev.recurring_event_id !== event.google_event_id);
         });
 
-        if (FinalizeEvent.justHolds(linkedEvents).length > 0) {
+        if (FinalizeEvent.justHolds(linkedEvents).length > 0 &&
+            prefs.double_booking_warning &&
+            prefs.delete_holds_inquiry) {
           var confirmModal =
             displayConfirmEventModal(view, event, events, team);
           $("body").append(confirmModal.view);
         } else {
           view.parent().find(".esper-ev").addClass("esper-disabled");
-          FinalizeEvent.finalizeEvent(event);
+          // Setting false here reduces API calls
+          FinalizeEvent.finalizeEvent(event, false);
         }
       });
   }
@@ -98,9 +102,10 @@ module Esper.EventWidget {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-confirm-event-modal">
+    <span #closeButton class="esper-modal-close esper-clickable">×</span>
     <div class="esper-modal-header">Finalize Event</div>
     <div #noConflicts class="esper-modal-content">
-      <p>Other HOLD linked events will be deleted. Are you sure?</p>
+      <p>Would you like to delete all other linked HOLD events?</p>
     </div>
     <div #eventConflicts class="esper-modal-content">
       <p>You are trying to finalize the following event:</p>
@@ -108,15 +113,17 @@ module Esper.EventWidget {
       <p>However there are other events on the calendar during this time frame:
       </p>
       <div #conflictingEventsList class="esper-events-list"/>
-      <p>Other HOLD linked events will also be deleted. Are you sure you wish to
-      proceed?</p>
+      <p>Would you also like to delete all other linked HOLD events?</p>
     </div>
     <div class="esper-modal-footer esper-clearfix">
       <button #yesButton class="esper-btn esper-btn-primary modal-primary">
-        Yes
+        Yes, delete
       </button>
       <button #noButton class="esper-btn esper-btn-secondary modal-cancel">
-        No
+        No, keep
+      </button>
+      <button #cancelButton class="esper-btn esper-btn-secondary modal-cancel">
+        Cancel
       </button>
     </div>
   </div>
@@ -136,15 +143,24 @@ module Esper.EventWidget {
 
     function yesOption() {
       eventView.parent().find(".esper-ev").addClass("esper-disabled");
-      FinalizeEvent.finalizeEvent(event);
+      FinalizeEvent.finalizeEvent(event, true);
       view.remove();
+      Analytics.track(Analytics.Trackable.ClickFinalizeEventYesDeleteHolds);
     }
-    function noOption() { view.remove(); }
+    function noOption() { 
+      eventView.parent().find(".esper-ev").addClass("esper-disabled");
+      FinalizeEvent.finalizeEvent(event, false);
+      view.remove();
+      Analytics.track(Analytics.Trackable.ClickFinalizeEventNoKeepHolds);
+    }
+    function cancelOption() { view.remove(); }
 
-    view.click(noOption);
+    view.click(cancelOption);
     Util.preventClickPropagation(modal);
     yesButton.click(yesOption);
     noButton.click(noOption);
+    cancelButton.click(cancelOption);
+    closeButton.click(cancelOption);
 
     return _view;
   }
