@@ -650,6 +650,12 @@ module Esper.TaskTab {
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
+
+    taskLabelsHeader: JQuery;
+    showTaskLabels: JQuery;
+    refreshTaskLabels: JQuery;
+    refreshTaskLabelsIcon: JQuery;
+    taskLabelsContainer: JQuery;
   }
 
   function meetingTypeDropdown(taskTitle : JQuery,
@@ -793,10 +799,10 @@ module Esper.TaskTab {
       </div>
     </div>
     <div class="esper-section">
-      <div #taskLabelsSection
+      <div #taskLabelsHeader
            class="esper-section-header esper-clearfix esper-open">
-        <span #showTaskLabelsren
-              class="esper-link" style="float:right">Show</span>
+        <span #showTaskLabels
+              class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Labels</span>
         <div #refreshTaskLabels
              class="esper-refresh esper-clickable">
@@ -1045,10 +1051,39 @@ module Esper.TaskTab {
 
     /* Task Label Stuff */
 
+    // Window.requestAnimationFrame ensures jQuery DOM is loaded before
+    // we render a React element
     window.requestAnimationFrame(function() {
       taskLabelsContainer.renderReact(
         React.createElement(TaskLabels.LabelListControl, {}));
     });
+
+    showTaskLabels.click(function() {
+      Sidebar.toggleList(taskLabelsContainer);
+      if (showTaskLabels.text() === "Hide") {
+        showTaskLabels.text("Show");
+        taskLabelsHeader.removeClass("esper-open");
+      } else {
+        showTaskLabels.text("Hide");
+        taskLabelsHeader.addClass("esper-open");
+      }
+    });
+
+    
+
+    // /* Set function to refresh from outside without passing any arguments  */
+    // refreshLinkedEventsAction = function() {
+    //   refreshLinkedEventsList(team, threadId, taskTabView);
+    //   if (linkedEventsContainer.css("display") === "none") {
+    //     Sidebar.toggleList(linkedEventsContainer);
+    //     showLinkedEvents.text("Hide");
+    //     linkedEventsHeader.addClass("esper-open");
+    //   }
+    // };
+    // refreshLinkedEvents.click(refreshLinkedEventsAction);
+
+
+    /////
 
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {

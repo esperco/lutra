@@ -135,7 +135,10 @@ module Esper.CalSidebar {
       var showSidebar = this.props.sidebarState === SidebarState.SHOW;
       return (<div className={"esper-sidebar esper-sidebar-simple " +
                               (showSidebar ? "" : "esper-hide")}>
-        <div className="esper-subheading">Labels</div>
+        <div className="esper-subheading">
+          <i className="fa fa-fw fa-tag"></i>
+          {" "} Labels
+        </div>
         <LabelListControl
           team={this.props.team}
           task={this.props.task}
