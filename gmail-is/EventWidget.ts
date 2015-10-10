@@ -64,8 +64,8 @@ module Esper.EventWidget {
         });
 
         if (FinalizeEvent.justHolds(linkedEvents).length > 0 &&
-            prefs.double_booking_warning &&
-            prefs.delete_holds_inquiry) {
+            (prefs.double_booking_warning ||
+            prefs.delete_holds_inquiry)) {
           var confirmModal =
             displayConfirmEventModal(view, event, events, team);
           $("body").append(confirmModal.view);
