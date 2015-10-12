@@ -42,9 +42,10 @@ module Esper.CurrentEvent {
 
         // Fetch task for this event
         .then(function() {
-          // TODO: Update task based on eventId once we have the API calls for
-          // it
-          return Promise.defer<ApiT.Task>(null);
+          return Api.getTaskListForEvent(fullEventId.eventId, false, false)
+            .then(function(tasks): ApiT.Task {
+              return tasks && tasks[0];
+            });
         })
 
         // Update current task and team based on event
@@ -201,15 +202,20 @@ module Esper.CurrentEvent {
   }
 
   // For when we change team while viewing an event -- we should update task
-  // as well
+  // as well.
   export function setTeam(team: ApiT.Team) {
     teamStore.set(team);
 
-    // TODO: Update task based on team once we have API
-    Promise.defer<ApiT.Task>(null)
-      .done(function(task) {
-        taskStore.set(task);
-      });
+    var currentTask = (<ApiT.Task> taskStore.val());
+    if (!currentTask || currentTask.task_teamid !== team.teamid) {
+      var fullEventId = eventIdStore.val();
+      Api.getTaskListForEvent(fullEventId.eventId, false, false)
+        .done(function(tasks) {
+          taskStore.set(_.find(tasks, function(task) {
+            return task.task_teamid === team.teamid;
+          }));
+        });
+    }
   }
 
   export function getTeam(): ApiT.Team {
