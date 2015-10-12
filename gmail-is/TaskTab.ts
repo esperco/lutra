@@ -655,7 +655,9 @@ module Esper.TaskTab {
     showTaskLabels: JQuery;
     refreshTaskLabels: JQuery;
     refreshTaskLabelsIcon: JQuery;
+    taskLabelsSpinner: JQuery;
     taskLabelsContainer: JQuery;
+    taskLabelsList: JQuery;
   }
 
   function meetingTypeDropdown(taskTitle : JQuery,
@@ -701,6 +703,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.hide();
       currentTaskTab.taskSpinner.show();
+      currentTaskTab.taskLabelsList.hide();
+      currentTaskTab.taskLabelsSpinner.show();
     }
   }
 
@@ -708,6 +712,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.show();
       currentTaskTab.taskSpinner.hide();
+      currentTaskTab.taskLabelsList.show();
+      currentTaskTab.taskLabelsSpinner.hide();
     }
   }
 
@@ -809,8 +815,12 @@ module Esper.TaskTab {
           <object #refreshTaskLabelsIcon class="esper-svg"/>
         </div>
       </div>
-      <div #taskLabelsContainer
-        class="esper-section-container esper-label-list">
+      <div #taskLabelsContainer class="esper-section-container" >
+        <div #taskLabelsSpinner class="esper-events-list-loading" >
+          <div class="esper-spinner esper-list-spinner" />
+        </div>
+        <div #taskLabelsList class="esper-label-list">
+        </div>
       </div>
     </div>
 
@@ -872,6 +882,7 @@ module Esper.TaskTab {
     refreshLinkedThreadsIcon.attr("data",
       Init.esperRootUrl + "img/refresh.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
@@ -935,6 +946,7 @@ module Esper.TaskTab {
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
         linkedThreadsSpinner.hide();
+        taskLabelsSpinner.hide();
         taskProgressSpinner.hide();
 
         Api.getPreferences(team.teamid).done(function(prefs) {
@@ -1054,7 +1066,7 @@ module Esper.TaskTab {
     // Window.requestAnimationFrame ensures jQuery DOM is loaded before
     // we render a React element
     window.requestAnimationFrame(function() {
-      taskLabelsContainer.renderReact(
+      taskLabelsList.renderReact(
         React.createElement(TaskLabels.LabelListControl, {}));
     });
 
@@ -1067,6 +1079,10 @@ module Esper.TaskTab {
         showTaskLabels.text("Hide");
         taskLabelsHeader.addClass("esper-open");
       }
+    });
+
+    refreshTaskLabels.click(function() {
+      CurrentThread.refreshTaskForThread(false);
     });
 
 
