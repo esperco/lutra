@@ -76,19 +76,14 @@ module Esper.CalSidebar {
 
   class SidebarAndDock extends Component<{}, SidebarAttrs> {
     render() {
-      if (Login.loggedIn() && this.state.eventId &&
-          Teams.initialize().state() === "resolved") {
+      if (Login.loggedIn() && this.state.eventId) {
         return (<div>
-          {
-            this.state.team ?
-            <Sidebar
-              eventId={this.state.eventId}
-              task={this.state.task}
-              taskMetadata={this.state.taskMetadata}
-              team={this.state.team}
-              sidebarState={this.state.sidebarState} /> :
-            ""
-          }
+          <Sidebar
+            eventId={this.state.eventId}
+            task={this.state.task}
+            taskMetadata={this.state.taskMetadata}
+            team={this.state.team}
+            sidebarState={this.state.sidebarState} />
           <Dock
             eventId={this.state.eventId}
             task={this.state.task}
@@ -97,9 +92,6 @@ module Esper.CalSidebar {
             sidebarState={this.state.sidebarState} />
         </div>);
       }
-
-      // TODO: Show "busy" indicator if we're still loading profile info
-      // or teams
 
       // No event (don't render)
       // TODO: Render something for new events
@@ -116,6 +108,9 @@ module Esper.CalSidebar {
         CurrentEvent.taskStore,
         sidebarStateStore
       ]);
+
+      // Ensures sidebar is updated after logging in
+      Login.onLogin(this.onChange);
     }
 
     getState() {
@@ -137,14 +132,25 @@ module Esper.CalSidebar {
 
   class Sidebar extends Component<SidebarAttrs, {}> {
     render() {
-      var showSidebar = this.props.sidebarState === SidebarState.SHOW;
+      var showLoading = (!this.props.task && this.props.taskMetadata &&
+        this.props.taskMetadata.dataStatus === Model.DataStatus.FETCHING);
+
+      var showSidebar = (this.props.team &&
+        this.props.sidebarState === SidebarState.SHOW);
       return (<div className={"esper-sidebar esper-sidebar-simple " +
                               (showSidebar ? "" : "esper-hide")}>
-        <TaskLabels.LabelListControl
-          team={this.props.team}
-          task={this.props.task}
-          taskMetadata={this.props.taskMetadata}
-          eventId={this.props.eventId} />
+        {
+          showLoading ?
+          <div className="esper-spinner esper-sidebar-spinner"></div> :
+          (
+            this.props.team ?
+            <TaskLabels.LabelListControl
+              team={this.props.team}
+              task={this.props.task}
+              taskMetadata={this.props.taskMetadata}
+              eventId={this.props.eventId} /> : ""
+          )
+        }
       </div>);
     }
   }
@@ -152,10 +158,22 @@ module Esper.CalSidebar {
 
   class Dock extends Component<SidebarAttrs, {}> {
     render() {
-      var teamName = (this.props.team ?
-        <span>{this.props.team.team_name}</span> :
-        <span className="esper-unknown-team">Unknown Team</span>);
-      var showWrap = this.props.sidebarState === SidebarState.SHOW;
+      var teamName: JSX.Element;
+      var loading: boolean;
+      if (this.props.team) {
+        teamName = (<span>{this.props.team.team_name}</span>);
+      }
+      else if (this.props.taskMetadata &&
+          this.props.taskMetadata.dataStatus === Model.DataStatus.FETCHING) {
+        loading = true;
+        teamName = (<span className="esper-dock-loading">
+          Loading &hellip;
+        </span>);
+      } else {
+        teamName = (<span className="esper-unknown-team">Unknown Team</span>);
+      }
+      var showWrap = (this.props.team &&
+        this.props.sidebarState === SidebarState.SHOW);
 
       return (<div className="esper-dock-container">
         <div className={"esper-dock-wrap " + (showWrap ? "" : "esper-hide")}>
@@ -163,9 +181,11 @@ module Esper.CalSidebar {
           <div className="esper-dock-wrap-right" />
         </div>
         <div className="esper-dock">
-          <DockMenu
-            selectedTeamId={this.props.team && this.props.team.teamid} />
-
+          {
+            loading ? "" :
+            <DockMenu
+              selectedTeamId={this.props.team && this.props.team.teamid} />
+          }
           <div className="esper-team-name">{teamName}</div>
           <div className="esper-dock-action esper-size"
                onClick={this.toggleSidebar.bind(this)}>

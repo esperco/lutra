@@ -20,34 +20,33 @@ module Esper.Teams {
       parameter is passed.
   */
   export function initialize(force=false): JQueryPromise<void> {
-    if (initJob && !force) {
-      return initJob;
-    } else {
-      Log.d("Initializing Teams");
-      teams = Login.myTeams();
-      var profilesJob =
-        Profile.fetchAllProfiles().done(function (profileList) {
-          profileList.forEach(function (profile) {
-            profiles[profile.profile_uid] = profile;
+    if (!initJob || force) {
+      // Ensures that Teams.initialize waits until *after* Login complets
+      initJob = Login.nextLogin().done(function() {
+        Log.d("Initializing Teams");
+        teams = Login.myTeams();
+        var profilesJob =
+          Profile.fetchAllProfiles().done(function(profileList) {
+            profileList.forEach(function(profile) {
+              profiles[profile.profile_uid] = profile;
+            });
           });
-        });
-      var prefsJob =
-        Preferences.fetchAllPreferences().done(function (prefList) {
-          prefList.forEach(function (prefs) {
-            preferences[prefs.teamid] = prefs;
+        var prefsJob =
+          Preferences.fetchAllPreferences().done(function(prefList) {
+            prefList.forEach(function(prefs) {
+              preferences[prefs.teamid] = prefs;
+            });
           });
-        });
-      var ourInitJob = Promise.join([
-        Promise.ignore(profilesJob),
-        Promise.ignore(prefsJob)
-      ]);
-      initJob = <JQueryPromise<any>> ourInitJob;
-      return ourInitJob.then(function() {
+        return Promise.join([
+          Promise.ignore(profilesJob),
+          Promise.ignore(prefsJob)
+        ]);
+      }).then(function() {
         Log.d("Finished initializing teams.");
         alreadyInitialized = true;
-        return;
       });
     }
+    return initJob;
   }
 
   /** Returns the profile for the given user if the user is in one of

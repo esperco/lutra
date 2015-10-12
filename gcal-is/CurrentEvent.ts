@@ -31,6 +31,13 @@ module Esper.CurrentEvent {
     eventIdStore.set(fullEventId);
 
     if (fullEventId && fullEventId.eventId) {
+      // Signal that we're fetching a new task
+      taskStore.set(function(task, metadata) {
+        return [task, {
+          dataStatus: Model.DataStatus.FETCHING
+        }];
+      });
+
       // Ensure we have login info before making new calls
       Login.getLoginInfo()
 
@@ -51,7 +58,7 @@ module Esper.CurrentEvent {
         // Update current task and team based on event
         .then(function(task) {
           if (task) {
-            taskStore.set(task);
+            taskStore.set([task, {dataStatus: Model.DataStatus.READY}]);
             teamStore.set(_.find(Login.myTeams(), function(team) {
               return team.teamid === task.task_teamid;
             }));
@@ -208,12 +215,20 @@ module Esper.CurrentEvent {
 
     var currentTask = (<ApiT.Task> taskStore.val());
     if (!currentTask || currentTask.task_teamid !== team.teamid) {
+      taskStore.set(function(task, metadata) {
+        return [null, {
+          dataStatus: Model.DataStatus.FETCHING
+        }];
+      });
+
       var fullEventId = eventIdStore.val();
       Api.getTaskListForEvent(fullEventId.eventId, false, false)
         .done(function(tasks) {
-          taskStore.set(_.find(tasks, function(task) {
+          taskStore.set([_.find(tasks, function(task) {
             return task.task_teamid === team.teamid;
-          }));
+          }), {
+            dataStatus: Model.DataStatus.READY
+          }]);
         });
     }
   }
