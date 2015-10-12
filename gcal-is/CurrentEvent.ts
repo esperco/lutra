@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Teams.ts" />
@@ -49,7 +50,10 @@ module Esper.CurrentEvent {
         // Update current task and team based on event
         .then(function(task) {
           if (task) {
-            setTask(task);
+            taskStore.set(task);
+            teamStore.set(_.find(Login.myTeams(), function(team) {
+              return team.teamid === task.task_teamid;
+            }));
           }
 
           // If no task for event, infer current team from calendar Id
@@ -66,22 +70,100 @@ module Esper.CurrentEvent {
   }
 
   /*
-    Set the current task, updates the currentTeam if necessary -- note that
-    we only use the Task rather than the NewTask interface here. If updating
-    with a NewTask for display purposes, just set store directly.
+    Returns a promise that resolves to the task for the current event.
+    Will create task if none exists yet and will fetch from local store if
+    already set.
   */
-  export function setTask(newTask?: ApiT.Task,
-      metadata?: Model.StoreMetadata) {
-    taskStore.set(newTask);
-    if (newTask) {
-      teamStore.set(_.find(Login.myTeams(), function(team) {
-        return team.teamid === newTask.task_teamid;
-      }));
+  export function getTask(): JQueryPromise<ApiT.Task> {
+    // Check current store, but be sure to check it's actually a task and
+    // not a NewTask
+    var current = taskStore.val();
+    if (current && (<ApiT.Task> current).taskid) {
+      return Promise.defer(<ApiT.Task> current);
     }
+
+    /* Else, create/refresh a task */
+    return refreshTask();
   }
 
-  export function getTask(): ApiT.Task|ApiT.NewTask {
-    return taskStore.val();
+  /* Refresh existing task and stores; create task if none exists */
+  export function refreshTask(): JQueryPromise<ApiT.Task> {
+    var ret: JQueryPromise<ApiT.Task>;
+
+    // Check current store, but be sure to check it's actually a task and
+    // not a NewTask
+    var current = taskStore.val();
+    if (current && (<ApiT.Task> current).taskid) {
+      // Update status to reflect that we're fetching from server
+      taskStore.set(function(oldTask, oldMetadata) {
+        return [oldTask, {dataStatus: Model.DataStatus.FETCHING}];
+      });
+
+      ret = Api.getTask((<ApiT.Task>current).taskid, false, false);
+    }
+
+    else {
+      /* Else, create a task */
+      var team = teamStore.val();
+      var eventId = eventIdStore.val();
+      if (team && eventId) {
+
+        /*
+          First, create a NewTask object and update our local source of truth
+          if none exists. Note that assign a dataStatus of FETCHING rather than
+          INFLIGHT because this NewTask object is a default placeholder that
+          we're okay with having overriden, not actual data that we want to
+          ensure is saved to the server.
+        */
+        var newTask: ApiT.NewTask = {
+          task_title: Gcal.Event.extractEventTitle()
+        };
+        taskStore.set(function(oldTask, oldMetadata) {
+          if (oldTask) {
+            // Existing data, don't change
+            return [oldTask, oldMetadata];
+          }
+          return [newTask, { dataStatus: Model.DataStatus.FETCHING }];
+        });
+
+        // Send to server and return promise
+        ret = Api.obtainTaskForEvent(
+          team.teamid,
+          eventId.calendarId,
+          eventId.eventId,
+          newTask,
+          false, false);
+      }
+    }
+
+    // Update stores after fetching
+    return ret.then(function(task) {
+      updateTaskFromServer(task);
+      return task;
+    });
+  }
+
+  /*
+    Updates the currently stored task based on server data. If dataStatus is
+    INFLIGHT, will not update an existing Task in store since server fetch may
+    not accurately reflet pending local changes. If current task is a NewTask,
+    will try to merge NewTask values into task.
+  */
+  function updateTaskFromServer(task: ApiT.Task) {
+    taskStore.set(function(oldTask, oldMetadata) {
+      if (oldMetadata &&
+          oldMetadata.dataStatus === Model.DataStatus.INFLIGHT) {
+        // No taskId => NewTask, try to merge
+        if (oldTask && !(<ApiT.Task> oldTask).taskid) {
+          return (<ApiT.Task> _.extend(task, oldTask));
+        }
+      }
+
+      // Not in flight, save normally
+      return [task, {
+        dataStatus: Model.DataStatus.READY
+      }];
+    });
   }
 
   /*

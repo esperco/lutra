@@ -8,7 +8,7 @@
 /// <reference path="../marten/ts/JQStore.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
-/// <reference path="../common/TaskLabels.tsx" />
+/// <reference path="./TaskLabels.Gcal.tsx" />
 /// <reference path="./CurrentEvent.ts" />
 
 module Esper.CalSidebar {
@@ -140,119 +140,12 @@ module Esper.CalSidebar {
       var showSidebar = this.props.sidebarState === SidebarState.SHOW;
       return (<div className={"esper-sidebar esper-sidebar-simple " +
                               (showSidebar ? "" : "esper-hide")}>
-        <div className="esper-subheading">
-          <i className="fa fa-fw fa-tag"></i>
-          {" "} Labels
-        </div>
-        <LabelListControl
+        <TaskLabels.LabelListControl
           team={this.props.team}
           task={this.props.task}
           taskMetadata={this.props.taskMetadata}
-          eventId={this.props.eventId}
-          sidebarState={this.props.sidebarState} />
+          eventId={this.props.eventId} />
       </div>);
-    }
-  }
-
-
-  class LabelListControl extends Component<SidebarAttrs, {}> {
-    /*
-      In order to avoid race conditions, we wait until the last update is
-      done until we send the next one. Since we're sending over the entire
-      set of labels we only need to store the next immediate update to send.
-    */
-    nextUpdate: string[];
-    callInProgress: JQueryPromise<any>;
-
-    render() {
-      return <TaskLabels.LabelList
-        team={this.props.team}
-        task={this.props.task}
-        busy={this.props.taskMetadata &&
-              this.props.taskMetadata.dataStatus === Model.DataStatus.INFLIGHT}
-        handleChange={this.handleLabelChange.bind(this) } />
-    }
-
-    handleLabelChange(labels: string[]) {
-      // If there is an in-progress update, just piggy back off of that
-      this.nextUpdate = labels;
-
-      // Mark as busy, update our local source of truth
-      CurrentEvent.taskStore.set(function(data, metadata) {
-        if (data) {
-          data = _.clone(data);
-          data.task_labels = labels;
-        } else {
-          // Store as NewTask
-          data = {
-            task_title: Esper.Gcal.Event.extractEventTitle(),
-            task_labels: labels
-          };
-        }
-        metadata = _.clone(metadata) || {};
-        metadata.dataStatus = Model.DataStatus.INFLIGHT;
-        return [data, metadata];
-      });
-
-      // Start a request if none in progress
-      if (!this.callInProgress || this.callInProgress.state() !== "pending") {
-        this.saveToServer();
-      }
-    }
-
-    // Makes actual calls to server
-    // TODO: Move this out of component so we don't get warning about setting
-    // the state of an unmounted component
-    saveToServer() {
-      if (this.nextUpdate) {
-        var teamId = this.props.team.teamid;
-        var labels = this.nextUpdate;
-        this.callInProgress = this.getTask()
-          .then(function(task) {
-            return Api.setTaskLabels(teamId, task.taskid, labels);
-          });
-
-        // Delete nextUpdate so callback doesn't re-trigger
-        delete this.nextUpdate;
-
-        // Once call is done, re-check
-        this.callInProgress.done(this.saveToServer.bind(this));
-      } else {
-        // No longer busy
-        CurrentEvent.taskStore.set(function(data, metadata) {
-          metadata = _.clone(metadata);
-          metadata.dataStatus = Model.DataStatus.READY;
-          return [data, metadata];
-        });
-      }
-    }
-
-    // Returns promise to resolves to task
-    getTask(): JQueryPromise<ApiT.Task> {
-      if (this.props.task) {
-        return Promise.defer(this.props.task);
-      } else {
-        return Api.obtainTaskForEvent(
-          this.props.team.teamid,
-          this.props.eventId.calendarId,
-          this.props.eventId.eventId,
-          { task_title: Esper.Gcal.Event.extractEventTitle() },
-          false, false
-        ).then(function(task) {
-          /*
-            Update local source of truth with new task but conform
-            task labels to next update so user doesn't see flicker
-            of checkmarks while we're updating.
-          */
-          CurrentEvent.taskStore.set(function(oldTask) {
-            if (oldTask && oldTask.task_labels) {
-              task.task_labels = oldTask.task_labels;
-            }
-            return task as ApiT.Task;
-          });
-          return task;
-        });
-      }
     }
   }
 
