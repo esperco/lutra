@@ -377,6 +377,7 @@ module Esper.InThreadControls {
             saveTaskNotes.prop("disabled", false);
             saveTaskNotes.trigger("click");
             actionDiv.remove();
+            Analytics.track(Analytics.Trackable.CopySelectionToTaskNotes);
           });
           actionDiv.append(button);
           $("body").append(actionDiv);

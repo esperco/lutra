@@ -3,6 +3,6 @@ module Esper.Conf {
   export var version = "@@VERSION@@";
   export var segmentKey = "QwsMs5clHuU0IhYhq664x8VyV32HFph6";
   export module Api {
-    export var url = "http://localhost";
+    export var url = "http://127.0.0.1";
   }
 }

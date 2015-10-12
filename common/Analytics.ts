@@ -12,6 +12,8 @@ module Esper.Analytics {
     // place where you can save your task notes
     ArchiveTaskTabTask = 1,
     CancelTaskTabTask,
+    ChangeSidebarTeam,
+    ChooseTaskTabEvent,
     ClickCalendarPickerCancel,
     ClickCalendarPickerSave,
     ClickCalendarPickerSaveEventsTo,
@@ -46,8 +48,7 @@ module Esper.Analytics {
     ClickUserTab,
     ClickUserTabMeetingsDropdown,
     ClickUserTabPreferences,
-    ChangeSidebarTeam,
-    ChooseTaskTabEvent,
+    CopySelectionToTaskNotes,
     CreateTask,
     CreateTaskTabLinkedEvent,
     EditCalendarPickerEventTitle,
