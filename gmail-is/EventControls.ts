@@ -235,15 +235,9 @@ module Esper.EventControls {
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
 
-        var start = new Date(event.start.local);
-        startDate.val(XDate.dateValue(start));
-        startTime.val(XDate.timeOnly24Hours(start));
-        var end =
-          event.end ?
-          new Date(event.end.local) :
-          new Date(event.start.local);
-        endDate.val(XDate.dateValue(end));
-        endTime.val(XDate.timeOnly24Hours(end));
+        var calendar = List.find(team.team_calendars, function(cal) {
+          return cal.google_cal_id === event.google_cal_id;
+        });
 
         if (event.location) {
           var address = event.location.address;
@@ -351,77 +345,99 @@ module Esper.EventControls {
         pubLocation.click(searchLocation);
 
         cancel.click(close);
-        save.click(function() {
-          var timezone = preferences.general.current_timezone;
 
-          //moment-tz apparently doesn't handle these timezones
-          if (timezone === "US/Eastern") timezone = "America/New_York";
-          else if (timezone === "US/Central") timezone = "America/Chicago";
-          else if (timezone === "US/Mountain") timezone = "America/Denver";
-          else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
+        CurrentThread.taskPrefs
+          .then(Option.unwrap<ApiT.TaskPreferences>
+            ("taskPrefs (in displayLinkedEventsList)"))
+          .done(function(tpref) {
+            var calTimezone = calendar.calendar_timezone;
+            var prefs = Teams.getTeamPreferences(team);
+            var showTimezone = PrefTimezone.execTimezone(prefs, tpref);
+            var start = XDate.ofString(Timezone.shiftTime(event.start.local,
+                                                          calTimezone,
+                                                          showTimezone));
+            var end = XDate.ofString(Timezone.shiftTime(event.end ? event.end.local : event.start.local,
+                                                        calTimezone,
+                                                        showTimezone));
 
-          var st = new Date(startDate.val() + " " + startTime.val() + "Z");
-          var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
-          var timeDiff = ed.getTime() - st.getTime();
-          if (timeDiff < 0) {
-            alert("Error: That change would make the event end " +
-                  "before it starts!");
-            return; // exit click handler
-          }
-          var evStart: ApiT.CalendarTime = {
-            local: XDate.toString(st),
-            utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
-          };
-          var evEnd: ApiT.CalendarTime = {
-            local: XDate.toString(ed),
-            utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
-          };
+            startDate.val(XDate.dateValue(start));
+            startTime.val(XDate.timeOnly24Hours(start));
+            endDate.val(XDate.dateValue(end));
+            endTime.val(XDate.timeOnly24Hours(end));
+          
+            save.click(function() {
+              //moment-tz apparently doesn't handle these timezones
+              if (calTimezone === "US/Eastern") calTimezone = "America/New_York";
+              else if (calTimezone === "US/Central") calTimezone = "America/Chicago";
+              else if (calTimezone === "US/Mountain") calTimezone = "America/Denver";
+              else if (calTimezone === "US/Pacific") calTimezone = "America/Los_Angeles";
 
-          var location : ApiT.Location = {
-            title: "",
-            address: pubLocation.val(),
-            timezone: timezone
-          };
-          if (!location.address) location = null;
+              var st = startDate.val() + " " + startTime.val() + "Z";
+              var ed = endDate.val() + " " + endTime.val() + "Z";
+              var timeDiff = new Date(ed).getTime() - new Date(st).getTime();
+              if (timeDiff < 0) {
+                alert("Error: That change would make the event end " +
+                      "before it starts!");
+                return; // exit click handler
+              }
+              var shiftSt = Timezone.shiftTime(st, showTimezone, calTimezone);
+              var shiftEd = Timezone.shiftTime(ed, showTimezone, calTimezone);
 
-          var guests = [];
-          for (var person in peopleInvolved) {
-            if (peopleInvolved.hasOwnProperty(person)) {
-              guests.push({
-                display_name : peopleInvolved[person] || null,
-                email        : person
-              });
-            }
-          }
+              var evStart: ApiT.CalendarTime = {
+                local: shiftSt,
+                utc: (<any> moment).tz(shiftSt.replace(/Z$/, ""), calTimezone).format()
+              };
+              var evEnd: ApiT.CalendarTime = {
+                local: shiftEd,
+                utc: (<any> moment).tz(shiftEd.replace(/Z$/, ""), calTimezone).format()
+              };
 
-          var e: ApiT.CalendarEventEdit = {
-            google_cal_id: event.google_cal_id,
-            start: evStart,
-            end: evEnd,
-            title: pubTitle.val(),
-            description: pubDescription.val(),
-            description_messageids: descriptionMessageids,
-            location: location,
-            all_day: event.all_day,
-            guests: guests,
-            recurrence: event.recurrence,
-            recurring_event_id: event.recurring_event_id
-          }
+              var location : ApiT.Location = {
+                title: "",
+                address: pubLocation.val(),
+                timezone: showTimezone
+              };
+              if (!location.address) location = null;
 
-          var alias = fromSelect.val();
+              var guests = [];
+              for (var person in peopleInvolved) {
+                if (peopleInvolved.hasOwnProperty(person)) {
+                  guests.push({
+                    display_name : peopleInvolved[person] || null,
+                    email        : person
+                  });
+                }
+              }
 
-          function finish() {
-            var taskTab = TaskTab.currentTaskTab;
-            TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-            close();
-          }
-          if (event.recurrence || event.recurring_event_id) {
-            changeRecurringEventModal(team, alias, event, e, timezone, finish);
-          } else {
-            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-              .done(finish);
-          }
-        });
+              var e: ApiT.CalendarEventEdit = {
+                google_cal_id: event.google_cal_id,
+                start: evStart,
+                end: evEnd,
+                title: pubTitle.val(),
+                description: pubDescription.val(),
+                description_messageids: descriptionMessageids,
+                location: location,
+                all_day: event.all_day,
+                guests: guests,
+                recurrence: event.recurrence,
+                recurring_event_id: event.recurring_event_id
+              }
+
+              var alias = fromSelect.val();
+
+              function finish() {
+                var taskTab = TaskTab.currentTaskTab;
+                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+                close();
+              }
+              if (event.recurrence || event.recurring_event_id) {
+                changeRecurringEventModal(team, alias, event, e, showTimezone, finish);
+              } else {
+                Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+                  .done(finish);
+              }
+            });
+          });
 
         return container;
       },
