@@ -19,7 +19,7 @@ module Esper.CurrentEvent {
   export var teamStore = new Model.StoreOne<ApiT.Team>();
 
   // Watcher for reference to current task (set via currentTeam and eventId)
-  export var taskStore = new Model.StoreOne<ApiT.Task>();
+  export var taskStore = new Model.StoreOne<ApiT.Task|ApiT.NewTask>();
 
   /*
     Function to set the above stores and watchers when eventId changes.
@@ -65,8 +65,13 @@ module Esper.CurrentEvent {
     return eventIdStore.val();
   }
 
-  /* Set the current task, updates the currentTeam if necessary */
-  export function setTask(newTask?: ApiT.Task) {
+  /*
+    Set the current task, updates the currentTeam if necessary -- note that
+    we only use the Task rather than the NewTask interface here. If updating
+    with a NewTask for display purposes, just set store directly.
+  */
+  export function setTask(newTask?: ApiT.Task,
+      metadata?: Model.StoreMetadata) {
     taskStore.set(newTask);
     if (newTask) {
       teamStore.set(_.find(Login.myTeams(), function(team) {
@@ -75,7 +80,7 @@ module Esper.CurrentEvent {
     }
   }
 
-  export function getTask(): ApiT.Task {
+  export function getTask(): ApiT.Task|ApiT.NewTask {
     return taskStore.val();
   }
 

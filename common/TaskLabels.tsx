@@ -16,7 +16,11 @@ module Esper.TaskLabels {
 
   interface LabelListProps {
     team: ApiT.Team;   // Used to determine which labels to show
-    task?: ApiT.Task;  // Used to determine which labels are checked
+
+    // Used to determine which labels are checked -- can pass a NewTask
+    // object to show stub labels
+    task?: ApiT.Task|ApiT.NewTask;
+
     busy?: boolean;    // If true, show busy indicator
 
     // Callback to handle label changes
