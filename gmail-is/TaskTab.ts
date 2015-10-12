@@ -146,7 +146,7 @@ module Esper.TaskTab {
       li.appendTo(threadsList);
     });
 
-    if (threadsList.children("li").length > 0) {
+    if (threadsList.children("li").length > 1) {
       taskTab.linkedThreadsList.append(threadsList);
     } else {
       displayEmptyLinkedThreadsList(taskTab);
