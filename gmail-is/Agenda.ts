@@ -328,11 +328,12 @@ module Esper.Agenda {
     timeFromDate.datepicker("widget").addClass("esper");
     timeUntilDate.datepicker("widget").addClass("esper");
 
-    var timezone = Teams.getPreferences(currentTeam.teamid).general.current_timezone;
+    var timezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
 
     var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone);
-    tzSel.removeClass("esper-select");
-    tzSel.addClass("esper-agenda-timezone-select");
+    tzSel.removeClass("esper-select")
+         .addClass("esper-agenda-timezone-select")
+         .bind("typeahead:change", renderEvents);
 
     allTeams.find("label > input").change(function(e) {
       e.stopPropagation();
@@ -409,8 +410,9 @@ module Esper.Agenda {
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.agendaRange(currentTeam.teamid,
-                   Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
-                   Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
+                    timezone,
+                    Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
+                    Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
       .done(function(result) {
         if (result.agenda_events.length === 0) {
           noEvents.show();
@@ -437,10 +439,12 @@ module Esper.Agenda {
       });
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
+      var tz = Timezone.selectedTimezone(tzSel);
       _.forEach(teams, function(team: ApiT.Team) {
         Api.agendaRange(team.teamid,
-                       Math.floor(f.getTime() / 1000),
-                       Math.floor(u.getTime()/ 1000 + 86399))
+                        tz,
+                        Math.floor(f.getTime() / 1000),
+                        Math.floor(u.getTime()/ 1000 + 86399))
           .done(function(result) {
             if (result.agenda_events.length === 0) {
               noEvents.show();

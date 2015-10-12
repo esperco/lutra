@@ -300,11 +300,13 @@ module Esper.Api {
   }
 
   export function agendaRange(teamid,
+                              timezone,
                               from: number,
                               until: number):
   JQueryPromise<ApiT.AgendaEventList> {
     var url = Conf.Api.url + "/api/agenda/range/" + string(Login.myUid())
       + "/" + string(teamid)
+      + "/" + encodeURIComponent(string(timezone))
       + "/" + from.toString()
       + "/" + until.toString();
     return JsonHttp.get(url);
