@@ -1069,19 +1069,6 @@ module Esper.TaskTab {
       }
     });
 
-    
-
-    // /* Set function to refresh from outside without passing any arguments  */
-    // refreshLinkedEventsAction = function() {
-    //   refreshLinkedEventsList(team, threadId, taskTabView);
-    //   if (linkedEventsContainer.css("display") === "none") {
-    //     Sidebar.toggleList(linkedEventsContainer);
-    //     showLinkedEvents.text("Hide");
-    //     linkedEventsHeader.addClass("esper-open");
-    //   }
-    // };
-    // refreshLinkedEvents.click(refreshLinkedEventsAction);
-
 
     /////
 

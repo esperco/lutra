@@ -39,6 +39,14 @@ module Esper.TaskLabels {
     }
 
     handleLabelChange(labels: string[]) {
+      // Update local state to reflect checkbox changes
+      this.setState(function(prevState) {
+        var state = _.clone(prevState); // For immutability purposes
+        state.task = _.clone(state.task);
+        state.task.task_labels = labels;
+        return state;
+      });
+
       // If there is an in-progress update, just piggy back off of that
       this.nextUpdate = labels;
 
@@ -80,15 +88,37 @@ module Esper.TaskLabels {
     }
 
     makeBusy() {
-      var newState = _.extend(this.state || {},
-        { busy: true }) as LabelListControlState;
-      this.setState(newState);
+      this.setState(function(prevState) {
+        var state = _.clone(prevState); // For immutability purposes
+        state.busy = true;
+        return state;
+      });
     }
 
     unmakeBusy() {
-      var newState = _.extend(this.state || {},
-        { busy: false }) as LabelListControlState;
-      this.setState(newState);
+      this.setState(function(prevState) {
+        var state = _.clone(prevState); // For immutability purposes
+        state.busy = false;
+        return state;
+      });
+    }
+
+    /*
+      Because state is dependent on current task, set watcher to re-render
+      when CurrentThread.task changes. We store reference to watcher to
+      de-reference when component is unmounted.
+    */
+    taskWatcherId: string;
+
+    componentDidMount() {
+      this.taskWatcherId = CurrentThread.task.watch(this.onChange);
+    }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      if (this.taskWatcherId) {
+        CurrentThread.task.unwatch(this.taskWatcherId);
+      }
     }
   }
 }

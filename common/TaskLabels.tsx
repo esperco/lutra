@@ -54,7 +54,7 @@ module Esper.TaskLabels {
       return (<div className="checkbox" key={index.toString() + "-" + name}>
         <label htmlFor={id}>
           <input id={id} type="checkbox" className="checkbox"
-            defaultChecked={checked} value={name}
+            checked={checked} value={name}
             onChange={this.onLabelClick.bind(this) } />
           {" "} {name}
         </label>
@@ -68,7 +68,7 @@ module Esper.TaskLabels {
       });
     }
 
-    protected onLabelClick() {
+    protected onLabelClick(e) {
       this.props.handleChange(this.getLabels());
     }
   }
