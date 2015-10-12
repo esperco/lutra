@@ -42,7 +42,7 @@ module Esper.TaskLabels {
           {
             this.props.busy ?
             <span>Saving &hellip;</span> :
-            <a href={Conf.Api.url}>
+            <a href={Conf.Api.url} target="_blank">
               <i className="fa fa-fw fa-cog"></i>
               {" "} Configure Labels
             </a>
