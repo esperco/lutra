@@ -749,6 +749,23 @@ module Esper.TaskTab {
         </div>
       </div>
       <div #linkedThreadsContainer class="esper-section-container">
+        <div #linkEmails
+        class="esper-section-actions esper-clearfix esper-open">
+          <div style="display:inline-block">
+            <div #createEmail
+            class="esper-link-action esper-dropdown-btn esper-click-safe">
+              <object #createEmailIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text esper-click-safe">
+              Create
+              </div>
+            </div>
+            <div class="esper-vertical-divider"/>
+            <div #linkEmail class="esper-link-action">
+              <object #linkEmailIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text">Link</div>
+            </div>
+          </div>
+        </div>
         <div #linkedThreadsSpinner class="esper-events-list-loading">
           <div class="esper-spinner esper-list-spinner"/>
         </div>
@@ -846,8 +863,9 @@ module Esper.TaskTab {
       }
     }, "TaskTab.refreshLinkedEventsList");
 
-    refreshLinkedThreadsIcon.attr("data",
-      Init.esperRootUrl + "img/refresh.svg");
+    refreshLinkedThreadsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    createEmailIcon.attr("data", Init.esperRootUrl + "img/create.svg");
+    linkEmailIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
@@ -864,6 +882,7 @@ module Esper.TaskTab {
       }
     };
     refreshLinkedThreads.click(refreshLinkedThreadsAction);
+
 
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
@@ -1021,6 +1040,14 @@ module Esper.TaskTab {
     linkEvent.click(function() {
       var searchModal =
         CalSearch.viewOfSearchModal(team, threadId, taskTabView);
+      $("body").append(searchModal.view);
+      searchModal.search.focus();
+      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
+    });
+
+    linkEmail.click(function() {
+      var searchModal =
+        GmailSearch.viewOfSearchModal(team, threadId, taskTabView);
       $("body").append(searchModal.view);
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);

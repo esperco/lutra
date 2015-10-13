@@ -43,6 +43,7 @@
 /// <reference path="./Recur.ts" />
 /// <reference path="./CalPicker.ts" />
 /// <reference path="./CalSearch.ts" />
+/// <reference path="./GmailSearch.ts" />
 /// <reference path="./ObserveMessage.ts" />
 /// <reference path="./ComposeHashtags.ts" />
 /// <reference path="./ComposeControls.ts" />
