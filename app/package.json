@@ -11,7 +11,7 @@
     "watch": "gulp watch --timeout 30000"
   },
   "devDependencies": {
-    "gulp": "git://github.com/gulpjs/gulp.git#4.0"
+    "gulp": "git://github.com/gulpjs/gulp.git#bbe3c56138a9ede627879d7e47daffd0a6d9b6db"
   },
   "dependencies": {}
 }

@@ -32,14 +32,32 @@ module Esper.ReactHelpers {
     renderReact: function(elmOrCls: any, props?: any) {
       // Call React clean-up on unbind
       var self = this;
+      var unmounted = false;
       this.off('destroyed');
       this.bind('destroyed', function() {
         React.unmountComponentAtNode(self.get(0));
+        unmounted = true;
       });
 
-      if (! $.contains(document.documentElement, this.get(0))) {
-        throw new Error("Node must be in DOM before React render");
-      }
+      /*
+        Throw error if parent node isn't in DOM when we render React element.
+        React itself doesn't care if it's rendered into a detached DOM node,
+        but rendering into a detached DOM node runs the risk of a memory leak
+        because we depend on the parent node being removed from the DOM to
+        trigger the event that unmounts the React component.
+
+        Run this check in window.requestAnimationFrame because we may want
+        to prepare a DOM element in JS before inserting into the DOM. Chrome
+        should wait until all synchronous operations affecting the DOM are
+        complete before calling the requestAnimationFrame callback.
+      */
+      var self = this;
+      window.requestAnimationFrame(function() {
+        if (self.data("react-component") && !unmounted &&
+            !$.contains(document.documentElement, self.get(0))) {
+          throw new Error("Node must be in DOM for React render");
+        }
+      });
 
       var elm: React.ReactElement<any>;
       if (_.isFunction(elmOrCls)) {

@@ -19,7 +19,9 @@ module Esper.ReactHelpers {
     }
 
     render() {
-      return React.createElement("div", {className: "cat"});
+      return React.createElement("div", {className: "dog"}, [
+        React.createElement("div", { className: "cat" })
+      ]);
     }
   }
 
@@ -30,39 +32,63 @@ module Esper.ReactHelpers {
       sandbox = $("<div>");
       $("body").append(sandbox);
       this.listener = listener = jasmine.createSpy("listener");
-      this.elm = $('<div class="dog">');
-      sandbox.append(this.elm);
-      this.elm.renderReact(TestComponent, {});
     });
 
     afterEach(function() {
       sandbox.remove();
     });
-    it("should call componentWillUnmount when removed", function() {
-      this.elm.remove();
-      expect(listener).toHaveBeenCalled();
-    });
 
-    it("should call componentWillUnmount when parent is removed", function() {
-      sandbox.remove();
-      expect(listener).toHaveBeenCalled();
-    });
-
-    describe("Component referenced from jQuery element", function() {
+    describe("render into element in DOM", function() {
       beforeEach(function() {
-        this.component = this.elm.reactComponent();
+        this.elm = $('<div class="top">');
+        sandbox.append(this.elm);
+        this.elm.renderReact(TestComponent, {});
       });
 
-      it("should exist", function() {
-        expect(this.component).toBeDefined();
+      it("should call componentWillUnmount when removed", function() {
+        this.elm.remove();
+        expect(listener).toHaveBeenCalled();
       });
 
-      it("should be able to get parent", function() {
-        expect(this.component.parent().attr("class")).toEqual("dog");
+      it("should call componentWillUnmount when parent is removed", function() {
+        sandbox.remove();
+        expect(listener).toHaveBeenCalled();
       });
 
-      it("should be able to query itself", function() {
-        expect(this.component.find("div").attr("class")).toEqual("cat");
+      describe("Component referenced from jQuery element", function() {
+        beforeEach(function() {
+          this.component = this.elm.reactComponent();
+        });
+
+        it("should exist", function() {
+          expect(this.component).toBeDefined();
+        });
+
+        it("should be able to get itself", function() {
+          expect(this.component.jQuery().attr("class")).toEqual("dog");
+        });
+
+        it("should be able to get child element", function() {
+          expect(this.component.find("div").attr("class")).toEqual("cat");
+        });
+      });
+    });
+
+    describe("render into element before insertion into DOM", function() {
+      beforeEach(function() {
+        this.elm = $('<div class="top">');
+        this.elm.renderReact(TestComponent, {});
+        sandbox.append(this.elm);
+      });
+
+      it("should still render the React element", function() {
+        expect(sandbox.find(".cat").length).toBe(1);
+      });
+
+      it("should call componentWillUnmount when removed", function() {
+        expect(listener).not.toHaveBeenCalled();
+        this.elm.remove();
+        expect(listener).toHaveBeenCalled();
       });
     });
   });
@@ -107,12 +133,12 @@ module Esper.ReactHelpers {
     });
 
     it("should display initial state", function() {
-      expect(this.component.find("div").text()).toBe("initial");
+      expect(this.component.jQuery().text()).toBe("initial");
     });
 
     it("should display updated state on change", function() {
       stringStore.set("second");
-      expect(this.component.find("div").text()).toBe("second");
+      expect(this.component.jQuery().text()).toBe("second");
     });
   });
 }
