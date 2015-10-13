@@ -106,6 +106,13 @@ module Esper.TaskTab {
 '''
     taskTab.linkedThreadsList.children().remove();
 
+    function trunc(string) {
+      if (string.length > 28)
+        return string.substring(0, 25) + '...';
+      else
+        return string;
+    };
+
     List.iter(task.task_threads || [], function(thread : ApiT.EmailThread) {
       var linkedThreadId = thread.gmail_thrid;
       if (linkedThreadId !== threadId) {
@@ -119,7 +126,7 @@ module Esper.TaskTab {
 </li>
 '''
         a
-          .text(thread.subject)
+          .text(trunc(thread.subject))
           .attr("title", thread.subject)
           .click(function(e) {
             e.stopPropagation();
@@ -143,7 +150,7 @@ module Esper.TaskTab {
   <span #cross />
 </li>
 '''
-        a.text(thread.subject).attr("title", thread.subject);
+        a.text(trunc(thread.subject)).attr("title", thread.subject);
       }
       li.appendTo(threadsList);
     });
