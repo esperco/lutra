@@ -16,43 +16,25 @@ module Esper.ReminderView {
 
   var currentReminderState: ()=>ReminderState;
 
-  function renderGuest(guest) {
-'''
-<li #view>
-  <input type='checkbox' #check/>
-  <label #label/>
-</li>
-'''
-    var randomId = Util.randomString();
-    check.attr("id", randomId);
-    label.attr("for", randomId);
-
-    check.prop("checked", guest.checked);
-    check.change(function() {
-      guest.checked = check.is(":checked");
+  function changeRecipientsEvent(checkbox: JQuery,
+                                 recipients: JQuery,
+                                 guests: ReminderGuest[]) {
+    checkbox.change(function() {
+      if (guests == []) return;
+      var emails = recipients.val();
+      if ($(this).is(":checked"))
+        _.forEach(guests, function(guest: ReminderGuest) {
+          if (emails.search(/(^\s*$)|(,\s*$)/) != -1)
+            recipients.val(emails + guest.email + ", ");
+          else
+            recipients.val(emails + ", " + guest.email + ", ");
+        });
+      else
+        _.forEach(guests, function(guest: ReminderGuest) {
+          var regex = new RegExp(guest.email + ",? *", "i");
+          recipients.val(emails.replace(regex, ""));
+        });
     });
-
-    if (guest.name && guest.name.length > 0
-     && guest.name !== guest.email) {
-      label.text(guest.name + " <" + guest.email + ">");
-    } else {
-      label.text(guest.email);
-    }
-    return view;
-  }
-
-  function setupGuestGroup(groupView, groupCheck, groupList) {
-    if (groupList.is(":empty")) {
-      groupView.hide();
-    } else {
-      groupCheck.prop("checked", groupList.find("input:checkbox:not(:checked)")
-                                 .length <= 0);
-      groupCheck.change(function() {
-        var checkboxes = groupList.find("input:checkbox");
-        checkboxes.prop("checked", groupCheck.is(":checked"));
-        checkboxes.trigger("change");
-      });
-    }
   }
 
   function render(fromEmail, reminderState, eventTitle) {
@@ -69,26 +51,19 @@ module Esper.ReminderView {
   <tr>
     <td>To:</td>
     <td>
-      <div #yesGuests>
-        <input #yesCheck type='checkbox' id='yesCheck'/>
-        <label for='yesCheck'>Yes</label><br/>
-        <ul #yesGuestsList/>
-      </div>
-      <div #noGuests>
-        <input #noCheck type='checkbox' id='noCheck'/>
-        <label for='noCheck'>No</label><br/>
-        <ul #noGuestsList/>
-      </div>
-      <div #maybeGuests>
-        <input #maybeCheck type='checkbox' id='maybeCheck'/>
-        <label for='maybeCheck'>Maybe</label><br/>
-        <ul #maybeGuestsList/>
-      </div>
-      <div #noreplyGuests>
-        <input #noreplyCheck type='checkbox' id='noreplyCheck'/>
-        <label for='noreplyCheck'>Waiting for Reply</label><br/>
-        <ul #noreplyGuestsList/>
-      </div>
+      <input #yesCheckbox type='checkbox' id='yesCheck'/>
+      <label for='yesCheck'>Yes</label>
+      <br/>
+      <input #noCheckbox type='checkbox' id='noCheck'/>
+      <label for='noCheck'>No</label>
+      <br/>
+      <input #maybeCheckbox type='checkbox' id='maybeCheck'/>
+      <label for='maybeCheck'>Maybe</label>
+      <br/>
+      <input #noReplyCheckbox type='checkbox' id='noReplyCheck'/>
+      <label for='noReplyCheck'>Waiting for reply</label>
+      <br/>
+      <textarea #recipients class="esper-input esper-reminder-text" />
     </td>
   </tr>
   <tr>
@@ -112,8 +87,7 @@ module Esper.ReminderView {
   <tr>
     <td>Message:</td>
     <td>
-      <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
-Hello,
+      <textarea #reminderField class="esper-input esper-reminder-text">Hello,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
       </textarea>
@@ -134,6 +108,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   </tr>
 </table>
 '''
+    var yesGuestsList=[], noGuestsList=[], maybeGuestsList=[],
+      noReplyGuestsList=[];
 
     // viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
@@ -141,23 +117,23 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     List.iter(reminderState.guests, function(guest:ReminderGuest) {
       switch (guest.response) {
       case GuestResponse.Yes:
-        yesGuestsList.append(renderGuest(guest));
+        yesGuestsList.push(guest);
         break;
       case GuestResponse.No:
-        noGuestsList.append(renderGuest(guest));
+        noGuestsList.push(guest);
         break;
       case GuestResponse.Maybe:
-        maybeGuestsList.append(renderGuest(guest));
+        maybeGuestsList.push(guest);
         break;
       case GuestResponse.WaitingForReply:
-        noreplyGuestsList.append(renderGuest(guest));
+        noReplyGuestsList.push(guest);
         break;
       }
     });
-    setupGuestGroup(    yesGuests,     yesCheck,     yesGuestsList);
-    setupGuestGroup(     noGuests,      noCheck,      noGuestsList);
-    setupGuestGroup(  maybeGuests,   maybeCheck,   maybeGuestsList);
-    setupGuestGroup(noreplyGuests, noreplyCheck, noreplyGuestsList);
+    changeRecipientsEvent(yesCheckbox, recipients, yesGuestsList);
+    changeRecipientsEvent(noCheckbox, recipients, noGuestsList);
+    changeRecipientsEvent(maybeCheckbox, recipients, maybeGuestsList);
+    changeRecipientsEvent(noReplyCheckbox, recipients, noReplyGuestsList);
 
     if (reminderState.enable) {
       var selTime = 172800;
