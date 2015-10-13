@@ -87,7 +87,6 @@ module Esper.ApiT {
     email: string;
     teams: Team[];
     team_members: TeamMember[];
-    missing_shared_calendar: string; // teamid
     waiting_for_sync: boolean;
   }
 

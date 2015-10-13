@@ -138,13 +138,6 @@ module Esper.Login {
       return false;
   };
 
-  export function isEsperAssistant() {
-    if (Util.isDefined(data))
-      return data.is_esper_assistant === true;
-    else
-      return false;
-  };
-
   export function isAlias() {
     if (Util.isDefined(data))
       return data.is_alias === true;
@@ -163,8 +156,7 @@ module Esper.Login {
     if (Util.isDefined(data))
       return data.uid === team.team_executive
         && !isAdmin()
-        && !isAlias()
-        && !isEsperAssistant();
+        && !isAlias();
     else
       return false;
   };
