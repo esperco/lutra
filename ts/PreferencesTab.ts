@@ -131,6 +131,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-confirmation").is(":checked"),
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
+      send_followup_reminders:
+        div.find(".esper-prefs-followup-reminders").is(":checked"),
       double_booking_warning:
         div.find(".esper-prefs-double-booking").is(":checked"),
       no_location_warning:
@@ -1599,6 +1601,13 @@ module Esper.PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
+          <input #sendFollowupReminders type="checkbox"
+                 class="esper-prefs-followup-reminders"/>
+          Send me followup reminder emails
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
           <input #doubleBookingWarning type="checkbox"
                  class="esper-prefs-double-booking"/>
           Warn me if I try to schedule conflicting events
@@ -1650,6 +1659,8 @@ module Esper.PreferencesTab {
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
+      if (general.send_followup_reminders)
+        sendFollowupReminders.prop("checked", true);
       if (general.double_booking_warning)
         doubleBookingWarning.prop("checked", true);
       if (general.no_location_warning)
@@ -1666,6 +1677,7 @@ module Esper.PreferencesTab {
 
     sendConfirmation.click(saveGeneralPrefs);
     sendReminder.click(saveGeneralPrefs);
+    sendFollowupReminders.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
     noLocationWarning.click(saveGeneralPrefs);
     deleteHoldsInquiry.click(saveGeneralPrefs);

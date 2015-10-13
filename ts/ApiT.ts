@@ -321,6 +321,7 @@ type token_response = [
   export interface GeneralPrefs {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
+    send_followup_reminders: boolean;
     double_booking_warning: boolean;
     no_location_warning: boolean;
     delete_holds_inquiry: boolean;
