@@ -84,6 +84,12 @@ module Esper.ReactHelpers {
       it("should still render the React element", function() {
         expect(sandbox.find(".cat").length).toBe(1);
       });
+
+      it("should call componentWillUnmount when removed", function() {
+        expect(listener).not.toHaveBeenCalled();
+        this.elm.remove();
+        expect(listener).toHaveBeenCalled();
+      });
     });
   });
 

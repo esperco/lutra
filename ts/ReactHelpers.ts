@@ -37,10 +37,6 @@ module Esper.ReactHelpers {
         React.unmountComponentAtNode(self.get(0));
       });
 
-      if (! $.contains(document.documentElement, this.get(0))) {
-        throw new Error("Node must be in DOM before React render");
-      }
-
       var elm: React.ReactElement<any>;
       if (_.isFunction(elmOrCls)) {
         elm = React.createElement(elmOrCls, props);
