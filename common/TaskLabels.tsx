@@ -124,8 +124,6 @@ module Esper.TaskLabels {
     if (nextUpdates[taskId]) {
       var teamId = nextUpdates[taskId].teamId;
       var labels = nextUpdates[taskId].labels;
-
-      console.info("Put to server", labels);
       var callInProgress = callsInProgress[taskId] =
         Api.setTaskLabels(teamId, taskId, labels).then(function() {
           return saveToServer(taskId);
