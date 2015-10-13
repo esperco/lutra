@@ -215,9 +215,9 @@ module Esper.Gcal {
     }
 
     export function extractEventTitle() {
-      var title = $(".ep-title").text().trim();
+      var title = ($(".ep-title").text() || "").trim();
       return 0 < title.length ? title
-           : $(".ep-title input").val().trim();
+           : ($(".ep-title input").val() || "").trim();
     }
 
     /* Find a good insertion point: after "Calendar" dropdown row. */
