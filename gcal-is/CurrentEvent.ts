@@ -124,7 +124,8 @@ module Esper.CurrentEvent {
           ensure is saved to the server.
         */
         var newTask: ApiT.NewTask = {
-          task_title: Gcal.Event.extractEventTitle()
+          task_title: Gcal.Event.extractEventTitle(),
+          task_progress: "In_progress"
         };
         taskStore.set(function(oldTask, oldMetadata) {
           if (oldTask) {

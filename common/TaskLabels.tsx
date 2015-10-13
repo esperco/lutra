@@ -67,9 +67,29 @@ module Esper.TaskLabels {
 
     // Gets a list of labels based on what's checked
     getLabels(): string[] {
-      return $.map(this.find("input:checked"), function(elm) {
+      var checkedLabels = $.map(this.find("input:checked"), function(elm) {
         return $(elm).val();
       });
+
+      /*
+        If we have an existing task and set of labels, preserve any labels
+        not in our list, including task progress labels.
+      */
+      if (this.props.task) {
+        var nonTeamLabels = _.difference(this.props.task.task_labels,
+                                         this.props.team.team_labels);
+        checkedLabels = checkedLabels.concat(nonTeamLabels);
+      }
+
+      /*
+        Make sure we set a "in progress" label to prevent the "new" label
+        from being re-added
+      */
+      else {
+        checkedLabels.push(this.props.team.team_label_in_progress);
+      }
+
+      return checkedLabels;
     }
 
     protected onLabelClick(e) {
