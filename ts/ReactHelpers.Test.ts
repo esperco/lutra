@@ -18,7 +18,6 @@ module Esper.ReactHelpers {
       }
     }
 
-
     render() {
       return React.createElement("div", {className: "dog"}, [
         React.createElement("div", { className: "cat" })
@@ -65,13 +64,25 @@ module Esper.ReactHelpers {
           expect(this.component).toBeDefined();
         });
 
-        it("should be able to get parent", function() {
+        it("should be able to get itself", function() {
           expect(this.component.jQuery().attr("class")).toEqual("dog");
         });
 
-        it("should be able to query itself", function() {
+        it("should be able to get child element", function() {
           expect(this.component.find("div").attr("class")).toEqual("cat");
         });
+      });
+    });
+
+    describe("render into element before insertion into DOM", function() {
+      beforeEach(function() {
+        this.elm = $('<div class="top">');
+        this.elm.renderReact(TestComponent, {});
+        sandbox.append(this.elm);
+      });
+
+      it("should still render the React element", function() {
+        expect(sandbox.find(".cat").length).toBe(1);
       });
     });
   });
