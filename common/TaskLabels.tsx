@@ -96,4 +96,58 @@ module Esper.TaskLabels {
       this.props.handleChange(this.getLabels());
     }
   }
+
+  /*
+    Makes API call for updating labels for a particular eventId. In order to
+    avoid race conditions, avoids making multiple label update calls at the
+    same time and buffers the next call. Smart enough to combine multiple
+    pending label update calls into a single call.
+
+    Returns a promise ONLY if there is no currently pending call immediately
+    before function is called. This is to prevent multiple unnecessary
+    promise callbacks from being called.
+  */
+  export function putLabels(taskId: string, teamId: string, labels: string[]) {
+    nextUpdates[taskId] = {
+      teamId: teamId,
+      labels: labels
+    };
+
+    // Start server call if none in progress
+    if (!callsInProgress[taskId] ||
+        callsInProgress[taskId].state() !== "pending") {
+      return saveToServer(taskId);
+    }
+  }
+
+  function saveToServer(taskId: string): JQueryPromise<any> {
+    if (nextUpdates[taskId]) {
+      var teamId = nextUpdates[taskId].teamId;
+      var labels = nextUpdates[taskId].labels;
+
+      console.info("Put to server", labels);
+      var callInProgress = callsInProgress[taskId] =
+        Api.setTaskLabels(teamId, taskId, labels).then(function() {
+          return saveToServer(taskId);
+        });
+
+      // Delete nextUpdate so callback doesn't re-trigger
+      delete nextUpdates[taskId];
+
+      return callInProgress;
+    }
+  }
+
+  // Used above for tracking API label update calls by taskId
+  var callsInProgress: {
+    [index: string]: JQueryPromise<any>;
+  } = {};
+
+  // Used to track the next pending update for a taskId
+  var nextUpdates: {
+    [index: string]: {
+      teamId: string;
+      labels: string[];
+    }
+  } = {};
 }

@@ -20,14 +20,6 @@ module Esper.TaskLabels {
   }
 
   export class LabelListControl extends Component<LabelListControlProps, {}> {
-    /*
-      In order to avoid race conditions, we wait until the last update is
-      done until we send the next one. Since we're sending over the entire
-      set of labels we only need to store the next immediate update to send.
-    */
-    nextUpdate: string[];
-    callInProgress: JQueryPromise<any>;
-
     render() {
       var updating = this.props.taskMetadata &&
         this.props.taskMetadata.dataStatus === Model.DataStatus.FETCHING;
@@ -60,9 +52,6 @@ module Esper.TaskLabels {
     }
 
     handleLabelChange(labels: string[]) {
-      // If there is an in-progress update, just piggy back off of that
-      this.nextUpdate = labels;
-
       // Mark as busy, update our local source of truth
       CurrentEvent.taskStore.set(function(data, metadata) {
         if (data) {
@@ -80,37 +69,27 @@ module Esper.TaskLabels {
         return [data, metadata];
       });
 
-      // Start a request if none in progress
-      if (!this.callInProgress || this.callInProgress.state() !== "pending") {
-        this.saveToServer();
-      }
-    }
+      // Make call to server
+      var teamId = this.props.team.teamid;
+      CurrentEvent.getTask()
+        .then(function(task) {
+          var promise = putLabels(task.taskid, teamId, labels);
 
-    // Makes actual calls to server
-    // TODO: Move this out of component so we don't get warning about setting
-    // the state of an unmounted component
-    saveToServer() {
-      if (this.nextUpdate) {
-        var teamId = this.props.team.teamid;
-        var labels = this.nextUpdate;
-        this.callInProgress = CurrentEvent.getTask()
-          .then(function(task) {
-            return Api.setTaskLabels(teamId, task.taskid, labels);
-          });
-
-        // Delete nextUpdate so callback doesn't re-trigger
-        delete this.nextUpdate;
-
-        // Once call is done, re-check
-        this.callInProgress.done(this.saveToServer.bind(this));
-      } else {
-        // No longer busy
-        CurrentEvent.taskStore.set(function(data, metadata) {
-          metadata = _.clone(metadata);
-          metadata.dataStatus = Model.DataStatus.READY;
-          return [data, metadata];
-        });
-      }
+          /*
+            If we get a promise back, that means there were no prior pending
+            calls and we should attach a promise to handle saves completing
+          */
+          if (promise) { // No existing call, set up post handlers
+            promise.done(function() {
+              // No longer busy
+              CurrentEvent.taskStore.set(function(data, metadata) {
+                metadata = _.clone(metadata);
+                metadata.dataStatus = Model.DataStatus.READY;
+                return [data, metadata];
+              });
+            });
+          }
+        })
     }
   }
 }
