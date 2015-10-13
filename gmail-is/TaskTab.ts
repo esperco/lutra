@@ -102,7 +102,7 @@ module Esper.TaskTab {
                                            taskTab: TaskTabView) {
 '''
   <div #noThreads class="esper-no-threads">No linked emails</div>
-  <ol #threadsList class="esper-thread-list"/>
+  <ul #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
 
