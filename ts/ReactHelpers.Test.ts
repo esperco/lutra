@@ -127,12 +127,12 @@ module Esper.ReactHelpers {
     });
 
     it("should display initial state", function() {
-      expect(this.component.find("div").text()).toBe("initial");
+      expect(this.component.jQuery().text()).toBe("initial");
     });
 
     it("should display updated state on change", function() {
       stringStore.set("second");
-      expect(this.component.find("div").text()).toBe("second");
+      expect(this.component.jQuery().text()).toBe("second");
     });
   });
 }
