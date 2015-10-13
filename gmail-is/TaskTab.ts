@@ -1063,12 +1063,8 @@ module Esper.TaskTab {
 
     /* Task Label Stuff */
 
-    // Window.requestAnimationFrame ensures jQuery DOM is loaded before
-    // we render a React element
-    window.requestAnimationFrame(function() {
-      taskLabelsList.renderReact(
-        React.createElement(TaskLabels.LabelListControl, {}));
-    });
+    taskLabelsList.renderReact(
+      React.createElement(TaskLabels.LabelListControl, {}));
 
     showTaskLabels.click(function() {
       Sidebar.toggleList(taskLabelsContainer);
