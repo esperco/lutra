@@ -18,8 +18,11 @@ module Esper.ReactHelpers {
       }
     }
 
+
     render() {
-      return React.createElement("div", {className: "cat"});
+      return React.createElement("div", {className: "dog"}, [
+        React.createElement("div", { className: "cat" })
+      ]);
     }
   }
 
@@ -30,39 +33,45 @@ module Esper.ReactHelpers {
       sandbox = $("<div>");
       $("body").append(sandbox);
       this.listener = listener = jasmine.createSpy("listener");
-      this.elm = $('<div class="dog">');
-      sandbox.append(this.elm);
-      this.elm.renderReact(TestComponent, {});
     });
 
     afterEach(function() {
       sandbox.remove();
     });
-    it("should call componentWillUnmount when removed", function() {
-      this.elm.remove();
-      expect(listener).toHaveBeenCalled();
-    });
 
-    it("should call componentWillUnmount when parent is removed", function() {
-      sandbox.remove();
-      expect(listener).toHaveBeenCalled();
-    });
-
-    describe("Component referenced from jQuery element", function() {
+    describe("render into element in DOM", function() {
       beforeEach(function() {
-        this.component = this.elm.reactComponent();
+        this.elm = $('<div class="top">');
+        sandbox.append(this.elm);
+        this.elm.renderReact(TestComponent, {});
       });
 
-      it("should exist", function() {
-        expect(this.component).toBeDefined();
+      it("should call componentWillUnmount when removed", function() {
+        this.elm.remove();
+        expect(listener).toHaveBeenCalled();
       });
 
-      it("should be able to get parent", function() {
-        expect(this.component.parent().attr("class")).toEqual("dog");
+      it("should call componentWillUnmount when parent is removed", function() {
+        sandbox.remove();
+        expect(listener).toHaveBeenCalled();
       });
 
-      it("should be able to query itself", function() {
-        expect(this.component.find("div").attr("class")).toEqual("cat");
+      describe("Component referenced from jQuery element", function() {
+        beforeEach(function() {
+          this.component = this.elm.reactComponent();
+        });
+
+        it("should exist", function() {
+          expect(this.component).toBeDefined();
+        });
+
+        it("should be able to get parent", function() {
+          expect(this.component.jQuery().attr("class")).toEqual("dog");
+        });
+
+        it("should be able to query itself", function() {
+          expect(this.component.find("div").attr("class")).toEqual("cat");
+        });
       });
     });
   });
