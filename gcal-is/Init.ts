@@ -1,6 +1,7 @@
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="./CurrentEvent.ts" />
+/// <reference path="./CalSidebar.tsx" />
 
 module Esper.Init {
   export var esperRootUrl : string;
@@ -172,6 +173,9 @@ module Esper.Init {
           Teams.initialize(true);
         }
       });
+
+      // Initialize sidebar watchers
+      CalSidebar.init();
 
       // Initialize watcher of current eventId
       CurrentEvent.init();

@@ -70,6 +70,10 @@
     border: 0;
   }
 
+  hr {
+    display: block;
+  }
+
   // Busy indicator
   .modal-footer .esper-spinner {
     float: left;
@@ -823,6 +827,27 @@ textarea.esper-input { resize: none; }
   }
 }
 
+/*** Esper Calendar Sidebar ***/
+
+.esper-cal-sidebar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 110px;
+  width: 300px;
+
+  // Set so this sits on top of every in Google Calendar except the very top
+  // One Google bar
+  z-index: 500;
+
+  // Override this in child elements to make them clickable
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
 /*** Esper Dock ***/
 
 .esper-dock-container {
@@ -859,6 +884,12 @@ textarea.esper-input { resize: none; }
   bottom: 36px;
   width: @sidebar_width + 14px;
   height: 7px;
+  opacity: 1;
+
+  transition: opacity 0.3s;
+  &.esper-hide {
+    opacity: 0;
+  }
 }
 
 .esper-dock-wrap-left {
@@ -955,6 +986,14 @@ textarea.esper-input { resize: none; }
   margin: 0 20px 0 0;
 }
 
+.esper-dock .dropdown-menu {
+  width: @sidebar_width;
+
+  .esper-dropdown-footer {
+    padding: 3px 15px
+  }
+}
+
 .esper-team-checkmark {
   float: right;
   width: 12px;
@@ -1010,6 +1049,40 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   top: 8px;
   right: 21px;
   bottom: 0;
+
+  // Used for simple sidebar without tabs or anything else
+  &.esper-sidebar-simple {
+    padding: 10px 10px 36px 10px;
+    background: white;
+    border: 1px solid @google_border_gray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: top 0.3s;
+
+    // TODO: Refactor transition stuff into all sidebar code?
+    &.esper-hide {
+      top: 100%;
+    }
+
+    .esper-subheading {
+      font-weight: bold;
+      padding: 10px 0;
+      border-bottom: 1px solid @google_border_gray;
+      margin: 0 0 10px;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      .fa-refresh {
+        .esper-link;
+        float: right;
+      }
+    }
+  }
 }
 
 .esper-tab {
@@ -1197,6 +1270,11 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border: 1px solid @google_border_gray;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+}
+
+.esper-subsection-footer {
+  border-top: 1px solid @google_border_gray;
+  padding: 10px 0;
 }
 
 .esper-save-notes {
@@ -1448,6 +1526,7 @@ ul.esper-availability-graph {
 
 .esper-no-events,
 .esper-no-prefs,
+.esper-no-labels,
 .esper-no-threads {
   padding: 50px 0;
   font-size: 16px;
@@ -1456,7 +1535,10 @@ ul.esper-availability-graph {
 }
 
 .esper-events-list { padding: 0 10px; }
-.esper-events-list-loading { padding: 24px 0; }
+.esper-events-list-loading, .esper-sidebar-loading { padding: 24px 0; }
+.esper-label-list {
+  padding: 10px 10px 0;
+}
 
 .esper-ev {
   padding: 14px 0 16px 0;
@@ -2501,6 +2583,12 @@ textarea.esper-description-text {
   animation: scaleout 1.0s ease-in-out 0s infinite;
   &.esper-tab-header-spinner { display: block; }
   &.esper-list-spinner { display: block; }
+  &.esper-sidebar-spinner {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 35px auto;
+  }
   &.esper-inline-spinner {
     display: block;
     width: 75px;
@@ -2514,12 +2602,6 @@ textarea.esper-description-text {
   display: block;
   height: 32px;
   width: 32px;
-}
-
-.esper-sidebar-spinner {
-  margin: 25% auto 0;
-  width: 60px;
-  height: 60px;
 }
 
 .esper-tab-header-spinner {

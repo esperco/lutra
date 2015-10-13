@@ -1,3 +1,5 @@
+/// <reference path="./TaskLabels.Gmail.tsx" />
+
 module Esper.TaskTab {
 
   var taskLabelCreate = "Create or Link to Other Task";
@@ -648,6 +650,14 @@ module Esper.TaskTab {
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
+
+    taskLabelsHeader: JQuery;
+    showTaskLabels: JQuery;
+    refreshTaskLabels: JQuery;
+    refreshTaskLabelsIcon: JQuery;
+    taskLabelsSpinner: JQuery;
+    taskLabelsContainer: JQuery;
+    taskLabelsList: JQuery;
   }
 
   function meetingTypeDropdown(taskTitle : JQuery,
@@ -693,6 +703,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.hide();
       currentTaskTab.taskSpinner.show();
+      currentTaskTab.taskLabelsList.hide();
+      currentTaskTab.taskLabelsSpinner.show();
     }
   }
 
@@ -700,6 +712,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.show();
       currentTaskTab.taskSpinner.hide();
+      currentTaskTab.taskLabelsList.show();
+      currentTaskTab.taskLabelsSpinner.hide();
     }
   }
 
@@ -790,6 +804,25 @@ module Esper.TaskTab {
         <div #linkedEventsList/>
       </div>
     </div>
+    <div class="esper-section">
+      <div #taskLabelsHeader
+           class="esper-section-header esper-clearfix esper-open">
+        <span #showTaskLabels
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Labels</span>
+        <div #refreshTaskLabels
+             class="esper-refresh esper-clickable">
+          <object #refreshTaskLabelsIcon class="esper-svg"/>
+        </div>
+      </div>
+      <div #taskLabelsContainer class="esper-section-container" >
+        <div #taskLabelsSpinner class="esper-events-list-loading" >
+          <div class="esper-spinner esper-list-spinner" />
+        </div>
+        <div #taskLabelsList class="esper-label-list">
+        </div>
+      </div>
+    </div>
 
     <hr class="esper-hr"/>
     <div class="esper-clearfix esper-workflow-gap esper-section">
@@ -849,6 +882,7 @@ module Esper.TaskTab {
     refreshLinkedThreadsIcon.attr("data",
       Init.esperRootUrl + "img/refresh.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
 
@@ -912,6 +946,7 @@ module Esper.TaskTab {
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
         linkedThreadsSpinner.hide();
+        taskLabelsSpinner.hide();
         taskProgressSpinner.hide();
 
         Api.getPreferences(team.teamid).done(function(prefs) {
@@ -1025,6 +1060,33 @@ module Esper.TaskTab {
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
     });
+
+    /* Task Label Stuff */
+
+    // Window.requestAnimationFrame ensures jQuery DOM is loaded before
+    // we render a React element
+    window.requestAnimationFrame(function() {
+      taskLabelsList.renderReact(
+        React.createElement(TaskLabels.LabelListControl, {}));
+    });
+
+    showTaskLabels.click(function() {
+      Sidebar.toggleList(taskLabelsContainer);
+      if (showTaskLabels.text() === "Hide") {
+        showTaskLabels.text("Show");
+        taskLabelsHeader.removeClass("esper-open");
+      } else {
+        showTaskLabels.text("Hide");
+        taskLabelsHeader.addClass("esper-open");
+      }
+    });
+
+    refreshTaskLabels.click(function() {
+      CurrentThread.refreshTaskForThread(false);
+    });
+
+
+    /////
 
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {

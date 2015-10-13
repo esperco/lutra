@@ -163,6 +163,7 @@ module Esper.Auth {
             request.value.googleAccountId,
             function() { Log.d("Removed credentials from storage"); }
           );
+          window.location.reload();
           break;
 
         case "ClearSyncStorage":
