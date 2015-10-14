@@ -193,14 +193,15 @@ module Esper.CalEventView {
         var state: ReminderView.ReminderGuest = {
           email: guest.attr("title"),
           name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
-          response: response,
-          checked: false
+          response: response
         };
         guestsState.push(state);
       });
 '''
 <div #view class="reminder-button">
-  <button #reminderButton class="esper-btn esper-btn-primary">Reminder</button>
+  <button #reminderButton class="esper-btn esper-btn-primary esper-reminder-btn">
+    Set Reminder
+  </button>
 </div>
 '''
       ReminderView.openReminderOnClick(reminderButton,
