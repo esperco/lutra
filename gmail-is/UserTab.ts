@@ -600,7 +600,6 @@ module Esper.UserTab {
   <div #profPic class="esper-profile-pic"/>
   <div class="esper-profile-row esper-profile-name-row">
     <span #name class="esper-profile-name"/>
-    <span #membership class="esper-badge"/>
     <object #appleLogo class="esper-svg esper-ios-app-icon"/>
   </div>
   <div #email class="esper-profile-row esper-profile-email"/>
@@ -636,25 +635,6 @@ module Esper.UserTab {
           appleLogo.hide();
         }
       });
-
-    Api.getCustomerStatus(teamid).done(function(customer) {
-      var sub = customer.status;
-      var plan = customer.plan;
-
-      if (sub === "Trialing" || sub === "Active") {
-        membership.addClass("esper-active");
-      } else if (sub === "Past_due" || sub === "Canceled" || sub === "Unpaid") {
-        membership.addClass("esper-suspended");
-      } else {
-        sub = "No Subscription";
-        membership.addClass("esper-suspended");
-      }
-
-      if (sub === "Active" && plan !== undefined) {
-        sub = Util.nameOfPlan(plan);
-      }
-      membership.text(sub.replace("_", " ").toUpperCase());
-    });
 
     return view;
   }
