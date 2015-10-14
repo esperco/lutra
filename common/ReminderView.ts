@@ -4,7 +4,6 @@ module Esper.ReminderView {
     email: string;
     name: string;
     response: GuestResponse;
-    checked: boolean;
   }
   interface ReminderState {
     enable: boolean;
@@ -12,6 +11,7 @@ module Esper.ReminderView {
     text: string;
     time: number;
     guests: ReminderGuest[];
+    emailList: string[];
   }
 
   var currentReminderState: ()=>ReminderState;
@@ -24,7 +24,6 @@ module Esper.ReminderView {
       var emails = recipients.val();
       if ($(this).is(":checked"))
         _.forEach(guests, function(guest: ReminderGuest) {
-          guest.checked = true;
           if (emails.search(/(^\s*$)|(,\s*$)/) != -1)
             recipients.val(emails + guest.email + ", ");
           else
@@ -32,7 +31,6 @@ module Esper.ReminderView {
         });
       else
         _.forEach(guests, function(guest: ReminderGuest) {
-          guest.checked = false;
           var regex = new RegExp(guest.email + ",? *", "i");
           recipients.val(emails.replace(regex, ""));
         });
@@ -54,16 +52,16 @@ module Esper.ReminderView {
     <td>To:</td>
     <td>
       <input #yesCheckbox type='checkbox' id='yesCheck'/>
-      <label for='yesCheck'>Yes</label>
+      <label #yesLabel for='yesCheck'>Yes</label>
       <br/>
       <input #noCheckbox type='checkbox' id='noCheck'/>
-      <label for='noCheck'>No</label>
+      <label #noLabel for='noCheck'>No</label>
       <br/>
       <input #maybeCheckbox type='checkbox' id='maybeCheck'/>
-      <label for='maybeCheck'>Maybe</label>
+      <label #maybeLabel for='maybeCheck'>Maybe</label>
       <br/>
       <input #noReplyCheckbox type='checkbox' id='noReplyCheck'/>
-      <label for='noReplyCheck'>Waiting for reply</label>
+      <label #noReplyLabel for='noReplyCheck'>Waiting for reply</label>
       <br/>
       <textarea #recipients class="esper-input esper-reminder-text" />
     </td>
@@ -137,6 +135,11 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     changeRecipientsEvent(maybeCheckbox, recipients, maybeGuestsList);
     changeRecipientsEvent(noReplyCheckbox, recipients, noReplyGuestsList);
 
+    yesLabel.text(yesLabel.text() + " (" + yesGuestsList.length + ")");
+    noLabel.text(noLabel.text() + " (" + noGuestsList.length + ")");
+    maybeLabel.text(maybeLabel.text() + " (" + maybeGuestsList.length + ")");
+    noReplyLabel.text(noReplyLabel.text() + " (" + noReplyGuestsList.length + ")");
+
     if (reminderState.enable) {
       var selTime = 172800;
       selectTime.find("option").each(function(i, opt) {
@@ -162,6 +165,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       reminderState.time = selTime;
       reminderState.bccMe = bcc.is(":checked");
       reminderState.text = reminderField.text();
+      reminderState.emailList = recipients.val().split(/\s*,\s*/);
       return reminderState;
     };
 
@@ -191,18 +195,16 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           } else {
             Api.disableReminderForGuest(eventId, fromEmail);
           }
-          List.iter(reminderState.guests, function(guest) {
-            if (guest.checked) {
-              var guestReminder = {
-                guest_email: guest.email,
-                guest_name: guest.name,
-                reminder_message: reminderState.text
-              }
-              Api.enableReminderForGuest(eventId,
-                guestReminder.guest_email, guestReminder);
-            } else {
-              Api.disableReminderForGuest(eventId, guest.email);
+          _.forEach(reminderState.emailList, function(email) {
+            if (email === "") return;
+            var guestReminder = {
+              guest_email: email,
+              guest_name: _.result(
+                _.find(reminderState.guests, 'email', email), 'name', ""),
+              reminder_message: reminderState.text
             }
+            Api.enableReminderForGuest(eventId,
+              email, guestReminder);
           });
           return true;
         } else {
@@ -233,16 +235,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         var text = 0 < event_reminders.guest_reminders.length
                  ? event_reminders.guest_reminders[0].reminder_message
                  : null;
-        List.iter(guests, function(guest: ReminderGuest) {
-          guest.checked = List.exists(event_reminders.guest_reminders,
-                                      sameEmail(guest.email));
-        });
         var reminderState: ReminderState = {
           enable: enable,
           bccMe: List.exists(event_reminders.guest_reminders, sameEmail(email)),
           text: text,
           time: time,
-          guests: guests
+          guests: guests,
+          emailList: []
         };
         button.click(function() {
           openReminder(teamid, email, calendarId, eventId, eventTitle,

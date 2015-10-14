@@ -234,8 +234,7 @@ module Esper.EventWidget {
       return {
         name:  guest.display_name,
         email: guest.email,
-        response: response,
-        checked: false
+        response: response
       };
     });
     ReminderView.openReminderOnClick(reminder,

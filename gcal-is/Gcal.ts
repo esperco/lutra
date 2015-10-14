@@ -83,12 +83,12 @@ module Esper.Gcal {
   }
 
   export function findAnchorForReminderDropdown(): JQuery {
-    var heading = $(".ep-gl-guests-header"); // The word "Guests"
-    if (heading.length !== 1) {
+    var anchor = $(".ep-gl"); // The container for the guest list
+    if (anchor.length !== 1) {
       Log.e("Cannot find anchor point for the Esper reminder dropdown.");
       return $();
     }
-    else return heading.parent();
+    else return anchor;
   }
 
   export function waitForGuestsToLoad(callback: (x: JQuery) => void) {
