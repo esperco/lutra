@@ -24,6 +24,7 @@ module Esper.ReminderView {
       var emails = recipients.val();
       if ($(this).is(":checked"))
         _.forEach(guests, function(guest: ReminderGuest) {
+          guest.checked = true;
           if (emails.search(/(^\s*$)|(,\s*$)/) != -1)
             recipients.val(emails + guest.email + ", ");
           else
@@ -31,6 +32,7 @@ module Esper.ReminderView {
         });
       else
         _.forEach(guests, function(guest: ReminderGuest) {
+          guest.checked = false;
           var regex = new RegExp(guest.email + ",? *", "i");
           recipients.val(emails.replace(regex, ""));
         });
