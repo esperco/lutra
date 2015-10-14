@@ -176,13 +176,9 @@ module Esper.EventWidget {
                    esper-clickable esper-ev-disclose"/>
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
-      <li #inviteGuests
-          class="esper-li">
-        Invite guests
-      </li>
       <li #chooseThisEvent
           class="esper-li">
-        Choose this event
+        Confirm Event
       </li>
       <li #editEvent
           class="esper-li">
@@ -197,7 +193,7 @@ module Esper.EventWidget {
         Unlink event
       </li>
       <li #deleteEvent
-          class="esper-li esper-danger">
+          class="esper-li">
         Delete event
       </li>
     </div>
@@ -221,14 +217,6 @@ module Esper.EventWidget {
       EventControls.insertAfterThread(e);
       Gmail.scrollToEventControl();
       Analytics.track(Analytics.Trackable.ClickTaskTabEditEvent);;
-    });
-
-    inviteGuests.click(function() {
-      CurrentThread.withPreferences(function(preferences) {
-        FinalizeEvent.inviteGuests(e, preferences);
-        Gmail.scrollToEventControl();
-      });
-      Analytics.track(Analytics.Trackable.ClickTaskTabInviteGuests);
     });
 
     var reminderGuests = List.map(e.guests, function(guest) {
