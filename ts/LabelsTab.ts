@@ -41,18 +41,24 @@ module Esper.LabelsTab {
       cancel.hide();
       newLabel.addClass("disabled");
       save.attr("disabled", "true");
-      var label = newLabel.val();
+      var labels = newLabel.val() || "";
+      labels = labels.split(",");
       Api.getSyncedLabels(team.teamid).done(function(response) {
-        teamLabels.push(label);
-        response.labels.push(label);
+        _.each(labels, function(label: string) {
+          label = label.trim();
+          teamLabels.push(label);
+          response.labels.push(label);
+        });
         Api.putSyncedLabels(team.teamid, { labels: response.labels })
           .done(function() {
             view.addClass("reset");
             Settings.togglePopover(_view);
             table.tableEmpty.hide();
-            var newRow = viewOfLabelRow(team, label);
-            table.labels.prepend(newRow);
-            newRow.addClass("purple-flash");
+            _.each(labels, function(label: string) {
+              var newRow = viewOfLabelRow(team, label);
+              table.labels.prepend(newRow);
+              newRow.addClass("purple-flash");
+            });
           });
       });
     });
