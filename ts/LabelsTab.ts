@@ -4,60 +4,87 @@
 
 module Esper.LabelsTab {
 
-  function renderLabelDialog(team, table, teamLabels) {
+  function renderLabelDialog(team, table, teamLabels: string[]) {
 '''
-<div #view class="new-label-popover overlay-popover click-safe">
-  <div class="overlay-popover-header click-safe">New team label</div>
+<div #view>
+  <div class="overlay-popover-header click-safe">
+    <i class="fa fa-fw fa-tags"></i>
+    Add New Labels (Separate by Comma)
+  </div>
   <div class="overlay-popover-body click-safe">
     <input #newLabel type="text" class="new-label-input click-safe"
-           autofocus placeholder="Untitled label"/>
+           autofocus placeholder="My First Label, My Second Label"/>
     <div class="clearfix click-safe">
       <div #error class="new-label-error click-safe">
         This label already exists.</div>
       <button #save class="button-primary label-btn click-safe"
               disabled>Save</button>
       <div #inlineSpinner class="spinner inline-spinner"/>
-      <button #cancel class="button-secondary label-btn">Cancel</button>
   </div>
 </div>
 '''
-    newLabel.keyup(function() {
-      if (newLabel.val() != "") {
-        if (teamLabels.indexOf(newLabel.val()) > -1) {
+    newLabel.keyup(function(e) {
+      if (newLabel.val() !== "") {
+        if (hasDuplicateLabels()) {
           save.prop("disabled", true);
           error.css("display", "inline-block");
-        } else {
+        }
+        else {
           save.prop("disabled", false);
           error.hide();
+
+          if (e.keyCode === 13) { // Enter
+            e.stopPropagation();
+            saveLabels();
+          }
         }
       }
       else
         save.prop("disabled", true);
     });
 
-    save.click(function() {
+    function hasDuplicateLabels() {
+      var labelVal: string = newLabel.val() || "";
+      var labels = _.map(labelVal.split(","), function(l) {
+        return l.trim().toLowerCase();
+      });
+      var existing = _.map(teamLabels, function(l) {
+        return l.trim().toLowerCase();
+      });
+      return _.intersection(labels, existing).length > 0;
+    }
+
+    function saveLabels() {
       inlineSpinner.show();
       save.hide();
-      cancel.hide();
-      newLabel.addClass("disabled");
-      save.attr("disabled", "true");
-      var label = newLabel.val();
+      save.prop("disabled", true);
+      newLabel.prop("disabled", true);
+      var labels = newLabel.val() || "";
+      labels = labels.split(",");
       Api.getSyncedLabels(team.teamid).done(function(response) {
-        teamLabels.push(label);
-        response.labels.push(label);
+        _.each(labels, function(label: string) {
+          label = label.trim();
+          teamLabels.push(label);
+          response.labels.push(label);
+        });
         Api.putSyncedLabels(team.teamid, { labels: response.labels })
           .done(function() {
-            view.addClass("reset");
-            Settings.togglePopover(_view);
+            inlineSpinner.hide();
+            save.show();
+            save.prop("disabled", false);
+            newLabel.prop("disabled", false);
+            newLabel.val("");
             table.tableEmpty.hide();
-            var newRow = viewOfLabelRow(team, label);
-            table.labels.prepend(newRow);
-            newRow.addClass("purple-flash");
+            _.each(labels, function(label: string) {
+              var newRow = viewOfLabelRow(team, label);
+              table.labels.prepend(newRow);
+              newRow.addClass("purple-flash");
+            });
           });
       });
-    });
+    }
 
-    cancel.click(function() { Settings.togglePopover(_view); });
+    save.click(saveLabels);
 
     return _view;
   }
@@ -107,21 +134,11 @@ module Esper.LabelsTab {
     <div #tableEmpty
          class="table-empty">No labels are set for this team.</div>
   </ul>
-  <div class="clearfix">
-    <div #labelIconContainer class="img-container-left"/>
-    <a #create disabled
-       class="link popover-trigger click-safe"
-       style="float:left">Add a team label</a>
-  </div>
 </div>
 '''
-    var labelIcon = $("<img class='svg-block label-icon'/>")
-      .appendTo(labelIconContainer);
-    Svg.loadImg(labelIcon, "/assets/img/new-label.svg");
-
     tableSpinner.show();
 
-    var teamLabels;
+    var teamLabels: string[];
 
     Api.getSyncedLabels(team.teamid).done(function(response) {
       teamLabels = response.labels;
@@ -137,10 +154,6 @@ module Esper.LabelsTab {
       }
       var popover = renderLabelDialog(team, _view, teamLabels);
       view.append(popover.view);
-      create.click(function() {
-        popover.newLabel.val("");
-        Settings.togglePopover(popover);
-      });
     });
 
     return view;
