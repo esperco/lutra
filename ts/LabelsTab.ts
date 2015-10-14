@@ -6,7 +6,7 @@ module Esper.LabelsTab {
 
   function renderLabelDialog(team, table, teamLabels: string[]) {
 '''
-<div #view class="">
+<div #view>
   <div class="overlay-popover-header click-safe">
     <i class="fa fa-fw fa-tags"></i>
     Add New Labels (Separate by Comma)
