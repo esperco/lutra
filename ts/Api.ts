@@ -143,23 +143,21 @@ module Esper.Api {
     : JQueryPromise<ApiT.LoginResponse>
   {
     return jsonHttpGet("/api/login/" + string(Login.me())
-                       + "/info?msc=true");
+                       + "/info");
   }
 
   export function loginAs(theirEmail)
     : JQueryPromise<ApiT.LoginResponse>
   {
     return jsonHttpGet("/api/login-as/" + string(Login.me())
-                       + "/" + string(theirEmail)
-                       + "?msc=true");
+                       + "/" + string(theirEmail));
   }
 
   export function loginOnce(uid, loginNonce)
     : JQueryPromise<ApiT.LoginResponse>
   {
     return jsonHttpPost("/api/login/" + string(uid)
-                        + "/once/" + string(loginNonce)
-                        + "?msc=true",
+                        + "/once/" + string(loginNonce),
                         "");
   }
 

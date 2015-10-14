@@ -23,6 +23,7 @@ module Esper.ApiT {
     team_approved: boolean;
     team_executive: string;
     team_assistants: string[];
+    team_primary_assistant?: string;
     team_calendars: Calendar[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
@@ -87,7 +88,6 @@ module Esper.ApiT {
     email: string;
     teams: Team[];
     team_members: TeamMember[];
-    missing_shared_calendar: string; // teamid
     waiting_for_sync: boolean;
   }
 
