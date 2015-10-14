@@ -32,7 +32,8 @@
         "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
         "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
-        "https://mail.google.com/mail/*"
+        "https://calendar.google.com/*",
+        "https://mail.google.com/*"
       ],
       "js": ["js/vendor.js", "js/content-script.js"],
 
@@ -49,7 +50,8 @@
       "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
       "https://app.esper.com/*",
       "https://www.google.com/calendar/*",
-      "https://mail.google.com/mail/*"
+      "https://calendar.google.com/*",
+      "https://mail.google.com/*"
     ]
   },
 

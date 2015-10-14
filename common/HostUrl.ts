@@ -4,7 +4,8 @@ module HostUrl {
   }
 
   export function isGcal(url: string) {
-    return (/^https:\/\/www\.google\.com\/calendar\//).test(url);
+    return (/^https:\/\/www\.google\.com\/calendar\//).test(url)
+        || (/^https:\/\/calendar\.google\.com\//).test(url);
   }
 
   export function hasExtension(url: string) {
