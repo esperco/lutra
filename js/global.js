@@ -8,6 +8,7 @@ function toggleNavMenu() {
   }
 }
 
+/*
 function slider() {
   $(window).scroll(slideNavbar);
 
@@ -22,7 +23,7 @@ function slider() {
   $(".navbar-container").hide();
   $(".navbar-container-mobile").hide();
   slideNavbar();
-}
+}*/
 
 function resizer() {
   var splash = $(".splash");
@@ -48,10 +49,8 @@ function resizer() {
 function loadElements() {
   $(".nav-menu").load("nav-menu");
   $(".navbar-container").load("navbar", function() {
-    $(".splash-navbar").load("splash-navbar", function() {
-      $(".nav-menu").click(function() { toggleNavMenu(); });
-      $(".nav-menu-toggle").click(function() { toggleNavMenu(); });
-    });
+    $(".nav-menu").click(function() { toggleNavMenu(); });
+    $(".nav-menu-toggle").click(function() { toggleNavMenu(); });
   });
   $(".about-navbar").load("about-navbar", function() {
     var page = $(".about-navbar").attr("id");
@@ -91,7 +90,6 @@ function main() {
   loadElements();
   loadPricingDescription();
   resizer();
-  slider();
  }
 
 $(document).ready(main);

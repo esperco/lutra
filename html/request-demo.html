@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Waiting List | Esper</title>
+    <title>Request Demo | Esper</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat">
@@ -17,30 +17,27 @@
     <script src="js/global.js"></script>
   </head>
 
-  <body>
-
-    <!-- Navbar -->
+  <!-- Navbar -->
     <div class="navbar-container"></div>
     <ul class="nav-menu"></ul>
 
+  <body>
     <!-- Splash -->
     <!-- <div class="splash-purple short"></div> -->
-    <div class="splash-content text-only">
-      <div class="splash-navbar clearfix"></div>
+    <!-- <div class="splash-content text-only">
+    <div class="splash-navbar clearfix"></div>
       <div class="splash-text-container">
         <div class="splash-text">
           <h1>Good things come to those who wait.</h1>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Overview -->
     <div class="section-container gray left-align">
-      <div class="section-content narrow">
-        Esper is currently in private beta, but if you sign up for our mailing
-        list below, we'll contact you as soon as we can support you. You can
-        also <a href="/faqs">check out our FAQs</a> or
-        <a href="/contact">contact us directly</a>.
+      <div class="section-content verynarrow">
+        Thanks for signing up. We'll reach out to you shortly!
+        <br>You can also <a href="mailto:allofus@esper.com">contact us directly</a>.
       </div>
 
       <!-- Signup Form -->
@@ -62,7 +59,7 @@
             <input type="email" placeholder="Email Address" name="EMAIL" class="required" id="email">
           </div>
           <div class="clearfix">
-            <select name="MMERGE3" class="required esper-select" id="platform" onchange="this.className=this.options[this.selectedIndex].className">
+            <select name="MMERGE3" class="required esper-select" style="font-size: 16px" id="platform" onchange="this.className=this.options[this.selectedIndex].className">
               <option selected disabled value="none">Email / Calendar Client</option>
               <option class="esper-select option-black" value="Google Apps">Google Apps</option>
               <option class="esper-select option-black" value="Microsoft Exchange">Microsoft Exchange</option>
@@ -72,7 +69,7 @@
             </select>
           </div>
           <div class="submit-button-row" align="right">
-            <button id="signup-btn" class="button-primary" type="submit">Join Mailing List</button>
+            <button id="signup-btn" class="button-primary green" type="submit">Request Demo</button>
           </div>
           <div id="mce-responses" class="clear">
             <div class="response" id="mce-error-response" style="display:none"></div>

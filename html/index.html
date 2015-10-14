@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="css/bootstrap.css" media"screen">
 <link rel="stylesheet" href="css/default.css" media="screen">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 <link rel="stylesheet" href="css/animate.min.css">
@@ -16,131 +17,265 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 <script src="js/global.js"></script>
 </head>
-<body>
 
+<!--Note for Andrew Fong: For the new fixed navbar to look nice, navbar must be -before- the body section-->
 <!-- Navbar -->
 <div class="navbar-container"></div>
 <ul class="nav-menu"></ul>
 
 <!-- Splash -->
-<div class="splash-content" style="background-image:url(img/splash_home.jpg)">
-  <div class="splash-navbar clearfix"></div>
+<body>
+<div class="splash-content large" style="background-image:url(img/splash_home.jpg)">
   <div class="splash-text-container" align="center" >
-    <div class="splash-text">
-      <h1>Focus on the important things.</h1>
-      <h2 class="splash-text-subheader">Maximize your time with an Esper assistant.</h2>
-      <h2> </h2>
+    <div class="splash-text" style="padding-bottom: 30px">
+      <h1 style="padding-bottom: 30px"><b>You can do it all, we're here to help.</b></h1>
+      <h2 class="splash-text-subheader" style="font-size:24px">Esper for Executive Assistants supercharges your inbox<br>to expertly handle any task.</h2>
     </div>
-    <!-- <a href="https://app.esper.com/#!join">
-      <button class="button-primary index">
-        Try Esper for free&nbsp;&nbsp;<i class="fa fa-arrow-right"></i>
+     <a href="request-demo">
+      <button class="button-primary index green">
+       Request Demo
       </button>
     </a>
     <span class="xs-spacer"></span>
-    <a href="pricing">
+    <a href="#learn">
       <button class="button-tertiary index">
-        Memberships
+        Learn More
       </button>
-    </a> -->
+    </a>
+    <br/>
+    <br/>
   </div>
 </div>
 
 
-<!-- Steps -->
-<div class="section-container gray">
-  <div class="section-content clearfix">
-    <h1 class="how-it-works">Scheduling Made Easy</h1>
-    <div class="step">
-      <div class="number purple">1</div>
-      <div class="connector"></div>
-      <h3 class="step-title">CC ESPER</h3>
-      <p class="step-description">Include your Esper Assistant on any email, and get back to work. One message, and you're done.</p>
-    </div>
-    <div class="step">
-      <div class="number orange">2</div>
-      <div class="connector"></div>
-      <h3 class="step-title">WE TAKE CARE OF IT</h3>
-      <p class="step-description">Your Esper Assistant will use your preferences to plan convenient meeting times and complete any basic task.</p>
-    </div>
-    <div class="step last">
-      <div class="number green">3</div>
-      <h3 class="step-title">CHECK YOUR INBOX</h3>
-      <p class="step-description">Once a meeting has been confirmed, your calendar will be automatically updated. </p>
-    </div>
+<!--Prominent Users-->
+<!-- Note for Andrew Fong : use FlexBoxes perhaps because resizing is mad ugly!-->
+<!--<div class="container" style="padding:50px 0px">
+    <div class="row">
+      <div class="col-sm-3">
+        <h2 class="users-text">Proudly used by EAs at</h2>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/facebook_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/food.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/github_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/healthcare.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/twitter_gray.svg">
+	      </a>
+      </div>
+      <div class="col-sm-1">
+        <a href="http://twitter.com/esper_co" target="_blank" class="users-logo">
+	  	    <img class="default" src="img/faqs.svg">
+	      </a>
+      </div>
+      <div class="col-sm-3">
+      </div>
   </div>
 </div>
 
-<!-- How We CAn Help -->
+<a name="learn"></a>
+<div class="section-container gray" style="padding:150px 0px">
+  <h1 class="splash-text">Features</h1>
+  <h2 class="splash-text" style="padding:50px 0px">Heyo I'm a section with content! Learn stuff! Wow!</h2>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-3">
+        <b>Calendar Scheduling</b><br>
+        This is a thing!<br>
+        Wow!
+      </div>
+      <div class="col-sm-3">
+        <b>Task Lists</b><br>
+        This is a thing!<br>
+        Cool!
+      </div>
+      <div class="col-sm-3">
+        <b>We got an app!</b><br>
+        This is another thing!<br>
+        Haha!
+      </div>
+      <div class="col-sm-3">
+        <b>Purple things!</b><br>
+        It's a good color.<br>
+        Yeah!
+      </div>
+
+    </div>
+  </div>
+</div> -->
+
+<!-- Supercharge your inbox -->
+<a name="learn"></a>
 <div class="section-container">
-  <div class="section-content narrow">
-    <h3 class="section-title">SMALL TASKS</h3>
-    <p>Besides scheduling, Esper Assistants can help out with a number of tasks. Whether it's travel, reservations, expenses, or online research, our assistants can help free up your time from burdensome administrative tasks.</p>
-    <div class= "tasks-left-col"><h4><a>PLANNING</a></h4><hr>
-      <ul class="event-examples">
-        <li> Dinner Reservations </li>
-        <li> Travel Bookings </li>
-        <li> Event Planning </li>
-      </ul>
-    </div>
-    <div class= "tasks-mid-col"><h4><a>RESEARCH</a></h4><hr>
-      <ul class="research-examples">
-        <li> Document Summaries </li>
-        <li> Comparison Research </li>
-        <li> Contractor Searches </li>
-      </ul>
-    </div>
-    <div class= "tasks-right-col"><h4><a>ADMIN</a></h4><hr>
-      <ul class="office-examples">
-        <li> Office Resupply </li>
-        <li> Expense Reports</li>
-        <li> CRM Tracking</li>
-      </ul>
-    </div>
+  <div class="section-content narrow index">
+    <h3 class="section-title">SCHEDULING MADE EASY</h3>
   </div>
 </div>
-<br>
-<!-- Meet The Dream Team -->
+
+<!-- Feature 1 -->
 <div class="section-container">
-  <div class="dream-team-container">
-    <div class="dream-team-right-col">
-      <h3 class="section-title">MEET THE DREAM TEAM</h3>
-      <p>No machine can replace a human &#8212; especially when it comes to your personal assistant. That's why we've assembled a team of world-class executive assistants and superpowered them with our powerful scheduling software. We'll find the perfect time for any meeting or appointment and complete any small task, ensuring that you never waste another second. </p><br>
-      <p>Are you an experienced executive assistant?<br><a href="ea-jobs"><b>We need your help!</b></a></p>
+  <div class="feature-container">
+    <div class="feature-text-left-col-small">
+      <h3 class="section-title">Your inbox. Your calendar. Synchronized.</h3>
+      <p>With Esper Calendaring, get an integrated view of your calendar within your inbox. Create, view, edit, and send invites directly from your email.</p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
     </div>
-    <div class="dream-team-left-col">
-      <img class="dream-team-faces" src="img/dream-team-esper.jpg">
+    <div class="feature-image-right-col-small">
+      <img class="feature-image-small" src="img/Feature_Calendaring.jpg">
     </div>
   </div>
 </div>
 
-<!-- Our Technology -->
+<!-- Feature 2 -->
+<div class="section-container">
+  <div class="feature-container">
+    <div class="feature-text-right-col-small">
+      <h3 class="section-title">Don’t sweat the small stuff.</h3>
+      <p>Forget calculating time zones, writing routine emails, and remembering to send event reminders. Esper Scheduling tools put time zone conversions, one-click customizable email templates, and set-and-forget reminder emails at your fingertips. </p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
+    </div>
+    <div class="feature-image-left-col-small">
+      <img class="feature-image-small" src="img/Feature_Scheduling.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Built-in Organization -->
+<a name="learn"></a>
 <div class="section-container gray">
-  <div class="section-content narrow">
-    <h3 class="section-title">OUR TECHNOLOGY</h3>
-    <p>We've worked closely with veteran executive assistants to create tools that bring the inbox and calendar closer together. Our platform supercharges our assistants, allowing them to rapidly link events with email conversations, reach out to colleagues for preferences, and easily keep track of tasks. This all means you'll have perfect context for every meeting and will be able to quickly check on the status of any appointment or task.</p><br>
-    <p>If you're already an executive assistant, <a href="software">see what our software can do for you!</a></p>
+  <div class="section-content narrow index">
+    <h3 class="section-title">BUILT-IN ORGANIZATION</h3>
+  </div>
+</div>
+
+<!-- Feature 3 -->
+<div class="section-container gray">
+  <div class="feature-container">
+    <div class="feature-text-left-col-small">
+      <h3 class="section-title">Private Notes Right In Your Inbox.</h3>
+      <p>No need to search long email threads or switch between screens for context. Esper Task Notes let you save critical information inside your email.</p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
+    </div>
+    <div class="feature-image-right-col-small">
+      <img class="feature-image-small" src="img/Feature_TaskNotes.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Feature 4 -->
+<div class="section-container gray">
+  <div class="feature-container">
+    <div class="feature-text-right-col-small">
+      <h3 class="section-title">Always Know What Is On Your Plate.</h3>
+      <p>With Esper Task List, you always know what is going on. Task List compiles all of your work into one central list with the click of a button -- combining emails, calendar events, and Task Notes. </p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
+    </div>
+    <div class="feature-image-left-col-small">
+      <img class="feature-image-small" src="img/Feature_TaskList.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Streamlined Communication -->
+<div class="section-container">
+  <div class="section-content narrow index">
+    <h3 class="section-title">STREAMLINED COMMUNICATION</h3>
+  </div>
+</div>
+
+<!-- Feature 5 -->
+<div class="section-container">
+  <div class="feature-container">
+    <div class="feature-text-left-col-small">
+      <h3 class="section-title">Esper Executive iOS App.</h3>
+      <p>With the Esper Executive App, Executives can send new tasks, answer questions with a single touch, and receive all the context needed before each meeting. Best of all, the Esper Executive App dovetails directly with Esper for Executive Assistants into one cohesive communication system for your team.</p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
+    </div>
+    <div class="feature-image-right-col-small">
+      <img class="feature-image-small" src="img/Feature_ExecutiveApp.jpg">
+    </div>
+  </div>
+</div>
+
+<!-- Feature 6 -->
+<div class="section-container">
+  <div class="feature-container">
+    <div class="feature-text-right-col-small">
+      <h3 class="section-title">Esper Agenda Keeps You Connected.</h3>
+      <p>With Esper Agenda, quickly draft agendas so everyone knows where they are supposed to be. Schedule daily agendas to automatically be sent or edit first and then send it along.</p><br>
+      <a href="request-demo">
+        <button class="button-primary green index">
+          Request Demo</i>
+        </button>
+      </a>
+    </div>
+    <div class="feature-image-left-col-small">
+      <img class="feature-image-small" src="img/Feature_Agenda.jpg">
+    </div>
   </div>
 </div>
 
 
 <!-- The Gold Standard -->
-<div class="section-container">
+<!-- <div class="section-containeri">
   <div class="section-content narrow">
     <h3 class="section-title">THE GOLD STANDARD</h3>
     <p>We're endlessly committed to improving your productivity. Our service was designed using the industry's best practices, and we're raising the bar even higher by integrating new insights from our users. We not only strive to create better software, but also a better human experience.</p>
   </div>
-</div>
+</div> -->
 
-<!-- Join the waiting list -->
-<!-- <div class="section-container dark">
+<!--Waiting List -->
+<div class="section-container dark">
   <div class="section-content narrow">
-    <a href="https://app.esper.com/#!join">
-      <button class="button-tertiary large">
-        <h2>Try Esper risk-free for 14 days&nbsp;&nbsp;<i class="fa fa-arrow-right"></i></h2>
+    <h2 class="splash-text-subheader" style="color:white;font-style:italic">Maximize your productivity with Esper.</h2>
+    <h2></h2>
+    <h2></h2>
+    <a href="request-demo">
+      <button class="button-primary green index">
+       Request Demo</i>
       </button>
     </a>
   </div>
-</div> -->
+</div>
+
+
 
 <!-- Footer -->
 <div class="footer-container"></div>
