@@ -23,9 +23,9 @@ module Esper.Auth {
 
   function getPageType() {
     if (pageType === undefined) {
-      if (/^https:\/\/mail.google.com\//.test(document.URL)) {
+      if (HostUrl.isGmail(document.URL)) {
         pageType = PageType.Gmail;
-      } else if (/^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
+      } else if (HostUrl.isGcal(document.URL)) {
         pageType = PageType.Gcal;
       } else {
         pageType = PageType.Other;
