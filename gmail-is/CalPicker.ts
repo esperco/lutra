@@ -307,8 +307,6 @@ module Esper.CalPicker {
 
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
-    Sidebar.customizeSelectArrow(execTz);
-    Sidebar.customizeSelectArrow(guestTz);
 
     execTz.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(execTz);
