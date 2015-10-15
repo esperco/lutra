@@ -43,11 +43,11 @@ module Esper.Page {
   }
 
   export var teamSettings : Loadable = {
-    load: function(teamid) {
+    load: function(teamid, viewId?: TeamSettings.View) {
       pageSelector.hideAll();
       showPage("team-settings");
       Log.d("TeamSettings.load()", teamid);
-      TeamSettings.load(teamid);
+      TeamSettings.load(teamid, viewId);
       Util.focus();
     }
   }
@@ -65,9 +65,7 @@ module Esper.Page {
       pageSelector.hideAll();
       showPage("team-settings");
       Log.d("TeamSettings.load()", teamid);
-      var onboarding = false;
-      var plans = true;
-      TeamSettings.load(teamid, onboarding, plans);
+      TeamSettings.load(teamid, TeamSettings.View.Plans);
       Util.focus();
     }
   }
@@ -77,10 +75,7 @@ module Esper.Page {
       pageSelector.hideAll();
       showPage("team-settings");
       Log.d("TeamSettings.load()", teamid);
-      var onboarding = false;
-      var plans = false;
-      var payment = true;
-      TeamSettings.load(teamid, onboarding, plans, payment);
+      TeamSettings.load(teamid, TeamSettings.View.Payment);
       Util.focus();
     }
   }

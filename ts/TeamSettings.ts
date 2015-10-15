@@ -24,7 +24,7 @@ module Esper.TeamSettings {
   });
 
   interface TabView {
-    name: string;
+    id: View;
     tab: JQuery;
     content: JQuery;
     shown: boolean; // whether the tab is shown to this user at all
@@ -48,10 +48,10 @@ module Esper.TeamSettings {
       .addClass("active");
   };
 
-  export function switchTabByName(name: string) {
+  export function switchTabById(id: View) {
     var sel;
     List.iter(tabViews, function(x, i) {
-      if (x.name === name)
+      if (x.id === id)
         sel = i;
     });
     if (sel === undefined)
@@ -71,20 +71,20 @@ module Esper.TeamSettings {
     return lastShown;
   }
 
-  function makeTabView(name: string,
+  function makeTabView(id: View,
                        tab: JQuery,
                        content: JQuery,
                        shown: boolean):
   TabView {
     return {
-      name: name,
+      id: id,
       tab: tab,
       content: content,
       shown: shown
     };
   }
 
-  function showTeamSettings(team : ApiT.Team, onboarding? : boolean, plans? : boolean, payment? : boolean) {
+  function showTeamSettings(team: ApiT.Team, viewId?: View) {
   '''
 <div #view>
   <div #tabsDiv style="padding-left:28px">
@@ -108,12 +108,12 @@ module Esper.TeamSettings {
 </div>
 '''
 
-    var tabViewAcc = makeTabView("acc", tabAcc, contentAcc, true);
-    var tabViewCal = makeTabView("cal", tabCal, contentCal, true);
-    var tabViewPrf = makeTabView("prf", tabPrf, contentPrf, true);
-    var tabViewWkf = makeTabView("wkf", tabWkf, contentWkf, true);
-    var tabViewLab = makeTabView("lab", tabLab, contentLab, true);
-    var tabViewTmp = makeTabView("tmp", tabTmp, contentTmp, true);
+    var tabViewAcc = makeTabView(View.Account, tabAcc, contentAcc, true);
+    var tabViewCal = makeTabView(View.Calendars, tabCal, contentCal, true);
+    var tabViewPrf = makeTabView(View.Preferences, tabPrf, contentPrf, true);
+    var tabViewWkf = makeTabView(View.Workflows, tabWkf, contentWkf, true);
+    var tabViewLab = makeTabView(View.Labels, tabLab, contentLab, true);
+    var tabViewTmp = makeTabView(View.Templates, tabTmp, contentTmp, true);
     tabViews /* global */ = [
       tabViewAcc,
       tabViewCal,
@@ -127,8 +127,14 @@ module Esper.TeamSettings {
       x.tab.click(function() { switchTab(i); });
     });
 
+    var plans = (viewId === View.Plans);
+    var payment = (viewId === View.Payment);
+    if (plans || payment) {
+      delete viewId;
+    }
     contentAcc.append(AccountTab.load(team, plans, payment));
     if (Login.isNylas()) {
+      tabViewCal.shown = false;
       tabCal.remove();
       contentCal.remove();
     } else {
@@ -138,16 +144,12 @@ module Esper.TeamSettings {
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentTmp.append(TemplateTab.load(team, contentTmp))
 
-    if (onboarding) {
-      // We'll guide the exec through each step
-      tabsDiv.remove();
-    }
-
     /* We don't have access to executive email accounts,
      * so executives don't need to configure label sync. */
     if (Login.isExecCustomer(team)) {
       tabViewLab.shown = false;
-      tabLab.addClass("hide");
+      tabLab.remove();
+      contentLab.remove();
     } else {
       contentLab.append(LabelsTab.load(team));
     }
@@ -156,9 +158,8 @@ module Esper.TeamSettings {
     last.tab.children() // the <a> element
       .addClass("last");
 
-    if (onboarding) {
-      view.addClass("onboarding");
-      tab.css("padding","0px");
+    if (viewId) {
+      switchTabById(viewId);
     }
 
     return view;
@@ -179,7 +180,19 @@ module Esper.TeamSettings {
     }
   }
 
-  export function load(teamid : string, onboarding? : boolean, plans? : boolean, payment? : boolean) {
+
+  export enum View {
+    Account,
+    Plans,
+    Payment,
+    Calendars,
+    Preferences,
+    Workflows,
+    Labels,
+    Templates
+  }
+
+  export function load(teamid: string, viewId?: View) {
 '''
 <div #view class="settings-container">
   <div #headerDiv class="header clearfix">
@@ -229,7 +242,7 @@ module Esper.TeamSettings {
         document.title = exec.display_name + " - Team Settings";
       });
 
-    main.append(showTeamSettings(selectedTeam, onboarding, plans, payment));
+    main.append(showTeamSettings(selectedTeam, viewId));
     footer.append(Footer.load());
 
     signOut.click(Login.logout);
