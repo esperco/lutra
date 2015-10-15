@@ -105,9 +105,39 @@ module Esper.Route {
 
     /* various pages */
 
+    "team-settings/:teamid/calendars": function(data) {
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Calendars);
+      });
+    },
+
+    "team-settings/:teamid/preferences": function(data) {
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Preferences);
+      });
+    },
+
+    "team-settings/:teamid/workflows": function(data) {
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Workflows);
+      });
+    },
+
+    "team-settings/:teamid/labels": function(data) {
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Labels);
+      });
+    },
+
+    "team-settings/:teamid/templates": function(data) {
+      withLogin(function() {
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Templates);
+      });
+    },
+
     "team-settings/:teamid" : function (data) {
       withLogin(function() {
-        Page.teamSettings.load(data.teamid);
+        Page.teamSettings.load(data.teamid, TeamSettings.View.Account);
       });
     },
 
@@ -116,7 +146,9 @@ module Esper.Route {
     },
 
     "plans/:teamid" : function (data) {
-      withLogin(Page.plans.load, data.teamid);
+      withLogin(function() {
+        Page.plans.load(data.teamid);
+      });
     },
 
     "payment/:teamid" : function (data) {
