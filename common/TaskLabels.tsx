@@ -33,6 +33,9 @@ module Esper.TaskLabels {
         this.props.team.team_labels,
         this.renderLabel.bind(this));
 
+      var labelSettingsUrl = Conf.Api.url + "/#!/team-settings/" +
+        this.props.team.teamid + "/labels";
+
       return (<div className="esper-bs">
         <div>
           { labelElms && labelElms.length ? labelElms :
@@ -42,7 +45,7 @@ module Esper.TaskLabels {
           {
             this.props.busy ?
             <span>Saving &hellip;</span> :
-            <a href={Conf.Api.url} target="_blank">
+            <a href={labelSettingsUrl} target="_blank">
               <i className="fa fa-fw fa-cog"></i>
               {" "} Configure Labels
             </a>
