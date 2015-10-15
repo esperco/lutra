@@ -2190,6 +2190,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-modal-header {
+  flex-grow: 0;
   height: 52px;
   padding: 16px 14px;
   font-size: 18px;
@@ -2207,6 +2208,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-modal-footer {
+  flex-grow: 0;
   padding: 20px 15px;
   text-align: right;
   border-top: 1px solid @gray_10;
@@ -2327,6 +2329,8 @@ textarea.esper-description-text {
 
 .esper-modal-default {
   .esper-modal;
+  display: flex;
+  flex-direction: column;
   @search_width: 640px;
   width: @search_width;
   margin-left: -@search_width/2;
@@ -2362,7 +2366,10 @@ textarea.esper-description-text {
   margin-left: -@search_width/2;
 }
 
-.esper-modal-content { padding: 10px; }
+.esper-modal-content {
+  padding: 10px;
+  overflow-y: auto; // Makes header and footer of modal sticky
+}
 
 .esper-search-modal-input {
   width: 100%;
