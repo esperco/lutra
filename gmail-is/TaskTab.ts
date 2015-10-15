@@ -825,16 +825,16 @@ module Esper.TaskTab {
     </div>
 
     <hr class="esper-hr"/>
-    <div class="esper-clearfix esper-workflow-gap esper-section">
-      <select #workflowSelect class="esper-select esper-select-fullwidth">
-        <option value="header">Select workflow...</option>
-      </select>
-    </div>
-    <div #workflowSection class="esper-section esper-hide">
+    <div #workflowSection class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
       </div>
       <div class="esper-section-container esper-section-notes">
+        <div class="esper-clearfix esper-workflow-gap">
+          <select #workflowSelect class="esper-select esper-select-fullwidth">
+            <option value="header">Select workflow...</option>
+          </select>
+        </div>
         <p #workflowNotes class="esper-text-notes"/>
         <div class="esper-clearfix esper-workflow-gap">
           <select #stepSelect class="esper-select esper-select-fullwidth">
