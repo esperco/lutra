@@ -543,6 +543,9 @@ module Esper.TaskTab {
           userTabContent.append(UserTab.viewOfUserTab(team).view);
 
           workflowSection.removeClass("esper-hide");
+        } else {
+          Api.deleteWorkflowProgress(team.teamid, task.taskid);
+          workflowSection.addClass("esper-hide");
         }
       });
     });

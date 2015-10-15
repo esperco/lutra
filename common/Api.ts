@@ -782,6 +782,16 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(progress));
   }
 
+  export function deleteWorkflowProgress(teamid: string, taskid: string)
+    : JQueryPromise<void>
+  {
+    var url =
+      Conf.Api.url + "/api/workflows/progress/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(taskid);
+    return JsonHttp.delete_(url);
+  }
+
   /* Team creation */
   export function createTeam(execEmail: string, execName: string)
     : JQueryPromise<ApiT.Team>
