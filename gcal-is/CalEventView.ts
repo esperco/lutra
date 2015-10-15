@@ -223,7 +223,7 @@ module Esper.CalEventView {
 '''
         if (event_reminders.reminder_time) {
           var time = new Date(event_reminders.reminder_time);
-          dateTime.text(time.toLocaleString());
+          dateTime.text(moment(time).format('DD MMM YYYY [at] h:mm a'));
           close.click(function() {
             Api.unsetReminderTime(fullEventId.eventId).done(function() {
               reminder.remove();
