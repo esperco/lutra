@@ -177,6 +177,7 @@ module Esper.CalEventView {
 
   function updateView(fullEventId) {
     Gcal.waitForGuestsToLoad(function(guests) {
+      $(".esper-reminder-container").remove();
       var guestsState = [];
       guests.each(function() {
         var guest = $(this);
@@ -228,7 +229,7 @@ module Esper.CalEventView {
               reminder.remove();
             });
           });
-          view.append(reminder);
+          reminder.appendTo(view);
         }
       });
     });
