@@ -63,7 +63,7 @@ module Esper.ReminderView {
       <input #noReplyCheckbox type='checkbox' id='noReplyCheck'/>
       <label #noReplyLabel for='noReplyCheck'>Waiting for reply</label>
       <br/>
-      <textarea #recipients class="esper-input esper-reminder-text" />
+      <textarea #recipients class="esper-input esper-reminder-recipients" />
     </td>
   </tr>
   <tr>
