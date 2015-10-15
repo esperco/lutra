@@ -434,6 +434,9 @@ select.esper-select {
   background-color: white;
   width: 280px;
   border: 1px solid;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 object.esper-svg { pointer-events: none; }
@@ -2298,11 +2301,28 @@ textarea.esper-description-text {
   }
 }
 
+.esper-reminder-recipients {
+  width: 100%;
+  font-size: 13px;
+  height: 54px;
+  padding: 8px;
+}
+
 .esper-reminder-text {
   width: 100%;
   font-size: 13px;
   height : 128px;
   padding: 8px;
+}
+
+.esper-active-reminders {
+  margin: 8px 0 8px 0;
+  .esper-close {
+    float: right;
+    font-size: 15px;
+    font-weight: bold;
+    color: @gray_60;
+  }
 }
 
 .esper-modal-default {
