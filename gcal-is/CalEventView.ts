@@ -198,7 +198,7 @@ module Esper.CalEventView {
         guestsState.push(state);
       });
 '''
-<div #view class="reminder-button">
+<div #view class="esper-reminder-container">
   <button #reminderButton class="esper-btn esper-btn-primary esper-reminder-btn">
     Set Reminder
   </button>
@@ -210,6 +210,27 @@ module Esper.CalEventView {
         guestsState);
       $(".reminder-button").remove();
       Gcal.findAnchorForReminderDropdown().append(view);
+
+      Api.getReminders(fullEventId.calendarId, fullEventId.eventId)
+         .done(function(event_reminders) {
+'''
+<div #reminder class="esper-active-reminders esper">
+  <i class="fa fa-envelope-o"></i>
+  <span #dateTime />
+  <span #close class="esper-clickable esper-close" >×</span>
+</div>
+'''
+        if (event_reminders.reminder_time) {
+          var time = new Date(event_reminders.reminder_time);
+          dateTime.text(time.toLocaleString());
+          close.click(function() {
+            Api.unsetReminderTime(fullEventId.eventId).done(function() {
+              reminder.remove();
+            });
+          });
+          view.append(reminder);
+        }
+      });
     });
   }
 
