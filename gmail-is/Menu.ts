@@ -36,13 +36,10 @@ module Esper.Menu {
   }
 
   function makeActionLink(text: string,
-                          action: () => void,
-                          danger: boolean) {
+                          action: () => void) {
     var link = $("<li class='esper-li'/>")
       .text(text)
       .click(action);
-
-    if (danger) link.addClass("esper-danger");
 
     return link;
   }
@@ -51,8 +48,8 @@ module Esper.Menu {
     var loggedIn = Login.loggedIn();
 
     var signIOLink = loggedIn?
-      makeActionLink("Sign out", Login.logout, false)
-      : makeActionLink("Sign in", Init.login, false);
+      makeActionLink("Sign out", Login.logout)
+      : makeActionLink("Sign in", Init.login);
 
     function openSettings() {
       window.open(Conf.Api.url);
@@ -76,18 +73,18 @@ module Esper.Menu {
       var agendaModal = Agenda.renderModal(currentTeam.get());
       $("body").append(agendaModal.view);
       Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
-    }, false);
+    });
 
     var taskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = TaskList.renderModal(currentTeam.get());
       $("body").append(taskListModal.view);
       Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
-    }, false);
+    });
 
     var hr = $("<hr>").addClass("esper-menu-hr");
 
     var getStartedLink = makeActionLink("Get Started", function() {
-      Message.post(Message.Type.RenderOnboarding);
+      Message.post(Message.Type.RenderGettingStarted);
       Analytics.track(Analytics.Trackable.ClickMenuGetStarted);
     });
 

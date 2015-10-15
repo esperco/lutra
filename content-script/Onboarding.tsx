@@ -123,8 +123,13 @@ module Esper.Onboarding {
     slideIndex: number;
   }
 
+  interface OnboardingModalProps {
+    account: Types.Account,
+    showFooter: boolean
+  }
+
   export class OnboardingModal
-      extends ReactHelpers.Component<Types.Account, ModalState> {
+      extends ReactHelpers.Component<OnboardingModalProps, ModalState> {
     private calendarStore: Model.StoreOne<ApiT.Calendars>;
     private calendarQuery: CalendarQuery;
     private teamStore: TeamStore;
@@ -156,8 +161,9 @@ module Esper.Onboarding {
         next: slideLogic.next,
         getState: slideLogic.getState,
         getSources: slideLogic.getSources,
-        account: this.props,
+        account: this.props.account,
         index: this.state.slideIndex,
+        showFooter: this.props.showFooter,
         onFinish: function() {
           // Reload page to force injected script to reload data
           location.reload();
@@ -235,6 +241,7 @@ module Esper.Onboarding {
     index: number;
     onFinish: () => void;
     account: Types.Account;
+    showFooter: boolean;
     data: DataSources;
   }
 
@@ -293,13 +300,15 @@ module Esper.Onboarding {
           index={ this.props.index }
           total= { slides.length }
         />
-        <Footer
-          firstSlide={ !this.props.index }
-          lastSlide={ this.props.index + 1 >= slides.length }
-          busy={this.state.busy}
-          prev={this.handlePrev.bind(this)}
-          next={this.handleNext.bind(this)}
-        />
+        { this.props.showFooter ?
+          <Footer
+            firstSlide={ !this.props.index }
+            lastSlide={ this.props.index + 1 >= slides.length }
+            busy={this.state.busy}
+            prev={this.handlePrev.bind(this)}
+            next={this.handleNext.bind(this)}
+          /> : null
+        }
       </div>);
     }
 

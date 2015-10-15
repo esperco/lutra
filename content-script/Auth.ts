@@ -73,9 +73,13 @@ module Esper.Auth {
     win.focus();
   }
 
-  export function openWelcomeModal(account: Types.Account) {
+  export function openWelcomeModal(account: Types.Account,
+                                   showFooter?: boolean) {
     var div = $('<div>').appendTo('body');
-    div.renderReact(Onboarding.OnboardingModal, account);
+    div.renderReact(Onboarding.OnboardingModal, {
+      account:   account,
+      showFooter: showFooter ? true : false
+    });
   }
 
   function obtainCredentials(googleAccountId, forceLogin) {
@@ -89,7 +93,7 @@ module Esper.Auth {
             sendCredentialsResponse(x);
           }
           else {
-            openWelcomeModal(x);
+            openWelcomeModal(x, true);
           }
         }
     });
@@ -105,7 +109,7 @@ module Esper.Auth {
             Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
           }
-          openWelcomeModal(x);
+          openWelcomeModal(x, true);
       });
   }
 

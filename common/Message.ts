@@ -23,8 +23,9 @@ module Esper.Message {
     // Post call from CS to IS that location hash has changed
     LocationUpdate,
 
-    // Instruct CS to render oonboarding modal again from IS
-    RenderOnboarding
+    // Instruct CS to render Getting Started page on the
+    // onboarding modal again from IS
+    RenderGettingStarted
   }
 
   export interface Message {
