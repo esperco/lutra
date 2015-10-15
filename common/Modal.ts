@@ -14,7 +14,7 @@ module Esper.Modal {
 <div #view class="esper-modal-bg">
   <div #modal class="esper-modal-default">
     <div #header class="esper-modal-header"> </div>
-    <div #content class="esper-modal-conent"> </div>
+    <div #content class="esper-modal-content"> </div>
     <div #footer class="esper-modal-footer esper-clearfix"> </div>
   </div>
 </div>
