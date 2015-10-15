@@ -825,26 +825,28 @@ module Esper.TaskTab {
     </div>
 
     <hr class="esper-hr"/>
-    <div #workflowSection class="esper-section">
+    <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
       </div>
-      <div class="esper-section-container esper-section-notes">
-        <div class="esper-clearfix esper-workflow-gap">
+      <div class="esper-section-container">
+        <div class="esper-section-selector esper-clearfix">
           <select #workflowSelect class="esper-select esper-select-fullwidth">
-            <option value="header">Select workflow...</option>
+            <option value="header">Select workflow&hellip;</option>
           </select>
         </div>
-        <p #workflowNotes class="esper-text-notes"/>
-        <div class="esper-clearfix esper-workflow-gap">
-          <select #stepSelect class="esper-select esper-select-fullwidth">
-            <option value="header">Select step...</option>
-          </select>
-        </div>
-        <p #stepNotes class="esper-hide esper-text-notes"/>
-        <div #checklistDiv class="esper-hide">
-          <span class="esper-subheading">Checklist</span>
-          <div #checklist class="esper-workflow-checklist"/>
+        <div #workflowSection class="esper-section-notes esper-hide">
+          <p #workflowNotes class="esper-text-notes"/>
+          <div class="esper-clearfix esper-workflow-gap">
+            <select #stepSelect class="esper-select esper-select-fullwidth">
+              <option value="header">Select step&hellip;</option>
+            </select>
+          </div>
+          <p #stepNotes class="esper-hide esper-text-notes"/>
+          <div #checklistDiv class="esper-hide">
+            <span class="esper-subheading">Checklist</span>
+            <div #checklist class="esper-workflow-checklist"/>
+          </div>
         </div>
       </div>
     </div>
