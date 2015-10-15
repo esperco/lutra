@@ -73,7 +73,7 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomeModal(account: Types.Account) {
+  export function openWelcomeModal(account: Types.Account) {
     var div = $('<div>').appendTo('body');
     div.renderReact(Onboarding.OnboardingModal, account);
   }

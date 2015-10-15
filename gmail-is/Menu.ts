@@ -60,7 +60,7 @@ module Esper.Menu {
     }
 
     var settingsLink = makeActionLink("Edit Settings",
-                                      openSettings, false);
+                                      openSettings);
 
     function openOptionsPage() {
       // Can't call Chrome API to open options page directly,
@@ -70,7 +70,7 @@ module Esper.Menu {
     }
 
     var optionsLink = makeActionLink("Extension Options",
-                                     openOptionsPage, false);
+                                     openOptionsPage);
 
     var agendaLink = makeActionLink("Get Agenda", function() {
       var agendaModal = Agenda.renderModal(currentTeam.get());
@@ -78,13 +78,18 @@ module Esper.Menu {
       Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
     }, false);
 
-    var getTaskListLink = makeActionLink("Get Task List", function() {
+    var taskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = TaskList.renderModal(currentTeam.get());
       $("body").append(taskListModal.view);
       Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     }, false);
 
     var hr = $("<hr>").addClass("esper-menu-hr");
+
+    var getStartedLink = makeActionLink("Get Started", function() {
+      Message.post(Message.Type.RenderOnboarding);
+      Analytics.track(Analytics.Trackable.ClickMenuGetStarted);
+    });
 
     var helpLink = $("<a class='esper-a'>Get Help</a>")
       .attr("href", "mailto:support@esper.com")
@@ -95,10 +100,11 @@ module Esper.Menu {
     ul.children().remove();
     ul
       .append(agendaLink)
-      .append(getTaskListLink)
+      .append(taskListLink)
       .append(settingsLink)
       .append(optionsLink)
       .append(hr)
+      .append(getStartedLink)
       .append(helpLink)
       .append(signIOLink);
   }
