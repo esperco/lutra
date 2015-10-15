@@ -6,61 +6,61 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "jquery/jquery.d.ts": {
-      "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "segment-analytics/segment-analytics.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "fullCalendar/fullCalendar.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "jqueryui/jqueryui.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "chrome/chrome.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "webrtc/MediaStream.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "es6-promise/es6-promise.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "cryptojs/cryptojs.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "moment/moment.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "moment/moment-node.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "jasmine/jasmine.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "lodash/lodash.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "moment-timezone/moment-timezone.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "react/react.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "react/react-global.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "eventemitter3/eventemitter3.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "page/page.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "bootstrap/bootstrap.d.ts": {
-      "commit": "947c06d1a8509814ae0034130dcc003eb26fe984"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "analytics-node/analytics-node.d.ts": {
-      "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "typeahead/typeahead.d.ts": {
       "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
