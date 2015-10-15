@@ -125,7 +125,8 @@ module Esper.Onboarding {
 
   interface OnboardingModalProps {
     account: Types.Account,
-    showFooter: boolean
+    hideProgressBar: boolean,
+    hideFooter: boolean
   }
 
   export class OnboardingModal
@@ -163,7 +164,8 @@ module Esper.Onboarding {
         getSources: slideLogic.getSources,
         account: this.props.account,
         index: this.state.slideIndex,
-        showFooter: this.props.showFooter,
+        hideProgressBar: this.props.hideProgressBar,
+        hideFooter: this.props.hideFooter,
         onFinish: function() {
           // Reload page to force injected script to reload data
           location.reload();
@@ -241,7 +243,8 @@ module Esper.Onboarding {
     index: number;
     onFinish: () => void;
     account: Types.Account;
-    showFooter: boolean;
+    hideProgressBar: boolean;
+    hideFooter: boolean;
     data: DataSources;
   }
 
@@ -296,18 +299,20 @@ module Esper.Onboarding {
             close: this.props.onFinish
           })}
         </div>
-        <ProgressBar
-          index={ this.props.index }
-          total= { slides.length }
-        />
-        { this.props.showFooter ?
+        { this.props.hideProgressBar ? null :
+          <ProgressBar
+            index={ this.props.index }
+            total= { slides.length }
+          />
+        }
+        { this.props.hideFooter ? null :
           <Footer
             firstSlide={ !this.props.index }
             lastSlide={ this.props.index + 1 >= slides.length }
             busy={this.state.busy}
             prev={this.handlePrev.bind(this)}
             next={this.handleNext.bind(this)}
-          /> : null
+          />
         }
       </div>);
     }

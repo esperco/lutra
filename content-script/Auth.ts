@@ -74,11 +74,13 @@ module Esper.Auth {
   }
 
   export function openWelcomeModal(account: Types.Account,
-                                   showFooter?: boolean) {
+                                   hideProgressBar?: boolean,
+                                   hideFooter?: boolean) {
     var div = $('<div>').appendTo('body');
     div.renderReact(Onboarding.OnboardingModal, {
       account:   account,
-      showFooter: showFooter ? true : false
+      hideProgressBar: hideProgressBar ? true : false,
+      hideFooter: hideFooter ? true : false
     });
   }
 
@@ -93,7 +95,7 @@ module Esper.Auth {
             sendCredentialsResponse(x);
           }
           else {
-            openWelcomeModal(x, true);
+            openWelcomeModal(x);
           }
         }
     });
@@ -109,7 +111,7 @@ module Esper.Auth {
             Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
           }
-          openWelcomeModal(x, true);
+          openWelcomeModal(x);
       });
   }
 

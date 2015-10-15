@@ -78,8 +78,8 @@ module Esper.Main {
 
     // Miscellaneous messaging setup
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);
-    Message.listen(Message.Type.RenderOnboarding, function() {
-      Auth.openWelcomeModal(Login.getAccount());
+    Message.listen(Message.Type.RenderGettingStarted, function() {
+      Auth.openWelcomeModal(Login.getAccount(), true, true);
       Onboarding.CurrentSlide.set(3);
     });
 
