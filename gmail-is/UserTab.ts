@@ -882,7 +882,8 @@ module Esper.UserTab {
   </div>
 </div>
 '''
-    var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
+    var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid +
+      "/preferences";
     var noPrefsLink = $("<a href='" + noPrefsURL + "'>Edit settings?</a>");
     noPrefsLink.addClass("esper-link");
     var noPrefsDescr = $("<span>Executive is marked unavailable " +
