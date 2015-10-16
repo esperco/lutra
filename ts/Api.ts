@@ -23,7 +23,7 @@ module Esper.Api {
 
   var suppressWarnings = false; //  Toggled with noWarn()
 
-  function jsonHttp(method, url, body) {
+  function jsonHttp(method, dataType, url, body) {
 
     var id = Util.randomString();
 
@@ -76,7 +76,7 @@ module Esper.Api {
       url: url,
       type: method,
       data: body,
-      dataType: "json",
+      dataType: dataType,
       beforeSend: Login.setHttpHeaders(url)
     };
     if (body && body.length > 0) {
@@ -99,19 +99,19 @@ module Esper.Api {
   }
 
   function jsonHttpGet(url) {
-    return jsonHttp("GET", url, null);
+    return jsonHttp("GET", "json", url, null);
   }
 
   function jsonHttpPost(url, body:any = "") {
-    return jsonHttp("POST", url, body);
+    return jsonHttp("POST", "json", url, body);
   }
 
   function jsonHttpPut(url, body) {
-    return jsonHttp("PUT", url, body);
+    return jsonHttp("PUT", "json", url, body);
   }
 
   function jsonHttpDelete(url) {
-    return jsonHttp("DELETE", url, null);
+    return jsonHttp("DELETE", "json", url, null);
   }
 
   /*
@@ -457,6 +457,16 @@ module Esper.Api {
     var url = "api/account/emails/" + string(Login.data.uid)
       + "/" + string(teamid) + "/" + string(theirUID);
     return jsonHttpPut(url, JSON.stringify(aliases));
+  }
+
+  export function postForCalendarEventsCSV(teamid: string,
+                                           calid: string,
+                                           q: ApiT.CalendarRequest)
+: JQueryPromise<string>
+  {
+    var url = "api/calendar/events/csv/" + string(Login.data.uid)
+            + "/" + string(teamid) + "/" + string(calid);
+    return jsonHttp("POST", "text", url, JSON.stringify(q));
   }
 
   /*** Executive Preferences ***/

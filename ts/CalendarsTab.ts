@@ -6,7 +6,7 @@ module Esper.CalendarsTab {
 
   var calendarAcls = {}; // cache of API call results
 
-  function makeCalendarRow(cal) {
+  function makeCalendarRow(teamid, cal) {
 '''
 <tr #view class="esper-calendar-option">
   <td><input #viewBox type="checkbox" class="esper-cal-view"></td>
@@ -14,6 +14,7 @@ module Esper.CalendarsTab {
   <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
   <td><input #agendaBox type= "checkbox" class="esper-cal-agenda"></td>
   <td #calName class="esper-cal-name"/>
+  <td><button #csvButton>csv</button></td>
 </tr>
 '''
     if (cal.calendar_default_view)
@@ -27,6 +28,19 @@ module Esper.CalendarsTab {
 
     calName.text(cal.calendar_title)
            .dblclick(function() { $(this).parent().remove(); });
+
+    csvButton.click(function() {
+      var now = new Date();
+      var start = new Date(now.getTime() - 31*86400000);
+      var q = {
+        window_start: XDate.toString(start),
+        window_end:   XDate.toString(now)
+      }
+      Api.postForCalendarEventsCSV(teamid, cal.google_cal_id, q)
+      .done(function(csv) {
+        window.open("data:text/csv;charset=utf-8," + encodeURI(csv));
+      });
+    });
 
     view.data("calid", cal.google_cal_id)
         .data("authorized", cal.authorized_as)
@@ -89,7 +103,7 @@ module Esper.CalendarsTab {
     makeAccountSelector(team, accountSelector);
 
     List.iter(team.team_calendars, function(cal) {
-      makeCalendarRow(cal).appendTo(teamCals);
+      makeCalendarRow(team.teamid, cal).appendTo(teamCals);
     });
 
     Api.getCalendarList(team.teamid).done(function(x) {
@@ -97,7 +111,7 @@ module Esper.CalendarsTab {
         $("<option>" + cal.calendar_title + "</option>")
           .appendTo(allCals)
           .dblclick(function() {
-            makeCalendarRow(cal).appendTo(teamCals);
+            makeCalendarRow(team.teamid, cal).appendTo(teamCals);
           });
       });
 
