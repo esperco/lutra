@@ -173,7 +173,6 @@ module Esper.InviteControls {
           <input #pubLocation type="text" class="esper-input"/>
           <ul #locationDropdown
               class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-            <div #locationSearchResults class="esper-dropdown-section"/>
           </ul>
         </div>
       </div>
@@ -341,8 +340,7 @@ module Esper.InviteControls {
     function searchLocation() {
       var query = pubLocation.val();
       LocSearch.displayResults(team, pubLocation, locationDropdown,
-                               locationSearchResults, query,
-                               preferences);
+                               query, preferences);
     }
     Util.afterTyping(pubLocation, 250, searchLocation);
     pubLocation.click(searchLocation);
