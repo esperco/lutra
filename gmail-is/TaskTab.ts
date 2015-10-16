@@ -959,6 +959,9 @@ module Esper.TaskTab {
     };
     refreshWorkflow.click(refreshWorkflowList);
 
+    // Load workflow now
+    refreshWorkflowList();
+
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
       if (showLinkedThreads.text() === "Hide") {
@@ -1009,45 +1012,32 @@ module Esper.TaskTab {
         taskLabelsSpinner.hide();
         taskProgressSpinner.hide();
 
-        Api.getPreferences(team.teamid).done(function(prefs) {
-          displayWorkflow(team, prefs, workflows,
-                          workflowSection, workflowSelect, workflowNotes,
-                          stepSelect, stepNotes,
-                          checklistDiv, checklist);
-
-          function showMTDrop() {
-            $("select.esper-meeting-type").remove();
-            taskTitle.hide();
-            taskCancel.hide();
-            taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
-          }
-          taskCancel.click(function() {
-            showMTDrop();
-            Analytics.track(Analytics.Trackable.CancelTaskTabTask);
-          });
-          if (task !== undefined) {
-            taskCaption.text(taskLabelExists);
-            title = task.task_title;
-            displayLinkedThreadsList(task, threadId, taskTabView);
-            displayTaskProgress(task, taskTabView);
-            if (task.task_meeting_type) {
-              selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
-            }
-
-            var progress = task.task_workflow_progress;
-            if (progress) {
-              workflowSelect.val(progress.workflow_id);
-              workflowSelect.trigger("change");
-            }
-          } else {
-            taskCaption.text(taskLabelCreate);
-            showMTDrop();
-            title = deets.subject;
-            if (title === undefined) title = "(no subject)";
-            displayEmptyLinkedThreadsList(taskTabView);
-          }
-          taskTitle.val(title);
+        function showMTDrop() {
+          $("select.esper-meeting-type").remove();
+          taskTitle.hide();
+          taskCancel.hide();
+          taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
+        }
+        taskCancel.click(function() {
+          showMTDrop();
+          Analytics.track(Analytics.Trackable.CancelTaskTabTask);
         });
+        if (task !== undefined) {
+          taskCaption.text(taskLabelExists);
+          title = task.task_title;
+          displayLinkedThreadsList(task, threadId, taskTabView);
+          displayTaskProgress(task, taskTabView);
+          if (task.task_meeting_type) {
+            selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+          }
+        } else {
+          taskCaption.text(taskLabelCreate);
+          showMTDrop();
+          title = deets.subject;
+          if (title === undefined) title = "(no subject)";
+          displayEmptyLinkedThreadsList(taskTabView);
+        }
+        taskTitle.val(title);
 
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
