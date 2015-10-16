@@ -21,7 +21,11 @@ module Esper.Message {
     Track,
 
     // Post call from CS to IS that location hash has changed
-    LocationUpdate
+    LocationUpdate,
+
+    // Instruct CS to render Getting Started page on the
+    // onboarding modal again from IS
+    RenderGettingStarted
   }
 
   export interface Message {

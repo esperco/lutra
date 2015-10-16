@@ -73,9 +73,15 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomeModal(account: Types.Account) {
+  export function openWelcomeModal(account: Types.Account,
+                                   hideProgressBar?: boolean,
+                                   hideFooter?: boolean) {
     var div = $('<div>').appendTo('body');
-    div.renderReact(Onboarding.OnboardingModal, account);
+    div.renderReact(Onboarding.OnboardingModal, {
+      account:   account,
+      hideProgressBar: hideProgressBar ? true : false,
+      hideFooter: hideFooter ? true : false
+    });
   }
 
   function obtainCredentials(googleAccountId, forceLogin) {

@@ -36,13 +36,10 @@ module Esper.Menu {
   }
 
   function makeActionLink(text: string,
-                          action: () => void,
-                          danger: boolean) {
+                          action: () => void) {
     var link = $("<li class='esper-li'/>")
       .text(text)
       .click(action);
-
-    if (danger) link.addClass("esper-danger");
 
     return link;
   }
@@ -51,8 +48,8 @@ module Esper.Menu {
     var loggedIn = Login.loggedIn();
 
     var signIOLink = loggedIn?
-      makeActionLink("Sign out", Login.logout, false)
-      : makeActionLink("Sign in", Init.login, false);
+      makeActionLink("Sign out", Login.logout)
+      : makeActionLink("Sign in", Init.login);
 
     function openSettings() {
       window.open(Conf.Api.url);
@@ -60,7 +57,7 @@ module Esper.Menu {
     }
 
     var settingsLink = makeActionLink("Edit Settings",
-                                      openSettings, false);
+                                      openSettings);
 
     function openOptionsPage() {
       // Can't call Chrome API to open options page directly,
@@ -70,21 +67,26 @@ module Esper.Menu {
     }
 
     var optionsLink = makeActionLink("Extension Options",
-                                     openOptionsPage, false);
+                                     openOptionsPage);
 
     var agendaLink = makeActionLink("Get Agenda", function() {
       var agendaModal = Agenda.renderModal(currentTeam.get());
       $("body").append(agendaModal.view);
       Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
-    }, false);
+    });
 
-    var getTaskListLink = makeActionLink("Get Task List", function() {
+    var taskListLink = makeActionLink("Get Task List", function() {
       var taskListModal = TaskList.renderModal(currentTeam.get());
       $("body").append(taskListModal.view);
       Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
-    }, false);
+    });
 
     var hr = $("<hr>").addClass("esper-menu-hr");
+
+    var getStartedLink = makeActionLink("Get Started", function() {
+      Message.post(Message.Type.RenderGettingStarted);
+      Analytics.track(Analytics.Trackable.ClickMenuGetStarted);
+    });
 
     var helpLink = $("<a class='esper-a'>Get Help</a>")
       .attr("href", "mailto:support@esper.com")
@@ -95,10 +97,11 @@ module Esper.Menu {
     ul.children().remove();
     ul
       .append(agendaLink)
-      .append(getTaskListLink)
+      .append(taskListLink)
       .append(settingsLink)
       .append(optionsLink)
       .append(hr)
+      .append(getStartedLink)
       .append(helpLink)
       .append(signIOLink);
   }
