@@ -14,9 +14,6 @@ module Esper.CalPicker {
   // error.
   class HaltEventSave extends Error {}
 
-  // Who appears as the creator of events that we write to the calendar
-  var createdByEmail : string;
-
   // The team calendars whose events are currently displayed
   var showCalendars : { [calid : string] : string /* tz */ } = {};
 
@@ -48,10 +45,8 @@ module Esper.CalPicker {
     locationDropdown : JQuery;
     locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
-    createdBy : JQuery;
     execTzDiv : JQuery;
     guestTzDiv : JQuery;
-    guestNames : JQuery;
     viewCalInput : JQuery;
     viewCalDropdown : JQuery;
     viewCalSection : JQuery;
@@ -127,10 +122,6 @@ module Esper.CalPicker {
             <div #locationSearchResults class="esper-dropdown-section"/>
           </ul>
         </div>
-        <div>
-          <span class="esper-bold">Thread participants:</span>
-          <div style="margin-top: 8px" #guestNames/>
-        </div>
         <div style="margin-top: 8px">
           <span class="esper-bold">View calendars:</span>
           <select #viewCalInput class="esper-select esper-click-safe"/>
@@ -145,11 +136,6 @@ module Esper.CalPicker {
         <div>
           <span class="esper-bold">Save events to:</span>
           <select #pickerSwitcher class="esper-select"/>
-        </div>
-        <br/>
-        <div class="new-line">
-          <span class="esper-bold">Created by:</span>
-          <select #createdBy class="esper-select"/>
         </div>
         <br/>
         <div class="new-line" #execTzDiv>
@@ -221,7 +207,6 @@ module Esper.CalPicker {
     });
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
-    Sidebar.customizeSelectArrow(createdBy);
     Sidebar.customizeSelectArrow(viewCalInput);
 
     for (var i = 0; i < calendars.length; i++) {
@@ -289,22 +274,6 @@ module Esper.CalPicker {
       calendarCheckboxRow.appendTo(viewCalSection);
     });
 
-    var aliases = team.team_email_aliases;
-    createdBy.children().remove();
-    if (aliases.length === 0) {
-      $("<option>" + Login.myEmail() + "</option>").appendTo(createdBy);
-      createdBy.prop("disabled", true);
-      createdByEmail = Login.myEmail();
-    } else {
-      aliases.forEach(function(email : string, i) {
-        $("<option>" + email + "</option>").appendTo(createdBy);
-        if (i === 0) createdByEmail = email;
-      });
-      createdBy.change(function() {
-        createdByEmail = $(this).val();
-      });
-    }
-
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
 
@@ -331,14 +300,6 @@ module Esper.CalPicker {
     });
     guestTz.click(function() {
       Analytics.track(Analytics.Trackable.SelectCalendarPickerGuestTimezone);
-    });
-
-    CurrentThread.getParticipants().done(function(guests) {
-      var names = List.map(guests, function(guest) {
-        // With a fallback if the display name is not set:
-        return guest.display_name || guest.email;
-      });
-      guestNames.text(names.join(", "));
     });
 
     var pv = <PickerView> _view;
@@ -786,7 +747,7 @@ module Esper.CalPicker {
     // Wait for link
     var linkCalls = List.map(events, function(ev) {
       return Api.createTaskLinkedEvent(
-        createdByEmail,
+        Login.myEmail(),
         team.teamid,
         ev,
         task.taskid
