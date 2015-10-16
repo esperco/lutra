@@ -1,4 +1,4 @@
-/// <reference path="../common/Analytics.ts" />
+/// <reference path="../common/Analytics.Chrome.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../common/Login.ts" />
@@ -82,9 +82,9 @@ module Esper.Auth {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: Types.Account) {
+        Login.setAccount(x);
         if (!x.declined || forceLogin) {
           if (x.credentials !== undefined) {
-            Login.setAccount(x);
             Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
           }
@@ -210,6 +210,7 @@ module Esper.Auth {
         for (var k in newStorage.accounts) {
           if (loginInProgressFor === k) {
             Login.setAccount(newStorage.accounts[k]);
+            Analytics.identify();
             Onboarding.handleLogin();
             Message.postToExtension(Message.Type.FocusOnSender);
             break;
