@@ -140,18 +140,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     maybeLabel.text(maybeLabel.text() + " (" + maybeGuestsList.length + ")");
     noReplyLabel.text(noReplyLabel.text() + " (" + noReplyGuestsList.length + ")");
 
-    if (reminderState.enable) {
-      var selTime = 172800;
-      selectTime.find("option").each(function(i, opt) {
-        var v = parseFloat(opt.getAttribute("value"));
-        if (reminderState.time <= v && v < selTime) {
-          selTime = v;
-        }
-      });
-      selectTime.val(String(selTime));
-    } else {
-      selectTime.val("-1");
-    }
+    selectTime.val("86400");
 
     if (reminderState.text) {
       reminderField.text(reminderState.text);
