@@ -832,13 +832,16 @@ module Esper.TaskTab {
     <hr class="esper-hr"/>
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
+        <span #showWorkflows
+              class="esper-link" style="float:right">Hide</span>
         <span class="esper-bold" style="float:left">Workflow</span>
         <div #refreshWorkflow
           class="esper-refresh esper-clickable">
           <object #refreshWorkflowIcon class="esper-svg"/>
         </div>
       </div>
-      <div class="esper-section-container">
+      <div #workflowContainer class="esper-section-container">
+        <div #workflowHeader>
         <div class="esper-section-selector esper-clearfix">
           <select #workflowSelect class="esper-select esper-select-fullwidth">
             <option value="header">Select workflow&hellip;</option>
@@ -856,6 +859,7 @@ module Esper.TaskTab {
             <span class="esper-subheading">Checklist</span>
             <div #checklist class="esper-workflow-checklist"/>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -944,7 +948,7 @@ module Esper.TaskTab {
           }
         });
       });
-    }
+    };
     refreshWorkflow.click(refreshWorkflowList);
 
     showLinkedThreads.click(function() {
@@ -967,6 +971,17 @@ module Esper.TaskTab {
         showLinkedEvents.text("Hide");
         linkActions.addClass("esper-open");
       }
+    });
+
+    showWorkflows.click(function() {
+        Sidebar.toggleList(workflowContainer);
+        if (showWorkflows.text() === "Hide") {
+            showWorkflows.text("Show");
+            workflowHeader.removeClass("esper-open");
+        } else {
+            showWorkflows.text("Hide");
+            workflowHeader.addClass("esper-open");
+        }
     });
 
     createEvent.click(function() {
