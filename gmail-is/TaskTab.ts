@@ -543,6 +543,9 @@ module Esper.TaskTab {
           userTabContent.append(UserTab.viewOfUserTab(team).view);
 
           workflowSection.removeClass("esper-hide");
+        } else {
+          Api.deleteWorkflowProgress(team.teamid, task.taskid);
+          workflowSection.addClass("esper-hide");
         }
       });
     });
@@ -825,26 +828,28 @@ module Esper.TaskTab {
     </div>
 
     <hr class="esper-hr"/>
-    <div class="esper-clearfix esper-workflow-gap esper-section">
-      <select #workflowSelect class="esper-select esper-select-fullwidth">
-        <option value="header">Select workflow...</option>
-      </select>
-    </div>
-    <div #workflowSection class="esper-section esper-hide">
+    <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
       </div>
-      <div class="esper-section-container esper-section-notes">
-        <p #workflowNotes class="esper-text-notes"/>
-        <div class="esper-clearfix esper-workflow-gap">
-          <select #stepSelect class="esper-select esper-select-fullwidth">
-            <option value="header">Select step...</option>
+      <div class="esper-section-container">
+        <div class="esper-section-selector esper-clearfix">
+          <select #workflowSelect class="esper-select esper-select-fullwidth">
+            <option value="header">Select workflow&hellip;</option>
           </select>
         </div>
-        <p #stepNotes class="esper-hide esper-text-notes"/>
-        <div #checklistDiv class="esper-hide">
-          <span class="esper-subheading">Checklist</span>
-          <div #checklist class="esper-workflow-checklist"/>
+        <div #workflowSection class="esper-section-notes esper-hide">
+          <p #workflowNotes class="esper-text-notes"/>
+          <div class="esper-clearfix esper-workflow-gap">
+            <select #stepSelect class="esper-select esper-select-fullwidth">
+              <option value="header">Select step&hellip;</option>
+            </select>
+          </div>
+          <p #stepNotes class="esper-hide esper-text-notes"/>
+          <div #checklistDiv class="esper-hide">
+            <span class="esper-subheading">Checklist</span>
+            <div #checklist class="esper-workflow-checklist"/>
+          </div>
         </div>
       </div>
     </div>
