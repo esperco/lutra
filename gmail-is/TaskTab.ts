@@ -924,24 +924,27 @@ module Esper.TaskTab {
 
     refreshWorkflowList = function() {
       Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
+        CurrentThread.setTask(task);
         Api.getPreferences(team.teamid).done(function(prefs) {
           if (task !== undefined) {
-            displayWorkflow(team, prefs, workflows,
-                            workflowSection, workflowSelect, workflowNotes,
-                            stepSelect, stepNotes,
-                            checklistDiv, checklist);
-            var progress = task.task_workflow_progress;
-            if (progress) {
-              if (workflowSelect.val() !== progress.workflow_id) {
-                workflowSelect.val(progress.workflow_id);
-                workflowSelect.trigger("change");
+            Api.listWorkflows(team.teamid).done(function(response) {
+              var newWorkflows = response.workflows;
+              displayWorkflow(team, prefs, newWorkflows,
+                              workflowSection, workflowSelect, workflowNotes,
+                              stepSelect, stepNotes,
+                              checklistDiv, checklist);
+              var progress = task.task_workflow_progress;
+              if (progress) {
+                if (workflowSelect.val() !== progress.workflow_id) {
+                  workflowSelect.val(progress.workflow_id);
+                  workflowSelect.trigger("change");
+                }
               }
-            }
+            });
           }
         });
       });
     }
-
     refreshWorkflow.click(refreshWorkflowList);
 
     showLinkedThreads.click(function() {
