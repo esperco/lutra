@@ -12,10 +12,14 @@ module Esper.ExtensionOptions {
   // Compose control display options
   export enum ComposeControlsOpts { HIDE, SHOW };
 
+  // Appearnace of task notes copy selection button
+  export enum CopySelectionOpts { HIDE, SHOW };
+
   // What our global options object looks like
   export interface Options {
     defaultSidebarState: SidebarOpts;
     displayComposeControls: ComposeControlsOpts;
+    showCopySelection: CopySelectionOpts;
   };
 
 }

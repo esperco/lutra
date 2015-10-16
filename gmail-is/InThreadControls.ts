@@ -4,6 +4,7 @@
  */
 
 /// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="./CurrentThread.ts" />
 
 module Esper.InThreadControls {
@@ -291,7 +292,11 @@ module Esper.InThreadControls {
       taskNotesKeyup(notes);
     });
 
-    enableHighlightToTaskNotes(editor, saveTaskNotes);
+    var options = ExtensionOptions.store.val();
+    if (options && options.showCopySelection ===
+        ExtensionOptions.CopySelectionOpts.SHOW) {
+      enableHighlightToTaskNotes(editor, saveTaskNotes);
+    }
 
     var timer: number;
     function taskNotesKeyup(notes) {
