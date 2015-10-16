@@ -208,30 +208,35 @@ module Esper.CalEventView {
       ReminderView.openReminderOnClick(reminderButton,
         fullEventId.calendarId, fullEventId.eventId,
         Gcal.Event.extractEventTitle(),
-        guestsState);
+        guestsState, updateReminderList);
       $(".reminder-button").remove();
       Gcal.findAnchorForReminderDropdown().append(view);
+      updateReminderList();
+    });
+  }
 
-      Api.getReminders(fullEventId.calendarId, fullEventId.eventId)
-         .done(function(event_reminders) {
+  function updateReminderList() {
+    var fullEventId = currentEventId;
+    Api.getReminders(fullEventId.calendarId, fullEventId.eventId)
+       .done(function(event_reminders) {
 '''
 <div #reminder class="esper-active-reminders esper">
-  <i class="fa fa-envelope-o"></i>
-  <span #dateTime />
-  <span #close class="esper-clickable esper-close" >×</span>
+<i class="fa fa-envelope-o"></i>
+<span #dateTime />
+<span #close class="esper-clickable esper-close" >×</span>
 </div>
 '''
-        if (event_reminders.reminder_time) {
-          var time = new Date(event_reminders.reminder_time);
-          dateTime.text(moment(time).format('DD MMM YYYY [at] h:mm a'));
-          close.click(function() {
-            Api.unsetReminderTime(fullEventId.eventId).done(function() {
-              reminder.remove();
-            });
+      $(".esper-active-reminders").remove();
+      if (event_reminders.reminder_time) {
+        var time = new Date(event_reminders.reminder_time);
+        dateTime.text(moment(time).format('DD MMM YYYY [at] h:mm a'));
+        close.click(function() {
+          Api.unsetReminderTime(fullEventId.eventId).done(function() {
+            reminder.remove();
           });
-          reminder.appendTo(view);
-        }
-      });
+        });
+        $(".esper-reminder-container").append(reminder);
+      }
     });
   }
 

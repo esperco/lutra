@@ -173,18 +173,23 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   }
 
   function openReminder(fromTeamId, fromEmail, calendarId, eventId,
-                        eventTitle, reminderState:ReminderState) {
+                        eventTitle, reminderState:ReminderState,
+                        onFinish?: () => void) {
     var dialog = Modal.okCancelDialog("Send timed reminder to guests",
       render(fromEmail, reminderState, eventTitle),
       function() {
         reminderState = currentReminderState();
         if (! reminderState.enable) {
-          Api.unsetReminderTime(eventId);
+          Api.unsetReminderTime(eventId).done(function() {
+            if (onFinish !== undefined) onFinish();
+          });
           return true;
         } else if (0 < reminderState.time) {
           Api.setReminderTime(fromTeamId, fromEmail,
                               calendarId, eventId,
-                              reminderState.time);
+                              reminderState.time).done(function() {
+            if (onFinish !== undefined) onFinish();
+          });
           if (reminderState.bccMe) {
             var bccReminder = {
               guest_email: fromEmail,
@@ -210,6 +215,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         } else {
           return false;
         }
+        if (onFinish !== undefined) onFinish();
       },
       "Set reminder");
     $("body").append(dialog.view);
@@ -222,7 +228,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   }
 
   export function openReminderOnClick(button, calendarId, eventId, eventTitle,
-                                      guests) {
+                                      guests, onFinish?: () => void) {
     var teams = Login.myTeams();
     if (teams.length > 0) {
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
@@ -245,7 +251,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         };
         button.click(function() {
           openReminder(teamid, email, calendarId, eventId, eventTitle,
-                       reminderState);
+                       reminderState, onFinish);
           Analytics.track(Analytics.Trackable.ClickReminderButton);
         });
       });
