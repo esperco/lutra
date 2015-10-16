@@ -8,7 +8,6 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
-  export var refreshWorkflowList: () => void;
 
   // TODO: Replace with JQStore or something else cleans up references when
   // removed from DOM?
@@ -263,6 +262,36 @@ module Esper.TaskTab {
         taskTab.linkedThreadsList.show();
       });
   }
+
+  /* Refresh workflow view, fetch task workflow progress and workflows from server */
+  function refreshWorkflowList(team, threadId, taskTab) {
+    taskTab.workflowSpinner.show();
+    taskTab.workflowHeader.hide();
+    Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
+      CurrentThread.setTask(task);
+      Api.getPreferences(team.teamid).done(function(prefs) {
+        if (task !== undefined) {
+          Api.listWorkflows(team.teamid).done(function(response) {
+            var newWorkflows = response.workflows;
+            displayWorkflow(team, prefs, newWorkflows,
+                taskTab.workflowSection, taskTab.workflowSelect, taskTab.workflowNotes,
+                taskTab.stepSelect, taskTab.stepNotes,
+                taskTab.checklistDiv, taskTab.checklist);
+            var progress = task.task_workflow_progress;
+            if (progress) {
+              if (taskTab.workflowSelect.val() !== progress.workflow_id) {
+                taskTab.workflowSelect.val(progress.workflow_id);
+                taskTab.workflowSelect.trigger("change");
+              }
+            }
+          }).always(function() {
+            taskTab.workflowSpinner.hide();
+            taskTab.workflowHeader.show();
+          });
+        }
+      });
+    });
+  };
 
   /* Refresh task progress, fetching task progress from the server. */
   export function refreshTaskProgressSelection(team, threadId, taskTab) {
@@ -929,38 +958,12 @@ module Esper.TaskTab {
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
 
-    refreshWorkflowList = function() {
-      workflowSpinner.show();
-      workflowHeader.hide();
-      Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
-        CurrentThread.setTask(task);
-        Api.getPreferences(team.teamid).done(function(prefs) {
-          if (task !== undefined) {
-            Api.listWorkflows(team.teamid).done(function(response) {
-              var newWorkflows = response.workflows;
-              displayWorkflow(team, prefs, newWorkflows,
-                              workflowSection, workflowSelect, workflowNotes,
-                              stepSelect, stepNotes,
-                              checklistDiv, checklist);
-              var progress = task.task_workflow_progress;
-              if (progress) {
-                if (workflowSelect.val() !== progress.workflow_id) {
-                  workflowSelect.val(progress.workflow_id);
-                  workflowSelect.trigger("change");
-                }
-              }
-            }).always(function () {
-              workflowSpinner.hide();
-              workflowHeader.show();
-            });
-          }
-        });
-      });
-    };
-    refreshWorkflow.click(refreshWorkflowList);
+    refreshWorkflow.click(function() {
+      refreshWorkflowList(team, threadId, taskTabView)
+    });
 
     // Load workflow now
-    refreshWorkflowList();
+    refreshWorkflowList(team, threadId, taskTabView);
 
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
