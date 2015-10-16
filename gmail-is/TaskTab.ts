@@ -8,6 +8,7 @@ module Esper.TaskTab {
   /* To refresh from outside, like in CalPicker */
   export var refreshLinkedThreadsAction : () => void;
   export var refreshLinkedEventsAction : () => void;
+  export var refreshWorkflowList: () => void;
 
   // TODO: Replace with JQStore or something else cleans up references when
   // removed from DOM?
@@ -491,16 +492,17 @@ module Esper.TaskTab {
                            checklist : JQuery) : void {
     Sidebar.customizeSelectArrow(workflowSelect);
     Sidebar.customizeSelectArrow(stepSelect);
-
+    
+    workflowSelect.children("#wf").remove();
     List.iter(workflows, function(wf) {
-      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
+      $("<option id='wf' value='" + wf.id + "'>" + wf.title + "</option>")
         .appendTo(workflowSelect);
     });
 
     var currentWorkflow : ApiT.Workflow;
     var currentProgress : ApiT.TaskWorkflowProgress;
 
-    workflowSelect.change(function() {
+    workflowSelect.unbind().change(function() {
       var chosen = $(this).val();
       CurrentThread.getTaskForThread().done(function(task) {
         if (chosen !== "header") {
@@ -554,7 +556,7 @@ module Esper.TaskTab {
       Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
-    stepSelect.change(function() {
+    stepSelect.unbind().change(function() {
       var chosen = $(this).val();
       if (chosen !== "header") {
         var wf = currentWorkflow;
@@ -831,6 +833,10 @@ module Esper.TaskTab {
     <div class="esper-section">
       <div class="esper-section-header esper-clearfix esper-open">
         <span class="esper-bold" style="float:left">Workflow</span>
+        <div #refreshWorkflow
+          class="esper-refresh esper-clickable">
+          <object #refreshWorkflowIcon class="esper-svg"/>
+        </div>
       </div>
       <div class="esper-section-container">
         <div class="esper-section-selector esper-clearfix">
@@ -890,6 +896,7 @@ module Esper.TaskTab {
     refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
+    refreshWorkflowIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
 
     displayLinkedEventsList(team, threadId, taskTabView, linkedEvents);
 
@@ -914,6 +921,28 @@ module Esper.TaskTab {
       }
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
+
+    refreshWorkflowList = function() {
+      Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
+        Api.getPreferences(team.teamid).done(function(prefs) {
+          if (task !== undefined) {
+            displayWorkflow(team, prefs, workflows,
+                            workflowSection, workflowSelect, workflowNotes,
+                            stepSelect, stepNotes,
+                            checklistDiv, checklist);
+            var progress = task.task_workflow_progress;
+            if (progress) {
+              if (workflowSelect.val() !== progress.workflow_id) {
+                workflowSelect.val(progress.workflow_id);
+                workflowSelect.trigger("change");
+              }
+            }
+          }
+        });
+      });
+    }
+
+    refreshWorkflow.click(refreshWorkflowList);
 
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
