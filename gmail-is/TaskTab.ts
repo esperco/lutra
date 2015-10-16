@@ -842,24 +842,27 @@ module Esper.TaskTab {
       </div>
       <div #workflowContainer class="esper-section-container">
         <div #workflowHeader>
-        <div class="esper-section-selector esper-clearfix">
-          <select #workflowSelect class="esper-select esper-select-fullwidth">
-            <option value="header">Select workflow&hellip;</option>
-          </select>
-        </div>
-        <div #workflowSection class="esper-section-notes esper-hide">
-          <p #workflowNotes class="esper-text-notes"/>
-          <div class="esper-clearfix esper-workflow-gap">
-            <select #stepSelect class="esper-select esper-select-fullwidth">
-              <option value="header">Select step&hellip;</option>
+          <div class="esper-section-selector esper-clearfix">
+            <select #workflowSelect class="esper-select esper-select-fullwidth">
+              <option value="header">Select workflow&hellip;</option>
             </select>
           </div>
-          <p #stepNotes class="esper-hide esper-text-notes"/>
-          <div #checklistDiv class="esper-hide">
-            <span class="esper-subheading">Checklist</span>
-            <div #checklist class="esper-workflow-checklist"/>
+          <div #workflowSection class="esper-section-notes esper-hide">
+            <p #workflowNotes class="esper-text-notes"/>
+            <div class="esper-clearfix esper-workflow-gap">
+              <select #stepSelect class="esper-select esper-select-fullwidth">
+                <option value="header">Select step&hellip;</option>
+              </select>
+            </div>
+            <p #stepNotes class="esper-hide esper-text-notes"/>
+            <div #checklistDiv class="esper-hide">
+              <span class="esper-subheading">Checklist</span>
+              <div #checklist class="esper-workflow-checklist"/>
+            </div>
           </div>
         </div>
+        <div #workflowSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
         </div>
       </div>
     </div>
@@ -927,6 +930,8 @@ module Esper.TaskTab {
     refreshLinkedEvents.click(refreshLinkedEventsAction);
 
     refreshWorkflowList = function() {
+      workflowSpinner.show();
+      workflowHeader.hide();
       Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
         CurrentThread.setTask(task);
         Api.getPreferences(team.teamid).done(function(prefs) {
@@ -944,6 +949,9 @@ module Esper.TaskTab {
                   workflowSelect.trigger("change");
                 }
               }
+            }).always(function () {
+              workflowSpinner.hide();
+              workflowHeader.show();
             });
           }
         });
