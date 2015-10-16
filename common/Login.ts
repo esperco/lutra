@@ -96,7 +96,7 @@ module Esper.Login {
       return undefined;
     }
     else {
-      return JSON.stringify(a.credentials);
+      return a.googleAccountId + " " + JSON.stringify(a.credentials);
     }
   }
 

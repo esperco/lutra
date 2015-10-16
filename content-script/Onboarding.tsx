@@ -7,6 +7,8 @@
 /// <reference path="../common/Log.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Types.ts" />
+/// <reference path="../common/HostUrl.ts" />
+/// <reference path="../common/Analytics.Chrome.ts" />
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
@@ -36,6 +38,7 @@ module Esper.Onboarding {
   // This function gest called when we have login data
   export function handleLogin() {
     CurrentSlide.set(2);
+    track(Analytics.Trackable.OnboardingLoginSuccess);
   }
 
 
@@ -116,6 +119,28 @@ module Esper.Onboarding {
   }
 
 
+  // Analytics helpers
+  function track(trackable: Analytics.Trackable,
+                 account?: Types.Account, props?: any) {
+    props = props || {};
+    account = account || Login.getAccount();
+    if (account) {
+      props.googleAccountId = account.googleAccountId;
+    }
+
+    var googlePage: string;
+    if (HostUrl.isGcal(document.URL)) {
+      props.googlePage = "Gmail";
+    } else if (HostUrl.isGcal(document.URL)) {
+      props.googlePage = "Gcal";
+    } else {
+      props.googlePage = document.URL;
+    }
+
+    Analytics.track(trackable, props);
+  }
+
+
   /////////////
 
   // State elements that slide logic cannot (directly) change
@@ -190,6 +215,8 @@ module Esper.Onboarding {
         self.jQuery().parent().remove();
         $('html').removeClass('esper-bs');
       });
+
+      track(Analytics.Trackable.OnboardingModalOpen, this.props);
     }
 
     // Get slide state -- mix in slide-specific state as well
@@ -448,6 +475,7 @@ module Esper.Onboarding {
       var account = this.props.account;
       account.declined = true;
       EsperStorage.saveAccount(account, this.props.close);
+      track(Analytics.Trackable.ClickOnboardingDisable, account);
     }
   }
 
@@ -476,7 +504,7 @@ module Esper.Onboarding {
             Waiting for {this.props.account.googleAccountId} to sign in
           </div>
           <button className="esper-google-btn"
-                  onClick={this.openLoginTab.bind(this)}></button>
+                  onClick={this.clickLoginButton.bind(this)}></button>
         </div>);
       }
 
@@ -492,6 +520,11 @@ module Esper.Onboarding {
 
     openLoginTab() {
       Auth.openLoginTab(this.props.account.googleAccountId);
+    }
+
+    clickLoginButton() {
+      track(Analytics.Trackable.ClickOnboardingLogin);
+      this.openLoginTab();
     }
   }
 
@@ -645,6 +678,16 @@ module Esper.Onboarding {
         });
       });
 
+      // Tracking
+      var newRequestsList = _.map(newRequests, function(tuple) {
+        return tuple[1];
+      });
+      track(Analytics.Trackable.ClickOnboardingCreateTeams, null, {
+        isValid: isValid,
+        teamCount: newRequestsList.length,
+        requests: newRequestsList
+      });
+
       if (isValid) {
         var promises = [];
         _.each(newRequests, function(tuple) {
@@ -663,7 +706,7 @@ module Esper.Onboarding {
                   return {
                     google_cal_id: calId,
                     calendar_title: "", // This gets replaced with actual
-                    // calendar title elsewhere
+                                        // calendar title elsewhere
                     calendar_default_agenda: true,
                     calendar_default_view: true
                   };
@@ -671,7 +714,7 @@ module Esper.Onboarding {
               calendars.push({
                 google_cal_id: request.defaultCal,
                 calendar_title: "", // This gets replaced with actual calendar
-                // title elsewhere
+                                    // title elsewhere
                 is_primary: true,
                 calendar_default_view: true,
                 calendar_default_write: true,
@@ -828,9 +871,11 @@ module Esper.Onboarding {
             }
             {
               saved ?
-              <div className="label label-success form-group">
-                <i className="fa fa-fw fa-check"></i>
-                Team Created
+              <div className="form-group">
+                <div className="label label-success">
+                  <i className="fa fa-fw fa-check"></i>
+                  Team Created
+                </div>
               </div> : ""
             }
           </div></div>
@@ -887,6 +932,30 @@ module Esper.Onboarding {
   // Slide 3 => videos + final stuff
   class FinishSlide extends Slide<{}> {
     render() {
+      var videoList: [string, string][] = [
+        ["Creating Tasks", "https://youtu.be/HjSvKdw8j-A"],
+        ["Creating Events", "https://youtu.be/wJ-CX7q7Tu0"],
+        ["Composing an Email", "https://youtu.be/n12EPAC3DIE"],
+        ["Sending an Invitation", "https://youtu.be/7QCyGYdyV6A"],
+        ["Setting Preferences", "https://youtu.be/ZtX-87KAYtg"]
+      ];
+
+      var self = this;
+      var videoLinks = _.map(videoList, function(tuple) {
+        var name = tuple[0];
+        var href = tuple[1];
+
+        // NB: Use onMouseDown instead of onClick because user may want to
+        // right-click and open in new tab
+        return (<li key={"video-" + name}>
+          <a href={href} target="_blank"
+             onMouseDown={self.trackOutbound.bind(self)}>
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            {name}
+          </a>
+        </li>);
+      });
+
       return (<div>
         <p>Let’s face it, most of us already use our inbox as a task list.
         So why not embrace it? At Esper, we do exactly that. Esper is built on
@@ -902,34 +971,25 @@ module Esper.Onboarding {
         expert!</p>
 
         <ol>
-          <li><a href="https://youtu.be/HjSvKdw8j-A">
-            <i className="fa fa-fw fa-la fa-youtube-play"></i>
-            Creating Tasks
-          </a></li>
-          <li><a href="https://youtu.be/wJ-CX7q7Tu0">
-            <i className="fa fa-fw fa-la fa-youtube-play"></i>
-            Creating Events
-          </a></li>
-          <li><a href="https://youtu.be/n12EPAC3DIE">
-            <i className="fa fa-fw fa-la fa-youtube-play"></i>
-            Composing an Email
-          </a></li>
-          <li><a href="https://youtu.be/7QCyGYdyV6A">
-            <i className="fa fa-fw fa-la fa-youtube-play"></i>
-            Sending an Invitation
-          </a></li>
-          <li><a href="https://youtu.be/ZtX-87KAYtg">
-            <i className="fa fa-fw fa-la fa-youtube-play"></i>
-            Setting Preferences
-          </a></li>
+          {videoLinks}
         </ol>
       </div>);
+    }
+
+    trackOutbound(e) {
+      track(Analytics.Trackable.ClickOnboardingYouTube, null, {
+        url: e.currentTarget.href
+      });
     }
   }
 
   var finishSlideLogic: SlideLogic = {
     view: FinishSlide,
-    title: "How to Use Esper"
+    title: "How to Use Esper",
+    next: function() {
+      track(Analytics.Trackable.ClickOnboardingFinish);
+      return Promise.defer(null);
+    }
   };
 
 
