@@ -224,7 +224,9 @@ module Esper.Onboarding {
         $('html').removeClass('esper-bs');
       });
 
-      track(Analytics.Trackable.OnboardingModalOpen, this.props);
+      if (!this.props.hideFooter && !this.props.hideProgressBar) {
+        track(Analytics.Trackable.OnboardingModalOpen, this.props.account);
+      }
     }
 
     // Get slide state -- mix in slide-specific state as well
