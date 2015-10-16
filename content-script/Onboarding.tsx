@@ -227,6 +227,7 @@ module Esper.Onboarding {
       if (!this.props.hideFooter && !this.props.hideProgressBar) {
         track(Analytics.Trackable.OnboardingModalOpen, this.props.account);
       }
+      track(Analytics.Trackable.OnboardingModalOpen, this.props.account);
     }
 
     // Get slide state -- mix in slide-specific state as well
