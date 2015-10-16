@@ -387,7 +387,6 @@ a.esper-a:hover {
 
 select.esper-select {
   vertical-align: middle !important;
-  float: left;
   height: 32px;
   padding: 6px 20px 6px 9px;
   line-height: 1.2;
@@ -2528,23 +2527,17 @@ textarea.esper-description-text {
   }
 }
 
-.esper-calendar-grid {
+.esper .esper-calendar-grid {
   .fc-toolbar { margin-bottom: 10px; }
   .esper-calendar-modal-event-settings {
-    padding: 10px;
+    padding: 5px;
     font-size: 13px;
     background: @gray_f8;
     border-bottom: 1px solid @gray_10;
-    .esper-event-settings-col {
-      float: left;
-      width: 50%;
-      span {
-        float: left;
-        margin: 8px 8px 0 0;
-      }
-      div.new-line { margin-top: 25px; }
-      select.esper-select, input.esper-input { width: 50%; }
-    }
+  }
+  .fc-toolbar .fc-state-active,
+  .fc-toolbar .ui-state-active {
+    z-index: 2;
   }
 }
 

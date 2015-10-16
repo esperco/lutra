@@ -43,13 +43,11 @@ module Esper.CalPicker {
     eventTitle : JQuery;
     eventLocation : JQuery;
     locationDropdown : JQuery;
-    locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
     execTzDiv : JQuery;
     guestTzDiv : JQuery;
     viewCalInput : JQuery;
     viewCalDropdown : JQuery;
-    viewCalSection : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
   }
@@ -108,45 +106,48 @@ module Esper.CalPicker {
 <div #view>
   <div #calendarPickerContainer class="hide">
     <div #dateJumper class="esper-date-jumper" style="display: none"/>
-    <div class="esper-calendar-modal-event-settings esper-clearfix">
-      <div class="esper-event-settings-col">
-        <div>
-          <span class="esper-bold">Event title:</span>
-          <input #eventTitle type="text" size="24" class="esper-input"/>
+    <div class="esper-calendar-modal-event-settings esper-clearfix esper-bs">
+      <div class="container-fluid"><div class="row">
+        <div class="col-md-6 col-lg-4">
+          <div class="form-group">
+            <label class="control-label">Event Title</label>
+            <input #eventTitle type="text" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <label class="control-label">Location</label>
+            <div class="dropdown">
+              <input #eventLocation type="text" class="form-control"
+                     data-toggle="dropdown" />
+              <ul #locationDropdown class="dropdown-menu" />
+            </div>
+          </div>
         </div>
-        <div style="margin-top: 8px">
-          <span class="esper-bold">Location:</span>
-          <input #eventLocation type="text" size="24" class="esper-input"/>
-          <ul #locationDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-            <div #locationSearchResults class="esper-dropdown-section"/>
-          </ul>
+        <div class="col-md-6 col-lg-4">
+          <div class="form-group">
+            <label class="control-label">View Calendars</label>
+            <div class="dropdown">
+              <select #viewCalInput class="esper-select form-control"
+                      data-toggle="dropdown" />
+              <ul #viewCalDropdown class="dropdown-menu" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label">Save Events To</label>
+            <select #pickerSwitcher class="esper-select form-control"/>
+          </div>
         </div>
-        <div style="margin-top: 8px">
-          <span class="esper-bold">View calendars:</span>
-          <select #viewCalInput class="esper-select esper-click-safe"/>
-          <ul #viewCalDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn"
-              style="width: 50%">
-            <div #viewCalSection class="esper-dropdown-section"/>
-          </ul>
+        <div class="col-md-12 col-lg-4"><div class="row">
+          <div class="col-md-6 col-lg-12 form-group">
+            <label class="control-label">Executive Timezone</label>
+            <div #execTzDiv />
+          </div>
+          <div class="col-md-6 col-lg-12 form-group">
+            <label class="control-label">Guest Timezone</label>
+            <div #guestTzDiv />
+          </div>
         </div>
-      </div>
-      <div class="esper-event-settings-col">
-        <div>
-          <span class="esper-bold">Save events to:</span>
-          <select #pickerSwitcher class="esper-select"/>
-        </div>
-        <br/>
-        <div class="new-line" #execTzDiv>
-          <span class="esper-bold">Executive timezone:</span>
-        </div>
-        <br/>
-        <div class="new-line" #guestTzDiv>
-          <span class="esper-bold">Guest timezone:</span>
-        </div>
-      </div>
-    </div>
+      </div></div>
+    </div></div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
         <div #calendarView class="esper-cal-picker-container"/>
@@ -181,10 +182,11 @@ module Esper.CalPicker {
     showZoneAbbr = zoneAbbr(showTimezone);
     guestZoneAbbr = zoneAbbr(guestTimezone);
 
+    eventLocation.dropdown();
     function searchLocation() {
       var query = eventLocation.val();
       LocSearch.displayResults(team, eventLocation, locationDropdown,
-                               locationSearchResults, query, prefs);
+                               query, prefs);
     }
     Util.afterTyping(eventLocation, 250, searchLocation);
     eventLocation.click(function() {
@@ -239,10 +241,11 @@ module Esper.CalPicker {
       viewCalInput.append("<option>" + curViewList.join(", ") + "</option>");
     }
     updateCalendarViewList();
+    viewCalInput.dropdown();
     viewCalInput.mousedown(function(e) {
       e.preventDefault();
-      viewCalDropdown.show();
-      viewCalDropdown.addClass("esper-open");
+      viewCalDropdown.width(viewCalInput.width());
+      viewCalInput.dropdown('toggle');
       Analytics.track(Analytics.Trackable.ClickCalendarPickerViewCalendar);
     });
     List.iter(calendars, function(cal, i) {
@@ -271,11 +274,15 @@ module Esper.CalPicker {
       });
       calendarName.text(cal.calendar_title + " (" + abbr + ")");
       calendarCheckboxRow.data("tz", cal.calendar_timezone);
-      calendarCheckboxRow.appendTo(viewCalSection);
+      calendarCheckboxRow.appendTo(viewCalDropdown);
     });
 
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
+    execTz.parent().css("display", "block");
+    execTz.addClass("form-control");
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
+    guestTz.parent().css("display", "block");
+    guestTz.addClass("form-control");
 
     execTz.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(execTz);
