@@ -827,7 +827,8 @@ module Esper.UserTab {
           <span class="esper-show-selector">Show: </span>
           <select #meetingSelector class="esper-select esper-meeting-selector"/>
         </div>
-        <div #noMeetingPrefs style="display: none" class="esper-no-prefs"/>
+        <div #noMeetingPrefs style="display: none"
+             class="esper-no-content esper-no-prefs"/>
         <div class="esper-user-tab-meeting-info" #meetingInfo/>
       </div>
     </div>

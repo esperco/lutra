@@ -39,7 +39,7 @@ module Esper.TaskLabels {
       return (<div className="esper-bs">
         <div>
           { labelElms && labelElms.length ? labelElms :
-            <div className="esper-no-labels">No Labels Found</div> }
+            <div className="esper-no-content">No Labels Found</div> }
         </div>
         <div className="esper-subsection-footer">
           {
