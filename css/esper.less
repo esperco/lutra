@@ -1336,6 +1336,10 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-top: none;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+
+  .esper-section-content {
+    padding: 10px;
+  }
 }
 
 
@@ -1526,14 +1530,17 @@ ul.esper-availability-graph {
   &:hover { background: @purple_bg_hover; }
 }
 
-.esper-no-events,
-.esper-no-prefs,
-.esper-no-labels,
-.esper-no-threads {
+.esper-no-content {
   padding: 50px 0;
   font-size: 16px;
   color: @gray_20;
   text-align: center;
+
+  .esper-settings-link {
+    font-size: 12px;
+    display: block;
+    margin-top: 10px;
+  }
 }
 
 .esper-events-list { padding: 0 10px; }
