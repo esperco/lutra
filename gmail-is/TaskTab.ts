@@ -288,6 +288,9 @@ module Esper.TaskTab {
             taskTab.workflowSpinner.hide();
             taskTab.workflowHeader.show();
           });
+        } else {
+          taskTab.workflowSpinner.hide();
+          taskTab.workflowHeader.show();
         }
       });
     });
