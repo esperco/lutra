@@ -34,7 +34,8 @@ module Esper.XDate {
 
   /* 0-23 */
   export function hours(d : Date) : number {
-    return d.getUTCHours();
+    return d.getHours();
+    //return d.getUTCHours(); Unknown why this stopped being correct.
   }
 
   /* 0-59 */
