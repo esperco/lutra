@@ -34,8 +34,7 @@ module Esper.XDate {
 
   /* 0-23 */
   export function hours(d : Date) : number {
-    return d.getHours();
-    //return d.getUTCHours(); Unknown why this stopped being correct.
+    return d.getUTCHours();
   }
 
   /* 0-59 */
@@ -146,6 +145,10 @@ module Esper.XDate {
 
   export function timeOnly24Hours(d : Date) : string {
     return pad(d.getUTCHours().toString()) + ":" + pad(d.getUTCMinutes().toString());
+  }
+
+  export function localTimeOnly24Hours(d : Date) : string {
+    return pad(d.getHours().toString()) + ":" + pad(d.getMinutes().toString());
   }
 
   /* "August 13, 12:30-1pm" */

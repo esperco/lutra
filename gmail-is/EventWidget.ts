@@ -334,8 +334,8 @@ module Esper.EventWidget {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
+    startTime.text(XDate.utcToLocalTimeOnly(start));
+    endTime.text(XDate.utcToLocalTimeOnly(end));
 
     timezone.text(CalPicker.zoneAbbr(showTimezone));
 
