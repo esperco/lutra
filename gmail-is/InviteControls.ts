@@ -925,8 +925,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
 
     var tzSel = Timezone.appendTimezoneSelector(tzSelectDiv, tz);
     tzSel.parent().css("display", "block");
-    tzSel.addClass("form-control");
-
+    tzSel.addClass("form-control").css("background-color", "white");
     tzSel.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(tzSel);
       var pref : ApiT.GuestPreferences = {
