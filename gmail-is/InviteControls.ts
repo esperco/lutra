@@ -163,36 +163,31 @@ module Esper.InviteControls {
   <div class="esper-modal-content container-fluid">
     <div class="form-horizontal">
       <div #titleRow class="form-group clearfix">
-        <label for="esper-invite-title"
-          class="control-label col-sm-2">Title</label>
+        <label class="control-label col-sm-2">Title</label>
         <div class="col-sm-10">
-          <input id="esper-invite-title"
-            #pubTitle type="text" class="form-control"/>
+          <input #pubTitle type="text" class="form-control"/>
         </div>
       </div>
       <div #whereRow class="form-group clearfix">
-        <label for="esper-invite-location"
-          class="control-label col-sm-2">Location</label>
+        <label class="control-label col-sm-2">Location</label>
         <div class="col-sm-10">
           <div class="dropdown">
-            <input id="esper-invite-location" #pubLocation
-              type="text" class="form-control"/>
+            <input #pubLocation type="text" class="form-control"
+              data-toggle="dropdown" />
             <ul #locationDropdown class="dropdown-menu" />
           </div>
         </div>
       </div>
       <div #calendarRow class="form-group clearfix">
-        <label for="esper-invite-calendar"
-          class="control-label col-sm-2">Calendar</label>
+        <label class="control-label col-sm-2">Calendar</label>
         <div class="col-sm-10">
-          <select id="esper-invite-calendar"
-            #pubCalendar class="esper-select form-control"/>
+          <select #pubCalendar class="esper-select form-control"/>
         </div>
       </div>
       <div #notesRow class="form-group clearfix">
-        <label for="esper-invite-notes" class="control-label col-sm-2">Notes</label>
+        <label class="control-label col-sm-2">Notes</label>
         <div class="col-sm-10">
-          <textarea id="esper-invite-notes" #pubNotes rows=8
+          <textarea #pubNotes rows=8
            class="form-control" style="min-height:100px" />
         </div>
       </div>
@@ -238,6 +233,23 @@ module Esper.InviteControls {
     var event    = state.event;
 
     Sidebar.customizeSelectArrow(pubCalendar);
+
+    // Assign random but matching ids and labels
+    var randomId = Util.randomString();
+    titleRow.find('label').attr('for', randomId);
+    titleRow.find('input').attr('id', randomId);
+
+    randomId = Util.randomString();
+    whereRow.find('label').attr('for', randomId);
+    whereRow.find('input').attr('id', randomId);
+
+    randomId = Util.randomString();
+    calendarRow.find('label').attr('for', randomId);
+    calendarRow.find('input').attr('id', randomId);
+
+    randomId = Util.randomString();
+    notesRow.find('label').attr('for', randomId);
+    notesRow.find('textarea').attr('id', randomId);
 
     var headingText: string;
     var defaultTitle: string;
