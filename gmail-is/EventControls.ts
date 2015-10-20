@@ -147,75 +147,104 @@ module Esper.EventControls {
   export function eventEditWidget(event: ApiT.CalendarEvent,
                                   prefs: Option.T<CurrentThread.TeamAndPreferences>) {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container class="esper-ev-inline-container esper-bs">
   <div #heading class="esper-modal-header">
     Edit Event Details
   </div>
-  <div class="esper-modal-content">
-    <div #titleRow class="esper-ev-modal-row esper-clearfix">
-      <div class="esper-ev-modal-left esper-bold">Title</div>
-        <div class="esper-ev-modal-right">
-          <input #pubTitle type="text" class="esper-input"/>
+  <div class="esper-modal-content container-fluid esper-scroll-target">
+    <div class="form-horizontal">
+      <div #titleRow class="form-group clearfix">
+        <label class="control-label col-sm-2" for="esper-event-title">
+          Title</label>
+        <div class="col-sm-10">
+          <input id="esper-event-title" #pubTitle type="text"
+            class="form-control" />
         </div>
       </div>
-      <div #whenRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">When</div>
-        <div class="esper-ev-modal-right">
-          <input #startDate type="date" class="esper-input"/>
-          <input #startTime type="time" class="esper-input"/>
-          to
-          <input #endDate type="date" class="esper-input"/>
-          <input #endTime type="time" class="esper-input"/>
+      <div #whenRow class="form-group clearfix">
+        <label class="control-label col-sm-2" for="esper-event-start-date">
+          When</label>
+        <div class="col-sm-10">
+          <div class="row">
+            <div class="col-lg-3 col-xs-6">
+              <input id="esper-event-start-date"
+               #startDate type="date" class="form-control"/>
+            </div>
+            <div class="col-lg-2 col-xs-5">
+              <input #startTime type="time" class="form-control"/>
+            </div>
+            <label class="col-lg-2 col-xs-1 inline-form-text text-center"
+              for="esper-event-end-date">
+              to
+            </label>
+            <div class="col-lg-3 col-xs-6">
+              <input #endDate type="date" id="esper-event-end-date"
+                class="form-control"/>
+            </div>
+            <div class="col-lg-2 col-xs-5">
+              <input #endTime type="time" class="form-control"/>
+            </div>
+          </div>
         </div>
       </div>
-      <div #whereRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Location</div>
-        <div class="esper-ev-modal-right">
-          <input #pubLocation type="text" class="esper-input"/>
-          <ul #locationDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-          </ul>
+      <div #whereRow class="form-group clearfix">
+        <label class="control-label col-sm-2"
+          for="esper-event-location-dropdown">Location</label>
+        <div class="col-sm-10">
+          <div class="dropdown">
+            <input #pubLocation type="text" class="form-control"
+              data-toggle="dropdown" id="esper-event-location-dropdown" />
+            <ul #locationDropdown class="dropdown-menu" />
+          </div>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Edited by</div>
-        <div class="esper-ev-modal-right">
-          <select #fromSelect class="esper-select"/>
-        </div>
-      </div>
-      <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description<br/>
-          <button #pickEmails class="esper-btn esper-btn-secondary">
+      <div #descriptionRow class="form-group clearfix">
+        <div class="col-sm-2 text-right">
+          <label for="esper-edit-event-description"
+                 class="control-label">Description</label>
+          <br /><br />
+          <button #pickEmails class="btn btn-secondary">
             Pick Emails
           </button>
         </div>
-        <div class="esper-ev-modal-right">
-          <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
+        <div class="col-sm-10">
+          <textarea id="esper-edit-event-description" #pubDescription
+           rows=8 class="form-control" style="min-height:100px" />
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Guests</div>
-        <div class="esper-ev-modal-right">
-          <ul #viewPeopleInvolved/>
-          <br/>
-          <input #newGuestName class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Name"/>
-          <input #newGuestEmail class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Email"/>
-          <button #addGuest class="esper-btn esper-btn-secondary">
-            Add
-          </button>
+      <div class="form-group clearfix">
+        <label class="control-label col-sm-2">Guests</label>
+        <div class="col-sm-10">
+          <ul #noGuestsFound class="list-group">
+            <li class="list-group-item">No Guests Found</li>
+          </ul>
+          <ul #viewPeopleInvolved class="list-group" />
+          <div class="row clearfix">
+            <div class="col-sm-5">
+              <input #newGuestName class="form-control"
+               type="text" placeholder="Name" />
+            </div>
+            <div class="col-sm-5">
+              <input #newGuestEmail class="form-control"
+               type="text" placeholder="Email" />
+            </div>
+            <div class="col-sm-2">
+              <button #addGuest class="btn btn-secondary" style="width:100%">
+                Add
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="esper-modal-footer esper-clearfix">
-        <button #save class="esper-btn esper-btn-primary modal-primary">
-          Save
-        </button>
-        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-          Cancel
-        </button>
       </div>
     </div>
+  </div>
+  <div class="esper-modal-footer esper-clearfix">
+    <button #save class="btn btn-primary">
+      Save
+    </button>
+    <button #cancel class="btn btn-secondary">
+      Cancel
+    </button>
   </div>
 </div>
 '''
@@ -228,8 +257,6 @@ module Esper.EventControls {
 
         var team = allPrefs.team;
         var threadId = CurrentThread.threadId.get();
-
-        Sidebar.customizeSelectArrow(fromSelect);
 
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
@@ -246,16 +273,6 @@ module Esper.EventControls {
           }
 
           pubLocation.val(address);
-        }
-
-        var aliases = team.team_email_aliases;
-        if (aliases.length === 0) {
-          $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-          fromSelect.prop("disabled", true);
-        } else {
-          aliases.forEach(function (email: string) {
-            $("<option>" + email + "</option>").appendTo(fromSelect);
-          });
         }
 
         var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
@@ -294,9 +311,11 @@ module Esper.EventControls {
                                                       checked);
             viewPeopleInvolved.append(v);
           });
+          noGuestsFound.hide();
+          viewPeopleInvolved.show();
         } else {
-          viewPeopleInvolved
-            .append($("<li class='esper-gray'>No guests found</li>"));
+          noGuestsFound.show();
+          viewPeopleInvolved.hide();
         }
 
         addGuest.click(function() {
@@ -313,6 +332,8 @@ module Esper.EventControls {
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
+          noGuestsFound.hide();
+          viewPeopleInvolved.show();
         });
 
         pubDescription.val(event.description);
@@ -362,7 +383,7 @@ module Esper.EventControls {
             startTime.val(XDate.timeOnly24Hours(start));
             endDate.val(XDate.dateValue(end));
             endTime.val(XDate.timeOnly24Hours(end));
-          
+
             save.click(function() {
               //moment-tz apparently doesn't handle these timezones
               if (calTimezone === "US/Eastern") calTimezone = "America/New_York";
@@ -421,7 +442,7 @@ module Esper.EventControls {
                 recurring_event_id: event.recurring_event_id
               }
 
-              var alias = fromSelect.val();
+              var alias = Login.myEmail();
 
               function finish() {
                 var taskTab = TaskTab.currentTaskTab;

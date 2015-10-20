@@ -110,39 +110,48 @@ module Esper.CalPicker {
       <div class="container-fluid"><div class="row">
         <div class="col-md-6 col-lg-4">
           <div class="form-group">
-            <label class="control-label">Event Title</label>
-            <input #eventTitle type="text" class="form-control"/>
+            <label for="esper-calpicker-title"
+              class="control-label">Event Title</label>
+            <input id="esper-calpicker-title"
+              #eventTitle type="text" class="form-control"/>
           </div>
           <div class="form-group">
-            <label class="control-label">Location</label>
+            <label for="esper-calpicker-location" class="control-label">Location</label>
             <div class="dropdown">
-              <input #eventLocation type="text" class="form-control"
-                     data-toggle="dropdown" />
+              <input id="esper-calpicker-location"
+                #eventLocation type="text" class="form-control"
+                data-toggle="dropdown" />
               <ul #locationDropdown class="dropdown-menu" />
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
           <div class="form-group">
-            <label class="control-label">View Calendars</label>
+            <label for="esper-calpicker-calendars" class="control-label">
+              View Calendars</label>
             <div class="dropdown">
               <select #viewCalInput class="esper-select form-control"
+                      id="esper-calpicker-calendars"
                       data-toggle="dropdown" />
               <ul #viewCalDropdown class="dropdown-menu" />
             </div>
           </div>
           <div class="form-group">
-            <label class="control-label">Save Events To</label>
-            <select #pickerSwitcher class="esper-select form-control"/>
+            <label for="esper-calpicker-save-to"
+              class="control-label">Save Events To</label>
+            <select id="esper-calpicker-save-to"
+              #pickerSwitcher class="esper-select form-control"/>
           </div>
         </div>
         <div class="col-md-12 col-lg-4"><div class="row">
           <div class="col-md-6 col-lg-12 form-group">
-            <label class="control-label">Executive Timezone</label>
+            <label for="esper-calpicker-exec-tz"
+              class="control-label">Executive Timezone</label>
             <div #execTzDiv />
           </div>
           <div class="col-md-6 col-lg-12 form-group">
-            <label class="control-label">Guest Timezone</label>
+            <label for="esper-calpicker-guest-tz"
+              class="control-label">Guest Timezone</label>
             <div #guestTzDiv />
           </div>
         </div>
@@ -280,9 +289,11 @@ module Esper.CalPicker {
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
     execTz.parent().css("display", "block");
     execTz.addClass("form-control");
+    execTz.attr("id", "esper-calpicker-exec-tz");
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
     guestTz.parent().css("display", "block");
     guestTz.addClass("form-control");
+    guestTz.attr("id", "esper-calpicker-guest-tz");
 
     execTz.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(execTz);

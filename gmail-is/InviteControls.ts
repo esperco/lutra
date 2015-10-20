@@ -156,58 +156,68 @@ module Esper.InviteControls {
     duplicate=false, execEvent=true): Slides.Slide<InviteState>
   {
 '''
-<div #container>
+<div #container class="esper-bs">
   <div #heading class="esper-modal-header">
     Invite Guests
   </div>
-  <div class="esper-modal-content">
-    <div #titleRow class="esper-ev-modal-row esper-clearfix">
-      <div class="esper-ev-modal-left esper-bold">Title</div>
-        <div class="esper-ev-modal-right">
-          <input #pubTitle type="text" class="esper-input"/>
+  <div class="esper-modal-content container-fluid">
+    <div class="form-horizontal">
+      <div #titleRow class="form-group clearfix">
+        <label for="esper-invite-title"
+          class="control-label col-sm-2">Title</label>
+        <div class="col-sm-10">
+          <input id="esper-invite-title"
+            #pubTitle type="text" class="form-control"/>
         </div>
       </div>
-      <div #whereRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Location</div>
-        <div class="esper-ev-modal-right">
-          <input #pubLocation type="text" class="esper-input"/>
-          <ul #locationDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
+      <div #whereRow class="form-group clearfix">
+        <label for="esper-invite-location"
+          class="control-label col-sm-2">Location</label>
+        <div class="col-sm-10">
+          <div class="dropdown">
+            <input id="esper-invite-location" #pubLocation
+              type="text" class="form-control"/>
+            <ul #locationDropdown class="dropdown-menu" />
+          </div>
+        </div>
+      </div>
+      <div #calendarRow class="form-group clearfix">
+        <label for="esper-invite-calendar"
+          class="control-label col-sm-2">Calendar</label>
+        <div class="col-sm-10">
+          <select id="esper-invite-calendar"
+            #pubCalendar class="esper-select form-control"/>
+        </div>
+      </div>
+      <div #notesRow class="form-group clearfix">
+        <label for="esper-invite-notes" class="control-label col-sm-2">Notes</label>
+        <div class="col-sm-10">
+          <textarea id="esper-invite-notes" #pubNotes rows=8
+           class="form-control" style="min-height:100px" />
+        </div>
+      </div>
+      <div #guestsRow class="form-group clearfix">
+        <label class="control-label col-sm-2">Guests</label>
+        <div class="col-sm-10">
+          <ul #noGuestsFound class="list-group">
+            <li class="list-group-item">No Guests Found</li>
           </ul>
-        </div>
-      </div>
-      <div #calendarRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-side-by-side">
-          <div class="esper-bold">Calendar</div>
-          <div>
-            <select #pubCalendar class="esper-select"/>
+          <ul #viewPeopleInvolved class="list-group" />
+          <div class="row clearfix">
+            <div class="col-sm-5">
+              <input #newGuestName class="form-control"
+               type="text" placeholder="Name" />
+            </div>
+            <div class="col-sm-5">
+              <input #newGuestEmail class="form-control"
+               type="text" placeholder="Email" />
+            </div>
+            <div class="col-sm-2">
+              <button #addGuest class="btn btn-secondary" style="width:100%">
+                Add
+              </button>
+            </div>
           </div>
-        </div>
-        <div class="esper-ev-modal-side-by-side">
-          <div class="esper-bold">Created by</div>
-          <div>
-            <select #fromSelect class="esper-select"/>
-          </div>
-        </div>
-      </div>
-      <div #notesRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Notes</div>
-        <div class="esper-ev-modal-right">
-          <textarea #pubNotes rows=8 cols=28 class="esper-input"/>
-        </div>
-      </div>
-      <div #guestsRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Guests</div>
-        <div class="esper-ev-modal-right">
-          <ul #viewPeopleInvolved/>
-          <br/>
-          <input #newGuestName class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Name"/>
-          <input #newGuestEmail class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Email"/>
-          <button #addGuest class="esper-btn esper-btn-secondary">
-            Add
-          </button>
         </div>
       </div>
     </div>
@@ -228,7 +238,6 @@ module Esper.InviteControls {
     var event    = state.event;
 
     Sidebar.customizeSelectArrow(pubCalendar);
-    Sidebar.customizeSelectArrow(fromSelect);
 
     var headingText: string;
     var defaultTitle: string;
@@ -274,16 +283,6 @@ module Esper.InviteControls {
       calendarRow.hide();
     }
 
-    var aliases = team.team_email_aliases;
-    if (aliases.length === 0) {
-      $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-      fromSelect.prop("disabled", true);
-    } else {
-      aliases.forEach(function (email: string) {
-        $("<option>" + email + "</option>").appendTo(fromSelect);
-      });
-    }
-
     var taskPrefs;
     prefs.taskPrefs.match({
       some: function(prefs) { taskPrefs = prefs; },
@@ -301,9 +300,11 @@ module Esper.InviteControls {
                                      tz, taskPrefs);
           viewPeopleInvolved.append(v);
         });
+        noGuestsFound.hide();
+        viewPeopleInvolved.show();
       } else {
-        viewPeopleInvolved
-          .append($("<li class='esper-gray'>No guests found</li>"));
+        noGuestsFound.show();
+        viewPeopleInvolved.hide();
       }
     });
 
@@ -320,6 +321,9 @@ module Esper.InviteControls {
       viewPeopleInvolved.append(v);
       newGuestName.val("");
       newGuestEmail.val("");
+
+      noGuestsFound.hide();
+      viewPeopleInvolved.show();
     });
 
     var preferences  = prefs.execPrefs;
@@ -385,7 +389,7 @@ module Esper.InviteControls {
           timezone: preferences.general.current_timezone,
         },
         calendarId: calendarId,
-        createdBy: fromSelect.val(),
+        createdBy: Login.myEmail(),
         notes: pubNotes.val(),
         guests: guests
       });
@@ -880,10 +884,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                                      taskPrefs: ApiT.TaskPreferences,
                                      checked?: boolean) {
 '''
-<li #viewPerson>
-  <label #labelPerson>
-    <input #checkPerson type="checkbox"/>
-  </label>
+<li #viewPerson class="list-group-item">
+  <div class="row clearfix">
+    <label class="col-xs-12 col-lg-6 inline-form-text" #labelPerson>
+      <input #checkPerson type="checkbox"/>
+    </label>
+    <div #tzSelectDiv class="col-xs-12 col-lg-6" />
+  </div>
 </li>
 '''
     var display = 0 < name.length ? name + " <" + email + ">" : email;
@@ -904,11 +911,9 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       // do nothing if the guest is already correctly included or not
     });
 
-    var tzSel = Timezone.appendTimezoneSelector(labelPerson, tz);
-
-    // Make it fit properly
-    tzSel.removeClass("esper-select");
-    tzSel.css("float", "right");
+    var tzSel = Timezone.appendTimezoneSelector(tzSelectDiv, tz);
+    tzSel.parent().css("display", "block");
+    tzSel.addClass("form-control");
 
     tzSel.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(tzSel);

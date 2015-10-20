@@ -140,6 +140,21 @@
       font-weight: bold;
     }
   }
+
+  .list-group-item input[type="checkbox"] {
+    vertical-align: text-bottom;
+    margin-right: 5px;
+  }
+
+  // Use this for adjusting height of inline spans to be the same height as
+  // buttons and whatnot
+  .inline-form-text {
+    line-height: 34px;
+  }
+
+  label.inline-form-text {
+    margin-bottom: 0;
+  }
 }
 
 /* Imports in some other vendor CSS files, but only as applied to elements with
@@ -1581,7 +1596,7 @@ ul.esper-availability-graph {
   }
 }
 
-.esper-centered-container {
+.esper-centered-container, .esper-ev-inline-container {
   position : relative;
 
   margin-top : 20px;
@@ -1592,12 +1607,14 @@ ul.esper-availability-graph {
   padding-right : 10px;
 
   border : 1px solid @border;
-}
 
-.esper-ev-inline-container {
-  .esper-centered-container;
-
-  max-width : 50em;
+  .esper-modal-header {
+    padding: 16px 6px;
+    height: auto;
+  }
+  .esper-modal-footer {
+    padding: 16px 6px;
+  }
 }
 
 .esper-reminder-options {
@@ -2015,6 +2032,7 @@ ul.esper-ev-dropdown {
 
 .esper-event-control-container {
   border-top: 1px solid @google_border_gray;
+  margin-right: 14px; // To match task notes container
 
   &:empty {
     border-top: 0;
