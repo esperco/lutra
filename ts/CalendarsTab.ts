@@ -6,7 +6,7 @@ module Esper.CalendarsTab {
 
   var calendarAcls = {}; // cache of API call results
 
-  function makeCalendarRow(teamid, cal) {
+  function makeCalendarRow(teamid, cal, shared=true) {
 '''
 <tr #view class="esper-calendar-option">
   <td><input #viewBox type="checkbox" class="esper-cal-view"></td>
@@ -14,37 +14,62 @@ module Esper.CalendarsTab {
   <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
   <td><input #agendaBox type= "checkbox" class="esper-cal-agenda"></td>
   <td #calName class="esper-cal-name"/>
-  <td><button #csvButton>csv</button></td>
+  <td><a #csvButton href="#">
+    <i class="fa fa-fw fa-cloud-download"></i> Export to CSV
+  </a></td>
 </tr>
 '''
-    if (cal.calendar_default_view)
-      viewBox.prop("checked", true);
-    if (cal.calendar_default_write)
-      writeBox.prop("checked", true);
-    if (cal.calendar_default_dupe)
-      dupeBox.prop("checked", true);
-    if (cal.calendar_default_agenda)
-      agendaBox.prop("checked", true);
+    calName.text(cal.calendar_title);
 
-    calName.text(cal.calendar_title)
-           .dblclick(function() { $(this).parent().remove(); });
-
-    csvButton.click(function() {
-      var now = new Date();
-      var start = new Date(now.getTime() - 31*86400000);
-      var q = {
-        window_start: XDate.toString(start),
-        window_end:   XDate.toString(now)
+    if (shared) {
+      if (cal.calendar_default_view)
+        viewBox.prop("checked", true);
+      if (cal.calendar_default_write)
+        writeBox.prop("checked", true);
+      if (cal.calendar_default_dupe) {
+        dupeBox.prop("checked", true);
+        viewBox.prop("checked", true).prop("disabled", true);
       }
-      Api.postForCalendarEventsCSV(teamid, cal.google_cal_id, q)
-      .done(function(csv) {
-        window.open("data:text/csv;charset=utf-8," + encodeURI(csv));
+      if (cal.calendar_default_agenda) {
+        agendaBox.prop("checked", true);
+        viewBox.prop("checked", true).prop("disabled", true);
+      }
+
+      csvButton.click(function() {
+        var now = new Date();
+        var start = new Date(now.getTime() - 31*86400000);
+        var q = {
+          window_start: XDate.toString(start),
+          window_end:   XDate.toString(now)
+        }
+        Api.postForCalendarEventsCSV(teamid, cal.google_cal_id, q)
+          .done(function(csv) {
+            window.open("data:text/csv;charset=utf-8," + encodeURI(csv));
+          });
       });
-    });
+    } else {
+      csvButton.hide();
+    }
 
     view.data("calid", cal.google_cal_id)
         .data("authorized", cal.authorized_as)
         .data("timezone", cal.calendar_timezone);
+
+    dupeBox.change(function(e) {
+      if (dupeBox.prop("checked")) {
+        viewBox.prop("checked", true).prop("disabled", true);
+      } else if (! agendaBox.prop("checked")) {
+        viewBox.prop("disabled", false);
+      }
+    });
+
+    agendaBox.change(function(e) {
+      if (agendaBox.prop("checked")) {
+        viewBox.prop("checked", true).prop("disabled", true);
+      } else if (! dupeBox.prop("checked")) {
+        viewBox.prop("disabled", false);
+      }
+    });
 
     return view;
   }
@@ -76,46 +101,39 @@ module Esper.CalendarsTab {
   function makeCalendarSelectors(team, root) {
 '''
 <div #view>
-  <div style="float: left; width: 40%">
-    <div><b>All calendars:</b></div>
-    <div style="font-size: 75%">(double-click to add)</div>
-    <select #allCals multiple="multiple" size=5 />
-    <div #accountSelector/>
-  </div>
-  <div>
-    <div><b>Team calendars:</b></div>
-    <div style="font-size: 75%">(double-click to remove)</div>
-    <table #teamCals>
-      <tr>
-        <td>View</td>
-        <td>Write</td>
-        <td>Dupe</td>
-        <td>Agenda</td>
-      </tr>
-    </table>
-  </div>
-  <br/>
-  <div>
-    <button #saveCals class="button-primary">Save Team Calendars</button>
-  </div>
+  <h4>Team Calendars <small>(Uncheck All to Unshare)</small></h4>
+  <table #teamCals class="table">
+    <tr>
+      <th>View</th>
+      <th>Write</th>
+      <th>Dupe</th>
+      <th>Agenda</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </table>
+  <hr />
+  <button #saveCals class="button-primary">Save Team Calendars</button>
 </div>
 '''
-    makeAccountSelector(team, accountSelector);
-
     List.iter(team.team_calendars, function(cal) {
       makeCalendarRow(team.teamid, cal).appendTo(teamCals);
     });
 
     Api.getCalendarList(team.teamid).done(function(x) {
       List.iter(x.calendars, function(cal) {
-        $("<option>" + cal.calendar_title + "</option>")
-          .appendTo(allCals)
-          .dblclick(function() {
-            makeCalendarRow(team.teamid, cal).appendTo(teamCals);
+        var alreadyShared = !!_.find(team.team_calendars,
+          function(teamCal: ApiT.Calendar) {
+            return teamCal.google_cal_id === cal.google_cal_id;
           });
+        if (! alreadyShared) {
+          makeCalendarRow(team.teamid, cal, false).appendTo(teamCals);
+        }
       });
 
       saveCals.click(function() {
+        saveCals.prop("disabled", true);
+        saveCals.text("Saving ...");
         var teamOpts = teamCals.find(".esper-calendar-option");
         var teamCalIDs = [];
         var calData = {};
@@ -123,28 +141,45 @@ module Esper.CalendarsTab {
           var row = $(teamOpts[i]);
           var calID = row.data("calid");
           var authorizedAs = row.data("authorized");
-          teamCalIDs.push(calID);
-          calData[calID] = {
-            google_cal_id: calID,
-            authorized_as: authorizedAs,
-            calendar_timezone: row.data("timezone"),
-            calendar_title: row.find(".esper-cal-name").text(),
-            calendar_default_view: row.find(".esper-cal-view").is(":checked"),
-            calendar_default_write: row.find(".esper-cal-write").is(":checked"),
-            calendar_default_dupe: row.find(".esper-cal-dupe").is(":checked"),
-            calendar_default_agenda: row.find(".esper-cal-agenda").is(":checked")
-          };
+
+          var calendar_default_view =
+            row.find(".esper-cal-view").is(":checked");
+          var calendar_default_write =
+            row.find(".esper-cal-write").is(":checked");
+          var calendar_default_dupe =
+            row.find(".esper-cal-dupe").is(":checked");
+          var calendar_default_agenda =
+            row.find(".esper-cal-agenda").is(":checked");
+
+          if (calendar_default_view || calendar_default_write ||
+              calendar_default_dupe || calendar_default_agenda) {
+            teamCalIDs.push(calID);
+            calData[calID] = {
+              google_cal_id: calID,
+              authorized_as: authorizedAs,
+              calendar_timezone: row.data("timezone"),
+              calendar_title: row.find(".esper-cal-name").text(),
+              calendar_default_view: calendar_default_view,
+              calendar_default_write: calendar_default_write,
+              calendar_default_dupe: calendar_default_dupe,
+              calendar_default_agenda: calendar_default_agenda
+            };
+          }
         });
+
         // remove duplicates
         var uniqueCalIDs = List.union(teamCalIDs, [], undefined);
         var teamCalendars = List.map(uniqueCalIDs, function(calID) {
           return calData[calID];
         });
         Api.putTeamCalendars(team.teamid, { calendars: teamCalendars })
-          .done(function() { window.location.reload(); });
+          .done(function() {
+            Route.nav.path("team-settings/" + team.teamid + "/calendars");
+            window.location.reload();
+          });
       });
 
-      root.append(view);
+      root.empty().append(view);
     });
   }
 
@@ -289,43 +324,11 @@ module Esper.CalendarsTab {
 '''
 <div #view>
   <div #container>
-  <div #teamCalendars>
-    <div #header class="esper-h1">Team Calendars</div>
-      <div #description class="calendar-setting-description">
-        Please select which calendars to share with your Esper assistant.
-      </div>
-      <div #calendarView class="esper-loading">Loading...</div>
-      <button #share class="button-primary" style="margin-top: 10px">Share Calendars</button>
-    </div>
-    <br/>
     <div #calendarSelector/>
-    <div #accountSelector/>
-    <br/>
-    <div #emailAliases/>
   </div>
 </div>
 '''
-    if (!Login.isExecCustomer(team)) {
-      teamCalendars.hide();
-      makeCalendarSelectors(team, calendarSelector);
-      makeAliasSection(team, emailAliases);
-    } else {
-      calendarSelector.hide();
-      emailAliases.hide();
-      makeAccountSelector(team, accountSelector);
-
-      Api.getCalendarList(team.teamid)
-      .done(function(response) {
-        displayCalendarList(calendarView, response.calendars);
-
-        share.click(function() {
-          saveCalendarShares(team, calendarView, share,
-                             response.calendars)
-            .then(function() { window.location.reload(); });
-        });
-      });
-    }
-
+    makeCalendarSelectors(team, calendarSelector);
     return view;
   }
 
