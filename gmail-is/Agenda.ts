@@ -330,7 +330,8 @@ module Esper.Agenda {
 
     var timezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
 
-    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone);
+    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone,
+      null);
     tzSel.removeClass("esper-select")
          .addClass("esper-agenda-timezone-select")
          .bind("typeahead:change", renderEvents);

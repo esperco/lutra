@@ -4,19 +4,28 @@ module Esper.FileUpload {
     name : string;
     id   : string
   }
-  
+
   export function uploadWidget(onUpload) {
 '''
-<div #attachmentsRow class="esper-ev-modal-row esper-clearfix">
-  <div class="esper-ev-modal-left esper-bold">Attachments</div>
-  <div class="esper-ev-modal-right">
-    <input #attachmentPicker type="file" multiple> Attach files to event. </input>
-    <button #uploadButton type="button"> Upload files </button>
-    <span #uploadingMessage>Uploading...</span>
+<div #attachmentsRow class="form-group clearfix">
+<label class="control-label col-sm-2" for="esper-attachments">Attachments</label>
+  <div class="col-sm-10">
+    <div class="input-group">
+      <input #attachmentPicker id="esper-attachments"
+        type="file" class="form-control" multiple>
+        Attach files to event</input>
+      <span class="input-group-btn">
+        <button #uploadButton type="button" class="btn btn-secondary">
+          <span #busyMessage>Uploading &hellip;</span>
+          <span #readyMessage>Upload Files</span>
+        </button>
+      </span>
+    </div>
   </div>
 </div>
 '''
-    uploadingMessage.hide();
+    busyMessage.hide();
+    readyMessage.show();
 
     /** Upload all the files currently selected in attachmentPicker. */
     function uploadFiles() {
@@ -53,11 +62,13 @@ module Esper.FileUpload {
 
     uploadButton.click(function () {
       uploadButton.prop("disabled", true);
-      uploadingMessage.show();
+      busyMessage.show();
+      readyMessage.hide();
 
       uploadFiles().done(function (fileInfos) {
         uploadButton.prop("disabled", false);
-        uploadingMessage.hide();
+        busyMessage.hide();
+        readyMessage.show();
 
         onUpload(fileInfos);
       });
