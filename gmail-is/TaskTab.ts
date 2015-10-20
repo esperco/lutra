@@ -1020,6 +1020,7 @@ module Esper.TaskTab {
       Analytics.track(Analytics.Trackable.CreateTaskTabLinkedEvent);
     });
 
+    showTaskSpinner();
     var apiGetTask = autoTask ?
       Api.obtainTaskForThread
       : Api.getTaskForThread;
@@ -1029,8 +1030,7 @@ module Esper.TaskTab {
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
         linkedThreadsSpinner.hide();
-        taskLabelsSpinner.hide();
-        taskProgressSpinner.hide();
+        hideTaskSpinner();
 
         function showMTDrop() {
           $("select.esper-meeting-type").remove();
