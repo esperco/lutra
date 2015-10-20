@@ -380,9 +380,9 @@ module Esper.EventControls {
                                                         showTimezone));
 
             startDate.val(XDate.dateValue(start));
-            startTime.val(XDate.timeOnly24Hours(start));
+            startTime.val(XDate.localTimeOnly24Hours(start));
             endDate.val(XDate.dateValue(end));
-            endTime.val(XDate.timeOnly24Hours(end));
+            endTime.val(XDate.localTimeOnly24Hours(end));
 
             save.click(function() {
               //moment-tz apparently doesn't handle these timezones
