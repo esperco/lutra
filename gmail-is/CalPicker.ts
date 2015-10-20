@@ -571,9 +571,9 @@ module Esper.CalPicker {
 
     calendarView.fullCalendar({
       header: {
-        left: 'prev,next today',
+        left: 'today prev,next',
         center: 'title',
-        right: 'month,agendaWeek,agendaDay'
+        right: 'agendaDay,agendaWeek,month'
       },
       height: calHeight,
       defaultView: 'agendaWeek',
