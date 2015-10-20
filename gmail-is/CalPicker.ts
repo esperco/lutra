@@ -67,10 +67,11 @@ module Esper.CalPicker {
   function meetingTypeMenu() {
 '''
 <select #container class="esper-select">
-</div>
+  <option value="">Select Meeting Type</option>
+</select>
 '''
-    var types = ["other", "phone_call", "video_call", "breakfast",
-                 "brunch", "lunch", "coffee", "dinner", "drinks"];
+    var types = ["phone_call", "video_call", "breakfast",
+                 "brunch", "lunch", "coffee", "dinner", "drinks", "other"];
     types.forEach(function (type) {
 '''
 <option #option></option>
@@ -624,7 +625,7 @@ module Esper.CalPicker {
     var menu = meetingTypeMenu();
     pickerView.view.find(".fc-left").append(menu);
     menu.change(function () {
-      meetingType = menu.val();
+      meetingType = menu.val() || "other";
       pickerView.calendarView.fullCalendar("refetchEvents");
     });
     menu.click(function() {
