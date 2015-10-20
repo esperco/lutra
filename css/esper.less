@@ -155,6 +155,33 @@
   label.inline-form-text {
     margin-bottom: 0;
   }
+
+  // Style Typeahead
+  .tt-hint, .tt-input {
+    .form-control;
+  }
+
+  .tt-hint[readonly] {
+    background: white;
+    color: #ccc;
+  }
+
+  .tt-menu {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: white;
+    width: 100%;
+  }
+
+  .tt-selectable {
+    cursor: pointer;
+    padding: 7px;
+  }
+
+  .tt-cursor, .tt-selectable:hover {
+    background: @purple;
+    color: white;
+  }
 }
 
 /* Imports in some other vendor CSS files, but only as applied to elements with

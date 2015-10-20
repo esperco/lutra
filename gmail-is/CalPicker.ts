@@ -287,12 +287,8 @@ module Esper.CalPicker {
     });
 
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
-    execTz.parent().css("display", "block");
-    execTz.addClass("form-control").css("background-color", "white");
     execTz.attr("id", "esper-calpicker-exec-tz");
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
-    guestTz.parent().css("display", "block");
-    guestTz.addClass("form-control").css("background-color", "white");
     guestTz.attr("id", "esper-calpicker-guest-tz");
 
     execTz.bind("typeahead:change", function() {
