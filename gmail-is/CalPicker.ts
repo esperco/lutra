@@ -67,10 +67,11 @@ module Esper.CalPicker {
   function meetingTypeMenu() {
 '''
 <select #container class="esper-select">
-</div>
+  <option value="">Select Meeting Type</option>
+</select>
 '''
-    var types = ["other", "phone_call", "video_call", "breakfast",
-                 "brunch", "lunch", "coffee", "dinner", "drinks"];
+    var types = ["phone_call", "video_call", "breakfast",
+                 "brunch", "lunch", "coffee", "dinner", "drinks", "other"];
     types.forEach(function (type) {
 '''
 <option #option></option>
@@ -110,39 +111,48 @@ module Esper.CalPicker {
       <div class="container-fluid"><div class="row">
         <div class="col-md-6 col-lg-4">
           <div class="form-group">
-            <label class="control-label">Event Title</label>
-            <input #eventTitle type="text" class="form-control"/>
+            <label for="esper-calpicker-title"
+              class="control-label">Event Title</label>
+            <input id="esper-calpicker-title"
+              #eventTitle type="text" class="form-control"/>
           </div>
           <div class="form-group">
-            <label class="control-label">Location</label>
+            <label for="esper-calpicker-location" class="control-label">Location</label>
             <div class="dropdown">
-              <input #eventLocation type="text" class="form-control"
-                     data-toggle="dropdown" />
+              <input id="esper-calpicker-location"
+                #eventLocation type="text" class="form-control"
+                data-toggle="dropdown" />
               <ul #locationDropdown class="dropdown-menu" />
             </div>
           </div>
         </div>
         <div class="col-md-6 col-lg-4">
           <div class="form-group">
-            <label class="control-label">View Calendars</label>
+            <label for="esper-calpicker-calendars" class="control-label">
+              View Calendars</label>
             <div class="dropdown">
               <select #viewCalInput class="esper-select form-control"
+                      id="esper-calpicker-calendars"
                       data-toggle="dropdown" />
               <ul #viewCalDropdown class="dropdown-menu" />
             </div>
           </div>
           <div class="form-group">
-            <label class="control-label">Save Events To</label>
-            <select #pickerSwitcher class="esper-select form-control"/>
+            <label for="esper-calpicker-save-to"
+              class="control-label">Save Events To</label>
+            <select id="esper-calpicker-save-to"
+              #pickerSwitcher class="esper-select form-control"/>
           </div>
         </div>
         <div class="col-md-12 col-lg-4"><div class="row">
           <div class="col-md-6 col-lg-12 form-group">
-            <label class="control-label">Executive Timezone</label>
+            <label for="esper-calpicker-exec-tz"
+              class="control-label">Executive Timezone</label>
             <div #execTzDiv />
           </div>
           <div class="col-md-6 col-lg-12 form-group">
-            <label class="control-label">Guest Timezone</label>
+            <label for="esper-calpicker-guest-tz"
+              class="control-label">Guest Timezone</label>
             <div #guestTzDiv />
           </div>
         </div>
@@ -244,30 +254,48 @@ module Esper.CalPicker {
     viewCalInput.dropdown();
     viewCalInput.mousedown(function(e) {
       e.preventDefault();
-      viewCalDropdown.width(viewCalInput.width());
+      viewCalDropdown.outerWidth(viewCalInput.outerWidth());
       viewCalInput.dropdown('toggle');
       Analytics.track(Analytics.Trackable.ClickCalendarPickerViewCalendar);
     });
     List.iter(calendars, function(cal, i) {
 '''
 <li #calendarCheckboxRow class="esper-calendar-checkbox esper-li esper-click-safe">
-  <input #calendarCheckbox type="checkbox" class="esper-click-safe"/>
-  <div style="display: inline" #calendarName class="esper-click-safe"/>
+  <span #fakeCheckbox class="fa fa-fw esper-fake-checkbox" />
+  <span #calendarName class="esper-fake-checkbox-text"/>
 </li>
 '''
+      var calColor = colorForCalendar(team, cal);
+      fakeCheckbox.css("background", calColor.background);
+      fakeCheckbox.css("color", calColor.foreground);
+
+      function isChecked() {
+        return fakeCheckbox.hasClass("fa-check");
+      }
+
+      function makeChecked(checked) {
+        if (checked) {
+          fakeCheckbox.addClass("fa-check");
+        } else {
+          fakeCheckbox.removeClass("fa-check");
+        }
+      }
+
       if (cal.calendar_default_view) {
-        calendarCheckbox.prop("checked", true);
+        makeChecked(true);
       }
       var abbr = zoneAbbr(cal.calendar_timezone);
       calendarCheckboxRow.click(function() {
-        calendarCheckbox.trigger("click");
+        fakeCheckbox.click();
       });
-      calendarCheckbox.click(function(e) {
+      fakeCheckbox.click(function(e) {
         e.stopPropagation();
-        if (this.checked) {
-          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-        } else {
+        if (isChecked()) {
+          makeChecked(false);
           delete showCalendars[cal.google_cal_id];
+        } else {
+          makeChecked(true);
+          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
         }
         calendarView.fullCalendar("refetchEvents");
         updateCalendarViewList();
@@ -278,11 +306,9 @@ module Esper.CalPicker {
     });
 
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
-    execTz.parent().css("display", "block");
-    execTz.addClass("form-control");
+    execTz.attr("id", "esper-calpicker-exec-tz");
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
-    guestTz.parent().css("display", "block");
-    guestTz.addClass("form-control");
+    guestTz.attr("id", "esper-calpicker-guest-tz");
 
     execTz.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(execTz);
@@ -390,10 +416,9 @@ module Esper.CalPicker {
             List.find(team.team_calendars, function(cal : ApiT.Calendar) {
               return cal.google_cal_id === x.google_cal_id;
             });
-          if (/ Ghost$/.test(evCal.calendar_title)) {
-            ev["color"] = "#BCBEC0"; // @gray_30
-          }
-
+          var colors = colorForCalendar(team, evCal);
+          ev["color"] = colors.background;
+          ev["textColor"] = colors.foreground;
           return ev;
         });
       },
@@ -571,9 +596,9 @@ module Esper.CalPicker {
 
     calendarView.fullCalendar({
       header: {
-        left: 'prev,next today',
+        left: 'today prev,next',
         center: 'title',
-        right: 'month,agendaWeek,agendaDay'
+        right: 'agendaDay,agendaWeek,month'
       },
       height: calHeight,
       defaultView: 'agendaWeek',
@@ -624,7 +649,7 @@ module Esper.CalPicker {
     var menu = meetingTypeMenu();
     pickerView.view.find(".fc-left").append(menu);
     menu.change(function () {
-      meetingType = menu.val();
+      meetingType = menu.val() || "other";
       pickerView.calendarView.fullCalendar("refetchEvents");
     });
     menu.click(function() {
@@ -1049,5 +1074,69 @@ module Esper.CalPicker {
 
   function hideCalPickerSpinner(): void {
     InThreadControls.setEventControlContainer($(`<span />`));
+  }
+
+  /*
+    Currently no way to get calendar colors from Google without backend changes,
+    so let's just use some pre-assigned colors based on the order in which
+    we get our list of calendars for the team.
+
+    Colors are pulled from Google Calendar and arranged in a way that ensures
+    at least some contrast between neighboring colors in the list.
+  */
+  var presetColors: string[] = [
+    "#9FE1E7",
+    "#FFAD46",
+    "#42D692",
+    "#9A9CFF",
+    "#FF7537",
+    "#92E1C0",
+    "#AC725E",
+    "#16A765",
+    "#D06B64",
+    "#B99AFF",
+    "#F83A22",
+    "#C2C2C2",
+    "#9FC6E7",
+    "#FBE983",
+    "#7BD148",
+    // "#CD74E6", -- This color is too close to our "active" calendar color
+    "#F691B2",
+    "#CABDBF",
+    "#4986E7",
+    "#FAD165",
+    "#B3DC6C",
+    "#A47AE2",
+    "#FA573C",
+    "#CCA6AC"
+  ];
+
+  interface eventColor {
+    background: string;
+    foreground: string;
+  }
+
+  function colorForCalendar(team: ApiT.Team, calendar: ApiT.Calendar)
+    : eventColor
+  {
+    var index = _.findIndex(team.team_calendars, function(teamCal) {
+      return teamCal.google_cal_id === calendar.google_cal_id;
+    });
+
+    // Ghost calendar check
+    if (/ Ghost$/.test(calendar.calendar_title)) {
+      return {
+        background: "#BCBEC0", // @gray_30
+        foreground: "333"
+      };
+    }
+
+    if (index < 0) {
+      index = 0;
+    }
+    return {
+      background: presetColors[index % presetColors.length],
+      foreground: "#333"
+    };
   }
 }

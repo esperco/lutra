@@ -355,13 +355,13 @@ module Esper.Timezone {
     });
   }
 
-  export function appendTimezoneSelector(parent, selected) {
+  export function appendTimezoneSelector(parent, selected, display="block") {
 '''
 <input #selector class="typeahead" type="text"/>
 '''
     parent.append(selector);
     selector.typeahead(
-      { highlight: true
+      { highlight: true,
       },
       { name: "timezones",
         source: function(query, sync, async) {
@@ -373,6 +373,11 @@ module Esper.Timezone {
     if (value) {
       selector.typeahead('val', value);
     }
+
+    if (display) {
+      selector.parent().css("display", display);
+    }
+
     return selector;
   }
 

@@ -140,6 +140,48 @@
       font-weight: bold;
     }
   }
+
+  .list-group-item input[type="checkbox"] {
+    vertical-align: text-bottom;
+    margin-right: 5px;
+  }
+
+  // Use this for adjusting height of inline spans to be the same height as
+  // buttons and whatnot
+  .inline-form-text {
+    line-height: 34px;
+  }
+
+  label.inline-form-text {
+    margin-bottom: 0;
+  }
+
+  // Style Typeahead
+  .tt-hint, .tt-input {
+    .form-control;
+  }
+
+  .tt-hint[readonly] {
+    background: white;
+    color: #ccc;
+  }
+
+  .tt-menu {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: white;
+    width: 100%;
+  }
+
+  .tt-selectable {
+    cursor: pointer;
+    padding: 7px;
+  }
+
+  .tt-cursor, .tt-selectable:hover {
+    background: @purple;
+    color: white;
+  }
 }
 
 /* Imports in some other vendor CSS files, but only as applied to elements with
@@ -171,6 +213,25 @@
       padding: 12px 15px;
       min-height: 100px;
     }
+  }
+
+  // A checkbox in which to insert fontawesome checks
+  .esper-fake-checkbox {
+    display: block;
+    height: 1.28571429em;
+    line-height: 1.28571429em;
+    width: 1.28571429em;
+    border-radius: 5px;
+    margin-right: 7px;
+    float: left;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.16);
+  }
+
+  .esper-fake-checkbox-text {
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.28571429em;
   }
 }
 
@@ -340,7 +401,7 @@ ul.esper-drop-ul {
 li.esper-li, a.esper-a {
   display: block;
   position: relative;
-  padding: 7px 16px;
+  padding: 7px;
   color: black;
   line-height: 1;
   text-align: left;
@@ -1581,7 +1642,7 @@ ul.esper-availability-graph {
   }
 }
 
-.esper-centered-container {
+.esper-centered-container, .esper-ev-inline-container {
   position : relative;
 
   margin-top : 20px;
@@ -1592,12 +1653,14 @@ ul.esper-availability-graph {
   padding-right : 10px;
 
   border : 1px solid @border;
-}
 
-.esper-ev-inline-container {
-  .esper-centered-container;
-
-  max-width : 50em;
+  .esper-modal-header {
+    padding: 16px 6px;
+    height: auto;
+  }
+  .esper-modal-footer {
+    padding: 16px 6px;
+  }
 }
 
 .esper-reminder-options {
@@ -2015,6 +2078,7 @@ ul.esper-ev-dropdown {
 
 .esper-event-control-container {
   border-top: 1px solid @google_border_gray;
+  margin-right: 14px; // To match task notes container
 
   &:empty {
     border-top: 0;
