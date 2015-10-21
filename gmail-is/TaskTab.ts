@@ -669,7 +669,6 @@ module Esper.TaskTab {
     headerContent: JQuery;
 
     taskProgressContainer: JQuery;
-    taskProgressSpinner: JQuery;
 
     linkedThreadsHeader: JQuery;
     showLinkedThreads: JQuery;
@@ -784,11 +783,7 @@ module Esper.TaskTab {
         <div class="esper-click-safe esper-drop-ul-divider"/>
         <div #taskSearchActions class="esper-dropdown-section"/>
       </ul>
-      <div #taskProgressContainer>
-        <div #taskProgressSpinner class="esper-events-list-loading">
-          <div class="esper-spinner esper-list-spinner"/>
-        </div>
-      </div>
+      <div #taskProgressContainer />
     </div>
   </div>
   <div class="esper-tab-overflow">
