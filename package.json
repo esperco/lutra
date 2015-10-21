@@ -1,0 +1,16 @@
+{
+  "name": "zorilla",
+  "version": "0.1.0",
+  "description": "Directory frontend",
+  "scripts": {
+    "build": "gulp build --timeout 30000",
+    "build-production": "gulp build-production --timeout 30000",
+    "serve": "gulp http-server",
+    "rebuild": "gulp rebuild",
+    "watch": "gulp watch --timeout 30000"
+  },
+  "devDependencies": {
+    "gulp": "git://github.com/gulpjs/gulp.git#bbe3c56138a9ede627879d7e47daffd0a6d9b6db"
+  },
+  "dependencies": {}
+}

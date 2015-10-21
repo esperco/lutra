@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Jasmine Spec Runner</title>
+  <link rel="stylesheet" href="/test/jasmine.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/vendor.css">
+  <script src="/test/jasmine.js"></script>
+  <script src="/test/jasmine-html.js"></script>
+  <script src="/test/boot.js"></script>
+  <script type="text/javascript">
+    function toggleTestFrame() {
+      "use strict"; /* global document */
+      var frame = document.getElementById("esper-test-frame");
+      frame.className = frame.className ? "" : "hide";
+    }
+  </script>
+  <style>
+    body {
+      padding-bottom: 50px;
+    }
+
+    #esper-test-frame-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+    }
+
+    #esper-test-frame-container button {
+      float: right;
+      background: #007069;
+      padding: 5px 10px;
+      border: 0;
+      color: white;
+      cursor: pointer;
+    }
+
+    #esper-test-frame.hide {
+      display: none;
+    }
+
+    #esper-test-frame {
+      resize: both;
+      overflow: auto;
+      display: block;
+      clear: both;
+      border: 1px solid #007069;
+    }
+  </style>
+</head>
+<body>
+  <div id="esper-test-frame-container">
+    <button onclick="toggleTestFrame();">Test Frame</button>
+    <iframe id="esper-test-frame" class="hide"></iframe>
+  </div>
+  <script type="text/javascript" src="/js/vendor.js"></script>
+  <script type="text/javascript" src="/js/app.js"></script>
+</body>
+</html>
+
