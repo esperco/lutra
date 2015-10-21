@@ -465,6 +465,13 @@ module Esper.Sidebar {
 
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
+    // Don't draw sidebar if opt out of displaying
+    var defaultState = ExtensionOptions.store.val();
+    if (defaultState && defaultState.defaultSidebarState ===
+        ExtensionOptions.SidebarOpts.NONE) {
+      return;
+    }
+
     function retry() {
       Log.d("Trying to display Esper sidebar...");
       var rootElement = insertEsperRoot();

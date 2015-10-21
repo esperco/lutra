@@ -9,7 +9,12 @@ module Esper.Message {
     // Request and push updates to Gmail ThreadState
     RequestThreadState,  // Request thread state from storage
     ThreadStateData,     // Data from storage
-    ThreadStateUpdate,    // Update from user to save to storage
+    ThreadStateUpdate,   // Update from user to save to storage
+
+    // Request and push updates to Gcal EventSidebarState
+    RequestEventState,  // Request from storage
+    EventStateData,     // Data from storage
+    EventStateUpdate,   // Updat from user to save to storage
 
     // Open Extension options page
     OpenExtensionOptions,
