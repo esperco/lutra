@@ -28,4 +28,15 @@ module Esper.ExtensionOptions {
     showCopySelection: CopySelectionOpts;
   };
 
+  // Convert options dict to string dict, e.g. for analytics purposes
+  export function enumToString(opts: Options): {[index:string]: string} {
+    var ret: { [index: string]: string } = {};
+
+    return {
+      defaultSidebarState: SidebarOpts[opts.defaultSidebarState],
+      calendarSidebarState: SidebarOpts[opts.calendarSidebarState],
+      displayComposeControls: ComposeControlsOpts[opts.displayComposeControls],
+      showCopySelection: CopySelectionOpts[opts.showCopySelection]
+    };
+  }
 }

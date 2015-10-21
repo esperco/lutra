@@ -10,6 +10,7 @@
 /// <reference path="./Analytics.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Message.ts" />
+/// <reference path="./ExtensionOptions.Storage.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.Analytics {
@@ -55,12 +56,20 @@ module Esper.Analytics {
     // Identify with some traits -- but only after flushing any anon calls
     // so we can mitigate chance of MixPanel race conditions
     analytics.flush(function() {
-      analytics.identify({
-        userId: uid,
-        traits: {
-          email: Login.myEmail() || Login.myGoogleAccountId(),
-          teams: _.pluck(Login.myTeams(), 'teamid')
-        }
+
+      ExtensionOptions.load(function(opts) {
+        var optsFlattened: { [index: string]: string } = {};
+        _.each(ExtensionOptions.enumToString(opts), function(v,k) {
+          optsFlattened["opts." + k] = v;
+        });
+
+        analytics.identify({
+          userId: uid,
+          traits: _.extend({
+            email: Login.myEmail() || Login.myGoogleAccountId(),
+            teams: _.pluck(Login.myTeams(), 'teamid'),
+          }, optsFlattened)
+        });
       });
 
       // Associate users with team groups
