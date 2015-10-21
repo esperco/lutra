@@ -1,3 +1,5 @@
+/// <reference path="./Util.ts" />
+
 module Esper.Log {
   /*
     Change this tag to distinguish between different scripts
@@ -58,7 +60,7 @@ module Esper.Log {
     // Trace in dev mode (unless error, since error traces itself)
     var extraTrace = false;
     if (consoleFunc !== console.error && enableTracing && !Esper.PRODUCTION) {
-      if (window["chrome"]) {
+      if (window.hasOwnProperty("chrome")) {
         // Chrome's console.trace actually showsmessage in trace, so replace
         // consoleFunc with trace
         consoleFunc = console.trace;
