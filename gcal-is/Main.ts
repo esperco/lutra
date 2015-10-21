@@ -34,6 +34,9 @@
 
 /// <reference path="../common/Menu.ts" />
 /// <reference path="../common/Option.ts" />
+/// <reference path="../common/TaskList.ts" />
+/// <reference path="../common/Agenda.ts" />
+/// <reference path="../common/Timezone.ts" />
 
 /// <reference path="./Gcal.ts" />
 /// <reference path="./ActiveEvents.ts" />

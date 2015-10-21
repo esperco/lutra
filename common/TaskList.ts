@@ -48,7 +48,7 @@ module Esper.TaskList {
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
     });
-    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
+    //timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined) {
       title.text(e.title);

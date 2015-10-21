@@ -200,6 +200,8 @@ module Esper.Init {
 
       // Initialize watcher of current eventId
       CurrentEvent.init();
+
+      Timezone.init();
     }
   }
 }

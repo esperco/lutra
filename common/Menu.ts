@@ -77,15 +77,15 @@ module Esper.Menu {
                                      openOptionsPage);
 
     var agendaLink = makeActionLink("Get Agenda", function() {
-      // var agendaModal = Agenda.renderModal(currentTeam.get());
-      // $("body").append(agendaModal.view);
-      // Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
+      var agendaModal = Agenda.renderModal(currentTeam.get());
+      $("body").append(agendaModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetAgenda);
     });
 
     var taskListLink = makeActionLink("Get Task List", function() {
-      // var taskListModal = TaskList.renderModal(currentTeam.get());
-      // $("body").append(taskListModal.view);
-      // Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
+      var taskListModal = TaskList.renderModal(currentTeam.get());
+      $("body").append(taskListModal.view);
+      Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     });
 
     var hr = $("<hr>").addClass("esper-menu-hr");
