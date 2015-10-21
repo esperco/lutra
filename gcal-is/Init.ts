@@ -1,3 +1,4 @@
+/// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="./CurrentEvent.ts" />
@@ -179,6 +180,9 @@ module Esper.Init {
       alreadyInitialized = true;
       listenForMessages();
       obtainCredentials();
+
+      // Initialize options data model
+      ExtensionOptions.init();
 
       // Init team preferences once login info set
       Login.watchableInfo.watch(function(data, valid, oldData, oldValid) {

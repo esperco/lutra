@@ -8,6 +8,7 @@
 /// <reference path="../marten/ts/JQStore.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
+/// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="./TaskLabels.Gcal.tsx" />
 /// <reference path="./CurrentEvent.ts" />
 
@@ -41,8 +42,9 @@ module Esper.CalSidebar {
   //////
 
   // Track sidebar min/max state by eventId
-  enum SidebarState { HIDE, SHOW };
-  var sidebarStateStore = new Model.CappedStore<SidebarState>();
+  var cap = 100;
+  var sidebarStateStore = new
+    Model.CappedStore<ExtensionOptions.SidebarOpts>(cap);
 
   function stringifyEventId(fullEventId: Types.FullEventId) {
     return fullEventId.calendarId + " " + fullEventId.eventId;
@@ -52,23 +54,43 @@ module Esper.CalSidebar {
     var _id = fullEventId && stringifyEventId(fullEventId);
     var ret = _id && sidebarStateStore.val(_id);
     if (_.isUndefined(ret)) {
-      return SidebarState.SHOW; // Default (TODO: Defer to options)
+      var opts = ExtensionOptions.store.val();
+      ret = (opts ? opts.calendarSidebarState :
+             ExtensionOptions.SidebarOpts.SHOW);
     }
     return ret;
   }
 
   function setSidebarState(fullEventId: Types.FullEventId,
-                           state: SidebarState) {
+                           state: ExtensionOptions.SidebarOpts) {
     var _id = stringifyEventId(fullEventId);
     sidebarStateStore.set(_id, state);
   }
+
+  /*
+    List of 2-tuples from stringified eventIds to sidebar state, as formmated
+    for local storage
+  */
+  type EventSidebarData = Array<[string, ExtensionOptions.SidebarOpts]>;
+
+  // Var we can toggle to keep listener from posting changes to Content Script
+  var quietSidebarChanges = false;
+
+  // Change listener that posts thread state to Content Script
+  var storeSidebarChanges = function(_ids: string[]) {
+    if (!quietSidebarChanges) {
+      Message.post(Message.Type.EventStateUpdate, _.map(_ids, function(_id) {
+        return [_id, sidebarStateStore.val(_id)];
+      }));
+    }
+  };
 
 
   //////
 
   interface SidebarAttrs {
     eventId: Types.FullEventId;
-    sidebarState: SidebarState;
+    sidebarState: ExtensionOptions.SidebarOpts;
     task: ApiT.Task|ApiT.NewTask;
     taskMetadata: Model.StoreMetadata;
     team: ApiT.Team;
@@ -76,7 +98,8 @@ module Esper.CalSidebar {
 
   class SidebarAndDock extends Component<{}, SidebarAttrs> {
     render() {
-      if (Login.loggedIn() && this.state.eventId) {
+      if (Login.loggedIn() && this.state.eventId &&
+          this.state.sidebarState !== ExtensionOptions.SidebarOpts.NONE) {
         return (<div>
           <Sidebar
             eventId={this.state.eventId}
@@ -103,6 +126,7 @@ module Esper.CalSidebar {
     componentDidMount() {
       // This ensures our sidebar gets updated if eventId or task changes
       this.setSources([
+        ExtensionOptions.store,
         CurrentEvent.eventIdStore,
         CurrentEvent.teamStore,
         CurrentEvent.taskStore,
@@ -118,7 +142,19 @@ module Esper.CalSidebar {
       var task = CurrentEvent.taskStore.val();
       var taskMetadata = CurrentEvent.taskStore.metadata();
       var team = CurrentEvent.teamStore.val();
-      var sidebarState = getSidebarState(eventId);
+
+      var sidebarState: ExtensionOptions.SidebarOpts;
+      var optState = ExtensionOptions.store.val();
+      if (optState && (
+          optState.calendarSidebarState ===
+            ExtensionOptions.SidebarOpts.SHOW ||
+          optState.calendarSidebarState ===
+            ExtensionOptions.SidebarOpts.HIDE)) {
+        sidebarState = getSidebarState(eventId);
+      } else {
+        sidebarState = ExtensionOptions.SidebarOpts.NONE;
+      }
+
       return {
         eventId: eventId,
         task: task,
@@ -136,7 +172,7 @@ module Esper.CalSidebar {
         this.props.taskMetadata.dataStatus === Model.DataStatus.FETCHING);
 
       var showSidebar = (this.props.team &&
-        this.props.sidebarState === SidebarState.SHOW);
+        this.props.sidebarState === ExtensionOptions.SidebarOpts.SHOW);
       return (<div className={"esper-sidebar esper-sidebar-simple " +
                               (showSidebar ? "" : "esper-hide")}>
         {
@@ -173,7 +209,7 @@ module Esper.CalSidebar {
         teamName = (<span className="esper-unknown-team">Unknown Team</span>);
       }
       var showWrap = (this.props.team &&
-        this.props.sidebarState === SidebarState.SHOW);
+        this.props.sidebarState === ExtensionOptions.SidebarOpts.SHOW);
 
       return (<div className="esper-dock-container">
         <div className={"esper-dock-wrap " + (showWrap ? "" : "esper-hide")}>
@@ -198,8 +234,10 @@ module Esper.CalSidebar {
 
     toggleSidebar() {
       if (this.props.eventId) {
-        var nextState = (this.props.sidebarState === SidebarState.HIDE ?
-          SidebarState.SHOW : SidebarState.HIDE);
+        var nextState = (
+          this.props.sidebarState === ExtensionOptions.SidebarOpts.HIDE ?
+            ExtensionOptions.SidebarOpts.SHOW :
+            ExtensionOptions.SidebarOpts.HIDE);
         setSidebarState(this.props.eventId, nextState);
       }
     }
@@ -303,6 +341,33 @@ module Esper.CalSidebar {
   }
 
   export function init() {
+    // Add our post-to-CS listener
+    sidebarStateStore.addChangeListener(storeSidebarChanges);
+
+    // Update options based on value from posted messages from Content Script
+    Message.listen(Message.Type.EventStateData,
+      function(data: EventSidebarData) {
+
+        // Silence listener while initializing
+        quietSidebarChanges = true;
+
+        _.each(data, function(datum) {
+          var _id = datum[0];
+          var state = datum[1];
+
+          // Don't override existing local state
+          if (!sidebarStateStore.has(_id)) {
+            sidebarStateStore.insert(_id, state);
+          }
+        });
+
+        quietSidebarChanges = false;
+      });
+
+    // Post initial request for data (response handled by listener above)
+    Message.post(Message.Type.RequestEventState);
+
+
     /*
       Render on init -- we may want to tie the render function to some sort
       of watcher later to ensure our anchor point gets re-added if necessary,
