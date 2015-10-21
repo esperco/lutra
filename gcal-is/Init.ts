@@ -92,14 +92,32 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
+    Menu.init();
     if (Login.loggedIn()) {
       Login.getLoginInfo()
         .done(function(loginInfo) {
           insertTeamSelector(loginInfo.teams);
           CalEventView.init();
         });
+    } else {
+      Menu.create();
     }
   }
+
+  /*
+    Watch for login changes and reinject the Esper controls
+   */
+  Login.watchableAccount.watch(function(newAccount, newValidity,
+    oldAccount, oldValidity) {
+    console.error("LELELELELELLELELELEELELE");
+    if (newValidity === true) {
+      injectEsperControls();
+    }
+    else {
+      /* Redraw main menu (remove "log out" option, add "log in" option) */
+      Menu.create();
+    }
+  });
 
   /*
     Check if the credentials we received from the content script

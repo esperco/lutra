@@ -32,6 +32,9 @@
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/Analytics.IS.ts" />
 
+/// <reference path="../common/Menu.ts" />
+/// <reference path="../common/Option.ts" />
+
 /// <reference path="./Gcal.ts" />
 /// <reference path="./ActiveEvents.ts" />
 /// <reference path="./CalEventView.ts" />
