@@ -24,7 +24,7 @@ module Esper.ThreadState {
   var loadDeferred = $.Deferred();
   export var loaded = loadDeferred.promise();
 
-  // Var we can toggle to keep listener fro posting changes to Content Script
+  // Var we can toggle to keep listener from posting changes to Content Script
   var quiet = false;
 
   // Change listener that posts thread state to Content Script

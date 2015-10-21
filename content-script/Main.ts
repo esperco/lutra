@@ -33,6 +33,7 @@
 /// <reference path="./Auth.ts" />
 /// <reference path="./Location.ts" />
 /// <reference path="./ThreadState.Storage.ts" />
+/// <reference path="./CalSidebar.Storage.ts" />
 
 
 module Esper.Main {
@@ -75,6 +76,7 @@ module Esper.Main {
     Auth.init();
     ExtensionOptions.init();
     ThreadState.init();
+    CalSidebar.init();
 
     // Miscellaneous messaging setup
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);
