@@ -109,7 +109,6 @@ module Esper.Init {
    */
   Login.watchableAccount.watch(function(newAccount, newValidity,
     oldAccount, oldValidity) {
-    console.error("LELELELELELLELELELEELELE");
     if (newValidity === true) {
       injectEsperControls();
     }

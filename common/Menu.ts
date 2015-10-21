@@ -4,7 +4,7 @@
 */
 
 /// <reference path="../common/Analytics.ts" />
-
+/// <reference path="../common/CurrentTeam.ts" />
 module Esper.Menu {
   /*
     The current team for the purpose of offering a default choice
@@ -54,13 +54,9 @@ module Esper.Menu {
     return link;
   }
 
-  function lel() { };
   function updateLinks(ul) {
-    var loggedIn = Login.loggedIn();
-
-    var signIOLink = loggedIn?
-      makeActionLink("Sign out", Login.logout)
-      : makeActionLink("Sign in", /*Init.login*/lel);
+    //sign-in is now done with onboarding
+    var signIOLink = makeActionLink("Sign out", Login.logout)
 
     function openSettings() {
       window.open(Conf.Api.url);
@@ -201,15 +197,15 @@ module Esper.Menu {
       create();
     });
 
-    // CurrentThread.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
-    //   team.match({
-    //     some : function (team) {
-    //       currentTeam.set(team);
-    //     },
-    //     none : function () {
-    //       // do nothing
-    //     }
-    //   });
-    // });
+    CurrentTeam.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
+      team.match({
+        some : function (team) {
+          currentTeam.set(team);
+        },
+        none : function () {
+          // do nothing
+        }
+      });
+    });
   }
 }
