@@ -972,10 +972,10 @@ module Esper.TaskTab {
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedThreadsAction = function() {
       refreshLinkedThreadsList(team, threadId, taskTabView);
-      if (linkedThreadsContainer.css("display") === "none") {
-        Sidebar.toggleList(linkedThreadsContainer);
-        showLinkedEvents.text("Hide");
-        linkedEventsHeader.addClass("esper-open");
+      if (linkedThreadsList.css("display") === "none") {
+        Sidebar.toggleList(linkedThreadsList);
+        showLinkedThreads.text("Hide");
+        linkedThreadsHeader.addClass("esper-open");
       }
     };
     refreshLinkedThreads.click(refreshLinkedThreadsAction);
@@ -984,8 +984,8 @@ module Esper.TaskTab {
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
       refreshLinkedEventsList(team, threadId, taskTabView);
-      if (linkedEventsContainer.css("display") === "none") {
-        Sidebar.toggleList(linkedEventsContainer);
+      if (linkedEventsList.css("display") === "none") {
+        Sidebar.toggleList(linkedEventsList);
         showLinkedEvents.text("Hide");
         linkedEventsHeader.addClass("esper-open");
       }
@@ -1000,7 +1000,7 @@ module Esper.TaskTab {
     refreshWorkflowList(team, threadId, taskTabView);
 
     showLinkedThreads.click(function() {
-      Sidebar.toggleList(linkedThreadsContainer);
+      Sidebar.toggleList(linkedThreadsList);
       if (showLinkedThreads.text() === "Hide") {
         showLinkedThreads.text("Show");
         linkedThreadsHeader.removeClass("esper-open");
@@ -1011,7 +1011,7 @@ module Esper.TaskTab {
     });
 
     showLinkedEvents.click(function() {
-      Sidebar.toggleList(linkedEventsContainer);
+      Sidebar.toggleList(linkedEventsList);
       if (showLinkedEvents.text() === "Hide") {
         showLinkedEvents.text("Show");
         linkActions.removeClass("esper-open");

@@ -49,8 +49,8 @@ module Esper.GmailSearch {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
+    startTime.text(XDate.utcToLocalTimeOnly(start));
+    endTime.text(XDate.utcToLocalTimeOnly(end));
 
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
