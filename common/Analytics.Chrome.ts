@@ -109,6 +109,7 @@ module Esper.Analytics {
           anonymous: true
         }
       });
+      analytics.flush();
     }
     return _anonId;
   }
