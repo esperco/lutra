@@ -7,9 +7,6 @@ module Esper.Log {
   */
   export var tag = "Esper";
 
-  /* Enable this to turn all log messages into traces in development */
-  export var enableTracing = true;
-
   // Shims
   if (! window.console) {
     window.console = <any>{ log: function () {} };
@@ -54,22 +51,6 @@ module Esper.Log {
 
     // Add prefix tag
     args.unshift(prefix ? tag + " " + prefix : tag);
-
-    // If we're not using Chrome --> don't tra
-
-    // Trace in dev mode (unless error, since error traces itself)
-    var extraTrace = false;
-    if (consoleFunc !== console.error && enableTracing && !Esper.PRODUCTION) {
-      if (window.hasOwnProperty("chrome")) {
-        // Chrome's console.trace actually showsmessage in trace, so replace
-        // consoleFunc with trace
-        consoleFunc = console.trace;
-      } else {
-        // Trace message now display, so trace now and then run original
-        // consoleFunc again
-        console.trace.apply(console, args);
-      }
-    }
 
     // Log
     consoleFunc.apply(console, args);
