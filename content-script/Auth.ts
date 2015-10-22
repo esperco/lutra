@@ -91,8 +91,13 @@ module Esper.Auth {
         Login.setAccount(x);
         if (!x.declined || forceLogin) {
           if (x.credentials !== undefined) {
-            Login.getLoginInfo().always(Analytics.identify);
-            sendCredentialsResponse(x);
+            Login.getLoginInfo().done(function(info) {
+              if (info.teams && info.teams.length > 0) {
+                sendCredentialsResponse(x);
+              } else {
+                openWelcomeModal(x);
+              }
+            }).always(Analytics.identify);
           }
           else {
             openWelcomeModal(x);
